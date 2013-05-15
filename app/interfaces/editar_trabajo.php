@@ -82,9 +82,10 @@
 		}
 
 		/*
-		hemos cambiado el cliente por lo tanto
-		este trabajo tomará un cobro CREADO del asunto, sino NULL
+		*    hemos cambiado el cliente por lo tanto
+		*    este trabajo tomará un cobro CREADO del asunto, sino NULL
 		*/
+
 		if (!$codigo_asunto_secundario) {
 			//se carga el codigo secundario
 			$asunto = new Asunto($sesion);
@@ -100,7 +101,10 @@
 			$codigo_asunto = $asunto->fields['codigo_asunto'];
 		}
 
-		// revisar para codigo secundario
+		/*
+		*	revisar para codigo secundario
+		*/
+
 		if ($codigo_asunto != $t->fields['codigo_asunto']) {
 			$contrato_anterior = new Contrato($sesion);
 			$contrato_modificado = new Contrato($sesion);
@@ -252,7 +256,9 @@
 				// Si el asunto no es cobrable
 				if ($asunto->fields['cobrable'] == 0) {
 					$t->Edit("cobrable",'0');
-					$t->Edit("visible",'0');
+					/*
+					*	$t->Edit("visible",'0');
+					*/
 					$pagina->AddInfo(__('El Trabajo se guardó como NO COBRABLE (Por Maestro).'));
 				}
 				if (!$id_usuario) {
@@ -274,10 +280,13 @@
 				}
 
 
-// Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
-//                             if ($t->fields['cobrable'] == 0) {
-//                                     $t->fields['duracion_cobrada']='00:00:00';
-//                             }
+				/*
+				*	Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
+				* 
+				*   if ($t->fields['cobrable'] == 0) {
+				*		$t->fields['duracion_cobrada']='00:00:00';
+				*	}
+				*/   
 
 				$ingreso_valido = true;
 				if ($cambio_duracion || $cambio_fecha) {
@@ -792,22 +801,20 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 					<?php } ?>
 				</td>
 				<td align=left>
-					<?php  if ($mostrar_cobrable) { 		 ?>
-
-					<input type="checkbox" style="display:inline;" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
-					<?php } 	else { ?>
-					<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
+					<?php if ($mostrar_cobrable) { ?>
+						<input type="checkbox" style="display:inline;" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
+					<?php } else { ?>
+						<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
 					<?php } ?>
 					&nbsp;&nbsp;
 					<div id=divVisible style="display:inline">
-					<?php if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
-						echo __('Visible');
-						echo "<input  style=\"display:inline;\" type=\"checkbox\" name=\"visible\" value=\"1\" checked=". (($t->fields['visible'] == 1)? '"checked"' : '""') ." id=\"chkVisible\" onMouseover=\"ddrivetip('Trabajo será visible en la ". __('Nota de Cobro')."')\" onMouseout=\"hideddrivetip()\"/>";
-					 } else {
-
-						echo "<input type=\"hidden\" name=\"visible\" value=\"". (($t->fields['visible']) ? $t->fields['visible'] : 1) ."\" id=\"hiddenVisible\" />";
-					 }
-					?>
+					<?php if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) { ?>
+						<?php echo __('Visible'); ?>
+						<input type="hidden" name="visible" value="0" />
+						<input  style="display:inline;" type="checkbox" name="visible" value="1" <?php echo ($t->fields['visible'] == 1) ? 'checked="checked"' : ''; ?> id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la <?php echo __('Nota de Cobro'); ?>')" onMouseout="hideddrivetip()"/>
+					<?php } else { ?>
+						<input type="hidden" name="visible" value="<?php echo $t->fields['visible'] ? $t->fields['visible'] : 1; ?>" id="hiddenVisible" />
+					<?php } ?>
 					</div>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 <?php
@@ -1505,9 +1512,9 @@ function AgregarNuevo(tipo)
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
 		} else {
-			//jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
 			jQuery('#divVisible').show();
-			//jQuery('.seccioncobrable').hide();
+			jQuery('.seccioncobrable').hide();
 		}
 	});
 	if (jQuery('#chkCobrable').is(':checked')) {
@@ -1515,9 +1522,9 @@ function AgregarNuevo(tipo)
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
 		} else {
-			//jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
 			jQuery('#divVisible').show();
-			//jQuery('.seccioncobrable').hide();
+			jQuery('.seccioncobrable').hide();
 		}
 
 			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
