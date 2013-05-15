@@ -287,8 +287,11 @@ if ($opcion == "guardar") {
 		//$asunto->EditarTodos();
 		$asunto->Edit("id_usuario", $sesion->usuario->fields['id_usuario']);
 		$asunto->Edit("codigo_asunto", $codigo_asunto, true);
+
+		$caracteres = strlen($codigo_asunto_secundario);
+
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-			$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -4));
+			$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -$caracteres));
 		} else {
 			if ($codigo_asunto_secundario) {
 				$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
@@ -948,7 +951,7 @@ if ($usuario_responsable_obligatorio) {
 								<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
 								<?php
 								if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='5' value='" . substr($asunto->fields['codigo_asunto_secundario'], -4) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
+									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . substr($asunto->fields['codigo_asunto_secundario'], -$caracteres) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/> 
 						<span style='color:#FF0000; font-size:10px'>*</span>";
 								} else {
 									if ($asunto->fields['codigo_asunto_secundario'] != '')

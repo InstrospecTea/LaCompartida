@@ -836,7 +836,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$fecha_primer_trabajo = $cobro->fields['fecha_ini'];
 		$fecha_ultimo_trabajo = $cobro->fields['fecha_fin'];
 		
-		$fecha_inicial_primer_trabajo = date('Y-m-01', strtotime($fecha_primer_trabajo));
+		$fecha_inicial_primer_trabajo = date('Y-m-d', strtotime($fecha_primer_trabajo));
 		$fecha_final_ultimo_trabajo = date('Y-m-d', strtotime($fecha_ultimo_trabajo));
 		
 		if ($fecha_primer_trabajo && $fecha_primer_trabajo != '0000-00-00') {
