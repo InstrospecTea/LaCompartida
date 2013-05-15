@@ -41,7 +41,8 @@ if ($codigo_cliente_secundario != '') {
 	$resp_codigos = mysql_query($query_codigos, $sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $sesion->dbh);
 
 	while (list($id_asunto_temp, $codigo_asunto_secundario_temp) = mysql_fetch_array($resp_codigos)) {
-		if ($codigo_asunto_secundario == substr($codigo_asunto_secundario_temp, -4)) {
+		$caracteres = strlen($codigo_asunto_secundario);
+		if ($codigo_asunto_secundario == substr($codigo_asunto_secundario_temp, $caracteres)) {
 			if (empty($id_asunto) || $id_asunto != $id_asunto_temp) {
 				$pagina->FatalError('El código ingresado ya existe');
 			}
