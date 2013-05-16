@@ -75,10 +75,7 @@ class APNSNotificationProvider  implements INotificationProvider {
   }
 
   public function deliver() {
-    $queue = $this->pushService->getQueue();
-    if (!empty($queue)) {
-      $this->pushService->send();
-    }
+    $this->pushService->send();
     $aErrorQueue = $this->pushService->getErrors();
     if (!empty($aErrorQueue)) {
       foreach ($aErrorQueue as $error) {
