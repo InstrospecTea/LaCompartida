@@ -271,7 +271,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 						($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_imprimir_buscador'):false;  
 
 				$html .= "</b></td>";
-				$html .= "<td style='font-size:10px' class='btpopover' id='tip_{$cobro->fields['id_contrato']}' align=left valing=top></td>";
+				$html .= "<td style='font-size:10px' class='btpopover' title='Listado de ".__('Asuntos')."' id='tip_{$cobro->fields['id_contrato']}' align=left valing=top></td>";
 				if($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL')
 					$texto_acuerdo = $cobro->fields['forma_cobro']." de ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ". number_format($cobro->fields['retainer_horas'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " Hrs.";
 				else if( $cobro->fields['forma_cobro'] == 'TASA' || $cobro->fields['forma_cobro'] == 'HITOS' || $cobro->fields['forma_cobro'] == 'ESCALONADA' )
@@ -362,7 +362,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 			if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 				$asuntos_separados = explode(', ',$cobro->fields['asuntos_cobro']);
 				$cantidad_asuntos = count($asuntos_separados);
-				$html .= " <div class=\"tip_asuntos_cobro\" id=\"tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "\">" . $cantidad_asuntos . "&nbsp;asunto" . ($cantidad_asuntos > 1 ? "s" : "") . "</div>";
+				$html .= " <div class=\"tip_asuntos_cobro inlinehelp\" title=\"Listado de '. __('Asuntos'); .'\" id=\"tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "\">" . $cantidad_asuntos . "&nbsp;asunto" . ($cantidad_asuntos > 1 ? "s" : "") . "</div>";
 				//$html .="<script> new Tip('tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "', '" . '<li>' . implode('</li><li>', $asuntos_separados) . '</li>' . "', {title : '".__('Listado de asuntos')."', effect: '', offset: {x:-2, y:10}}); </script>";
 			}
 
@@ -401,49 +401,50 @@ require_once dirname(__FILE__) . '/../conf.php';
 			 
 	
 	
-		jQuery(document).ready(function() {
+	jQuery(document).ready(function() {
 			<?php
 			if($_GET['buscar']==1) echo "jQuery('#boton_buscar').click();";
 			?>
-			BootStrap.done(function() {
+			jQueryUI.done(function() {
+	
+				jQuery('.btpopover').each(function() {
+					var self=jQuery(this);
+					var idContrato=jQuery(this).attr('id').replace('tip_','');
+					jQuery.ajax({url:'ajax/ajax_asuntos.php?id_contrato='+idContrato,dataType:'json'}).done(function(data) {
+						 
+						
+						if(data=='' || data==null) {
+							
+					 jQuery('#tip_'+idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'>No hay informaci&oacute;n sobre <?php echo __('Asuntos'); ?></span>");
+						} else {
+							 var popover=data[idContrato];
+							 if(popover.length>10) {
+								 var popover2=popover.slice(0,10);
+								 var sobra=popover.length-10;
+								 popover2.push('<small>(hay otros '+ sobra+' <?php echo __('asuntos');?> ocultos por falta de espacio en pantalla)</small>');
+							 } else {
+								 var popover2=popover;
+							 }
+							  var contenido=popover2.join('<li>');
+							  var contenidofull=popover.join('<li>');
+							  
 
-
-			jQuery('.btpopover').each(function() {
-				var idContrato=jQuery(this).attr('id').replace('tip_','');
-				jQuery.getJSON(  'ajax/ajax_asuntos.php?id_contrato='+idContrato,function(data) {
-					 
-					
-					if(data=='' || data==null) {
+							 jQuery('#tip_'+idContrato).data('content','<li>'+contenido);
+							jQuery('#tip_'+idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'><li>"+contenidofull+"</span>");
+						 
+						 
 						
-				 jQuery('#tip_'+idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'>No hay informaci&oacute;n sobre <?php echo __('Asuntos'); ?></span>");
-					} else {
-						 var popover=data[idContrato];
-						 if(popover.length>10) {
-							 var popover2=popover.slice(0,10);
-							 var sobra=popover.length-10;
-							 popover2.push('<small>(hay otros '+ sobra+' <?php echo __('asuntos');?> ocultos por falta de espacio en pantalla)</small>');
-						 } else {
-							 var popover2=popover;
-						 }
-						  var contenido=popover2.join('<li>');
-						  var contenidofull=popover.join('<li>');
-						  
-						 jQuery('#tip_'+idContrato).popover({title:'Listado de <?php echo __('Asuntos'); ?>', trigger:'hover',animation:false, html:true, content:'<li>'+contenido});
-						jQuery('#tip_'+idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'><li>"+contenidofull+"</span>");
-					 
-					 
-					 
-						
-						
-					}
-				});
+							
+							
+						}
+					});
 				
-			}  );
-
+		 		
+			  
 			});
 
+		});
 	});
-		
 		
 		
 //Genera o buisca los cobros.
