@@ -89,7 +89,7 @@ class APNSNotificationProvider  implements INotificationProvider {
         }
         foreach ($tokens as $token) {
           if ($invalid_token == true) {
-            $this->logger.log("APNSError: INVALID TOKEN: " . $token);
+            $this->logger->log("APNSError: INVALID TOKEN: " . $token);
             $userDevice = new UserDevice($this->session);
             $userDevice->deleteByToken($token);
           }
@@ -138,7 +138,7 @@ class APNSNotificationProvider  implements INotificationProvider {
     $aDeviceTokens = $feedback->receive();
     if (is_array($aDeviceTokens) && !empty($aDeviceTokens)) {
       foreach ($aDeviceTokens as $deviceToken) {
-        $this->logger.log('APNSFeedback:' . $deviceToken);
+        $this->logger->log('APNSFeedback:' . $deviceToken);
       }
     }
     $feedback->disconnect();
