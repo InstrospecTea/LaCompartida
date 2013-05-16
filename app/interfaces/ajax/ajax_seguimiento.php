@@ -80,10 +80,21 @@ $seguimientos = $ClienteSeguimiento->FindAll();
 				<input type="hidden" name="codigo_cliente" value="<?php echo $ClienteSeguimiento->fields['codigo_cliente']; ?>" />
 				<input type="hidden" name="opcion" value="guardar" />
 				<div style="vertical-align: top">
-					<textarea name="comentario" cols="38" rows="2"></textarea>
-					<input id="submit" type="submit" class="btn" value="Guardar" />
+					<textarea id="comentario" name="comentario" cols="38" rows="2"></textarea>
+					<input id="submit" type="submit" class="btn" value="Guardar" onclick="return Validar();" />
 				</div>
 			</form>
+			<script>
+				function Validar() {
+					c = document.getElementById('comentario');
+					if (c.value.trim() == '') {
+						alert('Debe ingresar un comentario');
+						c.focus();
+						return false;
+					}
+					return true;
+				}
+			</script>
 		</div>
 	</body>
 </html>

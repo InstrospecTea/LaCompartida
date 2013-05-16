@@ -71,7 +71,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 			-SUM($campo_hvalor) AS htotal,
 			-SUM($campo_gvalor) AS gtotal,
 			CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')  as identificadores,
-			T.cantidad_seguimiento
+			T.cantidad_seguimiento,
+			T.comentario_seguimiento
 		FROM
 			(SELECT 	";
 	/* $query .= " if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
@@ -107,7 +108,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 
 				DATEDIFF(NOW(), $fecha_atraso) AS dias_atraso_pago,
 				moneda_documento.simbolo AS moneda,
-				seguimiento.cantidad AS cantidad_seguimiento
+				seguimiento.cantidad AS cantidad_seguimiento,
+				seguimiento.comentario AS comentario_seguimiento
 			FROM
 				documento d
 			left JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
@@ -119,7 +121,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 			left JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			left join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
 			LEFT JOIN (
-				SELECT codigo_cliente, COUNT(*) AS cantidad
+				SELECT
+					codigo_cliente,
+					COUNT(*) AS cantidad,
+					MAX(CONCAT(fecha_creacion, ' | ', comentario)) AS comentario
 				FROM cliente_seguimiento
 				GROUP BY codigo_cliente
 			) seguimiento ON cliente.codigo_cliente = seguimiento.codigo_cliente
@@ -236,6 +241,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 				'class' => 'seguimiento'
 			)
 		);
+	} else {
+		$config_reporte[] = array(
+			'field' => 'comentario_seguimiento',
+			'title' => 'Comentario Seguimiento'
+		);
 	}
 
 	$SimpleReport->LoadConfigFromArray($config_reporte);
@@ -250,12 +260,22 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 	if ($_REQUEST['opcion'] == 'xls') {
 		$new_results = array();
 		foreach ($results as $result) {
+			// Corregir los identificadores
 			$array = json_decode(utf8_encode($result['identificadores']), true);
 			$identificadores = array();
 			foreach ($array as $key => $value) {
 				$identificadores[] = utf8_decode($value);
 			}
 			$result['identificadores'] = implode(', ', $identificadores);
+
+			// Corregir los comentarios de seguimiento
+			$array = explode(' | ', $result['comentario_seguimiento']);
+			if (count($array) > 1) {
+				$result['comentario_seguimiento'] = Utiles::sql2fecha($array[0], "%d/%m/%Y") . " " . $array[1];
+			} else {
+				$result['comentario_seguimiento'] = "";
+			}
+
 			$new_results[] = $result;
 		}
 
