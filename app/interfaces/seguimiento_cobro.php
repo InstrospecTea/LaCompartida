@@ -1,5 +1,6 @@
 <?php
-	require_once dirname(__FILE__).'/../conf.php';
+
+require_once dirname(__FILE__) . '/../conf.php'; 
 
 	$sesion = new Sesion(array('COB','DAT'));
 
@@ -8,8 +9,8 @@
 	$contrato = new Contrato($sesion);
 
 	$cobros = new Cobro($sesion);
-
-
+	
+ global $contratofields;
 	$series_documento = new DocumentoLegalNumero($sesion);
 
 	$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
@@ -31,9 +32,9 @@
 		    $documento_cobro = new Documento($sesion);
 		    $documento_cobro->LoadByCobro($id_cobro_hide);
 		    $lista_pagos = $documento_cobro->ListaPagos();
-
-
-			/*FFF: cambio esta query para usar clase Documento
+			 
+			    
+			/*FFF: cambio esta query para usar clase Documento    
 			$query = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($cont_documentos) = mysql_fetch_array($resp);*/
@@ -78,20 +79,22 @@
 			$lista_cobros_x_factura = $factura_obj->GetlistaCobroSoyDatoFactura('',$tipo_documento_legal,$factura,$serie);
 			if($lista_cobros_x_factura == '') {
 				$where .= " AND cobro.id_cobro = 0";
-			else
-			$where .= " AND cobro.id_cobro IN ($lista_cobros_x_factura)";
-		}
-		else
-		{
-			/*
-				if($proceso)
-				$where .= " AND cobro.id_proceso = '$proceso' ";
-			*/
-			if($id_usuario)
+			} else {
+				$where .= " AND cobro.id_cobro IN ($lista_cobros_x_factura)";
+			}
+		}	else		{
+			
+			if($proceso) {
+				$where .= " AND cobro.id_proceso in ($proceso) ";
+			}
+			
+			if($id_usuario) {
 				$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
-			if($id_usuario_secundario)
+			}
+			if($id_usuario_secundario) {
 				$where .= " AND contrato.id_usuario_secundario = '$id_usuario_secundario' ";
-			if(!empty($forma_cobro))
+			}
+			if(!empty($forma_cobro)) {
 				$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 			}
 			
