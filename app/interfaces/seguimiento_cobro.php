@@ -145,7 +145,9 @@
 		if(isset($_POST['tienehonorario'])) $where.=" AND documento.subtotal_honorarios>0";
 		if(isset($_POST['tienegastociva'])) $where.=" AND documento.subtotal_gastos>0";
 		if(isset($_POST['tienegastosiva'])) $where.=" AND documento.subtotal_gastos_sin_impuesto>0";
+		if(isset($_POST['tienegastos'])) $where.=" AND documento.subtotal_gastos>0";                                                        
 		if(isset($_POST['tienetramites'])) $where.=" AND documento.monto_tramites>0";                                                        
+
 
 		
 						
@@ -788,8 +790,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 			 
 			<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
 			<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios');?>
-			<br/><input type="checkbox" name="tienegastociva"   value="1" id="tienegastociva"  <?php if (isset($_POST['tienegastociva'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos c/ IVA');?>
-			<br/><input type="checkbox" name="tienegastosiva"   value="1" id="tienegastosiva"  <?php if (isset($_POST['tienegastosiva'])) echo 'checked="checked"' ; ?>/> Tiene <?php echo __('Gastos s/ IVA');?>
+			<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos');?>
 			<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites');?> 
 			<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> Hay <?php echo __('Adelantos');?>  disponibles
 			</div>
