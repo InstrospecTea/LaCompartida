@@ -168,7 +168,12 @@ if ($opcion == "guardar") {
 	} else {
 		$Ordenado_por = 0;
 	}
-	
+
+
+	if (($Ordenado_por == 1 || $Ordenado_por == 2) && $t) {
+		$t->Edit('solicitante', $solicitante);
+	}
+
 	if ($t) {
 		$t->Edit('descripcion', $descripcion);
 		$t->Edit('fecha', Utiles::fecha2sql($fecha));
@@ -1281,6 +1286,24 @@ if ($fecha == '')
 			<td align=left valign="top">
 				<!--<?php echo Html::PrintCalendar("fecha", $tramite->fields[fecha] ? $tramite->fields[fecha] : $fecha); ?>-->
 				<input type="text" class="fechadiff" name="fecha" value="<?php echo $tramite->fields['fecha'] ? Utiles::sql2date($tramite->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
+<?php
+if (method_exists('Conf', 'GetConf')) {
+	$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
+} else if (method_exists('Conf', 'Ordenado_por')) {
+	$Ordenado_por = Conf::Ordenado_por();
+} else {
+	$Ordenado_por = 0;
+}
+
+if ($Ordenado_por == 1 || $Ordenado_por == 2) {
+	?>
+					&nbsp;
+	<?php echo __('Ordenado por') ?>
+					&nbsp;
+					<input type="text" name="solicitante" value="<?php echo $t->fields['solicitante'] ? $t->fields['solicitante'] : $solicitante ?>" id="solicitante" size="32" />
+	<?php
+} //   
+?>
 			</td>
 		</tr>
 		<tr>
