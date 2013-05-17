@@ -1411,6 +1411,12 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -1858,6 +1864,12 @@ class NotaCobro extends Cobro {
 					}
 					
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
+					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
+					} else {
+						$row = str_replace('%td_id_trabajo%', '', $row);	
+					}
+					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
@@ -2359,6 +2371,13 @@ class NotaCobro extends Cobro {
 
 
 			case 'TRABAJOS_TOTAL': //GenerarDocumento
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);	
+				
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -4567,6 +4586,13 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento2
+
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -4915,6 +4941,12 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
+					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
+					} else {
+						$row = str_replace('%td_id_trabajo%', '', $row);	
+					}
+					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
@@ -5286,12 +5318,12 @@ class NotaCobro extends Cobro {
 
 
 			case 'TRABAJOS_TOTAL': //GenerarDocumento2
-
-				if ($lang == 'es') {
-					$html = str_replace('%sub_total_fees%', __('Sub-total honorarios'), $html);
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
 				} else {
-					$html = str_replace('%sub_total_fees%', __('Sub-total for fees'), $html);
+					$html = str_replace('%td_id_trabajo%', '', $html);	
 				}
+				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);		
 
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
@@ -7701,6 +7733,12 @@ class NotaCobro extends Cobro {
                 break;
 
             case 'TRABAJOS_ENCABEZADO': //GenerarDocumentoComun
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -8124,6 +8162,12 @@ class NotaCobro extends Cobro {
 					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
+					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
+					} else {
+						$row = str_replace('%td_id_trabajo%', '', $row);	
+					}
+					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
@@ -8697,12 +8741,12 @@ class NotaCobro extends Cobro {
 
 
             case 'TRABAJOS_TOTAL': //GenerarDocumentoComun
-
-                if ($lang == 'es') {
-                    $html = str_replace('%sub_total_fees%', __('Sub-total honorarios'), $html);
-                } else {
-                    $html = str_replace('%sub_total_fees%', __('Sub-total for fees'), $html);
-                }
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);	
 
                 if (method_exists('Conf', 'GetConf'))
                     $ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
