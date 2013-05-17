@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.3.19
+Viernes 17 de Mayo 2013
+* **Fixed:** [Se agrega anchor %td_id_trabajo% el cual solo se muestra cuando el cobro esta en los estados CREADO y EN REVISION](https://github.com/LemontechSA/ttb/pull/188)
+
 ## Hotfix: 13.3.18
 Viernes 17 de Mayo 2013
 * **Fixed:** [Correcciones segmento gastos cobro_xls](https://github.com/LemontechSA/ttb/pull/187)
