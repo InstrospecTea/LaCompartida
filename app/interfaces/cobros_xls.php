@@ -1910,6 +1910,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			*/
 					
 					$lineas_total_asunto_gasto[$gasto->fields['glosa_asunto']] = ($filas + 1);
+					
 					if (UtilesApp::GetConf($sesion, 'FacturaAsociada')) {
 						if (UtilesApp::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $formato_total);
@@ -1941,12 +1942,22 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
 							$coltotal = $col_descripcion - $offsetcolumna - 2;
 						} else {
-							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $formato_total);
+							if ( $cobro->fields['opc_ver_solicitante'] == 1){
+								$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Total'), $formato_total);
+								$ws->write($filas, $col_descripcion -1, '', $formato_total);
+							} else {
+								$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $formato_total);
+							}
+							
 							$ws->write($filas, $col_descripcion, '', $formato_total);
 							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
 							$coltotal = $col_descripcion + 1;
 						}
-						$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $formato_moneda_gastos_total);
+						if ( $cobro->fields['opc_ver_solicitante'] == 1){
+							$ws->writeFormula($filas, $col_descripcion - $offsetcolumna +1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $formato_moneda_gastos_total);
+						} else {
+							$ws->writeFormula($filas, $col_descripcion - $offsetcolumna + 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $formato_moneda_gastos_total);
+						}
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $formato_total);
 					}
