@@ -1858,7 +1858,6 @@ class NotaCobro extends Cobro {
 					}
 					
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
-					$row = str_replace('%id_trabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
@@ -4916,7 +4915,6 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
-					$row = str_replace('%id_trabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
@@ -8126,7 +8124,6 @@ class NotaCobro extends Cobro {
 					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
-					$row = str_replace('%id_trabajo%', $trabajo->fields['id_trabajo'], $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
