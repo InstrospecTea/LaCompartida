@@ -15,7 +15,7 @@ class LogDB extends Objeto {
 		$query="select log_db.fecha, log_db.campo_tabla,  log_db.usuario,concat(usuario.nombre,' ',usuario.apellido1,' ',usuario.apellido2) as nombre_usuario,  log_db.valor_antiguo, log_db.valor_nuevo 
 			from log_db left join usuario on log_db.usuario=usuario.id_usuario where id_field={$id_field} and titulo_tabla='{$titulo_tabla}' order by log_db.fecha desc;";
 
-		$this->ArrayMovimientos=$this->sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP);
+		$this->ArrayMovimientos=UtilesApp::utf8izar($this->sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP));
 
 
 	}
