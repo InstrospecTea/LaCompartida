@@ -446,13 +446,9 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 		}, "aTargets": [4]},
 
 		{"fnRender": function (o,val) {
-<<<<<<< HEAD
 			var activo=(o.aData[12] == 'SI') ? 'activo' :'inactivo';
 			if (typeof(contratos) != "undefined") {
-=======
-			var activo = (o.aData[12] == 'SI') ? 'activo' :'inactivo';
-			if (typeof(contratos)!="undefined") {
->>>>>>> 13.3.13
+
 				contratos['contrato_' + o.aData[0]] = o.aData[12];
 			}
 			 var datacliente=o.aData[3].split('|');

@@ -48,16 +48,23 @@ class UtilesApp extends Utiles {
 		return $result['simbolo'];
 	}
 
-	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '') {
+	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '',$cargar_selectores=true) {
 		echo InputId::Javascript($sesion);
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			echo Autocompletador::CSS();
+				if ($oncambio=='') {
+					$oncambio="CargarGlosaCliente();";
+				} elseif (substr($oncambio,0,1)=='+') {
+					$oncambio="CargarGlosaCliente(); $oncambio";
+				}
+			echo Autocompletador::Javascript($sesion,$cargar_selectores,$oncambio);
+
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width , $oncambio );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width   );
 			} else {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width , $oncambio );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width  );
 			}
-			echo Autocompletador::Javascript($sesion);
+			
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if ($oncambio=='') {
@@ -90,7 +97,7 @@ class UtilesApp extends Utiles {
 			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
 		}
 	}
-	
+
 	public static function FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato = '', $width = 320) {
 		?>
 		<tr>
@@ -938,9 +945,9 @@ HTML;
 			for ($j = 0; $row2 = mysql_fetch_assoc($resp2); $j++) {
 				$glosa_submenu = __($row2['glosa']);
 				$codigo_submenu = $row2['codigo'];
-				if ($codigo_submenu == 'MPDF' && !self::GetConf($sesion, 'MostrarMenuMantencionPDF') ||
-					$codigo_submenu == 'SOL_AD' && !self::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
+				if (($codigo_submenu == 'MPDF' && UtilesApp::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
 					//era mas fácil escribir el filtro de esta forma
+					continue;
 				} else {
 					if ($j == 0 && $i == 0) {
 						$menu_html .= <<<HTML
@@ -986,8 +993,9 @@ HTML;
 		for ($j = 0; $row3 = mysql_fetch_assoc($resp3); $j++) {
 			$glosa_submenu = __($row3['glosa']);
 			$codigo_submenu = $row3['codigo'];
-			if (!self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF') {
+			if (($codigo_submenu == 'MPDF' && UtilesApp::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
 				//era mas fácil escribir el filtro de esta forma
+				continue;
 			} else {
 				if ($url_actual == $row3['url']) {
 					$activo_adentro_ie = 'style="text-decoration: underline;"';
@@ -2183,10 +2191,10 @@ HTML;
 					$subject = 'Demo1: Visitante repetetivo.';
 					$body = 'El visitante, <br><br>Nombre:       '.$userdata['nombre'].'
 																						<br>Apellido1:    '.$userdata['apellido1'].'
-																						<br>Apellido2:    '.$userdata['apellido2'].' 
+																						<br>Apellido2:    '.$userdata['apellido2'].'
 																						<br>Empresa:      '.$userdata['empresa'].'
 																						<br>Telefono:     '.$userdata['telefono'].'
-																						<br>Mail:         '.$userdata['email'].' 
+																						<br>Mail:         '.$userdata['email'].'
 																						<br>País:         '.$userdata['pais'];
 					if($cant_visitas>0) $body.="<br><br>ya ha ingresado $cant_visitas veces al sistema demo.";
 					return Utiles::EnviarMail($sesion,$correos,$subject,$body,false);
@@ -2194,7 +2202,7 @@ HTML;
 	public static  function CrearUsuario($sesion,array $userdata,$id_visitante=false) {
 		$query = "SELECT id_notificacion_tt FROM usuario ORDER BY id_notificacion_tt DESC LIMIT 1";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					list($id_notificacion) = mysql_fetch_array( $resp ); 
+					list($id_notificacion) = mysql_fetch_array( $resp );
 
 					$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario DESC LIMIT 1";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -2214,7 +2222,7 @@ HTML;
 					$usuario->Edit('id_notificacion_tt',$id_notificacion);
 					$usuario->Write();
 
-					$query = "INSERT INTO usuario_permiso( id_usuario, codigo_permiso ) 
+					$query = "INSERT INTO usuario_permiso( id_usuario, codigo_permiso )
 												VALUES ( ".$id_usuario.", 'ADM' ),
 															 ( ".$id_usuario.", 'ALL' ),
 															 ( ".$id_usuario.", 'COB' ),

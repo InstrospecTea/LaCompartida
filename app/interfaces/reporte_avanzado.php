@@ -101,26 +101,55 @@ $estados_cobro = array("CREADO",
 	"PAGADO",
 	"PAGO PARCIAL");
 
-$agrupadores = array(
-	'glosa_cliente',
-	'codigo_asunto',
-	'glosa_asunto_con_codigo',
-	'profesional',
-	'estado',
-	'id_cobro',
-	'forma_cobro',
-	'tipo_asunto',
-	'area_asunto',
-	'categoria_usuario',
-	'area_usuario',
-	'fecha_emision',
-	'glosa_grupo_cliente',
-	'id_usuario_responsable',
-	'mes_reporte',
-	'dia_reporte',
-	'mes_emision',
-	'grupo_o_cliente'
-);
+
+	if(	UtilesApp::GetConf($sesion,'CodigoSecundario')){
+		
+		$agrupadores = array(
+			'glosa_cliente',
+			'codigo_cliente_secundario',
+			'codigo_asunto',
+			'glosa_asunto_con_codigo',
+			'profesional',
+			'estado',
+			'id_cobro',
+			'forma_cobro',
+			'tipo_asunto',
+			'area_asunto',
+			'categoria_usuario',
+			'area_usuario',
+			'fecha_emision',
+			'glosa_grupo_cliente',
+			'id_usuario_responsable',
+			'mes_reporte',
+			'dia_reporte',
+			'mes_emision',
+			'grupo_o_cliente'
+		);
+
+	} else {
+			
+		$agrupadores = array(
+			'glosa_cliente',
+			'codigo_cliente',
+			'codigo_asunto',
+			'glosa_asunto_con_codigo',
+			'profesional',
+			'estado',
+			'id_cobro',
+			'forma_cobro',
+			'tipo_asunto',
+			'area_asunto',
+			'categoria_usuario',
+			'area_usuario',
+			'fecha_emision',
+			'glosa_grupo_cliente',
+			'id_usuario_responsable',
+			'mes_reporte',
+			'dia_reporte',
+			'mes_emision',
+			'grupo_o_cliente'
+		);	
+	}
 
 if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) {
 	$agrupadores[] = 'area_trabajo';

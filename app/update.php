@@ -9797,6 +9797,12 @@ QUERY;
 			break;
 
 		case 7.37:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO prm_excel_cobro (`id_prm_excel_cobro` ,`nombre_interno` ,`grupo` ,`glosa_es` ,`glosa_en` ,`tamano`)VALUES (NULL ,  'solicitante',  'Listado de gastos',  'Solicitante',  'Applicant',  '10')";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.38:
 			$queries=array();
 			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` VARCHAR( 512 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
 			ejecutar($queries, $dbh);
@@ -9810,7 +9816,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.37;
+$max_update = 7.38;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

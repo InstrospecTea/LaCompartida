@@ -1411,6 +1411,12 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -1722,6 +1728,12 @@ class NotaCobro extends Cobro {
 				else
 					$dato_monto_cobrado = " trabajo.monto_cobrado ";
 
+				if ($this->fields['opc_ver_cobrable']){
+					$and .= "";
+				} else {
+					$and .= "AND trabajo.visible = 1";
+				}
+
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
@@ -1746,7 +1758,7 @@ class NotaCobro extends Cobro {
 							$join_categoria
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
+							$and AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -1852,6 +1864,12 @@ class NotaCobro extends Cobro {
 					}
 					
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
+					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
+					} else {
+						$row = str_replace('%td_id_trabajo%', '', $row);	
+					}
+					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
@@ -2353,6 +2371,13 @@ class NotaCobro extends Cobro {
 
 
 			case 'TRABAJOS_TOTAL': //GenerarDocumento
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);	
+				
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -4561,6 +4586,13 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento2
+
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -4830,6 +4862,12 @@ class NotaCobro extends Cobro {
 					$mostrar_horas_incobrables = "";
 				}
 
+				if ($this->fields['opc_ver_cobrable']){
+					$and .= "";
+				} else {
+					$and .= "AND trabajo.visible = 1";
+				}
+
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
@@ -4858,7 +4896,7 @@ class NotaCobro extends Cobro {
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							$mostrar_horas_incobrables 
-							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
+							$and AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -4903,6 +4941,12 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
+					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
+					} else {
+						$row = str_replace('%td_id_trabajo%', '', $row);	
+					}
+					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
@@ -5274,12 +5318,12 @@ class NotaCobro extends Cobro {
 
 
 			case 'TRABAJOS_TOTAL': //GenerarDocumento2
-
-				if ($lang == 'es') {
-					$html = str_replace('%sub_total_fees%', __('Sub-total honorarios'), $html);
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
 				} else {
-					$html = str_replace('%sub_total_fees%', __('Sub-total for fees'), $html);
+					$html = str_replace('%td_id_trabajo%', '', $html);	
 				}
+				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);		
 
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
@@ -7549,7 +7593,7 @@ class NotaCobro extends Cobro {
                     //muestra las iniciales de los profesionales
                     list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);
                     $row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
-
+					$row = str_replace('%username%', $tramite->fields['username'], $row);
 
                     if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
                         $row = str_replace('%profesional%', $tramite->fields['iniciales'], $row);
@@ -7689,6 +7733,12 @@ class NotaCobro extends Cobro {
                 break;
 
             case 'TRABAJOS_ENCABEZADO': //GenerarDocumentoComun
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -7971,6 +8021,12 @@ class NotaCobro extends Cobro {
 					$mostrar_horas_incobrables = "";
 				}
 
+				if ($this->fields['opc_ver_cobrable']){
+					$and .= "";
+				} else {
+					$and .= "AND trabajo.visible = 1";
+				}
+
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
@@ -8001,7 +8057,7 @@ class NotaCobro extends Cobro {
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							$mostrar_horas_incobrables
-							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
+							$and AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -8106,6 +8162,12 @@ class NotaCobro extends Cobro {
 					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
+					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
+					} else {
+						$row = str_replace('%td_id_trabajo%', '', $row);	
+					}
+					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
@@ -8679,12 +8741,12 @@ class NotaCobro extends Cobro {
 
 
             case 'TRABAJOS_TOTAL': //GenerarDocumentoComun
-
-                if ($lang == 'es') {
-                    $html = str_replace('%sub_total_fees%', __('Sub-total honorarios'), $html);
-                } else {
-                    $html = str_replace('%sub_total_fees%', __('Sub-total for fees'), $html);
-                }
+				if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
+					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);	
+				} else {
+					$html = str_replace('%td_id_trabajo%', '', $html);	
+				}
+				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);	
 
                 if (method_exists('Conf', 'GetConf'))
                     $ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
