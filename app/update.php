@@ -9734,7 +9734,7 @@ QUERY;
 			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
 			}
-			
+
 			ejecutar($queries, $dbh);
 			break;
 
@@ -9751,7 +9751,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CP',  'Cheque',  '8')";
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'TP',  'Transferencia',  '9')";
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'OP',  'Otro',  '10')";
-						
+
 			ejecutar($queries, $dbh);
 			break;
 
@@ -9762,8 +9762,8 @@ QUERY;
 			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
 			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
 			}
-			
-			$queries[]=" update cta_corriente cc 
+
+			$queries[]=" update cta_corriente cc
 					join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
 	 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
 					set cc.id_cobro=doc.id_cobro,
@@ -9771,7 +9771,7 @@ QUERY;
 						cc.documento_pago=nd.id_documento_pago
 				where cc.incluir_en_cobro='NO' ";
 
-		
+
 		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
 			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
 			}
@@ -9780,7 +9780,7 @@ QUERY;
 			}
 		ejecutar($queries, $dbh);
 		break;
-		
+
 		case 7.36:
 			$query = array();
 			$comentario = 'Esta opcion limita la generacion de codigos de cliente a solo 4 digitos';
@@ -9796,6 +9796,12 @@ QUERY;
 
 			break;
 
+		case 7.37:
+			$queries=array();
+			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` VARCHAR( 512 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
 
@@ -9804,7 +9810,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.36;
+$max_update = 7.37;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
