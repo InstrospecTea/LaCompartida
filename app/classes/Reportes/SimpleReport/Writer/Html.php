@@ -15,6 +15,10 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 	 * una tabla (con un encabezado) para todos los grupos
 	 */
 	private $single_table = false;
+	/**
+	 * Para el uso de la función ACUMULAR
+	 */
+	private $acumuladores = array();
 
 	public function __construct(SimpleReport $simpleReport) {
 		$this->SimpleReport = $simpleReport;
@@ -174,7 +178,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		$html_encabezado = $this->header($columns);
 
 		if(!$this->single_table){
-			$html .= '<table class="buscador" width="90%" cellpadding="3">';
+			$html .= '<table class="buscador" width="100%" cellpadding="3">';
 			if (!$repeat_header) {
 				$html .= $html_encabezado;
 			}
@@ -310,7 +314,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 								$valor += $param;
 							}
 						}
-                                                break;
+						break;
 					case 'CONCATENATE':
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
@@ -321,7 +325,23 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 								$valor .= trim($param, '"');
 							}
 						}
-                                                break;
+						break;
+
+					case 'ACUMULAR':
+						$original_param = $matches[2];
+						$params = explode(',', $original_param);
+						foreach ($params as $param) {
+							$param = trim($param);
+							if (strpos($param, '%') === 0) {
+								$param_field = trim($param, '%');
+								if (!array_key_exists($original_param, $this->acumuladores)) {
+									$this->acumuladores[$original_param] = 0;
+								}
+								$this->acumuladores[$original_param] += $row[$param_field];
+							}
+						}
+						$valor = $this->acumuladores[$original_param];
+						break;
 				}
 			}
 		}

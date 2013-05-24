@@ -33,6 +33,11 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 	private $sheet;
 	private $formats = array();
 
+	/**
+	 * Para los acumuladores de la función ACUMULAR
+	 */
+	private $acumuladores = array();
+
 	public function __construct(SimpleReport $simpleReport) {
 		ini_set('memory_limit', '1024M');
 		$this->SimpleReport = $simpleReport;
@@ -370,47 +375,79 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		}
 
 		$value = '';
+		$is_formula = false;
 		if (strpos($column->field, '=') !== 0) {
+			// es un valor normal
 			$value = isset($row[$column->field]) ? $row[$column->field] : '';
-			if ($format == 'text') {
-				//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
-				if (strpos($value, ";")) {
-					$value = str_replace(";", "\n", $value);
-					$format = 'text_wrap';
-				}
-			} else if ($format == 'date') {
-				//las fechas llegan en formato SQL, pasarlas a formato excel
-				$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
-			} else if ($format == 'time') {
-				$value /= 24;
-			}
-			if ((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)) {
-				$value = str_replace(',', '.', $value);
-			}
+		} else {
+			// es una formula: reemplazar los nombres de campos por celdas
+			$is_formula = true;
+			if (preg_match('/=(\w+)\((.+)\)/', $column->field, $matches)) {
+				switch ($matches[1]) {
+					case 'ACUMULAR':
+						// Si es acumular lo considero como un valor mas
+						$is_formula = false;
+						$original_param = $matches[2];
+						$params = explode(',', $original_param);
+						foreach ($params as $param) {
+							$param = trim($param);
+							if (strpos($param, '%') === 0) {
+								$param_field = trim($param, '%');
+								if (!array_key_exists($original_param, $this->acumuladores)) {
+									$this->acumuladores[$original_param] = 0;
+								}
+								$this->acumuladores[$original_param] += $row[$param_field];
+							}
+						}
+						$value = $this->acumuladores[$original_param];
+						break;
 
+					default:
+						// Usar las fórmulas de Excel
+						$value = $column->field;
+						if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
+							foreach ($matches as $match) {
+								$param = $match[1];
+								if (isset($this->col_letters[$match[1]])) {
+									$param = $this->xls->rowcolToCell($this->current_row, $this->col_letters[$match[1]]);
+								} else if (isset($row[$param])) {
+									$param = '"' . $row[$param] . '"';
+								} else if (strpos($param, '"') !== 0) {
+									$param = '"' . $param . '"';
+								}
+								$value = str_replace($match[0], $param, $value);
+							}
+						}
+						break;
+				}
+			}
+		}
+
+		if ($format == 'text') {
+			//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
+			if (strpos($value, ";")) {
+				$value = str_replace(";", "\n", $value);
+				$format = 'text_wrap';
+			}
+		} else if ($format == 'date') {
+			//las fechas llegan en formato SQL, pasarlas a formato excel
+			$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
+		} else if ($format == 'time') {
+			$value /= 24;
+		}
+		if ((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)) {
+			$value = str_replace(',', '.', $value);
+		}
+
+		if ($is_formula) {
+			$this->sheet->writeFormula($this->current_row, $col_i, $value, $this->formats[$format]);
+		} else {
 			$function = $format == 'text' ? 'writeString' : 'write';
 			$this->sheet->$function($this->current_row, $col_i, $value, $this->formats[$format]);
 
 			if (isset($column->extras['rowspan']) && $column->extras['rowspan'] > 1) {
 				$this->sheet->mergeCells($this->current_row - $column->extras['rowspan'] + 1, $col_i, $this->current_row, $col_i);
 			}
-		} else {
-			//es una formula: reemplazar los nombres de campos por celdas
-			$value = $column->field;
-			if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
-				foreach ($matches as $match) {
-					$param = $match[1];
-					if (isset($this->col_letters[$match[1]])) {
-						$param = $this->xls->rowcolToCell($this->current_row, $this->col_letters[$match[1]]);
-					} else if (isset($row[$param])) {
-						$param = '"' . $row[$param] . '"';
-					} else if (strpos($param, '"') !== 0) {
-						$param = '"' . $param . '"';
-					}
-					$value = str_replace($match[0], $param, $value);
-				}
-			}
-			$this->sheet->writeFormula($this->current_row, $col_i, $value, $this->formats[$format]);
 		}
 	}
 

@@ -16,12 +16,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$texto_adelantos_no_utilizados = __('Adelantos no utilizados');
 
 	$codigo_cliente = '';
-	$mostrar_detalle = false;
 
 	if (!empty($_REQUEST['codigo_cliente'])) {
 		$codigo_cliente = $_REQUEST['codigo_cliente'];
-		$mostrar_detalle = true;
 	}
+
+	$mostrar_detalle = $_REQUEST['mostrar_detalle'];
 
 	$id_contrato = $_REQUEST['id_contrato'];
 	$tipo_liquidacion = $_REQUEST['tipo_liquidacion'];
@@ -130,7 +130,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_liquidaciones .= " AND (d.saldo_honorarios + d.saldo_gastos) > 0 ";
 	}
 
-	if ($mostrar_detalle) {
+	if (!empty($codigo_cliente)) {
 		$where_liquidaciones .= " AND d.codigo_cliente = '$codigo_cliente' ";
 		$where_adelantos .= " AND d.codigo_cliente = '$codigo_cliente' ";
 		$where_gastos .= " AND cc.codigo_cliente = '$codigo_cliente' ";
@@ -167,7 +167,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				d.monto AS monto_original,
 				-1 * (d.saldo_honorarios + d.saldo_gastos) AS saldo_original,
 				d.monto * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio) AS monto_base,
-				-1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio) AS saldo_base,
+				-1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio) AS saldo_liquidaciones,
+				0 AS saldo_gastos,
+				0 AS saldo_adelantos,
 				IF(contrato.separar_liquidaciones = 0,
 					'$tipo_liq_mixtas', IF(cobro.incluye_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
@@ -202,7 +204,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				-1 * d.monto AS monto_original,
 				-1 * d.saldo_pago AS saldo_original,
 				-1 * d.monto * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS monto_base,
-				-1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS saldo_base,
+				0 AS saldo_liquidaciones,
+				0 AS saldo_gastos,
+				-1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS saldo_adelantos,
 				IF(d.pago_honorarios = 1 AND d.pago_gastos = 1,
 					'$tipo_liq_mixtas', IF(d.pago_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
@@ -238,11 +242,13 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 					cc.egreso * (moneda_gasto.tipo_cambio / moneda_base.tipo_cambio),
 					cc.ingreso * (moneda_gasto.tipo_cambio / moneda_base.tipo_cambio)
 				) AS monto_base,
+				0 AS saldo_liquidaciones,
 				IF (
 					cc.ingreso IS NULL,
 					-1 * cc.egreso * (moneda_gasto.tipo_cambio / moneda_base.tipo_cambio),
 					cc.ingreso * (moneda_gasto.tipo_cambio / moneda_base.tipo_cambio)
-				) AS saldo_base,
+				) AS saldo_gastos,
+				0 AS saldo_adelantos,
 				'$tipo_liq_gastos' AS tipo_liq
 			FROM
 				cta_corriente cc
@@ -285,11 +291,13 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			r.codigo_cliente,
 			r.glosa_cliente,
 			SUM(IF(r.tipo = '$texto_liquidaciones_por_pagar', r.monto_base, 0)) AS total_liquidaciones,
-			SUM(IF(r.tipo = '$texto_liquidaciones_por_pagar', r.saldo_base, 0)) AS saldo_liquidaciones,
+			SUM(r.saldo_liquidaciones) AS saldo_liquidaciones,
 			SUM(IF(r.tipo = '$texto_gastos_por_liquidar', r.monto_base, 0)) AS total_gastos,
-			SUM(IF(r.tipo = '$texto_gastos_por_liquidar', r.saldo_base, 0)) AS saldo_gastos,
+			SUM(r.saldo_gastos) AS saldo_gastos,
 			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados' OR r.tipo = '$texto_provisiones_por_liquidar', r.monto_base, 0)) AS total_adelantos,
-			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados' OR r.tipo = '$texto_provisiones_por_liquidar', r.saldo_base, 0)) AS saldo_adelantos,
+			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.saldo_adelantos,
+						IF(r.tipo = '$texto_provisiones_por_liquidar', r.saldo_gastos, 0)
+			)) AS saldo_adelantos,
 			0 AS total_total, -- total_liquidaciones + total_gastos + total_adelantos AS total_total,
 			0 AS saldo_total, -- saldo_liquidaciones + saldo_gastos + saldo_adelantos AS saldo_total
 			moneda_base AS simbolo_moneda
@@ -307,15 +315,15 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 	$SimpleReport->LoadResults($results);
 
-	if (true || $mostrar_detalle) {
-		$details_query = "($query_liquidaciones) UNION ($query_gastos) UNION ($query_adelantos)";
-
+	if ($mostrar_detalle) {
+		$details_query = "($query_liquidaciones) UNION ($query_gastos) UNION ($query_adelantos) ORDER BY fecha";
+		//echo $details_query; exit;
 		$SimpleReportDetails = new SimpleReport($Sesion);
 		$SimpleReportDetails->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 		$SimpleReportDetails->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 
 		$SimpleReportDetails->Config->columns['monto_base']->Title(__('Monto') . " ($simbolo_base)");
-		$SimpleReportDetails->Config->columns['saldo_base']->Title(__('Saldo') . " ($simbolo_base)");
+		// $SimpleReportDetails->Config->columns['saldo_base']->Title(__('Saldo') . " ($simbolo_base)");
 
 		$statement = $Sesion->pdodbh->prepare($details_query);
 		$statement->execute();
@@ -392,7 +400,7 @@ $Pagina->PrintTop($popup);
 			font-weight: normal !important;
 		}
 </style>
-<table width="90%">
+<table width="100%">
 		<tr>
 		<td>
 			<form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
@@ -462,6 +470,16 @@ $Pagina->PrintTop($popup);
 									<input type="hidden" name="mostrar_sin_saldo" value="0" />
 									<input type="checkbox" name="mostrar_sin_saldo" id="mostrar_sin_saldo" value="1" <?php echo $mostrar_sin_saldo ? 'checked="checked"' : '' ?> />
 									<?php echo __('Mostrar liquidaciones y adelantos sin saldo'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="left">
+								<label>
+									<input type="hidden" name="mostrar_detalle" value="0" />
+									<input type="checkbox" name="mostrar_detalle" id="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked="checked"' : '' ?> />
+									<?php echo __('Mostrar detalle del saldo'); ?>
 								</label>
 							</td>
 						</tr>

@@ -6,7 +6,8 @@ class ReportesEspecificos {
 	public static $configuracion_saldo_clientes = array(
 		array(
 			'field' => 'tipo',
-			'group' => 1,
+			//'group' => 1,
+			'visible' => false,
 		),
 		array(
 			'field' => 'identificador',
@@ -42,44 +43,75 @@ class ReportesEspecificos {
 				'width' => 5
 			)*/
 		),
-		array(
-			'field' => 'monto_original',
-			'title' => 'Monto',
-			'format' => 'number',
-			'extras' => array(
-				'symbol' => 'moneda_documento',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal' => false
-			)
-		),
-		array(
-			'field' => 'saldo_original',
-			'title' => 'Saldo',
-			'format' => 'number',
-			'extras' => array(
-				'symbol' => 'moneda_documento',
-				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal' => false
-			)
-		),
+		// array(
+		// 	'field' => 'monto_original',
+		// 	'title' => 'Monto',
+		// 	'format' => 'number',
+		// 	'extras' => array(
+		// 		'symbol' => 'moneda_documento',
+		// 		'attrs' => 'width="12%" style="text-align:right"',
+		// 		'subtotal' => false
+		// 	)
+		// ),
+		// array(
+		// 	'field' => 'saldo_original',
+		// 	'title' => 'Saldo',
+		// 	'format' => 'number',
+		// 	'extras' => array(
+		// 		'symbol' => 'moneda_documento',
+		// 		'class' => 'saldo',
+		// 		'attrs' => 'width="12%" style="text-align:right"',
+		// 		'subtotal' => false
+		// 	)
+		// ),
 		array(
 			'field' => 'monto_base',
 			'title' => 'Monto (base)',
 			'format' => 'number',
 			'extras' => array(
 				'symbol' => 'moneda_base',
-				'attrs' => 'width="15%" style="text-align:right"'
+				'attrs' => 'width="12%" style="text-align:right"'
 			)
 		),
 		array(
-			'field' => 'saldo_base',
-			'title' => 'Saldo (base)',
+			'field' => 'saldo_adelantos',
+			'title' => 'Adelantos no utilizados',
 			'format' => 'number',
 			'extras' => array(
 				'symbol' => 'moneda_base',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"'
+				'attrs' => 'width="12%" style="text-align:right"'
+			)
+		),
+		array(
+			'field' => 'saldo_gastos',
+			'title' => 'Gastos por liquidar',
+			'format' => 'number',
+			'extras' => array(
+				'symbol' => 'moneda_base',
+				'class' => 'saldo',
+				'attrs' => 'width="12%" style="text-align:right"'
+			)
+		),
+		array(
+			'field' => 'saldo_liquidaciones',
+			'title' => 'Liquidaciones por pagar',
+			'format' => 'number',
+			'extras' => array(
+				'symbol' => 'moneda_base',
+				'class' => 'saldo',
+				'attrs' => 'width="12%" style="text-align:right"'
+			)
+		),
+		array(
+			'field' => '=ACUMULAR(%saldo_adelantos%,%saldo_gastos%,%saldo_liquidaciones%)',
+			'title' => 'Acumulado',
+			'format' => 'number',
+			'extras' => array(
+				'symbol' => 'moneda_base',
+				'class' => 'saldo',
+				'attrs' => 'width="12%" style="text-align:right"',
+				'subtotal' => false
 			)
 		)
 	);
@@ -98,14 +130,13 @@ public static $configuracion_saldo_clientes_resumen = array(
 			'visible' => false
 		),
 		array(
-			'field' => 'saldo_liquidaciones',
-			'title' => 'Liquidaciones por pagar',
+			'field' => 'saldo_adelantos',
+			'title' => 'Adelantos no utilizados',
 			'format' => 'number',
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal_type' => 'FIXED'
+				'attrs' => 'width="12%" style="text-align:right"'
 			)
 		),
 		array(
@@ -115,19 +146,17 @@ public static $configuracion_saldo_clientes_resumen = array(
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal_type' => 'FIXED'
+				'attrs' => 'width="12%" style="text-align:right"'
 			)
 		),
 		array(
-			'field' => 'saldo_adelantos',
-			'title' => 'Adelantos no utilizados',
+			'field' => 'saldo_liquidaciones',
+			'title' => 'Liquidaciones por pagar',
 			'format' => 'number',
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal_type' => 'FIXED'
+				'attrs' => 'width="12%" style="text-align:right"'
 			)
 		),
 		array(
@@ -137,7 +166,7 @@ public static $configuracion_saldo_clientes_resumen = array(
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"',
+				'attrs' => 'width="12%" style="text-align:right"',
 			)
 		),
 /*
