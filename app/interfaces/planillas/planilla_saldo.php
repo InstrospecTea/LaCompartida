@@ -386,6 +386,9 @@ $Pagina->PrintTop($popup);
 			color: #040;
 		}
 
+		.subreport .buscador {
+			border-bottom: 1px solid #BDBDBD;
+		}
 		.subreport .buscador > tbody > tr {
 			border-left: 1px solid #BDBDBD;
 			border-right: 1px solid #BDBDBD;

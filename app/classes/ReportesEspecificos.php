@@ -70,7 +70,8 @@ class ReportesEspecificos {
 			'format' => 'number',
 			'extras' => array(
 				'symbol' => 'moneda_base',
-				'attrs' => 'width="12%" style="text-align:right"'
+				'attrs' => 'width="12%" style="text-align:right"',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -80,7 +81,8 @@ class ReportesEspecificos {
 			'extras' => array(
 				'symbol' => 'moneda_base',
 				'class' => 'saldo',
-				'attrs' => 'width="12%" style="text-align:right"'
+				'attrs' => 'width="12%" style="text-align:right"',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -90,7 +92,8 @@ class ReportesEspecificos {
 			'extras' => array(
 				'symbol' => 'moneda_base',
 				'class' => 'saldo',
-				'attrs' => 'width="12%" style="text-align:right"'
+				'attrs' => 'width="12%" style="text-align:right"',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -100,7 +103,8 @@ class ReportesEspecificos {
 			'extras' => array(
 				'symbol' => 'moneda_base',
 				'class' => 'saldo',
-				'attrs' => 'width="12%" style="text-align:right"'
+				'attrs' => 'width="12%" style="text-align:right"',
+				'subtotal' => false
 			)
 		),
 		array(
