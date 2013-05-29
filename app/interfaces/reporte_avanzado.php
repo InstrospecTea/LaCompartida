@@ -213,6 +213,7 @@ $glosa_boton['dispersion'] = "Despliega un Gráfico de Dispersión, usando el prim
 $explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 $explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
+$explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
 
 $tipos_moneda = Reporte::tiposMoneda();
 
@@ -257,10 +258,16 @@ if (!$popup) {
 	}
 	?>
 	<style type="text/css">
+		TD.boton_normal,
+		TD.boton_presionado,
+		TD.boton_comparar,
+		TD.boton_disabled {
+			height:25px; font-size: 11px; vertical-align: middle; text-align: center; cursor:pointer;
+		}
 		TD.boton_normal { width:100px;border: solid 2px #e0ffe0; background-color: #e0ffe0; }
 		TD.boton_presionado { border: solid 2px red; background-color: #e0ffe0; }
 		TD.boton_comparar { border: solid 2px blue; background-color: #e0ffe0; }
-		TD.boton_disabled { border: solid 2px #e5e5e5; background-color: #e5e5e5; color:#444444;}
+		TD.boton_disabled { border: solid 2px #e5e5e5; background-color: #e5e5e5; color:#444444; cursor: default;}
 		TD.borde_rojo { border: solid 1px red; }
 		TD.borde_azul { border: solid 1px blue; }
 		TD.borde_blanco { border: solid 1px white; }
@@ -290,10 +297,12 @@ if (!$popup) {
 		printf("case '%s': return '%s';\n", $td, __($td));
 	}
 	$otros = array(
-		'codigo_contrato' => 'Código ' . __('Contrato')
+		'codigo_contrato' => 'Código ' . __('Contrato'),
+		'usuarios' => __('Profesional'),
+		'clientes' => __('Cliente')
 	);
-	foreach ($otros as $td) {
-		printf("case '%s': return '%s';\n", $td, __($td));
+	foreach ($otros as $key => $translation) {
+		printf("case '%s': return '%s';\n", $key, $translation);
 	}
 	?>
 				default:
@@ -304,49 +313,50 @@ if (!$popup) {
 
 		/*Carga lo elegido en el deglose del nuevo reporte*/
 		function ActualizarNuevoReporte() {
-			var s = __($('tipo_dato').value);
-			if ($('comparar').checked == true)
+			var s = __(jQuery('#tipo_dato').val());
+			if ($('comparar').checked == true) {
 				s += ' vs. ' + __($('tipo_dato_comparado').value);
+			}
 
-
-			$('tipos_datos_nuevo_reporte').innerHTML = s;
+			jQuery('#tipos_datos_nuevo_reporte').html(s);
 
 			s = '';
-			var numero_agrupadores = parseInt($('numero_agrupadores').value);
+			var numero_agrupadores = parseInt(jQuery('#numero_agrupadores').val());
 			for (i = 0; i < numero_agrupadores; ++i) {
-				if (i != 0 && i != 3)
+				if (i != 0 && i != 3) {
 					s += ' - ';
-				s += __($('agrupador_' + i).value);
-				if (i == 2)
+				}
+				s += __(jQuery('#agrupador_' + i).val());
+				if (i == 2) {
 					s += '<br />';
+				}
 			}
-			$('agrupadores_nuevo_reporte').innerHTML = s;
+			jQuery('#agrupadores_nuevo_reporte').html(s);
 
 			s = "<i>Puede seleccionar 'Semana pasada',<br /> 'Mes pasado' o 'Año en curso'.</i>";
-			var fecha_corta = Form.getInputs('formulario', 'radio', 'fecha_corta').find(function(radio) {
-				return radio.checked;
-			}).value;
+			var fecha_corta = jQuery('#formulario input[name="fecha_corta"]:checked').val();
 
-			if (fecha_corta == 'semanal')
+			if (fecha_corta == 'semanal') {
 				s = '<?php echo __('Semana pasada') ?>';
-
-			if (fecha_corta == 'mensual')
+			} else if (fecha_corta == 'mensual') {
 				s = '<?php echo __('Mes pasado') ?>';
-
-			if (fecha_corta == 'anual')
+			} else if (fecha_corta == 'anual'){
 				s = '<?php echo __('Año en curso') ?>';
+			}
+			jQuery('#periodo_nuevo_reporte').html(s);
 
-			$('periodo_nuevo_reporte').innerHTML = s;
-
-			var campo_fecha = document.formulario.campo_fecha;
-			if (campo_fecha[0].checked)
+			var campo_fecha = jQuery('#formulario input[name="campo_fecha"]:checked').val();
+			if (campo_fecha == 'trabajo') {
 				s = '<?php echo __("Trabajo") ?>';
-			else if (campo_fecha[1].checked)
+			} else if (campo_fecha == 'corte') {
 				s = '<?php echo __("Corte") ?>';
-			else
+			} else if (campo_fecha == 'envio') {
+				s = '<?php echo __("Envío") ?>';
+			} else {
 				s = '<?php echo __("Emisión") ?>';
+			}
 
-			$('segun_nuevo_reporte').innerHTML = s;
+			jQuery('#segun_nuevo_reporte').html(s);
 
 		}
 
@@ -497,7 +507,7 @@ if (!$popup) {
 						<center>
 							<table id="mini_filtros"   style=" width:95%; <?php echo $filtros_check ? 'display:none' : '' ?> " cellpadding="0" cellspacing="3" >
 								<tr valign="top">
-									<td style="width:470px;"  rowspan="6">
+									<td style="width:470px;"  rowspan="7">
 										<div id="filtrosimple">
 											<div id="profesional">
 												<b><?php echo __('Profesional') ?>:</b><br/>
@@ -682,97 +692,125 @@ if (!$popup) {
 											</table>
 										</div>
 									</td>
-									<td align=center colspan=2>
-										<b><?php echo __('Periodo') ?>:</b>
-									</td>
-									<td align=center colspan=2 >
-										<b><?php echo __('Según') ?>:</b>
-									</td>
-								</tr>
-								<td align=right>
-									<input type="radio" name="fecha_corta" id="fecha_corta_semana" value="semanal" <?php if ($fecha_corta == 'semanal') echo 'checked="checked"'; ?> onclick ="SeleccionarSemana()" />
-								</td>
-								<td align=left>
-									<label for="fecha_corta_semana"><?php echo __("Semana pasada") ?></label>
-								</td>
-								<td align=right>
-									<span title="<?php echo __($explica_periodo_trabajo) ?>">
-										<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
-										<?php if ($campo_fecha == 'trabajo' || $campo_fecha == '') echo 'checked="checked"'; ?>
-											   onclick ="SincronizarCampoFecha()" />
-									</span>
-								</td>
-								<td align=left>
-									<label for="campo_fecha_trabajo"  title="<?php echo __($explica_periodo_trabajo) ?>"><?php echo __("Trabajo") ?></label>
-								</td>
 								</tr>
 								<tr>
-									<td align=right>
-										<input type="radio" name="fecha_corta" id="fecha_corta_mes" value="mensual" <?php if ($fecha_corta == 'mensual') echo 'checked="checked"'; ?> onclick ="SeleccionarMes()" />
-									</td>
-									<td align=left>
-										<label for="fecha_corta_mes"><?php echo __("Mes pasado") ?></label>
-									</td>
-									<td align=right>
-										<span title="<?php echo __($explica_periodo_cobro) ?>">
-											<input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-											<?php if ($campo_fecha == 'cobro') {
-												echo 'checked="checked"';
-											} ?>
-												   onclick ="SincronizarCampoFecha()" />
-										</span>
-									</td>
-									<td align=left>
-										<label for="campo_fecha_cobro" title="<?php echo __($explica_periodo_cobro) ?>"><?php echo __("Corte") ?></label>
-									</td>
-								</tr>
-								<tr>
-									<td align=right>
-										<input type="radio" name="fecha_corta" id="fecha_corta_anual" value="anual" <?php if ($fecha_corta == 'anual') echo 'checked="checked"' ?>  onclick ="SeleccionarAnual()" />
-									</td>
-									<td align=left>
-										<label for="fecha_corta_anual"><?php echo __("Año en curso") ?></label>
-									</td>
-									<td align=right>
-										<span title="<?php echo __($explica_periodo_emision) ?>">
-											<input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
-												<?php if ($campo_fecha == 'emision') {
-													echo 'checked="checked"';
-												} ?>
-												   onclick ="SincronizarCampoFecha()" />
-										</span>
-									</td>
-									<td align=left>
-										<label for="campo_fecha_emision" title="<?php echo __($explica_periodo_emision) ?>"><?php echo __("Emisión") ?></label>
-									</td>
-								</tr>
-								<tr>
-									<td align=right>
-										<input type="radio" name="fecha_corta" id="fecha_corta_selector" value="selector" onclick ="SeleccionarSelector()" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
-									</td>
-									<td align=left colspan=3>
-										<span onclick="jQuery('#fecha_corta_selector').click()">
-											<?php echo Html::SelectArrayDecente($meses, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', '', '90px'); ?>
-											<?php echo Html::SelectArrayDecente($anios, 'fecha_anio', $fecha_anio, 'id="fecha_anio"', '', '55px'); ?>
-										</span>
-									</td>
-								</tr>
-								<tr>
-									<!-- PERIODOS -->
-									<td align=right>
-										<input type="radio" name="fecha_corta" id="fecha_periodo" value="selector" onclick ="SeleccionarSelector()" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
-									</td>
-									<td align=left colspan=3>
-										<div id=periodo_rango>
+									<td>
+										<table>
+											<tr>
+												<td align="center" colspan="2">
+													<b><?php echo __('Periodo') ?>:</b>
+												</td>
+												<td align="center" colspan="2" >
+													<b><?php echo __('Según') ?>:</b>
+												</td>
+											</tr>
+											<tr>
+												<td align=right>
+													<input type="radio" name="fecha_corta" id="fecha_corta_semana" value="semanal" <?php if ($fecha_corta == 'semanal') echo 'checked="checked"'; ?> onclick ="SeleccionarSemana()" />
+												</td>
+												<td align=left>
+													<label for="fecha_corta_semana"><?php echo __("Semana pasada") ?></label>
+												</td>
+												<td align=right>
+													<span title="<?php echo __($explica_periodo_trabajo) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
+														<?php if ($campo_fecha == 'trabajo' || $campo_fecha == '') echo 'checked="checked"'; ?>
+															   onclick ="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align=left>
+													<label for="campo_fecha_trabajo"  title="<?php echo __($explica_periodo_trabajo) ?>"><?php echo __("Trabajo") ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align=right>
+													<input type="radio" name="fecha_corta" id="fecha_corta_mes" value="mensual" <?php if ($fecha_corta == 'mensual') echo 'checked="checked"'; ?> onclick ="SeleccionarMes()" />
+												</td>
+												<td align=left>
+													<label for="fecha_corta_mes"><?php echo __("Mes pasado") ?></label>
+												</td>
+												<td align=right>
+													<span title="<?php echo __($explica_periodo_cobro) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
+														<?php if ($campo_fecha == 'cobro') {
+															echo 'checked="checked"';
+														} ?>
+															   onclick ="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align=left>
+													<label for="campo_fecha_cobro" title=""><?php echo __("Corte") ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align=right>
+													<input type="radio" name="fecha_corta" id="fecha_corta_anual" value="anual" <?php if ($fecha_corta == 'anual') echo 'checked="checked"' ?>  onclick ="SeleccionarAnual()" />
+												</td>
+												<td align=left>
+													<label for="fecha_corta_anual"><?php echo __("Año en curso") ?></label>
+												</td>
+												<td align=right>
+													<span title="<?php echo __($explica_periodo_emision) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
+															<?php if ($campo_fecha == 'emision') {
+																echo 'checked="checked"';
+															} ?>
+															   onclick ="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align=left>
+													<label for="campo_fecha_emision" title="<?php echo __($explica_periodo_emision) ?>"><?php echo __("Emisión") ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													&nbsp;
+												</td>
+												<td align="left">
+													&nbsp;
+												</td>
+												<td align="right">
+													<span title="<?php echo __($explica_periodo_envio) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_envio" value="envio"
+															<?php if ($campo_fecha == 'emision') {
+																echo 'checked="checked"';
+															} ?>
+															   onclick="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align="left">
+													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Envio'); ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align=right>
+													<input type="radio" name="fecha_corta" id="fecha_corta_selector" value="selector" onclick ="SeleccionarSelector()" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
+												</td>
+												<td align=left colspan=3>
+													<span onclick="jQuery('#fecha_corta_selector').click()">
+														<?php echo Html::SelectArrayDecente($meses, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', '', '90px'); ?>
+														<?php echo Html::SelectArrayDecente($anios, 'fecha_anio', $fecha_anio, 'id="fecha_anio"', '', '55px'); ?>
+													</span>
+												</td>
+											</tr>
+											<tr>
+												<!-- PERIODOS -->
+												<td align=right>
+													<input type="radio" name="fecha_corta" id="fecha_periodo" value="selector" onclick ="SeleccionarSelector()" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
+												</td>
+												<td align=left colspan=3>
+													<div id=periodo_rango>
 
-											<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y", strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
-											<?php echo __('al') ?>
-											<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y", strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
+														<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y", strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
+														<?php echo __('al') ?>
+														<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y", strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
 
-										</div>
+													</div>
+												</td>
+											</tr>
+										</table>
 									</td>
 								</tr>
-
 							</table>
 						</center>
 					</fieldset>

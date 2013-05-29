@@ -481,7 +481,7 @@ function Monedas(visible) {
 //Hace visible o invisible por id [Para Inputs con + y -]
 function MostrarOculto(id) {
 	var table_full = jQuery('#full_' + id);
-	var table_mini = jQuery('mini_' + id);
+	var table_mini = jQuery('#mini_' + id);
 	var check = jQuery('#' + id + '_check');
 	var img = jQuery('#' + id + '_img');
 

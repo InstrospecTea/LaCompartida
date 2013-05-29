@@ -18,14 +18,13 @@ class ReporteAvanzado {
 		} else if ($this->tipo_dato_comparado == $nombre && $this->comparar) {
 			$clase = "boton_comparar";
 		}
-		$estilo = 'height:25px; font-size: 11px; vertical-align: middle; text-align: center; cursor:pointer;';
 		$onclick = sprintf("TipoDato('%s')", $nombre);
-		$html = '<td id="%s"rowspan="2" class="%s" style="%s" onclick="%s" title="%s"> %s</td>';
-		return sprintf($html, $nombre, $clase, $estilo, $onclick, __($this->glosa_dato[$nombre]), __($this->glosa_dato[$nombre]));
+		$html = '<td id="%s"rowspan="2" class="%s" onclick="%s" title="%s"> %s</td>';
+		return sprintf($html, $nombre, $clase, $onclick, __($this->glosa_dato[$nombre]), __($nombre));
 	}
 
 	public function celda_disabled($nombre) {
-		$td_tpl = '<td rowspan="2" align="center" class="boton_disabled" style="height:25px; font-size: 11px; vertical-align: middle;" title="%s"> %s</td>';
+		$td_tpl = '<td rowspan="2" align="center" class="boton_disabled" title="%s"> %s</td>';
 		printf($td_tpl, __($this->glosa_dato[$nombre]), __($nombre));
 	}
 
