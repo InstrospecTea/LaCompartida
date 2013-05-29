@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.3.21
+Viernes 28 de Mayo 2013
+* **Fixed:** [Corrige error de campo cliente en agregar_factura y agregar_pago_factura, agrega Ordenado por en resumen horas, corrige problema de decimal en ingresar_documento_pago"](https://github.com/LemontechSA/ttb/pull/189)
+
 ## Hotfix: 13.3.20
 Viernes 17 de Mayo 2013
 * **Fixed:** [Corrige error de despliege de opcion de impresion "opc ver solicitante", agrega update a tabla prm_cobro_excel](https://github.com/LemontechSA/ttb/pull/189)

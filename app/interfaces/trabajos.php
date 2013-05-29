@@ -319,6 +319,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 					trabajo.id_trabajo, 
 					trabajo.codigo_asunto,
 					trabajo.cobrable,
+					trabajo.solicitante,
 					prm_moneda.simbolo as simbolo,
 					prm_moneda.id_moneda as id_moneda,
 					asunto.codigo_cliente as codigo_cliente, 
