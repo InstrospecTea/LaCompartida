@@ -3403,6 +3403,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%DETALLE_COBRO%', "%DETALLE_COBRO%\n\n%TABLA_ESCALONADA%", $html);
 				}
 				$html = str_replace('%DETALLE_COBRO%', $this->GenerarDocumento2($parser, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%RESUMEN_ASUNTOS%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 					$this->CargarEscalonadas();
@@ -3968,8 +3969,12 @@ class NotaCobro extends Cobro {
 				//$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-
-
+		case 'RESUMEN_ASUNTOS':
+				$html = str_replace('%resumen_asuntos%', __('Resumen Asuntos'), $html);
+				$html = str_replace('%RESUMEN_ASUNTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%RESUMEN_ASUNTOS_FILAS%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);	
+				$html = str_replace('%RESUMEN_ASUNTOS_TOTAL%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);	
+				break;
 
 			case 'ADELANTOS': //GenerarDocumento2
 				$html = str_replace('%titulo_adelantos%', __('Adelantos por asignar'), $html);
@@ -4116,6 +4121,80 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = $fila_adelantos;
+				break;
+
+			case 'RESUMEN_ASUNTOS_ENCABEZADO':
+				$html = str_replace('%glosa_asunto%', __('Asuntos'), $html);
+				$html = str_replace('%horas%', __('Horas'), $html);
+				$html = str_replace('%importe%', __('Importe'), $html);
+				break;
+
+			case 'RESUMEN_ASUNTOS_FILAS':
+							
+				$row_tmpl = $html;
+				$html = '';
+
+				for ($k = 0; $k < count($this->asuntos); $k++) {
+					$asunto = new Asunto($this->sesion);
+					$asunto->LoadByCodigo($this->asuntos[$k]);
+					
+					$query = "
+							SELECT 
+								asunto.glosa_asunto,
+								SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada,
+								SUM(monto_cobrado) as importe
+							FROM trabajo
+							JOIN asunto ON asunto.codigo_asunto=trabajo.codigo_asunto 
+							WHERE trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
+								AND trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'  
+								AND trabajo.cobrable = 1
+								AND id_tramite=0
+								AND duracion_cobrada > 0
+								GROUP BY glosa_asunto ASC";
+							
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					while (list($glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
+						$row = $row_tmpl;
+
+						$horas = floor($duracion_cobrada/3600);
+						$minutes = (($duracion_cobrada/60 )%60);
+						$seconds = ($duracion_cobrada %60);
+
+						$row = str_replace('%glosa_asunto%', $glosa_asunto, $row);
+						$row = str_replace('%horas%', $horas. ':' . sprintf("%02d", $minutes), $row);
+						$row = str_replace('%importe%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						$html .= $row;
+						
+					}
+					
+				}
+				
+				break;
+
+			case 'RESUMEN_ASUNTOS_TOTAL':
+				
+				$query = "
+						SELECT SUM(TIME_TO_SEC(duracion_cobrada)) as duracion,SUM(monto_cobrado) as importe
+						FROM trabajo
+						JOIN asunto ON asunto.codigo_asunto=trabajo.codigo_asunto 
+						WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "' 
+						AND trabajo.cobrable = 1
+						AND id_tramite=0";
+				
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				
+				while (list($duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
+
+					$horas = floor($duracion_cobrada/3600);
+					$minutes = (($duracion_cobrada/60 )%60);
+					$seconds = ($duracion_cobrada %60);
+
+					
+					$html = str_replace('%total%', __('<b>TOTAL</b>'), $html);
+					$html = str_replace('%total_horas%', $horas. ':' . sprintf("%02d", $minutes), $html);
+					$html = str_replace('%total_tramites%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
+				
 				break;
 
 			case 'RESTAR_RETAINER': //GenerarDocumento2
@@ -4862,15 +4941,23 @@ class NotaCobro extends Cobro {
 					$mostrar_horas_incobrables = "";
 				}
 
-				if ($this->fields['opc_ver_cobrable']){
-					$and .= "";
-				} else {
-					$and .= "AND trabajo.visible = 1";
+				if ($this->fields['opc_ver_horas_trabajadas'] == 0){
+					$cobrable = " AND trabajo.cobrable = 1";
 				}
 
-				//Tabla de Trabajos.
-				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
-				//la duracion retainer.
+				if ($this->fields['opc_ver_cobrable']){
+					$visible = "";
+					if ($this->fields['opc_ver_horas_trabajadas'] == 0) {
+						$cobrable = " AND ((trabajo.cobrable = 0 AND trabajo.visible = 0)
+									    OR (trabajo.cobrable = 1 AND trabajo.visible = 1))";
+					}
+				} else {
+					$visible = "AND trabajo.visible = 1";
+				}
+
+				/*
+				*	Contenido de filas de seccion trabajo.
+				*/
 				$query = "SELECT SQL_CALC_FOUND_ROWS
 									trabajo.duracion_cobrada,
 									trabajo.duracion_retainer,
@@ -4896,7 +4983,9 @@ class NotaCobro extends Cobro {
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							$mostrar_horas_incobrables 
-							$and AND trabajo.id_tramite=0 $where_horas_cero
+							$cobrable
+							$visible
+							AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -4908,9 +4997,20 @@ class NotaCobro extends Cobro {
 
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
+
+					if ($trabajo->fields['cobrable'] == '0'){
+						list($h, $m, $s) = split(":", '0:00:00');
+						list($h_retainer, $m_retainer, $s_retainer) = split(":", '0:00:00');
+						$total_trabajo_importe = '0';
+						$total_trabajo_monto_cobrado = '0';
+					} else {
+						list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+						list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
+						$total_trabajo_importe = $trabajo->fields['importe'];
+						$total_trabajo_monto_cobrado = $trabajo->fields['monto_cobrado'];
+					}
+
 					list($ht, $mt, $st) = split(":", $trabajo->fields['duracion']);
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
-					list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
@@ -4976,7 +5076,7 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_tarifa_ajustada%', '', $row);
 					}
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-						$row = str_replace('%tarifa%', number_format(($trabajo->fields['monto_cobrado'] / $duracion_cobrada_decimal), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						$row = str_replace('%tarifa%', number_format(($total_trabajo_monto_cobrado / $duracion_cobrada_decimal), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%tarifa_ajustada%', number_format($trabajo->fields['tarifa_hh'] * $x_factor_ajuste, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					} else {
 						$row = str_replace('%tarifa%', number_format($trabajo->fields['tarifa_hh'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
@@ -4991,11 +5091,11 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_importe_ajustado%', '', $row);
 					}
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-						$row = str_replace('%importe%', number_format($trabajo->fields['monto_cobrado'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						$row = str_replace('%importe%', number_format($total_trabajo_monto_cobrado, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					} else {
-						$row = str_replace('%importe%', number_format($trabajo->fields['importe'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						$row = str_replace('%importe%', number_format($total_trabajo_importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					}
-					$row = str_replace('%importe_ajustado%', number_format($trabajo->fields['importe'] * $x_factor_ajuste, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					$row = str_replace('%importe_ajustado%', number_format($total_trabajo_importe * $x_factor_ajuste, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
@@ -8066,6 +8166,8 @@ class NotaCobro extends Cobro {
 				$asunto->fields['trabajos_total_valor'] = 0;
 				$asunto->fields['trabajos_total_duracion_retainer'] = 0;
 				$asunto->fields['trabajos_total_importe'] = 0;
+
+
 
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
