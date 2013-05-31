@@ -43,6 +43,8 @@ $_LANG['Contacto'] = "Contact";
 $_LANG['Atención'] = "Attention";
 $_LANG['Giro'] = "Type of business";
 $_LANG['Dirección'] = "Address";
+$_LANG['Resumen Asuntos'] = "Matter Summary";
+$_LANG['Titulo Asunto'] = "Legal Area";
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";

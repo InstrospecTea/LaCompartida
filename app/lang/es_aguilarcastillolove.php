@@ -235,6 +235,7 @@ $_LANG['Semana anterior'] = "Semana anterior";
 $_LANG['Semana siguiente'] = "Semana siguiente";
 $_LANG['Fechas asociadas guardadas exitosamente'] = "Fechas asociadas guardadas exitosamente";
 $_LANG['No Aplicable'] = "No Aplicable";
+$_LANG['Titulo Asunto'] = "Area Legal";
 $_LANG['Actualizar a cambio actual'] = "Actualizar a cambio actual";
 $_LANG['¿Desea actualizar al tipo de cambio actual?'] = "¿Desea actualizar al tipo de cambio actual?";
 $_LANG['El monto ingresado del tipo de cambio es incorrecto'] = "El monto ingresado del tipo de cambio es incorrecto";
