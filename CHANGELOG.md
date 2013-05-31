@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix: 13.3.21
 Viernes 31 de Mayo 2013
-* **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias"](https://github.com/LemontechSA/ttb/pull/192)
+* **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias"](https://github.com/LemontechSA/ttb/pull/196)
 
 ## Hotfix: 13.3.21
 Viernes 28 de Mayo 2013
