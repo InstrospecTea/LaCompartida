@@ -107,8 +107,7 @@ $doc = new DocGenerator($html, $cssData, $cobro->fields['opc_papel'], $cobro->fi
 $valor_unico = substr(time(), -3);
 
 
-//echo '<style>'.$cssData.'</style>'.$html;
-//exit;
+//echo '<style>'.$cssData.'</style>'.$html; exit;
 
 
 if ($enpdf) {
