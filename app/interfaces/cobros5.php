@@ -1841,36 +1841,36 @@ if ($cobro->fields['se_esta_cobrando'])
 											</table>
 										</td>
 									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
-									</tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
+                                    </tr>
 <?php if (UtilesApp::GetConf($sesion, 'PrmGastos')) { ?>
 										<tr>
 											<td align="right"><input type="checkbox" name="opc_ver_concepto_gastos" id="opc_ver_concepto_gastos" value="1" <?php echo $cobro->fields['opc_ver_concepto_gastos'] == '1' ? 'checked' : '' ?>></td>
-											<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?php echo __('Mostrar concepto de gastos') ?></label></td>
+											<td align="left" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?php echo __('Mostrar concepto de gastos') ?></label></td>
 										</tr>
 <?php } ?>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?php echo $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2"style="font-size: 10px;"><label for="opc_ver_morosidad"><?php echo __('Mostrar saldo adeudado') ?></label></td>
-									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?php echo $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?php echo __('Mostrar tipos de cambio') ?></label></td>
-									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_descuento" value="1" <?php echo $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><?php echo __('Mostrar el descuento del cobro') ?></td>
-									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
-									</tr>
-									<tr>        
-										<td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar columna cobrable') ?></label></td>
-									</tr> <!-- Andres Oestemer -->
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?php echo $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_morosidad"><?php echo __('Mostrar saldo adeudado') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?php echo $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?php echo __('Mostrar tipos de cambio') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_descuento" id="opc_ver_descuento" value="1" <?php echo $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?php echo __('Mostrar el descuento del cobro') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
+                                    </tr>
+                                    <tr>        
+                                        <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
+                                    </tr>="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
 <?php
 if (method_exists('Conf', 'GetConf'))
 	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
