@@ -109,16 +109,20 @@ require_once dirname(__FILE__).'/../conf.php';
 			    case '21': $condicion_pago = __('Cheque a fecha'); break;
 			}
 
+			$query_comodines ="SELECT nombre, valor FROM prm_comodin_fac_pdf";
+			$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
+			
+			$array_comodines = array();
+			while (list($nombre,$valor) = mysql_fetch_array($resp_comodines)) {
+				$array_comodines[$nombre] = $valor;
+			}
+
 			$arreglo_monedas = ArregloMonedas($this->sesion);
 			$monto_palabra=new MontoEnPalabra($this->sesion);
+
 			switch( $tipo_dato ) {
 
-				case 'debe': $glosa_dato = 'Debe';
-				case 'debea': $glosa_dato = 'Debe a';
-				case 'concepto': $glosa_dato = 'Concepto';
-				case 'son': $glosa_dato = 'Son:';
-				case 'atentamente': $glosa_dato = 'Atentamente';
-				case 'valor': $glosa_dato = 'Valor';
+				//case 'debe': $glosa_dato = 'Debe'; break;
 
 				case 'razon_social':						$glosa_dato = $factura->fields['cliente']; break;
 				case 'rut':											$glosa_dato = $factura->fields['RUT_cliente']; break;
@@ -151,13 +155,19 @@ require_once dirname(__FILE__).'/../conf.php';
 				case 'moneda_iva':							$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'moneda_total':						$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'monto_subtotal':					$glosa_dato = number_format(
-																												$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-																												$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-																												$idioma->fields['separador_decimales'],
-																												$idioma->fields['separador_miles']); break;
+																			$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+																			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+																			$idioma->fields['separador_decimales'],
+																			$idioma->fields['separador_miles']); break;
 				case 'monto_iva':								$glosa_dato = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 				case 'monto_total':							$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 				case 'monto_total_2':						$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
+				
+				default:
+					if (array_key_exists($tipo_dato, $array_comodines)) {
+						$glosa_dato = $array_comodines[$tipo_dato];
+					}
+					
 			}
 
 			return $glosa_dato;
