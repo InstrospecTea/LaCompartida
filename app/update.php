@@ -9810,9 +9810,9 @@ QUERY;
 
 		case 7.39:
 			$query = array();
-			$query[] = "CREATE TABLE IF NOT EXISTS prm_comodin_fac_pdf(id_comodin INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id_comodin), nombre VARCHAR(30),  valor VARCHAR(29))";
+			$query[] = "CREATE TABLE IF NOT EXISTS prm_parametrico_fac_pdf(id_comodin INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id_comodin), nombre VARCHAR(30),  valor VARCHAR(29))";
 
-			$query[] = "INSERT INTO  prm_comodin_fac_pdf (`id_comodin` ,`nombre` ,`valor`)VALUES (NULL ,  'debe',  'Debe'), (NULL ,  'concepto',  'Concepto'), (NULL ,  'atentamente',  'Atentamente'),(NULL, 'debea', 'Debe a:'),(NULL, 'son', 'Son:')";
+			$query[] = "INSERT INTO  prm_parametrico_fac_pdf (`id_comodin` ,`nombre` ,`valor`)VALUES (NULL ,  'debe',  'Debe'), (NULL ,  'concepto',  'Concepto'), (NULL ,  'atentamente',  'Atentamente'),(NULL, 'debea', 'Debe a:'),(NULL, 'son', 'Son:')";
 
 			ejecutar($query, $dbh);
 			break;
