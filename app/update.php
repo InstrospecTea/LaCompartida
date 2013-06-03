@@ -9812,7 +9812,7 @@ QUERY;
 			$query = array();
 			$query[] = "CREATE TABLE IF NOT EXISTS prm_comodin_fac_pdf(id_comodin INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id_comodin), nombre VARCHAR(30),  valor VARCHAR(29))";
 
-			$query[] = "INSERT INTO  `mosquera_timetracking`.`prm_comodin_fac_pdf` (`id_comodin` ,`nombre` ,`valor`)VALUES (NULL ,  'debe',  'Deb'), (NULL ,  'concepto',  'Concepto'), (NULL ,  'atentamente',  'Atentamente'), (NULL ,  'valor',  'Valor')";
+			$query[] = "INSERT INTO  prm_comodin_fac_pdf (`id_comodin` ,`nombre` ,`valor`)VALUES (NULL ,  'debe',  'Deb'), (NULL ,  'concepto',  'Concepto'), (NULL ,  'atentamente',  'Atentamente'), (NULL ,  'valor',  'Valor')";
 
 			ejecutar($query, $dbh);
 			break;
