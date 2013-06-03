@@ -1,5 +1,9 @@
 # Changelog
-## Hotfix: 13.3.21
+## hotfix: 13.3.23
+Lunes 3 de Junio 2013
+* **Fixed:** [Agrega campos comodines a mantenedor factura pdf](https://github.com/LemontechSA/ttb/pull/198)
+
+## Hotfix: 13.3.22
 Viernes 31 de Mayo 2013
 * **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias"](https://github.com/LemontechSA/ttb/pull/196)
 
