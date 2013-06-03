@@ -112,6 +112,14 @@ require_once dirname(__FILE__).'/../conf.php';
 			$arreglo_monedas = ArregloMonedas($this->sesion);
 			$monto_palabra=new MontoEnPalabra($this->sesion);
 			switch( $tipo_dato ) {
+
+				case 'debe': $glosa_dato = 'Debe';
+				case 'debea': $glosa_dato = 'Debe a';
+				case 'concepto': $glosa_dato = 'Concepto';
+				case 'son': $glosa_dato = 'Son:';
+				case 'atentamente': $glosa_dato = 'Atentamente';
+				case 'valor': $glosa_dato = 'Valor';
+
 				case 'razon_social':						$glosa_dato = $factura->fields['cliente']; break;
 				case 'rut':											$glosa_dato = $factura->fields['RUT_cliente']; break;
 				case 'telefono':								$glosa_dato = $contrato->fields['factura_telefono']; break;
