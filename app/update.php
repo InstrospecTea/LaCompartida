@@ -9802,15 +9802,23 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.38:
+			$queries = array();
+			$queries[] = "INSERT INTO  factura_pdf_datos_categoria (`id_factura_pdf_datos_categoria` ,`glosa`)VALUES (NULL ,  'Comodines')";
+			$queries[] = "INSERT INTO  prm_codigo (`id_codigo` ,`grupo` ,`codigo`,`glosa`)VALUES (NULL,'PRM_FACTURA_PDF','debe','Debe'), (NULL,'PRM_FACTURA_PDF','concepto','Concepto'), (NULL,'PRM_FACTURA_PDF','atentamente','Atentamente'), (NULL,'PRM_FACTURA_PDF','debea', 'Debe a:'), (NULL,'PRM_FACTURA_PDF','son', 'Son:')";
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
+
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.37;
+$max_update = 7.38;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
