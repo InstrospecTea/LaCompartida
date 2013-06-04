@@ -109,12 +109,11 @@ require_once dirname(__FILE__).'/../conf.php';
 			    case '21': $condicion_pago = __('Cheque a fecha'); break;
 			}
 
-			$query_comodines ="SELECT nombre, valor FROM prm_comodin_fac_pdf";
+			$query_comodines ="SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
 			$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
-			
 			$array_comodines = array();
-			while (list($nombre,$valor) = mysql_fetch_array($resp_comodines)) {
-				$array_comodines[$nombre] = $valor;
+			while (list($codigo,$glosa) = mysql_fetch_array($resp_comodines)) {
+				$array_comodines[$codigo] = $glosa;
 			}
 
 			$arreglo_monedas = ArregloMonedas($this->sesion);
