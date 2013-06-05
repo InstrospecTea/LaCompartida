@@ -22,7 +22,9 @@ require_once dirname(__FILE__).'/../app/conf.php';
 						'192.168.1.102',
 						'rdsdb1.thetimebilling.com',
 						'rdsdb2.thetimebilling.com',
-						'rdsdb3.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
+						'rdsdb3.thetimebilling.com',
+						'rdsdb4.thetimebilling.com',
+						'rdsdb5.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
 				
 			</div><br/>';
 	  
