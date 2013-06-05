@@ -413,9 +413,22 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 			return o.aData[2];
 		}, "bUseRendered": false, "aTargets": [2]},	
 
-		{  "fnRender": function ( o, val ) {
+		{"fnRender": function ( o, val ) {
+			var idcobro=o.aData[10];
 			var respuesta='';
-			if(o.aData[9]=='SIN COBRO' || o.aData[9]=='CREADO' || o.aData[9]=='EN REVISION') {
+			if (idcobro>0) {
+				respuesta+="<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+idcobro+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+idcobro+"</a><br/>";
+			}
+			return respuesta+'<small>'+o.aData[9]+'</small>';
+		}, "aTargets": [9]},
+
+		{  "fnRender": function ( o, val ) {
+
+			
+			var respuesta='';
+			/*mejorar*/
+			var estado = o.aData[9].replace('</small>','').replace('<small>','');
+			if(estado=='SIN COBRO' || estado=='CREADO' || estado=='EN REVISION') {
 				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[0]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[0]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
 				respuesta+="<input type='checkbox' class='eligegasto' id='check_"+o.aData[0]+"'/>";
 			} else {
@@ -424,15 +437,6 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 			return respuesta;
 		}, "bUseRendered": false, "aTargets": [13]},
-
-		{"fnRender": function ( o, val ) {
-			var idcobro=o.aData[8];
-			var respuesta='';
-			if (idcobro>0) {
-				respuesta+="<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+idcobro+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+idcobro+"</a><br/>";
-			}
-			return respuesta+'<small>'+o.aData[9]+'</small>';
-		}, "aTargets": [10]},
 		
 		{"fnRender": function (o,val) {
 			if(o.aData[13]) {
