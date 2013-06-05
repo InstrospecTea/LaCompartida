@@ -427,11 +427,8 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 			
 			var respuesta='';
 			/*mejorar*/
-			var est = o.aData[9];
-			var est1 = est.replace('</small>','');
-			var est2 = est1.replace('<small>','');
-			
-			if(est2=='SIN COBRO' || est2=='CREADO' || est2=='EN REVISION') {
+			var estado = o.aData[9].replace('</small>','').replace('<small>','');
+			if(estado=='SIN COBRO' || estado=='CREADO' || estado=='EN REVISION') {
 				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[0]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[0]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
 				respuesta+="<input type='checkbox' class='eligegasto' id='check_"+o.aData[0]+"'/>";
 			} else {
