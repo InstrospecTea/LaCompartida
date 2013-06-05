@@ -1,6 +1,10 @@
 # Changelog
+## hotfix: 13.3.24
+Miercoles 5 de Junio 2013
+* **Fixed:** [Correccion a update](https://github.com/LemontechSA/ttb/pull/199)
+
 ## hotfix: 13.3.23
-Lunes 3 de Junio 2013
+Martes 4 de Junio 2013
 * **Fixed:** [Agrega campos comodines a mantenedor factura pdf](https://github.com/LemontechSA/ttb/pull/198)
 
 ## Hotfix: 13.3.22
