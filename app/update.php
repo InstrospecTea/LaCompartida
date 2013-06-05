@@ -9804,7 +9804,7 @@ QUERY;
 
 		case 7.38:
 			$queries = array();
-			$queries[] = "INSERT INTO  factura_pdf_datos_categoria (`id_factura_pdf_datos_categoria` ,`glosa`)VALUES (NULL ,  'Comodines')";
+			$queries[] = "INSERT IGNORE INTO  factura_pdf_datos_categoria (`id_factura_pdf_datos_categoria` ,`glosa`)VALUES (NULL ,  'Comodines')";
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_codigo` (
 							`id_codigo` int(11) NOT NULL AUTO_INCREMENT,
 							`grupo` varchar(20) NOT NULL COMMENT 'listado al que pertenece este item',
@@ -9813,7 +9813,7 @@ QUERY;
 							PRIMARY KEY (`id_codigo`),
 							UNIQUE KEY `grupo` (`grupo`,`codigo`)
 						) ENGINE=InnoDB COMMENT='pares de codigo-glosa para listados parametricos en general' AUTO_INCREMENT=1 ;";
-			$queries[] = "INSERT INTO  prm_codigo (`id_codigo` ,`grupo` ,`codigo`,`glosa`)VALUES (NULL,'PRM_FACTURA_PDF','debe','Debe'), (NULL,'PRM_FACTURA_PDF','concepto','Concepto'), (NULL,'PRM_FACTURA_PDF','atentamente','Atentamente'), (NULL,'PRM_FACTURA_PDF','debea', 'Debe a:'), (NULL,'PRM_FACTURA_PDF','son', 'Son:')";
+			$queries[] = "INSERT IGNORE INTO  prm_codigo (`id_codigo` ,`grupo` ,`codigo`,`glosa`)VALUES (NULL,'PRM_FACTURA_PDF','debe','Debe'), (NULL,'PRM_FACTURA_PDF','concepto','Concepto'), (NULL,'PRM_FACTURA_PDF','atentamente','Atentamente'), (NULL,'PRM_FACTURA_PDF','debea', 'Debe a:'), (NULL,'PRM_FACTURA_PDF','son', 'Son:')";
 			ejecutar($queries, $dbh);
 			break;
 

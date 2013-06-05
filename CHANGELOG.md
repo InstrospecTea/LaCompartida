@@ -1,6 +1,10 @@
 # Changelog
 ## hotfix: 13.3.24
 Miercoles 5 de Junio 2013
+* **Fixed:** [modificacion update y recupera numero de cobro en planilla gastos](https://github.com/LemontechSA/ttb/pull/200)
+
+## hotfix: 13.3.24
+Miercoles 5 de Junio 2013
 * **Fixed:** [Correccion a update](https://github.com/LemontechSA/ttb/pull/199)
 
 ## hotfix: 13.3.23
