@@ -264,10 +264,18 @@ class Trabajo extends Objeto
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			// Si se pudo eliminar, loguear el cambio.
 			if ($resp) {
-				$query = "INSERT INTO trabajo_historial (id_trabajo, id_usuario, fecha, fecha_trabajo, descripcion, duracion, duracion_cobrada, id_usuario_trabajador, accion, codigo_asunto, cobrable)
-					VALUES ('{$this->fields['id_trabajo']}', '{$this->sesion->usuario->fields['id_usuario']}', '" . date("Y-m-d H:i:s") . "', '{$this->fields['fecha']}',
-						'{$this->fields['descripcion']}', '{$this->fields['duracion']}', '{$this->fields['duracion_cobrada']}', '{$this->fields['id_usuario']}', 'ELIMINAR',
-						'{$this->fields['codigo_asunto']}', '{$this->fields['cobrable']}')";
+				$query = "INSERT INTO trabajo_historial SET
+					id_trabajo = '{$this->fields['id_trabajo']}',
+					id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
+					fecha = '" . date("Y-m-d H:i:s") . "',
+					fecha_trabajo = '{$this->fields['fecha']}',
+					descripcion = '{$this->fields['descripcion']}',
+					duracion = '{$this->fields['duracion']}',
+					duracion_cobrada = '{$this->fields['duracion_cobrada']}',
+					id_usuario_trabajador = '{$this->fields['id_usuario']}',
+					accion = 'ELIMINAR',
+					codigo_asunto = '{$this->fields['codigo_asunto']}',
+					cobrable = '{$this->fields['cobrable']}'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
 		} else {
