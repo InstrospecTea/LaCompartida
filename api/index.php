@@ -188,6 +188,14 @@ $Slim->get('/settings', function () use ($Session) {
 		if ($Session->arrayconf['TodoMayuscula']) {
 			array_push($settings, array('code' => 'UseUppercase', 'value' => $Session->arrayconf['TodoMayuscula']));
 		}
+
+		if ($Session->arrayconf['PermitirCampoCobrableAProfesional']) {
+			array_push($settings, array('code' => 'AllowBillable', 'value' => $Session->arrayconf['PermitirCampoCobrableAProfesional']));
+		}
+
+		if ($Session->arrayconf['MaxDuracionTrabajo']) {
+			array_push($settings, array('code' => 'MaxWorkDuration', 'value' => $Session->arrayconf['MaxDuracionTrabajo']));
+		}
 	}
 
 	outputJson($settings);
