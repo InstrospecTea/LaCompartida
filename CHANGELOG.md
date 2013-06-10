@@ -1,4 +1,9 @@
 # Changelog
+## hotfix: 13.3.28
+Viernes 10 de Junio 2013
+* **Fixed:** [Correccion glosa_cliente en excel tramites](https://github.com/LemontechSA/ttb/pull/203)
+
+
 ## hotfix: 13.3.27
 Viernes 7 de Junio 2013
 * **Fixed:** [Correcciones varias Querys](https://github.com/LemontechSA/ttb/pull/202)
