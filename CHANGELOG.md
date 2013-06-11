@@ -1,8 +1,11 @@
 # Changelog
 ## hotfix: 13.3.28
+Viernes 11 de Junio 2013
+* **Fixed:** [Correccion glosa_cliente en interfaz listado tramites](https://github.com/LemontechSA/ttb/pull/204)
+
+## hotfix: 13.3.28
 Viernes 10 de Junio 2013
 * **Fixed:** [Correccion glosa_cliente en excel tramites](https://github.com/LemontechSA/ttb/pull/203)
-
 
 ## hotfix: 13.3.27
 Viernes 7 de Junio 2013
