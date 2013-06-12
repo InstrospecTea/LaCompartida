@@ -1,15 +1,70 @@
 # Changelog
-## Hotfix: 13.3.15
+## hotfix: 13.3.28
+Viernes 11 de Junio 2013
+* **Fixed:** [Correccion glosa_cliente en interfaz listado tramites](https://github.com/LemontechSA/ttb/pull/204)
+
+## hotfix: 13.3.28
+Viernes 10 de Junio 2013
+* **Fixed:** [Correccion glosa_cliente en excel tramites](https://github.com/LemontechSA/ttb/pull/203)
+
+## hotfix: 13.3.27
+Viernes 7 de Junio 2013
+* **Fixed:** [Correcciones varias Querys](https://github.com/LemontechSA/ttb/pull/202)
+
+## hotfix: 13.3.26
+Miercoles 6 de Junio 2013
+* **Fixed:** [Correcciones varias Querys](https://github.com/LemontechSA/ttb/pull/201)
+
+## hotfix: 13.3.25
+Miercoles 5 de Junio 2013
+* **Fixed:** [modificacion update y recupera numero de cobro en planilla gastos](https://github.com/LemontechSA/ttb/pull/200)
+
+## hotfix: 13.3.24
+Miercoles 5 de Junio 2013
+* **Fixed:** [Correccion a update](https://github.com/LemontechSA/ttb/pull/199)
+
+## hotfix: 13.3.23
+Martes 4 de Junio 2013
+* **Fixed:** [Agrega campos comodines a mantenedor factura pdf](https://github.com/LemontechSA/ttb/pull/198)
+
+## Hotfix: 13.3.22
+Viernes 31 de Mayo 2013
+* **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias"](https://github.com/LemontechSA/ttb/pull/196)
+
+## Hotfix: 13.3.21
+Viernes 28 de Mayo 2013
+* **Fixed:** [Corrige error de campo cliente en agregar_factura y agregar_pago_factura, agrega Ordenado por en resumen horas, corrige problema de decimal en ingresar_documento_pago"](https://github.com/LemontechSA/ttb/pull/189)
+
+## Hotfix: 13.3.20
+Viernes 17 de Mayo 2013
+* **Fixed:** [Corrige error de despliege de opcion de impresion "opc ver solicitante", agrega update a tabla prm_cobro_excel](https://github.com/LemontechSA/ttb/pull/189)
+
+## Hotfix: 13.3.19
+Viernes 17 de Mayo 2013
+* **Fixed:** [Se agrega anchor %td_id_trabajo% el cual solo se muestra cuando el cobro esta en los estados CREADO y EN REVISION](https://github.com/LemontechSA/ttb/pull/188)
+
+## Hotfix: 13.3.18
+Viernes 17 de Mayo 2013
+* **Fixed:** [Correcciones segmento gastos cobro_xls](https://github.com/LemontechSA/ttb/pull/187)
+
+## Hotfix: 13.3.17
+lunes 14 de mayo 2013
+* **Fixed:** [Permite agregar codigo asunto secundario con mas de 4 caracteres](https://github.com/LemontechSA/ttb/pull/185)
+* **Fixed:** [Permite editar el visible del cobro cuando el asunto al cual esta asociado esta definido como no cobrable](https://github.com/LemontechSA/ttb/pull/185)
+* **Fixed:** [Recupera funcionalidad de opc ver trabajos no visibles](https://github.com/LemontechSA/ttb/pull/185)
+* **Fixed:** [Corrige problema de fecha desde en excel de cobro](https://github.com/LemontechSA/ttb/pull/185)
+
+## Hotfix: 13.3.16
 lunes 09 de mayo 2013
-* **Fixed:** [Corrige error de error de despliege documento excel y agrega la opcion solicitante en gastos](#)
+* **Fixed:** [Corrige error de error de despliege documento excel y agrega la opcion solicitante en gastos](https://github.com/LemontechSA/ttb/pull/186)
 
 ## Hotfix: 13.3.15
 lunes 30 de abril 2013
-* **Fixed:** [Corrige error planilla saldo con clientes que utilizan codigo secundario](#178)
+* **Fixed:** [Corrige error planilla saldo con clientes que utilizan codigo secundario](https://github.com/LemontechSA/ttb/pull/178)
 
 ## Hotfix: 13.3.14
 lunes 29 de abril 2013
-* **Fixed:** [Corrige selector de documento](#176)
+* **Fixed:** [Corrige selector de documento](https://github.com/LemontechSA/ttb/pull/176)
 
 ## Hotfix: 13.3.13
 jueves 26 de abril 2013

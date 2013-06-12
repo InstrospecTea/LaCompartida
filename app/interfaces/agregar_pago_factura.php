@@ -657,12 +657,25 @@ if ($id_adelanto) {
 		continuar = 1;
 		ValidaMontoSaldoPago(form);
 
-		if ($('codigo_cliente').value == '') {
+		<?php if ( UtilesApp::GetConf($sesion,'CodigoSecundario')) { ?>
+
+		if ($('codigo_cliente_secundario').value == '') {
 			alert('Debe ingresar un cliente.');
 			$('codigo_cliente').focus();
 			$('boton_guardar').disabled = false;
 			return false;
 		}
+
+		<? } else { ?>
+
+			if ($('codigo_cliente').value == '') {
+			alert('Debe ingresar un cliente.');
+			$('codigo_cliente').focus();
+			$('boton_guardar').disabled = false;
+			return false;
+		}
+
+		<?php } ?>
 		// Validaciones de montos
 		if (!isNumber($('monto').value)) {
 			alert('El formato del monto ingresado no es valido.');
@@ -826,6 +839,7 @@ if ($id_adelanto) {
 				<?php
 				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					$cliente = new Cliente($sesion);
+					$codigo_cliente = $cobro->fields['codigo_cliente'];
 					$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				}
 
