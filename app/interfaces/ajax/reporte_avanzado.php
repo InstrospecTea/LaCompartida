@@ -21,7 +21,8 @@ if ($_POST['opc'] == 'guardar_reporte') {
 	if ($id_reporte) {
 		$query = "UPDATE usuario_reporte
 					SET `reporte` = '{$reporte_sql}',
-						`glosa` = '{$nombre}'
+						`glosa` = '{$nombre}',
+						`segun` = ''
 					WHERE `id_reporte` = '{$id_reporte}'";
 	} else {
 		$id_usuario = $sesion->usuario->fields['id_usuario'];
