@@ -9839,10 +9839,6 @@ QUERY;
 
 		case 7.39:
 			$queries = array();
-			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
-			break;
-		case 7.40:
-			$queries = array();
 			$queries[] = "INSERT IGNORE INTO  factura_pdf_datos_categoria (`id_factura_pdf_datos_categoria` ,`glosa`)VALUES (NULL ,  'Comodines')";
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_codigo` (
 							`id_codigo` int(11) NOT NULL AUTO_INCREMENT,
@@ -9856,6 +9852,10 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.40:
+			$queries = array();
+			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			break;
 	}
 }
 
@@ -9865,7 +9865,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.39;
+$max_update = 7.40;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
