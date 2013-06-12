@@ -53,6 +53,7 @@ class SimpleReport extends Objeto {
 		'RETRIBUCIONES_RESUMEN_ENCABEZADO' => 'RetribucionesResumen',
 		'RETRIBUCIONES_RESUMEN_DETALLE' => 'RetribucionesResumen.configuracion_subreporte',
 		'REPORTE_SALDO_CLIENTES' => 'ReportesEspecificos.configuracion_saldo_clientes',
+		'REPORTE_SALDO_CLIENTES_RESUMEN' => 'ReportesEspecificos.configuracion_saldo_clientes_resumen',
 //		'HORAS' => 'Trabajo',
 //		'TRAMITES' => 'Tramite',
 //		'ADELANTOS' => '',
