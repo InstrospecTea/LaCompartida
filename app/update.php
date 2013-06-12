@@ -9852,6 +9852,32 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.40:
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `cliente_seguimiento` (
+										`id` int(11) NOT NULL AUTO_INCREMENT,
+										`codigo_cliente` varchar(10) NOT NULL,
+										`comentario` text NOT NULL,
+										`id_usuario` int(11) NOT NULL,
+										`fecha_creacion` datetime NOT NULL,
+										`fecha_modificacion` datetime NOT NULL,
+										PRIMARY KEY (`id`),
+										KEY `id_usuario` (`id_usuario`),
+										KEY `codigo_cliente` (`codigo_cliente`)
+										) ENGINE=InnoDB;";
+
+			if (!ExisteLlaveForanea('cliente_seguimiento', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente_seguimiento`
+			  	ADD CONSTRAINT `cliente_seguimiento_ibfk_1` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`)";
+			}
+
+			if (!ExisteLlaveForanea('cliente_seguimiento', 'id_usuario', 'usuario', 'id_usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente_seguimiento`
+					ADD CONSTRAINT `cliente_seguimiento_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`);";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9861,7 +9887,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.39;
+$max_update = 7.40;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
