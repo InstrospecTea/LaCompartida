@@ -1,5 +1,10 @@
 # Changelog
 ## hotfix: 13.3.28
+Viernes 12 de Junio 2013
+* **Fixed:** [Campos de texto para nota cobro cuestacampos](https://github.com/LemontechSA/ttb/pull/205)
+
+
+## hotfix: 13.3.28
 Viernes 11 de Junio 2013
 * **Fixed:** [Correccion glosa_cliente en interfaz listado tramites](https://github.com/LemontechSA/ttb/pull/204)
 
