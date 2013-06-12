@@ -170,10 +170,15 @@ function SaldoPago(& $fila) {
 }
 
 function Opciones(& $fila) {
+	global $Sesion;
 	$id_factura_pago = $fila->fields['id_factura_pago'];
 	$codigo_cliente = $fila->fields['cliente_pago'];
 	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&id_cobro={$fila->fields['id_cobro']}&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 	$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumentoPago(" . $id_factura_pago . ");\" ><img src='" . Conf::ImgDir() . "/pdf.gif' border=0 title=Imprimir></a>";
+
+ 		 $html_opcion .=UtilesApp::LogDialog($Sesion, 'factura_pago',$id_factura_pago);
+
+	
 	return $html_opcion;
 }
 
