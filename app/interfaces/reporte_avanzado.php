@@ -430,10 +430,10 @@ if (!$popup) {
 
 											$glosa = sprintf('%02d) %s', $j, $glosa);
 											if (is_null(json_decode($mi_reporte['reporte']))) {
-												$tpl_option = '<option %s data-reporte="%s" value="%s" data-envio="%s" data-segun="%s" data-glosa="%s">old-%s</option>' . "\n";
+												$tpl_option = '<option %s data-reporte="%s" value="%s" data-envio="%s" data-segun="%s" data-glosa="%s">%s</option>' . "\n";
 												printf($tpl_option, $selected_mi_reporte, $mi_reporte['reporte'], $mi_reporte['id_reporte'], $mi_reporte['envio'], $mi_reporte['segun'], $mi_reporte['glosa'], $glosa);
 											} else {
-												$tpl_option = '<option %s data-reporte="%s" value="%s" data-glosa="%s">new-%s</option>' . "\n";
+												$tpl_option = '<option %s data-reporte="%s" value="%s" data-glosa="%s">%s</option>' . "\n";
 												printf($tpl_option, $selected_mi_reporte, str_replace('"', "'", $mi_reporte['reporte']), $mi_reporte['id_reporte'], $mi_reporte['glosa'], $glosa);
 											}
 											++$j;
