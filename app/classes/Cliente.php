@@ -340,7 +340,7 @@ class Cliente extends Objeto {
 	}
 
 	function InsertarDatos(/* Argumentos */) {
-		// Copia de pedazo de codigo en agregar_cliente.php	
+		// Copia de pedazo de codigo en agregar_cliente.php
 	}
 
 	//funcion que asigna el nuevo codigo automatico para un cliente
@@ -408,7 +408,7 @@ class Cliente extends Objeto {
 			$where .= " AND codigo_asunto IN ('$lista_asuntos') ";
 
 		$codigo_cliente = $this->fields['codigo_cliente'];
-		$query = "SELECT SUM(ingreso*tipo_cambio), SUM(egreso*tipo_cambio) 
+		$query = "SELECT SUM(ingreso*tipo_cambio), SUM(egreso*tipo_cambio)
 							FROM cta_corriente JOIN prm_moneda on prm_moneda.id_moneda =cta_corriente.id_moneda
 							WHERE $where AND codigo_cliente ='$codigo_cliente'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -428,7 +428,7 @@ class Cliente extends Objeto {
 							JOIN asunto ON t2.codigo_asunto = asunto.codigo_asunto
 							JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 							LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
-							WHERE 1 $where 
+							WHERE 1 $where
 							AND t2.cobrable = 1
 							AND asunto.codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -441,16 +441,16 @@ class Cliente extends Objeto {
 		if (!$emitido)
 			$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
 
-		$query = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa), prm_moneda.simbolo   
-							FROM trabajo 
+		$query = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa), prm_moneda.simbolo
+							FROM trabajo
 							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 							JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-							JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente 
-							JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
-							LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario AND contrato.id_moneda=usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa) 
-							LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
-							WHERE 1 $where  
-							AND trabajo.cobrable = 1 
+							JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+							JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
+							LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario AND contrato.id_moneda=usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
+							LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
+							WHERE 1 $where
+							AND trabajo.cobrable = 1
 							AND cliente.codigo_cliente ='" . $this->fields['codigo_cliente'] . "' GROUP BY cliente.codigo_cliente";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_monto_trabajado, $moneda) = mysql_fetch_array($resp);
@@ -675,7 +675,7 @@ class Cliente extends Objeto {
 		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username);
 		$SimpleReport->Config->columns['usuario_nombre']->Visible(!$usa_username);
 		$SimpleReport->Config->columns['usuario_secundario_nombre']->Visible(!$usa_username);
-		
+
 		//swapear codigo y codigo_secundario
 		if(UtilesApp::GetConf($this->sesion, 'CodigoSecundario')){
 			$SimpleReport->Config->columns['codigo_cliente']->Field('codigo_cliente_secundario');
@@ -781,6 +781,46 @@ class Cliente extends Objeto {
 		}
 	}
 
+	/**
+	 * Find all active clients
+	 * Return an array with next elements:
+	 * 	code (secondary if used), name and address
+	 */
+	public function findAllActive($timestamp = 0) {
+		$active = 1;
+		$clients = array();
+		$sql_select_client_code = '`client`.`codigo_cliente`';
+
+		// find if the client used secondary code
+		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
+			$sql_select_client_code = '`client`.`codigo_cliente_secundario`';
+		}
+
+		$sql = "SELECT $sql_select_client_code AS `code`, `client`.`glosa_cliente` AS `name`,
+			`contract`.`direccion_contacto` AS `address`
+			FROM `cliente` AS `client`
+				INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`
+			WHERE `client`.`activo`=:active AND (`client`.`fecha_touch`>=:timestamp OR `client`.`fecha_creacion`>=:timestamp)
+			ORDER BY `client`.`glosa_cliente` ASC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('active', $active);
+		$Statement->bindParam('timestamp', date('Y-m-d', $timestamp));
+
+		$Statement->execute();
+
+		while ($client = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($clients,
+				array(
+					'code' => $client->code,
+					'name' => !empty($client->name) ? $client->name : null,
+					'address' => !empty($client->address) ? $client->address : null
+				)
+			);
+		}
+
+		return $clients;
+	}
 }
 
 class ListaClientes extends Lista {
