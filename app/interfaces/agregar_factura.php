@@ -572,8 +572,13 @@ if ($zona_horaria) {
 		<tr>
 			<td align=right><?php echo  __('Cliente') ?></td>
 			<td align=left colspan=3>
-				<?php	 UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
+				<?php	 
+					$cliente = new Cliente($sesion);
+					$codigo_cliente = $cobro->fields['codigo_cliente'];
+					$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
+				UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+				
  				<span style="color:#FF0000; font-size:10px">*</span></td>
 		</tr>
 		<tr>

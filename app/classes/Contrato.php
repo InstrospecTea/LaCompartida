@@ -531,323 +531,280 @@ class Contrato extends Objeto {
 	function TotalHoras($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '') {
 		$where = '';
 		if (!$emitido) {
-			$where = " AND (t2.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado='EN REVISION') ";
+			$where = " AND (t2.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')) ";
 		}
+
 		if (!empty($codigo_asunto)) {
 			$where .= " AND t2.codigo_asunto = '$codigo_asunto' ";
 		}
+
 		if (!empty($fecha_ini)) {
 			$where .= " AND t2.fecha >= '$fecha_ini' ";
 		}
+
 		if (!empty($fecha_fin)) {
 			$where .= " AND t2.fecha <= '$fecha_fin' ";
 		}
 
 		$query = "SELECT
-								SUM(TIME_TO_SEC(duracion_cobrada))/3600 as hrs_no_cobradas
-							FROM trabajo AS t2
-							JOIN asunto ON t2.codigo_asunto = asunto.codigo_asunto
-							LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
-							WHERE 1 $where
-							AND t2.cobrable = 1
-							AND asunto.id_contrato='" . $this->fields['id_contrato'] . "'";
+				SUM(TIME_TO_SEC(duracion_cobrada)) / 3600 AS hrs_no_cobradas
+			FROM trabajo AS t2
+				JOIN asunto ON t2.codigo_asunto = asunto.codigo_asunto
+			WHERE 1 $where
+				AND t2.cobrable = 1
+				AND asunto.id_contrato = {$this->fields['id_contrato']}";
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_horas_no_cobradas) = mysql_fetch_array($resp);
 
-		if ($total_horas_no_cobradas)
-			return $total_horas_no_cobradas;   // total de horas cobrables no cobradas
-		else
+		if ($total_horas_no_cobradas) {
+			return $total_horas_no_cobradas; // total de horas cobrables no cobradas
+		} else {
 			return 0;
+		}
 	}
 
 	function TotalMonto($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '') {
 		$where = '';
-		if ($this->fields['forma_cobro'] == 'RETAINER') {
-			if (!$emitido) {
-				$where = " AND (t1.id_cobro IS NULL OR c2.estado = 'CREADO' OR c2.estado = 'EN REVISION') "; //el normal
-				$where_subquery = " AND (t2.id_cobro IS NULL OR c4.estado = 'CREADO' OR c4.estado = 'EN REVISION') "; //el que hace el calculo de horas que sobrepasan retainer
-			}
-			if (!empty($codigo_asunto)) {
-				$where .= " AND t1.codigo_asunto = '$codigo_asunto' ";
-				$where_subquery .= " AND t2.codigo_asunto = '$codigo_asunto' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND t1.fecha >= '$fecha_ini' ";
-				$where_subquery .= " AND t1.fecha >= '$fecha_ini' ";
-			}
-			if (!empty($fecha_fin)) {
-				$where .= " AND t1.fecha <= '$fecha_fin' ";
-				$where_subquery .= " AND t1.fecha <= '$fecha_fin' ";
-			}
 
-			if (!empty($codigo_asunto)) {
-				$cantidad_asuntos = $this->CantidadAsuntosPorFacturar($fecha_ini, $fecha_fin);
-				list($monto_hh_asunto, $x, $y) = $this->MontoHHTarifaSTD(false, $codigo_asunto, $fecha_ini, $fecha_fin);
-				list($monto_hh_contrato, $X, $Y) = $this->MontoHHTarifaSTD(false, '', $fecha_ini, $fecha_fin);
+		list($monto_hh_contrato, $X, $Y) = $this->MHHXYC;
+		list($monto_hh_asunto, $x, $y) = $this->MHHXYA;
 
-				if ($monto_hh_contrato > 0) {
-					$factor = number_format($monto_hh_asunto / $monto_hh_contrato, 6, '.', '');
-				} else {
-					$factor = number_format(1 / $cantidad_asuntos, 6, '.', '');
-				}
-			} else {
-				$factor = 1;
-			}
+		$factor = 1;
 
-			//subquery que se repite como mil veces
-			$subquery = " ( ( SELECT SUM( TIME_TO_SEC( t2.duracion_cobrada ) / 3600 )
-							FROM trabajo t2
-								JOIN asunto a2 ON ( t2.codigo_asunto = a2.codigo_asunto )
-								JOIN contrato c3 ON ( a2.id_contrato = c3.id_contrato )
-								JOIN prm_moneda pm2 ON ( c3.id_moneda = pm2.id_moneda )
-								LEFT JOIN usuario_tarifa ut2 ON ( t2.id_usuario = ut2.id_usuario
-									AND c3.id_moneda = ut2.id_moneda
-									AND c3.id_tarifa = ut2.id_tarifa )
-								LEFT JOIN cobro c4 ON ( t2.id_cobro = c4.id_cobro )
+		$where_estado = '';
+		$where_asunto = '';
+		$where_fecha1 = '';
+		$where_fecha2 = '';
+
+		if (!$emitido) {
+			$where_estado = " AND (t1.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')) "; //el normal
+		}
+
+		if (!empty($codigo_asunto)) {
+			$where_asunto = " AND t1.codigo_asunto = '$codigo_asunto' ";
+		}
+
+		if (!empty($fecha_ini)) {
+			$where_fecha1 = " AND t1.fecha >= '$fecha_ini' ";
+		}
+
+		if (!empty($fecha_fin)) {
+			$where_fecha2 = " AND t1.fecha <= '$fecha_fin' ";
+		}
+
+		switch ($this->fields['forma_cobro']) {
+			case'RETAINER':
+				$query = "SELECT $factor * plata_retainer + SUM(Macumulado) AS total_monto_trabajado, simbolo, id_moneda
+				FROM (
+					SELECT t1.codigo_asunto, t1.fecha, t1.plata_retainer, t1.simbolo, t1.id_moneda,
+						t1.duracionh AS t_individual, @acumulado:=@acumulado + t1.duracionh AS Tacumulado,
+						IF(@acumulado < t1.retainer_horas, 0, IF(@acumulado - t1.retainer_horas > t1.duracionh, t1.duracionh, @acumulado - t1.retainer_horas)) * t1.tarifa AS Macumulado
+					FROM
+						(
+							SELECT @acumulado:=0
+						) AS ac,
+						(
+							SELECT ut1.tarifa, c1.monto * (pm2.tipo_cambio / pm1.tipo_cambio) AS plata_retainer, c1.retainer_horas,
+								pm1.simbolo, pm1.id_moneda, t1.fecha, t1.id_trabajo, t1.id_usuario,
+								t1.codigo_asunto, time_to_sec(t1.duracion_cobrada) / 3600 AS duracionh
+							FROM trabajo t1
+								JOIN asunto a1 ON (t1.codigo_asunto = a1.codigo_asunto)
+								JOIN contrato c1 ON (a1.id_contrato = c1.id_contrato)
+								JOIN prm_moneda pm1 ON (c1.id_moneda = pm1.id_moneda)
+								LEFT JOIN prm_moneda pm2 ON (c1.id_moneda_monto = pm2.id_moneda)
+								LEFT JOIN usuario_tarifa ut1 ON (t1.id_usuario = ut1.id_usuario AND c1.id_moneda = ut1.id_moneda AND c1.id_tarifa = ut1.id_tarifa)
 							WHERE 1
-								$where_subquery
-								AND a2.id_contrato = '{$this->fields['id_contrato']}'
-								AND ( t2.fecha < t1.fecha OR ( t2.fecha = t1.fecha AND t2.id_trabajo <= t1.id_trabajo ) )
-								AND t2.cobrable = 1
-								AND t2.id_tramite = 0
-							GROUP BY a2.id_contrato ) - c1.retainer_horas * $factor ) ";
+								$where_estado
+								$where_fecha2
+								AND a1.id_contrato = {$this->fields['id_contrato']}
+								AND t1.cobrable = 1 AND t1.id_tramite = 0
+								ORDER BY t1.fecha, t1.id_trabajo
+						) AS t1
+				) AS t1
+				WHERE 1
+					$where_fecha1
+					$where_asunto
+				GROUP BY plata_retainer, simbolo, id_moneda";
+				break;
 
-			$query = "SELECT c1.monto * $factor * ( pm2.tipo_cambio / pm1.tipo_cambio ) + SUM( ut1.tarifa *
-					( IF ( $subquery < 0 , '0', IF ( $subquery > ( TIME_TO_SEC(t1.duracion_cobrada)/3600 ), TIME_TO_SEC(t1.duracion_cobrada)/3600 , $subquery ) ) )
-					) as total_monto_trabajado , pm1.simbolo, pm1.id_moneda
+			case 'PROPORCIONAL':
+				$subquery = "SELECT SUM((TIME_TO_SEC(duracion_cobrada) / 3600))
+				FROM trabajo AS t1
+					JOIN asunto ON t1.codigo_asunto = asunto.codigo_asunto
+					JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+					JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+					LEFT JOIN usuario_tarifa ON (
+						t1.id_usuario = usuario_tarifa.id_usuario
+						AND contrato.id_moneda = usuario_tarifa.id_moneda
+						AND contrato.id_tarifa = usuario_tarifa.id_tarifa
+					)
+				WHERE 1
+					$where_estado
+					$where_asunto
+					$where_fecha1
+					$where_fecha2
+					AND t1.cobrable = 1
+					AND t1.id_tramite = 0
+					AND asunto.id_contrato = {$this->fields['id_contrato']}
+				GROUP BY asunto.id_contrato";
+
+				$resp = mysql_query($subquery, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				list($duracion_total) = mysql_fetch_array($resp);
+
+				if (empty($duracion_total)) {
+					$duracion_total = '0';
+					$aporte_proporcional = 1;
+				} else {
+					$aporte_proporcional = number_format($factor * $this->fields['retainer_horas'] / $duracion_total, 6, '.', '');
+				}
+
+				$query = "SELECT
+						contrato.monto * $factor * (pm2.tipo_cambio / pm1.tipo_cambio) + SUM(((TIME_TO_SEC(t1.duracion_cobrada) / 3600) * usuario_tarifa.tarifa) * (1 - $aporte_proporcional)),
+						pm1.simbolo,
+						pm1.id_moneda
 					FROM trabajo t1
-						JOIN asunto a1 ON ( t1.codigo_asunto = a1.codigo_asunto )
-						JOIN contrato c1 ON ( a1.id_contrato = c1.id_contrato )
-						JOIN prm_moneda pm1 ON ( c1.id_moneda = pm1.id_moneda )
-						LEFT JOIN prm_moneda pm2 ON ( c1.id_moneda_monto = pm2.id_moneda )
-						LEFT JOIN usuario_tarifa ut1 ON ( t1.id_usuario = ut1.id_usuario
-							AND c1.id_moneda = ut1.id_moneda
-							AND c1.id_tarifa = ut1.id_tarifa )
-						LEFT JOIN cobro c2 ON ( t1.id_cobro = c2.id_cobro )
+						JOIN asunto ON t1.codigo_asunto = asunto.codigo_asunto
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+						JOIN prm_moneda AS pm1 ON contrato.id_moneda=pm1.id_moneda
+						LEFT JOIN prm_moneda AS pm2 ON contrato.id_moneda_monto = pm2.id_moneda
+						LEFT JOIN usuario_tarifa ON (
+							t1.id_usuario = usuario_tarifa.id_usuario
+							AND contrato.id_moneda = usuario_tarifa.id_moneda
+							AND contrato.id_tarifa = usuario_tarifa.id_tarifa
+						)
 					WHERE 1
-						$where
-						AND a1.id_contrato = '{$this->fields['id_contrato']}'
+						$where_estado
+						$where_asunto
+						$where_fecha1
+						$where_fecha2
+						AND t1.cobrable = 1 AND t1.id_tramite = 0 AND asunto.id_contrato = {$this->fields['id_contrato']}
+					GROUP BY asunto.id_contrato";
+				break;
+
+			case 'FLAT FEE':
+				// y por qué esta no mira la tabla trabajo?
+				$query = " SELECT contrato.monto * (moneda_monto.tipo_cambio / moneda_contrato.tipo_cambio) * $factor,
+					moneda_contrato.simbolo, moneda_contrato.id_moneda
+				FROM contrato
+					JOIN prm_moneda AS moneda_contrato ON contrato.opc_moneda_total = moneda_contrato.id_moneda
+					JOIN prm_moneda AS moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
+				WHERE contrato.id_contrato = {$this->fields['id_contrato']}";
+				break;
+
+			case 'CAP':
+				$query = " SELECT
+						SUM(TIME_TO_SEC(t1.duracion_cobrada) * usuario_tarifa.tarifa * (moneda_tarifa.tipo_cambio / moneda_monto.tipo_cambio) / 3600),
+						moneda_monto.simbolo,
+						moneda_monto.id_moneda
+					FROM trabajo t1
+						JOIN asunto ON t1.codigo_asunto = asunto.codigo_asunto
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+						JOIN prm_moneda AS moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
+						JOIN prm_moneda AS moneda_tarifa ON contrato.id_moneda = moneda_tarifa.id_moneda
+						LEFT JOIN usuario_tarifa ON (t1.id_usuario = usuario_tarifa.id_usuario
+							AND contrato.id_moneda = usuario_tarifa.id_moneda
+							AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
+					WHERE 1
+						$where_estado
+						$where_asunto
+						$where_fecha1
+						$where_fecha2
 						AND t1.cobrable = 1
 						AND t1.id_tramite = 0
-					GROUP BY a1.id_contrato";
-		} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
-			if (!$emitido) {
-				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
-			}
-			if (!empty($codigo_asunto)) {
-				$where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
-			}
+						AND asunto.id_contrato = {$this->fields['id_contrato']}
+					GROUP BY asunto.id_contrato ";
+				break;
 
-			if (!empty($codigo_asunto)) {
-				$cantidad_asuntos = $this->CantidadAsuntosPorFacturar($fecha_ini, $fecha_fin);
-				list($monto_hh_asunto, $x, $y) = $this->MontoHHTarifaSTD(false, $codigo_asunto, $fecha_ini, $fecha_fin);
-				list($monto_hh_contrato, $X, $Y) = $this->MontoHHTarifaSTD(false, '', $fecha_ini, $fecha_fin);
-				unset($x, $y, $X, $Y);
-
-				if ($monto_hh_contrato > 0) {
-					$factor = number_format($monto_hh_asunto / $monto_hh_contrato, 6, '.', '');
-				} else {
-					$factor = number_format(1 / $cantidad_asuntos, 6, '.', '');
-				}
-			} else {
-				$factor = 1;
-			}
-
-			$subquery = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600))
-						FROM trabajo
-						JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+			case 'ESCALONADA':
+				$query = "SELECT SQL_CALC_FOUND_ROWS t1.duracion_cobrada,
+						t1.descripcion,
+						t1.fecha,
+						t1.id_usuario,
+						t1.monto_cobrado,
+						t1.id_moneda AS id_moneda_trabajo,
+						t1.id_trabajo,
+						t1.tarifa_hh,
+						t1.cobrable,
+						t1.visible,
+						t1.codigo_asunto,
+						CONCAT_WS(' ', nombre, apellido1) AS nombre_usuario
+					FROM trabajo t1
+						JOIN usuario ON t1.id_usuario = usuario.id_usuario
+						JOIN asunto ON t1.codigo_asunto = asunto.codigo_asunto
 						JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-						JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
-						LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario
-							AND contrato.id_moneda=usuario_tarifa.id_moneda
-							AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
-						LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-						WHERE 1 $where
-						AND trabajo.cobrable = 1
-						AND trabajo.id_tramite = 0
-						AND asunto.id_contrato='" . $this->fields['id_contrato'] . "' GROUP BY asunto.id_contrato";
-			$resp = mysql_query($subquery, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($duracion_total) = mysql_fetch_array($resp);
-
-			if (empty($duracion_total)) {
-				$duracion_total = '0';
-				$aporte_proporcional = 1;
-			} else {
-				$aporte_proporcional = number_format($factor * $this->fields['retainer_horas'] / $duracion_total, 6, '.', '');
-			}
-
-
-			$query = "SELECT
-										contrato.monto * $factor * ( pm2.tipo_cambio / pm1.tipo_cambio ) +
-										SUM(((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa)*(1 - $aporte_proporcional)),
-										pm1.simbolo,
-										pm1.id_moneda
-									FROM trabajo
-									JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-									JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-									JOIN prm_moneda as pm1 ON contrato.id_moneda=pm1.id_moneda
-									LEFT JOIN prm_moneda as pm2 ON contrato.id_moneda_monto = pm2.id_moneda
-									LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario
-										AND contrato.id_moneda=usuario_tarifa.id_moneda
-										AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
-									LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-									WHERE 1 $where
-									AND trabajo.cobrable = 1
-									AND trabajo.id_tramite = 0
-									AND asunto.id_contrato='" . $this->fields['id_contrato'] . "' GROUP BY asunto.id_contrato";
-		} else if ($this->fields['forma_cobro'] == 'FLAT FEE') {
-			if (!$emitido) {
-				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
-			}
-
-			if (!empty($codigo_asunto)) {
-				$cantidad_asuntos = $this->CantidadAsuntosPorFacturar($fecha_ini, $fecha_fin);
-				list($monto_hh_asunto, $x, $y) = $this->MontoHHTarifaSTD(false, $codigo_asunto, $fecha_ini, $fecha_fin);
-				list($monto_hh_contrato, $X, $Y) = $this->MontoHHTarifaSTD(false, '', $fecha_ini, $fecha_fin);
-
-				if ($monto_hh_contrato > 0) {
-					$factor = number_format($monto_hh_asunto / $monto_hh_contrato, 6, '.', '');
-				} else {
-					$factor = number_format(1 / $cantidad_asuntos, 6, '.', '');
-				}
-			} else {
-				$factor = 1;
-			}
-
-			$query = " SELECT
-					contrato.monto * ( moneda_monto.tipo_cambio / moneda_contrato.tipo_cambio ) * $factor,
-					moneda_contrato.simbolo,
-					moneda_contrato.id_moneda
-                                    FROM contrato
-                                    JOIN prm_moneda as moneda_contrato ON contrato.opc_moneda_total = moneda_contrato.id_moneda
-                                    JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
-                                    WHERE contrato.id_contrato = '" . $this->fields['id_contrato'] . "' ";
-		} else if ($this->fields['forma_cobro'] == 'CAP') {
-			if (!$emitido) {
-				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
-			}
-			if (!empty($codigo_asunto)) {
-				$where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
-			}
-			if (!empty($fecha_fin)) {
-				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
-			}
-
-			$query = " SELECT
-					SUM(TIME_TO_SEC(duracion_cobrada)*usuario_tarifa.tarifa*(moneda_tarifa.tipo_cambio/moneda_monto.tipo_cambio)/3600),
-					moneda_monto.simbolo,
-                                        moneda_monto.id_moneda
-                                    FROM trabajo
-                                    JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-                                    JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-                                    JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto=moneda_monto.id_moneda
-                                    JOIN prm_moneda as moneda_tarifa ON contrato.id_moneda=moneda_tarifa.id_moneda
-                                    LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario
-                                    	AND contrato.id_moneda=usuario_tarifa.id_moneda
-					AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
-                                    LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-                                        WHERE 1 $where
-					AND trabajo.cobrable = 1
-					AND trabajo.id_tramite = 0
-					AND asunto.id_contrato='" . $this->fields['id_contrato'] . "' GROUP BY asunto.id_contrato ";
-		} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-			if (!$emitido) {
-				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
-			}
-			if (!empty($codigo_asunto)) {
-				$where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
-			}
-			if (!empty($fecha_fin)) {
-				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
-			}
-
-			$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
-					trabajo.descripcion,
-					trabajo.fecha,
-					trabajo.id_usuario,
-					trabajo.monto_cobrado,
-					trabajo.id_moneda as id_moneda_trabajo,
-					trabajo.id_trabajo,
-					trabajo.tarifa_hh,
-					trabajo.cobrable,
-					trabajo.visible,
-					trabajo.codigo_asunto,
-					CONCAT_WS(' ', nombre, apellido1) as nombre_usuario
-                                    FROM trabajo
-                                    JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-                                    JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-                                    JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-                                    JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
-                                    LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-                                    WHERE 1 $where
-                                        AND trabajo.cobrable = 1
-                                        AND trabajo.id_tramite = 0
-					AND asunto.id_contrato='" . $this->fields['id_contrato'] . "'";
-		} else {
-			if (!$emitido) {
-				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
-			}
-			if (!empty($codigo_asunto)) {
-				$where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
-			}
-			if (!empty($fecha_ini)) {
-				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
-			}
-			if (!empty($fecha_fin)) {
-				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
-			}
-
-			$query = "SELECT
-									SUM((TIME_TO_SEC(duracion_cobrada)*usuario_tarifa.tarifa)/3600),
-									prm_moneda.simbolo,
-									prm_moneda.id_moneda
-								FROM trabajo
-								JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-								JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-								JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
-								LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario
-									AND contrato.id_moneda=usuario_tarifa.id_moneda
-									AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
-								LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-								WHERE 1 $where
-								AND trabajo.cobrable = 1
-								AND trabajo.id_tramite = 0
-								AND asunto.id_contrato='" . $this->fields['id_contrato'] . "' GROUP BY asunto.id_contrato";
+						JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+					WHERE 1
+						$where_estado
+						$where_asunto
+						$where_fecha1
+						$where_fecha2
+						AND t1.cobrable = 1
+						AND t1.id_tramite = 0
+						AND asunto.id_contrato = {$this->fields['id_contrato']}";
+						break;
+			default:
+				$query = "SELECT
+						SUM((TIME_TO_SEC(t1.duracion_cobrada) * usuario_tarifa.tarifa) / 3600),
+						prm_moneda.simbolo,
+						prm_moneda.id_moneda
+					FROM trabajo t1
+						JOIN asunto ON t1.codigo_asunto = asunto.codigo_asunto
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+						JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+						LEFT JOIN usuario_tarifa ON (t1.id_usuario = usuario_tarifa.id_usuario
+						AND contrato.id_moneda = usuario_tarifa.id_moneda
+						AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
+					WHERE 1
+						$where_estado
+						$where_asunto
+						$where_fecha1
+						$where_fecha2
+						AND t1.cobrable = 1
+						AND t1.id_tramite = 0
+						AND asunto.id_contrato = {$this->fields['id_contrato']}
+					GROUP BY asunto.id_contrato";
+				break;
 		}
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_monto_trabajado, $moneda, $id_moneda) = mysql_fetch_array($resp);
-		//echo 'Monto estimado: '.$total_monto_trabajado.'<br>';
-		if ($moneda)
-			return array($total_monto_trabajado, $moneda, $id_moneda);
 
-		$query = "SELECT
-								prm_moneda.simbolo,
-								prm_moneda.id_moneda
-							FROM contrato
-							JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
-							WHERE contrato.id_contrato='" . $this->fields['id_contrato'] . "'";
+		if ($moneda) {
+			return array(
+				$total_monto_trabajado,
+				$moneda,
+				$id_moneda,
+				intval($cantidad_asuntos),
+				$monto_hh_contrato,
+				$X,
+				$Y,
+				$monto_hh_asunto,
+				$x,
+				$y
+			);
+		}
+
+		$query = "SELECT prm_moneda.simbolo, prm_moneda.id_moneda
+			FROM contrato
+				JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
+			WHERE contrato.id_contrato = '{$this->fields['id_contrato']}'";
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($moneda, $id_moneda) = mysql_fetch_array($resp);
-		return array(0, $moneda, $id_moneda);
+
+		return array(
+			0,
+			$moneda,
+			$id_moneda,
+			intval($cantidad_asuntos),
+			$monto_hh_contrato,
+			$X,
+			$Y,
+			$monto_hh_asunto,
+			$x,
+			$y
+		);
 	}
 
 	// Cargar información de escalonadas a un objeto
@@ -1129,48 +1086,35 @@ class Contrato extends Objeto {
 	}
 
 	function Prepare() {
-
 		$this->Edit("monto", str_replace(',','.',$this->fields['monto']), true);
-
-
-
-
-
 		$this->Edit("id_usuario_responsable", (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL");
-			if (UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')) {
-				$this->Edit("id_usuario_secundario", (!empty($this->fields['id_usuario_secundario']) && $this->fields['id_usuario_secundario'] != -1 ) ? $this->fields['id_usuario_secundario'] : "NULL");
+
+		if (UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')) {
+			$this->Edit("id_usuario_secundario", (!empty($this->fields['id_usuario_secundario']) && $this->fields['id_usuario_secundario'] != -1 ) ? $this->fields['id_usuario_secundario'] : "NULL");
+		}
+
+		if (UtilesApp::GetConf($this->sesion, 'CopiarEncargadoAlAsunto')) {
+			$id_usuario_responsable_def = (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL";
+			$sql_cambia = "UPDATE contrato SET id_usuario_responsable = $id_usuario_responsable_def  WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
+			if (!($res = mysql_query($sql_cambia, $this->sesion->dbh) )) {
+				throw new Exception($sql_cambia . "---" . mysql_error());
 			}
-			if (UtilesApp::GetConf($this->sesion, 'CopiarEncargadoAlAsunto')) {
-				$id_usuario_responsable_def = (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL";
-				$sql_cambia = "UPDATE contrato SET id_usuario_responsable = $id_usuario_responsable_def  WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
-				if (!($res = mysql_query($sql_cambia, $this->sesion->dbh) )) {
-					throw new Exception($sql_cambia . "---" . mysql_error());
-				}
-			}
+		}
 
+		$this->Edit("id_carta", $this->fields['id_carta'] ?  $this->fields['id_carta'] : 'NULL');
+		$this->Edit("codigo_idioma", $this->fields['codigo_idioma'] ?  $this->fields['codigo_idioma'] : 'es');
+		$this->Edit("id_tarifa",  $this->fields['id_tarifa'] ? $this->fields['id_tarifa']  : 'NULL');
+		$this->Edit("id_tramite_tarifa",$this->fields['id_tramite_tarifa']    ? $this->fields['id_tramite_tarifa']    : 'NULL' );
+		$this->Edit("id_formato", empty($this->fields['id_formato']) || $this->fields['id_formato'] == 'NULL' ? '0' : $this->fields['id_formato']);
+		$this->Edit("id_cuenta", empty($this->fields['id_cuenta']) || $this->fields['id_cuenta'] == 'NULL' ? '0' : $this->fields['id_cuenta']);
 
-
-
-
-			$this->Edit("id_carta", $this->fields['id_carta'] ?  $this->fields['id_carta'] : 'NULL');
-
-				$this->Edit("codigo_idioma", $this->fields['codigo_idioma'] ?  $this->fields['codigo_idioma'] : 'es');
-
-			$this->Edit("id_tarifa",  $this->fields['id_tarifa'] ? $this->fields['id_tarifa']  : 'NULL');
-			$this->Edit("id_tramite_tarifa",$this->fields['id_tramite_tarifa']    ? $this->fields['id_tramite_tarifa']    : 'NULL' );
-			$this->Edit("id_formato", empty($this->fields['id_formato']) || $this->fields['id_formato'] == 'NULL' ? '0' : $this->fields['id_formato']);
-			$this->Edit("id_cuenta", empty($this->fields['id_cuenta']) || $this->fields['id_cuenta'] == 'NULL' ? '0' : $this->fields['id_cuenta']);
-
-
-			if ( $this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$this->Edit("porcentaje_descuento", $this->fields['porcentaje_descuento'] > 0 ? $this->fields['porcentaje_descuento'] : '0');
-				$this->Edit("descuento", '0');
-			} else {
-				$this->Edit("descuento", $this->fields['descuento'] > 0 ? $this->fields['descuento'] : '0');
-				$this->Edit("porcentaje_descuento", '0');
-			}
-
-
+		if ( $this->fields['tipo_descuento'] == 'PORCENTAJE') {
+			$this->Edit("porcentaje_descuento", $this->fields['porcentaje_descuento'] > 0 ? $this->fields['porcentaje_descuento'] : '0');
+			$this->Edit("descuento", '0');
+		} else {
+			$this->Edit("descuento", $this->fields['descuento'] > 0 ? $this->fields['descuento'] : '0');
+			$this->Edit("porcentaje_descuento", '0');
+		}
 	}
 
 	/**
@@ -1371,38 +1315,64 @@ class Contrato extends Objeto {
 
 			if ($enviar_mail_asunto_nuevo) {
 				// Mandar un email al encargado comercial
-				if (method_exists('Conf', 'GetConf')) {
-					$CorreosModificacionAdminDatos = Conf::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
-				} else if (method_exists('Conf', 'CorreosModificacionAdminDatos')) {
-					$CorreosModificacionAdminDatos = Conf::CorreosModificacionAdminDatos();
-				} else {
+				if ( UtilesApp::GetConf($this->sesion, 'CorreosModificacionAdminDatos')){
+					$CorreosModificacionAdminDatos = UtilesApp::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
+                                } else {
 					$CorreosModificacionAdminDatos = '';
 				}
 				if ($CorreosModificacionAdminDatos != '') {
 					// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
-					$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $this->fields['id_usuario_responsable'];
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					if (list($nombre, $email) = mysql_fetch_array($resp)) {
-						$email .= ',' . $CorreosModificacionAdminDatos;
+                                        $id_responsable = $this->fields['id_usuario_responsable'];
 
-						$subject = 'Creación de contrato';
+                                        if (empty($id_responsable)){
+                                            $email = $CorreosModificacionAdminDatos;
+                                            $nombre = 'Usuario';
 
-						// Obtener el nombre del cliente asociado al contrato.
-						$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
-						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
-						list($nombre_cliente) = mysql_fetch_array($resp2);
+                                            $subject = 'Creación de contrato';
 
-						// Revisar si el contrato está asociado a algún asunto.
-						$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
-						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
-						if (list($glosa_asunto) = mysql_fetch_array($resp2))
-							$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
-						else
-							$asunto_contrato = '';
-						$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
+                                            // Obtener el nombre del cliente asociado al contrato.
+                                            $query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
+                                            $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+                                            list($nombre_cliente) = mysql_fetch_array($resp2);
 
-						Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
-					}
+                                            // Revisar si el contrato está asociado a algún asunto.
+                                            $query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
+                                            $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+                                            if (list($glosa_asunto) = mysql_fetch_array($resp2))
+                                                    $asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
+                                            else
+                                                    $asunto_contrato = '';
+                                            $mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
+
+                                            Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
+
+                                        } else {
+
+                                            $query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $id_responsable;
+                                            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+                                            if (list($nombre, $email) = mysql_fetch_array($resp)) {
+
+                                                    $email .= ',' . $CorreosModificacionAdminDatos;
+
+                                                    $subject = 'Creación de contrato';
+
+                                                    // Obtener el nombre del cliente asociado al contrato.
+                                                    $query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
+                                                    $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+                                                    list($nombre_cliente) = mysql_fetch_array($resp2);
+
+                                                    // Revisar si el contrato está asociado a algún asunto.
+                                                    $query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
+                                                    $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+                                                    if (list($glosa_asunto) = mysql_fetch_array($resp2))
+                                                            $asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
+                                                    else
+                                                            $asunto_contrato = '';
+                                                    $mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
+
+                                                    Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
+                                            }
+                                    }
 				}
 			}
 		}
@@ -1469,6 +1439,18 @@ class Contrato extends Objeto {
 		);
 
 		return $datos;
+	}
+
+	public static function QueriesPrevias($sesion) {
+		$Contrato = new Contrato($sesion);
+		$updateestado = "UPDATE trabajo SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";
+		$updateestado .= "UPDATE cta_corriente SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";
+		$updateestado .= "UPDATE tramite SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";
+		$updateestado .= "UPDATE trabajo JOIN cobro c ON trabajo.id_cobro = c.id_cobro SET trabajo.estadocobro = c.estado WHERE c.fecha_touch >= trabajo.fecha_touch;";
+		$updateestado .= "UPDATE cta_corriente JOIN cobro c ON cta_corriente.id_cobro = c.id_cobro SET cta_corriente.estadocobro = c.estado WHERE c.fecha_touch >= cta_corriente.fecha_touch;";
+		$updateestado .= "UPDATE tramite JOIN cobro c ON tramite.id_cobro = c.id_cobro SET tramite.estadocobro = c.estado WHERE c.fecha_touch >= tramite.fecha_touch;";
+
+		$Contrato->sesion->pdodbh->exec($updateestado);
 	}
 
 }

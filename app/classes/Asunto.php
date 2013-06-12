@@ -307,15 +307,15 @@ class Asunto extends Objeto {
 
 	}
 
-	function LoadByCodigo($codigo) {
-		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto='$codigo'";
+	function LoadByCodigo($codigo_asunto) {
+		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto='$codigo_asunto'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
 
-	function LoadByCodigoSecundario($codigo) {
-		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto_secundario='$codigo'";
+	function LoadByCodigoSecundario($codigo_asunto_secundario) {
+		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto_secundario='$codigo_asunto_secundario'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);

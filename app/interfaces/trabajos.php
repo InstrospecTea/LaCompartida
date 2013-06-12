@@ -17,7 +17,8 @@ if ($p_cobranza->fields['permitido']) {
 $params_array['codigo_permiso'] = 'PRO';
 $p_profesional = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 //echo '<pre>';print_r($_REQUEST);echo '</pre>';
-if ($id_cobro) {
+if ($motivo=='cobros' && $id_cobro) {
+
 	$cobro = new Cobro($sesion);
 	$cobro->Load($id_cobro);
 
@@ -318,6 +319,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 					trabajo.id_trabajo, 
 					trabajo.codigo_asunto,
 					trabajo.cobrable,
+					trabajo.solicitante,
 					prm_moneda.simbolo as simbolo,
 					prm_moneda.id_moneda as id_moneda,
 					asunto.codigo_cliente as codigo_cliente, 
@@ -872,7 +874,7 @@ function Opciones(& $trabajo, $texto = '') {
 
 	if ($p_revisor->fields['permitido']) {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
-			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
+			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',750,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
 			$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"alert('" ;
 			$opc_html.= __("No se puede modificar este trabajo. El Cobro que lo incluye ya ha sido Emitido al Cliente.") ;

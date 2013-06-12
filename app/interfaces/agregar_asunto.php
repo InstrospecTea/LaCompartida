@@ -41,7 +41,8 @@ if ($codigo_cliente_secundario != '') {
 	$resp_codigos = mysql_query($query_codigos, $sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $sesion->dbh);
 
 	while (list($id_asunto_temp, $codigo_asunto_secundario_temp) = mysql_fetch_array($resp_codigos)) {
-		if ($codigo_asunto_secundario == substr($codigo_asunto_secundario_temp, -4)) {
+		$caracteres = strlen($codigo_asunto_secundario);
+		if ($codigo_asunto_secundario == substr($codigo_asunto_secundario_temp, $caracteres)) {
 			if (empty($id_asunto) || $id_asunto != $id_asunto_temp) {
 				$pagina->FatalError('El código ingresado ya existe');
 			}
@@ -287,8 +288,11 @@ if ($opcion == "guardar") {
 		//$asunto->EditarTodos();
 		$asunto->Edit("id_usuario", $sesion->usuario->fields['id_usuario']);
 		$asunto->Edit("codigo_asunto", $codigo_asunto, true);
+
+		$caracteres = strlen($codigo_asunto_secundario);
+
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-			$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -4));
+			$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -$caracteres));
 		} else {
 			if ($codigo_asunto_secundario) {
 				$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
@@ -354,6 +358,11 @@ if ($opcion == "guardar") {
 					$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
 					$_REQUEST['id_tarifa'] = $id_tarifa;
 				}
+			}
+
+			if (isset($_REQUEST['nombre_contacto'])) {
+				// nombre_contacto no existe como campo en la tabla contrato y es necesario crear la variable "contacto" dentro de _REQUEST
+				$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
 			}
 
 			$contrato->Fill($_REQUEST, true);
@@ -943,7 +952,7 @@ if ($usuario_responsable_obligatorio) {
 								<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
 								<?php
 								if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='5' value='" . substr($asunto->fields['codigo_asunto_secundario'], -4) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
+									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . substr($asunto->fields['codigo_asunto_secundario'], -$caracteres) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/> 
 						<span style='color:#FF0000; font-size:10px'>*</span>";
 								} else {
 									if ($asunto->fields['codigo_asunto_secundario'] != '')

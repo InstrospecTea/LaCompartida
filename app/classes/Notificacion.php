@@ -1,9 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 
 /**
  * Clase que maneja los diferentes tipos de mail (mensual, semanal, diario),
@@ -446,7 +443,10 @@ class Notificacion {
 
 				// Enviar mail (id_usuario_mail, mensaje);
 				if ($enviar) {
-					$mensajes[$id_usuario_mail] = $mensaje;
+					$mensajes[$id_usuario_mail] = array(
+						'tipo' => 'semanal',
+						'mensaje' => $mensaje
+					);
 				}
 			}
 		}
@@ -463,6 +463,9 @@ class Notificacion {
 
 			foreach ($dato as $id_usuario_mail => $alertas) {
 				$enviar = false;
+				if(!array_key_exists('nombre_pila',$alertas)) {
+					$alertas['nombre_pila']='Usuario';
+				}
 				$mensaje = str_replace('%USUARIO', $alertas['nombre_pila'], $estructura['header']);
 
 				if (isset($alertas['asunto_excedido']) && $alertas['asunto_excedido']) {
@@ -485,7 +488,7 @@ class Notificacion {
 
 							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
 							$fila = str_replace('%COLOR', $color, $fila);
-							$i++;
+							++$i;
 
 							$filas .= $fila;
 						}
@@ -694,7 +697,10 @@ class Notificacion {
 				}
 
 				if ($enviar) {
-					$mensajes[$id_usuario_mail] = $mensaje;
+					$mensajes[$id_usuario_mail] = array(
+						'tipo' => 'diario',
+						'mensaje' => $mensaje
+					);
 				}
 			}
 		}
