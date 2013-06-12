@@ -1777,17 +1777,20 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                         <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
                                     </tr>
-									<?php
-									if (UtilesApp::GetConf($sesion, 'OrdenadoPor')) {
-										$solicitante = UtilesApp::GetConf($sesion, 'OrdenadoPor');
-									} else {
-										$solicitante = 2;
-									}
+<?php
+if (method_exists('Conf', 'GetConf'))
+	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
+elseif (method_exists('Conf', 'Ordenado_por'))
+	$solicitante = Conf::Ordenado_por();
+else
+	$solicitante = 2;
 
-									if ($solicitante == 0) {  // no mostrar
-										echo '<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />';
-									} else if ($solicitante == 1) { // obligatorio
-										?>
+if ($solicitante == 0) {  // no mostrar
+	?>
+										<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
+	<?php
+} elseif ($solicitante == 1) { // obligatorio
+	?>
 										<tr>
 											<td align="right"><input type="checkbox" name="opc_ver_solicitante" id="opc_ver_solicitante" value="1" <?php echo $cobro->fields['opc_ver_solicitante'] == '1' ? 'checked="checked"' : '' ?>></td>
 											<td align="left" style="font-size: 10px;"><label for="opc_ver_solicitante"><?php echo __('Mostrar solicitante') ?></label></td>

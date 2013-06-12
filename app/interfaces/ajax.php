@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
- 
+
 $sesion = new Sesion('');
 #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
 
@@ -538,17 +538,21 @@ if ($accion == "consistencia_cliente_asunto") {
 	}
 	echo "OK";
 } else if ($accion == 'actualizar_documento_moneda') {
-	$documento = new Documento($sesion);
-	$documento->Load($id_documento);
+	$Documento = new Documento($sesion);
+	$Documento->Load($id_documento);
 
-	$ids_monedas = explode(',', $ids_monedas);
-	$tcs = explode(',', $tcs);
-	$tipos_cambios = array();
-	foreach ($ids_monedas as $i => $id_moneda) {
-		$tipos_cambios[$id_moneda] = $tcs[$i];
+	if ($Documento->Loaded()) {
+		$ids_monedas = explode(',', $ids_monedas);
+		$tcs = explode(',', $tcs);
+		$tipos_cambios = array();
+		foreach ($ids_monedas as $i => $id_moneda) {
+			$tipos_cambios[$id_moneda] = $tcs[$i];
+		}
+		$Documento->ActualizarDocumentoMoneda($tipos_cambios);
+		echo "EXITO";
+	} else {
+		echo("ERROR AJAX. Acción: $accion");
 	}
-	$documento->ActualizarDocumentoMoneda($tipos_cambios);
-	echo "EXITO";
 } else if ($accion == 'actualizar_factura_moneda') {
 	$mvto = new CtaCteFactMvto($sesion);
 	$mvto->LoadByFactura($id_factura);
