@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -64,7 +64,6 @@
 								'NumFormat' => 0));
 
 	$ws =& $wb->addWorksheet(__('Reportes'));
-	#$ws->setInputEncoding('utf-8');
 	$ws->fitToPages(1, 0);
 	$ws->setZoom(75);
 
@@ -158,18 +157,22 @@
 								'Border' => 1,
 								'Color' => 'black',
 								'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+		
+		$codigo_cliente = $tramite->fields['codigo_cliente'];
+		$cliente = new Cliente($sesion);
+		$cliente->LoadByCodigo($codigo_cliente);
 
-		$ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($tramite->fields[fecha], "%d-%m-%Y"), $tex);
-		$ws->write($fila_inicial + $i, $col_cliente, $tramite->fields[glosa_cliente], $tex);
-		$ws->write($fila_inicial + $i, $col_asunto, $tramite->fields[glosa_asunto], $tex);
+		$ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($tramite->fields['fecha'], "%d-%m-%Y"), $tex);
+		$ws->write($fila_inicial + $i, $col_cliente, $cliente->fields['glosa_cliente'], $tex);
+		$ws->write($fila_inicial + $i, $col_asunto, $tramite->fields['glosa_asunto'], $tex);
 		
 		$text_descripcion = addslashes($tramite->fields['glosa_tramite'].'   '.$tramite->fields['descripcion']);
 
 		$ws->write($fila_inicial + $i, $col_descripcion, $text_descripcion, $tex);
-		$ws->write($fila_inicial + $i, $col_nombre, $tramite->fields[nombre], $tex);
-		$ws->write($fila_inicial + $i, $col_apellido, $tramite->fields[apellido1], $tex);
+		$ws->write($fila_inicial + $i, $col_nombre, $tramite->fields['nombre'], $tex);
+		$ws->write($fila_inicial + $i, $col_apellido, $tramite->fields['apellido1'], $tex);
 
-		$duracion= $tramite->fields[duracion];
+		$duracion= $tramite->fields['duracion'];
 		list($h, $m)= split(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);

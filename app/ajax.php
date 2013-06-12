@@ -123,8 +123,11 @@ switch ($accion) {
 		break;
 
 	case 'actualiza_beacon':
-		mysql_query("ALTER TABLE `configuracion_categoria` ADD UNIQUE (`glosa_configuracion_categoria`); ", $sesion->dbh);
-		mysql_query("insert ignore INTO  `configuracion_categoria` (	'`glosa_configuracion_categoria`	) VALUES ( 'Plugins - Hooks');", $sesion->dbh);
+		$ExisteIndex = mysql_query("SHOW INDEX FROM `configuracion_categoria` WHERE `key_name` = 'glosa_configuracion_categoria'", $sesion->dbh);
+		if (!$ExisteIndex) {
+			mysql_query("ALTER TABLE `configuracion_categoria` ADD UNIQUE (`glosa_configuracion_categoria`);", $sesion->dbh);
+		}
+		mysql_query("INSERT IGNORE INTO `configuracion_categoria` (`glosa_configuracion_categoria`) VALUES ('Plugins - Hooks');", $sesion->dbh);
 		$resp = mysql_query("select id_configuracion_categoria from configuracion_categoria where glosa_configuracion_categoria='Plugins - Hooks'", $sesion->dbh);
 		list($cat_id) = mysql_fetch_row($resp);
 		$beaconleft = intval(base64_decode($_POST['beaconleft']));

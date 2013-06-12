@@ -240,7 +240,7 @@ $_LANG['Semana anterior'] = "Previous week";
 $_LANG['Semana siguiente'] = "Next week";
 $_LANG['Fechas asociadas guardadas exitosamente'] = "Dates partner successfully saved";
 $_LANG['No Aplicable'] = "Not Applicable";
-
+$_LANG['Titulo Asunto'] = "Legal Area";
 
 #COBROS
 $_LANG['Cobros'] = "Cobros";
@@ -680,6 +680,11 @@ $_LANG['id_usuario_responsable'] = "Commercial Manager";
 $_LANG['id_usuario_secundario'] = "Secundary Manager";
 $_LANG['area_usuario'] = "Professional Area";
 $_LANG['categoria_usuario'] = "Professional Category";
+$_LANG['codigo_cliente'] = "Client Code";
+$_LANG['codigo_cliente_secundario'] = "Client Code";
+$_LANG['codigo_asunto_secundario'] = "Issue Code";
+$_LANG['fecha_emision'] = "Output Date";
+$_LANG['grupo_o_cliente'] = "Group or Client";
 
 ### Reportes - Tipo de Dato ###
 $_LANG['horas_trabajadas'] = "Worked Hours";

@@ -1,10 +1,8 @@
-<?php 
+<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-//require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
- 
+use TTB\Utiles as Utiles;
+
 class Alerta {
 
 	var $sesion = null;
@@ -15,18 +13,21 @@ class Alerta {
 
 	function AlertaGeneral() {
 		$dia = date("N"); # 6 = Sábado, 7 = Domingo;
-		if ($dia == 6 || $dia == 7)
+		if ($dia == 6 || $dia == 7) {
 			return;
+		}
 
 		$query = "SELECT id_asunto FROM asunto WHERE activo=1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		while (list($id_asunto) = mysql_fetch_array($resp))
+		while (list($id_asunto) = mysql_fetch_array($resp)) {
 			$this->AlertaAsunto($id_asunto);
+		}
 
 		$query = "SELECT usuario.id_usuario FROM usuario LEFT JOIN usuario_permiso USING (id_usuario) WHERE activo=1 AND codigo_permiso='PRO'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		while (list($id_persona) = mysql_fetch_array($resp))
+		while (list($id_persona) = mysql_fetch_array($resp)) {
 			$this->AlertaProfesional($id_persona);
+		}
 	}
 
 	function AlertaPersona($id_persona) {
@@ -99,42 +100,33 @@ class Alerta {
 			$asunto->Edit('notificado_hr_excedida_ult_cobro', '1');
 			$asunto->Write();
 		}
-
-		/*
-		  if(($total_monto * ($asunto->fields['alerta_porctje_lim_monto']/100) > $asunto->fields['limite_monto']) && ($asunto->fields['limite_monto'] > 0))
-		  $asunto->AlertaAdministrador("$total_monto Se ha alcanzado el limite de alerta de porcentaje de monto de ".$asunto->fields['alerta_porctje_lim_monto']."% asignado en el asunto ".$asunto->fields['glosa_asunto']);
-
-		  if(($total_horas_trabajadas * ($asunto->fields['alerta_porctje_lim_hh']/100) > $asunto->fields['limite_hh']) && ($asunto->fields['limite_hh'] > 0))
-		  $asunto->AlertaAdministrador("$total_horas_trabajadas Se ha alcanzado el limite de alerta de porcentaje de horas hombre de ".$asunto->fields['alerta_porctje_lim_hh']."% asignado en el asunto ".$asunto->fields['glosa_asunto']);
-		 */
 	}
 
-	function EnviarAlertaProfesional($id_persona, $mensaje, $sesion, $header = true) {
-		
-		if (is_numeric($id_persona)) {
-			$query = "SELECT email, CONCAT_WS(' ', nombre, apellido1) as nombre FROM usuario WHERE usuario.activo=1 AND id_usuario = '$id_persona'";
+	function EnviarAlertaProfesional($id_usuario, $mensaje, $sesion, $header = true) {
+		if (is_numeric($id_usuario)) {
+			$query = "SELECT email, CONCAT_WS(' ', nombre, apellido1) as nombre FROM usuario WHERE usuario.activo=1 AND id_usuario = '{$id_usuario}'";
 			$resp = mysql_query($query);
 			list($email, $nombre) = mysql_fetch_array($resp);
 		} else {
-			list($email, $nombre) = explode(':', $id_persona);
+			list($email, $nombre) = explode(':', $id_usuario);
 		}
-		
+
+		$tipo = null;
+		$simular=false;
+		if (is_array($mensaje)) {
+			$tipo = $mensaje['tipo'];
+			$mensaje = $mensaje['mensaje'];
+			$simular=!empty($mensaje['simular']) && $mensaje['simular'];
+		}
 		if ($header) {
 			$mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : "") . "Alerta: $mensaje";
 		}
 
-		$from =  html_entity_decode(Conf::AppName());
+		$from = html_entity_decode(Conf::AppName());
 
 		$to = $email; // Mail a Usuario
 
-		Utiles::Insertar($sesion, "Alerta $from", $mensaje, $to, $nombre);
-
-		/*
-		  $query = "SELECT email FROM usuario WHERE id_usuario IN (SELECT id_encargado FROM trabajo LEFT JOIN asunto USING (codigo_asunto) WHERE trabajo.fecha > DATE_SUB(NOW(), INTERVAL 10 DAY) AND trabajo.id_usuario=$id_persona)";
-		  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		  while(list($email) = mysql_fetch_array($resp))
-		  mail ( $email, "Alerta ".Conf::AppName(), $/
-		 */
+		Utiles::InsertarPlus($sesion, "Alerta $from", $mensaje, $to, $nombre, $tipo=='diario', $id_usuario, $tipo, $simular);
 	}
 
 	function AlertaProfesional($id_persona, $opc_mail, $sesion) {
@@ -216,20 +208,17 @@ class Alerta {
 		list($horas_mes) = mysql_fetch_array($resp);
 		return $horas_mes;
 	}
-		
-	function enviarAvisoCobrosProgramados( $mensajes, $sesion )
-	{
-			$from =  html_entity_decode(Conf::AppName());
 
-		if(  method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MailAdmin') != '' )
-		{
-			$to = Conf::GetConf($sesion,'MailAdmin'); // Mail al admin
+	function enviarAvisoCobrosProgramados($mensajes, $sesion) {
+		$from = html_entity_decode(Conf::AppName());
+
+		if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MailAdmin') != '') {
+			$to = Conf::GetConf($sesion, 'MailAdmin'); // Mail al admin
 		}
 
-		foreach( $mensajes as $id_usuario => $mensaje )
-		{
-			Utiles::Insertar( $sesion, "Aviso $from", $mensaje, $to, "Administrador");
+		foreach ($mensajes as $id_usuario => $mensaje) {
+			Utiles::InsertarPlus($sesion, "Aviso $from", $mensaje, $to, "Administrador");
 		}
 	}
+
 }
-?>

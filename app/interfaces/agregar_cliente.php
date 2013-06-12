@@ -46,7 +46,7 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
-		if ($codigo_cliente_secundario) {
+		if ( $codigo_cliente_secundario and empty($id_cliente) ) {
 			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '" . $cli->fields['id_cliente'] . "'";
 			$resp_codigos = mysql_query($query_codigos, $sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $sesion->dbh);
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
@@ -251,6 +251,11 @@ if ($opcion == "guardar") {
 					$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
 					$_REQUEST['id_tarifa'] = $id_tarifa;
 				}
+			}
+
+			if (isset($_REQUEST['nombre_contacto'])) {
+				// nombre_contacto no existe como campo en la tabla contrato y es necesario crear la variable "contacto" dentro de _REQUEST
+				$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
 			}
 
 			$contrato->Fill($_REQUEST, true);
@@ -743,10 +748,8 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	}
 
 </script>
-<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
-
-<!--<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min.css" />-->
-<style>
+ 
+ <style>
 
 	 textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"]
 	, input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {padding: 1px 2px !important;}
@@ -846,7 +849,9 @@ function TTip($texto) {
 									endif; ?>
 
 <?php
-$params_array['lista_permisos'] = array('REV'); // permisos de consultor jefe
+// permisos de consultor jefe
+$params_array['lista_permisos'] = array('REV','DAT');
+
 $permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
 if ($permisos->fields['permitido']) {
@@ -1039,7 +1044,9 @@ if ($CodigoSecundario) {
 			jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
 		}, 2000);
 	});
-
+jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.com/js/bootstrap.min.js"  ,
+                dataType: "script",
+                complete: function() {
     jQuery('#codigo_cliente_secundario').blur(function() {
 	if(jQuery(this).val()=="") return;
 	<?php if ($_GET['id_cliente'])  {
@@ -1082,7 +1089,8 @@ if ($CodigoSecundario) {
 
 			});
 		});
-
+	}
+});
 
 
 

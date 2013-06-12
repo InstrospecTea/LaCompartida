@@ -43,6 +43,8 @@ $_LANG['Contacto'] = "Contact";
 $_LANG['Atención'] = "Attention";
 $_LANG['Giro'] = "Type of business";
 $_LANG['Dirección'] = "Address";
+$_LANG['Resumen Asuntos'] = "Matter Summary";
+$_LANG['Titulo Asunto'] = "Legal Area";
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
@@ -587,14 +589,15 @@ $_LANG['equivalente en pesos a '] = "chilean pesos equivalent amount as ";
 $_LANG[', conforme al tipo de cambio observado del día de hoy'] = " per the \"observado\" rate of exchange";
 $_LANG[', conforme a su equivalencia al '] = " per the \"observado\" rate of exchange of ";
 $_LANG['por concepto de gastos incurridos por nuestro Estudio en dicho período'] = "";
-$_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
-$_LANG['%asunto_mb%'] = "Re.:";
-$_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
-$_LANG['%despedida_mb%'] = "Cordially yours,";
 
 #Carta JJR
 $_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
 $_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
+
+$_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
+$_LANG['%asunto_mb%'] = "Re.:";
+$_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
+$_LANG['%despedida_mb%'] = "Cordially yours,";
 
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -604,16 +607,16 @@ $_LANG['%cuenta_mb%'] = "";
 $_LANG['%detalle_mb_ny%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matter %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%detalle_mb_ny_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matters %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
-															<tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
-															<tr><td width='35%'>Address:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
-															<tr><td width='35%'>Swift Intermediary Bank:</td><td width='65%'>MRMDUS33</td></tr>
-															<tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
-															<tr><td width='35%'>Intermediary Bank A/c #:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
-															<tr><td width='35%'>Address:</td><td width='65%'>Av. Andrés Bello 2711, piso 9, Las Condes, Santiago</td></tr>
-															<tr><td width='35%'>Beneficiary:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
-															<tr><td width='35%'>Beneficiary Bank:</td><td width='65%'>HSBC Bank Chile</td></tr>
-															<tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
-															<tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
+  															<tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
+  															<tr><td width='35%'>Address:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
+  															<tr><td width='35%'>Swift Intermediary Bank:</td><td width='65%'>MRMDUS33</td></tr>
+  															<tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
+  															<tr><td width='35%'>Intermediary Bank A/c #:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
+  															<tr><td width='35%'>Address:</td><td width='65%'>Isidora Goyenechea 2800, piso 23, Las Condes, Santiago</td></tr>
+  															<tr><td width='35%'>Beneficiary:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
+  															<tr><td width='35%'>Beneficiary Bank:</td><td width='65%'>HSBC Bank Chile</td></tr>
+  															<tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
+  															<tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
 														</table>";
 #Carta MB Boleta (boleta)
 $_LANG['%detalle_mb_boleta%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -689,6 +692,14 @@ $_LANG['forma_cobro'] = "Type of Fee Agreement";
 $_LANG['cliente'] = "Client";
 $_LANG['id_usuario_responsable'] = "Commercial Manager";
 $_LANG['id_usuario_secundario'] = "Secundary Manager";
+$_LANG['codigo_cliente'] = "Cliente Code";
+$_LANG['fecha_emision'] = "Output Date";
+$_LANG['grupo_o_cliente'] = "Group or Client";
+$_LANG['codigo_cliente_secundario'] = "Client Code";
+$_LANG['codigo_asunto_secundario'] = "Issue Code";
+$_LANG['fecha_emision'] = "Output Date";
+$_LANG['grupo_o_cliente'] = "Group or Client";
+
 
 $_LANG['area_usuario'] = "Professional Area";
 $_LANG['categoria_usuario'] = "Professional Category";

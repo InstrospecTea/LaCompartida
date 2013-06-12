@@ -15,6 +15,10 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 	 * una tabla (con un encabezado) para todos los grupos
 	 */
 	private $single_table = false;
+	/**
+	 * Para el uso de la función ACUMULAR
+	 */
+	private $acumuladores = array();
 
 	public function __construct(SimpleReport $simpleReport) {
 		$this->SimpleReport = $simpleReport;
@@ -64,10 +68,20 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 //			$filename = $this->SimpleReport->Config->title;
 //		}
 		if ($this->SimpleReport->custom_format['collapsible']) {
-				$html .= "<script>jQuery('.ver-detalle').click(function(){
-					jQuery(this).closest('tr').next().find('.subreport').toggle();
-					return false;
-				});</script>";
+				$html .= "<script>
+					jQuery('.ver-detalle').click(function() {
+						sr_sender = jQuery(this);
+						sr_detalle = sr_sender.closest('tr').next().find('.subreport');
+						sr_detalle.toggle();
+						sr_imglink = sr_sender.find('img');
+						if (sr_detalle.css('display') == 'none') {
+							sr_imglink.attr('src', '//static.thetimebilling.com/images/mas.gif');
+						} else {
+							sr_imglink.attr('src', '//static.thetimebilling.com/images/menos.gif');
+						}
+						return false;
+					});
+					</script>";
 		}
 
 		return $html;
@@ -164,7 +178,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		$html_encabezado = $this->header($columns);
 
 		if(!$this->single_table){
-			$html .= '<table class="buscador" width="90%" cellpadding="3">';
+			$html .= '<table class="buscador" width="100%" cellpadding="3">';
 			if (!$repeat_header) {
 				$html .= $html_encabezado;
 			}
@@ -253,16 +267,27 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				} else {
 					$html .= '<tr class="subtotal">';
 				}
+				// Calcular las columnas que no tienen total para el colspan de la glosa
+				$i = 0;
+				foreach ($columns as $idx => $column) {
+					if (isset($totals[$idx])) {
+						break;
+					}
+					$i++;
+				}
+				$colspan_total = $i;
 				foreach ($columns as $idx => $column) {
 					if (isset($totals[$idx])) {
 						$row[$column->field] = $totals[$idx];
 						$html .= $this->td($row, $column);
 					} else {
-						$html .=  "<td class='level$level'>$name&nbsp;</td>";
-						$name = '';
+						if ($colspan_total > 0) {
+							$html .=  "<td colspan='$colspan_total' class='level$level'>$name&nbsp;</td>";
+							$colspan_total = -1;
+						}
 					}
 				}
-				$i+=1;
+				$i += 1;
 				$html .= '</tr>';
 			}
 		}
@@ -289,7 +314,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 								$valor += $param;
 							}
 						}
-                                                break;
+						break;
 					case 'CONCATENATE':
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
@@ -300,7 +325,23 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 								$valor .= trim($param, '"');
 							}
 						}
-                                                break;
+						break;
+
+					case 'ACUMULAR':
+						$original_param = $matches[2];
+						$params = explode(',', $original_param);
+						foreach ($params as $param) {
+							$param = trim($param);
+							if (strpos($param, '%') === 0) {
+								$param_field = trim($param, '%');
+								if (!array_key_exists($original_param, $this->acumuladores)) {
+									$this->acumuladores[$original_param] = 0;
+								}
+								$this->acumuladores[$original_param] += $row[$param_field];
+							}
+						}
+						$valor = $this->acumuladores[$original_param];
+						break;
 				}
 			}
 		}

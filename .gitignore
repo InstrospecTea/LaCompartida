@@ -11,6 +11,7 @@ nbproject/
 cap_servers.rb
 REVISION
 environment.txt
+._
 
 #################
 ## Eclipse
@@ -175,4 +176,7 @@ pip-log.txt
 /app/interfaces/DOMPDF_FONT_DIRlog.htm
 
 app/version.php
-sftp-config.json
+sftp-config*
+*.sublime-project
+*.sublime-workspace
+.idea*

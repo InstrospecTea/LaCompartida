@@ -5,7 +5,7 @@ require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
 
-if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
+if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 
 	$codigo_cliente = $_REQUEST['codigo_cliente'];
 	$id_contrato = $_REQUEST['id_contrato'];
@@ -14,52 +14,69 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 	$where = '';
 	$join = '';
 
-	if(!empty($codigo_cliente)){
+	if (!empty($codigo_cliente)) {
+
+#####################
+
+		$where .= " AND d.codigo_cliente = '$codigo_cliente' ";
 		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
+
+
+#######################
+
 	}
 
-	if(!empty($id_contrato)){
+	if (!empty($id_contrato)) {
 		$where .= " AND cobro.id_contrato = '$id_contrato' ";
-	 
 	}
 
-	if(!empty($tipo_liquidacion)){ //1-2 = honorarios-gastos, 3 = mixtas
+	if (!empty($tipo_liquidacion)) { //1-2 = honorarios-gastos, 3 = mixtas
 		$honorarios = $tipo_liquidacion & 1;
 		$gastos = $tipo_liquidacion & 2 ? 1 : 0;
 		$where .= "
-			AND contrato.separar_liquidaciones = '".($tipo_liquidacion=='3' ? 0 : 1)."'
+			AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "'
 			AND cobro.incluye_honorarios = '$honorarios'
 			AND cobro.incluye_gastos = '$gastos' ";
-		 
 	}
-	
-	if($_POST['solo_monto_facturado']) {
-		$campo_valor="T.fsaldo";
-		$campo_gvalor="T.fgsaldo";
-		$campo_hvalor="T.fhsaldo";
+
+	if ($_POST['solo_monto_facturado']) {
+		$campo_valor = "T.fsaldo";
+		$campo_gvalor = "T.fgsaldo";
+		$campo_hvalor = "T.fhsaldo";
 		$where.="AND  ccfm.saldo!=0 ";
 		$groupby.=" factura.id_factura";
-		$tipo=" pdl.glosa";
-		$identificador=" factura.id_factura";
-		$fecha_atraso=" factura.fecha";
-		$label=" concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
-		$identificadores='facturas';
-		$linktofile='agregar_factura.php?id_factura=';
+		$tipo = " pdl.glosa";
+		$fecha_atraso = " factura.fecha";
+		$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+		$identificadores = 'facturas';
+		//$linktofile = 'agregar_factura.php?id_factura=';
+		//$identificador = " factura.id_factura";
+		$identificador = " d.id_cobro";
+		$linktofile = 'cobros6.php?id_cobro=';
 	} else {
-		$campo_valor="T.saldo";
-		$campo_gvalor="T.gsaldo";
-		$campo_hvalor="T.hsaldo";
+		$campo_valor = "T.saldo";
+		$campo_gvalor = "T.gsaldo";
+		$campo_hvalor = "T.hsaldo";
+
+################
+
 		$where.="AND d.tipo_doc = 'N' AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')   AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
+		$where.="AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
+
+##############
+
+
 		$groupby.=" d.id_documento";
-		$tipo=" 'liquidacion'";
-		$identificador=" d.id_cobro";
-		$fecha_atraso=" cobro.fecha_emision";
-		$label=" d.id_cobro ";
-		$identificadores='cobros';
-		$linktofile='cobros6.php?id_cobro=';
+		$tipo = " 'liquidacion'";
+		$fecha_atraso = " cobro.fecha_emision";
+		$label = " d.id_cobro ";
+		$identificadores = 'cobros';
+		$identificador = " d.id_cobro";
+		$linktofile = 'cobros6.php?id_cobro=';
 	}
 
 	$query = "SELECT
+			T.codigo_cliente,
 			T.glosa_cliente,
 			T.moneda,
 			-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, $campo_valor, 0)) AS '0-30',
@@ -69,15 +86,16 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			-SUM($campo_valor) AS total,
 			-SUM($campo_hvalor) AS htotal,
 			-SUM($campo_gvalor) AS gtotal,
-			concat('{',group_concat(concat('".'"'."',identificador,'".'":"'."',label,'".'"'."') separator ','), '}')  as identificadores
-			
+			CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')  as identificadores,
+			T.cantidad_seguimiento,
+			T.comentario_seguimiento
 		FROM
-			(SELECT 	";  
-	/*$query .= " if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
-					if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
-					
-				) as tipo_cobro,"*/
-		$query .= "		d.fecha,
+			(SELECT 	";
+	/* $query .= " if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+	  if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+
+	  ) as tipo_cobro," */
+	$query .= "		d.fecha,
 				$identificador AS identificador,
 				$tipo AS tipo,
 				d.glosa_documento  AS descripcion,
@@ -105,22 +123,37 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fgsaldo_base, 
 
 				DATEDIFF(NOW(), $fecha_atraso) AS dias_atraso_pago,
-				moneda_documento.simbolo AS moneda
+				moneda_documento.simbolo AS moneda,
+				seguimiento.cantidad AS cantidad_seguimiento,
+				seguimiento.comentario AS comentario_seguimiento
+			FROM
+				documento d
+			left JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
+			left JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
+
+#######################
+
 			FROM cobro 
 			left join documento d  ON cobro.id_cobro = d.id_cobro
-			left JOIN prm_moneda moneda_documento ON cobro.opc_moneda_total = moneda_documento.id_moneda
-			left JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
 			
 			left JOIN factura  on factura.id_cobro=cobro.id_cobro
 			left JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
 			left JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			left JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
 			left join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
+			LEFT JOIN (
+				SELECT
+					codigo_cliente,
+					COUNT(*) AS cantidad,
+					MAX(CONCAT(fecha_creacion, ' | ', comentario)) AS comentario
+				FROM cliente_seguimiento
+				GROUP BY codigo_cliente
+			) seguimiento ON cliente.codigo_cliente = seguimiento.codigo_cliente
 
 			$join
-			WHERE 1
-				
-				
+			WHERE
+				d.tipo_doc = 'N' AND
+				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
 				$where
 			GROUP BY $groupby
 			) AS T
@@ -131,97 +164,114 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
-		array(
-			'field' => 'glosa_cliente',
-			'title' => __('Cliente'),
-			'extras' => array(
-				'attrs' => 'width="28%" style="text-align:left;"',
-				'groupinline' => true
-			)
-		),
-                array(
-                        'field' => 'identificadores',
-                        'title' => __(ucfirst($identificadores)),
-                        'extras' => array(
-                                'attrs' => 'width="11%" style="text-align:right;display:none;"','class' => 'identificadores'
-                        )
-                ),
-		 
-
-		array(
-			'field' => '0-30',
-			'title' => '0-30 ' . utf8_encode(__('días')),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="10%" style="text-align:right"',
-				
-			)
-		),
-		array(
-			'field' => '31-60',
-			'title' => '31-60 ' . utf8_encode(__('días')),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="10%" style="text-align:right"'
-			)
-		),
-		array(
-			'field' => '61-90',
-			'title' => '61-90 ' . utf8_encode(__('días')),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="10%" style="text-align:right"'
-			)
-		),
-		array(
-			'field' => '91+',
-			'title' => '91+ ' . utf8_encode(__('días')),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="10%" style="text-align:right"'
-			)
-		),
-		array(
-			'field' => 'total',
-			'title' => __('Total'),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
-			)
-		)/*,
 			array(
-			'field' => 'htotal',
-			'title' => __('Total Honorarios'),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
-			)
-		),
+					'field' => 'glosa_cliente',
+					'title' => __('Cliente'),
+					'extras' => array(
+							'attrs' => 'width="28%" style="text-align:left;"',
+							'groupinline' => true
+					)
+			),
 			array(
-			'field' => 'gtotal',
-			'title' => __('Total Gastos'),
-			'format' => 'number',
-			'extras' => array(
-				'subtotal' => 'moneda',
-				'symbol' => 'moneda',
-				'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
+					'field' => 'identificadores',
+					'title' => __(ucfirst($identificadores)),
+					'extras' => array(
+							'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
+					)
+			),
+			array(
+					'field' => '0-30',
+					'title' => '0-30 ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+							'subtotal' => 'moneda',
+							'symbol' => 'moneda',
+							'attrs' => 'width="10%" style="text-align:right"',
+					)
+			),
+			array(
+					'field' => '31-60',
+					'title' => '31-60 ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+							'subtotal' => 'moneda',
+							'symbol' => 'moneda',
+							'attrs' => 'width="10%" style="text-align:right"'
+					)
+			),
+			array(
+					'field' => '61-90',
+					'title' => '61-90 ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+							'subtotal' => 'moneda',
+							'symbol' => 'moneda',
+							'attrs' => 'width="10%" style="text-align:right"'
+					)
+			),
+			array(
+					'field' => '91+',
+					'title' => '91+ ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+							'subtotal' => 'moneda',
+							'symbol' => 'moneda',
+							'attrs' => 'width="10%" style="text-align:right"'
+					)
+			),
+			array(
+					'field' => 'total',
+					'title' => __('Total'),
+					'format' => 'number',
+					'extras' => array(
+							'subtotal' => 'moneda',
+							'symbol' => 'moneda',
+							'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					)
 			)
-		)*/
+			/* ,
+					  array(
+					  'field' => 'htotal',
+					  'title' => __('Total Honorarios'),
+					  'format' => 'number',
+					  'extras' => array(
+					  'subtotal' => 'moneda',
+					  'symbol' => 'moneda',
+					  'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
+					  )
+					  ),
+					  array(
+					  'field' => 'gtotal',
+					  'title' => __('Total Gastos'),
+					  'format' => 'number',
+					  'extras' => array(
+					  'subtotal' => 'moneda',
+					  'symbol' => 'moneda',
+					  'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
+					  )
+					  ) */
 	);
 
+	// Configuración especial para mostrar el seguimiento del cliente
+	if ($_REQUEST['opcion'] != 'xls') {
+		$config_reporte[] = array(
+			'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
+			'title' => '&nbsp;',
+			'extras' => array(
+				'attrs' => 'width="5%" style="text-align:right"',
+				'class' => 'seguimiento'
+			)
+		);
+	} else {
+		$config_reporte[] = array(
+			'field' => 'comentario_seguimiento',
+			'title' => 'Comentario Seguimiento'
+		);
+	}
+
 	$SimpleReport->LoadConfigFromArray($config_reporte);
+
+	//echo $query; exit();
 
 	$statement = $Sesion->pdodbh->prepare($query);
 	$statement->execute();
@@ -229,6 +279,28 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 	$SimpleReport->LoadResults($results);
 
 	if ($_REQUEST['opcion'] == 'xls') {
+		$new_results = array();
+		foreach ($results as $result) {
+			// Corregir los identificadores
+			$array = json_decode(utf8_encode($result['identificadores']), true);
+			$identificadores = array();
+			foreach ($array as $key => $value) {
+				$identificadores[] = utf8_decode($value);
+			}
+			$result['identificadores'] = implode(', ', $identificadores);
+
+			// Corregir los comentarios de seguimiento
+			$array = explode(' | ', $result['comentario_seguimiento']);
+			if (count($array) > 1) {
+				$result['comentario_seguimiento'] = Utiles::sql2fecha($array[0], "%d/%m/%Y") . " " . $array[1];
+			} else {
+				$result['comentario_seguimiento'] = "";
+			}
+
+			$new_results[] = $result;
+		}
+
+		$SimpleReport->LoadResults($new_results);
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
 		$writer->save('Reporte_antiguedad_deuda');
 	}
@@ -260,29 +332,31 @@ $Pagina->PrintTop();
 								<label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
 							</td>
 							<td colspan="3" align="left">
-								<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
+<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
 							</td>
 						</tr>
-						<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
-						
+<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
+
 						<tr>
 							<td align="right" width="30%">
 								<label for="filtro_facturado"><?php echo __('Considerar sólo monto facturado'); ?></label>
 							</td>
 							<td colspan="3" align="left"  >
-								<input type="checkbox" id="solo_monto_facturado" name="solo_monto_facturado"  value="1" <?php echo $solo_monto_facturado ? 'checked' : ''?>/>
-							<div class="inlinehelp" title="Sólo monto facturado" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="El reporte por defecto considera el saldo liquidado de cada liquidación. Active este campo para considerar sólo el saldo facturado.">?</div>
+								<input type="checkbox" id="solo_monto_facturado" name="solo_monto_facturado"  value="1" <?php echo $solo_monto_facturado ? 'checked' : '' ?>/>
+								<div class="inlinehelp" title="Sólo monto facturado" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="El reporte por defecto considera el saldo liquidado de cada liquidación. Active este campo para considerar sólo el saldo facturado.">?</div>
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-								<label for="tipo_liquidacion"><?php echo __('Tipo de Liquidación')?></label>
+								<label for="tipo_liquidacion"><?php echo __('Tipo de Liquidación') ?></label>
 							</td>
 							<td colspan=2 align=left>
-								<?php echo Html::SelectArray(array(
-									array('1', __('Sólo Honorarios')),
-									array('2', __('Sólo Gastos')),
-									array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Todas'))?>
+<?php
+echo Html::SelectArray(array(
+		array('1', __('Sólo Honorarios')),
+		array('2', __('Sólo Gastos')),
+		array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Todas'))
+?>
 							</td>
 						</tr>
 						<tr>
@@ -300,36 +374,93 @@ $Pagina->PrintTop();
 		</td>
 	</tr>
 </table>
+<div id="seguimiento_template">
+
+</div>
 <script type="text/javascript">
-<?php echo "var linktofile= '$linktofile';";?>
-	jQuery(document).ready(function () {
-		
-			jQuery('.inlinehelp').each(function() {
-				jQuery(this).popover({title:jQuery(this).attr('title'), trigger:'hover',animation:true, content:jQuery(this).attr('help')});
-			} );
-		jQuery('#boton_xls').click(function(){
+<?php echo "var linktofile= '$linktofile';"; ?>
+	var current_popover;
+	show_popover = function(sender, codigo_cliente) {
+		codigo_cliente = sender.data('codigo_cliente');
+
+		if (current_popover != undefined) {
+			codigo_cliente_old = current_popover.data('codigo_cliente');
+			if (codigo_cliente != codigo_cliente_old) {
+				current_popover.popover('hide');
+			} else {
+				sender.popover('hide');
+			}
+		}
+		current_popover = sender;
+		sender.popover({
+			title: '<?php echo __('Seguimiento del cliente'); ?>',
+			trigger: 'manual',
+			placement: 'left',
+			html: true,
+			content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente + '" />'
+		});
+
+		sender.popover('show')
+	};
+
+	jQuery(document).ready(function() {
+		var seguimiento_template = jQuery('#seguimiento_template');
+		jQuery('.inlinehelp').each(function() {
+			jQuery(this).popover({title: jQuery(this).attr('title'), trigger: 'hover', animation: true, content: jQuery(this).attr('help')});
+		});
+		jQuery('#boton_xls').click(function() {
 			jQuery('#opcion').val('xls');
 		});
-		jQuery('#boton_buscar').click(function(){
+		jQuery('#boton_buscar').click(function() {
 			jQuery('#opcion').val('buscar');
 		});
 
 		jQuery('.subtotal td').css('font-weight', 'bold');
 		jQuery('.encabezado').show();
-		jQuery('.identificadores').show().each(function(){
+		jQuery('.identificadores').show().each(function() {
 			var td = jQuery(this);
-			var contenido=td.html();
+			var contenido = td.html();
 			td.html('');
-			jQuery.each(jQuery.parseJSON(contenido), function(id,label) {
-		      td.append(jQuery('<a/>', {
+			jQuery.each(jQuery.parseJSON(contenido), function(id, label) {
+				td.append(jQuery('<a/>', {
 					text: label,
-					style:'white-space:nowrap;',
+					style: 'white-space:nowrap;',
 					href: 'javascript:void(0)',
-					onclick: "nuovaFinestra('Cobro', 1000, 700,'../"+linktofile+id+"&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
+					onclick: "nuovaFinestra('Cobro', 1000, 700,'../" + linktofile + id + "&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
 				})).append(' ');
-		    });
-			
-			
+			});
+		});
+
+		jQuery('.seguimiento').each(function () {
+			var td = jQuery(this);
+			var contenido = td.html();
+			if (contenido.trim() != '') {
+				partes = contenido.split('|');
+				codigo_cliente = partes[0];
+				cantidad_seguimiento = partes[1];
+				var link = jQuery('<a/>', { text: '', href: 'javascript:void(0)' });
+				icono = 'tarea_inactiva.gif';
+				if (parseInt(cantidad_seguimiento) > 0) {
+					icono = 'tarea.gif';
+				}
+				link.append(jQuery('<img/>', { src: '<?php echo Conf::ImgDir(); ?>/' + icono }));
+				td.html('');
+				td.append(link).append(' ');
+				td.data('codigo_cliente', codigo_cliente);
+			}
+
+			td.click(function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				show_popover(jQuery(this));
+			});
+		});
+
+		jQuery('body').click(function () {
+			if (current_popover != undefined) {
+				current_popover.popover('hide');
+			}
 		});
 	});
 </script>

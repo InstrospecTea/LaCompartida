@@ -1772,7 +1772,7 @@ class Factura extends Objeto {
 
 		if ($where == '') {
 			$where = 1;
-			if ($numero != '') {
+			if ($numero != '' && $numero != null && $numero !== false) {
 				$where .= " AND numero*1 = $numero*1 ";
 			}
 			if ($fecha1 && $fecha2) {
@@ -1821,7 +1821,7 @@ class Factura extends Objeto {
 				$where .= " AND factura.id_moneda = " . $id_moneda . " ";
 			}
 			if ($grupo_ventas) {
-				$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
+				$where .= " AND prm_documento_legal.grupo = 'VENTAS'";
 			}
 			if ($razon_social) {
 				$where .= " AND factura.cliente LIKE '%" . $razon_social . "%'";

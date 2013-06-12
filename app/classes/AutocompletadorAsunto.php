@@ -16,24 +16,22 @@ class AutocompletadorAsunto
 	 */
 	function ImprimirSelector($sesion, $codigo_asunto="", $codigo_asunto_secundario="", $codigo_cliente="", $codigo_cliente_secundario="",$mas_recientes=false, $width='', $oncambio='')
 	{
-		$output = "<script src=\"".Conf::RootDir()."/fw/js/prototype.js\" type=\"text/javascript\"></script>";
-		$output = "<script src=\"".Conf::RootDir()."/fw/js/src/scriptaculous.js?load=effects,controls\" type=\"text/javascript\"></script>";
 
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+		if( Conf::GetConf($sesion,'CodigoSecundario') ) {
 			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_asunto_secundario\" name=\"codigo_asunto_secundario\" onChange=\"CargarGlosaAsunto(); $oncambio\" value=\"".$codigo_asunto_secundario."\" />";
-		else
+		} else {
 			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_asunto\" name=\"codigo_asunto\" onChange=\"CargarGlosaAsunto(); $oncambio\" value=\"".$codigo_asunto."\" />";
-
+		}
 		$glosa_asunto = '';
 		if( $codigo_asunto || $codigo_asunto_secundario )
 		{
 			if($codigo_cliente || $codigo_cliente_secundario)
 			{
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+				if( Conf::GetConf($sesion,'CodigoSecundario') ) {
 					$query = "SELECT glosa_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario' AND codigo_cliente='$codigo_cliente_secundario'";
-				else
+				} else {
 					$query = "SELECT glosa_asunto FROM asunto WHERE codigo_asunto='$codigo_asunto' AND codigo_cliente='$codigo_cliente'";
-
+				}
 				$resp = mysql_query($query, $sesion->dbh);
 				if($row = mysql_fetch_array($resp))
 					$glosa_asunto = $row['glosa_asunto'];
@@ -42,17 +40,14 @@ class AutocompletadorAsunto
 		if( $width == '' )
 			{
 				if($mas_recientes)
-					$width = '245';
+					$width = '260';
 				else
-					$width = '305';
+					$width = '320';
 			}
-		//if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			$output .= "<input type=\"text\" id=\"glosa_asunto\" name=\"glosa_asunto\" value=\"".$glosa_asunto."\" style=\"width: ".$width."px\"/>";
-		/*else
-			$output .= "<input type=\"text\" id=\"glosa_asunto\" name=\"glosa_asunto\" value=\"".$glosa_asunto."\" style=\"width: ".$width."px;\"/>";
-		*/
+		
 		if( $mas_recientes )
-			$output .= "<input type=\"button\" class=\"btn\" value=\"".__('Más recientes')."\" onclick=\"cargarMejoresOpciones();\" />";
+			$output .= "<input type=\"button\" id=\"asuntos_recientes\" class=\"btn\" value=\"".__('Más recientes')."\" />";
 
 		$output .= "<span id=\"indicador_glosa_asunto\" style=\"display: none\">
 			<img src=\"".Conf::ImgDir()."/ajax_loader.gif\" alt=\"".__('Trabajando')."...\" />
@@ -64,94 +59,73 @@ class AutocompletadorAsunto
 
 	function CSS()
 	{
-		$output .= "<style type=\"text/css\">
-										div.autocomplete {
-											position:absolute;
-											width:250px;
-											background-color:white;
-											border:1px solid #888;
-											margin:0;
-											padding:0;
-										}
-										div.autocomplete ul {
-											list-style-type:none;
-											background-color: white;
-											margin:0;
-											padding:0;
-										}
-										div.autocomplete ul li.selected { background-color: #ffb;}
-										div.autocomplete ul li {
-											list-style-type:none;
-											display:block;
-											background-color: white;
-											margin:0;
-											padding:2px;
-											height:32px;
-											cursor:pointer;
-										}
-								</style>";
-
-	return $output;
+		
+	return;
 	}
 
 	function Javascript( $sesion , $cargar_select = true , $onchange = '' )
 	{
+		if(  Conf::GetConf($sesion,'CodigoSecundario') ) {
+			$lasid=array('codigo_cliente_secundario','codigo_asunto_secundario','codigo_cliente_secundario');
+		} else {
+			$lasid=array('codigo_cliente','codigo_asunto','codigo_cliente');
+ 		}
 		$output = "
 		<script type=\"text/javascript\">
-			id_usuario_original = ".$id_usuario."
+		var	id_usuario_original = ".intval($sesion->usuario->fields['id_usuario']).";
 
-			Autocompletador = new Ajax.Autocompleter(\"glosa_asunto\", \"sugerencias_glosa_asunto\", \"ajax_seleccionar_asunto.php\", {minChars: 1, indicator: 'indicador_glosa_asunto', afterUpdateElement : getSelectionId, callback: obtenerCodigoCliente })
+			
+	jQuery(document).ready(function() {
+					jQueryUI.done(function() {
 
-			function getSelectionId(text, li)
-			{
-				// El valor 'cualquiera' es retornado cuando la consulta ajax no tiene resultados que mostrar.
-				";
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-					{
-		$output .= "if(li.id == 'cualquiera')
-						{
-						document.getElementById('campo_codigo_asunto_secundario').value = '';
-						return;
-						}
-					document.getElementById('campo_codigo_asunto_secundario').value = li.id;";
-					$output.= $onchange;
+						
+						jQuery( \"#glosa_asunto\" ).autocomplete({
+						
+							      source: function( request, response ) {
+							      
+							        request.codigo_cliente= jQuery('#".$lasid[2]."').val();
+							        jQuery.ajax({url: '".Conf::RootDir()."/app/interfaces/ajax/ajax_seleccionar_asunto.php',
+							        	data: {term:request.term, codigo_cliente:jQuery('#".$lasid[2]."').val(), id_usuario:id_usuario_original },
+							        	dataType:\"json\",
+							        	type:\"POST\"}).done(function( data ) {
+							          response( data );
+							        });
+							      },
+      					          minLength: 3,
+						      select: function( event, ui ) {
+						      	//console.log(ui);
+        						jQuery('#".$lasid[1]."').val(ui.item.id);
+        						jQuery('#glosa_asunto').val(ui.item.value);
+        						";
+        						//$output.= $onchange;
+        						//$output.= "CargarSelect('".$lasid[0]."','".$lasid[1]."','cargar_asuntos');";
+        						$output.= "
+      							}	
+						    });
 
-					if( $cargar_select ) {
-							$output .= "
-								CargarSelect('campo_codigo_asunto_secundario','codigo_asunto_secundario','cargar_asuntos');";
-						}
-					}
-				else
-					{ $output .= "
-					if(li.id == 'cualquiera')
-						{
-						document.getElementById('campo_codigo_asunto').value = '';
-						return;
-						}
-					document.getElementById('campo_codigo_asunto').value = li.id;";
-					$output.= $onchange;
+					});
 
-					if( $cargar_select ) {
-							$output .= "
-								CargarSelect('campo_codigo_asunto','codigo_asunto','cargar_asuntos');";
-						}
-				} $output .= "
-			}
+					
+					jQuery('#asuntos_recientes').click(function() {
+						jQuery('#glosa_asunto').autocomplete('option','minLength',0).autocomplete('search','').autocomplete('option','minLength',3);
+					});
+				}); 
+			
 
 			function CargarGlosaAsunto()
 			{ ";
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-					{ $output .= "
+				if(  Conf::GetConf($sesion,'CodigoSecundario') ) 	{ 
+					$output .= "
 						var codigo_asunto=document.getElementById('codigo_asunto_secundario').value;
 						if(document.getElementById('codigo_cliente_secundario'))
 						var codigo_cliente=document.getElementById('codigo_cliente_secundario').value;";
-					}
-				else
-					{ $output .= "
+				}	else	{ 
+					$output .= "
 						var codigo_asunto=document.getElementById('codigo_asunto').value;
 						if(document.getElementById('codigo_cliente'))
 						var codigo_cliente=document.getElementById('codigo_cliente').value;";
-					} $output .= "
+					}
+					 $output .= "
 				var campo_glosa_asunto=document.getElementById('glosa_asunto');
 				var http = getXMLHTTP();
 				var url = root_dir + '/app/ajax.php?accion=cargar_glosa_asunto&id=' + codigo_asunto + '&id_cliente=' + codigo_cliente;
@@ -196,16 +170,7 @@ class AutocompletadorAsunto
 				return \"glosa_asunto=\"+glosa_asunto+\"&codigo_cliente=\" + codigo_cliente;
 			}
 
-			function cargarMejoresOpciones()
-			{
-				$('glosa_asunto').value='';
-				if(id_usuario_original != $('id_usuario').options[$('id_usuario').selectedIndex].value)
-				{
-					id_usuario_original = $('id_usuario').options[$('id_usuario').selectedIndex].value;
-					Autocompletador = new Ajax.Autocompleter(\"glosa_asunto\", \"sugerencias_glosa_asunto\", \"ajax_seleccionar_asunto.php\", {minChars: 3, indicator: 'indicador_glosa_asunto', afterUpdateElement: getSelectionId, parameters:'id_usuario='+id_usuario_original});
-				}
-				Autocompletador.activate();
-			}
+ 
 		</script>";
 		return $output;
 	}
