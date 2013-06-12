@@ -49,7 +49,6 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$dato = $versiondb->fetch();
 				$versiondb->closeCursor();
 
-	
 				echo '<br>&nbsp;&nbsp;&nbsp; <a href="' . Conf::RootDir() . '/app/update.php?hash=' . Conf::Hash() . '"/>Update</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/configuracion.php"/>Configuracion</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/templates.php"/>Templates</a>';
@@ -61,6 +60,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 		 		echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
 		 		echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/admin/auditoria/index.php"/>Auditoría</a>';
 
 		echo ' <br><br> Este software corre sobre la DB '. Conf::dbHost() .' <b>'. Conf::dbName().'</b> version '.$dato[0] ;
 				echo '. La m&aacute;s actual disponible es la ';

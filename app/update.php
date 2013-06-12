@@ -9707,7 +9707,7 @@ QUERY;
 			break;
 		case 7.31:
 			$queries = array();
-			if (!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
@@ -9794,29 +9794,79 @@ QUERY;
 				}
 			}
 
-			break;
+		break;
 
 		case 7.37:
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_tipo_correo` (
+							  `id` int(11) NOT NULL AUTO_INCREMENT,
+							  `nombre` varchar(45) DEFAULT NULL,
+							  PRIMARY KEY (`id`),
+							  UNIQUE KEY `nombre` (`nombre`)
+							) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;";
+
+			if(!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_usuario` INT NULL AFTER `id_log_correo;";
+			}
+			if(!ExisteCampo('tipo_id', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_tipo_correo` INT NULL  AFTER `id_usuario`;";
+			}
+			if(!ExisteCampo('fecha_envio', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_envio` DATETIME NULL DEFAULT NULL  AFTER `enviado`;";
+			}
+			if(!ExisteCampo('intento_envio', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `intento_envio` INT NULL  AFTER `fecha_envio`;";
+			}
+			if(!ExisteCampo('fecha_modificacion', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_modificacion` DATETIME NULL DEFAULT NULL  AFTER `fecha`;";
+			}
+			if(!ExisteIndex('fk_log_correo_tipo_correo', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD CONSTRAINT `fk_log_correo_tipo_correo` FOREIGN KEY (`id_tipo_correo`) REFERENCES `prm_tipo_correo` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, ADD INDEX `fk_log_correo_tipo_correo` (`id_tipo_correo` ASC);";
+			}
+			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha WHERE fecha_modificacion IS NULL;";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'diario';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'semanal';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspension_pago_comision';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'prueba';";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.38:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO prm_excel_cobro (`id_prm_excel_cobro` ,`nombre_interno` ,`grupo` ,`glosa_es` ,`glosa_en` ,`tamano`)VALUES (NULL ,  'solicitante',  'Listado de gastos',  'Solicitante',  'Applicant',  '10')";
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.38:
-			$queries=array();
-			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` VARCHAR( 512 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+		case 7.39:
+			$queries = array();
+			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			break;
+		case 7.40:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO  factura_pdf_datos_categoria (`id_factura_pdf_datos_categoria` ,`glosa`)VALUES (NULL ,  'Comodines')";
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_codigo` (
+							`id_codigo` int(11) NOT NULL AUTO_INCREMENT,
+							`grupo` varchar(20) NOT NULL COMMENT 'listado al que pertenece este item',
+							`codigo` varchar(100) NOT NULL,
+							`glosa` varchar(200) NOT NULL,
+							PRIMARY KEY (`id_codigo`),
+							UNIQUE KEY `grupo` (`grupo`,`codigo`)
+						) ENGINE=InnoDB COMMENT='pares de codigo-glosa para listados parametricos en general' AUTO_INCREMENT=1 ;";
+			$queries[] = "INSERT IGNORE INTO  prm_codigo (`id_codigo` ,`grupo` ,`codigo`,`glosa`)VALUES (NULL,'PRM_FACTURA_PDF','debe','Debe'), (NULL,'PRM_FACTURA_PDF','concepto','Concepto'), (NULL,'PRM_FACTURA_PDF','atentamente','Atentamente'), (NULL,'PRM_FACTURA_PDF','debea', 'Debe a:'), (NULL,'PRM_FACTURA_PDF','son', 'Son:')";
 			ejecutar($queries, $dbh);
 			break;
 
 	}
 }
 
+
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.38;
+$max_update = 7.39;
+
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

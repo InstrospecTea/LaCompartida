@@ -48,20 +48,20 @@
   $fm =& $wb->addFormat(array('Size' => 11, 'VAlign' => 'top','Color' => 'black','Align'=>'merge'));
     $f4->setNumFormat("0");
 
-    
+
     $querytarifas = "SELECT distinct id_tarifa, glosa_tarifa FROM tarifa";
    // mail('ffigueroa@lemontech.cl','Querytarifa',$querytarifas);
     $resptarifas = mysql_query($querytarifas, $sesion->dbh) or Utiles::errorSQL($querytarifas,__FILE__,__LINE__,$sesion->dbh);
    $stack="";
     while($hojas=mysql_fetch_array( $resptarifas )):
-	
-	
-	
+
+
+
 	$id_tarifa=$hojas['id_tarifa'];
 	$id_tarifa_mostrar = $hojas['id_tarifa'];
     $ws1 =& $wb->addWorksheet(__('Tarifa').' '.$id_tarifa.' '.substr($hojas['glosa_tarifa'],0,15));
   $stack.="\n".__('Tarifa').' '.$id_tarifa.' '.substr($hojas['glosa_tarifa'],0,20);
-   
+
 	$ws1->setInputEncoding('utf-8');
 	$ws1->fitToPages(1,0);
 	$ws1->setZoom(75);
@@ -71,10 +71,10 @@
 	$ws1->setColumn( 0, 0,  45.00);
 	$ws1->setColumn( 1, 10, 15.00);
 
-	
+
 		$PdfLinea1 = UtilesApp::GetConf($sesion, 'PdfLinea1');
 		$PdfLinea2 = UtilesApp::GetConf($sesion, 'PdfLinea2');
-	
+
 	$ws1->write(0, 0, 'Detalle de tarifa '.$hojas['glosa_tarifa'], $encabezado);
 	$ws1->mergeCells (0, 0, 0, 8);
 	$info_usr1 = str_replace(array('<br>','<br/>','<br />'),' - ',$PdfLinea1);
@@ -140,12 +140,12 @@
 			$fila_inicial++;
 		}
 
-		
-		
-################################## CLIENTES POR TARIFA ######################################  
-		
-		
-		$query_clientes = "SELECT 
+
+
+################################## CLIENTES POR TARIFA ######################################
+
+
+		$query_clientes = "SELECT
 			CONCAT_WS( ' - ', cliente.codigo_cliente, cliente.glosa_cliente) as glosa_cliente,
 			GROUP_CONCAT( asunto.codigo_asunto, ' - ', asunto.glosa_asunto ) as glosa_asunto
 		FROM cliente
@@ -167,21 +167,21 @@
 			$ws1->write($fila_inicial, 2, 'Asuntos', $tit);
 			$fila_inicial++;
 			while( list($glosa_cliente, $glosa_asuntos) = mysql_fetch_array($resp3) ) {
-			
+
 			    $ws1->write($fila_inicial, 0, $glosa_cliente, $f5);
-			  
-			   
-							
-				
+
+
+
+
 				$ws1->write($fila_inicial, 2, $glosa_asuntos, $f5);
-			
+
 				$fila_inicial++;
 			}
 		}
 	endwhile;
     $wb->close();
-    
-    $testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($stack, $this->sesion->dbh)."'";
-        	$respt = mysql_query($testimonio, $this->sesion->dbh);
-    exit;
+
+	$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($stack, $sesion->dbh) . "'";
+	$respt = mysql_query($testimonio, $sesion->dbh);
+	exit;
 ?>

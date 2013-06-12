@@ -1772,7 +1772,7 @@ class Factura extends Objeto {
 
 		if ($where == '') {
 			$where = 1;
-			if ($numero != '') {
+			if ($numero != '' && $numero != null && $numero !== false) {
 				$where .= " AND numero*1 = $numero*1 ";
 			}
 			if ($fecha1 && $fecha2) {

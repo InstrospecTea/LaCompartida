@@ -178,8 +178,11 @@ $pagina->PrintTop($popup);
 <?php } ?>
 
 <script type="text/javascript">
-	function formato_numeros() {
-		format = jQuery('#id_moneda').val() == 1 ? '0' : '#.00';
+    function formato_numeros() {
+		var cantidad_decimales = $('cifras_decimales').value;
+		var ceros = "0".times(parseFloat(cantidad_decimales));
+		var decimales = '#.' + ceros;
+		format = decimales;
 		return {format: format, locale: 'us'};
 	}
 

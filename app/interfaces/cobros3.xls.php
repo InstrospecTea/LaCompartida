@@ -117,8 +117,15 @@ $col_id_cobro = $col++;
 if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	$col_actividad = $col++;
 }
+
 $col_descripcion = $col++;
 $col_nombre_usuario = $col++;
+
+$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
+if ($solicitante == 1 || $solicitante == 2 ){
+	$col_solicitante = $col++;
+}
+
 $col_duracion = $col++;
 $col_duracion_cobrada = $col++;
 $col_cobrable = $col++;
@@ -149,6 +156,10 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 }
 $ws->setColumn($col_descripcion, $col_descripcion, 33);
 $ws->setColumn($col_nombre_usuario, $col_nombre_usuario, 30);
+if ($solicitante == 1 || $solicitante == 2 ){
+	$ws->setColumn($col_solicitante, $col_solicitante, 30);
+}
+
 $ws->setColumn($col_duracion, $col_duracion, 15.67);
 $ws->setColumn($col_duracion_cobrada, $col_duracion_cobrada, 15.67);
 $ws->setColumn($col_cobrable, $col_cobrable, 15);
@@ -187,6 +198,9 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 }
 $ws->write($fila_inicial, $col_descripcion, __('Descripción'), $tit);
 $ws->write($fila_inicial, $col_nombre_usuario, __('Nombre Usuario'), $tit);
+if ($solicitante == 1 || $solicitante == 2 ){
+	$ws->write($fila_inicial, $col_solicitante, __('Ordenado Por '), $tit);
+}
 $ws->write($fila_inicial, $col_duracion, __('Duración'), $tit);
 $ws->write($fila_inicial, $col_duracion_cobrada, __('Duración cobrada'), $tit);
 $ws->write($fila_inicial, $col_cobrable, __('Cobrable'), $tit);
@@ -247,7 +261,11 @@ for ($i = 0; $i < $lista->num; $i++) {
 	} else {
 		$ws->write($fila_inicial + $i, $col_nombre_usuario, $trabajo->fields['usr_nombre'], $tex);
 	}
-
+	
+	if ($solicitante == 1 || $solicitante == 2 ){
+		$ws->write($fila_inicial + $i, $col_solicitante, $trabajo->fields['solicitante'], $tex);
+	}
+	
 	list($duracion, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
 	list($h, $m) = split(':', $duracion);
 	$duracion_decimal = number_format($h + $m / 60, 1, '.', '');

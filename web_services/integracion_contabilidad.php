@@ -203,7 +203,7 @@ $server->wsdl->addComplexType(
 		array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:Pago[]')),
 		'tns:Pago'
 		);
-		
+
 $server->wsdl->addComplexType(
 		'ResultadoPagos',
 		'complexType',
@@ -263,7 +263,7 @@ function ListaClientesModificados($fecha_ini,$fecha_fin=0,$usuario,$password)
 							contrato.factura_direccion,mon.glosa_moneda as moneda,
 							contrato.direccion_contacto,contrato.id_moneda,us.username as codigo_usuario,
 							IF((contrato.fecha_creacion NOT BETWEEN '$fecha_ini' AND '$fecha_fin'),'0','1') as creado
-							FROM cliente 
+							FROM cliente
 							INNER JOIN contrato ON contrato.id_contrato=cliente.id_contrato
 							JOIN usuario as us ON contrato.id_usuario_responsable=us.id_usuario
 							LEFT JOIN grupo_cliente as gru ON gru.id_grupo_cliente=cliente.id_grupo_cliente
@@ -287,7 +287,7 @@ function ListaClientesModificados($fecha_ini,$fecha_fin=0,$usuario,$password)
 			$cliente['bloqueado'] = $temp['bloqueado'];
 			array_push($lista_clientes,$cliente);
 		}
-		
+
 		return new soapval('lista_clientes','ListaClientes',$lista_clientes);
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
@@ -321,7 +321,7 @@ function ListaAsuntosModificados($fecha_ini,$fecha_fin=0,$usuario,$password)
 			$asunto['creado'] = $temp['creado'];
 			array_push($lista_asuntos,$asunto);
 		}
-		
+
 		return new soapval('lista_asuntos','ListaAsuntos',$lista_asuntos);
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
@@ -382,7 +382,7 @@ function ListaCobrosEmitidos($usuario,$password)
 							cobro.opc_moneda_total,cobro_sap.codigo_sap,carta.descripcion as glosa_carta,
 							cobro.documento
 							FROM cobro
-							JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=1 
+							JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=1
 							LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
 							LEFT JOIN prm_moneda as prm_moneda_total ON prm_moneda.id_moneda=cobro.opc_moneda_total
 							LEFT JOIN cobro_sap ON cobro_sap.id_cobro=cobro.id_cobro
@@ -406,8 +406,8 @@ function ListaCobrosEmitidos($usuario,$password)
 			$cobro['total_honorarios'] = number_format($total_en_moneda,$temp['cifras_decimales_total'],'.','');
 			$cobro['glosa_carta'] = $temp['glosa_carta'];
 			$cobro['numero_factura'] = $temp['documento'];
-			$query_duraciones = "SELECT 
-														SUM( TIME_TO_SEC( trabajo.duracion_cobrada ) ) /3600 AS horas_cobrables, 
+			$query_duraciones = "SELECT
+														SUM( TIME_TO_SEC( trabajo.duracion_cobrada ) ) /3600 AS horas_cobrables,
 														usuario.id_usuario, usuario.username, trabajo.codigo_asunto
 														FROM trabajo
 														JOIN usuario ON usuario.id_usuario=trabajo.id_usuario
@@ -421,12 +421,12 @@ function ListaCobrosEmitidos($usuario,$password)
 				$usuario_cobro['codigo_usuario'] = $temp2['username'];
 				$usuario_cobro['id_usuario'] = $temp2['id_usuario'];
 				$usuario_cobro['horas'] = $temp2['horas_cobrables'] ? number_format($temp2['horas_cobrables'],2,'.','') : 0;
-				
+
 				array_push($usuarios_cobro,$usuario_cobro);
 				$cobro['codigo_proyecto'] = str_replace('-','',$temp2['codigo_asunto']);
 			}
 			$cobro['ListaUsuariosCobro'] = $usuarios_cobro;
-			
+
 			$query_gastos = "SELECT cta_corriente.egreso,cta_corriente.ingreso,moneda_gasto.tipo_cambio as tipo_cambio,
 									moneda_total.tipo_cambio as tipo_cambio_moneda_total,prm_moneda.cifras_decimales
 									FROM cta_corriente
@@ -454,7 +454,7 @@ function ListaCobrosEmitidos($usuario,$password)
 
 			array_push($lista_cobros,$cobro);
 		}
-		
+
 		return new soapval('lista_cobros_emitidos','ListaCobros',$lista_cobros);
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
@@ -493,41 +493,69 @@ function ResultadoIngresoCobro($DocEntry,$id_cobro,$usuario,$password)
 	return $ok;
 }
 
-function IngresoGasto($fecha,$codigo_asunto,$monto,$desc_param,$descripcion,$usuario,$password)
-{
+function IngresoGasto($fecha, $codigo_asunto, $monto, $desc_param, $descripcion, $usuario, $password) {
 	$sesion = new Sesion();
-	if(UtilesApp::VerificarPasswordWebServices($usuario,$password))
-	{
-		$codigo_cliente=substr($codigo_asunto,0,4);
-		$codigo_asunto_solo=substr($codigo_asunto,4,8);
-		if($desc_param==0)
-			$descripcion_a_usar=$descripcion;
-		else
-		{
+	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
+		$_codigo_asunto = explode('-', $codigo_asunto);
+		$codigo_cliente = $_codigo_asunto[0];
+		unset($_codigo_asunto);
+
+		if ($desc_param == 0) {
+			$descripcion_a_usar = $descripcion;
+		} else {
 			$query = "SELECT glosa_gasto FROM prm_glosa_gasto WHERE id_glosa_gasto='$desc_param'";
-			if(!($resp = mysql_query($query, $sesion->dbh) ))
-				return new soap_fault('Client', '','Error SQL.'.$query,'');
-			list($descripcion_a_usar)=mysql_fetch_array($resp);
+			if (!($resp = mysql_query($query, $sesion->dbh))) {
+				return new soap_fault('Client', '', 'Error SQL.' . $query, '');
+			}
+
+			list($descripcion_a_usar) = mysql_fetch_array($resp);
 		}
+
 		$tipo_monto = "egreso";
-		if($monto < 0)
-		{
+		if ($monto < 0) {
 			$tipo_monto = "ingreso";
 			$monto = $monto*-1;
 		}
-		
-		$query = "INSERT INTO cta_corriente SET id_usuario=1,fecha='$fecha',codigo_cliente='$codigo_cliente',codigo_asunto='".$codigo_cliente."-".$codigo_asunto_solo."', $tipo_monto='$monto',monto_cobrable='$monto',descripcion='$descripcion_a_usar',id_moneda='1',fecha_creacion=NOW(),incluir_en_cobro='SI',cobrable='1'";
-		if(!(mysql_query($query, $sesion->dbh) ))
-		{
+
+		// validar si existe el código del cliente
+		$query = "SELECT id_cliente FROM cliente WHERE codigo_cliente = '{$codigo_cliente}'";
+		$resp = mysql_query($query, $sesion->dbh);
+		list($id_cliente) = mysql_fetch_array($resp);
+
+		if (empty($id_cliente)) {
+			return new soap_fault('Client', '', 'parámetro "codigo_asunto" inválido');
+		}
+
+		// validar si existe el código del asunto
+		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto = '{$codigo_asunto}'";
+		$resp = mysql_query($query, $sesion->dbh);
+		list($id_asunto) = mysql_fetch_array($resp);
+
+		if (empty($id_asunto)) {
+			return new soap_fault('Client', '', 'parámetro "codigo_asunto" inválido');
+		}
+
+		$query = "INSERT INTO cta_corriente SET
+			id_usuario = 1,
+			fecha = '{$fecha}',
+			codigo_cliente = '{$codigo_cliente}',
+			codigo_asunto = '{$codigo_asunto}',
+			{$tipo_monto} = '{$monto}',
+			monto_cobrable = '{$monto}',
+			descripcion = '{$descripcion_a_usar}',
+			id_moneda = '1',
+			fecha_creacion = NOW(),
+			incluir_en_cobro = 'SI',
+			cobrable = '1'";
+		if (!(mysql_query($query, $sesion->dbh))) {
 			$error = -1;
 			return $error;
-		}
-		else
-		{
+		} else {
 			$query = "SELECT MAX(id_movimiento) FROM cta_corriente";
-			if(!($resp=mysql_query($query, $sesion->dbh) ))
-				return new soap_fault('Client', '','Error SQL.'.$query.' '.mysql_error($sesion->dbh),'');
-			list($id_nuevo_gasto)=mysql_fetch_array($resp);
+			if (!($resp = mysql_query($query, $sesion->dbh))) {
+				return new soap_fault('Client', '', 'Error SQL.' . $query . ' ' . mysql_error($sesion->dbh), '');
+			}
+			list($id_nuevo_gasto) = mysql_fetch_array($resp);
 			return $id_nuevo_gasto;
 		}
 	}
@@ -555,10 +583,10 @@ function PagoCobro($pagos,$usuario,$password)
 				$pago['monto_honorarios']=str_replace(',','.',$pago['monto_honorarios']);
 				$pago['monto_gastos']=str_replace(',','.',$pago['monto_gastos']);
 				$query = "INSERT INTO documento (monto,codigo_cliente,id_tipo_documento,id_moneda,tipo_doc,fecha_creacion,
-										glosa_documento,numero_doc,fecha) VALUES (".$pago['monto_total']." * -1,(SELECT cliente.codigo_cliente 
-										FROM cobro 
-										JOIN contrato ON contrato.id_contrato=cobro.id_contrato 
-										JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente 
+										glosa_documento,numero_doc,fecha) VALUES (".$pago['monto_total']." * -1,(SELECT cliente.codigo_cliente
+										FROM cobro
+										JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+										JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente
 										WHERE cobro.id_cobro=".$pago['id_cobro']."),'2', (SELECT opc_moneda_total
 										FROM cobro WHERE cobro.id_cobro=".$pago['id_cobro']."), '".$pago['tipo_documento']."',
 										NOW(),'Pago de Cobro #".$pago['id_cobro']."',".$pago['documento'].",NOW())";
@@ -566,7 +594,7 @@ function PagoCobro($pagos,$usuario,$password)
 					return new soap_fault('Client', '','Error SQL.'.$query.' '.mysql_error($sesion->dbh),'');
 				else
 					$id_documento=mysql_insert_id($sesion->dbh);
-				
+
 				$query = "INSERT INTO neteo_documento (id_documento_cobro,id_documento_pago,valor_cobro_honorarios,
 									valor_cobro_gastos,valor_pago_honorarios,valor_pago_gastos,fecha_creacion)
 									VALUES
@@ -576,7 +604,7 @@ function PagoCobro($pagos,$usuario,$password)
 									".$pago['monto_honorarios'].",".$pago['monto_gastos'].",NOW())";
 				if(!(mysql_query($query, $sesion->dbh) ))
 					return new soap_fault('Client', '','Error SQL.'.$query.' '.mysql_error($sesion->dbh),'');
-				
+
 				$query = "UPDATE documento AS doc
 									SET doc.saldo_honorarios=doc.saldo_honorarios - ".$pago['monto_honorarios'].",
 									doc.saldo_gastos=doc.saldo_gastos - ".$pago['monto_gastos'].",
@@ -584,7 +612,7 @@ function PagoCobro($pagos,$usuario,$password)
 									WHERE doc.id_cobro=".$pago['id_cobro'];
 				if(!(mysql_query($query, $sesion->dbh) ))
 					return new soap_fault('Client', '','Error SQL.'.$query.' '.mysql_error($sesion->dbh),'');
-					
+
 				$query = "UPDATE cobro SET estado='PAGADO',honorarios_pagados='SI',
 									gastos_pagados='SI',id_doc_pago_honorarios=".$id_documento.",id_doc_pago_gastos=".$id_documento.",
 									fecha_cobro=NOW(),documento=".$pago['factura'].",facturado=1 WHERE id_cobro=".$pago['id_cobro'];
@@ -602,5 +630,5 @@ function PagoCobro($pagos,$usuario,$password)
 
 
 $server->service($HTTP_RAW_POST_DATA);
-#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL: 
+#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL:
 ?>

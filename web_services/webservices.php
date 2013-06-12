@@ -119,7 +119,7 @@ $server->wsdl->addComplexType(
 );
 
 $server->register('CargarTrabajo',
-			array('usuario' => 'xsd:string', 
+			array('usuario' => 'xsd:string',
 					'password' => 'xsd:string',
 					'id_trabajo_local' => 'xsd:string',
 					'codigo_asunto' => 'xsd:string',
@@ -131,7 +131,7 @@ $server->register('CargarTrabajo',
 			array('resultado' => 'xsd:string'),
 			$ns);
 $server->register('CargarTrabajo2',
-			array('usuario' => 'xsd:string', 
+			array('usuario' => 'xsd:string',
 					'password' => 'xsd:string',
 					'id_trabajo_local' => 'xsd:string',
 					'codigo_asunto' => 'xsd:string',
@@ -194,7 +194,7 @@ $server->register('TituloAsunto',
 			$ns);
 $server->register('IngresarLog',
 			array('usuario' => 'xsd:string',
-					'password' => 'xsd:string', 
+					'password' => 'xsd:string',
 					'inicio' => 'xsd:string',
 					'fin' => 'xsd:string',
 					'programas' => 'tns:ListaLogPrograma'),
@@ -263,7 +263,7 @@ function EntregarListaClientes($usuario, $password)
 		return new soap_fault(
 			'Client', '',
 			'Debe entregar el usuario y el password.',''
-		); 
+		);
 
 	$sesion = new Sesion();
 	$lista_clientes = array();
@@ -298,7 +298,7 @@ function ActividadesObligatorias($usuario, $password, $codigo_asunto)
 		return new soap_fault(
 			'Client', '',
 			'Debe entregar el usuario y el password.',''
-		); 
+		);
 
 	$sesion = new Sesion();
 
@@ -322,7 +322,7 @@ function EntregarListaAsuntos($usuario, $password)
 		return new soap_fault(
 			'Client', '',
 			'Debe entregar el usuario y el password.',''
-		); 
+		);
 
 	$sesion = new Sesion();
 
@@ -333,14 +333,14 @@ function EntregarListaAsuntos($usuario, $password)
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 		{
 			$query = "SELECT asunto.codigo_asunto_secundario ,asunto.glosa_asunto,cliente.codigo_cliente_secundario
-								FROM asunto 
+								FROM asunto
 								JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
 								WHERE asunto.activo=1 AND cliente.activo=1 ORDER BY asunto.glosa_asunto";
 		}
 		else
 		{
-			$query = "SELECT asunto.codigo_asunto ,asunto.glosa_asunto, asunto.codigo_cliente FROM asunto 
-								JOIN cliente ON cliente.codigo_cliente = asunto.codigo_cliente 
+			$query = "SELECT asunto.codigo_asunto ,asunto.glosa_asunto, asunto.codigo_cliente FROM asunto
+								JOIN cliente ON cliente.codigo_cliente = asunto.codigo_cliente
 								WHERE asunto.activo=1 AND cliente.activo=1 ORDER BY glosa_asunto";
 		}
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
@@ -363,7 +363,7 @@ function EntregarListaActividades($usuario, $password)
 		return new soap_fault(
 			'Client', '',
 			'Debe entregar el usuario y el password.',''
-		); 
+		);
 
 	$sesion = new Sesion();
 
@@ -392,7 +392,7 @@ function EntregarListaAreas($usuario, $password)
 		return new soap_fault(
 			'Client', '',
 			'Debe entregar el usuario y el password.',''
-		); 
+		);
 
 	$sesion = new Sesion();
 
@@ -430,7 +430,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		return new soap_fault(
 			'Client', '',
 			'Debe entregar el usuario y el password.',''
-		); 
+		);
 
 	$sesion = new Sesion();
 
@@ -442,14 +442,14 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			if(!($resp_codigo = mysql_query($query_codigo, $sesion->dbh) ))
 				return new soap_fault('Client', '',mysql_error(),'');
 			list($codigo_asunto) = mysql_fetch_array($resp_codigo);
-		}  
-		$query_asunto="SELECT codigo_asunto FROM `asunto` WHERE codigos_alternativos like '%$codigo_asunto%' and codigo_asunto not in (select codigo_asunto from asunto where codigo_asunto='$codigo_asunto') ";
+		}
+		$query_asunto = "SELECT codigo_asunto FROM `asunto` WHERE codigo_asunto_secundario LIKE '%$codigo_asunto%' AND codigo_asunto not IN (SELECT codigo_asunto FROM asunto WHERE codigo_asunto='$codigo_asunto')";
 		if($resp_asunto = mysql_query($query_asunto, $sesion->dbh)) {
 			if($asunto_corregido=mysql_fetch_row($resp_asunto)) {
 				$codigo_asunto=$asunto_corregido[0];
 			}
 		}
-		
+
 		$query = "SELECT contrato.id_moneda, asunto.cobrable FROM contrato JOIN asunto on asunto.id_contrato = contrato.id_contrato WHERE codigo_asunto='$codigo_asunto'";
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '',mysql_error(),'');
@@ -458,8 +458,8 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		$minutos = $duracion / 60;
 		$min = $minutos % 60;
 		$hora = ($minutos - $min) / 60;
-		$min = $min < 10 ? "0$min" : $min; 
-		$hora = $hora < 10 ? "0$hora" : $hora; 
+		$min = $min < 10 ? "0$min" : $min;
+		$hora = $hora < 10 ? "0$hora" : $hora;
 
 		$query = "SELECT id_usuario, id_categoria_usuario ,dias_ingreso_trabajo FROM usuario WHERE rut='$usuario'";
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
@@ -488,10 +488,10 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			$fecha=date("Y-m-d");
 
 		$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : "NULL";
-			
+
 		$descripcion=addslashes($descripcion);
 		$ordenado_por=addslashes($ordenado_por);
-		$query = "INSERT INTO trabajo SET 
+		$query = "INSERT INTO trabajo SET
 								id_usuario='$id_usuario',
                                                                 id_categoria_usuario='$id_categoria_usuario',
 								id_trabajo_local='$id_trabajo_local',
@@ -507,7 +507,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 						duracion_cobrada='$hora:$min:00',
 						id_area_trabajo = $id_area_trabajo
 							";
-		
+
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '',mysql_error(). ". Query: $query",'');
 		else {
@@ -620,7 +620,7 @@ function _error($msg){
 
 
 $server->service($HTTP_RAW_POST_DATA);
-#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL: 
+#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL:
 ?>
 
 
