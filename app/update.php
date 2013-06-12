@@ -9855,6 +9855,7 @@ QUERY;
 		case 7.40:
 			$queries = array();
 			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			ejecutar($queries, $dbh);
 			break;
 	}
 }
