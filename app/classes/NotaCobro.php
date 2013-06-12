@@ -6553,6 +6553,11 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%solicitud_cheques%', __('Favor de no enviar cheques por correo postal. No nos haremos responsables de cheques extraviados y/o robados.'), $html);
 					$html = str_replace('%caso_dudas%', __('En caso de dudas o comentarios al respecto no dude en contactarnos.'), $html);
 					$html = str_replace('%atentamente%', __('Atentamente,'), $html);
+					$html = str_replace('%sucursal%', __('Sucursal'), $html);
+					$html = str_replace('%cuenta%', __('Cuenta'), $html);
+					$html = str_replace('%direccion%', __('Direción'), $html);
+					$html = str_replace('%banco%', __('Banco'), $html);
+					$html = str_replace('%beneficiario%', __('Beneficiario'), $html);
 
 				} else {
 
@@ -6561,11 +6566,17 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%total_factura%', __('TOTAL INVOICE'), $html);
 					$html = str_replace('%instrucciones_deposito%', __('INSTRUCTIONS FOR PAYMENTS TO VOUGA & OLMEDO ABOGADOS:<br>ELECTRONIC TRANSFER VIA SWIFT MT103 MESSAGE:'), $html);
 					$html = str_replace('%solicitud%', __('CORPORATE NAME AND INVOICE # MUST BE INCLUDED.'), $html);
+					
 					##Textos Cuesta Campos##
 					$html = str_replace('%pago_via%', __(' Payment by wire transfer to the following account:'), $html);
 					$html = str_replace('%solicitud_cheques%', __('Please do not send checks to our offices by regular mail. We will not be responsible for stolen checks.'), $html);
 					$html = str_replace('%caso_dudas%', __('Please feel free to contact us should you have any questions or comments on the above.'), $html);
 					$html = str_replace('%atentamente%', __('Atentamente,'), $html);
+					$html = str_replace('%sucursal%', __('Branch'), $html);
+					$html = str_replace('%cuenta%', __('Acount'), $html);
+					$html = str_replace('%direccion%', __('Address'), $html);
+					$html = str_replace('%banco%', __('Bank'), $html);
+					$html = str_replace('%beneficiario%', __('Bnf'), $html);
 				}
 
 				$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
