@@ -4,11 +4,9 @@ load 'config/cap_shared'
 load 'config/cap_servers'
 
 set :current_stage, "feature"
-default_branch = fetch(:branch, "develop")
+   default_branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
 
-if (default_branch == "develop")
-  feature_branch = Capistrano::CLI.ui.ask("Enter Feature Branch [#{default_branch}]: ")
-end
+feature_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
 feature_branch = (feature_branch && feature_branch.length > 0) ? feature_branch : default_branch
 feature_name = feature_branch.split('/').last
 
@@ -38,6 +36,6 @@ namespace :deploy do
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'
-  after "deploy", "deploy:stablish_symlinks"
+  
 
 end

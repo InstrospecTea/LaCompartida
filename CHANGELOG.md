@@ -1,4 +1,41 @@
 # Changelog
+## hotfix: 13.3.28
+Viernes 12 de Junio 2013
+* **Fixed:** [Campos de texto para nota cobro cuestacampos](https://github.com/LemontechSA/ttb/pull/205)
+
+
+## hotfix: 13.3.28
+Viernes 11 de Junio 2013
+* **Fixed:** [Correccion glosa_cliente en interfaz listado tramites](https://github.com/LemontechSA/ttb/pull/204)
+
+## hotfix: 13.3.28
+Viernes 10 de Junio 2013
+* **Fixed:** [Correccion glosa_cliente en excel tramites](https://github.com/LemontechSA/ttb/pull/203)
+
+## hotfix: 13.3.27
+Viernes 7 de Junio 2013
+* **Fixed:** [Correcciones varias Querys](https://github.com/LemontechSA/ttb/pull/202)
+
+## hotfix: 13.3.26
+Miercoles 6 de Junio 2013
+* **Fixed:** [Correcciones varias Querys](https://github.com/LemontechSA/ttb/pull/201)
+
+## hotfix: 13.3.25
+Miercoles 5 de Junio 2013
+* **Fixed:** [modificacion update y recupera numero de cobro en planilla gastos](https://github.com/LemontechSA/ttb/pull/200)
+
+## hotfix: 13.3.24
+Miercoles 5 de Junio 2013
+* **Fixed:** [Correccion a update](https://github.com/LemontechSA/ttb/pull/199)
+
+## hotfix: 13.3.23
+Martes 4 de Junio 2013
+* **Fixed:** [Agrega campos comodines a mantenedor factura pdf](https://github.com/LemontechSA/ttb/pull/198)
+
+## Hotfix: 13.3.22
+Viernes 31 de Mayo 2013
+* **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias"](https://github.com/LemontechSA/ttb/pull/196)
+
 ## Hotfix: 13.3.21
 Viernes 28 de Mayo 2013
 * **Fixed:** [Corrige error de campo cliente en agregar_factura y agregar_pago_factura, agrega Ordenado por en resumen horas, corrige problema de decimal en ingresar_documento_pago"](https://github.com/LemontechSA/ttb/pull/189)

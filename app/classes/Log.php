@@ -23,7 +23,7 @@ class Log {
 		}
 	}
 
-	public function write($text = '', $file_name = null) {
+	public static function write($text = '', $file_name = null) {
 		$me = new self;
 		if (!empty($file_name)) {
 			$me->logFile = $file_name;

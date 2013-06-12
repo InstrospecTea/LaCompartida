@@ -67,6 +67,11 @@ class Factura extends Objeto {
 			'visible' => false,
 		),
 		array (
+			'field' => 'codigo_contrato',
+			'title' => 'codigo_contrato' ,
+			'visible' => false,
+		),
+		array (
 			'field' => 'simbolo',
 			'visible' => false,
 			'title' => 'Símbolo Moneda',
@@ -190,8 +195,14 @@ class Factura extends Objeto {
 			'title' => 'Cifras Decimales',
 			'visible' => false,
 		),
-	);
 
+			array (
+			'field' => 'id_factura',
+			'title' => 'id_factura',
+			'visible' => false,
+		),
+	);
+	
 	function Factura($sesion, $fields = "", $params = "") {
 		$this->tabla = "factura";
 		$this->campo_id = "id_factura";
@@ -1654,83 +1665,6 @@ class Factura extends Objeto {
 		$this->fields['id_estado'] = $estado;
 	}
 
-	public function SearchQuery() {
-		$query = "SELECT SQL_CALC_FOUND_ROWS
-					prm_documento_legal.codigo as tipo
-					, numero
-					, factura.serie_documento_legal
-					, factura.codigo_cliente
-					, cliente.glosa_cliente
-					, contrato.id_contrato as idcontrato
-					, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
-								factura.cliente,
-								IF( contrato.factura_razon_social IN ('',' '),
-										factura.cliente,
-										IF( contrato.factura_razon_social IS NULL,
-												factura.cliente,
-												CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
-											)
-									)
-							) as factura_rsocial
-					, fecha
-					, usuario.username AS encargado_comercial
-					, descripcion
-					, prm_estado_factura.codigo as estado
-					, factura.id_cobro
-					, cobro.codigo_idioma as codigo_idioma
-					, prm_moneda.simbolo
-					, prm_moneda.cifras_decimales
-					, prm_moneda.tipo_cambio
-					, factura.id_moneda
-					, factura.honorarios
-					, factura.subtotal_gastos
-					, factura.subtotal_gastos_sin_impuesto
-					, factura.iva
-					, total
-					, '' as saldo_pagos
-					, cta_cte_fact_mvto.saldo as saldo
-					, '' as monto_pagos_moneda_base
-					, '' as saldo_moneda_base
-					, factura.id_factura
-					, if(factura.RUT_cliente != contrato.rut,factura.cliente, 'no' ) as mostrar_diferencia_razon_social,
-					factura.RUT_cliente
-				FROM factura
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable";
-
-		$wheres = array();
-
-//		if (!empty($this->fields['numero'])) {
-//			$wheres[] = "sa.id_solicitud_adelanto = '{$this->fields['id_solicitud_adelanto']}'";
-//		}
-//
-//		if (!empty($this->fields['codigo_cliente'])) {
-//			$wheres[] = "sa.codigo_cliente = '{$this->fields['codigo_cliente']}'";
-//		}
-//
-//		if (!empty($this->fields['estado'])) {
-//			$wheres[] = "sa.estado = '{$this->fields['estado']}'";
-//		}
-//
-//		if (!empty($this->extra_fields['fecha_desde'])) {
-//			$wheres[] = "sa.fecha >= '" . Utiles::fecha2sql($this->extra_fields['fecha_desde']) . "'";
-//		}
-//		if (!empty($this->extra_fields['fecha_hasta'])) {
-//			$wheres[] = "sa.fecha <= '" . Utiles::fecha2sql($this->extra_fields['fecha_hasta']) . "'";
-//		}
-
-		$query .= " WHERE " . implode(' AND ', $wheres);
-		$query .= " GROUP BY sa.id_solicitud_adelanto";
-
-		return $query;
-	}
-
 	/**
 	 * Descarga el reporte excel básico según configuraciones
 	 */
@@ -1762,17 +1696,21 @@ class Factura extends Objeto {
 		$writer->save(__('Reg_Venta'));
 	}
 
-	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable ) {
 
+		global $query, $where, $groupby;
 		if ($orden == "") {
 			$orden = "fecha DESC";
 		}
 
 		if ($where == '') {
 			$where = 1;
-			if ($numero != '') {
+			if ($numero != '' && $numero != null && $numero !== false) {
 				$where .= " AND numero*1 = $numero*1 ";
 			}
 			if ($fecha1 && $fecha2) {
@@ -1839,12 +1777,15 @@ class Factura extends Objeto {
 			$where = base64_decode($where);
 		}
 
-		return "SELECT SQL_CALC_FOUND_ROWS
+		$groupby=" GROUP BY factura.id_factura";
+
+		$query = "SELECT SQL_CALC_FOUND_ROWS
 				prm_documento_legal.codigo as tipo
 			   , numero
 			   , factura.serie_documento_legal
 			   , factura.codigo_cliente
 			   , cliente.glosa_cliente, contrato.id_contrato as idcontrato
+			
 			   , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
 						OR contrato.factura_razon_social IN ('',' ')
 						OR contrato.factura_razon_social IS NULL,
@@ -1864,6 +1805,7 @@ class Factura extends Objeto {
 			   , prm_moneda.tipo_cambio
 			   , factura.id_moneda
 			   , factura.honorarios
+			   , factura.subtotal
 			   , factura.subtotal_gastos
 			   , factura.subtotal_gastos_sin_impuesto
 			   , factura.iva
@@ -1876,8 +1818,11 @@ class Factura extends Objeto {
 			   , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 			   , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
 			   , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-			   , factura.RUT_cliente
-		   FROM factura
+			   , factura.RUT_cliente ";
+
+				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;  
+	   
+		   $query.=" FROM factura
 		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
 		   LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
@@ -1888,16 +1833,81 @@ class Factura extends Objeto {
 		   LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 		   LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-		   WHERE $where
-		   GROUP BY factura.id_factura";
+		   WHERE ";
+		 
+	
+
+		   $resultingquery=$query." \n ".$where." \n ".$groupby;
+		  
+		   return $resultingquery;
+	}
+ 
+	public  function FormatoDataTable() {
+			
+
+
+			$formato=array();
+ 
+ 		 	$formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
+  							 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
+ 							},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
+
+ 			$formato['numero']= '{  "sWidth": "90px", "bVisible": "true",  "sClass": "al"
+							,"fnRender": function ( o, val ) {
+								var respuesta="";
+								if(o.aData["tipo"])						respuesta+="<b>Tipo</b>: "+o.aData["tipo"];
+								if(o.aData["serie_documento_legal"])	respuesta+="<br><b>Serie</b>: "+o.aData["serie_documento_legal"];	 
+								if(o.aData["numero"])			respuesta+="<div style=\"white-space:nowrap\"><b>Número</b>: "+o.aData["numero"]+"</div>";	 
+								if(o.aData["glosa_estudio"])						respuesta+="<b>Emisor</b>: "+o.aData["glosa_estudio"];
+											 return respuesta;  }
+							,    "aTargets": ["numero" ] , sDefaultContent: " - "   }';
+
+			$formato['glosa_cliente']= '{    "bVisible": "true",  "sClass": "al"
+							,"fnRender": function ( o, val ) {
+								var respuesta="<div style=\"font-size:10px;width:200px;\">";
+								if(o.aData["glosa_cliente"])	respuesta+=	"<b>Cliente</b>: "+o.aData["glosa_cliente"];
+								if(o.aData["codigo_contrato"])	respuesta+=	"<br><b>Servicio</b>: "+o.aData["codigo_contrato"];	 
+								if(o.aData["factura_rsocial"])	respuesta+=	"<br><b>Razón Social</b>: "+o.aData["factura_rsocial"];	 
+								if(o.aData["descripcion"])	respuesta+=	"<br><b>Descripción</b>: "+o.aData["descripcion"];	 
+								
+											 return respuesta+"</div>";  }
+							,    "aTargets": ["glosa_cliente" ] , sDefaultContent: " - "   }';
+  
+ 		 	$formato['id_cobro']= '{ "aTargets": ["id_cobro" ] ,  "sWidth": "40px", "bVisible": "true", "mData":"id_cobro","fnRender": function ( o,val ) { 	return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana(\'Editar_Cobro\',950,660,\'cobros6.php?id_cobro="+o.aData["id_cobro"]+"&amp;popup=1\');\">"+o.aData["id_cobro"]+"</a>"; }	,    sDefaultContent: " - "   }';
+ 	
+
+ 			$formato['Acciones']='{ "aTargets": ["acciones" ] ,  "sClass": "ar",   "fnRender": function ( o, val ) {';
+			$formato['Acciones'] .= 'var id_factura=o.aData["id_factura"];';
+			$formato['Acciones'] .= 'var codigo_cliente=o.aData["codigo_cliente"];';
+
+			$formato['Acciones'] .= 'var 	respuesta="<div style=\"white-space: nowrap;\"><a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"nuovaFinestra(\'Editar_Factura\',730,700,\'agregar_factura.php?id_factura="+id_factura+"=&codigo_cliente="+codigo_cliente+"&popup=1\');\" >&nbsp;</a>&nbsp;";';
+			if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaDoc')) {
+				$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button doc\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirDocumento('+id_factura+');\" >&nbsp;</a>';";
+			}
+			if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaPdf')) {
+				$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button pdf\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirPDF('+id_factura+');\" >&nbsp;</a>';";
+			}
+			$formato['Acciones'] .="\nrespuesta+='<a  class=\"ui-icon lupa fl logdialog\" rel=\"factura\" id=\"factura_'+id_factura+'\" >&nbsp;</a></div>';";
+			$formato['Acciones'].="\n	return respuesta;";
+			$formato['Acciones'].=' },     sDefaultContent: " - "   }';
+
+ 		return $formato;
 	}
 
-	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+ 
+
+	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable) {
 
-		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago

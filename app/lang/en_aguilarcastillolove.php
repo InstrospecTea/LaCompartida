@@ -240,7 +240,7 @@ $_LANG['Semana anterior'] = "Previous week";
 $_LANG['Semana siguiente'] = "Next week";
 $_LANG['Fechas asociadas guardadas exitosamente'] = "Dates partner successfully saved";
 $_LANG['No Aplicable'] = "Not Applicable";
-
+$_LANG['Titulo Asunto'] = "Legal Area";
 
 #COBROS
 $_LANG['Cobros'] = "Cobros";

@@ -1,13 +1,7 @@
 <?php
+require_once dirname(__FILE__) . '/../conf.php';
 require_once dirname(__FILE__) . '/../classes/Cron.php';
 require_once dirname(__FILE__) . '/../classes/AlertaCron.php';
-require_once Conf::ServerDir() . '/classes/Observacion.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/Contrato.php';
-require_once Conf::ServerDir() . '/classes/Reporte.php';
-require_once Conf::ServerDir() . '/classes/Notificacion.php';
-require_once Conf::ServerDir() . '/classes/Tarea.php';
-require_once Conf::ServerDir() . '/classes/CobroPendiente.php';
 
 /**
  * Description of CronNotificacion
@@ -16,19 +10,20 @@ require_once Conf::ServerDir() . '/classes/CobroPendiente.php';
  */
 class CronNotificacion extends Cron {
 
-	public $Alerta;
+	public $AlertaCron;
 	public $Notificacion;
 	private $correo = false;
 	private $desplegar_correo;
 	private $datoDiario = array();
+	var $Sesion = null;
 
-	public function __construct() {
+	public function __construct($Sesion) {
 		$this->fecha_cron = date('Y-m-d');
 		$this->FileNameLog = 'CronNotificacion';
 
 		parent::__construct();
-
-		$this->Alerta = new Alerta($this->Sesion);
+		$this->Sesion=$Sesion;
+		$this->AlertaCron = new Alerta($this->Sesion);
 		$this->Notificacion = new Notificacion($this->Sesion);
 
 		if (method_exists('Conf', 'GetConf')) {
@@ -38,26 +33,39 @@ class CronNotificacion extends Cron {
 		}
 	}
 
-	public function main($correo, $desplegar_correo = null) {
+	public function main($correo, $desplegar_correo = null, $forzar_semanal='') {
 		$this->log('INICIO CronNotificacion');
 
-		$this->Sesion->phpConsole();
-		$this->Sesion->debug('empieza el cron notificacion');
+		$this->Sesion->phpConsole(1);
+		
 		$this->correo = $correo;
+		if(empty($this->correo)) {
+			$this->Sesion->debug('No se recibió parámetro para la acción a ejecutar. Terminamos.');
+			die('Finalizado');
+		} 
+		 $this->Sesion->debug('empieza el cron notificacion');
+
+
 		$this->desplegar_correo = $desplegar_correo;
 
-		$this->log('INICIO semanales');
-		$this->semanales();
+		$DiaMailSemanal = Conf::GetConf($this->Sesion, 'DiaMailSemanal') || 'Fri';
+		if (date('D') == $DiaMailSemanal || ($forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
+			$this->log('INICIO semanales');
+			$this->semanales();
+		}
+	 	 
 		$this->log('INICIO diarios');
+		$this->Sesion->debug('INICIO diarios');
 		$this->diarios();
 
-		if (date("j") == 1) {
+		if (date('j') == 1) {
 			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
 		}
 
-		$this->suspencion_pago();
+		$this->suspension_pago();
 
 		$this->log('FIN CronNotificacion');
+		$this->Sesion->debug('FIN CronNotificacion');
 	}
 
 	public function semanales() {
@@ -77,16 +85,7 @@ class CronNotificacion extends Cron {
 		$msg['horas_maximas_revisado'] = $warning . ' supera su m&aacute;ximo de %MAXIMO horas.';
 
 
-		//Queries de Notificacion Semanal
-		$DiaMailSemanal = 'Fri';
-		if (method_exists('Conf', 'GetConf')) {
-			$DiaMailSemanal = Conf::GetConf($this->Sesion, 'DiaMailSemanal');
-		} else if (method_exists('Conf', 'DiaMailSemanal')) {
-			$DiaMailSemanal = Conf::DiaMailSemanal();
-		}
 
-		if (date('D') == $DiaMailSemanal || (isset($forzar_semanal) && $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
-			// Mensaje para JPRO: Alertas de Mínimo y Máximo de horas semanales
 			$ids_usuarios_profesionales = '';
 			$query = "SELECT usuario.id_usuario,
 					alerta_semanal,
@@ -109,8 +108,8 @@ class CronNotificacion extends Cron {
 				$profesional->LoadId($id_usuario);
 				$minimo = $profesional->fields['restriccion_min'];
 				$maximo = $profesional->fields['restriccion_max'];
-				$horas = $this->Alerta->HorasUltimaSemana($id_usuario);
-				$horas_cobrables = $this->Alerta->HorasCobrablesUltimaSemana($id_usuario);
+				$horas = $this->AlertaCron->HorasUltimaSemana($id_usuario);
+				$horas_cobrables = $this->AlertaCron->HorasCobrablesUltimaSemana($id_usuario);
 
 				if (!$horas) {
 					$horas = '0.00';
@@ -199,17 +198,22 @@ class CronNotificacion extends Cron {
 					$dato_semanal[$id_usuario]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $revisados)));
 				}
 			}
-		}
+		
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
-		foreach ($mensajes as $id_usuario => $mensaje) {
-			if ($this->correo) {
-				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+
+		if ($this->correo=='generar_correo') {
+			foreach ($mensajes as $id_usuario => $mensaje) {
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
 			}
-		}
-		if ($this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+		} else 	if ($this->correo=='desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 			var_dump($dato_semanal);
 			echo implode('<br/><br/><br/>', $mensajes);
+		} else if ($this->correo='simular_correo') {
+			foreach ($mensajes as $id_usuario => $mensaje) {
+			 	$mensaje['simular']=true;
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+			}
 		}
 	}
 
@@ -241,16 +245,20 @@ class CronNotificacion extends Cron {
 
 		// Fin del mail diario. Envío.
 		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
-
-		foreach ($mensajes as $id_usuario => $mensaje) {
-			if ($this->correo) {
-				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+		
+		if ($this->correo=='generar_correo') {
+			foreach ($mensajes as $id_usuario => $mensaje) {
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
 			}
-		}
-
-		if ($this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+		} else 	if ($this->correo=='desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 			var_dump($this->datoDiario);
 			echo implode('<br><br><br>', $mensajes);
+		} else if ($this->correo=='simular_correo') {
+			
+			foreach ($mensajes as $id_usuario => $mensaje) {
+				$mensaje['simular']=true;
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
+			}
 		}
 	}
 
@@ -314,7 +322,7 @@ class CronNotificacion extends Cron {
 						'fecha' => date_format($date, 'd/m/Y  H:i:s')
 					);
 				}
-				if ($this->correo) {
+				if ($this->correo=='generar_correo') {
 					$query_update = "UPDATE modificaciones_contrato
 										SET fecha_enviado=NOW()
 										WHERE fecha_modificacion >= '$fecha'";
@@ -471,6 +479,7 @@ class CronNotificacion extends Cron {
 			$contrato = new Contrato($this->Sesion);
 			$contrato->Load($data_contrato['id_contrato']);
 
+			list($total_monto, $moneda_total_monto,$total_horas_trabajadas,$total_horas_ult_cobro,$total_monto_ult_cobro, $moneda_desde_ult_cobro)=array(0,1,0,0,0,1);
 			// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 			if ($contrato->fields['limite_monto'] > 0) {
 				list($total_monto, $moneda_total_monto) = $contrato->TotalMonto();
@@ -528,6 +537,8 @@ class CronNotificacion extends Cron {
 				$contrato->Edit('notificado_monto_excedido', '1');
 				$contrato->Write();
 			}
+
+			list($total_monto, $moneda_total_monto,$total_horas_trabajadas,$total_horas_ult_cobro,$total_monto_ult_cobro, $moneda_desde_ult_cobro)=array(0,1,0,0,0,1);
 
 			// Notificacion "Límite de horas"
 			if (($total_horas_trabajadas > $contrato->fields['limite_hh']) && ($contrato->fields['limite_hh'] > 0 ) && ($contrato->fields['notificado_hr_excedido'] == 0)) {
@@ -651,6 +662,7 @@ class CronNotificacion extends Cron {
 
 			$this->datoDiario[$resultado_cliente['id_usuario']]['nombre_pila'] = $resultado_cliente['username'];
 
+			list($total_monto, $moneda_total_monto,$total_horas_trabajadas,$total_horas_ult_cobro,$total_monto_ult_cobro, $moneda_desde_ult_cobro)=array(0,1,0,0,0,1);
 			//Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 			if ($cliente->fields['limite_monto'] > 0) {
 				list($total_monto, $moneda_total_monto) = $cliente->TotalMonto();
@@ -788,8 +800,10 @@ class CronNotificacion extends Cron {
 				FROM usuario
 					INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
 				WHERE usuario_permiso.codigo_permiso = 'PRO' AND usuario.alerta_diaria = 1
-					AND usuario.retraso_max_notificado = 0 AND usuario.activo = 1";
-
+					AND usuario.activo = 1";
+					if($this->correo!='simular_correo') {
+						$query.=" AND usuario.retraso_max_notificado = 0 ";
+					}
 			$profesionales = $this->query($query);
 			$total_profesionales = count($profesionales);
 
@@ -1002,10 +1016,10 @@ class CronNotificacion extends Cron {
 	}
 
 	/**
-	 * Notificación de suspencion de pago por comision por concepto de
+	 * Notificación de suspension de pago por comision por concepto de
 	 * presentación de nuevos clientes.
 	 */
-	private function suspencion_pago() {
+	private function suspension_pago() {
 		if (UtilesApp::GetConf($this->Sesion, 'UsoPagoComisionNuevoCliente') == 1) {
 			$max = UtilesApp::GetConf($this->Sesion, 'UsoPagoComisionNuevoClienteTiempo');
 			$max = $max && is_numeric($max) ? $max : 730; /* 730 dias */
@@ -1026,9 +1040,9 @@ class CronNotificacion extends Cron {
 				if ($cant > 0) {
 					$query .= ' ORDER BY c.id_cliente DESC LIMIT 10';
 					$message = 'El usuario "%s" deja de recibir comision por concepto de captacion del cliente "%s"';
-					$columns = "c.id_cliente, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS usuario, c.glosa_cliente";
+					$columns = "u.id_usuario, c.id_cliente, CONCAT_WS(' ', u.nombre, u.apellido1, u.apellido2) AS usuario, c.glosa_cliente";
+					$asunto = __('Alerta de facturación de tiempos');
 					for ($i = 0; $i <= $cant; $i = $i + 10) {
-						$columns = "c.id_cliente, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS usuario, c.glosa_cliente";
 						$q = sprintf($query, $columns, $i, $i + 10);
 						$rows = $this->query($q);
 						$total_rows = count($rows);
@@ -1036,7 +1050,7 @@ class CronNotificacion extends Cron {
 							$row = $rows[$x];
 							$from = html_entity_decode(Conf::AppName());
 							$m = sprintf($message, $row['usuario'], $row['glosa_cliente']);
-							Utiles::Insertar($this->Sesion, __("Alerta de facturación de tiempos") . " $from", $m, $email, false);
+							Utiles::Insertar($this->Sesion, "$asunto $from", $m, $email, '', false, $row['id_usuario'], 'suspension_pago_comision');
 							$this->query("UPDATE cliente SET termino_pago_comision=now(), fecha_modificacion=now() WHERE id_cliente={$row['id_cliente']}");
 						}
 					}

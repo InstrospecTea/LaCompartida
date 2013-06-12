@@ -806,4 +806,11 @@ class UsuarioExt extends Usuario {
 		return parent::Write();
 	}
 
+	public static function QueryComerciales() {
+		return "SELECT
+							usuario.id_usuario,
+							CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
+						FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
+						WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
+	}
 }
