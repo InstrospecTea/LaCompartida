@@ -271,7 +271,6 @@ $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Reporte Antigüedad Deudas Clientes');
 $Pagina->PrintTop();
 ?>
-<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
 <script type="text/javascript" src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
 <table width="90%">
 	<tr>
@@ -335,32 +334,51 @@ echo Html::SelectArray(array(
 	</tr>
 </table>
 <div id="seguimiento_template">
-
+	<div class="popover left">
+		<div class="arrow"></div>
+		<h3 class="popover-title">Seguimiento del cliente</h3>
+		<div class="popover-content">
+			<iframe id="seguimiento_iframe" width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php"></iframe>
+		</div>
+	</div>
 </div>
 <script type="text/javascript">
 <?php echo "var linktofile= '$linktofile';"; ?>
-	var current_popover;
-	show_popover = function(sender, codigo_cliente) {
+	// var current_popover;
+	// show_popover = function(sender) {
+	// 	codigo_cliente = sender.data('codigo_cliente');
+
+	// 	if (current_popover != undefined) {
+	// 		codigo_cliente_old = current_popover.data('codigo_cliente');
+	// 		if (codigo_cliente != codigo_cliente_old) {
+	// 			current_popover.popover('hide');
+	// 		} else {
+	// 			sender.popover('hide');
+	// 		}
+	// 	}
+	// 	current_popover = sender;
+	// 	current_popover.popover({
+	// 		title: '<?php echo __('Seguimiento del cliente'); ?>',
+	// 		trigger: 'manual',
+	// 		placement: 'left',
+	// 		html: true,
+	// 		content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente + '" />'
+	// 	});
+
+	// 	current_popover.popover('show')
+	// };
+	show_popover = function(sender) {
 		codigo_cliente = sender.data('codigo_cliente');
 
-		if (current_popover != undefined) {
-			codigo_cliente_old = current_popover.data('codigo_cliente');
-			if (codigo_cliente != codigo_cliente_old) {
-				current_popover.popover('hide');
-			} else {
-				sender.popover('hide');
-			}
-		}
-		current_popover = sender;
-		sender.popover({
-			title: '<?php echo __('Seguimiento del cliente'); ?>',
-			trigger: 'manual',
-			placement: 'left',
-			html: true,
-			content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente + '" />'
-		});
+		tpl = jQuery('#seguimiento_template').find('.popover');
 
-		sender.popover('show')
+		jQuery('#seguimiento_iframe').attr('src', '../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente);
+
+		sender_pos = sender.position();
+		tpl.css('display', 'block');
+		tpl.css('left', sender_pos.left - 414);
+		tpl.css('top', sender_pos.top - 106);
+		tpl.parent().show();
 	};
 
 	jQuery(document).ready(function() {
@@ -405,22 +423,20 @@ echo Html::SelectArray(array(
 				}
 				link.append(jQuery('<img/>', { src: '<?php echo Conf::ImgDir(); ?>/' + icono }));
 				td.html('');
+				link.data('codigo_cliente', codigo_cliente);
+				link.click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					show_popover(jQuery(this));
+				});
 				td.append(link).append(' ');
-				td.data('codigo_cliente', codigo_cliente);
 			}
-
-			td.click(function (e) {
-				e.preventDefault();
-				e.stopPropagation();
-
-				show_popover(jQuery(this));
-			});
 		});
 
 		jQuery('body').click(function () {
-			if (current_popover != undefined) {
-				current_popover.popover('hide');
-			}
+			// current_popover.popover('hide');
+			jQuery('#seguimiento_template').hide();
 		});
 	});
 </script>
