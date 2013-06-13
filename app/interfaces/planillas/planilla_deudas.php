@@ -15,7 +15,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 	$join = '';
 
 	if (!empty($codigo_cliente)) {
-		$where .= " AND d.codigo_cliente = '$codigo_cliente' ";
+		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
 	}
 
 	if (!empty($id_contrato)) {
@@ -49,7 +49,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 		$campo_valor = "T.saldo";
 		$campo_gvalor = "T.gsaldo";
 		$campo_hvalor = "T.hsaldo";
-		$where.="AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
+
+		$where .= " AND d.tipo_doc = 'N' AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE') ";
+		$where .= " AND ((d.saldo_honorarios + d.saldo_gastos) > 0) ";
+
 		$groupby.=" d.id_documento";
 		$tipo = " 'liquidacion'";
 		$fecha_atraso = " cobro.fecha_emision";
@@ -60,21 +63,21 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 	}
 
 	$query = "SELECT
-			T.codigo_cliente,
-			T.glosa_cliente,
-			T.moneda,
-			-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, $campo_valor, 0)) AS '0-30',
-			-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60, $campo_valor, 0)) AS '31-60',
-			-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, $campo_valor, 0)) AS '61-90',
-			-SUM(IF(T.dias_atraso_pago > 90, $campo_valor, 0)) AS '91+',
-			-SUM($campo_valor) AS total,
-			-SUM($campo_hvalor) AS htotal,
-			-SUM($campo_gvalor) AS gtotal,
-			CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')  as identificadores,
-			T.cantidad_seguimiento,
-			T.comentario_seguimiento
-		FROM
-			(SELECT 	";
+		T.codigo_cliente,
+		T.glosa_cliente,
+		T.moneda,
+		-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, $campo_valor, 0)) AS '0-30',
+		-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60, $campo_valor, 0)) AS '31-60',
+		-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, $campo_valor, 0)) AS '61-90',
+		-SUM(IF(T.dias_atraso_pago > 90, $campo_valor, 0)) AS '91+',
+		-SUM($campo_valor) AS total,
+		-SUM($campo_hvalor) AS htotal,
+		-SUM($campo_gvalor) AS gtotal,
+		CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')  as identificadores,
+		T.cantidad_seguimiento,
+		T.comentario_seguimiento
+	FROM
+		(SELECT 	";
 	/* $query .= " if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 	  if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
 
@@ -86,40 +89,41 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 				$label as label,
 				cliente.codigo_cliente,
 				cliente.glosa_cliente AS glosa_cliente,
-				d.monto AS  monto,
-				d.monto *  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS monto_base, 
-				sum(ccfm.monto_bruto) AS fmonto, 
-				sum(ccfm.monto_bruto)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fmonto_base, 
+
+				d.monto AS monto,
+				d.monto * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS monto_base,
+				sum(ccfm.monto_bruto) AS fmonto,
+				sum(ccfm.monto_bruto)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fmonto_base,
+
 				-1 * (d.saldo_honorarios + d.saldo_gastos) AS saldo,
 				-1 * (d.saldo_honorarios + d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS saldo_base,
-				sum(ccfm.saldo) AS fsaldo, 
-				sum(ccfm.saldo)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fsaldo_base, 
-				
+				sum(ccfm.saldo) AS fsaldo,
+				sum(ccfm.saldo)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fsaldo_base,
 
 				-1 * (d.saldo_honorarios) AS hsaldo,
 				-1 * (d.saldo_honorarios ) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS hsaldo_base,
-				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0)) AS fhsaldo, 
-				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fhsaldo_base, 
-				
+				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0)) AS fhsaldo,
+				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fhsaldo_base,
+
 				-1 * (d.saldo_gastos) AS gsaldo,
 				-1 * (d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS gsaldo_base,
-				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0)) AS fgsaldo, 
-				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fgsaldo_base, 
+				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0)) AS fgsaldo,
+				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fgsaldo_base,
 
 				DATEDIFF(NOW(), $fecha_atraso) AS dias_atraso_pago,
 				moneda_documento.simbolo AS moneda,
 				seguimiento.cantidad AS cantidad_seguimiento,
 				seguimiento.comentario AS comentario_seguimiento
-			FROM
-				documento d
-			left JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-			left JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
-			left JOIN cliente ON d.codigo_cliente = cliente.codigo_cliente
-			left JOIN cobro ON cobro.id_cobro = d.id_cobro
-			left JOIN factura  on factura.id_cobro=d.id_cobro
-			left JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
-			left JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-			left join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
+
+			FROM cobro
+			LEFT join documento d  ON cobro.id_cobro = d.id_cobro
+			LEFT JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
+			LEFT JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
+			LEFT JOIN factura  on factura.id_cobro=cobro.id_cobro
+			LEFT JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
+			LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+			LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+			LEFT join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
 			LEFT JOIN (
 				SELECT
 					codigo_cliente,
@@ -128,107 +132,84 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 				FROM cliente_seguimiento
 				GROUP BY codigo_cliente
 			) seguimiento ON cliente.codigo_cliente = seguimiento.codigo_cliente
-
 			$join
 			WHERE
 				d.tipo_doc = 'N' AND
 				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
 				$where
 			GROUP BY $groupby
-			) AS T
+		) AS T
 		GROUP BY T.glosa_cliente, T.moneda
 		ORDER BY glosa_cliente";
 
-//echo $query;
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
-			array(
-					'field' => 'glosa_cliente',
-					'title' => __('Cliente'),
-					'extras' => array(
-							'attrs' => 'width="28%" style="text-align:left;"',
-							'groupinline' => true
-					)
-			),
-			array(
-					'field' => 'identificadores',
-					'title' => __(ucfirst($identificadores)),
-					'extras' => array(
-							'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
-					)
-			),
-			array(
-					'field' => '0-30',
-					'title' => '0-30 ' . utf8_encode(__('días')),
-					'format' => 'number',
-					'extras' => array(
-							'subtotal' => 'moneda',
-							'symbol' => 'moneda',
-							'attrs' => 'width="10%" style="text-align:right"',
-					)
-			),
-			array(
-					'field' => '31-60',
-					'title' => '31-60 ' . utf8_encode(__('días')),
-					'format' => 'number',
-					'extras' => array(
-							'subtotal' => 'moneda',
-							'symbol' => 'moneda',
-							'attrs' => 'width="10%" style="text-align:right"'
-					)
-			),
-			array(
-					'field' => '61-90',
-					'title' => '61-90 ' . utf8_encode(__('días')),
-					'format' => 'number',
-					'extras' => array(
-							'subtotal' => 'moneda',
-							'symbol' => 'moneda',
-							'attrs' => 'width="10%" style="text-align:right"'
-					)
-			),
-			array(
-					'field' => '91+',
-					'title' => '91+ ' . utf8_encode(__('días')),
-					'format' => 'number',
-					'extras' => array(
-							'subtotal' => 'moneda',
-							'symbol' => 'moneda',
-							'attrs' => 'width="10%" style="text-align:right"'
-					)
-			),
-			array(
-					'field' => 'total',
-					'title' => __('Total'),
-					'format' => 'number',
-					'extras' => array(
-							'subtotal' => 'moneda',
-							'symbol' => 'moneda',
-							'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
-					)
+		array(
+			'field' => 'glosa_cliente',
+			'title' => __('Cliente'),
+			'extras' => array(
+				'attrs' => 'width="28%" style="text-align:left;"',
+				'groupinline' => true
 			)
-			/* ,
-					  array(
-					  'field' => 'htotal',
-					  'title' => __('Total Honorarios'),
-					  'format' => 'number',
-					  'extras' => array(
-					  'subtotal' => 'moneda',
-					  'symbol' => 'moneda',
-					  'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
-					  )
-					  ),
-					  array(
-					  'field' => 'gtotal',
-					  'title' => __('Total Gastos'),
-					  'format' => 'number',
-					  'extras' => array(
-					  'subtotal' => 'moneda',
-					  'symbol' => 'moneda',
-					  'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
-					  )
-					  ) */
+		),
+		array(
+			'field' => 'identificadores',
+			'title' => __(ucfirst($identificadores)),
+			'extras' => array(
+				'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
+			)
+		),
+		array(
+			'field' => '0-30',
+			'title' => '0-30 ' . utf8_encode(__('días')),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
+				'attrs' => 'width="10%" style="text-align:right"',
+			)
+		),
+		array(
+			'field' => '31-60',
+			'title' => '31-60 ' . utf8_encode(__('días')),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
+				'attrs' => 'width="10%" style="text-align:right"'
+			)
+		),
+		array(
+			'field' => '61-90',
+			'title' => '61-90 ' . utf8_encode(__('días')),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
+				'attrs' => 'width="10%" style="text-align:right"'
+			)
+		),
+		array(
+			'field' => '91+',
+			'title' => '91+ ' . utf8_encode(__('días')),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
+				'attrs' => 'width="10%" style="text-align:right"'
+			)
+		),
+		array(
+			'field' => 'total',
+			'title' => __('Total'),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
+				'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+			)
+		)
 	);
 
 	// Configuración especial para mostrar el seguimiento del cliente
