@@ -33,29 +33,8 @@ $codigo_cliente = empty($codigo_cliente) && $codigo_cliente_secundario ? $client
 $params_array['codigo_permiso'] = 'COB';
 $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 ?>
-<style type="text/css">
-    @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
-	td.sorting_1 {background:transparent !important;}
-	#tablon {border-spacing:0;border-collapse:collapse;}
-	#tablon th {font-size:10px;}
-	#contienefiltro {display:inline-block;margin-bottom:-8px;}
-	#tablon_paginate .fg-button {padding:0 5px;}
-	#tablon_paginate .first, #tablon_paginate .last {display:none;}
-	#tablon  tbody tr.odd {background-color: #fff !important;}
-	#tablon  tbody tr.even {background-color: #EFE !important;}
-	#totalcta {float: left;position: relative;top: 15px;}
-	#losadelantos {margin-top:10px;clear:both;}
-	.dataTables_paginate {clear: both; margin: -20px 350px 15px 0;width:390px;vertical-align:middle;}
-	.dttnombres, .dttactivo {text-align:left;font-size:10px;white-space: nowrap;}
-	.dataTables_paginate .last, dataTables_paginate .first,  .DataTables_sort_icon {display:none;}
-	.activo, .usuarioinactivo, .usuarioactivo {float:left;display:inline;}
-	.inactivo {opacity:0.4;}
-	.inactivo td {background:#F0F0F0;}
-	.tipodescripcion {font-size:8pt;clear:left;overflow:visible;position:relative;margin:3px 0;}
-	.marginleft {margin-left: 3px;}
-	.eligegasto {float:left;margin-top: 0 !important;}
+  <link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />
 
-</style>
 <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
@@ -150,22 +129,28 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 						"aTargets": [5]
 					},
 					{"fnRender": function ( o, val ) {
-							var respuesta="<a href=\"javascript:void(0)\"  style=\"float:right;display:inline;margin-right:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
+						var respuesta="<a href=\"javascript:void(0)\" class=\"fl\" style=\"margin-left:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
+
 							if (jQuery('#eliminados').is(':checked')) {
-								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='desborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";
+								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='fr desborraradelanto' ><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";	
 							} else {
 								if (o.aData[4]!=o.aData[5]) {
-									respuesta+="<a href=\"javascript:void(0)\"    class='noborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
+									respuesta+="<a href=\"javascript:void(0)\"    class='fr noborraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
 								} else {
-									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='borraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";
+									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='fr borraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
 								}
 							}
+ 							respuesta+='<?php echo	UtilesApp::LogDialog($sesion, 'documento',"'+ o.aData[0]+'");?>';
+ 							//"<a href=\"javascript:void(0)\"  id=\"documento_"+ o.aData[0]+"\" class=\"ui-icon lupa fr logdialog\" rel=\"documento\"   ></a>";	
+			
+
+
 							if(PERMISOCOBRANZA==1) {
 								return   respuesta;
 							} else {
 								return   '-';
 							}
-						},
+                        }, 
 						"aTargets": [6]
 					}
 				],

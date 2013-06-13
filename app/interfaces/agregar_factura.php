@@ -307,11 +307,12 @@ $contrato->Load($cobro->fields['id_contrato']);
 if (!$id_factura && $factura->loaded())
 	$id_factura = $factura->fields['id_factura'];
 
-$txt_pagina = $id_factura ? __('Edición de ') . $tipo_documento_legal . ' #' . $factura->fields['numero'] : __('Ingreso de ') . $tipo_documento_legal;
-if ($id_cobro)
-	$txt_pagina .= ' ' . __('para Cobro') . ' #' . $id_cobro;
-
-$pagina->titulo = $txt_pagina;
+$titulo_pagina = $txt_pagina = $id_factura ? __('Edición de ') . $tipo_documento_legal . ' #' . $factura->fields['numero'] : __('Ingreso de ') . $tipo_documento_legal;
+if ($id_cobro) {
+	$titulo_pagina .= ' ' . __('para Cobro') . ' #' . $id_cobro;
+	$txt_pagina .= ' ' . __('para Cobro') . '&nbsp; <a href="cobros6.php?id_cobro='.$id_cobro.'&popup=1">#' . $id_cobro.'</a>';
+}
+$pagina->titulo = $titulo_pagina;
 $pagina->PrintTop($popup);
 
 

@@ -2042,7 +2042,8 @@ class CartaCobro extends NotaCobro {
 				} else {
 					$html2 = str_replace('%factura_desc_mta%', 'factura', $html2);
 				}
-
+				
+				$html2 = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $html2);
 				$html2 = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $html2);

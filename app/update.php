@@ -9855,6 +9855,61 @@ QUERY;
 		case 7.40:
 			$queries = array();
 			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			$queries[] = "CREATE TABLE IF NOT EXISTS `cliente_seguimiento` (
+										`id` int(11) NOT NULL AUTO_INCREMENT,
+										`codigo_cliente` varchar(10) NOT NULL,
+										`comentario` text NOT NULL,
+										`id_usuario` int(11) NOT NULL,
+										`fecha_creacion` datetime NOT NULL,
+										`fecha_modificacion` datetime NOT NULL,
+										PRIMARY KEY (`id`),
+										KEY `id_usuario` (`id_usuario`),
+										KEY `codigo_cliente` (`codigo_cliente`)
+										) ENGINE=InnoDB;";
+
+			if (!ExisteLlaveForanea('cliente_seguimiento', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente_seguimiento`
+			  	ADD CONSTRAINT `cliente_seguimiento_ibfk_1` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`)";
+			}
+
+			if (!ExisteLlaveForanea('cliente_seguimiento', 'id_usuario', 'usuario', 'id_usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente_seguimiento`
+					ADD CONSTRAINT `cliente_seguimiento_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`);";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.41:
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `user_device` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`user_id` int(11) NOT NULL,
+				`token` varchar(120) NOT NULL DEFAULT '',
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`id`),
+				KEY `user_device_user_id` (`user_id`),
+				KEY `user_device_user_id_token` (`user_id`, `token`),
+				CONSTRAINT `user_device_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `user_token` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`user_id` int(11) NOT NULL,
+				`auth_token` varchar(60) NOT NULL DEFAULT '',
+				`app_key` varchar(250) NOT NULL,
+				`expiry_date` datetime NOT NULL,
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`id`),
+				KEY `user_token_user_id` (`user_id`),
+				KEY `user_token_auth_token` (`auth_token`),
+				CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
+			
 			ejecutar($queries, $dbh);
 			break;
 	}
@@ -9866,7 +9921,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.40;
+$max_update = 7.41;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
