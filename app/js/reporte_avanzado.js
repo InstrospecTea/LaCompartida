@@ -269,6 +269,8 @@ function CargarReporte() {
 			jQuery('#campo_fecha_trabajo').click();
 		} else if (segun == 'cobro') {
 			jQuery('#campo_fecha_cobro').click();
+		} else if (segun == 'cobro') {
+			jQuery('#campo_fecha_envio').click();
 		} else {
 			jQuery('#campo_fecha_emision').click();
 		}
