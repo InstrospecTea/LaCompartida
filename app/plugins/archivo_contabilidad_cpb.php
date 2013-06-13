@@ -19,12 +19,17 @@ function Ofrece_Planilla_Registro_Ventas() {
 function Descarga_Planilla_Registro_Ventas() {
 	global $sesion, $factura, $orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
 	$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
-	$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable;
+	$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable,$id_cia;
 
 	if ($_GET['planilla']) {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		$SimpleReport = new SimpleReport($sesion);
-		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
+		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
+		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 	}
 	 if ($_GET['planilla'] == 'registro_ventas') {
 

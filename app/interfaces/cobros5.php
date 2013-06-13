@@ -129,7 +129,7 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit('retainer_horas', $cobro_retainer_horas);
 	if (is_array($usuarios_retainer)) {
 		$cobro_retainer_usuarios = implode(',', $usuarios_retainer);
-	} else { 
+	} else {
 		$cobro_retainer_usuarios = $usuarios_retainer;
 	}
 	$cobro->Edit('retainer_usuarios', $cobro_retainer_usuarios);
@@ -511,7 +511,7 @@ echo $refrescar;
 		form.opc.value = 'en_revision';
 		form.submit();
 		return true;v4lh4ll4
-	
+
 	}
 
 	function VolverACreado( form )
@@ -529,7 +529,7 @@ echo $refrescar;
 
 	function Emitir(form)
 	{
-		jQuery('#btn_emitir_cobro').attr("disabled","disabled");	
+		jQuery('#btn_emitir_cobro').attr("disabled","disabled");
 		var http = getXMLHTTP();
 		http.open('get', 'ajax.php?accion=num_abogados_sin_tarifa&id_cobro='+document.getElementById('id_cobro').value);
 		http.onreadystatechange = function()
@@ -717,7 +717,7 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		{
 			div = document.getElementById("div_horas");
 			div.style.display = "block";
-   		
+
 			if( showUsuarios )
 			{
 				div = document.getElementById("td_retainer_usuarios");
@@ -779,7 +779,7 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		var ini = 0;
 		num_escalas = (document.getElementsByName('esc_tiempo[]')).length;
 		for( var i = aplicar; i< num_escalas; i++){
-			
+
 			if( i > 1){
 				ini = 0;
 				for( var j = i; j > 1; j-- ){
@@ -787,17 +787,17 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 					if( ini.length == 0 || isNaN(ini)){
 						ini = 0;
 					}
-				}				
+				}
 			}
-			
+
 			valor_actual = document.getElementById('esc_tiempo_'+(i)).value;
-			if( i == aplicar ){ 
-				if( cant.length > 0 && !isNaN(cant)){ 
+			if( i == aplicar ){
+				if( cant.length > 0 && !isNaN(cant)){
 					tiempo_final = parseFloat(ini,10) + parseFloat(cant,10);
 				} else {
 					tiempo_final = parseFloat(ini, 10);
 				}
-			} else {			
+			} else {
 				if( valor_actual.length > 0 && !isNaN(valor_actual)){
 					tiempo_final = parseFloat(ini,10) + parseFloat(valor_actual,10);
 				} else {
@@ -813,14 +813,14 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 			donde = document.getElementById('esc_rango_'+i);
 			donde.innerHTML = ini + ' - ' + tiempo_final;
 		}
-		
+
 	}
-	
+
 	function cambia_tipo_forma(valor, desde){
 		var aplicar = parseInt(desde.substr(-1,1));
 		var donde = 'tipo_forma_' + aplicar + '_';
 		var selector = document.getElementById(desde);
-		
+
 		for( var i = 1; i <= selector.length; i++ ){
 			if( i == valor ) {
 				document.getElementById(donde+i).style.display = 'inline-block';
@@ -829,14 +829,14 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 			}
 		}
 	}
-	
+
 	function setear_valores_escalon( donde, desde, tiempo, tipo, id_tarifa, monto, id_moneda, descuento ){
 		if( desde != '' ) {
 			/* si le paso desde donde copiar, los utilizo */
 			document.getElementById('esc_tiempo_' + donde).value = document.getElementById('esc_tiempo_' + desde).value;
 			document.getElementById('esc_selector_' + donde).value = document.getElementById('esc_selector_' + desde).value;
 			cambia_tipo_forma(document.getElementById('esc_selector_' + desde).value, 'esc_selector_' + donde);
-			document.getElementById('esc_id_tarifa_' + donde).value = document.getElementById('esc_id_tarifa_' + desde).value;			
+			document.getElementById('esc_id_tarifa_' + donde).value = document.getElementById('esc_id_tarifa_' + desde).value;
 			document.getElementById('esc_monto_' + donde).value = document.getElementById('esc_monto_' + desde).value;
 			document.getElementById('esc_id_moneda_' + donde).value = document.getElementById('esc_id_moneda_' + desde).value;
 			document.getElementById('esc_descuento_' + donde).value = document.getElementById('esc_descuento_' + desde).value;
@@ -849,17 +849,17 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 			document.getElementById('esc_monto_' + donde).value = monto;
 			document.getElementById('esc_id_moneda_' + donde).value = id_moneda;
 			document.getElementById('esc_descuento_' + donde).value = descuento;
-			
+
 		}
 	}
-	
+
 	function agregar_eliminar_escala(divID){
 		var numescala = parseInt(divID.substr(-1,1));
 		var divArea = document.getElementById(divID);
 		var divAreaImg = document.getElementById(divID+"_img");
 		var divAreaVisible = divArea.style['display'] != "none";
 		var esconder = "";
-		
+
 		if( !divAreaVisible ){
 			for( var i = numescala; i> 1; i--){
 				var valor_anterior = document.getElementById('esc_tiempo_'+(i-1)).value;
@@ -884,7 +884,7 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 						setear_valores_escalon((i+1), '','',1,1,'',1,'');
 						ActualizaRango('esc_tiempo_'+(parseInt(i)+1), '');
 						esconder = "escalon_" + (parseInt(numescala)+1);
-						
+
 					} else {
 						id_sgte = "escalon_" +(parseInt(i)+1);
 						document.getElementById(id_sgte).style.display = "none";
@@ -1007,7 +1007,7 @@ for ($i = 0; $i < $monedas->num; $i++) {
 	{
 		var form = jQuery('#form_cobro5');
 		var msg_cambio = $('msg_cambio');
-	
+
 		if(!parseFloat(tipo_cambio) || parseFloat(tipo_cambio) == 0)
 		{
 			alert('<?php echo __("El monto ingresado del tipo de cambio es incorrecto") ?>');
@@ -1020,10 +1020,10 @@ for ($i = 0; $i < $monedas->num; $i++) {
 			var id_cobro = $('id_cobro').value;
 			tipo_cambio = tipo_cambio.replace(',','.');
 			if(window.console) console.log(id_moneda+' tipo cambio es'+tipo_cambio);
-			
-			
+
+
 			jQuery.get('ajax_grabar_campo.php?accion=guardar_tipo_cambio&id_cobro='+id_cobro+'&id_moneda='+id_moneda+'&tipo_cambio='+tipo_cambio,function(data) {
-			
+
 				if(data=='OK')		{
 					msg_cambio.style.display = 'inline';
 					return true;
@@ -1031,9 +1031,9 @@ for ($i = 0; $i < $monedas->num; $i++) {
 					return false;
 				}
 			});
-		
-					
-			
+
+
+
 		}
 	}
 
@@ -1307,8 +1307,8 @@ for ($i = 0; $i < $monedas->num; $i++) {
 					<label for="fc6">Proporcional</label> &nbsp; &nbsp;
 <?php if (!UtilesApp::GetConf($sesion, 'EsconderTarifaEscalonada')) { ?>
 						<input <?php echo TTip($tip_escalonada) ?> id="fc7" type=radio name="cobro_forma_cobro" onclick="HideMonto();ShowCapMsg('none');DisplayEscalas(true);" value="ESCALONADA" <?php echo $cobro_forma_cobro == "ESCALONADA" ? "checked" : "" ?> />
-						<label for="fc7">Escalonada</label> 
-<?php } ?> 
+						<label for="fc7">Escalonada</label>
+<?php } ?>
 					&nbsp; &nbsp;
 					<div id="div_monto" align="left" style="display:none; background-color:#F8FBBD; padding-left:20px">
 						<table>
@@ -1336,12 +1336,12 @@ for ($i = 0; $i < $monedas->num; $i++) {
 								<td align=left style="vertical-align: top;">
 									<input name="cobro_retainer_horas" size="7" value="<?php echo $cobro->fields['retainer_horas'] ?>" />
 								</td>
-								<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se 
+								<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se
 										 desuentan las horas con preferencia -->
 					<?php if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RetainerUsuarios')) { ?>
 									<td id="td_retainer_usuarios" align="left" style="display:inline; background-color:#F8FBBD; padding-left:20px">
 										&nbsp;<?php echo __('Usuarios') ?>
-										&nbsp;<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) FROM usuario JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo = 1 AND codigo_permiso = 'PRO'", 'usuarios_retainer[]', $usuarios_retainer, TTip($tip_retainer_usuarios) . " class=\"selectMultiple\" multiple size=3 ", "", "160"); ?> 
+										&nbsp;<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) FROM usuario JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo = 1 AND codigo_permiso = 'PRO'", 'usuarios_retainer[]', $usuarios_retainer, TTip($tip_retainer_usuarios) . " class=\"selectMultiple\" multiple size=3 ", "", "160"); ?>
 									</td>
 <?php } ?>
 							</tr>
@@ -1367,7 +1367,7 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 								<tr>
 									<td valign="bottom">
 										<div style="display:inline-block; width: 65px;"><?php echo __('Las primeras'); ?> </div>
-										<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="4" value="<?php if (!empty($cobro->fields['esc1_tiempo'])) echo $cobro->fields['esc1_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+										<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="4" value="<?php if (!empty($cobro->fields['esc1_tiempo'])) echo $cobro->fields['esc1_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
 										<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_1" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango1; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 										<select name="esc_selector[]" id="esc_selector_1" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc1_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
@@ -1381,16 +1381,16 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 												<input type="text" size="8" style="font-size:9pt; width:116px;" id="esc_monto_1" value="<?php echo ($cobro->fields['esc1_monto'] > 0) ? $cobro->fields['esc1_monto'] : '0'; ?>" name="esc_monto[]" />
 											</span>
 										</span>
-										<span><?php echo __('en'); ?></span> 
-					<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_1', $cobro->fields['esc1_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+										<span><?php echo __('en'); ?></span>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_1', $cobro->fields['esc1_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
 										<span><?php echo __('con'); ?> </span>
-										<input type="text" name="esc_descuento[]" id="esc_descuento_1" value="<?php if (!empty($cobro->fields['esc1_descuento'])) echo $cobro->fields['esc1_descuento']; else echo '0'; ?>" size="4" /> 
+										<input type="text" name="esc_descuento[]" id="esc_descuento_1" value="<?php if (!empty($cobro->fields['esc1_descuento'])) echo $cobro->fields['esc1_descuento']; else echo '0'; ?>" size="4" />
 										<span><?php echo __('% dcto.'); ?> </span>
 									</td>
 								</tr>
 							</table>
 							<div onclick="agregar_eliminar_escala('escalon_2')" style="cursor:pointer;" >
-								<span id="escalon_2_img"><?php echo!($cobro->fields['esc2_tiempo'] > 0) ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>	
+								<span id="escalon_2_img"><?php echo!($cobro->fields['esc2_tiempo'] > 0) ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>
 							</div>
 						</div>
 						<div class="template_escalon" id="escalon_2" style="display: <?php echo isset($cobro->fields['esc2_tiempo']) && $cobro->fields['esc2_tiempo'] > 0 ? 'block' : 'none'; ?>;">
@@ -1398,7 +1398,7 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 								<tr>
 									<td valign="bottom">
 										<div style="display:inline-block; width: 65px;"><?php echo __('Las siguientes'); ?> </div>
-										<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="4" value="<?php if (!empty($cobro->fields['esc2_tiempo'])) echo $cobro->fields['esc2_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+										<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="4" value="<?php if (!empty($cobro->fields['esc2_tiempo'])) echo $cobro->fields['esc2_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
 										<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango2; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 										<select name="esc_selector[]" id="esc_selector_2" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc2_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
@@ -1412,16 +1412,16 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 												<input type="text" size="8" style="font-size:9pt; width:116px;" id="esc_monto_2" name="esc_monto[]" value="<?php echo ($cobro->fields['esc2_monto'] > 0) ? $cobro->fields['esc2_monto'] : '0'; ?>" />
 											</span>
 										</span>
-										<span><?php echo __('en'); ?></span> 
-										<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_2', $cobro->fields['esc2_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+										<span><?php echo __('en'); ?></span>
+										<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_2', $cobro->fields['esc2_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
 										<span><?php echo __('con'); ?> </span>
-										<input type="text" name="esc_descuento[]" value="<?php if (!empty($cobro->fields['esc2_descuento'])) echo $cobro->fields['esc2_descuento']; else echo ''; ?>" id="esc_descuento_2" size="4" /> 
+										<input type="text" name="esc_descuento[]" value="<?php if (!empty($cobro->fields['esc2_descuento'])) echo $cobro->fields['esc2_descuento']; else echo ''; ?>" id="esc_descuento_2" size="4" />
 										<span><?php echo __('% dcto.'); ?> </span>
 									</td>
 								</tr>
 							</table>
 							<div onclick="agregar_eliminar_escala('escalon_3')" style="cursor:pointer;" >
-								<span id="escalon_3_img"><?php echo!($cobro->fields['esc3_tiempo'] > 0) ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>	
+								<span id="escalon_3_img"><?php echo!($cobro->fields['esc3_tiempo'] > 0) ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>
 							</div>
 						</div>
 						<div class="template_escalon" id="escalon_3" style="display: <?php echo isset($cobro->fields['esc3_tiempo']) && $cobro->fields['esc3_tiempo'] > 0 ? 'block' : 'none'; ?>;">
@@ -1429,7 +1429,7 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 								<tr>
 									<td valign="bottom">
 										<div style="display:inline-block; width: 65px;"><?php echo __('Las siguientes'); ?> </div>
-										<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="4" value="<?php if (!empty($cobro->fields['esc3_tiempo'])) echo $cobro->fields['esc3_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+										<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="4" value="<?php if (!empty($cobro->fields['esc3_tiempo'])) echo $cobro->fields['esc3_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
 										<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango3; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 										<select name="esc_selector[]" id="esc_selector_3" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc3_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
@@ -1443,10 +1443,10 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 												<input type="text" size="8" style="font-size:9pt; width:116px;" id="esc_monto_3" name="esc_monto[]" value="<?php echo ($cobro->fields['esc3_monto'] > 0) ? $cobro->fields['esc3_monto'] : '0'; ?>" />
 											</span>
 										</span>
-										<span><?php echo __('en'); ?></span> 
-										<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_3', $cobro->fields['esc3_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+										<span><?php echo __('en'); ?></span>
+										<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_3', $cobro->fields['esc3_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
 										<span><?php echo __('con'); ?> </span>
-										<input type="text" name="esc_descuento[]" id="esc_descuento_3" value="<?php if (!empty($cobro->fields['esc3_descuento'])) echo $cobro->fields['esc3_descuento']; else echo '0'; ?>" size="4" /> 
+										<input type="text" name="esc_descuento[]" id="esc_descuento_3" value="<?php if (!empty($cobro->fields['esc3_descuento'])) echo $cobro->fields['esc3_descuento']; else echo '0'; ?>" size="4" />
 										<span><?php echo __('% dcto.'); ?> </span>
 									</td>
 								</tr>
@@ -1456,9 +1456,9 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 							<table style='padding: 5px; border: 0px solid' bgcolor='#F8FBBD'>
 								<tr>
 									<td valign="bottom">
-										<div style="display:inline-block; width: 170px;"><?php echo __('Para el resto de horas trabajadas'); ?> </div>													
+										<div style="display:inline-block; width: 170px;"><?php echo __('Para el resto de horas trabajadas'); ?> </div>
 <?php echo __('aplicar'); ?>
-										<input type="hidden" name="esc_tiempo[]" id="esc_tiempo_4" value="-1" size="4" onkeyup="ActualizaRango(this.id , this.value);" /> 
+										<input type="hidden" name="esc_tiempo[]" id="esc_tiempo_4" value="-1" size="4" onkeyup="ActualizaRango(this.id , this.value);" />
 										<select name="esc_selector[]" id="esc_selector_4" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc4_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 											<option value="2" <?php echo $cobro->fields['esc4_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
@@ -1472,11 +1472,11 @@ $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicia
 												<input type="text" size="8" style="font-size:9pt; width:116px;" id="esc_monto_4" value="<?php echo $cobro->fields['esc4_monto'] > 0 ? $cobro->fields['esc4_monto'] : '0'; ?>" name="esc_monto[]" />
 											</span>
 										</span>
-										<span><?php echo __('en'); ?></span> 
-<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_4', $cobro->fields['esc4_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+										<span><?php echo __('en'); ?></span>
+<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_4', $cobro->fields['esc4_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
 										<span><?php echo __('con'); ?> </span>
-										<input type="text" name="esc_descuento[]" id="esc_descuento_4" value="<?php if (!empty($cobro->fields['esc4_descuento'])) echo $cobro->fields['esc4_descuento']; else echo ''; ?>" size="4" /> 
-										<span><?php echo __('% dcto.'); ?> </span> 
+										<input type="text" name="esc_descuento[]" id="esc_descuento_4" value="<?php if (!empty($cobro->fields['esc4_descuento'])) echo $cobro->fields['esc4_descuento']; else echo ''; ?>" size="4" />
+										<span><?php echo __('% dcto.'); ?> </span>
 									</td>
 								</tr>
 							</table>
@@ -1841,36 +1841,36 @@ if ($cobro->fields['se_esta_cobrando'])
 											</table>
 										</td>
 									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
-									</tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
+                                    </tr>
 <?php if (UtilesApp::GetConf($sesion, 'PrmGastos')) { ?>
 										<tr>
 											<td align="right"><input type="checkbox" name="opc_ver_concepto_gastos" id="opc_ver_concepto_gastos" value="1" <?php echo $cobro->fields['opc_ver_concepto_gastos'] == '1' ? 'checked' : '' ?>></td>
-											<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?php echo __('Mostrar concepto de gastos') ?></label></td>
+											<td align="left" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?php echo __('Mostrar concepto de gastos') ?></label></td>
 										</tr>
 <?php } ?>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?php echo $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2"style="font-size: 10px;"><label for="opc_ver_morosidad"><?php echo __('Mostrar saldo adeudado') ?></label></td>
-									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?php echo $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?php echo __('Mostrar tipos de cambio') ?></label></td>
-									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_descuento" value="1" <?php echo $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><?php echo __('Mostrar el descuento del cobro') ?></td>
-									</tr>
-									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
-									</tr>
-									<tr>        
-										<td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
-										<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar columna cobrable') ?></label></td>
-									</tr> <!-- Andres Oestemer -->
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?php echo $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_morosidad"><?php echo __('Mostrar saldo adeudado') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?php echo $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?php echo __('Mostrar tipos de cambio') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_descuento" id="opc_ver_descuento" value="1" <?php echo $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?php echo __('Mostrar el descuento del cobro') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
+                                    </tr>
 <?php
 if (method_exists('Conf', 'GetConf'))
 	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -2004,41 +2004,41 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							</tr>
 							<tr>
 								<td colspan="2">&nbsp;</td>
-							</tr>	
+							</tr>
 							<tr>
 								<td colspan="2" align="center">
 									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-doc"  setwidth="185"  onclick="return ImprimirCobro(jQuery('#form_cobro5').get(0));" /><?php echo __('Descargar Archivo')?></a>
-								 
+
 							<?php
-							
+
 							if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
 							{
 							?>
-							 
+
 									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-pdf"  setwidth="185"   onclick="return ImprimirCobroPDF(jQuery('#form_cobro5').get(0));" /><?php echo __('Descargar Archivo')?> PDF</a>
-								 
+
 							<?php
 							}
-							
+
 							if( !UtilesApp::GetConf($sesion, 'EsconderExcelCobroModificable') ) {
 							?>
-							 
+
 									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185"   onclick="ImprimirExcel(jQuery('#form_cobro5').get(0));" /><?php echo __('descargar_excel_modificable')?></a>
-								 
+
 							<?php
 							}
-							
-							if( UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee') ) { 
+
+							if( UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee') ) {
 							?>
-							 
+
 									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185"  onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'rentabilidad');" /><?php echo __('Excel rentabilidad')?></a>
-								 
+
 							<?php
 							}
-							
+
 							if( !UtilesApp::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador')  && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
 							 <br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185" onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'especial');" /><?php echo __('Descargar Excel Cobro')?></a>
-								
+
 							<?php } 			 ?>
 								 </td>
 							</tr>
@@ -2054,11 +2054,11 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 <table width="100%">
 	<tr>
 		<td align='center'>
-			 
-			
+
+
                             <a style="margin:auto;display:block;" href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="GuardaCobro(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
-			
-			
+
+
 		</td>
 	</tr>
 	<tr>
@@ -2123,6 +2123,6 @@ for ($i = 0; $i < $monedas->num; $i++) {
 }
 ?>
 </script>
-<?php 
+<?php
 	$pagina->PrintBottom($popup);
 ?>

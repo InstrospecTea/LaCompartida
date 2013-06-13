@@ -288,21 +288,21 @@ class Trabajo extends Objeto
 
 	// Función que entrega false si supera las 23:59 horas trabajadas un usuario en un dia
 	function CantHorasDia($duracion_trabajo, $dia, $id_usuario, $sesion) {
-		list($h, $m, $s) = explode(":", $duracion_trabajo);
+		list($h, $m, $s) = explode(':', $duracion_trabajo);
 		$total_minutos = ($h * 60) + $m;
+
 		$query = "SELECT trabajo.duracion
-							FROM trabajo
-							WHERE
-								trabajo.fecha = '$dia'
-								AND trabajo.id_usuario = '$id_usuario'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			FROM trabajo
+			WHERE trabajo.fecha = '$dia' AND trabajo.id_usuario = '$id_usuario'";
+
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		while ($duracion = mysql_fetch_array($resp)) {
-			list($h, $m, $s) = explode(":", $duracion['duracion']);
+			list($h, $m, $s) = explode(':', $duracion['duracion']);
 			$total_minutos += ($h * 60) + $m;
 		}
 
-		$minutos_dia_total = method_exists('Conf','CantidadHorasDia') ? Conf::CantidadHorasDia() : 1439;
+		$minutos_dia_total = Conf::GetConf($sesion, 'CantidadHorasDia') ? Conf::GetConf($sesion, 'CantidadHorasDia') : 1439;
 
 		if ($total_minutos > $minutos_dia_total) {
 			return false;
@@ -725,6 +725,420 @@ class Trabajo extends Objeto
 				return "$mensajes$num_modificados trabajos actualizados.<br/>$num_insertados trabajos agregados.";
 			}
 		}
+	}
+
+	/**
+	 * Find all works by user id
+	 * Returns an array with next elements:
+	 *  id, creation_date, date, duration, notes
+	 *  rate, read_only, requester, activity_code, area_code
+	 *  client_code, matter_code, task_code, user_id
+	 *  billable, visible
+	 */
+	function findAllWorksByUserId($id, $before = null, $after = null) {
+		$works = array();
+
+		$sql = "SELECT `work`.`id_trabajo` AS `id`, `work`.`fecha_creacion` AS `creation_date`,
+			`work`.`fecha` AS `date`, TIME_TO_SEC(`work`.`duracion`)/60.0 AS `duration`, `work`.`descripcion` AS `notes`,
+			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
+			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
+			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
+			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
+			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
+			`work`.`revisado` AS `revised`
+			FROM `trabajo` AS `work`
+				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
+				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
+				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
+			WHERE `work`.`id_usuario`=:id AND `work`.`fecha` BETWEEN :after AND :before
+			ORDER BY `work`.`id_trabajo` DESC";
+
+		if (is_null($before) || is_null($after)) {
+			$before = date('Y-m-d 00:00:00');
+			$after = date('Y-m-d 23:59:59');
+		}
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $id);
+		$Statement->bindParam('before', $before);
+		$Statement->bindParam('after', $after);
+		$Statement->execute();
+
+		$date_now = strtotime('now');
+		while ($work = $Statement->fetch(PDO::FETCH_OBJ)) {
+			$read_only = 0;
+			if (!empty($work->date_read_only)) {
+				if ($date_now >= strtotime($work->date_read_only)) {
+					$read_only = 1;
+				}
+			}
+
+			if (!in_array($work->charge_status, array('CREADO', 'EN REVISION', '', 'SIN COBRO', null))) {
+				$read_only = 1;
+			}
+
+			if ($work->revised == '1') {
+				$read_only = 1;
+			}
+			$mapped_work = array(
+					'id' => (int) $work->id,
+					'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
+					'date' => !empty($work->date) ? strtotime($work->date) : null,
+					'duration' => !empty($work->duration) ? (float) $work->duration : null,
+					'notes' => !empty($work->notes) ? $work->notes : null,
+					'read_only' => $read_only,
+					'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
+					'billable' => !empty($work->billable) ? (int) $work->billable : 0,
+					'visible' => !empty($work->visible) ? (int) $work->visible : 0
+				);
+
+			if (!empty($work->rate)) {
+				$mapped_work['rate'] = $work->rate;
+			}
+			if (!empty($work->requester)) {
+				$mapped_work['requester'] = $work->requester;
+			}
+			if (!empty($work->activity_code)) {
+				$mapped_work['activity_code'] = $work->activity_code;
+			}
+			if (!empty($work->area_code)) {
+				$mapped_work['area_code'] = $work->area_code;
+			}
+			if (!empty($work->client_code)) {
+				$mapped_work['client_code'] = $work->client_code;
+			}
+			if (!empty($work->matter_code)) {
+				$mapped_work['matter_code'] = $work->matter_code;
+			}
+			if (!empty($work->task_code)) {
+				$mapped_work['task_code'] = $work->task_code;
+			}
+
+			array_push($works, $mapped_work);
+		}
+
+		return $works;
+	}
+
+	/**
+	 * validate data of a work
+	 * Returns an array with next elements:
+	 *  error (bool) and description (string) of error
+	 */
+	function validateDataOfWork($data) {
+
+		if (!empty($data['id'])) {
+			if ($this->Loaded()) {
+				$created_date = $this->fields['fecha_creacion'];
+				$charge_status = $this->Estado();
+				if (($charge_status == 'Cobrado' || $charge_status == __('Cobrado'))) {
+					return array('error' => true, 'description' => __("Work is already charged"));
+				} else if ($charge_status == 'Revisado' || $charge_status == __('Revisado')) {
+					return array('error' => true, 'description' => __("The work is revised"));
+				}
+			} else {
+				return array('error' => true, 'description' => __("The work doesn't exist"));
+			}
+		} else {
+			$created_date = $data['created_date'];
+		}
+
+		if (empty($data['duration']) || $data['duration'] == '00:00:00') {
+			return array('error' => true, 'description' => __("The hours entered must be greater than 0"));
+		}
+
+		$duration = $data['duration'];
+		if (!empty($this->fields['duracion'])) {
+			$duration = $duration - $this->fields['duracion'];
+		}
+
+		if (empty($data['user_id'])) {
+			return array('error' => true, 'description' => __("Invalid user ID"));
+		} else {
+			$User = new Usuario($this->sesion);
+			if (!$User->LoadId($data['user_id'])) {
+				return array('error' => true, 'description' => __("The user doesn't exist"));
+			} else {
+				if (!$this->validateWorkingDays($User->fields['dias_ingreso_trabajo'], $created_date, $data['date'])) {
+					return array('error' => true, 'description' => $this->error . ' ' . strtotime('2013-04-02'));
+				}
+			}
+		}
+
+		if (!Trabajo::CantHorasDia($duration, $data['date'], $data['user_id'], $this->sesion)) {
+			$total_minutes_per_day = Conf::GetConf($this->sesion, 'CantidadHorasDia') ? Conf::GetConf($this->sesion, 'CantidadHorasDia') : 1439;
+			$total_minutes_per_day = date('H:i', mktime(0, $total_minutes_per_day, 0, 0, 0, 0));
+			return array('error' => true, 'description' => __("You can not enter more than") . " $total_minutes_per_day " . __("hours per day"));
+		}
+
+		if (empty($data['notes'])) {
+			return array('error' => true, 'description' => __("Invalid Description"));
+		}
+
+		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
+			if (!empty($data['activity_code'])) {
+				$Activity = new Actividad($this->sesion);
+				if (!$Activity->loadByCode($data['activity_code'])) {
+					return array('error' => true, 'description' => __("The activity doesn't exist"));
+				}
+			}
+		}
+
+		if (Conf::GetConf($this->sesion, 'UsarAreaTrabajos')) {
+			if (!empty($data['area_code'])) {
+				$WorkArea = new AreaTrabajo($this->sesion);
+				if (!$WorkArea->Load($data['area_code'])) {
+					return array('error' => true, 'description' => __("The area code doesn't exist"));
+				}
+			} else {
+				return array('error' => true, 'description' => __("Invalid area code"));
+			}
+		}
+
+		if (empty($data['matter_code']))  {
+			return array('error' => true, 'description' => __("Invalid matter code"));
+		} else {
+			$Matter = new Asunto($this->sesion);
+			if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
+				$Matter->LoadByCodigoSecundario($data['matter_code']);
+			} else {
+				$Matter->LoadByCodigo($data['matter_code']);
+			}
+			if (!$Matter->Loaded()) {
+				return array('error' => true, 'description' => __("The matter doesn't exist"));
+			}
+		}
+
+		return array('error' => false, 'description' => '');
+	}
+
+	public function validateWorkingDays($income_working_days = null, $created_date = null, $date = null) {
+		if ($income_working_days) {
+			$deadline = strtotime($created_date) - ($income_working_days + 1) * 24 * 60 * 60;
+			if ($deadline > strtotime($date)) {
+				$this->error = __("You can not enter hours prior to") . " " . date('Y-m-d', $deadline + 24 * 60 * 60);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Save data
+	 * returns a bool if the update or insert completed successfully
+	 */
+	function save($data) {
+		$change_matter = false;
+		$type_income_hour = Conf::GetConf($this->sesion, 'TipoIngresoHoras');
+		$update_rate_work = true;
+
+		// convert to latin1 encoding
+		foreach ($data as $key => $value) {
+			$data[$key] = utf8_decode($value);
+		}
+
+		$Matter = new Asunto($this->sesion);
+		$matter_code = $data['matter_code'];
+
+		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
+			$Matter->LoadByCodigoSecundario($matter_code);
+			$matter_code = $Matter->fields['codigo_asunto'];
+		} else {
+			$Matter->LoadByCodigo($matter_code);
+			$seconds_matter_code = $Matter->fields['codigo_asunto_secundario'];
+		}
+
+		if (!empty($data['billable'])) {
+			$billable = 1;
+			$visible = 1;
+		} else {
+			$billable = 0;
+			$visible = $data['visible'];
+		}
+
+		// Si el asunto no es cobrable
+		if ($Matter->Loaded() && $Matter->fields['cobrable'] == 0) {
+			$billable = 0;
+			$visible = 0;
+		}
+
+		$this->Edit('cobrable', $billable);
+		$this->Edit('visible', $visible);
+
+		$duration = $type_income_hour == 'decimal' ? UtilesApp::Decimal2Time($data['duration']) : $data['duration'];
+
+		if ($this->Loaded()) {
+			$update_rate_work = false;
+
+			// revisar para codigo secundario
+			if ($matter_code != $this->fields['codigo_asunto']) {
+				$PreviousContract = new Contrato($this->sesion);
+				$ModifiedContract = new Contrato($this->sesion);
+
+				$PreviousContract->LoadByCodigoAsunto($this->fields['codigo_asunto']);
+				$ModifiedContract->LoadByCodigoAsunto($matter_code);
+
+				if ($PreviousContract->fields['id_tarifa'] != $ModifiedContract->fields['id_tarifa']) {
+					$update_rate_work = true;
+				}
+
+				$change_matter = true;
+			}
+
+			$change_duration = strtotime($duration) != strtotime($this->fields['duracion']);
+		}
+
+		if ($change_matter) {
+			$Charge = new Cobro($this->sesion);
+			$charge_id = $Charge->ObtieneCobroByCodigoAsunto($matter_code, $this->fields['fecha']);
+			$this->Edit('id_cobro', !empty($charge_id) ? $charge_id : 'NULL');
+		}
+
+		$this->Edit('duracion', $duration);
+		$this->Edit('duracion_cobrada', $type_income_hour == 'decimal' ? UtilesApp::Decimal2Time($duration) : $duration);
+
+		$sql = "SELECT `user`.`id_categoria_usuario` FROM `usuario` AS `user` WHERE `user`.`id_usuario`=:user_id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('user_id', $user_id);
+		$Statement->execute();
+		$user_data = $Statement->fetchObject();
+		if (is_object($user_data)) {
+			$this->Edit('id_categoria_usuario', !empty($user_data->id_categoria_usuario) ? $user_data->id_categoria_usuario : 'NULL');
+		} else {
+			$this->Edit('id_categoria_usuario', 'NULL');
+		}
+
+		$this->Edit('codigo_asunto', $matter_code);
+
+		// Agregar valores de tarifa
+		if ($this->Loaded() && $Matter->Loaded()) {
+			$Contract = new Contrato($this->sesion);
+			$Contract->Load($Matter->fields['id_contrato']);
+			if ($Contract->Loaded()) {
+				if (!$this->fields['tarifa_hh']) {
+					$this->Edit('tarifa_hh', Funciones::Tarifa($this->sesion, $id_usuario, $Contract->fields['id_moneda'], $matter_code));
+				}
+
+				if (!$this->fields['costo_hh']) {
+					$this->Edit('costo_hh', Funciones::TarifaDefecto($this->sesion, $data['user_id'], $Contract->fields['id_moneda']));
+				}
+			}
+		}
+
+		$ordenado_por = Conf::GetConf($this->sesion, 'OrdenadoPor');
+		if (in_array($ordenado_por, array(1, 2))) {
+			$this->Edit('solicitante', addslashes($data['requester']));
+		}
+
+		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
+			$this->Edit('codigo_actividad', !empty($data['activity_code']) ? $data['activity_code'] : 'NULL');
+		}
+
+		if (Conf::GetConf($this->sesion, 'UsarAreaTrabajos')) {
+			$this->Edit('id_area_trabajo', !empty($data['area_code']) ? $data['area_code'] : 'NULL');
+		}
+
+		if (Conf::GetConf($this->sesion, 'TodoMayuscula')) {
+			$this->Edit('descripcion', strtoupper($data['notes']));
+		} else {
+			$this->Edit('descripcion', $data['notes']);
+		}
+
+		$cambio_fecha = strtotime($this->fields['fecha']) != strtotime($data['date']);
+		$this->Edit('fecha', $data['date']);
+		$this->Edit('codigo_tarea', !empty($data['task_code']) ? $data['task_code'] : 'NULL');
+
+		if (empty($data['id'])) {
+			$this->Edit('id_usuario', $data['user_id']);
+		}
+
+		$this->Edit('tarifa_hh', $data['rate']);
+
+		if ($this->Write(true)) {
+			if (!empty($data['user_id'])) {
+				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`=0 WHERE `user`.`id_usuario`=:user_id";
+				$Statement = $this->sesion->pdodbh->prepare($sql);
+				$Statement->bindParam('user_id', $data['user_id']);
+				$Statement->execute();
+			}
+
+			if ($update_rate_work == true) {
+				$this->InsertarTrabajoTarifa();
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Find work by work id
+	 * Returns an array with next elements:
+	 *  id, creation_date, date, duration, notes
+	 *  rate, read_only, requester, activity_code, area_code
+	 *  client_code, matter_code, task_code, user_id
+	 *  billable, visible
+	 */
+	function findById($id) {
+		$_work = array();
+
+		$sql = "SELECT `work`.`id_trabajo` AS `id`, `work`.`fecha_creacion` AS `creation_date`,
+			`work`.`fecha` AS `date`, TIME_TO_SEC(`work`.`duracion`)/60.0 AS `duration`, `work`.`descripcion` AS `notes`,
+			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
+			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
+			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
+			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
+			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
+			`work`.`revisado` AS `revised`
+			FROM `trabajo` AS `work`
+				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
+				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
+				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
+			WHERE `work`.`id_trabajo`=:id
+			ORDER BY `work`.`id_trabajo` DESC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $id);
+		$Statement->execute();
+
+		$date_now = strtotime('now');
+		$work = $Statement->fetch(PDO::FETCH_OBJ);
+		$read_only = 0;
+		if (!empty($work->date_read_only)) {
+			if ($date_now >= strtotime($work->date_read_only)) {
+				$read_only = 1;
+			}
+		}
+
+		if (!in_array($work->charge_status, array('CREADO', 'EN REVISION', '', 'SIN COBRO', null))) {
+			$read_only = 1;
+		}
+
+		if ($work->revised == '1') {
+			$read_only = 1;
+		}
+
+		$_work = array(
+			'id' => (int) $work->id,
+			'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
+			'date' => !empty($work->date) ? strtotime($work->date) : null,
+			'duration' => !empty($work->duration) ? (float) $work->duration : null,
+			'notes' => !empty($work->notes) ? $work->notes : null,
+			'rate' => !empty($work->rate) ? (float) $work->rate : null,
+			'read_only' => $read_only,
+			'requester' => !empty($work->requester) ? $work->requester : null,
+			'activity_code' => !empty($work->activity_code) ? $work->activity_code : null,
+			'area_code' => !empty($work->area_code) ? $work->area_code : null,
+			'client_code' => !empty($work->client_code) ? $work->client_code : null,
+			'matter_code' => !empty($work->matter_code) ? $work->matter_code : null,
+			'task_code' => !empty($work->task_code) ? $work->task_code : null,
+			'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
+			'billable' => !empty($work->billable) ? (int) $work->billable : 0,
+			'visible' => !empty($work->visible) ? (int) $work->visible : 0
+		);
+
+		return $_work;
 	}
 }
 
