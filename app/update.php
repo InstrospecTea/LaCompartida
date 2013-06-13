@@ -9760,26 +9760,26 @@ QUERY;
 			$queries = array();
 
 			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
-			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
+				$queries[] = "ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
 			}
 
-			$queries[]=" update cta_corriente cc
-					join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
-	 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
-					set cc.id_cobro=doc.id_cobro,
+			$queries[] = "UPDATE cta_corriente cc
+					INNER JOIN documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
+	 				INNER JOIN neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
+					SET cc.id_cobro=doc.id_cobro,
 						cc.id_neteo_documento=nd.id_neteo_documento,
 						cc.documento_pago=nd.id_documento_pago
-				where cc.incluir_en_cobro='NO' ";
+					WHERE cc.incluir_en_cobro = 'NO' ";
 
+			if (!ExisteIndex('id_neteo_documento', $tabla, $dbh))	{
+				$queries[] = "ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
+			}
+			if (!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) ) {
+				$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			}
 
-		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
-			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
-			}
-		if(!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) )	 {
-			$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
-			}
-		ejecutar($queries, $dbh);
-		break;
+			ejecutar($queries, $dbh);
+			break;
 
 		case 7.36:
 			$query = array();
@@ -9908,8 +9908,10 @@ QUERY;
 				CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-			$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
-			
+			if (!ExisteCampo('receive_alerts', 'usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
+			}
+
 			ejecutar($queries, $dbh);
 			break;
 	}
