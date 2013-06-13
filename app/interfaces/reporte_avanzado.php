@@ -104,7 +104,7 @@ $estados_cobro = array(
 );
 
 
-if (Conf::GetConf($sesion,'CodigoSecundario')) {
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	$agrupadores = array(
 		'glosa_cliente',
 		'codigo_cliente_secundario',
@@ -126,7 +126,6 @@ if (Conf::GetConf($sesion,'CodigoSecundario')) {
 		'mes_emision',
 		'grupo_o_cliente'
 	);
-
 } else {
 	$agrupadores = array(
 		'glosa_cliente',
@@ -340,7 +339,7 @@ if (!$popup) {
 				s = '<?php echo __('Semana pasada') ?>';
 			} else if (fecha_corta == 'mensual') {
 				s = '<?php echo __('Mes pasado') ?>';
-			} else if (fecha_corta == 'anual'){
+			} else if (fecha_corta == 'anual') {
 				s = '<?php echo __('Año en curso') ?>';
 			}
 			jQuery('#periodo_nuevo_reporte').html(s);
@@ -509,18 +508,17 @@ if (!$popup) {
 								<tr valign="top">
 									<td style="width:470px;"  rowspan="7">
 										<div id="filtrosimple">
-											<div id="profesional">
+											<div id="profesional" style="float:left;display:inline-block;" >
 												<b><?php echo __('Profesional') ?>:</b><br/>
 												<?php
 												$query = "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC";
 												echo Html::SelectQuery($sesion, $query, "usuarios[]", $usuarios, '', "Todos", "200");
 												?>
 											</div>
-											<br/>
-											<div id="cliente" >
+											<div id="cliente" style="float:right;padding-right:10px;display:inline-block;" >
 												<b><?php echo __('Cliente') ?>:</b><br/>
 												<?php
-												$query = "SELECT codigo_cliente, concat('[',codigo_cliente,'] ',glosa_cliente) AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC";
+												$query = 'SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC';
 												echo Html::SelectQuery($sesion, $query, "clientes[]", $clientes, '', "Todos", "200");
 												?>
 											</div>
@@ -732,9 +730,11 @@ if (!$popup) {
 												<td align=right>
 													<span title="<?php echo __($explica_periodo_cobro) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-														<?php if ($campo_fecha == 'cobro') {
+														<?php
+														if ($campo_fecha == 'cobro') {
 															echo 'checked="checked"';
-														} ?>
+														}
+														?>
 															   onclick ="SincronizarCampoFecha()" />
 													</span>
 												</td>
@@ -752,9 +752,11 @@ if (!$popup) {
 												<td align=right>
 													<span title="<?php echo __($explica_periodo_emision) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
-															<?php if ($campo_fecha == 'emision') {
-																echo 'checked="checked"';
-															} ?>
+														<?php
+														if ($campo_fecha == 'emision') {
+															echo 'checked="checked"';
+														}
+														?>
 															   onclick ="SincronizarCampoFecha()" />
 													</span>
 												</td>
@@ -772,9 +774,11 @@ if (!$popup) {
 												<td align="right">
 													<span title="<?php echo __($explica_periodo_envio) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_envio" value="envio"
-															<?php if ($campo_fecha == 'emision') {
-																echo 'checked="checked"';
-															} ?>
+														<?php
+														if ($campo_fecha == 'emision') {
+															echo 'checked="checked"';
+														}
+														?>
 															   onclick="SincronizarCampoFecha()" />
 													</span>
 												</td>
@@ -828,15 +832,15 @@ if (!$popup) {
 							<table id="mini_tipo_dato" >
 								<tr>
 									<td id="td_dato" class="<?php echo $comparar ? 'borde_rojo' : 'borde_blanco' ?>">
-											<?php echo Html::SelectArrayDecente($tipos_de_dato_select, 'tipo_dato', $tipo_dato, 'id="tipo_dato" data-color="rojo"', '', '180px'); ?>
+										<?php echo Html::SelectArrayDecente($tipos_de_dato_select, 'tipo_dato', $tipo_dato, 'id="tipo_dato" data-color="rojo"', '', '180px'); ?>
 									</td>
 									<td>
 										<span id="vs" style="<?php echo $comparar ? '' : 'display: none;' ?>">
-										<?php echo __(" Vs. ") ?>
+											<?php echo __(" Vs. ") ?>
 										</span>
 									</td>
 									<td id="td_dato_comparado" class="borde_azul" style="<?php echo $comparar ? '' : 'display: none;' ?>" >
-								<?php echo Html::SelectArrayDecente($tipos_de_dato_select, 'tipo_dato_comparado', $tipo_dato, 'id="tipo_dato_comparado" data-color="azul"', '', '180px'); ?>
+										<?php echo Html::SelectArrayDecente($tipos_de_dato_select, 'tipo_dato_comparado', $tipo_dato, 'id="tipo_dato_comparado" data-color="azul"', '', '180px'); ?>
 									</td>
 								</tr>
 							</table>
@@ -1058,14 +1062,14 @@ if (!$popup) {
 								</td>
 							</tr>
 							<tr>
-								<td align=center colspan=5>
+								<td align="center" colspan="5">
 									<br/>
 									<a href="javascript:void(0)" class="btn botonizame" id="runreporte" name="runreporte" icon="code"/>Planilla</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="excel" name="excel" icon="xls"  title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'excel');"/><?php echo __('Excel') ?></a>
-									<a href="javascript:void(0)" class="btn botonizame" id="dispersion" name="dispersion" icon="icon-chart"   title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'dispersion');"/><?php echo __('Dispersión') ?></a>
-									<a href="javascript:void(0)" class="btn botonizame" id="tabla" name="tabla" icon="icon-table" title="Genera un Documento Excel con una tabla cruzada." onclick="Generar(jQuery('#formulario').get(0), 'tabla');"/><?php echo __('Tabla') ?></a>
-									<a href="javascript:void(0)" class="btn botonizame" id="barras" name="barras" icon="icon-bar" title="Despliega un Gráfico de Barras, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'barra');"/><?php echo __('Barras') ?></a>
-									<a href="javascript:void(0)" class="btn botonizame" id="circular" name="circular"  icon="pie-chart" title="Despliega un Gráfico de Torta, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'circular');"/><?php echo __('Gráfico Torta') ?></a>
+									<a href="javascript:void(0)" class="btn botonizame" id="excel" name="excel" icon="xls"  title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'excel');"/>Excel</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="dispersion" name="dispersion" icon="icon-chart"   title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'dispersion');"/>Dispersión</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="tabla" name="tabla" icon="icon-table" title="Genera un Documento Excel con una tabla cruzada." onclick="Generar(jQuery('#formulario').get(0), 'tabla');"/>Tabla</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="barras" name="barras" icon="icon-bar" title="Despliega un Gráfico de Barras, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'barra');"/>Barras</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="circular" name="circular"  icon="pie-chart" title="Despliega un Gráfico de Torta, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'circular');"/>Gráfico Torta</a>
 								</td>
 								<td style="width: 100px; font-size: 11px;">
 									<label for="comparar"><?php echo __('Comparar') ?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" <?php echo $comparar ? 'checked="checked"' : '' ?> title='Comparar' /> </td>
@@ -1077,11 +1081,11 @@ if (!$popup) {
 										<tr>
 											<td>
 												<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1"
-													<?php
-													if (isset($orden_barras_max2min) || !isset($tipo_dato))
-														echo 'checked="checked"';
-													?>
-													title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
+												<?php
+												if (isset($orden_barras_max2min) || !isset($tipo_dato))
+													echo 'checked="checked"';
+												?>
+													   title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
 												<label for="orden_barras_max2min"><?php echo __("Gráficar de Mayor a Menor") ?></label>
 											</td>
 											<td>
@@ -1107,129 +1111,14 @@ if (!$popup) {
 				</td>
 			</tr>
 		</table>
-
-		<!-- RESULTADO -->
-		<?php
-	}
-
-	$alto = 800;
-	switch ($opc) {
-		case 'print':
-			$url_iframe = "reporte_avanzado_planilla.php?popup=1";
-			break;
-		case 'circular':
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=circular&popup=1";
-			$alto = 540;
-			if ($orden_barras_max2min) {
-				$url_iframe .= "&orden=max2min";
-			}
-			break;
-		case 'barra':
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=barras&popup=1";
-			$alto = 540;
-			if ($orden_barras_max2min) {
-				$url_iframe .= "&orden=max2min";
-			}
-			break;
-		case 'dispersion':
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=dispersion&popup=1";
-			$alto = 640;
-			if ($orden_barras_max2min) {
-				$url_iframe .= "&orden=max2min";
-			}
-			break;
-	}
-	$url_iframe .= "&tipo_dato=" . $tipo_dato;
-	$url_iframe .= "&vista=" . $vista;
-	$url_iframe .= "&id_moneda=" . $id_moneda;
-	$url_iframe .= "&prop=" . $proporcionalidad;
-
-	if ($limitar) {
-		$url_iframe .= "&limite=" . $limite;
-	}
-	if ($agrupar) {
-		$url_iframe .= "&agrupar=1";
-	}
-
-	if ($filtros_check) {
-		if ($check_clientes) {
-			if (is_array($clientesF)) {
-				$url_iframe .= "&clientes=" . implode(',', $clientesF);
-			}
-		}
-
-		if ($check_profesionales) {
-			if (is_array($usuariosF)) {
-				$url_iframe .= "&usuarios=" . implode(',', $usuariosF);
-			}
-		}
-
-		if ($check_area_asunto) {
-			if (is_array($areas_asunto)) {
-				$url_iframe .= "&areas_asunto=" . implode(',', $areas_asunto);
-			}
-		}
-
-		if ($check_tipo_asunto) {
-			if (is_array($tipos_asunto)) {
-				$url_iframe .= "&tipos_asunto=" . implode(',', $tipos_asunto);
-			}
-		}
-
-		if ($check_moneda_contrato) {
-			if (is_array($moneda_contrato)) {
-				$url_iframe .= "&moneda_contrato=" . implode(',', $moneda_contrato);
-			}
-		}
-
-		if ($check_area_prof) {
-			if (is_array($areas)) {
-				$url_iframe .= "&areas_pro=" . implode(',', $areas);
-			}
-		}
-
-		if ($check_cat_prof) {
-			if (is_array($categorias)) {
-				$url_iframe .= "&categorias_pro=" . implode(',', $categorias);
-			}
-		}
-
-		if ($check_encargados) {
-			if (is_array($encargados)) {
-				$url_iframe .= "&en_com=" . implode(',', $encargados);
-			}
-		}
-
-		if ($check_estado_cobro) {
-			if (is_array($estado_cobro)) {
-				$url_iframe .= "&es_cob=" . implode(',', $estado_cobro);
-			}
-		}
-	} else {
-		if (is_array($clientes)) {
-			$url_iframe .= "&clientes=" . implode(',', $clientes);
-		}
-		if (is_array($usuarios)) {
-			$url_iframe .= "&usuarios=" . implode(',', $usuarios);
-		}
-	}
-
-	$url_iframe .= "&fecha_ini=" . $fecha_ini;
-	$url_iframe .= "&fecha_fin=" . $fecha_fin;
-
-	$url_iframe .= "&campo_fecha=" . $campo_fecha;
-
-	if ($comparar) {
-		$url_iframe .= "&tipo_dato_comparado=" . $tipo_dato_comparado;
-	}
-	?>
+	<?php } ?>
 </form>
 
 <?php if ($opc && $opc != 'nuevo_reporte' && $opc != 'eliminar_reporte') { ?>
 	<div class="resizable" id="iframereporte">
 		<div class="divloading">&nbsp;</div>
 		<iframe  class="resizableframe" onload="iframelista();" name="planilla" id="planilla" src="<?php echo $url_iframe; ?>" frameborder="0" style="display:none; width:730px; height:<?php echo $alto; ?>px;"></iframe>
-	</div>';
+	</div>
 <?php } else { ?>
 	<div class="resizable"  id="iframereporte"></div>
 <?php } ?>

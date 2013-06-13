@@ -574,6 +574,8 @@ function SincronizarCampoFecha() {
 function Generar(form, valor) {
 	form = jQuery(form);
 	var form_id = form.attr('id');
+	var action = '';
+	var ajax = false;
 	jQuery('#' + form_id + ' [value="opc"]').val(valor);
 	jQuery('#' + form_id + ' [value="vista"]').val(jQuery('#agrupador_0').val());
 	var numero_agrupadores = jQuery('#numero_agrupadores').val();
@@ -582,20 +584,42 @@ function Generar(form, valor) {
 	}
 	switch (valor) {
 		case 'pdf':
-			var action = 'html_to_pdf.php?frequire=reporte_avanzado.php&popup=1';
+			action = 'html_to_pdf.php?frequire=reporte_avanzado.php&popup=1';
 			break;
 		case 'excel':
-			var action = 'planillas/planilla_reporte_avanzado.php';
+			action = 'planillas/planilla_reporte_avanzado.php';
 			break;
 		case 'tabla':
-			var action = 'planillas/planilla_reporte_avanzado_tabla.php';
+			action = 'planillas/planilla_reporte_avanzado_tabla.php';
+			break;
+
+		case 'circular':
+			action = 'reporte_avanzado_grafico.php?tipo_grafico=circular&ajax=1';
+			ajax = true;
+		case 'barra':
+			action = 'reporte_avanzado_grafico.php?tipo_grafico=barras&ajax=1';
+			ajax = true;
+			break;
+		case 'dispersion':
+			action = 'reporte_avanzado_grafico.php?tipo_grafico=dispersion&ajax=1';
+			ajax = true;
 			break;
 		default:
-			var action = 'reporte_avanzado.php';
+			return;
 			break;
 	}
-	form.attr('action', action);
-	form.submit();
+	if (ajax) {
+		jQuery.ajax({
+			url: action,
+			data: jQuery('#formulario').serialize(),
+			type: 'POST'
+		}).done(function(data) {
+			jQuery('#iframereporte').html(data);
+		});
+	} else {
+		form.attr('action', action);
+		form.submit();
+	}
 }
 
 //Al cambiar un agrupador, en los agrupadores siguientes, el valor previo se hace disponible y el valor nuevo se indispone.
@@ -661,6 +685,7 @@ jQuery(document).ready(function() {
 
 	jQuery('#fullfiltrostoggle').click(function() {
 		jQuery('#filtrosimple, #full_filtros').toggle();
+		jQuery('#filtros_check').prop('checked', jQuery('#full_filtros').is(':visible'));
 	});
 
 	jQuery('#runreporte').on('click', function() {
@@ -679,9 +704,9 @@ jQuery(document).ready(function() {
 
 		jQuery('#vista').val(vista.join('-'));
 		jQuery.ajax({
-			url: "reporte_avanzado_planilla.php?popup=1&vista=" + jQuery('#vista').val(),
+			url: "reporte_avanzado_planilla.php?ajax=1&vista=" + jQuery('#vista').val(),
 			data: jQuery('#formulario').serialize(),
-			type: "POST"
+			type: 'POST'
 		}).done(function(data) {
 			jQuery('#iframereporte').html(data);
 		});
