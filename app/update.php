@@ -9854,6 +9854,7 @@ QUERY;
 
 		case 7.40:
 			$queries = array();
+			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
 			$queries[] = "CREATE TABLE IF NOT EXISTS `cliente_seguimiento` (
 										`id` int(11) NOT NULL AUTO_INCREMENT,
 										`codigo_cliente` varchar(10) NOT NULL,
@@ -9908,7 +9909,7 @@ QUERY;
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
-
+			
 			ejecutar($queries, $dbh);
 			break;
 	}

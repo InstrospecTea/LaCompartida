@@ -47,7 +47,7 @@ class Reporte {
 		} else {
 			$this->dato_usuario = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
 		}
-		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
+		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
 			$this->dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
 		} else {
 			$this->dato_codigo_asunto = 'asunto.codigo_asunto';
@@ -198,6 +198,15 @@ class Reporte {
 			$this->campo_fecha_cobro = 'cobro.fecha_emision';
 			$this->campo_fecha_cobro_2 = '';
 		}
+
+		if ($campo_fecha == 'envio') {
+			$this->campo_fecha = 'cobro.fecha_enviado_cliente';
+			$this->campo_fecha_2 = '';
+			$this->campo_fecha_3 = '';
+
+			$this->campo_fecha_cobro = 'cobro.fecha_enviado_cliente';
+			$this->campo_fecha_cobro_2 = '';
+		}
 	}
 
 	//Los Agrupadores definen GROUP y ORDER en las queries.
@@ -304,7 +313,7 @@ class Reporte {
 	}
 
 	function nombre_usuario($usuario) {
-		if (UtilesApp::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema')) {
+		if (Conf::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema')) {
 			return $usuario . '.username ';
 		}
 		return 'CONCAT_WS(\' \',' . $usuario . '.nombre, ' . $usuario . '.apellido1, LEFT(' . $usuario . '.apellido2,1)) ';
@@ -354,7 +363,7 @@ class Reporte {
 					cobro.forma_cobro AS forma_cobro,
 				';
 
-		if (UtilesApp::GetConf($this->sesion, 'UsoActividades')) {
+		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
 			$s .= " ' - ' as glosa_actividad, ";
 		}
 
@@ -542,7 +551,7 @@ class Reporte {
 						IFNULL(cobro.estado,\'Indefinido\') as estado,
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
 						';
-		if (UtilesApp::GetConf($this->sesion, 'UsoActividades')) {
+		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
 			$s .= " IFNULL( NULLIF( IFNULL( actividad.glosa_actividad, 'Indefinido' ), ' ' ), 'Indefinido' ) as glosa_actividad, ";
 		}
 
@@ -767,7 +776,7 @@ class Reporte {
 			$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda_base on (cobro_moneda_base.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
 		}
 
-		if (UtilesApp::GetConf($this->sesion, 'UsoActividades')) {
+		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
 			$s .= " LEFT JOIN actividad ON ( trabajo.codigo_actividad = actividad.codigo_actividad ) ";
 		}
 
