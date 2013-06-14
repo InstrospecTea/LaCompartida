@@ -32,13 +32,13 @@ $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 //Asumo que solo quiero refrescar cuando gardo el cobro
 // Aparentemente "guardar cobro" no existe. Es sólo "guardar"
 if ($refrescar && ($opc == 'guardar_cobro' || $opc == 'guardar')) {
-	
+
 	echo '<script type="text/javascript">
 		if (window.opener !== undefined && window.opener.Refrescar) {
-			window.opener.Refrescar();        
+			window.opener.Refrescar();
 		}
 	</script>';
-	
+
 }
 
 $factura_pago = new FacturaPago($sesion);
@@ -143,12 +143,12 @@ if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVI
 
 if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 
-    
+
 	if ($factura->LoadByCobro($id_cobro)) {
 
 		if ($opc == 'anular_factura') {
 			/**
-			 * ANULAR FACTURA 
+			 * ANULAR FACTURA
 			 */
 			// Buscar nuevo numero por la factura y ocupalo dentro de la tabla cobros
 			$cobro->Edit('documento', '');
@@ -186,7 +186,7 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 				$numero_documento = $documento;
 			}
 			$factura->Edit('numero', $numero_documento);
-		
+
 		} else {
 
 			if(!$documento) $documento=$documento_cobro->fields['id_documento'];
@@ -239,7 +239,7 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		$resp_lista_docLegalesActivos = mysql_query($query_lista_docLegalesActivos, $sesion->dbh) or Utiles::errorSQL($resp_lista_docLegalesActivos, __FILE__, __LINE__, $sesion->dbh);
 		list($lista_facturasActivas, $lista_NotaCreditoActivas) = mysql_fetch_array($resp_lista_docLegalesActivos);
 		$cobro->Edit('documento', $lista_facturasActivas);
-		
+
 		$cambiar_estado = false;
 
 		//if ($cobro->fields['estado'] != 'FACTURADO') // en vez de comparar si es distinto, comprueba si es un estado previo a Facturado
@@ -247,7 +247,7 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		$estado = 'FACTURADO';
 		$cambiar_estado = true;
 		}
-		
+
 
 		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra')) {
 			$cobro->Edit('nota_cobro', $lista_NotaCreditoActivas);
@@ -374,13 +374,13 @@ if ($opc == 'guardar') {
 	if ($estado != $cobro->fields['estado']) {
 		$cambiar_estado = true;
 	}
-       
+
 	if($fecha_emision) $cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 	if(isset($fecha_envio)) $cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
 	if(isset($fecha_pago)) $cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
 	if(isset($fecha_pago_parcial)) $cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
 	if(isset($fecha_facturacion)) $cobro->Edit('fecha_facturacion', $fecha_facturacion ? Utiles::fecha2sql($fecha_facturacion) : '');
-	
+
 	//al guardar el cobro verifica si hay que dejarlo como pagado, en concordancia al documento de deuda que lo respalda
 	$documentocobro = new Documento($sesion);
 	$documentocobro->LoadByCobro($cobro->fields['id_cobro']);
@@ -393,7 +393,7 @@ if ($opc == 'guardar') {
 		$cambiar_estado = false;
 	}
 	if($setpagos) $estado='PAGADO';
-	
+
 	$cobro->Edit('forma_envio', $forma_envio);
 
 	if (!UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
@@ -449,10 +449,10 @@ if ($cambiar_estado && $estado!='') {
 	// Se ingresa la anotación en el historial
 	if ($estado_anterior != $estado && $estado) { // no ingresa historial si no se recibe explícitamente un nuevo estado
 		$his = new Observacion($sesion);
-                
+
                 if($ultimaobservacion=$his->UltimaObservacion($cobro->fields['id_cobro'])) {
                    // mail('ffigueroa@lemontech.cl',"Cambiando De $estado_anterior a $estado",json_encode($ultimaobservacion));
-                
+
                     if($ultimaobservacion['comentario']!=__("COBRO $estado")) {
                         $his->Edit('fecha', date('Y-m-d H:i:s'));
                         $his->Edit('comentario', __("COBRO $estado"));
@@ -494,7 +494,7 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
        	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
-	
+
 // Opciones especificos para Vial Olivares
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
@@ -608,7 +608,7 @@ if ($popup) {
 
 	$glosa_asunto_titulo = $separador_inicio . $glosa_asunto_titulo;
 	// $glosa_asunto_titulo = Utiles::Glosa($sesion, $cobro->LoadAsuntos());
-	
+
 	?>
 	<table width="100%" border="0" cellspacing="0" cellpadding="2">
 		<tr>
@@ -633,7 +633,7 @@ $cobro_moneda->Load($cobro->fields['id_cobro']);
 $tipo_cambio_moneda_total = $cobro_moneda->GetTipoCambio($id_cobro, $cobro->fields['opc_moneda_total'] != '' ? $cobro->fields['opc_moneda_total'] : 1);
 
 /**
- * Contrato 
+ * Contrato
  */
 if ($cobro->fields['id_contrato'] != '') {
 	$contrato = new Contrato($sesion);
@@ -649,7 +649,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 
 ?>
 <script type="text/javascript">
-    
+
     var ciclo = self.setInterval("refrescaestado('estado_contabilidad')", 15000);
     jQuery(document).ready(function() {
         var Elidcobro = jQuery("#elidcobro").val();
@@ -665,17 +665,17 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
                 jQuery("#lista_pagos").html(data);
             });
         });
-     
+
         jQuery(".integracion").click(function() {
-            var estado = jQuery(this).attr('rel').toUpperCase();           
-         
+            var estado = jQuery(this).attr('rel').toUpperCase();
+
             var Idcobro = jQuery("#elidcobro").val();
             var Opc = 'guardar';
             var Opcic = jQuery(this).attr('id');
             var Confirma = 0;
-        
-       
-            if (estado == 'INFORMADO' && Opcic == 'parainfo') { 
+
+
+            if (estado == 'INFORMADO' && Opcic == 'parainfo') {
                 if (!confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?')) {
                     return false;
                 }
@@ -686,25 +686,25 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
                 }
                 Confirma = 1;
             }
-        
+
             jQuery.post('ajax/cobros7.php',{id_cobro: Idcobro, opc: Opc, opc_ic: Opcic, confirma: Confirma},function(data) {
                 if (data.length > 0) {
                     var respuesta = data.split('|');
                     jQuery('#estado_contabilidad').html(respuesta[0]).attr('title',respuesta[1]);
                     jQuery("#retorno").html(respuesta[3]);
                     jQuery(".integracion").attr('rel',respuesta[2]);
-                
+
                     if (respuesta[4].length > 0) {
-                        jQuery("#nota_venta_contabilidad").html('Nota de venta: '+respuesta[4]).css('display','inline-block');    
+                        jQuery("#nota_venta_contabilidad").html('Nota de venta: '+respuesta[4]).css('display','inline-block');
                     } else {
-                        jQuery("#nota_venta_contabilidad").fadeOut("slow");     
+                        jQuery("#nota_venta_contabilidad").fadeOut("slow");
                     }
                 }
             });
         });
     });
-    
-    function Refrescarse() 
+
+    function Refrescarse()
     {
         var Elidcobro = jQuery("#elidcobro").val();
         jQuery.post('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'}, function(data) {
@@ -713,32 +713,32 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 		Refrescar();
     }
 
-    function refrescaestado(id) 
+    function refrescaestado(id)
     {
         jQuery('#' + id).css("opacity", "0.75");
         var Idcobro = jQuery("#elidcobro").val();
-    
+
         jQuery.post('ajax/cobros7.php', {id_cobro: Idcobro, opc: 'refrescar'}, function(data) {
             if (data.length > 0) {
                 var respuesta = data.split('|');
                 jQuery("#retorno").html(respuesta[3]);
                 jQuery(".integracion").attr('rel', respuesta[2]);
-                jQuery('#' + id).html(respuesta[0]).attr('title', respuesta[1]).show();    
-            
+                jQuery('#' + id).html(respuesta[0]).attr('title', respuesta[1]).show();
+
                 if (respuesta[4].length > 0) {
-                    jQuery("#nota_venta_contabilidad").html('Nota de venta: ' + respuesta[4]).css('display', 'inline-block');    
+                    jQuery("#nota_venta_contabilidad").html('Nota de venta: ' + respuesta[4]).css('display', 'inline-block');
                 } else {
-                    jQuery("#nota_venta_contabilidad").fadeOut("slow");     
+                    jQuery("#nota_venta_contabilidad").fadeOut("slow");
                 }
             }
         });
-    } 
+    }
 
     function Informar(form, valor, estado_contabilidad)
     {
         if (estado_contabilidad) {
             var estado = estado_contabilidad.toUpperCase();
-            if (estado == 'INFORMADO' && valor == 'informar') { 
+            if (estado == 'INFORMADO' && valor == 'informar') {
                 if (!confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?')) {
                     return false;
                 }
@@ -752,8 +752,8 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
         //ValidarTodo(form);
         return false;
         //PARA INFORMAR Y FACTURAR
-    }       
-    
+    }
+
 
     //document.observe('dom:loaded', function() {
     //    new Tip('c_edit', 'Continuar con el cobro', {offset: {x:-2, y:5}});
@@ -780,11 +780,11 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
         var monto = monto_orig.replace('\,', '.');
         var arr_monto = monto.split('\.');
         var monto = arr_monto[0];
-    
+
         for ($i = 1; $i < arr_monto.length - 1; $i++) {
             monto += arr_monto[$i];
         }
-    
+
         if (arr_monto.length > 1) {
             monto += '.' + arr_monto[arr_monto.length - 1];
         }
@@ -799,17 +799,17 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
         ids_monedas = $('ids_monedas_documento').value;
         arreglo_ids = ids_monedas.split(',');
         var tc = new Array();
-    
+
         for (var i = 0; i< arreglo_ids.length; i++) {
             tc[i] = $('documento_moneda_' + arreglo_ids[i]).value;
         }
-    
+
         $('contenedor_tipo_cambio').innerHTML =
             "<table width=510px><tr><td align=center><br><br><img src='<?php echo Conf::ImgDir() ?>/ajax_loader.gif'/><br><br></td></tr></table>";
-    
+
         var http = getXMLHTTP();
         var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_documento_moneda&id_documento=<?php echo $documento_cobro->fields['id_documento'] ?>&ids_monedas=' + ids_monedas+'&tcs='+tc.join(',');
-    
+
         http.open('get', url);
         http.onreadystatechange = function() {
             if(http.readyState == 4) {
@@ -826,7 +826,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
     {
         var monto = 0;
         var lista_facturas = "";
-    
+
         $$('[id^="saldo_"]').each(function(elem) {
             ids = elem.id.split('_');
             if ($('pagar_factura_' + ids[1]).checked) {
@@ -837,7 +837,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
         lista_facturas = lista_facturas.substr(1);
 		if (lista_facturas) {
 			var codigo_cliente = '<?php echo $cobro->fields['codigo_cliente']; ?>';
-			nuevaVentana('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?php echo $cobro->fields['id_cobro'] ?>&popup=1', 'top=100, left=155, scrollbars=yes');			
+			nuevaVentana('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?php echo $cobro->fields['id_cobro'] ?>&popup=1', 'top=100, left=155, scrollbars=yes');
 		} else {
 			alert('Seleccione almenos un documento.');
 		}
@@ -880,7 +880,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
             l++;
         }
         while(r > l && s[r] == ' ') {
-            r--;	
+            r--;
         }
         return s.substring(l, r + 1);
     }
@@ -888,7 +888,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
     function ValidarTodo(form)
     {
         //Significa que estoy anulando la emisión
-        if (form.estado.value == 'CREADO') { 
+        if (form.estado.value == 'CREADO') {
             if (!confirm('<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
                 return false;
             } else {
@@ -906,7 +906,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
         }
 
         //Significa que estoy anulando la emisión
-        if( form.estado.value == 'EN REVISION' ) { 
+        if( form.estado.value == 'EN REVISION' ) {
 
 <?php if (UtilesApp::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 				if (form.estado_original.value == 'PAGADO' && trim(form.estado_motivo.value) == "") {
@@ -936,7 +936,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
             } else if (form.existe_factura.value == 1) {
                 var texto = '¡Este cobro tiene facturas asociadas! ';
             }
-        
+
             if (!confirm(texto + '<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
                 return false;
             } else {
@@ -960,13 +960,13 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 
         // No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
         if (form.todopagado.value=='NO' && form.estado.value == 'PAGADO' && form.estado_original.value != 'PAGADO' && (!form.existe_pago.value || form.existe_pago.value == 0)) {
-            
+
 	    alert('<?php echo __("No puede definir ") . __("el Cobro") . __(" como \"PAGADO\". Debe ingresar un documento de pago completo por el saldo pendiente."); ?>');
             return false;
         }
 
         //No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
-        if (form.estado.value == 'PAGO PARCIAL' && form.estado_original.value != 'PAGO PARCIAL' && ( !form.existe_pago.value || form.existe_pago.value == 0 )) { 
+        if (form.estado.value == 'PAGO PARCIAL' && form.estado_original.value != 'PAGO PARCIAL' && ( !form.existe_pago.value || form.existe_pago.value == 0 )) {
             alert('<?php echo __("No puede definir ") . __("el Cobro") . __(" como \"PAGO PARCIAL\". Debe ingresar un documento de pago.") ?>');
             return false;
         }
@@ -1003,7 +1003,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
     {
         $('VerDocumentosPagos_' + id_factura).hide();
     }
- 
+
     function ValidarFactura(form, id_factura, opcion)
     {
 <?php if (UtilesApp::GetConf($sesion, 'PermitirFactura')) { ?>
@@ -1026,7 +1026,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 					$('facturado').checked = true;
 					form.opc.value = 'facturar';
 				}
-	        
+
 				form.submit();
 				return true;
 <?php } else { ?>
@@ -1090,7 +1090,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
         } else {
             form.opc.value = 'descargar_excel';
         }
-    
+
         form.submit();
         return true;
     }
@@ -1149,7 +1149,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 <?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 			return true;
 <?php } ?>
-        
+
         if (estado == 'PAGADO') {
             if ($("estado_original").value=='INCOBRABLE') {
                 alert("<?php echo __('No puede pasar a estado \'Pagado\'. Debe pasar por estado \'Emitido\' para recuperar los montos, luego agregar el pago.') ?>");
@@ -1191,7 +1191,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 		}
 	}
 
-	function AgregarFactura(idx) 
+	function AgregarFactura(idx)
 	{
 <?php
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
@@ -1213,34 +1213,34 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
 
         var honorarios = jQuery('#honorarios_' + idx).val()*1;
         var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val()*1;
-        var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1; 
+        var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1;
 
         var honorarios_disp = jQuery('#honorarios_disponibles').val()*1;
 	var trabajos_disp = jQuery('#trabajos_disponibles').val()*1;
 	var tramites_disp = jQuery('#tramites_disponibles').val()*1;
-	
-        var gastos_con_impuestos_disp = jQuery('#gastos_con_iva_disponibles').val()*1; 
-        var gastos_sin_impuestos_disp = jQuery('#gastos_sin_iva_disponibles').val()*1; 
 
-        var honorarios_total = jQuery('#honorarios_total').val()*1;  
-        var gastos_con_impuestos_total =jQuery('#gastos_con_iva_total').val()*1;  
-        var gastos_sin_impuestos_total =jQuery('#gastos_sin_iva_total').val()*1;   
-		
+        var gastos_con_impuestos_disp = jQuery('#gastos_con_iva_disponibles').val()*1;
+        var gastos_sin_impuestos_disp = jQuery('#gastos_sin_iva_disponibles').val()*1;
+
+        var honorarios_total = jQuery('#honorarios_total').val()*1;
+        var gastos_con_impuestos_total =jQuery('#gastos_con_iva_total').val()*1;
+        var gastos_sin_impuestos_total =jQuery('#gastos_sin_iva_total').val()*1;
+
 
         var esCredito = jQuery('#tipo_documento_legal_'+idx).val() == <?php echo !empty($id_tipo_documento['NC']) ? $id_tipo_documento['NC'] : 0; ?>;
         var esFactura = jQuery('#tipo_documento_legal_'+idx).val() == <?php echo !empty($id_tipo_documento['FA']) ? $id_tipo_documento['FA'] : 1; ?>;
         var esDebito = jQuery('#tipo_documento_legal_'+idx).val() == <?php echo !empty($id_tipo_documento['ND']) ? $id_tipo_documento['ND'] : 0; ?>;
 
-        if (!honorarios && !gastos_con_impuestos && !gastos_sin_impuestos || 
+        if (!honorarios && !gastos_con_impuestos && !gastos_sin_impuestos ||
             honorarios < 0 || gastos_con_impuestos < 0 || gastos_sin_impuestos < 0) {
             alert('Ingrese montos válidos para el documento legal');
             return false;
         }
-    
-       
-        if (!esCredito && 
+
+
+        if (!esCredito &&
             (honorarios > honorarios_disp || gastos_con_impuestos > gastos_con_impuestos_disp || gastos_sin_impuestos > gastos_sin_impuestos_disp)) {
-       
+
             if (!confirm('<?php echo __("Los montos ingresados superan el saldo a facturar") ?>')) {
                 if (honorarios > honorarios_disp) {
                     jQuery('#honorarios_' + idx).focus();
@@ -1249,7 +1249,7 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
                 } else if (gastos_sin_impuestos > gastos_sin_impuestos_disp) {
                     jQuery('#gastos_sin_impuestos_' + idx).focus();
                 }
-            
+
                 return false;
             }
         }
@@ -1265,20 +1265,20 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
             '&gastos_con_impuestos_total=' + gastos_con_impuestos_total +
             '&gastos_sin_impuestos_total=' + gastos_sin_impuestos_total +
 	  '&trabajos_disponibles=' + trabajos_disp +
-            '&tramites_disponibles=' + tramites_disp +		
+            '&tramites_disponibles=' + tramites_disp +
             '&id_documento_legal=' + jQuery('#tipo_documento_legal_' + idx).val(), 'top=100, left=155');
     }
 
     function Numero(texto) {
         var coma = texto.indexOf(',');
         var punto = texto.indexOf('.');
-    
+
         if (coma >= 0 && punto >= 0) {
             texto = texto.replace(coma < punto ? /,/g : /\./g, '');
         } else if (coma >= 0) {
             texto = texto.replace(/,/g, '.');
         }
-    
+
         return Number(texto);
     }
 
@@ -1289,7 +1289,7 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
             (gastos ? '&pago_gastos=1' : '')+
             '&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>',
         'top=\'100\', left=\'125\', scrollbars=\'yes\'');
-    
+
         return false;
     }
 </script>
@@ -1363,21 +1363,21 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                             <br />
 							<?php echo'Estado '. __('Cobro') ?>:
                           <br /> <br/><?php echo __('Forma Cobro') ?>
-		      <br/><?php echo $cobro->fields['forma_cobro'] ?> 
+		      <br/><?php echo $cobro->fields['forma_cobro'] ?>
                         </td>
                         <td align="left" style="font-size: 11px; font-weight: bold;" >
                             <table cellpadding="3">
                                 <tr height=3>
 									<?php echo TArriba("BORRADOR", $cobro->fields['estado']); ?>
 									<?php echo TArriba("EMITIDO", $cobro->fields['estado']); ?>
-									<?php 
+									<?php
 									if (UtilesApp::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) {
 										echo TArriba("ENVIADO AL CLIENTE", $cobro->fields['estado']);
 										echo TArriba("FACTURADO", $cobro->fields['estado']);
 									} else {
 										echo TArriba("FACTURADO", $cobro->fields['estado']);
 										echo TArriba("ENVIADO AL CLIENTE", $cobro->fields['estado']);
-									} 
+									}
 									?>
 									<?php echo TArriba("PAGO PARCIAL", $cobro->fields['estado']); ?>
 									<?php echo TArriba("PAGADO", $cobro->fields['estado']); ?>
@@ -1385,14 +1385,14 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                 <tr height=13>
 									<?php echo TMedio("BORRADOR", $cobro->fields['estado']); ?>
 									<?php echo TMedio("EMITIDO", $cobro->fields['estado']); ?>
-									<?php 
+									<?php
 									if (UtilesApp::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) {
 										echo TMedio("ENVIADO AL CLIENTE", $cobro->fields['estado']);
 										echo TMedio("FACTURADO", $cobro->fields['estado']);
 									} else {
 										echo TMedio("FACTURADO", $cobro->fields['estado']);
 										echo TMedio("ENVIADO AL CLIENTE", $cobro->fields['estado']);
-									} 
+									}
 									?>
 									<?php echo TMedio("PAGO PARCIAL", $cobro->fields['estado']); ?>
 									<?php echo TMedio("PAGADO", $cobro->fields['estado']); ?>
@@ -1400,14 +1400,14 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                 <tr height=3>
 									<?php echo TAbajo("BORRADOR", $cobro->fields['estado']); ?>
 									<?php echo TAbajo("EMITIDO", $cobro->fields['estado']); ?>
-									<?php 
+									<?php
 									if (UtilesApp::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) {
 										echo TAbajo("ENVIADO AL CLIENTE", $cobro->fields['estado']);
 										echo TAbajo("FACTURADO", $cobro->fields['estado']);
 									} else {
 										echo TAbajo("FACTURADO", $cobro->fields['estado']);
 										echo TAbajo("ENVIADO AL CLIENTE", $cobro->fields['estado']);
-									} 
+									}
 									?>
 									<?php echo TAbajo("PAGO PARCIAL", $cobro->fields['estado']); ?>
 									<?php echo TAbajo("PAGADO", $cobro->fields['estado']); ?>
@@ -1418,30 +1418,30 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                     </td>
                                     <td nowrap>
                                         <input class="fechadiff" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_emision']) ?>" name="fecha_emision" id="fecha_emision" size="11" maxlength="10" />
-                                       
+
                                     </td>
 								<?php if (UtilesApp::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) { ?>
                                     <td nowrap>
                                         <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
-                                         
+
                                     </td>
                                     <td nowrap>
                                         <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
-                                         
+
                                     </td>
 								<?php } else { ?>
 									<td nowrap>
                                         <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
-                                       
+
                                     </td>
                                     <td nowrap>
                                         <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
-                                        
+
                                     </td>
 								<?php } ?>
                                     <td nowrap>
                                         <input class="fechadiff"  type="text" name="fecha_pago_parcial" value="<?php echo Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
-                                        
+
                                     </td>
                                     <td nowrap>
 										<?php
@@ -1460,7 +1460,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                 </tr>
                             </table>
                         </td>
-                   
+
                         <td align=left style="vertical-align: middle;" colspan="2">
                             <div style="float:left;text-align:center;width:150px;">
 								<?php echo __('Cambiar a') ?>:
@@ -1516,11 +1516,11 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                 <!-- Fin del Estado del cobro -->
 
                 <!-- Fin Cabecera -->
-              
+
 								<table id="cajafacturas" >
-								 
+
 								</table>
-						
+
                        </div>
 <br class="clearfix"/>
 <div id="historial">
@@ -1528,39 +1528,41 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                 <tr>
                                     <td width="220px"  >
                                         <span style="background:#EEE;padding:4px;display:block;font-weight: bold; font-size: 11px;"><?php echo __('Se está cobrando:') ?></span>
-                                    
-										<?php
-										$se_esta_cobrando = __('Periodo');
-										$se_esta_cobrando .=': ';
-										if ($cobro->fields['fecha_ini'] != '0000-00-00') {
-											$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
-											$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini . ' ';
-										}
-										if ($cobro->fields['fecha_fin'] != '0000-00-00') {
-											$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
-											$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin;
-										}
 
-										if ($cobro->fields['se_esta_cobrando']) {
-											$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
-										}
+<?php
+if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
+	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+	$disabled = "disabled";
+	$lineas = 'rows="6"';
+	$columnas = 'cols="25"';
+} else {
+	$se_esta_cobrando = __('Periodo');
+	$se_esta_cobrando .=': ';
+	if ($cobro->fields['fecha_ini'] != '0000-00-00' && !empty($cobro->fields['fecha_ini'])) {
+		$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
+		$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini;
+	}
+	if ($cobro->fields['fecha_fin'] != '0000-00-00' && !empty($cobro->fields['fecha_fin'])) {
+		$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
+		$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin;
+	}
+	$disabled = "";
+	$lineas = 'rows="3"';
+	$columnas = '';
+}
 
-										if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-											$lineas = 'rows="6"';
-											$columnas = 'cols="25"';
-										} else {
-											$lineas = 'rows="3"';
-											$columnas = "";
-										}
-										?>
-                                        <textarea style="width:220px;" name="se_esta_cobrando" <?php echo $lineas . ' ' . $columnas; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
+if (trim($cobro->fields['se_esta_cobrando']) != '') {
+	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+}
+?>
+                                        <textarea style="width:220px;" name="se_esta_cobrando" <?php echo "$lineas $columnas $disabled"; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
                                     </td>
                              <td style="text-align:center;">
                          <?php if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
-						
+
 								<table     cellspacing="0" cellpadding="2" style="text-align:center;margin:auto; border: 0px solid #bfbfcf;">
 									<tr id="nofac1row">
-										
+
 										<td align="center" id="Ver Factura">
 	<?php if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 												<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;" width="220" height=100>
@@ -1583,12 +1585,12 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 															<?php } ?>
 													<tr>
 														<td align="left" colspan=3>
-															<?php if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {  
+															<?php if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 																  echo __('Factura N°') .": <input name='documento' size='5' value='". $cobro->fields['documento'] ."'>";
 																  if (UtilesApp::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
 																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,600,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
-																	<?php }  
-																 } else { 
+																	<?php }
+																 } else {
 																  echo __('Factura N°') .": <input name='documento' size='5' value='". $cobro->fields['documento'] ."'>";
 																  if (UtilesApp::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
 																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,600,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
@@ -1615,7 +1617,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 												</table>
 	<?php } ?>
 										</td>
-									</tr>                                                     
+									</tr>
 								</table>
 <?php } ?>
 							 <br /><br /><div id="retorno" style="display:none;" >Caja Respuesta</div>
@@ -1626,9 +1628,9 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                         <!-- Submit -->
                        <div style=" clear:both;margin:auto;">
     <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>&popup=1"  class="iframeinterno" style="width:100%;height:550px;border: none;" frameborder="0"></iframe>
-</div> 
-                     
-               
+</div>
+
+
                 <!-- Fin FORM unica -->
             </div> <!-- FIN TABLA CABECERA (la que tiene el avance del cobro, la lista de facturas, etc) -->
 
@@ -1725,7 +1727,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                         <td align="left" colspan="2" style="font-size: 10px;">
                                             <table width="100%">
                                                 <tr>
-                                                    <td width="40%" align="left">																	
+                                                    <td width="40%" align="left">
                                                         <input type="checkbox" name="opc_ver_detalles_por_hora_iniciales" id="opc_ver_detalles_por_hora_iniciales" value="1" <?php echo $cobro->fields['opc_ver_detalles_por_hora_iniciales'] == '1' ? 'checked' : '' ?>>
                                                         <label for="opc_ver_detalles_por_hora_iniciales"><?php echo __('Iniciales') ?></label>
                                                     </td>
@@ -1773,7 +1775,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                         <td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
                                     </tr>
-                                    <tr>        
+                                    <tr>
                                         <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
                                     </tr>
@@ -1887,18 +1889,18 @@ if ($solicitante == 0) {  // no mostrar
                     </tr>
                     <tr>
                         <td align="center" colspan="2">
-							<?php echo __('Idioma') .':'. Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80);  
-                            
-                                                       
-							 
+							<?php echo __('Idioma') .':'. Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80);
+
+
+
 							 $cobro->BotoneraCobro();
-							 
+
 							 // Tuve que dejar afuera este botón porque necesita de un dato de esta pantalla
-							 if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['exportacion_ledes']) { 
+							 if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['exportacion_ledes']) {
 								 echo " <br class=\"clearfix vpx\" /><a class=\"btn botonizame\"   setwidth=\"185\" onclick=\"return DescargarLedes(jQuery('#todo_cobro').get(0));\">". __('Descargar LEDES') ." </a>";
 							 }
 							 ?>
-							
+
                         </td>
                     </tr>
                 </table>
@@ -1943,7 +1945,7 @@ if ($solicitante == 0) {  // no mostrar
     </div>
 </div>
 
- 
+
 
 
 <div id="TipoCambioDocumento" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
@@ -1993,7 +1995,7 @@ if ($solicitante == 0) {  // no mostrar
 <!-- Fin Tipo Cambio -->
 <div id="clip" style="background:url('https://static.thetimebilling.com/images/clip.png') no-repeat;position:absolute;top:250px;left:500px;display:none;height: 200px;width: 250px;"></div>
 <script type="text/javascript">
-   
+
 
 <?php if ($cobro->fields['estado'] == "PAGADO" && UtilesApp::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 		$("estado").value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
@@ -2003,17 +2005,16 @@ if ($solicitante == 0) {  // no mostrar
 <?php } ?>
 	jQuery('.iframeinterno').load(function() {
 		console.log(jQuery('.iframeinterno'));
-		
-		
-		
+
+
+
 	});
-	
+
 	// var t=setTimeout("jQuery('#clip').fadeIn(1000);",6000);
 
-	
+
 </script>
 
 <?php
 $pagina->PrintBottom($popup);
 
- 
