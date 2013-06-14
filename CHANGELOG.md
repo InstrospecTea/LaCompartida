@@ -1,4 +1,11 @@
 # Changelog
+## Hotfix: 13.4.1
+Viernes 14 de Junio 2013
+* **Fixed:** [Agrega/recupera filtro (fecha facturación) en reporte avanzados](https://github.com/LemontechSA/ttb/pull/209)
+* **Fixed:** [Corrección a editar en (agregar_asunto.php) codigo secundario](https://github.com/LemontechSA/ttb/pull/209)
+* **Fixed:** [Corrección del Conf 'SeEstaCobrandoEspecial' que sólo ocupa BMAJ](https://github.com/LemontechSA/ttb/pull/209)
+* **Fixed:** [Corrige el autocompletador de clientes para los clientes con codigo_secundario](https://github.com/LemontechSA/ttb/pull/209)
+
 ## Release: 13.4.0
 Jueves 13 de junio 2013.
 * **New:** [Mostrar la planilla antiguedad deuda por monto facturado](https://github.com/LemontechSA/ttb/pull/105)
@@ -16,15 +23,15 @@ Jueves 13 de junio 2013.
 * **New:** [Nueva API para integrar las aplicaciones iPhone y Mac](https://github.com/LemontechSA/ttb/pull/207)
 
 ## hotfix: 13.3.30
-Viernes 12 de Junio 2013
+Miércoles 12 de Junio 2013
 * **Fixed:** [Campos de texto para nota cobro cuestacampos](https://github.com/LemontechSA/ttb/pull/205)
 
 ## hotfix: 13.3.29
-Viernes 11 de Junio 2013
+Martes 11 de Junio 2013
 * **Fixed:** [Correccion glosa_cliente en interfaz listado tramites](https://github.com/LemontechSA/ttb/pull/204)
 
 ## hotfix: 13.3.28
-Viernes 10 de Junio 2013
+Lunes 10 de Junio 2013
 * **Fixed:** [Correccion glosa_cliente en excel tramites](https://github.com/LemontechSA/ttb/pull/203)
 
 ## hotfix: 13.3.27
