@@ -950,17 +950,22 @@ if ($usuario_responsable_obligatorio) {
 								?>
 
 								<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
-								<?php
-								if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . substr($asunto->fields['codigo_asunto_secundario'], -$caracteres) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/> 
-						<span style='color:#FF0000; font-size:10px'>*</span>";
-								} else {
-									if ($asunto->fields['codigo_asunto_secundario'] != '')
-										list( $codigo_cli_sec, $codigo_asunto_secundario ) = split("-", $asunto->fields['codigo_asunto_secundario']);
-									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='20' value='" . $codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
-						<span style='font-size:10px'>(" . __('Opcional') . ")</span>";
-								}
-								?>
+<?php
+
+if (empty($opcion)){
+	$caracteres = strlen($cliente->fields['codigo_cliente']);	
+}
+$field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], -$caracteres);
+
+if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='color:#FF0000; font-size:10px'>*</span>";
+} else {
+	if ($asunto->fields['codigo_asunto_secundario'] != ''){
+		list( $codigo_cli_sec, $codigo_asunto_secundario ) = split("-", $asunto->fields['codigo_asunto_secundario']);
+	}
+	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='20' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='font-size:10px'>(" . __('Opcional') . ")</span>";
+}
+?>
 							</td>
 						</tr>
 						<?php if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
