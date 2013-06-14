@@ -139,6 +139,14 @@ The Time Billing - Time Tracking
 
     $ cap production deploy
 
+##API
+
+Activar el módulo del RewriteEngine de Apache2.
+$ sudo a2enmod rewrite
+
+Reiniciar Apache2 para que tenga en cuenta al módulo recién activado.
+$ sudo service apache2 restart
+
 ##Test
 ###Pruebas de Integración
   * Duplica el archivo app/test/spec/conf.rb.default con el nombre app/test/spec/conf.rb y configura tu sitio local

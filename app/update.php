@@ -9707,7 +9707,7 @@ QUERY;
 			break;
 		case 7.31:
 			$queries = array();
-			if (!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
@@ -9734,7 +9734,7 @@ QUERY;
 			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
 			}
-			
+
 			ejecutar($queries, $dbh);
 			break;
 
@@ -9751,7 +9751,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CP',  'Cheque',  '8')";
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'TP',  'Transferencia',  '9')";
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'OP',  'Otro',  '10')";
-						
+
 			ejecutar($queries, $dbh);
 			break;
 
@@ -9760,27 +9760,27 @@ QUERY;
 			$queries = array();
 
 			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
-			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
+				$queries[] = "ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
 			}
-			
-			$queries[]=" update cta_corriente cc 
-					join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
-	 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
-					set cc.id_cobro=doc.id_cobro,
+
+			$queries[] = "UPDATE cta_corriente cc
+					INNER JOIN documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
+	 				INNER JOIN neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
+					SET cc.id_cobro=doc.id_cobro,
 						cc.id_neteo_documento=nd.id_neteo_documento,
 						cc.documento_pago=nd.id_documento_pago
-				where cc.incluir_en_cobro='NO' ";
+					WHERE cc.incluir_en_cobro = 'NO' ";
 
-		
-		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
-			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
+			if (!ExisteIndex('id_neteo_documento', $tabla, $dbh))	{
+				$queries[] = "ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
 			}
-		if(!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) )	 {
-			$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			if (!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) ) {
+				$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			}
-		ejecutar($queries, $dbh);
-		break;
-		
+
+			ejecutar($queries, $dbh);
+			break;
+
 		case 7.36:
 			$query = array();
 			$comentario = 'Esta opcion limita la generacion de codigos de cliente a solo 4 digitos';
@@ -9794,15 +9794,50 @@ QUERY;
 				}
 			}
 
-			break;
+		break;
 
 		case 7.37:
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_tipo_correo` (
+							  `id` int(11) NOT NULL AUTO_INCREMENT,
+							  `nombre` varchar(45) DEFAULT NULL,
+							  PRIMARY KEY (`id`),
+							  UNIQUE KEY `nombre` (`nombre`)
+							) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;";
+
+			if(!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_usuario` INT NULL AFTER `id_log_correo;";
+			}
+			if(!ExisteCampo('tipo_id', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_tipo_correo` INT NULL  AFTER `id_usuario`;";
+			}
+			if(!ExisteCampo('fecha_envio', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_envio` DATETIME NULL DEFAULT NULL  AFTER `enviado`;";
+			}
+			if(!ExisteCampo('intento_envio', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `intento_envio` INT NULL  AFTER `fecha_envio`;";
+			}
+			if(!ExisteCampo('fecha_modificacion', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_modificacion` DATETIME NULL DEFAULT NULL  AFTER `fecha`;";
+			}
+			if(!ExisteIndex('fk_log_correo_tipo_correo', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD CONSTRAINT `fk_log_correo_tipo_correo` FOREIGN KEY (`id_tipo_correo`) REFERENCES `prm_tipo_correo` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, ADD INDEX `fk_log_correo_tipo_correo` (`id_tipo_correo` ASC);";
+			}
+			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha WHERE fecha_modificacion IS NULL;";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'diario';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'semanal';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspension_pago_comision';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'prueba';";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.38:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO prm_excel_cobro (`id_prm_excel_cobro` ,`nombre_interno` ,`grupo` ,`glosa_es` ,`glosa_en` ,`tamano`)VALUES (NULL ,  'solicitante',  'Listado de gastos',  'Solicitante',  'Applicant',  '10')";
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.38:
+		case 7.39:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO  factura_pdf_datos_categoria (`id_factura_pdf_datos_categoria` ,`glosa`)VALUES (NULL ,  'Comodines')";
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_codigo` (
@@ -9817,6 +9852,68 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.40:
+			$queries = array();
+			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			$queries[] = "CREATE TABLE IF NOT EXISTS `cliente_seguimiento` (
+										`id` int(11) NOT NULL AUTO_INCREMENT,
+										`codigo_cliente` varchar(10) NOT NULL,
+										`comentario` text NOT NULL,
+										`id_usuario` int(11) NOT NULL,
+										`fecha_creacion` datetime NOT NULL,
+										`fecha_modificacion` datetime NOT NULL,
+										PRIMARY KEY (`id`),
+										KEY `id_usuario` (`id_usuario`),
+										KEY `codigo_cliente` (`codigo_cliente`)
+										) ENGINE=InnoDB;";
+
+			if (!ExisteLlaveForanea('cliente_seguimiento', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente_seguimiento`
+			  	ADD CONSTRAINT `cliente_seguimiento_ibfk_1` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`)";
+			}
+
+			if (!ExisteLlaveForanea('cliente_seguimiento', 'id_usuario', 'usuario', 'id_usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente_seguimiento`
+					ADD CONSTRAINT `cliente_seguimiento_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`);";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.41:
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `user_device` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`user_id` int(11) NOT NULL,
+				`token` varchar(120) NOT NULL DEFAULT '',
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`id`),
+				KEY `user_device_user_id` (`user_id`),
+				KEY `user_device_user_id_token` (`user_id`, `token`),
+				CONSTRAINT `user_device_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `user_token` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`user_id` int(11) NOT NULL,
+				`auth_token` varchar(60) NOT NULL DEFAULT '',
+				`app_key` varchar(250) NOT NULL,
+				`expiry_date` datetime NOT NULL,
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`id`),
+				KEY `user_token_user_id` (`user_id`),
+				KEY `user_token_auth_token` (`auth_token`),
+				CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			if (!ExisteCampo('receive_alerts', 'usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9826,7 +9923,8 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.38;
+$max_update = 7.41;
+
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

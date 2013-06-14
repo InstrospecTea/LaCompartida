@@ -1,10 +1,25 @@
 # Changelog
-## hotfix: 13.3.28
+## Release: 13.4.0
+Jueves 13 de junio 2013.
+* **New:** [Mostrar la planilla antiguedad deuda por monto facturado](https://github.com/LemontechSA/ttb/pull/105)
+* **New:** [Revisión de logs de correos enviados](https://github.com/LemontechSA/ttb/pull/126)
+* **Fixed:** [Refresca la pantalla de borradores luego de generarlos](https://github.com/LemontechSA/ttb/pull/138)
+* **New:** [Plugin para convertir las provisiones en adelantos](https://github.com/LemontechSA/ttb/pull/145)
+* **Fixed:** [Mover los links de dichos reportes a la sección "varios" en reportes específicos](https://github.com/LemontechSA/ttb/pull/146)
+* **Fixed:** [Correcciones al webservice y metaquery](https://github.com/LemontechSA/ttb/pull/150)
+* **New:** [Nueva planilla de saldo clientes como cuenta bancaria](https://github.com/LemontechSA/ttb/pull/153)
+* **New:** [Link al cuadro de logs en algunas pantallas](https://github.com/LemontechSA/ttb/pull/163)
+* **New:** [Datatables funcionando con SimpleReport](https://github.com/LemontechSA/ttb/pull/179)
+* **New:** [Filtro adelantos en seguimiento de cobro](https://github.com/LemontechSA/ttb/pull/186)
+* **New:** [Reporte avanzado permite guardar todos los campos del reporte](https://github.com/LemontechSA/ttb/pull/191)
+* **Fixed:** [Corrige cálculo de filas en sección trabajo](https://github.com/LemontechSA/ttb/pull/197)
+* **New:** [Nueva API para integrar las aplicaciones iPhone y Mac](https://github.com/LemontechSA/ttb/pull/207)
+
+## hotfix: 13.3.30
 Viernes 12 de Junio 2013
 * **Fixed:** [Campos de texto para nota cobro cuestacampos](https://github.com/LemontechSA/ttb/pull/205)
 
-
-## hotfix: 13.3.28
+## hotfix: 13.3.29
 Viernes 11 de Junio 2013
 * **Fixed:** [Correccion glosa_cliente en interfaz listado tramites](https://github.com/LemontechSA/ttb/pull/204)
 

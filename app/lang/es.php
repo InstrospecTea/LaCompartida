@@ -1083,3 +1083,36 @@ $_LANG['es_Hrs Trabajadas']="Hrs Trabajadas";
 $_LANG['en_Hrs Trabajadas']="Worked Hours";
 
 $_LANG['Código Postal'] = "Código Postal";
+
+
+/* Langs para API REST Errors */
+$_LANG["Invalid AUTH TOKEN"] = "Sesión de usuario inválida";
+$_LANG["Expired AUTH TOKEN"] = "Sesión de usuario expiró";
+$_LANG["Invalid user data"] = "Datos del usuario inválidos";
+$_LANG["Invalid user ID"] = "Identificación del usuario inválida";
+$_LANG["The user doesn't exist"] = "El usuario no existe";
+$_LANG["Invalid password data"] = "El password es incorrecto";
+$_LANG["Invalid application key data"] = "Aplicación no válida";
+$_LANG["Invalid client code"] = "El código del cliente no es válido";
+$_LANG["Invalid work ID"] = "El id del trabajo no es válido";
+$_LANG["The work doesn't exist"] = "El trabajo no existe";
+$_LANG["The client doesn't exist"] = "El cliente no existe";
+$_LANG["The date format is incorrect"] = "El formato de la fecha es incorrecto";
+$_LANG["The created date format is incorrect"] = "La fecha de creación del trabajo es incorrecta";
+$_LANG["The duration format is incorrect"] = "La duración del trabajo es incorrecta";
+$_LANG["Unexpected error when saving data"] = "Error al intentar guardar";
+$_LANG["Unexpected error deleting data"] = "Error al intentar eliminar";
+$_LANG["Invalid Description"] = "Descripción Inválida";
+$_LANG["Work is already charged"] = "No se puede modificar un trabajo Cobrado";
+$_LANG["The work is revised"] = "No se puede modificar un trabajo Revisado";
+$_LANG["The hours entered must be greater than 0"] = "Las horas ingresadas deben ser mayores que 0";
+$_LANG["You can not enter more than"] = "No puede ingresar más de";
+$_LANG["hours per day"] = "Horas por día";
+$_LANG["The activity doesn't exist"] = "La actividad no existe";
+$_LANG["The area code doesn't exist"] = "El área no existe";
+$_LANG["Invalid area code"] = "Area inválida";
+$_LANG["Invalid matter code"] = "Asunto inválido";
+$_LANG["The matter doesn't exist"] = "El Asunto no existe";
+$_LANG["You can not enter hours prior to"] = "No puede ingresar horas anteriores al";
+$_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %HOURS horas de un mínimo de %MINIMUM";
+$_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";

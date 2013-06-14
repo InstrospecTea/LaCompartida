@@ -315,6 +315,7 @@ if (UtilesApp::GetConf($sesion, 'SoloGastos')) {
 				close:function(ev,ui) {
 					jQuery(this).html('');
 					interrumpeproceso=1;
+					jQuery('#boton_buscar').click();
 				},
 				open: function() {
 					jQuery('.ui-dialog-titlebar').addClass('ui-icon-warning');
@@ -351,7 +352,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaGG=function(i) {
 																	 if(i>=largoGG) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestagg').html('Proceso finalizado: se ha generado '+largoGG+' liquidaciones de gastos. ('+errores+' con errores)');
+																		 jQuery('#respuestagg').html('Proceso finalizado: se ha generado '+largoGG+' liquidaciones de gastos. ('+errores+' con errores). <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -371,7 +372,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaHH=function(j) {
 																	 if(j>=largoHH) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestahh').html('Proceso finalizado: se ha generado '+largoHH+' liquidaciones de honorarios. ('+errores+' con errores)');
+																		 jQuery('#respuestahh').html('Proceso finalizado: se ha generado '+largoHH+' liquidaciones de honorarios. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -391,7 +392,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaMIXTAS=function(k) {
 																	 if(k>=largoMIXTAS ) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado '+largoMIXTAS+' liquidaciones mixtas. ('+errores+' con errores)');
+																		 jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado '+largoMIXTAS+' liquidaciones mixtas. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -453,7 +454,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 															var generaClientes=function(k) {
 																if(k>=largoClientes) {
 																	jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																	jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado '+largoClientes+' clientes. ('+errores+' con errores)');
+																	jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado '+largoClientes+' clientes. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																	jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																	jQuery('#loading, #nocerrar').hide();
 																	jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -575,6 +576,7 @@ Impresión de cobros
 														 close:function(ev,ui) {
 															 jQuery(this).html('');
 															 interrumpeproceso=1;
+
 														 },
 														 open: function() {
 															 jQuery('.ui-dialog-titlebar').addClass('ui-icon-warning');
@@ -765,11 +767,13 @@ else
 
 
 					jQuery( this ).dialog( "close" );
+					jQuery('#boton_buscar').click();
 					return true;
 				},
 				"<?php echo __('Cerrar') ?>": function() {
 
 					jQuery( this ).dialog( "close" );
+					jQuery('#boton_buscar').click();
 					return false;
 				}
 			}
@@ -1157,14 +1161,17 @@ function funcionTR(& $contrato) {
 					(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);
 			$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'><td width=3%>&nbsp;<img src='" . Conf::ImgDir() . "/color_amarillo.gif' border=0></td>
 									<td align=center width=5% style='font-size:10px'>#" . $cobro->fields['id_cobro'] . "</td>
-									<td align=left width=84% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
+									<td align=left width=82% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
 
-			$html .= "<td align=center width=8%><img src='" . Conf::ImgDir() . "/editar_on.gif' title='" . __('Continuar con el cobro') . "' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Cobro',1050,690,'cobros5.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1');\">&nbsp;";
-			if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-				$html .= "<img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
-			else
-				$html .= "<img src='" . Conf::ImgDir() . "/cruz_roja.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
+
+			$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
+			$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='".__('Continuar con el cobro')."' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true', '');\">&nbsp;</a>";
+			$html .=  "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='".__('Eliminar cobro')."'  onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\">&nbsp;</a>";
+			$html .=	UtilesApp::LogDialog($sesion, 'cobro',$cobro->fields['id_cobro']);
+
+			$html .= "</td>";
 		}
+		
 		$html .= "</tr></table></div>";
 		$html .= "</td></tr>\n";
 		#FIN DIV borrador

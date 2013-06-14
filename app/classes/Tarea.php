@@ -63,7 +63,7 @@ class Tarea extends Objeto
 				$where .= ' AND ('.implode(' OR ',$conjunto_estados).') ';
 		}
 
-		
+
 		$query = " SELECT SQL_CALC_FOUND_ROWS
 						tarea.id_tarea,
 						tarea.prioridad,
@@ -96,7 +96,7 @@ class Tarea extends Objeto
 						JOIN cliente ON tarea.codigo_cliente = cliente.codigo_cliente
 						JOIN asunto  ON tarea.codigo_asunto = asunto.codigo_asunto
 					WHERE 1 $where ";
-						
+
 		return $query;
 	}
 
@@ -152,7 +152,7 @@ class Tarea extends Objeto
 		else if($estado == 'Por Revisar')
 		{
 			$l = 'R';
-			$color = 'rgb(144,3,163)';		
+			$color = 'rgb(144,3,163)';
 		}
 		else if($estado == 'Lista')
 		{
@@ -161,11 +161,11 @@ class Tarea extends Objeto
 		}
 
 		if($verboso)
-			return __('Estado').': <span style="color: '.$color.'" >'.$estado.'</span>';	
-		return '<span style="color: '.$color.'" title="Estado: '.$estado.'" ><b>'.$l.'</b></span>';	
+			return __('Estado').': <span style="color: '.$color.'" >'.$estado.'</span>';
+		return '<span style="color: '.$color.'" title="Estado: '.$estado.'" ><b>'.$l.'</b></span>';
 	}
-	
-	
+
+
 function Write()
 	{
 		$this->error = "";
@@ -240,19 +240,19 @@ function Write()
 		}
 		else
 			$where = " id_usuario=0";
-			
-		$query = " SELECT c.glosa_cliente, a.glosa_asunto 
-								FROM tarea AS t 
+
+		$query = " SELECT c.glosa_cliente, a.glosa_asunto
+								FROM tarea AS t
 								JOIN cliente AS c ON t.codigo_cliente=c.codigo_cliente
 								JOIN asunto AS a ON t.codigo_asunto=a.codigo_asunto
 								WHERE id_tarea=".$this->fields['id_tarea'];
 		$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($nombre_cliente,$glosa_asunto)=mysql_fetch_array($resp);
-		
-		
+
+
 		if($glosa_asunto)
 		$texto_asunto = "Asunto: ".$glosa_asunto."<br>";
-		
+
 		$query = "SELECT id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) AS nombre, email FROM usuario WHERE activo=1 AND ".$where;
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		while(list($id,$nombre,$email) = mysql_fetch_array($resp))
@@ -261,14 +261,44 @@ function Write()
                         $query2 = "SELECT rut, dv_rut, password FROM usuario WHERE id_usuario=".$id;
 			$resp2 = mysql_query($query2,$this->sesion->dbh) or Utiles::errorSQL($query2,$this->sesion->dbh);
 			list($rut,$dv_rut,$password)=mysql_fetch_array($resp2);
-                        */ 
-			
+                        */
+
 			$subject = "[Tarea] ".$this->fields['nombre'];
 			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí</a>).";
-			
+
 			Utiles::Insertar($this->sesion,$subject,$mensaje,$email,$nombre,false);
 		}
 		return true;
+	}
+
+	/**
+	 * Find all tasks
+	 * Return an array with next elements:
+	 * 	code, name, client_code, matter_code
+	 */
+	function findAll() {
+		$tasks = array();
+
+		$sql = "SELECT `tasks`.`id_tarea` AS `code`, `tasks`.`nombre` AS `name`, `tasks`.`codigo_cliente` AS `client_code`,
+			`tasks`.`codigo_asunto` AS `matter_code`
+			FROM `tarea` AS `tasks`
+			ORDER BY `tasks`.`nombre` ASC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->execute();
+
+		while ($task = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($tasks,
+				array(
+					'code' => $task->code,
+					'name' => !empty($task->name) ? $task->name : null,
+					'client_code' => !empty($task->client_code) ? $task->client_code : null,
+					'matter_code' => !empty($task->matter_code) ? $task->matter_code : null
+				)
+			);
+		}
+
+		return $tasks;
 	}
 }
 

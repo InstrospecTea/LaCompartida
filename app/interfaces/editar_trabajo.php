@@ -796,8 +796,8 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 					}
 				?>
 				<td colspan="2" align=right>
-					<?php	if ($mostrar_cobrable) { ?>
-					<?php echo __('Cobrable')?><br/>
+					<?php if ($mostrar_cobrable) { ?>
+						<?php echo __('Cobrable')?><br/>
 					<?php } ?>
 				</td>
 				<td align=left>

@@ -1,13 +1,13 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('REP'));
-$pagina = new Pagina($sesion);
 $agrupadores = explode('-', $vista);
-$pagina->PrintTop(1);
-?>
 
-<!-- ESTILOS -->
-<?php
+if (!$ajax) {
+	$pagina = new Pagina($sesion);
+	$pagina->PrintTop(1);
+}
+
 $email_style = array();
 $email_style_valor = array();
 
@@ -520,5 +520,6 @@ if (sizeof($r) == 2) {
 	});
 </script>
 <?php
-$pagina->PrintBottom($popup);
-?>
+if (!$ajax) {
+	$pagina->PrintBottom($popup);
+}

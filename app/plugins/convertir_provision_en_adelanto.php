@@ -4,6 +4,24 @@ $Slim = Slim::getInstance('default', true);
 
 
 $Slim->hook('hook_agregar_gasto_inicio', 'Boton_Convertir_Adelanto');
+$Slim->hook('hook_formulario_gastos', 'Selector_Gasto_Provision');
+
+ function Selector_Gasto_Provision() {
+ 	global $sesion;
+ 	if(UtilesApp::GetConf($sesion, 'NuevoModuloGastos') && 	$sesion->usuario->TienePermiso('SADM')) {
+ 			echo '<tr>
+								<td align="right"> '. __('Gastos').' y '. __('Provisiones').'</td>';
+			echo '					<td colspan="2" align="left">
+									<select name="egresooingreso" id="egresooingreso" style="width: 140px;">
+										<option value=""  selected="selected"> '. __('Gastos').' y '. __('Provisiones') .'</option>';
+			echo '						<option value="soloingreso"> Sólo '. __('provisiones') .'</option>';
+			echo '						<option value="sologastos"> Sólo '. __('gastos') .'</option>';
+			echo '					</select>
+								</td>
+								<td></td>
+							</tr>';
+ 	}
+ }
 
  
 

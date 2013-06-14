@@ -426,13 +426,14 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 			
 			var respuesta='';
+
 			/*mejorar*/
 			var estado = o.aData[9].replace('</small>','').replace('<small>','');
 			if(estado=='SIN COBRO' || estado=='CREADO' || estado=='EN REVISION') {
 				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[0]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[0]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
 				respuesta+="<input type='checkbox' class='eligegasto' id='check_"+o.aData[0]+"'/>";
 			} else {
-				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
+				respuesta+="<a href=\"#\"  style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
 			}
 
 			return respuesta;
@@ -450,8 +451,9 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 		}, "aTargets": [4]},
 
 		{"fnRender": function (o,val) {
-			var activo = (o.aData[12] == 'SI') ? 'activo' :'inactivo';
-			if (typeof(contratos)!="undefined") {
+			var activo=(o.aData[12] == 'SI') ? 'activo' :'inactivo';
+			if (typeof(contratos) != "undefined") {
+
 				contratos['contrato_' + o.aData[0]] = o.aData[12];
 			}
 			 var datacliente=o.aData[3].split('|');
@@ -648,9 +650,11 @@ function Refrescar() {
 								</td>
 								<td></td>
 							</tr>
-<?php } else { ?>
-	<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />
-<?php } ?>
+<?php } else {  
+	echo '<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />';
+  	$Slim=Slim::getInstance('default')  ? $Slim->applyHook('hook_formulario_gastos') : false;	
+	}
+ ?>
 							<tr>
 								<td align=right><?php echo __('Moneda') ?></td>
 								<td colspan="2" align="left">
