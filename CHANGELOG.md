@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.4.2
+Lunes 17 de Junio 2013
+* **Fixed:** [Corrige generacion de excel en reporte avanzados](https://github.com/LemontechSA/ttb/pull/210)
+
 ## Hotfix: 13.4.1
 Viernes 14 de Junio 2013
 * **Fixed:** [Agrega/recupera filtro (fecha facturación) en reporte avanzados](https://github.com/LemontechSA/ttb/pull/209)
