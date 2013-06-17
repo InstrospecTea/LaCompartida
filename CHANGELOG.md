@@ -5,6 +5,7 @@ Viernes 14 de Junio 2013
 * **Fixed:** [Corrección a editar en (agregar_asunto.php) codigo secundario](https://github.com/LemontechSA/ttb/pull/209)
 * **Fixed:** [Corrección del Conf 'SeEstaCobrandoEspecial' que sólo ocupa BMAJ](https://github.com/LemontechSA/ttb/pull/209)
 * **Fixed:** [Corrige el autocompletador de clientes para los clientes con codigo_secundario](https://github.com/LemontechSA/ttb/pull/209)
+* **Fixed:** [Corrige método QueriesPrevias (static) en ReporteContrato](https://github.com/LemontechSA/ttb/pull/209)
 
 ## Release: 13.4.0
 Jueves 13 de junio 2013.
