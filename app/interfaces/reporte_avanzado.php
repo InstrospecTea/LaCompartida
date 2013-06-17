@@ -213,6 +213,7 @@ $explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 $explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
 $explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
+$explica_periodo_facturacion = 'Sólo considera Trabajos en Cobros con fecha de facturación en el Periodo';
 
 $tipos_moneda = Reporte::tiposMoneda();
 
@@ -796,7 +797,7 @@ if (!$popup) {
 													&nbsp;
 												</td>
 												<td align="right">
-													<span title="<?php echo __($explica_periodo_envio) ?>">
+													<span title="<?php echo __($explica_periodo_facturacion) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_facturacion" value="facturacion"
 														<?php
 														if ($campo_fecha == 'facturacion') {
@@ -807,7 +808,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align="left">
-													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Facturacion'); ?></label>
+													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Facturación'); ?></label>
 												</td>
 											</tr>
 											<tr>

@@ -207,7 +207,7 @@ class Reporte {
 			$this->campo_fecha_cobro = 'cobro.fecha_enviado_cliente';
 			$this->campo_fecha_cobro_2 = '';
 		}
-		if ($campo_fecha == 'envio') {
+		if ($campo_fecha == 'facturacion') {
 			$this->campo_fecha = 'cobro.fecha_facturacion';
 			$this->campo_fecha_2 = '';
 			$this->campo_fecha_3 = '';
