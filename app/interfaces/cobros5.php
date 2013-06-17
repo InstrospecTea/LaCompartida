@@ -1725,10 +1725,11 @@ if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
 	$columnas = '';
 }
 
-if ($cobro->fields['se_esta_cobrando'])
+if (trim($cobro->fields['se_esta_cobrando']) != '') {
 	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+}
 ?>
-							<textarea name="se_esta_cobrando" <?php echo $disabled . ' ' . $lineas . ' ' . $columnas; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
+							<textarea name="se_esta_cobrando" <?php echo "$lineas $columnas $disabled"; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
 						</td>
 					</tr>
 				</table>
