@@ -519,7 +519,7 @@ function ActualizarPeriodo(fi, ff) {
 function SeleccionarSelector() {
 	var month = jQuery('#fecha_mes').val();
 	var year = jQuery('#fecha_anio').val();
-	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month, 1));
+	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month-1, 1));
 	jQuery('#fecha_fin').datepicker('setDate', new Date(year, month, 0));
 
 	jQuery('#reporte_envio_selector').show();
@@ -578,12 +578,18 @@ function Generar(form, valor) {
 	var form_id = form.attr('id');
 	var action = '';
 	var ajax = false;
-	jQuery('#' + form_id + ' [value="opc"]').val(valor);
-	jQuery('#' + form_id + ' [value="vista"]').val(jQuery('#agrupador_0').val());
+	jQuery('#' + form_id + ' [name="opc"]').val(valor);
+	
+	var value = jQuery('#agrupador_0').val();
+	
 	var numero_agrupadores = jQuery('#numero_agrupadores').val();
+	
 	for (i = 1; i < numero_agrupadores; ++i) {
-		form.vista.value += '-' + jQuery('#agrupador_' + i).val();
+		value += '-' + jQuery('#agrupador_' + i).val();
 	}
+	jQuery('#vista').val(value);
+	//console.log(value);
+	//return false;
 	switch (valor) {
 		case 'pdf':
 			action = 'html_to_pdf.php?frequire=reporte_avanzado.php&popup=1';
