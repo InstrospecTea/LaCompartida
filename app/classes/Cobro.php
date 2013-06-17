@@ -29,6 +29,11 @@ class Cobro extends Objeto {
 			!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 			$ingreso_historial = true;
 		}
+
+		if (UtilesApp::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
+			$this->Edit('se_esta_cobrando', $this->GlosaSeEstaCobrandoEspecial());
+		}
+
 		if (parent::Write()) {
 			if ($ingreso_historial) {
 				// Esa linea es necesaria para que el estado no se guardará dos veces
@@ -48,6 +53,27 @@ class Cobro extends Objeto {
 			}
 			return true;
 		}
+	}
+
+	function GlosaSeEstaCobrandoEspecial() {
+		$se_esta_cobrando = "Honorarios Profesionales\nPeriodo Comprendido: \n";
+
+		if ($this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini'])) {
+			$se_esta_cobrando_fecha_ini = Utiles::sql2date($this->fields['fecha_ini']);
+			$se_esta_cobrando .= __('Desde') . ": $se_esta_cobrando_fecha_ini\n";
+		}
+
+		if ($this->fields['fecha_fin'] != '0000-00-00' && !empty($this->fields['fecha_fin'])) {
+			$se_esta_cobrando_fecha_fin = Utiles::sql2date($this->fields['fecha_fin']);
+			$se_esta_cobrando .= __('Hasta') . ": $se_esta_cobrando_fecha_fin\n";
+		}
+
+		$simbolo = Moneda::GetSimboloMoneda($this->sesion, $this->fields['id_moneda']);
+		$se_esta_cobrando .= "Tarifa Cobrada: $simbolo {$this->fields['monto']}\n";
+		$simbolo = Moneda::GetSimboloMoneda($this->sesion, Moneda::GetMonedaBase($this->sesion));
+		$se_esta_cobrando .= "Tipo de cambio: $simbolo {$this->fields['tipo_cambio_moneda']}\n";
+
+		return $se_esta_cobrando;
 	}
 
 	function BotoneraCobro() {
@@ -1596,25 +1622,6 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']); #revisar 15-05-2009
 
 		if ($this->Write()) {
-			if (UtilesApp::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
-				$se_esta_cobrando = "Honorarios Profesionales\n";
-				$se_esta_cobrando .= "Periodo Comprendido: \n";
-
-				if ($this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini'])) {
-					$se_esta_cobrando_fecha_ini = Utiles::sql2date($this->fields['fecha_ini']);
-					$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini . "\n";
-				}
-				if ($this->fields['fecha_fin'] != '0000-00-00' && !empty($this->fields['fecha_fin'])) {
-					$se_esta_cobrando_fecha_fin = Utiles::sql2date($this->fields['fecha_fin']);
-					$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin . "\n";
-				}
-				$se_esta_cobrando .= "Tarifa Cobrada: ";
-				$se_esta_cobrando .= $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . " ";
-				$se_esta_cobrando .= $this->fields['monto'];
-
-				$this->Edit('se_esta_cobrando', $se_esta_cobrando);
-				$this->Write();
-			}
 			if ($emitir) {
 				if ($provision && $provision_original && UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 

@@ -207,6 +207,14 @@ class Reporte {
 			$this->campo_fecha_cobro = 'cobro.fecha_enviado_cliente';
 			$this->campo_fecha_cobro_2 = '';
 		}
+		if ($campo_fecha == 'facturacion') {
+			$this->campo_fecha = 'cobro.fecha_facturacion';
+			$this->campo_fecha_2 = '';
+			$this->campo_fecha_3 = '';
+
+			$this->campo_fecha_cobro = 'cobro.fecha_facturacion';
+			$this->campo_fecha_cobro_2 = '';
+		}
 	}
 
 	//Los Agrupadores definen GROUP y ORDER en las queries.

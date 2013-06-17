@@ -5,7 +5,7 @@
 	$pedazo = strtolower(utf8_decode($_POST['term']));
 	$codigo_cliente = $_POST['codigo_cliente'];
 	$id=Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_asunto_secundario':'codigo_asunto';
-	$campocodigocliente=Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_secundario':'codigo_cliente';
+	$campocodigocliente=Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_cliente_secundario':'codigo_cliente';
 
 	$id_usuario=empty($_POST['id_usuario'])?  $sesion->usuario->fields['id_usuario']:$_POST['id_usuario'];
 	

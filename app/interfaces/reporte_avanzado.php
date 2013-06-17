@@ -213,6 +213,7 @@ $explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 $explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
 $explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
+$explica_periodo_facturacion = 'Sólo considera Trabajos en Cobros con fecha de facturación en el Periodo';
 
 $tipos_moneda = Reporte::tiposMoneda();
 
@@ -350,6 +351,8 @@ if (!$popup) {
 			} else if (campo_fecha == 'corte') {
 				s = '<?php echo __("Corte") ?>';
 			} else if (campo_fecha == 'envio') {
+				s = '<?php echo __("Facturacion") ?>';
+			} else if (campo_fecha == 'facturacion') {
 				s = '<?php echo __("Envío") ?>';
 			} else {
 				s = '<?php echo __("Emisión") ?>';
@@ -775,7 +778,7 @@ if (!$popup) {
 													<span title="<?php echo __($explica_periodo_envio) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_envio" value="envio"
 														<?php
-														if ($campo_fecha == 'emision') {
+														if ($campo_fecha == 'envio') {
 															echo 'checked="checked"';
 														}
 														?>
@@ -784,6 +787,28 @@ if (!$popup) {
 												</td>
 												<td align="left">
 													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Envio'); ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													&nbsp;
+												</td>
+												<td align="left">
+													&nbsp;
+												</td>
+												<td align="right">
+													<span title="<?php echo __($explica_periodo_facturacion) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_facturacion" value="facturacion"
+														<?php
+														if ($campo_fecha == 'facturacion') {
+															echo 'checked="checked"';
+														}
+														?>
+															   onclick="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align="left">
+													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Facturación'); ?></label>
 												</td>
 											</tr>
 											<tr>

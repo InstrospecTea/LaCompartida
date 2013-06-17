@@ -519,7 +519,7 @@ function ActualizarPeriodo(fi, ff) {
 function SeleccionarSelector() {
 	var month = jQuery('#fecha_mes').val();
 	var year = jQuery('#fecha_anio').val();
-	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month, 1));
+	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month -1, 1));
 	jQuery('#fecha_fin').datepicker('setDate', new Date(year, month, 0));
 
 	jQuery('#reporte_envio_selector').show();
