@@ -30,10 +30,6 @@ class Cobro extends Objeto {
 			$ingreso_historial = true;
 		}
 
-		if (UtilesApp::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
-			$this->Edit('se_esta_cobrando', $this->GlosaSeEstaCobrandoEspecial());
-		}
-
 		if (parent::Write()) {
 			if ($ingreso_historial) {
 				// Esa linea es necesaria para que el estado no se guardará dos veces
@@ -71,7 +67,7 @@ class Cobro extends Objeto {
 		$simbolo = Moneda::GetSimboloMoneda($this->sesion, $this->fields['id_moneda']);
 		$se_esta_cobrando .= "Tarifa Cobrada: $simbolo {$this->fields['monto']}\n";
 		$simbolo = Moneda::GetSimboloMoneda($this->sesion, Moneda::GetMonedaBase($this->sesion));
-		$se_esta_cobrando .= "Tipo de cambio: $simbolo {$this->fields['tipo_cambio_moneda']}\n";
+		$se_esta_cobrando .= "Tipo de cambio: $simbolo {$this->fields['tipo_cambio_moneda']}";
 
 		return $se_esta_cobrando;
 	}

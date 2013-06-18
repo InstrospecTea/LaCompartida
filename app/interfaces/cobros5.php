@@ -214,6 +214,10 @@ if ($opc == 'anular_emision') {
 			$cobro->Edit('id_usuario_secundario', $id_usuario_secundario);
 		}
 
+		if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
+			$cobro->Edit('se_esta_cobrando', $cobro->GlosaSeEstaCobrandoEspecial());
+		}
+
 		if ($cobro->Write()) {
 			if (!empty($usar_adelantos)) {
 				$documento = new Documento($sesion);
@@ -1705,7 +1709,7 @@ else
 						<td>
 <?php
 if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+	$se_esta_cobrando = $cobro->GlosaSeEstaCobrandoEspecial();
 	$disabled = "disabled";
 	$lineas = 'rows="6"';
 	$columnas = 'cols="25"';
@@ -1723,11 +1727,13 @@ if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
 	$disabled = "";
 	$lineas = 'rows="3"';
 	$columnas = '';
+
+	if (trim($cobro->fields['se_esta_cobrando']) != '') {
+		$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+	}
 }
 
-if (trim($cobro->fields['se_esta_cobrando']) != '') {
-	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
-}
+
 ?>
 							<textarea name="se_esta_cobrando" <?php echo "$lineas $columnas $disabled"; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
 						</td>
