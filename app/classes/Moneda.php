@@ -135,7 +135,7 @@ if(!class_exists('Moneda')) {
 		 * @param type $Sesion
 		 * @return array Arreglo con monedas para ser usados en Selects
 		 */
-		public static function GetMonedas(&$Sesion, $id_moneda = '') {
+		public static function GetMonedas(&$Sesion, $id_moneda = '', $como_objeto = false) {
 			$query = "SELECT
 						prm_moneda.id_moneda,
 						prm_moneda.glosa_moneda,
@@ -151,9 +151,22 @@ if(!class_exists('Moneda')) {
 
 			$r = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 			$monedas = array();
-			while ($moneda = mysql_fetch_array($r)) {
-				$monedas[] = $moneda;
+
+			if ($como_objeto) {
+				while (list($id_moneda, $glosa_moneda, $glosa_moneda_plural, $tipo_cambio, $cifras_decimales, $simbolo) = mysql_fetch_array($r)) {
+					$monedas[$id_moneda]['id_moneda'] = $id_moneda;
+					$monedas[$id_moneda]['tipo_cambio'] = $tipo_cambio;
+					$monedas[$id_moneda]['glosa_moneda'] = $glosa_moneda;
+					$monedas[$id_moneda]['glosa_moneda_plural'] = $glosa_moneda_plural;
+					$monedas[$id_moneda]['cifras_decimales'] = $cifras_decimales;
+					$monedas[$id_moneda]['simbolo'] = $simbolo;
+				}
+			} else {
+				while ($moneda = mysql_fetch_array($r)) {
+					$monedas[] = $moneda;
+				}
 			}
+
 			return $monedas;
 		}
 
