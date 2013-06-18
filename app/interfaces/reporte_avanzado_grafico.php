@@ -1,10 +1,14 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-
 $sesion = new Sesion(array('REP'));
 
-$agrupadores = explode('-', $vista);
+for($x = 0; $x < $_POST['numero_agrupadores']; ++$x) {
+	$agrupadores[] = $agrupador[$x];
+}
+
+$tipo_dato_comparado = $comparar ? $tipo_dato_comparado : null;
+$limite = $limitar ? $limite : null;
 
 ########## VER GRAFICO ##########
 if ($tipo_dato_comparado) {
@@ -131,7 +135,7 @@ if ($tipo_dato_comparado) {
 	$r = $reporte->fixBar($r, $r_c);
 	$r_c = $reporte->fixBar($r_c, $r);
 
-	if ($orden == 'max2min') {
+	if ($orden_barras_max2min) {
 		arsort($r);
 	}
 
@@ -144,7 +148,7 @@ if ($tipo_dato_comparado) {
 		}
 	}
 } else {
-	if ($orden == 'max2min') {
+	if ($orden_barras_max2min) {
 		arsort($r);
 	}
 }
@@ -228,7 +232,6 @@ switch ($tipo_grafico) {
 			break;
 		}
 }
-
 
 $html_info .= "<div id='print_link' align=right>";
 $html_info .= "<a href='javascript:void(0)' onclick='window.print()'>" . __('Imprimir') . "</a> | ";
