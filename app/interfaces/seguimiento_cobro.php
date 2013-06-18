@@ -63,7 +63,7 @@ if ($opc == 'buscar') {
 	$where = 1;
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura') && !empty($numero_factura)) {
+	} else if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')  && !empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		//$where .= " AND concat(cobro.documento, ',') LIKE '%$tipo_documento_legal $factura %' ";
@@ -209,7 +209,6 @@ if ($opc == 'buscar') {
                                                         $joinfactura 
                                                         WHERE $where 
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
-
 	$x_pag = 20;
 	$orden = ' cobro.id_contrato,cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente';
 
@@ -288,7 +287,8 @@ if ($opc == 'buscar') {
 			$ht .= "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-			if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+			//if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+			if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
 							</td>";
@@ -363,7 +363,8 @@ if ($opc == 'buscar') {
 		}
 
 		$html .= "</td>";
-		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') ) {
+		
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
 				$html.= "#" . $cobro->fields['documento'];
@@ -680,7 +681,7 @@ else
 			GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13)
 			GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-<?php if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+					<?php if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
 						&nbsp;&nbsp;<b><?php echo __('N° Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13)
 				GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
