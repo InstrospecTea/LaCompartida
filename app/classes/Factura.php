@@ -64,6 +64,10 @@ class Factura extends Objeto {
 			'relacion' => 'Moneda'
 		),
 		'descripcion' => 'Descripción',
+		'id_estado' => array(
+			'titulo' => 'Estado',
+			'relacion' => 'PrmEstadoFactura'
+		),
 		'id_cobro' => array(
 			'titulo' => 'N° Liquidación'
 		),
