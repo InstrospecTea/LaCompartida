@@ -211,8 +211,7 @@ if ($opc == 'buscar') {
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
 
 	$x_pag = 20;
-	$orden = ' cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
-
+	$orden = ' cobro.id_contrato,cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente';
 
 	$b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 	$b->mensaje_error_fecha = "N/A";

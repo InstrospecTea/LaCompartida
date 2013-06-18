@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix: 13.4.2
+Martes 18 de Junio 2013
+* **Fixed:** [Cambio en forma de agrupacion de interfaz seguimiento cobro](https://github.com/LemontechSA/ttb/pull/211)
+
+## Hotfix: 13.4.2
 Lunes 17 de Junio 2013
 * **Fixed:** [Corrige generacion de excel en reporte avanzados](https://github.com/LemontechSA/ttb/pull/210)
 
