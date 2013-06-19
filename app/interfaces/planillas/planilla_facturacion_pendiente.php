@@ -1,4 +1,5 @@
 <?php
+
 $tini = time();
 $fechactual = date('Ymd');
 require_once 'Spreadsheet/Excel/Writer.php';
@@ -16,20 +17,16 @@ require_once Conf::ServerDir() . '/classes/Moneda.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/ReporteContrato.php';
 
-
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
+
 if($AtacheSecundarioSoloAsunto) {
-	
 	$regularizacion=$sesion->pdodbh->exec("update contrato join cliente using (codigo_cliente)
-										set contrato.id_usuario_secundario=cliente.id_usuario_encargado 
+										set contrato.id_usuario_secundario=cliente.id_usuario_encargado
 										where contrato.id_usuario_secundario is null and cliente.id_usuario_encargado is not null and cliente.id_usuario_encargado >0;
 										update asunto join contrato using (id_contrato) set id_encargado=contrato.id_usuario_secundario where id_encargado is null;");
-	
-	//$sesion->pdodbh->closeCursor();
-	
 }
 
 set_time_limit(3600);
@@ -40,13 +37,12 @@ if ($xls) {
 	$moneda = new Moneda($sesion);
 	$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);
 	$id_moneda_base = $moneda->GetMonedaBase($sesion);
-
 	$arreglo_monedas = ArregloMonedas($sesion);
-
 	$moneda_base = Utiles::MonedaBase($sesion);
-	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
 
+	//Generando Documento Excel
+
+	$wb = new Spreadsheet_Excel_Writer();
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
 
@@ -363,7 +359,7 @@ if ($xls) {
 		$codigo_asunto_secundario_sep = "";
 	}
 
- 
+
 	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion))
 		mysql_query("ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'", $sesion->dbh);
 
@@ -374,11 +370,10 @@ $update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set trami
 $resp = mysql_query($update1, $sesion->dbh);
 $resp = mysql_query($update2, $sesion->dbh);
 $resp = mysql_query($update3, $sesion->dbh);
-	
-	
+
 	$ReporteContrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2,$AtacheSecundarioSoloAsunto);
-	
-	
+
+
 	// Esto debiera eliminarse cuando todos pasen al menos a la 5.92
 	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion))
 	$sesion->pdodbh->exec("ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'");
@@ -388,33 +383,32 @@ $resp = mysql_query($update3, $sesion->dbh);
 		$maxolaptime=$maxolapquery->fetchColumn();
 		if (!$maxolaptime || $llenar_olap) 	$maxolaptime = 0;
 		unset($maxolapquery);
-		
+
 		$ReporteContrato->InsertQuery($maxolaptime);
 
 		// Si la ultima actualización fue hace más de dos dias, voy a forzar la inserción de los trabajos que me falten.
 		if ($fechactual - $maxolaptime > 2) {
-			
+
 			$ReporteContrato->MissingEntriesQuery();
-			
-			
-		
+
+
+
 		}
-	 
+
 	$querycobros = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
 								$codigos_asuntos_secundarios
 								asunto.glosa_asunto,
 								GROUP_CONCAT( asunto.glosa_asunto ) as asuntos,
-                                                                asunto.codigo_asunto, 
-																$codigo_asunto_secundario_sep 
-                                                                GROUP_CONCAT( IF(asunto.cobrable=1,'SI','NO') ) as asuntos_cobrables,
+                                asunto.codigo_asunto,
+								$codigo_asunto_secundario_sep
+                              	GROUP_CONCAT( IF(asunto.cobrable=1,'SI','NO') ) as asuntos_cobrables,
 								cliente.glosa_cliente,
 								GROUP_CONCAT( cliente.glosa_cliente ) as clientes,
 								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
 								ec.username as username_encargado_comercial,
 								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
 								es.username as username_encargado_secundario,
-							
 								contrato.id_contrato,
                                                                 contrato.monto, 
 								contrato.forma_cobro,
@@ -459,23 +453,18 @@ $resp = mysql_query($update3, $sesion->dbh);
 		mail('ffigueroa@lemontech.cl', 'Horas por Facturar ' . Conf::AppName(), $querycobros);
 
 	$ReporteContrato->FillArrays();
-	
+
 	$ultimocobro = $ReporteContrato->arrayultimocobro;
 	//echo '<pre>';print_r($ultimocobro);echo '</pre>';                                die();
 	$arrayolap = $ReporteContrato->arrayolap;
 
 
-	//echo '<pre>';  print_r($ultimocobro);  echo '</pre>';   				echo $querycobros;			   
+	//echo '<pre>';  print_r($ultimocobro);  echo '</pre>';   				echo $querycobros;
 	$respcobro = mysql_query($querycobros, $sesion->dbh) or Utiles::errorSQL($querycobros, __FILE__, __LINE__, $sesion->dbh);
 
-	
-	
 	while ($cobro = mysql_fetch_array($respcobro)) {
 
-
 		$id_contrato = $cobro['id_contrato'];
-
-
 
 		// Definir datos ...
 		if ($separar_asuntos) {
@@ -485,7 +474,6 @@ $resp = mysql_query($update3, $sesion->dbh);
 			$ReporteContrato->LoadContrato($id_contrato, '', $fecha1, $fecha2, false);
 			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$id_contrato];
 		}
-
 
 		list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos,
 				$cantidad_asuntos,
@@ -497,9 +485,6 @@ $resp = mysql_query($update3, $sesion->dbh);
 		if (!UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar') && $horas_no_cobradas <= 0) {
 			continue;
 		}
-
-
-
 
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 			$codigos_asuntos = implode("\n", explode(',', $cobro['codigos_asuntos_secundarios']));
@@ -553,7 +538,6 @@ $resp = mysql_query($update3, $sesion->dbh);
 			endif;
 		}
 
-
 		if (!$ocultar_estado_ultimo_cobro) {
 			if ($separar_asuntos) :
 				$ws1->write($filas, $col_estado_ultimo_cobro, $ultimocobro[$cobro['codigo_asunto']]['estado'] != '' ? $ultimocobro[$cobro['codigo_asunto']]['estado'] : '', $formato_texto);
@@ -594,9 +578,6 @@ $resp = mysql_query($update3, $sesion->dbh);
 
 		$valor_estimado = $monto_estimado_trabajos;
 
-
-
-
 		if ($cobro['forma_cobro'] == 'CAP') {
 			if ($separar_asuntos) {
 				$cobro_aux = new Cobro($sesion);
@@ -633,17 +614,20 @@ $resp = mysql_query($update3, $sesion->dbh);
 		else {
 			$valor_estimado = $monto_estimado_trabajos;
 		}
+
 		// Aplicar descuentos del contrato al valor estimado
 		if ($cobro['porcentaje_descuento'] > 0) {
 			$valor_descuento = $valor_estimado * $cobro['porcentaje_descuento'];
 			$valor_estimado = $valor_estimado - $valor_descuento;
+
 			if ($valor_descuento > 0)
-				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo'] . ' ' . $valor_descuento);
+				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_monto']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_monto']]['cifras_decimales']));
 		}
+
 		else if ($valor_descuento > 0) {
 			$valor_estimado = $valor_estimado - $valor_descuento;
 			if ($valor_descuento > 0)
-				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo'] . ' ' . $valor_descuento);
+				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_monto']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_monto']]['cifras_decimales']));
 
 			if ($valor_estimado < 0) {
 				$valor_descuento = abs($valor_estimado);
@@ -653,12 +637,9 @@ $resp = mysql_query($update3, $sesion->dbh);
 				$valor_descuento = 0;
 		}
 
-
-
 		$valor_estimado = UtilesApp::CambiarMoneda($valor_estimado, number_format($arreglo_monedas[$id_moneda_trabajos]['tipo_cambio'], $arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'], '.', ''), $arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'], number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], '.', ''), $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales']);
 		$valor_estimado_moneda_base = UtilesApp::CambiarMoneda($valor_estimado, number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], '.', ''), $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], number_format($moneda_base['tipo_cambio'], $moneda_base['cifras_decimales'], '.', ''), $moneda_base['cifras_decimales']);
 		$valor_thh_moneda_base = UtilesApp::CambiarMoneda($monto_estimado_thh, number_format($arreglo_monedas[$id_moneda_thh]['tipo_cambio'], $arreglo_monedas[$id_moneda_thh]['cifras_decimales'], '.', ''), $arreglo_monedas[$id_moneda_thh]['cifras_decimales'], number_format($moneda_base['tipo_cambio'], $moneda_base['cifras_decimales'], '.', ''), $moneda_base['cifras_decimales']);
-
 
 		if ($desglosar_moneda) {
 			foreach ($arreglo_monedas as $id_moneda => $moneda) {
@@ -684,20 +665,6 @@ $resp = mysql_query($update3, $sesion->dbh);
 			$formato = $formatos_moneda[$moneda_base['id_moneda']];
 		$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, $valor_thh_moneda_base, $formato);
 
-		// $tact=microtime(true);
-		/* $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+1, round($ReporteContrato->tiempos[0]-$tant,4) , $formato_numero );                     
-		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+2, round($ReporteContrato->tiempos[1]-$ReporteContrato->tiempos[0],4) , $formato_numero );
-		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+3, round($ReporteContrato->tiempos[2]-$ReporteContrato->tiempos[1],4) , $formato_numero );
-		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+4, round($ReporteContrato->tiempos[3]-$ReporteContrato->tiempos[2],4) , $formato_numero );
-		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+5, round($ReporteContrato->tiempos[4]-$ReporteContrato->tiempos[3],4) , $formato_numero );
-		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+6, round($ReporteContrato->tiempos[5]-$ReporteContrato->tiempos[4],4) , $formato_numero );
-		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+7, round($tact-$ReporteContrato->tiempos[5],4) , $formato_numero ); */
-
-
-		//$tant=$tact;
-		// Excel guarda los tiempos en base a días, por eso se divide en 24.
-		//$ws1->writeNumber($filas, $col_horas_trabajadas, $cobro['horas_por_cobrar']/24, $formato_tiempo);
-
 		if ($debug) {
 			if ($cobro['forma_cobro'] != 'TASA')
 				$ws1->write($filas, $col_monto_contrato, $cobro['monto'], $formatos_moneda[$cobro['id_moneda_total']]);
@@ -710,6 +677,7 @@ $resp = mysql_query($update3, $sesion->dbh);
 
 			$ws1->write($filas, $col_porcentaje_retainer + 1, $cobro['horas_por_cobrar'], $formato_numero);
 		}
+
 		// Memorizarse el id_contrato para ver en el proximo
 		// paso si todavia estamos en el mismo contrato, importante por el tema del descuento
 		$id_contrato_anterior = $id_contrato;
@@ -757,31 +725,37 @@ $pagina->PrintTop();
         $('abrir_opciones_ocultar').style.display = 'block';
         $('cerrar_opciones_ocultar').style.display = 'none';
     }
-    
 </script>
-<style>
-	.formwidth {width:<?php echo ($AtacheSecundarioSoloAsunto ? 600 : 400); ?>px;}
-</style>
+
+<style>.formwidth {width:<?php echo ($AtacheSecundarioSoloAsunto ? 600 : 400); ?>px;}</style>
+
 <form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
 
     <input type="hidden" name="reporte" value="generar" />
 	<table  class="border_plomo tb_base" style="width:<?php echo ($AtacheSecundarioSoloAsunto ? 650 : 400); ?>px;">
 		<tr><td>&nbsp;&nbsp;&nbsp;</td>
-			<td  >
-<?php echo __('Fecha desde') ?>
-			</td> <td   colspan="2">
+			<td>
+				<?php echo __('Fecha desde') ?>
+			</td>
+			<td colspan="2">
 				<input type="text" class="fechadiff" name="fecha1" id="fecha1" value="<?php echo ($fecha1 ? $fecha1 : date('d-m-Y', strtotime('-1 year'))); ?>"/>			</td>
 			<td>&nbsp;</td>
-		</tr><tr><td>&nbsp;</td>
-			<td   >
-<?php echo __('Fecha hasta') ?>
-			</td> <td   colspan="2">
-				<input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2 ? $fecha2 : date('d-m-Y')); ?>"/>
-			</td><td>&nbsp;</td>
-		</tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+		</tr>
 		<tr>
-
-
+			<td>&nbsp;</td>
+			<td><?php echo __('Fecha hasta') ?></td> <td   colspan="2">
+				<input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2 ? $fecha2 : date('d-m-Y')); ?>"/>
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
 			<?php
 			echo '<td style="text-align:center;" colspan="' . ($AtacheSecundarioSoloAsunto ? 2 : 5) . '">';
 			echo 'Filtrar por ' . __('Encargado Comercial') . '<br/>(Opcional)<br/>';
@@ -791,18 +765,19 @@ $pagina->PrintTop();
 			?>
 			</td>
 				<?php if ($AtacheSecundarioSoloAsunto) { ?>
-				<td>&nbsp;</td><td style="text-align:center;" colspan="2">
-					<?php
-					echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
-					echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario  join prm_categoria_usuario using (id_categoria_usuario) JOIN usuario_permiso USING(id_usuario)
-					WHERE prm_categoria_usuario.id_categoria_lemontech in (1,2) and  codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
-					?>
-				</td>
-<?php } ?>
+					<td>&nbsp;</td><td style="text-align:center;" colspan="2">
+						<?php
+						echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
+						echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+						FROM usuario  join prm_categoria_usuario using (id_categoria_usuario) JOIN usuario_permiso USING(id_usuario)
+						WHERE prm_categoria_usuario.id_categoria_lemontech in (1,2) and  codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
+						?>
+					</td>
+				<?php } ?>
 		</tr>
-		<tr><td>&nbsp;</td>
-			<td  align="left" colspan="4">
+		<tr>
+			<td>&nbsp;</td>
+			<td align="left" colspan="4">
 				<div class="formwidth"> &nbsp;&nbsp;&nbsp;
 					<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 					&nbsp;&nbsp;&nbsp;
@@ -817,14 +792,16 @@ $pagina->PrintTop();
 			</td>
 		</tr>
 
-		<tr><td>&nbsp;</td>
+		<tr>
+			<td>&nbsp;</td>
 			<td  align="left" colspan="4">
 				<div id="abrir_opciones_ocultar" onclick="MostrarOpcionesParaOcultar();" style="display:block;"><img src=<?php echo Conf::ImgDir() . '/mas.gif' ?>  />&nbsp;<b><?php echo __('Opciones Avanzadas:') ?></b></div>
 				<div id="cerrar_opciones_ocultar" onclick="OcultarOpcionesParaOcultar();" style="display:none;"><img src=<?php echo Conf::ImgDir() . '/menos.gif' ?>  />&nbsp;<b><?php echo __('Opciones Avanzadas:') ?></b></div>
 			</td>
 		</tr>
-		<tr  id="tr_opciones_ocultar" style="display:none;">
-			<td>&nbsp;</td> <td align="left" colspan="4">
+		<tr id="tr_opciones_ocultar" style="display:none;">
+			<td>&nbsp;</td>
+			<td align="left" colspan="4">
 				<?php
 				if ($_POST['reporte'] != 'generar') {
 					$ocultar_encargado = UtilesApp::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
@@ -841,18 +818,19 @@ $pagina->PrintTop();
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked="checked"' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="llenar_olap" <?php echo $llenar_olap ? 'checked="checked"' : '' ?> /><?php echo __('Ejecutar llenado inicial de datos') ?><br/>
-<?php if ($sesion->usuario->TienePermiso('SADM')) echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/>Enviar correo al admin<br/>'; ?>
+				<?php if ($sesion->usuario->TienePermiso('SADM')) echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/>Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
 		<tr>
-
 			<td align=right colspan="4">
 				<input type="hidden" name="debug" value="<?php echo $debug ?>" />
 				<input type="submit" class=btn value="<?php echo __('Generar reporte') ?>" name="btn_reporte">
-			</td><td>&nbsp;</td>
+			</td>
+			<td>&nbsp;</td>
 		</tr>
 	</table>
 </form>
+
 <?php
 echo(InputId::Javascript($sesion));
 $pagina->PrintBottom();
