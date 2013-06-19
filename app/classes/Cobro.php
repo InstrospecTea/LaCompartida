@@ -72,8 +72,8 @@ class Cobro extends Objeto {
 			$m = $monedas[$this->fields['id_moneda']];
 			$se_esta_cobrando .= "Tarifa Cobrada: {$m['simbolo']} " . number_format($this->fields['monto'], $m['cifras_decimales'], '.', '') . "\n";
 
-			$m = $monedas[Moneda::GetMonedaBase($this->sesion)];
-			$se_esta_cobrando .= "Tipo de cambio: {$m['simbolo']} " . number_format($this->fields['tipo_cambio_moneda'], $m['cifras_decimales'], '.', '');
+			$mb = $monedas[Moneda::GetMonedaBase($this->sesion)];
+			$se_esta_cobrando .= "Tipo de cambio: {$mb['simbolo']} " . number_format($this->fields['tipo_cambio_moneda'], $m['cifras_decimales'], '.', '');
 		} else {
 			$se_esta_cobrando = __('Periodo') . ': ';
 
