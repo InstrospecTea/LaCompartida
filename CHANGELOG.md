@@ -1,7 +1,8 @@
 # Changelog
-## Hotfix: 13.4.2
+## Hotfix: 13.4.3
 Martes 18 de Junio 2013
 * **Fixed:** [Cambio en forma de agrupacion de interfaz seguimiento cobro](https://github.com/LemontechSA/ttb/pull/211)
+* **Fixed:** [Permite cambiar la glosa 'se está cobrando' en cobros6.php](https://github.com/LemontechSA/ttb/pull/211)
 
 ## Hotfix: 13.4.2
 Lunes 17 de Junio 2013
