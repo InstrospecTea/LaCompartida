@@ -400,9 +400,9 @@ $resp = mysql_query($update3, $sesion->dbh);
 								$codigos_asuntos_secundarios
 								asunto.glosa_asunto,
 								GROUP_CONCAT( asunto.glosa_asunto ) as asuntos,
-                                asunto.codigo_asunto,
+																asunto.codigo_asunto,
 								$codigo_asunto_secundario_sep
-                              	GROUP_CONCAT( IF(asunto.cobrable=1,'SI','NO') ) as asuntos_cobrables,
+																GROUP_CONCAT( IF(asunto.cobrable=1,'SI','NO') ) as asuntos_cobrables,
 								cliente.glosa_cliente,
 								GROUP_CONCAT( cliente.glosa_cliente ) as clientes,
 								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
@@ -410,10 +410,11 @@ $resp = mysql_query($update3, $sesion->dbh);
 								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
 								es.username as username_encargado_secundario,
 								contrato.id_contrato,
-                                                                contrato.monto, 
+								contrato.monto,
 								contrato.forma_cobro,
 								contrato.id_moneda as id_moneda_contrato,
-								contrato.opc_moneda_total as id_moneda_total
+								contrato.opc_moneda_total as id_moneda_total,
+								cobro.id_moneda_monto
 							FROM asunto
 							LEFT JOIN contrato USING( id_contrato )
 							LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
@@ -425,7 +426,7 @@ $resp = mysql_query($update3, $sesion->dbh);
 		$querycobros.=" 	LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario ";
 	}
 
-	$querycobros.=" 
+	$querycobros.="
 							WHERE $where
 								AND (
 									( SELECT count(*)
@@ -563,8 +564,8 @@ $resp = mysql_query($update3, $sesion->dbh);
 
 		/* 	//Esto se depreco: traer los descuentos a nivel de contrato
 		 * // En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual
-		  if ($id_contrato != $id_contrato_anterior)
-		  $valor_descuento = $cobro['valor_descuento']; */
+			if ($id_contrato != $id_contrato_anterior)
+			$valor_descuento = $cobro['valor_descuento']; */
 
 		//FFF: lo siguiente trae los descuentos hechos en los cobros no emitidos	(no es lo mismo que a nivel de contrato)
 		if ($separar_asuntos) {
@@ -620,21 +621,20 @@ $resp = mysql_query($update3, $sesion->dbh);
 			$valor_descuento = $valor_estimado * $cobro['porcentaje_descuento'];
 			$valor_estimado = $valor_estimado - $valor_descuento;
 
-			if ($valor_descuento > 0)
-				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_total']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''));
-		}
-
-		else if ($valor_descuento > 0) {
+			if ($valor_descuento > 0) {
+				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_monto']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_monto']]['cifras_decimales'],'.',''));
+			}
+		} else if ($valor_descuento > 0) {
 			$valor_estimado = $valor_estimado - $valor_descuento;
-			if ($valor_descuento > 0)
-				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_total']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''));
 
 			if ($valor_estimado < 0) {
-				$valor_descuento = abs($valor_estimado);
+				$valor_descuento = $valor_descuento + $valor_estimado;
 				$valor_estimado = 0;
 			}
-			else
-				$valor_descuento = 0;
+
+			if ($valor_descuento > 0) {
+				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_monto']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_monto']]['cifras_decimales'],'.',''));
+			}
 		}
 
 		$valor_estimado = UtilesApp::CambiarMoneda($valor_estimado, number_format($arreglo_monedas[$id_moneda_trabajos]['tipo_cambio'], $arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'], '.', ''), $arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'], number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], '.', ''), $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales']);
@@ -713,25 +713,25 @@ $pagina->titulo = __('Reporte Horas por Facturar');
 $pagina->PrintTop();
 ?>
 <script type="text/javascript">
-    function MostrarOpcionesParaOcultar()
-    {
-        $('tr_opciones_ocultar').style.display = 'table-row';
-        $('abrir_opciones_ocultar').style.display = 'none';
-        $('cerrar_opciones_ocultar').style.display = 'block';
-    }
-    function OcultarOpcionesParaOcultar()
-    {
-        $('tr_opciones_ocultar').style.display = 'none';
-        $('abrir_opciones_ocultar').style.display = 'block';
-        $('cerrar_opciones_ocultar').style.display = 'none';
-    }
+		function MostrarOpcionesParaOcultar()
+		{
+				$('tr_opciones_ocultar').style.display = 'table-row';
+				$('abrir_opciones_ocultar').style.display = 'none';
+				$('cerrar_opciones_ocultar').style.display = 'block';
+		}
+		function OcultarOpcionesParaOcultar()
+		{
+				$('tr_opciones_ocultar').style.display = 'none';
+				$('abrir_opciones_ocultar').style.display = 'block';
+				$('cerrar_opciones_ocultar').style.display = 'none';
+		}
 </script>
 
 <style>.formwidth {width:<?php echo ($AtacheSecundarioSoloAsunto ? 600 : 400); ?>px;}</style>
 
 <form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
 
-    <input type="hidden" name="reporte" value="generar" />
+		<input type="hidden" name="reporte" value="generar" />
 	<table  class="border_plomo tb_base" style="width:<?php echo ($AtacheSecundarioSoloAsunto ? 650 : 400); ?>px;">
 		<tr><td>&nbsp;&nbsp;&nbsp;</td>
 			<td>
@@ -783,7 +783,7 @@ $pagina->PrintTop();
 					&nbsp;&nbsp;&nbsp;
 					<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mostrar
-					<select name="cobrable" id="cobrable" style="width:210px;"> 
+					<select name="cobrable" id="cobrable" style="width:210px;">
 						<option value="-1" selected="selected"><?php echo __('Asuntos') . ' ' . __('Cobrables') . ' y No ' . __('Cobrables'); ?></option>
 						<option value="0">Sólo <?php echo __('Asuntos') . ' No  ' . __('Cobrables'); ?></option>
 						<option value="1">Sólo  <?php echo __('Asuntos') . ' ' . __('Cobrables'); ?></option>
