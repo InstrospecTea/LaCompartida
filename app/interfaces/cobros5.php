@@ -215,7 +215,7 @@ if ($opc == 'anular_emision') {
 		}
 
 		if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-			$cobro->Edit('se_esta_cobrando', $cobro->GlosaSeEstaCobrandoEspecial());
+			$cobro->Edit('se_esta_cobrando', $cobro->GlosaSeEstaCobrando());
 		}
 
 		if ($cobro->Write()) {
