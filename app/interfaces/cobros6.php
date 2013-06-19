@@ -1535,11 +1535,9 @@ if (trim($cobro->fields['se_esta_cobrando']) == '') {
 }
 
 if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-	$disabled = "disabled";
 	$lineas = 'rows="6"';
 	$columnas = 'cols="25"';
 } else {
-	$disabled = "";
 	$lineas = 'rows="3"';
 	$columnas = '';
 }
