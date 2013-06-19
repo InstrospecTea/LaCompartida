@@ -621,13 +621,13 @@ $resp = mysql_query($update3, $sesion->dbh);
 			$valor_estimado = $valor_estimado - $valor_descuento;
 
 			if ($valor_descuento > 0)
-				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_monto']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_monto']]['cifras_decimales']));
+				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_total']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''));
 		}
 
 		else if ($valor_descuento > 0) {
 			$valor_estimado = $valor_estimado - $valor_descuento;
 			if ($valor_descuento > 0)
-				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_monto']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_monto']]['cifras_decimales']));
+				$ws1->writeNote($filas, $col_valor_estimado, 'Incluye descuento por ' . $arreglo_monedas[$cobro['id_moneda_total']]['simbolo'] . ' ' . number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''));
 
 			if ($valor_estimado < 0) {
 				$valor_descuento = abs($valor_estimado);
