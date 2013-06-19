@@ -4,9 +4,9 @@ load 'config/cap_shared'
 load 'config/cap_servers'
 
 set :current_stage, "feature"
-   default_branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
+default_branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
 
-feature_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
+feature_branch = Capistrano::CLI.ui.ask("Enter Feature Branch [#{default_branch}]: ")
 feature_branch = (feature_branch && feature_branch.length > 0) ? feature_branch : default_branch
 feature_name = feature_branch.split('/').last
 

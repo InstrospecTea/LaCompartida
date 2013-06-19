@@ -214,6 +214,10 @@ if ($opc == 'anular_emision') {
 			$cobro->Edit('id_usuario_secundario', $id_usuario_secundario);
 		}
 
+		if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
+			$cobro->Edit('se_esta_cobrando', $cobro->GlosaSeEstaCobrando());
+		}
+
 		if ($cobro->Write()) {
 			if (!empty($usar_adelantos)) {
 				$documento = new Documento($sesion);
@@ -1704,30 +1708,23 @@ else
 					<tr>
 						<td>
 <?php
+$se_esta_cobrando = $cobro->GlosaSeEstaCobrando();
+
 if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
 	$disabled = "disabled";
 	$lineas = 'rows="6"';
 	$columnas = 'cols="25"';
 } else {
-	$se_esta_cobrando = __('Periodo');
-	$se_esta_cobrando .=': ';
-	if ($cobro->fields['fecha_ini'] != '0000-00-00' && !empty($cobro->fields['fecha_ini'])) {
-		$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
-		$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini;
-	}
-	if ($cobro->fields['fecha_fin'] != '0000-00-00' && !empty($cobro->fields['fecha_fin'])) {
-		$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
-		$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin;
-	}
 	$disabled = "";
 	$lineas = 'rows="3"';
 	$columnas = '';
+
+	if (trim($cobro->fields['se_esta_cobrando']) != '') {
+		$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+	}
 }
 
-if (trim($cobro->fields['se_esta_cobrando']) != '') {
-	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
-}
+
 ?>
 							<textarea name="se_esta_cobrando" <?php echo "$lineas $columnas $disabled"; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
 						</td>
