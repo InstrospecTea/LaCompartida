@@ -1160,7 +1160,6 @@ where ol.eliminado=0
 					     $bwherefecha2
 					   $bwhereestado
 GROUP BY  $bagrupador";
-		echo $bquerygastos; exit;
 
 		$respolap = mysql_query($bquerygastos, $this->sesion->dbh) or Utiles::errorSQL($bquerygastos, __FILE__, __LINE__, $this->sesion->dbh);
 
