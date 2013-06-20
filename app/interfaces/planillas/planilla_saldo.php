@@ -115,11 +115,17 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$gastos = $tipo_liquidacion == 2;
 
 		if ($honorarios) {
-			$where_liquidaciones .= " AND cobro.incluye_honorarios = '$honorarios' AND d.saldo_honorarios > 0 ";
+			$where_liquidaciones .= " AND cobro.incluye_honorarios = '$honorarios'";
+			if (!$mostrar_sin_saldo) {
+				$where_liquidaciones .= " AND d.saldo_honorarios > 0 ";
+			}
 			$where_adelantos .= " AND d.pago_honorarios = '$honorarios' ";
 		}
 		if ($gastos) {
-			$where_liquidaciones .= " AND cobro.incluye_gastos = '$gastos' AND d.saldo_gastos > 0 ";
+			$where_liquidaciones .= " AND cobro.incluye_gastos = '$gastos'";
+			if (!$mostrar_sin_saldo) {
+				$where_liquidaciones .= " AND d.saldo_gastos > 0 ";
+			}
 			$where_adelantos .= " AND d.pago_gastos = '$gastos' ";
 		}
 
@@ -540,7 +546,9 @@ if ($_REQUEST['opcion'] == 'buscar') {
 	$color = $saldo_total < 0 ? 'red' : 'blue';
 	$resultado = '<span style="color: ' . $color . '">' . $moneda_base . ' ' . number_format($saldo_total, 2, ',', '.') . '</span>';
 
-	//echo '<div style="text-align: right; font-size: 2em;">Saldo total: ' . $resultado . '</h1>';
+	// echo '<pre style="text-align: left">' . print_r($query_liquidaciones, true) . "</pre>";
+
+	// echo '<div style="text-align: right; font-size: 2em;">Saldo total: ' . $resultado . '</h1>';
 }
 
 //echo '<pre>' . print_r($query, true) . '</pre>';
