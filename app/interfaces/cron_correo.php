@@ -14,8 +14,6 @@ if (($argv[1] == 'debug') || (isset($_GET['debug']) && $_GET['debug'] == '1')) {
 	$debug = true;
 }
 
-// $correos_malos = 'correosmalos@thetimebilling.com';
-
 $query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo, intento_envio
 	FROM log_correo
 	WHERE enviado = 0 AND (intento_envio IS NULL OR intento_envio < 5)
@@ -23,7 +21,6 @@ $query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo
 $resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
 while ($log_correo = mysql_fetch_array($resp)) {
-	echo "entro";
 	$correos = array();
 	$addresses = explode(',', $log_correo['mail']);
 	++$encolados;
@@ -69,14 +66,26 @@ if ($debug === true) {
 }
 
 // verificar si existen correos NO enviados y con reintentos
-$query = "SELECT count(*) AS total FROM log_correo WHERE enviado = 0 AND intento_envio >= 5";
-$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-$log_correo = mysql_fetch_assoc($resp);
+$minutos = (int) date('i');
+if ($minutos == 10) {
+	$query = "SELECT count(*) AS total FROM log_correo WHERE enviado = 0 AND intento_envio >= 5";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	$log_correo = mysql_fetch_assoc($resp);
 
-$mensaje = ':D';
+	$AppName = Conf::AppName();
+	$mensaje = "<b>Atención:</b> Se encontraron {$log_correo['total']} correos con errores para el cliente '$AppName'";
 
-//Utiles::EnviarMail($Sesion, array(array('nombre' => 'Admin', 'mail' => 'cbriones@lemontech.cl'), array('nombre' => 'Admin2', 'mail' => 'vzurita@lemontech.cl')), "{$log_correo['total']} correos con errores", $mensaje);
-Utiles::EnviarMail($Sesion, array(array('nombre' => 'Admin', 'mail' => 'cbriones@lemontech.cl')), "{$log_correo['total']} correos con errores", $mensaje);
+	Utiles::EnviarMail(
+		$Sesion,
+		array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
+		"$AppName: {$log_correo['total']} correos con errores",
+		$mensaje
+	);
+
+	if ($debug === true) {
+		echo "<br>Correo aviso administrador enviado";
+	}
+}
 
 /**
  * Validate an email address.
