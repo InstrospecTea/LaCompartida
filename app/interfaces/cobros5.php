@@ -166,7 +166,9 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit('id_carta', $id_carta);
 	$cobro->Edit('id_formato', $id_formato);
 	$cobro->Edit('codigo_idioma', $lang);
-	$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
+	if (trim($se_esta_cobrando) != '') {
+		$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
+	}
 	$cobro->Edit("opc_ver_columna_cobrable", $opc_ver_columna_cobrable);
 	$cobro->Write(); //Se guarda porque despues se necesita para recalcular los datos del cobro
 	################### DESCUENTOS #####################
