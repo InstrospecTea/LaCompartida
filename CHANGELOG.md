@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.4.5
+Jueves 20 de Junio 2013
+* **Fixed:** [Corrección reporte saldo para mostrar honorarios y gastos sin saldo](https://github.com/LemontechSA/ttb/pull/213)
+
 ## Hotfix: 13.4.4
 Jueves 20 de Junio 2013
 * **Fixed:** [Corrección reporte horas por facturar considerando los descuentos](https://github.com/LemontechSA/ttb/pull/212)
