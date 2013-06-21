@@ -115,22 +115,20 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$gastos = $tipo_liquidacion == 2;
 
 		if ($honorarios) {
-			$where_liquidaciones .= " AND cobro.incluye_honorarios = '$honorarios'";
+			$where_liquidaciones .= " AND cobro.incluye_honorarios = '1' AND cobro.incluye_gastos = '0' ";
 			if (!$mostrar_sin_saldo) {
 				$where_liquidaciones .= " AND d.saldo_honorarios > 0 ";
 			}
 			$where_adelantos .= " AND d.pago_honorarios = '$honorarios' ";
+			$where_gastos .= ' AND 1=0 ';
 		}
+
 		if ($gastos) {
-			$where_liquidaciones .= " AND cobro.incluye_gastos = '$gastos'";
+			$where_liquidaciones .= " AND cobro.incluye_gastos = '1' AND cobro.incluye_honorarios = '0' ";
 			if (!$mostrar_sin_saldo) {
 				$where_liquidaciones .= " AND d.saldo_gastos > 0 ";
 			}
 			$where_adelantos .= " AND d.pago_gastos = '$gastos' ";
-		}
-
-		if ($honorarios) {
-			$where_gastos .= ' AND 1=0 ';
 		}
 	} else {
 		$where_liquidaciones .= " AND (d.saldo_honorarios + d.saldo_gastos) > 0 ";
