@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix: 13.4.6
+Viernes 21 de Junio 2013
+* **Fixed:** [Refrescar datos del cliente al cambiar el selector de cliente en la factura](https://github.com/LemontechSA/ttb/pull/215)
+* **Fixed:** [Corrección problema GlosaSeEstaCobrando al agregar factura o pago](https://github.com/LemontechSA/ttb/pull/215)
+
 ## Hotfix: 13.4.5
 Jueves 20 de Junio 2013
 * **Fixed:** [Corrección reporte saldo para mostrar honorarios y gastos sin saldo](https://github.com/LemontechSA/ttb/pull/213)
