@@ -104,6 +104,17 @@ if (empty($data)) {
 <input type="hidden" name="clase" value="<?php echo $clase; ?>"/>
 <button id="btn_enviar">Enviar</button>
 
+<div style="display: none">
+<?php foreach ($listados as $tipo => $lista) { ?>
+<select id="select-<?php echo $tipo; ?>">
+	<option value="">Select...</option>
+	<?php foreach ($lista as $val => $lbl) { ?>
+	<option value="<?php echo $val; ?>"><?php echo $lbl; ?></option>
+	<?php } ?>
+</select>
+<?php } ?>
+</div>
+
 <script type="text/javascript">
 	var clase = '<?php echo $clase; ?>';
 	var llave = '<?php echo $CargaMasiva->LlaveUnica($clase); ?>';
@@ -339,9 +350,10 @@ if (empty($data)) {
 	 * actualizar el valor del input al cambiar un selector de relacion
 	 */
 	function cambioRelacion() {
-		var input = jQuery(this).closest('td').find('[name^=data]');
+		var td = jQuery(this).closest('td');
+		var input = td.find('[name^=data]');
 		var val_input = limpiar(input.val());
-		var idx = jQuery(this).closest('td').index();
+		var idx = td.index();
 		if (val_input && (input.hasClass('error') || input.hasClass('warning'))) {
 			var iguales = inputsValoresUnicos(campos_idx[idx], val_input);
 			if (iguales && iguales.length > 1 && confirm('Cambiar todos los datos de esta columna que tienen el valor ' + input.val() + '?')) {
@@ -676,7 +688,7 @@ if (empty($data)) {
 	 * mostrar informacion adicional si el tipo de campo lo requiere, y valida la columna si aun no se ha hecho
 	 */
 	function focusData() {
-		jQuery('.extra').html('');
+		//jQuery('.extra').html('');
 		var td = jQuery(this).closest('td');
 		var idx = td.index();
 		var campo = campos_idx[idx];
@@ -689,10 +701,11 @@ if (empty($data)) {
 		if (info) {
 			//mostrar listado para relaciones o checkbox para bools
 			if (info.relacion) {
-				var sel = jQuery('<select/>', {html: '<option value=""/>'});
-				jQuery.each(listados[info.relacion], function(id, valor) {
-					sel.append(jQuery('<option/>').val(id).text(valor));
-				});
+				var sel = jQuery('#select-' + info.relacion);
+				//var sel = jQuery('<select/>', {html: '<option value=""/>'});
+				//jQuery.each(listados[info.relacion], function(id, valor) {
+				//	sel.append(jQuery('<option/>').val(id).text(valor));
+				//});
 				sel.change(cambioRelacion);
 				td.find('.extra').append(sel);
 			}
