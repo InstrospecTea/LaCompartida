@@ -1557,7 +1557,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 
 	  }  ?>
 
- jQuery(document).change(function() {
+ jQuery(document).ready(function() {
 
  		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function(){
  			CargarDatosCliente();
