@@ -409,7 +409,9 @@ if ($opc == 'guardar') {
 		$contrato->Write();
 	}
 
-	$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
+	if (!empty($se_esta_cobrando)) {
+		$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
+	}
 
 	if ($opc_informar_contabilidad == 'informar') {
 		$cobro->Edit('estado_contabilidad', 'PARA INFORMAR');
@@ -1530,7 +1532,8 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                         <span style="background:#EEE;padding:4px;display:block;font-weight: bold; font-size: 11px;"><?php echo __('Se está cobrando:') ?></span>
 
 <?php
-if (trim($cobro->fields['se_esta_cobrando']) == '') {
+$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+if (trim($se_esta_cobrando) == '') {
 	$se_esta_cobrando = $cobro->GlosaSeEstaCobrando();
 }
 
