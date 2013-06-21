@@ -334,7 +334,7 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			var id_contrato = jQuery('#id_contrato').val();
 			var params = jQuery('#form_gastos').serialize();
 			var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
-			var html_url = './planillas/planilla_saldo.php?popup=1&opcion=buscar&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
+			var html_url = './planillas/planilla_saldo.php?popup=1&opcion=buscar&tipo_liquidacion=2&mostrar_detalle=1&id_contrato=' + id_contrato + '&' + params;
 			jQuery('#totalcta').text('');
 			jQuery.getJSON(ajax_url,function(data) {
 				var onclick_html = "nuevaVentana('',1000,700,'" + html_url + "', '');";
