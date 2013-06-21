@@ -899,20 +899,11 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 	<?php
 }
 ?>
-				var accion = 'cargar_datos_contrato';
+				var accion = 'cargar_datos_cliente';
 				var select_origen = document.getElementById(id_origen);
 				var rut = document.getElementById('RUT_cliente');
 				var cliente = document.getElementById('cliente');;
 				var direccion_cliente = document.getElementById('direccion_cliente');
-				var id_contrato = jQuery('#id_contrato').val();
-				<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {	?>
-				var comuna_cliente = document.getElementById('comuna_cliente');
-				<?php
-					}
-					if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
-				?>
-				var ciudad_cliente = document.getElementById('ciudad_cliente');
-				<?php } ?>
 
 <?php
 if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
@@ -939,7 +930,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 ?>
 				var http = getXMLHTTP();
 
-				var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&id_contrato=' +id_contrato ;
+				var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value ;
 
 				http.open('get', url, true);
 				http.onreadystatechange = function()
@@ -959,8 +950,6 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 								rut.value = '';
 								direccion_cliente.value = '';
 								cliente.value = '';
-								comuna_cliente.value = '';
-								ciudad_cliente.value = '';
 
 								select_destino.options.length = 1;
 								offLoading();
@@ -976,13 +965,6 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 									option.value = valores[0];
 									option.text = valores[1];
 
-
-									if(valores[4] != '') {
-									if(window.ciudad_cliente)	ciudad_cliente.value = valores[4];
-									}
-									if(valores[3] != '') {
-									if(window.comuna_cliente)	comuna_cliente.value = valores[3];
-									}
 									if(valores[2] != '')
 										rut.value = valores[2];
 									else
@@ -1013,6 +995,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 				};
 				http.send(null);
 			}
+
 
 
 
@@ -1574,8 +1557,11 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 
 	  }  ?>
 
- jQuery(document).ready(function() {
+ jQuery(document).change(function() {
 
+ 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function(){
+ 			CargarDatosCliente();
+ 		});
 
 		if(cantidad_decimales!=-1) {
 
