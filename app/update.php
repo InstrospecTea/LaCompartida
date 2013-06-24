@@ -9805,29 +9805,29 @@ QUERY;
 							  UNIQUE KEY `nombre` (`nombre`)
 							) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;";
 
-			if(!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
+			if (!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_usuario` INT NULL AFTER `id_log_correo;";
 			}
-			if(!ExisteCampo('tipo_id', 'log_correo', $dbh)) {
+			if (!ExisteCampo('id_tipo_correo', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_tipo_correo` INT NULL  AFTER `id_usuario`;";
 			}
-			if(!ExisteCampo('fecha_envio', 'log_correo', $dbh)) {
+			if (!ExisteCampo('fecha_envio', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_envio` DATETIME NULL DEFAULT NULL  AFTER `enviado`;";
 			}
-			if(!ExisteCampo('intento_envio', 'log_correo', $dbh)) {
+			if (!ExisteCampo('intento_envio', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `intento_envio` INT NULL  AFTER `fecha_envio`;";
 			}
-			if(!ExisteCampo('fecha_modificacion', 'log_correo', $dbh)) {
+			if (!ExisteCampo('fecha_modificacion', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_modificacion` DATETIME NULL DEFAULT NULL  AFTER `fecha`;";
 			}
-			if(!ExisteIndex('fk_log_correo_tipo_correo', 'log_correo', $dbh)) {
+			if (!ExisteLlaveForanea('log_correo', 'id_tipo_correo', 'prm_tipo_correo', 'id', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD CONSTRAINT `fk_log_correo_tipo_correo` FOREIGN KEY (`id_tipo_correo`) REFERENCES `prm_tipo_correo` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, ADD INDEX `fk_log_correo_tipo_correo` (`id_tipo_correo` ASC);";
 			}
 			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha WHERE fecha_modificacion IS NULL;";
-			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'diario';";
-			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'semanal';";
-			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspension_pago_comision';";
-			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'prueba';";
+			$queries[] = "INSERT IGNORE INTO `prm_tipo_correo` SET nombre = 'diario';";
+			$queries[] = "INSERT IGNORE INTO `prm_tipo_correo` SET nombre = 'semanal';";
+			$queries[] = "INSERT IGNORE INTO `prm_tipo_correo` SET nombre = 'suspension_pago_comision';";
+			$queries[] = "INSERT IGNORE INTO `prm_tipo_correo` SET nombre = 'prueba';";
 			ejecutar($queries, $dbh);
 			break;
 
