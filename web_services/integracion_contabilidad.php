@@ -496,9 +496,7 @@ function ResultadoIngresoCobro($DocEntry,$id_cobro,$usuario,$password)
 function IngresoGasto($fecha, $codigo_asunto, $monto, $desc_param, $descripcion, $usuario, $password) {
 	$sesion = new Sesion();
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
-		$_codigo_asunto = explode('-', $codigo_asunto);
-		$codigo_cliente = $_codigo_asunto[0];
-		unset($_codigo_asunto);
+		$codigo_cliente = substr($codigo_asunto, 0, 4);
 
 		if ($desc_param == 0) {
 			$descripcion_a_usar = $descripcion;
