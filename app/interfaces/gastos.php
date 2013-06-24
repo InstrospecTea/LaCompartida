@@ -78,7 +78,7 @@ if ($id_gasto != "") {
 if ($opc == 'buscar') {
 	if ($orden == "") {
 		$orden = "fecha DESC";
-	} 
+	}
 
 	if ($where == '') {
 		$where=$gasto->WhereQuery($_REQUEST);
@@ -408,10 +408,10 @@ if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
 if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 	echo ' { "bVisible": false, "aTargets": [10 ] },';
 }
-?>  	
+?>
 		{  "fnRender": function ( o, val ) {
 			return o.aData[2];
-		}, "bUseRendered": false, "aTargets": [2]},	
+		}, "bUseRendered": false, "aTargets": [2]},
 
 		{"fnRender": function ( o, val ) {
 			var idcobro=o.aData[10];
@@ -424,7 +424,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 		{  "fnRender": function ( o, val ) {
 
-			
+
 			var respuesta='';
 
 			/*mejorar*/
@@ -438,7 +438,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 			return respuesta;
 		}, "bUseRendered": false, "aTargets": [13]},
-		
+
 		{"fnRender": function (o,val) {
 			if(o.aData[13]) {
 				return o.aData[13]+'<br/><small>'+o.aData[13]+'</small>';
@@ -541,18 +541,22 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 ?>
 });
 function Refrescarse() {
-	if (typeof(window.tablagastos.fnDraw)=='function')  {
-		window.tablagastos.fnDraw();
+	if (window.tablagastos != null) {
+		if (typeof(window.tablagastos.fnDraw)=='function')  {
+			window.tablagastos.fnDraw();
+		}
 	}
 }
 function Refrescar() {
-	if (typeof(window.tablagastos.fnDraw)=='function')  {
-		window.tablagastos.fnDraw();
+	if (window.tablagastos != null) {
+		if (typeof(window.tablagastos.fnDraw)=='function')  {
+			window.tablagastos.fnDraw();
+		}
 	}
 }
 </script>
 
- 
+
 			<input type="hidden" name="serializacion" id="serializacion" size="70"/>
 		<td>
 			<input type="hidden" name="serializacion" id="serializacion" size="70"/>
@@ -563,7 +567,7 @@ function Refrescar() {
 				<input type='hidden' name='motivo' id='motivo' value='gastos'/>
 				<fieldset class="tb_base" style="width: 90%;border: 1px solid #BDBDBD;margin:auto;">
 					<legend><?php echo __('Filtros') ?></legend>
-					
+
 					<table style="border: 0px solid black" width='750px'>
 						<tr>
 							<td align=right><?php echo __('Cobrado') ?></td>
@@ -650,9 +654,9 @@ function Refrescar() {
 								</td>
 								<td></td>
 							</tr>
-<?php } else {  
+<?php } else {
 	echo '<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />';
-  	$Slim=Slim::getInstance('default')  ? $Slim->applyHook('hook_formulario_gastos') : false;	
+  	$Slim=Slim::getInstance('default')  ? $Slim->applyHook('hook_formulario_gastos') : false;
 	}
  ?>
 							<tr>
@@ -675,7 +679,7 @@ function Refrescar() {
 							<td></td>
 						</tr>
 <?php } ?>
- 
+
 					</table>
 							<div  style="padding:10px;text-align:right;">
 								<a name="boton_buscar" id='boton_buscar' icon="find" class="btn botonizame buscargastos" rel="buscar" ><?php echo __('Buscar') ?></a>
@@ -700,7 +704,7 @@ function Refrescar() {
 				</table>
 <?php } ?>
 			</form>
- 
+
 	</tr>
 </table>
 
