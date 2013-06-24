@@ -1,5 +1,5 @@
 # Changelog
-## Hotfix: 13.4.6
+## Hotfix: 13.4.7
 Lunes 24 de Junio 2013
 * **Fixed:** [Corrige el envío de correo mediante "cron_correo"](https://github.com/LemontechSA/ttb/pull/219)
 * **Fixed:** [Corrige asignación de código cliente en WS de integración de contabilidad](https://github.com/LemontechSA/ttb/pull/219)
