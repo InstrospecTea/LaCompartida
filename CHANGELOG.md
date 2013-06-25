@@ -1,5 +1,5 @@
 # Changelog
-## Hotfix: 13.4.7
+## Hotfix: 13.4.8
 Lunes 25 de Junio 2013
 * **Fixed:** [Corriege Horror que gatilla alerta en agregar factura](https://github.com/LemontechSA/ttb/pull/220)
 
