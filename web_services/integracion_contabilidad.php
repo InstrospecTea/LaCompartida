@@ -496,9 +496,10 @@ function ResultadoIngresoCobro($DocEntry,$id_cobro,$usuario,$password)
 function IngresoGasto($fecha, $codigo_asunto, $monto, $desc_param, $descripcion, $usuario, $password) {
 	$sesion = new Sesion();
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
-		$_codigo_asunto = explode('-', $codigo_asunto);
-		$codigo_cliente = $_codigo_asunto[0];
-		unset($_codigo_asunto);
+		// El cliente no envía un guión en $codigo_asunto, por lo tanto, la separación del código del
+		// cliente desde el código del asunto se debe realizar por ancho fijo
+		$codigo_cliente = substr($codigo_asunto, 0, 4);
+		$_codigo_asunto = substr($codigo_asunto, 4, 8);
 
 		if ($desc_param == 0) {
 			$descripcion_a_usar = $descripcion;
@@ -527,7 +528,7 @@ function IngresoGasto($fecha, $codigo_asunto, $monto, $desc_param, $descripcion,
 		}
 
 		// validar si existe el código del asunto
-		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto = '{$codigo_asunto}'";
+		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto = '{$codigo_cliente}-{$_codigo_asunto}'";
 		$resp = mysql_query($query, $sesion->dbh);
 		list($id_asunto) = mysql_fetch_array($resp);
 
@@ -539,7 +540,7 @@ function IngresoGasto($fecha, $codigo_asunto, $monto, $desc_param, $descripcion,
 			id_usuario = 1,
 			fecha = '{$fecha}',
 			codigo_cliente = '{$codigo_cliente}',
-			codigo_asunto = '{$codigo_asunto}',
+			codigo_asunto = '{$codigo_cliente}-{$_codigo_asunto}',
 			{$tipo_monto} = '{$monto}',
 			monto_cobrable = '{$monto}',
 			descripcion = '{$descripcion_a_usar}',
