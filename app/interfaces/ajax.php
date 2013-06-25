@@ -448,7 +448,7 @@ if ($accion == "consistencia_cliente_asunto") {
 } else if ($accion == 'cargar_datos_cliente') {
 	$query_clientes = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
 												FROM contrato
-												WHERE contrato.codigo_cliente=$codigo_cliente LIMIT 1";
+												WHERE contrato.codigo_cliente='$codigo_cliente' LIMIT 1";
 	$resp = mysql_query($query_clientes, $sesion->dbh) or Utiles::errorSQL($query_clientes, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
@@ -470,7 +470,7 @@ if ($accion == "consistencia_cliente_asunto") {
 	}
 	$query_contrato = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut $campos_extra
 												FROM contrato
-												WHERE contrato.id_contrato=$id_contrato LIMIT 1";
+												WHERE contrato.id_contrato='$id_contrato' LIMIT 1";
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
