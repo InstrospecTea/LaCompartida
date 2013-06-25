@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.4.8
+Lunes 25 de Junio 2013
+* **Fixed:** [Corriege Horror que gatilla alerta en agregar factura](https://github.com/LemontechSA/ttb/pull/220)
+
 ## Hotfix: 13.4.7
 Lunes 24 de Junio 2013
 * **Fixed:** [Corrige el envío de correo mediante "cron_correo"](https://github.com/LemontechSA/ttb/pull/219)
