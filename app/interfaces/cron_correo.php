@@ -72,18 +72,22 @@ if ($minutos == 10) {
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	$log_correo = mysql_fetch_assoc($resp);
 
-	$AppName = Conf::AppName();
-	$mensaje = "<b>Atención:</b> Se encontraron {$log_correo['total']} correos con errores para el cliente '$AppName'";
+	// solo enviar si existen correos pendientes con errores por enviar
+	if ($log_correo['total'] > 0) {
+		$dbName = Conf::dbName();
+		$mensaje = "<b>Atención:</b> Se encontraron {$log_correo['total']} correos con errores para el cliente '$dbName'";
 
-	Utiles::EnviarMail(
-		$Sesion,
-		array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
-		"$AppName: {$log_correo['total']} correos con errores",
-		$mensaje
-	);
+		Utiles::EnviarMail(
+			$Sesion,
+			//array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
+			array(array('nombre' => 'Administrador', 'mail' => 'cbriones@lemontech.cl')),
+			"$dbName: {$log_correo['total']} correos con errores",
+			$mensaje
+		);
 
-	if ($debug === true) {
-		echo "<br>Correo aviso administrador enviado";
+		if ($debug === true) {
+			echo "<br>Correo aviso administrador enviado";
+		}
 	}
 }
 
