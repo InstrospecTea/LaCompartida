@@ -79,8 +79,7 @@ if ($minutos == 10) {
 
 		Utiles::EnviarMail(
 			$Sesion,
-			//array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
-			array(array('nombre' => 'Administrador', 'mail' => 'cbriones@lemontech.cl')),
+			array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
 			"$dbName: {$log_correo['total']} correos con errores",
 			$mensaje
 		);
