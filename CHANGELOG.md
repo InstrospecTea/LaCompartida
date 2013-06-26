@@ -1,5 +1,5 @@
 # Changelog
-## Hotfix: 13.4.8
+## Hotfix: 13.4.9
 Miércoles 26 de Junio 2013
 * **Fixed:** [Corrige validación Tipo de cambio](https://github.com/LemontechSA/ttb/pull/223)
 * **Fixed:** [Envío de alerta de correos avisando al administrador sobre correos no enviados](https://github.com/LemontechSA/ttb/pull/223)
