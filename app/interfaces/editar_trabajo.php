@@ -16,10 +16,14 @@
 
 	$tipo_ingreso = Conf::GetConf($sesion,'TipoIngresoHoras');
 	$actualizar_trabajo_tarifa = true;
+	$permiso_revisor_usuario = false;
 
 	if ($id_trabajo > 0) {
 		$actualizar_trabajo_tarifa = false;
 		$t->Load($id_trabajo);
+
+		// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+		$permiso_revisor_usuario = $sesion->usuario->Revisa($t->fields['id_usuario']);
 
 		if (($t->Estado() == 'Cobrado' || $t->Estado()== __("Cobrado"))&& $opcion != 'nuevo') {
 			$pagina->AddError(__('Trabajo ya cobrado'));
@@ -226,7 +230,7 @@
 				} else {
 					$t->Edit('descripcion', $descripcion);
 				}
-				
+
 				$cambio_fecha = strtotime($t->fields['fecha']) != strtotime(Utiles::fecha2sql($fecha));
 				$t->Edit('fecha', Utiles::fecha2sql($fecha));
 				// $t->Edit('fecha',$fecha);
@@ -282,11 +286,11 @@
 
 				/*
 				*	Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
-				* 
+				*
 				*   if ($t->fields['cobrable'] == 0) {
 				*		$t->fields['duracion_cobrada']='00:00:00';
 				*	}
-				*/   
+				*/
 
 				$ingreso_valido = true;
 				if ($cambio_duracion || $cambio_fecha) {
@@ -739,7 +743,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
 	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario", $id_usuario ,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 
-	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
+	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable') || $permiso_revisor_usuario) {
 
 		echo '<td class="seccioncobrable">&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td  class="seccioncobrable">';
 
