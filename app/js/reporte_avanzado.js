@@ -454,9 +454,9 @@ function RevisarTabla() {
 	var tabla = jQuery('#tabla');
 
 	if (!comparar.is(':checked') && jQuery('#numero_agrupadores').val() == 2) {
-		tabla.hide();
-	} else {
 		tabla.show();
+	} else {
+		tabla.hide();
 	}
 }
 
