@@ -32,7 +32,7 @@
 			exit;
 
 		} else if (($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo') {
-			if (!$permiso_revisor->fields['permitido']) {
+			if (!$permiso_revisor->fields['permitido'] && !$permiso_revisor_usuario) {
 				$pagina->AddError(__('Trabajo ya revisado'));
 				$pagina->PrintTop($popup);
 				$pagina->PrintBottom($popup);
