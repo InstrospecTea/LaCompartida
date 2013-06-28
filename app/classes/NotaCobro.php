@@ -4206,6 +4206,7 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'RESUMEN_ASUNTOS_ENCABEZADO':
+				$html = str_replace('%codigo_asunto%', __('Codigo Asunto'), $html);
 				$html = str_replace('%glosa_asunto%', __('Título Asunto'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
@@ -4222,6 +4223,8 @@ class NotaCobro extends Cobro {
 
 					$query = "
 							SELECT
+								asunto.codigo_asunto,
+								asunto.codigo_asunto_secundario,
 								asunto.glosa_asunto,
 								SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada,
 								SUM(monto_cobrado) as importe
@@ -4235,13 +4238,15 @@ class NotaCobro extends Cobro {
 								GROUP BY glosa_asunto ASC";
 
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					while (list($glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
+					while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
 						$row = $row_tmpl;
 
 						$horas = floor($duracion_cobrada/3600);
 						$minutes = (($duracion_cobrada/60 )%60);
 						$seconds = ($duracion_cobrada %60);
 
+						$row = str_replace('%codigo_asunto%', $codigo_asunto, $row);
+						$row = str_replace('%codigo_asunto_secundario%', $codigo_asunto_secundario, $row);
 						$row = str_replace('%glosa_asunto%', $glosa_asunto, $row);
 						$row = str_replace('%horas%', $horas. ':' . sprintf("%02d", $minutes), $row);
 						$row = str_replace('%importe%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
