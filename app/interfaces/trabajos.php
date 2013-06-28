@@ -913,8 +913,10 @@ function LinkAlTrabajo(& $trabajo, $texto = '') {
 	$cobro = new Cobro($sesion);
 	$cobro->Load($id_cobro);
 
+	// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+	$permiso_revisor_usuario = $sesion->usuario->Revisa($trabajo->fields['id_usuario']);
 
-	if ($p_revisor->fields['permitido']) {
+	if ($p_revisor->fields['permitido'] || $permiso_revisor_usuario) {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
 			$opc_html.= "<a style='vertical-align:top;' href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
