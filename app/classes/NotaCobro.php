@@ -10151,25 +10151,21 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%factura_razon_social_o_nombre_cliente%', ( isset($contrato->fields['factura_razon_social'])
 				&& $contrato->fields['factura_razon_social'] != '') ? $contrato->fields['factura_razon_social'] : $glosa_cliente, $htmlplantilla);
 		if ($this->fields['codigo_idioma'] == 'es') {
-			$htmlplantilla = str_replace('%factura%', __('Factura'), $htmlplantilla);
 			$htmlplantilla = str_replace('%fecha_liquidacion%', __('Fecha Liquidación'), $htmlplantilla);
 			$htmlplantilla = str_replace('%cliente_corporativo%', __('Cliente Corporativo'), $htmlplantilla);
 			$htmlplantilla = str_replace('%id_asunto%', __('ID Asunto'), $htmlplantilla);
 		} else {
-			$htmlplantilla = str_replace('%factura%', __('Factura'), $htmlplantilla);
 			$htmlplantilla = str_replace('%fecha_liquidacion%', __('Invoice Date'), $htmlplantilla);
 			$htmlplantilla = str_replace('%cliente_corporativo%', __('Corporate Customer '), $htmlplantilla);
 			$htmlplantilla = str_replace('%id_asunto%', __('Matter ID'), $htmlplantilla);
 		}
 
+		$htmlplantilla = str_replace('%factura%', __('Factura'), $htmlplantilla);
 		$htmlplantilla = str_replace('%codigo_cliente%', $contrato->fields['codigo_cliente'], $htmlplantilla);
 		$htmlplantilla = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == ''
 				|| $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $htmlplantilla);
 		$htmlplantilla = str_replace('%direccion%', __('Dirección'), $htmlplantilla);
-
-
-
 		$htmlplantilla = str_replace('%valor_direccion%', nl2br($contrato->fields['factura_direccion']), $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_direccion_uc%', nl2br(ucwords(strtolower($contrato->fields['factura_direccion']))), $htmlplantilla);
 		$direccion=explode('//',$contrato->fields['direccion_contacto']);
@@ -10221,6 +10217,24 @@ class NotaCobro extends Cobro {
 		} else {
 			$htmlplantilla = str_replace('%numero_factura%', '', $htmlplantilla);
 		}
+
+		$htmlplantilla = str_replace('%solo_num_factura%', date('Y').'/'.ereg_replace("[^0-9]", "", $this->fields['documento']), $htmlplantilla);
+
+		if (method_exists('Conf', 'GetConf')) {
+			if ($lang == 'es') {
+				$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ', ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+			} else {
+				$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ' (' . Conf::GetConf($this->sesion, 'PaisEstudio') . '), ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+			}
+		} else {
+			if ($lang == 'es') {
+				$fecha_lang = 'Santiago, ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+			} else {
+				$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
+			}
+		}
+		
+		$htmlplantilla = str_replace('%fecha_especial%', $fecha_lang, $htmlplantilla);
 
 		if ($contrato->fields['id_pais'] > 0) {
 			$query = "SELECT nombre FROM prm_pais
