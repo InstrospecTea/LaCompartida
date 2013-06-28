@@ -37,12 +37,12 @@ class CronNotificacion extends Cron {
 		$this->log('INICIO CronNotificacion');
 
 		$this->Sesion->phpConsole(1);
-		
+
 		$this->correo = $correo;
 		if(empty($this->correo)) {
 			$this->Sesion->debug('No se recibió parámetro para la acción a ejecutar. Terminamos.');
 			die('Finalizado');
-		} 
+		}
 		 $this->Sesion->debug('empieza el cron notificacion');
 
 
@@ -53,7 +53,7 @@ class CronNotificacion extends Cron {
 			$this->log('INICIO semanales');
 			$this->semanales();
 		}
-	 	 
+
 		$this->log('INICIO diarios');
 		$this->Sesion->debug('INICIO diarios');
 		$this->diarios();
@@ -198,7 +198,7 @@ class CronNotificacion extends Cron {
 					$dato_semanal[$id_usuario]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $revisados)));
 				}
 			}
-		
+
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
 
@@ -209,7 +209,7 @@ class CronNotificacion extends Cron {
 		} else 	if ($this->correo=='desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 			var_dump($dato_semanal);
 			echo implode('<br/><br/><br/>', $mensajes);
-		} else if ($this->correo='simular_correo') {
+		} else if ($this->correo == 'simular_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
 			 	$mensaje['simular']=true;
 				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
@@ -245,7 +245,7 @@ class CronNotificacion extends Cron {
 
 		// Fin del mail diario. Envío.
 		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
-		
+
 		if ($this->correo=='generar_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
@@ -254,7 +254,7 @@ class CronNotificacion extends Cron {
 			var_dump($this->datoDiario);
 			echo implode('<br><br><br>', $mensajes);
 		} else if ($this->correo=='simular_correo') {
-			
+
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$mensaje['simular']=true;
 				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
