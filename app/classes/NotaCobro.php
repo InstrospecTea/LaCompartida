@@ -5047,7 +5047,7 @@ class NotaCobro extends Cobro {
 				*	Contenido de filas de seccion trabajo.
 				*/
 				$query = "SELECT SQL_CALC_FOUND_ROWS
-									trabajo.duracion_cobrada,
+									IF(trabajo.cobrable,trabajo.duracion_cobrada,'00:00:00') as duracion_cobrada,
 									trabajo.duracion_retainer,
 									trabajo.descripcion,
 									trabajo.fecha,
@@ -5057,7 +5057,7 @@ class NotaCobro extends Cobro {
 									trabajo.cobrable,
 									trabajo.id_trabajo,
 									trabajo.tarifa_hh,
-									trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ) as importe,
+									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
 									prm_categoria_usuario.glosa_categoria AS categoria,
@@ -5086,34 +5086,18 @@ class NotaCobro extends Cobro {
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
 
-					if ($trabajo->fields['cobrable'] == '0'){
+					$total_trabajo_importe = $trabajo->fields['importe'];
+					$total_trabajo_monto_cobrado = $trabajo->fields['monto_cobrado'];
+					$tarifa_hh = $trabajo->fields['tarifa_hh'];
+					$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
+					$duracion_retainer = $trabajo->fields['duracion_retainer'];
+					$duracion = $trabajo->fields['duracion'];
+					$retainer_cobro = $this->fields['retainer_horas'];
 
-						// Se definen como tiempos y valores en cero debido a que estan definidos como no cobrables
-						list($h, $m, $s) = split(":", '0:00:00');
-						list($h_retainer, $m_retainer, $s_retainer) = split(":", '0:00:00');
-						$total_trabajo_importe = '0';
-						$total_trabajo_monto_cobrado = '0';
-					} else {
+					list($h, $m, $s) = split(":", $duracion_cobrada);
+					list($h_retainer, $m_retainer, $s_retainer) = split(":", $duracion_retainer);
+					list($ht, $mt, $st) = split(":", $duracion);
 
-						// Se convierte la duracion_cobrada a decimal para compararlo con el retainer_horas del cobro;
-						$trabajo_duracion_cobrada = UtilesApp::Time2Decimal($trabajo->fields['duracion_cobrada']);
-						$retainer_horas = $this->fields['retainer_horas'];
-						// Si forma de cobro es RETAINER Y la duracion de sus trabajos exede a la duracion retainer;
-						if (($this->fields['forma_cobro'] == 'RETAINER') && ($retainer_horas < $trabajo_duracion_cobrada)){
-							// se calcula obtiene la diferencia entre la duracion cobrada y el retainer.
-							$duracion_tarificada = $trabajo_duracion_cobrada - $retainer_horas;
-							$duracion_cobrada = UtilesApp::Decimal2Time($duracion_tarificada);
-						} else {
-							$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
-						}
-
-						list($h, $m, $s) = split(":", $duracion_cobrada);
-						list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
-						$total_trabajo_importe = $trabajo->fields['importe'];
-						$total_trabajo_monto_cobrado = $trabajo->fields['monto_cobrado'];
-					}
-
-					list($ht, $mt, $st) = split(":", $trabajo->fields['duracion']);
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
