@@ -1259,10 +1259,13 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%asunto%', __('Asunto'), $row);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'GlosaAsuntoSinCodigo') ) || (method_exists('Conf', 'GlosaAsuntoSinCodigo') && Conf::GlosaAsuntoSinCodigo() )))
+					if (UtilesApp::GetConf($this->sesion, 'GlosaAsuntoSinCodigo')) {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['glosa_asunto'], $row);
-					else
+						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['glosa_asunto'], $row);
+					} else {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['codigo_asunto'] . " - " . $asunto->fields['glosa_asunto'], $row);
+						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['codigo_asunto_secundario'] . " - " . $asunto->fields['glosa_asunto'], $row);
+					}
 					$row = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $row);
 					$row = str_replace('%glosa_asunto_codigo_area%', $asunto->fields['codigo_asunto'] . '-' . sprintf("%02d", ($asunto->fields['id_area_proyecto'] - 1)) . " - " . $asunto->fields['glosa_asunto'], $row);
 					$row = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $row);
@@ -4505,10 +4508,13 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%asunto%', __('Asunto'), $row);
-					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'GlosaAsuntoSinCodigo') ) || ( method_exists('Conf', 'GlosaAsuntoSinCodigo') && Conf::GlosaAsuntoSinCodigo() ))
+					if (UtilesApp::GetConf($this->sesion, 'GlosaAsuntoSinCodigo')) {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['glosa_asunto'], $row);
-					else
+						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['glosa_asunto'], $row);
+					} else {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['codigo_asunto'] . " - " . $asunto->fields['glosa_asunto'], $row);
+						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['codigo_asunto_secundario'] . " - " . $asunto->fields['glosa_asunto'], $row);
+					}
 					$row = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $row);
 					$row = str_replace('%glosa_asunto_codigo_area%', $asunto->fields['codigo_asunto'] . '-' . sprintf("%02d", ($asunto->fields['id_area_proyecto'] - 1)) . " - " . $asunto->fields['glosa_asunto'], $row);
 					$row = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $row);
@@ -5000,12 +5006,27 @@ class NotaCobro extends Cobro {
 					$trabajo = $lista_trabajos->Get($i);
 
 					if ($trabajo->fields['cobrable'] == '0'){
+
+						// Se definen como tiempos y valores en cero debido a que estan definidos como no cobrables
 						list($h, $m, $s) = split(":", '0:00:00');
 						list($h_retainer, $m_retainer, $s_retainer) = split(":", '0:00:00');
 						$total_trabajo_importe = '0';
 						$total_trabajo_monto_cobrado = '0';
 					} else {
-						list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+
+						// Se convierte la duracion_cobrada a decimal para compararlo con el retainer_horas del cobro;
+						$trabajo_duracion_cobrada = UtilesApp::Time2Decimal($trabajo->fields['duracion_cobrada']);
+						$retainer_horas = $this->fields['retainer_horas'];
+						// Si forma de cobro es RETAINER Y la duracion de sus trabajos exede a la duracion retainer;
+						if (($this->fields['forma_cobro'] == 'RETAINER') && ($retainer_horas < $trabajo_duracion_cobrada)){
+							// se calcula obtiene la diferencia entre la duracion cobrada y el retainer.
+							$duracion_tarificada = $trabajo_duracion_cobrada - $retainer_horas;
+							$duracion_cobrada = UtilesApp::Decimal2Time($duracion_tarificada);
+						} else {
+							$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
+						}
+
+						list($h, $m, $s) = split(":", $duracion_cobrada);
 						list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
 						$total_trabajo_importe = $trabajo->fields['importe'];
 						$total_trabajo_monto_cobrado = $trabajo->fields['monto_cobrado'];
@@ -7454,8 +7475,10 @@ class NotaCobro extends Cobro {
 
 					if (UtilesApp::GetConf($this->sesion, 'GlosaAsuntoSinCodigo')) {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['glosa_asunto'], $row);
+						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['glosa_asunto'], $row);
 					} else {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['codigo_asunto'] . " - " . $asunto->fields['glosa_asunto'], $row);
+						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['codigo_asunto_secundario'] . " - " . $asunto->fields['glosa_asunto'], $row);
 					}
 					$row = str_replace('%codigo_cliente%', $filaasunto['codigo_cliente'], $row);
 					$row = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $row);
