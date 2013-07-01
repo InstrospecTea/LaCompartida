@@ -1848,9 +1848,9 @@ class Factura extends Objeto {
 
 			$formato=array();
  
- 		 	$formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
-  							 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
- 							},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
+ 		 	// $formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
+  			// 				 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
+ 				// 			},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
 
  			$formato['numero']= '{  "sWidth": "90px", "bVisible": "true",  "sClass": "al"
 							,"fnRender": function ( o, val ) {
