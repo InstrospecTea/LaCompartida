@@ -125,7 +125,7 @@ class Alerta {
 		}
 
 		if ($header) {
-			$_mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : '') . "Alerta: $mensaje";
+			$_mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : '') . "Alerta: $_mensaje";
 		}
 
 		$from = html_entity_decode(Conf::AppName());
