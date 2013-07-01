@@ -5140,7 +5140,7 @@ class NotaCobro extends Cobro {
 					$categoria_duracion_descontada += $duracion_decimal_descontada;
 
 					$row = $row_tmpl;
-					 $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
+					$row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
 						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
