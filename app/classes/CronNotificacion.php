@@ -211,7 +211,7 @@ class CronNotificacion extends Cron {
 			echo implode('<br/><br/><br/>', $mensajes);
 		} else if ($this->correo == 'simular_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
-			 	$mensaje['simular']=true;
+			 	$mensaje['simular'] = true;
 				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
 			}
 		}

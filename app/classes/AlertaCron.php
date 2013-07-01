@@ -112,21 +112,27 @@ class Alerta {
 		}
 
 		$tipo = null;
-		$simular=false;
+		$simular = false;
+
 		if (is_array($mensaje)) {
 			$tipo = $mensaje['tipo'];
-			$mensaje = $mensaje['mensaje'];
-			$simular=!empty($mensaje['simular']) && $mensaje['simular'];
+			$_mensaje = $mensaje['mensaje'];
+			if (isset($mensaje['simular'])) {
+				$simular = $mensaje['simular'];
+			}
+		} else {
+			$_mensaje = $mensaje;
 		}
+
 		if ($header) {
-			$mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : "") . "Alerta: $mensaje";
+			$_mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : '') . "Alerta: $mensaje";
 		}
 
 		$from = html_entity_decode(Conf::AppName());
 
 		$to = $email; // Mail a Usuario
 
-		Utiles::InsertarPlus($sesion, "Alerta $from", $mensaje, $to, $nombre, $tipo=='diario', $id_usuario, $tipo, $simular);
+		Utiles::InsertarPlus($sesion, "Alerta $from", $_mensaje, $to, $nombre, ($tipo == 'diario'), $id_usuario, $tipo, $simular);
 	}
 
 	function AlertaProfesional($id_persona, $opc_mail, $sesion) {
