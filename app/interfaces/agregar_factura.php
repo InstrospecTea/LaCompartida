@@ -595,17 +595,13 @@ if ($buscar_padre) {
 			<td align=right><?php echo __('Direcci&oacute;n Cliente') ?></td>
 			<td align=left colspan=3><input type="text" name="direccion_cliente" value="<?php echo ($factura->fields['direccion_cliente'] ? $factura->fields['direccion_cliente'] : $contrato->fields['factura_direccion']) ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
 		</tr>
-			<?php if (UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) { ?>
 			<tr>
 				<td align=right><?php echo __('Comuna') ?></td>
 				<td align=left colspan=3><input type="text" name="comuna_cliente" value="<?php echo ($factura->fields['comuna_cliente'] ? $factura->fields['comuna_cliente'] : $contrato->fields['factura_comuna']) ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
 			</tr>
-				<?php
-			}
-			?>
 			<tr>
 				<td align="right"><?php echo __('Código Postal'); ?></td>
-				<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="' . ($factura->fields['factura_codigopostal'] ? $factura->fields['factura_codigopostal'] : $contrato->fields['factura_codigopostal']) . '" id="factura_codigopostal" size="30" maxlength="20" /></td>
+				<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="<?php echo ($factura->fields['factura_codigopostal'] ? $factura->fields['factura_codigopostal'] : $contrato->fields['factura_codigopostal']); ?>" id="factura_codigopostal" size="30" maxlength="20" /></td>
 			</tr>
 			<tr>
 				<td align="right"><?php echo __('Ciudad'); ?></td>
