@@ -5098,6 +5098,17 @@ class NotaCobro extends Cobro {
 					list($h_retainer, $m_retainer, $s_retainer) = split(":", $duracion_retainer);
 					list($ht, $mt, $st) = split(":", $duracion);
 
+					if ($this->fields['forma_cobro'] == 'RETAINER'){
+						$horas = $h + $m / 60 + $s / 3600;
+						$horas_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
+						$horas_tarificadas = $horas - $horas_retainer;
+						$horas_tarificadas_retainer = UtilesApp::Decimal2Time($horas_tarificadas);
+						$horas_trabajadas = $ht + $mt /60 + $st / 3600;
+
+						list($h, $m ,$s) = split(":",$horas_tarificadas_retainer);
+						$total_trabajo_importe = $tarifa_hh * $horas_tarificadas;
+					}
+
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
@@ -5105,8 +5116,11 @@ class NotaCobro extends Cobro {
 					$asunto->fields['trabajos_total_importe'] += $trabajo->fields['importe'];
 					$asunto->fields['trabajos_total_duracion_trabajada'] += $ht * 60 + $mt + $st / 60;
 					$duracion_decimal_trabajada = $ht + $mt / 60 + $st / 3600;
-					$duracion_decimal_descontada = $ht - $h + ($mt - $m) / 60 + ($st - $s) / 3600;
 					$duracion_decimal_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
+					$duracion_decimal_descontada = $ht - $h + ($mt - $m) / 60 + ($st - $s) / 3600;
+					if($horas_retainer - $horas_trabajadas < 0){
+						$duracion_decimal_descontada = $duracion_decimal_descontada - $duracion_decimal_retainer;
+					}
 
 					$minutos_decimal = $m / 60;
 					$duracion_decimal = $h + $minutos_decimal + $s / 3600;
@@ -5126,7 +5140,7 @@ class NotaCobro extends Cobro {
 					$categoria_duracion_descontada += $duracion_decimal_descontada;
 
 					$row = $row_tmpl;
-					 $row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
+					$row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					if ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' ){
 						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
