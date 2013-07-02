@@ -39,9 +39,9 @@ if ($exportar_excel) {
 //		$multiple = true;
 //		require_once Conf::ServerDir().'/interfaces/facturas_listado_xls.php';
 //		exit;
-	  
+
 }
- 
+
 
 
 if ($archivo_contabilidad) {
@@ -54,10 +54,10 @@ $idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
 global $factura;
-($Slim=Slim::getInstance()) ?  $Slim->applyHook('hook_factura_inicio'):false; 
+($Slim=Slim::getInstance()) ?  $Slim->applyHook('hook_factura_inicio'):false;
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
-	
+
 	$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 		,$tipo_documento_legal_buscado
 		, $codigo_cliente,$codigo_cliente_secundario
@@ -66,10 +66,10 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable );
 
 	if ($exportar_excel) {
-	
+
 		$factura->DownloadExcel($results);
-	die();	 
-	}  
+	die();
+	}
 }
 
 $pagina->titulo = __('Revisar Documentos Tributarios');
@@ -91,7 +91,7 @@ $pagina->PrintTop();
 	}
 
 
- 
+
 
 	function ImprimirDocumento( id_factura )
 	{
@@ -149,11 +149,11 @@ $pagina->PrintTop();
 
  <form method='post' name="form_facturas" id="form_facturas">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
- 
+
 	<?php
 		echo "<table width=\"90%\"><tr><td>";
 		$class_diseno = 'class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;"';
-	 
+
 	?>
 	<fieldset class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;">
 		<legend><?php echo __('Filtros') ?></legend>
@@ -176,7 +176,7 @@ $pagina->PrintTop();
 			</tr>
 			</tr>
 				<?php ($Slim=Slim::getInstance()) ?  $Slim->applyHook('hook_filtros_facturas'):false; ?>
-		
+
 			<tr>
 			<tr>
 				<td align=right>
@@ -264,24 +264,24 @@ if (method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza") {
 				</td>
 				<td nowrap align=left>
 					<input type="text" id="fecha1" class="fechadiff"  name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-					 
+
 				</td>
 				<td align=right>
 <?php echo __('Fecha Fin') ?>
 				</td>
 				<td align=left width="44%">
 					<input type="text" id="fecha2" class="fechadiff" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-					 
+
 				</td>
 			</tr>
 			<tr id="fila_botones">
 				<td colspan="4" style="text-align:center;margin:auto;">
 					<a name='boton_buscar' id='boton_buscar'  class="btn botonizame" icon="find"   onclick="BuscarFacturas(jQuery('#form_facturas').get(0),'buscar')" class=btn><?php echo __('Buscar') ?></a>
-				 
+
 					<a    class="btn botonizame" id="boton_descarga" icon="xls" name="boton_excel" onclick="BuscarFacturas(jQuery('#form_facturas').get(0), 'exportar_excel')"><?php echo __('Descargar Excel'); ?></a>
-				<?php ($Slim=Slim::getInstance()) ?  $Slim->applyHook('hook_factura_fin'):false;  
-				 
- 
+				<?php ($Slim=Slim::getInstance()) ?  $Slim->applyHook('hook_factura_fin'):false;
+
+
 
 if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
 						<input type="button" value="<?php echo __('Descargar Archivo Contabilidad'); ?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')" />
@@ -292,17 +292,17 @@ if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
 				</td>
 			</tr>
 		</table>
-	</fieldset> </td></tr></table> 
- 
+	</fieldset> </td></tr></table>
+
 </form>
- 
+
 
 <?php
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 
- 
-	$monto_saldo_total = 0; 
+
+	$monto_saldo_total = 0;
 	$glosa_monto_saldo_total = '';
 	$where_moneda = ' WHERE moneda_base = 1';
 	if ($id_moneda > 0) {
@@ -311,7 +311,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$query_moneda = 'SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio FROM prm_moneda	' . $where_moneda . ' ORDER BY id_moneda ';
 	$resp_moneda = mysql_query($query_moneda, $sesion->dbh) or Utiles::errorSQL($query_moneda, __FILE__, __LINE__, $sesion->dbh);
 	$id_moneda_base = 0;
-	
+
 	while (list($id_moneda_tmp, $simbolo_moneda_tmp, $cifras_decimales_tmp, $moneda_base_tmp, $tipo_cambio_tmp) = mysql_fetch_array($resp_moneda)) {
 		foreach ($results as $row) {
 			$monto_saldo_total += UtilesApp::CambiarMoneda($row['saldo'], $row['tipo_cambio'], $row['cifras_decimales'], $tipo_cambio_tmp, $cifras_decimales_tmp);
@@ -319,14 +319,14 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 		$glosa_monto_saldo_total = '<b>' . __('Saldo') . ' ' . $simbolo_moneda_tmp . ' ' . number_format($monto_saldo_total, $cifras_decimales_tmp, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']) . "</b>";
 	}
 	// calcular el saldo en moneda base
- 
+
 
  	$SimpleReport = new SimpleReport($sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($sesion));
 
 	$config=$SimpleReport->LoadConfiguration('FACTURAS');
 
- 
+
  $config->columns['numero']->title="Datos<br>Documento";
 $config->columns['glosas_asunto']->title=__('Expedientes');
 $config->columns['glosa_cliente']->title=__('Destinatario Documento');
@@ -350,13 +350,13 @@ $config->columns['acciones']=(object) array('visible'=>true,"field"=>"acciones",
 
 
 	$SimpleReport->LoadResults($results );
- 
+
 	$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'DataTable');
 	echo '<div class="titulo_buscador">Documentos Tributarios <br>'.$glosa_monto_saldo_total .'</div>';
-	
+
 
 	echo $writer->save(null,null,$factura->FormatoDataTable());
-	 
+
 
 }
 

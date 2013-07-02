@@ -148,7 +148,7 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 						$aoArray[$column->field] .= ', "sClass": "ar" ';
 					}
 				} else if ($column->format == 'date') {
-					$aoArray[$column->field] .= ', "mRender": function ( data, type, row ) { if(data=="") return;var fecha=new Date(data + " 00:00:00"); return  jQuery.datepicker.formatDate("dd/mm/y",fecha); }';
+					$aoArray[$column->field] .= ', "mRender": function ( data, type, row ) { if(data=="") return;var fecha_split = data.split(" "); var fecha = new Date(data + (fecha_split[1] ? "" : " 00:00:00")); return  jQuery.datepicker.formatDate("dd/mm/y",fecha); }';
 				} else {
 					if ($column->class) {
 						$aoArray[$column->field] .= ', "sClass": "' . $column->class . '" ';
@@ -186,37 +186,44 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 
 	private function datatable($result, $columns, $formato) {
 
-		$html = '<link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />';
-		$html.= '<script  src="//static.thetimebilling.com/js/jquery.dataTables.1.9.4.js"></script>';
+		$html =<<<HTML
+		<link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />
+		<script  src="//static.thetimebilling.com/js/jquery.dataTables.1.9.4.js"></script>
 
-		$html.='<script type="text/javascript">';
-		$html.="\njQuery(document).ready(function() {\n";
-		$html.="\njQueryUI.done(function() {\n";
-		$html.="\nvar tabledata =" . $this->aadata($result, $columns) . "\n";
-
-		$html.="var oTable = jQuery('#tablonsimplereport').dataTable( {\n";
-		$html.='"bProcessing": true,' . "\n";
-		//$html.='"bAutoWidth": false,'."\n";
-
-		$html.= ' "aaData": tabledata,  ' . "\n";
-		$html.=" \"bDestroy\":true,
-				\"oLanguage\": {    \"sProcessing\":  \"Procesando...\" ,   \"sLengthMenu\":   \"Mostrar _MENU_ registros\",\"sZeroRecords\":  \"No se encontraron resultados\",  \"sInfo\":         \"Mostrando desde _START_ hasta _END_ de _TOTAL_ registros\",
-			\"sInfoEmpty\":    \"Mostrando desde 0 hasta 0 de 0 registros\",  \"sInfoFiltered\": \"(filtrado de _MAX_ registros en total)\",  \"sSearch\":  \"Filtrar\",
-			 	\"oPaginate\": {            \"sPrevious\": \"Anterior\",   \"sNext\":     \"Siguiente\"}
-				},
-				    \"bProcessing\": true,
-					\"bJQueryUI\": true,
-
-				 \"aaSorting\": [[0,'desc']],
-			\"iDisplayLength\": 25,
-			\"aLengthMenu\": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, \"Todo\"]],
-			\"sPaginationType\": \"full_numbers\",
-			\"sDom\":  '<\"top\"ifp>rt<\"bottom\">',\n";
-		$html.=$this->aoColumnDefs($result, $columns, $formato);
-		$html.="\n 	});\n";
-		$html.="\n	});\n";
-		$html.="});\n";
-		$html.="</script>";
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+				jQueryUI.done(function() {
+					var tabledata = {$this->aadata($result, $columns)}
+					var oTable = jQuery('#tablonsimplereport').dataTable({
+						"bProcessing": true,
+						"aaData": tabledata,
+						"bDestroy": true,
+						"oLanguage": {
+							"sProcessing": "Procesando...",
+							"sLengthMenu": "Mostrar _MENU_ registros",
+							"sZeroRecords": "No se encontraron resultados",
+							"sInfo": "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
+							"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros",
+							"sInfoFiltered": "(filtrado de _MAX_ registros en total)",
+							"sSearch": "Filtrar",
+							"oPaginate": {
+								"sPrevious": "Anterior",
+								"sNext": "Siguiente"
+							}
+						},
+						"bProcessing": true,
+						"bJQueryUI": true,
+						"aaSorting": [[0, "desc"]],
+						"iDisplayLength": 25,
+						"aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
+						"sPaginationType": "full_numbers",
+						"sDom": '<"top"ifp>rt<"bottom">',
+						{$this->aoColumnDefs($result, $columns, $formato)}
+					});
+				});
+			});
+		</script>
+HTML;
 		return $html;
 	}
 
