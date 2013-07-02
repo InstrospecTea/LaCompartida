@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.4.12
+Martes 2 de Julio 2013
+* **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)
+
 ## Hotfix: 13.4.11
 Lunes 1 de Julio 2013
 * **Fixed:** [El autocompletador de datos de facturación saca los datos del cliente y no del contrato](https://github.com/LemontechSA/ttb/pull/230)
