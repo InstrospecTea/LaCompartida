@@ -2,6 +2,7 @@
 ## Hotfix: 13.4.12
 Martes 2 de Julio 2013
 * **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)
+* **Fixed:** [Corrección fecha último pago para facturas con SimpleReport y DataTables](https://github.com/LemontechSA/ttb/pull/231)
 
 ## Hotfix: 13.4.11
 Lunes 1 de Julio 2013
