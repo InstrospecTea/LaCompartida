@@ -1,5 +1,11 @@
 # Changelog
-## Hotfix: 13.4.9
+## Hotfix: 13.4.11
+Lunes 1 de Julio 2013
+* **Fixed:** [El autocompletador de datos de facturación saca los datos del cliente y no del contrato](https://github.com/LemontechSA/ttb/pull/230)
+* **Fixed:** [Visualización reportes de fecha con SimpleReport -> DataTables](https://github.com/LemontechSA/ttb/pull/230)
+* **Fixed:** [Genera modificacion a seccion trabajos filas para operar con retainer](https://github.com/LemontechSA/ttb/pull/230)
+
+## Hotfix: 13.4.10
 Miércoles 28 de Junio 2013
 * **Fixed:** [Corrige calculo columnas retainer en seccion trabajos filas](https://github.com/LemontechSA/ttb/pull/224)
 
