@@ -387,6 +387,7 @@ $_LANG['Publicaciones Diarios Locales'] = "Publicaciones Diarios Locales";
 $_LANG['Títulos Accionarios'] = "Títulos Accionarios";
 $_LANG['Compra Bases de Licitación'] = "Compra Bases de Licitación";
 $_LANG['Saldo aprovisionado restante tras Cobro #'] = "Saldo aprovisionado restante tras Cobro #";
+$_LANG['textoSolicitudCheque'] = "Favor de no enviar cheques por correo postal. No nos haremos responsables de cheques extraviados y/o robados.";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";

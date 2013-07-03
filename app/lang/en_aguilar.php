@@ -1,6 +1,5 @@
 <?php
-
-require_once dirname(__FILE__) . '/../../fw/funciones/funciones.php';
+require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
 
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
@@ -30,7 +29,7 @@ $_LANG['Nota de Cobro ACL'] = 'Debit Note';
 $_LANG['Trabajo'] = "Task";
 $_LANG['Trabajos'] = "Tasks";
 $_LANG['Total'] = "Total";
-$_LANG['Detalle Cobro'] = "Debit Note Details";
+$_LANG['Detalle Cobro'] = "Invoice Details";
 $_LANG['Servicios prestados'] = "Services";
 $_LANG['Profesional'] = "Professional";
 $_LANG['Detalle profesional'] = "Summary of fees";
@@ -44,6 +43,8 @@ $_LANG['Contacto'] = "Contact";
 $_LANG['Atención'] = "Attention";
 $_LANG['Giro'] = "Type of business";
 $_LANG['Dirección'] = "Address";
+$_LANG['Resumen Asuntos'] = "Matter Summary";
+$_LANG['Título Asunto'] = "Legal Area";
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
@@ -240,7 +241,7 @@ $_LANG['Semana anterior'] = "Previous week";
 $_LANG['Semana siguiente'] = "Next week";
 $_LANG['Fechas asociadas guardadas exitosamente'] = "Dates partner successfully saved";
 $_LANG['No Aplicable'] = "Not Applicable";
-$_LANG['Titulo Asunto'] = "Legal Area";
+
 
 #COBROS
 $_LANG['Cobros'] = "Cobros";
@@ -360,12 +361,16 @@ $_LANG['Títulos Accionarios'] = "Share Certificates";
 $_LANG['Compra Bases de Licitación'] = "Purchase of bidding terms/ RFPs";
 $_LANG['Saldo aprovisionado restante tras Cobro #'] = "Balance remaining after invoice #";
 
+
+
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";
 $_LANG['Carta'] = "Invoice";
 $_LANG['Oficio'] = "Oficio";
 $_LANG['A4'] = "A4";
 $_LANG['A4'] = "A5";
+
+
 
 $_LANG['Pago'] = "Pago";
 $_LANG['Versión para imprimir'] = "Printversion";
@@ -469,8 +474,7 @@ $_LANG['Correlativo'] = "Correlativo";
 $_LANG['entre'] = "entre";
 $_LANG['Responsable'] = "Responsable";
 $_LANG['Monto Impuesto'] = "Taxes";
-$_LANG['Monto total'] = "Monto total";
-$_LANG['Título Asunto'] = "Legal Area";
+$_LANG['Monto total'] = "Total";
 $_LANG['Egreso Monto'] = "Egreso Monto";
 $_LANG['Cobro inválido'] = "Cobro inválido";
 $_LANG['Fecha Realización'] = "Fecha Realización";
@@ -495,6 +499,7 @@ $_LANG['Fecha realización'] = "Fecha realización";
 $_LANG['Descargar listado a Excel'] = "Descargar listado a Excel";
 $_LANG['No tienes privilegios suficientes para ver esta sección.'] = "No tienes privilegios suficientes para ver esta sección.";
 
+
 #ASUNTO
 $_LANG['asuntos'] = "asuntos";
 $_LANG['Código asunto'] = "Código asunto";
@@ -502,7 +507,7 @@ $_LANG['Título asunto'] = "Título asunto";
 $_LANG['Listado de Asuntos'] = "Listado de Asuntos";
 $_LANG['Existe un asunto con el mismo código, por favor seleccione otro código'] = "Existe un asunto con el mismo código, por favor seleccione otro código";
 $_LANG['Asunto guardado con éxito'] = "Asunto guardado con éxito";
-$_LANG['El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo'] = "El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo";
+$LAN['El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo'] = "El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo";
 $_LANG['El último asunto ingresado es'] = "El último asunto ingresado es";
 $_LANG['Categoría de asunto'] = "Categoría de asunto";
 
@@ -527,12 +532,19 @@ $_LANG['Tip tarifa especial'] = "Al ingresar una nueva tarifa, esta se actualiza
 $_LANG['Tip individual'] = "El cobro se hará de forma individual de acuerdo al monto definido por Cliente.";
 $_LANG['Para agregar un nuevo usuario ingresa su RUT aquí.'] = "Para agregar un nuevo usuario ingresa su RUT aquí.";
 
+
 #TIPO CAMBIO
 $_LANG['Tipo de Cambio'] = "Exchange Rate";
 $_LANG['Debe selecciona una moneda base'] = "Debe selecciona una moneda base";
 $_LANG['Base'] = "Base";
 $_LANG['Tasa'] = "Tasa";
 $_LANG['Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?'] = "Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?";
+
+
+
+
+
+
 
 #Cartas Cobro - Cada formato de carta tiene sus lang definidos independientemente
 $_LANG['PROPORCIONAL'] = "RETAINER PRORRATEO";
@@ -578,14 +590,15 @@ $_LANG['equivalente en pesos a '] = "chilean pesos equivalent amount as ";
 $_LANG[', conforme al tipo de cambio observado del día de hoy'] = " per the \"observado\" rate of exchange";
 $_LANG[', conforme a su equivalencia al '] = " per the \"observado\" rate of exchange of ";
 $_LANG['por concepto de gastos incurridos por nuestro Estudio en dicho período'] = "";
-$_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
-$_LANG['%asunto_mb%'] = "Re.:";
-$_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
-$_LANG['%despedida_mb%'] = "Cordially yours,";
 
 #Carta JJR
 $_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
 $_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
+
+$_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
+$_LANG['%asunto_mb%'] = "Re.:";
+$_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
+$_LANG['%despedida_mb%'] = "Cordially yours,";
 
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -595,17 +608,17 @@ $_LANG['%cuenta_mb%'] = "";
 $_LANG['%detalle_mb_ny%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matter %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%detalle_mb_ny_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matters %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
-							<tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
-							<tr><td width='35%'>Address:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
-							<tr><td width='35%'>Swift Intermediary Bank:</td><td width='65%'>MRMDUS33</td></tr>
-							<tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
-							<tr><td width='35%'>Intermediary Bank A/c #:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
-							<tr><td width='35%'>Address:</td><td width='65%'>Av. Andrés Bello 2711, piso 9, Las Condes, Santiago</td></tr>
-							<tr><td width='35%'>Beneficiary:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
-							<tr><td width='35%'>Beneficiary Bank:</td><td width='65%'>HSBC Bank Chile</td></tr>
-							<tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
-							<tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
-				</table>";
+                                <tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
+                                <tr><td width='35%'>Address:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
+                                <tr><td width='35%'>Swift Intermediary Bank:</td><td width='65%'>MRMDUS33</td></tr>
+                                <tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
+                                <tr><td width='35%'>Intermediary Bank A/c #:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
+                                <tr><td width='35%'>Address:</td><td width='65%'>Isidora Goyenechea 2800, piso 23, Las Condes, Santiago</td></tr>
+                                <tr><td width='35%'>Beneficiary:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
+                                <tr><td width='35%'>Beneficiary Bank:</td><td width='65%'>HSBC Bank Chile</td></tr>
+                                <tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
+                                <tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
+                            </table>";
 #Carta MB Boleta (boleta)
 $_LANG['%detalle_mb_boleta%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%detalle_mb_boleta_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -618,30 +631,30 @@ $_LANG['Honorarios y Gastos'] = "Legal Fees and Expenses";
 #Carta CareyAllende
 $_LANG['%detalle_careyallende%'] = "
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 Attached please find our statements of fee No. %num_letter% for the total amount of US$ %monto_con_gasto% in connection with our legal services rendered %fecha% with regard to our [description of the work] on %Asunto%.</p>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   Attached please find our statements of fee No. %num_letter% for the total amount of US$ %monto_con_gasto% in connection with our legal services rendered %fecha% with regard to our [description of the work] on %Asunto%.</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 Additionally, attached for your information is a breakdown with the hours of work incurred in respect of this matter and the lawyers who have been involved.</p>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   Additionally, attached for your information is a breakdown with the hours of work incurred in respect of this matter and the lawyers who have been involved.</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 We would very much appreciate your payment by means of a wire transfer to Banco de Crédito e Inversiones, Santiago, Chile. Branch: oficina Opera. Swift CDREDCLRM. Account No. 18709231. Beneficiary: Carey, Allende & Abogados S.A.; RUT 96.991.950-8.</p><br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   We would very much appreciate your payment by means of a wire transfer to Banco de Crédito e Inversiones, Santiago, Chile. Branch: oficina Opera. Swift CDREDCLRM. Account No. 18709231. Beneficiary: Carey, Allende & Abogados S.A.; RUT 96.991.950-8.</p><br>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 Kind regards,</p>";
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   Kind regards,</p>";
 $_LANG['%firma_careyallende%'] = "
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 %nombre_encargado_comercial%<br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   %nombre_encargado_comercial%<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 CAREY & ALLENDE";
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   CAREY & ALLENDE";
 
 
 #Carta EBMO
@@ -680,13 +693,17 @@ $_LANG['forma_cobro'] = "Type of Fee Agreement";
 $_LANG['cliente'] = "Client";
 $_LANG['id_usuario_responsable'] = "Commercial Manager";
 $_LANG['id_usuario_secundario'] = "Secundary Manager";
-$_LANG['area_usuario'] = "Professional Area";
-$_LANG['categoria_usuario'] = "Professional Category";
-$_LANG['codigo_cliente'] = "Client Code";
+$_LANG['codigo_cliente'] = "Cliente Code";
+$_LANG['fecha_emision'] = "Output Date";
+$_LANG['grupo_o_cliente'] = "Group or Client";
 $_LANG['codigo_cliente_secundario'] = "Client Code";
 $_LANG['codigo_asunto_secundario'] = "Issue Code";
 $_LANG['fecha_emision'] = "Output Date";
 $_LANG['grupo_o_cliente'] = "Group or Client";
+
+
+$_LANG['area_usuario'] = "Professional Area";
+$_LANG['categoria_usuario'] = "Professional Category";
 
 ### Reportes - Tipo de Dato ###
 $_LANG['horas_trabajadas'] = "Worked Hours";
@@ -708,15 +725,20 @@ $_LANG['rentabilidad'] = "Profitability";
 $_LANG['valor_hora'] = "Hour Value";
 $_LANG['diferencia_valor_estandar'] = "Standard Value Difference";
 $_LANG['valor_estandar'] = "Standard Value";
+
 $_LANG['mes_emision'] = 'Emisión (mes)';
+
 $_LANG['valor_trabajado_estandar'] = "Standard Worked Value";
 $_LANG['rentabilidad_base'] = "Base Profitability";
+
 $_LANG['valor_trabajado'] = "Worked Value";
 $_LANG['valor_cobrable'] = "Chargeable Value";
 $_LANG['valor_no_cobrable'] = "Non-chargeable Value";
 $_LANG['valor_visible'] = "Revised Chargeable Value";
 $_LANG['valor_castigado'] = "Punished Value";
+
 $_LANG['mes_emision'] = 'Emisión (mes)';
+
 $_LANG['mes'] = 'Month';
 $_LANG['estado'] = "Status";
 
@@ -750,6 +772,7 @@ $_LANG['Abr'] = 'Apr';
 $_LANG['Ago'] = 'Aug';
 $_LANG['Dic'] = 'Dec';
 $_LANG['honorario_yo_gastos'] = 'Legal Fees and Expenses';
+
 $_LANG['Piso'] = 'Floor';
 $_LANG['4to'] = '4th';
 
@@ -793,3 +816,5 @@ $_LANG['Categoría'] = "Category";
 $_LANG['Dirección'] = 'Address';
 $_LANG['Importe'] = 'Fees';
 $_LANG['Importes'] = 'Fees';
+
+$_LANG['Código Postal'] = "Postal Code";
