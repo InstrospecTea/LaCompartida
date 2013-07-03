@@ -44,7 +44,7 @@ $_LANG['Atención'] = "Attention";
 $_LANG['Giro'] = "Type of business";
 $_LANG['Dirección'] = "Address";
 $_LANG['Resumen Asuntos'] = "Matter Summary";
-$_LANG['Titulo Asunto'] = "Legal Area";
+$_LANG['Título Asunto'] = "Legal Area";
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
@@ -473,7 +473,8 @@ $_LANG['Mis horas'] = "Mis horas";
 $_LANG['Correlativo'] = "Correlativo";
 $_LANG['entre'] = "entre";
 $_LANG['Responsable'] = "Responsable";
-$_LANG['Monto total'] = "Monto total";
+$_LANG['Monto Impuesto'] = "Taxes";
+$_LANG['Monto total'] = "Total";
 $_LANG['Egreso Monto'] = "Egreso Monto";
 $_LANG['Cobro inválido'] = "Cobro inválido";
 $_LANG['Fecha Realización'] = "Fecha Realización";
@@ -607,17 +608,17 @@ $_LANG['%cuenta_mb%'] = "";
 $_LANG['%detalle_mb_ny%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matter %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%detalle_mb_ny_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matters %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
-  															<tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
-  															<tr><td width='35%'>Address:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
-  															<tr><td width='35%'>Swift Intermediary Bank:</td><td width='65%'>MRMDUS33</td></tr>
-  															<tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
-  															<tr><td width='35%'>Intermediary Bank A/c #:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
-  															<tr><td width='35%'>Address:</td><td width='65%'>Isidora Goyenechea 2800, piso 23, Las Condes, Santiago</td></tr>
-  															<tr><td width='35%'>Beneficiary:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
-  															<tr><td width='35%'>Beneficiary Bank:</td><td width='65%'>HSBC Bank Chile</td></tr>
-  															<tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
-  															<tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
-														</table>";
+                                <tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
+                                <tr><td width='35%'>Address:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
+                                <tr><td width='35%'>Swift Intermediary Bank:</td><td width='65%'>MRMDUS33</td></tr>
+                                <tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
+                                <tr><td width='35%'>Intermediary Bank A/c #:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
+                                <tr><td width='35%'>Address:</td><td width='65%'>Isidora Goyenechea 2800, piso 23, Las Condes, Santiago</td></tr>
+                                <tr><td width='35%'>Beneficiary:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
+                                <tr><td width='35%'>Beneficiary Bank:</td><td width='65%'>HSBC Bank Chile</td></tr>
+                                <tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
+                                <tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
+                            </table>";
 #Carta MB Boleta (boleta)
 $_LANG['%detalle_mb_boleta%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%detalle_mb_boleta_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -630,30 +631,30 @@ $_LANG['Honorarios y Gastos'] = "Legal Fees and Expenses";
 #Carta CareyAllende
 $_LANG['%detalle_careyallende%'] = "
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 Attached please find our statements of fee No. %num_letter% for the total amount of US$ %monto_con_gasto% in connection with our legal services rendered %fecha% with regard to our [description of the work] on %Asunto%.</p>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   Attached please find our statements of fee No. %num_letter% for the total amount of US$ %monto_con_gasto% in connection with our legal services rendered %fecha% with regard to our [description of the work] on %Asunto%.</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 Additionally, attached for your information is a breakdown with the hours of work incurred in respect of this matter and the lawyers who have been involved.</p>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   Additionally, attached for your information is a breakdown with the hours of work incurred in respect of this matter and the lawyers who have been involved.</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 We would very much appreciate your payment by means of a wire transfer to Banco de Crédito e Inversiones, Santiago, Chile. Branch: oficina Opera. Swift CDREDCLRM. Account No. 18709231. Beneficiary: Carey, Allende & Abogados S.A.; RUT 96.991.950-8.</p><br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   We would very much appreciate your payment by means of a wire transfer to Banco de Crédito e Inversiones, Santiago, Chile. Branch: oficina Opera. Swift CDREDCLRM. Account No. 18709231. Beneficiary: Carey, Allende & Abogados S.A.; RUT 96.991.950-8.</p><br>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 Kind regards,</p>";
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   Kind regards,</p>";
 $_LANG['%firma_careyallende%'] = "
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 %nombre_encargado_comercial%<br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   %nombre_encargado_comercial%<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 CAREY & ALLENDE";
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   CAREY & ALLENDE";
 
 
 #Carta EBMO
