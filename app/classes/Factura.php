@@ -2047,7 +2047,7 @@ class Factura extends Objeto {
 		$data['gastos'] = $data['subtotal_gastos'] + $data['subtotal_gastos_sin_impuesto'];
 
 		$subtotal = $data['total'] - $data['iva'];
-		$data['porcentaje_impuesto'] = floor($data['iva'] * 100 / $subtotal);
+		$data['porcentaje_impuesto'] = round($data['iva'] * 100 / $subtotal);
 		$data['subtotal_sin_descuento'] = $subtotal;
 
 		if (!empty($data['id_cobro'])) {

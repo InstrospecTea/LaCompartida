@@ -768,6 +768,7 @@ if (empty($data)) {
 			success: function(response) {
 				tr.removeClass('procesando');
 				try {
+					console.log(response);
 					var resp = jQuery.parseJSON(response);
 					//se recibio una respuesta json
 					if (response === '[]') {
@@ -778,6 +779,7 @@ if (empty($data)) {
 					}
 				} catch (e) {
 					//se recibio un html
+					console.log(e);
 					var error = 'Error al guardar el dato';
 					var i = response.lastIndexOf('<!--');
 					if (i >= 0) {

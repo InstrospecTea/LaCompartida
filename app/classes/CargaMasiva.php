@@ -229,6 +229,11 @@ class CargaMasiva extends Objeto {
 
 			try {
 				foreach ($info_campos as $campo => $info) {
+					// Limpiar datos
+					$fila[$campo] = str_replace("'", '', $fila[$campo]);
+					$fila[$campo] = str_replace("\\", '|', $fila[$campo]);
+					$fila[$campo] = str_replace("*", '.', $fila[$campo]);
+
 					if (isset($info['relacion'])) {
 						//convierte la relacion por glosa a relacion por id
 						if (empty($fila[$campo])) {
