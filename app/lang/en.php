@@ -513,7 +513,7 @@ $_LANG['Título asunto'] = "Título asunto";
 $_LANG['Listado de Asuntos'] = "Listado de Asuntos";
 $_LANG['Existe un asunto con el mismo código, por favor seleccione otro código'] = "Existe un asunto con el mismo código, por favor seleccione otro código";
 $_LANG['Asunto guardado con éxito'] = "Asunto guardado con éxito";
-$LAN['El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo'] = "El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo";
+$_LANG['El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo'] = "El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo";
 $_LANG['El último asunto ingresado es'] = "El último asunto ingresado es";
 $_LANG['Categoría de asunto'] = "Categoría de asunto";
 
