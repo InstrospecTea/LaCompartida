@@ -1,5 +1,11 @@
 # Changelog
-## Hotfix: 13.4.12
+## Hotfix: 13.4.13
+Jueves 4 de Julio 2013
+* **Fixed:** [Modificaciones a langs para agregar traducciones.](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Modificación Nota de cobro para cumplir con requerimiento de Cuestacampos.](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Desarrollo de conjunto de modificaciones a Nota cobro para cumplir con requerimientos de Berlegal](https://github.com/LemontechSA/ttb/pull/232)
+
+## : 13.4.12
 Martes 2 de Julio 2013
 * **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)
 * **Fixed:** [Corrección fecha último pago para facturas con SimpleReport y DataTables](https://github.com/LemontechSA/ttb/pull/231)

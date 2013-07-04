@@ -43,14 +43,17 @@ class CronNotificacion extends Cron {
 			$this->Sesion->debug('No se recibió parámetro para la acción a ejecutar. Terminamos.');
 			die('Finalizado');
 		}
-		 $this->Sesion->debug('empieza el cron notificacion');
 
-
+		$this->Sesion->debug('empieza el cron notificacion');
 		$this->desplegar_correo = $desplegar_correo;
 
-		$DiaMailSemanal = Conf::GetConf($this->Sesion, 'DiaMailSemanal') || 'Fri';
+		$DiaMailSemanal = Conf::GetConf($this->Sesion, 'DiaMailSemanal');
+		if (empty($DiaMailSemanal)) {
+			$DiaMailSemanal = 'Fri';
+		}
+
 		if (date('D') == $DiaMailSemanal || ($forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
-			$this->log('INICIO semanales');
+			$this->log("INICIO semanales ({$DiaMailSemanal})");
 			$this->semanales();
 		}
 
