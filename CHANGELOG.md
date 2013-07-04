@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix: 13.4.13
+Jueves 4 de Julio 2013
+* **Fixed:** [Agrega traducciones archivos lang para documentos cuestacampos](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Modifica Seccion Resumen asuntos segun nuevas especificaciones de berlegal](https://github.com/LemontechSA/ttb/pull/232)
+
 ## Hotfix: 13.4.12
 Martes 2 de Julio 2013
 * **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)

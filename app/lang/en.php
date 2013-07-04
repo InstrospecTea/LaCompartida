@@ -361,6 +361,8 @@ $_LANG['Títulos Accionarios'] = "Share Certificates";
 $_LANG['Compra Bases de Licitación'] = "Purchase of bidding terms/ RFPs";
 $_LANG['Saldo aprovisionado restante tras Cobro #'] = "Balance remaining after invoice #";
 $_LANG['textoSolicitudCheque'] = "Please do not send checks to our office via regular mail. We will not be responsible for stolen checks. Additionally it is important to mention that sending checks via courier without complying with the formalities required by the Mexican Customs Authorities is considered as an infringement to the Customs Law that creates tax implications for the sender.";
+$_LANG['Liquidación'] = "Liquidation";
+$_LANG['Impuesto'] = "Taxes";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";

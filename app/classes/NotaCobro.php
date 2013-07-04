@@ -4207,7 +4207,8 @@ class NotaCobro extends Cobro {
 
 			case 'RESUMEN_ASUNTOS_ENCABEZADO':
 				$html = str_replace('%codigo_asunto%', __('Codigo Asunto'), $html);
-				$html = str_replace('%glosa_asunto%', __('Título Asunto'), $html);
+				$html = str_replace('%asunto%', __('Asunto'), $html);
+				$html = str_replace('%glosa_asunto%', __('Descripción'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
 				break;
@@ -4245,10 +4246,15 @@ class NotaCobro extends Cobro {
 						$minutes = (($duracion_cobrada/60 )%60);
 						$seconds = ($duracion_cobrada %60);
 
+						list($solo_codigo_cliente, $solo_codigo_asunto_secundario) = split("-",$codigo_asunto_secundario);
+
+						$row = str_replace('%solo_codigo_asunto_secundario%', $solo_codigo_asunto_secundario, $row);
+
 						$row = str_replace('%codigo_asunto%', $codigo_asunto, $row);
 						$row = str_replace('%codigo_asunto_secundario%', $codigo_asunto_secundario, $row);
 						$row = str_replace('%glosa_asunto%', $glosa_asunto, $row);
 						$row = str_replace('%horas%', $horas. ':' . sprintf("%02d", $minutes), $row);
+
 						$row = str_replace('%importe%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$html .= $row;
 
@@ -4261,7 +4267,7 @@ class NotaCobro extends Cobro {
 			case 'RESUMEN_ASUNTOS_TOTAL':
 
 				$query = "
-						SELECT SUM(TIME_TO_SEC(duracion_cobrada)) as duracion,SUM(monto_cobrado) as importe
+						SELECT SUM(TIME_TO_SEC(duracion_cobrada)) as duracion,SUM(monto_cobrado) as subtotal_sin_impuesto
 						FROM trabajo
 						JOIN asunto ON asunto.codigo_asunto=trabajo.codigo_asunto
 						WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
@@ -4270,16 +4276,21 @@ class NotaCobro extends Cobro {
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-				while (list($duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
+				while (list($duracion_cobrada, $subtotal_sin_impuesto) = mysql_fetch_array($resp)) {
 
 					$horas = floor($duracion_cobrada/3600);
 					$minutes = (($duracion_cobrada/60 )%60);
 					$seconds = ($duracion_cobrada %60);
 
+					$html = str_replace('%subtotal%', __('Subtotal'), $html);
+					$html = str_replace('%impuesto%', __('Impuesto'), $html);
+					$html = str_replace('%total%', __('Total'), $html);
 
-					$html = str_replace('%total%', __('<b>TOTAL</b>'), $html);
 					$html = str_replace('%total_horas%', $horas. ':' . sprintf("%02d", $minutes), $html);
-					$html = str_replace('%total_tramites%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%monto_subtotal%', $moneda->fields['simbolo'] . ' ' . number_format($subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%monto_impuesto%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%monto_total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto']+$subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					
 				}
 
 				break;
@@ -5563,8 +5574,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_importe%', '', $html);
 					$html = str_replace('%td_importe_ajustado%', '', $html);
 				}
-				$html = str_replace('%importe%', number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%importe_ajustado%', number_format($asunto->fields['trabajos_total_importe'] * $x_factor_ajuste, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%importe%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%importe_ajustado%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_importe'] * $x_factor_ajuste, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$html = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
@@ -6694,7 +6705,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%caso_dudas%', __('Please feel free to contact us should you have any questions or comments on the above.'), $html);
 					$html = str_replace('%atentamente%', __('Very truly yours'), $html);
 					$html = str_replace('%sucursal%', __('Branch'), $html);
-					$html = str_replace('%cuenta%', __('Acount'), $html);
+					$html = str_replace('%cuenta%', __('Account'), $html);
 					$html = str_replace('%direccion%', __('Address'), $html);
 					$html = str_replace('%banco%', __('Bank'), $html);
 					$html = str_replace('%beneficiario%', __('Bnf'), $html);
@@ -10221,7 +10232,10 @@ class NotaCobro extends Cobro {
 			$htmlplantilla = str_replace('%numero_factura%', '', $htmlplantilla);
 		}
 
-		$htmlplantilla = str_replace('%solo_num_factura%', date('Y').'/'.ereg_replace("[^0-9]", "", $this->fields['documento']), $htmlplantilla);
+		$htmlplantilla = str_replace('%liquidacion%', __('Liquidación'), $htmlplantilla);
+		$htmlplantilla = str_replace('%solo_num_factura%', $this->fields['id_cobro'], $htmlplantilla);
+		$htmlplantilla = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $htmlplantilla);
+		$htmlplantilla = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $htmlplantilla);
 
 		if (method_exists('Conf', 'GetConf')) {
 			if ($lang == 'es') {
