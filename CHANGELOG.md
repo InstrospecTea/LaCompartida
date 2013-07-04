@@ -1,4 +1,58 @@
 # Changelog
+## Hotfix: 13.4.13
+Jueves 4 de Julio 2013
+* **Fixed:** [Modificaciones a langs para agregar traducciones.](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Modificación Nota de cobro para cumplir con requerimiento de Cuestacampos.](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Desarrollo de conjunto de modificaciones a Nota cobro para cumplir con requerimientos de Berlegal](https://github.com/LemontechSA/ttb/pull/232)
+
+## : 13.4.12
+Martes 2 de Julio 2013
+* **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)
+* **Fixed:** [Corrección fecha último pago para facturas con SimpleReport y DataTables](https://github.com/LemontechSA/ttb/pull/231)
+
+## Hotfix: 13.4.11
+Lunes 1 de Julio 2013
+* **Fixed:** [El autocompletador de datos de facturación saca los datos del cliente y no del contrato](https://github.com/LemontechSA/ttb/pull/230)
+* **Fixed:** [Visualización reportes de fecha con SimpleReport -> DataTables](https://github.com/LemontechSA/ttb/pull/230)
+* **Fixed:** [Genera modificacion a seccion trabajos filas para operar con retainer](https://github.com/LemontechSA/ttb/pull/230)
+
+## Hotfix: 13.4.10
+Miércoles 28 de Junio 2013
+* **Fixed:** [Corrige calculo columnas retainer en seccion trabajos filas](https://github.com/LemontechSA/ttb/pull/224)
+
+## Hotfix: 13.4.9
+Miércoles 26 de Junio 2013
+* **Fixed:** [Corrige validación Tipo de cambio](https://github.com/LemontechSA/ttb/pull/223)
+* **Fixed:** [Envío de alerta de correos avisando al administrador sobre correos no enviados](https://github.com/LemontechSA/ttb/pull/223)
+* **New:** [agregar google-analytics](https://github.com/LemontechSA/ttb/pull/145)
+
+## Hotfix: 13.4.8
+Lunes 25 de Junio 2013
+* **Fixed:** [Corriege Horror que gatilla alerta en agregar factura](https://github.com/LemontechSA/ttb/pull/220)
+
+## Hotfix: 13.4.7
+Lunes 24 de Junio 2013
+* **Fixed:** [Corrige el envío de correo mediante "cron_correo"](https://github.com/LemontechSA/ttb/pull/219)
+* **Fixed:** [Corrige asignación de código cliente en WS de integración de contabilidad](https://github.com/LemontechSA/ttb/pull/219)
+
+## Hotfix: 13.4.6
+Viernes 21 de Junio 2013
+* **Fixed:** [Refrescar datos del cliente al cambiar el selector de cliente en la factura](https://github.com/LemontechSA/ttb/pull/215)
+* **Fixed:** [Corrección problema GlosaSeEstaCobrando al agregar factura o pago](https://github.com/LemontechSA/ttb/pull/215)
+
+## Hotfix: 13.4.5
+Jueves 20 de Junio 2013
+* **Fixed:** [Corrección reporte saldo para mostrar honorarios y gastos sin saldo](https://github.com/LemontechSA/ttb/pull/213)
+
+## Hotfix: 13.4.4
+Jueves 20 de Junio 2013
+* **Fixed:** [Corrección reporte horas por facturar considerando los descuentos](https://github.com/LemontechSA/ttb/pull/212)
+
+## Hotfix: 13.4.3
+Martes 18 de Junio 2013
+* **Fixed:** [Cambio en forma de agrupación de interfaz seguimiento cobro](https://github.com/LemontechSA/ttb/pull/211)
+* **Fixed:** [Permite cambiar la glosa 'se está cobrando' en cobros6.php](https://github.com/LemontechSA/ttb/pull/211)
+
 ## Hotfix: 13.4.2
 Lunes 17 de Junio 2013
 * **Fixed:** [Corrige generacion de excel en reporte avanzados](https://github.com/LemontechSA/ttb/pull/210)

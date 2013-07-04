@@ -1,52 +1,99 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
-
 set_time_limit(180);
-$sesion = new Sesion(null, true);
-$sesion->debug('abri sesión');
-$sesion->debug('incluyo alertacron');
-$alerta = new Alerta($sesion);
-$sesion->debug('instancio $alerta');
+
+$Sesion = new Sesion(null, true);
+
 $encolados = 0;
 $enviados = 0;
+$no_enviados = 0;
+$errores = '';
+$debug = false;
 
-$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0 limit 0,60";
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+if (($argv[1] == 'debug') || (isset($_GET['debug']) && $_GET['debug'] == '1')) {
+	$debug = true;
+}
 
-while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql_fetch_array($resp)) {
+$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo, intento_envio
+	FROM log_correo
+	WHERE enviado = 0 AND (intento_envio IS NULL OR intento_envio < 5)
+	LIMIT 0, 60";
+$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+
+while ($log_correo = mysql_fetch_array($resp)) {
 	$correos = array();
-	$adresses = explode(',', $mail);
+	$addresses = explode(',', $log_correo['mail']);
+	++$encolados;
 
-	foreach ($adresses as $adress) {
-		$correo = array('nombre' => $nombre, 'mail' => trim($adress));
-
-		if (validEmail($adress)) {
-			$sesion->debug('correo encolado: ' . $adress);
+	foreach ($addresses as $address) {
+		$correo = array('nombre' => $log_correo['nombre'], 'mail' => trim($address));
+		if (validEmail($address)) {
 			array_push($correos, $correo);
 		} else {
-			$sesion->debug('no válido ' . $adress);
+			$errores .= "<li>Error correo #{$log_correo['id_log_correo']}: '&lt;{$log_correo['nombre']}&gt; $address' <i>Dirección no válida</i></li>";
 		}
 	}
 
-	++$encolados;
-
-	if (Utiles::EnviarMail($sesion, $correos, $subject, $mensaje, true, $id_archivo_anexo)) {
-		$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=" . $id;
-		$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
-		++$enviados;
+	if (!empty($correos)) {
+		if (Utiles::EnviarMail($Sesion, $correos, $log_correo['subject'], $log_correo['mensaje'], true, $log_correo['id_archivo_anexo'])) {
+			$query2 = "UPDATE log_correo SET enviado = 1, fecha_modificacion = NOW(), fecha_envio = NOW() WHERE id_log_correo = {$log_correo['id_log_correo']}";
+			$resp2 = mysql_query($query2, $Sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $Sesion->dbh);
+			++$enviados;
+		}
+	} else {
+		$log_correo['intento_envio'] = ((int) $log_correo['intento_envio']) + 1;
+		$query2 = "UPDATE log_correo SET intento_envio = {$log_correo['intento_envio']}, fecha_modificacion = NOW() WHERE id_log_correo = {$log_correo['id_log_correo']}";
+		$resp2 = mysql_query($query2, $Sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $Sesion->dbh);
+		++$no_enviados;
 	}
 }
-$sesion->debug('recorri log correo where enviado = 0');
 
-echo '<br>Se ha detectado ' . $encolados . ' correos pendientes';
-echo '<br>Se ha  enviado ' . $enviados . ' correos pendientes';
+if ($debug === true) {
+	if (!empty($encolados)) {
+		echo "<h1>$encolados correos detectados para su env&iacute;o</h1>";
+	} else {
+		echo "<h1>No se encontraron correos pendientes para su env&iacute;o</h1>";
+	}
+
+	if (!empty($enviados)) {
+		echo "<br>Correos enviados: $enviados";
+	}
+
+	if (!empty($no_enviados)) {
+		echo "<br>Correos NO enviados: $no_enviados";
+		echo "<ul>{$errores}</ul>";
+	}
+}
+
+// verificar si existen correos NO enviados y con reintentos
+$minutos = (int) date('i');
+if ($minutos == 10) {
+	$query = "SELECT count(*) AS total FROM log_correo WHERE enviado = 0 AND intento_envio >= 5";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	$log_correo = mysql_fetch_assoc($resp);
+
+	// solo enviar si existen correos pendientes con errores por enviar
+	if ($log_correo['total'] > 0) {
+		$dbName = Conf::dbName();
+		$mensaje = "<b>Atención:</b> Se encontraron {$log_correo['total']} correos con errores para el cliente '$dbName'";
+
+		Utiles::EnviarMail(
+			$Sesion,
+			array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
+			"$dbName: {$log_correo['total']} correos con errores",
+			$mensaje
+		);
+
+		if ($debug === true) {
+			echo "<br>Correo aviso administrador enviado";
+		}
+	}
+}
 
 /**
-  Validate an email address.
-  Provide email address (raw input)
-  Returns true if the email address has the email
-  address format and the domain exists.
+ * Validate an email address.
+ * Provide email address (raw input)
+ * Returns true if the email address has the email address format and the domain exists.
  */
 function validEmail($email) {
 	$email = trim($email);

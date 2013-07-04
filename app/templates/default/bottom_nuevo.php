@@ -5,7 +5,7 @@
 		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.js"></script>
 </div>
 
-<?php  
+<?php
 $Slim=Slim::getInstance('default',true);
 	if($popup==true || (isset($_GET['popup']) && $_GET['popup']==1)) {
 		$Slim->applyHook('hook_footer_popup');
@@ -15,10 +15,10 @@ $Slim=Slim::getInstance('default',true);
 				<img src="//static.thetimebilling.com/images/logo_bottom.jpg" width="125" height="37" style="padding:15px 15px 0;float:left;" />&nbsp;
 			<div id="DigiCertClickID_iIR9fwBQ" style="float:right;" >&nbsp;</div>
 			</div>';
-	
+
   }
 
- ?>	
+ ?>
 
 </div>
 <div id="dialogomodal" style="display:none;text-align:center" > </div>
@@ -92,5 +92,6 @@ $Slim=Slim::getInstance('default',true);
 		<?php
 	}
 	?>
+	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/google_analytics.js"></script>
 </body>
 </html>

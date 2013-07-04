@@ -548,23 +548,33 @@ class ReporteContrato extends Contrato {
 	function Descuentos($separar_asuntos) {
 
 		if (!$this->separar_asuntos && !$separar_asuntos) {
-			$querydescuentos = "select  cob.id_contrato, sum(cob.descuento*pmcon.tipo_cambio/pmcob.tipo_cambio)  descuento
-								from cobro  cob join contrato con using (id_contrato)
-								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
-								join prm_moneda pmcon on pmcon.id_moneda=con.id_moneda
-
-								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION')
-								group by cob.id_contrato
-                           ";
+			$querydescuentos = "SELECT
+														cobro.id_contrato,
+														SUM(cobro.descuento * moneda_contrato.tipo_cambio / moneda_cobro.tipo_cambio) AS descuento
+													FROM cobro
+													INNER JOIN contrato USING(id_contrato)
+													INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
+													INNER JOIN prm_moneda moneda_contrato ON moneda_contrato.id_moneda = contrato.id_moneda
+													WHERE cobro.descuento > 0
+														AND cobro.estado IN ('CREADO', 'EN REVISION')
+													GROUP BY cobro.id_contrato";
 		} else {
-			$querydescuentos = "select ca.codigo_asunto, sum(cob.descuento*pmcon.tipo_cambio/pmcob.tipo_cambio) / ca2.divisor, cob.id_contrato
-								from cobro  cob join contrato con using (id_contrato)
-								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
-								join prm_moneda pmcon on pmcon.id_moneda=con.id_moneda
-								join cobro_asunto ca on ca.id_cobro=cob.id_cobro
-								join (select id_cobro, count(*) divisor from cobro_asunto group by id_cobro) as ca2 on ca2.id_cobro=cob.id_cobro
-								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION')
-								group by cob.id_contrato , ca.codigo_asunto                        ";
+			$querydescuentos = "SELECT
+														cobro_asunto.codigo_asunto,
+														SUM(cobro.descuento * moneda_contrato.tipo_cambio / moneda_cobro.tipo_cambio) / ca2.divisor,
+														cobro.id_contrato
+													FROM cobro
+													INNER JOIN contrato USING(id_contrato)
+													INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
+													INNER JOIN prm_moneda moneda_contrato ON moneda_contrato.id_moneda = contrato.id_moneda
+													INNER JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
+													INNER JOIN (
+														SELECT id_cobro, COUNT(*) AS divisor 
+														FROM cobro_asunto
+														GROUP BY id_cobro
+													) AS ca2 on ca2.id_cobro = cobro.id_cobro
+													WHERE cobro.descuento > 0 AND cobro.estado IN ('CREADO', 'EN REVISION')
+													GROUP BY cobro.id_contrato, cobro_asunto.codigo_asunto";
 		}
 
 		$respdescuentos = mysql_query($querydescuentos, $this->sesion->dbh) or Utiles::errorSQL($querydescuentos, __FILE__, __LINE__, $this->sesion->dbh);

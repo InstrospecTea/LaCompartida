@@ -275,7 +275,7 @@ class Factura extends Objeto {
 			'visible' => false,
 		),
 	);
-	
+
 	function Factura($sesion, $fields = "", $params = "") {
 		$this->tabla = "factura";
 		$this->campo_id = "id_factura";
@@ -1857,7 +1857,8 @@ class Factura extends Objeto {
 			$where = base64_decode($where);
 		}
 
-		$groupby=" GROUP BY factura.id_factura";
+		$groupby = " GROUP BY factura.id_factura ";
+		$orderby = " ORDER BY factura.fecha ASC ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 				prm_documento_legal.codigo as tipo
@@ -1865,7 +1866,7 @@ class Factura extends Objeto {
 			   , factura.serie_documento_legal
 			   , factura.codigo_cliente
 			   , cliente.glosa_cliente, contrato.id_contrato as idcontrato
-			
+
 			   , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
 						OR contrato.factura_razon_social IN ('',' ')
 						OR contrato.factura_razon_social IS NULL,
@@ -1900,8 +1901,8 @@ class Factura extends Objeto {
 			   , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 			   , factura.RUT_cliente ";
 
-				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;  
-	   
+				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;
+
 		   $query.=" FROM factura
 		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -1914,30 +1915,28 @@ class Factura extends Objeto {
 		   LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 		   WHERE ";
-		 
-	
 
-		   $resultingquery=$query." \n ".$where." \n ".$groupby;
-		  
+		   $resultingquery = $query . " \n " . $where . " \n " . $groupby . "\n" . $orderby;
+
 		   return $resultingquery;
 	}
- 
+
 	public  function FormatoDataTable() {
-			
+
 
 
 			$formato=array();
- 
- 		 	$formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
-  							 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
- 							},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
+
+ 		 	// $formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
+  			// 				 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
+ 				// 			},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
 
  			$formato['numero']= '{  "sWidth": "90px", "bVisible": "true",  "sClass": "al"
 							,"fnRender": function ( o, val ) {
 								var respuesta="";
 								if(o.aData["tipo"])						respuesta+="<b>Tipo</b>: "+o.aData["tipo"];
-								if(o.aData["serie_documento_legal"])	respuesta+="<br><b>Serie</b>: "+o.aData["serie_documento_legal"];	 
-								if(o.aData["numero"])			respuesta+="<div style=\"white-space:nowrap\"><b>Número</b>: "+o.aData["numero"]+"</div>";	 
+								if(o.aData["serie_documento_legal"])	respuesta+="<br><b>Serie</b>: "+o.aData["serie_documento_legal"];
+								if(o.aData["numero"])			respuesta+="<div style=\"white-space:nowrap\"><b>Número</b>: "+o.aData["numero"]+"</div>";
 								if(o.aData["glosa_estudio"])						respuesta+="<b>Emisor</b>: "+o.aData["glosa_estudio"];
 											 return respuesta;  }
 							,    "aTargets": ["numero" ] , sDefaultContent: " - "   }';
@@ -1946,15 +1945,15 @@ class Factura extends Objeto {
 							,"fnRender": function ( o, val ) {
 								var respuesta="<div style=\"font-size:10px;width:200px;\">";
 								if(o.aData["glosa_cliente"])	respuesta+=	"<b>Cliente</b>: "+o.aData["glosa_cliente"];
-								if(o.aData["codigo_contrato"])	respuesta+=	"<br><b>Servicio</b>: "+o.aData["codigo_contrato"];	 
-								if(o.aData["factura_rsocial"])	respuesta+=	"<br><b>Razón Social</b>: "+o.aData["factura_rsocial"];	 
-								if(o.aData["descripcion"])	respuesta+=	"<br><b>Descripción</b>: "+o.aData["descripcion"];	 
-								
+								if(o.aData["codigo_contrato"])	respuesta+=	"<br><b>Servicio</b>: "+o.aData["codigo_contrato"];
+								if(o.aData["factura_rsocial"])	respuesta+=	"<br><b>Razón Social</b>: "+o.aData["factura_rsocial"];
+								if(o.aData["descripcion"])	respuesta+=	"<br><b>Descripción</b>: "+o.aData["descripcion"];
+
 											 return respuesta+"</div>";  }
 							,    "aTargets": ["glosa_cliente" ] , sDefaultContent: " - "   }';
-  
+
  		 	$formato['id_cobro']= '{ "aTargets": ["id_cobro" ] ,  "sWidth": "40px", "bVisible": "true", "mData":"id_cobro","fnRender": function ( o,val ) { 	return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana(\'Editar_Cobro\',950,660,\'cobros6.php?id_cobro="+o.aData["id_cobro"]+"&amp;popup=1\');\">"+o.aData["id_cobro"]+"</a>"; }	,    sDefaultContent: " - "   }';
- 	
+
 
  			$formato['Acciones']='{ "aTargets": ["acciones" ] ,  "sClass": "ar",   "fnRender": function ( o, val ) {';
 			$formato['Acciones'] .= 'var id_factura=o.aData["id_factura"];';
@@ -1974,7 +1973,7 @@ class Factura extends Objeto {
  		return $formato;
 	}
 
- 
+
 
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 		,$tipo_documento_legal_buscado

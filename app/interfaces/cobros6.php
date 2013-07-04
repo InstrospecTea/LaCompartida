@@ -409,7 +409,9 @@ if ($opc == 'guardar') {
 		$contrato->Write();
 	}
 
-	$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
+	if (!empty($se_esta_cobrando)) {
+		$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
+	}
 
 	if ($opc_informar_contabilidad == 'informar') {
 		$cobro->Edit('estado_contabilidad', 'PARA INFORMAR');
@@ -1530,29 +1532,17 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                         <span style="background:#EEE;padding:4px;display:block;font-weight: bold; font-size: 11px;"><?php echo __('Se está cobrando:') ?></span>
 
 <?php
+$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+if (trim($se_esta_cobrando) == '') {
+	$se_esta_cobrando = $cobro->GlosaSeEstaCobrando();
+}
+
 if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
-	$disabled = "disabled";
 	$lineas = 'rows="6"';
 	$columnas = 'cols="25"';
 } else {
-	$se_esta_cobrando = __('Periodo');
-	$se_esta_cobrando .=': ';
-	if ($cobro->fields['fecha_ini'] != '0000-00-00' && !empty($cobro->fields['fecha_ini'])) {
-		$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
-		$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini;
-	}
-	if ($cobro->fields['fecha_fin'] != '0000-00-00' && !empty($cobro->fields['fecha_fin'])) {
-		$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
-		$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin;
-	}
-	$disabled = "";
 	$lineas = 'rows="3"';
 	$columnas = '';
-}
-
-if (trim($cobro->fields['se_esta_cobrando']) != '') {
-	$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
 }
 ?>
                                         <textarea style="width:220px;" name="se_esta_cobrando" <?php echo "$lineas $columnas $disabled"; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>

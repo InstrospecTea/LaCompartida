@@ -1081,6 +1081,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
+				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 
 
 				/* Primero se hacen las cartas particulares ya que lee los datos que siguen */

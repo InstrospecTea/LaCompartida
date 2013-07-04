@@ -174,7 +174,7 @@ if ($opcion == "guardar") {
 		}
 	}
 }
- 
+
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
 
@@ -184,9 +184,9 @@ $pagina->PrintTop($popup);
 <script type="text/javascript">
 
 		if(parent.window.Refrescarse) {
-					parent.window.Refrescarse(); 
+					parent.window.Refrescarse();
 				} else if( window.opener.Refrescar ) {
-					window.opener.Refrescar(); 
+					window.opener.Refrescar();
 				}
 
 	function ShowGastos(valor)
@@ -478,7 +478,7 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 				<?php echo __('Cliente') ?>
 			</td>
 			<td align=left>
-<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,false,320,'',false); ?>
+<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>

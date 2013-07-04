@@ -454,9 +454,9 @@ function RevisarTabla() {
 	var tabla = jQuery('#tabla');
 
 	if (!comparar.is(':checked') && jQuery('#numero_agrupadores').val() == 2) {
-		tabla.hide();
-	} else {
 		tabla.show();
+	} else {
+		tabla.hide();
 	}
 }
 
@@ -579,17 +579,15 @@ function Generar(form, valor) {
 	var action = '';
 	var ajax = false;
 	jQuery('#' + form_id + ' [name="opc"]').val(valor);
-	
+
 	var value = jQuery('#agrupador_0').val();
-	
+
 	var numero_agrupadores = jQuery('#numero_agrupadores').val();
-	
+
 	for (i = 1; i < numero_agrupadores; ++i) {
 		value += '-' + jQuery('#agrupador_' + i).val();
 	}
 	jQuery('#vista').val(value);
-	//console.log(value);
-	//return false;
 	switch (valor) {
 		case 'pdf':
 			action = 'html_to_pdf.php?frequire=reporte_avanzado.php&popup=1';
@@ -604,6 +602,7 @@ function Generar(form, valor) {
 		case 'circular':
 			action = 'reporte_avanzado_grafico.php?tipo_grafico=circular&ajax=1';
 			ajax = true;
+			break;
 		case 'barra':
 			action = 'reporte_avanzado_grafico.php?tipo_grafico=barras&ajax=1';
 			ajax = true;
@@ -616,6 +615,7 @@ function Generar(form, valor) {
 			return;
 			break;
 	}
+
 	if (ajax) {
 		jQuery.ajax({
 			url: action,
