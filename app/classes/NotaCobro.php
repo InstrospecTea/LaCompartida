@@ -4283,14 +4283,31 @@ class NotaCobro extends Cobro {
 					$minutes = (($duracion_cobrada/60 )%60);
 					$seconds = ($duracion_cobrada %60);
 
-					$html = str_replace('%subtotal%', __('Subtotal'), $html);
+					$monto_retainer = __('Monto Retainer');
+					$valor_monto_contrato = $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto_contrato'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+					
 					$html = str_replace('%impuesto%', __('Impuesto'), $html);
 					$html = str_replace('%total%', __('Total'), $html);
 
-					$html = str_replace('%total_horas%', $horas. ':' . sprintf("%02d", $minutes), $html);
+					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="right" width="70%"><b>'. $monto_retainer .'</b></td><td align="right" width="20%">'. $valor_monto_contrato .'</td></tr>';
+
+					if ($this->fields['forma_cobro'] == 'RETAINER'){
+						$html = str_replace('%subtotal%', __('Subtotal Excesos'), $html);
+						$html = str_replace('%monto_retainer%', __('Monto Retainer'), $html);
+						$html = str_replace('%valor_monto_contrato%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto_contrato'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%monto_total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto']+$subtotal_sin_impuesto+$this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%tr_retainer%', $tr_retainer, $html);
+					} else {
+						$html = str_replace('%subtotal%', __('Subtotal'), $html);
+						$html = str_replace('%monto_retainer%', '', $html);
+						$html = str_replace('%valor_monto_contrato%', '', $html);
+						$html = str_replace('%monto_total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto']+$subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%tr_retainer%', '', $html);
+					}
+					
 					$html = str_replace('%monto_subtotal%', $moneda->fields['simbolo'] . ' ' . number_format($subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%total_horas%', $horas. ':' . sprintf("%02d", $minutes), $html);
 					$html = str_replace('%monto_impuesto%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					$html = str_replace('%monto_total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto']+$subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					
 				}
 
