@@ -364,6 +364,7 @@ $_LANG['textoSolicitudCheque'] = "Please do not send checks to our office via re
 $_LANG['Liquidación'] = "Liquidation";
 $_LANG['Impuesto'] = "Taxes";
 $_LANG['Nombre Asunto'] = "Matter Name";
+$_LANG['Resumen Asuntos'] = "Matter Summary";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";
