@@ -363,6 +363,7 @@ $_LANG['Saldo aprovisionado restante tras Cobro #'] = "Balance remaining after i
 $_LANG['textoSolicitudCheque'] = "Please do not send checks to our office via regular mail. We will not be responsible for stolen checks. Additionally it is important to mention that sending checks via courier without complying with the formalities required by the Mexican Customs Authorities is considered as an infringement to the Customs Law that creates tax implications for the sender.";
 $_LANG['Liquidación'] = "Liquidation";
 $_LANG['Impuesto'] = "Taxes";
+$_LANG['Nombre Asunto'] = "Matter Name";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";
@@ -475,6 +476,7 @@ $_LANG['Correlativo'] = "Correlativo";
 $_LANG['entre'] = "entre";
 $_LANG['Responsable'] = "Responsable";
 $_LANG['Monto Impuesto'] = "Taxes";
+$_LANG['Monto_Impuesto_cc'] = "vat";
 $_LANG['Monto total'] = "Total";
 $_LANG['Egreso Monto'] = "Egreso Monto";
 $_LANG['Cobro inválido'] = "Cobro inválido";

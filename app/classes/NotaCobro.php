@@ -4208,6 +4208,7 @@ class NotaCobro extends Cobro {
 			case 'RESUMEN_ASUNTOS_ENCABEZADO':
 				$html = str_replace('%codigo_asunto%', __('Codigo Asunto'), $html);
 				$html = str_replace('%asunto%', __('Asunto'), $html);
+				$html = str_replace('%nombre_asunto%', __('Nombre Asunto'), $html);
 				$html = str_replace('%glosa_asunto%', __('Descripción'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
@@ -6339,9 +6340,11 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $html);
 
 					$html = str_replace('%monto_impuesto_total%', __('Monto Impuesto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+					$html = str_replace('%monto_impuesto_total_cc%', __('Monto_Impuesto_cc') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 					$html = str_replace('%monto_moneda_total_con_impuesto%', __('Monto total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				} else {
 					$html = str_replace('%monto_impuesto_total%', '', $html);
+					$html = str_replace('%monto_impuesto_total_cc%', '', $html);
 					$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
 					//si no hay impuesto para los gastos, no dibujo esas celdas
 					$html = str_replace('%td_monto_impuesto_total%', '&nbsp;', $html);
