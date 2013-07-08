@@ -10292,21 +10292,15 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%solo_num_factura%', $this->fields['id_cobro'], $htmlplantilla);
 		$htmlplantilla = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $htmlplantilla);
 		$htmlplantilla = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $htmlplantilla);
-
-		if (method_exists('Conf', 'GetConf')) {
-			if ($lang == 'es') {
-				$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ', ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
-			} else {
-				$fecha_lang = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
-			}
+		
+		if ($this->fields['codigo_idioma'] == 'es') {
+			$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ', ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 		} else {
-			if ($lang == 'es') {
-				$fecha_lang = 'Santiago, ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
-			} else {
-				$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
-			}
+			$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
 		}
 
+		print_r($idioma->fields['idioma']);
+		
 		$htmlplantilla = str_replace('%fecha_especial%', $fecha_lang, $htmlplantilla);
 
 		if ($contrato->fields['id_pais'] > 0) {

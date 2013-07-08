@@ -1894,13 +1894,12 @@ class CartaCobro extends NotaCobro {
 				}
 
 				$fecha_ingles = date('F d, Y');
-				$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
 				$fecha_ingles_ordinal = date('F jS, Y');
+				$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
 
 				$html2 = str_replace('%fecha%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_con_de%', $fecha_lang_con_de, $html2);
 				$html2 = str_replace('%fecha_ingles%', $fecha_ingles, $html2);
-				$html2 = str_replace('%fecha_ingles_ordinal%', $fecha_ingles_ordinal, $html2);
 				$html2 = str_replace('%ciudad_fecha_ingles%', $ciudad_fecha_ingles, $html2);
 
 				//numero Cobro + año + INICIALES username para PSU abogados
