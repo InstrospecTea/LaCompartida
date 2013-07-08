@@ -4285,8 +4285,9 @@ class NotaCobro extends Cobro {
 
 					$monto_retainer = __('Monto Retainer');
 					$valor_monto_contrato = $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto_contrato'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					
+
 					$html = str_replace('%impuesto%', __('Impuesto'), $html);
+					$html = str_replace('%ivg%', __('I.G.V. 18%'), $html);
 					$html = str_replace('%total%', __('Total'), $html);
 
 					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="right" width="70%"><b>'. $monto_retainer .'</b></td><td align="right" width="20%">'. $valor_monto_contrato .'</td></tr>';
@@ -4304,12 +4305,47 @@ class NotaCobro extends Cobro {
 						$html = str_replace('%monto_total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto']+$subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 						$html = str_replace('%tr_retainer%', '', $html);
 					}
-					
+
 					$html = str_replace('%monto_subtotal%', $moneda->fields['simbolo'] . ' ' . number_format($subtotal_sin_impuesto, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					$html = str_replace('%total_horas%', $horas. ':' . sprintf("%02d", $minutes), $html);
 					$html = str_replace('%monto_impuesto%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['impuesto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					
+
 				}
+
+				$html = str_replace('%glosa_cobro%', __('Liquidación de honorarios profesionales %desde% hasta %hasta%'), $html);
+
+				if ($lang == 'en') {
+					$html = str_replace('%servicios_prestados%', __('Services rendered'), $html);
+					$html = str_replace('%fecha_inicial%', __('From %desde%'), $html);
+					$html = str_replace('%fecha_final%', __('To %hasta%'), $html);
+					$html = str_replace('%desde%', date('m/d/y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_inicial_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+					$html = str_replace('%hasta%', date('m/d/y', strtotime($this->fields['fecha_fin'])), $html);
+				} else {
+					$html = str_replace('%servicios_prestados%', __('Servicios prestados'), $html);
+					$html = str_replace('%fecha_inicial%', __('Desde %desde%'), $html);
+					$html = str_replace('%fecha_final%', __('al %hasta%'), $html);
+					$html = str_replace('%servicios_prestados%', __('Liquidación de honorarios profesionales %desde% hasta %hasta%'), $html);
+					$html = str_replace('%desde%', date('d-m-y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_inicial_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+					$html = str_replace('%hasta%', date('d-m-y', strtotime($this->fields['fecha_fin'])), $html);
+				}
+
+				$detalle_cuenta_berlegal = "<table class=\"tabla_normal\" width=\"100%\">
+												<tr><td>&nbsp;<td></tr>
+												<tr><td>Please send us the payment by a wire transfer to our bank account in<td></tr>
+												<tr><td><b>BBVA Banco Continental<b><td></tr>
+												<tr><td><b>Bank Address  ".':'."</b> Av. República de Panamá Nº 3055 San Isidro-Lima-Perú<td></tr>
+												<tr><td><b>Account Number ".':'."</b>  0011-0123-0100053364<td></tr>
+												<tr><td><b>Account Name (Beneficiary) ".':'. "</b> ".'"'."BERLEGAL S.A.C.".'"'."<td></tr>
+												<tr><td><b>Swift Code ".':'."  BCONPEPL</b><td></tr>
+												<tr><td><b>Beneficiary Address ".':'." Av.<b> Camino Real Nro.390 Int. 801 Torre Central San Isidro-Lima-Perú</tr>
+											</table>";
+
+				if ( $lang == 'en') {
+					$html = str_replace('%detalle_cuenta_bancaria%', $detalle_cuenta_berlegal, $html);
+				} else {
+					$html = str_replace('%detalle_cuenta_bancaria%', '', $html);
+				}
+
 
 				break;
 
@@ -10261,7 +10297,7 @@ class NotaCobro extends Cobro {
 			if ($lang == 'es') {
 				$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ', ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 			} else {
-				$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ' (' . Conf::GetConf($this->sesion, 'PaisEstudio') . '), ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+				$fecha_lang = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
 			}
 		} else {
 			if ($lang == 'es') {
@@ -10270,7 +10306,7 @@ class NotaCobro extends Cobro {
 				$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
 			}
 		}
-		
+
 		$htmlplantilla = str_replace('%fecha_especial%', $fecha_lang, $htmlplantilla);
 
 		if ($contrato->fields['id_pais'] > 0) {

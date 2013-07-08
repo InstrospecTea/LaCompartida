@@ -1894,14 +1894,16 @@ class CartaCobro extends NotaCobro {
 				}
 
 				$fecha_ingles = date('F d, Y');
+				$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
 				$fecha_ingles_ordinal = date('F jS, Y');
 
 				$html2 = str_replace('%fecha%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_con_de%', $fecha_lang_con_de, $html2);
 				$html2 = str_replace('%fecha_ingles%', $fecha_ingles, $html2);
 				$html2 = str_replace('%fecha_ingles_ordinal%', $fecha_ingles_ordinal, $html2);
+				$html2 = str_replace('%ciudad_fecha_ingles%', $ciudad_fecha_ingles, $html2);
 
-//numero Cobro + año + INICIALES username para PSU abogados
+				//numero Cobro + año + INICIALES username para PSU abogados
 
 				$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __(' ') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%Y'));
 				$html2 = str_replace('%ANO%', $fecha_diff_con_de, $html2);
