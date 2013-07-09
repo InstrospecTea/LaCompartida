@@ -20,6 +20,7 @@ $_LANG['Ordenado<br>Por'] = "Requested<br>By";
 $_LANG['Monto Impuesto($)'] = "Taxes";
 $_LANG['Monto_total'] = "Total";
 $_LANG['Duración'] = "Duration";
+$_LANG['Duración Retainer'] = "Duration Retainer";
 $_LANG['Duración trabajada'] = "Worked duration";
 $_LANG['Duración cobrable'] = "Collectible duration";
 $_LANG['Status'] = "Status";
