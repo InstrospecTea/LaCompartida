@@ -367,6 +367,7 @@ $_LANG['Nombre Asunto'] = "Matter Name";
 $_LANG['Resumen Asuntos'] = "Matter Summary";
 $_LANG['Monto Retainer'] = "Retainer Fee";
 $_LANG['Subtotal Excesos'] = "Additional Hours";
+$_LANG['Excedentes Retainer'] = "Retainer Excess";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";
