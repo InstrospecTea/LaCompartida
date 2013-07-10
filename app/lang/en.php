@@ -20,7 +20,6 @@ $_LANG['Ordenado<br>Por'] = "Requested<br>By";
 $_LANG['Monto Impuesto($)'] = "Taxes";
 $_LANG['Monto_total'] = "Total";
 $_LANG['Duración'] = "Duration";
-$_LANG['Duración Retainer'] = "Duration Retainer";
 $_LANG['Duración trabajada'] = "Worked duration";
 $_LANG['Duración cobrable'] = "Collectible duration";
 $_LANG['Status'] = "Status";
@@ -31,6 +30,7 @@ $_LANG['Trabajo'] = "Task";
 $_LANG['Trabajos'] = "Tasks";
 $_LANG['Total'] = "Total";
 $_LANG['Detalle Cobro'] = "Invoice Details";
+$_LANG['glosa_cobro_aguilar'] = "Debit Note details";
 $_LANG['Servicios prestados'] = "Services";
 $_LANG['Profesional'] = "Professional";
 $_LANG['Detalle profesional'] = "Summary of fees";
@@ -368,7 +368,6 @@ $_LANG['Nombre Asunto'] = "Matter Name";
 $_LANG['Resumen Asuntos'] = "Matter Summary";
 $_LANG['Monto Retainer'] = "Retainer Fee";
 $_LANG['Subtotal Excesos'] = "Additional Hours";
-$_LANG['Excedentes Retainer'] = "Retainer Excess";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";

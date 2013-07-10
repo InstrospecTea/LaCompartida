@@ -23,6 +23,7 @@ $_LANG['Trabajos'] =  "Trabajos";
 $_LANG['trabajos'] = "trabajos";
 $_LANG['Total'] = "Total";
 $_LANG['Detalle Cobro'] = "Detalle cobro";
+$_LANG['glosa_cobro_aguilar'] = "Nota de Débito";
 $_LANG['Registro'] = "Registro";
 $_LANG['Servicios prestados'] =  "Servicios prestados";
 $_LANG['Profesional'] =  "Profesional";
