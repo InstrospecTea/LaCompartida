@@ -4290,7 +4290,7 @@ class NotaCobro extends Cobro {
 					
 					$html = str_replace('%impuesto%', __('Impuesto'), $html);
 					$html = str_replace('%total%', __('Total'), $html);
-					$html = str_replace('%ivg%', __('I.V.G.'), $html);
+					$html = str_replace('%igv%', __('I.G.V.'), $html);
 					$html = str_replace('%servicios_prestados%', __('Servicios prestados'), $html);
 					$html = str_replace('%fecha_inicial%', __('Fecha desde'), $html);
 					$html = str_replace('%fecha_final%', __('Fecha hasta'), $html);
