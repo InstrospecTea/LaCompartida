@@ -4294,12 +4294,22 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%servicios_prestados%', __('Servicios prestados'), $html);
 					$html = str_replace('%fecha_inicial%', __('Fecha desde'), $html);
 					$html = str_replace('%fecha_final%', __('Fecha hasta'), $html);
-						
+
+					//	Se saca la fecha inicial según el primer trabajo para evitar que fecha desde sea 1969
+					$query = "SELECT fecha FROM trabajo WHERE id_cobro='" . $this->fields['id_cobro'] . "' AND visible='1' ORDER BY fecha LIMIT 1";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+					if (mysql_num_rows($resp) > 0) {
+						list($fecha_primer_trabajo) = mysql_fetch_array($resp);
+					} else {
+						$fecha_primer_trabajo = $this->fields['fecha_fin'];
+					}
+
 					if ($lang == 'en') {
-						$html = str_replace('%desde%', date('m/d/y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_inicial_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+						$html = str_replace('%desde%', date('m/d/y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
 						$html = str_replace('%hasta%', date('m/d/y', strtotime($this->fields['fecha_fin'])), $html);
 						} else {
-						$html = str_replace('%desde%', date('d-m-y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_inicial_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+						$html = str_replace('%desde%', date('d-m-y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
 						$html = str_replace('%hasta%', date('d-m-y', strtotime($this->fields['fecha_fin'])), $html);
 					}
 
