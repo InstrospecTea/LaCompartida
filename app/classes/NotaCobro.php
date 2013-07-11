@@ -552,6 +552,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 				}
 
+				$html = str_replace('%glosa_cobro_aguilar%', __('glosa_cobro_aguilar'), $html);
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -3679,6 +3680,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 				}
 
+				$html = str_replace('%glosa_cobro_aguilar%', __('glosa_cobro_aguilar'), $html);
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -6780,6 +6782,8 @@ class NotaCobro extends Cobro {
 				} else {
 					$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 				}
+
+				$html = str_replace('%glosa_cobro_aguilar%', __('glosa_cobro_aguilar'), $html);
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);

@@ -34,12 +34,11 @@ while ($log_correo = mysql_fetch_array($resp)) {
 		}
 	}
 
-	if (!empty($correos)) {
-		if (Utiles::EnviarMail($Sesion, $correos, $log_correo['subject'], $log_correo['mensaje'], true, $log_correo['id_archivo_anexo'])) {
-			$query2 = "UPDATE log_correo SET enviado = 1, fecha_modificacion = NOW(), fecha_envio = NOW() WHERE id_log_correo = {$log_correo['id_log_correo']}";
-			$resp2 = mysql_query($query2, $Sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $Sesion->dbh);
-			++$enviados;
-		}
+	if (!empty($correos) && Utiles::EnviarMail($Sesion, $correos, $log_correo['subject'], $log_correo['mensaje'], true, $log_correo['id_archivo_anexo'])) {
+		$query2 = "UPDATE log_correo SET enviado = 1, fecha_modificacion = NOW(), fecha_envio = NOW() WHERE id_log_correo = {$log_correo['id_log_correo']}";
+		$resp2 = mysql_query($query2, $Sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $Sesion->dbh);
+		++$enviados;
+		$error_envio = false;
 	} else {
 		$log_correo['intento_envio'] = ((int) $log_correo['intento_envio']) + 1;
 		$query2 = "UPDATE log_correo SET intento_envio = {$log_correo['intento_envio']}, fecha_modificacion = NOW() WHERE id_log_correo = {$log_correo['id_log_correo']}";

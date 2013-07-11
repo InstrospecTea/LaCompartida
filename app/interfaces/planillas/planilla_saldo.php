@@ -189,6 +189,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_liquidaciones
 			WHERE
+				cliente.activo = 1 AND contrato.activo = 'SI' AND
 				d.tipo_doc = 'N' AND
 				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
 				$where_liquidaciones
@@ -223,6 +224,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_adelantos
 			WHERE
+				cliente.activo = 1 AND contrato.activo = 'SI' AND
 				d.es_adelanto = 1 AND
 				d.saldo_pago < 0
 				$where_adelantos
@@ -264,6 +266,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_gastos
 			WHERE
+				cliente.activo = 1 AND contrato.activo = 'SI' AND
 				cc.cobrable = 1 AND
 				(cc.id_cobro IS NULL OR cobro.estado IN ('CREADO', 'EN REVISION')) AND
 				cc.id_neteo_documento IS NULL AND
@@ -289,6 +292,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$saldo_total = 0;
 
+	if ($ocultar_clientes_sin_saldo) {
+		$where_saldo = "WHERE r.saldo_liquidaciones + r.saldo_gastos + r.saldo_adelantos > 0";
+	}
+
 	$query =
 		"SELECT
 			r.encargado_comercial,
@@ -299,14 +306,14 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			SUM(IF(r.tipo = '$texto_gastos_por_liquidar', r.monto_base, 0)) AS total_gastos,
 			SUM(r.saldo_gastos) AS saldo_gastos,
 			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados' OR r.tipo = '$texto_provisiones_por_liquidar', r.monto_base, 0)) AS total_adelantos,
-			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.saldo_adelantos,
-						IF(r.tipo = '$texto_provisiones_por_liquidar', r.saldo_gastos, 0)
+			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.saldo_adelantos, IF(r.tipo = '$texto_provisiones_por_liquidar', r.saldo_gastos, 0)
 			)) AS saldo_adelantos,
 			0 AS total_total, -- total_liquidaciones + total_gastos + total_adelantos AS total_total,
 			0 AS saldo_total, -- saldo_liquidaciones + saldo_gastos + saldo_adelantos AS saldo_total
 			moneda_base AS simbolo_moneda
 		FROM ( ($query_liquidaciones) UNION ($query_gastos) UNION ($query_adelantos) ) AS r
-			GROUP BY glosa_cliente";
+		$where_saldo
+		GROUP BY glosa_cliente";
 
 	 //echo $query;
 	 //echo $query_adelantos;
@@ -487,6 +494,16 @@ $Pagina->PrintTop($popup);
 									<input type="hidden" name="mostrar_detalle" value="0" />
 									<input type="checkbox" name="mostrar_detalle" id="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked="checked"' : '' ?> />
 									<?php echo __('Mostrar detalle del saldo'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="left">
+								<label>
+									<input type="hidden" name="ocultar_clientes_sin_saldo" value="0" />
+									<input type="checkbox" name="ocultar_clientes_sin_saldo" id="ocultar_clientes_sin_saldo" value="1" <?php echo $ocultar_clientes_sin_saldo ? 'checked="checked"' : '' ?> />
+									<?php echo __('Ocultar clientes sin saldo'); ?>
 								</label>
 							</td>
 						</tr>
