@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.4.14
+Lunes 8 de Julio 2013
+* **Fixed:** [Modificaciones para documentos de cobro Berlegal.](https://github.com/LemontechSA/ttb/pull/233)
+
 ## Hotfix: 13.4.13
 Jueves 4 de Julio 2013
 * **Fixed:** [Modificaciones a langs para agregar traducciones.](https://github.com/LemontechSA/ttb/pull/232)
