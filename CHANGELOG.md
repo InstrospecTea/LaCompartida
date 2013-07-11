@@ -1,6 +1,10 @@
 # Changelog
 ## Hotfix: 13.4.14
-Lunes 11 de Julio 2013
+
+Jueves 11 de Julio 2013
+* **Fixed:** [Correccion a fecha desde para seccion resumen asuntos.](https://github.com/LemontechSA/ttb/pull/235)
+
+Jueves 11 de Julio 2013
 * **Fixed:** [Comportamiento a comportamiento accionado al presionar el boton imprimir en reporte general.](https://github.com/LemontechSA/ttb/pull/234)
 
 Lunes 8 de Julio 2013
