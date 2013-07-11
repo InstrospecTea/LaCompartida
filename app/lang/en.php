@@ -306,6 +306,7 @@ $_LANG['Nota'] = "Note";
 $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'] = "Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
 $_LANG['Con Impuesto'] = "With Taxes";
 #Nota cobro Morales
+$_LANG['N°Trabajo'] = "Work ID";
 $_LANG['Atte'] = "Attn";
 $_LANG['Registro de Tiempo'] = "Time Records";
 $_LANG['POR SERVICIOS PROFESIONALES PRESTADOS'] = "FOR PROFESSIONAL SERVICES RENDERED";
