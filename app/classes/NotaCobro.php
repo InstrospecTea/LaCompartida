@@ -5141,7 +5141,7 @@ class NotaCobro extends Cobro {
 					list($h_retainer, $m_retainer, $s_retainer) = split(":", $duracion_retainer);
 					list($ht, $mt, $st) = split(":", $duracion);
 
-					if ($this->fields['forma_cobro'] == 'RETAINER'){
+					/*if ($this->fields['forma_cobro'] == 'RETAINER'){
 						$horas = $h + $m / 60 + $s / 3600;
 						$horas_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
 						$horas_tarificadas = $horas - $horas_retainer;
@@ -5150,7 +5150,7 @@ class NotaCobro extends Cobro {
 
 						list($h, $m ,$s) = split(":",$horas_tarificadas_retainer);
 						$total_trabajo_importe = $tarifa_hh * $horas_tarificadas;
-					}
+					}*/
 
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
