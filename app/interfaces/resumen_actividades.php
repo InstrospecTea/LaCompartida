@@ -1578,6 +1578,6 @@ if ($opc == 'grafico') {
 <?php
 //En el caso de que la opcion sea imprimir se imprime al final.
 if ($popup) {
-	echo "<script>window.print();window.close();</script>";
+	echo "<script>window.print();</script>";
 }
 $pagina->PrintBottom($popup);
