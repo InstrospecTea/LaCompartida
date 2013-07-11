@@ -4290,6 +4290,18 @@ class NotaCobro extends Cobro {
 					
 					$html = str_replace('%impuesto%', __('Impuesto'), $html);
 					$html = str_replace('%total%', __('Total'), $html);
+					$html = str_replace('%ivg%', __('I.V.G.'), $html);
+					$html = str_replace('%servicios_prestados%', __('Servicios prestados'), $html);
+					$html = str_replace('%fecha_inicial%', __('Fecha desde'), $html);
+					$html = str_replace('%fecha_final%', __('Fecha hasta'), $html);
+						
+					if ($lang == 'en') {
+						$html = str_replace('%desde%', date('m/d/y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_inicial_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+						$html = str_replace('%hasta%', date('m/d/y', strtotime($this->fields['fecha_fin'])), $html);
+						} else {
+						$html = str_replace('%desde%', date('d-m-y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_inicial_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+						$html = str_replace('%hasta%', date('d-m-y', strtotime($this->fields['fecha_fin'])), $html);
+					}
 
 					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="right" width="70%"><b>'. $monto_retainer .'</b></td><td align="right" width="20%">'. $valor_monto_contrato .'</td></tr>';
 
