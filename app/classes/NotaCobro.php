@@ -10150,8 +10150,7 @@ class NotaCobro extends Cobro {
 
 		global $contrato;
 		global $cobro_moneda;
-
-
+		global $lang;
 
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
@@ -10171,12 +10170,14 @@ class NotaCobro extends Cobro {
 		$asunto->LoadByCodigo($this->asuntos[0]);
 		$asuntos = $asunto->fields['glosa_asunto'];
 		$i = 1;
+
 		while ($this->asuntos[$i]) {
 			$asunto_extra = new Asunto($this->sesion);
 			$asunto_extra->LoadByCodigo($this->asuntos[$i]);
 			$asuntos .= ', ' . $asunto_extra->fields['glosa_asunto'];
 			$i++;
 		}
+
 		$htmlplantilla = str_replace('%materia%', __('Materia'), $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $htmlplantilla);
@@ -10193,13 +10194,13 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%cliente%', __('Cliente'), $htmlplantilla);
 
 		$query = "SELECT glosa_cliente FROM cliente
-									WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
+					WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($glosa_cliente) = mysql_fetch_array($resp);
+		
 		$htmlplantilla = str_replace('%nombre_cliente%', $glosa_cliente, $htmlplantilla);
+		$htmlplantilla = str_replace('%factura_razon_social_o_nombre_cliente%', ( isset($contrato->fields['factura_razon_social']) && $contrato->fields['factura_razon_social'] != '') ? $contrato->fields['factura_razon_social'] : $glosa_cliente, $htmlplantilla);
 
-		$htmlplantilla = str_replace('%factura_razon_social_o_nombre_cliente%', ( isset($contrato->fields['factura_razon_social'])
-				&& $contrato->fields['factura_razon_social'] != '') ? $contrato->fields['factura_razon_social'] : $glosa_cliente, $htmlplantilla);
 		if ($this->fields['codigo_idioma'] == 'es') {
 			$htmlplantilla = str_replace('%fecha_liquidacion%', __('Fecha Liquidación'), $htmlplantilla);
 			$htmlplantilla = str_replace('%cliente_corporativo%', __('Cliente Corporativo'), $htmlplantilla);
@@ -10222,8 +10223,10 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%direccion_carta%', nl2br($direccion[0]), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut%', __('RUT'), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut_minuscula%', __('Rut'), $htmlplantilla);
-		if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '')
+		
+		if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '') {
 			$rut_split = explode('-', $contrato->fields['rut']);
+		}
 
 		$htmlplantilla = str_replace('%valor_rut_sin_formato%', $contrato->fields['rut'], $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_rut%', $rut_split[0] ? $this->StrToNumber($rut_split[0]) . "-" . $rut_split[1] : __(''), $htmlplantilla);
@@ -10231,26 +10234,27 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%giro_factura_valor%', $contrato->fields['factura_giro'], $htmlplantilla);
 		$htmlplantilla = str_replace('%contacto%', empty($contrato->fields['contacto']) ? '' : __('Contacto'), $htmlplantilla);
 		$htmlplantilla = str_replace('%atencion%', empty($contrato->fields['contacto']) ? '' : __('Atención'), $htmlplantilla);
+		
 		if (method_exists('Conf', 'GetConf')) {
 			if (Conf::GetConf($this->sesion, 'TituloContacto'))
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' :
-								$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
+				$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
 			else
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' : $contrato->fields['contacto'], $htmlplantilla);
-		}
-		else if (method_exists('Conf', 'TituloContacto')) {
+		} else if (method_exists('Conf', 'TituloContacto')) {
 			if (Conf::TituloContacto())
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' :
-								$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
+				$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
 			else
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' : $contrato->fields['contacto'], $htmlplantilla);
-		}
-		else {
+		} else {
 			$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' : $contrato->fields['contacto'], $htmlplantilla);
 		}
+
 		$htmlplantilla = str_replace('%atte%', empty($contrato->fields['contacto']) ? '' : '(' . __('Atte') . ')', $htmlplantilla);
 		$htmlplantilla = str_replace('%telefono%', empty($contrato->fields['fono_contacto']) ? '' : __('Teléfono'), $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_telefono%', empty($contrato->fields['fono_contacto']) ? '' : $contrato->fields['fono_contacto'], $htmlplantilla);
+		
 		if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
 									FROM factura
@@ -10286,8 +10290,15 @@ class NotaCobro extends Cobro {
 				$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
 			}
 		}
+
+		if ($lang =="en"){
+			$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
+		} else {	
+			$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+		}
 		
 		$htmlplantilla = str_replace('%fecha_especial%', $fecha_lang, $htmlplantilla);
+		$htmlplantilla = str_replace('%ciudad_fecha_ingles%', $ciudad_fecha_ingles, $htmlplantilla);
 
 		if ($contrato->fields['id_pais'] > 0) {
 			$query = "SELECT nombre FROM prm_pais
