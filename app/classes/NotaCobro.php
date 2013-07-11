@@ -4303,7 +4303,7 @@ class NotaCobro extends Cobro {
 						$html = str_replace('%hasta%', date('d-m-y', strtotime($this->fields['fecha_fin'])), $html);
 					}
 
-					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="right" width="70%"><b>'. $monto_retainer .'</b></td><td align="right" width="20%">'. $valor_monto_contrato .'</td></tr>';
+					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="left" width="60%"><b>'. $monto_retainer .'</b></td><td align="right" width="30%">'. $valor_monto_contrato .'</td></tr>';
 
 					if ($this->fields['forma_cobro'] == 'RETAINER'){
 						$html = str_replace('%subtotal%', __('Subtotal Excesos'), $html);
