@@ -1,10 +1,21 @@
 # Changelog
-## Hotfix: 13.4.14
-Lunes 11 de Julio 2013
-* **Fixed:** [Comportamiento a comportamiento accionado al presionar el boton imprimir en reporte general.](https://github.com/LemontechSA/ttb/pull/234)
 
-Lunes 8 de Julio 2013
+## Hotfix: 13.4.16
+Jueves 11 de Julio 2013
+* **Fixed:** [Factura al filtrar por clientes y buscar, el resultado que muestra no se ordena segun fecha de documento.](https://github.com/LemontechSA/ttb/pull/235)
+
+## Hotfix: 13.4.15
+Jueves 11 de Julio 2013
+* **Fixed:** [Comportamiento a comportamiento accionado al presionar el boton imprimir en reporte general.](https://github.com/LemontechSA/ttb/pull/234)
+* **Fixed:** [Modificaciones para carta Berlegal](https://github.com/LemontechSA/ttb/pull/234)
+* **Fixed:** [Corrección carta Morales y Besa para retainers (forma anterior)](https://github.com/LemontechSA/ttb/pull/234)
+
+## Hotfix: 13.4.14
+Miércoles 10 de Julio 2013
 * **Fixed:** [Modificaciones para documentos de cobro Berlegal.](https://github.com/LemontechSA/ttb/pull/233)
+* **Fixed:** [Problema en alerta por contrato](https://github.com/LemontechSA/ttb/pull/233)
+* **Fixed:** [Filtrado reporte saldo clientes](https://github.com/LemontechSA/ttb/pull/233)
+* **Fixed:** [Link a juicios desde time_tracking](https://github.com/LemontechSA/ttb/pull/233)
 
 ## Hotfix: 13.4.13
 Jueves 4 de Julio 2013
@@ -12,7 +23,7 @@ Jueves 4 de Julio 2013
 * **Fixed:** [Modificación Nota de cobro para cumplir con requerimiento de Cuestacampos.](https://github.com/LemontechSA/ttb/pull/232)
 * **Fixed:** [Desarrollo de conjunto de modificaciones a Nota cobro para cumplir con requerimientos de Berlegal](https://github.com/LemontechSA/ttb/pull/232)
 
-## : 13.4.12
+## Hotfix: 13.4.12
 Martes 2 de Julio 2013
 * **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)
 * **Fixed:** [Corrección fecha último pago para facturas con SimpleReport y DataTables](https://github.com/LemontechSA/ttb/pull/231)
