@@ -6270,6 +6270,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%monto%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+				
+				$html = str_replace('%glosa_asunto%', __('Asunto'), $html);
 
 				if ($lang == 'es') {
 					$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);
@@ -6327,11 +6329,7 @@ class NotaCobro extends Cobro {
 				$query = "SELECT SQL_CALC_FOUND_ROWS
 						cta_corriente.*
 						, prm_cta_corriente_tipo.glosa AS tipo_gasto
-						, asunto.codigo_asunto
-						, asunto.codigo_asunto_secundario
-						, asunto.glosa_asunto
 					FROM cta_corriente
-					LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
 					LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
 					WHERE id_cobro = '{$this->fields['id_cobro']}'
 						AND monto_cobrable > 0
