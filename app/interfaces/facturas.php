@@ -385,7 +385,7 @@ function FormatoDatos($fila) {
 }
 
 function FormatoLiquidacion($fila) {
-	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Cobro',950,660,'cobros6.php?id_cobro=1420&amp;popup=1');\">{$fila->fields['id_cobro']}</a>";
+	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Cobro',950,660,'cobros6.php?id_cobro={$fila->fields['id_cobro']}&amp;popup=1');\">{$fila->fields['id_cobro']}</a>";
 }
 
 function FormatoMoneda($sesion, $numero, $moneda) {
