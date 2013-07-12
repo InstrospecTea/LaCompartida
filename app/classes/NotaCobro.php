@@ -6327,7 +6327,11 @@ class NotaCobro extends Cobro {
 				$query = "SELECT SQL_CALC_FOUND_ROWS
 						cta_corriente.*
 						, prm_cta_corriente_tipo.glosa AS tipo_gasto
+						, asunto.codigo_asunto
+						, asunto.codigo_asunto_secundario
+						, asunto.glosa_asunto
 					FROM cta_corriente
+					LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
 					LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
 					WHERE id_cobro = '{$this->fields['id_cobro']}'
 						AND monto_cobrable > 0
@@ -6355,6 +6359,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%monto_moneda_total_con_impuesto%', '&nbsp;', $row);
 					$row = str_replace('%td_monto_impuesto_total%', '&nbsp;', $row);
 					$row = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $row);
+					$row = str_replace('%glosa_asunto%', '&nbsp;', $row);
 					$html .= $row;
 				}
 				$cont_gasto_egreso = 0;
@@ -6379,7 +6384,8 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%fecha%', Utiles::sql2fecha($detalle['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%num_doc%', $detalle['numero_documento'], $row);
 					$row = str_replace('%tipo_gasto%', $detalle['tipo_gasto'], $row);
-					
+					$row = str_replace('%glosa_asunto%', $detalle['glosa_asunto'], $row);
+
 					if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
 						$row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
 					} else {
