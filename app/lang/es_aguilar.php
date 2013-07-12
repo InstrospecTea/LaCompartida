@@ -27,7 +27,6 @@ $_LANG['Monto'] =  "Monto";
 $_LANG['Trabajos'] =  "Trabajos";
 $_LANG['trabajos'] = "trabajos";
 $_LANG['Total'] = "Total";
-$_LANG['Detalle Cobro'] = "Nota de Débito";
 $_LANG['Registro'] = "Registro";
 $_LANG['Servicios prestados'] =  "Servicios prestados";
 $_LANG['Profesional'] =  "Profesional";
