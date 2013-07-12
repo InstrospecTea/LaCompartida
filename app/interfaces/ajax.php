@@ -477,17 +477,19 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_giro,
 											contrato.factura_codigopostal
 										FROM contrato
-										WHERE contrato.id_contrato='$id_contrato' LIMIT 1";
+										INNER JOIN cliente ON cliente.id_contrato = contrato.id_contrato
+										WHERE (cliente.codigo_cliente = '$codigo_cliente' OR cliente.codigo_cliente_secundario = '$codigo_cliente') LIMIT 1";
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
 		if ($i > 0) {
-			echo("~");
+			echo('~');
 		}
-		echo(join("|", $fila));
+		echo(join('|', $fila));
 	}
+
 	if ($i == 0) {
-		echo("VACIO|");
+		echo('VACIO|');
 	}
 } else if ($accion == 'set_cobro_trabajo') {#TIENE UN SOLO = BUG #Setea el trabajo a algún cobro (CREADO) correspondiente al periodo y asunto.
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {

@@ -69,12 +69,12 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	}
 
 	$opc_inicial = $opcion;
-	
+
 	if ($opcion == "restaurar") {
 		$opc_inicial = $opcion;
 		$opcion = "guardar";
 	}
-	
+
 	if ($opcion == "anular") {
 		$factura->Edit('estado', 'ANULADA');
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
@@ -567,10 +567,16 @@ if ($buscar_padre) {
 			<td align=left colspan=3>
 
 		<?php
-		$cliente = new Cliente($sesion);
-		$codigo_cliente = $cobro->fields['codigo_cliente'];
-		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
-		UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
+		$Cliente = new Cliente($sesion);
+
+		if (!empty($factura->fields['codigo_cliente'])) {
+			$codigo_cliente = $factura->fields['codigo_cliente'];
+		} else {
+			$codigo_cliente = $cobro->fields['codigo_cliente'];
+		}
+
+		$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+		UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $mas_recientes = false, $width = 320, $oncambio = "SetCampoInputId('codigo_cliente', 'campo_codigo_cliente')");
 		?>
 
 				<span style="color:#FF0000; font-size:10px">*</span></td>
@@ -892,7 +898,7 @@ if ($id_cobro > 0) {
 }
 ?>
 							var http = getXMLHTTP();
-							var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value + '&id_contrato=' + id_contrato;
+							var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value;
 
 							http.open('get', url, true);
 							http.onreadystatechange = function()
