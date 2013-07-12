@@ -3,7 +3,6 @@
 ## Hotfix: 13.4.17
 Viernes 12 de Julio 2013
 * **New:** [Agrega los %tags% para mostrar el asunto en el listado de gastos](https://github.com/LemontechSA/ttb/pull/237)
-* **Fixed:** [Actualizar datos de facturación dependiendo del cliente seleccionado](https://github.com/LemontechSA/ttb/pull/237)
 
 ## Hotfix: 13.4.16
 Jueves 11 de Julio 2013
