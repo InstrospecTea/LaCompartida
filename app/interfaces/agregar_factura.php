@@ -554,7 +554,7 @@ if ($buscar_padre) {
 		?>
 		<tr>
 			<td align=right><?php echo __('Fecha') ?></td>
-			<td align=left colspan=2><input type="text" name="fecha" clase="fechadiff" value="<?php echo $factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
+			<td align=left colspan=2><input type="text" name="fecha" clase="fechadiff" value="<?php echo $factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" /></td>
 
 			<td><span style='display:none' id=letra_inicial>&nbsp;&nbsp;
 		<?php echo __('Letra') ?>
@@ -1342,7 +1342,6 @@ if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
 							//monto_impuesto = monto_impuesto.toFixed(decimales);
 							//monto_impuesto_gasto = monto_impuesto_gasto.toFixed(decimales);
 							monto_impuesto_suma = parseFloat(monto_impuesto) + parseFloat(monto_impuesto_gasto);
-							console.log(monto_impuesto, monto_impuesto_gasto, monto_impuesto_suma);
 							//monto_impuesto_suma= jQuery.formatNumber(monto_impuesto_suma, {format:"0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale:"us"});
 <?php
 if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
