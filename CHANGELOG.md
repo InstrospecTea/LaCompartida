@@ -2,6 +2,7 @@
 
 ## Hotfix: 13.4.16
 Jueves 11 de Julio 2013
+* **Fixed:** [Corrige fecha desde en sección Resumen Asuntos](https://github.com/LemontechSA/ttb/pull/235)
 * **Fixed:** [Factura al filtrar por clientes y buscar, el resultado que muestra no se ordena segun fecha de documento.](https://github.com/LemontechSA/ttb/pull/235)
 
 ## Hotfix: 13.4.15
