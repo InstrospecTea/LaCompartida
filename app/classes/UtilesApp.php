@@ -1769,6 +1769,8 @@ HTML;
 					cta_corriente.con_impuesto,
 					cta_corriente.numero_documento,
 					prm_cta_corriente_tipo.glosa AS tipo_gasto,
+					asunto.glosa_asunto,
+					asunto.codigo_asunto_secundario,
 					IF(descripcion like 'Saldo aprovisionado%','SI','NO') as es_liquido_provision
 				FROM cta_corriente
 				LEFT JOIN asunto USING(codigo_asunto)
@@ -1868,6 +1870,8 @@ HTML;
 				$lista[$v]['id_usuario'] = $gasto->fields['id_usuario'];
 				$lista[$v]['username'] = $gasto->fields['username'];
 				$lista[$v]['codigo_asunto'] = $gasto->fields['codigo_asunto'];
+				$lista[$v]['codigo_asunto_secundario'] = $gasto->fields['codigo_asunto_secundario'];
+				$lista[$v]['glosa_asunto'] = $gasto->fields['glosa_asunto'];
 				$lista[$v]['id_moneda'] = $gasto->fields['id_moneda'];
 				$lista[$v]['fecha'] = $gasto->fields['fecha'];
 				$lista[$v]['numero_documento'] = $gasto->fields['numero_documento'];
