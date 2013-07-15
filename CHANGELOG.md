@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.18
+Lunes 15 de Julio 2013
+* **New:** [Correccion para nota de cobro morales y besa](https://github.com/LemontechSA/ttb/pull/238)
+
 ## Hotfix: 13.4.17
 Viernes 12 de Julio 2013
 * **New:** [Agrega los %tags% para mostrar el asunto en el listado de gastos](https://github.com/LemontechSA/ttb/pull/237)
