@@ -4,7 +4,7 @@ require_once('../classes/Reportes/spell-check-library.php');
 $content = "";
 $options = array(
 	"lang"						=> $_REQUEST['lang'],
-	"maxSuggestions"	=> 10,
+	"maxSuggestions"	=> 5,
 	"customDict"			=> 0,
 	"charset"					=> 'utf-8'
 );
@@ -13,7 +13,7 @@ $words = strip_tags(file_get_contents('php://input'));
 $spell = $factory->create($words);
 
 header('Content-Type: text/xml');
-echo utf8_decode($spell->toXML());
+echo $spell->toXML();
 exit;
 
 
