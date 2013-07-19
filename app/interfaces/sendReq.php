@@ -1,4 +1,22 @@
 <?php
+require_once('../classes/Reportes/spell-check-library.php');
+
+$content = "";
+$options = array(
+  "lang"                    => $_REQUEST['lang'],
+    "maxSuggestions"        => 10,
+    "customDict"            => 0,
+    "charset"               => 'utf-8'
+);
+$factory = new SpellChecker($options);
+
+$spell = $factory->create(trim(file_get_contents('php://input')));
+
+header('Content-Type: text/xml');
+echo utf8_decode($spell->toXML());
+exit;
+
+
 // Thanks to:
 //   Marcin 'nosferathoo' Puchalski
 //   Johan Sijbesma

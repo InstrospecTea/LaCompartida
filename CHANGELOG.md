@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.20
+Viernes 19 de Julio 2013
+* **Fixed:** [Se reemplaza el corrector ortográfico por pspell](https://github.com/LemontechSA/ttb/pull/241)
+
 ## Hotfix: 13.4.19
 Jueves 18 de Julio 2013
 * **New:** [Modificacion a interfaz reporte avanzado para selector cliente bmaj](https://github.com/LemontechSA/ttb/pull/240)
