@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.4.19
 Jueves 18 de Julio 2013
-* **New:** [Modificacion a interfaz reporte avanzado para selector cliente bmaj](https://github.com/LemontechSA/ttb/pull/238)
+* **New:** [Modificacion a interfaz reporte avanzado para selector cliente bmaj](https://github.com/LemontechSA/ttb/pull/240)
 
 ## Hotfix: 13.4.18
 Lunes 15 de Julio 2013
