@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.21
+Viernes 19 de Julio 2013
+* **Fixed:** [Corregir modificación de cliente al editar una factura](https://github.com/LemontechSA/ttb/pull/242)
+
 ## Hotfix: 13.4.20
 Viernes 19 de Julio 2013
 * **Fixed:** [Se reemplaza el corrector ortográfico por pspell](https://github.com/LemontechSA/ttb/pull/241)
