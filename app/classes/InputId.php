@@ -90,13 +90,13 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		if($tabla == 'prm_codigo'){
 			$where = " WHERE grupo = '$otro_filtro' ";
 		}
-			
-		/*if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) 
+
+		/*if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )
 			|| ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
 			$oncambio='';
 		else*/
 			$oncambio=$onchange;
-			
+
 		if( $filtro_banco != "" ) {
 			if( $filtro_banco == "no_existe" ) {
 				$where .= " WHERE 1=2 ";
@@ -104,7 +104,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				$where .= " WHERE cuenta_banco.id_banco = '$filtro_banco' ";
 			}
 		}
-			
+
 
 		$output .= "<input maxlength=\"15\" id=\"campo_".$name."\" size=\"15\" value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" ".str_replace("class='comboplus'","",$opciones)." />";
 		$output .= Html::SelectQuery($sesion,
@@ -132,12 +132,12 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 	 * @param type $usa_inactivo
 	 * @param type $desde
 	 * @param type $filtro_banco
-	 * @return type 
+	 * @return type
 	 */
 	function ImprimirCodigo($sesion, $grupo, $name, $selected="", $opciones="", $onchange="",$width=320, $usa_inactivo=false, $desde = "", $filtro_banco = ""){
 		return self::Imprimir($sesion, 'prm_codigo', 'codigo', 'glosa', $name, $selected, $opciones, $onchange, $width, $grupo, $usa_inactivo, $desde, $filtro_banco);
 	}
-	
+
 	function ImprimirSinCualquiera($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "", $desde = "")
 	{
 		$join = '';
@@ -151,12 +151,12 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 		if($tabla == "cliente")
 			$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected')";
-			
+
 		if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
 			$oncambio='';
 		else
 			$oncambio=$onchange;
-		 
+
 		$output .= "<input maxlength=10 id=\"campo_".$name."\" size=10 value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" ".str_replace("class='comboplus'","",$opciones)." />";
 
 		$output .= Html::SelectQuery($sesion,
@@ -168,7 +168,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 						$name,
 						$selected,
 						"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones ",'Vacio',$width);
-		
+
 		return $output;
 	}
 
@@ -182,7 +182,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				var obj_select = document.getElementById(select);
 				var obj_campo = document.getElementById(campo);
 				obj_select.value = obj_campo.value;
-				
+
 				if( obj_select.value != obj_campo.value && select != \"codigo_cliente\" && select != \"codigo_cliente_secundario\" )
 				{
 					CargarSelect(campo,select,\"cargar_asuntos_desde_campo\",jQuery('#soloasuntosactivos').is(':checked')?1:0);
@@ -215,24 +215,23 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				}
 				return false;
 			}
- 
+
 			function CargarSelect(id_origen,id_destino,accion,soloactivos)
 			{
-			
-				
+
+
 				soloactivos = typeof soloactivos !== 'undefined' ? soloactivos : 1;
 				var select_origen = document.getElementById(id_origen);
 				var select_destino = document.getElementById(id_destino);
 				var valor_original_destino = select_destino.value;
-				console.log(id_origen,id_destino,accion,soloactivos);
-			 
+
 				var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value+'&soloactivos='+soloactivos ;
 				 jQuery('#'+id_destino).addClass('loadingbar');
- 
-				jQuery.get(url, function(response) 
+
+				jQuery.get(url, function(response)
 				{
-					 
-						
+
+
 						if(response.indexOf('|') != -1)
 						{
 							response = response.split('\\n');
@@ -249,16 +248,16 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							{
 								if( accion != \"cargar_asuntos_desde_campo\" )
 									select_destino.options.length = 1;
- 
+
 								 jQuery('#'+id_destino).removeClass('loadingbar');
- 
-								
+
+
 								if( accion ==\"cargar_asuntos_desde_campo\" )
 									{
 									alert('".__('El código ingresado no existe')."');
 									jQuery('#'+id_origen).val('');
 									jQuery('#'+id_destino).val('');
-									
+
 									}
 								else if( jQuery('#'+id_origen).val() != '' )
 									alert('".$mje_error."');
@@ -273,15 +272,15 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 									valores = campos[i].split('|');
 									if( valores[0] == 'noexiste' )
 										continue;
-										
+
 										var option = new Option();
 										option.value = valores[0];
 										option.text = valores[1];
-										
+
 										if(i == 0)
 										{
 											select_destino.options.length = 1;
-											 
+
 										}
 										try
 										{
@@ -299,10 +298,10 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 										else if(valor_original_destino){
 											select_destino.value = valor_original_destino;
 										}
- 
+
 										 jQuery('#'+id_destino).removeClass('loadingbar');
- 
-								
+
+
 								select_destino.onchange();
 							}
 						}
@@ -318,8 +317,8 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 						}
 					});
 				};
-				 
-			 
+
+
 
 
 
@@ -334,7 +333,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		$output .= "
 			var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
 
-			jQuery.get(url, function(response) {  		
+			jQuery.get(url, function(response) {
 				response = response.replace(' ','');
 				if(campo.val() != response) {
 					campo.val(response);
@@ -352,12 +351,12 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 			});
 		}
 	}
-	
+
 	function RevisarConsistenciaClienteAsunto( form ) {
 		var accion = 'consistencia_cliente_asunto';
 		if( form.codigo_cliente_secundario && !form.codigo_cliente )
 			var codigo_cliente = form.codigo_cliente_secundario.value;
-		else 
+		else
 			var codigo_cliente = form.codigo_cliente.value;
 		if( form.codigo_asunto_secundario && !form.codigo_asunto )
 			var codigo_asunto = form.codigo_asunto_secundario.value;
@@ -388,11 +387,11 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 ";
 		return $output;
 		}
-		
-		
-		
-		
-		
-		 
-		
+
+
+
+
+
+
+
 }

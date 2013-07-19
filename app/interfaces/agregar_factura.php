@@ -69,12 +69,12 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	}
 
 	$opc_inicial = $opcion;
-	
+
 	if ($opcion == "restaurar") {
 		$opc_inicial = $opcion;
 		$opcion = "guardar";
 	}
-	
+
 	if ($opcion == "anular") {
 		$factura->Edit('estado', 'ANULADA');
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
@@ -568,12 +568,15 @@ if ($buscar_padre) {
 
 		<?php
 		$cliente = new Cliente($sesion);
-		$codigo_cliente = $cobro->fields['codigo_cliente'];
+		$codigo_cliente = $factura->fields['codigo_cliente'];
 		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 		UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
 		?>
 
 				<span style="color:#FF0000; font-size:10px">*</span></td>
+		</tr>
+		<tr style="display:none;">
+			<td><?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?></td>
 		</tr>
 		<tr>
 					<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
