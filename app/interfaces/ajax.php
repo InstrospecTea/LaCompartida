@@ -468,8 +468,7 @@ if ($accion == "consistencia_cliente_asunto") {
 	if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 		$campos_extra .= ', contrato.factura_ciudad';
 	}
-	$query_contrato = "SELECT
-											contrato.factura_razon_social,
+	$query_contrato = "SELECT contrato.factura_razon_social,
 											contrato.factura_direccion,
 											contrato.rut,
 											contrato.factura_comuna,
@@ -477,7 +476,9 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_giro,
 											contrato.factura_codigopostal
 										FROM contrato
-										WHERE contrato.id_contrato='$id_contrato' LIMIT 1";
+											JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
+										WHERE cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}'
+										LIMIT 1";
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
