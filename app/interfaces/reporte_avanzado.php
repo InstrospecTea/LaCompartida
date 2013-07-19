@@ -386,6 +386,18 @@ if (!$popup) {
 			ActualizarNuevoReporte();
 		}
 
+		jQuery(function(){
+    		jQuery("select option").attr( "title", "" );
+    		jQuery("select option").each(function(i){
+  				this.title = this.text;
+    		})
+  		});
+
+  		
+  		jQuery("select").tooltip({
+   			left: 25
+		});
+
 	</script>
 	<?php
 }
