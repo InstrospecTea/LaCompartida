@@ -563,7 +563,7 @@ if (!$popup) {
 															<label for="check_clientes" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'cliente_full' style="<?php echo $check_clientes ? "" : "display:none;" ?>">
-															<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]", $clientesF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]", $clientesF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "300"); ?>
 														</div>
 													</td>
 												</tr>
