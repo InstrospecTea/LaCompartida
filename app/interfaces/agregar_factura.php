@@ -568,7 +568,11 @@ if ($buscar_padre) {
 
 		<?php
 		$cliente = new Cliente($sesion);
-		$codigo_cliente = $factura->fields['codigo_cliente'];
+		if (!empty($factura->fields['codigo_cliente'])) {
+			$codigo_cliente = $factura->fields['codigo_cliente'];
+		} else {
+			$codigo_cliente = $cobro->fields['codigo_cliente'];
+		}
 		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 		UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
 		?>
