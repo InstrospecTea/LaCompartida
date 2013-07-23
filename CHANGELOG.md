@@ -3,6 +3,7 @@
 ## Hotfix: 13.4.22
 Lunes 22 de Julio 2013
 * **Fixed:** [Corrige cálculo monto cobierto por adelanto según moneda](https://github.com/LemontechSA/ttb/pull/243)
+* **Fixed:** [Cargar los datos del cliente al agregar factura](https://github.com/LemontechSA/ttb/pull/243)
 
 ## Hotfix: 13.4.21
 Viernes 19 de Julio 2013
