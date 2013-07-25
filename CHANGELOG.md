@@ -1,6 +1,10 @@
 # Changelog
 
 ## Hotfix: 13.4.22
+Jueves 25 de Julio 2013
+* **Fixed:** [Corrige la asignación de actividades (selector) al crear o modificar un trabajo](https://github.com/LemontechSA/ttb/pull/245)
+
+## Hotfix: 13.4.22
 Lunes 22 de Julio 2013
 * **Fixed:** [Corrige cálculo monto cobierto por adelanto según moneda](https://github.com/LemontechSA/ttb/pull/243)
 * **Fixed:** [Cargar los datos del cliente al agregar factura](https://github.com/LemontechSA/ttb/pull/243)
