@@ -63,60 +63,69 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		return $output;
 	}
 
-	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false, $desde = "", $filtro_banco = "")
-	{
+	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '') {
 		$join = '';
-		if($tabla == "asunto")
-		{
-			if(  UtilesApp::GetConf($sesion,'CodigoSecundario')  && $otro_filtro != '')
-				{
-					$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario='$otro_filtro'";
-					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					list($otro_filtro) = mysql_fetch_array($resp);
-				}
+
+		if ($tabla == 'asunto') {
+			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')  && $otro_filtro != '') {
+				$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$otro_filtro'";
+				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+				list($otro_filtro) = mysql_fetch_array($resp);
+			}
+
 			$join .= "JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente";
-			if(!$usa_inactivo)
-				$where = " WHERE asunto.activo=1 AND cliente.activo = 1 ";
-			if($otro_filtro != "")
+
+			if (!$usa_inactivo) {
+				$where = " WHERE asunto.activo = 1 AND cliente.activo = 1 ";
+			}
+
+			if ($otro_filtro != '') {
 				$where .= "  AND asunto.codigo_cliente = '$otro_filtro' ";
-			else
-				$where .= " AND 1=0";
+			} else {
+				// esto es para que no retorne registros
+				$where .= " AND 1 = 0 ";
+			}
 		}
 
-		if($tabla == "cliente" && !$usa_inactivo){
-			$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected' )";
+		if ($tabla == 'cliente' && !$usa_inactivo) {
+			$where = " WHERE (activo = 1 OR cliente.codigo_cliente = '$selected') ";
 		}
 
-		if($tabla == 'prm_codigo'){
+		if ($tabla == 'prm_codigo'){
 			$where = " WHERE grupo = '$otro_filtro' ";
 		}
 
-		/*if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )
-			|| ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
-			$oncambio='';
-		else*/
-			$oncambio=$onchange;
+		if ($tabla == 'actividad') {
+			if ($otro_filtro == '') {
+				$where = " WHERE actividad.codigo_asunto IS NULL ";
+			} else {
+				$where = " WHERE actividad.codigo_asunto = '{$otro_filtro}' ";
+			}
+		}
 
-		if( $filtro_banco != "" ) {
-			if( $filtro_banco == "no_existe" ) {
-				$where .= " WHERE 1=2 ";
+		$oncambio = $onchange;
+
+		if ($filtro_banco != '') {
+			if ($filtro_banco == 'no_existe') {
+				// esto es para que no retorne registros
+				$where .= " WHERE 1 = 2 ";
 			} else {
 				$where .= " WHERE cuenta_banco.id_banco = '$filtro_banco' ";
 			}
 		}
 
+		$output .= "<input maxlength=\"15\" id=\"campo_{$name}\" size=\"15\" value=\"{$selected}\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_{$name}','{$name}'); {$oncambio}\" " . str_replace("class='comboplus'", '', $opciones) . " />";
 
-		$output .= "<input maxlength=\"15\" id=\"campo_".$name."\" size=\"15\" value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" ".str_replace("class='comboplus'","",$opciones)." />";
-		$output .= Html::SelectQuery($sesion,
-						"SELECT ".$campo_id.",".$campo_glosa."
-						FROM ".$tabla."
-						$join
-						$where
-						ORDER BY ".$campo_glosa,
-						$name,
-						$selected,
-						"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones",
-						__("Cualquiera"),$width);
+		$output .= Html::SelectQuery(
+			$sesion,
+			"SELECT {$campo_id}, {$campo_glosa} FROM {$tabla} {$join} {$where} ORDER BY {$campo_glosa}",
+			$name,
+			$selected,
+			"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones",
+			__("Cualquiera"),
+			$width
+		);
+
 		return $output;
 	}
 
