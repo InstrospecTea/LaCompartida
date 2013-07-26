@@ -2229,7 +2229,7 @@ HTML;
 															 ( ".$id_usuario.", 'REP' ),
 															 ( ".$id_usuario.", 'REV' )";
 					return mysql_query($query,$sesion->dbh);
-}
+	}
 
 /**
  * Devuelve un botón para abrir el diálogo de historial de un elemento (factura, cobro, etc)
@@ -2243,6 +2243,29 @@ HTML;
 						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";	
 				}
 
+	}
+
+	public static function UploadToS3($name, $file) {
+		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
+
+		$s3 = new AmazonS3(array(
+        	'key' => 'AKIAIQYFL5PYVQKORTBA',
+        	'secret' => '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'
+        ));
+		$bucket = S3_UPLOAD_BUCKET;
+
+		$name = SUBDOMAIN . '/dtes/' . $name;
+
+		$response = $s3->create_object($bucket, $name, array(
+			'body' => $file,
+			'acl' => AmazonS3::ACL_PUBLIC
+		));
+
+		if ($response->isOK()) {
+			return $s3->get_object_url($bucket, $name);
+		}
+
+		return "";
 	}
 
 }

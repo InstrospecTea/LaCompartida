@@ -9914,6 +9914,22 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.42:
+			$queries = array();
+
+			if (!ExisteCampo('dte_fecha_creacion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_creacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha creacion';";
+			}
+			if (!ExisteCampo('dte_firma', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_firma` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - Firma';";
+			}
+			if (!ExisteCampo('dte_url_pdf', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_url_pdf` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - URL PDF documento';";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9923,7 +9939,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.41;
+$max_update = 7.42;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
