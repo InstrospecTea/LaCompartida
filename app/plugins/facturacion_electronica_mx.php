@@ -31,12 +31,14 @@ $datos = array(
 $result = $client->RecibirTXT($usuario, $contra, $strdocumento);
 // $result = $client->__soapCall('RecibirTXT', $datos);
 
+header('Content-Type: text/html; charset=utf-8');
+
 echo "<pre style='color: green;'>" . utf8_decode(utf8_decode(print_r($result, true))) . "</pre>";
 echo "<pre style='color: grey;'>" . htmlentities($client->__getLastRequest()) . "</pre>";
 echo "<pre style='color: blue;'>" . htmlentities($client->__getLastResponse()) . "</pre>";
 echo "<pre style='color: red;'>" . $return . "</pre>";
 echo "<pre style='color: yellow;'>" . print_r($client->__getFunctions(), true) . "</pre>";
-echo "<pre style='color: black;'>" . $strdocumento . "</pre>";
+echo "<pre style='color: black;'>" . utf8_decode($strdocumento) . "</pre>";
 
 function FacturaToTXT($id_factura) {
 	require_once dirname(__FILE__) . '/../conf.php';
@@ -52,8 +54,8 @@ function FacturaToTXT($id_factura) {
 		'COM' => array(
 			'version|3.2',
 			'serie|' . $Factura->fields['serie_documento_legal'],
-			'folio|' . 425, //$Factura->fields['numero'],
-			'fecha|' . Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%dT%H:%M:%S'),
+			'folio|' . 430, //$Factura->fields['numero'],
+			'fecha|' . '2013-07-25T00:00:00', // Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%dT%H:%M:%S'),
 			'formaDePago|' . utf8_encode('PAGO EN UNA SOLA EXHIBICION'),
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . utf8_encode('EFECTOS FISCALES AL PAGO'), // $Factura->fields['condicion_pago'],
@@ -68,7 +70,7 @@ function FacturaToTXT($id_factura) {
 			'Regimen|' . utf8_encode('Persona física régimen general')
 		),
 		'REC' => array(
-			'rfc|' . $Factura->fields['RUT_cliente'],
+			'rfc|' . 'DNM070221BS4', //$Factura->fields['RUT_cliente'],
 			'nombre|' . utf8_encode($Factura->fields['cliente'])
 		),
 		'DOR' => array(
