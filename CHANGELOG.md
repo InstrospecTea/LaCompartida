@@ -1,6 +1,10 @@
 # Changelog
 
-## Hotfix: 13.4.22
+## Hotfix: 13.4.24
+Jueves 25 de Julio 2013
+* **Fixed:** [Agrega Tooltip para multiselectores en reporte liquidaciones.](https://github.com/LemontechSA/ttb/pull/246)
+
+## Hotfix: 13.4.23
 Jueves 25 de Julio 2013
 * **Fixed:** [Corrige la asignación de actividades (selector) al crear o modificar un trabajo](https://github.com/LemontechSA/ttb/pull/246)
 
