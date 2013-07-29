@@ -1499,7 +1499,8 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_mta_agno%', $fecha_mta_agno, $html2);
 				$html2 = str_replace('%fecha_agno%', $fecha_agno_creacion, $html2);
 
-				$fecha_facturacion_carta = $this->fields['fecha_facturacion'] ? Utiles::fecha2sql($this->fields['fecha_facturacion'], '%d de %B de %Y') : $fecha_facturacion_carta;
+				$fecha_facturacion_carta = ucfirst(Utiles::sql3fecha($this->fields['fecha_facturacion'], '%d de %B de %Y'));
+				
 				$html2 = str_replace('%monto_total_demo_uf%', number_format($monto_moneda_demo, $cobro_moneda->moneda[3]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . $cobro_moneda->moneda[3]['simbolo'], $html2);
 				$html2 = str_replace('%fecha_facturacion%', $fecha_facturacion_carta, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1779,7 +1780,7 @@ class CartaCobro extends NotaCobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado, $categoria_usuario) = mysql_fetch_array($resp);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
-				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
+				$html2 = str_replace('%%%', ucwords(strtolower($nombre_encargado)), $html2);
 				$simbolo_opc_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
 				$html2 = str_replace('%simbolo_opc_moneda_totall%', $simbolo_opc_moneda_total, $html2);
 				$html2 = str_replace('%categoria_encargado_comercial%', __($categoria_usuario), $html2);
