@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.25
+Martes 30 de Julio 2013
+* **Fixed:** [Correccion a seccion Detalle Profesional Nota Cobro](https://github.com/LemontechSA/ttb/pull/248)
+
 ## Hotfix: 13.4.24
 Jueves 25 de Julio 2013
 * **Fixed:** [Agrega Tooltip para multiselectores en reporte liquidaciones.](https://github.com/LemontechSA/ttb/pull/246)

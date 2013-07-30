@@ -6003,24 +6003,30 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%hrs_trabajadas_previo%', '', $row);
 						$row = str_replace('%horas_trabajadas_especial%', '', $row);
 						$row = str_replace('%horas_cobrables%', '', $row);
-						if ($this->fields['opc_ver_profesional_categoria'] == 1)
-							$row = str_replace('%categoria%', $data['glosa_categoria'], $row);
-						else
+						
+						if ($this->fields['opc_ver_profesional_categoria'] == 1) {
+							$row = str_replace('%categoria%', __($data['glosa_categoria']), $row);
+						} else {
 							$row = str_replace('%categoria%', '', $row);
-						//$row = str_replace('%horas_cobrables%', $horas_trabajadas.':'.sprintf("%02d",$minutos_trabajadas),$row);
-						#horas en decimal
-						if ($this->fields['forma_cobro'] == 'FLAT FEE')
+						}
+
+						if ($this->fields['forma_cobro'] == 'FLAT FEE'){
 							$row = str_replace('%horas%', number_format($data['duracion_cobrada'], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						else
+						} else {
 							$row = str_replace('%horas%', number_format($data['duracion_tarificada'], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						}
+							
 						$row = str_replace('%tarifa_horas%', $flatfee ? '' : number_format($data['tarifa'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%total_horas%', $flatfee ? '' : number_format($data['valor_tarificada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						if ($this->fields['opc_ver_horas_trabajadas'] && $data['duracion_trabajada'] && $data['duracion_trabajada'] != '0:00')
+						
+						if ($this->fields['opc_ver_horas_trabajadas'] && $data['duracion_trabajada'] && $data['duracion_trabajada'] != '0:00') {
 							$html .= $row;
-						else if ($data['duracion_cobrada'] && $data['duracion_cobrada'] != '0:00')
+						} else if ($data['duracion_cobrada'] && $data['duracion_cobrada'] != '0:00') {
 							$html .= $row;
+						}
 					}
 				}
+				
 				break;
 
 			case 'PROFESIONAL_TOTAL': //GenerarDocumento2
