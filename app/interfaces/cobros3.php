@@ -76,7 +76,7 @@
  	<table width=100%>
     <tr>
         <td class=cvs align=center colspan=2>
-            <iframe name=trabajos id=asuntos src="trabajos.php?id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
+            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente=<?=$cliente->fields['codigo_cliente']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
         </td>
     </tr>
 	</table>

@@ -1936,6 +1936,7 @@ class CartaCobro extends NotaCobro {
 				break;
 
 			case 'ENVIO_DIRECCION': //GenerarDocumentoCartaComun
+
 				$query = "SELECT glosa_cliente FROM cliente
 									WHERE codigo_cliente='" . $contrato->fields['codigo_cliente']."'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1952,6 +1953,7 @@ class CartaCobro extends NotaCobro {
 				$html2= str_replace('%codigo_postal%',$contrato->fields['factura_codigopostal'],$html2);
 				$html2 = str_replace('%titulo_contacto%', $contrato->fields['titulo_contacto'], $html2);
 				$html2 = str_replace('%nombre_contacto_mb%', __('%nombre_contacto_mb%'), $html2);
+
 				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {
 					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $html2);
 				} else {
@@ -1964,29 +1966,30 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
 				}
 
-				/* PSU optimizacion segmento codigo y creacion ANCHOR NOMBRE CONTACTO MAYUSCULA */
 				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
 				$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 
-
 				$direccion=explode('//',$contrato->fields['direccion_contacto']);
+
 				$html2 = str_replace('%valor_direccion%', nl2br($direccion[0]), $html2);
 				$html2 = str_replace('%valor_direccion_uc%', ucwords(strtolower(nl2br($direccion[0]))), $html2);
 
 				#formato especial
-				if ($lang == 'es')
+				if ($lang == 'es') {
 					$fecha_lang = 'Santiago, ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
-				else
-					$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
+				} else {
+					$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');	
+				}
 
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_especial_minusculas%', strtolower($fecha_lang), $html2);
+				$html2 = str_replace('%NumeroCliente%', $cliente->fields['id_cliente'], $html2);
 
 				$this->loadAsuntos();
-
+				
 				$asuntos_doc = '';
 				for ($k = 0; $k < count($this->asuntos); $k++) {
 					$asunto = new Asunto($this->sesion);
@@ -1997,14 +2000,16 @@ class CartaCobro extends NotaCobro {
 					$asuntos_doc_con_salto .= $asunto->fields['glosa_asunto'] . '' . $salto_linea;
 					$codigo_asunto .= $asunto->fields['codigo_asunto'] . '' . $espace;
 				}
+
 				$html2 = str_replace('%Asunto%', $asuntos_doc, $html2);
 				$html2 = str_replace('%asunto_salto_linea%', $asuntos_doc_con_salto, $html2);
-				#$html2 = str_replace('%NumeroContrato%', $contrato->fields['id_contrato'], $html2);
-				$html2 = str_replace('%NumeroCliente%', $cliente->fields['id_cliente'], $html2);
-				if (count($this->asuntos) == 1)
+
+				if (count($this->asuntos) == 1){
 					$html2 = str_replace('%CodigoAsunto%', $codigo_asunto, $html2);
-				else
+				} else {
 					$html2 = str_replace('%CodigoAsunto%', '', $html2);
+				}
+
 				$html2 = str_replace('%pais%', 'Chile', $html2);
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
 				$html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
@@ -2056,6 +2061,24 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $html2);
 				$html2 = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $html2);
 				$html2 = str_replace('%codigo_postal_cliente%', $contrato->fields['factura_codigopostal'], $html2);
+
+				$queryasuntosrel = "SELECT asunto.glosa_asunto 
+											FROM trabajo 
+											LEFT JOIN asunto ON ( asunto.codigo_asunto = trabajo.codigo_asunto) WHERE id_cobro='" . $this->fields['id_cobro'] . "' GROUP BY asunto.glosa_asunto ";
+				$resultado = mysql_query($queryasuntosrel, $this->sesion->dbh) or Utiles::errorSQL($queryasuntosrel, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($resultado)){
+			        $asuntos_rel[] = $data;
+			    }
+
+			    $asuntosrelacionados = '';
+			    
+			    for ($k = 0; $k < count($asuntos_rel); $k++) {
+			    	$espace_rel = $k < count($asuntos_rel) - 1 ? ', ' : '';
+			    	$asuntos_relacionados .= $asuntos_rel[$k]['glosa_asunto'] . '' . $espace_rel;
+			    }
+
+				$html2 = str_replace('%asuntos_relacionados%', $asuntos_relacionados, $html2);
 
 				break;
 
