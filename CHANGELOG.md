@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.26
+Martes 30 de Julio 2013
+* **Fixed:** [Corrige el reporte de saldo para incluir los adelantos del cliente (sin contrato específico) y filtra el contrato correcto del gasto](https://github.com/LemontechSA/ttb/pull/249)
+
 ## Hotfix: 13.4.25
 Martes 30 de Julio 2013
 * **Fixed:** [Correccion a seccion Detalle Profesional Nota Cobro](https://github.com/LemontechSA/ttb/pull/248)
