@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.27
+Martes 31 de Julio 2013
+* **Fixed:** [Corrige problema de listado de trabajos en cobros3 que lista trabajos de otros cliente en ambiente grahamabogados](https://github.com/LemontechSA/ttb/pull/250)
+
 ## Hotfix: 13.4.26
 Martes 30 de Julio 2013
 * **Fixed:** [Corrige el reporte de saldo para incluir los adelantos del cliente (sin contrato específico) y filtra el contrato correcto del gasto](https://github.com/LemontechSA/ttb/pull/249)
