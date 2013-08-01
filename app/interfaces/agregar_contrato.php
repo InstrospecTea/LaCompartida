@@ -2000,6 +2000,24 @@ if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
 								<?php
 							}
 							?>
+<?php
+	$estudios_array = PrmEstudio::GetEstudios($sesion);
+
+	// Si no viene de un POST puede ser nuevo o existente, si es nuevo ocupo el del $contrato
+	if (empty($id_estudio)) {
+		$id_estudio = $contrato->fields['id_estudio'];
+	}
+?>
+<?php if (count($estudios_array) > 1) { ?>
+			<tr>
+				<td align="right"><?php echo __('Companía') ?></td>
+				<td align="left" colspan="5">
+					<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio); ?>
+				</td>
+			</tr>
+<?php } else { ?>
+			<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+<?php } ?>
 						</table>
 
 					</fieldset>

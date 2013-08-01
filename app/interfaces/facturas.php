@@ -61,7 +61,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	if ($exportar_excel) {
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 			, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_cia
+			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 			, $descripcion_factura, $serie, $desde_asiento_contable);
 
@@ -239,23 +239,18 @@ $pagina->PrintTop();
 				</td>
 			</tr>
 <?php
-if (method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza") {
-	?>
-				<tr>
-					<td align=right>
-	<?php echo __('Companía') ?>
-					</td>
-					<td align=left width="18%">
-						<select name="id_cia" id="id_cia" value="<?php echo $id_cia ?>">
-							<option value="">Todos</option>
-							<option value="1" <?php echo $id_cia == 1 ? 'selected' : '' ?>>Rebaza Alcazar</option>
-							<option value="2" <?php echo $id_cia == 2 ? 'selected' : '' ?>>Acerta</option>
-						</select>
-					</td>
-				</tr>
-	<?php
-}
+	$estudios_array = PrmEstudio::GetEstudios($sesion);
 ?>
+<?php if (count($estudios_array) > 1) { ?>
+			<tr>
+				<td align="right"><?php echo __('Companía') ?></td>
+				<td align="left" width="18%">
+					<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio, '', 'Todas'); ?>
+				</td>
+			</tr>
+<?php } else { ?>
+			<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+<?php } ?>
 			<tr>
 				<td align=right>
 <?php echo __('Fecha Inicio') ?>
@@ -325,7 +320,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 	$search_query = $factura->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 			, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_cia
+			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 

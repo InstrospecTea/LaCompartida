@@ -125,6 +125,7 @@ if ($opcion == "guardar") {
 		}
 		$factura->Edit('condicion_pago', '' . $condicion_pago);
 		$factura->Edit('iva', $iva);
+		$factura->Edit('id_estudio', $id_estudio);
 		$factura->Edit('total', '' . ($monto_neto + $iva));
 		$factura->Edit("id_factura_padre", $id_factura_padre ? $id_factura_padre : NULL);
 		$factura->Edit("fecha", Utiles::fecha2sql($fecha));
@@ -618,6 +619,24 @@ if ($buscar_padre) {
 				<td align="right"><?php echo __('Giro'); ?></td>
 				<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo ($factura->fields['giro_cliente'] ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']) ?>" id="giro_cliente" size="70" maxlength="255" /></td>
 			</tr>
+<?php
+	$estudios_array = PrmEstudio::GetEstudios($sesion);
+
+	// Si no viene de un POST puede ser nuevo o existente, si es nuevo ocupo el del $contrato
+	if (empty($id_estudio)) {
+		$id_estudio = !empty($factura->fields['id_estudio']) ? $factura->fields['id_estudio'] : $contrato->fields['id_estudio'];
+	}
+?>
+<?php if (count($estudios_array) > 1) { ?>
+			<tr>
+				<td align="right"><?php echo __('Companía') ?></td>
+				<td align="left" colspan="3">
+					<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio); ?>
+				</td>
+			</tr>
+<?php } else { ?>
+			<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+<?php } ?>
 		<tr>
 			<td align=right><?php echo __('Condición de Pago') ?></td>
 			<td align=left colspan=3>
