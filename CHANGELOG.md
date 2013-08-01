@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.28
+Martes 01 de Agosto 2013
+* **Fixed:** [Nuevo anchor ciudad y pais estudio en seccion fecha documento carta](https://github.com/LemontechSA/ttb/pull/251)
+
 ## Hotfix: 13.4.27
 Martes 31 de Julio 2013
 * **Fixed:** [Corrige problema de listado de trabajos en cobros3 que lista trabajos de otros cliente en ambiente grahamabogados](https://github.com/LemontechSA/ttb/pull/250)

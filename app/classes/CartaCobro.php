@@ -1930,8 +1930,10 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
 
+				$html2 = str_replace('%ciudad_estudio%', UtilesApp::GetConf($this->sesion, 'CiudadEstudio'), $html2);
+				$html2 = str_replace('%pais_estudio%', UtilesApp::GetConf($this->sesion, 'PaisEstudio'), $html2);
 
-//numero Cobro + año + INICIALES username para PSU abogados
+				//numero Cobro + año + INICIALES username para PSU abogados
 
 				break;
 
