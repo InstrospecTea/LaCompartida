@@ -36,7 +36,7 @@ class CartaCobro extends NotaCobro {
 			'%xfecha_ano_dos_digitos%' => 'Año emision (yy)',
 			'%xnro_factura%' => 'N° del cobro',
 			'%glosa_cliente%' => 'Razón social Factura',
-			'%xdireccion%' => 'Dirección Factura',
+			'%xdireccion%' => 'Dir|ección Factura',
 			'%xrut%' => 'RUT contrato'
 		),
 		'FECHA' => array(
@@ -1844,6 +1844,24 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%codigo_cci2%', '', $html2);
 					}
 				}
+
+				$queryasuntosrel = "SELECT asunto.glosa_asunto 
+										FROM trabajo 
+									LEFT JOIN asunto ON ( asunto.codigo_asunto = trabajo.codigo_asunto) WHERE id_cobro='" . $this->fields['id_cobro'] . "' GROUP BY asunto.glosa_asunto ";
+				$resultado = mysql_query($queryasuntosrel, $this->sesion->dbh) or Utiles::errorSQL($queryasuntosrel, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($resultado)){
+			        $asuntos_rel[] = $data;
+			    }
+
+			    $asuntosrelacionados = '';
+			    
+			    for ($k = 0; $k < count($asuntos_rel); $k++) {
+			    	$espace_rel = $k < count($asuntos_rel) - 1 ? ', ' : '';
+			    	$asuntos_relacionados .= $asuntos_rel[$k]['glosa_asunto'] . '' . $espace_rel;
+			    }
+
+				$html2 = str_replace('%asuntos_relacionados%', $asuntos_relacionados, $html2);
 
 				break;
 
