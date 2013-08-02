@@ -1,49 +1,59 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/classes/PaginaCobro.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
-	require_once Conf::ServerDir().'/classes/Cobro.php';
-	require_once Conf::ServerDir().'/classes/Cliente.php';
-
-	$sesion = new Sesion(array('COB'));
-	$pagina = new PaginaCobro($sesion);
-	$id_usuario = $sesion->usuario->fields['id_usuario'];
-
-	$cobro = new Cobro($sesion);
-	$cobro->Load($id_cobro);
-	if(!$cobro->Load($id_cobro))
-		$pagina->FatalError(__('Cobro inválido'));
-	$cliente = new Cliente($sesion);
-	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
-	$nombre_cliente = $cliente->fields['glosa_cliente'];
-	$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #').$id_cobro.__(' ').$nombre_cliente;
-
-    if($cobro->fields['estado'] <> 'CREADO' && $cobro->fields['estado'] <> 'EN REVISION')
-	    $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");	
-
-	$cobro->Edit('etapa_cobro','2');
-	$cobro->Write();
-
-	if($opc=="siguiente")
-		$pagina->Redirect("cobros_tramites.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
-	else if($opc=="anterior")
-		$pagina->Redirect("cobros2.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
-
-	$cobro->LoadAsuntos();
-
-	$comma_separated = implode("','", $cobro->asuntos);
- 
-	$pagina->PrintTop($popup);
+<?php 
 	
-	if($popup)
-	{
+require_once dirname(__FILE__).'/../conf.php';
+require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+require_once Conf::ServerDir().'/classes/PaginaCobro.php';
+require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+require_once Conf::ServerDir().'/../fw/classes/Html.php';
+require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
+require_once Conf::ServerDir().'/../app/classes/Debug.php';
+require_once Conf::ServerDir().'/classes/InputId.php';
+require_once Conf::ServerDir().'/classes/Trabajo.php';
+require_once Conf::ServerDir().'/classes/Funciones.php';
+require_once Conf::ServerDir().'/classes/Cobro.php';
+require_once Conf::ServerDir().'/classes/Cliente.php';
+
+$sesion = new Sesion(array('COB'));
+$pagina = new PaginaCobro($sesion);
+$id_usuario = $sesion->usuario->fields['id_usuario'];
+
+$cobro = new Cobro($sesion);
+$cobro->Load($id_cobro);
+
+if(!$cobro->Load($id_cobro)) {
+	$pagina->FatalError(__('Cobro inválido'));
+}
+
+/*echo '<pre>';
+var_dump($sesion);
+echo '</pre>';
+exit;*/
+
+$cliente = new Cliente($sesion);
+$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
+$nombre_cliente = $cliente->fields['glosa_cliente'];
+$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #').$id_cobro.__(' ').$nombre_cliente;
+
+if($cobro->fields['estado'] <> 'CREADO' && $cobro->fields['estado'] <> 'EN REVISION'){
+    $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");	
+}
+
+$cobro->Edit('etapa_cobro','2');
+$cobro->Write();
+
+if($opc=="siguiente"){
+	$pagina->Redirect("cobros_tramites.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
+} else if($opc=="anterior") {
+	$pagina->Redirect("cobros2.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
+}
+
+$cobro->LoadAsuntos();
+
+$comma_separated = implode("','", $cobro->asuntos);
+ 
+$pagina->PrintTop($popup);
+	
+if($popup) {
 ?>
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
@@ -75,9 +85,19 @@
     </table>
  	<table width=100%>
     <tr>
-        <td class=cvs align=center colspan=2>
-            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente=<?=$cliente->fields['codigo_cliente']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
-        </td>
+		<?php if ( UtilesApp::GetConf($sesion,'CodigoSecundario')) { ?>
+
+	        <td class=cvs align=center colspan=2>
+	            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente=<?=$cliente->fields['codigo_cliente_secundario']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
+	        </td>
+
+        <?php } else { ?>
+
+        	<td class=cvs align=center colspan=2>
+	            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente=<?=$cliente->fields['codigo_cliente']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
+	        </td>
+
+        <?php } ?>
     </tr>
 	</table>
 	</form>
