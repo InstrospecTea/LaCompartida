@@ -88,7 +88,7 @@ if($popup) {
 		<?php if ( UtilesApp::GetConf($sesion,'CodigoSecundario')) { ?>
 
 	        <td class=cvs align=center colspan=2>
-	            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente=<?=$cliente->fields['codigo_cliente_secundario']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
+	            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente_secundario=<?=$cliente->fields['codigo_cliente_secundario']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
 	        </td>
 
         <?php } else { ?>
