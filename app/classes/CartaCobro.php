@@ -36,7 +36,7 @@ class CartaCobro extends NotaCobro {
 			'%xfecha_ano_dos_digitos%' => 'Año emision (yy)',
 			'%xnro_factura%' => 'N° del cobro',
 			'%glosa_cliente%' => 'Razón social Factura',
-			'%xdireccion%' => 'Dir|ección Factura',
+			'%xdireccion%' => 'Dirección Factura',
 			'%xrut%' => 'RUT contrato'
 		),
 		'FECHA' => array(
