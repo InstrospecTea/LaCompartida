@@ -24,11 +24,6 @@ if(!$cobro->Load($id_cobro)) {
 	$pagina->FatalError(__('Cobro inválido'));
 }
 
-/*echo '<pre>';
-var_dump($sesion);
-echo '</pre>';
-exit;*/
-
 $cliente = new Cliente($sesion);
 $cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 $nombre_cliente = $cliente->fields['glosa_cliente'];
@@ -55,56 +50,57 @@ $pagina->PrintTop($popup);
 	
 if($popup) {
 ?>
-		<table width="100%" border="0" cellspacing="0" cellpadding="2">
-			<tr>
-				<td valign="top" align="left" class="titulo" bgcolor="<?=(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
-					<?=__('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #').$id_cobro.__(' ').$nombre_cliente;?>
-				</td>
-			</tr>
-		</table>
-		<br>
-<?
+	<table width="100%" border="0" cellspacing="0" cellpadding="2">
+		<tr>
+			<td valign="top" align="left" class="titulo" bgcolor="<?php echo (method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
+				<?php echo __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #').$id_cobro.__(' ').$nombre_cliente;?>
+			</td>
+		</tr>
+	</table>
+<br>
+<?php
 	}
 
 ?>
-    <form method=post>
-    <input type=hidden name=opc>
-    <input type=hidden name=id_cobro value=<?=$id_cobro?>>
-<?
-	$pagina->PrintPasos($sesion,2,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
+<form method="post">
+	<input type="hidden" name="opc">
+    <input type="hidden" name="id_cobro" value="<?php echo $id_cobro ?>">
+	<?php
+		$pagina->PrintPasos($sesion,2,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 	?>
+	
 	<table width=100%>
-    <tr>
-        <td align=left><input type=button class=btn value="<?=__('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();">
-		<td align=center>
-		</td>
-		<td align=right>
-			<input type=button class=btn value="<?=__('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
-		</td>
-    </tr>
+	    <tr>
+	        <td align=left><input type=button class=btn value="<?php echo __('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();">
+			<td align=center>
+			</td>
+			<td align=right>
+				<input type=button class=btn value="<?php echo __('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
+			</td>
+	    </tr>
     </table>
  	<table width=100%>
-    <tr>
-		<?php if ( UtilesApp::GetConf($sesion,'CodigoSecundario')) { ?>
+	    <tr>
+			<?php     	
+				
+				$codigo_cliente_query_string = "codigo_cliente={$codigo_cliente}";
+				
+				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	  				$codigo_cliente_query_string = "codigo_cliente_secundario={$codigo_cliente_secundario}";
+				}
 
-	        <td class=cvs align=center colspan=2>
-	            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente_secundario=<?=$cliente->fields['codigo_cliente_secundario']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
+			?>
+	    	<td class="cvs" align="center" colspan="2">
+	            <iframe name="trabajos" id="asuntos" src="trabajos.php?$codigo_cliente_query_string?>&id_cobro=<?php echo $id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder="0" width="800px" height="1500px"></iframe>
 	        </td>
-
-        <?php } else { ?>
-
-        	<td class=cvs align=center colspan=2>
-	            <iframe name=trabajos id=asuntos src="trabajos.php?codigo_cliente=<?=$cliente->fields['codigo_cliente']?>&id_cobro=<?=$id_cobro?>&motivo=cobros&opc=buscar&popup=1" frameborder=0 width=800px height=1500px></iframe>
-	        </td>
-
-        <?php } ?>
-    </tr>
+	    </tr>
 	</table>
-	</form>
-	<?= InputId::Javascript($sesion) ?>
-	<script src=guardar_campo_trabajo.js></script>
-<?
+</form>
 
+<?php echo InputId::Javascript($sesion) ?>
+
+<script src="guardar_campo_trabajo.js"></script>
+<?php
 
 	$pagina->PrintBottom($popup);
 
@@ -114,19 +110,23 @@ if($popup) {
         global $id_cobro;
 		static $i = 0;
 
-		if($i % 2 == 0)
+		if($i % 2 == 0) {
 			$color = "#dddddd";
-		else
+		} else {
 			$color = "#ffffff";
+		}
 
         $img_dir = Conf::ImgDir();
         $tarifa = Funciones::Tarifa($sesion,$trabajo->fields[id_usuario],$trabajo->fields[id_moneda],$trabajo->fields[codigo_asunto]);
         
 		list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']); 
+
 		$duracion = $h + ($m > 0 ? ($m / 60) :'0');
         $total = round($tarifa * $duracion, 2);
         $dur_cob = "$h:$m";
+
 		list($h,$m,$s) = split(":",$trabajo->fields['duracion']); 
+
         $dur = "$h:$m";
 		$formato_fecha = "%d/%m/%y";
 		$fecha = Utiles::sql2fecha($trabajo->fields[fecha],$formato_fecha);
@@ -138,7 +138,7 @@ if($popup) {
 	 	$html .= "<td>". $dur."</td>";
 	 	$html .= "<td>". $dur_cob ."</td>";
 	 	$html .= "<td align=center>";
-			$html .= $trabajo->fields[cobrable] == 1 ? "SI" : "NO" ;
+		$html .= $trabajo->fields[cobrable] == 1 ? "SI" : "NO" ;
 		$html .= "</td>";
 	 	$html .= "<td>".$trabajo->Estado()."</td>";
 	 	$html .= "<td><a href=editar_trabajo.php?id_cobro=$id_cobro&id_trabajo=".$trabajo->fields[id_trabajo]."><img src=$img_dir/editar_on.gif border=0></td>";
@@ -149,6 +149,7 @@ if($popup) {
 	 	$html .= "<td colspan=2><strong>Tarifa</strong><br>".$trabajo->fields[id_moneda]." ".$total."</td>";
 		$html .= "</tr>";
 		$i++;
+
 		return $html;
 	}
 ?>
