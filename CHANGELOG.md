@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.29
+Martes 02 de Agosto 2013
+* **Fixed:** [Correccion a paso 2 codigo sedundario](https://github.com/LemontechSA/ttb/pull/252)
+
 ## Hotfix: 13.4.28
 Martes 01 de Agosto 2013
 * **Fixed:** [Nuevo anchor ciudad y pais estudio en seccion fecha documento carta](https://github.com/LemontechSA/ttb/pull/251)
