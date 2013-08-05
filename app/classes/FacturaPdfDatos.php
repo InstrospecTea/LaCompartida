@@ -112,6 +112,7 @@ require_once dirname(__FILE__).'/../conf.php';
 			$query_comodines ="SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
 			$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
 			$array_comodines = array();
+			
 			while (list($codigo,$glosa) = mysql_fetch_array($resp_comodines)) {
 				$array_comodines[$codigo] = $glosa;
 			}
@@ -120,7 +121,6 @@ require_once dirname(__FILE__).'/../conf.php';
 			$monto_palabra=new MontoEnPalabra($this->sesion);
 
 			$monto_total_factura = $factura->fields['total'];
-
 
 			list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
 
@@ -256,28 +256,30 @@ require_once dirname(__FILE__).'/../conf.php';
 		function generarFacturaPDF($id_factura, $mantencion = false,$orientacion='P',$format='Letter')
 		{
 			require_once Conf::ServerDir().'/fpdf/fpdf.php';
+
 			$factura = new Factura( $this->sesion );
+
 			if( !$factura->Load( $id_factura ) ) {
 				echo "<html><head><title>Error</title></head><body><p>No se encuentra la factura $id_factura.</p></body></html>";
 				return;
 			}
 
-           $query = " SELECT id_documento_legal, codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
+           	$query = " SELECT id_documento_legal, codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list( $id_documento_legal, $codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 
 			$this->CargarDatos( $id_factura, $id_documento_legal ); // esto trae la posicion, tamaño y glosa de todos los campos más los datos del papel en la variable $this->papel;
 
-                 if(count($this->papel)) {
-                        $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
-							$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
-							$pdf->SetAutoPageBreak(true,$margin);
-                } else {
-			// P: hoja vertical
-			// mm: todo se mide en milímetros
-			// Letter: formato de hoja
-						$pdf = new FPDF($orientacion, 'mm', $format);
-                 }
+	        if(count($this->papel)) {
+	                $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
+						$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
+						$pdf->SetAutoPageBreak(true,$margin);
+			} else {
+					// P: hoja vertical
+					// mm: todo se mide en milímetros
+					// Letter: formato de hoja
+					$pdf = new FPDF($orientacion, 'mm', $format);
+	         }
 
 
 			$query = " SELECT codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
@@ -285,6 +287,7 @@ require_once dirname(__FILE__).'/../conf.php';
 			list($codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 
 			$pdf->SetTitle($glosa_documento_legal ." ".$factura->fields['numero']);
+
 			// La orientación y formato de la página son los mismos que del documento
 			$pdf->AddPage();
 			$datos['dato_letra'] = str_replace(array("<br>\n","<br/>\n","<br />\n" ),"\n",$datos['dato_letra']);
@@ -327,12 +330,12 @@ require_once dirname(__FILE__).'/../conf.php';
 				}
 
 			}
-                        if( $mantencion ) {
-                         //   $pdf->Output("../../pdf/factura.pdf","F");
-                        } else {
-                            $pdf->Output($glosa_documento_legal."_".$factura->fields['numero'].".pdf","D");
-                        }
+
+            if( $mantencion ) {
+             //   $pdf->Output("../../pdf/factura.pdf","F");
+            } else {
+                $pdf->Output($glosa_documento_legal."_".$factura->fields['numero'].".pdf","D");
+            }
 		}
 	}
-
 ?>
