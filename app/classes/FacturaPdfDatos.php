@@ -124,7 +124,7 @@ require_once dirname(__FILE__).'/../conf.php';
 			list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
 
 			if ($monto_parte_decimal > 0) {
-				//$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura,$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
+				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura,$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
 			} else {
 				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'], "0/100 " .$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'], $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']) );
 			}
