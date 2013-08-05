@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix: 13.4.31
+Lunes 05 de Agosto 2013
+* **Fixed:** [Generacion de nuevo tag para mantenedor pdf factura para cliente santivañez](https://github.com/LemontechSA/ttb/pull/256)
+
+## Hotfix: 13.4.30
+Viernes 02 de Agosto 2013
+* **Fixed:** [Corrección reporte de saldo para que no duplique montos de gastos y provisiones](https://github.com/LemontechSA/ttb/pull/255)
+
 ## Hotfix: 13.4.29
 Martes 02 de Agosto 2013
 * **Fixed:** [Correccion a paso 2 codigo sedundario](https://github.com/LemontechSA/ttb/pull/252)
