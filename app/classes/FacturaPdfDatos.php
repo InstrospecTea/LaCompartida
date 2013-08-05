@@ -121,13 +121,21 @@ require_once dirname(__FILE__).'/../conf.php';
 
 			$monto_total_factura = $factura->fields['total'];
 
+
 			list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
 
-			if ($monto_parte_decimal > 0) {
-				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura,$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
+			$glosa_moneda_cero_cien = " 0/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
+			$glosa_moneda_plural_cero_cien = " 0/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
+
+			$glosa_moneda = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
+			$glosa_moneda_plural = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
+
+			if ( empty($monto_parte_decimal)){
+				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'],$glosa_moneda_cero_cien, $glosa_moneda_plural_cero_cien));
 			} else {
-				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'], "0/100 " .$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'], $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']) );
+				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura, $factura->fields['id_moneda'],$glosa_moneda, $glosa_moneda_plural));
 			}
+				
 
 			switch( $tipo_dato ) {
 
