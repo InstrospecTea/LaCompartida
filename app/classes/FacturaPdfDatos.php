@@ -119,48 +119,60 @@ require_once dirname(__FILE__).'/../conf.php';
 			$arreglo_monedas = ArregloMonedas($this->sesion);
 			$monto_palabra=new MontoEnPalabra($this->sesion);
 
+			$monto_total_factura = $factura->fields['total'];
+
+			list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
+
+			if ($monto_parte_decimal > 0) {
+				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura,$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
+			} else {
+				$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera,$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'] . "0/100 Centavos"));
+			}
+
 			switch( $tipo_dato ) {
 
 				//case 'debe': $glosa_dato = 'Debe'; break;
 
-				case 'razon_social':						$glosa_dato = $factura->fields['cliente']; break;
-				case 'rut':											$glosa_dato = $factura->fields['RUT_cliente']; break;
-				case 'telefono':								$glosa_dato = $contrato->fields['factura_telefono']; break;
-				case 'fecha_dia':								$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
-				case 'fecha_mes':								$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break;
-				case 'fecha_numero_mes': 				$glosa_dato = strftime("%m",strtotime($factura->fields['fecha'])); break;
-				case 'fecha_ano':								$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
-				case 'fecha_ano_ultima_cifra': 	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
-				case 'fecha_ano_dos_ultimas_cifras': $glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
-				case 'direccion':								$glosa_dato = $factura->fields['direccion_cliente']; break;
-				case 'comuna':									$glosa_dato = $factura->fields['comuna_cliente']; break;
+				case 'razon_social':				$glosa_dato = $factura->fields['cliente']; break;
+				case 'rut':							$glosa_dato = $factura->fields['RUT_cliente']; break;
+				case 'telefono':					$glosa_dato = $contrato->fields['factura_telefono']; break;
+				case 'fecha_dia':					$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
+				case 'fecha_mes':					$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break;
+				case 'fecha_numero_mes': 			$glosa_dato = strftime("%m",strtotime($factura->fields['fecha'])); break;
+				case 'fecha_ano':					$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
+				case 'fecha_ano_ultima_cifra': 		$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
+				case 'fecha_ano_dos_ultimas_cifras':$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
+				case 'direccion':					$glosa_dato = $factura->fields['direccion_cliente']; break;
+				case 'comuna':						$glosa_dato = $factura->fields['comuna_cliente']; break;
 				case 'factura_codigopostal':		$glosa_dato = $factura->fields['factura_codigopostal']; break;
-				case 'ciudad':									$glosa_dato = $factura->fields['ciudad_cliente']; break;
-				case 'giro_cliente':						$glosa_dato = $factura->fields['giro_cliente']; break;
-				case 'lugar':										$glosa_dato =  UtilesApp::GetConf($this->sesion, 'LugarFacturacion'); break;
-				case 'nota_factura':						$glosa_dato = $condicion_pago; break;
-				case 'descripcion_honorarios':	$glosa_dato = $factura->fields['descripcion']; break;
-				case 'descripcion_gastos_con_iva': $glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;
-				case 'descripcion_gastos_sin_iva': $glosa_dato = $factura->fields['descripcion_subtotal_gastos_sin_impuesto']; break;
-				case 'monto_honorarios':				$glosa_dato = number_format($factura->fields['subtotal_sin_descuento'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); break;
+				case 'ciudad':						$glosa_dato = $factura->fields['ciudad_cliente']; break;
+				case 'giro_cliente':				$glosa_dato = $factura->fields['giro_cliente']; break;
+				case 'lugar':						$glosa_dato =  UtilesApp::GetConf($this->sesion, 'LugarFacturacion'); break;
+				case 'nota_factura':				$glosa_dato = $condicion_pago; break;
+				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
+				case 'descripcion_gastos_con_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;
+				case 'descripcion_gastos_sin_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos_sin_impuesto']; break;
+				case 'monto_honorarios':			$glosa_dato = number_format($factura->fields['subtotal_sin_descuento'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); break;
 				case 'monto_gastos_con_iva':		$glosa_dato = number_format($factura->fields['subtotal_gastos'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); break;
 				case 'monto_gastos_sin_iva':		$glosa_dato = number_format($factura->fields['subtotal_gastos_sin_impuesto'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); break;
-				case 'moneda_honorarios':				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
+				case 'moneda_honorarios':			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'moneda_gastos_con_iva':		$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'moneda_gastos_sin_iva':		$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
-				case 'monto_en_palabra':				$glosa_dato = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])); break;
+				case 'monto_en_palabra':			$glosa_dato = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])); break;
+				case 'monto_en_palabra_cero_cien':  $glosa_dato = $monto_en_palabra_cero_cien; break;
 				case 'porcentaje_impuesto':			$glosa_dato = $factura->fields['porcentaje_impuesto']."%"; break;
-				case 'moneda_subtotal':					$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
-				case 'moneda_iva':							$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
-				case 'moneda_total':						$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
-				case 'monto_subtotal':					$glosa_dato = number_format(
-																			$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-																			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-																			$idioma->fields['separador_decimales'],
-																			$idioma->fields['separador_miles']); break;
-				case 'monto_iva':								$glosa_dato = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
-				case 'monto_total':							$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
-				case 'monto_total_2':						$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
+				case 'moneda_subtotal':				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
+				case 'moneda_iva':					$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
+				case 'moneda_total':				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
+				case 'monto_subtotal':				$glosa_dato = number_format(
+																		$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+																		$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+																		$idioma->fields['separador_decimales'],
+																		$idioma->fields['separador_miles']); break;
+
+				case 'monto_iva':					$glosa_dato = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
+				case 'monto_total':					$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
+				case 'monto_total_2':				$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 				
 				default:
 					if (array_key_exists($tipo_dato, $array_comodines)) {
@@ -215,6 +227,7 @@ require_once dirname(__FILE__).'/../conf.php';
 				$fila['moneda_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 				$fila['moneda_gastos_con_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 				$fila['moneda_gastos_sin_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
+				$fila['monto_en_palabra_cero_cien'] = $monto_en_palabra_cero_cien;
 				$fila['monto_en_palabra'] = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
 				$fila['porcentaje_impuesto'] = $factura->fields['porcentaje_impuesto']."%";
 				$fila['moneda_subtotal'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
