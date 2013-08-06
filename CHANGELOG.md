@@ -1,6 +1,10 @@
 # Changelog
 
 ## Hotfix: 13.4.31
+Martes 06 de Agosto 2013
+* **Fixed:** [Correccion a alerta para selector actividades en ingresar horas.](https://github.com/LemontechSA/ttb/pull/258)
+
+## Hotfix: 13.4.31
 Lunes 05 de Agosto 2013
 * **Fixed:** [Generacion de nuevo tag para mantenedor pdf factura para cliente santivañez](https://github.com/LemontechSA/ttb/pull/256)
 
