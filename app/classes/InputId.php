@@ -259,10 +259,6 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 											select_destino.options.length = 1;
 										}
 
-										if ( accion == \"cargar_actividades\") {
-											alert('No existen actividades definidas');
-										}
-										 
 										jQuery('#'+id_destino).removeClass('loadingbar');
 
 										if( accion ==\"cargar_asuntos_desde_campo\" ) {
@@ -272,7 +268,10 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 											jQuery('#'+id_destino).val('');
 
 										} else if ( jQuery('#'+id_origen).val() != '') {
-											alert('".$mje_error."');
+											if ( accion != \"cargar_actividades\") {
+												alert('".$mje_error."');	
+											}
+											
 										}
 									
 									} else {
