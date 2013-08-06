@@ -99,7 +99,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'Regimen|' . 'Persona física régimen general'
 		),
 		'REC' => array(
-			'rfc|' . $Factura->fields['RUT_cliente'],
+			'rfc|' . 'DNM070221BS4', //$Factura->fields['RUT_cliente'],
 			'nombre|' . utf8_encode($Factura->fields['cliente'])
 		),
 		'DOR' => array(
