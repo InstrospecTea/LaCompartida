@@ -1,6 +1,10 @@
 # Changelog
 
-## Hotfix: 13.4.31
+## Hotfix: 13.4.33
+Miercoles 06 de Agosto 2013
+* **Fixed:** [Correccion monto en palabra decimal para santivañez.](https://github.com/LemontechSA/ttb/pull/259)
+
+## Hotfix: 13.4.32
 Martes 06 de Agosto 2013
 * **Fixed:** [Correccion a alerta para selector actividades en ingresar horas.](https://github.com/LemontechSA/ttb/pull/258)
 
