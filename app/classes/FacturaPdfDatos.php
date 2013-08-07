@@ -124,8 +124,8 @@ require_once dirname(__FILE__).'/../conf.php';
 
 			list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
 
-			$glosa_moneda_cero_cien = " 0/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
-			$glosa_moneda_plural_cero_cien = " 0/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
+			$glosa_moneda_cero_cien = " 00/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
+			$glosa_moneda_plural_cero_cien = " 00/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
 
 			$glosa_moneda = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
 			$glosa_moneda_plural = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
