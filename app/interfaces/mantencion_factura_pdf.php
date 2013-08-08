@@ -289,6 +289,7 @@ jQuery(document).ready(function() {
         if(Style=='L') Css={'text-decoration':'none', 'text-align': 'left'};
         if(Style=='R') Css={'text-decoration':'none', 'text-align': 'right'};
         if(Style=='C') Css={'text-decoration':'none', 'text-align': 'center'};
+        if(Style=='J') Css={'text-decoration':'none', 'text-align': 'justify'};
         jQuery('#caja_'+ID).css(Css);
     });
     
