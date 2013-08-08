@@ -421,6 +421,7 @@ function pizarron() {
         if(Align=='L') Css={'text-decoration':'none', 'text-align': 'left'};
         if(Align=='R') Css={'text-decoration':'none', 'text-align': 'right'};
         if(Align=='C') Css={'text-decoration':'none', 'text-align': 'center'};
+        if(Align=='J') Css={'text-decoration':'none', 'text-align': 'justify'};
 
 	    jQuery("#pizarra").append("<div rel='"+Cat+"' class='cajitas' id='caja_"+ID+"' style='text-transform:"+transform+";font-family:"+Font+";font-size:"+Fontsize+"pt;position:absolute; width:"+Width+"px;height:"+Height+"px;left:"+posx+"px;top:"+posy+"px;z-index:"+ID+";'>"+Relleno+"</div>");
 	    jQuery('#caja_'+ID).draggable({cursor:'move', containment:'#pizarra', 
