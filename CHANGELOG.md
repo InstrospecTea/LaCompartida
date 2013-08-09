@@ -1,6 +1,11 @@
 # Changelog
 
 ## Hotfix: 13.4.33
+Jueves 08 de Agosto 2013
+* **Added:** [Agrega posibilidad de alineacion justificada en mantenedor factura pdf.](https://github.com/LemontechSA/ttb/pull/261)
+* **Fixed:** [Corrige monto Equivalente a en excel de cobro.](https://github.com/LemontechSA/ttb/pull/261)
+
+## Hotfix: 13.4.33
 Miercoles 06 de Agosto 2013
 * **Fixed:** [Correccion monto en palabra decimal para santivañez.](https://github.com/LemontechSA/ttb/pull/259)
 
