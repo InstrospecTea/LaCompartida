@@ -175,6 +175,7 @@ if( $opc == 'dibuja_tabla' ) {
 						<option value='L' ".($row['align'] == 'L' ? 'selected' : '').">Izquierda</option>
 						<option value='R' ".($row['align'] == 'R' ? 'selected' : '').">Derecha</option>
 						<option value='C' ".($row['align'] == 'C' ? 'selected' : '').">Centro</option>
+						<option value='J' ".($row['align'] == 'J' ? 'selected' : '').">Justificado</option>
 					</select></li>";
 
 			echo "<li class='th11cellx'>
