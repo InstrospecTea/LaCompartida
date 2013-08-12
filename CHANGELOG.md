@@ -1,6 +1,10 @@
 # Changelog
 
 ## Hotfix: 13.4.33
+Lunes 12 de Agosto 2013
+* **Added:** [Genera monto equivalente A como numero y no como formula, Corrige monto en cobro_xls](https://github.com/LemontechSA/ttb/pull/261)
+
+## Hotfix: 13.4.33
 Jueves 08 de Agosto 2013
 * **Added:** [Agrega posibilidad de alineacion justificada en mantenedor factura pdf.](https://github.com/LemontechSA/ttb/pull/261)
 * **Fixed:** [Corrige monto Equivalente a en excel de cobro.](https://github.com/LemontechSA/ttb/pull/261)
