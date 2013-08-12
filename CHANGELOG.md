@@ -1,4 +1,118 @@
 # Changelog
+
+## Hotfix: 13.4.33
+Jueves 08 de Agosto 2013
+* **Added:** [Agrega posibilidad de alineacion justificada en mantenedor factura pdf.](https://github.com/LemontechSA/ttb/pull/261)
+* **Fixed:** [Corrige monto Equivalente a en excel de cobro.](https://github.com/LemontechSA/ttb/pull/261)
+
+## Hotfix: 13.4.33
+Miercoles 06 de Agosto 2013
+* **Fixed:** [Correccion monto en palabra decimal para santivañez.](https://github.com/LemontechSA/ttb/pull/259)
+
+## Hotfix: 13.4.32
+Martes 06 de Agosto 2013
+* **Fixed:** [Correccion a alerta para selector actividades en ingresar horas.](https://github.com/LemontechSA/ttb/pull/258)
+
+## Hotfix: 13.4.31
+Lunes 05 de Agosto 2013
+* **Fixed:** [Generacion de nuevo tag para mantenedor pdf factura para cliente santivañez](https://github.com/LemontechSA/ttb/pull/256)
+
+## Hotfix: 13.4.30
+Viernes 02 de Agosto 2013
+* **Fixed:** [Corrección reporte de saldo para que no duplique montos de gastos y provisiones](https://github.com/LemontechSA/ttb/pull/255)
+
+## Hotfix: 13.4.29
+Martes 02 de Agosto 2013
+* **Fixed:** [Correccion a paso 2 codigo sedundario](https://github.com/LemontechSA/ttb/pull/252)
+
+## Hotfix: 13.4.28
+Martes 01 de Agosto 2013
+* **Fixed:** [Nuevo anchor ciudad y pais estudio en seccion fecha documento carta](https://github.com/LemontechSA/ttb/pull/251)
+
+## Hotfix: 13.4.27
+Martes 31 de Julio 2013
+* **Fixed:** [Corrige problema de listado de trabajos en cobros3 que lista trabajos de otros cliente en ambiente grahamabogados](https://github.com/LemontechSA/ttb/pull/250)
+
+## Hotfix: 13.4.26
+Martes 30 de Julio 2013
+* **Fixed:** [Corrige el reporte de saldo para incluir los adelantos del cliente (sin contrato específico) y filtra el contrato correcto del gasto](https://github.com/LemontechSA/ttb/pull/249)
+
+## Hotfix: 13.4.25
+Martes 30 de Julio 2013
+* **Fixed:** [Correccion a seccion Detalle Profesional Nota Cobro](https://github.com/LemontechSA/ttb/pull/248)
+
+## Hotfix: 13.4.24
+Jueves 25 de Julio 2013
+* **Fixed:** [Agrega Tooltip para multiselectores en reporte liquidaciones.](https://github.com/LemontechSA/ttb/pull/246)
+
+## Hotfix: 13.4.23
+Jueves 25 de Julio 2013
+* **Fixed:** [Corrige la asignación de actividades (selector) al crear o modificar un trabajo](https://github.com/LemontechSA/ttb/pull/246)
+
+## Hotfix: 13.4.22
+Lunes 22 de Julio 2013
+* **Fixed:** [Corrige cálculo monto cobierto por adelanto según moneda](https://github.com/LemontechSA/ttb/pull/243)
+* **Fixed:** [Cargar los datos del cliente al agregar factura](https://github.com/LemontechSA/ttb/pull/243)
+
+## Hotfix: 13.4.21
+Viernes 19 de Julio 2013
+* **Fixed:** [Corregir modificación de cliente al editar una factura](https://github.com/LemontechSA/ttb/pull/242)
+
+## Hotfix: 13.4.20
+Viernes 19 de Julio 2013
+* **Fixed:** [Se reemplaza el corrector ortográfico por pspell](https://github.com/LemontechSA/ttb/pull/241)
+
+## Hotfix: 13.4.19
+Jueves 18 de Julio 2013
+* **New:** [Modificacion a interfaz reporte avanzado para selector cliente bmaj](https://github.com/LemontechSA/ttb/pull/240)
+
+## Hotfix: 13.4.18
+Lunes 15 de Julio 2013
+* **New:** [Correccion para nota de cobro morales y besa](https://github.com/LemontechSA/ttb/pull/238)
+
+## Hotfix: 13.4.17
+Viernes 12 de Julio 2013
+* **New:** [Agrega los %tags% para mostrar el asunto en el listado de gastos](https://github.com/LemontechSA/ttb/pull/237)
+
+## Hotfix: 13.4.16
+Jueves 11 de Julio 2013
+* **Fixed:** [Corrige fecha desde en sección Resumen Asuntos](https://github.com/LemontechSA/ttb/pull/235)
+* **Fixed:** [Factura al filtrar por clientes y buscar, el resultado que muestra no se ordena segun fecha de documento.](https://github.com/LemontechSA/ttb/pull/235)
+
+## Hotfix: 13.4.15
+Jueves 11 de Julio 2013
+* **Fixed:** [Comportamiento a comportamiento accionado al presionar el boton imprimir en reporte general.](https://github.com/LemontechSA/ttb/pull/234)
+* **Fixed:** [Modificaciones para carta Berlegal](https://github.com/LemontechSA/ttb/pull/234)
+* **Fixed:** [Corrección carta Morales y Besa para retainers (forma anterior)](https://github.com/LemontechSA/ttb/pull/234)
+
+## Hotfix: 13.4.14
+Miércoles 10 de Julio 2013
+* **Fixed:** [Modificaciones para documentos de cobro Berlegal.](https://github.com/LemontechSA/ttb/pull/233)
+* **Fixed:** [Problema en alerta por contrato](https://github.com/LemontechSA/ttb/pull/233)
+* **Fixed:** [Filtrado reporte saldo clientes](https://github.com/LemontechSA/ttb/pull/233)
+* **Fixed:** [Link a juicios desde time_tracking](https://github.com/LemontechSA/ttb/pull/233)
+
+## Hotfix: 13.4.13
+Jueves 4 de Julio 2013
+* **Fixed:** [Modificaciones a langs para agregar traducciones.](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Modificación Nota de cobro para cumplir con requerimiento de Cuestacampos.](https://github.com/LemontechSA/ttb/pull/232)
+* **Fixed:** [Desarrollo de conjunto de modificaciones a Nota cobro para cumplir con requerimientos de Berlegal](https://github.com/LemontechSA/ttb/pull/232)
+
+## Hotfix: 13.4.12
+Martes 2 de Julio 2013
+* **Fixed:** [Campo factura_codigopostal al editar una factura existente](https://github.com/LemontechSA/ttb/pull/231)
+* **Fixed:** [Corrección fecha último pago para facturas con SimpleReport y DataTables](https://github.com/LemontechSA/ttb/pull/231)
+
+## Hotfix: 13.4.11
+Lunes 1 de Julio 2013
+* **Fixed:** [El autocompletador de datos de facturación saca los datos del cliente y no del contrato](https://github.com/LemontechSA/ttb/pull/230)
+* **Fixed:** [Visualización reportes de fecha con SimpleReport -> DataTables](https://github.com/LemontechSA/ttb/pull/230)
+* **Fixed:** [Genera modificacion a seccion trabajos filas para operar con retainer](https://github.com/LemontechSA/ttb/pull/230)
+
+## Hotfix: 13.4.10
+Miércoles 28 de Junio 2013
+* **Fixed:** [Corrige calculo columnas retainer en seccion trabajos filas](https://github.com/LemontechSA/ttb/pull/224)
+
 ## Hotfix: 13.4.9
 Miércoles 26 de Junio 2013
 * **Fixed:** [Corrige validación Tipo de cambio](https://github.com/LemontechSA/ttb/pull/223)

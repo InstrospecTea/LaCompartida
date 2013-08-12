@@ -477,23 +477,20 @@ switch ($accion) {
 		echo("OK");
 		break;
 	case "cargar_actividades":
-
-		$query = "SELECT codigo_actividad,glosa_actividad
-					FROM actividad
-				   	WHERE codigo_asunto = '$id'
-						OR codigo_asunto IS NULL
-					ORDER BY glosa_actividad";
+		$query = "SELECT codigo_actividad,glosa_actividad FROM actividad WHERE codigo_asunto = '$id' OR codigo_asunto IS NULL ORDER BY glosa_actividad";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
 			if ($i > 0) {
-				echo("~");
+				echo('~');
 			}
-			echo(join("|", $fila));
+			echo(join('|', $fila));
 		}
+
 		if ($i == 0) {
-			echo("VACIO|");
+			echo('VACIO|');
 		}
+
 		break;
 	case 'cargar_cargos':
 

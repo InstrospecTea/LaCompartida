@@ -8,9 +8,9 @@
 	require_once Conf::ServerDir().'/../app/classes/Aviso.php';
 	$sesion = new Sesion( array() );
 ?>
-<body class="non_popup" <?php if (UtilesApp::GetConf($sesion, 'UsarOverlay')) echo 'title="overlay"'; ?>>
+<body class="non_popup" <?php if (Conf::GetConf($sesion, 'UsarOverlay')) echo 'title="overlay"'; ?>>
 <?php
-if (!UtilesApp::GetConf($sesion,'ActualizacionTerminado')) {
+if (!Conf::GetConf($sesion,'ActualizacionTerminado')) {
 	echo "<div style='display:block;margin:auto;text-align:center;'><h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
 	echo "<br/><br/><img src='https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png' />";
 
@@ -47,8 +47,8 @@ if (!UtilesApp::GetConf($sesion,'ActualizacionTerminado')) {
 			<span class="text_bold">Usuario</span>:
 				<?php echo $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1'] . ' ' . $sesion->usuario->fields['apellido2']; ?>
 				| <a style="color: white;" href="#" onClick="irIntranet('/fw/usuarios/index.php');">Inicio</a>
-				<?php if (isset($_SESSION['ACTIVO_JUICIO']) && method_exists('Conf','HostJuicios') ) { ?>
-					| <a style="color: white;" href="<?php echo Conf::HostJuicios()?>" onClick="irIntranet('/fw/usuarios/index.php');">Gestión de Causas</a>
+				<?php if (isset($_SESSION['ACTIVO_JUICIO']) && Conf::GetConf($sesion, 'HostJuicios') ) { ?>
+					| <a style="color: white;" href="<?php echo Conf::GetConf($sesion, 'HostJuicios'); ?>" onClick="irIntranet('/fw/usuarios/index.php');">Gestión de Causas</a>
 				<?php } ?>
 				| <a style="color: white;" href="http://soporte.thetimebilling.com" target="_blank" >Soporte</a>
 			 	<?php if (isset($_SESSION['switchuser'])) { ?>
@@ -69,8 +69,8 @@ echo UtilesApp::PrintMenuDisenoNuevojQuery($this->sesion, substr($_SERVER['PHP_S
 	<div id="mainttb" style="padding: 30px 0 5px ;width:960px;position:relative;left:-10px; ">
 		<div class="titulo_sec">
 <?php
-if (UtilesApp::GetConf($sesion, 'BeaconTimer')) {
-	$beaconleft = UtilesApp::GetConf($sesion, 'BeaconTimer') - time();
+if (Conf::GetConf($sesion, 'BeaconTimer')) {
+	$beaconleft = Conf::GetConf($sesion, 'BeaconTimer') - time();
 	if ($beaconleft < 0) {
 	 //echo 'Versi&oacute;n expirada del software';
 	} else {

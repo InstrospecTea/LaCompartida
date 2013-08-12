@@ -853,6 +853,23 @@
 	$pagina->titulo = __('Reporte Liquidaciones');
 	$pagina->PrintTop();
 ?>
+
+<script type="text/javascript">
+	
+	jQuery(function(){
+		jQuery("select option").attr( "title", "" );
+		jQuery("select option").each(function(i){
+				this.title = this.text;
+		})
+		});
+
+		
+		jQuery("select").tooltip({
+			left: 25
+	});
+
+</script>
+
 <form method=post name=formulario action="<?php echo $_server['php_self'];?>?xls=1">
 <input type=hidden name=horas_sql id=horas_sql value='<?php echo $horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
 <!-- Calendario DIV -->

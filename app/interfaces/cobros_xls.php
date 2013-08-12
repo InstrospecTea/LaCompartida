@@ -884,7 +884,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas2++, $col_valor_trabajo, "$horas_cobrables:$minutos_cobrables", $formato_encabezado_derecha);
 
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-		$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
+		$ws->writeNumber($filas2++, $col_valor_trabajo, number_format($cobro->fields['monto_subtotal'],2), $formato_moneda_encabezado);
 
 		if ($cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total']) {
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);

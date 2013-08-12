@@ -202,7 +202,7 @@ class Factura extends Objeto {
 			'visible' => false,
 		),
 	);
-	
+
 	function Factura($sesion, $fields = "", $params = "") {
 		$this->tabla = "factura";
 		$this->campo_id = "id_factura";
@@ -1697,16 +1697,17 @@ class Factura extends Objeto {
 	}
 
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-		,$tipo_documento_legal_buscado
-		, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
-		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable ) {
+		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_cia
+		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
-		if ($orden == "") {
-			$orden = "fecha DESC";
-		}
+		
+		// if ($orden == "") {
+		// 	$orden = "factura.fecha DESC";
+		// 	$orderby = " ORDER BY $orden ";
+		// }
 
 		if ($where == '') {
 			$where = 1;
@@ -1777,51 +1778,74 @@ class Factura extends Objeto {
 			$where = base64_decode($where);
 		}
 
-		$groupby=" GROUP BY factura.id_factura";
+		$groupby = " GROUP BY factura.id_factura ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 				prm_documento_legal.codigo as tipo
-			   , numero
-			   , factura.serie_documento_legal
-			   , factura.codigo_cliente
-			   , cliente.glosa_cliente, contrato.id_contrato as idcontrato
-			
-			   , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
-						OR contrato.factura_razon_social IN ('',' ')
-						OR contrato.factura_razon_social IS NULL,
-					factura.cliente,
-					CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
-				) as factura_rsocial
-			   , usuario.username AS encargado_comercial
-			   , fecha
-			   , usuario.username AS encargado_comercial
-			   , descripcion
-			   , prm_estado_factura.codigo as codigo_estado
-			   , prm_estado_factura.glosa as estado
-			   , factura.id_cobro
-			   , cobro.codigo_idioma as codigo_idioma
-			   , prm_moneda.simbolo
-			   , prm_moneda.cifras_decimales
-			   , prm_moneda.tipo_cambio
-			   , factura.id_moneda
-			   , factura.honorarios
-			   , factura.subtotal
-			   , factura.subtotal_gastos
-			   , factura.subtotal_gastos_sin_impuesto
-			   , factura.iva
-			   , total
-			   , '' as saldo_pagos
-			   , -cta_cte_fact_mvto.saldo as saldo
-			   , '' as monto_pagos_moneda_base
-			   , '' as saldo_moneda_base
-			   , factura.id_factura
-			   , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-			   , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
-			   , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-			   , factura.RUT_cliente ";
+			  , factura.numero
+			  , factura.serie_documento_legal
+			  , factura.codigo_cliente
+			  , cliente.glosa_cliente
+			  , contrato.id_contrato as idcontrato
+			  , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
+							OR contrato.factura_razon_social IN ('',' ')
+							OR contrato.factura_razon_social IS NULL,
+						factura.cliente,
+						CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+					) as factura_rsocial
+			  , usuario.username AS encargado_comercial
+			  , factura.fecha
+			  , factura.descripcion
+			  , prm_estado_factura.codigo as codigo_estado
+			  , prm_estado_factura.glosa as estado
+			  , factura.id_cobro
+			  , cobro.codigo_idioma as codigo_idioma
+			  , prm_moneda.simbolo
+			  , prm_moneda.cifras_decimales
+			  , prm_moneda.tipo_cambio
+			  , factura.id_moneda
+			  , factura.honorarios
+			  , factura.subtotal
+			  , factura.subtotal_gastos
+			  , factura.subtotal_gastos_sin_impuesto
+			  , factura.iva
+			  , factura.total
+			  , '' as saldo_pagos
+			  , -cta_cte_fact_mvto.saldo as saldo
+			  , '' as monto_pagos_moneda_base
+			  , '' as saldo_moneda_base
+			  , factura.id_factura
+			  , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+			  , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
+			  , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+			  , factura.RUT_cliente";
 
-				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;  
-	   
+			if ($opciones['mostrar_pagos']) {
+				$query .= ", (
+			  		SELECT SUM(ccfmn.monto)
+	  				FROM factura_pago AS fp
+						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+						WHERE ccfm2.id_factura = factura.id_factura
+						GROUP BY ccfm2.id_factura 
+			  	) AS pagos";
+			}
+
+			if ($opciones['mostrar_fecha_ultimo_pago']) {
+				$query .= ", (
+				  	SELECT MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
+	  				FROM factura_pago AS fp
+						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+						WHERE ccfm2.id_factura = factura.id_factura
+						GROUP BY ccfm2.id_factura 
+			  	) AS fecha_ultimo_pago";
+			}
+
+				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;
+
 		   $query.=" FROM factura
 		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -1834,30 +1858,28 @@ class Factura extends Objeto {
 		   LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 		   WHERE ";
-		 
-	
 
-		   $resultingquery=$query." \n ".$where." \n ".$groupby;
-		  
+		   $resultingquery = $query . " \n " . $where . " \n " . $groupby . "\n" . $orderby;
+
 		   return $resultingquery;
 	}
- 
+
 	public  function FormatoDataTable() {
-			
+
 
 
 			$formato=array();
- 
- 		 	$formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
-  							 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
- 							},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
+
+ 		 	// $formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
+  			// 				 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
+ 				// 			},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
 
  			$formato['numero']= '{  "sWidth": "90px", "bVisible": "true",  "sClass": "al"
 							,"fnRender": function ( o, val ) {
 								var respuesta="";
 								if(o.aData["tipo"])						respuesta+="<b>Tipo</b>: "+o.aData["tipo"];
-								if(o.aData["serie_documento_legal"])	respuesta+="<br><b>Serie</b>: "+o.aData["serie_documento_legal"];	 
-								if(o.aData["numero"])			respuesta+="<div style=\"white-space:nowrap\"><b>Número</b>: "+o.aData["numero"]+"</div>";	 
+								if(o.aData["serie_documento_legal"])	respuesta+="<br><b>Serie</b>: "+o.aData["serie_documento_legal"];
+								if(o.aData["numero"])			respuesta+="<div style=\"white-space:nowrap\"><b>Número</b>: "+o.aData["numero"]+"</div>";
 								if(o.aData["glosa_estudio"])						respuesta+="<b>Emisor</b>: "+o.aData["glosa_estudio"];
 											 return respuesta;  }
 							,    "aTargets": ["numero" ] , sDefaultContent: " - "   }';
@@ -1866,15 +1888,15 @@ class Factura extends Objeto {
 							,"fnRender": function ( o, val ) {
 								var respuesta="<div style=\"font-size:10px;width:200px;\">";
 								if(o.aData["glosa_cliente"])	respuesta+=	"<b>Cliente</b>: "+o.aData["glosa_cliente"];
-								if(o.aData["codigo_contrato"])	respuesta+=	"<br><b>Servicio</b>: "+o.aData["codigo_contrato"];	 
-								if(o.aData["factura_rsocial"])	respuesta+=	"<br><b>Razón Social</b>: "+o.aData["factura_rsocial"];	 
-								if(o.aData["descripcion"])	respuesta+=	"<br><b>Descripción</b>: "+o.aData["descripcion"];	 
-								
+								if(o.aData["codigo_contrato"])	respuesta+=	"<br><b>Servicio</b>: "+o.aData["codigo_contrato"];
+								if(o.aData["factura_rsocial"])	respuesta+=	"<br><b>Razón Social</b>: "+o.aData["factura_rsocial"];
+								if(o.aData["descripcion"])	respuesta+=	"<br><b>Descripción</b>: "+o.aData["descripcion"];
+
 											 return respuesta+"</div>";  }
 							,    "aTargets": ["glosa_cliente" ] , sDefaultContent: " - "   }';
-  
+
  		 	$formato['id_cobro']= '{ "aTargets": ["id_cobro" ] ,  "sWidth": "40px", "bVisible": "true", "mData":"id_cobro","fnRender": function ( o,val ) { 	return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana(\'Editar_Cobro\',950,660,\'cobros6.php?id_cobro="+o.aData["id_cobro"]+"&amp;popup=1\');\">"+o.aData["id_cobro"]+"</a>"; }	,    sDefaultContent: " - "   }';
- 	
+
 
  			$formato['Acciones']='{ "aTargets": ["acciones" ] ,  "sClass": "ar",   "fnRender": function ( o, val ) {';
 			$formato['Acciones'] .= 'var id_factura=o.aData["id_factura"];';
@@ -1894,14 +1916,13 @@ class Factura extends Objeto {
  		return $formato;
 	}
 
- 
+
 
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
-		,$tipo_documento_legal_buscado
-		, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
-		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable) {
+		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_cia
+		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 		,$tipo_documento_legal_buscado
