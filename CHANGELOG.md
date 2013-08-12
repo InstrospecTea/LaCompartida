@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.4.33
 Lunes 12 de Agosto 2013
-* **Added:** [Genera monto equivalente A como numero y no como formula, Corrige monto en cobro_xls](https://github.com/LemontechSA/ttb/pull/261)
+* **Added:** [Genera monto equivalente A como numero y no como formula, Corrige monto en cobro_xls](https://github.com/LemontechSA/ttb/pull/262)
 
 ## Hotfix: 13.4.33
 Jueves 08 de Agosto 2013
