@@ -95,7 +95,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		),
 		array(
 			'field' => 'moneda_codigo',
-			'title' => 'Moneda'
+			'title' => 'Moneda original'
 		),
 		array(
 			'field' => 'monto_honorarios',
@@ -139,6 +139,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	if (count($where) > 0) {
 		$where = "WHERE " . implode(' AND ', $where);
+	} else {
+		$where = "";
 	}
 
 	$query =
@@ -150,14 +152,14 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			cobro.forma_cobro,
 			tarifa.glosa_tarifa,
 			moneda_cobro.codigo AS moneda_codigo,
-			moneda_cobro.simbolo AS moneda_simbolo,
+			moneda_base.simbolo AS moneda_simbolo,
 			cobro.monto * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_honorarios,
 			cobro.monto_thh_estandar * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_honorarios_base,
 			cobro.subtotal_gastos * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_gastos,
-			cobro.total_minutos,
+			cobro.total_minutos / 60 AS total_minutos,
 			prm_categoria_usuario.glosa_categoria AS categoria_usuario,
 			GROUP_CONCAT(DISTINCT usuario_trabajo.username) AS usuarios_categoria,
-			SUM(TIME_TO_SEC(trabajo.duracion) / 60) AS duracion_categoria
+			SUM(TIME_TO_SEC(trabajo.duracion) / 3600) AS duracion_categoria
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
 		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
