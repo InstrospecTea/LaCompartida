@@ -5,8 +5,10 @@ require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
 
+
 if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
+	$id_tarifa_comparativa = $_REQUEST['id_tarifa_comparativa'];
 	$codigo_cliente = '';
 	$where = array();
 
@@ -29,18 +31,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$moneda_base = Utiles::MonedaBase($Sesion);
 		$moneda_mostrar = $moneda_base['id_moneda'];
 	}
-
-	// if (!empty($codigo_cliente)) {
-	// 	$query_glosa_cliente = "SELECT glosa_cliente AS cliente FROM cliente WHERE codigo_cliente = '$codigo_cliente'";
-	// 	$resp = mysql_query($query_glosa_cliente) or Utiles::errorSQL($query_glosa_cliente, __FILE__, __LINE__);
-	// 	list($glosa_clientes) = mysql_fetch_array($resp);
-	// }
-
-	// if (!empty($moneda_mostrar)) {
-	// 	$query_glosa_moneda = "SELECT glosa_moneda AS moneda FROM prm_moneda WHERE id_moneda = '$moneda_mostrar'";
-	// 	$resp2 = mysql_query($query_glosa_moneda) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__);
-	// 	list($glosa_moneda) = mysql_fetch_array($resp2);
-	// }
 
 	// $filters = array(
 	// 	__('Cliente') => $glosa_cliente,
@@ -94,7 +84,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Tarifa'
 		),
 		array(
-			'field' => 'moneda_codigo',
+			'field' => 'moneda_cobro_codigo',
 			'title' => 'Moneda original'
 		),
 		array(
@@ -102,8 +92,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Honorarios',
 			'format' => 'number',
 			'extras' => array(
-				'subtotal' => 'moneda_simbolo',
-				'symbol' => 'moneda_simbolo'
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
@@ -111,8 +101,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Gastos',
 			'format' => 'number',
 			'extras' => array(
-				'subtotal' => 'moneda_simbolo',
-				'symbol' => 'moneda_simbolo'
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
@@ -125,13 +115,49 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Categoría'
 		),
 		array(
+			'field' => 'tarifa_categoria',
+			'title' => 'Tarifa Categoría',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
+		),
+		array(
 			'field' => 'usuarios_categoria',
 			'title' => 'Usuarios'
 		),
 		array(
 			'field' => 'duracion_categoria',
-			'title' => 'Duración categoría',
+			'title' => 'Duración cobrada',
 			'format' => 'time'
+		),
+		array(
+			'field' => 'monto_categoria',
+			'title' => 'Monto cobrado',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
+		),
+		array(
+			'field' => 'tarifa_comparativa',
+			'title' => 'Tarifa Comparativa',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
+		),
+		array(
+			'field' => 'monto_comparativo',
+			'title' => 'Monto',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
 		)
 	);
 
@@ -151,18 +177,35 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			cliente.glosa_cliente,
 			cobro.forma_cobro,
 			tarifa.glosa_tarifa,
-			moneda_cobro.codigo AS moneda_codigo,
-			moneda_base.simbolo AS moneda_simbolo,
+			moneda_cobro.codigo AS moneda_cobro_codigo,
+			moneda_cobro.simbolo AS moneda_cobro_simbolo,
+			moneda_base.simbolo AS moneda_base_simbolo,
 			cobro.monto * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_honorarios,
 			cobro.monto_thh_estandar * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_honorarios_base,
 			cobro.subtotal_gastos * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_gastos,
 			cobro.total_minutos / 60 AS total_minutos,
+			prm_categoria_usuario.id_categoria_usuario AS id_categoria_usuario,
 			prm_categoria_usuario.glosa_categoria AS categoria_usuario,
 			GROUP_CONCAT(DISTINCT usuario_trabajo.username) AS usuarios_categoria,
-			SUM(TIME_TO_SEC(trabajo.duracion) / 3600) AS duracion_categoria
+			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_categoria,
+			SUM(trabajo.monto_cobrado) AS monto_categoria,
+			(
+				SELECT tarifa
+				FROM categoria_tarifa
+				WHERE id_tarifa = contrato.id_tarifa
+				AND id_categoria_usuario = usuario_trabajo.id_categoria_usuario
+				AND id_moneda = moneda_cobro.id_moneda
+			) AS tarifa_categoria,
+			(
+				SELECT tarifa
+				FROM categoria_tarifa
+				WHERE id_tarifa = '$id_tarifa_comparativa'
+				AND id_categoria_usuario = usuario_trabajo.id_categoria_usuario
+				AND id_moneda = moneda_cobro.id_moneda
+			) AS tarifa_comparativa
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
-		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
+		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = cobro.id_moneda
 		INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 		INNER JOIN usuario usuario_contrato ON usuario_contrato.id_usuario = contrato.id_usuario_responsable
 		INNER JOIN tarifa ON tarifa.id_tarifa = contrato.id_tarifa
@@ -170,19 +213,25 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		LEFT JOIN trabajo ON trabajo.id_cobro = cobro.id_cobro
 		INNER JOIN usuario usuario_trabajo ON usuario_trabajo.id_usuario = trabajo.id_usuario
 		INNER JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario_trabajo.id_categoria_usuario
-
 		$where
 		GROUP BY cobro.id_cobro, prm_categoria_usuario.id_categoria_usuario";
 
-	 //echo $query;
+	 // echo $query;
 	 //echo $query_adelantos;
 	 //echo $query_gastos;
 	 //echo $query_liquidaciones;
-	 //exit;
+	 // exit;
 
 	$statement = $Sesion->pdodbh->prepare($query);
 	$statement->execute();
 	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($results as $i => $r) {
+		// $results[$i]['tarifa_comparativa'] = $categoria_comparativa[$r['id_categoria_usuario']];
+		$results[$i]['monto_comparativo'] = $r['tarifa_comparativa'] * $r['duracion_categoria'];
+	}
+
+
 	$SimpleReport->LoadResults($results);
 
 	if ($_REQUEST['opcion'] == 'xls') {
@@ -251,12 +300,13 @@ $Pagina->PrintTop($popup);
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><?php echo __('Tipo de Liquidación'); ?></td>
+							<td align="right"><?php echo __('Forma de Tarificación'); ?></td>
 							<td align="left" colspan="3">
-			<?php echo Html::SelectArrayDecente(array('TASA' => 'Tasas/HH', 'RETAINER' => 'Retainer', 'FLAT FEE' => 'Flat fee', 'CAP' => 'Cap', 'PROPORCIONAL' => 'Proporcional', 'HITOS' => 'Hitos'), "tipo_liquidacion", $tipo_liquidacion, '', 'Cualquiera') ?>
+			<?php // echo Html::SelectArrayDecente(array('TASA' => 'Tasas/HH', 'RETAINER' => 'Retainer', 'FLAT FEE' => 'Flat fee', 'CAP' => 'Cap', 'PROPORCIONAL' => 'Proporcional', 'HITOS' => 'Hitos'), "tipo_liquidacion", $tipo_liquidacion, '', 'Cualquiera') ?>
+			<?php echo Html::SelectQuery($Sesion, "SELECT forma_cobro, descripcion FROM prm_forma_cobro", "tipo_liquidacion", $tipo_liquidacion, '', 'Cualquiera') ?>
 							</td>
 						</tr>
-						<tr>
+						<!--tr>
 							<td align="right">
 								<label for="moneda_mostrar"><?php echo __('Moneda') ?></label>
 							</td>
@@ -265,7 +315,7 @@ $Pagina->PrintTop($popup);
 								echo Html::SelectArray(Moneda::GetMonedas($Sesion), 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
 								?>
 							</td>
-						</tr>
+						</tr-->
 						<tr>
 							<td align="right"><?php echo __('Fecha Desde') ?></td>
 							<td nowrap align="left">
@@ -284,6 +334,12 @@ $Pagina->PrintTop($popup);
 									<input type="checkbox" name="incluir_gastos" id="incluir_gastos" value="1" <?php echo $incluir_gastos ? 'checked="checked"' : '' ?> />
 									<?php echo __('Incluir gastos en el cálculo'); ?>
 								</label>
+							</td>
+						</tr>
+						<tr>
+							<td align="right">Tarifa Comparativa</td>
+							<td colspan="3" align="left">
+								<?php echo Html::SelectQuery($Sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa", "id_tarifa_comparativa", $id_tarifa_comparativa); ?>
 							</td>
 						</tr>
 						<tr>
