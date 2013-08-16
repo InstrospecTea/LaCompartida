@@ -691,7 +691,7 @@
 				$x_monto_gastos = number_format($monto_gastos, $cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
 				$x_subtotal_gastos = number_format($monto_gastos, $cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
 				$x_monto_iva = number_format($monto_iva,$cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
-				$x_monto_honorarios_original = number_format($monto_honorarios_original, $cobro_moneda->moneda[$cobro['id_moneda']]['cifras_decimales_titulo'],'.','');
+				$x_monto_honorarios_original = number_format($monto_honorarios_original, $cobro_moneda->moneda[$cobro['id_moneda']]['cifras_decimales'],'.','');
 				$x_monto_cobro_original = $aproximacion_monto;
 				$x_monto_cobro_original_con_iva = $aproximacion_monto;
 			}

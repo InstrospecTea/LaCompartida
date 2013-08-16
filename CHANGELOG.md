@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.37
+Viernes 16 de Agosto 2013
+* **Fixed:** [Corrige problema reporte resumen de liquidaciones con modalidad de cálculo antigua](https://github.com/LemontechSA/ttb/pull/264)
+
 ## Hotfix: 13.4.36
 Lunes 12 de Agosto 2013
 * **Added:** [Agrega comportamiento "desasocia gastos de el cobro cuando este es eliminado"](https://github.com/LemontechSA/ttb/pull/263)
