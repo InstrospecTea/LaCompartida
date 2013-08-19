@@ -9914,6 +9914,12 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+			
+		case 7.42:
+			$queries = array();
+			$queries[] = "ALTER TABLE `tramite` ADD `solicitante` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL AFTER `id_usuario`";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9923,7 +9929,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.41;
+$max_update = 7.42;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

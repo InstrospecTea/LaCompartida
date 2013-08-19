@@ -1669,10 +1669,6 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_siempre%', __('Valor'), $html);
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 
-
-
-
-
 				if ($this->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 					$html = str_replace('%td_tarifa%', '<td width="80" align="center">%tarifa%</td>', $html);
 					$html = str_replace('%td_tarifa_ajustada%', '<td width="80" align="center">%tarifa%</td>', $html);
@@ -1690,25 +1686,17 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_importe_ajustado%', '', $html);
 				}
 				$html = str_replace('%importe%', __($this->fields['codigo_idioma'].'_Importe'), $html);
-				break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento
+
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
+
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -2297,18 +2285,27 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+				$query = "SELECT SQL_CALC_FOUND_ROWS 
+							tramite.duracion,
+							tramite_tipo.glosa_tramite as glosa_tramite,
+							tramite.descripcion,
+							tramite.solicitante,
+							tramite.fecha,
+							tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
-							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+						FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
+						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
 
@@ -2348,6 +2345,12 @@ class NotaCobro extends Cobro {
 
 					$row = str_replace('%username%', $tramite->fields['username'], $row);
 
+					if ($this->fields['opc_ver_solicitante']) {
+						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
+					} else {
+						$row = str_replace('%td_solicitante%', '', $row);
+					}
+					$row = str_replace('%solicitante%', $tramite->fields['solicitante'], $row);
 
 					list($ht, $mt, $st) = split(":", $tramite->fields['duracion']);
 					$asunto->fields['tramites_total_duracion_trabajado'] += $ht * 60 + $mt + $st / 60;
@@ -4965,6 +4968,11 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -5682,6 +5690,12 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%duracion_decimal%', number_format($duracion_decimal, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%duracion_tramites%', $horas_cobrables_tramites . ':' . $minutos_cobrables_tramites, $html);
 				$html = str_replace('%duracion%', $horas_cobrables . ':' . $minutos_cobrables, $html);
+
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">&nbsp;</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
 
 				$html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $espacio_conf . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $espacio_conf . number_format($asunto->fields['tramites_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
@@ -7639,6 +7653,13 @@ class NotaCobro extends Cobro {
                 break;
 
             case 'TRAMITES_ENCABEZADO': //GenerarDocumentoComun
+				
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
+
                 $html = str_replace('%solicitante%', __('Solicitado Por'), $html);
                 $html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
                 $html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -7899,6 +7920,12 @@ class NotaCobro extends Cobro {
                 $html = str_replace('%duracion_tramites%', $horas_cobrables_tramites . ':' . $minutos_cobrables_tramites, $html);
                 $html = str_replace('%duracion%', $horas_cobrables . ':' . $minutos_cobrables, $html);
 
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">&nbsp;</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
+
                 if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
                     $html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
                     $html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . number_format($asunto->fields['tramites_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
@@ -8095,6 +8122,13 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumentoComun
+				
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
+
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -9090,6 +9124,12 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%duracion_decimal%', number_format($duracion_decimal, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%duracion_tramites%', $horas_cobrables_tramites . ':' . $minutos_cobrables_tramites, $html);
 				$html = str_replace('%duracion%', $horas_cobrables . ':' . $minutos_cobrables, $html);
+
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td align="left">&nbsp;</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
 
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
 					$html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
