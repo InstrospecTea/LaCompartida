@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.4.38
+Lunes 19 de Agosto 2013
+* **Fixed:** [Editar un gasto en revision](https://github.com/LemontechSA/ttb/pull/265)
+
 ## Hotfix: 13.4.37
 Viernes 16 de Agosto 2013
 * **Fixed:** [Corrige problema reporte resumen de liquidaciones con modalidad de cálculo antigua](https://github.com/LemontechSA/ttb/pull/264)
