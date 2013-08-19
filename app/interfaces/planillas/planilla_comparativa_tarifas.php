@@ -65,27 +65,45 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		array(
 			'field' => 'fecha',
 			'title' => 'Fecha',
-			'format' => 'date'
+			'format' => 'date',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'username',
 			'title' => 'Encargado comercial',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'glosa_cliente',
-			'title' => 'Cliente'
+			'title' => 'Cliente',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'forma_cobro',
-			'title' => 'Tipo'
+			'title' => 'Tipo',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'glosa_tarifa',
-			'title' => 'Tarifa'
+			'title' => 'Tarifa',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'moneda_cobro_codigo',
-			'title' => 'Moneda original'
+			'title' => 'Moneda original',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'monto_honorarios',
@@ -93,7 +111,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_base_simbolo'
+				'symbol' => 'moneda_base_simbolo',
+				'inlinegroup_field' => 'id_cobro'
 			)
 		),
 		array(
@@ -102,21 +121,42 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_base_simbolo'
+				'symbol' => 'moneda_base_simbolo',
+				'inlinegroup_field' => 'id_cobro'
 			)
 		),
 		array(
 			'field' => 'total_minutos',
 			'title' => 'Duración',
-			'format' => 'time'
+			'format' => 'time',
+			'extras' => array(
+				'inlinegroup_field' => 'id_cobro'
+			)
 		),
 		array(
 			'field' => 'categoria_usuario',
 			'title' => 'Categoría'
 		),
 		array(
-			'field' => 'tarifa_categoria',
-			'title' => 'Tarifa Categoría',
+			'field' => 'usuario_categoria',
+			'title' => 'Usuario'
+		),
+		array(
+			'field' => 'duracion_usuario',
+			'title' => 'Duración cobrada',
+			'format' => 'time'
+		),
+		array(
+			'field' => 'duracion_usuario_numero',
+			'title' => 'Duración numérica',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="display:none"'
+			)
+		),
+		array(
+			'field' => 'tarifa_usuario',
+			'title' => 'Tarifa Usuario',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
@@ -124,16 +164,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'usuarios_categoria',
-			'title' => 'Usuarios'
-		),
-		array(
-			'field' => 'duracion_categoria',
-			'title' => 'Duración cobrada',
-			'format' => 'time'
-		),
-		array(
-			'field' => 'monto_categoria',
+			'field' => 'monto_usuario',
 			'title' => 'Monto cobrado',
 			'format' => 'number',
 			'extras' => array(
@@ -151,14 +182,42 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'monto_comparativo',
-			'title' => 'Monto',
+			'field' => '=PRODUCT(%tarifa_comparativa%,%duracion_usuario_numero%)',
+			'title' => 'Monto Comparativa',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
 				'symbol' => 'moneda_cobro_simbolo'
 			)
-		)
+		),
+		array(
+			'field' => 'factor_comparativa',
+			'title' => 'Factor Comparativa',
+			'format' => 'number'
+		),
+		array(
+			'field' => 'tarifa_standard',
+			'title' => 'Tarifa Standard',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
+		),
+		array(
+			'field' => '=PRODUCT(%tarifa_standard%,%duracion_usuario_numero%)',
+			'title' => 'Monto Standard',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
+		),
+		array(
+			'field' => 'factor_standard',
+			'title' => 'Factor Standard',
+			'format' => 'number'
+		),
 	);
 
 	$SimpleReport->LoadConfigFromArray($config_reporte);
@@ -169,6 +228,36 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where = "";
 	}
 
+	// Calcular factores
+	$query_tarifa_standard = "SELECT id_categoria_usuario, id_moneda, tarifa FROM categoria_tarifa INNER JOIN tarifa USING(id_tarifa) WHERE tarifa_defecto = 1 OR id_tarifa = '$id_tarifa_comparativa'";
+	$statement = $Sesion->pdodbh->prepare($query_tarifa_standard);
+	$statement->execute();
+	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+	$factores_tarifa_standard = array();
+	$factores_tarifa_standard_total = array();
+
+	$factores_tarifa_comparativa = array();
+	$factores_tarifa_comparativa_total = array();
+
+	foreach ($results as $i => $r) {
+		$factores_tarifa_standard[$r['id_moneda']][$r['id_categoria_usuario']] = $r['tarifa'];
+		$factores_tarifa_standard_total[$r['id_moneda']] += $r['tarifa'];
+
+		$factores_tarifa_comparativa[$r['id_moneda']][$r['id_categoria_usuario']] = $r['tarifa'];
+		$factores_tarifa_comparativa_total[$r['id_moneda']] += $r['tarifa'];
+	}
+	foreach ($factores_tarifa_standard as $moneda => $factores_moneda) {
+		foreach ($factores_moneda as $id => $tarifa) {
+			$factores_tarifa_standard[$moneda][$id] = $tarifa / ($factores_tarifa_standard_total[$moneda] / count($factores_tarifa_standard[$moneda]));
+		}
+	}
+	foreach ($factores_tarifa_comparativa as $moneda => $factores_moneda) {
+		foreach ($factores_moneda as $id => $tarifa) {
+			$factores_tarifa_comparativa[$moneda][$id] = $tarifa / ($factores_tarifa_comparativa_total[$moneda] / count($factores_tarifa_comparativa[$moneda]));
+		}
+	}
+
 	$query =
 		"SELECT
 			cobro.id_cobro,
@@ -177,6 +266,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			cliente.glosa_cliente,
 			cobro.forma_cobro,
 			tarifa.glosa_tarifa,
+			moneda_cobro.id_moneda AS moneda_cobro_id,
 			moneda_cobro.codigo AS moneda_cobro_codigo,
 			moneda_cobro.simbolo AS moneda_cobro_simbolo,
 			moneda_base.simbolo AS moneda_base_simbolo,
@@ -186,23 +276,32 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			cobro.total_minutos / 60 AS total_minutos,
 			prm_categoria_usuario.id_categoria_usuario AS id_categoria_usuario,
 			prm_categoria_usuario.glosa_categoria AS categoria_usuario,
-			GROUP_CONCAT(DISTINCT usuario_trabajo.username) AS usuarios_categoria,
-			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_categoria,
-			SUM(trabajo.monto_cobrado) AS monto_categoria,
+			usuario_trabajo.username AS usuario_categoria,
+			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario,
+			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario_numero,
+			SUM(trabajo.monto_cobrado) AS monto_usuario,
 			(
 				SELECT tarifa
-				FROM categoria_tarifa
+				FROM usuario_tarifa
 				WHERE id_tarifa = contrato.id_tarifa
-				AND id_categoria_usuario = usuario_trabajo.id_categoria_usuario
+				AND id_usuario = usuario_trabajo.id_usuario
 				AND id_moneda = moneda_cobro.id_moneda
-			) AS tarifa_categoria,
+			) AS tarifa_usuario,
 			(
 				SELECT tarifa
-				FROM categoria_tarifa
+				FROM usuario_tarifa
 				WHERE id_tarifa = '$id_tarifa_comparativa'
-				AND id_categoria_usuario = usuario_trabajo.id_categoria_usuario
+				AND id_usuario = usuario_trabajo.id_usuario
 				AND id_moneda = moneda_cobro.id_moneda
-			) AS tarifa_comparativa
+			) AS tarifa_comparativa,
+			(
+				SELECT tarifa
+				FROM usuario_tarifa
+				INNER JOIN tarifa ON usuario_tarifa.id_tarifa = tarifa.id_tarifa
+				WHERE tarifa_defecto = 1
+				AND id_usuario = usuario_trabajo.id_usuario
+				AND id_moneda = moneda_cobro.id_moneda
+			) AS tarifa_standard
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
 		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = cobro.id_moneda
@@ -214,7 +313,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		INNER JOIN usuario usuario_trabajo ON usuario_trabajo.id_usuario = trabajo.id_usuario
 		INNER JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario_trabajo.id_categoria_usuario
 		$where
-		GROUP BY cobro.id_cobro, prm_categoria_usuario.id_categoria_usuario";
+		GROUP BY cobro.id_cobro, usuario_trabajo.id_usuario";
 
 	 // echo $query;
 	 //echo $query_adelantos;
@@ -228,7 +327,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	foreach ($results as $i => $r) {
 		// $results[$i]['tarifa_comparativa'] = $categoria_comparativa[$r['id_categoria_usuario']];
-		$results[$i]['monto_comparativo'] = $r['tarifa_comparativa'] * $r['duracion_categoria'];
+		// $results[$i]['monto_comparativo'] = $r['tarifa_comparativa'] * $r['duracion_categoria'];
+		// $results[$i]['monto_standard'] = $r['tarifa_standard'] * $r['duracion_categoria'];
+		$results[$i]['factor_comparativa'] = $factores_tarifa_comparativa[$r['moneda_cobro_id']][$r['id_categoria_usuario']];
+		$results[$i]['factor_standard'] = $factores_tarifa_standard[$r['moneda_cobro_id']][$r['id_categoria_usuario']];
 	}
 
 
@@ -332,7 +434,7 @@ $Pagina->PrintTop($popup);
 								<label>
 									<input type="hidden" name="incluir_gastos" value="0" />
 									<input type="checkbox" name="incluir_gastos" id="incluir_gastos" value="1" <?php echo $incluir_gastos ? 'checked="checked"' : '' ?> />
-									<?php echo __('Incluir gastos en el cálculo'); ?>
+									<?php echo __('Incluir gastos en el cÃ¡lculo'); ?>
 								</label>
 							</td>
 						</tr>

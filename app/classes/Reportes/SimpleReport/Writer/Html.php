@@ -214,6 +214,15 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$rowspan++;
 					}
 					$column->extras['rowspan'] = $rowspan;
+					$columns[$column->field]->extras['rowspan'] = $rowspan;
+				}
+				
+				$inlinegroup_field = $column->extras['inlinegroup_field'];
+				if (isset($inlinegroup_field)) {
+					if (isset($result[$row_idx - 1]) && $result[$row_idx - 1][$inlinegroup_field] == $row[$inlinegroup_field]) {
+						continue;
+					}
+					$column->extras['rowspan'] = $columns[$inlinegroup_field]->extras['rowspan'];
 				}
 
 				$tds .= $this->td($row, $column, $collapsible);
@@ -312,6 +321,18 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 								$valor += str_replace(',', '.', $row[trim($param, '%')]);
 							} else if (is_numeric($param)) {
 								$valor += $param;
+							}
+						}
+						break;
+					case 'PRODUCT':
+						$valor = 1;
+						$params = explode(',', $matches[2]);
+						foreach ($params as $param) {
+							$param = trim($param);
+							if (strpos($param, '%') === 0) {
+								$valor *= str_replace(',', '.', $row[trim($param, '%')]);
+							} else if (is_numeric($param)) {
+								$valor *= $param;
 							}
 						}
 						break;

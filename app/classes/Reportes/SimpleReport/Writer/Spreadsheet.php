@@ -255,7 +255,13 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 							$rowspan++;
 						}
 						$column->extras['rowspan'] = $rowspan;
+						$columns[$idx]->extras['rowspan'] = $rowspan;
 					}
+				}
+
+				$inlinegroup_field = $column->extras['inlinegroup_field'];
+				if (isset($inlinegroup_field) && $columns[$inlinegroup_field]->extras['rowspan'] > 0) {
+					$column->extras['rowspan'] = $columns[$inlinegroup_field]->extras['rowspan'];
 				}
 
 				$this->cell($row, $column, $col_i);
