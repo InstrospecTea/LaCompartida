@@ -17,8 +17,8 @@ if (!$Factura->Loaded()) {
 
 if (empty($Factura->fields['dte_url_pdf'])) {
 	$client = new SoapClient("https://www.facturemosya.com:443/webservice/sRecibirXML.php?wsdl");
-	$usuario = 'democfdi';
-	$contra = 'demo2011';
+	$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
+	$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
 	
 	if ($err) {
 		$return = 'Constructor error: ' . $err;
@@ -34,20 +34,21 @@ if (empty($Factura->fields['dte_url_pdf'])) {
 // TRA|||impuesto|IVA||tasa|16.0||importe|68.00
 // ADI|||numorden|111111||comentarios|demo comentarios';
 	$strdocumento = FacturaToTXT($Sesion, $Factura);
-	$datos = array(
-		'usuario' => $usuario,
-		'contra' => $contra,
-		'documento' => $strdocumento
-	);
 
-	$result = $client->RecibirTXT($usuario, $contra, $strdocumento);
+	$result = $client->RecibirTXT($usuario, $password, $strdocumento);
 
 	if ($result->codigo == 201) {
 		try {
+			$result_xml = $client->RecibirXML($usuario, $password, $strdocumento);
+
+			if ($result_xml->codigo == 201) {
+				$Factura->Edit('dte_xml', $result->documento);
+			}
+
 			$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 			$Factura->Edit('dte_firma', $result->timbrefiscal);
 
-			$file_name = Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
+			$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 			$file_data = base64_decode($result->documentopdf);
 			$file_url = UtilesApp::UploadToS3($file_name, $file_data);
 

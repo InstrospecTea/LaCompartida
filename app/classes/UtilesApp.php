@@ -2254,7 +2254,7 @@ HTML;
         ));
 		$bucket = S3_UPLOAD_BUCKET;
 
-		$name = SUBDOMAIN . '/dtes/' . $name;
+		$name = SUBDOMAIN . $name;
 
 		$response = $s3->create_object($bucket, $name, array(
 			'body' => $file,
