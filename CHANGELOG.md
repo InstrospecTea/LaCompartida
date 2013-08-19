@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.4.38
 Lunes 19 de Agosto 2013
-* **Fixed:** [Editar un gasto en revision](https://github.com/LemontechSA/ttb/pull/265)
+* **Fixed:** [Editar un gasto en revision](https://github.com/LemontechSA/ttb/pull/266)
 
 ## Hotfix: 13.4.37
 Viernes 16 de Agosto 2013
