@@ -87,8 +87,8 @@ if ($where == '') {
 		$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
 	}
 
-	if ($id_cia && ( method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza" )) {
-		$where .= " AND factura.id_cia = '$id_cia' ";
+	if ($id_estudio) {
+		$where .= " AND factura.id_estudio = '$id_estudio' ";
 	}
 	if ($razon_social) {
 		$where .= " AND factura.cliente LIKE '%" . $razon_social . "%'";

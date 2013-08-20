@@ -1698,7 +1698,7 @@ class Factura extends Objeto {
 
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_cia
+		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
 		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
@@ -1747,8 +1747,8 @@ class Factura extends Objeto {
 			if ($id_contrato) {
 				$where .= " AND cobro.id_contrato=" . $id_contrato . " ";
 			}
-			if ($id_cia && ( method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza" )) {
-				$where .= " AND factura.id_cia = '$id_cia' ";
+			if ($id_estudio) {
+				$where .= " AND factura.id_estudio = '$id_estudio' ";
 			}
 			if ($id_cobro) {
 				$where .= " AND factura.id_cobro=" . $id_cobro . " ";
@@ -1920,7 +1920,7 @@ class Factura extends Objeto {
 
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_cia
+		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
 		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
@@ -1928,7 +1928,7 @@ class Factura extends Objeto {
 		,$tipo_documento_legal_buscado
 		, $codigo_cliente,$codigo_cliente_secundario
 		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
+		, $id_contrato, $id_estudio,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
