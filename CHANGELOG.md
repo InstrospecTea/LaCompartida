@@ -1,11 +1,24 @@
 # Changelog
 
-## Hotfix: 13.4.33
+## Hotfix: 13.4.38
+Lunes 19 de Agosto 2013
+* **Fixed:** [Editar un gasto en revision](https://github.com/LemontechSA/ttb/pull/266)
+
+## Hotfix: 13.4.37
+Viernes 16 de Agosto 2013
+* **Fixed:** [Corrige problema reporte resumen de liquidaciones con modalidad de cálculo antigua](https://github.com/LemontechSA/ttb/pull/264)
+
+## Hotfix: 13.4.36
+Lunes 12 de Agosto 2013
+* **Added:** [Agrega comportamiento "desasocia gastos de el cobro cuando este es eliminado"](https://github.com/LemontechSA/ttb/pull/263)
+
+## Hotfix: 13.4.35
 Jueves 08 de Agosto 2013
 * **Added:** [Agrega posibilidad de alineacion justificada en mantenedor factura pdf.](https://github.com/LemontechSA/ttb/pull/261)
 * **Fixed:** [Corrige monto Equivalente a en excel de cobro.](https://github.com/LemontechSA/ttb/pull/261)
+* **Added:** [Genera monto equivalente A como numero y no como formula, Corrige monto en cobro_xls](https://github.com/LemontechSA/ttb/pull/262)
 
-## Hotfix: 13.4.33
+## Hotfix: 13.4.34
 Miercoles 06 de Agosto 2013
 * **Fixed:** [Correccion monto en palabra decimal para santivañez.](https://github.com/LemontechSA/ttb/pull/259)
 
