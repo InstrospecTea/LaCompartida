@@ -9854,7 +9854,7 @@ QUERY;
 
 		case 7.40:
 			$queries = array();
-			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''";
+			$queries[] = "ALTER TABLE `usuario_reporte` CHANGE `reporte` `reporte` text CHARACTER SET latin1 COLLATE latin1_swedish_ci";
 			$queries[] = "CREATE TABLE IF NOT EXISTS `cliente_seguimiento` (
 										`id` int(11) NOT NULL AUTO_INCREMENT,
 										`codigo_cliente` varchar(10) NOT NULL,
@@ -9867,6 +9867,7 @@ QUERY;
 										KEY `codigo_cliente` (`codigo_cliente`)
 										) ENGINE=InnoDB;";
 
+			$queries[] = "SET foreign_key_checks=0;";
 			if (!ExisteLlaveForanea('cliente_seguimiento', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh)) {
 				$queries[] = "ALTER TABLE `cliente_seguimiento`
 			  	ADD CONSTRAINT `cliente_seguimiento_ibfk_1` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`)";
@@ -9876,6 +9877,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `cliente_seguimiento`
 					ADD CONSTRAINT `cliente_seguimiento_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`);";
 			}
+			$queries[] = "SET foreign_key_checks=1;";
 
 			ejecutar($queries, $dbh);
 			break;
@@ -9921,7 +9923,7 @@ QUERY;
 			$queries[]="CREATE TABLE IF NOT EXISTS `prm_estudio` (
 				`id_estudio` smallint(3) NOT NULL AUTO_INCREMENT,
 				`glosa_estudio` varchar(120) NOT NULL,
-				`metadata_estudio` text NOT NULL COMMENT 'Opcionalmente, este campo puede tener dirección, fono, etc de cada sub_estudio',
+				`metadata_estudio` text COMMENT 'Opcionalmente, este campo puede tener dirección, fono, etc de cada sub_estudio',
 				`visible` tinyint(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (`id_estudio`),
 				KEY `visible` (`visible`),
@@ -9931,7 +9933,7 @@ QUERY;
 			// Inserto como primera (y probablemente única) compañía, al nombre del estudio. Lo intento obtener de PdfLinea1, y si no del archivo Conf.
 			$NombreEstudio = trim(Conf::GetConf($sesion,'PdfLinea1')) ? Conf::GetConf($sesion,'PdfLinea1') : Conf::AppName();
 
-			$queries[] = "REPLACE INTO prm_estudio (id_estudio, glosa_estudio) VALUES (1, '$NombreEstudio')";
+			$queries[] = "REPLACE INTO prm_estudio (id_estudio, glosa_estudio, metadata_estudio) VALUES (1, '$NombreEstudio', '')";
 
 			if (!ExisteCampo('id_estudio', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD `id_estudio` INT( 3 ) NOT NULL DEFAULT '1' COMMENT 'Identidad del estudio que emite. Por defecto existe solo 1' ";
