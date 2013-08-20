@@ -9917,6 +9917,13 @@ QUERY;
 
 		case 7.42:
 			$queries = array();
+			$queries[] = "ALTER TABLE `tramite` ADD `solicitante` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL AFTER `id_usuario`";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.43:
+			$queries = array();
 
 			$queries[]="CREATE TABLE IF NOT EXISTS `prm_estudio` (
 				`id_estudio` smallint(3) NOT NULL AUTO_INCREMENT,
@@ -9953,7 +9960,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.42;
+$max_update = 7.43;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
