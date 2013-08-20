@@ -1693,21 +1693,6 @@ class NotaCobro extends Cobro {
 				break;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-				break;
-
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
@@ -4975,13 +4960,6 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
-				
-				if ($this->fields['opc_ver_solicitante']) {
-					$html = str_replace('%td_solicitante%', '<td align="left">%ordenado_por%</td>', $html);
-				} else {
-					$html = str_replace('%td_solicitante%', '', $html);
-				}
-
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
 				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
@@ -7918,7 +7896,6 @@ class NotaCobro extends Cobro {
                 $minutos_cobrables = sprintf("%02d", $asunto->fields['trabajos_total_duracion_trabajada'] % 60);
 
                 $html = str_replace('%glosa_tramites%', __('Total ' . __('Trámites')), $html);
-                //$html = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? '<td>&nbsp;</td>' : '', $html);
                 $html = str_replace('%glosa%', __('Total'), $html);
                 $minutos_decimal = $minutos_cobrables / 60;
                 $duracion_decimal = $horas_cobrables + $minutos_decimal;
