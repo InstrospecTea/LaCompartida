@@ -602,7 +602,13 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 						 <?php echo __('Asunto')?>
 				</td>
 				<td align=left width="440" nowrap>
-<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,320,"+CargarTarifa();");  ?>
+					<?php
+					$oncambio = '+CargarTarifa();';
+					if (Conf::GetConf($sesion,'UsoActividades')) {
+						$oncambio .= 'CargarActividad();';
+					}
+					UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
+					?>
 			 </td>
 		</tr>
 <?php
@@ -625,19 +631,22 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 <?php
 	}
 ?>
-		<?php if (Conf::GetConf($sesion,'UsoActividades')) { ?>
-		<tr>
-				<td colspan="2" align=right>
-						<?php echo __('Actividad')?>
-				</td>
-				<td align=left width="440" nowrap>
-						<?php echo  InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t->fields[codigo_actividad]) ?>
-				</td>
-		</tr>
-		<?php }else{ ?>
-		<input type="hidden" name="codigo_actividad" id="codigo_actividad">
-		<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
-<?php }
+
+<?php if (Conf::GetConf($sesion,'UsoActividades')) { ?>
+<tr>
+	<td colspan="2" align=right>
+		<?php echo __('Actividad'); ?>
+	</td>
+	<td align=left width="440" nowrap>
+		<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['asunto']); ?>
+	</td>
+</tr>
+<?php } else { ?>
+	<input type="hidden" name="codigo_actividad" id="codigo_actividad">
+	<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
+<?php } ?>
+
+<?php
 	// Mostrar este campo solo cuando sea un revisor
 	if (Conf::GetConf($sesion, 'ExportacionLedes') && $permiso_revisor->fields['permitido']) { ?>
 	<tr>
@@ -959,6 +968,10 @@ UtilesApp::GetConfJS($sesion, "TipoSelectCliente");
 UtilesApp::GetConfJS($sesion, 'IdiomaGrande');
 UtilesApp::GetConfJS($sesion,'PrellenarTrabajoConActividad');
 ?>
+
+function CargarActividad() {
+	CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+}
 
 function MostrarTrabajoTarifas() {
 	jQuery('#TarifaTrabajo').show();

@@ -102,7 +102,7 @@ if ($id_adelanto) {
 
 	$query_tipo_cambio = "select cm.tipo_cambio as tipo_cambio_cobro, ca.tipo_cambio as  tipo_cambio_adelanto
 		from cobro c
-		 join cobro_moneda cm on c.id_moneda_monto = cm.id_moneda and cm.id_cobro = $id_cobro
+		 join cobro_moneda cm on c.opc_moneda_total = cm.id_moneda and cm.id_cobro = $id_cobro
 		 join cobro_moneda ca on ca.id_moneda = " . $documento_adelanto->fields['id_moneda'] . "  and ca.id_cobro = $id_cobro
 		 where c.id_cobro = $id_cobro";
 
@@ -1083,7 +1083,6 @@ if ($id_adelanto) {
 	$b->mensaje_error_fecha = "N/A";
 	$b->nombre = "busc_facturas";
 	$b->titulo = __('Listado de') . ' ' . __('documentos legales');
-	$b->titulo .= "<table width=100%>";
 	$b->AgregarEncabezado("id_cobro", __('N° Cobro'), "align=center");
 	$b->AgregarEncabezado("numero", __('N° Documento'), "align=center");
 	$b->AgregarEncabezado("glosa_documento_legal", __('Tipo Documento'), "align=center");
