@@ -125,6 +125,7 @@ if ($opcion == "guardar") {
 		}
 		$factura->Edit('condicion_pago', '' . $condicion_pago);
 		$factura->Edit('iva', $iva);
+		$factura->Edit('id_estudio', $id_estudio);
 		$factura->Edit('total', '' . ($monto_neto + $iva));
 		$factura->Edit("id_factura_padre", $id_factura_padre ? $id_factura_padre : NULL);
 		$factura->Edit("fecha", Utiles::fecha2sql($fecha));
@@ -618,6 +619,24 @@ if ($buscar_padre) {
 				<td align="right"><?php echo __('Giro'); ?></td>
 				<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo ($factura->fields['giro_cliente'] ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']) ?>" id="giro_cliente" size="70" maxlength="255" /></td>
 			</tr>
+<?php
+	$estudios_array = PrmEstudio::GetEstudios($sesion);
+
+	// Si no viene de un POST puede ser nuevo o existente, si es nuevo ocupo el del $contrato
+	if (empty($id_estudio)) {
+		$id_estudio = !empty($factura->fields['id_estudio']) ? $factura->fields['id_estudio'] : $contrato->fields['id_estudio'];
+	}
+?>
+<?php if (count($estudios_array) > 1) { ?>
+			<tr>
+				<td align="right"><?php echo __('Companía') ?></td>
+				<td align="left" colspan="3">
+					<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio); ?>
+				</td>
+			</tr>
+<?php } else { ?>
+			<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+<?php } ?>
 		<tr>
 			<td align=right><?php echo __('Condición de Pago') ?></td>
 			<td align=left colspan=3>
@@ -813,8 +832,8 @@ foreach ($condiciones_pago as $vc => $cond) {
 									?>
 								<tr>
 									<td colspan=<?php echo $num_monedas ?> align=center>
-										<a href="javascript:void();" icon="ui-icon-save" onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))"><?php echo __('Guardar') ?></a>
-										<a href="javascript:void();" icon="ui-icon-exitl" onclick="CancelarDocumentoMonedaPago()"><?php echo __('Cancelar') ?></a>
+										<a href="javascript:void(0);" icon="ui-icon-save" onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))"><?php echo __('Guardar') ?></a>
+										<a href="javascript:void(0);" icon="ui-icon-exitl" onclick="CancelarDocumentoMonedaPago()"><?php echo __('Cancelar') ?></a>
 
 										<input type="hidden" id="tipo_cambios_factura" name="tipo_cambios_factura" value="<?php echo implode(',', $tipo_cambios) ?>" />
 										<input type="hidden" id="ids_monedas_factura" name="ids_monedas_factura" value="<?php echo implode(',', $ids_monedas) ?>" /></td>
@@ -829,11 +848,11 @@ foreach ($condiciones_pago as $vc => $cond) {
 	<table style="border: 0px solid #666;" width='95%'>
 		<tr>
 			<td align=left>
-				<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
-				<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
+				<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
+				<a class="btn botonizame"  href="javascript:void(0);" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
 									<?php if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
 
-					<a class="btn botonizame" href="javascript:void();" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
+					<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
 
 
 <?php } ?>
@@ -844,62 +863,59 @@ foreach ($condiciones_pago as $vc => $cond) {
 <script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 
 <script type="text/javascript">
-						var cantidad_decimales = <?php echo intval($cifras_decimales_opc_moneda_total); ?>;
-						var string_decimales = '<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>';
+	var cantidad_decimales = <?php echo intval($cifras_decimales_opc_moneda_total); ?>;
+	var string_decimales = "<?php echo str_pad('', $cifras_decimales_opc_moneda_total, '0'); ?>";
+	var porcentaje_impuesto = "<?php echo $porcentaje_impuesto; ?>";
+	var saldo_trabajos = "<?php echo $x_resultados['monto_trabajos'][$opc_moneda_total]; ?>";
+	var saldo_tramites = "<?php echo $x_resultados['monto_trabajos'][$opc_moneda_total]; ?>";
 
-<?php
-echo "var porcentaje_impuesto =" . $porcentaje_impuesto . ';';
-echo "\n var	saldo_trabajos = " . $x_resultados['monto_trabajos'][$opc_moneda_total] . ';';
-echo "\n var	saldo_tramites = " . $x_resultados['monto_tramites'][$opc_moneda_total] . ";\n";
-
-if ($id_cobro > 0) {
-	echo 'var	porcentaje_impuesto_gastos = ' . $cobro->fields['porcentaje_impuesto_gastos'] . ';';
-} else {
-	if ($cobro->fields['porcentaje_impuesto_gastos'] == 0 && (UtilesApp::GetConf($sesion, 'ValorImpuestoGastos'))) {
-		echo 'var porcentaje_impuesto_gastos = ' . UtilesApp::GetConf($sesion, 'ValorImpuestoGastos') . ';';
+	<?php
+	if ($id_cobro > 0) {
+		echo "var porcentaje_impuesto_gastos = '{$cobro->fields['porcentaje_impuesto_gastos']}';";
+	} else {
+		if ($cobro->fields['porcentaje_impuesto_gastos'] == 0 && (UtilesApp::GetConf($sesion, 'ValorImpuestoGastos'))) {
+			echo "var porcentaje_impuesto_gastos = '" . UtilesApp::GetConf($sesion, 'ValorImpuestoGastos') . "';";
+		}
 	}
-}
-?>
+	?>
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
-						function CargarDatosCliente()
-						{
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-							var id_origen = 'codigo_cliente_secundario';
-<?php } else { ?>
-							var id_origen = 'codigo_cliente';
-<?php } ?>
-							var accion = 'cargar_datos_contrato';
-							var id_contrato = "<?php echo $cobro->fields['id_contrato']; ?>";
-							var select_origen = document.getElementById(id_origen);
-							var rut = document.getElementById('RUT_cliente');
-							var cliente = document.getElementById('cliente');
-							var direccion_cliente = document.getElementById('direccion_cliente');
-							var comuna_cliente = document.getElementById('comuna_cliente');
-							var ciudad_cliente = document.getElementById('ciudad_cliente');
-							var giro_cliente = document.getElementById('giro_cliente');
-							var factura_codigopostal = document.getElementById('factura_codigopostal');
+	function CargarDatosCliente() {
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+			var id_origen = 'codigo_cliente_secundario';
+		<?php } else { ?>
+			var id_origen = 'codigo_cliente';
+		<?php } ?>
 
-<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
-							var descripcion_honorarios_legales = document.getElementById('descripcion_honorarios_legales');
-							var monto_honorarios_legales = document.getElementById('monto_honorarios_legales');
-							var monto_iva_honorarios_legales = document.getElementById('monto_iva_honorarios_legales');
-							var descripcion_gastos_con_iva = document.getElementById('descripcion_gastos_con_iva');
-							var monto_gastos_con_iva = document.getElementById('monto_gastos_con_iva');
-							var monto_iva_gastos_con_iva = document.getElementById('monto_iva_gastos_con_iva');
-	<?php	if (Conf::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') { ?>
-							var descripcion_gastos_sin_iva = document.getElementById('descripcion_gastos_sin_iva');
-							var monto_gastos_sin_iva = document.getElementById('monto_gastos_sin_iva');
-	<?php
-	}
-} else {
-	?>
-							var descripcion = document.getElementById('descripcion');
-	<?php
-}
-?>
-							var http = getXMLHTTP();
-							var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value + '&id_contrato=' + id_contrato;
+		var accion = 'cargar_datos_contrato';
+		var id_contrato = "<?php echo $cobro->fields['id_contrato']; ?>";
+		var select_origen = document.getElementById(id_origen);
+		var rut = document.getElementById('RUT_cliente');
+		var cliente = document.getElementById('cliente');
+		var direccion_cliente = document.getElementById('direccion_cliente');
+		var comuna_cliente = document.getElementById('comuna_cliente');
+		var ciudad_cliente = document.getElementById('ciudad_cliente');
+		var giro_cliente = document.getElementById('giro_cliente');
+		var factura_codigopostal = document.getElementById('factura_codigopostal');
+
+		<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+			var descripcion_honorarios_legales = document.getElementById('descripcion_honorarios_legales');
+			var monto_honorarios_legales = document.getElementById('monto_honorarios_legales');
+			var monto_iva_honorarios_legales = document.getElementById('monto_iva_honorarios_legales');
+			var descripcion_gastos_con_iva = document.getElementById('descripcion_gastos_con_iva');
+			var monto_gastos_con_iva = document.getElementById('monto_gastos_con_iva');
+			var monto_iva_gastos_con_iva = document.getElementById('monto_iva_gastos_con_iva');
+			<?php	if (Conf::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') { ?>
+			var descripcion_gastos_sin_iva = document.getElementById('descripcion_gastos_sin_iva');
+			var monto_gastos_sin_iva = document.getElementById('monto_gastos_sin_iva');
+			<?php
+			}
+		} else { ?>
+			var descripcion = document.getElementById('descripcion');
+		<?php } ?>
+
+		var http = getXMLHTTP();
+		var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value + '&id_contrato=' + id_contrato;
 
 							http.open('get', url, true);
 							http.onreadystatechange = function()
@@ -1591,6 +1607,4 @@ echo ($requiere_refrescar) ? $requiere_refrescar : '';
 <?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_javascript_after') : false; ?>
 </script>
 
-<?php
-$pagina->PrintBottom($popup);
-
+<?php $pagina->PrintBottom($popup); ?>

@@ -9914,6 +9914,36 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.42:
+			$queries = array();
+
+			$queries[]="CREATE TABLE IF NOT EXISTS `prm_estudio` (
+				`id_estudio` smallint(3) NOT NULL AUTO_INCREMENT,
+				`glosa_estudio` varchar(120) NOT NULL,
+				`metadata_estudio` text NOT NULL COMMENT 'Opcionalmente, este campo puede tener dirección, fono, etc de cada sub_estudio',
+				`visible` tinyint(1) NOT NULL DEFAULT '1',
+				PRIMARY KEY (`id_estudio`),
+				KEY `visible` (`visible`),
+				UNIQUE KEY `glosa_estudio` (`glosa_estudio`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Las empresas que componen el estudio. Por defecto es una sola: el estudio mismo.' AUTO_INCREMENT=1 ;";
+
+			// Inserto como primera (y probablemente única) compañía, al nombre del estudio. Lo intento obtener de PdfLinea1, y si no del archivo Conf.
+			$NombreEstudio = trim(Conf::GetConf($sesion,'PdfLinea1')) ? Conf::GetConf($sesion,'PdfLinea1') : Conf::AppName();
+
+			$queries[] = "REPLACE INTO prm_estudio (id_estudio, glosa_estudio) VALUES (1, '$NombreEstudio')";
+
+			if (!ExisteCampo('id_estudio', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD `id_estudio` INT( 3 ) NOT NULL DEFAULT '1' COMMENT 'Identidad del estudio que emite. Por defecto existe solo 1' ";
+				$queries[] = "ALTER TABLE `factura` ADD INDEX ( `id_estudio` )";
+			}
+
+			if (!ExisteCampo('id_estudio', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE `contrato` ADD `id_estudio` INT( 3 ) NOT NULL DEFAULT '1' COMMENT 'Identidad del estudio que emite. Por defecto existe solo 1' ";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9923,7 +9953,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.41;
+$max_update = 7.42;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
