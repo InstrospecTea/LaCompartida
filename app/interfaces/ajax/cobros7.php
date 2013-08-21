@@ -395,9 +395,8 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 																	<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a>
 																<?php } ?>
 																<img title="Ver pagos para este documento" src="<?php echo Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="MostrarVerDocumentosPagos(<?php echo $id_factura ?>);" border="0" alt="Examinar" />
-																<a href="../plugins/facturacion_electronica_mx.php?id_factura=<?php echo $id_factura; ?>" target="_factura_electronica">
-																	<img title="" src="<?php echo Conf::ImgDir() ?>/add_noticia16.gif" border="0" />
-																</a>
+
+																<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_cobros7_botones_after') : false; ?> 
 															</td>
 														</tr>
 														<tr>

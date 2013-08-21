@@ -1,18 +1,17 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-if (empty($_REQUEST['id_factura'])) {
-	die('Error de factura');
-}
+$Slim = Slim::getInstance('default',true);
 
-$id_factura = $_REQUEST['id_factura'];
+$Slim->hook('hook_cobros7_botones_after', 'AgregarBotonFacturaElectronica');
+$Slim->hook('hook_guardar_documento_pago', 'Guardar_Adelantos_Con_Usuario_Orden');
 
-$Sesion = new Sesion();
-$Factura = new Factura($Sesion);
-$Factura->Load($id_factura);
+function AgregarBotonFacturaElectronica() {
+	global $id_factura;
 
-if (!$Factura->Loaded()) {
-	die('Error, factura no existe');
+	echo '<a href="../plugins/facturacion_electronica_mx.php?id_factura=' . $id_factura . '" target="_factura_electronica">
+			<img src="' . Conf::ImgDir() . '/add_noticia16.gif" border="0" />
+		</a>';
 }
 
 if (empty($Factura->fields['dte_url_pdf'])) {
@@ -55,26 +54,26 @@ if (empty($Factura->fields['dte_url_pdf'])) {
 			$Factura->Edit('dte_url_pdf', $file_url);
 
 			if ($Factura->Write()) {
-				header("Location: $file_url;");
+				header("Location: $file_url");
 			}
 		} catch (Exception $ex) {
 			echo "<pre style='color: red;'>" . print_r($ex, true) . "</pre>";
 			// buu
 		}
 	} else {
-		// $result = $client->__soapCall('RecibirTXT', $datos);
+			// $result = $client->__soapCall('RecibirTXT', $datos);
 
-		header('Content-Type: text/html; charset=utf-8');
+			header('Content-Type: text/html; charset=utf-8');
 
-		echo "<pre style='color: green;'>" . utf8_decode(utf8_decode(print_r($result, true))) . "</pre>";
-		echo "<pre style='color: grey;'>" . htmlentities($client->__getLastRequest()) . "</pre>";
-		echo "<pre style='color: blue;'>" . htmlentities($client->__getLastResponse()) . "</pre>";
-		echo "<pre style='color: red;'>" . $return . "</pre>";
-		echo "<pre style='color: yellow;'>" . print_r($client->__getFunctions(), true) . "</pre>";
-		echo "<pre style='color: black;'>" . $strdocumento . "</pre>";
+			echo "<pre style='color: green;'>" . utf8_decode(utf8_decode(print_r($result, true))) . "</pre>";
+			echo "<pre style='color: grey;'>" . htmlentities($client->__getLastRequest()) . "</pre>";
+			echo "<pre style='color: blue;'>" . htmlentities($client->__getLastResponse()) . "</pre>";
+			echo "<pre style='color: red;'>" . $return . "</pre>";
+			echo "<pre style='color: yellow;'>" . print_r($client->__getFunctions(), true) . "</pre>";
+			echo "<pre style='color: black;'>" . $strdocumento . "</pre>";
 	}
 } else {
-	header("Location: {$Factura->fields['dte_url_pdf']};");
+	header("Location: {$Factura->fields['dte_url_pdf']}");
 }
 
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
