@@ -16,10 +16,14 @@
 
 	$tipo_ingreso = Conf::GetConf($sesion,'TipoIngresoHoras');
 	$actualizar_trabajo_tarifa = true;
+	$permiso_revisor_usuario = false;
 
 	if ($id_trabajo > 0) {
 		$actualizar_trabajo_tarifa = false;
 		$t->Load($id_trabajo);
+
+		// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+		$permiso_revisor_usuario = $sesion->usuario->Revisa($t->fields['id_usuario']);
 
 		if (($t->Estado() == 'Cobrado' || $t->Estado()== __("Cobrado"))&& $opcion != 'nuevo') {
 			$pagina->AddError(__('Trabajo ya cobrado'));
@@ -28,7 +32,7 @@
 			exit;
 
 		} else if (($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo') {
-			if (!$permiso_revisor->fields['permitido']) {
+			if (!$permiso_revisor->fields['permitido'] && !$permiso_revisor_usuario) {
 				$pagina->AddError(__('Trabajo ya revisado'));
 				$pagina->PrintTop($popup);
 				$pagina->PrintBottom($popup);
@@ -226,7 +230,7 @@
 				} else {
 					$t->Edit('descripcion', $descripcion);
 				}
-				
+
 				$cambio_fecha = strtotime($t->fields['fecha']) != strtotime(Utiles::fecha2sql($fecha));
 				$t->Edit('fecha', Utiles::fecha2sql($fecha));
 				// $t->Edit('fecha',$fecha);
@@ -282,11 +286,11 @@
 
 				/*
 				*	Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
-				* 
+				*
 				*   if ($t->fields['cobrable'] == 0) {
 				*		$t->fields['duracion_cobrada']='00:00:00';
 				*	}
-				*/   
+				*/
 
 				$ingreso_valido = true;
 				if ($cambio_duracion || $cambio_fecha) {
@@ -598,7 +602,13 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 						 <?php echo __('Asunto')?>
 				</td>
 				<td align=left width="440" nowrap>
-<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,320,"+CargarTarifa();");  ?>
+					<?php
+					$oncambio = '+CargarTarifa();';
+					if (Conf::GetConf($sesion,'UsoActividades')) {
+						$oncambio .= 'CargarActividad();';
+					}
+					UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
+					?>
 			 </td>
 		</tr>
 <?php
@@ -621,19 +631,22 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 <?php
 	}
 ?>
-		<?php if (Conf::GetConf($sesion,'UsoActividades')) { ?>
-		<tr>
-				<td colspan="2" align=right>
-						<?php echo __('Actividad')?>
-				</td>
-				<td align=left width="440" nowrap>
-						<?php echo  InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t->fields[codigo_actividad]) ?>
-				</td>
-		</tr>
-		<?php }else{ ?>
-		<input type="hidden" name="codigo_actividad" id="codigo_actividad">
-		<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
-<?php }
+
+<?php if (Conf::GetConf($sesion,'UsoActividades')) { ?>
+<tr>
+	<td colspan="2" align=right>
+		<?php echo __('Actividad'); ?>
+	</td>
+	<td align=left width="440" nowrap>
+		<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['asunto']); ?>
+	</td>
+</tr>
+<?php } else { ?>
+	<input type="hidden" name="codigo_actividad" id="codigo_actividad">
+	<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
+<?php } ?>
+
+<?php
 	// Mostrar este campo solo cuando sea un revisor
 	if (Conf::GetConf($sesion, 'ExportacionLedes') && $permiso_revisor->fields['permitido']) { ?>
 	<tr>
@@ -739,7 +752,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
 	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario", $id_usuario ,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 
-	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
+	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable') || $permiso_revisor_usuario) {
 
 		echo '<td class="seccioncobrable">&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td  class="seccioncobrable">';
 
@@ -955,6 +968,10 @@ UtilesApp::GetConfJS($sesion, "TipoSelectCliente");
 UtilesApp::GetConfJS($sesion, 'IdiomaGrande');
 UtilesApp::GetConfJS($sesion,'PrellenarTrabajoConActividad');
 ?>
+
+function CargarActividad() {
+	CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+}
 
 function MostrarTrabajoTarifas() {
 	jQuery('#TarifaTrabajo').show();

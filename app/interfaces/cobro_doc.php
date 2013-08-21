@@ -21,7 +21,6 @@ $pagina = new Pagina($Sesion);
 
 // Carga de datos del cobro
 $cobro = new NotaCobro($Sesion);
-//$cobro->Load(this->fields['id_cobro'];
 
 if (!$cobro->Load($id_cobro)) {
 	$pagina->FatalError('Cobro inválido');
@@ -33,6 +32,7 @@ $comma_separated = implode("','", $cobro->asuntos);
 if ($lang == '') {
 	$lang = 'es';
 }
+
 if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
 	$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
 } else {
@@ -43,6 +43,7 @@ require_once Conf::ServerDir() . "/lang/$lang_archivo";
 
 //Usa el segundo formato de nota de cobro
 //solo si lo tiene definido en el conf y solo tiene gastos
+
 $css_cobro = 1;
 $solo_gastos = true;
 
@@ -53,21 +54,22 @@ for ($k = 0; $k < count($cobro->asuntos); $k++) {
 				FROM trabajo AS t2
 				LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
 				WHERE t2.cobrable = 1
-				AND t2.codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'
-				AND cobro.id_cobro='" . $cobro->fields['id_cobro'] . "'";
+				AND t2.codigo_asunto='" . $asunto->fields['codigo_asunto'] . "' AND cobro.id_cobro='" . $cobro->fields['id_cobro'] . "'";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	list($total_monto_trabajado) = mysql_fetch_array($resp);
 	if ($asunto->fields['trabajos_total_duracion'] > 0) {
 		$solo_gastos = false;
 	}
 }
+
 if (method_exists('Conf', 'GetConf')) {
-	if ($solo_gastos && Conf::GetConf($Sesion, 'CSSSoloGastos'))
+	if ($solo_gastos && Conf::GetConf($Sesion, 'CSSSoloGastos')){
 		$css_cobro = 2;
-}
-else if (method_exists('Conf', 'CSSSoloGastos')) {
-	if ($solo_gastos && Conf::CSSSoloGastos())
+	}
+} else if (method_exists('Conf', 'CSSSoloGastos')) {
+	if ($solo_gastos && Conf::CSSSoloGastos()) {
 		$css_cobro = 2;
+	}
 }
 
 if (empty($cobro->fields['id_formato'])) {
@@ -75,7 +77,6 @@ if (empty($cobro->fields['id_formato'])) {
 } else {
 	$id_formato = $cobro->fields['id_formato'];
 }
-
 
 $html .= $cobro->GeneraHTMLCobro(false, $id_formato);
 $cssData = UtilesApp::TemplateCartaCSS($Sesion, $cobro->fields['id_carta']);
@@ -96,6 +97,7 @@ if (UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') && UtilesApp::GetConf($Sesio
 	$html .= $html2;
 	$cssData .= $cssData2;
 }
+
 // margenes 1.5, 2.0, 2.0, 2.0
 $orientacion_papel = UtilesApp::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
@@ -106,9 +108,7 @@ if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT',
 $doc = new DocGenerator($html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'], $orientacion_papel, $docm_top, $docm_right, $docm_bottom, $docm_left, $cobro->fields['estado'], $id_formato, '', $docm_header, $docm_footer, $lang, $Sesion);
 $valor_unico = substr(time(), -3);
 
-
 //echo '<style>'.$cssData.'</style>'.$html; exit;
-
 
 if ($enpdf) {
 	require_once '../dompdf/dompdf_config.inc.php';
@@ -124,40 +124,43 @@ if ($enpdf) {
 		list($img_archivo, $img_formato, $img_ancho, $img_alto, $img_x, $img_y) = explode("::", $encabezado_imagen);
 		list($texto_texto, $texto_tipografia, $texto_estilo, $texto_size, $texto_color, $texto_x, $texto_y, $bodystyle) = explode("::", $encabezado_texto);
 	}
-	if (substr($img_archivo, 0, 4) == 'http')
+	if (substr($img_archivo, 0, 4) == 'http'){
 		$img_dir = '';
+	}
+
 	ob_start();
+
 	if (isset($pdf)) {
 		$anchodoc = $pdf->get_width();
 	}
+
 	$margin_body = ceil(($img_alto + $img_y ) / 2) + 10;
+
 	?>
+
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		"http://www.w3.org/TR/html4/strict.dtd">
 	<html>
 		<head>
-			<style type="text/css">			
-	<?php echo $cssData; ?>
-				hr{
-					border: 0px;
-					border-top: 1px solid #999;
-					border-left: 1px solid #999;
-					height: 1px;
+			<style type="text/css">
+				<?php echo $cssData; ?>
+				hr{ border: 0px; border-top: 1px solid #999; border-left: 1px solid #999; height: 1px;
 				}
-				
+
 				table.tabla_normal tr.tr_total3 td {
 					border: 0px;
 					border-top: 1pt solid #999;
 				}
+
 			</style>
 		</head>
 		<body style="<?php echo $bodystyle; ?>">
 
+		<?php echo $html; ?>
 
-
-	<?php echo $html; ?>
 		</body>
 	</html>
+
 	<?php
 	$cambio_html = array("<br size=\"1\" class=\"separador_vacio_salto\">" => '<div style="page-break-after: always;"></div>');
 
@@ -168,11 +171,11 @@ if ($enpdf) {
 	$dompdf->set_paper(strtolower($cobro->fields['opc_papel']), 'portrait'); //letter, landscape
 	$dompdf->render();
 	$dompdf->stream('cobro_' . $id_cobro . '_' . $valor_unico . '.pdf');
-	#echo $html;
+
 } else {
 	$doc->output('cobro_' . $id_cobro . '_' . $valor_unico . '.doc');
-	//$doc->outputxml($xml, 'cobro_'.$id_cobro.'_' . $valor_unico . '.xml');
 }
+
 exit;
 
 

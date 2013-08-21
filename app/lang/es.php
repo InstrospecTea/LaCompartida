@@ -424,6 +424,7 @@ $_LANG['Categoria de'] = "Categoría de asunto";
 $_LANG['Idioma'] = "Idioma";
 $_LANG['Encargado'] = "Encargado";
 $_LANG['Solicitante'] = "Solicitante";
+$_LANG['solicitante'] = "Solicitante";
 $_LANG['Cobrable'] = "Cobrable";
 $_LANG['Actividades obligatorias'] = "Actividades obligatorias";
 $_LANG['Alertas'] = "Alertas";

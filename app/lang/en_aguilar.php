@@ -29,7 +29,6 @@ $_LANG['Nota de Cobro ACL'] = 'Debit Note';
 $_LANG['Trabajo'] = "Task";
 $_LANG['Trabajos'] = "Tasks";
 $_LANG['Total'] = "Total";
-$_LANG['Detalle Cobro'] = "Invoice Details";
 $_LANG['Servicios prestados'] = "Services";
 $_LANG['Profesional'] = "Professional";
 $_LANG['Detalle profesional'] = "Summary of fees";
@@ -809,7 +808,7 @@ $_LANG['Factura ACL'] = "Reference";
 $_LANG['Asociado'] = "Associate";
 $_LANG['Procurador'] = "Attorney";
 $_LANG['Socio'] = "Partner";
-$_LANG['Administrativo'] = "Administrative";  
+$_LANG['Administrativo'] = "Administrative";
 
 /* Olvidados */
 $_LANG['Categoría'] = "Category";

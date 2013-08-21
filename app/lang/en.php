@@ -305,6 +305,7 @@ $_LANG['Nota'] = "Note";
 $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'] = "Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
 $_LANG['Con Impuesto'] = "With Taxes";
 #Nota cobro Morales
+$_LANG['N°Trabajo'] = "Work ID";
 $_LANG['Atte'] = "Attn";
 $_LANG['Registro de Tiempo'] = "Time Records";
 $_LANG['POR SERVICIOS PROFESIONALES PRESTADOS'] = "FOR PROFESSIONAL SERVICES RENDERED";
@@ -361,7 +362,7 @@ $_LANG['Títulos Accionarios'] = "Share Certificates";
 $_LANG['Compra Bases de Licitación'] = "Purchase of bidding terms/ RFPs";
 $_LANG['Saldo aprovisionado restante tras Cobro #'] = "Balance remaining after invoice #";
 $_LANG['textoSolicitudCheque'] = "Please do not send checks to our office via regular mail. We will not be responsible for stolen checks. Additionally it is important to mention that sending checks via courier without complying with the formalities required by the Mexican Customs Authorities is considered as an infringement to the Customs Law that creates tax implications for the sender.";
-$_LANG['Liquidación'] = "Liquidation";
+$_LANG['Liquidación'] = "Bill";
 $_LANG['Impuesto'] = "Taxes";
 $_LANG['Nombre Asunto'] = "Matter Name";
 $_LANG['Resumen Asuntos'] = "Matter Summary";

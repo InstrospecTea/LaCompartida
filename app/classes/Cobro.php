@@ -713,6 +713,9 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 
 			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			
+			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			#Se ingresa la anotación en el historial
 			$his = new Observacion($this->sesion);

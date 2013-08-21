@@ -552,6 +552,12 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 				}
 
+				if ($lang == "en"){
+					$html = str_replace('%glosa_cobro_aguilar%', __('Debit Note details'), $html);
+				} else {
+					$html = str_replace('%glosa_cobro_aguilar%', __('Nota de Débito'), $html);
+				}
+
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -1687,21 +1693,6 @@ class NotaCobro extends Cobro {
 				break;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-				break;
-
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
@@ -2291,8 +2282,17 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+				$query = "SELECT SQL_CALC_FOUND_ROWS 
+							tramite.duracion,
+							tramite_tipo.glosa_tramite as glosa_tramite,
+							tramite.descripcion,
+							tramite.fecha,
+							tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.solicitante,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
 							FROM tramite
 							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
@@ -2335,6 +2335,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
 					$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
+					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
 					//muestra las iniciales de los profesionales
 					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $tramite->fields['nombre_usuario'], 4);
@@ -3317,6 +3318,7 @@ class NotaCobro extends Cobro {
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 
+		$espacio_conf = Conf::GetConf($this->sesion, 'ValorSinEspacio') ? '' : '&nbsp;';
 
 		if (!isset($parser->tags[$theTag]))
 			return;
@@ -3679,6 +3681,12 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 				}
 
+				if ($lang == "en"){
+					$html = str_replace('%glosa_cobro_aguilar%', __('Debit Note details'), $html);
+				} else {
+					$html = str_replace('%glosa_cobro_aguilar%', __('Nota de Débito'), $html);
+				}
+
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -3749,7 +3757,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%detalle_modalidad_lowercase%', $this->fields['opc_ver_modalidad'] == 1 && $this->fields['forma_cobro'] != 'ESCALONADA' ? $detalle_modalidad_lowercase : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
 				$html = str_replace('%periodo_cobro%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo Cobro'), $html);
-				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
+				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : __('Desde') . ' ' . Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%valor_periodo_fin%', ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '') ? '' : __('hasta') . ' ' . Utiles::sql2fecha($this->fields['fecha_fin'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%fecha_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : __('Fecha desde'), $html);
 				$html = str_replace('%fecha_ini_primer_trabajo%', __('Fecha desde'), $html);
@@ -4288,8 +4296,30 @@ class NotaCobro extends Cobro {
 					
 					$html = str_replace('%impuesto%', __('Impuesto'), $html);
 					$html = str_replace('%total%', __('Total'), $html);
+					$html = str_replace('%igv%', __('I.G.V.'), $html);
+					$html = str_replace('%servicios_prestados%', __('Servicios prestados'), $html);
+					$html = str_replace('%fecha_inicial%', __('Fecha desde'), $html);
+					$html = str_replace('%fecha_final%', __('Fecha hasta'), $html);
 
-					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="right" width="70%"><b>'. $monto_retainer .'</b></td><td align="right" width="20%">'. $valor_monto_contrato .'</td></tr>';
+					//	Se saca la fecha inicial según el primer trabajo para evitar que fecha desde sea 1969
+					$query = "SELECT fecha FROM trabajo WHERE id_cobro='" . $this->fields['id_cobro'] . "' AND visible='1' ORDER BY fecha LIMIT 1";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+					if (mysql_num_rows($resp) > 0) {
+						list($fecha_primer_trabajo) = mysql_fetch_array($resp);
+					} else {
+						$fecha_primer_trabajo = $this->fields['fecha_fin'];
+					}
+
+					if ($lang == 'en') {
+						$html = str_replace('%desde%', date('m/d/y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+						$html = str_replace('%hasta%', date('m/d/y', strtotime($this->fields['fecha_fin'])), $html);
+						} else {
+						$html = str_replace('%desde%', date('d-m-y', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? strtotime($fecha_primer_trabajo) : strtotime($this->fields['fecha_ini'])), $html);
+						$html = str_replace('%hasta%', date('d-m-y', strtotime($this->fields['fecha_fin'])), $html);
+					}
+
+					$tr_retainer .= '<tr class="tr_datos"><td width="10%">&nbsp;</td><td align="left" width="60%"><b>'. $monto_retainer .'</b></td><td align="right" width="30%">'. $valor_monto_contrato .'</td></tr>';
 
 					if ($this->fields['forma_cobro'] == 'RETAINER'){
 						$html = str_replace('%subtotal%', __('Subtotal Excesos'), $html);
@@ -4385,15 +4415,11 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumento2($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'DETALLE_TRAMITES': //GenerarDocumento
+			case 'DETALLE_TRAMITES': //GenerarDocumento2
 				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$aproximacion_tramites = number_format($this->fields['monto_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$valor_tramites = $aproximacion_tramites * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-				if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio') ) {
-				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] . number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				} else {
-				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] .' '. number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				}
+				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'DETALLE_GASTOS': //GenerarDocumento2
@@ -4403,13 +4429,11 @@ class NotaCobro extends Cobro {
 
 				$total_gastos_moneda = $x_cobro_gastos['gasto_total'];
 				$impuestos_total_gastos_moneda = $x_cobro_gastos['gasto_impuesto'];
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() )))
+				if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 					$total_gastos_moneda = $x_cobro_gastos['gasto_total'];
+				}
 				$impuestos_total_gastos_moneda = $x_cobro_gastos['gasto_impuesto'];
-				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))
-					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . ' ' . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				break;
 
@@ -4429,16 +4453,19 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%monedabase%', __('Equivalente a'), $html);
 					$html = str_replace('%total_pagar%', __('Total a Pagar'), $html);
 
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) || ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) ) && $contrato->fields['usa_impuesto_separado'] && (!( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) && !( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ) ))
+					if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado')
+						&& $contrato->fields['usa_impuesto_separado']
+						&& !Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 						$total_en_moneda -= $this->fields['impuesto'] * ($this->fields['tipo_cambio_moneda'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio']);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-						$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					else
-						$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					if ($this->EsCobrado())
+					}
+					
+					$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					
+					if ($this->EsCobrado()) {
 						$html = str_replace('%valor_honorarios_monedabase_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					else
+					} else {
 						$html = str_replace('%valor_honorarios_monedabase_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']] - $x_resultados['descuento'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					}
 				}
 				break;
 
@@ -4449,11 +4476,7 @@ class NotaCobro extends Cobro {
 					if (UtilesApp::GetConf($this->sesion, 'FormatoNotaCobroMTA')) {
 
 						$valor_honorarios = number_format($x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-						if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-							$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $valor_honorarios, $html);
-						} else {
-							$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . $valor_honorarios, $html);
-						}
+						$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . $valor_honorarios, $html);
 						$html = str_replace('%valor_descuento%', '', $html);
 						$html = str_replace('%porcentaje_descuento%', '', $html);
 						$html = str_replace('%descuento%', '', $html);
@@ -4466,49 +4489,36 @@ class NotaCobro extends Cobro {
 				$valor_honorarios = number_format($x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$valor_descuento = number_format($x_resultados['descuento'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$valor_honorarios_demo = $x_resultados['monto_trabajos'][$this->fields['id_moneda']];
-				if ($this->EsCobrado())
+				if ($this->EsCobrado()) {
 					$valor_descuento_demo = $x_resultados['descuento_honorarios'][$this->fields['id_moneda']];
-				else
-					$valor_descuento_demo = $x_resultados['descuento'][$this->fields['id_moneda']];
-
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-					$html = str_replace('%valor_honorarios_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($valor_honorarios_demo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					$html = str_replace('%valor_descuento_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($valor_descuento_demo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				} else {
-					$html = str_replace('%valor_honorarios_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($valor_honorarios_demo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					$html = str_replace('%valor_descuento_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($valor_descuento_demo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				}
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $valor_honorarios, $html);
-						$html = str_replace('%valor_descuento%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $valor_descuento, $html);
-					} else {
-						$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . $valor_honorarios, $html);
-						$html = str_replace('%valor_descuento%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . $valor_descuento, $html);
-					}
+					$valor_descuento_demo = $x_resultados['descuento'][$this->fields['id_moneda']];
 				}
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . number_format($this->fields['monto_subtotal'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto_subtotal'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_honorarios_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $espacio_conf . number_format($valor_honorarios_demo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_descuento_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $espacio_conf . number_format($valor_descuento_demo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+				if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
+					$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . $valor_honorarios, $html);
+					$html = str_replace('%valor_descuento%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . $valor_descuento, $html);
+				}
+
+				$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $espacio_conf . number_format($this->fields['monto_subtotal'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%descuento%', __('Descuento'), $html);
-				if ($x_resultados['monto_trabajos'][$this->fields['id_moneda']] > 0)
+
+				if ($x_resultados['monto_trabajos'][$this->fields['id_moneda']] > 0) {
 					$porcentaje_demo = ($x_resultados['descuento'][$this->fields['id_moneda']] * 100) / $x_resultados['monto_trabajos'][$this->fields['id_moneda']];
+				}
 				$html = str_replace('%porcentaje_descuento_demo%', ' (' . number_format($porcentaje_demo, 0) . '%)', $html);
-				if ($this->fields['monto_subtotal'] > 0)
+				
+				if ($this->fields['monto_subtotal'] > 0) {
 					$porcentaje = ($this->fields['descuento'] * 100) / $this->fields['monto_subtotal'];
+				}
 				$html = str_replace('%porcentaje_descuento%', ' (' . number_format($porcentaje, 0) . '%)', $html);
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_descuento%', $moneda->fields['simbolo'] . number_format($this->fields['descuento'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_descuento%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['descuento'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_descuento%', $moneda->fields['simbolo'] . $espacio_conf . number_format($this->fields['descuento'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%total_honorarios%', __('Total Honorarios'), $html);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . $espacio_conf . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'RESUMEN_CAP': //GenerarDocumento2
@@ -4518,16 +4528,10 @@ class NotaCobro extends Cobro {
 				//$monto_restante = $this->fields['monto_contrato'] -  $monto_trabajo_con_descuento;
 
 				$html = str_replace('%cap%', __('Total CAP'), $html);
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_cap%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->fields['monto_contrato'], $html);
-				else
-					$html = str_replace('%valor_cap%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . ' ' . $this->fields['monto_contrato'], $html);
+				$html = str_replace('%valor_cap%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $espacio_conf . $this->fields['monto_contrato'], $html);
 				$html = str_replace('%COBROS_DEL_CAP%', $this->GenerarDocumento2($parser, 'COBROS_DEL_CAP', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%restante%', __('Monto restante'), $html);
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $espacio_conf . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'COBROS_DEL_CAP': //GenerarDocumento2
@@ -4546,10 +4550,7 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 
 					$row = str_replace('%numero_cobro%', __('Cobro') . ' ' . $id_cobro, $row);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-						$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . number_format($monto_cap, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					else
-						$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($monto_cap, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $espacio_conf . number_format($monto_cap, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
 					$html .= $row;
 				}
@@ -4767,19 +4768,21 @@ class NotaCobro extends Cobro {
 
 					$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos') ) || ( method_exists('Conf', 'ParafoGastosSoloSiHayGastos') && Conf::ParafoGastosSoloSiHayGastos() )) {
-						if ($cont_gastos > 0)
+						if ($cont_gastos > 0) {
 							$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-						else
+						} else {
 							$row = str_replace('%GASTOS%', '', $row);
-					}
-					else
+						}
+					} else {
 						$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+					}
 
-					#especial mb
+					// especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0)
+					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0) {
 						$html .= $row;
+					}
 				}
 				break;
 
@@ -4828,12 +4831,13 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
 
-				if ($this->fields['opc_ver_columna_cobrable'])
+				if ($this->fields['opc_ver_columna_cobrable']) {
 					$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);  // tAndres Oestemer
-				else
+				} else {
 					$html = str_replace('%cobrable%', '', $html);
+				}
 
-				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )) {
+				if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
 					$query = "SELECT cat.glosa_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
@@ -4846,7 +4850,7 @@ class NotaCobro extends Cobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($categoria) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
-				} elseif (UtilesApp::GetConf($this->sesion, 'SepararPorUsuario')) {
+				} else if (UtilesApp::GetConf($this->sesion, 'SepararPorUsuario')) {
 					$query = "SELECT CONCAT(usuario.nombre,' ',usuario.apellido1),trabajo.tarifa_hh
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
@@ -4858,21 +4862,13 @@ class NotaCobro extends Cobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($abogado, $tarifa) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($abogado), $html);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-						$html = str_replace('%tarifa%', $moneda->fields['simbolo'] . number_format($tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					else
-						$html = str_replace('%tarifa%', $moneda->fields['simbolo'] . ' ' . number_format($tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				}
-				else
+					$html = str_replace('%tarifa%', $moneda->fields['simbolo'] . $espacio_conf . number_format($tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				} else {
 					$html = str_replace('%categoria_abogado%', '', $html);
+				}
 
 				//Por conf se ve si se imprime la duracion trabajada cuando el cobro este en estado creado tambien
-				if (method_exists('Conf', 'GetConf'))
-					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
-				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
-					$ImprimirDuracionTrabajada = Conf::ImprimirDuracionTrabajada();
-				else
-					$ImprimirDuracionTrabajada = false;
+				$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
 				/* Lo anchores con la extension _bmahj usa Bofill Mir y lo que hace es que llama a las columnas
 				  en la lista de trabajos igual como a las columnas en el resumen profesional */
@@ -4901,12 +4897,12 @@ class NotaCobro extends Cobro {
 
 					$html = str_replace('%duracion_trabajada%', __('Duración trabajada'), $html);
 					$html = str_replace('%duracion%', __('Duración cobrable'), $html);
-					if ($descontado)
+					if ($descontado) {
 						$html = str_replace('%duracion_descontada%', __('Duración descontada'), $html);
-					else
+					} else {
 						$html = str_replace('%duracion_descontada%', '', $html);
-				}
-				else if ($this->fields['opc_ver_horas_trabajadas']) {
+					}
+				} else if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
@@ -4925,25 +4921,23 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion%', __('Duración'), $html);
 				}
 				$html = str_replace('%duracion_tyc%', __('Duración'), $html);
+				
 				//Por conf se ve si se imprime o no el valor del trabajo
-				if (method_exists('Conf', 'GetConf'))
-					$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
-				else if (method_exists('Conf', 'ImprimirValorTrabajo'))
-					$ImprimirValorTrabajo = Conf::ImprimirValorTrabajo();
-				else
-					$ImprimirValorTrabajo = true;
-
-				if ($ImprimirValorTrabajo && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION')
+				$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
+			
+				if ($ImprimirValorTrabajo && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 					$html = str_replace('%valor%', '', $html);
-				else
+				} else {
 					$html = str_replace('%valor%', __('Valor'), $html);
+				}
 				$html = str_replace('%valor_siempre%', __('Valor'), $html);
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 
-				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1)
+				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 					$html = str_replace('%td_categoria%', '<td width="100" align="left">%categoria%</td>', $html);
-				else
+				} else {
 					$html = str_replace('%td_categoria%', '', $html);
+				}
 				$html = str_replace('%categoria%', __($this->fields['codigo_idioma'].'_Categoría'), $html);
 
 				if ($this->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
@@ -4966,7 +4960,6 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
-				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
 				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
@@ -4997,9 +4990,9 @@ class NotaCobro extends Cobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($categoria) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
-				}
-				else
+				} else {
 					$html = str_replace('%categoria_abogado%', '', $html);
+				}
 
 				//Por conf se ve si se imprime la duracion trabajada cuando el cobro este en estado creado tambien
 				//Por conf se ve si se imprime o no el valor del trabajo
@@ -5127,7 +5120,7 @@ class NotaCobro extends Cobro {
 					list($h_retainer, $m_retainer, $s_retainer) = split(":", $duracion_retainer);
 					list($ht, $mt, $st) = split(":", $duracion);
 
-					if ($this->fields['forma_cobro'] == 'RETAINER'){
+					/*if ($this->fields['forma_cobro'] == 'RETAINER'){
 						$horas = $h + $m / 60 + $s / 3600;
 						$horas_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
 						$horas_tarificadas = $horas - $horas_retainer;
@@ -5136,7 +5129,7 @@ class NotaCobro extends Cobro {
 
 						list($h, $m ,$s) = split(":",$horas_tarificadas_retainer);
 						$total_trabajo_importe = $tarifa_hh * $horas_tarificadas;
-					}
+					}*/
 
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
@@ -5234,13 +5227,8 @@ class NotaCobro extends Cobro {
 					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
 					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
-					if (method_exists('Conf', 'GetConf'))
-						$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
-					else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
-						$ImprimirDuracionTrabajada = Conf::ImprimirDuracionTrabajada();
-					else
-						$ImprimirDuracionTrabajada = false;
-
+					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
+				
 					if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 						$row = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $row);
 						if (UtilesApp::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -5310,21 +5298,16 @@ class NotaCobro extends Cobro {
 
 
 					if ($this->fields['opc_ver_columna_cobrable']) {
-						if ($trabajo->fields['cobrable'] == 1)
+						if ($trabajo->fields['cobrable'] == 1) {
 							$row = str_replace('%cobrable%', __('<td align="center">Si</td>'), $row);
-						else
+						} else {
 							$row = str_replace('%cobrable%', __('<td align="center">No</td>'), $row);
-					}
-					else
+						}
+					} else {
 						$row = str_replace('%cobrable%', __(''), $row);
+					}
 
-
-					if (method_exists('Conf', 'GetConf'))
-						$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
-					else if (method_exists('Conf', 'ImprimirValorTrabajo'))
-						$ImprimirValorTrabajo = Conf::ImprimirValorTrabajo();
-					else
-						$ImprimirValorTrabajo = true;
+					$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
 
 					if ($ImprimirValorTrabajo && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 						$row = str_replace('%valor%', '', $row);
@@ -5555,12 +5538,7 @@ class NotaCobro extends Cobro {
 				}
 				$html = str_replace('%ntrabajo%', __('&nbsp;'), $html);
 
-				if (method_exists('Conf', 'GetConf'))
-					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
-				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
-					$ImprimirDuracionTrabajada = Conf::ImprimirDuracionTrabajada();
-				else
-					$ImprimirDuracionTrabajada = false;
+				$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
 				$duracion_trabajada_total = ($asunto->fields['trabajos_total_duracion_trabajada']) / 60;
 				$duracion_cobrada_total = ($asunto->fields['trabajos_total_duracion']) / 60;
@@ -5572,10 +5550,11 @@ class NotaCobro extends Cobro {
 				} else {
 					$html = str_replace('%td_solicitante%', '', $html);
 				}
-				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1)
+				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 					$html = str_replace('%td_categoria%', '<td>&nbsp;</td>', $html);
-				else
+				} else {
 					$html = str_replace('%td_categoria%', '', $html);
+				}
 
 				if ($this->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 					$html = str_replace('%td_tarifa%', '<td>&nbsp;</td>', $html);
@@ -5663,38 +5642,25 @@ class NotaCobro extends Cobro {
 				}
 
 
-				if ($this->fields['opc_ver_columna_cobrable'] == 1)
+				if ($this->fields['opc_ver_columna_cobrable'] == 1) {
 					$html = str_replace('%cobrable%', __('<td>&nbsp;</td>'), $html);
-				else
+				} else {
 					$html = str_replace('%cobrable%', __(''), $html);
+				}
 
-				if (method_exists('Conf', 'GetConf'))
-					$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
-				else if (method_exists('Conf', 'ImprimirValorTrabajo'))
-					$ImprimirValorTrabajo = Conf::ImprimirValorTrabajo();
-				else
-					$ImprimirValorTrabajo = true;
-
+				$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
+			
 				$aproximacion_monto_cyc = number_format($this->fields['monto_subtotal'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$subtotal_en_moneda_cyc = $aproximacion_monto_cyc * ($cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio']);
-
 
 				if ($ImprimirValorTrabajo && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 					$html = str_replace('%valor%', '', $html);
 					$html = str_replace('%valor_cyc%', '', $html);
 				} else {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$html = str_replace('%valor_cyc%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($subtotal_en_moneda_cyc, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-						$html = str_replace('%valor%', $moneda->fields['simbolo'] . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					} else {
-						$html = str_replace('%valor_cyc%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($subtotal_en_moneda_cyc, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-						$html = str_replace('%valor%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					}
+					$html = str_replace('%valor_cyc%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($subtotal_en_moneda_cyc, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor%', $moneda->fields['simbolo'] . $espacio_conf . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $espacio_conf . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'TRAMITES_TOTAL': //GenerarDocumento2
@@ -5703,7 +5669,7 @@ class NotaCobro extends Cobro {
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion_trabajada']) / 60);
 				$minutos_cobrables = sprintf("%02d", $asunto->fields['trabajos_total_duracion_trabajada'] % 60);
 
-                $html = str_replace('%glosa_tramites%', __('Total') . ' ' . __('Trámites'), $html);
+				$html = str_replace('%glosa_tramites%', __('Total') . ' ' . __('Trámites'), $html);
 				$html = str_replace('%glosa%', __('Total'), $html);
 				$minutos_decimal = $minutos_cobrables / 60;
 				$duracion_decimal = $horas_cobrables + $minutos_decimal;
@@ -5711,19 +5677,15 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%duracion_tramites%', $horas_cobrables_tramites . ':' . $minutos_cobrables_tramites, $html);
 				$html = str_replace('%duracion%', $horas_cobrables . ':' . $minutos_cobrables, $html);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-					$html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . number_format($asunto->fields['tramites_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				} else {
-					$html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['tramites_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				}
+				$html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $espacio_conf . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $espacio_conf . number_format($asunto->fields['tramites_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'DETALLE_PROFESIONAL': //GenerarDocumento2
 				global $columna_hrs_retainer;
-				if ($this->fields['opc_ver_profesional'] == 0)
+				if ($this->fields['opc_ver_profesional'] == 0) {
 					return '';
+				}
 				$html = str_replace('%glosa_profesional%', __('Detalle profesional'), $html);
 				$html = str_replace('%detalle_tiempo_por_abogado%', __('Detalle tiempo por abogado'), $html);
 				$html = str_replace('%detalle_honorarios%', __('Detalle de honorarios profesionales'), $html);
@@ -5755,17 +5717,11 @@ class NotaCobro extends Cobro {
 
 				$impuesto_moneda_total = $x_resultados['monto_iva'][$this->fields['opc_moneda_total']];
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
-				// Mu?oz y Tamayo
+				// Muñoz y Tamayo
 				$impuesto_solo_honorarios = $x_resultados['monto_iva_hh'][$this->fields['opc_moneda_total']];
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_impuesto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($impuesto_solo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_impuesto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($impuesto_solo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_impuesto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($impuesto_solo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'ADELANTOS_FILAS': //GenerarDocumento2
@@ -6041,24 +5997,30 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%hrs_trabajadas_previo%', '', $row);
 						$row = str_replace('%horas_trabajadas_especial%', '', $row);
 						$row = str_replace('%horas_cobrables%', '', $row);
-						if ($this->fields['opc_ver_profesional_categoria'] == 1)
-							$row = str_replace('%categoria%', $data['glosa_categoria'], $row);
-						else
+						
+						if ($this->fields['opc_ver_profesional_categoria'] == 1) {
+							$row = str_replace('%categoria%', __($data['glosa_categoria']), $row);
+						} else {
 							$row = str_replace('%categoria%', '', $row);
-						//$row = str_replace('%horas_cobrables%', $horas_trabajadas.':'.sprintf("%02d",$minutos_trabajadas),$row);
-						#horas en decimal
-						if ($this->fields['forma_cobro'] == 'FLAT FEE')
+						}
+
+						if ($this->fields['forma_cobro'] == 'FLAT FEE'){
 							$row = str_replace('%horas%', number_format($data['duracion_cobrada'], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						else
+						} else {
 							$row = str_replace('%horas%', number_format($data['duracion_tarificada'], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						}
+							
 						$row = str_replace('%tarifa_horas%', $flatfee ? '' : number_format($data['tarifa'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%total_horas%', $flatfee ? '' : number_format($data['valor_tarificada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						if ($this->fields['opc_ver_horas_trabajadas'] && $data['duracion_trabajada'] && $data['duracion_trabajada'] != '0:00')
+						
+						if ($this->fields['opc_ver_horas_trabajadas'] && $data['duracion_trabajada'] && $data['duracion_trabajada'] != '0:00') {
 							$html .= $row;
-						else if ($data['duracion_cobrada'] && $data['duracion_cobrada'] != '0:00')
+						} else if ($data['duracion_cobrada'] && $data['duracion_cobrada'] != '0:00') {
 							$html .= $row;
+						}
 					}
 				}
+				
 				break;
 
 			case 'PROFESIONAL_TOTAL': //GenerarDocumento2
@@ -6289,12 +6251,10 @@ class NotaCobro extends Cobro {
 					return '';
 				$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
-				 if ($lang == 'es') {
+				if ($lang == 'es') {
 					 $html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
-					
 				} else {
 					 $html = str_replace('%glosa_gasto%', __('EXPENSES'), $html);
-					
 				}
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
@@ -6320,6 +6280,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%monto%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+				
+				$html = str_replace('%glosa_asunto%', __('Asunto'), $html);
 
 				if ($lang == 'es') {
 					$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);
@@ -6339,19 +6301,12 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%solicitante%', '', $html);
 				}
 
-				if ($cantidad_gastos_en_otra_moneda > 0 || !( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta') )) {
+				if ($cantidad_gastos_en_otra_moneda > 0 || !Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta')) {
 					$html = str_replace('%monto_original%', __('Monto'), $html);
 				} else {
 					$html = str_replace('%monto_original%', '', $html);
 				}
 
-				/*
-				 * Implementación Gastos con IVA y sin IVA
-				 * acordados en la reunión del 4/02/2011
-				 * JMBT
-				 *
-				 * Se utiliza funcion UtilesApp::ProcesaGastosCobro, instanciada en GeneraHTMLCobro
-				 */
 				if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
 					$html = str_replace('%td_monto_impuesto_total%', '<td style="text-align:center;">%monto_impuesto_total%</a>', $html);
 					$html = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $html);
@@ -6374,22 +6329,24 @@ class NotaCobro extends Cobro {
 
 				$row_tmpl = $html;
 				$html = '';
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararGastosPorAsunto') ) || ( method_exists('Conf', 'SepararGastosPorAsunto') && Conf::SepararGastosPorAsunto() ))) {
+				if (Conf::GetConf($this->sesion, 'SepararGastosPorAsunto')) {
 					if (!empty($asunto->fields['codigo_asunto']) && $asunto->separar_asuntos) {
 						$where_gastos_asunto = " AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'";
 					}
 				} else {
 					$where_gastos_asunto = "";
 				}
-				$query = "SELECT SQL_CALC_FOUND_ROWS *, prm_cta_corriente_tipo.glosa AS tipo_gasto
-				FROM cta_corriente
-				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-				WHERE id_cobro='" . $this->fields['id_cobro'] . "'
-					AND monto_cobrable > 0
-					AND cta_corriente.incluir_en_cobro = 'SI'
-					AND cta_corriente.cobrable = 1
-				$where_gastos_asunto
-				ORDER BY fecha ASC";
+				$query = "SELECT SQL_CALC_FOUND_ROWS
+						cta_corriente.*
+						, prm_cta_corriente_tipo.glosa AS tipo_gasto
+					FROM cta_corriente
+					LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
+					WHERE id_cobro = '{$this->fields['id_cobro']}'
+						AND monto_cobrable > 0
+						AND cta_corriente.incluir_en_cobro = 'SI'
+						AND cta_corriente.cobrable = 1
+					$where_gastos_asunto
+					ORDER BY fecha ASC";
 
 				$lista_gastos = new ListaGastos($this->sesion, '', $query);
 				$totales['total'] = 0;
@@ -6406,26 +6363,11 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%monto_moneda_total%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total_sin_simbolo%', '&nbsp;', $row);
 					$row = str_replace('%valor_codigo_asunto%', $detalle->fields['codigo_asunto'], $row);
-
-					/*
-					 * Implementación Gastos con IVA y sin IVA
-					 * acordados en la reunión del 4/02/2011
-					 * JMBT
-					 */
-					if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
-						//  $row = str_replace('%td_monto_impuesto_total%', '<td style="text-align:center;">%monto_impuesto_total%</a>', $row);
-						// $row = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $row);
-						$row = str_replace('%monto_impuesto_total%', '&nbsp;', $row);
-						$row = str_replace('%monto_moneda_total_con_impuesto%', '&nbsp;', $row);
-						//si no hay impuesto para los gastos, no dibujo esas celdas
-						$row = str_replace('%td_monto_impuesto_total%', '&nbsp;', $row);
-						$row = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $row);
-					} else {
-						$row = str_replace('%monto_impuesto_total%', '&nbsp;', $row);
-						$row = str_replace('%monto_moneda_total_con_impuesto%', '&nbsp;', $row);
-						$row = str_replace('%td_monto_impuesto_total%', '&nbsp;', $row);
-						$row = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $row);
-					}
+					$row = str_replace('%monto_impuesto_total%', '&nbsp;', $row);
+					$row = str_replace('%monto_moneda_total_con_impuesto%', '&nbsp;', $row);
+					$row = str_replace('%td_monto_impuesto_total%', '&nbsp;', $row);
+					$row = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $row);
+					$row = str_replace('%glosa_asunto%', '&nbsp;', $row);
 					$html .= $row;
 				}
 				$cont_gasto_egreso = 0;
@@ -6440,13 +6382,17 @@ class NotaCobro extends Cobro {
 				$monto_gastos_bruto_por_asunto = 0;
 
 				foreach ($x_cobro_gastos['gasto_detalle'] as $id_gasto => $detalle) {
-					if (UtilesApp::GetConf($this->sesion, 'SepararGastosPorAsunto') && $asunto->separar_asuntos && !empty($asunto->fields['codigo_asunto']) && $asunto->fields['codigo_asunto'] != $detalle['codigo_asunto']) {
+					if (Conf::GetConf($this->sesion, 'SepararGastosPorAsunto')
+						&& $asunto->separar_asuntos
+						&& !empty($asunto->fields['codigo_asunto'])
+						&& $asunto->fields['codigo_asunto'] != $detalle['codigo_asunto']) {
 						continue;
 					}
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($detalle['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%num_doc%', $detalle['numero_documento'], $row);
 					$row = str_replace('%tipo_gasto%', $detalle['tipo_gasto'], $row);
+					$row = str_replace('%glosa_asunto%', $detalle['glosa_asunto'], $row);
 
 					if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
 						$row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
@@ -6467,11 +6413,8 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%descripcion%', __($detalle['descripcion']), $row);
 						$row = str_replace('%descripcion_b%', __($detalle['descripcion']), $row); #Ojo, este no debería existir
 					}
-					if ($detalle['id_moneda'] != $this->fields['opc_moneda_total'] && ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta') )) {
-						if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-							$row = str_replace('%monto_original%', $cobro_moneda->moneda[$detalle['id_moneda']]['simbolo'] . number_format($detalle['monto_original'], $cobro_moneda->moneda[$detalle['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_miles']), $row);
-						else
-							$row = str_replace('%monto_original%', $cobro_moneda->moneda[$detalle['id_moneda']]['simbolo'] . ' ' . number_format($detalle['monto_original'], $cobro_moneda->moneda[$detalle['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_miles']), $row);
+					if ($detalle['id_moneda'] != $this->fields['opc_moneda_total'] && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta')) {
+						$row = str_replace('%monto_original%', $cobro_moneda->moneda[$detalle['id_moneda']]['simbolo'] . $espacio_conf . number_format($detalle['monto_original'], $cobro_moneda->moneda[$detalle['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_miles']), $row);
 					} else {
 						$row = str_replace('%monto_original%', '', $row);
 					}
@@ -6481,34 +6424,17 @@ class NotaCobro extends Cobro {
 					$monto_gastos_impuesto_por_asunto += $detalle['monto_total_impuesto'];
 					$monto_gastos_bruto_por_asunto += $detalle['monto_total_mas_impuesto'];
 
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					} else {
-						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					}
+					$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					
 					// El código de aquí a 10 lineas más abajo es inútil ya que los reemplazos se hacen el las lineas anteriores bajos las mismas condiciones
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . number_format($saldo_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					} else {
-						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					}
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					} else {
-						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-					}
-
+					$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($saldo_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+		
 					$row = str_replace('%monto_moneda_total_sin_simbolo%', number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					$row = str_replace('%valor_codigo_asunto%', $gasto->fields['codigo_asunto'], $row);
-					/*
-					 * Implementación Gastos con IVA y sin IVA
-					 * acordados en la reunión del 4/02/2011
-					 * JMBT
-					 */
+
 					if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
 						$row = str_replace('%td_monto_impuesto_total%', '<td style="text-align:center;">%monto_impuesto_total%</a>', $row);
 						$row = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $row);
@@ -6533,12 +6459,10 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td>&nbsp;</td>', $html);
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
-				 if ($lang == 'es') {
-					 $html = str_replace('%sub_total_gastos%', __('Sub total gastos'), $html);
-					
+				if ($lang == 'es') {
+					$html = str_replace('%sub_total_gastos%', __('Sub total gastos'), $html);
 				} else {
-					 $html = str_replace('%sub_total_gastos%', __('Sub total for expenses'), $html);
-					
+					$html = str_replace('%sub_total_gastos%', __('Sub total for expenses'), $html);
 				}
 				#$html = str_replace('%valor_total%', ''/*$cobro_moneda->fields['simbolo'].' '.number_format($totales['total_moneda_cobro'],$cobro_moneda->fields['cifras_decimales']*/,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 
@@ -6546,10 +6470,11 @@ class NotaCobro extends Cobro {
 				$id_moneda_base = Moneda::GetMonedaBase($this->sesion);
 
 				#$html = str_replace('%valor_total%', ''/*$cobro_moneda->fields['simbolo'].' '.number_format($totales['total_moneda_cobro'],$cobro_moneda->fields['cifras_decimales']*/,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-				if ($this->fields['id_moneda_base'] <= 0)
+				if ($this->fields['id_moneda_base'] <= 0) {
 					$tipo_cambio_cobro_moneda_base = 1;
-				else
+				} else {
 					$tipo_cambio_cobro_moneda_base = $cobro_moneda->moneda[$id_moneda_base]['tipo_cambio'];
+				}
 
 				#$gastos_moneda_total = ($totales['total']*($this->fields['tipo_cambio_moneda']/$this->fields['tipo_cambio_moneda_base']))/$this->fields['opc_moneda_total_tipo_cambio'];
 				#$gastos_moneda_total = ($totales['total']*($this->fields['tipo_cambio_moneda']/$tipo_cambio_cobro_moneda_base))/$tipo_cambio_moneda_total;
@@ -6560,14 +6485,10 @@ class NotaCobro extends Cobro {
 					$gastos_moneda_total = $x_cobro_gastos['gasto_total'];
 				}
 
-
-				$html = str_replace('%total_gastos_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($totales['total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%total_gastos_moneda_total%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($totales['total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				#$gastos_moneda_total = ($totales['total']*($moneda->fields['tipo_cambio']/$moneda_base->fields['tipo_cambio']))/$this->fields['opc_moneda_total_tipo_cambio'];
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-					$html = str_replace('%valor_total_monedabase%', $moneda_total->fields['simbolo'] . number_format($gastos_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
-					$html = str_replace('%valor_total_monedabase%', $moneda_total->fields['simbolo'] . ' ' . number_format($gastos_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_total_monedabase%', $moneda_total->fields['simbolo'] . $espacio_conf . number_format($gastos_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				$contr = new Contrato($this->sesion);
 				$contr->Load($this->fields['id_contrato']);
@@ -6575,20 +6496,11 @@ class NotaCobro extends Cobro {
 				if ($moneda_total->fields['id_moneda'] != $id_moneda_base) {
 					$html = str_replace('%glosa_total_moneda_base%', __('Total Moneda Base'), $html);
 					$gastos_moneda_total_contrato = ( $gastos_moneda_total * ( $cobro_moneda->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio'])) / $tipo_cambio_cobro_moneda_base;
-					if (method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio()) {
-						$html = str_replace(array('%valor_total_moneda_carta%', '%valor_total_monedabase%'), $cobro_moneda->moneda[$id_moneda_base]['simbolo'] . number_format($gastos_moneda_total_contrato, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					} else {
-						$html = str_replace(array('%valor_total_moneda_carta%', '%valor_total_monedabase%'), $cobro_moneda->moneda[$id_moneda_base]['simbolo'] . ' ' . number_format($gastos_moneda_total_contrato, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					}
+					$html = str_replace(array('%valor_total_moneda_carta%', '%valor_total_monedabase%'), $cobro_moneda->moneda[$id_moneda_base]['simbolo'] . $espacio_conf . number_format($gastos_moneda_total_contrato, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				} else {
 					$html = str_replace('%glosa_total_moneda_base%', '&nbsp;', $html);
 					$html = str_replace('%valor_total_moneda_carta%', '&nbsp;', $html);
 				}
-
-				/*
-				 * Calculo de gastos con impuesto
-				 * JMBT 10/02/2011
-				 */
 
 				if (UtilesApp::GetConf($this->sesion, 'SepararGastosPorAsunto') && !empty($asunto->fields['codigo_asunto']) && $asunto->separar_asuntos) {
 					$gasto_impuesto_moneda_total = $monto_gastos_impuesto_por_asunto;
@@ -6602,13 +6514,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_valor_impuesto_monedabase%', '<td style="text-align:center;">%valor_impuesto_monedabase%</a>', $html);
 					$html = str_replace('%td_valor_total_monedabase_con_impuesto%', '<td style="text-align:center;">%valor_total_monedabase_con_impuesto%</a>', $html);
 
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-						$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($gasto_bruto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					} else {
-						$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-						$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($gasto_bruto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-					}
+					$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($gasto_bruto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				} else {
 					$html = str_replace('%td_valor_impuesto_monedabase%', '', $html);
 					$html = str_replace('%td_valor_total_monedabase_con_impuesto%', '', $html);
@@ -6780,6 +6687,13 @@ class NotaCobro extends Cobro {
 				} else {
 					$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 				}
+
+				if ($lang == "en"){
+					$html = str_replace('%glosa_cobro_aguilar%', __('Debit Note details'), $html);
+				} else {
+					$html = str_replace('%glosa_cobro_aguilar%', __('Nota de Débito'), $html);
+				}
+				
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -7800,19 +7714,28 @@ class NotaCobro extends Cobro {
                 //Tabla de Trabajos.
                 //se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
                 //la duracion retainer.
-                $query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+                $query = "SELECT SQL_CALC_FOUND_ROWS 
+                			tramite.duracion,
+                			tramite_tipo.glosa_tramite as glosa_tramite,
+                			tramite.descripcion,
+                			tramite.fecha,
+                			tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.solicitante,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
-							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+						FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
+						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
                 $lista_tramites = new ListaTramites($this->sesion, '', $query);
 
@@ -7845,6 +7768,7 @@ class NotaCobro extends Cobro {
                     $row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
                     $row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
 
+                    $row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
                     //muestra las iniciales de los profesionales
                     list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);
@@ -8836,19 +8760,28 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+				$query = "SELECT SQL_CALC_FOUND_ROWS 
+							tramite.duracion,
+							tramite_tipo.glosa_tramite as glosa_tramite,
+							tramite.descripcion,
+							tramite.fecha,
+							tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.solicitante,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
-							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+						FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
+						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
 
@@ -8880,7 +8813,7 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
-
+					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
 					//muestra las iniciales de los profesionales
 					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);
@@ -10134,8 +10067,7 @@ class NotaCobro extends Cobro {
 
 		global $contrato;
 		global $cobro_moneda;
-
-
+		global $lang;
 
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
@@ -10155,12 +10087,14 @@ class NotaCobro extends Cobro {
 		$asunto->LoadByCodigo($this->asuntos[0]);
 		$asuntos = $asunto->fields['glosa_asunto'];
 		$i = 1;
+
 		while ($this->asuntos[$i]) {
 			$asunto_extra = new Asunto($this->sesion);
 			$asunto_extra->LoadByCodigo($this->asuntos[$i]);
 			$asuntos .= ', ' . $asunto_extra->fields['glosa_asunto'];
 			$i++;
 		}
+
 		$htmlplantilla = str_replace('%materia%', __('Materia'), $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $htmlplantilla);
@@ -10177,13 +10111,13 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%cliente%', __('Cliente'), $htmlplantilla);
 
 		$query = "SELECT glosa_cliente FROM cliente
-									WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
+					WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($glosa_cliente) = mysql_fetch_array($resp);
+		
 		$htmlplantilla = str_replace('%nombre_cliente%', $glosa_cliente, $htmlplantilla);
+		$htmlplantilla = str_replace('%factura_razon_social_o_nombre_cliente%', ( isset($contrato->fields['factura_razon_social']) && $contrato->fields['factura_razon_social'] != '') ? $contrato->fields['factura_razon_social'] : $glosa_cliente, $htmlplantilla);
 
-		$htmlplantilla = str_replace('%factura_razon_social_o_nombre_cliente%', ( isset($contrato->fields['factura_razon_social'])
-				&& $contrato->fields['factura_razon_social'] != '') ? $contrato->fields['factura_razon_social'] : $glosa_cliente, $htmlplantilla);
 		if ($this->fields['codigo_idioma'] == 'es') {
 			$htmlplantilla = str_replace('%fecha_liquidacion%', __('Fecha Liquidación'), $htmlplantilla);
 			$htmlplantilla = str_replace('%cliente_corporativo%', __('Cliente Corporativo'), $htmlplantilla);
@@ -10206,8 +10140,10 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%direccion_carta%', nl2br($direccion[0]), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut%', __('RUT'), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut_minuscula%', __('Rut'), $htmlplantilla);
-		if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '')
+		
+		if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '') {
 			$rut_split = explode('-', $contrato->fields['rut']);
+		}
 
 		$htmlplantilla = str_replace('%valor_rut_sin_formato%', $contrato->fields['rut'], $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_rut%', $rut_split[0] ? $this->StrToNumber($rut_split[0]) . "-" . $rut_split[1] : __(''), $htmlplantilla);
@@ -10215,26 +10151,27 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%giro_factura_valor%', $contrato->fields['factura_giro'], $htmlplantilla);
 		$htmlplantilla = str_replace('%contacto%', empty($contrato->fields['contacto']) ? '' : __('Contacto'), $htmlplantilla);
 		$htmlplantilla = str_replace('%atencion%', empty($contrato->fields['contacto']) ? '' : __('Atención'), $htmlplantilla);
+		
 		if (method_exists('Conf', 'GetConf')) {
 			if (Conf::GetConf($this->sesion, 'TituloContacto'))
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' :
-								$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
+				$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
 			else
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' : $contrato->fields['contacto'], $htmlplantilla);
-		}
-		else if (method_exists('Conf', 'TituloContacto')) {
+		} else if (method_exists('Conf', 'TituloContacto')) {
 			if (Conf::TituloContacto())
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' :
-								$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
+				$contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $htmlplantilla);
 			else
 				$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' : $contrato->fields['contacto'], $htmlplantilla);
-		}
-		else {
+		} else {
 			$htmlplantilla = str_replace('%valor_contacto%', empty($contrato->fields['contacto']) ? '' : $contrato->fields['contacto'], $htmlplantilla);
 		}
+
 		$htmlplantilla = str_replace('%atte%', empty($contrato->fields['contacto']) ? '' : '(' . __('Atte') . ')', $htmlplantilla);
 		$htmlplantilla = str_replace('%telefono%', empty($contrato->fields['fono_contacto']) ? '' : __('Teléfono'), $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_telefono%', empty($contrato->fields['fono_contacto']) ? '' : $contrato->fields['fono_contacto'], $htmlplantilla);
+		
 		if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
 									FROM factura
@@ -10270,8 +10207,15 @@ class NotaCobro extends Cobro {
 				$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
 			}
 		}
+
+		if ($lang =="en"){
+			$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
+		} else {	
+			$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+		}
 		
 		$htmlplantilla = str_replace('%fecha_especial%', $fecha_lang, $htmlplantilla);
+		$htmlplantilla = str_replace('%ciudad_fecha_ingles%', $ciudad_fecha_ingles, $htmlplantilla);
 
 		if ($contrato->fields['id_pais'] > 0) {
 			$query = "SELECT nombre FROM prm_pais

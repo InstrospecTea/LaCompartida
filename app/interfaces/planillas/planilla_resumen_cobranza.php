@@ -691,7 +691,7 @@
 				$x_monto_gastos = number_format($monto_gastos, $cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
 				$x_subtotal_gastos = number_format($monto_gastos, $cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
 				$x_monto_iva = number_format($monto_iva,$cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
-				$x_monto_honorarios_original = number_format($monto_honorarios_original, $cobro_moneda->moneda[$cobro['id_moneda']]['cifras_decimales_titulo'],'.','');
+				$x_monto_honorarios_original = number_format($monto_honorarios_original, $cobro_moneda->moneda[$cobro['id_moneda']]['cifras_decimales'],'.','');
 				$x_monto_cobro_original = $aproximacion_monto;
 				$x_monto_cobro_original_con_iva = $aproximacion_monto;
 			}
@@ -853,6 +853,23 @@
 	$pagina->titulo = __('Reporte Liquidaciones');
 	$pagina->PrintTop();
 ?>
+
+<script type="text/javascript">
+	
+	jQuery(function(){
+		jQuery("select option").attr( "title", "" );
+		jQuery("select option").each(function(i){
+				this.title = this.text;
+		})
+		});
+
+		
+		jQuery("select").tooltip({
+			left: 25
+	});
+
+</script>
+
 <form method=post name=formulario action="<?php echo $_server['php_self'];?>?xls=1">
 <input type=hidden name=horas_sql id=horas_sql value='<?php echo $horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
 <!-- Calendario DIV -->

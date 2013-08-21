@@ -1777,16 +1777,17 @@ class Factura extends Objeto {
 	}
 
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-		,$tipo_documento_legal_buscado
-		, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
-		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable ) {
+		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
+		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
-		if ($orden == "") {
-			$orden = "fecha DESC";
-		}
+		
+		// if ($orden == "") {
+		// 	$orden = "factura.fecha DESC";
+		// 	$orderby = " ORDER BY $orden ";
+		// }
 
 		if ($where == '') {
 			$where = 1;
@@ -1826,8 +1827,8 @@ class Factura extends Objeto {
 			if ($id_contrato) {
 				$where .= " AND cobro.id_contrato=" . $id_contrato . " ";
 			}
-			if ($id_cia && ( method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza" )) {
-				$where .= " AND factura.id_cia = '$id_cia' ";
+			if ($id_estudio) {
+				$where .= " AND factura.id_estudio = '$id_estudio' ";
 			}
 			if ($id_cobro) {
 				$where .= " AND factura.id_cobro=" . $id_cobro . " ";
@@ -1858,48 +1859,70 @@ class Factura extends Objeto {
 		}
 
 		$groupby = " GROUP BY factura.id_factura ";
-		$orderby = " ORDER BY factura.fecha ASC ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 				prm_documento_legal.codigo as tipo
-			   , numero
-			   , factura.serie_documento_legal
-			   , factura.codigo_cliente
-			   , cliente.glosa_cliente, contrato.id_contrato as idcontrato
+			  , factura.numero
+			  , factura.serie_documento_legal
+			  , factura.codigo_cliente
+			  , cliente.glosa_cliente
+			  , contrato.id_contrato as idcontrato
+			  , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
+							OR contrato.factura_razon_social IN ('',' ')
+							OR contrato.factura_razon_social IS NULL,
+						factura.cliente,
+						CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+					) as factura_rsocial
+			  , usuario.username AS encargado_comercial
+			  , factura.fecha
+			  , factura.descripcion
+			  , prm_estado_factura.codigo as codigo_estado
+			  , prm_estado_factura.glosa as estado
+			  , factura.id_cobro
+			  , cobro.codigo_idioma as codigo_idioma
+			  , prm_moneda.simbolo
+			  , prm_moneda.cifras_decimales
+			  , prm_moneda.tipo_cambio
+			  , factura.id_moneda
+			  , factura.honorarios
+			  , factura.subtotal
+			  , factura.subtotal_gastos
+			  , factura.subtotal_gastos_sin_impuesto
+			  , factura.iva
+			  , factura.total
+			  , '' as saldo_pagos
+			  , -cta_cte_fact_mvto.saldo as saldo
+			  , '' as monto_pagos_moneda_base
+			  , '' as saldo_moneda_base
+			  , factura.id_factura
+			  , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+			  , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
+			  , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+			  , factura.RUT_cliente";
 
-			   , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
-						OR contrato.factura_razon_social IN ('',' ')
-						OR contrato.factura_razon_social IS NULL,
-					factura.cliente,
-					CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
-				) as factura_rsocial
-			   , usuario.username AS encargado_comercial
-			   , fecha
-			   , usuario.username AS encargado_comercial
-			   , descripcion
-			   , prm_estado_factura.codigo as codigo_estado
-			   , prm_estado_factura.glosa as estado
-			   , factura.id_cobro
-			   , cobro.codigo_idioma as codigo_idioma
-			   , prm_moneda.simbolo
-			   , prm_moneda.cifras_decimales
-			   , prm_moneda.tipo_cambio
-			   , factura.id_moneda
-			   , factura.honorarios
-			   , factura.subtotal
-			   , factura.subtotal_gastos
-			   , factura.subtotal_gastos_sin_impuesto
-			   , factura.iva
-			   , total
-			   , '' as saldo_pagos
-			   , -cta_cte_fact_mvto.saldo as saldo
-			   , '' as monto_pagos_moneda_base
-			   , '' as saldo_moneda_base
-			   , factura.id_factura
-			   , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-			   , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
-			   , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-			   , factura.RUT_cliente ";
+			if ($opciones['mostrar_pagos']) {
+				$query .= ", (
+			  		SELECT SUM(ccfmn.monto)
+	  				FROM factura_pago AS fp
+						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+						WHERE ccfm2.id_factura = factura.id_factura
+						GROUP BY ccfm2.id_factura 
+			  	) AS pagos";
+			}
+
+			if ($opciones['mostrar_fecha_ultimo_pago']) {
+				$query .= ", (
+				  	SELECT MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
+	  				FROM factura_pago AS fp
+						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+						WHERE ccfm2.id_factura = factura.id_factura
+						GROUP BY ccfm2.id_factura 
+			  	) AS fecha_ultimo_pago";
+			}
 
 				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;
 
@@ -1976,17 +1999,16 @@ class Factura extends Objeto {
 
 
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
-		,$tipo_documento_legal_buscado
-		, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
-		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable) {
+		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
+		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 		,$tipo_documento_legal_buscado
 		, $codigo_cliente,$codigo_cliente_secundario
 		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
+		, $id_contrato, $id_estudio,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
