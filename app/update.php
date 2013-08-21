@@ -9968,7 +9968,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_url_pdf` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - URL PDF documento';";
 			}
 
-			$query[] = "INSERT IGNORE INTO configuracion (glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+			$queries[] = "INSERT IGNORE INTO configuracion (glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
 									VALUES ('FacturacionElectronicaUsuario', 'democfdi', 'string', 'Usuario para integración con facturación electrónica', 10, -1)
 											,  ('FacturacionElectronicaPassword', 'demo2011', 'string', 'Password para integración con facturación electrónica', 10, -1)";
 			ejecutar($queries, $dbh);
