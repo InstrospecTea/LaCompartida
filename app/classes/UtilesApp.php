@@ -2,7 +2,7 @@
 
 //Clase UtilesApp
 require_once dirname(__FILE__) . '/../conf.php';
- 
+
 class UtilesApp extends Utiles {
 
 	/**
@@ -57,7 +57,7 @@ class UtilesApp extends Utiles {
 			} else {
 				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width  );
 			}
-			
+
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if ($oncambio=='') {
@@ -2246,14 +2246,14 @@ HTML;
  * @param int $id   el id del elemento. Esto no acepta código alfanumérico, tiene que ser el id de la tabla.
  */
 	public static function LogDialog($sesion,$elemento,$id) {
-			
+
 				if( $sesion->usuario->TienePermiso('SADM') ) {
-						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";	
+						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";
 				}
 
 	}
 
-	public static function UploadToS3($name, $file) {
+	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
 		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
 
 		$s3 = new AmazonS3(array(
@@ -2266,7 +2266,8 @@ HTML;
 
 		$response = $s3->create_object($bucket, $name, array(
 			'body' => $file,
-			'acl' => AmazonS3::ACL_PUBLIC
+			'acl' => AmazonS3::ACL_PUBLIC,
+			'contentType' => $contentType
 		));
 
 		if ($response->isOK()) {

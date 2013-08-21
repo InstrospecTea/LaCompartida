@@ -4,7 +4,6 @@ require_once dirname(__FILE__) . '/../conf.php';
 $id_factura = $_REQUEST['id_factura_generar'];
 
 if (!$id_factura) {
-	#inicialización de SLIM
 	$Slim = Slim::getInstance('default',false);
 	$Slim->hook('hook_cobros7_botones_after', 'AgregarBotonFacturaElectronica');
 } else {
@@ -56,7 +55,7 @@ function GeneraFactura($id_factura) {
 
 				$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 				$file_data = base64_decode($result->documentopdf);
-				$file_url = UtilesApp::UploadToS3($file_name, $file_data);
+				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
 
 				$Factura->Edit('dte_url_pdf', $file_url);
 
