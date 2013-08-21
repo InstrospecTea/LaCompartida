@@ -248,28 +248,10 @@ if ($opcion == "guardar") {
 					$cobro->CambiarEstadoSegunFacturas();
 				}
 
-				$documento = new Documento($sesion);
-				$documento->LoadByCobro($id_cobro);
-
-				$valores = array(
-						$factura->fields['id_factura'],
-						$id_cobro,
-						$documento->fields['id_documento'],
-						$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-						$factura->fields['iva'],
-						$documento->fields['id_moneda'],
-						$documento->fields['id_moneda']
-				);
-
-				$query = "DELETE FROM factura_cobro WHERE id_factura = '" . $factura->fields['id_factura'] . "' AND id_cobro = '" . $id_cobro . "' ";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-				$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento)
-					VALUES ('" . implode("','", $valores) . "')";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
+				$cobro->AgregarFactura($factura);
 
 				if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
+					$documento = $cobro->DocumentoCobro();
 					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], array($factura->fields['id_factura'] => $factura->fields['total']));
 				}
 			}
