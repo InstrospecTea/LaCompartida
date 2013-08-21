@@ -60,7 +60,7 @@ function GeneraFactura($id_factura) {
 				$Factura->Edit('dte_url_pdf', $file_url);
 
 				if ($Factura->Write()) {
-					header("Location: $file_url");
+					DescargaFactura($Factura);
 				}
 			} catch (Exception $ex) {
 				echo "<pre style='color: red;'>" . print_r($ex, true) . "</pre>";
@@ -79,8 +79,18 @@ function GeneraFactura($id_factura) {
 				echo "<pre style='color: black;'>" . $strdocumento . "</pre>";
 		}
 	} else {
-		header("Location: {$Factura->fields['dte_url_pdf']}");
+		DescargaFactura($Factura);
 	}
+}
+
+function DescargaFactura(Factura $Factura) {
+	$url = $Factura->fields['dte_url_pdf'];
+	$headerURL = array_shift(explode('?', basename($url)));
+	header("Content-Transfer-Encoding: binary");
+	header("Content-Type: application/pdf");
+	header('Content-Description: File Transfer');
+	header("Content-Disposition: attachment; filename=".$headerURL);
+	readfile($url);
 }
 
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
@@ -170,7 +180,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 function AgregarBotonFacturaElectronica() {
 	global $id_factura;
 
-	echo '<a href="../plugins/facturacion_electronica_mx.php?id_factura_generar=' . $id_factura . '" target="_factura_electronica">
+	echo '<a href="../plugins/facturacion_electronica_mx.php?id_factura_generar=' . $id_factura . '" >
 			<img src="' . Conf::ImgDir() . '/add_noticia16.gif" border="0" />
 		</a>';
 }
