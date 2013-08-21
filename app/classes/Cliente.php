@@ -263,17 +263,29 @@ class Cliente extends Objeto {
 	}
 
 	function LoadByCodigo($codigo) {
-		$query = "SELECT id_cliente FROM cliente WHERE codigo_cliente='$codigo'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id) = mysql_fetch_array($resp);
-		return $this->Load($id);
+		$query = "SELECT * FROM {$this->tabla} WHERE codigo_cliente = '$codigo'";
+		return $this->LoadWithQuery($query);
 	}
 
 	function LoadByCodigoSecundario($codigo) {
-		$query = "SELECT id_cliente FROM cliente WHERE codigo_cliente_secundario='$codigo'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id) = mysql_fetch_array($resp);
-		return $this->Load($id);
+		$query = "SELECT * FROM {$this->tabla} WHERE codigo_cliente_secundario = '$codigo'";
+		return $this->LoadWithQuery($query);
+	}
+
+	function LoadByGlosa($glosa) {
+		$query = "SELECT * FROM {$this->tabla} WHERE glosa_cliente = '$glosa'";
+		return $this->LoadWithQuery($query);
+	}
+
+	// Esto debiera ir al framework
+	function LoadWithQuery($query) {
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+
+		if ($this->fields = mysql_fetch_assoc($resp))   {
+			$this->loaded = true;
+			return true;
+		}
+		return false;
 	}
 
 	function IntentaInsertar() {

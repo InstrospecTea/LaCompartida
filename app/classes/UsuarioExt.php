@@ -8,7 +8,7 @@ define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", 
 
 class UsuarioExt extends Usuario {
 
-	public static $llave_carga_masiva = CONCAT_RUT_DV_USUARIO;
+	public static $llave_carga_masiva = 'username';
 	public static $campos_carga_masiva = array(
 		CONCAT_RUT_DV_USUARIO => 'RUT', //todo: agregar tipo "rut" para validar? (solo si esta configurado como rut)
 		'nombre' => array(
