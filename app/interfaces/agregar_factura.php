@@ -251,6 +251,7 @@ if ($opcion == "guardar") {
 				$cobro->AgregarFactura($factura);
 
 				if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
+					$documento = $cobro->DocumentoCobro();
 					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], array($factura->fields['id_factura'] => $factura->fields['total']));
 				}
 			}

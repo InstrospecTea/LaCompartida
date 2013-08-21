@@ -713,7 +713,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 
 			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			
+
 			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
@@ -2783,9 +2783,14 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		);
 	}
 
-	function AgregarFactura(Factura $Factura) {
+	function DocumentoCobro() {
 		$Documento = new Documento($this->sesion);
 		$Documento->LoadByCobro($this->fields['id_cobro']);
+		return $Documento;
+	}
+
+	function AgregarFactura(Factura $Factura) {
+		$Documento = $this->DocumentoCobro();
 
 		$valores = array(
 			$Factura->fields['id_factura'],
