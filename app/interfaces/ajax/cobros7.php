@@ -53,18 +53,18 @@ if ($documento_cobro->LoadByCobro($id_cobro)) {
 
 if ($opc=='refrescar') {
 switch($cobro->fields['estado_contabilidad']):
-    case 'NO INFORMADO': 
+    case 'NO INFORMADO':
         $estado_c = __('Sin informar');
         $titulo_c = __('El Cobro no ha sido informado.');
-    break;    
-    case 'PARA INFORMAR': 
+    break;
+    case 'PARA INFORMAR':
         $estado_c = __('Para informar');
-        $titulo_c = __('El Cobro se ha informado a Contabilidad');									
+        $titulo_c = __('El Cobro se ha informado a Contabilidad');
     break;
     case 'PARA INFORMAR Y FACTURAR':
         $estado_c = __('Para informar y facturar');
         $titulo_c = __('El Cobro se ha informado a Contabilidad con la instrucción de facturar.');
-    break;									
+    break;
     case 'INFORMADO':
         $estado_c = __('Informado');
         $titulo_c = __('El Cobro ha sido requerido por Contabilidad');
@@ -80,7 +80,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|Estado 
 
 
 } else if ($opc=='listapagos') {
-		
+
 $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
 
     $retorno= '<tr style="height: 26px;">
@@ -89,10 +89,10 @@ $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobr
     $retorno.= __('Pago');
     $retorno.= '</td>		</tr>';
 
-								
+
 				if ($cobro->fields['incluye_honorarios'] == 1) {
 					if ($documento_cobro->fields['honorarios_pagados'] == 'SI') {
-										
+
 						$retorno.= '<tr>	<td align=left colspan="3" >';
                                                 $retorno.= __('Pago de Honorarios Completo');
                                                 $retorno.= '&nbsp;&nbsp;</td>	</tr>';
@@ -123,20 +123,20 @@ $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobr
 			$retorno.= '<tr><td colspan="3"><hr></td>	</tr>';
 			$lista_pagos = $documento_cobro->ListaPagos();
 			if ($lista_pagos) {
-						
+
                             $retorno.= '<tr><td align=left colspan="3">';
                             $retorno.= __("Lista de Documentos de Pago");
                             $retorno.= ':	<input type="hidden" id="hay_pagos" value="si"/></td></tr>';
                             $retorno.= $lista_pagos ;
                             $retorno.= '<tr><td colspan="3"><hr></td></tr>';
 
-                            } else { 
+                            } else {
 						$retorno.= '<input type="hidden" id="hay_pagos" value="no"/>';
-			    } 
-                            
+			    }
+
  $retorno.= '<tr><td colspan="3" align=center><img src="'.Conf::ImgDir().'/money_16.gif" border=0> <a href="javascript:void(0)" onclick="MostrarTipoCambio()" title="'. __('Tipo de Cambio del Documento de Cobro al ser pagado.') .'">'. __('Actualizar Tipo de Cambio') .'</a></td>	</tr>	<tr>	<td colspan="3" align=center>	&nbsp;	</td>	</tr>';
 
-					
+
 					$faltan_pagos = $cobro->fields['estado'] != 'INCOBRABLE' && ( $documento_cobro->fields['honorarios_pagados'] == 'NO' || $documento_cobro->fields['gastos_pagados'] == 'NO' );
 					$hay_adelantos = false;
 					if($faltan_pagos && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura')){
@@ -144,26 +144,26 @@ $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobr
 						$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
 						$hay_adelantos = $documento_cobro->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 					}
-					
+
 					if ($faltan_pagos && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-					
+
 					$retorno.= '	<tr>	<td colspan="3"><hr>	</td>		</tr><tr><td colspan="3" align=center>	';
 					 if($hay_adelantos) 	$retorno.= '<img src="'. Conf::ImgDir() .'/agregar.gif" border=0 /> <a href="javascript:void(0)" onclick="UsarAdelanto('.$pago_honorarios.','.$pago_gastos.')" title="'. __('Usar Adelanto') .'">'. __('Usar Adelanto') .'</a><br/><br/>';
 					$retorno.= '<img src="'. Conf::ImgDir() .'/agregar.gif" border=0 /> <a href="javascript:void(0)" onclick="AgregarPago()" title="'. __('Agregar Pago') .'">'. __('Agregar Pago') .'</a>';
-								
+
 					$retorno.= '</td></tr><tr><td colspan="3" align=center>&nbsp;	</td>	</tr>';
-					 } 
-                            
-                            
-                            
-			
-                     
+					 }
+
+
+
+
+
                             echo $retorno;
-    
+
 } else if ($opc == 'guardar' && ($opc_informar_contabilidad == 'parainfo' OR $opc_informar_contabilidad == 'parainfoyfacturar')) {
 
 	if($cobro->fields['estado_contabilidad']=='INFORMADO' && $opc_informar_contabilidad == 'parainfo' && $confirma==0) {
-            $mensajeinterno='Se ignora la orden porque el webservice cambia el estado a INFORMADO';  
+            $mensajeinterno='Se ignora la orden porque el webservice cambia el estado a INFORMADO';
         } else if($cobro->fields['estado_contabilidad']=='INFORMADO Y FACTURADO' && $opc_informar_contabilidad == 'parainfoyfacturar' && $confirma==0) {
               $mensajeinterno='Se ignora la orden porque el webservice cambia el estado a INFORMADO Y FACTURADO';
         } else if ($cobro->fields['estado_contabilidad']=='PARA INFORMAR' && $opc_informar_contabilidad == 'parainfo' &&  $confirma==0) {
@@ -176,23 +176,23 @@ $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobr
                 } else if($opc_informar_contabilidad == 'parainfoyfacturar') {
 			$cobro->Edit('estado_contabilidad','PARA INFORMAR Y FACTURAR');
                 }
-                
+
 	$cobro->Write();
         $mensajeinterno='Cambio Realizado';
         }
    switch($cobro->fields['estado_contabilidad']):
-    case 'NO INFORMADO': 
+    case 'NO INFORMADO':
         $estado_c = __('Sin informar');
         $titulo_c = __('El Cobro no ha sido informado.');
-    break;    
-    case 'PARA INFORMAR': 
+    break;
+    case 'PARA INFORMAR':
         $estado_c = __('Para informar');
-        $titulo_c = __('El Cobro se ha informado a Contabilidad');									
+        $titulo_c = __('El Cobro se ha informado a Contabilidad');
     break;
     case 'PARA INFORMAR Y FACTURAR':
         $estado_c = __('Para informar y facturar');
         $titulo_c = __('El Cobro se ha informado a Contabilidad con la instrucción de facturar.');
-    break;									
+    break;
     case 'INFORMADO':
         $estado_c = __('Informado');
         $titulo_c = __('El Cobro ha sido requerido por Contabilidad');
@@ -206,19 +206,19 @@ $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobr
 endswitch;
 echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mensajeinterno.'|'.$cobro->fields['nota_venta_contabilidad'];
 
-        
+
 } else if($opc=='cajafacturas') {
-		 
+
 		$idioma->Load($contrato->fields['codigo_idioma']);
 	$contrato->Load($cobro->fields['id_contrato']);
 
 
-	
+
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
-		
+
 									if ($cobro->fields['modalidad_calculo'] == 1) {
 										$saldo_honorarios = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
-								
+
 										$saldo_disponible_trabajos =  $saldo_trabajos =  $x_resultados['monto_trabajos'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
 										if($saldo_disponible_trabajos<0) {
 											$saldo_disponible_tramites = $saldo_tramites =  $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']]+$saldo_disponible_trabajos;
@@ -226,12 +226,12 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 										} else {
 											$saldo_disponible_tramites = $saldo_tramites =  $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']];
 										}
-										
-										
-									 
-										
-										
-										
+
+
+
+
+
+
 										} else {
 										if ($cobro->fields['porcentaje_impuesto'] > 0) {
 											$honorarios_original = $cobro->fields['monto_subtotal'] - $cobro->fields['descuento'];
@@ -265,53 +265,53 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 									if ($saldo_gastos_sin_impuestos < 0) {
 										$saldo_gastos_sin_impuestos = 0;
 									}
-								 
+
 	echo '<tr style="height: 26px;">
 										<td colspan="12" align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;" colspan=2>
 											<img src="'. Conf::ImgDir().'/imprimir_16.gif" border="0" alt="Imprimir"/> '.  __('Documentos Tributarios') ;
-											  if ( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') &&  $cobro->DiferenciaCobroConFactura() != '') { 
+											  if ( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') &&  $cobro->DiferenciaCobroConFactura() != '') {
 												echo '<span style="border: 1px solid #bfbfcf; color: #ffffff; background-color: #ff0000; float: right; padding: 2px">'. $cobro->DiferenciaCobroConFactura() .'</span>';
 												} ?>
 										</td>
 									</tr>
 									<tr>
-									<?php echo			
+									<?php echo
 												'<th>'.__('Tipo ').__('Documento').'</th>
 												<th>'.__('Número').'</th>
 												<th style="white-space:nowrap; width:78px;">'.__('Fecha').'</th>';
-									
+
 									echo			'<th>'.__('Honorarios').'</th>
 												<th>'. __('Gasto ').__('c/IVA') .'</th>
 												<th>'.  __('Gasto ').__('s/IVA') .'</th>';
 									echo			'<th>Impuesto</th>
 												<th>Total</th>
 												<th>Estado</th>
-												
+
 												<th>Saldo<br>por pagar</th>
 												<th>'.__('Agregar Pago').'</th>
 												<th>Acciones</th></tr>
-											
+
 													<tr style="background:#EFE;">
 														<td>'.__('Cobro').'</td>
-														
+
 										<td>'. $cobro->fields['id_cobro'] .'</td>
 														<td style="width:78px;">'. date('d-m-Y',strtotime($cobro->fields['fecha_emision'])).'</td>
 														<td>';
 	 echo $moneda_documento->fields['simbolo'].'&nbsp;'. number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ;
 	 echo '<input type="hidden" name="honorarios_total" id="honorarios_total" value="'. $saldo_honorarios .'" />
 														</td>';
-														
+
 	echo '<td>'. $moneda_documento->fields['simbolo'].'&nbsp;'. number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ;
 	echo 	'<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="'. $saldo_gastos_con_impuestos .'" /></td>';
-	
-	
+
+
 	 echo '<td>'.$moneda_documento->fields['simbolo'] .'&nbsp;'. number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 	echo '	<input type="hidden" name="gastos_sin_iva_total" id="gastos_sin_iva_total" value="'. $saldo_gastos_sin_impuestos .'" /></td>';
 
 	echo ' <td>';
-	 if ($cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0) {  
+	 if ($cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0) {
 		 echo $moneda_documento->fields['simbolo'] .'&nbsp;'. number_format($x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']], $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ;
-	  } 
+	  }
 	echo '</td>';
 echo '<td>	<b>'. $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($saldo_honorarios + $saldo_gastos_con_impuestos + $saldo_gastos_sin_impuestos + $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']], $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) .'</b>';
 echo '		</td>					<td/>						<td/>						<td/>				<td/>											</tr>';
@@ -363,9 +363,9 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 														?>
 														<tr bgcolor="<?php echo $fila++ % 2 ? '#f2f2ff' : '#ffffff' ?>">
 															<td><?php echo $tipo ?></td>
-														
+
 															<td style="width:78px;white-space:nowrap;"><?php   echo $factura->ObtenerNumero(null,null, null, true) ?></td>
-															 
+
 															<td><?php echo date('d-m-Y',strtotime($factura->fields['fecha'])); ?></td>
 															<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
 															<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
@@ -373,8 +373,8 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 															<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
 															<td><b><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_honorarios + $subtotal_gastos + $subtotal_gastos_sin_impuesto + $impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></b></td>
 															<td><?php echo $estado ?></td>
-															
-															 
+
+
 															<td align="right">
 		<?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format(-$saldo, $moneda_factura->fields['cifras_decimales'], $idioma->fieldls['separador_decimales'], $idioma->fields['separador_miles']) ?>
 		<?php $saldo_tmp = -$saldo; ?>
@@ -391,12 +391,21 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 																<?php if (UtilesApp::GetConf($sesion, 'ImprimirFacturaDoc')) { ?>
 																	<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir');" ><img src='<?php echo Conf::ImgDir() ?>/doc.gif' border="0" title="Descargar Word"/></a>
 																<?php } ?>
-																<?php if (UtilesApp::GetConf($sesion, 'ImprimirFacturaPdf')) { ?>
-																	<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a>
-																<?php } ?>
-																<img title="Ver pagos para este documento" src="<?php echo Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="MostrarVerDocumentosPagos(<?php echo $id_factura ?>);" border="0" alt="Examinar" />
+                                                                <?
+                                                                    $pdf_content = null;
+                                                                    if ($Slim = Slim::getInstance('default', true)) {
+                                                                        $Slim->applyHook('hook_cobros7_botones_after');
+                                                                    }
+                                                                    if (!$pdf_content) {
+                                                                        if (UtilesApp::GetConf($sesion, 'ImprimirFacturaPdf')) {
+                                                                            ?><a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a><?
+                                                                        }
+                                                                    } else {
+                                                                        echo($pdf_content);
+                                                                    }
+                                                                 ?>
 
-																<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_cobros7_botones_after') : false; ?> 
+																<img title="Ver pagos para este documento" src="<?php echo Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="MostrarVerDocumentosPagos(<?php echo $id_factura ?>);" border="0" alt="Examinar" />
 															</td>
 														</tr>
 														<tr>
@@ -538,7 +547,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 															<td/>
 															<td/>
 															<td/>
-															 
+
 															<td align="center">
 																<?php
 																echo $boton_pagar;
@@ -546,12 +555,11 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 																?>
 															</td><td/>
 														</tr>
-	<?php } 
-			
-	
+	<?php }
+
+
 }
 
 }
 die();
 
- 

@@ -179,8 +179,8 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 
 function AgregarBotonFacturaElectronica() {
 	global $id_factura;
-
-	echo '<a href="../plugins/facturacion_electronica_mx.php?id_factura_generar=' . $id_factura . '" >
-			<img src="' . Conf::ImgDir() . '/add_noticia16.gif" border="0" />
+	global $pdf_content;
+	$pdf_content = '<a href="../plugins/facturacion_electronica_mx.php?id_factura_generar=' . $id_factura . '" >
+			<img src="' . Conf::ImgDir() . '/pdf.gif" border="0" />
 		</a>';
 }
