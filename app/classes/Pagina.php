@@ -12,7 +12,7 @@ class Pagina extends \Pagina {
 			die('No Autorizado');
 		}
 
-		if ((method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaDisenoNuevo')) || (method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo())) {
+		if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaDisenoNuevo')) {
 			if (!$popup) {
 				require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/top_nuevo.php';
 			} else {
@@ -30,7 +30,7 @@ class Pagina extends \Pagina {
 	function PrintBottom($popup = false, $forzar_bottom_antiguo = false) {
 		echo '<script type="text/javascript"> var intervalo ='. Conf::GetConf($this->sesion, 'Intervalo') .';</script>';
 
-		if (((method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaDisenoNuevo')) || (method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo())) && $forzar_bottom_antiguo == false)  {
+		if ((method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaDisenoNuevo')) && $forzar_bottom_antiguo == false)  {
 			if (!$popup) {
 				require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/bottom_nuevo.php';
 			} else {
