@@ -550,6 +550,7 @@ class Reporte {
 						CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 						trabajo.fecha as fecha_final,
+						trabajo.solicitante as solicitante,
 						' . (in_array('mes_reporte', $this->agrupador) ? 'DATE_FORMAT(trabajo.fecha, \'%m-%Y\') as mes_reporte,' : '') . '
 						' . (in_array('dia_reporte', $this->agrupador) ? 'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,' : '') . '
 						' . (in_array('dia_corte', $this->agrupador) ? 'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,' : '') . '

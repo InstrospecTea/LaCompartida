@@ -180,3 +180,4 @@ sftp-config*
 *.sublime-project
 *.sublime-workspace
 .idea*
+config.ru

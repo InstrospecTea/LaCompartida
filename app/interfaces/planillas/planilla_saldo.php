@@ -189,9 +189,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_liquidaciones
 			WHERE
-				cliente.activo = 1 AND contrato.activo = 'SI' AND
-				d.tipo_doc = 'N' AND
-				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
+				cliente.activo = 1
+				AND contrato.activo = 'SI'
+				AND d.tipo_doc = 'N'
+				AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
 				$where_liquidaciones
 			ORDER BY fecha";
 
@@ -224,9 +225,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_adelantos
 			WHERE
-				cliente.activo = 1 AND contrato.activo = 'SI' AND
-				d.es_adelanto = 1 AND
-				d.saldo_pago < 0
+				cliente.activo = 1
+				AND (d.id_contrato IS NULL OR contrato.activo = 'SI')
+				AND d.es_adelanto = 1
+				AND d.saldo_pago < 0
 				$where_adelantos
 			ORDER BY fecha";
 
@@ -261,16 +263,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN prm_moneda moneda_gasto ON cc.id_moneda=moneda_gasto.id_moneda
 			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			INNER JOIN cliente ON cliente.codigo_cliente = cc.codigo_cliente
+			INNER JOIN asunto ON asunto.codigo_asunto = cc.codigo_asunto
+			INNER JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 			LEFT JOIN cobro ON cc.id_cobro = cobro.id_cobro
-			INNER JOIN contrato ON cliente.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_gastos
 			WHERE
-				cliente.activo = 1 AND contrato.activo = 'SI' AND
-				cc.cobrable = 1 AND
-				(cc.id_cobro IS NULL OR cobro.estado IN ('CREADO', 'EN REVISION')) AND
-				cc.id_neteo_documento IS NULL AND
-				cc.documento_pago IS NULL
+				cliente.activo = 1
+				AND contrato.activo = 'SI'
+				AND cc.cobrable = 1
+				AND (cc.id_cobro IS NULL OR cobro.estado IN ('CREADO', 'EN REVISION'))
+				AND cc.id_neteo_documento IS NULL
+				AND cc.documento_pago IS NULL
 				$where_gastos
 			ORDER BY fecha";
 
@@ -303,11 +307,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			r.glosa_cliente,
 			SUM(IF(r.tipo = '$texto_liquidaciones_por_pagar', r.monto_base, 0)) AS total_liquidaciones,
 			SUM(r.saldo_liquidaciones) AS saldo_liquidaciones,
-			SUM(IF(r.tipo = '$texto_gastos_por_liquidar', r.monto_base, 0)) AS total_gastos,
+			SUM(IF(r.tipo = '$texto_gastos_por_liquidar' OR r.tipo = '$texto_provisiones_por_liquidar', r.monto_base, 0)) AS total_gastos,
 			SUM(r.saldo_gastos) AS saldo_gastos,
-			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados' OR r.tipo = '$texto_provisiones_por_liquidar', r.monto_base, 0)) AS total_adelantos,
-			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.saldo_adelantos, IF(r.tipo = '$texto_provisiones_por_liquidar', r.saldo_gastos, 0)
-			)) AS saldo_adelantos,
+			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.monto_base, 0)) AS total_adelantos,
+			SUM(r.saldo_adelantos) AS saldo_adelantos,
 			0 AS total_total, -- total_liquidaciones + total_gastos + total_adelantos AS total_total,
 			0 AS saldo_total, -- saldo_liquidaciones + saldo_gastos + saldo_adelantos AS saldo_total
 			moneda_base AS simbolo_moneda
@@ -561,7 +564,10 @@ if ($_REQUEST['opcion'] == 'buscar') {
 	$color = $saldo_total < 0 ? 'red' : 'blue';
 	$resultado = '<span style="color: ' . $color . '">' . $moneda_base . ' ' . number_format($saldo_total, 2, ',', '.') . '</span>';
 
-	// echo '<pre style="text-align: left">' . print_r($query_liquidaciones, true) . "</pre>";
+	// echo '<pre style="text-align: left; color: red;">' . $query_gastos . "</pre>";
+	// echo '<pre style="text-align: left; color: blue;">' . $query_liquidaciones . "</pre>";
+	// echo '<pre style="text-align: left; color: green;">' . $query_adelantos . "</pre>";
+	// echo '<pre style="text-align: left; color: grey;">' . $query . "</pre>";
 
 	// echo '<div style="text-align: right; font-size: 2em;">Saldo total: ' . $resultado . '</h1>';
 }

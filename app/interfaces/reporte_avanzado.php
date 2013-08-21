@@ -124,7 +124,8 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'mes_reporte',
 		'dia_reporte',
 		'mes_emision',
-		'grupo_o_cliente'
+		'grupo_o_cliente',
+		'solicitante'
 	);
 } else {
 	$agrupadores = array(
@@ -146,7 +147,8 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'mes_reporte',
 		'dia_reporte',
 		'mes_emision',
-		'grupo_o_cliente'
+		'grupo_o_cliente',
+		'solicitante'
 	);
 }
 
