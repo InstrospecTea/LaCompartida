@@ -1,6 +1,6 @@
 <?php
 /**
- * Ofrece exportar las facturas al WS de Facturaci贸n electr贸nica M茅xico
+ * Ofrece exportar las facturas al WS de Facturaci髇 electr髇ica M閤ico
  *
  * @package The Time Billing
  * @subpackage Plugins
@@ -53,7 +53,7 @@ function AgregarBotonFacturaElectronica($hookArg) {
 	$Factura = $hookArg['Factura'];
 	$dte_exist = !is_null($Factura->fields['dte_fecha_creacion']);
 	if (!$dte_exist) {
-		$content = '<a title = "Generar Factura Electr贸nica" class = "factura-electronica" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
+		$content = '<a title = "Generar Factura Electr髇ica" class = "factura-electronica" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
 			<img src="' . Conf::ImgDir() . '/invoice.png" border="0" />
 		</a>';
 	} else {
@@ -118,7 +118,7 @@ function GeneraFacturaElectronica($hookArg) {
 //
 // $strdocumento = 'COM|||version|3.2||serie|WS||folio|15||fecha|2013-07-18T10:14:49||formaDePago|PAGO EN UNA SOLA EXHIBICION||TipoCambio|1.000||condicionesDePago|EFECTOS FISCALES AL PAGO||subTotal|425.00||Moneda|MX||total|493.00||tipoDeComprobante|ingreso||metodoDePago|PAGO NO IDENTIFICADO||LugarExpedicion|MEXICO DISTRITO FEDERAL||NumCtaPago|1234||descuento|0.00||motivoDescuento|desc
 // REF|||Regimen|REGIMEN GENERAL DE LEY PERSONAS MORALES
-// REC|||rfc|DNM070221BS4||nombre|DISE脙鈥極S NAOMI MEXICO, S.A. DE C.V.
+// REC|||rfc|DNM070221BS4||nombre|DISE褉極S NAOMI MEXICO, S.A. DE C.V.
 // DOR|||calle|JOSE MARIA IZAZAGA # 50 DESP 101 1ER PISO||noExterior|51||colonia|CENTRO||municipio|CUAHUTEMOC||estado|MEXICO, D.F.||pais|MEXICO||codigopostal|06000
 // CON|||cantidad|850||unidad|M||noIdentificacion|6XO959455C-BRU||descripcion|COLA DE RATA X  METRO||valorUnitario|0.50||descuento|0||importe|425.00
 // CUP|||numero|A-1234
@@ -141,13 +141,13 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
 			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'Moneda|' . $monedas[$Factura->fields['id_moneda']]['codigo'],
-			'metodoDePago|' . 'Dep贸sito en Cuenta',
+			'metodoDePago|' . 'Dep髎ito en Cuenta',
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
-			'LugarExpedicion|' . 'M茅xico Distrito Federal',
+			'LugarExpedicion|' . 'M閤ico Distrito Federal',
 			'tipoDeComprobante|ingreso'
 		),
 		'REF' => array(
-			'Regimen|' . 'Persona f铆sica r茅gimen general'
+			'Regimen|' . 'Persona f韘ica r間imen general'
 		),
 		'REC' => array(
 			'rfc|' . 'DNM070221BS4', //$Factura->fields['RUT_cliente'],
