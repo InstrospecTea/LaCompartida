@@ -1294,6 +1294,7 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
 
         return false;
     }
+<?php  ($Slim=Slim::getInstance()) ? $Slim->applyHook('hook_cobro6_javascript_after') : false; ?>
 </script>
 <br />
 <?php
