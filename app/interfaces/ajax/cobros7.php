@@ -1,25 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/classes/PaginaCobro.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/CobroMoneda.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/../app/classes/Observacion.php';
-require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
-require_once Conf::ServerDir() . '/../app/classes/Factura.php';
-require_once Conf::ServerDir() . '/../app/classes/FacturaPago.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/FacturaPdfDatos.php';
 
 header('Content-type: text/html; charset=iso-8859-1');
 
 $sesion = new Sesion(array('COB'));
-
 
 $cobro = new Cobro($sesion);
 $contrato = new Contrato($sesion);
@@ -289,7 +273,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 
 												<th>Saldo<br>por pagar</th>
 												<th>'.__('Agregar Pago').'</th>
-												<th>Acciones</th></tr>
+												<th style="width:82px;">Acciones</th></tr>
 
 													<tr style="background:#EFE;">
 														<td>'.__('Cobro').'</td>
@@ -392,16 +376,16 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 																	<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir');" ><img src='<?php echo Conf::ImgDir() ?>/doc.gif' border="0" title="Descargar Word"/></a>
 																<?php } ?>
                                                                 <?
-                                                                    $pdf_content = null;
+                                                                    $data = array('Factura' => $factura);
                                                                     if ($Slim = Slim::getInstance('default', true)) {
-                                                                        $Slim->applyHook('hook_cobros7_botones_after');
+                                                                        $Slim->applyHook('hook_cobros7_botones_after', &$data);
                                                                     }
-                                                                    if (!$pdf_content) {
+                                                                    if (!($data && $data['content'])) {
                                                                         if (UtilesApp::GetConf($sesion, 'ImprimirFacturaPdf')) {
                                                                             ?><a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a><?
                                                                         }
                                                                     } else {
-                                                                        echo($pdf_content);
+                                                                        echo($data['content']);
                                                                     }
                                                                  ?>
 

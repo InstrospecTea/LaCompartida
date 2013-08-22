@@ -544,7 +544,61 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
+$Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
+	if (isset($id)) {
+		$Invoice = new Factura($Session);
+		$Invoice->Load($id);
+		if (!$Invoice->Loaded()) {
+			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+		}	else {
+			$data = array('Factura' => $Invoice);
+			$Slim->applyHook('hook_genera_factura_electronica', &$data);
+			$error = $data['Error'];
+			if ($error) {
+				halt($error['Message'] ? $error['Message'] : __($error['Code']), $error['Code']);
+			} else {
+				outputJson(array('invoice_url' => $data['InvoiceURL']));
+			}
+		}
+	} else {
+		halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+	}
+});
+
+$Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
+	$format = is_null($Slim->request()->params('format')) ? 'pdf' : $Slim->request()->params('format');
+	if (isset($id)) {
+		$Invoice = new Factura($Session);
+		$Invoice->Load($id);
+		if (!$Invoice->Loaded()) {
+			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+		}	else {
+			if ($format == 'pdf') {
+				$url = $Invoice->fields['dte_url_pdf'];
+				$name = array_shift(explode('?', basename($url)));
+				downloadFile($name, 'application/pdf', file_get_contents($url));
+			} else {
+				if ($format == 'xml') {
+					downloadFile("invoice_$id.xml", 'text/xml', $Invoice->fields['dte_xml']);
+				} else {
+					halt(__("Invalid document format"), "InvalidDocumentFormat");
+				}
+			}
+		}
+	} else {
+		halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+	}
+});
+
 $Slim->run();
+
+function downloadFile($name, $type, $content) {
+	header("Content-Transfer-Encoding: binary");
+	header("Content-Type: $type");
+	header('Content-Description: File Transfer');
+	header("Content-Disposition: attachment; filename=$name");
+	echo $content;
+}
 
 function validateAuthTokenSendByHeaders() {
 	global $Session, $Slim;

@@ -829,7 +829,7 @@ foreach ($condiciones_pago as $vc => $cond) {
 	<br>
 	<table style="border: 0px solid #666;" width='95%'>
 		<tr>
-			<td align=left>
+			<td id="botones_factura" align=left>
 				<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void(0);" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
 									<?php if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>

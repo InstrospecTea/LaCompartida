@@ -1,47 +1,84 @@
 <?php
+/**
+ * Ofrece exportar las facturas al WS de Facturación electrónica México
+ *
+ * @package The Time Billing
+ * @subpackage Plugins
+ */
+
 require_once dirname(__FILE__) . '/../conf.php';
+$Slim = Slim::getInstance('default', true);
 
-$id_factura = $_REQUEST['id_factura_generar'];
+$Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
+$Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
+$Slim->hook('hook_cobros7_botones_after',  function($hookArg) {
+	return AgregarBotonFacturaElectronica($hookArg);
+});
+$Slim->hook('hook_genera_factura_electronica', function($hookArg) {
+	return GeneraFacturaElectronica($hookArg);
+});
 
-if (!$id_factura) {
-	$Slim = Slim::getInstance('default',false);
-	$Slim->hook('hook_cobros7_botones_after', 'AgregarBotonFacturaElectronica');
-} else {
-	GeneraFactura($id_factura);
+function InsertaJSFacturaElectronica() {
+	echo 'jQuery(document).on("click", ".factura-electronica", function() {
+		var self = jQuery(this);
+		var id_factura = self.data("factura");
+		var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:85px;height:20px;margin-left:-80px;"});
+		self.parent().append(loading);
+		jQuery.ajax({url: root_dir + "/api/index.php/invoices/" + id_factura +  "/build",
+			type: "POST"
+		}).success(function(data) {
+			loading.remove();
+			var img = jQuery("<img />").attr("src", "' . Conf::ImgDir() . '/pdf.gif");
+			self.removeClass("factura-electronica").addClass("factura-documento").attr("title", "").html(img);
+			window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=pdf"
+		}).error(function(error_data){
+			loading.remove();
+			response = JSON.parse(error_data.responseText);
+			if (response.errors) {
+				error_message = response.errors[0].message;
+				alert(error_message);
+			}
+		});
+	});';
+
+	echo 'jQuery(document).on("click", ".factura-documento", function() {
+		var self = jQuery(this);
+		var id_factura = self.data("factura");
+		var format = self.data("format") || "pdf";
+		window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
+	});';
 }
 
-function GeneraFactura($id_factura) {
-
-	$Sesion = new Sesion();
-	$Factura = new Factura($Sesion);
-	$Factura->Load($id_factura);
-
-	if (!$Factura->Loaded()) {
-		die('Error, factura no existe');
+function AgregarBotonFacturaElectronica($hookArg) {
+	$Factura = $hookArg['Factura'];
+	$dte_exist = !is_null($Factura->fields['dte_fecha_creacion']);
+	if (!$dte_exist) {
+		$content = '<a title = "Generar Factura Electrónica" class = "factura-electronica" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
+			<img src="' . Conf::ImgDir() . '/invoice.png" border="0" />
+		</a>';
+	} else {
+		$content = '<a class = "factura-documento" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
+			<img src="' . Conf::ImgDir() . '/pdf.gif" border="0" />
+		</a>
+		<a class = "factura-documento" data-format = "xml" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
+			<img src="' . Conf::ImgDir() . '/xml.gif" border="0" />
+		</a>';
 	}
+	$hookArg['content'] = $content;
+	return $hookArg;
+}
 
-	if (empty($Factura->fields['dte_url_pdf'])) {
+function GeneraFacturaElectronica($hookArg) {
+	$Sesion = new Sesion();
+	$Factura = $hookArg['Factura'];
+	if (!empty($Factura->fields['dte_url_pdf'])) {
+		$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
+	} else {
 		$client = new SoapClient("https://www.facturemosya.com:443/webservice/sRecibirXML.php?wsdl");
 		$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
 		$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
-
-		if ($err) {
-			$return = 'Constructor error: ' . $err;
-		}
-
-		// 	$strdocumento = 'COM|||version|3.2||serie|WS||folio|15||fecha|2013-07-18T10:14:49||formaDePago|PAGO EN UNA SOLA EXHIBICION||TipoCambio|1.000||condicionesDePago|EFECTOS FISCALES AL PAGO||subTotal|425.00||Moneda|MX||total|493.00||tipoDeComprobante|ingreso||metodoDePago|PAGO NO IDENTIFICADO||LugarExpedicion|MEXICO DISTRITO FEDERAL||NumCtaPago|1234||descuento|0.00||motivoDescuento|desc
-		// REF|||Regimen|REGIMEN GENERAL DE LEY PERSONAS MORALES
-		// REC|||rfc|DNM070221BS4||nombre|DISEÃ‘OS NAOMI MEXICO, S.A. DE C.V.
-		// DOR|||calle|JOSE MARIA IZAZAGA # 50 DESP 101 1ER PISO||noExterior|51||colonia|CENTRO||municipio|CUAHUTEMOC||estado|MEXICO, D.F.||pais|MEXICO||codigopostal|06000
-		// CON|||cantidad|850||unidad|M||noIdentificacion|6XO959455C-BRU||descripcion|COLA DE RATA X  METRO||valorUnitario|0.50||descuento|0||importe|425.00
-		// CUP|||numero|A-1234
-		// RET|||impuesto|IVA||importe|0
-		// TRA|||impuesto|IVA||tasa|16.0||importe|68.00
-		// ADI|||numorden|111111||comentarios|demo comentarios';
 		$strdocumento = FacturaToTXT($Sesion, $Factura);
-
 		$result = $client->RecibirTXT($usuario, $password, $strdocumento);
-
 		if ($result->codigo == 201) {
 			try {
 				$result_xml = $client->RecibirXML($usuario, $password, $strdocumento);
@@ -58,41 +95,38 @@ function GeneraFactura($id_factura) {
 				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
 
 				$Factura->Edit('dte_url_pdf', $file_url);
-
 				if ($Factura->Write()) {
-					DescargaFactura($Factura);
+					$hookArg['InvoiceURL'] = $file_url;
 				}
 			} catch (Exception $ex) {
-				echo "<pre style='color: red;'>" . print_r($ex, true) . "</pre>";
-				// buu
+				$hookArg['Error'] = array(
+					'Code' => 'SaveGeneratedInvoiceError',
+					'Message' => print_r($ex, true)
+				);
 			}
 		} else {
-				// $result = $client->__soapCall('RecibirTXT', $datos);
-
-				header('Content-Type: text/html; charset=utf-8');
-
-				echo "<pre style='color: green;'>" . utf8_decode(utf8_decode(print_r($result, true))) . "</pre>";
-				echo "<pre style='color: grey;'>" . htmlentities($client->__getLastRequest()) . "</pre>";
-				echo "<pre style='color: blue;'>" . htmlentities($client->__getLastResponse()) . "</pre>";
-				echo "<pre style='color: red;'>" . $return . "</pre>";
-				echo "<pre style='color: yellow;'>" . print_r($client->__getFunctions(), true) . "</pre>";
-				echo "<pre style='color: black;'>" . $strdocumento . "</pre>";
+			$hookArg['Error'] = array(
+				'Code' => 'BuildingInvoiceError',
+				'Message' => utf8_decode($result->descripcion)
+			);
 		}
-	} else {
-		DescargaFactura($Factura);
 	}
+	return $hookArg;
 }
 
-function DescargaFactura(Factura $Factura) {
-	$url = $Factura->fields['dte_url_pdf'];
-	$headerURL = array_shift(explode('?', basename($url)));
-	header("Content-Transfer-Encoding: binary");
-	header("Content-Type: application/pdf");
-	header('Content-Description: File Transfer');
-	header("Content-Disposition: attachment; filename=".$headerURL);
-	readfile($url);
-}
 
+//
+// $strdocumento = 'COM|||version|3.2||serie|WS||folio|15||fecha|2013-07-18T10:14:49||formaDePago|PAGO EN UNA SOLA EXHIBICION||TipoCambio|1.000||condicionesDePago|EFECTOS FISCALES AL PAGO||subTotal|425.00||Moneda|MX||total|493.00||tipoDeComprobante|ingreso||metodoDePago|PAGO NO IDENTIFICADO||LugarExpedicion|MEXICO DISTRITO FEDERAL||NumCtaPago|1234||descuento|0.00||motivoDescuento|desc
+// REF|||Regimen|REGIMEN GENERAL DE LEY PERSONAS MORALES
+// REC|||rfc|DNM070221BS4||nombre|DISEÃ‘OS NAOMI MEXICO, S.A. DE C.V.
+// DOR|||calle|JOSE MARIA IZAZAGA # 50 DESP 101 1ER PISO||noExterior|51||colonia|CENTRO||municipio|CUAHUTEMOC||estado|MEXICO, D.F.||pais|MEXICO||codigopostal|06000
+// CON|||cantidad|850||unidad|M||noIdentificacion|6XO959455C-BRU||descripcion|COLA DE RATA X  METRO||valorUnitario|0.50||descuento|0||importe|425.00
+// CUP|||numero|A-1234
+// RET|||impuesto|IVA||importe|0
+// TRA|||impuesto|IVA||tasa|16.0||importe|68.00
+// ADI|||numorden|111111||comentarios|demo comentarios';
+//
+//
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion);
 
@@ -175,12 +209,4 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	}
 
 	return $txt;
-}
-
-function AgregarBotonFacturaElectronica() {
-	global $id_factura;
-	global $pdf_content;
-	$pdf_content = '<a href="../plugins/facturacion_electronica_mx.php?id_factura_generar=' . $id_factura . '" >
-			<img src="' . Conf::ImgDir() . '/pdf.gif" border="0" />
-		</a>';
 }
