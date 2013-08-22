@@ -40,6 +40,14 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		} else {
 			$columns = $this->SimpleReport->Config->VisibleColumns();
 
+			if (!empty($this->SimpleReport->variables)) {
+				$html .= '<fieldset><legend>Variables</legend><table>';
+				foreach ($this->SimpleReport->variables as $nombre => $valor) {
+					$html .= "<tr><td align=\"right\">$nombre:</td><td>$valor</td></tr>";
+				}
+				$html .= '</table></fieldset>';
+			}
+
 			//agrupadores de resultados
 			$groups = array();
 			foreach ($columns as $idx => $column) {
@@ -216,7 +224,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 					$column->extras['rowspan'] = $rowspan;
 					$columns[$column->field]->extras['rowspan'] = $rowspan;
 				}
-				
+
 				$inlinegroup_field = $column->extras['inlinegroup_field'];
 				if (isset($inlinegroup_field)) {
 					if (isset($result[$row_idx - 1]) && $result[$row_idx - 1][$inlinegroup_field] == $row[$inlinegroup_field]) {
@@ -290,9 +298,13 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$row[$column->field] = $totals[$idx];
 						$html .= $this->td($row, $column);
 					} else {
-						if ($colspan_total > 0) {
+						if ($colspan_total == $i && $i > 0) {
 							$html .=  "<td colspan='$colspan_total' class='level$level'>$name&nbsp;</td>";
-							$colspan_total = -1;
+							$colspan_total--;
+						} else if ($colspan_total) {
+							$colspan_total--;
+						} else {
+							$html .= '<td/>';
 						}
 					}
 				}
@@ -316,35 +328,20 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$valor = 0;
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
-							$param = trim($param);
-							if (strpos($param, '%') === 0) {
-								$valor += str_replace(',', '.', $row[trim($param, '%')]);
-							} else if (is_numeric($param)) {
-								$valor += $param;
-							}
+							$valor += $this->parse_param($param, $row, true, 0);
 						}
 						break;
 					case 'PRODUCT':
 						$valor = 1;
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
-							$param = trim($param);
-							if (strpos($param, '%') === 0) {
-								$valor *= str_replace(',', '.', $row[trim($param, '%')]);
-							} else if (is_numeric($param)) {
-								$valor *= $param;
-							}
+							$valor *= $this->parse_param($param, $row, true, 1);
 						}
 						break;
 					case 'CONCATENATE':
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
-							$param = trim($param);
-							if (strpos($param, '%') === 0) {
-								$valor .= $row[trim($param, '%')];
-							} else {
-								$valor .= trim($param, '"');
-							}
+							$valor .= $this->parse_param($param, $row, false, '');
 						}
 						break;
 
@@ -364,6 +361,9 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$valor = $this->acumuladores[$original_param];
 						break;
 				}
+			} else { //es una referencia a otra columna o variable
+				$isnum = $column->format == 'number';
+				$valor = $this->parse_param(trim($column->field, '='), $row, $isnum, $isnum ? 0 : '');
 			}
 		}
 
@@ -405,5 +405,37 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		return "<td class=\"$class\" $attrs>$extras$valor</td>";
 	}
 
+	private function parse_param($param, $row, $numeric = true, $default = null){
+		$param = trim($param);
+		if (strpos($param, '"') === 0) {
+			return trim($param, '"');
+		}
+
+		if (preg_match_all('/%(\w+)%/', $param, $matches_fields, PREG_SET_ORDER)) {
+			foreach ($matches_fields as $match_field) {
+				$value = $field = $match_field[1];
+				if (isset($row[$field])) {
+					$value = $row[$field];
+				}
+				$param = str_replace($match_field[0], $value, $param);
+			}
+		}
+
+		if (preg_match_all('/\$(.+?)\$/', $param, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$value = $var = $match[1];
+				$value = isset($this->SimpleReport->variables[$var]) ? $this->SimpleReport->variables[$var] : $default;
+				$param = str_replace($match[0], $value, $param);
+			}
+		}
+
+		if($numeric) {
+			$param = str_replace(',', '.', $param);
+			if(!is_numeric($param)) $param = $default;
+		} else if (!$param) {
+			$param = $default;
+		}
+		return $param;
+	}
 }
 

@@ -214,6 +214,10 @@ class SimpleReport extends Objeto {
 		$this->filters = $filters;
 	}
 
+	public function SetVariables($variables) {
+		$this->variables = $variables;
+	}
+
 	public function SetRegionalFormat($format) {
 		$this->regional_format = $format;
 	}

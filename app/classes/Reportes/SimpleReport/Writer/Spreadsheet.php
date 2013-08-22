@@ -84,6 +84,17 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			$this->current_row++;
 		}
 
+		$this->variableCells = array();
+		if (!empty($this->SimpleReport->variables)) {
+			foreach ($this->SimpleReport->variables as $nombre => $valor) {
+				$this->sheet->write($this->current_row, 0, $nombre, $this->formats['filtros']);
+				$this->sheet->write($this->current_row, 1, $valor, $this->formats['valoresfiltros']);
+				$this->current_row++;
+				$this->variableCells[$nombre] = '$B$' . $this->current_row;
+			}
+			$this->current_row++;
+		}
+
 
 
 		// 1.1 Formatear todos los arreglos
@@ -223,9 +234,17 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			if ($repeat_header) {
 				$this->header($columns, $col0);
 			}
+
 			$col_i = $col0;
 			foreach ($columns as $idx => $column) {
+				if (!isset($this->col_letters[$column->field])) {
+					$this->col_letters[$column->field] = $col_i;
+				}
+				$col_i++;
+			}
 
+			$col_i = $col0;
+			foreach ($columns as $idx => $column) {
 				if (in_array($column->format, $formatos_con_total) &&
 								(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
 					$grupo_subtotal = isset($column->extras['subtotal']) && is_string($column->extras['subtotal']) ? $row[$column->extras['subtotal']] : '';
@@ -376,10 +395,6 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			$format = $f;
 		}
 
-		if (!isset($this->col_letters[$column->field])) {
-			$this->col_letters[$column->field] = $col_i;
-		}
-
 		$value = '';
 		$is_formula = false;
 		if (strpos($column->field, '=') !== 0) {
@@ -409,23 +424,11 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						break;
 
 					default:
-						// Usar las fórmulas de Excel
-						$value = $column->field;
-						if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
-							foreach ($matches as $match) {
-								$param = $match[1];
-								if (isset($this->col_letters[$match[1]])) {
-									$param = $this->xls->rowcolToCell($this->current_row, $this->col_letters[$match[1]]);
-								} else if (isset($row[$param])) {
-									$param = '"' . $row[$param] . '"';
-								} else if (strpos($param, '"') !== 0) {
-									$param = '"' . $param . '"';
-								}
-								$value = str_replace($match[0], $param, $value);
-							}
-						}
+						$value = $this->parse_param($column, $row);
 						break;
 				}
+			} else {
+				$value = $this->parse_param($column, $row);
 			}
 		}
 
@@ -455,6 +458,46 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$this->sheet->mergeCells($this->current_row - $column->extras['rowspan'] + 1, $col_i, $this->current_row, $col_i);
 			}
 		}
+	}
+
+	private function parse_param($column, $row){
+		// Usar las fórmulas de Excel
+		$value = $column->field;
+
+		if (preg_match_all('/\$(.+?)\$/', $value, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$var = $match[1];
+
+				if (preg_match_all('/%(\w+)%/', $var, $matches_params, PREG_SET_ORDER)) {
+					foreach ($matches_params as $match_param) {
+						$param = $match_param[1];
+						if (isset($row[$param])) {
+							$param = $row[$param];
+						}
+						$var = str_replace($match_param[0], $param, $var);
+					}
+				}
+
+				$var = isset($this->variableCells[$var]) ? $this->variableCells[$var] : 0;
+				$value = str_replace($match[0], $var, $value);
+			}
+		}
+
+		if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$param = $match[1];
+				if (isset($this->col_letters[$match[1]])) {
+					$param = $this->xls->rowcolToCell($this->current_row, $this->col_letters[$match[1]]);
+				} else if (isset($row[$param])) {
+					$param = '"' . $row[$param] . '"';
+				} else if (strpos($param, '"') !== 0) {
+					$param = '"' . $param . '"';
+				}
+				$value = str_replace($match[0], $param, $value);
+			}
+		}
+
+		return $value;
 	}
 
 }

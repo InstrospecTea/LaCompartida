@@ -9,11 +9,15 @@ $Sesion = new Sesion(array('REP'));
 if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$id_tarifa_comparativa = $_REQUEST['id_tarifa_comparativa'];
+	$query_tarifa = "SELECT glosa_tarifa FROM tarifa WHERE id_tarifa = '$id_tarifa_comparativa'";
+	list($glosa_tarifa) = $Sesion->pdodbh->query($query_tarifa)->fetchAll(PDO::FETCH_COLUMN,0);
 	$codigo_cliente = '';
 	$where = array();
 
 	if (!empty($_REQUEST['codigo_cliente'])) {
 		$codigo_cliente = $_REQUEST['codigo_cliente'];
+		$query_cliente = "SELECT glosa_cliente FROM cliente WHERE codigo_cliente = '$codigo_cliente'";
+		list($glosa_cliente) = $Sesion->pdodbh->query($query_cliente)->fetchAll(PDO::FETCH_COLUMN,0);
 		$where[] = "cobro.codigo_cliente = '$codigo_cliente'";
 	}
 
@@ -25,22 +29,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$fecha1 = $_REQUEST['fecha1'];
 	$fecha2 = $_REQUEST['fecha2'];
 
-	$moneda_mostrar = !empty($_REQUEST['moneda_mostrar']) ? $_REQUEST['moneda_mostrar'] : 1;
-
+	$moneda_mostrar = $_REQUEST['moneda_mostrar'];
 	if (empty($moneda_mostrar)) {
 		$moneda_base = Utiles::MonedaBase($Sesion);
 		$moneda_mostrar = $moneda_base['id_moneda'];
 	}
-
-	// $filters = array(
-	// 	__('Cliente') => $glosa_cliente,
-	// 	__('Asuntos') => "$id_contrato $glosa_asuntos",
-	// 	__('Mostrar Saldo') => empty($tipo_liquidacion) ? 'Total' : $tipos_liquidacion[$tipo_liquidacion],
-	// 	__('Mostrar montos en') => "$glosa_moneda",
-	// 	'Desde' => $fecha1, 'Hasta' => $fecha2,
-	// 	'Mostrar liquidaciones y adelantos sin saldo' => $mostrar_sin_saldo ? 'SI' : '',
-	// 	__('Encargado Comercial') => $glosa_encargado_comercial
-	// );
+	list($moneda) = Moneda::GetMonedas($Sesion, $moneda_mostrar);
 
 	if ($fecha1) {
 		$where[] = "cobro.fecha_emision >= '" . Utiles::fecha2sql($fecha1) . "'";
@@ -51,7 +45,22 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
+
+	$filters = array(
+		__('Cliente') => $glosa_cliente,
+		__('Forma de Tarificación') => $tipo_liquidacion,
+		__('Fecha Desde') => $fecha1,
+		__('Fecha Hasta') => $fecha2,
+		__('Tarifa Comparativa') => $glosa_tarifa,
+		__('Moneda') => $moneda['glosa_moneda']
+	);
 	$SimpleReport->SetFilters($filters);
+
+	$Tarifa = new Tarifa($Sesion);
+	$CategoriaTarifa = new CategoriaTarifa($Sesion);
+	$variables = $CategoriaTarifa->TarifasCategorias($id_tarifa_comparativa, $moneda_mostrar);
+	$variables += $CategoriaTarifa->TarifasCategorias($Tarifa->SetTarifaDefecto(), $moneda_mostrar, 'Estandar ');
+	$SimpleReport->SetVariables($variables);
 
 	$config_reporte = array(
 		array(
@@ -160,7 +169,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_cobro_simbolo'
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
@@ -169,25 +178,25 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_cobro_simbolo'
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
-			'field' => 'tarifa_comparativa',
+			'field' => '=$%categoria_usuario%$',
 			'title' => 'Tarifa Comparativa',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_cobro_simbolo'
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
-			'field' => '=PRODUCT(%tarifa_comparativa%,%duracion_usuario_numero%)',
-			'title' => 'Monto Comparativa',
+			'field' => '=PRODUCT($%categoria_usuario%$,%duracion_usuario_numero%)',
+			'title' => 'Monto Comparativo',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_cobro_simbolo'
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
@@ -223,9 +232,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$SimpleReport->LoadConfigFromArray($config_reporte);
 
 	if (count($where) > 0) {
-		$where = "WHERE " . implode(' AND ', $where);
+		$where = implode(' AND ', $where);
 	} else {
-		$where = "";
+		$where = "1 > 0";
 	}
 
 	// Calcular factores
@@ -270,30 +279,17 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			moneda_cobro.codigo AS moneda_cobro_codigo,
 			moneda_cobro.simbolo AS moneda_cobro_simbolo,
 			moneda_base.simbolo AS moneda_base_simbolo,
-			cobro.monto * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_honorarios,
-			cobro.monto_thh_estandar * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_honorarios_base,
-			cobro.subtotal_gastos * (moneda_cobro.tipo_cambio / moneda_base.tipo_cambio) AS monto_gastos,
+			cobro.monto * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_honorarios,
+			cobro.monto_thh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_honorarios_base,
+			cobro.subtotal_gastos * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_gastos,
 			cobro.total_minutos / 60 AS total_minutos,
 			prm_categoria_usuario.id_categoria_usuario AS id_categoria_usuario,
 			prm_categoria_usuario.glosa_categoria AS categoria_usuario,
 			usuario_trabajo.username AS usuario_categoria,
 			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario,
 			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario_numero,
-			SUM(trabajo.monto_cobrado) AS monto_usuario,
-			(
-				SELECT tarifa
-				FROM usuario_tarifa
-				WHERE id_tarifa = contrato.id_tarifa
-				AND id_usuario = usuario_trabajo.id_usuario
-				AND id_moneda = moneda_cobro.id_moneda
-			) AS tarifa_usuario,
-			(
-				SELECT tarifa
-				FROM usuario_tarifa
-				WHERE id_tarifa = '$id_tarifa_comparativa'
-				AND id_usuario = usuario_trabajo.id_usuario
-				AND id_moneda = moneda_cobro.id_moneda
-			) AS tarifa_comparativa,
+			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_usuario,
+			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) / SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS tarifa_usuario,
 			(
 				SELECT tarifa
 				FROM usuario_tarifa
@@ -304,7 +300,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			) AS tarifa_standard
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
-		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = cobro.id_moneda
+		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
+		INNER JOIN cobro_moneda cobro_moneda_cobro ON  cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = cobro.id_moneda
+		INNER JOIN cobro_moneda cobro_moneda_base ON  cobro_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_base.id_moneda = $moneda_mostrar
 		INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 		INNER JOIN usuario usuario_contrato ON usuario_contrato.id_usuario = contrato.id_usuario_responsable
 		INNER JOIN tarifa ON tarifa.id_tarifa = contrato.id_tarifa
@@ -312,7 +310,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		LEFT JOIN trabajo ON trabajo.id_cobro = cobro.id_cobro
 		INNER JOIN usuario usuario_trabajo ON usuario_trabajo.id_usuario = trabajo.id_usuario
 		INNER JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario_trabajo.id_categoria_usuario
-		$where
+		WHERE cobro.estado IN ('PAGADO', 'FACTURADO')
+		AND $where
 		GROUP BY cobro.id_cobro, usuario_trabajo.id_usuario";
 
 	 // echo $query;
@@ -408,23 +407,13 @@ $Pagina->PrintTop($popup);
 			<?php echo Html::SelectQuery($Sesion, "SELECT forma_cobro, descripcion FROM prm_forma_cobro", "tipo_liquidacion", $tipo_liquidacion, '', 'Cualquiera') ?>
 							</td>
 						</tr>
-						<!--tr>
-							<td align="right">
-								<label for="moneda_mostrar"><?php echo __('Moneda') ?></label>
-							</td>
-							<td colspan="2" align="left">
-								<?php
-								echo Html::SelectArray(Moneda::GetMonedas($Sesion), 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
-								?>
-							</td>
-						</tr-->
 						<tr>
 							<td align="right"><?php echo __('Fecha Desde') ?></td>
 							<td nowrap align="left">
 									<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
 							</td>
 							<td nowrap align="left" colspan="2">
-	&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
+									&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
 									<input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
 							</td>
 						</tr>
@@ -434,8 +423,18 @@ $Pagina->PrintTop($popup);
 								<label>
 									<input type="hidden" name="incluir_gastos" value="0" />
 									<input type="checkbox" name="incluir_gastos" id="incluir_gastos" value="1" <?php echo $incluir_gastos ? 'checked="checked"' : '' ?> />
-									<?php echo __('Incluir gastos en el cÃ¡lculo'); ?>
+									<?php echo __('Incluir gastos en el cálculo'); ?>
 								</label>
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<label for="moneda_mostrar"><?php echo __('Moneda') ?></label>
+							</td>
+							<td colspan="2" align="left">
+								<?php
+								echo Html::SelectArray(Moneda::GetMonedas($Sesion), 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
+								?>
 							</td>
 						</tr>
 						<tr>

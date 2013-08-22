@@ -7,9 +7,9 @@ require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 
 class Tarifa extends Objeto
 {
-	
+
 	public static $llave_carga_masiva = 'glosa_tarifa';
-	
+
 	function Tarifa($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "tarifa";
@@ -17,7 +17,7 @@ class Tarifa extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	
+
 	#Carga a través de ID
 	function LoadById($id_tarifa)
 	{
@@ -26,8 +26,8 @@ class Tarifa extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
-	
-	
+
+
 	# Elimina Tarifas
 	function Eliminar()
 	{
@@ -46,10 +46,10 @@ class Tarifa extends Objeto
 		}
 		$query = "DELETE FROM usuario_tarifa WHERE id_tarifa = '".$this->fields['id_tarifa']."'";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		
+
 		$query = "DELETE FROM categoria_tarifa WHERE id_tarifa = '".$this->fields['id_tarifa']."'";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			
+
 		$query = "DELETE FROM tarifa WHERE id_tarifa = '".$this->fields['id_tarifa']."'";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
@@ -64,7 +64,7 @@ class Tarifa extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $id;
 	}
-	
+
 	#Limpia Tarifa por defecto
 	function TarifaDefecto($id_tarifa)
 	{
@@ -72,7 +72,7 @@ class Tarifa extends Objeto
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}
-	
+
 	#Retorna ID tarifa declarada como defecto
 	function SetTarifaDefecto()
 	{
@@ -81,7 +81,7 @@ class Tarifa extends Objeto
 		list($id_tarifa) = mysql_fetch_array($resp);
 		return $id_tarifa;
 	}
-	
+
 	//crea (o edita) una tarifa donde todos los usuarios tienen el mismo valor. retorna el id de la tarifa
 	function GuardaTarifaFlat($valor, $id_moneda, $id_tarifa=null){
 		/*logica pro?
@@ -156,7 +156,7 @@ Class UsuarioTarifa extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	
+
 	#Carga a través de ID_TARIF, ID_USUARIO, ID_MONEDA la tarifa(monto)
 	function LoadById($id_tarifa, $id_usuario, $id_moneda)
 	{
@@ -165,7 +165,7 @@ Class UsuarioTarifa extends Objeto
 		list($tarifa) = mysql_fetch_array($resp);
 		return $tarifa;
 	}
-	
+
 	#Guardando Tarifa
 	function GuardarTarifa($id_tarifa, $id_usuario, $id_moneda, $valor)
 	{
@@ -176,7 +176,7 @@ Class UsuarioTarifa extends Objeto
 		}
 		else
 		{
-			$query = "INSERT usuario_tarifa SET id_tarifa = '$id_tarifa', id_moneda = '$id_moneda', 
+			$query = "INSERT usuario_tarifa SET id_tarifa = '$id_tarifa', id_moneda = '$id_moneda',
 								id_usuario = '$id_usuario', tarifa = '$valor'
 								ON DUPLICATE KEY UPDATE tarifa = '$valor'";
 		}
@@ -184,8 +184,8 @@ Class UsuarioTarifa extends Objeto
 		return true;
 	}
 }
-		
-		
+
+
 Class CategoriaTarifa extends Objeto
 {
 	function CategoriaTarifa($sesion, $fields = "", $params = "")
@@ -195,7 +195,7 @@ Class CategoriaTarifa extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	
+
 	#Carga a través de ID_TARIF, ID_CATEGORIA_USUARIO, ID_MONEDA la tarifa(monto)
 	function LoadById($id_tarifa, $id_usuario, $id_moneda)
 	{
@@ -204,7 +204,7 @@ Class CategoriaTarifa extends Objeto
 		list($tarifa_categoria) = mysql_fetch_array($resp_categoria);
 		return $tarifa_categoria;
 	}
-	
+
 	#Guardar Tarifa
 	function GuardarTarifaCategoria($id_tarifa, $id_categoria_usuario, $id_moneda, $valor)
 	{
@@ -215,13 +215,26 @@ Class CategoriaTarifa extends Objeto
 		}
 		else
 		{
-			$query = "INSERT categoria_tarifa SET id_tarifa = '$id_tarifa', id_moneda = '$id_moneda', 
+			$query = "INSERT categoria_tarifa SET id_tarifa = '$id_tarifa', id_moneda = '$id_moneda',
 								id_categoria_usuario = '$id_categoria_usuario', tarifa = '$valor'
 								ON DUPLICATE KEY UPDATE tarifa = '$valor'";
 		}
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}
-	
+
+	function TarifasCategorias($id_tarifa, $id_moneda, $prefijo = ''){
+		$query = "SELECT c.glosa_categoria, IFNULL(ct.tarifa, 0) as tarifa
+			FROM prm_categoria_usuario c
+			LEFT JOIN categoria_tarifa ct
+				ON c.id_categoria_usuario = ct.id_categoria_usuario
+				AND ct.id_tarifa = $id_tarifa
+				AND ct.id_moneda = $id_moneda";
+		$valores = array();
+		foreach($this->sesion->pdodbh->query($query) as $tarifa) {
+			$valores[$prefijo . $tarifa['glosa_categoria']] = $tarifa['tarifa'];
+		}
+		return $valores;
+	}
 }
 ?>
