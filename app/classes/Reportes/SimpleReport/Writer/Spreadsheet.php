@@ -88,7 +88,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		if (!empty($this->SimpleReport->variables)) {
 			foreach ($this->SimpleReport->variables as $nombre => $valor) {
 				$this->sheet->write($this->current_row, 0, $nombre, $this->formats['filtros']);
-				$this->sheet->write($this->current_row, 1, $valor, $this->formats['valoresfiltros']);
+				$this->sheet->write($this->current_row, 1, $this->parse_param($valor, null), $this->formats['valoresfiltros']);
 				$this->current_row++;
 				$this->variableCells[$nombre] = '$B$' . $this->current_row;
 			}
@@ -424,11 +424,11 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						break;
 
 					default:
-						$value = $this->parse_param($column, $row);
+						$value = $this->parse_param($column->field, $row);
 						break;
 				}
 			} else {
-				$value = $this->parse_param($column, $row);
+				$value = $this->parse_param($column->field, $row);
 			}
 		}
 
@@ -460,10 +460,8 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		}
 	}
 
-	private function parse_param($column, $row){
+	private function parse_param($value, $row){
 		// Usar las fórmulas de Excel
-		$value = $column->field;
-
 		if (preg_match_all('/\$(.+?)\$/', $value, $matches, PREG_SET_ORDER)) {
 			foreach ($matches as $match) {
 				$var = $match[1];

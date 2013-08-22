@@ -43,7 +43,9 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 			if (!empty($this->SimpleReport->variables)) {
 				$html .= '<fieldset><legend>Variables</legend><table>';
 				foreach ($this->SimpleReport->variables as $nombre => $valor) {
+					$valor = $this->parse_field($valor, array(), true);
 					$html .= "<tr><td align=\"right\">$nombre:</td><td>$valor</td></tr>";
+					$this->SimpleReport->variables[$nombre] = $valor;
 				}
 				$html .= '</table></fieldset>';
 			}
@@ -316,13 +318,17 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		return $html;
 	}
 
-	private function td($row, $column, $extras ='') {
+	private function parse_field($field, $row, $isnum = false){
 		$valor = '';
-		if (strpos($column->field, '=') !== 0) {
-			$valor = $row[$column->field];
+		if (strpos($field, '=') !== 0) {
+			$valor = isset($row[$field]) ? $row[$field] : $field;
 		} else {
+			if (preg_match('/=(.+)\/(.+)/', $field, $matches)) {
+				return $this->parse_field('=' . $matches[1], $row, true) / $this->parse_field('=' . $matches[2], $row, true);
+			}
+
 			//es una formula: reemplazar los nombres de campos por celdas
-			if (preg_match('/=(\w+)\((.+)\)/', $column->field, $matches)) {
+			if (preg_match('/=(\w+)\((.+)\)/', $field, $matches)) {
 				switch ($matches[1]) {
 					case 'SUM':
 						$valor = 0;
@@ -330,6 +336,14 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						foreach ($params as $param) {
 							$valor += $this->parse_param($param, $row, true, 0);
 						}
+						break;
+					case 'AVERAGE':
+						$valor = 0;
+						$params = explode(',', $matches[2]);
+						foreach ($params as $param) {
+							$valor += $this->parse_param($param, $row, true, 0);
+						}
+						$valor /= count($params);
 						break;
 					case 'PRODUCT':
 						$valor = 1;
@@ -362,11 +376,14 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						break;
 				}
 			} else { //es una referencia a otra columna o variable
-				$isnum = $column->format == 'number';
-				$valor = $this->parse_param(trim($column->field, '='), $row, $isnum, $isnum ? 0 : '');
+				$valor = $this->parse_param(trim($field, '='), $row, $isnum, $isnum ? 0 : '');
 			}
 		}
+		return $valor;
+	}
 
+	private function td($row, $column, $extras ='') {
+		$valor = $this->parse_field($column->field, $row, $column->format == 'number');
 		switch ($column->format) {
 			case 'text':
 				if (strpos($valor, ";")) {

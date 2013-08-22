@@ -58,8 +58,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$Tarifa = new Tarifa($Sesion);
 	$CategoriaTarifa = new CategoriaTarifa($Sesion);
-	$variables = $CategoriaTarifa->TarifasCategorias($id_tarifa_comparativa, $moneda_mostrar);
-	$variables += $CategoriaTarifa->TarifasCategorias($Tarifa->SetTarifaDefecto(), $moneda_mostrar, 'Estandar ');
+
+	$variables = $tarifas = $CategoriaTarifa->TarifasCategorias($id_tarifa_comparativa, $moneda_mostrar, 'Tarifa Comparativa ');
+	$promedio = 'AVERAGE($' . implode('$,$', array_keys($tarifas)) . '$)';
+	foreach ($tarifas as $nombre => $valor) {
+		$variables["Factor $nombre"] = "=\$$nombre\$/$promedio";
+	}
+
+	$variables += $tarifas = $CategoriaTarifa->TarifasCategorias($Tarifa->SetTarifaDefecto(), $moneda_mostrar, 'Tarifa Standard ');
+	$promedio = 'AVERAGE($' . implode('$,$', array_keys($tarifas)) . '$)';
+	foreach ($tarifas as $nombre => $valor) {
+		$variables["Factor $nombre"] = "=\$$nombre\$/$promedio";
+	}
 	$SimpleReport->SetVariables($variables);
 
 	$config_reporte = array(
@@ -182,7 +192,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => '=$%categoria_usuario%$',
+			'field' => '=$Tarifa Comparativa %categoria_usuario%$',
 			'title' => 'Tarifa Comparativa',
 			'format' => 'number',
 			'extras' => array(
@@ -191,7 +201,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => '=PRODUCT($%categoria_usuario%$,%duracion_usuario_numero%)',
+			'field' => '=PRODUCT($Tarifa Comparativa %categoria_usuario%$,%duracion_usuario_numero%)',
 			'title' => 'Monto Comparativo',
 			'format' => 'number',
 			'extras' => array(
@@ -200,31 +210,41 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'factor_comparativa',
-			'title' => 'Factor Comparativa',
+			'field' => '=$Factor Tarifa Comparativa %categoria_usuario%$',
+			'title' => 'Factor Comparativo',
 			'format' => 'number'
 		),
 		array(
-			'field' => 'tarifa_standard',
+			'field' => '=PRODUCT($Factor Tarifa Comparativa %categoria_usuario%$,%duracion_usuario_numero%)',
+			'title' => 'Horas x Factor Comparativo',
+			'format' => 'number'
+		),
+		array(
+			'field' => '=$Tarifa Standard %categoria_usuario%$',
 			'title' => 'Tarifa Standard',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_cobro_simbolo'
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
-			'field' => '=PRODUCT(%tarifa_standard%,%duracion_usuario_numero%)',
+			'field' => '=PRODUCT($Tarifa Standard %categoria_usuario%$,%duracion_usuario_numero%)',
 			'title' => 'Monto Standard',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_cobro_simbolo'
+				'symbol' => 'moneda_base_simbolo'
 			)
 		),
 		array(
-			'field' => 'factor_standard',
+			'field' => '=$Factor Tarifa Standard %categoria_usuario%$',
 			'title' => 'Factor Standard',
+			'format' => 'number'
+		),
+		array(
+			'field' => '=PRODUCT($Factor Tarifa Standard %categoria_usuario%$,%duracion_usuario_numero%)',
+			'title' => 'Horas x Factor Standard',
 			'format' => 'number'
 		),
 	);
@@ -235,36 +255,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where = implode(' AND ', $where);
 	} else {
 		$where = "1 > 0";
-	}
-
-	// Calcular factores
-	$query_tarifa_standard = "SELECT id_categoria_usuario, id_moneda, tarifa FROM categoria_tarifa INNER JOIN tarifa USING(id_tarifa) WHERE tarifa_defecto = 1 OR id_tarifa = '$id_tarifa_comparativa'";
-	$statement = $Sesion->pdodbh->prepare($query_tarifa_standard);
-	$statement->execute();
-	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-	$factores_tarifa_standard = array();
-	$factores_tarifa_standard_total = array();
-
-	$factores_tarifa_comparativa = array();
-	$factores_tarifa_comparativa_total = array();
-
-	foreach ($results as $i => $r) {
-		$factores_tarifa_standard[$r['id_moneda']][$r['id_categoria_usuario']] = $r['tarifa'];
-		$factores_tarifa_standard_total[$r['id_moneda']] += $r['tarifa'];
-
-		$factores_tarifa_comparativa[$r['id_moneda']][$r['id_categoria_usuario']] = $r['tarifa'];
-		$factores_tarifa_comparativa_total[$r['id_moneda']] += $r['tarifa'];
-	}
-	foreach ($factores_tarifa_standard as $moneda => $factores_moneda) {
-		foreach ($factores_moneda as $id => $tarifa) {
-			$factores_tarifa_standard[$moneda][$id] = $tarifa / ($factores_tarifa_standard_total[$moneda] / count($factores_tarifa_standard[$moneda]));
-		}
-	}
-	foreach ($factores_tarifa_comparativa as $moneda => $factores_moneda) {
-		foreach ($factores_moneda as $id => $tarifa) {
-			$factores_tarifa_comparativa[$moneda][$id] = $tarifa / ($factores_tarifa_comparativa_total[$moneda] / count($factores_tarifa_comparativa[$moneda]));
-		}
 	}
 
 	$query =
@@ -289,15 +279,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario,
 			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario_numero,
 			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_usuario,
-			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) / SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS tarifa_usuario,
-			(
-				SELECT tarifa
-				FROM usuario_tarifa
-				INNER JOIN tarifa ON usuario_tarifa.id_tarifa = tarifa.id_tarifa
-				WHERE tarifa_defecto = 1
-				AND id_usuario = usuario_trabajo.id_usuario
-				AND id_moneda = moneda_cobro.id_moneda
-			) AS tarifa_standard
+			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) / SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS tarifa_usuario
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
 		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
@@ -323,15 +305,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$statement = $Sesion->pdodbh->prepare($query);
 	$statement->execute();
 	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-	foreach ($results as $i => $r) {
-		// $results[$i]['tarifa_comparativa'] = $categoria_comparativa[$r['id_categoria_usuario']];
-		// $results[$i]['monto_comparativo'] = $r['tarifa_comparativa'] * $r['duracion_categoria'];
-		// $results[$i]['monto_standard'] = $r['tarifa_standard'] * $r['duracion_categoria'];
-		$results[$i]['factor_comparativa'] = $factores_tarifa_comparativa[$r['moneda_cobro_id']][$r['id_categoria_usuario']];
-		$results[$i]['factor_standard'] = $factores_tarifa_standard[$r['moneda_cobro_id']][$r['id_categoria_usuario']];
-	}
-
 
 	$SimpleReport->LoadResults($results);
 
