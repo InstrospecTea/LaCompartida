@@ -208,5 +208,5 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$txt .= "\n";
 	}
 
-	return $txt;
+	return utf8_encode($txt);
 }
