@@ -2257,9 +2257,9 @@ HTML;
 		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
 
 		$s3 = new AmazonS3(array(
-        	'key' => 'AKIAIQYFL5PYVQKORTBA',
-        	'secret' => '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'
-        ));
+			'key' => 'AKIAIQYFL5PYVQKORTBA',
+			'secret' => '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'
+		));
 		$bucket = S3_UPLOAD_BUCKET;
 
 		$name = SUBDOMAIN . $name;
@@ -2267,7 +2267,8 @@ HTML;
 		$response = $s3->create_object($bucket, $name, array(
 			'body' => $file,
 			'acl' => AmazonS3::ACL_PUBLIC,
-			'contentType' => $contentType
+			'contentType' => $contentType,
+			'headers' => array('content-disposition' => 'attachment')
 		));
 
 		if ($response->isOK()) {
