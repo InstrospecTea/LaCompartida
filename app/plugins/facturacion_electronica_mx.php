@@ -8,7 +8,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 $Slim = Slim::getInstance('default', true);
-
+error_reporting(E_ALL ^ E_NOTICE);
 $Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_cobros7_botones_after',  function($hookArg) {
@@ -20,6 +20,9 @@ $Slim->hook('hook_genera_factura_electronica', function($hookArg) {
 
 function InsertaJSFacturaElectronica() {
 	echo 'jQuery(document).on("click", ".factura-electronica", function() {
+		if (!confirm("¿Confirma la generación de Factura electrónica?")) {
+			return;
+		}
 		var self = jQuery(this);
 		var id_factura = self.data("factura");
 		var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:85px;height:20px;margin-left:-80px;"});
@@ -28,8 +31,9 @@ function InsertaJSFacturaElectronica() {
 			type: "POST"
 		}).success(function(data) {
 			loading.remove();
-			var img = jQuery("<img />").attr("src", "' . Conf::ImgDir() . '/pdf.gif");
-			self.removeClass("factura-electronica").addClass("factura-documento").attr("title", "").html(img);
+			buttons = jQuery("' . BotonDescargarHTML("0") . '");
+			buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
+			self.replaceWith(buttons);
 			window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=pdf"
 		}).error(function(error_data){
 			loading.remove();
@@ -49,22 +53,25 @@ function InsertaJSFacturaElectronica() {
 	});';
 }
 
+function BotonGenerarHTML($id_factura) {
+	$img_dir = Conf::ImgDir();
+	$content = "<a style = 'margin-left: 8px;margin-right: 8px;' title = 'Generar Factura Electrónica' class = 'factura-electronica' data-factura = '$id_factura' href = '#' >
+			<img src = '$img_dir/invoice.png' border='0' />
+		</a>";
+	return $content;
+}
+
+function BotonDescargarHTML($id_factura) {
+	$img_dir = Conf::ImgDir();
+	$content  = "<a class = 'factura-documento' data-factura = '$id_factura' href = '#' >	<img src='$img_dir/pdf.gif' border='0' /></a>";
+	$content .= "<a class = 'factura-documento' data-format = 'xml' data-factura = '$id_factura' href = '#' > <img src='$img_dir/xml.gif' border='0' /></a>";
+	return $content;
+}
+
 function AgregarBotonFacturaElectronica($hookArg) {
 	$Factura = $hookArg['Factura'];
 	$dte_exist = !is_null($Factura->fields['dte_fecha_creacion']);
-	if (!$dte_exist) {
-		$content = '<a title = "Generar Factura Electrónica" class = "factura-electronica" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
-			<img src="' . Conf::ImgDir() . '/invoice.png" border="0" />
-		</a>';
-	} else {
-		$content = '<a class = "factura-documento" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
-			<img src="' . Conf::ImgDir() . '/pdf.gif" border="0" />
-		</a>
-		<a class = "factura-documento" data-format = "xml" data-factura = "' . $Factura->fields['id_factura'] . '" href = "#" >
-			<img src="' . Conf::ImgDir() . '/xml.gif" border="0" />
-		</a>';
-	}
-	$hookArg['content'] = $content;
+	$hookArg['content'] = (!$dte_exist) ? BotonGenerarHTML($Factura->fields['id_factura']) : BotonDescargarHTML($Factura->fields['id_factura']);
 	return $hookArg;
 }
 
