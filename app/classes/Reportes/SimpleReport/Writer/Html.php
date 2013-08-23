@@ -40,14 +40,42 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		} else {
 			$columns = $this->SimpleReport->Config->VisibleColumns();
 
+			$this->variables = array();
 			if (!empty($this->SimpleReport->variables)) {
 				$html .= '<fieldset><legend>Variables</legend><table>';
-				foreach ($this->SimpleReport->variables as $nombre => $valor) {
-					$valor = $this->parse_field($valor, array(), true);
-					$html .= "<tr><td align=\"right\">$nombre:</td><td>$valor</td></tr>";
-					$this->SimpleReport->variables[$nombre] = $valor;
+				if(isset($this->SimpleReport->variables[0])) {
+					$vars = array();
+					foreach ($this->SimpleReport->variables as $variable) {
+						$value = $this->parse_field($variable['value'], array(), true);
+						if(!isset($vars[$variable['row']])) {
+							$vars[$variable['row']] = array();
+						}
+						$vars[$variable['row']][$variable['col']] = $value;
+						$this->variables[$variable['name']] = $value;
+					}
+
+					$html .= '<tr><td/>';
+					foreach (array_keys(reset($vars)) as $col) {
+						$html .= "<th>$col</th>";
+					}
+					$html .= '</tr>';
+
+					foreach ($vars as $row => $cols) {
+						$html .= "<tr><th align=\"right\">$row</th>";
+						foreach ($cols as $value) {
+							$html .= "<td>$value</td>";
+						}
+						$html .= '</tr>';
+					}
+					$html .= '</table></fieldset>';
+				} else {
+					foreach ($this->SimpleReport->variables as $name => $value) {
+						$value = $this->parse_field($value, array(), true);
+						$html .= "<tr><td align=\"right\">$name:</td><td>$value</td></tr>";
+						$this->variables[$name] = $value;
+					}
+					$html .= '</table></fieldset>';
 				}
-				$html .= '</table></fieldset>';
 			}
 
 			//agrupadores de resultados
@@ -442,7 +470,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		if (preg_match_all('/\$(.+?)\$/', $param, $matches, PREG_SET_ORDER)) {
 			foreach ($matches as $match) {
 				$value = $var = $match[1];
-				$value = isset($this->SimpleReport->variables[$var]) ? $this->SimpleReport->variables[$var] : $default;
+				$value = isset($this->variables[$var]) ? $this->variables[$var] : $default;
 				$param = str_replace($match[0], $value, $param);
 			}
 		}

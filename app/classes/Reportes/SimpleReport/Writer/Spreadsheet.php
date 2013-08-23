@@ -74,10 +74,10 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		}
 
 		if (!empty($this->SimpleReport->filters)) {
-			foreach ($this->SimpleReport->filters as $nombre => $valor) {
-				if (!empty($valor)) {
-					$this->sheet->writeString($this->current_row, 0, $nombre, $this->formats['filtros']);
-					$this->sheet->writeString($this->current_row, 1, $valor, $this->formats['valoresfiltros']);
+			foreach ($this->SimpleReport->filters as $name => $value) {
+				if (!empty($value)) {
+					$this->sheet->writeString($this->current_row, 0, $name, $this->formats['filtros']);
+					$this->sheet->writeString($this->current_row, 1, $value, $this->formats['valoresfiltros']);
 					$this->current_row++;
 				}
 			}
@@ -86,11 +86,30 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 		$this->variableCells = array();
 		if (!empty($this->SimpleReport->variables)) {
-			foreach ($this->SimpleReport->variables as $nombre => $valor) {
-				$this->sheet->write($this->current_row, 0, $nombre, $this->formats['filtros']);
-				$this->sheet->write($this->current_row, 1, $this->parse_param($valor, null), $this->formats['valoresfiltros']);
-				$this->current_row++;
-				$this->variableCells[$nombre] = '$B$' . $this->current_row;
+			if(isset($this->SimpleReport->variables[0])) {
+				$header_row = $this->current_row++;
+				$current_col = 1;
+				$rows = array();
+				$cols = array();
+				foreach ($this->SimpleReport->variables as $variable) {
+					if(!isset($rows[$variable['row']])){
+						$this->sheet->write($this->current_row, 0, $variable['row'], $this->formats['filtros']);
+						$rows[$variable['row']] = $this->current_row++;
+					}
+					if(!isset($rows[$variable['col']])){
+						$this->sheet->write($header_row, $current_col, $variable['col'], $this->formats['filtros']);
+						$rows[$variable['col']] = $current_col++;
+					}
+					$this->sheet->write($rows[$variable['row']], $rows[$variable['col']], $this->parse_param($variable['value'], null), $this->formats['valoresfiltros']);
+					$this->variableCells[$variable['name']] = $this->xls->rowcolToCell($rows[$variable['row']], $rows[$variable['col']]);
+				}
+			} else {
+				foreach ($this->SimpleReport->variables as $name => $value) {
+					$this->sheet->write($this->current_row, 0, $name, $this->formats['filtros']);
+					$this->sheet->write($this->current_row, 1, $this->parse_param($value, null), $this->formats['valoresfiltros']);
+					$this->current_row++;
+					$this->variableCells[$name] = '$B$' . $this->current_row;
+				}
 			}
 			$this->current_row++;
 		}

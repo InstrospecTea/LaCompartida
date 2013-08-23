@@ -59,16 +59,43 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$Tarifa = new Tarifa($Sesion);
 	$CategoriaTarifa = new CategoriaTarifa($Sesion);
 
-	$variables = $tarifas = $CategoriaTarifa->TarifasCategorias($id_tarifa_comparativa, $moneda_mostrar, 'Tarifa Comparativa ');
-	$promedio = 'AVERAGE($' . implode('$,$', array_keys($tarifas)) . '$)';
+	$variables = array();
+	$tarifas = $CategoriaTarifa->TarifasCategorias($id_tarifa_comparativa, $moneda_mostrar);
+	$promedio = 'AVERAGE($Tarifa Comparativa ' . implode('$,$Tarifa Comparativa ', array_keys($tarifas)) . '$)';
 	foreach ($tarifas as $nombre => $valor) {
-		$variables["Factor $nombre"] = "=\$$nombre\$/$promedio";
+		$variables[] = array(
+			'row' => $nombre,
+			'col' => 'Tarifa Comparativa',
+			'name' => "Tarifa Comparativa $nombre",
+			'value' => $valor
+		);
+	}
+	foreach ($tarifas as $nombre => $valor) {
+		$variables[] = array(
+			'row' => $nombre,
+			'col' => 'Factor Comparativa',
+			'name' => "Factor Tarifa Comparativa $nombre",
+			'value' => "=\$Tarifa Comparativa $nombre\$/$promedio"
+		);
 	}
 
-	$variables += $tarifas = $CategoriaTarifa->TarifasCategorias($Tarifa->SetTarifaDefecto(), $moneda_mostrar, 'Tarifa Standard ');
-	$promedio = 'AVERAGE($' . implode('$,$', array_keys($tarifas)) . '$)';
+	$tarifas = $CategoriaTarifa->TarifasCategorias($Tarifa->SetTarifaDefecto(), $moneda_mostrar);
+	$promedio = 'AVERAGE($Tarifa Standard ' . implode('$,$Tarifa Standard ', array_keys($tarifas)) . '$)';
 	foreach ($tarifas as $nombre => $valor) {
-		$variables["Factor $nombre"] = "=\$$nombre\$/$promedio";
+		$variables[] = array(
+			'row' => $nombre,
+			'col' => 'Tarifa Standard',
+			'name' => "Tarifa Standard $nombre",
+			'value' => $valor
+		);
+	}
+	foreach ($tarifas as $nombre => $valor) {
+		$variables[] = array(
+			'row' => $nombre,
+			'col' => 'Factor Standard',
+			'name' => "Factor Tarifa Standard $nombre",
+			'value' => "=\$Tarifa Standard $nombre\$/$promedio"
+		);
 	}
 	$SimpleReport->SetVariables($variables);
 
