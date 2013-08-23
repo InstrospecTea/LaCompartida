@@ -76,12 +76,20 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	}
 
 	if ($opcion == "anular") {
-		$factura->Edit('estado', 'ANULADA');
-		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
-		$factura->Edit('anulado', 1);
-		if ($factura->Escribir()) {
-			$pagina->AddInfo(__('Documento Tributario') . ' ' . __('anulado con éxito'));
+		$data = array('Factura' => $factura);
+		$Slim->applyHook('hook_anula_factura_electronica', &$data);
+		$error = $data['Error'];
+		if (!$error) {
+			$pagina->AddError($error['Message'] ? $error['Message'] : __($error['Code']));
 			$requiere_refrescar = "window.opener.Refrescar();";
+		} else {
+			$factura->Edit('estado', 'ANULADA');
+			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
+			$factura->Edit('anulado', 1);
+			if ($factura->Escribir()) {
+				$pagina->AddInfo(__('Documento Tributario') . ' ' . __('anulado con éxito'));
+				$requiere_refrescar = "window.opener.Refrescar();";
+			}
 		}
 	}
 }//FIN DE ELSE (No es WEBSERVICE)
