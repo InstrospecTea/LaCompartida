@@ -8,7 +8,6 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 $Slim = Slim::getInstance('default', true);
-error_reporting(E_ALL ^ E_NOTICE);
 $Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_cobros7_botones_after',  function($hookArg) {
@@ -55,7 +54,7 @@ function InsertaJSFacturaElectronica() {
 
 function BotonGenerarHTML($id_factura) {
 	$img_dir = Conf::ImgDir();
-	$content = "<a style = 'margin-left: 8px;margin-right: 8px;' title = 'Generar Factura Electrónica' class = 'factura-electronica' data-factura = '$id_factura' href = '#' >
+	$content = "<a style = 'margin-left: 8px;margin-right: 8px;text-decoration: none;' title = 'Generar Factura Electrónica' class = 'factura-electronica' data-factura = '$id_factura' href = '#' >
 			<img src = '$img_dir/invoice.png' border='0' />
 		</a>";
 	return $content;
@@ -88,12 +87,7 @@ function GeneraFacturaElectronica($hookArg) {
 		$result = $client->RecibirTXT($usuario, $password, $strdocumento);
 		if ($result->codigo == 201) {
 			try {
-				$result_xml = $client->RecibirXML($usuario, $password, $strdocumento);
-
-				if ($result_xml->codigo == 201) {
-					$Factura->Edit('dte_xml', $result->documento);
-				}
-
+				$Factura->Edit('dte_xml', $result->descripcion);
 				$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 				$Factura->Edit('dte_firma', $result->timbrefiscal);
 
