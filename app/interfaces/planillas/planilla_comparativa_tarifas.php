@@ -201,8 +201,29 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
+			'name' => 'monto_comparativo',
 			'field' => '=PRODUCT($Tarifa Comparativa %categoria_usuario%$,%duracion_usuario_numero%)',
 			'title' => 'Monto Comparativo',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_base_simbolo'
+			)
+		),
+		array(
+			'name' => 'total_comparativo',
+			'field' => '=SUMIF(:id_cobro:,%id_cobro%,:monto_comparativo:)',
+			'title' => 'Total Comparativo',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_base_simbolo',
+				'inlinegroup_field' => 'id_cobro'
+			)
+		),
+		array(
+			'field' => '=PRODUCT(%monto_comparativo%,%monto_honorarios%)/%total_comparativo%',
+			'title' => 'Aporte Comparativo',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
@@ -229,8 +250,29 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
+			'name' => 'monto_standard',
 			'field' => '=PRODUCT($Tarifa Standard %categoria_usuario%$,%duracion_usuario_numero%)',
 			'title' => 'Monto Standard',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_base_simbolo'
+			)
+		),
+		array(
+			'name' => 'total_standard',
+			'field' => '=SUMIF(:id_cobro:,%id_cobro%,:monto_standard:)',
+			'title' => 'Total Standard',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_base_simbolo',
+				'inlinegroup_field' => 'id_cobro'
+			)
+		),
+		array(
+			'field' => '=PRODUCT(%monto_standard%,%monto_honorarios%)/%total_standard%',
+			'title' => 'Aporte Standard',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',

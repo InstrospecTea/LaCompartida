@@ -222,7 +222,8 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		if (!$this->single_table && !$repeat_header) {
 			$this->header($columns, $col0);
 		}
-		$first_row = $this->current_row;
+		$this->first_row = $first_row = $this->current_row;
+		$this->last_row = $first_row + count($result);
 
 		// 4.2 Body
 		$formatos_con_total = array('number', 'time');
@@ -237,8 +238,8 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 			$col_i = $col0;
 			foreach ($columns as $idx => $column) {
-				if (!isset($this->col_letters[$column->field])) {
-					$this->col_letters[$column->field] = $col_i;
+				if (!isset($this->col_letters[$column->name])) {
+					$this->col_letters[$column->name] = $col_i;
 				}
 				$col_i++;
 			}
@@ -490,6 +491,18 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					$param = '"' . $row[$param] . '"';
 				} else if (strpos($param, '"') !== 0) {
 					$param = '"' . $param . '"';
+				}
+				$value = str_replace($match[0], $param, $value);
+			}
+		}
+
+		if (preg_match_all('/:(\w+):/', $value, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$param = $match[1];
+				if (isset($this->col_letters[$match[1]])) {
+					$first = $this->xls->rowcolToCell($this->first_row, $this->col_letters[$match[1]]);
+					$last = $this->xls->rowcolToCell($this->last_row, $this->col_letters[$match[1]]);
+					$param = "$first:$last";
 				}
 				$value = str_replace($match[0], $param, $value);
 			}

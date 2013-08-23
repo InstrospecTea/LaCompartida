@@ -382,8 +382,9 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		return $valor;
 	}
 
-	private function td($row, $column, $extras ='') {
+	private function td(&$row, $column, $extras ='') {
 		$valor = $this->parse_field($column->field, $row, $column->format == 'number');
+		$row[$column->name] = $valor;
 		switch ($column->format) {
 			case 'text':
 				if (strpos($valor, ";")) {
