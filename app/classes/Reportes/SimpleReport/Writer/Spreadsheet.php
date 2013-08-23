@@ -91,7 +91,10 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$current_col = 1;
 				$rows = array();
 				$cols = array();
-				foreach ($this->SimpleReport->variables as $variable) {
+				foreach ($this->SimpleReport->variables as $key => $variable) {
+					if(!is_numeric($key)){
+						continue;
+					}
 					if(!isset($rows[$variable['row']])){
 						$this->sheet->write($this->current_row, 0, $variable['row'], $this->formats['filtros']);
 						$rows[$variable['row']] = $this->current_row++;
@@ -100,7 +103,11 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						$this->sheet->write($header_row, $current_col, $variable['col'], $this->formats['filtros']);
 						$rows[$variable['col']] = $current_col++;
 					}
-					$this->sheet->write($rows[$variable['row']], $rows[$variable['col']], $this->parse_param($variable['value'], null), $this->formats['valoresfiltros']);
+
+					$this->write_cell($this->parse_param($variable['value'], null),
+						$rows[$variable['row']], $rows[$variable['col']], 'number',
+						isset($variable['extras']) ? $variable['extras'] : array(),
+						$this->SimpleReport->variables['data'], strpos($variable['value'], '=') === 0);
 					$this->variableCells[$variable['name']] = $this->xls->rowcolToCell($rows[$variable['row']], $rows[$variable['col']]);
 				}
 			} else {
@@ -385,22 +392,18 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		}
 	}
 
-	private function cell($row, $column, $col_i, $format = null) {
-
-		if (empty($format)) {
-			$format = $column->format;
-		}
-		if (in_array($format, array('number', 'total_number')) && (isset($column->extras['symbol']) || isset($column->extras['decimals']))) {
+	private function write_cell($value, $row_number, $col_i, $format, $extras, $row, $is_formula) {
+		if (in_array($format, array('number', 'total_number')) && (isset($extras['symbol']) || isset($extras['decimals']))) {
 			$symbol = '';
-			if (isset($column->extras['symbol'])) {
-				$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
+			if (isset($extras['symbol'])) {
+				$symbol = array_key_exists($extras['symbol'], $row) ? $row[$extras['symbol']] : $extras['symbol'];
 				if (ord($symbol) == 128) {
 					$symbol = 'EUR';
 				}
 			}
 			$decimals = 2;
-			if (isset($column->extras['decimals'])) {
-				$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
+			if (isset($extras['decimals'])) {
+				$decimals = array_key_exists($extras['decimals'], $row) ? $row[$extras['decimals']] : $extras['decimals'];
 			}
 
 			$f = $format . '_' . $symbol . '_' . $decimals;
@@ -414,6 +417,36 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			}
 			$format = $f;
 		}
+
+		if ($format == 'text') {
+			//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
+			if (strpos($value, ";")) {
+				$value = str_replace(";", "\n", $value);
+				$format = 'text_wrap';
+			}
+		} else if ($format == 'date') {
+			//las fechas llegan en formato SQL, pasarlas a formato excel
+			$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
+		} else if ($format == 'time') {
+			$value /= 24;
+		}
+		if ((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)) {
+			$value = str_replace(',', '.', $value);
+		}
+
+		if ($is_formula) {
+			$this->sheet->writeFormula($row_number, $col_i, $value, $this->formats[$format]);
+		} else {
+			$function = $format == 'text' ? 'writeString' : 'write';
+			$this->sheet->$function($row_number, $col_i, $value, $this->formats[$format]);
+
+			if (isset($extras['rowspan']) && $extras['rowspan'] > 1) {
+				$this->sheet->mergeCells($row_number - $extras['rowspan'] + 1, $col_i, $row_number, $col_i);
+			}
+		}
+	}
+
+	private function cell($row, $column, $col_i, $format = null) {
 
 		$value = '';
 		$is_formula = false;
@@ -452,32 +485,10 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			}
 		}
 
-		if ($format == 'text') {
-			//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
-			if (strpos($value, ";")) {
-				$value = str_replace(";", "\n", $value);
-				$format = 'text_wrap';
-			}
-		} else if ($format == 'date') {
-			//las fechas llegan en formato SQL, pasarlas a formato excel
-			$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
-		} else if ($format == 'time') {
-			$value /= 24;
+		if (empty($format)) {
+			$format = $column->format;
 		}
-		if ((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)) {
-			$value = str_replace(',', '.', $value);
-		}
-
-		if ($is_formula) {
-			$this->sheet->writeFormula($this->current_row, $col_i, $value, $this->formats[$format]);
-		} else {
-			$function = $format == 'text' ? 'writeString' : 'write';
-			$this->sheet->$function($this->current_row, $col_i, $value, $this->formats[$format]);
-
-			if (isset($column->extras['rowspan']) && $column->extras['rowspan'] > 1) {
-				$this->sheet->mergeCells($this->current_row - $column->extras['rowspan'] + 1, $col_i, $this->current_row, $col_i);
-			}
-		}
+		$this->write_cell($value, $this->current_row, $col_i, $format, $column->extras, $row, $is_formula);
 	}
 
 	private function parse_param($value, $row){

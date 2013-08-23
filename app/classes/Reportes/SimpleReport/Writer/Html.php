@@ -45,12 +45,16 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				$html .= '<fieldset><legend>Variables</legend><table>';
 				if(isset($this->SimpleReport->variables[0])) {
 					$vars = array();
-					foreach ($this->SimpleReport->variables as $variable) {
+					foreach ($this->SimpleReport->variables as $key => $variable) {
+						if(!is_numeric($key)){
+							continue;
+						}
 						$value = $this->parse_field($variable['value'], array(), true);
 						if(!isset($vars[$variable['row']])) {
 							$vars[$variable['row']] = array();
 						}
-						$vars[$variable['row']][$variable['col']] = $value;
+						$variable['value'] = $value;
+						$vars[$variable['row']][$variable['col']] = $variable;
 						$this->variables[$variable['name']] = $value;
 					}
 
@@ -62,8 +66,8 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 
 					foreach ($vars as $row => $cols) {
 						$html .= "<tr><th align=\"right\">$row</th>";
-						foreach ($cols as $value) {
-							$html .= "<td>$value</td>";
+						foreach ($cols as $variable) {
+							$html .= $this->format_td($variable['value'], 'number', $variable['extras'], '', $this->SimpleReport->variables['data']);
 						}
 						$html .= '</tr>';
 					}
@@ -413,7 +417,11 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 	private function td(&$row, $column, $extras ='') {
 		$valor = $this->parse_field($column->field, $row, $column->format == 'number');
 		$row[$column->name] = $valor;
-		switch ($column->format) {
+		return $this->format_td($valor, $column->format, $column->extras, $extras, $row);
+	}
+
+	private function format_td($valor, $format, $extras, $extra_text, $row) {
+		switch ($format) {
 			case 'text':
 				if (strpos($valor, ";")) {
 					$valor = str_replace(";", "<br />", $valor);
@@ -421,12 +429,12 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				break;
 			case 'number':
 				$decimals = 2;
-				if (isset($column->extras['decimals'])) {
-					$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
+				if (isset($extras['decimals'])) {
+					$decimals = array_key_exists($extras['decimals'], $row) ? $row[$extras['decimals']] : $extras['decimals'];
 				}
 				$valor = number_format($valor, $decimals, $this->SimpleReport->regional_format['decimal_separator'], $this->SimpleReport->regional_format['thousands_separator']);
-				if (isset($column->extras['symbol'])) {
-					$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
+				if (isset($extras['symbol'])) {
+					$symbol = array_key_exists($extras['symbol'], $row) ? $row[$extras['symbol']] : $extras['symbol'];
 					$valor = "$symbol&nbsp;$valor";
 				}
 				break;
@@ -438,17 +446,17 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				break;
 		}
 
-		$attrs = isset($column->extras['attrs']) ? $column->extras['attrs'] : '';
-		if (isset($column->extras['rowspan'])) {
-			$attrs .= ' rowspan="' . $column->extras['rowspan'] . '"';
+		$attrs = isset($extras['attrs']) ? $extras['attrs'] : '';
+		if (isset($extras['rowspan'])) {
+			$attrs .= ' rowspan="' . $extras['rowspan'] . '"';
 		}
 
 		$class = 'buscador';
-		if (isset($column->extras['class'])) {
-			$class .= ' ' . $column->extras['class'];
+		if (isset($extras['class'])) {
+			$class .= ' ' . $extras['class'];
 		}
 
-		return "<td class=\"$class\" $attrs>$extras$valor</td>";
+		return "<td class=\"$class\" $attrs>$extra_text$valor</td>";
 	}
 
 	private function parse_param($param, $row, $numeric = true, $default = null){

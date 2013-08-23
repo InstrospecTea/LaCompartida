@@ -59,7 +59,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$Tarifa = new Tarifa($Sesion);
 	$CategoriaTarifa = new CategoriaTarifa($Sesion);
 
-	$variables = array();
+	$variables = array('data' => array('moneda' => $moneda['simbolo']));
 	$tarifas = $CategoriaTarifa->TarifasCategorias($id_tarifa_comparativa, $moneda_mostrar);
 	$promedio = 'AVERAGE($Tarifa Comparativa ' . implode('$,$Tarifa Comparativa ', array_keys($tarifas)) . '$)';
 	foreach ($tarifas as $nombre => $valor) {
@@ -67,7 +67,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'row' => $nombre,
 			'col' => 'Tarifa Comparativa',
 			'name' => "Tarifa Comparativa $nombre",
-			'value' => $valor
+			'value' => $valor,
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda'
+			)
 		);
 	}
 	foreach ($tarifas as $nombre => $valor) {
@@ -86,7 +90,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'row' => $nombre,
 			'col' => 'Tarifa Standard',
 			'name' => "Tarifa Standard $nombre",
-			'value' => $valor
+			'value' => $valor,
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda'
+			)
 		);
 	}
 	foreach ($tarifas as $nombre => $valor) {
@@ -243,7 +251,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Total Comparativo',
 			'format' => 'number',
 			'extras' => array(
-				'attrs' => 'style="text-align:right;"',
+				'attrs' => 'style="text-align:right;display:none"',
 				'symbol' => 'moneda_base_simbolo',
 				'inlinegroup_field' => 'id_cobro'
 			)
@@ -253,7 +261,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Aporte Comparativo',
 			'format' => 'number',
 			'extras' => array(
-				'attrs' => 'style="text-align:right;"',
+				'attrs' => 'style="text-align:right;display:none"',
 				'symbol' => 'moneda_base_simbolo'
 			)
 		),
@@ -292,7 +300,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Total Standard',
 			'format' => 'number',
 			'extras' => array(
-				'attrs' => 'style="text-align:right;"',
+				'attrs' => 'style="text-align:right;display:none"',
 				'symbol' => 'moneda_base_simbolo',
 				'inlinegroup_field' => 'id_cobro'
 			)
@@ -302,7 +310,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Aporte Standard',
 			'format' => 'number',
 			'extras' => array(
-				'attrs' => 'style="text-align:right;"',
+				'attrs' => 'style="text-align:right;display:none"',
 				'symbol' => 'moneda_base_simbolo'
 			)
 		),
