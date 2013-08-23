@@ -459,7 +459,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <input type="hidden" name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type="hidden" name="max_hora" id="max_hora" value=<?php echo Conf::GetConf($sesion,'MaxDuracionTrabajo')?> />
-<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo $t->fields['codigo_asunto']?>" />
+<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo Conf::GetConf($sesion,'CodigoSecundario') ? $asunto->fields['codigo_asunto_secundario'] : $t->fields['codigo_asunto']; ?>" />
 <?php
 	if ($opcion != 'nuevo') {
 ?>
