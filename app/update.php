@@ -9967,6 +9967,9 @@ QUERY;
 			if (!ExisteCampo('dte_url_pdf', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_url_pdf` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - URL PDF documento';";
 			}
+			if (!ExisteCampo('dte_fecha_anulacion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_anulacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha anulacion';";
+			}
 
 			$queries[] = "INSERT IGNORE INTO configuracion (glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
 									VALUES ('FacturacionElectronicaUsuario', 'democfdi', 'string', 'Usuario para integración con facturación electrónica', 10, -1)

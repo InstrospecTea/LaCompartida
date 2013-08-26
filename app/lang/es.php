@@ -1119,3 +1119,7 @@ $_LANG["The matter doesn't exist"] = "El Asunto no existe";
 $_LANG["You can not enter hours prior to"] = "No puede ingresar horas anteriores al";
 $_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %HOURS horas de un mínimo de %MINIMUM";
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+
+$_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+$_LANG["SaveGeneratedInvoiceError"] = "Error guardar la factura electrónica";
+$_LANG["CancelGeneratedInvoiceError"] = "Error anular la factura electrónica";

@@ -16,6 +16,9 @@ $Slim->hook('hook_cobros7_botones_after',  function($hookArg) {
 $Slim->hook('hook_genera_factura_electronica', function($hookArg) {
 	return GeneraFacturaElectronica($hookArg);
 });
+$Slim->hook('hook_anula_factura_electronica', function($hookArg) {
+	return AnulaFacturaElectronica($hookArg);
+});
 
 function InsertaJSFacturaElectronica() {
 	echo 'jQuery(document).on("click", ".factura-electronica", function() {
@@ -115,6 +118,49 @@ function GeneraFacturaElectronica($hookArg) {
 	return $hookArg;
 }
 
+function AnulaFacturaElectronica($hookArg) {
+	$Sesion = new Sesion();
+	$Factura = $hookArg['Factura'];
+	/*$hookArg['Error'] = array(
+		'Code' => 'CancelGeneratedInvoiceError',
+		'Message' => print_r($ex, true)
+	);*/
+	$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+	return $hookArg;
+
+	$client = new SoapClient("https://www.facturemosya.com:443/webservice/sRecibirXML.php?wsdl");
+	$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
+	$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
+	$strdocumento = FacturaToTXT($Sesion, $Factura);
+	$result = $client->RecibirTXT($usuario, $password, $strdocumento);
+	if ($result->codigo == 201) {
+		try {
+			$Factura->Edit('dte_xml', $result->descripcion);
+			$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
+			$Factura->Edit('dte_firma', $result->timbrefiscal);
+
+			$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
+			$file_data = base64_decode($result->documentopdf);
+			$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
+
+			$Factura->Edit('dte_url_pdf', $file_url);
+			if ($Factura->Write()) {
+				$hookArg['InvoiceURL'] = $file_url;
+			}
+		} catch (Exception $ex) {
+			$hookArg['Error'] = array(
+				'Code' => 'SaveGeneratedInvoiceError',
+				'Message' => print_r($ex, true)
+			);
+		}
+	} else {
+		$hookArg['Error'] = array(
+			'Code' => 'BuildingInvoiceError',
+			'Message' => utf8_decode($result->descripcion)
+		);
+	}
+	return $hookArg;
+}
 
 //
 // $strdocumento = 'COM|||version|3.2||serie|WS||folio|15||fecha|2013-07-18T10:14:49||formaDePago|PAGO EN UNA SOLA EXHIBICION||TipoCambio|1.000||condicionesDePago|EFECTOS FISCALES AL PAGO||subTotal|425.00||Moneda|MX||total|493.00||tipoDeComprobante|ingreso||metodoDePago|PAGO NO IDENTIFICADO||LugarExpedicion|MEXICO DISTRITO FEDERAL||NumCtaPago|1234||descuento|0.00||motivoDescuento|desc

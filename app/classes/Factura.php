@@ -322,7 +322,7 @@ class Factura extends Objeto {
 		}
 		return false;
 	}
-	
+
 	function ObtenerValorReal($id_factura) {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
 					FROM cta_cte_fact_mvto ccfm
@@ -405,6 +405,13 @@ class Factura extends Objeto {
 		return $saldo;
 	}
 
+	function FacturaElectronicaCreada() {
+		return !is_null($this->fields['dte_fecha_creacion']);
+	}
+
+	function FacturaElectronicaAnulada() {
+		return !is_null($this->fields['dte_fecha_anulacion']);
+	}
 
 	function Escribir() {
 		if (!$this->Id()) {
@@ -1783,7 +1790,7 @@ class Factura extends Objeto {
 		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
-		
+
 		// if ($orden == "") {
 		// 	$orden = "factura.fecha DESC";
 		// 	$orderby = " ORDER BY $orden ";
@@ -1908,7 +1915,7 @@ class Factura extends Objeto {
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
-						GROUP BY ccfm2.id_factura 
+						GROUP BY ccfm2.id_factura
 			  	) AS pagos";
 			}
 
@@ -1920,7 +1927,7 @@ class Factura extends Objeto {
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
-						GROUP BY ccfm2.id_factura 
+						GROUP BY ccfm2.id_factura
 			  	) AS fecha_ultimo_pago";
 			}
 
