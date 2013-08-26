@@ -15,8 +15,8 @@ function Ofrece_Planilla_Resumen_Facturacion() {
 
 function Descarga_Planilla_Resumen_Facturacion() {
 	global $sesion, $factura, $orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-	$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
-	$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable,$id_cia;
+	$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_estudio,
+	$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable;
 
 	if ($_GET['planilla']) {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
@@ -25,7 +25,7 @@ function Descarga_Planilla_Resumen_Facturacion() {
 		,$tipo_documento_legal_buscado
 		, $codigo_cliente,$codigo_cliente_secundario
 		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_cia,
+		, $id_contrato, $id_estudio,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 	}
 

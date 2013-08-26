@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(__FILE__)).'/conf.php'; 
+require_once dirname(dirname(__FILE__)).'/conf.php';
 
 
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
@@ -16,7 +16,7 @@ if ($p_cobranza->fields['permitido']) {
 
 $params_array['codigo_permiso'] = 'PRO';
 $p_profesional = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
-//echo '<pre>';print_r($_REQUEST);echo '</pre>';
+
 if ($motivo=='cobros' && $id_cobro) {
 
 	$cobro = new Cobro($sesion);
@@ -194,7 +194,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		$cobro->LoadAsuntos();
 		$query_asuntos = implode("','", $cobro->asuntos);
 		$id_contrato=$cobro->fields['id_contrato'];
-		
+
 		  if(count($cobro->asuntos)>0) {
 		      $where .= " AND trabajo.codigo_asunto IN ('$query_asuntos')";// or contrato.id_contrato='$id_contrato')";
 		      $where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos')";// or contrato.id_contrato='$id_contrato')";
@@ -215,7 +215,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		//para tema de los gastos que se preseleccionaran para cobro4.php
 		$codigo_cliente = $cobro->fields['codigo_cliente'];
 	} else if ($query_asuntos) { // FFF si viene seteado el codigo de asunto, lo mantengo
-		
+
 			if($id_contrato) {
 				$where .= " AND (trabajo.codigo_asunto IN ('$query_asuntos') or cobro.id_contrato='$id_contrato')";
 				$where_gastos .= " AND (cta_corriente.codigo_asunto IN ('$query_asuntos') or cobro.id_contrato='$id_contrato')";
@@ -223,7 +223,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 				$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
 				$where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
 			}
-		
+
 		//$where .= " AND trabajo.cobrable = 1";
 
 		if ($id_cobro) {
@@ -233,13 +233,13 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			$where .= " AND cobro.estado IS NULL";
 			$where_gastos .= " AND cobro.estado IS NULL";
 		}
-	} 
+	}
 
 	if ($buscar_id_cobro){
 			$where .= " AND trabajo.id_cobro='$buscar_id_cobro'";
 			$where_gastos .= " AND cta_corriente.id_cobro='$buscar_id_cobro'";
-		} 	
-	
+		}
+
 	$where_gasto .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
 
 	if ($cobrable == 'SI') {
@@ -284,22 +284,22 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		 global $where, $query;
 		 $where=$wherelocal;
 	// TOTAL HORAS
-	$query = "SELECT 
-					SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion, 
+	$query = "SELECT
+					SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion,
 					SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada ";
-				
+
 	  	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
-		
+
 	$query.=" FROM trabajo
 				JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 				LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
 				LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
 				LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
 				LEFT JOIN contrato ON asunto.id_contrato =contrato.id_contrato
-				LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
-				LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+				LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+				LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
 				WHERE $where ";
-	
+
 
 	 // echo $query;
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -309,56 +309,56 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		$select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	}
-	
-	
+
+
 	#BUSCAR
-	$query = "SELECT  SQL_CALC_FOUND_ROWS 
+	$query = "SELECT  SQL_CALC_FOUND_ROWS
 					trabajo.id_trabajo,
 					trabajo.id_cobro,
-					trabajo.revisado, 
-					trabajo.id_trabajo, 
+					trabajo.revisado,
+					trabajo.id_trabajo,
 					trabajo.codigo_asunto,
 					trabajo.cobrable,
 					trabajo.solicitante,
 					prm_moneda.simbolo as simbolo,
 					prm_moneda.id_moneda as id_moneda,
-					asunto.codigo_cliente as codigo_cliente, 
-					contrato.id_moneda as id_moneda_asunto, 
+					asunto.codigo_cliente as codigo_cliente,
+					contrato.id_moneda as id_moneda_asunto,
 					asunto.id_asunto AS id,
 					cliente.glosa_cliente,
-					trabajo.fecha_cobro as fecha_cobro_orden, 
-					trabajo.descripcion, 
-					IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable, 
-					trabajo.visible, 
-					cobro.estado as estado_cobro, 
+					trabajo.fecha_cobro as fecha_cobro_orden,
+					trabajo.descripcion,
+					IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable,
+					trabajo.visible,
+					cobro.estado as estado_cobro,
 					cobro.id_moneda as id_moneda_cobro,
 					contrato.id_moneda as id_moneda_contrato,
-					CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre, 
-					usuario.username, 
-					usuario.id_usuario, 
-					CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'), 
+					CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre,
+					usuario.username,
+					usuario.id_usuario,
+					CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'),
 					DATE_FORMAT(duracion_cobrada,'%H:%i')) as duracion,
-					TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas, 
-					trabajo.tarifa_hh, 
+					TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas,
+					trabajo.tarifa_hh,
 					tramite_tipo.id_tramite_tipo,
-					DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
-					cobro.estado, 
-					cliente.glosa_cliente, 
-					asunto.forma_cobro, 
-					asunto.codigo_asunto_secundario, 
-					asunto.monto, 
+					DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro,
+					cobro.estado,
+					cliente.glosa_cliente,
+					asunto.forma_cobro,
+					asunto.codigo_asunto_secundario,
+					asunto.monto,
 					asunto.glosa_asunto,
-					contrato.descuento, 
-					tramite_tipo.glosa_tramite, 
-					trabajo.fecha, 
+					contrato.descuento,
+					tramite_tipo.glosa_tramite,
+					trabajo.fecha,
 					prm_idioma.codigo_idioma as codigo_idioma,
-					contrato.id_tarifa  
+					contrato.id_tarifa
 					$select_glosa_actividad ";
 							   	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
 
 				$query.=" FROM trabajo
 				LEFT JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-				LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
+				LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
 				LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
 				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
@@ -369,7 +369,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 				LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 				WHERE $where ";
 
-				
+
 				//echo $query;
 	if ($excel && $simplificado) {
 		$query = str_replace('SELECT  SQL_CALC_FOUND_ROWS', 'SELECT  SQL_BIG_RESULT SQL_NO_CACHE  ', $query);
@@ -590,7 +590,7 @@ if ($motivo == "horas") {
 		http.send(null);
 	}
 
-	
+
 	// Basado en http://snipplr.com/view/1696/get-elements-by-class-name/
 	function getElementsByClassName(classname)
 	{
@@ -606,9 +606,9 @@ if ($motivo == "horas") {
 	// Función para seleccionar todos las filas para editar, basada en la de phpMyAdmin
 	function seleccionarTodo(valor)
 	{
-	 
+
 		jQuery('.editartrabajo').each(function() {
-		 
+
 			if(!jQuery(this).is(':disabled')) {
 			  if(valor==true) {
 				  jQuery(this).attr('checked','checked');
@@ -617,7 +617,7 @@ if ($motivo == "horas") {
 			  }
 			}
 		});
-		
+
 		return true;
 	}
 	// Encuentra los id de los trabajos seleccionados para editar, depende del id del primer <tr> que contiene al trabajo.
@@ -625,17 +625,17 @@ if ($motivo == "horas") {
 	function getIdTrabajosSeleccionados()
 	{
 		var ids = '';
-				
+
 		jQuery('.editartrabajo').each(function() {
 			var trabajoid=jQuery(this).closest('tr').attr('id');
 			if(jQuery(this).is(':checked')) {
 			ids += trabajoid;
 			}
 		});
-		
+
 		return ids;
 	}
-	
+
 	// Intenta editar múltiples trabajos, genera un error si no hay trabajos seleccionados.
 	function editarMultiplesArchivos()
 	{
@@ -657,7 +657,7 @@ if ($motivo == "horas") {
 
 
 </script>
- 
+
 <form method='post' name="form_trabajos" id="form_trabajos">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
 	<input type='hidden' name='popup' id='popup' value='<?php echo $popup ?>'>
@@ -676,17 +676,17 @@ if ($motivo == "horas") {
 	?>
 	<input type='hidden' name='check_trabajo' id='check_trabajo' value=''>
 
-	 
+
 					<fieldset class="tb_base" width="100%" style="border: 1px solid #BDBDBD;">
 						<legend><?php echo __('Filtros') ?></legend>
 						<table   style="border: 0px solid black;width:700px;margin:auto;" >
- 
+
 							<?php
 							if ($motivo != "cobros") {
 								if ($p_revisor->fields['permitido']) {
 									?>
 									<tr>
- 
+
 										<td style="width:180px;" class="buscadorlabel"><?php echo __('Cobrado') ?></td>
 										<td align='left'>
 											<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", $cobrado, ' class="fl" ', 'Todos', '60') ?>
@@ -697,8 +697,8 @@ if ($motivo == "horas") {
 											<?php
 											if ($motivo == 'horas') {
 												echo ' <div class="fl buscadorlabel" style="margin-top: 3px;padding-right:3px;width:60px;">' . __('Cobro') . " </div><input id='id_cobro' class='fl' type='text' style='float:left;width:80px;' name='buscar_id_cobro' id='buscar_id_cobro' value='$buscar_id_cobro'/>";
- 
-											}  
+
+											}
 											?>
 										</td>
 									</tr>
@@ -717,7 +717,7 @@ if ($motivo == "horas") {
 									<td class="buscadorlabel"><?php echo __('Asunto') ?></td>
 									<td nowrap align='left' colspan="2">
 										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
- 
+
 									</td>
 								</tr>
 								<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_filtros_trabajos'):false; ?>
@@ -728,7 +728,7 @@ if ($motivo == "horas") {
 										<td nowrap align='left' colspan="2">
 											<?php echo Html::SelectQuery($sesion, "SELECT IF( glosa_actividad != '', glosa_actividad, 'Indefinido' ) as glosa_actividad,'' FROM actividad GROUP BY glosa_actividad", "glosa_actividad", $glosa_actividad, '', 'Cualquiera', '200'); ?>
 										</td>
-									</tr>	
+									</tr>
 									<?php
 								}
 								?>
@@ -738,13 +738,13 @@ if ($motivo == "horas") {
 									</td>
 									<td align='left' colspan="2">
 										<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='SOC' ORDER BY nombre ASC", "id_encargado_comercial", $id_encargado_comercial, '', 'Todos', '200'); ?>
-									<td>
+									</td>
 								</tr>
 								<?php
 								// Explicacion adicional: Esa condición "strlen($select_usuario) > 164" esta validando si hay mas usuarios
 								// que solamente Admin Lemontech
 								// TODO: WTF!
- 
+
 								//if (strlen($select_usuario) > 164) { // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
 								// mejor que siempre salga
 
@@ -754,7 +754,7 @@ if ($motivo == "horas") {
 										<td align='left' colspan="2"><?php echo $select_usuario ?></td>
 									</tr>
 									<?php
- 
+
 							}
 							// Validando fecha
 							$hoy = date('Y-m-d');
@@ -777,25 +777,25 @@ if ($motivo == "horas") {
 							<tr>
 								<td class="buscadorlabel" colspan=1><?php echo __('Fecha desde') ?></td>
 								<td align=left colspan="2">
- 
+
 									<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
 									 &nbsp;&nbsp;&nbsp;&nbsp;
 									<div class="buscadorlabel" style="margin-bottom: 3px;width:70px;display:inline-block;" ><?php echo __('Fecha hasta') ?></div>
 									<input type="text" name="fecha_fin"  class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
  								</td>
- 
+
 							</tr>
 							<tr>
 								<td></td>
 								<td colspan="2"  align=left>
- 
+
 									<a name='boton_buscar' id='boton_buscar'  class="btn botonizame" icon="find" onclick="jQuery('#check_trabajo').attr('checked','checked').val(1);jQuery('#form_trabajos').submit();"><?php echo __('Buscar') ?></a>
- 
+
 								</td>
 							</tr>
 						</table>
 					</fieldset>
- 
+
 </form>
 
 <?php
@@ -872,7 +872,10 @@ function Opciones(& $trabajo, $texto = '') {
 		$opc_html = Cobrable($trabajo);
 	}
 
-	if ($p_revisor->fields['permitido']) {
+	// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+	$permiso_revisor_usuario = $sesion->usuario->Revisa($trabajo->fields['id_usuario']);
+
+	if ($p_revisor->fields['permitido'] || $permiso_revisor_usuario) {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
 			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',750,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
@@ -910,8 +913,10 @@ function LinkAlTrabajo(& $trabajo, $texto = '') {
 	$cobro = new Cobro($sesion);
 	$cobro->Load($id_cobro);
 
+	// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+	$permiso_revisor_usuario = $sesion->usuario->Revisa($trabajo->fields['id_usuario']);
 
-	if ($p_revisor->fields['permitido']) {
+	if ($p_revisor->fields['permitido'] || $permiso_revisor_usuario) {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
 			$opc_html.= "<a style='vertical-align:top;' href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
@@ -963,8 +968,8 @@ function funcionTR(& $trabajo) {
 		$moneda_cobro->Load($trabajo->fields['id_moneda_asunto']);
 	}
 	if ($trabajo->fields['id_tramite'] > 0) {
-		$query = "SELECT glosa_tramite FROM tramite_tipo 
-	JOIN tramite USING(id_tramite_tipo) 
+		$query = "SELECT glosa_tramite FROM tramite_tipo
+	JOIN tramite USING(id_tramite_tipo)
 	WHERE tramite.id_tramite=" . $trabajo->fields['id_tramite'];
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($glosa_tramite) = mysql_fetch_array($resp);
@@ -1105,11 +1110,11 @@ function funcionTR(& $trabajo) {
 }
 ?>
 <script type="text/javascript">
-   
 
-	jQuery(document).ready(function() { 
 
-		
+	jQuery(document).ready(function() {
+
+
 		jQuery('#descargapro').click(function() {
 			jQuery('#descargapro').attr('disabled','disabled');
 			var Where='<?php echo base64_encode($where) ?>';
@@ -1121,7 +1126,7 @@ function funcionTR(& $trabajo) {
 					var dialogoconfirma=top.window.jQuery( "#dialog-confirm" );
 					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
 					jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
-				
+
 					dialogoconfirma.dialog({
 						resizable: false,
 						autoOpen:true,
@@ -1136,33 +1141,33 @@ function funcionTR(& $trabajo) {
 								jQuery('#descargapro').removeAttr('disabled');
 								window.location.href='trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&simplificado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
 								dialogoconfirma.dialog( "close" );
-												
+
 								return true;
 							},
 
 							"<?php echo __('Cancelar') ?>": function() {
 								jQuery('#descargapro').removeAttr('disabled');
 								dialogoconfirma.dialog( "close" );
-												
+
 								return false;
-															
+
 							}
 						}
 					});
 				} else {
-					jQuery('#descargapro').removeAttr('disabled');  
+					jQuery('#descargapro').removeAttr('disabled');
 					window.location.href='trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
 					return true;
 				}
 			});
-           
-			jQuery('#descargapro').removeAttr('disabled');  
-		});    
-        
+
+			jQuery('#descargapro').removeAttr('disabled');
+		});
+
 	});
-  
+
 </script>
 <?php
- 
+
 
 $pagina->PrintBottom($popup);

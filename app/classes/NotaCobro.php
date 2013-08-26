@@ -1693,21 +1693,6 @@ class NotaCobro extends Cobro {
 				break;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-				break;
-
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
@@ -2297,8 +2282,17 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+				$query = "SELECT SQL_CALC_FOUND_ROWS 
+							tramite.duracion,
+							tramite_tipo.glosa_tramite as glosa_tramite,
+							tramite.descripcion,
+							tramite.fecha,
+							tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.solicitante,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
 							FROM tramite
 							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
@@ -2341,6 +2335,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
 					$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
+					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
 					//muestra las iniciales de los profesionales
 					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $tramite->fields['nombre_usuario'], 4);
@@ -4965,7 +4960,6 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
-				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
 				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
@@ -7720,19 +7714,28 @@ class NotaCobro extends Cobro {
                 //Tabla de Trabajos.
                 //se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
                 //la duracion retainer.
-                $query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+                $query = "SELECT SQL_CALC_FOUND_ROWS 
+                			tramite.duracion,
+                			tramite_tipo.glosa_tramite as glosa_tramite,
+                			tramite.descripcion,
+                			tramite.fecha,
+                			tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.solicitante,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
-							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+						FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
+						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
                 $lista_tramites = new ListaTramites($this->sesion, '', $query);
 
@@ -7765,6 +7768,7 @@ class NotaCobro extends Cobro {
                     $row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
                     $row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
 
+                    $row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
                     //muestra las iniciales de los profesionales
                     list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);
@@ -8756,19 +8760,28 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+				$query = "SELECT SQL_CALC_FOUND_ROWS 
+							tramite.duracion,
+							tramite_tipo.glosa_tramite as glosa_tramite,
+							tramite.descripcion,
+							tramite.fecha,
+							tramite.id_usuario,
+							tramite.id_tramite,
+							tramite.solicitante,
+							tramite.tarifa_tramite as tarifa,
+							tramite.codigo_asunto,
+							tramite.id_moneda_tramite,
 							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
-							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+						FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
+						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
 
@@ -8800,7 +8813,7 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
-
+					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
 					//muestra las iniciales de los profesionales
 					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);

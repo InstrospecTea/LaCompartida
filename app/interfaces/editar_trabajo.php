@@ -16,10 +16,14 @@
 
 	$tipo_ingreso = Conf::GetConf($sesion,'TipoIngresoHoras');
 	$actualizar_trabajo_tarifa = true;
+	$permiso_revisor_usuario = false;
 
 	if ($id_trabajo > 0) {
 		$actualizar_trabajo_tarifa = false;
 		$t->Load($id_trabajo);
+
+		// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+		$permiso_revisor_usuario = $sesion->usuario->Revisa($t->fields['id_usuario']);
 
 		if (($t->Estado() == 'Cobrado' || $t->Estado()== __("Cobrado"))&& $opcion != 'nuevo') {
 			$pagina->AddError(__('Trabajo ya cobrado'));
@@ -28,7 +32,7 @@
 			exit;
 
 		} else if (($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo') {
-			if (!$permiso_revisor->fields['permitido']) {
+			if (!$permiso_revisor->fields['permitido'] && !$permiso_revisor_usuario) {
 				$pagina->AddError(__('Trabajo ya revisado'));
 				$pagina->PrintTop($popup);
 				$pagina->PrintBottom($popup);
@@ -748,7 +752,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
 	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario", $id_usuario ,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 
-	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
+	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable') || $permiso_revisor_usuario) {
 
 		echo '<td class="seccioncobrable">&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td  class="seccioncobrable">';
 

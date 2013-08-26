@@ -307,11 +307,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			r.glosa_cliente,
 			SUM(IF(r.tipo = '$texto_liquidaciones_por_pagar', r.monto_base, 0)) AS total_liquidaciones,
 			SUM(r.saldo_liquidaciones) AS saldo_liquidaciones,
-			SUM(IF(r.tipo = '$texto_gastos_por_liquidar', r.monto_base, 0)) AS total_gastos,
+			SUM(IF(r.tipo = '$texto_gastos_por_liquidar' OR r.tipo = '$texto_provisiones_por_liquidar', r.monto_base, 0)) AS total_gastos,
 			SUM(r.saldo_gastos) AS saldo_gastos,
-			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados' OR r.tipo = '$texto_provisiones_por_liquidar', r.monto_base, 0)) AS total_adelantos,
-			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.saldo_adelantos, IF(r.tipo = '$texto_provisiones_por_liquidar', r.saldo_gastos, 0)
-			)) AS saldo_adelantos,
+			SUM(IF(r.tipo = '$texto_adelantos_no_utilizados', r.monto_base, 0)) AS total_adelantos,
+			SUM(r.saldo_adelantos) AS saldo_adelantos,
 			0 AS total_total, -- total_liquidaciones + total_gastos + total_adelantos AS total_total,
 			0 AS saldo_total, -- saldo_liquidaciones + saldo_gastos + saldo_adelantos AS saldo_total
 			moneda_base AS simbolo_moneda
