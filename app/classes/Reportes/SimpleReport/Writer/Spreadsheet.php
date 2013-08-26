@@ -450,7 +450,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 		$value = '';
 		$is_formula = false;
-		if (strpos($column->field, '=') !== 0) {
+		if (strpos($column->field, '=') !== 0 || isset($row[$column->field])) {
 			// es un valor normal
 			$value = isset($row[$column->field]) ? $row[$column->field] : '';
 		} else {

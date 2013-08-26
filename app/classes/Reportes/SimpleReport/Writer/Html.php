@@ -338,7 +338,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						} else if ($colspan_total) {
 							$colspan_total--;
 						} else {
-							$html .= '<td/>';
+							$html .= '<td ' . (isset($column->extras['attrs']) ? $column->extras['attrs'] : '') . '/>';
 						}
 					}
 				}

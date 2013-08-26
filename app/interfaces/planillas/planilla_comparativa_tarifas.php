@@ -166,7 +166,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
 				'symbol' => 'moneda_base_simbolo',
-				'inlinegroup_field' => 'id_cobro'
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -176,7 +177,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
 				'symbol' => 'moneda_base_simbolo',
-				'inlinegroup_field' => 'id_cobro'
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -184,7 +186,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Duración',
 			'format' => 'time',
 			'extras' => array(
-				'inlinegroup_field' => 'id_cobro'
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -205,7 +208,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'title' => 'Duración numérica',
 			'format' => 'number',
 			'extras' => array(
-				'attrs' => 'style="display:none"'
+				'attrs' => 'style="display:none"',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -214,7 +218,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_base_simbolo'
+				'symbol' => 'moneda_base_simbolo',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -232,7 +237,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_base_simbolo'
+				'symbol' => 'moneda_base_simbolo',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -253,7 +259,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'extras' => array(
 				'attrs' => 'style="text-align:right;display:none"',
 				'symbol' => 'moneda_base_simbolo',
-				'inlinegroup_field' => 'id_cobro'
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -268,12 +275,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		array(
 			'field' => '=$Factor Tarifa Comparativa %categoria_usuario%$',
 			'title' => 'Factor Comparativo',
-			'format' => 'number'
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array(
 			'field' => '=PRODUCT($Factor Tarifa Comparativa %categoria_usuario%$,%duracion_usuario_numero%)',
 			'title' => 'Horas x Factor Comparativo',
-			'format' => 'number'
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array(
 			'field' => '=$Tarifa Standard %categoria_usuario%$',
@@ -281,7 +294,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
-				'symbol' => 'moneda_base_simbolo'
+				'symbol' => 'moneda_base_simbolo',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -302,7 +316,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'extras' => array(
 				'attrs' => 'style="text-align:right;display:none"',
 				'symbol' => 'moneda_base_simbolo',
-				'inlinegroup_field' => 'id_cobro'
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
 			)
 		),
 		array(
@@ -317,12 +332,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		array(
 			'field' => '=$Factor Tarifa Standard %categoria_usuario%$',
 			'title' => 'Factor Standard',
-			'format' => 'number'
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array(
 			'field' => '=PRODUCT($Factor Tarifa Standard %categoria_usuario%$,%duracion_usuario_numero%)',
 			'title' => 'Horas x Factor Standard',
-			'format' => 'number'
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 	);
 
