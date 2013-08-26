@@ -27,7 +27,7 @@ function InsertaJSFacturaElectronica() {
 		}
 		var self = jQuery(this);
 		var id_factura = self.data("factura");
-		var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:85px;height:20px;margin-left:-80px;"});
+		var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:95px;height:20px;margin-left:-90px;"});
 		self.parent().append(loading);
 		jQuery.ajax({url: root_dir + "/api/index.php/invoices/" + id_factura +  "/build",
 			type: "POST"
@@ -124,42 +124,30 @@ function GeneraFacturaElectronica($hookArg) {
 function AnulaFacturaElectronica($hookArg) {
 	$Sesion = new Sesion();
 	$Factura = $hookArg['Factura'];
-	/*$hookArg['Error'] = array(
-		'Code' => 'CancelGeneratedInvoiceError',
-		'Message' => print_r($ex, true)
-	);*/
-	$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
-	return $hookArg;
 
-	$client = new SoapClient("https://www.facturemosya.com:443/webservice/sRecibirXML.php?wsdl");
 	$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
 	$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
-	$strdocumento = FacturaToTXT($Sesion, $Factura);
-	$result = $client->RecibirTXT($usuario, $password, $strdocumento);
+
+	$firma = $Factura->fields['dte_firma'];
+	$firma_parts = explode("|", $firma);
+	$UUID = $firma_parts[1];
+
+	$client = new SoapClient("https://www.facturemosya.com:443/webservice/sCancelarCFDI.php?wsdl");
+	$result = $client->CancelarCFDI($usuario, $password, $UUID);
 	if ($result->codigo == 201) {
 		try {
-			$Factura->Edit('dte_xml', $result->descripcion);
-			$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
-			$Factura->Edit('dte_firma', $result->timbrefiscal);
-
-			$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
-			$file_data = base64_decode($result->documentopdf);
-			$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
-
-			$Factura->Edit('dte_url_pdf', $file_url);
-			if ($Factura->Write()) {
-				$hookArg['InvoiceURL'] = $file_url;
-			}
+			$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+			$Factura->Write();
 		} catch (Exception $ex) {
 			$hookArg['Error'] = array(
-				'Code' => 'SaveGeneratedInvoiceError',
+				'Code' => 'SaveCanceledInvoiceError',
 				'Message' => print_r($ex, true)
 			);
 		}
 	} else {
 		$hookArg['Error'] = array(
-			'Code' => 'BuildingInvoiceError',
-			'Message' => utf8_decode($result->descripcion)
+			'Code' => 'CancelGeneratedInvoiceError',
+			'Message' => utf8_decode($result->descripcion . " $UUID")
 		);
 	}
 	return $hookArg;

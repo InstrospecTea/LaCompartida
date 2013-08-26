@@ -1122,4 +1122,5 @@ $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingre
 
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
 $_LANG["SaveGeneratedInvoiceError"] = "Error guardar la factura electrónica";
+$_LANG["SaveCanceledInvoiceError"] = "Error al guardar el estado de la Factura electrónica anulada";
 $_LANG["CancelGeneratedInvoiceError"] = "Error anular la factura electrónica";
