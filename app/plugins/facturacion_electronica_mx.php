@@ -72,8 +72,11 @@ function BotonDescargarHTML($id_factura) {
 
 function AgregarBotonFacturaElectronica($hookArg) {
 	$Factura = $hookArg['Factura'];
-	$dte_exist = !is_null($Factura->fields['dte_fecha_creacion']);
-	$hookArg['content'] = (!$dte_exist) ? BotonGenerarHTML($Factura->fields['id_factura']) : BotonDescargarHTML($Factura->fields['id_factura']);
+	if ($Factura->FacturaElectronicaCreada()){
+		$hookArg['content'] = BotonDescargarHTML($Factura->fields['id_factura']);
+	} elseif (!$Factura->Anulada()) {
+		$hookArg['content'] = BotonGenerarHTML($Factura->fields['id_factura']);
+	}
 	return $hookArg;
 }
 

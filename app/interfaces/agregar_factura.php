@@ -854,7 +854,7 @@ foreach ($condiciones_pago as $vc => $cond) {
 			<td id="botones_factura" align=left>
 				<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void(0);" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
-				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && $factura->FacturaElectronicaCreada() && !$factura->FacturaElectronicaAnulada()) { ?>
+				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && (!$factura->FacturaElectronicaCreada() || ($factura->FacturaElectronicaCreada() && !$factura->FacturaElectronicaAnulada()))) { ?>
 					<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
 				<?php } ?>
 				<a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio') ?>	</a></td>

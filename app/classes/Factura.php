@@ -413,6 +413,10 @@ class Factura extends Objeto {
 		return !is_null($this->fields['dte_fecha_anulacion']);
 	}
 
+	function Anulada() {
+		return ($this->fields['anulado'] == 1);
+	}
+
 	function Escribir() {
 		if (!$this->Id()) {
 			$this->Edit('asiento_contable', $this->MaxNumeroAsientoContable() + 1);
