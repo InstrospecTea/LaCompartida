@@ -1907,6 +1907,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_especial2%', $fecha_lang_esp, $html2);
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
+				$html2 = str_replace('%fecha_slash%', date('d/m/ Y'), $html2);
 
 				#formato normal
 				if ($lang == 'es') {
