@@ -710,7 +710,7 @@ if ($motivo == "horas") {
 
 									<td class="buscadorlabel"><?php echo __('Nombre Cliente') ?></td>
 									<td nowrap align='left' colspan="2">
-										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,false,320,'',false); ?>
+										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 									</td>
 								</tr>
