@@ -1,7 +1,6 @@
 <?php
 require_once dirname(dirname(__FILE__)).'/conf.php';
 
-
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
 
@@ -17,16 +16,14 @@ if ($p_cobranza->fields['permitido']) {
 $params_array['codigo_permiso'] = 'PRO';
 $p_profesional = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
-if ($motivo=='cobros' && $id_cobro) {
-
+if ($motivo == 'cobros' && $id_cobro) {
 	$cobro = new Cobro($sesion);
-	$cobro->Load($id_cobro);
 
 	if (!$cobro->Load($id_cobro)) {
 		$pagina->FatalError(__('Cobro inválido'));
 	}
 
-	if ($buscar != 1) {
+	if ($opc != 'buscar') {
 		if ($fecha_ini == '' || $fecha_ini == '00-00-0000' || $fecha_ini == NULL) {
 			$fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
 		}
@@ -67,8 +64,8 @@ if ($id_cobro == 'Indefinido') {
 
 // Si estamos en un cobro
 if ($cobro) {
-	if ($opc == "buscar") {
-		//Significa que se apreto el boton buscar asi que hay que considerarlas nuevas fechas
+	//Significa que se apreto el boton buscar asi que hay que considerarlas nuevas fechas
+	if ($opc == "buscar" && (isset($check_trabajo) && $check_trabajo == '1')) {
 		if ($fecha_ini != '0000-00-00' && $fecha_ini != '') {
 			$cobro->Edit('fecha_ini', $fecha_ini);
 		} else {
@@ -81,8 +78,10 @@ if ($cobro) {
 			$fecha_hoy = date("Y-m-d", time());
 			$cobro->Edit('fecha_fin', $fecha_hoy);
 		}
+
 		$cobro->Write();
-	} else { //En caso de que no estoy buscando debo setear fecha ini y fecha fin
+	} else {
+		// En caso de que no estoy buscando debo setear fecha ini y fecha fin
 		$fecha_ini = $cobro->fields['fecha_ini'];
 		$fecha_fin = $cobro->fields['fecha_fin'];
 	}
@@ -336,6 +335,8 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 					CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre,
 					usuario.username,
 					usuario.id_usuario,
+					usuario.nombre,
+					usuario.apellido1,
 					CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'),
 					DATE_FORMAT(duracion_cobrada,'%H:%i')) as duracion,
 					TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas,
@@ -709,7 +710,7 @@ if ($motivo == "horas") {
 
 									<td class="buscadorlabel"><?php echo __('Nombre Cliente') ?></td>
 									<td nowrap align='left' colspan="2">
-										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,false,320,'',false); ?>
+										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 									</td>
 								</tr>
@@ -1167,7 +1168,4 @@ function funcionTR(& $trabajo) {
 	});
 
 </script>
-<?php
-
-
-$pagina->PrintBottom($popup);
+<?php $pagina->PrintBottom($popup);

@@ -69,7 +69,7 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 
 	$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 
-	
+
 }
 
 
@@ -101,7 +101,7 @@ if ($_GET['totalctacorriente']) { ?>
 				<input type="hidden"  name="ingreso" 	value="<?php echo $balance[1]; ?>"/>
 				<input type="hidden"  name="egreso" 	value="<?php echo $balance[2]; ?>"/>
 				<input type="hidden"  name="borrador" 	value="<?php echo $balance[3]; ?>"/>
-				
+
 			<?php } else {
 				echo number_format($balance, 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
 			}?>
@@ -172,7 +172,7 @@ if ($_GET['totalctacorriente']) { ?>
 
 	$selectfrom = $gasto::SelectFromQuery();
 
-				
+
 	$query = $gasto->SearchQuery($sesion,$where." order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
 

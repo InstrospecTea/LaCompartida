@@ -297,17 +297,20 @@ class Gasto extends Objeto {
 
 
 
-	public function WhereQuery($request) {
+	public function WhereQuery($request = array()) {
+		if (empty($request)) {
+			$request = $_REQUEST;
+		}
 		$where = 1;
-		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
-			if ($_REQUEST['codigo_cliente_secundario']) {
-				$where .= " AND cliente.codigo_cliente_secundario = '{$_REQUEST['codigo_cliente_secundario']}'";
+		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
+			if ($request['codigo_cliente_secundario']) {
+				$where .= " AND cliente.codigo_cliente_secundario = '{$request['codigo_cliente_secundario']}'";
 				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigoSecundario($_REQUEST['codigo_cliente_secundario']);
+				$cliente->LoadByCodigoSecundario($request['codigo_cliente_secundario']);
 
-				if ($_REQUEST['codigo_asunto_secundario']) {
+				if ($request['codigo_asunto_secundario']) {
 					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigoSecundario($_REQUEST['codigo_asunto_secundario']);
+					$asunto->LoadByCodigoSecundario($request['codigo_asunto_secundario']);
 					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
 					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
 					$asuntos_list_secundario = array();
@@ -318,13 +321,13 @@ class Gasto extends Objeto {
 				}
 			}
 		} else {
-			if (!empty($_REQUEST['codigo_cliente'])) {
-				$where .= " AND cta_corriente.codigo_cliente = '{$_REQUEST['codigo_cliente']}'";
+			if (!empty($request['codigo_cliente'])) {
+				$where .= " AND cta_corriente.codigo_cliente = '{$request['codigo_cliente']}'";
 				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigo($_REQUEST['codigo_cliente']);
-				if (!empty($_REQUEST['codigo_asunto'])) {
+				$cliente->LoadByCodigo($request['codigo_cliente']);
+				if (!empty($request['codigo_asunto'])) {
 					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigo($_REQUEST['codigo_asunto']);
+					$asunto->LoadByCodigo($request['codigo_asunto']);
 					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
 					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
 					$asuntos_list = array();
@@ -335,38 +338,38 @@ class Gasto extends Objeto {
 				}
 			}
 		}
-		$fecha1 = !empty($_REQUEST['fecha1'])? Utiles::fecha2sql($_REQUEST['fecha1']) : '';
-		$fecha2 = !empty($_REQUEST['fecha2'])? Utiles::fecha2sql($_REQUEST['fecha2']) : '';
+		$fecha1 = !empty($request['fecha1'])? Utiles::fecha2sql($request['fecha1']) : '';
+		$fecha2 = !empty($request['fecha2'])? Utiles::fecha2sql($request['fecha2']) : '';
 
-		if ($_REQUEST['cobrado'] == 'NO') {
+		if ($request['cobrado'] == 'NO') {
 			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
 		}
-		if ($_REQUEST['cobrado'] == 'SI') {
+		if ($request['cobrado'] == 'SI') {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
-		if ($_REQUEST['codigo_asunto'] && $lista_asuntos) {
+		if ($request['codigo_asunto'] && $lista_asuntos) {
 			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 		}
-		if ($_REQUEST['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
+		if ($request['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
 		}
-		if ($_REQUEST['id_usuario_orden']) {
-			$where .= " AND cta_corriente.id_usuario_orden = '{$_REQUEST['id_usuario_orden']}'";
+		if ($request['id_usuario_orden']) {
+			$where .= " AND cta_corriente.id_usuario_orden = '{$request['id_usuario_orden']}'";
 		}
-		if ($_REQUEST['id_usuario_responsable']) {
-			$where .= " AND contrato.id_usuario_responsable = '{$_REQUEST['id_usuario_responsable']}' ";
+		if ($request['id_usuario_responsable']) {
+			$where .= " AND contrato.id_usuario_responsable = '{$request['id_usuario_responsable']}' ";
 		}
-		if (isset($_REQUEST['cobrable']) &&  $_REQUEST['cobrable'] != '') {
-			$where .= " AND cta_corriente.cobrable ={$_REQUEST['cobrable']} ";
-		}
-
-		if (isset($_REQUEST['id_tipo']) and $_REQUEST['id_tipo'] != '') {
-			$where .= " AND cta_corriente.id_cta_corriente_tipo = '{$_REQUEST['id_tipo']}'";
+		if (isset($request['cobrable']) &&  $request['cobrable'] != '') {
+			$where .= " AND cta_corriente.cobrable ={$request['cobrable']} ";
 		}
 
-		if ($_REQUEST['clientes_activos'] == 'activos') {
+		if (isset($request['id_tipo']) and $request['id_tipo'] != '') {
+			$where .= " AND cta_corriente.id_cta_corriente_tipo = '{$request['id_tipo']}'";
+		}
+
+		if ($request['clientes_activos'] == 'activos') {
 			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-		} else if ($_REQUEST['clientes_activos']  == 'inactivos') {
+		} else if ($request['clientes_activos']  == 'inactivos') {
 			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
 		}
 		if ($fecha1 && $fecha2) {
@@ -375,17 +378,17 @@ class Gasto extends Objeto {
 			$where .= " AND cta_corriente.fecha >= '$fecha1' ";
 		} else if ($fecha2) {
 			$where .= " AND cta_corriente.fecha <= '$fecha2' ";
-		} else if (!empty($_REQUEST['id_cobro'])) {
-			$where .= " AND cta_corriente.id_cobro='{$_REQUEST['id_cobro']}' ";
+		} else if (!empty($request['id_cobro'])) {
+			$where .= " AND cta_corriente.id_cobro='{$request['id_cobro']}' ";
 		}
 
 		// Filtrar por moneda del gasto
-		if ($_REQUEST['moneda_gasto'] != '') {
-			$where .= " AND cta_corriente.id_moneda={$_REQUEST['moneda_gasto']} ";
+		if ($request['moneda_gasto'] != '') {
+			$where .= " AND cta_corriente.id_moneda={$request['moneda_gasto']} ";
 		}
-		if ($_REQUEST['egresooingreso'] == 'soloingreso') {
+		if ($request['egresooingreso'] == 'soloingreso') {
 			$where .= " AND cta_corriente.ingreso IS NOT NULL AND cta_corriente.ingreso>0 ";
-		} else if ($_REQUEST['egresooingreso'] == 'sologastos') {
+		} else if ($request['egresooingreso'] == 'sologastos') {
 			$where .= " AND cta_corriente.egreso IS NOT NULL AND cta_corriente.egreso>0 ";
 		}
 		$where.=" AND incluir_en_cobro='SI' ";

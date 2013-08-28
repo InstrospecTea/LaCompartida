@@ -103,7 +103,6 @@ $estados_cobro = array(
 	'PAGO PARCIAL'
 );
 
-
 if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	$agrupadores = array(
 		'glosa_cliente',
@@ -170,13 +169,9 @@ if ($debug == 1) {
 $ReporteAvanzado = new ReporteAvanzado($sesion);
 
 $ReporteAvanzado->comparar = $comparar;
-
 $ReporteAvanzado->tipo_dato_comparado = $tipo_dato_comparado;
-
 $ReporteAvanzado->tipo_dato = empty($tipo_dato) ? null : $tipo_dato;
-
 $ReporteAvanzado->proporcionalidad = $proporcionalidad;
-
 $ReporteAvanzado->id_moneda = $id_moneda;
 
 $ReporteAvanzado->glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
@@ -224,6 +219,7 @@ $hoy = date("Y-m-d");
 if (!$fecha_anio) {
 	$fecha_anio = date('Y');
 }
+
 if (!$fecha_mes) {
 	$fecha_mes = date('m');
 }
@@ -234,21 +230,22 @@ $fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
 $week = date('W');
 $year = date('Y');
 $lastweek = $week - 1;
+
 if ($lastweek == 0) {
 	$lastweek = 52;
 	--$year;
 }
+
 $lastweek = sprintf("%02d", $lastweek);
 $semana_pasada = "'" . date('d-m-Y', strtotime("$year" . "W$lastweek" . "1")) . "','" . date('d-m-Y', strtotime("$year" . "W$lastweek" . "7")) . "'";
-
-
 $last_month = strtotime("-" . (date('j')) . " day");
 $mes_pasado = "'01" . date('-m-Y', $last_month) . "','" . date('t-m-Y', $last_month) . "'";
-
 $actual = "'01-01-" . date('Y') . "','" . date('d-m-Y') . "'";
 
-if (!isset($numero_agrupadores))
+if (!isset($numero_agrupadores)) {
 	$numero_agrupadores = 1;
+}
+
 if (!$popup) {
 	$pagina->PrintTop($popup);
 	/* Si se eligió fecha con el selector [MES] [AÑO] (o viene default), se cambia a lo indicado por este. */
@@ -291,26 +288,25 @@ if (!$popup) {
 		/*Traduce los codigos utilizados para mostrarlos al usuario*/
 		function __(s) {
 			switch (s) {
-	<?php
-	foreach ($tipos_de_dato as $td) {
-		printf("case '%s': return '%s';\n", $td, __($td));
-	}
-	foreach ($agrupadores as $td) {
-		printf("case '%s': return '%s';\n", $td, __($td));
-	}
-	$otros = array(
-		'codigo_contrato' => 'Código ' . __('Contrato'),
-		'usuarios' => __('Profesional'),
-		'clientes' => __('Cliente')
-	);
-	foreach ($otros as $key => $translation) {
-		printf("case '%s': return '%s';\n", $key, $translation);
-	}
-	?>
+				<?php
+				foreach ($tipos_de_dato as $td) {
+					printf("case '%s': return '%s';\n", $td, __($td));
+				}
+				foreach ($agrupadores as $td) {
+					printf("case '%s': return '%s';\n", $td, __($td));
+				}
+				$otros = array(
+					'codigo_contrato' => 'Código ' . __('Contrato'),
+					'usuarios' => __('Profesional'),
+					'clientes' => __('Cliente')
+				);
+				foreach ($otros as $key => $translation) {
+					printf("case '%s': return '%s';\n", $key, $translation);
+				}
+				?>
 				default:
 					return s;
 			}
-
 		}
 
 		/*Carga lo elegido en el deglose del nuevo reporte*/
@@ -388,26 +384,20 @@ if (!$popup) {
 			ActualizarNuevoReporte();
 		}
 
-		jQuery(function(){
-    		jQuery("select option").attr( "title", "" );
-    		jQuery("select option").each(function(i){
-  				this.title = this.text;
-    		})
-  		});
-
-  		
-  		jQuery("select").tooltip({
-   			left: 25
+		jQuery(function() {
+			jQuery("select option").attr("title", "");
+			jQuery("select option").each(function(i){
+				this.title = this.text;
+			})
 		});
-
 	</script>
 	<?php
 }
 ?>
 
 <form method="post" name="formulario" action="" id="formulario" autocomplete="off">
-	<input type=hidden name=opc id=opc value='print'>
-	<input type=hidden name=debug id=debug value='<?php echo $debug ?>'>
+	<input type="hidden" name="opc" id="opc" value="print">
+	<input type="hidden" name="debug" id="debug" value="<?php echo $debug; ?>">
 	<?php if (!$popup) { ?>
 		<!-- Calendario DIV -->
 		<div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -419,7 +409,8 @@ if (!$popup) {
 		<table width="90%">
 			<tr>
 				<td align="center">
-					<fieldset width="100%" class="border_plomo tb_base" align="center"><legend><?php echo __('Mis Reportes') ?></legend>
+					<fieldset width="100%" class="border_plomo tb_base" align="center">
+						<legend><?php echo __('Mis Reportes') ?></legend>
 						<div>
 							<div style="float:right" align=right>
 								<input type=button value="<?php echo __('Nuevo Reporte') ?>" onclick="NuevoReporte()"  />
@@ -730,7 +721,7 @@ if (!$popup) {
 													<span title="<?php echo __($explica_periodo_trabajo) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
 														<?php if ($campo_fecha == 'trabajo' || $campo_fecha == '') echo 'checked="checked"'; ?>
-															   onclick ="SincronizarCampoFecha()" />
+																 onclick ="SincronizarCampoFecha()" />
 													</span>
 												</td>
 												<td align=left>
@@ -747,12 +738,12 @@ if (!$popup) {
 												<td align=right>
 													<span title="<?php echo __($explica_periodo_cobro) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-														<?php
-														if ($campo_fecha == 'cobro') {
-															echo 'checked="checked"';
-														}
-														?>
-															   onclick ="SincronizarCampoFecha()" />
+															<?php
+															if ($campo_fecha == 'cobro') {
+																echo 'checked="checked"';
+															}
+															?>
+															onclick ="SincronizarCampoFecha()" />
 													</span>
 												</td>
 												<td align=left>
@@ -769,12 +760,12 @@ if (!$popup) {
 												<td align=right>
 													<span title="<?php echo __($explica_periodo_emision) ?>">
 														<input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
-														<?php
-														if ($campo_fecha == 'emision') {
-															echo 'checked="checked"';
-														}
-														?>
-															   onclick ="SincronizarCampoFecha()" />
+															<?php
+															if ($campo_fecha == 'emision') {
+																echo 'checked="checked"';
+															}
+															?>
+															onclick ="SincronizarCampoFecha()" />
 													</span>
 												</td>
 												<td align=left>
@@ -796,7 +787,7 @@ if (!$popup) {
 															echo 'checked="checked"';
 														}
 														?>
-															   onclick="SincronizarCampoFecha()" />
+																 onclick="SincronizarCampoFecha()" />
 													</span>
 												</td>
 												<td align="left">
@@ -818,7 +809,7 @@ if (!$popup) {
 															echo 'checked="checked"';
 														}
 														?>
-															   onclick="SincronizarCampoFecha()" />
+																 onclick="SincronizarCampoFecha()" />
 													</span>
 												</td>
 												<td align="left">
@@ -841,13 +832,11 @@ if (!$popup) {
 												<td align=right>
 													<input type="radio" name="fecha_corta" id="fecha_periodo" value="selector" onclick ="SeleccionarSelector()" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
 												</td>
-												<td align=left colspan=3>
-													<div id=periodo_rango>
-
+												<td align="left" colspan="3">
+													<div id="periodo_rango">
 														<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y", strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
 														<?php echo __('al') ?>
 														<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y", strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
-
 													</div>
 												</td>
 											</tr>
@@ -857,7 +846,6 @@ if (!$popup) {
 							</table>
 						</center>
 					</fieldset>
-
 
 					<!-- SELECTOR TIPO DE DATO -->
 					<br/>
@@ -1047,6 +1035,7 @@ if (!$popup) {
 
 						</table>
 					</fieldset>
+
 					<!-- SELECTOR DE VISTA -->
 					<br>
 					<fieldset align="center" width="90%" class="border_plomo tb_base">
@@ -1058,8 +1047,8 @@ if (!$popup) {
 										<img src="<?php echo Conf::ImgDir() ?>/menos.gif" onclick="Agrupadores(-1)" style='cursor:pointer;' />
 										<img src="<?php echo Conf::ImgDir() ?>/mas.gif" onclick="Agrupadores(1)" style='cursor:pointer;' />
 										<?php echo __('Agrupar por') ?>:&nbsp;
-										<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?php echo $numero_agrupadores ?> />
-										<input type=hidden name=vista id="vista" value='' />
+										<input type="hidden" name="numero_agrupadores" id="numero_agrupadores" value="<?php echo $numero_agrupadores ?>" />
+										<input type="hidden" name=vista id="vista" value='' />
 									</div>
 									<div style="float:left" id="agrupadores">
 										<?php
@@ -1070,8 +1059,7 @@ if (!$popup) {
 											if ($i >= $numero_agrupadores)
 												echo ' style="display:none;" ';
 											echo '>';
-											echo '<select name="agrupador[' . $i . ']" id="agrupador_' . $i . '" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" onchange="CambiarAgrupador(' . $i . ');"  ';
-											echo '/>';
+											echo '<select name="agrupador[' . $i . ']" id="agrupador_' . $i . '" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" onchange="CambiarAgrupador(' . $i . ');">';
 											$elegido = false;
 											$valor_previo = '';
 											foreach ($agrupadores as $key => $v) {
@@ -1103,19 +1091,19 @@ if (!$popup) {
 							<tr>
 								<td align="center" colspan="5">
 									<br/>
-									<a href="javascript:void(0)" class="btn botonizame" id="runreporte" name="runreporte" icon="code"/>Planilla</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="excel" name="excel" icon="xls"  title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'excel');"/>Excel</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="dispersion" name="dispersion" icon="icon-chart"   title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'dispersion');"/>Dispersión</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="tabla" name="tabla" icon="icon-table" title="Genera un Documento Excel con una tabla cruzada." onclick="Generar(jQuery('#formulario').get(0), 'tabla');"/>Tabla</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="barras" name="barras" icon="icon-bar" title="Despliega un Gráfico de Barras, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'barra');"/>Barras</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="circular" name="circular"  icon="pie-chart" title="Despliega un Gráfico de Torta, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'circular');"/>Gráfico Torta</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="runreporte" name="runreporte" icon="code">Planilla</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="excel" name="excel" icon="xls"  title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'excel');">Excel</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="dispersion" name="dispersion" icon="icon-chart"   title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'dispersion');">Dispersión</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="tabla" name="tabla" icon="icon-table" title="Genera un Documento Excel con una tabla cruzada." onclick="Generar(jQuery('#formulario').get(0), 'tabla');">Tabla</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="barras" name="barras" icon="icon-bar" title="Despliega un Gráfico de Barras, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'barra');">Barras</a>
+									<a href="javascript:void(0)" class="btn botonizame" id="circular" name="circular"  icon="pie-chart" title="Despliega un Gráfico de Torta, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'circular');">Gráfico Torta</a>
 								</td>
 								<td style="width: 100px; font-size: 11px;">
-									<label for="comparar"><?php echo __('Comparar') ?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" <?php echo $comparar ? 'checked="checked"' : '' ?> title='Comparar' /> </td>
+									<label for="comparar"><?php echo __('Comparar') ?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" <?php echo $comparar ? 'checked="checked"' : '' ?> title='Comparar' />
 								</td>
 							</tr>
 							<tr>
-								<td colspan = 6>
+								<td colspan="6">
 									<table cellpadding="2" cellspacing="5">
 										<tr>
 											<td>
@@ -1124,7 +1112,7 @@ if (!$popup) {
 												if (isset($orden_barras_max2min) || !isset($tipo_dato))
 													echo 'checked="checked"';
 												?>
-													   title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
+														 title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
 												<label for="orden_barras_max2min"><?php echo __("Gráficar de Mayor a Menor") ?></label>
 											</td>
 											<td>
@@ -1159,7 +1147,7 @@ if (!$popup) {
 		<iframe  class="resizableframe" onload="iframelista();" name="planilla" id="planilla" src="<?php echo $url_iframe; ?>" frameborder="0" style="display:none; width:730px; height:<?php echo $alto; ?>px;"></iframe>
 	</div>
 <?php } else { ?>
-	<div class="resizable"  id="iframereporte"></div>
+	<div class="resizable" id="iframereporte"></div>
 <?php } ?>
 
 <?php
