@@ -141,7 +141,8 @@ class Contrato extends Objeto {
 		'esc4_id_moneda'	,
 		'esc4_descuento'	,
 		'retribucion_usuario_responsable',
-		'retribucion_usuario_secundario'
+		'retribucion_usuario_secundario',
+		'id_estudio'
 	);
 
 	function Contrato($sesion, $fields = "", $params = "") {

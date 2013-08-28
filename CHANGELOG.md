@@ -1,5 +1,14 @@
 # Changelog
 
+## Release: 13.5.0
+Martes 20 de Agosto 2013
+
+* **Feature:** [Ingreso de Solicitante en tramites](https://github.com/LemontechSA/ttb/pull/224)
+* **Feature:** [Agrupador solicitante en reporte avanzado](https://github.com/LemontechSA/ttb/pull/267)
+* **Feature:** [Mostrar solicitante de tramites en nota de cobro](https://github.com/LemontechSA/ttb/pull/265)
+* **Feature:** [Manejo de multiples compañias (estudios) para facturar](https://github.com/LemontechSA/ttb/pull/252)
+* **Feature:** [Usuario Revisor](https://github.com/LemontechSA/ttb/pull/226)
+
 ## Hotfix: 13.4.38
 Lunes 19 de Agosto 2013
 * **Fixed:** [Editar un gasto en revision](https://github.com/LemontechSA/ttb/pull/266)
