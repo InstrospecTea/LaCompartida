@@ -170,7 +170,7 @@ function AnulaFacturaElectronica($hookArg) {
 //
 //
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
-	$monedas = Moneda::GetMonedas($Sesion);
+	$monedas = Moneda::GetMonedas($Sesion, '', true);
 
 	$r = array(
 		'COM' => array(
