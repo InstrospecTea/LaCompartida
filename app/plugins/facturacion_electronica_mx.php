@@ -126,6 +126,9 @@ function AnulaFacturaElectronica($hookArg) {
 	$Sesion = new Sesion();
 	$Factura = $hookArg['Factura'];
 
+	if (!$Factura->FacturaElectronicaCreada()) {
+		return $hookArg;
+	}
 	$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
 	$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
 
