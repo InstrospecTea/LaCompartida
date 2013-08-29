@@ -90,6 +90,7 @@ function GeneraFacturaElectronica($hookArg) {
 		$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
 		$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
 		$strdocumento = FacturaToTXT($Sesion, $Factura);
+		$hookArg['ExtraData'] = $strdocumento;
 		$result = $client->RecibirTXT($usuario, $password, $strdocumento);
 		if ($result->codigo == 201) {
 			try {

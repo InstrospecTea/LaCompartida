@@ -551,13 +551,13 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 		if (!$Invoice->Loaded()) {
 			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
 		}	else {
-			$data = array('Factura' => $Invoice);
+			$data = array('Factura' => $Invoice, 'ExtraData' => 'TextoInvoice');
 			$Slim->applyHook('hook_genera_factura_electronica', &$data);
 			$error = $data['Error'];
 			if ($error) {
-				halt($error['Message'] ? $error['Message'] : __($error['Code']), $error['Code']);
+				halt($error['Message'] ? $error['Message'] : __($error['Code']), $error['Code'], 400, $data['ExtraData']);
 			} else {
-				outputJson(array('invoice_url' => $data['InvoiceURL']));
+				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData']));
 			}
 		}
 	} else {
@@ -629,7 +629,7 @@ function validateAuthTokenSendByHeaders() {
 	}
 }
 
-function halt($error_message = null, $error_code = null, $halt_code = 400) {
+function halt($error_message = null, $error_code = null, $halt_code = 400, $data = '') {
 	$errors = array();
 	$Slim = Slim::getInstance();
 	switch ($halt_code) {
@@ -639,7 +639,7 @@ function halt($error_message = null, $error_code = null, $halt_code = 400) {
 
 		default:
 			array_push($errors, array('message' => UtilesApp::utf8izar($error_message), 'code' => $error_code));
-			$Slim->halt($halt_code, json_encode(array('errors' => $errors)));
+			$Slim->halt($halt_code, json_encode(array('errors' => $errors, 'extra_data' => $data)));
 			break;
 	}
 }
