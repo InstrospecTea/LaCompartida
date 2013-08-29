@@ -182,7 +182,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
 			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
-			'Moneda|' . $monedas[$Factura->fields['id_moneda']]['codigo'],
+			'Moneda|' . utf8_encode($monedas[$Factura->fields['id_moneda']]['codigo']),
 			'metodoDePago|' . 'Depósito en Cuenta',
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
