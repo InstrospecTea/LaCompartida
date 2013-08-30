@@ -3802,6 +3802,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_fecha_fin%', ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_fin'], $idioma->fields['formato_fecha']), $html);
 
 				$html = str_replace('%horas%', __('Total Horas'), $html);
+				$html = str_replace('%total_horas%', __('total_horas'), $html);
+
 				if (UtilesApp::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 					$duracion_decimal_cobrable = number_format($horas_cobrables + $minutos_cobrables / 60, UtilesApp::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', '');
 					$html = str_replace('%valor_horas%', $duracion_decimal_cobrable, $html);
@@ -3958,6 +3960,8 @@ class NotaCobro extends Cobro {
 
 
 				$html = str_replace('%total_cobro%', __('Total Cobro'), $html);
+				$html = str_replace('%totalcobro%', __('total_cobro'), $html);
+
 				$html = str_replace('%total_cobro_mta%', __('GRAN TOTAL'), $html);
 
 				$html = str_replace('%total_cobro_cyc%', __('Honorarios y Gastos'), $html);
@@ -4214,6 +4218,8 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'RESUMEN_ASUNTOS_ENCABEZADO':
+
+				$html = str_replace('%resumenasuntos%', __('resumen_asunto'), $html);
 				$html = str_replace('%codigo_asunto%', __('Codigo Asunto'), $html);
 				$html = str_replace('%asunto%', __('Asunto'), $html);
 				$html = str_replace('%nombre_asunto%', __('Nombre Asunto'), $html);
@@ -11358,4 +11364,5 @@ class NotaCobro extends Cobro {
 	}
 
 }
+
 
