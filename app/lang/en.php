@@ -69,6 +69,7 @@ $_LANG['TASA'] = "HOURLY RATE";
 $_LANG['Tasa Horas Hombres'] = "Hourly Rate";
 $_LANG['FLAT FEE'] = "FLAT FEE";
 $_LANG['Total Horas'] = "Total Hours";
+$_LANG['total_horas'] = "Hours";
 $_LANG['Total horas:'] = "Total Hours:";
 $_LANG['Cobro'] = "Invoice";
 $_LANG['Fecha desde'] = "From";
@@ -321,6 +322,7 @@ $_LANG['Honorarios'] = "Fees";
 $_LANG['Detalle del Trabajo Realizado'] = "Description of Work";
 $_LANG['Abogado'] = "Lawyer";
 $_LANG['Total Cobro'] = "Invoice Total";
+$_LANG['total_cobro'] = "Total";
 $_LANG['Total Cobro:'] = "Invoice Total:";
 $_LANG['Total Nota de Cobro'] = "Invoice Total";
 $_LANG['TELEFAX'] = "TELECOPIER";
@@ -368,6 +370,7 @@ $_LANG['Nombre Asunto'] = "Matter Name";
 $_LANG['Resumen Asuntos'] = "Matter Summary";
 $_LANG['Monto Retainer'] = "Retainer Fee";
 $_LANG['Subtotal Excesos'] = "Additional Hours";
+$_LANG['resumen_asunto']= "Summary";
 
 #PAPELES
 $_LANG['Tamaño del papel'] = "Tamaño del papel";

@@ -33,13 +33,14 @@ $codigo_cliente = empty($codigo_cliente) && $codigo_cliente_secundario ? $client
 $params_array['codigo_permiso'] = 'COB';
 $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 ?>
-  <link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />
 
+<link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />
 <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
 <script type="text/javascript">
 	var MonedaArray= new Array();
+
 	<?php
 	$currency = array();
 	$querycurrency = "select * from prm_moneda";
@@ -55,7 +56,6 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	jQuery(document).ready(function() {
 		jQuery('.noborraradelanto').live('click',function() {
 			jQuery('#mensaje').html('No se puede borrar el adelanto, ha sido utilizado en al menos <?php echo __('un cobro'); ?>...');
-
 		});
 
 		jQuery('.desborraradelanto').live('click',function() {
@@ -69,6 +69,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 				return false;
 			}
 		});
+
 		jQuery('.borraradelanto').live('click',function() {
 			var laID=jQuery(this).attr('id').replace('borra_','');
 
@@ -80,7 +81,6 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 				return false;
 			}
 		});
-
 
 		jQuery('#boton_buscar').click(function() {
 			var tablagastos=   jQuery('#tablon').hide().dataTable({
@@ -129,28 +129,26 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 						"aTargets": [5]
 					},
 					{"fnRender": function ( o, val ) {
-						var respuesta="<a href=\"javascript:void(0)\" class=\"fl\" style=\"margin-left:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
+							var respuesta="<a href=\"javascript:void(0)\" class=\"fl\" style=\"margin-left:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
 
 							if (jQuery('#eliminados').is(':checked')) {
-								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='fr desborraradelanto' ><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";	
+								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='fr desborraradelanto' ><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";
 							} else {
 								if (o.aData[4]!=o.aData[5]) {
-									respuesta+="<a href=\"javascript:void(0)\"    class='fr noborraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
+									respuesta += "<a href=\"javascript:void(0)\"    class='fr noborraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
 								} else {
-									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='fr borraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
+									respuesta += "<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='fr borraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";
 								}
 							}
- 							respuesta+='<?php echo	UtilesApp::LogDialog($sesion, 'documento',"'+ o.aData[0]+'");?>';
- 							//"<a href=\"javascript:void(0)\"  id=\"documento_"+ o.aData[0]+"\" class=\"ui-icon lupa fr logdialog\" rel=\"documento\"   ></a>";	
-			
 
+							respuesta += '<?php echo UtilesApp::LogDialog($sesion, 'documento',"'+ o.aData[0]+'"); ?>';
 
-							if(PERMISOCOBRANZA==1) {
-								return   respuesta;
+							if (PERMISOCOBRANZA == 1) {
+								return respuesta;
 							} else {
-								return   '-';
+								return '-';
 							}
-                        }, 
+						},
 						"aTargets": [6]
 					}
 				],
@@ -163,7 +161,6 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 					"sSwfPath": "../js/copy_cvs_xls.swf",
 					"aButtons": [ "xls","copy" ]
 				}
-
 			}).show();
 		});
 
@@ -172,6 +169,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	function Refrescarse() {
 		jQuery('#boton_buscar').click();
 	}
+
 	function AgregarNuevo(tipo) {
 		<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
@@ -180,12 +178,11 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 			var codigo_cliente = $('codigo_cliente').value;
 			var url_extension = "&codigo_cliente=" + codigo_cliente;
 		<?php } ?>
-		if(tipo == 'adelanto') {
+
+		if (tipo == 'adelanto') {
 			var urlo = "ingresar_documento_pago.php?popup=1&adelanto=1" + url_extension;
 			return	nuovaFinestra('Agregar_Adelanto', 720, 500, urlo, 'top=100, left=125');
-
 		}
-
 	}
 </script>
 
@@ -204,7 +201,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 					<legend><?php echo __('Filtros') ?></legend>
 					<table style="border: 0px solid black" width='720px'>
 						<tr>
-							<td align="right"><label for="id_documento">N° Adelanto</laber>
+							<td align="right"><label for="id_documento">N° Adelanto</label></td>
 							<td align="left">
 								<input type="text" size="6" name="id_documento" id="id_documento" value="<?php echo $id_documento ?>">
 							</td>

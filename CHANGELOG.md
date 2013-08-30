@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.5.1
+Jueves 29 de Agosto 2013
+* **Fixed:** [Modificacion a seccion resumen asuntos](https://github.com/LemontechSA/ttb/pull/26x)
+
 ## Release: 13.5.0
 Martes 20 de Agosto 2013
 
