@@ -6398,6 +6398,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%td_monto_impuesto_total%', '&nbsp;', $row);
 					$row = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $row);
 					$row = str_replace('%glosa_asunto%', '&nbsp;', $row);
+					$row = str_replace('%ruc_proveedor%', '&nbsp;', $row);
 					$html .= $row;
 				}
 				$cont_gasto_egreso = 0;
@@ -6423,6 +6424,12 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%num_doc%', $detalle['numero_documento'], $row);
 					$row = str_replace('%tipo_gasto%', $detalle['tipo_gasto'], $row);
 					$row = str_replace('%glosa_asunto%', $detalle['glosa_asunto'], $row);
+
+					$query = "SELECT rut FROM prm_proveedor WHERE id_proveedor = '" . $detalle['id_proveedor'] . "' ";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					list($rut) = mysql_fetch_array($resp);
+
+					$row = str_replace('%ruc_proveedor%', $rut, $row);
 
 					if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
 						$row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
@@ -6468,15 +6475,19 @@ class NotaCobro extends Cobro {
 					if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
 						$row = str_replace('%td_monto_impuesto_total%', '<td style="text-align:center;">%monto_impuesto_total%</a>', $row);
 						$row = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $row);
-
 						$row = str_replace('%monto_impuesto_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total_impuesto'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%monto_moneda_total_con_impuesto%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total_mas_impuesto'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						$row = str_replace('%total_con_impuesto%', number_format($detalle['monto_total_mas_impuesto'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+						$row = str_replace('%total_impuesto%', number_format($detalle['monto_total_impuesto'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					} else {
 						$row = str_replace('%td_monto_impuesto_total%', ' ', $row);
 						$row = str_replace('%td_monto_moneda_total_con_impuesto%', ' ', $row);
 						$row = str_replace('%monto_impuesto_total%', '', $row);
 						$row = str_replace('%monto_moneda_total_con_impuesto%', '', $row);
+						$row = str_replace('%total_con_impuesto%', '', $row);
+						$row = str_replace('%total_impuesto%', '', $row);
 					}
+					
 					$html .= $row;
 				}
 				break;
@@ -6540,12 +6551,15 @@ class NotaCobro extends Cobro {
 					$gasto_bruto_moneda_total = $x_cobro_gastos['gasto_total_con_impuesto'];
 				}
 
+				$html = str_replace('%valor_total_monedabase_sin_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($gasto_bruto_moneda_total-$gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
 					$html = str_replace('%td_valor_impuesto_monedabase%', '<td style="text-align:center;">%valor_impuesto_monedabase%</a>', $html);
 					$html = str_replace('%td_valor_total_monedabase_con_impuesto%', '<td style="text-align:center;">%valor_total_monedabase_con_impuesto%</a>', $html);
 
 					$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($gasto_bruto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_total_monedabase_sin_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $espacio_conf . number_format($gasto_bruto_moneda_total-$gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				} else {
 					$html = str_replace('%td_valor_impuesto_monedabase%', '', $html);
 					$html = str_replace('%td_valor_total_monedabase_con_impuesto%', '', $html);
