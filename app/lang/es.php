@@ -64,6 +64,7 @@ $_LANG['TASA'] = "TARIFA HORARIA";
 $_LANG['Tasa Horas Hombres'] = "Tasa Horas Hombres";
 $_LANG['FLAT FEE'] = "SUMA FIJA";
 $_LANG['Total Horas'] = "Total Horas";
+$_LANG['total_horas'] = "Total Horas";
 $_LANG['Cobro'] = "Cobro";
 $_LANG['Fecha desde'] = "Fecha desde";
 $_LANG['Fecha hasta'] = "Fecha hasta";
@@ -350,6 +351,7 @@ $_LANG['Detalle del Trabajo Realizado'] = "Detalle del Trabajo Realizado";
 $_LANG['Abogado'] = "Abogado";
 $_LANG['Total Nota de Cobro'] = "Total Nota de Cobro";
 $_LANG['Total Cobro'] = "Total Cobro";
+$_LANG['total_cobro'] = "Total Cobro";
 $_LANG['TELEFAX'] = "TELEFAX";
 $_LANG['TELÉFONO'] = "TELÉFONO";
 $_LANG['Teléfono y Fax'] = "Teléfono y Fax";
@@ -1031,6 +1033,7 @@ $_LANG['MonedaTotalPorDefecto'] = "Moneda total por defecto";
 $_LANG['UsarGastosConSinImpuesto'] = "Usar conceptos gastos con/sin impuestos";
 $_LANG['UsarGastosCobrable'] = "Permitir a diferenciar entre gastos cobrables y no cobrables";
 $_LANG['AlertaRevisor'] = "Mandar resumen de horas trabajadas a los revisores";
+$_LANG['resumen_asunto']= "Resumen Asuntos";
 
 /*Mantención Tabla fw*/
 // prm_banco
