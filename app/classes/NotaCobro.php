@@ -6405,6 +6405,8 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $row);
 					$row = str_replace('%glosa_asunto%', '&nbsp;', $row);
 					$row = str_replace('%ruc_proveedor%', '&nbsp;', $row);
+					$row = str_replace('%total_impuesto%', '&nbsp;', $row);
+					$row = str_replace('%total_con_impuesto%', '&nbsp;', $row);
 					$html .= $row;
 				}
 				$cont_gasto_egreso = 0;
