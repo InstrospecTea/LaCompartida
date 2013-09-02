@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.5.2
+Lunes 02 de Septiembre 2013
+* **Fixed:** [Corregir interfaz de búsqueda de adelantos](https://github.com/LemontechSA/ttb/pull/283)
+
 ## Hotfix: 13.5.1
 Jueves 29 de Agosto 2013
 * **Fixed:** [Modificacion a seccion resumen asuntos](https://github.com/LemontechSA/ttb/pull/26x)
