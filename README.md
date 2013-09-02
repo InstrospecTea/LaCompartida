@@ -1,5 +1,3 @@
-
-
 The Time Billing
 ================================
 
@@ -44,6 +42,21 @@ The Time Billing - Time Tracking
  * OLE (0.5)
 
       $ sudo pear install OLE-0.5
+
+###requisitos adicionales
+
+* PHP 5 CURL sudo apt-get install php5-curl
+* CURL		 sudo apt-get install CURL
+* PEAR		 sudo apt-get install php-user
+
+###Incluir el framework de lemontech en nuestro codigo
+* git clone git@github.com:LemontechSA/framework.git dentro del directori "FW" de le aplicacion.
+
+###Incluir amazon WSDDKforPHP
+* https://github.com/amayonwebservices/aws-sdk-for-php.git
+
+###Deshabilitar Slim Error Handler
+* Comentar linea 186 de la clase Slim.php dentro del framework
 
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
