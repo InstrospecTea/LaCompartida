@@ -53,9 +53,9 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 		IF(documento.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(glosa_asunto)) AS asuntos,
 		IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
 		IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
-		prm_moneda.cifras_decimales,
 		documento.glosa_documento,
-		prm_moneda.id_moneda
+		prm_moneda.id_moneda,
+		prm_moneda.cifras_decimales
 		FROM
 			documento
 			JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
