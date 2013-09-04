@@ -565,6 +565,7 @@ $pagina->PrintTop($popup);
 				}
 			} else {
 				jQuery("input:text[id^='pago_honorarios_']").attr('readonly',true).removeClass('saldojq');
+				jQuery("input:text[id^='pago_honorarios_']").attr('disabled','disabled')
 				jQuery("input:text[id^='pago_gastos_']").attr('readonly',true).removeClass('saldojq');
 				jQuery("#monto").attr('readonly',true)
 			}
