@@ -1,7 +1,7 @@
 # Changelog
 
-## Hotfix: 13.5.2
-Lunes 02 de Septiembre 2013
+## Hotfix: 13.5.3
+Miercoles 04 de Septiembre 2013
 * **Fixed:** [Ingresar documento de pago](https://github.com/LemontechSA/ttb/pull/285)
 * **Fixed:** [Correccion para anchor %monto_total_espacio%](https://github.com/LemontechSA/ttb/pull/285)
 * **Fixed:** [Correccion a columna factura en reporte resumen_planilla_saldo](https://github.com/LemontechSA/ttb/pull/285)
