@@ -953,7 +953,7 @@ if ($usuario_responsable_obligatorio) {
 <?php
 
 if (empty($opcion)){
-	$caracteres = strlen($cliente->fields['codigo_cliente']);	
+	$caracteres = strlen($cliente->fields['codigo_cliente']);
 }
 $field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], -$caracteres);
 
@@ -1200,6 +1200,171 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 					</table>
 				</fieldset>
 				<br>
+
+				<? if (UtilesApp::GetConf($sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $asunto->Loaded()) { ?>
+					<script>
+						jQuery('document').ready(function() {
+							var $ = jQuery;
+							var client_id = "<?= $cliente->fields['id_cliente'] ?>";
+							var matter_id = "<?= $asunto->fields['id_asunto'] ?>";
+							var generator_url = "<? echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/matters/' . $asunto->fields['id_asunto'] . '/generators' ?>";
+							var actionButtons = function(id_matter_generator) {
+								return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
+					            	<a data-id="' + id_matter_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
+					            	<a data-id="' + id_matter_generator + '" class="fl delete_generator ui-button cruz_roja" style="margin: 3px 1px;width: 18px;height: 18px;" title="Eliminar Generador">&nbsp;</a>\
+					            </td>';
+							};
+
+							var loadGeneratorForm = function(state, data) {
+								$('#form_generator_status').val(state);
+								if (state == 'NEW') {
+									$('#id_matter_generator').val('');
+									$('#id_user_generator').val('');
+									$('#percent_generator').val('');
+									$('#add_generator').val('Agregar');
+									$('#cancel_generator').val('Cancelar').hide();
+								} else if (state == 'EDIT') {
+									$('#id_matter_generator').val(data.id_matter_generator);
+									$('#id_user_generator').val(data.id_user_generator);
+									$('#percent_generator').val(data.percent_generator);
+									$('#add_generator').val('Modificar');
+									$('#cancel_generator').val('Cancelar').show();
+								}
+							}
+
+							var loadGenerators = function() {
+								$.ajax({url: generator_url})
+									.done(function(data) {
+										rows = $('<tbody>');
+										header = $("<tr bgcolor='#A3D55C'>")
+										header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
+										header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
+										header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
+										header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
+										rows.append(header);
+				          	$.each(data, function(i, generator){
+				          		generator_row = $('<tr>');
+											generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
+											generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
+											generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">%' + generator.porcentaje_genera + '</td>');
+											generator_row.append(actionButtons(generator.id_asunto_generador));
+				          		rows.append(generator_row)
+				          	});
+				          	$('#user_generators_result').html(rows)
+				        	});
+							};
+
+							$(document).on('click', '.edit_generator', function() {
+								var percent = $(this).closest('tr').find('.percent-data').data('percent_value');
+								var user_id = $(this).closest('tr').find('.user-data').data('user_id');
+								var generator_id = $(this).data('id');
+								loadGeneratorForm('EDIT', {
+									id_matter_generator: generator_id,
+									id_user_generator: user_id,
+									percent_generator: percent
+								});
+							});
+
+							$(document).on('click', '.delete_generator', function() {
+								if (!confirm('¿Seguro desea elminar este usuario?')) {
+									return;
+								}
+								var generator_id = $(this).data('id');
+								$.ajax({
+									url: generator_url + '/' + generator_id,
+									type: 'DELETE'
+								}).done(function(data) {
+									loadGenerators();
+								});
+							});
+
+							$(document).on('click', '#cancel_generator', function() {
+								loadGeneratorForm('NEW', {});
+							});
+
+
+							$('#add_generator').click(function() {
+								var percent = $('#percent_generator').val();
+								var user = $('#id_user_generator').val();
+								var id_matter_generator = $('#id_matter_generator').val();
+								var form_status = $('#form_generator_status').val();
+								if (percent && user && percent.length > 0) {
+									if (parseInt(percent) < 1 || parseInt(percent) > 100) {
+										alert('El porcentaje debe estar entre 1 y 100');
+										return;
+									}
+
+									if (form_status == 'EDIT') {
+										$.ajax({
+											url: generator_url + '/' + id_matter_generator,
+											type: 'POST',
+											data: {percent_generator: percent}
+										}).done(function(data) {
+											loadGeneratorForm('NEW', {});
+											loadGenerators();
+										});
+									} else if (form_status == 'NEW') {
+										$.ajax({
+											url: generator_url,
+											type: 'PUT',
+											data: {
+												percent_generator: percent,
+												user_id:user
+											}
+										}).done(function(data) {
+											loadGeneratorForm('NEW', {});
+											loadGenerators();
+										});
+									}
+								} else {
+									alert('Ingrese todos los datos para agregar el usuario');
+								}
+							});
+							loadGeneratorForm('NEW', {});
+							loadGenerators();
+						});
+					</script>
+
+					<fieldset class="border_plomo tb_base">
+						<legend><?php echo __('Profesionales') . ' ' . __('Generadores') ?></legend>
+						<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_form">
+							<tbody>
+								<tr>
+									<td>
+										<?php echo __('Profesional') ?>
+										</td>
+									<td>
+										<?
+										echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+																					FROM usuario
+																					WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
+																					AND usuario.activo = 1
+																					ORDER BY usuario.apellido1", "id_user_generator", "", "  ", "Seleccione", "200");
+																					?>
+										</td>
+									<td>
+										Porcentaje Genera:
+										</td>
+									<td>
+										<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">
+										</td>
+									<td>
+										<input type="hidden" id="form_generator_status" value="" />
+										<input type="hidden" id="id_matter_generator" value="" />
+										<input type="button" id="add_generator" value='<?php echo __('Agregar') . ' ' . __('Generador') ?>' class='btn' >&nbsp;
+										<input type="button" id="cancel_generator" value='<?php echo __('Cancelar') ?>' class='btn' />
+										</td>
+								<tr>
+							</tbody>
+						</table>
+
+						<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_result">
+
+						</table>
+					</fieldset>
+					<br>
+				<? } ?>
+
 				<!-- GUARDAR -->
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Guardar datos') ?></legend>

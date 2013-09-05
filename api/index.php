@@ -544,6 +544,73 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
+$Slim->get('/clients/:client_id/matters/:matter_id/generators', function ($client_id, $matter_id) use ($Session) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($matter_id) || empty($matter_id)) {
+		halt(__("Invalid matter ID"), "InvalidMatterId");
+	}
+
+	$Matter = new Asunto($Session);
+	$generators = $Matter->matterGenerators($client_id, $matter_id);
+	outputJson($generators);
+
+});
+
+$Slim->post('/clients/:client_id/matters/:matter_id/generators/:generator_id', function ($client_id, $matter_id, $generator_id) use ($Session, $Slim) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($matter_id) || empty($matter_id)) {
+		halt(__("Invalid matter ID"), "InvalidMatterId");
+	}
+	if (is_null($generator_id) || empty($generator_id)) {
+		halt(__("Invalid generator ID"), "InvalidGeneratorId");
+	}
+
+	$Matter = new Asunto($Session);
+	$percent_generator = $Slim->request()->params('percent_generator');
+	$generator = $Matter->updateMatterGenerator($generator_id, $percent_generator);
+	outputJson($generator);
+
+});
+
+$Slim->put('/clients/:client_id/matters/:matter_id/generators', function ($client_id, $matter_id) use ($Session, $Slim) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($matter_id) || empty($matter_id)) {
+		halt(__("Invalid matter ID"), "InvalidMatterId");
+	}
+
+	$Matter = new Asunto($Session);
+	$percent_generator = $Slim->request()->params('percent_generator');
+	$user_id = $Slim->request()->params('user_id');
+
+	$generator = $Matter->createMatterGenerator($client_id, $matter_id, $user_id, $percent_generator);
+	outputJson($generator);
+});
+
+
+
+$Slim->delete('/clients/:client_id/matters/:matter_id/generators/:generator_id', function ($client_id, $matter_id, $generator_id) use ($Session) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($matter_id) || empty($matter_id)) {
+		halt(__("Invalid matter ID"), "InvalidMatterId");
+	}
+	if (is_null($generator_id) || empty($generator_id)) {
+		halt(__("Invalid generator ID"), "InvalidGeneratorId");
+	}
+
+	$Matter = new Asunto($Session);
+	$Matter->deleteMatterGenerator($generator_id);
+	outputJson(array('result' => 'OK'));
+});
+
+
 $Slim->run();
 
 function validateAuthTokenSendByHeaders() {

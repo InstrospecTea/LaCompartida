@@ -836,6 +836,84 @@ class Asunto extends Objeto {
 	}
 
 	/**
+	 * Find all user generators of matter
+	 */
+	public function matterGenerators($client_id, $matter_id) {
+		$generators = array();
+		$sql = "SELECT id_asunto_generador, id_cliente, id_asunto, prm_area_usuario.glosa as area_usuario,
+									 usuario.id_usuario, usuario.nombre,  usuario.apellido1, usuario.apellido2, porcentaje_genera
+							FROM asunto_generador
+						 INNER JOIN usuario on asunto_generador.id_usuario = usuario.id_usuario
+  					 INNER JOIN prm_area_usuario on usuario.id_area_usuario = prm_area_usuario.id
+					   WHERE asunto_generador.id_cliente=:client_id
+					     AND asunto_generador.id_asunto=:matter_id
+					ORDER BY usuario.nombre ASC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('client_id', $client_id);
+		$Statement->bindParam('matter_id', $matter_id);
+		$Statement->execute();
+
+		while ($generator = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($generators,
+				array(
+					'id_asunto_generador' => $generator->id_asunto_generador,
+					'id_cliente' => $generator->id_cliente,
+					'id_asunto' => $generator->id_asunto,
+					'area_usuario' => $generator->area_usuario,
+					'id_usuario' => $generator->id_usuario,
+					'nombre' => $generator->apellido1 . ' ' . $generator->apellido2 . ' ' . $generator->nombre,
+					'porcentaje_genera' => $generator->porcentaje_genera,
+				)
+			);
+		}
+
+		return $generators;
+	}
+
+	/**
+	 * Delete a generators of matter
+	 */
+	public function deleteMatterGenerator($generator_id) {
+		$sql = "DELETE FROM `asunto_generador` WHERE `asunto_generador`.`id_asunto_generador`=:generator_id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('generator_id', $generator_id);
+		return $Statement->execute();
+	}
+
+	/**
+	 * Update a generator of matter
+	 */
+	public function updateMatterGenerator($generator_id, $percent_generator) {
+		$sql = "UPDATE `asunto_generador`
+				SET `asunto_generador`.`porcentaje_genera` 	= :percent_generator
+				WHERE `asunto_generador`.`id_asunto_generador` = :generator_id";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('percent_generator', $percent_generator);
+		$Statement->bindParam('generator_id', $generator_id);
+
+		return $Statement->execute();
+	}
+
+	/**
+	 * Create a generator of matter
+	 */
+	public function createMatterGenerator($client_id, $matter_id, $user_id, $percent_generator) {
+		$sql = "INSERT INTO `asunto_generador`
+				SET `asunto_generador`.`id_cliente`=:client_id, `asunto_generador`.`id_asunto`=:matter_id,
+						`asunto_generador`.`id_usuario`=:user_id, `asunto_generador`.`porcentaje_genera`=:percent_generator ";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('client_id', $client_id);
+		$Statement->bindParam('matter_id', $matter_id);
+		$Statement->bindParam('user_id', $user_id);
+		$Statement->bindParam('percent_generator', $percent_generator);
+
+		return $Statement->execute();
+	}
+
+	/**
 	 * Find all active matters
 	 * Return an array with next elements:
 	 * 	code (secondary if used) and name
