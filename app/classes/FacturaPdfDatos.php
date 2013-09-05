@@ -131,7 +131,7 @@ class FacturaPdfDatos extends Objeto
 		$glosa_moneda = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
 		$glosa_moneda_plural = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
 
-		if (strlen($total_parte_decimal) == '2'){
+		if (strlen($monto_parte_decimal) == '2'){
 			$fix_decimal = '1';
 		} else {
 			$fix_decimal = '10';
@@ -139,18 +139,18 @@ class FacturaPdfDatos extends Objeto
 
 		if ( empty($monto_parte_decimal) ){
 			$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'],$glosa_moneda_cero_cien, $glosa_moneda_plural_cero_cien));
-			
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_decimal,'es'));
+			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera,'es'));
 			$monto_total_palabra_fix = $monto_parte_entera.' '.strtoupper($glosa_moneda_plural);
 
 		} else {
 			$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura, $factura->fields['id_moneda'],$glosa_moneda, $glosa_moneda_plural));
 			
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera,'es'));
-			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal*$fix_decimal,'es'));
-			$monto_total_palabra_fix = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural).' CON  '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal,'es'));
+			$monto_total_palabra_fix = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural).' CON '. $monto_palabra_parte_decimal .' CENTAVOS';
 
 		}
+
 
 		switch( $tipo_dato ) {
 
@@ -181,7 +181,7 @@ class FacturaPdfDatos extends Objeto
 			case 'moneda_gastos_sin_iva':		$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 			case 'monto_en_palabra':			$glosa_dato = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])); break;
 
-			case 'monto_en_palabra_fix':		$glosa_dato = $monto_total_palabra_fix;
+			case 'monto_total_palabra':			$glosa_dato = $monto_total_palabra_fix; break;
 			
 			case 'monto_en_palabra_cero_cien':  $glosa_dato = $monto_en_palabra_cero_cien; break;
 			case 'porcentaje_impuesto':			$glosa_dato = $factura->fields['porcentaje_impuesto']."%"; break;
@@ -252,7 +252,9 @@ class FacturaPdfDatos extends Objeto
 			$fila['moneda_gastos_con_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 			$fila['moneda_gastos_sin_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 			$fila['monto_en_palabra_cero_cien'] = $monto_en_palabra_cero_cien;
-			$fila['monto_en_palabra_fix'] = $monto_total_palabra_fix;
+			
+			$fila['monto_total_palabra'] = $monto_total_palabra_fix;
+			
 			$fila['monto_en_palabra'] = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
 			$fila['porcentaje_impuesto'] = $factura->fields['porcentaje_impuesto']."%";
 			$fila['moneda_subtotal'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
