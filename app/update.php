@@ -9954,22 +9954,35 @@ QUERY;
 
 		case 7.44:
 			$queries = array();
-			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_generador` (
-				  `id_asunto_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
+			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_generador` (
+				  `id_contrato_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `id_cliente` int(11) NOT NULL,
-				  `id_asunto` int(11) NOT NULL,
+				  `id_contrato` int(11) NOT NULL,
 				  `id_usuario` int(11) NOT NULL,
 				  `porcentaje_genera` double NOT NULL,
-				  PRIMARY KEY (`id_asunto_generador`),
+				  PRIMARY KEY (`id_contrato_generador`),
 				  KEY `id_cliente` (`id_cliente`),
 				  KEY `id_usuario` (`id_usuario`),
-				  KEY `id_asunto` (`id_asunto`),
-				  CONSTRAINT `asunto_generador_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
-				  CONSTRAINT `asunto_generador_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`),
-				  CONSTRAINT `asunto_generador_ibfk_2` FOREIGN KEY (`id_asunto`) REFERENCES `asunto` (`id_asunto`)
+				  KEY `id_contrato` (`id_contrato`),
+				  CONSTRAINT `contrato_generador_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
+				  CONSTRAINT `contrato_generador_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`),
+				  CONSTRAINT `contrato_generador_ibfk_2` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-			$comentario = 'Esta opcion habilita el módulo de producción, % de generadores por asunto y reportes';
+			$queries[] = "CREATE TABLE IF NOT EXISTS `cobro_generador` (
+				  `id_cobro` int(11) NOT NULL,
+				  `id_contrato` int(11) NOT NULL,
+				  `id_usuario` int(11) NOT NULL,
+				  `porcentaje_genera` double NOT NULL,
+				  KEY `id_cobro` (`id_cobro`),
+				  KEY `id_contrato` (`id_contrato`),
+				  KEY `id_usuario` (`id_usuario`),
+				  CONSTRAINT `cobro_generador_ibfk_3` FOREIGN KEY (`id_cobro`) REFERENCES `cobro` (`id_cobro`),
+				  CONSTRAINT `cobro_generador_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`),
+				  CONSTRAINT `cobro_generador_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$comentario = 'Esta opcion habilita el módulo de producción, % de generadores por contrato y reportes';
 
 			$queries[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
                                             VALUES('UsarModuloProduccion', 0, 'boolean','{$comentario}', 10, -1)";

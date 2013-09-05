@@ -544,69 +544,63 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
-$Slim->get('/clients/:client_id/matters/:matter_id/generators', function ($client_id, $matter_id) use ($Session) {
+$Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
 	}
-	if (is_null($matter_id) || empty($matter_id)) {
-		halt(__("Invalid matter ID"), "InvalidMatterId");
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
 	}
 
-	$Matter = new Asunto($Session);
-	$generators = $Matter->matterGenerators($client_id, $matter_id);
+	$generators = Contrato::contractGenerators($Session, $client_id, $contract_id);
 	outputJson($generators);
 
 });
 
-$Slim->post('/clients/:client_id/matters/:matter_id/generators/:generator_id', function ($client_id, $matter_id, $generator_id) use ($Session, $Slim) {
+$Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session, $Slim) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
 	}
-	if (is_null($matter_id) || empty($matter_id)) {
-		halt(__("Invalid matter ID"), "InvalidMatterId");
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
 	}
 	if (is_null($generator_id) || empty($generator_id)) {
 		halt(__("Invalid generator ID"), "InvalidGeneratorId");
 	}
 
-	$Matter = new Asunto($Session);
 	$percent_generator = $Slim->request()->params('percent_generator');
-	$generator = $Matter->updateMatterGenerator($generator_id, $percent_generator);
+	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator);
 	outputJson($generator);
 
 });
 
-$Slim->put('/clients/:client_id/matters/:matter_id/generators', function ($client_id, $matter_id) use ($Session, $Slim) {
+$Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session, $Slim) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
 	}
-	if (is_null($matter_id) || empty($matter_id)) {
-		halt(__("Invalid matter ID"), "InvalidMatterId");
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
 	}
-
-	$Matter = new Asunto($Session);
 	$percent_generator = $Slim->request()->params('percent_generator');
 	$user_id = $Slim->request()->params('user_id');
 
-	$generator = $Matter->createMatterGenerator($client_id, $matter_id, $user_id, $percent_generator);
+	$generator = Contrato::createContractGenerator($Session, $client_id, $contract_id, $user_id, $percent_generator);
 	outputJson($generator);
 });
 
 
 
-$Slim->delete('/clients/:client_id/matters/:matter_id/generators/:generator_id', function ($client_id, $matter_id, $generator_id) use ($Session) {
+$Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
 	}
-	if (is_null($matter_id) || empty($matter_id)) {
-		halt(__("Invalid matter ID"), "InvalidMatterId");
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
 	}
 	if (is_null($generator_id) || empty($generator_id)) {
 		halt(__("Invalid generator ID"), "InvalidGeneratorId");
 	}
-
-	$Matter = new Asunto($Session);
-	$Matter->deleteMatterGenerator($generator_id);
+	Contrato::deleteContractGenerator($Session, $generator_id);
 	outputJson(array('result' => 'OK'));
 });
 
