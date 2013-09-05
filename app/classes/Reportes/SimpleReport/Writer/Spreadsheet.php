@@ -99,16 +99,16 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						$this->sheet->write($this->current_row, 0, $variable['row'], $this->formats['filtros']);
 						$rows[$variable['row']] = $this->current_row++;
 					}
-					if(!isset($rows[$variable['col']])){
+					if(!isset($cols[$variable['col']])){
 						$this->sheet->write($header_row, $current_col, $variable['col'], $this->formats['filtros']);
-						$rows[$variable['col']] = $current_col++;
+						$cols[$variable['col']] = $current_col++;
 					}
 
 					$this->write_cell($this->parse_param($variable['value'], null),
-						$rows[$variable['row']], $rows[$variable['col']], 'number',
+						$rows[$variable['row']], $cols[$variable['col']], 'number',
 						isset($variable['extras']) ? $variable['extras'] : array(),
 						$this->SimpleReport->variables['data'], strpos($variable['value'], '=') === 0);
-					$this->variableCells[$variable['name']] = $this->xls->rowcolToCell($rows[$variable['row']], $rows[$variable['col']]);
+					$this->variableCells[$variable['name']] = $this->xls->rowcolToCell($rows[$variable['row']], $cols[$variable['col']]);
 				}
 			} else {
 				foreach ($this->SimpleReport->variables as $name => $value) {

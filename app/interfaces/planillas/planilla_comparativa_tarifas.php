@@ -105,6 +105,20 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'value' => "=\$Tarifa Standard $nombre\$/$promedio"
 		);
 	}
+
+	$monedas =  Moneda::GetMonedas($Sesion);
+	foreach ($monedas as $moneda_cambio) {
+		$variables[] = array(
+			'row' => $moneda_cambio['glosa_moneda'],
+			'col' => 'Tipo Cambio',
+			'name' => 'Tipo Cambio ' . $moneda_cambio['codigo'],
+			'value' => $moneda_cambio['tipo_cambio'] / $moneda['tipo_cambio'],
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda'
+			)
+		);
+	}
 	$SimpleReport->SetVariables($variables);
 
 	$config_reporte = array(
@@ -160,7 +174,19 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'monto_honorarios',
+			'field' => 'monto_honorarios_original',
+			'title' => 'Honorarios Original',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo',
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
+			)
+		),
+		array(
+			'name' => 'monto_honorarios',
+			'field' => '=PRODUCT(%monto_honorarios_original%,$Tipo Cambio %moneda_cobro_codigo%$)',
 			'title' => 'Honorarios',
 			'format' => 'number',
 			'extras' => array(
@@ -171,7 +197,19 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'monto_gastos',
+			'field' => 'monto_gastos_original',
+			'title' => 'Gastos Original',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo',
+				'inlinegroup_field' => 'id_cobro',
+				'subtotal' => false
+			)
+		),
+		array(
+			'name' => 'monto_gastos',
+			'field' => '=PRODUCT(%monto_gastos_original%,$Tipo Cambio %moneda_cobro_codigo%$)',
 			'title' => 'Gastos',
 			'format' => 'number',
 			'extras' => array(
@@ -213,7 +251,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'tarifa_usuario',
+			'field' => 'tarifa_usuario_original',
+			'title' => 'Tarifa Usuario Original',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo',
+				'subtotal' => false
+			)
+		),
+		array(
+			'name' => 'tarifa_usuario',
+			'field' => '=PRODUCT(%tarifa_usuario_original%,$Tipo Cambio %moneda_cobro_codigo%$)',
 			'title' => 'Tarifa Usuario',
 			'format' => 'number',
 			'extras' => array(
@@ -223,8 +272,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			)
 		),
 		array(
-			'field' => 'monto_usuario',
-			'title' => 'Monto cobrado',
+			'field' => 'monto_usuario_original',
+			'title' => 'Monto Cobrado Original',
+			'format' => 'number',
+			'extras' => array(
+				'attrs' => 'style="text-align:right;"',
+				'symbol' => 'moneda_cobro_simbolo'
+			)
+		),
+		array(
+			'name' => 'monto_usuario',
+			'field' => '=PRODUCT(%monto_usuario_original%,$Tipo Cambio %moneda_cobro_codigo%$)',
+			'title' => 'Monto Cobrado',
 			'format' => 'number',
 			'extras' => array(
 				'attrs' => 'style="text-align:right;"',
@@ -367,22 +426,19 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			moneda_cobro.codigo AS moneda_cobro_codigo,
 			moneda_cobro.simbolo AS moneda_cobro_simbolo,
 			moneda_base.simbolo AS moneda_base_simbolo,
-			cobro.monto * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_honorarios,
-			cobro.monto_thh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_honorarios_base,
-			cobro.subtotal_gastos * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_gastos,
+			cobro.monto AS monto_honorarios_original,
+			cobro.subtotal_gastos AS monto_gastos_original,
 			cobro.total_minutos / 60 AS total_minutos,
 			prm_categoria_usuario.id_categoria_usuario AS id_categoria_usuario,
 			prm_categoria_usuario.glosa_categoria AS categoria_usuario,
 			usuario_trabajo.username AS usuario_categoria,
 			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario,
 			SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS duracion_usuario_numero,
-			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS monto_usuario,
-			SUM(trabajo.monto_cobrado) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) / SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS tarifa_usuario
+			SUM(trabajo.monto_cobrado) AS monto_usuario_original,
+			SUM(trabajo.monto_cobrado) / SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS tarifa_usuario_original
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
 		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
-		INNER JOIN cobro_moneda cobro_moneda_cobro ON  cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = cobro.id_moneda
-		INNER JOIN cobro_moneda cobro_moneda_base ON  cobro_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_base.id_moneda = $moneda_mostrar
 		INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 		INNER JOIN usuario usuario_contrato ON usuario_contrato.id_usuario = contrato.id_usuario_responsable
 		INNER JOIN tarifa ON tarifa.id_tarifa = contrato.id_tarifa
@@ -504,7 +560,7 @@ $Pagina->PrintTop($popup);
 							</td>
 							<td colspan="2" align="left">
 								<?php
-								echo Html::SelectArray(Moneda::GetMonedas($Sesion), 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
+								echo Html::SelectArray($monedas, 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
 								?>
 							</td>
 						</tr>
