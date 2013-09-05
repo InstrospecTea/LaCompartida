@@ -1215,6 +1215,19 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 					            </td>';
 							};
 
+							var showAlert = function(type, message) {
+								var alert_html = '<table id="generator_message" width="70%" class="' + type + '">\
+									<tbody><tr>\
+										<td valign="top" align="left" style="font-size: 12px;">\
+										' + message + '</td>\
+									</tr></tbody>\
+								</table></br>';
+								$('#user_generators_form').before(alert_html);
+								setTimeout(function(){
+									$('#generator_message').remove()
+								}, 3000);
+							};
+
 							var loadGeneratorForm = function(state, data) {
 								$('#form_generator_status').val(state);
 								if (state == 'NEW') {
@@ -1290,7 +1303,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 								var form_status = $('#form_generator_status').val();
 								if (percent && user && percent.length > 0) {
 									if (parseInt(percent) < 1 || parseInt(percent) > 100) {
-										alert('El porcentaje debe estar entre 1 y 100');
+										showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
 										return;
 									}
 
@@ -1304,6 +1317,10 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 											loadGenerators();
 										});
 									} else if (form_status == 'NEW') {
+										if ($('td[data-user_id="' + user + '"]').length > 0) {
+											showAlert('alerta', 'El profesional ya existe, favor agregue otro o modifíquelo desde el listado');
+											return;
+										}
 										$.ajax({
 											url: generator_url,
 											type: 'PUT',
@@ -1312,12 +1329,13 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 												user_id:user
 											}
 										}).done(function(data) {
+											showAlert('info', 'Profesional agregado con éxito');
 											loadGeneratorForm('NEW', {});
 											loadGenerators();
 										});
 									}
 								} else {
-									alert('Ingrese todos los datos para agregar el usuario');
+									showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
 								}
 							});
 							loadGeneratorForm('NEW', {});
