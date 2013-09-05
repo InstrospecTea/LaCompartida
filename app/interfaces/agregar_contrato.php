@@ -3080,7 +3080,6 @@ if ($solicitante == 0) {  // no mostrar
 										header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
 										rows.append(header);
 				          	$.each(data, function(i, generator){
-				          		console.log(generator);
 				          		generator_row = $('<tr>');
 											generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
 											generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
