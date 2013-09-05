@@ -5,6 +5,7 @@ require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
 
+$monedas = Moneda::GetMonedas($Sesion);
 
 if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
@@ -106,7 +107,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		);
 	}
 
-	$monedas =  Moneda::GetMonedas($Sesion);
 	foreach ($monedas as $moneda_cambio) {
 		$variables[] = array(
 			'row' => $moneda_cambio['glosa_moneda'],
