@@ -9988,6 +9988,13 @@ QUERY;
                                             VALUES('UsarModuloProduccion', 0, 'boolean','{$comentario}', 10, -1)";
 
 
+			if (!ExisteCampo('query', 'reporte_listado', $dbh)) {
+				$queries[] = "ALTER TABLE `reporte_listado` ADD `query` TEXT NULL COMMENT 'Query principal del reporte' ";
+			}
+			if (!ExisteCampo('post_code', 'reporte_listado', $dbh)) {
+				$queries[] = "ALTER TABLE `reporte_listado` ADD `post_code` TEXT NULL COMMENT 'Codigo para post procesar los datos' ";
+			}
+
 			ejecutar($queries, $dbh);
 			break;
 	}

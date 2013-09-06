@@ -373,7 +373,7 @@ function FormatoDatos($fila) {
 		$serie = str_pad($fila->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
 		$html .= "<b>Serie</b>: $serie<br />";
 	}
-	
+
 	$html .= "<b>Número</b>: {$fila->fields['numero']}";
 
 	return $html;
@@ -409,7 +409,7 @@ function Opciones($fila) {
 		. 'id_factura=' . $fila->fields['id_factura']
 		. '&codigo_cliente=' . $fila->fields['codigo_cliente']
 		. '&popup=1\');" title="Editar Factura">';
-	
+
 	if (Conf::GetConf($sesion, 'ImprimirFacturaDoc')) {
 		$boton_word = '<a class="fl ui-button doc" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="ImprimirDocumento(' . $fila->fields['id_factura'] . ');" title="Descargar Word">';
 	}
@@ -417,9 +417,9 @@ function Opciones($fila) {
 	if (Conf::GetConf($sesion, 'ImprimirFacturaPdf')) {
 		$boton_pdf = '<a class="fl ui-button pdf" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="ImprimirPDF(' . $fila->fields['id_factura'] . ');" title="Descargar PDF">';
 	}
-	
+
 	$boton_log = '<a class="fl ui-icon lupa logdialog" href="javascript:void(0);" rel="factura" id="factura_' . $fila->fields['id_factura'] . '">&nbsp;</a>';
-	
+
 	return "$boton_editar $boton_word $boton_pdf $boton_log";
 }
 

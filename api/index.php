@@ -605,6 +605,27 @@ $Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_
 });
 
 
+$Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim) {
+
+	if (is_null($report_code) || empty($report_code)) {
+		halt(__("Invalid report Code"), "InvalidReportCode");
+	}
+
+	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+	$simpleReport = new SimpleReport($Session);
+	$simpleReport->LoadWithType($report_code);
+	$reportClass = $simpleReport->GetClass($report_code);
+	$reportObject = new $reportClass($Session);
+	$query = ($simpleReport->fields['query']);
+	if (!isset($query)) {
+		$query = $reportObject->QueryReporte();
+	}
+	$results = $reportObject->DatosReporte($query, $Slim->request()->params());
+	$reportObject->DownloadReport($results, 'Json');
+});
+
+
 $Slim->run();
 
 function validateAuthTokenSendByHeaders() {

@@ -54,7 +54,9 @@ class SimpleReport extends Objeto {
 		'RETRIBUCIONES_RESUMEN_DETALLE' => 'RetribucionesResumen.configuracion_subreporte',
 		'REPORTE_SALDO_CLIENTES' => 'ReportesEspecificos.configuracion_saldo_clientes',
 		'REPORTE_SALDO_CLIENTES_RESUMEN' => 'ReportesEspecificos.configuracion_saldo_clientes_resumen',
-//		'HORAS' => 'Trabajo',
+		'FACTURA_PRODUCCION' => 'FacturaProduccion',
+//		'FACTURA_COBRANZA' => 'FacturaProduccion.configuracion_cobranza',
+//		'FACTURA_COBRANZA_APLICADA' => 'FacturaProduccion.configuracion_cobranza_aplicada'
 //		'TRAMITES' => 'Tramite',
 //		'ADELANTOS' => '',
 //		'USUARIOS' => 'Usuario'
@@ -153,8 +155,39 @@ class SimpleReport extends Objeto {
 		}
 
 		require_once $archivo_clase;
-
 		return $clase::${$configuracion};
+	}
+
+	public function GetClass($tipo) {
+		if (!empty($this->base_config)) {
+			return $this->base_config;
+		}
+
+		if (!isset(self::$tipos[$tipo])) {
+			throw new Exception('Error: Por favor seleccionar un tipo válido');
+		}
+
+		list($clase, $configuracion) = explode('.', self::$tipos[$tipo]);
+		$archivo_clase = Conf::ServerDir() . '/classes/' . $clase . '.php';
+
+		if (!$configuracion) {
+			$configuracion = 'configuracion_reporte';
+		}
+
+		require_once $archivo_clase;
+
+		return $clase;
+	}
+
+
+	public function LoadDBTipos(){
+		$query = "SELECT distinct Tipo FROM reporte_listado";
+		$Statement = $this->sesion->pdodbh->prepare($query);
+		$Statement->execute();
+		while ($tipo = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($tipo->Tipo, null);
+		}
+		return $resultado;
 	}
 
 	public function LoadConfiguration($tipo) {
