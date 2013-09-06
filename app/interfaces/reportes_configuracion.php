@@ -8,6 +8,8 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('ADM'));
+
+use TTB\Pagina as Pagina;
 $Pagina = new Pagina($Sesion);
 
 $SimpleReport = new SimpleReport($Sesion);
@@ -54,7 +56,7 @@ $configuraciones = $SimpleReport->GetAllConfigurations();
 							<input name="<?php echo "data[$tipo][$field][title]"; ?>" type="text" value="<?php echo utf8_decode($column->title); ?>" />
 							<em style="font-size: 0.8em; cursor: move"><?php echo utf8_decode($configuracion->columns[$field]->extras['original_title']) . " ($field)"; ?></em>
 						</li>
-					<?php } ?> 
+					<?php } ?>
 				</ul>
 				<br />
 				<div>
@@ -71,19 +73,19 @@ $configuraciones = $SimpleReport->GetAllConfigurations();
 		jQuery('ul').sortable({ axis: 'y' });
 		jQuery('#tabs').tabs();
 	});
-	
+
 	jQuery(document).ready(function () {
 		jQuery('input[type="button"]').click(changeOrderOnSubmit);
 	});
-	
+
 	changeOrderOnSubmit = function() {
 		form_submit = jQuery(this.form);
 		form_submit.find('.sortable_item').each(function (index) {
 			jQuery(this).val(index);
 		});
-		
+
 		form_submit.submit();
 	}
 </script>
 <?php
-$Pagina->PrintBottom($popup);
+$Pagina->PrintBottom($popup, true);

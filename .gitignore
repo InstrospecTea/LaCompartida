@@ -181,3 +181,5 @@ sftp-config*
 *.sublime-workspace
 .idea*
 config.ru
+
+.ruby-version
