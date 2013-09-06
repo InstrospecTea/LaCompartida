@@ -139,8 +139,9 @@ class FacturaPdfDatos extends Objeto
 
 		if ( empty($monto_parte_decimal) ){
 			$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'],$glosa_moneda_cero_cien, $glosa_moneda_plural_cero_cien));
+			
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera,'es'));
-			$monto_total_palabra_fix = $monto_parte_entera.' '.strtoupper($glosa_moneda_plural);
+			$monto_total_palabra_fix = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural);
 
 		} else {
 			$monto_en_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($monto_total_factura, $factura->fields['id_moneda'],$glosa_moneda, $glosa_moneda_plural));
