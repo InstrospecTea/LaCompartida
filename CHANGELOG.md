@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 13.5.4
+Miercoles 06 de Septiembre 2013
+* **Fixed:** [Corrige error de generacion de monto en palabra](https://github.com/LemontechSA/ttb/pull/286)
+* **Fixed:** [Corrige resultado de filtro grupo Listado asuntos](https://github.com/LemontechSA/ttb/pull/286)
+
 ## Hotfix: 13.5.3
 Miercoles 04 de Septiembre 2013
 * **Fixed:** [Ingresar documento de pago](https://github.com/LemontechSA/ttb/pull/285)
