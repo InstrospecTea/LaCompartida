@@ -552,7 +552,7 @@ $Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($c
 		halt(__("Invalid contract ID"), "InvalidContractId");
 	}
 
-	$generators = Contrato::contractGenerators($Session, $client_id, $contract_id);
+	$generators = Contrato::contractGenerators($Session, $contract_id);
 	outputJson($generators);
 
 });
@@ -614,8 +614,13 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 	$simpleReport = new SimpleReport($Session);
-	$simpleReport->LoadWithType($report_code);
-	$reportClass = $simpleReport->GetClass($report_code);
+	try {
+		$simpleReport->LoadWithType($report_code);
+		$reportClass = $simpleReport->GetClass($report_code);
+	} catch (Exception $e) {
+		halt(__("Invalid report Code"), "InvalidReportCode");
+	}
+
 	$reportObject = new $reportClass($Session);
 	$query = ($simpleReport->fields['query']);
 	if (!isset($query)) {
@@ -623,6 +628,12 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	}
 	$results = $reportObject->DatosReporte($query, $Slim->request()->params());
 	$reportObject->DownloadReport($results, 'Json');
+});
+
+$Slim->get('/reports', function () use ($Session, $Slim) {
+	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+	$results = SimpleReport::LoadApiReports($Session);
+	outputJson($results);
 });
 
 

@@ -24,7 +24,8 @@ class SimpleReport_Writer_Json implements SimpleReport_Writer_IWriter {
 	public function save($filename = null, $group_values = null) {
 		$result = $this->SimpleReport->RunReport($group_values);
 		$columns = $this->SimpleReport->Config->VisibleColumns();
-		$json = array('headers' => $columns);
+		$filters = $this->SimpleReport->filters;
+		$json = array('headers' => $columns, 'filters' => $filters);
 		if (!empty($result)) {
 			$json['results'] = $this->table($result, $columns);
 		}
@@ -128,13 +129,6 @@ class SimpleReport_Writer_Json implements SimpleReport_Writer_IWriter {
 					$valor = str_replace(";", "\n", $valor);
 				}
 				break;
-			case 'number':
-				$decimals = 2;
-				if (isset($column->extras['decimals'])) {
-					$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
-				}
-				$valor = number_format($valor, $decimals, $this->SimpleReport->regional_format['decimal_separator'], $this->SimpleReport->regional_format['thousands_separator']);
-				break;
 			case 'date':
 				$valor = Utiles::sql2fecha($valor, $this->SimpleReport->regional_format['date_format']);
 				break;
@@ -153,7 +147,11 @@ class SimpleReport_Writer_Json implements SimpleReport_Writer_IWriter {
 			$class .= ' ' . $column->extras['class'];
 		}
 
-		return array($column->field => "$extras$valor");
+		if ($column->format == 'number') {
+			return array($column->field =>  (float) $valor);
+		} else {
+			return array($column->field => "$extras$valor");
+		}
 
 	}
 

@@ -9969,30 +9969,35 @@ QUERY;
 				  CONSTRAINT `contrato_generador_ibfk_2` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-			$queries[] = "CREATE TABLE IF NOT EXISTS `cobro_generador` (
-				  `id_cobro` int(11) NOT NULL,
+			$queries[] = "CREATE TABLE IF NOT EXISTS `factura_generador` (
+				  `id_factura` int(11) NOT NULL,
 				  `id_contrato` int(11) NOT NULL,
 				  `id_usuario` int(11) NOT NULL,
 				  `porcentaje_genera` double NOT NULL,
-				  KEY `id_cobro` (`id_cobro`),
+				  KEY `id_factura` (`id_factura`),
 				  KEY `id_contrato` (`id_contrato`),
 				  KEY `id_usuario` (`id_usuario`),
-				  CONSTRAINT `cobro_generador_ibfk_3` FOREIGN KEY (`id_cobro`) REFERENCES `cobro` (`id_cobro`),
-				  CONSTRAINT `cobro_generador_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`),
-				  CONSTRAINT `cobro_generador_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+				  CONSTRAINT `factura_generador_ibfk_3` FOREIGN KEY (`id_factura`) REFERENCES `factura` (`id_factura`),
+				  CONSTRAINT `factura_generador_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`),
+				  CONSTRAINT `factura_generador_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$comentario = 'Esta opcion habilita el módulo de producción, % de generadores por contrato y reportes';
 
-			$queries[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+			$queries[] = "INSERT IGNORE INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
                                             VALUES('UsarModuloProduccion', 0, 'boolean','{$comentario}', 10, -1)";
 
 
 			if (!ExisteCampo('query', 'reporte_listado', $dbh)) {
 				$queries[] = "ALTER TABLE `reporte_listado` ADD `query` TEXT NULL COMMENT 'Query principal del reporte' ";
 			}
-			if (!ExisteCampo('post_code', 'reporte_listado', $dbh)) {
-				$queries[] = "ALTER TABLE `reporte_listado` ADD `post_code` TEXT NULL COMMENT 'Codigo para post procesar los datos' ";
+
+			if (!ExisteCampo('filters', 'reporte_listado', $dbh)) {
+				$queries[] = "ALTER TABLE `reporte_listado` ADD `filters` TEXT NULL COMMENT 'Filtros para formulario' ";
+			}
+
+			if (!ExisteCampo('api_accessible', 'reporte_listado', $dbh)) {
+				$queries[] = "ALTER TABLE `reporte_listado` ADD `api_accessible` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Determina si este reporte esta visible en el API /api/reports/' ";
 			}
 
 			ejecutar($queries, $dbh);

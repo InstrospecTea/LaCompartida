@@ -1445,19 +1445,17 @@ class Contrato extends Objeto {
 	/**
      * Find all user generators of matter
      */
-    public static function contractGenerators($sesion, $client_id, $contract_id) {
+    public static function contractGenerators($sesion, $contract_id) {
         $generators = array();
         $sql = "SELECT id_contrato_generador, id_cliente, id_contrato, prm_area_usuario.glosa as area_usuario,
                                      usuario.id_usuario, usuario.nombre,  usuario.apellido1, usuario.apellido2, porcentaje_genera
                             FROM contrato_generador
                          INNER JOIN usuario on contrato_generador.id_usuario = usuario.id_usuario
                      INNER JOIN prm_area_usuario on usuario.id_area_usuario = prm_area_usuario.id
-                       WHERE contrato_generador.id_cliente=:client_id
-                         AND contrato_generador.id_contrato=:contract_id
+                       WHERE contrato_generador.id_contrato=:contract_id
                     ORDER BY usuario.nombre ASC";
 
         $Statement = $sesion->pdodbh->prepare($sql);
-        $Statement->bindParam('client_id', $client_id);
         $Statement->bindParam('contract_id', $contract_id);
         $Statement->execute();
 

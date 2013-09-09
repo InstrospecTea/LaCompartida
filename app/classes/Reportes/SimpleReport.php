@@ -180,14 +180,15 @@ class SimpleReport extends Objeto {
 	}
 
 
-	public function LoadDBTipos(){
-		$query = "SELECT distinct Tipo FROM reporte_listado";
-		$Statement = $this->sesion->pdodbh->prepare($query);
-		$Statement->execute();
-		while ($tipo = $Statement->fetch(PDO::FETCH_OBJ)) {
-			array_push($tipo->Tipo, null);
+	public static function LoadApiReports($session, $id_usuario = null){
+		$query = "SELECT * FROM reporte_listado WHERE api_accessible = 1";
+		if (isset($id_usuario) && !is_null($id_usuario)) {
+			$query += " AND id_usuario = $id_usuario ";
 		}
-		return $resultado;
+		$Statement = $session->pdodbh->prepare($query);
+		$Statement->execute();
+		$result = $Statement->fetchAll(PDO::FETCH_ASSOC);
+		return $result;
 	}
 
 	public function LoadConfiguration($tipo) {

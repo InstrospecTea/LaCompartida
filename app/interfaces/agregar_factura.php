@@ -217,6 +217,10 @@ if ($opcion == "guardar") {
 				$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie);
 			}
 
+			if (UtilesApp::GetConf($sesion, 'UsarModuloProduccion')) {
+				$factura->ActualizaGeneradores();
+			}
+
 			$signo = $codigo_tipo_doc == 'NC' ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
 			$neteos = empty($id_factura_padre) ? null : array(array($id_factura_padre, $signo * $factura->fields['total']));
 

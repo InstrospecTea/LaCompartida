@@ -322,7 +322,7 @@ class Factura extends Objeto {
 		}
 		return false;
 	}
-	
+
 	function ObtenerValorReal($id_factura) {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
 					FROM cta_cte_fact_mvto ccfm
@@ -1783,7 +1783,7 @@ class Factura extends Objeto {
 		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
-		
+
 		// if ($orden == "") {
 		// 	$orden = "factura.fecha DESC";
 		// 	$orderby = " ORDER BY $orden ";
@@ -1908,7 +1908,7 @@ class Factura extends Objeto {
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
-						GROUP BY ccfm2.id_factura 
+						GROUP BY ccfm2.id_factura
 			  	) AS pagos";
 			}
 
@@ -1920,7 +1920,7 @@ class Factura extends Objeto {
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
-						GROUP BY ccfm2.id_factura 
+						GROUP BY ccfm2.id_factura
 			  	) AS fecha_ultimo_pago";
 			}
 
@@ -2165,6 +2165,31 @@ class Factura extends Objeto {
 		$Cobro->Load($this->fields['id_cobro']);
 		$Cobro->AgregarFactura($this);
 	}
+
+	public function ActualizaGeneradores() {
+		$id_contrato = $this->fields['id_contrato'];
+		$id_factura = $this->fields['id_factura'];
+		if (!is_null($id_contrato)) {
+			$sql = "DELETE FROM `factura_generador` WHERE `factura_generador`.`id_factura`=:id_factura";
+      $Statement = $this->sesion->pdodbh->prepare($sql);
+      $Statement->bindParam('id_factura', $id_factura);
+      $Statement->execute();
+      $generators = Contrato::contractGenerators($this->sesion, $id_contrato);
+      foreach ($generators as $generator) {
+      	$sql = "INSERT INTO `factura_generador`
+                SET `factura_generador`.`id_factura`=:id_factura, `factura_generador`.`id_contrato`=:id_contrato,
+                        `factura_generador`.`id_usuario`=:id_usuario, `factura_generador`.`porcentaje_genera`=:porcentaje_genera ";
+
+        $Statement = $this->sesion->pdodbh->prepare($sql);
+        $Statement->bindParam('id_factura', $id_factura);
+        $Statement->bindParam('id_contrato', $id_contrato);
+        $Statement->bindParam('id_usuario', $generator['id_usuario']);
+        $Statement->bindParam('porcentaje_genera', $generator['porcentaje_genera']);
+        $Statement->execute();
+      }
+		}
+	}
+
 }
 
 #end Class
