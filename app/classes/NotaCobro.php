@@ -10044,6 +10044,7 @@ class NotaCobro extends Cobro {
                         $row = str_replace(array('%saldo_total%','%monto_moroso_documento%'), number_format($saldo_honorarios + $saldo_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
                         $row = str_replace('%monto_moroso_moneda_total%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+                        $row = str_replace('%monto_moroso%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
                         $html.=$row;
 
                     }
