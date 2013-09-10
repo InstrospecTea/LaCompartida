@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.5.5
+Lunes 09 de Septiembre 2013
+* **Fixed:** [Corrige anchor error de despliegue por anchor inexistente en seccion 'MOROSIDAD_FILAS'](https://github.com/LemontechSA/ttb/pull/286)
+
 ## Hotfix: 13.5.4
 Miercoles 06 de Septiembre 2013
 * **Fixed:** [Corrige error de generacion de monto en palabra](https://github.com/LemontechSA/ttb/pull/286)
