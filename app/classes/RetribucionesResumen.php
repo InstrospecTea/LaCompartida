@@ -1,4 +1,4 @@
-<?php
+s<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Lista.php';

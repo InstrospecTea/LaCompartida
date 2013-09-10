@@ -624,10 +624,10 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	$reportObject = new $reportClass($Session);
 	$query = ($simpleReport->fields['query']);
 	if (!isset($query)) {
-		$query = $reportObject->QueryReporte();
+		$query = $reportObject->QueryReporte($report_code);
 	}
 	$results = $reportObject->DatosReporte($query, $Slim->request()->params());
-	$reportObject->DownloadReport($results, 'Json');
+	$reportObject->DownloadReport($report_code, $results, 'Json');
 });
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
