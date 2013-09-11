@@ -1,24 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../app/classes/PaginaCobro.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../app/classes/CobroAsunto.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
-require_once Conf::ServerDir() . '/../app/classes/InputId.php';
-require_once Conf::ServerDir() . '/../app/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Moneda.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
-require_once Conf::ServerDir() . '/../app/classes/Observacion.php';
-require_once Conf::ServerDir() . '/../app/classes/CobroMoneda.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cliente.php';
 
 $sesion = new Sesion(array('COB'));
 $pagina = new PaginaCobro($sesion);
@@ -216,7 +197,7 @@ if ($opc == 'anular_emision') {
 			$cobro->Edit('id_usuario_secundario', $id_usuario_secundario);
 		}
 
-		if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
+		if (Conf::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
 			$cobro->Edit('se_esta_cobrando', $cobro->GlosaSeEstaCobrando());
 		}
 
@@ -239,8 +220,8 @@ if ($opc == 'anular_emision') {
 		include dirname(__FILE__) . '/cobro_doc.php';
 		exit;
 	} else if ($accion == 'descargar_excel_especial') {
-		if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '') {
-			require_once Conf::ServerDir() . '/../app/interfaces/' . UtilesApp::GetConf($sesion, 'XLSFormatoEspecial');
+		if (Conf::GetConf($sesion, 'XLSFormatoEspecial') != '') {
+			require_once Conf::ServerDir() . '/../app/interfaces/' . Conf::GetConf($sesion, 'XLSFormatoEspecial');
 		}
 		exit;
 	} else if ($accion == 'descargar_excel_rentabilidad') {
@@ -323,7 +304,7 @@ if ($popup) {
 	?>
 	<table width="100%" border="0" cellspacing="0" cellpadding="2">
 		<tr>
-			<td valign="top" align="left" class="titulo" bgcolor="<?php echo (method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'ColorTituloPagina') : Conf::ColorTituloPagina()) ?>">
+			<td valign="top" align="left" class="titulo" bgcolor="<?php echo Conf::GetConf($sesion, 'ColorTituloPagina') ?>">
 	<?php echo __('Emitir') . " " . __('Cobro') . __(' :: Detalle #') . $id_cobro . __(' ') . $nombre_cliente; ?>
 			</td>
 		</tr>
@@ -545,7 +526,7 @@ echo $refrescar;
 				var response = http.responseText;
 				response = response.split('//');
 <?php
-if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
+if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 	?>
 
 					var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
@@ -608,7 +589,7 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 					id: "myDialogId",
 					cancel:function(win){ jQuery('#btn_emitir_cobro').removeAttr("disabled"); return false; },
 					ok:function(win){
-						var modulo_facturacion = <?php echo UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ? 'true' : 'false'; ?>;
+						var modulo_facturacion = <?php echo Conf::GetConf($sesion, 'NuevoModuloFactura') ? 'true' : 'false'; ?>;
 						if( !AgregarParametros( form ) )
 							return false;
 						else
@@ -928,7 +909,7 @@ if (UtilesApp::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		if( isNaN(descuento) ) descuento = 0;
 		var impuesto=0;
 <?php
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarImpuestoSeparado') ) || ( method_exists('Conf', 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado']) {
+if ( Conf::GetConf($sesion, 'UsarImpuestoSeparado')  || $contrato->fields['usa_impuesto_separado']) {
 	?>
 			var campoImpuesto = document.getElementById("cobro_impuesto");
 			valorImpuesto = (subtotal - descuento)*(<?php echo $cobro->fields['porcentaje_impuesto'] ? $cobro->fields['porcentaje_impuesto'] : 0 ?>)/100;
@@ -1311,7 +1292,7 @@ for ($i = 0; $i < $monedas->num; $i++) {
 					<? } ?>
 					<input <?php echo TTip($tip_proporcional) ?> onclick="ShowMonto(true, false);ShowCapMsg('none');DisplayEscalas(false);" id="fc6" type=radio name="cobro_forma_cobro" value="PROPORCIONAL" <?php echo $cobro_forma_cobro == "PROPORCIONAL" ? "checked" : "" ?> />
 					<label for="fc6">Proporcional</label> &nbsp; &nbsp;
-<?php if (!UtilesApp::GetConf($sesion, 'EsconderTarifaEscalonada')) { ?>
+<?php if (!Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) { ?>
 						<input <?php echo TTip($tip_escalonada) ?> id="fc7" type=radio name="cobro_forma_cobro" onclick="HideMonto();ShowCapMsg('none');DisplayEscalas(true);" value="ESCALONADA" <?php echo $cobro_forma_cobro == "ESCALONADA" ? "checked" : "" ?> />
 						<label for="fc7">Escalonada</label>
 <?php } ?>
@@ -1623,7 +1604,7 @@ else
 							$cifras_decimales_moneda_total = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales'];
 							?>
 
-<?php if (UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos') && !empty($cobro->fields['incluye_gastos'])) {
+<?php if (Conf::GetConf($sesion, 'UsarImpuestoPorGastos') && !empty($cobro->fields['incluye_gastos'])) {
 	?>
 					<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
 						<tr>
@@ -1677,7 +1658,7 @@ else
 					</tr>
 					<tr>
 						<td align="right" width="45%" nowrap>
-							<span style='font-size:10px;float:left'><?php echo __('Total Honorarios ') . (UtilesApp::GetConf($sesion, 'UsarImpuestoSeparado') ? '<br/>(' . __('con impuestos') . ')' : '') ?></span> (<span id="divCobroUnidadHonorariosTotal" style='font-size:10px'><?php echo $moneda_total->fields['simbolo'] ?></span>):
+							<span style='font-size:10px;float:left'><?php echo __('Total Honorarios ') . (Conf::GetConf($sesion, 'UsarImpuestoSeparado') ? '<br/>(' . __('con impuestos') . ')' : '') ?></span> (<span id="divCobroUnidadHonorariosTotal" style='font-size:10px'><?php echo $moneda_total->fields['simbolo'] ?></span>):
 						</td>
 						<td align="left" width="55%" nowrap>
 							<input type="text" id="total_honorarios" value="<?php echo $x_resultados['monto'][$cobro->fields['opc_moneda_total']] ?>" size="12" readonly="readonly" style="text-align: right;">
@@ -1685,7 +1666,7 @@ else
 					</tr>
 					<tr>
 						<td align="right" width="45%" nowrap>
-							<span style='font-size:10px;float:left'><?php echo __('Total Gastos ') . (UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos') ? '<br/>(' . __('con impuestos') . ')' : '') ?></span> (<span id="divCobroUnidadGastosTotal" style='font-size:10px'><?php echo $moneda_total->fields['simbolo'] ?></span>):
+							<span style='font-size:10px;float:left'><?php echo __('Total Gastos ') . (Conf::GetConf($sesion, 'UsarImpuestoPorGastos') ? '<br/>(' . __('con impuestos') . ')' : '') ?></span> (<span id="divCobroUnidadGastosTotal" style='font-size:10px'><?php echo $moneda_total->fields['simbolo'] ?></span>):
 						</td>
 						<td align="left" width="55%" nowrap>
 							<input type="text" id="total_gastos" value="<?php echo $x_resultados['monto_gastos'][$cobro->fields['opc_moneda_total']] ?>" size="12" readonly="readonly" style="text-align: right;">
@@ -1712,7 +1693,7 @@ else
 <?php
 $se_esta_cobrando = $cobro->GlosaSeEstaCobrando();
 
-if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
+if (Conf::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
 	$disabled = "disabled";
 	$lineas = 'rows="6"';
 	$columnas = 'cols="25"';
@@ -1845,7 +1826,7 @@ if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
                                         <td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
                                     </tr>
-<?php if (UtilesApp::GetConf($sesion, 'PrmGastos')) { ?>
+<?php if (Conf::GetConf($sesion, 'PrmGastos')) { ?>
 										<tr>
 											<td align="right"><input type="checkbox" name="opc_ver_concepto_gastos" id="opc_ver_concepto_gastos" value="1" <?php echo $cobro->fields['opc_ver_concepto_gastos'] == '1' ? 'checked' : '' ?>></td>
 											<td align="left" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?php echo __('Mostrar concepto de gastos') ?></label></td>
@@ -1872,13 +1853,7 @@ if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
                                     </tr>
 <?php
-if (method_exists('Conf', 'GetConf'))
-	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
-elseif (method_exists('Conf', 'Ordenado_por'))
-	$solicitante = Conf::Ordenado_por();
-else
-	$solicitante = 2;
-
+$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
 if ($solicitante == 0) {  // no mostrar
 	?>
 										<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
@@ -1959,8 +1934,8 @@ if ($solicitante == 0) {  // no mostrar
 								<tr>
 									<td align="left" colspan="3">
 <?php
-if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDefecto')) {
-	$cobro->fields['opc_papel'] = UtilesApp::GetConf($sesion, 'PapelPorDefecto');
+if ($cobro->fields['opc_papel'] == '' && Conf::GetConf($sesion, 'PapelPorDefecto')) {
+	$cobro->fields['opc_papel'] = Conf::GetConf($sesion, 'PapelPorDefecto');
 }
 ?>
 										<select name="opc_papel">
@@ -2020,7 +1995,7 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							<?php
 							}
 
-							if( !UtilesApp::GetConf($sesion, 'EsconderExcelCobroModificable') ) {
+							if( !Conf::GetConf($sesion, 'EsconderExcelCobroModificable') ) {
 							?>
 
 									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185"   onclick="ImprimirExcel(jQuery('#form_cobro5').get(0));" /><?php echo __('descargar_excel_modificable')?></a>
@@ -2028,7 +2003,7 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							<?php
 							}
 
-							if( UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee') ) {
+							if( Conf::GetConf($sesion, 'ExcelRentabilidadFlatFee') ) {
 							?>
 
 									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185"  onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'rentabilidad');" /><?php echo __('Excel rentabilidad')?></a>
@@ -2036,7 +2011,7 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							<?php
 							}
 
-							if( !UtilesApp::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador')  && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
+							if( !Conf::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador')  && Conf::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && Conf::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
 							 <br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185" onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'especial');" /><?php echo __('Descargar Excel Cobro')?></a>
 
 							<?php } 			 ?>
