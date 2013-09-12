@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.5.6
+jueves 12 de septiembre 2013
+* **Fixed:** [obtiene los respaldos segun subdominio.](https://github.com/LemontechSA/ttb/pull/296)
+* **Fixed:** [Revisa cada carpeta del bucket, sin pasar por paginacion.](https://github.com/LemontechSA/ttb/pull/296)
 
 ## Hotfix: 13.5.5
 Lunes 09 de Septiembre 2013
