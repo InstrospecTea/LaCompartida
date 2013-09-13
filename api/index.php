@@ -621,19 +621,21 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 		halt(__("Invalid report Code"), "InvalidReportCode");
 	}
 
-	$reportObject = new $reportClass($Session);
+	$reportObject = new $reportClass($Session, $report_code);
 	$query = ($simpleReport->fields['query']);
 	if (!isset($query)) {
-		$query = $reportObject->QueryReporte($report_code);
+		$query = $reportObject->QueryReporte();
 	}
-	$results = $reportObject->DatosReporte($query, $Slim->request()->params());
-	$reportObject->DownloadReport($report_code, $results, 'Json');
+	$params = $Slim->request()->params();
+	$results = $reportObject->ReportData($query, $params);
+	$results = $reportObject->ProcessReport($results, $params);
+	$reportObject->DownloadReport($results, 'Json');
 });
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 	$results = SimpleReport::LoadApiReports($Session);
-	outputJson($results);
+	outputJson(array('reports' => $results));
 });
 
 
