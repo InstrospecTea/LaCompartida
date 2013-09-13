@@ -378,9 +378,9 @@ if (!$popup) {
 
 		function SeleccionarAnual() {
 			ActualizarPeriodo(<?php echo $actual; ?>);
-			$('reporte_envio_selector').hide();
-			$('reporte_envio_semana').hide();
 			$('reporte_envio_mes').show();
+			$('reporte_envio_semana').hide();
+			$('reporte_envio_selector').hide();
 			ActualizarNuevoReporte();
 		}
 

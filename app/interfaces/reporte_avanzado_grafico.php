@@ -21,119 +21,65 @@ $datos_grafico = '';
 $total = 0;
 
 
-/** REPORTE PRINCIPAL * */
+if (!$filtros_check) {
+	$fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
+	$fecha_m = '' . $fecha_mes;
+} else {
+	$clientes = null;
+	$usuarios = null;
+
+	if ($check_clientes) {
+		$clientes = $clientesF;
+	}
+	if ($check_profesionales) {
+		$usuarios = $usuariosF;
+	}
+	if ($check_area_prof) {
+		$areas_usuario = $areas;
+	}
+	if ($check_cat_prof) {
+		$categorias_usuario = $categorias;
+	}
+	if (!$check_area_asunto) {
+		$areas_asunto = null;
+	}
+	if (!$check_tipo_asunto) {
+		$tipos_asunto = null;
+	}
+	if (!$check_estado_cobro) {
+		$estado_cobro = null;
+	}
+	if (!$check_encargados) {
+		$encargados = null;
+	}
+}
+
+/* Se crea el reporte según el Input del usuario */
 $reporte = new Reporte($sesion);
-/* USUARIOS */
-$users = is_array($usuarios) ? $usuarios : explode(",", $usuarios);
-if (!is_array($users)) {
-	$users = array($users);
-}
-foreach ($users as $usuario) {
-	if ($usuario) {
-		$reporte->addFiltro('usuario', 'id_usuario', $usuario);
-	}
-}
-
-/* ENCARGADOS */
-$encargados = is_array($usuarios) ? $en_com : explode(",", $en_com);
-if (!is_array($encargados)) {
-	$encargados = array($encargados);
-}
-foreach ($encargados as $encargado) {
-	if ($encargado) {
-		$reporte->addFiltro('contrato', 'id_usuario_responsable', $encargado);
-	}
-}
-/* ESTADOS */
-$estados = is_array($es_cob) ? $es_cob : explode(",", $es_cob);
-if (!is_array($estados)) {
-	$estados = array($estados);
-}
-foreach ($estados as $estado) {
-	if ($estado) {
-		$reporte->addFiltro('cobro', 'estado', $estado);
-	}
-}
-
-/* CLIENTES */
-$clients = is_array($clientes) ? $clientes : explode(",", $clientes);
-if (!is_array($clients)) {
-	$clients = array($clients);
-}
-foreach ($clients as $cliente) {
-	if ($cliente) {
-		$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
-	}
-}
-
-/* AREAS */
-$areas = is_array($areas_asunto) ? $areas_asunto : explode(",", $areas_asunto);
-if (!is_array($areas)) {
-	$areas = array($areas);
-}
-foreach ($areas as $area) {
-	if ($area) {
-		$reporte->addFiltro('asunto', 'id_area_proyecto', $area);
-	}
-}
-
-/* AREAS USUARIO */
-$areas_usuario = is_array($areas_usuario) ? $areas_usuario : explode(",", $areas_usuario);
-if (!is_array($areas_usuario)) {
-	$areas_usuario = array($areas_usuario);
-}
-foreach ($areas_usuario as $area_usuario) {
-	if ($area_usuario) {
-		$reporte->addFiltro('usuario', 'id_area_usuario', $area_usuario);
-	}
-}
-
-/* CATEGORIAS USUARIO */
-$categorias_usuario = is_array($categorias_usuario) ? $categorias_usuario : explode(",", $categorias_usuario);
-if (!is_array($categorias_usuario)) {
-	$categorias_usuario = array($categorias_usuario);
-}
-foreach ($categorias_usuario as $categoria_usuario) {
-	if ($categoria_usuario) {
-		$reporte->addFiltro('usuario', 'id_categoria_usuario', $categoria_usuario);
-	}
-}
-
-/* TIPOS */
-$tipos = is_array($tipos_asunto) ? $tipos_asunto : explode(",", $tipos_asunto);
-if (!is_array($tipos)) {
-	$tipos = array($tipos);
-}
-foreach ($tipos as $tipo) {
-	if ($tipo) {
-		$reporte->addFiltro('asunto', 'id_tipo_asunto', $tipo);
-	}
-}
-
-
-$reporte->id_moneda = $id_moneda;
-$reporte->addRangoFecha($fecha_ini, $fecha_fin);
-$reporte->setTipoDato($tipo_dato);
-$reporte->setVista($vista);
-$reporte->setProporcionalidad($prop);
-
-if ($campo_fecha) {
-	$reporte->setCampoFecha($campo_fecha);
-}
-
+$dato = $tipo_dato;
+$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
+	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
+	'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+$reporte->setFiltros($filtros);
 $reporte->Query();
-
 $r = $reporte->toBars();
 /** FIN PRINCIPAL * */
+
 /* * REPORTE COMPARADO* */
 if ($tipo_dato_comparado) {
+	$reporte_c = new Reporte($sesion);
+	$dato = $tipo_dato_comparado;
+	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
+		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
+		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+	$reporte_c->setFiltros($filtros);
+	$reporte_c->setTipoDato($tipo_dato_comparado);
 
-	$reporte->setTipoDato($tipo_dato_comparado);
-	$reporte->Query();
+	$reporte_c->Query();
 
-	$r_c = $reporte->toBars();
-	$r = $reporte->fixBar($r, $r_c);
-	$r_c = $reporte->fixBar($r_c, $r);
+	$r_c = $reporte_c->toBars();
+	$r = $reporte_c->fixBar($r, $r_c);
+	$r_c = $reporte_c->fixBar($r_c, $r);
 
 	if ($orden_barras_max2min) {
 		arsort($r);
