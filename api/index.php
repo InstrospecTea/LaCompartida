@@ -610,7 +610,6 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	if (is_null($report_code) || empty($report_code)) {
 		halt(__("Invalid report Code"), "InvalidReportCode");
 	}
-
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 	$simpleReport = new SimpleReport($Session);
@@ -636,6 +635,11 @@ $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 	$results = SimpleReport::LoadApiReports($Session);
 	outputJson(array('reports' => $results));
+});
+
+$Slim->get('/currencies', function () use ($Session, $Slim) {
+	$results = Moneda::GetMonedas($Session, '', false);
+	outputJson(array('currencies' => $results));
 });
 
 

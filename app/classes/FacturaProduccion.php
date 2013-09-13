@@ -113,8 +113,8 @@ class FacturaProduccion {
 			'format' => 'number',
 			'title' => 'Total'
 		),
-		array (
-			'field' => 'total_pagado',
+		array
+(			'field' => 'total_pagado',
 			'format' => 'number',
 			'title' => 'Total'
 		),
