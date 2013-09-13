@@ -1982,13 +1982,10 @@ class CartaCobro extends NotaCobro {
 
 				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {
 					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $html2);
-				} else {
-					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
-				}
 
-				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto']), $html2);
 				} else {
+					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
 				}
 
