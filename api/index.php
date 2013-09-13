@@ -633,19 +633,20 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+	$user_id = validateAuthTokenSendByHeaders('REP');
 	$results = SimpleReport::LoadApiReports($Session);
-	outputJson(array('reports' => $results));
+	outputJson(array('results' => $results));
 });
 
 $Slim->get('/currencies', function () use ($Session, $Slim) {
 	$results = Moneda::GetMonedas($Session, '', false);
-	outputJson(array('currencies' => $results));
+	outputJson(array('results' => $results));
 });
 
 
 $Slim->run();
 
-function validateAuthTokenSendByHeaders() {
+function validateAuthTokenSendByHeaders($permission = null) {
 	global $Session, $Slim;
 
 	$UserToken = new UserToken($Session);
@@ -669,6 +670,21 @@ function validateAuthTokenSendByHeaders() {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
 			}
 		}
+
+		if (!is_null($permission)) {
+			$User = new Usuario($Session);
+			if (!$User->LoadId($user_token_data->user_id)) {
+				halt(__("The user doesn't exist"), "UserDoesntExist");
+			} else {
+				$User->LoadPermisos($user_token_data->user_id);
+			 	$params_array['codigo_permiso'] = $permission;
+				$p = $User->permisos->Find('FindPermiso', $params_array);
+				if (!$p->fields['permitido']) {
+					halt(__('Not allowed'), "SecurityError");
+				}
+			}
+		}
+
 
 		return $user_token_data->user_id;
 	}
