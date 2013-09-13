@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
-
 require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
@@ -154,7 +153,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			d.codigo_cliente = '$codigo_cliente'
 			$where_adelantos
 		)";
-//		$where_gastos .= "";
+		//$where_gastos .= "";
+	}
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT('{\"codigo\":\"', asunto.codigo_asunto, '\", \"glosa\":\"', asunto.glosa_asunto, '\"}') AS asunto";
 	}
 
 	$query_liquidaciones = "SELECT
@@ -177,6 +180,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				IF(contrato.separar_liquidaciones = 0,
 					'$tipo_liq_mixtas', IF(cobro.incluye_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
+				$concat_asunto
 			FROM
 				documento d
 			INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -187,6 +191,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
+			LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto
 			$join_liquidaciones
 			WHERE
 				cliente.activo = 1
@@ -216,6 +221,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				IF(d.pago_honorarios = 1 AND d.pago_gastos = 1,
 					'$tipo_liq_mixtas', IF(d.pago_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
+				$concat_asunto
 			FROM
 				documento d
 			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
@@ -223,6 +229,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 			LEFT JOIN contrato ON d.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
+			LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto
 			$join_adelantos
 			WHERE
 				cliente.activo = 1
@@ -258,9 +265,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				) AS saldo_gastos,
 				0 AS saldo_adelantos,
 				'$tipo_liq_gastos' AS tipo_liq
+				$concat_asunto
 			FROM
 				cta_corriente cc
-			INNER JOIN prm_moneda moneda_gasto ON cc.id_moneda=moneda_gasto.id_moneda
+			INNER JOIN prm_moneda moneda_gasto ON cc.id_moneda = moneda_gasto.id_moneda
 			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			INNER JOIN cliente ON cliente.codigo_cliente = cc.codigo_cliente
 			INNER JOIN asunto ON asunto.codigo_asunto = cc.codigo_asunto
@@ -336,8 +344,13 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$SimpleReportDetails->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 		$SimpleReportDetails->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 
+
 		$SimpleReportDetails->Config->columns['monto_base']->Title(__('Monto') . " ($simbolo_base)");
 		// $SimpleReportDetails->Config->columns['saldo_base']->Title(__('Saldo') . " ($simbolo_base)");
+
+		if (!Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+			unset($SimpleReportDetails->Config->columns['asunto']);
+		}
 
 		$statement = $Sesion->pdodbh->prepare($details_query);
 		$statement->execute();
@@ -367,6 +380,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save('Reporte_saldo');
 	}
+
 	if ($_REQUEST['opcion'] == 'json') {
 		foreach ($results as $fila) {
 			$saldo_total += $fila['saldo_liquidaciones'] + $fila['saldo_gastos'] + $fila['saldo_adelantos'];
@@ -389,39 +403,39 @@ $Pagina->PrintTop($popup);
 	.subreport {
 		padding-bottom: 40px;
 	}
-		.subreport h1 {
-			font-size: 12px;
-			margin-left: 5%;
-			color: #777;
-			font-weight: normal;
-		}
-		.subreport td.encabezado {
-			background-color: #ddd;
-			color: #040;
-		}
+	.subreport h1 {
+		font-size: 12px;
+		margin-left: 5%;
+		color: #777;
+		font-weight: normal;
+	}
+	.subreport td.encabezado {
+		background-color: #ddd;
+		color: #040;
+	}
 
-		.subreport .buscador {
-			border-bottom: 1px solid #BDBDBD;
-		}
-		.subreport .buscador > tbody > tr {
-			border-left: 1px solid #BDBDBD;
-			border-right: 1px solid #BDBDBD;
-		}
-		.subreport .buscador > tbody > tr.subtotal {
-			border-left: none;
-			border-right: none;
-		}
-		.subreport .buscador > tbody > tr.subtotal td.level2 {
-			text-align: left;
-			color: #777;
-			font-weight: normal !important;
-		}
+	.subreport .buscador {
+		border-bottom: 1px solid #BDBDBD;
+	}
+	.subreport .buscador > tbody > tr {
+		border-left: 1px solid #BDBDBD;
+		border-right: 1px solid #BDBDBD;
+	}
+	.subreport .buscador > tbody > tr.subtotal {
+		border-left: none;
+		border-right: none;
+	}
+	.subreport .buscador > tbody > tr.subtotal td.level2 {
+		text-align: left;
+		color: #777;
+		font-weight: normal !important;
+	}
 </style>
 <table width="100%">
-		<tr>
+	<tr>
 		<td>
 			<form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
-				<input  id="xdesde"  name="xdesde" type="hidden" value="">
+				<input id="xdesde" name="xdesde" type="hidden" value="">
 				<input type="hidden" name="opcion" id="opcion" value="buscar">
 				<!-- Calendario DIV -->
 				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -471,14 +485,14 @@ $Pagina->PrintTop($popup);
 							</td>
 						</tr>
 						<tr>
-								<td align="right"><?php echo __('Fecha Desde') ?></td>
-								<td nowrap align="left">
-										<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-								</td>
-								<td nowrap align="left" colspan="2">
-		&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
-										<input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-								</td>
+							<td align="right"><?php echo __('Fecha Desde') ?></td>
+							<td nowrap align="left">
+								<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+							</td>
+							<td nowrap align="left" colspan="2">
+								&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
+								<input class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+							</td>
 						</tr>
 						<tr>
 							<td>&nbsp;</td>
@@ -523,32 +537,51 @@ $Pagina->PrintTop($popup);
 				</fieldset>
 			</form>
 		</td>
-		</tr>
+	</tr>
 </table>
 <link rel="stylesheet" type="text/css" media="print" href="https://static.thetimebilling.com/css/imprimir.css" />
 <script type="text/javascript">
-		jQuery(document).ready(function () {
-			jQuery('#boton_xls').click(function(){
-				jQuery('#opcion').val('xls');
-			});
-			jQuery('#boton_buscar').click(function(){
-				jQuery('#opcion').val('buscar');
-			});
-
-			jQuery('.saldo:contains(-)').css('color', '#f00');
-			jQuery('.saldo:not(:contains(-))').css('color', '#00f');
-			jQuery('.subtotal td').css('font-weight', 'bold');
-
-			/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
-				var td = jQuery(el);
-				var contenido = td.html();
-				td.html('');
-				td.append(jQuery('<a/>', {
-					text: contenido,
-					href: 'planilla_saldo.php?codigo_cliente='
-				})).append(' ');
-			});*/
+	jQuery(document).ready(function () {
+		jQuery('#boton_xls').click(function(){
+			jQuery('#opcion').val('xls');
 		});
+
+		jQuery('#boton_buscar').click(function(){
+			jQuery('#opcion').val('buscar');
+		});
+
+		jQuery('.saldo:contains(-)').css('color', '#f00');
+		jQuery('.saldo:not(:contains(-))').css('color', '#00f');
+		jQuery('.subtotal td').css('font-weight', 'bold');
+
+		/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
+			var td = jQuery(el);
+			var contenido = td.html();
+			td.html('');
+			td.append(jQuery('<a/>', {
+				text: contenido,
+				href: 'planilla_saldo.php?codigo_cliente='
+			})).append(' ');
+		});*/
+
+		jQuery('td.asunto').each(function() {
+			var td = jQuery(this);
+			var contenido = '[' + td.html() + ']';
+			td.html('');
+			try {
+				var contenido_json = jQuery.parseJSON(contenido);
+				jQuery.each(contenido_json, function(key, value) {
+					td.append(jQuery('<a/>', {
+						text: value.codigo,
+						style: 'white-space:nowrap;',
+						href: 'javascript:void(0)',
+						onMouseover: 'ddrivetip("' + value.glosa + '")',
+						onMouseout: 'hideddrivetip()'
+					})).append(' ');
+				});
+			} catch (err) {}
+		});
+	});
 </script>
 <?php
 if ($_REQUEST['opcion'] == 'buscar') {
