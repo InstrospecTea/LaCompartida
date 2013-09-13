@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix: 13.5.7
+Viernes 13 de septiembre 2013
+* **Fixed:** [Corrige problema en Nota de cobro para clientes antiguos que utilizan la seccion %TIPO_CAMBIO%.](https://github.com/LemontechSA/ttb/pull/297)
+
 ## Hotfix: 13.5.6
 jueves 12 de septiembre 2013
 * **Fixed:** [obtiene los respaldos segun subdominio.](https://github.com/LemontechSA/ttb/pull/296)
