@@ -7,15 +7,28 @@ class FacturaProduccion {
 	public static $configuracion_reporte = array (
 		array (
 			'field' => 'id_factura',
-			'title' => 'Correlativo'
+			'title' => 'Correlativo',
+			'visible' => false
 		),
 		array (
 			'field' => 'id_contrato',
-			'title' => 'Contrato'
+			'title' => 'Código Asunto'
+		),
+		array (
+			'field' => 'glosas_asunto',
+			'title' => 'Glosa Asunto',
+		),
+		array (
+			'field' => 'codigo_cliente',
+			'title' => 'Codigo cliente',
 		),
 		array (
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
+		),
+		array (
+			'field' => 'tipo',
+			'title' => 'Tipo Doc.'
 		),
 		array (
 			'field' => 'serie_documento_legal',
@@ -24,11 +37,10 @@ class FacturaProduccion {
 		array (
 			'field' => 'numero',
 			'format' => 'number',
-			'title' => 'NÂ° Documento'
-		),
-		array (
-			'field' => 'tipo',
-			'title' => 'Tipo'
+			'title' => 'Nº Documento',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array (
 			'field' => 'fecha',
@@ -38,41 +50,23 @@ class FacturaProduccion {
 		array (
 			'field' => 'total',
 			'format' => 'number',
-			'title' => 'Total'
-		),
-		array (
-			'field' => 'numero',
-			'format' => 'number',
-			'title' => 'NÂ° Documento',
-			'extras' => array(
-				'subtotal' => false
-			)
+			'title' => 'Total Facturado'
 		),
 		array (
 			'field' => 'username_generador',
-			'title' => 'Generador'
+			'title' => 'Código Generador'
 		),
 
 		array (
 			'field' => 'nombre_generador',
-			'title' => 'Nombre'
+			'title' => 'Nombre Generador'
 		),
 
 		array (
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
 			'format' => 'number',
-		),
-
-		array (
-			'field' => 'codigo_cliente',
-			'title' => 'Codigo cliente',
-		),
-
-		array (
-			'field' => 'glosas_asunto',
-			'title' => 'Asuntos',
-		),
+		)
 
 	);
 
@@ -80,15 +74,28 @@ class FacturaProduccion {
 	public static $configuracion_cobranza = array (
 		array (
 			'field' => 'id_factura',
-			'title' => 'Correlativo'
+			'title' => 'Correlativo',
+			'visible' => false
 		),
 		array (
 			'field' => 'id_contrato',
-			'title' => 'Contrato'
+			'title' => 'Código Asunto'
+		),
+		array (
+			'field' => 'glosas_asunto',
+			'title' => 'Glosa Asunto',
+		),
+		array (
+			'field' => 'codigo_cliente',
+			'title' => 'Código cliente',
 		),
 		array (
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
+		),
+		array (
+			'field' => 'tipo',
+			'title' => 'Tipo Doc.'
 		),
 		array (
 			'field' => 'serie_documento_legal',
@@ -97,11 +104,10 @@ class FacturaProduccion {
 		array (
 			'field' => 'numero',
 			'format' => 'number',
-			'title' => 'NÂ° Documento'
-		),
-		array (
-			'field' => 'tipo',
-			'title' => 'Tipo'
+			'title' => 'N° Documento',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array (
 			'field' => 'fecha',
@@ -111,61 +117,56 @@ class FacturaProduccion {
 		array (
 			'field' => 'total_facturado',
 			'format' => 'number',
-			'title' => 'Total'
-		),
-		array
-(			'field' => 'total_pagado',
-			'format' => 'number',
-			'title' => 'Total'
+			'title' => 'Total Facturado'
 		),
 		array (
-			'field' => 'numero',
+			'field' => 'total_pagado',
 			'format' => 'number',
-			'title' => 'NÂ° Documento',
-			'extras' => array(
-				'subtotal' => false
-			)
+			'title' => 'Total Pagado'
 		),
 		array (
 			'field' => 'username_generador',
-			'title' => 'Generador'
+			'title' => 'Código Generador'
 		),
 
 		array (
 			'field' => 'nombre_generador',
-			'title' => 'Nombre'
+			'title' => 'Nombre Generador'
 		),
 
 		array (
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
 			'format' => 'number',
-		),
-
-		array (
-			'field' => 'codigo_cliente',
-			'title' => 'Codigo cliente',
-		),
-
-		array (
-			'field' => 'glosas_asunto',
-			'title' => 'Asuntos',
-		),
-
+		)
 	);
 
 	public static $configuracion_cobranza_aplicada = array (
 		array (
 			'field' => 'id_factura',
-			'title' => 'Correlativo'
+			'title' => 'Correlativo',
+			'visible' => false
 		),
 		array (
 			'field' => 'id_contrato',
-			'title' => 'Contrato'
+			'title' => 'Código Asunto'
+		),
+		array (
+			'field' => 'glosas_asunto',
+			'title' => 'Glosa Asunto',
+		),
+
+		array (
+			'field' => 'codigo_cliente',
+			'title' => 'Código cliente',
 		),
 		array (
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
+		),
+		array (
+			'field' => 'tipo',
+			'title' => 'Tipo Doc.'
 		),
 		array (
 			'field' => 'serie_documento_legal',
@@ -174,11 +175,10 @@ class FacturaProduccion {
 		array (
 			'field' => 'numero',
 			'format' => 'number',
-			'title' => 'NÂ° Documento'
-		),
-		array (
-			'field' => 'tipo',
-			'title' => 'Tipo'
+			'title' => 'N° Documento',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array (
 			'field' => 'fecha',
@@ -188,28 +188,24 @@ class FacturaProduccion {
 		array (
 			'field' => 'total',
 			'format' => 'number',
-			'title' => 'Total'
-		),
-		array (
-			'field' => 'simbolo',
-			'title' => 'SÃ­mbolo Moneda'
+			'title' => 'Total Facturado'
 		),
 		array (
 			'field' => 'numero',
 			'format' => 'number',
-			'title' => 'NÂ° Documento',
+			'title' => 'N° Documento',
 			'extras' => array(
 				'subtotal' => false
 			)
 		),
 		array (
 			'field' => 'username_generador',
-			'title' => 'Generador'
+			'title' => 'Código Generador'
 		),
 
 		array (
 			'field' => 'nombre_generador',
-			'title' => 'Nombre'
+			'title' => 'Nombre Generador'
 		),
 
 		array (
@@ -230,15 +226,6 @@ class FacturaProduccion {
 			'format' => 'number',
 		),
 
-		array (
-			'field' => 'codigo_cliente',
-			'title' => 'Codigo cliente',
-		),
-
-		array (
-			'field' => 'glosas_asunto',
-			'title' => 'Asuntos',
-		),
 
 	);
 
@@ -443,7 +430,7 @@ class FacturaProduccion {
 
 
 	/**
-	 * Descarga el reporte excel bÃ¡sico segÃºn configuraciones
+	 * Descarga el reporte excel básico según configuraciones
 	 */
 	public function DownloadReport($results, $writer_type= 'Json') {
 		$SimpleReport = new SimpleReport($this->sesion);
