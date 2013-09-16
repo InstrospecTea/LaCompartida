@@ -607,6 +607,10 @@ $Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_
 
 $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim) {
 
+	if ($report_code == 'TEST') {
+		outputJson($Slim->request()->params());
+		exit();
+	}
 	if (is_null($report_code) || empty($report_code)) {
 		halt(__("Invalid report Code"), "InvalidReportCode");
 	}

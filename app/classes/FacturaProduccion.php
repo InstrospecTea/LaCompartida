@@ -278,7 +278,7 @@ class FacturaProduccion {
 						LEFT JOIN usuario ON usuario.id_usuario = factura_generador.id_usuario
 					WHERE prm_estado_factura.id_estado != 5
 						AND factura.fecha >= :period_from AND factura.fecha <= :period_to
-					GROUP BY factura.numero";
+					GROUP BY factura.numero, usuario.id_usuario";
 		}
 
 		if ($this->report_code == 'FACTURA_COBRANZA') {
