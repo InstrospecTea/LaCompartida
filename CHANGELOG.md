@@ -2,7 +2,7 @@
 
 # Hotfix: 13.5.9
 Lunes 16 de septiembre 2013
-* **Fixed:** [](https://github.com/LemontechSA/ttb/pull/300)
+* **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
 
 ## Hotfix: 13.5.8
 Viernes 13 de septiembre 2013
