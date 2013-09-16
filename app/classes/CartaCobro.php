@@ -769,6 +769,27 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
+				if ($this->fields['monto_gastos'] > 0 && $this->fields['monto_subtotal'] == 0) {
+					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo_solo_gastos%'), $html2);
+					$html2 = str_replace('%monto_honorarios_cuando_hay%', '', $html2);
+					$html2 = str_replace('%concepto_honorarios_cuando_hay%', '', $html2);
+					$html2 = str_replace('%monto_gastos_cuando_hay%', '%monto_gasto%', $html2);
+					$html2 = str_replace('%concepto_gastos_cuando_hay%', __('por_concepto_de_gastos'), $html2);
+				} else if ($this->fields['monto_gastos'] == 0 && $this->fields['monto_subtotal'] > 0) {
+
+					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo_solo_honorarios%'), $html2);
+					$html2 = str_replace('%monto_gastos_cuando_hay%', '', $html2);
+					$html2 = str_replace('%concepto_gastos_cuando_hay%', '', $html2);
+					$html2 = str_replace('%monto_honorarios_cuando_hay%', '%monto_sin_gasto%', $html2);
+					$html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios'), $html2);
+				} else {
+					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo%'), $html2);
+					$html2 = str_replace('%monto_honorarios_cuando_hay%', '%monto_sin_gasto%', $html2);
+					$html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios') . ' y ', $html2);
+					$html2 = str_replace('%monto_gastos_cuando_hay%', '%monto_gasto%', $html2);
+					$html2 = str_replace('%concepto_gastos_cuando_hay%', __('por_concepto_de_gastos'), $html2);
+				}
+
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
 				$html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
@@ -783,11 +804,13 @@ class CartaCobro extends NotaCobro {
 
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
 					$html2 = str_replace('%monto_total_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] .' '. number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_con_gasto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_con_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_original%', $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_total_sin_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_subtotal, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
 					$html2 = str_replace('%monto_total_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_con_gasto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_con_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_original%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_total_sin_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_subtotal, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1909,6 +1932,9 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
 				$html2 = str_replace('%fecha_slash%', date('d/m/ Y'), $html2);
 
+				$test = 'hahahahahahahah';
+				$html2 = str_replace('%example%', $test, $html2);
+
 				#formato normal
 				if ($lang == 'es') {
 					$fecha_lang_con_de = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %d de %Y'));
@@ -1977,13 +2003,10 @@ class CartaCobro extends NotaCobro {
 
 				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {
 					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $html2);
-				} else {
-					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
-				}
 
-				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto']), $html2);
 				} else {
+					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
 				}
 
