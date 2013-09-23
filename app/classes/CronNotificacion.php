@@ -1067,7 +1067,9 @@ class CronNotificacion extends Cron {
 					contrato.id_usuario_secundario,
 					cliente.codigo_cliente,
 					cliente.glosa_cliente AS cliente,
-					GROUP_CONCAT(asunto.glosa_asunto) AS asuntos
+					GROUP_CONCAT(asunto.glosa_asunto) AS asuntos,
+					CONCAT_WS(' ', usuario_responable.nombre, usuario_responable.apellido1) as usuario_responable_nombre,
+					CONCAT_WS(' ', usuario_secundario.nombre, usuario_secundario.apellido1) as usuario_secundario_nombre
 				FROM asunto
 					LEFT JOIN contrato ON contrato.id_contrato = asunto.id_contrato
 					LEFT JOIN usuario AS usuario_responable ON usuario_responable.id_usuario = contrato.id_usuario_responsable
@@ -1119,7 +1121,11 @@ class CronNotificacion extends Cron {
 					$_horas_no_cobradas = number_format($horas_no_cobradas / 24, 6, '.', '');
 				}
 
-				if (UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoComercial')) {
+				if (!empty($cobro['id_usuario_responsable']) && UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoComercial')) {
+					if (empty($alertas[$cobro['id_usuario_responsable']]['usuario_nombre'])) {
+						$alertas[$cobro['id_usuario_responsable']]['usuario_nombre'] = $cobro['usuario_responable_nombre'];
+					}
+
 					if (empty($alertas[$cobro['id_usuario_responsable']]['clientes'][$cobro['codigo_cliente']]['nombre'])) {
 						$alertas[$cobro['id_usuario_responsable']]['clientes'][$cobro['codigo_cliente']]['nombre'] = $cobro['cliente'];
 					}
@@ -1132,7 +1138,11 @@ class CronNotificacion extends Cron {
 					);
 				}
 
-				if (UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoSecundario')) {
+				if (!empty($cobro['id_usuario_secundario']) && UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoSecundario')) {
+					if (empty($alertas[$cobro['id_usuario_secundario']]['usuario_nombre'])) {
+						$alertas[$cobro['id_usuario_secundario']]['usuario_nombre'] = $cobro['usuario_secundario_nombre'];
+					}
+
 					if (empty($alertas[$cobro['id_usuario_secundario']]['clientes'][$cobro['codigo_cliente']]['nombre'])) {
 						$alertas[$cobro['id_usuario_secundario']]['clientes'][$cobro['codigo_cliente']]['nombre'] = $cobro['cliente'];
 					}
@@ -1152,29 +1162,60 @@ class CronNotificacion extends Cron {
 				$alerta = array(
 					'tipo' => 'diario',
 					'simular' => false,
-					'mensaje' => '<br>'
+					'mensaje' => '<table border="0" cellpadding="3" cellspacing="5">
+						<tr>
+							<td colspan="6">Estimado/a: ' . $datos_alerta['usuario_nombre'] . '</td>
+						</tr>
+						<tr>
+							<td width="10px">&nbsp;</td>
+							<td colspan="6">' . __('Horas por facturar') . '</td>
+						</tr>
+						<tr style="background-color:#B3E58C;">
+							<td>&nbsp;</td>
+							<td><b>Cliente</b></td>
+							<td><b>Asunto</b></td>
+							<td><b>' . __('Horas trabajadas') . '</b></td>
+							<td><b>' . __('Último cobro') . '</b></td>
+							<td><b>' . __('Código contrato') . '</b></td>
+						</tr>'
 				);
 
+				$i = 0;
 				foreach ($datos_alerta['clientes'] as $codigo_cliente => $datos_cliente) {
-					$alerta['mensaje'] .= "<b>{$datos_cliente['nombre']}</b>";
-					$alerta['mensaje'] .= '<ul>';
+					$color = ($i % 2) ? '#DDDDDD' : '#FFFFFF';
 					for ($x = 0; $x < count($datos_cliente['asuntos']); $x++) {
-						$alerta['mensaje'] .= "<li>{$datos_cliente['asuntos'][$x]['nombre']}</li>";
-						$alerta['mensaje'] .= '<ul>';
-						$alerta['mensaje'] .= '<li>' . __('Horas trabajadas') . ": {$datos_cliente['asuntos'][$x]['horas_no_cobradas']}</li>";
+						$alerta['mensaje'] .= '<tr style="vertical-align:top; background-color:' . $color . ';">';
+
+						if ($x == 0) {
+							$alerta['mensaje'] .= '<td rowspan="' . count($datos_cliente['asuntos']) . '">&nbsp;</td>';
+							$alerta['mensaje'] .= '<td rowspan="' . count($datos_cliente['asuntos']) . '"><b>' . $datos_cliente['nombre'] . '</b></td>';
+						}
+
+						$asuntos = str_replace(',', '<br> * ', $datos_cliente['asuntos'][$x]['nombre']);
+
+						$alerta['mensaje'] .= "<td> * $asuntos</td>";
+						$alerta['mensaje'] .= "<td>{$datos_cliente['asuntos'][$x]['horas_no_cobradas']}</td>";
 
 						if (!empty($datos_cliente['asuntos'][$x]['fecha_ultimo_cobro'])) {
 							$fecha_ultimo_cobro = Utiles::sql2fecha($datos_cliente['asuntos'][$x]['fecha_ultimo_cobro'], $formato_fecha, '-');
-							$alerta['mensaje'] .= '<li>' . __('Último cobro') . ": {$fecha_ultimo_cobro}</li>";
+							$alerta['mensaje'] .= "<td>$fecha_ultimo_cobro</td>";
+						} else {
+							$alerta['mensaje'] .= '<td>&nbsp;</td>';
 						}
 
 						if (!empty($datos_cliente['asuntos'][$x]['codigo_contrato'])) {
-							$alerta['mensaje'] .= '<li>' . __('Código contrato') . ": {$datos_cliente['asuntos'][$x]['codigo_contrato']}</li>";
+							$alerta['mensaje'] .= "<td>{$datos_cliente['asuntos'][$x]['codigo_contrato']}</td>";
+						} else {
+							$alerta['mensaje'] .= '<td>&nbsp;</td>';
 						}
-						$alerta['mensaje'] .= '</ul>';
+
+						$alerta['mensaje'] .= '</tr>';
 					}
-					$alerta['mensaje'] .= '</ul><br>';
+
+					$i++;
 				}
+
+				$alerta['mensaje'] .= '</table>';
 
 				if ($this->correo == 'desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 					print_r($alerta);
@@ -1182,7 +1223,10 @@ class CronNotificacion extends Cron {
 					if ($this->correo == 'simular_correo') {
 						$alerta['simular'] = true;
 					}
-					$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $alerta, $this->Sesion, true);
+
+					if ($this->correo == 'simular_correo' || $this->correo == 'generar_correo') {
+						$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $alerta, $this->Sesion, false);
+					}
 				}
 			}
 		}
