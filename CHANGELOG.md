@@ -1,5 +1,10 @@
 # Changelog
 
+# Hotfix: 13.5.9
+Lunes 16 de septiembre 2013
+* **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
+* **Fixed:** [Corregir monto hitos con alter table para modificar tabla cobro_pendiente](https://github.com/LemontechSA/ttb/pull/301)
+
 ## Hotfix: 13.5.8
 Viernes 13 de septiembre 2013
 * **Fixed:** [Modificacion a interface agregar_gasto para no listar usuarios definidos como no visibles.](https://github.com/LemontechSA/ttb/pull/299)
