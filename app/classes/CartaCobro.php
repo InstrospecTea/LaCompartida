@@ -1492,13 +1492,11 @@ class CartaCobro extends NotaCobro {
 				/* FECHA PERIODO EXACTO PARA COBROS SOLO GASTOS */
 				
 				$query_fecha_ini_periodo_gastos = "SELECT MIN(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1 ";
-				echo $query_fecha_ini_periodo_gastos; echo '<br>';
 				$resp_fecha_ini_gastos = mysql_query($query_fecha_ini_periodo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_fecha_ini_periodo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 
 				list($fecha_primer_gasto) = mysql_fetch_array($resp_fecha_ini_gastos);
 
 				$query_fecha_fin_periodo_gastos = "SELECT max(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1";
-				echo $query_fecha_fin_periodo_gastos; echo '<br>';
 				$resp_fecha_fin_gastos = mysql_query($query_fecha_fin_periodo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_fecha_fin_periodo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 
 				list($fecha_ultimo_gasto) = mysql_fetch_array($resp_fecha_fin_gastos);
