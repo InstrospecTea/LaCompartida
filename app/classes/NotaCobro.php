@@ -394,6 +394,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%fecha_mes_del_cobro%', ucfirst($fecha_mes_del_cobro), $html);
 				$html = str_replace('%fecha_larga%', $fecha_lang, $html);
+				$html = str_replace('%fecha_dia_mes_ano%', date("d/m/Y"), $html);
 				
 				$query = "SELECT CONCAT(a.nombre, ' ', a.apellido1, ' ', a.apellido2) FROM usuario AS a JOIN contrato ON a.id_usuario=contrato.id_usuario_responsable JOIN cobro ON cobro.id_contrato=contrato.id_contrato WHERE cobro.id_cobro=" . $this->fields['id_cobro'];
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -3470,6 +3471,7 @@ class NotaCobro extends Cobro {
 				}
 				$html = str_replace('%fecha_mes_dos_digitos%', date("m", $time_fecha_fin), $html);
 				$html = str_replace('%fecha_ano_dos_digitos%', date("y", $time_fecha_fin), $html);
+				$html = str_replace('%fecha_dia_mes_ano%', date("d/m/Y"), $html);
 				$html = str_replace('%codigo_cliente%', $codigo_cliente, $html);
 				$html = str_replace('%fecha_mes_del_cobro%', ucfirst($fecha_mes_del_cobro), $html);
 				$html = str_replace('%fecha_larga%', $fecha_lang, $html);
