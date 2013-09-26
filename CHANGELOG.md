@@ -2,6 +2,10 @@
 
 # Hotfix: 13.5.10
 Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
 * **Fixed:** [Nuevos Tags para fecha inicial periodo y fecha final periodo para documento carta](https://github.com/LemontechSA/ttb/pull/301)
 
 # Hotfix: 13.5.9
