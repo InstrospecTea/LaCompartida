@@ -1,5 +1,9 @@
 # Changelog
 
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Fixed:** [Nuevos Tags para fecha inicial periodo y fecha final periodo para documento carta](https://github.com/LemontechSA/ttb/pull/301)
+
 # Hotfix: 13.5.9
 Lunes 16 de septiembre 2013
 * **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
