@@ -662,7 +662,7 @@ class CartaCobro extends NotaCobro {
 
 				list($fecha_primer_gasto) = mysql_fetch_array($resp_fecha_ini_gastos);
 
-				$query_fecha_fin_periodo_gastos = "SELECT LAST_DAY(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1";
+				$query_fecha_fin_periodo_gastos = "SELECT max(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1";
 				$resp_fecha_fin_gastos = mysql_query($query_fecha_fin_periodo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_fecha_fin_periodo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 
 				list($fecha_ultimo_gasto) = mysql_fetch_array($resp_fecha_fin_gastos);
@@ -670,7 +670,7 @@ class CartaCobro extends NotaCobro {
 				if ( $lang == 'es') {
 					$fecha_diff_periodo_gastos .= __('el día') . ' ' . ucfirst(Utiles::sql3fecha($fecha_primer_gasto,'%d-%m-%Y')) .' '. __('hasta el día') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y'));
 				} else {
-					$fecha_diff_periodo_gastos .= __('from') . ' ' . ucfirst(Utiles::sql3fecha($fecha_primer_gasto,'%d-%m-%Y')) .' '. __('to') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y'));
+					$fecha_diff_periodo_gastos .= __('from') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y')) .' '. __('to') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y'));
 				}
 
 				//Se saca la fecha inicial según el primer trabajo
@@ -799,8 +799,13 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_con_prestada_minusculas%', strtolower($fecha_diff_prestada), $html2);
 				$html2 = str_replace('%fecha_emision%', $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d de %B') : Utiles::sql2fecha($this->fields['fecha_fin'], '%d de %B'), $html2);
 				$html2 = str_replace('%monto_total_demo_uf%', number_format($monto_moneda_demo, $cobro_moneda->moneda[3]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . $cobro_moneda->moneda[3]['simbolo'], $html2);
-				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
-				$html2 = str_replace('%fecha_periodo_exacto_gastos%', $fecha_diff_periodo_gastos, $html2);
+				
+				if ( ($this->fields['incluye_honorarios'] == '0') && $this->fields['fecha_ini'] == '0000-00-00') {
+					$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_gastos, $html2);
+				} else {
+					$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
+				}
+				
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				if ($this->fields['monto_gastos'] > 0 && $this->fields['monto_subtotal'] == 0) {
@@ -1383,7 +1388,7 @@ class CartaCobro extends NotaCobro {
 				if (mysql_num_rows($resp) > 0) {
 					list($fecha_primer_trabajo) = mysql_fetch_array($resp);
 				} else {
-					$fecha_primer_trabajo = $this->fields['fecha_fin'];
+					$fecha_primer_trabajo = $this->fields['fecha_ini'];
 				}
 
 				/*  OBTENEMOS LA FECHA FINAL DEL ULTIMO TRABAJO (PARA EVITAR FECHAS 1969) */
@@ -1487,11 +1492,13 @@ class CartaCobro extends NotaCobro {
 				/* FECHA PERIODO EXACTO PARA COBROS SOLO GASTOS */
 				
 				$query_fecha_ini_periodo_gastos = "SELECT MIN(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1 ";
+				echo $query_fecha_ini_periodo_gastos; echo '<br>';
 				$resp_fecha_ini_gastos = mysql_query($query_fecha_ini_periodo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_fecha_ini_periodo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 
 				list($fecha_primer_gasto) = mysql_fetch_array($resp_fecha_ini_gastos);
 
-				$query_fecha_fin_periodo_gastos = "SELECT LAST_DAY(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1";
+				$query_fecha_fin_periodo_gastos = "SELECT max(fecha) FROM cta_corriente WHERE id_cobro='" . $this->fields['id_cobro'] . "' ORDER BY fecha LIMIT 1";
+				echo $query_fecha_fin_periodo_gastos; echo '<br>';
 				$resp_fecha_fin_gastos = mysql_query($query_fecha_fin_periodo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_fecha_fin_periodo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 
 				list($fecha_ultimo_gasto) = mysql_fetch_array($resp_fecha_fin_gastos);
@@ -1499,7 +1506,7 @@ class CartaCobro extends NotaCobro {
 				if ( $lang == 'es') {
 					$fecha_diff_periodo_gastos .= __('el día') . ' ' . ucfirst(Utiles::sql3fecha($fecha_primer_gasto,'%d-%m-%Y')) .' '. __('hasta el día') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y'));
 				} else {
-					$fecha_diff_periodo_gastos .= __('from') . ' ' . ucfirst(Utiles::sql3fecha($fecha_primer_gasto,'%d-%m-%Y')) .' '. __('to') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y'));
+					$fecha_diff_periodo_gastos .= __('from') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y')) .' '. __('to') . ' ' . ucfirst(Utiles::sql3fecha($fecha_ultimo_gasto,'%d-%m-%Y'));
 				}
 
 				if (method_exists('Conf', 'GetConf')) {
@@ -1562,9 +1569,13 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_total_demo_uf%', number_format($monto_moneda_demo, $cobro_moneda->moneda[3]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . $cobro_moneda->moneda[3]['simbolo'], $html2);
 				$html2 = str_replace('%fecha_facturacion%', $fecha_facturacion_carta, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				$html2 = str_replace('%fecha_periodo_exacto_gastos%', $fecha_diff_periodo_gastos, $html2);
-				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				
+				if ( ($this->fields['incluye_honorarios'] == '0') && $this->fields['fecha_ini'] == '0000-00-00') {
+					$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_gastos, $html2);
+				} else {
+					$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
+				}
+
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
 				$html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
 				
