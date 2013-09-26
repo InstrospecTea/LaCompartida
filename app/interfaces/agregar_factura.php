@@ -421,11 +421,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 ?>
 
 <form method=post id="form_facturas" name="form_facturas">
-	<input type="hidden" name=opcion value="" />
-	<input type='hidden' name=id_factura id=id_factura value="<?php echo $factura->fields['id_factura'] ?>" />
-	<input type="hidden" name=id_documento_legal value="<?php echo $id_documento_legal ?>" />
-	<input type="hidden" name=elimina_ingreso id=elimina_ingreso value=''>
-	<input type="hidden" name=id_cobro id=id_cobro value='<?php echo $id_cobro ?>'/>
+	<input type="hidden" name="opcion" value="" />
+	<input type='hidden' name="id_factura" id="id_factura" value="<?php echo $factura->fields['id_factura']; ?>" />
+	<input type="hidden" name="id_documento_legal" value="<?php echo $id_documento_legal; ?>" />
+	<input type="hidden" name="elimina_ingreso" id="elimina_ingreso" value="" />
+	<input type="hidden" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro; ?>" />
 	<input type="hidden" name="id_contrato" id="id_contrato" value='<?php echo $cobro->fields['id_contrato'] ?>'/>
 	<input type="hidden" name="id_moneda_factura" id="id_moneda_factura" value='<?php echo $id_moneda_factura ?>'/>
 	<input type="hidden" class="aproximable" name="honorario_disp" id="honorario_disp" value='<?php echo $honorario_disp ?>'/>
@@ -447,60 +447,74 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 	<table width='90%'>
 		<tr>
-			<td align=left><b>
-<?php echo $txt_pagina ?>
-				</b></td>
+			<td align="left">
+				<b><?php echo $txt_pagina; ?></b>
+			</td>
 		</tr>
 	</table>
 	<br>
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
-			<td align=left><b>
-<?php echo __('Información de') . ' ' . $tipo_documento_legal ?>
-				</b></td>
+			<td align="left">
+				<b><?php echo __('Información de') . ' ' . $tipo_documento_legal; ?></b>
+			</td>
 		</tr>
 	</table>
 	<table class="border_plomo" style="background-color:#FFFFFF;" width='95%'>
 		<tbody>
 			<tr>
-				<td id="controles_factura"colspan="4" align=center>
+				<td id="controles_factura" colspan="4" align="center"></td>
+			</tr>
+			<?php
+			// Si no viene de un POST puede ser nuevo o existente, si es nuevo ocupo el del $contrato
+			if (empty($id_estudio)) {
+				$id_estudio = !empty($factura->fields['id_estudio']) ? $factura->fields['id_estudio'] : $contrato->fields['id_estudio'];
+			}
+
+			$estudios_array = PrmEstudio::GetEstudios($sesion);
+			if (count($estudios_array) > 1) {
+			?>
+				<tr>
+					<td align="right"><?php echo __('Companía'); ?></td>
+					<td align="left" colspan="3">
+						<?php echo Html::SelectArray($estudios_array, 'id_estudio', $id_estudio, 'id="id_estudio" onchange="cambiarEstudio(this.value)"'); ?>
+					</td>
+				</tr>
+			<?php } else { ?>
+				<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+			<?php } ?>
+
+			<?php
+			$numero_documento = '';
+
+			if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+				$serie_ = null;
+				//Primera serie
+				if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+					$serie_ = $serienumero_documento->SeriesPorTipoDocumento($id_documento_legal, true);
+				}
+				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie_);
+			} else if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
+				$numero_documento = $factura->ObtieneNumeroFactura();
+			}
+			?>
+
+			<tr>
+				<td width="140" align="right"><?php echo __('Número'); ?></td>
+				<td align="left">
+					<?php
+					if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+						$valor_actual = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
+						echo Html::SelectQuery($sesion, $serienumero_documento->SeriesQuery($id_estudio), "serie", $valor_actual, 'onchange="NumeroDocumentoLegal()"', null, 60);
+					}
+					?>
+					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
+				</td>
+				<td align="right"><?php echo __('Estado'); ?></td>
+				<td align="left">
+					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', '', "160"); ?>
 				</td>
 			</tr>
-		</tbody>
-<?php
-$numero_documento = '';
-
-if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-	$serie_ = null;
-	//Primera serie
-	if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
-		$serie_ = $serienumero_documento->SeriesPorTipoDocumento($id_documento_legal, true);
-	}
-	$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie_);
-} else if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
-	$numero_documento = $factura->ObtieneNumeroFactura();
-}
-?>
-		<tr>
-			<td width="140" align=right><?php echo __('Número') ?></td>
-			<td align="left">
-		<?php if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')): ?>
-			<?php
-			$valor_actual = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
-			$select_serie = Html::SelectQuery($sesion, $serienumero_documento->SeriesQuery(), "serie", $valor_actual, 'onchange="NumeroDocumentoLegal()"', null, 60);
-			//Si el valor de esta serie no aparece, lo añandimos:
-			/* if(strpos($select_serie,$valor_actual)===false)
-			  {
-			  $select_serie = str_replace("</select>","<option value = '$valor_actual' selected>$valor_actual</option></select>",$select_serie);
-			  } -- causa problemas con valor de serie por defecto Factura con sin serie definido y no funcionan los corelativos -- */
-			echo $select_serie;
-			?>
-		<?php endif; ?>
-				<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento ?>" id="numero" size="11" maxlength="10" />
-			</td>
-			<td align=right><?php echo __('Estado') ?></td>
-			<td align=left><?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', '', "160"); ?></td>
-		</tr>
 <?php
 //Se debe elegir un documento legal padre si:
 $buscar_padre = false;
@@ -601,24 +615,6 @@ if ($buscar_padre) {
 				<td align="right"><?php echo __('Giro'); ?></td>
 				<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo ($factura->fields['giro_cliente'] ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']) ?>" id="giro_cliente" size="70" maxlength="255" /></td>
 			</tr>
-<?php
-	$estudios_array = PrmEstudio::GetEstudios($sesion);
-
-	// Si no viene de un POST puede ser nuevo o existente, si es nuevo ocupo el del $contrato
-	if (empty($id_estudio)) {
-		$id_estudio = !empty($factura->fields['id_estudio']) ? $factura->fields['id_estudio'] : $contrato->fields['id_estudio'];
-	}
-?>
-<?php if (count($estudios_array) > 1) { ?>
-			<tr>
-				<td align="right"><?php echo __('Companía') ?></td>
-				<td align="left" colspan="3">
-					<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio); ?>
-				</td>
-			</tr>
-<?php } else { ?>
-			<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
-<?php } ?>
 		<tr>
 			<td align=right><?php echo __('Condición de Pago') ?></td>
 			<td align=left colspan=3>
@@ -812,6 +808,7 @@ foreach ($condiciones_pago as $vc => $cond) {
 										$tipo_cambios[] = $tipo_cambio;
 									}
 									?>
+								</tr>
 								<tr>
 									<td colspan=<?php echo $num_monedas ?> align=center>
 										<a href="javascript:void(0);" icon="ui-icon-save" onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))"><?php echo __('Guardar') ?></a>
@@ -840,9 +837,11 @@ foreach ($condiciones_pago as $vc => $cond) {
 <?php } ?>
 				<a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio') ?>	</a></td>
 		</tr>
+		</tbody>
 	</table>
 </form>
-<script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
+
+<script type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 
 <script type="text/javascript">
 	var cantidad_decimales = <?php echo intval($cifras_decimales_opc_moneda_total); ?>;
@@ -859,6 +858,13 @@ foreach ($condiciones_pago as $vc => $cond) {
 			echo "var porcentaje_impuesto_gastos = '" . UtilesApp::GetConf($sesion, 'ValorImpuestoGastos') . "';";
 		}
 	}
+
+	$numeros_serie = $serienumero_documento->UltimosNumerosSerie($id_documento_legal);
+	$_series = array();
+	foreach ($numeros_serie as $numero_serie) {
+		$_series[$numero_serie['estudio']][$numero_serie['serie']] = $numero_serie['numero'];
+	}
+	echo 'var estudio_series = ' . json_encode($_series) . ';';
 	?>
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
@@ -1373,220 +1379,237 @@ if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 
 						}
 
-						function ActualizarDocumentoMonedaPago()
-						{
-							ids_monedas = $('ids_monedas_factura').value;
-							arreglo_ids = ids_monedas.split(',');
-							$('tipo_cambios_factura').value = "";
-							for (var i = 0; i < arreglo_ids.length - 1; i++)
-								$('tipo_cambios_factura').value += $('factura_moneda_' + arreglo_ids[i]).value + ",";
-							i = arreglo_ids.length - 1;
-							$('tipo_cambios_factura').value += $('factura_moneda_' + arreglo_ids[i]).value;
-							//alert( $('id_factura').value );
-							if ($('id_factura').value != '')
-							{
-								var tc = new Array();
-								for (var i = 0; i < arreglo_ids.length; i++)
-									tc[i] = $('factura_moneda_' + arreglo_ids[i]).value;
-								$('contenedor_tipo_load').innerHTML =
-												"<table width=510px><tr><td align=center><br><br><img src='<?php echo Conf::ImgDir() ?>/ajax_loader.gif'/><br><br></td></tr></table>";
-								var http = getXMLHTTP();
-								var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_factura_moneda&id_factura=<?php echo $factura->fields['id_factura'] ?>&ids_monedas=' + ids_monedas + '&tcs=' + tc.join(',');
-								http.open('get', url);
-								http.onreadystatechange = function()
-								{
-									if (http.readyState == 4)
-									{
-										var response = http.responseText;
-										alert(response);
-										if (response == 'EXITO')
-										{
-											$('contenedor_tipo_load').innerHTML = '';
-										}
-									}
-								}
-								http.send(null);
-							}
-							CancelarDocumentoMonedaPago();
-						}
+	function ActualizarDocumentoMonedaPago() {
+		ids_monedas = $('ids_monedas_factura').value;
+		arreglo_ids = ids_monedas.split(',');
 
-						/*Validador de Rut*/
-						function Validar_Rut()
-						{
-<?php if (!UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) : ?>
-								return true;
-<?php else: ?>
-								var tipo = $('tipo_documento_identidad');
-								if (tipo.value != 5)
-									return true;
-<?php endif; ?>
-							var o = $('RUT_cliente');
-							var tmpstr = "";
-							var intlargo = o.value
-							if (intlargo.length > 0)
-							{
-								crut = o.value
-								largo = crut.length;
-								if (largo < 2)
-								{
-									alert('<?php echo __("Rut inválido") ?>');
-									o.focus();
-									return false;
-								}
-								for (i = 0; i < crut.length; i++)
-									if (crut.charAt(i) != ' ' && crut.charAt(i) != '.' && crut.charAt(i) != '-')
-									{
-										tmpstr = tmpstr + crut.charAt(i);
-									}
-								rut = tmpstr;
-								crut = tmpstr;
-								largo = crut.length;
+		$('tipo_cambios_factura').value = "";
+		for (var i = 0; i < arreglo_ids.length - 1; i++) {
+			$('tipo_cambios_factura').value += $('factura_moneda_' + arreglo_ids[i]).value + ",";
+		}
 
-								if (largo > 2)
-									rut = crut.substring(0, largo - 1);
-								else
-									rut = crut.charAt(0);
+		i = arreglo_ids.length - 1;
+		$('tipo_cambios_factura').value += $('factura_moneda_' + arreglo_ids[i]).value;
 
-								dv = crut.charAt(largo - 1);
+		if ($('id_factura').value != '') {
+			var tc = new Array();
 
-								if (rut == null || dv == null)
-								{
-									alert('<?php echo __("Rut inválido") ?>');
-									o.focus();
-									return false;
-								}
+			for (var i = 0; i < arreglo_ids.length; i++){
+				tc[i] = $('factura_moneda_' + arreglo_ids[i]).value;
+			}
 
-								var dvr = '0';
-								suma = 0;
-								mul = 2;
+			$('contenedor_tipo_load').innerHTML = "<table width=510px><tr><td align=center><br><br><img src='<?php echo Conf::ImgDir() ?>/ajax_loader.gif'/><br><br></td></tr></table>";
+			var http = getXMLHTTP();
+			var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_factura_moneda&id_factura=<?php echo $factura->fields['id_factura'] ?>&ids_monedas=' + ids_monedas + '&tcs=' + tc.join(',');
+			http.open('get', url);
+			http.onreadystatechange = function() {
+				if (http.readyState == 4) {
+					var response = http.responseText;
+					alert(response);
+					if (response == 'EXITO') {
+						$('contenedor_tipo_load').innerHTML = '';
+					}
+				}
+			}
 
-								for (i = rut.length - 1; i >= 0; i--)
-								{
-									suma = suma + rut.charAt(i) * mul;
-									if (mul == 7)
-										mul = 2;
-									else
-										mul++;
-								}
+			http.send(null);
+		}
 
-								res = suma % 11;
-								if (res == 1)
-									dvr = 'k';
-								else if (res == 0)
-									dvr = '0';
-								else
-								{
-									dvi = 11 - res;
-									dvr = dvi + "";
-								}
+		CancelarDocumentoMonedaPago();
+	}
 
-								if (dvr != dv.toLowerCase())
-								{
-									alert('<?php echo __("El Rut Ingresado es Invalido") ?>');
-									o.focus();
-									return false;
-								}
-								return true;
-							}
+	/*Validador de Rut*/
+	function Validar_Rut() {
+		<?php if (!UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
+			return true;
+		<?php  } else { ?>
 
-							alert('<?php echo __("Rut inválido") ?>');
-							o.focus();
-							return false;
+			var tipo = $('tipo_documento_identidad');
+			if (tipo.value != 5) {
+				return true;
+			}
+		<?php } ?>
 
-						}
+		var o = $('RUT_cliente');
+		var tmpstr = "";
+		var intlargo = o.value
 
-						function ObtenerPagos(id_factura)
-						{
-							/* por algun motivo no me lo toma, aunque sea sincrono */
-							var http = getXMLHTTP();
-							http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura=' + id_factura, false);
-							http.onreadystatechange = revisaEstado;
-							http.send(null);
+		if (intlargo.length > 0) {
+			crut = o.value
+			largo = crut.length;
 
-							function revisaEstado()
-							{
-								if (http.readyState == 4)
-								{
-									response = http.responseText;
-									return response;
-								}
-							}
+			if (largo < 2) {
+				alert('<?php echo __("Rut inválido"); ?>');
+				o.focus();
+				return false;
+			}
 
-							return http.responseText;
-						}
+			for (i = 0; i < crut.length; i++) {
+				if (crut.charAt(i) != ' ' && crut.charAt(i) != '.' && crut.charAt(i) != '-') {
+					tmpstr = tmpstr + crut.charAt(i);
+				}
+			}
 
-						function NumeroDocumentoLegal()
-						{
-							if ($('serie').value == "")
-								return true;
-							var series = new Array();
-<?php $numeros_serie = $serienumero_documento->UltimosNumerosSerie($id_documento_legal); ?>
-<?php
-foreach ($numeros_serie as $numero_serie) {
-	echo "\n series['{$numero_serie['serie']}'] = {$numero_serie['numero']};";
-}
-?>
-							if ($('serie').value in series)
-								$('numero').value = series[$('serie').value];
-							return true;
-						}
+			rut = tmpstr;
+			crut = tmpstr;
+			largo = crut.length;
 
-<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+			if (largo > 2) {
+				rut = crut.substring(0, largo - 1);
+			} else {
+				rut = crut.charAt(0);
+			}
 
-							desgloseMontosFactura(document.form_facturas);
-	<?php if ($factura->loaded() && $factura->fields['id_estado'] == '4' && $factura->fields['letra'] != '') { ?>
-								Letra();
-	<?php }
-}
-?>
+			dv = crut.charAt(largo - 1);
 
-						jQuery(document).ready(function() {
+			if (rut == null || dv == null) {
+				alert('<?php echo __("Rut inválido"); ?>');
+				o.focus();
+				return false;
+			}
 
-							jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
-								CargarDatosCliente();
-							});
+			var dvr = '0';
+			suma = 0;
+			mul = 2;
 
-							if (cantidad_decimales != -1) {
+			for (i = rut.length - 1; i >= 0; i--) {
+				suma = suma + rut.charAt(i) * mul;
+				if (mul == 7) {
+					mul = 2;
+				} else {
+					mul++;
+				}
+			}
 
-								jQuery('.aproximable').each(function() {
-									//
-									//
-									jQuery(this).val = jQuery(this).parseNumber({format: "0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale: "us"}) + 0.0000001;
-									jQuery(this).formatNumber({format: "0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale: "us"});
+			res = suma % 11;
+			if (res == 1) {
+				dvr = 'k';
+			} else if (res == 0) {
+				dvr = '0';
+			} else {
+				dvi = 11 - res;
+				dvr = dvi + "";
+			}
 
-								});
+			if (dvr != dv.toLowerCase()) {
+				alert('<?php echo __("El Rut Ingresado es Invalido") ?>');
+				o.focus();
+				return false;
+			}
 
-								jQuery('.aproximable').typeWatch({
-									callback: function() {
-										desgloseMontosFactura(jQuery('#form_facturas').get(0));
+			return true;
+		} else {
+			alert('<?php echo __("Rut inválido"); ?>');
+			o.focus();
+			return false;
+		}
+	}
 
-									},
-									wait: 700,
-									highlight: false,
-									captureLength: 1
-								});
+	function ObtenerPagos(id_factura) {
+		/* por algun motivo no me lo toma, aunque sea sincrono */
+		var http = getXMLHTTP();
+		http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura=' + id_factura, false);
+		http.onreadystatechange = revisaEstado;
+		http.send(null);
 
-							}
+		function revisaEstado() {
+			if (http.readyState == 4) {
+				response = http.responseText;
+				return response;
+			}
+		}
 
-							jQuery('#RUT_cliente').blur(function() {
+		return http.responseText;
+	}
 
+	function NumeroDocumentoLegal() {
+		if (jQuery('#serie').attr('value') == '') {
+			return true;
+		}
 
-<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
-									Validar_Rut();
-<?php } ?>
-							});
+		jQuery.each(estudio_series, function(estudio, series) {
+			if (jQuery('#id_estudio').attr('value') == estudio) {
+				jQuery.each(series, function(serie, numero) {
+					if (jQuery('#serie').attr('value') == serie) {
+						jQuery('#numero').attr('value', numero);
+						return false;
+					}
+				});
+				return false;
+			}
+		});
 
-<?php if (($codigo_cliente || $codigo_cliente_secundario) && empty($id_factura)) { ?>
+		return true;
+	}
 
-								CargarDatosCliente();
+	function cambiarEstudio(id_estudio) {
+		var select = jQuery('#serie');
 
-<?php
-}
-echo ($requiere_refrescar) ? $requiere_refrescar : '';
-?>
+		if (select.prop) {
+			var options = select.prop('options');
+		} else {
+			var options = select.attr('options');
+		}
 
-						})
-<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_javascript_after') : false; ?>
+		jQuery('option', select).remove();
+
+		jQuery.each(estudio_series, function(estudio, series) {
+			if (jQuery('#id_estudio').attr('value') == estudio) {
+				jQuery.each(series, function(serie, numero) {
+					options[options.length] = new Option(serie, serie);
+				});
+			}
+		});
+
+		NumeroDocumentoLegal();
+
+		return true;
+	}
+
+	<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+		desgloseMontosFactura(document.form_facturas);
+		<?php if ($factura->loaded() && $factura->fields['id_estado'] == '4' && $factura->fields['letra'] != '') { ?>
+			Letra();
+		<?php }
+	} ?>
+
+	jQuery(document).ready(function() {
+		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
+			CargarDatosCliente();
+		});
+
+		if (cantidad_decimales != -1) {
+			jQuery('.aproximable').each(function() {
+				jQuery(this).val = jQuery(this).parseNumber({format: "0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale: "us"}) + 0.0000001;
+				jQuery(this).formatNumber({format: "0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale: "us"});
+			});
+
+			jQuery('.aproximable').typeWatch({
+				callback: function() {
+					desgloseMontosFactura(jQuery('#form_facturas').get(0));
+				},
+				wait: 700,
+				highlight: false,
+				captureLength: 1
+			});
+		}
+
+		jQuery('#RUT_cliente').blur(function() {
+			<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
+				Validar_Rut();
+			<?php } ?>
+		});
+
+		<?php if (($codigo_cliente || $codigo_cliente_secundario) && empty($id_factura)) { ?>
+			CargarDatosCliente();
+		<?php
+		}
+		echo ($requiere_refrescar) ? $requiere_refrescar : '';
+		?>
+
+	});
+
+	<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_javascript_after') : false; ?>
 </script>
 
-<?php $pagina->PrintBottom($popup); ?>
+<?php $pagina->PrintBottom($popup);

@@ -9958,6 +9958,21 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.45:
+			$queries = array();
+			if (!ExisteCampo('id_estudio', 'prm_doc_legal_numero', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_doc_legal_numero`
+					ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1,
+					ADD KEY `id_estudio` (`id_estudio`),
+					DROP KEY `id_documento_legal_2`,
+					ADD KEY `id_documento_legal_2` (`id_documento_legal`, `serie`, `id_estudio`)";
+
+				$queries[] = "ALTER TABLE `factura_pdf_datos` ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1 AFTER `id_documento_legal`, ADD KEY `id_estudio` (`id_estudio`);";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9967,7 +9982,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.44;
+$max_update = 7.45;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
