@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(__FILE__).'/../conf.php';
 require_once('Numbers/Words.php');
 
@@ -17,29 +18,17 @@ class FacturaPdfDatos extends Objeto
 	function CargarDatos( $id_factura, $id_documento_legal )
 	{
 
-		if(!UtilesApp::ExisteCampo('align','factura_pdf_datos',$this->sesion))  mysql_query("ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';",$this->sesion->dbh);
+		if (!UtilesApp::ExisteCampo('align','factura_pdf_datos',$this->sesion))  mysql_query("ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';",$this->sesion->dbh);
 
-		$query = "SELECT
-							codigo_tipo_dato,
-							activo,
-							coordinateX,
-							coordinateY,
-	                        cellW,
-	                        cellH,
-							font,
-							style,
-							mayuscula,
-							tamano , align
-				FROM
-					factura_pdf_datos
-       			JOIN
-       				factura_pdf_tipo_datos USING( id_tipo_dato )
-				WHERE activo = 1 AND id_documento_legal = '$id_documento_legal' ";
+		$query = "SELECT codigo_tipo_dato, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano , align
+					FROM factura_pdf_datos
+       				JOIN factura_pdf_tipo_datos USING( id_tipo_dato )
+					WHERE activo = 1 AND id_documento_legal = '$id_documento_legal' ";
+		
 		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
-		while( $row = mysql_fetch_assoc($resp) )
-		{
-			foreach($row as $tipo_dato => $valor) {
+		while ( $row = mysql_fetch_assoc($resp) ) {
+			foreach ( $row as $tipo_dato => $valor ) {
 				if( $tipo_dato == 'codigo_tipo_dato' ) {
 					$this->datos[$row['codigo_tipo_dato']]['dato_letra'] = $this->CargarGlosaDato($valor, $id_factura);
 				} else {
@@ -48,26 +37,10 @@ class FacturaPdfDatos extends Objeto
 			}
 		}
 
-		/*$factura = new Factura($this->sesion);
-		$factura->Load($id_factura);
-
-		echo '<pre>';print_r($factura->fields);echo '</pre>';*/
-		$querypapel = "SELECT
-								codigo_tipo_dato,
-								activo,
-								coordinateX,
-								coordinateY,
-		                        cellW,
-		                        cellH,
-								font,
-								style,
-								mayuscula,
-								tamano
-				FROM
-					factura_pdf_datos
-				JOIN
-					factura_pdf_tipo_datos USING( id_tipo_dato )
-				WHERE codigo_tipo_dato = 'tipo_papel' AND id_documento_legal= '$id_documento_legal' limit 1";
+		$querypapel = "SELECT codigo_tipo_dato, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano
+						FROM factura_pdf_datos
+						JOIN factura_pdf_tipo_datos USING( id_tipo_dato )
+						WHERE codigo_tipo_dato = 'tipo_papel' AND id_documento_legal= '$id_documento_legal' limit 1";
 
 		$resppapel = mysql_query($querypapel,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
 
@@ -84,14 +57,14 @@ class FacturaPdfDatos extends Objeto
 		$cobro->Load($factura->fields['id_cobro']);
 
 		$contrato = new Contrato($this->sesion);
-                    $contrato->Load($cobro->fields['id_contrato']);
+        $contrato->Load($cobro->fields['id_contrato']);
 
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
 		$condicion_pago = $factura->fields['condicion_pago'];
 
-		switch ($condicion_pago){
+		switch ($condicion_pago) {
 		    case '1': $condicion_pago = __('CONTADO'); break;
 		    case '3': $condicion_pago = __('Vencimiento 15 días	'); break;
 		    case '4': $condicion_pago = __('Vencimiento 30 días	'); break;
@@ -110,11 +83,11 @@ class FacturaPdfDatos extends Objeto
 		    case '21': $condicion_pago = __('Cheque a fecha'); break;
 		}
 
-		$query_comodines ="SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
+		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
 		$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
 		$array_comodines = array();
 		
-		while (list($codigo,$glosa) = mysql_fetch_array($resp_comodines)) {
+		while ( list($codigo,$glosa) = mysql_fetch_array($resp_comodines) ) {
 			$array_comodines[$codigo] = $glosa;
 		}
 
@@ -131,7 +104,7 @@ class FacturaPdfDatos extends Objeto
 		$glosa_moneda = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
 		$glosa_moneda_plural = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
 
-		if (strlen($monto_parte_decimal) == '2'){
+		if ( strlen($monto_parte_decimal) == '2') {
 			$fix_decimal = '1';
 		} else {
 			$fix_decimal = '10';
@@ -182,25 +155,19 @@ class FacturaPdfDatos extends Objeto
 			case 'moneda_gastos_con_iva':		$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 			case 'moneda_gastos_sin_iva':		$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 			case 'monto_en_palabra':			$glosa_dato = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])); break;
-
 			case 'monto_total_palabra':			$glosa_dato = $monto_total_palabra_fix; break;
-			
 			case 'monto_en_palabra_cero_cien':  $glosa_dato = $monto_en_palabra_cero_cien; break;
 			case 'porcentaje_impuesto':			$glosa_dato = $factura->fields['porcentaje_impuesto']."%"; break;
 			case 'moneda_subtotal':				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 			case 'moneda_iva':					$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 			case 'moneda_total':				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
-			case 'monto_subtotal':				$glosa_dato = number_format(
-																	$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-																	$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-																	$idioma->fields['separador_decimales'],
-																	$idioma->fields['separador_miles']); break;
-
+			case 'monto_subtotal':				$glosa_dato = number_format( $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'], $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 			case 'monto_iva':					$glosa_dato = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 			case 'monto_total':					$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 			case 'monto_total_2':				$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 			
 			default:
+			
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
@@ -255,19 +222,13 @@ class FacturaPdfDatos extends Objeto
 			$fila['moneda_gastos_con_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 			$fila['moneda_gastos_sin_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 			$fila['monto_en_palabra_cero_cien'] = $monto_en_palabra_cero_cien;
-			
 			$fila['monto_total_palabra'] = $monto_total_palabra_fix;
-			
 			$fila['monto_en_palabra'] = strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']));
 			$fila['porcentaje_impuesto'] = $factura->fields['porcentaje_impuesto']."%";
 			$fila['moneda_subtotal'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 			$fila['moneda_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 			$fila['moneda_total'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
-			$fila['monto_subtotal'] = number_format(
-										    $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-										    $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-										    $idioma->fields['separador_decimales'],
-										    $idioma->fields['separador_decimales']);
+			$fila['monto_subtotal'] = number_format( $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'], $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_decimales']);
 			$fila['monto_iva'] = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 			$fila['monto_total'] = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 			$fila['monto_total_2'] = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
@@ -281,7 +242,7 @@ class FacturaPdfDatos extends Objeto
 
 		$factura = new Factura( $this->sesion );
 
-		if( !$factura->Load( $id_factura ) ) {
+		if ( !$factura->Load( $id_factura ) ) {
 			echo "<html><head><title>Error</title></head><body><p>No se encuentra la factura $id_factura.</p></body></html>";
 			return;
 		}
@@ -292,17 +253,16 @@ class FacturaPdfDatos extends Objeto
 
 		$this->CargarDatos( $id_factura, $id_documento_legal ); // esto trae la posicion, tamaño y glosa de todos los campos más los datos del papel en la variable $this->papel;
 
-        if(count($this->papel)) {
-                $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
-					$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
-					$pdf->SetAutoPageBreak(true,$margin);
+        if (count($this->papel) ) {
+            $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
+			$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
+			$pdf->SetAutoPageBreak(true,$margin);
 		} else {
 				// P: hoja vertical
 				// mm: todo se mide en milímetros
 				// Letter: formato de hoja
-				$pdf = new FPDF($orientacion, 'mm', $format);
-         }
-
+			$pdf = new FPDF($orientacion, 'mm', $format);
+		}
 
 		$query = " SELECT codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
 		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -314,30 +274,30 @@ class FacturaPdfDatos extends Objeto
 		$pdf->AddPage();
 		$datos['dato_letra'] = str_replace(array("<br>\n","<br/>\n","<br />\n" ),"\n",$datos['dato_letra']);
 
-		//echo '<pre>';print_r($this->datos);echo '</pre>';
 		if (isset($this->datos['monto_honorarios']['dato_letra']) && intval($this->datos['monto_honorarios']['dato_letra'])===0) {
 		    unset($this->datos['monto_honorarios']);
 		    unset($this->datos['moneda_honorarios']);
 		    unset($this->datos['descripcion_honorarios']);
 		}
+
 		if (isset($this->datos['monto_gastos_con_iva']['dato_letra']) && intval($this->datos['monto_gastos_con_iva']['dato_letra'])===0) {
 		    unset($this->datos['monto_gastos_con_iva']);
 		    unset($this->datos['moneda_gastos_con_iva']);
 		    unset($this->datos['descripcion_gastos_con_iva']);
 		}
+
 		if (isset($this->datos['monto_gastos_sin_iva']['dato_letra'])  && intval($this->datos['monto_gastos_sin_iva']['dato_letra'])===0) {
 		    unset($this->datos['monto_gastos_sin_iva']);
 		    unset($this->datos['moneda_gastos_sin_iva']);
 		    unset($this->datos['descripcion_gastos_sin_iva']);
 		}
-		//echo '<pre>';print_r($this->datos);echo '</pre>';die();
-		foreach( $this->datos as $tipo_dato => $datos ) {
 
+		foreach( $this->datos as $tipo_dato => $datos ) {
 
 			$pdf->SetFont($datos['font'], $datos['style'], $datos['tamano']);
 			$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
 
-			if( $datos['mayuscula'] == 'may' ) {
+			if ( $datos['mayuscula'] == 'may' ) {
 				$datos['dato_letra'] = strtoupper($datos['dato_letra']);
 			} else if( $datos['mayuscula'] == 'min' ) {
 				$datos['dato_letra'] = strtolower($datos['dato_letra']);
@@ -345,19 +305,14 @@ class FacturaPdfDatos extends Objeto
 				$datos['dato_letra'] = ucwords(strtolower($datos['dato_letra']));
 			}
 
-             if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
-					$pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']? $datos['align']:'L') );
-                           } else  {
-					$pdf->Write(4, $datos['dato_letra']);
+            if ( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
+				$pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']? $datos['align']:'L') );
+			} else {
+				$pdf->Write(4, $datos['dato_letra']);
 			}
-
 		}
 
-        if( $mantencion ) {
-         //   $pdf->Output("../../pdf/factura.pdf","F");
-        } else {
-            $pdf->Output($glosa_documento_legal."_".$factura->fields['numero'].".pdf","D");
-        }
+	    $pdf->Output($glosa_documento_legal."_".$factura->fields['numero'].".pdf","D");
 	}
 }
 ?>
