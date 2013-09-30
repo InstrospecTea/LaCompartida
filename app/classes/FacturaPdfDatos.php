@@ -131,7 +131,6 @@ class FacturaPdfDatos extends Objeto
 			case 'razon_social':				$glosa_dato = $factura->fields['cliente']; break;
 			case 'rut':							$glosa_dato = $factura->fields['RUT_cliente']; break;
 			case 'telefono':					$glosa_dato = $contrato->fields['factura_telefono']; break;
-			case 'glosa_contrato':				$glosa_dato = $contrato->fields['glosa_contrato']; break;
 			case 'fecha_dia':					$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
 			case 'fecha_mes':					$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break;
 			case 'fecha_numero_mes': 			$glosa_dato = strftime("%m",strtotime($factura->fields['fecha'])); break;
@@ -198,7 +197,6 @@ class FacturaPdfDatos extends Objeto
 			$fila['razon_social'] = $factura->fields['cliente'];
 			$fila['rut'] = $factura->fields['RUT_cliente'];
 			$fila['telefono'] = $contrato->fields['factura_telefono'];
-			$fila['glosa_contrato'] = $contrato->fields['glosa_contrato'];
 			$fila['comuna'] = $factura->fields['comuna_cliente'];
 			$fila['ciudad'] = $factura->fields['ciudad_cliente'];
 			$fila['factura_codigopostal'] = $factura->fields['factura_codigopostal'];
