@@ -1067,7 +1067,7 @@ class CronNotificacion extends Cron {
 					contrato.id_usuario_secundario,
 					cliente.codigo_cliente,
 					cliente.glosa_cliente AS cliente,
-					GROUP_CONCAT(asunto.glosa_asunto) AS asuntos,
+					GROUP_CONCAT(asunto.codigo_asunto, '|@|', asunto.glosa_asunto) AS asuntos,
 					CONCAT_WS(' ', usuario_responable.nombre, usuario_responable.apellido1) as usuario_responable_nombre,
 					CONCAT_WS(' ', usuario_secundario.nombre, usuario_secundario.apellido1) as usuario_secundario_nombre
 				FROM asunto
@@ -1076,6 +1076,7 @@ class CronNotificacion extends Cron {
 					LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				WHERE  1
+					AND contrato.activo = 'SI'
 					AND (
 						(SELECT Count(*)
 							FROM trabajo
@@ -1162,22 +1163,24 @@ class CronNotificacion extends Cron {
 				$alerta = array(
 					'tipo' => 'diario',
 					'simular' => false,
-					'mensaje' => '<table border="0" cellpadding="3" cellspacing="5">
-						<tr>
-							<td colspan="6">Estimado/a: ' . $datos_alerta['usuario_nombre'] . '</td>
-						</tr>
-						<tr>
-							<td width="10px">&nbsp;</td>
-							<td colspan="6">' . __('Horas por facturar') . '</td>
-						</tr>
-						<tr style="background-color:#B3E58C;">
-							<td>&nbsp;</td>
-							<td><b>Cliente</b></td>
-							<td><b>Asunto</b></td>
-							<td><b>' . __('Horas trabajadas') . '</b></td>
-							<td><b>' . __('Último cobro') . '</b></td>
-							<td><b>' . __('Código contrato') . '</b></td>
-						</tr>'
+					'mensaje' => '
+						<table border="0" cellpadding="3" cellspacing="0">
+							<tr>
+								<td colspan="7">Estimado/a: ' . $datos_alerta['usuario_nombre'] . '</td>
+							</tr>
+							<tr>
+								<td width="10px">&nbsp;</td>
+								<td colspan="6">' . __('Horas por facturar') . '</td>
+							</tr>
+							<tr style="background-color:#B3E58C;">
+								<td>&nbsp;</td>
+								<td width="250px"><b>' . __('Cliente') . '</b></td>
+								<td width="100px"><b>Código ' . __('asunto') . '</b></td>
+								<td width="300px"><b>' . __('Asunto') . '</b></td>
+								<td width="100px"><b>' . __('Horas trabajadas') . '</b></td>
+								<td width="50px"><b>' . __('Último cobro') . '</b></td>
+								<td width="100px"><b>' . __('Código servicio') . '</b></td>
+							</tr>'
 				);
 
 				$i = 0;
@@ -1191,9 +1194,19 @@ class CronNotificacion extends Cron {
 							$alerta['mensaje'] .= '<td rowspan="' . count($datos_cliente['asuntos']) . '"><b>' . $datos_cliente['nombre'] . '</b></td>';
 						}
 
-						$asuntos = str_replace(',', '<br> * ', $datos_cliente['asuntos'][$x]['nombre']);
+						$_asuntos = explode(',', $datos_cliente['asuntos'][$x]['nombre']);
+						$alerta['mensaje'] .= '<td colspan="2">';
+						$alerta['mensaje'] .= '<table border="0" cellpadding="3" cellspacing="0">';
+						for($y = 0; $y < count($_asuntos); $y++) {
+							$__asunto = explode('|@|', $_asuntos[$y]);
+							$alerta['mensaje'] .= '<tr style="vertical-align:top;">';
+							$alerta['mensaje'] .= '<td width="100px">' . $__asunto[0] . '</td>';
+							$alerta['mensaje'] .= '<td width="300px">' . $__asunto[1] . '</td>';
+							$alerta['mensaje'] .= '</tr>';
 
-						$alerta['mensaje'] .= "<td> * $asuntos</td>";
+						}
+						$alerta['mensaje'] .= '</table>';
+						$alerta['mensaje'] .= '</td>';
 						$alerta['mensaje'] .= "<td>{$datos_cliente['asuntos'][$x]['horas_no_cobradas']}</td>";
 
 						if (!empty($datos_cliente['asuntos'][$x]['fecha_ultimo_cobro'])) {
