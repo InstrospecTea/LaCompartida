@@ -2,6 +2,8 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('ADM'));
+
+use TTB\Pagina as Pagina;
 $pagina = new Pagina($Sesion);
 
 $pagina->titulo = __('Configuración');
@@ -408,6 +410,6 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 	<!-- <script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>-->
 
 	<?php
-	$pagina->PrintBottom($popup);
+	$pagina->PrintBottom($popup, true);
 
 

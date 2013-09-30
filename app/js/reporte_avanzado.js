@@ -184,7 +184,7 @@ function eliminarItemReporte(data) {
 	}
 }
 function cargarItemReporte(data) {
-	if (this.data.id_reporte) {
+	if (jQuery('#mis_reportes option[value="' + data.id_reporte + '"]').attr('value')) {
 		jQuery('#mis_reportes option[value="' + data.id_reporte + '"]')
 				.data('reporte', data.reporte)
 				.data('glosa', data.glosa)
@@ -287,11 +287,14 @@ function CargarReporte() {
 			}
 		}
 	} else {
-		var json_reporte = reporte.data('reporte').replace(/'/g, '"')
-		var datos = jQuery.parseJSON(json_reporte);
-		setFieldsValues(datos);
 		var filtros_avanzados = ['check_area_asunto', 'check_area_prof', 'check_cat_prof', 'check_clientes', 'check_encargados', 'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto'];
 		var showFullFiltros = false;
+		var json_reporte = reporte.data('reporte').replace(/'/g, '"')
+		var datos = jQuery.parseJSON(json_reporte);
+
+		setFieldsValues(datos);
+		Comparar();
+
 		jQuery.each(datos, function(k) {
 			if (jQuery.inArray(k, filtros_avanzados) != -1) {
 				showFullFiltros = true;
@@ -301,9 +304,9 @@ function CargarReporte() {
 		if ((showFullFiltros && jQuery('#filtrosimple').is(':visible')) || (!showFullFiltros && jQuery('#full_filtros').is(':visible'))) {
 			jQuery('#fullfiltrostoggle').click();
 		}
+
 		Agrupadores(0);
 		TipoDato();
-
 	}
 }
 
@@ -383,6 +386,8 @@ function setFieldsValues(data) {
 }
 
 function resetForm() {
+	// al asignar el valor "checked" el reset no funciona así que se fuerza a deschequear el campo
+	jQuery('#comparar').attr('checked', false);
 	jQuery('#formulario').get(0).reset();
 }
 
@@ -512,8 +517,10 @@ function MostrarLimite(visible) {
 }
 
 function ActualizarPeriodo(fi, ff) {
-	jQuery('#fecha_ini').val(fi).datepicker('option', 'dateFormat', 'dd-mm-yy');
-	jQuery('#fecha_fin').val(ff).datepicker('option', 'dateFormat', 'dd-mm-yy');
+	fi = fi.split('-');
+	ff = ff.split('-');
+	jQuery('#fecha_ini').datepicker('setDate', new Date(fi[2], fi[1]-1, fi[0]));
+	jQuery('#fecha_fin').datepicker('setDate', new Date(ff[2], ff[1]-1, ff[0]));
 }
 
 function SeleccionarSelector() {

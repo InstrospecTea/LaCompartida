@@ -523,6 +523,10 @@ class Asunto extends Objeto {
 			$wheres[] = "a1.activo = " . ($activo == 'SI' ? 1 : 0);
 		}
 
+		if ($id_grupo_cliente) {
+			$wheres[] = "cliente.id_grupo_cliente = '$id_grupo_cliente'";
+		}
+
 		if ($codigo_asunto != "") {
 			$wheres[] = "a1.codigo_asunto LIKE '$codigo_asunto%'";
 		}
@@ -587,6 +591,7 @@ class Asunto extends Objeto {
 
 			tarifa.glosa_tarifa,
 			cliente.glosa_cliente,
+			cliente.id_grupo_cliente,
 			prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
 			prm_area_proyecto.glosa AS area_proyecto,
 			prm_idioma.glosa_idioma,

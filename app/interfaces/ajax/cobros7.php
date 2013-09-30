@@ -371,7 +371,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 																<input type="checkbox" name="pagar_factura_<?php echo $id_factura ?>" id="pagar_factura_<?php echo $id_factura ?>" value="<?php echo $saldo ?>"   class="tooltip" alt="Active esta casilla y luego pinche en 'Pagar' para añadir pagos" />
 															</td>
 															<td style="white-space:nowrap;cursor:pointer;">
-																<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 800, 600, 'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1&id_cobro=<?php echo $id_cobro ?>', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border="0" title="Editar"/></a>
+																<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 800, 635, 'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1&id_cobro=<?php echo $id_cobro ?>', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border="0" title="Editar"/></a>
 																<?php if (UtilesApp::GetConf($sesion, 'ImprimirFacturaDoc')) { ?>
 																	<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir');" ><img src='<?php echo Conf::ImgDir() ?>/doc.gif' border="0" title="Descargar Word"/></a>
 																<?php } ?>

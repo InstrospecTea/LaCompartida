@@ -9954,6 +9954,12 @@ QUERY;
 
 		case 7.44:
 			$queries = array();
+			$queries[] = "ALTER TABLE `cobro_pendiente` CHANGE `monto_estimado` `monto_estimado` DOUBLE NOT NULL DEFAULT '0' ";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.45:
+			$queries = array();
 
 			if (!ExisteCampo('dte_fecha_creacion', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_creacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha creacion';";
@@ -9976,6 +9982,7 @@ QUERY;
 											,  ('FacturacionElectronicaPassword', 'demo2011', 'string', 'Password para integración con facturación electrónica', 10, -1)";
 			ejecutar($queries, $dbh);
 			break;
+
 	}
 }
 
