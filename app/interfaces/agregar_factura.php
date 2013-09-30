@@ -350,7 +350,14 @@ $suma_total = $subtotal_honorarios + $subtotal_gastos + $impuesto_gastos + $impu
 
 //CON DESGLOSE
 $cobro_ = new Cobro($sesion);
-$descripcion_honorario = __(UtilesApp::GetConf($sesion, 'FacturaDescripcionHonorarios'));
+
+$conf_facturadescripcionhonorarios = UtilesApp::GetConf($sesion, 'FacturaDescripcionHonorarios');
+
+if ( $conf_facturadescripcionhonorarios == '' ) {
+	$descripcion_honorario = $contrato->fields['glosa_contrato'];
+} else {
+	$descripcion_honorario = __(UtilesApp::GetConf($sesion, 'FacturaDescripcionHonorarios'));
+}
 
 if (UtilesApp::GetConf($sesion, 'DescripcionFacturaConAsuntos')) {
 	$descripcion_honorario .= "\n" . implode(', ', $cobro_->AsuntosNombreCodigo($id_cobro));
