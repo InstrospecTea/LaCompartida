@@ -1067,7 +1067,7 @@ class CronNotificacion extends Cron {
 					contrato.id_usuario_secundario,
 					cliente.codigo_cliente,
 					cliente.glosa_cliente AS cliente,
-					GROUP_CONCAT(asunto.codigo_asunto, '|@|', asunto.glosa_asunto) AS asuntos,
+					GROUP_CONCAT(asunto.codigo_asunto, '|@|', asunto.glosa_asunto SEPARATOR '|$|') AS asuntos,
 					CONCAT_WS(' ', usuario_responable.nombre, usuario_responable.apellido1) as usuario_responable_nombre,
 					CONCAT_WS(' ', usuario_secundario.nombre, usuario_secundario.apellido1) as usuario_secundario_nombre
 				FROM asunto
@@ -1194,7 +1194,7 @@ class CronNotificacion extends Cron {
 							$alerta['mensaje'] .= '<td rowspan="' . count($datos_cliente['asuntos']) . '"><b>' . $datos_cliente['nombre'] . '</b></td>';
 						}
 
-						$_asuntos = explode(',', $datos_cliente['asuntos'][$x]['nombre']);
+						$_asuntos = explode('|$|', $datos_cliente['asuntos'][$x]['nombre']);
 						$alerta['mensaje'] .= '<td colspan="2">';
 						$alerta['mensaje'] .= '<table border="0" cellpadding="3" cellspacing="0">';
 						for($y = 0; $y < count($_asuntos); $y++) {
