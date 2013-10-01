@@ -89,7 +89,7 @@ if ($opcion == "guardar") {
 	$guardar_datos = true;
 
 	//El webservice ignora todo llamado a $pagina
-	if ($desde_webservice) { 
+	if ($desde_webservice) {
 		$errores = array();
 		if (!is_numeric($monto_honorarios_legales) || !is_numeric($monto_gastos_con_iva) || !is_numeric($monto_gastos_sin_iva)) {
 			$errores[] = 'error';
@@ -117,12 +117,12 @@ if ($opcion == "guardar") {
 	}
 
 	if ($guardar_datos) {
-	
+
 		//chequear
 		$mensaje_accion = 'guardar';
 		$factura->Edit('subtotal', $monto_neto);
 		$factura->Edit('porcentaje_impuesto', $porcentaje_impuesto);
-	
+
 		if ($comprobante_erp) {
 			$factura->Edit('comprobante_erp', $comprobante_erp);
 		}
@@ -136,7 +136,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
-		
+
 		if (UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
 			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
 		}
@@ -156,7 +156,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
-		
+
 		if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
 			$factura->Edit("serie_documento_legal", $serie);
 		} else if (!isset($factura->fields['serie_documento_legal'])) {
@@ -166,7 +166,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("numero", $numero ? $numero : "1");
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
 		$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
-		
+
 		if ($id_estado == '5') {
 			$factura->Edit('estado', 'ANULADA');
 			$factura->Edit('anulado', 1);
@@ -493,9 +493,9 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 			<td align="left"><b><?php echo $txt_pagina ?></b></td>
 		</tr>
 	</table>
-	
+
 	<br>
-	
+
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
 			<td align="left"><b><?php echo __('Información de') . ' ' . $tipo_documento_legal ?></b></td>
@@ -508,22 +508,22 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				<td id="controles_factura"colspan="4" align=center></td>
 			</tr>
 		</tbody>
-	
+
 		<tr>
 			<td width="140" align="right"><?php echo __('Número') ?></td>
 			<td align="left">
-			
+
 			<?php if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')): ?>
 
 			<?php
 
 			$valor_actual = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
 			$select_serie = Html::SelectQuery($sesion, $serienumero_documento->SeriesQuery(), "serie", $valor_actual, 'onchange="NumeroDocumentoLegal()"', null, 60);
-			
+
 			//Si el valor de esta serie no aparece, lo añandimos:
-			
+
 			echo $select_serie;
-			
+
 			?>
 		<?php endif; ?>
 				<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento ?>" id="numero" size="11" maxlength="10" />
@@ -559,13 +559,13 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				<td align="right"><?php echo __('Para Documento Tributario:') ?></td>
 				<td align="left" colspan="3"><?php echo Html::SelectQuery($sesion, $query_padre, 'id_factura_padre', $factura->fields['id_factura_padre'], '', '--', '160') ?></td>
 			</tr>
-		
+
 		<?php } ?>
-		
+
 		<?php
-		
+
 		$zona_horaria = UtilesApp::GetConf($sesion, 'ZonaHoraria');
-		
+
 		if ($zona_horaria) {
 			date_default_timezone_set($zona_horaria);
 		}
@@ -578,18 +578,18 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				<span style='display:none' id="letra_inicial"><?php echo __('Letra') ?>	:&nbsp;	<input name='letra_inicial' value='<?php echo $factura->fields['letra'] ? $factura->fields['letra'] : '' ?>' size="10"/></span>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td align="right"><?php echo __('Cliente') ?></td>
 			<td align="left" colspan="3"> <?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-				<span style="color:#FF0000; font-size:10px">*</span> 
+				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
 
 		<tr style="display:none;">
 			<td><?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?></td>
 		</tr>
-		
+
 		<tr>
 			<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
 				<td align="right"><?php echo __('Doc. Identidad'); ?></td>
@@ -638,7 +638,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 			?>
 
 			<?php if (count($estudios_array) > 1) { ?>
-			
+
 				<tr>
 					<td align="right"><?php echo __('Companía') ?></td>
 					<td align="left" colspan="3">
@@ -648,7 +648,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 			<?php } else { ?>
 				<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
 			<?php } ?>
-			
+
 			<tr>
 				<td align="right"><?php echo __('Condición de Pago') ?></td>
 				<td align="left" colspan="3">
@@ -683,11 +683,11 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 					</select>
 				</td>
 			</tr>
-			
-			<?php 
+
+			<?php
 
 			$cantidad_lineas_descripcion = UtilesApp::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
-			
+
 			if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			?>
 				<tr id='descripcion_factura'>
@@ -696,7 +696,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 					<td align="left" width="100"><?php echo __('Monto'); ?></td>
 					<td align="left"><?php echo __('Monto Impuesto'); ?></td>
 				</tr>
-			
+
 				<tr id="fila_descripcion_honorarios_legales">
 					<td id="glosa_honorarios_legales" align="right"><?php echo __('Honorarios legales'); ?></td>
 					<td align="left">
@@ -704,21 +704,21 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						<?php
 						if (UtilesApp::GetConf($sesion, 'DescripcionFacturaConAsuntos')) {
 						?>
-					
+
 							<textarea id="descripcion_honorarios_legales" name="descripcion_honorarios_legales"  id="descripcion_honorarios_legales" cols="50" rows="5" style="font-family: Arial; font-size: 11px"><?php echo trim($descripcion_honorario); ?></textarea>
-					
+
 						<?php
 						} else if ($cantidad_lineas_descripcion > 1) {
 						?>
 
 							<textarea  id="descripcion_honorarios_legales"  name="descripcion_honorarios_legales"  id="descripcion_honorarios_legales" cols="50" rows="<?php echo $cantidad_lineas_descripcion ?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_honorario); ?></textarea>
-						
+
 						<?php
 						} else {
 						?>
 
 							<input type="text" name="descripcion_honorarios_legales" id="descripcion_honorarios_legales" value="<?php echo trim($descripcion_honorario); ?>" maxlength="300" size="40" />
-						
+
 						<?php
 						}
 						?>
@@ -730,7 +730,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 					<td id="td_impto_honorarios_legales" align="left" nowrap><?php echo $simbolo; ?>
 						<input type="text" name="monto_iva_honorarios_legales" class="aproximable"   id="monto_iva_honorarios_legales" value="<?php echo $impuesto; ?>" disabled="true" value="0" size="10" maxlength="30" onkeydown="MontoValido(this.id);"></td>
 				</tr>
-				
+
 				<tr id="fila_descripcion_gastos_con_iva">
 					<td align="right"><?php echo __('Gastos c/ IVA'); ?></td>
 					<td align="left">
@@ -768,14 +768,14 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						<input type="text"  class="aproximable"  name="monto_neto" id='monto_neto' value="<?php echo $suma_monto; ?>" size="10" maxlength="30" disabled="true"  /></td>
 					<td align="left">&nbsp;</td>
 				</tr>
-				
+
 				<tr id='descripcion_factura'>
 					<td align="right" colspan=2><?php echo __('Impuesto') ?></td>
 					<td align="left" nowrap><?php echo $simbolo; ?>
 						<input type="text" id='iva'  class="aproximable"  name="iva" value="<?php echo $suma_iva; ?>" size="10" maxlength="30" disabled="true"  />
 						<input type="hidden" id='iva_hidden'   class="aproximable" name="iva_hidden"></td>
 				</tr>
-				
+
 				<tr id='descripcion_factura'>
 					<td align="right" colspan=2><?php echo __('Monto Total') ?></td>
 					<td align="left" nowrap><?php echo $simbolo; ?>
@@ -819,10 +819,10 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						<div id="contenedor_tipo_cambio">
 							<table style='border-collapse:collapse;' cellpadding='3'>
 								<tr>
-			
+
 								<?php
 								if ($factura->fields['id_factura']) {
-									
+
 									$query = "SELECT count(*) FROM cta_cte_fact_mvto_moneda LEFT JOIN cta_cte_fact_mvto AS ccfm ON ccfm.id_cta_cte_mvto=cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
 												WHERE ccfm.id_factura = '" . $factura->fields['id_factura'] . "'";
 									$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -830,7 +830,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 								} else {
 									$cont = 0;
 								}
-								
+
 								if ($cont > 0) {
 									$query = "SELECT prm_moneda.id_moneda, glosa_moneda, cta_cte_fact_mvto_moneda.tipo_cambio FROM cta_cte_fact_mvto_moneda
 												JOIN prm_moneda ON cta_cte_fact_mvto_moneda.id_moneda = prm_moneda.id_moneda
@@ -848,15 +848,15 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 								$num_monedas = 0;
 								$ids_monedas = array();
 								$tipo_cambios = array();
-									
+
 								while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp)) {
-									
+
 									echo "<td>";
 										echo "<span><b> $glosa_moneda </b></span>";
 										echo "<br>";
 										echo "<input type='text' size='9' id='factura_moneda_$id_moneda' name='factura_moneda_$id_moneda' value='$tipo_cambio' />";
 									echo "</td>";
-										
+
 										$num_monedas++;
 										$ids_monedas[] = $id_moneda;
 										$tipo_cambios[] = $tipo_cambio;
@@ -877,7 +877,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				</div></td>
 			</tr>
 		</table>
-	
+
 		</br>
 
 		<table style="border: 0px solid #666;" width='95%'>
@@ -889,7 +889,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
 					<?php } ?>
 						<a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio')
-					 ?>	
+					 ?>
 				</a>
 			</td>
 		</tr>
@@ -1156,7 +1156,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 							UtilesApp::GetConfJS($sesion, 'CodigoSecundario');
 							UtilesApp::GetConfJS($sesion, 'NuevoModuloFactura');
 							?>
-							
+
 							var msgerror = '';
 							if (TipoDocumentoIdentidadFacturacion != 0) {
 								if (!Validar_Rut())
@@ -1277,9 +1277,9 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 									if ((form.id_documento_legal.value != 2) && (saltar_validacion_saldo == 0) && ( (monto_honorarios_legales_value + monto_gastos_con_iva_value + monto_gastos_sin_iva_validacion) > (honorario_disp_value + gastos_con_impuestos_disp_value + gastos_sin_impuestos_disp_validacion))) {
 
 										if (!confirm('<?php echo __("Los montos ingresados superan el saldo a facturar") ?>')) {
-											
+
 											if (UsarGastosConSinImpuesto == '1') {
-								
+
 												if (form.monto_honorarios_legales.value > form.honorario_disp.value) {
 													form.monto_honorarios_legales.focus();
 												} else if (form.monto_gastos_con_iva.value > form.gastos_con_impuestos_disp.value) {
@@ -1315,7 +1315,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 										alert('<?php echo __('Debe ingresar un monto válido para los gastos s/ IVA') ?>');
 										form.monto_gastos_sin_iva.focus();
 										return false;
-									} 
+									}
 
 									if (form.descripcion_gastos_sin_iva.value == "" && form.descripcion_honorarios_legales.value == "" && form.descripcion_gastos_con_iva.value == "") {
 										alert('<?php echo __('Debe ingresar una descripción para los honorarios y/o  gastos') ?>');
@@ -1345,11 +1345,12 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 
 							if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
 								$saldo = $factura->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $subtotal_honorarios, $subtotal_gastos, $cobro->fields['opc_moneda_total']);
-							
+
 								if ($saldo) { ?>
-									
-									if (confirm("<?php echo __('Existen adelantos por ') . $saldo . __(' asociados a esta liquidación. ¿Desea utilizarlos para saldar esta ') . $tipo_documento_legal . '?' ?>")) {
+
+									if (confirm("<?php echo __('Existen adelantos por ') . $saldo . __(' asociados a esta liquidación. ¿Desea utilizarlos para saldar esta ') . $tipo_documento_legal . '?'; ?>")) {
 										$('usar_adelantos').value = '1';
+									}
 								<?php }
 							}
 							?>
@@ -1385,7 +1386,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 							monto_impuesto = form.monto_honorarios_legales.value * (porcentaje_impuesto / 100);
 							monto_impuesto_gasto = form.monto_gastos_con_iva.value * (porcentaje_impuesto_gastos / 100);
 							monto_impuesto_suma = parseFloat(monto_impuesto) + parseFloat(monto_impuesto_gasto);
-							
+
 							<?php
 							if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 							?>
@@ -1402,7 +1403,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 							jQuery('#monto_iva_gastos_con_iva').val(jQuery.formatNumber(monto_impuesto_gasto + 0.000001, {format: "0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale: "us"}));
 							jQuery('#iva').val(jQuery('#monto_iva_honorarios_legales').parseNumber() + jQuery('#monto_iva_gastos_con_iva').parseNumber());
 							var total = Number($('monto_neto').value.replace(',', '.')) + Number($('iva').value.replace(',', '.'));
-							
+
 							$('total').value = total.toFixed(decimales);
 
 							if (cantidad_decimales != -1) {
@@ -1420,20 +1421,20 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 							ids_monedas = $('ids_monedas_factura').value;
 							arreglo_ids = ids_monedas.split(',');
 							$('tipo_cambios_factura').value = "";
-							
+
 							for (var i = 0; i < arreglo_ids.length - 1; i++)
 								$('tipo_cambios_factura').value += $('factura_moneda_' + arreglo_ids[i]).value + ",";
 							i = arreglo_ids.length - 1;
-							
+
 							$('tipo_cambios_factura').value += $('factura_moneda_' + arreglo_ids[i]).value;
 
 							if ($('id_factura').value != '') {
 								var tc = new Array();
-								
+
 								for (var i = 0; i < arreglo_ids.length; i++) {
 									tc[i] = $('factura_moneda_' + arreglo_ids[i]).value;
 								}
-									
+
 								$('contenedor_tipo_load').innerHTML ="<table width=510px><tr><td align=center><br><br><img src='<?php echo Conf::ImgDir() ?>/ajax_loader.gif'/><br><br></td></tr></table>";
 								var http = getXMLHTTP();
 								var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_factura_moneda&id_factura=<?php echo $factura->fields['id_factura'] ?>&ids_monedas=' + ids_monedas + '&tcs=' + tc.join(',');
@@ -1458,8 +1459,8 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						/*Validador de Rut*/
 						function Validar_Rut()
 						{
-						
-							<?php 
+
+							<?php
 
 							if (!UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) : ?>
 								return true;
@@ -1468,24 +1469,24 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 								if (tipo.value != 5) {
 									return true;
 								}
-									
+
 							<?php endif; ?>
 
 							var o = $('RUT_cliente');
 							var tmpstr = "";
 							var intlargo = o.value
-							
+
 							if (intlargo.length > 0) {
 								crut = o.value
 								largo = crut.length;
-								
+
 								if (largo < 2) {
 									alert('<?php echo __("Rut inválido") ?>');
 									o.focus();
 									return false;
 								}
 
-								for (i = 0; i < crut.length; i++) 
+								for (i = 0; i < crut.length; i++)
 									if (crut.charAt(i) != ' ' && crut.charAt(i) != '.' && crut.charAt(i) != '-') {
 										tmpstr = tmpstr + crut.charAt(i);
 									}
@@ -1498,7 +1499,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 								} else {
 									rut = crut.charAt(0);
 								}
-									
+
 								dv = crut.charAt(largo - 1);
 
 								if (rut == null || dv == null) {
@@ -1513,13 +1514,13 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 
 								for (i = rut.length - 1; i >= 0; i--) {
 									suma = suma + rut.charAt(i) * mul;
-									
+
 									if (mul == 7){
 										mul = 2;
 									} else {
 										mul++;
 									}
-										
+
 								}
 
 								res = suma % 11;
@@ -1550,7 +1551,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						function ObtenerPagos(id_factura) {
 
 							/* por algun motivo no me lo toma, aunque sea sincrono */
-							
+
 							var http = getXMLHTTP();
 							http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura=' + id_factura, false);
 							http.onreadystatechange = revisaEstado;
@@ -1569,45 +1570,45 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 						}
 
 						function NumeroDocumentoLegal() {
-							
+
 							if ($('serie').value == "") {
 								return true;
 							}
-								
-							var series = new Array();
-							
-							<?php 
 
-							$numeros_serie = $serienumero_documento->UltimosNumerosSerie($id_documento_legal); 
+							var series = new Array();
+
+							<?php
+
+							$numeros_serie = $serienumero_documento->UltimosNumerosSerie($id_documento_legal);
 
 							?>
 
 							<?php
-							
+
 							foreach ($numeros_serie as $numero_serie) {
 								echo "\n series['{$numero_serie['serie']}'] = {$numero_serie['numero']};";
 							}
 							?>
-							
+
 							if ($('serie').value in series) {
 								$('numero').value = series[$('serie').value];
 							}
-								
+
 							return true;
 						}
 
 					<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 
 							desgloseMontosFactura(document.form_facturas);
-							
-							<?php 
 
-							if ($factura->loaded() && $factura->fields['id_estado'] == '4' && $factura->fields['letra'] != '') { 
+							<?php
+
+							if ($factura->loaded() && $factura->fields['id_estado'] == '4' && $factura->fields['letra'] != '') {
 
 							?>
-							
+
 							Letra();
-							
+
 							<?php }
 							}
 							?>
@@ -1650,9 +1651,9 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 
 								});
 
-								<?php 
+								<?php
 
-								if (($codigo_cliente || $codigo_cliente_secundario) && empty($id_factura)) { 
+								if (($codigo_cliente || $codigo_cliente_secundario) && empty($id_factura)) {
 
 								?>
 

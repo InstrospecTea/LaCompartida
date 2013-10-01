@@ -1,6 +1,10 @@
 # Changelog
 
-# Hotfix: 13.5.10
+# Hotfix: 13.5.12
+Lunes 01 de Octubre 2013
+* **Fixed:** [Error al cargar JS cuando una factura contiene adelantos](https://github.com/LemontechSA/ttb/pull/305)
+
+# Hotfix: 13.5.11
 Jueves 26 de septiembre 2013
 * **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
 
