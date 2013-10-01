@@ -313,7 +313,7 @@ foreach ($arreglo as $sitio) {
 		loguear("Listando contenidos del bucket $bucketname");
 		$respaldos = array();
 		$respaldosborrar = array();
-		$all = $S3sdk->get_object_list($bucketName);
+		$all = $S3sdk->get_object_list($bucketname);
 		$prefixes = array();
 		foreach ($all as $file) {
 			$prefixes[] = preg_replace('/^([^\/]+\/).*/', '\1', $file);

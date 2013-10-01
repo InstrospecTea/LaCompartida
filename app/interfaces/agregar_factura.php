@@ -1313,7 +1313,8 @@ if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
 		?>
 
 							if (confirm("<?php echo __('Existen adelantos por ') . $saldo . __(' asociados a esta liquidación. ¿Desea utilizarlos para saldar esta ') . $tipo_documento_legal . '?' ?>")) {
-							$('usar_adelantos').value = '1';
+								$('usar_adelantos').value = '1';
+							}
 		<?php
 	}
 }
