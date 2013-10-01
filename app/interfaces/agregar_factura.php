@@ -88,7 +88,9 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 			}
 		}
 	}
-}//FIN DE ELSE (No es WEBSERVICE)
+}
+
+//FIN DE ELSE (No es WEBSERVICE)
 
 if ($opcion == "guardar") {
 
@@ -261,7 +263,8 @@ if ($opcion == "guardar") {
 					$factura->Edit('id_estado', $id_estado_cobrado);
 				}
 
-				if (!$desde_webservice) { //El webservice ignora todo llamado a $pagina
+				//El webservice ignora todo llamado a $pagina
+				if (!$desde_webservice) {
 					if ($opc_inicial != 'restaurar') {
 						$pagina->AddInfo(__('Documento Tributario') . ' ' . $mensaje_accion . ' ' . __(' con éxito'));
 					}
@@ -673,7 +676,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				<tr>
 					<td align="right"><?php echo __('Companía') ?></td>
 					<td align="left" colspan="3">
-						<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio); ?>
+						<?php echo Html::SelectArray($estudios_array, "id_estudio", $id_estudio, null, null, '350px'); ?>
 					</td>
 				</tr>
 			<?php } else { ?>

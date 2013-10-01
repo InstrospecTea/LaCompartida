@@ -87,8 +87,11 @@ function GeneraFacturaElectronica($hookArg) {
 		$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
 	} else {
 		$client = new SoapClient("https://www.facturemosya.com:443/webservice/sRecibirXML.php?wsdl");
-		$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
-		$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
+		$estudio = new PrmEstudio($Sesion);
+		$estudio->Load($Factura->fields['id_estudio']);
+		$estudio_data = $estudio->getMetadata('facturacion_electronica_mx');
+		$usuario = $estudio_data['usuario'];
+		$password = $estudio_data['password'];
 		$strdocumento = FacturaToTXT($Sesion, $Factura);
 		$hookArg['ExtraData'] = $strdocumento;
 		$result = $client->RecibirTXT($usuario, $password, $strdocumento);
@@ -129,8 +132,12 @@ function AnulaFacturaElectronica($hookArg) {
 	if (!$Factura->FacturaElectronicaCreada()) {
 		return $hookArg;
 	}
-	$usuario = Conf::GetConf($Sesion, 'FacturacionElectronicaUsuario');
-	$password = Conf::GetConf($Sesion, 'FacturacionElectronicaPassword');
+
+	$estudio = new PrmEstudio($Sesion);
+	$estudio->Load($Factura->fields['id_estudio']);
+	$estudio_data = $estudio->getMetadata('facturacion_electronica_mx');
+	$usuario = $estudio_data['usuario'];
+	$password = $estudio_data['password'];
 
 	$firma = $Factura->fields['dte_firma'];
 	$firma_parts = explode("|", $firma);
@@ -192,14 +199,13 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'Regimen|' . 'Persona física régimen general'
 		),
 		'REC' => array(
-			'rfc|' . 'DNM070221BS4', //$Factura->fields['RUT_cliente'],
+			'rfc|' . $Factura->fields['RUT_cliente'],
 			'nombre|' . utf8_encode($Factura->fields['cliente'])
 		),
 		'DOR' => array(
 			'calle|' . utf8_encode($Factura->fields['direccion_cliente']),
 			'colonia|' . utf8_encode($Factura->fields['comuna_cliente']),
 			'municipio|' . utf8_encode($Factura->fields['comuna_cliente']),
-			//'estado|' . utf8_encode($Factura->fields['ciudad_cliente']),
 			'pais|' . utf8_encode($Factura->fields['ciudad_cliente']),
 			'codigoPostal|' . $Factura->fields['factura_codigopostal'],
 		),
