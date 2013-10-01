@@ -517,8 +517,10 @@ function MostrarLimite(visible) {
 }
 
 function ActualizarPeriodo(fi, ff) {
-	jQuery('#fecha_ini').val(fi).datepicker('option', 'dateFormat', 'dd-mm-yy');
-	jQuery('#fecha_fin').val(ff).datepicker('option', 'dateFormat', 'dd-mm-yy');
+	fi = fi.split('-');
+	ff = ff.split('-');
+	jQuery('#fecha_ini').datepicker('setDate', new Date(fi[2], fi[1]-1, fi[0]));
+	jQuery('#fecha_fin').datepicker('setDate', new Date(ff[2], ff[1]-1, ff[0]));
 }
 
 function SeleccionarSelector() {

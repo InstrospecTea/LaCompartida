@@ -1,4 +1,26 @@
 # Changelog
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Fixed:** [Nuevos Tags para fecha inicial periodo y fecha final periodo para documento carta](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.9
+Lunes 16 de septiembre 2013
+* **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
+* **Fixed:** [Corregir monto hitos con alter table para modificar tabla cobro_pendiente](https://github.com/LemontechSA/ttb/pull/301)
+
+## Hotfix: 13.5.8
+Viernes 13 de septiembre 2013
+* **Fixed:** [Modificacion a interface agregar_gasto para no listar usuarios definidos como no visibles.](https://github.com/LemontechSA/ttb/pull/299)
+
+## Hotfix: 13.5.7
+Viernes 13 de septiembre 2013
+* **Fixed:** [Corrige problema en Nota de cobro para clientes antiguos que utilizan la seccion %TIPO_CAMBIO%.](https://github.com/LemontechSA/ttb/pull/297)
+
 ## Hotfix: 13.5.6
 jueves 12 de septiembre 2013
 * **Fixed:** [obtiene los respaldos segun subdominio.](https://github.com/LemontechSA/ttb/pull/296)

@@ -65,6 +65,7 @@ if ($opc == 'refrescar') {
 		default:
 			$estado_c = $cobro->fields['estado_contabilidad'];
 	}
+
 	echo $estado_c . '|' . $titulo_c . '|' . $cobro->fields['estado_contabilidad'] . '|Estado cobro refrescado|' . $cobro->fields['nota_venta_contabilidad'];
 } else if ($opc == 'listapagos') {
 
