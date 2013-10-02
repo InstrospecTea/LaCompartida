@@ -153,6 +153,10 @@ if ($opcion == "guardar") {
 			$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		}
 
+		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
+			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
+		}
+
 		if (UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		}
@@ -717,6 +721,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 					</select>
 				</td>
 			</tr>
+			<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_metodo_pago') : false; ?>
 
 			<?php
 
@@ -1695,6 +1700,7 @@ $codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 								?>
 
 						})
+
 	<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_javascript_after') : false; ?>
 </script>
 

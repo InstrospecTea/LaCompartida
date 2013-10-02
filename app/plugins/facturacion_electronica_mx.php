@@ -9,7 +9,9 @@
 require_once dirname(__FILE__) . '/../conf.php';
 $Slim = Slim::getInstance('default', true);
 $Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
+$Slim->hook('hook_factura_metodo_pago', 'InsertaMetodoPago');
 $Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
+
 $Slim->hook('hook_cobros7_botones_after',  function($hookArg) {
 	return AgregarBotonFacturaElectronica($hookArg);
 });
@@ -19,6 +21,17 @@ $Slim->hook('hook_genera_factura_electronica', function($hookArg) {
 $Slim->hook('hook_anula_factura_electronica', function($hookArg) {
 	return AnulaFacturaElectronica($hookArg);
 });
+
+function InsertaMetodoPago() {
+	global $factura;
+	$Sesion = new Sesion();
+	echo "<tr>";
+	echo "<td align='right'>M&eacute;todo de Pago</td>";
+	echo "<td align='left' colspan='3'>";
+ 	echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "350");
+	echo "</td>";
+	echo "</tr>";
+}
 
 function InsertaJSFacturaElectronica() {
 	echo 'jQuery(document).on("click", ".factura-electronica", function() {
@@ -164,6 +177,29 @@ function AnulaFacturaElectronica($hookArg) {
 	return $hookArg;
 }
 
+function PaymentMethod(Sesion $Sesion, Factura $Factura) {
+	if (is_null($Factura->fields['dte_metodo_pago']) || $Factura->fields['dte_metodo_pago'] == "") {
+		return "No Identificado";
+	}
+
+	$sql = "SELECT `prm_codigo`.`glosa`
+			FROM `prm_codigo`
+			WHERE `prm_codigo`.`id_codigo` = :code_id
+				AND `prm_codigo`.`grupo` = 'PRM_FACTURA_MX_METOD'";
+
+	$Statement = $Sesion->pdodbh->prepare($sql);
+	$Statement->bindParam('code_id', $Factura->fields['dte_metodo_pago']);
+	$Statement->execute();
+
+	$payment_method = $Statement->fetchObject();
+
+	if (is_object($payment_method)) {
+		return $payment_method->glosa;
+	} else {
+		return "No Identificado";
+	}
+}
+
 //
 // $strdocumento = 'COM|||version|3.2||serie|WS||folio|15||fecha|2013-07-18T10:14:49||formaDePago|PAGO EN UNA SOLA EXHIBICION||TipoCambio|1.000||condicionesDePago|EFECTOS FISCALES AL PAGO||subTotal|425.00||Moneda|MX||total|493.00||tipoDeComprobante|ingreso||metodoDePago|PAGO NO IDENTIFICADO||LugarExpedicion|MEXICO DISTRITO FEDERAL||NumCtaPago|1234||descuento|0.00||motivoDescuento|desc
 // REF|||Regimen|REGIMEN GENERAL DE LEY PERSONAS MORALES
@@ -178,7 +214,6 @@ function AnulaFacturaElectronica($hookArg) {
 //
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
-
 	$r = array(
 		'COM' => array(
 			'version|3.2',
@@ -190,7 +225,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
 			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'Moneda|' . utf8_encode($monedas[$Factura->fields['id_moneda']]['codigo']),
-			'metodoDePago|' . 'Depósito en Cuenta',
+			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
 			'tipoDeComprobante|ingreso'

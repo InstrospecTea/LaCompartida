@@ -9976,6 +9976,17 @@ QUERY;
 			if (!ExisteCampo('dte_fecha_anulacion', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_anulacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha anulacion';";
 			}
+			if (!ExisteCampo('dte_metodo_pago', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago` INT(3)  NULL COMMENT 'Método de pago para facturar electronicamente, se cuelga de prm_codigo';";
+			}
+
+			$queries[] = "INSERT IGNORE INTO prm_codigo (grupo, codigo, glosa) VALUES
+							('PRM_FACTURA_MX_METOD', 'M01', 'Cheque'),
+							('PRM_FACTURA_MX_METOD', 'M02', 'Tarjeta de crédito'),
+							('PRM_FACTURA_MX_METOD', 'M03', 'Tarjeta de débito'),
+							('PRM_FACTURA_MX_METOD', 'M04', 'Depósito en cuenta'),
+							('PRM_FACTURA_MX_METOD', 'M05', 'Transferencia interbancaria'),
+							('PRM_FACTURA_MX_METOD', 'M06', 'No Identificado')";
 
 			ejecutar($queries, $dbh);
 			break;
@@ -9989,7 +10000,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.44;
+$max_update = 7.45;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
