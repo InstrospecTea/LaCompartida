@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.5.13
+jueves 03 de octubre 2013
+* **Fixed:** [cabia ruta tmp para backups](https://github.com/LemontechSA/ttb/pull/307)
+
 
 # Hotfix: 13.5.12
 Lunes 01 de Octubre 2013
