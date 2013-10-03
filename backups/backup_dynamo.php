@@ -40,7 +40,7 @@ if (!is_dir('/var/www/error_logs')) {
 
 class CONF {
 
-	public $dir_temp = '/tmp';
+	public $dir_temp = '/var/www/tmp';
 	public $alerta_disco_temp = 5; //(GB) si el espacio libre es menos q eso, tira un mensaje (y manda mail)
 	public $alerta_disco_base = 5; //(GB) si el espacio libre es menos q eso, tira un mensaje (y manda mail)
 	public $mailer = array(
