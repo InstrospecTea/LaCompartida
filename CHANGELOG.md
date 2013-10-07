@@ -1,4 +1,29 @@
 # Changelog
+## Hotfix: 13.5.13
+jueves 03 de octubre 2013
+* **Fixed:** [cabia ruta tmp para backups](https://github.com/LemontechSA/ttb/pull/307)
+
+
+# Hotfix: 13.5.12
+Lunes 01 de Octubre 2013
+* **Fixed:** [Error al cargar JS cuando una factura contiene adelantos](https://github.com/LemontechSA/ttb/pull/305)
+
+# Hotfix: 13.5.11
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Fixed:** [Nuevos Tags para fecha inicial periodo y fecha final periodo para documento carta](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.9
+Lunes 16 de septiembre 2013
+* **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
+* **Fixed:** [Corregir monto hitos con alter table para modificar tabla cobro_pendiente](https://github.com/LemontechSA/ttb/pull/301)
 
 ## Hotfix: 13.5.8
 Viernes 13 de septiembre 2013

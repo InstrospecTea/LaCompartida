@@ -9954,6 +9954,15 @@ QUERY;
 
 		case 7.44:
 			$queries = array();
+
+			$queries[] = "ALTER TABLE `cobro_pendiente` CHANGE `monto_estimado` `monto_estimado` DOUBLE NOT NULL DEFAULT '0' ";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.45:
+			$queries = array();
+
 			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_generador` (
 				  `id_contrato_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `id_cliente` int(11) NOT NULL,
@@ -10017,7 +10026,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.44;
+$max_update = 7.45;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
