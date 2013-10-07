@@ -834,7 +834,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		 */
 		
 		if ( $cobro->fields['fecha_ini'] = '0000-00-00' || $cobro->fields['fecha_ini'] = '' ) {
-			$query_fecha_primer_trabajo = " SELECT MAX(date(fecha_creacion)) FROM trabajo WHERE id_cobro ='".$cobro->fields['id_cobro']."' LIMIT 1";
+			$query_fecha_primer_trabajo = "SELECT MIN( DATE( fecha_creacion ) ) FROM trabajo WHERE id_cobro ='".$cobro->fields['id_cobro']."'";
 			$resp_fecha_primer_trabajo = mysql_query($query_fecha_primer_trabajo, $sesion->dbh) or Utiles::errorSQL($query_fecha_primer_trabajo, __FILE__, __LINE__, $sesion->dbh);
 			list($primer_trabajo) = mysql_fetch_array($resp_fecha_primer_trabajo);
 			$fecha_primer_trabajo = $primer_trabajo;
