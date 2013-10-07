@@ -833,7 +833,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		 *	esto es especial para LyR
 		 */
 		
-		if ( $cobro->fields['fecha_ini'] = '0000-00-00' || $cobro->fields['fecha_ini'] = '' ) {
+		if ( $cobro->fields['fecha_ini'] == '0000-00-00' ) {
 			$query_fecha_primer_trabajo = "SELECT MIN( DATE( fecha ) ) FROM trabajo WHERE id_cobro ='".$cobro->fields['id_cobro']."'";
 			$resp_fecha_primer_trabajo = mysql_query($query_fecha_primer_trabajo, $sesion->dbh) or Utiles::errorSQL($query_fecha_primer_trabajo, __FILE__, __LINE__, $sesion->dbh);
 			list($primer_trabajo) = mysql_fetch_array($resp_fecha_primer_trabajo);
