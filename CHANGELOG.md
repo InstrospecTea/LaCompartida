@@ -1,4 +1,27 @@
 # Changelog
+## Hotfix: 13.5.14
+Lunes 07 de octubre 2013
+* **Fixed:** [Corrige el problema de fechas en excel de cobros](https://github.com/LemontechSA/ttb/pull/309)
+
+## Hotfix: 13.5.14
+Viernes 04 de octubre 2013
+* **Fixed:** [Corrige el problema con OrdenarPorCategoria para los encabezados de TRABAJO_ENCABEZADO de GenerarDocumento2](https://github.com/LemontechSA/ttb/pull/308)
+
+## Hotfix: 13.5.13
+jueves 03 de octubre 2013
+* **Fixed:** [cabia ruta tmp para backups](https://github.com/LemontechSA/ttb/pull/307)
+
+# Hotfix: 13.5.12
+Lunes 01 de Octubre 2013
+* **Fixed:** [Error al cargar JS cuando una factura contiene adelantos](https://github.com/LemontechSA/ttb/pull/305)
+
+# Hotfix: 13.5.11
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
 
 # Hotfix: 13.5.10
 Jueves 26 de septiembre 2013

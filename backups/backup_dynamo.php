@@ -40,7 +40,7 @@ if (!is_dir('/var/www/error_logs')) {
 
 class CONF {
 
-	public $dir_temp = '/tmp';
+	public $dir_temp = '/var/www/tmp';
 	public $alerta_disco_temp = 5; //(GB) si el espacio libre es menos q eso, tira un mensaje (y manda mail)
 	public $alerta_disco_base = 5; //(GB) si el espacio libre es menos q eso, tira un mensaje (y manda mail)
 	public $mailer = array(
@@ -313,7 +313,7 @@ foreach ($arreglo as $sitio) {
 		loguear("Listando contenidos del bucket $bucketname");
 		$respaldos = array();
 		$respaldosborrar = array();
-		$all = $S3->get_object_list($bucketName);
+		$all = $S3sdk->get_object_list($bucketname);
 		$prefixes = array();
 		foreach ($all as $file) {
 			$prefixes[] = preg_replace('/^([^\/]+\/).*/', '\1', $file);

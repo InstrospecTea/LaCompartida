@@ -98,7 +98,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 		}
 
-		$query_comodines ="SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
+		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
 		$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
 		$array_comodines = array();
 
@@ -288,6 +288,7 @@ class FacturaPdfDatos extends Objeto {
 				);
 				break;
 			default:
+			
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
