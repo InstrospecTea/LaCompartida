@@ -496,7 +496,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<tr>
 					<td align="right"><?php echo __('Companía'); ?></td>
 					<td align="left" colspan="3">
-						<?php echo Html::SelectArray($estudios_array, 'id_estudio', $id_estudio, 'id="id_estudio" onchange="cambiarEstudio(this.value)"'); ?>
+						<?php echo Html::SelectArray($estudios_array, 'id_estudio', $id_estudio, 'id="id_estudio" onchange="cambiarEstudio(this.value)"', '', '300px'); ?>
 					</td>
 				</tr>
 			<?php } else { ?>
