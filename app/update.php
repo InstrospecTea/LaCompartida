@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 /*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
 
 /* IMPORTANTE:
-	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
+  Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
 if (!function_exists('ExisteCampo')) {
 
 	function ExisteCampo($campo, $tabla, $dbh) {
@@ -294,12 +294,12 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 			break;
 		case 2.21:
 			/* $query = "ALTER TABLE `prm_si_no` DROP INDEX `codigo_si_no_2`;";
-				if( !mysql_query($query,$dbh) )
-				throw new Exception(mysql_error());
+			  if( !mysql_query($query,$dbh) )
+			  throw new Exception(mysql_error());
 
-				$query = "INSERT INTO `prm_si_no` ( `id_codigo_si_no` , `codigo_si_no` ) VALUES ('0', 'NO');";
-				if( !mysql_query($query,$dbh) )
-				throw new Exception(mysql_error());
+			  $query = "INSERT INTO `prm_si_no` ( `id_codigo_si_no` , `codigo_si_no` ) VALUES ('0', 'NO');";
+			  if( !mysql_query($query,$dbh) )
+			  throw new Exception(mysql_error());
 			 */
 			$query = "SELECT * FROM caca";
 			break;
@@ -382,7 +382,7 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 
 
 			$query[] = "INSERT ignore INTO `tarifa`  ( `id_tarifa` , `glosa_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` )
-																				VALUES ( '1' , 'Standard', '2008-05-12', '0000-00-00', '1');";
+                                        VALUES ( '1' , 'Standard', '2008-05-12', '0000-00-00', '1');";
 
 			foreach ($query as $q) {
 				if (!($resp = mysql_query($q, $dbh)))
@@ -420,16 +420,16 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 		case 2.25:
 
 			$tarifasfaltantes = "SELECT us.id_usuario, ct.id_moneda, ct.tarifa, ct.id_tarifa
-			FROM usuario us
-			JOIN usuario_permiso usp
-			USING ( id_usuario )
-			JOIN categoria_tarifa ct
-			USING ( id_categoria_usuario )
-			LEFT JOIN usuario_tarifa ut ON ut.id_usuario = us.id_usuario
-			AND ut.id_moneda = ct.id_moneda
-			AND ut.id_tarifa = ct.id_tarifa
-			WHERE usp.codigo_permiso =  'PRO'
-			AND id_usuario_tarifa IS NULL ";
+	    FROM usuario us
+	    JOIN usuario_permiso usp
+	    USING ( id_usuario )
+	    JOIN categoria_tarifa ct
+	    USING ( id_categoria_usuario )
+	    LEFT JOIN usuario_tarifa ut ON ut.id_usuario = us.id_usuario
+	    AND ut.id_moneda = ct.id_moneda
+	    AND ut.id_tarifa = ct.id_tarifa
+	    WHERE usp.codigo_permiso =  'PRO'
+	    AND id_usuario_tarifa IS NULL ";
 
 			if (!$resptarifas = mysql_query($tarifasfaltantes, $dbh))
 				throw new Exception(mysql_error());
@@ -782,12 +782,12 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 
 			if (!ExisteLlaveForanea('cta_corriente', 'codigo_asunto', 'asunto', 'codigo_asunto', $dbh))
 				$query[] = "ALTER TABLE `cta_corriente`
-	ADD CONSTRAINT `codigo_asunto_fk` FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto` (`codigo_asunto`) ON DELETE RESTRICT ON UPDATE CASCADE;";
+  ADD CONSTRAINT `codigo_asunto_fk` FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto` (`codigo_asunto`) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
 
 			if (!ExisteLlaveForanea('cta_corriente', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh))
 				$query[] = "ALTER TABLE `cta_corriente`
-	ADD CONSTRAINT `codigo_cliente_fk` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`) ON DELETE RESTRICT ON UPDATE CASCADE;";
+  ADD CONSTRAINT `codigo_cliente_fk` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
 
 
@@ -9961,6 +9961,38 @@ QUERY;
 		case 7.45:
 			$queries = array();
 
+			if (!ExisteCampo('id_estudio', 'prm_doc_legal_numero', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_doc_legal_numero`
+					ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1,
+					ADD KEY `id_estudio` (`id_estudio`),
+					DROP KEY `id_documento_legal_2`,
+					ADD KEY `id_documento_legal_2` (`id_documento_legal`, `serie`, `id_estudio`)";
+
+				$queries[] = "INSERT INTO prm_doc_legal_numero (id_documento_legal, numero_inicial, serie, id_estudio)
+					SELECT id_documento_legal, numero_inicial, serie, prm_estudio.id_estudio
+					  FROM prm_estudio
+					  JOIN prm_doc_legal_numero
+					 WHERE prm_estudio.id_estudio != 1
+					  ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+			}
+
+			if (!ExisteCampo('id_estudio', 'factura_pdf_datos', $dbh)) {
+				$queries[] = "ALTER TABLE `factura_pdf_datos` ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1 AFTER `id_documento_legal`, ADD KEY `id_estudio` (`id_estudio`);";
+
+				$queries[] = "INSERT INTO factura_pdf_datos (id_tipo_dato, id_documento_legal, id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align)
+					SELECT id_tipo_dato, id_documento_legal, prm_estudio.id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align
+					  FROM factura_pdf_datos
+					  JOIN prm_estudio
+					 WHERE prm_estudio.id_estudio != 1
+					 ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.46:
+			$queries = array();
+
 			if (!ExisteCampo('dte_fecha_creacion', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_creacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha creacion';";
 			}
@@ -9990,7 +10022,6 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
-
 	}
 }
 
@@ -10000,7 +10031,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.45;
+$max_update = 7.46;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

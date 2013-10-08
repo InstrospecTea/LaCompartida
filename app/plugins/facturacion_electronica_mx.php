@@ -28,7 +28,7 @@ function InsertaMetodoPago() {
 	echo "<tr>";
 	echo "<td align='right'>M&eacute;todo de Pago</td>";
 	echo "<td align='left' colspan='3'>";
- 	echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "350");
+ 	echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "300");
 	echo "</td>";
 	echo "</tr>";
 }
