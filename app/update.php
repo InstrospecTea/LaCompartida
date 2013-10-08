@@ -9961,6 +9961,7 @@ QUERY;
 
 		case 7.45:
 			$queries = array();
+
 			if (!ExisteCampo('id_estudio', 'prm_doc_legal_numero', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_doc_legal_numero`
 					ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1,
@@ -9968,7 +9969,23 @@ QUERY;
 					DROP KEY `id_documento_legal_2`,
 					ADD KEY `id_documento_legal_2` (`id_documento_legal`, `serie`, `id_estudio`)";
 
+				$queries[] = "INSERT INTO prm_doc_legal_numero (id_documento_legal, numero_inicial, serie, id_estudio)
+					SELECT id_documento_legal, numero_inicial, serie, prm_estudio.id_estudio
+					  FROM prm_estudio
+					  JOIN prm_doc_legal_numero
+					 WHERE prm_estudio.id_estudio != 1
+					  ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+			}
+
+			if (!ExisteCampo('id_estudio', 'factura_pdf_datos', $dbh)) {
 				$queries[] = "ALTER TABLE `factura_pdf_datos` ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1 AFTER `id_documento_legal`, ADD KEY `id_estudio` (`id_estudio`);";
+
+				$queries[] = "INSERT INTO factura_pdf_datos (id_tipo_dato, id_documento_legal, id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align)
+					SELECT id_tipo_dato, id_documento_legal, prm_estudio.id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align
+					  FROM factura_pdf_datos
+					  JOIN prm_estudio
+					 WHERE prm_estudio.id_estudio != 1
+					 ORDER BY prm_estudio.id_estudio, id_documento_legal;";
 			}
 
 			ejecutar($queries, $dbh);
