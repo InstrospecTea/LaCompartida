@@ -66,6 +66,12 @@ class FacturaProduccion {
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
 			'format' => 'number',
+		),
+
+		array (
+			'field' => 'monto_genera',
+			'title' => 'Monto Generador',
+			'format' => 'number',
 		)
 
 	);
@@ -137,6 +143,12 @@ class FacturaProduccion {
 		array (
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
+			'format' => 'number',
+		),
+
+		array (
+			'field' => 'monto_genera',
+			'title' => 'Monto Generador',
 			'format' => 'number',
 		)
 	);
@@ -220,13 +232,6 @@ class FacturaProduccion {
 			'format' => 'number',
 		),
 
-		array (
-			'field' => 'monto_aporte',
-			'title' => 'Monto Aporte',
-			'format' => 'number',
-		),
-
-
 	);
 
 	function FacturaProduccion($sesion, $report_code = 'FACTURA_PRODUCCION') {
@@ -249,6 +254,7 @@ class FacturaProduccion {
 						usuario.username username_generador,
 						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
 						factura_generador.porcentaje_genera,
+						(factura_generador.porcentaje_genera / 100.0) * factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_genera,
 						factura.codigo_cliente,
 						GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 					 FROM factura
@@ -283,6 +289,7 @@ class FacturaProduccion {
 							usuario.username username_generador,
 							CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
 							factura_generador.porcentaje_genera,
+							(factura_generador.porcentaje_genera / 100.0) * SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS monto_genera,
 							factura.codigo_cliente,
 							(SELECT GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';')
 								 FROM cobro_asunto
