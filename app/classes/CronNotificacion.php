@@ -1077,6 +1077,7 @@ class CronNotificacion extends Cron {
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				WHERE  1
 					AND contrato.activo = 'SI'
+					AND (usuario_responable.activo = 1 OR usuario_secundario.activo = 1)
 					AND (
 						(SELECT Count(*)
 							FROM trabajo
