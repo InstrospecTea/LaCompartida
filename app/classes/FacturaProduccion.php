@@ -197,19 +197,23 @@ class FacturaProduccion {
 			'format' => 'date',
 			'title' => 'Fecha Documento'
 		),
+
 		array (
-			'field' => 'total',
+			'field' => 'subtotal_cobro',
+			'format' => 'number',
+			'title' => 'Total Liquidación'
+		),
+		array (
+			'field' => 'total_facturado',
 			'format' => 'number',
 			'title' => 'Total Facturado'
 		),
 		array (
-			'field' => 'numero',
+			'field' => 'total_pagado',
 			'format' => 'number',
-			'title' => 'N° Documento',
-			'extras' => array(
-				'subtotal' => false
-			)
+			'title' => 'Total Pagado'
 		),
+
 		array (
 			'field' => 'username_generador',
 			'title' => 'Código Generador'
@@ -227,8 +231,26 @@ class FacturaProduccion {
 		),
 
 		array (
-			'field' => 'porcentaje_aporte',
-			'title' => 'Porcentaje Aporte',
+			'field' => 'total_trabajado',
+			'title' => 'Total Trabajado',
+			'format' => 'number',
+		),
+
+		array (
+			'field' => 'porcentaje_aporte_cobro',
+			'title' => 'Porcentaje Aporte a Cobro',
+			'format' => 'number',
+		),
+
+		array (
+			'field' => 'porcentaje_factura_cobro',
+			'title' => 'Porcentaje Factura a Cobro',
+			'format' => 'number',
+		),
+
+		array (
+			'field' => 'porcentaje_aporte_factura',
+			'title' => 'Porcentaje Aporte a Factura',
 			'format' => 'number',
 		),
 
@@ -321,61 +343,23 @@ class FacturaProduccion {
 		}
 
 		if ($this->report_code == 'FACTURA_COBRANZA_APLICADA') {
-			$query = "SELECT factura.id_cobro,
-						ccfm2.id_factura,
-						factura.id_contrato AS id_contrato,
-				   	cliente.glosa_cliente,
-						factura.serie_documento_legal,
-				   	factura.numero,
-				   	prm_documento_legal.codigo AS tipo,
-			         fp.fecha,
-			         documento.monto * (cobro_moneda.tipo_cambio) /  (moneda_filtro.tipo_cambio) AS total_cobrado,
-			         factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
-			         factura.total * (moneda_factura.tipo_cambio) / documento.monto * (cobro_moneda.tipo_cambio) AS aporte_factura_cobro,
-			         SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS total_pagado,
-						usuario.id_usuario,
-						usuario.username,
-						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_usuario,
-						factura_generador.porcentaje_genera / 100.0,
-						factura.codigo_cliente,
-						(SELECT GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';')
-					   	FROM cobro_asunto
-						   JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-						  WHERE cobro_asunto.id_cobro = factura.id_cobro) AS glosas_asunto
-				FROM factura_pago AS fp
-
-				JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-				JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-				JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-				JOIN factura ON ccfm2.id_factura = factura.id_factura
-
-				JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
-				JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
-
-				JOIN cta_cte_fact_mvto_moneda AS ccfmm ON ccfmm.id_cta_cte_fact_mvto = ccfm.id_cta_cte_mvto AND ccfmm.id_moneda = ccfm.id_moneda
-				JOIN cta_cte_fact_mvto_moneda AS ccfmmf ON ccfmmf.id_cta_cte_fact_mvto = ccfm.id_cta_cte_mvto AND ccfmmf.id_moneda = :currency_id
-
-				JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
-			 	JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				JOIN documento ON documento.id_cobro = factura.id_cobro AND documento.tipo_doc = 'N'
-			 	JOIN cobro_moneda  ON cobro_moneda.id_cobro = documento.id_cobro AND cobro_moneda.id_moneda = documento.id_moneda
-			 	JOIN cliente ON cliente.codigo_cliente = factura.codigo_cliente
-
-				LEFT JOIN factura_generador ON factura_generador.id_factura = factura.id_factura
-				LEFT JOIN usuario ON usuario.id_usuario = factura_generador.id_usuario
-
-				WHERE ccfm.anulado = 0 AND ccfm2.anulado = 0
-				AND fp.fecha >= :period_from AND fp.fecha <= :period_to
-				GROUP BY ccfm2.id_factura, usuario.id_usuario";
+			$query = "SELECT factura.id_cobro
+						FROM factura_pago AS fp
+						JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+						JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+						JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+						JOIN factura ON ccfm2.id_factura = factura.id_factura
+						JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+					 	JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+						JOIN documento ON documento.id_cobro = factura.id_cobro AND documento.tipo_doc = 'N'
+						WHERE ccfm.anulado = 0 AND ccfm2.anulado = 0 AND factura.anulado = 0
+						AND fp.fecha >= :period_from AND fp.fecha <= :period_to AND :currency_id = :currency_id";
 		}
 
 		return $query;
 	}
 
 	public function ReportData($query, $params, $fetch_options = PDO::FETCH_ASSOC) {
-		if ($this->report_code == 'FACTURA_COBRANZA_APLICADA') {
-			$fetch_options = PDO::FETCH_ASSOC | PDO::FETCH_GROUP;
-		}
 		$Statement = $this->sesion->pdodbh->prepare($query);
 		foreach ($params as $key => $item) {
 			if (strpos($key, 'period_') !== false) {
@@ -400,39 +384,137 @@ class FacturaProduccion {
 			$charges = '0';
 		}
 
-		$query = "SELECT 	trabajo.id_cobro,
-					 usuario.id_usuario,
-					 usuario.username,
-					 CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_usuario,
-					 SUM(Time_to_sec(trabajo.duracion_cobrada) / 3600 * trabajo.tarifa_hh_estandar) *
-						(moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_cobrado,
-					 prm_moneda.simbolo
-			FROM trabajo
-			JOIN cobro_moneda AS moneda_cobro
-			  ON moneda_cobro.id_cobro = trabajo.id_cobro
-			JOIN cobro_moneda AS moneda_filtro
-			  ON moneda_filtro.id_cobro = trabajo.id_cobro
-			 AND moneda_filtro.id_moneda = :currency_id
-			 AND moneda_cobro.id_moneda = trabajo.id_moneda
-			JOIN prm_moneda ON moneda_filtro.id_moneda = prm_moneda.id_moneda
-			JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
-		  WHERE trabajo.id_cobro IN ($charges)
-			  AND trabajo.cobrable = 1
-		  GROUP BY usuario.id_usuario, trabajo.id_cobro";
+		$query = "SELECT id_factura,
+					id_contrato,
+					glosa_cliente,
+					serie_documento_legal,
+					numero,
+					tipo,
+					fecha,
+					id_cobro,
+					subtotal_cobro,
+					total_facturado,
+					total_pagado,
+					monto_trabajos AS total_trabajado,
+					id_usuario_generador,
+					username_generador,
+					nombre_generador,
+					porcentaje_genera / 100.0,
+		 			(monto_trabajos / subtotal_cobro) AS porcentaje_aporte_cobro,
+		 			(total_facturado / subtotal_cobro) AS porcentaje_factura_cobro,
+		 			(monto_trabajos / subtotal_cobro)  * (total_facturado / subtotal_cobro) AS porcentaje_aporte_factura,
+					glosas_asunto
+				FROM (
+					 SELECT ccfm2.id_factura,
+							factura.id_contrato AS id_contrato,
+							factura.id_cobro AS id_cobro,
+							cliente.glosa_cliente,
+							factura.serie_documento_legal,
+							factura.numero,
+							prm_documento_legal.codigo AS tipo,
+							fp.fecha,
+							cobro.monto_subtotal * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_cobro,
+							factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
+							SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS total_pagado,
 
-		$jobs = $this->ReportData($query, array('currency_id' => $params['currency_id']));
-		/*foreach ($user_jobs as $id_cobro => $jobs_cobro) {
-			$paymentos_cobro = $results[$id_cobro];
-			foreach ($jobs_cobro as $job) {
-				$invoice_id = 0;
-				foreach ($paymentos_cobro as $payment) {
-					if ($invoice_id != $payment['id_factura']) {
+							CASE
+							    WHEN factura_generador.id_usuario IS NULL THEN trabajos.id_usuario
+							    ELSE factura_generador.id_usuario
+							END   AS id_usuario_generador,
 
-					}
-				}
-			}
-		}
-		*/
+							CASE
+							    WHEN factura_generador.id_usuario IS NULL THEN trabajos.username
+							    ELSE usuario.username
+							END   username_generador,
+
+							CASE
+							    WHEN factura_generador.id_usuario IS NULL
+							    THEN trabajos.nombre_usuario
+							    ELSE CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)
+							END   nombre_generador,
+
+							factura_generador.porcentaje_genera,
+
+							CASE
+							    WHEN factura_generador.id_usuario IS NULL THEN trabajos.monto_trabajos
+							    ELSE 0
+							END monto_trabajos,
+
+							factura.codigo_cliente,
+							(SELECT GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';')
+								 FROM cobro_asunto
+								 JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+								WHERE cobro_asunto.id_cobro = factura.id_cobro) AS glosas_asunto
+				FROM factura_pago AS fp
+				JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+				JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+				JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+				JOIN factura ON ccfm2.id_factura = factura.id_factura
+				JOIN cobro ON cobro.id_cobro = factura.id_cobro
+				JOIN cobro_moneda moneda_cobro ON cobro.id_moneda = moneda_cobro.id_moneda AND cobro.id_cobro = moneda_cobro.id_cobro
+				JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
+				JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
+
+				JOIN cta_cte_fact_mvto_moneda AS ccfmm ON ccfmm.id_cta_cte_fact_mvto = ccfm.id_cta_cte_mvto AND ccfmm.id_moneda = ccfm.id_moneda
+				JOIN cta_cte_fact_mvto_moneda AS ccfmmf ON ccfmmf.id_cta_cte_fact_mvto = ccfm.id_cta_cte_mvto AND ccfmmf.id_moneda = :currency_id
+
+				JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+				JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+
+				JOIN cliente ON cliente.codigo_cliente = factura.codigo_cliente
+				LEFT JOIN factura_generador ON factura_generador.id_factura = factura.id_factura
+				LEFT JOIN usuario ON usuario.id_usuario = factura_generador.id_usuario
+				LEFT JOIN (SELECT 	trabajo.id_cobro,
+							usuario.id_usuario,
+							usuario.username,
+							CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_usuario,
+							SUM(Time_to_sec(trabajo.duracion_cobrada) / 3600 * trabajo.tarifa_hh_estandar) *
+								(moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_trabajos,
+							prm_moneda.simbolo
+					FROM trabajo
+					JOIN cobro_moneda AS moneda_cobro
+					  ON moneda_cobro.id_cobro = trabajo.id_cobro
+					JOIN cobro_moneda AS moneda_filtro
+					  ON moneda_filtro.id_cobro = trabajo.id_cobro
+					 AND moneda_filtro.id_moneda = :currency_id
+					 AND moneda_cobro.id_moneda = trabajo.id_moneda
+					JOIN prm_moneda ON moneda_filtro.id_moneda = prm_moneda.id_moneda
+					JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
+				  WHERE trabajo.id_cobro IN ($charges)
+					  AND trabajo.cobrable = 1
+				  GROUP BY trabajo.id_cobro, usuario.id_usuario
+				  ) AS trabajos ON trabajos.id_cobro = factura.id_cobro AND (usuario.id_usuario IS NULL AND NOT trabajos.id_usuario IS NULL )
+				  LEFT JOIN (SELECT 	trabajo.id_cobro,
+							usuario.id_usuario,
+							usuario.username,
+							CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_usuario,
+							SUM(Time_to_sec(trabajo.duracion_cobrada) / 3600 * trabajo.tarifa_hh_estandar) *
+								(moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_trabajos,
+							prm_moneda.simbolo
+					FROM trabajo
+					JOIN cobro_moneda AS moneda_cobro
+					  ON moneda_cobro.id_cobro = trabajo.id_cobro
+					JOIN cobro_moneda AS moneda_filtro
+					  ON moneda_filtro.id_cobro = trabajo.id_cobro
+					 AND moneda_filtro.id_moneda = :currency_id
+					 AND moneda_cobro.id_moneda = trabajo.id_moneda
+					JOIN prm_moneda ON moneda_filtro.id_moneda = prm_moneda.id_moneda
+					JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
+				  WHERE trabajo.id_cobro IN ($charges)
+					  AND trabajo.cobrable = 1
+				  GROUP BY trabajo.id_cobro, usuario.id_usuario
+				  ) AS trabajos_generador ON trabajos_generador.id_cobro = factura.id_cobro AND usuario.id_usuario = trabajos_generador.id_usuario
+				WHERE fp.fecha >= :period_from AND fp.fecha <= :period_to
+				  AND cobro.id_cobro IN ($charges)
+				GROUP BY ccfm2.id_factura, 	CASE
+							    WHEN factura_generador.id_usuario IS NULL THEN trabajos.id_usuario
+							    ELSE factura_generador.id_usuario
+							END ) AS reporte";
+
+
+
+		return $this->ReportData($query, $params);
+
 	}
 
 
