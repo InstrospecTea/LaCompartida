@@ -7,7 +7,7 @@ $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 if ($excel) {
 	$asunto = new Asunto($sesion);
-	$asunto->DownloadExcel(compact('activo', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc','id_tipo_asunto'),'id_grupo_cliente');
+	$asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc','id_tipo_asunto'),'id_grupo_cliente');
 }
 
 if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {

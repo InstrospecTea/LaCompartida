@@ -16,10 +16,10 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		$this->onchange = $onchange;
 	}
 
-	function ImprimirAsunto($sesion,   $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false) 
+	function ImprimirAsunto($sesion,   $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false)
 	{
 		$join = '';
-		
+
 		if(  UtilesApp::GetConf($sesion,'CodigoSecundario')  && $otro_filtro != '') {
 			$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario='$otro_filtro'";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -37,36 +37,36 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		} else {
 			$where .= " AND 1=0";
 		}
-			
+
 		$oncambio=$onchange;
- 		
+
 		$output .= Html::SelectQuery($sesion, "SELECT ".$campo_id.",".$campo_glosa." FROM asunto $join $where ORDER BY ".$campo_glosa, $name, $selected, "onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones", __("Cualquiera"),$width);
-		
+
 		return $output;
 	}
 
-	function ImprimirCliente($sesion, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false) 
+	function ImprimirCliente($sesion, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false)
 	{
 		$join = '';
-	
+
 		if( !$usa_inactivo){
 			$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected' )";
 		}
 
 		$oncambio=$onchange;
- 		
+
  		$output .= Html::SelectQuery($sesion, "SELECT ".$campo_id.",".$campo_glosa." FROM cliente $join $where ORDER BY ".$campo_glosa, $name, $selected, "onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones ", __("Cualquiera"),$width);
-		
+
 		return $output;
 	}
 
 	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '')
 	{
-		
+
 		$join = '';
 
 		if ($tabla == 'asunto') {
-	
+
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')  && $otro_filtro != '') {
 				$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$otro_filtro'";
 				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -96,11 +96,10 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		}
 
 		if ($tabla == 'actividad') {
-
 			if ($otro_filtro == '') {
-				$where = " WHERE actividad.codigo_asunto IS NULL ";
+				$where = 'WHERE actividad.codigo_asunto IS NULL';
 			} else {
-				$where = " WHERE actividad.codigo_asunto = '{$otro_filtro}' ";
+				$where = "WHERE (actividad.codigo_asunto = '{$otro_filtro}' OR actividad.codigo_asunto IS NULL)";
 			}
 		}
 
@@ -189,7 +188,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 	{
 		$output .= "<script type=\"text/javascript\">
 						cargando = false;
-			
+
 						function SetSelectInputId(campo,select)
 						{
 							var obj_select = document.getElementById(select);
@@ -210,15 +209,15 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 						function getHTTPObject()
 						{
-							
+
 							if (typeof XMLHttpRequest != 'undefined') {
 								return new XMLHttpRequest();
 							}
-							
+
 							try {
 								return new ActiveXObject(\"Msxml2.XMLHTTP\");
 							} catch (e) {
-								
+
 								try {
 									return new ActiveXObject(\"Microsoft.XMLHTTP\");
 								} catch (e) {
@@ -244,7 +243,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 								if(response.indexOf('|') != -1) {
 									response = response.split('\\n');
-									
+
 									if(response[0] != '') {
 										response = response[0];
 									} else {
@@ -262,18 +261,18 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 										jQuery('#'+id_destino).removeClass('loadingbar');
 
 										if( accion ==\"cargar_asuntos_desde_campo\" ) {
-											
+
 											alert('".__('El código ingresado no existe')."');
 											jQuery('#'+id_origen).val('');
 											jQuery('#'+id_destino).val('');
 
 										} else if ( jQuery('#'+id_origen).val() != '') {
 											if ( accion != \"cargar_actividades\") {
-												alert('".$mje_error."');	
+												alert('".$mje_error."');
 											}
-											
+
 										}
-									
+
 									} else {
 
 										if(response.indexOf('noexiste') != -1 ) {
@@ -281,15 +280,15 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 										}
 
 										jQuery('#'+id_destino).length = 1;
-										
+
 										for(i = 0; i < campos.length; i++) {
-											
+
 											valores = campos[i].split('|');
-											
+
 											if( valores[0] == 'noexiste' ) {
 												continue;
 											}
-												
+
 											var option = new Option();
 											option.value = valores[0];
 											option.text = valores[1];
@@ -298,11 +297,11 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 												select_destino.options.length = 1;
 
 											}
-												
+
 											try {
 												select_destino.add(option);
 											}
-												
+
 											catch(err) {
 													select_destino.add(option,null);
 											}
@@ -320,7 +319,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 									}
 
 								} else {
-									 
+
 									if(response.indexOf('head')!=-1) {
 										alert('Sesión Caducada');
 										top.location.href='".Conf::Host()."';
@@ -337,9 +336,9 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 						function CargarSelectCliente(codigo)
 						{
-							
+
 							if(codigo!='') { ";
-							
+
 							if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) {
 								$output .= "var campo = jQuery('#codigo_cliente_secundario, #campo_codigo_cliente_secundario');";
 							} else {
@@ -400,7 +399,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 						    http.send(null);
 						}
 			</script>";
-			
+
 		return $output;
 		}
 }

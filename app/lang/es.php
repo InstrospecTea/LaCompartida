@@ -814,6 +814,8 @@ $_LANG['Sra.'] = "Señora";
 $_LANG['Srta.'] = "Señorita";
 $_LANG['según Boleta de Honorarios adjunta'] = "según Boleta de Honorarios adjunta";
 $_LANG['por concepto de honorarios'] = "por concepto de honorarios";
+$_LANG['por_concepto_de_honorarios'] = "por concepto de honorarios";
+$_LANG['por_concepto_de_gastos'] = "por concepto de gastos";
 $_LANG['; más'] = "; más";
 $_LANG['por gastos a reembolsar'] = "por gastos a reembolsar";
 $_LANG[', según Boleta de Recuperación de Gastos adjunta'] = ", según Boleta de Recuperación de Gastos adjunta";
@@ -1122,3 +1124,8 @@ $_LANG["The matter doesn't exist"] = "El Asunto no existe";
 $_LANG["You can not enter hours prior to"] = "No puede ingresar horas anteriores al";
 $_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %HOURS horas de un mínimo de %MINIMUM";
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+
+$_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+$_LANG["SaveGeneratedInvoiceError"] = "Error guardar la factura electrónica";
+$_LANG["SaveCanceledInvoiceError"] = "Error al guardar el estado de la Factura electrónica anulada";
+$_LANG["CancelGeneratedInvoiceError"] = "Error anular la factura electrónica";

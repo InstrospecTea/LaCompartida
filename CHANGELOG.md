@@ -1,4 +1,65 @@
 # Changelog
+## Hotfix: 13.5.14
+Lunes 07 de octubre 2013
+* **Fixed:** [Corrige el problema de fechas en excel de cobros](https://github.com/LemontechSA/ttb/pull/309)
+
+## Hotfix: 13.5.14
+Viernes 04 de octubre 2013
+* **Fixed:** [Corrige el problema con OrdenarPorCategoria para los encabezados de TRABAJO_ENCABEZADO de GenerarDocumento2](https://github.com/LemontechSA/ttb/pull/308)
+
+## Hotfix: 13.5.13
+jueves 03 de octubre 2013
+* **Fixed:** [cabia ruta tmp para backups](https://github.com/LemontechSA/ttb/pull/307)
+
+# Hotfix: 13.5.12
+Lunes 01 de Octubre 2013
+* **Fixed:** [Error al cargar JS cuando una factura contiene adelantos](https://github.com/LemontechSA/ttb/pull/305)
+
+# Hotfix: 13.5.11
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Fixed:** [Nuevos Tags para fecha inicial periodo y fecha final periodo para documento carta](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.9
+Lunes 16 de septiembre 2013
+* **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
+* **Fixed:** [Corregir monto hitos con alter table para modificar tabla cobro_pendiente](https://github.com/LemontechSA/ttb/pull/301)
+
+## Hotfix: 13.5.8
+Viernes 13 de septiembre 2013
+* **Fixed:** [Modificacion a interface agregar_gasto para no listar usuarios definidos como no visibles.](https://github.com/LemontechSA/ttb/pull/299)
+
+## Hotfix: 13.5.7
+Viernes 13 de septiembre 2013
+* **Fixed:** [Corrige problema en Nota de cobro para clientes antiguos que utilizan la seccion %TIPO_CAMBIO%.](https://github.com/LemontechSA/ttb/pull/297)
+
+## Hotfix: 13.5.6
+jueves 12 de septiembre 2013
+* **Fixed:** [obtiene los respaldos segun subdominio.](https://github.com/LemontechSA/ttb/pull/296)
+* **Fixed:** [Revisa cada carpeta del bucket, sin pasar por paginacion.](https://github.com/LemontechSA/ttb/pull/296)
+
+## Hotfix: 13.5.5
+Lunes 09 de Septiembre 2013
+* **Fixed:** [Corrige anchor error de despliegue por anchor inexistente en seccion 'MOROSIDAD_FILAS'](https://github.com/LemontechSA/ttb/pull/286)
+
+## Hotfix: 13.5.4
+Miercoles 06 de Septiembre 2013
+* **Fixed:** [Corrige error de generacion de monto en palabra](https://github.com/LemontechSA/ttb/pull/286)
+* **Fixed:** [Corrige resultado de filtro grupo Listado asuntos](https://github.com/LemontechSA/ttb/pull/286)
+
+## Hotfix: 13.5.3
+Miercoles 04 de Septiembre 2013
+* **Fixed:** [Ingresar documento de pago](https://github.com/LemontechSA/ttb/pull/285)
+* **Fixed:** [Correccion para anchor %monto_total_espacio%](https://github.com/LemontechSA/ttb/pull/285)
+* **Fixed:** [Correccion a columna factura en reporte resumen_planilla_saldo](https://github.com/LemontechSA/ttb/pull/285)
+* **Fixed:** [Problema al cargar las estadisticas de un cliente que viene de GTD sin activo_juicio](https://github.com/LemontechSA/ttb/pull/285)
 
 ## Hotfix: 13.5.2
 Lunes 02 de Septiembre 2013

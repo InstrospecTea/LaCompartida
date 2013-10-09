@@ -565,19 +565,21 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		</tr>
 </table>
 
-<table style='border:0px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
+<table style="border:0px solid black" style="display:<?php echo $txt_opcion ? 'inline' : 'none'; ?>" width="90%">
 	<tr>
-		<td align=left><span style="font-weight:bold; font-size:11px; "><?php echo $txt_opcion?></span></td>
-	</td>
-	<?php if ($id_trabajo > 0) { ?>
-		<td width='40%' align=right>
-			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
+		<td align="left">
+			<span style="font-weight:bold; font-size:11px;"><?php echo $txt_opcion; ?></span>
 		</td>
-	<?php } ?>
 	</tr>
+	<?php if ($id_trabajo > 0) { ?>
+	<tr>
+		<td width="40%" align="right">
+			<img src="<?php echo Conf::ImgDir(); ?>/agregar.gif" border="0"> <a href"javascript:void(0)" onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
+		</td>
+	</tr>
+	<?php } ?>
 </table>
 <br>
-
 
 <table class="border_plomo"   id="tbl_trabajo" style="width: 665px !important;">
 		<tr>
@@ -638,7 +640,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 		<?php echo __('Actividad'); ?>
 	</td>
 	<td align=left width="440" nowrap>
-		<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['asunto']); ?>
+		<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['codigo_asunto']); ?>
 	</td>
 </tr>
 <?php } else { ?>
@@ -901,6 +903,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 							$num_monedas++;
 						}
 						?>
+					</tr>
 					<tr>
 						<td colspan=<?php echo $num_monedas?> align=center>
 							<input type=button onclick="ActualizarTrabajosTarifas();" value="<?php echo __('Guardar')?>" />
