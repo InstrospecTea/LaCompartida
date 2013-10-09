@@ -107,7 +107,7 @@ function GeneraFacturaElectronica($hookArg) {
 		$password = $estudio_data['password'];
 		$strdocumento = FacturaToTXT($Sesion, $Factura);
 		$hookArg['ExtraData'] = $strdocumento;
-		$result = $client->RecibirTXT($usuario, $password, $strdocumento);
+		$result = $client->RecibirTXT($usuario, $password, $strdocumento, 0);
 		if ($result->codigo == 201) {
 			try {
 				$Factura->Edit('dte_xml', $result->descripcion);
