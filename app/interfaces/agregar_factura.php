@@ -73,12 +73,20 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	}
 
 	if ($opcion == "anular") {
-		$factura->Edit('estado', 'ANULADA');
-		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
-		$factura->Edit('anulado', 1);
-		if ($factura->Escribir()) {
-			$pagina->AddInfo(__('Documento Tributario') . ' ' . __('anulado con éxito'));
+		$data = array('Factura' => $factura);
+		$Slim->applyHook('hook_anula_factura_electronica', &$data);
+		$error = $data['Error'];
+		if (!$error) {
+			$pagina->AddError($error['Message'] ? $error['Message'] : __($error['Code']));
 			$requiere_refrescar = "window.opener.Refrescar();";
+		} else {
+			$factura->Edit('estado', 'ANULADA');
+			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
+			$factura->Edit('anulado', 1);
+			if ($factura->Escribir()) {
+				$pagina->AddInfo(__('Documento Tributario') . ' ' . __('anulado con éxito'));
+				$requiere_refrescar = "window.opener.Refrescar();";
+			}
 		}
 	}
 }
@@ -146,6 +154,10 @@ if ($opcion == "guardar") {
 			$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		}
 
+		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
+			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
+		}
+
 		if (UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		}
@@ -158,7 +170,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
 
-		if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
+		if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
 			$factura->Edit("serie_documento_legal", $serie);
 		} else if (!isset($factura->fields['serie_documento_legal'])) {
 			$factura->Edit("serie_documento_legal", Conf::GetConf($sesion, 'SerieDocumentosLegales'));
@@ -223,48 +235,63 @@ if ($opcion == "guardar") {
 			} else {
 				$resultado = array('error' => 'El número ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, vuelva a intentar con número: ' . $factura->ObtenerNumeroDocLegal($id_documento_legal));
 			}
-		} else if ($factura->Escribir()) {
-
-			if ($generar_nuevo_numero) {
-				$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie);
-			}
-
-			$signo = $codigo_tipo_doc == 'NC' ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
-			$neteos = empty($id_factura_padre) ? null : array(array($id_factura_padre, $signo * $factura->fields['total']));
-
-			$cta_cte_fact = new CtaCteFact($sesion);
-			$mvto_guardado = $cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'], $signo * ($factura->fields['total'] - $factura->fields['iva']), $signo * $factura->fields['iva'], $signo * $factura->fields['total'], $factura->fields['fecha'], $neteos, $factura->fields['id_factura'], null, $codigo_tipo_doc, $ids_monedas_documento, $tipo_cambios_documento, !empty($factura->fields['anulado']));
-
-
-			if ($mvto_guardado->fields['tipo_mvto'] != 'NC' && $mvto_guardado->fields['saldo'] == 0 && $mvto_guardado->fields['anulado'] != 1) {
-				$query = "SELECT id_estado FROM prm_estado_factura WHERE codigo = 'C'";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-				list($id_estado_cobrado) = mysql_fetch_array($resp);
-
-				$factura->Edit('id_estado', $id_estado_cobrado);
-			}
-
-			if (!$desde_webservice) { //El webservice ignora todo llamado a $pagina
-				if ($opc_inicial != 'restaurar') {
-					$pagina->AddInfo(__('Documento Tributario') . ' ' . $mensaje_accion . ' ' . __(' con éxito'));
+		} else {
+			$has_errors = false;
+			if ($mensaje_accion == 'anulado') {
+				$data_anular = array('Factura' => $factura);
+				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data_anular) : false;
+				$has_errors = $data_anular['Error'];
+				if ($has_errors) {
+					$pagina->AddError($has_errors['Message'] ? $has_errors['Message'] : __($has_errors['Code']));
+					$factura->Load($id_factura);
 				}
 			}
 
-			$requiere_refrescar = "window.opener.Refrescar();";
+			if (!$has_errors && $factura->Escribir()) {
 
-			# Esto se puede descomentar para imprimir facturas desde la edición
-
-			if ($id_cobro) {
-
-				if ($cobro->Load($id_cobro)) {
-					$cobro->CambiarEstadoSegunFacturas();
+				if ($generar_nuevo_numero) {
+					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie);
 				}
 
-				$cobro->AgregarFactura($factura);
+				$signo = $codigo_tipo_doc == 'NC' ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
+				$neteos = empty($id_factura_padre) ? null : array(array($id_factura_padre, $signo * $factura->fields['total']));
 
-				if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
-					$documento = $cobro->DocumentoCobro();
-					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], array($factura->fields['id_factura'] => $factura->fields['total']));
+				$cta_cte_fact = new CtaCteFact($sesion);
+				$mvto_guardado = $cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'], $signo * ($factura->fields['total'] - $factura->fields['iva']), $signo * $factura->fields['iva'], $signo * $factura->fields['total'], $factura->fields['fecha'], $neteos, $factura->fields['id_factura'], null, $codigo_tipo_doc, $ids_monedas_documento, $tipo_cambios_documento, !empty($factura->fields['anulado']));
+
+
+				if ($mvto_guardado->fields['tipo_mvto'] != 'NC' && $mvto_guardado->fields['saldo'] == 0 && $mvto_guardado->fields['anulado'] != 1) {
+					$query = "SELECT id_estado FROM prm_estado_factura WHERE codigo = 'C'";
+					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+					list($id_estado_cobrado) = mysql_fetch_array($resp);
+
+					$factura->Edit('id_estado', $id_estado_cobrado);
+				}
+
+				//El webservice ignora todo llamado a $pagina
+				if (!$desde_webservice) {
+					if ($opc_inicial != 'restaurar') {
+						$pagina->AddInfo(__('Documento Tributario') . ' ' . $mensaje_accion . ' ' . __(' con éxito'));
+					}
+				}
+				$requiere_refrescar = "window.opener.Refrescar();";
+
+
+
+				# Esto se puede descomentar para imprimir facturas desde la edición
+
+				if ($id_cobro) {
+
+					if ($cobro->Load($id_cobro)) {
+						$cobro->CambiarEstadoSegunFacturas();
+					}
+
+					$cobro->AgregarFactura($factura);
+
+					if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
+						$documento = $cobro->DocumentoCobro();
+						$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], array($factura->fields['id_factura'] => $factura->fields['total']));
+					}
 				}
 			}
 		}
@@ -530,8 +557,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
 				<td align="right"><?php echo __('Estado'); ?></td>
+				<?php
+					$deshabilita_estado = ($factura->fields['anulado'] == 1 && $factura->FacturaElectronicaCreada() && $factura->FacturaElectronicaAnulada()) ? 'disabled' : '';
+				?>
 				<td align="left">
-					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', '', "160"); ?>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
 				</td>
 			</tr>
 <?php
@@ -675,6 +705,8 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				</select>
 			</td>
 		</tr>
+		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_metodo_pago') : false; ?>
+
 		<?php
 		$cantidad_lineas_descripcion = Conf::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
@@ -864,7 +896,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<td align="left">
 				<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void(0);" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
-				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
+				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && (!$factura->FacturaElectronicaCreada() || ($factura->FacturaElectronicaCreada() && !$factura->FacturaElectronicaAnulada()))) { ?>
 					<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
 				<?php } ?>
 				<a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio') ?>	</a></td>

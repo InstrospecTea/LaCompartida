@@ -142,7 +142,8 @@ if(!class_exists('Moneda')) {
 						prm_moneda.glosa_moneda_plural,
 						prm_moneda.tipo_cambio,
 						prm_moneda.cifras_decimales,
-						prm_moneda.simbolo
+						prm_moneda.simbolo,
+						prm_moneda.codigo
 					FROM prm_moneda";
 
 			if (!empty($id_moneda)) {
@@ -153,13 +154,14 @@ if(!class_exists('Moneda')) {
 			$monedas = array();
 
 			if ($como_objeto) {
-				while (list($id_moneda, $glosa_moneda, $glosa_moneda_plural, $tipo_cambio, $cifras_decimales, $simbolo) = mysql_fetch_array($r)) {
+				while (list($id_moneda, $glosa_moneda, $glosa_moneda_plural, $tipo_cambio, $cifras_decimales, $simbolo, $codigo) = mysql_fetch_array($r)) {
 					$monedas[$id_moneda]['id_moneda'] = $id_moneda;
 					$monedas[$id_moneda]['tipo_cambio'] = $tipo_cambio;
 					$monedas[$id_moneda]['glosa_moneda'] = $glosa_moneda;
 					$monedas[$id_moneda]['glosa_moneda_plural'] = $glosa_moneda_plural;
 					$monedas[$id_moneda]['cifras_decimales'] = $cifras_decimales;
 					$monedas[$id_moneda]['simbolo'] = $simbolo;
+					$monedas[$id_moneda]['codigo'] = $codigo;
 				}
 			} else {
 				while ($moneda = mysql_fetch_array($r)) {
