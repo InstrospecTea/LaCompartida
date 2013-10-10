@@ -3,7 +3,7 @@
 Jueves 10 de Octubre 2013
 
 * **Feature:** [MultiCompañia](https://github.com/LemontechSA/ttb/pull/304)
-* **Feature:** [MultiCompañia](https://github.com/LemontechSA/ttb/pull/294)
+* **Feature:** [Alerta nota de crédito](https://github.com/LemontechSA/ttb/pull/294)
 * **Feature:** [Alerta horas por facturar](https://github.com/LemontechSA/ttb/pull/286)
 * **Feature:** [Facturacion electronica MX](https://github.com/LemontechSA/ttb/pull/259)
 
