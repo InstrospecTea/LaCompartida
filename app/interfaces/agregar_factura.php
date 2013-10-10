@@ -469,7 +469,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 	<input type="hidden" name="id_documento_legal" value="<?php echo $id_documento_legal; ?>" />
 	<input type="hidden" name="elimina_ingreso" id="elimina_ingreso" value="" />
 	<input type="hidden" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro; ?>" />
-	<input type="hidden" name="id_contrato" id="id_contrato" value='<?php echo $cobro->fields['id_contrato'] ?>'/>
+	<input type="hidden" name="id_contrato" id="id_contrato" value='<?php echo $id_contrato ?>'/>
 	<input type="hidden" name="id_moneda_factura" id="id_moneda_factura" value='<?php echo $id_moneda_factura ?>'/>
 	<input type="hidden" class="aproximable" name="honorario_disp" id="honorario_disp" value='<?php echo $honorario_disp ?>'/>
 	<input type="hidden" class="aproximable" name="gastos_con_impuestos_disp" id="gastos_con_impuestos_disp" value='<?php echo $gastos_con_impuestos_disp ?>'/>
@@ -665,7 +665,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			</tr>
 			<tr>
 				<td align="right"><?php echo __('Ciudad'); ?></td>
-				<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo ($factura->fields['ciudad_cliente']) ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
+				<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo ($factura->fields['ciudad_cliente'] ? $factura->fields['ciudad_cliente'] : $contrato->fields['factura_ciudad']) ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
 			</tr>
 			<tr>
 				<td align="right"><?php echo __('Giro'); ?></td>
@@ -800,8 +800,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			<tr id='descripcion_factura'>
 				<td align="right"><?php echo __('Descripción') ?></td>
-				<td align="left"><textarea id='descripcion' name=descripcion cols="45" rows="3"><?php echo $factura->fields['descripcion'] ?>
-					</textarea></td>
+				<td align="left"><textarea id="descripcion" name="descripcion" cols="45" rows="3"><?php echo ($factura->fields['descripcion'] ? $factura->fields['giro_cliente'] : $contrato->fields['glosa_contrato']) ?></textarea></td>
 			</tr>
 			<tr id='descripcion_factura'>
 				<td align="right"><?php echo __('Monto') ?></td>
@@ -921,7 +920,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			echo "var porcentaje_impuesto_gastos = '" . Conf::GetConf($sesion, 'ValorImpuestoGastos') . "';";
 		}
 	}
-
 	$numeros_serie = $serienumero_documento->UltimosNumerosSerie($id_documento_legal);
 	$_series = array();
 	foreach ($numeros_serie as $numero_serie) {
@@ -939,7 +937,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		<?php } ?>
 
 		var accion = 'cargar_datos_contrato';
-		var id_contrato = "<?php echo $cobro->fields['id_contrato']; ?>";
+		var id_contrato = "<?php echo $id_contrato; ?>";
 		var select_origen = document.getElementById(id_origen);
 		var rut = document.getElementById('RUT_cliente');
 		var cliente = document.getElementById('cliente');
