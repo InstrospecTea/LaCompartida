@@ -1157,7 +1157,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 							http.send(null);
 						}
 
-						enviado = 0;
 						function Validar(form)
 						{
 
@@ -1376,16 +1375,25 @@ if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
 ?>
 
 							form.opcion.value = 'guardar';
-							if (!enviado)
-							{
-								if (NuevoModuloFactura == 1) {
-									form.iva_hidden.value = form.iva.value;
 
-								}
-
-								enviado = 1;
-								form.submit();
+							if (NuevoModuloFactura == 1) {
+								form.iva_hidden.value = form.iva.value;
 							}
+
+							// Debe ser syncrono para que devuelva el valor antes de continuar
+							http = getXMLHTTP();
+							http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura=' + jQuery('#id_factura_padre').attr('value'), false);
+							http.send(null);
+							num_pagos = http.responseText;
+
+							if (num_pagos > 0) {
+								var mensaje = 'Estimado usuario, está tratando de asociar una nota de crédito a una factura que contiene pagos.\n\n¿Desea continuar?';
+								if (!confirm(mensaje)) {
+									return false;
+								}
+							}
+
+							form.submit();
 							return true;
 						}
 
