@@ -245,6 +245,8 @@ class CronNotificacion extends Cron {
 		$this->hitos_cumplidos();
 		$this->log('- horas_mensuales');
 		$this->horas_mensuales();
+		$this->log('- horas_por_facturar');
+		$this->horas_por_facturar();
 
 		// Fin del mail diario. Envío.
 		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
@@ -257,7 +259,6 @@ class CronNotificacion extends Cron {
 			print_r($this->datoDiario);
 			print_r($mensajes);
 		} else if ($this->correo=='simular_correo') {
-
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$mensaje['simular']=true;
 				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
@@ -1027,6 +1028,220 @@ class CronNotificacion extends Cron {
 			for ($x = 0; $x < $total_horas; ++$x) {
 				$hora = $horas[$x];
 				$this->datoDiario[$hora['id_usuario']]['horas_mensuales'] = $hora['horas'];
+			}
+		}
+	}
+
+	/**
+	 * Horas pendientes de liquidar a cada usuario según relación contrato-attache secundario
+	 */
+	public function horas_por_facturar() {
+		if (UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturar')) {
+			$AtacheSecundarioSoloAsunto = UtilesApp::GetConf($this->Sesion, 'AtacheSecundarioSoloAsunto');
+			$separar_asuntos = 0;
+			$fecha1 = date('Y-m-d', strtotime('-1 year'));
+			$fecha2 = date('Y-m-d');
+			$alertas = array();
+
+			$ReporteContrato = new ReporteContrato($this->Sesion, false, $separar_asuntos, $fecha1, $fecha2, $AtacheSecundarioSoloAsunto);
+
+			//Quiero saber cuando se actualizó el olap por ultima vez
+			$maxolapquery = $this->Sesion->pdodbh->query("SELECT DATE_FORMAT(DATE_ADD(MAX(fecha_modificacion), INTERVAL -2 DAY), '%Y%m%d') AS maxfecha FROM olap_liquidaciones");
+			$maxolaptime = $maxolapquery->fetchColumn();
+			if (!$maxolaptime) {
+				$maxolaptime = 0;
+			}
+			unset($maxolapquery);
+
+			$ReporteContrato->InsertQuery($maxolaptime);
+
+			// Si la ultima actualización fue hace más de dos dias, voy a forzar la inserción de los trabajos que me falten.
+			if ($fechactual - $maxolaptime > 2) {
+				$ReporteContrato->MissingEntriesQuery();
+			}
+
+			$querycobros = "SELECT
+					contrato.id_contrato,
+					contrato.codigo_contrato,
+					contrato.id_usuario_responsable,
+					contrato.id_usuario_secundario,
+					cliente.codigo_cliente,
+					cliente.glosa_cliente AS cliente,
+					GROUP_CONCAT(asunto.codigo_asunto, '|@|', asunto.glosa_asunto SEPARATOR '|$|') AS asuntos,
+					CONCAT_WS(' ', usuario_responable.nombre, usuario_responable.apellido1) as usuario_responable_nombre,
+					CONCAT_WS(' ', usuario_secundario.nombre, usuario_secundario.apellido1) as usuario_secundario_nombre
+				FROM asunto
+					LEFT JOIN contrato ON contrato.id_contrato = asunto.id_contrato
+					LEFT JOIN usuario AS usuario_responable ON usuario_responable.id_usuario = contrato.id_usuario_responsable
+					LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
+					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+				WHERE  1
+					AND contrato.activo = 'SI'
+					AND (usuario_responable.activo = 1 OR usuario_secundario.activo = 1)
+					AND (
+						(SELECT Count(*)
+							FROM trabajo
+							WHERE trabajo.codigo_asunto = asunto.codigo_asunto
+								AND trabajo.cobrable = 1
+								AND trabajo.id_tramite = 0
+								AND trabajo.duracion_cobrada != '00:00:00'
+								AND trabajo.estadocobro IN ('SIN COBRO', 'CREADO', 'EN REVISION')
+								AND trabajo.fecha >= '$fecha1'
+								AND trabajo.fecha <= '$fecha2'
+						) > 0
+						OR
+						(SELECT Count(*)
+							FROM cta_corriente
+							WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto
+								AND cta_corriente.cobrable = 1
+								AND cta_corriente.monto_cobrable > 0
+								AND cta_corriente.estadocobro IN ('SIN COBRO', 'CREADO', 'EN REVISION')
+								AND cta_corriente.fecha >= '$fecha1'
+								AND cta_corriente.fecha <= '$fecha2'
+								AND cta_corriente.incluir_en_cobro = 'SI'
+						) > 0
+					)
+				GROUP BY contrato.id_contrato";
+
+			$ReporteContrato->FillArrays();
+
+			$arrayolap = $ReporteContrato->arrayolap;
+			$respcobro = mysql_query($querycobros, $this->Sesion->dbh) or Utiles::errorSQL($querycobros, __FILE__, __LINE__, $this->Sesion->dbh);
+
+			while ($cobro = mysql_fetch_array($respcobro)) {
+				// horas no cobradas tiene que ser mayor a 0
+				if ($ReporteContrato->arrayolap[$cobro['id_contrato']][3] <= 0) {
+					continue;
+				}
+
+				$horas_no_cobradas = $ReporteContrato->arrayolap[$cobro['id_contrato']][3];
+				$fecha_ultimo_cobro = $ReporteContrato->arrayultimocobro[$cobro['id_contrato']]['fecha_emision'];
+
+				if (UtilesApp::GetConf($this->Sesion, 'TipoIngresoHoras') == 'decimal') {
+					$_horas_no_cobradas = number_format($horas_no_cobradas, 1, '.', '');
+				} else {
+					$_horas_no_cobradas = number_format($horas_no_cobradas / 24, 6, '.', '');
+				}
+
+				if (!empty($cobro['id_usuario_responsable']) && UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoComercial')) {
+					if (empty($alertas[$cobro['id_usuario_responsable']]['usuario_nombre'])) {
+						$alertas[$cobro['id_usuario_responsable']]['usuario_nombre'] = $cobro['usuario_responable_nombre'];
+					}
+
+					if (empty($alertas[$cobro['id_usuario_responsable']]['clientes'][$cobro['codigo_cliente']]['nombre'])) {
+						$alertas[$cobro['id_usuario_responsable']]['clientes'][$cobro['codigo_cliente']]['nombre'] = $cobro['cliente'];
+					}
+
+					$alertas[$cobro['id_usuario_responsable']]['clientes'][$cobro['codigo_cliente']]['asuntos'][] = array(
+						'nombre' => $cobro['asuntos'],
+						'horas_no_cobradas' => UtilesApp::Decimal2Time($_horas_no_cobradas),
+						'codigo_contrato' => $cobro['codigo_contrato'],
+						'fecha_ultimo_cobro' => $fecha_ultimo_cobro
+					);
+				}
+
+				if (!empty($cobro['id_usuario_secundario']) && UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoSecundario')) {
+					if (empty($alertas[$cobro['id_usuario_secundario']]['usuario_nombre'])) {
+						$alertas[$cobro['id_usuario_secundario']]['usuario_nombre'] = $cobro['usuario_secundario_nombre'];
+					}
+
+					if (empty($alertas[$cobro['id_usuario_secundario']]['clientes'][$cobro['codigo_cliente']]['nombre'])) {
+						$alertas[$cobro['id_usuario_secundario']]['clientes'][$cobro['codigo_cliente']]['nombre'] = $cobro['cliente'];
+					}
+
+					$alertas[$cobro['id_usuario_secundario']]['clientes'][$cobro['codigo_cliente']]['asuntos'][] = array(
+						'nombre' => $cobro['asuntos'],
+						'horas_no_cobradas' => UtilesApp::Decimal2Time($_horas_no_cobradas),
+						'codigo_contrato' => $cobro['codigo_contrato'],
+						'fecha_ultimo_cobro' => $fecha_ultimo_cobro
+					);
+				}
+			}
+
+			$formato_fecha = UtilesApp::ObtenerFormatoFecha($this->Sesion);
+
+			foreach ($alertas as $id_usuario => $datos_alerta) {
+				$alerta = array(
+					'tipo' => 'diario',
+					'simular' => false,
+					'mensaje' => '
+						<table border="0" cellpadding="3" cellspacing="0">
+							<tr>
+								<td colspan="7">Estimado/a: ' . $datos_alerta['usuario_nombre'] . '</td>
+							</tr>
+							<tr>
+								<td width="10px">&nbsp;</td>
+								<td colspan="6">' . __('Horas por facturar') . '</td>
+							</tr>
+							<tr style="background-color:#B3E58C;">
+								<td>&nbsp;</td>
+								<td width="250px"><b>' . __('Cliente') . '</b></td>
+								<td width="100px"><b>Código ' . __('asunto') . '</b></td>
+								<td width="300px"><b>' . __('Asunto') . '</b></td>
+								<td width="100px"><b>' . __('Horas trabajadas') . '</b></td>
+								<td width="50px"><b>' . __('Último cobro') . '</b></td>
+								<td width="100px"><b>' . __('Código servicio') . '</b></td>
+							</tr>'
+				);
+
+				$i = 0;
+				foreach ($datos_alerta['clientes'] as $codigo_cliente => $datos_cliente) {
+					$color = ($i % 2) ? '#DDDDDD' : '#FFFFFF';
+					for ($x = 0; $x < count($datos_cliente['asuntos']); $x++) {
+						$alerta['mensaje'] .= '<tr style="vertical-align:top; background-color:' . $color . ';">';
+
+						if ($x == 0) {
+							$alerta['mensaje'] .= '<td rowspan="' . count($datos_cliente['asuntos']) . '">&nbsp;</td>';
+							$alerta['mensaje'] .= '<td rowspan="' . count($datos_cliente['asuntos']) . '"><b>' . $datos_cliente['nombre'] . '</b></td>';
+						}
+
+						$_asuntos = explode('|$|', $datos_cliente['asuntos'][$x]['nombre']);
+						$alerta['mensaje'] .= '<td colspan="2">';
+						$alerta['mensaje'] .= '<table border="0" cellpadding="3" cellspacing="0">';
+						for($y = 0; $y < count($_asuntos); $y++) {
+							$__asunto = explode('|@|', $_asuntos[$y]);
+							$alerta['mensaje'] .= '<tr style="vertical-align:top;">';
+							$alerta['mensaje'] .= '<td width="100px">' . $__asunto[0] . '</td>';
+							$alerta['mensaje'] .= '<td width="300px">' . $__asunto[1] . '</td>';
+							$alerta['mensaje'] .= '</tr>';
+
+						}
+						$alerta['mensaje'] .= '</table>';
+						$alerta['mensaje'] .= '</td>';
+						$alerta['mensaje'] .= "<td>{$datos_cliente['asuntos'][$x]['horas_no_cobradas']}</td>";
+
+						if (!empty($datos_cliente['asuntos'][$x]['fecha_ultimo_cobro'])) {
+							$fecha_ultimo_cobro = Utiles::sql2fecha($datos_cliente['asuntos'][$x]['fecha_ultimo_cobro'], $formato_fecha, '-');
+							$alerta['mensaje'] .= "<td>$fecha_ultimo_cobro</td>";
+						} else {
+							$alerta['mensaje'] .= '<td>&nbsp;</td>';
+						}
+
+						if (!empty($datos_cliente['asuntos'][$x]['codigo_contrato'])) {
+							$alerta['mensaje'] .= "<td>{$datos_cliente['asuntos'][$x]['codigo_contrato']}</td>";
+						} else {
+							$alerta['mensaje'] .= '<td>&nbsp;</td>';
+						}
+
+						$alerta['mensaje'] .= '</tr>';
+					}
+
+					$i++;
+				}
+
+				$alerta['mensaje'] .= '</table>';
+
+				if ($this->correo == 'desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+					print_r($alerta);
+				} else {
+					if ($this->correo == 'simular_correo') {
+						$alerta['simular'] = true;
+					}
+
+					if ($this->correo == 'simular_correo' || $this->correo == 'generar_correo') {
+						$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $alerta, $this->Sesion, false);
+					}
+				}
 			}
 		}
 	}

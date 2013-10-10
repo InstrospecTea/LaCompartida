@@ -10022,6 +10022,13 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+		case 7.47:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturar', 0, 'Alerta diaria de horas por facturar enviada a los profesionales', 'boolean', 3, -1);";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturarEncargadoComercial', 0, 'Alerta diaria de horas por facturar enviada al encargado comercial', 'boolean', 3, -1);";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturarEncargadoSecundario', 0, 'Alerta diaria de horas por facturar enviada al encargado secundario', 'boolean', 3, -1);";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10031,7 +10038,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.46;
+$max_update = 7.47;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
