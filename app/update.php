@@ -868,17 +868,17 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 		) ENGINE = innodb";
 
 			$query[] = "CREATE TABLE if not exists `prm_tipo_carpeta` (
-            `id_tipo_carpeta` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-            `glosa_tipo_carpeta` VARCHAR( 20 ) NOT NULL
-        ) ENGINE = innodb";
+						`id_tipo_carpeta` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+						`glosa_tipo_carpeta` VARCHAR( 20 ) NOT NULL
+				) ENGINE = innodb";
 
 
 			$query[] = "CREATE TABLE if not exists `bodega` (
-        `id_bodega` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-        `glosa_bodega` VARCHAR( 50 ) NOT NULL ,
-        `fecha_creacion` DATETIME NOT NULL ,
-        `fecha_modificacion` DATETIME NOT NULL
-        ) ENGINE = innodb";
+				`id_bodega` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`glosa_bodega` VARCHAR( 50 ) NOT NULL ,
+				`fecha_creacion` DATETIME NOT NULL ,
+				`fecha_modificacion` DATETIME NOT NULL
+				) ENGINE = innodb";
 
 
 			if (!ExisteIndex('codigo_asunto', 'carpeta', $dbh))
@@ -969,7 +969,7 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 )
-    					CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este código es vacío si la actividad sirve para todos los asuntos'";
+							CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este código es vacío si la actividad sirve para todos los asuntos'";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
@@ -977,12 +977,12 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 
 		case 2.47:
 			$query = "UPDATE `prm_permisos` SET `glosa` = 'Revisar Biblioteca'
-  		WHERE CONVERT( `codigo_permiso` USING utf8 ) = 'LEE' LIMIT 1 ;";
+			WHERE CONVERT( `codigo_permiso` USING utf8 ) = 'LEE' LIMIT 1 ;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "INSERT INTO `prm_permisos` ( `codigo_permiso` , `glosa` )
-  		VALUES ('EDI', 'Editar Biblioteca');";
+			VALUES ('EDI', 'Editar Biblioteca');";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 			break;
@@ -1173,8 +1173,8 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "ALTER TABLE `archivo`
-  			ADD CONSTRAINT `archivo_ibfk_1` FOREIGN KEY (`id_contrato`)
-  			REFERENCES `contrato` (`id_contrato`) ON UPDATE CASCADE;";
+				ADD CONSTRAINT `archivo_ibfk_1` FOREIGN KEY (`id_contrato`)
+				REFERENCES `contrato` (`id_contrato`) ON UPDATE CASCADE;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 			break;
@@ -1201,8 +1201,8 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "CREATE TABLE if not exists  prm_area_proyecto (
- 							id_area_proyecto INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
- 							glosa VARCHAR( 50 ) NOT NULL
+							id_area_proyecto INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+							glosa VARCHAR( 50 ) NOT NULL
 							) ENGINE = INNODB;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
@@ -1684,7 +1684,7 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "ALTER TABLE `neteo_documento`
-			  ADD CONSTRAINT `neteo_documento_ibfk_1` FOREIGN KEY (`id_documento_cobro`) REFERENCES `documento` (`id_documento`) ON UPDATE CASCADE,
+				ADD CONSTRAINT `neteo_documento_ibfk_1` FOREIGN KEY (`id_documento_cobro`) REFERENCES `documento` (`id_documento`) ON UPDATE CASCADE,
 			 ADD CONSTRAINT `neteo_documento_ibfk_2` FOREIGN KEY (`id_documento_pago`) REFERENCES `documento` (`id_documento`) ON UPDATE CASCADE;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
@@ -1732,27 +1732,27 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 		############## HISTORIAL TRABAJO Y USUARIO REVISOR ####################
 		case 2.73:
 			$query = "CREATE TABLE if not exists `usuario_revisor` (
-			 					 `id_revisor` int(11) NOT NULL default '0',
-				 				 `id_revisado` int(11) NOT NULL default '0',
-					  		 UNIQUE KEY `id_revisado` (`id_revisado`),
-						  	 KEY `id_revisor` (`id_revisor`)
+								 `id_revisor` int(11) NOT NULL default '0',
+								 `id_revisado` int(11) NOT NULL default '0',
+								 UNIQUE KEY `id_revisado` (`id_revisado`),
+								 KEY `id_revisor` (`id_revisor`)
 								 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 			$query = "ALTER TABLE `usuario_revisor`
-			  					ADD CONSTRAINT `usuario_revisor_ibfk_2` FOREIGN KEY (`id_revisado`)
+									ADD CONSTRAINT `usuario_revisor_ibfk_2` FOREIGN KEY (`id_revisado`)
 										REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
-				  				ADD CONSTRAINT `usuario_revisor_ibfk_1` FOREIGN KEY (`id_revisor`)
+									ADD CONSTRAINT `usuario_revisor_ibfk_1` FOREIGN KEY (`id_revisor`)
 										REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "CREATE TABLE if not exists `trabajo_historial` (
-			  					`id_trabajo` int(11) NOT NULL default '0',
-				  				`id_usuario` int(11) NOT NULL default '0',
-					  			`fecha` datetime NOT NULL default '0000-00-00 00:00:00',
-						  		`accion` varchar(9) NOT NULL default '',
-							  	KEY `id_usuario` (`id_usuario`)
+									`id_trabajo` int(11) NOT NULL default '0',
+									`id_usuario` int(11) NOT NULL default '0',
+									`fecha` datetime NOT NULL default '0000-00-00 00:00:00',
+									`accion` varchar(9) NOT NULL default '',
+									KEY `id_usuario` (`id_usuario`)
 									) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
@@ -1767,8 +1767,8 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 			$query = "CREATE TABLE if not exists `usuario_costo` (
-			  					`id_usuario` int(11) NOT NULL default '0',
-					  			`costo` double(15,2) NOT NULL default '0.00',
+									`id_usuario` int(11) NOT NULL default '0',
+									`costo` double(15,2) NOT NULL default '0.00',
 								`fecha` date NOT NULL default '0000-00-00',
 								PRIMARY KEY  (`id_usuario`, `fecha`)
 									) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
@@ -2495,38 +2495,38 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 			$query[] = "ALTER TABLE `contrato` ADD COLUMN `id_tramite_tarifa` INT(11) NULL";
 			$query[] = "ALTER TABLE `contrato` ADD COLUMN `id_moneda_tramite` INT(11) NOT NULL DEFAULT '1'";
 			$query[] = "CREATE TABLE if not exists `tramite` (
-								  `id_tramite` int(11) NOT NULL auto_increment,
-								  `codigo_asunto` varchar(10) NOT NULL default '',
-								  `fecha` date NOT NULL default '0000-00-00',
-								  `id_tramite_tipo` int(11) NOT NULL default '0',
-								  `trabajo_si_no` int(1) NOT NULL default '0',
-								  `cobrable` tinyint(4) NOT NULL default '1',
-								  `duracion` time NOT NULL default '00:00:00',
-								  `descripcion` mediumtext character set latin1,
-								  `id_usuario` int(11) NOT NULL default '0',
-								  `id_cobro` int(11) default NULL,
-								  `revisado` tinyint(4) NOT NULL default '0',
-								  `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
-								  `fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00',
-								  PRIMARY KEY  (`id_tramite`)
+									`id_tramite` int(11) NOT NULL auto_increment,
+									`codigo_asunto` varchar(10) NOT NULL default '',
+									`fecha` date NOT NULL default '0000-00-00',
+									`id_tramite_tipo` int(11) NOT NULL default '0',
+									`trabajo_si_no` int(1) NOT NULL default '0',
+									`cobrable` tinyint(4) NOT NULL default '1',
+									`duracion` time NOT NULL default '00:00:00',
+									`descripcion` mediumtext character set latin1,
+									`id_usuario` int(11) NOT NULL default '0',
+									`id_cobro` int(11) default NULL,
+									`revisado` tinyint(4) NOT NULL default '0',
+									`fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
+									`fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00',
+									PRIMARY KEY  (`id_tramite`)
 								) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=78;";
 			$query[] = "CREATE TABLE if not exists `tramite_tarifa` (
-								  `id_tramite_tarifa` int(11) NOT NULL auto_increment,
-								  `glosa_tramite_tarifa` varchar(30) default NULL,
-								  `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
-								  `fecha_modificacion` datetime default NULL,
-								  `tarifa_defecto` int(1) NOT NULL default '0',
-								  `guardado` int(1) NOT NULL default '0',
-								  PRIMARY KEY  (`id_tramite_tarifa`)
+									`id_tramite_tarifa` int(11) NOT NULL auto_increment,
+									`glosa_tramite_tarifa` varchar(30) default NULL,
+									`fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
+									`fecha_modificacion` datetime default NULL,
+									`tarifa_defecto` int(1) NOT NULL default '0',
+									`guardado` int(1) NOT NULL default '0',
+									PRIMARY KEY  (`id_tramite_tarifa`)
 								) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;";
 			$query[] = "CREATE TABLE if not exists `tramite_tipo` (
-								  `id_tramite_tipo` int(11) NOT NULL auto_increment,
-								  `glosa_tramite` varchar(60) default NULL,
-								  `duracion_defecto` time NOT NULL default '00:00:00',
-								  `trabajo_si_no_defecto` tinyint(1) NOT NULL default '0',
-								  `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
-								  `fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00',
-								  PRIMARY KEY  (`id_tramite_tipo`)
+									`id_tramite_tipo` int(11) NOT NULL auto_increment,
+									`glosa_tramite` varchar(60) default NULL,
+									`duracion_defecto` time NOT NULL default '00:00:00',
+									`trabajo_si_no_defecto` tinyint(1) NOT NULL default '0',
+									`fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
+									`fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00',
+									PRIMARY KEY  (`id_tramite_tipo`)
 								) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=89 ;";
 			$query[] = "CREATE TABLE if not exists `tramite_valor`(
 									`id_tramite_valor` int(11) NOT NULL auto_increment,
@@ -2627,26 +2627,26 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "ALTER TABLE `tramite` ADD INDEX `fecha` ( `fecha` );";
 			$query[] = "ALTER TABLE `tramite` ADD INDEX `cobrable` ( `cobrable` );";
 			$query[] = "ALTER TABLE `tramite`
-                                  ADD CONSTRAINT `tramite_ibfk_23` FOREIGN KEY (`id_moneda_tramite`) REFERENCES `prm_moneda` (`id_moneda`);";
+																	ADD CONSTRAINT `tramite_ibfk_23` FOREIGN KEY (`id_moneda_tramite`) REFERENCES `prm_moneda` (`id_moneda`);";
 			$query[] = "ALTER TABLE `tramite`
-                                  ADD CONSTRAINT `tramite_ibfk_21` FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto` (`codigo_asunto`) ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_ibfk_21` FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto` (`codigo_asunto`) ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE `tramite`
-                                  ADD CONSTRAINT `tramite_ibfk_22` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_ibfk_22` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE `tramite`
-                                  ADD CONSTRAINT `tramite_ibfk_25` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_ibfk_25` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE `tramite`
-                                  ADD CONSTRAINT `tramite_ibfk_9` FOREIGN KEY (`id_cobro`) REFERENCES `cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_ibfk_9` FOREIGN KEY (`id_cobro`) REFERENCES `cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE;";
 
 
 			$query[] = "ALTER TABLE `tramite_valor` ADD INDEX `id_tramite_tipo` (`id_tramite_tipo` );";
 			$query[] = "ALTER TABLE `tramite_valor` ADD INDEX `id_moneda` ( `id_moneda` );";
 			$query[] = "ALTER TABLE `tramite_valor` ADD INDEX `id_tramite_tarifa` ( `id_tramite_tarifa` );";
 			$query[] = "ALTER TABLE `tramite_valor`
-                                  ADD CONSTRAINT `tramite_valor_ibfk_3` FOREIGN KEY (`id_tramite_tarifa`) REFERENCES `tramite_tarifa` (`id_tramite_tarifa`) ON DELETE CASCADE ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_valor_ibfk_3` FOREIGN KEY (`id_tramite_tarifa`) REFERENCES `tramite_tarifa` (`id_tramite_tarifa`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE `tramite_valor`
-                                  ADD CONSTRAINT `tramite_valor_ibfk_1` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON DELETE CASCADE ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_valor_ibfk_1` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE `tramite_valor`
-                                  ADD CONSTRAINT `tramite_valor_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE;";
+																	ADD CONSTRAINT `tramite_valor_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE;";
 
 			$query[] = "UPDATE `menu` SET `glosa` =  'Tareas',
 												`url` = '/app/interfaces/tareas.php',
@@ -2678,10 +2678,10 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query = array();
 			$query[] = "ALTER TABLE `cobro` DROP `opc_moneda_total_tipo_cambio`;";
 			$query[] = "CREATE TABLE if not exists `factura_rtf` (
-								  `id_factura_formato` int(11) NOT NULL auto_increment,
-								  `factura_template` text character set latin1 NOT NULL,
-								  `factura_css` text character set latin1 NOT NULL,
-								  PRIMARY KEY  (`id_factura_formato`)
+									`id_factura_formato` int(11) NOT NULL auto_increment,
+									`factura_template` text character set latin1 NOT NULL,
+									`factura_css` text character set latin1 NOT NULL,
+									PRIMARY KEY  (`id_factura_formato`)
 								) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
 			$query[] = "DELETE FROM `configuracion` WHERE `id` = 1 LIMIT 1;";
 			$query[] = "DELETE FROM `configuracion` WHERE `id` = 2 LIMIT 1;";
@@ -2787,8 +2787,8 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "UPDATE `prm_estado_cobro` SET `orden` = '4' WHERE CONVERT( `codigo_estado_cobro` USING utf8 ) = 'ENVIADO AL CLIENTE' AND `orden` =3 LIMIT 1 ;";
 			$query[] = "UPDATE `prm_estado_cobro` SET `orden` = '3' WHERE CONVERT( `codigo_estado_cobro` USING utf8 ) = 'EMITIDO' AND `orden` =2 LIMIT 1 ;";
 			$query[] = "INSERT INTO `prm_estado_cobro` ( `codigo_estado_cobro` , `orden` )
-      					VALUES
-      							('EN REVISION','2');";
+								VALUES
+										('EN REVISION','2');";
 			$query[] = "ALTER TABLE `cobro` ADD `fecha_en_revision` DATETIME NULL AFTER `fecha_creacion` ;";
 
 			foreach ($query as $q) {
@@ -2840,10 +2840,10 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 		case 3.19:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_titulo_persona` (
-										  `id_titulo` int(11) NOT NULL auto_increment,
-										  `titulo` varchar(30) character set latin1 NOT NULL default '',
-										  `glosa_titulo` varchar(30) default NULL,
-										  PRIMARY KEY  (`id_titulo`)
+											`id_titulo` int(11) NOT NULL auto_increment,
+											`titulo` varchar(30) character set latin1 NOT NULL default '',
+											`glosa_titulo` varchar(30) default NULL,
+											PRIMARY KEY  (`id_titulo`)
 										) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;";
 			$query[] = "INSERT INTO `prm_titulo_persona` (`id_titulo`, `titulo`, `glosa_titulo`)
 											 VALUES (1, 'Sr.', 'SeÃ±or'),
@@ -2889,40 +2889,40 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "ALTER TABLE  `contrato` ADD  `usa_impuesto_gastos` TINYINT( 1 ) NOT NULL DEFAULT  '0';";
 			$query[] = "ALTER TABLE  `cobro` ADD  `porcentaje_impuesto_gastos` TINYINT( 3 ) UNSIGNED NOT NULL AFTER  `porcentaje_impuesto` ;";
 			$query[] = "CREATE TABLE if not exists `trabajo_respaldo_excel_eliminados` (
-											  `id_trabajo` int(11) NOT NULL auto_increment,
-											  `codigo_asunto` varchar(10) default NULL,
-											  `id_usuario` int(11) default NULL,
-											  `codigo_actividad` varchar(5) default NULL,
-											  `descripcion` mediumtext,
-											  `fecha` date default NULL,
-											  `hora_inicio` time default NULL,
-											  `duracion` time default NULL,
-											  `duracion_cobrada` time default NULL,
-											  `duracion_retainer` time default NULL,
-											  `monto_cobrado` double default NULL COMMENT 'Se refiere al monto que aparece respecto a este trabajo en el cobro',
-											  `id_moneda` int(11) NOT NULL default '1',
-											  `cobrable` int(11) NOT NULL default '1',
-											  `visible` int(11) NOT NULL default '1',
-											  `id_cobro` int(11) default NULL,
-											  `fecha_cobro` datetime default NULL,
-											  `revisado` tinyint(4) NOT NULL default '0',
-											  `id_trabajo_local` int(11) default NULL COMMENT 'Este es el id que se le asigna al trabajo en la base de datos local del cliente Windows. Se usa para no insertar trabajos duplicados.',
-											  `solicitante` varchar(75) NOT NULL default '' COMMENT 'solicitante del trabajo',
-											  `fecha_creacion` datetime default NULL,
-											  `fecha_modificacion` datetime default NULL,
-											  `costo_hh` double default NULL,
-											  `costo_hh_monedabase` double default NULL,
-											  `tarifa_hh` double default NULL,
-											  `tarifa_hh_estandar` double NOT NULL default '0',
-											  `id_tramite` int(11) NOT NULL default '0',
-											  PRIMARY KEY  (`id_trabajo`),
-											  KEY `id_actividad` (`codigo_actividad`),
-											  KEY `id_usuario` (`id_usuario`),
-											  KEY `id_moneda` (`id_moneda`),
-											  KEY `id_asunto` (`codigo_asunto`),
-											  KEY `id_cobro` (`id_cobro`),
-											  KEY `cobrable` (`cobrable`),
-											  KEY `fecha` (`fecha`)
+												`id_trabajo` int(11) NOT NULL auto_increment,
+												`codigo_asunto` varchar(10) default NULL,
+												`id_usuario` int(11) default NULL,
+												`codigo_actividad` varchar(5) default NULL,
+												`descripcion` mediumtext,
+												`fecha` date default NULL,
+												`hora_inicio` time default NULL,
+												`duracion` time default NULL,
+												`duracion_cobrada` time default NULL,
+												`duracion_retainer` time default NULL,
+												`monto_cobrado` double default NULL COMMENT 'Se refiere al monto que aparece respecto a este trabajo en el cobro',
+												`id_moneda` int(11) NOT NULL default '1',
+												`cobrable` int(11) NOT NULL default '1',
+												`visible` int(11) NOT NULL default '1',
+												`id_cobro` int(11) default NULL,
+												`fecha_cobro` datetime default NULL,
+												`revisado` tinyint(4) NOT NULL default '0',
+												`id_trabajo_local` int(11) default NULL COMMENT 'Este es el id que se le asigna al trabajo en la base de datos local del cliente Windows. Se usa para no insertar trabajos duplicados.',
+												`solicitante` varchar(75) NOT NULL default '' COMMENT 'solicitante del trabajo',
+												`fecha_creacion` datetime default NULL,
+												`fecha_modificacion` datetime default NULL,
+												`costo_hh` double default NULL,
+												`costo_hh_monedabase` double default NULL,
+												`tarifa_hh` double default NULL,
+												`tarifa_hh_estandar` double NOT NULL default '0',
+												`id_tramite` int(11) NOT NULL default '0',
+												PRIMARY KEY  (`id_trabajo`),
+												KEY `id_actividad` (`codigo_actividad`),
+												KEY `id_usuario` (`id_usuario`),
+												KEY `id_moneda` (`id_moneda`),
+												KEY `id_asunto` (`codigo_asunto`),
+												KEY `id_cobro` (`id_cobro`),
+												KEY `cobrable` (`cobrable`),
+												KEY `fecha` (`fecha`)
 											) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=13142 ;";
 
 			foreach ($query as $q)
@@ -2985,25 +2985,25 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query = array();
 			$query[] = "ALTER TABLE  `cobro_historial` CHANGE  `es_modificacble`  `es_modificable` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'SI'";
 			$query[] = "CREATE TABLE if not exists `gasto_historial` (
-																  `id_gasto_historial` int(11) NOT NULL default '0',
-																  `id_movimiento` int(11) NOT NULL default '0',
-																  `fecha` datetime NOT NULL default '0000-00-00 00:00:00',
-																  `id_usuario` int(11) NOT NULL default '0',
-																  `accion` varchar(10) NOT NULL default '',
-																  `fecha_movimiento` datetime default NULL,
-																  `fecha_movimiento_modificado` datetime default NULL,
-																  `codigo_cliente` varchar(10) default NULL,
-																  `codigo_cliente_modificado` varchar(10) default NULL,
-																  `codigo_asunto` varchar(10) default NULL,
-																  `codigo_asunto_modificado` varchar(10) default NULL,
-																  `egreso` double default NULL,
-																  `egreso_modificado` double default NULL,
-																  `ingreso` double default NULL,
-																  `ingreso_modificado` double default NULL,
-																  `monto_cobrable` double NOT NULL default '0',
-																  `monto_cobrable_modificado` double NOT NULL default '0',
-																  `descripcion` mediumtext,
-																  `descripcion_modificado` mediumtext
+																	`id_gasto_historial` int(11) NOT NULL default '0',
+																	`id_movimiento` int(11) NOT NULL default '0',
+																	`fecha` datetime NOT NULL default '0000-00-00 00:00:00',
+																	`id_usuario` int(11) NOT NULL default '0',
+																	`accion` varchar(10) NOT NULL default '',
+																	`fecha_movimiento` datetime default NULL,
+																	`fecha_movimiento_modificado` datetime default NULL,
+																	`codigo_cliente` varchar(10) default NULL,
+																	`codigo_cliente_modificado` varchar(10) default NULL,
+																	`codigo_asunto` varchar(10) default NULL,
+																	`codigo_asunto_modificado` varchar(10) default NULL,
+																	`egreso` double default NULL,
+																	`egreso_modificado` double default NULL,
+																	`ingreso` double default NULL,
+																	`ingreso_modificado` double default NULL,
+																	`monto_cobrable` double NOT NULL default '0',
+																	`monto_cobrable_modificado` double NOT NULL default '0',
+																	`descripcion` mediumtext,
+																	`descripcion_modificado` mediumtext
 																) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '15' WHERE  `id_prm_excel_cobro` =3 LIMIT 1;";
 			$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '12' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
@@ -3173,12 +3173,12 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "ALTER TABLE  `documento` ADD  `monto_trabajos` DOUBLE NOT NULL DEFAULT  '0' AFTER  `subtotal_honorarios` ;";
 			$query[] = "ALTER TABLE  `documento` ADD  `monto_tramites` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_trabajos` ;";
 			$query[] = "UPDATE  documento as d
-                                                JOIN cobro as c  ON ( c.id_cobro=d.id_cobro AND d.tipo_doc='N' )
-                                                JOIN cobro_moneda AS cm ON ( c.id_cobro=cm.id_cobro AND c.id_moneda=cm.id_moneda )
-                                                JOIN cobro_moneda AS cmt ON ( c.id_cobro=cmt.id_cobro AND c.opc_moneda_total=cmt.id_moneda )
-                                                JOIN prm_moneda AS mt ON c.opc_moneda_total=mt.id_moneda
-                                                SET d.monto_trabajos=ROUND(c.monto_trabajos*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales),
-                                                d.monto_tramites=ROUND(c.monto_tramites*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales);";
+																								JOIN cobro as c  ON ( c.id_cobro=d.id_cobro AND d.tipo_doc='N' )
+																								JOIN cobro_moneda AS cm ON ( c.id_cobro=cm.id_cobro AND c.id_moneda=cm.id_moneda )
+																								JOIN cobro_moneda AS cmt ON ( c.id_cobro=cmt.id_cobro AND c.opc_moneda_total=cmt.id_moneda )
+																								JOIN prm_moneda AS mt ON c.opc_moneda_total=mt.id_moneda
+																								SET d.monto_trabajos=ROUND(c.monto_trabajos*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales),
+																								d.monto_tramites=ROUND(c.monto_tramites*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales);";
 			$query[] = "UPDATE contrato SET id_moneda_monto = 1 WHERE id_moneda_monto = 0;";
 			$query[] = "ALTER TABLE  `contrato` CHANGE  `id_moneda_monto`  `id_moneda_monto` INT( 11 ) NOT NULL DEFAULT  '1';";
 
@@ -3191,22 +3191,22 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query = array();
 			//1:CREAR TABLA
 			$query[] = "CREATE TABLE if not exists  `documento_moneda` (
-                                             `id_documento` INT( 11 ) NOT NULL ,
-                                             `id_moneda` INT( 11 ) NOT NULL ,
-                                             `tipo_cambio` DOUBLE NOT NULL DEFAULT  '0',
-                                            PRIMARY KEY (  `id_documento` ,  `id_moneda` )
-                                            ) ENGINE = INNODB COMMENT =  'Tipo de cambio de pago';";
+																						 `id_documento` INT( 11 ) NOT NULL ,
+																						 `id_moneda` INT( 11 ) NOT NULL ,
+																						 `tipo_cambio` DOUBLE NOT NULL DEFAULT  '0',
+																						PRIMARY KEY (  `id_documento` ,  `id_moneda` )
+																						) ENGINE = INNODB COMMENT =  'Tipo de cambio de pago';";
 			//2:SELECCIONAR cobros sin documento.
 
 			$query[] = "INSERT INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
-                					SELECT documento.id_documento,
-                    					cobro_moneda.id_moneda,
-                    					cobro_moneda.tipo_cambio
-                					FROM documento
-                					JOIN cobro ON documento.id_cobro = cobro.id_cobro
-                					JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
-                					WHERE documento.tipo_doc = 'N'
-                				";
+													SELECT documento.id_documento,
+															cobro_moneda.id_moneda,
+															cobro_moneda.tipo_cambio
+													FROM documento
+													JOIN cobro ON documento.id_cobro = cobro.id_cobro
+													JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
+													WHERE documento.tipo_doc = 'N'
+												";
 
 			foreach ($query as $q)
 				if (!($resp = mysql_query($q, $dbh)))
@@ -3233,13 +3233,13 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				}
 			}
 			/* 2.B: Futuro: insertar documento_monedas
-			  INSERT INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
-			  SELECT documento.id_documento,
-			  cobro_moneda.id_moneda,
-			  cobro_moneda.tipo_cambio
-			  FROM documento
-			  JOIN cobro ON documento.id_cobro = cobro.id_cobro
-			  JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
+				INSERT INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
+				SELECT documento.id_documento,
+				cobro_moneda.id_moneda,
+				cobro_moneda.tipo_cambio
+				FROM documento
+				JOIN cobro ON documento.id_cobro = cobro.id_cobro
+				JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
 			 */
 			foreach ($query as $q)
 				if (!($resp = mysql_query($q, $dbh)))
@@ -3254,24 +3254,24 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "DROP TABLE configuracion;";
 			$query[] = "DROP TABLE configuracion_categoria;";
 			$query[] = "CREATE TABLE if not exists `configuracion_categoria` (
-												  `id_configuracion_categoria` int(11) NOT NULL auto_increment,
-												  `glosa_configuracion_categoria` varchar(50) character set latin1 NOT NULL default '',
-												  PRIMARY KEY  (`id_configuracion_categoria`)
+													`id_configuracion_categoria` int(11) NOT NULL auto_increment,
+													`glosa_configuracion_categoria` varchar(50) character set latin1 NOT NULL default '',
+													PRIMARY KEY  (`id_configuracion_categoria`)
 												) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;";
 			$query[] = "CREATE TABLE if not exists `configuracion` (
-												  `id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la página de configuración.',
-												  `glosa_opcion` varchar(64) NOT NULL default '' COMMENT 'Nombre de la opcion para mostrar al usuario.',
-												  `valor_opcion` text NOT NULL,
-												  `comentario` varchar(255) default NULL COMMENT 'Comentario explicando la funcionalidad para mostrar al usuario.',
-												  `valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un número, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
-												  `id_configuracion_categoria` int(11) NOT NULL default '0',
-												  `orden` int(11) NOT NULL default '-1' COMMENT 'Orden de aparición en la página de configuración, -1 para no mostrar la opción.',
-												  PRIMARY KEY  (`id`)
+													`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la página de configuración.',
+													`glosa_opcion` varchar(64) NOT NULL default '' COMMENT 'Nombre de la opcion para mostrar al usuario.',
+													`valor_opcion` text NOT NULL,
+													`comentario` varchar(255) default NULL COMMENT 'Comentario explicando la funcionalidad para mostrar al usuario.',
+													`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un número, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
+													`id_configuracion_categoria` int(11) NOT NULL default '0',
+													`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de aparición en la página de configuración, -1 para no mostrar la opción.',
+													PRIMARY KEY  (`id`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 			$query[] = "ALTER TABLE `configuracion` ADD INDEX (  `id_configuracion_categoria` );";
 			$query[] = "ALTER TABLE `configuracion` ADD CONSTRAINT `id_configuracion_categoria` FOREIGN KEY `id_configuracion_categoria` (`id_configuracion_categoria`)
-										   REFERENCES `configuracion_categoria` (`id_configuracion_categoria`)
-										   ON DELETE RESTRICT ON UPDATE CASCADE;";
+											 REFERENCES `configuracion_categoria` (`id_configuracion_categoria`)
+											 ON DELETE RESTRICT ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE  `configuracion` ADD UNIQUE (`glosa_opcion`);";
 			$query[] = "INSERT INTO `configuracion_categoria` (`id_configuracion_categoria`, `glosa_configuracion_categoria`) VALUES (1, 'Datos Generales'),
 													(2, 'Datos Cobranza'),
@@ -4088,9 +4088,9 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 
 			$query[] = "CREATE TABLE if not exists `prm_documento_legal` (
-								  `id_documento_legal` int(11) NOT NULL auto_increment,
-								  `glosa` varchar(50) NOT NULL default '',
-								  PRIMARY KEY  (`id_documento_legal`)
+									`id_documento_legal` int(11) NOT NULL auto_increment,
+									`glosa` varchar(50) NOT NULL default '',
+									PRIMARY KEY  (`id_documento_legal`)
 								) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 
@@ -4101,12 +4101,12 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 			$query[] = "
 						CREATE TABLE if not exists `prm_documento_legal_motivo` (
-						  `id_documento_legal_motivo` int(11) NOT NULL auto_increment,
-						  `glosa` varchar(50) NOT NULL default '',
-						  `id_documento_legal` int(11) NOT NULL default '0',
-						  PRIMARY KEY  (`id_documento_legal_motivo`),
-						  KEY `id_documento_legal` (`id_documento_legal`),
-						  CONSTRAINT `prm_documento_legal_motivo_ibfk_1` FOREIGN KEY (`id_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`) ON UPDATE CASCADE
+							`id_documento_legal_motivo` int(11) NOT NULL auto_increment,
+							`glosa` varchar(50) NOT NULL default '',
+							`id_documento_legal` int(11) NOT NULL default '0',
+							PRIMARY KEY  (`id_documento_legal_motivo`),
+							KEY `id_documento_legal` (`id_documento_legal`),
+							CONSTRAINT `prm_documento_legal_motivo_ibfk_1` FOREIGN KEY (`id_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`) ON UPDATE CASCADE
 						) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 
 
@@ -4272,19 +4272,19 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 		case 3.55:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_banco` (
-								  `id_banco` int(11) NOT NULL auto_increment,
-								  `nombre` varchar(50) NOT NULL default '',
-								  `orden` int(11) NOT NULL default '0',
-								  PRIMARY KEY  (`id_banco`)
+									`id_banco` int(11) NOT NULL auto_increment,
+									`nombre` varchar(50) NOT NULL default '',
+									`orden` int(11) NOT NULL default '0',
+									PRIMARY KEY  (`id_banco`)
 								) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 			$query[] = "CREATE TABLE if not exists `cuenta_banco` (
-								  `id_cuenta` int(11) NOT NULL auto_increment,
-								  `id_banco` int(11) NOT NULL default '0',
-								  `numero` varchar(40) NOT NULL default '',
-								  PRIMARY KEY  (`id_cuenta`,`id_banco`),
-								  KEY `id_cuenta` (`id_cuenta`),
-								  KEY `id_banco` (`id_banco`),
-								  CONSTRAINT `id_banco_fk` FOREIGN KEY (`id_banco`) REFERENCES `prm_banco` (`id_banco`) ON DELETE NO ACTION ON UPDATE CASCADE
+									`id_cuenta` int(11) NOT NULL auto_increment,
+									`id_banco` int(11) NOT NULL default '0',
+									`numero` varchar(40) NOT NULL default '',
+									PRIMARY KEY  (`id_cuenta`,`id_banco`),
+									KEY `id_cuenta` (`id_cuenta`),
+									KEY `id_banco` (`id_banco`),
+									CONSTRAINT `id_banco_fk` FOREIGN KEY (`id_banco`) REFERENCES `prm_banco` (`id_banco`) ON DELETE NO ACTION ON UPDATE CASCADE
 								) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 			$query[] = "ALTER TABLE `documento` ADD `id_banco` INT NOT NULL ,
 								ADD `id_cuenta` INT NOT NULL ,
@@ -4443,9 +4443,9 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 		case 3.68:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_color` (
-													  `id_color` int(11) NOT NULL auto_increment,
-													  `codigo_color` varchar(10) NOT NULL default '',
-													  PRIMARY KEY  (`id_color`)
+														`id_color` int(11) NOT NULL auto_increment,
+														`codigo_color` varchar(10) NOT NULL default '',
+														PRIMARY KEY  (`id_color`)
 													) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=89 ;";
 			$query[] = "INSERT INTO `prm_color` (`id_color`, `codigo_color`) VALUES (1, '#B4D3B5'),(2, '#E7EABB'),(3, '#FFCAD8'),(4, '#FFD2C4'),(5, '#FFE9A6'),
 																	(6, '#A4BE81'),(7, '#BEFFA8'),(8, '#A8FFBE'),(9, '#E0E0E0'),(10, '#BEF'),(11, '#DD9'),(12, '#A4BBFF'),(13, '#CDA9FE'),(14, '#FDDC9F'),
@@ -4709,9 +4709,9 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 		case 3.85:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                                VALUES (
-                                                    NULL ,  'MontoGastoOriginalSiMonedaDistinta',  '0', NULL ,  'boolean',  '6',  '-1'
-                                                );";
+																								VALUES (
+																										NULL ,  'MontoGastoOriginalSiMonedaDistinta',  '0', NULL ,  'boolean',  '6',  '-1'
+																								);";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh)))
@@ -4723,12 +4723,12 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 			$query = array();
 			if (!ExisteCampo('opc_ver_columna_cobrable', 'contrato', $dbh))
 				$query[] = "ALTER TABLE `contrato`
-                                                ADD `opc_ver_columna_cobrable` TINYINT( 1 ) NOT NULL DEFAULT '0'
-                                                AFTER `opc_ver_profesional` ;";
+																								ADD `opc_ver_columna_cobrable` TINYINT( 1 ) NOT NULL DEFAULT '0'
+																								AFTER `opc_ver_profesional` ;";
 			if (!ExisteCampo('opc_ver_columna_cobrable', 'cobro', $dbh))
 				$query[] = "ALTER TABLE `cobro`
-                                                ADD `opc_ver_columna_cobrable` TINYINT( 1 ) NOT NULL DEFAULT '0'
-                                                AFTER `opc_ver_profesional` ;";
+																								ADD `opc_ver_columna_cobrable` TINYINT( 1 ) NOT NULL DEFAULT '0'
+																								AFTER `opc_ver_profesional` ;";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh)))
@@ -4849,9 +4849,9 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 		case 3.91:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                                VALUES (
-                                                    NULL ,  'ColumnaIdYCodigoAsuntoAExcelRevisarHoras',  '0',  'Config para Grasty Quintana que quieren esas columnas en su excel revisar horas.',  'boolean',  '6',  '-1'
-                                                );";
+																								VALUES (
+																										NULL ,  'ColumnaIdYCodigoAsuntoAExcelRevisarHoras',  '0',  'Config para Grasty Quintana que quieren esas columnas en su excel revisar horas.',  'boolean',  '6',  '-1'
+																								);";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -4862,22 +4862,22 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 		case 4:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists factura_documento_cobro (
-  id int(11) NOT NULL auto_increment,
-  id_factura int(11) NOT NULL default '0',
-  id_documento_cobro int(11) default NULL,
-  id_cobro int(11) NOT NULL default '0',
-  PRIMARY KEY  (id),
-  KEY id_factura (id_factura),
-  KEY id_documento_cobro (id_documento_cobro),
-  KEY id_cobro (id_cobro)
+	id int(11) NOT NULL auto_increment,
+	id_factura int(11) NOT NULL default '0',
+	id_documento_cobro int(11) default NULL,
+	id_cobro int(11) NOT NULL default '0',
+	PRIMARY KEY  (id),
+	KEY id_factura (id_factura),
+	KEY id_documento_cobro (id_documento_cobro),
+	KEY id_cobro (id_cobro)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$query[] = "CREATE TABLE if not exists prm_estado_factura (
-  id_estado int(11) NOT NULL auto_increment,
-  codigo char(1) NOT NULL default '',
-  glosa varchar(50) NOT NULL default '',
-  PRIMARY KEY  (id_estado),
-  KEY codigo (codigo)
+	id_estado int(11) NOT NULL auto_increment,
+	codigo char(1) NOT NULL default '',
+	glosa varchar(50) NOT NULL default '',
+	PRIMARY KEY  (id_estado),
+	KEY codigo (codigo)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$query[] = "INSERT ignore  INTO `prm_estado_factura` (`id_estado`, `codigo`, `glosa`)
@@ -4899,14 +4899,14 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 			if (!ExisteCampo('id_documento_legal_motivo', 'factura', $dbh))
 				$query[] = "ALTER TABLE `factura`
-                                    ADD INDEX ( `id_documento_legal_motivo` ),
-                                    ADD CONSTRAINT factura_ibfk_1 FOREIGN KEY (id_estado) REFERENCES prm_estado_factura (id_estado),
-                                    ADD CONSTRAINT factura_ibfk_2 FOREIGN KEY (id_documento_legal_motivo) REFERENCES prm_documento_legal_motivo (id_documento_legal_motivo);";
+																		ADD INDEX ( `id_documento_legal_motivo` ),
+																		ADD CONSTRAINT factura_ibfk_1 FOREIGN KEY (id_estado) REFERENCES prm_estado_factura (id_estado),
+																		ADD CONSTRAINT factura_ibfk_2 FOREIGN KEY (id_documento_legal_motivo) REFERENCES prm_documento_legal_motivo (id_documento_legal_motivo);";
 
 			$query[] = "ALTER TABLE `factura_documento_cobro`
-  ADD CONSTRAINT factura_documento_cobro_ibfk_3 FOREIGN KEY (id_cobro) REFERENCES cobro (id_cobro) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT factura_documento_cobro_ibfk_1 FOREIGN KEY (id_factura) REFERENCES factura (id_factura) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT factura_documento_cobro_ibfk_2 FOREIGN KEY (id_documento_cobro) REFERENCES documento (id_documento) ON DELETE SET NULL ON UPDATE CASCADE;";
+	ADD CONSTRAINT factura_documento_cobro_ibfk_3 FOREIGN KEY (id_cobro) REFERENCES cobro (id_cobro) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT factura_documento_cobro_ibfk_1 FOREIGN KEY (id_factura) REFERENCES factura (id_factura) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT factura_documento_cobro_ibfk_2 FOREIGN KEY (id_documento_cobro) REFERENCES documento (id_documento) ON DELETE SET NULL ON UPDATE CASCADE;";
 
 			$query[] = "INSERT ignore INTO factura_documento_cobro( id_factura, id_cobro, id_documento_cobro )
 SELECT f.id_factura AS id_factura, f.id_cobro AS id_cobro, d.id_documento AS id_documento_cobro
@@ -4922,21 +4922,21 @@ INNER JOIN cobro c ON ( f.id_cobro = c.id_cobro );";
 ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios` ;";
 
 			$query[] = "CREATE TABLE if not exists `contrato_documento_legal` (
-											  `id_contrato_documento_legal` int(11) NOT NULL auto_increment,
-											  `id_contrato` int(11) NOT NULL default '0',
-											  `id_tipo_documento_legal` int(11) NOT NULL default '0',
-											  `honorarios` tinyint(1) NOT NULL default '0',
-											  `gastos_con_impuestos` tinyint(1) NOT NULL default '0',
-											  `gastos_sin_impuestos` tinyint(1) NOT NULL default '0',
-											  `fecha_creacion` date default NULL,
-											  PRIMARY KEY  (`id_contrato_documento_legal`),
-											  KEY `id_contrato` (`id_contrato`),
-											  KEY `id_tipo_documento_legal` (`id_tipo_documento_legal`)
+												`id_contrato_documento_legal` int(11) NOT NULL auto_increment,
+												`id_contrato` int(11) NOT NULL default '0',
+												`id_tipo_documento_legal` int(11) NOT NULL default '0',
+												`honorarios` tinyint(1) NOT NULL default '0',
+												`gastos_con_impuestos` tinyint(1) NOT NULL default '0',
+												`gastos_sin_impuestos` tinyint(1) NOT NULL default '0',
+												`fecha_creacion` date default NULL,
+												PRIMARY KEY  (`id_contrato_documento_legal`),
+												KEY `id_contrato` (`id_contrato`),
+												KEY `id_tipo_documento_legal` (`id_tipo_documento_legal`)
 											) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='documentos legales que se generaran por defecto tras emitir ' AUTO_INCREMENT=1 ;";
 
 			$query[] = "ALTER TABLE `contrato_documento_legal`
-											  ADD CONSTRAINT `contrato_documento_legal_ibfk_2` FOREIGN KEY (`id_tipo_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`) ON DELETE CASCADE ON UPDATE CASCADE,
-											  ADD CONSTRAINT `contrato_documento_legal_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON DELETE CASCADE ON UPDATE CASCADE;";
+												ADD CONSTRAINT `contrato_documento_legal_ibfk_2` FOREIGN KEY (`id_tipo_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`) ON DELETE CASCADE ON UPDATE CASCADE,
+												ADD CONSTRAINT `contrato_documento_legal_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON DELETE CASCADE ON UPDATE CASCADE;";
 
 			if (!ExisteCampo('incluye_gastos', 'cobro_pendiente', $dbh))
 				$query[] = "ALTER TABLE `cobro_pendiente` ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `id_cobro` ,
@@ -4975,38 +4975,38 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 			$query = array();
 
 			$query[] = "CREATE TABLE if not exists `cta_cte_fact_mvto` (
-												  `id_cta_cte_mvto` int(11) NOT NULL auto_increment,
-												  `tipo_mvto` varchar(10) NOT NULL default '',
-												  `id_factura` int(11) default NULL COMMENT 'si es un documento legal, apunta a la tabla factura (si no es null)',
-												  `id_factura_pago` int(11) default NULL COMMENT 'si el movimiento es un pago, esto apunta al pago (si no es null)',
-												  `id_moneda` int(11) default NULL,
-												  `monto_neto` double NOT NULL default '0',
-												  `monto_iva` double NOT NULL default '0',
-												  `monto_bruto` double NOT NULL default '0',
-												  `saldo` double NOT NULL default '0',
-												  `id_cta_banco` int(11) default NULL,
-												  `fecha_movimiento` datetime NOT NULL default '0000-00-00 00:00:00',
-												  `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
-												  `fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00',
-												  PRIMARY KEY  (`id_cta_cte_mvto`),
-												  UNIQUE KEY `id_factura` (`id_factura`),
-												  UNIQUE KEY `id_factura_pago` (`id_factura_pago`)
+													`id_cta_cte_mvto` int(11) NOT NULL auto_increment,
+													`tipo_mvto` varchar(10) NOT NULL default '',
+													`id_factura` int(11) default NULL COMMENT 'si es un documento legal, apunta a la tabla factura (si no es null)',
+													`id_factura_pago` int(11) default NULL COMMENT 'si el movimiento es un pago, esto apunta al pago (si no es null)',
+													`id_moneda` int(11) default NULL,
+													`monto_neto` double NOT NULL default '0',
+													`monto_iva` double NOT NULL default '0',
+													`monto_bruto` double NOT NULL default '0',
+													`saldo` double NOT NULL default '0',
+													`id_cta_banco` int(11) default NULL,
+													`fecha_movimiento` datetime NOT NULL default '0000-00-00 00:00:00',
+													`fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
+													`fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00',
+													PRIMARY KEY  (`id_cta_cte_mvto`),
+													UNIQUE KEY `id_factura` (`id_factura`),
+													UNIQUE KEY `id_factura_pago` (`id_factura_pago`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Movimientos de CtaCte Factura';";
 			$query[] = "CREATE TABLE if not exists  `cta_cte_fact_mvto_moneda` (
-												  `id_cta_cte_fact_mvto_moneda` int(11) NOT NULL auto_increment,
-												  `id_moneda` int(11) NOT NULL default '0',
-												  `tipo_cambio` double NOT NULL default '0',
-												  PRIMARY KEY  (`id_cta_cte_fact_mvto_moneda`)
+													`id_cta_cte_fact_mvto_moneda` int(11) NOT NULL auto_increment,
+													`id_moneda` int(11) NOT NULL default '0',
+													`tipo_cambio` double NOT NULL default '0',
+													PRIMARY KEY  (`id_cta_cte_fact_mvto_moneda`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='tipos de cambio de los movimientos';";
 			$query[] = "CREATE TABLE if not exists  `cta_cte_fact_mvto_neteo` (
-												  `id_cta_cte_mvto_neteo` int(11) NOT NULL auto_increment,
-												  `id_mvto_deuda` int(11) NOT NULL default '0' COMMENT 'la factura. A este se le suma el monto',
-												  `id_mvto_pago` int(11) NOT NULL default '0' COMMENT 'el pago. A este se le resta el valor',
-												  `monto` double NOT NULL default '0',
-												  `fecha_movimiento` datetime NOT NULL default '0000-00-00 00:00:00',
-												  PRIMARY KEY  (`id_cta_cte_mvto_neteo`),
-												  KEY `id_mvto_ingreso` (`id_mvto_deuda`),
-												  KEY `id_mvto_egreso` (`id_mvto_pago`)
+													`id_cta_cte_mvto_neteo` int(11) NOT NULL auto_increment,
+													`id_mvto_deuda` int(11) NOT NULL default '0' COMMENT 'la factura. A este se le suma el monto',
+													`id_mvto_pago` int(11) NOT NULL default '0' COMMENT 'el pago. A este se le resta el valor',
+													`monto` double NOT NULL default '0',
+													`fecha_movimiento` datetime NOT NULL default '0000-00-00 00:00:00',
+													PRIMARY KEY  (`id_cta_cte_mvto_neteo`),
+													KEY `id_mvto_ingreso` (`id_mvto_deuda`),
+													KEY `id_mvto_egreso` (`id_mvto_pago`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Neteo de cuenta corriente facturas';";
 
 			foreach ($query as $q)
@@ -5032,11 +5032,11 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 											PRIMARY KEY (  `id_factura_pago` )
 											) ENGINE = INNODB DEFAULT CHARSET = latin1 AUTO_INCREMENT =1;";
 			$query[] = "ALTER TABLE `cta_cte_fact_mvto`
-												  ADD CONSTRAINT `cta_cte_fact_mvto_ibfk_2` FOREIGN KEY (`id_factura_pago`) REFERENCES `factura_pago` (`id_factura_pago`) ON DELETE CASCADE ON UPDATE CASCADE,
-												  ADD CONSTRAINT `cta_cte_fact_mvto_ibfk_1` FOREIGN KEY (`id_factura`) REFERENCES `factura` (`id_factura`) ON DELETE CASCADE ON UPDATE CASCADE;";
+													ADD CONSTRAINT `cta_cte_fact_mvto_ibfk_2` FOREIGN KEY (`id_factura_pago`) REFERENCES `factura_pago` (`id_factura_pago`) ON DELETE CASCADE ON UPDATE CASCADE,
+													ADD CONSTRAINT `cta_cte_fact_mvto_ibfk_1` FOREIGN KEY (`id_factura`) REFERENCES `factura` (`id_factura`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo`
-												  ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_4` FOREIGN KEY (`id_mvto_pago`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE,
-												  ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_3` FOREIGN KEY (`id_mvto_deuda`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE;";
+													ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_4` FOREIGN KEY (`id_mvto_pago`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE,
+													ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_3` FOREIGN KEY (`id_mvto_deuda`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE  `factura` CHANGE  `cliente`  `cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT  'Razón Social Cliente'";
 
 
@@ -5106,8 +5106,8 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 				$query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda` ADD PRIMARY KEY ( `id_cta_cte_fact_mvto` , `id_moneda` ) ;";
 
 				$query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda`
-  ADD CONSTRAINT `cta_cte_fact_mvto_moneda_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `cta_cte_fact_mvto_moneda_ibfk_1` FOREIGN KEY (`id_cta_cte_fact_mvto`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON DELETE CASCADE ON UPDATE CASCADE;";
+	ADD CONSTRAINT `cta_cte_fact_mvto_moneda_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `cta_cte_fact_mvto_moneda_ibfk_1` FOREIGN KEY (`id_cta_cte_fact_mvto`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			}
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -5127,7 +5127,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 				$query[] = "ALTER TABLE `documento` ADD `id_factura_pago` INT NULL COMMENT 'si es un pago generado desde un pago a facturas, apunta al factura_pago q lo creo';";
 				$query[] = "ALTER TABLE `documento` ADD INDEX ( `id_factura_pago` ) ;";
 				$query[] = "ALTER TABLE `documento`
-  ADD CONSTRAINT `documento_ibfk_13` FOREIGN KEY (`id_factura_pago`) REFERENCES `factura_pago` (`id_factura_pago`) ON DELETE CASCADE ON UPDATE CASCADE;";
+	ADD CONSTRAINT `documento_ibfk_13` FOREIGN KEY (`id_factura_pago`) REFERENCES `factura_pago` (`id_factura_pago`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			}
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -5138,14 +5138,14 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 			$query = array();
 
 			$query[] = "CREATE TABLE if not exists  `factura_pago_rtf` (
-								  `id_formato` int(11) NOT NULL auto_increment,
-								  `descripcion` varchar(60) default NULL,
-								  `factura_pago_formato` mediumtext NOT NULL,
-								  `html_header` text NOT NULL,
-								  `html_pie` text NOT NULL,
-								  `factura_pago_template` text NOT NULL,
-								  `factura_pago_css` text NOT NULL,
-								  PRIMARY KEY  (`id_formato`)
+									`id_formato` int(11) NOT NULL auto_increment,
+									`descripcion` varchar(60) default NULL,
+									`factura_pago_formato` mediumtext NOT NULL,
+									`html_header` text NOT NULL,
+									`html_pie` text NOT NULL,
+									`factura_pago_template` text NOT NULL,
+									`factura_pago_css` text NOT NULL,
+									PRIMARY KEY  (`id_formato`)
 								) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			foreach ($query as $q)
@@ -5211,22 +5211,22 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 				$query[] = "ALTER TABLE  `prm_factura_pago_concepto` ADD  `pje_variable` INT NOT NULL COMMENT  'si es 1, se hace un replace de % por el % que corresponda' AFTER  `glosa` ;";
 
 			$query[] = "INSERT ignore INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
-                                                (1, 'Cobranza al 100%', 0, 2),
-                                                (2, 'Cobranza de detracción 12%', 0, 6),
-                                                (3, 'Comisión y gastos bancarios', 0, 7),
-                                                (4, 'Retención', 0, 15),
-                                                (5, 'Dscto. nota de credito', 0, 8),
-                                                (6, 'Cobranza al 88%', 0, 3),
-                                                (7, 'Gastos Financieros', 0, 10),
-                                                (8, 'Pago a cuenta', 0, 13),
-                                                (9, 'Saldo de factura', 0, 14),
-                                                (10, 'Pago por canje', 0, 12),
-                                                (11, 'Otros ingresos', 0, 11),
-                                                (12, 'Ajuste por tipo de cambio', 0, 1),
-                                                (13, 'Cobranza al 6%', 0, 4),
-                                                (14, 'Cobranza al 94%', 0, 5),
-                                                (15, 'Dscto. nota de credito parcial', 0, 9),
-                                                (16, 'Concepto pagado', 0, 16);";
+																								(1, 'Cobranza al 100%', 0, 2),
+																								(2, 'Cobranza de detracción 12%', 0, 6),
+																								(3, 'Comisión y gastos bancarios', 0, 7),
+																								(4, 'Retención', 0, 15),
+																								(5, 'Dscto. nota de credito', 0, 8),
+																								(6, 'Cobranza al 88%', 0, 3),
+																								(7, 'Gastos Financieros', 0, 10),
+																								(8, 'Pago a cuenta', 0, 13),
+																								(9, 'Saldo de factura', 0, 14),
+																								(10, 'Pago por canje', 0, 12),
+																								(11, 'Otros ingresos', 0, 11),
+																								(12, 'Ajuste por tipo de cambio', 0, 1),
+																								(13, 'Cobranza al 6%', 0, 4),
+																								(14, 'Cobranza al 94%', 0, 5),
+																								(15, 'Dscto. nota de credito parcial', 0, 9),
+																								(16, 'Concepto pagado', 0, 16);";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -5327,18 +5327,18 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 		case 4.19:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists  `usuario_vacacion` (
-							  `id` int(11) NOT NULL auto_increment,
-							  `id_usuario` int(10) NOT NULL default '0',
-							  `id_usuario_creador` int(10) default NULL,
-							  `fecha_inicio` date NOT NULL default '0000-00-00',
-							  `fecha_fin` date NOT NULL default '0000-00-00',
-							  PRIMARY KEY  (`id`),
-							  KEY `id_usuario` (`id_usuario`),
-							  KEY `usuario_creador` (`id_usuario_creador`)
+								`id` int(11) NOT NULL auto_increment,
+								`id_usuario` int(10) NOT NULL default '0',
+								`id_usuario_creador` int(10) default NULL,
+								`fecha_inicio` date NOT NULL default '0000-00-00',
+								`fecha_fin` date NOT NULL default '0000-00-00',
+								PRIMARY KEY  (`id`),
+								KEY `id_usuario` (`id_usuario`),
+								KEY `usuario_creador` (`id_usuario_creador`)
 							) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='vacaciones de usuarios' AUTO_INCREMENT=1;";
 			$query[] = "ALTER TABLE `usuario_vacacion`
-				  		ADD CONSTRAINT `usuario_vacacion_ibfk_2` FOREIGN KEY (`id_usuario_creador`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE SET NULL,
-				  		ADD CONSTRAINT `usuario_vacacion_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;";
+							ADD CONSTRAINT `usuario_vacacion_ibfk_2` FOREIGN KEY (`id_usuario_creador`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE SET NULL,
+							ADD CONSTRAINT `usuario_vacacion_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());
@@ -5374,14 +5374,14 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 		case 4.22:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `usuario_cambio_historial` (
-						  `id_usuario` int(11) default NULL,
-						  `id_usuario_creador` int(11) NOT NULL default '0',
-						  `nombre_dato` varchar(255) default NULL,
-						  `valor_original` text,
-						  `valor_actual` text,
-						  `fecha` datetime default NULL,
-						  KEY `id_usuario` (`id_usuario`),
-						  KEY `usuario_creador` (`id_usuario_creador`)
+							`id_usuario` int(11) default NULL,
+							`id_usuario_creador` int(11) NOT NULL default '0',
+							`nombre_dato` varchar(255) default NULL,
+							`valor_original` text,
+							`valor_actual` text,
+							`fecha` datetime default NULL,
+							KEY `id_usuario` (`id_usuario`),
+							KEY `usuario_creador` (`id_usuario_creador`)
 						) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Historial de cambios en usuarios';";
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -5513,10 +5513,10 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 		case 4.29:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_proveedor` (
-									  `id_proveedor` int(11) NOT NULL auto_increment,
-									  `rut` varchar(12) NOT NULL default '',
-									  `glosa` varchar(50) NOT NULL default '',
-									  PRIMARY KEY  (`id_proveedor`)
+										`id_proveedor` int(11) NOT NULL auto_increment,
+										`rut` varchar(12) NOT NULL default '',
+										`glosa` varchar(50) NOT NULL default '',
+										PRIMARY KEY  (`id_proveedor`)
 									) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 
 			if (!ExisteCampo('id_proveedor', 'cta_corriente', $dbh))
@@ -5566,13 +5566,13 @@ VALUES (
 			if (!ExisteCampo('id_pais', 'contrato', $dbh))
 				$query[] = "ALTER TABLE  `contrato` ADD  `id_pais` INT( 11 ) NOT NULL ;";
 			$query[] = "CREATE TABLE if not exists `prm_pais` (
-  `id_pais` int(11) NOT NULL auto_increment,
-  `iso_num` smallint(6) default NULL,
-  `iso_2siglas` char(2) default NULL,
-  `iso_3siglas` char(3) default NULL,
-  `nombre` varchar(80) default NULL,
-  `preferencia` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`id_pais`)
+	`id_pais` int(11) NOT NULL auto_increment,
+	`iso_num` smallint(6) default NULL,
+	`iso_2siglas` char(2) default NULL,
+	`iso_3siglas` char(3) default NULL,
+	`nombre` varchar(80) default NULL,
+	`preferencia` tinyint(1) NOT NULL default '0',
+	PRIMARY KEY  (`id_pais`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 			$query[] = "
 INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganistán', 0),
@@ -6138,8 +6138,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 			$query = array();
 			if (ExisteCampo('opc_ver_resumen_cobro_categoria', 'contrato', $dbh) && !ExisteCampo('opc_ver_detalles_por_hora_iniciales', 'contrato', $dbh)) {
 				$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1',
-							   CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
-							   CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+								 CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
+								 CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 				$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 				$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 				$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
@@ -6435,9 +6435,9 @@ WHERE  `id` =105 LIMIT 1 ;";
 		case 4.76:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_tipo_documento_asociado` (
-						  `id_tipo_documento_asociado` int(11) NOT NULL auto_increment,
-						  `glosa` varchar(250) NOT NULL default '',
-						  PRIMARY KEY  (`id_tipo_documento_asociado`)
+							`id_tipo_documento_asociado` int(11) NOT NULL auto_increment,
+							`glosa` varchar(250) NOT NULL default '',
+							PRIMARY KEY  (`id_tipo_documento_asociado`)
 						) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
 
 			$query[] = "INSERT ignore INTO `prm_tipo_documento_asociado` (`id_tipo_documento_asociado`, `glosa`) VALUES (NULL, 'Factura Asociada'),
@@ -6455,16 +6455,16 @@ WHERE  `id` =105 LIMIT 1 ;";
 		case 4.77:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `trabajo_tarifa` (
-										  `id_trabajo` int(11) NOT NULL default '0',
-										  `id_moneda` int(11) NOT NULL default '0',
-										  `valor` double NOT NULL default '0',
-										  UNIQUE KEY `id_trabajo_2` (`id_trabajo`,`id_moneda`),
-										  KEY `id_trabajo` (`id_trabajo`),
-										  KEY `id_moneda` (`id_moneda`)
+											`id_trabajo` int(11) NOT NULL default '0',
+											`id_moneda` int(11) NOT NULL default '0',
+											`valor` double NOT NULL default '0',
+											UNIQUE KEY `id_trabajo_2` (`id_trabajo`,`id_moneda`),
+											KEY `id_trabajo` (`id_trabajo`),
+											KEY `id_moneda` (`id_moneda`)
 										) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			$query[] = "ALTER TABLE `trabajo_tarifa`
-										  ADD CONSTRAINT `trabajo_tarifa_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
-										  ADD CONSTRAINT `trabajo_tarifa_ibfk_1` FOREIGN KEY (`id_trabajo`) REFERENCES `trabajo` (`id_trabajo`) ON DELETE CASCADE ON UPDATE CASCADE;";
+											ADD CONSTRAINT `trabajo_tarifa_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
+											ADD CONSTRAINT `trabajo_tarifa_ibfk_1` FOREIGN KEY (`id_trabajo`) REFERENCES `trabajo` (`id_trabajo`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL , 'GuardarTarifaAlIngresoDeHora',  '0', NULL ,  'boolean',  '6',  '-1'
@@ -6564,65 +6564,65 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 											NULL ,  'AltoFacturaPdf',  '279', NULL ,  'numero',  '6',  '-1'
 											);";
 			/* $query[] = "DROP TABLE if exists `factura_pdf_datos` ";
-			  $query[] = "CREATE TABLE if not exists `factura_pdf_datos` (
-			  `id_tipo_dato` int(11) NOT NULL auto_increment,
-			  `tipo_dato` varchar(30) NOT NULL default '',
-			  `glosa_dato` varchar(30) NOT NULL default '',
-			  `activo` tinyint(1) NOT NULL default '0',
-			  `coordinateX` int(11) NOT NULL default '0',
-			  `coordinateY` int(11) NOT NULL default '0',
-			  `font` varchar(30) NOT NULL default '',
-			  `style` varchar(30) NOT NULL default '',
-			  `mayuscula` varchar(10) NOT NULL default '',
-			  `tamano` int(11) NOT NULL default '0',
-			  PRIMARY KEY  (`id_tipo_dato`)
-			  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;";
-			  $query[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Dirección', 1, 50, 70, 'Times', '', '', 8),
-			  (2, 'fecha_ano', 'Fecha Año', 1, 90, 50, 'Times', '', '', 8),
-			  (3, 'fecha_dia', 'Fecha Día', 1, 45, 50, 'Times', '', '', 8),
-			  (4, 'fecha_mes', 'Fecha Mes', 1, 60, 50, 'Times', '', 'may', 8),
-			  (5, 'razon_social', 'Razon Social', 1, 50, 60, 'Times', '', '', 8),
-			  (6, 'rut', 'Rut', 1, 160, 60, 'Times', '', '', 8),
-			  (7, 'descripcion_honorarios', 'Glosa honorarios', 1, 50, 100, 'Times', '', '', 8),
-			  (8, 'moneda_honorarios', 'Moneda honorarios', 1, 160, 100, 'Times', '', '', 8),
-			  (9, 'monto_honorarios', 'Monto honorarios', 1, 170, 100, 'Times', '', '', 8),
-			  (10, 'descripcion_gastos_con_iva', 'Glosa gastos con IVA', 1, 50, 110, 'Times', '', '', 8),
-			  (11, 'moneda_gastos_con_iva', 'Moneda gastos c/ IVA', 1, 160, 110, 'Times', '', '', 8),
-			  (12, 'monto_gastos_con_iva', 'Monto gastos c/ IVA', 1, 170, 110, 'Times', '', '', 8),
-			  (13, 'descripcion_gastos_sin_iva', 'Glosa gastos s/ IVA', 1, 50, 120, 'Times', '', '', 8),
-			  (14, 'moneda_gastos_sin_iva', 'Moneda gastos s/ IVA', 1, 160, 120, 'Times', '', '', 8),
-			  (15, 'monto_gastos_sin_iva', 'Monto gastos s/ IVA', 1, 170, 120, 'Times', '', '', 8),
-			  (16, 'monto_en_palabra', 'Monto en palabra', 1, 50, 150, 'Times', '', '', 8),
-			  (17, 'porcentaje_impuesto', 'Porcentaje IVA', 1, 150, 160, 'Times', '', '', 8),
-			  (18, 'moneda_subtotal', 'Moneda subtotal', 1, 160, 150, 'Times', '', '', 8),
-			  (19, 'monto_subtotal', 'Monto subtotal', 1, 170, 150, 'Times', '', '', 8),
-			  (20, 'moneda_iva', 'Moneda IVA', 1, 160, 160, 'Times', '', '', 8),
-			  (21, 'monto_iva', 'Monto IVA', 1, 170, 160, 'Times', '', '', 8),
-			  (22, 'moneda_total', 'Moneda total', 1, 160, 170, 'Times', '', '', 8),
-			  (23, 'monto_total', 'Monto total', 1, 170, 170, 'Times', '', '', 8);"; */
+				$query[] = "CREATE TABLE if not exists `factura_pdf_datos` (
+				`id_tipo_dato` int(11) NOT NULL auto_increment,
+				`tipo_dato` varchar(30) NOT NULL default '',
+				`glosa_dato` varchar(30) NOT NULL default '',
+				`activo` tinyint(1) NOT NULL default '0',
+				`coordinateX` int(11) NOT NULL default '0',
+				`coordinateY` int(11) NOT NULL default '0',
+				`font` varchar(30) NOT NULL default '',
+				`style` varchar(30) NOT NULL default '',
+				`mayuscula` varchar(10) NOT NULL default '',
+				`tamano` int(11) NOT NULL default '0',
+				PRIMARY KEY  (`id_tipo_dato`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;";
+				$query[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Dirección', 1, 50, 70, 'Times', '', '', 8),
+				(2, 'fecha_ano', 'Fecha Año', 1, 90, 50, 'Times', '', '', 8),
+				(3, 'fecha_dia', 'Fecha Día', 1, 45, 50, 'Times', '', '', 8),
+				(4, 'fecha_mes', 'Fecha Mes', 1, 60, 50, 'Times', '', 'may', 8),
+				(5, 'razon_social', 'Razon Social', 1, 50, 60, 'Times', '', '', 8),
+				(6, 'rut', 'Rut', 1, 160, 60, 'Times', '', '', 8),
+				(7, 'descripcion_honorarios', 'Glosa honorarios', 1, 50, 100, 'Times', '', '', 8),
+				(8, 'moneda_honorarios', 'Moneda honorarios', 1, 160, 100, 'Times', '', '', 8),
+				(9, 'monto_honorarios', 'Monto honorarios', 1, 170, 100, 'Times', '', '', 8),
+				(10, 'descripcion_gastos_con_iva', 'Glosa gastos con IVA', 1, 50, 110, 'Times', '', '', 8),
+				(11, 'moneda_gastos_con_iva', 'Moneda gastos c/ IVA', 1, 160, 110, 'Times', '', '', 8),
+				(12, 'monto_gastos_con_iva', 'Monto gastos c/ IVA', 1, 170, 110, 'Times', '', '', 8),
+				(13, 'descripcion_gastos_sin_iva', 'Glosa gastos s/ IVA', 1, 50, 120, 'Times', '', '', 8),
+				(14, 'moneda_gastos_sin_iva', 'Moneda gastos s/ IVA', 1, 160, 120, 'Times', '', '', 8),
+				(15, 'monto_gastos_sin_iva', 'Monto gastos s/ IVA', 1, 170, 120, 'Times', '', '', 8),
+				(16, 'monto_en_palabra', 'Monto en palabra', 1, 50, 150, 'Times', '', '', 8),
+				(17, 'porcentaje_impuesto', 'Porcentaje IVA', 1, 150, 160, 'Times', '', '', 8),
+				(18, 'moneda_subtotal', 'Moneda subtotal', 1, 160, 150, 'Times', '', '', 8),
+				(19, 'monto_subtotal', 'Monto subtotal', 1, 170, 150, 'Times', '', '', 8),
+				(20, 'moneda_iva', 'Moneda IVA', 1, 160, 160, 'Times', '', '', 8),
+				(21, 'monto_iva', 'Monto IVA', 1, 170, 160, 'Times', '', '', 8),
+				(22, 'moneda_total', 'Moneda total', 1, 160, 170, 'Times', '', '', 8),
+				(23, 'monto_total', 'Monto total', 1, 170, 170, 'Times', '', '', 8);"; */
 
 
 
 
 			$query[] = "DROP TABLE IF EXISTS `factura_pdf_datos`;";
 			$query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_datos` (
-  `id_dato` int(11) NOT NULL AUTO_INCREMENT,
-  `id_tipo_dato` int(11) NOT NULL,
-  `id_documento_legal` int(11) NOT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT '0',
-  `coordinateX` int(11) NOT NULL DEFAULT '0',
-  `coordinateY` int(11) NOT NULL DEFAULT '0',
-  `cellW` int(11) NOT NULL DEFAULT '0',
-  `cellH` int(11) NOT NULL DEFAULT '0',
-  `font` varchar(100) DEFAULT NULL,
-  `style` varchar(30) NOT NULL DEFAULT '',
-  `mayuscula` varchar(10) NOT NULL DEFAULT '',
-  `tamano` int(11) NOT NULL DEFAULT '0',
-  `Ejemplo` varchar(300) CHARACTER SET latin1 COLLATE latin1_spanish_ci DEFAULT NULL,
-  `align` varchar(1) NOT NULL DEFAULT 'J' COMMENT 'J justifica, tb puede ser R C o L',
-  PRIMARY KEY (`id_dato`),
-  KEY `id_tipo_dato` (`id_tipo_dato`),
-  KEY `id_documento_legal` (`id_documento_legal`)
+	`id_dato` int(11) NOT NULL AUTO_INCREMENT,
+	`id_tipo_dato` int(11) NOT NULL,
+	`id_documento_legal` int(11) NOT NULL,
+	`activo` tinyint(1) NOT NULL DEFAULT '0',
+	`coordinateX` int(11) NOT NULL DEFAULT '0',
+	`coordinateY` int(11) NOT NULL DEFAULT '0',
+	`cellW` int(11) NOT NULL DEFAULT '0',
+	`cellH` int(11) NOT NULL DEFAULT '0',
+	`font` varchar(100) DEFAULT NULL,
+	`style` varchar(30) NOT NULL DEFAULT '',
+	`mayuscula` varchar(10) NOT NULL DEFAULT '',
+	`tamano` int(11) NOT NULL DEFAULT '0',
+	`Ejemplo` varchar(300) CHARACTER SET latin1 COLLATE latin1_spanish_ci DEFAULT NULL,
+	`align` varchar(1) NOT NULL DEFAULT 'J' COMMENT 'J justifica, tb puede ser R C o L',
+	PRIMARY KEY (`id_dato`),
+	KEY `id_tipo_dato` (`id_tipo_dato`),
+	KEY `id_documento_legal` (`id_documento_legal`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=105 ;";
 
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_dato`, `id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES
@@ -6735,9 +6735,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 			$query[] = "DROP TABLE IF EXISTS `factura_pdf_datos_categoria`;";
 			$query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_datos_categoria` (
-  `id_factura_pdf_datos_categoria` int(11) NOT NULL AUTO_INCREMENT,
-  `glosa` varchar(30) NOT NULL,
-  PRIMARY KEY (`id_factura_pdf_datos_categoria`)
+	`id_factura_pdf_datos_categoria` int(11) NOT NULL AUTO_INCREMENT,
+	`glosa` varchar(30) NOT NULL,
+	PRIMARY KEY (`id_factura_pdf_datos_categoria`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;";
 
 
@@ -6751,13 +6751,13 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 			$query[] = "DROP TABLE IF EXISTS `factura_pdf_tipo_datos`;";
 			$query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
-  `id_tipo_dato` int(11) NOT NULL AUTO_INCREMENT,
-  `id_factura_pdf_datos_categoria` int(11) NOT NULL,
-  `codigo_tipo_dato` varchar(30) NOT NULL,
-  `glosa_tipo_dato` varchar(30) NOT NULL,
-  PRIMARY KEY (`id_tipo_dato`),
-  UNIQUE KEY `codigo_tipo_dato` (`codigo_tipo_dato`),
-  KEY `id_factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`)
+	`id_tipo_dato` int(11) NOT NULL AUTO_INCREMENT,
+	`id_factura_pdf_datos_categoria` int(11) NOT NULL,
+	`codigo_tipo_dato` varchar(30) NOT NULL,
+	`glosa_tipo_dato` varchar(30) NOT NULL,
+	PRIMARY KEY (`id_tipo_dato`),
+	UNIQUE KEY `codigo_tipo_dato` (`codigo_tipo_dato`),
+	KEY `id_factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=27 ;";
 
 
@@ -6792,11 +6792,11 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 
 			$query[] = "ALTER TABLE `factura_pdf_datos`
-  ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`) REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
+	ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`) REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
 
 
 			$query[] = "ALTER TABLE `factura_pdf_tipo_datos`
-  ADD CONSTRAINT `factura_pdf_tipo_datos_ibfk_1` FOREIGN KEY (`id_factura_pdf_datos_categoria`) REFERENCES `factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`) ON UPDATE CASCADE;";
+	ADD CONSTRAINT `factura_pdf_tipo_datos_ibfk_1` FOREIGN KEY (`id_factura_pdf_datos_categoria`) REFERENCES `factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`) ON UPDATE CASCADE;";
 
 
 
@@ -6853,9 +6853,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 4.88:
 			$query = array();
 			/* DEPRECATED	$query[] = "INSERT ignore INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` )
-			  VALUES (
-			  NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
-			  );"; */
+				VALUES (
+				NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
+				);"; */
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'ImprimirFacturaDoc',  '1', NULL ,  'boolean',  '6',  '-1'
@@ -6881,10 +6881,10 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 4.90:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_tipo_pago` (
-                                             `codigo` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
-                                             `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
-                                            PRIMARY KEY (  `codigo` )
-                                            ) ENGINE = INNODB;";
+																						 `codigo` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+																						 `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+																						PRIMARY KEY (  `codigo` )
+																						) ENGINE = INNODB;";
 			$query[] = "INSERT ignore INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'T', 'Transferencia' ), ( 'A', 'Amortización' );";
 			$query[] = "INSERT ignore  INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'E', 'Efectivo' ), ( 'C', 'Cheque' );";
 			$query[] = "INSERT ignore  INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'O',  'Otro' ), ( 'N',  'Ninguno' );";
@@ -6927,7 +6927,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 4.93:
 			$query = array();
 			$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero',
-                                            `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
+																						`comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -6939,9 +6939,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 4.94:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                                VALUES (
-                                                    NULL ,  'OpcVerConceptoGastos',  '1',  'Para decidir si por defecto se ve el concepto de gastos o no',  'boolean',  '6',  '-1'
-                                                );";
+																								VALUES (
+																										NULL ,  'OpcVerConceptoGastos',  '1',  'Para decidir si por defecto se ve el concepto de gastos o no',  'boolean',  '6',  '-1'
+																								);";
 			if (!ExisteCampo('opc_ver_concepto_gastos', 'contrato', $dbh))
 				$query[] = "ALTER TABLE `contrato` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
 			if (!ExisteCampo('opc_ver_concepto_gastos', 'cobro', $dbh))
@@ -7047,19 +7047,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				--
 
 				CREATE TABLE if not exists`prm_doc_legal_numero` (
-				  `id_doc_legal_numero` int(11) NOT NULL auto_increment,
-				  `id_documento_legal` int(11) NOT NULL default '0',
-				  `numero_inicial` varchar(11) NOT NULL default '0',
-				  `serie` varchar(11) NOT NULL default '0',
-				  PRIMARY KEY  (`id_doc_legal_numero`),
-				  UNIQUE KEY `id_documento_legal_2` (`id_documento_legal`,`serie`),
-				  KEY `id_documento_legal` (`id_documento_legal`)
+					`id_doc_legal_numero` int(11) NOT NULL auto_increment,
+					`id_documento_legal` int(11) NOT NULL default '0',
+					`numero_inicial` varchar(11) NOT NULL default '0',
+					`serie` varchar(11) NOT NULL default '0',
+					PRIMARY KEY  (`id_doc_legal_numero`),
+					UNIQUE KEY `id_documento_legal_2` (`id_documento_legal`,`serie`),
+					KEY `id_documento_legal` (`id_documento_legal`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 				";
 
 			$query[] = "
 				ALTER TABLE `prm_doc_legal_numero`
-				  ADD CONSTRAINT `prm_doc_legal_numero_ibfk_1` FOREIGN KEY (`id_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`);
+					ADD CONSTRAINT `prm_doc_legal_numero_ibfk_1` FOREIGN KEY (`id_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`);
 				";
 
 			$query[] = "INSERT ignore INTO `prm_doc_legal_numero` (`id_documento_legal`, `numero_inicial`, `serie`) SELECT `id_documento_legal`, `numero_inicial`, '001' AS serie FROM prm_documento_legal;";
@@ -7160,9 +7160,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 5.09:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                                VALUES (
-                                                    NULL ,  'EsPRC',  '0', NULL ,  'boolean',  '6',  '-1'
-                                                );";
+																								VALUES (
+																										NULL ,  'EsPRC',  '0', NULL ,  'boolean',  '6',  '-1'
+																								);";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -7196,17 +7196,17 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 5.11:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` )
-                                                VALUES (
-                                                    'SEC',  'Secretaría'
-                                                );";
+																								VALUES (
+																										'SEC',  'Secretaría'
+																								);";
 			$query[] = "INSERT ignore  INTO menu_permiso ( codigo_menu, codigo_permiso )
-                                            VALUES ( 'PRO', 'SEC' ), ('MIS_HRS','SEC'), ('TRAB','SEC'), ('TRA_HRS','SEC')";
+																						VALUES ( 'PRO', 'SEC' ), ('MIS_HRS','SEC'), ('TRAB','SEC'), ('TRA_HRS','SEC')";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                                VALUES (
-                                                NULL ,  'MostrarColumnaCodigoAsuntoHorasPorFacturar',  '1', NULL ,  'boolean',  '6',  '-1'
-                                                ), (
-                                                NULL ,  'MostrarColumnaAsuntoCobrableHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
-                                                );";
+																								VALUES (
+																								NULL ,  'MostrarColumnaCodigoAsuntoHorasPorFacturar',  '1', NULL ,  'boolean',  '6',  '-1'
+																								), (
+																								NULL ,  'MostrarColumnaAsuntoCobrableHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
+																								);";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -7243,7 +7243,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$query = array();
 			if (!ExisteCampo('asiento_contable', 'factura', $dbh)) {
 				$query[] = "ALTER TABLE `factura` ADD `asiento_contable` INT NULL COMMENT 'correlativo mensual (para PRC)',
-                        						ADD `mes_contable` INT NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)';";
+																		ADD `mes_contable` INT NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)';";
 
 				$query[] = "ALTER TABLE `factura` ADD UNIQUE (`asiento_contable` ,`mes_contable`);";
 			}
@@ -7317,7 +7317,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			list($tiene_dato) = mysql_fetch_array($resp);
 			if (!$tiene_dato) {
 				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero',
-                                            `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
+																						`comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
 			}
 
 			foreach ($query as $q) {
@@ -7345,10 +7345,10 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 5.19:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `factura_pdf_tipo_datos` (
-                                         `id_tipo_dato` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-                                         `codigo_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
-                                         `glosa_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
-                                        ) ENGINE = INNODB;";
+																				 `id_tipo_dato` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+																				 `codigo_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+																				 `glosa_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+																				) ENGINE = INNODB;";
 
 			if (ExisteCampo('id_tipo_dato', 'factura_pdf_datos', $dbh) && !ExisteCampo('id_dato', 'factura_pdf_datos', $dbh))
 				$query[] = "ALTER TABLE  `factura_pdf_datos` CHANGE  `id_tipo_dato`  `id_dato` INT( 11 ) NOT NULL AUTO_INCREMENT";
@@ -7358,17 +7358,17 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				$query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX ( `id_tipo_dato` ) ;";
 
 				$query[] = "UPDATE factura_pdf_datos SET factura_pdf_datos.id_tipo_dato = (
-                                                SELECT factura_pdf_tipo_datos.id_tipo_dato
-                                                FROM factura_pdf_tipo_datos
-                                                WHERE factura_pdf_tipo_datos.codigo_tipo_dato = factura_pdf_datos.tipo_dato
-                                            )";
+																								SELECT factura_pdf_tipo_datos.id_tipo_dato
+																								FROM factura_pdf_tipo_datos
+																								WHERE factura_pdf_tipo_datos.codigo_tipo_dato = factura_pdf_datos.tipo_dato
+																						)";
 			}
 			if (ExisteCampo('id_tipo_dato', 'factura_pdf_datos', $dbh)) {
 				if (!ExisteLlaveForanea('factura_pdf_datos', 'id_tipo_dato', 'factura_pdf_tipo_datos', 'id_tipo_dato', $dbh)) {
 
 					$query[] = "ALTER TABLE `factura_pdf_datos`
-                                        ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`)
-                                        REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
+																				ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`)
+																				REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
 				}
 			}
 			if (ExisteCampo('tipo_dato', 'factura_pdf_datos', $dbh))
@@ -7383,38 +7383,38 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				$query[] = "UPDATE factura_pdf_datos SET id_documento_legal =1;";
 			}
 			$query[] = "INSERT INTO factura_pdf_datos ( id_documento_legal, id_tipo_dato, activo, coordinateX, coordinateY, font, style, mayuscula, tamano )
-                                            SELECT
-                                                prm_documento_legal.id_documento_legal,
-                                                id_tipo_dato,
-                                                activo,
-                                                coordinateX,
-                                                coordinateY,
-                                                font,
-                                                style,
-                                                mayuscula,
-                                                tamano
-                                            FROM factura_pdf_datos
-                                            JOIN prm_documento_legal ON 1=1
-                                            WHERE prm_documento_legal.id_documento_legal > 1";
+																						SELECT
+																								prm_documento_legal.id_documento_legal,
+																								id_tipo_dato,
+																								activo,
+																								coordinateX,
+																								coordinateY,
+																								font,
+																								style,
+																								mayuscula,
+																								tamano
+																						FROM factura_pdf_datos
+																						JOIN prm_documento_legal ON 1=1
+																						WHERE prm_documento_legal.id_documento_legal > 1";
 			if (!ExisteCampo('cellW', 'factura_pdf_datos', $dbh))
 				$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellW` INT( 11 ) NOT NULL DEFAULT '0' AFTER `coordinateY` ;";
 			if (!ExisteCampo('cellH', 'factura_pdf_datos', $dbh))
 				$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellH` INT( 11 ) NOT NULL DEFAULT '0' AFTER `cellW` ;";
 			$query[] = "CREATE TABLE if not exists `factura_pdf_datos_categoria` (
-                                         `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-                                         `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
-                                        ) ENGINE = MYISAM ;";
+																				 `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+																				 `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+																				) ENGINE = MYISAM ;";
 			$query[] = "INSERT ignore INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` )
-                                            VALUES ( '1', 'Fecha' ), ( '2', 'Datos cliente' );";
+																						VALUES ( '1', 'Fecha' ), ( '2', 'Datos cliente' );";
 			$query[] = "INSERT ignore INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` )
-                                            VALUES ( '3', 'Detalle factura' ), ( '4', 'Totales factura' );";
+																						VALUES ( '3', 'Detalle factura' ), ( '4', 'Totales factura' );";
 			if (!ExisteCampo('id_factura_pdf_datos_categoria', 'factura_pdf_tipo_datos', $dbh)) {
 				$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD  `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AFTER  `id_tipo_dato`;";
 				$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD INDEX ( `id_factura_pdf_datos_categoria` );";
 
 				$query[] = "ALTER TABLE  `factura_pdf_datos_categoria` ENGINE = INNODB";
 				$query[] = "INSERT ignore INTO factura_pdf_tipo_datos ( codigo_tipo_dato, glosa_tipo_dato )
-                                            SELECT tipo_dato, glosa_dato FROM factura_pdf_datos;";
+																						SELECT tipo_dato, glosa_dato FROM factura_pdf_datos;";
 				$query[] = "ALTER TABLE `factura_pdf_tipo_datos`    ADD CONSTRAINT `factura_pdf_tipo_datos_ibfk_1` FOREIGN KEY (`id_factura_pdf_datos_categoria`) REFERENCES `factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`) ON UPDATE CASCADE;";
 			}
 			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 1 WHERE id_tipo_dato IN(2,3,4,24);";
@@ -7469,7 +7469,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			}
 			if (!ExisteCampo('esc1_tiempo', 'cobro', $dbh)) {
 				$query[] = "ALTER TABLE  `contrato` ADD  `esc1_tiempo` DOUBLE NULL ,
-                        				ADD  `esc1_id_tarifa` INT NULL ,
+																ADD  `esc1_id_tarifa` INT NULL ,
 							ADD  `esc1_monto` DOUBLE NULL ,
 							ADD  `esc1_id_moneda` INT NULL ,
 							ADD  `esc1_descuento` DOUBLE NULL ,
@@ -7518,8 +7518,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				$query[] = "ALTER TABLE  `trabajo` ADD  `id_categoria_usuario` INT( 11 ) NULL DEFAULT NULL AFTER  `id_usuario` ;";
 				$query[] = "ALTER TABLE  `trabajo` ADD INDEX (  `id_categoria_usuario` )";
 				$query[] = "ALTER TABLE `trabajo`
-                                        ADD CONSTRAINT `trabajo_ibfk_31` FOREIGN KEY (`id_categoria_usuario`)
-                                        REFERENCES `prm_categoria_usuario` (`id_categoria_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
+																				ADD CONSTRAINT `trabajo_ibfk_31` FOREIGN KEY (`id_categoria_usuario`)
+																				REFERENCES `prm_categoria_usuario` (`id_categoria_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
 			}
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -7708,9 +7708,9 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.29:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                            VALUES (
-                                            NULL ,  'OcultarColumnasHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
-                                            );";
+																						VALUES (
+																						NULL ,  'OcultarColumnasHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
+																						);";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -7722,9 +7722,9 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.30:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-                                            VALUES (
-                                                NULL ,  'CantidadDecimalesIngresoHoras',  '1', NULL ,  'numero',  '6',  '-1'
-                                            );";
+																						VALUES (
+																								NULL ,  'CantidadDecimalesIngresoHoras',  '1', NULL ,  'numero',  '6',  '-1'
+																						);";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -7772,15 +7772,15 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.34:
 			$query = array();
 			$query[] = "CREATE TABLE IF NOT EXISTS `log_db` (
-							  `id` int(11) NOT NULL auto_increment,
-							  `id_field` int(11) NOT NULL default '0',
-							  `titulo_tabla` varchar(25) NOT NULL default '',
-							  `campo_tabla` varchar(25) NOT NULL default '',
-							  `fecha` datetime NOT NULL default '0000-00-00 00:00:00',
-							  `usuario` varchar(64) NOT NULL default '',
-							  `valor_antiguo` varchar(255) NOT NULL default '',
-							  `valor_nuevo` varchar(255) NOT NULL default '',
-							  PRIMARY KEY  (`id`)
+								`id` int(11) NOT NULL auto_increment,
+								`id_field` int(11) NOT NULL default '0',
+								`titulo_tabla` varchar(25) NOT NULL default '',
+								`campo_tabla` varchar(25) NOT NULL default '',
+								`fecha` datetime NOT NULL default '0000-00-00 00:00:00',
+								`usuario` varchar(64) NOT NULL default '',
+								`valor_antiguo` varchar(255) NOT NULL default '',
+								`valor_nuevo` varchar(255) NOT NULL default '',
+								PRIMARY KEY  (`id`)
 							) ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 
 			foreach ($query as $q) {
@@ -7849,12 +7849,12 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.39:
 			$query = array();
 			$query[] = "CREATE TABLE IF NOT EXISTS `evaluacion` (
-							  `id_evaluacion` tinyint(11) NOT NULL auto_increment,
-							  `id_usuario` tinyint(11) NOT NULL default '0',
-							  `valuacion` tinyint(11) NOT NULL default '0',
-							  `glosa_valuacion` text,
-							  `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
-							  PRIMARY KEY  (`id_evaluacion`)
+								`id_evaluacion` tinyint(11) NOT NULL auto_increment,
+								`id_usuario` tinyint(11) NOT NULL default '0',
+								`valuacion` tinyint(11) NOT NULL default '0',
+								`glosa_valuacion` text,
+								`fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
+								PRIMARY KEY  (`id_evaluacion`)
 							) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
 
 			foreach ($query as $q) {
@@ -7967,7 +7967,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				$query[] = "ALTER TABLE `cliente` ADD `id_cliente_referencia` INT( 11 ) NULL DEFAULT NULL ;";
 				$query[] = "ALTER TABLE `cliente` ADD INDEX (  `id_cliente_referencia` )";
 				$query[] = "ALTER TABLE `cliente`
-							  ADD CONSTRAINT `cliente_ibfk_1` FOREIGN KEY (`id_cliente_referencia`) REFERENCES `prm_cliente_referencia` (`id_cliente_referencia`) ON UPDATE CASCADE;";
+								ADD CONSTRAINT `cliente_ibfk_1` FOREIGN KEY (`id_cliente_referencia`) REFERENCES `prm_cliente_referencia` (`id_cliente_referencia`) ON UPDATE CASCADE;";
 			}
 			$query[] = "INSERT ignore  INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` )
 								VALUES (
@@ -8112,9 +8112,9 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 			// inserta para cada tipo de documento legal el tipo de dato "Tamaño Papel" usando como id_tipo_dato el máximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,216 as cellW,297 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
+																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,216 as cellW,297 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																group by  pdl.id_documento_legal)";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8328,14 +8328,14 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$comentario = 'Esta opcion activa el uso de notificaciones de pago de comision a personas que contratan nuevos clientes';
 
 			$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
-                                            VALUES('UsoPagoComisionNuevoCliente', 0, 'boolean','{$comentario}', 6, -1)";
+																						VALUES('UsoPagoComisionNuevoCliente', 0, 'boolean','{$comentario}', 6, -1)";
 			$comentario = 'Registra el email donde se notificara el termino de pago de comision a personas que contratan nuevos clientes';
 			$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
-                                            VALUES('UsoPagoComisionNuevoClienteEmail', 'soporte@lemontech.cl', 'string','{$comentario}', 3, 300)";
+																						VALUES('UsoPagoComisionNuevoClienteEmail', 'soporte@lemontech.cl', 'string','{$comentario}', 3, 300)";
 
 			$comentario = 'Registra el umbral de tiempo(dias) para el termino de pago de comision a personas que contratan nuevos clientes';
 			$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
-                                        VALUES('UsoPagoComisionNuevoClienteTiempo', '730', 'string','{$comentario}', 6, -1)";
+																				VALUES('UsoPagoComisionNuevoClienteTiempo', '730', 'string','{$comentario}', 6, -1)";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8489,25 +8489,25 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				$query[] = "ALTER TABLE  `olap_liquidaciones` ADD  `id_usuario_entry` MEDIUMINT UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'El que realiza el trabajo o solicita el gasto' AFTER  `id_entry`";
 
 			$query[] = "replace delayed into olap_liquidaciones (SELECT
-                                                                asunto.codigo_asunto as codigos_asuntos,
-                                                                asunto.codigo_asunto_secundario,
-								  contrato.id_usuario_responsable,
-								   asunto.glosa_asunto as asuntos,
-								   (asunto.cobrable+1) as asuntos_cobrables,
-								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+																																asunto.codigo_asunto as codigos_asuntos,
+																																asunto.codigo_asunto_secundario,
+									contrato.id_usuario_responsable,
+									 asunto.glosa_asunto as asuntos,
+									 (asunto.cobrable+1) as asuntos_cobrables,
+										cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
 
 								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
 								ec.username as username_encargado_comercial,
 								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
 								es.username as username_encargado_secundario,
 								contrato.id_contrato,
-                                                                contrato.monto,
+																																contrato.monto,
 								contrato.forma_cobro,
 								contrato.retainer_horas,
 								contrato.id_moneda as id_moneda_contrato,
 								contrato.opc_moneda_total as id_moneda_total,
 
-															  movs.*,0
+																movs.*,0
 								FROM  asunto JOIN contrato  using (id_contrato)
 								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 								join
@@ -8538,25 +8538,25 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 								";
 
 			$query[] = "replace delayed into olap_liquidaciones (SELECT
-                                                                asunto.codigo_asunto as codigos_asuntos,
-                                                                asunto.codigo_asunto_secundario,
-								  contrato.id_usuario_responsable,
-								   asunto.glosa_asunto as asuntos,
-								   (asunto.cobrable+1) as asuntos_cobrables,
-								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+																																asunto.codigo_asunto as codigos_asuntos,
+																																asunto.codigo_asunto_secundario,
+									contrato.id_usuario_responsable,
+									 asunto.glosa_asunto as asuntos,
+									 (asunto.cobrable+1) as asuntos_cobrables,
+										cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
 
 								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
 								ec.username as username_encargado_comercial,
 								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
 								es.username as username_encargado_secundario,
 								contrato.id_contrato,
-                                                                contrato.monto,
+																																contrato.monto,
 								contrato.forma_cobro,
 								contrato.retainer_horas,
 								contrato.id_moneda as id_moneda_contrato,
 								contrato.opc_moneda_total as id_moneda_total,
 
-															  movs.*,0
+																movs.*,0
 								FROM  asunto JOIN contrato  using (id_contrato)
 								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 								join
@@ -8627,22 +8627,22 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.75:
 			$query = array();
 			$query[] = "CREATE TABLE IF NOT EXISTS `usuario_costo_hh` (
-			  `id_costohh` mediumint(12) NOT NULL AUTO_INCREMENT,
-			  `id_usuario` mediumint(8) NOT NULL DEFAULT '0',
-			  `yearmonth` mediumint(6) NOT NULL DEFAULT '200001',
-			  `costo_hh` decimal(12,5) NOT NULL DEFAULT '0.00000',
-			  `fecha_touch` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'La fecha de insert o update',
-			  PRIMARY KEY (`id_costohh`),
-			  UNIQUE KEY `id_usuario` (`id_usuario`,`yearmonth`)
+				`id_costohh` mediumint(12) NOT NULL AUTO_INCREMENT,
+				`id_usuario` mediumint(8) NOT NULL DEFAULT '0',
+				`yearmonth` mediumint(6) NOT NULL DEFAULT '200001',
+				`costo_hh` decimal(12,5) NOT NULL DEFAULT '0.00000',
+				`fecha_touch` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'La fecha de insert o update',
+				PRIMARY KEY (`id_costohh`),
+				UNIQUE KEY `id_usuario` (`id_usuario`,`yearmonth`)
 			) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 
 			$query[] = "replace delayed into `usuario_costo_hh` (id_usuario, yearmonth, costo_hh)
-			    (SELECT t.id_usuario, date_format( uc.fecha, '%Y%m' ),costo *3600 / sum( time_to_sec( duracion ) )
-			    FROM trabajo t
-			    JOIN usuario_costo uc ON t.id_usuario = uc.id_usuario
-			    AND date_format( uc.fecha, '%Y%m%d' ) = concat( extract(
-			    YEAR_MONTH FROM t.fecha ) , '01' )
-			    GROUP BY id_usuario, uc.fecha)";
+					(SELECT t.id_usuario, date_format( uc.fecha, '%Y%m' ),costo *3600 / sum( time_to_sec( duracion ) )
+					FROM trabajo t
+					JOIN usuario_costo uc ON t.id_usuario = uc.id_usuario
+					AND date_format( uc.fecha, '%Y%m%d' ) = concat( extract(
+					YEAR_MONTH FROM t.fecha ) , '01' )
+					GROUP BY id_usuario, uc.fecha)";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8652,11 +8652,11 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			break;
 		case 5.76:
 			$query[] = "CREATE TABLE if not exists `z_log_fff` (
-				      `idlog` bigint(20) NOT NULL auto_increment,
-				      `fecha` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-				      `mensaje` text NOT NULL,
-				      PRIMARY KEY  (`idlog`)
-				    ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=109 ;";
+							`idlog` bigint(20) NOT NULL auto_increment,
+							`fecha` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+							`mensaje` text NOT NULL,
+							PRIMARY KEY  (`idlog`)
+						) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=109 ;";
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -8781,28 +8781,28 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.87: // sincroniza el setting con la manera vieja de comprobarlo
 			$query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 255 )";
 			$query[] = "CREATE TABLE if not exists `prm_mantencion_tablas` (
-				    `id_tabla` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT,
-				    `nombre_tabla` VARCHAR( 64 ) NOT NULL ,
-				    `glosa_tabla` VARCHAR( 255 ) NULL ,
-				    `info_tabla` TEXT NULL ,
-				    PRIMARY KEY (  `id_tabla` ) ,
-				    UNIQUE (
-				    `nombre_tabla`
-				    )
-				    ) ENGINE = MYISAM";
+						`id_tabla` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT,
+						`nombre_tabla` VARCHAR( 64 ) NOT NULL ,
+						`glosa_tabla` VARCHAR( 255 ) NULL ,
+						`info_tabla` TEXT NULL ,
+						PRIMARY KEY (  `id_tabla` ) ,
+						UNIQUE (
+						`nombre_tabla`
+						)
+						) ENGINE = MYISAM";
 
 			$query[] = "INSERT ignore INTO `prm_mantencion_tablas` (`id_tabla`, `nombre_tabla`, `glosa_tabla`, `info_tabla`) VALUES
-				    (1, 'grupo_cliente', 'Grupo Cliente', NULL),
-				    (2, 'prm_mantencion_tablas', 'Tablas Paramétricas', NULL),
-				    (3, 'prm_comuna', 'Comuna', NULL),
-				    (4, 'prm_area_proyecto', 'Área Proyecto', NULL),
-				    (5, 'prm_area_usuario', 'Área Usuario', NULL),
-				    (6, 'prm_tipo_proyecto', 'Tipo Asunto o Proyecto', NULL),
-				    (7, 'prm_moneda', 'Monedas y Tasas de Cambio', NULL),
-				    (8, 'j_prm_materia', 'Juicios: Materia de la Causa', NULL),
-				    (9, 'j_prm_estado_causa', 'Juicios: Estado de la Causa', NULL),
-				    (10, 'prm_categoria_usuario', 'Categorías de Usuario', NULL),
-				    (11, 'prm_banco', 'Bancos', NULL);";
+						(1, 'grupo_cliente', 'Grupo Cliente', NULL),
+						(2, 'prm_mantencion_tablas', 'Tablas Paramétricas', NULL),
+						(3, 'prm_comuna', 'Comuna', NULL),
+						(4, 'prm_area_proyecto', 'Área Proyecto', NULL),
+						(5, 'prm_area_usuario', 'Área Usuario', NULL),
+						(6, 'prm_tipo_proyecto', 'Tipo Asunto o Proyecto', NULL),
+						(7, 'prm_moneda', 'Monedas y Tasas de Cambio', NULL),
+						(8, 'j_prm_materia', 'Juicios: Materia de la Causa', NULL),
+						(9, 'j_prm_estado_causa', 'Juicios: Estado de la Causa', NULL),
+						(10, 'prm_categoria_usuario', 'Categorías de Usuario', NULL),
+						(11, 'prm_banco', 'Bancos', NULL);";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8833,14 +8833,14 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			break;
 		case 5.90:
 			$query[] = "CREATE TABLE IF NOT EXISTS `trabajos_por_actualizar` (
-					      `id_trabajo` int(11) NOT NULL DEFAULT '0',
-					      `codigo_asunto` varchar(10) CHARACTER SET latin1 DEFAULT NULL,
-					      `duracion_cobrada_segs` bigint(20) DEFAULT NULL,
-					      `time_to_sec(t.duracion_cobrada)` int(10) DEFAULT NULL,
-					      `fecha_modificacion` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-					      `fecha_touch` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-					      PRIMARY KEY (`id_trabajo`)
-					    ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
+								`id_trabajo` int(11) NOT NULL DEFAULT '0',
+								`codigo_asunto` varchar(10) CHARACTER SET latin1 DEFAULT NULL,
+								`duracion_cobrada_segs` bigint(20) DEFAULT NULL,
+								`time_to_sec(t.duracion_cobrada)` int(10) DEFAULT NULL,
+								`fecha_modificacion` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+								`fecha_touch` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+								PRIMARY KEY (`id_trabajo`)
+							) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8928,9 +8928,9 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 			// inserta para cada tipo de documento legal el tipo de dato "Tamaño Papel" usando como id_tipo_dato el máximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                    (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                    from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                    group by  pdl.id_documento_legal)";
+																		(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																		from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																		group by  pdl.id_documento_legal)";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -9075,18 +9075,18 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
+																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																group by  pdl.id_documento_legal)";
 
 			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
 								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
 								VALUES (2, 'comuna', 'Comuna') on duplicate key update glosa_tipo_dato='Comuna';";
 
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
+																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																group by  pdl.id_documento_legal)";
 
 
 
@@ -9304,8 +9304,8 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						`documento` MEDIUMBLOB NOT NULL ,
 						`fecha_creacion` DATETIME NOT NULL ,
 						`fecha_modificacion` DATETIME NOT NULL ,
-					   PRIMARY KEY (  `id_template` )
-					   ) ENGINE = INNODB DEFAULT CHARSET = latin1 COLLATE = latin1_general_ci COMMENT =  'Permite el manejo de distintos templates para toda la aplicacion' AUTO_INCREMENT =1;";
+						 PRIMARY KEY (  `id_template` )
+						 ) ENGINE = INNODB DEFAULT CHARSET = latin1 COLLATE = latin1_general_ci COMMENT =  'Permite el manejo de distintos templates para toda la aplicacion' AUTO_INCREMENT =1;";
 
 			ejecutar($query, $dbh);
 			break;
@@ -9331,7 +9331,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						`fecha_creacion` datetime NOT NULL,
 						`fecha_modificacion` datetime NOT NULL,
 						PRIMARY KEY (`id_solicitud_adelanto`)
-					  ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=1 ;";
+						) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=1 ;";
 
 			if (!ExisteCampo('id_solicitud_adelanto', 'documento', $dbh)) {
 				$query[] = "ALTER TABLE  `documento` ADD  `id_solicitud_adelanto` INT NULL COMMENT  'Hace referencia a la solicitud de adelanto que genero el adelanto, cuando el documento es_adelanto' AFTER  `es_adelanto`";
@@ -9371,7 +9371,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 				`fecha_modificacion` datetime NOT NULL,
 				PRIMARY KEY (`id`),
 				UNIQUE KEY `codigo` (`tipo`,`id_usuario`)
-			  ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT =  'Permite el manejo de distintos reportes excel con campos configurables' AUTO_INCREMENT =1;";
+				) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT =  'Permite el manejo de distintos reportes excel con campos configurables' AUTO_INCREMENT =1;";
 
 			ejecutar($query, $dbh);
 			break;
@@ -9626,27 +9626,27 @@ QUERY;
 								VALUES (2, 'lugar', 'Lugar') on duplicate key update glosa_tipo_dato='Lugar';";
 
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
+																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																group by  pdl.id_documento_legal)";
 
 			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
 								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
 								VALUES (2, 'giro_cliente', 'Giro') on duplicate key update glosa_tipo_dato='Giro';";
 
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
+																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																group by  pdl.id_documento_legal)";
 
 			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
 								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
 								VALUES (1, 'fecha_numero_mes', 'Fecha digito mes') on duplicate key update glosa_tipo_dato='Fecha digito mes';";
 
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
+																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+																from factura_pdf_tipo_datos td, prm_documento_legal pdl
+																group by  pdl.id_documento_legal)";
 
 			if (!ExisteCampo('giro_cliente', 'factura', $dbh)) {
 				$query[] = "ALTER TABLE  `factura` ADD  `giro_cliente` VARCHAR( 100 ) NULL AFTER  `ciudad_cliente`";
@@ -9765,7 +9765,7 @@ QUERY;
 
 			$queries[] = "UPDATE cta_corriente cc
 					INNER JOIN documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
-	 				INNER JOIN neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
+					INNER JOIN neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
 					SET cc.id_cobro=doc.id_cobro,
 						cc.id_neteo_documento=nd.id_neteo_documento,
 						cc.documento_pago=nd.id_documento_pago
@@ -9786,7 +9786,7 @@ QUERY;
 			$comentario = 'Esta opcion limita la generacion de codigos de cliente a solo 4 digitos';
 
 			$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
-                                            VALUES('MascaraCodigoCliente', 0, 'boolean','{$comentario}', 10, -1)";
+																						VALUES('MascaraCodigoCliente', 0, 'boolean','{$comentario}', 10, -1)";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -9799,10 +9799,10 @@ QUERY;
 		case 7.37:
 			$queries = array();
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_tipo_correo` (
-							  `id` int(11) NOT NULL AUTO_INCREMENT,
-							  `nombre` varchar(45) DEFAULT NULL,
-							  PRIMARY KEY (`id`),
-							  UNIQUE KEY `nombre` (`nombre`)
+								`id` int(11) NOT NULL AUTO_INCREMENT,
+								`nombre` varchar(45) DEFAULT NULL,
+								PRIMARY KEY (`id`),
+								UNIQUE KEY `nombre` (`nombre`)
 							) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;";
 
 			if (!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
@@ -9869,7 +9869,7 @@ QUERY;
 
 			if (!ExisteLlaveForanea('cliente_seguimiento', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh)) {
 				$queries[] = "ALTER TABLE `cliente_seguimiento`
-			  	ADD CONSTRAINT `cliente_seguimiento_ibfk_1` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`)";
+					ADD CONSTRAINT `cliente_seguimiento_ibfk_1` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`)";
 			}
 
 			if (!ExisteLlaveForanea('cliente_seguimiento', 'id_usuario', 'usuario', 'id_usuario', $dbh)) {
@@ -9955,7 +9955,87 @@ QUERY;
 		case 7.44:
 			$queries = array();
 			$queries[] = "ALTER TABLE `cobro_pendiente` CHANGE `monto_estimado` `monto_estimado` DOUBLE NOT NULL DEFAULT '0' ";
+			ejecutar($queries, $dbh);
+			break;
 
+		case 7.45:
+			$queries = array();
+
+			if (!ExisteCampo('id_estudio', 'prm_doc_legal_numero', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_doc_legal_numero`
+					ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1,
+					ADD KEY `id_estudio` (`id_estudio`),
+					DROP KEY `id_documento_legal_2`,
+					ADD KEY `id_documento_legal_2` (`id_documento_legal`, `serie`, `id_estudio`)";
+
+				$queries[] = "INSERT INTO prm_doc_legal_numero (id_documento_legal, numero_inicial, serie, id_estudio)
+					SELECT id_documento_legal, numero_inicial, serie, prm_estudio.id_estudio
+					  FROM prm_estudio
+					  JOIN prm_doc_legal_numero
+					 WHERE prm_estudio.id_estudio != 1
+					  ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+
+				$queries[] = "UPDATE prm_doc_legal_numero
+					  JOIN prm_documento_legal
+					    ON prm_doc_legal_numero.id_documento_legal = prm_documento_legal.id_documento_legal
+					  JOIN configuracion ON configuracion.valor_opcion = 0
+					   AND configuracion.glosa_opcion = 'NumeroFacturaConSerie'
+					   SET prm_doc_legal_numero.numero_inicial = prm_documento_legal.numero_inicial
+					 WHERE prm_doc_legal_numero.numero_inicial < prm_documento_legal.numero_inicial;";
+
+			}
+
+			if (!ExisteCampo('id_estudio', 'factura_pdf_datos', $dbh)) {
+				$queries[] = "ALTER TABLE `factura_pdf_datos` ADD COLUMN `id_estudio` SMALLINT(3) DEFAULT 1 AFTER `id_documento_legal`, ADD KEY `id_estudio` (`id_estudio`);";
+
+				$queries[] = "INSERT INTO factura_pdf_datos (id_tipo_dato, id_documento_legal, id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align)
+					SELECT id_tipo_dato, id_documento_legal, prm_estudio.id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align
+					  FROM factura_pdf_datos
+					  JOIN prm_estudio
+					 WHERE prm_estudio.id_estudio != 1
+					 ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.46:
+			$queries = array();
+
+			if (!ExisteCampo('dte_fecha_creacion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_creacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha creacion';";
+			}
+			if (!ExisteCampo('dte_firma', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_firma` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - Firma';";
+			}
+			if (!ExisteCampo('dte_xml', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_xml` TEXT NULL COMMENT 'Documento Tributario Electrónico - XML';";
+			}
+			if (!ExisteCampo('dte_url_pdf', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_url_pdf` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - URL PDF documento';";
+			}
+			if (!ExisteCampo('dte_fecha_anulacion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_anulacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha anulacion';";
+			}
+			if (!ExisteCampo('dte_metodo_pago', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago` INT(3)  NULL COMMENT 'Método de pago para facturar electronicamente, se cuelga de prm_codigo';";
+			}
+
+			$queries[] = "INSERT IGNORE INTO prm_codigo (grupo, codigo, glosa) VALUES
+							('PRM_FACTURA_MX_METOD', 'M01', 'Cheque'),
+							('PRM_FACTURA_MX_METOD', 'M02', 'Tarjeta de crédito'),
+							('PRM_FACTURA_MX_METOD', 'M03', 'Tarjeta de débito'),
+							('PRM_FACTURA_MX_METOD', 'M04', 'Depósito en cuenta'),
+							('PRM_FACTURA_MX_METOD', 'M05', 'Transferencia interbancaria'),
+							('PRM_FACTURA_MX_METOD', 'M06', 'No Identificado')";
+
+			ejecutar($queries, $dbh);
+			break;
+		case 7.47:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturar', 0, 'Alerta diaria de horas por facturar enviada a los profesionales', 'boolean', 3, -1);";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturarEncargadoComercial', 0, 'Alerta diaria de horas por facturar enviada al encargado comercial', 'boolean', 3, -1);";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturarEncargadoSecundario', 0, 'Alerta diaria de horas por facturar enviada al encargado secundario', 'boolean', 3, -1);";
 			ejecutar($queries, $dbh);
 			break;
 	}
@@ -9963,11 +10043,11 @@ QUERY;
 
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
-  (No olvidar agregar la notificacion de los cambios) */
+	(No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.44;
+$max_update = 7.47;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
@@ -10068,10 +10148,10 @@ MAIL;
 function GuardarVersion($versionFileName, $new_version, $sesion) {
 
 	mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (
-  `version` decimal(3,2) NOT NULL DEFAULT '0.00',
-  `version_ct` decimal(3,2) NOT NULL DEFAULT '0.00',
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`version`,`version_ct`)
+	`version` decimal(3,2) NOT NULL DEFAULT '0.00',
+	`version_ct` decimal(3,2) NOT NULL DEFAULT '0.00',
+	`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`version`,`version_ct`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
 	mysql_query("insert ignore INTO version_db (version) values (" . number_format($new_version, 2, '.', '') . ");", $sesion->dbh);
 	$data = '<?php	$VERSION = ' . number_format($new_version, 2, '.', '') . ' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';

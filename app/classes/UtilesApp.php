@@ -2,7 +2,7 @@
 
 //Clase UtilesApp
 require_once dirname(__FILE__) . '/../conf.php';
- 
+
 class UtilesApp extends Utiles {
 
 	/**
@@ -57,7 +57,7 @@ class UtilesApp extends Utiles {
 			} else {
 				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width  );
 			}
-			
+
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if ($oncambio=='') {
@@ -2237,7 +2237,7 @@ HTML;
 															 ( ".$id_usuario.", 'REP' ),
 															 ( ".$id_usuario.", 'REV' )";
 					return mysql_query($query,$sesion->dbh);
-}
+	}
 
 /**
  * Devuelve un botón para abrir el diálogo de historial de un elemento (factura, cobro, etc)
@@ -2246,11 +2246,36 @@ HTML;
  * @param int $id   el id del elemento. Esto no acepta código alfanumérico, tiene que ser el id de la tabla.
  */
 	public static function LogDialog($sesion,$elemento,$id) {
-			
+
 				if( $sesion->usuario->TienePermiso('SADM') ) {
-						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";	
+						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";
 				}
 
+	}
+
+	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
+		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
+
+		$s3 = new AmazonS3(array(
+			'key' => 'AKIAIQYFL5PYVQKORTBA',
+			'secret' => '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'
+		));
+		$bucket = S3_UPLOAD_BUCKET;
+
+		$name = SUBDOMAIN . $name;
+
+		$response = $s3->create_object($bucket, $name, array(
+			'body' => $file,
+			'acl' => AmazonS3::ACL_PUBLIC,
+			'contentType' => $contentType,
+			'headers' => array('content-disposition' => 'attachment')
+		));
+
+		if ($response->isOK()) {
+			return $s3->get_object_url($bucket, $name);
+		}
+
+		return "";
 	}
 
 }
