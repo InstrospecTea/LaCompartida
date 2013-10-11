@@ -13,20 +13,6 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	$DocumentoLegalNumero = new DocumentoLegalNumero($sesion);
 	$factura = new Factura($sesion);
 
-	if ($id_factura != "") {
-		$factura->Load($id_factura);
-		if (empty($codigo_cliente)) {
-			$codigo_cliente = $factura->fields['codigo_cliente'];
-		}
-		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-			$cliente_factura = new Cliente($sesion);
-			$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario($codigo_cliente);
-		}
-	}
-
-	if ($factura->loaded() && !$id_cobro) {
-		$id_cobro = $factura->fields['id_cobro'];
-	}
 	if ($id_cobro > 0) {
 		$cobro = new Cobro($sesion);
 		$cobro->load($id_cobro);
@@ -37,8 +23,19 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		$contrato->Load($id_contrato);
 	}
 
-	if ($factura->loaded() && !$codigo_cliente) {
-		$codigo_cliente = $factura->fields['codigo_cliente'];
+	if ($id_factura != "") {
+		$factura->Load($id_factura);
+		if (empty($codigo_cliente)) {
+			$codigo_cliente = $factura->fields['codigo_cliente'];
+		}
+	} else {
+		$codigo_cliente = $cobro->fields['codigo_cliente'];
+	}
+	$cliente = new Cliente($sesion);
+	$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
+
+	if ($factura->loaded() && !$id_cobro) {
+		$id_cobro = $factura->fields['id_cobro'];
 	}
 
 	if ($factura->loaded()) {
@@ -613,21 +610,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		<tr>
 			<td align=right><?php echo __('Cliente') ?></td>
 			<td align=left colspan=3>
-
-		<?php
-		$cliente = new Cliente($sesion);
-		if (!empty($factura->fields['codigo_cliente'])) {
-			$codigo_cliente = $factura->fields['codigo_cliente'];
-		} else {
-			$codigo_cliente = $cobro->fields['codigo_cliente'];
-		}
-		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
-		UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
-		?>
-
-				<span style="color:#FF0000; font-size:10px">*</span></td>
+				<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);?>
+			</td>
 		</tr>
-
 		<tr style="display:none;">
 			<td><?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?></td>
 		</tr>
@@ -938,7 +923,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		<?php } else { ?>
 			var id_origen = 'codigo_cliente';
 		<?php } ?>
-
 		var accion = 'cargar_datos_contrato';
 		var id_contrato = "<?php echo $id_contrato; ?>";
 		var select_origen = document.getElementById(id_origen);
@@ -965,7 +949,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		} else { ?>
 			var descripcion = document.getElementById('descripcion');
 		<?php } ?>
-
 		var http = getXMLHTTP();
 		var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value + '&id_contrato=' + id_contrato;
 
@@ -987,7 +970,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 											rut.value = '';
 											direccion_cliente.value = '';
 											cliente.value = '';
-
 											select_destino.options.length = 1;
 											offLoading();
 											alert('No existen <?php echo __('cobros'); ?> para este cliente.');
