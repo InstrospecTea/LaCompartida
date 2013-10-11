@@ -476,8 +476,9 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_giro,
 											contrato.factura_codigopostal
 										FROM contrato
-											JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
-										WHERE cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}'
+											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
+										WHERE (cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}')
+											AND contrato.id_contrato = {$id_contrato}
 										LIMIT 1";
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
