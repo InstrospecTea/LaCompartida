@@ -9974,6 +9974,15 @@ QUERY;
 					  JOIN prm_doc_legal_numero
 					 WHERE prm_estudio.id_estudio != 1
 					  ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+
+				$queries[] = "UPDATE prm_doc_legal_numero
+					  JOIN prm_documento_legal
+					    ON prm_doc_legal_numero.id_documento_legal = prm_documento_legal.id_documento_legal
+					  JOIN configuracion ON configuracion.valor_opcion = 0
+					   AND configuracion.glosa_opcion = 'NumeroFacturaConSerie'
+					   SET prm_doc_legal_numero.numero_inicial = prm_documento_legal.numero_inicial
+					 WHERE prm_doc_legal_numero.numero_inicial < prm_documento_legal.numero_inicial;";
+
 			}
 
 			if (!ExisteCampo('id_estudio', 'factura_pdf_datos', $dbh)) {
