@@ -917,7 +917,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 	?>
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
-	function CargarDatosCliente() {
+	function CargarDatosCliente(sin_contrato) {
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var id_origen = 'codigo_cliente_secundario';
 		<?php } else { ?>
@@ -950,7 +950,12 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			var descripcion = document.getElementById('descripcion');
 		<?php } ?>
 		var http = getXMLHTTP();
-		var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value + '&id_contrato=' + id_contrato;
+		console.log(select_origen.value);
+		var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value;
+		if (!sin_contrato) {
+			url += '&id_contrato=' + id_contrato;
+		}
+		console.log(url);
 
 							http.open('get', url, true);
 							http.onreadystatechange = function()
@@ -1647,7 +1652,7 @@ if (Conf::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 		});
 
 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
-			CargarDatosCliente();
+			CargarDatosCliente(1);
 		});
 
 		if (cantidad_decimales != -1) {
