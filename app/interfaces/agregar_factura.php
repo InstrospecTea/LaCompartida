@@ -118,6 +118,7 @@ if ($opcion == "guardar") {
 				$pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA. (' . $monto_gastos_sin_iva . ')'));
 			}
 		}
+		($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_validar_factura') : false;
 		$errores = $pagina->GetErrors();
 	}
 

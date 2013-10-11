@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 $Slim = Slim::getInstance('default', true);
 $Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_factura_metodo_pago', 'InsertaMetodoPago');
+$Slim->hook('hook_validar_factura', 'ValidarFactura');
 $Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
 
 $Slim->hook('hook_cobros7_botones_after',  function($hookArg) {
@@ -21,6 +22,22 @@ $Slim->hook('hook_genera_factura_electronica', function($hookArg) {
 $Slim->hook('hook_anula_factura_electronica', function($hookArg) {
 	return AnulaFacturaElectronica($hookArg);
 });
+
+function ValidarFactura() {
+	global $factura, $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago;
+	if (empty($RUT_cliente)) {
+		$pagina->AddError(__('Debe ingresar RFC del cliente.'));
+	}
+	if (empty($direccion_cliente)) {
+		$pagina->AddError(__('Debe ingresar Dirección del cliente.'));
+	}
+	if (empty($ciudad_cliente)) {
+		$pagina->AddError(__('Debe ingresar Ciudad del cliente.'));
+	}
+	if (empty($dte_metodo_pago)) {
+		$pagina->AddError(__('Debe seleccionar el Método de Pago.'));
+	}
+}
 
 function InsertaMetodoPago() {
 	global $factura;
@@ -237,19 +254,28 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'rfc|' . $Factura->fields['RUT_cliente'],
 			'nombre|' . utf8_encode($Factura->fields['cliente'])
 		),
-		'DOR' => array(
-			'calle|' . utf8_encode($Factura->fields['direccion_cliente']),
-			'colonia|' . utf8_encode($Factura->fields['comuna_cliente']),
-			'municipio|' . utf8_encode($Factura->fields['comuna_cliente']),
-			'pais|' . utf8_encode($Factura->fields['ciudad_cliente']),
-			'codigoPostal|' . $Factura->fields['factura_codigopostal'],
-		),
 		'TRA' => array(
 			'impuesto|IVA',
 			'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['iva'], 2, '.', '')
 		)
 	);
+
+	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
+		$r['DOR'][] = 'calle|' . utf8_encode($Factura->fields['direccion_cliente']);
+	}
+	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
+		$r['DOR'][] = 'colonia|' . utf8_encode($Factura->fields['comuna_cliente']);
+	}
+	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
+		$r['DOR'][] = 'municipio|' . utf8_encode($Factura->fields['comuna_cliente']);
+	}
+	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
+		$r['DOR'][] = 'pais|' . utf8_encode($Factura->fields['ciudad_cliente']);
+	}
+	if (!is_null($Factura->fields['factura_codigopostal']) && !empty($Factura->fields['factura_codigopostal'])) {
+		$r['DOR'][] = 'codigoPostal|' . utf8_encode($Factura->fields['factura_codigopostal']);
+	}
 
 	if ($Factura->fields['subtotal'] > 0) {
 		$r['CON_honorarios'] = array(
