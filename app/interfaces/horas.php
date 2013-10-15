@@ -97,9 +97,5 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	}
 }
 
-
-
-
 echo "<iframe name='trabajos' class='resizableframe'  id='trabajos' src='" . $url_iframe . "' frameborder=0 width=100% height=2000px></iframe>";
 $pagina->PrintBottom();
-
