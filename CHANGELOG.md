@@ -2,7 +2,7 @@
 ## Hotfix: 13.6.2
 Martes 15 de Octubre 2013
 
-* **Fixed:** [](https://github.com/LemontechSA/ttb/pull/)
+* **Fixed:** [Corregir edición campo duración al agregar o modificar un trámite](https://github.com/LemontechSA/ttb/pull/314)
 
 ## Hotfix: 13.6.1
 Martes 15 de Octubre 2013
