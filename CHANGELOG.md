@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix: 13.6.2
+Martes 15 de Octubre 2013
+
+* **Fixed:** [](https://github.com/LemontechSA/ttb/pull/)
+
 ## Hotfix: 13.6.1
 Martes 15 de Octubre 2013
 
