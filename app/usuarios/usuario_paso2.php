@@ -47,7 +47,7 @@ switch ($opc) {
 			$datos['password'] = md5($new_password);
 		}
 
-		$guardado = $usuario->Guardar($datos, $pagina);
+		$guardado = $usuario->Guardar($datos, $pagina, $validaciones_segun_config);
 		$errores = $pagina->GetErrors();
 		if (empty($errores)) {
 			if ($guardado) {

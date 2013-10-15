@@ -813,8 +813,7 @@ class UsuarioExt extends Usuario {
 					WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
 	}
 
-	public function Guardar($datos, &$pagina = null) {
-		$validaciones_segun_config = Conf::GetConf($this->sesion, 'ValidacionesCliente');
+	public function Guardar($datos, &$pagina = null, $validaciones_segun_config = false) {
 		$arr1 = $this->fields;
 
 		foreach ($datos as $key => $value) {
@@ -822,7 +821,7 @@ class UsuarioExt extends Usuario {
 		}
 
 		//Compara y guarda cambios en los datos del Usuario
-		if (!is_null($pagina)) {
+		if (!is_null($pagina) && $validaciones_segun_config) {
 			$this->Validaciones($arr1, $pagina, $validaciones_segun_config);
 			if ($pagina->GetErrors()) {
 				return false;
