@@ -248,10 +248,15 @@
 		$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_numero_cobro+2);
 		$filas +=2;
 		$ws1->write($filas, $col_numero_cobro, __('GENERADO EL:'), $txt_opcion);
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
-			$ws1->write($filas, $col_nota_cobro, date("d-m-Y H:i:s"), $txt_opcion);
-		else
-			$ws1->write($filas, $col_factura, date("d-m-Y H:i:s"), $txt_opcion);
+		
+		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) ) {
+			//$ws1->write($filas, $col_nota_cobro, date("d-m-Y H:i:s"), $txt_opcion);
+			$ws1->write($filas, $col_factura, $filas, $txt_opcion);
+		} else {
+			//$ws1->write($filas, $col_factura, date("d-m-Y H:i:s"), $txt_opcion);
+			$ws1->write($filas, $col_factura, $filas, $txt_opcion);
+		}
+			
 
 		$where = "1";
 		if(is_array($socios))
@@ -735,7 +740,7 @@
 			}
 			else
 			{
-				$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $fecha);
+				$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $factura);
 			}
 			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2fecha($cobro['fecha_creacion'], $formato_fecha, '-'), $fecha);
 			$ws1->write($filas, $col_grupo_cliente, $cobro['glosa_grupo_cliente'], $txt_opcion);
@@ -926,7 +931,7 @@ $hoy = date("Y-m-d");
 			<?php echo Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda ASC","monedas[]", $monedas, "class=\"selectMultiple\" multiple size=3 ","","160"); ?>
 		</td>
 		<td align=right><b><?php echo __('Fecha de') ?>:&nbsp;</b></td><td align=left>
-		<select name='estado' id='estado' style='width: 120px;'>
+		<select name='estado' id='estado' style='width: 148px;'>
 			<option value='CORTE'>CORTE</option>
 			<option value='CREADO'>CREADO</option>
 			<option value='EN REVISION'>EN REVISION</option>
@@ -950,7 +955,7 @@ $hoy = date("Y-m-d");
 			$fecha_mes = date('m');
 ?>
 			<div id=periodo style='display:<?php echo !$rango ? 'inline' : 'none' ?>;'>
-				<select name="fecha_mes" style='width:60px'>
+				<select name="fecha_mes" style='width:89px'>
 					<option value='1' <?php echo $fecha_mes==1 ? 'selected':'' ?>><?php echo __('Enero') ?></option>
 					<option value='2' <?php echo $fecha_mes==2 ? 'selected':'' ?>><?php echo __('Febrero') ?></option>
 					<option value='3' <?php echo $fecha_mes==3 ? 'selected':'' ?>><?php echo __('Marzo') ?></option>

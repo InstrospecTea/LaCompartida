@@ -322,7 +322,7 @@ class Factura extends Objeto {
 		}
 		return false;
 	}
-	
+
 	function ObtenerValorReal($id_factura) {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
 					FROM cta_cte_fact_mvto ccfm
@@ -405,6 +405,17 @@ class Factura extends Objeto {
 		return $saldo;
 	}
 
+	function FacturaElectronicaCreada() {
+		return !is_null($this->fields['dte_fecha_creacion']);
+	}
+
+	function FacturaElectronicaAnulada() {
+		return !is_null($this->fields['dte_fecha_anulacion']);
+	}
+
+	function Anulada() {
+		return ($this->fields['anulado'] == 1);
+	}
 
 	function Escribir() {
 		if (!$this->Id()) {
@@ -431,53 +442,6 @@ class Factura extends Objeto {
 			return false;
 		}
 	}
-
-	/* function ComparaGastos() {
-	  $factura_subtotal_gastos = 0;
-	  $factura_subtotal_gastos_sin_impuesto = 0;
-	  $documento_subtotal_gastos = 0;
-	  $documento_subtotal_gastos_sin_impuesto = 0;
-
-	  $query = "SELECT subtotal_gastos, subtotal_gastos_sin_impuesto FROM factura
-	  WHERE id_cobro = " . $this->fields['id_cobro'] . "
-	  AND ( subtotal_gastos > 0 OR subtotal_gastos_sin_impuesto > 0 ) ";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	  list( $factura_subtotal_gastos, $factura_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp);
-
-	  $query = "SELECT subtotal_gastos, subtotal_gastos_sin_impuesto FROM documento
-	  WHERE id_cobro = " . $this->fields['id_cobro'] . "
-	  AND ( subtotal_gastos > 0 OR subtotal_gastos_sin_impuesto > 0 ) ";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	  list( $documento_subtotal_gastos, $documento_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp);
-
-	  if ($factura_subtotal_gastos != $documento_subtotal_gastos || $factura_subtotal_gastos_sin_impuesto != $documento_subtotal_gastos_sin_impuesto) {
-	  return false;
-	  }
-	  return true;
-	  }
-
-	  function GastosAsociaCobro() {
-	  $query = "SELECT id_movimiento FROM cta_corriente WHERE id_cobro = " . $this->fields['id_cobro'] . "";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-	  $gasto = new Gasto($this->sesion);
-	  while (list($id_movimiento) = mysql_fetch_array($resp)) {
-	  $gasto->Load($id_movimiento);
-
-	  if ($this->fields['id_estado'] == 5) {
-	  $gasto->Edit('id_factura', "NULL");
-	  $gasto->Edit('fecha_factura', "NULL");
-	  } else {
-	  $gasto->Edit('id_factura', $this->fields['id_factura']);
-	  $gasto->Edit('fecha_factura', $this->fields['fecha']);
-	  }
-	  if (!$gasto->Write()) {
-	  //return false;
-	  }
-	  }
-
-	  return true;
-	  } */
 
 	function PrimerTipoDocumentoLegal() {
 		$query = "SELECT id_documento_legal FROM prm_documento_legal ORDER BY id_documento_legal ASC LIMIT 1";
@@ -1485,69 +1449,36 @@ class Factura extends Objeto {
 
 	function ObtieneNumeroDocumentoLegal($tipo_documento_legal) {
 		return $this->ObtenerNumeroDocLegal($tipo_documento_legal);
-
-		/*EL RESTO ESTA DEPRECATED*/
-		/*$min_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionDesde');
-		$max_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionHasta');
-
-		$where_max = " 1 ";
-		if ($max_numero_factura > 0) {
-			$where_max .= " AND numero <= " . $max_numero_factura;
-		}
-		if ($tipo_documento_legal > 0) {
-			$where_max .= " AND f.id_documento_legal = " . $tipo_documento_legal;
-		}
-
-		$query = "SELECT IF(MAX(f.numero)>pdl.numero_inicial,MAX(f.numero),pdl.numero_inicial) as numero_actual
-					FROM factura f
-					LEFT JOIN prm_documento_legal pdl on pdl.id_documento_legal = f.id_documento_legal
-					WHERE $where_max";
-
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($max_numero_documento) = mysql_fetch_array($resp);
-
-		if ($max_numero_documento < $min_numero_factura) {
-			return $min_numero_factura;
-		} else {
-			return $max_numero_documento + 1;
-		}*/
 	}
 
-	function ObtenerNumeroDocLegal($tipo_documento_legal, $serie = null) {
-
-		if (empty($tipo_documento_legal)) {
+	function ObtenerNumeroDocLegal($tipo_documento_legal, $serie, $id_estudio) {
+		if (empty($tipo_documento_legal) || empty($serie) || empty($id_estudio)) {
 			return false;
 		}
 
-		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
-			$query = "SELECT numero_inicial FROM prm_doc_legal_numero WHERE id_documento_legal = " . $tipo_documento_legal . " AND serie = '" . $serie . "'";
-		} else {
-			$query = "SELECT numero_inicial FROM prm_documento_legal WHERE id_documento_legal = " . $tipo_documento_legal;
-		}
-
+		$query = "SELECT numero_inicial FROM prm_doc_legal_numero WHERE id_documento_legal = '{$tipo_documento_legal}' AND serie = '{$serie}' AND id_estudio = '{$id_estudio}'";
 		$numero_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($numero) = mysql_fetch_array($numero_resp);
+
 		return $numero;
 	}
 
-	function ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie) {
-		if (empty($tipo_documento_legal) or empty($numero)) {
+	function ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie, $id_estudio) {
+		if (empty($tipo_documento_legal) || empty($numero) || empty($serie) || empty($id_estudio)) {
 			return false;
 		}
 
-		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
-			$query = "SELECT COUNT(*) FROM factura WHERE numero = '" . $numero . "' AND id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . (int) $serie . "'";
-		} else {
-			$query = "SELECT COUNT(*) FROM factura WHERE numero = '" . $numero . "' AND id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . Conf::GetConf($this->sesion, 'SerieDocumentosLegales') . "'";
-		}
+		$serie = (int) $serie;
+		$query = "SELECT COUNT(*) FROM factura WHERE numero = '$numero' AND id_documento_legal = '$tipo_documento_legal' AND serie_documento_legal = '$serie' AND id_estudio = '{$id_estudio}'";
 		$cantidad_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cantidad) = mysql_fetch_array($cantidad_resp);
+
 		return $cantidad > 0;
 	}
 
 	function ValidarDocLegal() {
 		if (empty($this->fields['id_factura'])) {
-			if ($this->ExisteNumeroDocLegal($this->fields['id_documento_legal'], $this->fields['numero'], $this->fields['serie_documento_legal'])) {
+			if ($this->ExisteNumeroDocLegal($this->fields['id_documento_legal'], $this->fields['numero'], $this->fields['serie_documento_legal'], $this->fields['id_estudio'])) {
 				return false;
 			}
 		}
@@ -1590,13 +1521,12 @@ class Factura extends Objeto {
 		return new ListaFacturaPago($this->sesion, null, $query);
 	}
 
-	function MaxNumeroDocLegal($tipo_documento_legal, $serie = null) {
-		if (empty($tipo_documento_legal)) {
+	function MaxNumeroDocLegal($tipo_documento_legal, $serie, $id_estudio) {
+		if (empty($tipo_documento_legal) || empty($serie)) {
 			return false;
 		}
-		$serie = UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') && !empty($serie) ? (int)$serie : Conf::GetConf($this->sesion, 'SerieDocumentosLegales');
-		$query = "SELECT MAX(numero+0) as numero_actual FROM factura
-			WHERE id_documento_legal = '$tipo_documento_legal' AND (numero+0) < {$this->max_numero} AND serie_documento_legal = '$serie'";
+
+		$query = "SELECT MAX(numero+0) as numero_actual FROM factura WHERE id_documento_legal = '$tipo_documento_legal' AND (numero+0) < {$this->max_numero} AND serie_documento_legal = '$serie' AND id_estudio = '{$id_estudio}'";
 		$numero_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($numero_max) = mysql_fetch_array($numero_resp);
 		return $numero_max;
@@ -1611,24 +1541,20 @@ class Factura extends Objeto {
 		return $numero_max;
 	}
 
-	function GuardarNumeroDocLegal($tipo_documento_legal, $numero, $serie = null) {
+	function GuardarNumeroDocLegal($tipo_documento_legal, $numero, $serie, $id_estudio) {
 		//si el "numero" no es un int32 lo ignoro para efectos del numero siguiente
-		if (empty($tipo_documento_legal) || empty($numero) || !is_numeric($numero) || $numero >= $this->max_numero) {
+		if (empty($tipo_documento_legal) || (empty($numero) || !is_numeric($numero) || $numero >= $this->max_numero) || empty($serie) || empty($id_estudio)) {
 			return false;
 		}
 
 		$numero += 1;
-		if ($this->ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie) || UtilesApp::GetConf($this->sesion, 'InformarContabilidad')) {
-			$numero = $this->MaxNumeroDocLegal($tipo_documento_legal, $serie) + 1;
+		if ($this->ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie, $id_estudio) || Conf::GetConf($this->sesion, 'InformarContabilidad')) {
+			$numero = $this->MaxNumeroDocLegal($tipo_documento_legal, $serie, $id_estudio) + 1;
 		}
 
-		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
-			$query = "UPDATE prm_doc_legal_numero SET numero_inicial = " . $numero . " WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie = '" . $serie . "'";
-			$respuesta = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		} else {
-			$query = "UPDATE prm_documento_legal SET numero_inicial = $numero WHERE id_documento_legal = '" . $tipo_documento_legal . "'";
-			$respuesta = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		}
+		$query = "UPDATE prm_doc_legal_numero SET numero_inicial = $numero WHERE id_documento_legal = '{$tipo_documento_legal}' AND serie = '{$serie}' AND id_estudio = '{$id_estudio}'";
+		$respuesta = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
 		return true;
 	}
 
@@ -1783,7 +1709,7 @@ class Factura extends Objeto {
 		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
-		
+
 		// if ($orden == "") {
 		// 	$orden = "factura.fecha DESC";
 		// 	$orderby = " ORDER BY $orden ";
@@ -1908,7 +1834,7 @@ class Factura extends Objeto {
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
-						GROUP BY ccfm2.id_factura 
+						GROUP BY ccfm2.id_factura
 			  	) AS pagos";
 			}
 
@@ -1920,7 +1846,7 @@ class Factura extends Objeto {
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
-						GROUP BY ccfm2.id_factura 
+						GROUP BY ccfm2.id_factura
 			  	) AS fecha_ultimo_pago";
 			}
 
@@ -1995,8 +1921,6 @@ class Factura extends Objeto {
 
  		return $formato;
 	}
-
-
 
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
@@ -2170,10 +2094,8 @@ class Factura extends Objeto {
 #end Class
 if(!class_exists('ListaFacturas')) {
 	class ListaFacturas extends Lista {
-
 		function ListaFacturas($sesion, $params, $query) {
 			$this->Lista($sesion, 'Factura', $params, $query);
 		}
-
 	}
 }

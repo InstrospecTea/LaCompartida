@@ -64,6 +64,7 @@ $_LANG['TASA'] = "TARIFA HORARIA";
 $_LANG['Tasa Horas Hombres'] = "Tasa Horas Hombres";
 $_LANG['FLAT FEE'] = "SUMA FIJA";
 $_LANG['Total Horas'] = "Total Horas";
+$_LANG['total_horas'] = "Total Horas";
 $_LANG['Cobro'] = "Cobro";
 $_LANG['Fecha desde'] = "Fecha desde";
 $_LANG['Fecha hasta'] = "Fecha hasta";
@@ -350,6 +351,7 @@ $_LANG['Detalle del Trabajo Realizado'] = "Detalle del Trabajo Realizado";
 $_LANG['Abogado'] = "Abogado";
 $_LANG['Total Nota de Cobro'] = "Total Nota de Cobro";
 $_LANG['Total Cobro'] = "Total Cobro";
+$_LANG['total_cobro'] = "Total Cobro";
 $_LANG['TELEFAX'] = "TELEFAX";
 $_LANG['TELÉFONO'] = "TELÉFONO";
 $_LANG['Teléfono y Fax'] = "Teléfono y Fax";
@@ -812,6 +814,8 @@ $_LANG['Sra.'] = "Señora";
 $_LANG['Srta.'] = "Señorita";
 $_LANG['según Boleta de Honorarios adjunta'] = "según Boleta de Honorarios adjunta";
 $_LANG['por concepto de honorarios'] = "por concepto de honorarios";
+$_LANG['por_concepto_de_honorarios'] = "por concepto de honorarios";
+$_LANG['por_concepto_de_gastos'] = "por concepto de gastos";
 $_LANG['; más'] = "; más";
 $_LANG['por gastos a reembolsar'] = "por gastos a reembolsar";
 $_LANG[', según Boleta de Recuperación de Gastos adjunta'] = ", según Boleta de Recuperación de Gastos adjunta";
@@ -1031,6 +1035,7 @@ $_LANG['MonedaTotalPorDefecto'] = "Moneda total por defecto";
 $_LANG['UsarGastosConSinImpuesto'] = "Usar conceptos gastos con/sin impuestos";
 $_LANG['UsarGastosCobrable'] = "Permitir a diferenciar entre gastos cobrables y no cobrables";
 $_LANG['AlertaRevisor'] = "Mandar resumen de horas trabajadas a los revisores";
+$_LANG['resumen_asunto']= "Resumen Asuntos";
 
 /*Mantención Tabla fw*/
 // prm_banco
@@ -1119,3 +1124,8 @@ $_LANG["The matter doesn't exist"] = "El Asunto no existe";
 $_LANG["You can not enter hours prior to"] = "No puede ingresar horas anteriores al";
 $_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %HOURS horas de un mínimo de %MINIMUM";
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+
+$_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+$_LANG["SaveGeneratedInvoiceError"] = "Error guardar la factura electrónica";
+$_LANG["SaveCanceledInvoiceError"] = "Error al guardar el estado de la Factura electrónica anulada";
+$_LANG["CancelGeneratedInvoiceError"] = "Error anular la factura electrónica";

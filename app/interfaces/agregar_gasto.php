@@ -711,7 +711,7 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 					<?php echo __('Ordenado por') ?>
 				</td>
 				<td align=left>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -721,7 +721,7 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 			</td>
 			<td align=left>
 				<!-- $sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150' -->
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
 			</td>
 		</tr>
 	</table>

@@ -18,7 +18,7 @@ class PrmEstudio extends Objeto
 	 * @param Sesion $Sesion
 	 * @param integer $id_estudio
 	 * @param boolean $como_objeto
-	 * @return array Arreglo con monedas para ser usados en Selects
+	 * @return array Arreglo con estudios :)
 	 */
 	public static function GetEstudios(Sesion $Sesion, $id_estudio = '', $como_objeto = false, $mostrar_todos = false) {
 		$query = "SELECT
@@ -54,6 +54,25 @@ class PrmEstudio extends Objeto
 		}
 
 		return $estudios;
+	}
+
+	/**
+	 * Obtiene la metadata asociada a una key existente en el JSON
+	 *
+	 * @param string $key
+	 * @return array Arreglo asociativo o String dependiendo del contenido
+	 * de la key
+	 */
+	public function GetMetaData($key) {
+		$metadata = $this->fields['metadata_estudio'];
+		$data = null;
+		if (!is_null($metadata)) {
+			$all_data = json_decode(utf8_encode($metadata), true);
+			if (isset($all_data[$key]) && !is_null($all_data[$key])) {
+				$data = $all_data[$key];
+			}
+		}
+		return $data;
 	}
 
 }
