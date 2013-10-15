@@ -2,7 +2,7 @@
 ## Hotfix: 13.6.1
 Martes 15 de Octubre 2013
 
-* **Fixed:** [Problemas en interfaz agregar factura](https://github.com/LemontechSA/ttb/pull/305)
+* **Fixed:** [Problemas en interfaz agregar factura](https://github.com/LemontechSA/ttb/pull/313)
 
 ## Release: 13.6.0
 Jueves 10 de Octubre 2013
