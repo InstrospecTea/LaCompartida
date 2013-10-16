@@ -1,8 +1,23 @@
 # Changelog
+## Release: 13.6.0
+Jueves 10 de Octubre 2013
+
+* **Feature:** [MultiCompañia](https://github.com/LemontechSA/ttb/pull/304)
+* **Feature:** [Alerta nota de crédito](https://github.com/LemontechSA/ttb/pull/294)
+* **Feature:** [Alerta horas por facturar](https://github.com/LemontechSA/ttb/pull/286)
+* **Feature:** [Facturacion electronica MX](https://github.com/LemontechSA/ttb/pull/259)
+
+## Hotfix: 13.5.14
+Lunes 07 de octubre 2013
+* **Fixed:** [Corrige el problema de fechas en excel de cobros](https://github.com/LemontechSA/ttb/pull/309)
+
+## Hotfix: 13.5.14
+Viernes 04 de octubre 2013
+* **Fixed:** [Corrige el problema con OrdenarPorCategoria para los encabezados de TRABAJO_ENCABEZADO de GenerarDocumento2](https://github.com/LemontechSA/ttb/pull/308)
+
 ## Hotfix: 13.5.13
 jueves 03 de octubre 2013
 * **Fixed:** [cabia ruta tmp para backups](https://github.com/LemontechSA/ttb/pull/307)
-
 
 # Hotfix: 13.5.12
 Lunes 01 de Octubre 2013

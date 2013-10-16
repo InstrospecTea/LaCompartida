@@ -16,6 +16,8 @@ class NotaCobro extends Cobro {
 	var $carta_id = 'id_formato';
 	var $carta_formato = 'cobro_template';
 
+	var $siguiente = array();
+
 	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro";
 		$this->campo_id = "id_cobro";
@@ -4931,29 +4933,42 @@ class NotaCobro extends Cobro {
 				}
 
 				if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
-					$query = "SELECT cat.glosa_categoria
-									FROM trabajo
-									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
-									WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-									AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-									AND trabajo.visible=1
-									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
-									LIMIT 1";
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($categoria) = mysql_fetch_array($resp);
+					if (!empty($this->siguiente['categoria_abogado'])) {
+						$categoria = $this->siguiente['categoria_abogado'];
+						unset($this->siguiente['categoria_abogado']);
+					} else {
+						$query = "SELECT cat.glosa_categoria
+										FROM trabajo
+										JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+										JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
+										WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
+										AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+										AND trabajo.visible=1
+										ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
+										LIMIT 1";
+						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+						list($categoria) = mysql_fetch_array($resp);
+					}
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
 				} else if (UtilesApp::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$query = "SELECT CONCAT(usuario.nombre,' ',usuario.apellido1),trabajo.tarifa_hh
-									FROM trabajo
-									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-									WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-									AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-									AND trabajo.visible=1
-									ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
-									LIMIT 1";
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($abogado, $tarifa) = mysql_fetch_array($resp);
+					if (!empty($this->siguiente['nombre_usuario'])) {
+						$abogado = $this->siguiente['nombre_usuario'];
+						$tarifa = $this->siguiente['tarifa_usuario'];
+
+						unset($this->siguiente['nombre_usuario']);
+						unset($this->siguiente['tarifa_usuario']);
+					} else {
+						$query = "SELECT CONCAT(usuario.nombre,' ',usuario.apellido1),trabajo.tarifa_hh
+										FROM trabajo
+										JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+										WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
+										AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+										AND trabajo.visible=1
+										ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
+										LIMIT 1";
+						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+						list($abogado, $tarifa) = mysql_fetch_array($resp);
+					}
 					$html = str_replace('%categoria_abogado%', __($abogado), $html);
 					$html = str_replace('%tarifa%', $moneda->fields['simbolo'] . $espacio_conf . number_format($tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				} else {
@@ -5440,6 +5455,8 @@ class NotaCobro extends Cobro {
 
 								$total_trabajos_categoria .= $html3;
 
+								// Permite a TRABAJOS_ENCABEZADO poner la categoría correcta reutilizando la lógica
+								$this->siguiente['categoria_abogado'] = $trabajo_siguiente->fields['categoria'];
 								$encabezado_trabajos_categoria .= $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
@@ -5536,6 +5553,9 @@ class NotaCobro extends Cobro {
 
 								$total_trabajos_categoria .= $html3;
 
+								// Permite a TRABAJOS_ENCABEZADO poner el nombre correcto reutilizando la lógica
+								$this->siguiente['nombre_usuario'] = $trabajo_siguiente->fields['nombre_usuario'];
+								$this->siguiente['tarifa_usuario'] = $trabajo_siguiente->fields['tarifa_hh'];
 								$encabezado_trabajos_categoria .= $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
