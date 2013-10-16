@@ -256,11 +256,13 @@ if ($accion == "consistencia_cliente_asunto") {
 		$cont++;
 	}
 	echo $respuesta;
-} else if ($accion == "set_duracion_defecto") {
-	$query = "SELECT duracion_defecto, trabajo_si_no_defecto FROM tramite_tipo WHERE id_tramite_tipo=" . $id;
+} else if ($accion == 'set_duracion_defecto') {
+	$query = "SELECT duracion_defecto, trabajo_si_no_defecto FROM tramite_tipo WHERE id_tramite_tipo = '{$id}'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($duracion, $como_trabajo) = mysql_fetch_array($resp);
-
+	if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
+		$duracion = UtilesApp::Time2Decimal($duracion);
+	}
 	echo $duracion . '-' . $como_trabajo;
 } else if ($accion == "actualizar_trabajo") {
 	if ($valor == "") {
@@ -481,7 +483,7 @@ if ($accion == "consistencia_cliente_asunto") {
 	if (!empty($id_contrato)) {
 		$query_contrato .= " AND contrato.id_contrato = {$id_contrato}";
 	}
-	
+
 	$query_contrato .= " LIMIT 1";
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
