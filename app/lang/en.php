@@ -616,7 +616,7 @@ $_LANG['%detalle_mb%'] = "Enclosed please find our Invoice #%num_letter% in the 
 $_LANG['%detalle_mb_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%cuenta_mb%'] = "";
 #Carta MB NY (NY)
-$_LANG['%detalle_mb_ny%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matter %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
+$_LANG['%detalle_mb_ny%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_total_espacio%</b> for services rendered %si_gastos% in connection with the above captioned matter %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%detalle_mb_ny_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% in connection with the above captioned matters %fecha%. Please contact me with any questions or comments in this regard. To make payment, you may transfer the funds to:<br><br>";
 $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
                                 <tr><td width='35%'>Intermediary Bank:</td><td width='65%'>HSBC Bank USA NA</td></tr>
