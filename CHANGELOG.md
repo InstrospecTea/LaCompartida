@@ -1,5 +1,10 @@
 # Changelog
 ## Hotfix: 13.6.2
+Jueves 17 de Octubre 2013
+
+* **Fixed:** [Error en JS al agregar un trámite en IE9](https://github.com/LemontechSA/ttb/pull/)
+
+## Hotfix: 13.6.2
 Martes 15 de Octubre 2013
 
 * **Fixed:** [Corregir edición campo duración al agregar o modificar un trámite](https://github.com/LemontechSA/ttb/pull/314)
