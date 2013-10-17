@@ -72,6 +72,7 @@ $_LANG['Total Horas'] = "Total Hours";
 $_LANG['total_horas'] = "Hours";
 $_LANG['Total horas:'] = "Total Hours:";
 $_LANG['Cobro'] = "Invoice";
+$_LANG['Desde'] = "From";
 $_LANG['Fecha desde'] = "From";
 $_LANG['Fecha desde:'] = "From:";
 $_LANG['Fecha hasta'] = "To";
