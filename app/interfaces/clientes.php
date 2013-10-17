@@ -142,7 +142,7 @@ echo Autocompletador::Javascript($sesion,false);
 								<?php echo  Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "giro", $giro, "", "Cualquiera")  ?>
 							</td>
 						</tr>
-				<?php } ?>
+					<?php } ?>
 						<tr>
 							<td align="right" class="cvs">
 								<?php echo __('Fecha Desde')?>
