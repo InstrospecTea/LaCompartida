@@ -23,18 +23,20 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		$contrato->Load($id_contrato);
 	}
 
-	if ($id_factura != "") {
+	if (!empty($id_factura)) {
 		$factura->Load($id_factura);
 		if (empty($codigo_cliente)) {
 			$codigo_cliente = $factura->fields['codigo_cliente'];
 		}
 	} else {
-		$codigo_cliente = $cobro->fields['codigo_cliente'];
+		if (empty($codigo_cliente)) {
+			$codigo_cliente = $cobro->fields['codigo_cliente'];
+		}
 	}
-	
-	if ($opcion != 'guardar') {
-		$cliente = new Cliente($sesion);
-		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);		
+
+	if (!empty($codigo_cliente) && empty($codigo_cliente_secundario)) {
+		$Cliente = new Cliente($sesion);
+		$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
 	}
 
 	if ($factura->loaded() && !$id_cobro) {
@@ -1302,7 +1304,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					return false;
 				}
 			}
-			
+
 		<?php } ?>
 
 			if (UsarGastosConSinImpuesto == '1') {
@@ -1483,7 +1485,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		if (intlargo.length > 0) {
 			crut = o.value
 			largo = crut.length;
-			
+
 			if (largo < 2) {
 				alert('<?php echo __("Rut inválido") ?>');
 				o.focus();
@@ -1527,7 +1529,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			}
 
 			res = suma % 11;
-			
+
 			if (res == 1) {
 				dvr = 'k';
 			} else if (res == 0) {

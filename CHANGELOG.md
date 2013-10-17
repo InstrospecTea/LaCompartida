@@ -1,8 +1,9 @@
 # Changelog
-## Hotfix: 13.6.2
+## Hotfix: 13.6.3
 Jueves 17 de Octubre 2013
 
-* **Fixed:** [Error en JS al agregar un trámite en IE9](https://github.com/LemontechSA/ttb/pull/)
+* **Fixed:** [Error en JS al agregar un trámite en IE9](https://github.com/LemontechSA/ttb/pull/316)
+* **Fixed:** [Corregir asignación de cliente al crear factura](https://github.com/LemontechSA/ttb/pull/316)
 
 ## Hotfix: 13.6.2
 Martes 15 de Octubre 2013
