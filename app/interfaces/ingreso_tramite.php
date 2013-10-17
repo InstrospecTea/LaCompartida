@@ -544,8 +544,8 @@ $pagina->PrintTop($popup);
 					return false;
 				}
 				var decimales = dur.split(".");
-				if (decimales[1].length > 1) {
-					alert("<?php echo __('Solo se permite ingresar un decimal') ?>");
+				if (decimales.length > 1 && decimales[1].length > 1) {
+					alert("<?php echo __('Solo se permite ingresar un decimal'); ?>");
 					form.duracion.focus();
 					return false;
 				}
@@ -1207,6 +1207,7 @@ function Substring($string) {
 
 <script language="javascript" type="text/javascript">
 	CargarMonedaContrato();
+	var IdiomaGrande = <?php echo Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? 'true' : 'false'; ?>;
 
 	jQuery('document').ready(function() {
 		jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
