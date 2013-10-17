@@ -627,39 +627,49 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td align="right"><?php echo __('Doc. Identidad'); ?></td>
 				<td align="left" colspan="3">
 					<?php echo Html::SelectQuery($sesion, "SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad", "tipo_documento_identidad", $factura->fields['id_tipo_documento_identidad'], "", " ", 150); ?>
-					<input type="text" name="RUT_cliente" value="<?php echo $factura->fields['RUT_cliente'] ?>" id="RUT_cliente" size="40" maxlength="20" />
+					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="40" maxlength="20" />
 				</td>
 			<?php } else { ?>
 				<td align="right"><?php echo __('ROL/RUT'); ?></td>
-				<td align="left" colspan="3"><input type="text" name="RUT_cliente" value="<?php echo $factura->fields['RUT_cliente'] ? $factura->fields['RUT_cliente'] : $contrato->fields['rut'] ?>" id="RUT_cliente" size="70" maxlength="20" /></td>
-
+				<td align="left" colspan="3">
+					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="70" maxlength="20" />
+				</td>
 			<?php } ?>
 		</tr>
-
 		<tr>
-			<td align="right"><?php echo __('Raz&oacute;n Social Cliente') ?></td>
-			<td align="left" colspan="3"><input type="text" name="cliente" value="<?php echo ($factura->fields['cliente'] ? $factura->fields['cliente'] : $contrato->fields['factura_razon_social']) ?>" id="cliente" size="70"/></td>
+			<td align="right"><?php echo __('Raz&oacute;n Social Cliente'); ?></td>
+			<td align="left" colspan="3">
+				<input type="text" name="cliente" value="<?php echo $factura->loaded() ? $factura->fields['cliente'] : $contrato->fields['factura_razon_social']; ?>" id="cliente" size="70"/>
+			</td>
 		</tr>
 		<tr>
 			<td align="right"><?php echo __('Direcci&oacute;n Cliente'); ?></td>
-			<td align="left" colspan="3"><input type="text" name="direccion_cliente" value="<?php echo ($factura->fields['direccion_cliente'] ? $factura->fields['direccion_cliente'] : $contrato->fields['factura_direccion']) ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
+			<td align="left" colspan="3">
+				<input type="text" name="direccion_cliente" value="<?php echo $factura->loaded() ? $factura->fields['direccion_cliente'] : $contrato->fields['factura_direccion']; ?>" id="direccion_cliente" size="70" maxlength="255" />
+			</td>
 		</tr>
-			<tr>
-				<td align="right"><?php echo __('Comuna') ?></td>
-				<td align="left" colspan="3"><input type="text" name="comuna_cliente" value="<?php echo ($factura->fields['comuna_cliente'] ? $factura->fields['comuna_cliente'] : $contrato->fields['factura_comuna']) ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
-			</tr>
-			<tr>
-				<td align="right"><?php echo __('Código Postal'); ?></td>
-				<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="<?php echo ($factura->fields['factura_codigopostal'] ? $factura->fields['factura_codigopostal'] : $contrato->fields['factura_codigopostal']); ?>" id="factura_codigopostal" size="30" maxlength="20" /></td>
-			</tr>
-			<tr>
-				<td align="right"><?php echo __('Ciudad'); ?></td>
-				<td align="left" colspan="3"><input type="text" name="ciudad_cliente" value="<?php echo ($factura->fields['ciudad_cliente'] ? $factura->fields['ciudad_cliente'] : $contrato->fields['factura_ciudad']) ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
-			</tr>
-			<tr>
-				<td align="right"><?php echo __('Giro'); ?></td>
-				<td align="left" colspan="3"><input type="text" name="giro_cliente" value="<?php echo ($factura->fields['giro_cliente'] ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']) ?>" id="giro_cliente" size="70" maxlength="255" /></td>
-			</tr>
+		<tr>
+			<td align="right"><?php echo __('Comuna'); ?></td>
+			<td align="left" colspan="3">
+				<input type="text" name="comuna_cliente" value="<?php echo $factura->loaded() ? $factura->fields['comuna_cliente'] : $contrato->fields['factura_comuna']; ?>" id="comuna_cliente" size="70" maxlength="255" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo __('Código Postal'); ?></td>
+			<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="<?php echo $factura->loaded() ? $factura->fields['factura_codigopostal'] : $contrato->fields['factura_codigopostal']; ?>" id="factura_codigopostal" size="30" maxlength="20" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo __('Ciudad'); ?></td>
+			<td align="left" colspan="3"><input type="text" name="ciudad_cliente" value="<?php echo $factura->loaded() ? $factura->fields['ciudad_cliente'] : $contrato->fields['factura_ciudad']; ?>" id="ciudad_cliente" size="70" maxlength="255" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo __('Giro'); ?></td>
+			<td align="left" colspan="3">
+				<input type="text" name="giro_cliente" value="<?php echo $factura->loaded() ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']; ?>" id="giro_cliente" size="70" maxlength="255" />
+			</td>
+		</tr>
 		<tr>
 			<td align="right"><?php echo __('Condición de Pago') ?></td>
 			<td align="left" colspan="3">
@@ -789,7 +799,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			<tr id='descripcion_factura'>
 				<td align="right"><?php echo __('Descripción') ?></td>
-				<td align="left"><textarea id="descripcion" name="descripcion" cols="45" rows="3"><?php echo ($factura->fields['descripcion'] ? $factura->fields['giro_cliente'] : $contrato->fields['glosa_contrato']) ?></textarea></td>
+				<td align="left"><textarea id="descripcion" name="descripcion" cols="45" rows="3"><?php echo $factura->loaded() ? $factura->fields['giro_cliente'] : $contrato->fields['glosa_contrato']; ?></textarea></td>
 			</tr>
 			<tr id='descripcion_factura'>
 				<td align="right"><?php echo __('Monto') ?></td>
@@ -923,6 +933,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
 	function CargarDatosCliente(sin_contrato) {
+		console.log(sin_contrato);
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var id_origen = 'codigo_cliente_secundario';
 		<?php } else { ?>
