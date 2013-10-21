@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix: 13.6.4
+Viernes 18 de Octubre 2013
+
+* **Added:** [Generar por sistema factura para cliente PRSLAWS](https://github.com/LemontechSA/ttb/pull/317)
+
 ## Hotfix: 13.6.3
 Jueves 17 de Octubre 2013
 

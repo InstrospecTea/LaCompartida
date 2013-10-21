@@ -43,6 +43,7 @@ class CartaCobro extends NotaCobro {
 			'%fecha_especial%' => 'Ciudad (país), día de mes de año',
 			'%fecha_especial2%' => 'Santiago, dia de Mes de año',
 			'%fecha_espanol%' => 'dia De Mes De año',
+			'%fecha_espanol_del%' => 'dia De Mes Del año',
 			'%fecha%' => 'mes dia, año',
 			'%fecha_con_de%' => 'mes dia de año',
 			'%fecha_ingles%' => 'month day, year',
@@ -1978,14 +1979,13 @@ class CartaCobro extends NotaCobro {
 				$transformar = array('De' => 'de', 'DE' => 'de');
 				$fecha_lang_esp = 'Santiago, ' . strtr(ucwords(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y')), $transformar);
 				$fecha_espanol = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+				$fecha_espanol_del = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B del %Y'));
 
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_especial2%', $fecha_lang_esp, $html2);
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
+				$html2 = str_replace('%fecha_espanol_del%', $fecha_espanol_del, $html2);
 				$html2 = str_replace('%fecha_slash%', date('d/m/ Y'), $html2);
-
-				$test = 'hahahahahahahah';
-				$html2 = str_replace('%example%', $test, $html2);
 
 				#formato normal
 				if ($lang == 'es') {

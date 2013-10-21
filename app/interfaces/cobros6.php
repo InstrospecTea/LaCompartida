@@ -1819,14 +1819,14 @@ if ($solicitante == 0) {  // no mostrar
                                         <td align="right">&nbsp;</td>
                                         <td align="left" style="font-size: 10px;">
 <?php echo __('Formato de Carta Cobro') ?>:
-<?php echo Html::SelectQuery($sesion, "SELECT carta.id_carta, carta.descripcion FROM carta ORDER BY id_carta", "id_carta", $cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta'] == '1' ? '' : 'disabled') . ' class="wide"'); ?>
+<?php echo Html::SelectQuery($sesion, "SELECT carta.id_carta, carta.descripcion FROM carta ORDER BY id_carta", "id_carta", $cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta'] == '1' ? '' : 'disabled') . ' class="wide"', 'Seleccione', 200); ?>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td align="right">&nbsp;</td>
                                         <td align="left" style="font-size: 10px;">
 <?php echo __('Formato Detalle Carta Cobro') ?>:
-<?php echo Html::SelectQuery($sesion, "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion FROM cobro_rtf ORDER BY cobro_rtf.id_formato", "id_formato", $cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"', 'Seleccione'); ?>
+<?php echo Html::SelectQuery($sesion, "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion FROM cobro_rtf ORDER BY cobro_rtf.id_formato", "id_formato", $cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"', 'Seleccione', 200); ?>
                                         </td>
                                     </tr>
                                     <tr>
