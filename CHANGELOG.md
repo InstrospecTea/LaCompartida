@@ -1,4 +1,21 @@
 # Changelog
+## Hotfix: 13.6.3
+Jueves 17 de Octubre 2013
+
+* **Fixed:** [Error en JS al agregar un trámite en IE9](https://github.com/LemontechSA/ttb/pull/316)
+* **Fixed:** [Corregir asignación de cliente al crear factura](https://github.com/LemontechSA/ttb/pull/316)
+
+## Hotfix: 13.6.2
+Martes 15 de Octubre 2013
+
+* **Fixed:** [Corregir edición campo duración al agregar o modificar un trámite](https://github.com/LemontechSA/ttb/pull/314)
+* **Fixed:** [Codigo de cliente en excel de clientes](https://github.com/LemontechSA/ttb/pull/314)
+
+## Hotfix: 13.6.1
+Martes 15 de Octubre 2013
+
+* **Fixed:** [Problemas en interfaz agregar factura](https://github.com/LemontechSA/ttb/pull/313)
+
 ## Release: 13.6.0
 Jueves 10 de Octubre 2013
 
