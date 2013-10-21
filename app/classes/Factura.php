@@ -710,7 +710,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%id_cobro%', '  ' . $id_cobro, $html2);
 					$html2 = str_replace('%cliente%', 'CLIENTE', $html2);
 					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
-					$html2 = str_replace('%fecha%', 'FECHA', $html2);
+					$html2 = str_replace('%fecha%', 'Fecha', $html2);
 				} elseif ($lang == 'en') {
 					$html2 = str_replace('%fecha_actual%', str_replace($meses_org, $month_short, date('M-d-y', strtotime($fecha_factura))), $html2);
 					$html2 = str_replace('%glosa_fecha%', 'DATE', $html2);
@@ -718,7 +718,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%id_cobro%', '   <br> INVOICE No.   ' . $id_cobro, $html2);
 					$html2 = str_replace('%cliente%', 'CLIENT', $html2);
 					$html2 = str_replace('%asunto%', 'MATTER', $html2);
-					$html2 = str_replace('%fecha%', 'DATE', $html2);
+					$html2 = str_replace('%fecha%', 'Date', $html2);
 				}
 				
 				if ($lang == 'es') {
@@ -1643,7 +1643,7 @@ class Factura extends Objeto {
 				/* AGREGADO EL 9 DE OCTUBRE 2013 */
 
 				if ( $lang == 'es') {
-				  $html2 = str_replace('%columna_descripciones%', 'DESCRIPCI?N', $html2);
+				  $html2 = str_replace('%columna_descripciones%', 'DESCRIPCI&Oacute;N', $html2);
 				  $html2 = str_replace('%columna_valores%', 'VALOR '.strtoupper($tipo_cambio_glosa_moneda_plural), $html2);
 				} else {
 				  $html2 = str_replace('%columna_descripciones%', 'DESCRIPTION', $html2);
@@ -1686,10 +1686,10 @@ class Factura extends Objeto {
 				if ( $lang == 'es' ) {
 
 					if ($this->fields['id_documento_legal'] != '5') {
-						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA c ICA R?gimen Com?n. Somos declarantes de ICA', $html2);  
+						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA c ICA R&eacute;gimen Com&uacute;n. Somos declarantes de ICA', $html2);  
 					} else {
 						$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);  
-						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci?n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr?guez San?n S.A.S. As? mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';
+						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci&oacute;n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr&iacute;guez San&iacute;n S.A.S. As&iacute; mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';
 					}
 
 				} else {
@@ -1697,7 +1697,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
 					
 					if ($this->fields['id_documento_legal'] != '5') {
-						$texto_pie_pagina = 'Please settle this invoice upon receipt, by wire transfer to BANCO DE BOGOTA INTERNATIONAL CORPORATION, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, for further credit to Account No.038501 in the name of Parra, Rodr?guez & Cavelier. Also, once the transfer has been made, please advise us by telefax so that we can make the corresponding internal records. Please note that we do neither accept payments by check, nor can we accept any responsibility for payments made or sent by chek.';
+						$texto_pie_pagina = 'Please settle this invoice upon receipt, by wire transfer to BANCO DE BOGOTA INTERNATIONAL CORPORATION, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, for further credit to Account No.038501 in the name of Parra, Rodr&iacute;guez & Cavelier. Also, once the transfer has been made, please advise us by telefax so that we can make the corresponding internal records. Please note that we do neither accept payments by check, nor can we accept any responsibility for payments made or sent by chek.';
 					} else {
 						$texto_pie_pagina = '&nbsp;';
 					}
