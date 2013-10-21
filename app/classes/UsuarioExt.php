@@ -739,7 +739,7 @@ class UsuarioExt extends Usuario {
 		if (Conf::GetConf($this->sesion, 'NombreIdentificador') == 'RUT') {
 			$rutdv = explode('-', $data['rut']);
 			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
-			$data['dv'] = trim($rutdv[1]);
+			$data['dv_rut'] = trim($rutdv[1]);
 		}
 
 		if (isset($data['admin'])) {
