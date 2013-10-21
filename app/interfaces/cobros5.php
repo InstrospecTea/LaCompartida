@@ -1911,7 +1911,7 @@ if ($solicitante == 0) {  // no mostrar
 									<td align="left" colspan="3">
 										<?php echo  Html::SelectQuery($sesion, "SELECT carta.id_carta, carta.descripcion
 																				FROM carta ORDER BY id_carta","id_carta",
-																$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta']=='1'?'':'disabled') . ' class="wide"','',150); ?>
+																$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta']=='1'?'':'disabled') . ' class="wide"','',200); ?>
 									</td>
 								</tr>
 								<tr>
@@ -1923,7 +1923,7 @@ if ($solicitante == 0) {  // no mostrar
 									<td align="left" colspan="3">
 										<?php echo  Html::SelectQuery($sesion, "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion
 																FROM cobro_rtf ORDER BY cobro_rtf.id_formato","id_formato",
-												$cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"','Seleccione',150); ?>
+												$cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"','Seleccione',200); ?>
 									</td>
 								</tr>
 								<tr>
