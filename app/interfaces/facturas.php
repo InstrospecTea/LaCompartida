@@ -86,7 +86,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 	}
 
 	function Refrescar() {
-		BuscarFacturas('','buscar');
+		document.form_buscador.submit();
 	}
 
 	function BuscarFacturas(form, from) {
