@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.6.5
+lunes 21 de octubre 2013
+* **Fixed:** [Actualiza listado manteniendo orden y paginación.](https://github.com/LemontechSA/ttb/pull/320)
+
 ## Hotfix: 13.6.4
 Viernes 18 de Octubre 2013
 

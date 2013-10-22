@@ -543,14 +543,14 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 function Refrescarse() {
 	if (window.tablagastos != null) {
 		if (typeof(window.tablagastos.fnDraw)=='function')  {
-			window.tablagastos.fnDraw();
+			window.tablagastos.fnDraw(true);
 		}
 	}
 }
 function Refrescar() {
 	if (window.tablagastos != null) {
 		if (typeof(window.tablagastos.fnDraw)=='function')  {
-			window.tablagastos.fnDraw();
+			window.tablagastos.fnDraw(true);
 		}
 	}
 }
