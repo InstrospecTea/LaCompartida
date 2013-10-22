@@ -709,7 +709,6 @@ class Factura extends Objeto {
 					$html2 = str_replace('%ATN%', 'ATENCION', $html2);
 					$html2 = str_replace('%id_cobro%', '  ' . $id_cobro, $html2);
 					$html2 = str_replace('%cliente%', 'CLIENTE', $html2);
-					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
 					$html2 = str_replace('%fecha%', 'Fecha', $html2);
 				} elseif ($lang == 'en') {
 					$html2 = str_replace('%fecha_actual%', str_replace($meses_org, $month_short, date('M-d-y', strtotime($fecha_factura))), $html2);
@@ -717,7 +716,6 @@ class Factura extends Objeto {
 					$html2 = str_replace('%ATN%', 'Attention', $html2);
 					$html2 = str_replace('%id_cobro%', '   <br> INVOICE No.   ' . $id_cobro, $html2);
 					$html2 = str_replace('%cliente%', 'CLIENT', $html2);
-					$html2 = str_replace('%asunto%', 'MATTER', $html2);
 					$html2 = str_replace('%fecha%', 'Date', $html2);
 				}
 				
@@ -728,24 +726,6 @@ class Factura extends Objeto {
 				}
 				
 		        $html2 = str_replace('%fecha_lang%', $fecha_lang, $html2);
-
-		        $queryasuntosrel = "SELECT asunto.glosa_asunto 
-				                      FROM trabajo 
-				                      LEFT JOIN asunto ON ( asunto.codigo_asunto = trabajo.codigo_asunto) WHERE id_cobro='" . $this->fields['id_cobro'] . "' GROUP BY asunto.glosa_asunto ";
-				$resultado = mysql_query($queryasuntosrel, $this->sesion->dbh) or Utiles::errorSQL($queryasuntosrel, __FILE__, __LINE__, $this->sesion->dbh);
-
-		        while ($data = mysql_fetch_assoc($resultado)) {
-					$asuntos_rel[] = $data;
-				}
-
-				$asuntosrelacionados = '';
-
-		        for ($k = 0; $k < count($asuntos_rel); $k) {
-					$espace_rel = $k < count($asuntos_rel) - 1 ? ', ' : '';
-					$asuntos_relacionados .= $asuntos_rel[$k]['glosa_asunto'] . '' . $espace_rel;
-				}
-
-				$html2 = str_replace('%asuntos_relacionados%', $asuntos_relacionados, $html2);
 
 				/*   NUMERO FEE NOTE PARA prslaws */
 
@@ -1080,6 +1060,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%descuento_glosa%', '', $html2);
 					}
 				}
+
 				if (UtilesApp::GetConf($this->sesion, "DescripcionFacturaConAsuntos")) {
 					// Lo separo en lineas
 					$factura_descripcion_con_asuntos = explode("\n", __($factura_descripcion));
@@ -1118,6 +1099,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%asuntos%', $asuntos, $html2);
 					$html2 = str_replace('%cod_asuntos%', $cod_asuntos, $html2);
 				}
+
 				if (method_exists('Conf', 'Server') && method_exists('Conf', 'ImgDir')) {
 					$html2 = str_replace('%logo_cobro%', Conf::Server() . Conf::ImgDir(), $html2);
 				}
@@ -1602,9 +1584,11 @@ class Factura extends Objeto {
 				  }
 
 				  if ( $lang == 'es' ) {
+					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
 					$glosa_iva = 'IVA ';
 				  } else {
 					$glosa_iva = 'VAT ';
+				  	$html2 = str_replace('%asunto%', 'MATTER', $html2);
 				  }
 
 				  $porcentaje_impuesto = UtilesApp::GetConf($this->sesion, 'ValorImpuesto');
