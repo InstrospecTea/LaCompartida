@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.6.6
+Martes 22 de octubre 2013
+* **Fixed:** [Correcciones en configuracion AsuntosPorDefecto.](https://github.com/LemontechSA/ttb/pull/320)
+
 ## Hotfix: 13.6.5
 lunes 21 de octubre 2013
 * **Fixed:** [Actualiza listado manteniendo orden y paginación.](https://github.com/LemontechSA/ttb/pull/320)
