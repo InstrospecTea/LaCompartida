@@ -13,29 +13,6 @@ class Actividad extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	function Loaded()
-	{
-		if($this->fields['id_actividad'] == "")
-			return false;
-		return true;
-	}
-	function Editar() 
-	{
-		$glosa_actividad = $_POST["glosa_actividad"];
-		$codigo_asunto = $_POST["codigo_asunto"];
-		$id_actividad = $_POST["id_actividad"];
-
-		if ($codigo_asunto != '') { 
-			$query = "UPDATE actividad SET glosa_actividad = '". $glosa_actividad ."', codigo_asunto = '". $codigo_asunto ."', fecha_modificacion = NOW() 
-				WHERE id_actividad = " .$id_actividad ;
-		} else {
-			$query = "UPDATE actividad SET glosa_actividad = '". $glosa_actividad ."', codigo_asunto = NULL, fecha_modificacion = NOW() 
-				WHERE id_actividad = " .$id_actividad ;
-		}
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-
-		return true;
-	}
 	function Eliminar()
 	{
 		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_actividad = '".$this->fields['codigo_actividad']."'";
