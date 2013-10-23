@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -22,19 +22,38 @@ $actividad = new Actividad($sesion);
 if ($id_actividad != '') {
 	$actividad->Load($id_actividad);
 }
-if ($opcion == "guardar") {
-	if ($actividad->Editar()) {
+if ($opcion2 == "guardar") {
 
-		$id_actividad = $actividad->fields['id_actividad'];
-		$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') );
-		$actividad->Load($id_actividad);
-	}
-	
-	echo '<script type="text/javascript">
-		if (window.opener !== undefined && window.opener.Refrescar) {
-			window.opener.Refrescar();
+	if ($actividad->Check() ) {
+		
+		if ($opcion == '') {
+			if ($actividad->Editar()) {
+
+				$id_actividad = $actividad->fields['id_actividad'];
+				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') );
+				$actividad->Load($id_actividad);
+			}
+		} else if ($opcion == 'agregar') {
+
+			echo '--A-- ';
+			if ($actividad->Agregar()) {
+				echo 'A ';
+				$id_actividad = $actividad->fields['id_actividad'];
+				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') );
+				echo 'B ';
+				$actividad->Load($id_actividad);
+				echo 'C ';
+			}
 		}
-		</script>';
+		
+		echo '<script type="text/javascript">
+			if (window.opener !== undefined && window.opener.Refrescar) {
+				window.opener.Refrescar();
+			}
+			</script>';
+	} else {  
+
+	}
 }
 
 $pagina->titulo = __('Ingreso de actividad');
@@ -50,31 +69,62 @@ $pagina->PrintTop($popup);
 		window.opener.Refrescar();
 	}
 
+	jQuery(document).ready(function() {
+		startP = window.location.search.indexOf('codact');
+		hrefPart2 = window.location.search.substring(startP + 7);
+		endP = hrefPart2.indexOf('&');
+		campo_codact = hrefPart2.substring(0, endP);
+		
+
+
+		if  (campo_codact != '') {
+			// load values to the form
+			document.getElementById('codigo_actividad').value = campo_codact;
+			document.getElementById('codigo_actividad').value = campo_codact;
+			document.getElementById('codigo_actividad').value = campo_codact;
+			document.getElementById('codigo_actividad').value = campo_codact;
+		}
+    });
+
 	function Validar(p) {
+
+		if( document.getElementById('codigo_actividad').value=='' ) {
+			alert( 'Debe ingresar un código.' );
+			document.getElementById('codigo_actividad').focus();
+			return false;
+		}
 		if( document.getElementById('glosa_actividad').value=='' ) {
 			alert( 'Debe ingresar un título.' );
 			document.getElementById('glosa_actividad').focus();
+			return false;
 		} else {
 			var form = document.getElementById('form_actividades');
+			var codact = document.getElementById('codigo_actividad').value;
+			var titact = document.getElementById('glosa_actividad').value;
+			var codcliente = document.getElementById('codigo_cliente').value;
+			var codasunto = document.getElementById('campo_codigo_asunto').value;
+			
+			var startP = window.location.search.indexOf('opcion');
+			var opc = window.location.search.substring(startP + 7, startP + 14);
+			
+			form.action =  "agregar_actividades.php?buscar=1&popup=1&codact="+codact+"&titact="+titact+"&codcliente="+codcliente+"&codasunto="+codasunto;
+			if (opc == 'agregar') {
+				form.action += "&opcion=agregar";
+			}
+			console.log('formaction value: ' + form.action ); 
 			form.submit();
+
+			//perfecto:  solo agregar y ordenar
 		}
 		return true;
 	}
 
+	function preparevalues(p) {
+
+	}
+
 	function __Guardar(p) {
 		console.log('func guardar is executing');
-		var1 =  jQuery("#opcion").val();
-		var2 =  jQuery("#id_actividad").val();
-		var3 =  jQuery("#glosa_actividad").val();
-		var4 =  jQuery("#_codigo_asunto").val();
-
-		console.log('4: ' + var4);
-
-		var5 = jQuery("#_codigo_asunto");
-		var5.value = "oooo";		
-		console.log('aabb '  + var5.value);
-
-		var form = document.getElementById('form_actividades');
 	}
 
 </script>
@@ -83,7 +133,7 @@ $pagina->PrintTop($popup);
 <?php echo Autocompletador::CSS(); ?>
 
 <form method="post" name="form_actividades" id="form_actividades">
-	<input type="hidden"  name="opcion" id="opcion" value="guardar">
+	<input type="hidden"  name="opcion2" id="opcion2" value="guardar">
 	<input type="hidden" name="id_actividad" value="<?= $actividad->fields['id_actividad'] ?>" />
 
 	<table>
@@ -123,7 +173,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Código actividad')?>
 			</td>
 			<td align="left">
-				<input id="codigo_actividad" name="codigo_actividad" size="5" maxlength="5" readonly value="<?php echo $cod_actividad; ?>" />
+				<input id="codigo_actividad" name="codigo_actividad" size="5" maxlength="5" value="<?php echo $cod_actividad; ?>" />
 			</td>
 		</tr>
 		
@@ -191,3 +241,4 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectClient
 	echo(Autocompletador::Javascript($sesion));
 }
 $pagina->PrintBottom($popup);
+

@@ -32,11 +32,11 @@
 			$pagina->AddInfo( __('Actividad guardada con exito') );
 		else
 			$pagina->AddError($actividad->error);
-	}
-	else if($opcion == 'eliminar')
-	{
+	} else if($opcion == 'eliminar') {
 		if(!$actividad->Eliminar())
 			$pagina->AddError($actividad->error);
+	} else if ($opcion == 'buscar') {
+		$buscar = 1;
 	}
 	
 	$tooltip = Html::Tooltip(str_replace('%s', __('asunto'), __('Para agregar una actividad genérica deja el cliente y el %s en blanco.<br>Si quieres asignarla a un %s en particular, selecciónalo de la lista.')));
@@ -44,44 +44,59 @@
 	$pagina->titulo = __('Ingreso de actividad');
 	$pagina->PrintTop();
 ?>
-<script>
-function EliminarActividad( id , desde)
-{
-	if( parseInt(id)>0 && confirm('¿Desea eliminar la actividad seleccionada') == true )
-	{
-		var url = '?id_actividad='+id+'&opcion=eliminar&desde='+desde;
-		self.location.href = url;
-	}
-}
+<script type="text/javascript">
 
-function Validar()
-{
-	if( document.getElementById('glosa_actividad').value=='' )
+	jQuery(document).ready(function() {
+        jQuery("#agregar_actividad").click(function() {
+			nuovaFinestra('Agregar_Asunto',670,300,'agregar_actividades.php?popup=1&opcion=agregar'); 
+        });
+
+    });
+
+	function EliminarActividad( id , desde)
+	{
+		if( parseInt(id)>0 && confirm('¿Desea eliminar la actividad seleccionada') == true )
 		{
-			alert( 'Debe ingresar un título.' );
-			document.getElementById('glosa_actividad').focus();
+			var url = '?id_actividad='+id+'&opcion=eliminar&desde='+desde;
+			self.location.href = url;
 		}
-	else
-		{
-			var form = document.getElementById('form_actividades');
-			form.submit();
-		}
-	return true;
-}
+	}
+
+	function go() {
+		var form = document.getElementById('form_actividades');
+		var cod_act = document.getElementById('codigo_actividad');
+
+		form.action = "actividades.php?buscar=1&cod_act="+cod_act.value;
+		form.submit();
+	}
+
+	function Refrescar() {
+		self.location.reload(); 
+	}
 </script>
+
+
 <? echo Autocompletador::CSS(); ?>
 <form method="post" action="actividades.php" name="form_actividades" id="form_actividades">
-<input type=hidden name=opcion value="guardar" />
-<input type=hidden name=codigo_actividad value="<?= $actividad->fields['codigo_actividad'] ?>" />
-<input type=hidden name=id_actividad value="<?= $actividad->fields['id_actividad'] ?>" />
+<input type="hidden" name="opcion" value="buscar" />
+<input type="hidden" name="codigo_actividad" value="<?= $actividad->fields['codigo_actividad'] ?>" />
+<input type="hidden" name="id_actividad" value="<?= $actividad->fields['id_actividad'] ?>" />
 
+<table style="border: 0px solid black" width='90%'>
+	<tr>
+		<td></td>
+		<td colspan="3" align="right">
+			<a href="#" class="btn botonizame" icon="agregar" id="agregar_actividad" title="<?php echo __('Agregar') ?>" onclick=""><?php echo __('Agregar') . ' ' . __('Actividad') ?></a>
+		</td>
+	</tr>
+</table>
 <table style="border: 1px solid #BDBDBD;" class="tb_base" width="90%">
 	<tr>
 		<td align=right>
 			<?=__('Código')?>
 		</td>
 		<td align=left>
-			<input name="codigo_actividad" size="5" maxlength="5" readonly value="<?=$actividad->fields['codigo_actividad']?>" id="codigo_actividad" />
+			<input name="codigo_actividad" size="5" maxlength="5" value="<?=$actividad->fields['codigo_actividad']?>" id="codigo_actividad" />
 		</td>
 	</tr>
 	<tr>
@@ -144,7 +159,7 @@ function Validar()
 	</tr>
 	<tr>
 		<td colspan=2 align="center">
-			<input type="button" class=btn value="<?=__('Agregar')?>" onclick="return Validar()" />
+			<a href="#" class="btn botonizame" icon="find" id="buscar_actividad" title="<?php echo __('Buscar') ?>" onclick="go()"><?php echo __('Buscar') ?></a>
 		</td>
 	</tr>
 
@@ -154,44 +169,76 @@ function Validar()
 <br/><br/>
 
 <?
-	$query = "SELECT SQL_CALC_FOUND_ROWS *
-				FROM actividad
-				LEFT JOIN asunto USING(codigo_asunto)
-				LEFT JOIN cliente USING (codigo_cliente)
-				";
-	if(!$desde)
-		$desde = 0;	
-	
-	$x_pag = 10;					
-	$b = new Buscador($sesion, $query, 'Actividad', $desde, $x_pag, $orden);
-	$b->AgregarEncabezado("glosa_actividad", __('Nombre Actividad'), "align=left");
-	$b->AgregarEncabezado("glosa_asunto",__('Asunto'), "align=left");
-	$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "align=left");
-	$b->AgregarEncabezado("codigo_actividad", __('Código'), "align=left");
-    $b->AgregarFuncion("",'Opciones', "align=center");
-	$b->color_mouse_over = "#bcff5c";
-	$b->Imprimir();
 
-    function Opciones(& $fila)
-    {
-    global $sesion;
+	if ($buscar) {
+		$query = "SELECT SQL_CALC_FOUND_ROWS *
+					FROM actividad
+					LEFT JOIN asunto USING(codigo_asunto)
+					LEFT JOIN cliente USING (codigo_cliente)
+					";
+
+		if ($cod_act != '') {
+		 		$where .= ' codigo_actividad = "'.$cod_act.'"';
+		 		$whereOn = 1;
+		}
+		if ($glosa_actividad != '') {
+			if (!$whereOn) {
+				$where .= ' glosa_actividad = "'.$glosa_actividad.'"';
+				$whereOn = 1;
+			} else {
+				$where .= ' AND glosa_actividad = "'.$glosa_actividad.'"';
+			}
+		}
+		if ($codigo_cliente != '') {
+			if (!$whereOn) {
+				$where .= ' codigo_cliente_secundario = "'.$codigo_cliente.'"';
+				$whereOn = 1;
+			} else {
+				$where .= ' AND codigo_cliente_secundario = "'.$codigo_cliente.'"';
+			}
+		}
+		if ($codigo_asunto != '') {
+			if (!$whereOn) {
+				$where .= ' codigo_asunto = "'.$codigo_asunto.'"';
+				$whereOn = 1;
+			} else {
+				$where .= ' AND codigo_asunto = "'.$codigo_asunto.'"';
+			}
+		}
+		if ($whereOn) {
+			$where = ' WHERE ' . $where . '';
+			$query .= $where;
+		}
+
+		if(!$desde)
+			$desde = 0;	
+		
+		$x_pag = 10;					
+		$b = new Buscador($sesion, $query, 'Actividad', $desde, $x_pag, $orden);
+		$b->AgregarEncabezado("glosa_actividad", __('Nombre Actividad'), "align=left");
+		$b->AgregarEncabezado("glosa_asunto",__('Asunto'), "align=left");
+		$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "align=left");
+		$b->AgregarEncabezado("codigo_actividad", __('Código'), "align=left");
+	    $b->AgregarFuncion("",'Opciones', "align=center");
+		$b->color_mouse_over = "#bcff5c";
+		$b->Imprimir();
+	}
+
+    function Opciones(& $fila) {
+    	global $sesion;
 		global $desde;
 		$id_act = $fila->fields['id_actividad'];
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
-			{
-        return "<a href=?id_actividad=$id_act><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title='".__('Editar actividad')."' alt='' /></a>"
-        . "<a href='javascript:void(0)' onclick='EliminarActividad($id_act,$desde)'><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title='".__('Eliminar actividad')."' alt='".__('Eliminar')."'/></a>";
-      }
-     else
-      {
-      	 return "<a href=?id_actividad=$id_act><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title='".__('Editar actividad')."' alt='' /></a>"
-        . "<a href='javascript:void(0)' onclick='EliminarActividad($id_act,$desde)'><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title='".__('Eliminar actividad')."' alt='".__('Eliminar')."'/></a>";
-      }
+		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) {
+			return "<a href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Actividad', 670, 300,'agregar_actividades.php?id_actividad=" . $id_act . "&popup=1')\"><img src=\"".Conf::ImgDir()."/editar_on.gif\" border=0 title=\"".__('Editar actividad')."\" /></a>"
+	        . "<a href='javascript:void(0)' onclick='EliminarActividad($id_act,$desde)'><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title='".__('Eliminar actividad')."' alt='".__('Eliminar')."'/></a>";
+      	} else {
+      		return "<a href=?id_actividad=$id_act><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title='".__('Editar actividad')."' alt='' /></a>"
+        	. "<a href='javascript:void(0)' onclick='EliminarActividad($id_act,$desde)'><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title='".__('Eliminar actividad')."' alt='".__('Eliminar')."'/></a>";
+      	}
     }
 
-  echo(InputId::Javascript($sesion)); 
-  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-  {
+  	echo(InputId::Javascript($sesion)); 
+	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) {
 		echo(Autocompletador::Javascript($sesion));
 	}
 	$pagina->PrintBottom();
