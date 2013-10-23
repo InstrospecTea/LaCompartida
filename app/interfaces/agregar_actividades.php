@@ -35,14 +35,10 @@ if ($opcion2 == "guardar") {
 			}
 		} else if ($opcion == 'agregar') {
 
-			echo '--A-- ';
 			if ($actividad->Agregar()) {
-				echo 'A ';
 				$id_actividad = $actividad->fields['id_actividad'];
 				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') );
-				echo 'B ';
 				$actividad->Load($id_actividad);
-				echo 'C ';
 			}
 		}
 		
@@ -71,23 +67,50 @@ $pagina->PrintTop($popup);
 
 	jQuery(document).ready(function() {
 		startP = window.location.search.indexOf('codact');
-		hrefPart2 = window.location.search.substring(startP + 7);
-		endP = hrefPart2.indexOf('&');
-		campo_codact = hrefPart2.substring(0, endP);
-		
+		if (startP > 0) {
+			//codigo actividad
+			hrefPart2 = window.location.search.substring(startP + 7);
+			endP = hrefPart2.indexOf('&');
+			campo_value = hrefPart2.substring(0, endP);
+			document.getElementById('codigo_actividad').value = campo_value;
 
+			//glosa actividad
+			startP = window.location.search.indexOf('titact');
+			hrefPart2 = window.location.search.substring(startP + 7);
+			endP = hrefPart2.indexOf('&');
+			campo_value = hrefPart2.substring(0, endP);
+			document.getElementById('glosa_actividad').value = campo_value;
 
-		if  (campo_codact != '') {
-			// load values to the form
-			document.getElementById('codigo_actividad').value = campo_codact;
-			document.getElementById('codigo_actividad').value = campo_codact;
-			document.getElementById('codigo_actividad').value = campo_codact;
-			document.getElementById('codigo_actividad').value = campo_codact;
+			//codigo cliente
+			startP = window.location.search.indexOf('codcliente');
+			if (startP > 0) {
+				hrefPart2 = window.location.search.substring(startP + 11);
+				endP = hrefPart2.indexOf('&');
+				campo_value = hrefPart2.substring(0, endP);
+				document.getElementById('codigo_cliente').value = campo_value;
+			}
+
+			//glosa_cliente
+			startP = window.location.search.indexOf('gloscliente');
+			if (startP > 0) {
+				hrefPart2 = window.location.search.substring(startP + 12);
+				endP = hrefPart2.indexOf('&');
+				campo_value = hrefPart2.substring(0, endP);
+				document.getElementById('glosa_cliente').value = campo_value;
+			}
+
+			//codigo asunto
+			startP = window.location.search.indexOf('codasunto');
+			if (startP > 0) {
+				hrefPart2 = window.location.search.substring(startP + 10);
+				endP = hrefPart2.indexOf('&');
+				campo_value = hrefPart2.substring(0, endP);
+				document.getElementById('campo_codigo_asunto').value = campo_value;
+			}
 		}
     });
 
 	function Validar(p) {
-
 		if( document.getElementById('codigo_actividad').value=='' ) {
 			alert( 'Debe ingresar un código.' );
 			document.getElementById('codigo_actividad').focus();
@@ -102,29 +125,21 @@ $pagina->PrintTop($popup);
 			var codact = document.getElementById('codigo_actividad').value;
 			var titact = document.getElementById('glosa_actividad').value;
 			var codcliente = document.getElementById('codigo_cliente').value;
+			//var gloscliente = document.getElementById('glosa_cliente').value;
+			var gloscliente = "";
 			var codasunto = document.getElementById('campo_codigo_asunto').value;
 			
 			var startP = window.location.search.indexOf('opcion');
 			var opc = window.location.search.substring(startP + 7, startP + 14);
 			
-			form.action =  "agregar_actividades.php?buscar=1&popup=1&codact="+codact+"&titact="+titact+"&codcliente="+codcliente+"&codasunto="+codasunto;
+			form.action =  "agregar_actividades.php?buscar=1&popup=1&codact="+codact+"&titact="+titact+"&codcliente="+codcliente+"&gloscliente="+gloscliente+"&codasunto="+codasunto;
 			if (opc == 'agregar') {
 				form.action += "&opcion=agregar";
 			}
 			console.log('formaction value: ' + form.action ); 
 			form.submit();
-
-			//perfecto:  solo agregar y ordenar
 		}
 		return true;
-	}
-
-	function preparevalues(p) {
-
-	}
-
-	function __Guardar(p) {
-		console.log('func guardar is executing');
 	}
 
 </script>
@@ -136,13 +151,6 @@ $pagina->PrintTop($popup);
 	<input type="hidden"  name="opcion2" id="opcion2" value="guardar">
 	<input type="hidden" name="id_actividad" value="<?= $actividad->fields['id_actividad'] ?>" />
 
-	<table>
-		<tr>
-			<td>
-				
-			<td>
-		</tr>
-	</table>
 	<fieldset class="border_plomo tb_base">
 		<legend>Ingreso de Actividades</legend>
 	<?php 
