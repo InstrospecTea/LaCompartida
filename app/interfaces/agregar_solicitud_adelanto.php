@@ -47,8 +47,6 @@ if ($SolicitudAdelanto->Loaded()) {
 }
 
 $Pagina->PrintTop($popup);
-
-echo $msg;
 ?>
 <br />
 <table width="90%" id="txt_pagina">

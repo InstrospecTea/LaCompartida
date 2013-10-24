@@ -1,125 +1,55 @@
-<?php 
+<?php
+require_once dirname(__FILE__) . '/../conf.php';
 
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../fw/classes/Html.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/classes/Actividad.php';
-require_once Conf::ServerDir().'/classes/InputId.php';
-require_once Conf::ServerDir().'/classes/Funciones.php';
-require_once Conf::ServerDir().'/classes/Autocompletador.php';
+$Sesion = new Sesion(array('DAT'));
+$Pagina = new Pagina($Sesion);
 
+$Actividad = new Actividad($Sesion);
 
-$sesion = new Sesion(array('DAT'));
-$pagina = new Pagina($sesion);
+if ($opcion == 'guardar') {
+	$Actividad->Fill($_REQUEST, true);
 
-$id_usuario = $sesion->usuario->fields['id_usuario'];
+	if ($Actividad->Write()) {
+		$Pagina->AddInfo(__('Actividad guardada con éxito'));
 
-$actividad = new Actividad($sesion);
-
-if ($id_actividad != '') {
-	$actividad->Load($id_actividad);
-}
-if ($opcion2 == "guardar") {
-	if ($actividad->Check() ) {
-		
-		if ($opcion == '') {
-			if ($actividad->Editar()) {
-
-				$id_actividad = $actividad->fields['id_actividad'];
-				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') );
-				$actividad->Load($id_actividad);
-			}
-		} else if ($opcion == 'agregar') {
-
-			if ($actividad->Agregar()) {
-				$id_actividad = $actividad->fields['id_actividad'];
-				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') );
-				$actividad->Load($id_actividad);
-			}
-		}
-		
 		echo '<script type="text/javascript">
 			if (window.opener !== undefined && window.opener.Refrescar) {
 				window.opener.Refrescar();
 			}
 			</script>';
-	} else {  
-		$pagina->AddError($actividad->error);
+	} else {
+		$Pagina->AddError(__('Por favor corrija lo siguiente: ') . implode(', ', $Actividad->error));
 	}
-} elseif ($opcion == 'editar') {
-	$actividad->Load($id_actividad);
+} else {
+	if ($id_actividad != '') {
+		$Actividad->Load($id_actividad);
+	}
 
-	$codigo_asunto = $actividad->fields['codigo_asunto'];
-
-	$query = "SELECT codigo_cliente FROM `asunto` WHERE codigo_asunto = '". $codigo_asunto ."'";
-	$codigo_cliente = $actividad->exSQL($query, 'codigo_cliente');
+	$Actividad->Fill($_REQUEST);
 }
 
+$Pagina->titulo = __('Actividad');
+if ($Actividad->Loaded()) {
+	$Pagina->titulo = __('Edición') . ' de ' . $Pagina->titulo . ' N° ' . $Actividad->fields['id_actividad'];
+	
+	if (!empty($Actividad->fields['codigo_asunto'])) {
+		$Asunto = new Asunto($Sesion);
+		$Asunto->LoadByCodigo($Actividad->fields['codigo_asunto']);
 
-$pagina->titulo = __('Ingreso de actividad');
-$pagina->PrintTop($popup);
+		$glosa_asunto = $Asunto->fields['glosa_asunto'];
 
+		$Cliente = new Cliente($Sesion);
+		$Cliente->LoadByCodigo($Asunto->fields['codigo_cliente']);
+
+		$glosa_cliente = $Cliente->fields['glosa_cliente'];
+		$Actividad->extra_fields['codigo_cliente'] = $Cliente->fields['codigo_cliente'];
+	}
+}
+
+$Pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
-
-	if(parent.window.Refrescarse) {
-		parent.window.Refrescarse();
-	} else if( window.opener.Refrescar ) {
-		window.opener.Refrescar();
-	}
-
-	jQuery(document).ready(function() {
-
-		console.log('anfang hier');
-		startP = window.location.search.indexOf('codact');
-		if (startP > 0) {
-			//codigo actividad
-			hrefPart2 = window.location.search.substring(startP + 7);
-			endP = hrefPart2.indexOf('&');
-			campo_value = hrefPart2.substring(0, endP);
-			document.getElementById('codigo_actividad').value = campo_value;
-
-			//glosa actividad
-			startP = window.location.search.indexOf('titact');
-			hrefPart2 = window.location.search.substring(startP + 7);
-			endP = hrefPart2.indexOf('&');
-			campo_value = hrefPart2.substring(0, endP);
-			document.getElementById('glosa_actividad').value = campo_value;
-
-			//codigo cliente
-			startP = window.location.search.indexOf('codcliente');
-			if (startP > 0) {
-				hrefPart2 = window.location.search.substring(startP + 11);
-				endP = hrefPart2.indexOf('&');
-				campo_value = hrefPart2.substring(0, endP);
-				document.getElementById('codigo_cliente').value = campo_value.toUpperCase();
-			}
-
-			//codigo asunto
-			startP = window.location.search.indexOf('codasunto');
-			if (startP > 0) {
-				hrefPart2 = window.location.search.substring(startP + 10);
-				endP = hrefPart2.indexOf('&');
-				campo_value = hrefPart2.substring(0, endP);
-				var valcodigo = campo_value; 
-				document.getElementById('campo_codigo_asunto').value = campo_value.toUpperCase();
-			}
-
-			//glosa asunto
-			startP = window.location.search.indexOf('glosasunto');
-			if (startP > 0) {
-				hrefPart2 = window.location.search.substring(startP + 11);
-				endP = hrefPart2.indexOf('&');
-				campo_value = hrefPart2.substring(0, endP);
-				document.getElementById('codigo_asunto').value = campo_value;
-			}
-		}
-    });
-
 	function Validar(p) {
 		if( document.getElementById('codigo_actividad').value=='' ) {
 			alert( 'Debe ingresar un código.' );
@@ -130,138 +60,63 @@ $pagina->PrintTop($popup);
 			alert( 'Debe ingresar un título.' );
 			document.getElementById('glosa_actividad').focus();
 			return false;
-		} else {
-			var form = document.getElementById('form_actividades');
-			var codact = document.getElementById('codigo_actividad').value;
-			var titact = document.getElementById('glosa_actividad').value;
-			var codcliente = document.getElementById('codigo_cliente').value;
-			//var gloscliente = document.getElementById('glosa_cliente').value;
-			var gloscliente = "";
-			var codasunto = document.getElementById('campo_codigo_asunto').value;
-			//var glosasunto = document.getElementById('glosa_asunto').value;
-			var glosasunto = codigo_asunto.options[codigo_asunto.selectedIndex].text;
-			console.log('glosasunto: ' + glosasunto);
-
-			var startP = window.location.search.indexOf('opcion');
-			var opc = window.location.search.substring(startP + 7, startP + 14);
-			
-			form.action =  "agregar_actividades.php?buscar=1&popup=1&codact="+codact+"&titact="+titact+"&codcliente="+codcliente+"&gloscliente="+gloscliente+"&codasunto="+codasunto+"&glosasunto="+glosasunto;
-			if (opc == 'agregar') {
-				form.action += "&opcion=agregar";
-				form.encoding = "ISO-8859-1";
-			}
-			console.log('formaction value: ' + form.action ); 
-			form.submit();
 		}
+
+		form.submit();
+		
 		return true;
 	}
 </script>
 
-
-<?php echo Autocompletador::CSS(); ?>
-
-<form method="post" name="form_actividades" id="form_actividades">
-	<input type="hidden"  name="opcion2" id="opcion2" value="guardar">
-	<input type="hidden" name="id_actividad" value="<?= $actividad->fields['id_actividad'] ?>" />
+<form method="POST" action="#" name="form_actividades" id="form_actividades">
+	<input type="hidden"  name="opcion" id="opcion" value="guardar">
+	<input type="hidden" name="id_actividad" value="<?= $Actividad->fields['id_actividad'] ?>" />
 
 	<fieldset class="border_plomo tb_base">
 		<legend>Ingreso de Actividades</legend>
-	<?php 
-		//$codigo_asunto = $actividad->fields['codigo_asunto'];
-		$cod_actividad =  Utiles::Glosa($sesion, $id_actividad, 'codigo_actividad', 'actividad', 'id_actividad');
-		$glosa_asunto = Utiles::Glosa($sesion, $glosa_asunto, 'glosa_asunto', 'asunto', 'codigo_asunto');
-		//$codigo_cliente = Utiles::Glosa($sesion, $codigo_asunto, 'codigo_cliente', 'asunto', 'codigo_asunto');
-		$glosa_cliente = Utiles::Glosa($sesion, $codigo_cliente, 'glosa_cliente', 'cliente', 'codigo_cliente');
+		<table style="border: 1px solid #BDBDBD;" class="" width="100%">
+			<tr>
+				<td align="right">
+					<?php echo __('Código'); ?>
+				</td>
+				<td align="left">
+					<input id="codigo_actividad" name="codigo_actividad" size="5" maxlength="5" value="<?php echo $Actividad->fields['codigo_actividad']; ?>" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td align="right">
+					<?php echo __('Título'); ?>
+				</td>
+				<td align="left">
+					<input id='glosa_actividad' name='glosa_actividad' size='35' value="<? echo $Actividad->fields['glosa_actividad']; ?>" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td align="right">
+					<?php echo __('Cliente'); ?>
+				</td>
+				<td align="left">
+					<?php UtilesApp::CampoCliente($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
+				</td>
+			</tr>
 
-		if ($cod_actividad == 'No existe información') {
-			$cod_actividad = '';
-		} 
-		if (strstr($glosa_asunto, 'No existe información') == true) {
-			$glosa_asunto = '';
-		} 
-		if ($codigo_cliente == 'No existe información') {
-			$codigo_cliente = '';
-		}
-		if ($glosa_cliente == 'No existe información') {
-			$glosa_cliente = '';
-		}	
-	?>
-
-	<table style="border: 1px solid #BDBDBD;" class="" width="100%">
-		<tr>
-			<td align="right">
-				<?php echo __('Código actividad')?>
-			</td>
-			<td align="left">
-				<input id="codigo_actividad" name="codigo_actividad" size="5" maxlength="5" value="<?php echo $cod_actividad; ?>" />
-			</td>
-		</tr>
-		
-		<tr>
-			<td align="right">
-				<?php echo __('Título')?>
-			</td>
-			<td align="left">
-				<input id='glosa_actividad' name='glosa_actividad' size='35' value="<? echo $actividad->fields['glosa_actividad']; ?>" />
-			</td>
-		</tr>
-		
-		<tr>
-			<td align="right">
-				<?php echo __('Cliente')?>
-			</td>
-			<td align="left">
-			<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-			<?php
-				// if( Conf::GetConf($sesion,'TipoSelectCliente') == 'autocompletador' ) {
-				// 	if( Conf::GetConf($sesion,'CodigoSecundario') )  {
-				// 		//echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario);						
-				// 		echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); 
-				// 	} else {
-				// 		//echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);	
-				// 		echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); 
-				// 	}	
-				// } else {
-				// 	if( Conf::GetConf($sesion,'CodigoSecundario') )  {
-				// 		echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
-				// 	} else {
-				// 		echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
-				// 	}
-				// }
-			?>
-			</td>
-		</tr>
-
-		<tr>
-			<td align="right">
-				<?php echo __('Asunto')?>
-			</td>
-			<td align="left">
-				
-				<?php
-					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )) {
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
-						// CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width=320, $oncambio='') {
-					} else {
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto ? $actividad->fields['codigo_asunto'] : $codigo_asunto ,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
-					}
-				?>
-				<input type="hidden" name="hid1" id="hid1" value="lol(this)">
-			</td>
-		</tr>		
-	</table>
+			<tr>
+				<td align="right">
+					<?php echo __('Asunto')?>
+				</td>
+				<td align="left">
+					<?php UtilesApp::CampoAsunto($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
+				</td>
+			</tr>		
+		</table>
 	</fieldset>
-	<br>
-		<div class="fl">																			
-			<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="Validar(jQuery('#form_actividades').get(0))"><?php echo  __('Guardar') ?></a>
-			<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar') ?></a>
-		</div>
+	<br />
+	<div class="fl">																			
+		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="Validar(jQuery('#form_actividades').get(0))"><?php echo  __('Guardar') ?></a>
+		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar') ?></a>
+	</div>
 </form>
-
 <?php 
-echo(InputId::Javascript($sesion)); 
-if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) {
-	echo(Autocompletador::Javascript($sesion));
-}
-$pagina->PrintBottom($popup);
-
+$Pagina->PrintBottom($popup);
