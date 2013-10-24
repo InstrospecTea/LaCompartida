@@ -689,20 +689,20 @@ class Factura extends Objeto {
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_mes%', date('m', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_anio_2cifras%', date('y', strtotime($fecha_factura)), $html2);
-				
+
 				$html2 = str_replace('%contrato_titulo_contacto%', strtoupper($titulo_contacto), $html2);
-		        $html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
+				$html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%contrato_razon_social%', strtoupper($factura_razon_social), $html2);
 				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($nombre_ciudad), $html2);
 				$html2 = str_replace('%contrato_nombre_pais%', strtoupper($nombre_pais), $html2);
 				$html2 = str_replace('%cobro_asunto%', strtoupper($nombre_pais), $html2);
-				
+
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
-				
+
 				$html2 = str_replace('%num_anio_ultimacifra%', $anio_yyyy[3], $html2);
-				
-				
-				
+
+
+
 				if ($lang == 'es') {
 					$html2 = str_replace('%fecha_actual%', str_replace($meses_org, $mes_corto, date('j-M-y', strtotime($fecha_factura))), $html2);
 					$html2 = str_replace('%glosa_fecha%', 'FECHA', $html2);
@@ -718,33 +718,33 @@ class Factura extends Objeto {
 					$html2 = str_replace('%cliente%', 'CLIENT', $html2);
 					$html2 = str_replace('%fecha%', 'Date', $html2);
 				}
-				
+
 				if ($lang == 'es') {
 					$fecha_lang = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 				} else {
 					$fecha_lang = date('F d, Y');
 				}
-				
-		        $html2 = str_replace('%fecha_lang%', $fecha_lang, $html2);
+
+				$html2 = str_replace('%fecha_lang%', $fecha_lang, $html2);
 
 				/*   NUMERO FEE NOTE PARA prslaws */
 
-				$query_existe_fee_note = "SELECT numero FROM factura where id_cobro = '".$this->fields['id_cobro']."' AND id_documento_legal ='5' ";
+				$query_existe_fee_note = "SELECT numero FROM factura where id_cobro = '" . $this->fields['id_cobro'] . "' AND id_documento_legal ='5' ";
 				$resultado = mysql_query($query_existe_fee_note, $this->sesion->dbh) or Utiles::errorSQL($query_existe_fee_note, __FILE__, __LINE__, $this->sesion->dbh);
 				list( $numero_fee_note_asociado ) = mysql_fetch_array($resultado);
 
-				if ( !empty($numero_fee_note_asociado) && $this->fields['id_documento_legal'] != '5' ) {
-					$html2 = str_replace('%numero_fee_note_factura%', 'FN: '.$numero_fee_note_asociado, $html2);
+				if (!empty($numero_fee_note_asociado) && $this->fields['id_documento_legal'] != '5') {
+					$html2 = str_replace('%numero_fee_note_factura%', 'FN: ' . $numero_fee_note_asociado, $html2);
 				} else {
 					$html2 = str_replace('%numero_fee_note_factura%', '&nbsp;', $html2);
 				}
 
-				if ( $this->fields['id_documento_legal'] == '5') {
-					$html2 = str_replace('%fee_note%', 'FN: '.$this->fields['numero'], $html2);
+				if ($this->fields['id_documento_legal'] == '5') {
+					$html2 = str_replace('%fee_note%', 'FN: ' . $this->fields['numero'], $html2);
 				} else {
-					$html2 = str_replace('%fee_note%', '&nbsp;', $html2);  
+					$html2 = str_replace('%fee_note%', '&nbsp;', $html2);
 				}
-				
+
 				break;
 
 			case 'DATOS_FACTURA':
@@ -1105,10 +1105,13 @@ class Factura extends Objeto {
 				}
 				$html2 = str_replace('%glosa_moneda_factura%', '%' . $cobro_moneda->moneda[$factura_id_moneda]['glosa_moneda'] . '%', $html2);
 				$html2 = str_replace('%Peso%', 'PESOS', $html2);
+				
 				if ($lang == 'es') {
+					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
 					$html2 = str_replace('%Dólar%', 'DÓLARES', $html2);
 				} else {
 					$html2 = str_replace('%Dólar%', 'DOLLARS', $html2);
+					$html2 = str_replace('%asunto%', 'MATTER', $html2);
 				}
 
 				$html2 = str_replace('%Euro%', 'EUROS', $html2);
@@ -1391,7 +1394,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%monto_total_bruto_sin_gastos%', number_format($total, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_palabra%', $monto_total_palabra, $html2);
 
-				/*PARA EVITAR MODIFICAR CODIGO UTILIZADO POR OTROS CLIENTES ( UTILIZADO POR PRSLAWS )*/
+				/* PARA EVITAR MODIFICAR CODIGO UTILIZADO POR OTROS CLIENTES ( UTILIZADO POR PRSLAWS ) */
 
 				$query_datos_factura = "SELECT
 							  factura.subtotal,
@@ -1407,22 +1410,22 @@ class Factura extends Objeto {
 							  descripcion_subtotal_gastos_sin_impuesto
 
 							FROM factura
-							WHERE id_cobro = '".$this->fields["id_cobro"]."' AND id_factura = '".$this->fields["id_factura"]."' ";
+							WHERE id_cobro = '" . $this->fields["id_cobro"] . "' AND id_factura = '" . $this->fields["id_factura"] . "' ";
 
 
 				$resp_datos_factura = mysql_query($query_datos_factura, $this->sesion->dbh) or Utiles::errorSQL($query_datos_factura, __FILE__, __LINE__, $this->sesion->dbh);
 
-				list(  $subtotal_honorarios,
-					$subtotal_honorarios_sin_descuento,
-					$descuento_honorarios,
-					$honorarios,
-					$impuesto,
-					$subtotal_gastos,
-					$subtotal_gastos_sin_impuesto,
-					$factura_id_moneda,
-					$descripcion_honorarios_legales,
-					$descripcion_subtotal_gastos,
-					$descripcion_subtotal_gastos_sin_impuesto   ) = mysql_fetch_array($resp_datos_factura);
+				list( $subtotal_honorarios,
+						$subtotal_honorarios_sin_descuento,
+						$descuento_honorarios,
+						$honorarios,
+						$impuesto,
+						$subtotal_gastos,
+						$subtotal_gastos_sin_impuesto,
+						$factura_id_moneda,
+						$descripcion_honorarios_legales,
+						$descripcion_subtotal_gastos,
+						$descripcion_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp_datos_factura);
 
 
 
@@ -1430,17 +1433,17 @@ class Factura extends Objeto {
 				$query_moneda_tipo_cambio = "SELECT prm_moneda.simbolo, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales, prm_moneda.glosa_moneda_plural
 								FROM cobro_moneda
 								 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro_moneda.id_moneda
-								WHERE cobro_moneda.id_cobro =  '".$this->fields["id_cobro"]."' AND cobro_moneda.id_moneda = '".$factura_id_moneda."' ";
+								WHERE cobro_moneda.id_cobro =  '" . $this->fields["id_cobro"] . "' AND cobro_moneda.id_moneda = '" . $factura_id_moneda . "' ";
 
 				$resp_tipo_cambio = mysql_query($query_moneda_tipo_cambio, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_tipo_cambio, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $simbolo_moneda, $tipo_cambio_moneda ,$tipo_cambio_cifras_decimales, $tipo_cambio_glosa_moneda_plural)  = mysql_fetch_array($resp_tipo_cambio);
+				list( $simbolo_moneda, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_glosa_moneda_plural) = mysql_fetch_array($resp_tipo_cambio);
 
 
 				// OBTIENE MONEDA DE FACTURACION
-				$query_moneda_facturacion = "SELECT id_moneda, opc_moneda_total FROM cobro WHERE id_cobro = '".$this->fields["id_cobro"]."' ";
+				$query_moneda_facturacion = "SELECT id_moneda, opc_moneda_total FROM cobro WHERE id_cobro = '" . $this->fields["id_cobro"] . "' ";
 
 				$resp_moneda_base = mysql_query($query_moneda_facturacion, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_facturacion, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $id_moneda_cobro ,$moneda_facturacion ) = mysql_fetch_array($resp_moneda_base);
+				list( $id_moneda_cobro, $moneda_facturacion ) = mysql_fetch_array($resp_moneda_base);
 
 				$factura_monto_honorarios_con_impuesto = $honorarios;
 				$factura_monto_honorarios_sin_impuesto = $subtotal_honorarios_sin_descuento;
@@ -1454,185 +1457,179 @@ class Factura extends Objeto {
 				$query_moneda_diff = "SELECT cobro_moneda.tipo_cambio, prm_moneda.simbolo , prm_moneda.cifras_decimales
 							FROM cobro_moneda 
 							LEFT JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda 
-							WHERE cobro_moneda.id_cobro = '".$this->fields['id_cobro']."' AND cobro_moneda.id_moneda = '".$id_moneda_cobro."' ";
+							WHERE cobro_moneda.id_cobro = '" . $this->fields['id_cobro'] . "' AND cobro_moneda.id_moneda = '" . $id_moneda_cobro . "' ";
 
 				$resp_moneda_diff = mysql_query($query_moneda_diff, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_diff, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $moneda_diff_tipo_cambio , $moneda_diff_simbolo, $moneda_diff_cifras_decimales ) = mysql_fetch_array($resp_moneda_diff);
+				list( $moneda_diff_tipo_cambio, $moneda_diff_simbolo, $moneda_diff_cifras_decimales ) = mysql_fetch_array($resp_moneda_diff);
 
-				if ( $moneda_facturacion == '2') {
-				  $decim = '2';
+				if ($moneda_facturacion == '2') {
+					$decim = '2';
 				} else {
-				  $decim = '0';    
+					$decim = '0';
 				}
 
 				// // HONORARIOS
 
-				if ( ($factura_monto_honorarios_con_impuesto == '0' ) && ( $factura_monto_honorarios_sin_impuesto == '0' ) ) {
-				  $html2 = str_replace('%factura_monto_honorarios%', '&nbsp;', $html2);
-				  $html2 = str_replace('%factura_descripcion_honorarios%', '&nbsp;', $html2);
-				  $html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
+				if (($factura_monto_honorarios_con_impuesto == '0' ) && ( $factura_monto_honorarios_sin_impuesto == '0' )) {
+					$html2 = str_replace('%factura_monto_honorarios%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_descripcion_honorarios%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
 				} else {
 
-				  /*   SE CONSIDERA SOLAMENTE HONORARIOS SIN IMPUESTO 
-				  *  DEBIDO A QUE LA FACTURA DEBE HACER UNA SUMA DEL IMPUESTO POR SEPARADO
-				  */
+					/*   SE CONSIDERA SOLAMENTE HONORARIOS SIN IMPUESTO 
+					 *  DEBIDO A QUE LA FACTURA DEBE HACER UNA SUMA DEL IMPUESTO POR SEPARADO
+					 */
 
-				  $factura_monto_honorarios = $factura_monto_honorarios_sin_impuesto;
+					$factura_monto_honorarios = $factura_monto_honorarios_sin_impuesto;
 
-				  if ( $id_moneda_cobro != $moneda_facturacion ) {
+					if ($id_moneda_cobro != $moneda_facturacion) {
 
-					if ( $id_moneda_cobro == '2' && $moneda_facturacion == '1'){
-					  $factura_monto_honorarios_diff = $subtotal_honorarios_sin_descuento / $moneda_diff_tipo_cambio;
-					  $factura_tipo_cambio_honorarios = 'Valor '. $moneda_diff_simbolo .' '. number_format($factura_monto_honorarios_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' .$moneda_diff_tipo_cambio;
+						if ($id_moneda_cobro == '2' && $moneda_facturacion == '1') {
+							$factura_monto_honorarios_diff = $subtotal_honorarios_sin_descuento / $moneda_diff_tipo_cambio;
+							$factura_tipo_cambio_honorarios = 'Valor ' . $moneda_diff_simbolo . ' ' . number_format($factura_monto_honorarios_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' . $moneda_diff_tipo_cambio;
+						} else {
+							$factura_tipo_cambio_honorarios = 'Valor ' . $simbolo_moneda . ' ' . number_format($factura_monto_honorarios, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' . $tipo_cambio_moneda;
+						}
+
+						$factura_monto_honorarios_pesos = UtilesApp::CambiarMoneda($factura_monto_honorarios, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, $cifras_decimales_moneda_base, '');
 					} else {
-					  $factura_tipo_cambio_honorarios = 'Valor '. $simbolo_moneda .' '. number_format($factura_monto_honorarios, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' .$tipo_cambio_moneda;  
+						$factura_tipo_cambio_honorarios = '&nbsp;';
+						$factura_monto_honorarios_pesos = $factura_monto_honorarios;
 					}
 
-					$factura_monto_honorarios_pesos = UtilesApp::CambiarMoneda($factura_monto_honorarios, $tipo_cambio_moneda , $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, $cifras_decimales_moneda_base,'');
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%factura_monto_honorarios%', number_format($factura_monto_honorarios_pesos, $decim, ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_honorarios%', $factura_tipo_cambio_honorarios, $html2);
+					} else {
+						$html2 = str_replace('%factura_monto_honorarios%', number_format($subtotal_honorarios_sin_descuento, '2', ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
+					}
 
-				  } else {
-					$factura_tipo_cambio_honorarios = '&nbsp;';
-					$factura_monto_honorarios_pesos = $factura_monto_honorarios;
-				  }
-
-				  if ($this->fields['id_documento_legal'] != '5') {
-					$html2 = str_replace('%factura_monto_honorarios%', number_format($factura_monto_honorarios_pesos, $decim, ',', '.'), $html2);
+					$html2 = str_replace('%factura_descripcion_honorarios%', $descripcion_honorarios_legales, $html2);
 					$html2 = str_replace('%factura_tipo_cambio_honorarios%', $factura_tipo_cambio_honorarios, $html2);
-				  } else {
-					$html2 = str_replace('%factura_monto_honorarios%', number_format($subtotal_honorarios_sin_descuento, '2', ',', '.'), $html2);
-					$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
-				  }
-
-				  $html2 = str_replace('%factura_descripcion_honorarios%', $descripcion_honorarios_legales, $html2);
-				  $html2 = str_replace('%factura_tipo_cambio_honorarios%', $factura_tipo_cambio_honorarios, $html2);
 				}
 
 				// GASTOS
 
-				if ( ($factura_monto_gastos_con_impuesto == 0 ) && ( $factura_monto_gastos_sin_impuesto == 0 ) ) {
-				  $html2 = str_replace('%factura_monto_gastos%', '&nbsp;', $html2);
-				  $html2 = str_replace('%factura_descripcion_gastos%', '&nbsp;', $html2);
-				  $html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
+				if (($factura_monto_gastos_con_impuesto == 0 ) && ( $factura_monto_gastos_sin_impuesto == 0 )) {
+					$html2 = str_replace('%factura_monto_gastos%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_descripcion_gastos%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
 				} else {
 
-				  if ( $factura_monto_gastos_sin_impuesto == '0') { 
-					$factura_monto_gastos = $factura_monto_gastos_con_impuesto;
-					$descripcion_gastos = $descripcion_subtotal_gastos;
-				  } else { 
-					$factura_monto_gastos = $factura_monto_gastos_sin_impuesto;
-					$descripcion_gastos = $descripcion_subtotal_gastos_sin_impuesto;
-				  }
-
-				  if ( $id_moneda_cobro != $moneda_facturacion ) {
-
-					if ( $id_moneda_cobro == '2' ){
-
-					  $factura_monto_gastos_diff = $factura_monto_gastos / $moneda_diff_tipo_cambio;
-					  $factura_tipo_cambio_gastos = 'Valor '. $moneda_diff_simbolo .' '. number_format($factura_monto_gastos_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' .$moneda_diff_tipo_cambio;
+					if ($factura_monto_gastos_sin_impuesto == '0') {
+						$factura_monto_gastos = $factura_monto_gastos_con_impuesto;
+						$descripcion_gastos = $descripcion_subtotal_gastos;
 					} else {
-					  $factura_tipo_cambio_gastos = 'Valor '. $simbolo_moneda .' '. number_format($factura_monto_gastos, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' .$tipo_cambio_moneda;
+						$factura_monto_gastos = $factura_monto_gastos_sin_impuesto;
+						$descripcion_gastos = $descripcion_subtotal_gastos_sin_impuesto;
 					}
 
-					$factura_monto_honorarios_gastos_pesos = UtilesApp::CambiarMoneda($factura_monto_gastos, $tipo_cambio_moneda ,$tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base,'0','');
+					if ($id_moneda_cobro != $moneda_facturacion) {
 
-				  } else {
-					$factura_monto_honorarios_gastos_pesos = $factura_monto_gastos;
-					$factura_tipo_cambio_gastos = '&nbsp;';
-				  }
+						if ($id_moneda_cobro == '2') {
 
-				  if ($this->fields['id_documento_legal'] != '5') {
-					$html2 = str_replace('%factura_monto_gastos%', number_format($factura_monto_honorarios_gastos_pesos, $decim, ',', '.'), $html2);
-					$html2 = str_replace('%factura_tipo_cambio_gastos%', $factura_tipo_cambio_gastos, $html2);
-				  } else {
-					$html2 = str_replace('%factura_monto_gastos%', number_format($factura_monto_gastos, '2', ',', '.'), $html2);
-					$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
-				  }
+							$factura_monto_gastos_diff = $factura_monto_gastos / $moneda_diff_tipo_cambio;
+							$factura_tipo_cambio_gastos = 'Valor ' . $moneda_diff_simbolo . ' ' . number_format($factura_monto_gastos_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' . $moneda_diff_tipo_cambio;
+						} else {
+							$factura_tipo_cambio_gastos = 'Valor ' . $simbolo_moneda . ' ' . number_format($factura_monto_gastos, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' . $tipo_cambio_moneda;
+						}
 
-				  $html2 = str_replace('%factura_descripcion_gastos%', $descripcion_gastos, $html2);
+						$factura_monto_honorarios_gastos_pesos = UtilesApp::CambiarMoneda($factura_monto_gastos, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, '0', '');
+					} else {
+						$factura_monto_honorarios_gastos_pesos = $factura_monto_gastos;
+						$factura_tipo_cambio_gastos = '&nbsp;';
+					}
 
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%factura_monto_gastos%', number_format($factura_monto_honorarios_gastos_pesos, $decim, ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_gastos%', $factura_tipo_cambio_gastos, $html2);
+					} else {
+						$html2 = str_replace('%factura_monto_gastos%', number_format($factura_monto_gastos, '2', ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
+					}
+
+					$html2 = str_replace('%factura_descripcion_gastos%', $descripcion_gastos, $html2);
 				}
 
 				// IMPUESTO
 
-				if ( $factura_monto_impuesto == 0 )  {
-				  $html2 = str_replace('%factura_monto_impuesto%', '&nbsp;', $html2);
-				  $html2 = str_replace('%factura_descripcion_impuesto%', '&nbsp;', $html2);
-				  $html2 = str_replace('%factura_tipo_cambio_impuesto%', '&nbsp;', $html2);
+				if ($factura_monto_impuesto == 0) {
+					$html2 = str_replace('%factura_monto_impuesto%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_descripcion_impuesto%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_impuesto%', '&nbsp;', $html2);
 				} else {
 
-				  if ( $factura_monto_impuesto == '0') {
-					$factura_monto_impuesto = '&nbsp;';
-				  } else {
-					$factura_monto_impuesto = $impuesto;
-				  }
-
-				  if ( $id_moneda_cobro != $moneda_facturacion ) {
-
-					if ( $id_moneda_cobro == '2' ){
-
-					  $factura_monto_impuesto_diff = $factura_monto_impuesto / $moneda_diff_tipo_cambio;
-					  $factura_tipo_cambio_impuesto = 'Valor '. $moneda_diff_simbolo .' '. number_format($factura_monto_impuesto_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' .$moneda_diff_tipo_cambio;
+					if ($factura_monto_impuesto == '0') {
+						$factura_monto_impuesto = '&nbsp;';
 					} else {
-					  $factura_tipo_cambio_impuesto = 'Valor '. $simbolo_moneda .' '. number_format($factura_monto_impuesto, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' .$tipo_cambio_moneda;
+						$factura_monto_impuesto = $impuesto;
 					}
 
-					$factura_monto_impuesto_pesos = UtilesApp::CambiarMoneda($factura_monto_impuesto, $tipo_cambio_moneda ,$tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base,'0','');
+					if ($id_moneda_cobro != $moneda_facturacion) {
 
-				  } else {
-					$factura_monto_impuesto_pesos = $factura_monto_impuesto;
-					$factura_tipo_cambio_impuesto = '&nbsp;';
-				  }
+						if ($id_moneda_cobro == '2') {
 
-				  if ( $lang == 'es' ) {
-					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
-					$glosa_iva = 'IVA ';
-				  } else {
-					$glosa_iva = 'VAT ';
-				  	$html2 = str_replace('%asunto%', 'MATTER', $html2);
-				  }
+							$factura_monto_impuesto_diff = $factura_monto_impuesto / $moneda_diff_tipo_cambio;
+							$factura_tipo_cambio_impuesto = 'Valor ' . $moneda_diff_simbolo . ' ' . number_format($factura_monto_impuesto_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' . $moneda_diff_tipo_cambio;
+						} else {
+							$factura_tipo_cambio_impuesto = 'Valor ' . $simbolo_moneda . ' ' . number_format($factura_monto_impuesto, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' . $tipo_cambio_moneda;
+						}
 
-				  $porcentaje_impuesto = UtilesApp::GetConf($this->sesion, 'ValorImpuesto');
+						$factura_monto_impuesto_pesos = UtilesApp::CambiarMoneda($factura_monto_impuesto, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, '0', '');
+					} else {
+						$factura_monto_impuesto_pesos = $factura_monto_impuesto;
+						$factura_tipo_cambio_impuesto = '&nbsp;';
+					}
 
-				  if ($this->fields['id_documento_legal'] != '5') {
-					$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto_pesos, $decim, ',', '.'), $html2);
+					if ($lang == 'es') {
+						$glosa_iva = 'IVA ';
+					} else {
+						$glosa_iva = 'VAT ';
+					}
+
+					$porcentaje_impuesto = UtilesApp::GetConf($this->sesion, 'ValorImpuesto');
+
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto_pesos, $decim, ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_impuesto%', $factura_tipo_cambio_impuesto, $html2);
+					} else {
+						$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto, '2', ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_impuesto%', '&nbsp;', $html2);
+					}
+
+					$html2 = str_replace('%factura_descripcion_impuesto%', $glosa_iva . $porcentaje_impuesto . ' %', $html2);
 					$html2 = str_replace('%factura_tipo_cambio_impuesto%', $factura_tipo_cambio_impuesto, $html2);
-				  } else {
-					$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto, '2', ',', '.'), $html2);
-					$html2 = str_replace('%factura_tipo_cambio_impuesto%', '&nbsp;', $html2);
-				  }
-
-				  $html2 = str_replace('%factura_descripcion_impuesto%', $glosa_iva. $porcentaje_impuesto .' %', $html2);
-				  $html2 = str_replace('%factura_tipo_cambio_impuesto%', $factura_tipo_cambio_impuesto, $html2);
 				}
 
 				// TOTAL
 
 				$factura_monto_total = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
 
-				if ( $id_moneda_cobro != $moneda_facturacion ) {
-				  $html2 = str_replace('%linea_auxiliar%', '&nbsp', $html2);
-				  $factura_monto_total = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
-				  $factura_monto_total_pesos =  UtilesApp::CambiarMoneda($factura_monto_total, $tipo_cambio_moneda , $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, $$tipo_cambio_moneda_base,'');
+				if ($id_moneda_cobro != $moneda_facturacion) {
+					$html2 = str_replace('%linea_auxiliar%', '&nbsp', $html2);
+					$factura_monto_total = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
+					$factura_monto_total_pesos = UtilesApp::CambiarMoneda($factura_monto_total, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, $$tipo_cambio_moneda_base, '');
 				} else {
-				  $factura_monto_total_pesos = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
-				  $html2 = str_replace('%linea_auxiliar%', '', $html2);
+					$factura_monto_total_pesos = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
+					$html2 = str_replace('%linea_auxiliar%', '', $html2);
 				}
 
 				if ($this->fields['id_documento_legal'] != '5') {
-				  $html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total_pesos, $decim, ',', '.'), $html2);
+					$html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total_pesos, $decim, ',', '.'), $html2);
 				} else {
-				  $html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total, '2', ',', '.'), $html2);
+					$html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total, '2', ',', '.'), $html2);
 				}
 
 				/* AGREGADO EL 9 DE OCTUBRE 2013 */
 
-				if ( $lang == 'es') {
-				  $html2 = str_replace('%columna_descripciones%', 'DESCRIPCI&Oacute;N', $html2);
-				  $html2 = str_replace('%columna_valores%', 'VALOR '.strtoupper($tipo_cambio_glosa_moneda_plural), $html2);
+				if ($lang == 'es') {
+					$html2 = str_replace('%columna_descripciones%', 'DESCRIPCI&Oacute;N', $html2);
+					$html2 = str_replace('%columna_valores%', 'VALOR ' . strtoupper($tipo_cambio_glosa_moneda_plural), $html2);
 				} else {
-				  $html2 = str_replace('%columna_descripciones%', 'DESCRIPTION', $html2);
-				  $html2 = str_replace('%columna_valores%', 'AMOUNT '.strtoupper($simbolo_moneda), $html2);
-				}				
+					$html2 = str_replace('%columna_descripciones%', 'DESCRIPTION', $html2);
+					$html2 = str_replace('%columna_valores%', 'AMOUNT ' . strtoupper($simbolo_moneda), $html2);
+				}
 
 				break;
 			/* case ( $theTag == 'BOTTOM' || $theTag == 'BOTTOM_COPIA' ):  <<< esto creo que no se puede */
@@ -1666,20 +1663,19 @@ class Factura extends Objeto {
 				$html2 = str_replace('%numeracion_hasta%', $numeracion_hasta, $html2);
 				$html2 = str_replace('%titulo%', $titulo_empresa, $html2);
 				$html2 = str_replace('%subtitulo%', $subtitulo_empresa, $html2);
-				
-				if ( $lang == 'es' ) {
+
+				if ($lang == 'es') {
 
 					if ($this->fields['id_documento_legal'] != '5') {
-						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA c ICA R&eacute;gimen Com&uacute;n. Somos declarantes de ICA', $html2);  
+						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA e ICA R&eacute;gimen Com&uacute;n. Somos declarantes de ICA', $html2);
 					} else {
-						$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);  
+						$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
 						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci&oacute;n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr&iacute;guez San&iacute;n S.A.S. As&iacute; mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';
 					}
-
 				} else {
 
 					$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
-					
+
 					if ($this->fields['id_documento_legal'] != '5') {
 						$texto_pie_pagina = 'Please settle this invoice upon receipt, by wire transfer to BANCO DE BOGOTA INTERNATIONAL CORPORATION, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, for further credit to Account No.038501 in the name of Parra, Rodr&iacute;guez & Cavelier. Also, once the transfer has been made, please advise us by telefax so that we can make the corresponding internal records. Please note that we do neither accept payments by check, nor can we accept any responsibility for payments made or sent by chek.';
 					} else {
@@ -1688,8 +1684,8 @@ class Factura extends Objeto {
 				}
 
 				$html2 = str_replace('%texto_pie%', $texto_pie_pagina, $html2);
-		break;
-}
+				break;
+		}
 
 		return $html2;
 	}
