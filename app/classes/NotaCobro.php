@@ -10356,12 +10356,15 @@ class NotaCobro extends Cobro {
 
 		if ($lang =="en"){
 			$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .date('F d, Y');
+			$fecha_segun_lenguaje = date('F d, Y');
 		} else {	
 			$ciudad_fecha_ingles = UtilesApp::GetConf($this->sesion, 'CiudadEstudio'). ' ' .ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+			$fecha_segun_lenguaje = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 		}
 		
 		$htmlplantilla = str_replace('%fecha_especial%', $fecha_lang, $htmlplantilla);
 		$htmlplantilla = str_replace('%ciudad_fecha_ingles%', $ciudad_fecha_ingles, $htmlplantilla);
+		$htmlplantilla = str_replace('%fecha_segun_lenguaje%', $fecha_segun_lenguaje, $htmlplantilla);
 
 		if ($contrato->fields['id_pais'] > 0) {
 			$query = "SELECT nombre FROM prm_pais
