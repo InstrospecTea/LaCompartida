@@ -52,9 +52,27 @@ class FacturaProduccion {
 			'title' => 'Fecha Documento'
 		),
 		array (
+			'field' => 'moneda_original',
+			'title' => 'Moneda Original'
+		),
+		array (
+			'field' => 'subtotal_facturado_original',
+			'format' => 'number',
+			'title' => 'SubTotal Facturado Original'
+		),
+		array (
+			'field' => 'impuesto_facturado_original',
+			'format' => 'number',
+			'title' => 'Impuesto'
+		),
+		array (
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
+		),
+		array (
+			'field' => 'moneda',
+			'title' => 'Moneda'
 		),
 		array (
 			'field' => 'total',
@@ -147,9 +165,27 @@ class FacturaProduccion {
 			'title' => 'Fecha Pago'
 		),
 		array (
+			'field' => 'moneda_original',
+			'title' => 'Moneda Original'
+		),
+		array (
+			'field' => 'subtotal_facturado_original',
+			'format' => 'number',
+			'title' => 'SubTotal Facturado Original'
+		),
+		array (
+			'field' => 'impuesto_facturado_original',
+			'format' => 'number',
+			'title' => 'Impuesto'
+		),
+		array (
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
+		),
+		array (
+			'field' => 'moneda',
+			'title' => 'Moneda'
 		),
 		array (
 			'field' => 'total_facturado',
@@ -246,14 +282,32 @@ class FacturaProduccion {
 			'title' => 'Fecha Pago'
 		),
 		array (
-			'field' => 'subtotal_cobro',
+			'field' => 'moneda_original',
+			'title' => 'Moneda Original'
+		),
+		array (
+			'field' => 'subtotal_facturado_original',
 			'format' => 'number',
-			'title' => 'Total Liquidación'
+			'title' => 'SubTotal Facturado Original'
+		),
+		array (
+			'field' => 'impuesto_facturado_original',
+			'format' => 'number',
+			'title' => 'Impuesto'
 		),
 		array (
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
+		),
+		array (
+			'field' => 'moneda',
+			'title' => 'Moneda'
+		),
+		array (
+			'field' => 'subtotal_cobro',
+			'format' => 'number',
+			'title' => 'Total Liquidación'
 		),
 		array (
 			'field' => 'total_facturado',
@@ -325,10 +379,13 @@ class FacturaProduccion {
 						prm_estado_factura.codigo estado_factura,
 						prm_documento_legal.codigo AS tipo,
 						factura.fecha,
-						factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total,
+						moneda_factura.simbolo AS moneda_original,
+						factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total,
+						factura.subtotal AS subtotal_facturado_original,
+						factura.iva AS impuesto_facturado_original,
 						factura.total AS total_facturado_original,
 						(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
-						moneda_filtro.simbolo,
+						moneda_filtro.simbolo moneda,
 						usuario.id_usuario id_usuario_generador,
 						usuario.username username_generador,
 						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
@@ -363,10 +420,14 @@ class FacturaProduccion {
 							prm_documento_legal.codigo AS tipo,
 							factura.fecha,
 							fp.fecha as fecha_pago,
+							prm_moneda.simbolo AS moneda_original,
 							cobro.monto_subtotal * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_cobro,
 							factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
-							factura.subtotal AS total_facturado_original,
+							factura.subtotal AS subtotal_facturado_original,
+							factura.iva AS impuesto_facturado_original,
+							factura.total AS total_facturado_original,
 							(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
+							prm_moneda_filtro.simbolo moneda,
 							SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS total_pagado,
 							usuario.id_usuario id_usuario_generador,
 							usuario.username username_generador,
@@ -387,8 +448,9 @@ class FacturaProduccion {
 				JOIN cobro ON cobro.id_cobro = factura.id_cobro
 				JOIN cobro_moneda moneda_cobro ON cobro.id_moneda = moneda_cobro.id_moneda AND cobro.id_cobro = moneda_cobro.id_cobro
 				JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
+				JOIN prm_moneda ON moneda_factura.id_moneda = prm_moneda.id_moneda
 				JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
-
+				JOIN prm_moneda prm_moneda_filtro  ON prm_moneda_filtro.id_moneda = moneda_filtro.id_moneda
 				JOIN cta_cte_fact_mvto_moneda AS ccfmm ON ccfmm.id_cta_cte_fact_mvto = ccfm.id_cta_cte_mvto AND ccfmm.id_moneda = ccfm.id_moneda
 				JOIN cta_cte_fact_mvto_moneda AS ccfmmf ON ccfmmf.id_cta_cte_fact_mvto = ccfm.id_cta_cte_mvto AND ccfmmf.id_moneda = :currency_id
 
