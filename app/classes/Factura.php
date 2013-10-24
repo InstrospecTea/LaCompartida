@@ -1670,7 +1670,7 @@ class Factura extends Objeto {
 				if ( $lang == 'es' ) {
 
 					if ($this->fields['id_documento_legal'] != '5') {
-						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA c ICA R&eacute;gimen Com&uacute;n. Somos declarantes de ICA', $html2);  
+						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA e ICA R&eacute;gimen Com&uacute;n. Somos declarantes de ICA', $html2);  
 					} else {
 						$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);  
 						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci&oacute;n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr&iacute;guez San&iacute;n S.A.S. As&iacute; mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';

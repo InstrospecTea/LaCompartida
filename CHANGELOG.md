@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix: 13.6.6
+Miercoles 22 de octubre 2013
+* **Fixed:** [Modificaciones para factura prslaws.](https://github.com/LemontechSA/ttb/pull/321)
+
+## Hotfix: 13.6.6
 Martes 22 de octubre 2013
 * **Fixed:** [Correcciones en configuracion AsuntosPorDefecto.](https://github.com/LemontechSA/ttb/pull/320)
 
