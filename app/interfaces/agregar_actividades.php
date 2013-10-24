@@ -23,7 +23,6 @@ if ($id_actividad != '') {
 	$actividad->Load($id_actividad);
 }
 if ($opcion2 == "guardar") {
-
 	if ($actividad->Check() ) {
 		
 		if ($opcion == '') {
@@ -48,9 +47,17 @@ if ($opcion2 == "guardar") {
 			}
 			</script>';
 	} else {  
-
+		$pagina->AddError($actividad->error);
 	}
+} elseif ($opcion == 'editar') {
+	$actividad->Load($id_actividad);
+
+	$codigo_asunto = $actividad->fields['codigo_asunto'];
+
+	$query = "SELECT codigo_cliente FROM `asunto` WHERE codigo_asunto = '". $codigo_asunto ."'";
+	$codigo_cliente = $actividad->exSQL($query, 'codigo_cliente');
 }
+
 
 $pagina->titulo = __('Ingreso de actividad');
 $pagina->PrintTop($popup);
@@ -66,6 +73,8 @@ $pagina->PrintTop($popup);
 	}
 
 	jQuery(document).ready(function() {
+
+		console.log('anfang hier');
 		startP = window.location.search.indexOf('codact');
 		if (startP > 0) {
 			//codigo actividad
@@ -87,16 +96,7 @@ $pagina->PrintTop($popup);
 				hrefPart2 = window.location.search.substring(startP + 11);
 				endP = hrefPart2.indexOf('&');
 				campo_value = hrefPart2.substring(0, endP);
-				document.getElementById('codigo_cliente').value = campo_value;
-			}
-
-			//glosa_cliente
-			startP = window.location.search.indexOf('gloscliente');
-			if (startP > 0) {
-				hrefPart2 = window.location.search.substring(startP + 12);
-				endP = hrefPart2.indexOf('&');
-				campo_value = hrefPart2.substring(0, endP);
-				document.getElementById('glosa_cliente').value = campo_value;
+				document.getElementById('codigo_cliente').value = campo_value.toUpperCase();
 			}
 
 			//codigo asunto
@@ -105,7 +105,17 @@ $pagina->PrintTop($popup);
 				hrefPart2 = window.location.search.substring(startP + 10);
 				endP = hrefPart2.indexOf('&');
 				campo_value = hrefPart2.substring(0, endP);
-				document.getElementById('campo_codigo_asunto').value = campo_value;
+				var valcodigo = campo_value; 
+				document.getElementById('campo_codigo_asunto').value = campo_value.toUpperCase();
+			}
+
+			//glosa asunto
+			startP = window.location.search.indexOf('glosasunto');
+			if (startP > 0) {
+				hrefPart2 = window.location.search.substring(startP + 11);
+				endP = hrefPart2.indexOf('&');
+				campo_value = hrefPart2.substring(0, endP);
+				document.getElementById('codigo_asunto').value = campo_value;
 			}
 		}
     });
@@ -128,20 +138,23 @@ $pagina->PrintTop($popup);
 			//var gloscliente = document.getElementById('glosa_cliente').value;
 			var gloscliente = "";
 			var codasunto = document.getElementById('campo_codigo_asunto').value;
-			
+			//var glosasunto = document.getElementById('glosa_asunto').value;
+			var glosasunto = codigo_asunto.options[codigo_asunto.selectedIndex].text;
+			console.log('glosasunto: ' + glosasunto);
+
 			var startP = window.location.search.indexOf('opcion');
 			var opc = window.location.search.substring(startP + 7, startP + 14);
 			
-			form.action =  "agregar_actividades.php?buscar=1&popup=1&codact="+codact+"&titact="+titact+"&codcliente="+codcliente+"&gloscliente="+gloscliente+"&codasunto="+codasunto;
+			form.action =  "agregar_actividades.php?buscar=1&popup=1&codact="+codact+"&titact="+titact+"&codcliente="+codcliente+"&gloscliente="+gloscliente+"&codasunto="+codasunto+"&glosasunto="+glosasunto;
 			if (opc == 'agregar') {
 				form.action += "&opcion=agregar";
+				form.encoding = "ISO-8859-1";
 			}
 			console.log('formaction value: ' + form.action ); 
 			form.submit();
 		}
 		return true;
 	}
-
 </script>
 
 
@@ -154,11 +167,10 @@ $pagina->PrintTop($popup);
 	<fieldset class="border_plomo tb_base">
 		<legend>Ingreso de Actividades</legend>
 	<?php 
-
-		$codigo_asunto = $actividad->fields['codigo_asunto'];
+		//$codigo_asunto = $actividad->fields['codigo_asunto'];
 		$cod_actividad =  Utiles::Glosa($sesion, $id_actividad, 'codigo_actividad', 'actividad', 'id_actividad');
 		$glosa_asunto = Utiles::Glosa($sesion, $glosa_asunto, 'glosa_asunto', 'asunto', 'codigo_asunto');
-		$codigo_cliente = Utiles::Glosa($sesion, $codigo_asunto, 'codigo_cliente', 'asunto', 'codigo_asunto');
+		//$codigo_cliente = Utiles::Glosa($sesion, $codigo_asunto, 'codigo_cliente', 'asunto', 'codigo_asunto');
 		$glosa_cliente = Utiles::Glosa($sesion, $codigo_cliente, 'glosa_cliente', 'cliente', 'codigo_cliente');
 
 		if ($cod_actividad == 'No existe información') {
@@ -175,7 +187,7 @@ $pagina->PrintTop($popup);
 		}	
 	?>
 
-	<table style="border: 1px solid #BDBDBD;" class="" width="80%">
+	<table style="border: 1px solid #BDBDBD;" class="" width="100%">
 		<tr>
 			<td align="right">
 				<?php echo __('Código actividad')?>
@@ -199,21 +211,23 @@ $pagina->PrintTop($popup);
 				<?php echo __('Cliente')?>
 			</td>
 			<td align="left">
-
+			<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 			<?php
-				if( Conf::GetConf($sesion,'TipoSelectCliente') == 'autocompletador' ) {
-					if( Conf::GetConf($sesion,'CodigoSecundario') )  {
-						echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario);						
-					} else {
-						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);	
-					}	
-				} else {
-					if( Conf::GetConf($sesion,'CodigoSecundario') )  {
-						echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
-					} else {
-						echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
-					}
-				}
+				// if( Conf::GetConf($sesion,'TipoSelectCliente') == 'autocompletador' ) {
+				// 	if( Conf::GetConf($sesion,'CodigoSecundario') )  {
+				// 		//echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario);						
+				// 		echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); 
+				// 	} else {
+				// 		//echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);	
+				// 		echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); 
+				// 	}	
+				// } else {
+				// 	if( Conf::GetConf($sesion,'CodigoSecundario') )  {
+				// 		echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
+				// 	} else {
+				// 		echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
+				// 	}
+				// }
 			?>
 			</td>
 		</tr>
@@ -226,12 +240,13 @@ $pagina->PrintTop($popup);
 				
 				<?php
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )) {
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+						// CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width=320, $oncambio='') {
 					} else {
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto ? $actividad->fields['codigo_asunto'] : $codigo_asunto ,"","CargaIdioma(this.value); CargarSelectCliente(this.value);", 320,$codigo_cliente);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto ? $actividad->fields['codigo_asunto'] : $codigo_asunto ,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
 				?>
-
+				<input type="hidden" name="hid1" id="hid1" value="lol(this)">
 			</td>
 		</tr>		
 	</table>

@@ -47,7 +47,9 @@
 <script type="text/javascript">
 
 	jQuery(document).ready(function() {
+		console.log('esta aqui');
         jQuery("#agregar_actividad").click(function() {
+        	console.log('esta aqui2');
 			nuovaFinestra('Agregar_Asunto',670,300,'agregar_actividades.php?popup=1&opcion=agregar'); 
         });
 
@@ -57,7 +59,7 @@
 	{
 		if( parseInt(id)>0 && confirm('¿Desea eliminar la actividad seleccionada') == true )
 		{
-			var url = '?id_actividad='+id+'&opcion=eliminar&desde='+desde;
+			var url = '?id_actividad='+id+'&opcion=eliminar&desde='+desde+'&buscar=1';
 			self.location.href = url;
 		}
 	}
@@ -113,25 +115,27 @@
 			<?=__('Cliente')?>
 		</td>
 		<td align=left nowrap>
-			<?
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario);
-		else
-			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-	}
-	else
-	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-		{
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
-		}
-		else
-		{
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
-		}
-	}
+			<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+<?	// if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+	// {
+	// 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+	// 		//echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario);
+	// 		echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); 
+	// 	else
+	// 		//echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+	// 		echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); 
+	// }
+	// else
+	// {
+	// 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+	// 	{
+	// 		echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
+	// 	}
+	// 	else
+	// 	{
+	// 		echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
+	// 	}
+	// }
 ?>
 		</td>
 	</tr>
@@ -143,11 +147,11 @@
 				<?
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
 					}
 					else
 					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $tramite->fields['codigo_asunto'] ? $tramite->fields['codigo_asunto'] : $codigo_asunto ,"","CargaIdioma(this.value); CargarSelectCliente(this.value);", 320,$codigo_cliente);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $tramite->fields['codigo_asunto'] ? $tramite->fields['codigo_asunto'] : $codigo_asunto ,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
 
 				?>
@@ -229,7 +233,7 @@
 		global $desde;
 		$id_act = $fila->fields['id_actividad'];
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) {
-			return "<a href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Actividad', 670, 300,'agregar_actividades.php?id_actividad=" . $id_act . "&popup=1')\"><img src=\"".Conf::ImgDir()."/editar_on.gif\" border=0 title=\"".__('Editar actividad')."\" /></a>"
+			return "<a href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Actividad', 670, 300,'agregar_actividades.php?id_actividad=" . $id_act . "&popup=1&opcion=editar')\"><img src=\"".Conf::ImgDir()."/editar_on.gif\" border=0 title=\"".__('Editar actividad')."\" /></a>"
 	        . "<a href='javascript:void(0)' onclick='EliminarActividad($id_act,$desde)'><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title='".__('Eliminar actividad')."' alt='".__('Eliminar')."'/></a>";
       	} else {
       		return "<a href=?id_actividad=$id_act><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title='".__('Editar actividad')."' alt='' /></a>"

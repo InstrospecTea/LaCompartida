@@ -6,6 +6,13 @@ require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 
 class Actividad extends Objeto
 {
+	function exSQL($sqlstr, $c) {
+		$resp = mysql_query($sqlstr, $this->sesion->dbh) or Utiles::errorSQL($sqlstr,__FILE__,__LINE__,$this->sesion->dbh);
+		$arr = mysql_fetch_array($resp);
+		$codigo_cliente = $arr[$c];
+		return $codigo_cliente;
+	} 
+
 	function Actividad($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "actividad";
@@ -77,10 +84,8 @@ class Actividad extends Objeto
 		if($count > 0)
 		{
 			$this->error = __('Ya existe una actividad con el código elegido.');
-			echo 'Ya existe una actividad con el código elegido.';
 			return false;
 		}
-		echo 'passed here ';
 		return true;
 	}
 	//funcion que asigna el nuevo codigo automatico para un actividad
