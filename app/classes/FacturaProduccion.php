@@ -142,6 +142,11 @@ class FacturaProduccion {
 			'title' => 'Fecha Documento'
 		),
 		array (
+			'field' => 'fecha_pago',
+			'format' => 'date',
+			'title' => 'Fecha Pago'
+		),
+		array (
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
@@ -235,7 +240,11 @@ class FacturaProduccion {
 			'format' => 'date',
 			'title' => 'Fecha Documento'
 		),
-
+		array (
+			'field' => 'fecha_pago',
+			'format' => 'date',
+			'title' => 'Fecha Pago'
+		),
 		array (
 			'field' => 'subtotal_cobro',
 			'format' => 'number',
@@ -352,7 +361,8 @@ class FacturaProduccion {
 							factura.numero,
 							prm_estado_factura.codigo estado_factura,
 							prm_documento_legal.codigo AS tipo,
-							fp.fecha,
+							factura.fecha,
+							fp.fecha as fecha_pago,
 							cobro.monto_subtotal * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_cobro,
 							factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
 							factura.subtotal AS total_facturado_original,
