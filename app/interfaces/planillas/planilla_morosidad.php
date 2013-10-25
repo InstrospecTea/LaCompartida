@@ -90,6 +90,7 @@
 
 		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
 		$mostrar_columna_codigo_asunto = UtilesApp::GetConf($sesion,'CodigoAsuntoEnColumnasSeparadas');
+		$mostrar_columna_estudio = count(PrmEstudio::GetEstudios($sesion)) > 1;
 
 		// Definir columnas a usar
 		$indice_columnas = 1;
@@ -107,8 +108,10 @@
 		$col_fecha_facturacion = $indice_columnas++;
 		$col_cobro = $indice_columnas++;
 		$col_factura = $indice_columnas++;
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-		{
+		if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+			if ($mostrar_columna_estudio) {
+				$col_estudio = $indice_columnas++;
+			}
 			$col_cliente_facturable = $indice_columnas++;
 		}
 		$col_moneda = $indice_columnas++;
@@ -137,8 +140,10 @@
 		if($mostrar_encargado_secundario)
 			$ws1->setColumn($col_encargado_secundario, $col_encargado_secundario, 30);
 		$ws1->setColumn($col_factura, $col_factura, 10);
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-		{
+		if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+			if ($mostrar_columna_estudio) {
+				$ws1->setColumn($col_estudio, $col_estudio, 30);
+			}
 			$ws1->setColumn($col_cliente_facturable, $col_cliente_facturable, 30);
 		}
 		$ws1->setColumn($col_moneda, $col_moneda, 14);
@@ -312,8 +317,10 @@
 				$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 				$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 				$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-				{
+				if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+					if ($mostrar_columna_estudio) {
+						$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+					}
 					$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 				}
 				$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -358,8 +365,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -406,8 +415,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -498,8 +509,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -545,8 +558,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -580,13 +595,12 @@
 					if (strlen($facturas) > 0) {
 						$facturas .= "\n";
 						$clientes_factura .= "\n";
-						$estudio_factura .= "\n";
 					}
 
 					$numero = $Factura->ObtenerNumero(null, $serie, $numero_factura);
-					$facturas .= ( strlen( $numero_factura ) > 0 ? "$codigo_legal_factura $numero" : " "  );
+					$facturas .= ( strlen( $numero_factura ) > 0 ? "$codigo_legal_factura $numero " : " "  );
 					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
-					$estudio_factura .= ( strlen( $estudio_factura ) > 0 ? $estudio_factura : " "  );
+					$estudio_factura = $estudio;
 				}
 			}
 
@@ -647,8 +661,10 @@
 				$ws1->write($filas, $col_encargado, $cobro['nombre'], $txt_izquierda);
 			if($mostrar_encargado_secundario)
 				$ws1->write($filas, $col_encargado_secundario, $cobro['nombre_secundario'], $txt_izquierda);
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-			{
+			if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+				if ($mostrar_columna_estudio) {
+					$ws1->write($filas, $col_estudio, $estudio_factura, $fecha);
+				}
 				$ws1->write($filas, $col_factura, $facturas, $fecha);
 				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
 			}
