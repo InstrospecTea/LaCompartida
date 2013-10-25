@@ -559,23 +559,37 @@
 			}
 			++$filas;
 			// Nombres de clientes segun facturas asociadas al cobro;
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-			{
+			if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
 				$facturas = "";
 				$clientes_factura = "";
-				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo FROM factura f JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  WHERE f.id_cobro = '" . $cobro['id_cobro'] . "'";
+				$estudio_factura = "";
+				$query_obtener_facturas = "SELECT 
+						pdl.codigo,
+						f.serie_documento_legal,
+						f.numero,
+						pe.glosa_estudio,
+						f.cliente
+					FROM factura f
+					INNER JOIN prm_documento_legal pdl ON (f.id_documento_legal = pdl.id_documento_legal)
+					INNER JOIN prm_estudio pe ON (f.id_estudio = pe.id_estudio)
+					WHERE f.id_cobro = '{$cobro['id_cobro']}'";
+
+				$Factura = new Factura($sesion);
 				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
-				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura )  = mysql_fetch_array($resp3))
-				{
-					if( strlen( $facturas ) > 0 )
-					{
+				while (list($codigo_legal_factura, $serie, $numero_factura, $estudio, $cliente_factura) = mysql_fetch_array($resp3)) {
+					if (strlen($facturas) > 0) {
 						$facturas .= "\n";
 						$clientes_factura .= "\n";
+						$estudio_factura .= "\n";
 					}
-					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " . $numero_factura : " "  );
+
+					$numero = $Factura->ObtenerNumero(null, $serie, $numero_factura);
+					$facturas .= ( strlen( $numero_factura ) > 0 ? "$codigo_legal_factura $numero" : " "  );
 					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
+					$estudio_factura .= ( strlen( $estudio_factura ) > 0 ? $estudio_factura : " "  );
 				}
 			}
+
 			if($nombre_cliente != $cobro['glosa_cliente']||$nueva_tabla)
 			{
 				if($cliente_creado)
