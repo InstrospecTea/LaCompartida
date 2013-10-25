@@ -62,7 +62,7 @@ $Pagina->PrintTop($popup);
 			return false;
 		}
 
-		form.submit();
+		document.getElementById('form_actividades').submit();
 		
 		return true;
 	}
