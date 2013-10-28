@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.6.6
 Lunes 28 de octubre 2013
-* **Fixed:** [Modificaciones para factura prslaws, Correccion a reporte avanzado](https://github.com/LemontechSA/ttb/pull/327)
+* **Fixed:** [Modificaciones para factura prslaws, Correccion a reporte avanzado](https://github.com/LemontechSA/ttb/pull/326)
 
 ## Hotfix: 13.6.6
 Miercoles 22 de octubre 2013
