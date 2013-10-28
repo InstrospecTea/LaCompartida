@@ -5,8 +5,8 @@ require_once dirname(__FILE__) . '/../conf.php';
 define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-",numero)');
 
 class Factura extends Objeto {
-	var $max_numero = 1000000000;
 
+	var $max_numero = 1000000000;
 	public static $llave_carga_masiva = CONCAT_FACTURA;
 	public static $campos_carga_masiva = array(
 		'id_documento_legal' => array(
@@ -77,32 +77,31 @@ class Factura extends Objeto {
 		),
 		'id_factura_padre' => 'Factura Asociada'
 	);
-
-	public static $configuracion_reporte = array (
-		array (
+	public static $configuracion_reporte = array(
+		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Código Cliente',
 			'visible' => false,
 		),
-		array (
+		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente',
 		),
-		array (
+		array(
 			'field' => 'fecha',
 			'format' => 'date',
 			'title' => 'Fecha Documento',
 		),
-		array (
+		array(
 			'field' => 'tipo',
 			'title' => 'Tipo',
 		),
-		array (
+		array(
 			'field' => 'serie_documento_legal',
 			'title' => 'Serie Documento',
 			'visible' => false,
 		),
-		array (
+		array(
 			'field' => 'numero',
 			'format' => 'number',
 			'title' => 'N° Documento',
@@ -110,166 +109,165 @@ class Factura extends Objeto {
 				'subtotal' => false
 			)
 		),
-		array (
+		array(
 			'field' => 'factura_rsocial',
 			'title' => 'Razón Social',
 		),
-		array (
+		array(
 			'field' => 'glosas_asunto',
 			'title' => 'Asuntos',
 		),
-		array (
+		array(
 			'field' => 'codigos_asunto',
 			'title' => 'Códigos Asuntos',
 		),
-		array (
+		array(
 			'field' => 'encargado_comercial',
 			'title' => 'Encargado Comercial',
 		),
-		array (
+		array(
 			'field' => 'descripcion',
 			'title' => 'Descripción Factura',
 		),
-		array (
+		array(
 			'field' => 'id_cobro',
 			'title' => 'N° Liquidación',
 		),
-		array (
+		array(
 			'field' => 'idcontrato',
 			'title' => 'Acuerdo Comercial',
 			'visible' => false,
 		),
-		array (
+		array(
 			'field' => 'codigo_contrato',
-			'title' => 'codigo_contrato' ,
+			'title' => 'codigo_contrato',
 			'visible' => false,
 		),
-		array (
+		array(
 			'field' => 'simbolo',
 			'visible' => false,
 			'title' => 'Símbolo Moneda',
 		),
-		array (
+		array(
 			'field' => 'tipo_cambio',
 			'format' => 'number',
 			'title' => 'Tipo Cambio',
 			'visible' => false,
 		),
-		array (
+		array(
 			'field' => 'honorarios',
 			'format' => 'number',
 			'title' => 'Honorarios',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'subtotal_gastos',
 			'format' => 'number',
 			'title' => 'Subtotal Gastos',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'subtotal_gastos_sin_impuesto',
 			'format' => 'number',
 			'title' => 'Subtotal Gastos sin impuesto',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'subtotal',
 			'format' => 'number',
 			'title' => 'Subtotal',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'iva',
 			'format' => 'number',
 			'title' => 'IVA',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'total',
 			'format' => 'number',
 			'title' => 'Total',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'monto_real',
 			'format' => 'number',
 			'title' => 'Monto Real',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'observaciones',
 			'title' => 'Observaciones',
 		),
-		array (
+		array(
 			'field' => 'pagos',
 			'format' => 'number',
 			'title' => 'Pagos',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'saldo',
 			'format' => 'number',
 			'title' => 'Saldo',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'fecha_ultimo_pago',
 			'format' => 'date',
 			'title' => 'Fecha Último Pago',
 		),
-		array (
+		array(
 			'field' => 'estado',
 			'title' => 'Estado Documento',
 		),
-		array (
+		array(
 			'field' => 'codigo_idioma',
 			'title' => 'Código Idioma',
 			'visible' => false,
 		),
-		array (
+		array(
 			'field' => 'cifras_decimales',
 			'title' => 'Cifras Decimales',
 			'visible' => false,
 		),
-
-			array (
+		array(
 			'field' => 'id_factura',
 			'title' => 'id_factura',
 			'visible' => false,
@@ -629,14 +627,14 @@ class Factura extends Objeto {
 					$html2 = str_replace('%Senores%', 'SEÑORES', $html2);
 					$html2 = str_replace('%tipo_doc_legal%', $glosa_tipo_doc_mayus, $html2);
 					$html2 = str_replace('%numero_doc_legal%', $numero_factura, $html2);
-					$html2 = str_replace('%numero_factura_cyc%', __('FACTURA DE VENTA NO.').' '. $numero_factura, $html2);
+					$html2 = str_replace('%numero_factura_cyc%', __('FACTURA DE VENTA NO.') . ' ' . $numero_factura, $html2);
 				} else {
 					$titulos_es = array('Sr.', 'Sra.', 'Srta.');
 					$titulos_en = array('Mr.', 'Mrs.', 'Ms.');
 					$titulo_contacto = str_replace($titulos_es, $titulos_en, $titulo_contacto);
 					$html2 = str_replace('%numero_factura%', __($glosa_tipo_doc) . ' No. ' . $numero_factura, $html2);
 					$html2 = str_replace('%Senores%', 'Messrs', $html2);
-					$html2 = str_replace('%numero_factura_cyc%', __('INVOICE').' '. $numero_factura, $html2);
+					$html2 = str_replace('%numero_factura_cyc%', __('INVOICE') . ' ' . $numero_factura, $html2);
 				}
 				$html2 = str_replace('%subtitulo%', '', $html2);
 
@@ -691,19 +689,62 @@ class Factura extends Objeto {
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_mes%', date('m', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_anio_2cifras%', date('y', strtotime($fecha_factura)), $html2);
+
+				$html2 = str_replace('%contrato_titulo_contacto%', strtoupper($titulo_contacto), $html2);
+				$html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
+				$html2 = str_replace('%contrato_razon_social%', strtoupper($factura_razon_social), $html2);
+				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($nombre_ciudad), $html2);
+				$html2 = str_replace('%contrato_nombre_pais%', strtoupper($nombre_pais), $html2);
+				$html2 = str_replace('%cobro_asunto%', strtoupper($nombre_pais), $html2);
+
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
+
 				$html2 = str_replace('%num_anio_ultimacifra%', $anio_yyyy[3], $html2);
+
+
+
 				if ($lang == 'es') {
 					$html2 = str_replace('%fecha_actual%', str_replace($meses_org, $mes_corto, date('j-M-y', strtotime($fecha_factura))), $html2);
 					$html2 = str_replace('%glosa_fecha%', 'FECHA', $html2);
 					$html2 = str_replace('%ATN%', 'ATENCION', $html2);
 					$html2 = str_replace('%id_cobro%', '  ' . $id_cobro, $html2);
+					$html2 = str_replace('%cliente%', 'CLIENTE', $html2);
+					$html2 = str_replace('%fecha%', 'Fecha', $html2);
 				} elseif ($lang == 'en') {
 					$html2 = str_replace('%fecha_actual%', str_replace($meses_org, $month_short, date('M-d-y', strtotime($fecha_factura))), $html2);
 					$html2 = str_replace('%glosa_fecha%', 'DATE', $html2);
 					$html2 = str_replace('%ATN%', 'Attention', $html2);
 					$html2 = str_replace('%id_cobro%', '   <br> INVOICE No.   ' . $id_cobro, $html2);
+					$html2 = str_replace('%cliente%', 'CLIENT', $html2);
+					$html2 = str_replace('%fecha%', 'Date', $html2);
 				}
+
+				if ($lang == 'es') {
+					$fecha_lang = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+				} else {
+					$fecha_lang = date('F d, Y');
+				}
+
+				$html2 = str_replace('%fecha_lang%', $fecha_lang, $html2);
+
+				/*   NUMERO FEE NOTE PARA prslaws */
+
+				$query_existe_fee_note = "SELECT numero FROM factura where id_cobro = '" . $this->fields['id_cobro'] . "' AND id_documento_legal ='5' ";
+				$resultado = mysql_query($query_existe_fee_note, $this->sesion->dbh) or Utiles::errorSQL($query_existe_fee_note, __FILE__, __LINE__, $this->sesion->dbh);
+				list( $numero_fee_note_asociado ) = mysql_fetch_array($resultado);
+
+				if (!empty($numero_fee_note_asociado) && $this->fields['id_documento_legal'] != '5') {
+					$html2 = str_replace('%numero_fee_note_factura%', 'FN: ' . $numero_fee_note_asociado, $html2);
+				} else {
+					$html2 = str_replace('%numero_fee_note_factura%', '&nbsp;', $html2);
+				}
+
+				if ($this->fields['id_documento_legal'] == '5') {
+					$html2 = str_replace('%fee_note%', 'FN: ' . $this->fields['numero'], $html2);
+				} else {
+					$html2 = str_replace('%fee_note%', '&nbsp;', $html2);
+				}
+
 				break;
 
 			case 'DATOS_FACTURA':
@@ -752,7 +793,7 @@ class Factura extends Objeto {
 				}
 
 				// FFF 2012-09-15 normaliza saltos de linea en la descripcion. Y sí, ya probé con preg_replace y tiene comportamiento impredecible.
-				$factura_descripcion=str_replace(array('\r\n','\n\r',"\r\n","\n\r",'\n','\r'), "\n", $factura_descripcion);
+				$factura_descripcion = str_replace(array('\r\n', '\n\r', "\r\n", "\n\r", '\n', '\r'), "\n", $factura_descripcion);
 
 				$moneda_factura = new Moneda($this->sesion);
 				$moneda_factura->Load($factura_id_moneda);
@@ -795,13 +836,13 @@ class Factura extends Objeto {
 					//echo $query_cyc; exit;
 					$resp_cyc = mysql_query($query_cyc, $this->sesion->dbh) or Utiles::errorSQL($query_cyc, __FILE__, __LINE__, $this->sesion->dbh);
 					list( $monto_subtotal,
-						$monto_subtotal_sin_descuento,
-						$descuento_honorarios,
-						$honorarios_con_descuento_con_impuesto,
-						$impuesto_factura,
-						$subtotal_gastos,
-						$subtotal_gastos_sin_impuesto,
-						$subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
+							$monto_subtotal_sin_descuento,
+							$descuento_honorarios,
+							$honorarios_con_descuento_con_impuesto,
+							$impuesto_factura,
+							$subtotal_gastos,
+							$subtotal_gastos_sin_impuesto,
+							$subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
 					$monto_gastos = $subtotal_gastos;
 					$subtotal_gastos_con_impuesto = $subtotal_gastos;
 					if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
@@ -1019,6 +1060,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%descuento_glosa%', '', $html2);
 					}
 				}
+
 				if (UtilesApp::GetConf($this->sesion, "DescripcionFacturaConAsuntos")) {
 					// Lo separo en lineas
 					$factura_descripcion_con_asuntos = explode("\n", __($factura_descripcion));
@@ -1032,7 +1074,7 @@ class Factura extends Objeto {
 						foreach ($factura_descripcion_con_asuntos as $linea) {
 							if (strlen($linea) > $max_caracter_por_linea) {
 								$lineas_factura_descripcion = array_merge(
-									$lineas_factura_descripcion, str_split($linea, $max_caracter_por_linea)
+										$lineas_factura_descripcion, str_split($linea, $max_caracter_por_linea)
 								);
 							} else {
 								$lineas_factura_descripcion[] = $linea;
@@ -1057,15 +1099,19 @@ class Factura extends Objeto {
 					$html2 = str_replace('%asuntos%', $asuntos, $html2);
 					$html2 = str_replace('%cod_asuntos%', $cod_asuntos, $html2);
 				}
+
 				if (method_exists('Conf', 'Server') && method_exists('Conf', 'ImgDir')) {
 					$html2 = str_replace('%logo_cobro%', Conf::Server() . Conf::ImgDir(), $html2);
 				}
 				$html2 = str_replace('%glosa_moneda_factura%', '%' . $cobro_moneda->moneda[$factura_id_moneda]['glosa_moneda'] . '%', $html2);
 				$html2 = str_replace('%Peso%', 'PESOS', $html2);
+				
 				if ($lang == 'es') {
+					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
 					$html2 = str_replace('%Dólar%', 'DÓLARES', $html2);
 				} else {
 					$html2 = str_replace('%Dólar%', 'DOLLARS', $html2);
+					$html2 = str_replace('%asunto%', 'MATTER', $html2);
 				}
 
 				$html2 = str_replace('%Euro%', 'EUROS', $html2);
@@ -1256,8 +1302,8 @@ class Factura extends Objeto {
 					}
 
 					if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
-						$descripcion_subtotal_gastos_separado = nl2br( __($descripcion_subtotal_gastos));
-						$descripcion_subtotal_gastos_sin_impuesto_separado = nl2br( __($descripcion_subtotal_gastos_sin_impuesto));
+						$descripcion_subtotal_gastos_separado = nl2br(__($descripcion_subtotal_gastos));
+						$descripcion_subtotal_gastos_sin_impuesto_separado = nl2br(__($descripcion_subtotal_gastos_sin_impuesto));
 					} else {
 						$descripcion_subtotal_gastos_separado = __($descripcion_subtotal_gastos);
 						$descripcion_subtotal_gastos_sin_impuesto_separado = __($descripcion_subtotal_gastos_sin_impuesto);
@@ -1348,6 +1394,242 @@ class Factura extends Objeto {
 				$html2 = str_replace('%monto_total_bruto_sin_gastos%', number_format($total, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_palabra%', $monto_total_palabra, $html2);
 
+				/* PARA EVITAR MODIFICAR CODIGO UTILIZADO POR OTROS CLIENTES ( UTILIZADO POR PRSLAWS ) */
+
+				$query_datos_factura = "SELECT
+							  factura.subtotal,
+							  factura.subtotal_sin_descuento,
+							  factura.descuento_honorarios,
+							  factura.honorarios,
+							  factura.iva,
+							  factura.subtotal_gastos,
+							  factura.gastos,
+							  factura.id_moneda,
+							  descripcion,
+							  descripcion_subtotal_gastos,
+							  descripcion_subtotal_gastos_sin_impuesto
+
+							FROM factura
+							WHERE id_cobro = '" . $this->fields["id_cobro"] . "' AND id_factura = '" . $this->fields["id_factura"] . "' ";
+
+
+				$resp_datos_factura = mysql_query($query_datos_factura, $this->sesion->dbh) or Utiles::errorSQL($query_datos_factura, __FILE__, __LINE__, $this->sesion->dbh);
+
+				list( $subtotal_honorarios,
+						$subtotal_honorarios_sin_descuento,
+						$descuento_honorarios,
+						$honorarios,
+						$impuesto,
+						$subtotal_gastos,
+						$subtotal_gastos_sin_impuesto,
+						$factura_id_moneda,
+						$descripcion_honorarios_legales,
+						$descripcion_subtotal_gastos,
+						$descripcion_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp_datos_factura);
+
+
+
+				// OBTENIENDO DATOS DE MONEDA PARA EL TIPO DE CAMBIO
+				$query_moneda_tipo_cambio = "SELECT prm_moneda.simbolo, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales, prm_moneda.glosa_moneda_plural
+								FROM cobro_moneda
+								 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro_moneda.id_moneda
+								WHERE cobro_moneda.id_cobro =  '" . $this->fields["id_cobro"] . "' AND cobro_moneda.id_moneda = '" . $factura_id_moneda . "' ";
+
+				$resp_tipo_cambio = mysql_query($query_moneda_tipo_cambio, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_tipo_cambio, __FILE__, __LINE__, $this->sesion->dbh);
+				list( $simbolo_moneda, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_glosa_moneda_plural) = mysql_fetch_array($resp_tipo_cambio);
+
+
+				// OBTIENE MONEDA DE FACTURACION
+				$query_moneda_facturacion = "SELECT id_moneda, opc_moneda_total FROM cobro WHERE id_cobro = '" . $this->fields["id_cobro"] . "' ";
+
+				$resp_moneda_base = mysql_query($query_moneda_facturacion, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_facturacion, __FILE__, __LINE__, $this->sesion->dbh);
+				list( $id_moneda_cobro, $moneda_facturacion ) = mysql_fetch_array($resp_moneda_base);
+
+				$factura_monto_honorarios_con_impuesto = $honorarios;
+				$factura_monto_honorarios_sin_impuesto = $subtotal_honorarios_sin_descuento;
+
+				$factura_monto_gastos_con_impuesto = $subtotal_gastos;
+				$factura_monto_gastos_sin_impuesto = $subtotal_gastos_sin_impuesto;
+
+				$factura_monto_impuesto = $impuesto;
+
+
+				$query_moneda_diff = "SELECT cobro_moneda.tipo_cambio, prm_moneda.simbolo , prm_moneda.cifras_decimales
+							FROM cobro_moneda 
+							LEFT JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda 
+							WHERE cobro_moneda.id_cobro = '" . $this->fields['id_cobro'] . "' AND cobro_moneda.id_moneda = '" . $id_moneda_cobro . "' ";
+
+				$resp_moneda_diff = mysql_query($query_moneda_diff, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_diff, __FILE__, __LINE__, $this->sesion->dbh);
+				list( $moneda_diff_tipo_cambio, $moneda_diff_simbolo, $moneda_diff_cifras_decimales ) = mysql_fetch_array($resp_moneda_diff);
+
+				if ($moneda_facturacion == '2') {
+					$decim = '2';
+				} else {
+					$decim = '0';
+				}
+
+				// // HONORARIOS
+
+				if (($factura_monto_honorarios_con_impuesto == '0' ) && ( $factura_monto_honorarios_sin_impuesto == '0' )) {
+					$html2 = str_replace('%factura_monto_honorarios%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_descripcion_honorarios%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
+				} else {
+
+					/*   SE CONSIDERA SOLAMENTE HONORARIOS SIN IMPUESTO 
+					 *  DEBIDO A QUE LA FACTURA DEBE HACER UNA SUMA DEL IMPUESTO POR SEPARADO
+					 */
+
+					$factura_monto_honorarios = $factura_monto_honorarios_sin_impuesto;
+
+					if ($id_moneda_cobro != $moneda_facturacion) {
+
+						if ($id_moneda_cobro == '2' && $moneda_facturacion == '1') {
+							$factura_monto_honorarios_diff = $subtotal_honorarios_sin_descuento / $moneda_diff_tipo_cambio;
+							$factura_tipo_cambio_honorarios = 'Valor ' . $moneda_diff_simbolo . ' ' . number_format($factura_monto_honorarios_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' . $moneda_diff_tipo_cambio;
+						} else {
+							$factura_tipo_cambio_honorarios = 'Valor ' . $simbolo_moneda . ' ' . number_format($factura_monto_honorarios, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' . $tipo_cambio_moneda;
+						}
+
+						$factura_monto_honorarios_pesos = UtilesApp::CambiarMoneda($factura_monto_honorarios, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, $cifras_decimales_moneda_base, '');
+					} else {
+						$factura_tipo_cambio_honorarios = '&nbsp;';
+						$factura_monto_honorarios_pesos = $factura_monto_honorarios;
+					}
+
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%factura_monto_honorarios%', number_format($factura_monto_honorarios_pesos, $decim, ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_honorarios%', $factura_tipo_cambio_honorarios, $html2);
+					} else {
+						$html2 = str_replace('%factura_monto_honorarios%', number_format($subtotal_honorarios_sin_descuento, '2', ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
+					}
+
+					$html2 = str_replace('%factura_descripcion_honorarios%', $descripcion_honorarios_legales, $html2);
+					$html2 = str_replace('%factura_tipo_cambio_honorarios%', $factura_tipo_cambio_honorarios, $html2);
+				}
+
+				// GASTOS
+
+				if (($factura_monto_gastos_con_impuesto == 0 ) && ( $factura_monto_gastos_sin_impuesto == 0 )) {
+					$html2 = str_replace('%factura_monto_gastos%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_descripcion_gastos%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
+				} else {
+
+					if ($factura_monto_gastos_sin_impuesto == '0') {
+						$factura_monto_gastos = $factura_monto_gastos_con_impuesto;
+						$descripcion_gastos = $descripcion_subtotal_gastos;
+					} else {
+						$factura_monto_gastos = $factura_monto_gastos_sin_impuesto;
+						$descripcion_gastos = $descripcion_subtotal_gastos_sin_impuesto;
+					}
+
+					if ($id_moneda_cobro != $moneda_facturacion) {
+
+						if ($id_moneda_cobro == '2') {
+
+							$factura_monto_gastos_diff = $factura_monto_gastos / $moneda_diff_tipo_cambio;
+							$factura_tipo_cambio_gastos = 'Valor ' . $moneda_diff_simbolo . ' ' . number_format($factura_monto_gastos_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' . $moneda_diff_tipo_cambio;
+						} else {
+							$factura_tipo_cambio_gastos = 'Valor ' . $simbolo_moneda . ' ' . number_format($factura_monto_gastos, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' . $tipo_cambio_moneda;
+						}
+
+						$factura_monto_honorarios_gastos_pesos = UtilesApp::CambiarMoneda($factura_monto_gastos, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, '0', '');
+					} else {
+						$factura_monto_honorarios_gastos_pesos = $factura_monto_gastos;
+						$factura_tipo_cambio_gastos = '&nbsp;';
+					}
+
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%factura_monto_gastos%', number_format($factura_monto_honorarios_gastos_pesos, $decim, ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_gastos%', $factura_tipo_cambio_gastos, $html2);
+					} else {
+						$html2 = str_replace('%factura_monto_gastos%', number_format($factura_monto_gastos, '2', ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
+					}
+
+					$html2 = str_replace('%factura_descripcion_gastos%', $descripcion_gastos, $html2);
+				}
+
+				// IMPUESTO
+
+				if ($factura_monto_impuesto == 0) {
+					$html2 = str_replace('%factura_monto_impuesto%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_descripcion_impuesto%', '&nbsp;', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_impuesto%', '&nbsp;', $html2);
+				} else {
+
+					if ($factura_monto_impuesto == '0') {
+						$factura_monto_impuesto = '&nbsp;';
+					} else {
+						$factura_monto_impuesto = $impuesto;
+					}
+
+					if ($id_moneda_cobro != $moneda_facturacion) {
+
+						if ($id_moneda_cobro == '2') {
+
+							$factura_monto_impuesto_diff = $factura_monto_impuesto / $moneda_diff_tipo_cambio;
+							$factura_tipo_cambio_impuesto = 'Valor ' . $moneda_diff_simbolo . ' ' . number_format($factura_monto_impuesto_diff, $moneda_diff_cifras_decimales, '.', ',') . ' x ' . $moneda_diff_tipo_cambio;
+						} else {
+							$factura_tipo_cambio_impuesto = 'Valor ' . $simbolo_moneda . ' ' . number_format($factura_monto_impuesto, $tipo_cambio_cifras_decimales, '.', ',') . ' x ' . $tipo_cambio_moneda;
+						}
+
+						$factura_monto_impuesto_pesos = UtilesApp::CambiarMoneda($factura_monto_impuesto, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, '0', '');
+					} else {
+						$factura_monto_impuesto_pesos = $factura_monto_impuesto;
+						$factura_tipo_cambio_impuesto = '&nbsp;';
+					}
+
+					if ($lang == 'es') {
+						$glosa_iva = 'IVA ';
+					} else {
+						$glosa_iva = 'VAT ';
+					}
+
+					$porcentaje_impuesto = UtilesApp::GetConf($this->sesion, 'ValorImpuesto');
+
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto_pesos, $decim, ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_impuesto%', $factura_tipo_cambio_impuesto, $html2);
+					} else {
+						$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto, '2', ',', '.'), $html2);
+						$html2 = str_replace('%factura_tipo_cambio_impuesto%', '&nbsp;', $html2);
+					}
+
+					$html2 = str_replace('%factura_descripcion_impuesto%', $glosa_iva . $porcentaje_impuesto . ' %', $html2);
+					$html2 = str_replace('%factura_tipo_cambio_impuesto%', $factura_tipo_cambio_impuesto, $html2);
+				}
+
+				// TOTAL
+
+				$factura_monto_total = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
+
+				if ($id_moneda_cobro != $moneda_facturacion) {
+					$html2 = str_replace('%linea_auxiliar%', '&nbsp', $html2);
+					$factura_monto_total = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
+					$factura_monto_total_pesos = UtilesApp::CambiarMoneda($factura_monto_total, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_moneda_base, $$tipo_cambio_moneda_base, '');
+				} else {
+					$factura_monto_total_pesos = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
+					$html2 = str_replace('%linea_auxiliar%', '', $html2);
+				}
+
+				if ($this->fields['id_documento_legal'] != '5') {
+					$html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total_pesos, $decim, ',', '.'), $html2);
+				} else {
+					$html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total, '2', ',', '.'), $html2);
+				}
+
+				/* AGREGADO EL 9 DE OCTUBRE 2013 */
+
+				if ($lang == 'es') {
+					$html2 = str_replace('%columna_descripciones%', 'DESCRIPCI&Oacute;N', $html2);
+					$html2 = str_replace('%columna_valores%', 'VALOR ' . strtoupper($tipo_cambio_glosa_moneda_plural), $html2);
+				} else {
+					$html2 = str_replace('%columna_descripciones%', 'DESCRIPTION', $html2);
+					$html2 = str_replace('%columna_valores%', 'AMOUNT ' . strtoupper($simbolo_moneda), $html2);
+				}
 
 				break;
 			/* case ( $theTag == 'BOTTOM' || $theTag == 'BOTTOM_COPIA' ):  <<< esto creo que no se puede */
@@ -1381,6 +1663,27 @@ class Factura extends Objeto {
 				$html2 = str_replace('%numeracion_hasta%', $numeracion_hasta, $html2);
 				$html2 = str_replace('%titulo%', $titulo_empresa, $html2);
 				$html2 = str_replace('%subtitulo%', $subtitulo_empresa, $html2);
+
+				if ($lang == 'es') {
+
+					if ($this->fields['id_documento_legal'] != '5') {
+						$html2 = str_replace('%pie_de_factura%', 'Agente retenedor IVA e ICA R&eacute;gimen Com&uacute;n. Somos declarantes de ICA', $html2);
+					} else {
+						$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
+						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci&oacute;n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr&iacute;guez San&iacute;n S.A.S. As&iacute; mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';
+					}
+				} else {
+
+					$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
+
+					if ($this->fields['id_documento_legal'] != '5') {
+						$texto_pie_pagina = 'Please settle this invoice upon receipt, by wire transfer to BANCO DE BOGOTA INTERNATIONAL CORPORATION, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, for further credit to Account No.038501 in the name of Parra, Rodr&iacute;guez & Cavelier. Also, once the transfer has been made, please advise us by telefax so that we can make the corresponding internal records. Please note that we do neither accept payments by check, nor can we accept any responsibility for payments made or sent by chek.';
+					} else {
+						$texto_pie_pagina = '&nbsp;';
+					}
+				}
+
+				$html2 = str_replace('%texto_pie%', $texto_pie_pagina, $html2);
 				break;
 		}
 
@@ -1674,7 +1977,7 @@ class Factura extends Objeto {
 	/**
 	 * Descarga el reporte excel básico según configuraciones
 	 */
-	public function DownloadExcel($results,$tipo='Spreadsheet') {
+	public function DownloadExcel($results, $tipo = 'Spreadsheet') {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
@@ -1686,6 +1989,7 @@ class Factura extends Objeto {
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, $tipo);
 		$writer->save(__('Facturas'));
 	}
+
 	/**
 	 * Descarga el reporte excel básico según configuraciones
 	 */
@@ -1703,10 +2007,10 @@ class Factura extends Objeto {
 	}
 
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
-		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
+	, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+	, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+	, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
 
@@ -1826,8 +2130,8 @@ class Factura extends Objeto {
 			  , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 			  , factura.RUT_cliente";
 
-			if ($opciones['mostrar_pagos']) {
-				$query .= ", (
+		if ($opciones['mostrar_pagos']) {
+			$query .= ", (
 			  		SELECT SUM(ccfmn.monto)
 	  				FROM factura_pago AS fp
 						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
@@ -1836,10 +2140,10 @@ class Factura extends Objeto {
 						WHERE ccfm2.id_factura = factura.id_factura
 						GROUP BY ccfm2.id_factura
 			  	) AS pagos";
-			}
+		}
 
-			if ($opciones['mostrar_fecha_ultimo_pago']) {
-				$query .= ", (
+		if ($opciones['mostrar_fecha_ultimo_pago']) {
+			$query .= ", (
 				  	SELECT MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
 	  				FROM factura_pago AS fp
 						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
@@ -1848,11 +2152,11 @@ class Factura extends Objeto {
 						WHERE ccfm2.id_factura = factura.id_factura
 						GROUP BY ccfm2.id_factura
 			  	) AS fecha_ultimo_pago";
-			}
+		}
 
-				($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_facturas'):false;
+		($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_facturas') : false;
 
-		   $query.=" FROM factura
+		$query.=" FROM factura
 		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
 		   LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
@@ -1865,22 +2169,22 @@ class Factura extends Objeto {
 		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 		   WHERE ";
 
-		   $resultingquery = $query . " \n " . $where . " \n " . $groupby . "\n" . $orderby;
+		$resultingquery = $query . " \n " . $where . " \n " . $groupby . "\n" . $orderby;
 
-		   return $resultingquery;
+		return $resultingquery;
 	}
 
-	public  function FormatoDataTable() {
+	public function FormatoDataTable() {
 
 
 
-			$formato=array();
+		$formato = array();
 
- 		 	// $formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
-  			// 				 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
- 				// 			},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
+		// $formato['fecha']= '{  "bVisible": "true",  "sClass": "al",   "fnRender": function ( o, val ) {
+		// 				 if(o.aData["fecha"])		return jQuery.datepicker.formatDate("dd/mm/y",new Date(o.aData["fecha"]));
+		// 			},    "aTargets": ["fecha" ] , sDefaultContent: " - "   }';
 
- 			$formato['numero']= '{  "sWidth": "90px", "bVisible": "true",  "sClass": "al"
+		$formato['numero'] = '{  "sWidth": "90px", "bVisible": "true",  "sClass": "al"
 							,"fnRender": function ( o, val ) {
 								var respuesta="";
 								if(o.aData["tipo"])						respuesta+="<b>Tipo</b>: "+o.aData["tipo"];
@@ -1890,7 +2194,7 @@ class Factura extends Objeto {
 											 return respuesta;  }
 							,    "aTargets": ["numero" ] , sDefaultContent: " - "   }';
 
-			$formato['glosa_cliente']= '{    "bVisible": "true",  "sClass": "al"
+		$formato['glosa_cliente'] = '{    "bVisible": "true",  "sClass": "al"
 							,"fnRender": function ( o, val ) {
 								var respuesta="<div style=\"font-size:10px;width:200px;\">";
 								if(o.aData["glosa_cliente"])	respuesta+=	"<b>Cliente</b>: "+o.aData["glosa_cliente"];
@@ -1901,39 +2205,38 @@ class Factura extends Objeto {
 											 return respuesta+"</div>";  }
 							,    "aTargets": ["glosa_cliente" ] , sDefaultContent: " - "   }';
 
- 		 	$formato['id_cobro']= '{ "aTargets": ["id_cobro" ] ,  "sWidth": "40px", "bVisible": "true", "mData":"id_cobro","fnRender": function ( o,val ) { 	return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana(\'Editar_Cobro\',950,660,\'cobros6.php?id_cobro="+o.aData["id_cobro"]+"&amp;popup=1\');\">"+o.aData["id_cobro"]+"</a>"; }	,    sDefaultContent: " - "   }';
+		$formato['id_cobro'] = '{ "aTargets": ["id_cobro" ] ,  "sWidth": "40px", "bVisible": "true", "mData":"id_cobro","fnRender": function ( o,val ) { 	return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana(\'Editar_Cobro\',950,660,\'cobros6.php?id_cobro="+o.aData["id_cobro"]+"&amp;popup=1\');\">"+o.aData["id_cobro"]+"</a>"; }	,    sDefaultContent: " - "   }';
 
 
- 			$formato['Acciones']='{ "aTargets": ["acciones" ] ,  "sClass": "ar",   "fnRender": function ( o, val ) {';
-			$formato['Acciones'] .= 'var id_factura=o.aData["id_factura"];';
-			$formato['Acciones'] .= 'var codigo_cliente=o.aData["codigo_cliente"];';
+		$formato['Acciones'] = '{ "aTargets": ["acciones" ] ,  "sClass": "ar",   "fnRender": function ( o, val ) {';
+		$formato['Acciones'] .= 'var id_factura=o.aData["id_factura"];';
+		$formato['Acciones'] .= 'var codigo_cliente=o.aData["codigo_cliente"];';
 
-			$formato['Acciones'] .= 'var 	respuesta="<div style=\"white-space: nowrap;\"><a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"nuovaFinestra(\'Editar_Factura\',730,700,\'agregar_factura.php?id_factura="+id_factura+"=&codigo_cliente="+codigo_cliente+"&popup=1\');\" >&nbsp;</a>&nbsp;";';
-			if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaDoc')) {
-				$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button doc\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirDocumento('+id_factura+');\" >&nbsp;</a>';";
-			}
-			if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaPdf')) {
-				$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button pdf\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirPDF('+id_factura+');\" >&nbsp;</a>';";
-			}
-			$formato['Acciones'] .="\nrespuesta+='<a  class=\"ui-icon lupa fl logdialog\" rel=\"factura\" id=\"factura_'+id_factura+'\" >&nbsp;</a></div>';";
-			$formato['Acciones'].="\n	return respuesta;";
-			$formato['Acciones'].=' },     sDefaultContent: " - "   }';
+		$formato['Acciones'] .= 'var 	respuesta="<div style=\"white-space: nowrap;\"><a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"nuovaFinestra(\'Editar_Factura\',730,700,\'agregar_factura.php?id_factura="+id_factura+"=&codigo_cliente="+codigo_cliente+"&popup=1\');\" >&nbsp;</a>&nbsp;";';
+		if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaDoc')) {
+			$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button doc\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirDocumento('+id_factura+');\" >&nbsp;</a>';";
+		}
+		if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaPdf')) {
+			$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button pdf\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirPDF('+id_factura+');\" >&nbsp;</a>';";
+		}
+		$formato['Acciones'] .="\nrespuesta+='<a  class=\"ui-icon lupa fl logdialog\" rel=\"factura\" id=\"factura_'+id_factura+'\" >&nbsp;</a></div>';";
+		$formato['Acciones'].="\n	return respuesta;";
+		$formato['Acciones'].=' },     sDefaultContent: " - "   }';
 
- 		return $formato;
+		return $formato;
 	}
 
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
-		, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
-		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-		, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
+	, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+	, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+	, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-		,$tipo_documento_legal_buscado
-		, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_estudio,
-		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
+				, $tipo_documento_legal_buscado
+				, $codigo_cliente, $codigo_cliente_secundario
+				, $codigo_asunto, $codigo_asunto_secundario
+				, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
@@ -2069,33 +2372,30 @@ class Factura extends Objeto {
 		$neteos = array();
 		if (!empty($this->fields['id_factura_padre'])) {
 			$neteos = array(array(
-				$this->fields['id_factura_padre'],
-				$signo * $this->fields['total']
+					$this->fields['id_factura_padre'],
+					$signo * $this->fields['total']
 			));
 		}
 		// 1. Crear cta_cte_fact_mvto
-		$Movimiento->RegistrarMvto($this->fields['id_moneda'],
-				$signo * ($this->fields['total'] - $this->fields['iva']),
-				$signo * $this->fields['iva'],
-				$signo * $this->fields['total'],
-				$this->fields['fecha'],
-				$neteos,
-				$this->fields['id_factura'],
-				null,
-				$tipo_documento_legal);
+		$Movimiento->RegistrarMvto($this->fields['id_moneda'], $signo * ($this->fields['total'] - $this->fields['iva']), $signo * $this->fields['iva'], $signo * $this->fields['total'], $this->fields['fecha'], $neteos, $this->fields['id_factura'], null, $tipo_documento_legal);
 
 		// 2. Crear los factura_cobro
 		$Cobro = new Cobro($this->sesion);
 		$Cobro->Load($this->fields['id_cobro']);
 		$Cobro->AgregarFactura($this);
 	}
+
 }
 
 #end Class
-if(!class_exists('ListaFacturas')) {
+if (!class_exists('ListaFacturas')) {
+
 	class ListaFacturas extends Lista {
+
 		function ListaFacturas($sesion, $params, $query) {
 			$this->Lista($sesion, 'Factura', $params, $query);
 		}
+
 	}
+
 }

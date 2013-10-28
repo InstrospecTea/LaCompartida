@@ -1,4 +1,33 @@
 # Changelog
+## Hotfix: 13.6.6
+Miercoles 22 de octubre 2013
+* **Fixed:** [Modificaciones para factura prslaws.](https://github.com/LemontechSA/ttb/pull/321)
+
+## Hotfix: 13.6.6
+Martes 22 de octubre 2013
+* **Fixed:** [Correcciones en configuracion AsuntosPorDefecto.](https://github.com/LemontechSA/ttb/pull/320)
+
+## Hotfix: 13.6.5
+lunes 21 de octubre 2013
+* **Fixed:** [Actualiza listado manteniendo orden y paginación.](https://github.com/LemontechSA/ttb/pull/320)
+
+## Hotfix: 13.6.4
+Viernes 18 de Octubre 2013
+
+* **Added:** [Generar por sistema factura para cliente PRSLAWS](https://github.com/LemontechSA/ttb/pull/317)
+
+## Hotfix: 13.6.3
+Jueves 17 de Octubre 2013
+
+* **Fixed:** [Error en JS al agregar un trámite en IE9](https://github.com/LemontechSA/ttb/pull/316)
+* **Fixed:** [Corregir asignación de cliente al crear factura](https://github.com/LemontechSA/ttb/pull/316)
+
+## Hotfix: 13.6.2
+Martes 15 de Octubre 2013
+
+* **Fixed:** [Corregir edición campo duración al agregar o modificar un trámite](https://github.com/LemontechSA/ttb/pull/314)
+* **Fixed:** [Codigo de cliente en excel de clientes](https://github.com/LemontechSA/ttb/pull/314)
+
 ## Hotfix: 13.6.1
 Martes 15 de Octubre 2013
 

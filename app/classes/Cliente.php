@@ -629,7 +629,7 @@ class Cliente extends Objeto {
 
 		$where = empty($wheres) ? '' : (' WHERE ' . implode(' AND ', $wheres));
 		$query = "SELECT SQL_CALC_FOUND_ROWS
-				LPAD(cliente.codigo_cliente, 4, '0') as codigo_cliente,
+				cliente.codigo_cliente as codigo_cliente,
 				cliente.codigo_cliente_secundario,
 				cliente.glosa_cliente,
 				grupo_cliente.glosa_grupo_cliente,
