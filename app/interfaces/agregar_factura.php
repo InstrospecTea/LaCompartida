@@ -749,7 +749,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					<?php if ($cantidad_lineas_descripcion > 1) { ?>
 						<textarea id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion ?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos); ?></textarea>
 					<?php } else { ?>
-						<input type="text" id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" value="<?php echo trim($descripcion_subtotal_gastos); ?>" size="40" maxlength="30">
+						<input type="text" id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" value="<?php echo trim($descripcion_subtotal_gastos); ?>" size="40" maxlength="300">
 					<?php } ?>
 				</td>
 				<td align="left" nowrap><?php echo $simbolo; ?>
@@ -766,11 +766,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					<?php if ($cantidad_lineas_descripcion > 1) { ?>
 						<textarea id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion ?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?></textarea>
 					<?php } else { ?>
-						<input type="text" id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva"     id="descripcion_gastos_sin_iva" value="<?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?>" size="40" maxlength="30" >
+						<input type="text" id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva"     id="descripcion_gastos_sin_iva" value="<?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?>" size="40" maxlength="300" >
 					<?php } ?>
 				</td>
 				<td align="left" nowrap><?php echo $simbolo; ?>
-					<input type="text" name="monto_gastos_sin_iva"  class="aproximable"  id="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto; ?>" size="10" maxlength="30"   ></td>
+					<input type="text" name="monto_gastos_sin_iva"  class="aproximable"  id="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto; ?>" size="10" maxlength="300"   ></td>
 				<td align="left">&nbsp;</td>
 			</tr>
 
