@@ -610,18 +610,29 @@ class Factura extends Objeto {
 				$html2 = str_replace('%linea3%', $PdfLinea3, $html2);
 				$html2 = str_replace('%ciudad%', $CiudadSignatura, $html2);
 				$html2 = str_replace('%LogoDoc%', $logo_doc, $html2);
-				$query = "SELECT titulo_contacto, contacto, apellido_contacto, cobro.id_cobro, factura.numero,
-													 CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre, factura.fecha as fecha,
-													prm_documento_legal.glosa
-											FROM contrato
-											LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
-											LEFT JOIN factura ON cobro.id_cobro=factura.id_cobro
-											LEFT JOIN prm_documento_legal ON prm_documento_legal.id_documento_legal = factura.id_documento_legal
-											LEFT JOIN usuario ON contrato.id_usuario_responsable=usuario.id_usuario
-											WHERE id_factura=" . $this->fields['id_factura'];
+
+				$query = "SELECT 
+								titulo_contacto,
+								contacto,
+								apellido_contacto,
+								cobro.id_cobro,
+								factura.numero,
+								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre, factura.fecha as fecha,
+								prm_documento_legal.glosa,
+								contrato.factura_ciudad,
+								prm_pais.nombre as nombre_pais
+							FROM contrato
+							LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
+							LEFT JOIN factura ON cobro.id_cobro=factura.id_cobro
+							LEFT JOIN prm_documento_legal ON prm_documento_legal.id_documento_legal = factura.id_documento_legal
+							LEFT JOIN usuario ON contrato.id_usuario_responsable=usuario.id_usuario
+							LEFT JOIN prm_pais ON contrato.id_pais = prm_pais.id_pais
+							WHERE id_factura=" . $this->fields['id_factura'];
+
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc) = mysql_fetch_array($resp);
+				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc, $factura_ciudad, $nombre_pais) = mysql_fetch_array($resp);
 				$glosa_tipo_doc_mayus = str_replace('é', 'É', strtoupper($glosa_tipo_doc));
+
 				if ($lang == 'es') {
 					$html2 = str_replace('%numero_factura%', __($glosa_tipo_doc) . ' No. ' . $numero_factura, $html2);
 					$html2 = str_replace('%Senores%', 'SEÑORES', $html2);
@@ -693,15 +704,12 @@ class Factura extends Objeto {
 				$html2 = str_replace('%contrato_titulo_contacto%', strtoupper($titulo_contacto), $html2);
 				$html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%contrato_razon_social%', strtoupper($factura_razon_social), $html2);
-				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($nombre_ciudad), $html2);
+				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($factura_ciudad), $html2);
 				$html2 = str_replace('%contrato_nombre_pais%', strtoupper($nombre_pais), $html2);
-				$html2 = str_replace('%cobro_asunto%', strtoupper($nombre_pais), $html2);
 
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
 
 				$html2 = str_replace('%num_anio_ultimacifra%', $anio_yyyy[3], $html2);
-
-
 
 				if ($lang == 'es') {
 					$html2 = str_replace('%fecha_actual%', str_replace($meses_org, $mes_corto, date('j-M-y', strtotime($fecha_factura))), $html2);

@@ -90,6 +90,7 @@
 
 		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
 		$mostrar_columna_codigo_asunto = UtilesApp::GetConf($sesion,'CodigoAsuntoEnColumnasSeparadas');
+		$mostrar_columna_estudio = count(PrmEstudio::GetEstudios($sesion)) > 1;
 
 		// Definir columnas a usar
 		$indice_columnas = 1;
@@ -107,8 +108,10 @@
 		$col_fecha_facturacion = $indice_columnas++;
 		$col_cobro = $indice_columnas++;
 		$col_factura = $indice_columnas++;
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-		{
+		if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+			if ($mostrar_columna_estudio) {
+				$col_estudio = $indice_columnas++;
+			}
 			$col_cliente_facturable = $indice_columnas++;
 		}
 		$col_moneda = $indice_columnas++;
@@ -137,8 +140,10 @@
 		if($mostrar_encargado_secundario)
 			$ws1->setColumn($col_encargado_secundario, $col_encargado_secundario, 30);
 		$ws1->setColumn($col_factura, $col_factura, 10);
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-		{
+		if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+			if ($mostrar_columna_estudio) {
+				$ws1->setColumn($col_estudio, $col_estudio, 30);
+			}
 			$ws1->setColumn($col_cliente_facturable, $col_cliente_facturable, 30);
 		}
 		$ws1->setColumn($col_moneda, $col_moneda, 14);
@@ -312,8 +317,10 @@
 				$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 				$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 				$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-				{
+				if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+					if ($mostrar_columna_estudio) {
+						$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+					}
 					$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 				}
 				$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -358,8 +365,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -406,8 +415,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -498,8 +509,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -545,8 +558,10 @@
 					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
-					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-					{
+					if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+						if ($mostrar_columna_estudio) {
+							$ws1->write($filas, $col_estudio, __('Estudio'), $titulo_filas);
+						}
 						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -559,23 +574,36 @@
 			}
 			++$filas;
 			// Nombres de clientes segun facturas asociadas al cobro;
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-			{
+			if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
 				$facturas = "";
 				$clientes_factura = "";
-				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo FROM factura f JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  WHERE f.id_cobro = '" . $cobro['id_cobro'] . "'";
+				$estudio_factura = "";
+				$query_obtener_facturas = "SELECT 
+						pdl.codigo,
+						f.serie_documento_legal,
+						f.numero,
+						pe.glosa_estudio,
+						f.cliente
+					FROM factura f
+					INNER JOIN prm_documento_legal pdl ON (f.id_documento_legal = pdl.id_documento_legal)
+					INNER JOIN prm_estudio pe ON (f.id_estudio = pe.id_estudio)
+					WHERE f.id_cobro = '{$cobro['id_cobro']}'";
+
+				$Factura = new Factura($sesion);
 				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
-				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura )  = mysql_fetch_array($resp3))
-				{
-					if( strlen( $facturas ) > 0 )
-					{
+				while (list($codigo_legal_factura, $serie, $numero_factura, $estudio, $cliente_factura) = mysql_fetch_array($resp3)) {
+					if (strlen($facturas) > 0) {
 						$facturas .= "\n";
 						$clientes_factura .= "\n";
 					}
-					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " . $numero_factura : " "  );
+
+					$numero = $Factura->ObtenerNumero(null, $serie, $numero_factura);
+					$facturas .= ( strlen( $numero_factura ) > 0 ? "$codigo_legal_factura $numero " : " "  );
 					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
+					$estudio_factura = $estudio;
 				}
 			}
+
 			if($nombre_cliente != $cobro['glosa_cliente']||$nueva_tabla)
 			{
 				if($cliente_creado)
@@ -633,8 +661,10 @@
 				$ws1->write($filas, $col_encargado, $cobro['nombre'], $txt_izquierda);
 			if($mostrar_encargado_secundario)
 				$ws1->write($filas, $col_encargado_secundario, $cobro['nombre_secundario'], $txt_izquierda);
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-			{
+			if (Conf::GetConf($sesion,'NuevoModuloFactura')) {
+				if ($mostrar_columna_estudio) {
+					$ws1->write($filas, $col_estudio, $estudio_factura, $fecha);
+				}
 				$ws1->write($filas, $col_factura, $facturas, $fecha);
 				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
 			}
