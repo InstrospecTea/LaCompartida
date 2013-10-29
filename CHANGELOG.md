@@ -1,10 +1,14 @@
 # Changelog
 
-## Hotfix: 13.6.6
+## Hotfix: 13.6.9
+Lunes 28 de octubre 2013
+* **Added:** [Modificaciones a menu actividades, Modificaciones a tamaño de campos en agregar factura](https://github.com/LemontechSA/ttb/pull/327)
+
+## Hotfix: 13.6.8
 Lunes 28 de octubre 2013
 * **Fixed:** [Modificaciones para factura prslaws, Correccion a reporte avanzado](https://github.com/LemontechSA/ttb/pull/326)
 
-## Hotfix: 13.6.6
+## Hotfix: 13.6.7
 Miercoles 22 de octubre 2013
 * **Fixed:** [Modificaciones para factura prslaws.](https://github.com/LemontechSA/ttb/pull/321)
 
