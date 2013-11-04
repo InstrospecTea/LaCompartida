@@ -29,6 +29,8 @@ if ($opc == "eliminar") {
 $modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
 $id_categoria_anterior = $usuario->fields['id_categoria_usuario'];
 
+//echo 'Categoria original <b>'.$id_categoria_anterior.'</b></br>';
+
 if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
 	$arr1 = $usuario->fields;
@@ -87,7 +89,9 @@ if ($opc == 'edit') {
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
 
-				if ( $id_categoria_anterior != $usuario->fields['id_categoria_usuario']) {
+				//echo 'Categoria actual <b>'.$id_categoria_usuario.'</b></br>';
+
+				if ( $id_categoria_anterior != $id_categoria_usuario) {
 					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);	
 				}
 				
