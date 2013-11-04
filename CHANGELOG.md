@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.6.10
+Lunes 04 de Noviembre 2013
+* **Added:** [Modificaciones a menu usuario paso 2 no actualiza tarifas al guardar salvo que exista un cambio de categoria.](https://github.com/LemontechSA/ttb/pull/327)
+
 ## Hotfix: 13.6.9
 Lunes 28 de octubre 2013
 * **Added:** [Modificaciones a menu actividades, Modificaciones a tamaño de campos en agregar factura](https://github.com/LemontechSA/ttb/pull/327)
