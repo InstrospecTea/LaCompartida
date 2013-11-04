@@ -29,6 +29,8 @@ if ($opc == "eliminar") {
 $modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
 $id_categoria_anterior = $usuario->fields['id_categoria_usuario'];
 
+//echo 'Categoria original <b>'.$id_categoria_anterior.'</b></br>';
+
 if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
 	$arr1 = $usuario->fields;
@@ -87,7 +89,9 @@ if ($opc == 'edit') {
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
 
-				if ( $categoria_anterior != $id_categoria_usuario) {
+				//echo 'Categoria actual <b>'.$id_categoria_usuario.'</b></br>';
+
+				if ( $id_categoria_anterior != $id_categoria_usuario) {
 					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);	
 				}
 				
@@ -107,10 +111,7 @@ if ($opc == 'edit') {
 				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
-				
-				if ( $id_categoria_anterior != $id_categoria_usuario) {
-					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
-				}
+				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 
 				$pagina->AddInfo(__('Usuario ingresado con éxito, su nuevo password es') . ' ' . $new_password);
 			} else {
@@ -341,15 +342,14 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		<legend><?php echo __('Datos básicos') ?></legend>
 		<table>
 
-<!-- 			<tr>
+			<tr>
 				<td valign="top" class="texto" align="right">
 					<strong>
 
 						<?php 
-
 						$nombre_identificador = ( method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'NombreIdentificador') : Conf::NombreIdentificador() ); 
-
-						echo $nombre_identificador ?>
+						echo $nombre_identificador 
+						?>
 
 					</strong>
 				</td>
@@ -365,7 +365,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 					<strong> <?php echo $rut ?> <?php echo $separador ?> <?php echo $dv_rut ?> </strong>
 				</td>
-			</tr> -->
+			</tr>
 
 			<tr>
 				<td valign="top" class="texto" align="right">
