@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.6.11
 Lunes 05 de Noviembre 2013
-* **Added:** [Correccion a cobros_xls para solucionar problema de redondeo al obtener resultado de el monto_subtotal en otra moneda.](https://github.com/LemontechSA/ttb/pull/328)
+* **Added:** [Correccion a cobros_xls para solucionar problema de redondeo al obtener resultado de el monto_subtotal en otra moneda.](https://github.com/LemontechSA/ttb/pull/332)
 
 ## Hotfix: 13.6.10
 Lunes 04 de Noviembre 2013
