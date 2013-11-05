@@ -345,6 +345,7 @@ if ($borradores) {
 
 		$ws->setColumn($col_abogado, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 	}
+
 	if (!$opc_ver_asuntos_separados) {
 		$ws->setColumn($col_asunto, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 	}
@@ -887,32 +888,30 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		 */
 		
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_horas', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+
 		$horas_cobrables = floor($cobro->fields['total_minutos'] / 60);
 		$minutos_cobrables = sprintf("%02d", $cobro->fields['total_minutos'] % 60);
-		$ws->write($filas2++, $col_valor_trabajo, "$horas_cobrables:$minutos_cobrables", $formato_encabezado_derecha);
 
+		$ws->write($filas2++, $col_valor_trabajo, "$horas_cobrables:$minutos_cobrables", $formato_encabezado_derecha);
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 		$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 
 		if ($cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total']) {
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			
-			//$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo" . ($filas2 - 1) . "*" . $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] . "/" . $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
-
-			$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '') ."<br>";
-			$id_moneda = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] . "<br>";
-			$opc_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'] . "<br>";
-
-			$monto_equivalente_a = $monto_subtotal * $id_moneda / $opc_moneda_total. "<br>";
-
-            $ws->writeNumber($filas2++, $col_valor_trabajo, $monto_equivalente_a, $formato_moneda_resumen);
+			$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '');
+			$id_moneda = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
+			$opc_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
+			$monto_equivalente_a = $monto_subtotal * $id_moneda / $opc_moneda_total;
+            $ws->writeNumber($filas2++, $col_valor_trabajo, round($monto_equivalente_a), $formato_moneda_resumen);
 		}
+
 		if ($cobro->fields['descuento'] > 0) {
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 			$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['descuento'] * $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 			$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo" . ($filas2 - 2) . "-$col_formula_valor_trabajo" . ($filas2 - 1), $formato_moneda_resumen);
 		}
+
 		if ($cobro->fields['porcentaje_impuesto'] > 0 && UtilesApp::GetConf($sesion, 'ValorImpuesto') > 0) {
 			if ($cobro->fields['porcentaje_impuesto_gastos'] > 0 && UtilesApp::GetConf($sesion, 'ValorImpuestoGastos') > 0) {
 				if ($opc_ver_gastos) {
