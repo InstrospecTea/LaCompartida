@@ -3,6 +3,7 @@
 ## Hotfix: 13.6.12
 Jueves 07 de Noviembre 2013
 * **Fixed:** [Corrige bug en interfaz agregar_tarifa, no se autocompletaban tarifas de monedas con glosa compuesta de 2 palabras](https://github.com/LemontechSA/ttb/pull/333)
+* **Fixed:** Corrige bugs de encoding y glosa de régimen en facturación electrónica MX
 
 ## Hotfix: 13.6.11
 Martes 05 de Noviembre 2013
