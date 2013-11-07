@@ -248,7 +248,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'tipoDeComprobante|ingreso'
 		),
 		'REF' => array(
-			'Regimen|' . 'Persona física régimen general'
+			'Regimen|' . 'Régimen General de Ley, Personas Morales'
 		),
 		'REC' => array(
 			'rfc|' . $Factura->fields['RUT_cliente'],
