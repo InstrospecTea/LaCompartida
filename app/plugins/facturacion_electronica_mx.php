@@ -231,12 +231,14 @@ function PaymentMethod(Sesion $Sesion, Factura $Factura) {
 //
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
+	$mx_timezone = -6;
+	$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
 	$r = array(
 		'COM' => array(
 			'version|3.2',
 			'serie|' . $Factura->fields['serie_documento_legal'],
 			'folio|' . $Factura->fields['numero'],
-			'fecha|' . Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%dT%H:%M:%S'),
+			'fecha|' . Utiles::sql2date($Factura->fields['fecha'] . ' ' . $mx_hour, '%Y-%m-%dT%H:%M:%S'),
 			'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],

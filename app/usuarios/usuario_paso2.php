@@ -92,9 +92,9 @@ if ($opc == 'edit') {
 				//echo 'Categoria actual <b>'.$id_categoria_usuario.'</b></br>';
 
 				if ( $id_categoria_anterior != $id_categoria_usuario) {
-					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);	
+					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 				}
-				
+
 				$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
 				$pagina->AddInfo(__('Usuario editado con éxito.'));
 			} else {
@@ -103,7 +103,7 @@ if ($opc == 'edit') {
 
 		} else {
 
-			
+
 			$new_password = Utiles::NewPassword();
 			$usuario->Edit('password', md5($new_password));
 
@@ -128,7 +128,7 @@ if ($opc == 'edit') {
 	}
 
 } else if ($opc == 'pass' and $usuario->loaded) {
- 
+
  	if (isset($genpass)) {
 
 		if ($genpass > 0) {
@@ -143,9 +143,9 @@ if ($opc == 'edit') {
 	$usuario->Edit('force_reset_password', $force_reset);
 
 	if ($usuario->Write()) {
-		
+
 		$pagina->AddInfo(__('Contraseña modificada con éxito'));
-		
+
 		if ($genpass > 0) {
 			$pagina->AddInfo(__('Nueva contraseña:') . ' ' . $new_password);
 		}
@@ -155,15 +155,15 @@ if ($opc == 'edit') {
 	}
 
 } elseif ($opc == 'cancelar') {
-	
+
 	$pagina->Redirect('usuario_paso1.php');
 
 } elseif ($opc == 'elimina_vacacion' and $usuario->loaded) {
-	
+
 	if ($usuario->EliminaVacacion($vacacion_id_tmp, $usuario->fields['id_usuario'])) {
 		$pagina->AddInfo(__('Se ha eliminado correctamente el dato de vacaciones.'));
 	}
-		
+
 }
 
 //Lista de vacaciones
@@ -180,7 +180,7 @@ $pagina->PrintTop();
 if ($usuario->loaded) {
 	$dv_rut = $usuario->fields['dv_rut'];
 }
-	
+
 $lista_monedas = new ListaObjetos($sesion, "", "SELECT * FROM prm_moneda");
 $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la selección, presiona la tecla <strong>CTRL</strong> al momento de hacer <strong>clic</strong>.");
 ?>
@@ -208,7 +208,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	}
 
 	var necesitaConfirmar = false;
-	
+
 	function Validar(form)
 	{
 		if (form.email.value == "") {
@@ -346,21 +346,21 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				<td valign="top" class="texto" align="right">
 					<strong>
 
-						<?php 
-						$nombre_identificador = ( method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'NombreIdentificador') : Conf::NombreIdentificador() ); 
-						echo $nombre_identificador 
+						<?php
+						$nombre_identificador = ( method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'NombreIdentificador') : Conf::NombreIdentificador() );
+						echo $nombre_identificador
 						?>
 
 					</strong>
 				</td>
 				<td valign="top" class="texto" align="left">
-					
-					<?php 
+
+					<?php
 
 					if ( $nombre_identificador == 'RUT' ) {
-						$separador = '-'; 
-					} else { 
-						$separador = ''; 
+						$separador = '-';
+					} else {
+						$separador = '';
 					} ?>
 
 					<strong> <?php echo $rut ?> <?php echo $separador ?> <?php echo $dv_rut ?> </strong>
@@ -438,14 +438,14 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 										LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
 										ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
 					}
-					
+
 					echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario)
  					?>
 				</td>
 			</tr>
-			
+
 			<?php if ($modulo_retribuciones_activo) { ?>
-			
+
 				<tr>
 					<td valign="top" class="texto" align="right">
 						<?php echo __('Porcentaje de Retribución') ?>
@@ -527,7 +527,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<span id="secretario_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
 			<?php echo __('Usuario secretario de') ?>
 		</legend>
-		
+
 		<table id="secretario_tabla" style="display:none">
 			<tr>
 				<td>
@@ -536,15 +536,15 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				$where = '';
 				if ($usuario->loaded) {	$where = "id_usuario <> " . $usuario->fields['id_usuario'];	}
 				if (!$where) { $where = 1; }
-				
+
 				$lista_usuarios = new ListaObjetos($sesion, '', "SELECT id_usuario,CONCAT_WS(' ',nombre,apellido1,apellido2) as name FROM usuario WHERE activo=1 AND $where ORDER BY nombre");
-				
+
 				echo "<select name='usuario_secretario[]' id='usuario_secretario' multiple size=6 $tooltip_select  style='width: 200px;'>";
-				
+
 				for ($x = 0; $x < $lista_usuarios->num; $x++) {
 					$us = $lista_usuarios->Get($x);
 				?>
-				
+
 				<option value='<?php echo $us->fields['id_usuario'] ?>' <?php echo $usuario->LoadSecretario($us->fields['id_usuario']) ? "selected" : "" ?>><?php echo $us->fields['name'] ?></option>
 					<?php
 				} echo "</select>";	?>
@@ -655,14 +655,14 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 			<?php
 			if ($usuario->loaded) {
-			
+
 				$params_array['codigo_permiso'] = 'COB';
 				$permiso_cobranza = $usuario->permisos->Find('FindPermiso', $params_array);
-			
+
 				if (!$permiso_cobranza->fields['permitido']) {
-			
+
 					echo '<tr>';
-						
+
 						echo '<td colspan="5" align="right">';
 							echo '<label for="dias_ingreso_trabajo">'. __('Plazo máximo (en días) para ingreso de trabajos') . '</label>';
 						echo '</td>';
@@ -716,7 +716,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fin</td>
 				<td width="40px" style="border:1px solid #ccc">&nbsp;</td>
 			</tr>
-			
+
 			<?php
 			if (!empty($usuario_vacaciones)) {
 				foreach ($usuario_vacaciones as $k => $vaca) {
@@ -735,7 +735,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 	<!-- Historial -->
 	<fieldset>
-		
+
 		<legend onClick="Expandir('historial')" style="cursor:pointer">
 			<span id="historial_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
 			<?php echo __('Historial') ?>
@@ -752,10 +752,10 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<?php } else { ?>
 				<input type="button" onclick="alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.');" value="<?php echo __('Guardar') ?>" class=btn /> &nbsp;&nbsp;
 			<?php } ?>
-		
+
 			<input type="button" value="<?php echo __('Cancelar') ?>" onclick="Cancelar(this.form);" class=btn />
-		
-			<?php if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0) { ?>
+
+			<?php if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0 && $rut != '99511620') { ?>
 				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Usuario') ?>' class="btn_rojo" ></input>
 			<?php } ?>
 	</fieldset>
@@ -783,14 +783,14 @@ if ($usuario->loaded) {
 					<strong><?php echo __('Contraseña') ?>:</strong>
 				</td>
 				<td align="left">
-				
+
 				<?php
 				$reset_password_by = __('Administrador');
 				if ($usuario->fields['reset_password_by'] == 'U') {
 					$reset_password_by = __('Usuario');
 				}
 				?>
-				
+
 				<span><?php echo __('Establecida por el') . " $reset_password_by" ?></span>
 				<a href="#" id="change_password_link" ><?php echo __('Cambiar contraseña') ?></a><br/>
 				<div id="change_password_information" style="display:none"><?php echo __('Ingrese una nueva contraseña para este usuario, o escoja crear una aleatoria.') ?><br/>
@@ -802,20 +802,20 @@ if ($usuario->loaded) {
 							<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
 							<input type="text" name="new_password" id="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
 						</div>
-				
+
 						<?php PasswordStrength::PrintHTML(); ?>
-				
+
 					</div>
-		
+
 					<div>
 						<input type="radio" name="genpass" value="1" id="rand_pass" />
 						<label for="rand_pass"><?php echo __('Generar contraseña aleatoria') ?></label>
 					</div>
-					
+
 					</div>
 				</td>
 			</tr>
-				
+
 			<tr>
 				<td width="100" align="left">
 					<strong>&nbsp;</strong>
@@ -831,13 +831,13 @@ if ($usuario->loaded) {
 					</label>
 				<td>
 			</tr>
-			
+
 			<tr>
 				<td align="right" colspan="2">
 					<input type="submit" value="<?php echo __('Cambiar Contraseña') ?>" size="16"/>
 				</td>
 			</tr>
-			
+
 		</table>
 	</fieldset>
 </form>
@@ -854,15 +854,15 @@ function CargarPermisos() {
 	$permisos_activados = array();
 	//Obtenemos lista de permisos actual sin considerar ALL
 	$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
-	
+
 	for ($i = 0; $i < $usuario->permisos->num; $i++) {
-	
+
 		$permiso = &$usuario->permisos->get($i);
-	
+
 		if ($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']]) {
 			$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
 			$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
-	
+
 			if (!$usuario->EditPermisos($permiso)) {
 				$pagina->AddError($usuario->error);
 			} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
@@ -908,7 +908,7 @@ function CargarPermisos() {
 
 		jQuery('#change_password_link').live('click', function() {
 			var lang_cambiar = "<?php echo __('Cambiar contraseña'); ?>";
-		
+
 			if (jQuery(this).text() == lang_cambiar) {
 				jQuery(this).text('Cancelar');
 			} else {
@@ -948,7 +948,7 @@ function CargarPermisos() {
 			button: "img_"+ide
 		});
 	});
-	
+
 	//Submit desde botón agregar Vacacciones
 	$('btn_guardar_vacacion').observe('click', function(e){
 		var fecha_ini = $F('vacaciones_fecha_inicio').fechaDDMMAAAA();
@@ -964,7 +964,7 @@ function CargarPermisos() {
 			$('form_usuario').submit();
 		}
 	});
-	
+
 	//Eliminar Vacaciones
 	$$('.cls_eliminar_vacacion').each(function(elemento){
 		elemento.observe('click', function(evento){

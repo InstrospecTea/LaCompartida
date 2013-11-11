@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 13.6.13
+Jueves 07 de Noviembre 2013
+* **Fixed:** Permite generar facturas electrónicas con diferente hora para que FacturemosYA no se caiga
+* **Fixed:** No permite que el usuario cualquiera pueda eliminar al superuser: 99511620
+
 ## Hotfix: 13.6.12
 Jueves 07 de Noviembre 2013
 * **Fixed:** [Corrige bug en interfaz agregar_tarifa, no se autocompletaban tarifas de monedas con glosa compuesta de 2 palabras](https://github.com/LemontechSA/ttb/pull/333)
