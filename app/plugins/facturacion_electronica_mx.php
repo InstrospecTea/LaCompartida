@@ -236,7 +236,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'version|3.2',
 			'serie|' . $Factura->fields['serie_documento_legal'],
 			'folio|' . $Factura->fields['numero'],
-			'fecha|' . Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%dT%H:%M:%S'),
+			'fecha|' . Utiles::sql2date($Factura->fields['fecha'] . ' ' . date('H:i:s'), '%Y-%m-%dT%H:%M:%S'),
 			'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
