@@ -1,14 +1,19 @@
 # Changelog
 
+## Hotfix: 13.6.14
+Martes 12 de Noviembre 2013
+* **Fixed:** [No permite que el campo para el rut del usuario esta vacío](https://github.com/LemontechSA/ttb/pull/337)
+* **Fixed:** [Corrige problema de despliege de tag %asuntos_relacionados% en Carta de cobro funcion GenerarDocumentoCarta](https://github.com/LemontechSA/ttb/pull/337)
+
 ## Hotfix: 13.6.13
 Jueves 07 de Noviembre 2013
-* **Fixed:** Permite generar facturas electrónicas con diferente hora para que FacturemosYA no se caiga
-* **Fixed:** No permite que el usuario cualquiera pueda eliminar al superuser: 99511620
+* **Fixed:** [Permite generar facturas electrónicas con diferente hora para que FacturemosYA no se caiga](https://github.com/LemontechSA/ttb/pull/336)
+* **Fixed:** [No permite que el usuario cualquiera pueda eliminar al superuser: 99511620](https://github.com/LemontechSA/ttb/pull/336)
 
 ## Hotfix: 13.6.12
 Jueves 07 de Noviembre 2013
 * **Fixed:** [Corrige bug en interfaz agregar_tarifa, no se autocompletaban tarifas de monedas con glosa compuesta de 2 palabras](https://github.com/LemontechSA/ttb/pull/333)
-* **Fixed:** Corrige bugs de encoding y glosa de régimen en facturación electrónica MX
+* **Fixed:** [Corrige bugs de encoding y glosa de régimen en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/333)
 
 ## Hotfix: 13.6.11
 Martes 05 de Noviembre 2013
