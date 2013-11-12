@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.6.14
+Jueves 12 de Noviembre 2013
+* **Fixed:** No permite que el campo para el rut del usuario esta vacío
+
 ## Hotfix: 13.6.13
 Jueves 07 de Noviembre 2013
 * **Fixed:** Permite generar facturas electrónicas con diferente hora para que FacturemosYA no se caiga
