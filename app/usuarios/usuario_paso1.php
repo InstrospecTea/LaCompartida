@@ -313,10 +313,6 @@ function RevisarRut( form )
 	} else {
 		return true;
 	}	
-	//if( Rut(form.rut.value, form.dv_rut.value ) )
-		
-	//alert( 'El rut es inválido' );
-	//return false;
 }
 
 function Listar( form, from )
@@ -510,9 +506,10 @@ function DisableColumna( from, valor, text)
 
 function asegurarIngreso(p) 
 {
-	var valRut = document.getElementById('rut');
+	var valRut = document.getElementById('rut').value;
 
-	if (valRut.value == '') {
+	valRut = valRut.trim();
+	if (valRut == '') {
 		alert('El campo rut no puede ser vacío.');
 		return false;
 	} else {
