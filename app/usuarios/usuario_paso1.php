@@ -294,10 +294,12 @@ jQuery('.permiso').live('click',function() {
 	     jQuery('#costos').click(function(){
 
 		 var theform=jQuery(this).parents('form:first');
+		 console.log('submit 04');
 		  theform.submit();
 	     });
 	     jQuery('#btnbuscar').click(function(){
 
+	     	console.log('submit 05');
 		 jQuery(this).parents('form:first').attr('action','usuario_paso1.php?buscar=1').submit();
 
 	     });
@@ -306,9 +308,13 @@ jQuery('.permiso').live('click',function() {
 
 function RevisarRut( form )
 {
-	//if( Rut(form.rut.value, form.dv_rut.value ) )
+	if (! asegurarIngreso() ) {
+		return false;
+	} else {
 		return true;
-
+	}	
+	//if( Rut(form.rut.value, form.dv_rut.value ) )
+		
 	//alert( 'El rut es inválido' );
 	//return false;
 }
@@ -337,167 +343,184 @@ function Listar( form, from )
 	else
 		return false;
 	//alert(form.action);
+	console.log('submit 01');
 	form.submit();
 	//return true;
 }
 
-		function ModificaTodos( from )
+function ModificaTodos( from )
+{
+if( from.cambiar_alerta_diaria.checked==true)
+	{
+	var alerta_diaria = from.alerta_diaria.checked;
+	if( alerta_diaria == true ) alerta_diaria='\n Alerta diaria:          SI'; else alerta_diaria='\n Alerta diaria:          NO';
+	var retraso_max = '\n Restraso Max:        '
+	}
+else
+	{
+	var alerta_diaria = '';
+	var retraso_max = '';
+	}
+if( from.cambiar_alerta_semanal.checked==true)
+	{
+	var alerta_semanal = from.alerta_semanal.checked;
+	if( alerta_semanal == true ) alerta_semanal='\n Alerta semanal:     SI'; else alerta_semanal='\n Alerta semanal:     NO';
+	var restriccion_min = '\n Min HH:                 '
+	var restriccion_max = '\n Max HH:                 '
+	}
+else
+	{
+	var alerta_semanal = '';
+	var restriccion_min = '';
+	var restriccion_max = '';
+	}
+if( from.cambiar_restriccion_mensual.checked==true)
+	{
+	var restriccion_mensual = '\n Min HH mensual: '
+	}
+else
+	{
+	var restriccion_mensual = '';
+	}
+if( from.cambiar_dias_ingreso_trabajo.checked==true)
+	{
+	var dias_ingreso_trabajo = '\n Max dias ingreso:  '
+	}
+else
+	{
+	var dias_ingreso_trabajo = '';
+	}
+
+if(confirm( alerta_diaria + alerta_semanal + retraso_max + from.retraso_max.value + restriccion_min + from.restriccion_min.value + restriccion_max + from.restriccion_max.value + restriccion_mensual + from.restriccion_mensual.value + dias_ingreso_trabajo + from.dias_ingreso_trabajo.value + '\n\n ¿Desea cambiar los restricciones y alertas de todos los usuarios?' ))
+{
+from.action="usuario_paso1.php";
+console.log('submit 02');
+from.submit();
+}
+}
+function Cancelar(form)
+{
+	form.opc.value = 'cancelar';
+	console.log('submit 03');
+	form.submit();
+}
+
+function DisableColumna( from, valor, text)
+{
+	if(text == 'alerta_diaria')
+	{
+		var Input1 = $('alerta_diaria');
+		var Input2 = $('retraso_max');
+			var check = $(valor);
+
+		if(check.checked)
 		{
-			if( from.cambiar_alerta_diaria.checked==true)
-				{
-				var alerta_diaria = from.alerta_diaria.checked;
-				if( alerta_diaria == true ) alerta_diaria='\n Alerta diaria:          SI'; else alerta_diaria='\n Alerta diaria:          NO';
-				var retraso_max = '\n Restraso Max:        '
-				}
-			else
-				{
-				var alerta_diaria = '';
-				var retraso_max = '';
-				}
-			if( from.cambiar_alerta_semanal.checked==true)
-				{
-				var alerta_semanal = from.alerta_semanal.checked;
-				if( alerta_semanal == true ) alerta_semanal='\n Alerta semanal:     SI'; else alerta_semanal='\n Alerta semanal:     NO';
-				var restriccion_min = '\n Min HH:                 '
-				var restriccion_max = '\n Max HH:                 '
-				}
-			else
-				{
-				var alerta_semanal = '';
-				var restriccion_min = '';
-				var restriccion_max = '';
-				}
-			if( from.cambiar_restriccion_mensual.checked==true)
-				{
-				var restriccion_mensual = '\n Min HH mensual: '
-				}
-			else
-				{
-				var restriccion_mensual = '';
-				}
-			if( from.cambiar_dias_ingreso_trabajo.checked==true)
-				{
-				var dias_ingreso_trabajo = '\n Max dias ingreso:  '
-				}
-			else
-				{
-				var dias_ingreso_trabajo = '';
-				}
-
-		if(confirm( alerta_diaria + alerta_semanal + retraso_max + from.retraso_max.value + restriccion_min + from.restriccion_min.value + restriccion_max + from.restriccion_max.value + restriccion_mensual + from.restriccion_mensual.value + dias_ingreso_trabajo + from.dias_ingreso_trabajo.value + '\n\n ¿Desea cambiar los restricciones y alertas de todos los usuarios?' ))
-			{
-			from.action="usuario_paso1.php";
-			from.submit();
-			}
+			Input1.disabled= false;
+			Input2.disabled= false;
+			Input2.style.background="#FFFFFF";
 		}
-		function Cancelar(form)
-			{
-				form.opc.value = 'cancelar';
-				form.submit();
-			}
+		else
+		{
+			Input1.checked = false;
+			Input1.disabled = true;
+			Input2.value = '';
+			Input2.disabled = true;
+			Input2.style.background="#EEEEEE";
+		}
+	}
+	else if(text == 'alerta_semanal')
+	{
+		var Input1 = $('alerta_semanal');
+		var Input2 = $('restriccion_min');
+		var Input3 = $('restriccion_max');
+			var check = $(valor);
 
-			function DisableColumna( from, valor, text)
-			{
-				if(text == 'alerta_diaria')
-				{
-					var Input1 = $('alerta_diaria');
-					var Input2 = $('retraso_max');
- 					var check = $(valor);
+		if(check.checked)
+		{
+			Input1.disabled= false;
+			Input2.disabled= false;
+			Input3.disabled= false;
+			Input2.style.background="#FFFFFF";
+			Input3.style.background="#FFFFFF";
+		}
+		else
+		{
+			Input1.checked = false;
+			Input1.disabled = true;
+			Input2.value = '';
+			Input2.disabled = true;
+			Input3.value = '';
+			Input3.disabled = true;
+			Input2.style.background="#EEEEEE";
+			Input3.style.background="#EEEEEE";
+		}
+	}
+	if(text == 'alerta_mensual')
+	{
+		var Input1 = $('restriccion_mensual');
+			var check = $(valor);
 
-					if(check.checked)
-					{
-						Input1.disabled= false;
-						Input2.disabled= false;
-						Input2.style.background="#FFFFFF";
-					}
-					else
-					{
-						Input1.checked = false;
-						Input1.disabled = true;
-						Input2.value = '';
-						Input2.disabled = true;
-						Input2.style.background="#EEEEEE";
-					}
-				}
-				else if(text == 'alerta_semanal')
-				{
-					var Input1 = $('alerta_semanal');
-					var Input2 = $('restriccion_min');
-					var Input3 = $('restriccion_max');
- 					var check = $(valor);
+		if(check.checked)
+		{
+			Input1.disabled= false;
+			Input1.style.background="#FFFFFF";
+		}
+		else
+		{
+			Input1.value = '';
+			Input1.disabled = true;
+			Input1.style.background="#EEEEEE"
+		}
+	}
+	if(text == 'dias_ingreso')
+	{
+		var Input1 = $('dias_ingreso_trabajo');
+			var check = $(valor);
 
-					if(check.checked)
-					{
-						Input1.disabled= false;
-						Input2.disabled= false;
-						Input3.disabled= false;
-						Input2.style.background="#FFFFFF";
-						Input3.style.background="#FFFFFF";
-					}
-					else
-					{
-						Input1.checked = false;
-						Input1.disabled = true;
-						Input2.value = '';
-						Input2.disabled = true;
-						Input3.value = '';
-						Input3.disabled = true;
-						Input2.style.background="#EEEEEE";
-						Input3.style.background="#EEEEEE";
-					}
-				}
-				if(text == 'alerta_mensual')
-				{
-					var Input1 = $('restriccion_mensual');
- 					var check = $(valor);
+		if(check.checked)
+		{
+			Input1.disabled= false;
+			Input1.style.background="#FFFFFF";
+		}
+		else
+		{
+			Input1.value = '';
+			Input1.disabled = true;
+			Input1.style.background="#EEEEEE";
+		}
+	}
+	if(text == 'restriccion_diario')
+	{
+		var Input1 = $('restriccion_diario');
+		var check = $(valor);
 
-					if(check.checked)
-					{
-						Input1.disabled= false;
-						Input1.style.background="#FFFFFF";
-					}
-					else
-					{
-						Input1.value = '';
-						Input1.disabled = true;
-						Input1.style.background="#EEEEEE"
-					}
-				}
-				if(text == 'dias_ingreso')
-				{
-					var Input1 = $('dias_ingreso_trabajo');
- 					var check = $(valor);
+		if(check.checked)
+		{
+			Input1.disabled= false;
+			Input1.style.background="#FFFFFF";
+		}
+		else
+		{
+			Input1.value = '';
+			Input1.disabled = true;
+			Input1.style.background="#EEEEEE";
+		}
+	}
+}
 
-					if(check.checked)
-					{
-						Input1.disabled= false;
-						Input1.style.background="#FFFFFF";
-					}
-					else
-					{
-						Input1.value = '';
-						Input1.disabled = true;
-						Input1.style.background="#EEEEEE";
-					}
-				}
-				if(text == 'restriccion_diario')
-				{
-					var Input1 = $('restriccion_diario');
-					var check = $(valor);
+function asegurarIngreso(p) 
+{
+	var valRut = document.getElementById('rut');
 
-					if(check.checked)
-					{
-						Input1.disabled= false;
-						Input1.style.background="#FFFFFF";
-					}
-					else
-					{
-						Input1.value = '';
-						Input1.disabled = true;
-						Input1.style.background="#EEEEEE";
-					}
-				}
-			}
+	if (valRut.value == '') {
+		alert('El campo rut no puede ser vacío.');
+		return false;
+	} else {
+		return true;
+	}
+
+}
+
 
 </script>
 <table width="96%" align="left">
@@ -528,13 +551,13 @@ function Listar( form, from )
 		</td>
 		<td valign="top" class="texto" align="left">
 			<?php   if( strtolower(UtilesApp::GetConf($sesion,'NombreIdentificador'))=='rut' ) { ?>
-				<input type="text" name="rut" value="" size="10" onMouseover="ddrivetip('<?php $tooltip_text?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
+				<input type="text" id="rut" name="rut" value="" size="10" onMouseover="ddrivetip('<?php $tooltip_text?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
 			<?php } else { ?>
-				<input type="text" name="rut" value="" size="17" onMouseover="ddrivetip('<?php echo $tooltip_text?>')" onMouseout="hideddrivetip()" />
+				<input type="text" id="rut" name="rut" value="" size="17" onMouseover="ddrivetip('<?php echo $tooltip_text?>')" onMouseout="hideddrivetip()" />
 			<?php } ?>
 				&nbsp;
 			<?php 			if( $sesion->usuario->fields['id_visitante'] == 0 )
-				echo "&nbsp;&nbsp;<input type=\"submit\" class='botonizame' name=\"boton\" value=\"".__('Aceptar')."\" />";
+				echo "&nbsp;&nbsp;<input type=\"submit\" class='botonizame' name=\"boton\" value=\"".__('Aceptar')."\" onclick=\"\"/>";
 			else
 				echo "&nbsp;&nbsp;<input type=\"button\" class='botonizame' name=\"boton\" value=\"".__('Aceptar')."\" onclick=\"alert('Usted no tiene derecho para agegar un usuario nuevo');\" />";
 			?>
