@@ -96,6 +96,7 @@ class Actividad extends Objeto {
 
 	function CheckDelete() {
 		// Buscar que no tenga trabajos o tramites asociados
+		return true;
 	}
 
 	//funcion que asigna el nuevo codigo automatico para un actividad

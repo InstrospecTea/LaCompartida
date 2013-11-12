@@ -123,7 +123,7 @@ function EditarActividad(id) {
 }
 
 function EliminarActividad(id) {
-	if (parseInt(id) > 0 && confirm('¿Desea eliminar la actividad seleccionada') == true) {
+	if (parseInt(id) > 0 && confirm('¿Desea eliminar la actividad seleccionada?') == true) {
 		var url = 'actividades.php?id_actividad=' + id + '&accion=eliminar&desde=<?php echo ($desde) ? $desde : '0'?>';
 		self.location.href = url;
 	}
