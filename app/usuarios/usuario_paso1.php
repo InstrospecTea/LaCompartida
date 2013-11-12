@@ -1,4 +1,4 @@
-<?php 	
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -133,17 +133,17 @@ td.sorting_1 {background:transparent !important;}
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
-		
 
- 
+
+
 	  var oTable=jQuery('#tablapermiso').dataTable( {
-		
-		 
+
+
 	  "bJQueryUI": true,
 		     "bDeferRender": true,
 "bDestroy":true,
-               
-		 		"oLanguage": {   
+
+		 		"oLanguage": {
 		    "sProcessing":   "Procesando..." ,
 		    "sLengthMenu":   "Mostrar _MENU_ registros",
 		    "sZeroRecords":  "No se encontraron resultados",
@@ -154,23 +154,23 @@ td.sorting_1 {background:transparent !important;}
 		    "sSearch":       "<b>Buscar Nombre</b>",
 		    "sUrl":          "",
 		    "oPaginate": {
-			 
+
 			"sPrevious": "anterior",
 			"sNext":     "siguiente"
-			 
+
 		 }
 	 },
 	 "bFilter": true,
 	 		 "aoColumns": [
-				 	{ "mDataProp": "rut" }, 
-				 	{ "mDataProp": "id_usuario" }, 
-			{ "mDataProp": "nombrecompleto" }, 
-			 
+				 	{ "mDataProp": "rut" },
+				 	{ "mDataProp": "id_usuario" },
+			{ "mDataProp": "nombrecompleto" },
+
 				{ "mDataProp": "ADM" },
 				{ "mDataProp": "DAT" },
-			
+
 			     { "mDataProp": "COB" },
-				
+
 				{ "mDataProp": "EDI" },
 				{ "mDataProp": "LEE" },
 				{ "mDataProp": "OFI" },
@@ -181,20 +181,20 @@ td.sorting_1 {background:transparent !important;}
 				{ "mDataProp": "SOC" },
 				{ "mDataProp": "TAR" },
 				{ "mDataProp": "RET" },
-				{ "mDataProp": "ACT" } 
-	 
-		],   
+				{ "mDataProp": "ACT" }
+
+		],
 		   "aoColumnDefs": [
 			    { "sClass": "dttnombres", "aTargets": [ 2  ] },
-		 
-		
+
+
 	{  "fnRender": function ( o, val ) {
 				var botones='';
 				botones+= "<div style='float:left;display:inline;' id='"+o.aData['id_usuario']+';'+o.mDataProp+"'>";
 				if(val==1) {
 					botones+="<input class='permiso usuarioactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb.png' alt='ACTIVO' title='Usuario Activo'";
 				} else {
-    			
+
 				 botones+= "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
 				}
 			   		return botones+" rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut="+o.aData['rut']+"' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
@@ -207,8 +207,8 @@ td.sorting_1 {background:transparent !important;}
 				}
 	}, "bUseRendered": false, "sClass": "dttpermisos",  "aTargets": [3,4,5,6,7,8,9,10,11,12,13,14,15   ]   }  ,
 	 { "bVisible": false, "aTargets": [ 0,1 ] }
-	
-    
+
+
     ],
 	"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         if ( aData['ACT'] == "0" )        jQuery(nRow).addClass('inactivo').attr('title','Usuario Inactivo');
@@ -218,15 +218,15 @@ td.sorting_1 {background:transparent !important;}
 		       "sDom":  '<"top"flp>t<"bottom"i>',
 	    "aLengthMenu": [[25, 50, 100,200, -1], [25, 50, 100,200, "Todo"]],
 	    "sPaginationType": "full_numbers",
-	   
+
 	    "aaSorting": [[ 2, "asc" ]]
-		
+
 	     });
 		  jQuery('#contienefiltro').append(jQuery('#tablapermiso_filter'));
 		 /*jQuery('#tablapermiso_filter').append(' S&oacute;lo activos');*/
-		 
+
 		 oTable.fnFilter( '1',16 );
-	 	
+
 		 jQuery('#activo').click(function() {
 			if(jQuery(this).is(':checked')) {
 				 oTable.fnFilter( '1',16,0,1 );
@@ -237,9 +237,9 @@ td.sorting_1 {background:transparent !important;}
 jQuery('.permiso').live('click',function() {
    var Objeto=jQuery(this);
    var Dato=jQuery(this).attr('rel').split(';');
-  
+
    var Act=jQuery(this).attr('alt');
-  
+
    var Accion='';
     if(Act=='OK') {
 	Accion='revocar';
@@ -247,7 +247,7 @@ jQuery('.permiso').live('click',function() {
     } else if (Act=='NO') {
 	Accion='conceder';
 	jQuery(this).attr('alt','OK');
-	
+
     } else if (Act=='ACTIVO') {
 		Accion='desactivar';
 	jQuery(this).attr('alt','INACTIVO');
@@ -258,17 +258,17 @@ jQuery('.permiso').live('click',function() {
 	jQuery(this).closest('tr').removeClass('inactivo');
 	}
      jQuery.post('../interfaces/ajax/permiso_ajax.php',{accion:Accion,userid:Dato[0], permiso:Dato[1]},function(data) {
-		
+
 		Objeto.attr('src',data);
-		 
+
 	    });
             Objeto.attr('src','https://static.thetimebilling.com/images/ico_loading.gif');
 	    return false;
-  
+
 });
 
-	
-	    jQuery('.descargaxls').click(function() {
+
+	jQuery('.descargaxls').click(function() {
 		var activo=0;
 		if(jQuery('#activo').is(':checked')) activo=1;
 
@@ -288,23 +288,17 @@ jQuery('.permiso').live('click',function() {
 			destino = '../interfaces/usuarios_xls.php?act='+activo+'&nombre='+nom+'&modificaciones=true';
 		}
 		top.window.location.href=destino;
-		//if (console!==undefined) console.log(destino);
+	});
+
+	    jQuery('#costos').click(function() {
+		 	var theform=jQuery(this).parents('form:first');
+		  	theform.submit();
 	    });
- 	    
-	     jQuery('#costos').click(function(){
+	    jQuery('#btnbuscar').click(function(){
+		 	jQuery(this).parents('form:first').attr('action','usuario_paso1.php?buscar=1').submit();
+	    });
+       });
 
-		 var theform=jQuery(this).parents('form:first');
-		 console.log('submit 04');
-		  theform.submit();
-	     });
-	     jQuery('#btnbuscar').click(function(){
-
-	     	console.log('submit 05');
-		 jQuery(this).parents('form:first').attr('action','usuario_paso1.php?buscar=1').submit();
-
-	     });
-        });
- 
 
 function RevisarRut( form )
 {
@@ -312,7 +306,7 @@ function RevisarRut( form )
 		return false;
 	} else {
 		return true;
-	}	
+	}
 }
 
 function Listar( form, from )
@@ -338,66 +332,49 @@ function Listar( form, from )
 	}
 	else
 		return false;
-	//alert(form.action);
-	console.log('submit 01');
 	form.submit();
-	//return true;
 }
 
 function ModificaTodos( from )
 {
-if( from.cambiar_alerta_diaria.checked==true)
-	{
-	var alerta_diaria = from.alerta_diaria.checked;
-	if( alerta_diaria == true ) alerta_diaria='\n Alerta diaria:          SI'; else alerta_diaria='\n Alerta diaria:          NO';
-	var retraso_max = '\n Restraso Max:        '
+	if (from.cambiar_alerta_diaria.checked == true) {
+		var alerta_diaria = from.alerta_diaria.checked;
+		if( alerta_diaria == true ) alerta_diaria='\n Alerta diaria:          SI'; else alerta_diaria='\n Alerta diaria:          NO';
+		var retraso_max = '\n Restraso Max:        ';
+	} else {
+		var alerta_diaria = '';
+		var retraso_max = '';
 	}
-else
-	{
-	var alerta_diaria = '';
-	var retraso_max = '';
+	if (from.cambiar_alerta_semanal.checked == true) {
+		var alerta_semanal = from.alerta_semanal.checked;
+		if( alerta_semanal == true ) alerta_semanal='\n Alerta semanal:     SI'; else alerta_semanal='\n Alerta semanal:     NO';
+		var restriccion_min = '\n Min HH:                 ';
+		var restriccion_max = '\n Max HH:                 ';
+	} else {
+		var alerta_semanal = '';
+		var restriccion_min = '';
+		var restriccion_max = '';
 	}
-if( from.cambiar_alerta_semanal.checked==true)
-	{
-	var alerta_semanal = from.alerta_semanal.checked;
-	if( alerta_semanal == true ) alerta_semanal='\n Alerta semanal:     SI'; else alerta_semanal='\n Alerta semanal:     NO';
-	var restriccion_min = '\n Min HH:                 '
-	var restriccion_max = '\n Max HH:                 '
+	if (from.cambiar_restriccion_mensual.checked == true) {
+		var restriccion_mensual = '\n Min HH mensual: ';
+	} else {
+		var restriccion_mensual = '';
 	}
-else
-	{
-	var alerta_semanal = '';
-	var restriccion_min = '';
-	var restriccion_max = '';
-	}
-if( from.cambiar_restriccion_mensual.checked==true)
-	{
-	var restriccion_mensual = '\n Min HH mensual: '
-	}
-else
-	{
-	var restriccion_mensual = '';
-	}
-if( from.cambiar_dias_ingreso_trabajo.checked==true)
-	{
-	var dias_ingreso_trabajo = '\n Max dias ingreso:  '
-	}
-else
-	{
-	var dias_ingreso_trabajo = '';
+	if(from.cambiar_dias_ingreso_trabajo.checked == true) {
+		var dias_ingreso_trabajo = '\n Max dias ingreso:  ';
+	} else {
+		var dias_ingreso_trabajo = '';
 	}
 
-if(confirm( alerta_diaria + alerta_semanal + retraso_max + from.retraso_max.value + restriccion_min + from.restriccion_min.value + restriccion_max + from.restriccion_max.value + restriccion_mensual + from.restriccion_mensual.value + dias_ingreso_trabajo + from.dias_ingreso_trabajo.value + '\n\n ¿Desea cambiar los restricciones y alertas de todos los usuarios?' ))
-{
-from.action="usuario_paso1.php";
-console.log('submit 02');
-from.submit();
+	if (confirm(alerta_diaria + alerta_semanal + retraso_max + from.retraso_max.value + restriccion_min + from.restriccion_min.value + restriccion_max + from.restriccion_max.value + restriccion_mensual + from.restriccion_mensual.value + dias_ingreso_trabajo + from.dias_ingreso_trabajo.value + '\n\n ¿Desea cambiar los restricciones y alertas de todos los usuarios?')) {
+		from.action="usuario_paso1.php";
+		from.submit();
+	}
 }
-}
+
 function Cancelar(form)
 {
 	form.opc.value = 'cancelar';
-	console.log('submit 03');
 	form.submit();
 }
 
@@ -504,7 +481,7 @@ function DisableColumna( from, valor, text)
 	}
 }
 
-function asegurarIngreso(p) 
+function asegurarIngreso(p)
 {
 	var valRut = document.getElementById('rut').value;
 
@@ -560,7 +537,7 @@ function asegurarIngreso(p)
 			?>
 		</td>
 	</tr>
-	 
+
 </table>
 <br class="clearfix"/>
 <table width=100% class="tb_base">
@@ -704,28 +681,28 @@ function asegurarIngreso(p)
 						<hr class="subtitulo_linea_plomo"/>
 				</td>
 		</tr>
-		
+
 		<tr>
 				<td valign="top" align="left" colspan="2"><img src="https://files.thetimebilling.com/templates/default/img/pix.gif" border="0" width="1" height="10"></td>
 		</tr>
 		<tr>
 				<td valign="top" align="center" style="white-space:nowrap">
 			<form name="act"  method="post">
-					  	 
-						
+
+
 						<input type="checkbox" name="activo"  id="activo" <?php if(!$activo) echo 'value="1" checked="checked"'; ?> />s&oacute;lo activos &nbsp;&nbsp;&nbsp;
 						<span id="contienefiltro"></span>
-						&nbsp;&nbsp; 
-						
+						&nbsp;&nbsp;
+
 						&nbsp; <a href="#" id="btnbuscar" style="display:none;" class="u1 botonizame"  icon="ui-icon-search" rel="buscar">Buscar</a>
-						
+
 						&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel"   rel="xls">Descargar Listado</a>
 						&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_vacacion">Descargar Vacaciones</a>
 						&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_modificaciones">Descargar Modificaciones</a>
-					
-						
+
+
 			</form>
-				    
+
 				</td>
 		</tr>
 		<tr>
@@ -740,13 +717,13 @@ function asegurarIngreso(p)
 	<thead><tr><td class="encabezado">RUT</td>
 		<th>ID</th>
 				<th>Nombre</th>
-			
+
 				<th>Admin</th>
 				<th>Admin<br>Datos</th><th width="23">Cobranza</th>
 					<th>Editar<br/>Biblioteca</th>
-				
-				
-				
+
+
+
 				<th>Lectura</th>
 				<th>Oficina</th>
 				<th>Profesional</th>
@@ -757,13 +734,13 @@ function asegurarIngreso(p)
 				<th>Tarifa</th>
 				<th>Retribuciones</th>
 				<th width="25">Activo</th>
-			 
+
 		</tr></thead>
 	<tbody></tbody>
-		
-	
-	
-	
+
+
+
+
 </table>
 				</td>
 		</tr>
