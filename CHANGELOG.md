@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.6.15
+Jueves 14 de Noviembre 2013
+* **Fixed:** [Corrigie el tema, que despues de refrescar aparece la pagina que fue eligida]()
+
 ## Hotfix: 13.6.14
 Martes 12 de Noviembre 2013
 * **Fixed:** [No permite que el campo para el rut del usuario esta vacío](https://github.com/LemontechSA/ttb/pull/337)
