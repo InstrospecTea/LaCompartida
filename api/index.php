@@ -590,6 +590,33 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 	}
 });
 
+$Slim->map('/release-list', function () use ($Session, $Slim) {
+	$response = array(
+		"success" => "true",
+		"releases" => array(
+			array(
+				"version" => "2.1.3.GA",
+				"manifest" => "MANIFEST CONTENTS OF UPDATED APP",
+				"release_notes" => "COSITAS NUEVAS"
+			),
+			array(
+				"version" => "2.1.4.GA",
+				"manifest" => "MANIFEST CONTENTS OF UPDATED APP",
+				"release_notes" => "COSITAS NUEVAS"
+			)
+		)
+	);
+	outputJson($response);
+
+/*
+mid - Ti.Platform.id (example: ‘841b4cfedc1d13e027bf0c56a0cb7d8e’)
+limit - 1 (default in Client SDK)
+guid - Ti.App.getGUID() (example: ‘0d776399-a82e-48c5-a711-5d0f158d4cfe’)
+os - Ti.platform (example: ‘osx’)
+ostype - Ti.Platform.ostype (example: ‘32bit’)*/
+
+})->via('GET', 'POST');
+
 $Slim->run();
 
 function downloadFile($name, $type, $content) {
