@@ -591,29 +591,45 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 });
 
 $Slim->map('/release-list', function () use ($Session, $Slim) {
-	$response = array(
-		"success" => "true",
-		"releases" => array(
-			array(
-				"version" => "2.1.3.GA",
-				"manifest" => "MANIFEST CONTENTS OF UPDATED APP",
-				"release_notes" => "COSITAS NUEVAS"
-			),
-			array(
-				"version" => "2.1.4.GA",
-				"manifest" => "MANIFEST CONTENTS OF UPDATED APP",
-				"release_notes" => "COSITAS NUEVAS"
-			)
-		)
-	);
-	outputJson($response);
+	$bucket = 'timebilling-uploads';
+	$os = $Slim->request()->params('os');
+	$app_guid = $Slim->request()->params('guid');
+	$action_name = $Slim->request()->params('name');
+	$s3 = new AmazonS3(array(
+ 		'key' => 'AKIAIQYFL5PYVQKORTBA',
+ 		'secret' => 'q5dgekDyR9DgGVX7/Zp0OhgrMjiI0KgQMAWRNZwn'
+ 	));
 
-/*
-mid - Ti.Platform.id (example: ‘841b4cfedc1d13e027bf0c56a0cb7d8e’)
-limit - 1 (default in Client SDK)
-guid - Ti.App.getGUID() (example: ‘0d776399-a82e-48c5-a711-5d0f158d4cfe’)
-os - Ti.platform (example: ‘osx’)
-ostype - Ti.Platform.ostype (example: ‘32bit’)*/
+	$response = $s3->get_object_list($bucket, array('prefix' => "apps/$action_name/$app_guid/$os/1"));
+	if ($response && gettype($response) === 'array' && count($response)) {
+		$object = $s3->get_object_list($bucket, array('prefix' => "apps/$action_name/$app_guid/$os/1"));
+		$dir = $object[0];
+		$version_directory = $s3->get_object_headers($bucket, "{$dir}");
+		$parts = explode('/', $version_directory->header['_info']['url']);
+ 		$version = $parts[count($parts)-2];
+
+ 		$manifest_headers = $s3->get_object_headers($bucket, "{$dir}manifest");
+		$manifest = file_get_contents($manifest_headers->header['_info']['url']);
+		$manifest .= "#version: {$version}";
+
+		$appudate = $s3->get_object_headers($bucket, "{$dir}appupdate.zip");
+
+		$response = array(
+		"success" => "true",
+			"releases" => array(
+				array(
+					"version" => $version,
+					"manifest" => $manifest,
+					"release_notes" => 'app://CHANGELOG.md',
+					"update_url" => $appudate->header['_info']['url']
+				),
+			)
+		);
+	} else {
+		halt(__("Invalid params"), "InvalidParams");
+	}
+
+	outputJson($response);
 
 })->via('GET', 'POST');
 
@@ -650,6 +666,8 @@ function validateAuthTokenSendByHeaders() {
 			} else {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
 			}
+		} else {
+			$UserToken->save($user_token_data);
 		}
 
 		return $user_token_data->user_id;
