@@ -14,6 +14,43 @@ class Actividad extends Objeto {
 		'codigo_asunto'
 	);
 
+	/*
+	 * Configuración de SimpleReport
+	 */
+	public static $configuracion_reporte = array(
+		array(
+			'field' => 'id_actividad',
+			'title' => 'N°',
+			'visible' => false
+		),
+		array(
+			'field' => 'codigo_actividad',
+			'title' => 'Código',
+		),
+		array(
+			'field' => 'glosa_actividad',
+			'title' => 'Nombre Actividad'
+		),
+		array(
+			'field' => 'codigo_cliente',
+			'title' => 'Código Cliente',
+			'visible' => false
+		),
+		array(
+			'field' => 'glosa_cliente',
+			'title' => 'Nombre Cliente'
+		),
+		array(
+			'field' => 'codigo_asunto',
+			'title' => 'Código Asunto',
+			'visible' => false
+		),
+		array(
+			'field' => 'glosa_asunto',
+			'title' => 'Nombre Asunto'
+		)
+	);
+
 	function Actividad($sesion, $fields = "", $params = "") {
 		$this->tabla = "actividad";
 		$this->campo_id = "id_actividad";
@@ -97,6 +134,26 @@ class Actividad extends Objeto {
 	function CheckDelete() {
 		// Buscar que no tenga trabajos o tramites asociados
 		return true;
+	}
+
+	/**
+	 * Descarga el reporte excel básico según configuraciones
+	 */
+	public function DownloadExcel() {
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
+		$SimpleReport->LoadConfiguration('ACTIVIDADES');
+		
+		$query = $this->SearchQuery();
+		$statement = $this->sesion->pdodbh->prepare($query);
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$SimpleReport->LoadResults($results);
+
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
+		$writer->save('Actividades');
 	}
 
 	//funcion que asigna el nuevo codigo automatico para un actividad

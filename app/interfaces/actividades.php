@@ -9,12 +9,18 @@ $id_usuario = $Sesion->usuario->fields['id_usuario'];
 $Actividad = new Actividad($Sesion);
 $Actividad->Fill($_REQUEST);
 
-if ($opc == 'eliminar') {
-	if ($Actividad->Delete()) {
-		$Pagina->AddInfo(__('Actividad') . ' ' . __('eliminada con éxito'));
-	} else {
-		$Pagina->AddError($Actividad->error);
-	}
+switch ($opc) {
+	case 'eliminar':
+		if ($Actividad->Delete()) {
+			$Pagina->AddInfo(__('Actividad') . ' ' . __('eliminada con éxito'));
+		} else {
+			$Pagina->AddError($Actividad->error);
+		}
+		break;
+	
+	case 'xls':
+		$Actividad->DownloadExcel();
+		break;
 }
 
 $Pagina->titulo = __('Actividades');
@@ -76,9 +82,10 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan=2 align="center">
-				<a name="boton_buscar" id="boton_buscar" class="btn botonizame" icon="find" onclick="BuscarFacturas($('form_actividades'), 'buscar')"><?php echo __('Buscar'); ?></a>
-				<a name="boton_excel" id="boton_descarga" class="btn botonizame" icon="xls" onclick="BuscarFacturas($('form_actividades'), 'exportar_excel')"><?php echo __('Descargar Excel'); ?></a>
+			<td colspan="2" align="center">
+				<input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn"  onclick="javascript:this.form.opc.value = 'buscar'"/>
+				<input name="boton_excel" id="boton_excel" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn"  onclick="javascript:this.form.opc.value = 'xls'"/>
+				<!-- <a class="btn botonizame"  href="actividades_xls.php?codigo_actividad=<?php echo $codigo_actividad?>&codigo_cliente=<?php echo $codigo_cliente?>&codigo_asunto=<?php echo $codigo_asunto?>" icon="xls" name='descargar_excel' id='descargar_excel' onclick=""><?php echo __('Descargar Excel') ?></a> -->
 			</td>
 			<td align="left">
 			</td>
