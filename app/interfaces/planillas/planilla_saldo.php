@@ -7,9 +7,11 @@ $Sesion = new Sesion(array('REP'));
 
 $tipos_liquidacion = array(
 	1 => __('Honorarios'),
-	2 => __('Gastos'));
+	2 => __('Gastos')
+);
 
 if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
+
 	$texto_liquidaciones_por_pagar = __('Liquidaciones por pagar');
 	$texto_gastos_por_liquidar = __('Gastos por liquidar');
 	$texto_provisiones_por_liquidar = __('Provisiones por liquidar');
@@ -81,16 +83,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_fecha .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . "' ";
 	}
 
-	$where_liquidaciones =
-		$where_adelantos =
-		$where_gastos = $where_fecha;
-	$join_liquidaciones =
-		$join_adelantos =
-		$join_gastos = '';
-	$select_liquidaciones =
-		$select_adelantos =
-		$select_gastos =
-		$select_resumen = "";
+	$where_liquidaciones = $where_adelantos = $where_gastos = $where_fecha;
+	$join_liquidaciones = $join_adelantos = $join_gastos = '';
+	$select_liquidaciones = $select_adelantos = $select_gastos = $select_resumen = "";
 
 	$tipo_liq_gastos = 'G';
 	$tipo_liq_honorarios = 'H';
@@ -300,8 +295,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_saldo = "WHERE r.saldo_liquidaciones + r.saldo_gastos + r.saldo_adelantos > 0";
 	}
 
-	$query =
-		"SELECT
+	$query = "SELECT
 			r.encargado_comercial,
 			r.codigo_cliente,
 			r.glosa_cliente,
@@ -318,11 +312,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_saldo
 		GROUP BY glosa_cliente";
 
-	 //echo $query;
-	 //echo $query_adelantos;
-	 //echo $query_gastos;
-	 //echo $query_liquidaciones;
-	 //exit;
+	//echo $query;
+	//echo $query_adelantos;
+	//echo $query_gastos;
+	//echo $query_liquidaciones;
+	//exit;
 
 	$statement = $Sesion->pdodbh->prepare($query);
 	$statement->execute();
@@ -386,169 +380,169 @@ $Pagina->titulo = __('Reporte Saldo');
 $Pagina->PrintTop($popup);
 ?>
 <style>
-	.subreport {
-		padding-bottom: 40px;
-	}
-		.subreport h1 {
-			font-size: 12px;
-			margin-left: 5%;
-			color: #777;
-			font-weight: normal;
-		}
-		.subreport td.encabezado {
-			background-color: #ddd;
-			color: #040;
-		}
+    .subreport {
+        padding-bottom: 40px;
+    }
+    .subreport h1 {
+        font-size: 12px;
+        margin-left: 5%;
+        color: #777;
+        font-weight: normal;
+    }
+    .subreport td.encabezado {
+        background-color: #ddd;
+        color: #040;
+    }
 
-		.subreport .buscador {
-			border-bottom: 1px solid #BDBDBD;
-		}
-		.subreport .buscador > tbody > tr {
-			border-left: 1px solid #BDBDBD;
-			border-right: 1px solid #BDBDBD;
-		}
-		.subreport .buscador > tbody > tr.subtotal {
-			border-left: none;
-			border-right: none;
-		}
-		.subreport .buscador > tbody > tr.subtotal td.level2 {
-			text-align: left;
-			color: #777;
-			font-weight: normal !important;
-		}
+    .subreport .buscador {
+        border-bottom: 1px solid #BDBDBD;
+    }
+    .subreport .buscador > tbody > tr {
+        border-left: 1px solid #BDBDBD;
+        border-right: 1px solid #BDBDBD;
+    }
+    .subreport .buscador > tbody > tr.subtotal {
+        border-left: none;
+        border-right: none;
+    }
+    .subreport .buscador > tbody > tr.subtotal td.level2 {
+        text-align: left;
+        color: #777;
+        font-weight: normal !important;
+    }
 </style>
 <table width="100%">
-		<tr>
-		<td>
-			<form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
-				<input  id="xdesde"  name="xdesde" type="hidden" value="">
-				<input type="hidden" name="opcion" id="opcion" value="buscar">
-				<!-- Calendario DIV -->
-				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
-					<div class="floating" id="calendar"></div>
-				</div>
-				<!-- Fin calendario DIV -->
-				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-					<legend><?php echo __('Filtros') ?></legend>
-					<table style="border: 0px solid black" width='720px'>
-						<tr>
-							<td align="right" width="30%">
-								<label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
-							</td>
-							<td colspan="3" align="left">
+    <tr>
+        <td>
+            <form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
+                <input  id="xdesde"  name="xdesde" type="hidden" value="">
+                <input type="hidden" name="opcion" id="opcion" value="buscar">
+                <!-- Calendario DIV -->
+                <div id="calendar-container" style="width:221px; position:absolute; display:none;">
+                    <div class="floating" id="calendar"></div>
+                </div>
+                <!-- Fin calendario DIV -->
+                <fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
+                    <legend><?php echo __('Filtros') ?></legend>
+                    <table style="border: 0px solid black" width='720px'>
+                        <tr>
+                            <td align="right" width="30%">
+                                <label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
+                            </td>
+                            <td colspan="3" align="left">
 								<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
-							</td>
-						</tr>
+                            </td>
+                        </tr>
 						<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
-						<tr>
-							<td align="right">
-								<label for="tipo_liquidacion"><?php echo __('Mostrar Saldo') ?></label>
-							</td>
-							<td colspan="2" align="left">
+                        <tr>
+                            <td align="right">
+                                <label for="tipo_liquidacion"><?php echo __('Mostrar Saldo') ?></label>
+                            </td>
+                            <td colspan="2" align="left">
 								<?php
 								echo Html::SelectArrayDecente($tipos_liquidacion, 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Total'))
 								?>
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<label for="moneda_mostrar"><?php echo __('Mostrar Montos en') ?></label>
-							</td>
-							<td colspan="2" align="left">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="moneda_mostrar"><?php echo __('Mostrar Montos en') ?></label>
+                            </td>
+                            <td colspan="2" align="left">
 								<?php
 								echo Html::SelectQuery($Sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda', 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
 								?>
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<label for="encargado_comercial"><?php echo __('Encargado Comercial') ?></label>
-							</td>
-							<td colspan="2" align="left">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="encargado_comercial"><?php echo __('Encargado Comercial') ?></label>
+                            </td>
+                            <td colspan="2" align="left">
 								<?php
 								echo Html::SelectQuery($Sesion, UsuarioExt::QueryComerciales(), 'encargado_comercial', $_REQUEST['encargado_comercial'], '', __('Cualquiera'));
 								?>
-							</td>
-						</tr>
-						<tr>
-								<td align="right"><?php echo __('Fecha Desde') ?></td>
-								<td nowrap align="left">
-										<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-								</td>
-								<td nowrap align="left" colspan="2">
-		&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
-										<input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-								</td>
-						</tr>
-						<tr>
-							<td>&nbsp;</td>
-							<td colspan="3" align="left">
-								<label>
-									<input type="hidden" name="mostrar_sin_saldo" value="0" />
-									<input type="checkbox" name="mostrar_sin_saldo" id="mostrar_sin_saldo" value="1" <?php echo $mostrar_sin_saldo ? 'checked="checked"' : '' ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right"><?php echo __('Fecha Desde') ?></td>
+                            <td nowrap align="left">
+                                <input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+                            </td>
+                            <td nowrap align="left" colspan="2">
+                                &nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
+                                <input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td colspan="3" align="left">
+                                <label>
+                                    <input type="hidden" name="mostrar_sin_saldo" value="0" />
+                                    <input type="checkbox" name="mostrar_sin_saldo" id="mostrar_sin_saldo" value="1" <?php echo $mostrar_sin_saldo ? 'checked="checked"' : '' ?> />
 									<?php echo __('Mostrar liquidaciones y adelantos sin saldo'); ?>
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<td>&nbsp;</td>
-							<td colspan="3" align="left">
-								<label>
-									<input type="hidden" name="mostrar_detalle" value="0" />
-									<input type="checkbox" name="mostrar_detalle" id="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked="checked"' : '' ?> />
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td colspan="3" align="left">
+                                <label>
+                                    <input type="hidden" name="mostrar_detalle" value="0" />
+                                    <input type="checkbox" name="mostrar_detalle" id="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked="checked"' : '' ?> />
 									<?php echo __('Mostrar detalle del saldo'); ?>
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<td>&nbsp;</td>
-							<td colspan="3" align="left">
-								<label>
-									<input type="hidden" name="ocultar_clientes_sin_saldo" value="0" />
-									<input type="checkbox" name="ocultar_clientes_sin_saldo" id="ocultar_clientes_sin_saldo" value="1" <?php echo $ocultar_clientes_sin_saldo ? 'checked="checked"' : '' ?> />
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td colspan="3" align="left">
+                                <label>
+                                    <input type="hidden" name="ocultar_clientes_sin_saldo" value="0" />
+                                    <input type="checkbox" name="ocultar_clientes_sin_saldo" id="ocultar_clientes_sin_saldo" value="1" <?php echo $ocultar_clientes_sin_saldo ? 'checked="checked"' : '' ?> />
 									<?php echo __('Ocultar clientes sin saldo'); ?>
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td colspan="2" align="left">
-								<input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn" />
-							</td>
-							<td width="40%" align="right">
-								<input name="boton_xls" id="boton_xls" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn" />
-							</td>
-						</tr>
-					</table>
-				</fieldset>
-			</form>
-		</td>
-		</tr>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="2" align="left">
+                                <input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn" />
+                            </td>
+                            <td width="40%" align="right">
+                                <input name="boton_xls" id="boton_xls" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn" />
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </form>
+        </td>
+    </tr>
 </table>
 <link rel="stylesheet" type="text/css" media="print" href="https://static.thetimebilling.com/css/imprimir.css" />
 <script type="text/javascript">
-		jQuery(document).ready(function () {
-			jQuery('#boton_xls').click(function(){
-				jQuery('#opcion').val('xls');
-			});
-			jQuery('#boton_buscar').click(function(){
-				jQuery('#opcion').val('buscar');
-			});
-
-			jQuery('.saldo:contains(-)').css('color', '#f00');
-			jQuery('.saldo:not(:contains(-))').css('color', '#00f');
-			jQuery('.subtotal td').css('font-weight', 'bold');
-
-			/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
-				var td = jQuery(el);
-				var contenido = td.html();
-				td.html('');
-				td.append(jQuery('<a/>', {
-					text: contenido,
-					href: 'planilla_saldo.php?codigo_cliente='
-				})).append(' ');
-			});*/
+	jQuery(document).ready(function() {
+		jQuery('#boton_xls').click(function() {
+			jQuery('#opcion').val('xls');
 		});
+		jQuery('#boton_buscar').click(function() {
+			jQuery('#opcion').val('buscar');
+		});
+
+		jQuery('.saldo:contains(-)').css('color', '#f00');
+		jQuery('.saldo:not(:contains(-))').css('color', '#00f');
+		jQuery('.subtotal td').css('font-weight', 'bold');
+
+		/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
+		 var td = jQuery(el);
+		 var contenido = td.html();
+		 td.html('');
+		 td.append(jQuery('<a/>', {
+		 text: contenido,
+		 href: 'planilla_saldo.php?codigo_cliente='
+		 })).append(' ');
+		 });*/
+	});
 </script>
 <?php
 if ($_REQUEST['opcion'] == 'buscar') {
@@ -568,7 +562,6 @@ if ($_REQUEST['opcion'] == 'buscar') {
 	// echo '<pre style="text-align: left; color: blue;">' . $query_liquidaciones . "</pre>";
 	// echo '<pre style="text-align: left; color: green;">' . $query_adelantos . "</pre>";
 	// echo '<pre style="text-align: left; color: grey;">' . $query . "</pre>";
-
 	// echo '<div style="text-align: right; font-size: 2em;">Saldo total: ' . $resultado . '</h1>';
 }
 
