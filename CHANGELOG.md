@@ -1,6 +1,10 @@
 # Changelog
 
-## Hotfix: 13.6.15
+## Hotfix: 13.6.17
+Martes 19 de Noviembre 2013
+* **Fixed:** [agrega nuevo tag a factura para desplegar el numero de telefono en factura](https://github.com/LemontechSA/ttb/pull/341)
+
+## Hotfix: 13.6.16
 Martes 19 de Noviembre 2013
 * **Fixed:** [Agrega saldo pendiente o saldo a favor en nota de cobro seccion detalle cobro](https://github.com/LemontechSA/ttb/pull/340)
 
