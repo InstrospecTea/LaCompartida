@@ -365,7 +365,7 @@ class Cliente extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
 		$f = $codigo + 1;
-		
+
         if ( UtilesApp::GetConf($this->sesion, 'MascaraCodigoCliente')) {
             $codigo_cliente = sprintf("%04d", $f);
         } else {
@@ -798,7 +798,7 @@ class Cliente extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used), name and address
 	 */
-	public function findAllActive($timestamp = 0) {
+	public function findAllActive($timestamp = 0, $include_all = 0) {
 		$active = 1;
 		$clients = array();
 		$sql_select_client_code = '`client`.`codigo_cliente`';
@@ -807,16 +807,23 @@ class Cliente extends Objeto {
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
 			$sql_select_client_code = '`client`.`codigo_cliente_secundario`';
 		}
+		if (!$include_all) {
+			$sql_include = "`client`.`activo`=:active AND";
+		} else {
+			$sql_include = "";
+		}
 
 		$sql = "SELECT $sql_select_client_code AS `code`, `client`.`glosa_cliente` AS `name`,
-			`contract`.`direccion_contacto` AS `address`
+			`contract`.`direccion_contacto` AS `address`, `client`.`activo` AS  `active`
 			FROM `cliente` AS `client`
 				INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`
-			WHERE `client`.`activo`=:active AND (`client`.`fecha_touch`>=:timestamp OR `client`.`fecha_creacion`>=:timestamp)
+			WHERE {$sql_include} (`client`.`fecha_touch`>=:timestamp OR `client`.`fecha_creacion`>=:timestamp)
 			ORDER BY `client`.`glosa_cliente` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
-		$Statement->bindParam('active', $active);
+		if (!$include_all) {
+			$Statement->bindParam('active', $active);
+		}
 		$Statement->bindParam('timestamp', date('Y-m-d', $timestamp));
 
 		$Statement->execute();
@@ -826,7 +833,8 @@ class Cliente extends Objeto {
 				array(
 					'code' => $client->code,
 					'name' => !empty($client->name) ? $client->name : null,
-					'address' => !empty($client->address) ? $client->address : null
+					'address' => !empty($client->address) ? $client->address : null,
+					'active' => $client->active
 				)
 			);
 		}

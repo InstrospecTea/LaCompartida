@@ -800,7 +800,7 @@ class Asunto extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used) and name
 	 */
-	public function findAllByClientCode($code) {
+	public function findAllByClientCode($code, $include_all = 0) {
 		$matters = array();
 		$active = 1;
 		$sql_select_matter_code = '`matter`.`codigo_asunto`';
@@ -812,18 +812,27 @@ class Asunto extends Objeto {
 			$sql_where_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
+		if (!$include_all) {
+			$sql_include = "AND `matter`.`activo`=:active";
+		} else {
+			$sql_include = "";
+		}
+
 		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`,
 		 	`prm_idioma`.`codigo_idioma` AS `language`,
-			`prm_idioma`.`glosa_idioma` AS `language_name`
+			`prm_idioma`.`glosa_idioma` AS `language_name`,
+			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE $sql_where_client_code=:code AND `matter`.`activo`=:active
+			WHERE $sql_where_client_code=:code {$sql_include}
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('code', $code);
-		$Statement->bindParam('active', $active);
+		if (!$include_all) {
+			$Statement->bindParam('active', $active);
+		}
 		$Statement->execute();
 
 		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {
@@ -832,7 +841,8 @@ class Asunto extends Objeto {
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
 					'language' =>  !empty($matter->language) ? $matter->languag : null,
-					'language_name' => !empty($matter->language_name) ? $matter->language_name : null
+					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
+					'active' =>  $matter->active
 				)
 			);
 		}
@@ -845,7 +855,7 @@ class Asunto extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used) and name
 	 */
-	public function findAllActive($timestamp = 0) {
+	public function findAllActive($timestamp = 0, $include_all = 0) {
 		$matters = array();
 		$active = 1;
 		$sql_select_client_code = '`client`.`codigo_cliente`';
@@ -857,18 +867,27 @@ class Asunto extends Objeto {
 			$sql_select_matter_code = '`matter`.`codigo_asunto_secundario`';
 		}
 
+		if (!$include_all) {
+			$sql_include = "AND `matter`.`activo`=:active";
+		} else {
+			$sql_include = "";
+		}
+
 		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
 			`matter`.`glosa_asunto` AS `name`, `prm_idioma`.`codigo_idioma` AS `language`,
-			`prm_idioma`.`glosa_idioma` AS `language_name`
+			`prm_idioma`.`glosa_idioma` AS `language_name`,
+			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto`<>''
+			WHERE `matter`.`glosa_asunto`<>'' {$sql_include}
 			 AND (`matter`.`fecha_touch`>=:timestamp OR `matter`.`fecha_creacion`>=:timestamp)
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
-		$Statement->bindParam('active', $active);
+		if (!$include_all) {
+			$Statement->bindParam('active', $active);
+		}
 		$Statement->bindParam('timestamp', date('Y-m-d', $timestamp));
 		$Statement->execute();
 
@@ -879,7 +898,8 @@ class Asunto extends Objeto {
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
 					'language' =>  !empty($matter->language) ? $matter->languag : null,
-					'language_name' => !empty($matter->language_name) ? $matter->language_name : null
+					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
+					'active' => $matter->active
 				)
 			);
 		}

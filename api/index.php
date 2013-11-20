@@ -64,13 +64,14 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$timestamp = $Slim->request()->params('timestamp');
-
+	$include = $Slim->request()->params('include');
+	$include_all = (!is_null($include) && $include == 'all');
 	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
 	$Client = new Cliente($Session);
-	$clients = $Client->findAllActive($timestamp);
+	$clients = $Client->findAllActive($timestamp, $include_all);
 
 	outputJson($clients);
 });
@@ -106,13 +107,14 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$timestamp = $Slim->request()->params('timestamp');
-
+	$include = $Slim->request()->params('include');
+	$include_all = (!is_null($include) && $include == 'all');
 	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
 	$Matter = new Asunto($Session);
-	$matters = $Matter->findAllActive($timestamp);
+	$matters = $Matter->findAllActive($timestamp, $include_all);
 
 	outputJson($matters);
 });
@@ -615,7 +617,7 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 		$appudate = $s3->get_object_headers($bucket, "{$dir}appupdate.zip");
 
 		$response = array(
-		"success" => "true",
+		"success" => "false",
 			"releases" => array(
 				array(
 					"version" => $version,
@@ -626,7 +628,18 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 			)
 		);
 	} else {
-		halt(__("Invalid params"), "InvalidParams");
+		$response = array(
+		"success" => "false",
+			"releases" => array(
+				array(
+					"version" => '1.1',
+					"manifest" => '',
+					"release_notes" => 'app://CHANGELOG.md',
+					"update_url" => 'localhost'
+				),
+			)
+		);
+		//halt(__("Invalid params"), "InvalidParams");
 	}
 
 	outputJson($response);
