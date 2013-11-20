@@ -599,6 +599,7 @@ class Factura extends Objeto {
 				break;
 
 			case 'ENCABEZADO':
+
 				$PdfLinea1 = UtilesApp::GetConf($this->sesion, 'PdfLinea1');
 				$PdfLinea2 = UtilesApp::GetConf($this->sesion, 'PdfLinea2');
 				$PdfLinea3 = UtilesApp::GetConf($this->sesion, 'PdfLinea3');
@@ -612,15 +613,19 @@ class Factura extends Objeto {
 				$html2 = str_replace('%LogoDoc%', $logo_doc, $html2);
 
 				$query = "SELECT 
-								titulo_contacto,
-								contacto,
-								apellido_contacto,
+								contrato.titulo_contacto,
+								contrato.contacto,
+								contrato.apellido_contacto,
+								contrato.factura_razon_social,
 								cobro.id_cobro,
+								factura.direccion_cliente,
 								factura.numero,
 								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre, factura.fecha as fecha,
 								prm_documento_legal.glosa,
 								contrato.factura_ciudad,
-								prm_pais.nombre as nombre_pais
+								prm_pais.nombre as nombre_pais,
+								contrato.fono_contacto as fono_contacto, 
+								contrato.factura_telefono
 							FROM contrato
 							LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
 							LEFT JOIN factura ON cobro.id_cobro=factura.id_cobro
@@ -630,7 +635,22 @@ class Factura extends Objeto {
 							WHERE id_factura=" . $this->fields['id_factura'];
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc, $factura_ciudad, $nombre_pais) = mysql_fetch_array($resp);
+				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc, $factura_ciudad, $nombre_pais, $fono_contacto) = mysql_fetch_array($resp);
+				
+				list (	$titulo_contacto,
+						$contacto,
+						$apellido_contacto,
+						$contrato_factura_razon_social,
+						$id_cobro,
+						$factura_direccion_cliente,
+						$numero_factura,
+						$encargado_comercial,
+						$fecha_factura,
+						$glosa_tipo_doc,
+						$factura_ciudad,
+						$nombre_pais,
+						$factura_telefono ) = mysql_fetch_array($resp);
+
 				$glosa_tipo_doc_mayus = str_replace('é', 'É', strtoupper($glosa_tipo_doc));
 
 				if ($lang == 'es') {
@@ -647,6 +667,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%Senores%', 'Messrs', $html2);
 					$html2 = str_replace('%numero_factura_cyc%', __('INVOICE') . ' ' . $numero_factura, $html2);
 				}
+
 				$html2 = str_replace('%subtitulo%', '', $html2);
 
 				if (method_exists('Conf', 'Server') && method_exists('Conf', 'ImgDir')) {
@@ -703,9 +724,11 @@ class Factura extends Objeto {
 
 				$html2 = str_replace('%contrato_titulo_contacto%', strtoupper($titulo_contacto), $html2);
 				$html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
-				$html2 = str_replace('%contrato_razon_social%', strtoupper($factura_razon_social), $html2);
+				$html2 = str_replace('%contrato_razon_social%', strtoupper($contrato_factura_razon_social), $html2);
 				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($factura_ciudad), $html2);
 				$html2 = str_replace('%contrato_nombre_pais%', strtoupper($nombre_pais), $html2);
+				$html2 = str_replace('%contrato_factura_telefono%', strtoupper($factura_telefono), $html2);
+				$html2 = str_replace('%factura_direccion_cliente%', strtoupper($this->fields['direccion_cliente']), $html2);
 
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
 
@@ -945,7 +968,7 @@ class Factura extends Objeto {
 				} else {
 					$html2 = str_replace('%gastos_con_impuesto_periodo%', '', $html2);
 				}
-				if ($mostrar_gastos_sin_impuesto) {
+				if ($mostrar_gastos_sin_impuesto) {$
 					$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
 				} else {
 					$html2 = str_replace('%gastos_sin_impuesto_periodo%', '', $html2);
@@ -1681,7 +1704,6 @@ class Factura extends Objeto {
 						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci&oacute;n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr&iacute;guez San&iacute;n S.A.S. As&iacute; mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';
 					}
 				} else {
-
 					$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
 
 					if ($this->fields['id_documento_legal'] != '5') {
@@ -2407,3 +2429,4 @@ if (!class_exists('ListaFacturas')) {
 	}
 
 }
+

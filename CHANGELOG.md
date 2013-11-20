@@ -1,6 +1,10 @@
 # Changelog
 
 ## Hotfix: 13.6.15
+Martes 19 de Noviembre 2013
+* **Fixed:** [Agrega saldo pendiente o saldo a favor en nota de cobro seccion detalle cobro](https://github.com/LemontechSA/ttb/pull/340)
+
+## Hotfix: 13.6.15
 Jueves 14 de Noviembre 2013
 * **Fixed:** [Corrigie el tema, que despues de refrescar aparece la pagina que fue eligida](https://github.com/LemontechSA/ttb/pull/339)
 

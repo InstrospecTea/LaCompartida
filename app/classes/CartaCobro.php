@@ -332,6 +332,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
 				$html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
+				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 
 				$html2 = str_replace('%FECHA%', $this->GenerarDocumentoCartaComun($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCartaComun($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
@@ -877,7 +878,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%monto_total_sin_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_subtotal, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				}
 
-				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				if ($this->fields['opc_moneda_total'] != $this->fields['id_moneda'])
 					$html2 = str_replace('%equivalente_a_baz%', ', equivalentes a ' . $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1162,6 +1163,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
+				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 
 				if (count($this->asuntos) > 1) {
 					$html2 = str_replace('%detalle_mb%', __('%detalle_mb_asuntos%'), $html2);
@@ -1627,7 +1629,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%monto_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format(( $x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']] - $x_resultados['monto_cobro_original'][$this->fields['opc_moneda_total']]), $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				}
 
-				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				$html2 = str_replace('%porcentaje_iva_con_simbolo%', $this->fields['porcentaje_impuesto'] . "%", $html2);
 				$monto_palabra = new MontoEnPalabra($this->sesion);
@@ -1881,7 +1883,6 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%categoria_encargado_comercial%', __($categoria_usuario), $html2);
 				$html2 = str_replace('%categoria_encargado_comercial_mayusculas%', mb_strtoupper(__($categoria_usuario)), $html2);
 
-
 				$nombre_contacto_partes = explode(' ', $contrato->fields['contacto']);
 				$html2 = str_replace('%SoloNombreContacto%', $nombre_contacto_partes[0], $html2);
 
@@ -2086,6 +2087,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
+				$html2 = str_replace('%factura_giro%', $contrato->fields['factura_giro'], $html2);
 
 				$direccion=explode('//',$contrato->fields['direccion_contacto']);
 
@@ -2176,6 +2178,10 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $html2);
 				$html2 = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $html2);
 				$html2 = str_replace('%codigo_postal_cliente%', $contrato->fields['factura_codigopostal'], $html2);
+				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
+				$html2 = str_replace('%cliente_fax%', $contrato->fields['fono_contacto'], $html2);
+				$html2 = str_replace('%cliente_correo%', $contrato->fields['email_contacto'], $html2);
+				$html2 = str_replace('%factura_giro%', $contrato->fields['factura_giro'], $html2);
 
 				$queryasuntosrel = "SELECT asunto.glosa_asunto 
 											FROM trabajo 
@@ -2216,6 +2222,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%num_letter_baz%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%cliente_fax%', $contrato->fields['fono_contacto'], $html2);
+				$html2 = str_replace('%cliente_correo%', $contrato->fields['email_contacto'], $html2);
 				break;
 
 			case 'PIE': //GenerarDocumentoCartaComun
