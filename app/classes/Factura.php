@@ -635,7 +635,6 @@ class Factura extends Objeto {
 							WHERE id_factura=" . $this->fields['id_factura'];
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc, $factura_ciudad, $nombre_pais, $fono_contacto) = mysql_fetch_array($resp);
 				
 				list (	$titulo_contacto,
 						$contacto,
@@ -649,7 +648,8 @@ class Factura extends Objeto {
 						$glosa_tipo_doc,
 						$factura_ciudad,
 						$nombre_pais,
-						$factura_telefono ) = mysql_fetch_array($resp);
+						$contrato_fono_contacto,
+						$contrato_factura_telefono ) = mysql_fetch_array($resp);
 
 				$glosa_tipo_doc_mayus = str_replace('é', 'É', strtoupper($glosa_tipo_doc));
 
@@ -678,6 +678,7 @@ class Factura extends Objeto {
 
 				$glosa_cliente = $this->fields['cliente'];
 				$direccion_cliente = $this->fields['direccion_cliente'];
+
 				if (UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion)) {
 					$ciudad_cliente = $this->fields['ciudad_cliente'];
 				}
@@ -705,10 +706,12 @@ class Factura extends Objeto {
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($glosa_cliente), $html2);
 				$html2 = str_replace('%encargado_comercial%', $encargado_comercial, $html2);
 				$html2 = str_replace('%rut_cliente%', $this->fields['RUT_cliente'], $html2);
+
 				$meses_org = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 				$month_short = array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
 				$mes_corto = array('JAN', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC');
 				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
+
 				$html2 = str_replace('%nombre_encargado%', strtoupper($titulo_contacto . ' ' . $contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%direccion_cliente%', $direccion_cliente, $html2);
 				$html2 = str_replace('%direccion_cliente_mayuscula%', strtoupper($direccion_cliente), $html2);
@@ -721,13 +724,12 @@ class Factura extends Objeto {
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_mes%', date('m', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_anio_2cifras%', date('y', strtotime($fecha_factura)), $html2);
-
 				$html2 = str_replace('%contrato_titulo_contacto%', strtoupper($titulo_contacto), $html2);
 				$html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%contrato_razon_social%', strtoupper($contrato_factura_razon_social), $html2);
 				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($factura_ciudad), $html2);
 				$html2 = str_replace('%contrato_nombre_pais%', strtoupper($nombre_pais), $html2);
-				$html2 = str_replace('%contrato_factura_telefono%', strtoupper($factura_telefono), $html2);
+				$html2 = str_replace('%contrato_factura_telefono%', strtoupper($contrato_factura_telefono), $html2);
 				$html2 = str_replace('%factura_direccion_cliente%', strtoupper($this->fields['direccion_cliente']), $html2);
 
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
