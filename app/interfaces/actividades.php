@@ -23,17 +23,15 @@ $Pagina->PrintTop();
 $codigo_actividad = $Actividad->fields['codigo_actividad'];
 $codigo_cliente = $Actividad->extra_fields['codigo_cliente'];
 $codigo_asunto = $Actividad->fields['codigo_asunto'];
-
-
 ?>
 
 <form method="POST" action="actividades.php" name="form_actividades" id="form_actividades">
 	<input  id="xdesde"  name="xdesde" type="hidden" value="">
 	<input type="hidden" name="opc" value="buscar" />
-	
+
 
 	<div style="width: 95%; text-align: "right"; margin: 4px auto;" align="right">
-		<a href="#" class="btn botonizame" icon="agregar" id="agregar_actividad" title="<?php echo __('Agregar') ?>" onclick=""><?php echo __('Agregar') . ' ' . __('Actividad') ?></a>
+		 <a href="#" class="btn botonizame" icon="agregar" id="agregar_actividad" title="<?php echo __('Agregar') ?>" onclick=""><?php echo __('Agregar') . ' ' . __('Actividad') ?></a>
 	</div>
 
 	<table style="border: 1px solid #BDBDBD;" class="tb_base" width="90%">
@@ -79,8 +77,8 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 		</tr>
 		<tr>
 			<td colspan=2 align="center">
-				<input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn"  onclick="javascript:this.form.opc.value = 'buscar'"/>
-				<a class="btn botonizame"  href="actividades_xls.php?codigo_actividad=<?php echo $codigo_actividad?>&codigo_cliente=<?php echo $codigo_cliente?>&codigo_asunto=<?php echo $codigo_asunto?>" icon="xls" name='descargar_excel' id='descargar_excel' onclick=""><?php echo __('Descargar Excel') ?></a>
+				<a name="boton_buscar" id="boton_buscar" class="btn botonizame" icon="find" onclick="BuscarFacturas($('form_actividades'), 'buscar')"><?php echo __('Buscar'); ?></a>
+				<a name="boton_excel" id="boton_descarga" class="btn botonizame" icon="xls" onclick="BuscarFacturas($('form_actividades'), 'exportar_excel')"><?php echo __('Descargar Excel'); ?></a>
 			</td>
 			<td align="left">
 			</td>
@@ -94,8 +92,6 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 <br/><br/>
 
 <?php
-
-
 if ($opc == 'buscar') {
 
 	if ($orden == '') {
@@ -152,6 +148,28 @@ function EliminarActividad(id) {
 function Refrescar() {
 	document.form_buscador.submit();
 }
+function BuscarFacturas(form, from) {
+	if (!form) {
+		var form = $('form_actividades');
+	}
+
+	switch (from) {
+		case 'buscar':
+			form.action = 'actividades.php';
+			break;
+
+		case 'exportar_excel':
+			form.action = 'actividades_xls.php';
+			break;
+
+		default:
+			return false;
+	}
+
+	form.submit();
+	return true;
+}
+
 </script>
 <?php
 $Pagina->PrintBottom();
