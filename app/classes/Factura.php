@@ -620,7 +620,8 @@ class Factura extends Objeto {
 								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre, factura.fecha as fecha,
 								prm_documento_legal.glosa,
 								contrato.factura_ciudad,
-								prm_pais.nombre as nombre_pais
+								prm_pais.nombre as nombre_pais,
+								fono_contacto as fono_contacto 
 							FROM contrato
 							LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
 							LEFT JOIN factura ON cobro.id_cobro=factura.id_cobro
@@ -630,7 +631,7 @@ class Factura extends Objeto {
 							WHERE id_factura=" . $this->fields['id_factura'];
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc, $factura_ciudad, $nombre_pais) = mysql_fetch_array($resp);
+				list( $titulo_contacto, $contacto, $apellido_contacto, $id_cobro, $numero_factura, $encargado_comercial, $fecha_factura, $glosa_tipo_doc, $factura_ciudad, $nombre_pais, $fono_contacto) = mysql_fetch_array($resp);
 				$glosa_tipo_doc_mayus = str_replace('é', 'É', strtoupper($glosa_tipo_doc));
 
 				if ($lang == 'es') {
@@ -1681,7 +1682,6 @@ class Factura extends Objeto {
 						$texto_pie_pagina = 'Favor efectuar el pago de la presente cuenta de honorarios a su presentaci&oacute;n, por transferencia al BANCO DE BOGOTA MIAMI AGENCY, 701 Brickell Avenue Suite 1450, Miami, Florida 33131 ABA 066010720, SWIFT BBOGUS3M para abonar a la cuenta No 65698 a nombre de Parra Rodr&iacute;guez San&iacute;n S.A.S. As&iacute; mismo, una vez realizada la transferencia, por favor avisar por telefax o e-mail (cartera@prslaws.com) con el fin de hacer los registros internos correspondientes. Por favor no realizar pagos con cheques, toda vez que no aceptamos responsabilidad si sus pagos son efectuados mediante cheques.';
 					}
 				} else {
-
 					$html2 = str_replace('%pie_de_factura%', '&nbsp;', $html2);
 
 					if ($this->fields['id_documento_legal'] != '5') {
@@ -2407,3 +2407,4 @@ if (!class_exists('ListaFacturas')) {
 	}
 
 }
+
