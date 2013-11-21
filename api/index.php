@@ -61,7 +61,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/clients', function () use ($Session, $Slim) {
-	//$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$timestamp = $Slim->request()->params('timestamp');
 	$include = $Slim->request()->params('include');
@@ -209,7 +209,6 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 	}
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
-
 	$User = new Usuario($Session);
 	$user = array();
 
@@ -660,30 +659,35 @@ function validateAuthTokenSendByHeaders() {
 	global $Session, $Slim;
 
 	$UserToken = new UserToken($Session);
-
 	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
-	$user_token_data = $UserToken->findByAuthToken($auth_token);
+	$user_token = $UserToken->findByAuthToken($auth_token);
 
 	// if not exist the auth_token then return error
-	if (!is_object($user_token_data)) {
+	if (!is_object($user_token)) {
 		halt(__('Invalid AUTH TOKEN'), "SecurityError");
 	} else {
 		// verify if the token is expired
 		// date_default_timezone_set("UTC");
 		$now = time();
-		$expiry_date = strtotime($user_token_data->expiry_date);
+		$expiry_date = strtotime($user_token->expiry_date);
 		if ($expiry_date < $now) {
-			if ($UserToken->delete($user_token_data->id)) {
+			if ($UserToken->delete($user_token->id)) {
 				halt(__('Expired AUTH TOKEN'), "SecurityError");
 			} else {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
 			}
 		} else {
+			$user_token_data = array(
+				'id' => $user_token->id,
+				'user_id' => $user_token->user_id,
+				'auth_token' => $user_token->auth_token,
+				'app_key' => $user_token->app_key
+			);
 			$UserToken->save($user_token_data);
 		}
 
-		return $user_token_data->user_id;
+		return $user_token->user_id;
 	}
 }
 

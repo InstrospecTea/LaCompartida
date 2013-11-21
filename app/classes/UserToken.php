@@ -61,7 +61,6 @@ class UserToken extends Objeto {
 		if (isset($data['id'])) {
 			$user_token_data = $this->findById($data['id']);
 		}
-
 		$expiry_date = strtotime(date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'))) . ' +1 month');
 		// if exist the auth_token then replace for the new one
 		if (is_object($user_token_data)) {
