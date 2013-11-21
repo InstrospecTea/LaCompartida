@@ -61,7 +61,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/clients', function () use ($Session, $Slim) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	//$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$timestamp = $Slim->request()->params('timestamp');
 	$include = $Slim->request()->params('include');

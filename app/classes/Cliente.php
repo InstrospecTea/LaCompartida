@@ -834,7 +834,7 @@ class Cliente extends Objeto {
 					'code' => $client->code,
 					'name' => !empty($client->name) ? $client->name : null,
 					'address' => !empty($client->address) ? $client->address : null,
-					'active' => $client->active
+					'active' => (int) $client->active
 				)
 			);
 		}

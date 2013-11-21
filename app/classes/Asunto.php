@@ -842,7 +842,7 @@ class Asunto extends Objeto {
 					'name' => !empty($matter->name) ? $matter->name : null,
 					'language' =>  !empty($matter->language) ? $matter->languag : null,
 					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
-					'active' =>  $matter->active
+					'active' => (int)$matter->active
 				)
 			);
 		}
@@ -899,7 +899,7 @@ class Asunto extends Objeto {
 					'name' => !empty($matter->name) ? $matter->name : null,
 					'language' =>  !empty($matter->language) ? $matter->languag : null,
 					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
-					'active' => $matter->active
+					'active' => (int) $matter->active
 				)
 			);
 		}
