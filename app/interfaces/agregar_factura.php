@@ -735,7 +735,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 						<?php
 					} else {
 						?>
-						<input type="text" name="descripcion_honorarios_legales" id="descripcion_honorarios_legales" value="<?php echo trim($descripcion_honorario); ?>" maxlength="300" size="40" />
+						<input type="text" name="descripcion_honorarios_legales" id="descripcion_honorarios_legales" value="<?php echo trim($descripcion_honorario); ?>" maxlength="250" size="40" />
 						<?php
 					}
 					?>
@@ -753,7 +753,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					<?php if ($cantidad_lineas_descripcion > 1) { ?>
 						<textarea id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion ?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos); ?></textarea>
 					<?php } else { ?>
-						<input type="text" id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" value="<?php echo trim($descripcion_subtotal_gastos); ?>" size="40" maxlength="30">
+						<input type="text" id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" value="<?php echo trim($descripcion_subtotal_gastos); ?>" size="40" maxlength="250">
 					<?php } ?>
 				</td>
 				<td align="left" nowrap><?php echo $simbolo; ?>
@@ -770,7 +770,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					<?php if ($cantidad_lineas_descripcion > 1) { ?>
 						<textarea id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion ?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?></textarea>
 					<?php } else { ?>
-						<input type="text" id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva"     id="descripcion_gastos_sin_iva" value="<?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?>" size="40" maxlength="30" >
+						<input type="text" id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva"     id="descripcion_gastos_sin_iva" value="<?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?>" size="40" maxlength="250" >
 					<?php } ?>
 				</td>
 				<td align="left" nowrap><?php echo $simbolo; ?>

@@ -124,7 +124,7 @@ function GeneraFacturaElectronica($hookArg) {
 		$password = $estudio_data['password'];
 		$strdocumento = FacturaToTXT($Sesion, $Factura);
 		$hookArg['ExtraData'] = $strdocumento;
-		$result = $client->RecibirTXT($usuario, $password, $strdocumento, 0);
+		$result = $client->RecibirTXT($usuario, $password, UtilesApp::utf8izar($strdocumento), 0);
 		if ($result->codigo == 201) {
 			try {
 				$Factura->Edit('dte_xml', $result->descripcion);
@@ -231,28 +231,30 @@ function PaymentMethod(Sesion $Sesion, Factura $Factura) {
 //
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
+	$mx_timezone = -6;
+	$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
 	$r = array(
 		'COM' => array(
 			'version|3.2',
 			'serie|' . $Factura->fields['serie_documento_legal'],
 			'folio|' . $Factura->fields['numero'],
-			'fecha|' . Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%dT%H:%M:%S'),
+			'fecha|' . Utiles::sql2date($Factura->fields['fecha'] . ' ' . $mx_hour, '%Y-%m-%dT%H:%M:%S'),
 			'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
 			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
-			'Moneda|' . utf8_encode($monedas[$Factura->fields['id_moneda']]['codigo']),
+			'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
 			'tipoDeComprobante|ingreso'
 		),
 		'REF' => array(
-			'Regimen|' . 'Persona física régimen general'
+			'Regimen|' . 'Régimen General de Ley, Personas Morales'
 		),
 		'REC' => array(
 			'rfc|' . $Factura->fields['RUT_cliente'],
-			'nombre|' . utf8_encode($Factura->fields['cliente'])
+			'nombre|' . ($Factura->fields['cliente'])
 		),
 		'TRA' => array(
 			'impuesto|IVA',
@@ -262,26 +264,23 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	);
 
 	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
-		$r['DOR'][] = 'calle|' . utf8_encode($Factura->fields['direccion_cliente']);
+		$r['DOR'][] = 'calle|' . ($Factura->fields['direccion_cliente']);
 	}
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
-		$r['DOR'][] = 'colonia|' . utf8_encode($Factura->fields['comuna_cliente']);
-	}
-	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
-		$r['DOR'][] = 'municipio|' . utf8_encode($Factura->fields['comuna_cliente']);
+		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
 	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
-		$r['DOR'][] = 'pais|' . utf8_encode($Factura->fields['ciudad_cliente']);
+		$r['DOR'][] = 'pais|' . ($Factura->fields['ciudad_cliente']);
 	}
 	if (!is_null($Factura->fields['factura_codigopostal']) && !empty($Factura->fields['factura_codigopostal'])) {
-		$r['DOR'][] = 'codigoPostal|' . utf8_encode($Factura->fields['factura_codigopostal']);
+		$r['DOR'][] = 'codigoPostal|' . ($Factura->fields['factura_codigopostal']);
 	}
 
 	if ($Factura->fields['subtotal'] > 0) {
 		$r['CON_honorarios'] = array(
 			'cantidad|1.00',
 			'unidad|un',
-			'descripcion|' . utf8_encode($Factura->fields['descripcion']),
+			'descripcion|' . ($Factura->fields['descripcion']),
 			'valorUnitario|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'descuento|0.00'
@@ -291,7 +290,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$r['CON_gastos_con_iva'] = array(
 			'cantidad|1.00',
 			'unidad|un',
-			'descripcion|' . utf8_encode($Factura->fields['descripcion_subtotal_gastos']),
+			'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos']),
 			'valorUnitario|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
 			'descuento|0.00'
@@ -301,7 +300,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$r['CON_gastos_sin_iva'] = array(
 			'cantidad|1.00',
 			'unidad|un',
-			'descripcion|' . utf8_encode($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
+			'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
 			'valorUnitario|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
 			'descuento|0.00'
@@ -317,5 +316,5 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$txt .= "\n";
 	}
 
-	return utf8_encode($txt);
+	return $txt;
 }

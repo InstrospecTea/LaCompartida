@@ -677,17 +677,17 @@ if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 
 	function ActualizarMontos( form )
 	{
-		if(!form)
+		if(!form) {
 			var form = $('form_cobro5');
+		}
 
-		if(form.cobro_descuento.value=='')
-		{
+		if(form.cobro_descuento.value=='') {
 			alert("<?php echo __('Ud. debe ingresar un descuento a realizar.') ?>");
 			form.cobro_descuento.focus();
 			return false;
 		}
 
-		if( !AgregarParametros( form ) )
+		if ( !AgregarParametros( form ) )
 			return false;
 
 		form.opc.value = 'guardar_cobro';
@@ -746,7 +746,7 @@ if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		document.getElementById('ajustar_monto').style.display = 'inline';
 	}
 
-	function DisplayEscalas(mostrar){
+	function DisplayEscalas(mostrar) {
 		var div = document.getElementById("div_escalonada");
 		// var img_mas = document.getElementById("mostrar_escalonadas");
 		// var img_menos = document.getElementById("ocultar_escalonadas");
@@ -761,7 +761,7 @@ if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		}
 	}
 
-	function ActualizaRango(desde, cant){
+	function ActualizaRango(desde, cant) {
 		var aplicar = parseInt(desde.substr(-1,1));
 		var ini = 0;
 		num_escalas = (document.getElementsByName('esc_tiempo[]')).length;
@@ -817,7 +817,7 @@ if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		}
 	}
 
-	function setear_valores_escalon( donde, desde, tiempo, tipo, id_tarifa, monto, id_moneda, descuento ){
+	function setear_valores_escalon( donde, desde, tiempo, tipo, id_tarifa, monto, id_moneda, descuento ) {
 		if( desde != '' ) {
 			/* si le paso desde donde copiar, los utilizo */
 			document.getElementById('esc_tiempo_' + donde).value = document.getElementById('esc_tiempo_' + desde).value;
@@ -899,29 +899,39 @@ if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 		var descuento = parseFloat(desc); //document.getElementById("cobro_descuento").value);
 		var totalObj = document.getElementById("cobro_total");
 		var form = document.getElementById("form_cobro5");
+		var cobroMontoContrato = document.getElementById("cobro_monto_contrato");
 
-		if(parseFloat(descuento)>parseFloat(subtotal))
-		{
-			descuento = 0;
-			form.cobro_descuento.value = 0;
+		if (jQuery('#fc5').attr('checked') != 'checked') {
+			if (parseFloat(descuento) > parseFloat(subtotal)) {
+				descuento = 0;
+				form.cobro_descuento.value = 0;
+			}
+		} else {
+			if (parseFloat(descuento) > parseFloat(cobroMontoContrato.value)) {
+				descuento = 0;
+				form.cobro_descuento.value = 0;
+				alert('El descuento aplicado no puede ser superior al monto definido en el CAP.');
+			}
 		}
-
-		if( isNaN(descuento) ) descuento = 0;
+		if( isNaN(descuento) ) {
+			descuento = 0;
+		}
 		var impuesto=0;
-<?php
-if ( Conf::GetConf($sesion, 'UsarImpuestoSeparado')  || $contrato->fields['usa_impuesto_separado']) {
-	?>
-			var campoImpuesto = document.getElementById("cobro_impuesto");
-			valorImpuesto = (subtotal - descuento)*(<?php echo $cobro->fields['porcentaje_impuesto'] ? $cobro->fields['porcentaje_impuesto'] : 0 ?>)/100;
-			campoImpuesto.value = valorImpuesto.toFixed(2);
-			impuesto = parseFloat(campoImpuesto.value);
+		<?php
+			if ( Conf::GetConf($sesion, 'UsarImpuestoSeparado')  || $contrato->fields['usa_impuesto_separado']) {
+				?>
+						var campoImpuesto = document.getElementById("cobro_impuesto");
+						valorImpuesto = (subtotal - descuento)*(<?php echo $cobro->fields['porcentaje_impuesto'] ? $cobro->fields['porcentaje_impuesto'] : 0 ?>)/100;
+						campoImpuesto.value = valorImpuesto.toFixed(2);
+						impuesto = parseFloat(campoImpuesto.value);
 
-	<?php
-}
-?>
+				<?php
+			}
+		?>
 		valorTotal = subtotal - descuento + impuesto;
 		totalObj.value = valorTotal.toFixed(2);
 	}
+
 
 	function ToggleDiv( divId )
 	{
@@ -1304,7 +1314,7 @@ for ($i = 0; $i < $monedas->num; $i++) {
 					<?php echo __('Monto') ?>
 								</td>
 								<td>
-									<input name="cobro_monto_contrato" size="7" value="<?php echo $cobro->fields['monto_contrato'] ?>" <?php echo $cobro->fields['id_contrato'] && $cobro->fields['forma_cobro'] == 'CAP' ? 'onchange="UpdateCap(this.value, false)"' : '' ?>>
+									<input id="cobro_monto_contrato" name="cobro_monto_contrato" size="7" value="<?php echo $cobro->fields['monto_contrato'] ?>" <?php echo $cobro->fields['id_contrato'] && $cobro->fields['forma_cobro'] == 'CAP' ? 'onchange="UpdateCap(this.value, false)"' : '' ?>>
 
 								</td>
 								<td>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1911,7 +1921,7 @@ if ($solicitante == 0) {  // no mostrar
 									<td align="left" colspan="3">
 										<?php echo  Html::SelectQuery($sesion, "SELECT carta.id_carta, carta.descripcion
 																				FROM carta ORDER BY id_carta","id_carta",
-																$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta']=='1'?'':'disabled') . ' class="wide"','',150); ?>
+																$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta']=='1'?'':'disabled') . ' class="wide"','',200); ?>
 									</td>
 								</tr>
 								<tr>
@@ -1923,7 +1933,7 @@ if ($solicitante == 0) {  // no mostrar
 									<td align="left" colspan="3">
 										<?php echo  Html::SelectQuery($sesion, "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion
 																FROM cobro_rtf ORDER BY cobro_rtf.id_formato","id_formato",
-												$cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"','Seleccione',150); ?>
+												$cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"','Seleccione',200); ?>
 									</td>
 								</tr>
 								<tr>

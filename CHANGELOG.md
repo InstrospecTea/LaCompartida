@@ -1,4 +1,69 @@
 # Changelog
+
+## Hotfix: 13.6.18
+Miércoles 20 de Noviembre 2013
+* **Fixed:** [Corrige el excel de gastos y solución provisoria para backups de aym y bmaj](https://github.com/LemontechSA/ttb/pull/342)
+
+## Hotfix: 13.6.17
+Martes 19 de Noviembre 2013
+* **Fixed:** [agrega nuevo tag a factura para desplegar el numero de telefono en factura](https://github.com/LemontechSA/ttb/pull/341)
+
+## Hotfix: 13.6.16
+Martes 19 de Noviembre 2013
+* **Fixed:** [Agrega saldo pendiente o saldo a favor en nota de cobro seccion detalle cobro](https://github.com/LemontechSA/ttb/pull/340)
+
+## Hotfix: 13.6.15
+Jueves 14 de Noviembre 2013
+* **Fixed:** [Corrigie el tema, que despues de refrescar aparece la pagina que fue eligida](https://github.com/LemontechSA/ttb/pull/339)
+
+## Hotfix: 13.6.14
+Martes 12 de Noviembre 2013
+* **Fixed:** [No permite que el campo para el rut del usuario esta vacío](https://github.com/LemontechSA/ttb/pull/337)
+* **Fixed:** [Corrige problema de despliege de tag %asuntos_relacionados% en Carta de cobro funcion GenerarDocumentoCarta](https://github.com/LemontechSA/ttb/pull/337)
+
+## Hotfix: 13.6.13
+Jueves 07 de Noviembre 2013
+* **Fixed:** [Permite generar facturas electrónicas con diferente hora para que FacturemosYA no se caiga](https://github.com/LemontechSA/ttb/pull/336)
+* **Fixed:** [No permite que el usuario cualquiera pueda eliminar al superuser: 99511620](https://github.com/LemontechSA/ttb/pull/336)
+
+## Hotfix: 13.6.12
+Jueves 07 de Noviembre 2013
+* **Fixed:** [Corrige bug en interfaz agregar_tarifa, no se autocompletaban tarifas de monedas con glosa compuesta de 2 palabras](https://github.com/LemontechSA/ttb/pull/333)
+* **Fixed:** [Corrige bugs de encoding y glosa de régimen en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/333)
+
+## Hotfix: 13.6.11
+Martes 05 de Noviembre 2013
+* **Fixed:** [Correccion a cobros_xls para solucionar problema de redondeo al obtener resultado de el monto_subtotal en otra moneda.](https://github.com/LemontechSA/ttb/pull/332)
+
+## Hotfix: 13.6.10
+Lunes 04 de Noviembre 2013
+* **Fixed:** [Modificaciones a menu usuario paso 2 no actualiza tarifas al guardar salvo que exista un cambio de categoria.](https://github.com/LemontechSA/ttb/pull/328)
+
+## Hotfix: 13.6.9
+Lunes 28 de octubre 2013
+* **Added:** [Modificaciones a menu actividades, Modificaciones a tamaño de campos en agregar factura](https://github.com/LemontechSA/ttb/pull/327)
+
+## Hotfix: 13.6.8
+Lunes 28 de octubre 2013
+* **Fixed:** [Modificaciones para factura prslaws, Correccion a reporte avanzado](https://github.com/LemontechSA/ttb/pull/326)
+
+## Hotfix: 13.6.7
+Miercoles 22 de octubre 2013
+* **Fixed:** [Modificaciones para factura prslaws.](https://github.com/LemontechSA/ttb/pull/321)
+
+## Hotfix: 13.6.6
+Martes 22 de octubre 2013
+* **Fixed:** [Correcciones en configuracion AsuntosPorDefecto.](https://github.com/LemontechSA/ttb/pull/320)
+
+## Hotfix: 13.6.5
+lunes 21 de octubre 2013
+* **Fixed:** [Actualiza listado manteniendo orden y paginación.](https://github.com/LemontechSA/ttb/pull/320)
+
+## Hotfix: 13.6.4
+Viernes 18 de Octubre 2013
+
+* **Added:** [Generar por sistema factura para cliente PRSLAWS](https://github.com/LemontechSA/ttb/pull/317)
+
 ## Hotfix: 13.6.3
 Jueves 17 de Octubre 2013
 

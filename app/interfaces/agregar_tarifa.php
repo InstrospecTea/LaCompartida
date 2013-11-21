@@ -20,7 +20,7 @@ if ($opc == 'eliminar') {
 	$tarifa_eliminar = new Tarifa($sesion);
 	$tarifa_eliminar->loadById($id_tarifa_eliminar);
 
-	if ( $id_tarifa_eliminar == '1'){
+	if ($id_tarifa_eliminar == '1') {
 		$pagina->AddError(__('La tarifa base no puede ser eliminada solo puede ser editada'));
 	} else {
 		if ($tarifa_eliminar->Eliminar()) {
@@ -30,7 +30,6 @@ if ($opc == 'eliminar') {
 			$pagina->AddError($tarifa_eliminar->error);
 		}
 	}
-	
 }
 
 if (!empty($id_tarifa_edicion) && !$tarifa->loadById($id_tarifa_edicion)) {
@@ -90,15 +89,14 @@ if ($id_nuevo && $opc != 'guardar') {
 	}
 }
 
-
-
 if ($opc == 'guardar') {
-	
+
 	if (empty($glosa_tarifa)) {
 		$pagina->AddError(__('Debe definir un nombre para la tarifa.'));
 	} else {
 
 		$tarifa->Edit('glosa_tarifa', $glosa_tarifa);
+
 		if ($tarifa_defecto) {
 			$tarifa->TarifaDefecto($tarifa->fields['id_tarifa']);
 			$tarifa->Edit('tarifa_defecto', '1');
@@ -143,6 +141,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 ?>
 
 <script type="text/javascript">
+
 	jQuery('document').ready(function() {
 		jQuery('#fix_tarifas').click(function() {
 			jQuery.ajax({
@@ -173,6 +172,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		if (confirm('<?php echo __('Confirma cambio de tarifa?') ?>'))
 			self.location.href = 'agregar_tarifa.php?id_tarifa_edicion=' + valor + '&popup=' + popup;
 	}
+
 	function Eliminar()
 	{
 		var http = getXMLHTTP();
@@ -210,14 +210,13 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 
 	function ActualizarTarifaUsuario(glosa_categoria, valor, glosa_moneda, vacio)
 	{
-		var clase = '.' + glosa_categoria + '' + glosa_moneda;
-
-		//alert(clase);
+		var glosa_moneda_tarifa = glosa_moneda.replace(" ", "");
+		var clase = '.' + glosa_categoria + '' + glosa_moneda_tarifa;
 
 		if (!vacio || confirm('<?php echo __('Confirma cambio de tarifa para todos los usuarios de esta categoria?') ?>') == true)
 		{
 			$$(clase).each(// Para el cambio del tarifa de la categoria cambia todos los tarifas de usuarios 
-					function(item)						// que pertenecen a este categoria.
+					function(item) // que pertenecen a este categoria.
 					{
 						item.value = valor;
 					}
@@ -254,7 +253,8 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	}
 </style>
 
-<?php if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
+<?php
+if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
 	echo "<table width=\"90%\" class=\"tb_base\"><tr><td align=\"center\">";
 ?>
 <form name=formulario id=formulario method=post action='' autocomplete="off">
@@ -264,17 +264,17 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 
 	<table width='95%' border="0" cellpadding="0" cellspacing="0">
 		<tr>
-<?php
-$colspan = 3;
+			<?php
+			$colspan = 3;
 
-if ($tarifa->fields['id_tarifa']) {
-	$colspan = 5;
-	?>
+			if ($tarifa->fields['id_tarifa']) {
+				$colspan = 5;
+				?>
 				<td style="text-align:left;vertical-align: middle;"><?php echo __('Tarifa') ?>:&nbsp;</td>
 				<td style="text-align:left;vertical-align: middle;"><?php echo Html::SelectQuery($sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa", "id_tarifa", $tarifa->fields['id_tarifa'], "onchange='cambia_tarifa(this.value)'", "", "120"); ?></td>
-	<?php
-}
-?>
+				<?php
+			}
+			?>
 			<td style="text-align:left;vertical-align: middle;" colspan="2"> <?php echo __('Nombre') ?>: <input style="width:200px;" type=text name="glosa_tarifa" value='<?php echo $tarifa->fields['glosa_tarifa'] ?>' <?php echo $active ?>> </td>
 
 			<td style="text-align:right;vertical-align: middle;"> <?php echo __('Defecto') ?>: <input type=checkbox name=tarifa_defecto value='1' <?php echo $tarifa->fields['tarifa_defecto'] ? 'checked' : '' ?>></td>
@@ -297,13 +297,13 @@ if ($tarifa->fields['id_tarifa']) {
 			</td>
 		</tr>
 		<tr>
-<?php
-$colspan = 3;
+			<?php
+			$colspan = 3;
 
-if ($tarifa->fields['id_tarifa']) {
-	$colspan = 4;
-}
-?>
+			if ($tarifa->fields['id_tarifa']) {
+				$colspan = 4;
+			}
+			?>
 			<td colspan="<?php echo $colspan ?>"></td><td  align=left>
 				<input type=checkbox id=usar_tarifa_previa value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> copiando la actual 
 			</td>
@@ -313,37 +313,32 @@ if ($tarifa->fields['id_tarifa']) {
 
 
 
-			<?php
-			/* self.location.href= */
-			######## MONEDAS #########
-			$lista_monedas = new ListaObjetos($sesion, '', "SELECT * from prm_moneda Order by id_moneda ASC");
-			$td_moneda = '';
-			for ($x = 0; $x < $lista_monedas->num; $x++) {
-				$moneda = $lista_monedas->Get($x);
-				$td_moneda .= "<td align=center class=\"border_plomo\"><b>" . $moneda->fields['glosa_moneda'] . "</b></td>";
-			}
+	<?php
+	/* self.location.href= */
+	######## MONEDAS #########
+	$lista_monedas = new ListaObjetos($sesion, '', "SELECT * from prm_moneda Order by id_moneda ASC");
+	$td_moneda = '';
+	for ($x = 0; $x < $lista_monedas->num; $x++) {
+		$moneda = $lista_monedas->Get($x);
+		$td_moneda .= "<td align=center class=\"border_plomo\"><b>" . $moneda->fields['glosa_moneda'] . "</b></td>";
+	}
 
+	########## CATEGORIA TARIFA ###########
+	$td_categoria_tarifas = '';
+	$cont = 0;
+	$where = '1';
+	if ($id_tarifa_edicion) {
+		$where .= " AND categoria_tarifa.id_tarifa = '$id_tarifa_edicion'";
+	} else if ($id_nuevo) {
+		$where .= " AND categoria_tarifa.id_tarifa = '$id_nuevo'";
+	} else if ($tarifa->fields['id_tarifa']) {
+		$where .= " AND categoria_tarifa.id_tarifa = '" . $tarifa->fields['id_tarifa'] . "'";
+	} else {
+		$where = 'categoria_tarifa.id_tarifa IS NULL';
+	}
 
-
-
-
-
-########## CATEGORIA TARIFA ###########
-			$td_categoria_tarifas = '';
-			$cont = 0;
-			$where = '1';
-			if ($id_tarifa_edicion) {
-				$where .= " AND categoria_tarifa.id_tarifa = '$id_tarifa_edicion'";
-			} else if ($id_nuevo) {
-				$where .= " AND categoria_tarifa.id_tarifa = '$id_nuevo'";
-			} else if ($tarifa->fields['id_tarifa']) {
-				$where .= " AND categoria_tarifa.id_tarifa = '" . $tarifa->fields['id_tarifa'] . "'";
-			} else {
-				$where = 'categoria_tarifa.id_tarifa IS NULL';
-			}
-
-			#Revisar coordinacion de usuarios con usuario_tarifa
-			$query_tarifas_categoria = "SELECT categoria_tarifa.id_categoria_usuario,
+	#Revisar coordinacion de usuarios con usuario_tarifa
+	$query_tarifas_categoria = "SELECT categoria_tarifa.id_categoria_usuario,
 																categoria_tarifa.id_tarifa,
 																IF(categoria_tarifa.tarifa >= 0,categoria_tarifa.tarifa,'') AS tarifa,
 																categoria_tarifa.id_moneda
@@ -351,56 +346,56 @@ if ($tarifa->fields['id_tarifa']) {
 																JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario=categoria_tarifa.id_categoria_usuario
 																WHERE $where
 																ORDER BY prm_categoria_usuario.glosa_categoria,prm_categoria_usuario.id_categoria_usuario, categoria_tarifa.id_moneda ASC";
-			$resp_categoria = mysql_query($query_tarifas_categoria, $sesion->dbh) or Utiles::errorSQL($query_tarifas_categoria, __FILE__, __LINE__, $sesion->dbh);
-			list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
+	$resp_categoria = mysql_query($query_tarifas_categoria, $sesion->dbh) or Utiles::errorSQL($query_tarifas_categoria, __FILE__, __LINE__, $sesion->dbh);
+	list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
 
-			########## CATEGORIA TARIFA #########
-			$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria_corregido 
+	########## CATEGORIA TARIFA #########
+	$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria_corregido 
 												FROM prm_categoria_usuario
 												ORDER BY glosa_categoria,id_categoria_usuario";
-			$resp_categoria2 = mysql_query($query_categoria, $sesion->dbh) or Utiles::errorSQL($query_categoria, __FILE__, __LINE__, $sesion->dbh);
-			$result_categoria = mysql_query("SELECT FOUND_ROWS()");
-			$row_categoria = mysql_fetch_row($result_categoria);
-			$total_categoria = $row_categoria[0];
-			while (list($id_categoria_usuario, $glosa_categoria) = mysql_fetch_array($resp_categoria2)) {
-				$cont++;
-				$glosa_categoria_2 = preg_replace("/_/", " ", $glosa_categoria);
-				$glosa_categoria = str_replace('/', '', $glosa_categoria);
-				$td_categoria_tarifas .= '<tr><td align=left class="border_plomo">' . $glosa_categoria_2 . '</td>';
-				$tab = $cont;
-				for ($j = 0; $j < $lista_monedas->num; $j++) {
-					$tab += ($total_categoria * ($j + 1)) + $j;
-					$money = $lista_monedas->Get($j);
-					$glosa_moneda = preg_replace("/ó/", "o", $money->fields['glosa_moneda']);
+	$resp_categoria2 = mysql_query($query_categoria, $sesion->dbh) or Utiles::errorSQL($query_categoria, __FILE__, __LINE__, $sesion->dbh);
+	$result_categoria = mysql_query("SELECT FOUND_ROWS()");
+	$row_categoria = mysql_fetch_row($result_categoria);
+	$total_categoria = $row_categoria[0];
+	while (list($id_categoria_usuario, $glosa_categoria) = mysql_fetch_array($resp_categoria2)) {
+		$cont++;
+		$glosa_categoria_2 = preg_replace("/_/", " ", $glosa_categoria);
+		$glosa_categoria = str_replace('/', '', $glosa_categoria);
+		$td_categoria_tarifas .= '<tr><td align=left class="border_plomo">' . $glosa_categoria_2 . '</td>';
+		$tab = $cont;
+		for ($j = 0; $j < $lista_monedas->num; $j++) {
+			$tab += ($total_categoria * ($j + 1)) + $j;
+			$money = $lista_monedas->Get($j);
+			$glosa_moneda = preg_replace("/ó/", "o", $money->fields['glosa_moneda']);
 
-					#echo "comienzo<br>".$id_moneda."<br>".$money->fields['id_moneda']."<br>".$id_categoria_usuario_tarifa."<br>".$id_categoria_usuario."<br>";
+			#echo "comienzo<br>".$id_moneda."<br>".$money->fields['id_moneda']."<br>".$id_categoria_usuario_tarifa."<br>".$id_categoria_usuario."<br>";
 
-					if ($id_moneda == $money->fields['id_moneda'] && $id_categoria_usuario_tarifa == $id_categoria_usuario) {
-						$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda','$valor');\"></td> \n";
-						list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
-					}
-					else
-						$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda');\"></td> \n";
-				}
-				$td_categoria_tarifas .= '</tr>';
+			if ($id_moneda == $money->fields['id_moneda'] && $id_categoria_usuario_tarifa == $id_categoria_usuario) {
+				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda','$valor');\"></td> \n";
+				list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
 			}
-			$cont = $tab;	// deja tabindex equal al maximo de la tabla de categorias para que no se interfere con la tabla de usuarios
-			########## USUARIO TARIFA ###########
-			$td_tarifas = '';
-			//$cont = 0;
-			$where = '1';
-			if ($id_tarifa_edicion) {
-				$where .= " AND usuario_tarifa.id_tarifa = '$id_tarifa_edicion'";
-			} else if ($id_nuevo) {
-				$where .= " AND usuario_tarifa.id_tarifa = '$id_nuevo'";
-			} else if ($tarifa->fields['id_tarifa']) {
-				$where .= " AND usuario_tarifa.id_tarifa = '" . $tarifa->fields['id_tarifa'] . "'";
-			} else {
-				$where = 'usuario_tarifa.id_tarifa IS NULL';
-			}
+			else
+				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda');\"></td> \n";
+		}
+		$td_categoria_tarifas .= '</tr>';
+	}
+	$cont = $tab; // deja tabindex equal al maximo de la tabla de categorias para que no se interfere con la tabla de usuarios
+	########## USUARIO TARIFA ###########
+	$td_tarifas = '';
+	//$cont = 0;
+	$where = '1';
+	if ($id_tarifa_edicion) {
+		$where .= " AND usuario_tarifa.id_tarifa = '$id_tarifa_edicion'";
+	} else if ($id_nuevo) {
+		$where .= " AND usuario_tarifa.id_tarifa = '$id_nuevo'";
+	} else if ($tarifa->fields['id_tarifa']) {
+		$where .= " AND usuario_tarifa.id_tarifa = '" . $tarifa->fields['id_tarifa'] . "'";
+	} else {
+		$where = 'usuario_tarifa.id_tarifa IS NULL';
+	}
 
-			#Revisar coordinacion de usuarios con usuario_tarifa
-			$query_tarifas = "SELECT	usuario_tarifa.id_usuario,
+	#Revisar coordinacion de usuarios con usuario_tarifa
+	$query_tarifas = "SELECT	usuario_tarifa.id_usuario,
 														usuario_tarifa.id_tarifa,
 														IF(usuario_tarifa.tarifa >= 0,usuario_tarifa.tarifa,'') AS tarifa,
 														usuario_tarifa.id_moneda
@@ -410,72 +405,73 @@ if ($tarifa->fields['id_tarifa']) {
 														WHERE $where
 														AND usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO'
 														ORDER BY usuario.apellido1, usuario.apellido2, usuario.nombre, usuario.id_usuario, usuario_tarifa.id_moneda ASC";
-			$resp = mysql_query($query_tarifas, $sesion->dbh) or Utiles::errorSQL($query_tarifas, __FILE__, __LINE__, $sesion->dbh);
-			list($id_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp);
+	$resp = mysql_query($query_tarifas, $sesion->dbh) or Utiles::errorSQL($query_tarifas, __FILE__, __LINE__, $sesion->dbh);
+	list($id_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp);
 
-			########## USUARIO TARIFA #########
-			$query = "SELECT usuario.id_usuario, CONCAT(usuario.apellido1,' ',usuario.apellido2,' ',usuario.nombre) AS nombre_usuario,
+	########## USUARIO TARIFA #########
+	$query = "SELECT usuario.id_usuario, CONCAT(usuario.apellido1,' ',usuario.apellido2,' ',usuario.nombre) AS nombre_usuario,
 									REPLACE(prm_categoria_usuario.glosa_categoria,' ','_') as glosa_categoria
 									FROM usuario
 									JOIN usuario_permiso USING(id_usuario)
 									LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario=usuario.id_categoria_usuario
 									WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY usuario.apellido1, usuario.apellido2, usuario.nombre, usuario.id_usuario";
-			$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			$result = mysql_query("SELECT FOUND_ROWS()");
-			$row = mysql_fetch_row($result);
-			$total = $row[0];
-			while (list($id_usuario, $nombre_usuario, $glosa_categoria) = mysql_fetch_array($resp2)) {
-				$cont++;
-				$glosa_categoria = str_replace('/', '', $glosa_categoria);
-				$td_tarifas .= '<tr><td align=left class="border_plomo">' . $nombre_usuario . '</td>';
-				$tab = $cont;
-				for ($j = 0; $j < $lista_monedas->num; $j++) {
-					$tab += ($total * ($j + 1)) + $j;
-					$money = $lista_monedas->Get($j);
-					$glosa_moneda = $money->fields['glosa_moneda'];
-					$nombre_clase = preg_replace("/ó/", "o", $glosa_categoria . $glosa_moneda);
+	$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$result = mysql_query("SELECT FOUND_ROWS()");
+	$row = mysql_fetch_row($result);
+	$total = $row[0];
+	while (list($id_usuario, $nombre_usuario, $glosa_categoria) = mysql_fetch_array($resp2)) {
+		$cont++;
+		$glosa_categoria = str_replace('/', '', $glosa_categoria);
+		$td_tarifas .= '<tr><td align=left class="border_plomo">' . $nombre_usuario . '</td>';
+		$tab = $cont;
+		for ($j = 0; $j < $lista_monedas->num; $j++) {
+			$tab += ($total * ($j + 1)) + $j;
+			$money = $lista_monedas->Get($j);
+			$glosa_moneda = str_replace(' ', '', $money->fields['glosa_moneda']);
+			$nombre_clase = preg_replace("/ó/", "o", $glosa_categoria . $glosa_moneda);
 
-					if ($id_moneda == $money->fields['id_moneda'] && $id_usuario_tarifa == $id_usuario) {
-						$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' id='' name='tarifa_moneda[$id_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab></td> \n";
-						list($id_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp);
-					}
-					else
-						$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' name='tarifa_moneda[$id_usuario][" . $money->fields['id_moneda'] . "]' value='' $active tabindex=$tab></td> \n";
-				}
-				$td_tarifas .= '</tr>';
+			if ($id_moneda == $money->fields['id_moneda'] && $id_usuario_tarifa == $id_usuario) {
+				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' id='' name='tarifa_moneda[$id_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab></td> \n";
+				list($id_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp);
 			}
+			else
+				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' name='tarifa_moneda[$id_usuario][" . $money->fields['id_moneda'] . "]' value='' $active tabindex=$tab></td> \n";
+		}
+		$td_tarifas .= '</tr>';
+	}
 
-			if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
-				?>
+	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
+		?>
 		<table width='95%' border="1px solid #BDBDBD" style='border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 			<tr bgcolor=#A3D55C>
 				<td align=left class="border_plomo"><b><?php echo __("Categoría") ?></b></td>
-		<?php echo $td_moneda ?>
+				<?php echo $td_moneda ?>
 			</tr>
-		<?php echo $td_categoria_tarifas ?>
+			<?php echo $td_categoria_tarifas ?>
 		</table>
 		<br>
 
 		<table width='95%' border="1px solid #BDBDBD" style='border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 			<tr bgcolor=#A3D55C>
 				<td align=left class="border_plomo"><b><?php echo __("Profesional") ?></b></td>
-		<?php echo $td_moneda ?>
+				<?php echo $td_moneda ?>
 			</tr>
-		<?php echo $td_tarifas ?>
+			<?php echo $td_tarifas ?>
 		</table>
 	</form>
-		<?php if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-			echo "</td></tr></table>";
-		?>
+	<?php
+	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
+		echo "</td></tr></table>";
+	?>
 	<br>
 	<?
-	}
-	else {
-		?>
+}
+else {
+	?>
 	<table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 		<tr bgcolor=#6CA522>
 			<td align=left><b><?php echo __("Categoría") ?></b></td>
-		<?php echo $td_moneda ?>
+			<?php echo $td_moneda ?>
 		</tr>
 		<?php echo $td_categoria_tarifas ?>
 	</table>
@@ -484,16 +480,17 @@ if ($tarifa->fields['id_tarifa']) {
 	<table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 		<tr bgcolor=#6CA522>
 			<td align=left><b><?php echo __("Profesional") ?></b></td>
-		<?php echo $td_moneda ?>
+			<?php echo $td_moneda ?>
 		</tr>
 		<?php echo $td_tarifas ?>
 	</table>
 	</form>
-		<?php if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-			echo "</td></tr></table>";
-		?>
+	<?php
+	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
+		echo "</td></tr></table>";
+	?>
 	<br>
-<?php
+	<?php
 }
 //include('ajax/tarifas_duplicadas.php');
 $pagina->PrintBottom($popup);
