@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.6.18
+Miércoles 20 de Noviembre 2013
+* **Fixed:** [Corrige el excel de gastos y solución provisoria para backups de aym y bmaj](https://github.com/LemontechSA/ttb/pull/342)
+
 ## Hotfix: 13.6.17
 Martes 19 de Noviembre 2013
 * **Fixed:** [agrega nuevo tag a factura para desplegar el numero de telefono en factura](https://github.com/LemontechSA/ttb/pull/341)
