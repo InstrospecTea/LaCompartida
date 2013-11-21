@@ -251,7 +251,9 @@ foreach ($arreglo as $sitio) {
 			loguear("dumpeando a $path");
 			file_put_contents('/var/www/error_logs/backup_mysqlerror.txt', '');
 
-			$sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db 2>/var/www/error_logs/backup_mysqlerror.txt | gzip  > $path";
+			$extra_cmd = in_array($db, array('aym_timetracking', 'bmaj_timetracking')) ? " --ignore-table=$db.log_trabajo --ignore-table=$db.tramite " : "";
+
+			$sentencia = "mysqldump $extra_cmd --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db 2>/var/www/error_logs/backup_mysqlerror.txt | gzip  > $path";
 			//echo $sentencia;
 			exec(" $sentencia ", $out, $ret);
 			$ret = file_get_contents('/var/www/error_logs/backup_mysqlerror.txt');

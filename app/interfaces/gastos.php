@@ -87,8 +87,6 @@ if ($id_gasto != "") {
 
 if ($opc == 'buscar') {
 	
-	var_dump($_REQUEST);
-
 	if ($orden == "") {
 		$orden = "fecha DESC";
 	}
