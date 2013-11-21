@@ -2046,7 +2046,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 		?>
 									</td>
 									<td align="left" colspan='3'>
-										<?php echo Html::SelectQuery($Sesion, "SELECT titulo, glosa_titulo FROM prm_titulo_persona ORDER BY id_titulo", "titulo_contacto", $contrato->fields['titulo_contacto'] ? $contrato->fields['titulo_contacto'] : '', '', 'Vacio', 65); ?>&nbsp;&nbsp;
+										<?php echo Html::SelectQuery($Sesion, "SELECT titulo, glosa_titulo FROM prm_titulo_persona ORDER BY id_titulo", "titulo_contacto", $contrato->fields['titulo_contacto'] ? $contrato->fields['titulo_contacto'] : '', '', 'Vacio', 120); ?>&nbsp;&nbsp;
 									</td>
 								</tr>
 								<tr>

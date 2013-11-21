@@ -16,7 +16,7 @@
     $id_usuario = $sesion->usuario->fields['id_usuario'];
 
 		$params_array['codigo_permiso'] = 'COB';
-		$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array); #tiene permiso de Cobranza 
+		$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array); #tiene permiso de Cobranza
 
 		if( !$permisos->fields['permitido'] )
 		die(__('No tienes privilegios suficientes para ver esta sección.'));
@@ -43,7 +43,7 @@
 
 	#if($opc == "buscar")
     #{
-    
+
 		$where = 1;
 		if($id_cobro_sql)
 			$where .= " AND cobro.id_cobro = '$id_cobro_sql' ";
@@ -58,19 +58,19 @@
 			if($estado_cobro)
 				$where.= " AND (cobro.estado = '$estado_cobro') ";
 			if ($fecha_creacion1 || $fecha_creacion2)
-				$where .= " AND fecha_creacion BETWEEN '".Utiles::fecha2sql($fecha_creacion1)."' AND '".Utiles::fecha2sql($fecha_creacion2).' 23:59:59'."' ";
+				$where .= " AND cobro.fecha_creacion BETWEEN '".Utiles::fecha2sql($fecha_creacion1)."' AND '".Utiles::fecha2sql($fecha_creacion2).' 23:59:59'."' ";
 		}
-				
+
 	    $query = "SELECT SQL_CALC_FOUND_ROWS cobro.*, cliente.*, CONCAT_WS(' ',prm_moneda.simbolo,cobro.monto) AS cobro_monto
-                FROM cobro 
+                FROM cobro
                 LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 				JOIN prm_moneda on cobro.id_moneda = prm_moneda.id_moneda
-                WHERE 1 AND $where";        
+                WHERE 1 AND $where";
 	    if($orden == "")
-	    	$orden = "fecha_emision, fecha_creacion DESC";
+	    	$orden = "fecha_emision, cobro.fecha_creacion DESC";
 			if(!$desde)
     		$desde = 0;
-		
+
     	$x_pag = 10;
     	$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden);
     	#$b->no_pages = true;
@@ -97,7 +97,7 @@ function Refrescar()
 		echo "var pagina_desde = '&desde=".$desde."';";
 	else
 		echo "var pagina_desde = '';";
-?>	
+?>
 	var url = "lista_cobros.php?codigo_cliente=<?=$codigo_cliente?>&popup=1&opc=buscar&no_mostrar_filtros=1"+pagina_desde;
 	self.location.href= url;
 }
@@ -115,7 +115,7 @@ Object.extend(scal.prototype,
     },
 
     isOpen: function()
-    { 
+    {
         return ( $(this.options.wrapper) || this.element).visible();
     }
 });
@@ -127,21 +127,21 @@ var calendar = null;
 //@input     => is the <input> where the date will be updated.
 //@container => is the <div> for dragging.
 //@source    => is the img/button which raises up the calender, the script will locate the calenar over this control.
-function showCalendar(element, input, container, source)            
+function showCalendar(element, input, container, source)
 {
     if (!calendar)
     {
         container = $(container);
         //the Draggable handle is hard coded to "rtop" to avoid other parameter.
         new Draggable(container, {handle: "rtop", starteffect: Prototype.emptyFunction, endeffect: Prototype.emptyFunction});
-        
+
         //The singleton calendar is created.
-        calendar = new scal(element, $(input), 
+        calendar = new scal(element, $(input),
         {
             updateformat: 'dd-mm-yyyy',
-            closebutton: '&nbsp;', 
+            closebutton: '&nbsp;',
             wrapper: container
-        }); 
+        });
     }
     else
     {
@@ -150,13 +150,13 @@ function showCalendar(element, input, container, source)
 
     var date = new Date($F(input));
     calendar.setCurrentDate(isNaN(date) ? new Date() : date);
-    
+
     //Locates the calendar over the calling control  (in this example the "img").
     if (source = $(source))
     {
         Position.clone($(source), container, {setWidth: false, setHeight: false, offsetLeft: source.getWidth() + 2});
     }
-    
+
     //finally show the calendar =)
     calendar.openCalendar();
 };
@@ -174,7 +174,7 @@ document.observe('dom:loaded', function() {
 ?>
 <form method=post name="form_cobros" id="form_cobros">
 <input type=hidden name=opc value=buscar>
-<!-- Calendario DIV -->	
+<!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>

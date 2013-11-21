@@ -346,11 +346,13 @@ if (isset($id_tramite) || !isset($tramite->fields['multiplicador']) || !is_numer
 	$multiplicador = 1;
 	$tramite->fields['multiplicador'] = 1;
 }
+
 $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
 	var langtramite = '<?php echo __('trámite'); ?>';
+
 	function ShowTime() {
 		var check = $('como_trabajo');
 		var tr = $('time_tr');
@@ -413,6 +415,7 @@ $pagina->PrintTop($popup);
 
 	function CargarMonedaContrato() {
 		var id_tramite_tipo = $('lista_tramite').value;
+
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var codigo_asunto = $('codigo_asunto_secundario').value;
 			var codigo_cliente = $('codigo_cliente_secundario').value;
@@ -423,7 +426,7 @@ $pagina->PrintTop($popup);
 
 		reiniciarAlertaTarifa();
 
-		if (id_tramite == '' || (codigo_cliente == '' && codigo_asunto == '')) {
+		if (id_tramite_tipo == '' || (codigo_cliente == '' && codigo_asunto == '')) {
 			return false;
 		}
 
@@ -541,26 +544,9 @@ $pagina->PrintTop($popup);
 					return false;
 				}
 				var decimales = dur.split(".");
-				if (decimales[1].length > 1) {
-					alert("<?php echo __('Solo se permite ingresar un decimal') ?>");
+				if (decimales.length > 1 && decimales[1].length > 1) {
+					alert("<?php echo __('Solo se permite ingresar un decimal'); ?>");
 					form.duracion.focus();
-					return false;
-				}
-			<?php } ?>
-		}
-
-		//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-		if (form.id_cobro.value != '' && $('id_tramite').value != '') {
-			<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-				if (ActualizaCobro(form.codigo_asunto_secundario.value)) {
-					return true;
-				} else {
-					return false;
-				}
-			<?php } else { ?>
-				if (ActualizaCobro(form.codigo_asunto.value)) {
-					return true;
-				} else {
 					return false;
 				}
 			<?php } ?>
@@ -603,6 +589,15 @@ $pagina->PrintTop($popup);
 		pasavalidacion = validaCantidad(document.getElementById('multiplicador').value, 'validandoform');
 		if (!pasavalidacion) {
 			return false;
+		}
+
+		//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
+		if (form.id_cobro.value != '' && $('id_tramite').value != '') {
+			<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+				return ActualizaCobro(form.codigo_asunto_secundario.value);
+			<?php } else { ?>
+				return ActualizaCobro(form.codigo_asunto.value);
+			<?php } ?>
 		}
 
 		form.action = 'ingreso_tramite.php'
@@ -726,41 +721,6 @@ $pagina->PrintTop($popup);
 			}
 		};
 		http.send(null);
-	}
-
-	function CargaIdioma(codigo) {
-		var txt_span = document.getElementById('txt_span');
-		if (!codigo) {
-			txt_span.innerHTML = '';
-			return false;
-		} else {
-			var accion = 'idioma';
-			var http = getXMLHTTP();
-			http.open('GET', 'ajax.php?accion=' + accion + '&codigo_asunto=' + codigo, true);
-			http.onreadystatechange = revisaIdioma;
-			http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-			http.send(null);
-		}
-	}
-
-	function revisaIdioma() {
-		var IdiomaGrande = <?php echo Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? 'true' : 'false'; ?>;
-		if (http.readyState == 4) {
-			var response = http.responseText;
-			if (response.length > 0) {
-				var idio = response.split('|');
-				if (IdiomaGrande) {
-					txt_span.innerHTML = idio[1];
-				} else {
-					txt_span.innerHTML = 'Idioma: ' + idio[1];
-					if (idio[1] == 'Español') {
-						googie2.setCurrentLanguage('es');
-					} else if (idio[1] == 'Inglés') {
-						googie2.setCurrentLanguage('en');
-					}
-				}
-			}
-		}
 	}
 
 	function ActualizaCobro(valor) {
@@ -1218,9 +1178,9 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 		<tr>
 			<td colspan="2" align="right">
 				<?php if ($id_tramite > 0) { ?>
-					<input type="submit" class="btn" value="<?php echo __('Guardar'); ?>" onclick="return Confirmar(this.form, '<?php echo $id_trabajo; ?>')" />
+					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Confirmar(this.form, '<?php echo $id_trabajo; ?>')" />
 				<?php } else { ?>
-					<input type="submit" class="btn" value="<?php echo __('Guardar'); ?>" onclick="return Validar(this.form)" />
+					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Validar(this.form)" />
 				<?php } ?>
 			</td>
 		</tr>
@@ -1246,12 +1206,45 @@ function Substring($string) {
 ?>
 
 <script language="javascript" type="text/javascript">
-	<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-		CargaIdioma('<?php echo $codigo_asunto_secundario; ?>');
-	<?php } else { ?>
-		CargaIdioma('<?php echo $t->fields['codigo_asunto']; ?>');
-	<?php } ?>
 	CargarMonedaContrato();
+	var IdiomaGrande = <?php echo Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? 'true' : 'false'; ?>;
+
+	jQuery('document').ready(function() {
+		jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
+			var codigo = jQuery(this).val();
+
+			if (!codigo) {
+				jQuery('#txt_span').html('');
+				return false;
+			} else {
+				jQuery.ajax({
+					type: "GET",
+					url: "ajax.php",
+					contentType: "application/x-www-form-urlencoded;charset=ISO-8859-1",
+					data:{accion:'idioma', codigo_asunto:codigo},
+					beforeSend: function(xhr) {
+						xhr.overrideMimeType("text/html; charset=ISO-8859-1");
+					}
+				}).done(function(response) {
+					var idio = response.split("|");
+					if (idio[1].length == 0) idio[1] = 'Español';
+					if (idio[0].length == 0) idio[0] = 'es';
+
+					if (IdiomaGrande) {
+						jQuery('#txt_span').html(idio[1]);
+					} else {
+						jQuery('#txt_span').html('Idioma: '+idio[1]);
+					}
+
+					if (idio[0]=='es') {
+						googie2.setCurrentLanguage('es');
+					} else if (idio[0] == 'en') {
+						googie2.setCurrentLanguage('en');
+					}
+				});
+			}
+		});
+	});
 </script>
 
 <?php

@@ -343,7 +343,11 @@ if ($opcion == "guardar") {
 			if (!$id_usuario_encargado || $id_usuario_encargado==-1) {
                 $id_usuario_encargado = ($id_usuario_secundario)? $id_usuario_secundario : 0;
             }
-            $asunto->Edit("id_encargado", $id_usuario_encargado);
+
+            if ( !$id_usuario_encargado == -1) {
+            	$asunto->Edit("id_encargado", $id_usuario_encargado);
+        	}
+        	
 			$asunto->Write();
 		}
 	}

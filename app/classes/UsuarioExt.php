@@ -369,7 +369,7 @@ class UsuarioExt extends Usuario {
 
 	function select_revisados() {
 		$query =
-			"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
+				"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
 			FROM
 			usuario JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisado)
 			WHERE id_revisor = '" . $this->fields['id_usuario'] . "' AND usuario.activo = 1 AND usuario.id_usuario <> '" . $this->fields['id_usuario'] . "'
@@ -384,7 +384,7 @@ class UsuarioExt extends Usuario {
 
 	function select_no_revisados() {
 		$query_otros =
-			"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
+				"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
 			FROM usuario
 			WHERE id_usuario NOT IN (
 				SELECT usuario_revisor.id_revisado
@@ -631,7 +631,6 @@ class UsuarioExt extends Usuario {
 		if ($validar_segun_conf) {
 			if (empty($this->fields["username"]))
 				$pagina->AddError(__('Debe ingresar el código usuario'));
-			//if (empty($this->fields["apellido2"])) $pagina->AddError(__('Debe ingresar el apellido materno del usuario'));
 			if (empty($this->fields["id_categoria_usuario"]))
 				$pagina->AddError(__('Debe ingresar la categoría del usuario'));
 			if (empty($this->fields["id_area_usuario"]))
@@ -727,8 +726,8 @@ class UsuarioExt extends Usuario {
 
 	public function LoadWithToken($token) {
 		$query = "SELECT * FROM " . $this->tbl_usuario
-			. " WHERE reset_password_token = '$token'"
-			. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
+				. " WHERE reset_password_token = '$token'"
+				. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
 
 		return $this->LoadWithQuery($query);
 	}
@@ -739,7 +738,7 @@ class UsuarioExt extends Usuario {
 		if (Conf::GetConf($this->sesion, 'NombreIdentificador') == 'RUT') {
 			$rutdv = explode('-', $data['rut']);
 			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
-			$data['dv'] = trim($rutdv[1]);
+			$data['dv_rut'] = trim($rutdv[1]);
 		}
 
 		if (isset($data['admin'])) {
@@ -783,7 +782,7 @@ class UsuarioExt extends Usuario {
 
 	/**
 	 * Completa el objeto con los valores que vengan en $parametros
-	 * 
+	 *
 	 * @param array $parametros entrega los campos y valores del objeto campo => valor
 	 * @param boolean $edicion indica si se marcan los $parametros para edición
 	 */
@@ -808,9 +807,31 @@ class UsuarioExt extends Usuario {
 
 	public static function QueryComerciales() {
 		return "SELECT
-							usuario.id_usuario,
-							CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
-						FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
-						WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
+						usuario.id_usuario,
+						CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
+					FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
+					WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
 	}
+
+	public function Guardar($datos, &$pagina = null, $validaciones_segun_config = false) {
+		$arr1 = $this->fields;
+
+		foreach ($datos as $key => $value) {
+			$this->Edit($key, $value);
+		}
+
+		//Compara y guarda cambios en los datos del Usuario
+		if (!is_null($pagina) && $validaciones_segun_config) {
+			$this->Validaciones($arr1, $pagina, $validaciones_segun_config);
+			if ($pagina->GetErrors()) {
+				return false;
+			}
+		}
+		$guardado = $this->Write();
+		if ($guardado) {
+			$this->GuardaCambiosUsuario($arr1, $this->fields);
+		}
+		return $guardado;
+	}
+
 }
