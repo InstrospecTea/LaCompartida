@@ -587,8 +587,7 @@
 					FROM factura f
 					INNER JOIN prm_documento_legal pdl ON (f.id_documento_legal = pdl.id_documento_legal)
 					INNER JOIN prm_estudio pe ON (f.id_estudio = pe.id_estudio)
-					WHERE f.id_cobro = '{$cobro['id_cobro']}'";
-
+					WHERE f.id_cobro = '{$cobro['id_cobro']}' AND anulado != 1 AND id_estado !=2";
 				$Factura = new Factura($sesion);
 				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
 				while (list($codigo_legal_factura, $serie, $numero_factura, $estudio, $cliente_factura) = mysql_fetch_array($resp3)) {

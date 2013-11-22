@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
+require_once Conf::ServerDir() . '/../app/classes/Tarifa.php';
 
 define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))');
 
@@ -210,10 +211,9 @@ class UsuarioExt extends Usuario {
 		$query = "SELECT id_tarifa, id_moneda, tarifa FROM categoria_tarifa WHERE id_categoria_usuario=" . $id_categoria_usuario . " ORDER BY id_moneda";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
+		$UsuarioTarifa = new UsuarioTarifa($sesion);
 		while (list( $id_tarifa, $id_moneda, $tarifa) = mysql_fetch_array($resp)) {
-			$query2 = "INSERT usuario_tarifa SET id_usuario = '" . $id . "', id_moneda = '" . $id_moneda . "', tarifa = " . $tarifa . ", id_tarifa = '" . $id_tarifa . "'
-									ON DUPLICATE KEY UPDATE tarifa = '" . $tarifa . "'";
-			$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+			$UsuarioTarifa->GuardarTarifa($id_tarifa, $id, $id_moneda, $tarifa);
 		}
 		return true;
 	}
@@ -228,31 +228,10 @@ class UsuarioExt extends Usuario {
 			return 0;
 	}
 
-	function Moneda($id_moneda) {
-		$query = "SELECT tarifa FROM usuario_tarifa WHERE id_usuario='" . $this->fields['id_usuario'] . "' AND id_moneda='$id_moneda'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-		if ($tarifa = mysql_fetch_assoc($resp))
-			return $tarifa['tarifa'];
-		else
-			return 0;
-	}
-
 	function GuardarCosto($id_moneda, $costo) {
 		$query = "INSERT INTO usuario_costo
 							SET id_usuario=" . $this->fields['id_usuario'] . ", id_moneda='$id_moneda', costo = '$costo'
 							ON DUPLICATE KEY UPDATE id_usuario='" . $this->fields['id_usuario'] . "', id_moneda='$id_moneda', costo = '$costo'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		return true;
-	}
-
-	function GuardarMoneda($id_moneda, $tarifa) {
-		if ($tarifa == 0 || !$tarifa)
-			$tarifa = 1;
-
-		$query = "INSERT INTO usuario_tarifa
-							SET id_usuario=" . $this->fields['id_usuario'] . ", id_moneda='$id_moneda', tarifa = '$tarifa'
-							ON DUPLICATE KEY UPDATE id_usuario='" . $this->fields['id_usuario'] . "', id_moneda='$id_moneda', tarifa = '$tarifa'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		return true;
 	}
