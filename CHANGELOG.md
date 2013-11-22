@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.6.19
+Miércoles 22 de Noviembre 2013
+* **Fixed:** [Corrige que facturas pagadas no aparecen en el reporte deuda cliente](https://github.com/LemontechSA/ttb/pull/343)
+
 ## Hotfix: 13.6.18
 Miércoles 20 de Noviembre 2013
 * **Fixed:** [Corrige el excel de gastos y solución provisoria para backups de aym y bmaj](https://github.com/LemontechSA/ttb/pull/342)
