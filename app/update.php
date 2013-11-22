@@ -10038,8 +10038,16 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('AlertaDiariaHorasPorFacturarEncargadoSecundario', 0, 'Alerta diaria de horas por facturar enviada al encargado secundario', 'boolean', 3, -1);";
 			ejecutar($queries, $dbh);
 			break;
-	
+
 		case 7.48:
+			$queries = array();
+			if (!ExisteCampo('url', 'log_db', $dbh)) {
+				$queries[] = "ALTER TABLE `log_db` ADD `url` VARCHAR(255) NULL COMMENT 'donde estaba parado el usuario cuando hizo este cambio'";
+			}
+			ejecutar($queries, $dbh);
+			break;
+	
+		case 7.49:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsaGiroClienteParametrizable', 0, 'Permite parametrizar los giros de lso clientes', 'boolean', 10, -1);";
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsaEstadoPagoGastos', 0, 'Permite agregar el estado del pago a proveedores de gastos', 'boolean', 10, -1);";
@@ -10057,7 +10065,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.48;
+$max_update = 7.49;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
