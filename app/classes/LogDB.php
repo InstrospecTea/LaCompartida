@@ -24,7 +24,7 @@ class LogDB extends Objeto {
 			$this->Edit('id_field', $id);
 			$this->Edit('titulo_tabla', $tabla);
 			$this->Edit('campo_tabla', $campo);
-			$this->Edit('fecha', date('Y-m-d H:i:s'));
+			$this->Edit('fecha', gmdate('Y-m-d H:i:s'));
 			$this->Edit('usuario', $this->sesion->usuario->fields['id_usuario']);
 			$this->Edit('valor_antiguo', $valor_original);
 			$this->Edit('valor_nuevo', $valor);
