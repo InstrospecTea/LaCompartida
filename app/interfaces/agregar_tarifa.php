@@ -75,17 +75,17 @@ if ($id_nuevo && $opc != 'guardar') {
 	$query = "SELECT id_usuario, id_moneda, tarifa FROM usuario_tarifa WHERE id_tarifa=" . $id_tarifa_previa;
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
+	$UsuarioTarifa = new UsuarioTarifa($sesion);
 	while (list($id_usuario, $id_moneda, $tarifa) = mysql_fetch_array($resp)) {
-		$query2 = "INSERT INTO usuario_tarifa(id_usuario, id_moneda, tarifa, id_tarifa) VALUES(" . $id_usuario . "," . $id_moneda . "," . $tarifa . "," . $id_nuevo . ")";
-		$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
+		$UsuarioTarifa->GuardarTarifa($id_nuevo, $id_usuario, $id_moneda, $tarifa);
 	}
 
 	$query = "SELECT id_categoria_usuario, id_moneda, tarifa FROM categoria_tarifa WHERE id_tarifa=" . $id_tarifa_previa;
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
+	$CategoriaTarifa = new CategoriaTarifa($sesion);
 	while (list($id_categoria_usuario, $id_moneda, $tarifa) = mysql_fetch_array($resp)) {
-		$query2 = "INSERT INTO categoria_tarifa(id_categoria_usuario, id_moneda, tarifa, id_tarifa) VALUES(" . $id_categoria_usuario . "," . $id_moneda . "," . $tarifa . "," . $id_nuevo . ")";
-		$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
+		$CategoriaTarifa->GuardarTarifa($id_nuevo, $id_categoria_usuario, $id_moneda, $tarifa);
 	}
 }
 
@@ -215,7 +215,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 
 		if (!vacio || confirm('<?php echo __('Confirma cambio de tarifa para todos los usuarios de esta categoria?') ?>') == true)
 		{
-			$$(clase).each(// Para el cambio del tarifa de la categoria cambia todos los tarifas de usuarios 
+			$$(clase).each(// Para el cambio del tarifa de la categoria cambia todos los tarifas de usuarios
 					function(item) // que pertenecen a este categoria.
 					{
 						item.value = valor;
@@ -289,7 +289,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNue
 
 				<input type="button" id="fix_tarifas" value='<?php echo __('Completar Tarifas') ?>' class='btn' title="Esta función completará las tarifas faltantes de los profesionales basándose en su categoría, para todas las tarifas" />
 
-				<input type="button" onclick="self.location.href = 'tarifas_xls.php?id_tarifa_edicion=<?php echo $id_tarifa_edicion ?>&glosa=<?php echo $tarifa->fields['glosa_tarifa'] ?>'" value='<?php echo __('Imprimir tarifas') ?>' class='btn' >				
+				<input type="button" onclick="self.location.href = 'tarifas_xls.php?id_tarifa_edicion=<?php echo $id_tarifa_edicion ?>&glosa=<?php echo $tarifa->fields['glosa_tarifa'] ?>'" value='<?php echo __('Imprimir tarifas') ?>' class='btn' >
 				<input type="button" onclick="self.location.href = 'tarifas_clientes.php'" value='<?php echo __('Imprimir Todas') ?>' class='btn' title="Exporta todas las tarifas a un excel. Incluye qué contratos estan afectos a cada una" >
 			</td><td  style="text-align:left;vertical-align: middle;width:202px;" >
 				<input type="button" onclick="CrearTarifa(this.form, <?php echo $id_tarifa_edicion ?>);" value='<?php echo __('Crear nueva tarifa') ?>' class=btn title="Crea una nueva tarifa. Active el checkbox inferior para basarse en los datos de la actual">
@@ -305,7 +305,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNue
 			}
 			?>
 			<td colspan="<?php echo $colspan ?>"></td><td  align=left>
-				<input type=checkbox id=usar_tarifa_previa value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> copiando la actual 
+				<input type=checkbox id=usar_tarifa_previa value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> copiando la actual
 			</td>
 		</tr>
 	</table>
@@ -350,7 +350,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNue
 	list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
 
 	########## CATEGORIA TARIFA #########
-	$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria_corregido 
+	$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria_corregido
 												FROM prm_categoria_usuario
 												ORDER BY glosa_categoria,id_categoria_usuario";
 	$resp_categoria2 = mysql_query($query_categoria, $sesion->dbh) or Utiles::errorSQL($query_categoria, __FILE__, __LINE__, $sesion->dbh);
@@ -361,7 +361,8 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNue
 		$cont++;
 		$glosa_categoria_2 = preg_replace("/_/", " ", $glosa_categoria);
 		$glosa_categoria = str_replace('/', '', $glosa_categoria);
-		$td_categoria_tarifas .= '<tr><td align=left class="border_plomo">' . $glosa_categoria_2 . '</td>';
+		$td_categoria_tarifas .= '<tr><td align=left class="border_plomo">' . $glosa_categoria_2 .
+			UtilesApp::LogDialog($sesion, 'categoria_tarifa', 1000000 * $id_tarifa + $id_categoria_usuario) . '</td>';
 		$tab = $cont;
 		for ($j = 0; $j < $lista_monedas->num; $j++) {
 			$tab += ($total_categoria * ($j + 1)) + $j;
@@ -422,7 +423,8 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNue
 	while (list($id_usuario, $nombre_usuario, $glosa_categoria) = mysql_fetch_array($resp2)) {
 		$cont++;
 		$glosa_categoria = str_replace('/', '', $glosa_categoria);
-		$td_tarifas .= '<tr><td align=left class="border_plomo">' . $nombre_usuario . '</td>';
+		$td_tarifas .= '<tr><td align=left class="border_plomo">' . $nombre_usuario .
+			UtilesApp::LogDialog($sesion, 'usuario_tarifa', 1000000 * $id_tarifa + $id_usuario) . '</td>';
 		$tab = $cont;
 		for ($j = 0; $j < $lista_monedas->num; $j++) {
 			$tab += ($total * ($j + 1)) + $j;

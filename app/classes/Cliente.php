@@ -150,6 +150,14 @@ class Cliente extends Objeto {
 			)
 		),
 		array(
+			'field' => 'factura_giro',
+			'title' => 'Giro',
+			'visible' => false,
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
 			'field' => 'glosa_tarifa',
 			'title' => 'Tarifa',
 			'extras' => array(
@@ -626,6 +634,9 @@ class Cliente extends Objeto {
 		if ($solo_activos == 1) {
 			$wheres[] = "cliente.activo = 1 ";
 		}
+		if (!empty($giro)) {
+			$wheres[] = "contrato.factura_giro LIKE '%$giro%'";
+		}
 
 		$where = empty($wheres) ? '' : (' WHERE ' . implode(' AND ', $wheres));
 		$query = "SELECT SQL_CALC_FOUND_ROWS
@@ -639,6 +650,7 @@ class Cliente extends Objeto {
 				CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1) as usuario_secundario_nombre,
 				usuario_secundario.username as username_secundario,
 				contrato.factura_razon_social,
+				contrato.factura_giro,
 				CONCAT(contrato.cod_factura_telefono,' ',contrato.factura_telefono) as telefono,
 				contrato.factura_direccion,
 				contrato.rut,
