@@ -56,6 +56,8 @@ if (isset($_POST['accion'])) {
 			$Usuario->Edit('reset_password_by', 'U');
 
 			if ($Usuario->Write()) {
+				$userToken = new UserToken($Sesion);
+				$userToken->deleteAll($Usuario->fields['id_usuario']);
 				$host = Conf::Host();
 				$mail =<<<MAIL
 <p>Estimado {$Usuario->fields['nombre']},</p>

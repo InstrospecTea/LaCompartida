@@ -130,4 +130,19 @@ class UserToken extends Objeto {
 
 		return $Statement->execute();
 	}
+
+	/**
+	 * Delete all user_tokens of an user
+	 * returns true if the delete completed successfully, else false
+	 */
+	function deleteAll($user_id) {
+		if (!isset($user_id) || empty($user_id)) {
+			return false;
+		}
+		$sql = "DELETE FROM `user_token` WHERE `user_token`.`user_id`=:user_id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('user_id', $user_id);
+
+		return $Statement->execute();
+	}
 }

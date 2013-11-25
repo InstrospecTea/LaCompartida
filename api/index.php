@@ -51,7 +51,6 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 			halt(__("Unexpected error when saving data"), "UnexpectedSave");
 		}
 	}
-
 	outputJson(
 		array(
 			'auth_token' => $auth_token,
@@ -193,6 +192,8 @@ $Slim->get('/settings', function () use ($Session) {
 
 		if ($Session->arrayconf['PermitirCampoCobrableAProfesional']) {
 			array_push($settings, array('code' => 'AllowBillable', 'value' => $Session->arrayconf['PermitirCampoCobrableAProfesional']));
+		} else {
+			array_push($settings, array('code' => 'AllowBillable', 'value' => 0));
 		}
 
 		if ($Session->arrayconf['MaxDuracionTrabajo']) {
@@ -616,7 +617,7 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 		$appudate = $s3->get_object_headers($bucket, "{$dir}appupdate.zip");
 
 		$response = array(
-		"success" => "false",
+		"success" => "true",
 			"releases" => array(
 				array(
 					"version" => $version,
