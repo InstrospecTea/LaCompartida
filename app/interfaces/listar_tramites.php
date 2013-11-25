@@ -353,56 +353,35 @@ $pagina->PrintTop($popup);
 		http.send(null);
 	}
 
-	function Refrescar()
-	{
-<?php
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-		?>
-				var codigo_cliente = '&codigo_cliente_secundario=' + jQuery('#codigo_cliente_secundario').val();
-	<?php
-	} else {
-		?>
-				var codigo_cliente = '&codigo_cliente_secundario=' + jQuery('#campo_codigo_cliente_secundario').val();
-	<?php } ?>
-			var codigo_asunto = '&codigo_asunto_secundario=' + jQuery('#campo_codigo_cliente_secundario').val();
-<?php
-} else {
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-		?>
-				var codigo_cliente = '&codigo_cliente=' + jQuery('#codigo_cliente').val();
-	<?php
-	} else {
-		?>
-				var codigo_cliente = '&codigo_cliente=' + jQuery('#campo_codigo_cliente').val();
-	<?php } ?>
-			var codigo_asunto = '&codigo_asunto=' + jQuery('#campo_codigo_asunto').val();
-<?php }
-?>
-		var usuario = '&id_usuario=' + jQuery('#id_usuario').val();
-		var fecha_ini = '&fecha_ini=' + jQuery('#fecha_ini').val();
-		var fecha_fin = '&fecah_fin=' + jQuery('#fecha_fin').val();
-
-		var url = "listar_tramites.php?popup=1&opc=buscar&accion=refrescar" + codigo_cliente + codigo_asunto + usuario + fecha_ini + fecha_fin;
-		self.location.href = url;
+	function Refrescar() {
+		document.form_buscador.submit();
 	}
 
 
 	function AgregarNuevo(name)
 	{
 		var usuario = jQuery('#id_usuario').length > 0 ? jQuery('#id_usuario').val() : <?php echo $sesion->usuario->fields[id_usuario]; ?>;
-<?php if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	?>
-			var cliente = jQuery('#codigo_cliente_secundario').val();
-			var asunto = jQuery('#codigo_asunto_secundario').val();
-			urlo = 'ingreso_tramite.php?popup=1&codigo_cliente_secundario=' + cliente + '&codigo_asunto_secundario=' + asunto + '&id_usuario=' + usuario;
-<?php
-} else {
-	?>
-			var cliente = jQuery('#codigo_cliente').val();
-			var asunto = jQuery('#codigo_asunto').val();
-			urlo = 'ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' + usuario;
-<?php } ?>
+			
+		<?php 
+			if (Conf::GetConf($sesion, 'CodigoSecundario') ) {
+		?>
+
+				var cliente = jQuery('#codigo_cliente_secundario').val();
+				var asunto = jQuery('#codigo_asunto_secundario').val();
+				urlo = 'ingreso_tramite.php?popup=1&codigo_cliente_secundario=' + cliente + '&codigo_asunto_secundario=' + asunto + '&id_usuario=' + usuario;
+		
+		<?php
+			 } else {
+		?>
+
+				var cliente = jQuery('#codigo_cliente').val();
+				var asunto = jQuery('#codigo_asunto').val();
+				urlo = 'ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' + usuario;
+		
+		<?php 
+			} 
+		?>
+
 		nuovaFinestra('Agregar_Tramite', 750, 470, urlo, 'top=100, left=125');
 	}
 
@@ -426,18 +405,11 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 			{
 				var response = http.responseText;
 
-				/*if(response.indexOf('OK') == -1)
-				 {
-				 alert(response);
-				 }*/
-
 				offLoading();
 			}
 		};
 		http.send(null);
 	}
-
-
 
 // Basado en http://snipplr.com/view/1696/get-elements-by-class-name/
 	function getElementsByClassName(classname)
@@ -499,6 +471,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 			alert('Debe seleccionar por lo menos un trabajo para editar.');
 	}
 </script>
+
 
 <form method='get' name="form_tramites" id="form_tramites">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
@@ -599,6 +572,7 @@ if ($motivo != "cobros") {
 }
 ?>
 </form>
+
 
 <?php
 if (isset($cobro) || $opc == 'buscar') {

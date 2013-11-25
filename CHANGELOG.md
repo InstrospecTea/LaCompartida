@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix: 13.6.18
+Miércoles 20 de Noviembre 2013
+* **Fixed:** [Corrige el excel de gastos y solución provisoria para backups de aym y bmaj](https://github.com/LemontechSA/ttb/pull/342)
+
+## Hotfix: 13.6.17
+Martes 19 de Noviembre 2013
+* **Fixed:** [agrega nuevo tag a factura para desplegar el numero de telefono en factura](https://github.com/LemontechSA/ttb/pull/341)
+
+## Hotfix: 13.6.16
+Martes 19 de Noviembre 2013
+* **Fixed:** [Agrega saldo pendiente o saldo a favor en nota de cobro seccion detalle cobro](https://github.com/LemontechSA/ttb/pull/340)
+
+## Hotfix: 13.6.15
+Jueves 14 de Noviembre 2013
+* **Fixed:** [Corrigie el tema, que despues de refrescar aparece la pagina que fue eligida](https://github.com/LemontechSA/ttb/pull/339)
+
 ## Hotfix: 13.6.14
 Martes 12 de Noviembre 2013
 * **Fixed:** [No permite que el campo para el rut del usuario esta vacío](https://github.com/LemontechSA/ttb/pull/337)
