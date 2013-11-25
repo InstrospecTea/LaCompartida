@@ -168,6 +168,7 @@ if ($opcion == "guardar") {
 		}
 
 		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
+		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
 
 		if ($gasto->Write()) {
 			$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
@@ -522,7 +523,16 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 				<a href='javascript:void(0)' onclick="AgregarProveedor();" title="Agregar Proveedor"><img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0 ></a>
 			</td>
 		</tr>
-
+	<?php if (Conf::GetConf($sesion, 'UsaEstadoPagoGastos')) { ?>
+		<tr>
+			<td align="right">
+				<?php echo __('Estado Pago'); ?>
+			</td>
+			<td align="left">
+				<?php echo Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'ESTADO_PAGO_GASTOS' ORDER BY glosa ASC", "estado_pago", $gasto->fields['estado_pago'], "", ""); ?>
+			</td>
+		</tr>
+	<?php } ?>
 		<tr>
 			<td align=right>
 				<?php echo __('Monto') ?>
