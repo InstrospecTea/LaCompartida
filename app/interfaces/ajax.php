@@ -316,18 +316,13 @@ if ($accion == "consistencia_cliente_asunto") {
 	} else {
 		echo("0");
 	}
-} else if ($accion == "set_tarifa") {
-	$query = "INSERT INTO usuario_tarifa SET tarifa='$tarifa', id_usuario = '$id_usuario', id_moneda = '$id_moneda', codigo_asunto = '$codigo_asunto'
-					ON DUPLICATE KEY UPDATE tarifa = '$tarifa'";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	echo("OK");
 } else if ($accion == "set_tarifa_cliente") {
 	$query = "INSERT INTO usuario_tarifa_cliente SET tarifa='$tarifa', id_usuario = '$id_usuario', id_moneda = '$id_moneda', codigo_cliente = '$codigo_cliente'
 					ON DUPLICATE KEY UPDATE tarifa = '$tarifa'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo("OK");
 } else if ($accion == "get_tarifa_cliente") {
-	$query = "SELECT tarifa FROM usuario_tarifa WHERE id_usuario = '$id_usuario' AND id_moneda = '$id_moneda' AND codigo_cliente = '$codigo_cliente'";
+	$query = "SELECT tarifa FROM usuario_tarifa_cliente WHERE id_usuario = '$id_usuario' AND id_moneda = '$id_moneda' AND codigo_cliente = '$codigo_cliente'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	if (list($tarifa) = mysql_fetch_array($resp)) {
 		echo("$tarifa");

@@ -1182,35 +1182,35 @@ if (count($cobro->asuntos)) {
 
 	function AgregarFactura(idx)
 	{
-<?php
-if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-	$cliente_factura = new Cliente($sesion);
-	$codigo_cliente_secundario_factura = $cliente_factura->CodigoACodigoSecundario($cobro->fields['codigo_cliente']);
-	$url_agregar_factura = "agregar_factura.php?popup=1&id_cobro=" . $id_cobro . "&codigo_cliente_secundario=" . $codigo_cliente_secundario_factura;
-} else {
-	$url_agregar_factura = "agregar_factura.php?popup=1&id_cobro=" . $id_cobro . "&codigo_cliente=" . $cobro->fields['codigo_cliente'];
-}
+		<?php
+		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+			$cliente_factura = new Cliente($sesion);
+			$codigo_cliente_secundario_factura = $cliente_factura->CodigoACodigoSecundario($cobro->fields['codigo_cliente']);
+			$url_agregar_factura = "agregar_factura.php?popup=1&id_cobro=" . $id_cobro . "&codigo_cliente_secundario=" . $codigo_cliente_secundario_factura;
+		} else {
+			$url_agregar_factura = "agregar_factura.php?popup=1&id_cobro=" . $id_cobro . "&codigo_cliente=" . $cobro->fields['codigo_cliente'];
+		}
 
-if (!empty($id_contrato)) {
-	$url_agregar_factura .= "&id_contrato=$id_contrato";
-}
+		if (!empty($id_contrato)) {
+			$url_agregar_factura .= "&id_contrato=$id_contrato";
+		}
 
-$query = "SELECT id_documento_legal, codigo FROM prm_documento_legal";
-$resp = mysql_query($query, $sesion->dbh) or  Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-$id_tipo_documento = array();
+		$query = "SELECT id_documento_legal, codigo FROM prm_documento_legal";
+		$resp = mysql_query($query, $sesion->dbh) or  Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$id_tipo_documento = array();
 
-while (list($id, $codigo) = mysql_fetch_array($resp)) {
-	$id_tipo_documento[$codigo] = $id;
-}
-?>
-
-        var honorarios = jQuery('#honorarios_' + idx).val()*1;
+		while (list($id, $codigo) = mysql_fetch_array($resp)) {
+			$id_tipo_documento[$codigo] = $id;
+		}
+		?>
+        var honorarios = jQuery('#honorarios_' + idx).val().replace(',', '').replace(',', '') * 1;
+        
         var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val()*1;
         var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1;
 
         var honorarios_disp = jQuery('#honorarios_disponibles').val()*1;
-	var trabajos_disp = jQuery('#trabajos_disponibles').val()*1;
-	var tramites_disp = jQuery('#tramites_disponibles').val()*1;
+		var trabajos_disp = jQuery('#trabajos_disponibles').val()*1;
+		var tramites_disp = jQuery('#tramites_disponibles').val()*1;
 
         var gastos_con_impuestos_disp = jQuery('#gastos_con_iva_disponibles').val()*1;
         var gastos_sin_impuestos_disp = jQuery('#gastos_sin_iva_disponibles').val()*1;

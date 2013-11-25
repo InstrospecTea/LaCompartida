@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 /*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
 
 /* IMPORTANTE:
-  Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
+	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
 if (!function_exists('ExisteCampo')) {
 
 	function ExisteCampo($campo, $tabla, $dbh) {
@@ -294,12 +294,12 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 			break;
 		case 2.21:
 			/* $query = "ALTER TABLE `prm_si_no` DROP INDEX `codigo_si_no_2`;";
-			  if( !mysql_query($query,$dbh) )
-			  throw new Exception(mysql_error());
+				if( !mysql_query($query,$dbh) )
+				throw new Exception(mysql_error());
 
-			  $query = "INSERT INTO `prm_si_no` ( `id_codigo_si_no` , `codigo_si_no` ) VALUES ('0', 'NO');";
-			  if( !mysql_query($query,$dbh) )
-			  throw new Exception(mysql_error());
+				$query = "INSERT INTO `prm_si_no` ( `id_codigo_si_no` , `codigo_si_no` ) VALUES ('0', 'NO');";
+				if( !mysql_query($query,$dbh) )
+				throw new Exception(mysql_error());
 			 */
 			$query = "SELECT * FROM caca";
 			break;
@@ -382,7 +382,7 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 
 
 			$query[] = "INSERT ignore INTO `tarifa`  ( `id_tarifa` , `glosa_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` )
-                                        VALUES ( '1' , 'Standard', '2008-05-12', '0000-00-00', '1');";
+																				VALUES ( '1' , 'Standard', '2008-05-12', '0000-00-00', '1');";
 
 			foreach ($query as $q) {
 				if (!($resp = mysql_query($q, $dbh)))
@@ -420,16 +420,16 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 		case 2.25:
 
 			$tarifasfaltantes = "SELECT us.id_usuario, ct.id_moneda, ct.tarifa, ct.id_tarifa
-	    FROM usuario us
-	    JOIN usuario_permiso usp
-	    USING ( id_usuario )
-	    JOIN categoria_tarifa ct
-	    USING ( id_categoria_usuario )
-	    LEFT JOIN usuario_tarifa ut ON ut.id_usuario = us.id_usuario
-	    AND ut.id_moneda = ct.id_moneda
-	    AND ut.id_tarifa = ct.id_tarifa
-	    WHERE usp.codigo_permiso =  'PRO'
-	    AND id_usuario_tarifa IS NULL ";
+			FROM usuario us
+			JOIN usuario_permiso usp
+			USING ( id_usuario )
+			JOIN categoria_tarifa ct
+			USING ( id_categoria_usuario )
+			LEFT JOIN usuario_tarifa ut ON ut.id_usuario = us.id_usuario
+			AND ut.id_moneda = ct.id_moneda
+			AND ut.id_tarifa = ct.id_tarifa
+			WHERE usp.codigo_permiso =  'PRO'
+			AND id_usuario_tarifa IS NULL ";
 
 			if (!$resptarifas = mysql_query($tarifasfaltantes, $dbh))
 				throw new Exception(mysql_error());
@@ -782,12 +782,12 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 
 			if (!ExisteLlaveForanea('cta_corriente', 'codigo_asunto', 'asunto', 'codigo_asunto', $dbh))
 				$query[] = "ALTER TABLE `cta_corriente`
-  ADD CONSTRAINT `codigo_asunto_fk` FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto` (`codigo_asunto`) ON DELETE RESTRICT ON UPDATE CASCADE;";
+	ADD CONSTRAINT `codigo_asunto_fk` FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto` (`codigo_asunto`) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
 
 			if (!ExisteLlaveForanea('cta_corriente', 'codigo_cliente', 'cliente', 'codigo_cliente', $dbh))
 				$query[] = "ALTER TABLE `cta_corriente`
-  ADD CONSTRAINT `codigo_cliente_fk` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`) ON DELETE RESTRICT ON UPDATE CASCADE;";
+	ADD CONSTRAINT `codigo_cliente_fk` FOREIGN KEY (`codigo_cliente`) REFERENCES `cliente` (`codigo_cliente`) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
 
 
@@ -9971,17 +9971,17 @@ QUERY;
 
 				$queries[] = "INSERT INTO prm_doc_legal_numero (id_documento_legal, numero_inicial, serie, id_estudio)
 					SELECT id_documento_legal, numero_inicial, serie, prm_estudio.id_estudio
-					  FROM prm_estudio
-					  JOIN prm_doc_legal_numero
+						FROM prm_estudio
+						JOIN prm_doc_legal_numero
 					 WHERE prm_estudio.id_estudio != 1
-					  ORDER BY prm_estudio.id_estudio, id_documento_legal;";
+						ORDER BY prm_estudio.id_estudio, id_documento_legal;";
 
 				$queries[] = "UPDATE prm_doc_legal_numero
-					  JOIN prm_documento_legal
-					    ON prm_doc_legal_numero.id_documento_legal = prm_documento_legal.id_documento_legal
-					  JOIN configuracion ON configuracion.valor_opcion = 0
-					   AND configuracion.glosa_opcion = 'NumeroFacturaConSerie'
-					   SET prm_doc_legal_numero.numero_inicial = prm_documento_legal.numero_inicial
+						JOIN prm_documento_legal
+							ON prm_doc_legal_numero.id_documento_legal = prm_documento_legal.id_documento_legal
+						JOIN configuracion ON configuracion.valor_opcion = 0
+						 AND configuracion.glosa_opcion = 'NumeroFacturaConSerie'
+						 SET prm_doc_legal_numero.numero_inicial = prm_documento_legal.numero_inicial
 					 WHERE prm_doc_legal_numero.numero_inicial < prm_documento_legal.numero_inicial;";
 
 			}
@@ -9991,8 +9991,8 @@ QUERY;
 
 				$queries[] = "INSERT INTO factura_pdf_datos (id_tipo_dato, id_documento_legal, id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align)
 					SELECT id_tipo_dato, id_documento_legal, prm_estudio.id_estudio, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, Ejemplo, align
-					  FROM factura_pdf_datos
-					  JOIN prm_estudio
+						FROM factura_pdf_datos
+						JOIN prm_estudio
 					 WHERE prm_estudio.id_estudio != 1
 					 ORDER BY prm_estudio.id_estudio, id_documento_legal;";
 			}
@@ -10042,40 +10042,55 @@ QUERY;
 
 		case 7.48:
 			$queries = array();
+			if (!ExisteCampo('url', 'log_db', $dbh)) {
+				$queries[] = "ALTER TABLE `log_db` ADD `url` VARCHAR(255) NULL COMMENT 'donde estaba parado el usuario cuando hizo este cambio'";
+			}
+			ejecutar($queries, $dbh);
+			break;
+	
+		case 7.49:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsaGiroClienteParametrizable', 0, 'Permite parametrizar los giros de lso clientes', 'boolean', 10, -1);";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsaEstadoPagoGastos', 0, 'Permite agregar el estado del pago a proveedores de gastos', 'boolean', 10, -1);";
+			if (!ExisteCampo('estado_pago', 'cta_corriente', $dbh)) {
+				$queries[] = "ALTER TABLE `cta_corriente` ADD `estado_pago` VARCHAR( 255 ) NULL DEFAULT NULL";
+			}
+			ejecutar($queries, $dbh);
+		break; 
 
+		case 7.50:
 			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_generador` (
-				  `id_contrato_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
-				  `id_cliente` int(11) NOT NULL,
-				  `id_contrato` int(11) NOT NULL,
-				  `id_usuario` int(11) NOT NULL,
-				  `porcentaje_genera` double NOT NULL,
-				  PRIMARY KEY (`id_contrato_generador`),
-				  KEY `id_cliente` (`id_cliente`),
-				  KEY `id_usuario` (`id_usuario`),
-				  KEY `id_contrato` (`id_contrato`),
-				  CONSTRAINT `contrato_generador_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
-				  CONSTRAINT `contrato_generador_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`),
-				  CONSTRAINT `contrato_generador_ibfk_2` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`)
+					`id_contrato_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
+					`id_cliente` int(11) NOT NULL,
+					`id_contrato` int(11) NOT NULL,
+					`id_usuario` int(11) NOT NULL,
+					`porcentaje_genera` double NOT NULL,
+					PRIMARY KEY (`id_contrato_generador`),
+					KEY `id_cliente` (`id_cliente`),
+					KEY `id_usuario` (`id_usuario`),
+					KEY `id_contrato` (`id_contrato`),
+					CONSTRAINT `contrato_generador_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
+					CONSTRAINT `contrato_generador_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`),
+					CONSTRAINT `contrato_generador_ibfk_2` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `factura_generador` (
-				  `id_factura` int(11) NOT NULL,
-				  `id_contrato` int(11) NOT NULL,
-				  `id_usuario` int(11) NOT NULL,
-				  `porcentaje_genera` double NOT NULL,
-				  KEY `id_factura` (`id_factura`),
-				  KEY `id_contrato` (`id_contrato`),
-				  KEY `id_usuario` (`id_usuario`),
-				  CONSTRAINT `factura_generador_ibfk_3` FOREIGN KEY (`id_factura`) REFERENCES `factura` (`id_factura`),
-				  CONSTRAINT `factura_generador_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`),
-				  CONSTRAINT `factura_generador_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+					`id_factura` int(11) NOT NULL,
+					`id_contrato` int(11) NOT NULL,
+					`id_usuario` int(11) NOT NULL,
+					`porcentaje_genera` double NOT NULL,
+					KEY `id_factura` (`id_factura`),
+					KEY `id_contrato` (`id_contrato`),
+					KEY `id_usuario` (`id_usuario`),
+					CONSTRAINT `factura_generador_ibfk_3` FOREIGN KEY (`id_factura`) REFERENCES `factura` (`id_factura`),
+					CONSTRAINT `factura_generador_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`),
+					CONSTRAINT `factura_generador_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$comentario = 'Esta opcion habilita el módulo de producción, % de generadores por contrato y reportes';
 
 			$queries[] = "INSERT IGNORE INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
-                                            VALUES('UsarModuloProduccion', 0, 'boolean','{$comentario}', 10, -1)";
-
+										VALUES('UsarModuloProduccion', 0, 'boolean','{$comentario}', 10, -1)";
 
 			if (!ExisteCampo('query', 'reporte_listado', $dbh)) {
 				$queries[] = "ALTER TABLE `reporte_listado` ADD `query` TEXT NULL COMMENT 'Query principal del reporte' ";
@@ -10096,7 +10111,7 @@ QUERY;
 				('FACTURA_COBRANZA', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 1, 'Cobranza');";
 
 			ejecutar($queries, $dbh);
-			break;
+			break;		
 	}
 }
 
@@ -10106,7 +10121,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.48;
+$max_update = 7.50;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

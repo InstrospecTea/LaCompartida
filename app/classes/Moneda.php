@@ -172,6 +172,14 @@ if(!class_exists('Moneda')) {
 			return $monedas;
 		}
 
+		public static function GetGlosaMoneda($sesion, $id_moneda){
+			$query = "SELECT glosa_moneda FROM prm_moneda WHERE id_moneda = $id_moneda";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($glosa_moneda) = mysql_fetch_array($resp);
+
+			return $glosa_moneda;
+		}
+
 	}
 }
 

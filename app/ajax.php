@@ -468,11 +468,9 @@ switch ($accion) {
 							WHERE id_categoria_usuario='$id_2'";
 		$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 
+		$UsuarioTarifa = new UsuarioTarifa($sesion);
 		while (list($tarifa, $id_tarifa, $id_moneda) = mysql_fetch_array($resp2)) {
-			$query = "INSERT usuario_tarifa SET id_tarifa = '$id_tarifa', id_moneda = '$id_moneda',
-							id_usuario = '$id', tarifa = '$tarifa'
-							ON DUPLICATE KEY UPDATE tarifa = '$tarifa'";
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			$UsuarioTarifa->GuardarTarifa($id_tarifa, $id, $id_moneda, $tarifa);
 		}
 		echo("OK");
 		break;
