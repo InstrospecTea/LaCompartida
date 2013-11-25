@@ -554,7 +554,7 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
 		}	else {
 			$data = array('Factura' => $Invoice, 'ExtraData' => 'TextoInvoice');
-			$Slim->applyHook('hook_genera_factura_electronica', &$data);
+			$Slim->applyHook('hook_genera_factura_electronica', $data);
 			$error = $data['Error'];
 			if ($error) {
 				halt($error['Message'] ? $error['Message'] : __($error['Code']), $error['Code'], 400, $data['ExtraData']);
