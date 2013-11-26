@@ -792,7 +792,7 @@ function validateAuthTokenSendByHeaders($permission = null) {
 	$user_token = $UserToken->findByAuthToken($auth_token);
 	// if not exist the auth_token then return error
 	if (!is_object($user_token)) {
-		halt(__('Invalid AUTH TOKEN'), "SecurityError");
+		halt(__('Invalid AUTH TOKEN'), "SecurityError", 401);
 	} else {
 		// verify if the token is expired
 		// date_default_timezone_set("UTC");
@@ -800,7 +800,7 @@ function validateAuthTokenSendByHeaders($permission = null) {
 		$expiry_date = strtotime($user_token->expiry_date);
 		if ($expiry_date < $now) {
 			if ($UserToken->delete($user_token->id)) {
-				halt(__('Expired AUTH TOKEN'), "SecurityError");
+				halt(__('Expired AUTH TOKEN'), "SecurityError", 401);
 			} else {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
 			}
