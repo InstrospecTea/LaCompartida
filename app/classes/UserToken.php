@@ -61,12 +61,13 @@ class UserToken extends Objeto {
 		if (isset($data['id'])) {
 			$user_token_data = $this->findById($data['id']);
 		}
-
+		$expiry_date = strtotime(date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'))) . ' +1 month');
 		// if exist the auth_token then replace for the new one
 		if (is_object($user_token_data)) {
-			$sql = "UPDATE `user_token` SET `user_token`.`modified`=:modified WHERE `user_token`.`user_id`=:id";
+			$sql = "UPDATE `user_token` SET `user_token`.`modified`=:modified, `user_token`.`expiry_date`=:expiry_date WHERE `user_token`.`id`=:id";
 			$Statement = $this->sesion->pdodbh->prepare($sql);
 			$Statement->bindParam('modified', date('Y-m-d H:i:s'));
+			$Statement->bindParam('expiry_date', date('Y-m-d H:i:s', $expiry_date));
 			$Statement->bindParam('id', $user_token_data->id);
 		} else {
 			// if not exist then create the auth_token
@@ -78,10 +79,7 @@ class UserToken extends Objeto {
 			$Statement->bindParam('user_id', $data['user_id']);
 			$Statement->bindParam('auth_token', $data['auth_token']);
 			$Statement->bindParam('app_key', $data['app_key']);
-
-			$expiry_date = strtotime(date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'))) . ' +1 month');
 			$Statement->bindParam('expiry_date', date('Y-m-d H:i:s', $expiry_date));
-
 			$Statement->bindParam('created', date('Y-m-d H:i:s'));
 		}
 
@@ -129,6 +127,21 @@ class UserToken extends Objeto {
 		$sql = "DELETE FROM `user_token` WHERE `user_token`.`id`=:id";
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('id', $id);
+
+		return $Statement->execute();
+	}
+
+	/**
+	 * Delete all user_tokens of an user
+	 * returns true if the delete completed successfully, else false
+	 */
+	function deleteAll($user_id) {
+		if (!isset($user_id) || empty($user_id)) {
+			return false;
+		}
+		$sql = "DELETE FROM `user_token` WHERE `user_token`.`user_id`=:user_id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('user_id', $user_id);
 
 		return $Statement->execute();
 	}

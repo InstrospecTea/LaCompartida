@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
+require_once Conf::ServerDir() . '/../app/classes/Tarifa.php';
 
 define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))');
 
@@ -210,10 +211,9 @@ class UsuarioExt extends Usuario {
 		$query = "SELECT id_tarifa, id_moneda, tarifa FROM categoria_tarifa WHERE id_categoria_usuario=" . $id_categoria_usuario . " ORDER BY id_moneda";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
+		$UsuarioTarifa = new UsuarioTarifa($sesion);
 		while (list( $id_tarifa, $id_moneda, $tarifa) = mysql_fetch_array($resp)) {
-			$query2 = "INSERT usuario_tarifa SET id_usuario = '" . $id . "', id_moneda = '" . $id_moneda . "', tarifa = " . $tarifa . ", id_tarifa = '" . $id_tarifa . "'
-									ON DUPLICATE KEY UPDATE tarifa = '" . $tarifa . "'";
-			$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+			$UsuarioTarifa->GuardarTarifa($id_tarifa, $id, $id_moneda, $tarifa);
 		}
 		return true;
 	}
@@ -228,31 +228,10 @@ class UsuarioExt extends Usuario {
 			return 0;
 	}
 
-	function Moneda($id_moneda) {
-		$query = "SELECT tarifa FROM usuario_tarifa WHERE id_usuario='" . $this->fields['id_usuario'] . "' AND id_moneda='$id_moneda'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-		if ($tarifa = mysql_fetch_assoc($resp))
-			return $tarifa['tarifa'];
-		else
-			return 0;
-	}
-
 	function GuardarCosto($id_moneda, $costo) {
 		$query = "INSERT INTO usuario_costo
 							SET id_usuario=" . $this->fields['id_usuario'] . ", id_moneda='$id_moneda', costo = '$costo'
 							ON DUPLICATE KEY UPDATE id_usuario='" . $this->fields['id_usuario'] . "', id_moneda='$id_moneda', costo = '$costo'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		return true;
-	}
-
-	function GuardarMoneda($id_moneda, $tarifa) {
-		if ($tarifa == 0 || !$tarifa)
-			$tarifa = 1;
-
-		$query = "INSERT INTO usuario_tarifa
-							SET id_usuario=" . $this->fields['id_usuario'] . ", id_moneda='$id_moneda', tarifa = '$tarifa'
-							ON DUPLICATE KEY UPDATE id_usuario='" . $this->fields['id_usuario'] . "', id_moneda='$id_moneda', tarifa = '$tarifa'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		return true;
 	}
@@ -369,7 +348,7 @@ class UsuarioExt extends Usuario {
 
 	function select_revisados() {
 		$query =
-			"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
+				"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
 			FROM
 			usuario JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisado)
 			WHERE id_revisor = '" . $this->fields['id_usuario'] . "' AND usuario.activo = 1 AND usuario.id_usuario <> '" . $this->fields['id_usuario'] . "'
@@ -384,7 +363,7 @@ class UsuarioExt extends Usuario {
 
 	function select_no_revisados() {
 		$query_otros =
-			"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
+				"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
 			FROM usuario
 			WHERE id_usuario NOT IN (
 				SELECT usuario_revisor.id_revisado
@@ -631,7 +610,6 @@ class UsuarioExt extends Usuario {
 		if ($validar_segun_conf) {
 			if (empty($this->fields["username"]))
 				$pagina->AddError(__('Debe ingresar el código usuario'));
-			//if (empty($this->fields["apellido2"])) $pagina->AddError(__('Debe ingresar el apellido materno del usuario'));
 			if (empty($this->fields["id_categoria_usuario"]))
 				$pagina->AddError(__('Debe ingresar la categoría del usuario'));
 			if (empty($this->fields["id_area_usuario"]))
@@ -727,8 +705,8 @@ class UsuarioExt extends Usuario {
 
 	public function LoadWithToken($token) {
 		$query = "SELECT * FROM " . $this->tbl_usuario
-			. " WHERE reset_password_token = '$token'"
-			. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
+				. " WHERE reset_password_token = '$token'"
+				. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
 
 		return $this->LoadWithQuery($query);
 	}
@@ -783,7 +761,7 @@ class UsuarioExt extends Usuario {
 
 	/**
 	 * Completa el objeto con los valores que vengan en $parametros
-	 * 
+	 *
 	 * @param array $parametros entrega los campos y valores del objeto campo => valor
 	 * @param boolean $edicion indica si se marcan los $parametros para edición
 	 */
@@ -808,9 +786,31 @@ class UsuarioExt extends Usuario {
 
 	public static function QueryComerciales() {
 		return "SELECT
-							usuario.id_usuario,
-							CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
-						FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
-						WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
+						usuario.id_usuario,
+						CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
+					FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
+					WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
 	}
+
+	public function Guardar($datos, &$pagina = null, $validaciones_segun_config = false) {
+		$arr1 = $this->fields;
+
+		foreach ($datos as $key => $value) {
+			$this->Edit($key, $value);
+		}
+
+		//Compara y guarda cambios en los datos del Usuario
+		if (!is_null($pagina) && $validaciones_segun_config) {
+			$this->Validaciones($arr1, $pagina, $validaciones_segun_config);
+			if ($pagina->GetErrors()) {
+				return false;
+			}
+		}
+		$guardado = $this->Write();
+		if ($guardado) {
+			$this->GuardaCambiosUsuario($arr1, $this->fields);
+		}
+		return $guardado;
+	}
+
 }

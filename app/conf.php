@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 ini_set('display_errors', 'Off');
+error_reporting(0);
 
 if (file_exists('/var/www/html/addbd.php')) {
 	require_once '/var/www/html/addbd.php';

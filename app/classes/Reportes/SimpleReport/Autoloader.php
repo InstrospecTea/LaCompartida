@@ -48,6 +48,7 @@ class SimpleReport_Autoloader {
 			//	Can't load
 			return FALSE;
 		}
+		
 		require($pObjectFilePath);
 	}
 

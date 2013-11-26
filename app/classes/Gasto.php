@@ -124,6 +124,11 @@ class Gasto extends Objeto {
 			'title' => 'Proveedor',
 		),
 		array(
+			'field' => 'estado_pago',
+			'title' => 'Estado Pago',
+			'visible' => false
+		),
+		array(
 			'field' => 'tipo_documento_asociado',
 			'title' => 'Tipo Documento Asociado',
 		),
@@ -328,8 +333,6 @@ class Gasto extends Objeto {
 			}
 		}
 		
-		$fecha1 = !empty($request['fecha1']) ? Utiles::fecha2sql($request['fecha1']) : '';
-		$fecha2 = !empty($request['fecha2']) ? Utiles::fecha2sql($request['fecha2']) : '';
 
 		if ($request['cobrado'] == 'NO') {
 			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
@@ -362,14 +365,28 @@ class Gasto extends Objeto {
 		} else if ($request['clientes_activos'] == 'inactivos') {
 			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
 		}
-		if ($fecha1 && $fecha2) {
-			$where .= " AND cta_corriente.fecha BETWEEN '$fecha1' AND '$fecha2' ";
-		} else if ($fecha1) {
-			$where .= " AND cta_corriente.fecha >= '$fecha1' ";
-		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '$fecha2' ";
-		} else if (!empty($request['id_cobro'])) {
+
+		if (!empty($request['id_cobro'])) {
 			$where .= " AND cta_corriente.id_cobro='{$request['id_cobro']}' ";
+		}
+
+		// Chequeo si alguno de los parametros comienza con ":", ya que puede venir de FacturaProduccion y ser utilizado con PDO->prepare
+		if (strpos($request['fecha1'], ':') === 0) {
+			$fecha1 = $request["fecha1"];
+		} else {
+			$fecha1 = !empty($request['fecha1']) ? "'" . Utiles::fecha2sql($request['fecha1']) . "'" : '';
+		}
+		if (strpos($request['fecha2'], ':') === 0) {
+			$fecha2 = $request["fecha2"];
+		} else {
+			$fecha2 = !empty($request['fecha2']) ? "'" . Utiles::fecha2sql($request['fecha2']) . "'" : '';
+		}
+		if ($fecha1 && $fecha2) {
+			$where .= " AND cta_corriente.fecha BETWEEN $fecha1 AND $fecha2 ";
+		} else if ($fecha1) {
+			$where .= " AND cta_corriente.fecha >= $fecha1 ";
+		} else if ($fecha2) {
+			$where .= " AND cta_corriente.fecha <= $fecha2 ";
 		}
 
 		// Filtrar por moneda del gasto
@@ -382,6 +399,10 @@ class Gasto extends Objeto {
 			$where .= " AND cta_corriente.egreso IS NOT NULL AND cta_corriente.egreso>0 ";
 		}
 		$where.=" AND incluir_en_cobro='SI' ";
+		// if (!empty($request['estado_pago'])) {
+		// 	$where .= " AND cta_corriente.estado_pago LIKE '%{$request['estado_pago']}%' "
+		// }
+
 		return $where;
 	}
 
@@ -425,9 +446,9 @@ class Gasto extends Objeto {
 				prm_cta_corriente_tipo.glosa AS tipo,
 				cta_corriente.descripcion,
 				moneda_gasto.simbolo,
-					ifnull(cta_corriente.egreso,0) egreso,
-					ifnull(cta_corriente.ingreso,0) ingreso,
-				if(ifnull(cta_corriente.ingreso,0)=0, 'egreso','ingreso') as ingresooegreso,";
+				IFNULL(cta_corriente.egreso, 0) egreso,
+				IFNULL(cta_corriente.ingreso, 0) ingreso,
+				IF(IFNULL(cta_corriente.ingreso, 0) = 0, 'egreso', 'ingreso') as ingresooegreso,";
 
 		if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
 			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0,IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable)) AS monto_cobrable,
@@ -446,6 +467,7 @@ class Gasto extends Objeto {
 				cta_corriente.numero_documento,
 				prm_proveedor.rut AS rut_proveedor,
 				prm_proveedor.glosa AS nombre_proveedor,
+				cta_corriente.estado_pago,
 				prm_tipo_documento_asociado.glosa AS tipo_documento_asociado,
 				cta_corriente.fecha_factura AS fecha_documento_asociado,
 				cta_corriente.codigo_factura_gasto AS codigo_documento_asociado,

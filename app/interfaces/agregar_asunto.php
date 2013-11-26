@@ -953,7 +953,7 @@ if ($usuario_responsable_obligatorio) {
 <?php
 
 if (empty($opcion)){
-	$caracteres = strlen($cliente->fields['codigo_cliente']);	
+	$caracteres = strlen($cliente->fields['codigo_cliente']);
 }
 $field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], -$caracteres);
 
@@ -1200,6 +1200,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 					</table>
 				</fieldset>
 				<br>
+
 				<!-- GUARDAR -->
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Guardar datos') ?></legend>

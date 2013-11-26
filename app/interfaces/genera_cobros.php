@@ -57,7 +57,7 @@ if ($opc == 'asuntos_liquidar') {
 		$cliente->LoadByCodigo($codigo_cliente);
 		$codigo_cliente_secundario = $cliente->fields['codigo_cliente_secundario'];
 	}
-	
+
 	$where = 1;
 	if ($activo)
 		$where .= " AND contrato.activo = 'SI' ";
@@ -79,7 +79,7 @@ if ($opc == 'asuntos_liquidar') {
 		$where .= " AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
 
 	$mostrar_codigo_asuntos = "";
-	
+
 	if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 		$mostrar_codigo_asuntos = "asunto.codigo_asunto";
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
@@ -157,15 +157,15 @@ $pagina->PrintTop();
 <script type="text/javascript">
 	var interrumpeproceso = 0;
 
-	<?php
-	if ($opc == 'buscar') {
+<?php
+if ($opc == 'buscar') {
 
-		echo "var arrayHH=" . json_encode($arrayHH) . ";\n";
-		echo "var arrayGG=" . json_encode($arrayGG) . ";\n";
-		echo "var arrayMIXTAS=" . json_encode($arrayMIXTAS) . ";\n";
-		echo "var arrayClientes=" . json_encode(array_values($arrayClientes)) . ";\n";
-	}
-	?>
+	echo "var arrayHH=" . json_encode($arrayHH) . ";\n";
+	echo "var arrayGG=" . json_encode($arrayGG) . ";\n";
+	echo "var arrayMIXTAS=" . json_encode($arrayMIXTAS) . ";\n";
+	echo "var arrayClientes=" . json_encode(array_values($arrayClientes)) . ";\n";
+}
+?>
 
 	function ToggleDiv(divId)
 	{
@@ -177,7 +177,7 @@ $pagina->PrintTop();
 			} else {
 				divObj.style.display = 'none';
 			}
-				
+
 		}
 	}
 
@@ -191,11 +191,11 @@ $pagina->PrintTop();
 		if (!form) {
 			var form = $('form_busca');
 		}
-		
+
 		var div = $('cobros_' + i);
 
-		if (id)	{
-			
+		if (id) {
+
 			var text_window = '<span style="font-size:12px;margin:10px; text-align:center;font-weight:bold"><?php echo __('¿Desea eliminar') . " " . __('el cobro') . " " . __('seleccionado?') ?>.</span><br>';
 
 			interrumpeproceso = 0;
@@ -277,18 +277,18 @@ $pagina->PrintTop();
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
 			text_window += '<input type="radio" name="radio_generacion" id="radio_wip" checked /><?php echo __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
 
-			<?php if (UtilesApp::GetConf($sesion, 'SoloGastos')) { ?>
-					
-					if (jQuery('#tipo_liquidacion').val() == '') {
-						text_window += '<br><input type="radio" name="radio_generacion" id="radio_gastos" /><?php echo __('Sólo Gastos') ?>';
-					}
-						
-					if (jQuery('#tipo_liquidacion').val() == '') {
-						text_window += '<br><input type="radio" name="radio_generacion" id="radio_honorarios" /><?php echo __('Sólo Honorarios') ?>';
-					}
-						
-			<?php } ?>
-			
+<?php if (UtilesApp::GetConf($sesion, 'SoloGastos')) { ?>
+
+				if (jQuery('#tipo_liquidacion').val() == '') {
+					text_window += '<br><input type="radio" name="radio_generacion" id="radio_gastos" /><?php echo __('Sólo Gastos') ?>';
+				}
+
+				if (jQuery('#tipo_liquidacion').val() == '') {
+					text_window += '<br><input type="radio" name="radio_generacion" id="radio_honorarios" /><?php echo __('Sólo Honorarios') ?>';
+				}
+
+<?php } ?>
+
 			text_window += '</div><div style="text-align:center;"> ';
 
 			var largoGG = arrayGG.length;
@@ -336,15 +336,15 @@ $pagina->PrintTop();
 						jQuery('#nocerrar').html('Procure no cerrar la pestaña actual de su navegador. Si necesita realizar otras tareas en paralelo, puede hacerlo en otras pestañas.');
 
 						jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?generar_silenciosamente=1');
-						<?php if (UtilesApp::GetConf($sesion, 'SoloGastos')) { ?>
-								if (jQuery('#radio_gastos').is(':checked')) {
-									jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?gastos=1&generar_silenciosamente=1');
-								} else if (jQuery('#radio_honorarios').is(':checked')) {
-									jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?solohh=1&generar_silenciosamente=1');
-								}
-						<?php } ?>
+<?php if (UtilesApp::GetConf($sesion, 'SoloGastos')) { ?>
+							if (jQuery('#radio_gastos').is(':checked')) {
+								jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?gastos=1&generar_silenciosamente=1');
+							} else if (jQuery('#radio_honorarios').is(':checked')) {
+								jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?solohh=1&generar_silenciosamente=1');
+							}
+<?php } ?>
 
-						<?php if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
+<?php if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
 
 							var generaGG = function(i) {
 								if (i >= largoGG) {
@@ -355,7 +355,7 @@ $pagina->PrintTop();
 									jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
 									return false;
 								}
-								
+
 								laURL = arrayGG[i] + '&generar_silenciosamente=1';
 								jQuery.ajax({url: laURL}).fail(function(data) {
 									errores++;
@@ -366,7 +366,7 @@ $pagina->PrintTop();
 										generaGG(i);
 								});
 							}
-							
+
 							var generaHH = function(j) {
 								if (j >= largoHH) {
 									jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
@@ -389,7 +389,7 @@ $pagina->PrintTop();
 							}
 
 							var generaMIXTAS = function(k) {
-								
+
 								if (k >= largoMIXTAS) {
 									jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
 									jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado ' + largoMIXTAS + ' liquidaciones mixtas. (' + errores + ' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
@@ -417,7 +417,7 @@ $pagina->PrintTop();
 										generaMIXTAS(k);
 								});
 							}
-							
+
 							// Si hay liquidaciones de gastos y no se ha elegido "solo honorarios"
 							if (arrayGG[0] && !jQuery('#radio_honorarios').is(':checked')) {
 								jQuery.ajax({url: arrayGG[1]}).complete(function(data) {
@@ -448,11 +448,11 @@ $pagina->PrintTop();
 							}
 
 
-						<?php } else { ?>
+<?php } else { ?>
 
 							var laURL = jQuery('#form_busca').attr('action');
 							var generaClientes = function(k) {
-								
+
 								if (k >= largoClientes) {
 									jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
 									jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado ' + largoClientes + ' clientes. (' + errores + ' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
@@ -461,16 +461,16 @@ $pagina->PrintTop();
 									jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
 									return false;
 								}
-								
+
 								jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(arrayClientes[k]);
 								jQuery.ajax({type: 'POST', url: laURL, data: jQuery('#form_busca').serialize()}).fail(function(data) {
 									errores++;
-									}).complete(function(data) {
-										k++;
-										jQuery('#respuestamixtas').html('Procesando ' + k + ' de ' + largoClientes + ' clientes. (' + errores + ' con errores)');
-										if (interrumpeproceso == 0) {
-											generaClientes(k);
-										}
+								}).complete(function(data) {
+									k++;
+									jQuery('#respuestamixtas').html('Procesando ' + k + ' de ' + largoClientes + ' clientes. (' + errores + ' con errores)');
+									if (interrumpeproceso == 0) {
+										generaClientes(k);
+									}
 								});
 							}
 
@@ -481,10 +481,9 @@ $pagina->PrintTop();
 
 
 
-						<?php } ?>
+<?php } ?>
 
 					},
-							
 					"<?php echo __('Cancelar') ?>": function() {
 
 						jQuery(this).dialog("close");
@@ -514,7 +513,7 @@ $pagina->PrintTop();
 
 
 		} else if (desde == 'emitir') {
-			
+
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está realizando la emisión masiva de cobros, asegúrese de haber verificado sus datos o cobros en proceso.') ?><br><br><?php echo __('¿Desea emitir los cobros?') ?></span><br>';
 			text_window += '<br><table><tr>';
@@ -677,13 +676,13 @@ $pagina->PrintTop();
 		//var form = $('form_busca');
 		$('opc').value = 'buscar';
 		var opc = $('opc').value;
-	
-		<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
-				var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
-		<?php } else { ?>
-				var codigo_cliente = $('codigo_cliente').value;
-		<?php } ?>
-			
+
+<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
+<?php } else { ?>
+			var codigo_cliente = $('codigo_cliente').value;
+<?php } ?>
+
 		var grupo = $('id_grupo_cliente').value;
 		var codigo_asunto = $('codigo_asunto').value;
 		var id_usuario = $('id_usuario').value;
@@ -691,23 +690,21 @@ $pagina->PrintTop();
 		var id_proceso = $('id_proceso').value;
 		var fecha_ini = $('fecha_ini').value;
 		var fecha_fin = $('fecha_fin').value;
-		
+
 		if ($('activo').checked == true) {
 			var activo = $('activo').value;
 		} else {
 			var activo = '';
 		}
-			
-		<?php
-		
-		if ($desde) {
-			echo "var pagina_desde = '&desde=" . $desde . "';";
-		} else {
-			echo "var pagina_desde = '';";
-		}
-			
-		?>
-				
+
+<?php
+if ($desde) {
+	echo "var pagina_desde = '&desde=" . $desde . "';";
+} else {
+	echo "var pagina_desde = '';";
+}
+?>
+
 		if ($('codigo_cliente')) {
 			var url = "genera_cobros.php?codigo_cliente=" + codigo_cliente + "&popup=1&opc=" + opc + pagina_desde + "&id_grupo=" + id_grupo + "&id_usuario=" + id_usuario + "&id_usuario_secundario=" + id_usuario_secundario + "&id_proceso=" + id_proceso + "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&activo=" + activo + "&codigo_asunto=" + codigo_asunto;
 			console.log(url);
@@ -717,7 +714,7 @@ $pagina->PrintTop();
 
 		self.location.href = url;
 	}
-	
+
 	//fin refrescar para popup
 
 	//Confirmación de generación de cobros individuales
@@ -832,10 +829,10 @@ $pagina->PrintTop();
 						<tr>
 							<td align=right width='30%'><b><?php echo __('Cliente') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
-								<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-								<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
 									<input type="hidden" name="codigo_cliente" id="codigo_cliente"/>
-<?php } ?>
+								<?php } ?>
 							</td>
 						</tr>
 						<tr>
@@ -843,7 +840,7 @@ $pagina->PrintTop();
 <?php echo __('Asunto') ?>
 							</td>
 							<td nowrap align=left colspan=2>
-<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+								<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 							</td>
 						</tr>
@@ -862,11 +859,11 @@ $pagina->PrintTop();
 									<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
 								</td>
 							</tr>
-						<?php
-						}
+	<?php
+}
 
-						($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_generacion_cobro') : false;
-						?>
+($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_generacion_cobro') : false;
+?>
 						<tr>
 							<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
@@ -876,12 +873,12 @@ $pagina->PrintTop();
 						<tr>
 							<td align=right><b><?php echo __('Tipo de Liquidación') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
-								<?php
-								echo Html::SelectArray(array(
-									array('1', __('Sólo Honorarios')),
-									array('2', __('Sólo Gastos')),
-									array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, ' id="tipo_liquidacion" ', __('Todas'))
-								?>
+<?php
+echo Html::SelectArray(array(
+	array('1', __('Sólo Honorarios')),
+	array('2', __('Sólo Gastos')),
+	array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, ' id="tipo_liquidacion" ', __('Todas'))
+?>
 							</td>
 						</tr>
 						<!-- <?php echo __('Incluir Asuntos sin cobros pendientes') ?> <input type="checkbox" name=sin_cobro_pendiente value=1 <?php echo $sin_cobro_pendiente ? 'checked' : '' ?>> -->
@@ -900,26 +897,26 @@ $pagina->PrintTop();
 								<input onkeydown="if (event.keyCode == 13)
 			GeneraCobros(this.form, '', false)" type="text" class="fechadiff"  name="fecha_fin" value="<?php echo!$fecha_fin ? date('d-m-Y') : $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 							</td>
-							<?php
-							if (isset($_POST['activo']) && $_POST['activo'] == 1) {
-								$chk = 'checked="checked"';
-							} else {
-								$chk = '';
-							}
-							if (isset($_POST['cobrosencero'])) {
-								if ($_POST['cobrosencero'] == 1) {
-									$chk0 = 'checked="checked"';
-								} else {
-									$chk0 = '';
-								}
-							} else {
-								if (UtilesApp::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
-									$chk0 = '';
-								} else {
-									$chk0 = 'checked="checked"';
-								}
-							}
-							?>
+									   <?php
+									   if (isset($_POST['activo']) && $_POST['activo'] == 1) {
+										   $chk = 'checked="checked"';
+									   } else {
+										   $chk = '';
+									   }
+									   if (isset($_POST['cobrosencero'])) {
+										   if ($_POST['cobrosencero'] == 1) {
+											   $chk0 = 'checked="checked"';
+										   } else {
+											   $chk0 = '';
+										   }
+									   } else {
+										   if (UtilesApp::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
+											   $chk0 = '';
+										   } else {
+											   $chk0 = 'checked="checked"';
+										   }
+									   }
+									   ?>
 							<td>
 							</td>
 						</tr>
@@ -949,9 +946,9 @@ $pagina->PrintTop();
 
 
 
-	<?php
-	if ($opc == 'buscar') {
-		?>
+<?php
+if ($opc == 'buscar') {
+	?>
 		<table width="820">
 			<tr>
 				<td align="right" width="680">
@@ -969,16 +966,16 @@ $pagina->PrintTop();
 					<label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label>
 					<input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo UtilesApp::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
 					<label for="opc_ver_asuntos_separados"><?php echo __('Ver asuntos por separado') ?></label>
-					<?php
-					if (method_exists('Conf', 'GetConf'))
-						$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
-					else if (method_exists('Conf', 'Ordenado_por'))
-						$solicitante = Conf::Ordenado_por();
-					else
-						$solicitante = 2;
+	<?php
+	if (method_exists('Conf', 'GetConf'))
+		$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
+	else if (method_exists('Conf', 'Ordenado_por'))
+		$solicitante = Conf::Ordenado_por();
+	else
+		$solicitante = 2;
 
-					if ($solicitante == 0) {  // no mostrar
-						?>
+	if ($solicitante == 0) {  // no mostrar
+		?>
 						<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
 						<?php
 					} elseif ($solicitante == 1) { // obligatorio
@@ -1004,9 +1001,9 @@ $pagina->PrintTop();
 				</td>
 			</tr>
 		</table>
-		<?php
-	}
-	?>
+	<?php
+}
+?>
 	<br>
 </form>
 <br />
@@ -1041,8 +1038,7 @@ function funcionTR(& $contrato) {
 		$idioma->Load($contrato->fields['codigo_idioma']);
 	else
 		$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
-
-	if ($contrato->fields['fecha_ultimo_cobro'] != $cobros->FechaUltimoCobro($contrato->fields['codigo_cliente'])) {
+	if (!empty($contrato->fields['fecha_ultimo_cobro'])) {
 		$fecha_ultimo_cobro = Utiles::sql2fecha($contrato->fields['fecha_ultimo_cobro'], $formato_fecha, "-");
 	} else {
 		$fecha_ultimo_cobro = 'N/A';
@@ -1054,17 +1050,17 @@ function funcionTR(& $contrato) {
 					" AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
 
 		$query_pendientes = "SELECT
-															cobro_pendiente.id_cobro_pendiente,
-															cobro_pendiente.monto_estimado,
-															cobro_pendiente.descripcion,
-															cobro_pendiente.fecha_cobro,
-															prm_moneda.simbolo,
-															prm_moneda.cifras_decimales
-														FROM cobro_pendiente
-														JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
-														JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
-														WHERE cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.id_contrato = '" . $contrato->fields['id_contrato'] . "'
-														AND cobro_pendiente.fecha_cobro <= '" . Utiles::fecha2sql($fecha_fin) . "' AND cobro_pendiente.hito = 0 ORDER BY cobro_pendiente.fecha_cobro ASC";
+									cobro_pendiente.id_cobro_pendiente,
+									cobro_pendiente.monto_estimado,
+									cobro_pendiente.descripcion,
+									cobro_pendiente.fecha_cobro,
+									prm_moneda.simbolo,
+									prm_moneda.cifras_decimales
+								FROM cobro_pendiente
+								JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
+								JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+								WHERE cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.id_contrato = '" . $contrato->fields['id_contrato'] . "'
+								AND cobro_pendiente.fecha_cobro <= '" . Utiles::fecha2sql($fecha_fin) . "' AND cobro_pendiente.hito = 0 ORDER BY cobro_pendiente.fecha_cobro ASC";
 		$lista_pendientes = new ListaCobrosPendientes($sesion, '', $query_pendientes);
 
 		//Hitos
