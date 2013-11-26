@@ -752,16 +752,15 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 $Slim->map('/release-download', function () use ($Session, $Slim) {
 	$os = $Slim->request()->params('os');
 	$app_guid = $Slim->request()->params('guid');
-	$action_name = $Slim->request()->params('name');
+	$action_name = 'app-update';
 	$version = $Slim->request()->params('version');
 	$bucket = 'timebilling-uploads';
 	$s3 = new AmazonS3(array(
  		'key' => 'AKIAIQYFL5PYVQKORTBA',
  		'secret' => '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'
  	));
-	$appupdate = $s3->get_object_headers($bucket, "apps/$action_name/$app_guid/$os/$version/appupdate.zip");
-	if (!is_null($appupdate)) {
-		$url = $appupdate->header['_info']['url'];
+	$url = $s3->get_object_url($bucket, "apps/$action_name/$app_guid/$os/$version/appupdate.zip");
+	if (!is_null($url)) {
 		$Slim->redirect($url);
 	} else {
 		halt(__("Invalid params"), "InvalidParams");
@@ -792,7 +791,7 @@ function validateAuthTokenSendByHeaders($permission = null) {
 	$user_token = $UserToken->findByAuthToken($auth_token);
 	// if not exist the auth_token then return error
 	if (!is_object($user_token)) {
-		halt(__('Invalid AUTH TOKEN'), "SecurityError");
+		halt(__('Invalid AUTH TOKEN'), "SecurityError", 401);
 	} else {
 		// verify if the token is expired
 		// date_default_timezone_set("UTC");
@@ -800,7 +799,7 @@ function validateAuthTokenSendByHeaders($permission = null) {
 		$expiry_date = strtotime($user_token->expiry_date);
 		if ($expiry_date < $now) {
 			if ($UserToken->delete($user_token->id)) {
-				halt(__('Expired AUTH TOKEN'), "SecurityError");
+				halt(__('Expired AUTH TOKEN'), "SecurityError", 401);
 			} else {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
 			}

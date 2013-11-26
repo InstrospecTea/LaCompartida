@@ -1838,7 +1838,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</td>
 								<td align="left" colspan="5">
 									<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
-										<?php echo Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "factura_giro", $contrato->fields['factura_giro'], "", ""); ?>
+										<?php echo Html::SelectQuery($Sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "factura_giro", $contrato->fields['factura_giro'], "", ""); ?>
 									<?php } else { ?>
 										<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
 									<?php } ?>

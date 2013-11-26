@@ -175,6 +175,13 @@ Es como [GitFlow][7] pero con más flow. Descargar de [acá][8].
 
 Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archivo msysgit-install.cmd reemplazando "git-flow" por "git-hf" y "gitflow" por "hubflow".
 
+#Configuracion MySQL
+
+En OSX la configuracion es estricta, por eso debe ajustarse para ser identica a la de produccion
+
+```sql
+SET @@global.sql_mode= '';
+```
 
 [1]: https://gist.github.com/3867988
 [2]: https://gist.github.com/3868074
