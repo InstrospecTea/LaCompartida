@@ -10046,7 +10046,7 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
-	
+
 		case 7.49:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsaGiroClienteParametrizable', 0, 'Permite parametrizar los giros de lso clientes', 'boolean', 10, -1);";
@@ -10055,7 +10055,13 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `estado_pago` VARCHAR( 255 ) NULL DEFAULT NULL";
 			}
 			ejecutar($queries, $dbh);
-		break; 
+			break;
+
+		case 7.50:
+			$queries = array();
+			$queries[] = "ALTER TABLE `user_token` CHANGE `modified` `modified` DATETIME NULL;";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10065,7 +10071,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.49;
+$max_update = 7.50;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

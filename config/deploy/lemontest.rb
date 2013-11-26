@@ -15,10 +15,10 @@ set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_nam
 set :branch, custom_branch
 set :deploy_to, "#{base_directory}/#{file_path}"
 
- 
+
 namespace :deploy do
 
-  
+
 
   task :update_symlinks do
     update_symlinks(self)
@@ -27,7 +27,7 @@ namespace :deploy do
     task :expose_vars do
     expose_vars(self)
   end
- 
+
   task :finalize_update, :except => { :no_release => true } do
     transaction do
       run "chmod -R g+w #{releases_path}/#{release_name}"
@@ -35,7 +35,7 @@ namespace :deploy do
       run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/environment.txt"
     end
   end
- 
+
   task :lemontest_symlink do
       subdominio = 'lemontest'
       dominio = 'thetimebilling.com'
@@ -45,7 +45,7 @@ namespace :deploy do
       symlink_path = '/var/www/virtual/lemontest.thetimebilling.com/htdocs/' << dirname
       #p absolute_path
      #p symlink_path
-   
+
     run " ln -nsf #{absolute_path} #{symlink_path}"
        puts "\n\n\n\e[00;32m ====  SUCCESS: \e[0;37m deployed test environment on \e[04;36mhttp://lemontest.thetimebilling.com/#{dirname}\e[00;32m ====\e[0;37m\n\n\n"
 
@@ -56,16 +56,16 @@ task :create_database do
        dbname='lemontest_' << dirname.tr('_','').tr('.','')
 
       existedb = `mysql -h192.168.1.24 -uroot -pasdwsx -e "show databases like '%dbname%'";`
-      
-      if(existedb=='')  
+
+      if(existedb=='')
         puts "\n\e[0;31m   ##########################################################################"
-        puts           "   #    No existe la base \e[01;37m #{dbname}\e[0;31m, desea crearla? (y/N) #" 
+        puts           "   #    No existe la base \e[01;37m #{dbname}\e[0;31m, desea crearla? (y/N) #"
         puts           "   #########################################################################\e[0m\n"
         proceed = STDIN.gets[0..0] rescue nil
         if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
-          run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'CREATE DATABASE IF NOT EXISTS #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
+          run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'CREATE DATABASE IF NOT EXISTS `#{dbname}`' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
         end
-      
+
       else
           puts "\n\e[0;32m   ############# NO NECESITO CREAR LA BASE \e[01;37m #{dbname}\e[0;32m (PORQUE YA EXISTE) ################\n\n"
           puts "       __                                  _                 _"
@@ -80,11 +80,11 @@ task :create_database do
 
 end
     before "deploy:update_code", "deploy:setup"
-   
+
   after "deploy:update", "deploy:cleanup"
   after "deploy:cleanup", "deploy:create_database"
    after "deploy:cleanup", "deploy:lemontest_symlink"
- 
+
 
 
 end
