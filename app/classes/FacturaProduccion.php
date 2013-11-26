@@ -381,6 +381,139 @@ class FacturaProduccion {
 
 	);
 
+public static $configuracion_gastos = array(
+		array(
+			'field' => 'id_movimiento',
+			'title' => 'N°',
+			'visible' => false
+		),
+		array(
+			'field' => 'fecha',
+			'format' => 'date',
+			'title' => 'Fecha',
+		),
+		array(
+			'field' => 'codigo_cliente',
+			'title' => 'Código Cliente',
+		),
+		array(
+			'field' => 'glosa_cliente',
+			'title' => 'Cliente',
+		),
+		array(
+			'field' => 'codigo_asunto',
+			'title' => 'Código Asunto',
+		),
+		array(
+			'field' => 'glosa_asunto',
+			'title' => 'Asunto',
+		),
+		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial',
+		),
+		array(
+			'field' => 'usuario_ingresa',
+			'title' => 'Ingresado por',
+		),
+		array(
+			'field' => 'usuario_ordena',
+			'title' => 'Ordenado por',
+		),
+		array(
+			'field' => 'tipo',
+			'title' => 'Tipo',
+		),
+		array(
+			'field' => 'descripcion',
+			'title' => 'Descripción',
+		),
+		array(
+			'field' => 'simbolo',
+			'title' => 'Símbolo Moneda',
+		),
+		array(
+			'field' => 'egreso',
+			'format' => 'number',
+			'title' => 'Egreso',
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			),
+		),
+		array(
+			'field' => 'ingreso',
+			'format' => 'number',
+			'title' => 'Ingreso',
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			),
+		),
+		array(
+			'field' => 'monto_cobrable',
+			'format' => 'number',
+			'title' => 'Monto Cobrable',
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			),
+		),
+		array(
+			'field' => 'con_impuesto',
+			'title' => 'Con Impuesto',
+		),
+		array(
+			'field' => 'id_cobro',
+			'title' => 'N° Liquidación',
+		),
+		array(
+			'field' => 'estado_cobro',
+			'title' => 'Estado Liquidación',
+		),
+		array(
+			'field' => 'cobrable',
+			'title' => 'Cobrable',
+		),
+		array(
+			'field' => 'numero_documento',
+			'title' => 'N° Documento',
+		),
+		array(
+			'field' => 'numero_ot',
+			'title' => 'N° Orden Trabajo',
+			'visible' => false
+		),
+		array(
+			'field' => 'rut_proveedor',
+			'title' => 'RUT Proveedor',
+		),
+		array(
+			'field' => 'nombre_proveedor',
+			'title' => 'Proveedor',
+		),
+		array(
+			'field' => 'estado_pago',
+			'title' => 'Estado Pago',
+			'visible' => false
+		),
+		array(
+			'field' => 'tipo_documento_asociado',
+			'title' => 'Tipo Documento Asociado',
+		),
+		array(
+			'field' => 'fecha_documento_asociado',
+			'title' => 'Fecha Documento Asociado',
+		),
+		array(
+			'field' => 'codigo_documento_asociado',
+			'title' => 'N° Documento Asociado',
+		),
+	);
+
 	private static $queries = array(
 		'FACTURAS' => " SELECT factura.id_cobro,
 						factura.id_factura,
@@ -520,14 +653,25 @@ class FacturaProduccion {
 	}
 
 	public function QueryReporte() {
-		if ($this->report_code == 'FACTURA_PRODUCCION') {
-			return FacturaProduccion::$queries['FACTURAS'];
-		}
-		if ($this->report_code == 'FACTURA_COBRANZA') {
-			return FacturaProduccion::$queries['PAGOS'];
-		}
-		if ($this->report_code == 'FACTURA_COBRANZA_APLICADA') {
-			return FacturaProduccion::$queries['COBROS'];
+		switch ($this->report_code) {
+			case 'FACTURA_PRODUCCION':
+				return FacturaProduccion::$queries['FACTURAS'];
+
+			case 'FACTURA_COBRANZA':
+				return FacturaProduccion::$queries['PAGOS'];
+
+			case 'FACTURA_COBRANZA_APLICADA':
+				return FacturaProduccion::$queries['COBROS'];
+
+			case 'GASTOS_NO_COBRABLES':
+				$Gasto = new Gasto($this->sesion);
+				$where = array(
+					'cobrable' => '0',
+					'fecha1' => ':period_from',
+					'fecha2' => ':period_to',
+					'moneda_gasto' => ':currency_id'
+				);
+				return $Gasto->SearchQuery($this->sesion, $Gasto->WhereQuery($where));
 		}
 	}
 
@@ -535,11 +679,11 @@ class FacturaProduccion {
 		$Statement = $this->sesion->pdodbh->prepare($query);
 		foreach ($params as $key => $item) {
 			if (strpos($key, 'period_') !== false) {
-				$Statement->bindValue($key, Utiles::fecha2sql($item));
-			} else {
-				$Statement->bindValue($key, $item, PDO::PARAM_BOOL);
+				$item = Utiles::fecha2sql($item);
 			}
+			$Statement->bindValue($key, $item);
 		}
+
 		$Statement->execute();
 		return $Statement->fetchAll($fetch_options);
 	}

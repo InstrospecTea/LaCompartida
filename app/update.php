@@ -10106,9 +10106,10 @@ QUERY;
 
 			$queries[] = "INSERT IGNORE INTO `reporte_listado` (`tipo`, `id_usuario`, `configuracion_original`, `configuracion`, `fecha_creacion`, `fecha_modificacion`, `query`, `api_accessible`, `title`)
 				VALUES
-				('FACTURA_COBRANZA_APLICADA', NULL, '', '', '2013-09-12 19:12:48', '0000-00-00 00:00:00', NULL, 1, 'Cobranza Aplicada'),
-				('FACTURA_PRODUCCION', NULL, '', '', '2013-09-12 19:12:53', '2013-09-12 19:13:21', NULL, 1, 'Facturación'),
-				('FACTURA_COBRANZA', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 1, 'Cobranza');";
+				('FACTURA_COBRANZA_APLICADA', NULL, '', '', '2013-09-12 19:12:48', '0000-00-00 00:00:00', NULL, 0, 'Cobranza Aplicada'),
+				('FACTURA_PRODUCCION', NULL, '', '', '2013-09-12 19:12:53', '2013-09-12 19:13:21', NULL, 0, 'Facturación'),
+				('FACTURA_COBRANZA', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 0, 'Cobranza'),
+				('GASTOS_NO_COBRABLES', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 0, 'Gastos No Cobrables');";
 
 			ejecutar($queries, $dbh);
 			break;		

@@ -56,7 +56,8 @@ class SimpleReport extends Objeto {
 		'REPORTE_SALDO_CLIENTES_RESUMEN' => 'ReportesEspecificos.configuracion_saldo_clientes_resumen',
 		'FACTURA_PRODUCCION' => 'FacturaProduccion',
 		'FACTURA_COBRANZA' => 'FacturaProduccion.configuracion_cobranza',
-		'FACTURA_COBRANZA_APLICADA' => 'FacturaProduccion.configuracion_cobranza_aplicada'
+		'FACTURA_COBRANZA_APLICADA' => 'FacturaProduccion.configuracion_cobranza_aplicada',
+		'GASTOS_NO_COBRABLES' => 'FacturaProduccion.configuracion_gastos'
 //		'TRAMITES' => 'Tramite',
 //		'ADELANTOS' => '',
 //		'USUARIOS' => 'Usuario'
