@@ -4,37 +4,37 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 class FacturaProduccion {
 
-	public static $configuracion_reporte = array (
-		array (
+	public static $configuracion_reporte = array(
+		array(
 			'field' => 'id_factura',
 			'title' => 'Correlativo',
 			'visible' => false
 		),
-		array (
+		array(
 			'field' => 'id_contrato',
 			'title' => 'Código Asunto'
 		),
-		array (
+		array(
 			'field' => 'glosas_asunto',
 			'title' => 'Glosa Asunto',
 		),
-		array (
+		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Codigo cliente',
 		),
-		array (
+		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
 		),
-		array (
+		array(
 			'field' => 'tipo',
 			'title' => 'Tipo Doc.'
 		),
-		array (
+		array(
 			'field' => 'serie_documento_legal',
 			'title' => 'Serie'
 		),
-		array (
+		array(
 			'field' => 'numero',
 			'format' => 'number',
 			'title' => 'Nº Documento',
@@ -42,68 +42,68 @@ class FacturaProduccion {
 				'subtotal' => false
 			)
 		),
-		array (
+		array(
 			'field' => 'estado_factura',
 			'title' => 'Estado'
 		),
-		array (
+		array(
 			'field' => 'fecha',
 			'format' => 'date',
 			'title' => 'Fecha Documento'
 		),
-		array (
+		array(
 			'field' => 'moneda_original',
 			'title' => 'Moneda Original'
 		),
-		array (
+		array(
 			'field' => 'subtotal_facturado_original',
 			'format' => 'number',
 			'title' => 'SubTotal Facturado Original'
 		),
-		array (
+		array(
 			'field' => 'impuesto_facturado_original',
 			'format' => 'number',
 			'title' => 'Impuesto'
 		),
-		array (
+		array(
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
 		),
-		array (
+		array(
 			'field' => 'moneda',
 			'title' => 'Moneda'
 		),
-		array (
+		array(
 			'field' => 'total',
 			'format' => 'number',
 			'title' => 'Total Facturado'
 		),
-		array (
+		array(
 			'field' => 'tipo_cambio',
 			'format' => 'number',
 			'title' => 'Tipo de Cambio'
 		),
-		array (
+		array(
 			'field' => 'username_generador',
 			'title' => 'Código Generador'
 		),
-		array (
+		array(
 			'field' => 'area_usuario',
 			'title' => 'Area Usuario'
 		),
-		array (
+		array(
 			'field' => 'nombre_generador',
 			'title' => 'Nombre Generador'
 		),
 
-		array (
+		array(
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
 			'format' => 'number',
 		),
 
-		array (
+		array(
 			'field' => 'monto_genera',
 			'title' => 'Monto Generador',
 			'format' => 'number',
@@ -112,37 +112,37 @@ class FacturaProduccion {
 	);
 
 
-	public static $configuracion_cobranza = array (
-		array (
+	public static $configuracion_cobranza = array(
+		array(
 			'field' => 'id_factura',
 			'title' => 'Correlativo',
 			'visible' => false
 		),
-		array (
+		array(
 			'field' => 'id_contrato',
 			'title' => 'Código Asunto'
 		),
-		array (
+		array(
 			'field' => 'glosas_asunto',
 			'title' => 'Glosa Asunto',
 		),
-		array (
+		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Código cliente',
 		),
-		array (
+		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
 		),
-		array (
+		array(
 			'field' => 'tipo',
 			'title' => 'Tipo Doc.'
 		),
-		array (
+		array(
 			'field' => 'serie_documento_legal',
 			'title' => 'Serie'
 		),
-		array (
+		array(
 			'field' => 'numero',
 			'format' => 'number',
 			'title' => 'N° Documento',
@@ -150,116 +150,128 @@ class FacturaProduccion {
 				'subtotal' => false
 			)
 		),
-		array (
+		array(
 			'field' => 'estado_factura',
 			'title' => 'Estado'
 		),
-		array (
+		array(
 			'field' => 'fecha',
 			'format' => 'date',
 			'title' => 'Fecha Documento'
 		),
-		array (
+		array(
 			'field' => 'fecha_pago',
 			'format' => 'date',
 			'title' => 'Fecha Pago'
 		),
-		array (
+		array(
 			'field' => 'moneda_original',
 			'title' => 'Moneda Original'
 		),
-		array (
+		array(
 			'field' => 'subtotal_facturado_original',
 			'format' => 'number',
 			'title' => 'SubTotal Facturado Original'
 		),
-		array (
+		array(
 			'field' => 'impuesto_facturado_original',
 			'format' => 'number',
 			'title' => 'Impuesto'
 		),
-		array (
+		array(
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
 		),
-		array (
+		array(
 			'field' => 'moneda',
 			'title' => 'Moneda'
 		),
-		array (
+		array(
 			'field' => 'total_facturado',
 			'format' => 'number',
 			'title' => 'Total Facturado'
 		),
-		array (
+		array(
+			'field' => 'monto_detraccion',
+			'format' => 'number',
+			'title' => 'Monto Detracción',
+			'visible' => false
+		),
+		array(
+			'field' => 'total_liquido',
+			'format' => 'number',
+			'title' => 'Total Líquido',
+			'visible' => false
+		),
+		array(
 			'field' => 'tipo_cambio',
 			'format' => 'number',
 			'title' => 'Tipo de Cambio'
 		),
-		array (
+		array(
 			'field' => 'total_pagado',
 			'format' => 'number',
 			'title' => 'Total Pagado'
 		),
-		array (
+		array(
 			'field' => 'username_generador',
 			'title' => 'Código Generador'
 		),
-		array (
+		array(
 			'field' => 'area_usuario',
 			'title' => 'Area Usuario'
 		),
-		array (
+		array(
 			'field' => 'nombre_generador',
 			'title' => 'Nombre Generador'
 		),
 
-		array (
+		array(
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
 			'format' => 'number',
 		),
 
-		array (
+		array(
 			'field' => 'monto_genera',
 			'title' => 'Monto Generador',
 			'format' => 'number',
 		)
 	);
 
-	public static $configuracion_cobranza_aplicada = array (
-		array (
+	public static $configuracion_cobranza_aplicada = array(
+		array(
 			'field' => 'id_factura',
 			'title' => 'Correlativo',
 			'visible' => false
 		),
-		array (
+		array(
 			'field' => 'id_contrato',
 			'title' => 'Código Asunto'
 		),
-		array (
+		array(
 			'field' => 'glosas_asunto',
 			'title' => 'Glosa Asunto',
 		),
 
-		array (
+		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Código cliente',
 		),
-		array (
+		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
 		),
-		array (
+		array(
 			'field' => 'tipo',
 			'title' => 'Tipo Doc.'
 		),
-		array (
+		array(
 			'field' => 'serie_documento_legal',
 			'title' => 'Serie'
 		),
-		array (
+		array(
 			'field' => 'numero',
 			'format' => 'number',
 			'title' => 'N° Documento',
@@ -267,101 +279,101 @@ class FacturaProduccion {
 				'subtotal' => false
 			)
 		),
-		array (
+		array(
 			'field' => 'estado_factura',
 			'title' => 'Estado'
 		),
-		array (
+		array(
 			'field' => 'fecha',
 			'format' => 'date',
 			'title' => 'Fecha Documento'
 		),
-		array (
+		array(
 			'field' => 'fecha_pago',
 			'format' => 'date',
 			'title' => 'Fecha Pago'
 		),
-		array (
+		array(
 			'field' => 'moneda_original',
 			'title' => 'Moneda Original'
 		),
-		array (
+		array(
 			'field' => 'subtotal_facturado_original',
 			'format' => 'number',
 			'title' => 'SubTotal Facturado Original'
 		),
-		array (
+		array(
 			'field' => 'impuesto_facturado_original',
 			'format' => 'number',
 			'title' => 'Impuesto'
 		),
-		array (
+		array(
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
 		),
-		array (
+		array(
 			'field' => 'moneda',
 			'title' => 'Moneda'
 		),
-		array (
+		array(
 			'field' => 'subtotal_cobro',
 			'format' => 'number',
 			'title' => 'Total Liquidación'
 		),
-		array (
+		array(
 			'field' => 'total_facturado',
 			'format' => 'number',
 			'title' => 'Total Facturado'
 		),
-		array (
+		array(
 			'field' => 'tipo_cambio',
 			'format' => 'number',
 			'title' => 'Tipo de Cambio'
 		),
-		array (
+		array(
 			'field' => 'total_pagado',
 			'format' => 'number',
 			'title' => 'Total Pagado'
 		),
-		array (
+		array(
 			'field' => 'username_generador',
 			'title' => 'Código Generador'
 		),
-		array (
+		array(
 			'field' => 'area_usuario',
 			'title' => 'Area Usuario'
 		),
-		array (
+		array(
 			'field' => 'nombre_generador',
 			'title' => 'Nombre Generador'
 		),
 
-		array (
+		array(
 			'field' => 'porcentaje_genera',
 			'title' => 'Porcentaje Generador',
 			'format' => 'number',
 		),
 
-		array (
+		array(
 			'field' => 'monto_genera',
 			'title' => 'Monto Generador',
 			'format' => 'number',
 		),
 
-		array (
+		array(
 			'field' => 'total_trabajado',
 			'title' => 'Total Trabajado',
 			'format' => 'number',
 		),
 
-		array (
+		array(
 			'field' => 'porcentaje_aporte_trabajos',
 			'title' => 'Porcentaje Trabajado',
 			'format' => 'number',
 		),
 
-		array (
+		array(
 			'field' => 'monto_aporte_pago_trabajos',
 			'title' => 'Monto Aporte Pago Trabajos',
 			'format' => 'number',
@@ -426,6 +438,8 @@ class FacturaProduccion {
 							factura.subtotal AS subtotal_facturado_original,
 							factura.iva AS impuesto_facturado_original,
 							factura.total AS total_facturado_original,
+							factura.total * 0.12 AS monto_detraccion,
+							factura.total * 0.88 AS total_liquido,
 							(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
 							prm_moneda_filtro.simbolo moneda,
 							SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS total_pagado,
