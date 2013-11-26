@@ -601,7 +601,6 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
  		'key' => 'AKIAIQYFL5PYVQKORTBA',
  		'secret' => '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'
  	));
-
 	$response = $s3->get_object_list($bucket, array('prefix' => "apps/$action_name/$app_guid/$os/1"));
 	if ($response && gettype($response) === 'array' && count($response)) {
 		$object = $s3->get_object_list($bucket, array('prefix' => "apps/$action_name/$app_guid/$os/1"));
@@ -623,7 +622,7 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 					"version" => $version,
 					"manifest" => $manifest,
 					"release_notes" => 'app://CHANGELOG.md',
-					"update_url" => $appudate->header['_info']['url']
+					"url" => $appudate->header['_info']['url']
 				),
 			)
 		);
@@ -632,18 +631,41 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 		"success" => "false",
 			"releases" => array(
 				array(
-					"version" => '1.1',
+					"version" => '0',
 					"manifest" => '',
 					"release_notes" => 'app://CHANGELOG.md',
-					"update_url" => 'localhost'
+					"url" => 'localhost'
 				),
 			)
 		);
-		//halt(__("Invalid params"), "InvalidParams");
 	}
 
 	outputJson($response);
 
+})->via('GET', 'POST');
+
+$Slim->map('/release-download', function () use ($Session, $Slim) {
+	$os = $Slim->request()->params('os');
+	$app_guid = $Slim->request()->params('guid');
+	$action_name = $Slim->request()->params('name');
+	$version = $Slim->request()->params('version');
+	$bucket = 'timebilling-uploads';
+	$s3 = new AmazonS3(array(
+ 		'key' => 'AKIAIQYFL5PYVQKORTBA',
+ 		'secret' => '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'
+ 	));
+	$appupdate = $s3->get_object_headers($bucket, "apps/$action_name/$app_guid/$os/$version/appupdate.zip");
+	if (!is_null($appupdate)) {
+		$url = $appupdate->header['_info']['url'];
+		$Slim->redirect($url);
+	} else {
+		halt(__("Invalid params"), "InvalidParams");
+	}
+})->via('GET', 'POST');
+
+$Slim->map('/app-track', function () use ($Session, $Slim) {
+	//TODO Implement analytics
+	outputJson(array('result' => 'OK'));
 })->via('GET', 'POST');
 
 $Slim->run();
