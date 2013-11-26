@@ -546,6 +546,111 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
+
+$Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+
+	$generators = Contrato::contractGenerators($Session, $contract_id);
+	outputJson($generators);
+
+});
+
+$Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session, $Slim) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+	if (is_null($generator_id) || empty($generator_id)) {
+		halt(__("Invalid generator ID"), "InvalidGeneratorId");
+	}
+
+	$percent_generator = $Slim->request()->params('percent_generator');
+	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator);
+	outputJson($generator);
+
+});
+
+$Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session, $Slim) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+	$percent_generator = $Slim->request()->params('percent_generator');
+	$user_id = $Slim->request()->params('user_id');
+
+	$generator = Contrato::createContractGenerator($Session, $client_id, $contract_id, $user_id, $percent_generator);
+	outputJson($generator);
+});
+
+
+
+$Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+	if (is_null($generator_id) || empty($generator_id)) {
+		halt(__("Invalid generator ID"), "InvalidGeneratorId");
+	}
+	Contrato::deleteContractGenerator($Session, $generator_id);
+	outputJson(array('result' => 'OK'));
+});
+
+
+$Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim) {
+
+	if ($report_code == 'TEST') {
+		outputJson($Slim->request()->params());
+		exit();
+	}
+	if (is_null($report_code) || empty($report_code)) {
+		halt(__("Invalid report Code"), "InvalidReportCode");
+	}
+	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+	$simpleReport = new SimpleReport($Session);
+	try {
+		$simpleReport->LoadWithType($report_code);
+		$reportClass = $simpleReport->GetClass($report_code);
+	} catch (Exception $e) {
+		halt(__("Invalid report Code"), "InvalidReportCode");
+	}
+
+	$reportObject = new $reportClass($Session, $report_code);
+	$query = ($simpleReport->fields['query']);
+	if (!isset($query)) {
+		$query = $reportObject->QueryReporte();
+	}
+	$params = $Slim->request()->params();
+	$results = $reportObject->ReportData($query, $params);
+	$results = $reportObject->ProcessReport($results, $params);
+	$reportObject->DownloadReport($results, 'Json');
+});
+
+$Slim->get('/reports', function () use ($Session, $Slim) {
+	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+	$user_id = validateAuthTokenSendByHeaders('REP');
+	$results = SimpleReport::LoadApiReports($Session);
+	outputJson(array('results' => $results));
+});
+
+$Slim->get('/currencies', function () use ($Session, $Slim) {
+	$results = Moneda::GetMonedas($Session, '', false);
+	outputJson(array('results' => $results));
+});
+
+
 $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 	if (isset($id)) {
 		$Invoice = new Factura($Session);
@@ -678,7 +783,7 @@ function downloadFile($name, $type, $content) {
 	echo $content;
 }
 
-function validateAuthTokenSendByHeaders() {
+function validateAuthTokenSendByHeaders($permission = null) {
 	global $Session, $Slim;
 
 	$UserToken = new UserToken($Session);
@@ -707,6 +812,20 @@ function validateAuthTokenSendByHeaders() {
 				'app_key' => $user_token->app_key
 			);
 			$UserToken->save($user_token_data);
+		}
+
+		if (!is_null($permission)) {
+			$User = new Usuario($Session);
+			if (!$User->LoadId($user_token_data['user_id'])) {
+				halt(__("The user doesn't exist"), "UserDoesntExist");
+			} else {
+				$User->LoadPermisos($user_token_data['user_id']);
+			 	$params_array['codigo_permiso'] = $permission;
+				$p = $User->permisos->Find('FindPermiso', $params_array);
+				if (!$p->fields['permitido']) {
+					halt(__('Not allowed'), "SecurityError");
+				}
+			}
 		}
 
 		return $user_token->user_id;

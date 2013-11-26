@@ -1028,7 +1028,7 @@ class NotaCobro extends Cobro {
 					        INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = 1
 					        INNER JOIN cobro_moneda tipo_cambio_base ON tipo_cambio_base.id_moneda = moneda_base.id_moneda AND tipo_cambio_base.id_cobro = cobro.id_cobro
 					        INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-					        INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente 
+					        INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 								WHERE
 							        cliente.activo = 1
 							        AND contrato.activo = 'SI'
@@ -2382,7 +2382,7 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS 
+				$query = "SELECT SQL_CALC_FOUND_ROWS
 							tramite.duracion,
 							tramite_tipo.glosa_tramite as glosa_tramite,
 							tramite.descripcion,
@@ -2434,6 +2434,8 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
+					$row = str_replace('%tramite_glosa%', ucfirst(stripslashes($tramite->fields['glosa_tramite'])), $row);
+					$row = str_replace('%tramite_descripcion%', ucfirst(stripslashes($tramite->fields['descripcion'])), $row);
 					$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
@@ -3546,7 +3548,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%direccion%', __('Dirección'), $html);
 				$html = str_replace('%cuenta_bancaria%', __('Cuenta'), $html);
 
-				$query = "SELECT 
+				$query = "SELECT
                                 CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado,
                                 usuario.rut,
                                 IFNULL(usuario.dv_rut, 'NA'),
@@ -4239,7 +4241,7 @@ class NotaCobro extends Cobro {
 					        INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = 1
 					        INNER JOIN cobro_moneda tipo_cambio_base ON tipo_cambio_base.id_moneda = moneda_base.id_moneda AND tipo_cambio_base.id_cobro = cobro.id_cobro
 					        INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-					        INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente 
+					        INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 								WHERE
 							        cliente.activo = 1
 							        AND contrato.activo = 'SI'
@@ -4259,7 +4261,7 @@ class NotaCobro extends Cobro {
 
 				$monto_saldo_cliente = $monto_saldo_adelantos + $monto_saldo_gastos + $monto_saldo_liquidaciones;
 
-				// echo '<b>Monto Saldo Cliente = </b>'.$monto_saldo_cliente.'</br>';				
+				// echo '<b>Monto Saldo Cliente = </b>'.$monto_saldo_cliente.'</br>';
 
 				if ( $monto_saldo_cliente < 0 ) {
 					$texto_saldo_favor_o_contra = 'Saldo en contra';
@@ -7400,7 +7402,7 @@ class NotaCobro extends Cobro {
 					        INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = 1
 					        INNER JOIN cobro_moneda tipo_cambio_base ON tipo_cambio_base.id_moneda = moneda_base.id_moneda AND tipo_cambio_base.id_cobro = cobro.id_cobro
 					        INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-					        INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente 
+					        INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 								WHERE
 							        cliente.activo = 1
 							        AND contrato.activo = 'SI'
@@ -8083,7 +8085,7 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS 
+				$query = "SELECT SQL_CALC_FOUND_ROWS
                 			tramite.duracion,
                 			tramite_tipo.glosa_tramite as glosa_tramite,
                 			tramite.descripcion,
@@ -8136,6 +8138,8 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
+					$row = str_replace('%tramite_glosa%', ucfirst(stripslashes($tramite->fields['glosa_tramite'])), $row);
+					$row = str_replace('%tramite_descripcion%', ucfirst(stripslashes($tramite->fields['descripcion'])), $row);
 
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
@@ -9123,7 +9127,7 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS 
+				$query = "SELECT SQL_CALC_FOUND_ROWS
 							tramite.duracion,
 							tramite_tipo.glosa_tramite as glosa_tramite,
 							tramite.descripcion,
@@ -9176,6 +9180,8 @@ class NotaCobro extends Cobro {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
+					$row = str_replace('%tramite_glosa%', ucfirst(stripslashes($tramite->fields['glosa_tramite'])), $row);
+					$row = str_replace('%tramite_descripcion%', ucfirst(stripslashes($tramite->fields['descripcion'])), $row);
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
 					//muestra las iniciales de los profesionales

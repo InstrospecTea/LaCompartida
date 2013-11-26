@@ -2417,6 +2417,29 @@ class Factura extends Objeto {
 		$Cobro->AgregarFactura($this);
 	}
 
+	public function ActualizaGeneradores() {
+		$id_contrato = $this->fields['id_contrato'];
+		$id_factura = $this->fields['id_factura'];
+		if (!is_null($id_contrato)) {
+			$sql = "DELETE FROM `factura_generador` WHERE `factura_generador`.`id_factura`=:id_factura";
+      $Statement = $this->sesion->pdodbh->prepare($sql);
+      $Statement->bindParam('id_factura', $id_factura);
+      $Statement->execute();
+      $generators = Contrato::contractGenerators($this->sesion, $id_contrato);
+      foreach ($generators as $generator) {
+      	$sql = "INSERT INTO `factura_generador`
+                SET `factura_generador`.`id_factura`=:id_factura, `factura_generador`.`id_contrato`=:id_contrato,
+                        `factura_generador`.`id_usuario`=:id_usuario, `factura_generador`.`porcentaje_genera`=:porcentaje_genera ";
+
+        $Statement = $this->sesion->pdodbh->prepare($sql);
+        $Statement->bindParam('id_factura', $id_factura);
+        $Statement->bindParam('id_contrato', $id_contrato);
+        $Statement->bindParam('id_usuario', $generator['id_usuario']);
+        $Statement->bindParam('porcentaje_genera', $generator['porcentaje_genera']);
+        $Statement->execute();
+      }
+		}
+	}
 }
 
 #end Class

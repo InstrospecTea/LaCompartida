@@ -55,7 +55,10 @@ class SimpleReport extends Objeto {
 		'RETRIBUCIONES_RESUMEN_DETALLE' => 'RetribucionesResumen.configuracion_subreporte',
 		'REPORTE_SALDO_CLIENTES' => 'ReportesEspecificos.configuracion_saldo_clientes',
 		'REPORTE_SALDO_CLIENTES_RESUMEN' => 'ReportesEspecificos.configuracion_saldo_clientes_resumen',
-//		'HORAS' => 'Trabajo',
+		'FACTURA_PRODUCCION' => 'FacturaProduccion',
+		'FACTURA_COBRANZA' => 'FacturaProduccion.configuracion_cobranza',
+		'FACTURA_COBRANZA_APLICADA' => 'FacturaProduccion.configuracion_cobranza_aplicada',
+		'GASTOS_NO_COBRABLES' => 'FacturaProduccion.configuracion_gastos'
 //		'TRAMITES' => 'Tramite',
 //		'ADELANTOS' => '',
 //		'USUARIOS' => 'Usuario'
@@ -154,8 +157,40 @@ class SimpleReport extends Objeto {
 		}
 
 		require_once $archivo_clase;
-
 		return $clase::${$configuracion};
+	}
+
+	public function GetClass($tipo) {
+		if (!empty($this->base_config)) {
+			return $this->base_config;
+		}
+
+		if (!isset(self::$tipos[$tipo])) {
+			throw new Exception('Error: Por favor seleccionar un tipo válido');
+		}
+
+		list($clase, $configuracion) = explode('.', self::$tipos[$tipo]);
+		$archivo_clase = Conf::ServerDir() . '/classes/' . $clase . '.php';
+
+		if (!$configuracion) {
+			$configuracion = 'configuracion_reporte';
+		}
+
+		require_once $archivo_clase;
+
+		return $clase;
+	}
+
+
+	public static function LoadApiReports($session, $id_usuario = null){
+		$query = "SELECT * FROM reporte_listado WHERE api_accessible = 1";
+		if (isset($id_usuario) && !is_null($id_usuario)) {
+			$query += " AND id_usuario = $id_usuario ";
+		}
+		$Statement = $session->pdodbh->prepare($query);
+		$Statement->execute();
+		$result = $Statement->fetchAll(PDO::FETCH_ASSOC);
+		return $result;
 	}
 
 	public function LoadConfiguration($tipo) {

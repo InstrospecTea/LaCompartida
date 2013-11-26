@@ -251,6 +251,10 @@ if ($opcion == "guardar") {
 				}
 			}
 
+			if (UtilesApp::GetConf($sesion, 'UsarModuloProduccion')) {
+				$factura->ActualizaGeneradores();
+			}
+
 			if (!$has_errors && $factura->Escribir()) {
 				if ($generar_nuevo_numero) {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio);
