@@ -64,7 +64,7 @@ class UserToken extends Objeto {
 		$expiry_date = strtotime(date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'))) . ' +1 month');
 		// if exist the auth_token then replace for the new one
 		if (is_object($user_token_data)) {
-			$sql = "UPDATE `user_token` SET `user_token`.`modified`=:modified, `user_token`.`expiry_date`=:expiry_date WHERE `user_token`.`user_id`=:id";
+			$sql = "UPDATE `user_token` SET `user_token`.`modified`=:modified, `user_token`.`expiry_date`=:expiry_date WHERE `user_token`.`id`=:id";
 			$Statement = $this->sesion->pdodbh->prepare($sql);
 			$Statement->bindParam('modified', date('Y-m-d H:i:s'));
 			$Statement->bindParam('expiry_date', date('Y-m-d H:i:s', $expiry_date));

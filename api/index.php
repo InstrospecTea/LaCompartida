@@ -685,7 +685,6 @@ function validateAuthTokenSendByHeaders() {
 	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
 	$user_token = $UserToken->findByAuthToken($auth_token);
-
 	// if not exist the auth_token then return error
 	if (!is_object($user_token)) {
 		halt(__('Invalid AUTH TOKEN'), "SecurityError");
