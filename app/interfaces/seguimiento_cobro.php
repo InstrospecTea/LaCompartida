@@ -137,26 +137,15 @@ if ($opc == 'buscar') {
 		$documentof = " cobro.documento ";
 	}
 	if (isset($_POST['tienehonorario']))
-    	$where.= " AND (
-			        SELECT count(id_tramite) 
-			        FROM  `trabajo` AS t1
-			        WHERE t1.id_cobro = cobro.id_cobro
-			        AND t1.id_tramite = 0
-	    ) > 0 ";
+		$where.=" AND documento.subtotal_honorarios>0";
+	if (isset($_POST['tienegastociva']))
+		$where.=" AND documento.subtotal_gastos>0";
+	if (isset($_POST['tienegastosiva']))
+		$where.=" AND documento.subtotal_gastos_sin_impuesto>0";
 	if (isset($_POST['tienegastos']))
-		$where.= " AND (
-					SELECT count(id_movimiento) 
-			        FROM cta_corriente c
-			        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null 
-			        group by c.id_cobro
-        ) IS NOT NULL ";
+		$where.=" AND documento.subtotal_gastos>0";
 	if (isset($_POST['tienetramites']))
-		$where.=" AND (
-					SELECT count(id_tramite) 
-			        FROM  `trabajo` AS t1
-			        WHERE t1.id_cobro = cobro.id_cobro
-			        AND t1.id_tramite != 0
-    	) > 0 ";
+		$where.=" AND documento.monto_tramites>0";
 
 
 
@@ -197,27 +186,7 @@ if ($opc == 'buscar') {
 					
 								
 								CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
-								tarifa.glosa_tarifa, 
-
-								(
-							        SELECT count(id_tramite) 
-							        FROM  `trabajo` AS t1
-							        WHERE t1.id_cobro = cobro.id_cobro
-							        AND t1.id_tramite != 0
-							    ) as tramites_count,
-							    (
-							        SELECT count(id_tramite) 
-							        FROM  `trabajo` AS t1
-							        WHERE t1.id_cobro = cobro.id_cobro
-							        AND t1.id_tramite = 0
-							    ) as trabajos_count, 
-							    (
-							    	SELECT count(id_movimiento) 
-							        FROM cta_corriente c
-							        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null 
-							        group by c.id_cobro
-								) as gastos_SiNo
-								";
+								tarifa.glosa_tarifa ";
 
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_seguimiento_cobro') : false;
 

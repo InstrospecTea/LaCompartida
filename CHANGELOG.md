@@ -3,7 +3,6 @@
 ## Hotfix: 13.6.20
 Viernes 25 de Noviembre 2013
 * **Fixed:** [Agrega saldo cliente a seccion DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/344)
-* **Fixed:** [Corrige el problema que cobros en el estado 'CREADO' y 'EN REVISION' aparecen al buscar cuando se usa filtros determinados](https://github.com/LemontechSA/ttb/pull/344)
 
 ## Hotfix: 13.6.19
 Viernes 22 de Noviembre 2013
