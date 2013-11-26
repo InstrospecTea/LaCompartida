@@ -1,10 +1,13 @@
 # Changelog
 
+## Hotfix: 13.6.20
+Viernes 25 de Noviembre 2013
+* **Fixed:** [Agrega saldo cliente a seccion DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/344)
+
 ## Hotfix: 13.6.19
 Viernes 22 de Noviembre 2013
 * **Fixed:** [Corrige que problema de calculo que evita generar facturas en pstbn](https://github.com/LemontechSA/ttb/pull/343)
 * **Fixed:** [Corrige que facturas pagadas no aparecen en el reporte deuda cliente](https://github.com/LemontechSA/ttb/pull/343)
-* **Added:** [Agrega saldo cliente a seccion DETALLE_COBRO en NotaCobro.php](https://github.com/LemontechSA/ttb/pull/343)
 
 ## Hotfix: 13.6.18
 Miércoles 20 de Noviembre 2013

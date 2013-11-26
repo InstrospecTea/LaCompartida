@@ -48,6 +48,7 @@ class SimpleReport extends Objeto {
 		'GASTOS' => 'Gasto',
 		'CLIENTES' => 'Cliente',
 		'ASUNTOS' => 'Asunto',
+		'ACTIVIDADES' => 'Actividad',
 		'RETRIBUCIONES_ENCABEZADO' => 'Retribuciones',
 		'RETRIBUCIONES_DETALLE' => 'Retribuciones.configuracion_subreporte',
 		'RETRIBUCIONES_RESUMEN_ENCABEZADO' => 'RetribucionesResumen',

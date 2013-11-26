@@ -10047,7 +10047,7 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
-	
+
 		case 7.49:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsaGiroClienteParametrizable', 0, 'Permite parametrizar los giros de lso clientes', 'boolean', 10, -1);";
@@ -10056,7 +10056,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `estado_pago` VARCHAR( 255 ) NULL DEFAULT NULL";
 			}
 			ejecutar($queries, $dbh);
-		break; 
+		break;
 
 		case 7.50:
 			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_generador` (
@@ -10110,8 +10110,10 @@ QUERY;
 				('FACTURA_PRODUCCION', NULL, '', '', '2013-09-12 19:12:53', '2013-09-12 19:13:21', NULL, 1, 'Facturación'),
 				('FACTURA_COBRANZA', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 1, 'Cobranza');";
 
+			$queries[] = "ALTER TABLE `user_token` CHANGE `modified` `modified` DATETIME NULL;";
+
 			ejecutar($queries, $dbh);
-			break;		
+			break;
 	}
 }
 
