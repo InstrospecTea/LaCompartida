@@ -752,16 +752,15 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 $Slim->map('/release-download', function () use ($Session, $Slim) {
 	$os = $Slim->request()->params('os');
 	$app_guid = $Slim->request()->params('guid');
-	$action_name = $Slim->request()->params('name');
+	$action_name = 'app-update';
 	$version = $Slim->request()->params('version');
 	$bucket = 'timebilling-uploads';
 	$s3 = new AmazonS3(array(
  		'key' => 'AKIAIQYFL5PYVQKORTBA',
  		'secret' => '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'
  	));
-	$appupdate = $s3->get_object_headers($bucket, "apps/$action_name/$app_guid/$os/$version/appupdate.zip");
-	if (!is_null($appupdate)) {
-		$url = $appupdate->header['_info']['url'];
+	$url = $s3->get_object_url($bucket, "apps/$action_name/$app_guid/$os/$version/appupdate.zip");
+	if (!is_null($url)) {
 		$Slim->redirect($url);
 	} else {
 		halt(__("Invalid params"), "InvalidParams");
