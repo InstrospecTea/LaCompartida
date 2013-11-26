@@ -1,5 +1,15 @@
 # Changelog
 
+## Release: 13.7.0
+Martes 26 de Noviembre 2013
+
+* **Feature:** [Agrega Giro cliente parametrizable y Estado Pago Proveedor](https://github.com/LemontechSA/ttb/pull/317)
+* **Feature:** [API updates](https://github.com/LemontechSA/ttb/pull/345)
+* **Feature:** [Informe producción](https://github.com/LemontechSA/ttb/pull/310)
+* **Fixed:** [Muestra último cobro del contrato](https://github.com/LemontechSA/ttb/pull/330)
+* **Fixed:** [Modificaciones al comparar descuento con CAP](https://github.com/LemontechSA/ttb/pull/336)
+* **Fixed:** [Modificacion actividades](https://github.com/LemontechSA/ttb/pull/325)
+
 ## Hotfix: 13.6.20
 Viernes 25 de Noviembre 2013
 * **Fixed:** [Agrega saldo cliente a seccion DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/344)
