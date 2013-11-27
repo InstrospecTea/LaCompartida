@@ -1054,11 +1054,6 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-				if ( ($monto_saldo_adelantos - $monto_saldo_gastos) == 0) {
-					$texto_saldo_favor_o_contra = '';
-					$monto_saldo_final = '';
-				}
-
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
@@ -4255,13 +4250,7 @@ class NotaCobro extends Cobro {
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
-				// echo '<b>Monto Saldo Adelantos = </b>'.$monto_saldo_adelantos.'</br>';
-				// echo '<b>Monto Saldo Gastos = </b>'.$monto_saldo_gastos.'</br>';
-				// echo '<b>Monto Saldo Liquidaciones = </b>'.$monto_saldo_liquidaciones.'</br>';
-
 				$monto_saldo_cliente = $monto_saldo_adelantos + $monto_saldo_gastos + $monto_saldo_liquidaciones;
-
-				// echo '<b>Monto Saldo Cliente = </b>'.$monto_saldo_cliente.'</br>';
 
 				if ( $monto_saldo_cliente < 0 ) {
 					$texto_saldo_favor_o_contra = 'Saldo en contra';
@@ -4272,11 +4261,6 @@ class NotaCobro extends Cobro {
 				$monto_saldo_liquidaciones = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_liquidaciones, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
-				// if ( ($monto_saldo_adelantos - $monto_saldo_gastos) == 0) {
-				// 	$texto_saldo_favor_o_contra = '';
-				// 	$monto_saldo_final = '';
-				// }
 
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
@@ -7427,11 +7411,6 @@ class NotaCobro extends Cobro {
 				$monto_saldo_liquidaciones = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_liquidaciones, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
-				if ( ($monto_saldo_adelantos - $monto_saldo_gastos) == 0) {
-					$texto_saldo_favor_o_contra = '';
-					$monto_saldo_final = '';
-				}
 
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);

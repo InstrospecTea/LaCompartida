@@ -3031,7 +3031,7 @@ if ($solicitante == 0) {  // no mostrar
 					<!-- ASOCIAR DOC LEGALES -->
 
 				<!-- Modulo de -->
-				<? if (UtilesApp::GetConf($sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
+				<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
 					<script>
 						jQuery('document').ready(function() {
 							var $ = jQuery;
