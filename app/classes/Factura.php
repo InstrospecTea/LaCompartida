@@ -612,7 +612,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%ciudad%', $CiudadSignatura, $html2);
 				$html2 = str_replace('%LogoDoc%', $logo_doc, $html2);
 
-				$query = "SELECT 
+				$query = "SELECT
 								contrato.titulo_contacto,
 								contrato.contacto,
 								contrato.apellido_contacto,
@@ -624,7 +624,7 @@ class Factura extends Objeto {
 								prm_documento_legal.glosa,
 								contrato.factura_ciudad,
 								prm_pais.nombre as nombre_pais,
-								contrato.fono_contacto as fono_contacto, 
+								contrato.fono_contacto as fono_contacto,
 								contrato.factura_telefono
 							FROM contrato
 							LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
@@ -635,7 +635,7 @@ class Factura extends Objeto {
 							WHERE id_factura=" . $this->fields['id_factura'];
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				
+
 				list (	$titulo_contacto,
 						$contacto,
 						$apellido_contacto,
@@ -1138,7 +1138,7 @@ class Factura extends Objeto {
 				}
 				$html2 = str_replace('%glosa_moneda_factura%', '%' . $cobro_moneda->moneda[$factura_id_moneda]['glosa_moneda'] . '%', $html2);
 				$html2 = str_replace('%Peso%', 'PESOS', $html2);
-				
+
 				if ($lang == 'es') {
 					$html2 = str_replace('%asunto%', 'ASUNTO', $html2);
 					$html2 = str_replace('%Dólar%', 'DÓLARES', $html2);
@@ -1488,8 +1488,8 @@ class Factura extends Objeto {
 
 
 				$query_moneda_diff = "SELECT cobro_moneda.tipo_cambio, prm_moneda.simbolo , prm_moneda.cifras_decimales
-							FROM cobro_moneda 
-							LEFT JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda 
+							FROM cobro_moneda
+							LEFT JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
 							WHERE cobro_moneda.id_cobro = '" . $this->fields['id_cobro'] . "' AND cobro_moneda.id_moneda = '" . $id_moneda_cobro . "' ";
 
 				$resp_moneda_diff = mysql_query($query_moneda_diff, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_diff, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1509,7 +1509,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
 				} else {
 
-					/*   SE CONSIDERA SOLAMENTE HONORARIOS SIN IMPUESTO 
+					/*   SE CONSIDERA SOLAMENTE HONORARIOS SIN IMPUESTO
 					 *  DEBIDO A QUE LA FACTURA DEBE HACER UNA SUMA DEL IMPUESTO POR SEPARADO
 					 */
 
@@ -1919,6 +1919,17 @@ class Factura extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $id;
+	}
+
+	function GetPais() {
+		$query = "SELECT prm_pais.nombre
+			  FROM factura
+			 INNER JOIN contrato ON factura.id_contrato = contrato.id_contrato
+			 INNER JOIN prm_pais ON contrato.id_pais = prm_pais.id_pais
+			 WHERE factura.id_factura = {$this->fields[$this->campo_id]};";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($pais) = mysql_fetch_array($resp);
+		return $pais;
 	}
 
 	function GetlistaCobroSoyDatoFactura($id = null, $tipo = null, $numero = null, $serie = null) {

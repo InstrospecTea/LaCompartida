@@ -3,6 +3,7 @@
 ## Hotfix: 13.7.1
 Miercoles 27 de Noviembre 2013
 * **Fixed:** [Corrige asi que los saldos adeudados no aparecen cuando el cobro esta pagado o su saldo se eleva a 0](https://github.com/LemontechSA/ttb/pull/348)
+* **Fixed:** [Corrige la filtracion de cobros en terminos de "tiene Tramites"](https://github.com/LemontechSA/ttb/pull/348)
 
 ## Release: 13.7.0
 Martes 26 de Noviembre 2013
