@@ -92,7 +92,7 @@ if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT',
 $doc = new DocGenerator($html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'], $orientacion_papel, $docm_top, $docm_right, $docm_bottom, $docm_left, $cobro->fields['estado'], $id_formato, '', $docm_header, $docm_footer, $lang, $Sesion);
 $valor_unico = substr(time(), -3);
 
-//echo '<style>'.$cssData.'</style>'.$html; exit;
+echo '<style>'.$cssData.'</style>'.$html; exit;
 
 if ($enpdf) {
     require_once '../dompdf/dompdf_config.inc.php';
