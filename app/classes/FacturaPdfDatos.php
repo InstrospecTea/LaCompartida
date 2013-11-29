@@ -106,9 +106,6 @@ class FacturaPdfDatos extends Objeto {
 			$array_comodines[$codigo] = $glosa;
 		}
 
-		echo 'codigo =<b>'.$codigo.'</b><br>';
-		echo 'glosa =<b>'.$glosa.'</b><br>'; exit;
-
 		$arreglo_monedas = ArregloMonedas($this->sesion);
 		$monto_palabra=new MontoEnPalabra($this->sesion);
 
