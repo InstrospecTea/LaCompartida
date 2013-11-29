@@ -10346,14 +10346,14 @@ class NotaCobro extends Cobro {
 
 						$resp = mysql_query($query_saldo_adeudado, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adeudado, __FILE__, __LINE__, $this->sesion->dbh);
 
-						while (list($c_numero_cobro, $c_numero_factura, $d_fecha_documento, $d_subtotal_honorarios, $c_montogastos, $d_simbolo_moneda_documento, $d_saldo_honorarios, $d_saldo_gasto, $d_honorarios_pagados, $d_gastos_pagados) = mysql_fetch_array($resp)) {
+						while (list($d_numero_cobro, $c_numero_factura, $d_fecha_documento, $d_simbolo_moneda_documento, $d_subtotal_honorarios, $c_montogastos, $d_saldo_honorarios, $d_saldo_gasto, $d_honorarios_pagados, $d_gastos_pagados) = mysql_fetch_array($resp)) {
 
 							$saldo_adeudado = $d_saldo_honorarios + $d_saldo_gasto;
 
 							$row = $row_tmpl;
 
 							//Lyr
-							$row = str_replace('%numero_nota_cobro%', $c_numero_cobro, $row);
+							$row = str_replace('%numero_nota_cobro%', $d_numero_cobro, $row);
 							$row = str_replace('%numero_factura%', $c_numero_factura ? $c_numero_factura : ' - ', $row);
 							$row = str_replace('%fecha%', Utiles::sql2fecha($d_fecha_documento, '%d-%m-%Y'), $row);
 							$row = str_replace('%moneda_total%', $d_simbolo_moneda_documento . '&nbsp;', $row);
