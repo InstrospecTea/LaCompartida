@@ -38,7 +38,7 @@ $pagina->PrintTop($popup);
 			<form name="form_archivo" id="form_archivo" method="post" action="" enctype="multipart/form-data">
 				<input type="hidden" name="opc" id="opc" value="subir_excel" />
 				Subir excel modificado: <input type="file" name="archivo_data" />
-				<input type="button" value="<?= __('Cargar Documento') ?>" class="btn" onclick="confirmar(this.form);" />
+				<input type="button" value="<?php echo  __('Cargar Documento') ?>" class="btn" onclick="confirmar(this.form);" />
 				<br />
 				<?php
 				if ($opc == 'subir_excel') {
