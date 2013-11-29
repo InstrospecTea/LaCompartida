@@ -39,7 +39,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 	}
 
 	if (!$Session->login($user, $dv, $password)) {
-		halt(__("The user doesn't exist"), "UserDoesntExist");
+		halt(__("User or password is incorrect"), "UserDoesntExist");
 	} else {
 		$user_token_data = array(
 			'user_id' => $Session->usuario->fields['id_usuario'],

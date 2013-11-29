@@ -1099,6 +1099,7 @@ $_LANG["Expired AUTH TOKEN"] = "Sesión de usuario expiró";
 $_LANG["Invalid user data"] = "Datos del usuario inválidos";
 $_LANG["Invalid user ID"] = "Identificación del usuario inválida";
 $_LANG["The user doesn't exist"] = "El usuario no existe";
+$_LANG["User or password is incorrect"] = "El usuario o el password es incorrecto";
 $_LANG["Invalid password data"] = "El password es incorrecto";
 $_LANG["Invalid application key data"] = "Aplicación no válida";
 $_LANG["Invalid client code"] = "El código del cliente no es válido";
