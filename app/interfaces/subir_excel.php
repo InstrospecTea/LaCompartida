@@ -40,9 +40,10 @@ $pagina->PrintTop($popup);
 				Subir excel modificado: <input type="file" name="archivo_data" />
 				<input type="button" value="<?= __('Cargar Documento') ?>" class="btn" onclick="confirmar(this.form);" />
 				<br />
-				<?php if($opc=='subir_excel') {
+				<?php
+				if ($opc == 'subir_excel') {
 					// Esta función actualiza los trabajos y entrega feedback del resultado.
-					echo '<br /><span align="center">'.Trabajo::ActualizarConExcel($archivo_data, $sesion).'</span>';
+					echo '<br /><span align="center">' . Trabajo::ActualizarConExcel($archivo_data, $sesion) . '</span>';
 				}
 				?>
 			</form>
@@ -50,4 +51,4 @@ $pagina->PrintTop($popup);
 	</tr>
 </table>
 
-<?php $pagina->PrintBottom( $popup ); ?>
+<?php $pagina->PrintBottom($popup); ?>

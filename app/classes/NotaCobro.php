@@ -10418,9 +10418,7 @@ class NotaCobro extends Cobro {
 				} else {
 
 					$query_saldo_adeudado_total= "
-							SELECT 
-
-								SUM(d.saldo_honorarios + d.saldo_gastos) as saldo_total
+							SELECT SUM(d.saldo_honorarios + d.saldo_gastos) as saldo_total
 								FROM documento d
 							LEFT JOIN cobro c ON d.id_cobro = c.id_cobro
 								WHERE d.codigo_cliente = '".$this->fields['codigo_cliente']."'
@@ -10437,8 +10435,6 @@ class NotaCobro extends Cobro {
 					list($saldo_total) = mysql_fetch_array($resp);
 					$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($saldo_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
-
-				
 
 				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
 				break;
