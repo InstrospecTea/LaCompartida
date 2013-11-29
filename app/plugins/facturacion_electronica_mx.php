@@ -269,8 +269,10 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
-	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
-		$r['DOR'][] = 'pais|' . ($Factura->fields['ciudad_cliente']);
+	$pais = $Factura->GetPais();
+
+	if (!is_null($pais) && !empty($pais)) {
+		$r['DOR'][] = 'pais|' . $pais;
 	}
 	if (!is_null($Factura->fields['factura_codigopostal']) && !empty($Factura->fields['factura_codigopostal'])) {
 		$r['DOR'][] = 'codigoPostal|' . ($Factura->fields['factura_codigopostal']);

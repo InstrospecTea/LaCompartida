@@ -1054,11 +1054,6 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-				if ( ($monto_saldo_adelantos - $monto_saldo_gastos) == 0) {
-					$texto_saldo_favor_o_contra = '';
-					$monto_saldo_final = '';
-				}
-
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
@@ -4255,13 +4250,7 @@ class NotaCobro extends Cobro {
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
-				// echo '<b>Monto Saldo Adelantos = </b>'.$monto_saldo_adelantos.'</br>';
-				// echo '<b>Monto Saldo Gastos = </b>'.$monto_saldo_gastos.'</br>';
-				// echo '<b>Monto Saldo Liquidaciones = </b>'.$monto_saldo_liquidaciones.'</br>';
-
 				$monto_saldo_cliente = $monto_saldo_adelantos + $monto_saldo_gastos + $monto_saldo_liquidaciones;
-
-				// echo '<b>Monto Saldo Cliente = </b>'.$monto_saldo_cliente.'</br>';
 
 				if ( $monto_saldo_cliente < 0 ) {
 					$texto_saldo_favor_o_contra = 'Saldo en contra';
@@ -4272,11 +4261,6 @@ class NotaCobro extends Cobro {
 				$monto_saldo_liquidaciones = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_liquidaciones, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
-				// if ( ($monto_saldo_adelantos - $monto_saldo_gastos) == 0) {
-				// 	$texto_saldo_favor_o_contra = '';
-				// 	$monto_saldo_final = '';
-				// }
 
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
@@ -7428,11 +7412,6 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-				if ( ($monto_saldo_adelantos - $monto_saldo_gastos) == 0) {
-					$texto_saldo_favor_o_contra = '';
-					$monto_saldo_final = '';
-				}
-
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
@@ -10283,28 +10262,26 @@ class NotaCobro extends Cobro {
 
 				$totales = $totalescontrato['contrato'];
 				$totalescobro = $totalescontrato[$this->fields['id_cobro']];
-
-
+					
 				if (count($facturasRS) > 0) {
-					foreach ($facturasRS as $facturanumero => $facturaarray) {
-						$factura = $facturaarray[0];
-						$factura['facturanumero'] = $facturanumero;
 
-						$monto_honorarios = number_format($factura['subtotal_honorarios'], $factura['cifras_decimales'], '.', '');
-						$monto_gastos_c_iva = number_format($factura['subtotal_gastos'], $factura['cifras_decimales'], '.', '');
-						$monto_gastos_s_iva = number_format($factura['subtotal_gastos_sin_impuesto'], $factura['cifras_decimales'], '.', '');
-						$monto_gastos = $monto_gastos_c_iva + $monto_gastos_s_iva;
+					if ($nuevomodulofactura) {
 
-						$monto_honorarios_moneda = $monto_honorarios * $factura['tasa_cambio'];
-						$monto_gastos_c_iva_moneda = $monto_gastos_c_iva * $factura['tasa_cambio'];
-						$monto_gastos_s_iva_moneda = $monto_gastos_s_iva * $factura['tasa_cambio'];
-						$monto_gastos_moneda = $monto_gastos * $factura['tasa_cambio'];
+						foreach ($facturasRS as $facturanumero => $facturaarray) {
 
+							$factura = $facturaarray[0];
+							$factura['facturanumero'] = $facturanumero;
 
-						$total_en_moneda = $monto_honorarios_moneda = $total_honorarios * ($factura['tipo_cambio_moneda'] / $factura['tipo_cambio']);
-
-
-						if ($nuevomodulofactura) {
+							$monto_honorarios = number_format($factura['subtotal_honorarios'], $factura['cifras_decimales'], '.', '');
+							$monto_gastos_c_iva = number_format($factura['subtotal_gastos'], $factura['cifras_decimales'], '.', '');
+							$monto_gastos_s_iva = number_format($factura['subtotal_gastos_sin_impuesto'], $factura['cifras_decimales'], '.', '');
+							$monto_gastos = $monto_gastos_c_iva + $monto_gastos_s_iva;
+							$monto_honorarios_moneda = $monto_honorarios * $factura['tasa_cambio'];
+							$monto_gastos_c_iva_moneda = $monto_gastos_c_iva * $factura['tasa_cambio'];
+							$monto_gastos_s_iva_moneda = $monto_gastos_s_iva * $factura['tasa_cambio'];
+							$monto_gastos_moneda = $monto_gastos * $factura['tasa_cambio'];
+							$total_en_moneda = $monto_honorarios_moneda = $total_honorarios * ($factura['tipo_cambio_moneda'] / $factura['tipo_cambio']);
+							
 							if ($factura['incluye_honorarios'] == 1) {
 								$saldo_honorarios = -1 * $factura['saldo'];
 								$saldo_gastos = 0;
@@ -10312,50 +10289,96 @@ class NotaCobro extends Cobro {
 								$saldo_honorarios = 0;
 								$saldo_gastos = -1 * $factura['saldo'];
 							}
-						} else {
-							$saldo_honorarios = $factura['saldo_honorarios'];
-							$saldo_gastos = $factura['saldo_gastos'];
+
+							if (($saldo_honorarios + $saldo_gastos) == 0) {
+								continue;
+							}
+
+							$row = $row_tmpl;
+							$row = str_replace('%numero_nota_cobro%', $factura['id_cobro'], $row);
+							$row = str_replace('%numero_factura%', $factura['facturanumero'] ? $factura['facturanumero'] : ' - ', $row);
+							$row = str_replace('%fecha%', Utiles::sql2fecha($factura['fecha_enviado_cliente'], '%d-%m-%Y') == 'No existe fecha' ? Utiles::sql2fecha($factura['fecha_emision'], '%d-%m-%Y') : Utiles::sql2fecha($factura['fecha_enviado_cliente'], '%d-%m-%Y'), $row);
+							$row = str_replace('%moneda%', $factura['simbolo'] . '&nbsp;', $row);
+							$row = str_replace('%moneda_total%', $factura['simbolo_moneda_total'] . '&nbsp;', $row);
+
+							$row = str_replace('%monto_honorarios%', number_format($monto_honorarios, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_honorarios_moneda%', number_format($monto_honorarios_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace('%monto_gastos_c_iva%', number_format($monto_gastos_c_iva, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_gastos_c_iva_moneda%', number_format($monto_gastos_c_iva_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace('%monto_gastos_s_iva%', number_format($monto_gastos_s_iva, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_gastos_s_iva_moneda%', number_format($monto_gastos_s_iva_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace('%monto_gastos%', number_format($monto_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_gastos_moneda%', number_format($monto_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace('%monto_total%', number_format($monto_gastos + $monto_honorarios, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace('%saldo_honorarios%', number_format($saldo_honorarios, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%saldo_gastos%', number_format($saldo_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace(array('%saldo_total%', '%monto_moroso_documento%'), number_format($saldo_honorarios + $saldo_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+							$row = str_replace('%monto_moroso_moneda_total%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_moroso%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							
+							$html.=$row;
 						}
 
-						if (($saldo_honorarios + $saldo_gastos) == 0)
-							continue;
+					} else {
 
+						$query_saldo_adeudado = "
+							SELECT d.id_cobro, c.documento, d.fecha, prm_m.simbolo, d.subtotal_honorarios, c.monto_gastos,d.saldo_honorarios, d.saldo_gastos, d.honorarios_pagados, d.gastos_pagados
+								FROM documento d
+							LEFT JOIN cobro c ON d.id_cobro = c.id_cobro
+							LEFT JOIN prm_moneda prm_m ON d.id_moneda = prm_m.id_moneda
+								WHERE d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									AND (d.saldo_honorarios + d.saldo_gastos) > 0
+									AND c.documento IS NOT NULL
+								    AND c.id_cobro IS NOT NULL
+									AND c.estado != 'CREADO'
+									AND c.estado != 'EMITIDO'
+									AND c.estado != 'EN REVISION'
+									AND c.estado != 'INCOBRABLE'
+									AND c.estado != 'PAGADO'
+									GROUP BY id_cobro";
 
-						$row = $row_tmpl;
-						$row = str_replace('%numero_nota_cobro%', $factura['id_cobro'], $row);
-						$row = str_replace('%numero_factura%', $factura['facturanumero'] ? $factura['facturanumero'] : ' - ', $row);
-						$row = str_replace('%fecha%', Utiles::sql2fecha($factura['fecha_enviado_cliente'], '%d-%m-%Y') == 'No existe fecha' ? Utiles::sql2fecha($factura['fecha_emision'], '%d-%m-%Y') : Utiles::sql2fecha($factura['fecha_enviado_cliente'], '%d-%m-%Y'), $row);
-						$row = str_replace('%moneda%', $factura['simbolo'] . '&nbsp;', $row);
-						$row = str_replace('%moneda_total%', $factura['simbolo_moneda_total'] . '&nbsp;', $row);
+						$resp = mysql_query($query_saldo_adeudado, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adeudado, __FILE__, __LINE__, $this->sesion->dbh);
 
+						while (list($d_numero_cobro, $c_numero_factura, $d_fecha_documento, $d_simbolo_moneda_documento, $d_subtotal_honorarios, $c_montogastos, $d_saldo_honorarios, $d_saldo_gasto, $d_honorarios_pagados, $d_gastos_pagados) = mysql_fetch_array($resp)) {
 
-						$row = str_replace('%monto_honorarios%', number_format($monto_honorarios, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto_honorarios_moneda%', number_format($monto_honorarios_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$saldo_adeudado = $d_saldo_honorarios + $d_saldo_gasto;
 
-						$row = str_replace('%monto_gastos_c_iva%', number_format($monto_gastos_c_iva, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto_gastos_c_iva_moneda%', number_format($monto_gastos_c_iva_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = $row_tmpl;
 
-						$row = str_replace('%monto_gastos_s_iva%', number_format($monto_gastos_s_iva, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto_gastos_s_iva_moneda%', number_format($monto_gastos_s_iva_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							//Lyr
+							$row = str_replace('%numero_nota_cobro%', $d_numero_cobro, $row);
+							$row = str_replace('%numero_factura%', $c_numero_factura ? $c_numero_factura : ' - ', $row);
+							$row = str_replace('%fecha%', Utiles::sql2fecha($d_fecha_documento, '%d-%m-%Y'), $row);
+							$row = str_replace('%moneda_total%', $d_simbolo_moneda_documento . '&nbsp;', $row);
+							$row = str_replace('%monto_moroso_documento%', number_format($saldo_adeudado, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
-						$row = str_replace('%monto_gastos%', number_format($monto_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto_gastos_moneda%', number_format($monto_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							//Modulo Facturacion
+							$row = str_replace('%moneda%', $factura['simbolo'] . '&nbsp;', $row);
 
-						$row = str_replace('%monto_total%', number_format($monto_gastos + $monto_honorarios, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_honorarios%', number_format($d_subtotal_honorarios, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_gastos%', number_format($c_montogastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
+							$row = str_replace('%saldo_honorarios%', number_format($d_saldo_honorarios, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%saldo_gastos%', number_format($d_saldo_gasto, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
-						$row = str_replace('%saldo_honorarios%', number_format($saldo_honorarios, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%saldo_gastos%', number_format($saldo_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%monto_moroso_moneda_total%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							
+							$html.=$row;
+						}
 
-						$row = str_replace(array('%saldo_total%', '%monto_moroso_documento%'), number_format($saldo_honorarios + $saldo_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-
-						$row = str_replace('%monto_moroso_moneda_total%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$row = str_replace('%monto_moroso%', number_format(($monto_gastos_moneda + $monto_honorarios_moneda), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						$html.=$row;
 					}
+
 				} else {
 					$html = str_replace('%numero_nota_cobro%', __('No hay facturas adeudadas'), $html);
 				}
+
 				break;
 
 			case 'MOROSIDAD_HONORARIOS_TOTAL': //GenerarDocumentoComun
@@ -10389,8 +10412,29 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%fecha%', '', $html);
 				$html = str_replace('%moneda%', __('Total Adeudado') . ':', $html);
 
-				$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format(($totales['saldo_honorarios'] + $totales['saldo_gastos']), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%monto_moroso%', $totales['simbolo_moneda_total'] . $this->espacio . number_format(($totales['saldo_gastos_moneda'] + $totales['saldo_honorarios_moneda']), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				if ($nuevomodulofactura) {
+					$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format(($totales['saldo_honorarios'] + $totales['saldo_gastos']), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%monto_moroso%', $totales['simbolo_moneda_total'] . $this->espacio . number_format(($totales['saldo_gastos_moneda'] + $totales['saldo_honorarios_moneda']), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);	
+				} else {
+
+					$query_saldo_adeudado_total= "
+							SELECT SUM(d.saldo_honorarios + d.saldo_gastos) as saldo_total
+								FROM documento d
+							LEFT JOIN cobro c ON d.id_cobro = c.id_cobro
+								WHERE d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									AND (d.saldo_honorarios + d.saldo_gastos) > 0
+									AND c.documento IS NOT NULL
+								    AND c.id_cobro IS NOT NULL
+									AND c.estado != 'CREADO'
+									AND c.estado != 'EMITIDO'
+									AND c.estado != 'EN REVISION'
+									AND c.estado != 'INCOBRABLE'
+									AND c.estado != 'PAGADO'";
+
+					$resp = mysql_query($query_saldo_adeudado_total, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adeudado_total, __FILE__, __LINE__, $this->sesion->dbh);
+					list($saldo_total) = mysql_fetch_array($resp);
+					$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($saldo_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
 
 				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
 				break;

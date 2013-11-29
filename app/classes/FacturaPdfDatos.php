@@ -182,6 +182,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'lugar':
 				$glosa_dato = UtilesApp::GetConf($this->sesion, 'LugarFacturacion');
 				break;
+			case 'id_cobro':
+				$glosa_dato = $factura->fields['id_cobro'];
+				break;
 			case 'nota_factura':
 				$glosa_dato = $condicion_pago;
 				break;
@@ -323,6 +326,7 @@ class FacturaPdfDatos extends Objeto {
 		$fila['giro_cliente'] = $factura->fields['giro_cliente'];
 		$fila['lugar'] = UtilesApp::GetConf($this->sesion, 'LugarFacturacion');
 		$fila['nota_factura'] = $factura->fields['condicion_pago'];
+		$fila['id_cobro'] = $factura->fields['id_cobro'];
 		$fila['fecha_dia'] = date("d",strtotime($factura->fields['fecha']));
 		$fila['fecha_mes'] = strftime("%B",strtotime($factura->fields['fecha']));
 		$fila['fecha_numero_mes'] = strftime("%m",strtotime($factura->fields['fecha']));

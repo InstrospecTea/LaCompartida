@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 13.7.1
+Miercoles 27 de Noviembre 2013
+* **Fixed:** [Corrige asi que los saldos adeudados no aparecen cuando el cobro esta pagado o su saldo se eleva a 0](https://github.com/LemontechSA/ttb/pull/348)
+* **Fixed:** [Corrige la filtracion de cobros en terminos de "tiene Tramites"](https://github.com/LemontechSA/ttb/pull/348)
+
 ## Release: 13.7.0
 Martes 26 de Noviembre 2013
 
@@ -11,7 +16,7 @@ Martes 26 de Noviembre 2013
 * **Fixed:** [Modificacion actividades](https://github.com/LemontechSA/ttb/pull/325)
 
 ## Hotfix: 13.6.20
-Viernes 25 de Noviembre 2013
+Lunes 25 de Noviembre 2013
 * **Fixed:** [Agrega saldo cliente a seccion DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/344)
 
 ## Hotfix: 13.6.19
