@@ -71,6 +71,18 @@ class FacturaProduccion {
 			'title' => 'Total Facturado Original'
 		),
 		array(
+			'field' => 'monto_detraccion_original',
+			'format' => 'number',
+			'title' => 'Monto Detracción Original',
+			'visible' => false
+		),
+		array(
+			'field' => 'total_liquido_original',
+			'format' => 'number',
+			'title' => 'Total Líquido Original',
+			'visible' => false
+		),
+		array(
 			'field' => 'moneda',
 			'title' => 'Moneda'
 		),
@@ -78,6 +90,18 @@ class FacturaProduccion {
 			'field' => 'total',
 			'format' => 'number',
 			'title' => 'Total Facturado'
+		),
+		array(
+			'field' => 'monto_detraccion',
+			'format' => 'number',
+			'title' => 'Monto Detracción',
+			'visible' => false
+		),
+		array(
+			'field' => 'total_liquido',
+			'format' => 'number',
+			'title' => 'Total Líquido',
+			'visible' => false
 		),
 		array(
 			'field' => 'tipo_cambio',
@@ -182,6 +206,18 @@ class FacturaProduccion {
 			'field' => 'total_facturado_original',
 			'format' => 'number',
 			'title' => 'Total Facturado Original'
+		),
+		array(
+			'field' => 'monto_detraccion_original',
+			'format' => 'number',
+			'title' => 'Monto Detracción Original',
+			'visible' => false
+		),
+		array(
+			'field' => 'total_liquido_original',
+			'format' => 'number',
+			'title' => 'Total Líquido Original',
+			'visible' => false
 		),
 		array(
 			'field' => 'moneda',
@@ -313,6 +349,18 @@ class FacturaProduccion {
 			'title' => 'Total Facturado Original'
 		),
 		array(
+			'field' => 'monto_detraccion_original',
+			'format' => 'number',
+			'title' => 'Monto Detracción Original',
+			'visible' => false
+		),
+		array(
+			'field' => 'total_liquido_original',
+			'format' => 'number',
+			'title' => 'Total Líquido Original',
+			'visible' => false
+		),
+		array(
 			'field' => 'moneda',
 			'title' => 'Moneda'
 		),
@@ -325,6 +373,18 @@ class FacturaProduccion {
 			'field' => 'total_facturado',
 			'format' => 'number',
 			'title' => 'Total Facturado'
+		),
+		array(
+			'field' => 'monto_detraccion',
+			'format' => 'number',
+			'title' => 'Monto Detracción',
+			'visible' => false
+		),
+		array(
+			'field' => 'total_liquido',
+			'format' => 'number',
+			'title' => 'Total Líquido',
+			'visible' => false
 		),
 		array(
 			'field' => 'tipo_cambio',
@@ -525,10 +585,14 @@ public static $configuracion_gastos = array(
 						prm_documento_legal.codigo AS tipo,
 						factura.fecha,
 						moneda_factura.simbolo AS moneda_original,
-						factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total,
+						factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total,
 						factura.subtotal AS subtotal_facturado_original,
 						factura.iva AS impuesto_facturado_original,
 						factura.total AS total_facturado_original,
+						(factura.total * 0.12)  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_detraccion,
+						(factura.subtotal - (factura.total * 0.12))  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
+						factura.total * 0.12 AS monto_detraccion_original,
+						factura.subtotal - (factura.total * 0.12) AS total_liquido_original,
 						(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
 						moneda_filtro.simbolo moneda,
 						usuario.id_usuario id_usuario_generador,
@@ -567,12 +631,14 @@ public static $configuracion_gastos = array(
 							fp.fecha as fecha_pago,
 							prm_moneda.simbolo AS moneda_original,
 							cobro.monto_subtotal * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_cobro,
-							factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
+							factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
 							factura.subtotal AS subtotal_facturado_original,
 							factura.iva AS impuesto_facturado_original,
 							factura.total AS total_facturado_original,
-							factura.total * 0.12 AS monto_detraccion,
-							factura.total * 0.88 AS total_liquido,
+							(factura.total * 0.12) * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_detraccion,
+							(factura.subtotal - (factura.total * 0.12)) * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
+							factura.total * 0.12 AS monto_detraccion_original,
+							factura.subtotal - (factura.total * 0.12) AS total_liquido_original,
 							(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
 							prm_moneda_filtro.simbolo moneda,
 							SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS total_pagado,
@@ -630,7 +696,7 @@ public static $configuracion_gastos = array(
 					CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_usuario,
 					prm_area_usuario.glosa AS area_usuario,
 					moneda_filtro.tipo_cambio AS tipo_cambio,
-					SUM(trabajo.monto_cobrado) * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_trabajos,
+					SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600*trabajo.tarifa_hh)  * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_trabajos,
 					prm_moneda.simbolo
 				FROM trabajo
 				JOIN cobro_moneda AS moneda_cobro
@@ -676,6 +742,8 @@ public static $configuracion_gastos = array(
 	}
 
 	public function ReportData($query, $params, $fetch_options = PDO::FETCH_ASSOC) {
+		#echo $query;
+		#exit();
 		$Statement = $this->sesion->pdodbh->prepare($query);
 		foreach ($params as $key => $item) {
 			if (strpos($key, 'period_') !== false) {
@@ -796,7 +864,7 @@ public static $configuracion_gastos = array(
 		$SimpleReport->LoadConfiguration($this->report_code);
 		$SimpleReport->LoadResults($results);
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, $writer_type);
-		$writer->save(__('Facturas'));
+		return $writer->save(__('Facturas'));
 	}
 
 

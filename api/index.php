@@ -635,7 +635,8 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	$params = $Slim->request()->params();
 	$results = $reportObject->ReportData($query, $params);
 	$results = $reportObject->ProcessReport($results, $params);
-	$reportObject->DownloadReport($results, 'Json');
+	#$reportObject->DownloadReport($results, 'Json');
+	echo $reportObject->DownloadReport($results, 'Html');
 });
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
