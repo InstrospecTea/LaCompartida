@@ -2,11 +2,11 @@
 
 ## Hotfix: 13.7.2
 Martes 3 de Diciembre 2013
-* **Fixed:** [Reversa cambio en codigo asunto cobros_xls]()
+* **Fixed:** [Reversa cambio en codigo asunto cobros_xls](https://github.com/LemontechSA/ttb/pull/353)
 
 ## Hotfix: 13.7.2
 Martes 3 de Diciembre 2013
-* **Fixed:** [Corrige calculo de saldo a favor o contra para cdrabogados ahora considera el codigo del asunto]()
+* **Fixed:** [Corrige calculo de saldo a favor o contra para cdrabogados ahora considera el codigo del asunto](https://github.com/LemontechSA/ttb/pull/352)
 
 ## Hotfix: 13.7.1
 Miercoles 27 de Noviembre 2013
