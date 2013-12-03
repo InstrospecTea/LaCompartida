@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.7.2
+Martes 3 de Diciembre 2013
+* **Fixed:** [Corrige calculo de saldo a favor o contra para cdrabogados ahora considera el codigo del asunto]()
+
 ## Hotfix: 13.7.1
 Miercoles 27 de Noviembre 2013
 * **Fixed:** [Corrige asi que los saldos adeudados no aparecen cuando el cobro esta pagado o su saldo se eleva a 0](https://github.com/LemontechSA/ttb/pull/348)
