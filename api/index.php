@@ -640,7 +640,7 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
-	$user_id = validateAuthTokenSendByHeaders('REP');
+	#$user_id = validateAuthTokenSendByHeaders('REP');
 	$results = SimpleReport::LoadApiReports($Session);
 	outputJson(array('results' => $results));
 });
