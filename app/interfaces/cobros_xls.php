@@ -1155,9 +1155,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 					if (!$opc_ver_asuntos_separados) {
 						if (UtilesApp::GetConf($sesion, 'TipoCodigoAsunto') == 2) {
-							$ws->write($filas, $col_asunto, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -3), $formato_descripcion);
+							$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -3), $formato_descripcion);
 						} else {
-							$ws->write($filas, $col_asunto, $trabajo->fields['codigo_asunto_secundario'], $formato_descripcion);
+							$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -4), $formato_descripcion);
 						}
 					}
 					$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $formato_descripcion);
