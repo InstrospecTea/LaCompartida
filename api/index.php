@@ -635,13 +635,13 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	$params = $Slim->request()->params();
 	$results = $reportObject->ReportData($query, $params);
 	$results = $reportObject->ProcessReport($results, $params);
-	#$reportObject->DownloadReport($results, 'Json');
-	echo $reportObject->DownloadReport($results, 'Html');
+	$reportObject->DownloadReport($results, 'Json');
+	#echo $reportObject->DownloadReport($results, 'Html');
 });
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
-	#$user_id = validateAuthTokenSendByHeaders('REP');
+	$user_id = validateAuthTokenSendByHeaders('REP');
 	$results = SimpleReport::LoadApiReports($Session);
 	outputJson(array('results' => $results));
 });
