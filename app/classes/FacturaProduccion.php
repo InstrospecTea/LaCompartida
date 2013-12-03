@@ -572,6 +572,30 @@ public static $configuracion_gastos = array(
 			'field' => 'codigo_documento_asociado',
 			'title' => 'N° Documento Asociado',
 		),
+		array(
+			'field' => 'username_generador',
+			'title' => 'Código Generador'
+		),
+		array(
+			'field' => 'area_usuario',
+			'title' => 'Area Generador'
+		),
+		array(
+			'field' => 'nombre_generador',
+			'title' => 'Nombre Generador'
+		),
+
+		array(
+			'field' => 'porcentaje_genera',
+			'title' => 'Porcentaje Generador',
+			'format' => 'number',
+		),
+
+		array(
+			'field' => 'monto_genera',
+			'title' => 'Monto Generador',
+			'format' => 'number',
+		)
 	);
 
 	private static $queries = array(
@@ -596,6 +620,7 @@ public static $configuracion_gastos = array(
 						(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
 						moneda_filtro.simbolo moneda,
 						usuario.id_usuario id_usuario_generador,
+
 						usuario.username username_generador,
 						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
 						prm_area_usuario.glosa AS area_usuario,
@@ -618,6 +643,7 @@ public static $configuracion_gastos = array(
 						LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario
 					WHERE factura.fecha >= :period_from AND factura.fecha <= :period_to
 					GROUP BY factura.numero, usuario.id_usuario",
+
 
 		'PAGOS' => "SELECT factura.id_cobro AS id_cobro,
 							ccfm2.id_factura,
@@ -737,7 +763,18 @@ public static $configuracion_gastos = array(
 					'fecha2' => ':period_to',
 					'moneda_gasto' => ':currency_id'
 				);
-				return $Gasto->SearchQuery($this->sesion, $Gasto->WhereQuery($where));
+
+				$col_select = " , generador.username AS username_generador
+								, CONCAT(generador.apellido1, ' ', generador.apellido2, ', ', generador.nombre) AS nombre_generador
+								, area_generador.glosa AS area_usuario
+								, contrato_generador.porcentaje_genera / 100.0 AS porcentaje_genera
+								, (contrato_generador.porcentaje_genera / 100.0) * IFNULL(cta_corriente.egreso, 0) AS monto_genera ";
+
+				$join_extra = " LEFT JOIN contrato_generador ON contrato.id_contrato = contrato_generador.id_contrato
+						LEFT JOIN usuario AS generador ON generador.id_usuario = contrato_generador.id_usuario
+						LEFT JOIN prm_area_usuario AS area_generador ON area_generador.id = generador.id_area_usuario ";
+
+				return $Gasto->SearchQuery($this->sesion, $Gasto->WhereQuery($where), $col_select, $join_extra);
 		}
 	}
 
