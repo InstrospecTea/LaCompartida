@@ -625,7 +625,7 @@ public static $configuracion_gastos = array(
 						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
 						prm_area_usuario.glosa AS area_usuario,
 						factura_generador.porcentaje_genera / 100.0 AS porcentaje_genera,
-						(factura_generador.porcentaje_genera / 100.0) * factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_genera,
+						(factura_generador.porcentaje_genera / 100.0) * factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_genera,
 						factura.codigo_cliente,
 						GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 					 FROM factura
