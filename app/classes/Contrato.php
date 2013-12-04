@@ -119,7 +119,7 @@ class Contrato extends Objeto {
 		'notificar_otros_correos'	,
 		'id_cuenta'	,
 		'id_cuenta2'	,
-		'id_pais'	,
+		//'id_pais'	,
 		'esc1_tiempo'	,
 		'esc1_id_tarifa'	,
 		'esc1_monto'	,
