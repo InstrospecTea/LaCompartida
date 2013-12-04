@@ -1039,7 +1039,8 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
-							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
@@ -4251,7 +4252,8 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
-							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
@@ -7383,6 +7385,8 @@ class NotaCobro extends Cobro {
 												    AND cta_corriente.documento_pago IS NULL
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
 												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
+
+				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
 
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
@@ -7402,7 +7406,8 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
-							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);

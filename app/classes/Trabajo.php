@@ -603,7 +603,7 @@ class Trabajo extends Objeto
 							}
 						}
 						if (!$codigo_existe) {
-							$mensajes .= "<br />No se puede modificar el trabajo $id_trabajo ($descripcion) porque el codigo de asunto ingresado (cod: $asunto_data) no existe.<br/>";
+							$mensajes .= "<br />No se puede modificar el trabajo $id_trabajo ($descripcion) porque el codigo de asunto ingresado (cod: $asunto_data) no esta asociado al cobro.<br/>";
 							continue;
 						}
 					}
