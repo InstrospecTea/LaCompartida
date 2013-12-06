@@ -1,12 +1,16 @@
 # Changelog
 
-## Hotfix: 13.7.2
+## Hotfix: 13.7.5
+Viernes 6 de Diciembre 2013
+* **New:** [Descripcion]($link)
+
+## Hotfix: 13.7.4
 Martes 3 de Diciembre 2013
 * **New:** [Obtiene datos de facturacion del contrato principal del cliente para nuevos asuntos](https://github.com/LemontechSA/ttb/pull/355)
 * **Fixed:** [Saldo clientes para cdrabogados segun asunto asociado al cobro](https://github.com/LemontechSA/ttb/pull/355)
 
 
-## Hotfix: 13.7.2
+## Hotfix: 13.7.3
 Martes 3 de Diciembre 2013
 * **Fixed:** [Reversa cambio en codigo asunto cobros_xls](https://github.com/LemontechSA/ttb/pull/353)
 
