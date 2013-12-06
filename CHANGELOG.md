@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.7.5
 Viernes 6 de Diciembre 2013
-* **New:** [Descripcion]($link)
+* **New:** [Descripcion](https://github.com/LemontechSA/ttb/pull/357)
 
 ## Hotfix: 13.7.4
 Martes 3 de Diciembre 2013
