@@ -10120,7 +10120,10 @@ QUERY;
 		case 7.51:
 			$queries = array();
 			if (!ExisteCampo('dte_metodo_pago_cta', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago_cta` INT(3)  NULL COMMENT 'Cuenta en la que se cobrara';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago_cta` VARCHAR(50) NULL COMMENT 'Cuenta en la que se cobrara';";
+			}
+			if (!ExisteCampo('dte_id_pais', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_id_pais` INT(3)  NULL COMMENT 'País de la factura';";
 			}
 			ejecutar($queries, $dbh);
 			break;

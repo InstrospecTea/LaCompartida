@@ -164,6 +164,12 @@ if ($opcion == "guardar") {
 			$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
 		}
 
+		if (UtilesApp::existecampo('dte_id_pais', 'factura', $sesion)) {
+			if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
+				$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
+			}
+		}
+
 		if (UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		}
@@ -678,6 +684,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<input type="text" name="giro_cliente" value="<?php echo $factura->loaded() ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']; ?>" id="giro_cliente" size="70" maxlength="255" />
 			</td>
 		</tr>
+		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_metodo_pago') : false; ?>
 		<tr>
 			<td align="right"><?php echo __('Condición de Pago') ?></td>
 			<td align="left" colspan="3">
@@ -712,7 +719,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				</select>
 			</td>
 		</tr>
-		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_metodo_pago') : false; ?>
 
 		<?php
 		$cantidad_lineas_descripcion = Conf::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
@@ -957,6 +963,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var ciudad_cliente = document.getElementById('ciudad_cliente');
 		var giro_cliente = document.getElementById('giro_cliente');
 		var factura_codigopostal = document.getElementById('factura_codigopostal');
+		var dte_id_pais = document.getElementById('dte_id_pais');
 
 		<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 			var descripcion_honorarios_legales = document.getElementById('descripcion_honorarios_legales');
@@ -1054,6 +1061,16 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 								factura_codigopostal.value = valores[6];
 							} else {
 								factura_codigopostal.value = '';
+							}
+
+							if (valores[7] != '') {
+								if (dte_id_pais) {
+									dte_id_pais.value = valores[7];
+								}
+							} else {
+								if (dte_id_pais) {
+									dte_id_pais.value = '';
+								}
 							}
 						}
 					}

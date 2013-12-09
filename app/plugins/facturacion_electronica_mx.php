@@ -24,7 +24,7 @@ $Slim->hook('hook_anula_factura_electronica', function($hookArg) {
 });
 
 function ValidarFactura() {
-	global $factura, $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago;
+	global $factura, $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago, $dte_id_pais;
 	if (empty($RUT_cliente)) {
 		$pagina->AddError(__('Debe ingresar RFC del cliente.'));
 	}
@@ -37,11 +37,21 @@ function ValidarFactura() {
 	if (empty($dte_metodo_pago)) {
 		$pagina->AddError(__('Debe seleccionar el Método de Pago.'));
 	}
+	if (empty($dte_id_pais)) {
+		$pagina->AddError(__('Debe seleccionar el País del cliente.'));
+	}
 }
 
 function InsertaMetodoPago() {
-	global $factura;
+	global $factura, $contrato;
 	$Sesion = new Sesion();
+	echo '<tr>';
+	echo '<td align="right" colspan="1">' . __('País') . '</td>';
+	echo '<td align="left" colspan="3">';
+	echo Html::SelectQuery($Sesion, "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC", "dte_id_pais", $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160);
+	echo '</td>';
+	echo '</tr>';
+
 	echo "<tr>";
 	echo "<td align='right'>M&eacute;todo de Pago</td>";
 	echo "<td align='left' colspan='3'>";
