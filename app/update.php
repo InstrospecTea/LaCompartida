@@ -10119,7 +10119,7 @@ QUERY;
 
 		case 7.51:
 			$queries = array();
-			if (!ExisteCampo('dte_metodo_pago', 'factura', $dbh)) {
+			if (!ExisteCampo('dte_metodo_pago_cta', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago_cta` INT(3)  NULL COMMENT 'Cuenta en la que se cobrara';";
 			}
 			ejecutar($queries, $dbh);

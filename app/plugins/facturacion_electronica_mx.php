@@ -46,8 +46,7 @@ function InsertaMetodoPago() {
 	echo "<td align='right'>M&eacute;todo de Pago</td>";
 	echo "<td align='left' colspan='3'>";
  	echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "300");
- 	echo "<input type='text' name='dte_metodo_pago_cta' placeholder='n&uacute;mero de cuenta' value='' id='dte_metodo_pago_cta' size='20' maxlength='10'>";
-	echo "<a href='javascript:void(0)' id='agrega_metodo_pago' title='Agregar M&eacute;todo de Pago'><img src='" . Conf::ImgDir() . "/agregar.gif' border='0'></a>";
+ 	echo "<input type='text' name='dte_metodo_pago_cta' placeholder='No. cuenta' value='" . $factura->fields['dte_metodo_pago_cta'] . "' id='dte_metodo_pago_cta' size='10' maxlength='10'>";
 	echo "</td>";
 	echo "</tr>";
 }
@@ -86,10 +85,16 @@ function InsertaJSFacturaElectronica() {
 		window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
 	});';
 
-	echo 'jQuery(document).on("click", "#agrega_metodo_pago",  function() {
-		var urlo = "agregar_forma_pago.php?popup=1";
-		nuovaFinestra("Agregar_Forma_Pago",430,370,urlo, "top=400, left=400");
+	echo 'jQuery(document).on("change", "#dte_metodo_pago",  function() {
+		var metodo_pago = jQuery("#dte_metodo_pago option:selected").text();
+		if (metodo_pago != "No Identificado") {
+			jQuery("#dte_metodo_pago_cta").show();
+		} else {
+			jQuery("#dte_metodo_pago_cta").hide();
+		}
 	});';
+
+	echo 'jQuery("#dte_metodo_pago").trigger("change")';
 
 }
 
@@ -253,6 +258,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
+			'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'],
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
 			'tipoDeComprobante|ingreso'
