@@ -258,7 +258,6 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
-			'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'],
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
 			'tipoDeComprobante|ingreso'
@@ -277,6 +276,9 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		)
 	);
 
+	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta'])) {
+		$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
+	}
 	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
 		$r['DOR'][] = 'calle|' . ($Factura->fields['direccion_cliente']);
 	}
