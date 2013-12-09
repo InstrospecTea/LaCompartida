@@ -10059,6 +10059,7 @@ QUERY;
 		break;
 
 		case 7.50:
+			$queries = array();
 			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_generador` (
 					`id_contrato_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
 					`id_cliente` int(11) NOT NULL,
@@ -10115,6 +10116,14 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.51:
+			$queries = array();
+			if (!ExisteCampo('dte_metodo_pago', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago_cta` INT(3)  NULL COMMENT 'Cuenta en la que se cobrara';";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10124,7 +10133,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.50;
+$max_update = 7.51;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

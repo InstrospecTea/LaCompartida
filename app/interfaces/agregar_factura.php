@@ -160,6 +160,10 @@ if ($opcion == "guardar") {
 			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
 		}
 
+		if (UtilesApp::existecampo('dte_metodo_pago_cta', 'factura', $sesion)) {
+			$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
+		}
+
 		if (UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		}

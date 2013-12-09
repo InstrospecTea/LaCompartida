@@ -46,6 +46,8 @@ function InsertaMetodoPago() {
 	echo "<td align='right'>M&eacute;todo de Pago</td>";
 	echo "<td align='left' colspan='3'>";
  	echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "300");
+ 	echo "<input type='text' name='dte_metodo_pago_cta' placeholder='n&uacute;mero de cuenta' value='' id='dte_metodo_pago_cta' size='20' maxlength='10'>";
+	echo "<a href='javascript:void(0)' id='agrega_metodo_pago' title='Agregar M&eacute;todo de Pago'><img src='" . Conf::ImgDir() . "/agregar.gif' border='0'></a>";
 	echo "</td>";
 	echo "</tr>";
 }
@@ -83,6 +85,12 @@ function InsertaJSFacturaElectronica() {
 		var format = self.data("format") || "pdf";
 		window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
 	});';
+
+	echo 'jQuery(document).on("click", "#agrega_metodo_pago",  function() {
+		var urlo = "agregar_forma_pago.php?popup=1";
+		nuovaFinestra("Agregar_Forma_Pago",430,370,urlo, "top=400, left=400");
+	});';
+
 }
 
 function BotonGenerarHTML($id_factura) {
@@ -269,6 +277,10 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
+	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
+		$r['DOR'][] = 'localidad|' . ($Factura->fields['ciudad_cliente']);
+	}
+
 	$pais = $Factura->GetPais();
 
 	if (!is_null($pais) && !empty($pais)) {
