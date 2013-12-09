@@ -1000,6 +1000,7 @@ class NotaCobro extends Cobro {
 									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
 									        AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
+
 				$resp_saldo_adelantos = mysql_query($query_saldo_adelantos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adelantos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_adelantos) = mysql_fetch_array($resp_saldo_adelantos);
 
@@ -1018,10 +1019,16 @@ class NotaCobro extends Cobro {
 												    AND cta_corriente.documento_pago IS NULL
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
 												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
-
+				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
-
+				
+				if ( ($monto_saldo_adelantos + $monto_saldo_gastos) == 0){
+					$and_saldo_liquidaciones = "";
+				} else {
+					$and_saldo_liquidaciones = "'".$asunto->fields['codigo_asunto']."' ";
+				}
+				
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
 								FROM documento d
 					        INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -1040,8 +1047,8 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
 							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
-									AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
-
+									".$and_saldo_liquidaciones."";
+				
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
@@ -4232,10 +4239,16 @@ class NotaCobro extends Cobro {
 												    AND cta_corriente.documento_pago IS NULL
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
 												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
-
+				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
-
+				
+				if ( ($monto_saldo_adelantos + $monto_saldo_gastos) == 0){
+					$and_saldo_liquidaciones = "";
+				} else {
+					$and_saldo_liquidaciones = "'".$asunto->fields['codigo_asunto']."' ";
+				}
+				
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
 								FROM documento d
 					        INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -4254,8 +4267,8 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
 							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
-									AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
-
+									".$and_saldo_liquidaciones."";
+				
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
@@ -7353,7 +7366,6 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%DETALLES_PAGOS%', '', $html);
 					$html = str_replace('%DETALLES_PAGOS_CONTRATO%', '', $html);
 				}
-
 				$query_saldo_adelantos = "SELECT SUM(- 1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio)) AS saldo_adelantos
 										FROM documento d
     								INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
@@ -7387,10 +7399,16 @@ class NotaCobro extends Cobro {
 												    AND cta_corriente.documento_pago IS NULL
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
 												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
-
+				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
-
+				
+				if ( ($monto_saldo_adelantos + $monto_saldo_gastos) == 0){
+					$and_saldo_liquidaciones = "";
+				} else {
+					$and_saldo_liquidaciones = "'".$asunto->fields['codigo_asunto']."' ";
+				}
+				
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
 								FROM documento d
 					        INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -7409,8 +7427,8 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
 							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
-									AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
-
+									".$and_saldo_liquidaciones."";
+				
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
