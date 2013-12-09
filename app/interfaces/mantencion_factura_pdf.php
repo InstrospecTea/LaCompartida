@@ -620,7 +620,7 @@ $pagina->PrintTop();
 	#tabla_coordenadas li.th11cellx {width:60px;text-align:center;}
 	#tabla_coordenadas li.th11cellx  input {width:30px;}
 	#tabla_coordenadas li.fatcellx {width:343px;text-align:right;}
-	#tabla_coordenadas li.fatcellx input {    height: 16px;   margin: 2px 0 0 4px;   padding: 0 0 0 1px;float:left;    width: 308px;}*/
+	#tabla_coordenadas li.fatcellx input {  height: 16px;   margin: 2px 0 0 4px;   padding: 0 0 0 1px;float:left;    width: 308px;}
 </style>
 
 <?php
