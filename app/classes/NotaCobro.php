@@ -395,9 +395,14 @@ class NotaCobro extends Cobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
 
+				if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
+					$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
+				} else {
+					$html = str_replace('%nombre_socio%', '', $html);
+				}
+
 				$html = str_replace('%socio%', __('SOCIO'), $html);
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
-				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
 				$html = str_replace('%fono%', __('TELÉFONO'), $html);
 				$html = str_replace('%fax%', __('TELEFAX'), $html);
 				$html = str_replace('%asunto%', __('Asunto'), $html);
@@ -985,7 +990,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%DETALLES_PAGOS_CONTRATO%', '', $html);
 				}
 
-								$query_saldo_adelantos = "SELECT SUM(- 1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio)) AS saldo_adelantos
+
+				$query_saldo_adelantos = "SELECT SUM(- 1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio)) AS saldo_adelantos
 										FROM documento d
     								INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
         							INNER join prm_moneda moneda_base ON moneda_base.id_moneda = 1
@@ -997,7 +1003,10 @@ class NotaCobro extends Cobro {
 									        AND d.es_adelanto = 1
 									        AND d.saldo_pago < 0
 									        AND d.pago_gastos = '1'
-									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									        AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
+
+		        //echo '<b>QUERY SALDO ADELANTOS</b><br>'.$query_saldo_adelantos.'<br><hr>';
 
 				$resp_saldo_adelantos = mysql_query($query_saldo_adelantos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adelantos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_adelantos) = mysql_fetch_array($resp_saldo_adelantos);
@@ -1015,11 +1024,20 @@ class NotaCobro extends Cobro {
 												    OR cobro.estado IN ('CREADO' , 'EN REVISION'))
 												    AND cta_corriente.id_neteo_documento IS NULL
 												    AND cta_corriente.documento_pago IS NULL
-												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
+												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
+			    //echo '<b>QUERY SALDO GASTOS</b><br>'.$query_saldo_gastos.'<br><hr>';
+				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
 
+				if ( $monto_saldo_gastos == NULL || $monto_saldo_adelantos == NULL ) {
+					$and_saldo_liquidaciones = "";
+				} else {
+					$and_saldo_liquidaciones = "AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."'";
+				}
+				
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
 								FROM documento d
 					        INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -1037,12 +1055,21 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
-							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									".$and_saldo_liquidaciones." ";
 
+				//echo '<b>QUERY SALDO LIQUIDACION</b><br>'.$query_saldo_liquidaciones.'<br><hr>';
+				
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
+				//echo '<b>MONTO SALDO ADELANTOS =</b>'.$monto_saldo_adelantos.'<br>';
+				//echo '<b>MONTO SALDO GASTOS =</b>'.$monto_saldo_gastos.'<br>';
+				//echo '<b>MONTO SALDO LIQUIDACIONES =</b>'.$monto_saldo_liquidaciones.'<br>';
+
 				$monto_saldo_cliente = $monto_saldo_adelantos + $monto_saldo_gastos + $monto_saldo_liquidaciones;
+
+				$monto_saldo_moneda_impresion = UtilesApp::CambiarMoneda( $monto_saldo_cliente, 1, 0, $x_resultados['tipo_cambio_opc_moneda_total'], $x_resultados['cifras_decimales_opc_moneda_total'] );
 
 				if ( $monto_saldo_cliente < 0 ) {
 					$texto_saldo_favor_o_contra = 'Saldo en contra';
@@ -1052,7 +1079,7 @@ class NotaCobro extends Cobro {
 
 				$monto_saldo_liquidaciones = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_liquidaciones, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
@@ -1793,6 +1820,7 @@ class NotaCobro extends Cobro {
 
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento
+				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -3518,7 +3546,11 @@ class NotaCobro extends Cobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
 
-				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
+				if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
+					$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
+				} else {
+					$html = str_replace('%nombre_socio%', '', $html);
+				}
 
 				$html = str_replace('%socio%', __('SOCIO'), $html);
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
@@ -4205,7 +4237,10 @@ class NotaCobro extends Cobro {
 									        AND d.es_adelanto = 1
 									        AND d.saldo_pago < 0
 									        AND d.pago_gastos = '1'
-									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									        AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
+
+		        //echo '<b>QUERY SALDO ADELANTOS</b><br>'.$query_saldo_adelantos.'<br><hr>';
 
 				$resp_saldo_adelantos = mysql_query($query_saldo_adelantos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adelantos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_adelantos) = mysql_fetch_array($resp_saldo_adelantos);
@@ -4223,11 +4258,20 @@ class NotaCobro extends Cobro {
 												    OR cobro.estado IN ('CREADO' , 'EN REVISION'))
 												    AND cta_corriente.id_neteo_documento IS NULL
 												    AND cta_corriente.documento_pago IS NULL
-												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
+												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
+			    //echo '<b>QUERY SALDO GASTOS</b><br>'.$query_saldo_gastos.'<br><hr>';
+				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
 
+				if ( $monto_saldo_gastos == NULL || $monto_saldo_adelantos == NULL ) {
+					$and_saldo_liquidaciones = "";
+				} else {
+					$and_saldo_liquidaciones = "AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."'";
+				}
+				
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
 								FROM documento d
 					        INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -4245,12 +4289,21 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
-							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									".$and_saldo_liquidaciones." ";
 
+				//echo '<b>QUERY SALDO LIQUIDACION</b><br>'.$query_saldo_liquidaciones.'<br><hr>';
+				
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
+				//echo '<b>MONTO SALDO ADELANTOS =</b>'.$monto_saldo_adelantos.'<br>';
+				//echo '<b>MONTO SALDO GASTOS =</b>'.$monto_saldo_gastos.'<br>';
+				//echo '<b>MONTO SALDO LIQUIDACIONES =</b>'.$monto_saldo_liquidaciones.'<br>';
+
 				$monto_saldo_cliente = $monto_saldo_adelantos + $monto_saldo_gastos + $monto_saldo_liquidaciones;
+
+				$monto_saldo_moneda_impresion = UtilesApp::CambiarMoneda( $monto_saldo_cliente, 1, 0, $x_resultados['tipo_cambio_opc_moneda_total'], $x_resultados['cifras_decimales_opc_moneda_total'] );
 
 				if ( $monto_saldo_cliente < 0 ) {
 					$texto_saldo_favor_o_contra = 'Saldo en contra';
@@ -4260,7 +4313,7 @@ class NotaCobro extends Cobro {
 
 				$monto_saldo_liquidaciones = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_liquidaciones, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
@@ -4270,7 +4323,6 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
-
 
 				break;
 
@@ -5214,6 +5266,7 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
+				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
 				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
@@ -7355,7 +7408,10 @@ class NotaCobro extends Cobro {
 									        AND d.es_adelanto = 1
 									        AND d.saldo_pago < 0
 									        AND d.pago_gastos = '1'
-									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									        AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
+
+		        //echo '<b>QUERY SALDO ADELANTOS</b><br>'.$query_saldo_adelantos.'<br><hr>';
 
 				$resp_saldo_adelantos = mysql_query($query_saldo_adelantos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_adelantos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_adelantos) = mysql_fetch_array($resp_saldo_adelantos);
@@ -7373,11 +7429,20 @@ class NotaCobro extends Cobro {
 												    OR cobro.estado IN ('CREADO' , 'EN REVISION'))
 												    AND cta_corriente.id_neteo_documento IS NULL
 												    AND cta_corriente.documento_pago IS NULL
-												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' 
+												    AND cta_corriente.codigo_asunto = '".$asunto->fields['codigo_asunto']."' ";
 
+			    //echo '<b>QUERY SALDO GASTOS</b><br>'.$query_saldo_gastos.'<br><hr>';
+				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_gastos) = mysql_fetch_array($resp_saldo_gastos);
 
+				if ( $monto_saldo_gastos == NULL || $monto_saldo_adelantos == NULL ) {
+					$and_saldo_liquidaciones = "";
+				} else {
+					$and_saldo_liquidaciones = "AND d.codigo_asunto = '".$asunto->fields['codigo_asunto']."'";
+				}
+				
 				$query_saldo_liquidaciones ="SELECT SUM(- 1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio)) AS saldo_liquidaciones
 								FROM documento d
 					        INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -7395,12 +7460,21 @@ class NotaCobro extends Cobro {
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
-							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+							        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."'
+									".$and_saldo_liquidaciones." ";
 
+				//echo '<b>QUERY SALDO LIQUIDACION</b><br>'.$query_saldo_liquidaciones.'<br><hr>';
+				
 				$resp_saldo_liquidaciones = mysql_query($query_saldo_liquidaciones, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_liquidaciones, __FILE__, __LINE__, $this->sesion->dbh);
 				list($monto_saldo_liquidaciones) = mysql_fetch_array($resp_saldo_liquidaciones);
 
+				//echo '<b>MONTO SALDO ADELANTOS =</b>'.$monto_saldo_adelantos.'<br>';
+				//echo '<b>MONTO SALDO GASTOS =</b>'.$monto_saldo_gastos.'<br>';
+				//echo '<b>MONTO SALDO LIQUIDACIONES =</b>'.$monto_saldo_liquidaciones.'<br>';
+
 				$monto_saldo_cliente = $monto_saldo_adelantos + $monto_saldo_gastos + $monto_saldo_liquidaciones;
+
+				$monto_saldo_moneda_impresion = UtilesApp::CambiarMoneda( $monto_saldo_cliente, 1, 0, $x_resultados['tipo_cambio_opc_moneda_total'], $x_resultados['cifras_decimales_opc_moneda_total'] );
 
 				if ( $monto_saldo_cliente < 0 ) {
 					$texto_saldo_favor_o_contra = 'Saldo en contra';
@@ -7410,7 +7484,7 @@ class NotaCobro extends Cobro {
 
 				$monto_saldo_liquidaciones = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_liquidaciones, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_cliente, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
     			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
@@ -7984,6 +8058,7 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumentoComun
+				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -8447,6 +8522,7 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_ENCABEZADO': //GenerarDocumentoComun
+				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);

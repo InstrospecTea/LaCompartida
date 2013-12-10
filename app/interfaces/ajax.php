@@ -471,7 +471,11 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_comuna,
 											contrato.factura_ciudad,
 											contrato.factura_giro,
-											contrato.factura_codigopostal
+											contrato.factura_codigopostal,
+											contrato.id_pais,
+											contrato.cod_factura_telefono,
+											contrato.factura_telefono,
+											contrato.glosa_contrato
 										FROM contrato
 											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
 										WHERE (cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}')";

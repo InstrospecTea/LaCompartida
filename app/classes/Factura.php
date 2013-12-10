@@ -1922,13 +1922,21 @@ class Factura extends Objeto {
 	}
 
 	function GetPais() {
-		$query = "SELECT prm_pais.nombre
-			  FROM factura
-			 INNER JOIN contrato ON factura.id_contrato = contrato.id_contrato
-			 INNER JOIN prm_pais ON contrato.id_pais = prm_pais.id_pais
-			 WHERE factura.id_factura = {$this->fields[$this->campo_id]};";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($pais) = mysql_fetch_array($resp);
+		if (!is_null($this->fields['dte_id_pais']) && !empty($this->fields['dte_id_pais'])) {
+			$query = "SELECT prm_pais.nombre
+				  FROM prm_pais
+				 WHERE prm_pais.id_pais = {$this->fields['dte_id_pais']};";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($pais) = mysql_fetch_array($resp);
+		} else {
+			$query = "SELECT prm_pais.nombre
+				  FROM factura
+				 INNER JOIN contrato ON factura.id_contrato = contrato.id_contrato
+				 INNER JOIN prm_pais ON contrato.id_pais = prm_pais.id_pais
+				 WHERE factura.id_factura = {$this->fields[$this->campo_id]};";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($pais) = mysql_fetch_array($resp);
+		}
 		return $pais;
 	}
 

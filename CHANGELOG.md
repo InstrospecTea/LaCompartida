@@ -1,5 +1,29 @@
 # Changelog
 
+## Hotfix: 13.7.5
+Viernes 6 de Diciembre 2013
+* **Fixed:** [Calculo saldo cliente en detalle de cobro](https://github.com/LemontechSA/ttb/pull/358)
+* **Added:** [Graficar horas no cobrables en reporte Reporte Gráfico por Período](https://github.com/LemontechSA/ttb/pull/358)
+* **Fixed:** [Problemas con Facturación Electrónica México](https://github.com/LemontechSA/ttb/pull/359)
+
+## Hotfix: 13.7.5
+Viernes 6 de Diciembre 2013
+* **New:** [Descripcion](https://github.com/LemontechSA/ttb/pull/357)
+
+## Hotfix: 13.7.4
+Martes 3 de Diciembre 2013
+* **New:** [Obtiene datos de facturacion del contrato principal del cliente para nuevos asuntos](https://github.com/LemontechSA/ttb/pull/355)
+* **Fixed:** [Saldo clientes para cdrabogados segun asunto asociado al cobro](https://github.com/LemontechSA/ttb/pull/355)
+
+
+## Hotfix: 13.7.3
+Martes 3 de Diciembre 2013
+* **Fixed:** [Reversa cambio en codigo asunto cobros_xls](https://github.com/LemontechSA/ttb/pull/353)
+
+## Hotfix: 13.7.2
+Martes 3 de Diciembre 2013
+* **Fixed:** [Corrige calculo de saldo a favor o contra para cdrabogados ahora considera el codigo del asunto](https://github.com/LemontechSA/ttb/pull/352)
+
 ## Hotfix: 13.7.1
 Miercoles 27 de Noviembre 2013
 * **Fixed:** [Corrige asi que los saldos adeudados no aparecen cuando el cobro esta pagado o su saldo se eleva a 0](https://github.com/LemontechSA/ttb/pull/348)
