@@ -395,9 +395,14 @@ class NotaCobro extends Cobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
 
+				if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
+					$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
+				} else {
+					$html = str_replace('%nombre_socio%', '', $html);
+				}
+
 				$html = str_replace('%socio%', __('SOCIO'), $html);
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
-				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
 				$html = str_replace('%fono%', __('TELÉFONO'), $html);
 				$html = str_replace('%fax%', __('TELEFAX'), $html);
 				$html = str_replace('%asunto%', __('Asunto'), $html);
@@ -3531,7 +3536,11 @@ class NotaCobro extends Cobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
 
-				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
+				if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
+					$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
+				} else {
+					$html = str_replace('%nombre_socio%', '', $html);
+				}
 
 				$html = str_replace('%socio%', __('SOCIO'), $html);
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
