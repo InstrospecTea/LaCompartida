@@ -229,6 +229,11 @@ class FacturaProduccion {
 			'title' => 'Total Facturado'
 		),
 		array(
+			'field' => 'subtotal_facturado',
+			'format' => 'number',
+			'title' => 'Subtotal Facturado'
+		),
+		array(
 			'field' => 'monto_detraccion',
 			'format' => 'number',
 			'title' => 'Monto Detracción',
@@ -373,6 +378,11 @@ class FacturaProduccion {
 			'field' => 'total_facturado',
 			'format' => 'number',
 			'title' => 'Total Facturado'
+		),
+		array(
+			'field' => 'subtotal_facturado',
+			'format' => 'number',
+			'title' => 'Subtotal Facturado'
 		),
 		array(
 			'field' => 'monto_detraccion',
@@ -658,6 +668,7 @@ public static $configuracion_gastos = array(
 							prm_moneda.simbolo AS moneda_original,
 							cobro.monto_subtotal * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_cobro,
 							factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
+							factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_facturado,
 							factura.subtotal AS subtotal_facturado_original,
 							factura.iva AS impuesto_facturado_original,
 							factura.total AS total_facturado_original,
@@ -673,7 +684,7 @@ public static $configuracion_gastos = array(
 							CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
 							prm_area_usuario.glosa AS area_usuario,
 							factura_generador.porcentaje_genera / 100.0 AS porcentaje_genera,
-							(factura_generador.porcentaje_genera / 100.0) * SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS monto_genera,
+							(factura_generador.porcentaje_genera / 100.0) * factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_genera,
 							factura.codigo_cliente,
 							(SELECT GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';')
 								 FROM cobro_asunto
@@ -838,7 +849,7 @@ public static $configuracion_gastos = array(
 						# Proratear el monto del trabajo en el monto del cobro  (trabajo es 50% del cobro (ej))
 						# Proratear el monto de la factura en el monto del cobro (factura corresponde al 20% del cobro)
 						# Obtener el % de aporte del usuario (aportó con el 10% a la factura)
-						$aporte_factura = $factura['total_facturado'] / $factura['subtotal_cobro'];
+						$aporte_factura = $factura['subtotal_facturado'] / $factura['subtotal_cobro'];
 						$aporte_trabajo = $trabajo['monto_trabajos'] / $factura['subtotal_cobro'];
 						$aporte = $aporte_factura * $aporte_trabajo;
 
@@ -847,7 +858,7 @@ public static $configuracion_gastos = array(
 							$elgenerador = $generadores[$numero][$usuario];
 							$elgenerador["total_trabajado"] = $trabajo['monto_trabajos'];
 							$elgenerador["porcentaje_aporte_trabajos"] = $aporte;
-							$elgenerador["monto_aporte_pago_trabajos"] = $factura['total_pagado'] * $elgenerador["porcentaje_aporte_trabajos"];
+							$elgenerador["monto_aporte_pago_trabajos"] = $factura['subtotal_facturado'] * $elgenerador["porcentaje_aporte_trabajos"];
 							$generadores[$numero][$usuario] = $elgenerador;
 						} else {
 							# Le copio los datos de la factura y calculo los correspondientes
@@ -861,7 +872,7 @@ public static $configuracion_gastos = array(
 							$eltrabajador["monto_genera"] = 0;
 							$eltrabajador["total_trabajado"] = $trabajo['monto_trabajos'];
 							$eltrabajador["porcentaje_aporte_trabajos"] = $aporte;
-							$eltrabajador["monto_aporte_pago_trabajos"] = $eltrabajador['total_pagado'] * $eltrabajador["porcentaje_aporte_trabajos"];
+							$eltrabajador["monto_aporte_pago_trabajos"] = $eltrabajador['subtotal_facturado'] * $eltrabajador["porcentaje_aporte_trabajos"];
 							$trabajadores[$numero][$usuario] = $eltrabajador;
 						}
 					}
