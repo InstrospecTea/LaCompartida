@@ -4,6 +4,7 @@
 Viernes 6 de Diciembre 2013
 * **Fixed:** [Calculo saldo cliente en detalle de cobro](https://github.com/LemontechSA/ttb/pull/358)
 * **Added:** [Graficar horas no cobrables en reporte Reporte Gráfico por Período](https://github.com/LemontechSA/ttb/pull/358)
+* **Fixed:** [Problemas con Facturación Electrónica México](https://github.com/LemontechSA/ttb/pull/359)
 
 ## Hotfix: 13.7.5
 Viernes 6 de Diciembre 2013
