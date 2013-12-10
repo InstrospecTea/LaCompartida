@@ -24,7 +24,7 @@ $Slim->hook('hook_anula_factura_electronica', function($hookArg) {
 });
 
 function ValidarFactura() {
-	global $factura, $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago;
+	global $factura, $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago, $dte_id_pais, $dte_metodo_pago_cta;
 	if (empty($RUT_cliente)) {
 		$pagina->AddError(__('Debe ingresar RFC del cliente.'));
 	}
@@ -37,15 +37,35 @@ function ValidarFactura() {
 	if (empty($dte_metodo_pago)) {
 		$pagina->AddError(__('Debe seleccionar el Método de Pago.'));
 	}
+	if ((int)$dte_metodo_pago_cta < 1000 && (int)$dte_metodo_pago_cta > 0) {
+		$pagina->AddError(__('El número de cuenta debe tener al menos 4 d&iacute;gitos'));
+	}
+	if (empty($dte_id_pais)) {
+		$pagina->AddError(__('Debe seleccionar el País del cliente.'));
+	}
 }
 
 function InsertaMetodoPago() {
-	global $factura;
+	global $factura, $contrato;
 	$Sesion = new Sesion();
+	echo '<tr>';
+	echo '<td align="right" colspan="1">' . __('País') . '</td>';
+	echo '<td align="left" colspan="3">';
+	echo Html::SelectQuery($Sesion, "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC", "dte_id_pais", $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160);
+	echo '</td>';
+	echo '</tr>';
+
 	echo "<tr>";
 	echo "<td align='right'>M&eacute;todo de Pago</td>";
 	echo "<td align='left' colspan='3'>";
  	echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "300");
+	$cta_pago = $factura->fields['dte_metodo_pago_cta'];
+	if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
+		$cta_pago = "";
+	} else {
+		$cta_pago = (int)$cta_pago;
+	}
+ 	echo "<input type='text' name='dte_metodo_pago_cta' placeholder='No. cuenta' value='" . $cta_pago . "' id='dte_metodo_pago_cta' size='10' maxlength='30'>";
 	echo "</td>";
 	echo "</tr>";
 }
@@ -83,6 +103,18 @@ function InsertaJSFacturaElectronica() {
 		var format = self.data("format") || "pdf";
 		window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
 	});';
+
+	echo 'jQuery(document).on("change", "#dte_metodo_pago",  function() {
+		var metodo_pago = jQuery("#dte_metodo_pago option:selected").text();
+		if (metodo_pago != "No Identificado") {
+			jQuery("#dte_metodo_pago_cta").show();
+		} else {
+			jQuery("#dte_metodo_pago_cta").hide();
+		}
+	});';
+
+	echo 'jQuery("#dte_metodo_pago").trigger("change")';
+
 }
 
 function BotonGenerarHTML($id_factura) {
@@ -263,12 +295,19 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		)
 	);
 
+	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int)$Factura->fields['dte_metodo_pago_cta'] > 0) {
+		$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
+	}
 	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
 		$r['DOR'][] = 'calle|' . ($Factura->fields['direccion_cliente']);
 	}
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
+	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
+		$r['DOR'][] = 'localidad|' . ($Factura->fields['ciudad_cliente']);
+	}
+
 	$pais = $Factura->GetPais();
 
 	if (!is_null($pais) && !empty($pais)) {
