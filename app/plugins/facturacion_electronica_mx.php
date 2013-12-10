@@ -65,7 +65,7 @@ function InsertaMetodoPago() {
 	} else {
 		$cta_pago = (int)$cta_pago;
 	}
- 	echo "<input type='number' max='9999' name='dte_metodo_pago_cta' placeholder='No. cuenta' value='" . $cta_pago . "' id='dte_metodo_pago_cta' size='10' maxlength='10'>";
+ 	echo "<input type='text' name='dte_metodo_pago_cta' placeholder='No. cuenta' value='" . $cta_pago . "' id='dte_metodo_pago_cta' size='10' maxlength='30'>";
 	echo "</td>";
 	echo "</tr>";
 }
