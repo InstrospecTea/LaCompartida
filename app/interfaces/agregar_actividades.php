@@ -74,7 +74,7 @@ $Pagina->PrintTop($popup);
 
 <form method="POST" action="#" name="form_actividades" id="form_actividades">
 	<input type="hidden"  name="opcion" id="opcion" value="guardar">
-	<input type="hidden" name="id_actividad" value="<?= $Actividad->fields['id_actividad'] ?>" />
+	<input type="hidden" name="id_actividad" value="<?php echo $Actividad->fields['id_actividad']; ?>" />
 
 	<fieldset class="border_plomo tb_base">
 		<legend>Ingreso de Actividades</legend>
@@ -92,7 +92,7 @@ $Pagina->PrintTop($popup);
 					<?php echo __('Título'); ?>
 				</td>
 				<td align="left">
-					<input id='glosa_actividad' name='glosa_actividad' size='35' value="<? echo $Actividad->fields['glosa_actividad']; ?>" />
+					<input id='glosa_actividad' name='glosa_actividad' size='35' value="<?php echo $Actividad->fields['glosa_actividad']; ?>" />
 				</td>
 			</tr>
 			<tr>
@@ -105,7 +105,7 @@ $Pagina->PrintTop($popup);
 			</tr>
 			<tr>
 				<td align="right">
-					<?php echo __('Asunto')?>
+					<?php echo __('Asunto'); ?>
 				</td>
 				<td align="left">
 					<?php UtilesApp::CampoAsunto($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
@@ -115,9 +115,8 @@ $Pagina->PrintTop($popup);
 	</fieldset>
 	<br />
 	<div class="fl">
-		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="Validar(jQuery('#form_actividades').get(0))"><?php echo  __('Guardar') ?></a>
-		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar') ?></a>
+		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="Validar(jQuery('#form_actividades').get(0))"><?php echo __('Guardar'); ?></a>
+		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-exit" onclick="window.close();" ><?php echo __('Cancelar'); ?></a>
 	</div>
 </form>
-<?php
-$Pagina->PrintBottom($popup);
+<?php $Pagina->PrintBottom($popup);
