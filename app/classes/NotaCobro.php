@@ -531,6 +531,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%glosa_asunto_sin_codigo%', $imprimir_asuntos, $html);
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
+				$html = str_replace('%texto_fecha_emision%', __('Fecha de Emisión'), $html);
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
@@ -1498,6 +1499,7 @@ class NotaCobro extends Cobro {
 
 						$row = str_replace('%espacio_tramite%', '<br>', $row);
 						$row = str_replace('%servicios_tramites%', __('Trámites'), $row);
+						$row = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $row);
 						$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumento($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						$row = str_replace('%TRAMITES_FILAS%', $this->GenerarDocumento($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						$row = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumento($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
@@ -1505,6 +1507,7 @@ class NotaCobro extends Cobro {
 
 						$row = str_replace('%espacio_tramite%', '', $row);
 						$row = str_replace('%servicios_tramites%', '', $row);
+						$row = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $row);
 						$row = str_replace('%TRAMITES_ENCABEZADO%', '', $row);
 						$row = str_replace('%TRAMITES_FILAS%', '', $row);
 						$row = str_replace('%TRAMITES_TOTAL%', '', $row);
@@ -1596,19 +1599,24 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%TRAMITES_FILAS%', $this->GenerarDocumento($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 					$row = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumento($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 					$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos') ) || ( method_exists('Conf', 'ParafoGastosSoloSiHayGastos') && Conf::ParafoGastosSoloSiHayGastos() ))) {
-						if ($cont_gastos > 0)
+					
+					if ( Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos')) {
+						if ($cont_gastos > 0) {
 							$row = str_replace('%GASTOS%', $this->GenerarDocumento($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-						else
+						} else {
 							$row = str_replace('%GASTOS%', '', $row);
-					} else
+						}
+					} else {
 						$row = str_replace('%GASTOS%', $this->GenerarDocumento($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+					}
 
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0)
+					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0) {
 						$html .= $row;
+					}
+						
 				}
 				break;
 
@@ -1818,6 +1826,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%servicios_prestados%', __('Servicios Prestados'), $html);
 				$html = str_replace('%servicios_tramites%', __('Trámites'), $html);
+				$html = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $html);
 				$html = str_replace('%detalle_trabajo%', __('Detalle del Trámite Realizado'), $html);
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
@@ -3762,6 +3771,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%glosa_asunto_sin_codigo%', $imprimir_asuntos, $html);
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
+				$html = str_replace('%texto_fecha_emision%', __('Fecha de Emisión'), $html);
 
 				if (array_key_exists('codigo_contrato', $contrato->fields)) {
 					$html = str_replace('%glosa_codigo_contrato%', __('Código') . ' ' . __('Contrato'), $html);
@@ -4948,12 +4958,14 @@ class NotaCobro extends Cobro {
 					if ($cont_tramites > 0) {
 						$row = str_replace('%espacio_tramite%', '<br>', $row);
 						$row = str_replace('%servicios_tramites%', __('Trámites'), $row);
+						$row = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $row);
 						$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						$row = str_replace('%TRAMITES_FILAS%', $this->GenerarDocumentoComun($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						$row = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumentoComun($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 					} else {
 						$row = str_replace('%espacio_tramite%', '', $row);
 						$row = str_replace('%servicios_tramites%', '', $row);
+						$row = str_replace('%servicios_tramites_castropal%', '', $row);
 						$row = str_replace('%TRAMITES_ENCABEZADO%', '', $row);
 						$row = str_replace('%TRAMITES_FILAS%', '', $row);
 						$row = str_replace('%TRAMITES_TOTAL%', '', $row);
@@ -4975,6 +4987,9 @@ class NotaCobro extends Cobro {
 					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && UtilesApp::GetConf($this->sesion, 'SepararGastosPorAsunto') ) || UtilesApp::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
 						$html .= $row;
 					}
+
+					$html = str_replace('%texto_servicios_profesionales%', __('Servicios Profesionales por hora'), $html);
+					$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 				}
 				break;
 
@@ -5248,6 +5263,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%servicios_prestados%', __('Servicios Prestados'), $html);
 				$html = str_replace('%servicios_tramites%', __('Trámites'), $html);
+				$html = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $html);
 				$html = str_replace('%detalle_trabajo%', __('Detalle del Trámite Realizado'), $html);
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
@@ -6965,6 +6981,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%glosa_asunto_sin_codigo%', $imprimir_asuntos, $html);
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
+				$html = str_replace('%texto_fecha_emision%', __('Fecha de Emisión'), $html);
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
@@ -7941,12 +7958,14 @@ class NotaCobro extends Cobro {
 					if ($cont_tramites > 0) {
 						$row = str_replace('%espacio_tramite%', '<br>', $row);
 						$row = str_replace('%servicios_tramites%', __('Trámites'), $row);
+						$row = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $row);
 						$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						$row = str_replace('%TRAMITES_FILAS%', $this->GenerarDocumentoComun($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						$row = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumentoComun($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 					} else {
 						$row = str_replace('%espacio_tramite%', '', $row);
 						$row = str_replace('%servicios_tramites%', '', $row);
+						$row = str_replace('%servicios_tramites_castropal%', '', $row);
 						$row = str_replace('%TRAMITES_ENCABEZADO%', '', $row);
 						$row = str_replace('%TRAMITES_FILAS%', '', $row);
 						$row = str_replace('%TRAMITES_TOTAL%', '', $row);
@@ -8025,6 +8044,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%servicios_prestados%', __('Servicios Prestados'), $html);
 				$html = str_replace('%servicios_tramites%', __('Trámites'), $html);
+				$html = str_replace('%servicios_tramites_castropal%', 'Otros Servicios Profesionales', $html);
 				$html = str_replace('%detalle_trabajo%', __('Detalle del Trámite Realizado'), $html);
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
@@ -8489,6 +8509,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%servicios_prestados%', __('Servicios Prestados'), $html);
 				$html = str_replace('%servicios_tramites%', __('Trámites'), $html);
+				$html = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $html);
 				$html = str_replace('%detalle_trabajo%', __('Detalle del Trámite Realizado'), $html);
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
@@ -10527,6 +10548,7 @@ class NotaCobro extends Cobro {
 		}
 
 		$htmlplantilla = str_replace('%materia%', __('Materia'), $htmlplantilla);
+		$htmlplantilla = str_replace('%factura_emitida_a%', __('Factura emitida a'), $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_asuntos_sin_codigo%', $asuntos, $htmlplantilla);
@@ -10560,6 +10582,7 @@ class NotaCobro extends Cobro {
 		}
 
 		$htmlplantilla = str_replace('%factura%', __('Factura'), $htmlplantilla);
+		$htmlplantilla = str_replace('%factura_mayuscula%', __('FACTURA'), $htmlplantilla);
 		$htmlplantilla = str_replace('%codigo_cliente%', $contrato->fields['codigo_cliente'], $htmlplantilla);
 		$htmlplantilla = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $htmlplantilla);
