@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 13.7.8
+Miercoles 11 de Diciembre 2013
+* **Fixed:** [Nuevo Tag con comportamiento segun estados de cobro](https://github.com/LemontechSA/ttb/pull/361)
 
 ## Hotfix: 13.7.7
 Martes 10 de Diciembre 2013
