@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix: 13.7.9
+Miercoles 11 de Diciembre 2013
+* **Fixed:** [Corregir correlativo de códigos de actividades](https://github.com/LemontechSA/ttb/pull/362)
+
 ## Hotfix: 13.7.8
 Miercoles 11 de Diciembre 2013
 * **Fixed:** [Nuevo Tag con comportamiento segun estados de cobro](https://github.com/LemontechSA/ttb/pull/361)
