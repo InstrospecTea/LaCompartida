@@ -145,7 +145,7 @@ class Actividad extends Objeto {
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('ACTIVIDADES');
-		
+
 		$query = $this->SearchQuery();
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
@@ -158,11 +158,15 @@ class Actividad extends Objeto {
 
 	//funcion que asigna el nuevo codigo automatico para un actividad
 	function AsignarCodigoActividad() {
-		$query = "SELECT codigo_actividad AS x FROM actividad ORDER BY x DESC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$query = "SELECT id_actividad FROM actividad ORDER BY id_actividad DESC LIMIT 1";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
-		$f=$codigo+1;
-		$codigo_actividad=sprintf("%04d",$f);
+
+		if (empty($codigo)) {
+			$codigo = 0;
+		}
+
+		$codigo_actividad = sprintf("%04d", $codigo + 1);
 		return $codigo_actividad;
 	}
 
