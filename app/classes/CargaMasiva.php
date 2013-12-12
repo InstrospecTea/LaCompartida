@@ -73,7 +73,6 @@ class CargaMasiva extends Objeto {
 	 */
 	public function ObtenerInstancia($clase) {
 		if (!isset($this->instancias[$clase])) {
-			echo 'aqui: '. $clase . '<br>';
 			$this->instancias[$clase] = new $clase($this->sesion);
 		}
 		return $this->instancias[$clase];

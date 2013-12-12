@@ -80,6 +80,10 @@ class Asunto extends Objeto {
 		'opc_moneda_total' => array(
 			'titulo' => 'Moneda Liquidación',
 			'relacion' => 'Moneda'
+		),
+		'id_cuenta' => array(
+			'titulo' => 'Cuenta Bancaria',
+			'relacion' => 'CuentaBanco'
 		)
 	);
 
@@ -739,7 +743,7 @@ class Asunto extends Objeto {
 		unset($data['monto_tarifa_flat']);
 
 		$campos_contrato = array('id_contrato_cliente', 'id_moneda_monto', 'id_tarifa', 'forma_cobro', 'id_moneda_tramite',
-			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total');
+			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_cuenta');
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
 		$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
 
@@ -754,7 +758,7 @@ class Asunto extends Objeto {
 		//copiar contrato del cliente y agregar datos especificados aca
 		$Contrato = new Contrato($this->sesion);
 		$Contrato->Load($this->fields['id_contrato']);
-		if($this->fields['id_contrato'] == $this->extra_fields['id_contrato_cliente']){
+		if($this->fields['id_contrato'] == $this->extra_fields['id_contrato_cliente']) {
 			unset($Contrato->fields['id_contrato']);
 		}
 		unset($this->extra_fields['id_contrato_cliente']);

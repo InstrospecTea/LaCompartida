@@ -712,7 +712,10 @@ if (empty($data)) {
 			else if (info.tipo === 'bool') {
 				//agregar checkbox
 				var check = jQuery('<input/>', {type: 'checkbox'}).change(cambioCheck);
-				td.find('.extra').append(check);
+				r = td.closest("tr")[0].rowIndex - 1;
+				if (jQuery('tbody tr td #data_'+r+'_'+idx).parent().contents().children(0).length < 1) {
+					td.find('.extra').append(check);
+				}
 			}
 			jQuery(this).change();
 		}
@@ -768,7 +771,6 @@ if (empty($data)) {
 			success: function(response) {
 				tr.removeClass('procesando');
 				try {
-					console.log(response);
 					var resp = jQuery.parseJSON(response);
 					//se recibio una respuesta json
 					if (response === '[]') {
@@ -879,7 +881,7 @@ if (empty($data)) {
 			//se validan que esten las columnas que deben estar
 			var repetidos = [];
 			var faltan = [];
-			var campos = jQuery('[name^=campos]');
+			var campos = jQuery('[name^=campos]');		
 			jQuery.each(campos_clase, function(campo, info) {
 				var num = campos.filter(function() {
 					return jQuery(this).val() === campo;
@@ -897,6 +899,40 @@ if (empty($data)) {
 			if (faltan.length) {
 				msg += '\nLas siguientes columnas no están pero son obligatorias: ' + faltan.join(', ');
 			}
+
+
+			// descubrir si 'cuenta bancaria' esta usando y cual es en el orden, tambien 'forma de cobro'
+			var numero_campo_cuenta = -1;
+			var numero_campo_formacobro = -1;
+			for (var i = 0; i < jQuery('[name^=campos]').length; i++) {
+				var campo_curr = jQuery('[name^=campos]').get(i).value;
+				if (campo_curr == 'id_cuenta') {
+					var numero_campo_cuenta = i;
+					console.log('loop nr. ' +i+ ' campo name: ' +campo_curr);	
+				}
+				if (campo_curr == 'forma_cobro') {
+					var numero_campo_formacobro = i;
+					console.log('loop nr. ' +i+ ' campo name: ' +campo_curr);	
+				}				
+			}
+
+			//cuando hay una 'Cuenta Bancaria' intregada es necesario intregar tambien una 'Forma de Cobro'
+			if (numero_campo_cuenta > -1 && numero_campo_formacobro == -1) {
+				msg = 'Es necesario la columna Forma de Cobro para cuentas bancarias.'
+			} else {
+				var str_campo_cuenta = '#data_0_'+numero_campo_cuenta;
+				var str_campo_formacobro = '#data_0_'+numero_campo_formacobro;
+				var number_lines = jQuery('#data tbody tr').length;
+				for (var i = 0; i < number_lines; i++) {
+					if ( jQuery('#data_'+i+'_'+numero_campo_cuenta).val() != '' ) {
+						if ( jQuery('#data_'+i+'_'+numero_campo_formacobro).val() == '' ) {
+							msg = 'Es necesario ingresar una Forma de Cobro para una Cuenta Bancaria en la linea. ';
+							jQuery('#data_'+i+'_'+numero_campo_formacobro).focus();
+						}
+					}
+				}
+			}
+
 
 			//si aun no se valida alguna columna, se valida ahora
 			validacionColumnas(jQuery('[name^=campos]:visible').filter(function() {
