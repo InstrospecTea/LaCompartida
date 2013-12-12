@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.10
+jueves 12 de diciembre 2013
+* **Fixed:** [Cambia variable que causa error MySQL](https://github.com/LemontechSA/ttb/pull/364)
+
 
 ## Hotfix: 13.7.9
 Miercoles 11 de Diciembre 2013
