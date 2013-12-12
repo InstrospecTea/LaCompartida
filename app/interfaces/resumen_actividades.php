@@ -131,7 +131,7 @@ if (is_array($areasF)) {
 		$areas_tmp .= $value;
 	}
 }
-$areas = $areas_tmp;
+$areas_asunto = $areas_tmp;
 
 
 // AREA TRABAJO  areas_trabajo[]
@@ -838,7 +838,6 @@ if ($opc == 'print' || $popup) {
 	if (!is_array($clients)) {
 		$clients = array($clients);
 	}
-
 	foreach ($clients as $cliente) {
 		if ($cliente) {
 			$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
