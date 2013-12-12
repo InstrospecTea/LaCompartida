@@ -907,12 +907,10 @@ if (empty($data)) {
 			for (var i = 0; i < jQuery('[name^=campos]').length; i++) {
 				var campo_curr = jQuery('[name^=campos]').get(i).value;
 				if (campo_curr == 'id_cuenta') {
-					var numero_campo_cuenta = i;
-					console.log('loop nr. ' +i+ ' campo name: ' +campo_curr);	
+					var numero_campo_cuenta = i;	
 				}
 				if (campo_curr == 'forma_cobro') {
-					var numero_campo_formacobro = i;
-					console.log('loop nr. ' +i+ ' campo name: ' +campo_curr);	
+					var numero_campo_formacobro = i;	
 				}				
 			}
 
