@@ -256,7 +256,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				if(http.readyState == 4)
 				{
 					var response = http.responseText;
-					alert( 'Tarifas actualizados con éxito.' );
+					alert( 'Tarifas actualizadas con éxito.' );
 				}
 				cargando = false;
 			}
