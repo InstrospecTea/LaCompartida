@@ -426,26 +426,26 @@ class FacturaProduccion {
 		),
 
 		array(
-			'field' => 'monto_genera',
-			'title' => 'Monto Generador',
+			'field' => 'producido_total',
+			'title' => 'Producido Total',
 			'format' => 'number',
 		),
 
 		array(
-			'field' => 'total_trabajado',
-			'title' => 'Total Trabajado',
+			'field' => 'horas_trabajadas',
+			'title' => 'Horas Trabajadas',
 			'format' => 'number',
 		),
 
 		array(
-			'field' => 'porcentaje_aporte_trabajos',
-			'title' => 'Porcentaje Trabajado',
+			'field' => 'producido_abogado',
+			'title' => 'Producido Abogado',
 			'format' => 'number',
 		),
 
 		array(
-			'field' => 'monto_aporte_pago_trabajos',
-			'title' => 'Monto Aporte Pago Trabajos',
+			'field' => 'monto_aporte',
+			'title' => 'Monto Aporte',
 			'format' => 'number',
 		),
 
@@ -727,12 +727,32 @@ public static $configuracion_gastos = array(
 						WHERE ccfm.anulado = 0 AND ccfm2.anulado = 0 AND factura.anulado = 0
 						AND fp.fecha >= :period_from AND fp.fecha <= :period_to AND :currency_id = :currency_id",
 
+		'TRABAJOS_COBRO' => "SELECT trabajo.id_cobro,
+					moneda_filtro.tipo_cambio AS tipo_cambio,
+					SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600) AS duracion,
+					SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600*trabajo.tarifa_hh)  * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_trabajos,
+					prm_moneda.simbolo
+				FROM trabajo
+				JOIN cobro_moneda AS moneda_cobro
+				  ON moneda_cobro.id_cobro = trabajo.id_cobro
+				JOIN cobro_moneda AS moneda_filtro
+				  ON moneda_filtro.id_cobro = trabajo.id_cobro
+				 AND moneda_filtro.id_moneda = :currency_id
+				 AND moneda_cobro.id_moneda = trabajo.id_moneda
+				JOIN prm_moneda ON moneda_filtro.id_moneda = prm_moneda.id_moneda
+				JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
+				LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario
+ 			   WHERE trabajo.id_cobro IN (:charges)
+ 				 AND trabajo.cobrable = 1
+			GROUP BY trabajo.id_cobro",
+
 		'TRABAJOS' => "SELECT trabajo.id_cobro,
 					usuario.id_usuario,
 					usuario.username,
 					CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_usuario,
 					prm_area_usuario.glosa AS area_usuario,
 					moneda_filtro.tipo_cambio AS tipo_cambio,
+					SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600) AS duracion,
 					SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600*trabajo.tarifa_hh)  * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_trabajos,
 					prm_moneda.simbolo
 				FROM trabajo
@@ -823,14 +843,23 @@ public static $configuracion_gastos = array(
 			$charges = '0';
 		}
 
+		$trab = 1.0;
+		$gen = 0.0;
+
 		$query_trabajos = str_replace(":charges", $charges, FacturaProduccion::$queries['TRABAJOS']);
+		$query_totales = str_replace(":charges", $charges, FacturaProduccion::$queries['TRABAJOS_COBRO']);
+
 		$trabajos = $this->ReportData($query_trabajos, array('currency_id' => $params['currency_id']), PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
+		$trabajos_totales = $this->ReportData($query_totales, array('currency_id' => $params['currency_id']), PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
 		$pagos = $this->ReportData(FacturaProduccion::$queries['PAGOS'], $params, PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
 
 		$report_results = array();
 		error_reporting(E_ALL ^ E_NOTICE);
 		foreach ($pagos as $id_cobro => $facturas_generador) {
 			$trabajos_cobro = $trabajos[$id_cobro];
+			$total_trabajos = $trabajos_totales[$id_cobro][0];
+			$producido_total = $total_trabajos["monto_trabajos"];
+
 			if (!is_null($trabajos_cobro) && !empty($trabajos_cobro)) {
 				$generadores = array();
 				$trabajadores = array();
@@ -850,15 +879,23 @@ public static $configuracion_gastos = array(
 						# Proratear el monto de la factura en el monto del cobro (factura corresponde al 20% del cobro)
 						# Obtener el % de aporte del usuario (aportó con el 10% a la factura)
 						$aporte_factura = $factura['subtotal_facturado'] / $factura['subtotal_cobro'];
-						$aporte_trabajo = $trabajo['monto_trabajos'] / $factura['subtotal_cobro'];
-						$aporte = $aporte_factura * $aporte_trabajo;
+						$producido_total_factura = $producido_total * $aporte_factura;
 
 						if ($generadores && $generadores[$numero] && $generadores[$numero][$usuario]) {
 							# Ya existe como generador No lo vuelvo a agregar a esta factura ya que se agregará al final
 							$elgenerador = $generadores[$numero][$usuario];
-							$elgenerador["total_trabajado"] = $trabajo['monto_trabajos'];
-							$elgenerador["porcentaje_aporte_trabajos"] = $aporte;
-							$elgenerador["monto_aporte_pago_trabajos"] = $factura['subtotal_facturado'] * $elgenerador["porcentaje_aporte_trabajos"];
+							$elgenerador["producido_total"] = $producido_total_factura;
+							$elgenerador["horas_trabajadas"] = $trabajo['duracion'] * $aporte_factura;
+							$elgenerador["producido_abogado"] = $trabajo['monto_trabajos'] * $aporte_factura;
+
+							if ($elgenerador["producido_total"] > ($factura['subtotal_facturado'] * $trab)) {
+								$elgenerador["monto_aporte"] = $elgenerador["porcentaje_genera"] * $factura['subtotal_facturado'] * $gen
+															 + $elgenerador["producido_abogado"] * $trab * ($factura['subtotal_facturado'] / $elgenerador["producido_total"]);
+							} else {
+								$elgenerador["monto_aporte"] = $elgenerador["producido_abogado"]
+															 + $elgenerador["porcentaje_genera"] * ($factura['subtotal_facturado'] - $elgenerador["producido_total"]);
+							}
+
 							$generadores[$numero][$usuario] = $elgenerador;
 						} else {
 							# Le copio los datos de la factura y calculo los correspondientes
@@ -869,10 +906,18 @@ public static $configuracion_gastos = array(
 							$eltrabajador["nombre_generador"] = $trabajo['nombre_usuario'];
 							$eltrabajador["area_usuario"] = $trabajo['area_usuario'];
 							$eltrabajador["porcentaje_genera"] = 0;
-							$eltrabajador["monto_genera"] = 0;
-							$eltrabajador["total_trabajado"] = $trabajo['monto_trabajos'];
-							$eltrabajador["porcentaje_aporte_trabajos"] = $aporte;
-							$eltrabajador["monto_aporte_pago_trabajos"] = $eltrabajador['subtotal_facturado'] * $eltrabajador["porcentaje_aporte_trabajos"];
+							$eltrabajador["producido_total"] = $producido_total_factura;
+							$eltrabajador["horas_trabajadas"] = $trabajo['duracion'] * $aporte_factura;
+							$eltrabajador["producido_abogado"] = $trabajo['monto_trabajos'] * $aporte_factura;
+
+							if ($eltrabajador["producido_total"] > ($factura['subtotal_facturado'] * $trab)) {
+								$eltrabajador["monto_aporte"] = $eltrabajador["porcentaje_genera"] * $factura['subtotal_facturado'] * $gen
+															 + $eltrabajador["producido_abogado"] * $trab * ($factura['subtotal_facturado'] / $eltrabajador["producido_total"]);
+							} else {
+								$eltrabajador["monto_aporte"] = $eltrabajador["producido_abogado"]
+															 + $eltrabajador["porcentaje_genera"] * ($factura['subtotal_facturado'] - $eltrabajador["producido_total"]);
+							}
+
 							$trabajadores[$numero][$usuario] = $eltrabajador;
 						}
 					}
