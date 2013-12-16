@@ -64,6 +64,8 @@ $pagina->PrintTop();
         return form.submit();
     }
     
+jQuery(document).ready(function() {
+    
     var disable_selector = function(){
         if( jQuery('#comparar').is(':checked')) {
             jQuery("#tipo_duracion_comparada").prop('disabled', false);
@@ -71,8 +73,10 @@ $pagina->PrintTop();
             jQuery("#tipo_duracion_comparada").prop('disabled', 'disabled');
         }
     }; 
+    
     jQuery(disable_selector);
     jQuery("#comparar").change(disable_selector);
+});
 
 </script>
 
@@ -222,7 +226,7 @@ $pagina->PrintTop();
                 <?php echo __('Comparar'); ?>
             </td>
             <td align="left">
-                <input type="checkbox" id="comparar" name="comparar" value="1">
+                <input type="checkbox" id="comparar" name="comparar" value="1" <?php echo $comparar ? 'checked="checked"' : '' ?>>
             </td>
         </tr>
 
@@ -232,10 +236,10 @@ $pagina->PrintTop();
             </td>
             <td align="left">
                 <select id="tipo_duracion_comparada" name="tipo_duracion_comparada" style="width:200px;" >
-                    <option <?php echo $tipo_duracion_comparada == "trabajada_comparada" ? "selected" : "" ?> value="trabajada_comparada"><?php echo _('Trabajadas') ?></option>
-                    <option <?php echo $tipo_duracion_comparada == "cobrable_comparada" ? "selected" : "" ?> value="cobrable_comparada"><?php echo _('Cobrables') ?></option>
-                    <option <?php echo $tipo_duracion_comparada == "no_cobrable_comparada" ? "selected" : "" ?> value="no_cobrable_comparada"><?php echo _('No Cobrables') ?></option>
-                    <option <?php echo $tipo_duracion_comparada == "cobrada_comparada" ? "selected" : "" ?> value="cobrada_comparada"><?php echo _('Cobradas') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "trabajada" ? "selected" : "" ?> value="trabajada"><?php echo _('Trabajadas') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "cobrable" ? "selected" : "" ?> value="cobrable"><?php echo _('Cobrables') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "no_cobrable" ? "selected" : "" ?> value="no_cobrable"><?php echo _('No Cobrables') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "cobrada" ? "selected" : "" ?> value="cobrada"><?php echo _('Cobradas') ?></option>
 
                 </select>
             </td>
@@ -268,11 +272,10 @@ if ($opcion == "desplegar") {
     $datos .= '&fecha_desde=' . $fecha_desde . '&fecha_hasta=' . $fecha_hasta . '&tipo_duracion=' . $tipo_duracion;
 
     if ( $comparar == '1') {
+        $datos .= '&comparar='. $comparar;
         $datos .= '&tipo_duracion_comparada=' . $tipo_duracion_comparada;
     }
     
-    echo $datos;
-
     //en caso de que el tipo de reporte sea por el estudio
     //se imprime un grafico resumen de los clientes y/o usuarios seleccionados
 
