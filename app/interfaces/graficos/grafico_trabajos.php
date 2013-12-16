@@ -9,6 +9,7 @@ $where = 1;
 $join = "";
 
 //segun el tipo de duracion se ven los parametros de la duracion
+
 if ($tipo_duracion == 'trabajada') {
 	$duracion_query = "trabajo.duracion";
 }
@@ -27,6 +28,28 @@ if ($tipo_duracion == 'cobrada') {
 	$duracion_query = "trabajo.duracion_cobrada";
 	$join = "INNER JOIN cobro ON cobro.id_cobro=trabajo.id_cobro";
 	$where .= " AND trabajo.cobrable=1 AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION'";
+}
+
+if ( $comparar == '1') {
+	if ($tipo_duracion == 'trabajada_comparada') {
+		$duracion_query_comparada = "trabajo.duracion";
+	}
+
+	if ($tipo_duracion == 'cobrable_comparada') {
+		$duracion_query_comparada = "trabajo.duracion_cobrada";
+		$where .= " AND trabajo.cobrable=1";
+	}
+
+	if ($tipo_duracion == 'no_cobrable_comparada') {
+		$duracion_query_comparada = "trabajo.duracion";
+		$where .= " AND trabajo.cobrable=0";
+	}
+
+	if ($tipo_duracion == 'cobrada_comparada') {
+		$duracion_query_comparada = "trabajo.duracion_cobrada";
+		$join = "INNER JOIN cobro ON cobro.id_cobro=trabajo.id_cobro";
+		$where .= " AND trabajo.cobrable=1 AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION'";
+	}
 }
 
 //segun el tipo de reporte se ven los parametros del query
@@ -109,6 +132,43 @@ $query = "SELECT
 			ORDER BY mes_anio ASC";
 
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+if ( $comparar == '1'){
+
+	$query_comparada = "SELECT 
+				DATE_FORMAT(fechas.mes,'%Y-%m') as mes_anio_comparada,
+				IFNULL(meses_duracion.duracion,0) as duracion_mes_comparada 
+			FROM (
+				SELECT
+					DATE_SUB(DATE_FORMAT(NOW(),'%Y-%m-01'),INTERVAL n2.num+n1.num MONTH) AS 'mes'
+				FROM 
+					(SELECT 0 AS num UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n1,
+					(SELECT 0 AS num UNION ALL SELECT 10 UNION ALL SELECT 20 UNION ALL SELECT 30 UNION ALL SELECT 40 UNION ALL SELECT 50 UNION ALL SELECT 60 UNION ALL SELECT 70 UNION ALL SELECT 80 UNION ALL SELECT 90) n2
+				WHERE 
+					DATE_SUB(DATE_FORMAT(NOW(),'%Y-%m-01'),INTERVAL n2.num+n1.num MONTH) >='$fecha_desde' 
+					AND DATE_SUB(DATE_FORMAT(NOW(),'%Y-%m-01'),INTERVAL n2.num+n1.num MONTH) <='$fecha_hasta'
+					ORDER BY 'mes') as fechas
+				
+				LEFT JOIN 
+					(SELECT 
+						SUM( TIME_TO_SEC( $duracion_query_comparada ) ) /3600 AS duracion,
+						DATE_FORMAT( trabajo.fecha,  '%Y-%m-01' ) AS periodo
+						FROM trabajo
+						JOIN usuario ON usuario.id_usuario=trabajo.id_usuario
+						JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
+						JOIN cliente ON cliente.codigo_cliente = asunto.codigo_cliente
+						$join
+						WHERE $where $where_usuario $where_cliente AND trabajo.fecha
+						BETWEEN '$fecha_desde'
+						AND '$fecha_hasta'
+						GROUP BY YEAR( trabajo.fecha ) , MONTH( trabajo.fecha ) $groupby
+						ORDER BY YEAR( trabajo.fecha ) , MONTH( trabajo.fecha ) ) as meses_duracion ON meses_duracion.periodo=fechas.mes 
+			ORDER BY mes_anio ASC";
+
+	$resp_comparada = mysql_query_comparada($query_comparada, $sesion->dbh) or Utiles::errorSQL($query_comparada, __FILE__, __LINE__, $sesion->dbh);
+}
+
+
 for ($i = 0; $fila = mysql_fetch_array($resp); $i++) {
 	$color[$i] = 0xFF3300;
 	$periodo[$i] = $fila['mes_anio'];
@@ -117,10 +177,34 @@ for ($i = 0; $fila = mysql_fetch_array($resp); $i++) {
 }
 
 if ($i > 0) {
-	$color[$i] = 0x0099FF;
-	$duracion[$i] = $total_duracion / $i;
-	$periodo[$i] = 'Promedio Periodo';
+	for ($i = 0; $fila = mysql_fetch_array($resp_comparada); $i++) {
+		$color_comparada[$i] = 0xFF8800;
+		$periodo[$i] = $fila['mes_anio'];
+		$duracion[$i] = $fila['duracion_mes'];
+		$total_duracion += $fila['duracion_mes'];
+	}
 }
+
+if ( $comparar == '1') {
+
+	for ($k = 0; $fila = mysql_fetch_array($resp_comparada); $k++) {
+		$color[$k] = 0xFF3300;
+		$periodo[$k] = $fila['mes_anio_comparada'];
+		$duracion[$k] = $fila['duracion_mes_comparada'];
+		$total_duracion += $fila['duracion_mes_comparada'];
+	}
+
+	if ($k > 0) {
+		for ($k = 0; $fila = mysql_fetch_array($resp_comparada); $k++) {
+			$color_comparada[$k] = 0xFF8800;
+			$periodo[$k] = $fila['mes_anio_comparada'];
+			$duracion[$k] = $fila['duracion_mes_comparada'];
+			$total_duracion += $fila['duracion_mes_comparada'];
+		}
+	}
+
+}
+
 #Create a XYChart object of size 300 x 240 pixels
 $c = new GraficoBarras();
 
