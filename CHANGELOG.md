@@ -5,6 +5,7 @@ https://github.com/LemontechSA/ttb/pull/365
 ## Hotfix: 13.7.11
 jueves 12 de diciembre 2013
 * **Fixed:** [Modificaciones al interfaz resumen actividades profesionales](https://github.com/LemontechSA/ttb/pull/365)
+* **Added:** [Modificaciones a grafico periodo](https://github.com/LemontechSA/ttb/pull/365)
 
 ## Hotfix: 13.7.10
 jueves 12 de diciembre 2013
