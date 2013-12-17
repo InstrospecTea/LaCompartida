@@ -59,6 +59,7 @@ if ($tipo_reporte != 'trabajos_por_estudio') {
 
 		if (!empty($codigo_cliente)) {
 			$where .= " AND cliente.codigo_cliente=$codigo_cliente";
+			$where_comparada .= " AND cliente.codigo_cliente=$codigo_cliente";
 		}
 
 		if (is_array($usuarios)) {
@@ -70,9 +71,10 @@ if ($tipo_reporte != 'trabajos_por_estudio') {
 	}
 
 	if ($tipo_reporte == 'trabajos_por_empleado') {
-
+		
 		if (!empty($id_usuario)) {
 			$where .= " AND usuario.id_usuario=$id_usuario";
+			$where_comparada .= " AND usuario.id_usuario=$id_usuario";
 		}
 
 		if (is_array($clientes)) {
