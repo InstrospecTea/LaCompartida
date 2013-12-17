@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.12
+martes 17 de diciembre 2013
+* **Fixed:** [Corrige saldo adelantos](https://github.com/LemontechSA/ttb/pull/366)
+
 
 https://github.com/LemontechSA/ttb/pull/365
 

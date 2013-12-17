@@ -137,8 +137,18 @@ class Documento extends Objeto {
 			$this->Edit("monto_base", number_format($monto_base * $multiplicador, max(2,$moneda_base['cifras_decimales']), ".", ""));
 
 			$this->Edit("monto",      number_format($monto * $multiplicador, max(2,$moneda->fields['cifras_decimales']), ".", ""));
-			$this->Edit("saldo_pago", $this->fields['monto']);
 
+			$query = "SELECT SUM(valor_pago_honorarios + valor_pago_gastos) total
+						FROM  neteo_documento
+						WHERE id_documento_pago = '{$this->fields[$this->campo_id]}'
+						GROUP BY id_documento_pago";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			$neteo = mysql_fetch_assoc($resp);
+			if (!empty($neteo['total'])) {
+				$this->Edit('saldo_pago', $this->fields['monto'] + $neteo['total']);
+			} else {
+				$this->Edit('saldo_pago', $this->fields['monto']);
+			}
 
 			if ($id_cobro) {
 				$this->Edit("id_cobro", $id_cobro);
@@ -942,7 +952,7 @@ class Documento extends Objeto {
 				break;
 			}
 		}
-		
+
 		$cobro = new Cobro($this->sesion);
 		$cobro->Load($id_cobro);
 		$cobro->CambiarEstadoSegunFacturas();
