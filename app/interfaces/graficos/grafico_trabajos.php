@@ -165,7 +165,7 @@ if ($comparar) {
 	}
 }
 
-$cant_meses = count($periodo);
+$cant_meses = count($periodo) -1;
 
 #Create a XYChart object of size 300 x 240 pixels
 $c = new GraficoBarras();
