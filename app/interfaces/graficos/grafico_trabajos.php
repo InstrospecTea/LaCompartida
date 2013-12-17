@@ -135,42 +135,31 @@ $query = sprintf($query_tpl, $fecha_desde, $fecha_hasta, $duracion_query, $join,
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 if ($comparar) {
-
 	$query_comparada = sprintf($query_tpl, $fecha_desde, $fecha_hasta, $duracion_query_comparada, $join_comparada, $where_comparada, $where_usuario, $where_cliente, $fecha_desde, $fecha_hasta, $groupby);
 	$resp_comparada = mysql_query($query_comparada, $sesion->dbh) or Utiles::errorSQL($query_comparada, __FILE__, __LINE__, $sesion->dbh);
 }
 
 for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
-	$color[$i] = 0xFF3300;
 	$periodo[$i] = $fila['mes_anio'];
 	$duracion[$i] = $fila['duracion_mes'];
 	$total_duracion += $fila['duracion_mes'];
 }
 
 if ($i > 0) {
-	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
-		$color[$i] = 0xFF8800;
-		$periodo[$i] = $fila['mes_anio'];
-		$duracion[$i] = $fila['duracion_mes'];
-		$total_duracion += $fila['duracion_mes'];
-	}
+	$duracion[$i] = $total_duracion / $i;
+	$periodo[$i] = 'Promedio Periodo';
 }
 
 if ($comparar) {
-	
+
 	for ($k = 0; $fila = mysql_fetch_assoc($resp_comparada); $k++) {
-		$color_comparada[$k] = 0xFF3300;
 		$periodo_comparada[$k] = $fila['mes_anio'];
 		$duracion_comparada[$k] = $fila['duracion_mes'];
 		$total_duracion_comparada += $fila['duracion_mes'];
 	}
 
 	if ($k > 0) {
-		for ($k = 0; $fila = mysql_fetch_assoc($resp_comparada); $k++) {
-			$periodo_comparada[$k] = $fila['mes_anio'];
-			$duracion_comparada[$k] = $fila['duracion_mes'];
-			$total_duracion_comparada += $fila['duracion_mes'];
-		}
+		$duracion_comparada[$k] = $total_duracion_comparada / $k;
 	}
 }
 
@@ -199,9 +188,11 @@ $c->Ejes(__("Periodo"), __("Horas"));
 
 #Set the x axis labels
 $c->Labels($periodo);
-// se debe cambiar al original para poder ponerle el formato... ACA
-//$c->setLabelFormat("{value|2}");
-#Add a multi-bar layer with 2 data sets
+
+function fixNumber(&$valor) {
+	$valor = number_format($valor,2,'.','');
+	return $valor;
+}
 
 $titulo_tipo = array(
 	'trabajada' => __("Horas trabajadas"),
@@ -211,16 +202,21 @@ $titulo_tipo = array(
 );
 
 $barLayerObj = $c->addBarLayer2(Side, 1);
-$barLayerObj->AddDataSet($duracion, 0xFF3300, $titulo_tipo[$tipo_duracion] . ': ' . $total_duracion . ' en ' . $cant_meses . ' meses');
+
+array_walk($duracion,'fixNumber');
+
+$barLayerObj->AddDataSet( $duracion, 0xFF3300, $titulo_tipo[$tipo_duracion] . ': ' . number_format($total_duracion,2) . ' en ' . $cant_meses . ' meses');
 $barLayerObj->setBorderColor(-1, 1);
 $barLayerObj->setAggregateLabelStyle("arialbd.ttf", 8, 0x000);
 
 if ($comparar) {
-	$barLayerObj->addDataSet($duracion_comparada, 0x33FF00, $titulo_tipo[$tipo_duracion_comparada] . ': ' . $total_duracion_comparada . ' en ' . $cant_meses . ' meses', 2);
+	
+	array_walk($duracion_comparada,'fixNumber');
+	
+	$barLayerObj->addDataSet( $duracion_comparada, 0x33FF00, $titulo_tipo[$tipo_duracion_comparada] . ': ' . number_format($total_duracion_comparada,2) . ' en ' . $cant_meses . ' meses', 2);
 	$barLayerObj->setBorderColor(-1, 1);
 	$barLayerObj->setAggregateLabelStyle("arialbd.ttf", 8, 0x000);
 }
-
 
 #output the chart
 $c->Imprimir();
