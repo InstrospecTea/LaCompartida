@@ -178,7 +178,7 @@ class Documento extends Objeto {
 				
 				if(empty($id_contrato) || $id_contrato == 'NULL'){
 					$codigo_asunto = 'NULL';
-				} else if(empty($codigo_asunto)) { echo '2';
+				} else if(empty($codigo_asunto)) {
 					$query = "SELECT codigo_asunto FROM asunto
 						WHERE id_contrato = '$id_contrato'
 						AND codigo_cliente = '$codigo_cliente'
