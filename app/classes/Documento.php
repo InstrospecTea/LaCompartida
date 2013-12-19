@@ -176,7 +176,7 @@ class Documento extends Objeto {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($id_contrato) = mysql_fetch_array($resp);
 				
-				if(empty($id_contrato) || $id_contrato == 'NULL'){ echo '1';
+				if(empty($id_contrato) || $id_contrato == 'NULL'){
 					$codigo_asunto = 'NULL';
 				} else if(empty($codigo_asunto)) { echo '2';
 					$query = "SELECT codigo_asunto FROM asunto
