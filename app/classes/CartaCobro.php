@@ -1312,7 +1312,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos_balance, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 				$html2 = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 				$html2 = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
-
+				$html2 = str_replace('%monto_thh%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto_thh'], $moneda->fields['cifras_decimales'], $idiome->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				/* MONTOS SEGUN MONEDA TOTAL IMPRESION */
 
@@ -2267,7 +2267,6 @@ class CartaCobro extends NotaCobro {
 				} else if (method_exists('Conf', 'TituloContacto')) {
 					if (Conf::TituloContacto()) {
 						$html2 = str_replace('%sr%', __($contrato->fields['titulo_contacto']), $html2);
-						$html2 = str_replace('%NombrePilaContacto%', $contrato->fields['contacto'], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
