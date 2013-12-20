@@ -60,32 +60,32 @@
 	$pagina->PrintTop($popup);
 
 ?>
-    <form method=post>
-    <input type=hidden name=opc>
-    <input type=hidden name=id_cobro value=<?=$id_cobro?>>
+    <form method="post">
+    <input type="hidden" name="opc">
+    <input type="hidden" name="id_cobro" value=<?=$id_cobro?>>
 <?
 	$pagina->PrintPasos($sesion,6,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 	?>
-	<table width=100%>
+	<table width="100%">
     <tr>
-        <td align=left><input type=button class=btn value="<?=__('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();">
-		<td align=center>
+        <td align="left">A<input type="button" class="btn" value="<?=__('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();"></td>
+		<td align="center">
 		</td>
-		<td align=right>
-			<input type=button class=btn value="<?=__('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
+		<td align="right">B
+			<input type="button" class="btn" value="<?=__('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
 		</td>
     </tr>
     </table>
- 	<table width=100%>
+ 	<table width="100%">
     <tr>
-        <td class=cvs align=center colspan=2>
-            <iframe name=tramites id=asuntos src="listar_tramites.php?id_cobro=<?=$id_cobro?>&opc=buscar&motivo=cobros&popup=1" frameborder=0 width=800px height=1500px></iframe>
+        <td class="cvs" align="center" colspan="2">
+            <iframe name="tramites" id="asuntos" src="listar_tramites.php?id_cobro=<?=$id_cobro?>&opc=buscar&motivo=cobros&popup=1" frameborder="0" width="800px" height="1500px"></iframe>
         </td>
     </tr>
 	</table>
 	</form>
 	<?= InputId::Javascript($sesion) ?>
-	<script src=guardar_campo_trabajo.js></script>
+	<script src="guardar_campo_trabajo.js"></script>
 <?
 
 

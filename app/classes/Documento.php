@@ -103,7 +103,7 @@ class Documento extends Objeto {
 		$adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false,
 		$id_contrato = null, $pagar_facturas = false, $id_usuario_ingresa = null, $id_usuario_orden = null,
 		$id_solicitud_adelanto = null, $codigo_asunto = null) {
-
+		
 		list($dtemp, $mtemp, $atemp) = explode("-", $fecha);
 		if (strlen($dtemp) == 2) {
 			$fecha = Utiles::fecha2sql($fecha);
@@ -113,8 +113,6 @@ class Documento extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($activo) = mysql_fetch_array($resp);
 
-#		if($activo==1)
-#			{
 		$monto = str_replace(',', '.', $monto);
 
 		/* Es pago, asi que monto es negativo */
@@ -128,6 +126,7 @@ class Documento extends Objeto {
 		if ($usando_adelanto) {
 			$id_documento = $this->fields['id_documento'];
 			//resetea el saldo y aplica los neteos q lo recalculan
+
 			$this->Edit("saldo_pago", $this->fields['monto']);
 			if ($this->Write()) {
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos, $pagar_facturas);
@@ -136,7 +135,7 @@ class Documento extends Objeto {
 
 			$this->Edit("monto_base", number_format($monto_base * $multiplicador, max(2,$moneda_base['cifras_decimales']), ".", ""));
 
-			$this->Edit("monto",      number_format($monto * $multiplicador, max(2,$moneda->fields['cifras_decimales']), ".", ""));
+			$this->Edit("monto", number_format($monto * $multiplicador, max(2,$moneda->fields['cifras_decimales']), ".", ""));
 
 			$query = "SELECT SUM(valor_pago_honorarios + valor_pago_gastos) total
 						FROM  neteo_documento
@@ -164,12 +163,19 @@ class Documento extends Objeto {
 			$this->Edit("numero_operacion", $numero_operacion);
 			$this->Edit("numero_cheque", $numero_cheque);
 			$this->Edit("id_factura_pago", $id_factura_pago ? $id_factura_pago : "NULL" );
+			
 			if ($pago_retencion) {
 				$this->Edit("pago_retencion", "1");
 			}
+			
 			$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
 			if (!empty($adelanto)) {
 				$this->Edit("id_contrato", $id_contrato);
+				
+				$query = "SELECT id_contrato FROM asunto WHERE '".$codigo_asunto."'";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				list($id_contrato) = mysql_fetch_array($resp);
+				
 				if(empty($id_contrato) || $id_contrato == 'NULL'){
 					$codigo_asunto = 'NULL';
 				} else if(empty($codigo_asunto)) {
@@ -180,6 +186,8 @@ class Documento extends Objeto {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($codigo_asunto) = mysql_fetch_array($resp);
 				}
+				
+				
 				$this->Edit('codigo_asunto', $codigo_asunto);
 			}
 			$this->Edit("pago_honorarios", empty($pago_honorarios) ? '0' : '1');
@@ -219,12 +227,6 @@ class Documento extends Objeto {
 				 throw new Exception($this->error);
 			}
 
-			/* 			}
-			  else
-			  { ?>
-			  <script type="text/javascript">alert('¡No se puede modificar un pago de un cliente inactivo!');</script>
-			  <?	}
-			 */
 		}
 
 		/*
