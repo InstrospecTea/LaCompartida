@@ -868,6 +868,16 @@ public static $configuracion_gastos = array(
 					if (!is_null($factura['id_usuario_generador'])) {
 						$numero = $factura['numero'];
 						$usuario = $factura['id_usuario_generador'];
+						$aporte_factura = $factura['subtotal_facturado'] / $factura['subtotal_cobro'];
+						$factura["producido_total"] = $producido_total * $aporte_factura;
+						$factura["producido_abogado"] = 0;
+						if ($factura["producido_total"] > ($factura['subtotal_facturado'] * $trab)) {
+							$factura["monto_aporte"] = $factura["porcentaje_genera"] * $factura['subtotal_facturado'] * $gen
+														 + $factura["producido_abogado"] * $trab * ($factura['subtotal_facturado'] / $factura["producido_total"]);
+						} else {
+							$factura["monto_aporte"] = $factura["producido_abogado"]
+														 + $factura["porcentaje_genera"] * ($factura['subtotal_facturado'] - $factura["producido_total"]);
+						}
 						$generadores[$numero][$usuario] = $factura;
 					}
 				}
