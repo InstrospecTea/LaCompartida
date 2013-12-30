@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 13.7.15
+Lunes 30 de diciembre 2013
+* **Fixed:** [Elimina elemento inecesario en interfaz listar_tramites](https://github.com/LemontechSA/ttb/pull/372)
 
 ## Hotfix: 13.7.14
 Lunes 30 de diciembre 2013
