@@ -512,7 +512,7 @@ if ($motivo != "cobros") {
 								?>
 								<tr>
 									<td align="right">
-										aabb<?php echo __('Nombre Cliente') ?>
+										<?php echo __('Nombre Cliente') ?>
 									</td>
 									<td nowrap align='left' colspan="3">
 										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
