@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.7.14
+Lunes 30 de diciembre 2013
+* **Fixed:** [Obtiene saldo cliente en base al id_contrato del asunto](https://github.com/LemontechSA/ttb/pull/370)
+
 ## Hotfix: 13.7.13
 martes 17 de diciembre 2013
 * **Fixed:** [Modificaciones al interfaz Listado de tramites en el cobro](https://github.com/LemontechSA/ttb/pull/367)
