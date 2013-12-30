@@ -1003,7 +1003,7 @@ class NotaCobro extends Cobro {
 								    		AND (d.id_contrato IS NULL OR contrato.activo = 'SI')
 									        AND d.es_adelanto = 1
 									        AND d.saldo_pago < 0
-											AND d.id_contrato = '".$this->fields['id_contrato']."'
+											AND d.id_contrato = '".$asunto->fields['id_contrato']."'
 											AND d.pago_gastos = '1'
 									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
 
@@ -1023,7 +1023,7 @@ class NotaCobro extends Cobro {
 												    OR cobro.estado IN ('CREADO' , 'EN REVISION'))
 												    AND cta_corriente.id_neteo_documento IS NULL
 												    AND cta_corriente.documento_pago IS NULL
-													AND asunto.id_contrato = '".$this->fields['id_contrato']."'
+													AND asunto.id_contrato = '".$asunto->fields['id_contrato']."'
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
 				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1043,7 +1043,7 @@ class NotaCobro extends Cobro {
 							        AND contrato.activo = 'SI'
 							        AND d.tipo_doc = 'N'
 							        AND cobro.estado NOT IN ('CREADO' , 'EN REVISION', 'INCOBRABLE')
-									AND cobro.id_contrato = '".$this->fields['id_contrato']."'
+									AND cobro.id_contrato = '".$asunto->fields['id_contrato']."'
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
@@ -4236,7 +4236,7 @@ class NotaCobro extends Cobro {
 								    		AND (d.id_contrato IS NULL OR contrato.activo = 'SI')
 									        AND d.es_adelanto = 1
 									        AND d.saldo_pago < 0
-											AND d.id_contrato = '".$this->fields['id_contrato']."'
+											AND d.id_contrato = '".$asunto->fields['id_contrato']."'
 											AND d.pago_gastos = '1'
 									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
 
@@ -4256,7 +4256,7 @@ class NotaCobro extends Cobro {
 												    OR cobro.estado IN ('CREADO' , 'EN REVISION'))
 												    AND cta_corriente.id_neteo_documento IS NULL
 												    AND cta_corriente.documento_pago IS NULL
-													AND asunto.id_contrato = '".$this->fields['id_contrato']."'
+													AND asunto.id_contrato = '".$asunto->fields['id_contrato']."'
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
 				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
@@ -4276,7 +4276,7 @@ class NotaCobro extends Cobro {
 							        AND contrato.activo = 'SI'
 							        AND d.tipo_doc = 'N'
 							        AND cobro.estado NOT IN ('CREADO' , 'EN REVISION', 'INCOBRABLE')
-									AND cobro.id_contrato = '".$this->fields['id_contrato']."'
+									AND cobro.id_contrato = '".$asunto->fields['id_contrato']."'
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
@@ -7403,7 +7403,7 @@ class NotaCobro extends Cobro {
 								    		AND (d.id_contrato IS NULL OR contrato.activo = 'SI')
 									        AND d.es_adelanto = 1
 									        AND d.saldo_pago < 0
-											AND d.id_contrato = '".$this->fields['id_contrato']."'
+											AND d.id_contrato = '".$asunto->fields['id_contrato']."'
 											AND d.pago_gastos = '1'
 									        AND d.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
 
@@ -7423,7 +7423,7 @@ class NotaCobro extends Cobro {
 												    OR cobro.estado IN ('CREADO' , 'EN REVISION'))
 												    AND cta_corriente.id_neteo_documento IS NULL
 												    AND cta_corriente.documento_pago IS NULL
-													AND asunto.id_contrato = '".$this->fields['id_contrato']."'
+													AND asunto.id_contrato = '".$asunto->fields['id_contrato']."'
 												    AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
 				
 				$resp_saldo_gastos = mysql_query($query_saldo_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_saldo_gastos, __FILE__, __LINE__, $this->sesion->dbh);
@@ -7443,7 +7443,7 @@ class NotaCobro extends Cobro {
 							        AND contrato.activo = 'SI'
 							        AND d.tipo_doc = 'N'
 							        AND cobro.estado NOT IN ('CREADO' , 'EN REVISION', 'INCOBRABLE')
-									AND cobro.id_contrato = '".$this->fields['id_contrato']."'
+									AND cobro.id_contrato = '".$asunto->fields['id_contrato']."'
 							        AND cobro.incluye_gastos = '1'
 							        AND cobro.incluye_honorarios = '0'
 							        AND d.saldo_gastos > 0
