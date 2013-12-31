@@ -361,26 +361,26 @@ $pagina->PrintTop($popup);
 	function AgregarNuevo(name)
 	{
 		var usuario = jQuery('#id_usuario').length > 0 ? jQuery('#id_usuario').val() : <?php echo $sesion->usuario->fields[id_usuario]; ?>;
-			
-		<?php 
-			if (Conf::GetConf($sesion, 'CodigoSecundario') ) {
-		?>
 
-				var cliente = jQuery('#codigo_cliente_secundario').val();
-				var asunto = jQuery('#codigo_asunto_secundario').val();
-				urlo = 'ingreso_tramite.php?popup=1&codigo_cliente_secundario=' + cliente + '&codigo_asunto_secundario=' + asunto + '&id_usuario=' + usuario;
-		
-		<?php
-			 } else {
-		?>
+<?php
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	?>
 
-				var cliente = jQuery('#codigo_cliente').val();
-				var asunto = jQuery('#codigo_asunto').val();
-				urlo = 'ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' + usuario;
-		
-		<?php 
-			} 
-		?>
+			var cliente = jQuery('#codigo_cliente_secundario').val();
+			var asunto = jQuery('#codigo_asunto_secundario').val();
+			urlo = 'ingreso_tramite.php?popup=1&codigo_cliente_secundario=' + cliente + '&codigo_asunto_secundario=' + asunto + '&id_usuario=' + usuario;
+
+	<?php
+} else {
+	?>
+
+			var cliente = jQuery('#codigo_cliente').val();
+			var asunto = jQuery('#codigo_asunto').val();
+			urlo = 'ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' + usuario;
+
+	<?php
+}
+?>
 
 		nuovaFinestra('Agregar_Tramite', 750, 470, urlo, 'top=100, left=125');
 	}
@@ -483,22 +483,22 @@ $pagina->PrintTop($popup);
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
 	</div>
-<?php
-if ($motivo != "cobros") {
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-		$width_tabla = 'width="90%"';
-	else
-		$width_tabla = 'width="100%"';
-	?>
+	<?php
+	if ($motivo != "cobros") {
+		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
+			$width_tabla = 'width="90%"';
+		else
+			$width_tabla = 'width="100%"';
+		?>
 		<!-- Fin calendario DIV -->
 		<center>
 			<table <?php echo $width_tabla ?>><tr><td>
 						<fieldset class="tb_base" style="border: 1px solid #BDBDBD;" width="100%">
 							<legend><?php echo __('Filtros') ?></legend>
 							<table style="border: 0px solid black;" >
-		<?php
-		if ($p_revisor->fields['permitido']) {
-			?>
+								<?php
+								if ($p_revisor->fields['permitido']) {
+									?>
 									<tr>
 										<td align="right">
 											<?php echo __('Trabajo') ?>
@@ -507,8 +507,8 @@ if ($motivo != "cobros") {
 											<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no", "trabajo_si_no", $trabajo_si_no, '', 'Todos', '60') ?>
 										</td>
 									</tr>
-								<?php
-		}
+									<?php
+								}
 								?>
 								<tr>
 									<td align="right">
@@ -521,16 +521,16 @@ if ($motivo != "cobros") {
 								</tr>
 								<tr>
 									<td align="right">
-								<?php echo __('Asunto') ?>
+										<?php echo __('Asunto') ?>
 									</td>
 									<td nowrap align='left' colspan="3">
 										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 									</td>
 								</tr>
-	<?php
-	if (strlen($select_usuario) > 164) { // Depende de que no cambie la función Html::SelectQuery(...)
-		?>
+								<?php
+								if (strlen($select_usuario) > 164) { // Depende de que no cambie la función Html::SelectQuery(...)
+									?>
 									<tr>
 										<td align="right">
 											<?php echo __('Usuario') ?>
@@ -553,7 +553,7 @@ if ($motivo != "cobros") {
 									</td>
 									<td align="left" colspan="3">
 										<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
-								<?php echo __('Fecha hasta') ?>:&nbsp;
+										<?php echo __('Fecha hasta') ?>:&nbsp;
 										<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 									</td>
 								</tr>
@@ -568,9 +568,9 @@ if ($motivo != "cobros") {
 						</fieldset>
 					</td></tr></table>
 		</center>
-	<?php
-}
-?>
+		<?php
+	}
+	?>
 </form>
 
 
@@ -681,8 +681,7 @@ function Opciones(& $tramite) {
 			else
 				$opc_html.= "<a href=# onclick=\"alert('" . __('No se puede eliminar este tr�mite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\"><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 		}
-	}
-	else
+	} else
 		$opc_html .= "<img src=$img_dir/candado_16.gif border=0 title='" . __('Usted no tiene permiso de Revisor') . "'>";
 
 	return $opc_html;
@@ -782,11 +781,14 @@ function funcionTR(& $tramite) {
 	}
 
 	$moneda_tramite = new Moneda($sesion);
-	$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
+	
+	//	$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
+	//	Lo comentado de la linea anterior a esta fue reemplazado por el siguiente despues del comentario
+	//	debido a que no se obtenian los formatos ni los simbolos para las monedas que correspondian
+	$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
-	#$html .= "<td>".$tramite->Estado()."</td>";
 	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164) {
 		if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 			$html .= "<td align=center>" . $tramite->fields['username'] . "</td>";
@@ -795,8 +797,8 @@ function funcionTR(& $tramite) {
 		}
 	}
 	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido']) {
-		//$html .= '<td>Rev.'.Revisado(& $tramite).'</td>';
-		$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['codigo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
+		//$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['codigo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
+		$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['simbolo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
 	}
 	$html .= '<td align=center nowrap>' . Opciones($tramite) . '</td>';
 	$html .= "</tr>";
