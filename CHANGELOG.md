@@ -1,8 +1,47 @@
 # Changelog
+## Hotfix: 13.7.15
+Lunes 30 de diciembre 2013
+* **Fixed:** [Elimina elemento inecesario en interfaz listar_tramites](https://github.com/LemontechSA/ttb/pull/372)
 
-## Hotfix: 13.7.5
+## Hotfix: 13.7.14
+Lunes 30 de diciembre 2013
+* **Fixed:** [Obtiene saldo cliente en base al id_contrato del asunto](https://github.com/LemontechSA/ttb/pull/370)
+
+## Hotfix: 13.7.13
+martes 17 de diciembre 2013
+* **Fixed:** [Modificaciones al interfaz Listado de tramites en el cobro](https://github.com/LemontechSA/ttb/pull/367)
+
+## Hotfix: 13.7.12
+martes 17 de diciembre 2013
+* **Fixed:** [Corrige saldo adelantos](https://github.com/LemontechSA/ttb/pull/366)
+
+
+https://github.com/LemontechSA/ttb/pull/365
+
+## Hotfix: 13.7.11
+jueves 12 de diciembre 2013
+* **Fixed:** [Modificaciones al interfaz resumen actividades profesionales](https://github.com/LemontechSA/ttb/pull/365)
+* **Added:** [Modificaciones a grafico periodo](https://github.com/LemontechSA/ttb/pull/365)
+
+## Hotfix: 13.7.10
+jueves 12 de diciembre 2013
+* **Fixed:** [Cambia variable que causa error MySQL](https://github.com/LemontechSA/ttb/pull/364)
+
+
+## Hotfix: 13.7.9
+Miercoles 11 de Diciembre 2013
+* **Fixed:** [Corregir correlativo de códigos de actividades](https://github.com/LemontechSA/ttb/pull/362)
+
+## Hotfix: 13.7.8
+Miercoles 11 de Diciembre 2013
+* **Fixed:** [Nuevo Tag con comportamiento segun estados de cobro](https://github.com/LemontechSA/ttb/pull/361)
+
+## Hotfix: 13.7.7
+Martes 10 de Diciembre 2013
+* **Fixed:** [Calculo saldo cliente en detalle de cobro](https://github.com/LemontechSA/ttb/pull/360)
+
+## Hotfix: 13.7.6
 Viernes 6 de Diciembre 2013
-* **Fixed:** [Calculo saldo cliente en detalle de cobro](https://github.com/LemontechSA/ttb/pull/358)
 * **Added:** [Graficar horas no cobrables en reporte Reporte Gráfico por Período](https://github.com/LemontechSA/ttb/pull/358)
 * **Fixed:** [Problemas con Facturación Electrónica México](https://github.com/LemontechSA/ttb/pull/359)
 

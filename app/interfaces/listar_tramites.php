@@ -500,30 +500,30 @@ if ($motivo != "cobros") {
 		if ($p_revisor->fields['permitido']) {
 			?>
 									<tr>
-										<td align=right>
-		<?php echo __('Trabajo') ?>
+										<td align="right">
+											<?php echo __('Trabajo') ?>
 										</td>
 										<td align='left'> 
-									<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no", "trabajo_si_no", $trabajo_si_no, '', 'Todos', '60') ?>
+											<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no", "trabajo_si_no", $trabajo_si_no, '', 'Todos', '60') ?>
 										</td>
 									</tr>
-									<?php
-								}
+								<?php
+		}
 								?>
 								<tr>
-									<td align=right>
+									<td align="right">
 										<?php echo __('Nombre Cliente') ?>
 									</td>
-									<td nowrap align='left' colspan=3>
+									<td nowrap align='left' colspan="3">
 										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 									</td>
 								</tr>
 								<tr>
-									<td align=right>
+									<td align="right">
 								<?php echo __('Asunto') ?>
 									</td>
-									<td nowrap align='left' colspan=3>
+									<td nowrap align='left' colspan="3">
 										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
 									</td>
@@ -532,10 +532,10 @@ if ($motivo != "cobros") {
 	if (strlen($select_usuario) > 164) { // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
 		?>
 									<tr>
-										<td align=right>
+										<td align="right">
 											<?php echo __('Usuario') ?>
 										</td>
-										<td align='left' colspan=3>
+										<td align='left' colspan="3">
 											<?php echo $select_usuario ?>
 										</td>
 									</tr>
@@ -548,10 +548,10 @@ if ($motivo != "cobros") {
 								$fecha_fin = Utiles::sql2date($fecha_fin);
 								?>
 								<tr>
-									<td align=right colspan=1>
+									<td align="right" colspan="1">
 										<?php echo __('Fecha desde') ?>:
 									</td>
-									<td align=left colspan=3>
+									<td align="left" colspan="3">
 										<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
 								<?php echo __('Fecha hasta') ?>:&nbsp;
 										<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
@@ -559,10 +559,10 @@ if ($motivo != "cobros") {
 								</tr>
 								<tr>
 									<td></td>
-									<td colspan='3'  align=left>
-										<input name='boton_buscar' id='boton_buscar' type='submit' class=btn onclick="this.form.check_tramite.value = 1"  value=<?php echo __('Buscar') ?>>
+									<td colspan='3'  align="left">
+										<input name='boton_buscar' id='boton_buscar' type='submit' class="btn" onclick="this.form.check_tramite.value = 1"  value=<?php echo __('Buscar') ?>>
 									</td>
-									<td> <img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?php echo __('Agregar') ?> <?php echo __('trámite') ?></a> </td>
+									<td> <img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border="0"> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?php echo __('Agregar') ?> <?php echo __('trámite') ?></a> </td>
 								</tr>
 							</table>
 						</fieldset>
@@ -592,7 +592,7 @@ if (isset($cobro) || $opc == 'buscar') {
 	<a href="#" onclick="nuovaFinestra('Editar_listado_trámites', 700, 450, 'editar_multiples_tramites.php?ids=<?php echo $ids_listado_tramites ?>&popup=1&listado_completo=1', '');" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
 
 	<br /> 
-	<input type=button class=btn value="<?php echo __('Descargar listado a Excel') ?>" onclick="window.open('listar_tramites.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>')">
+	<input type="button" class="btn" value="<?php echo __('Descargar listado a Excel') ?>" onclick="window.open('listar_tramites.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>')">
 	<br />
 	</center>
 		<!--<input type=button class=btn value="<?php echo __('Descargar Archivo a Word') ?>" onclick="window.open('trabajos.php?id_cobro=<?php echo $id_cobro ?>&word=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>')">-->
@@ -782,7 +782,7 @@ function funcionTR(& $tramite) {
 	}
 
 	$moneda_tramite = new Moneda($sesion);
-	$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
+	$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
@@ -796,7 +796,7 @@ function funcionTR(& $tramite) {
 	}
 	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido']) {
 		//$html .= '<td>Rev.'.Revisado(& $tramite).'</td>';
-		$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['simbolo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
+		$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['codigo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
 	}
 	$html .= '<td align=center nowrap>' . Opciones($tramite) . '</td>';
 	$html .= "</tr>";

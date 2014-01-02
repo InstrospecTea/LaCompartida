@@ -211,7 +211,7 @@ class UsuarioExt extends Usuario {
 		$query = "SELECT id_tarifa, id_moneda, tarifa FROM categoria_tarifa WHERE id_categoria_usuario=" . $id_categoria_usuario . " ORDER BY id_moneda";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-		$UsuarioTarifa = new UsuarioTarifa($sesion);
+		$UsuarioTarifa = new UsuarioTarifa($this->sesion);
 		while (list( $id_tarifa, $id_moneda, $tarifa) = mysql_fetch_array($resp)) {
 			$UsuarioTarifa->GuardarTarifa($id_tarifa, $id, $id_moneda, $tarifa);
 		}

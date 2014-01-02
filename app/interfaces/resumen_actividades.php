@@ -119,21 +119,6 @@ if (is_array($clientesF)) {
 }
 $clientes = $clientes_tmp;
 
-
-// AREA areas[]
-
-$areas_tmp = '';
-if (is_array($areasF)) {
-	foreach ($areasF as $key => $value) {
-		if (strlen($areas_tmp) > 0) {
-			$areas_tmp .= ",";
-		}
-		$areas_tmp .= $value;
-	}
-}
-$areas = $areas_tmp;
-
-
 // AREA TRABAJO  areas_trabajo[]
 
 $areas_trabajo_tmp = '';
@@ -838,7 +823,6 @@ if ($opc == 'print' || $popup) {
 	if (!is_array($clients)) {
 		$clients = array($clients);
 	}
-
 	foreach ($clients as $cliente) {
 		if ($cliente) {
 			$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
@@ -846,15 +830,10 @@ if ($opc == 'print' || $popup) {
 	}
 
 	/* AREAS */
-	$areas = explode(",", $areas_asunto);
-	if (!is_array($areas)) {
-		$areas = array($areas);
+	foreach ($areasF as $valor) {
+		$reporte->addFiltro('usuario', 'id_area_usuario', $valor);
 	}
-	foreach ($areas as $area) {
-		if ($area) {
-			$reporte->addFiltro('asunto', 'id_area_proyecto', $area);
-		}
-	}
+
 	/* TIPOS */
 	$tipos = explode(",", $tipos_asunto);
 	if (!is_array($tipos)) {
@@ -906,9 +885,6 @@ if ($opc == 'print' || $popup) {
 	//genero el formato valor a ser usado en las celdas (
 	$moneda = new Moneda($sesion);
 	$moneda->Load($id_moneda);
-
-
-	//echo ">>> " . $reporte->sQuery(); exit; 
 
 	$reporte->Query();
 	$r = $reporte->toArray();
