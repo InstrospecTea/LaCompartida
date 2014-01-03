@@ -878,6 +878,10 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%monto_total_sin_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_subtotal, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				}
 
+
+				/* MONTO Honorario sin IVA */
+				$html2 = str_replace('%monto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
 				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				if ($this->fields['opc_moneda_total'] != $this->fields['id_moneda'])
@@ -1155,6 +1159,15 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigopropuesta%', '', $html2);
 				}
 
+				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {
+					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto'], $html2);
+
+					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto'] . ' ' . $contrato->fields['apellido_contacto']), $html2);
+				} else {
+					$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
+					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
+				}
+
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%rut_cliente%', $contrato->fields['rut'], $html2);
@@ -1312,7 +1325,12 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos_balance, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 				$html2 = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 				$html2 = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
-				$html2 = str_replace('%monto_thh%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto_thh'], $moneda->fields['cifras_decimales'], $idiome->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				
+
+				/* MONTO Honorario sin IVA */
+				
+				$html2 = str_replace('%monto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
 
 				/* MONTOS SEGUN MONEDA TOTAL IMPRESION */
 
@@ -2085,6 +2103,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
 				$html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
+				$html2 = str_replace('%nombre_cliente_ucfirst%', ucfirst($glosa_cliente), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%factura_giro%', $contrato->fields['factura_giro'], $html2);
@@ -2406,7 +2425,6 @@ class CartaCobro extends NotaCobro {
 					$row = str_replace('%honorarios_asunto_mi%', round($subtotal_hh_mi * $rowdesglose['pthh'], $cifras_decimales_mi), $row);
 					$row = str_replace('%gastos_asunto_mi%', round($subtotal_gasto_mi * $rowdesglose['pg'], $cifras_decimales_mi), $row);
 
-					//var_dump( $cobro_moneda ); exit;
 					$total_asunto_mi = round(floatval($subtotal_hh_mi) + floatval($subtotal_gasto_mi) + floatval($impuesto_hh_mi) + floatval($impuesto_gasto_mi), $cifras_decimales_mi);
 					$row = str_replace('%total_asunto_mi%', number_format($total_asunto_mi, $cifras_decimales_mi, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 

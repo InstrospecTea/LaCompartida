@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix: 13.7.16
+Martes 31 de diciembre 2013
+* **Fixed:** [Corrige monto y moneda en listado de tramites](https://github.com/LemontechSA/ttb/pull/373)
+* **Fixed:** [Modificaciones en CartaCobro](https://github.com/LemontechSA/ttb/pull/373)
+
 ## Hotfix: 13.7.15
 Lunes 30 de diciembre 2013
 * **Fixed:** [Elimina elemento inecesario en interfaz listar_tramites](https://github.com/LemontechSA/ttb/pull/372)
