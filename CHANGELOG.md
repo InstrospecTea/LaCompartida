@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.17
+viernes 03 de enero 2014
+* **Fixed:** Actualiza /fw
+
 ## Hotfix: 13.7.16
 Martes 31 de diciembre 2013
 * **Fixed:** [Corrige monto y moneda en listado de tramites](https://github.com/LemontechSA/ttb/pull/373)
