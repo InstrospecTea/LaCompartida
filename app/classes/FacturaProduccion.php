@@ -855,6 +855,7 @@ public static $configuracion_gastos = array(
 
 		$report_results = array();
 		error_reporting(E_ALL ^ E_NOTICE);
+
 		foreach ($pagos as $id_cobro => $facturas_generador) {
 			$trabajos_cobro = $trabajos[$id_cobro];
 			$total_trabajos = $trabajos_totales[$id_cobro][0];
@@ -881,6 +882,7 @@ public static $configuracion_gastos = array(
 						$generadores[$numero][$usuario] = $factura;
 					}
 				}
+
 				foreach ($facturas_generador as $factura) {
 					foreach ($trabajos_cobro as $trabajo) {
 						$numero = $factura['numero'];
@@ -948,6 +950,9 @@ public static $configuracion_gastos = array(
 
 			} else {
 				foreach ($facturas_generador as $factura) {
+					$factura["producido_total"] = 0;
+					$factura["producido_abogado"] = 0;
+					$factura["monto_aporte"] = $factura["porcentaje_genera"] * $factura['subtotal_facturado'];
 					$this->AddRowToResults($id_cobro, $factura, $report_results);
 				}
 			}
