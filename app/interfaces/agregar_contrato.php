@@ -3181,7 +3181,7 @@ if ($solicitante == 0) {  // no mostrar
 										</td>
 									<td>
 										<?
-										echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+										echo Html::SelectQuery($Sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																					FROM usuario
 																					WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																					AND usuario.activo = 1
