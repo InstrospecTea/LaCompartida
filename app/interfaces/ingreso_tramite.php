@@ -592,12 +592,16 @@ $pagina->PrintTop($popup);
 		}
 
 		//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-		if (form.id_cobro.value != '' && $('id_tramite').value != '') {
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-				return ActualizaCobro(form.codigo_asunto_secundario.value);
-<?php } else { ?>
-				return ActualizaCobro(form.codigo_asunto.value);
-<?php } ?>
+		if (form.id_cobro.value !== '' && $('id_trabajo').value !== '') {
+			
+			var cod_asunto = jQuery('#campo_codigo_asunto').val();
+			var cod_asunto_secundario = jQuery('#campo_codigo_asunto_secundario').val();
+
+			<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+				return ActualizaCobro(cod_asunto_secundario);
+			<?php } else { ?>
+				return ActualizaCobro(cod_asunto);
+			<?php } ?>
 		}
 
 		form.action = 'ingreso_tramite.php'
