@@ -618,19 +618,18 @@ public static $configuracion_gastos = array(
 						prm_estado_factura.codigo estado_factura,
 						prm_documento_legal.codigo AS tipo,
 						factura.fecha,
-						moneda_factura.simbolo AS moneda_original,
+						prm_moneda.simbolo AS moneda_original,
 						factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total,
 						factura.subtotal AS subtotal_facturado_original,
 						factura.iva AS impuesto_facturado_original,
 						factura.total AS total_facturado_original,
-						(factura.total * 0.12)  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_detraccion,
-						(factura.subtotal - (factura.total * 0.12))  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
-						factura.total * 0.12 AS monto_detraccion_original,
-						factura.subtotal - (factura.total * 0.12) AS total_liquido_original,
+						(CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END)  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_detraccion,
+						(factura.subtotal - (CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END))  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
+						(CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) AS monto_detraccion_original,
+						factura.subtotal - (CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) AS total_liquido_original,
 						(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
-						moneda_filtro.simbolo moneda,
+						prm_moneda_filtro.simbolo moneda,
 						usuario.id_usuario id_usuario_generador,
-
 						usuario.username username_generador,
 						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre_generador,
 						prm_area_usuario.glosa AS area_usuario,
@@ -640,14 +639,18 @@ public static $configuracion_gastos = array(
 						GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 					 FROM factura
 					 JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
-					 JOIN prm_moneda moneda_factura ON moneda_factura.id_moneda = factura.id_moneda
 					 JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 					 JOIN cobro ON cobro.id_cobro = factura.id_cobro
+					 JOIN cobro_moneda moneda_cobro ON cobro.id_moneda = moneda_cobro.id_moneda AND cobro.id_cobro = moneda_cobro.id_cobro
+					 JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
+					 JOIN cobro_moneda moneda_base ON moneda_base.id_moneda = 1 AND factura.id_cobro = moneda_base.id_cobro
+					 JOIN prm_moneda ON moneda_factura.id_moneda = prm_moneda.id_moneda
+				 	 JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
+					 JOIN prm_moneda prm_moneda_filtro  ON prm_moneda_filtro.id_moneda = moneda_filtro.id_moneda
 					 JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 					 JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 					 LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 					 LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-					 LEFT JOIN prm_moneda moneda_filtro ON moneda_filtro.id_moneda = :currency_id
 					 LEFT JOIN factura_generador ON factura_generador.id_factura = factura.id_factura
 						LEFT JOIN usuario ON usuario.id_usuario = factura_generador.id_usuario
 						LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario
@@ -672,10 +675,10 @@ public static $configuracion_gastos = array(
 							factura.subtotal AS subtotal_facturado_original,
 							factura.iva AS impuesto_facturado_original,
 							factura.total AS total_facturado_original,
-							(factura.total * 0.12) * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_detraccion,
-							(factura.subtotal - (factura.total * 0.12)) * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
-							factura.total * 0.12 AS monto_detraccion_original,
-							factura.subtotal - (factura.total * 0.12) AS total_liquido_original,
+							(CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS monto_detraccion,
+							(factura.subtotal - (CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END)) * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
+							(CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) AS monto_detraccion_original,
+							factura.subtotal - (CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) AS total_liquido_original,
 							(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
 							prm_moneda_filtro.simbolo moneda,
 							SUM(ccfmn.monto * (ccfmm.tipo_cambio) / (ccfmmf.tipo_cambio)) AS total_pagado,
@@ -698,6 +701,7 @@ public static $configuracion_gastos = array(
 				JOIN cobro ON cobro.id_cobro = factura.id_cobro
 				JOIN cobro_moneda moneda_cobro ON cobro.id_moneda = moneda_cobro.id_moneda AND cobro.id_cobro = moneda_cobro.id_cobro
 				JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
+				JOIN cobro_moneda moneda_base ON moneda_base.id_moneda = 1 AND factura.id_cobro = moneda_base.id_cobro
 				JOIN prm_moneda ON moneda_factura.id_moneda = prm_moneda.id_moneda
 				JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
 				JOIN prm_moneda prm_moneda_filtro  ON prm_moneda_filtro.id_moneda = moneda_filtro.id_moneda
