@@ -73,7 +73,7 @@ $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 							<?php echo __('Área Usuario') ?>:
 						</td>
 						<td valign="top" class="texto" align="left">
-							<?php echo Html::SelectQuery($sesion, 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa', 'id_area_usuario', $id_area_usuario, '', 'Cualquiera') ?>
+							<?php echo AreaUsuario::SelectAreas($sesion, 'id_area_usuario', $id_area_usuario, '', 'Cualquiera') ?>
 						</td>
 					</tr>
 					<tr>

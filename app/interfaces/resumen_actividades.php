@@ -778,7 +778,7 @@ if (!$popup) {
 						</tr>
 						<tr valign="top">
 							<td rowspan="2" align="left">
-	<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areasF[]", $areasF, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+	<?php echo AreaUsuario::SelectAreas($sesion, "areasF[]", $areasF, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 							</td>
 	<?php if (UtilesApp::GetConf($sesion, 'UsarAreaTrabajos')) { ?>
 								<td rowspan="2" align="left">
