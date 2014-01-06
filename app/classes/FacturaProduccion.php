@@ -63,7 +63,7 @@ class FacturaProduccion {
 		array(
 			'field' => 'impuesto_facturado_original',
 			'format' => 'number',
-			'title' => 'Impuesto'
+			'title' => 'Impuesto Original'
 		),
 		array(
 			'field' => 'total_facturado_original',
@@ -85,6 +85,16 @@ class FacturaProduccion {
 		array(
 			'field' => 'moneda',
 			'title' => 'Moneda'
+		),
+		array(
+			'field' => 'subtotal_facturado',
+			'format' => 'number',
+			'title' => 'Subtotal Facturado'
+		),
+		array(
+			'field' => 'impuesto_facturado',
+			'format' => 'number',
+			'title' => 'Impuesto'
 		),
 		array(
 			'field' => 'total',
@@ -200,7 +210,7 @@ class FacturaProduccion {
 		array(
 			'field' => 'impuesto_facturado_original',
 			'format' => 'number',
-			'title' => 'Impuesto'
+			'title' => 'Impuesto Original'
 		),
 		array(
 			'field' => 'total_facturado_original',
@@ -232,6 +242,11 @@ class FacturaProduccion {
 			'field' => 'subtotal_facturado',
 			'format' => 'number',
 			'title' => 'Subtotal Facturado'
+		),
+		array(
+			'field' => 'impuesto_facturado',
+			'format' => 'number',
+			'title' => 'Impuesto'
 		),
 		array(
 			'field' => 'monto_detraccion',
@@ -346,7 +361,7 @@ class FacturaProduccion {
 		array(
 			'field' => 'impuesto_facturado_original',
 			'format' => 'number',
-			'title' => 'Impuesto'
+			'title' => 'Impuesto Original'
 		),
 		array(
 			'field' => 'total_facturado_original',
@@ -383,6 +398,11 @@ class FacturaProduccion {
 			'field' => 'subtotal_facturado',
 			'format' => 'number',
 			'title' => 'Subtotal Facturado'
+		),
+		array(
+			'field' => 'impuesto_facturado',
+			'format' => 'number',
+			'title' => 'Impuesto'
 		),
 		array(
 			'field' => 'monto_detraccion',
@@ -627,6 +647,8 @@ public static $configuracion_gastos = array(
 						(factura.subtotal - (CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END))  * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_liquido,
 						(CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) AS monto_detraccion_original,
 						factura.subtotal - (CASE WHEN factura.total * moneda_base.tipo_cambio <= 700 THEN 0 ELSE factura.total * 0.12 END) AS total_liquido_original,
+						factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_facturado,
+						factura.iva * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS impuesto_facturado,
 						(moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS tipo_cambio,
 						prm_moneda_filtro.simbolo moneda,
 						usuario.id_usuario id_usuario_generador,
@@ -672,6 +694,7 @@ public static $configuracion_gastos = array(
 							cobro.monto_subtotal * (moneda_cobro.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_cobro,
 							factura.total * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS total_facturado,
 							factura.subtotal * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS subtotal_facturado,
+							factura.iva * (moneda_factura.tipo_cambio) / (moneda_filtro.tipo_cambio) AS impuesto_facturado,
 							factura.subtotal AS subtotal_facturado_original,
 							factura.iva AS impuesto_facturado_original,
 							factura.total AS total_facturado_original,
