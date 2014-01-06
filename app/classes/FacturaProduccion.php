@@ -525,32 +525,21 @@ public static $configuracion_gastos = array(
 		array(
 			'field' => 'egreso',
 			'format' => 'number',
-			'title' => 'Egreso',
-			'extras' =>
-			array(
-				'symbol' => 'simbolo',
-				'subtotal' => 'simbolo'
-			),
+			'title' => 'Egreso'
 		),
 		array(
-			'field' => 'ingreso',
-			'format' => 'number',
-			'title' => 'Ingreso',
-			'extras' =>
-			array(
-				'symbol' => 'simbolo',
-				'subtotal' => 'simbolo'
-			),
+			'field' => 'simbolo_monto',
+			'title' => 'Símbolo Moneda',
 		),
 		array(
-			'field' => 'monto_cobrable',
+			'field' => 'monto_egreso',
 			'format' => 'number',
-			'title' => 'Monto Cobrable',
-			'extras' =>
-			array(
-				'symbol' => 'simbolo',
-				'subtotal' => 'simbolo'
-			),
+			'title' => 'Monto Egreso'
+		),
+		array(
+			'field' => 'tipo_cambio',
+			'format' => 'number',
+			'title' => 'Tipo de Cambio'
 		),
 		array(
 			'field' => 'con_impuesto',
@@ -818,19 +807,22 @@ public static $configuracion_gastos = array(
 				$where = array(
 					'cobrable' => '0',
 					'fecha1' => ':period_from',
-					'fecha2' => ':period_to',
-					'moneda_gasto' => ':currency_id'
+					'fecha2' => ':period_to'
 				);
 
-				$col_select = " , generador.username AS username_generador
+				$col_select = " , IFNULL(cta_corriente.egreso, 0) * prm_moneda_filtro.tipo_cambio AS monto_egreso
+								, prm_moneda_filtro.tipo_cambio AS tipo_cambio
+								, prm_moneda_filtro.simbolo AS simbolo_monto
+								, generador.username AS username_generador
 								, CONCAT(generador.apellido1, ' ', generador.apellido2, ', ', generador.nombre) AS nombre_generador
 								, area_generador.glosa AS area_usuario
 								, contrato_generador.porcentaje_genera / 100.0 AS porcentaje_genera
-								, (contrato_generador.porcentaje_genera / 100.0) * IFNULL(cta_corriente.egreso, 0) AS monto_genera ";
+								, (contrato_generador.porcentaje_genera / 100.0) * IFNULL(cta_corriente.egreso, 0) * prm_moneda_filtro.tipo_cambio AS monto_genera ";
 
 				$join_extra = " LEFT JOIN contrato_generador ON contrato.id_contrato = contrato_generador.id_contrato
 						LEFT JOIN usuario AS generador ON generador.id_usuario = contrato_generador.id_usuario
-						LEFT JOIN prm_area_usuario AS area_generador ON area_generador.id = generador.id_area_usuario ";
+						LEFT JOIN prm_area_usuario AS area_generador ON area_generador.id = generador.id_area_usuario
+						LEFT JOIN prm_moneda prm_moneda_filtro ON prm_moneda_filtro.id_moneda = :currency_id";
 
 				return $Gasto->SearchQuery($this->sesion, $Gasto->WhereQuery($where), $col_select, $join_extra);
 		}
