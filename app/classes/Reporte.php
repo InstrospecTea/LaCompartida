@@ -896,8 +896,6 @@ class Reporte {
 			$this->row[] = $row;
 		}
 
-		/* UTILIZADO PARA DEBUG */
-
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 	 	if (
 		 	$this->requiereMoneda($this->tipo_dato)
@@ -912,20 +910,24 @@ class Reporte {
 				$cobroquery = $this->cobroQuery();
 				$stringquery = " \n\n\n union all \n\n\n $cobroquery";
 
+				/* UTILIZADO PARA DEBUG */
+
 				// $testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . $stringquery . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
 				// $respt = mysql_query($testimonio, $this->sesion->dbh);
 
 				$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
+				
 				while ($row = mysql_fetch_array($resp)) {
 					$this->row[] = $row;
 				}
 		}
+
+		/* UTILIZADO PARA DEBUG */
 		// } else {
 		//  	$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
 		//  	$respt = mysql_query($testimonio, $this->sesion->dbh);
 		// }
 
-		/* FIN UTILIZADO PARA DEBUG */
 	}
 
 	/*
