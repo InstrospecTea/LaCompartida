@@ -69,13 +69,13 @@ $pagina->PrintTop($popup);
 	<table width="100%">
 		<tr>
 			<td align="left">
-				<input type="button" class="btn" value="<?=__('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();">
+				<input type="button" class="btn" value="<?php echo __('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();">
 			</td>
 			
 			<td align="center">&nbsp;</td>
 			
 			<td align="right">
-				<input type="button" class="btn" value="<?=__('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
+				<input type="button" class="btn" value="<?php echo __('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
 			</td>
 		</tr>
     </table>
