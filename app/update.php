@@ -10123,7 +10123,7 @@ QUERY;
 
 		case 7.52:
 			$queries = array();
-			$queries[] = "INSERT INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES ( NULL , 'SaldoClientePorAsunto', '0', '1', 'boolean', '8', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES ( NULL , 'SaldoClientePorAsunto', '0', '1', 'boolean', '8', '-1');";
 			ejecutar($queries, $dbh);
 			break;
 	}
