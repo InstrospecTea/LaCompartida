@@ -810,14 +810,14 @@ public static $configuracion_gastos = array(
 					'fecha2' => ':period_to'
 				);
 
-				$col_select = " , IFNULL(cta_corriente.egreso, 0) * prm_moneda_filtro.tipo_cambio AS monto_egreso
+				$col_select = " , IFNULL(cta_corriente.egreso, 0) / prm_moneda_filtro.tipo_cambio AS monto_egreso
 								, prm_moneda_filtro.tipo_cambio AS tipo_cambio
 								, prm_moneda_filtro.simbolo AS simbolo_monto
 								, generador.username AS username_generador
 								, CONCAT(generador.apellido1, ' ', generador.apellido2, ', ', generador.nombre) AS nombre_generador
 								, area_generador.glosa AS area_usuario
 								, contrato_generador.porcentaje_genera / 100.0 AS porcentaje_genera
-								, (contrato_generador.porcentaje_genera / 100.0) * IFNULL(cta_corriente.egreso, 0) * prm_moneda_filtro.tipo_cambio AS monto_genera ";
+								, (contrato_generador.porcentaje_genera / 100.0) * IFNULL(cta_corriente.egreso, 0) / prm_moneda_filtro.tipo_cambio AS monto_genera ";
 
 				$join_extra = " LEFT JOIN contrato_generador ON contrato.id_contrato = contrato_generador.id_contrato
 						LEFT JOIN usuario AS generador ON generador.id_usuario = contrato_generador.id_usuario
