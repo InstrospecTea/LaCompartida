@@ -18,7 +18,7 @@ $cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 $nombre_cliente = $cliente->fields['glosa_cliente'];
 $pagina->titulo = __('Emitir') . " " . __('Cobro') . __(' :: Selección de trámites #').$id_cobro.__(' ').$nombre_cliente;
 
-if($cobro->fields['estado'] <> 'CREADO' && $cobro->fields['estado'] <> 'EN REVISION'){
+if($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVISION'){
 	$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");	
 }
 
