@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix: 13.7.19
+Miercoles 8 de enero 2014
+* **Fixed:** [Corrige error que impedia editar un tramite](https://github.com/LemontechSA/ttb/pull/374)
+
 ## Hotfix: 13.7.18
-Lunes 6 de diciembre 2013
+Lunes 6 de de enero 2014
 * **Fixed:** [Corrige error que impedia editar un tramite](https://github.com/LemontechSA/ttb/pull/374)
 * **Fixed:** [Corrige Update.php que agregaba elemento inecesario](https://github.com/LemontechSA/ttb/pull/374)
 
