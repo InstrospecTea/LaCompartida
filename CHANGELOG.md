@@ -1,4 +1,10 @@
 # Changelog
+
+## Hotfix: 13.7.18
+Lunes 6 de diciembre 2013
+* **Fixed:** [Corrige error que impedia editar un tramite](https://github.com/LemontechSA/ttb/pull/374)
+* **Fixed:** [Corrige Update.php que agregaba elemento inecesario](https://github.com/LemontechSA/ttb/pull/374)
+
 ## Hotfix: 13.7.17
 viernes 03 de enero 2014
 * **Fixed:** Actualiza /fw
