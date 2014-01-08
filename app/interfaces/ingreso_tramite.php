@@ -749,7 +749,6 @@ $pagina->PrintTop($popup);
 		var form = jQuery('#form_editar_trabajo');
 
 		if (codigo_asunto_hide != valor && id_cobro && id_trabajo) {
-			console.log('Dentro de IF ActualizaCobro');
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece') . " " . __('al cobro') ?>:' + id_cobro + ' ';
 			text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de') . " " . __('este cobro') . " " . __('y eventualmente se vinculará a') . " " . __('un cobro') . " " . __('pendiente para el nuevo asunto en caso de que exista') ?>.</span><br>';
@@ -770,7 +769,6 @@ $pagina->PrintTop($popup);
 				}
 			});
 		} else {
-			console.log('Dentro de ELSE ActualizaCobro');
 			return true;
 		}
 	}
