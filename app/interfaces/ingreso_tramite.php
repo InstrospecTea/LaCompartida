@@ -601,7 +601,7 @@ $pagina->PrintTop($popup);
 
 		//	Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje
 
-		if (form.id_cobro.value !== '' && jQuery('#id_trabajo').val() !== '') {
+		if (form.id_cobro.value !== '' && jQuery('#id_tramite').val() !== '') {
 
 			var cod_asunto = jQuery('#campo_codigo_asunto').val();
 			var cod_asunto_secundario = jQuery('#campo_codigo_asunto_secundario').val();
