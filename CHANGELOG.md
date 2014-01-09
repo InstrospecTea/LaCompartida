@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.7.21
+Jueves 9 de enero 2014
+* **Fixed:** [Modificacion a saldo cliente para fjdabogados](https://github.com/LemontechSA/ttb/pull/382)
+
 ## Hotfix: 13.7.20
 Miercoles 8 de enero 2014
 * **Fixed:** [Modificacion a saldo cliente para fjdabogados](https://github.com/LemontechSA/ttb/pull/381)
