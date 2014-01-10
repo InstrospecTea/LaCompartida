@@ -817,7 +817,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%fecha_fin_periodo_exacto%', $fecha_diff_ultimo_trabajo, $html2);
 				}
 
-				$html2 = str_replace('%glosa_cliente_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
+				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%n_num_factura%', 'N°' . $this->fields['documento'], $html2);
 				$html2 = str_replace('%fecha_primer_trabajo%', $fecha_primer_trabajo, $html2);
@@ -2106,7 +2106,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%nombre_cliente_ucfirst%', ucfirst($glosa_cliente), $html2);
-				$html2 = str_replace('%razon_social_cliente_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
+				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%factura_giro%', $contrato->fields['factura_giro'], $html2);
