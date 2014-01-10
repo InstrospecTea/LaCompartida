@@ -1171,7 +1171,7 @@ class CartaCobro extends NotaCobro {
 
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
-				$html2 = str_replace('%glosa_cliente_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
+				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%rut_cliente%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
