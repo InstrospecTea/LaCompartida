@@ -19,7 +19,7 @@ require_once Conf::ServerDir() . '/../app/classes/Tarea.php';
 //$dbh = mysql_connect(Conf::dbHost(), Conf::dbUser(), Conf::dbPass());
 //mysql_select_db(Conf::dbName()) or mysql_error($dbh);
 $sesion = new Sesion(null, true);
-$alerta = new Alerta($sesion);
+$alerta = new AlertaCron($sesion);
 
 
 $notificacion = new Notificacion($sesion);

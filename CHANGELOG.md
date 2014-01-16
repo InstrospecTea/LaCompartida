@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.22
+jueves 16 de enero 2014
+* **Fixed:** [Hice cosas pero se me olvido cambiar el changelog](#0)
+
 
 ## Hotfix: 13.7.21
 Jueves 9 de enero 2014
