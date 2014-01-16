@@ -1505,44 +1505,7 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%TRABAJOS_FILAS%', '', $row);
 						$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 					}
-
-					if ($cont_tramites > 0) {
-
-						$row = str_replace('%espacio_tramite%', '<br>', $row);
-						$row = str_replace('%servicios_tramites%', __('Trámites'), $row);
-						$row = str_replace('%titulo_seccion_tramites_castropal%', __('Otros Servicios'), $row);
-						$row = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $row);
-						$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumento($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-						$row = str_replace('%TRAMITES_FILAS%', $this->GenerarDocumento($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-						$row = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumento($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-					} else {
-
-						$row = str_replace('%espacio_tramite%', '', $row);
-						$row = str_replace('%servicios_tramites%', '', $row);
-						$row = str_replace('%titulo_seccion_tramites_castropal%', '', $row);
-						$row = str_replace('%servicios_tramites_castropal%', '', $row);
-						$row = str_replace('%TRAMITES_ENCABEZADO%', '', $row);
-						$row = str_replace('%TRAMITES_FILAS%', '', $row);
-						$row = str_replace('%TRAMITES_TOTAL%', '', $row);
-					}
-
-					if (UtilesApp::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos')) {
-
-						if ($cont_gastos > 0) {
-							$row = str_replace('%GASTOS%', $this->GenerarDocumento($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-						} else {
-							$row = str_replace('%GASTOS%', '', $row);
-						}
-					} else {
-						$row = str_replace('%GASTOS%', $this->GenerarDocumento($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-					}
-
-					#especial mb
-					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
-
-					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || UtilesApp::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
-						$html .= $row;
-					}
+                
 				}
 				break;
 
@@ -4962,6 +4925,58 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%TRABAJOS_FILAS%', '', $row);
 						$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 					}
+
+					/*
+						Gastos implementado
+					*/					
+					if ($this->fields['opc_ver_gastos'] != 0) {
+						/*
+							Revisar si se trate sobre el nuevo template
+						*/
+						if ($k == 0 && trim(strstr($row, '%GASTOS_FILAS%')) != '') {
+							$templateNotaCobroGastosSeparados = 1;
+						}	
+						foreach ($x_cobro_gastos['gasto_detalle'] as $d) {
+							if ( $this->asuntos[$k] == $d['codigo_asunto'] ) {
+								$asunto_tiene_gastos = 1;
+								break;
+							}
+						}
+						
+						if ($templateNotaCobroGastosSeparados && $asunto_tiene_gastos) {
+							$asunto_tiene_gastos = 0;
+							//$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
+							$row = str_replace('%glosa_gastos%', __('Gastos'), $row);
+							if ($lang == 'es') {
+								$row = str_replace('%glosa_gasto%', __('GASTOS'), $row);
+							} else {
+								$row = str_replace('%glosa_gasto%', __('EXPENSES'), $row);
+							}
+							$row = str_replace('%expenses%', __('%expenses%'), $row); //en vez de Disbursements es Expenses en inglés
+							$row = str_replace('%detalle_gastos%', __('Detalle de gastos'), $row);
+							
+							$row = str_replace('%GASTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'GASTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+							$row = str_replace('%GASTOS_FILAS%', $this->GenerarDocumento2($parser, 'GASTOS_FILAS',      $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+							$row = str_replace('%GASTOS_TOTAL%', $this->GenerarDocumento2($parser, 'GASTOS_TOTAL',      $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+						} else {
+							//$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
+							$row = str_replace('%glosa_gastos%', '', $row);
+							if ($lang == 'es') {
+								$row = str_replace('%glosa_gasto%', '', $row);
+							} else {
+								$row = str_replace('%glosa_gasto%', '', $row);
+							}
+							$row = str_replace('%expenses%', '', $row); //en vez de Disbursements es Expenses en inglés
+							$row = str_replace('%detalle_gastos%', '', $row);
+							
+							$row = str_replace('%GASTOS_ENCABEZADO%', '', $row);
+							$row = str_replace('%GASTOS_FILAS%', '', $row);
+							$row = str_replace('%GASTOS_TOTAL%', '', $row);
+						}
+
+					}
+
+
 					$query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_cobro=" . $this->fields['id_cobro'];
 					$resp_hitos = mysql_query($query_hitos, $this->sesion->dbh) or Utiles::errorSQL($query_hitos, __FILE__, __LINE__, $this->sesion->dbh);
 
@@ -5002,17 +5017,20 @@ class NotaCobro extends Cobro {
 					// cuando el template de ese cliente lo soporta.
 					$asunto->separar_asuntos = true;
 					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos') ) || ( method_exists('Conf', 'ParafoGastosSoloSiHayGastos') && Conf::ParafoGastosSoloSiHayGastos() )) {
-						if ($cont_gastos > 0)
+						if ($cont_gastos > 0) {
 							$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-						else
+						} else {
 							$row = str_replace('%GASTOS%', '', $row);
-					} else
+						}
+					} else {
 						$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+					}
+
 					$asunto->separar_asuntos = false;
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && UtilesApp::GetConf($this->sesion, 'SepararGastosPorAsunto') ) || UtilesApp::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
+					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || UtilesApp::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
 						$html .= $row;
 					}
 
@@ -6570,8 +6588,15 @@ class NotaCobro extends Cobro {
 			  GASTOS -> esto sólo lista los gastos agregados al cobro obteniendo un total
 			 */
 			case 'GASTOS': //GenerarDocumento2
-				if ($this->fields['opc_ver_gastos'] == 0)
+				if ($this->fields['opc_ver_gastos'] == 0) {
 					return '';
+				}
+				/*
+					Solamente para antiguas templates 
+				*/
+				if ($templateNotaCobroGastosSeparados) {
+					break;
+				}
 				$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				if ($lang == 'es') {
@@ -6820,8 +6845,6 @@ class NotaCobro extends Cobro {
 					$tipo_cambio_cobro_moneda_base = $cobro_moneda->moneda[$id_moneda_base]['tipo_cambio'];
 				}
 
-				#$gastos_moneda_total = ($totales['total']*($this->fields['tipo_cambio_moneda']/$this->fields['tipo_cambio_moneda_base']))/$this->fields['opc_moneda_total_tipo_cambio'];
-				#$gastos_moneda_total = ($totales['total']*($this->fields['tipo_cambio_moneda']/$tipo_cambio_cobro_moneda_base))/$tipo_cambio_moneda_total;
 				# Comentado por ICC $gastos_moneda_total = $totales['total']*$moneda->fields['tipo_cambio']/$tipo_cambio_moneda_total;
 				if (UtilesApp::GetConf($this->sesion, 'SepararGastosPorAsunto') && !empty($asunto->fields['codigo_asunto']) && $asunto->separar_asuntos) {
 					$gastos_moneda_total = $monto_gastos_neto_por_asunto;
@@ -7509,11 +7532,6 @@ class NotaCobro extends Cobro {
 
 			case 'DESGLOSE_POR_ASUNTO_DETALLE': //GenerarDocumentoComun
 				global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo, $cifras_decimales;
-
-				/* 	echo '<pre>';
-				  print_r($this->x_resultados);
-				  echo '</pre>';
-				  die(); */
 
 				$query_desglose_asuntos = "SELECT    pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
 						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),8)) pthh
@@ -10051,7 +10069,7 @@ class NotaCobro extends Cobro {
 									AND cta_corriente.cobrable = 1
 								$where_gastos_asunto
 								ORDER BY fecha ASC";
-				//echo $query.'<br><br>';
+
 				$lista_gastos = new ListaGastos($this->sesion, '', $query);
 				$totales['total'] = 0;
 				$totales['total_moneda_cobro'] = 0;
