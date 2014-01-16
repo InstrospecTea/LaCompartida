@@ -189,7 +189,8 @@ class AlertaCron {
 		$query = "SELECT
 						ROUND(IFNULL(SUM(TIME_TO_SEC(duracion))/3600, 0), 2) total,
 						DATE_SUB(CURDATE(), INTERVAL 7 DAY) fecha_ini,
-						CURDATE() fecha_fin FROM trabajo
+						CURDATE() fecha_fin
+					FROM trabajo
 					WHERE
 						fecha < CURDATE() AND
 						fecha >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
@@ -204,7 +205,7 @@ class AlertaCron {
 		$query = "SELECT
 						ROUND(IFNULL(SUM(TIME_TO_SEC(duracion_cobrada))/3600, 0), 2) total,
 						DATE_SUB(CURDATE(), INTERVAL 7 DAY) fecha_ini,
-						CURDATE() fecha_fin FROM trabajo
+						CURDATE() fecha_fin
 					FROM trabajo
 					WHERE
 						fecha <= CURDATE()
