@@ -188,11 +188,11 @@ class AlertaCron {
 	function HorasUltimaSemana($id_usuario) {
 		$query = "SELECT
 						ROUND(IFNULL(SUM(TIME_TO_SEC(duracion))/3600, 0), 2) total,
-						DATE_SUB(NOW(), INTERVAL 7 DAY) fecha_ini,
-						NOW() fecha_fin FROM trabajo
+						DATE_SUB(CURDATE(), INTERVAL 7 DAY) fecha_ini,
+						CURDATE() fecha_fin FROM trabajo
 					WHERE
-						fecha <= NOW() AND
-						fecha > DATE_SUB(NOW(), INTERVAL 7 DAY)
+						fecha < CURDATE() AND
+						fecha >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
 						AND id_usuario = '$id_usuario'";
 		$resp = mysql_query($query);
 		$result = mysql_fetch_assoc($resp);
@@ -203,12 +203,12 @@ class AlertaCron {
 	function HorasCobrablesUltimaSemana($id_usuario) {
 		$query = "SELECT
 						ROUND(IFNULL(SUM(TIME_TO_SEC(duracion_cobrada))/3600, 0), 2) total,
-						DATE_SUB(NOW(), INTERVAL 7 DAY) fecha_ini,
-						NOW() fecha_fin FROM trabajo
+						DATE_SUB(CURDATE(), INTERVAL 7 DAY) fecha_ini,
+						CURDATE() fecha_fin FROM trabajo
 					FROM trabajo
 					WHERE
-						fecha <= NOW()
-						AND fecha > DATE_SUB(NOW(), INTERVAL 7 DAY)
+						fecha <= CURDATE()
+						AND fecha > DATE_SUB(CURDATE(), INTERVAL 7 DAY)
 						AND id_usuario = '$id_usuario' AND cobrable = 1";
 		$resp = mysql_query($query);
 		$result = mysql_fetch_assoc($resp);

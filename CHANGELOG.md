@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix: 13.7.22
 jueves 16 de enero 2014
-* **Fixed:** [Hice cosas pero se me olvido cambiar el changelog](#0)
+* **Fixed:** [Agrega log de querys a CronNotificacion y corrige querys semanales](https://github.com/LemontechSA/ttb/pull/387)
 
 
 ## Hotfix: 13.7.21
