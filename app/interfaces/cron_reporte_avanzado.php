@@ -8,7 +8,7 @@
 
 
 	$sesion = new Sesion (null, true);
-	$alerta = new Alerta ($sesion);
+	$alerta = new AlertaCron ($sesion);
 
     set_time_limit(500);
 
@@ -32,20 +32,20 @@
 		return __('Domingo');
 	}
 
-	function get_inner_html( $node ) 
-	{ 
-		$innerHTML= ''; 
-		$children = $node->childNodes; 
-		foreach ($children as $child) { 
-			$innerHTML .= $child->ownerDocument->saveXML( $child ); 
-		} 
-		return $innerHTML; 
+	function get_inner_html( $node )
+	{
+		$innerHTML= '';
+		$children = $node->childNodes;
+		foreach ($children as $child) {
+			$innerHTML .= $child->ownerDocument->saveXML( $child );
+		}
+		return $innerHTML;
 	}
-	
+
 
 	function getTabla($s,$agrupadores)
 	{
-		
+
 		// No interesa que se generen los warnings en PHP.
 		libxml_use_internal_errors(true);
 		$dom = new DOMDocument();
@@ -53,10 +53,10 @@
 
 		$xpath = new DOMXPath($dom);
 
-		$query_header = '//table[@id="tabla_planilla"]';	
+		$query_header = '//table[@id="tabla_planilla"]';
 		$headers = $xpath->query($query_header);
 
-		$query = '//table[@id="tabla_planilla_2"]';	
+		$query = '//table[@id="tabla_planilla_2"]';
 		$entries = $xpath->query($query);
 
 		//Debo eliminar los primeros X nodos de cada tr:
@@ -80,9 +80,9 @@
 			}
 		}
 		foreach( $nodesToDelete as $domElement )
-		{ 
-			$domElement->parentNode->removeChild($domElement); 
-		} 
+		{
+			$domElement->parentNode->removeChild($domElement);
+		}
 
 		$sub_query = './/td';
 		$sub_entries = $xpath->query($sub_query,$entries->item(0));
@@ -98,9 +98,9 @@
 
 			}
 			//while($an->item(0))
-			//	$celda->removeChild($an->item(0));	
+			//	$celda->removeChild($an->item(0));
 		}
-		
+
 
 		$output = "<table style='font-family: Tahoma, Arial, Geneva, sans-serif;'>".get_inner_html( $headers->item(0)).'</table>';
 		$output .= "<table style='border:1px solid #CCC; border-collapse:collapse; font-family: Tahoma, Arial, Geneva, sans-serif;'>".get_inner_html( $entries->item(0)).'</table>';
@@ -130,7 +130,7 @@
 		$out = ob_get_clean();
 
 		$tabla = getTabla($out,sizeof(explode('-',$vista)));
-		
+
 		$tabla .= '<br><br>'.$ver;
 		return $tabla;
 	}
@@ -147,14 +147,14 @@
 	$semana_pasada_ini = date('d-m-Y',strtotime("$year". "W$lastweek"."1"));
 	$semana_pasada_fin = date('d-m-Y',strtotime("$year". "W$lastweek"."7"));
 
-	
+
 	$last_month = strtotime("-".(date('j'))." day");
 	$mes_pasado_ini = "01".date('-m-Y',$last_month);
 	$mes_pasado_fin = date('t-m-Y',$last_month);
 
 	$actual_ini = "01-01-".date('Y');
 	$actual_fin = date('d-m-Y');
-	
+
 
 
 	/* Query de Usuarios a los que se les envia Reportes */
@@ -165,10 +165,10 @@
 							JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario AND usuario_permiso.codigo_permiso = 'REP'
 							WHERE usuario.activo = 1 ";
 	$result_usuarios = mysql_query($query_usuarios , $sesion->dbh) or Utiles::errorSQL($query_usuarios,__FILE__,__LINE__,$sesion->dbh);
-					
+
 	/*Por cada usuario de Reportes: */
 	while ($row = mysql_fetch_array($result_usuarios))
-    {	
+    {
 		$id_usuario = $row['id_usuario'];
 		$nombre_pila = $row['nombre_pila'];
 
@@ -182,13 +182,13 @@
 				if($envio_reporte_encontrado > 0)
 				{
 					$datos = explode('.',$reporte_encontrado);
-				
+
 					$enviar = false;
 					if($datos[2] == 'semanal' && $envio_reporte_encontrado == date('N'))
 						$enviar = true;
 					if( ($datos[2] == 'mensual' || $datos[2] == 'anual' ) && $envio_reporte_encontrado == date('j'))
 						$enviar = true;
-					
+
 					//Enviamos el mail
 					if($enviar || $todo_periodo == 'asda123qasdwMWAdngvvesdrseASDaCAFVASCW' )
 					{
@@ -198,12 +198,12 @@
 						$args = array();
 
 						$args['reporte'] = $reporte_encontrado;
-						
+
 						$args['tipo_dato'] = $tds[0];
 						$args['tipo_dato_comparado'] = '';
 						if(sizeof($tds)>1)
 							$args['tipo_dato_comparado'] = $tds[1];
-						
+
 						$args['vista'] = implode('-',$ags);
 						$args['id_moneda'] = 2;
 						$args['prop'] = 'estandar';
@@ -233,13 +233,13 @@
 
 						$s = __("Estimado/a")." ".$nombre_pila.":";
 						$s .= "<br />&nbsp;&nbsp;&nbsp;".__("El reporte")." '".$nombre_reporte_encontrado."' ";
-						
+
 						$s .= __("se ha generado para el periodo del ").$args['fecha_ini']." ".__("al")." ".$args['fecha_fin']." (".__("según fecha del")." ".$campo_fecha_usado.").";
 
 						$periodicidad = __('día')." ".str_pad($envio_reporte_encontrado, 2, '0', STR_PAD_LEFT)." ".__('del mes')." ";
 						if($datos[2] == 'semanal')
 								$periodicidad = dia_semana($envio_reporte_encontrado);
-						
+
 						/* Periodo */
 						$s .= "<br />&nbsp;&nbsp;&nbsp;".__("Este reporte está configurado para enviarse cada")." ".$periodicidad.".";
 

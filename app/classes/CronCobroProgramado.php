@@ -1,13 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-
-require_once Conf::ServerDir() . '/classes/Cron.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Notificacion.php';
-require_once Conf::ServerDir() . '/classes/AlertaCron.php';
 
 class CronCobroProgramado extends Cron {
 
@@ -113,7 +106,7 @@ class CronCobroProgramado extends Cron {
 				$this->log("Generando Mensaje");
 
 				if (!empty($mensajes)) {
-					$Alerta = new Alerta($this->Sesion);
+					$Alerta = new AlertaCron($this->Sesion);
 					// encola correo con los datos del mensaje
 					$Alerta->enviarAvisoCobrosProgramados($mensajes, $this->Sesion);
 

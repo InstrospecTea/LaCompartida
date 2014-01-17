@@ -1,13 +1,14 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
+
 use TTB\Utiles as Utiles;
 
-class Alerta {
+class AlertaCron {
 
 	var $sesion = null;
 
-	function Alerta($sesion) {
+	function AlertaCron($sesion) {
 		$this->sesion = $sesion;
 	}
 
@@ -185,23 +186,35 @@ class Alerta {
 	}
 
 	function HorasUltimaSemana($id_usuario) {
-		$query = "SELECT SUM(TIME_TO_SEC(duracion))/3600 FROM trabajo WHERE
-									fecha <= NOW() AND
-									fecha > DATE_SUB(NOW(), INTERVAL 7 DAY)
-									AND id_usuario = '$id_usuario'";
+		$query = "SELECT
+						ROUND(IFNULL(SUM(TIME_TO_SEC(duracion))/3600, 0), 2) total,
+						DATE_SUB(CURDATE(), INTERVAL 7 DAY) fecha_ini,
+						CURDATE() fecha_fin
+					FROM trabajo
+					WHERE
+						fecha < CURDATE() AND
+						fecha >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+						AND id_usuario = '$id_usuario'";
 		$resp = mysql_query($query);
-		list($horas_ultima_semana) = mysql_fetch_array($resp);
-		return $horas_ultima_semana;
+		$result = mysql_fetch_assoc($resp);
+		$this->queryLog($query, $result);
+		return $result['total'];
 	}
 
 	function HorasCobrablesUltimaSemana($id_usuario) {
-		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 FROM trabajo WHERE
-									fecha <= NOW() AND
-									fecha > DATE_SUB(NOW(), INTERVAL 7 DAY)
-									AND id_usuario = '$id_usuario' AND cobrable = 1";
+		$query = "SELECT
+						ROUND(IFNULL(SUM(TIME_TO_SEC(duracion_cobrada))/3600, 0), 2) total,
+						DATE_SUB(CURDATE(), INTERVAL 7 DAY) fecha_ini,
+						CURDATE() fecha_fin
+					FROM trabajo
+					WHERE
+						fecha <= CURDATE()
+						AND fecha > DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+						AND id_usuario = '$id_usuario' AND cobrable = 1";
 		$resp = mysql_query($query);
-		list($horas_ultima_semana) = mysql_fetch_array($resp);
-		return $horas_ultima_semana;
+		$result = mysql_fetch_assoc($resp);
+		$this->queryLog($query, $result);
+		return $result['total'];
 	}
 
 	function HorasMes($id_usuario, $mes, $ano) {
@@ -224,6 +237,14 @@ class Alerta {
 
 		foreach ($mensajes as $id_usuario => $mensaje) {
 			Utiles::InsertarPlus($sesion, "Aviso $from", $mensaje, $to, "Administrador");
+		}
+	}
+
+	public function queryLog($query, $result) {
+		if (Conf::GetConf($this->sesion, 'LogQueryAlerta')) {
+			$q = array('query' => preg_replace("([\r\n\t]+)", ' ', $query), 'result' => $result);
+			$q = mysql_escape_string(json_encode($q));
+			mysql_query("INSERT INTO z_log_fff SET mensaje='$q'", $this->sesion->dbh);
 		}
 	}
 
