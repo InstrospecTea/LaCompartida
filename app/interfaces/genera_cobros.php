@@ -1225,8 +1225,10 @@ function funcionTR(& $contrato) {
 							. $contrato->fields['forma_cobro'] . "'," . $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','','" . Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-") . "',"
 							. ($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0) . "," . $contrato->fields['monto'] . ",'" . $contrato->fields['simbolo'] . "'," . $pendiente->fields['id_cobro_pendiente'] . ", 1, 0)\" >";
 				}
+
 				if (!$tipo_liquidacion)
 					$html .= "&nbsp;&nbsp;";
+
 				if (!($tipo_liquidacion & 1)) { //1-2 = honorarios-gastos, 3 = mixtas
 					$html .= "<img src='" . Conf::ImgDir() . "/coins_16_gastos.png' title='" . __('Generar cobro individual para gastos') . "' border=0 onclick=\"GenerarIndividual('"
 							. $contrato->fields['forma_cobro'] . "'," . $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','','" . Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-") . "',"
@@ -1350,9 +1352,11 @@ function funcionTR(& $contrato) {
 			$html .= "<img src='" . Conf::ImgDir() . "/coins_16_honorarios.png' title='" . __('Generar cobro individual para honorarios') . "' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','" . $fecha_ini . "','" . $fecha_fin . "',0,0,'',0, 1, 0);\" />";
 		}
+
 		if (!$tipo_liquidacion)
 			$html .= "&nbsp;&nbsp;";
-		if (!($tipo_liquidacion & 1) || $contrato->fields['forma_cobro'] == 'HITOS') { //1-2 = honorarios-gastos, 3 = mixtas
+
+		if (!($tipo_liquidacion & 1) && $contrato->fields['forma_cobro'] == 'HITOS') { //1-2 = honorarios-gastos, 3 = mixtas
 			$html .= "<img src='" . Conf::ImgDir() . "/coins_16_gastos.png' title='" . __('Generar cobro individual para gastos') . "' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','" . $fecha_ini . "','" . $fecha_fin . "',0,0,'',0, 0, 1);\" />";
 		}
