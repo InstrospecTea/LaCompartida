@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.23
+jueves 16 de enero 2014
+* **Fixed:** [Permite guardar fecha de un cap](https://github.com/LemontechSA/ttb/pull/388)
+
 ## Hotfix: 13.7.22
 jueves 16 de enero 2014
 * **Fixed:** [Agrega log de querys a CronNotificacion y corrige querys semanales](https://github.com/LemontechSA/ttb/pull/387)
