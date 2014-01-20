@@ -22,7 +22,11 @@
 	{
 		$archivo->Edit('id_contrato',$contrato->fields['id_contrato']);
 		$archivo->Edit('descripcion',$descripcion);
-		$archivo->Edit('archivo_data',$archivo_data);
+
+		// Write to S3 Server
+		$s3url = $archivo->Upload($contrato->fields['id_contrato'], $archivo_data);
+		$archivo->Edit('archivo_s3', $s3url);
+
 		if($archivo->Write())
 			$pagina->AddInfo(__('Documento guardado con éxito'));
 		else

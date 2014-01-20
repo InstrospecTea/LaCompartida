@@ -312,6 +312,10 @@ if ($opcion == "guardar") {
 				if ($cliente->Write()) {
 					$pagina->AddInfo(__('Cliente') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 				}
+
+				//To S3
+				$archivo->LoadById($contrato->fields['id_contrato']);
+				
 			}
 			else
 				$pagina->AddError($contrato->error);
