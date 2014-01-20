@@ -1356,7 +1356,7 @@ function funcionTR(& $contrato) {
 		if (!$tipo_liquidacion)
 			$html .= "&nbsp;&nbsp;";
 
-		if (!($tipo_liquidacion & 1) && $contrato->fields['forma_cobro'] == 'HITOS') { //1-2 = honorarios-gastos, 3 = mixtas
+		if (!($tipo_liquidacion & 1) || $contrato->fields['forma_cobro'] == 'HITOS') { //1-2 = honorarios-gastos, 3 = mixtas
 			$html .= "<img src='" . Conf::ImgDir() . "/coins_16_gastos.png' title='" . __('Generar cobro individual para gastos') . "' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','" . $fecha_ini . "','" . $fecha_fin . "',0,0,'',0, 0, 1);\" />";
 		}
