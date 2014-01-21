@@ -2262,7 +2262,10 @@ HTML;
 		));
 		$bucket = S3_UPLOAD_BUCKET;
 
-		$name = SUBDOMAIN . $name;
+		$archivoname = substr($name, 0, strpos($name, "."));
+		$archivoext  = substr($name, stripos($name, "."));
+		$archivoname .= '_'.date('U'). $archivoext;
+		$name = SUBDOMAIN . $archivoname;
 
 		$response = $s3->create_object($bucket, $name, array(
 			'body' => $file,
