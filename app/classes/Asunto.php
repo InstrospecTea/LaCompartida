@@ -295,6 +295,14 @@ class Asunto extends Objeto {
 			'extras' => array(
 				'width' => 20
 			)
+		),
+		array(
+			'field' => 'descuento',
+			'title' => 'Descuento',
+			'visible' => false,
+			'extras' => array(
+				'width' => 20
+			)
 		)
 	);
 
@@ -612,7 +620,9 @@ class Asunto extends Objeto {
 
 			SUM(TIME_TO_SEC(trabajo.duracion))/3600 AS horas_trabajadas,
 			SUM(IF(cobro_trabajo.estado IS NULL OR cobro_trabajo.estado = 'CREADO' OR cobro_trabajo.estado = 'EN REVISION',
-				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas
+				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas,
+
+			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento
 
 			FROM asunto AS a1
 			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
