@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix: 13.7.23
+Martes 21 de enero 2014
+* **Fixed:** [Modificaciones a listado de asuntos agrega nueva columna descuento](https://github.com/LemontechSA/ttb/pull/390)
+
+## Hotfix: 13.7.23
 jueves 16 de enero 2014
 * **Fixed:** [Permite guardar fecha de un cap](https://github.com/LemontechSA/ttb/pull/388)
 
