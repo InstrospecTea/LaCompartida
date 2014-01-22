@@ -1505,6 +1505,46 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%TRABAJOS_FILAS%', '', $row);
 						$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 					}
+
+					if ($cont_tramites > 0) {
+
+						$row = str_replace('%espacio_tramite%', '<br>', $row);
+						$row = str_replace('%servicios_tramites%', __('Trámites'), $row);
+						$row = str_replace('%titulo_seccion_tramites_castropal%', __('Otros Servicios'), $row);
+						$row = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $row);
+						$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumento($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+						$row = str_replace('%TRAMITES_FILAS%', $this->GenerarDocumento($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+						$row = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumento($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+
+					} else {
+
+						$row = str_replace('%espacio_tramite%', '', $row);
+						$row = str_replace('%servicios_tramites%', '', $row);
+						$row = str_replace('%titulo_seccion_tramites_castropal%', '', $row);
+						$row = str_replace('%servicios_tramites_castropal%', '', $row);
+						$row = str_replace('%TRAMITES_ENCABEZADO%', '', $row);
+						$row = str_replace('%TRAMITES_FILAS%', '', $row);
+						$row = str_replace('%TRAMITES_TOTAL%', '', $row);
+
+					}
+
+					if (UtilesApp::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos')) {
+						if ($cont_gastos > 0) {
+							$row = str_replace('%GASTOS%', $this->GenerarDocumento($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+						} else {
+							$row = str_replace('%GASTOS%', '', $row);
+						}
+					} else {
+						$row = str_replace('%GASTOS%', $this->GenerarDocumento($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+					}
+
+					#especial mb
+
+					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
+
+					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || UtilesApp::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
+						$html .= $row;
+					}
                 
 				}
 				break;
