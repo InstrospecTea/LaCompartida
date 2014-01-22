@@ -14,17 +14,20 @@ if ($xls) {
 
 	$where = 1;
 
-	if ($codigo_cliente_secundario != '' && $codigo_cliente == '') {
-		$cliente = new Cliente($sesion);
-		$codigo_cliente = $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario);
+	if (!empty($fecha1)){
+		$fecha1 = date('Y-m-d', strtotime($fecha1));	
 	}
 
-	if ($codigo_cliente) {
-		$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
+	if (!empty($fecha2)){
+		$fecha2 = date('Y-m-d', strtotime($fecha2));	
 	}
 
-	if ($codigo_asunto) {
-		$where .= " AND actividad.codigo_asunto = '$codigo_asunto' ";
+	if (!empty($codigo_cliente)) {
+		$where .= " AND cli.codigo_cliente = '$codigo_cliente' ";
+	}
+
+	if (!empty($fecha1) && !empty($fecha2)){
+		$where .=" AND fecha_cobro BETWEEN '".$fecha1."' AND '".$fecha2."' ";
 	}
 
 	$query_excel = "SELECT
@@ -35,7 +38,9 @@ if ($xls) {
 						cli.codigo_cliente AS codigo_cliente,
 						asu.codigo_asunto AS codigo_asunto,
 						cp.descripcion AS descripcion,
-						cp.observaciones AS observaciones
+						cp.observaciones AS observaciones,
+						IF(cp.id_cobro IS NULL, 'SIN COBRO', 'COBRADO') AS cobrado,
+						cp.id_cobro AS numero_cobro
 
 					FROM cobro_pendiente as cp
 
@@ -43,7 +48,8 @@ if ($xls) {
 					LEFT JOIN asunto AS asu ON con.id_contrato = asu.id_contrato
 					LEFT JOIN cliente AS cli ON con.codigo_cliente = cli.codigo_cliente
 
-					WHERE $where";
+					WHERE $where
+					AND monto_estimado != '0'";
 
 	$resultado = mysql_query($query_excel, $sesion->dbh) or Utiles::errorSQL($query_excel, __FILE__, __LINE__, $sesion->dbh);
 
@@ -105,8 +111,10 @@ if ($xls) {
 	$worksheet->setColumn(6,6,20);
 	$worksheet->setColumn(7,7,20);
 	$worksheet->setColumn(8,8,50);
+	$worksheet->setColumn(9,9,10);
+	$worksheet->setColumn(10,10,15);
 
-	$worksheet->writeString(1,1,'Listado de Hitos',$titulo);
+	$worksheet->writeString(1,1,'Reporte Hitos',$titulo);
 
 	$fila_datos_documento = 3;
 
@@ -121,6 +129,8 @@ if ($xls) {
 	$columna_codigo_asunto = 6;
 	$columna_descripcion = 7;
 	$columna_observaciones = 8;
+	$columna_cobrado = 9;
+	$columna_id_cobro = 10;
 
 	//Worksheet::write ( integer $row , integer $col , mixed $token , mixed $format=0 )
 	$worksheet->write($fila_datos_documento,1, 'Fecha Creacion : '.date('Y-m-d h:i:s'),$glosa_detalle_documento);
@@ -134,9 +144,11 @@ if ($xls) {
 	$worksheet->write($fila_encabezado, $columna_codigo_asunto, __('Codigo Asunto'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_descripcion, __('Descripcion'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_observaciones, __('Observaciones'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_cobrado, __('Cobrado'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_id_cobro, __('Numero Cobro'), $encabezados_borde);
 
 	// Filas del documento
-	while ( list ($glosa_cliente, $glosa_asunto, $monto_estimado, $fecha_cobro, $codigo_cliente, $codigo_asunto, $descripcion, $observaciones ) = mysql_fetch_array($resultado)) {
+	while ( list ($glosa_cliente, $glosa_asunto, $monto_estimado, $fecha_cobro, $codigo_cliente, $codigo_asunto, $descripcion, $observaciones, $cobrado, $id_cobro ) = mysql_fetch_array($resultado)) {
 
 		++$fila_encabezado;
 		$worksheet->write($fila_encabezado, $columna_glosa_cliente, $glosa_cliente, $general_izquierda);
@@ -147,6 +159,8 @@ if ($xls) {
 		$worksheet->write($fila_encabezado, $columna_codigo_asunto, $codigo_asunto, $general);
 		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general);
 		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general);
+		$worksheet->write($fila_encabezado, $columna_cobrado, $cobrado, $general);
+		$worksheet->write($fila_encabezado, $columna_id_cobro, $id_cobro, $general);
 
 	}
 
@@ -165,16 +179,28 @@ $pagina->PrintTop();
 
 	<input type="hidden" name="reporte" value="generar" />
 	
-	<table  class="border_plomo tb_base">
+	<table  class="border_plomo tb_base" width="40%" align="center">
+
 		<tr>
-			<td><span><?php echo __('Fecha desde') ?></span></td>
-			<td><input type="text" class="fechadiff" name="fecha1" id="fecha1" value="<?php echo ($fecha1 ? $fecha1 : date('d-m-Y', strtotime('-1 year'))); ?>"/></td>
+			<td align="right"><b><?php echo __('Fecha desde') ?></b></td>
+			<td align="left"><input type="text" class="fechadiff" name="fecha1" id="fecha1" value="<?php echo ($fecha1 ? $fecha1 : date('d-m-Y', strtotime('-1 year'))); ?>"/></td>
 		</tr>
 		<tr>
-			<td><span><?php echo __('Fecha hasta') ?></span></td> 
-			<td><input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2 ? $fecha2 : date('d-m-Y')); ?>"/></td>
+			<td align="right"><b><?php echo __('Fecha hasta') ?></b></td> 
+			<td align="left"><input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2 ? $fecha2 : date('d-m-Y')); ?>"/></td>
 		</tr>
-		
+
+		<tr>
+			<td align="right">
+				<b><?php echo __('Clientes')?>:</b>
+			</td>
+			<td align="left">
+				<?php $query = 'SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC';
+					echo Html::SelectQuery($sesion, $query, "codigo_cliente", $codigo_cliente, '', "Todos", "200");
+				?>
+			</td>
+		</tr>
+
 		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
