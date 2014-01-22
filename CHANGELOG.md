@@ -1,5 +1,10 @@
 # Changelog
-## Hotfix: 13.7.23
+
+## Hotfix: 13.7.25
+Miercoles 22 de enero 2014
+* **Fixed:** [Restaura codigo eliminado en case ASUNTOS modalidad calculo antigua](https://github.com/LemontechSA/ttb/pull/391)
+
+## Hotfix: 13.7.24
 Martes 21 de enero 2014
 * **Fixed:** [Modificaciones a listado de asuntos agrega nueva columna descuento](https://github.com/LemontechSA/ttb/pull/390)
 
