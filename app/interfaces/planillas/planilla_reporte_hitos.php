@@ -170,7 +170,7 @@ if ($xls) {
 
 	}
 
-$pagina->titulo = __('Reporte Horas por Facturar');
+$pagina->titulo = __('Reporte Hitos');
 $pagina->PrintTop();
 
 ?>
