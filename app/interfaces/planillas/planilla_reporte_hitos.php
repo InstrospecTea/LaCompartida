@@ -52,11 +52,10 @@ if ($xls) {
 					LEFT JOIN prm_moneda ON con.id_moneda = prm_moneda.id_moneda
 					LEFT JOIN asunto AS asu ON con.id_contrato = asu.id_contrato
 					LEFT JOIN cliente AS cli ON con.codigo_cliente = cli.codigo_cliente
+					LEFT JOIN cobro AS cob ON cp.id_cobro = cob.id_cobro
 
 					WHERE $where
 					AND monto_estimado != '0'";
-
-					echo $query_excel; exit;
 
 	$resultado = mysql_query($query_excel, $sesion->dbh) or Utiles::errorSQL($query_excel, __FILE__, __LINE__, $sesion->dbh);
 
@@ -133,7 +132,7 @@ if ($xls) {
 	$columna_glosa_cliente = 0;
 	$columna_glosa_asunto = 1;
 	$columna_monto_estimado = 2;
-	$columna_moneda_estimada = 3,
+	$columna_moneda_estimada = 3;
 	$columna_fecha_cobro = 4;
 	$columna_codigo_cliente = 5;
 	$columna_codigo_asunto = 6;
@@ -183,28 +182,17 @@ if ($xls) {
 		$worksheet->write($fila_encabezado, $columna_glosa_cliente, $glosa_cliente, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_glosa_asunto, $glosa_asunto, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $general);
+		$worksheet->write($fila_encabezado, $columna_monto_estimado, $moneda_estimada, $general);
 		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $general);
 		$worksheet->write($fila_encabezado, $columna_codigo_cliente, $codigo_cliente, $general);
 		$worksheet->write($fila_encabezado, $columna_codigo_asunto, $codigo_asunto, $general);
 		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general);
 		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general);
-		$worksheet->write($fila_encabezado, $columna_cobrado, $cobrado, $general);
-		$worksheet->write($fila_encabezado, $columna_id_cobro, $id_cobro, $general);
-
-		$worksheet->write($fila_encabezado, $columna_glosa_cliente, $glosa_cliente, $general_izquierda);
-		$worksheet->write($fila_encabezado, $columna_glosa_asunto, $glosa_asunto, $general_izquierda);
-		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $general);
-		$worksheet->write($fila_encabezado, $columna_monto_estimado, $moneda_estimada, $general);
-		$worksheet->write($fila_encabezado, $columna_fecha_cobro, __('Fecha Cobro'), $general);
-		$worksheet->write($fila_encabezado, $columna_codigo_cliente, __('Codigo Cliente'), $general);
-		$worksheet->write($fila_encabezado, $columna_codigo_asunto, __('Codigo Asunto'), $general);
-		$worksheet->write($fila_encabezado, $columna_descripcion, __('Descripcion'), $general);
-		$worksheet->write($fila_encabezado, $columna_observaciones, __('Observaciones'), $general);
-		$worksheet->Write($fila_encabezado, $columna_estado_cobro, __('Estado Cobro'), $encabezados_borde);
-		$worksheet->write($fila_encabezado, $columna_numero_cobro, __('Numero Cobro'), $general);
-		$worksheet->write($fila_encabezado, $columna_monto_cobrado, __('Monto Cobrado'), $general);
-		$worksheet->write($fila_encabezado, $columna_moneda_cobrada, __('Moneda'), $general);
-		$worksheet->write($fila_encabezado, $columna_numero_factura, __('Numero Factura'), $general);
+		$worksheet->Write($fila_encabezado, $columna_estado_cobro, $estado_cobro, $general);
+		$worksheet->write($fila_encabezado, $columna_numero_cobro, $numero_cobro, $general);
+		$worksheet->write($fila_encabezado, $columna_monto_cobrado, $monto_cobrado, $general);
+		$worksheet->write($fila_encabezado, $columna_moneda_cobrada, $moneda_cobrada, $general);
+		$worksheet->write($fila_encabezado, $columna_numero_factura, $numero_factura, $general);
 
 	}
 
@@ -212,7 +200,7 @@ if ($xls) {
 
 	exit;
 
-	}
+}
 
 $pagina->titulo = __('Reporte Hitos');
 $pagina->PrintTop();
