@@ -27,7 +27,7 @@ if ($xls) {
 	}
 
 	if (!empty($fecha1) && !empty($fecha2)){
-		$where .=" AND fecha_cobro BETWEEN '".$fecha1."' AND '".$fecha2."' ";
+		$where .=" AND cp.fecha_cobro BETWEEN '".$fecha1."' AND '".$fecha2."' ";
 	}
 
 	$query_excel = "SELECT
@@ -69,12 +69,19 @@ if ($xls) {
 	$worksheet =& $workbook->addWorksheet('Listado Actividades');
 
 	//Styles
+
+	$workbook->setCustomColor(35, 220, 255, 220);
+	
 	$titulo = &$workbook->addFormat(
-		array ( 'bold' => '1', 'size' =>'12','Align' => 'center')
+		array ( 'bold' => '1', 'size' =>'12','Align' => 'left')
 	);
 
 	$glosa_detalle_documento = &$workbook->addFormat(
 		array ( 'bold' => '1', 'size' =>'10','Align' => 'center')
+	);
+
+	$glosa_detalle_documento_left = &$workbook->addFormat(
+		array ( 'bold' => '1', 'size' =>'10','Align' => 'left')
 	);
 
 	$glosa_detalle_documento_right = &$workbook->addFormat(
@@ -86,7 +93,7 @@ if ($xls) {
 	);
 
 	$encabezados_borde = &$workbook->addFormat(
-		array ( 'bold' => '1', 'size' =>'10','Align' => 'center','Border' => '1', 'FgColor' => 'green')
+		array ( 'bold' => '1', 'size' =>'10','Align' => 'center','Border' => '1', 'FgColor' => 35)
 	);
 
 	$general = &$workbook->addFormat(
@@ -108,22 +115,22 @@ if ($xls) {
 	);
 
 	//Worksheet::setColumn ( integer $firstcol , integer $lastcol , float $width , mixed $format=0 , integer $hidden=0 )
-	$worksheet->setColumn(0,0,10);
-	$worksheet->setColumn(1,1,60);
-	$worksheet->setColumn(2,2,60);
-	$worksheet->setColumn(3,3,30);
+	$worksheet->setColumn(0,0,40);
+	$worksheet->setColumn(1,1,40);
+	$worksheet->setColumn(2,2,20);
+	$worksheet->setColumn(3,3,10);
 	$worksheet->setColumn(4,4,20);
 	$worksheet->setColumn(5,5,20);
 	$worksheet->setColumn(6,6,20);
-	$worksheet->setColumn(7,7,20);
+	$worksheet->setColumn(7,7,50);
 	$worksheet->setColumn(8,8,50);
-	$worksheet->setColumn(9,9,10);
+	$worksheet->setColumn(9,9,20);
 	$worksheet->setColumn(10,10,15);
-	$worksheet->setColumn(11,10,15);
-	$worksheet->setColumn(12,10,15);
-	$worksheet->setColumn(13,10,15);
+	$worksheet->setColumn(11,11,15);
+	$worksheet->setColumn(12,12,15);
+	$worksheet->setColumn(13,13,20);
 
-	$worksheet->writeString(1,1,'Reporte Hitos',$titulo);
+	$worksheet->writeString(1,0,'Reporte Hitos',$titulo);
 
 	$fila_datos_documento = 3;
 
@@ -145,12 +152,12 @@ if ($xls) {
 	$columna_numero_factura = 13;
 
 	//Worksheet::write ( integer $row , integer $col , mixed $token , mixed $format=0 )
-	$worksheet->write($fila_datos_documento,1, 'Fecha Creacion : '.date('Y-m-d h:i:s'),$glosa_detalle_documento);
+	$worksheet->write($fila_datos_documento,0, 'Fecha Creacion : '.date('Y-m-d h:i:s'),$glosa_detalle_documento_left);
 
 	$worksheet->write($fila_encabezado, $columna_glosa_cliente, __('Glosa Cliente'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_glosa_asunto, __('Glosa Asunto'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_monto_estimado, __('Monto Estimado'), $encabezados_borde);
-	$worksheet->write($fila_encabezado, $columna_monto_estimado, __('Moneda'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_moneda_estimada, __('Moneda'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_fecha_cobro, __('Fecha Cobro'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_codigo_cliente, __('Codigo Cliente'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_codigo_asunto, __('Codigo Asunto'), $encabezados_borde);
@@ -182,12 +189,12 @@ if ($xls) {
 		$worksheet->write($fila_encabezado, $columna_glosa_cliente, $glosa_cliente, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_glosa_asunto, $glosa_asunto, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $general);
-		$worksheet->write($fila_encabezado, $columna_monto_estimado, $moneda_estimada, $general);
+		$worksheet->write($fila_encabezado, $columna_moneda_estimada, $moneda_estimada, $general);
 		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $general);
 		$worksheet->write($fila_encabezado, $columna_codigo_cliente, $codigo_cliente, $general);
 		$worksheet->write($fila_encabezado, $columna_codigo_asunto, $codigo_asunto, $general);
-		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general);
-		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general);
+		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general_izquierda);
+		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general_izquierda);
 		$worksheet->Write($fila_encabezado, $columna_estado_cobro, $estado_cobro, $general);
 		$worksheet->write($fila_encabezado, $columna_numero_cobro, $numero_cobro, $general);
 		$worksheet->write($fila_encabezado, $columna_monto_cobrado, $monto_cobrado, $general);
