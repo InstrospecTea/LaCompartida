@@ -52,7 +52,7 @@ class Archivo extends Objeto {
 		$nombre = $archivo_anexo['name'];
 		fclose($subir);
 		
-		$url_s3 = UtilesApp::UploadToS3('/' . urlencode($nombre), $contenido, $archivo_anexo['type']);
+		$url_s3 = UtilesApp::UploadToS3($this->sesion, '/' . urlencode($nombre), $contenido, $archivo_anexo['type']);
 		$this->Edit('archivo_nombre', $archivo_anexo['name']);
 		$this->Edit('data_tipo', $archivo_anexo['type']);
 

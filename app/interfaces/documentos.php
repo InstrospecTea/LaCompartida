@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../app/classes/Contrato.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -10,60 +10,85 @@
 	require_once Conf::ServerDir().'/../app/classes/Archivo.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	
+
+	function sizeInBytes($size) {
+		$sizer = array(
+			'' => 1,
+			'K' => 1024,
+			'M' => 1024 * 1024,
+			'G' => 1024 * 1024 * 1024
+		);
+		preg_match('/(\d+)([KMGkmg])?/', $size, $result);
+		return (int) ($result[1] * $sizer[strtoupper($result[2])]);
+	}
+
 	$sesion = new Sesion(array('DAT','COB'));
 	$pagina = new Pagina($sesion);
 	$archivo = new Archivo($sesion);
 	$contrato = new Contrato($sesion);
 	$contrato->Load($id_contrato);
-	if(!$contrato->loaded())
+	if(!$contrato->loaded()) {
 		$pagina->AddError(__('No se ha cargado el contrato.'));
+	}
 	#Subiendo Archivo
-	if(!empty($archivo_data['name'])&&$accion=="guardar")
-	{
-		$archivo->Edit('id_contrato',$contrato->fields['id_contrato']);
-		$archivo->Edit('descripcion',$descripcion);
+	if(!empty($archivo_data['name']) && $accion == "guardar") {
 
-		// Write to S3 Server
-		$s3url = $archivo->Upload($contrato->fields['id_contrato'], $archivo_data);
-		$archivo->Edit('archivo_s3', $s3url);
+		if ($archivo_data['size'] <= sizeInBytes( ini_get('upload_max_filesize') )) {
+			$archivo->Edit('id_contrato',$contrato->fields['id_contrato']);
+			$archivo->Edit('descripcion',$descripcion);
 
-		if($archivo->Write())
-			$pagina->AddInfo(__('Documento guardado con éxito'));
-		else
-			$pagina->AddError(__('No se ha podido guardar el documento.'));
+			// Write to S3 Server
+			$s3url = $archivo->Upload($contrato->fields['id_contrato'], $archivo_data);
+			$archivo->Edit('archivo_s3', $s3url);
+
+			if($archivo->Write()) {
+				$pagina->AddInfo(__('Documento guardado con éxito'));
+			} else {
+				$pagina->AddError(__('No se ha podido guardar el documento.'));
+			}
+			
+		} else {
+			$pagina->AddError("El archivo es demasiado pesado.");
+		}
+
+
 	}
 	#eliminando archivo
-	if($accion=="eliminar" && $id_archivo)
-	{
-		if($archivo->Eliminar($id_archivo))
+	if($accion=="eliminar" && $id_archivo) {
+		if($archivo->Eliminar($id_archivo)) {
 			$pagina->AddInfo(__('Documento eliminado con éxito'));
-		else
+		} else {
 			$pagina->AddError($archivo->error);
+		}
 	}
+
 	$pagina->PrintTop(1);
 ?>
-<script>
-function Guardar()
-{
-	var form = $('form_archivo');
-	$('accion').value = 'guardar';
-	$('id_archivo').value = '';
-	form.submit();
-	return true;
-}
-function Eliminar(id)
-{
-	var form = $('form_archivo');
-	if(confirm("<?=__('¿Desea eliminar el archivo seleccionado?')?>") && id)
-	{
-		$('id_archivo').value = id;
-		$('accion').value = 'eliminar';
-		form.submit();
-		return true;
+
+<script type="text\javascript">
+	function Guardar(t) {	
+		var form = $('form_archivo');
+		$('accion').value = 'guardar';
+		$('id_archivo').value = '';
+		observeFile('archivo_data');
+		if (fileValidator()) {
+			form.submit();
+			return true;
+		}
+		return false;
 	}
-	return false;
-}
+	function Eliminar(id) {
+		var form = $('form_archivo');
+		if(confirm("<?=__('¿Desea eliminar el archivo seleccionado?')?>") && id) {
+			$('id_archivo').value = id;
+			$('accion').value = 'eliminar';
+			form.submit();
+			return true;
+		}
+		return false;
+	}
 </script>
+
 <form name='form_archivo' id='form_archivo' method='post' action="" enctype="multipart/form-data">
 <input type=hidden name='id_contrato' id='id_contrato' value='<?=$id_contrato ? $id_contrato : $contrato->fields['id_contrato'] ?>' />
 <input type=hidden name='id_cliente' id='id_cliente' value='<?=$id_cliente ?>' />
@@ -80,7 +105,7 @@ function Eliminar(id)
 			Documento:
 		</td>
 		<td align=left>
-			<input type=file name="archivo_data">
+			<input type=file id="archivo_data" name="archivo_data">
 		</td>
 	</tr>
 	<tr>
@@ -93,7 +118,7 @@ function Eliminar(id)
 	</tr>
 	<tr>
 		<td colspan=2 align=center>
-			<input type=button onclick="return Guardar();" value="<?=__('Cargar Documento')?>" class="btn" />
+			<input type=button onclick="return Guardar(this);" value="<?=__('Cargar Documento')?>" class="btn" />
 		</td>
 	</tr>
 </table>
@@ -117,8 +142,7 @@ function Eliminar(id)
 				$b->AgregarFuncion('', 'Opciones', "align=center nowrap width=10%");
 				
 				#Opciones TR del buscador archivos
-				function Opciones(& $fila)
-				{
+				function Opciones(& $fila) {
 					global $id_cliente;
 					global $id_asunto;
 					global $sesion;
@@ -162,5 +186,21 @@ function Eliminar(id)
 				$b->Imprimir();
 			}
 		} #fin id_cliente OR id_asunto
+
+/**
+* Verifica que version de IE sea menor a 9 para usar uploader especifico.
+*/
+if (preg_match('/(?i)msie (\d+)/', $_SERVER['HTTP_USER_AGENT'], $version) && $version[1] <= 8) {
+ printf('<script type="text/javascript" src="%s/app/templates/default/js/uploader_ie.js"></script>', Conf::RootDir());
+} else {
+ printf('<script type="text/javascript" src="%s/app/templates/default/js/uploader_other.js"></script>', Conf::RootDir());
+}
+printf('<script type="text/javascript" src="%s/app/templates/default/js/uploader.js"></script>', Conf::RootDir());
 ?>
+<script type="text/javascript">
+ var max_file_uploads = <?php echo ini_get('max_file_uploads') ?>;
+ var upload_max_filesize = <?php echo sizeInBytes(ini_get('upload_max_filesize')); ?>;
+ var upload_max_filesize_h = '<?php echo ini_get('upload_max_filesize'); ?>';
+ observeFile('archivo_data');
+</script>
 
