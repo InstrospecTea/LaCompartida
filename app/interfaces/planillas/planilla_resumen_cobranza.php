@@ -249,12 +249,12 @@
 		$filas +=2;
 		$ws1->write($filas, $col_numero_cobro, __('GENERADO EL:'), $txt_opcion);
 		
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) ) {
+		if( Conf::GetConf($sesion,'NotaCobroExtra') ) {
 			//$ws1->write($filas, $col_nota_cobro, date("d-m-Y H:i:s"), $txt_opcion);
-			$ws1->write($filas, $col_factura, $filas, $txt_opcion);
+			$ws1->write($filas, $col_nota_cobro, date("d-m-Y H:i:s"), $txt_opcion);
 		} else {
 			//$ws1->write($filas, $col_factura, date("d-m-Y H:i:s"), $txt_opcion);
-			$ws1->write($filas, $col_factura, $filas, $txt_opcion);
+			$ws1->write($filas, $col_factura, date("d-m-Y H:i:s"), $txt_opcion);
 		}
 			
 
