@@ -30,32 +30,42 @@ if ($xls) {
 		$where .=" AND cp.fecha_cobro BETWEEN '".$fecha1."' AND '".$fecha2."' ";
 	}
 
-	$query_excel = "SELECT
-					cli.glosa_cliente AS glosa_cliente,
-				    asu.glosa_asunto AS glosa_asunto,
-				    cp.monto_estimado AS monto_estimado,
-					prm_moneda.simbolo AS moneda_estimada,
-				    IF (cp.fecha_cobro  IS NULL , cob.fecha_emision , cp.fecha_cobro)AS fecha_cobro,
-				    cli.codigo_cliente AS codigo_cliente,
-				    asu.codigo_asunto AS codigo_asunto,
-				    cp.descripcion AS descripcion,
-				    cp.observaciones AS observaciones,
-				    IF(cp.id_cobro IS NULL, 'SIN COBRO', cob.estado) AS estado_cobro,
-				    cp.id_cobro AS numero_cobro,
-					cob.monto as monto_cobrado,
-					prm_moneda.simbolo AS moneda_cobrada,
-					cob.documento as numero_factura
+	if ($mostrar_con_cobro){
+		$where .=" AND cp.id_cobro IS NOT NULL";
+	}
+
+	$query_excel = "SELECT 
+    				cli.glosa_cliente AS glosa_cliente,
+    				asu.glosa_asunto AS glosa_asunto,
+    				cp.monto_estimado AS monto_estimado,
+    				pmcp.simbolo AS moneda_estimada,
+
+    				IF(cp.fecha_cobro IS NULL, cob.fecha_emision, cp.fecha_cobro) AS fecha_cobro, cli.codigo_cliente AS codigo_cliente,
+
+    				asu.codigo_asunto AS codigo_asunto,
+    				cp.descripcion AS descripcion,
+    				cp.observaciones AS observaciones,
+
+    				IF(cp.id_cobro IS NULL, 'SIN COBRO', cob.estado) AS estado_cobro,
+
+    				cp.id_cobro AS numero_cobro,
+    				cob.monto as monto_cobrado,
+
+    				IF(cob.id_cobro IS NULL,'', pmcob.simbolo) AS moneda_cobrada,
+
+    				cob.documento as numero_factura
 
 					FROM cobro_pendiente as cp
-
+					    
 					LEFT JOIN contrato AS con ON cp.id_contrato = con.id_contrato
-					LEFT JOIN prm_moneda ON con.id_moneda = prm_moneda.id_moneda
+					LEFT JOIN prm_moneda as pmcp ON con.id_moneda = pmcp.id_moneda
+					LEFT JOIN cobro AS cob ON cp.id_cobro = cob.id_cobro
+					LEFT JOIN prm_moneda AS pmcob ON cob.id_moneda = pmcob.id_moneda
 					LEFT JOIN asunto AS asu ON con.id_contrato = asu.id_contrato
 					LEFT JOIN cliente AS cli ON con.codigo_cliente = cli.codigo_cliente
-					LEFT JOIN cobro AS cob ON cp.id_cobro = cob.id_cobro
 
 					WHERE $where
-					AND monto_estimado != '0'";
+					AND monto_estimado != 0";
 
 	$resultado = mysql_query($query_excel, $sesion->dbh) or Utiles::errorSQL($query_excel, __FILE__, __LINE__, $sesion->dbh);
 
@@ -132,7 +142,8 @@ if ($xls) {
 
 	$worksheet->writeString(1,0,'Reporte Hitos',$titulo);
 
-	$fila_datos_documento = 3;
+	$celda_fecha_creacion = 2;
+	$celda_periodo_reporte = 3;
 
 	$fila_encabezado = 5;
 
@@ -152,7 +163,11 @@ if ($xls) {
 	$columna_numero_factura = 13;
 
 	//Worksheet::write ( integer $row , integer $col , mixed $token , mixed $format=0 )
-	$worksheet->write($fila_datos_documento,0, 'Fecha Creacion : '.date('Y-m-d h:i:s'),$glosa_detalle_documento_left);
+	$worksheet->write($celda_fecha_creacion,0, 'Fecha Creacion : '.date('d-m-Y'),$glosa_detalle_documento_left);
+
+	$periodo = "Periodo : Desde ".$fecha1." Hasta ".$fecha2;
+
+	$worksheet->write($celda_periodo_reporte,0, $periodo,$glosa_detalle_documento_left);
 
 	$worksheet->write($fila_encabezado, $columna_glosa_cliente, __('Glosa Cliente'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_glosa_asunto, __('Glosa Asunto'), $encabezados_borde);
@@ -243,6 +258,15 @@ $pagina->PrintTop();
 		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
+		</tr>
+
+		<tr>
+			<td align="right">
+				<input type="checkbox" name="mostrar_con_cobro" id="mostrar_con_cobro" value="1" <?php echo $mostrar_con_cobro ? 'checked="checked"' : '' ?> />
+			</td>
+			<td align="left">
+				<?php echo __('Mostrar hitos con cobros asociados'); ?></td>
+			</td>
 		</tr>
 		
 		<tr>
