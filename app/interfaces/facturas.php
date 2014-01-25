@@ -29,11 +29,6 @@ if ($opc == 'generar_factura') {
 	}
 }
 
-if ($archivo_contabilidad) {
-	require_once Conf::ServerDir() . '/interfaces/facturas_contabilidad_txt.php';
-	exit;
-}
-
 $idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
@@ -41,14 +36,19 @@ global $factura;
 ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_factura_inicio') : false;
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
-	if ($exportar_excel) {
+	if ($exportar_excel || $archivo_contabilidad) {
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 			, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
 			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 			, $descripcion_factura, $serie, $desde_asiento_contable);
 
-		$factura->DownloadExcel($results);
+		if ($exportar_excel) {
+			$factura->DownloadExcel($results);
+		} elseif ($archivo_contabilidad) {
+			$data = array('Resultados' => $results);
+			$Slim = Slim::getInstance() ? $Slim->applyHook('hook_facturas_genera_archivo_contabilidad', &$data) : false;
+		}
 		exit;
 	}
 }
@@ -103,12 +103,6 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 				form.action = 'facturas.php?opc=buscar&exportar_excel=1';
 				break;
 
-			<?php if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
-			case 'archivo_contabilidad':
-				form.action = 'facturas.php?archivo_contabilidad=1';
-				break;
-			<?php } ?>
-
 			default:
 				return false;
 		}
@@ -121,6 +115,8 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 		var urlo = "agregar_factura.php?popup=1";
 		nuovaFinestra('Agregar_Factura', 730, 470, urlo, 'top=100, left=125');
 	}
+
+	<?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_facturas_js') : false; ?>
 </script>
 
 <form method="post" name="form_facturas" id="form_facturas">
@@ -243,15 +239,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 							<td colspan="4" style="text-align:center;margin:auto;">
 								<a name="boton_buscar" id="boton_buscar" class="btn botonizame" icon="find" onclick="BuscarFacturas(jQuery('#form_facturas').get(0), 'buscar')"><?php echo __('Buscar'); ?></a>
 								<a name="boton_excel" id="boton_descarga" class="btn botonizame" icon="xls" onclick="BuscarFacturas(jQuery('#form_facturas').get(0), 'exportar_excel')"><?php echo __('Descargar Excel'); ?></a>
-								<?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_factura_fin') : false;
-									if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
-									<input type="button" value="<?php echo __('Descargar Archivo Contabilidad'); ?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')" />
-									<br />
-									<label>
-										desde el asiento contable
-										<input type="text" size="4" name="desde_asiento_contable" value="<?php echo $desde_asiento_contable; ?>" />
-									</label>
-								<?php } ?>
+								<?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_factura_fin') : false; ?>
 							</td>
 						</tr>
 					</table>

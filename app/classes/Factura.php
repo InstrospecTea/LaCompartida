@@ -2161,6 +2161,7 @@ class Factura extends Objeto {
 			  , prm_estado_factura.glosa as estado
 			  , factura.id_cobro
 			  , cobro.codigo_idioma as codigo_idioma
+			  , prm_moneda.codigo AS codigo_moneda
 			  , prm_moneda.simbolo
 			  , prm_moneda.cifras_decimales
 			  , prm_moneda.tipo_cambio
