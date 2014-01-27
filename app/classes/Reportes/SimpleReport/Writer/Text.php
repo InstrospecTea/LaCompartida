@@ -33,7 +33,7 @@ class SimpleReport_Writer_Text implements SimpleReport_Writer_IWriter {
 			foreach ($columns as $col_i => $c) {
 				$txt .= $this->format($r, $c, $r_i + 1);
 			}
-			$txt .= "\n";
+			$txt .= "\r\n";
 		}
 
 		$this->outputTXT($txt);
