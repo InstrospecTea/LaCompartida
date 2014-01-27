@@ -1,8 +1,8 @@
 # Changelog
 
 ## Hotfix: 13.7.27
-Lunes 17 de enero 2014
-* **Fixed:** Problemas con Nota de Crédito en SAT
+Lunes 27 de enero 2014
+* **Fixed:** [Problemas con Nota de Crédito en SAT](https://github.com/LemontechSA/ttb/pull/396)
 
 ## Hotfix: 13.7.26
 Viernes 24 de enero 2014
