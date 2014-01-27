@@ -42,19 +42,36 @@ class SimpleReport_Writer_Text implements SimpleReport_Writer_IWriter {
 	public function format($result, $column, $iterator) {
 		$length = $column->extras['length'];
 
-		if ($column->format == 'number') {
-			$padder = '0';
-			$type = 'd';
-		} else {
-			$padder = ' ';
-			$type = 's';
+		switch ($column->format) {
+			case 'number':
+				$padder = '0';
+				$type = 'd';
+				$precision = 0;
+				break;
+			case 'float':
+				$padder = '0';
+				$type = 'f';
+				$precision = 2;
+				break;
+			default:
+				$padder = ' ';
+				$type = 's';
+				$precision = $length;
+				break;
 		}
 
-		$format = "%'{$padder}{$length}.{$length}{$type}";
+		$alignment = ($column->extras['align'] == 'left') ? "-" : "";
 
-		$field = strpos($column->field, "fixed") === 0 ? "fixed" : $column->field;
+		$format = "%'{$padder}{$alignment}{$length}.{$precision}{$type}";
 
-		$value = $result[$column->field];
+		$field = $column->field;
+
+		if (!empty($column->extras['real_field'])) {
+			$field = $column->extras['real_field'];
+		}
+
+		$value = $result[$field];
+		
 		if ($column->format == 'date') {
 			$value = Utiles::sql2fecha($value, '%d/%m/%Y');
 		}
@@ -70,6 +87,11 @@ class SimpleReport_Writer_Text implements SimpleReport_Writer_IWriter {
 			default:
 				$value = trim(str_replace(array("\n", "\r"), ' ', $value));
 				break;
+		}
+
+		$translate = $column->extras['translate'];
+		if (count($translate) > 1) {
+			$value = $translate[$value];
 		}
 
 		return sprintf($format, $value);

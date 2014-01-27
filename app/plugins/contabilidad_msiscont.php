@@ -49,7 +49,8 @@ function GenerarArchivoContabilidad($hookArg) {
 			'format' => 'number',
 			'extras' => array(
 				'length' => 2,
-				'value' => '2'
+				'value' => '2',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
@@ -61,27 +62,31 @@ function GenerarArchivoContabilidad($hookArg) {
 			)
 		),
 		array(
-			'field' => 'fecha',
+			'field' => 'fecha_1',
 			'format' => 'date',
 			'order' => 3,
 			'extras' => array(
-				'length' => 10
+				'length' => 10,
+				'real_field' => 'fecha'
 			)
 		),
 		array(
 			'field' => 'fixed_2',
+			'format' => 'number',
 			'order' => 4,
 			'extras' => array(
 				'length' => 10,
-				'value' => '7041'
+				'value' => '7041',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_1',
+			'format' => 'float',
 			'order' => 5,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
@@ -89,7 +94,8 @@ function GenerarArchivoContabilidad($hookArg) {
 			'order' => 6,
 			'extras' => array(
 				'length' => 1,
-				'value' => 'D'
+				'value' => 'D',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
@@ -105,7 +111,7 @@ function GenerarArchivoContabilidad($hookArg) {
 		),
 		array(
 			'field' => 'tipo_cambio',
-			'format' => 'number',
+			'format' => 'float',
 			'order' => 8,
 			'extras' => array(
 				'length' => 10
@@ -137,7 +143,8 @@ function GenerarArchivoContabilidad($hookArg) {
 			'order' => 11,
 			'extras' => array(
 				'length' => 1,
-				'value' => '-'
+				'value' => '-',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
@@ -153,14 +160,16 @@ function GenerarArchivoContabilidad($hookArg) {
 			'order' => 13,
 			'extras' => array(
 				'length' => 8,
-				'value' => ''
+				'value' => '',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
-			'field' => 'RUT_cliente',
+			'field' => 'RUT_cliente_1',
 			'order' => 14,
 			'extras' => array(
-				'length' => 11
+				'length' => 11,
+				'real_field' => 'RUT_cliente'
 			)
 		),
 		array(
@@ -168,62 +177,71 @@ function GenerarArchivoContabilidad($hookArg) {
 			'order' => 15,
 			'extras' => array(
 				'length' => 25,
-				'value' => 'C'
+				//'value' => 'C',
+				'value' => '',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
-			'field' => 'fecha',
+			'field' => 'fecha_2',
 			'format' => 'date',
 			'order' => 16,
 			'extras' => array(
-				'length' => 10
+				'length' => 10,
+				'real_field' => 'fecha'
 			)
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_2',
+			'format' => 'float',
 			'order' => 17,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_3',
+			'format' => 'float',
 			'order' => 18,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_4',
+			'format' => 'float',
 			'order' => 19,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_5',
+			'format' => 'float',
 			'order' => 20,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_6',
+			'format' => 'float',
 			'order' => 21,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
-			'field' => 'RUT_cliente',
+			'field' => 'RUT_cliente_2',
 			'order' => 22,
 			'extras' => array(
-				'length' => 11
+				'length' => 11,
+				'real_field' => 'RUT_cliente'
 			)
 		),
 		array(
@@ -231,14 +249,16 @@ function GenerarArchivoContabilidad($hookArg) {
 			'order' => 23,
 			'extras' => array(
 				'length' => 1,
-				'value' => '1'
+				'value' => '1',
+				'real_field' => 'fixed'
 			)
 		),
 		array(
 			'field' => 'factura_rsocial',
 			'order' => 24,
 			'extras' => array(
-				'length' => 40
+				'length' => 40,
+				'align' => 'left'
 			)
 		),
 		array(
@@ -252,24 +272,28 @@ function GenerarArchivoContabilidad($hookArg) {
 			'field' => 'fixed_8',
 			'order' => 26,
 			'extras' => array(
-				'length' => 4,
-				'value' => '1001'
+				'length' => 64,
+				'value' => '1001',
+				'real_field' => 'fixed',
+				'align' => 'left'
 			)
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_7',
+			'format' => 'float',
 			'order' => 27,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
-			'field' => 'total',
-			'format' => 'number',
+			'field' => 'total_8',
+			'format' => 'float',
 			'order' => 28,
 			'extras' => array(
-				'length' => 12
+				'length' => 12,
+				'real_field' => 'total'
 			),
 		),
 		array(
@@ -277,7 +301,8 @@ function GenerarArchivoContabilidad($hookArg) {
 			'order' => 29,
 			'extras' => array(
 				'length' => 58,
-				'value' => ''
+				'value' => '',
+				'real_field' => 'fixed'
 			)
 		)
 	);
