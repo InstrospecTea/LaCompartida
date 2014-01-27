@@ -265,6 +265,12 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
 	$mx_timezone = -6;
 	$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
+
+	$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+	$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+	$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
+	$tipoComprobante = $tipo_documento_legal == 'NC' ? 'egreso' : 'ingreso';
+
 	$r = array(
 		'COM' => array(
 			'version|3.2',
@@ -279,7 +285,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
-			'tipoDeComprobante|ingreso'
+			'tipoDeComprobante|' . $tipoComprobante
 		),
 		'REF' => array(
 			'Regimen|' . 'Régimen General de Ley, Personas Morales'
