@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.28
+mi√©rcoles 29 de enero 2014
+* **Fixed:** [Agrega nuevos logs y filtra los usuarios que no ser·n alertados antes de generar los mensajes.](https://github.com/LemontechSA/ttb/pull/399)
+
 
 ## Hotfix: 13.7.27
 Lunes 27 de enero 2014

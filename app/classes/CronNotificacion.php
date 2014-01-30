@@ -116,15 +116,14 @@ class CronNotificacion extends Cron {
 			if ($alerta_semanal_todos_abogadosa_administradores) {
 				$ids_usuarios_profesionales .= ',' . $id_usuario;
 			}
-
-			$this->log("    {$nombre_pila} ({$id_usuario}) Minimo: {$minimo}, Maximo: {$maximo}, Horas: {$horas}");
-
+			$tipo_alerta = array();
 			if ($minimo > 0 && $horas < $minimo) {
 				//Alerto al usuario
 				if ($alerta_semanal) {
 					$txt = str_replace('%HORAS', $horas, $msg['horas_minimas_propio']);
 					$txt = str_replace('%MINIMO', $minimo, $txt);
 					$dato_semanal[$id_usuario]['alerta_propia'] = $txt;
+					$tipo_alerta[] = 'horas_minimas';
 				}
 				//Alerto a sus revisores
 				$txt = str_replace('%HORAS', $horas, $msg['horas_minimas_revisado']);
@@ -137,13 +136,16 @@ class CronNotificacion extends Cron {
 					$txt = str_replace('%HORAS', $horas, $msg['horas_maximas_propio']);
 					$txt = str_replace('%MAXIMO', $maximo, $txt);
 					$dato_semanal[$id_usuario]['alerta_propia'] = $txt;
+					$tipo_alerta[] = 'horas_maximas';
 				}
 				//Alerta a sus revisores
 				$txt = str_replace('%HORAS', $horas, $msg['horas_maximas_revisado']);
 				$txt = str_replace('%MAXIMO', $maximo, $txt);
 				$cache_revisados[$id_usuario]['alerta'] = $txt;
 			}
-			$dato_semanal[$id_usuario]['nombre_pila'] = $nombre_pila;
+			$tipo_alerta = implode('-', $tipo_alerta);
+			$this->log("    {$nombre_pila} ({$id_usuario}) Minimo: {$minimo}, Maximo: {$maximo}, Horas: {$horas}, Alerta: {$alerta_semanal}, Tipo: {$tipo_alerta}");
+			$dato_semanal[$id_usuario]['nombre_pila'] = htmlentities($nombre_pila);
 			$cache_revisados[$id_usuario]['nombre'] = $nombre_usuario;
 			$cache_revisados[$id_usuario]['horas'] = number_format($horas, 1);
 			$cache_revisados[$id_usuario]['horas_cobrables'] = number_format($horas_cobrables, 1);
@@ -197,7 +199,11 @@ class CronNotificacion extends Cron {
 		}
 
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
+		$dato_semanal = array_filter($dato_semanal, function ($i) {
+			return !empty($i['alerta_propia']);
+		});
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
+		$this->log(json_encode(compact('dato_semanal', 'mensajes')));
 
 		if ($this->correo == 'generar_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
