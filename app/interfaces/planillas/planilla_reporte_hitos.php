@@ -39,21 +39,17 @@ if ($xls) {
     				asu.glosa_asunto AS glosa_asunto,
     				cp.monto_estimado AS monto_estimado,
     				pmcp.simbolo AS moneda_estimada,
-
-    				IF(cp.fecha_cobro IS NULL, cob.fecha_emision, cp.fecha_cobro) AS fecha_cobro, cli.codigo_cliente AS codigo_cliente,
-
+    				IF(cp.fecha_cobro IS NULL, DATE_FORMAT(cob.fecha_emision,'%d-%m-%Y'), DATE_FORMAT(cp.fecha_cobro,'%d-%m-%Y')) AS fecha_cobro, 
+    				cli.codigo_cliente AS codigo_cliente,
     				asu.codigo_asunto AS codigo_asunto,
     				cp.descripcion AS descripcion,
     				cp.observaciones AS observaciones,
-
     				IF(cp.id_cobro IS NULL, 'SIN COBRO', cob.estado) AS estado_cobro,
-
     				cp.id_cobro AS numero_cobro,
     				cob.monto as monto_cobrado,
-
     				IF(cob.id_cobro IS NULL,'', pmcob.simbolo) AS moneda_cobrada,
-
-    				cob.documento as numero_factura
+    				cob.documento as numero_factura,
+    				con.id_moneda
 
 					FROM cobro_pendiente as cp
 					    
@@ -65,7 +61,8 @@ if ($xls) {
 					LEFT JOIN cliente AS cli ON con.codigo_cliente = cli.codigo_cliente
 
 					WHERE $where
-					AND monto_estimado != 0";
+					AND monto_estimado != 0
+					#AND cp.hito = 1";
 
 	$resultado = mysql_query($query_excel, $sesion->dbh) or Utiles::errorSQL($query_excel, __FILE__, __LINE__, $sesion->dbh);
 
@@ -73,7 +70,7 @@ if ($xls) {
 	$workbook = new Spreadsheet_Excel_Writer();
 
 	// sending HTTP headers
-	$workbook->send("Reporte_Hitos.xls");
+	$workbook->send("planilla_reporte_hitos.xls");
 
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet('Listado Actividades');
@@ -124,6 +121,16 @@ if ($xls) {
 		array ( 'size' =>'10','Align' => 'right')
 	);
 
+	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+	$idioma->Load($cobro->fields['codigo_idioma']);
+
+	$ff = str_replace('%m', 'MM', $ff);
+	$ff = str_replace('%y', 'YYYY', $ff);
+	$ff = str_replace('%Y', 'YYYY', $ff);
+
+	$formato_fecha = & $workbook->addFormat(array('Size' => 7, 'Valign' => 'top',	'Color' => 'black'));
+	$formato_fecha->setNumFormat($ff . ';[Red]@ "' . __("Error: Formato incorrecto de fecha") . '"');
+
 	//Worksheet::setColumn ( integer $firstcol , integer $lastcol , float $width , mixed $format=0 , integer $hidden=0 )
 	$worksheet->setColumn(0,0,40);
 	$worksheet->setColumn(1,1,40);
@@ -163,7 +170,7 @@ if ($xls) {
 	$columna_numero_factura = 13;
 
 	//Worksheet::write ( integer $row , integer $col , mixed $token , mixed $format=0 )
-	$worksheet->write($celda_fecha_creacion,0, 'Fecha Creacion : '.date('d-m-Y'),$glosa_detalle_documento_left);
+	$worksheet->write($celda_fecha_creacion,0, 'Fecha Creación : '.date('d-m-Y'),$glosa_detalle_documento_left);
 
 	$periodo = "Periodo : Desde ".$fecha1." Hasta ".$fecha2;
 
@@ -198,21 +205,41 @@ if ($xls) {
 					$numero_cobro,
 					$monto_cobrado,
 					$moneda_cobrada,
-					$numero_factura ) = mysql_fetch_array($resultado)) {
+					$numero_factura,
+					$id_moneda_contrato ) = mysql_fetch_array($resultado)) {
+
+		$cifras_decimales = Utiles::glosa($sesion, $id_moneda_contrato, 'cifras_decimales', 'prm_moneda', 'id_moneda');
+
+		if ($cifras_decimales) {
+			$decimales = '.';
+			while ($cifras_decimales-- > 0) {
+				$decimales .= '0';
+			}
+		} else {
+			$decimales = '';
+		}
+
+		$simbolo_moneda = Utiles::glosa($sesion, $id_moneda_contrato, 'simbolo', 'prm_moneda', 'id_moneda');
+
+		$formato_moneda_monto = &$workbook->addFormat(array('Size' => 10,
+					'VAlign' => 'top',
+					'Align' => 'right',
+					'Color' => 'black',
+					'NumFormat' => "#,##,0$decimales"));
 
 		++$fila_encabezado;
 		$worksheet->write($fila_encabezado, $columna_glosa_cliente, $glosa_cliente, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_glosa_asunto, $glosa_asunto, $general_izquierda);
-		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $general);
+		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $formato_moneda_monto);
 		$worksheet->write($fila_encabezado, $columna_moneda_estimada, $moneda_estimada, $general);
-		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $general);
+		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $formato_fechas);
 		$worksheet->write($fila_encabezado, $columna_codigo_cliente, $codigo_cliente, $general);
 		$worksheet->write($fila_encabezado, $columna_codigo_asunto, $codigo_asunto, $general);
 		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general_izquierda);
 		$worksheet->Write($fila_encabezado, $columna_estado_cobro, $estado_cobro, $general);
 		$worksheet->write($fila_encabezado, $columna_numero_cobro, $numero_cobro, $general);
-		$worksheet->write($fila_encabezado, $columna_monto_cobrado, $monto_cobrado, $general);
+		$worksheet->write($fila_encabezado, $columna_monto_cobrado, $monto_cobrado, $formato_moneda_monto);
 		$worksheet->write($fila_encabezado, $columna_moneda_cobrada, $moneda_cobrada, $general);
 		$worksheet->write($fila_encabezado, $columna_numero_factura, $numero_factura, $general);
 
