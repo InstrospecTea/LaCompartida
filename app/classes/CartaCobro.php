@@ -1066,6 +1066,23 @@ class CartaCobro extends NotaCobro {
 				list($nombre_encargado) = mysql_fetch_array($resp);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
+
+				// Numero de cuenta segun contrato
+
+				$query_cuenta = "SELECT cuenta_banco.numero,prm_banco.nombre
+									FROM contrato 
+										LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
+										LEFT JOIN prm_banco ON cuenta_banco.id_banco = prm_banco.id_banco
+											WHERE contrato.id_cuenta = '".$contrato->fields['id_cuenta']."' LIMIT 1";
+
+				$resp = mysql_query($query_cuenta, $this->sesion->dbh) or Utiles::errorSQL($query_cuenta, __FILE__, __LINE__, $this->sesion->dbh);
+				list($numero_cuenta_contrato,$nombre_banco) = mysql_fetch_array($resp);
+
+				$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta_contrato, $html2);
+				$html2 = str_replace('%nombre_banco_contrato%', $nombre_banco, $html2);
+
+				// FIN cuenta segun contrato
+				
 				break;
 		}
 
@@ -1978,6 +1995,22 @@ class CartaCobro extends NotaCobro {
 			    }
 
 				$html2 = str_replace('%asuntos_relacionados%', $asuntos_relacionados, $html2);
+
+				// Numero de cuenta segun contrato
+
+				$query_cuenta = "SELECT cuenta_banco.numero,prm_banco.nombre
+									FROM contrato 
+										LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
+										LEFT JOIN prm_banco ON cuenta_banco.id_banco = prm_banco.id_banco
+											WHERE contrato.id_cuenta = '".$contrato->fields['id_cuenta']."' LIMIT 1";
+
+				$resp = mysql_query($query_cuenta, $this->sesion->dbh) or Utiles::errorSQL($query_cuenta, __FILE__, __LINE__, $this->sesion->dbh);
+				list($numero_cuenta_contrato,$nombre_banco) = mysql_fetch_array($resp);
+
+				$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta_contrato, $html2);
+				$html2 = str_replace('%nombre_banco_contrato%', $nombre_banco, $html2);
+
+				// FIN cuenta segun contrato
 
 				break;
 
