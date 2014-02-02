@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.31
+domingo 02 de febrero 2014
+* **Fixed:** [agrega nuevos logs para seguimiento de negri](https://github.com/LemontechSA/ttb/pull/404)
+
 ## Hotfix: 13.7.30
 Martes 04 de Febrero 2014
 * **Fixed:** [Permite guardar un monto 0 para forma de cobro Retainer en agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
