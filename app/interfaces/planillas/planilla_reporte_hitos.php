@@ -12,6 +12,16 @@ set_time_limit(3600);
 
 if ($xls) {
 
+	if ($codigo_cliente_secundario) {
+		$cliente = new Cliente($sesion);
+		$codigo_cliente = $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario);
+	}
+
+	if ($codigo_cliente) {
+		$cliente = new Cliente($sesion);
+		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
+	}
+
 	$where = 1;
 
 	if (!empty($fecha1)){
@@ -34,7 +44,7 @@ if ($xls) {
 		$where .=" AND cp.id_cobro IS NOT NULL";
 	}
 
-	$query_excel = "SELECT 
+	$query_excel = "SELECT
     				cli.glosa_cliente AS glosa_cliente,
     				asu.glosa_asunto AS glosa_asunto,
     				cp.monto_estimado AS monto_estimado,
@@ -107,11 +117,10 @@ if ($xls) {
 		array ( 'size' =>'10','Align' => 'center')
 	);
 
-	$general_codigo_cliente = &$workbook->addFormat(
-		array ( 'size' =>'10','Align' => 'center')
+	$fcodigo_cliente = &$workbook->addFormat(
+		array ('Size' => 10, 'Align' => 'center')
 	);
-
-	$general_codigo_cliente->setNumFormat("0");
+	$fcodigo_cliente->setNumFormat("0");
 
 	$general_izquierda = &$workbook->addFormat(
 		array ( 'size' =>'10','Align' => 'left')
@@ -127,9 +136,6 @@ if ($xls) {
 	$ff = str_replace('%m', 'MM', $ff);
 	$ff = str_replace('%y', 'YYYY', $ff);
 	$ff = str_replace('%Y', 'YYYY', $ff);
-
-	$formato_fecha = & $workbook->addFormat(array('Size' => 7, 'Valign' => 'top',	'Color' => 'black'));
-	$formato_fecha->setNumFormat($ff . ';[Red]@ "' . __("Error: Formato incorrecto de fecha") . '"');
 
 	//Worksheet::setColumn ( integer $firstcol , integer $lastcol , float $width , mixed $format=0 , integer $hidden=0 )
 	$worksheet->setColumn(0,0,40);
@@ -232,8 +238,8 @@ if ($xls) {
 		$worksheet->write($fila_encabezado, $columna_glosa_asunto, $glosa_asunto, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $formato_moneda_monto);
 		$worksheet->write($fila_encabezado, $columna_moneda_estimada, $moneda_estimada, $general);
-		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $formato_fechas);
-		$worksheet->write($fila_encabezado, $columna_codigo_cliente, $codigo_cliente, $general);
+		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $general);
+		$worksheet->write($fila_encabezado, $columna_codigo_cliente, $codigo_cliente, $fcodigo_cliente);
 		$worksheet->write($fila_encabezado, $columna_codigo_asunto, $codigo_asunto, $general);
 		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general_izquierda);
