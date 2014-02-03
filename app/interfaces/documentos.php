@@ -65,7 +65,7 @@
 	$pagina->PrintTop(1);
 ?>
 
-<script type="text\javascript">
+<script type="text/javascript">
 	function Guardar(t) {	
 		var form = $('form_archivo');
 		$('accion').value = 'guardar';
