@@ -1,5 +1,7 @@
 # Changelog
 ## Hotfix: 13.7.30
+Martes 04 de Febrero 2014
+* **Fixed:** [Permite guardar un monto 0 para forma de cobro Retainer en agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
 Lunes 03 de Febrero 2014
 * **Fixed:** [Permite guardar una fecha_cap desde el agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
 
