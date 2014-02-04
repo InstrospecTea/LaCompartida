@@ -72,7 +72,7 @@ if ($opcion == "guardar") {
 	}
 
 	if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
-            $id_usuario_secundario = (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : 0;
+        $id_usuario_secundario = (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : 0;
 	}
 
 	//Validaciones segun la configuración
@@ -135,7 +135,7 @@ if ($opcion == "guardar") {
 		} else {
 			switch ($forma_cobro) {
 				case "RETAINER":
-					if (empty($monto))
+					if ( (empty($monto) && $monto != 0) || $monto == '' )
 						$pagina->AddError(__("Por favor ingrese el monto para el retainer en la tarificación"));
 					if ($retainer_horas <= 0)
 						$pagina->AddError(__("Por favor ingrese las horas para el retainer en la tarificación"));
@@ -236,11 +236,12 @@ if ($opcion == "guardar") {
 
 			#CONTRATO
 			$contrato->Load($cliente->fields['id_contrato']);
-			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
+			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == '') {
 				$pagina->AddError(__('Ud. ha seleccionado forma de cobro:') . ' ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 				$val = true;
-			} elseif ($forma_cobro == 'TASA')
+			} elseif ($forma_cobro == 'TASA') {
 				$monto = '0';
+			}
 
 			if ($tipo_tarifa == 'flat') {
 				if (empty($tarifa_flat)) {
@@ -312,15 +313,15 @@ if ($opcion == "guardar") {
 				if ($cliente->Write()) {
 					$pagina->AddInfo(__('Cliente') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 				}
-			}
-			else
+			} else {
 				$pagina->AddError($contrato->error);
-		}
-		else
+			}
+		} else {
 			$pagina->AddError($cliente->error);
+		}
 	}
 
-			$asuntos = explode(';', UtilesApp::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
+	$asuntos = explode(';', UtilesApp::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
 
 	if ( $asuntos[0] == "true" && $loadasuntos ) {
 
@@ -366,27 +367,22 @@ $pagina->PrintTop();
 	var cargando = false;
 
 
-	function validarUnicoCliente(dato,campo,id_cliente)
-	{
+	function validarUnicoCliente(dato,campo,id_cliente) {
 
 
 		var accion = 'existe_'+campo+'_cliente';
-		if(id_cliente !== undefined)
-		{
+		if(id_cliente !== undefined) {
 			var url_ajax = 'ajax.php?accion='+accion+'&dato_cliente='+dato+'&id_cliente='+id_cliente;
-		}
-		else
-		{
+		} else {
 			var url_ajax = 'ajax.php?accion='+accion+'&dato_cliente='+dato;
 		}
 
 
 
 
-	jQuery.get(url_ajax,function(response) {
+		jQuery.get(url_ajax,function(response) {
 
-		if(response==0)
-			{
+			if(response==0) {
 				if(campo == 'glosa')
 				{
 					glosa_cliente_unica = true;
@@ -395,9 +391,7 @@ $pagina->PrintTop();
 				{
 					rut_cliente_unica = true;
 				}
-			}
-			else if(response==1)
-			{
+			} else if(response==1) {
 				if(campo == 'glosa')
 				{
 					glosa_cliente_unica = false;
@@ -407,43 +401,39 @@ $pagina->PrintTop();
 					rut_cliente_unica = false;
 				}
 			}
-				return response;
+			return response;
 		});
 
 
 	}
 
-	function Validar(form)
-	{
-		if(!form)
+	function Validar(form) {
+		if(!form) {
 			var form = $('formulario');
+		}
 
-		if(!form.glosa_cliente.value)
-		{
+		if(!form.glosa_cliente.value) {
 			alert("<?php echo  __('Debe ingresar el nombre del cliente') ?>");
 			form.glosa_cliente.focus();
 			return false;
 		}
 
-		if(validarUnicoCliente(form.glosa_cliente.value,'glosa',form.id_cliente.value))
-		{
-			if(!glosa_cliente_unica)
-			{
-				if(!confirm(("<?php echo  __('El nombre del cliente ya existe, ¿desea continuar de todas formas?') ?>")))
-				{
+		if(validarUnicoCliente(form.glosa_cliente.value,'glosa',form.id_cliente.value)) {
+			if(!glosa_cliente_unica) {
+				if(!confirm(("<?php echo  __('El nombre del cliente ya existe, ¿desea continuar de todas formas?') ?>"))) {
 					form.glosa_cliente.focus();
 					return false;
 				}
 			}
 		}
 
-<?php if ($validaciones_segun_config) { ?>
+		<?php if ($validaciones_segun_config) { ?>
+
 			// DATOS FACTURACION
 
 			<?php if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) { ?>
 
-			if(!form.id_cliente_referencia.value || form.id_cliente_referencia.value == -1)
-			{
+			if(!form.id_cliente_referencia.value || form.id_cliente_referencia.value == -1) {
 				alert("<?php echo  __('Debe ingresar la referencia')?>");
 				form.id_cliente_referencia.focus();
 				return false;
@@ -451,50 +441,46 @@ $pagina->PrintTop();
 
 			<?php } ?>
 
-			if(!form.factura_rut.value)
-			{
+			if(!form.factura_rut.value) {
 				alert("<?php echo  __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_rut.focus();
 				return false;
 			}
 
-			if(!form.factura_razon_social.value)
-			{
+			if(!form.factura_razon_social.value) {
 				alert("<?php echo  __('Debe ingresar la razón social del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_razon_social.focus();
 				return false;
 			}
 
-			if(!form.factura_giro.value)
-			{
+			if(!form.factura_giro.value) {
 				alert("<?php echo  __('Debe ingresar el giro del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_giro.focus();
 				return false;
 			}
 
-			if(!form.factura_direccion.value)
-			{
+			if(!form.factura_direccion.value) {
 				alert("<?php echo  __('Debe ingresar la dirección del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_direccion.focus();
 				return false;
 			}
+			
 			<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
-				if(!form.factura_ciudad.value)
-			{
+			if(!form.factura_ciudad.value) {
 				alert("<?php echo  __('Debe ingresar la ciudad del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_ciudad.focus();
 				return false;
-				}
+			
+			}
 			<?php } ?>
 
 			<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
-				if(!form.factura_comuna.value)
-			{
+			if(!form.factura_comuna.value) {
 				alert("<?php echo  __('Debe ingresar la comuna del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_comuna.focus();
@@ -502,24 +488,21 @@ $pagina->PrintTop();
 			}
 			<?php } ?>
 
-			if(form.id_pais.options[0].selected == true)
-			{
+			if(form.id_pais.options[0].selected == true) {
 				alert("<?php echo  __('Debe ingresar el pais del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.id_pais.focus();
 				return false;
 			}
 
-			if(!form.cod_factura_telefono.value)
-			{
+			if(!form.cod_factura_telefono.value) {
 				alert("<?php echo  __('Debe ingresar el codigo de area del teléfono') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.cod_factura_telefono.focus();
 				return false;
 			}
 
-			if(!form.factura_telefono.value)
-			{
+			if(!form.factura_telefono.value) {
 				alert("<?php echo  __('Debe ingresar el número de telefono') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_telefono.focus();
@@ -527,48 +510,48 @@ $pagina->PrintTop();
 			}
 
 			// SOLICITANTE
-			if(form.titulo_contacto.options[0].selected == true)
-			{
+			var titulocontacto = jQuery('#contacto');
+			if (!titulocontacto) {
 				alert("<?php echo  __('Debe ingresar el titulo del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.titulo_contacto.focus();
 				return false;
 			}
 
-			if(!form.nombre_contacto.value)
-			{
+			var nombrecontacto = jQuery('#nombre_contacto');
+			if (!nombrecontacto) {
 				alert("<?php echo  __('Debe ingresar el nombre del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.nombre_contacto.focus();
 				return false;
 			}
 
-			if(!form.apellido_contacto.value)
-			{
+			var apellidocontacto = jQuery('#apellido_contacto');
+			if (!apellidocontacto)	{
 				alert("<?php echo  __('Debe ingresar el apellido del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.apellido_contacto.focus();
 				return false;
 			}
 
-			if(!form.fono_contacto_contrato.value)
-			{
+			var telefonocontacto = jQuery('#email_contacto_contrato');
+			if (!telefonocontacto)	{
 				alert("<?php echo  __('Debe ingresar el teléfono del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.fono_contacto_contrato.focus();
 				return false;
 			}
 
-			if(!form.email_contacto_contrato.value)
-			{
+			var emailcontacto = jQuery('#email_contacto_contrato');
+			if (!emailcontacto)	{
 				alert("<?php echo  __('Debe ingresar el email del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.email_contacto_contrato.focus();
 				return false;
 			}
 
-			if(!form.direccion_contacto_contrato.value)
-			{
+			var direccioncontacto = jQuery('#direccion_contacto_contrato');
+			if (!direccioncontacto)	{
 				alert("<?php echo  __('Debe ingresar la dirección de envío del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.direccion_contacto_contrato.focus();
@@ -576,8 +559,7 @@ $pagina->PrintTop();
 			}
 
 			// DATOS DE TARIFICACION
-			if(!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
-			{
+			if (!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked)) {
 				alert("<?php echo  __('Debe seleccionar un tipo de tarifa') ?>");
 				MuestraPorValidacion('datos_cobranza');
 				form.tipo_tarifa[0].focus();
@@ -586,8 +568,7 @@ $pagina->PrintTop();
 
 			/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
 
-			if( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 )
-			{
+			if ( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 ) {
 				alert("<?php echo  __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
 				MuestraPorValidacion('datos_cobranza');
 				form.tarifa_flat.focus();
@@ -602,18 +583,17 @@ $pagina->PrintTop();
 			return false;
 		}*/
 
-			if(!$$('[name="forma_cobro"]').any(function(elem){return elem.checked;}))
-			{
+			if (!$$('[name="forma_cobro"]').any(function(elem){return elem.checked;})) {
 				alert("<?php echo  __('Debe seleccionar una forma de cobro') . ' ' . __('para la tarifa') ?>");
 				form.forma_cobro[0].focus();
 				return false;
 			}
 
-			if($('fc7').checked){
-				if($$('[id^="fila_hito_"]').any(function(elem){return !validarHito(elem, true);})){
+			if ($('fc7').checked) {
+				if ($$('[id^="fila_hito_"]').any(function(elem){return !validarHito(elem, true);})) {
 					return false;
 				}
-				if(!$$('[id^="hito_monto_"]').any(function(elem){return Number(elem.value)>0;})){
+				if (!$$('[id^="hito_monto_"]').any(function(elem){return Number(elem.value)>0;})) {
 					alert("<?php echo  __('Debe ingresar al menos un hito válido') ?>");
 					$('hito_descripcion_1').focus();
 					return false;
@@ -628,81 +608,77 @@ $pagina->PrintTop();
 			return false;
 		}*/
 
-			if(!form.observaciones.value)
-			{
+			if (!form.observaciones.value) {
 				alert("<?php echo  __('Debe ingresar un detalle para la cobranza') ?>");
 				MuestraPorValidacion('datos_cobranza');
 				form.observaciones.focus();
 				return false;
 			}
 
-<?php } ?>
+		<?php } ?>
 
 		// NUEVO MODULO FACTURA
-<?php
-if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-	?>
-				if (!validar_doc_legales(true)) {
-					return false;
-				}
-<?php } ?>
+		<?php
+		if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+			?>
+						if (!validar_doc_legales(true)) {
+							return false;
+						}
+		<?php } ?>
 
-<?php
-if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
-	echo "form.glosa_cliente.value=form.glosa_cliente.value.toUpperCase();";
-}
-?>
+		<?php
+		if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
+			echo "form.glosa_cliente.value=form.glosa_cliente.value.toUpperCase();";
+		}
+		?>
 
-<?php
-if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-	?>
-			if(!form.codigo_cliente_secundario.value)
-			{
-				alert("<?php echo  __('Debe ingresar el código secundario del cliente') ?>");
-				form.codigo_cliente_secundario.focus();
-				return false;
-			}
-	<?php
-}
-?>
+		<?php
+		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+			?>
+					if (!form.codigo_cliente_secundario.value) {
+						alert("<?php echo  __('Debe ingresar el código secundario del cliente') ?>");
+						form.codigo_cliente_secundario.focus();
+						return false;
+					}
+			<?php
+		}
+		?>
 
-		if(form.factura_rut.value)
-		{
+		if (form.factura_rut.value) {
 			validarUnicoCliente(form.factura_rut.value,'rut',form.id_cliente.value);
-			if(!rut_cliente_unica)
-			{
-				if(!confirm(("<?php echo  __('El rut del cliente ya existe, ¿desea continuar de todas formas?') ?>")))
-				{
+			if (!rut_cliente_unica) {
+				if (!confirm(("<?php echo  __('El rut del cliente ya existe, ¿desea continuar de todas formas?') ?>"))) {
 					form.factura_rut.focus();
 					return false;
 				}
 			}
 		}
 
-                <?php if ($usuario_responsable_obligatorio) { ?>
-                if ($('id_usuario_responsable').value == '-1')
-                {
-                    alert("<?php echo  __("Debe ingresar el") . " " . __('Encargado Comercial') ?>");
-                    $('id_usuario_responsable').focus();
-                    return false;
-                }
-                <?php } ?>
+        <?php if ($usuario_responsable_obligatorio) { ?>
+        if ($('id_usuario_responsable').value == '-1') {
+            alert("<?php echo  __("Debe ingresar el") . " " . __('Encargado Comercial') ?>");
+            $('id_usuario_responsable').focus();
+            return false;
+        }
+        <?php } ?>
 
-                <?php if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
-                if ($('id_usuario_secundario').value == '-1')
-                {
-                    alert("<?php echo  __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
-                    $('id_usuario_secundario').focus();
-                    return false;
-                }
-                <?php } ?>
+        <?php if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+        if ($('id_usuario_secundario').value == '-1') {
+            alert("<?php echo  __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
+            $('id_usuario_secundario').focus();
+            return false;
+        }
+        <?php } ?>
 
+		if (form.monto.value == 0 && form.monto.value != '') {
+			alert('Se eligió Retainer como Forma de Cobro e ingresó el monto 0');
+		}
+          
 		form.submit();
 		return true;
 	}
 
-	function MuestraPorValidacion(divID)
-	{
+	function MuestraPorValidacion(divID) {
 		var divArea = $(divID);
 		var divAreaImg = $(divID+"_img");
 		var divAreaVisible = divArea.style['display'] != "none";
@@ -710,7 +686,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
 	}
 
-	function calcHeight(idIframe, idMainElm){
+	function calcHeight(idIframe, idMainElm) {
 		ifr = $(idIframe);
 		the_size = ifr.$(idMainElm).offsetHeight + 20;
 		new Effect.Morph(ifr, {
@@ -719,35 +695,32 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		});
 	}
 
-	function ShowMonto()
-	{
+	function ShowMonto() {
 		div = document.getElementById("div_monto");
 		div.style.display = "block";
 	}
 
 
-	function HideMonto()
-	{
+	function HideMonto() {
 		div = document.getElementById("div_monto");
 		div.style.display = "none";
 	}
-	function goLite(form, boton)
-	{
+
+	function goLite(form, boton) {
 		var btn = $(boton);
 		btn.style['color'] = '#336699';
 		btn.style['borderTopColor'] = '#666666';
 		btn.style['borderBottomColor'] = '#666666';
 	}
 
-	function goDim(form, boton)
-	{
+	function goDim(form, boton) {
 		var btn = $(boton);
 		btn.style['color'] = '#777777';
 		btn.style['borderTopColor'] = '#AAAAAA';
 		btn.style['borderBottomColor'] = '#AAAAAA';
 	}
-	function iframeLoad(url)
-	{
+
+	function iframeLoad(url) {
 		window.document.getElementById('iframe_asuntos').src = url;
 	}
 
