@@ -486,12 +486,12 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 	<input type="hidden" name="id_documento_legal" value="<?php echo $id_documento_legal; ?>" />
 	<input type="hidden" name="elimina_ingreso" id="elimina_ingreso" value="" />
 	<input type="hidden" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro; ?>" />
+	<input type="hidden" name="subTotal" id="subTotal" value="<?php echo $suma_monto; ?>" />
 	<input type="hidden" name="id_contrato" id="id_contrato" value='<?php echo $id_contrato ?>'/>
 	<input type="hidden" name="id_moneda_factura" id="id_moneda_factura" value='<?php echo $id_moneda_factura ?>'/>
 	<input type="hidden" class="aproximable" name="honorario_disp" id="honorario_disp" value='<?php echo $honorario_disp ?>'/>
 	<input type="hidden" class="aproximable" name="gastos_con_impuestos_disp" id="gastos_con_impuestos_disp" value='<?php echo $gastos_con_impuestos_disp ?>'/>
 	<input type="hidden" class="aproximable" name="gastos_sin_impuestos_disp" id="gastos_sin_impuestos_disp" value='<?php echo $gastos_sin_impuestos_disp ?>'/>
-	<input type="hidden" class="aproximable" name="subtotal" id="subtotal" value='<?php echo $suma_monto ?>'/>
 	<input type="hidden" class="aproximable" name="honorario_total" id="honorario_total" value='<?php echo $honorario_total ?>'/>
 	<input type="hidden" class="aproximable" name="gastos_con_impuestos_total" id="gastos_con_impuestos_total" value='<?php echo $gastos_con_impuestos_total ?>'/>
 	<input type="hidden" class="aproximable" name="gastos_sin_impuestos_total" id="gastos_sin_impuestos_total" value='<?php echo $gastos_sin_impuestos_total ?>'/>
