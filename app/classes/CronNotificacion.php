@@ -203,20 +203,25 @@ class CronNotificacion extends Cron {
 			return !empty($i['alerta_propia']);
 		});
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
-		$this->log(json_encode(compact('dato_semanal', 'mensajes')));
+		$this->log(json_encode($dato_semanal));
 
-		if ($this->correo == 'generar_correo') {
-			foreach ($mensajes as $id_usuario => $mensaje) {
-				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+		try {
+			if ($this->correo == 'generar_correo') {
+				foreach ($mensajes as $id_usuario => $mensaje) {
+					$this->log($this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false));
+				}
+			} else if ($this->correo == 'desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+				var_dump($dato_semanal);
+				echo implode('<br/><br/><br/>', $mensajes);
+			} else if ($this->correo == 'simular_correo') {
+				foreach ($mensajes as $id_usuario => $mensaje) {
+					$mensaje['simular'] = true;
+					$this->log($this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false));
+				}
 			}
-		} else if ($this->correo == 'desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
-			var_dump($dato_semanal);
-			echo implode('<br/><br/><br/>', $mensajes);
-		} else if ($this->correo == 'simular_correo') {
-			foreach ($mensajes as $id_usuario => $mensaje) {
-				$mensaje['simular'] = true;
-				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
-			}
+		} catch (Exception $e) {
+			$msg = $e->getMessage();
+			$this->log("Error: {$msg}");
 		}
 	}
 
