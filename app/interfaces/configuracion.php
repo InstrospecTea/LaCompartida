@@ -2,6 +2,8 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('ADM'));
+
+use TTB\Pagina as Pagina;
 $pagina = new Pagina($Sesion);
 
 $pagina->titulo = __('Configuración');
@@ -215,6 +217,18 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 							echo "<input type='hidden' id='opcion[$id]' name='opcion[$id]' value='" . $valor_opcion . "' />";
 							$valores_array = explode(';', $valor_opcion);
 							echo "<input type='checkbox'  id='usa_asuntos_por_defecto' " . ($valores_array[0] == "true" ? "checked='checked'" : "") . " rel='opcion[$id]' />";
+							
+							$valores_array2 = explode(';', $valor_opcion);
+							$elementos_en_array = count($valores_array2);
+							if ($elementos_en_array > 1) {
+								if ($elementos_en_array == 1) {
+									$query = "update `configuracion` set valor_opcion = concat('false;', SUBSTRING( valor_opcion, LOCATE(';', valor_opcion) +1 )) WHERE id = 41"; 
+								} else { 
+									$query = "update `configuracion` set valor_opcion = concat('true;', SUBSTRING( valor_opcion, LOCATE(';', valor_opcion) +1 )) WHERE id = 41"; 
+								}
+								mysql_query($query, $Sesion->dbh);	
+							} 							
+
 							echo "<table id='tabla_asuntos' " . ((!$valor_opcion) ? "style='display: none;'" : "") . ">";
 							for ($i = 1; $i < count($valores_array); ++$i)
 								echo "<tr id='$valores_array[$i]'><td>" . $valores_array[$i] . "</td><td><img style=\"filter:alpha(opacity=100);\" src='" . Conf::ImgDir() . "/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('viejo','" . $valores_array[$i] . "', 'opcion[" . $id . "]');\"/></td></tr>";
@@ -408,6 +422,6 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 	<!-- <script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>-->
 
 	<?php
-	$pagina->PrintBottom($popup);
+	$pagina->PrintBottom($popup, true);
 
 

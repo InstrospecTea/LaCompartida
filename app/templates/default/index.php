@@ -7,8 +7,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 
 
 
-//	$img_dir = empty($row['foto_url']) ? '' : ('<img src="' . ($row['foto_url'] ? Conf::ImgDir() . '/' . $row['foto_url'] : '') . '" alt=""/>');
-	$img_dir = empty($row['foto_url']) ? '' : '<i class="sprite sprite-' .str_replace('.gif','', $row['foto_url']).'"></i>';
+	$img_dir = empty($row['foto_url']) ? '' : '<i class="sprite sprite-' . str_replace('.gif', '', $row['foto_url']) . '"></i>';
 
 
 	$home_html.='<td>
@@ -30,14 +29,13 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 		$home_html .="</tr><tr><td colspan=2>&nbsp;</td></tr><tr>";
 }
 
-//echo '<pre>';print_r(ini_get_all());echo '</pre>';
 ?>
 
 <table width="100%" border=0>
     <tr>
         <td align="left" colspan="2" nowrap>
 			&nbsp;&nbsp;&nbsp;&nbsp; <strong><?php echo __('Usuario') ?>:</strong>
-<?php echo $sesion->usuario->fields['nombre'] ?> <?php echo $sesion->usuario->fields['apellido1'] ?> <?php echo $sesion->usuario->fields['apellido2'] ?><br/>
+			<?php echo $sesion->usuario->fields['nombre'] ?> <?php echo $sesion->usuario->fields['apellido1'] ?> <?php echo $sesion->usuario->fields['apellido2'] ?><br/>
 			&nbsp;&nbsp;&nbsp;&nbsp; <strong><?php echo __('Ultimo ingreso') ?>:</strong>
 			<?php
 			echo Utiles::sql2fecha($sesion->ultimo_ingreso, '%A %d de %B de %Y');
@@ -49,7 +47,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$dato = $versiondb->fetch();
 				$versiondb->closeCursor();
 
-				echo '<br>&nbsp;&nbsp;&nbsp; <a href="' . Conf::RootDir() . '/app/update.php?hash=' . Conf::Hash() . '"/>Update</a>';
+				echo '<br/>&nbsp;&nbsp;&nbsp; <a href="' . Conf::RootDir() . '/app/update.php?hash=' . Conf::Hash() . '"/>Update</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/configuracion.php"/>Configuracion</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/templates.php"/>Templates</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/reportes_configuracion.php"/>Configuración Reportes</a>';
@@ -57,29 +55,27 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/nota_cobro.php"/>Notas de cobro</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/phpminiadmin.php"/>MySQL</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/error_log.php"/>Error Log</a>';
-		 		echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
-		 		echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/auditoria/index.php"/>Auditoría</a>';
+				if ($Slim = Slim::getInstance('default', true)) {
+					$Slim->applyHook('hook_link_shell_convertir_adelanto');
+				}
 
-		echo ' <br><br> Este software corre sobre la DB '. Conf::dbHost() .' <b>'. Conf::dbName().'</b> version '.$dato[0] ;
+				echo ' <br/><br/> Este software corre sobre la DB ' . Conf::dbHost() . ' <b>' . Conf::dbName() . '</b> version ' . $dato[0];
 				echo '. La m&aacute;s actual disponible es la ';
 				$_GET['lastver'] = 1;
 				include(Conf::ServerDir() . '/update.php');
-			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../') .'</b><br>';
-			$path_environment = dirname(__FILE__) . '/../../../environment.txt';
-			$path_source_version = dirname(__FILE__) . '/../../../VERSION';
-			$path_deploy_revision = dirname(__FILE__) . '/../../../REVISION';
-			$environment = is_readable($path_environment) ? file_get_contents($path_environment) : '';
-			$source_version = is_readable($path_source_version) ? file_get_contents($path_source_version) : '';
-			$deploy_revision = is_readable($path_deploy_revision) ? file_get_contents($path_deploy_revision) : '';
-			echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy:&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
-
+				echo '<br>Ruta real del repositorio: <b>' . realpath(dirname(__FILE__) . '/../../../') . '</b><br>';
+				$path_environment = dirname(__FILE__) . '/../../../environment.txt';
+				$path_source_version = dirname(__FILE__) . '/../../../VERSION';
+				$path_deploy_revision = dirname(__FILE__) . '/../../../REVISION';
+				$environment = is_readable($path_environment) ? file_get_contents($path_environment) : '';
+				$source_version = is_readable($path_source_version) ? file_get_contents($path_source_version) : '';
+				$deploy_revision = is_readable($path_deploy_revision) ? file_get_contents($path_deploy_revision) : '';
+				echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy:&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
 			}
-
-
-
-
 			?>
 			<br/><br style="clear:both;display:block;"/>
 		</td>

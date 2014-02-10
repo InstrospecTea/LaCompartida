@@ -9,129 +9,134 @@ require_once 'Asunto.php';
 
 class Gasto extends Objeto {
 
-	public static $configuracion_reporte = array (
-		array (
+	public static $configuracion_reporte = array(
+		array(
 			'field' => 'id_movimiento',
 			'title' => 'N°',
 			'visible' => false
 		),
-		array (
+		array(
 			'field' => 'fecha',
 			'format' => 'date',
 			'title' => 'Fecha',
 		),
-		array (
+		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Código Cliente',
 		),
-		array (
+		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente',
 		),
-		array (
+		array(
 			'field' => 'codigo_asunto',
 			'title' => 'Código Asunto',
 		),
-		array (
+		array(
 			'field' => 'glosa_asunto',
 			'title' => 'Asunto',
 		),
-		array (
+		array(
 			'field' => 'encargado_comercial',
 			'title' => 'Encargado Comercial',
 		),
-		array (
+		array(
 			'field' => 'usuario_ingresa',
 			'title' => 'Ingresado por',
 		),
-		array (
+		array(
 			'field' => 'usuario_ordena',
 			'title' => 'Ordenado por',
 		),
-		array (
+		array(
 			'field' => 'tipo',
 			'title' => 'Tipo',
 		),
-		array (
+		array(
 			'field' => 'descripcion',
 			'title' => 'Descripción',
 		),
-		array (
+		array(
 			'field' => 'simbolo',
 			'title' => 'Símbolo Moneda',
 		),
-		array (
+		array(
 			'field' => 'egreso',
 			'format' => 'number',
 			'title' => 'Egreso',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'ingreso',
 			'format' => 'number',
 			'title' => 'Ingreso',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'monto_cobrable',
 			'format' => 'number',
 			'title' => 'Monto Cobrable',
 			'extras' =>
-			array (
+			array(
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
 		),
-		array (
+		array(
 			'field' => 'con_impuesto',
 			'title' => 'Con Impuesto',
 		),
-		array (
+		array(
 			'field' => 'id_cobro',
 			'title' => 'N° Liquidación',
 		),
-		array (
+		array(
 			'field' => 'estado_cobro',
 			'title' => 'Estado Liquidación',
 		),
-		array (
+		array(
 			'field' => 'cobrable',
 			'title' => 'Cobrable',
 		),
-		array (
+		array(
 			'field' => 'numero_documento',
 			'title' => 'N° Documento',
 		),
-		array (
+		array(
 			'field' => 'numero_ot',
 			'title' => 'N° Orden Trabajo',
 			'visible' => false
 		),
-		array (
+		array(
 			'field' => 'rut_proveedor',
 			'title' => 'RUT Proveedor',
 		),
-		array (
+		array(
 			'field' => 'nombre_proveedor',
 			'title' => 'Proveedor',
 		),
-		array (
+		array(
+			'field' => 'estado_pago',
+			'title' => 'Estado Pago',
+			'visible' => false
+		),
+		array(
 			'field' => 'tipo_documento_asociado',
 			'title' => 'Tipo Documento Asociado',
 		),
-		array (
+		array(
 			'field' => 'fecha_documento_asociado',
 			'title' => 'Fecha Documento Asociado',
 		),
-		array (
+		array(
 			'field' => 'codigo_documento_asociado',
 			'title' => 'N° Documento Asociado',
 		),
@@ -154,23 +159,12 @@ class Gasto extends Objeto {
 			$this->campo_id = "id_gasto_general";
 			unset($this->changes[general]);
 		} else {
-#			$this->tabla = "";
-#			$this->campo_id = "id_gasto";
 
 			if ($this->fields[id_moneda] > 0) {
 				$query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda = " . $this->fields[id_moneda];
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($tasa) = mysql_fetch_array($resp);
 			}
-
-#			$monto = $this->fields[ingreso] * $tasa;
-#			$asunto = new Asunto($this->sesion);
-#			$asunto->LoadByCodigo($this->fields[codigo_asunto]);
-#			$cliente = new Cliente($this->sesion);
-#			$cliente->LoadByCodigo($asunto->fields[codigo_cliente]);
-#			if($cliente)
-#				$cuenta_corriente = $cliente->TotalCuentaCorriente();
-#            $this->Edit("ingreso_descontado",$monto);
 
 			unset($this->changes['general']);
 		}
@@ -225,24 +219,27 @@ class Gasto extends Objeto {
 	}
 
 	function Eliminar() {
+
 		if ($this->Loaded()) {
+			
 			$query = "DELETE FROM cta_corriente WHERE id_movimiento=" . $this->fields['id_movimiento'];
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		
 			if ($resp) {
+			
 				if ($this->fields['egreso'] > 0) {
 					$query_tipo_ingreso = $this->fields['egreso'];
 				} else if ($this->fields['ingreso'] > 0) {
 					$query_tipo_ingreso = $this->fields['ingreso'];
 				}
 
-				$query = "INSERT INTO gasto_historial
-								( id_movimiento, fecha, accion, id_usuario, fecha_movimiento, codigo_cliente, codigo_asunto, ingreso, monto_cobrable, descripcion, id_moneda)
+				$query = "INSERT INTO gasto_historial ( id_movimiento, fecha, accion, id_usuario, fecha_movimiento, codigo_cliente, codigo_asunto, ingreso, monto_cobrable, descripcion, id_moneda)
 							VALUES( " . $this->fields['id_movimiento'] . ", NOW(), 'ELIMINAR', " . $this->sesion->usuario->fields['id_usuario'] . ", '" . $this->fields['fecha'] . "', '" . $this->fields['codigo_cliente'] . "', '" . $this->fields['codigo_asunto'] . "', '" . $query_tipo_ingreso . "', '" . $this->fields['monto_cobrable'] . "', '" . addslashes($this->fields['descripcion']) . "', " . $this->fields['id_moneda'] . ")";
 				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			}
-		}
-		else
+		} else {
 			return false;
+		}
 
 		return true;
 	}
@@ -294,20 +291,20 @@ class Gasto extends Objeto {
 		$writer->save(__('Gastos'));
 	}
 
-
-
-
-	public function WhereQuery($request) {
+	public function WhereQuery($request = array()) {
+		if (empty($request)) {
+			$request = $_REQUEST;
+		}
 		$where = 1;
-		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
-			if ($_REQUEST['codigo_cliente_secundario']) {
-				$where .= " AND cliente.codigo_cliente_secundario = '{$_REQUEST['codigo_cliente_secundario']}'";
+		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
+			if ($request['codigo_cliente_secundario']) {
+				$where .= " AND cliente.codigo_cliente_secundario = '{$request['codigo_cliente_secundario']}'";
 				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigoSecundario($_REQUEST['codigo_cliente_secundario']);
+				$cliente->LoadByCodigoSecundario($request['codigo_cliente_secundario']);
 
-				if ($_REQUEST['codigo_asunto_secundario']) {
+				if ($request['codigo_asunto_secundario']) {
 					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigoSecundario($_REQUEST['codigo_asunto_secundario']);
+					$asunto->LoadByCodigoSecundario($request['codigo_asunto_secundario']);
 					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
 					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
 					$asuntos_list_secundario = array();
@@ -318,13 +315,13 @@ class Gasto extends Objeto {
 				}
 			}
 		} else {
-			if (!empty($_REQUEST['codigo_cliente'])) {
-				$where .= " AND cta_corriente.codigo_cliente = '{$_REQUEST['codigo_cliente']}'";
+			if (!empty($request['codigo_cliente'])) {
+				$where .= " AND cta_corriente.codigo_cliente = '{$request['codigo_cliente']}'";
 				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigo($_REQUEST['codigo_cliente']);
-				if (!empty($_REQUEST['codigo_asunto'])) {
+				$cliente->LoadByCodigo($request['codigo_cliente']);
+				if (!empty($request['codigo_asunto'])) {
 					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigo($_REQUEST['codigo_asunto']);
+					$asunto->LoadByCodigo($request['codigo_asunto']);
 					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
 					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
 					$asuntos_list = array();
@@ -335,64 +332,81 @@ class Gasto extends Objeto {
 				}
 			}
 		}
-		$fecha1 = !empty($_REQUEST['fecha1'])? Utiles::fecha2sql($_REQUEST['fecha1']) : '';
-		$fecha2 = !empty($_REQUEST['fecha2'])? Utiles::fecha2sql($_REQUEST['fecha2']) : '';
+		
 
-		if ($_REQUEST['cobrado'] == 'NO') {
+		if ($request['cobrado'] == 'NO') {
 			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
 		}
-		if ($_REQUEST['cobrado'] == 'SI') {
+		if ($request['cobrado'] == 'SI') {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
-		if ($_REQUEST['codigo_asunto'] && $lista_asuntos) {
+		if ($request['codigo_asunto'] && $lista_asuntos) {
 			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 		}
-		if ($_REQUEST['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
+		if ($request['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
 		}
-		if ($_REQUEST['id_usuario_orden']) {
-			$where .= " AND cta_corriente.id_usuario_orden = '{$_REQUEST['id_usuario_orden']}'";
+		if ($request['id_usuario_orden']) {
+			$where .= " AND cta_corriente.id_usuario_orden = '{$request['id_usuario_orden']}'";
 		}
-		if ($_REQUEST['id_usuario_responsable']) {
-			$where .= " AND contrato.id_usuario_responsable = '{$_REQUEST['id_usuario_responsable']}' ";
+		if ($request['id_usuario_responsable']) {
+			$where .= " AND contrato.id_usuario_responsable = '{$request['id_usuario_responsable']}' ";
 		}
-		if (isset($_REQUEST['cobrable']) &&  $_REQUEST['cobrable'] != '') {
-			$where .= " AND cta_corriente.cobrable ={$_REQUEST['cobrable']} ";
-		}
-
-		if (isset($_REQUEST['id_tipo']) and $_REQUEST['id_tipo'] != '') {
-			$where .= " AND cta_corriente.id_cta_corriente_tipo = '{$_REQUEST['id_tipo']}'";
+		if (isset($request['cobrable']) && $request['cobrable'] != '') {
+			$where .= " AND cta_corriente.cobrable ={$request['cobrable']} ";
 		}
 
-		if ($_REQUEST['clientes_activos'] == 'activos') {
+		if (isset($request['id_tipo']) and $request['id_tipo'] != '') {
+			$where .= " AND cta_corriente.id_cta_corriente_tipo = '{$request['id_tipo']}'";
+		}
+
+		if ($request['clientes_activos'] == 'activos') {
 			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-		} else if ($_REQUEST['clientes_activos']  == 'inactivos') {
+		} else if ($request['clientes_activos'] == 'inactivos') {
 			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
 		}
+
+		if (!empty($request['id_cobro'])) {
+			$where .= " AND cta_corriente.id_cobro='{$request['id_cobro']}' ";
+		}
+
+		// Chequeo si alguno de los parametros comienza con ":", ya que puede venir de FacturaProduccion y ser utilizado con PDO->prepare
+		if (strpos($request['fecha1'], ':') === 0) {
+			$fecha1 = $request["fecha1"];
+		} else {
+			$fecha1 = !empty($request['fecha1']) ? "'" . Utiles::fecha2sql($request['fecha1']) . "'" : '';
+		}
+		if (strpos($request['fecha2'], ':') === 0) {
+			$fecha2 = $request["fecha2"];
+		} else {
+			$fecha2 = !empty($request['fecha2']) ? "'" . Utiles::fecha2sql($request['fecha2']) . "'" : '';
+		}
 		if ($fecha1 && $fecha2) {
-			$where .= " AND cta_corriente.fecha BETWEEN '$fecha1' AND '$fecha2' ";
+			$where .= " AND cta_corriente.fecha BETWEEN $fecha1 AND $fecha2 ";
 		} else if ($fecha1) {
-			$where .= " AND cta_corriente.fecha >= '$fecha1' ";
+			$where .= " AND cta_corriente.fecha >= $fecha1 ";
 		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '$fecha2' ";
-		} else if (!empty($_REQUEST['id_cobro'])) {
-			$where .= " AND cta_corriente.id_cobro='{$_REQUEST['id_cobro']}' ";
+			$where .= " AND cta_corriente.fecha <= $fecha2 ";
 		}
 
 		// Filtrar por moneda del gasto
-		if ($_REQUEST['moneda_gasto'] != '') {
-			$where .= " AND cta_corriente.id_moneda={$_REQUEST['moneda_gasto']} ";
+		if ($request['moneda_gasto'] != '') {
+			$where .= " AND cta_corriente.id_moneda={$request['moneda_gasto']} ";
 		}
-		if ($_REQUEST['egresooingreso'] == 'soloingreso') {
+		if ($request['egresooingreso'] == 'soloingreso') {
 			$where .= " AND cta_corriente.ingreso IS NOT NULL AND cta_corriente.ingreso>0 ";
-		} else if ($_REQUEST['egresooingreso'] == 'sologastos') {
+		} else if ($request['egresooingreso'] == 'sologastos') {
 			$where .= " AND cta_corriente.egreso IS NOT NULL AND cta_corriente.egreso>0 ";
 		}
 		$where.=" AND incluir_en_cobro='SI' ";
+		// if (!empty($request['estado_pago'])) {
+		// 	$where .= " AND cta_corriente.estado_pago LIKE '%{$request['estado_pago']}%' "
+		// }
+
 		return $where;
 	}
 
-	public static function SelectFromQuery($join_extra='') {
+	public static function SelectFromQuery($join_extra = '') {
 		//Sirve para hacer count(*) sobre el conjunto, sin cláusula orden, limit ni group by
 		return "cta_corriente
 			LEFT JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
@@ -412,15 +426,10 @@ class Gasto extends Objeto {
 			LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
 			LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
 			 $join_extra ";
-
-
-
 	}
 
-
-
-	public static function SearchQuery($sesion,$where,$col_select='',$join_extra='') {
-		$query= "SELECT SQL_BIG_RESULT SQL_NO_CACHE
+	public static function SearchQuery($sesion, $where, $col_select = '', $join_extra = '') {
+		$query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE
 				cta_corriente.id_movimiento,
 				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
 				DATE_FORMAT(cta_corriente.fecha_creacion, '%Y-%m-%d') AS fecha_creacion,
@@ -437,11 +446,11 @@ class Gasto extends Objeto {
 				prm_cta_corriente_tipo.glosa AS tipo,
 				cta_corriente.descripcion,
 				moneda_gasto.simbolo,
-					ifnull(cta_corriente.egreso,0) egreso,
-					ifnull(cta_corriente.ingreso,0) ingreso,
-				if(ifnull(cta_corriente.ingreso,0)=0, 'egreso','ingreso') as ingresooegreso,";
+				IFNULL(cta_corriente.egreso, 0) egreso,
+				IFNULL(cta_corriente.ingreso, 0) ingreso,
+				IF(IFNULL(cta_corriente.ingreso, 0) = 0, 'egreso', 'ingreso') as ingresooegreso,";
 
-	if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
+		if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
 			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0,IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable)) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as  monto_cobrable_moneda_base,  \n \n";
 		} else {
@@ -458,6 +467,7 @@ class Gasto extends Objeto {
 				cta_corriente.numero_documento,
 				prm_proveedor.rut AS rut_proveedor,
 				prm_proveedor.glosa AS nombre_proveedor,
+				cta_corriente.estado_pago,
 				prm_tipo_documento_asociado.glosa AS tipo_documento_asociado,
 				cta_corriente.fecha_factura AS fecha_documento_asociado,
 				cta_corriente.codigo_factura_gasto AS codigo_documento_asociado,
@@ -471,66 +481,53 @@ class Gasto extends Objeto {
 				1 as opcion,
 				contrato.id_contrato
 				$col_select
-			FROM ".self::SelectFromQuery($join_extra)."
+			FROM " . self::SelectFromQuery($join_extra) . "
 			WHERE
 			1
 
 			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' )
 			AND (cta_corriente.ingreso IS NOT NULL OR cta_corriente.egreso IS NOT NULL)
 			AND $where ";
-			return $query;
+		return $query;
 	}
 
+	public static function TotalCuentaCorriente($sesion, $where = '1', $cobrable = 1, $array = false) {
 
-	public static function TotalCuentaCorriente($sesion, $where = '1',$cobrable=1,$array=false) {
-
-		//$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-		if($cobrable!='' && Conf::GetConf($sesion, 'UsarGastosCobrable')) {
+		if ($cobrable != '' && Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 			$where .= " AND  cta_corriente.cobrable = $cobrable ";
 		}
+
 		$total_ingresos = 0;
 		$total_egresos = 0;
 
+		$query = self::SearchQuery($sesion, $where);
+		$gastosST = $sesion->pdodbh->query($query);
 
+		while ($ingresoyegreso = $gastosST->fetch(PDO::FETCH_ASSOC)) {
 
-		$query=self::SearchQuery($sesion,$where);
-
-	// echo 'LA query es:'. $query;
-
-		//	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-			$gastosST=$sesion->pdodbh->query($query);
-			//$gastosRS=$gastosST->fetchAll(PDO::FETCH_ASSOC);
-			//echo '<pre>'; 			print_r($resp);			echo '</pre>';
-			while($ingresoyegreso=$gastosST->fetch(PDO::FETCH_ASSOC) ) {
-
-				 if($ingresoyegreso['estado_cobro']!='PAGADO' && $ingresoyegreso['estado_cobro']!='INCOBRABLE') {
-					if ($ingresoyegreso['monto_cobrable'] < 0) {  // es provisión
-						$total_ingresos += $ingresoyegreso['monto_cobrable_moneda_base'];
-					} else if ($ingresoyegreso['monto_cobrable'] > 0) { // es gasto
-						$total_egresos += $ingresoyegreso['monto_cobrable_moneda_base'];
-						if($ingresoyegreso['estado_cobro']=='CREADO' || $ingresoyegreso['estado_cobro']=='SIN COBRO') $egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
-					}
-				 }
+			if ($ingresoyegreso['estado_cobro'] != 'PAGADO' && $ingresoyegreso['estado_cobro'] != 'INCOBRABLE') {
+				if ($ingresoyegreso['monto_cobrable'] < 0) {  // es provisión
+					$total_ingresos += $ingresoyegreso['monto_cobrable_moneda_base'];
+				} else if ($ingresoyegreso['monto_cobrable'] > 0) { // es gasto
+					$total_egresos += $ingresoyegreso['monto_cobrable_moneda_base'];
+					if ($ingresoyegreso['estado_cobro'] == 'CREADO' || $ingresoyegreso['estado_cobro'] == 'SIN COBRO')
+						$egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
+				}
 			}
-			 //echo 'Ingreso:'.$total_ingresos.' Egreso: '.$total_egresos.'<br>';
-			$total = $total_ingresos-$total_egresos;
-		if($array) {
-			return array($total,$total_ingresos,$total_egresos, $egresos_borrador);
+		}
+
+		$total = $total_ingresos - $total_egresos;
+		
+		if ($array) {
+			return array($total, $total_ingresos, $total_egresos, $egresos_borrador);
 		} else {
 			return $total;
 		}
-
-
 	}
-
-
 }
 
+if (!class_exists('ListaGastos')) {
 
-
-#end Class
-if(!class_exists('ListaGastos')) {
 	class ListaGastos extends Lista {
 
 		function ListaGastos($sesion, $params, $query) {
@@ -538,4 +535,5 @@ if(!class_exists('ListaGastos')) {
 		}
 
 	}
+
 }

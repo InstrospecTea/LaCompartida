@@ -9,7 +9,7 @@ $CronNotificacion = new CronNotificacion($sesion);
  *  ej cron_notificacion.php correo
  *  ej cron_notificacion.php?correo=correo
  */
-if (($argv[1] == 'correo') || (isset($_GET['correo']) && $_GET['correo']=='correo' )) {
+if (($argv[1] == 'correo') || (isset($_GET['correo']) && $_GET['correo'] == 'correo')) {
 	$correo = 'generar_correo';
 /**
  * ej cron_notificacion.php desplegar_correo aefgaeddfesdg23k1h3kk1

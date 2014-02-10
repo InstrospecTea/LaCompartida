@@ -16,10 +16,14 @@
 
 	$tipo_ingreso = Conf::GetConf($sesion,'TipoIngresoHoras');
 	$actualizar_trabajo_tarifa = true;
+	$permiso_revisor_usuario = false;
 
 	if ($id_trabajo > 0) {
 		$actualizar_trabajo_tarifa = false;
 		$t->Load($id_trabajo);
+
+		// verificar si el usuario que inició sesión es revisor del usuario que se le está revisando las horas ingresadas
+		$permiso_revisor_usuario = $sesion->usuario->Revisa($t->fields['id_usuario']);
 
 		if (($t->Estado() == 'Cobrado' || $t->Estado()== __("Cobrado"))&& $opcion != 'nuevo') {
 			$pagina->AddError(__('Trabajo ya cobrado'));
@@ -28,7 +32,7 @@
 			exit;
 
 		} else if (($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo') {
-			if (!$permiso_revisor->fields['permitido']) {
+			if (!$permiso_revisor->fields['permitido'] && !$permiso_revisor_usuario) {
 				$pagina->AddError(__('Trabajo ya revisado'));
 				$pagina->PrintTop($popup);
 				$pagina->PrintBottom($popup);
@@ -455,7 +459,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <input type="hidden" name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type="hidden" name="max_hora" id="max_hora" value=<?php echo Conf::GetConf($sesion,'MaxDuracionTrabajo')?> />
-<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo $t->fields['codigo_asunto']?>" />
+<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo Conf::GetConf($sesion,'CodigoSecundario') ? $asunto->fields['codigo_asunto_secundario'] : $t->fields['codigo_asunto']; ?>" />
 <?php
 	if ($opcion != 'nuevo') {
 ?>
@@ -561,19 +565,21 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		</tr>
 </table>
 
-<table style='border:0px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
+<table style="border:0px solid black" style="display:<?php echo $txt_opcion ? 'inline' : 'none'; ?>" width="90%">
 	<tr>
-		<td align=left><span style="font-weight:bold; font-size:11px; "><?php echo $txt_opcion?></span></td>
-	</td>
-	<?php if ($id_trabajo > 0) { ?>
-		<td width='40%' align=right>
-			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
+		<td align="left">
+			<span style="font-weight:bold; font-size:11px;"><?php echo $txt_opcion; ?></span>
 		</td>
-	<?php } ?>
 	</tr>
+	<?php if ($id_trabajo > 0) { ?>
+	<tr>
+		<td width="40%" align="right">
+			<img src="<?php echo Conf::ImgDir(); ?>/agregar.gif" border="0"> <a href"javascript:void(0)" onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
+		</td>
+	</tr>
+	<?php } ?>
 </table>
 <br>
-
 
 <table class="border_plomo"   id="tbl_trabajo" style="width: 665px !important;">
 		<tr>
@@ -634,7 +640,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 		<?php echo __('Actividad'); ?>
 	</td>
 	<td align=left width="440" nowrap>
-		<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['asunto']); ?>
+		<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['codigo_asunto']); ?>
 	</td>
 </tr>
 <?php } else { ?>
@@ -748,7 +754,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
 	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario", $id_usuario ,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 
-	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
+	if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable') || $permiso_revisor_usuario) {
 
 		echo '<td class="seccioncobrable">&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td  class="seccioncobrable">';
 
@@ -897,6 +903,7 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 							$num_monedas++;
 						}
 						?>
+					</tr>
 					<tr>
 						<td colspan=<?php echo $num_monedas?> align=center>
 							<input type=button onclick="ActualizarTrabajosTarifas();" value="<?php echo __('Guardar')?>" />

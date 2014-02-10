@@ -367,6 +367,7 @@ if ($opcion == "guardar") {
 
 			$contrato->Fill($_REQUEST, true);
 			$contrato->Edit('codigo_cliente', $codigo_cliente);
+			$contrato->Edit('fecha_inicio_cap',Utiles::fecha2sql($fecha_inicio_cap));
 
 			if ($contrato->Write()) {
 				#Subiendo Archivo
@@ -953,7 +954,7 @@ if ($usuario_responsable_obligatorio) {
 <?php
 
 if (empty($opcion)){
-	$caracteres = strlen($cliente->fields['codigo_cliente']);	
+	$caracteres = strlen($cliente->fields['codigo_cliente']);
 }
 $field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], -$caracteres);
 
@@ -987,21 +988,22 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 								<span style="color:#FF0000; font-size:10px">*</span>
 							</td>
 						</tr>
+
 						<tr>
 							<td align=right>
 								<?php echo __('Cliente') ?>
 							</td>
 							<td align=left>
-<?php
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "  ", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value);");
-} else {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "  ", "CambioEncargadoSegunCliente(this.value);");
-}
-?>
+								<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+									echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "  ", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);");
+								} else {
+									echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "  ", "CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);");
+								}
+								?>
 								<span style="color:#FF0000; font-size:10px">*</span>
 							</td>
 						</tr>
+
 						<tr>
 							<td align=right>
 								<?php echo __('Idioma') ?>
@@ -1200,6 +1202,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 					</table>
 				</fieldset>
 				<br>
+
 				<!-- GUARDAR -->
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Guardar datos') ?></legend>
@@ -1281,6 +1284,116 @@ if ($motivo == "agregar_proyecto") {
 			jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
 		});
 		jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
+	}
+
+	function CambioDatosFacturacion(id_cliente) {
+		var url = root_dir + '/app/interfaces/ajax.php?accion=cargar_datos_contrato&codigo_cliente=' + id_cliente;
+		var http = getXMLHTTP();
+
+		http.open('get', url, true);
+		http.onreadystatechange = function() {
+			if (http.readyState == 4) {
+				var response = http.responseText;
+
+				if (response.indexOf('|') != -1) {
+					response = response.split('\\n');
+					response = response[0];
+					var campos = response.split('~');
+
+					if (response.indexOf('VACIO') != -1) {
+						//dejamos los campos en blanco.
+					} else {
+						for (i = 0; i < campos.length; i++) {
+							valores = campos[i].split('|');
+
+							// Cliente
+							if (valores[0] != '') {
+								jQuery('[name="factura_razon_social"]').attr('value', valores[0]);
+							} else {
+								jQuery('[name="factura_razon_social"]').attr('value', '');
+							}
+
+							// Dirección
+							if (valores[1] != '') {
+								jQuery('[name="factura_direccion"]').attr('value', valores[1]);
+							} else {
+								jQuery('[name="factura_direccion"]').attr('value', '');
+							}
+
+							// Rut
+							if (valores[2] != '') {
+								jQuery('[name="factura_rut"]').attr('value', valores[2]);
+							} else {
+								jQuery('[name="factura_rut"]').attr('value', '');
+							}
+
+							// Comuna
+							if (valores[3] != '') {
+								jQuery('[name="factura_comuna"]').attr('value', valores[3]);
+							} else {
+								jQuery('[name="factura_comuna"]').attr('value', '');
+							}
+
+							// Ciudad
+							if (valores[4] != '') {
+								jQuery('[name="factura_ciudad"]').attr('value', valores[4]);
+							} else {
+								jQuery('[name="factura_ciudad"]').attr('value', '');
+							}
+
+							// Giro
+							if (valores[5] != '') {
+								jQuery('[name="factura_giro"]').attr('value', valores[5]);
+							} else {
+								jQuery('[name="factura_giro"]').attr('value', '');
+							}
+
+							// Ciudad
+							if (valores[6] != '') {
+								jQuery('[name="factura_codigopostal"]').attr('value', valores[6]);
+							} else {
+								jQuery('[name="factura_codigopostal"]').attr('value', '');
+							}
+
+							// País
+							if (valores[7] != '') {
+								jQuery('[name="id_pais"]').attr('value', valores[7]);
+							} else {
+								jQuery('[name="id_pais"]').attr('value', '');
+							}
+
+							// Teléfono
+							if (valores[8] != '') {
+								jQuery('[name="cod_factura_telefono"]').attr('value', valores[8]);
+							} else {
+								jQuery('[name="cod_factura_telefono"]').attr('value', '');
+							}
+							if (valores[9] != '') {
+								jQuery('[name="factura_telefono"]').attr('value', valores[8]);
+							} else {
+								jQuery('[name="factura_telefono"]').attr('value', '');
+							}
+
+							// glosa contrato
+							if (valores[10] != '') {
+								jQuery('[name="glosa_contrato"]').attr('value', valores[10]);
+							} else {
+								jQuery('[name="glosa_contrato"]').attr('value', '');
+							}
+						}
+					}
+				} else {
+					if (response.indexOf('head') != -1) {
+						alert('Sesión Caducada');
+						top.location.href = '<?php echo Conf::Host(); ?>';
+					} else {
+						alert(response);
+					}
+				}
+			}
+		}
+
+		http.send(null);
 	}
 
 </script>

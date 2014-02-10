@@ -1,5 +1,3 @@
-
-
 The Time Billing
 ================================
 
@@ -44,6 +42,21 @@ The Time Billing - Time Tracking
  * OLE (0.5)
 
       $ sudo pear install OLE-0.5
+
+###requisitos adicionales
+
+* PHP 5 CURL sudo apt-get install php5-curl
+* CURL		 sudo apt-get install CURL
+* PEAR		 sudo apt-get install php-user
+
+###Incluir el framework de lemontech en nuestro codigo
+* git clone git@github.com:LemontechSA/framework.git dentro del directori "FW" de le aplicacion.
+
+###Incluir amazon WSDDKforPHP
+* https://github.com/amayonwebservices/aws-sdk-for-php.git
+
+###Deshabilitar Slim Error Handler
+* Comentar linea 186 de la clase Slim.php dentro del framework
 
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
@@ -162,6 +175,13 @@ Es como [GitFlow][7] pero con más flow. Descargar de [acá][8].
 
 Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archivo msysgit-install.cmd reemplazando "git-flow" por "git-hf" y "gitflow" por "hubflow".
 
+#Configuracion MySQL
+
+En OSX la configuracion es estricta, por eso debe ajustarse para ser identica a la de produccion
+
+```sql
+SET @@global.sql_mode= '';
+```
 
 [1]: https://gist.github.com/3867988
 [2]: https://gist.github.com/3868074

@@ -19,6 +19,7 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 	if (empty($where)) {
 		$where = 1;
 	}
+
 	$where .= ' AND ' . (isset($_GET['eliminados']) ? 'es_adelanto = -1' : 'es_adelanto = 1');
 	if (isset($_GET['tiene_saldo']) && $_GET['tiene_saldo'] == 1) {
 		$where .= ' AND saldo_pago < 0 ';
@@ -35,7 +36,6 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 	if (!empty($_GET['id_contrato'])) {
 		$where .= " AND (documento.id_contrato = '" . intval($_GET['id_contrato']) . "' OR documento.id_contrato IS NULL)";
 	}
-
 	if (!empty($_GET['fecha1'])) {
 		$where .= ' AND documento.fecha >= ' . formatofecha($_GET['fecha1']);
 	}
@@ -46,33 +46,28 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 		$where .= ' AND documento.id_moneda = ' . intval($_GET['moneda']);
 	}
 
-	$selectfrom = "FROM
-		documento
-		JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
-		JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
-		left join asunto  on documento.codigo_cliente = asunto.codigo_cliente and (documento.id_contrato = asunto.id_contrato) 
-	WHERE $where";
-
-	$query = "SELECT
+	$query = "SELECT SQL_CALC_FOUND_ROWS
 		documento.id_documento,
 		cliente.glosa_cliente,
 		documento.fecha,
-		IF(documento.id_contrato is null, 'Todos los Asuntos',  GROUP_CONCAT( glosa_asunto ) ) as asuntos,
+		IF(documento.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(glosa_asunto)) AS asuntos,
 		IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
 		IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
 		documento.glosa_documento,
-		prm_moneda.id_moneda
-		$selectfrom";
-
-		$query .= " GROUP BY documento.id_documento, cliente.glosa_cliente, documento.fecha, documento.monto, documento.saldo_pago, documento.glosa_documento, prm_moneda.id_moneda";
-
-		$query.=" LIMIT $limitdesde,$limitcantidad";
-
-	$selectcount = "SELECT COUNT(*) $selectfrom ";
+		prm_moneda.id_moneda,
+		prm_moneda.cifras_decimales
+		FROM
+			documento
+			JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
+			JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
+			LEFT JOIN asunto ON documento.codigo_cliente = asunto.codigo_cliente AND (documento.id_contrato = asunto.id_contrato)
+		WHERE $where
+		GROUP BY documento.id_documento, cliente.glosa_cliente, documento.fecha, documento.monto, documento.saldo_pago, documento.glosa_documento, prm_moneda.id_moneda
+		LIMIT $limitdesde, $limitcantidad";
 
 	try {
-		$rows = $sesion->pdodbh->query($selectcount)->fetch();
 		$resp = $sesion->pdodbh->query($query);
+		$rows = $sesion->pdodbh->query('SELECT FOUND_ROWS()')->fetch();
 	} catch (PDOException $e) {
 		if ($sesion->usuario->TienePermiso('SADM')) {
 			$Slim = Slim::getInstance('default', true);
@@ -95,6 +90,7 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 		'iTotalDisplayRecords' => $rows[0],
 		'aaData' => array()
 	);
+
 	foreach ($resp as $fila) {
 		$data['aaData'][] = array(
 			$fila[0],

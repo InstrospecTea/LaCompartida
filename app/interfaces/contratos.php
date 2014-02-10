@@ -11,7 +11,7 @@
 	$pagina = new Pagina($sesion);
 
 	$params_array['codigo_permiso'] = 'COB';
-	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array); #tiene permiso de Cobranza 
+	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array); #tiene permiso de Cobranza
 
 	if( !$permisos->fields['permitido'] )
 		die(__('No tienes privilegios suficientes para ver esta sección.'));
@@ -43,7 +43,7 @@ function Refrescar()
 	else
 		echo "var codigo_cliente = 0;"
 ?>
-	
+
 	var url = "contratos.php?codigo_cliente="+codigo_cliente+"&popup=1&buscar=1&activo=SI";
 	self.location.href= url;
 }
@@ -56,66 +56,66 @@ if($mostrar_filtros)
 ?>
 
 <fieldset>
-<legend><?=__('Filtros')?></legend>	
+<legend><?=__('Filtros')?></legend>
 <table style="border: 0px solid black" width=100%>
-    <tr>
-        <td width=50% align=right style="font-weight:bold;">
-           <?=__('Activo')?>
-        </td>
-        <td align=left>
-        	<?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","activo",$activo,'','Todos','60')?>
+		<tr>
+				<td width=50% align=right style="font-weight:bold;">
+					 <?=__('Activo')?>
+				</td>
+				<td align=left>
+					<?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","activo",$activo,'','Todos','60')?>
 		</td>
-        <td width=50% align=right style="font-weight:bold;">
-            <?=__('Cliente')?>
-        </td>
-        <td nowrap align=left>
-            <input type="text" name="glosa_cliente" size="17" value="<?=$glosa_cliente?>">
-        </td>
-    </tr>
-    <tr>
-        <td width=50% align=right style="font-weight:bold;">
-            <?=__('Correlativo').' '.__('contrato')?>
-        </td>
-        <td nowrap align=left>
-        	<input type="text" name="id_contrato" size="7" maxlength="5" value="<?=$id_contrato?>" onchange="this.value=this.value.toUpperCase();">
+				<td width=50% align=right style="font-weight:bold;">
+						<?=__('Cliente')?>
+				</td>
+				<td nowrap align=left>
+						<input type="text" name="glosa_cliente" size="17" value="<?=$glosa_cliente?>">
+				</td>
+		</tr>
+		<tr>
+				<td width=50% align=right style="font-weight:bold;">
+						<?=__('Correlativo').' '.__('contrato')?>
+				</td>
+				<td nowrap align=left>
+					<input type="text" name="id_contrato" size="7" maxlength="5" value="<?=$id_contrato?>" onchange="this.value=this.value.toUpperCase();">
 		</td>
-        <td width=50% align=right style="font-weight:bold;">
-            <?=__('Titulo').' '.__('contrato')?>
-        </td>
-        <td nowrap align=left>
-            <input type="text" name="glosa_contrato" size="35" value="<?=$glosa_contrato?>">
-        </td>
-    </tr>
-    <tr>
-        <td width=50% align=right style="font-weight:bold;">
-            <?=__('Fecha creacion').' '.__('entre')?> 
-        </td>
-        <td nowrap align=left colspan = 3>
-           <?= Html::PrintCalendar("fecha1", $fecha1,"false") ?><?= Html::PrintCalendar("fecha2", $fecha2,"false") ?>
-        </td>
-    </tr>
-        <td width=50% align=right style="font-weight:bold;">
-           <?=__('Usuario').' '.__('Responsable')?>
-        </td>
-        <td align=left colspan =3>
-            <?=Html::SelectQuery($sesion,"SELECT id_usuario, CONCAT_WS(', ',apellido1,nombre) as nombre FROM usuario ORDER BY nombre","id_usuario",$id_usuario,'','Todos','200')?>
-        </td>
-    <tr>
-    		<td></td>
-        <td align=left>
-            <input type=submit class=btn name=buscar value=<?=__('Buscar')?>>
-        </td>
-    </tr>
+				<td width=50% align=right style="font-weight:bold;">
+						<?=__('Titulo').' '.__('contrato')?>
+				</td>
+				<td nowrap align=left>
+						<input type="text" name="glosa_contrato" size="35" value="<?=$glosa_contrato?>">
+				</td>
+		</tr>
+		<tr>
+				<td width=50% align=right style="font-weight:bold;">
+						<?=__('Fecha creacion').' '.__('entre')?>
+				</td>
+				<td nowrap align=left colspan = 3>
+					 <?= Html::PrintCalendar("fecha1", $fecha1,"false") ?><?= Html::PrintCalendar("fecha2", $fecha2,"false") ?>
+				</td>
+		</tr>
+				<td width=50% align=right style="font-weight:bold;">
+					 <?=__('Usuario').' '.__('Responsable')?>
+				</td>
+				<td align=left colspan =3>
+						<?=Html::SelectQuery($sesion,"SELECT id_usuario, CONCAT_WS(', ',apellido1,nombre) as nombre FROM usuario ORDER BY nombre","id_usuario",$id_usuario,'','Todos','200')?>
+				</td>
+		<tr>
+				<td></td>
+				<td align=left>
+						<input type=submit class=btn name=buscar value=<?=__('Buscar')?>>
+				</td>
+		</tr>
 	<tr>
-        <td align=right colspan=4>
-            <img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='agregar_contrato.php' title="Agregar <?=__('contrato');?>">Agregar <?=__('contrato')?></a>
+				<td align=right colspan=4>
+						<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='agregar_contrato.php' title="Agregar <?=__('contrato');?>">Agregar <?=__('contrato')?></a>
 
-        </td>
-    </tr>
+				</td>
+		</tr>
 	<tr>
-        <td colspan=2 align=right>
-        </td>
-    </tr>
+				<td colspan=2 align=right>
+				</td>
+		</tr>
 </table>
 <?
 }
@@ -129,24 +129,24 @@ if($codigo_cliente)
 
 <table width=100%>
 <tr>
-    <td align=right>
-        <img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href=# onclick="nuovaFinestra('Agregar_Contrato',730,600,'agregar_contrato.php?popup=1&codigo_cliente=<?=$codigo_cliente?>');" title="<?=__('Agregar contrato')?>"><?=__('Agregar contrato')?></a>
-    </td>
+		<td align=right>
+				<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href=# onclick="nuovaFinestra('Agregar_Contrato',730,600,'agregar_contrato.php?popup=1&codigo_cliente=<?=$codigo_cliente?>');" title="<?=__('Agregar contrato')?>"><?=__('Agregar contrato')?></a>
+		</td>
 </tr>
 </table>
 <?
 }
-  	if ($busqueda)
+		if ($busqueda)
 		$link ="Opciones";
-	
+
 		$where = 1;
-    if($buscar)
-    {
+		if($buscar)
+		{
 			if($activo)
 				$where .= " AND contrato.activo = '$activo' ";
 
 		if($id_contrato != "")
-		{		
+		{
 			$where .= " AND contrato.id_contrato Like '$id_contrato%'";
 		}
 
@@ -167,22 +167,22 @@ if($codigo_cliente)
 
 		if($fecha1 || $fecha2)
 			$where .= " AND contrato.fecha_creacion BETWEEN '$fecha1' AND '$fecha2'";
-    
+
 		if($id_usuario)
 			$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
-			
+
 			#a1.id_encargado
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato, contrato.codigo_cliente, cliente.glosa_cliente, 
-							GROUP_CONCAT('<li>', glosa_asunto SEPARATOR '</li><br>')  as asuntos, contrato.forma_cobro, CONCAT(simbolo, ' ', contrato.monto) AS monto_total,  contrato.activo,
-							(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION') as fecha_ultimo_cobro
-                    FROM contrato
-                    LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato
-                    JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente
-                    JOIN prm_moneda  ON (prm_moneda.id_moneda=contrato.id_moneda)
-                    WHERE $where
-                    GROUP BY contrato.id_contrato";
-	
+		$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato, contrato.codigo_cliente, cliente.glosa_cliente,
+			GROUP_CONCAT('<li>', glosa_asunto SEPARATOR '</li><br>')  as asuntos, contrato.forma_cobro, CONCAT(simbolo, ' ', contrato.monto) AS monto_total,  contrato.activo,
+			(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro
+			FROM contrato
+			LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato
+			JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente
+			JOIN prm_moneda  ON (prm_moneda.id_moneda=contrato.id_moneda)
+			WHERE $where
+			GROUP BY contrato.id_contrato";
+
 		#, IF(contrato.es_periodico = 'NO', periodo_fecha_inicio, DATE_ADD(fecha_ultimo_cobro, INTERVAL contrato.periodo_intervalo contrato.periodo_unidad)) as fecha_prox_cobro
 		if($orden == "")
 			$orden = "contrato.codigo_cliente";
@@ -203,41 +203,41 @@ if($codigo_cliente)
 			$b->AgregarFuncion("$link",'Opciones',"align=center nowrap");
 
 		$b->color_mouse_over = "#DF9862";
-		
+
 		$b->Imprimir();
 	}
 	function Cobrable(& $fila)
 	{
-        global $id_cobro;
-        $checked = '';
+				global $id_cobro;
+				$checked = '';
 
-        if($fila->fields['id_cobro_asunto'] == $id_cobro and $id_cobro != '')
-            $checked = "checked";
-            $id_moneda = $fila->fields['id_moneda'];
-        $Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','".$fila->fields['codigo_asunto']."','$id_cobro',this.checked,'$id_moneda')>";
-        return $Check;
+				if($fila->fields['id_cobro_asunto'] == $id_cobro and $id_cobro != '')
+						$checked = "checked";
+						$id_moneda = $fila->fields['id_moneda'];
+				$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','".$fila->fields['codigo_asunto']."','$id_cobro',this.checked,'$id_moneda')>";
+				return $Check;
 
 	}
 
-    function Opciones(& $fila)
-    {
+		function Opciones(& $fila)
+		{
 		global $checkall;
 		global $motivo;
-		
-		
-		
-		
+
+
+
+
 		if($motivo == 'cobros')
 		{
 			return Cobrable($fila,$checkall);
 		}
 		$id_contrato = $fila->fields['id_contrato'];
-        return 
+				return
 		"<a href=# onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?id_contrato=$id_contrato&popup=1');\" title='Editar Contrato'><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Contrato></a>"
 		. "<a href='javascript:void
 		(0);' onclick=\"if(confirm('¿Desea generar este cobro individualmente?'))nuevaVentana('Cobrar',750,660,'genera_cobros_guarda.php?id_contrato=$id_contrato&individual=true');\"><img src='".Conf::ImgDir()."/coins_16.png' border=0 title=Cobrar></a>";
 			#<a target='_top' onclick=\"return confirm('¿Está seguro de eliminar este contrato?');\" href=contratos.php?id_contrato=$id_contrato&accion=eliminar&buscar=1&mostrar_filtros=1><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' /></a>
-    }
-    echo(InputId::Javascript($sesion));
+		}
+		echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom($popup);
 ?>

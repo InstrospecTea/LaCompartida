@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 ini_set('display_errors', 'Off');
+error_reporting(0);
 
 if (file_exists('/var/www/html/addbd.php')) {
 	require_once '/var/www/html/addbd.php';
@@ -140,6 +141,7 @@ defined('USERWS') || define('USERWS', Conf::PasswordWS());
 defined('PASSWS') || define('PASSWS', Conf::UsuarioWS());
 defined('CACHEDIR') || define('CACHEDIR', '/var/www/virtual/cache/');
 defined('LOGDIR') || define('LOGDIR', '/tmp/logs/');
+defined('S3_UPLOAD_BUCKET') || define('S3_UPLOAD_BUCKET', 'timebilling-uploads');
 
 require_once APPPATH . '/fw/funciones/funciones.php';
 require_once APPPATH . '/app/lang/es.php';		//Para que cargue el idioma por defecto

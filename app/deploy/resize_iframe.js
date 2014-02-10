@@ -23,5 +23,5 @@ Element.addMethods('iframe', {
         return frameElement || element;
     }
 });	
-<!-- Paste this snippet into your existing code  -->
+//Paste this snippet into your existing code
 
