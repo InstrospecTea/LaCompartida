@@ -1634,9 +1634,11 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_agno%', $fecha_agno_creacion, $html2);
 				
 				$fecha_facturacion_carta = ucfirst(Utiles::sql3fecha($this->fields['fecha_facturacion'], '%d de %B de %Y'));
+				$fecha_facturacion_mes_carta = ucfirst(Utiles::sql3fecha($this->fields['fecha_facturacion'], '%B'));
 				
 				$html2 = str_replace('%monto_total_demo_uf%', number_format($monto_moneda_demo, $cobro_moneda->moneda[3]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . $cobro_moneda->moneda[3]['simbolo'], $html2);
 				$html2 = str_replace('%fecha_facturacion%', $fecha_facturacion_carta, $html2);
+				$html2 = str_replace('%fecha_facturacion_mes%', $fecha_facturacion_mes_carta, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
