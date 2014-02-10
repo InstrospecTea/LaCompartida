@@ -1587,10 +1587,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 </script>
 <?php if ($popup && !$motivo) { ?>
 
-	<form name='formulario' id='formulario' method=post>
-		<input type=hidden name=codigo_cliente value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
-		<input type=hidden name='opcion_contrato' value="guardar_contrato" />
-		<input type=hidden name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
+	<form name='formulario' id='formulario' method="post">
+		<input type="hidden" name="codigo_cliente" value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
+		<input type="hidden" name='opcion_contrato' value="guardar_contrato" />
+		<input type="hidden" name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
 		<input type="hidden" name="desde" value="agregar_contrato" />
 <?php } ?>
 	<br />
@@ -2226,6 +2226,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 												$usuarios_retainer = explode(',', $contrato->fields['retainer_usuarios']);
 											?>
 									<td align="left" style="font-size:10pt;">
+										<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/> 
 										<div id="div_cobro" class="buttonset">
 											<input <?php echo TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
 											<label for="fc1">Tasas/HH</label>&nbsp;
