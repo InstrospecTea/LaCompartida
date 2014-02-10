@@ -670,7 +670,13 @@ $pagina->PrintTop();
         }
         <?php } ?>
 
-		if (form.monto.value == 0 && form.monto.value != '') {
+        if (form.monto.value < 0) {
+        	alert('Se ingresó un monto negativo');
+        	return false;
+        }
+
+        var forma_cobro = jQuery('#div_cobro').children("input:checked").val();
+		if (forma_cobro == 'RETAINER' && form.monto.value == 0 && form.monto.value != '' && form.monto_posterior.value != form.monto.value) {
 			alert('Se eligió Retainer como Forma de Cobro e ingresó el monto 0');
 		}
           
