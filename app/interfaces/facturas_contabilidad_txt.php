@@ -8,16 +8,6 @@ header('Content-Disposition: attachment; filename="' . $nombre . '.txt"');
 $MARCA_CONTABILIDAD = 'INFORMADO A CONTABILIDAD';
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
-require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 $where_cobro = ' 1 ';
