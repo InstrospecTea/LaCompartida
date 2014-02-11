@@ -503,11 +503,15 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 					$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 				}
+
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
-				if (strtolower($contrato->fields['titulo_contacto']) == 'sra.' || strtolower($contrato->fields['titulo_contacto']) == 'srta.')
+				$html2 = str_replace('%nombre_del_cliente%', $cliente->fields['glosa_cliente'], $html2);
+				
+				if (strtolower($contrato->fields['titulo_contacto']) == 'sra.' || strtolower($contrato->fields['titulo_contacto']) == 'srta.'){
 					$html2 = str_replace('%estimado%', __('Estimada'), $html2);
-				else
+				} else {
 					$html2 = str_replace('%estimado%', __('Estimado'), $html2);
+				}
 
 				/*
 				  Total Gastos
@@ -1189,6 +1193,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
+				$html2 = str_replace('%nombre_del_cliente%', $cliente->fields['glosa_cliente'], $html2);
 				$html2 = str_replace('%rut_cliente%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
