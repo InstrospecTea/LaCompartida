@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.34
+martes 11 de febrero 2014
+* **Fixed:** [Elimina query que reemplaza código de asunto](https://github.com/LemontechSA/ttb/pull/408)
+
 ## Hotfix: 13.7.33
 Lunes 10 de febrero 2014
 * **Fixed:** [Corregir la validacion del monto de forma_cobro en el interfaz cliente](https://github.com/LemontechSA/ttb/pull/407)
