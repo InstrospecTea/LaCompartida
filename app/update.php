@@ -10141,6 +10141,11 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.55:	
+			$queries = array();
+			$queries[] = "ALTER TABLE archivo ADD archivo_s3 varchar(256) DEFAULT Null;";
+			ejecutar($queries, $dbh);
 	}
 }
 
@@ -10150,7 +10155,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.54;
+$max_update = 7.55;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
