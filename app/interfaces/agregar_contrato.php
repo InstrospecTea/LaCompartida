@@ -1587,10 +1587,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 </script>
 <?php if ($popup && !$motivo) { ?>
 
-	<form name='formulario' id='formulario' method=post>
-		<input type=hidden name=codigo_cliente value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
-		<input type=hidden name='opcion_contrato' value="guardar_contrato" />
-		<input type=hidden name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
+	<form name='formulario' id='formulario' method="post">
+		<input type="hidden" name="codigo_cliente" value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
+		<input type="hidden" name='opcion_contrato' value="guardar_contrato" />
+		<input type="hidden" name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
 		<input type="hidden" name="desde" value="agregar_contrato" />
 <?php } ?>
 	<br />
@@ -2226,6 +2226,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 												$usuarios_retainer = explode(',', $contrato->fields['retainer_usuarios']);
 											?>
 									<td align="left" style="font-size:10pt;">
+										<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/> 
 										<div id="div_cobro" class="buttonset">
 											<input <?php echo TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
 											<label for="fc1">Tasas/HH</label>&nbsp;
@@ -2250,9 +2251,9 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 											<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 												<span id="span_monto">&nbsp;<?php echo __('Monto') ?>
 												<?php if ($validaciones_segun_config)
-													echo $obligatorio
-													?>
-													&nbsp;<input id='monto' name=monto size="7" value="<?php echo $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
+													echo $obligatorio ?>
+													<input type="hidden" id="monto_posterior"  name="monto_posterior" value="<?php echo $contrato->fields['monto'] ?>"/> 
+													&nbsp;<input id="monto" name="monto" size="7" value="<?php echo $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
 												</span>
 												&nbsp;&nbsp;<?php echo __('Moneda') ?>
 <?php if ($validaciones_segun_config)
@@ -2268,7 +2269,7 @@ Html::SelectQuery($Sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER 
 															<?php if ($validaciones_segun_config)
 																echo $obligatorio
 																?>
-												&nbsp;<input name=retainer_horas size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
+												&nbsp;<input name="retainer_horas" size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
 												<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se
 														 desuentan las horas con preferencia -->
 <?php if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'RetainerUsuarios')) { ?>
@@ -2288,7 +2289,7 @@ Html::SelectQuery($Sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER 
 		echo $obligatorio
 		?>
 															</td>
-															<td align=left>&nbsp;<label style='background-color:#FFFFFF'> <?php echo $cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0; ?> </label></td>
+															<td align="left">&nbsp;<label style='background-color:#FFFFFF'> <?php echo $cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0; ?> </label></td>
 														</tr>
 																		<?php } ?>
 													<tr>

@@ -25,7 +25,7 @@ if ($id_tramite > 0) {
 		$query = "SELECT id_trabajo FROM trabajo WHERE id_tramite = '{$id_tramite}'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_trabajo) = mysql_fetch_array($resp);
-		
+	
 		if ($id_trabajo > 0){
 			$trabajo->Load($id_trabajo);
 		}
@@ -159,7 +159,7 @@ if ($opcion == "guardar") {
 	$Ordenado_por = (int) Conf::GetConf($sesion, 'OrdenadoPor');
 
 	if (in_array($Ordenado_por, array(1, 2))) {
-		
+
 		if (!empty($trabajo)) {
 			$trabajo->Edit('solicitante', $solicitante);
 		} else {
@@ -541,22 +541,23 @@ $pagina->PrintTop($popup);
 
 		//Revisa el Conf si esta permitido y la función existe
 		if (form.como_trabajo.checked) {
-		<?php if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') { ?>
 
-			var dur = form.duracion.value.replace(",", ".");
-			if (isNaN(dur)) {
-				alert("<?php echo __('Solo se aceptan valores numéricos') ?>");
-				form.duracion.focus();
-				return false;
-			}
+			<?php if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') { ?>
 
-			var decimales = dur.split(".");
-			if (decimales.length > 1 && decimales[1].length > 1) {
-				alert("<?php echo __('Solo se permite ingresar un decimal'); ?>");
-				form.duracion.focus();
-				return false;
-			}
-		<?php } ?>
+				var dur = form.duracion.value.replace(",", ".");
+				if (isNaN(dur)) {
+					alert("<?php echo __('Solo se aceptan valores numéricos') ?>");
+					form.duracion.focus();
+					return false;
+				}
+
+				var decimales = dur.split(".");
+				if (decimales.length > 1 && decimales[1].length > 1) {
+					alert("<?php echo __('Solo se permite ingresar un decimal'); ?>");
+					form.duracion.focus();
+					return false;
+				}
+			<?php } ?>
 		}
 
 		<?php if ((int) Conf::GetConf($sesion, 'OrdenadoPor') == 1) { ?>
@@ -566,6 +567,7 @@ $pagina->PrintTop($popup);
 				return false;
 			}
 		<?php } ?>
+
 
 		// Si la configuracion lo indica convertimos en mayuscula todo el contenido de la descripcion
 		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
@@ -582,6 +584,7 @@ $pagina->PrintTop($popup);
 			fecha = new Date(temp[2] + '//' + temp[1] + '//' + temp[0]);
 			hoy = new Date();
 			fecha_tope = new Date(hoy.getTime() - (<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?> * 24 * 60 * 60 * 1000));
+
 			if (fecha_tope > fecha) {
 				alert('No se puede ingresar ' + langtramite + ' anterior a <?php echo date('d-m-Y', mktime(0, 0, 0, date('m'), date('d') - $dias, date('Y'))) ?>');
 				$('fecha').focus;
@@ -591,10 +594,11 @@ $pagina->PrintTop($popup);
 
 		//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
 		<?php if (isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo') { ?>
-			var string = new String(top.location);
+					var string = new String(top.location);
 		<?php } ?>
 
 		pasavalidacion = validaCantidad(document.getElementById('multiplicador').value, 'validandoform');
+		
 		if (!pasavalidacion) {
 			return false;
 		}
@@ -706,6 +710,7 @@ $pagina->PrintTop($popup);
 			form.campo_codigo_cliente.value = codigo;
 			SetSelectInputId('campo_codigo_cliente', 'codigo_cliente');
 
+
 			<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 				echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
 			} else {
@@ -791,13 +796,13 @@ $pagina->PrintTop($popup);
 	}
 
 	function AgregarNuevo(tipo) {
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 			var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
-<?php } else { ?>
+		<?php } else { ?>
 			var codigo_cliente = $('codigo_cliente').value;
 			var codigo_asunto = $('codigo_asunto').value;
-<?php } ?>
+		<?php } ?>
 
 		if (tipo == 'tramite') {
 			var urlo = "ingreso_tramite.php?popup=1";
@@ -1124,7 +1129,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr id="filamultiplicador" style="display: <?php echo ( isset($id_tramite) || $como_trabajo == 1 ) ? 'none' : 'table-row'; ?>">
 			<td align="right">
-<?php echo __('Cantidad de repeticiones'); ?>
+				<?php echo __('Cantidad de repeticiones'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="multiplicador" id="multiplicador" onkeyup="validaCantidad(this.value, 'validandoinput');" value="<?php echo isset($tramite->fields['multiplicador']) ? $tramite->fields['multiplicador'] : $multiplicador; ?>" />
@@ -1133,7 +1138,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-<?php echo __('Valor según tarifa'); ?>
+				<?php echo __('Valor según tarifa'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="tarifa_tramite" id="tarifa_tramite" disabled value="<?php echo $tarifa_tramite_contrato > 0 ? $tarifa_tramite_contrato : '0'; ?>" />
@@ -1147,7 +1152,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr id="tr_tarifa_mod" <?php echo $display_tr_mod; ?>>
 			<td align="right">
-<?php echo __('Tarifa modificado'); ?>
+				<?php echo __('Tarifa modificado'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="tarifa_tramite_individual" id="tarifa_tramite_individual" value="<?php echo $tramite->fields['tarifa_tramite_individual'] ? $tramite->fields['tarifa_tramite_individual'] : '0'; ?>" />
@@ -1157,8 +1162,8 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-<?php $font_size_descripcion = Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? '18px' : '9px'; ?>
-<?php echo __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?php echo $font_size_descripcion; ?>"></span>
+				<?php $font_size_descripcion = Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? '18px' : '9px'; ?>
+				<?php echo __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?php echo $font_size_descripcion; ?>"></span>
 			</td>
 			<td align="left">
 				<textarea id="descripcion" cols="45" rows="4" name="descripcion"><?php echo $tramite->fields['descripcion'] ? stripslashes($tramite->fields['descripcion']) : $descripcion; ?></textarea>
@@ -1174,7 +1179,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-<?php echo __('Cobrable'); ?>
+				<?php echo __('Cobrable'); ?>
 			</td>
 			<td align="left">
 				<input type="checkbox" name="cobrable" valor="1" <?php echo $tramite->fields['cobrable'] || $cobrable ? 'checked' : ''; ?> />&nbsp;&nbsp;
@@ -1190,13 +1195,13 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 					</a>
 				</td>
 			</tr>
-<?php } ?>
+				<?php } ?>
 
 		<tr>
 			<td colspan="2" align="right">
-		<?php if ($id_tramite > 0) { ?>
+				<?php if ($id_tramite > 0) { ?>
 					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Confirmar(this.form, '<?php echo $id_trabajo; ?>')" />
-<?php } else { ?>
+				<?php } else { ?>
 					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Validar(this.form)" />
 				<?php } ?>
 			</td>

@@ -165,7 +165,7 @@ function GeneraFacturaElectronica($hookArg) {
 
 				$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 				$file_data = base64_decode($result->documentopdf);
-				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
+				$file_url = UtilesApp::UploadToS3($Sesion, $file_name, $file_data, 'application/pdf');
 
 				$Factura->Edit('dte_url_pdf', $file_url);
 				if ($Factura->Write()) {
@@ -265,6 +265,12 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
 	$mx_timezone = -6;
 	$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
+
+	$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+	$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+	$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
+	$tipoComprobante = $tipo_documento_legal == 'NC' ? 'egreso' : 'ingreso';
+
 	$r = array(
 		'COM' => array(
 			'version|3.2',
@@ -274,13 +280,13 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
-			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
-			'tipoDeComprobante|ingreso'
+			'tipoDeComprobante|' . $tipoComprobante
 		),
+
 		'REF' => array(
 			'Regimen|' . 'Régimen General de Ley, Personas Morales'
 		),
@@ -295,15 +301,30 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		)
 	);
 
+	if ($Factura->fields['subtotal'] > 0) {
+		$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', '');
+	}
+
+	if ($Factura->fields['subtotal_gastos'] > 0) {
+		$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', '');
+	}
+	
+	if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
+		$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', '');
+	}
+	
 	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int)$Factura->fields['dte_metodo_pago_cta'] > 0) {
 		$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
 	}
+	
 	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
 		$r['DOR'][] = 'calle|' . ($Factura->fields['direccion_cliente']);
 	}
+	
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
+	
 	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
 		$r['DOR'][] = 'localidad|' . ($Factura->fields['ciudad_cliente']);
 	}
@@ -327,6 +348,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'descuento|0.00'
 		);
 	}
+
 	if ($Factura->fields['subtotal_gastos'] > 0) {
 		$r['CON_gastos_con_iva'] = array(
 			'cantidad|1.00',
@@ -337,6 +359,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'descuento|0.00'
 		);
 	}
+
 	if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
 		$r['CON_gastos_sin_iva'] = array(
 			'cantidad|1.00',

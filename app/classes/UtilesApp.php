@@ -2253,7 +2253,7 @@ HTML;
 
 	}
 
-	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
+	public static function UploadToS3($sesion, $name, $file, $contentType = 'application/octet-stream') {
 		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
 
 		$s3 = new AmazonS3(array(
@@ -2262,7 +2262,14 @@ HTML;
 		));
 		$bucket = S3_UPLOAD_BUCKET;
 
-		$name = SUBDOMAIN . $name;
+		$query = "SELECT codigo_cliente FROM cliente WHERE id_cliente = " . $_POST['id_cliente'];
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		list($codigo_cliente) = mysql_fetch_array($resp);
+
+		$archivoname = substr($name, 0, strpos($name, "."));
+		$archivoext  = substr($name, stripos($name, "."));
+		$archivoname .= '_'.date('U'). $archivoext;
+		$name = SUBDOMAIN . '/' . $codigo_cliente . $archivoname;
 
 		$response = $s3->create_object($bucket, $name, array(
 			'body' => $file,

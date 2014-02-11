@@ -1,13 +1,16 @@
 <?php
+
 namespace TTB;
+
 require_once dirname(__FILE__) . '/../conf.php';
+
 use \Conf;
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+
+require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
+
 use \TipoCorreo as TipoCorreo;
 
-
 class Utiles extends \Utiles {
-
 
 	function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
@@ -16,9 +19,9 @@ class Utiles extends \Utiles {
 		# Common Headers
 		$headers .= 'From: ' . $fromname . '<' . $fromaddress . '>' . $eol;
 		$headers .= 'Reply-To: ' . $fromname . '<' . $fromaddress . '>' . $eol;
-		$headers .= 'Return-Path: ' . $fromname . '<' . $fromaddress . '>' . $eol;	// these two to set reply address
+		$headers .= 'Return-Path: ' . $fromname . '<' . $fromaddress . '>' . $eol; // these two to set reply address
 		$headers .= "Message-ID: <" . $now . " TheSystem@" . $_SERVER['SERVER_NAME'] . ">" . $eol;
-		$headers .= "X-Mailer: PHP v" . phpversion() . $eol;		  // These two to help avoid spam-filters
+		$headers .= "X-Mailer: PHP v" . phpversion() . $eol;	// These two to help avoid spam-filters
 		# Boundry for marking the split & Multitype Headers
 		$headers .= 'MIME-Version: 1.0' . $eol;
 		$headers .= "Content-Type: multipart/related; boundary=\"" . $mime_boundary . "\"" . $eol;
@@ -34,7 +37,7 @@ class Utiles extends \Utiles {
 
 					$handle = fopen($attachments[$i]["file"], 'rb');
 					$f_contents = fread($handle, filesize($attachments[$i]["file"]));
-					$f_contents = chunk_split(base64_encode($f_contents));	//Encode The Data For Transition using base64_encode();
+					$f_contents = chunk_split(base64_encode($f_contents)); //Encode The Data For Transition using base64_encode();
 					fclose($handle);
 
 					# Attachment
@@ -85,7 +88,8 @@ class Utiles extends \Utiles {
 	 * @param string  $tipo       Tipo de correo: alerta diaria, semanal, etc
 	 * @param boolean $simular    Cuando es true, marca el correo como si ya lo hubiera enviado
 	 */
-	public static function InsertarPlus($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null,$simular=false) {
+	public static function InsertarPlus($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null, $simular = false) {
+		$clean_patt = '/[\r\n\t]+/';
 		$id_tipo_correo = null;
 		if (!empty($tipo)) {
 			$TipoCorreo = new TipoCorreo($sesion);
@@ -93,20 +97,21 @@ class Utiles extends \Utiles {
 		}
 		$where_dia = '';
 		if ($es_diario) {
-			$where_dia = ' AND fecha>CURDATE()';
+			$where_dia = 'AND fecha > CURDATE()';
 		}
 		$mensaje = mysql_real_escape_string($mensaje);
-		$query = "SELECT COUNT(id_log_correo)
+		$query = "SELECT COUNT(id_log_correo) total
 					FROM log_correo
 					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo={$id_tipo_correo}  {$where_dia}";
-		$querytemp=$query;
-		
 
 		$query .=" AND mensaje= '{$mensaje}' ";
-		$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		
-		list($count) = mysql_fetch_array($resp2);
-		if ($count == 0) {
+		$resp = mysql_query($query, $sesion->dbh);
+		if (!$resp) {
+			throw new Exception(preg_replace($clean_patt, ' ', $query));
+		}
+
+		$count = mysql_fetch_assoc($resp);
+		if ($count['total'] == 0) {
 			$query2 = "INSERT INTO log_correo SET
 				subject = '{$subject}',
 				mensaje = '{$mensaje}',
@@ -120,30 +125,31 @@ class Utiles extends \Utiles {
 			if (!empty($id_tipo_correo)) {
 				$query2 .= ", id_tipo_correo = '{$id_tipo_correo}'";
 			}
-			if($simular) {
-				$query2 .= ", enviado = 1, fecha_envio = NOW()";
+			if ($simular) {
+				$query2 .= ', enviado = 1, fecha_envio = NOW()';
 			}
-			mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
-			
-			if($simular) {
-				echo 'Nuevo Correo<pre>'."\n".$subject."\n". $tipo."\n". $email."\n". $nombre.'</pre><hr>';
+			if (!mysql_query($query2, $sesion->dbh)) {
+				throw new Exception(preg_replace($clean_patt, ' ', $query2));
 			}
-		} else {
-			if($simular) {
-				echo 'Omitiendo Correo Repetido<pre>'."\n".$subject."\n". $tipo."\n". $email."\n". $nombre.'</pre><hr>';
+
+			if ($simular) {
+				echo 'Nuevo Correo<pre>' . "\n" . $subject . "\n" . $tipo . "\n" . $email . "\n" . $nombre . '</pre><hr>';
 			}
+			return 'Agrega Correo: ' . preg_replace($clean_patt, ' ', $query2);
 		}
+		if ($simular) {
+			echo 'Omitiendo Correo Repetido<pre>' . "\n" . $subject . "\n" . $tipo . "\n" . $email . "\n" . $nombre . '</pre><hr>';
+		}
+		return json_encode(compact('query', 'count'));
 	}
 
- 
-  function camelize($word) { 
-    return preg_replace('/(_)([a-z])/e', 'strtoupper("\\2")', $word); 
-  }
-  
-  function pascalize($word) { 
-    return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word); 
-  }
-  
-}
+	function camelize($word) {
+		return preg_replace('/(_)([a-z])/e', 'strtoupper("\\2")', $word);
+	}
 
+	function pascalize($word) {
+		return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word);
+	}
+
+}
 
