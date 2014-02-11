@@ -10142,10 +10142,16 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.55:	
+		case 7.55:
 			$queries = array();
 			$queries[] = "ALTER TABLE archivo ADD archivo_s3 varchar(256) DEFAULT Null;";
 			ejecutar($queries, $dbh);
+
+		case 7.56:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarAsuntoPlanillaSaldo', 0, 'Desplegar columna de asunto en planilla de saldo', 'boolean', 2, -1);";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10155,7 +10161,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.55;
+$max_update = 7.56;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

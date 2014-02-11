@@ -1,7 +1,7 @@
 <?php
 
 class ReportesEspecificos {
-	
+
 	// Del reporte /interfaces/planillas/planilla_saldo.php
 	public static $configuracion_saldo_clientes = array(
 		array(
@@ -20,6 +20,13 @@ class ReportesEspecificos {
 			'format' => 'date',
 			'extras' => array(
 				'attrs' => 'width="10%" style="text-align:center"'
+			)
+		),
+		array(
+			'field' => 'asunto',
+			'title' => 'Asunto',
+			'extras' => array(
+				'attrs' => 'width="10%" style="text-align:center"', 'class' => 'asunto'
 			)
 		),
 		array(
