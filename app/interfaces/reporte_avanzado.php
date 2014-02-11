@@ -378,9 +378,9 @@ if (!$popup) {
 
 		function SeleccionarAnual() {
 			ActualizarPeriodo(<?php echo $actual; ?>);
-			$('reporte_envio_selector').hide();
-			$('reporte_envio_semana').hide();
 			$('reporte_envio_mes').show();
+			$('reporte_envio_semana').hide();
+			$('reporte_envio_selector').hide();
 			ActualizarNuevoReporte();
 		}
 
@@ -604,7 +604,7 @@ if (!$popup) {
 															<label for="check_area_prof" style="cursor:pointer"><hr></label>
 														</div>
 														<div class='area_prof_full' style="<?php echo $check_area_prof ? "" : "display:none;" ?>">
-															<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
+															<?php echo AreaUsuario::SelectAreas($sesion, "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
 														</div>
 													</td>
 												</tr>

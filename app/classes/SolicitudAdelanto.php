@@ -44,60 +44,60 @@ class SolicitudAdelanto extends Objeto {
 		'DEPOSITADO'
 	);
 
-	public static $configuracion_reporte = array (
-		array (
+	public static $configuracion_reporte = array(
+		array(
 			'field' => 'id_solicitud_adelanto',
 			'title' => 'N°',
 		),
-		array (
+		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Código Cliente',
 		),
-		array (
+		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente',
 		),
-		array (
+		array(
 			'field' => 'descripcion',
 			'title' => 'Descripción',
 		),
-		array (
+		array(
 			'field' => 'fecha',
 			'title' => 'Fecha',
 			'format' => 'date',
 		),
-		array (
+		array(
 			'field' => 'monto',
 			'title' => 'Monto solicitado',
 			'format' => 'number',
 		),
-		array (
+		array(
 			'field' => 'estado',
 			'title' => 'Estado',
 		),
-		array (
+		array(
 			'field' => 'username',
 			'title' => 'Solicitante',
 		),
-		array (
+		array(
 			'field' => 'cantidad_adelantos',
 			'title' => 'Cantidad Adelantos',
 		),
-		array (
+		array(
 			'field' => 'monto_adelantos',
 			'title' => 'Monto Adelantos',
 			'format' => 'number',
 		),
-		array (
+		array(
 			'field' => 'saldo_adelantos',
 			'title' => 'Saldo Adelantos',
 			'format' => 'number',
 		),
-		array (
+		array(
 			'field' => 'codigos_asunto',
 			'title' => 'Códigos Asuntos',
 		),
-		array (
+		array(
 			'field' => 'glosas_asunto',
 			'title' => 'Asuntos',
 		),

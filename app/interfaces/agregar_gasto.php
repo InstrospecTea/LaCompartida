@@ -168,6 +168,7 @@ if ($opcion == "guardar") {
 		}
 
 		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
+		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
 
 		if ($gasto->Write()) {
 			$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
@@ -522,7 +523,16 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 				<a href='javascript:void(0)' onclick="AgregarProveedor();" title="Agregar Proveedor"><img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0 ></a>
 			</td>
 		</tr>
-
+	<?php if (Conf::GetConf($sesion, 'UsaEstadoPagoGastos')) { ?>
+		<tr>
+			<td align="right">
+				<?php echo __('Estado Pago'); ?>
+			</td>
+			<td align="left">
+				<?php echo Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'ESTADO_PAGO_GASTOS' ORDER BY glosa ASC", "estado_pago", $gasto->fields['estado_pago'], "", ""); ?>
+			</td>
+		</tr>
+	<?php } ?>
 		<tr>
 			<td align=right>
 				<?php echo __('Monto') ?>
@@ -711,7 +721,7 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 					<?php echo __('Ordenado por') ?>
 				</td>
 				<td align=left>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -721,7 +731,7 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 			</td>
 			<td align=left>
 				<!-- $sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150' -->
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
 			</td>
 		</tr>
 	</table>

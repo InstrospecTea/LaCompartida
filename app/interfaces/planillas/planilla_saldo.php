@@ -6,9 +6,11 @@ $Sesion = new Sesion(array('REP'));
 
 $tipos_liquidacion = array(
 	1 => __('Honorarios'),
-	2 => __('Gastos'));
+	2 => __('Gastos')
+);
 
 if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
+
 	$texto_liquidaciones_por_pagar = __('Liquidaciones por pagar');
 	$texto_gastos_por_liquidar = __('Gastos por liquidar');
 	$texto_provisiones_por_liquidar = __('Provisiones por liquidar');
@@ -80,16 +82,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_fecha .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . "' ";
 	}
 
-	$where_liquidaciones =
-		$where_adelantos =
-		$where_gastos = $where_fecha;
-	$join_liquidaciones =
-		$join_adelantos =
-		$join_gastos = '';
-	$select_liquidaciones =
-		$select_adelantos =
-		$select_gastos =
-		$select_resumen = "";
+	$where_liquidaciones = $where_adelantos = $where_gastos = $where_fecha;
+	$join_liquidaciones = $join_adelantos = $join_gastos = '';
+	$select_liquidaciones = $select_adelantos = $select_gastos = $select_resumen = "";
 
 	$tipo_liq_gastos = 'G';
 	$tipo_liq_honorarios = 'H';
@@ -308,8 +303,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_saldo = "WHERE r.saldo_liquidaciones + r.saldo_gastos + r.saldo_adelantos > 0";
 	}
 
-	$query =
-		"SELECT
+	$query = "SELECT
 			r.encargado_comercial,
 			r.codigo_cliente,
 			r.glosa_cliente,
@@ -326,11 +320,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_saldo
 		GROUP BY glosa_cliente";
 
-	 //echo $query;
-	 //echo $query_adelantos;
-	 //echo $query_gastos;
-	 //echo $query_liquidaciones;
-	 //exit;
+	//echo $query;
+	//echo $query_adelantos;
+	//echo $query_gastos;
+	//echo $query_liquidaciones;
+	//exit;
 
 	$statement = $Sesion->pdodbh->prepare($query);
 	$statement->execute();
@@ -399,7 +393,7 @@ $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Reporte Saldo');
 $Pagina->PrintTop($popup);
 ?>
-<style>
+<style type="text/css">
 	.subreport {
 		padding-bottom: 40px;
 	}
@@ -541,28 +535,17 @@ $Pagina->PrintTop($popup);
 </table>
 <link rel="stylesheet" type="text/css" media="print" href="https://static.thetimebilling.com/css/imprimir.css" />
 <script type="text/javascript">
-	jQuery(document).ready(function () {
-		jQuery('#boton_xls').click(function(){
+	jQuery(document).ready(function() {
+		jQuery('#boton_xls').click(function() {
 			jQuery('#opcion').val('xls');
 		});
-
-		jQuery('#boton_buscar').click(function(){
+		jQuery('#boton_buscar').click(function() {
 			jQuery('#opcion').val('buscar');
 		});
 
 		jQuery('.saldo:contains(-)').css('color', '#f00');
 		jQuery('.saldo:not(:contains(-))').css('color', '#00f');
 		jQuery('.subtotal td').css('font-weight', 'bold');
-
-		/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
-			var td = jQuery(el);
-			var contenido = td.html();
-			td.html('');
-			td.append(jQuery('<a/>', {
-				text: contenido,
-				href: 'planilla_saldo.php?codigo_cliente='
-			})).append(' ');
-		});*/
 
 		jQuery('td.asunto').each(function() {
 			var td = jQuery(this);
@@ -579,7 +562,8 @@ $Pagina->PrintTop($popup);
 						onMouseout: 'hideddrivetip()'
 					})).append(' ');
 				});
-			} catch (err) {}
+			} catch (err) {
+			}
 		});
 	});
 </script>
@@ -596,15 +580,6 @@ if ($_REQUEST['opcion'] == 'buscar') {
 
 	$color = $saldo_total < 0 ? 'red' : 'blue';
 	$resultado = '<span style="color: ' . $color . '">' . $moneda_base . ' ' . number_format($saldo_total, 2, ',', '.') . '</span>';
-
-	// echo '<pre style="text-align: left; color: red;">' . $query_gastos . "</pre>";
-	// echo '<pre style="text-align: left; color: blue;">' . $query_liquidaciones . "</pre>";
-	// echo '<pre style="text-align: left; color: green;">' . $query_adelantos . "</pre>";
-	// echo '<pre style="text-align: left; color: grey;">' . $query . "</pre>";
-
-	// echo '<div style="text-align: right; font-size: 2em;">Saldo total: ' . $resultado . '</h1>';
 }
-
-//echo '<pre>' . print_r($query, true) . '</pre>';
 
 $Pagina->PrintBottom();

@@ -43,6 +43,7 @@ if (isset($_POST['accion'])) {
 			if ($passwd == '' || $c_passwd == '' || $passwd != $c_passwd) {
 				$Sesion->error_msg = __('Debe ingresar un password válido y ambos deben ser iguales');
 				$view = 'restablecer_password';
+				break;
 			}
 
 			if ($token != $_GET['token']) {
@@ -56,6 +57,8 @@ if (isset($_POST['accion'])) {
 			$Usuario->Edit('reset_password_by', 'U');
 
 			if ($Usuario->Write()) {
+				$userToken = new UserToken($Sesion);
+				$userToken->deleteAll($Usuario->fields['id_usuario']);
 				$host = Conf::Host();
 				$mail =<<<MAIL
 <p>Estimado {$Usuario->fields['nombre']},</p>

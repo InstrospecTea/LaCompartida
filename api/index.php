@@ -39,7 +39,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 	}
 
 	if (!$Session->login($user, $dv, $password)) {
-		halt(__("The user doesn't exist"), "UserDoesntExist");
+		halt(__("User or password is incorrect"), "UserDoesntExist");
 	} else {
 		$user_token_data = array(
 			'user_id' => $Session->usuario->fields['id_usuario'],
@@ -51,7 +51,6 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 			halt(__("Unexpected error when saving data"), "UnexpectedSave");
 		}
 	}
-
 	outputJson(
 		array(
 			'auth_token' => $auth_token,
@@ -64,13 +63,14 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$timestamp = $Slim->request()->params('timestamp');
-
+	$include = $Slim->request()->params('include');
+	$include_all = (!is_null($include) && $include == 'all');
 	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
 	$Client = new Cliente($Session);
-	$clients = $Client->findAllActive($timestamp);
+	$clients = $Client->findAllActive($timestamp, $include_all);
 
 	outputJson($clients);
 });
@@ -106,13 +106,14 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$timestamp = $Slim->request()->params('timestamp');
-
+	$include = $Slim->request()->params('include');
+	$include_all = (!is_null($include) && $include == 'all');
 	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
 	$Matter = new Asunto($Session);
-	$matters = $Matter->findAllActive($timestamp);
+	$matters = $Matter->findAllActive($timestamp, $include_all);
 
 	outputJson($matters);
 });
@@ -191,6 +192,8 @@ $Slim->get('/settings', function () use ($Session) {
 
 		if ($Session->arrayconf['PermitirCampoCobrableAProfesional']) {
 			array_push($settings, array('code' => 'AllowBillable', 'value' => $Session->arrayconf['PermitirCampoCobrableAProfesional']));
+		} else {
+			array_push($settings, array('code' => 'AllowBillable', 'value' => 0));
 		}
 
 		if ($Session->arrayconf['MaxDuracionTrabajo']) {
@@ -207,7 +210,6 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 	}
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
-
 	$User = new Usuario($Session);
 	$user = array();
 
@@ -544,38 +546,299 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
+
+$Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+
+	$generators = Contrato::contractGenerators($Session, $contract_id);
+	outputJson($generators);
+
+});
+
+$Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session, $Slim) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+	if (is_null($generator_id) || empty($generator_id)) {
+		halt(__("Invalid generator ID"), "InvalidGeneratorId");
+	}
+
+	$percent_generator = $Slim->request()->params('percent_generator');
+	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator);
+	outputJson($generator);
+
+});
+
+$Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session, $Slim) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+	$percent_generator = $Slim->request()->params('percent_generator');
+	$user_id = $Slim->request()->params('user_id');
+
+	$generator = Contrato::createContractGenerator($Session, $client_id, $contract_id, $user_id, $percent_generator);
+	outputJson($generator);
+});
+
+
+
+$Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session) {
+	if (is_null($client_id) || empty($client_id)) {
+		halt(__("Invalid client ID"), "InvalidClientId");
+	}
+	if (is_null($contract_id) || empty($contract_id)) {
+		halt(__("Invalid contract ID"), "InvalidContractId");
+	}
+	if (is_null($generator_id) || empty($generator_id)) {
+		halt(__("Invalid generator ID"), "InvalidGeneratorId");
+	}
+	Contrato::deleteContractGenerator($Session, $generator_id);
+	outputJson(array('result' => 'OK'));
+});
+
+
+$Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim) {
+
+	if ($report_code == 'TEST') {
+		outputJson($Slim->request()->params());
+		exit();
+	}
+	if (is_null($report_code) || empty($report_code)) {
+		halt(__("Invalid report Code"), "InvalidReportCode");
+	}
+	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+	$simpleReport = new SimpleReport($Session);
+	try {
+		$simpleReport->LoadWithType($report_code);
+		$reportClass = $simpleReport->GetClass($report_code);
+	} catch (Exception $e) {
+		halt(__("Invalid report Code"), "InvalidReportCode");
+	}
+
+	$reportObject = new $reportClass($Session, $report_code);
+	$query = ($simpleReport->fields['query']);
+	if (!isset($query)) {
+		$query = $reportObject->QueryReporte();
+	}
+	$params = $Slim->request()->params();
+	$format = isset($params['format']) ? $params['format'] : 'Json';
+	unset($params['format']);
+	$results = $reportObject->ReportData($query, $params);
+	$results = $reportObject->ProcessReport($results, $params);
+	if ($format == 'Html') {
+		echo $reportObject->DownloadReport($results, $format);
+	} else {
+		$reportObject->DownloadReport($results, $format);
+	}
+});
+
+$Slim->get('/reports', function () use ($Session, $Slim) {
+	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+	$user_id = validateAuthTokenSendByHeaders('REP');
+	$results = SimpleReport::LoadApiReports($Session);
+	outputJson(array('results' => $results));
+});
+
+$Slim->get('/currencies', function () use ($Session, $Slim) {
+	$results = Moneda::GetMonedas($Session, '', false);
+	outputJson(array('results' => $results));
+});
+
+
+$Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
+	if (isset($id)) {
+		$Invoice = new Factura($Session);
+		$Invoice->Load($id);
+		if (!$Invoice->Loaded()) {
+			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+		}	else {
+			$data = array('Factura' => $Invoice, 'ExtraData' => 'TextoInvoice');
+			$Slim->applyHook('hook_genera_factura_electronica', &$data);
+			$error = $data['Error'];
+			if ($error) {
+				halt($error['Message'] ? $error['Message'] : __($error['Code']), $error['Code'], 400, $data['ExtraData']);
+			} else {
+				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData']));
+			}
+		}
+	} else {
+		halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+	}
+});
+
+$Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
+	$format = is_null($Slim->request()->params('format')) ? 'pdf' : $Slim->request()->params('format');
+	if (isset($id)) {
+		$Invoice = new Factura($Session);
+		$Invoice->Load($id);
+		if (!$Invoice->Loaded()) {
+			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+		}	else {
+			if ($format == 'pdf') {
+				$url = $Invoice->fields['dte_url_pdf'];
+				$name = array_shift(explode('?', basename($url)));
+				downloadFile($name, 'application/pdf', file_get_contents($url));
+			} else {
+				if ($format == 'xml') {
+					$file_name = 'invoice_' . Utiles::sql2date($Invoice->fields['fecha'], "%Y%m%d") . "_{$Invoice->fields['serie_documento_legal']}-{$Invoice->fields['numero']}.xml";
+					downloadFile($file_name, 'text/xml', $Invoice->fields['dte_xml']);
+				} else {
+					halt(__("Invalid document format"), "InvalidDocumentFormat");
+				}
+			}
+		}
+	} else {
+		halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+	}
+});
+
+$Slim->map('/release-list', function () use ($Session, $Slim) {
+	$bucket = 'timebilling-uploads';
+	$os = $Slim->request()->params('os');
+	$app_guid = $Slim->request()->params('guid');
+	$action_name = $Slim->request()->params('name');
+	$s3 = new AmazonS3(array(
+ 		'key' => 'AKIAIQYFL5PYVQKORTBA',
+ 		'secret' => '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'
+ 	));
+	$response = $s3->get_object_list($bucket, array('prefix' => "apps/$action_name/$app_guid/$os/1"));
+	if ($response && gettype($response) === 'array' && count($response)) {
+		$object = $s3->get_object_list($bucket, array('prefix' => "apps/$action_name/$app_guid/$os/1"));
+		$dir = $object[0];
+		$version_directory = $s3->get_object_headers($bucket, "{$dir}");
+		$parts = explode('/', $version_directory->header['_info']['url']);
+ 		$version = $parts[count($parts)-2];
+
+ 		$manifest_headers = $s3->get_object_headers($bucket, "{$dir}manifest");
+		$manifest = file_get_contents($manifest_headers->header['_info']['url']);
+		$manifest .= "#version: {$version}";
+
+		$appudate = $s3->get_object_headers($bucket, "{$dir}appupdate.zip");
+
+		$response = array(
+		"success" => "true",
+			"releases" => array(
+				array(
+					"version" => $version,
+					"manifest" => $manifest,
+					"release_notes" => 'app://CHANGELOG.md',
+					"url" => $appudate->header['_info']['url']
+				),
+			)
+		);
+	} else {
+		$response = array(
+		"success" => "false",
+			"releases" => array(
+				array(
+					"version" => '0',
+					"manifest" => '',
+					"release_notes" => 'app://CHANGELOG.md',
+					"url" => 'localhost'
+				),
+			)
+		);
+	}
+
+	outputJson($response);
+
+})->via('GET', 'POST');
+
+$Slim->map('/release-download', function () use ($Session, $Slim) {
+	$os = $Slim->request()->params('os');
+	$app_guid = $Slim->request()->params('guid');
+	$action_name = 'app-update';
+	$version = $Slim->request()->params('version');
+	$bucket = 'timebilling-uploads';
+	$s3 = new AmazonS3(array(
+ 		'key' => 'AKIAIQYFL5PYVQKORTBA',
+ 		'secret' => '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'
+ 	));
+	$url = $s3->get_object_url($bucket, "apps/$action_name/$app_guid/$os/$version/appupdate.zip");
+	if (!is_null($url)) {
+		$Slim->redirect($url);
+	} else {
+		halt(__("Invalid params"), "InvalidParams");
+	}
+})->via('GET', 'POST');
+
+$Slim->map('/app-track', function () use ($Session, $Slim) {
+	//TODO Implement analytics
+	outputJson(array('result' => 'OK'));
+})->via('GET', 'POST');
+
 $Slim->run();
 
-function validateAuthTokenSendByHeaders() {
+function downloadFile($name, $type, $content) {
+	header("Content-Transfer-Encoding: binary");
+	header("Content-Type: $type");
+	header('Content-Description: File Transfer');
+	header("Content-Disposition: attachment; filename=$name");
+	echo $content;
+}
+
+function validateAuthTokenSendByHeaders($permission = null) {
 	global $Session, $Slim;
 
 	$UserToken = new UserToken($Session);
-
 	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
-	$user_token_data = $UserToken->findByAuthToken($auth_token);
-
+	$user_token = $UserToken->findByAuthToken($auth_token);
 	// if not exist the auth_token then return error
-	if (!is_object($user_token_data)) {
-		halt(__('Invalid AUTH TOKEN'), "SecurityError");
+	if (!is_object($user_token)) {
+		halt(__('Invalid AUTH TOKEN'), "SecurityError", 401);
 	} else {
 		// verify if the token is expired
 		// date_default_timezone_set("UTC");
 		$now = time();
-		$expiry_date = strtotime($user_token_data->expiry_date);
+		$expiry_date = strtotime($user_token->expiry_date);
 		if ($expiry_date < $now) {
-			if ($UserToken->delete($user_token_data->id)) {
-				halt(__('Expired AUTH TOKEN'), "SecurityError");
+			if ($UserToken->delete($user_token->id)) {
+				halt(__('Expired AUTH TOKEN'), "SecurityError", 401);
 			} else {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
 			}
+		} else {
+			$user_token_data = array(
+				'id' => $user_token->id,
+				'user_id' => $user_token->user_id,
+				'auth_token' => $user_token->auth_token,
+				'app_key' => $user_token->app_key
+			);
+			$UserToken->save($user_token_data);
 		}
 
-		return $user_token_data->user_id;
+		if (!is_null($permission)) {
+			$User = new Usuario($Session);
+			if (!$User->LoadId($user_token_data['user_id'])) {
+				halt(__("The user doesn't exist"), "UserDoesntExist");
+			} else {
+				$User->LoadPermisos($user_token_data['user_id']);
+			 	$params_array['codigo_permiso'] = $permission;
+				$p = $User->permisos->Find('FindPermiso', $params_array);
+				if (!$p->fields['permitido']) {
+					halt(__('Not allowed'), "SecurityError");
+				}
+			}
+		}
+
+		return $user_token->user_id;
 	}
 }
 
-function halt($error_message = null, $error_code = null, $halt_code = 400) {
+function halt($error_message = null, $error_code = null, $halt_code = 400, $data = '') {
 	$errors = array();
 	$Slim = Slim::getInstance();
 	switch ($halt_code) {
@@ -585,7 +848,7 @@ function halt($error_message = null, $error_code = null, $halt_code = 400) {
 
 		default:
 			array_push($errors, array('message' => UtilesApp::utf8izar($error_message), 'code' => $error_code));
-			$Slim->halt($halt_code, json_encode(array('errors' => $errors)));
+			$Slim->halt($halt_code, json_encode(array('errors' => $errors, 'extra_data' => $data)));
 			break;
 	}
 }

@@ -55,6 +55,7 @@ class SimpleReport_Configuration {
 		foreach ($columns as $idx => $column) {
 			$config_column = new SimpleReport_Configuration_Column();
 			$config_column->Field($column['field'])
+				->Name(array_key_exists('name', $column) ? $column['name'] : $column['field'])
 				->Title(array_key_exists('title', $column) ? $column['title'] : $column['field'])
 				->Order(array_key_exists('order', $column) ? $column['order'] : $idx)
 				->Format(array_key_exists('format', $column) ? $column['format'] : 'text')

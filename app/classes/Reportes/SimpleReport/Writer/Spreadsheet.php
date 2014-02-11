@@ -8,6 +8,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 	 * @var SimpleReport
 	 */
 	var $SimpleReport;
+	var $reports = array();
 
 	/**
 	 * fila actual del excel
@@ -40,45 +41,105 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 	public function __construct(SimpleReport $simpleReport) {
 		ini_set('memory_limit', '1024M');
-		$this->SimpleReport = $simpleReport;
+		$this->reports[] = $simpleReport;
+	}
+
+	/**
+	 * Agrega un SimpleReport como hoja al reporte, este debe tener un titulo distinto de las otras hojas.
+	 * @param SimpleReport $simpleReport
+	 */
+	public function addSheet(SimpleReport $simpleReport) {
+		$total_reports = count($this->reports);
+		for ($rx = 0; $rx < $total_reports; ++$rx) {
+			if ($simpleReport->Config->title == $this->reports[$rx]->Config->title) {
+				trigger_error('No pueden haber dos hojas con el mismo t�tulo.');
+			}
+		}
+		$this->reports[] = $simpleReport;
 	}
 
 	public function save($filename = null, $group_values = null, $parent_writer = null, $indent_level = 0) {
 		// 1. Construir base Excel
 		// Enviar headers a la pagina
-		if (empty($filename)) {
-			$filename = $this->SimpleReport->Config->title;
-		}
-		if (!$parent_writer) {
-			$this->xls = new Spreadsheet_Excel_Writer();
-			$this->xls->send("$filename.xls");
-			// Crear worksheet
-			$this->sheet = & $this->xls->addWorksheet($this->SimpleReport->Config->title);
-			$this->sheet->setLandscape();
-			// Definir colores y formatos
-			//$this->xls->setCustomColor(35, 155, 187, 89); //verde lemontech
-			$this->xls->setCustomColor(35, 220, 255, 220); //encabezados
-			$this->xls->setCustomColor(36, 255, 255, 220); //?
+		$total_reports = count($this->reports);
+		for ($rx = 0; $rx < $total_reports; ++$rx) {
 
-			foreach (SimpleReport_Writer_Spreadsheet_Format::$formats as $name => $format) {
-				$this->formats[$name] = & $this->xls->addFormat($format);
+			$this->SimpleReport = $this->reports[$rx];
+			$this->current_row = 0;
+
+			if (empty($filename)) {
+				$filename = $this->SimpleReport;
 			}
-		} else {
-			$this->xls = & $parent_writer->xls;
-			$this->sheet = & $parent_writer->sheet;
-			$this->current_row = & $parent_writer->current_row;
-			$this->formats = & $parent_writer->formats;
-			$this->autofilter = false;
 
-			$this->current_row++;
-		}
+			if (!$parent_writer) {
+				if (empty($this->xls)) {
+					$this->xls = new Spreadsheet_Excel_Writer();
+					$this->xls->send("$filename.xls");
+				}
+				// Crear worksheet
+				$this->sheet = & $this->xls->addWorksheet($this->SimpleReport->Config->title);
+				$this->sheet->setLandscape();
+				// Definir colores y formatos
+				$this->xls->setCustomColor(35, 220, 255, 220); //encabezados
+				$this->xls->setCustomColor(36, 255, 255, 220); //?
 
-		if (!empty($this->SimpleReport->filters)) {
-			foreach ($this->SimpleReport->filters as $nombre => $valor) {
-				if (!empty($valor)) {
-					$this->sheet->writeString($this->current_row, 0, $nombre, $this->formats['filtros']);
-					$this->sheet->writeString($this->current_row, 1, $valor, $this->formats['valoresfiltros']);
+				foreach (SimpleReport_Writer_Spreadsheet_Format::$formats as $name => $format) {
+					$this->formats[$name] = & $this->xls->addFormat($format);
+				}
+			} else {
+				$this->xls = & $parent_writer->xls;
+				$this->sheet = & $parent_writer->sheet;
+				$this->current_row = & $parent_writer->current_row;
+				$this->formats = & $parent_writer->formats;
+				$this->autofilter = false;
+
+				++$this->current_row;
+			}
+
+
+			if (!empty($this->SimpleReport->filters)) {
+				foreach ($this->SimpleReport->filters as $nombre => $valor) {
+					if (!empty($valor)) {
+						$this->sheet->writeString($this->current_row, 0, $nombre, $this->formats['filtros']);
+						$this->sheet->writeString($this->current_row, 1, $valor, $this->formats['valoresfiltros']);
+						++$this->current_row;
+					}
+				}
+				++$this->current_row;
+			}
+
+		$this->variableCells = array();
+		if (!empty($this->SimpleReport->variables)) {
+			if(isset($this->SimpleReport->variables[0])) {
+				$header_row = $this->current_row++;
+				$current_col = 1;
+				$rows = array();
+				$cols = array();
+				foreach ($this->SimpleReport->variables as $key => $variable) {
+					if(!is_numeric($key)){
+						continue;
+					}
+					if(!isset($rows[$variable['row']])){
+						$this->sheet->write($this->current_row, 0, $variable['row'], $this->formats['filtros']);
+						$rows[$variable['row']] = $this->current_row++;
+					}
+					if(!isset($cols[$variable['col']])){
+						$this->sheet->write($header_row, $current_col, $variable['col'], $this->formats['filtros']);
+						$cols[$variable['col']] = $current_col++;
+					}
+
+					$this->write_cell($this->parse_param($variable['value'], null),
+						$rows[$variable['row']], $cols[$variable['col']], 'number',
+						isset($variable['extras']) ? $variable['extras'] : array(),
+						$this->SimpleReport->variables['data'], strpos($variable['value'], '=') === 0);
+					$this->variableCells[$variable['name']] = $this->xls->rowcolToCell($rows[$variable['row']], $cols[$variable['col']]);
+				}
+			} else {
+				foreach ($this->SimpleReport->variables as $name => $value) {
+					$this->sheet->write($this->current_row, 0, $name, $this->formats['filtros']);
+					$this->sheet->write($this->current_row, 1, $this->parse_param($value, null), $this->formats['valoresfiltros']);
 					$this->current_row++;
+					$this->variableCells[$name] = '$B$' . $this->current_row;
 				}
 			}
 			$this->current_row++;
@@ -86,38 +147,38 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 
 
-		// 1.1 Formatear todos los arreglos
-		// 2. Correr query
-		$result = $this->SimpleReport->RunReport($group_values);
-		// 3. Ordenar y filtrar segun conf
-		$columns = $this->SimpleReport->Config->VisibleColumns();
+			// 1.1 Formatear todos los arreglos
+			// 2. Correr query
+			$result = $this->SimpleReport->RunReport($group_values);
+			// 3. Ordenar y filtrar segun conf
+			$columns = $this->SimpleReport->Config->VisibleColumns();
 
-		//agrupadores de resultados
-		$groups = array();
-		$aux_columns = array();
-		foreach ($columns as $idx => $column) {
-			if ($column->group) {
-				//el espacio es para q se mantenga como string y no se reseteen los indices al shiftear
-				$groups[$column->group + $indent_level . ' '] = $column->field;
-				unset($columns[$idx]);
-			} else if (isset($column->extras['subtotal']) && $column->extras['subtotal'] && !isset($columns[$column->extras['subtotal']])) {
-				$col_subtotal = new SimpleReport_Configuration_Column();
-				$col_subtotal->Field($column->extras['subtotal'])
-								->Title($column->extras['subtotal'])
-								->Format('text')
-								->Extras(array('width' => 0));
-				$aux_columns[$column->extras['subtotal']] = $col_subtotal;
+			//agrupadores de resultados
+			$groups = array();
+			$aux_columns = array();
+			foreach ($columns as $idx => $column) {
+				if ($column->group) {
+					//el espacio es para q se mantenga como string y no se reseteen los indices al shiftear
+					$groups[$column->group + $indent_level . ' '] = $column->field;
+					unset($columns[$idx]);
+				} else if (isset($column->extras['subtotal']) && $column->extras['subtotal'] && !isset($columns[$column->extras['subtotal']])) {
+					$col_subtotal = new SimpleReport_Configuration_Column();
+					$col_subtotal->Field($column->extras['subtotal'])
+							->Title($column->extras['subtotal'])
+							->Format('text')
+							->Extras(array('width' => 0));
+					$aux_columns[$column->extras['subtotal']] = $col_subtotal;
+				}
 			}
-		}
-		if (!empty($aux_columns)) {
-			//se insertan las columnas ocultas antes del final, para asegurar que se incluyan si se intenta seleccionar todo
-			$columns = array_slice($columns, 0, -1) + $aux_columns + array_slice($columns, -1);
-		}
-		ksort($groups);
+			if (!empty($aux_columns)) {
+				//se insertan las columnas ocultas antes del final, para asegurar que se incluyan si se intenta seleccionar todo
+				$columns = array_slice($columns, 0, -1) + $aux_columns + array_slice($columns, -1);
+			}
+			ksort($groups);
 
-		// 4. Escribir en excel
-		$this->groups($result, $columns, $groups, $totals, 'Total', $indent_level ? $indent_level + 1 : 0);
-
+			// 4. Escribir en excel
+			$this->groups($result, $columns, $groups, $totals, 'Total', $indent_level ? $indent_level + 1 : 0);
+		}
 		// 5. Descargar
 		if (!$parent_writer) {
 			$this->xls->close();
@@ -160,7 +221,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				//poner el titulo del grupo
 				$s = str_pad('', $col_i * 3);
 				$this->sheet->write($this->current_row, 0, $s . $group, $this->formats['encabezado']);
-				$this->current_row++;
+				++$this->current_row;
 
 				//generar la(s) subtabla(s)
 				$this->groups($rows, $columns, $groups, $subtotals, "$s Subtotal $group", $col0);
@@ -177,9 +238,9 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 							if (isset($totals_row['totals'][$col_idx])) {
 								$totals[$g]['totals'][$col_idx][] = $this->xls->rowcolToCell($r, $c);
 							}
-							$c++;
+							++$c;
 						}
-						$r++;
+						++$r;
 					}
 				}
 			}
@@ -195,7 +256,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		foreach ($columns as $column) {
 			$this->sheet->write($this->current_row, $col_i++, utf8_decode($column->title), $this->formats['title']);
 		}
-		$this->current_row++;
+		++$this->current_row;
 	}
 
 	private function table($result, $columns, &$totals_rows, $totals_name, $col0 = 0) {
@@ -211,7 +272,8 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		if (!$this->single_table && !$repeat_header) {
 			$this->header($columns, $col0);
 		}
-		$first_row = $this->current_row;
+		$this->first_row = $first_row = $this->current_row;
+		$this->last_row = $first_row + count($result);
 
 		// 4.2 Body
 		$formatos_con_total = array('number', 'time');
@@ -223,11 +285,19 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			if ($repeat_header) {
 				$this->header($columns, $col0);
 			}
+
 			$col_i = $col0;
 			foreach ($columns as $idx => $column) {
+				if (!isset($this->col_letters[$column->name])) {
+					$this->col_letters[$column->name] = $col_i;
+				}
+				$col_i++;
+			}
 
+			$col_i = $col0;
+			foreach ($columns as $idx => $column) {
 				if (in_array($column->format, $formatos_con_total) &&
-								(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
+						(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
 					$grupo_subtotal = isset($column->extras['subtotal']) && is_string($column->extras['subtotal']) ? $row[$column->extras['subtotal']] : '';
 					if (!isset($totals_rows[$grupo_subtotal])) {
 						$totals_rows[$grupo_subtotal] = array('row' => $row, 'totals' => array());
@@ -252,17 +322,23 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					if (!isset($result[$row_idx + 1]) || $result[$row_idx + 1][$column->field] != $row[$column->field]) {
 						$rowspan = 1;
 						while (isset($result[$row_idx - $rowspan]) && $result[$row_idx - $rowspan][$column->field] == $row[$column->field]) {
-							$rowspan++;
+							++$rowspan;
 						}
 						$column->extras['rowspan'] = $rowspan;
+						$columns[$idx]->extras['rowspan'] = $rowspan;
 					}
 				}
 
+				$inlinegroup_field = $column->extras['inlinegroup_field'];
+				if (isset($inlinegroup_field) && $columns[$inlinegroup_field]->extras['rowspan'] > 0) {
+					$column->extras['rowspan'] = $columns[$inlinegroup_field]->extras['rowspan'];
+				}
+
 				$this->cell($row, $column, $col_i);
-				$col_i++;
+				++$col_i;
 			}
 
-			$this->current_row++;
+			++$this->current_row;
 
 			if ($report->SubReport) {
 				$values = array();
@@ -275,17 +351,17 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					$writer = SimpleReport_IOFactory::createWriter($report->SubReport['SimpleReport'], 'Spreadsheet');
 					$writer->save('', $values, $this, $report->SubReport['Level']);
 				}
-				$this->current_row++;
+				++$this->current_row;
 			}
 		}
 
 		// 4.3 Totales
 		$last_row = $this->current_row - 1;
-		$this->current_row++; //espacio para no pescar los totales en los filtros
+		++$this->current_row; //espacio para no pescar los totales en los filtros
 		$this->totales($totals_rows, $columns, $totals_name, $col0, false, $first_row, $last_row);
 
 		// 4.4 Estilos de columnas
-		for ($col_i = 0; $col_i < count($columns); $col_i++) {
+		for ($col_i = 0; $col_i < count($columns); ++$col_i) {
 			$column = array_pop(array_slice($columns, $col_i, 1));
 			$widths = array('number' => 20, 'date' => 15, 'text' => 25); // 1 == 9px
 			$width = isset($widths[$column->format]) ? $widths[$column->format] : 23;
@@ -327,35 +403,31 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						$this->cell($row, $column, $col_i, 'total_' . $column->format);
 					} else {
 						$sum_cells = count($totals_rows) > 1 || !$first_row ? implode(',', $totals[$idx]) :
-										($this->xls->rowcolToCell($first_row, $col_i) . ':' . $this->xls->rowcolToCell($last_row, $col_i));
+								($this->xls->rowcolToCell($first_row, $col_i) . ':' . $this->xls->rowcolToCell($last_row, $col_i));
 						//el implode hace q se muestre el error "a value used in the formula is of the wrong datatype",
 						//aunque editando manualmente la formula (sin cambiar nada) se arregla
 						$row[$column->field] = "=SUBTOTAL(9,$sum_cells)";
 						$this->cell($row, $column, $col_i, 'total_' . $column->format);
 					}
 				}
-				$col_i++;
+				++$col_i;
 			}
-			$this->current_row++;
+			++$this->current_row;
 		}
 	}
 
-	private function cell($row, $column, $col_i, $format = null) {
-
-		if (empty($format)) {
-			$format = $column->format;
-		}
-		if (in_array($format, array('number', 'total_number')) && (isset($column->extras['symbol']) || isset($column->extras['decimals']))) {
+	private function write_cell($value, $row_number, $col_i, $format, $extras, $row, $is_formula) {
+		if (in_array($format, array('number', 'total_number')) && (isset($extras['symbol']) || isset($extras['decimals']))) {
 			$symbol = '';
-			if (isset($column->extras['symbol'])) {
-				$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
+			if (isset($extras['symbol'])) {
+				$symbol = array_key_exists($extras['symbol'], $row) ? $row[$extras['symbol']] : $extras['symbol'];
 				if (ord($symbol) == 128) {
 					$symbol = 'EUR';
 				}
 			}
 			$decimals = 2;
-			if (isset($column->extras['decimals'])) {
-				$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
+			if (isset($extras['decimals'])) {
+				$decimals = array_key_exists($extras['decimals'], $row) ? $row[$extras['decimals']] : $extras['decimals'];
 			}
 
 			$f = $format . '_' . $symbol . '_' . $decimals;
@@ -363,20 +435,46 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$decimals = $decimals ? '.' . str_pad('', $decimals, '0') : '';
 				$symbol = $symbol ? "[$$symbol] " : '';
 				$this->formats[$f] = & $this->xls->addFormat(
-												SimpleReport_Writer_Spreadsheet_Format::$formats[$format] +
-												array('NumFormat' => "$symbol#,###,0$decimals")
+								SimpleReport_Writer_Spreadsheet_Format::$formats[$format] +
+								array('NumFormat' => "$symbol#,###,0$decimals")
 				);
 			}
 			$format = $f;
 		}
 
-		if (!isset($this->col_letters[$column->field])) {
-			$this->col_letters[$column->field] = $col_i;
+		if ($format == 'text') {
+			//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
+			if (strpos($value, ";")) {
+				$value = str_replace(";", "\n", $value);
+				$format = 'text_wrap';
+			}
+		} else if ($format == 'date') {
+			//las fechas llegan en formato SQL, pasarlas a formato excel
+			$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
+		} else if ($format == 'time') {
+			$value /= 24;
 		}
+		if ((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)) {
+			$value = str_replace(',', '.', $value);
+		}
+
+		if ($is_formula) {
+			$this->sheet->writeFormula($row_number, $col_i, $value, $this->formats[$format]);
+		} else {
+			$function = $format == 'text' ? 'writeString' : 'write';
+			$this->sheet->$function($row_number, $col_i, $value, $this->formats[$format]);
+
+			if (isset($extras['rowspan']) && $extras['rowspan'] > 1) {
+				$this->sheet->mergeCells($row_number - $extras['rowspan'] + 1, $col_i, $row_number, $col_i);
+			}
+		}
+	}
+
+	private function cell($row, $column, $col_i, $format = null) {
 
 		$value = '';
 		$is_formula = false;
-		if (strpos($column->field, '=') !== 0) {
+		if (strpos($column->field, '=') !== 0 || isset($row[$column->field])) {
 			// es un valor normal
 			$value = isset($row[$column->field]) ? $row[$column->field] : '';
 		} else {
@@ -403,52 +501,68 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						break;
 
 					default:
-						// Usar las fórmulas de Excel
-						$value = $column->field;
-						if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
-							foreach ($matches as $match) {
-								$param = $match[1];
-								if (isset($this->col_letters[$match[1]])) {
-									$param = $this->xls->rowcolToCell($this->current_row, $this->col_letters[$match[1]]);
-								} else if (isset($row[$param])) {
-									$param = '"' . $row[$param] . '"';
-								} else if (strpos($param, '"') !== 0) {
-									$param = '"' . $param . '"';
-								}
-								$value = str_replace($match[0], $param, $value);
-							}
-						}
+						$value = $this->parse_param($column->field, $row);
 						break;
 				}
+			} else {
+				$value = $this->parse_param($column->field, $row);
 			}
 		}
 
-		if ($format == 'text') {
-			//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
-			if (strpos($value, ";")) {
-				$value = str_replace(";", "\n", $value);
-				$format = 'text_wrap';
-			}
-		} else if ($format == 'date') {
-			//las fechas llegan en formato SQL, pasarlas a formato excel
-			$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
-		} else if ($format == 'time') {
-			$value /= 24;
+		if (empty($format)) {
+			$format = $column->format;
 		}
-		if ((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)) {
-			$value = str_replace(',', '.', $value);
+		$this->write_cell($value, $this->current_row, $col_i, $format, $column->extras, $row, $is_formula);
+	}
+
+	private function parse_param($value, $row){
+		// Usar las fórmulas de Excel
+		if (preg_match_all('/\$(.+?)\$/', $value, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$var = $match[1];
+
+				if (preg_match_all('/%(\w+)%/', $var, $matches_params, PREG_SET_ORDER)) {
+					foreach ($matches_params as $match_param) {
+						$param = $match_param[1];
+						if (isset($row[$param])) {
+							$param = $row[$param];
+						}
+						$var = str_replace($match_param[0], $param, $var);
+					}
+				}
+
+				$var = isset($this->variableCells[$var]) ? $this->variableCells[$var] : 0;
+				$value = str_replace($match[0], $var, $value);
+			}
 		}
 
-		if ($is_formula) {
-			$this->sheet->writeFormula($this->current_row, $col_i, $value, $this->formats[$format]);
-		} else {
-			$function = $format == 'text' ? 'writeString' : 'write';
-			$this->sheet->$function($this->current_row, $col_i, $value, $this->formats[$format]);
-
-			if (isset($column->extras['rowspan']) && $column->extras['rowspan'] > 1) {
-				$this->sheet->mergeCells($this->current_row - $column->extras['rowspan'] + 1, $col_i, $this->current_row, $col_i);
+		if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$param = $match[1];
+				if (isset($this->col_letters[$match[1]])) {
+					$param = $this->xls->rowcolToCell($this->current_row, $this->col_letters[$match[1]]);
+				} else if (isset($row[$param])) {
+					$param = '"' . $row[$param] . '"';
+				} else if (strpos($param, '"') !== 0) {
+					$param = '"' . $param . '"';
+				}
+				$value = str_replace($match[0], $param, $value);
 			}
 		}
+
+		if (preg_match_all('/:(\w+):/', $value, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$param = $match[1];
+				if (isset($this->col_letters[$match[1]])) {
+					$first = $this->xls->rowcolToCell($this->first_row, $this->col_letters[$match[1]]);
+					$last = $this->xls->rowcolToCell($this->last_row, $this->col_letters[$match[1]]);
+					$param = "$first:$last";
+				}
+				$value = str_replace($match[0], $param, $value);
+			}
+		}
+
+		return $value;
 	}
 
 }

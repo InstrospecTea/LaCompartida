@@ -1,57 +1,173 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 
-class Actividad extends Objeto
-{
-	function Actividad($sesion, $fields = "", $params = "")
-	{
+class Actividad extends Objeto {
+	/**
+	 * Define los campos de la actividad permitidos para llenar
+	 *
+	 * @var array
+	 */
+	private $campos = array(
+		'id_actividad',
+		'codigo_actividad',
+		'glosa_actividad',
+		'codigo_asunto'
+	);
+
+	/*
+	 * Configuración de SimpleReport
+	 */
+	public static $configuracion_reporte = array(
+		array(
+			'field' => 'id_actividad',
+			'title' => 'N°',
+			'visible' => false
+		),
+		array(
+			'field' => 'codigo_actividad',
+			'title' => 'Código',
+		),
+		array(
+			'field' => 'glosa_actividad',
+			'title' => 'Nombre Actividad'
+		),
+		array(
+			'field' => 'codigo_cliente',
+			'title' => 'Código Cliente',
+			'visible' => false
+		),
+		array(
+			'field' => 'glosa_cliente',
+			'title' => 'Nombre Cliente'
+		),
+		array(
+			'field' => 'codigo_asunto',
+			'title' => 'Código Asunto',
+			'visible' => false
+		),
+		array(
+			'field' => 'glosa_asunto',
+			'title' => 'Nombre Asunto'
+		)
+	);
+
+	function Actividad($sesion, $fields = "", $params = "") {
 		$this->tabla = "actividad";
 		$this->campo_id = "id_actividad";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->editable_fields = $this->campos;
 	}
-	function Eliminar()
-	{
-		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_actividad = '".$this->fields['codigo_actividad']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($count) = mysql_fetch_array($resp);
-		if($count > 0)
-		{
-			$this->error = __('No se puede eliminar una actividad que tiene trabajos asociados.');
-			return false;
-		}
-		else
-		{
-			$query = "DELETE FROM actividad WHERE codigo_actividad = '".$this->fields['codigo_actividad']."'";
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			return true;
+
+	/**
+	 * Search Query Builder
+	 */
+	function SearchQuery() {
+		$query = "SELECT SQL_CALC_FOUND_ROWS
+					actividad.*,
+					cliente.*,
+					asunto.*
+				FROM actividad
+				LEFT JOIN asunto USING (codigo_asunto)
+				LEFT JOIN cliente USING (codigo_cliente)";
+
+		$wheres = array();
+
+		if (!empty($this->fields['codigo_actividad'])) {
+				$wheres[] = "actividad.codigo_actividad = '{$this->fields['codigo_actividad']}'";
 		}
 
-	}
-	function Check()
-	{
-		$query = "SELECT COUNT(*) FROM actividad WHERE codigo_actividad = '".$this->fields['codigo_actividad']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($count) = mysql_fetch_array($resp);
-		if($count > 0)
-		{
-			$this->error = __('Ya existe una actividad con el código elegido.');
-			return false;
+		if (!empty($this->fields['glosa_actividad'])) {
+				$wheres[] = "actividad.glosa_actividad LIKE '%{$this->fields['glosa_actividad']}%'";
 		}
+
+		if (!empty($this->extra_fields['codigo_cliente'])) {
+				$wheres[] = "cliente.codigo_cliente = '{$this->extra_fields['codigo_cliente']}'";
+		}
+
+		if (!empty($this->fields['codigo_asunto'])) {
+				$wheres[] = "actividad.codigo_asunto = '{$this->fields['codigo_asunto']}'";
+		}
+
+		if (count($wheres) > 0) {
+			$query .= " WHERE " . implode(' AND ', $wheres);
+		}
+
+		return $query;
+	}
+
+	/**
+	 * Implementar las mismas validaciones que se realizan en la vista, a nivel de código
+	 *
+	 * @return boolean Si todo anda ok, sino deja una variable en $_SESSION['errores']
+	 * con las cosas que fallaron
+	 */
+	function Check() {
+		$errores = array();
+
+		// asunto
+		if ($this->fields['codigo_asunto'] == '') {
+			$errores[] = __('Debe seleccionar un ') . __('asunto');
+		}
+
+		// glosa
+		if ($this->fields['glosa_actividad'] == '') {
+			$errores[] = __('Debe ingresar un título');
+		}
+
+		// codigo y codigo repetido
+		if ($this->fields['codigo_actividad'] == '') {
+			$errores[] = __('Debe ingresar un código válido');
+		} else {
+			$OtraActividad = new Actividad($this->sesion);
+			$OtraActividad->loadByCode($this->fields['codigo_actividad']);
+			if ($OtraActividad->Loaded() && $this->fields['id_actividad'] != $OtraActividad->fields['id_actividad']) {
+				$errores[] = __('Ya existe una actividad con el código elegido.');
+			}
+		}
+
+		$this->error = $errores;
+
+		return empty($this->error);
+	}
+
+	function CheckDelete() {
+		// Buscar que no tenga trabajos o tramites asociados
 		return true;
 	}
+
+	/**
+	 * Descarga el reporte excel básico según configuraciones
+	 */
+	public function DownloadExcel() {
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
+		$SimpleReport->LoadConfiguration('ACTIVIDADES');
+
+		$query = $this->SearchQuery();
+		$statement = $this->sesion->pdodbh->prepare($query);
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$SimpleReport->LoadResults($results);
+
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
+		$writer->save('Actividades');
+	}
+
 	//funcion que asigna el nuevo codigo automatico para un actividad
-	function AsignarCodigoActividad()
-	{
-		$query = "SELECT codigo_actividad AS x FROM actividad ORDER BY x DESC LIMIT 1";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-    list($codigo) = mysql_fetch_array($resp);
-		$f=$codigo+1;
-	  $codigo_actividad=sprintf("%04d",$f);
-	  return $codigo_actividad;
+	function AsignarCodigoActividad() {
+		$query = "SELECT id_actividad FROM actividad ORDER BY id_actividad DESC LIMIT 1";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($codigo) = mysql_fetch_array($resp);
+
+		if (empty($codigo)) {
+			$codigo = 0;
+		}
+
+		$codigo_actividad = sprintf("%04d", $codigo + 1);
+		return $codigo_actividad;
 	}
 
 	/**
@@ -106,10 +222,8 @@ class Actividad extends Objeto
 	}
 }
 
-class ListaActividades extends Lista
-{
-    function ListaActividades($sesion, $params, $query)
-    {
-        $this->Lista($sesion, 'Actividad', $params, $query);
-    }
+class ListaActividades extends Lista {
+	function ListaActividades($sesion, $params, $query) {
+		$this->Lista($sesion, 'Actividad', $params, $query);
+	}
 }

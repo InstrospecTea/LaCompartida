@@ -14,7 +14,7 @@ require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 $Sesion = new Sesion(array('COB'));
 $pagina = new Pagina($Sesion);
- 
+
 $factura = new Factura($Sesion);
 
 $series_documento = new DocumentoLegalNumero($Sesion);
@@ -46,7 +46,7 @@ $idioma_default->Load(strtolower(UtilesApp::GetConf($Sesion, 'Idioma')));
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$FacturaPago = new FacturaPago($Sesion);
-	
+
 	if ($exportar_excel) {
 		$results = $FacturaPago->DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta,
 			$id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
@@ -54,12 +54,12 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 			$razon_social, $descripcion_factura);
 		$FacturaPago->DownloadExcel($results);
 	}
-	
+
 	$query = $FacturaPago->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta,
 		$id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas,
 		$razon_social, $descripcion_factura);
-	
+
 	$resp = mysql_query($query . ' LIMIT 0,12', $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	$monto_saldo_total = 0;
 	$glosa_monto_saldo_total = '';
@@ -78,7 +78,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	}
 	// calcular el saldo en moneda base
 //echo $query;
-	
+
 }
 
 $pagina->titulo = __('Revisar Pago de Documentos Tributarios');
@@ -178,7 +178,7 @@ function Opciones(& $fila) {
 
  		 $html_opcion .=UtilesApp::LogDialog($Sesion, 'factura_pago',$id_factura_pago);
 
-	
+
 	return $html_opcion;
 }
 
@@ -256,7 +256,7 @@ function funcionTR(& $fila) {
 
 	function Refrescar()
 	{
-		BuscarFacturasPago('','buscar');
+		document.form_buscador.submit();
 	}
 
 	function BuscarFacturasPago( form, from )
@@ -298,7 +298,7 @@ function funcionTR(& $fila) {
 			var url = 'ajax.php?accion=cargar_multiples_cuentas&id=' + seleccionados;
 		} else {
 			var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
-		}	
+		}
 
 		loading("Actualizando campo");
 		http.open('get', url);
@@ -307,7 +307,7 @@ function funcionTR(& $fila) {
 			if(http.readyState == 4)
 			{
 				var response = http.responseText;
-				
+
 				if( response == "~noexiste" ){
 					$(destino).options.length = 0;
 					alert( "Ústed no tiene cuentas en este banco." );
@@ -557,7 +557,7 @@ if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				<td align="right">
 					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn botonizame" id="boton_descarga" name="boton_excel" onclick="BuscarFacturasPago(jQuery('#form_facturas').get(0), 'exportar_excel')">
 				<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_factura_pago_fin'):false; ?>
-						   
+
 				</td>
 			</tr>
 		</table>

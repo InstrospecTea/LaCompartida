@@ -1,4 +1,307 @@
 # Changelog
+## Hotfix: 13.7.34
+martes 11 de febrero 2014
+* **Fixed:** [Elimina query que reemplaza código de asunto](https://github.com/LemontechSA/ttb/pull/408)
+
+## Hotfix: 13.7.33
+Lunes 10 de febrero 2014
+* **Fixed:** [Corregir la validacion del monto de forma_cobro en el interfaz cliente](https://github.com/LemontechSA/ttb/pull/407)
+
+## Hotfix: 13.7.32
+Lunes 10 de febrero 2014
+* **Fixed:** [Corregir la validacion del monto de forma_cobro en el interfaz cliente](https://github.com/LemontechSA/ttb/pull/405)
+* **Fixed:** [Correccion monto subtotal RDABOGADOS](https://github.com/LemontechSA/ttb/pull/405)
+
+## Hotfix: 13.7.31
+Viernes 07 de febrero 2014
+* **Fixed:** [agrega nuevos logs para seguimiento de negri](https://github.com/LemontechSA/ttb/pull/404)
+* **Fixed:** [Se agrego un archivo lang para peru](https://github.com/LemontechSA/ttb/pull/404)
+* **Fixed:** [Se creo un indice para codigo_cliente_secundario](https://github.com/LemontechSA/ttb/pull/404)
+* **Fixed:** [Se agrego una variable para carta cobro](https://github.com/LemontechSA/ttb/pull/404)
+
+## Hotfix: 13.7.30
+Martes 04 de Febrero 2014
+* **Fixed:** [Permite guardar un monto 0 para forma de cobro Retainer en agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
+Lunes 03 de Febrero 2014
+* **Fixed:** [Permite guardar una fecha_cap desde el agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
+
+## Hotfix: 13.7.29
+Viernes 31 de enero 2014
+* **Fixed:** [Agrega nuevos tags para carta cobro, cuentas bancarias](https://github.com/LemontechSA/ttb/pull/400)
+
+## Hotfix: 13.7.28
+Miercoles 29 de enero 2014
+* **Fixed:** [Agrega nuevos logs y filtra los usuarios que no serán alertados antes de generar los mensajes.](https://github.com/LemontechSA/ttb/pull/399)
+
+## Hotfix: 13.7.27
+Lunes 27 de enero 2014
+* **Fixed:** [Problemas con Nota de Crédito en SAT](https://github.com/LemontechSA/ttb/pull/396)
+
+## Hotfix: 13.7.26
+Viernes 24 de enero 2014
+* **Fixed:** [Restaura codigo eliminado en case ASUNTOS modalidad calculo antigua](https://github.com/LemontechSA/ttb/pull/393)
+
+## Hotfix: 13.7.25
+Miercoles 22 de enero 2014
+* **Fixed:** [Restaura codigo eliminado en case ASUNTOS modalidad calculo antigua](https://github.com/LemontechSA/ttb/pull/391)
+
+## Hotfix: 13.7.24
+Martes 21 de enero 2014
+* **Fixed:** [Modificaciones a listado de asuntos agrega nueva columna descuento](https://github.com/LemontechSA/ttb/pull/390)
+
+## Hotfix: 13.7.23
+jueves 16 de enero 2014
+* **Fixed:** [Permite guardar fecha de un cap](https://github.com/LemontechSA/ttb/pull/388)
+
+## Hotfix: 13.7.22
+jueves 16 de enero 2014
+* **Fixed:** [Agrega log de querys a CronNotificacion y corrige querys semanales](https://github.com/LemontechSA/ttb/pull/387)
+
+
+## Hotfix: 13.7.21
+Jueves 9 de enero 2014
+* **Fixed:** [Modificacion a saldo cliente para fjdabogados](https://github.com/LemontechSA/ttb/pull/382)
+
+## Hotfix: 13.7.20
+Miercoles 8 de enero 2014
+* **Fixed:** [Modificacion a saldo cliente para fjdabogados](https://github.com/LemontechSA/ttb/pull/381)
+
+## Hotfix: 13.7.19
+Miercoles 8 de enero 2014
+* **Fixed:** [Corrige error que impedia editar un tramite](https://github.com/LemontechSA/ttb/pull/380)
+
+## Hotfix: 13.7.18
+Lunes 6 de de enero 2014
+* **Fixed:** [Corrige error que impedia editar un tramite](https://github.com/LemontechSA/ttb/pull/374)
+* **Fixed:** [Corrige Update.php que agregaba elemento inecesario](https://github.com/LemontechSA/ttb/pull/374)
+
+## Hotfix: 13.7.17
+viernes 03 de enero 2014
+* **Fixed:** Actualiza /fw
+
+## Hotfix: 13.7.16
+Martes 31 de diciembre 2013
+* **Fixed:** [Corrige monto y moneda en listado de tramites](https://github.com/LemontechSA/ttb/pull/373)
+* **Fixed:** [Modificaciones en CartaCobro](https://github.com/LemontechSA/ttb/pull/373)
+
+## Hotfix: 13.7.15
+Lunes 30 de diciembre 2013
+* **Fixed:** [Elimina elemento inecesario en interfaz listar_tramites](https://github.com/LemontechSA/ttb/pull/372)
+
+## Hotfix: 13.7.14
+Lunes 30 de diciembre 2013
+* **Fixed:** [Obtiene saldo cliente en base al id_contrato del asunto](https://github.com/LemontechSA/ttb/pull/370)
+
+## Hotfix: 13.7.13
+martes 17 de diciembre 2013
+* **Fixed:** [Modificaciones al interfaz Listado de tramites en el cobro](https://github.com/LemontechSA/ttb/pull/367)
+
+## Hotfix: 13.7.12
+martes 17 de diciembre 2013
+* **Fixed:** [Corrige saldo adelantos](https://github.com/LemontechSA/ttb/pull/366)
+
+
+https://github.com/LemontechSA/ttb/pull/365
+
+## Hotfix: 13.7.11
+jueves 12 de diciembre 2013
+* **Fixed:** [Modificaciones al interfaz resumen actividades profesionales](https://github.com/LemontechSA/ttb/pull/365)
+* **Added:** [Modificaciones a grafico periodo](https://github.com/LemontechSA/ttb/pull/365)
+
+## Hotfix: 13.7.10
+jueves 12 de diciembre 2013
+* **Fixed:** [Cambia variable que causa error MySQL](https://github.com/LemontechSA/ttb/pull/364)
+
+
+## Hotfix: 13.7.9
+Miercoles 11 de Diciembre 2013
+* **Fixed:** [Corregir correlativo de códigos de actividades](https://github.com/LemontechSA/ttb/pull/362)
+
+## Hotfix: 13.7.8
+Miercoles 11 de Diciembre 2013
+* **Fixed:** [Nuevo Tag con comportamiento segun estados de cobro](https://github.com/LemontechSA/ttb/pull/361)
+
+## Hotfix: 13.7.7
+Martes 10 de Diciembre 2013
+* **Fixed:** [Calculo saldo cliente en detalle de cobro](https://github.com/LemontechSA/ttb/pull/360)
+
+## Hotfix: 13.7.6
+Viernes 6 de Diciembre 2013
+* **Added:** [Graficar horas no cobrables en reporte Reporte Gráfico por Período](https://github.com/LemontechSA/ttb/pull/358)
+* **Fixed:** [Problemas con Facturación Electrónica México](https://github.com/LemontechSA/ttb/pull/359)
+
+## Hotfix: 13.7.5
+Viernes 6 de Diciembre 2013
+* **New:** [Descripcion](https://github.com/LemontechSA/ttb/pull/357)
+
+## Hotfix: 13.7.4
+Martes 3 de Diciembre 2013
+* **New:** [Obtiene datos de facturacion del contrato principal del cliente para nuevos asuntos](https://github.com/LemontechSA/ttb/pull/355)
+* **Fixed:** [Saldo clientes para cdrabogados segun asunto asociado al cobro](https://github.com/LemontechSA/ttb/pull/355)
+
+
+## Hotfix: 13.7.3
+Martes 3 de Diciembre 2013
+* **Fixed:** [Reversa cambio en codigo asunto cobros_xls](https://github.com/LemontechSA/ttb/pull/353)
+
+## Hotfix: 13.7.2
+Martes 3 de Diciembre 2013
+* **Fixed:** [Corrige calculo de saldo a favor o contra para cdrabogados ahora considera el codigo del asunto](https://github.com/LemontechSA/ttb/pull/352)
+
+## Hotfix: 13.7.1
+Miercoles 27 de Noviembre 2013
+* **Fixed:** [Corrige asi que los saldos adeudados no aparecen cuando el cobro esta pagado o su saldo se eleva a 0](https://github.com/LemontechSA/ttb/pull/348)
+* **Fixed:** [Corrige la filtracion de cobros en terminos de "tiene Tramites"](https://github.com/LemontechSA/ttb/pull/348)
+
+## Release: 13.7.0
+Martes 26 de Noviembre 2013
+
+* **Feature:** [Agrega Giro cliente parametrizable y Estado Pago Proveedor](https://github.com/LemontechSA/ttb/pull/317)
+* **Feature:** [API updates](https://github.com/LemontechSA/ttb/pull/345)
+* **Feature:** [Informe producción](https://github.com/LemontechSA/ttb/pull/310)
+* **Fixed:** [Muestra último cobro del contrato](https://github.com/LemontechSA/ttb/pull/330)
+* **Fixed:** [Modificaciones al comparar descuento con CAP](https://github.com/LemontechSA/ttb/pull/336)
+* **Fixed:** [Modificacion actividades](https://github.com/LemontechSA/ttb/pull/325)
+
+## Hotfix: 13.6.20
+Lunes 25 de Noviembre 2013
+* **Fixed:** [Agrega saldo cliente a seccion DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/344)
+
+## Hotfix: 13.6.19
+Viernes 22 de Noviembre 2013
+* **Fixed:** [Corrige que problema de calculo que evita generar facturas en pstbn](https://github.com/LemontechSA/ttb/pull/343)
+* **Fixed:** [Corrige que facturas pagadas no aparecen en el reporte deuda cliente](https://github.com/LemontechSA/ttb/pull/343)
+
+## Hotfix: 13.6.18
+Miércoles 20 de Noviembre 2013
+* **Fixed:** [Corrige el excel de gastos y solución provisoria para backups de aym y bmaj](https://github.com/LemontechSA/ttb/pull/342)
+
+## Hotfix: 13.6.17
+Martes 19 de Noviembre 2013
+* **Fixed:** [agrega nuevo tag a factura para desplegar el numero de telefono en factura](https://github.com/LemontechSA/ttb/pull/341)
+
+## Hotfix: 13.6.16
+Martes 19 de Noviembre 2013
+* **Fixed:** [Agrega saldo pendiente o saldo a favor en nota de cobro seccion detalle cobro](https://github.com/LemontechSA/ttb/pull/340)
+
+## Hotfix: 13.6.15
+Jueves 14 de Noviembre 2013
+* **Fixed:** [Corrigie el tema, que despues de refrescar aparece la pagina que fue eligida](https://github.com/LemontechSA/ttb/pull/339)
+
+## Hotfix: 13.6.14
+Martes 12 de Noviembre 2013
+* **Fixed:** [No permite que el campo para el rut del usuario esta vacío](https://github.com/LemontechSA/ttb/pull/337)
+* **Fixed:** [Corrige problema de despliege de tag %asuntos_relacionados% en Carta de cobro funcion GenerarDocumentoCarta](https://github.com/LemontechSA/ttb/pull/337)
+
+## Hotfix: 13.6.13
+Jueves 07 de Noviembre 2013
+* **Fixed:** [Permite generar facturas electrónicas con diferente hora para que FacturemosYA no se caiga](https://github.com/LemontechSA/ttb/pull/336)
+* **Fixed:** [No permite que el usuario cualquiera pueda eliminar al superuser: 99511620](https://github.com/LemontechSA/ttb/pull/336)
+
+## Hotfix: 13.6.12
+Jueves 07 de Noviembre 2013
+* **Fixed:** [Corrige bug en interfaz agregar_tarifa, no se autocompletaban tarifas de monedas con glosa compuesta de 2 palabras](https://github.com/LemontechSA/ttb/pull/333)
+* **Fixed:** [Corrige bugs de encoding y glosa de régimen en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/333)
+
+## Hotfix: 13.6.11
+Martes 05 de Noviembre 2013
+* **Fixed:** [Correccion a cobros_xls para solucionar problema de redondeo al obtener resultado de el monto_subtotal en otra moneda.](https://github.com/LemontechSA/ttb/pull/332)
+
+## Hotfix: 13.6.10
+Lunes 04 de Noviembre 2013
+* **Fixed:** [Modificaciones a menu usuario paso 2 no actualiza tarifas al guardar salvo que exista un cambio de categoria.](https://github.com/LemontechSA/ttb/pull/328)
+
+## Hotfix: 13.6.9
+Lunes 28 de octubre 2013
+* **Added:** [Modificaciones a menu actividades, Modificaciones a tamaño de campos en agregar factura](https://github.com/LemontechSA/ttb/pull/327)
+
+## Hotfix: 13.6.8
+Lunes 28 de octubre 2013
+* **Fixed:** [Modificaciones para factura prslaws, Correccion a reporte avanzado](https://github.com/LemontechSA/ttb/pull/326)
+
+## Hotfix: 13.6.7
+Miercoles 22 de octubre 2013
+* **Fixed:** [Modificaciones para factura prslaws.](https://github.com/LemontechSA/ttb/pull/321)
+
+## Hotfix: 13.6.6
+Martes 22 de octubre 2013
+* **Fixed:** [Correcciones en configuracion AsuntosPorDefecto.](https://github.com/LemontechSA/ttb/pull/320)
+
+## Hotfix: 13.6.5
+lunes 21 de octubre 2013
+* **Fixed:** [Actualiza listado manteniendo orden y paginación.](https://github.com/LemontechSA/ttb/pull/320)
+
+## Hotfix: 13.6.4
+Viernes 18 de Octubre 2013
+
+* **Added:** [Generar por sistema factura para cliente PRSLAWS](https://github.com/LemontechSA/ttb/pull/317)
+
+## Hotfix: 13.6.3
+Jueves 17 de Octubre 2013
+
+* **Fixed:** [Error en JS al agregar un trámite en IE9](https://github.com/LemontechSA/ttb/pull/316)
+* **Fixed:** [Corregir asignación de cliente al crear factura](https://github.com/LemontechSA/ttb/pull/316)
+
+## Hotfix: 13.6.2
+Martes 15 de Octubre 2013
+
+* **Fixed:** [Corregir edición campo duración al agregar o modificar un trámite](https://github.com/LemontechSA/ttb/pull/314)
+* **Fixed:** [Codigo de cliente en excel de clientes](https://github.com/LemontechSA/ttb/pull/314)
+
+## Hotfix: 13.6.1
+Martes 15 de Octubre 2013
+
+* **Fixed:** [Problemas en interfaz agregar factura](https://github.com/LemontechSA/ttb/pull/313)
+
+## Release: 13.6.0
+Jueves 10 de Octubre 2013
+
+* **Feature:** [MultiCompañia](https://github.com/LemontechSA/ttb/pull/304)
+* **Feature:** [Alerta nota de crédito](https://github.com/LemontechSA/ttb/pull/294)
+* **Feature:** [Alerta horas por facturar](https://github.com/LemontechSA/ttb/pull/286)
+* **Feature:** [Facturacion electronica MX](https://github.com/LemontechSA/ttb/pull/259)
+
+## Hotfix: 13.5.14
+Lunes 07 de octubre 2013
+* **Fixed:** [Corrige el problema de fechas en excel de cobros](https://github.com/LemontechSA/ttb/pull/309)
+
+## Hotfix: 13.5.14
+Viernes 04 de octubre 2013
+* **Fixed:** [Corrige el problema con OrdenarPorCategoria para los encabezados de TRABAJO_ENCABEZADO de GenerarDocumento2](https://github.com/LemontechSA/ttb/pull/308)
+
+## Hotfix: 13.5.13
+jueves 03 de octubre 2013
+* **Fixed:** [cabia ruta tmp para backups](https://github.com/LemontechSA/ttb/pull/307)
+
+# Hotfix: 13.5.12
+Lunes 01 de Octubre 2013
+* **Fixed:** [Error al cargar JS cuando una factura contiene adelantos](https://github.com/LemontechSA/ttb/pull/305)
+
+# Hotfix: 13.5.11
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Added:** [Muestra glosa factura definia en el contrato del cliente en la factura PDF](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.10
+Jueves 26 de septiembre 2013
+* **Fixed:** [Nuevos Tags para fecha inicial periodo y fecha final periodo para documento carta](https://github.com/LemontechSA/ttb/pull/301)
+
+# Hotfix: 13.5.9
+Lunes 16 de septiembre 2013
+* **Fixed:** [Corregir selección de actividad al modificar trabajo](https://github.com/LemontechSA/ttb/pull/301)
+* **Fixed:** [Corregir monto hitos con alter table para modificar tabla cobro_pendiente](https://github.com/LemontechSA/ttb/pull/301)
+
+## Hotfix: 13.5.8
+Viernes 13 de septiembre 2013
+* **Fixed:** [Modificacion a interface agregar_gasto para no listar usuarios definidos como no visibles.](https://github.com/LemontechSA/ttb/pull/299)
+
+## Hotfix: 13.5.7
+Viernes 13 de septiembre 2013
+* **Fixed:** [Corrige problema en Nota de cobro para clientes antiguos que utilizan la seccion %TIPO_CAMBIO%.](https://github.com/LemontechSA/ttb/pull/297)
+
 ## Hotfix: 13.5.6
 jueves 12 de septiembre 2013
 * **Fixed:** [obtiene los respaldos segun subdominio.](https://github.com/LemontechSA/ttb/pull/296)

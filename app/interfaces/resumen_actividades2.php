@@ -564,7 +564,7 @@ $hoy = date("Y-m-d");
 		</tr>
 		<tr valign="top">
 			<td rowspan="2" align="left">
-				<?php echo Html::SelectQuery($sesion,"SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+				<?php echo AreaUsuario::SelectAreas($sesion, "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 			</td>
 			<?php if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
 			<td rowspan="2" align="left">
