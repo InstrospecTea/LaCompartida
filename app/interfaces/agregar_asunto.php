@@ -367,6 +367,7 @@ if ($opcion == "guardar") {
 
 			$contrato->Fill($_REQUEST, true);
 			$contrato->Edit('codigo_cliente', $codigo_cliente);
+			$contrato->Edit('fecha_inicio_cap',Utiles::fecha2sql($fecha_inicio_cap));
 
 			if ($contrato->Write()) {
 				#Subiendo Archivo

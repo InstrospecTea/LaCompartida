@@ -816,7 +816,8 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%fecha_inicial_periodo_exacto%', $fecha_diff_primer_trabajo, $html2);
 					$html2 = str_replace('%fecha_fin_periodo_exacto%', $fecha_diff_ultimo_trabajo, $html2);
 				}
-					
+
+				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%n_num_factura%', 'N°' . $this->fields['documento'], $html2);
 				$html2 = str_replace('%fecha_primer_trabajo%', $fecha_primer_trabajo, $html2);
@@ -1065,6 +1066,23 @@ class CartaCobro extends NotaCobro {
 				list($nombre_encargado) = mysql_fetch_array($resp);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
+
+				// Numero de cuenta segun contrato
+
+				$query_cuenta = "SELECT cuenta_banco.numero,prm_banco.nombre
+									FROM contrato 
+										LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
+										LEFT JOIN prm_banco ON cuenta_banco.id_banco = prm_banco.id_banco
+											WHERE contrato.id_cuenta = '".$contrato->fields['id_cuenta']."' LIMIT 1";
+
+				$resp = mysql_query($query_cuenta, $this->sesion->dbh) or Utiles::errorSQL($query_cuenta, __FILE__, __LINE__, $this->sesion->dbh);
+				list($numero_cuenta_contrato,$nombre_banco) = mysql_fetch_array($resp);
+
+				$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta_contrato, $html2);
+				$html2 = str_replace('%nombre_banco_contrato%', $nombre_banco, $html2);
+
+				// FIN cuenta segun contrato
+				
 				break;
 		}
 
@@ -1170,6 +1188,7 @@ class CartaCobro extends NotaCobro {
 
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
+				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%rut_cliente%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
@@ -1615,9 +1634,11 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_agno%', $fecha_agno_creacion, $html2);
 				
 				$fecha_facturacion_carta = ucfirst(Utiles::sql3fecha($this->fields['fecha_facturacion'], '%d de %B de %Y'));
+				$fecha_facturacion_mes_carta = ucfirst(Utiles::sql3fecha($this->fields['fecha_facturacion'], '%B'));
 				
 				$html2 = str_replace('%monto_total_demo_uf%', number_format($monto_moneda_demo, $cobro_moneda->moneda[3]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . $cobro_moneda->moneda[3]['simbolo'], $html2);
 				$html2 = str_replace('%fecha_facturacion%', $fecha_facturacion_carta, $html2);
+				$html2 = str_replace('%fecha_facturacion_mes%', $fecha_facturacion_mes_carta, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
@@ -1977,6 +1998,22 @@ class CartaCobro extends NotaCobro {
 
 				$html2 = str_replace('%asuntos_relacionados%', $asuntos_relacionados, $html2);
 
+				// Numero de cuenta segun contrato
+
+				$query_cuenta = "SELECT cuenta_banco.numero,prm_banco.nombre
+									FROM contrato 
+										LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
+										LEFT JOIN prm_banco ON cuenta_banco.id_banco = prm_banco.id_banco
+											WHERE contrato.id_cuenta = '".$contrato->fields['id_cuenta']."' LIMIT 1";
+
+				$resp = mysql_query($query_cuenta, $this->sesion->dbh) or Utiles::errorSQL($query_cuenta, __FILE__, __LINE__, $this->sesion->dbh);
+				list($numero_cuenta_contrato,$nombre_banco) = mysql_fetch_array($resp);
+
+				$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta_contrato, $html2);
+				$html2 = str_replace('%nombre_banco_contrato%', $nombre_banco, $html2);
+
+				// FIN cuenta segun contrato
+
 				break;
 
 
@@ -2104,6 +2141,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%nombre_cliente_ucfirst%', ucfirst($glosa_cliente), $html2);
+				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%factura_giro%', $contrato->fields['factura_giro'], $html2);

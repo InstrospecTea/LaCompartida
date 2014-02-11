@@ -1,18 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../fw/classes/SelectorHoras.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Tramite.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 $pagina = new Pagina($sesion);
@@ -32,16 +19,20 @@ $params_array['codigo_permiso'] = 'COB';
 $permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
 if ($id_tramite > 0) {
+
 	if ($tramite->fields['trabajo_si_no'] == 1 || $como_trabajo == 1) {
+		
 		$query = "SELECT id_trabajo FROM trabajo WHERE id_tramite = '{$id_tramite}'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_trabajo) = mysql_fetch_array($resp);
-		if ($id_trabajo > 0)
-			;
-		$trabajo->Load($id_trabajo);
+	
+		if ($id_trabajo > 0){
+			$trabajo->Load($id_trabajo);
+		}
 	}
 
 	if ($tramite->Estado() == 'Cobrado' && $opcion != 'nuevo') {
+		
 		$pagina->AddError(__(__('Trámite') . ' ya cobrado'));
 		$pagina->PrintTop($popup);
 		$pagina->PrintBottom($popup);
@@ -49,6 +40,7 @@ if ($id_tramite > 0) {
 	}
 
 	if ($tramite->Estado() == 'Revisado' && $opcion != 'nuevo') {
+		
 		if (!$permisos->fields['permitido']) {
 			$pagina->AddError(__(__('Trámite') . ' ya revisado'));
 			$pagina->PrintTop($popup);
@@ -65,6 +57,7 @@ if ($id_tramite > 0) {
 	 * Hemos cambiado el cliente por lo tanto
 	 * este trabajo tomará un cobro CREADO del asunto, sino NULL
 	 */
+
 	if (!$codigo_asunto_secundario) {
 		//se carga el codigo secundario
 		$asunto = new Asunto($sesion);
@@ -75,9 +68,11 @@ if ($id_tramite > 0) {
 		$codigo_cliente_secundario = $cliente->fields['codigo_cliente_secundario'];
 		$codigo_cliente = $asunto->fields['codigo_cliente'];
 	}
+
 	if ($codigo_asunto != $tramite->fields['codigo_asunto']) {#revisar para codigo secundario
 		$cambio_asunto = true;
 	}
+
 } else {
 	//Si no se está editando un trámite
 	if (!$id_usuario) {
@@ -100,13 +95,16 @@ if ($opcion == "guardar") {
 		$asunto->LoadByCodigo($codigo_asunto);
 	}
 
-	/**
-	 * Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
-	 * y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
+	/*
+	 *	Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
+	 *	y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
 	 */
+
 	if ($cambio_asunto) {
+
 		$cobro = new Cobro($sesion);
 		$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($codigo_asunto, $tramite->fields['fecha']);
+		
 		if ($id_cobro_cambio) {
 			if ($trabajo) {
 				$trabajo->Edit('id_cobro', $id_cobro_cambio);
@@ -122,6 +120,7 @@ if ($opcion == "guardar") {
 
 	//Revisa el Conf si esta permitido y la función existe
 	if (!empty($trabajo)) {
+
 		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$trabajo->Edit('duracion', UtilesApp::Decimal2Time($duracion));
 			$tramite->Edit('duracion', UtilesApp::Decimal2Time($duracion));
@@ -136,7 +135,9 @@ if ($opcion == "guardar") {
 		} else {
 			$trabajo->Edit('duracion_cobrada', $duracion);
 		}
+
 	} else {
+
 		if (!empty($duracion)) {
 			if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 				$tramite->Edit('duracion', UtilesApp::Decimal2Time($duracion));
@@ -146,6 +147,7 @@ if ($opcion == "guardar") {
 		} else {
 			$tramite->Edit('duracion', '00:00:00');
 		}
+
 	}
 
 	if ($trabajo) {
@@ -155,12 +157,15 @@ if ($opcion == "guardar") {
 	$tramite->Edit('codigo_asunto', $codigo_asunto);
 
 	$Ordenado_por = (int) Conf::GetConf($sesion, 'OrdenadoPor');
+
 	if (in_array($Ordenado_por, array(1, 2))) {
+
 		if (!empty($trabajo)) {
 			$trabajo->Edit('solicitante', $solicitante);
 		} else {
 			$tramite->Edit('solicitante', $solicitante);
 		}
+
 	}
 
 	if ($trabajo) {
@@ -416,13 +421,13 @@ $pagina->PrintTop($popup);
 	function CargarMonedaContrato() {
 		var id_tramite_tipo = $('lista_tramite').value;
 
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var codigo_asunto = $('codigo_asunto_secundario').value;
 			var codigo_cliente = $('codigo_cliente_secundario').value;
-<?php } else { ?>
+		<?php } else { ?>
 			var codigo_asunto = $('codigo_asunto').value;
 			var codigo_cliente = $('codigo_cliente').value;
-<?php } ?>
+		<?php } ?>
 
 		reiniciarAlertaTarifa();
 
@@ -508,19 +513,19 @@ $pagina->PrintTop($popup);
 	}
 
 	function Validar(form) {
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			if (!form.codigo_asunto_secundario.value) {
 				alert("<?php echo __('Debe seleccionar un') . ' ' . __('asunto') ?>");
 				form.codigo_asunto_secundario.focus();
 				return false;
 			}
-<?php } else { ?>
+		<?php } else { ?>
 			if (!form.codigo_asunto.value) {
 				alert("<?php echo __('Debe seleccionar un') . ' ' . __('asunto') ?>");
 				form.codigo_asunto.focus();
 				return false;
 			}
-<?php } ?>
+		<?php } ?>
 
 		if (!form.fecha.value) {
 			alert("<?php echo __('Debe ingresar una fecha.') ?>");
@@ -536,68 +541,80 @@ $pagina->PrintTop($popup);
 
 		//Revisa el Conf si esta permitido y la función existe
 		if (form.como_trabajo.checked) {
-<?php if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') { ?>
+
+			<?php if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') { ?>
+
 				var dur = form.duracion.value.replace(",", ".");
 				if (isNaN(dur)) {
 					alert("<?php echo __('Solo se aceptan valores numéricos') ?>");
 					form.duracion.focus();
 					return false;
 				}
+
 				var decimales = dur.split(".");
 				if (decimales.length > 1 && decimales[1].length > 1) {
 					alert("<?php echo __('Solo se permite ingresar un decimal'); ?>");
 					form.duracion.focus();
 					return false;
 				}
-<?php } ?>
+			<?php } ?>
 		}
 
-<?php if ((int) Conf::GetConf($sesion, 'OrdenadoPor') == 1) { ?>
+		<?php if ((int) Conf::GetConf($sesion, 'OrdenadoPor') == 1) { ?>
 			if (form.solicitante.value == '') {
 				alert("<?php echo __('Debe ingresar la persona que solicitó el tramite') ?>");
 				form.solicitante.focus();
 				return false;
 			}
-<?php } ?>
+		<?php } ?>
 
-<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
-			//Se pasa todo a mayúscula por configuración
+
+		// Si la configuracion lo indica convertimos en mayuscula todo el contenido de la descripcion
+		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
 			form.descripcion.value = form.descripcion.value.toUpperCase();
-	<?php if ((int) Conf::GetConf($sesion, 'OrdenadoPor') != 0) { ?>
-				form.solicitante.value = form.solicitante.value.toUpperCase();
-	<?php } ?>
-<?php } ?>
+
+			<?php if ((int) Conf::GetConf($sesion, 'OrdenadoPor') != 0) { ?>
+						form.solicitante.value = form.solicitante.value.toUpperCase();
+			<?php } ?>
+		<?php } ?>
 
 		// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
-<?php if (!$permiso_cobranza->fields['permitido']) { ?>
+		<?php if (!$permiso_cobranza->fields['permitido']) { ?>
 			temp = $('fecha').value.split("-");
 			fecha = new Date(temp[2] + '//' + temp[1] + '//' + temp[0]);
 			hoy = new Date();
 			fecha_tope = new Date(hoy.getTime() - (<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?> * 24 * 60 * 60 * 1000));
+
 			if (fecha_tope > fecha) {
 				alert('No se puede ingresar ' + langtramite + ' anterior a <?php echo date('d-m-Y', mktime(0, 0, 0, date('m'), date('d') - $dias, date('Y'))) ?>');
 				$('fecha').focus;
 				return false;
 			}
-<?php } ?>
+		<?php } ?>
 
 		//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
-<?php if (isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo') { ?>
-			var string = new String(top.location);
-<?php } ?>
+		<?php if (isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo') { ?>
+					var string = new String(top.location);
+		<?php } ?>
 
 		pasavalidacion = validaCantidad(document.getElementById('multiplicador').value, 'validandoform');
+		
 		if (!pasavalidacion) {
 			return false;
 		}
 
-		//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-		if (form.id_cobro.value != '' && $('id_tramite').value != '') {
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-				return ActualizaCobro(form.codigo_asunto_secundario.value);
-<?php } else { ?>
-				return ActualizaCobro(form.codigo_asunto.value);
-<?php } ?>
+		//	Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje
+
+		if (form.id_cobro.value !== '' && jQuery('#id_tramite').val() !== '') {
+
+			var cod_asunto = jQuery('#campo_codigo_asunto').val();
+			var cod_asunto_secundario = jQuery('#campo_codigo_asunto_secundario').val();
+
+			<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+				ActualizaCobro(cod_asunto_secundario);
+			<?php } else { ?>
+				ActualizaCobro(cod_asunto);
+			<?php } ?>
 		}
 
 		form.action = 'ingreso_tramite.php'
@@ -677,32 +694,37 @@ $pagina->PrintTop($popup);
 	}
 
 	/*
-	 AJAX Lista de datos historial
-	 accion -> llama ajax
-	 div -> que hace update
-	 codigo -> codigo del parámetro necesario SQL
-	 div_post -> id div posterior onclick
-	 */
+	*	AJAX Lista de datos historial
+	*	accion -> llama ajax
+	*	div -> que hace update
+	*	codigo -> codigo del parámetro necesario SQL
+	*	div_post -> id div posterior onclick
+	*/
+
 	function Lista(accion, div, codigo, div_post) {
 		var form = document.getElementById('form_editar_trabajo');
 		var data = document.getElementById(div);
 		hideddrivetip();
 		if (accion == 'lista_asuntos') {
+
 			form.campo_codigo_cliente.value = codigo;
 			SetSelectInputId('campo_codigo_cliente', 'codigo_cliente');
-<?php
-if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-	echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
-} else {
-	echo "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos');";
-}
-?>
+
+
+			<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
+			} else {
+				echo "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos');";
+			} ?>
+
 		} else if (accion == 'lista_trabajos') {
+			
 			form.campo_codigo_asunto.value = codigo;
 			SetSelectInputId('campo_codigo_asunto', 'codigo_asunto');
-<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
+			
+			<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
 				CargarSelect('codigo_asunto', 'codigo_actividad', 'cargar_actividades');
-<?php } ?>
+			<?php } ?>
 		}
 
 		var http = getXMLHTTP();
@@ -724,11 +746,12 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	}
 
 	function ActualizaCobro(valor) {
-		var codigo_asunto_hide = $('codigo_asunto_hide').value;
-		var id_cobro = $('id_cobro').value;
-		var id_trabajo = $('id_trabajo').value;
-		var fecha_trabajo_hide = $('fecha_trabajo_hide').value;
-		var form = $('form_editar_trabajo');
+
+		var codigo_asunto_hide = jQuery('#codigo_asunto_hide').val();
+		var id_cobro = jQuery('#id_cobro').val();
+		var id_trabajo = <?php echo json_encode($id_tramite); ?>;
+		var fecha_trabajo_hide = jQuery('#fecha').val();
+		var form = jQuery('#form_editar_trabajo');
 
 		if (codigo_asunto_hide != valor && id_cobro && id_trabajo) {
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
@@ -737,6 +760,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
 			Dialog.confirm(text_window, {
+
 				top: 100, left: 80, width: 400, okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
 				id: "myDialogId",
 				cancel: function(win) {
@@ -772,13 +796,13 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	}
 
 	function AgregarNuevo(tipo) {
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 			var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
-<?php } else { ?>
+		<?php } else { ?>
 			var codigo_cliente = $('codigo_cliente').value;
 			var codigo_asunto = $('codigo_asunto').value;
-<?php } ?>
+		<?php } ?>
 
 		if (tipo == 'tramite') {
 			var urlo = "ingreso_tramite.php?popup=1";
@@ -1105,7 +1129,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr id="filamultiplicador" style="display: <?php echo ( isset($id_tramite) || $como_trabajo == 1 ) ? 'none' : 'table-row'; ?>">
 			<td align="right">
-<?php echo __('Cantidad de repeticiones'); ?>
+				<?php echo __('Cantidad de repeticiones'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="multiplicador" id="multiplicador" onkeyup="validaCantidad(this.value, 'validandoinput');" value="<?php echo isset($tramite->fields['multiplicador']) ? $tramite->fields['multiplicador'] : $multiplicador; ?>" />
@@ -1114,7 +1138,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-<?php echo __('Valor según tarifa'); ?>
+				<?php echo __('Valor según tarifa'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="tarifa_tramite" id="tarifa_tramite" disabled value="<?php echo $tarifa_tramite_contrato > 0 ? $tarifa_tramite_contrato : '0'; ?>" />
@@ -1128,7 +1152,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr id="tr_tarifa_mod" <?php echo $display_tr_mod; ?>>
 			<td align="right">
-<?php echo __('Tarifa modificado'); ?>
+				<?php echo __('Tarifa modificado'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="tarifa_tramite_individual" id="tarifa_tramite_individual" value="<?php echo $tramite->fields['tarifa_tramite_individual'] ? $tramite->fields['tarifa_tramite_individual'] : '0'; ?>" />
@@ -1138,8 +1162,8 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-<?php $font_size_descripcion = Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? '18px' : '9px'; ?>
-<?php echo __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?php echo $font_size_descripcion; ?>"></span>
+				<?php $font_size_descripcion = Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? '18px' : '9px'; ?>
+				<?php echo __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?php echo $font_size_descripcion; ?>"></span>
 			</td>
 			<td align="left">
 				<textarea id="descripcion" cols="45" rows="4" name="descripcion"><?php echo $tramite->fields['descripcion'] ? stripslashes($tramite->fields['descripcion']) : $descripcion; ?></textarea>
@@ -1155,7 +1179,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-<?php echo __('Cobrable'); ?>
+				<?php echo __('Cobrable'); ?>
 			</td>
 			<td align="left">
 				<input type="checkbox" name="cobrable" valor="1" <?php echo $tramite->fields['cobrable'] || $cobrable ? 'checked' : ''; ?> />&nbsp;&nbsp;
@@ -1171,13 +1195,13 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 					</a>
 				</td>
 			</tr>
-<?php } ?>
+				<?php } ?>
 
 		<tr>
 			<td colspan="2" align="right">
-		<?php if ($id_tramite > 0) { ?>
+				<?php if ($id_tramite > 0) { ?>
 					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Confirmar(this.form, '<?php echo $id_trabajo; ?>')" />
-<?php } else { ?>
+				<?php } else { ?>
 					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Validar(this.form)" />
 				<?php } ?>
 			</td>

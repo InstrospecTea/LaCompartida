@@ -43,6 +43,7 @@ if (isset($_POST['accion'])) {
 			if ($passwd == '' || $c_passwd == '' || $passwd != $c_passwd) {
 				$Sesion->error_msg = __('Debe ingresar un password válido y ambos deben ser iguales');
 				$view = 'restablecer_password';
+				break;
 			}
 
 			if ($token != $_GET['token']) {
