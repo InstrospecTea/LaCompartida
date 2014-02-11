@@ -392,8 +392,6 @@ function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $
 function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo) {
 	$sesion = new Sesion();
 
-	$Trabajo = new Trabajo($sesion);
-	$Trabajo->log(compact('usuario', 'password', 'id_trabajo_local', 'codigo_asunto', 'codigo_actividad', 'descripcion', 'ordenado_por', 'fecha', 'duracion', 'area_trabajo'));
 	if ($usuario == '' || $password == '') {
 		return new soap_fault('Client', '', 'Debe entregar el usuario y el password.', '');
 	}
@@ -585,6 +583,3 @@ function _error($msg) {
 
 $server->service($HTTP_RAW_POST_DATA);
 #In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL:
-?>
-
-
