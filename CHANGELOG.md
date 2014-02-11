@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.33
+Lunes 10 de febrero 2014
+* **Fixed:** [Corregir la validacion del monto de forma_cobro en el interfaz cliente](https://github.com/LemontechSA/ttb/pull/407)
+
 ## Hotfix: 13.7.32
 Lunes 10 de febrero 2014
 * **Fixed:** [Corregir la validacion del monto de forma_cobro en el interfaz cliente](https://github.com/LemontechSA/ttb/pull/405)
