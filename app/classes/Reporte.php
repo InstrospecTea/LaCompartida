@@ -661,6 +661,8 @@ class Reporte {
 				break;
 
 			case "horas_cobrables":
+			case 'horas_spot':
+			case 'horas_convenio':
 				$s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600.0";
 				break;
 
@@ -735,6 +737,7 @@ class Reporte {
 				$s .= $datos_monedas . ",SUM( ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*cut.costo_hh * 	(TIME_TO_SEC( duracion)/3600)	) ";
 
 				break;
+
 		}
 		$s .= ' as ' . $this->tipo_dato;
 		return $s;
@@ -916,7 +919,7 @@ class Reporte {
 				// $respt = mysql_query($testimonio, $this->sesion->dbh);
 
 				$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
-				
+
 				while ($row = mysql_fetch_array($resp)) {
 					$this->row[] = $row;
 				}
