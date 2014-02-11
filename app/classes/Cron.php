@@ -1,9 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Log.php';
 
 class Cron {
 	var $Sesion;
@@ -11,6 +7,7 @@ class Cron {
 
 	public function __construct() {
 		$this->Sesion = new Sesion(null, true);
+		$this->AlertaCron = new AlertaCron($this->Sesion);
 
 		// iniciar sesión como Lemontech
 		$this->Sesion->usuario = new Usuario($this->Sesion, '99511620');
@@ -25,6 +22,7 @@ class Cron {
 				$table[] = $row;
 			}
 		}
+		$this->AlertaCron->queryLog($query, $table);
 		return $table;
 	}
 

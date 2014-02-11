@@ -1,8 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../classes/Cron.php';
-require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/classes/AlertaCron.php';
 require_once Conf::ServerDir() . '/classes/Notifications/NotificationService.php';
 
 ini_set('display_errors', 'on');
@@ -15,7 +12,7 @@ class CronNotificationPush extends Cron {
 		parent::__construct();
 		$this->Session = $this->Sesion;
 
-		$this->Alert = new Alerta($this->Session);
+		$this->Alert = new AlertaCron($this->Session);
 		$this->FileNameLog = 'CronNotificacionPush';
 
 		if (method_exists('Conf', 'GetConf')) {

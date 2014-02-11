@@ -25,6 +25,7 @@ if (!function_exists('ExisteCampo')) {
 
 function ExisteIndex($campo, $tabla, $dbh) {
 	$ExisteIndex = mysql_query("SHOW INDEX FROM   $tabla where key_name = '$campo'", $dbh);
+	list($ExisteIndex) = mysql_fetch_array($ExisteIndex);
 	if (!$ExisteIndex) {
 		return false;
 	} else {
@@ -10126,7 +10127,22 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES ( NULL , 'SaldoClientePorAsunto', '0', '1', 'boolean', '8', '-1');";
 			ejecutar($queries, $dbh);
 			break;
-		case 7.53:	
+
+		case 7.53:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES ( NULL , 'LogQueryAlerta', '0', '1', 'boolean', '8', '-1');";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.54:
+			$queries = array();
+			if (!ExisteIndex('codigo_cliente_secundario', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente`   ADD INDEX ( `codigo_cliente_secundario` )";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.55:	
 			$queries = array();
 			$queries[] = "ALTER TABLE archivo ADD archivo_s3 varchar(256) DEFAULT Null;";
 			ejecutar($queries, $dbh);
@@ -10139,7 +10155,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.53;
+$max_update = 7.55;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

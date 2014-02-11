@@ -1,4 +1,54 @@
 # Changelog
+## Hotfix: 13.7.32
+Lunes 10 de febrero 2014
+* **Fixed:** [Corregir la validacion del monto de forma_cobro en el interfaz cliente](https://github.com/LemontechSA/ttb/pull/405)
+* **Fixed:** [Correccion monto subtotal RDABOGADOS](https://github.com/LemontechSA/ttb/pull/405)
+
+## Hotfix: 13.7.31
+Viernes 07 de febrero 2014
+* **Fixed:** [agrega nuevos logs para seguimiento de negri](https://github.com/LemontechSA/ttb/pull/404)
+* **Fixed:** [Se agrego un archivo lang para peru](https://github.com/LemontechSA/ttb/pull/404)
+* **Fixed:** [Se creo un indice para codigo_cliente_secundario](https://github.com/LemontechSA/ttb/pull/404)
+* **Fixed:** [Se agrego una variable para carta cobro](https://github.com/LemontechSA/ttb/pull/404)
+
+## Hotfix: 13.7.30
+Martes 04 de Febrero 2014
+* **Fixed:** [Permite guardar un monto 0 para forma de cobro Retainer en agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
+Lunes 03 de Febrero 2014
+* **Fixed:** [Permite guardar una fecha_cap desde el agregar_cliente](https://github.com/LemontechSA/ttb/pull/402)
+
+## Hotfix: 13.7.29
+Viernes 31 de enero 2014
+* **Fixed:** [Agrega nuevos tags para carta cobro, cuentas bancarias](https://github.com/LemontechSA/ttb/pull/400)
+
+## Hotfix: 13.7.28
+Miercoles 29 de enero 2014
+* **Fixed:** [Agrega nuevos logs y filtra los usuarios que no serán alertados antes de generar los mensajes.](https://github.com/LemontechSA/ttb/pull/399)
+
+## Hotfix: 13.7.27
+Lunes 27 de enero 2014
+* **Fixed:** [Problemas con Nota de Crédito en SAT](https://github.com/LemontechSA/ttb/pull/396)
+
+## Hotfix: 13.7.26
+Viernes 24 de enero 2014
+* **Fixed:** [Restaura codigo eliminado en case ASUNTOS modalidad calculo antigua](https://github.com/LemontechSA/ttb/pull/393)
+
+## Hotfix: 13.7.25
+Miercoles 22 de enero 2014
+* **Fixed:** [Restaura codigo eliminado en case ASUNTOS modalidad calculo antigua](https://github.com/LemontechSA/ttb/pull/391)
+
+## Hotfix: 13.7.24
+Martes 21 de enero 2014
+* **Fixed:** [Modificaciones a listado de asuntos agrega nueva columna descuento](https://github.com/LemontechSA/ttb/pull/390)
+
+## Hotfix: 13.7.23
+jueves 16 de enero 2014
+* **Fixed:** [Permite guardar fecha de un cap](https://github.com/LemontechSA/ttb/pull/388)
+
+## Hotfix: 13.7.22
+jueves 16 de enero 2014
+* **Fixed:** [Agrega log de querys a CronNotificacion y corrige querys semanales](https://github.com/LemontechSA/ttb/pull/387)
+
 
 ## Hotfix: 13.7.21
 Jueves 9 de enero 2014
