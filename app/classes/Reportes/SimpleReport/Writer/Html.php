@@ -40,6 +40,48 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		} else {
 			$columns = $this->SimpleReport->Config->VisibleColumns();
 
+			$this->variables = array();
+			if (!empty($this->SimpleReport->variables)) {
+				$html .= '<fieldset><legend>Variables</legend><table>';
+				if(isset($this->SimpleReport->variables[0])) {
+					$vars = array();
+					foreach ($this->SimpleReport->variables as $key => $variable) {
+						if(!is_numeric($key)){
+							continue;
+						}
+						$value = $this->parse_field($variable['value'], array(), true);
+						if(!isset($vars[$variable['row']])) {
+							$vars[$variable['row']] = array();
+						}
+						$variable['value'] = $value;
+						$vars[$variable['row']][$variable['col']] = $variable;
+						$this->variables[$variable['name']] = $value;
+					}
+
+					$html .= '<tr><td/>';
+					foreach (array_keys(reset($vars)) as $col) {
+						$html .= "<th>$col</th>";
+					}
+					$html .= '</tr>';
+
+					foreach ($vars as $row => $cols) {
+						$html .= "<tr><th align=\"right\">$row</th>";
+						foreach ($cols as $variable) {
+							$html .= $this->format_td($variable['value'], 'number', $variable['extras'], '', $this->SimpleReport->variables['data']);
+						}
+						$html .= '</tr>';
+					}
+					$html .= '</table></fieldset>';
+				} else {
+					foreach ($this->SimpleReport->variables as $name => $value) {
+						$value = $this->parse_field($value, array(), true);
+						$html .= "<tr><td align=\"right\">$name:</td><td>$value</td></tr>";
+						$this->variables[$name] = $value;
+					}
+					$html .= '</table></fieldset>';
+				}
+			}
+
 			//agrupadores de resultados
 			$groups = array();
 			foreach ($columns as $idx => $column) {
@@ -214,6 +256,15 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$rowspan++;
 					}
 					$column->extras['rowspan'] = $rowspan;
+					$columns[$column->field]->extras['rowspan'] = $rowspan;
+				}
+
+				$inlinegroup_field = $column->extras['inlinegroup_field'];
+				if (isset($inlinegroup_field)) {
+					if (isset($result[$row_idx - 1]) && $result[$row_idx - 1][$inlinegroup_field] == $row[$inlinegroup_field]) {
+						continue;
+					}
+					$column->extras['rowspan'] = $columns[$inlinegroup_field]->extras['rowspan'];
 				}
 
 				$tds .= $this->td($row, $column, $collapsible);
@@ -281,9 +332,13 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$row[$column->field] = $totals[$idx];
 						$html .= $this->td($row, $column);
 					} else {
-						if ($colspan_total > 0) {
+						if ($colspan_total == $i && $i > 0) {
 							$html .=  "<td colspan='$colspan_total' class='level$level'>$name&nbsp;</td>";
-							$colspan_total = -1;
+							$colspan_total--;
+						} else if ($colspan_total) {
+							$colspan_total--;
+						} else {
+							$html .= '<td ' . (isset($column->extras['attrs']) ? $column->extras['attrs'] : '') . '/>';
 						}
 					}
 				}
@@ -295,35 +350,44 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		return $html;
 	}
 
-	private function td($row, $column, $extras ='') {
+	private function parse_field($field, $row, $isnum = false){
 		$valor = '';
-		if (strpos($column->field, '=') !== 0) {
-			$valor = $row[$column->field];
+		if (strpos($field, '=') !== 0) {
+			$valor = isset($row[$field]) ? $row[$field] : $field;
 		} else {
+			if (preg_match('/=(.+)\/(.+)/', $field, $matches)) {
+				return $this->parse_field('=' . $matches[1], $row, true) / $this->parse_field('=' . $matches[2], $row, true);
+			}
+
 			//es una formula: reemplazar los nombres de campos por celdas
-			if (preg_match('/=(\w+)\((.+)\)/', $column->field, $matches)) {
+			if (preg_match('/=(\w+)\((.+)\)/', $field, $matches)) {
 				switch ($matches[1]) {
 					case 'SUM':
 						$valor = 0;
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
-							$param = trim($param);
-							if (strpos($param, '%') === 0) {
-								$valor += str_replace(',', '.', $row[trim($param, '%')]);
-							} else if (is_numeric($param)) {
-								$valor += $param;
-							}
+							$valor += $this->parse_param($param, $row, true, 0);
+						}
+						break;
+					case 'AVERAGE':
+						$valor = 0;
+						$params = explode(',', $matches[2]);
+						foreach ($params as $param) {
+							$valor += $this->parse_param($param, $row, true, 0);
+						}
+						$valor /= count($params);
+						break;
+					case 'PRODUCT':
+						$valor = 1;
+						$params = explode(',', $matches[2]);
+						foreach ($params as $param) {
+							$valor *= $this->parse_param($param, $row, true, 1);
 						}
 						break;
 					case 'CONCATENATE':
 						$params = explode(',', $matches[2]);
 						foreach ($params as $param) {
-							$param = trim($param);
-							if (strpos($param, '%') === 0) {
-								$valor .= $row[trim($param, '%')];
-							} else {
-								$valor .= trim($param, '"');
-							}
+							$valor .= $this->parse_param($param, $row, false, '');
 						}
 						break;
 
@@ -343,10 +407,21 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 						$valor = $this->acumuladores[$original_param];
 						break;
 				}
+			} else { //es una referencia a otra columna o variable
+				$valor = $this->parse_param(trim($field, '='), $row, $isnum, $isnum ? 0 : '');
 			}
 		}
+		return $valor;
+	}
 
-		switch ($column->format) {
+	private function td(&$row, $column, $extras ='') {
+		$valor = $this->parse_field($column->field, $row, $column->format == 'number');
+		$row[$column->name] = $valor;
+		return $this->format_td($valor, $column->format, $column->extras, $extras, $row);
+	}
+
+	private function format_td($valor, $format, $extras, $extra_text, $row) {
+		switch ($format) {
 			case 'text':
 				if (strpos($valor, ";")) {
 					$valor = str_replace(";", "<br />", $valor);
@@ -354,12 +429,12 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				break;
 			case 'number':
 				$decimals = 2;
-				if (isset($column->extras['decimals'])) {
-					$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
+				if (isset($extras['decimals'])) {
+					$decimals = array_key_exists($extras['decimals'], $row) ? $row[$extras['decimals']] : $extras['decimals'];
 				}
 				$valor = number_format($valor, $decimals, $this->SimpleReport->regional_format['decimal_separator'], $this->SimpleReport->regional_format['thousands_separator']);
-				if (isset($column->extras['symbol'])) {
-					$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
+				if (isset($extras['symbol'])) {
+					$symbol = array_key_exists($extras['symbol'], $row) ? $row[$extras['symbol']] : $extras['symbol'];
 					$valor = "$symbol&nbsp;$valor";
 				}
 				break;
@@ -371,18 +446,50 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				break;
 		}
 
-		$attrs = isset($column->extras['attrs']) ? $column->extras['attrs'] : '';
-		if (isset($column->extras['rowspan'])) {
-			$attrs .= ' rowspan="' . $column->extras['rowspan'] . '"';
+		$attrs = isset($extras['attrs']) ? $extras['attrs'] : '';
+		if (isset($extras['rowspan'])) {
+			$attrs .= ' rowspan="' . $extras['rowspan'] . '"';
 		}
 
 		$class = 'buscador';
-		if (isset($column->extras['class'])) {
-			$class .= ' ' . $column->extras['class'];
+		if (isset($extras['class'])) {
+			$class .= ' ' . $extras['class'];
 		}
 
-		return "<td class=\"$class\" $attrs>$extras$valor</td>";
+		return "<td class=\"$class\" $attrs>$extra_text$valor</td>";
 	}
 
+	private function parse_param($param, $row, $numeric = true, $default = null){
+		$param = trim($param);
+		if (strpos($param, '"') === 0) {
+			return trim($param, '"');
+		}
+
+		if (preg_match_all('/%(\w+)%/', $param, $matches_fields, PREG_SET_ORDER)) {
+			foreach ($matches_fields as $match_field) {
+				$value = $field = $match_field[1];
+				if (isset($row[$field])) {
+					$value = $row[$field];
+				}
+				$param = str_replace($match_field[0], $value, $param);
+			}
+		}
+
+		if (preg_match_all('/\$(.+?)\$/', $param, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$value = $var = $match[1];
+				$value = isset($this->variables[$var]) ? $this->variables[$var] : $default;
+				$param = str_replace($match[0], $value, $param);
+			}
+		}
+
+		if($numeric) {
+			$param = str_replace(',', '.', $param);
+			if(!is_numeric($param)) $param = $default;
+		} else if (!$param) {
+			$param = $default;
+		}
+		return $param;
+	}
 }
 

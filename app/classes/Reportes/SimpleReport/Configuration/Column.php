@@ -18,6 +18,7 @@ class SimpleReport_Configuration_Column {
 
 	function __construct() {
 		$this->field = '';
+		$this->name = '';
 		$this->title = '';
 		$this->order = 0;
 		$this->visible = true;
@@ -27,6 +28,11 @@ class SimpleReport_Configuration_Column {
 
 	public function Field($field) {
 		$this->field = $field;
+		return $this;
+	}
+
+	public function Name($name) {
+		$this->name = $name;
 		return $this;
 	}
 
