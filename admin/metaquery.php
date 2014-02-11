@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../app/conf.php';
 						'rdsdb3.thetimebilling.com',
 						'rdsdb4.thetimebilling.com',
 						'rdsdb5.thetimebilling.com',
-						'rdsdb5.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
+						'rdsdb6.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
 				
 			</div><br/>';
 	  
