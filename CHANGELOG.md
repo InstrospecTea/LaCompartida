@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.35
+martes 12 de febrero 2014
+* **Fixed:** [Corrige error javascript en interfaz agregar_contrato](https://github.com/LemontechSA/ttb/pull/410)
+
 ## Hotfix: 13.7.34
 martes 11 de febrero 2014
 * **Fixed:** [Elimina query que reemplaza código de asunto](https://github.com/LemontechSA/ttb/pull/408)
