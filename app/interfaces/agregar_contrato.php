@@ -1420,7 +1420,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							respuesta_revisar_tarifa = true;
 							if( !desde_combo )
 							{
-								if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_cliente' == 'agregar_asunto')
+								if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_cliente')
 								{
 									Validar(f);
 								}
