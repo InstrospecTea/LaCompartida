@@ -80,6 +80,10 @@ class Asunto extends Objeto {
 		'opc_moneda_total' => array(
 			'titulo' => 'Moneda Liquidación',
 			'relacion' => 'Moneda'
+		),
+		'id_cuenta' => array(
+			'titulo' => 'Cuenta Bancaria',
+			'relacion' => 'CuentaBanco'
 		)
 	);
 
@@ -292,6 +296,14 @@ class Asunto extends Objeto {
 			'field' => 'fecha_inactivo',
 			'title' => 'Fecha Inactivo',
 			'format' => 'date',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'descuento',
+			'title' => 'Descuento',
+			'visible' => false,
 			'extras' => array(
 				'width' => 20
 			)
@@ -523,6 +535,10 @@ class Asunto extends Objeto {
 			$wheres[] = "a1.activo = " . ($activo == 'SI' ? 1 : 0);
 		}
 
+		if ($id_grupo_cliente) {
+			$wheres[] = "cliente.id_grupo_cliente = '$id_grupo_cliente'";
+		}
+
 		if ($codigo_asunto != "") {
 			$wheres[] = "a1.codigo_asunto LIKE '$codigo_asunto%'";
 		}
@@ -587,6 +603,7 @@ class Asunto extends Objeto {
 
 			tarifa.glosa_tarifa,
 			cliente.glosa_cliente,
+			cliente.id_grupo_cliente,
 			prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
 			prm_area_proyecto.glosa AS area_proyecto,
 			prm_idioma.glosa_idioma,
@@ -607,7 +624,9 @@ class Asunto extends Objeto {
 
 			SUM(TIME_TO_SEC(trabajo.duracion))/3600 AS horas_trabajadas,
 			SUM(IF(cobro_trabajo.estado IS NULL OR cobro_trabajo.estado = 'CREADO' OR cobro_trabajo.estado = 'EN REVISION',
-				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas
+				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas,
+
+			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento
 
 			FROM asunto AS a1
 			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
@@ -734,7 +753,7 @@ class Asunto extends Objeto {
 		unset($data['monto_tarifa_flat']);
 
 		$campos_contrato = array('id_contrato_cliente', 'id_moneda_monto', 'id_tarifa', 'forma_cobro', 'id_moneda_tramite',
-			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total');
+			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_cuenta');
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
 		$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
 
@@ -749,7 +768,7 @@ class Asunto extends Objeto {
 		//copiar contrato del cliente y agregar datos especificados aca
 		$Contrato = new Contrato($this->sesion);
 		$Contrato->Load($this->fields['id_contrato']);
-		if($this->fields['id_contrato'] == $this->extra_fields['id_contrato_cliente']){
+		if($this->fields['id_contrato'] == $this->extra_fields['id_contrato_cliente']) {
 			unset($Contrato->fields['id_contrato']);
 		}
 		unset($this->extra_fields['id_contrato_cliente']);
@@ -795,7 +814,7 @@ class Asunto extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used) and name
 	 */
-	public function findAllByClientCode($code) {
+	public function findAllByClientCode($code, $include_all = 0) {
 		$matters = array();
 		$active = 1;
 		$sql_select_matter_code = '`matter`.`codigo_asunto`';
@@ -807,18 +826,27 @@ class Asunto extends Objeto {
 			$sql_where_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
+		if (!$include_all) {
+			$sql_include = "AND `matter`.`activo`=:active";
+		} else {
+			$sql_include = "";
+		}
+
 		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`,
 		 	`prm_idioma`.`codigo_idioma` AS `language`,
-			`prm_idioma`.`glosa_idioma` AS `language_name`
+			`prm_idioma`.`glosa_idioma` AS `language_name`,
+			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE $sql_where_client_code=:code AND `matter`.`activo`=:active
+			WHERE $sql_where_client_code=:code {$sql_include}
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('code', $code);
-		$Statement->bindParam('active', $active);
+		if (!$include_all) {
+			$Statement->bindParam('active', $active);
+		}
 		$Statement->execute();
 
 		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {
@@ -827,7 +855,8 @@ class Asunto extends Objeto {
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
 					'language' =>  !empty($matter->language) ? $matter->languag : null,
-					'language_name' => !empty($matter->language_name) ? $matter->language_name : null
+					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
+					'active' => (int)$matter->active
 				)
 			);
 		}
@@ -840,7 +869,7 @@ class Asunto extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used) and name
 	 */
-	public function findAllActive($timestamp = 0) {
+	public function findAllActive($timestamp = 0, $include_all = 0) {
 		$matters = array();
 		$active = 1;
 		$sql_select_client_code = '`client`.`codigo_cliente`';
@@ -852,18 +881,27 @@ class Asunto extends Objeto {
 			$sql_select_matter_code = '`matter`.`codigo_asunto_secundario`';
 		}
 
+		if (!$include_all) {
+			$sql_include = "AND `matter`.`activo`=:active";
+		} else {
+			$sql_include = "";
+		}
+
 		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
 			`matter`.`glosa_asunto` AS `name`, `prm_idioma`.`codigo_idioma` AS `language`,
-			`prm_idioma`.`glosa_idioma` AS `language_name`
+			`prm_idioma`.`glosa_idioma` AS `language_name`,
+			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto`<>''
+			WHERE `matter`.`glosa_asunto`<>'' {$sql_include}
 			 AND (`matter`.`fecha_touch`>=:timestamp OR `matter`.`fecha_creacion`>=:timestamp)
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
-		$Statement->bindParam('active', $active);
+		if (!$include_all) {
+			$Statement->bindParam('active', $active);
+		}
 		$Statement->bindParam('timestamp', date('Y-m-d', $timestamp));
 		$Statement->execute();
 
@@ -874,7 +912,8 @@ class Asunto extends Objeto {
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
 					'language' =>  !empty($matter->language) ? $matter->languag : null,
-					'language_name' => !empty($matter->language_name) ? $matter->language_name : null
+					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
+					'active' => (int) $matter->active
 				)
 			);
 		}

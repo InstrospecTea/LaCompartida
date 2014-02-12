@@ -770,10 +770,10 @@ if(!$popup)
 					</tr>
 					<tr valign="top">
 						<td rowspan="2" align="left">
-							<?=Html::SelectQuery($sesion,"SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+							<?php echo AreaUsuario::SelectAreas($sesion, "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 						</td>
 						<td rowspan="2" align="left">
-							<?=Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+							<?php echo Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 						</td>
 						<td align="left" colspan="2" width="40%">&nbsp;</td>
 					</tr>

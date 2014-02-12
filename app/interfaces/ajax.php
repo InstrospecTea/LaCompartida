@@ -256,11 +256,13 @@ if ($accion == "consistencia_cliente_asunto") {
 		$cont++;
 	}
 	echo $respuesta;
-} else if ($accion == "set_duracion_defecto") {
-	$query = "SELECT duracion_defecto, trabajo_si_no_defecto FROM tramite_tipo WHERE id_tramite_tipo=" . $id;
+} else if ($accion == 'set_duracion_defecto') {
+	$query = "SELECT duracion_defecto, trabajo_si_no_defecto FROM tramite_tipo WHERE id_tramite_tipo = '{$id}'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($duracion, $como_trabajo) = mysql_fetch_array($resp);
-
+	if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
+		$duracion = UtilesApp::Time2Decimal($duracion);
+	}
 	echo $duracion . '-' . $como_trabajo;
 } else if ($accion == "actualizar_trabajo") {
 	if ($valor == "") {
@@ -314,18 +316,13 @@ if ($accion == "consistencia_cliente_asunto") {
 	} else {
 		echo("0");
 	}
-} else if ($accion == "set_tarifa") {
-	$query = "INSERT INTO usuario_tarifa SET tarifa='$tarifa', id_usuario = '$id_usuario', id_moneda = '$id_moneda', codigo_asunto = '$codigo_asunto'
-					ON DUPLICATE KEY UPDATE tarifa = '$tarifa'";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	echo("OK");
 } else if ($accion == "set_tarifa_cliente") {
 	$query = "INSERT INTO usuario_tarifa_cliente SET tarifa='$tarifa', id_usuario = '$id_usuario', id_moneda = '$id_moneda', codigo_cliente = '$codigo_cliente'
 					ON DUPLICATE KEY UPDATE tarifa = '$tarifa'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo("OK");
 } else if ($accion == "get_tarifa_cliente") {
-	$query = "SELECT tarifa FROM usuario_tarifa WHERE id_usuario = '$id_usuario' AND id_moneda = '$id_moneda' AND codigo_cliente = '$codigo_cliente'";
+	$query = "SELECT tarifa FROM usuario_tarifa_cliente WHERE id_usuario = '$id_usuario' AND id_moneda = '$id_moneda' AND codigo_cliente = '$codigo_cliente'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	if (list($tarifa) = mysql_fetch_array($resp)) {
 		echo("$tarifa");
@@ -474,11 +471,19 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_comuna,
 											contrato.factura_ciudad,
 											contrato.factura_giro,
-											contrato.factura_codigopostal
+											contrato.factura_codigopostal,
+											contrato.id_pais,
+											contrato.cod_factura_telefono,
+											contrato.factura_telefono,
+											contrato.glosa_contrato
 										FROM contrato
-											JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
-										WHERE cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}'
-										LIMIT 1";
+											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
+										WHERE (cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}')";
+	if (!empty($id_contrato)) {
+		$query_contrato .= " AND contrato.id_contrato = {$id_contrato}";
+	}
+
+	$query_contrato .= " LIMIT 1";
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {

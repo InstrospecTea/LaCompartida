@@ -119,7 +119,7 @@ class Contrato extends Objeto {
 		'notificar_otros_correos'	,
 		'id_cuenta'	,
 		'id_cuenta2'	,
-		'id_pais'	,
+		'id_pais'  ,
 		'esc1_tiempo'	,
 		'esc1_id_tarifa'	,
 		'esc1_monto'	,
@@ -1142,14 +1142,14 @@ class Contrato extends Objeto {
 			}
 		}
 		foreach($this->editable_fields as $editable_field) {
-				if(substr($editable_field,0,4)=='opc_') {
-					if(empty($parametros[$editable_field])) {
-						$this->Edit($editable_field,"0");
-					} else {
-						$this->Edit($editable_field,$parametros[$editable_field]);
-					}
+			if(substr($editable_field,0,4)=='opc_') {
+				if(empty($parametros[$editable_field])) {
+					$this->Edit($editable_field,"0");
+				} else {
+					$this->Edit($editable_field,$parametros[$editable_field]);
 				}
 			}
+		}
 
 		if($this->extra_fields['activo_contrato'] || empty($this->fields['activo'])  || empty($this->fields['id_contrato']) ) {
 			$this->Edit("activo",'SI');
@@ -1441,6 +1441,82 @@ class Contrato extends Objeto {
 
 		return $datos;
 	}
+
+	/**
+     * Find all user generators of matter
+     */
+    public static function contractGenerators($sesion, $contract_id) {
+        $generators = array();
+        $sql = "SELECT id_contrato_generador, id_cliente, id_contrato, prm_area_usuario.glosa as area_usuario,
+                                     usuario.id_usuario, usuario.nombre,  usuario.apellido1, usuario.apellido2, porcentaje_genera
+                            FROM contrato_generador
+                         INNER JOIN usuario on contrato_generador.id_usuario = usuario.id_usuario
+                     INNER JOIN prm_area_usuario on usuario.id_area_usuario = prm_area_usuario.id
+                       WHERE contrato_generador.id_contrato=:contract_id
+                    ORDER BY usuario.nombre ASC";
+
+        $Statement = $sesion->pdodbh->prepare($sql);
+        $Statement->bindParam('contract_id', $contract_id);
+        $Statement->execute();
+
+        while ($generator = $Statement->fetch(PDO::FETCH_OBJ)) {
+            array_push($generators,
+                array(
+                    'id_contrato_generador' => $generator->id_contrato_generador,
+                    'id_cliente' => $generator->id_cliente,
+                    'id_contrato' => $generator->id_contrato,
+                    'area_usuario' => $generator->area_usuario,
+                    'id_usuario' => $generator->id_usuario,
+                    'nombre' => $generator->apellido1 . ' ' . $generator->apellido2 . ' ' . $generator->nombre,
+                    'porcentaje_genera' => $generator->porcentaje_genera,
+                )
+            );
+        }
+
+        return $generators;
+    }
+
+    /**
+     * Delete a generators of matter
+     */
+    public static function deleteContractGenerator($sesion, $generator_id) {
+        $sql = "DELETE FROM `contrato_generador` WHERE `contrato_generador`.`id_contrato_generador`=:generator_id";
+        $Statement = $sesion->pdodbh->prepare($sql);
+        $Statement->bindParam('generator_id', $generator_id);
+        return $Statement->execute();
+    }
+
+    /**
+     * Update a generator of matter
+     */
+    public static function updateContractGenerator($sesion, $generator_id, $percent_generator) {
+        $sql = "UPDATE `contrato_generador`
+                SET `contrato_generador`.`porcentaje_genera`    = :percent_generator
+                WHERE `contrato_generador`.`id_contrato_generador` = :generator_id";
+
+        $Statement = $sesion->pdodbh->prepare($sql);
+        $Statement->bindParam('percent_generator', $percent_generator);
+        $Statement->bindParam('generator_id', $generator_id);
+
+        return $Statement->execute();
+    }
+
+    /**
+     * Create a generator of matter
+     */
+    public static function createContractGenerator($sesion, $client_id, $contract_id, $user_id, $percent_generator) {
+        $sql = "INSERT INTO `contrato_generador`
+                SET `contrato_generador`.`id_cliente`=:client_id, `contrato_generador`.`id_contrato`=:contract_id,
+                        `contrato_generador`.`id_usuario`=:user_id, `contrato_generador`.`porcentaje_genera`=:percent_generator ";
+
+        $Statement = $sesion->pdodbh->prepare($sql);
+        $Statement->bindParam('client_id', $client_id);
+        $Statement->bindParam('contract_id', $contract_id);
+        $Statement->bindParam('user_id', $user_id);
+        $Statement->bindParam('percent_generator', $percent_generator);
+
+        return $Statement->execute();
+    }
 
 	public static function QueriesPrevias($sesion) {
 		$Contrato = new Contrato($sesion);

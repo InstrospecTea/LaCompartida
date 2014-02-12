@@ -48,7 +48,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	$i = 0;
 	while ($fila = mysql_fetch_assoc($respcurrency)) {
 		$currency[++$i] = $fila;
-		echo 'MonedaArray[' . $i . '] = "' . $currency[$i]['simbolo'] . '"' . "\n";
+		echo 'MonedaArray[' . $i . '] = "' . $currency[$i]['simbolo'] . '";' . "\n";
 	}
 	echo 'var PERMISOCOBRANZA = ' . ($p_cobranza->fields['permitido'] ? 1 : 0) . ';';
 	?>

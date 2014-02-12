@@ -54,7 +54,7 @@ if ($opcion == "guardar") {
 		if ($_POST['cobrable'] == 1) {
 			$gasto->Edit("cobrable", 1);
 		} else {
-			if (UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
+			if (Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 				$gasto->Edit("cobrable", "0");
 			} else {
 				$gasto->Edit("cobrable", "1");
@@ -66,7 +66,7 @@ if ($opcion == "guardar") {
 		 *  se calcula en base al porcentaje impuesto gasto
 		 *  del cobro
 		 */
-		if (!UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto')) {
+		if (!Conf::GetConf($sesion, 'UsarGastosConSinImpuesto')) {
 			$con_impuesto = 1;
 		}
 
@@ -77,7 +77,7 @@ if ($opcion == "guardar") {
 			$gasto->Edit("ingreso", $monto);
 			$gasto->Edit("monto_cobrable", $monto);
 		} else if ($prov == 'false') {
-			if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
+			if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
 				if ($monto <= 0) {
 					$gasto->Edit("egreso", $monto_cobrable);
 				} else {
@@ -109,7 +109,7 @@ if ($opcion == "guardar") {
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
 		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
 
-		if (UtilesApp::GetConf($sesion, 'FacturaAsociadaCodificada')) {
+		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
 		}
 
@@ -131,6 +131,7 @@ if ($opcion == "guardar") {
 		}
 
 		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
+		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
 
 		if ($gasto->Write()) {
 			$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
@@ -156,7 +157,7 @@ $pagina->PrintTop($popup);
 	function CambiaMonto(form) {
 		var monto = form.monto.value;
 
-		<?php if (UtilesApp::GetConf($sesion, 'ComisionGastos')) { ?>
+		<?php if (Conf::GetConf($sesion, 'ComisionGastos')) { ?>
 			form.monto_cobrable.value = (form.monto.value * (1+form.porcentajeComision.value/100)).toFixed(2);
 		<?php } else { ?>
 			if (form.monto_cobrable) {
@@ -176,7 +177,7 @@ $pagina->PrintTop($popup);
 			monto = monto_cobrable;
 		}
 
-		<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			if ($('codigo_cliente_secundario').value == '') {
 				alert('<?php echo __('Debe seleccionar un cliente'); ?>');
 				form.codigo_cliente_secundario.focus();
@@ -206,7 +207,7 @@ $pagina->PrintTop($popup);
 				RevisarConsistenciaClienteAsunto(form);
 			}
 
-		<?php if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) { ?>
+		<?php if (Conf::GetConf($sesion, 'UsaMontoCobrable')) { ?>
 			if ((monto <= 0 || isNaN(monto)) && (monto_cobrable <= 0 || isNaN(monto_cobrable))) {
 				alert('<?php echo __('Debe ingresar un monto para el gasto'); ?>');
 				form.monto.focus();
@@ -226,7 +227,7 @@ $pagina->PrintTop($popup);
 			return false;
 		}
 
-		<?php if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) { ?>
+		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
 			if (form.descripcion.value != "") {
 				form.descripcion.value=form.descripcion.value.toUpperCase();
 			}
@@ -281,7 +282,7 @@ $pagina->PrintTop($popup);
 				if (http.readyState == 4) {
 					var response = http.responseText;
 					var idio = response.split("|");
-					<?php if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) { ?>
+					<?php if (Conf::GetConf($sesion, 'IdiomaGrande')) { ?>
 						txt_span.innerHTML = idio[1];
 					<?php } else { ?>
 						txt_span.innerHTML = 'Idioma: '+idio[1];
@@ -295,7 +296,7 @@ $pagina->PrintTop($popup);
 	<?php
 	$contrato = new Contrato($sesion);
 
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$contrato->LoadByCodigoAsuntoSecundario($codigo_asunto_secundario);
 		echo 'var CodigoSecundario = 1;';
 	} else {
@@ -350,7 +351,7 @@ $pagina->PrintTop($popup);
 	</table>
 
 	<?php
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		if (!$codigo_cliente_secundario) {
 			if ($gasto->fields['codigo_cliente']) {
 				$codigo_cliente = $gasto->fields['codigo_cliente'];
@@ -421,7 +422,7 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 
-		<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
+		<?php if(Conf::GetConf($sesion, 'ExportacionLedes')) { ?>
 		<tr>
 			<td align="right">
 				<?php echo __('Código UTBMS'); ?>
@@ -432,7 +433,7 @@ $pagina->PrintTop($popup);
 		</tr>
 		<?php } ?>
 
-		<?php if (UtilesApp::GetConf($sesion, 'TipoGasto') && $prov == 'false') { ?>
+		<?php if (Conf::GetConf($sesion, 'TipoGasto') && $prov == 'false') { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('Tipo de Gasto'); ?>
@@ -452,7 +453,16 @@ $pagina->PrintTop($popup);
 				<a href='javascript:void(0)' onclick="AgregarProveedor();" title="Agregar Proveedor"><img src="<?php echo Conf::ImgDir(); ?>/agregar.gif" border=0 ></a>
 			</td>
 		</tr>
-
+	<?php if (Conf::GetConf($sesion, 'UsaEstadoPagoGastos')) { ?>
+		<tr>
+			<td align="right">
+				<?php echo __('Estado Pago'); ?>
+			</td>
+			<td align="left">
+				<?php echo Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'ESTADO_PAGO_GASTOS' ORDER BY glosa ASC", "estado_pago", $gasto->fields['estado_pago'], "", ""); ?>
+			</td>
+		</tr>
+	<?php } ?>
 		<tr>
 			<td align="right">
 				<?php echo __('Monto'); ?>
@@ -466,7 +476,7 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 
-		<?php if (UtilesApp::GetConf($sesion, 'ComisionGastos') && $prov == 'false') { ?>
+		<?php if (Conf::GetConf($sesion, 'ComisionGastos') && $prov == 'false') { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('Porcentaje comisión'); ?>
@@ -477,7 +487,7 @@ $pagina->PrintTop($popup);
 			</tr>
 		<?php } ?>
 
-		<?php if ($prov == 'false' && UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) { ?>
+		<?php if ($prov == 'false' && Conf::GetConf($sesion, 'UsaMontoCobrable')) { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('Monto cobrable'); ?>&nbsp;
@@ -489,10 +499,10 @@ $pagina->PrintTop($popup);
 		<?php } ?>
 
 		<?php
-		if (UtilesApp::GetConf($sesion, 'PrmGastos')) {
+		if (Conf::GetConf($sesion, 'PrmGastos')) {
 			$_onchange = '';
 			$_titulo = 'Vacio';
-			if (UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion')) {
+			if (Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion')) {
 				$_onchange = 'onchange="ActualizarDescripcion()"';
 				$_titulo = '';
 			}
@@ -507,7 +517,7 @@ $pagina->PrintTop($popup);
 			</tr>
 		<?php } ?>
 
-		<?php if (UtilesApp::GetConf($sesion, 'NumeroGasto')) { ?>
+		<?php if (Conf::GetConf($sesion, 'NumeroGasto')) { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('N° Documento'); ?>
@@ -518,7 +528,7 @@ $pagina->PrintTop($popup);
 			</tr>
 		<?php } ?>
 
-		<?php if (UtilesApp::GetConf($sesion, 'FacturaAsociada')) { ?>
+		<?php if (Conf::GetConf($sesion, 'FacturaAsociada')) { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('Documento Asociado'); ?>
@@ -527,7 +537,7 @@ $pagina->PrintTop($popup);
 					<?php
 					echo Html::SelectQuery($sesion, "SELECT id_tipo_documento_asociado, glosa FROM prm_tipo_documento_asociado ORDER BY id_tipo_documento_asociado", "id_tipo_documento_asociado", $gasto->fields['id_tipo_documento_asociado'] ? $gasto->fields['id_tipo_documento_asociado'] : '', '', 'Vacio', "140");
 
-					if (UtilesApp::GetConf($sesion, 'FacturaAsociadaCodificada')) {
+					if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 						$numero_factura = explode('-', $gasto->fields['codigo_factura_gasto']);
 						$tamano_numero_factura = sizeof($numero_factura);
 						if ($tamano_numero_factura > 1) {
@@ -559,7 +569,7 @@ $pagina->PrintTop($popup);
 			</tr>
 		<?php } ?>
 
-		<?php if (UtilesApp::GetConf($sesion, 'NumeroOT') && $prov == 'false') { ?>
+		<?php if (Conf::GetConf($sesion, 'NumeroOT') && $prov == 'false') { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('N° OT'); ?>
@@ -572,7 +582,7 @@ $pagina->PrintTop($popup);
 
 		<tr id='descripcion_gastos'>
 			<td align="right">
-				<?php if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) { ?>
+				<?php if (Conf::GetConf($sesion, 'IdiomaGrande')) { ?>
 					<?php echo __('Descripción'); ?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
 				<?php } else { ?>
 					<?php echo __('Descripción'); ?>
@@ -593,13 +603,13 @@ $pagina->PrintTop($popup);
 		<?php
 		// Por definicion las provisiones no deben tener Impuestos
 		if ($prov == 'false') {
-			if (UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos') && UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto')) {
+			if (Conf::GetConf($sesion, 'UsarImpuestoPorGastos') && Conf::GetConf($sesion, 'UsarGastosConSinImpuesto')) {
 				?>
 				<tr>
 					<td align="right">
 						<?php
 						echo __('Con Impuesto');
-						if ($gasto->fields['con_impuesto'] == 'SI' || (empty($gasto->fields['id_movimiento']) && UtilesApp::GetConf($sesion, 'GastosConImpuestosPorDefecto'))) {
+						if ($gasto->fields['con_impuesto'] == 'SI' || (empty($gasto->fields['id_movimiento']) && Conf::GetConf($sesion, 'GastosConImpuestosPorDefecto'))) {
 							$con_impuesto_check = 'checked';
 						} else {
 							$con_impuesto_check = '';
@@ -614,7 +624,7 @@ $pagina->PrintTop($popup);
 			}
 		} ?>
 
-		<?php if (UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) { ?>
+		<?php if (Conf::GetConf($sesion, 'UsarGastosCobrable')) { ?>
 			<tr>
 				<td align="right">
 					<?php
@@ -640,8 +650,8 @@ $pagina->PrintTop($popup);
 				<td align="right">
 					<?php echo __('Ordenado por'); ?>
 				</td>
-				<td align="left">
-					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
+				<td align=left>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -649,20 +659,20 @@ $pagina->PrintTop($popup);
 			<td align="right">
 				<?php echo __('Ingresado por'); ?>
 			</td>
-			<td align="left">
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
+			<td align=left>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
 			</td>
 		</tr>
 	</table>
 
-	<br>
+	<br/>
 	<div class="fl">
 		<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_gastos').get(0));"><?php echo  __('Guardar'); ?></a>
 		<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar'); ?></a>
 	</div>
 </form>
 <script type="text/javascript">
-	<?php if (UtilesApp::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
+	<?php if (Conf::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
 		CargaIdioma("<?php echo $codigo_asunto; ?>");
 	<?php } ?>
 

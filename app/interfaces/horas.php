@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf.php'; 
+require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
@@ -90,16 +90,5 @@ if ($from == 'cliente') {
 	$url_iframe = "trabajos.php?popup=1&id_usuario=" . $id_usuario . "&motivo=horas";
 }
 
-if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
-	$url_iframe .= "&glosa_actividad=" . $glosa_actividad;
-	if (isset($sin_actividad_definida) && $sin_actividad_definida) {
-		$url_iframe .= "&sin_actividad_definida==1";
-	}
-}
-
-
-
-
 echo "<iframe name='trabajos' class='resizableframe'  id='trabajos' src='" . $url_iframe . "' frameborder=0 width=100% height=2000px></iframe>";
 $pagina->PrintBottom();
-

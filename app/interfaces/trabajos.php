@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(dirname(__FILE__)).'/conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
@@ -9,6 +10,7 @@ $p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
 $params_array['codigo_permiso'] = 'COB';
 $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
+
 if ($p_cobranza->fields['permitido']) {
 	$p_revisor->fields['permitido'] = true;
 }
@@ -24,6 +26,7 @@ if ($motivo == 'cobros' && $id_cobro) {
 	}
 
 	if ($opc != 'buscar') {
+
 		if ($fecha_ini == '' || $fecha_ini == '00-00-0000' || $fecha_ini == NULL) {
 			$fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
 		}
@@ -37,6 +40,7 @@ if ($motivo == 'cobros' && $id_cobro) {
 if ($p_revisor->fields['permitido'] && $accion == "eliminar") {
 	$trabajo = new Trabajo($sesion);
 	$trabajo->Load($id_trabajo);
+
 	if (!$trabajo->Eliminar()) {
 		$pagina->AddError($asunto->error);
 	} else {
@@ -93,6 +97,7 @@ if ($p_revisor->fields['permitido']) {
 } else {
 	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields[id_usuario] . ") OR usuario.id_usuario=" . $sesion->usuario->fields[id_usuario] . ")";
 }
+
 $select_usuario = Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' " . $where_usuario . " ORDER BY nombre ASC", "id_usuario", $id_usuario, '', 'Todos', '200');
 
 if (isset($cobro) || $opc == 'buscar' || $excel) {
@@ -256,6 +261,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			$where .= " AND cliente.id_grupo_cliente = $id_grupo";
 		}
 	}
+
+	if ($id_area_usuario) {
+		$where .= " AND usuario.id_area_usuario = $id_area_usuario ";
+	}
+
 	if ($clientes) {
 		$where .= "	AND cliente.codigo_cliente IN ('" . base64_decode($clientes) . "')";
 	}
@@ -271,14 +281,10 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	}
 
 	// Filtro para Actividades si están activos
-
-	if (isset($glosa_actividad) && $glosa_actividad != '') {
-		if (isset($sin_actividad_definida) && $sin_actividad_definida) {
-			$where .= " AND ( trabajo.codigo_actividad IS NULL OR trabajo.codigo_actividad = '' OR trabajo.codigo_actividad = 0 ) ";
-		} else {
-			$where .= " AND actividad.glosa_actividad = '$glosa_actividad'";
-		}
+	if (UtilesApp::GetConf($sesion, 'UsoActividades') && !empty($codigo_actividad)) {
+		$where .= " AND actividad.codigo_actividad = '$codigo_actividad'";
 	}
+
 		$wherelocal=$where;
 		 global $where, $query;
 		 $where=$wherelocal;
@@ -299,8 +305,6 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 				LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
 				WHERE $where ";
 
-
-	 // echo $query;
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($total_duracion, $total_duracion_trabajada) = mysql_fetch_array($resp);
 
@@ -308,7 +312,6 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		$select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	}
-
 
 	#BUSCAR
 	$query = "SELECT  SQL_CALC_FOUND_ROWS
@@ -370,7 +373,6 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 				LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 				WHERE $where ";
 
-
 				//echo $query;
 	if ($excel && $simplificado) {
 		$query = str_replace('SELECT  SQL_CALC_FOUND_ROWS', 'SELECT  SQL_BIG_RESULT SQL_NO_CACHE  ', $query);
@@ -411,17 +413,17 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 
 		$cobro->GuardarCobro();
 	}
+
 	//Se hace la lista para la edición de TODOS los trabajos del query
 	//A la página de editar multiples trabajos se le pasa encriptado el where
 	//de esta manera no se sobrecarga esta página
 	//Esta comentado hasta encontrar una buena manera de encriptarlo
 	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
 
-
-
 	if ($orden == "") {
 		$orden = " trabajo.fecha ASC, trabajo.descripcion";
 	}
+
 	if (stristr($orden, ".") === FALSE) {
 		$orden = str_replace("codigo_asunto", "a1.codigo_asunto", $orden);
 	}
@@ -431,24 +433,31 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	$b->mensaje_error_fecha = "N/A";
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('trabajos');
+
 	if ($p_revisor->fields['permitido']) {
 		$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas trabajadas') . ": </b>" . number_format($total_duracion_trabajada, 1) . "</span></td></tr></table>";
 	}
+
 	$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas cobrables corregidas') . ": </b>" . number_format($total_duracion, 1) . "</span></td></tr></table>";
 	$b->AgregarFuncion("Editar", 'Editar', "align=center nowrap");
 	$b->AgregarEncabezado("trabajo.fecha", __('Fecha'));
 	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "align=left");
 	$b->AgregarEncabezado("asunto.codigo_asunto", __('Asunto'), "align=left");
+
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		$b->AgregarEncabezado("actividad.glosa_actividad", __('Actividad'), "align=left");
 	}
+
 	$b->AgregarEncabezado("glosa_cobrable", __('Cobrable'), "", "", "");
+
 	if ($p_revisor->fields['permitido']) {
 		$glosa_duracion = __('Hrs Trab./Cobro.');
 	} else {
 		$glosa_duracion = __('Hrs trab.');
 	}
+
 	$b->AgregarEncabezado("duracion", $glosa_duracion, "", "", "SplitDuracion");
+
 	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido']) {
 		$b->AgregarEncabezado("trabajo.id_cobro", __('Cobro'), "align=left");
 	}
@@ -463,14 +472,13 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 }
 
 if ($excel) {
+
 	if ($p_cobranza->fields['permitido']) {
 		$orden = "cliente.glosa_cliente,contrato.id_contrato,asunto.glosa_asunto,trabajo.fecha,trabajo.descripcion";
 	}
+
 	$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 	$lista = $b1->lista;
-
-//			require_once Conf::ServerDir().'/interfaces/cobros_generales2.php';
-//			exit;
 
 	if ($p_cobranza->fields['permitido'] && UtilesApp::GetConf($sesion, 'CobranzaExcel')) {
 		require_once('cobros_generales.xls.php');
@@ -479,6 +487,7 @@ if ($excel) {
 	} else {
 		require_once('cobros3.xls.php');
 	}
+
 	exit;
 }
 
@@ -490,9 +499,11 @@ if ($word) {
 $pagina->titulo = __('Listado de trabajos');
 $pagina->PrintTop($popup);
 ?>
+
 <script type="text/javascript">
-	function GrabarCampo(accion,id_trabajo,cobro,valor)
-	{
+
+	function GrabarCampo(accion,id_trabajo,cobro,valor) {
+
 		var http = getXMLHTTP();
 		if (valor) {
 			valor = '1';
@@ -502,7 +513,9 @@ $pagina->PrintTop($popup);
 
 		loading("Actualizando opciones");
 		http.open('get', 'ajax_grabar_campo.php?accion=' + accion + '&id_trabajo=' + id_trabajo + '&id_cobro=' + cobro + '&valor=' + valor);
+
 		http.onreadystatechange = function() {
+
 			if (http.readyState == 4) {
 				var response = http.responseText;
 				var update = new Array();
@@ -511,29 +524,29 @@ $pagina->PrintTop($popup);
 				}
 				offLoading();
 			}
+
 		};
 		http.send(null);
 	}
 
-	function Refrescar()
-	{
+	function Refrescar() {
 		//todo if $motivo=="cobros",$motivo=="horas"
 		var pagina_desde = '<?php echo $desde ? "&desde=$desde" : ''; ?>';
 		var orden = '<?php echo $desde ? "&orden=$orden" : ''; ?>';
-<?php
-if ($motivo == "horas") {
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		<?php
+		if ($motivo == "horas") {
+			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		?>
 				var cliente = 'codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
 				var asunto = 'codigo_asunto_secundario='+$('codigo_asunto_secundario').value;
-		<?php
-	} else {
-		?>
+			<?php
+			} else {
+			?>
 				var cliente = 'codigo_cliente='+$('codigo_cliente').value;
 				var asunto = 'codigo_asunto='+$('codigo_asunto').value;
 		<?php
-	}
-	?>
+		}
+		?>
 
 			var cobrado = $('cobrado').value;
 			var cobrable = $('cobrable').value;
@@ -556,21 +569,23 @@ if ($motivo == "horas") {
 				+ "&fecha_fin=" + fecha_fin
 				+ pagina_desde
 				+ orden;
-	<?php
-} else if ($motivo == "cobros") {
-	?>
+
+		<?php
+		} else if ($motivo == "cobros") {
+		?>
+
 			var fecha_ini = $('fecha_ini').value;
 			var fecha_fin = $('fecha_fin').value;
 			var url = "trabajos.php?id_cobro=<?php echo $id_cobro ?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
 
-<?php } ?>
+		<?php } ?>
 
 		self.location.href= url;
 	}
 
 
-	function GuardarCampoTrabajo(id,campo,valor)
-	{
+	function GuardarCampoTrabajo(id,campo,valor) {
+
 		var http = getXMLHTTP();
 		var url = 'ajax.php?accion=actualizar_trabajo&id=' + id + '&campo=' + campo + '&valor=' + valor;
 
@@ -707,6 +722,14 @@ if ($motivo == "horas") {
 								}
 								?>
 								<tr>
+									<td class="buscadorlabel" align="right">
+										<?php echo __('Grupo Cliente')?>
+									</td>
+									<td align="left">
+										<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", "Ninguno","width=100px")  ?>
+									</td>
+								</tr>
+								<tr>
 
 									<td class="buscadorlabel"><?php echo __('Nombre Cliente') ?></td>
 									<td nowrap align='left' colspan="2">
@@ -717,22 +740,27 @@ if ($motivo == "horas") {
 								<tr>
 									<td class="buscadorlabel"><?php echo __('Asunto') ?></td>
 									<td nowrap align='left' colspan="2">
-										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+
+										<?php
+										if (Conf::GetConf($sesion,'UsoActividades')) {
+											$oncambio .= 'CargarActividad();';
+										}?>
+
+										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320,$oncambio); ?>
 
 									</td>
 								</tr>
 								<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_filtros_trabajos'):false; ?>
 
 								<?php if (UtilesApp::GetConf($sesion, 'UsoActividades')) { ?>
-									<tr>
-										<td class="buscadorlabel"><?php echo __('Actividad') ?></td>
-										<td nowrap align='left' colspan="2">
-											<?php echo Html::SelectQuery($sesion, "SELECT IF( glosa_actividad != '', glosa_actividad, 'Indefinido' ) as glosa_actividad,'' FROM actividad GROUP BY glosa_actividad", "glosa_actividad", $glosa_actividad, '', 'Cualquiera', '200'); ?>
-										</td>
-									</tr>
-									<?php
-								}
-								?>
+								<tr>
+									<td class="buscadorlabel"><?php echo __('Actividad') ?></td>
+									<td align=left width="440" nowrap>
+										<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 300, $codigo_asunto); ?>
+									</td>
+								</tr>
+								<?php } ?>
+
 								<tr>
 									<td class="buscadorlabel">
 										<?php echo __('Encargado Comercial') ?>
@@ -741,7 +769,9 @@ if ($motivo == "horas") {
 										<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='SOC' ORDER BY nombre ASC", "id_encargado_comercial", $id_encargado_comercial, '', 'Todos', '200'); ?>
 									</td>
 								</tr>
+
 								<?php
+
 								// Explicacion adicional: Esa condición "strlen($select_usuario) > 164" esta validando si hay mas usuarios
 								// que solamente Admin Lemontech
 								// TODO: WTF!
@@ -749,12 +779,33 @@ if ($motivo == "horas") {
 								//if (strlen($select_usuario) > 164) { // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
 								// mejor que siempre salga
 
-									?>
-									<tr>
-										<td class="buscadorlabel"><?php echo __('Usuario') ?></td>
-										<td align='left' colspan="2"><?php echo $select_usuario ?></td>
-									</tr>
-									<?php
+								?>
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Usuario') ?>
+									</td>
+									<td align='left' colspan="2">
+										<?php echo $select_usuario ?>
+									</td>
+								</tr>
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Área Usuario') ?>
+										<?php if ( Conf::GetConf($sesion, 'ValidacionesCliente') ) echo $obligatorio ?>
+									</td>
+									<td valign="top" class="texto" align="left">
+										<?php
+											$query_areas = 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa';
+											if ( Conf::GetConf($sesion, 'UsarModuloRetribuciones') ) {
+												$query_areas = 'SELECT area.id, CONCAT(REPEAT("&nbsp;", IF(ISNULL(padre.id), 0, 5)), area.glosa) FROM prm_area_usuario AS area
+																LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
+																ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
+											}
+											echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", "Ninguna")
+ 										?>
+									</td>
+								</tr>
+								<?php
 
 							}
 							// Validando fecha
@@ -1112,17 +1163,24 @@ function funcionTR(& $trabajo) {
 ?>
 <script type="text/javascript">
 
+	function CargarActividad() {
+		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+	}
 
 	jQuery(document).ready(function() {
 
+		jQuery('#campo_codigo_actividad').hide();
 
 		jQuery('#descargapro').click(function() {
+
 			jQuery('#descargapro').attr('disabled','disabled');
 			var Where='<?php echo base64_encode($where) ?>';
 			var Idcobro='<?php echo $id_cobro; ?>';
 			var Motivo='<?php echo $motivo; ?>';
 			jQuery.post('ajax/estimar_datos.php',{where:Where,id_cobro:Idcobro,motivo:Motivo},function(data) {
+
 				if(parseInt(data)>15000) {
+
 					var formated=data/1000;
 					var dialogoconfirma=top.window.jQuery( "#dialog-confirm" );
 					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');

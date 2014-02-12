@@ -661,6 +661,8 @@ class Reporte {
 				break;
 
 			case "horas_cobrables":
+			case 'horas_spot':
+			case 'horas_convenio':
 				$s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600.0";
 				break;
 
@@ -735,6 +737,7 @@ class Reporte {
 				$s .= $datos_monedas . ",SUM( ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*cut.costo_hh * 	(TIME_TO_SEC( duracion)/3600)	) ";
 
 				break;
+
 		}
 		$s .= ' as ' . $this->tipo_dato;
 		return $s;
@@ -897,30 +900,37 @@ class Reporte {
 		}
 
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
-		if (
-			$this->requiereMoneda($this->tipo_dato)
-			&& $this->tipo_dato != 'valor_hora'
-			&& $this->tipo_dato != 'costo'
-			&& $this->tipo_dato != 'costo_hh'
-			&& $this->cobroQuery()
-			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0]
-			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
-			&& !$this->ignorar_cobros_sin_horas
-		) {
+	 	if (
+		 	$this->requiereMoneda($this->tipo_dato)
+		 	&& $this->tipo_dato != 'valor_hora'
+		 	&& $this->tipo_dato != 'costo'
+		 	&& $this->tipo_dato != 'costo_hh'
+		 	&& $this->cobroQuery()
+		 	&& !$this->filtros['usuario.id_area_usuario']['positivo'][0]
+		 	&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
+		 	&& !$this->ignorar_cobros_sin_horas ) {
 
-			$cobroquery = $this->cobroQuery();
-			$stringquery = " \n\n\n union all \n\n\n $cobroquery";
-			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . $stringquery . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
-			$respt = mysql_query($testimonio, $this->sesion->dbh);
+				$cobroquery = $this->cobroQuery();
+				$stringquery = " \n\n\n union all \n\n\n $cobroquery";
 
-			$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
-			while ($row = mysql_fetch_array($resp)) {
-				$this->row[] = $row;
-			}
-		} else {
-			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
-			$respt = mysql_query($testimonio, $this->sesion->dbh);
+				/* UTILIZADO PARA DEBUG */
+
+				// $testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . $stringquery . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
+				// $respt = mysql_query($testimonio, $this->sesion->dbh);
+
+				$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while ($row = mysql_fetch_array($resp)) {
+					$this->row[] = $row;
+				}
 		}
+
+		/* UTILIZADO PARA DEBUG */
+		// } else {
+		//  	$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
+		//  	$respt = mysql_query($testimonio, $this->sesion->dbh);
+		// }
+
 	}
 
 	/*

@@ -100,7 +100,7 @@
 			<li><a href='resumen_cliente.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte de Ventas')?></a></li>
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_facturacion_pendiente.php' style="color:#000;text-decoration: none;"><?php echo __('Horas por facturar')?></a></li>
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_cobros_por_area.php' style="color:#000;text-decoration: none;"><?php echo __('Cobros por Area')?></a></li>
-      
+
 
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reporte_liq_no_facturadas.php' style="color:#000;text-decoration: none;"><?php echo __('Cobros').' por facturar';?></a></li>
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_resumen_cobranza.php' style="color:#000;text-decoration: none;"><?php echo __('Resumen de Liquidaciones')?></a></li>
@@ -131,10 +131,10 @@
 				<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reportes_horas.php' style="color:#000;text-decoration: none;"><?php echo __('Gráfico por Período')?></a></li>
 				<li><a href='planillas.php' style="color:#000;text-decoration: none;"><?php echo __('Profesional v/s Cliente')?></a></li>
 				<li><a href='olap.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte gen&eacute;rico')?></a></li>
-		<? if ($modulo_retribuciones_activo && $sesion->usuario->TienePermiso('RET')) { ?>
+		<?php if ($modulo_retribuciones_activo && $sesion->usuario->TienePermiso('RET')) { ?>
 	       		<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reporte_retribuciones_b.php' style="color:#000;text-decoration: none;"><?php echo 'Detalle de ' . __('Retribuciones') . ' por ' . __('Cobro');?></a></li>
 	        	<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reporte_retribuciones_resumen_b.php' style="color:#000;text-decoration: none;"><?php echo 'Resumen de ' . __('Retribuciones') . ' por ' . __('Profesional');?></a></li>
-		 <?php }?>
+		 <?php } ?>
 
       </ul>
 		</td>
@@ -199,7 +199,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_alertas_graficas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Alertas')?></a></li>
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_saldo.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Saldo Clientes')?></a></li>
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_deudas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Antigüedad Deudas Clientes')?></a></li>
-
+			<?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_link_reporte') : false; ?>
 			</ul>
 			</td>
 

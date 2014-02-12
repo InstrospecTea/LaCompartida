@@ -1366,6 +1366,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			var respuesta = RevisarTarifasRequest(tarifa, moneda);
 			var parts = respuesta.split("::");
 			var todos = false;
+
 			if( parts[0] > 0)
 			{
 				text_window += "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br></span>";
@@ -1419,7 +1420,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							respuesta_revisar_tarifa = true;
 							if( !desde_combo )
 							{
-								if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto')
+								if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_cliente')
 								{
 									Validar(f);
 								}
@@ -1443,7 +1444,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				respuesta_revisar_tarifa = true;
 				if( !desde_combo )
 				{
-					if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto' )
+					if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_asunto' )
 					{
 						Validar(f);
 					}
@@ -1459,7 +1460,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		{
 			if( !desde_combo )
 			{
-				if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto' )
+				if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_asunto' )
 				{
 					Validar(f);
 				}
@@ -1587,10 +1588,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 </script>
 <?php if ($popup && !$motivo) { ?>
 
-	<form name='formulario' id='formulario' method=post>
-		<input type=hidden name=codigo_cliente value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
-		<input type=hidden name='opcion_contrato' value="guardar_contrato" />
-		<input type=hidden name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
+	<form name='formulario' id='formulario' method="post">
+		<input type="hidden" name="codigo_cliente" value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
+		<input type="hidden" name='opcion_contrato' value="guardar_contrato" />
+		<input type="hidden" name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
 		<input type="hidden" name="desde" value="agregar_contrato" />
 <?php } ?>
 	<br />
@@ -1837,7 +1838,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	?>
 								</td>
 								<td align="left" colspan="5">
-									<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
+									<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
+										<?php echo Html::SelectQuery($Sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "factura_giro", $contrato->fields['factura_giro'], "", ""); ?>
+									<?php } else { ?>
+										<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
+									<?php } ?>
 								</td>
 							</tr>
 							<tr>
@@ -2042,7 +2047,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 		?>
 									</td>
 									<td align="left" colspan='3'>
-										<?php echo Html::SelectQuery($Sesion, "SELECT titulo, glosa_titulo FROM prm_titulo_persona ORDER BY id_titulo", "titulo_contacto", $contrato->fields['titulo_contacto'] ? $contrato->fields['titulo_contacto'] : '', '', 'Vacio', 65); ?>&nbsp;&nbsp;
+										<?php echo Html::SelectQuery($Sesion, "SELECT titulo, glosa_titulo FROM prm_titulo_persona ORDER BY id_titulo", "titulo_contacto", $contrato->fields['titulo_contacto'] ? $contrato->fields['titulo_contacto'] : '', '', 'Vacio', 120); ?>&nbsp;&nbsp;
 									</td>
 								</tr>
 								<tr>
@@ -2222,6 +2227,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 												$usuarios_retainer = explode(',', $contrato->fields['retainer_usuarios']);
 											?>
 									<td align="left" style="font-size:10pt;">
+										<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/> 
 										<div id="div_cobro" class="buttonset">
 											<input <?php echo TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
 											<label for="fc1">Tasas/HH</label>&nbsp;
@@ -2246,9 +2252,9 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 											<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 												<span id="span_monto">&nbsp;<?php echo __('Monto') ?>
 												<?php if ($validaciones_segun_config)
-													echo $obligatorio
-													?>
-													&nbsp;<input id='monto' name=monto size="7" value="<?php echo $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
+													echo $obligatorio ?>
+													<input type="hidden" id="monto_posterior"  name="monto_posterior" value="<?php echo $contrato->fields['monto'] ?>"/> 
+													&nbsp;<input id="monto" name="monto" size="7" value="<?php echo $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
 												</span>
 												&nbsp;&nbsp;<?php echo __('Moneda') ?>
 <?php if ($validaciones_segun_config)
@@ -2264,7 +2270,7 @@ Html::SelectQuery($Sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER 
 															<?php if ($validaciones_segun_config)
 																echo $obligatorio
 																?>
-												&nbsp;<input name=retainer_horas size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
+												&nbsp;<input name="retainer_horas" size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
 												<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se
 														 desuentan las horas con preferencia -->
 <?php if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'RetainerUsuarios')) { ?>
@@ -2284,7 +2290,7 @@ Html::SelectQuery($Sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER 
 		echo $obligatorio
 		?>
 															</td>
-															<td align=left>&nbsp;<label style='background-color:#FFFFFF'> <?php echo $cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0; ?> </label></td>
+															<td align="left">&nbsp;<label style='background-color:#FFFFFF'> <?php echo $cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0; ?> </label></td>
 														</tr>
 																		<?php } ?>
 													<tr>
@@ -3025,6 +3031,189 @@ if ($solicitante == 0) {  // no mostrar
 ?>
 					<br>
 					<!-- ASOCIAR DOC LEGALES -->
+
+				<!-- Modulo de -->
+				<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
+					<script>
+						jQuery('document').ready(function() {
+							var $ = jQuery;
+							var generator_url = "<? echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+							var actionButtons = function(id_contract_generator) {
+								return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
+					            	<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
+					            	<a data-id="' + id_contract_generator + '" class="fl delete_generator ui-button cruz_roja" style="margin: 3px 1px;width: 18px;height: 18px;" title="Eliminar Generador">&nbsp;</a>\
+					            </td>';
+							};
+
+							var showAlert = function(type, message) {
+								var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
+									<tbody><tr>\
+										<td valign="top" align="left" style="font-size: 12px;">\
+										' + message + '</td>\
+									</tr></tbody>\
+								</table></br></div>';
+								$('#user_generators_form').before(alert_html);
+								setTimeout(function(){
+									$('#generator_message').remove()
+								}, 3000);
+							};
+
+							var loadGeneratorForm = function(state, data) {
+								$('#form_generator_status').val(state);
+								if (state == 'NEW') {
+									$('#id_contract_generator').val('');
+									$('#id_user_generator').val('');
+									$('#percent_generator').val('');
+									$('#add_generator').val('Agregar');
+									$('#cancel_generator').val('Cancelar').hide();
+								} else if (state == 'EDIT') {
+									$('#id_contract_generator').val(data.id_contract_generator);
+									$('#id_user_generator').val(data.id_user_generator);
+									$('#percent_generator').val(data.percent_generator);
+									$('#add_generator').val('Modificar');
+									$('#cancel_generator').val('Cancelar').show();
+								}
+							}
+
+							var loadGenerators = function() {
+								$.ajax({url: generator_url})
+									.done(function(data) {
+										rows = $('<tbody>');
+										header = $("<tr bgcolor='#A3D55C'>")
+										header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
+										header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
+										header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
+										header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
+										rows.append(header);
+				          	$.each(data, function(i, generator){
+				          		generator_row = $('<tr>');
+											generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
+											generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
+											generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">%' + generator.porcentaje_genera + '</td>');
+											generator_row.append(actionButtons(generator.id_contrato_generador));
+				          		rows.append(generator_row)
+				          	});
+				          	$('#user_generators_result').html(rows)
+				        	});
+							};
+
+							$(document).on('click', '.edit_generator', function() {
+								var percent = $(this).closest('tr').find('.percent-data').data('percent_value');
+								var user_id = $(this).closest('tr').find('.user-data').data('user_id');
+								var generator_id = $(this).data('id');
+								loadGeneratorForm('EDIT', {
+									id_contract_generator: generator_id,
+									id_user_generator: user_id,
+									percent_generator: percent
+								});
+							});
+
+							$(document).on('click', '.delete_generator', function() {
+								if (!confirm('¿Seguro desea elminar este usuario?')) {
+									return;
+								}
+								var generator_id = $(this).data('id');
+								$.ajax({
+									url: generator_url + '/' + generator_id,
+									type: 'DELETE'
+								}).done(function(data) {
+									loadGenerators();
+								});
+							});
+
+							$(document).on('click', '#cancel_generator', function() {
+								loadGeneratorForm('NEW', {});
+							});
+
+
+							$('#add_generator').click(function() {
+								var percent = $('#percent_generator').val();
+								var user = $('#id_user_generator').val();
+								var id_contract_generator = $('#id_contract_generator').val();
+								var form_status = $('#form_generator_status').val();
+								if (percent && user && percent.length > 0) {
+									if (parseInt(percent) < 1 || parseInt(percent) > 100) {
+										showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
+										return;
+									}
+
+									if (form_status == 'EDIT') {
+										$.ajax({
+											url: generator_url + '/' + id_contract_generator,
+											type: 'POST',
+											data: {percent_generator: percent}
+										}).done(function(data) {
+											loadGeneratorForm('NEW', {});
+											loadGenerators();
+										});
+									} else if (form_status == 'NEW') {
+										if ($('td[data-user_id="' + user + '"]').length > 0) {
+											showAlert('alerta', 'El profesional ya existe, favor agregue otro o modifíquelo desde el listado');
+											return;
+										}
+										$.ajax({
+											url: generator_url,
+											type: 'PUT',
+											data: {
+												percent_generator: percent,
+												user_id:user
+											}
+										}).done(function(data) {
+											showAlert('info', 'Profesional agregado con éxito');
+											loadGeneratorForm('NEW', {});
+											loadGenerators();
+										});
+									}
+								} else {
+									showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
+								}
+							});
+							loadGeneratorForm('NEW', {});
+							loadGenerators();
+						});
+					</script>
+
+					<fieldset class="border_plomo tb_base">
+						<legend><?php echo __('Profesionales') . ' ' . __('Generadores') ?></legend>
+						<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_form">
+							<tbody>
+								<tr>
+									<td>
+										<?php echo __('Profesional') ?>
+										</td>
+									<td>
+										<?
+										echo Html::SelectQuery($Sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+																					FROM usuario
+																					WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
+																					AND usuario.activo = 1
+																					ORDER BY usuario.apellido1", "id_user_generator", "", "  ", "Seleccione", "200");
+																					?>
+										</td>
+									<td>
+										Porcentaje Genera:
+										</td>
+									<td>
+										<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">
+										</td>
+									<td>
+										<input type="hidden" id="form_generator_status" value="" />
+										<input type="hidden" id="id_contract_generator" value="" />
+										<input type="button" id="add_generator" value='<?php echo __('Agregar') . ' ' . __('Generador') ?>' class='btn' >&nbsp;
+										<input type="button" id="cancel_generator" value='<?php echo __('Cancelar') ?>' class='btn' />
+										</td>
+								<tr>
+							</tbody>
+						</table>
+
+						<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_result">
+
+						</table>
+					</fieldset>
+					<br>
+				<? } ?>
+
+				<!-- Fin modulo de generadores -->
 
 					<!-- GUARDAR -->
 <?php if ($popup && !$motivo) { ?>
