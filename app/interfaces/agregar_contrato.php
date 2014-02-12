@@ -1366,6 +1366,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			var respuesta = RevisarTarifasRequest(tarifa, moneda);
 			var parts = respuesta.split("::");
 			var todos = false;
+
 			if( parts[0] > 0)
 			{
 				text_window += "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br></span>";
@@ -1419,7 +1420,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							respuesta_revisar_tarifa = true;
 							if( !desde_combo )
 							{
-								if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto')
+								if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_cliente' == 'agregar_asunto')
 								{
 									Validar(f);
 								}
@@ -1443,7 +1444,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				respuesta_revisar_tarifa = true;
 				if( !desde_combo )
 				{
-					if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto' )
+					if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_asunto' )
 					{
 						Validar(f);
 					}
@@ -1459,7 +1460,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		{
 			if( !desde_combo )
 			{
-				if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto' )
+				if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_asunto' )
 				{
 					Validar(f);
 				}
