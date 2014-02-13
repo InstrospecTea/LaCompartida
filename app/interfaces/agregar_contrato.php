@@ -248,21 +248,45 @@ $query_count = "SELECT COUNT(usuario.id_usuario)
 				WHERE codigo_permiso='SOC'";
 $resp = mysql_query($query_count, $Sesion->dbh);
 list($cant_encargados) = mysql_fetch_array($resp);
+
+// Para validaciones de plugins activos de momento solo para "facturacion_electronica_mx"
+$query_plugins = "SELECT archivo_nombre FROM prm_plugin 
+	WHERE activo = 1 and archivo_nombre = 'facturacion_electronica_mx.php'";
+$resp_plugins = mysql_query($query_plugins, $Sesion->dbh);
+list ($plugins_activos) = mysql_fetch_array($resp_plugins);
+
 ?>
 <script type="text/javascript">
+
 	function ValidarContrato(form)
 	{
-		if(!form) var form = jQuery('[name="formulario"]').get(0);
 
+		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
+		console.log(plugin_facturacion_mx);
+		if (plugin_facturacion_mx != ''){
+			if(form.id_pais.options[0].selected == true) {
+				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");
+				form.id_pais.focus();
+				return false;
+			}
+		}
 
+		if(!form) {
+			var form = jQuery('[name="formulario"]').get(0);
+		}
 
-<?php if (UtilesApp::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
+		<?php if (UtilesApp::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
 			if (!validar_doc_legales(true)){
 				return false;
 			}
-<?php } ?>
+		<?php } ?>
 
-<?php if ($validaciones_segun_config) { ?>
+		<?php if ($plugins_activos == 'facturacion_electronica_mx.php') { ?>
+			alert('ok existe');
+		<?php } ?>
+
+
+		<?php if ($validaciones_segun_config) { ?>
 			// DATOS FACTURACION
 
 			if(!form.factura_rut.value)
