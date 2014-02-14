@@ -475,7 +475,7 @@ $pagina->PrintTop();
 			<tr  class="controls controls-row " >
 				<td class="ar"  width="200">
 					<div class="span2">
-<?php echo __('Codigo'); ?>
+						<?php echo __('Codigo'); ?>
 						<?php echo $obligatorio; ?>
 					</div >
 				</td>
@@ -483,14 +483,14 @@ $pagina->PrintTop();
 					<div   class="controls controls-row " style="white-space:nowrap;">	  
 						<input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
 						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('Código secundario') ?>
-								<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
-<?php
-if ($CodigoSecundario) {
-	echo "<span  class=\"help-inline\" style='color:#FF0000;'>*</span>";
-} else {
-	echo "<span class=\"help-inline\"  >(" . __('Opcional') . ")</span>";
-}
-?>
+							<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
+							<?php
+							if ($CodigoSecundario) {
+								echo "<span  class=\"help-inline\" style='color:#FF0000;'>*</span>";
+							} else {
+								echo "<span class=\"help-inline\"  >(" . __('Opcional') . ")</span>";
+							}
+							?>
 						</div>
 					</div>
 				</td>
@@ -552,7 +552,7 @@ if ($CodigoSecundario) {
 			<tr class="controls controls-row ">
 				<td class="ar">
 					<div class="span2">
-<?php echo __('Activo') ?>
+						<?php echo __('Activo') ?>
 					</div>
 				</td>
 				<td class="al">
@@ -576,7 +576,7 @@ if ($CodigoSecundario) {
 	<table width='100%' cellspacing="0" cellpadding="0">
 		<tr>
 			<td>
-<?php require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
+				<?php require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
 			</td>
 		</tr>
 	</table>
@@ -640,9 +640,9 @@ if ($CodigoSecundario) {
 
 					<a href="javascript:void(0);" icon="ui-icon-save" class="btn botonizame" onclick="<?php echo $funcion_validar; ?>" /><?php echo __('Guardar'); ?></a>
 
-<?php } else { ?>
-					<span style="font-size:10px;background-color:#C6DEAD"><?php echo __('No se han configurado encargados comerciales') . '<br>' . __('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.') ?></span>
-<?php } ?>
+				<?php } else { ?>
+						<span style="font-size:10px;background-color:#C6DEAD"><?php echo __('No se han configurado encargados comerciales') . '<br>' . __('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.') ?></span>
+				<?php } ?>
 
 			</td>
 		</tr>
