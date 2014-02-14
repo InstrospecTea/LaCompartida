@@ -102,7 +102,7 @@ if (!empty($cliente->fields["id_contrato"])) {
 	$contrato_defecto->Load($cliente->fields["id_contrato"]);
 }
 
-$validaciones_segun_config = UtilesApp::GetConf($Sesion, 'ValidacionesCliente');
+$validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 
 if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
@@ -135,7 +135,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		$val = true;
 	}
 
-	if (UtilesApp::GetConf($Sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
+	if (Conf::GetConf($Sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
 		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
 		$val = true;
 	}
@@ -195,7 +195,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 				$contrato_doc_legal->Write();
 			}
 
-			if (UtilesApp::GetConf($Sesion, 'EncargadoSecundario')) {
+			if (Conf::GetConf($Sesion, 'EncargadoSecundario')) {
 				mysql_query("UPDATE cliente SET id_usuario_encargado = '" .
 						((!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL") .
 						"' WHERE id_contrato = " . $contrato->fields['id_contrato'], $Sesion->dbh);
@@ -275,7 +275,7 @@ list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 			var form = jQuery('[name="formulario"]').get(0);
 		}
 
-		<?php if (UtilesApp::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
+		<?php if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
 			if (!validar_doc_legales(true)){
 				return false;
 			}
@@ -455,7 +455,7 @@ list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 							}
 
 <?php } ?>
-<?php if (UtilesApp::GetConf($Sesion, 'EncargadoSecundario')) { ?>
+<?php if (Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
 							if ($('id_usuario_secundario').value == '-1')
 							{
 								alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
@@ -1333,7 +1333,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					var cobro_independiente = '&cobro_independiente=NO';
 					//var cliente = '&codigo_cliente='+$('codigo_cliente').value;
 
-					var cliente = '&codigo_cliente='+$('<?php echo UtilesApp::GetConf($Sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente'; ?>').value;
+					var cliente = '&codigo_cliente='+$('<?php echo Conf::GetConf($Sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente'; ?>').value;
 
 				}
 			} else {
@@ -1496,9 +1496,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		}
 	}
 
-	var mismoEncargado = <?php echo UtilesApp::GetConf($Sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
-	var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($Sesion, "CopiarEncargadoAlAsunto") ) ? '1' : '0'; ?>;
-	var EncargadoSecundario=<?php echo (UtilesApp::GetConf($Sesion, "EncargadoSecundario") ) ? '1' : '0'; ?>;
+	var mismoEncargado = <?php echo Conf::GetConf($Sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
+	var CopiarEncargadoAlAsunto=<?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ) ? '1' : '0'; ?>;
+	var EncargadoSecundario=<?php echo (Conf::GetConf($Sesion, "EncargadoSecundario") ) ? '1' : '0'; ?>;
     var DesdeAgregaCliente=<?php echo ($desde_agrega_cliente ) ? '1' : '0'; ?>;
 
 	function CambioEncargado(elemento){
@@ -1646,7 +1646,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					&nbsp;<?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></label>
 				 </td>
 			</tr>
-		<?php if (UtilesApp::GetConf($Sesion, 'UsarImpuestoSeparado')) { ?>
+		<?php if (Conf::GetConf($Sesion, 'UsarImpuestoSeparado')) { ?>
 				<tr   class="controls controls-row ">
 					<td class="al">
 						<div class="span4">
@@ -1669,7 +1669,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</td>
 				</tr>
 				<?php 	}
-				if (UtilesApp::GetConf($Sesion, 'UsarImpuestoPorGastos')) {
+				if (Conf::GetConf($Sesion, 'UsarImpuestoPorGastos')) {
 				?>
 				<tr   class="controls controls-row ">
 					<td class="al"><div class="span4">
@@ -1696,7 +1696,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			if ($contrato->Loaded()) {
 				$separar_liquidaciones = $contrato->fields['separar_liquidaciones'];
 				$exportacion_ledes = $contrato->fields['exportacion_ledes'];
-			} else if (UtilesApp::GetConf($Sesion, 'SepararLiquidacionesPorDefecto')) {
+			} else if (Conf::GetConf($Sesion, 'SepararLiquidacionesPorDefecto')) {
 				$separar_liquidaciones = '1';
 			} else {
 				$separar_liquidaciones = '0';
@@ -1724,13 +1724,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 <td class="al">
 				<?php
 
-				if (UtilesApp::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
+				if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
 					echo Html::SelectQuery($Sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'], ' class="span3" onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
 					echo '(Se copia del contrato principal)';
 					echo '<input type="hidden" value="' . $contrato_defecto->fields['id_usuario_responsable'] . '" name="id_usuario_responsable" />';
 				} else {
 					if ($contrato_defecto->Loaded() && $contrato->Loaded()) {
-						if (UtilesApp::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente) {
+						if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente) {
 							echo Html::SelectQuery($Sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'class="span3"  onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
 							echo '<input type="hidden" value="' . $contrato_defecto->fields['id_usuario_responsable'] . '" name="id_usuario_responsable" />';
 							echo '(Se copia del contrato principal)';
@@ -1738,7 +1738,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							//FFF si estoy agregando o editando un asunto que se cobra por separado
 							echo Html::SelectQuery($Sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", ' class="span3" onchange="CambioEncargado(this)"', "Vacio", "200");
 						}
-					} else if (UtilesApp::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
+					} else if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
 						// Estoy creando un cliente (y su contrato por defecto).
 						echo Html::SelectQuery($Sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "  ", ' class="span3"  onchange="CambioEncargado(this)"', "Vacio", "200");
 					} else {
@@ -1760,14 +1760,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</div></td>
 				<td class="al">
 					<input name="retribucion_usuario_responsable" type="text" size="6" value="<?php
-						echo empty($contrato->fields['id_contrato']) ? UtilesApp::GetConf($Sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable'];
+						echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable'];
 					?>"/>%
 				</td>
 				</tr>
 			<?php
 			}//$modulo_retribuciones_activo
 
-			if (UtilesApp::GetConf($Sesion, 'EncargadoSecundario')) {
+			if (Conf::GetConf($Sesion, 'EncargadoSecundario')) {
 				$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 				FROM usuario
 				WHERE activo = 1 OR id_usuario = '" . $contrato->fields['id_usuario_secundario'] . "'
@@ -1793,14 +1793,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</div></td>
 				<td class="al">
 					<input name="retribucion_usuario_secundario" type="text" size="6" value="<?php
-						echo empty($contrato->fields['id_contrato']) ? UtilesApp::GetConf($Sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario'];
+						echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario'];
 					?>" />%
 				</td>
 				</tr>
 						<?php
 					}
 			}
-				  if (UtilesApp::GetConf($Sesion, 'ExportacionLedes')) { ?>
+				  if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
 					<tr   class="controls controls-row ">
 						<td class="al"><div class="span4">
 	<?php echo __('Usa exportación LEDES'); ?>
@@ -1815,7 +1815,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<br><br>
 					<!-- FIN RESPONSABLE -->
 					<?php
-					if (UtilesApp::GetConf($Sesion, 'SetFormatoRut'))
+					if (Conf::GetConf($Sesion, 'SetFormatoRut'))
 						$setformato = "SetFormatoRut();";
 					else
 						$setformato = "";
@@ -1988,7 +1988,7 @@ if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
 								</td>
 							</tr>
 							<?php
-							if (UtilesApp::GetConf($Sesion, 'SegundaCuentaBancaria')) {
+							if (Conf::GetConf($Sesion, 'SegundaCuentaBancaria')) {
 								$id_banco = false;
 								if ($contrato->fields['id_cuenta2'] && is_numeric($contrato->fields['id_cuenta2'])) {
 									$query_banco = "SELECT b.* FROM cuenta_banco c, prm_banco b WHERE b.id_banco = c.id_banco AND c.id_cuenta = '{$contrato->fields['id_cuenta2']}'";
@@ -2178,7 +2178,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 					if (!$opc_moneda_total)
 						$opc_moneda_total = Moneda::GetMonedaBase($Sesion);
 
-					$config_validar_tarifa = ( UtilesApp::GetConf($Sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
+					$config_validar_tarifa = ( Conf::GetConf($Sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 					?>
 
 					<!-- COBRANZA -->
@@ -2265,7 +2265,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TituloContacto
 											<label for="fc6">Proporcional</label> &nbsp;
 											<input <?php echo TTip($tip_hitos) ?>  class="formacobro"  id="fc7" type="radio" name="forma_cobro"  value="HITOS" <?php echo $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
 											<label for="fc7"><?php echo __('Hitos') ?></label>
-												<?php if (!UtilesApp::GetConf($Sesion, 'EsconderTarifaEscalonada')) { ?>
+												<?php if (!Conf::GetConf($Sesion, 'EsconderTarifaEscalonada')) { ?>
 												<input <?php echo TTip($tip_escalonada) ?>  class="formacobro"  id="fc8" type="radio" name="forma_cobro"  value="ESCALONADA" <?php echo $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
 												<label for="fc8"><?php echo __('Escalonada') ?></label>
 <?php } ?>
@@ -2733,7 +2733,7 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 												<?php echo __('Encargado Comercial'); ?></label>
 											</td>
 										</tr>
-<?php if (UtilesApp::GetConf($Sesion, 'EncargadoSecundario')) { ?>
+<?php if (Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
 											<tr>
 												<td>
 													<label for="notificar_encargado_secundario"> <input type="hidden" name="notificar_encargado_secundario" value="0"/><input type="checkbox" name="notificar_encargado_secundario" id="notificar_encargado_secundario" value="1" <?php echo $contrato->fields['notificar_encargado_secundario'] == '1' ? 'checked="checked"' : ''; ?> />
@@ -2820,8 +2820,8 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 								<td align="right" colspan='1'><?php echo __('Tamaño del papel') ?>:</td>
 								<td align="left" colspan='5'>
 							<?php
-							if ($contrato->fields['opc_papel'] == '' && UtilesApp::GetConf($Sesion, 'PapelPorDefecto')) {
-								$contrato->fields['opc_papel'] = UtilesApp::GetConf($Sesion, 'PapelPorDefecto');
+							if ($contrato->fields['opc_papel'] == '' && Conf::GetConf($Sesion, 'PapelPorDefecto')) {
+								$contrato->fields['opc_papel'] = Conf::GetConf($Sesion, 'PapelPorDefecto');
 							}
 							?>
 									<select name="opc_papel">
@@ -2924,7 +2924,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 								<td align="right" colspan='1'><input type="hidden" name="opc_ver_gastos" value="0"/><input type="checkbox" name="opc_ver_gastos"  value="1" <?php echo $contrato->fields['opc_ver_gastos'] == '1' ? 'checked="checked"' : '' ?> /></td>
 								<td align="left" colspan='5'><label><?php echo __('Mostrar gastos del cobro') ?></label></td>
 							</tr>
-							<?php if (UtilesApp::GetConf($Sesion, 'PrmGastos')) { ?>
+							<?php if (Conf::GetConf($Sesion, 'PrmGastos')) { ?>
 								<tr>
 									<td align="right" colspan='1'><input type="hidden" name="opc_ver_concepto_gastos" value="0"/><input type="checkbox" name="opc_ver_concepto_gastos"  value="1" <?php echo $contrato->fields['opc_ver_concepto_gastos'] == '1' ? 'checked="checked"' : '' ?> /></td>
 									<td align="left" colspan='5'><label><?php echo __('Mostrar concepto de gastos') ?></label></td>
@@ -2983,7 +2983,7 @@ if ($solicitante == 0) {  // no mostrar
 								<td align="right" colspan='1'><input type="hidden" name="opc_ver_cobrable" value="0"/><input type="checkbox" name="opc_ver_cobrable"  value="1" <?php echo $contrato->fields['opc_ver_cobrable'] == '1' ? 'checked="checked"' : '' ?> ></td>
 								<td align="left" colspan='5'><label><?php echo __('Mostrar trabajos no visibles') ?></label></td>
 							</tr>
-<?php if (UtilesApp::GetConf($Sesion, 'ResumenProfesionalVial') ) { ?>
+<?php if (Conf::GetConf($Sesion, 'ResumenProfesionalVial') ) { ?>
 								<tr>
 									<td align="right" colspan='1'><input type="hidden" name="opc_restar_retainer" value="0"/><input type="checkbox" name="opc_restar_retainer"  value="1" <?php echo $contrato->fields['opc_restar_retainer'] == '1' ? 'checked="checked"' : '' ?>  /></td>
 									<td align="left" colspan='5'><label><?php echo __('Restar valor retainer') ?></label></td>
@@ -3038,7 +3038,7 @@ if ($solicitante == 0) {  // no mostrar
 
 					<!-- ASOCIAR DOC LEGALES -->
 									<?php
-									if (UtilesApp::GetConf($Sesion, 'NuevoModuloFactura')) {
+									if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) {
 										?>
 						<fieldset style="width: 97%; background-color: #FFFFFF;">
 							<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'div_doc_legales_asociados\')" style="cursor:pointer"' : '' ?>>
@@ -3247,7 +3247,7 @@ if ($solicitante == 0) {  // no mostrar
 								<tr>
 									<td colspan=6 align="center">
 	<?php
-	if (UtilesApp::GetConf($Sesion, 'RevisarTarifas')) {
+	if (Conf::GetConf($Sesion, 'RevisarTarifas')) {
 		?>
 											<input type="button" class=btn value="<?php echo __('Guardar') ?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false);" />
 		<?php
@@ -3312,8 +3312,8 @@ if ($solicitante == 0) {  // no mostrar
 							actualizarMoneda();
 
 <?php
-if (UtilesApp::GetConf($Sesion, "CopiarEncargadoAlAsunto") && !$desde_agrega_cliente) {
-	if (UtilesApp::GetConf($Sesion, 'EncargadoSecundario')) {
+if (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") && !$desde_agrega_cliente) {
+	if (Conf::GetConf($Sesion, 'EncargadoSecundario')) {
 		echo "if(jQuery('#id_usuario_secundario').length>0) jQuery('#id_usuario_secundario').attr('disabled','disabled');";
 	}
 	echo "if(jQuery('#id_usuario_encargado').length>0) jQuery('#id_usuario_encargado').attr('disabled','disabled');";
