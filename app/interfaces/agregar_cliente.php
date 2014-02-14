@@ -11,8 +11,8 @@ $contrato = new Contrato($sesion);
 $archivo = new Archivo($sesion);
 $codigo_obligatorio = true;
 
-if ( Conf::GetConf($sesion, 'CodigoObligatorio') )   {
-	if (!Conf::CodigoObligatorio()){
+if (Conf::GetConf($sesion, 'CodigoObligatorio')) {
+	if (!Conf::CodigoObligatorio()) {
 		$codigo_obligatorio = false;
 	} else {
 		$codigo_obligatorio = true;
@@ -29,7 +29,7 @@ if ($id_cliente > 0) {
 
 $validaciones_segun_config = Conf::GetConf($sesion, 'ValidacionesCliente');
 
-if ($validaciones_segun_config){
+if($validaciones_segun_config) {
 	$obligatorio = '<span class="req">*</span>';
 } else {
 	$obligatorio = '';
@@ -410,14 +410,14 @@ if ( Conf::GetConf($sesion, 'VerCampoUsuarioEncargado') != 1) {
 		if(Conf::GetConf($sesion, 'AtacheSecundarioSoloAsunto')==0) {
 
 			$segmento_usuario_encargado .= '<tr  class="controls controls-row ">';
-				$segmento_usuario_encargado .='<td class="ar">';
-				 	$segmento_usuario_encargado .= '<div class="span2">'. __('Usuario encargado').' </div> ';
-						$segmento_usuario_encargado .= $obligatorio;
-				$segmento_usuario_encargado .= '</td>';
-				$segmento_usuario_encargado .= '<td class="al"> ';
-					$id_default = $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '';
-					$segmento_usuario_encargado .= Html::SelectQuery($sesion, $query, "id_usuario_encargado", $id_default,  " class='span3' ", 'Vacio', 'width="170"');
-				$segmento_usuario_encargado .= '</td>';
+			$segmento_usuario_encargado .='<td class="ar">';
+		 	$segmento_usuario_encargado .= '<div class="span2">'. __('Usuario encargado').' </div> ';
+			$segmento_usuario_encargado .= $obligatorio;
+			$segmento_usuario_encargado .= '</td>';
+			$segmento_usuario_encargado .= '<td class="al"> ';
+			$id_default = $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '';
+			$segmento_usuario_encargado .= Html::SelectQuery($sesion, $query, "id_usuario_encargado", $id_default,  " class='span3' ", 'Vacio', 'width="170"');
+			$segmento_usuario_encargado .= '</td>';
 			$segmento_usuario_encargado .= '</tr>';
 		}
 	}
@@ -429,14 +429,14 @@ $segmento_cliente_referencia = '';
 
 if( Conf::GetConf($sesion,'ClienteReferencia') ) {
 	$segmento_cliente_referencia .= '<tr>';
-		$segmento_cliente_referencia .=  '<td class="ar">';
-			$segmento_cliente_referencia .=  "<div class=\"controls controls-row\">" . __('Referencia') . $obligatorio . "</div>";
- 			$segmento_cliente_referencia .= '</td>';
-			$segmento_cliente_referencia .= '<td class="al">';
-			$segmento_cliente_referencia .= '<div class="span2">';
-				$segmento_cliente_referencia .= Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', " class='span3' ", "Vacio");
-			$segmento_cliente_referencia .= '</div>';
-		$segmento_cliente_referencia .= '</td>';
+	$segmento_cliente_referencia .=  '<td class="ar">';
+	$segmento_cliente_referencia .=  "<div class=\"controls controls-row\">" . __('Referencia') . $obligatorio . "</div>";
+	$segmento_cliente_referencia .= '</td>';
+	$segmento_cliente_referencia .= '<td class="al">';
+	$segmento_cliente_referencia .= '<div class="span2">';
+	$segmento_cliente_referencia .= Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', " class='span3' ", "Vacio");
+	$segmento_cliente_referencia .= '</div>';
+	$segmento_cliente_referencia .= '</td>';
 	$segmento_cliente_referencia .= '</tr>';
 }
 
@@ -461,17 +461,12 @@ $pagina->titulo = __('Ingreso cliente');
 $pagina->PrintTop();
 ?>
 
-
-
-
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo  $_SERVER[PHP_SELF] ?>" >
 	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name='opcion_contrato' value="guardar_contrato" />
 	<input type="hidden" name="id_cliente" value="<?php echo  $cliente->fields['id_cliente'] ?>" />
 	<input type="hidden" name="id_contrato" value="<?php echo  $contrato->fields['id_contrato'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_cliente" />
-
-
 
 	<fieldset   id="formularioinicial" class="tb_base" style="border: 1px solid #BDBDBD;">
 
@@ -783,7 +778,6 @@ $pagina->PrintTop();
 		}
 		
 		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
-		console.log(plugin_facturacion_mx);
 		if (plugin_facturacion_mx != ''){
 			if(form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");

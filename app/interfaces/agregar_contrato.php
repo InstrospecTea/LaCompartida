@@ -58,8 +58,10 @@ $validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($
 $obligatorio = '<span class="req">*</span>';
 $modulo_retribuciones_activo = Conf::GetConf($Sesion, 'UsarModuloRetribuciones');
 
-if (!defined('HEADERLOADED'))
+if (!defined('HEADERLOADED')) {
 	$addheaderandbottom = true;
+}
+
 if ($addheaderandbottom || ($popup && !$motivo)) {
 	$pagina = new Pagina($Sesion);
 	$show = 'inline';
@@ -69,25 +71,24 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 	}
 
 	$contrato = new Contrato($Sesion);
-	if ($id_contrato > 0) {
-		if (!$contrato->Load($id_contrato)) {
+	if($id_contrato > 0) {
+		if(!$contrato->Load($id_contrato)) {
 			$pagina->FatalError(__('Código inválido'));
 		}
 
 		$cobro = new Cobro($Sesion);
 	}
 
-
-	if ($contrato->fields['codigo_cliente'] != '') {
+	if($contrato->fields['codigo_cliente'] != '') {
 		$cliente = new Cliente($Sesion);
 		$cliente->LoadByCodigo($contrato->fields['codigo_cliente']);
 	}
 
-	if ($contrato->fields['id_moneda'] == '') {
+	if($contrato->fields['id_moneda'] == '') {
 		$contrato->fields['id_moneda'] = $cliente->fields['id_moneda'];
 	}
 
-	if ($id_contrato) {
+	if($id_contrato) {
 		$pagina->titulo = __('Editar Contrato');
 	} else {
 		$pagina->titulo = __('Agregar Contrato');
@@ -262,7 +263,6 @@ list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 	{
 
 		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
-		console.log(plugin_facturacion_mx);
 		if (plugin_facturacion_mx != ''){
 			if(form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");
@@ -1840,7 +1840,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	?>
 								</td>
 								<td align="left" colspan="3">
-									<input type="text" size=20 name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" onblur="<?php echo $setformato ?>validarUnicoCliente(this.value,'rut');" />
+									<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" onblur="<?php echo $setformato ?>validarUnicoCliente(this.value,'rut');" />
 								</td>
 							</tr>
 							<tr>
