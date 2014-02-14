@@ -9912,7 +9912,9 @@ QUERY;
 
 		case 7.42:
 			$queries = array();
-			$queries[] = "ALTER TABLE `tramite` ADD `solicitante` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL AFTER `id_usuario`";
+			if (!ExisteCampo('solicitante', 'tramite', $dbh)) {
+				$queries[] = "ALTER TABLE `tramite` ADD `solicitante` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL AFTER `id_usuario`";
+			}
 
 			ejecutar($queries, $dbh);
 			break;

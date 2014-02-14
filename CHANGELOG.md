@@ -1,10 +1,18 @@
 # Changelog
+## Hotfix: 13.7.37
+Viernes 14 de febrero 2014
+* **Added:** [Corrige monto subtotal para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
+
+## Hotfix: 13.7.36
+Miercoles 13 de febrero 2014
+* **Added:** [Agrega alerta para obligar a usuario a elegir un país para evitar error en facturación eletrónica](https://github.com/LemontechSA/ttb/pull/412)
+
 ## Hotfix: 13.7.35
-martes 12 de febrero 2014
+Martes 12 de febrero 2014
 * **Fixed:** [Corrige error javascript en interfaz agregar_contrato](https://github.com/LemontechSA/ttb/pull/410)
 
 ## Hotfix: 13.7.34
-martes 11 de febrero 2014
+Martes 11 de febrero 2014
 * **Fixed:** [Elimina query que reemplaza código de asunto](https://github.com/LemontechSA/ttb/pull/408)
 
 ## Hotfix: 13.7.33
