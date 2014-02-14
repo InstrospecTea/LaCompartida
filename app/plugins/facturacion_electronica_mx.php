@@ -310,9 +310,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 
 	$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
 
-	if ($Factura->fields['subtotal'] > 0) {
-		$r['COM'][] = 'subTotal|' . number_format($subtotal_factura, 2, '.', '');
-	}
+	$r['COM'][] = 'subTotal|' . number_format($subtotal_factura, 2, '.', '');
 	
 	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int)$Factura->fields['dte_metodo_pago_cta'] > 0) {
 		$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
