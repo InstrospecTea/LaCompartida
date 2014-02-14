@@ -265,7 +265,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
 
 	//	Se ajusta zona horaria segun el timezone del servidor
-	$zona_horaria = Conf::GetConf($sesion,'ZonaHoraria');
+	$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
 	date_default_timezone_set($zona_horaria); 
 	$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
 
