@@ -263,8 +263,11 @@ function PaymentMethod(Sesion $Sesion, Factura $Factura) {
 //
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
-	$mx_timezone = -6;
-	$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
+
+	//	Se ajusta zona horaria segun el timezone del servidor
+	$zona_horaria = Conf::GetConf($sesion,'ZonaHoraria');
+	date_default_timezone_set($zona_horaria); 
+	$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
 
 	$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 	$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
