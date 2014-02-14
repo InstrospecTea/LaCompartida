@@ -165,7 +165,7 @@ function GeneraFacturaElectronica($hookArg) {
 
 				$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 				$file_data = base64_decode($result->documentopdf);
-				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
+				$file_url = UtilesApp::UploadToS3($Sesion, $file_name, $file_data, 'application/pdf');
 
 				$Factura->Edit('dte_url_pdf', $file_url);
 				if ($Factura->Write()) {
@@ -301,16 +301,17 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		)
 	);
 
-	if ($Factura->fields['subtotal'] > 0) {
-		$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', '');
-	}
+	/*	
+	*	El monto subtotal de la factura debe ser la suma de los subtotales
+	*	subtotal = Monto Horararios;
+	*	subtotal_gastos = Monto Gastos con impuestos;
+	*	subtotal_gastos_sin_impuesto = Monto Gastos sin impuestos;
+	*/
 
-	if ($Factura->fields['subtotal_gastos'] > 0) {
-		$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', '');
-	}
-	
-	if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
-		$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', '');
+	$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
+
+	if ($Factura->fields['subtotal'] > 0) {
+		$r['COM'][] = 'subTotal|' . number_format($subtotal_factura, 2, '.', '');
 	}
 	
 	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int)$Factura->fields['dte_metodo_pago_cta'] > 0) {
