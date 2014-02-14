@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.7.37
+Miercoles 13 de febrero 2014
+* **Added:** [Corrige monto subtotal para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
+
 ## Hotfix: 13.7.36
 Miercoles 13 de febrero 2014
 * **Added:** [Agrega alerta para obligar a usuario a elegir un país para evitar error en facturación eletrónica](https://github.com/LemontechSA/ttb/pull/412)
