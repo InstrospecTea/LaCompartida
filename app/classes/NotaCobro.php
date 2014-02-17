@@ -4888,12 +4888,6 @@ class NotaCobro extends Cobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($cont_tramites) = mysql_fetch_array($resp);
 
-					if (UtilesApp::GetConf($this->sesion, 'NoMostrarHorasIncobrablesEnNotaDeCobro')) {
-						$mostrar_horas_incobrables = " AND trabajo.cobrable = 1 ";
-					} else {
-						$mostrar_horas_incobrables = "";
-					}
-
 					$query = "SELECT count(*) FROM trabajo
 									WHERE id_cobro=" . $this->fields['id_cobro'] . "
 										AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'
@@ -5419,15 +5413,10 @@ class NotaCobro extends Cobro {
 						$where_horas_cero = "AND trabajo.duracion_cobrada > '0000-00-00 00:00:00'";
 				}
 
-				if ($this->fields['opc_ver_valor_hh_flat_fee'] && $this->fields['forma_cobro'] != 'ESCALONADA')
+				if ($this->fields['opc_ver_valor_hh_flat_fee'] && $this->fields['forma_cobro'] != 'ESCALONADA'){
 					$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
-				else
-					$dato_monto_cobrado = " trabajo.monto_cobrado ";
-
-				if (UtilesApp::GetConf($this->sesion, 'NoMostrarHorasIncobrablesEnNotaDeCobro')) {
-					$mostrar_horas_incobrables = " AND trabajo.cobrable = 1 ";
 				} else {
-					$mostrar_horas_incobrables = "";
+					$dato_monto_cobrado = " trabajo.monto_cobrado ";
 				}
 
 				if ($this->fields['opc_ver_horas_trabajadas'] == 0) {
@@ -8689,17 +8678,10 @@ class NotaCobro extends Cobro {
 					}
 				}
 
-				if ($this->fields['opc_ver_valor_hh_flat_fee'] && $this->fields['forma_cobro'] != 'ESCALONADA')
+				if ($this->fields['opc_ver_valor_hh_flat_fee'] && $this->fields['forma_cobro'] != 'ESCALONADA'){
 					$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
-				else
-					$dato_monto_cobrado = " trabajo.monto_cobrado ";
-
-
-
-				if (UtilesApp::GetConf($this->sesion, 'NoMostrarHorasIncobrablesEnNotaDeCobro')) {
-					$mostrar_horas_incobrables = " AND trabajo.cobrable = 1 ";
 				} else {
-					$mostrar_horas_incobrables = "";
+					$dato_monto_cobrado = " trabajo.monto_cobrado ";
 				}
 
 				if ($this->fields['opc_ver_cobrable']) {

@@ -7911,10 +7911,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 		case 5.44:
 			$query = array();
-			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-							VALUES (
-								NULL ,  'NoMostrarHorasIncobrablesEnNotaDeCobro',  '0',  'para que en el detalle de horas de PRC no les muestra las horas definidos como incobrables',  'boolean',  '6',  '-1'
-							);";
+			$query[] = "";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
