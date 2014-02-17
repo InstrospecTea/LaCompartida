@@ -340,14 +340,38 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$r['DOR'][] = 'codigoPostal|' . ($Factura->fields['factura_codigopostal']);
 	}
 
-	$r['CON_gastos_sin_iva'] = array(
-		'cantidad|1.00',
-		'unidad|un',
-		'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
-		'valorUnitario|' . number_format($subtotal_factura, 2, '.', ''),
-		'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
-		'descuento|0.00'
-	);
+	if ($Factura->fields['subtotal'] > 0) {
+		$r['CON_honorarios'] = array(
+			'cantidad|1.00',
+			'unidad|un',
+			'descripcion|' . ($Factura->fields['descripcion']),
+			'valorUnitario|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
+			'importe|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
+			'descuento|0.00'
+		);
+	}
+
+	if ($Factura->fields['subtotal_gastos'] > 0) {
+		$r['CON_gastos_con_iva'] = array(
+			'cantidad|1.00',
+			'unidad|un',
+			'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos']),
+			'valorUnitario|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
+			'importe|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
+			'descuento|0.00'
+		);
+	}
+
+	if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
+		$r['CON_gastos_sin_iva'] = array(
+			'cantidad|1.00',
+			'unidad|un',
+			'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
+			'valorUnitario|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
+			'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
+			'descuento|0.00'
+		);
+	}
 
 	foreach ($r as $identificador => $valores) {
 		if (in_array($identificador, array('CON_honorarios', 'CON_gastos_con_iva', 'CON_gastos_sin_iva'))) {
