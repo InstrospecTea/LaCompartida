@@ -1158,8 +1158,6 @@ $pagina->PrintTop();
 	}
 });
 
-</script>
-
 <?php
 if ($CodigoSecundario) {
 	echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
@@ -1167,6 +1165,8 @@ if ($CodigoSecundario) {
 	echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
 }
 ?>
+
+</script>
 
 <?php
 
