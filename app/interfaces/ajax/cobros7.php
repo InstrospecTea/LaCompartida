@@ -370,19 +370,19 @@ if ($opc == 'refrescar') {
 					<?php if (Conf::GetConf($sesion, 'ImprimirFacturaDoc')) { ?>
 						<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir');" ><img src='<?php echo Conf::ImgDir() ?>/doc.gif' border="0" title="Descargar Word"/></a>
 					<?php } ?>
-						<?
-                                                                    $data = array('Factura' => $factura);
-                                                                    if ($Slim = Slim::getInstance('default', true)) {
-                                                                        $Slim->applyHook('hook_cobros7_botones_after', &$data);
-                                                                    }
-                                                                    if (!($data && $data['content'])) {
-                                                                        if (Conf::GetConf($sesion, 'ImprimirFacturaPdf')) {
-                                                                            ?><a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a><?
-                                                                        }
-                                                                    } else {
-                                                                        echo($data['content']);
-                                                                    }
-                                                                 ?>
+						<?php
+							$data = array('Factura' => $factura);
+							if ($Slim = Slim::getInstance('default', true)) {
+								$Slim->applyHook('hook_cobros7_botones_after', &$data);
+							}
+							if (!($data && $data['content'])) {
+								if (Conf::GetConf($sesion, 'ImprimirFacturaPdf')) {
+									?><a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a><?
+								}
+							} else {
+								echo($data['content']);
+							}
+						 ?>
 					<img title="Ver pagos para este documento" src="<?php echo Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="MostrarVerDocumentosPagos(<?php echo $id_factura ?>);" border="0" alt="Examinar" />
 				</td>
 			</tr>
