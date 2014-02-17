@@ -12,6 +12,10 @@ Lunes 17 de Febrero 2014
 * **Feature:** [TXT contabilidad](https://github.com/LemontechSA/ttb/pull/394)
 * **Feature:** [Subir archivos s3](https://github.com/LemontechSA/ttb/pull/406)
 
+## Hotfix: 13.7.38
+Viernes 14 de febrero 2014
+* **Added:** [Corrige Zona horaria para para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
+
 ## Hotfix: 13.7.37
 Viernes 14 de febrero 2014
 * **Added:** [Corrige monto subtotal para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
