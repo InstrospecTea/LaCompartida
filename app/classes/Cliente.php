@@ -77,6 +77,10 @@ class Cliente extends Objeto {
 			'titulo' => 'Usuario Encargado',
 			'relacion' => 'UsuarioExt'
 		),
+		'id_pais' => array(
+			'titulo' => 'Pais',
+			'relacion' => 'PrmPais'
+		),
 	);
 	public static $configuracion_reporte = array(
 		array(
@@ -736,7 +740,7 @@ class Cliente extends Objeto {
 
 		//no intento guardar los campos que son de la tabla contrato
 		$campos_contrato = array('id_moneda_monto', 'id_tarifa', 'factura_ciudad', 'factura_comuna', 'id_cuenta',
-			'forma_cobro', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total');
+			'forma_cobro', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_pais');
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
 
 		//copio algunos datos de la tabla cliente a su equivalente en contrato
@@ -862,3 +866,4 @@ class ListaClientes extends Lista {
 	}
 
 }
+

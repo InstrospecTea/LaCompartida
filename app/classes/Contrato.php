@@ -119,7 +119,7 @@ class Contrato extends Objeto {
 		'notificar_otros_correos'	,
 		'id_cuenta'	,
 		'id_cuenta2'	,
-		'id_pais'	,
+		'id_pais'  ,
 		'esc1_tiempo'	,
 		'esc1_id_tarifa'	,
 		'esc1_monto'	,
@@ -1142,14 +1142,14 @@ class Contrato extends Objeto {
 			}
 		}
 		foreach($this->editable_fields as $editable_field) {
-				if(substr($editable_field,0,4)=='opc_') {
-					if(empty($parametros[$editable_field])) {
-						$this->Edit($editable_field,"0");
-					} else {
-						$this->Edit($editable_field,$parametros[$editable_field]);
-					}
+			if(substr($editable_field,0,4)=='opc_') {
+				if(empty($parametros[$editable_field])) {
+					$this->Edit($editable_field,"0");
+				} else {
+					$this->Edit($editable_field,$parametros[$editable_field]);
 				}
 			}
+		}
 
 		if($this->extra_fields['activo_contrato'] || empty($this->fields['activo'])  || empty($this->fields['id_contrato']) ) {
 			$this->Edit("activo",'SI');

@@ -261,6 +261,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			$where .= " AND cliente.id_grupo_cliente = $id_grupo";
 		}
 	}
+
+	if ($id_area_usuario) {
+		$where .= " AND usuario.id_area_usuario = $id_area_usuario ";
+	}
+
 	if ($clientes) {
 		$where .= "	AND cliente.codigo_cliente IN ('" . base64_decode($clientes) . "')";
 	}
@@ -367,7 +372,6 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 				LEFT JOIN tramite ON trabajo.id_tramite=tramite.id_tramite
 				LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 				WHERE $where ";
-
 
 				//echo $query;
 	if ($excel && $simplificado) {
@@ -718,6 +722,14 @@ $pagina->PrintTop($popup);
 								}
 								?>
 								<tr>
+									<td class="buscadorlabel" align="right">
+										<?php echo __('Grupo Cliente')?>
+									</td>
+									<td align="left">
+										<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", "Ninguno","width=100px")  ?>
+									</td>
+								</tr>
+								<tr>
 
 									<td class="buscadorlabel"><?php echo __('Nombre Cliente') ?></td>
 									<td nowrap align='left' colspan="2">
@@ -767,12 +779,33 @@ $pagina->PrintTop($popup);
 								//if (strlen($select_usuario) > 164) { // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
 								// mejor que siempre salga
 
-									?>
-									<tr>
-										<td class="buscadorlabel"><?php echo __('Usuario') ?></td>
-										<td align='left' colspan="2"><?php echo $select_usuario ?></td>
-									</tr>
-									<?php
+								?>
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Usuario') ?>
+									</td>
+									<td align='left' colspan="2">
+										<?php echo $select_usuario ?>
+									</td>
+								</tr>
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Área Usuario') ?>
+										<?php if ( Conf::GetConf($sesion, 'ValidacionesCliente') ) echo $obligatorio ?>
+									</td>
+									<td valign="top" class="texto" align="left">
+										<?php
+											$query_areas = 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa';
+											if ( Conf::GetConf($sesion, 'UsarModuloRetribuciones') ) {
+												$query_areas = 'SELECT area.id, CONCAT(REPEAT("&nbsp;", IF(ISNULL(padre.id), 0, 5)), area.glosa) FROM prm_area_usuario AS area
+																LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
+																ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
+											}
+											echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", "Ninguna")
+ 										?>
+									</td>
+								</tr>
+								<?php
 
 							}
 							// Validando fecha

@@ -3,36 +3,33 @@
 require_once dirname(__FILE__) . '/../../conf.php';
 require_once(Conf::RutaGraficos());
 
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-
 require_once Conf::ServerDir() . '/../app/interfaces/graficos/GraficoBarras.php';
 
 
 $sesion = new Sesion();
 // The data for the pie chart
 
-$ancho = (UtilesApp::GetConf($sesion, 'AnchoGraficoReporteGeneral')) ? UtilesApp::GetConf($sesion, 'AnchoGraficoReporteGeneral') : 900;
+$ancho = Conf::GetConf($sesion, 'AnchoGraficoReporteGeneral') ? Conf::GetConf($sesion, 'AnchoGraficoReporteGeneral') : 900;
 
-$alto = (UtilesApp::GetConf($sesion, 'AltoGraficoReporteGeneral')) ? UtilesApp::GetConf($sesion, 'AltoGraficoReporteGeneral') : 900;
+$alto = Conf::GetConf($sesion, 'AltoGraficoReporteGeneral') ? Conf::GetConf($sesion, 'AltoGraficoReporteGeneral') : 900;
 
 $radio = 100;
 
+$data = json_decode(base64_decode($_GET['datos']), true);
 
-$data = $tiempo;
 // The labels for the pie chart
 $labels = array();
-foreach ($nombres as $label) {
-	$labels[] = urldecode($label);
+foreach ($data['nombres'] as $label) {
+	$labels[] = $label;
 }
 
 $total = array_sum($data);
 $derecha = 0;
-foreach ($data as $k => $v) {
+$total_tiempo = count($data['tiempo']);
+foreach ($data['tiempo'] as $k => $v) {
 	$derecha += $v;
 	if ($derecha * 2 > $total) {
-		$alto = max($alto, 19 * ($k > count($data) / 2 ? $k + 2 : count($data) - $k) + 50);
+		$alto = max($alto, 19 * ($k > $total_tiempo / 2 ? $k + 2 : $total_tiempo - $k) + 50);
 		break;
 	}
 }
@@ -74,7 +71,7 @@ $c->setLineColor(SameAsMainColor, 0x000000);
 $c->setStartAngle(0);
 
 // Set the pie data and the pie labels
-$c->setData($data, $labels);
+$c->setData($data['tiempo'], $labels);
 
 // output the chart
 header("Content-type: image/png");

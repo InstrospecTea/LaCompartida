@@ -1,9 +1,36 @@
 <?php
-
 //Clase UtilesApp
 require_once dirname(__FILE__) . '/../conf.php';
 
 class UtilesApp extends Utiles {
+
+	public static $_transliteration = array(
+		'/ü/' => 'ue',
+		'/Ä/' => 'Ae',
+		'/Ü/' => 'Ue',
+		'/Ö/' => 'Oe',
+		'/À|Á|Â|Ã|Ä|Å/' => 'A',
+		'/à|á|â|ã|å|ª/' => 'a',
+		'/Ç/' => 'C',
+		'/ç/' => 'c',
+		'/Ð|Ð/' => 'D',
+		'/ð/' => 'd',
+		'/È|É|Ê|Ë/' => 'E',
+		'/è|é|ê|ë/' => 'e',
+		'/Ì|Í|Î|Ï/' => 'I',
+		'/ì|í|î|ï/' => 'i',
+		'/Ñ/' => 'N',
+		'/ñ/' => 'n',
+		'/Ò|Ó|Ô|Õ|Ø/' => 'O',
+		'/ò|ó|ô|õ|ø|º/' => 'o',
+		'/Ù|Ú|Û/' => 'U',
+		'/ù|ú|û/' => 'u',
+		'/Ý/' => 'Y',
+		'/ý|ÿ/' => 'y',
+		'/Ž/' => 'x',
+		'/Æ/' => 'AE',
+		'/ß/'=> 'ss'
+	);
 
 	/**
 	 *
@@ -30,7 +57,7 @@ class UtilesApp extends Utiles {
 			echo "var $conf = $v;\n";
 		} else {
 			echo "var $conf = '$v';\n";
-	}
+		}
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
@@ -41,48 +68,47 @@ class UtilesApp extends Utiles {
 		return $result['simbolo'];
 	}
 
-	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '',$cargar_selectores=true) {
+	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $mas_recientes = false, $width = 320, $oncambio = '', $cargar_selectores = true) {
 		echo InputId::Javascript($sesion);
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			echo Autocompletador::CSS();
-				if ($oncambio=='') {
-					$oncambio="CargarGlosaCliente();";
-				} elseif (substr($oncambio,0,1)=='+') {
-					$oncambio="CargarGlosaCliente(); $oncambio";
-				}
-			echo Autocompletador::Javascript($sesion,$cargar_selectores,$oncambio);
+			if ($oncambio == '') {
+				$oncambio = "CargarGlosaCliente();";
+			} elseif (substr($oncambio, 0, 1) == '+') {
+				$oncambio = "CargarGlosaCliente(); $oncambio";
+			}
+			echo Autocompletador::Javascript($sesion, $cargar_selectores, $oncambio);
 
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width   );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario, $mas_recientes, $width);
 			} else {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width  );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null, $mas_recientes, $width);
 			}
-
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				if ($oncambio=='') {
-					$oncambio="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
-				} elseif (substr($oncambio,0,1)=='+') {
+				if ($oncambio == '') {
+					$oncambio = "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
+				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
 				}
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "  ", $oncambio, $width, $codigo_asunto_secundario);
 			} else {
-				if ($oncambio=='') {
-					$oncambio="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
-				} elseif (substr($oncambio,0,1)=='+') {
+				if ($oncambio == '') {
+					$oncambio = "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
+				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
-			}
+				}
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
+			}
 		}
 	}
-	}
 
-	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width=320, $oncambio='') {
-			if ($oncambio=='') {
-					$oncambio="CargarSelectCliente(this.value);";
-				} elseif (substr($oncambio,0,1)=='+') {
-					$oncambio.="CargarSelectCliente(this.value);";
-				}
+	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '') {
+		if ($oncambio == '') {
+			$oncambio = "CargarSelectCliente(this.value);";
+		} elseif (substr($oncambio, 0, 1) == '+') {
+			$oncambio.="CargarSelectCliente(this.value);";
+		}
 
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
@@ -95,15 +121,15 @@ class UtilesApp extends Utiles {
 		?>
 		<tr>
 			<td align="right">
-				<?php echo __('Asuntos'); ?>
+		<?php echo __('Asuntos'); ?>
 			</td>
 			<td colspan="3" align="left" id="td_selector_contrato">
-				<?php self::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $width, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+		<?php self::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $width, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
 				<input type="hidden" name="id_contrato" id="id_contrato" value="<?php echo $id_contrato; ?>" />
 				<script type="text/javascript">
 					function CargarContrato(asunto) {
 						var ajax_url = root_dir + '/app/interfaces/ajax/ajax_gastos.php?opc=contratoasunto&codigo_asunto=' + asunto;
-						jQuery.getJSON(ajax_url,function(data) {
+						jQuery.getJSON(ajax_url, function(data) {
 							if (data) {
 								jQuery('#id_contrato').val(data.id_contrato);
 								jQuery('#codigo_contrato').val(data.codigo_contrato);
@@ -122,7 +148,7 @@ class UtilesApp extends Utiles {
 			</td>
 		</tr>
 		<?php
-		if($Slim=Slim::getInstance('default',true)){
+		if ($Slim = Slim::getInstance('default', true)) {
 			global $id_contrato, $Contrato;
 			$Contrato = new Contrato($sesion);
 			$Slim->applyHook('hook_filtros_asunto_contrato');
@@ -138,11 +164,13 @@ class UtilesApp extends Utiles {
 			WHERE pec1.codigo_estado_cobro='$estado'
 			and pec2.codigo_estado_cobro='$estadoactual' ";
 		$queryrespuesta = mysql_query($queryorden, $sesion->dbh);
-		if (!queryrespuesta)
+		if (!queryrespuesta) {
 			return false;
+		}
 		list($respuesta) = mysql_fetch_array($queryrespuesta);
-		if ($respuesta == 1)
+		if ($respuesta == 1) {
 			return true;
+		}
 		return false;
 	}
 
@@ -150,15 +178,10 @@ class UtilesApp extends Utiles {
 
 	}
 
-	public static function ExisteCampo($campo, $tabla, $sesion=null) {
-
-
+	public static function ExisteCampo($campo, $tabla, $sesion = null) {
 		$queryexisten = "show columns  from $tabla like '$campo'";
-
 		$existencampos = $sesion->pdodbh->query($queryexisten);
-
-		$nextcolumn=$existencampos->fetchAll(PDO::FETCH_COLUMN,0);
-
+		$nextcolumn = $existencampos->fetchAll(PDO::FETCH_COLUMN, 0);
 		if (empty($nextcolumn)) {
 			return false;
 		} else {
@@ -166,11 +189,11 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function ExisteIndex($nombre, $tabla, $sesion=null) {
+	public static function ExisteIndex($nombre, $tabla, $sesion = null) {
 
 		$ExisteIndex = $sesion->pdodbh->query("SHOW INDEX FROM   $tabla where key_name = '$nombre'");
 
-			if (!$ExisteIndex) {
+		if (!$ExisteIndex) {
 			return false;
 		} else {
 			$sesion->debug(json_encode($ExisteIndex));
@@ -178,7 +201,7 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function ExisteLlaveForanea($tabla_columna, $tablar_columnar, $sesion=null) {
+	public static function ExisteLlaveForanea($tabla_columna, $tablar_columnar, $sesion = null) {
 
 		if (!DEFINED('DBNAME'))
 			define('DBNAME', Conf::dbName());
@@ -194,7 +217,7 @@ class UtilesApp extends Utiles {
 		AND column_name='$tabla_columna[1]'";
 		$sesion->debug($queryllave);
 		$ExisteLlaveForanea = $sesion->pdodbh->query($queryllave);
-		$nombrellaveforanea=$ExisteLlaveForanea->fetch();
+		$nombrellaveforanea = $ExisteLlaveForanea->fetch();
 		$ExisteLlaveForanea->closeCursor();
 
 		if (!$ExisteLlaveForanea) {
@@ -204,9 +227,9 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function cuentaregistros($tabla, $sesion, $sesion=null) {
+	public static function cuentaregistros($tabla, $sesion, $sesion = null) {
 
-		$registros = mysql_query("select count(*)  from $tabla",  $sesion->dbh);
+		$registros = mysql_query("select count(*)  from $tabla", $sesion->dbh);
 		if (!$registros):
 			return 0;
 		elseif ($cantidad = mysql_fetch_field($registros)):
@@ -475,7 +498,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-		Reemplaza , por . para numero
+	  Reemplaza , por . para numero
 	 */
 
 	function PonerPuntoNumeros($valor) {
@@ -500,46 +523,26 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-		HTML 2 (F)PDF
+	  HTML 2 (F)PDF
 	 */
 
 	function Html2Pdf($html) {
 		echo($html);
 		exit();
-
-		/*
-			require_once dirname(__FILE__).'/../libs/html2fpdf/html2fpdf.php';
-			$pdf = new HTML2FPDF('P','mm','A4');
-			$pdf->DisableTags();
-			$pdf->DisplayPreferences('');
-			$pdf->SetAuthor( 'Lemontech SA.' );
-			$pdf->SetCreator( 'Lemontech SA.' );
-			$pdf->SetTitle( 'Informe periódico' );
-			$pdf->SetSubject("Lemontech SA.");
-			$pdf->SetDisplayMode('fullpage', 'continuous'); #'real'
-			$pdf->PageNo();
-			$pdf->AddPage();
-			$pdf->UseCSS(true);
-			$pdf->WriteHTML($html);
-			$pdf->Close();
-			$pdf->Output('informe_periodico.pdf', 'D');
-		 */
 	}
 
 	/*
-		La cuenta corriente funciona sólo restando de los ingresos para gastos,
-		todos los montos_descontados(monto real en pesos) de cada gasto ingresado
+	  La cuenta corriente funciona sólo restando de los ingresos para gastos,
+	  todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	 */
 
-	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
+	function TotalCuentaCorriente(&$sesion, $where = '1', $cobrable = 1, $array = false) {
 
-		return Gasto::TotalCuentaCorriente($sesion, $where ,$cobrable,$array);
-
-
+		return Gasto::TotalCuentaCorriente($sesion, $where, $cobrable, $array);
 	}
 
 	/*
-		La cuenta del cliente funciona sólo sumando los montos asociados al cliente
+	  La cuenta del cliente funciona sólo sumando los montos asociados al cliente
 	 */
 
 	function TotalCuentaCliente(&$sesion, $codigo_cliente = '') {
@@ -828,23 +831,26 @@ class UtilesApp extends Utiles {
 		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
 
 		$bitmap = UtilesApp::GetConf($sesion, 'LogoExcel');
-		if(!$bitmap){
+		if (!$bitmap) {
 			return 0;
 		}
 		// Open file.
 		$bmp_fd = @fopen($bitmap, "rb");
 		if (!$bmp_fd)
-			return 0;//throw new Exception("Couldn't import $bitmap");
-		// Slurp the file into a string.
+			return 0; //throw new Exception("Couldn't import $bitmap");
+
+// Slurp the file into a string.
 		$data = fread($bmp_fd, filesize($bitmap));
 		// Check that the file is big enough to be a bitmap.
 		if (strlen($data) <= 0x36)
-			return 0;//throw new Exception("$bitmap doesn't contain enough data.\n");
-		// The first 2 bytes are used to identify the bitmap.
+			return 0; //throw new Exception("$bitmap doesn't contain enough data.\n");
+
+// The first 2 bytes are used to identify the bitmap.
 		$identity = unpack("A2ident", $data);
 		if ($identity['ident'] != "BM")
-			return 0;//throw new Exception("$bitmap doesn't appear to be a valid bitmap image.\n");
-		// Remove bitmap data.
+			return 0; //throw new Exception("$bitmap doesn't appear to be a valid bitmap image.\n");
+
+// Remove bitmap data.
 		$data = substr($data, 18);
 		// Read the bitmap width and height.
 		$width_and_height = unpack("V2", substr($data, 0, 8));
@@ -1007,7 +1013,7 @@ HTML;
 			</ul>
 HTML;
 		if (isset($vinculo_ayuda))
-		$menu_html .= $vinculo_ayuda;
+			$menu_html .= $vinculo_ayuda;
 		$menu_html .= <<<HTML
 		 </div>
 HTML;
@@ -1060,7 +1066,7 @@ HTML;
 
 		if ($tipo_cambio1 == $tipo_cambio2) {// si no es el mismo tipo de moneda, que haga el calculo
 			$monto_fin = $monto_ini;
-		} else  if (empty($tipo_cambio2) || ($tipo_cambio2 == 0)) {
+		} else if (empty($tipo_cambio2) || ($tipo_cambio2 == 0)) {
 			$monto_fin = $monto_ini;
 		} else {// sino, mantener el monto
 			$monto_fin = ($monto_ini * $tipo_cambio1) / $tipo_cambio2;
@@ -1167,8 +1173,6 @@ HTML;
 			$datos_cobro->LoadByCobro($id_cobro);
 			if ($datos_cobro->Loaded()) {
 				$xtabla = 'documento';
-				//$cobro_moneda = new DocumentoMoneda($sesion);
-				//$cobro_moneda->LoadByCobro($id_cobro);
 				$cobro_moneda = new CobroMoneda($sesion); // Cuando DocumentoMoneda esta averiguado hay que cambiar $cobro_moneda a un objeto Documento Moneda.
 				$cobro_moneda->Load($id_cobro);
 			}
@@ -1216,8 +1220,7 @@ HTML;
 		);
 		$decimales_completos = 6;
 		if (($arr_resultado['id_moneda'] != $arr_resultado['id_moneda_monto']) && ($arr_resultado['id_moneda_monto'] == $arr_resultado['opc_moneda_total'])) {
-			if (($cobro->fields['forma_cobro'] == 'FLAT FEE')
-					&& (empty($datos_cobro->fields[$campo[$xtabla]['descuento']]) || ($datos_cobro->fields[$campo[$xtabla]['descuento']] == 0))) {
+			if (($cobro->fields['forma_cobro'] == 'FLAT FEE') && (empty($datos_cobro->fields[$campo[$xtabla]['descuento']]) || ($datos_cobro->fields[$campo[$xtabla]['descuento']] == 0))) {
 
 
 
@@ -1242,12 +1245,12 @@ HTML;
 						);
 						if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
 							$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
-										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $decimales_completos
-										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+											, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+											, $decimales_completos
 							);
-					}
+						}
 					}
 
 					$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
@@ -1256,27 +1259,23 @@ HTML;
 											, $decimales_completos
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, $decimales_completos
-									)
-									+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $decimales_completos, '', $decimales_completos);
+									) + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $decimales_completos, '', $decimales_completos);
 
 					$arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 									UtilesApp::CambiarMoneda($cobro->fields[$campo[$xtabla]['monto_contrato']]//monto_moneda_l
 											, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-											,  $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
+											, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-									)
-									+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+									) + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 									UtilesApp::CambiarMoneda($cobro->fields[$campo[$xtabla]['monto_contrato']]//monto_moneda_l
 											, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio']//tipo de cambio ini
 											, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales']//decimales ini
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-									)
-									- $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]
-									+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], ''
-									,  $cifras_decimales_actual
+									) - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], ''
+									, $cifras_decimales_actual
 									, ''
 									, $cifras_decimales_actual);
 					$arr_resultado[$campo[$xtabla]['monto_trabajos']][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields[$campo[$xtabla]['monto_contrato']]//monto_moneda_l
@@ -1286,7 +1285,7 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
-										, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
+									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
@@ -1295,18 +1294,16 @@ HTML;
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-									,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
-					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual])*($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
+					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] =
 							$arr_resultado[$campo[$xtabla]['monto']][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $decimales_completos, '', $decimales_completos);
 				}
 				$hacer_calculo_normal++;
 			}
 			// CONDICION PARA RETAINER Y PROPORCIONAL
-			if ((($cobro->fields['forma_cobro'] == 'RETAINER') || ($cobro->fields['forma_cobro'] == 'PROPORCIONAL'))
-					&& (60 * ($cobro->fields['retainer_horas']) >= $cobro->fields['total_minutos'])
-					&& (empty($datos_cobro->fields[$campo[$xtabla]['descuento']]) || ($datos_cobro->fields[$campo[$xtabla]['descuento']] == 0))) {
+			if ((($cobro->fields['forma_cobro'] == 'RETAINER') || ($cobro->fields['forma_cobro'] == 'PROPORCIONAL')) && (60 * ($cobro->fields['retainer_horas']) >= $cobro->fields['total_minutos']) && (empty($datos_cobro->fields[$campo[$xtabla]['descuento']]) || ($datos_cobro->fields[$campo[$xtabla]['descuento']] == 0))) {
 				for ($i = 0; $i < $lista_monedas->num; $i++) {
 					$id_moneda_obj = $lista_monedas->Get($i);
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
@@ -1328,12 +1325,12 @@ HTML;
 						);
 						if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
 							$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
-										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $decimales_completos
-										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+											, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+											, $decimales_completos
 							);
-					}
+						}
 					}
 					//if( round($cobro->fields[$campo[$xtabla]['monto_contrato']]/100) >= round($arr_resultado[$campo[$xtabla]['monto_trabajos']][$cobro->fields['id_moneda_monto']]/100) ) {
 					if ($arr_resultado['tipo_cambio_id_moneda_monto'] > $arr_resultado['tipo_cambio_id_moneda']) {
@@ -1348,8 +1345,7 @@ HTML;
 												, $decimales_completos
 												, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 												, $decimales_completos
-										)
-										+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $decimales_completos, '', $decimales_completos);
+										) + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $decimales_completos, '', $decimales_completos);
 
 						$arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 										UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
@@ -1357,19 +1353,16 @@ HTML;
 												, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales']//decimales ini
 												, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 												, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-										)
-										+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+										) + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 
 
 						$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 										UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
-													, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio']//tipo de cambio ini
+												, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio']//tipo de cambio ini
 												, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales']//decimales ini
 												, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 												, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-										)
-										- $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]
-										+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+										) - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 
 
 						$arr_resultado[$campo[$xtabla]['monto_trabajos']][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
@@ -1382,13 +1375,13 @@ HTML;
 						$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					}
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
-								, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
+									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh_estandar'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
-								, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
+									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
@@ -1401,9 +1394,9 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cifras_decimales_actual);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
-							$arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
+									$arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									,  $cifras_decimales_actual
+									, $cifras_decimales_actual
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']); //decimales fin)
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]
@@ -1415,9 +1408,7 @@ HTML;
 				$hacer_calculo_normal++;
 			}
 			// CONDICION PARA CAP
-			if (($cobro->fields['forma_cobro'] == 'CAP')
-					&& ($cobro->TotalCobrosCap($id_cobro) == 0)
-					&& ($datos_cobro->fields[$campo[$xtabla]['monto_contrato']] <= $monto_subtotal_cap)) {
+			if (($cobro->fields['forma_cobro'] == 'CAP') && ($cobro->TotalCobrosCap($id_cobro) == 0) && ($datos_cobro->fields[$campo[$xtabla]['monto_contrato']] <= $monto_subtotal_cap)) {
 				for ($i = 0; $i < $lista_monedas->num; $i++) {
 					$id_moneda_obj = $lista_monedas->Get($i);
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
@@ -1439,24 +1430,23 @@ HTML;
 						);
 						if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
 							$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
-										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $decimales_completos
-										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+											, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+											, $decimales_completos
 							);
-					}
+						}
 					}
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 									UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
-												, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio']//tipo de cambio ini
+											, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio']//tipo de cambio ini
 											, $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales']//decimales ini
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-									)
-									+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+									) + $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					;
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
-								, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
+									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
@@ -1475,7 +1465,7 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
-							$arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
+									$arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
 									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
@@ -1490,17 +1480,17 @@ HTML;
 				}
 				$hacer_calculo_normal++;
 			}/*
-				for($e=0;$e<$lista_monedas->num;$e++)
-				{
-				$id_moneda_obj = $lista_monedas->Get($e);
-				$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
-				$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$campo[$xtabla]['monto']]//monto_moneda_l
-				,$arr_resultado['tipo_cambio_id_moneda']//tipo de cambio ini
-				,$arr_resultado['cifras_decimales_id_moneda']//decimales ini
-				,$arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio fin
-				,$arr_resultado['cifras_decimales_opc_moneda_total']//decimales fin
-				);
-				} */
+			  for($e=0;$e<$lista_monedas->num;$e++)
+			  {
+			  $id_moneda_obj = $lista_monedas->Get($e);
+			  $id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
+			  $arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$campo[$xtabla]['monto']]//monto_moneda_l
+			  ,$arr_resultado['tipo_cambio_id_moneda']//tipo de cambio ini
+			  ,$arr_resultado['cifras_decimales_id_moneda']//decimales ini
+			  ,$arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio fin
+			  ,$arr_resultado['cifras_decimales_opc_moneda_total']//decimales fin
+			  );
+			  } */
 		}
 		/*		 * *
 		 * CALCULO COBRO NORMAL
@@ -1539,16 +1529,16 @@ HTML;
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+										, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 						);
 						if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
 							$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
-										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-																																						, $decimales_completos
-										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+											, $decimales_completos
+											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+											, $decimales_completos
 							);
-					}
+						}
 					}
 
 
@@ -1562,7 +1552,7 @@ HTML;
 					);
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
-									,  $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
+									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
@@ -1579,27 +1569,27 @@ HTML;
 					if ($xtabla == 'documento') {
 						$valor_monto_honorarios = $arr_resultado['subtotal_sin_descuento'][$id_moneda_actual];
 					}
-				/*	$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios
-									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									,  $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
-									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-									,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-					);
-					$arr_resultado['impuesto'][$id_moneda_actual] = ( $arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100);
+					/* 	$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios
+					  , $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+					  ,  $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+					  , $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+					  ,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+					  );
+					  $arr_resultado['impuesto'][$id_moneda_actual] = ( $arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100);
 
-				//	$arr_resultado['monto'][$id_moneda_actual] = $arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]	;
+					  //	$arr_resultado['monto'][$id_moneda_actual] = $arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]	;
 
-				$arr_resultado['monto'][$id_moneda] = UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
-								, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio ini
-								,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales ini
-								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
-					);
+					  $arr_resultado['monto'][$id_moneda] = UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
+					  , $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio ini
+					  ,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales ini
+					  , $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
+					  , $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
+					  );
 
-						$arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
+					  $arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
 
 
-				$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
@@ -1625,22 +1615,22 @@ HTML;
 					);
 					if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
 						$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
-									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									, $decimales_completos
-									, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-									, $decimales_completos
+										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+										, $decimales_completos
+										, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
+										, $decimales_completos
 						);
-				}
+					}
 				}
 
 				$arr_resultado['monto_honorarios'][$id_moneda] = UtilesApp::CambiarMoneda($suma_monto_honorario_moneda_tarifa//monto_moneda_l
 								, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								,  $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 				$arr_resultado['monto_thh'][$id_moneda] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
-									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
+								, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 								, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
@@ -1659,7 +1649,7 @@ HTML;
 				);
 				$arr_resultado['monto'][$id_moneda] = UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
 								, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								,  $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
@@ -1782,8 +1772,8 @@ HTML;
 		$query .= $soloegreso ? ' AND egreso > 0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
 
 		$query .= "AND cta_corriente.incluir_en_cobro = 'SI'
-							AND cta_corriente.cobrable = 1
-							ORDER BY cta_corriente.fecha ASC";
+						AND cta_corriente.cobrable = 1
+						ORDER BY cta_corriente.fecha ASC";
 
 		$lista_gastos = new ListaGastos($sesion, '', $query);
 
@@ -1936,49 +1926,71 @@ HTML;
 		$url_actual = $actual[0];
 		$bitmodfactura = UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
 		switch ($url_actual) {
-			case '/app/interfaces/agregar_tarifa.php': $url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';
+			case '/app/interfaces/agregar_tarifa.php':
+				$url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';
 				break;
-			case '/app/interfaces/tarifas_tramites.php': $url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1';
+			case '/app/interfaces/tarifas_tramites.php':
+				$url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1';
 				break;
-			case '/app/interfaces/agregar_cliente.php': $url_actual = '/app/interfaces/clientes.php';
+			case '/app/interfaces/agregar_cliente.php':
+				$url_actual = '/app/interfaces/clientes.php';
 				break;
-			case '/app/interfaces/agregar_asunto.php': $url_actual = '/app/interfaces/asuntos.php';
+			case '/app/interfaces/agregar_asunto.php':
+				$url_actual = '/app/interfaces/asuntos.php';
 				break;
-			case '/app/usuarios/usuario_paso2.php': $url_actual = '/app/usuarios/usuario_paso1.php';
+			case '/app/usuarios/usuario_paso2.php':
+				$url_actual = '/app/usuarios/usuario_paso1.php';
 				break;
-			case '/app/interfaces/reportes_asuntos.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reportes_asuntos.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/resumen_cliente.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/resumen_cliente.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/planillas/planilla_facturacion_pendiente.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/planillas/planilla_facturacion_pendiente.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/planillas/planilla_cobros_por_area.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/planillas/planilla_cobros_por_area.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/planillas/planilla_resumen_cobranza.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/planillas/planilla_resumen_cobranza.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/planillas/planilla_morosidad.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/planillas/planilla_morosidad.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/resumen_abogado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/resumen_abogado.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/reportes_usuarios.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reportes_usuarios.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/reportes_horas.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reportes_horas.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/planillas.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/planillas.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/olap.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/olap.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/reporte_avanzado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reporte_avanzado.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/reporte_financiero.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reporte_financiero.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/reporte_costos.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reporte_costos.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/planillas/planilla_participacion_abogado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/planillas/planilla_participacion_abogado.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/app/interfaces/reporte_consolidado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+			case '/app/interfaces/reporte_consolidado.php':
+				$url_actual = '/app/interfaces/reportes_especificos.php';
 				break;
-			case '/fw/tablas/agregar_campo.php': $url_actual = '/fw/tablas/mantencion_tablas.php';
+			case '/fw/tablas/agregar_campo.php':
+				$url_actual = '/fw/tablas/mantencion_tablas.php';
 				break;
 		}
 		$lista_menu_permiso = Html::ListaMenuPermiso($sesion);
@@ -2089,7 +2101,7 @@ HTML;
 		$query_idioma = "SELECT formato_fecha as date_format, separador_decimales as decimal_separator, separador_miles as thousands_separator
 			FROM prm_idioma WHERE codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma')";
 		$result = $sesion->pdodbh->query($query_idioma)->fetchAll(PDO::FETCH_ASSOC);
-		if(!empty($result)){
+		if (!empty($result)) {
 			return $result[0];
 		}
 		return array('date_format' => '%d/%m/%Y', 'thousands_separator' => '.', 'decimal_separator' => ',');
@@ -2121,13 +2133,13 @@ HTML;
 
 	public static function ArregloMonedas($sesion) {
 		$query = "SELECT
-								prm_moneda.id_moneda,
-								prm_moneda.tipo_cambio,
-								prm_moneda.cifras_decimales,
-								prm_moneda.glosa_moneda,
-								prm_moneda.glosa_moneda_plural,
-								prm_moneda.simbolo
-							FROM prm_moneda";
+						prm_moneda.id_moneda,
+						prm_moneda.tipo_cambio,
+						prm_moneda.cifras_decimales,
+						prm_moneda.glosa_moneda,
+						prm_moneda.glosa_moneda_plural,
+						prm_moneda.simbolo
+					FROM prm_moneda";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		while (list($id_moneda, $tipo_cambio, $cifras_decimales, $glosa_moneda, $glosa_moneda_plural, $simbolo) = mysql_fetch_array($resp)) {
 			$moneda[$id_moneda]['tipo_cambio'] = $tipo_cambio;
@@ -2189,68 +2201,71 @@ HTML;
 		return $isValid;
 	}
 
-	public static function CorreoAreaComercial(array $userdata,$cant_visitas=0) {
+	public static function CorreoAreaComercial(array $userdata, $cant_visitas = 0) {
 		$correos = array();
-					$correo = array( 'mail' => 'areacomercial@lemontech.cl', 'nombre' => 'Equipo Time Tracking' );
-					array_push($correos,$correo);
-					$subject = 'Demo1: Visitante repetetivo.';
-					$body = 'El visitante, <br><br>Nombre:       '.$userdata['nombre'].'
-																						<br>Apellido1:    '.$userdata['apellido1'].'
-																						<br>Apellido2:    '.$userdata['apellido2'].'
-																						<br>Empresa:      '.$userdata['empresa'].'
-																						<br>Telefono:     '.$userdata['telefono'].'
-																						<br>Mail:         '.$userdata['email'].'
-																						<br>País:         '.$userdata['pais'];
-					if($cant_visitas>0) $body.="<br><br>ya ha ingresado $cant_visitas veces al sistema demo.";
-					return Utiles::EnviarMail($sesion,$correos,$subject,$body,false);
+		$correo = array('mail' => 'areacomercial@lemontech.cl', 'nombre' => 'Equipo Time Tracking');
+		array_push($correos, $correo);
+		$subject = 'Demo1: Visitante repetetivo.';
+		$body = 'El visitante, <br><br>Nombre:       ' . $userdata['nombre'] . '
+						<br>Apellido1:    ' . $userdata['apellido1'] . '
+						<br>Apellido2:    ' . $userdata['apellido2'] . '
+						<br>Empresa:      ' . $userdata['empresa'] . '
+						<br>Telefono:     ' . $userdata['telefono'] . '
+						<br>Mail:         ' . $userdata['email'] . '
+						<br>País:         ' . $userdata['pais'];
+		if ($cant_visitas > 0) {
+			$body.="<br><br>ya ha ingresado $cant_visitas veces al sistema demo.";
+		}
+		return Utiles::EnviarMail($sesion, $correos, $subject, $body, false);
 	}
-	public static  function CrearUsuario($sesion,array $userdata,$id_visitante=false) {
+
+	public static function CrearUsuario($sesion, array $userdata, $id_visitante = false) {
 		$query = "SELECT id_notificacion_tt FROM usuario ORDER BY id_notificacion_tt DESC LIMIT 1";
-					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					list($id_notificacion) = mysql_fetch_array( $resp );
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		list($id_notificacion) = mysql_fetch_array($resp);
 
-					$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario DESC LIMIT 1";
-					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					list( $id_usuario ) = mysql_fetch_array($resp);
-					$id_usuario++;
+		$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario DESC LIMIT 1";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		list( $id_usuario ) = mysql_fetch_array($resp);
+		$id_usuario++;
 
-					$usuario = new Usuario($sesion);
-					$usuario->Edit('id_usuario',$id_usuario);
-					$usuario->Edit('rut',$userdata['rut']);
-					$usuario->Edit('email',$userdata['email']);
-					$usuario->Edit('nombre',$userdata['nombre']);
-					$usuario->Edit('apellido1',$userdata['apellido1']);
-					$usuario->Edit('apellido2',$userdata['apellido2']);
-                    $usuario->Edit('username',$userdata['nombre'].' '.$userdata['apellido1']);
-					$usuario->Edit('password',md5('12345'));
-					if($id_visitante) $usuario->Edit('id_visitante',$id_visitante);
-					$usuario->Edit('id_notificacion_tt',$id_notificacion);
-					$usuario->Write();
+		$usuario = new Usuario($sesion);
+		$usuario->Edit('id_usuario', $id_usuario);
+		$usuario->Edit('rut', $userdata['rut']);
+		$usuario->Edit('email', $userdata['email']);
+		$usuario->Edit('nombre', $userdata['nombre']);
+		$usuario->Edit('apellido1', $userdata['apellido1']);
+		$usuario->Edit('apellido2', $userdata['apellido2']);
+		$usuario->Edit('username', $userdata['nombre'] . ' ' . $userdata['apellido1']);
+		$usuario->Edit('password', md5('12345'));
+		if ($id_visitante) {
+			$usuario->Edit('id_visitante', $id_visitante);
+		}
+		$usuario->Edit('id_notificacion_tt', $id_notificacion);
+		$usuario->Write();
 
-					$query = "INSERT INTO usuario_permiso( id_usuario, codigo_permiso )
-												VALUES ( ".$id_usuario.", 'ADM' ),
-															 ( ".$id_usuario.", 'ALL' ),
-															 ( ".$id_usuario.", 'COB' ),
-															 ( ".$id_usuario.", 'DAT' ),
-															 ( ".$id_usuario.", 'OFI' ),
-															 ( ".$id_usuario.", 'PRO' ),
-															 ( ".$id_usuario.", 'REP' ),
-															 ( ".$id_usuario.", 'REV' )";
-					return mysql_query($query,$sesion->dbh);
+		$query = "INSERT INTO usuario_permiso( id_usuario, codigo_permiso )
+						VALUES ( " . $id_usuario . ", 'ADM' ),
+								( " . $id_usuario . ", 'ALL' ),
+								( " . $id_usuario . ", 'COB' ),
+								( " . $id_usuario . ", 'DAT' ),
+								( " . $id_usuario . ", 'OFI' ),
+								( " . $id_usuario . ", 'PRO' ),
+								( " . $id_usuario . ", 'REP' ),
+								( " . $id_usuario . ", 'REV' )";
+		return mysql_query($query, $sesion->dbh);
 	}
 
-/**
- * Devuelve un botón para abrir el diálogo de historial de un elemento (factura, cobro, etc)
- * @param object $sesion   la sesión con el usuario logueado, para saber si tiene permiso de ver los logs
- * @param string $elemento el tipo de elemento que se está revisando: cobro, asunto, factura, factura_pago, etc.
- * @param int $id   el id del elemento. Esto no acepta código alfanumérico, tiene que ser el id de la tabla.
- */
-	public static function LogDialog($sesion,$elemento,$id) {
-
-				if( $sesion->usuario->TienePermiso('SADM') ) {
-						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";
-				}
-
+	/**
+	 * Devuelve un botón para abrir el diálogo de historial de un elemento (factura, cobro, etc)
+	 * @param object $sesion   la sesión con el usuario logueado, para saber si tiene permiso de ver los logs
+	 * @param string $elemento el tipo de elemento que se está revisando: cobro, asunto, factura, factura_pago, etc.
+	 * @param int $id   el id del elemento. Esto no acepta código alfanumérico, tiene que ser el id de la tabla.
+	 */
+	public static function LogDialog($sesion, $elemento, $id) {
+		if ($sesion->usuario->TienePermiso('SADM')) {
+			return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";
+		}
 	}
 
 	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
@@ -2260,11 +2275,10 @@ HTML;
 			'key' => 'AKIAIQYFL5PYVQKORTBA',
 			'secret' => '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'
 		));
-		$bucket = S3_UPLOAD_BUCKET;
 
 		$name = SUBDOMAIN . $name;
 
-		$response = $s3->create_object($bucket, $name, array(
+		$response = $s3->create_object(S3_UPLOAD_BUCKET, $name, array(
 			'body' => $file,
 			'acl' => AmazonS3::ACL_PUBLIC,
 			'contentType' => $contentType,
@@ -2272,10 +2286,40 @@ HTML;
 		));
 
 		if ($response->isOK()) {
-			return $s3->get_object_url($bucket, $name);
+			return $s3->get_object_url(S3_UPLOAD_BUCKET, $name);
 		}
 
-		return "";
+		return '';
+	}
+
+	public static function FileExistS3($name) {
+		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
+
+		$s3 = new AmazonS3(array(
+			'key' => 'AKIAIQYFL5PYVQKORTBA',
+			'secret' => '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'
+		));
+
+		$name = SUBDOMAIN . $name;
+
+		return $s3->if_object_exists(S3_UPLOAD_BUCKET, $name);
+	}
+
+	public static function slug($string, $replacement = '_', $map = array()) {
+		if (is_array($replacement)) {
+			$map = $replacement;
+			$replacement = '_';
+		}
+		$quotedReplacement = preg_quote($replacement, '/');
+
+		$merge = array(
+			'/[^\s\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
+			'/\\s+/' => $replacement,
+			sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
+		);
+
+		$map = $map + self::$_transliteration + $merge;
+		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
 }

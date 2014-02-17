@@ -7911,10 +7911,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 		case 5.44:
 			$query = array();
-			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-							VALUES (
-								NULL ,  'NoMostrarHorasIncobrablesEnNotaDeCobro',  '0',  'para que en el detalle de horas de PRC no les muestra las horas definidos como incobrables',  'boolean',  '6',  '-1'
-							);";
+			$query[] = "";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -9951,7 +9948,6 @@ QUERY;
 
 		case 7.44:
 			$queries = array();
-
 			$queries[] = "ALTER TABLE `cobro_pendiente` CHANGE `monto_estimado` `monto_estimado` DOUBLE NOT NULL DEFAULT '0' ";
 			ejecutar($queries, $dbh);
 			break;
@@ -10143,6 +10139,23 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.55:
+			$queries = array();
+			$queries[] = "ALTER TABLE archivo ADD archivo_s3 varchar(256) DEFAULT Null;";
+			ejecutar($queries, $dbh);
+
+		case 7.56:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarAsuntoPlanillaSaldo', 0, 'Desplegar columna de asunto en planilla de saldo', 'boolean', 2, -1);";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.57:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('GastosConImpuestosPorDefecto', 0, 'Dejar seleccionado la opción de impuesto al agregar un gasto', 'boolean', 2, -1);";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10152,7 +10165,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.54;
+$max_update = 7.57;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

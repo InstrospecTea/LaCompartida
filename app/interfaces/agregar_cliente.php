@@ -48,6 +48,7 @@ if ($opcion == "guardar") {
 	$val = false;
 
 	if ($cli->Loaded()) {
+
 		if (!$activo) {
 			$cli->InactivarAsuntos();
 		}
@@ -83,6 +84,7 @@ if ($opcion == "guardar") {
 			}
 		}
 	}
+
 
 	if (Conf::GetConf($sesion, 'EncargadoSecundario')) {
 		$id_usuario_secundario = (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : 0;
@@ -210,7 +212,6 @@ if ($opcion == "guardar") {
 					$pagina->AddError(__("Por favor ingrese la forma de") . __("cobro") . __("en la tarificación"));
 			}
 		}
-
 		if (empty($opc_moneda_total)) {
 			$pagina->AddError(__("Por favor ingrese la moneda a mostrar el total de la tarifa en la tarificación"));
 		}
@@ -233,10 +234,10 @@ if ($opcion == "guardar") {
 	}
 
 	if (!$val) {
-
+	
 		$cliente->Edit("glosa_cliente", $glosa_cliente);
 		$cliente->Edit("codigo_cliente", $codigo_cliente);
-
+		
 		if ($codigo_cliente_secundario) {
 			$cliente->Edit("codigo_cliente_secundario", strtoupper($codigo_cliente_secundario));
 		} else {
@@ -260,10 +261,10 @@ if ($opcion == "guardar") {
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 
-		if ($cliente->Write()) {
+		
+		if($cliente->Write()) {
 
 			//	Segmento : "Contrato";
-
 			$contrato->Load($cliente->fields['id_contrato']);
 
 			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == '') {
@@ -304,8 +305,9 @@ if ($opcion == "guardar") {
 				$cliente->Edit("id_contrato", $contrato->fields['id_contrato']);
 
 				foreach (array_keys($hito_fecha) as $i) {
-					if (empty($hito_monto_estimado[$i]))
+					if (empty($hito_monto_estimado[$i])){
 						continue;
+					}
 					$cobro_pendiente = new CobroPendiente($sesion);
 					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 					$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
@@ -338,14 +340,18 @@ if ($opcion == "guardar") {
 						$contrato_doc_legal->Write();
 					}
 				}
+
 				if ($cliente->Write()) {
 					$pagina->AddInfo(__('Cliente') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+					//To S3
+					$archivo->LoadById($contrato->fields['id_contrato']);
+				} else {
+					$pagina->AddError($contrato->error);
 				}
+
 			} else {
-				$pagina->AddError($contrato->error);
-			}
-		} else {
 			$pagina->AddError($cliente->error);
+			}
 		}
 	}
 
@@ -366,6 +372,7 @@ if ($opcion == "guardar") {
 			$asunto->Edit("fono_contacto", $fono_contacto_contrato);
 			$asunto->Edit("email_contacto", $email_contacto_contrato);
 			$asunto->Edit("direccion_contacto", $direccion_contacto_contrato);
+
 			if (!$id_usuario_encargado || $id_usuario_encargado == -1) {
 				$id_usuario_encargado = ($id_usuario_secundario) ? $id_usuario_secundario : 0;
 			}
@@ -457,6 +464,7 @@ function TTip($texto) {
 
 $pagina->titulo = __('Ingreso cliente');
 $pagina->PrintTop();
+
 ?>
 
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo $_SERVER[PHP_SELF] ?>" >
@@ -627,17 +635,15 @@ $pagina->PrintTop();
 	<table width="100%" cellspacing="3" cellpadding="3">
 		<tr>
 			<td colspan="2" align="center">
-
-				<?php
-				if ($cant_encargados > 0) {
+				
+				<?php if ($cant_encargados > 0) {
 
 					if (Conf::GetConf($sesion, 'RevisarTarifas')) {
 						$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario-cliente').get(0), false);";
 					} else {
 						$funcion_validar = "return Validar(jQuery('#formulario-cliente').get(0));";
-					}
-					?>
-
+					} ?>
+					
 					<a href="javascript:void(0);" icon="ui-icon-save" class="btn botonizame" onclick="<?php echo $funcion_validar; ?>" /><?php echo __('Guardar'); ?></a>
 
 				<?php } else { ?>
@@ -665,9 +671,7 @@ $pagina->PrintTop();
 		</tr>
 		<tr>
 			<td class="cvs" align="center" colspan=3>
-
 				<iframe name='iframe_asuntos'  class="resizableframe" id='iframe_asuntos' src='about:blank' style="width:100%;border:0 none;">&nbsp;</iframe>
-
 			</td>
 		</tr>
 	</table>
@@ -747,10 +751,10 @@ $pagina->PrintTop();
 
 	function validarUnicoCliente(dato, campo, id_cliente) {
 
-
 		var accion = 'existe_' + campo + '_cliente';
 		if (id_cliente !== undefined) {
 			var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato + '&id_cliente=' + id_cliente;
+
 		} else {
 			var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato;
 		}
@@ -772,6 +776,7 @@ $pagina->PrintTop();
 			}
 			return response;
 		});
+
 	}
 
 	function Validar(form) {
@@ -829,14 +834,12 @@ $pagina->PrintTop();
 				form.factura_razon_social.focus();
 				return false;
 			}
-
 			if (!form.factura_giro.value) {
 				alert("<?php echo __('Debe ingresar el giro del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_giro.focus();
 				return false;
 			}
-
 			if (!form.factura_direccion.value) {
 				alert("<?php echo __('Debe ingresar la dirección del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
@@ -869,7 +872,6 @@ $pagina->PrintTop();
 				form.id_pais.focus();
 				return false;
 			}
-
 			if (!form.cod_factura_telefono.value) {
 				alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
 				MuestraPorValidacion('datos_factura');
@@ -883,8 +885,7 @@ $pagina->PrintTop();
 				form.factura_telefono.focus();
 				return false;
 			}
-
-			// SOLICITANTE
+			
 			var titulocontacto = jQuery('#contacto');
 			if (!titulocontacto) {
 				alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
@@ -892,7 +893,7 @@ $pagina->PrintTop();
 				form.titulo_contacto.focus();
 				return false;
 			}
-
+			
 			var nombrecontacto = jQuery('#nombre_contacto');
 			if (!nombrecontacto) {
 				alert("<?php echo __('Debe ingresar el nombre del solicitante') ?>");
@@ -949,7 +950,6 @@ $pagina->PrintTop();
 				form.tarifa_flat.focus();
 				return false;
 			}
-
 			if (!$$('[name="forma_cobro"]').any(function(elem) {
 				return elem.checked;
 			})) {
@@ -982,7 +982,8 @@ $pagina->PrintTop();
 
 		<?php } ?>
 
-				// NUEVO MODULO FACTURA
+
+		// NUEVO MODULO FACTURA
 		<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 			if (!validar_doc_legales(true)) {
 				return false;
@@ -1066,7 +1067,6 @@ $pagina->PrintTop();
 		div.style.display = "block";
 	}
 
-
 	function HideMonto() {
 		div = document.getElementById("div_monto");
 		div.style.display = "none";
@@ -1090,63 +1090,73 @@ $pagina->PrintTop();
 		window.document.getElementById('iframe_asuntos').src = url;
 	}
 
+	<?php if ($CodigoSecundario) {
+		echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	} else {
+		echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	} ?>
+
+  	jQuery(document).ready(function() {
+
+		setTimeout(function() {
+			jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
+		}, 2000);
+	});
 
 	jQuery.ajax({
 		async: true,
-		cache: true,
+		cache:true,
 		type: "GET",
 		url: "//static.thetimebilling.com/js/bootstrap.min.js",
-		dataType: "script",
-		complete: function() {
-			jQuery('#codigo_cliente_secundario').blur(function() {
+        dataType: "script",
+        complete: function() {
+    		jQuery('#codigo_cliente_secundario').blur(function() {
+			if(jQuery(this).val()==="") {
+				return;
+			}
+			<?php if ($_GET['id_cliente'])  {
+				echo 'var id_cliente='.intval($_GET['id_cliente']).';';
+			} else {
+				echo 'var id_cliente=null;';
+			}?>
 
-				if (jQuery(this).val() == "") {
-					return;
+			var dato=jQuery(this).val();
+			var campo=jQuery(this).attr('id');
+			var accion = 'existe_'+campo+'_cliente';
+			var url_ajax = 'ajax.php?accion='+accion+'&dato_cliente='+dato;
+			
+			jQuery.get(url_ajax,function(data) {
+				objResp=null;
+				try {
+					var objResp=JSON.parse(data);
+				} catch (e) {
+					console.log(e);
 				}
 
-				<?php
-				if ($_GET['id_cliente']) {
-					echo 'var id_cliente=' . intval($_GET['id_cliente']) . ';';
-				} else {
-					echo 'var id_cliente=null;';
-				}
-				?>
+				if(objResp) {
+					var bd_cliente=1*objResp.id_cliente;
 
-				var dato = jQuery(this).val();
-				var campo = jQuery(this).attr('id');
-				var accion = 'existe_' + campo + '_cliente';
-				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato;
-				jQuery.get(url_ajax, function(data) {
-					objResp = null;
+					if(id_cliente!==null && bd_cliente===id_cliente) {
+						console.log(id_cliente, bd_cliente);
+						return true;
+					} else {
+						console.log(id_cliente, objResp);
 
-					try {
-						var objResp = JSON.parse(data);
-					} catch (e) {
-						console.log(e)
-					}
+						var codigo_cliente=objResp.codigo_cliente;
+						var codigo_cliente_secundario=objResp.codigo_cliente_secundario;
+						var glosa_cliente=objResp.glosa_cliente;
 
-					if (objResp) {
-						var bd_cliente = 1 * objResp.id_cliente;
-						if (id_cliente != null && bd_cliente == id_cliente) {
-							console.log(id_cliente, bd_cliente);
-							return true;
-						} else {
-							console.log(id_cliente, objResp);
-							var codigo_cliente = objResp.codigo_cliente;
-							var codigo_cliente_secundario = objResp.codigo_cliente_secundario;
-							var glosa_cliente = objResp.glosa_cliente;
-
-							if (codigo_cliente != "") {
-								jQuery('#formularioinicial').prepend('<div  class="alert"><span  id="alerta"></span><a class="close" data-dismiss="alert">×</a>  </div>');
-								var MensajeAlerta = "Error: el código secundario " + codigo_cliente_secundario + " ya existe en la Base de Datos y corresponde a <a href='?id_cliente=" + bd_cliente + "'>[" + codigo_cliente + "] " + glosa_cliente + "</a>."
-								jQuery('#alerta').html(MensajeAlerta).alert();
-							}
+						if(codigo_cliente!=="") {
+							jQuery('#formularioinicial').prepend('<div  class="alert"><span  id="alerta"></span><a class="close" data-dismiss="alert">×</a>  </div>'  );
+							var MensajeAlerta="Error: el código secundario "+codigo_cliente_secundario+" ya existe en la Base de Datos y corresponde a <a href='?id_cliente="+bd_cliente+"'>["+codigo_cliente +"] "+glosa_cliente+"</a>."
+							jQuery('#alerta').html(MensajeAlerta).alert();
 						}
 					}
-				});
+				}
 			});
-		}
-	});
+		});
+	}
+});
 
 <?php
 if ($CodigoSecundario) {
@@ -1158,7 +1168,6 @@ if ($CodigoSecundario) {
 
 </script>
 
-
 <?php
-$pagina->NewPrintBottom();
 
+$pagina->NewPrintBottom();
