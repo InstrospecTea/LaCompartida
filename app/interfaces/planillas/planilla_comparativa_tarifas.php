@@ -427,7 +427,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			moneda_cobro.simbolo AS moneda_cobro_simbolo,
 			moneda_base.simbolo AS moneda_base_simbolo,
 			cobro.monto AS monto_honorarios_original,
-			cobro.subtotal_gastos AS monto_gastos_original,
+			cobro.monto_gastos * (tc_moneda_total.tipo_cambio / moneda_cobro.tipo_cambio) AS monto_gastos_original,
 			cobro.total_minutos / 60 AS total_minutos,
 			prm_categoria_usuario.id_categoria_usuario AS id_categoria_usuario,
 			prm_categoria_usuario.glosa_categoria AS categoria_usuario,
@@ -438,6 +438,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			SUM(trabajo.monto_cobrado) / SUM(TIME_TO_SEC(trabajo.duracion_cobrada) / 3600) AS tarifa_usuario_original
 		FROM cobro
 		INNER JOIN prm_moneda moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
+		INNER JOIN prm_moneda moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
+		INNER JOIN cobro_moneda tc_moneda_total ON tc_moneda_total.id_moneda = moneda_total.id_moneda AND tc_moneda_total.id_cobro = cobro.id_cobro
 		INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 		INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 		INNER JOIN usuario usuario_contrato ON usuario_contrato.id_usuario = contrato.id_usuario_responsable
@@ -450,7 +452,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		AND $where
 		GROUP BY cobro.id_cobro, usuario_trabajo.id_usuario";
 
-	 // echo $query;
+	//echo $query; exit;
 	 //echo $query_adelantos;
 	 //echo $query_gastos;
 	 //echo $query_liquidaciones;
