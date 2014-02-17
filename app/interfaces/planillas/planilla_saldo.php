@@ -157,9 +157,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
 		$concat_asunto = ", GROUP_CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
-	}
-
-	if (!empty($concat_asunto)) {
 		$join_asunto = "LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro";
 		$join_asunto .= " LEFT JOIN asunto ON cobro_asunto.codigo_asunto = asunto.codigo_asunto";
 		$group_by = "GROUP BY cobro.id_cobro";
@@ -208,7 +205,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			ORDER BY fecha";
 
 
-	if (!empty($concat_asunto)) {
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
 		$join_asunto = "LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto";
 	}
 
@@ -249,6 +247,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				AND d.saldo_pago < 0
 				$where_adelantos
 			ORDER BY fecha";
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+	}
 
 	$query_gastos = "SELECT
 				$select_gastos
