@@ -1,4 +1,17 @@
 # Changelog
+
+## Release: 14.0.0
+Lunes 17 de Febrero 2014
+
+* **Feature:** [Reporte gbplegal](https://github.com/LemontechSA/ttb/pull/273)
+* **Feature:** [Impuesto por defecto al agregar un gasto](https://github.com/LemontechSA/ttb/pull/282)
+* **Feature:** [Agregar columna de asunto en planilla de saldos](https://github.com/LemontechSA/ttb/pull/298)
+* **Feature:** [Carga masiva](https://github.com/LemontechSA/ttb/pull/363)
+* **Feature:** [Nuevos filtros a interfaz revisar horas](https://github.com/LemontechSA/ttb/pull/374)
+* **Feature:** [Grafico reporte general](https://github.com/LemontechSA/ttb/pull/386)
+* **Feature:** [TXT contabilidad](https://github.com/LemontechSA/ttb/pull/394)
+* **Feature:** [Subir archivos s3](https://github.com/LemontechSA/ttb/pull/406)
+
 ## Hotfix: 13.7.37
 Viernes 14 de febrero 2014
 * **Added:** [Corrige monto subtotal para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
