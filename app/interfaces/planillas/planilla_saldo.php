@@ -151,8 +151,15 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		//$where_gastos .= "";
 	}
 
+	$concat_asunto = '';
+	$join_asunto = '';
+	$group_by = '';
+
 	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
-		$concat_asunto = ", CONCAT('{\"codigo\":\"', asunto.codigo_asunto, '\", \"glosa\":\"', asunto.glosa_asunto, '\"}') AS asunto";
+		$concat_asunto = ", GROUP_CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+		$join_asunto = "LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro";
+		$join_asunto .= " LEFT JOIN asunto ON cobro_asunto.codigo_asunto = asunto.codigo_asunto";
+		$group_by = "GROUP BY cobro.id_cobro";
 	}
 
 	$query_liquidaciones = "SELECT
@@ -186,7 +193,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
-			LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto
+			$join_asunto
 			$join_liquidaciones
 			WHERE
 				cliente.activo = 1
@@ -194,7 +201,14 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				AND d.tipo_doc = 'N'
 				AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
 				$where_liquidaciones
+			$group_by
 			ORDER BY fecha";
+
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+		$join_asunto = "LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto";
+	}
 
 	$query_adelantos = "SELECT
 				$select_adelantos
@@ -224,7 +238,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 			LEFT JOIN contrato ON d.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
-			LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto
+			$join_asunto
 			$join_adelantos
 			WHERE
 				cliente.activo = 1
@@ -233,6 +247,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				AND d.saldo_pago < 0
 				$where_adelantos
 			ORDER BY fecha";
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+	}
 
 	$query_gastos = "SELECT
 				$select_gastos
@@ -549,19 +567,26 @@ $Pagina->PrintTop($popup);
 
 		jQuery('td.asunto').each(function() {
 			var td = jQuery(this);
-			var contenido = '[' + td.html() + ']';
+			var contenido = td.html();
 			td.html('');
 			try {
-				var contenido_json = jQuery.parseJSON(contenido);
-				jQuery.each(contenido_json, function(key, value) {
-					td.append(jQuery('<a/>', {
-						text: value.codigo,
-						style: 'white-space:nowrap;',
-						href: 'javascript:void(0)',
-						onMouseover: 'ddrivetip("' + value.glosa + '")',
-						onMouseout: 'hideddrivetip()'
-					})).append(' ');
-				});
+				if (contenido.length > 0 && contenido != 'asunto') {
+					var _contenido = contenido.split(',');
+					if (_contenido.length > 5) {
+						td.append(_contenido.length + ' asuntos');
+					} else {
+						jQuery.each(_contenido, function(k,v) {
+						var _v = v.split('|');
+							td.append(jQuery('<a/>', {
+								text: _v[0],
+								style: 'white-space:nowrap;',
+								href: 'javascript:void(0)',
+								onMouseover: 'ddrivetip("' + _v[1] + '")',
+								onMouseout: 'hideddrivetip()'
+							})).append(' ');
+						});
+					}
+				}
 			} catch (err) {
 			}
 		});

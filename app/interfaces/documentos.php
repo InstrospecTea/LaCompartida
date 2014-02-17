@@ -29,13 +29,17 @@ if (!empty($archivo_data['name']) && $accion == "guardar") {
 		$archivo->Edit('descripcion', $descripcion);
 
 		// Write to S3 Server
-		$s3url = $archivo->Upload($contrato->fields['id_contrato'], $archivo_data);
-		$archivo->Edit('archivo_s3', $s3url);
-
-		if ($archivo->Write()) {
-			$pagina->AddInfo(__('Documento guardado con éxito'));
+		$s3url = $archivo->Upload($contrato->fields['codigo_cliente'], $contrato->fields['id_contrato'], $archivo_data);
+		if ($s3url === false) {
+			$pagina->AddInfo(__('Ya existe un documento con ese nombre.'));
 		} else {
-			$pagina->AddError(__('No se ha podido guardar el documento.'));
+			$archivo->Edit('archivo_s3', $s3url);
+
+			if ($archivo->Write()) {
+				$pagina->AddInfo(__('Documento guardado con éxito'));
+			} else {
+				$pagina->AddError(__('No se ha podido guardar el documento.'));
+			}
 		}
 	} else {
 		$pagina->AddError("El archivo es demasiado pesado.");
@@ -75,7 +79,7 @@ $pagina->PrintTop(1);
 			</tr>
 			<tr>
 				<td align=right>
-					Descripci&oacute;n: 
+					Descripci&oacute;n:
 				</td>
 				<td align=left>
 					<textarea cols=30 rows=2 name="descripcion"></textarea>
@@ -98,7 +102,7 @@ $pagina->PrintTop(1);
 		if ($x_pag = ""){
 			$x_pag = 3;
 		}
-			
+
 		$query = "SELECT SQL_CALC_FOUND_ROWS *,id_archivo, descripcion, archivo_nombre FROM archivo WHERE id_contrato = '" . $contrato->fields['id_contrato'] . "' ";
 		$b = new Buscador($sesion, $query, "Archivo", $desde, $x_pag, 'archivo_nombre');
 		$b->nombre = "busc_archivos";
@@ -165,12 +169,12 @@ printf('<script type="text/javascript" src="%s/app/templates/default/js/uploader
 ?>
 
 <script type="text/javascript">
-	
+
 	var max_file_uploads = <?php echo ini_get('max_file_uploads') ?>;
 	var upload_max_filesize = <?php echo sizeInBytes(ini_get('upload_max_filesize')); ?>;
 	var upload_max_filesize_h = '<?php echo ini_get('upload_max_filesize'); ?>';
 	observeFile('archivo_data');
-	
+
 	function Guardar(t) {
 		var form = $('form_archivo');
 		$('accion').value = 'guardar';
