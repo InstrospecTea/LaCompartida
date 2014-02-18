@@ -165,7 +165,7 @@ function GeneraFacturaElectronica($hookArg) {
 
 				$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 				$file_data = base64_decode($result->documentopdf);
-				$file_url = UtilesApp::UploadToS3($Sesion, $file_name, $file_data, 'application/pdf');
+				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
 
 				$Factura->Edit('dte_url_pdf', $file_url);
 				if ($Factura->Write()) {
@@ -266,7 +266,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 
 	//	Se ajusta zona horaria segun el timezone del servidor
 	$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
-	date_default_timezone_set($zona_horaria); 
+	date_default_timezone_set($zona_horaria);
 	$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
 
 	$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
@@ -304,7 +304,7 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		)
 	);
 
-	/*	
+	/*
 	*	El monto subtotal de la factura debe ser la suma de los subtotales
 	*	subtotal = Monto Horararios;
 	*	subtotal_gastos = Monto Gastos con impuestos;
@@ -314,19 +314,19 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
 
 	$r['COM'][] = 'subTotal|' . number_format($subtotal_factura, 2, '.', '');
-	
+
 	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int)$Factura->fields['dte_metodo_pago_cta'] > 0) {
 		$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
 	}
-	
+
 	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
 		$r['DOR'][] = 'calle|' . ($Factura->fields['direccion_cliente']);
 	}
-	
+
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
-	
+
 	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
 		$r['DOR'][] = 'localidad|' . ($Factura->fields['ciudad_cliente']);
 	}
