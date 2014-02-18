@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.0.1
+martes 18 de febrero 2014
+* **Fixed:** [Corrige subir archivo desde facturacion mx](https://github.com/LemontechSA/ttb/pull/418)
+
 
 ## Release: 14.0.0
 Lunes 17 de Febrero 2014
