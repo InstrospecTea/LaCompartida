@@ -10156,6 +10156,13 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('GastosConImpuestosPorDefecto', 0, 'Dejar seleccionado la opción de impuesto al agregar un gasto', 'boolean', 2, -1);";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.58:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'GlosaDetraccion', ' ', 'Glosa Detraccion', 'text', '4', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaTextoImpuesto', ' ', 'Texto Factura Impuesto', 'text', '4', '-1');";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10165,7 +10172,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.57;
+$max_update = 7.58;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
