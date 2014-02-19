@@ -1,7 +1,8 @@
 # Changelog
 ## Hotfix: 14.0.1
-martes 18 de febrero 2014
-* **Added:** [Agrega Glosa Detraccion para](https://github.com/LemontechSA/ttb/pull/419)
+Miercoles 19 de febrero 2014
+* **Added:** [Agrega Glosa Detraccion para cliente](https://github.com/LemontechSA/ttb/pull/419)
+* **Added:** [Agrega simbolo de moneda a los montos que aparecen en RESUMEN PROFESIONAL, DETALLE PROFESIONAL](https://github.com/LemontechSA/ttb/pull/419)
 
 ## Hotfix: 14.0.1
 martes 18 de febrero 2014
