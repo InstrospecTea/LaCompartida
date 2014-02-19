@@ -365,7 +365,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 
    	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
 
-	$query.=" 
+	$query.="
 		FROM trabajo
 			LEFT JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 			LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
@@ -426,13 +426,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
 
 	if ($orden == "") {
-
 		if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
 			$orden = " cliente.glosa_cliente ASC, trabajo.fecha ASC";
 		} else {
 			$orden = " trabajo.fecha ASC ";
 		}
-
 	}
 
 	if (stristr($orden, ".") === FALSE) {
@@ -544,11 +542,11 @@ $pagina->PrintTop($popup);
 		//todo if $motivo=="cobros",$motivo=="horas"
 		var pagina_desde = '<?php echo $desde ? "&desde=$desde" : ''; ?>';
 		var orden = '<?php echo $desde ? "&orden=$orden" : ''; ?>';
-		
+
 		<?php if ($motivo == "horas") {
 			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		?>
-		
+
 			var cliente = 'codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
 			var asunto = 'codigo_asunto_secundario='+$('codigo_asunto_secundario').value;
 			<?php } else { ?>
@@ -698,7 +696,7 @@ $pagina->PrintTop($popup);
 		<table   style="border: 0px solid black;width:700px;margin:auto;" >
 
 			<?php
-			
+
 			if ($motivo != "cobros") {
 				if ($p_revisor->fields['permitido']) {
 					?>
