@@ -6257,8 +6257,8 @@ class NotaCobro extends Cobro {
 							$row = str_replace('%tarifa_horas_demo%', '', $row);
 						}
 						if ($this->fields['opc_ver_profesional_importe'] == 1) {
-							$row = str_replace('%td_importe%', '<td align="center">%total_horas_demo%</td>', $row);
-							$row = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							$row = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $row);
+							$row = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($data['valor_tarificada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						} else {
 							$row = str_replace('%td_importe%', '', $row);
 							$row = str_replace('%total_horas_demo%', '', $row);
@@ -6492,7 +6492,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%td_tarifa%', '<td>&nbsp;</td>', $html);
 				if ($this->fields['opc_ver_profesional_importe'] == 1) {
 					$html = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $html);
-					$html = str_replace('%total_horas_demo%', number_format($totales['valor_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($totales['valor_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				} else {
 					$html = str_replace('%td_importe%', '', $html);
 					$html = str_replace('%total_horas_demo%', '', $html);
@@ -11024,7 +11024,7 @@ class NotaCobro extends Cobro {
 									$resumen_fila = str_replace('%td_importe%', '', $resumen_fila);
 									$resumen_fila = str_replace('%td_importe_ajustado%', '', $resumen_fila);
 								}
-								$resumen_fila = str_replace('%total_horas_demo%', number_format($usuarios['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_fila);
+								$resumen_fila = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_fila);
 
 								$resumen_fila = str_replace('%td_descontada%', '', $resumen_fila);
 								$resumen_fila = str_replace('%td_cobrable%', '', $resumen_fila);
@@ -11056,7 +11056,7 @@ class NotaCobro extends Cobro {
 								$resumen_total = str_replace('%td_importe%', '', $resumen_total);
 								$resumen_total = str_replace('%td_importe_ajustado%', '', $resumen_total);
 							}
-							$resumen_total = str_replace('%total_horas_demo%', number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_total);
+							$resumen_total = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_total);
 							$html .= $resumen_total;
 							$html .= "</table>";
 						}
@@ -11254,11 +11254,11 @@ class NotaCobro extends Cobro {
 					}
 
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-						$html3 = str_replace('%total_horas_demo%', number_format($data['monto_cobrado_escalonada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
+						$html3 = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($data['monto_cobrado_escalonada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 						$html3 = str_replace('%total_horas%', number_format($data['monto_cobrado_escalonada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 						$html3 = str_replace('%total_horas_ajustado%', number_format($data['monto_cobrado_escalonada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 					} else if ($this->fields['opc_ver_profesional_importe'] == 1) {
-						$html3 = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
+						$html3 = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($data['valor_tarificada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 						$html3 = str_replace('%total_horas%', number_format($data['valor_tarificada'] > 0 ? $data['valor_tarificada'] : 0, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 						$html3 = str_replace('%total_horas_ajustado%', number_format($data['duracion_cobrada'] * $data['tarifa'] * $x_factor_ajuste, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 					} else {
@@ -11404,7 +11404,7 @@ class NotaCobro extends Cobro {
 				if ($this->fields['opc_ver_profesional_importe'] == 1) {
 					$html3 = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $html3);
 					$html3 = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_ajustado%</td>', $html3);
-					$html3 = str_replace('%total_horas_demo%', number_format($resumen_valor, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
+					$html3 = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($resumen_valor, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 					$html3 = str_replace('%total_horas_ajustado%', number_format($this->fields['monto_subtotal'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 				} else {
 					$html3 = str_replace('%td_importe%', '', $html3);

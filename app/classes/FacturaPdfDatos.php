@@ -61,6 +61,7 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
+		// Segmento Condiciones de pago
 		$condicion_pago = $factura->fields['condicion_pago'];
 
 		switch ($condicion_pago) {
@@ -98,6 +99,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 		}
 
+		// Segmento Comodines. Solicitados por @gtigre
 		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
 		$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
 		$array_comodines = array();
@@ -106,6 +108,7 @@ class FacturaPdfDatos extends Objeto {
 			$array_comodines[$codigo] = $glosa;
 		}
 
+		// Segmento Monto en palabra solicitado por @gtigre
 		$arreglo_monedas = ArregloMonedas($this->sesion);
 		$monto_palabra=new MontoEnPalabra($this->sesion);
 
@@ -134,6 +137,37 @@ class FacturaPdfDatos extends Objeto {
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, 'es'));
 			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, 'es'));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1') . ' CON ' . $monto_palabra_parte_decimal . ' CENTAVOS';
+		}
+
+		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
+		
+		$tipo_cambio_usd = $arreglo_monedas[2]['tipo_cambio'];
+		$cifras_decimales_usd = $arreglo_monedas[2]['cifras_decimales'];
+
+		$tipo_cambio_moneda_base = $arreglo_monedas[1]['tipo_cambio'];
+		$cifras_decimales_moneda_base = $arreglo_monedas[1]['cifras_decimales'];
+
+		$monto_total_factura_monedabase = $monto_total_factura;
+		$glosa_detraccion = explode(';',Conf::GetConf($this->sesion,'GlosaDetraccion'));
+		$FacturaTextoImpuesto = Conf::GetConf($this->sesion,'FacturaTextoImpuesto');
+
+		$monto_detraccion = $glosa_detraccion[0];
+		$texto_detraccion = $glosa_detraccion[1];
+
+		if ($factura->fields['id_moneda'] != 1) {
+			$monto_total_factura_monedabase = UtilesApp::CambiarMoneda($monto_total_factura, $tipo_cambio_usd, $cifras_decimales_usd, $tipo_cambio_moneda_base, $cifras_decimales_moneda_base, '');
+		}
+
+		if ($monto_total_factura_monedabase >= $monto_detraccion){
+			$factura_texto_detraccion =  $texto_detraccion;
+		} else {
+			$factura_texto_detraccion = '';
+		}
+
+		if ($factura->fields['RUT_cliente'] == '' || $factura->fields['iva'] == 0){
+			$texto_impuesto = '';
+		} else {
+			$texto_impuesto = $FacturaTextoImpuesto;
 		}
 
 		switch( $tipo_dato ) {
@@ -290,6 +324,14 @@ class FacturaPdfDatos extends Objeto {
 					$idioma->fields['separador_miles']
 				);
 				break;
+			case 'glosa_detraccion':
+				$glosa_dato = $factura_texto_detraccion;
+				break;
+
+			case 'texto_impuesto':
+				$glosa_dato = $texto_impuesto;
+				break;
+
 			default:
 			
 				if (array_key_exists($tipo_dato, $array_comodines)) {
@@ -396,6 +438,8 @@ class FacturaPdfDatos extends Objeto {
 			$idioma->fields['separador_decimales'],
 			$idioma->fields['separador_miles']
 		);
+		$fila['glosa_detraccion'] = $factura_texto_detraccion;
+		$fila['texto_impuesto'] = $texto_impuesto;
 
 		return $fila;
 	}
