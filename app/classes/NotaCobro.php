@@ -1,4 +1,4 @@
-%<?php
+<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
 require_once('Numbers/Words.php');
