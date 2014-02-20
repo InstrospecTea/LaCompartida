@@ -681,7 +681,9 @@ $pagina->PrintTop($popup);
 		jQuery(this).val(str.replace(',', '.'));
 		jQuery(this).parseNumber({format:"0.00", locale:"us"});
 		jQuery(this).formatNumber({format:"0.00", locale:"us"});
-		CambiaMonto(this.form, this.id);
+		if (jQuery(this).attr('id') == 'monto') {
+			CambiaMonto(this.form, this.id);
+		}
 	});
 </script>
 
