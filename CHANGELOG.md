@@ -1,10 +1,14 @@
 # Changelog
-## Hotfix: 14.0.1
+## Hotfix: 14.0.4
+Jueves 20 de febrero 2014
+* **Fixed:** [Corrige query de verificacion de duplicidad de correo semanal.](https://github.com/LemontechSA/ttb/pull/422)
+
+## Hotfix: 14.0.3
 Jueves 20 de febrero 2014
 * **Added:** [Nuevos elementos para la facturación del cliente "Governance"](https://github.com/LemontechSA/ttb/pull/420)
 * **Added:** [Corrección a interfaz de gastos "Monto Facturable"](https://github.com/LemontechSA/ttb/pull/420)
 
-## Hotfix: 14.0.1
+## Hotfix: 14.0.2
 Miercoles 19 de febrero 2014
 * **Added:** [Agrega Glosa Detraccion para cliente](https://github.com/LemontechSA/ttb/pull/419)
 * **Added:** [Agrega simbolo de moneda a los montos que aparecen en RESUMEN PROFESIONAL, DETALLE PROFESIONAL](https://github.com/LemontechSA/ttb/pull/419)
