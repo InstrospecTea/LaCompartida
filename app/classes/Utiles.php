@@ -95,7 +95,7 @@ class Utiles extends \Utiles {
 			$TipoCorreo = new TipoCorreo($sesion);
 			$id_tipo_correo = $TipoCorreo->obtenerId($tipo);
 		}
-		$where_dia = '';
+		$where_dia = 'AND fecha = CURDATE()';
 		if ($es_diario) {
 			$where_dia = 'AND fecha > CURDATE()';
 		}
