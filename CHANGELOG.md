@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.0.5
+Viernes 21 de febrero 2014
+* **Fixed:** [Corrige query de verificacion de duplicidad de correo semanal.](https://github.com/LemontechSA/ttb/pull/423)
+
 ## Hotfix: 14.0.4
 Jueves 20 de febrero 2014
 * **Fixed:** [Corrige query de verificacion de duplicidad de correo semanal.](https://github.com/LemontechSA/ttb/pull/422)
