@@ -11298,12 +11298,15 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_tarifa%', '<td align="center" width="60">%valor_hh%</td>', $html);
 					$html = str_replace('%td_tarifa_simbolo%', '<td align="center" width="60">%valor_hh_simbolo%</td>', $html);
 					$html = str_replace('%valor_horas%', $flatfee ? '' : __('Tarifa'), $html);
+					$html = str_replace('%valor_hh%', __('TARIFA'), $html);
 					$html = str_replace('%valor_hh_simbolo%', __('TARIFA') . ' (' .$moneda->fields['simbolo'] . ')', $html);
 					$html = str_replace('%td_tarifa_ajustada%', '<td align="center" width="60">' . __('TARIFA') . '</td>', $html);
 				} else {
 					$html = str_replace('%td_tarifa%', '', $html);
+					$html = str_replace('%td_tarifa_simbolo%', '', $html);
 					$html = str_replace('%valor_horas%', '', $html);
 					$html = str_replace('%valor_hh%', '', $html);
+					$html = str_replace('%valor_hh_simbolo%', '', $html);
 					$html = str_replace('%td_tarifa_ajustada%', '', $html);
 				}
 
