@@ -1,20 +1,40 @@
 <?php
 
+require_once Conf::ServerDir() . '/classes/Html.php';
+
 Class FacturacionElectronica {
+
+	private static $Html;
+
+	public static function getHtml() {
+		if (empty(self::$Html)) {
+			self::$Html = new \TTB\Html;
+		}
+		return self::$Html;
+	}
 
 	public static function BotonDescargarHTML($id_factura) {
 		$img_dir = Conf::ImgDir();
-		$content = "<a class = 'factura-documento' data-factura = '$id_factura' href = '#'> <img src='$img_dir/pdf.gif' border='0' /></a>";
-		$content .= "<a class = 'factura-documento' data-format = 'xml' data-factura = '$id_factura' href = '#' > <img src='$img_dir/xml.gif' border='0' /></a>";
-		return $content;
+		$Html = self::getHtml();
+		$img_pdf = $Html->img("{$img_dir}/pdf.gif", array('border' => 0));
+		$a1 = $Html->tag('a', $img_pdf, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'href' => '#'));
+		$img_xml = $Html->img("{$img_dir}/xml.gif", array('border' => 0));
+		$a2 = $Html->tag('a', $img_xml, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'data-format' => 'xml', 'href' => '#'));
+		return $a1 . $a2;
 	}
 
 	public static function BotonGenerarHTML($id_factura) {
+		$Html = self::getHtml();
 		$img_dir = Conf::ImgDir();
-		$content = "<a style = 'margin-left: 8px;margin-right: 8px;text-decoration: none;' title = 'Generar Factura Electrónica' class = 'factura-electronica' data-factura = '$id_factura' href = '#' >
-			<img src = '$img_dir/invoice.png' border='0' />
-		</a>";
-		return $content;
+		$img = $Html->img("$img_dir/invoice.png", array('border' => '0'));
+		$attr_a = array(
+			'style' => 'margin-left: 8px;margin-right: 8px;',
+			'title' => 'Generar Factura Electrónica',
+			'class' => 'factura-electronica',
+			'data-factura' => $id_factura,
+			'href' => '#'
+		);
+		return  $Html->tag('a', $img, $attr_a);
 	}
 
 	public static function AgregarBotonFacturaElectronica($hookArg) {

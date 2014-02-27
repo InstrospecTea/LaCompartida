@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $Slim = Slim::getInstance('default', true);
 
-$clase = 'FacturacionElectronicaMx';
+$clase = 'FacturacionElectronicaCl';
 
 $Slim->hook('hook_factura_javascript_after', array($clase, 'InsertaJSFacturaElectronica'));
 $Slim->hook('hook_factura_metodo_pago', array($clase, 'InsertaMetodoPago'));

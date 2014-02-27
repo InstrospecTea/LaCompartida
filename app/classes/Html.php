@@ -15,13 +15,13 @@ class Html extends \Html {
 
 
     $attributes = is_array($attributes) ? self::attributes($attributes) : $attributes;
-     
+
     if ($closed) {
       $html = sprintf('<%s%s />', $tag, $attributes);
     } else {
       $html = sprintf('<%s%s>%s</%s>', $tag, $attributes, $content, $tag);
     }
-    
+
     return $html;
   }
 
@@ -37,7 +37,9 @@ class Html extends \Html {
     return $html;
   }
 
+  public function img($image, $attributes) {
+	  $attr = array_merge(array('src' => $image), $attributes);
+	  return $this->tag('img', '', $attr, true);
+  }
+
 }
-
- 
-
