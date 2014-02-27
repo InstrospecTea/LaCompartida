@@ -374,7 +374,7 @@ if ($opcion == "guardar") {
 			$asunto->Edit("direccion_contacto", $direccion_contacto_contrato);
 
 			if (!$id_usuario_encargado || $id_usuario_encargado == -1) {
-				$id_usuario_encargado = ($id_usuario_secundario) ? $id_usuario_secundario : 0;
+				$id_usuario_encargado = ($id_usuario_secundario) ? $id_usuario_secundario : 'NULL';
 			}
 
 			if (!$id_usuario_encargado == -1) {
