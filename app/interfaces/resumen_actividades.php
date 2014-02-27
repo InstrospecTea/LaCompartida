@@ -875,7 +875,6 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 		$reporteC->addRangoFecha($fecha_ini, $fecha_fin);
 		$reporteC->setTipoDato($tipo_dato_comparado);
 		$reporteC->setVista($vista);
-		//$reporte->setProporcionalidad($prop);
 
 		if ($campo_fecha) {
 			$reporteC->setCampoFecha($campo_fecha);
@@ -1290,26 +1289,29 @@ if ($opc == 'grafico') {
 	$contador = 0;
 	foreach ($reporte->row as $row) {
 		if ($row[$campo_nombre] != $nombres[$contador]) {
-			$contador++;
+			++$contador;
 			$nombres[$contador] = $row[$campo_nombre];
 		}
-		$tiempos[$contador] += $row[$tipo_dato];
+		$tiempos[$contador] += round($row[$tipo_dato], 2);
 	}
 
 	if ($tipo_dato_comparado) {
 		$contador = 0;
 		foreach ($reporteC->row as $row) {
 			if ($row[$campo_nombre] != $nombres[$contador]) {
-				$contador++;
+				++$contador;
 				$nombresC[$contador] = $row[$campo_nombre];
 			}
-			$tiemposC[$contador] += $row[$tipo_dato_comparado];
+			$tiemposC[$contador] += round($row[$tipo_dato_comparado], 2);
 		}
 	}
 
 	$datos_grafico = array();
 	$datos_grafico_compara = array();
 	if ($nombres) {
+		$nombres = UtilesApp::utf8izar($nombres);
+		$nombresC = UtilesApp::utf8izar($nombresC);
+		$limiteC = $limite;
 		$otros = 0;
 		foreach ($tiempos as $key => $tiempo) {
 			if ($limite-- > 0) {
@@ -1327,7 +1329,7 @@ if ($opc == 'grafico') {
 		if ($tipo_dato_comparado) {
 			$otrosC = 0;
 			foreach ($tiemposC as $key => $tiempo) {
-				if ($limite-- > 0) {
+				if ($limiteC-- > 0) {
 					$datos_grafico_compara['nombres'][] = $nombresC[$key];
 					$datos_grafico_compara['tiempo'][] = str_replace(',', '.', $tiemposC[$key]);
 				} else {
