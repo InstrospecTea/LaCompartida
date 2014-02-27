@@ -1,7 +1,11 @@
 # Changelog
+## Hotfix: 14.0.7
+Viernes 21 de febrero 2014
+* **Fixed:** [Corrige error al agregar un cliente sin encargado secundario definido.](https://github.com/LemontechSA/ttb/pull/428)
+
 ## Hotfix: 14.0.6
 Viernes 21 de febrero 2014
-* **Fixed:** [Corrige selector para cdrabogados interfaz agregar_gasto.](https://github.com/LemontechSA/ttb/pull/425)
+* **Fixed:** [Corrige selector para cdrabogados interfaz agregar_gasto.](https://github.com/LemontechSA/ttb/pull/426)
 
 ## Hotfix: 14.0.5
 Viernes 21 de febrero 2014
