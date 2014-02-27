@@ -281,11 +281,6 @@ list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 			}
 		<?php } ?>
 
-		<?php if ($plugins_activos == 'facturacion_electronica_mx.php') { ?>
-			alert('ok existe');
-		<?php } ?>
-
-
 		<?php if ($validaciones_segun_config) { ?>
 			// DATOS FACTURACION
 
