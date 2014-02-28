@@ -6,17 +6,31 @@ require_once(Conf::RutaGraficos());
 require_once Conf::ServerDir() . '/../app/interfaces/graficos/GraficoBarras.php';
 
 
-$sesion = new Sesion();
+$Sesion = new Sesion();
 
 
-$data = json_decode(base64_decode($_GET['datos']), true);
-$data_compara = empty($_GET['datos_compara']) ? false : json_decode(base64_decode($_GET['datos_compara']), true);
-if ($data_compara) {
-	$labels = explode(',', $_GET['labels']);
+$data = UtilesApp::utf8izar(json_decode(base64_decode($_GET['datos']), true), false);
+$data_compara = empty($_GET['datos_compara']) ? false : UtilesApp::utf8izar(json_decode(base64_decode($_GET['datos_compara']), true), false);
+
+$datos = array_combine($data['nombres'], $data['tiempo']);
+$datos_compara = array_combine($data_compara['nombres'], $data_compara['tiempo']);
+
+function dort_desc($a, $b) {
+	return $a < $b;
 }
-$colores = array();
+uasort($datos, 'dort_desc');
 
-foreach ($data['nombres'] as $d) {
+if ($datos_compara) {
+	$labels = explode(',', $_GET['labels']);
+	$datos_comparados = array();
+	foreach ($datos as $key => $value) {
+		$datos_comparados[] = $datos_compara[$key];
+	}
+}
+
+$colores = array();
+$nombres = array_keys($datos);
+foreach ($nombres as $d) {
 	if ($d > 0) {
 		$colores[] = 0x0044ff;
 	} else {
@@ -25,22 +39,16 @@ foreach ($data['nombres'] as $d) {
 }
 
 $estimado_ampliacion = 0;
-$cantidad_labels = sizeof($data['nombres']);
-if ($data_compara) {
-	if ($labels[0] == $labels[1]) {
-		$cantidad_labels *= 2;
-	}
-}
+$cantidad_datos = count($datos);
 
-if ($cantidad_labels > 20) {
-	$estimado_ampliacion = 18 * ($cantidad_labels - 20);
+if ($cantidad_datos > 20) {
+	$estimado_ampliacion = 18 * ($cantidad_datos - 20);
 }
-
 
 # Create a XY object
 $c = new XYChart(700 + $estimado_ampliacion, 400);
 
-$margen_horizontal = strlen($data['nombres']) * 4;
+$margen_horizontal = $cantidad_datos * 4;
 $margen_vertical = 0;
 foreach ($data['nombres'] as $label) {
 	if (strlen($label) * 4 > $margen_vertical) {
@@ -57,7 +65,7 @@ $c->setPlotArea(35 + $margen_horizontal, 40, 590 - $margen_horizontal + $estimad
 
 $c->yAxis->setTitle($labels[0]);
 //Cuando se compara se usan dos set de Valores para los mismos Labels
-if ($data_compara) {
+if ($datos_compara) {
 	$c->yAxis2->setTitle($labels[1]);
 
 	$c->yAxis->setColors(0x000000, 0x000000, 0xD00000);
@@ -65,26 +73,22 @@ if ($data_compara) {
 
 	$layer = $c->addBarLayer2(Side, 0);
 
-	$layer->addDataSet($data['tiempo'], 0xff4400, "1");
-	$layer->addDataSet($data_compara['tiempo'], 0x4400ff, '2');
+	$layer->addDataSet(array_values($datos), 0xff4400, "1");
+	$layer->addDataSet($datos_comparados, 0x4400ff, '2');
 
 	$layer->setAggregateLabelStyle('arial.ttf', 9, 0x000000);
 
 	$c->xAxis->setTickOffset(0.5);
 } else {
-	$layer = $c->addBarLayer3($data['tiempo'], $colores, $titulo);
+	$layer = $c->addBarLayer3(array_values($datos), $colores, $titulo);
 	$layer->setAggregateLabelStyle('arialbd.ttf', 8, $layer->yZoneColor(0, 0xcc3300, 0x3333ff));
 }
-$labelsObj = $c->xAxis->setLabels($data['nombres']);
+$labelsObj = $c->xAxis->setLabels($nombres);
 $labelsObj->setFontStyle('arialbd.ttf');
-$labelsObj->setFontAngle(30);
+$labelsObj->setFontAngle(45);
 
 $c->setYAxisOnRight(true);
 $c->yAxis->setLabelStyle('arialbd.ttf');
 
-
-
-//$chart1URL = $c->makeSession("chart1");
-// output the chart
 header('Content-type: image/png');
 print($c->makeChart2(PNG));
