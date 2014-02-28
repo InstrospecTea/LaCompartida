@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.0.8
+jueves 27 de febrero 2014
+* **Fixed:** [Orden de datos de los gráficos](https://github.com/LemontechSA/ttb/pull/429)
+
 ## Hotfix: 14.0.7
 Viernes 21 de febrero 2014
 * **Fixed:** [Corrige error al agregar un cliente sin encargado secundario definido.](https://github.com/LemontechSA/ttb/pull/428)
