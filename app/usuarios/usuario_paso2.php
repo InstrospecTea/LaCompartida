@@ -10,10 +10,11 @@ require_once Conf::ServerDir() . '/classes/Funciones.php';
 
 $sesion = new Sesion(array('ADM'));
 $pagina = new Pagina($sesion);
-$rut_limpio = Utiles::LimpiarRut($rut);
+$esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut';
+$rut_limpio = $esRut ? Utiles::LimpiarRut($rut) : preg_replace('/[,\.-]+/', '', $rut);
 $usuario = new UsuarioExt($sesion, $rut_limpio);
 
-$validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValidacionesCliente');
+$validaciones_segun_config = Conf::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span style="color:#ff0000;font-size:10px;vertical-align:top;">*</span>';
 
 if ($opc == "eliminar") {
@@ -35,7 +36,7 @@ if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
 	$arr1 = $usuario->fields;
 
-	$usuario->Edit('rut', Utiles::LimpiarRut($rut));
+	$usuario->Edit('rut', $rut_limpio);
 	$usuario->Edit('dv_rut', $dv_rut);
 	$usuario->Edit('nombre', $nombre);
 	$usuario->Edit('apellido1', $apellido1);
@@ -345,24 +346,11 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<tr>
 				<td valign="top" class="texto" align="right">
 					<strong>
-
-						<?php
-						$nombre_identificador = ( method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'NombreIdentificador') : Conf::NombreIdentificador() );
-						echo $nombre_identificador
-						?>
-
+						<?php echo Conf::GetConf($sesion, 'NombreIdentificador'); ?>
 					</strong>
 				</td>
 				<td valign="top" class="texto" align="left">
-
-					<?php
-
-					if ( $nombre_identificador == 'RUT' ) {
-						$separador = '-';
-					} else {
-						$separador = '';
-					} ?>
-
+					<?php $separador = $esRut ? '-' : ''; ?>
 					<strong> <?php echo $rut ?> <?php echo $separador ?> <?php echo $dv_rut ?> </strong>
 				</td>
 			</tr>

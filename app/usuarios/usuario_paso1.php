@@ -5,6 +5,8 @@ $sesion = new Sesion(array('ADM'));
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Administración de Usuarios');
 
+$esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut';
+
 if ($desde == '') {
 	$desde = 0;
 }
@@ -477,20 +479,13 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 		<td width="20">&nbsp;</td>
 		<td valign="top">
 
-<?php if (strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut') { ?>
-				<form action="usuario_paso2.php" method="post" onsubmit="return RevisarRut(this);">
-	<?php
-} else {
-	?>
-					<form action="usuario_paso2.php" method="post">
-			<?php } ?>
-					</table>
+				<form action="usuario_paso2.php" method="post" <?php if ($esRut) { echo 'onsubmit="return RevisarRut(this);"'; } ?>>
 					<br class="clearfix"/>
 					<br>
 					<table  width="100%" class="tb_base">
 						<tr>
 							<td valign="top" class="subtitulo" align="left" colspan="2">
-					<?php echo __('Ingrese ') . UtilesApp::GetConf($sesion, 'NombreIdentificador') . __(' del usuario') ?>:
+								<?php echo __('Ingrese ') . UtilesApp::GetConf($sesion, 'NombreIdentificador') . __(' del usuario') ?>:
 								<hr class="subtitulo_linea_plomo"/>
 							</td>
 						</tr>
@@ -499,11 +494,11 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 								<strong><?php echo UtilesApp::GetConf($sesion, 'NombreIdentificador'); ?></strong>
 							</td>
 							<td valign="top" class="texto" align="left">
-<?php if (strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut') { ?>
+								<?php if ($esRut) { ?>
 									<input type="text" name="rut" value="" size="10" onMouseover="ddrivetip('<?php $tooltip_text ?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
-<?php } else { ?>
+								<?php } else { ?>
 									<input type="text" name="rut" value="" size="17" onMouseover="ddrivetip('<?php echo $tooltip_text ?>')" onMouseout="hideddrivetip()" />
-<?php } ?>
+								<?php } ?>
 								&nbsp;
 								<?php
 								if ($sesion->usuario->fields['id_visitante'] == 0)
@@ -529,7 +524,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 						<table width=100%>
 							<tr>
 								<td valign="top" class="subtitulo" align="left" colspan="2">
-<?php echo __('Modificacion de Datos para todos los usuarios ') ?>:
+									<?php echo __('Modificacion de Datos para todos los usuarios ') ?>:
 									<hr class="subtitulo_linea_plomo"/>
 								</td>
 							</tr>
@@ -557,7 +552,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 											<label for="alerta_diaria"><?php echo __('Alerta Diaria') ?></label> <input type="checkbox" id="alerta_diaria" name="alerta_diaria" <?php echo $cambiar_alerta_diaria == 'on' ? '' : disabled ?> <?php echo $alerta_diaria != '' ? "checked" : "" ?> />
 										</td>
 										<td align="right">
-<?php echo __('Retraso max.') ?>
+											<?php echo __('Retraso max.') ?>
 										</td>
 										<td align="left">
 											<input type="text" style="background-color: #EEEEEE;" size=10 value="<?php echo $retraso_max > 0 ? $retraso_max : '' ?>" id="retraso_max" name="retraso_max" <?php echo $cambiar_alerta_diaria == 'on' ? '' : disabled ?> />
@@ -572,7 +567,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 											&nbsp;
 										</td>
 										<td align="right">
-<?php echo __('Min HH.') ?>
+											<?php echo __('Min HH.') ?>
 										</td>
 										<td align="left">
 											<input type="text" style="background-color: #EEEEEE;" size=10 value="<?php echo $restriccion_diario > 0 ? $restriccion_diario : '' ?>" id="restriccion_diario" name="restriccion_diario" <?php echo $cambiar_restriccion_diario == 'on' ? '' : disabled ?> />
@@ -587,7 +582,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 											<label for="alerta_semanal"><?php echo __('Alerta Semanal') ?></label> <input type="checkbox" id="alerta_semanal" name="alerta_semanal" <?php echo $cambiar_alerta_semanal == 'on' ? '' : disabled ?> <?php echo $alerta_semanal != '' ? "checked" : "" ?> />
 										</td>
 										<td align="right">
-<?php echo __('Mín. HH') ?>
+											<?php echo __('Mín. HH') ?>
 										</td>
 										<td align="left">
 											<input type="text" style="background-color: #EEEEEE;" size=10 value="<?php echo $restriccion_min > 0 ? $restriccion_min : '' ?>" id="restriccion_min" name="restriccion_min" <?php echo $cambiar_alerta_semanal == 'on' ? '' : disabled ?> />
@@ -632,12 +627,12 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 								<legend><?php echo __('Guardar datos') ?></legend>
 								<table width=100%>
 									<tr><td align="center">
-<?php
-if ($sesion->usuario->fields['id_visitante'] == 0)
-	echo "<input type=\"button\" value=\"" . __('Guardar') . "\" class='botonizame' onclick=\"ModificaTodos(this.form);\"  /> &nbsp;&nbsp;";
-else
-	echo "<input type=\"button\" value=\"" . __('Guardar') . "\" class='botonizame' onclick=\"alert('Usted no tiene derecho para modificar estos valores.');\" /> &nbsp;&nbsp;";
-?>
+											<?php
+											if ($sesion->usuario->fields['id_visitante'] == 0)
+												echo "<input type=\"button\" value=\"" . __('Guardar') . "\" class='botonizame' onclick=\"ModificaTodos(this.form);\"  /> &nbsp;&nbsp;";
+											else
+												echo "<input type=\"button\" value=\"" . __('Guardar') . "\" class='botonizame' onclick=\"alert('Usted no tiene derecho para modificar estos valores.');\" /> &nbsp;&nbsp;";
+											?>
 											<input type="button" value="<?php echo __('Cancelar') ?>" onclick="Cancelar(this.form);" class='botonizame' />
 										</td></tr>
 								</table>
@@ -654,7 +649,7 @@ else
 			<table width=100% class="tb_base">
 				<tr>
 					<td valign="top" class="subtitulo" align="left" colspan="2">
-<?php echo __('Lista de Usuarios') ?>:
+						<?php echo __('Lista de Usuarios') ?>:
 						<hr class="subtitulo_linea_plomo"/>
 					</td>
 				</tr>
@@ -714,10 +709,6 @@ else
 
 								</tr></thead>
 							<tbody></tbody>
-
-
-
-
 						</table>
 					</td>
 				</tr>
@@ -725,13 +716,13 @@ else
 
 	<tr><td colspan="2">&nbsp;</td></tr>
 
-<?php if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ReportesAvanzados') ) || ( method_exists('Conf', 'ReportesAvanzados') && Conf::ReportesAvanzados() )) {
-	?>
+	<?php if (Conf::GetConf($sesion, 'ReportesAvanzados')) {
+		?>
 		<tr><td></td><td>
 				<table width=100%>
 					<tr>
 						<td valign="top" class="subtitulo" align="left" colspan="2">
-		<?php echo __('Costo por usuario') ?>:
+							<?php echo __('Costo por usuario') ?>:
 							<hr class="subtitulo"/>
 						</td>
 					</tr>
@@ -741,7 +732,7 @@ else
 						</td>
 					</tr>
 				</table>
-<?php } ?>
+			<?php } ?>
 	<tr><td colspan="2">&nbsp;</td></tr>
 </table>
 
@@ -750,7 +741,7 @@ else
 
 function Opciones(& $fila) {
 	global $sesion;
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )) {
+	if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) {
 		return "<a href=usuario_paso2.php?rut=" . $fila->fields[rut] . " title='Editar usuario'><img border=0 src=" . Conf::ImgDir() . "/ver_persona_nuevo.gif alt='Editar' /></a>";
 	} else {
 		return "<a href=usuario_paso2.php?rut=" . $fila->fields[rut] . " title='Editar usuario'><img border=0 src=" . Conf::ImgDir() . "/ver_persona.gif alt='Editar' /></a>";
@@ -786,7 +777,7 @@ function PrintCheck(& $fila) {
 
 function PrintActivo(& $fila) {
 	global $sesion;
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )) {
+	if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) {
 		if ($fila->fields[activo])
 			return "<img src=" . Conf::ImgDir() . "/check_nuevo.gif alt='OK' />";
 		else
@@ -801,5 +792,3 @@ function PrintActivo(& $fila) {
 }
 
 $pagina->PrintBottom();
-
-
