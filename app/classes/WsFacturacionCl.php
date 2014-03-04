@@ -8,12 +8,23 @@ class WsFacturacioCl {
 
 	protected $tipoCodigo;
 	protected $ValorCodigo;
+	protected $url = 'http://192.168.1.1:8088/wsplano.asmx?wsdl';
+	protected $Client;
 
-	public function emitirFactura($dataFactura) {
+	public function __construct() {
+		 $this->Client = new SoapClient($this->url);
+	}
+
+	/**
+	 *
+	 * @param type $dataFactura datos de la factura
+	 * @param type $afecta indica si la factura es afecta, defaul false
+	 */
+	public function emitirFactura($dataFactura, $afecta = false) {
 		$documento = array(
 			'Encabezado' => array(
 				'IdDoc' => array(
-					'TipoDTE' => 34,
+					'TipoDTE' => $afecta ? 34 : 33,
 					'Folio' => 0,
 					'FchEmis' => $dataFactura['fecha_emision']
 				),
@@ -59,12 +70,22 @@ class WsFacturacioCl {
 			);
 		}
 
-		$this->enviarDocumento($documento);
+		return $this->enviarDocumento($documento);
 	}
 
 	private function enviarDocumento($arrayFactura) {
 		$respuesta = $this->Client->enviar($arrayFactura);
-		return $respuesta;
+		return self::parseRepply($respuesta);
+	}
+
+	private static function parseRepply($respuesta) {
+		$result->codigo = 201;
+		$result->descripcion = '';
+		$result->timbrefiscal = '';
+		$result->documentopdf = '';
+		if (error()) {
+			$result->descripcion = '';
+		}
 	}
 
 }

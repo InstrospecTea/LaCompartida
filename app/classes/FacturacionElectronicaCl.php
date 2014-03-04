@@ -56,7 +56,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 	public static function ValidarFactura() {
 		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago, $dte_id_pais, $dte_metodo_pago_cta;
 		if (empty($RUT_cliente)) {
-			$pagina->AddError(__('Debe ingresar RFC del cliente.'));
+			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
 		}
 		if (empty($direccion_cliente)) {
 			$pagina->AddError(__('Debe ingresar Dirección del cliente.'));
@@ -75,7 +75,8 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 		if (!empty($Factura->fields['dte_url_pdf'])) {
 			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
 		} else {
-			$client = new SoapClient("https://www.facturemosya.com:443/webservice/sRecibirXML.php?wsdl");
+			$WsFacturacioCl = new WsFacturacioCl;
+
 			$estudio = new PrmEstudio($Sesion);
 			$estudio->Load($Factura->fields['id_estudio']);
 			$estudio_data = $estudio->getMetadata('facturacion_electronica_mx');
@@ -83,7 +84,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 			$password = $estudio_data['password'];
 			$strdocumento = self::FacturaToTXT($Sesion, $Factura);
 			$hookArg['ExtraData'] = $strdocumento;
-			$result = $client->RecibirTXT($usuario, $password, UtilesApp::utf8izar($strdocumento), 0);
+			$result = $WsFacturacioCl->emitirFactura($usuario, $password, UtilesApp::utf8izar($strdocumento), 0);
 			if ($result->codigo == 201) {
 				try {
 					$Factura->Edit('dte_xml', $result->descripcion);
