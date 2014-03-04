@@ -407,7 +407,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Cliente'); ?>
 			</td>
 			<td align="left">
-				<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,false,320,'',false); ?>
+				<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
@@ -417,7 +417,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Asunto'); ?>
 			</td>
 			<td align="left">
-				<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+				<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
@@ -681,7 +681,9 @@ $pagina->PrintTop($popup);
 		jQuery(this).val(str.replace(',', '.'));
 		jQuery(this).parseNumber({format:"0.00", locale:"us"});
 		jQuery(this).formatNumber({format:"0.00", locale:"us"});
-		CambiaMonto(this.form, this.id);
+		if (jQuery(this).attr('id') == 'monto') {
+			CambiaMonto(this.form, this.id);
+		}
 	});
 </script>
 

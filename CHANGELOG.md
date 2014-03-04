@@ -1,10 +1,72 @@
 # Changelog
+## Hotfix: 14.0.9
+lunes 03 de marzo 2014
+* **Fixed:** [Hice cosas pero se me olvido cambiar el changelog](#0)
+
+## Hotfix: 14.0.8
+jueves 27 de febrero 2014
+* **Fixed:** [Orden de datos de los gráficos](https://github.com/LemontechSA/ttb/pull/429)
+
+## Hotfix: 14.0.7
+Viernes 21 de febrero 2014
+* **Fixed:** [Corrige error al agregar un cliente sin encargado secundario definido.](https://github.com/LemontechSA/ttb/pull/428)
+
+## Hotfix: 14.0.6
+Viernes 21 de febrero 2014
+* **Fixed:** [Corrige selector para cdrabogados interfaz agregar_gasto.](https://github.com/LemontechSA/ttb/pull/426)
+
+## Hotfix: 14.0.5
+Viernes 21 de febrero 2014
+* **Fixed:** [Corrige query de verificacion de duplicidad de correo semanal.](https://github.com/LemontechSA/ttb/pull/423)
+
+## Hotfix: 14.0.4
+Jueves 20 de febrero 2014
+* **Fixed:** [Corrige query de verificacion de duplicidad de correo semanal.](https://github.com/LemontechSA/ttb/pull/422)
+
+## Hotfix: 14.0.3
+Jueves 20 de febrero 2014
+* **Added:** [Nuevos elementos para la facturación del cliente "Governance"](https://github.com/LemontechSA/ttb/pull/420)
+* **Added:** [Corrección a interfaz de gastos "Monto Facturable"](https://github.com/LemontechSA/ttb/pull/420)
+
+## Hotfix: 14.0.2
+Miercoles 19 de febrero 2014
+* **Added:** [Agrega Glosa Detraccion para cliente](https://github.com/LemontechSA/ttb/pull/419)
+* **Added:** [Agrega simbolo de moneda a los montos que aparecen en RESUMEN PROFESIONAL, DETALLE PROFESIONAL](https://github.com/LemontechSA/ttb/pull/419)
+
+## Hotfix: 14.0.1
+martes 18 de febrero 2014
+* **Fixed:** [Corrige subir archivo desde facturacion mx](https://github.com/LemontechSA/ttb/pull/418)
+
+## Release: 14.0.0
+Lunes 17 de Febrero 2014
+
+* **Feature:** [Reporte gbplegal](https://github.com/LemontechSA/ttb/pull/273)
+* **Feature:** [Impuesto por defecto al agregar un gasto](https://github.com/LemontechSA/ttb/pull/282)
+* **Feature:** [Agregar columna de asunto en planilla de saldos](https://github.com/LemontechSA/ttb/pull/298)
+* **Feature:** [Carga masiva](https://github.com/LemontechSA/ttb/pull/363)
+* **Feature:** [Nuevos filtros a interfaz revisar horas](https://github.com/LemontechSA/ttb/pull/374)
+* **Feature:** [Grafico reporte general](https://github.com/LemontechSA/ttb/pull/386)
+* **Feature:** [TXT contabilidad](https://github.com/LemontechSA/ttb/pull/394)
+* **Feature:** [Subir archivos s3](https://github.com/LemontechSA/ttb/pull/406)
+
+## Hotfix: 13.7.38
+Viernes 14 de febrero 2014
+* **Added:** [Corrige Zona horaria para para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
+
+## Hotfix: 13.7.37
+Viernes 14 de febrero 2014
+* **Added:** [Corrige monto subtotal para facturacion eletronica](https://github.com/LemontechSA/ttb/pull/413)
+
+## Hotfix: 13.7.36
+Miercoles 13 de febrero 2014
+* **Added:** [Agrega alerta para obligar a usuario a elegir un país para evitar error en facturación eletrónica](https://github.com/LemontechSA/ttb/pull/412)
+
 ## Hotfix: 13.7.35
-martes 12 de febrero 2014
+Martes 12 de febrero 2014
 * **Fixed:** [Corrige error javascript en interfaz agregar_contrato](https://github.com/LemontechSA/ttb/pull/410)
 
 ## Hotfix: 13.7.34
-martes 11 de febrero 2014
+Martes 11 de febrero 2014
 * **Fixed:** [Elimina query que reemplaza código de asunto](https://github.com/LemontechSA/ttb/pull/408)
 
 ## Hotfix: 13.7.33

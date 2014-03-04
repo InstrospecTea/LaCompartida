@@ -1507,6 +1507,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%factura_monto_honorarios%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_descripcion_honorarios%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
+					$html2 = str_replace('%xmonto_honorarios%', '&nbsp;', $html2);
 				} else {
 
 					/*   SE CONSIDERA SOLAMENTE HONORARIOS SIN IMPUESTO
@@ -1514,6 +1515,7 @@ class Factura extends Objeto {
 					 */
 
 					$factura_monto_honorarios = $factura_monto_honorarios_sin_impuesto;
+					$html2 = str_replace('%xmonto_honorarios%', number_format($factura_monto_honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 					if ($id_moneda_cobro != $moneda_facturacion) {
 
@@ -1548,6 +1550,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%factura_monto_gastos%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_descripcion_gastos%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
+					$html2 = str_replace('%xmonto_gastos%', '&nbsp;', $html2);
 				} else {
 
 					if ($factura_monto_gastos_sin_impuesto == '0') {
@@ -1583,6 +1586,7 @@ class Factura extends Objeto {
 					}
 
 					$html2 = str_replace('%factura_descripcion_gastos%', $descripcion_gastos, $html2);
+					$html2 = str_replace('%xmonto_gastos%', number_format($factura_monto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				}
 
 				// IMPUESTO
@@ -1653,6 +1657,8 @@ class Factura extends Objeto {
 				} else {
 					$html2 = str_replace('%factura_monto_total%', number_format($factura_monto_total, '2', ',', '.'), $html2);
 				}
+
+				$html2 = str_replace('%xmonto_total%', number_format($factura_monto_total_pesos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				/* AGREGADO EL 9 DE OCTUBRE 2013 */
 

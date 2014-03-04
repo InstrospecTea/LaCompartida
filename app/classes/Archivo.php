@@ -45,14 +45,24 @@ class Archivo extends Objeto {
 		return $this->Load($id);
 	}
 
-	function Upload($id_archivo_bitacora, $archivo_anexo = '') {
+	function Upload($codigo_cliente, $id_contrato, $archivo_anexo = '') {
 		$archivo_subir = $archivo_anexo['tmp_name'];
 		$subir = fopen($archivo_subir, 'r');
 		$contenido = fread($subir, filesize($archivo_subir));
-		$nombre = $archivo_anexo['name'];
 		fclose($subir);
-		
-		$url_s3 = UtilesApp::UploadToS3($this->sesion, '/' . urlencode($nombre), $contenido, $archivo_anexo['type']);
+
+		$nombre = $archivo_anexo['name'];
+		$archivoname = UtilesApp::slug(substr($nombre, 0, strpos($nombre, '.')));
+		$archivoext = substr($nombre, stripos($nombre, '.'));
+		$codigo_cliente = UtilesApp::slug($codigo_cliente);
+
+		$name = "/{$codigo_cliente}/contrato_{$id_contrato}/{$archivoname}{$archivoext}";
+
+		if (UtilesApp::FileExistS3($name)) {
+			return false;
+		}
+
+		$url_s3 = UtilesApp::UploadToS3($name, $contenido, $archivo_anexo['type']);
 		$this->Edit('archivo_nombre', $archivo_anexo['name']);
 		$this->Edit('data_tipo', $archivo_anexo['type']);
 
@@ -76,5 +86,3 @@ class Archivo extends Objeto {
 	}
 
 }
-
-?>
