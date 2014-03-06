@@ -5,7 +5,7 @@ $sesion = new Sesion(array('ADM'));
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Administración de Usuarios');
 
-$esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut';
+$esRut = strtolower(Conf::GetConf($sesion, 'NombreIdentificador')) == 'rut';
 
 if ($desde == '') {
 	$desde = 0;
@@ -485,13 +485,13 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 					<table  width="100%" class="tb_base">
 						<tr>
 							<td valign="top" class="subtitulo" align="left" colspan="2">
-								<?php echo __('Ingrese ') . UtilesApp::GetConf($sesion, 'NombreIdentificador') . __(' del usuario') ?>:
+								<?php echo __('Ingrese ') . Conf::GetConf($sesion, 'NombreIdentificador') . __(' del usuario') ?>:
 								<hr class="subtitulo_linea_plomo"/>
 							</td>
 						</tr>
 						<tr>
 							<td valign="top" class="texto" align="right">
-								<strong><?php echo UtilesApp::GetConf($sesion, 'NombreIdentificador'); ?></strong>
+								<strong><?php echo Conf::GetConf($sesion, 'NombreIdentificador'); ?></strong>
 							</td>
 							<td valign="top" class="texto" align="left">
 								<?php if ($esRut) { ?>
@@ -760,7 +760,7 @@ function PrintCheck(& $fila) {
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	$i++;
 	list($count) = mysql_fetch_array($resp);
-	if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) {
+	if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) {
 		if ($count > 0)
 			return "<div class='permiso on' id='" . $fila->fields['id_usuario'] . ';' . $permiso . "'><input class='permiso' type='image' src='" . Conf::ImgDir() . "/check_nuevo.gif' alt='OK' rel='" . $fila->fields['id_usuario'] . ';' . $permiso . "'/></div>";
 		else
