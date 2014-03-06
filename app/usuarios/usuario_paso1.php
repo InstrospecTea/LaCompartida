@@ -479,7 +479,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 		<td width="20">&nbsp;</td>
 		<td valign="top">
 
-				<form action="usuario_paso2.php" method="post" <?php if ($esRut) { echo 'onsubmit="return RevisarRut(this);"'; } ?>>
+				<form action="usuario_paso2.php" method="post" <?php if ($esRut) { echo 'onsubmit="return RevisarRut(this);"'; } ?> >
 					<br class="clearfix"/>
 					<br>
 					<table  width="100%" class="tb_base">
@@ -495,7 +495,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 							</td>
 							<td valign="top" class="texto" align="left">
 								<?php if ($esRut) { ?>
-									<input type="text" name="rut" value="" size="10" onMouseover="ddrivetip('<?php $tooltip_text ?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
+									<input type="text" name="rut" value="" size="10" onMouseover="ddrivetip('<?php echo $tooltip_text ?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
 								<?php } else { ?>
 									<input type="text" name="rut" value="" size="17" onMouseover="ddrivetip('<?php echo $tooltip_text ?>')" onMouseout="hideddrivetip()" />
 								<?php } ?>
@@ -511,12 +511,12 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 
 					</table>
 					<br class="clearfix"/>
-					<table width=100% class="tb_base">
 				</form>
 		</td>
 	</tr>
 
-	<tr><td></td>
+	<tr>
+		<td></td>
 		<td>
 			<table width=100% class="tb_base">
 				<tr>
@@ -532,7 +532,8 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 					</td>
 				</tr>
 
-				<tr><td>
+				<tr>
+					<td>
 						<form name="form_usuario" method="post" enctype="multipart/form-data">
 							<input type="hidden" name="opc" value="edit" />
 							<fieldset class="table_blanco">
@@ -645,7 +646,9 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 		</td>
 	</tr>
 
-	<tr><td></td><td>
+	<tr>
+		<td></td>
+		<td>
 			<table width=100% class="tb_base">
 				<tr>
 					<td valign="top" class="subtitulo" align="left" colspan="2">
@@ -660,21 +663,14 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 				<tr>
 					<td valign="top" align="center" style="white-space:nowrap">
 						<form name="act"  method="post">
-
-
 							<input type="checkbox" name="activo"  id="activo" <?php if (!$activo) echo 'value="1" checked="checked"'; ?> />s&oacute;lo activos &nbsp;&nbsp;&nbsp;
 							<span id="contienefiltro"></span>
 							&nbsp;&nbsp;
-
 							&nbsp; <a href="#" id="btnbuscar" style="display:none;" class="u1 botonizame"  icon="ui-icon-search" rel="buscar">Buscar</a>
-
 							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel"   rel="xls">Descargar Listado</a>
 							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_vacacion">Descargar Vacaciones</a>
 							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_modificaciones">Descargar Modificaciones</a>
-
-
 						</form>
-
 					</td>
 				</tr>
 				<tr>
@@ -686,16 +682,15 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 					<td colspan=2>
 						<br />
 						<table id="tablapermiso">
-							<thead><tr><td class="encabezado">RUT</td>
+							<thead>
+								<tr>
+									<td class="encabezado">RUT</td>
 									<th>ID</th>
 									<th>Nombre</th>
-
 									<th>Admin</th>
-									<th>Admin<br>Datos</th><th width="23">Cobranza</th>
+									<th>Admin<br>Datos</th>
+									<th width="23">Cobranza</th>
 									<th>Editar<br/>Biblioteca</th>
-
-
-
 									<th>Lectura</th>
 									<th>Oficina</th>
 									<th>Profesional</th>
@@ -706,19 +701,21 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 									<th>Tarifa</th>
 									<th>Retribuciones</th>
 									<th width="25">Activo</th>
-
-								</tr></thead>
+								</tr>
+							</thead>
 							<tbody></tbody>
 						</table>
 					</td>
 				</tr>
 			</table>
-
+		</td>
+	</tr>
 	<tr><td colspan="2">&nbsp;</td></tr>
 
-	<?php if (Conf::GetConf($sesion, 'ReportesAvanzados')) {
-		?>
-		<tr><td></td><td>
+	<?php if (Conf::GetConf($sesion, 'ReportesAvanzados')) { ?>
+		<tr>
+			<td></td>
+			<td>
 				<table width=100%>
 					<tr>
 						<td valign="top" class="subtitulo" align="left" colspan="2">
@@ -732,7 +729,9 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 						</td>
 					</tr>
 				</table>
-			<?php } ?>
+			</td>
+		</tr>
+	<?php } ?>
 	<tr><td colspan="2">&nbsp;</td></tr>
 </table>
 
