@@ -10167,6 +10167,8 @@ QUERY;
 		case 7.59:
 			$queries = array();
 			$queries[] = "ALTER TABLE `documento` CHANGE COLUMN `glosa_documento` `glosa_documento` text NOT NULL;";
+			$queries[] = "ALTER TABLE `gasto_general` CHANGE COLUMN `descripcion` `descripcion` TEXT NULL DEFAULT NULL;";
+			$queries[] = "ALTER TABLE `cta_corriente` CHANGE COLUMN `descripcion` `descripcion` TEXT NULL DEFAULT NULL;";
 			ejecutar($queries, $dbh);
 			break;
 
