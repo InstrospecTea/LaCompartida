@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.0.11
+Lunes 10 de marzo 2014
+* **Fixed:** [Corrige Reporte horas por facturar](https://github.com/LemontechSA/ttb/pull/434)
+
 ## Hotfix: 14.0.10
 martes 04 de marzo 2014
 * **Fixed:** [Corrige HTML de la interfaz](https://github.com/LemontechSA/ttb/pull/431)
