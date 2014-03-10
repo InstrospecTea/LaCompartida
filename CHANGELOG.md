@@ -2,6 +2,7 @@
 ## Hotfix: 14.0.11
 Lunes 10 de marzo 2014
 * **Fixed:** [Corrige calculo saldo pago.](https://github.com/LemontechSA/ttb/pull/438)
+* **Fixed:** [Cambia tipo de campo glosa_documento.](https://github.com/LemontechSA/ttb/pull/438)
 
 ## Hotfix: 14.0.10
 martes 04 de marzo 2014
