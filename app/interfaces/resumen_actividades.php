@@ -64,9 +64,6 @@ $agrupadores = array(
 	'mes_emision'
 );  // vista
 
-
-$tipos_moneda = Reporte::tiposMoneda();
-
 $hoy = date("Y-m-d");
 if (!$fecha_anio) {
 	$fecha_anio = date('Y');
@@ -756,7 +753,6 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	$reporte->setVista($vista);
 	$reporte->addRangoFecha($fecha_ini, $fecha_fin);
 
-
 	/* USUARIOS */
 	$users = explode(',', $usuarios);
 	foreach ($users as $usuario) {
@@ -875,7 +871,6 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 		$reporteC->addRangoFecha($fecha_ini, $fecha_fin);
 		$reporteC->setTipoDato($tipo_dato_comparado);
 		$reporteC->setVista($vista);
-		//$reporte->setProporcionalidad($prop);
 
 		if ($campo_fecha) {
 			$reporteC->setCampoFecha($campo_fecha);
@@ -1288,35 +1283,42 @@ if ($opc == 'grafico') {
 
 
 	$contador = 0;
-	foreach ($reporte->row as $row) {
-		if ($row[$campo_nombre] != $nombres[$contador]) {
-			$contador++;
-			$nombres[$contador] = $row[$campo_nombre];
-		}
-		$tiempos[$contador] += $row[$tipo_dato];
-	}
 
+	$tdatos = array();
+	foreach ($reporte->row as $row) {
+		if ($row[$campo_nombre] != $tdatos[$contador]['nombre']) {
+			++$contador;
+			$tdatos[$contador]['nombre'] = $row[$campo_nombre];
+		}
+		$tdatos[$contador]['tiempo'] += round($row[$tipo_dato], 2);
+	}
+	function dort_desc($a, $b) {
+		return $a['tiempo'] < $b['tiempo'];
+	}
+	uasort($tdatos, 'dort_desc');
+
+	$tdatosC = array();
 	if ($tipo_dato_comparado) {
 		$contador = 0;
 		foreach ($reporteC->row as $row) {
-			if ($row[$campo_nombre] != $nombres[$contador]) {
-				$contador++;
-				$nombresC[$contador] = $row[$campo_nombre];
+			if ($row[$campo_nombre] != $tdatosC[$contador]['nombre']) {
+				++$contador;
+				$tdatosC[$contador]['nombre'] = $row[$campo_nombre];
 			}
-			$tiemposC[$contador] += $row[$tipo_dato_comparado];
+			$tdatosC[$contador]['tiempo'] += round($row[$tipo_dato_comparado], 2);
 		}
 	}
 
 	$datos_grafico = array();
 	$datos_grafico_compara = array();
-	if ($nombres) {
+	if (!empty($tdatos)) {
 		$otros = 0;
-		foreach ($tiempos as $key => $tiempo) {
+		foreach ($tdatos as $key => $tdato) {
 			if ($limite-- > 0) {
-				$datos_grafico['nombres'][] = $nombres[$key];
-				$datos_grafico['tiempo'][] = str_replace(',', '.', $tiempos[$key]);
+				$datos_grafico['nombres'][] = $tdato['nombre'];
+				$datos_grafico['tiempo'][] = str_replace(',', '.', $tdato['tiempo']);
 			} else {
-				$otros += $tiempos[$key];
+				$otros += $tdato['tiempo'];
 			}
 		}
 		if ($otros) {
@@ -1326,12 +1328,12 @@ if ($opc == 'grafico') {
 
 		if ($tipo_dato_comparado) {
 			$otrosC = 0;
-			foreach ($tiemposC as $key => $tiempo) {
-				if ($limite-- > 0) {
-					$datos_grafico_compara['nombres'][] = $nombresC[$key];
-					$datos_grafico_compara['tiempo'][] = str_replace(',', '.', $tiemposC[$key]);
+			foreach ($tdatosC as $key => $tdatoC) {
+				if (in_array($tdatoC['nombre'], $datos_grafico['nombres'])) {
+					$datos_grafico_compara['nombres'][] = $tdatoC['nombre'];
+					$datos_grafico_compara['tiempo'][] = str_replace(',', '.', $tdatoC['tiempo']);
 				} else {
-					$otrosC += $tiemposC[$key];
+					$otrosC += $tdatoC['tiempo'];
 				}
 			}
 			if ($otrosC) {
@@ -1340,6 +1342,9 @@ if ($opc == 'grafico') {
 			}
 		}
 	}
+
+	$datos_grafico['nombres'] = UtilesApp::utf8izar($datos_grafico['nombres']);
+	$datos_grafico_compara['nombres'] = UtilesApp::utf8izar($datos_grafico_compara['nombres']);
 
 	$datos = urlencode(base64_encode(json_encode($datos_grafico)));
 	$datosC = '';

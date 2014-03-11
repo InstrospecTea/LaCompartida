@@ -1,4 +1,21 @@
 # Changelog
+## Hotfix: 14.0.11
+Lunes 10 de marzo 2014
+* **Fixed:** [Corrige calculo saldo pago.](https://github.com/LemontechSA/ttb/pull/438)
+* **Fixed:** [Cambia tipo de campo glosa_documento.](https://github.com/LemontechSA/ttb/pull/438)
+
+## Hotfix: 14.0.10
+martes 04 de marzo 2014
+* **Fixed:** [Corrige HTML de la interfaz](https://github.com/LemontechSA/ttb/pull/431)
+
+## Hotfix: 14.0.9
+lunes 03 de marzo 2014
+* **Fixed:** [Hice cosas pero se me olvido cambiar el changelog](#0)
+
+## Hotfix: 14.0.8
+jueves 27 de febrero 2014
+* **Fixed:** [Orden de datos de los gráficos](https://github.com/LemontechSA/ttb/pull/429)
+
 ## Hotfix: 14.0.7
 Viernes 21 de febrero 2014
 * **Fixed:** [Corrige error al agregar un cliente sin encargado secundario definido.](https://github.com/LemontechSA/ttb/pull/428)
