@@ -52,11 +52,11 @@ The Time Billing - Time Tracking
 ###Incluir el framework de lemontech en nuestro codigo
 * git clone git@github.com:LemontechSA/framework.git dentro del directori "FW" de le aplicacion.
 
-###Incluir amazon WSDDKforPHP
-* https://github.com/amayonwebservices/aws-sdk-for-php.git
+###Incluir amazon WSDDKforPHP en el subdirectorio backups AWSSDKforPHP
+* https://github.com/amazonwebservices/aws-sdk-for-php
 
 ###Deshabilitar Slim Error Handler
-* Comentar linea 186 de la clase Slim.php dentro del framework
+* Comentar la variable set_error_handler (linea 186) de la clase Slim.php dentro del framework
 
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
@@ -86,8 +86,7 @@ The Time Billing - Time Tracking
   * dbUser: Usuario de inicio de sesión con acceso full a la base de datos **dbName**
   * dbPass: El password del usuario **dbUser**
   * Agrega la siguiente linea para no desplegar ciertos mensajes:
-
-        $ error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
+    error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
 
 * [Probar configuración][6]
 
