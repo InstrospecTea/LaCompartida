@@ -30,7 +30,7 @@ if ($opc == 'generar_factura') {
 }
 
 $idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+$idioma_default->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 
 global $factura;
 ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_factura_inicio') : false;
@@ -38,10 +38,10 @@ global $factura;
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 	if ($exportar_excel || $archivo_contabilidad) {
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
-			, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
-			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-			, $descripcion_factura, $serie, $desde_asiento_contable);
+				, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+				, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+				, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+				, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		if ($exportar_excel) {
 			$factura->DownloadExcel($results);
@@ -63,11 +63,11 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 	function CrearNuevoDocumentoLegal() {
 		var dl_url = 'agregar_factura.php?popup=1&id_documento_legal=' + $('tipo_documento_legal').value;
 		if ($('codigo_cliente')) {
-			dl_url += '&codigo_cliente='+$('codigo_cliente').value
+			dl_url += '&codigo_cliente=' + $('codigo_cliente').value
 		}
 
 		if ($('id_cobro')) {
-			dl_url += '&id_cobro='+$('id_cobro').value
+			dl_url += '&id_cobro=' + $('id_cobro').value
 			$('id_cobro').focus();
 		}
 		nuovaFinestra('Agregar_Factura', 730, 580, dl_url, 'top=100, left=155');//')	';
@@ -116,7 +116,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 		nuovaFinestra('Agregar_Factura', 730, 470, urlo, 'top=100, left=125');
 	}
 
-	<?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_facturas_js') : false; ?>
+<?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_facturas_js') : false; ?>
 </script>
 
 <form method="post" name="form_facturas" id="form_facturas">
@@ -147,7 +147,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 							</td>
 						</tr>
 
-						<?php ($Slim=Slim::getInstance()) ? $Slim->applyHook('hook_filtros_facturas') : false; ?>
+						<?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_filtros_facturas') : false; ?>
 
 						<tr>
 							<td align="right">
@@ -208,17 +208,18 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 								<?php echo __('N° Factura'); ?>
 							</td>
 							<td align="left" width="18%" nowrap>
-								<?php if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
-									echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', 'Vacio', 60); ?>
+								<?php if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
+									echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', 'Vacio', 60);
+									?>
 									<span style="vertical-align: center;">-</span>
 								<?php } ?>
-								<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="numero" name="numero" size="15" value="<?php echo $numero; ?>" onchange="this.value=this.value.toUpperCase();">
+								<input onkeydown="if (event.keyCode == 13) BuscarFacturas(this.form, 'buscar');" type="text" id="numero" name="numero" size="15" value="<?php echo $numero; ?>" onchange="this.value = this.value.toUpperCase();">
 							</td>
 							<td align="right" width="18%">
 								<?php echo __('N° Cobro'); ?>
 							</td>
 							<td align="left" width="44%">
-								<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form, 'buscar');" type="text" id="id_cobro" name="id_cobro" size="15" value="<?php echo $id_cobro; ?>">
+								<input onkeydown="if (event.keyCode == 13) BuscarFacturas(this.form, 'buscar');" type="text" id="id_cobro" name="id_cobro" size="15" value="<?php echo $id_cobro; ?>">
 							</td>
 						</tr>
 						<tr>
@@ -251,6 +252,14 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 
 <?php
 if ($opc == 'buscar' || $opc == 'generar_factura') {
+
+	$where = '';
+	$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
+			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+			, $descripcion_factura, $serie, $desde_asiento_contable);
+
 	$monto_saldo_total = 0;
 	$glosa_monto_saldo_total = '';
 	$where_moneda = ' WHERE moneda_base = 1';
@@ -259,7 +268,6 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	}
 	$query_moneda = "SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio FROM prm_moneda {$where_moneda} ORDER BY id_moneda";
 	$resp_moneda = mysql_query($query_moneda, $sesion->dbh) or Utiles::errorSQL($query_moneda, __FILE__, __LINE__, $sesion->dbh);
-	$id_moneda_base = 0;
 
 	while (list($id_moneda_tmp, $simbolo_moneda_tmp, $cifras_decimales_tmp, $moneda_base_tmp, $tipo_cambio_tmp) = mysql_fetch_array($resp_moneda)) {
 		foreach ($results as $row) {
@@ -274,33 +282,33 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 	$opciones['mostrar_pagos'] = true;
 	$opciones['mostrar_fecha_ultimo_pago'] = true;
-
+	$where = '';
 	$search_query = $factura->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-			, $tipo_documento_legal_buscado, $codigo_cliente,$codigo_cliente_secundario
-			, $codigo_asunto,$codigo_asunto_secundario, $id_contrato, $id_estudio
+			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 	$x_pag = 25;
 
-	$b = new Buscador($sesion, $search_query, "Factura", $desde, $x_pag, $orden);
+	$b = new Buscador($sesion, $search_query, 'Factura', $desde, $x_pag, $orden);
 	$b->titulo = "Documentos Tributarios<br />$glosa_monto_saldo_total";
-	$b->AgregarFuncion(__('Destinatario Documento'), 'FormatoDestinatario', "width='30%' align=left");
-	$b->AgregarEncabezado("fecha", __('Fecha Documento'), "align=center");
-	$b->AgregarFuncion(__('Datos Documento'), 'FormatoDatos', "width='10%' align=left");
+	$b->AgregarFuncion(__('Destinatario Documento'), 'FormatoDestinatario', 'width="30%" align="left"');
+	$b->AgregarEncabezado('fecha', __('Fecha Documento'), 'align="center"');
+	$b->AgregarFuncion(__('Datos Documento'), 'FormatoDatos', 'width="10%" align="left"');
 
 	if ($config->columns['encargado_comercial']->visible) {
-		$b->AgregarEncabezado("encargado_comercial", __('Socio a cargo'), "align=center");
+		$b->AgregarEncabezado("encargado_comercial", __('Socio a cargo'), 'align="center"');
 	}
 
-	$b->AgregarFuncion(__('Nº Liquidación'), 'FormatoLiquidacion', "align=center");
-	$b->AgregarFuncion(__('IVA'), "FormatoIVA", "align=right");
-	$b->AgregarFuncion(__('Pagos'), "FormatoPagos", "align=right");
-	$b->AgregarFuncion(__('Saldo adeudado'), "FormatoSaldo", "align=right");
-	$b->AgregarEncabezado("fecha_ultimo_pago", __('Fecha Último Pago'), "align=center");
-	$b->AgregarEncabezado("estado", __('Estado'), "align=center");
-	$b->AgregarFuncion(__('Opciones'), 'Opciones', "style='white-space:nowrap' align=right");
-	$b->color_mouse_over = "#bcff5c";
+	$b->AgregarFuncion(__('Nº Liquidación'), 'FormatoLiquidacion', 'align="center"');
+	$b->AgregarFuncion(__('Total'), 'FormatoTotal', 'align="right"');
+	$b->AgregarFuncion(__('Pagos'), 'FormatoPagos', 'align="right"');
+	$b->AgregarFuncion(__('Saldo adeudado'), 'FormatoSaldo', 'align="right"');
+	$b->AgregarEncabezado('fecha_ultimo_pago', __('Fecha Último Pago'), 'align="center"');
+	$b->AgregarEncabezado('estado', __('Estado'), 'align="center"');
+	$b->AgregarFuncion(__('Opciones'), 'Opciones', 'style="white-space:nowrap" align="right"');
+	$b->color_mouse_over = '#bcff5c';
 	$b->Imprimir();
 }
 
@@ -346,9 +354,9 @@ function FormatoMoneda($sesion, $numero, $moneda) {
 	return UtilesApp::PrintFormatoMoneda($sesion, $numero, $moneda);
 }
 
-function FormatoIVA($fila) {
+function FormatoTotal($fila) {
 	global $sesion;
-	return FormatoMoneda($sesion, $fila->fields['iva'], $fila->fields['id_moneda']);
+	return FormatoMoneda($sesion, $fila->fields['total'], $fila->fields['id_moneda']);
 }
 
 function FormatoPagos($fila) {

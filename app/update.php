@@ -10163,6 +10163,15 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaTextoImpuesto', ' ', 'Texto Factura Impuesto', 'text', '4', '-1');";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.59:
+			$queries = array();
+			$queries[] = "ALTER TABLE `documento` CHANGE COLUMN `glosa_documento` `glosa_documento` text NOT NULL;";
+			$queries[] = "ALTER TABLE `gasto_general` CHANGE COLUMN `descripcion` `descripcion` TEXT NULL DEFAULT NULL;";
+			$queries[] = "ALTER TABLE `cta_corriente` CHANGE COLUMN `descripcion` `descripcion` TEXT NULL DEFAULT NULL;";
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
 
@@ -10172,7 +10181,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.58;
+$max_update = 7.59;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
