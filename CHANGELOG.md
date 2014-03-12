@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.0.12
+Miércoles 12 de marzo 2014
+* **Fixed:** Corrige agrupador fecha de emisión en reporte avanzado.
+
 ## Hotfix: 14.0.11
 Lunes 10 de marzo 2014
 * **Fixed:** [Corrige calculo saldo pago.](https://github.com/LemontechSA/ttb/pull/438)
