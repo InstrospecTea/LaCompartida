@@ -896,12 +896,12 @@ class CartaCobro extends NotaCobro {
 						if ($this->fields['monto_gastos'] > 0) {
 					
 							if ($this->fields['monto'] == round($this->fields['monto'])) {
-								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . number_format($this->fields['monto'], 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
+								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							} else {
-								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
+								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							}
 						} else {
-							$detalle_cuenta_honorarios_primer_dia_mes .= ' ' . __('correspondiente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
+							$detalle_cuenta_honorarios_primer_dia_mes .= ' ' . __('correspondiente a') . ' ' . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 						}
 
 						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('conforme a su equivalencia en peso según el Dólar Observado publicado por el Banco Central de Chile, el primer día hábil del presente mes') . ' )';
