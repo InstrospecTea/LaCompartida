@@ -971,6 +971,7 @@ $_LANG['valor_castigado'] = "Valor Castigado";
 $_LANG['mes_reporte'] = 'Trabajo (mes)';
 $_LANG['dia_reporte'] = 'Trabajo (día)';
 $_LANG['mes_emision'] = 'Emisión (mes)';
+$_LANG['dia_emision'] = 'Fecha Emisión';
 $_LANG['estado'] = "Estado";
 
 ### Configuración ###
