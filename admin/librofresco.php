@@ -79,6 +79,12 @@ function fieldExist(&$pdodbh, $table, $field) {
 	a.error {
 		color: red;
 	}
+	a.actualizado {
+		color: green;
+	}
+	a.actualizando {
+		color: blue;
+	}
 	div.error {
 		padding: 5px;
 		margin-top: 10px;
@@ -100,7 +106,45 @@ function fieldExist(&$pdodbh, $table, $field) {
 	form select {
 		width: 200px !important;
 	}
+	#modal-background {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: black;
+		opacity: .50;
+		-webkit-opacity: .5;
+		-moz-opacity: .5;
+		filter: alpha(opacity=50);
+		z-index: 1000;
+	}
+	#modal-content {
+		background-color: white;
+		border-radius: 10px;
+		-webkit-border-radius: 10px;
+		-moz-border-radius: 10px;
+		box-shadow: 0 0 20px 0 #222;
+		-webkit-box-shadow: 0 0 20px 0 #222;
+		-moz-box-shadow: 0 0 20px 0 #222;
+		display: none;
+		height: 240px;
+		left: 50%;
+		margin: -120px 0 0 -160px;
+		padding: 10px;
+		position: fixed;
+		top: 50%;
+		width: 320px;
+		z-index: 1000;
+	}
+	#modal-background.active, #modal-content.active {
+		display: block;
+	}​
 </style>
+
+<div id="modal-background"></div>
+<div id="modal-content"></div>
 
 <form method="POST">
 	<table>
@@ -115,7 +159,10 @@ function fieldExist(&$pdodbh, $table, $field) {
 </form>
 
 <?php if (empty($error_coneccion)) { ?>
-	<div class="actualizar_todos"><a href="#" class="actualizar_todos">Actualizar a todos los clientes</a></div>
+	<div class="actualizar_todos">
+		<a href="javascript:void(0)" class="actualizar_todos">Actualizar a todos los clientes</a>
+	</div>
+
 	<table>
 		<thead>
 			<tr>
@@ -176,7 +223,8 @@ function fieldExist(&$pdodbh, $table, $field) {
 										data-timekeeper="<?php echo $cliente['timekeeper']; ?>"
 										data-administrative="<?php echo $cliente['administrative']; ?>"
 										data-casetracking="<?php echo $cliente['casetracking']; ?>"
-										data-subdomain="<?php echo base64_encode("http://{$_base}.thetimebilling.com"); ?>">
+										data-subdomain="<?php echo base64_encode("http://{$_base}.thetimebilling.com"); ?>"
+										data-error="">
 										Actualizar
 									</a>
 								</td>
@@ -191,7 +239,7 @@ function fieldExist(&$pdodbh, $table, $field) {
 							<td class="usuarios">0</td>
 							<td class="usuarios">0</td>
 							<td class="actualizar">
-								<a href="javascript:void(0)" class="error" data-error="<?php echo addslashes($e->getMessage()); ?>">Error!</a>
+								<a href="javascript:void(0)" class="error" data-error="<?php echo addslashes($e->getMessage()); ?>">Error</a>
 							</td>
 						</tr>
 						<?php
@@ -203,11 +251,21 @@ function fieldExist(&$pdodbh, $table, $field) {
 
 	<script type="text/javascript">
 		jQuery(function() {
-			jQuery('a.error').on('click', function() {
+			jQuery('a.actualizar_todos').click(function() {
+				jQuery('#modal-content, #modal-background').toggleClass('active');
+			});
+
+			jQuery('a.error').live('click', function() {
 				alert(jQuery(this).attr('data-error').replace(/\\/gi, ''));
 			});
 
-			jQuery('a.actualizar').on('click', function() {
+			jQuery('a.actualizado').live('click', function() {
+				alert(jQuery(this).attr('data-error').replace(/\\/gi, ''));
+			});
+
+			jQuery('a.actualizar').live('click', function() {
+				var a_actualizar = this;
+
 				jQuery.ajax({
 					url: 'librofresco_api.php',
 					type: 'POST',
@@ -219,11 +277,33 @@ function fieldExist(&$pdodbh, $table, $field) {
 						casetracking: jQuery(this).attr('data-casetracking'),
 						subdomain: jQuery(this).attr('data-subdomain')
 					},
+					beforeSend: function() {
+						jQuery(a_actualizar)
+							.html('Actualizando...')
+							.addClass('actualizando')
+							.removeClass('actualizar');
+					},
 					success: function (data) {
-						console.log(data);
+						if (data.error == false) {
+							jQuery(a_actualizar)
+								.html('Actualizado')
+								.removeClass('actualizando')
+								.addClass('actualizado')
+								.attr('data-error', 'Actualizado');
+						} else {
+							jQuery(a_actualizar)
+								.html('Error')
+								.removeClass('actualizando')
+								.addClass('error')
+								.attr('data-error', data.error);
+						}
 					},
 					error: function (data) {
-						console.log(data);
+						jQuery(a_actualizar)
+						.html('Error')
+						.removeClass('actualizando')
+						.addClass('error')
+						.attr('data-error', data.error);
 					}
 				});
 			});
@@ -236,4 +316,4 @@ function fieldExist(&$pdodbh, $table, $field) {
 	</div>
 <?php } ?>
 
-<?php $Pagina->PrintBottom();
+<?php $Pagina->PrintBottom(); ?>
