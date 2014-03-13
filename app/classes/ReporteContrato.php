@@ -327,39 +327,39 @@ class ReporteContrato extends Contrato {
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
-        function LoadContrato($idcontrato,$codigo_asunto='',$fecha1='',$fecha2='',$emitido=true) {
-            $this->Load($idcontrato);
-            $this->asunto=$codigo_asunto;
-            $this->fecha1=$fecha1;
-            $this->fecha2=$fecha2;
+
+    function LoadContrato($idcontrato, $codigo_asunto='',$fecha1='',$fecha2='',$emitido=true) {
+        $this->Load($idcontrato);
+        $this->asunto=$codigo_asunto;
+        $this->fecha1=$fecha1;
+        $this->fecha2=$fecha2;
 
 
-            $this->MHHXYC=$this->MontoHHTarifaSTD2( $emitido, '', $fecha1, $fecha2 ); // monto hh del contrato y sus monedas
-            if ($this->asunto=='' || !$this->separar_asuntos):
-                $this->MHHXYA=$this->MHHXYC;
-            else:
-                $this->MHHXYA=$this->MontoHHTarifaSTD2( $emitido, $codigo_asunto, $fecha1, $fecha2 ); // monto hh del asunto y sus monedas
-            endif;
-            if($this->fields['forma_cobro']=='CAP'  || $this->MHHXYC[0] <= 0) { // solamente necesito calcular la cantidad de asuntos por facturar si es un contrato CAP o si el monto hh del contrato viene vacio
-                $this->asuntosporfacturar= $this->CantidadAsuntosPorFacturar2( $fecha1, $fecha2 );
-			}  else {
-                 $this->asuntosporfacturar= 1;
-			}
-			    if (!$this->separar_asuntos) {
-				$this->factor =1;
-			    } elseif( $this->MHHXYC[0] > 0 ) {
-                                $this->factor = number_format($this->MHHXYA[0]/$this->MHHXYC[0],6,'.','');
+        $this->MHHXYC=$this->MontoHHTarifaSTD2( $emitido, '', $fecha1, $fecha2 ); // monto hh del contrato y sus monedas
+        if ($this->asunto=='' || !$this->separar_asuntos):
+            $this->MHHXYA=$this->MHHXYC;
+        else:
+            $this->MHHXYA=$this->MontoHHTarifaSTD2( $emitido, $codigo_asunto, $fecha1, $fecha2 ); // monto hh del asunto y sus monedas
+        endif;
+        if($this->fields['forma_cobro']=='CAP'  || $this->MHHXYC[0] <= 0) { // solamente necesito calcular la cantidad de asuntos por facturar si es un contrato CAP o si el monto hh del contrato viene vacio
+            $this->asuntosporfacturar= $this->CantidadAsuntosPorFacturar2( $fecha1, $fecha2 );
+		}  else {
+             $this->asuntosporfacturar= 1;
+		}
+		    if (!$this->separar_asuntos) {
+			$this->factor =1;
+		    } elseif( $this->MHHXYC[0] > 0 ) {
+                            $this->factor = number_format($this->MHHXYA[0]/$this->MHHXYC[0],6,'.','');
 
-			    } else {
-                                $this->factor = number_format(1/$this->asuntosporfacturar,6,'.','');
-                            }
+		    } else {
+                            $this->factor = number_format(1/$this->asuntosporfacturar,6,'.','');
+                        }
 
-            $this->arraymonto=$this->TotalMonto2($emitido, $codigo_asunto, $fecha1,$fecha2);
+        $this->arraymonto=$this->TotalMonto2($emitido, $codigo_asunto, $fecha1,$fecha2);
 
-        }
+    }
 
-	function LoadByCodigoAsunto( $codigo_asunto )
-	{
+	function LoadByCodigoAsunto( $codigo_asunto ) {
 		$query = "SELECT id_contrato FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
@@ -683,7 +683,8 @@ class ReporteContrato extends Contrato {
                                t1.simbolo, t1.id_moneda,t1.duracionh t_individual, @acumulado:=@acumulado+t1.duracionh Tacumulado,
                                 if(@acumulado<t1.retainer_horas,0,
                                             if(@acumulado- t1.retainer_horas >t1.duracionh,t1.duracionh,@acumulado-t1.retainer_horas))*t1.tarifa as Macumulado
-                                                                   FROM (select @acumulado:=0) ac,
+                                                                
+                                                                FROM (select @acumulado:=0) ac,
                                                                     (select ut1.tarifa, c1.monto   * ( pm2.tipo_cambio / pm1.tipo_cambio ) plata_retainer,c1.retainer_horas,
                                                                            pm1.simbolo, pm1.id_moneda, t1.fecha, t1.id_trabajo, t1.id_usuario,
                                                                            t1.codigo_asunto, time_to_sec(t1.duracion_cobrada)/3600 duracionh from trabajo t1
@@ -697,22 +698,26 @@ class ReporteContrato extends Contrato {
                                                                                    AND c1.id_moneda = ut1.id_moneda
                                                                                    AND c1.id_tarifa = ut1.id_tarifa )
 
-                                                                   WHERE 1
-                                                                      $where_estado
+		                                                                   WHERE 1
+		                                                                      $where_estado
 
-                                                                        $where_fecha2
-                                                                         AND a1.id_contrato = " . $this->fields['id_contrato'] . "
-                                                                           and   t1.cobrable = 1   AND t1.id_tramite = 0
-                                                                    order by t1.fecha, t1.id_trabajo) t1
-                                                                         ) t1
+		                                                                        $where_fecha2
+		                                                                         AND a1.id_contrato = " . $this->fields['id_contrato'] . "
+		                                                                           and   t1.cobrable = 1   AND t1.id_tramite = 0
+		                                                                    order by t1.fecha, t1.id_trabajo) t1
+		                                                            ) t1
+
                                                                 where 1
                                                                 $where_fecha1
-								 $where_asunto
+								 								$where_asunto
+
                                                                 group by  plata_retainer, simbolo, id_moneda";
 
 				//subquery que se repite como mil veces
 //mail('ffigueroa@lemontech.cl','RETAINER',$query)		;
 				break;
+			
+
 			case 'PROPORCIONAL':
 
 
@@ -811,7 +816,9 @@ class ReporteContrato extends Contrato {
 
 				break;
 
+
 			case 'ESCALONADA':
+
 
 				$query = "SELECT SQL_CALC_FOUND_ROWS t1.duracion_cobrada,
 					t1.descripcion,
@@ -839,7 +846,35 @@ class ReporteContrato extends Contrato {
                                         AND t1.id_tramite = 0
 					AND asunto.id_contrato=" . $this->fields['id_contrato'];
 				break;
+			
+
+			case 'HITOS':
+
+				if (!empty($fecha_ini)) {
+					$w_fecha1 = " AND cp.fecha_cobro >= '$fecha_ini' ";
+				}
+				if (!empty($fecha_fin)) {
+					$w_fecha2 = " AND cp.fecha_cobro <= '$fecha_fin' ";
+				}
+
+				$query = " 
+					SELECT SUM(cp.monto_estimado), 
+					    	m.simbolo, 
+        					m.id_moneda
+    				FROM cobro_pendiente cp
+					        INNER JOIN contrato cn ON cp.id_contrato = cn.id_contrato 
+					        INNER JOIN prm_moneda m ON  cn.id_moneda_monto = m.id_moneda
+    				WHERE 	cp.id_contrato = " .$this->fields['id_contrato']. " 
+							AND cp.hito = 1 
+							AND cp.fecha_cobro is not NULL 
+							$w_fecha1
+							$w_fecha2
+    			";				
+				break;
+
+
 			default:
+
 
 				$query = "SELECT
 									SUM((TIME_TO_SEC(t1.duracion_cobrada)*usuario_tarifa.tarifa)/3600),
@@ -863,6 +898,7 @@ class ReporteContrato extends Contrato {
 
 				break;
 		endswitch;
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_monto_trabajado, $moneda, $id_moneda) = mysql_fetch_array($resp);
 		//echo 'Monto estimado: '.$total_monto_trabajado.'<br>';
