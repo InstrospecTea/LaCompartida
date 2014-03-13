@@ -11,7 +11,7 @@ if ($opc == 'eliminar') {
 	$tarifa_eliminar = new Tarifa($Sesion);
 	$tarifa_eliminar->loadById($id_tarifa_eliminar);
 
-	if ($id_tarifa_eliminar == '1') {
+	if ($tarifa_eliminar->fields['tarifa_defecto'] == '1') {
 		$Pagina->AddError(__('La tarifa base no puede ser eliminada solo puede ser editada'));
 	} else {
 		if ($tarifa_eliminar->Eliminar()) {
