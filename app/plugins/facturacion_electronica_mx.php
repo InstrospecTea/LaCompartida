@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 $Slim = Slim::getInstance('default', true);
 $Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_factura_metodo_pago', 'InsertaMetodoPago');
+$Slim->hook('hook_factura_dte_estado', 'InsertaEstadoDTE');
 $Slim->hook('hook_validar_factura', 'ValidarFactura');
 $Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
 
@@ -70,6 +71,17 @@ function InsertaMetodoPago() {
 	echo "</tr>";
 }
 
+
+function InsertaEstadoDTE() {
+	global $factura;
+	$img_dir = Conf::ImgDir();
+	$mensaje = $factura->fields['dte_estado_descripcion'];
+	if (!is_null($mensaje) && $mensaje != '') {
+		echo "<a class = 'factura-dte-estado' href = 'javascript:alert(\"{$mensaje}\");'><img src='$img_dir/info-icon-24.png' border='0' /></a>";
+	}
+}
+
+
 function InsertaJSFacturaElectronica() {
 	echo 'jQuery(document).on("click", ".factura-electronica", function() {
 		if (!confirm("¿Confirma la generación de Factura electrónica?")) {
@@ -125,6 +137,12 @@ function BotonGenerarHTML($id_factura) {
 	return $content;
 }
 
+function BotonDescargarEstadoHTML($id_factura, $estado, $icon) {
+	$img_dir = Conf::ImgDir();
+	$content  = "<a class = 'factura-documento' data-factura = '$id_factura' href = '#' title='{$estado}' >	<img src='$img_dir/{$icon}' border='0' /></a>";
+	return $content;
+}
+
 function BotonDescargarHTML($id_factura) {
 	$img_dir = Conf::ImgDir();
 	$content  = "<a class = 'factura-documento' data-factura = '$id_factura' href = '#' >	<img src='$img_dir/pdf.gif' border='0' /></a>";
@@ -134,10 +152,14 @@ function BotonDescargarHTML($id_factura) {
 
 function AgregarBotonFacturaElectronica($hookArg) {
 	$Factura = $hookArg['Factura'];
-	if ($Factura->FacturaElectronicaCreada()){
+	if ($Factura->DTEFirmado()){
 		$hookArg['content'] = BotonDescargarHTML($Factura->fields['id_factura']);
 	} elseif (!$Factura->Anulada()) {
 		$hookArg['content'] = BotonGenerarHTML($Factura->fields['id_factura']);
+	} elseif ($Factura->DTEAnulado()) {
+		$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
+	} elseif ($Factura->DTEProcesandoAnular()) {
+		$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
 	}
 	return $hookArg;
 }
@@ -159,10 +181,12 @@ function GeneraFacturaElectronica($hookArg) {
 		$result = $client->RecibirTXT($usuario, $password, UtilesApp::utf8izar($strdocumento), 0);
 		if ($result->codigo == 201) {
 			try {
+				$estado_dte = Factura::$estados_dte['Firmado'];
 				$Factura->Edit('dte_xml', $result->descripcion);
 				$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 				$Factura->Edit('dte_firma', $result->timbrefiscal);
-
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 				$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 				$file_data = base64_decode($result->documentopdf);
 				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
@@ -182,6 +206,10 @@ function GeneraFacturaElectronica($hookArg) {
 				'Code' => 'BuildingInvoiceError',
 				'Message' => utf8_decode($result->descripcion)
 			);
+			$estado_dte = Factura::$estados_dte['ErrorFirmado'];
+			$Factura->Edit('dte_estado', $estado_dte);
+			$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
+			$Factura->Write();
 		}
 	}
 	return $hookArg;
@@ -191,7 +219,7 @@ function AnulaFacturaElectronica($hookArg) {
 	$Sesion = new Sesion();
 	$Factura = $hookArg['Factura'];
 
-	if (!$Factura->FacturaElectronicaCreada()) {
+	if (!$Factura->DTEFirmado() && !$Factura->DTEProcesandoAnular()) {
 		return $hookArg;
 	}
 
@@ -200,7 +228,6 @@ function AnulaFacturaElectronica($hookArg) {
 	$estudio_data = $estudio->getMetadata('facturacion_electronica_mx');
 	$usuario = $estudio_data['usuario'];
 	$password = $estudio_data['password'];
-
 	$firma = $Factura->fields['dte_firma'];
 	$firma_parts = explode("|", $firma);
 	$UUID = $firma_parts[1];
@@ -209,7 +236,12 @@ function AnulaFacturaElectronica($hookArg) {
 	$result = $client->CancelarCFDI($usuario, $password, $UUID);
 	if ($result->codigo == 201) {
 		try {
+			$estado_dte = Factura::$estados_dte['Anulado'];
 			$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+			$Factura->Edit('dte_estado', $estado_dte);
+			$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
+
+			$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
 			$Factura->Write();
 		} catch (Exception $ex) {
 			$hookArg['Error'] = array(
@@ -218,9 +250,15 @@ function AnulaFacturaElectronica($hookArg) {
 			);
 		}
 	} else {
+		$mensaje = "Ha ocurrido un error al " . __("Anular") . " el documento tributario electrónico, sin embargo, se intentará automáticamente más tarde.\n";
+		$mensaje .= "Detalle del Error: " . utf8_decode($result->descripcion);
+		$estado_dte = Factura::$estados_dte['ProcesoAnular'];
+		$Factura->Edit('dte_estado', $estado_dte);
+		$Factura->Edit('dte_estado_descripcion', $mensaje);
+		$Factura->Write();
 		$hookArg['Error'] = array(
 			'Code' => 'CancelGeneratedInvoiceError',
-			'Message' => utf8_decode($result->descripcion . " $UUID")
+			'Message' => $mensaje
 		);
 	}
 	return $hookArg;
