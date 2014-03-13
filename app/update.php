@@ -10172,6 +10172,30 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.60:
+			$queries = array();
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `application` (
+					`id` int(3) NOT NULL,
+					`name` varchar(256) NOT NULL,
+					`app_key` varchar(256) NOT NULL,
+					`app_secret` varchar(256) NOT NULL,
+					PRIMARY KEY (`id`),
+					INDEX (`app_key`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (1, 'The Time Billing', 'ttb');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (2, 'TTB Webservice', 'ttb-ws');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (3, 'TTB iOS', 'ttb-ios');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (4, 'TTB Desktop', 'ttb-desktop');";
+
+			if (!ExisteCampo('app_id', 'trabajo_historial', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' ";
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD INDEX (`app_id`)";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10181,7 +10205,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.59;
+$max_update = 7.60;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

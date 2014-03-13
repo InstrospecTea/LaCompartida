@@ -60,7 +60,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/clients', function () use ($Session, $Slim) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$timestamp = $Slim->request()->params('timestamp');
 	$include = $Slim->request()->params('include');
@@ -80,7 +80,7 @@ $Slim->get('/clients/:code/matters', function ($code) use ($Session) {
 		halt(__("Invalid client code"), "InvalidClientCode");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$Client = new Cliente($Session);
 	$Matter = new Asunto($Session);
@@ -103,7 +103,7 @@ $Slim->get('/clients/:code/matters', function ($code) use ($Session) {
 });
 
 $Slim->get('/matters', function () use ($Session, $Slim) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$timestamp = $Slim->request()->params('timestamp');
 	$include = $Slim->request()->params('include');
@@ -119,7 +119,7 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/activities', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$Activity = new Actividad($Session);
 	$activities = $Activity->findAll();
@@ -128,7 +128,7 @@ $Slim->get('/activities', function () use ($Session) {
 });
 
 $Slim->get('/areas', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$WorkArea = new AreaTrabajo($Session);
 	$work_areas = $WorkArea->findAll();
@@ -137,7 +137,7 @@ $Slim->get('/areas', function () use ($Session) {
 });
 
 $Slim->get('/tasks', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$Task = new Tarea($Session);
 	$tasks = $Task->findAll();
@@ -146,7 +146,7 @@ $Slim->get('/tasks', function () use ($Session) {
 });
 
 $Slim->get('/translations', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$translations = array();
 	array_push($translations, array('code' => 'Matters', 'value' => __('Asuntos')));
@@ -157,7 +157,7 @@ $Slim->get('/translations', function () use ($Session) {
 });
 
 $Slim->get('/settings', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$settings = array();
 
@@ -209,7 +209,7 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 	$User = new Usuario($Session);
 	$user = array();
 
@@ -241,7 +241,7 @@ $Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -273,7 +273,9 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = $auth_token->user_id;
+	$app_id = getAppIdByAppKey($auth_token->app_key);
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -293,6 +295,7 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 	$work['user_id'] = (int) $Slim->request()->params('user_id');
 	$work['billable'] = (int) $Slim->request()->params('billable');
 	$work['visible'] = (int) $Slim->request()->params('visible');
+	$work['app_id'] =  $app_id;
 
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
@@ -343,7 +346,9 @@ $Slim->post('/users/:user_id/works/:id', function ($user_id, $id) use ($Session,
 		halt(__("Invalid work ID"), "InvalidWorkID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = $auth_token->user_id;
+	$app_id = getAppIdByAppKey($auth_token->app_key);
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -363,6 +368,7 @@ $Slim->post('/users/:user_id/works/:id', function ($user_id, $id) use ($Session,
 	$work['user_id'] = (int) $user_id;
 	$work['billable'] = (int) $Slim->request()->params('billable');
 	$work['visible'] = (int) $Slim->request()->params('visible');
+	$work['app_id'] = $app_id;
 
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
@@ -411,7 +417,7 @@ $Slim->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Sessi
 		halt(__("Invalid work ID"), "InvalidWorkID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -440,7 +446,7 @@ $Slim->put('/users/:user_id/device', function ($user_id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
@@ -484,7 +490,7 @@ $Slim->delete('/users/:user_id/device/:token', function ($user_id, $token) use (
 		halt(__("Invalid token device"), "InvalidTokenDevice");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
@@ -510,7 +516,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$receive_alerts = (int) $Slim->request()->params('receive_alerts');
@@ -646,7 +652,7 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
-	$user_id = validateAuthTokenSendByHeaders('REP');
+	$user_id = validateAuthTokenSendByHeaders('REP')->user_id;
 	$results = SimpleReport::LoadApiReports($Session);
 	outputJson(array('results' => $results));
 });
@@ -789,7 +795,22 @@ function downloadFile($name, $type, $content) {
 	echo $content;
 }
 
-function validateAuthTokenSendByHeaders($permission = null) {
+function getAppIdByAppKey($app_key) {
+	global $Session, $Slim;
+	$sql = "SELECT `application`.`id`
+			FROM `application` WHERE `application`.`app_key`=:app_key";
+	$Statement = $Session->pdodbh->prepare($sql);
+	$Statement->bindParam('app_key', $app_key);
+	$Statement->execute();
+	$app_data = $Statement->fetchObject();
+	if (is_object($app_data)) {
+		return $app_data->id;
+	} else {
+		return 1; //default app id = TimeBilling.
+	}
+}
+
+function validateAuthTokenSendByHeaders($permission = null, $includes_app_id = false) {
 	global $Session, $Slim;
 
 	$UserToken = new UserToken($Session);
@@ -834,7 +855,7 @@ function validateAuthTokenSendByHeaders($permission = null) {
 			}
 		}
 
-		return $user_token->user_id;
+		return $user_token;
 	}
 }
 
