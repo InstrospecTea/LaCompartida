@@ -304,8 +304,6 @@ class CartaCobro extends NotaCobro {
 			return;
 		}
 
-		echo 'uno'. $valorsinespacio . 'dos';
-
 		$html2 = $parser_carta->tags[$theTag];
 
 		switch ($theTag) {
