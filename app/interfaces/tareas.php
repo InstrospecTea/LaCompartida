@@ -1,11 +1,9 @@
 <?php
-
 require_once dirname(__FILE__).'/../conf.php';
 
 $Sesion = new Sesion(array('PRO','ADM'));
 $Pagina = new Pagina($Sesion);
 $Tarea = new Tarea($Sesion);
-
 
 $Pagina->titulo = __('Listado de Tareas');
 $Pagina->PrintTop();
@@ -18,74 +16,83 @@ $opc = 'buscar';
 //Inicializador de Datos de Busqueda. Pueden provenir de:
 // Form (incluidas paginas del buscador
 // Url (si el popup, o los headers) invocaron Refrescar()
-if($otras_t)
-	$opciones['otras_tareas'] = 1;
-if($t_mandante)
-	$opciones['tareas_mandante'] = 1;
-if($t_responsable)
-	$opciones['tareas_responsable'] = 1;
-if($t_revisor)
-	$opciones['tareas_revisor'] = 1;
-if($t_encargado)
-	$opciones['tareas_encargado'] = 1;
+if ($otras_t) {
+    $opciones['otras_tareas'] = 1;
+}
+if ($t_mandante) {
+    $opciones['tareas_mandante'] = 1;
+}
+if ($t_responsable) {
+    $opciones['tareas_responsable'] = 1;
+}
+if ($t_revisor) {
+    $opciones['tareas_revisor'] = 1;
+}
+if ($t_encargado) {
+    $opciones['tareas_encargado'] = 1;
+}
 
-if($fecha_desde)
-	$opciones['fecha_desde'] = $fecha_desde;
-if($fecha_hasta)
-	$opciones['fecha_hasta'] = $fecha_hasta;
+if ($fecha_desde) {
+    $opciones['fecha_desde'] = $fecha_desde;
+}
+if ($fecha_hasta) {
+    $opciones['fecha_hasta'] = $fecha_hasta;
+}
 
-if($estados_elegidos)
-	$estados = explode(',',$estados_elegidos);
-if(!is_array($estados)&&$estados)
-	$estados = array($estados);
+if ($estados_elegidos) {
+    $estados = explode(',', $estados_elegidos);
+}
+if (!is_array($estados) && $estados) {
+    $estados = array($estados);
+}
 if(is_array($estados)) {
-	$opciones['estado'] = $estados;
-	$expandido = '';
+    $opciones['estado'] = $estados;
+    $expandido = '';
 }else if(!$incluir_historicas) {
-	$opciones['estado'] = $Tarea->estados;
+    $opciones['estado'] = $Tarea->estados;
 }
 
 if($fecha_desde || $fecha_hasta) {
-	$expandido = '';
+    $expandido = '';
 }
 
 if( !($opciones['tareas_mandante'] || $opciones['tareas_responsable'] || $opciones['tareas_revisor'] || $opciones['otras_tareas'] || $opciones['tareas_encargado']) ) {
-	$opciones['tareas_mandante'] = true;
-	$opciones['tareas_responsable'] = true;
-	$opciones['tareas_revisor'] = true;
-	$opciones['tareas_encargado'] = true;
+    $opciones['tareas_mandante'] = true;
+    $opciones['tareas_responsable'] = true;
+    $opciones['tareas_revisor'] = true;
+    $opciones['tareas_encargado'] = true;
 }
 
 $conf_codigo_primario = true;
 if(Conf::GetConf($Sesion,'CodigoSecundario'))
-	$conf_codigo_primario = false;
+    $conf_codigo_primario = false;
 
 if($conf_codigo_primario) {
-	if($cc)
-		$codigo_cliente = $cc;
-	if($ca)
-		$codigo_asunto = $ca;
+    if($cc)
+        $codigo_cliente = $cc;
+    if($ca)
+        $codigo_asunto = $ca;
 }else{
-	if($cc) {
-		$codigo_cliente_secundario = $cc;
-		$cliente = new Cliente($Sesion);
-		$codigo_cliente = $cliente->codigoSecundarioACodigo($codigo_cliente_secundario);
-	}
-	if($ca) {
-		$codigo_asunto_secundario = $ca;
-		$asunto = new Asunto($Sesion);
-		$codigo_asunto = $asunto->codigoSecundarioACodigo($codigo_asunto_secundario);
-	}
+    if($cc) {
+        $codigo_cliente_secundario = $cc;
+        $cliente = new Cliente($Sesion);
+        $codigo_cliente = $cliente->codigoSecundarioACodigo($codigo_cliente_secundario);
+    }
+    if($ca) {
+        $codigo_asunto_secundario = $ca;
+        $asunto = new Asunto($Sesion);
+        $codigo_asunto = $asunto->codigoSecundarioACodigo($codigo_asunto_secundario);
+    }
 }
 if($codigo_cliente)
-	$opciones['codigo_cliente'] = $codigo_cliente;
+    $opciones['codigo_cliente'] = $codigo_cliente;
 if($codigo_asunto)
-	$opciones['codigo_asunto'] = $codigo_asunto;
+    $opciones['codigo_asunto'] = $codigo_asunto;
 
 if($orden_click)
-	$opciones['orden'] = $orden_click;
+    $opciones['orden'] = $orden_click;
 else if($orden_select)
-	$opciones['orden'] = $orden_select;
+    $opciones['orden'] = $orden_select;
 ?>
 <script type="text/javascript">
 	function Validar() {
@@ -203,12 +210,12 @@ else if($orden_select)
 
 <? echo(Autocompletador::CSS()); ?>
 <form name='formulario' id='formulario' method='post' action='tareas.php' autocomplete='off'>
-	<input type='hidden' name='conf_codigo_primario' id="conf_codigo_primario" value="<?= (Conf::GetConf($Sesion,'CodigoSecundario') ? 'false' : 'true'); ?>"/>
-	<input type='hidden' name='opc' id='opc' value='buscar' />
-	<input type='hidden' name='id_usuario' id='id_usuario' value=<?=$id_usuario?> />
-	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
-		<div class="floating" id="calendar"></div>
-	</div>
+    <input type='hidden' name='conf_codigo_primario' id="conf_codigo_primario" value="<?= (Conf::GetConf($Sesion,'CodigoSecundario') ? 'false' : 'true'); ?>"/>
+    <input type='hidden' name='opc' id='opc' value='buscar' />
+    <input type='hidden' name='id_usuario' id='id_usuario' value=<?=$id_usuario?> />
+    <div id="calendar-container" style="width:221px; position:absolute; display:none;">
+            <div class="floating" id="calendar"></div>
+    </div>
 	<center>
 		<table <?= (Conf::GetConf($Sesion,'UsaDisenoNuevo') ? 'width="90%"' : 'width="95%"');?>>
 			<tr>
@@ -263,7 +270,7 @@ else if($orden_select)
 									Cliente:
 								</td>
 								<td align='left' colspan='4'>
-									<?
+									<?php
 										if(Conf::GetConf($Sesion,'TipoSelectCliente')=='autocompletador') {
 												if(Conf::GetConf($Sesion,'CodigoSecundario')) {
 													echo Autocompletador::ImprimirSelector($Sesion,'',$codigo_cliente_secundario,'',"220");
@@ -414,15 +421,17 @@ else if($orden_select)
 
 	<?php
 		if($opc == 'buscar') {
-			if( $codigo_cliente != '' )
-				$opciones['codigo_cliente'] = $codigo_cliente;
-			if( $codigo_cliente_secundario != '' ) {
+			if ($codigo_cliente != '') {
+                $opciones['codigo_cliente'] = $codigo_cliente;
+            }
+            if( $codigo_cliente_secundario != '' ) {
 					$cliente = new Cliente($Sesion);
 					$opciones['codigo_cliente'] = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario );
 			}
-			if( $codigo_asunto != '' )
-				$opciones['codigo_asunto'] = $codigo_asunto;
-			if( $codigo_asunto_secundario != '' ) {
+			if ($codigo_asunto != '') {
+                $opciones['codigo_asunto'] = $codigo_asunto;
+            }
+            if( $codigo_asunto_secundario != '' ) {
 				$asunto = new Asunto($Sesion);
 				$opciones['codigo_asunto'] = $asunto->CodigoSecundarioACodigo( $codigo_asunto_secundario );
 			}

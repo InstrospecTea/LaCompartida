@@ -1,8 +1,8 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/modulos/ical_Creator/ICS_Creation.php';
 
-//Tarea implementa un buscador con columnas dinÃ¡micas
+//Tarea implementa un buscador con columnas dinámicas
 class Tarea extends Objeto
 {
 	// Sesion PHP
@@ -190,11 +190,11 @@ class Tarea extends Objeto
 			}
 
 			$query .= " WHERE ".$this->campo_id."='".$this->fields[$this->campo_id]."'";
-			if($do_update) //Solo en caso de que se haya modificado algÃºn campo
+			if($do_update) //Solo en caso de que se haya modificado algún campo
 			{
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
-			else //Retorna true ya que si no quiere hacer update la funciÃ³n corriÃ³ bien
+			else //Retorna true ya que si no quiere hacer update la función corría bien
 				return true;
 		}
 		else
@@ -227,7 +227,7 @@ class Tarea extends Objeto
 		}
 		else if( $this->fields['orden_estado'] == 4)
 		{
-			$estado = " La siguiente tarea ha sido desarrollada y estÃ¡ a la espera de su revisiÃ³n:";
+			$estado = " La siguiente tarea ha sido desarrollada y está a la espera de su revisiÃ³n:";
 			$where = "id_usuario=".$this->fields['usuario_revisor'];
 		}
 		else if( $this->fields['orden_estado'] == 5)
@@ -261,7 +261,7 @@ class Tarea extends Objeto
                         */
 
 			$subject = "[Tarea] ".$this->fields['nombre'];
-			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquÃ­</a>).";
+			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí­</a>).";
 
 			Utiles::Insertar($this->sesion,$subject,$mensaje,$email,$nombre,false);
 		}
@@ -319,7 +319,7 @@ class Tarea extends Objeto
 	}
 
 	/**
-	* Se envia un mail con una invitaciÃ³n para google calendar al registrar una nueva Tarea
+	* Se envia un mail con una invitación para google calendar al registrar una nueva Tarea
 	**/
 	function enviarMailNotificaciones(){
 		$invitados = array();
