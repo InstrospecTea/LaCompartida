@@ -245,11 +245,8 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	}
 </style>
 
-<?php
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-	echo "<table width=\"90%\" class=\"tb_base\"><tr><td align=\"center\">";
-?>
-<form name=formulario id=formulario method=post action='' autocomplete="off">
+<table width="90%" class="tb_base"><tr><td align="center">
+<form name="formulario" id="formulario" method="post" action="" autocomplete="off">
 	<input type=hidden name='id_tarifa_edicion' value='<?php echo $tarifa->fields['id_tarifa'] ?>'>
 	<input type=hidden name='opc' value='guardar'>
 	<input type=hidden name='popup' id='popup' value='<?php echo $popup ?>'>
