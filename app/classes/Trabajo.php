@@ -269,7 +269,7 @@ class Trabajo extends Objeto
 					id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
 					fecha = '" . date("Y-m-d H:i:s") . "',
 					fecha_trabajo = '{$this->fields['fecha']}',
-					descripcion = '{$this->fields['descripcion']}',
+					descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
 					duracion = '{$this->fields['duracion']}',
 					duracion_cobrada = '{$this->fields['duracion_cobrada']}',
 					id_usuario_trabajador = '{$this->fields['id_usuario']}',
