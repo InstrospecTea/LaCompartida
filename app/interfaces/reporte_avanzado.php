@@ -117,7 +117,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'area_asunto',
 		'categoria_usuario',
 		'area_usuario',
-		'fecha_emision',
+		'dia_emision',
 		'glosa_grupo_cliente',
 		'id_usuario_responsable',
 		'mes_reporte',
@@ -140,7 +140,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'area_asunto',
 		'categoria_usuario',
 		'area_usuario',
-		'fecha_emision',
+		'dia_emision',
 		'glosa_grupo_cliente',
 		'id_usuario_responsable',
 		'mes_reporte',
@@ -162,7 +162,6 @@ if (Conf::GetConf($sesion, 'EncargadoSecundario')) {
 if ($debug == 1) {
 	$agrupadores[] = 'id_trabajo';
 	$agrupadores[] = 'dia_corte';
-	$agrupadores[] = 'dia_emision';
 	$agrupadores[] = 'id_contrato';
 }
 

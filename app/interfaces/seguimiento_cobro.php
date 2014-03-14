@@ -31,7 +31,7 @@ if ($opc == 'eliminar') {
 		$lista_pagos = $documento_cobro->ListaPagos();
 
 
-		/* FFF: cambio esta query para usar clase Documento    
+		/* FFF: cambio esta query para usar clase Documento
 		  $query = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
 		  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		  list($cont_documentos) = mysql_fetch_array($resp); */
@@ -138,21 +138,21 @@ if ($opc == 'buscar') {
 	}
 	if (isset($_POST['tienehonorario']))
     	$where.= " AND (
-			        SELECT count(id_tramite) 
+			        SELECT count(id_tramite)
 			        FROM  `trabajo` AS t1
 			        WHERE t1.id_cobro = cobro.id_cobro
 			        AND t1.id_tramite = 0
 	    ) > 0 ";
 	if (isset($_POST['tienegastos']))
 		$where.= " AND (
-					SELECT count(id_movimiento) 
+					SELECT count(id_movimiento)
 			        FROM cta_corriente c
-			        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null 
+			        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null
 			        group by c.id_cobro
         ) IS NOT NULL ";
 	if (isset($_POST['tienetramites']))
 		$where.=" AND (
-			           SELECT count(id_tramite) 
+			           SELECT count(id_tramite)
 			           FROM tramite AS t1
 			           WHERE t1.id_cobro = cobro.id_cobro
     	) > 0 ";
@@ -162,7 +162,7 @@ if ($opc == 'buscar') {
 
 
 
-	$query = "SELECT SQL_CALC_FOUND_ROWS 
+	$query = "SELECT SQL_CALC_FOUND_ROWS
 								cobro.id_cobro,
 								cobro.monto as cobro_monto,
 								cobro.monto_subtotal,
@@ -188,32 +188,33 @@ if ($opc == 'buscar') {
 								cliente.glosa_cliente,
 								contrato.forma_cobro,
 								contrato.monto,
+								contrato.retainer_horas,
 								moneda.simbolo,
 								moneda.cifras_decimales,
 								cobro.incluye_honorarios as incluye_honorarios,
-								cobro.incluye_gastos as incluye_gastos, 
+								cobro.incluye_gastos as incluye_gastos,
 
-					
-								
+
+
 								CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
-								tarifa.glosa_tarifa, 
+								tarifa.glosa_tarifa,
 
 								(
-							        SELECT count(id_tramite) 
+							        SELECT count(id_tramite)
 							        FROM  `trabajo` AS t1
 							        WHERE t1.id_cobro = cobro.id_cobro
 							        AND t1.id_tramite != 0
 							    ) as tramites_count,
 							    (
-							        SELECT count(id_tramite) 
+							        SELECT count(id_tramite)
 							        FROM  `trabajo` AS t1
 							        WHERE t1.id_cobro = cobro.id_cobro
 							        AND t1.id_tramite = 0
-							    ) as trabajos_count, 
+							    ) as trabajos_count,
 							    (
-							    	SELECT count(id_movimiento) 
+							    	SELECT count(id_movimiento)
 							        FROM cta_corriente c
-							        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null 
+							        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null
 							        group by c.id_cobro
 								) as gastos_SiNo
 								";
@@ -223,10 +224,10 @@ if ($opc == 'buscar') {
 	$query.="FROM contrato  join cobro ON cobro.id_contrato = contrato.id_contrato
 							 left JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 							 left JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
-						 
-							 
+
+
 							LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
-							LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda 
+							LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
 							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
 							 ";
 	if (isset($_POST['tieneadelantos'])) {
@@ -236,8 +237,8 @@ if ($opc == 'buscar') {
 	}
 
 	$query.=" left join documento on documento.id_cobro=cobro.id_cobro and documento.tipo_doc='N'
-                                                        $joinfactura 
-                                                        WHERE $where 
+                                                        $joinfactura
+                                                        WHERE $where
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
 	$orden = ' cobro.id_contrato,cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente';
@@ -394,7 +395,7 @@ if ($opc == 'buscar') {
 
 		$html .= "</td>";
 		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') ) {
-		
+
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
 				$html.= "#" . $cobro->fields['documento'];
@@ -835,7 +836,7 @@ $fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
 			<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
 				<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios'); ?>
 				<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos'); ?>
-				<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites'); ?> 
+				<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites'); ?>
 				<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> Hay <?php echo __('Adelantos'); ?>  disponibles
 			</div>
 			</tr>
