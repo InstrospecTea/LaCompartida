@@ -22,6 +22,14 @@ class Tarifa extends Objeto {
 		return $this->Load($id);
 	}
 
+	// Cargar la tarifa por defecto
+	function LoadDefault() {
+		$query = " SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($id_tarifa) = mysql_fetch_array($resp);
+		return $this->Load($id_tarifa);
+	}
+
 	// Elimina Tarifas
 
 	function Eliminar() {

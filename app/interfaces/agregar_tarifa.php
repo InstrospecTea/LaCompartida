@@ -23,11 +23,9 @@ if ($opc == 'eliminar') {
 	}
 }
 
-if (!empty($id_tarifa_edicion) && !$tarifa->loadById($id_tarifa_edicion)) {
-	$query = " SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	list($id_tarifa_edicion) = mysql_fetch_array($resp);
-	$tarifa->Load($id_tarifa);
+if (!empty($id_tarifa_edicion) && !$tarifa->Load($id_tarifa_edicion)) {
+	$tarifa->LoadDefault();
+	$Pagina->Redirect('agregar_tarifa.php?id_tarifa_edicion=' . $tarifa->fields['id_tarifa']);
 }
 
 
