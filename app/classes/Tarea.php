@@ -1,17 +1,13 @@
 <?
 require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../app/classes/Cobro.php';
+require_once Conf::ServerDir().'/modulos/ical_Creator/ICS_Creation.php';
 
-//Tarea implementa un buscador con columnas dinámicas
+//Tarea implementa un buscador con columnas dinÃ¡micas
 class Tarea extends Objeto
 {
 	// Sesion PHP
     var $sesion = null;
-
+    public $estados = array('Por Asignar','Asignada','En Desarrollo','Por Revisar','Lista');
 
 	function Tarea($sesion, $fields = "", $params = "")
 	{
@@ -166,7 +162,7 @@ class Tarea extends Objeto
 	}
 
 
-function Write()
+	function Write()
 	{
 		$this->error = "";
 		if(!$this->Check())
@@ -194,11 +190,11 @@ function Write()
 			}
 
 			$query .= " WHERE ".$this->campo_id."='".$this->fields[$this->campo_id]."'";
-			if($do_update) //Solo en caso de que se haya modificado algún campo
+			if($do_update) //Solo en caso de que se haya modificado algÃºn campo
 			{
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
-			else //Retorna true ya que si no quiere hacer update la función corrió bien
+			else //Retorna true ya que si no quiere hacer update la funciÃ³n corriÃ³ bien
 				return true;
 		}
 		else
@@ -222,6 +218,7 @@ function Write()
 			}
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			$this->fields[$this->campo_id] = mysql_insert_id($this->sesion->dbh);
+			$this->enviarMailNotificaciones();
 		}
 		if( $this->fields['orden_estado']==2 || $this->fields['estado'] == 'Asignada')
 		{
@@ -230,7 +227,7 @@ function Write()
 		}
 		else if( $this->fields['orden_estado'] == 4)
 		{
-			$estado = " La siguiente tarea ha sido desarrollada y está a la espera de su revisión:";
+			$estado = " La siguiente tarea ha sido desarrollada y estÃ¡ a la espera de su revisiÃ³n:";
 			$where = "id_usuario=".$this->fields['usuario_revisor'];
 		}
 		else if( $this->fields['orden_estado'] == 5)
@@ -264,7 +261,7 @@ function Write()
                         */
 
 			$subject = "[Tarea] ".$this->fields['nombre'];
-			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí</a>).";
+			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquÃ­</a>).";
 
 			Utiles::Insertar($this->sesion,$subject,$mensaje,$email,$nombre,false);
 		}
@@ -299,6 +296,68 @@ function Write()
 		}
 
 		return $tasks;
+	}
+
+	/**
+	* Busca las novedades dada una tarea $id_tarea
+	* @param id_usuario
+	* @param id_tarea
+	**/
+	function getNovedades($id_usuario,$id_tarea){
+		$query = sprintf("SELECT
+								tarea.id_tarea,
+								COUNT(tarea_comentario.id_comentario) AS comentarios,
+								COUNT(tarea_comentario_usuario.id_comentario) AS vistos
+							FROM tarea
+								JOIN tarea_comentario ON (tarea_comentario.id_tarea = tarea.id_tarea)
+								JOIN usuario
+								LEFT JOIN tarea_comentario_usuario ON (tarea_comentario_usuario.id_comentario = tarea_comentario.id_comentario AND tarea_comentario_usuario.id_usuario = '%d')
+							WHERE usuario.id_usuario = '%d' AND tarea.id_tarea = '%d'
+							GROUP BY tarea.id_tarea",$id_usuario,$id_usuario,$id_tarea);
+		$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		return mysql_fetch_array($result);
+	}
+
+	/**
+	* Se envia un mail con una invitaciÃ³n para google calendar al registrar una nueva Tarea
+	**/
+	function enviarMailNotificaciones(){
+		$invitados = array();
+		if($this->fields['usuario_registro']!='NULL')
+			$invitados[] = $this->fields['usuario_registro'];
+		if($this->fields['usuario_encargado']!='NULL')
+			$invitados[] = $this->fields['usuario_encargado'];
+		if($this->fields['usuario_revisor']!='NULL')
+			$invitados[] = $this->fields['usuario_revisor'];
+		if($this->fields['usuario_generador']!='NULL')
+			$invitados[] = $this->fields['usuario_generador'];
+		$invitados = array_unique($invitados);
+		if(sizeof($invitados)>0){
+			$query_usuarios_emails = sprintf("SELECT
+												u.email,
+												CONCAT_WS(' ',u.nombre, u.apellido1) nombre
+											FROM usuario u
+											WHERE
+												u.id_usuario IN (%s);",implode(",",$invitados));
+			$result = mysql_query($query_usuarios_emails) or Utiles::errorSQL($query_usuarios_emails,__FILE__,__LINE__,$sesion->dbh);
+			$correos = array();
+			while ($row = mysql_fetch_array($result)) {
+			    $correos[] = array('mail' => trim($row['email']),'nombre' => $row['nombre']);
+			}
+
+			$ICS_data = NEW ICS_Creation();
+			$fecha = strtotime($this->fields['fecha_entrega']);
+            $ICS_data->addEvent($fecha, $fecha, "Nueva tarea ".$this->fields['nombre'], $this->fields['detalle'], '');
+            $attachment = array(
+            	'data_string' => $ICS_data->render_Event(),
+	 		 	'filename'	  => 'invitacion.ics',
+		        'base_encode' => '7bit'
+            );
+            $subject = 'Se creado una nueva tarea cliente '.$this->fields['codigo_cliente'];
+            $body = 'Estimado usuario, se registrado una nueva tarea, cliente: '.$this->fields['codigo_cliente'].' y asunto:'.$this->fields['codigo_asunto'];
+            Utiles::EnviarMail($this->sesion,array($correos),$subject,$body,false, NULL,$attachment);
+			mysql_free_result($result);
+		}
 	}
 }
 

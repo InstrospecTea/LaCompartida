@@ -1,21 +1,5 @@
 <?
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	
-	require_once Conf::ServerDir().'/../fw/classes/SelectorHoras.php';
-	require_once Conf::ServerDir().'/classes/Tarea.php';
-	require_once Conf::ServerDir().'/classes/TareaComentario.php';
-	require_once Conf::ServerDir().'/classes/Asunto.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Archivo.php';
-
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('PRO'));
 	$pagina = new Pagina($sesion);
@@ -367,7 +351,7 @@
 		if(!empty($infos))
 		{
 			?>
-				<table class="info" width="80%">
+				<table class="info" width="100%">
 					<tbody>
 						<? foreach($infos as $info)
 							{
@@ -385,7 +369,7 @@
 		if(!empty($errors))
 		{
 			?>
-				<table class="error" width="80%">
+				<table class="error" width="100%">
 					<tbody>
 						<? foreach($errors as $error)
 							echo '<tr>  <td style="font-size: 12px;" valign="top" align="left">';

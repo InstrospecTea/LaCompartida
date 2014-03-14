@@ -12,23 +12,20 @@
 	{
 ?>
 
-<table width="90%" class="info">
+<table width="100%" class="info">
 	<tr>
 		<td valign="top" align="left" style="font-size: 12px;">
 			<?php echo $this->GetInfos(); ?>
 		</td>
 	</tr>
 </table>
-
-			<br/><br/>
-
 <?php
 	}
 	if($this->num_errors > 0)
 	{
 ?>
 
-<table width="90%" class="alerta">
+<table width="100%" class="alerta">
 	<tr>
 		<td valign="top" align="left" style="font-size: 12px;">
 			<strong>Se han encontrado los siguientes errores:</strong><br/>
@@ -36,7 +33,5 @@
 		</td>
 	</tr>
 </table>
-			<br/><br/>
-
 <?php
 }
