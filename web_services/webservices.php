@@ -403,14 +403,14 @@ function CargarTrabajoApp($usuario, $password, $id_trabajo_local, $codigo_asunto
 }
 
 function CargarTrabajo2($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo = null) {
-	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo);
+	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, 2);
 }
 
 function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $fecha, $duracion) {
-	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, '', $fecha, $duracion, '');
+	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, '', $fecha, $duracion, '', '', 2);
 }
 
-function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id = 2) {
+function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id) {
 	$sesion = new Sesion();
 
 	if ($usuario == '' || $password == '') {
@@ -494,7 +494,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			$trabajo = new Trabajo($sesion);
 			$trabajo->Load(mysql_insert_id($sesion->dbh));
 			$trabajo->InsertarTrabajoTarifa();
-			$trabajo->GuardarHistorial($trabajo->QueryHistorial('CREAR', 2));
+			$trabajo->GuardarHistorial($trabajo->QueryHistorial('CREAR', $app_id));
 			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
