@@ -5,13 +5,7 @@ require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 
 $sesion = new Sesion(array('ADM'));
 
-$permiso_sadmin = $sesion->usuario->permisos->datos[10]->fields['permitido'];
-
-//if ($permiso_sadmin == 0) {
-	$where = " WHERE usr.rut != '99511620' ";
-//} else {
-	//$where = " WHERE 1 ";
-//}
+$where = " WHERE usr.rut != '99511620' ";
 
 $queryuser="
 	select 
