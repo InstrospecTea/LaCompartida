@@ -250,15 +250,14 @@ function AnulaFacturaElectronica($hookArg) {
 			);
 		}
 	} else {
-		$mensaje = "Ha ocurrido un error al " . __("Anular") . " el documento tributario electrónico, sin embargo, se intentará automáticamente más tarde.\n";
-		$mensaje .= "Detalle del Error: " . utf8_decode($result->descripcion);
+		$mensaje = "Usted ha solicitado anular una factura. Este proceso no es inmediato y puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos esta factura en TTB para que usted pueda volver a generar el documento correctamente en el sistema. Para consultar el estado de su factura, puede dar clic en el ícono i (más información)";
 		$estado_dte = Factura::$estados_dte['ProcesoAnular'];
 		$Factura->Edit('dte_estado', $estado_dte);
 		$Factura->Edit('dte_estado_descripcion', $mensaje);
 		$Factura->Write();
 		$hookArg['Error'] = array(
 			'Code' => 'CancelGeneratedInvoiceError',
-			'Message' => $mensaje
+			'Message' => utf8_decode($result->descripcion)
 		);
 	}
 	return $hookArg;

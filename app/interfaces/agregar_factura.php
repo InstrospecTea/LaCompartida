@@ -250,13 +250,13 @@ if ($opcion == "guardar") {
 				$resultado = array('error' => 'El número ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, vuelva a intentar con número: ' . $numero_documento_legal);
 			}
 		} else {
-			$has_errors = false;
 			if ($mensaje_accion == 'anulado') {
 				$data_anular = array('Factura' => $factura);
 				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data_anular) : false;
-				$has_errors = $data_anular['Error'];
-				if ($has_errors) {
-					$pagina->AddError($has_errors['Message'] ? $has_errors['Message'] : __($has_errors['Code']));
+				$error_message = $data_anular['Error'];
+				echo "<!-- {$error_message} -->";
+				if (!is_null($error_message)) {
+					$pagina->AddInfo($factura->fields["dte_estado_descripcion"]);
 					$factura->Load($id_factura);
 				}
 			}
