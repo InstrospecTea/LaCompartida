@@ -7,11 +7,11 @@ $sesion = new Sesion(array('ADM'));
 
 $permiso_sadmin = $sesion->usuario->permisos->datos[10]->fields['permitido'];
 
-if ($permiso_sadmin == 0) {
+//if ($permiso_sadmin == 0) {
 	$where = " WHERE usr.rut != '99511620' ";
-} else {
-	$where = " WHERE 1 ";
-}
+//} else {
+	//$where = " WHERE 1 ";
+//}
 
 $queryuser="
 	select 
