@@ -250,7 +250,7 @@ function AnulaFacturaElectronica($hookArg) {
 			);
 		}
 	} else {
-		$mensaje = "Usted ha solicitado anular una factura. Este proceso no es inmediato y puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos esta factura en TTB para que usted pueda volver a generar el documento correctamente en el sistema. Para consultar el estado de su factura, puede dar clic en el ícono i (más información)";
+		$mensaje = "Usted ha solicitado anular una factura. Este proceso no es inmediato y puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos esta factura en TTB para que usted pueda volver a generar el documento correctamente en el sistema.";
 		$estado_dte = Factura::$estados_dte['ProcesoAnular'];
 		$Factura->Edit('dte_estado', $estado_dte);
 		$Factura->Edit('dte_estado_descripcion', $mensaje);

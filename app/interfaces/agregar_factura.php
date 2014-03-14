@@ -256,7 +256,7 @@ if ($opcion == "guardar") {
 				$error_message = $data_anular['Error'];
 				echo "<!-- {$error_message} -->";
 				if (!is_null($error_message)) {
-					$pagina->AddInfo($factura->fields["dte_estado_descripcion"]);
+					$pagina->AddInfo($factura->fields["dte_estado_descripcion"] . " <br/>Para consultar el estado de su factura, puede dar clic en el ícono i (más información)");
 					$factura->Load($id_factura);
 				}
 			}
