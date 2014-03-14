@@ -2,11 +2,11 @@
 
 require_once(dirname(__FILE__) . '/../app/conf.php');
 
+ini_set("soap.wsdl_cache_enabled", 0);
+
+
 $Slim=Slim::getInstance('default')? Slim::getInstance('default') : new Slim();
 $sesion = new Sesion();
-
-
-
 
 $wsdl = Conf::Server() . Conf::RootDir() . '/web_services/webservices.php';
 
