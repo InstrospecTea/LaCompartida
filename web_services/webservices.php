@@ -141,6 +141,23 @@ $server->register('CargarTrabajo2',
 			),
 			array('resultado' => 'xsd:string'),
 			$ns);
+
+$server->register('CargarTrabajoApp',
+			array('usuario' => 'xsd:string',
+				'password' => 'xsd:string',
+				'id_trabajo_local' => 'xsd:string',
+				'codigo_asunto' => 'xsd:string',
+				'codigo_actividad' => 'xsd:string',
+				'descripcion' => 'xsd:string',
+				'ordenado_por' => 'xsd:string',
+				'fecha' => 'xsd:string',
+				'duracion' => 'xsd:string',
+				'area_trabajo' => 'xsd:string',
+				'app_id' => 'xsd:int',
+			),
+			array('resultado' => 'xsd:string'),
+			$ns);
+
 $server->register('EntregarListaActividades',
 			array('usuario' => 'xsd:string', 'password' => 'xsd:string'),
 			array('lista_actividades' => 'tns:ListaCodigoGlosa'),
@@ -381,6 +398,10 @@ function EntregarListaAreas($usuario, $password) {
 	return new soapval('lista_areas', 'ListaCodigoGlosa', $lista_areas);
 }
 
+function CargarTrabajoApp($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo = null, $app_id = 2) {
+	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id);
+}
+
 function CargarTrabajo2($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo = null) {
 	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo);
 }
@@ -389,7 +410,7 @@ function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $
 	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, '', $fecha, $duracion, '');
 }
 
-function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo) {
+function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id = 2) {
 	$sesion = new Sesion();
 
 	if ($usuario == '' || $password == '') {

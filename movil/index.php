@@ -134,6 +134,33 @@ function cargar_trabajo2() {
 	echo "Trabajo cargado OK";
 }
 
+$Slim->post('/trabajos_app', 'cargar_trabajo_app');
+$Slim->post('trabajos_app', 'cargar_trabajo_app');
+
+function getAppIdByAppKey($app_key) {
+	global $sesion;
+	$UserToken = new UserToken($sesion);
+	return $UserToken->getAppIdByAppKey($app_key);
+}
+
+function cargar_trabajo_app() {
+	global $sesion, $wsClient;
+	$Slim = Slim::getInstance();
+	try {
+		$app_id = getAppIdByAppKey($_POST['app_key']);
+		$wsClient->CargarTrabajoApp($_POST['rut'], $_POST['password'], "", $_POST['codigo_asunto'], "", $_POST['descripcion'], $_POST['ordenado_por'], date('Y-m-d', strtotime($_POST['fecha']) + 86400), (int) $_POST['duracion'] * 60, "", $app_id);
+	} catch (SoapFault $e) {
+		if ($e->faultstring == "Debe entregar el usuario y el password.") {
+			$Slim->halt(401, '["Debe entregar el usuario y el password."]');
+		} else {
+			$Slim->halt(500, $e->faultstring);
+		}
+	}
+
+	echo "Trabajo cargado OK";
+}
+
+
 $Slim->get('/*.manifest', 'obtener_manifest');
 $Slim->get('*.manifest', 'obtener_manifest');
 

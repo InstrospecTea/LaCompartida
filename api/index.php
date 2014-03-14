@@ -796,18 +796,9 @@ function downloadFile($name, $type, $content) {
 }
 
 function getAppIdByAppKey($app_key) {
-	global $Session, $Slim;
-	$sql = "SELECT `application`.`id`
-			FROM `application` WHERE `application`.`app_key`=:app_key";
-	$Statement = $Session->pdodbh->prepare($sql);
-	$Statement->bindParam('app_key', $app_key);
-	$Statement->execute();
-	$app_data = $Statement->fetchObject();
-	if (is_object($app_data)) {
-		return $app_data->id;
-	} else {
-		return 1; //default app id = TimeBilling.
-	}
+	global $Session;
+	$UserToken = new UserToken($Session);
+	return $UserToken->getAppIdByAppKey($app_key);
 }
 
 function validateAuthTokenSendByHeaders($permission = null, $includes_app_id = false) {

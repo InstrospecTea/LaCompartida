@@ -10188,6 +10188,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (2, 'TTB Webservice', 'ttb-ws');";
 			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (3, 'TTB iOS', 'ttb-ios');";
 			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (4, 'TTB Desktop', 'ttb-desktop');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (5, 'TTB Web Móvil', 'ttb-movil');";
 
 			if (!ExisteCampo('app_id', 'trabajo_historial', $dbh)) {
 				$queries[] = "ALTER TABLE `trabajo_historial` ADD `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' ";

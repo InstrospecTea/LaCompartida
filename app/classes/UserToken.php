@@ -145,4 +145,18 @@ class UserToken extends Objeto {
 
 		return $Statement->execute();
 	}
+
+	function getAppIdByAppKey($app_key) {
+		$sql = "SELECT `application`.`id`
+				FROM `application` WHERE `application`.`app_key`=:app_key";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('app_key', $app_key);
+		$Statement->execute();
+		$app_data = $Statement->fetchObject();
+		if (is_object($app_data)) {
+			return $app_data->id;
+		} else {
+			return 1; //default app id = TimeBilling.
+		}
+	}
 }
