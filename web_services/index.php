@@ -285,7 +285,7 @@ function CargarTrabajo($callback = '') {
 	$codigo_actividad = $Slim->request()->params('codigo_actividad');  // opcional, puede venir vacio, NO Cero
 	$area_trabajo = $Slim->request()->params('area_trabajo');  // opcional, puede venir vacio, NO Cero
 	$fecha = $Slim->request()->params('fecha');  // opcional, puede venir vacio, NO Cero
-	$app_key = getAppIdByAppKey($Slim->request()->params('app_id'));
+	$app_id = getAppIdByAppKey($Slim->request()->params('app_key'));
 	if ($fecha == "")		$fecha = date('Y-m-d', strtotime($starttimer / 1000) + 86400);
 
 
@@ -389,7 +389,7 @@ $trabajo->Edit('descripcion', $descripcion);
 		if (!is_null($queryHistorial)) {
 			$this->GuardarHistorial($queryHistorial);
 		}
-		$trabajo->InsertarTrabajoTarifa();
+		$trabajo->InsertarTrabajoTarifa($app_id);
 
 
 		try {

@@ -103,9 +103,9 @@ class Trabajo extends Objeto
 		return $queryHistorial;
 	}
 
-	function Write($historialOnWrite = true) {
+	function Write($historialOnWrite = true, $app_id = null) {
 		$accionHistorial = $this->Loaded() ? 'MODIFICAR' : 'CREAR';
-		$queryHistorial = $historialOnWrite ? $this->QueryHistorial($accionHistorial) : null;
+		$queryHistorial = $historialOnWrite ? $this->QueryHistorial($accionHistorial, $app_id) : null;
 		if (parent::Write()) {
 			if ($historialOnWrite && !is_null($queryHistorial)) {
 				$this->GuardarHistorial($queryHistorial);
@@ -184,7 +184,7 @@ class Trabajo extends Objeto
 		return $duracion[0];
 	}
 
-	function InsertarTrabajoTarifa() {
+	function InsertarTrabajoTarifa($app_id = null) {
 		$id_trabajo = $this->fields['id_trabajo'];
 		$codigo_asunto = $this->fields['codigo_asunto'];
 		$id_usuario = $this->fields['id_usuario'];
@@ -224,7 +224,7 @@ class Trabajo extends Objeto
 
 			if ($contrato->fields['id_moneda'] == $id_moneda) {
 				$this->Edit("tarifa_hh", $valor);
-				$this->Write();
+				$this->Write(true, $app_id);
 			}
 		}
 	}
