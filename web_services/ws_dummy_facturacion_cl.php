@@ -21,12 +21,17 @@ $server->wsdl->schemaTargetNamespace = $ns;
  */
 
 $server->wsdl->addComplexType(
-		'logininfo', 'complexType', 'struct', 'all', '', array(
-	'Usuario' => array('name' => 'Usuario', 'type' => 'xsd:string'),
-	'Rut' => array('name' => 'Rut', 'type' => 'xsd:string'),
-	'Clave' => array('name' => 'Clave', 'type' => 'xsd:string'),
-	'Puerto' => array('name' => 'Puerto', 'type' => 'xsd:string'),
-		)
+	'logininfo',
+	'complexType',
+	'struct',
+	'all',
+	'',
+	array(
+		'Usuario' => array('name' => 'Usuario', 'type' => 'xsd:string'),
+		'Rut' => array('name' => 'Rut', 'type' => 'xsd:string'),
+		'Clave' => array('name' => 'Clave', 'type' => 'xsd:string'),
+		'Puerto' => array('name' => 'Puerto', 'type' => 'xsd:string'),
+	)
 );
 
 /**
@@ -110,8 +115,28 @@ $server->register(
 	$ns
 );
 
+$server->register(
+	'EliminarDoc', array(
+		'login' => 'tns:logininfo',
+		'tpomov' => 'xsd:char',
+		'folio' => 'xsd:integer',
+		'tipo' => 'xsd:integer'
+	),
+	array('EliminarDocResult' => 'xsd:string'),
+	$ns
+);
+
+$server->register(
+	'Online',
+	array(),
+	array('OnlineResult' => 'xsd:string'),
+	$ns
+);
+
 
 function Procesar($login, $file, $formato) {
+	global $Sesion;
+	$Sesion->cache_xml = $file;
 	$xml = base64_decode($file);
 	$sxmle = new SimpleXMLElement($xml);
 	$aXML = XML2Array($sxmle);;
@@ -119,7 +144,7 @@ function Procesar($login, $file, $formato) {
 	$TipoDTE = $aXML['Documento']['Encabezado']['IdDoc']['TipoDTE'];
 	$FchEmis = date('Y-m-d\TH:i:s');
 
-return "<WSPLANO>
+	return "<WSPLANO>
 	<Resultado>True</Resultado>
 	<Mensaje>Proceso existoso.</Mensaje>
 	<Detalle>
@@ -134,21 +159,45 @@ return "<WSPLANO>
 </WSPLANO>";
 }
 
-function ObtenerLink($login, $tpomov, $folio, $tipo, $cedible) {
-//	$xml = base64_decode($file);
-//	$sxmle = new SimpleXMLElement($xml);
-//	$aXML = XML2Array($sxmle);;
-//	$Folio = $aXML['Documento']['Encabezado']['IdDoc']['Folio'];
-//	$TipoDTE = $aXML['Documento']['Encabezado']['IdDoc']['TipoDTE'];
-//	$FchEmis = date('Y-m-d\TH:i:s');
+function EliminarDoc() {
+	$operacion = ($tpomov == 'V') ? 'VENTA' : 'COMPRA';
+	return "<WSPLANO>
+	<Resultado>True</Resultado>
+	<Mensaje>Documento Eliminado.</Mensaje>
+	<Detalle>
+		<Documento>
+			<Folio>{$Folio}</Folio>
+			<TipoDte>{$TipoDTE}</TipoDte>
+			<Operacion>$operacion</Operacion>
+			<Resultado>True</Resultado>
+		</Documento>
+	</Detalle>
+</WSPLANO>";
+}
 
-return "<WSPLANO>
+function ObtenerLink($login, $tpomov, $folio, $tipo) {
+	$file = base64_encode('https://s3.amazonaws.com/timebilling-uploads/factura_prueba.pdf');
+	return "<WSPLANO>
 	<Mensaje>
-		aHR0cDovL3d3dy5kb21pbmlvLmNvbS9zaXN0ZW1hL2Rlc2Nhcmdhci5waHA/cDE9YzI1YzBmYzllYiZwMj1HREkmbT1WJmk9JmM9ZmFsc2U=
+		$file
 	</Mensaje>
 </WSPLANO>";
 }
 
+function getXMLDte($login, $tpomov, $folio, $tipo) {
+	$xml = "<WSPLANO>
+	<XmlDTE>
+		<tpomov>$tpomov</tpomov>
+		<folio>$folio</folio>
+		<tipo>$tipo</tipo>
+	</XmlDTE>
+</WSPLANO>";
+	return base64_encode($xml);
+}
+
+function Online() {
+	return 'Online=1';
+}
 
 function XML2Array(SimpleXMLElement $parent) {
 	$array = array();
