@@ -1030,6 +1030,14 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
+				$monto_palabra = new MontoEnPalabra($this->sesion);
+
+				$glosa_moneda_lang = __($glosa_moneda);
+				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+
+				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
+
 				break;
 
 			// FIN DE ORDEN DE CODIGO ARV 27/06/2013 //
@@ -4029,6 +4037,14 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
+
+				$monto_palabra = new MontoEnPalabra($this->sesion);
+
+				$glosa_moneda_lang = __($glosa_moneda);
+				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+
+				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
 				break;
 
@@ -7140,6 +7156,14 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
+
+				$monto_palabra = new MontoEnPalabra($this->sesion);
+
+				$glosa_moneda_lang = __($glosa_moneda);
+				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+
+				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
 				break;
 
@@ -10628,7 +10652,7 @@ class NotaCobro extends Cobro {
 					if ($this->fields['opc_ver_profesional_iniciales'] == 1) {
 						$html3 = str_replace('%nombre%', $data['username'], $html3);
 					} else {
-						$html3 = str_replace('%nombre%', $data['nombre_usuario'], $html3);
+						$html3 = str_replace('%nombre%', $data['nombre_usuario'] . ' (' . $data['username'] . ')', $html3);
 					}
 					if ($this->fields['opc_ver_profesional_tarifa'] == 1) {
 						$html3 = str_replace('%td_tarifa%', '<td align="center">%tarifa_horas_demo%</td>', $html3);

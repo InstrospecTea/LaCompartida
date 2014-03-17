@@ -442,7 +442,7 @@ if ($xls) {
 			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$cobro['codigo_asunto']];
 		} else {
 			$ReporteContrato->LoadContrato($id_contrato, '', $fecha1, $fecha2, false);
-			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$id_contrato];
+			list($monto_estimado_gastos, $simbolo_moneda_gastos , $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$id_contrato];
 		}
 
 
