@@ -493,7 +493,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				return false;
 			}
 
-			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) ?>
+			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
 				if(!form.factura_estado.value) {
 					alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
 					form.factura_estado.focus();
@@ -2071,7 +2071,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			</td>
 		</tr>
 
-		<?php if (Conf::GetConf($Sesion, 'RegionCliente')) ?>
+		<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
 			<tr>
 				<td align="right" colspan="1">
 					<?php echo __('Región') ?>
