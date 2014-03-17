@@ -10176,6 +10176,8 @@ QUERY;
 			$queries = array();
 			$queries[] = "ALTER TABLE  `contrato` CHANGE  `factura_estado`  `factura_estado` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;";
 			$queries[] = "ALTER TABLE  `factura` ADD  `estado_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
+			$queries[] = "INSERT IGNORE INTO `time_tracking`.`configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
+
 			ejecutar($queries,$dbh);
 			break;
 	}
