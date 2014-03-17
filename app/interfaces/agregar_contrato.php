@@ -271,150 +271,154 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 
 <script type="text/javascript">
 
-	jQuery('document').ready(function() {
-		var $ = jQuery;
-		var generator_url = "<? echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
-		var actionButtons = function(id_contract_generator) {
-			return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
-	        	<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
-	        	<a data-id="' + id_contract_generator + '" class="fl delete_generator ui-button cruz_roja" style="margin: 3px 1px;width: 18px;height: 18px;" title="Eliminar Generador">&nbsp;</a>\
-	        </td>';
-		};
+	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
 
-		var showAlert = function(type, message) {
-			var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
-				<tbody><tr>\
-					<td valign="top" align="left" style="font-size: 12px;">\
-					' + message + '</td>\
-				</tr></tbody>\
-			</table></br></div>';
-			$('#user_generators_form').before(alert_html);
-			setTimeout(function(){
-				$('#generator_message').remove()
-			}, 3000);
-		};
+		jQuery('document').ready(function() {
+			var $ = jQuery;
+			var generator_url = "<? echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+			var actionButtons = function(id_contract_generator) {
+				return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
+		        	<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
+		        	<a data-id="' + id_contract_generator + '" class="fl delete_generator ui-button cruz_roja" style="margin: 3px 1px;width: 18px;height: 18px;" title="Eliminar Generador">&nbsp;</a>\
+		        </td>';
+			};
 
-		var loadGeneratorForm = function(state, data) {
-			$('#form_generator_status').val(state);
-			if (state == 'NEW') {
-				$('#id_contract_generator').val('');
-				$('#id_user_generator').val('');
-				$('#percent_generator').val('');
-				$('#add_generator').val('Agregar');
-				$('#cancel_generator').val('Cancelar').hide();
-			} else if (state == 'EDIT') {
-				$('#id_contract_generator').val(data.id_contract_generator);
-				$('#id_user_generator').val(data.id_user_generator);
-				$('#percent_generator').val(data.percent_generator);
-				$('#add_generator').val('Modificar');
-				$('#cancel_generator').val('Cancelar').show();
+			var showAlert = function(type, message) {
+				var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
+					<tbody><tr>\
+						<td valign="top" align="left" style="font-size: 12px;">\
+						' + message + '</td>\
+					</tr></tbody>\
+				</table></br></div>';
+				$('#user_generators_form').before(alert_html);
+				setTimeout(function(){
+					$('#generator_message').remove()
+				}, 3000);
+			};
+
+			var loadGeneratorForm = function(state, data) {
+				$('#form_generator_status').val(state);
+				if (state == 'NEW') {
+					$('#id_contract_generator').val('');
+					$('#id_user_generator').val('');
+					$('#percent_generator').val('');
+					$('#add_generator').val('Agregar');
+					$('#cancel_generator').val('Cancelar').hide();
+				} else if (state == 'EDIT') {
+					$('#id_contract_generator').val(data.id_contract_generator);
+					$('#id_user_generator').val(data.id_user_generator);
+					$('#percent_generator').val(data.percent_generator);
+					$('#add_generator').val('Modificar');
+					$('#cancel_generator').val('Cancelar').show();
+				}
 			}
-		}
 
-		var loadGenerators = function() {
-			$.ajax({url: generator_url})
-				.done(function(data) {
-					rows = $('<tbody>');
-					header = $("<tr bgcolor='#A3D55C'>")
-					header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
-					header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
-					header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
-					header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
-					rows.append(header);
-	  	$.each(data, function(i, generator){
-	  		generator_row = $('<tr>');
-						generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
-						generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
-						generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">%' + generator.porcentaje_genera + '</td>');
-						generator_row.append(actionButtons(generator.id_contrato_generador));
-	  		rows.append(generator_row)
-	  	});
-	  	$('#user_generators_result').html(rows)
-		});
-		};
-
-		$(document).on('click', '.edit_generator', function() {
-			var percent = $(this).closest('tr').find('.percent-data').data('percent_value');
-			var user_id = $(this).closest('tr').find('.user-data').data('user_id');
-			var generator_id = $(this).data('id');
-			loadGeneratorForm('EDIT', {
-				id_contract_generator: generator_id,
-				id_user_generator: user_id,
-				percent_generator: percent
+			var loadGenerators = function() {
+				$.ajax({url: generator_url})
+					.done(function(data) {
+						rows = $('<tbody>');
+						header = $("<tr bgcolor='#A3D55C'>")
+						header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
+						header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
+						header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
+						header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
+						rows.append(header);
+		  	$.each(data, function(i, generator){
+		  		generator_row = $('<tr>');
+							generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
+							generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
+							generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">%' + generator.porcentaje_genera + '</td>');
+							generator_row.append(actionButtons(generator.id_contrato_generador));
+		  		rows.append(generator_row)
+		  	});
+		  	$('#user_generators_result').html(rows)
 			});
-		});
+			};
 
-		$(document).on('click', '.delete_generator', function() {
-			if (!confirm('¿Seguro desea elminar este usuario?')) {
-				return;
-			}
-			var generator_id = $(this).data('id');
-			$.ajax({
-				url: generator_url + '/' + generator_id,
-				type: 'DELETE'
-			}).done(function(data) {
-				loadGenerators();
+			$(document).on('click', '.edit_generator', function() {
+				var percent = $(this).closest('tr').find('.percent-data').data('percent_value');
+				var user_id = $(this).closest('tr').find('.user-data').data('user_id');
+				var generator_id = $(this).data('id');
+				loadGeneratorForm('EDIT', {
+					id_contract_generator: generator_id,
+					id_user_generator: user_id,
+					percent_generator: percent
+				});
 			});
-		});
 
-		$(document).on('click', '#cancel_generator', function() {
-			loadGeneratorForm('NEW', {});
-		});
-
-
-		$('#add_generator').click(function() {
-			var percent = $('#percent_generator').val();
-			var user = $('#id_user_generator').val();
-			var id_contract_generator = $('#id_contract_generator').val();
-			var form_status = $('#form_generator_status').val();
-			if (percent && user && percent.length > 0) {
-				if (parseInt(percent) < 1 || parseInt(percent) > 100) {
-					showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
+			$(document).on('click', '.delete_generator', function() {
+				if (!confirm('¿Seguro desea elminar este usuario?')) {
 					return;
 				}
+				var generator_id = $(this).data('id');
+				$.ajax({
+					url: generator_url + '/' + generator_id,
+					type: 'DELETE'
+				}).done(function(data) {
+					loadGenerators();
+				});
+			});
 
-				if (form_status == 'EDIT') {
-					$.ajax({
-						url: generator_url + '/' + id_contract_generator,
-						type: 'POST',
-						data: {percent_generator: percent}
-					}).done(function(data) {
-						loadGeneratorForm('NEW', {});
-						loadGenerators();
-					});
-				} else if (form_status == 'NEW') {
-					if ($('td[data-user_id="' + user + '"]').length > 0) {
-						showAlert('alerta', 'El profesional ya existe, favor agregue otro o modifíquelo desde el listado');
+			$(document).on('click', '#cancel_generator', function() {
+				loadGeneratorForm('NEW', {});
+			});
+
+
+			$('#add_generator').click(function() {
+				var percent = $('#percent_generator').val();
+				var user = $('#id_user_generator').val();
+				var id_contract_generator = $('#id_contract_generator').val();
+				var form_status = $('#form_generator_status').val();
+				if (percent && user && percent.length > 0) {
+					if (parseInt(percent) < 1 || parseInt(percent) > 100) {
+						showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
 						return;
 					}
-					$.ajax({
-						url: generator_url,
-						type: 'PUT',
-						data: {
-							percent_generator: percent,
-							user_id:user
+
+					if (form_status == 'EDIT') {
+						$.ajax({
+							url: generator_url + '/' + id_contract_generator,
+							type: 'POST',
+							data: {percent_generator: percent}
+						}).done(function(data) {
+							loadGeneratorForm('NEW', {});
+							loadGenerators();
+						});
+					} else if (form_status == 'NEW') {
+						if ($('td[data-user_id="' + user + '"]').length > 0) {
+							showAlert('alerta', 'El profesional ya existe, favor agregue otro o modifíquelo desde el listado');
+							return;
 						}
-					}).done(function(data) {
-						showAlert('info', 'Profesional agregado con éxito');
-						loadGeneratorForm('NEW', {});
-						loadGenerators();
-					});
+						$.ajax({
+							url: generator_url,
+							type: 'PUT',
+							data: {
+								percent_generator: percent,
+								user_id:user
+							}
+						}).done(function(data) {
+							showAlert('info', 'Profesional agregado con éxito');
+							loadGeneratorForm('NEW', {});
+							loadGenerators();
+						});
+					}
+				} else {
+					showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
 				}
-			} else {
-				showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
-			}
-		});
+			});
 
-		ActualizarFormaCobro();
+			ActualizarFormaCobro();
+		
+			jQuery(".formacobro").click(function() {
+				var laID=jQuery(this).attr('id');
+				ActualizarFormaCobro(laID);
+			});
+
+			loadGeneratorForm('NEW', {});
+			loadGenerators();
+		});
 	
-		jQuery(".formacobro").click(function() {
-			var laID=jQuery(this).attr('id');
-			ActualizarFormaCobro(laID);
-		});
-
-		loadGeneratorForm('NEW', {});
-		loadGenerators();
-	});
+	<?php } ?>
 	
 	function YoucangonowMichael() {
 
