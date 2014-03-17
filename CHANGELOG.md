@@ -1,4 +1,16 @@
 # Changelog
+
+## Hotfix: 14.0.12
+Jueves 13 de marzo 2014
+* **Fixed:** [Agrega Monto en palabra NotaCobro Corrige Conf ValorSinEspacio en CartaCobro](https://github.com/LemontechSA/ttb/pull/443)
+
+## Hotfix: 14.0.12
+Miércoles 12 de marzo 2014
+* **Fixed:** [Corrige agrupador fecha de emisión en reporte avanzado.](https://github.com/LemontechSA/ttb/pull/440)
+* **Fixed:** [Corrige el valor de los hitos en reporte horas por facturar.](https://github.com/LemontechSA/ttb/pull/440)
+* **Fixed:** [Corrige moneda desplegada en listado de trámites.](https://github.com/LemontechSA/ttb/pull/440)
+* **Fixed:** [Corrige horas de retainer en seguimiento de cobros.](https://github.com/LemontechSA/ttb/pull/440)
+
 ## Hotfix: 14.0.11
 Lunes 10 de marzo 2014
 * **Fixed:** [Corrige calculo saldo pago.](https://github.com/LemontechSA/ttb/pull/438)
