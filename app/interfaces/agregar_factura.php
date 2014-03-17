@@ -148,45 +148,22 @@ if ($opcion == "guardar") {
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
 
-		if (UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
-			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
+		$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
+		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
+		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
+		$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
+
+		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
+			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
 
-		if (UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
-			$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
-		}
-
-		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
-			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
-		}
-
-		if (UtilesApp::existecampo('dte_metodo_pago_cta', 'factura', $sesion)) {
-			$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
-		}
-
-		if (UtilesApp::existecampo('dte_id_pais', 'factura', $sesion)) {
-			if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
-				$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
-			}
-		}
-
-		if (UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
-			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
-		}
-
-		if (UtilesApp::existecampo('estado_cliente', 'factura', $sesion)) {
-			$factura->Edit("estado_cliente", $estado_cliente ? addslashes($estado_cliente) : "");
-		}
-
-		if (UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
-			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
-		}
-
+		$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
+		$factura->Edit("estado_cliente", $estado_cliente ? addslashes($estado_cliente) : "");
+		$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
 		$factura->Edit('serie_documento_legal', (int) $serie);
-
 		$factura->Edit("numero", $numero ? $numero : "1");
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
 		$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
@@ -683,11 +660,13 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<td align="left" colspan="3"><input type="text" name="ciudad_cliente" value="<?php echo $factura->loaded() ? $factura->fields['ciudad_cliente'] : $contrato->fields['factura_ciudad']; ?>" id="ciudad_cliente" size="70" maxlength="255" />
 			</td>
 		</tr>
+		<?php if ($conf::GetConf($Sesion,'RegionCliente')) { ?>
 		<tr>
 			<td align="right"><?php echo __('Estado'); ?></td>
 			<td align="left" colspan="3"><input type="text" name="estado_cliente" value="<?php echo $factura->loaded() ? $factura->fields['estado_cliente'] : $contrato->fields['factura_estado']; ?>" id="estado_cliente" size="70" maxlength="255" />
 			</td>
 		</tr>
+		<?php } ?>
 		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
 			<td align="left" colspan="3">
