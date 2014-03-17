@@ -311,13 +311,24 @@ list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 				form.factura_direccion.focus();
 				return false;
 			}
+			
 	<?php if (UtilesApp::existecampo('factura_ciudad', 'contrato', $Sesion)) { ?>
-								if(!form.factura_ciudad.value)
-								{
-									alert("<?php echo __('Debe ingresar la cuidad del cliente') ?>");
-									form.factura_cuidad.focus();
-									return false;
-								}
+			if(!form.factura_ciudad.value)
+			{
+				alert("<?php echo __('Debe ingresar la cuidad del cliente') ?>");
+				form.factura_cuidad.focus();
+				return false;
+			}
+	<?php } ?>
+
+	<?php if ( ( Conf::GetConf($Sesion,'PaisEstudio') == "Mexico" ) && ( UtilesApp::existecampo('factura_estado','contrato',$Sesion) ) ) { ?>
+
+		if(!form.factura_estado.value) {
+			alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+			form.factura_estado.focus();
+			return false;
+		}
+
 	<?php } ?>
 
 	<?php if (UtilesApp::existecampo('factura_comuna', 'contrato', $Sesion)) { ?>
@@ -1925,23 +1936,27 @@ if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
 <?php echo Html::SelectQuery($Sesion, "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC", "id_pais", $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : '', 'class ="span3"', 'Vacio', 260); ?>&nbsp;&nbsp;
 								</td>
 							</tr>
-							<tr>
-								<td align="right" colspan="1">
-									<?php echo __('Estado') ?>
-									<?php if ($validaciones_segun_config)
-										echo $obligatorio
-									?>
-								</td>
-								<td align="left" colspan="5">
-									<input type="text" name="factura_estado" size="50" value="<?php echo $contrato->fields['factura_estado'] ?>" >
-								</td>
-							</tr>
+							
+							<?php if((Conf::GetConf($Sesion,'PaisEstudio')) == "Mexico") { ?>
+								<tr>
+									<td align="right" colspan="1">
+										<?php echo __('Estado') ?>
+										<?php if ($validaciones_segun_config)
+											echo $obligatorio
+										?>
+									</td>
+									<td align="left" colspan="5">
+										<input type="text" name="factura_estado" size="50" value="<?php echo $contrato->fields['factura_estado'] ?>" >
+									</td>
+								</tr>
+							<?php } ?>
+								
 							<tr>
 								<td align="right" colspan="1">
 									<?php echo __('Teléfono') ?>
-<?php if ($validaciones_segun_config)
-	echo $obligatorio
-	?>
+								<?php if ($validaciones_segun_config)
+									echo $obligatorio
+									?>
 								</td>
 								<td align="left" colspan="5">
 									<input type="text" class="span1" name='cod_factura_telefono' size=8 value="<?php echo $contrato->fields['cod_factura_telefono'] ?>" />&nbsp;<input type="text" class="span2" name='factura_telefono' size=30 value="<?php echo $contrato->fields['factura_telefono'] ?>" />

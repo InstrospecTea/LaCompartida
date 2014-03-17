@@ -875,8 +875,6 @@ $pagina->PrintTop();
 					}
 			<?php } ?>
 
-			?>
-
 			if (form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
