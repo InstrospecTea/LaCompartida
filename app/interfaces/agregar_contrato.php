@@ -1895,7 +1895,7 @@ if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
 								<?php echo __('Código Postal'); ?>
 																</td>
 									<td align="left" colspan="5">
-										<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
+										<input  type="text"  name='factura_codigopostal' size="50" value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
 									</td>
 								</tr>
 										<?php
@@ -1923,6 +1923,17 @@ if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
 								</td>
 								<td align="left" colspan='3'>
 <?php echo Html::SelectQuery($Sesion, "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC", "id_pais", $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : '', 'class ="span3"', 'Vacio', 260); ?>&nbsp;&nbsp;
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="1">
+									<?php echo __('Estado') ?>
+									<?php if ($validaciones_segun_config)
+										echo $obligatorio
+									?>
+								</td>
+								<td align="left" colspan="5">
+									<input type="text" name="factura_estado" size="50" value="<?php echo $contrato->fields['factura_estado'] ?>" >
 								</td>
 							</tr>
 							<tr>

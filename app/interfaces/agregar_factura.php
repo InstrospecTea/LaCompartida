@@ -174,6 +174,10 @@ if ($opcion == "guardar") {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		}
 
+		if (UtilesApp::existecampo('estado_cliente', 'factura', $sesion)) {
+			$factura->Edit("estado_cliente", $estado_cliente ? addslashes($estado_cliente) : "");
+		}
+
 		if (UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
 			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
 		}
@@ -680,6 +684,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			</td>
 		</tr>
 		<tr>
+			<td align="right"><?php echo __('Estado'); ?></td>
+			<td align="left" colspan="3"><input type="text" name="estado_cliente" value="<?php echo $factura->loaded() ? $factura->fields['estado_cliente'] : $contrato->fields['factura_estado']; ?>" id="estado_cliente" size="70" maxlength="255" />
+			</td>
+		</tr>
+		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
 			<td align="left" colspan="3">
 				<input type="text" name="giro_cliente" value="<?php echo $factura->loaded() ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']; ?>" id="giro_cliente" size="70" maxlength="255" />
@@ -948,7 +957,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
 	function CargarDatosCliente(sin_contrato) {
-		console.log(sin_contrato);
+
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var id_origen = 'codigo_cliente_secundario';
 		<?php } else { ?>
@@ -962,6 +971,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var direccion_cliente = document.getElementById('direccion_cliente');
 		var comuna_cliente = document.getElementById('comuna_cliente');
 		var ciudad_cliente = document.getElementById('ciudad_cliente');
+		var estado_cliente = document.getElementById('estado_cliente');
 		var giro_cliente = document.getElementById('giro_cliente');
 		var factura_codigopostal = document.getElementById('factura_codigopostal');
 		var dte_id_pais = document.getElementById('dte_id_pais');
@@ -982,12 +992,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			var descripcion = document.getElementById('descripcion');
 		<?php } ?>
 		var http = getXMLHTTP();
-		console.log(select_origen.value);
+
 		var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value;
 		if (!sin_contrato) {
 			url += '&id_contrato=' + id_contrato;
 		}
-		console.log(url);
 
 		http.open('get', url, true);
 		http.onreadystatechange = function()
@@ -1051,22 +1060,32 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 							} else {
 								ciudad_cliente.value = '';
 							}
-							// Ciudad
-							if (valores[5] != '') {
-								giro_cliente.value = valores[5];
+
+							//Estado
+							if(valores[5] != ''){
+								estado_cliente.value = valores[5]
+							} else{
+								estado_cliente.value = '';
+							}
+
+							// Giro
+							if (valores[6] != '') {
+								giro_cliente.value = valores[6];
 							} else {
 								giro_cliente.value = '';
 							}
-							// Ciudad
-							if (valores[6] != '') {
-								factura_codigopostal.value = valores[6];
+
+							// Codigo Postal
+							if (valores[7] != '') {
+								factura_codigopostal.value = valores[7];
 							} else {
 								factura_codigopostal.value = '';
 							}
 
-							if (valores[7] != '') {
+							// País
+							if (valores[8] != '') {
 								if (dte_id_pais) {
-									dte_id_pais.value = valores[7];
+									dte_id_pais.value = valores[8];
 								}
 							} else {
 								if (dte_id_pais) {

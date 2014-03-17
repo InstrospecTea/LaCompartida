@@ -10172,6 +10172,12 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 8.00:
+			$queries = array();
+			$queries[] = "ALTER TABLE  `contrato` CHANGE  `factura_estado`  `factura_estado` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;";
+			$queries[] = "ALTER TABLE  `factura` ADD  `estado_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
+			ejecutar($queries,$dbh);
+			break;
 	}
 }
 
@@ -10181,7 +10187,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.59;
+$max_update = 8.00;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

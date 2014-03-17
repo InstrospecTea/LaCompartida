@@ -866,6 +866,17 @@ $pagina->PrintTop();
 				}
 			<?php } ?>
 
+			<?php if(UtilesApp::existecampo('factura_estado','contrato',$sesion)) { ?>
+					if(!form.factura_estado.value){
+						alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+						MuestraPorValidacion('datos_factura');
+						form.factura_ciudad.focus();
+						return false;
+					}
+			<?php } ?>
+
+			?>
+
 			if (form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
 				MuestraPorValidacion('datos_factura');

@@ -38,6 +38,7 @@ class Factura extends Objeto {
 		'comuna_cliente' => 'Comuna Cliente',
 		'factura_codigopostal' => 'Código Postal Cliente',
 		'ciudad_cliente' => 'Ciudad Cliente',
+		'estado_cliente' => 'Estado Cliente',
 		'giro_cliente' => 'Giro Cliente',
 		'subtotal' => array(
 			'titulo' => 'Subtotal Honorarios',

@@ -470,6 +470,7 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.rut,
 											contrato.factura_comuna,
 											contrato.factura_ciudad,
+											contrato.factura_estado,
 											contrato.factura_giro,
 											contrato.factura_codigopostal,
 											contrato.id_pais,
@@ -496,7 +497,7 @@ if ($accion == "consistencia_cliente_asunto") {
 		echo("VACIO|");
 	}
 } else if ($accion == 'set_cobro_trabajo') {#TIENE UN SOLO = BUG #Setea el trabajo a algún cobro (CREADO) correspondiente al periodo y asunto.
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$asunto = new Asunto($sesion);
 		$asunto->LoadByCodigoSecundario($codigo_asunto);
 		$codigo_asunto = $asunto->fields['codigo_asunto'];
