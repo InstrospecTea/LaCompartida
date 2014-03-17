@@ -404,18 +404,18 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
 			}
 		});
-		loadGeneratorForm('NEW', {});
-		loadGenerators();
-	});
-	
-	jQuery(document).ready(function() {
+
 		ActualizarFormaCobro();
+	
 		jQuery(".formacobro").click(function() {
 			var laID=jQuery(this).attr('id');
 			ActualizarFormaCobro(laID);
 		});
-	});
 
+		loadGeneratorForm('NEW', {});
+		loadGenerators();
+	});
+	
 	function YoucangonowMichael() {
 
 		<?php if ($contrato->fields['id_cuenta']) echo "SetBanco('id_cuenta','id_banco');"; ?>
