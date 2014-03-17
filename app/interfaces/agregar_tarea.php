@@ -12,9 +12,9 @@ if($id_tarea) {
 }
 
 $conf_codigo_primario = true;
-if(Conf::GetConf($sesion,'CodigoSecundario'))
+if(Conf::GetConf($sesion,'CodigoSecundario')){
 	$conf_codigo_primario = false;
-
+}
 if($Tarea->loaded() && (!$codigo_cliente || !$codigo_cliente_secundario)) {
 	$codigo_cliente = $Tarea->fields['codigo_cliente'];
 	$codigo_asunto = $Tarea->fields['codigo_asunto'];
@@ -36,12 +36,12 @@ if($opcion == "guardar") {
 	//Revisa el Conf si esta permitido y la función existe02-09-2010 16:54:17
 	if( (Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' )) {
 		$Tarea->Edit("tiempo_estimado",UtilesApp::Decimal2Time($duracion));
-	}else
+	}else{
 		$Tarea->Edit("tiempo_estimado",$duracion);
-
-	if(!$id_usuario_registro)
+    }
+	if(!$id_usuario_registro){
 		$Tarea->Edit("usuario_registro",$id_usuario_actual);
-
+    }
 	if( $codigo_cliente_secundario != '' ) {
 		$cliente = new Cliente($sesion);
 		$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario );
@@ -53,31 +53,37 @@ if($opcion == "guardar") {
 	$Tarea->Edit("codigo_cliente",$codigo_cliente);
 	$Tarea->Edit("codigo_asunto",$codigo_asunto);
 
-	if($id_usuario_encargado)
+	if($id_usuario_encargado){
 		$Tarea->Edit("usuario_encargado",$id_usuario_encargado);
-	else
+    }else{
 		$Tarea->Edit("usuario_encargado",'NULL');
-	if($id_usuario_revisor)
+    }
+	if($id_usuario_revisor){
 		$Tarea->Edit("usuario_revisor",$id_usuario_revisor);
-	else
+    }
+	else{
 		$Tarea->Edit("usuario_revisor",'NULL');
-	if($id_usuario_generador)
+    }
+	if($id_usuario_generador){
 		$Tarea->Edit("usuario_generador",$id_usuario_generador);
-	else
+    }
+	else{
 		$Tarea->Edit("usuario_generador",'NULL');
-
+    }
 	if($estado == 'inicial') {
-		if($Tarea->fields['usuario_encargado'])
+		if($Tarea->fields['usuario_encargado']){
 			$Tarea->Edit("estado","Asignada");
-		else
+		}else{
 			$Tarea->Edit("estado","Por Asignar");
+        }
 	}else{
 		$Tarea->Edit("estado",$estado);
-		foreach($Tarea->estados as $k => $es)
-			if($estado == $es)
+		foreach($Tarea->estados as $k => $es){
+			if($estado == $es){
 				$Tarea->Edit("orden_estado",$k+1);
+            }
+        }
 	}
-
 	if ($Tarea->Write()) {
 		$pagina->AddInfo(__('Tarea').' '.__('guardada con exito'));
 		$js_refrescar = "window.opener.Refrescar('');";
@@ -86,10 +92,11 @@ if($opcion == "guardar") {
 
 
 $usuario_generador = new UsuarioExt($sesion);
-if($id_usuario_generador)
+if($id_usuario_generador){
 	$usuario_generador->LoadId($id_usuario_generador);
-else
+}else{
 	$usuario_generador->LoadId($id_usuario_actual);
+}
 
 $txt_pagina = $Tarea->loaded() ? __('Edición de Tarea').' :: '.$Tarea->fields['nombre'] : __('Ingreso de Tarea');
 $req = '<span style="color:#FF0000; font-size:10px">*</span>';
@@ -134,20 +141,20 @@ $pagina->PrintTop($popup);
 	}
 	function Validar(form) {
 		var err = false;
-		<?
+		<?php
 			if($conf_codigo_primario)
 			{
 		?>
-		var form_codigo_cliente = form.codigo_cliente;
-		var form_codigo_asunto = form.codigo_asunto;
-		<?
+                var form_codigo_cliente = form.codigo_cliente;
+                var form_codigo_asunto = form.codigo_asunto;
+		<?php
 			}
 			else
 			{
 		?>
-			var form_codigo_cliente = form.codigo_cliente_secundario;
-			var form_codigo_asunto = form.codigo_asunto_secundario;
-		<?
+                var form_codigo_cliente = form.codigo_cliente_secundario;
+                var form_codigo_asunto = form.codigo_asunto_secundario;
+		<?php
 			}
 		?>
 		if(!form_codigo_cliente.value) {
@@ -191,7 +198,7 @@ $pagina->PrintTop($popup);
 		}
 	});
 </script>
-<? if($Tarea->loaded()) {
+<?php if($Tarea->loaded()) {
 		$TareaComentario = new TareaComentario($sesion);
 		$TareaComentario->setTarea($Tarea->fields['id_tarea']);
 		$TareaComentario->setUsuario($id_usuario_actual);
@@ -224,7 +231,7 @@ $pagina->PrintTop($popup);
 				<?=__('Cliente')?>
 			</td>
 			<td align='left' colspan='3'>
-				<?
+				<?php
 					if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
 							if(Conf::GetConf($sesion,'CodigoSecundario') || Conf::CodigoSecundario()) {
 								echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario,'',"320");
@@ -246,7 +253,7 @@ $pagina->PrintTop($popup);
 				<?=__('Asunto')?>
 			</td>
 			<td align='left' colspan='3'>
-				<?
+				<?php
 					if (Conf::GetConf($sesion,'CodigoSecundario')) {
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
 					}else{
@@ -287,16 +294,18 @@ $pagina->PrintTop($popup);
 			</td>
 			<td align='left'>
 				<select name='prioridad' id='prioridad' title="10 mayor prioridad, 1 menor prioridad" >
-					<? for($i = 1; $i < 11; $i++) {?>
+					<?php for($i = 1; $i < 11; $i++) {?>
 						<option value="<?=$i?>"
-							<? if($Tarea->fields['prioridad'])
+							<?php if($Tarea->fields['prioridad'])
 							{
-									if($Tarea->fields['prioridad'] == $i)
+									if($Tarea->fields['prioridad'] == $i){
 										echo 'selected';
+                                    }
 							}
 							else
-								if( $i == 5)
+								if( $i == 5){
 									echo 'selected';
+                                }
 							?>
 						>
 							<?=$i?>
@@ -336,17 +345,18 @@ $pagina->PrintTop($popup);
 			</td>
 			<td align='left'>
 				<select name='estado' id='estado'>
-					<?
+					<?php
 						foreach($Tarea->estados as $e)
 						{
 							$selected = '';
-							if($id_tarea)
-							{
-								if($Tarea->fields['estado'] == $e)
+							if($id_tarea){
+								if($Tarea->fields['estado'] == $e){
 									$selected = 'selected="selected"';
+                                }
 							}
-							else if($e == 'Asignada')
+							else if($e == 'Asignada'){
 								$selected = 'selected="selected"';
+                            }
 							echo "<option value='".$e."' ".$selected.">".$e."</option>";
 						}
 					?>
@@ -369,14 +379,16 @@ $pagina->PrintTop($popup);
 					$input_estimado = str_replace('size="6"','size="7"',$input_estimado);
 					if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector') {
 						$tiempo_estimado = '00:00:00';
-						if($Tarea->fields['tiempo_estimado'])
+						if($Tarea->fields['tiempo_estimado']){
 							$tiempo_estimado = $Tarea->fields['tiempo_estimado'];
 							$input_estimado = SelectorHoras::PrintTimeSelector($sesion,"duracion", $tiempo_estimado, '');
+                        }
 					}else if( Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) {
-							$tiempo_estimado = '';
-							if($Tarea->fields['tiempo_estimado'])
-								$tiempo_estimado =  UtilesApp::Time2Decimal($Tarea->fields['tiempo_estimado']);
-							$input_estimado = '<input type="text" name="duracion" value="" id="duracion" size="7" maxlength=4   onchange="CambiaDuracion(this.form,\"duracion\");"/>';
+                        $tiempo_estimado = '';
+                        if($Tarea->fields['tiempo_estimado']){
+                            $tiempo_estimado =  UtilesApp::Time2Decimal($Tarea->fields['tiempo_estimado']);
+                        }
+                        $input_estimado = '<input type="text" name="duracion" value="" id="duracion" size="7" maxlength=4   onchange="CambiaDuracion(this.form,\"duracion\");"/>';
 					}
 					echo $input_estimado;
 				?>
@@ -393,27 +405,27 @@ $pagina->PrintTop($popup);
 				<?=__('Duración Ingresada')?>
 			</td>
 			<td align='left'>
-				<input readonly=readonly value='<?=$Tarea->getTiempoIngresado();?>' id='tiempo_ingresado' size='7' />
+				<input readonly='readonly' value='<?=$Tarea->getTiempoIngresado();?>' id='tiempo_ingresado' size='7' />
 			</td>
 		</tr>
 		<tr>
 		</tr>
-		<? if($Tarea->loaded()) { ?>
+		<?php if($Tarea->loaded()) { ?>
 			<tr>
 				<td align='right'>
 				</td>
 				<td align='left' colspan='3'>
 				</td>
 			</tr>
-		<? } ?>
+		<?php } ?>
 		<tr>
 			<td>
 				<br />
 			</td>
 			<td align='right' colspan='3'>
-				<?if($Tarea->loaded()) { ?>
+				<?php if($Tarea->loaded()) { ?>
 					<span style="font-size:10px;"><i><?=__('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-				<?}?>
+				<?php } ?>
 			</td>
 		</tr>
 		<tr>
@@ -423,9 +435,9 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 	</table>
-	<? if(!$Tarea->loaded()) { ?>
+	<?php if(!$Tarea->loaded()) { ?>
 		<input type="hidden" name="estado" value="inicial" />
-	<? } ?>
+	<?php } ?>
 	<br>
 </form>
 <?php if($Tarea->loaded()) { ?>
@@ -438,8 +450,8 @@ $pagina->PrintTop($popup);
 		<iframe name='bitacora' id='bitacora' src='<?=$url_iframe ?>' frameborder='0' width='95%' height='<?php $alto_iframe ?>px'>
 		</iframe>
 	</div>
-<? }?>
-<?
+<?php }?>
+<?php
 	if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
 		echo Autocompletador::Javascript($sesion);
 	}
