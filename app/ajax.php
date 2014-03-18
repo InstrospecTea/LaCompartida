@@ -490,6 +490,26 @@ switch ($accion) {
 		}
 
 		break;
+
+	case "cargar_actividades_activas":
+
+	echo 'ASDADADADADADAJDHAKJDHAKJFHAKFJHAKFHAKJS';
+		$query = "SELECT codigo_actividad,glosa_actividad FROM actividad WHERE activo = '1' AND codigo_asunto = '$id' OR codigo_asunto IS NULL ORDER BY glosa_actividad";
+		echo $query;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+		for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
+			if ($i > 0) {
+				echo('~');
+			}
+			echo(join('|', $fila));
+		}
+
+		if ($i == 0) {
+			echo('VACIO|');
+		}
+
+		break;
 	case 'cargar_cargos':
 
 		$query_clientes = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut FROM cobro

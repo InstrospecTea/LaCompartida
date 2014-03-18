@@ -756,7 +756,7 @@ $pagina->PrintTop($popup);
 								<tr>
 									<td class="buscadorlabel"><?php echo __('Actividad') ?></td>
 									<td align=left width="440" nowrap>
-										<?php echo InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 300, $codigo_asunto); ?>
+										<?php echo InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto); ?>
 									</td>
 								</tr>
 								<?php } ?>

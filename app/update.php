@@ -10184,6 +10184,11 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.60:
+			$queries = array();
+			$queries[] = "ALTER TABLE `actividad` ADD `visible` TINYINT( 2 ) NOT NULL DEFAULT '1' AFTER `activo`; ";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
