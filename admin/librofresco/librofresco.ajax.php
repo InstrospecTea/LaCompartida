@@ -1,9 +1,17 @@
 <?php
+require_once dirname(__FILE__) . '/../../app/conf.php';
 require_once dirname(__FILE__) . '/librofresco_api.class.php';
+
+$Sesion = new Sesion(array('ADM'));
+$LibrofrescoApi = new LibrofrescoApi(Conf::GetConf($Sesion, 'LibrofrescoApi'));
 
 $product_items_id = array('timekeeper' => 19, 'administrative' => 20, 'casetracking' => 5);
 $return_json = array('error' => '');
-$LibrofrescoApi = new LibrofrescoApi('http://lemontech.librofres.co:3000/api/v1');
+
+if (!$Sesion->usuario->TienePermiso('SADM')) {
+	echo json_encode(array('error' => 'No Autorizado'));
+	exit;
+}
 
 if (!empty($_POST)) {
 	try {
