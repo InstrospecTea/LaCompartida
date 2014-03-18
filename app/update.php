@@ -10172,7 +10172,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 8.00:
+		case 7.60:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'RevHrsClinteFecha', ' ', 'Glosa Detraccion', 'boolean', '6', '-1');";
 			ejecutar($queries, $dbh);
@@ -10186,7 +10186,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.00;
+$max_update = 7.60;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
