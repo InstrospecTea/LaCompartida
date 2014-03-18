@@ -142,7 +142,6 @@ switch ($accion) {
 		$campoacomparar = UtilesApp::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$codigobuscado = $_POST['codigobuscado'];
 		$query = "select  contrato.id_usuario_responsable, contrato.id_usuario_secundario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) nombre_usuario_secundario from cliente join contrato using (id_contrato) left join usuario on usuario.id_usuario=contrato.id_usuario_secundario where cliente.$campoacomparar='$codigobuscado'";
-		//echo $query;
 		if ($resp = mysql_query($query, $sesion->dbh)) {
 			list($responsable, $encargadosecundario, $nombre_usuario_secundario) = mysql_fetch_array($resp);
 		} else {
@@ -402,7 +401,6 @@ switch ($accion) {
 		if ($i == 0) {
 			echo("VACIO|");
 		}
-		//echo $query;
 		break;
 	case 'averiguar_codigo_cliente':
 
@@ -494,7 +492,6 @@ switch ($accion) {
 	case "cargar_actividades_activas":
 
 		$query = "SELECT codigo_actividad,glosa_actividad FROM actividad WHERE activo = '1' AND codigo_asunto = '$id' OR codigo_asunto IS NULL ORDER BY glosa_actividad";
-		echo $query;
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
