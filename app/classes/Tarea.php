@@ -342,9 +342,8 @@ class Tarea extends Objeto
 			$result = mysql_query($query_usuarios_emails) or Utiles::errorSQL($query_usuarios_emails,__FILE__,__LINE__,$sesion->dbh);
 			$correos = array();
 			while ($row = mysql_fetch_array($result)) {
-			    $correos[] = array('mail' => trim($row['email']),'nombre' => $row['nombre']);
+			    $correos[] = array('nombre' => $row['nombre'],'mail' => trim($row['email']));
 			}
-
 			$ICS_data = NEW ICS_Creation();
 			$fecha = strtotime($this->fields['fecha_entrega']);
             $ICS_data->addEvent($fecha, $fecha, "Nueva tarea ".$this->fields['nombre'], $this->fields['detalle'], '');
@@ -355,8 +354,8 @@ class Tarea extends Objeto
             );
             $subject = 'Se creado una nueva tarea cliente '.$this->fields['codigo_cliente'];
             $body = 'Estimado usuario, se registrado una nueva tarea, cliente: '.$this->fields['codigo_cliente'].' y asunto:'.$this->fields['codigo_asunto'];
-            Utiles::EnviarMail($this->sesion,array($correos),$subject,$body,false, NULL,$attachment);
-			mysql_free_result($result);
+            mysql_free_result($result);
+            return Utiles::EnviarMail($this->sesion,$correos,$subject,$body,false, NULL,$attachment);
 		}
 	}
 }
