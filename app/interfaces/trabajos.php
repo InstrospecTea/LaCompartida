@@ -428,7 +428,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	if ($orden == "") {
 
 		if (Conf::GetConf($sesion,'RevHrsClinteFecha')) {
-			$orden = " cliente.glosa_cliente DESC, trabajo.fecha";
+			$orden = " cliente.glosa_cliente ASC, trabajo.fecha ASC";
 		} else {
 			$orden = " trabajo.fecha ASC, trabajo.descripcion";
 		}
