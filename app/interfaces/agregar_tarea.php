@@ -338,7 +338,7 @@ $pagina->PrintTop($popup);
 				<?=__('Usuario Responsable')?>
 			</td>
 			<td align='left' width='20%'>
-				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_encargado", $Tarea->fields['usuario_encargado']? $Tarea->fields['usuario_encargado']:$id_usuario_actual,"onchange='CambiarEncargado();'", __('Ninguno'),'170'); ?>
+				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE activo='1' ORDER BY apellido1", "id_usuario_encargado", $Tarea->fields['usuario_encargado']? $Tarea->fields['usuario_encargado']:$id_usuario_actual,"onchange='CambiarEncargado();'", __('Ninguno'),'170'); ?>
 			</td>
 			<td align='right' width='24%'>
 				<?=__('Estado')?>
@@ -368,7 +368,7 @@ $pagina->PrintTop($popup);
 				<?=__('Usuario Revisor')?>
 			</td>
 			<td align='left'>
-				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_revisor", $Tarea->fields['usuario_revisor']? $Tarea->fields['usuario_revisor']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
+				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_revisor", $Tarea->fields['usuario_revisor']? $Tarea->fields['usuario_revisor']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
 			</td>
 			<td align='right'>
 				<?=__('Duración Estimada')?>
@@ -399,7 +399,7 @@ $pagina->PrintTop($popup);
 				<?=__('Usuario Mandante')?>
 			</td>
 			<td align='left'>
-				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_generador", $Tarea->fields['usuario_generador']? $Tarea->fields['usuario_generador']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
+				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_generador", $Tarea->fields['usuario_generador']? $Tarea->fields['usuario_generador']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
 			</td>
 			<td align='right'>
 				<?=__('Duración Ingresada')?>
