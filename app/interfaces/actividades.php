@@ -153,7 +153,7 @@ function EliminarActividad(id) {
 }
 
 function Refrescar() {
-	document.form_buscador.submit();
+	jQuery('#boton_buscar').click();
 }
 function BuscarFacturas(form, from) {
 	if (!form) {
