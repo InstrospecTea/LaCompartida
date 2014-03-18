@@ -10174,7 +10174,7 @@ QUERY;
 
 		case 7.60:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'RevHrsClinteFecha', ' ', 'Glosa Detraccion', 'boolean', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'RevHrsClienteFecha', ' ', 'Glosa Detraccion', 'boolean', '6', '-1');";
 			ejecutar($queries, $dbh);
 			break;
 	}

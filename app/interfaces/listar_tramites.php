@@ -275,7 +275,7 @@ for ($x = 0; $x < $lista_tramites->num; $x++) {
 }
 if ($orden == "") {
 
-	if (Conf::GetConf($sesion,'RevHrsClinteFecha')) {
+	if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
 		$orden = " cliente.glosa_cliente ASC, tramite.fecha ASC";
 	} else {
 
