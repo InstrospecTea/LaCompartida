@@ -7,6 +7,21 @@ define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-
 class Factura extends Objeto {
 
 	var $max_numero = 1000000000;
+	public static $estados_dte = array(
+		'Firmado' => 1,
+		'ErrorFirmado' => 2,
+		'ProcesoAnular' => 3,
+		'Anulado' => 4
+	);
+
+	public static $estados_dte_desc = array(
+		'Sin Estado',
+		'Documento Tributario Electrónico Firmado',
+		'Error al Firmar el Documento Tributario Electrónico',
+		'Documento Tributario Electrónico en proceso de Anulación',
+		'Documento Tributario Electrónico Anulado'
+	);
+
 	public static $llave_carga_masiva = CONCAT_FACTURA;
 	public static $campos_carga_masiva = array(
 		'id_documento_legal' => array(
@@ -404,12 +419,24 @@ class Factura extends Objeto {
 		return $saldo;
 	}
 
-	function FacturaElectronicaCreada() {
-		return !is_null($this->fields['dte_fecha_creacion']);
+	function ObtenerEnProcesoAnulacion() {
+		$estado_anular = Factura::$estados_dte['ProcesoAnular'];
+		$query = "SELECT f.*
+				FROM factura AS f
+				WHERE f.dte_estado = $estado_anular";
+		return new ListaFacturas($this->sesion, null, $query);
 	}
 
-	function FacturaElectronicaAnulada() {
-		return !is_null($this->fields['dte_fecha_anulacion']);
+	function DTEFirmado() {
+		return (!is_null($this->fields['dte_fecha_creacion']) && $this->fields['dte_estado'] == Factura::$estados_dte['Firmado']);
+	}
+
+	function DTEAnulado() {
+		return (!is_null($this->fields['dte_estado']) && $this->fields['dte_estado'] == Factura::$estados_dte['Anulado']);
+	}
+
+	function DTEProcesandoAnular() {
+		return (!is_null($this->fields['dte_estado']) && $this->fields['dte_estado'] == Factura::$estados_dte['ProcesoAnular']);
 	}
 
 	function Anulada() {

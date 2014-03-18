@@ -10171,6 +10171,18 @@ QUERY;
 			$queries[] = "ALTER TABLE `cta_corriente` CHANGE COLUMN `descripcion` `descripcion` TEXT NULL DEFAULT NULL;";
 			ejecutar($queries, $dbh);
 			break;
+		case 7.60:
+			$queries = array();
+			if (!ExisteCampo('dte_estado', 'factura', $dbh) && !ExisteCampo('dte_estado_descripcion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura`
+							ADD COLUMN `dte_estado` INT(3) NULL COMMENT 'Estado del documento [1: firmado, 2: error_firma, 3: proceso_anular, 4: anulado]',
+							ADD COLUMN `dte_estado_descripcion` VARCHAR(255) NULL COMMENT 'Descripción del estado o mensaje de error';";
+
+				$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrónico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
+				$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrónico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
+			}
+			ejecutar($queries, $dbh);
+			break;
 
 		case 8.00:
 			$queries = array();

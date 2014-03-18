@@ -77,7 +77,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		$data = array('Factura' => $factura);
 		$Slim->applyHook('hook_anula_factura_electronica', &$data);
 		$error = $data['Error'];
-		if (!$error) {
+		if (!is_null($error)) {
 			$pagina->AddError($error['Message'] ? $error['Message'] : __($error['Code']));
 			$requiere_refrescar = "window.opener.Refrescar();";
 		} else {
@@ -231,13 +231,13 @@ if ($opcion == "guardar") {
 				$resultado = array('error' => 'El número ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, vuelva a intentar con número: ' . $numero_documento_legal);
 			}
 		} else {
-			$has_errors = false;
 			if ($mensaje_accion == 'anulado') {
 				$data_anular = array('Factura' => $factura);
 				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data_anular) : false;
-				$has_errors = $data_anular['Error'];
-				if ($has_errors) {
-					$pagina->AddError($has_errors['Message'] ? $has_errors['Message'] : __($has_errors['Code']));
+				$error_message = $data_anular['Error'];
+				echo "<!-- {$error_message} -->";
+				if (!is_null($error_message)) {
+					$pagina->AddInfo($factura->fields["dte_estado_descripcion"] . " <br/>Para consultar el estado de su factura, puede dar clic en el ícono i (más información)");
 					$factura->Load($id_factura);
 				}
 			}
@@ -246,7 +246,7 @@ if ($opcion == "guardar") {
 				$factura->ActualizaGeneradores();
 			}
 
-			if (!$has_errors && $factura->Escribir()) {
+			if ($factura->Escribir()) {
 				if ($generar_nuevo_numero) {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio);
 				}
@@ -555,10 +555,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				</td>
 				<td align="right"><?php echo __('Estado'); ?></td>
 				<?php
-					$deshabilita_estado = ($factura->fields['anulado'] == 1 && $factura->FacturaElectronicaCreada() && $factura->FacturaElectronicaAnulada()) ? 'disabled' : '';
+					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
 				<td align="left">
 					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
+					<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
 				</td>
 			</tr>
 
@@ -899,7 +900,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<td align="left">
 				<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void(0);" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
-				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && (!$factura->FacturaElectronicaCreada() || ($factura->FacturaElectronicaCreada() && !$factura->FacturaElectronicaAnulada()))) { ?>
+				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && !$factura->DTEAnulado() && !$factura->DTEAnulado() && !$factura->DTEProcesandoAnular()) { ?>
 					<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
 				<?php } ?>
 				<a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio') ?></a>
