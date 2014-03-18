@@ -493,7 +493,6 @@ switch ($accion) {
 
 	case "cargar_actividades_activas":
 
-	echo 'ASDADADADADADAJDHAKJDHAKJFHAKFJHAKFHAKJS';
 		$query = "SELECT codigo_actividad,glosa_actividad FROM actividad WHERE activo = '1' AND codigo_asunto = '$id' OR codigo_asunto IS NULL ORDER BY glosa_actividad";
 		echo $query;
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
