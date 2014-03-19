@@ -357,7 +357,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 			<tr>
 				<td valign="top" class="texto" align="right">
-					<?php echo __('Nombre Completo') ?><span class="req">*</span>
+					<?php echo __('Nombres') ?><span class="req">*</span>
 				</td>
 				<td valign="top" class="texto" align="left">
 					<input type="text" name="nombre" value="<?php echo $usuario->fields['nombre'] ? $usuario->fields['nombre'] : $nombre ?>" size="30" style=""/>
