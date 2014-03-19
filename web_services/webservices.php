@@ -492,7 +492,12 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			return new soap_fault('Client', '', mysql_error() . ". Query: $query", '');
 		} else {
 			$trabajo = new Trabajo($sesion);
-			$trabajo->Load(mysql_insert_id($sesion->dbh));
+			$id_trabajo = mysql_insert_id($sesion->dbh);
+			$trabajo->Load($id_trabajo);
+			$queryHistorial = $trabajo->QueryHistorial('CREAR', $app_id);
+			if (!is_null($queryHistorial)) {
+				$trabajo->GuardarHistorial($id_trabajo , $queryHistorial);
+			}
 			$trabajo->InsertarTrabajoTarifa($app_id);
 			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
