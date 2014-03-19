@@ -167,7 +167,7 @@ ToolbarDemo.views.LoginCard = Ext.extend(Ext.form.FormPanel, {
 		console.log('rut '+rut+ ' y pass '+password);
 		$.ajax({
 			type:"post",
-			url:"../index.php/login",
+			url:"../login",
 			data: {"rut": rut, "password": password},
 			complete:function(req) {
 			//alert(req),
