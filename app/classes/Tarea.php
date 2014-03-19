@@ -227,7 +227,7 @@ class Tarea extends Objeto
 		}
 		else if( $this->fields['orden_estado'] == 4)
 		{
-			$estado = " La siguiente tarea ha sido desarrollada y está a la espera de su revisiÃ³n:";
+			$estado = " La siguiente tarea ha sido desarrollada y está a la espera de su revisión:";
 			$where = "id_usuario=".$this->fields['usuario_revisor'];
 		}
 		else if( $this->fields['orden_estado'] == 5)

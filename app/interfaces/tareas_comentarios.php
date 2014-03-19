@@ -1,7 +1,7 @@
 <?
 	require_once dirname(__FILE__).'/../conf.php';
 
-	$sesion = new Sesion(array('PRO'));
+	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
