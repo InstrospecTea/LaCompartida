@@ -354,13 +354,13 @@ class Tarea extends Objeto
             	'filename'	  => 'invitacion.ics',
 		        'base_encode' => '7bit'
             );
-            $query = sprintf("SELECT glosa_cliente FROM cliente WHERE id_cliente=%d",$this->fields['codigo_cliente']);
+            $query = sprintf("SELECT glosa_cliente FROM cliente WHERE codigo_cliente=%d",$this->fields['codigo_cliente']);
             $result_cliente = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
             while ($row = mysql_fetch_array($result_cliente)) {
 			   $glosa_cliente = $row['glosa_cliente'];
 			}
 
-			$query = sprintf("SELECT glosa_asunto FROM asunto WHERE id_asunto=%d",$this->fields['codigo_asunto']);
+			$query = sprintf("SELECT glosa_asunto FROM asunto WHERE codigo_asunto=%d",$this->fields['codigo_asunto']);
 			$result_asunto = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
             while ($row = mysql_fetch_array($result_asunto)) {
 			   $glosa_asunto = $row['glosa_asunto'];
