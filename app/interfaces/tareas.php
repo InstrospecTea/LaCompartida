@@ -57,12 +57,13 @@ if($fecha_desde || $fecha_hasta) {
 }
 
 
-// if( !($opciones['tareas_mandante'] || $opciones['tareas_responsable'] || $opciones['tareas_revisor'] || $opciones['otras_tareas'] || $opciones['tareas_encargado']) ) {
-//     $opciones['tareas_mandante'] = true;
-//     $opciones['tareas_responsable'] = true;
-//     $opciones['tareas_revisor'] = true;
-//     $opciones['tareas_encargado'] = true;
-// }
+if( !($opciones['tareas_mandante'] || $opciones['tareas_responsable'] || $opciones['tareas_revisor'] || $opciones['otras_tareas'] || $opciones['tareas_encargado']) ) {
+    $opciones['tareas_mandante'] = true;
+    $opciones['tareas_responsable'] = true;
+    $opciones['tareas_revisor'] = true;
+    $opciones['otras_tareas'] = false;
+    $opciones['tareas_encargado'] = true;
+}
 
 $conf_codigo_primario = true;
 if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
@@ -240,7 +241,7 @@ if ($orden_click) {
 								<td align='right' width='18%'>
 								</td>
 								<td align='left' colspan='2' valign='top'>
-									<input type='checkbox' name='opciones[tareas_responsable]' id='tareas_responsable' value='1' <?=$opciones['tareas_responsable'] ? 'checked' : '' ?> />
+									<input type='checkbox' name='opciones[tareas_responsable]' id='tareas_responsable' value='1'  <?=$opciones['tareas_responsable'] ? 'checked' : '' ?> />
 									<label for='tareas_responsable'><?=__('Tareas en que soy Reponsable')?></label>
 								</td>
 								<td>
@@ -252,7 +253,7 @@ if ($orden_click) {
 								<td align='right'>
 								</td>
 								<td align=left colspan='2' width='36%' valign='top'>
-									<input type='checkbox' name='opciones[tareas_revisor]' id='tareas_revisor' value='1' <?=$opciones['tareas_revisor'] ? 'checked' : '' ?> />
+									<input type='checkbox' name='opciones[tareas_revisor]' id='tareas_revisor' value='1' <?php if($opciones['tareas_revisor']|| $opciones['tareas_encargado']){echo 'checked';} ?> />
 									<label for='tareas_revisor'><?=__('Tareas en que soy Revisor')?></label>
 								</td>
 								<td>

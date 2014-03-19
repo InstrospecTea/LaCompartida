@@ -345,15 +345,47 @@ class Tarea extends Objeto
 			    $correos[] = array('nombre' => $row['nombre'],'mail' => trim($row['email']));
 			}
 			$ICS_data = NEW ICS_Creation();
-			$fecha = strtotime($this->fields['fecha_entrega']);
-            $ICS_data->addEvent($fecha, $fecha, "Nueva tarea ".$this->fields['nombre'], $this->fields['detalle'], '');
+			$nombre_tarea = $this->fields['nombre'];
+			$detalle = $this->fields['detalle'];
+            $ICS_data->addEvent($this->fields['fecha_entrega'], $this->fields['fecha_entrega'], "Nueva tarea ".$nombre_tarea, $detalle, '');
+            $event_data = utf8_encode($ICS_data->render_Event());
             $attachment = array(
-            	'data_string' => $ICS_data->render_Event(),
-	 		 	'filename'	  => 'invitacion.ics',
+            	'data_string' => $event_data,
+            	'filename'	  => 'invitacion.ics',
 		        'base_encode' => '7bit'
             );
-            $subject = 'Se creado una nueva tarea cliente '.$this->fields['codigo_cliente'];
-            $body = 'Estimado usuario, se registrado una nueva tarea, cliente: '.$this->fields['codigo_cliente'].' y asunto:'.$this->fields['codigo_asunto'];
+            $query = sprintf("SELECT glosa_cliente FROM cliente WHERE id_cliente=%d",$this->fields['codigo_cliente']);
+            $result_cliente = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result_cliente)) {
+			   $glosa_cliente = $row['glosa_cliente'];
+			}
+
+			$query = sprintf("SELECT glosa_asunto FROM asunto WHERE id_asunto=%d",$this->fields['codigo_asunto']);
+			$result_asunto = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result_asunto)) {
+			   $glosa_asunto = $row['glosa_asunto'];
+			}
+
+			$query = sprintf("SELECT CONCAT_WS(' ',nombre, apellido1) as nombre FROM usuario WHERE id_usuario=%d",$this->fields['usuario_encargado']);
+			$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result)) {
+			   $usuario_encargado_nombre = $row['nombre'];
+			}
+
+			$query = sprintf("SELECT CONCAT_WS(' ',nombre, apellido1) as nombre FROM usuario WHERE id_usuario=%d",$this->fields['usuario_revisor']);
+			$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result)) {
+			   $usuario_revisor_nombre = $row['nombre'];
+			}
+
+			$query = sprintf("SELECT CONCAT_WS(' ',nombre, apellido1) as nombre FROM usuario WHERE id_usuario=%d",$this->fields['usuario_generador']);
+			$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result)) {
+			   $usuario_generador_nombre = $row['nombre'];
+			}
+
+            $subject = sprintf('Se ha creado una nueva tarea (%s) para el cliente (%s)',$nombre_tarea,$glosa_cliente);
+            $body = sprintf("Estimado usuario,<br><br> Se ha registrado una nueva tarea <b>%s</b> para el cliente %s (%d) y asunto %s (%d).<br><br> Responsable: %s<br>Revisor: %s<br>Mandante: %s<br><br>Mensaje generado por The Time Billing.",$nombre_tarea,$glosa_cliente,$this->fields['codigo_cliente'],$glosa_asunto,$this->fields['codigo_asunto'],$usuario_encargado_nombre,$usuario_revisor_nombre,$usuario_generador_nombre);
             mysql_free_result($result);
             return Utiles::EnviarMail($this->sesion,$correos,$subject,$body,false, NULL,$attachment);
 		}
