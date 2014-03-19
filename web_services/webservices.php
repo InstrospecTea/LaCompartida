@@ -493,7 +493,6 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		} else {
 			$trabajo = new Trabajo($sesion);
 			$trabajo->Load(mysql_insert_id($sesion->dbh));
-			$trabajo->GuardarHistorial($trabajo->QueryHistorial('CREAR', $app_id));
 			$trabajo->InsertarTrabajoTarifa($app_id);
 			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);

@@ -10213,6 +10213,12 @@ QUERY;
 				$queries[] = "ALTER TABLE `trabajo_historial` ADD `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' ";
 				$queries[] = "ALTER TABLE `trabajo_historial` ADD INDEX (`app_id`)";
 			}
+			if (!ExisteCampo('tarifa_hh', 'trabajo_historial', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `tarifa_hh` double NULL";
+			}
+			if (!ExisteCampo('tarifa_hh_modificado', 'trabajo_historial', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `tarifa_hh_modificado` double NULL";
+			}
 
 			ejecutar($queries, $dbh);
 			break;

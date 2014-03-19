@@ -383,15 +383,7 @@ $trabajo->Edit('descripcion', $descripcion);
 	$trabajo->Edit("fecha", $fecha); // si intenta ingresar un trabajo con fecha más antigua que su límite, lo ingresa con fecha de hoy
 	//$trabajo->Edit('fecha_creacion', date('Y-m-d H:i:s')); // el sistema le añade NOW de por si, mala cosa.
 
-	$accionHistorial = $trabajo->Loaded() ? 'MODIFICAR' : 'CREAR';
-	$queryHistorial = $trabajo->QueryHistorial($accionHistorial, $app_id);
-	if ($trabajo->Write()) {
-		if (!is_null($queryHistorial)) {
-			$this->GuardarHistorial($queryHistorial);
-		}
-		$trabajo->InsertarTrabajoTarifa($app_id);
-
-
+	if ($trabajo->Write(true, $app_id)) {
 		try {
 		$sesion->pdodbh->exec("UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'");
 		} catch (Exception $e) {

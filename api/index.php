@@ -276,7 +276,6 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 	$auth_token = validateAuthTokenSendByHeaders();
 	$auth_token_user_id = $auth_token->user_id;
 	$app_id = getAppIdByAppKey($auth_token->app_key);
-
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
 
