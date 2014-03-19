@@ -476,7 +476,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 </script>
 <table width="96%" align="left">
 
-	<?php if ($sesion->usuario->fields['username'] == 'lemontech') { ?>
+	<?php if ($sesion->usuario->fields['rut'] == '99511620') { ?>
 	
 	<tr>
 		<td width="20">&nbsp;</td>
