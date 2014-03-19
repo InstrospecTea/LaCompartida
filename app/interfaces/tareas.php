@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
 
-$Sesion = new Sesion(array('PRO','ADM'));
+$Sesion = new Sesion();
 $Pagina = new Pagina($Sesion);
 $Tarea = new Tarea($Sesion);
 
