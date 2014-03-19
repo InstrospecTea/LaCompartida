@@ -10175,6 +10175,19 @@ QUERY;
 		case 7.60:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'RevHrsClienteFecha', 0, 'Glosa Detraccion', 'boolean', '6', '-1');";
+			$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrónico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
+			$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrónico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
+			if (!ExisteCampo('dte_estado', 'factura', $dbh) && !ExisteCampo('dte_estado_descripcion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura`	ADD COLUMN `dte_estado` INT(3) NULL COMMENT 'Estado del documento [1: firmado, 2: error_firma, 3: proceso_anular, 4: anulado]',
+							ADD COLUMN `dte_estado_descripcion` VARCHAR(255) NULL COMMENT 'Descripción del estado o mensaje de error';";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.61:
+			$queries = array();
+			$queries[] = "ALTER TABLE `actividad` ADD `activo` TINYINT( 1 ) NOT NULL DEFAULT '1';";
 			ejecutar($queries, $dbh);
 			break;
 	}
@@ -10186,7 +10199,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.60;
+$max_update = 7.61;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

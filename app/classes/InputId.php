@@ -60,6 +60,16 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		return $output;
 	}
 
+
+	function ImprimirActividad($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '') {
+
+		$join = '';
+		$output .= "<input maxlength=\"15\" id=\"campo_{$name}\" size=\"15\" value=\"{$selected}\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_{$name}','{$name}'); {$oncambio}\" " . str_replace("class='comboplus'", '', $opciones) . " />";
+		$output .= Html::SelectQuery($sesion, "SELECT {$campo_id}, {$campo_glosa} FROM {$tabla} {$join} {$where} ORDER BY {$campo_glosa}", $name, $selected,	"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones", __("Cualquiera"), $width);
+		return $output;
+		
+	}
+
 	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '')
 	{
 
@@ -268,7 +278,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 										} else if ( jQuery('#'+id_origen).val() != '') {
 											if ( accion != \"cargar_actividades\") {
-												alert('".$mje_error."');
+												alert('No existen actividades activas para este cliente');
 											}
 
 										}

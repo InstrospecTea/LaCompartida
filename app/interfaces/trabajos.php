@@ -694,9 +694,11 @@ $pagina->PrintTop($popup);
 
 	<fieldset class="tb_base" width="100%" style="border: 1px solid #BDBDBD;">
 		<legend><?php echo __('Filtros') ?></legend>
+
 		<table   style="border: 0px solid black;width:700px;margin:auto;" >
 
 			<?php
+			
 			if ($motivo != "cobros") {
 				if ($p_revisor->fields['permitido']) {
 					?>
@@ -712,7 +714,6 @@ $pagina->PrintTop($popup);
 							<?php
 							if ($motivo == 'horas') {
 								echo ' <div class="fl buscadorlabel" style="margin-top: 3px;padding-right:3px;width:60px;">' . __('Cobro') . " </div><input id='id_cobro' class='fl' type='text' style='float:left;width:80px;' name='buscar_id_cobro' id='buscar_id_cobro' value='$buscar_id_cobro'/>";
-
 							}
 							?>
 						</td>
@@ -770,18 +771,6 @@ $pagina->PrintTop($popup);
 				</tr>
 				<?php } ?>
 
-
-
-				<?php
-
-				// Explicacion adicional: Esa condición "strlen($select_usuario) > 164" esta validando si hay mas usuarios
-				// que solamente Admin Lemontech
-				// TODO: WTF!
-
-				//if (strlen($select_usuario) > 164) { // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
-				// mejor que siempre salga
-
-				?>
 				<tr>
 					<td class="buscadorlabel">
 						<?php echo __('Usuario') ?>

@@ -1,6 +1,14 @@
 # Changelog
 
-## Hotfix: 14.0.12
+## Hotfix: 14.0.15
+Viernes 13 de marzo 2014
+* **Fixed:** [Corrige el problema al eliminar un trabajo con caracter no escapado](https://github.com/LemontechSA/ttb/pull/448)
+
+## Hotfix: 14.0.14
+Jueves 13 de marzo 2014
+* **Fixed:** [Corrige el problema con las tarifas](https://github.com/LemontechSA/ttb/pull/445)
+
+## Hotfix: 14.0.13
 Jueves 13 de marzo 2014
 * **Fixed:** [Agrega Monto en palabra NotaCobro Corrige Conf ValorSinEspacio en CartaCobro](https://github.com/LemontechSA/ttb/pull/443)
 
