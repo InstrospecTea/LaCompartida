@@ -85,8 +85,6 @@ if ($activo == 1 || $_GET['act']==1) {
 if( $nombre != "" && $nombre!="undefined") {
 	$where .= " AND (nombre LIKE '%$nombre%' OR apellido1 LIKE '%$nombre%' OR apellido2 LIKE '%$nombre%')";
 }
-
-$where = " AND usr.rut != '99511620' ";
   
 if(!empty($vacacion)) {
   	
@@ -152,7 +150,7 @@ if(!empty($vacacion)) {
 			$select_fecha2 
 		FROM usuario AS u
 			JOIN usuario_vacacion AS UV on u.id_usuario = UV.id_usuario
-				WHERE $where ORDER BY u.id_usuario, nombre";
+				WHERE $where and u.rut != '99511620' ORDER BY u.id_usuario, nombre";
 
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
 	while($row = mysql_fetch_assoc($resp)) {
@@ -216,7 +214,7 @@ if(!empty($vacacion)) {
 			UV.valor_actual
 		FROM usuario AS u
 			JOIN usuario_cambio_historial AS UV on u.id_usuario = UV.id_usuario
-				WHERE $where ORDER BY u.id_usuario, UV.fecha DESC";
+				WHERE $where AND u.rut != '99511620' ORDER BY u.id_usuario, UV.fecha DESC";
 
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
 	while($row = mysql_fetch_assoc($resp)) {
@@ -400,7 +398,7 @@ if(!empty($vacacion)) {
 		FROM usuario AS u
 			LEFT JOIN prm_categoria_usuario AS cu on u.id_categoria_usuario=cu.id_categoria_usuario
 			LEFT JOIN prm_area_usuario AS au on u.id_area_usuario=au.id
-				WHERE $where ORDER BY nombre";
+				WHERE $where AND u.rut != '99511620' ORDER BY nombre";
 
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
