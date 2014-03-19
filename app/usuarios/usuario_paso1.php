@@ -475,6 +475,9 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 
 </script>
 <table width="96%" align="left">
+
+	<?php if ($sesion->usuario->fields['username'] == 'lemontech') { ?>
+	
 	<tr>
 		<td width="20">&nbsp;</td>
 		<td valign="top">
@@ -489,6 +492,7 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 								<hr class="subtitulo_linea_plomo"/>
 							</td>
 						</tr>
+
 						<tr>
 							<td valign="top" class="texto" align="right">
 								<strong><?php echo Conf::GetConf($sesion, 'NombreIdentificador'); ?></strong>
@@ -514,6 +518,8 @@ $tooltip_text = __('Para agregar un nuevo usuario ingresa su ' . Conf::GetConf($
 				</form>
 		</td>
 	</tr>
+
+	<?php } ?>
 
 	<tr>
 		<td></td>
