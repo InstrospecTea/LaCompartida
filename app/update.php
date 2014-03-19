@@ -10174,7 +10174,6 @@ QUERY;
 
 		case 7.60:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'RevHrsClienteFecha', 0, 'Glosa Detraccion', 'boolean', '6', '-1');";
 			$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrónico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
 			$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrónico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
 			if (!ExisteCampo('dte_estado', 'factura', $dbh) && !ExisteCampo('dte_estado_descripcion', 'factura', $dbh)) {
@@ -10190,6 +10189,18 @@ QUERY;
 			$queries[] = "ALTER TABLE `actividad` ADD `activo` TINYINT( 1 ) NOT NULL DEFAULT '1';";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.62:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('LibrofrescoApi', 'http://lemontech.librofresco.com/api/v1', 'URL API de Librofresco', 'string', 2, -1);";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.63:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('RevHrsClienteFecha', 0, 'Glosa Detraccion', 'boolean', '6', '-1');";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10199,7 +10210,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.61;
+$max_update = 7.63;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
