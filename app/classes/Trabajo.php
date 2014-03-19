@@ -52,6 +52,7 @@ class Trabajo extends Objeto
 	}
 
 	function QueryHistorial($tipo = 'CREAR', $app_id = 1) {
+		$app_id = !is_null($app_id) ? $app_id : 1;
 		if ($tipo == 'MODIFICAR') {
 			$query = "SELECT
 					fecha, descripcion,
@@ -82,12 +83,12 @@ class Trabajo extends Objeto
 						 	codigo_asunto = '" . mysql_real_escape_string($codigo_asunto) . "',
 						 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
 						 	cobrable = '$cobrable',
-						 	app_id = $app_id,
+						 	app_id = {$app_id},
 						 	cobrable_modificado = '{$this->fields['cobrable']}'";
 		} else {
 			$queryHistorial = "INSERT INTO trabajo_historial
 								SET
-									app_id = $app_id,
+									app_id = {$app_id},
 									id_trabajo = '{$this->fields['id_trabajo']}',
 									id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
 									fecha = '" . date("Y-m-d H:i:s") . "',
@@ -100,6 +101,7 @@ class Trabajo extends Objeto
 								 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
 								 	cobrable_modificado = '{$this->fields['cobrable']}'";
 		}
+
 		return $queryHistorial;
 	}
 
