@@ -64,12 +64,15 @@ class Actividad extends Objeto {
 	 */
 	function SearchQuery() {
 		$query = "SELECT SQL_CALC_FOUND_ROWS
-					actividad.*,
-					cliente.*,
-					asunto.*
+					actividad.id_actividad,
+					actividad.glosa_actividad,
+					cliente.glosa_cliente,
+					asunto.glosa_asunto,
+					actividad.codigo_actividad,
+					IF (actividad.activo = 1, 'SI','NO') AS activo
 				FROM actividad
-				LEFT JOIN asunto USING (codigo_asunto)
-				LEFT JOIN cliente USING (codigo_cliente)";
+				LEFT JOIN asunto ON actividad.codigo_asunto = asunto.codigo_asunto
+				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente";
 
 		$wheres = array();
 
