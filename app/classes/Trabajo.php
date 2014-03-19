@@ -46,62 +46,80 @@ class Trabajo extends Objeto
 		return __("Abierto");
 	}
 
-	function Write($ingreso_historial = true) {
-		if ($this->Loaded()) {
-			if ($ingreso_historial) {
-				$query = "SELECT
-										fecha, descripcion,
-										duracion, duracion_cobrada,
-										id_usuario, codigo_asunto, cobrable
-									FROM trabajo
-									WHERE id_trabajo = {$this->fields['id_trabajo']}";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($fecha, $descripcion, $duracion, $duracion_cobrada, $id_usuario, $codigo_asunto, $cobrable) = mysql_fetch_array($resp);
+	function GuardarHistorial($id_trabajo, $queryHistorial) {
+		$queryHistorial = str_replace('{{id_trabajo}}', $id_trabajo, $queryHistorial);
+		$resp = mysql_query($queryHistorial, $this->sesion->dbh) or Utiles::errorSQL($queryHistorial, __FILE__, __LINE__, $this->sesion->dbh);
+		return $resp;
+	}
 
-				$query = "INSERT INTO trabajo_historial
-									SET
-										id_trabajo = '{$this->fields['id_trabajo']}',
-										id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-										fecha = '" . date("Y-m-d H:i:s") . "',
-									 	fecha_trabajo = '$fecha',
-									 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
-									 	descripcion = '" . mysql_real_escape_string(empty($descripcion) ? ' Sin descripcion' : $descripcion) . "',
-									 	descripcion_modificado = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
-									 	duracion = '".mysql_real_escape_string($duracion)."',
-									 	duracion_modificado = '{$this->fields['duracion']}',
-									 	duracion_cobrada = '" . mysql_real_escape_string($duracion_cobrada) . "',
-									 	duracion_cobrada_modificado = '{$this->fields['duracion_cobrada']}',
-									 	id_usuario_trabajador = '" . mysql_real_escape_string($id_usuario) . "',
-									 	id_usuario_trabajador_modificado = '{$this->fields['id_usuario']}',
-									 	accion = 'MODIFICAR',
-									 	codigo_asunto = '" . mysql_real_escape_string($codigo_asunto) . "',
-									 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
-									 	cobrable = '$cobrable',
-									 	cobrable_modificado = '{$this->fields['cobrable']}'";
-			}
+	function QueryHistorial($tipo = 'CREAR', $app_id = 1) {
+		$app_id = !is_null($app_id) ? $app_id : 1;
+		if ($tipo == 'MODIFICAR') {
+			$query = "SELECT
+					fecha,
+					descripcion,
+					duracion,
+					duracion_cobrada,
+					id_usuario,
+					codigo_asunto,
+					cobrable,
+					tarifa_hh
+				FROM trabajo
+				WHERE id_trabajo = {$this->fields['id_trabajo']}";
+
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($fecha, $descripcion, $duracion, $duracion_cobrada, $id_usuario, $codigo_asunto, $cobrable, $tarifa_hh) = mysql_fetch_array($resp);
+
+			$queryHistorial = "INSERT INTO trabajo_historial
+						SET
+							id_trabajo = '{{id_trabajo}}',
+							id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
+							fecha = '" . date("Y-m-d H:i:s") . "',
+						 	fecha_trabajo = '$fecha',
+						 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
+						 	descripcion = '" . mysql_real_escape_string(empty($descripcion) ? ' Sin descripcion' : $descripcion) . "',
+						 	descripcion_modificado = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
+						 	duracion = '".mysql_real_escape_string($duracion)."',
+						 	duracion_modificado = '{$this->fields['duracion']}',
+						 	duracion_cobrada = '" . mysql_real_escape_string($duracion_cobrada) . "',
+						 	duracion_cobrada_modificado = '{$this->fields['duracion_cobrada']}',
+						 	id_usuario_trabajador = '" . mysql_real_escape_string($id_usuario) . "',
+						 	id_usuario_trabajador_modificado = '{$this->fields['id_usuario']}',
+						 	accion = 'MODIFICAR',
+						 	codigo_asunto = '" . mysql_real_escape_string($codigo_asunto) . "',
+						 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
+						 	tarifa_hh = '{$this->fields['tarifa_hh']}',
+						 	tarifa_hh_modificado = '{$tarifa_hh}',
+						 	cobrable = '$cobrable',
+						 	app_id = {$app_id},
+						 	cobrable_modificado = '{$this->fields['cobrable']}'";
 		} else {
-			if ($ingreso_historial) {
-				// Creamos un trabajo nuevo, logueamos la creación.
-				$query = "INSERT INTO trabajo_historial
-									SET
-										id_trabajo = '{$this->fields['id_trabajo']}',
-										id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-										fecha = '" . date("Y-m-d H:i:s") . "',
-									 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
-									 	descripcion_modificado = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
-									 	duracion_modificado = '{$this->fields['duracion']}',
-									 	duracion_cobrada_modificado = '{$this->fields['duracion_cobrada']}',
-									 	id_usuario_trabajador_modificado = '{$this->fields['id_usuario']}',
-									 	accion = 'CREAR',
-									 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
-									 	cobrable_modificado = '{$this->fields['cobrable']}'";
-			}
+			$queryHistorial = "INSERT INTO trabajo_historial
+								SET
+									app_id = {$app_id},
+									id_trabajo = '{{id_trabajo}}',
+									id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
+									fecha = '" . date("Y-m-d H:i:s") . "',
+								 	fecha_trabajo = '{$this->fields['fecha']}',
+								 	descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
+								 	duracion = '{$this->fields['duracion']}',
+								 	duracion_cobrada = '{$this->fields['duracion_cobrada']}',
+								 	id_usuario_trabajador =  '{$this->fields['id_usuario']}',
+								 	accion = 'CREAR',
+								 	tarifa_hh = '{$this->fields['tarifa_hh']}',
+								 	codigo_asunto = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
+								 	cobrable_modificado = '{$this->fields['cobrable']}'";
 		}
 
+		return $queryHistorial;
+	}
+
+	function Write($historialOnWrite = true, $app_id = null) {
+		$accionHistorial = $this->Loaded() ? 'MODIFICAR' : 'CREAR';
+		$queryHistorial = $historialOnWrite ? $this->QueryHistorial($accionHistorial, $app_id) : null;
 		if (parent::Write()) {
-			// Modificamos un trabajo que ya existía, logueamos el cambio.
-			if( $ingreso_historial ) {
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			if ($historialOnWrite && !is_null($queryHistorial)) {
+				$this->GuardarHistorial($this->fields['id_trabajo'], $queryHistorial);
 			}
 			return true;
 		} else {
@@ -177,7 +195,7 @@ class Trabajo extends Objeto
 		return $duracion[0];
 	}
 
-	function InsertarTrabajoTarifa() {
+	function InsertarTrabajoTarifa($app_id = null) {
 		$id_trabajo = $this->fields['id_trabajo'];
 		$codigo_asunto = $this->fields['codigo_asunto'];
 		$id_usuario = $this->fields['id_usuario'];
@@ -217,7 +235,7 @@ class Trabajo extends Objeto
 
 			if ($contrato->fields['id_moneda'] == $id_moneda) {
 				$this->Edit("tarifa_hh", $valor);
-				$this->Write();
+				$this->Write(true, $app_id);
 			}
 		}
 	}
@@ -1055,7 +1073,7 @@ class Trabajo extends Objeto
 
 		$this->Edit('tarifa_hh', $data['rate']);
 
-		if ($this->Write(true)) {
+		if ($this->Write(true, $data['app_id'])) {
 			if (!empty($data['user_id'])) {
 				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`=0 WHERE `user`.`id_usuario`=:user_id";
 				$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -1064,8 +1082,9 @@ class Trabajo extends Objeto
 			}
 
 			if ($update_rate_work == true) {
-				$this->InsertarTrabajoTarifa();
+				$this->InsertarTrabajoTarifa($data['app_id']);
 			}
+
 			return true;
 		}
 
