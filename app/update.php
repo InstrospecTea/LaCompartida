@@ -10186,6 +10186,13 @@ QUERY;
 
 		case 7.61:
 			$queries = array();
+			$queries[] = "ALTER TABLE `actividad` ADD `activo` TINYINT( 2 ) NOT NULL DEFAULT '1';";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.62:
+			$queries = array();
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `application` (
 					`id` int(3) NOT NULL,
@@ -10218,7 +10225,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.61;
+$max_update = 7.62;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
