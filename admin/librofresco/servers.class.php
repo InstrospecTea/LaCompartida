@@ -98,14 +98,17 @@ class Servers {
 			$query = "SELECT
 					COUNT(*) AS 'usuarios',
 					SUM(timekeeper) AS 'timekeeper',
-					(COUNT(*) - SUM(timekeeper)) AS 'administrative',
+					SUM(administrative) AS 'administrative',
 					SUM(casetracking) AS 'casetracking'
 				FROM (
 					SELECT
 						`usuario`.`id_usuario`,
-						IF(`usuario_permiso`.`id_usuario` IS NULL, 0, 1) AS 'timekeeper',
+						IF(`usuario_permiso`.`id_usuario` IS NOT NULL, 1, 0) AS 'timekeeper',
+						IF(`prm_categoria_usuario`.`id_categoria_lemontech` = 5, 1, 0) AS 'administrative',
 						{$usuario_juicio}
 					FROM `usuario`
+						LEFT JOIN `prm_categoria_usuario`
+							ON `usuario`.`id_categoria_usuario` = `prm_categoria_usuario`.`id_categoria_usuario`
 						LEFT JOIN  `usuario_permiso`
 							ON `usuario_permiso`.`id_usuario` = `usuario`.`id_usuario`
 								AND `usuario_permiso`.`codigo_permiso` = 'PRO'

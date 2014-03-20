@@ -387,7 +387,8 @@ if (empty($data)) {
 			'Í|Ì|Ï': 'I',
 			'Ó|Ò|Ö': 'O',
 			'Ú|Ù|Ü': 'U',
-			'Ñ': 'N'
+			'Ñ': 'N',
+			'\'': ''
 		};
 		jQuery.each(acentos, function(acento, limpio) {
 			s = s.replace(new RegExp(acento, 'g'), limpio);
