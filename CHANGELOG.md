@@ -1,5 +1,21 @@
 # Changelog
 
+## Release: 14.1.0
+Miércoles 19 de Marzo 2014
+
+* **Feature:** [Permite Activar o Desactivar Actividades](#453)
+* **Feature:** [Actualizar usuarios Librofresco](#452)
+* **Feature:** [Feature/mejoras tareas](#450)
+* **Feature:** [modifica orden de trabajos en revisar horas](#449)
+* **Feature:** [Correcciones a reporte profesional VS](#447)
+* **Feature:** [Auditoria de app trabajos](#446)
+* **Feature:** [Anular DTEs](#444)
+* **Feature:** [Feature/mod nota cobro](#441)
+* **Feature:** [Correccion a reporte Profesional V/S](#437)
+* **Feature:** [Refactorizacion Conf ValorSinEspacio CartaCobro.php](#436)
+* **Feature:** [Modificacion a listado usuario "Lemontech"](#435)
+* **Feature:** [Feature/interfaces revision](#432)
+
 ## Hotfix: 14.0.15
 Viernes 13 de marzo 2014
 * **Fixed:** [Corrige el problema al eliminar un trabajo con caracter no escapado](https://github.com/LemontechSA/ttb/pull/448)
