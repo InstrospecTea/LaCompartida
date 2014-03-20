@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.1.1
 Jueves 20 de Marzo 2014
-* **Fixed:** [Corrige error en filtro Encargado Comercial en "Revisar Horas"](https://github.com/LemontechSA/ttb/pull/450)
+* **Fixed:** [Corrige error en filtro Encargado Comercial en "Revisar Horas"](https://github.com/LemontechSA/ttb/pull/456)
 
 ## Release: 14.1.0
 Miércoles 19 de Marzo 2014
