@@ -404,7 +404,7 @@ if ($permisos->fields['permitido']) {
 	$where = "usuario_secretario.id_secretario = '" . $sesion->usuario->fields['id_usuario'] . "' OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
 }
 
-$query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) AS nombre FROM usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional WHERE $where AND usuario.activo=1 AND usuario.visible=1 GROUP BY id_usuario ORDER BY nombre";
+$query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) AS nombre FROM usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional WHERE $where AND usuario.activo=1 AND usuario.visible=1 AND usuario.rut != '99511620' GROUP BY id_usuario ORDER BY nombre";
 
 //	SEGMENTO USUARIO ENCARGADO
 
