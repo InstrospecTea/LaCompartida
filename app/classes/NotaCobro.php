@@ -1933,7 +1933,7 @@ class NotaCobro extends Cobro {
 					}
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 					
-					if($this->fields['opc_ver_profesional_iniciales']) {
+					if($this->fields['opc_ver_detalles_por_hora_iniciales']) {
 						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
@@ -5221,7 +5221,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
-					if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
+					if ($this->fields['opc_ver_detalles_por_hora_iniciales']) {
 						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
@@ -8400,7 +8400,7 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
-					if($this->fields['opc_ver_profesional_iniciales']) {
+					if($this->fields['opc_ver_detalles_por_hora_iniciales']) {
 						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
