@@ -1932,7 +1932,12 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_solicitante%', '', $row);
 					}
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
-					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					
+					if($this->fields['opc_ver_profesional_iniciales']) {
+						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+					} else {
+						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					}
 					$row = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $row);
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
@@ -8395,7 +8400,11 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
-					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					if($this->fields['opc_ver_profesional_iniciales']) {
+						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+					} else {
+						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					}
 
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
