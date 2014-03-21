@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.1.2
+Viernes 21 de Marzo 2014
+* **Fixed:** [Revierte la funcionalidad de iniciales por username](https://github.com/LemontechSA/ttb/pull/457)
+
 ## Hotfix: 14.1.1
 Jueves 20 de Marzo 2014
 * **Fixed:** [Corrige error en filtro Encargado Comercial en "Revisar Horas"](https://github.com/LemontechSA/ttb/pull/456)
