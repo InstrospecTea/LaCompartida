@@ -73,6 +73,12 @@ $pagina->PrintTop();
 		<input type="submit" value="Previsualizar carta" id="btn_previsualizar"/>
 		<input type="button" value="Ver valores de tags" id="btn_valores"/>
 	</div>
+	<hr/>
+	<h3>
+		Previsualización HTML
+		<button id="btn_previsualizar_html" type="button">Regenerar</button>
+	</h3>
+	<iframe id="previsualizacion_html" style="width:674px;height:730px"></iframe>
 </form>
 
 <script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>
@@ -81,6 +87,8 @@ $pagina->PrintTop();
 	var secciones = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->secciones)); ?>;
 
 	jQuery(function(){
+		CKEDITOR.config.allowedContent = true;
+
 		jQuery('.agregar_valor').live('click', AgregarValor);
 		jQuery('.agregar_seccion').live('click', AgregarSeccion);
 		jQuery('#btn_guardar').click(function(){
@@ -96,6 +104,11 @@ $pagina->PrintTop();
 		jQuery('#btn_valores').click(function(){
 			window.open('carta_test_valores.php?id_cobro=' + jQuery('[name=id_cobro]').val());
 		});
+		jQuery('#btn_previsualizar_html').click(function(){
+			PrevisualizarHTML();
+		});
+
+		PrevisualizarHTML();
 	});
 
 	function AgregarValor(){
@@ -164,6 +177,28 @@ $pagina->PrintTop();
 			}
 		}
 		return false;
+	}
+
+	function PrevisualizarHTML(){
+		var css = jQuery('[name="carta[formato_css]"]').val();
+		var body = GenerarHTML('CARTA');
+		var html = '<style type="text/css">'+css+'</style>'+body;
+		jQuery('#previsualizacion_html')[0].contentWindow.document.body.innerHTML = html;
+	}
+
+	function GenerarHTML(seccion){
+		var id = 'editor_' + seccion;
+
+		var html = CKEDITOR.instances[id] && !v ? CKEDITOR.instances[id].getData() : jQuery('#'+id).val();
+		if(!html) return '';
+
+		jQuery.each(secciones[seccion] || [], function(s){
+			var tag = '%' + s + '%';
+			if(html.indexOf(tag) >= 0){
+				html = html.replace(tag, GenerarHTML(s));
+			}
+		});
+		return html;
 	}
 
 </script>
