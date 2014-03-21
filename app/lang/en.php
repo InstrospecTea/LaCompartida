@@ -97,7 +97,6 @@ $_LANG['No hay facturas adeudadas'] = "There are no invoices due";
 $_LANG['Total Honorarios Adeudados'] = "Total legal fees due";
 $_LANG['Total Gastos Adeudados'] = "Total disbursements due";
 $_LANG['Total Adeudado'] = "Total due";
-$_LANG['Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
 $_LANG['Periodo Cobro'] = "Billing Period";
 $_LANG['%tarifa_fee%'] = "Fee";
 $_LANG['%fees%'] = "Legal Fees";
@@ -109,27 +108,14 @@ $_LANG['Saldo del cobro'] = "Invoice balance";
 $_LANG['Solicitado Por'] = "Requested By";
 $_LANG['Ordenado Por'] = "Name of Client";
 $_LANG['Estimado'] = "Dear";
-#Monedas
+
+#MONEDAS
 $_LANG['Tipos de Cambio'] = "Exchange Rates";
 $_LANG['Dólar'] = "Dollar";
 $_LANG['Euro'] = "Euro";
 $_LANG['Libra'] = "Pound";
+
 #CONTRATOS
-/* $_LANG['Agregar contratos'] = "Agregar contratos";
-  $_LANG['Listado de Contratos'] = "Listado de Contratos";
-  $_LANG['Contrato Eliminado con éxito'] = "Contrato Eliminado con éxito";
-  $_LANG['Contrato guardado con éxito'] = "Contrato guardado con éxito";
-  $_LANG['No se pudieron actualizar los Asuntos del contrato'] = "No se pudieron actualizar los Asuntos del contrato";
-  $_LANG['Contratos'] = "Contratos";
-  $_LANG['contratos'] = "contratos";
-  $_LANG['contrato'] = "contrato";
-  $_LANG['Contrato'] = "Contrato";
-  $_LANG['Ingresa el'] = "Ingresa el";
-  $_LANG['Agregar Contrato'] = "Agregar Contrato";
-  $_LANG['Editar Contrato'] = "Editar Contrato";
-  $_LANG['El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :'] = "El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :";
-  $_LANG['Datos generales Contrato'] = "Datos generales Contrato";
- */
 $_LANG['Listado de Contratos'] = "List of Contracts";
 $_LANG['Contrato Eliminado con éxito'] = "Contract deleted successfully";
 $_LANG['Contrato guardado con éxito'] = "Contract saved successfully";
@@ -611,8 +597,10 @@ $_LANG[', conforme a su equivalencia al '] = " per the \"observado\" rate of exc
 $_LANG['por concepto de gastos incurridos por nuestro Estudio en dicho período'] = "";
 
 #Carta JJR
-$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
-$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
+$_LANG['nota_morosidad_honorarios'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
+$_LANG['nota_morosidad_gastos'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
+$_LANG['nota_morosidad_total'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
+$_LANG['nota_morosidad'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
 
 $_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
 $_LANG['%asunto_mb%'] = "Re.:";
