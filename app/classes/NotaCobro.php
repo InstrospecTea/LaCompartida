@@ -1933,8 +1933,12 @@ class NotaCobro extends Cobro {
 					}
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 					
+					//muestra las iniciales de los profesionales
+					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
+					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+					
 					if($this->fields['opc_ver_detalles_por_hora_iniciales']) {
-						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+						$row = str_replace('%profesional%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
 					}
@@ -1942,9 +1946,6 @@ class NotaCobro extends Cobro {
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
-					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
 
@@ -5221,8 +5222,13 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
+
+					//muestra las iniciales de los profesionales
+					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
+					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+
 					if ($this->fields['opc_ver_detalles_por_hora_iniciales']) {
-						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+						$row = str_replace('%profesional%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
 					}
@@ -5265,9 +5271,7 @@ class NotaCobro extends Cobro {
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
-					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+
 
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
@@ -7840,7 +7844,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%username%', $tramite->fields['username'], $row);
 
 					if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
-						$row = str_replace('%profesional%', $tramite->fields['iniciales'], $row);
+						$row = str_replace('%profesional%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 					} else {
 						$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
 					}
@@ -8400,8 +8404,12 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
+					
+					//muestra las iniciales de los profesionales
+					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
+					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 					if($this->fields['opc_ver_detalles_por_hora_iniciales']) {
-						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+						$row = str_replace('%profesional%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
 					}
@@ -8409,9 +8417,6 @@ class NotaCobro extends Cobro {
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
-					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
 
@@ -8845,8 +8850,8 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
 
-					if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
-						$row = str_replace('%profesional%', $tramite->fields['iniciales'], $row);
+					if ($this->fields['opc_ver_detalles_por_hora_iniciales']) {
+						$row = str_replace('%profesional%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 					} else {
 						$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
 					}
