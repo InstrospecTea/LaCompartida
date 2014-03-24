@@ -9,6 +9,12 @@ $Actividad = new Actividad($Sesion);
 if ($opcion == 'guardar') {
 	$Actividad->Fill($_REQUEST, true);
 
+	if ($_REQUEST['activo'] == 1){
+		$Actividad->Edit("activo", "1");
+	} else {
+		$Actividad->Edit("activo", "0");
+	}
+
 	if ($Actividad->Write()) {
 		$Pagina->AddInfo(__('Actividad guardada con éxito'));
 
@@ -26,6 +32,7 @@ if ($opcion == 'guardar') {
 	} else {
 		if (empty($codigo_actividad)) {
 			$codigo_actividad = $Actividad->AsignarCodigoActividad();
+			$Actividad->fields['activo'] = 1;
 		}
 	}
 
@@ -54,6 +61,19 @@ $Pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
+
+	jQuery(document).ready(function() {
+		var glosa_actividad = jQuery('#glosa_actividad').val();
+		if (!glosa_actividad){
+			jQuery('#td_check_activo').hide();
+			jQuery('#td_text_activo').hide();
+		} else {
+			jQuery('#td_check_activo').show();
+			jQuery('#td_text_activo').show();
+		}
+	});
+
+
 	function Validar(p) {
 		if (document.getElementById('codigo_actividad').value == '') {
 			alert('Debe ingresar un código.');
@@ -109,6 +129,19 @@ $Pagina->PrintTop($popup);
 				</td>
 				<td align="left">
 					<?php UtilesApp::CampoAsunto($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
+				</td>
+			</tr>
+			<tr>
+				<td align="right" id="td_text_activo">
+					<?php echo __('Activa'); ?>
+				</td>
+				<td align="left" id="td_check_activo">
+					<?php if ($Actividad->fields['activo'] == '1') {
+						$Habilitada = 'checked="checked"';
+					} else {
+						$Habilitada = '';
+					} ?>
+					<input type="checkbox" title="Al inactivar no sera listada en ingreso de horas" id="activo" name="activo" value="1" <?php echo $Habilitada ;?> onClick="CheckActivo();" >
 				</td>
 			</tr>
 		</table>

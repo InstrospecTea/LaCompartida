@@ -10160,7 +10160,7 @@ QUERY;
 		case 7.58:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'GlosaDetraccion', ' ', 'Glosa Detraccion', 'text', '4', '-1');";
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaTextoImpuesto', ' ', 'Texto Factura Impuesto', 'text', '4', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaTextoImpuesto', '', 'Texto Factura Impuesto', 'text', '4', '-1');";
 			ejecutar($queries, $dbh);
 			break;
 
@@ -10171,20 +10171,70 @@ QUERY;
 			$queries[] = "ALTER TABLE `cta_corriente` CHANGE COLUMN `descripcion` `descripcion` TEXT NULL DEFAULT NULL;";
 			ejecutar($queries, $dbh);
 			break;
+
 		case 7.60:
 			$queries = array();
 			if (!ExisteCampo('dte_estado', 'factura', $dbh) && !ExisteCampo('dte_estado_descripcion', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura`
-							ADD COLUMN `dte_estado` INT(3) NULL COMMENT 'Estado del documento [1: firmado, 2: error_firma, 3: proceso_anular, 4: anulado]',
+				$queries[] = "ALTER TABLE `factura`	ADD COLUMN `dte_estado` INT(3) NULL COMMENT 'Estado del documento [1: firmado, 2: error_firma, 3: proceso_anular, 4: anulado]',
 							ADD COLUMN `dte_estado_descripcion` VARCHAR(255) NULL COMMENT 'Descripción del estado o mensaje de error';";
-
-				$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrónico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
-				$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrónico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
 			}
+			$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrónico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
+			$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrónico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
+
 			ejecutar($queries, $dbh);
 			break;
 
 		case 7.61:
+			$queries = array();
+			$queries[] = "ALTER TABLE `actividad` ADD `activo` TINYINT( 1 ) NOT NULL DEFAULT '1';";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.62:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('LibrofrescoApi', 'http://lemontech.librofresco.com/api/v1', 'URL API de Librofresco', 'string', 2, -1);";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.63:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('RevHrsClienteFecha', 0, 'Glosa Detraccion', 'boolean', '6', '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.64:
+			$queries = array();
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `application` (
+					`id` int(3) NOT NULL,
+					`name` varchar(256) NOT NULL,
+					`app_key` varchar(256) NOT NULL,
+					`app_secret` varchar(256) NOT NULL,
+					PRIMARY KEY (`id`),
+					INDEX (`app_key`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (1, 'The Time Billing', 'ttb');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (2, 'TTB Webservice', 'ttb-ws');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (3, 'TTB iOS', 'ttb-ios');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (4, 'TTB Desktop', 'ttb-desktop');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (5, 'TTB Web Móvil', 'ttb-movil');";
+
+			if (!ExisteCampo('app_id', 'trabajo_historial', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' ";
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD INDEX (`app_id`)";
+			}
+			if (!ExisteCampo('tarifa_hh', 'trabajo_historial', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `tarifa_hh` double NULL";
+			}
+			if (!ExisteCampo('tarifa_hh_modificado', 'trabajo_historial', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `tarifa_hh_modificado` double NULL";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.65:
 			$queries = array();
 			$queries[] = "ALTER TABLE  `contrato` CHANGE  `factura_estado`  `factura_estado` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;";
 			$queries[] = "ALTER TABLE  `factura` ADD  `estado_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
@@ -10201,7 +10251,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.61;
+$max_update = 7.65;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

@@ -1,0 +1,93 @@
+.cont_tabla {
+	padding: 0 30px !important;
+}
+table {
+	width: 100%;
+}
+table th {
+	text-align: left;
+	background-color: #CCC;
+	padding: 5px;
+	font-size: 12px;
+}
+table tr.error {
+	background-color: #FFD2D4;
+}
+table td {
+	text-align: left;
+}
+table th.cliente {
+	width: 50%;
+}
+table td.usuarios {
+	width: 10%;
+	text-align: right;
+}
+table td.actualizar {
+	width: 10%;
+	text-align: center;
+}
+a.error {
+	color: red;
+}
+a.actualizado {
+	color: green;
+}
+a.actualizando {
+	color: blue;
+}
+div.error {
+	padding: 5px;
+	margin-top: 10px;
+	border: 1px solid red;
+	color: red;
+}
+div.actualizar_todos {
+	padding: 5px;
+	margin-top: 10px;
+	text-align: right;
+}
+a.actualizar_todos {
+	font-size: 12px;
+	font-weight: bold !important;
+}
+form label {
+	font-weight: bold !important;
+}
+form select {
+	width: 200px !important;
+}
+#modal_background {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	opacity: .70;
+	-webkit-opacity: .5;
+	-moz-opacity: .5;
+	filter: alpha(opacity=50);
+	z-index: 1000;
+}
+#modal_content {
+	background-color: #FFF;
+	border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	box-shadow: 0 0 20px 0 #222;
+	-webkit-box-shadow: 0 0 20px 0 #222;
+	-moz-box-shadow: 0 0 20px 0 #222;
+	display: none;
+	height: 100px;
+	left: 50%;
+	margin: -120px 0 0 -160px;
+	position: fixed;
+	top: 50%;
+	width: 300px;
+	z-index: 1000;
+}
+#modal_background.active, #modal_content.active {
+	display: block;
+}​

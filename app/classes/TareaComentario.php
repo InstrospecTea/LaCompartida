@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -31,7 +31,7 @@ class TareaComentario extends Objeto
 
 	function Eliminar()
 	{
-		
+
 			$query = "DELETE FROM tarea_comentario WHERE id_comentario='".$this->fields[id_comentario]."'";;
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			if($resp)
@@ -46,7 +46,7 @@ class TareaComentario extends Objeto
 						<tr>
 							<td class="tc_td_label_agregar">
 								<!--<img src="'.Conf::ImgDir().'/mas_16.gif"/>-->
-								<span>'.__('Agregar').'&nbsp;: 
+								<span>'.__('Agregar').'&nbsp;:
 							</td>
 							<td class="tc_td_btn_agregar" onclick="	$(\'AgregarAvance\').show()">
 								'.$this->AgregarAvance().'
@@ -61,7 +61,7 @@ class TareaComentario extends Objeto
 								</span>
 							</td>
 							<td class="tc_td_btn_agregar">
-								<span	class="tc_btn_agregar" 
+								<span	class="tc_btn_agregar"
 										onclick="	$(\'AgregarComentario\').show()"
 								>
 									'.__('Archivo').'
@@ -71,11 +71,11 @@ class TareaComentario extends Objeto
 							</td>
 						</tr>
 					</table>
-		';		
+		';
 		return $html;
 	}
 
-	//Imprime el Div de 'Agregar Avance' 
+	//Imprime el Div de 'Agregar Avance'
 	function AgregarAvance()
 	{
 				//Input de Duracion depende de la Configuracion
@@ -89,7 +89,7 @@ class TareaComentario extends Objeto
 					{
 						$input_duracion_avance = Html::PrintTime("duracion_avance",'',"",true);
 					}
-					
+
 				}
 				else if (method_exists('Conf','TipoIngresoHoras'))
 				{
@@ -121,7 +121,7 @@ class TareaComentario extends Objeto
 									</td>
 									<td align=left>
 										<input type='text' name='fecha_avance' id='fecha_avance' value='".date('d-m-Y')."'  size='11' maxlength='10' />
-										<img src='".Conf::ImgDir()."/calendar.gif' id='img_fecha_avance' style='cursor:pointer' /> 
+										<img src='".Conf::ImgDir()."/calendar.gif' id='img_fecha_avance' style='cursor:pointer' />
 									</td>
 								<tr>
 									<td align=right>
@@ -264,7 +264,7 @@ class TareaComentario extends Objeto
 		return $html;
 	}
 
-	
+
 	//Funciones Javascript para el funcionamiento de las Gestiones (Resumen y Tab de Ingreso en Bitácora)
 	function js_TareaComentario()
 	{
@@ -302,7 +302,7 @@ class TareaComentario extends Objeto
 							alert('Debe ingresar un comentario.')
 							$('comentario').focus();
 							return false;
-						}	
+						}
 						var c = $('comentario').value;
 						var url = 'ajax_tareas.php';
 
@@ -320,7 +320,7 @@ class TareaComentario extends Objeto
 							alert('Debe ingresar una descripción.');
 							$('descripcion_avance').focus();
 							return false;
-						}	
+						}
 						var descripcion_avance = $('descripcion_avance').value;
 
 						if(!$('duracion_avance').value)
@@ -328,7 +328,7 @@ class TareaComentario extends Objeto
 							alert('Debe ingresar una duración.');
 							$('duracion_avance').focus();
 							return false;
-						}							
+						}
 						".$revisa_duracion."
 
 						var descripcion_avance = $('descripcion_avance').value;
@@ -349,9 +349,9 @@ class TareaComentario extends Objeto
 						var par5 = '&fecha_avance=' + fecha_avance;
 						var par6 = ''; if(trabajo_avance)  par6 = '&trabajo_avance=' + trabajo_avance;
 						var par7 = ''; if(cobrable_avance) par7 = '&cobrable_avance=' + cobrable_avance;
-						var par8 = '&codigo_asunto=' + '".$this->codigo_asunto."'; 
+						var par8 = '&codigo_asunto=' + '".$this->codigo_asunto."';
 
-						
+
 						new Ajax.Request(url, {	asynchronous: true,parameters : 'accion=add_avance'+par1+par2+par3+par4+par5+par6+par7+par8, onComplete:  AvanceEnviado });
 					}
 
@@ -441,7 +441,7 @@ class TareaComentario extends Objeto
 						width:290px;
 						height:220px;
 					}
-					
+
 				";
 
 		$css = "<style>
@@ -459,7 +459,7 @@ class TareaComentario extends Objeto
 					{
 						width: 100%;
 					}
-					
+
 					#tc_tbl_agregar
 					{
 						border-spacing : 5px;
@@ -468,11 +468,11 @@ class TareaComentario extends Objeto
 
 					.tc_td_btn_agregar
 					{
-						font-size: 14px;	
+						font-size: 14px;
 						width: 95px;
 						text-align:center;
 						cursor:pointer;
-						
+
 						background-color:#CFB;
 					}
 
@@ -494,7 +494,32 @@ class TareaComentario extends Objeto
 		";
 		return $css;
 	}
-	
+
+
+	/**
+	* Busca los comentarios dada una $id_tarea
+	* @param id_usuario
+	* @param id_tarea
+	**/
+	function getComentarioQuery($id_usuario,$id_tarea){
+		$query = sprintf("SELECT SQL_CALC_FOUND_ROWS *, tarea_comentario.fecha_creacion AS fecha_creacion_comentario, CONCAT(usuario.apellido1,' ',usuario.nombre) as nombre_usuario, IF(tcu.id_comentario IS NULL,1,0) AS novedad FROM tarea_comentario JOIN usuario ON (tarea_comentario.id_usuario = usuario.id_usuario) LEFT JOIN tarea_comentario_usuario AS tcu ON (tcu.id_comentario = tarea_comentario.id_comentario AND tcu.id_usuario = '%d') WHERE id_tarea ='%d'",$id_usuario,$id_tarea);
+		return $query;
+	}
+
+
+	/**
+	* Inserta un archivo, utilizado para crear un registro sin data
+	* @param id_contrato
+	* @param archivo_nombre
+	* @param data_tipo
+	* @param descripcion
+	* @param archivo_s3
+	*/
+	function saveEmptyFile($id_contrato,$archivo_nombre,$data_tipo, $archivo_data, $descripcion,$archivo_s3){
+		$query = sprintf("INSERT INTO archivo (id_contrato, archivo_nombre, data_tipo, archivo_data, descripcion, archivo_s3,fecha_creacion,fecha_modificacion) VALUES(%d, '%s', '%s', '%s', '%s','%s',NOW(),NOW());",$id_contrato,$archivo_nombre,$data_tipo,$archivo_data,$descripcion,$archivo_s3);
+		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		return mysql_insert_id();
+	}
 } #end Class
 
 class ListaTareaComentarios extends Lista
