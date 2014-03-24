@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.1.3
+Lunes 24 de Marzo 2014
+* **Fixed:** [Agrega traducción de asunto](https://github.com/LemontechSA/ttb/pull/458)
+
 ## Hotfix: 14.1.2
 Viernes 21 de Marzo 2014
 * **Fixed:** [Revierte la funcionalidad de iniciales por username](https://github.com/LemontechSA/ttb/pull/457)
