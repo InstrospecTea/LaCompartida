@@ -1259,10 +1259,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						}
 
 					}
-
-					if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
-						$ws->writeNumber($filas, $col_valor_trabajo, $trabajo->fields['monto_cobrado'], $formato_moneda);
-					}
 					
 					$ws->write($filas, $col_id_trabajo, $trabajo->fields['id_trabajo'], $formato_normal);
 					$ws->write($filas, $col_id_abogado, $trabajo->fields['id_usuario'], $formato_normal);
