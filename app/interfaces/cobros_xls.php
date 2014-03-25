@@ -1082,7 +1082,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
 										DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
 										asunto.codigo_asunto_secundario as codigo_asunto_secundario,
-										prm_categoria_usuario.orden as orden
+										prm_categoria_usuario.orden as orden,
+										trabajo.monto_cobrado as monto_cobrado
 									FROM trabajo
 										JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 										LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
@@ -1177,7 +1178,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					} else {
 						$nombre = $trabajo->fields['nombre_usuario'];
 					}
-					
+
 					if ($cobro->fields['opc_ver_profesional_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
 						$nombreresumen = $trabajo->fields['username'];
 					} else {
@@ -1246,10 +1247,21 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->writeNumber($filas, $col_cobrable, $duracion_tarificable, $formato_tiempo);
 					$ws->writeNumber($filas, $col_tarifa_hh, $trabajo->fields['tarifa_hh'], $formato_moneda);
 					
-					if ($col_duracion_retainer) {
-						$ws->writeFormula($filas, $col_valor_trabajo, "=MAX(" . ($ingreso_via_decimales ? "" : "24*" ) . "($col_formula_duracion_cobrable" . ($filas + 1) . "-$col_formula_duracion_retainer" . ($filas + 1) . ")*$col_formula_tarifa_hh" . ($filas + 1) . ";0)", $formato_moneda);
+					// Solucion a evaluar ante problema con forma de cobro ESCALONADA
+					if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
+						$ws->writeNumber($filas, $col_valor_trabajo, $trabajo->fields['monto_cobrado'], $formato_moneda);
 					} else {
-						$ws->writeFormula($filas, $col_valor_trabajo, "=" . ($ingreso_via_decimales ? "" : "24*" ) . "$col_formula_duracion_cobrable" . ($filas + 1) . "*$col_formula_tarifa_hh" . ($filas + 1), $formato_moneda);
+
+						if ($col_duracion_retainer) {
+							$ws->writeFormula($filas, $col_valor_trabajo, "=MAX(" . ($ingreso_via_decimales ? "" : "24*" ) . "($col_formula_duracion_cobrable" . ($filas + 1) . "-$col_formula_duracion_retainer" . ($filas + 1) . ")*$col_formula_tarifa_hh" . ($filas + 1) . ";0)", $formato_moneda);
+						} else {
+							$ws->writeFormula($filas, $col_valor_trabajo, "=" . ($ingreso_via_decimales ? "" : "24*" ) . "$col_formula_duracion_cobrable" . ($filas + 1) . "*$col_formula_tarifa_hh" . ($filas + 1), $formato_moneda);
+						}
+
+					}
+
+					if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
+						$ws->writeNumber($filas, $col_valor_trabajo, $trabajo->fields['monto_cobrado'], $formato_moneda);
 					}
 					
 					$ws->write($filas, $col_id_trabajo, $trabajo->fields['id_trabajo'], $formato_normal);
