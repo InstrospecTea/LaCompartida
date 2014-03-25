@@ -426,11 +426,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
 
 	if ($orden == "") {
-		if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
-			$orden = " cliente.glosa_cliente ASC, trabajo.fecha ASC";
-		} else {
-			$orden = " trabajo.fecha ASC ";
-		}
+		$orden = " trabajo.fecha ASC";
 	}
 
 	if (stristr($orden, ".") === FALSE) {
@@ -438,7 +434,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	}
 
 	$x_pag = 15;
-	$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden);
+	$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden, "", false);
 	$b->mensaje_error_fecha = "N/A";
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('trabajos');
