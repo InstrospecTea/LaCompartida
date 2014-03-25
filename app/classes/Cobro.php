@@ -573,6 +573,14 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 								JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total
 							WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "'";
 			} else {
+				$query = "SELECT
+							ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales ) AS monto_pagado,
+							ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales ) AS monto_pago_menos_ncs
+						FROM documento
+						INNER JOIN neteo_documento nd ON nd.id_documento_cobro = documento.id_documento
+						INNER JOIN prm_moneda moneda ON moneda.id_moneda = '{$this->fields['opc_moneda_total']}'
+						WHERE documento.id_cobro = '{$this->fields['id_cobro']}' AND documento.tipo_doc = 'N'";
+				/*
 				$query = "SELECT ROUND( SUM(-1*docpago.monto), mon.cifras_decimales ), ROUND( SUM(-1*docpago.monto), mon.cifras_decimales )
 							FROM documento doccobro
 								join neteo_documento nd on doccobro.id_documento=nd.id_documento_cobro
@@ -580,6 +588,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 								JOIN prm_moneda as mon ON mon.id_moneda ='" . $this->fields['opc_moneda_total'] . "'
 
 							WHERE doccobro.id_cobro = '" . $this->fields['id_cobro'] . "' and doccobro.tipo_doc='N' AND docpago.tipo_doc != 'N' ";
+				 */
 			}
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($monto_pagado, $monto_pago_menos_ncs) = mysql_fetch_array($resp);
