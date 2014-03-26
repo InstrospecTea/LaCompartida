@@ -426,7 +426,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
 
 	if ($orden == "") {
-		$orden = " trabajo.fecha ASC";
+		if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
+			$orden = " cliente.glosa_cliente ASC, trabajo.fecha ASC";
+		} else {
+			$orden = " trabajo.fecha ASC";
+		}
 	}
 
 	if (stristr($orden, ".") === FALSE) {
