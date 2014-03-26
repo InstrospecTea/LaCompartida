@@ -10233,7 +10233,8 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
-	}
+
+		}
 }
 
 

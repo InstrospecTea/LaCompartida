@@ -833,7 +833,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		 *	Se saca la fecha inicial según el primer trabajo
 		 *	esto es especial para LyR
 		 */
-		
+
 		if ( $cobro->fields['fecha_ini'] == '0000-00-00' ) {
 			$query_fecha_primer_trabajo = "SELECT MIN( DATE( fecha ) ) FROM trabajo WHERE id_cobro ='".$cobro->fields['id_cobro']."'";
 			$resp_fecha_primer_trabajo = mysql_query($query_fecha_primer_trabajo, $sesion->dbh) or Utiles::errorSQL($query_fecha_primer_trabajo, __FILE__, __LINE__, $sesion->dbh);
@@ -1076,7 +1076,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
 										DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
 										asunto.codigo_asunto_secundario as codigo_asunto_secundario,
-										prm_categoria_usuario.orden as orden
+										prm_categoria_usuario.orden as orden,
+										trabajo.monto_cobrado as monto_cobrado
 									FROM trabajo
 										JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 										LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
@@ -1171,7 +1172,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					} else {
 						$nombre = $trabajo->fields['nombre_usuario'];
 					}
-					
+
 					if ($cobro->fields['opc_ver_profesional_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
 						$nombreresumen = $trabajo->fields['username'];
 					} else {
