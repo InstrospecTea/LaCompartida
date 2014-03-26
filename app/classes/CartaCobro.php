@@ -933,7 +933,7 @@ class CartaCobro extends NotaCobro {
 
 						}
 
-						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$detalle_cuenta_honorarios_primer_dia_mes .= ' (' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 						$detalle_cuenta_honorarios_primer_dia_mes .= __(', conforme a su equivalencia en pesos al primer día hábil del presente mes') . ')';
 					}
 				}
@@ -1735,7 +1735,7 @@ class CartaCobro extends NotaCobro {
 								$detalle_cuenta_honorarios_primer_dia_mes = __('. Esta cantidad corresponde a') . __(' (i) ') . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_sin_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							}
 						}
-						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$detalle_cuenta_honorarios_primer_dia_mes .= ' (' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 						$detalle_cuenta_honorarios_primer_dia_mes .= __(', conforme a su equivalencia en pesos al primer día hábil del presente mes') . ')';
 					}
 				}

@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 14.1.4
+Martes 25 de Marzo 2014
+* **Fixed:** [Agrega conf FechaDesdeCobroXls](https://github.com/LemontechSA/ttb/pull/462)
 
 ## Hotfix: 14.1.3
 Lunes 24 de Marzo 2014
