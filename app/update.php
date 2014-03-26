@@ -10234,13 +10234,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.65:
-			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'FechaDesdeCobroXls', '0', 'Nota de Cobro (XLS) mantenga la fecha inicial tal cual como era en GTD', 'boolean', '4', '210');";
-
-			ejecutar($queries, $dbh);
-			break;
-	}
+		}
 }
 
 
@@ -10249,7 +10243,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.65;
+$max_update = 7.64;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
