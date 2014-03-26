@@ -1241,17 +1241,10 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->writeNumber($filas, $col_cobrable, $duracion_tarificable, $formato_tiempo);
 					$ws->writeNumber($filas, $col_tarifa_hh, $trabajo->fields['tarifa_hh'], $formato_moneda);
 					
-					// Solucion a evaluar ante problema con forma de cobro ESCALONADA
-					if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
-						$ws->writeNumber($filas, $col_valor_trabajo, $trabajo->fields['monto_cobrado'], $formato_moneda);
+					if ($col_duracion_retainer) {
+						$ws->writeFormula($filas, $col_valor_trabajo, "=MAX(" . ($ingreso_via_decimales ? "" : "24*" ) . "($col_formula_duracion_cobrable" . ($filas + 1) . "-$col_formula_duracion_retainer" . ($filas + 1) . ")*$col_formula_tarifa_hh" . ($filas + 1) . ";0)", $formato_moneda);
 					} else {
-
-						if ($col_duracion_retainer) {
-							$ws->writeFormula($filas, $col_valor_trabajo, "=MAX(" . ($ingreso_via_decimales ? "" : "24*" ) . "($col_formula_duracion_cobrable" . ($filas + 1) . "-$col_formula_duracion_retainer" . ($filas + 1) . ")*$col_formula_tarifa_hh" . ($filas + 1) . ";0)", $formato_moneda);
-						} else {
-							$ws->writeFormula($filas, $col_valor_trabajo, "=" . ($ingreso_via_decimales ? "" : "24*" ) . "$col_formula_duracion_cobrable" . ($filas + 1) . "*$col_formula_tarifa_hh" . ($filas + 1), $formato_moneda);
-						}
-
+						$ws->writeFormula($filas, $col_valor_trabajo, "=" . ($ingreso_via_decimales ? "" : "24*" ) . "$col_formula_duracion_cobrable" . ($filas + 1) . "*$col_formula_tarifa_hh" . ($filas + 1), $formato_moneda);
 					}
 					
 					$ws->write($filas, $col_id_trabajo, $trabajo->fields['id_trabajo'], $formato_normal);
