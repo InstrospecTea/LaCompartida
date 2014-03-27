@@ -1,6 +1,6 @@
 # Changelog
 ## Hotfix: 14.1.5
-Martes 25 de Marzo 2014
+Jueves 27 de Marzo 2014
 * **Fixed:** [Correccion a calculo de columna total trabajos en cobros_xls forma cobro ESCALONADA](https://github.com/LemontechSA/ttb/pull/463)
 
 ## Hotfix: 14.1.4
