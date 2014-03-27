@@ -2103,6 +2103,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				$this->Edit("opc_ver_columna_cobrable", $contrato->fields['opc_ver_columna_cobrable']);
 
 				if ($fecha_ini != '' && $fecha_ini != '0000-00-00') {
+					$fecha_ini = Utiles::fecha2sql($fecha_ini);
 					$this->Edit('fecha_ini', $fecha_ini);
 				}
 
