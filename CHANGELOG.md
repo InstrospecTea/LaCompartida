@@ -1,7 +1,11 @@
 # Changelog
+## Hotfix: 14.1.5
+Jueves 27 de Marzo 2014
+* **Fixed:** [Correccion a calculo de columna total trabajos en cobros_xls forma cobro ESCALONADA](https://github.com/LemontechSA/ttb/pull/463)
+
 ## Hotfix: 14.1.4
 Martes 25 de Marzo 2014
-* **Fixed:** [Agrega conf FechaDesdeCobroXls](https://github.com/LemontechSA/ttb/pull/462)
+* **Fixed:** [Modificaciones a CartaCobro jdf](https://github.com/LemontechSA/ttb/pull/462)
 
 ## Hotfix: 14.1.3
 Lunes 24 de Marzo 2014
