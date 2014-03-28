@@ -1142,7 +1142,7 @@ class CartaCobro extends NotaCobro {
 			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
 			    }
 				
-				$html2 = str_replace('%documentos_relacionados%', $documentos_rel, $html2);
+				$html2 = str_replace('%doc_tributario%', $documentos_rel, $html2);
 				
 				if (count($this->asuntos) > 1) {
 					$html2 = str_replace('%detalle_mb%', __('%detalle_mb_asuntos%'), $html2);
@@ -1530,7 +1530,7 @@ class CartaCobro extends NotaCobro {
 			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
 			    }
 				
-				$html2 = str_replace('%documentos_relacionados%', $documentos_rel, $html2);
+				$html2 = str_replace('%doc_tributario%', $documentos_rel, $html2);
 				
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%n_num_factura%', 'N°' . $this->fields['documento'], $html2);
@@ -2148,7 +2148,7 @@ class CartaCobro extends NotaCobro {
 			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
 			    }
 				
-				$html2 = str_replace('%documentos_relacionados%', $documentos_rel, $html2);
+				$html2 = str_replace('%doc_tributario', $documentos_rel, $html2);
 				
 				$html2 = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
