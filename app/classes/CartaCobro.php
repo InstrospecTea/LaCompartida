@@ -2156,7 +2156,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%factura_desc_mta%', 'factura', $html2);
 				}
 				
-				$query = "SELECT CONCAT_WS (' ',prm_documento_legal.codigo,CONCAT_WS('-',CONCAT('00',factura.serie_documento_legal),factura.numero)) as documentos
+				$query = "SELECT factura.numero as documentos
 							FROM factura
 							LEFT JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
 								WHERE id_cobro = '".$this->fields['id_cobro']."' AND anulado != 1";
