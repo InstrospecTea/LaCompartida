@@ -2082,6 +2082,7 @@ class CartaCobro extends NotaCobro {
 
 				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
 				$html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
+				$html2 = str_replace('%contrato_solo_apellido_contacto%', $contrato->fields['apellido_contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%nombre_cliente_ucfirst%', ucfirst($glosa_cliente), $html2);
 				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
@@ -2131,19 +2132,17 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
 				$html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%num_letter_baz%', $this->fields['documento'], $html2);
-
-				if (Conf::GetConf($this->sesion, 'TituloContacto')) {
-					$html2 = str_replace('%sr%', __($contrato->fields['titulo_contacto']), $html2);
-				} else {
-					$html2 = str_replace('%sr%', __('Señor'), $html2);
-				}
-
 				$html2 = str_replace('%asunto_mb%', __('%asunto_mb%'), $html2);
 				$html2 = str_replace('%presente%', __('Presente'), $html2);
 
 				if ($contrato->fields['id_pais'] > 0) {
-					$query = "SELECT nombre FROM prm_pais
-										WHERE id_pais=" . $contrato->fields['id_pais'];
+
+					if ($lang == 'es') {
+						$nombre = 'nombre';
+					} else {
+						$nombre = 'nombre_en';
+					}
+					$query = "SELECT $nombre FROM prm_pais WHERE id_pais=" . $contrato->fields['id_pais'];
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($nombre_pais) = mysql_fetch_array($resp);
 					$html2 = str_replace('%nombre_pais%', $nombre_pais, $html2);
