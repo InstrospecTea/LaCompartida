@@ -2137,12 +2137,7 @@ class CartaCobro extends NotaCobro {
 
 				if ($contrato->fields['id_pais'] > 0) {
 
-					if ($lang == 'es') {
-						$nombre = 'nombre';
-					} else {
-						$nombre = 'nombre_en';
-					}
-					$query = "SELECT $nombre FROM prm_pais WHERE id_pais=" . $contrato->fields['id_pais'];
+					$query = "SELECT nombre FROM prm_pais WHERE id_pais=" . $contrato->fields['id_pais'];
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($nombre_pais) = mysql_fetch_array($resp);
 					$html2 = str_replace('%nombre_pais%', $nombre_pais, $html2);

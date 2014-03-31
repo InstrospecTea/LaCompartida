@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.1.6
 Lunes 31 de Marzo 2014
-* **Fixed:** [Nuevos elementos para Documentos PRWSLAWS](https://github.com/LemontechSA/ttb/pull/463)
+* **Fixed:** [Nuevos elementos para Documentos PRWSLAWS](https://github.com/LemontechSA/ttb/pull/465)
 
 ## Hotfix: 14.1.5
 Jueves 27 de Marzo 2014
