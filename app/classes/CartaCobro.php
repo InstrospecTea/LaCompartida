@@ -1988,15 +1988,12 @@ class CartaCobro extends NotaCobro {
 				$fecha_espanol_del = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B del %Y'));
 
 				// PRSLAWS %texto_segun_serie
-				$query = "SELECT serie_documento_legal FROM factura WHERE id_cobro = '".$this->fields['id_cobro']."' AND estado != 'ANULADA' ";
+				$query = "SELECT prm_codigo.glosa AS texto_segun_serie
+							FROM factura
+								LEFT JOIN prm_codigo ON factura.serie_documento_legal = prm_codigo.codigo
+									WHERE id_cobro = '".$this->fields['id_cobro']."' AND estado != 'ANULADA' ";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($serie_documento_legal,$id_documento_legal) = mysql_fetch_array($resp);
-
-				if ( $id_documento_legal == 1) {
-					$texto_segun_serie = 'Bogotá';	
-				} else {
-					$texto_segun_serie = 'Medellín';
-				}
+				list($texto_segun_serie) = mysql_fetch_array($resp);
 
 				$html2 = str_replace('%texto_segun_serie%', $texto_segun_serie, $html2);
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
