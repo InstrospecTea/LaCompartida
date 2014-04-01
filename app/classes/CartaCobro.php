@@ -1995,7 +1995,7 @@ class CartaCobro extends NotaCobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($texto_segun_serie) = mysql_fetch_array($resp);
 
-				$html2 = str_replace('%texto_segun_serie%', $texto_segun_serie, $html2);
+				$html2 = str_replace('%ciudad_segun_serie%', $texto_segun_serie, $html2);
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_especial2%', $fecha_lang_esp, $html2);
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
