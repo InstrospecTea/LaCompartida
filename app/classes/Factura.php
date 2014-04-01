@@ -753,7 +753,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%contrato_contacto%', strtoupper($contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%contrato_razon_social%', strtoupper($contrato_factura_razon_social), $html2);
 				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($factura_ciudad), $html2);
-				$html2 = str_replace('%contrato_nombre_pais%', strtoupper($nombre_pais), $html2);
+				$html2 = str_replace('%contrato_nombre_pais%', strtoupper(__($nombre_pais)), $html2);
 				$html2 = str_replace('%contrato_factura_telefono%', strtoupper($contrato_factura_telefono), $html2);
 				$html2 = str_replace('%factura_direccion_cliente%', strtoupper($this->fields['direccion_cliente']), $html2);
 
