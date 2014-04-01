@@ -7,21 +7,6 @@ define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-
 class Factura extends Objeto {
 
 	var $max_numero = 1000000000;
-	public static $estados_dte = array(
-		'Firmado' => 1,
-		'ErrorFirmado' => 2,
-		'ProcesoAnular' => 3,
-		'Anulado' => 4
-	);
-
-	public static $estados_dte_desc = array(
-		'Sin Estado',
-		'Documento Tributario Electrónico Firmado',
-		'Error al Firmar el Documento Tributario Electrónico',
-		'Documento Tributario Electrónico en proceso de Anulación',
-		'Documento Tributario Electrónico Anulado'
-	);
-
 	public static $llave_carga_masiva = CONCAT_FACTURA;
 	public static $campos_carga_masiva = array(
 		'id_documento_legal' => array(
@@ -418,24 +403,12 @@ class Factura extends Objeto {
 		return $saldo;
 	}
 
-	function ObtenerEnProcesoAnulacion() {
-		$estado_anular = Factura::$estados_dte['ProcesoAnular'];
-		$query = "SELECT f.*
-				FROM factura AS f
-				WHERE f.dte_estado = $estado_anular";
-		return new ListaFacturas($this->sesion, null, $query);
+	function FacturaElectronicaCreada() {
+		return !is_null($this->fields['dte_fecha_creacion']);
 	}
 
-	function DTEFirmado() {
-		return (!is_null($this->fields['dte_fecha_creacion']) && $this->fields['dte_estado'] == Factura::$estados_dte['Firmado']);
-	}
-
-	function DTEAnulado() {
-		return (!is_null($this->fields['dte_estado']) && $this->fields['dte_estado'] == Factura::$estados_dte['Anulado']);
-	}
-
-	function DTEProcesandoAnular() {
-		return (!is_null($this->fields['dte_estado']) && $this->fields['dte_estado'] == Factura::$estados_dte['ProcesoAnular']);
+	function FacturaElectronicaAnulada() {
+		return !is_null($this->fields['dte_fecha_anulacion']);
 	}
 
 	function Anulada() {
@@ -1454,28 +1427,29 @@ class Factura extends Objeto {
 				$html2 = str_replace('%monto_total_bruto_sin_gastos%', number_format($total, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_palabra%', $monto_total_palabra, $html2);
 
-				/* PARA EVITAR MODIFICAR CODIGO UTILIZADO POR OTROS CLIENTES ( UTILIZADO POR PRSLAWS ) */
+				/* PARA EVITAR MODIFICAR CODIGO UTILIZADO POR OTROS CLIENTES ( UTILIZADO POR PRSLAWS ) @arielrosver	*/
 
-				$query_datos_factura = "SELECT
-							  factura.subtotal,
-							  factura.subtotal_sin_descuento,
-							  factura.descuento_honorarios,
-							  factura.honorarios,
-							  factura.iva,
-							  factura.subtotal_gastos,
-							  factura.gastos,
-							  factura.id_moneda,
-							  descripcion,
-							  descripcion_subtotal_gastos,
-							  descripcion_subtotal_gastos_sin_impuesto
+				$query_datos_factura = "
+					SELECT
+						factura.subtotal,
+						factura.subtotal_sin_descuento,
+						factura.descuento_honorarios,
+						factura.honorarios,
+						factura.iva,
+						factura.subtotal_gastos,
+						factura.subtotal_gastos_sin_impuesto,
+						factura.id_moneda,
+						descripcion,
+						descripcion_subtotal_gastos,
+						descripcion_subtotal_gastos_sin_impuesto
 
-							FROM factura
-							WHERE id_cobro = '" . $this->fields["id_cobro"] . "' AND id_factura = '" . $this->fields["id_factura"] . "' ";
+						FROM factura
+						WHERE id_cobro = '" . $this->fields["id_cobro"] . "' AND id_factura = '" . $this->fields["id_factura"] . "' ";
 
 
 				$resp_datos_factura = mysql_query($query_datos_factura, $this->sesion->dbh) or Utiles::errorSQL($query_datos_factura, __FILE__, __LINE__, $this->sesion->dbh);
 
-				list( $subtotal_honorarios,
+				list( 	$subtotal_honorarios,
 						$subtotal_honorarios_sin_descuento,
 						$descuento_honorarios,
 						$honorarios,
@@ -1487,9 +1461,12 @@ class Factura extends Objeto {
 						$descripcion_subtotal_gastos,
 						$descripcion_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp_datos_factura);
 
+				//	DATOS ESPECIFICOS INCLUIDOS EN EL DETALLE DEL DOCUMENTO 
+				$html2 = str_replace('%text_emisor%', 'EMISOR', $html2);
+				$html2 = str_replace('%text_num_documento%', 'N° DOCUMENTO', $html2);
+				$html2 = str_replace('%text_ruc%', 'RUC', $html2);
 
-
-				// OBTENIENDO DATOS DE MONEDA PARA EL TIPO DE CAMBIO
+				// 	OBTENIENDO DATOS DE MONEDA PARA EL TIPO DE CAMBIO
 				$query_moneda_tipo_cambio = "SELECT prm_moneda.simbolo, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales, prm_moneda.glosa_moneda_plural
 								FROM cobro_moneda
 								 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro_moneda.id_moneda
@@ -1499,7 +1476,7 @@ class Factura extends Objeto {
 				list( $simbolo_moneda, $tipo_cambio_moneda, $tipo_cambio_cifras_decimales, $tipo_cambio_glosa_moneda_plural) = mysql_fetch_array($resp_tipo_cambio);
 
 
-				// OBTIENE MONEDA DE FACTURACION
+				// 	OBTENIENDO MONEDA DE FACTURACION
 				$query_moneda_facturacion = "SELECT id_moneda, opc_moneda_total FROM cobro WHERE id_cobro = '" . $this->fields["id_cobro"] . "' ";
 
 				$resp_moneda_base = mysql_query($query_moneda_facturacion, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_facturacion, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1614,6 +1591,26 @@ class Factura extends Objeto {
 
 					$html2 = str_replace('%factura_descripcion_gastos%', $descripcion_gastos, $html2);
 					$html2 = str_replace('%xmonto_gastos%', number_format($factura_monto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
+					//	DESCRIPCION DEL GASTO EN FACTURA
+					$query_detalle_gastos = "
+						SELECT 
+							cta_corriente.descripcion,
+							cta_corriente.numero_documento,
+							prm_proveedor.glosa,
+							prm_proveedor.rut
+						FROM cta_corriente
+						LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+						WHERE id_cobro = '".$cobro->fields['id_cobro']."'";
+
+					$resp_detalle_gastos = mysql_query($query_detalle_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_detalle_gastos, __FILE__, __LINE__, $this->sesion->dbh);
+					list( $descripcion_del_gasto, $numero_gasto, $nombre_proveedor, $rut_proveedor ) = mysql_fetch_array($resp_detalle_gastos);
+
+					$html2 = str_replace('%descripcion_del_gasto%', $descripcion_del_gasto, $html2);
+					$html2 = str_replace('%numero_gasto%', $numero_gasto, $html2);
+					$html2 = str_replace('%nombre_proveedor%', $nombre_proveedor, $html2);
+					$html2 = str_replace('%rut_proveedor%', $rut_proveedor, $html2);
+
 				}
 
 				// IMPUESTO
@@ -1666,7 +1663,13 @@ class Factura extends Objeto {
 					$html2 = str_replace('%factura_tipo_cambio_impuesto%', $factura_tipo_cambio_impuesto, $html2);
 				}
 
-				// TOTAL
+				//	SUBTOTAL
+
+				$factura_monto_subtotal = $factura_monto_honorarios + $factura_monto_gastos;
+
+				$html2 = str_replace('%xmonto_subtotal%', number_format($factura_monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
+				// 	TOTAL
 
 				$factura_monto_total = $factura_monto_honorarios + $factura_monto_gastos + $factura_monto_impuesto;
 
