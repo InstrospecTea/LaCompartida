@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
+error_reporting(E_ERROR);
 $correo = '';
 $correofinal = '';
 $arreglo = array();
-$DDBarray = array();
 
 $errores = array();
 
@@ -174,12 +174,10 @@ foreach ($scan_response->body->Items as $registro) {
 		foreach (get_object_vars($objeto) as $tipo => $valor)
 			$arreglo[$i][$etiqueta] = $valor;
 	}
-	$apps[$arreglo[$i]['subdominiosubdir']] = $arreglo[$i];
 }
 $jsonscan = json_encode($arreglo);
 
-$S3sdk->create_object('TTBfiles', 'dynamo2.json', array('body' => $jsonscan)
-);
+$S3sdk->create_object('TTBfiles', 'dynamo2.json', array('body' => $jsonscan));
 
 
 file_put_contents('/var/www/backup_svn/dynamo2.json', $jsonscan);
@@ -251,7 +249,7 @@ foreach ($arreglo as $sitio) {
 			loguear("dumpeando a $path");
 			file_put_contents('/var/www/error_logs/backup_mysqlerror.txt', '');
 
-			$extra_cmd = in_array($db, array('aym_timetracking', 'bmaj_timetracking')) ? " --ignore-table=$db.log_trabajo --ignore-table=$db.tramite " : "";
+			$extra_cmd = in_array($db, array('aym_timetracking', 'bmaj_timetracking')) ? " --ignore-table=$db.log_trabajo --ignore-table=$db.tramite " : '';
 
 			$sentencia = "mysqldump $extra_cmd --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db 2>/var/www/error_logs/backup_mysqlerror.txt | gzip  > $path";
 			//echo $sentencia;
@@ -268,7 +266,7 @@ foreach ($arreglo as $sitio) {
 				continue;
 			}
 
-			loguear("copiando a S3:  $path");
+			loguear("copiando a S3: $path");
 			try {
 				$crearobject = $S3sdk->create_object($bucketname, $filebkp, array('fileUpload' => $path));
 				$db_updater->update('update_db', $sitio['subdominiosubdir'], $sitio['update_db']);
@@ -284,6 +282,7 @@ foreach ($arreglo as $sitio) {
 				$errores[] = loguear("error al borrar el comprimido temporal $path");
 			}
 		}
+
 		$db_updater->update('update_db', $sitio['subdominiosubdir'], $sitio['update_db']);
 
 		/*		 * ********* CLONANDO ***************** */
@@ -303,7 +302,6 @@ foreach ($arreglo as $sitio) {
 				$errores[] = loguear("no se puede clonar " . $dbclonarray['dbhost'] . ".$db sobre si misma");
 			} else {
 				$sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db 2>/var/www/error_logs/backup_mysqlerror.txt |  mysql --host=" . $dbclonarray['dbhost'] . "   --user=" . $sitio['dbuser'] . "   --password=" . $sitio['dbpass'] . "  " . $dbclonarray['dbname'];
-				//echo $sentencia;
 				exec(" $sentencia ", $out, $ret);
 				$ret = file_get_contents('/var/www/error_logs/backup_mysqlerror.txt');
 				if ($ret) {
@@ -312,32 +310,23 @@ foreach ($arreglo as $sitio) {
 			}
 		}
 
-		loguear("Listando contenidos del bucket $bucketname");
+		loguear("Listando contenidos de {$bucketname}/{$subdominiosubdir[0]}");
 		$respaldos = array();
 		$respaldosborrar = array();
-		$all = $S3sdk->get_object_list($bucketname);
-		$prefixes = array();
-		foreach ($all as $file) {
-			$prefixes[] = preg_replace('/^([^\/]+\/).*/', '\1', $file);
-		}
-		$prefixes = array_unique($prefixes);
-		sort($prefixes);
-		foreach ($prefixes as $prefix) {
-			if (($contents = $S3sdk->list_objects($bucketname, array('prefix' => $prefix))) !== false) {
-				foreach ($contents->body as $object) {
-					$dropname = $object->Key;
-					if ($dropname != '') {
-						if (preg_match("/\d{4}-\d{2}-\d{2}/", $dropname, $match)) {
-							$fechaviejo = $match[0];
-							if (fechaBorrable($fechaviejo, $duracion)) {
-								$S3sdk->delete_object($bucketname, $dropname);
-								$respaldosborrar[] = $dropname;
-							} else if ($object->Size < 500) {
-								$S3sdk->delete_object($bucketname, $dropname);
-								$respaldosborrar[] = $dropname;
-							} else {
-								$respaldos[] = $dropname;
-							}
+		if (($contents = $S3sdk->list_objects($bucketname, array('prefix' => $subdominiosubdir[0]))) !== false) {
+			foreach ($contents->body as $object) {
+				$dropname = $object->Key;
+				if ($dropname != '') {
+					if (preg_match("/\d{4}-\d{2}-\d{2}/", $dropname, $match)) {
+						$fechaviejo = $match[0];
+						if (fechaBorrable($fechaviejo, $duracion)) {
+							$S3sdk->delete_object($bucketname, $dropname);
+							$respaldosborrar[] = $dropname;
+						} else if ($object->Size < 500) {
+							$S3sdk->delete_object($bucketname, $dropname);
+							$respaldosborrar[] = $dropname;
+						} else {
+							$respaldos[] = $dropname;
 						}
 					}
 				}
@@ -345,9 +334,10 @@ foreach ($arreglo as $sitio) {
 		}
 
 		if (count($respaldosborrar) > 0) {
-			loguear("Eliminando " . count($respaldosborrar) . "respaldos viejos o fallados del bucket $bucketname");
+			loguear("Eliminando " . count($respaldosborrar) . "respaldos viejos o fallados de $bucketname/$subdominiosubdir[0]}");
+			loguear(implode("<br/>\n ", $respaldosborrar));
 		}
-		loguear(implode("\n ", $respaldos));
+
 		$espacio = disk_free_space($conf->dir_temp) / (1024 * 1024 * 1024);
 		if ($espacio < $conf->alerta_disco_base) {
 			$errores['espacio_base'] = loguear("quedan solo $espacio GB libres en " . $conf->dir_temp);
@@ -356,8 +346,8 @@ foreach ($arreglo as $sitio) {
 		}
 
 		//borro los backups antiguos q no sean de esta semana o de los ultimos 5 viernes
-		loguear("borrando backups antiguos...");
 		$dir = rtrim($sitio['backupdir'], '/');
+		loguear("borrando backups del directorio {$dir}...");
 		if (file_exists($dir)) {
 			$viejos = glob($dir . "/" . $db . "_*.sql.tar.gz");
 			foreach ($viejos as $viejo) {
@@ -385,6 +375,7 @@ foreach ($arreglo as $sitio) {
 			}
 		}
 	}
+	echo "<br/>\n";
 } //endforeach
 
 $espacio_disco_local = disk_free_space($conf->dir_temp) / (1024 * 1024 * 1024);
@@ -404,6 +395,4 @@ if (!empty($errores)) {
 	}
 }
 
-loguear("fin");
-
-
+loguear('fin');
