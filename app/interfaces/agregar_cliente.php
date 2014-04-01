@@ -85,7 +85,6 @@ if ($opcion == "guardar") {
 		}
 	}
 
-
 	if (Conf::GetConf($sesion, 'EncargadoSecundario')) {
 		$id_usuario_secundario = (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : 0;
 	}
@@ -111,13 +110,11 @@ if ($opcion == "guardar") {
 		if (empty($factura_direccion)) {
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		}
-		if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
-			if (empty($factura_ciudad))
-				$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
+		if (empty($factura_ciudad)) {
+			$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
 		}
-		if (UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
-			if (empty($factura_comuna))
-				$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
+		if (empty($factura_comuna)) {
+			$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
 		}
 		if (empty($factura_telefono)) {
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
@@ -262,7 +259,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 
 		
-		if($cliente->Write()) {
+		if ($cliente->Write()) {
 
 			//	Segmento : "Contrato";
 			$contrato->Load($cliente->fields['id_contrato']);
@@ -474,7 +471,7 @@ $pagina->PrintTop();
 	<input type="hidden" name="id_contrato" value="<?php echo $contrato->fields['id_contrato'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_cliente" />
 
-	<fieldset   id="formularioinicial" class="tb_base" style="border: 1px solid #BDBDBD;">
+	<fieldset id="formularioinicial" class="tb_base" style="border: 1px solid #BDBDBD;">
 
 		<legend><?php echo __('Agregar Cliente') ?>&nbsp;&nbsp;<?php echo $cliente->fields['activo'] == 0 && $id_cliente ? '<span style="color:#FF0000; font-size:10px">(' . __('Este cliente está Inactivo') . ')</span>' : '' ?></legend>
 
@@ -759,24 +756,26 @@ $pagina->PrintTop();
 			var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato;
 		}
 
-		jQuery.get(url_ajax, function(response) {
-
-			if (response == 0) {
-				if (campo == 'glosa') {
-					glosa_cliente_unica = true;
-				} else if (campo == 'rut') {
-					rut_cliente_unica = true;
-				}
-			} else if (response == 1) {
-				if (campo == 'glosa') {
-					glosa_cliente_unica = false;
-				} else if (campo == 'rut') {
-					rut_cliente_unica = false;
+		jQuery.ajax(url_ajax, {
+			async: false,
+			success: function(response) {
+				if (response == 0) {
+					if (campo == 'glosa') {
+						glosa_cliente_unica = true;
+					} else if (campo == 'rut') {
+						rut_cliente_unica = true;
+					}
+				} else if (response == 1) {
+					if (campo == 'glosa') {
+						glosa_cliente_unica = false;
+					} else if (campo == 'rut') {
+						rut_cliente_unica = false;
+					}
 				}
 			}
-			return response;
 		});
 
+		return true;
 	}
 
 	function Validar(form) {
@@ -1007,7 +1006,7 @@ $pagina->PrintTop();
 		if (form.factura_rut.value) {
 			validarUnicoCliente(form.factura_rut.value, 'rut', form.id_cliente.value);
 			if (!rut_cliente_unica) {
-				if (!confirm(("<?php echo __('El rut del cliente ya existe, ¿desea continuar de todas formas?') ?>"))) {
+				if (!confirm(("El <?php echo __('ROL/RUT'); ?> del cliente ya existe, ¿desea continuar de todas formas?"))) {
 					form.factura_rut.focus();
 					return false;
 				}
