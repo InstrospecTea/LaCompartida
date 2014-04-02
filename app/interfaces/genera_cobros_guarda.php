@@ -21,7 +21,9 @@ if ((!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0 ) && isset($_
 if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
 	$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) FROM cobro WHERE id_contrato = '" . $id_contrato . "'";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	list($fecha_ini) = mysql_fetch_array($resp);
+	list($fecha_ini_cobro) = mysql_fetch_array($resp);
+} else {
+	$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
 }
 
 //si no me llega uno, es 0
@@ -49,8 +51,6 @@ if ($individual) {
 		if (empty($id_cobro_pendiente)) {
 			$id_cobro_pendiente = '';
 		}
-
-		$fecha_ini_cobro = empty($fecha_ini) ? "" : Utiles::fecha2sql($fecha_ini); // Comentado por SM 28.01.2011 el conf nunca se usa
 
 		$id = $Cobro->PrepararCobro(
 				$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios
