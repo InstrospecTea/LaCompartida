@@ -1990,12 +1990,14 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 				$moneda->Load($contrato->fields['id_moneda']);
 
-				if (( ( ( method_exists('Conf', 'LoginDesdeSitio') && Conf::LoginDesdeSitio() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'LoginDesdeSitio') ) ) && !$this->sesion->usuario->fields['id_usuario']) || !$this->sesion->usuario->fields['id_usuario']) {
-					if (( method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'TieneTablaVisitante') )) {
+				if ( (Conf::GetConf($this->sesion, 'LoginDesdeSitio') && !$this->sesion->usuario->fields['id_usuario']) || !$this->sesion->usuario->fields['id_usuario']) {
+					
+					if ( Conf::GetConf($this->sesion, 'TieneTablaVisitante') ) {
 						$query = "SELECT id_usuario FROM usuario WHERE id_visitante = 0 ORDER BY id_usuario LIMIT 1";
 					} else {
 						$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario LIMIT 1";
 					}
+					
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($id_usuario_cobro) = mysql_fetch_array($resp);
 
@@ -2003,6 +2005,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				} else {
 					$this->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				}
+				
 				$this->Edit('codigo_cliente', $contrato->fields['codigo_cliente']);
 				$this->Edit('id_contrato', $contrato->fields['id_contrato']);
 				$this->Edit('id_moneda', $contrato->fields['id_moneda']);
@@ -2046,6 +2049,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 
 				$this->Edit('retainer_horas', $contrato->fields['retainer_horas']);
 				$this->Edit('retainer_usuarios', $contrato->fields['retainer_usuarios']);
+				
 				#Opciones
 				$this->Edit('id_carta', $contrato->fields['id_carta']);
 				$this->Edit('id_formato', $contrato->fields['id_formato']);
@@ -2084,17 +2088,17 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				}
 
 				$this->Edit("opc_moneda_total", $moneda_cobro_configurada);
-				/* */
-
 				$this->Edit("opc_ver_asuntos_separados", $contrato->fields['opc_ver_asuntos_separados']);
 				$this->Edit("opc_ver_horas_trabajadas", $contrato->fields['opc_ver_horas_trabajadas']);
 				$this->Edit("opc_ver_cobrable", $contrato->fields['opc_ver_cobrable']);
+				
 				// Guardamos datos de la moneda base
 				$this->Edit('id_moneda_base', $moneda_base['id_moneda']);
 				$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']);
 				$this->Edit('etapa_cobro', '4');
 				$this->Edit('codigo_idioma', $contrato->fields['codigo_idioma'] != '' ? $contrato->fields['codigo_idioma'] : 'es');
 				$this->Edit('id_proceso', $id_proceso);
+
 				#descuento
 				$this->Edit("tipo_descuento", $contrato->fields['tipo_descuento']);
 				$this->Edit("descuento", $contrato->fields['descuento']);
@@ -2102,8 +2106,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				$this->Edit("id_moneda_monto", $contrato->fields['id_moneda_monto']);
 				$this->Edit("opc_ver_columna_cobrable", $contrato->fields['opc_ver_columna_cobrable']);
 
-				if ($fecha_ini != '' && $fecha_ini != '0000-00-00') {
-					$fecha_ini = Utiles::fecha2sql($fecha_ini);
+				if ($fecha_ini != '') {
 					$this->Edit('fecha_ini', $fecha_ini);
 				}
 
