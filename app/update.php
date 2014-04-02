@@ -10236,8 +10236,8 @@ QUERY;
 
 		case 7.65:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TopeUsuariosProfesionales', 0, 'Tope máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TopeUsuariosAdministradores', 0, 'Tope máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
 			ejecutar($queries, $dbh);
 			break;
 
