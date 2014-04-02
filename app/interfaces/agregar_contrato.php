@@ -1835,7 +1835,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	?>
 								</td>
 								<td align="left" colspan="3">
-									<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" onblur="<?php echo $setformato ?>validarUnicoCliente(this.value,'rut');" />
+									<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" />
 								</td>
 							</tr>
 							<tr>
