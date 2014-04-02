@@ -63,7 +63,7 @@ if ($opc == 'buscar') {
 	$where = 1;
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')  && !empty($numero_factura)) {
+	} else if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		//$where .= " AND concat(cobro.documento, ',') LIKE '%$tipo_documento_legal $factura %' ";
@@ -137,7 +137,7 @@ if ($opc == 'buscar') {
 		$documentof = " cobro.documento ";
 	}
 	if (isset($_POST['tienehonorario']))
-    	$where.= " AND (
+		$where.= " AND (
 			        SELECT count(id_tramite)
 			        FROM  `trabajo` AS t1
 			        WHERE t1.id_cobro = cobro.id_cobro
@@ -241,7 +241,7 @@ if ($opc == 'buscar') {
                                                         WHERE $where
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
-	$orden = ' cobro.id_contrato,cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente';
+	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
 
 	$b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 	$b->mensaje_error_fecha = "N/A";
@@ -353,19 +353,19 @@ if ($opc == 'buscar') {
 		$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['cobro_monto'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		if (!empty($cobro->fields['impuesto'])) {
 			$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto_subtotal'] - $cobro->fields['descuento'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) .
-					" + $txt_iva ($honorarios)";
+				" + $txt_iva ($honorarios)";
 		}
 
 
 		$texto_honorarios = "$honorarios por <a href=\"horas.php?from=reporte&id_cobro={$cobro->fields['id_cobro']}\">" .
-				number_format($total_horas, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs.</a> ';
+			number_format($total_horas, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs.</a> ';
 
 
 		$gastos = $cobro->fields['simbolo_moneda_total'] . ' ' . number_format($cobro->fields['monto_gastos'], $cobro->fields['cifras_decimales_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
 		if (!empty($cobro->fields['impuesto_gastos'])) {
 			$gastos = $cobro->fields['simbolo_moneda_total'] . ' ' . number_format($cobro->fields['subtotal_gastos'], $cobro->fields['cifras_decimales_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) .
-					" + $txt_iva ($gastos)";
+				" + $txt_iva ($gastos)";
 		}
 		$texto_gastos = "$gastos en gastos ";
 
@@ -394,7 +394,7 @@ if ($opc == 'buscar') {
 		}
 
 		$html .= "</td>";
-		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') ) {
+		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
@@ -526,17 +526,17 @@ if ($_GET['buscar'] == 1)
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
 			Dialog.confirm(text_window,
-					{
-						top: 150, left: 290, width: 400, okLabel: "<?php echo __('Continuar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
-						id: "myDialogId",
-						cancel: function(win) {
-							return false;
-						},
-						ok: function(win) {
-							nuevaVentana('Editar_Contrato', 1050, 700, 'cobros6.php?id_cobro=' + id_cobro + '&popup=1&contitulo=true');
-							return true;
-						}
-					});
+							{
+								top: 150, left: 290, width: 400, okLabel: "<?php echo __('Continuar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
+								id: "myDialogId",
+								cancel: function(win) {
+									return false;
+								},
+								ok: function(win) {
+									nuevaVentana('Editar_Contrato', 1050, 700, 'cobros6.php?id_cobro=' + id_cobro + '&popup=1&contitulo=true');
+									return true;
+								}
+							});
 		}
 		else if (estado == 'CREADO' || estado == 'EN REVISION')
 		{
@@ -545,17 +545,17 @@ if ($_GET['buscar'] == 1)
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
 			Dialog.confirm(text_window,
-					{
-						top: 150, left: 290, width: 400, okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
-						id: "myDialogId",
-						cancel: function(win) {
-							return false;
-						},
-						ok: function(win) {
-							DeleteCobro(id_cobro);
-							return true;
-						}
-					});
+							{
+								top: 150, left: 290, width: 400, okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
+								id: "myDialogId",
+								cancel: function(win) {
+									return false;
+								},
+								ok: function(win) {
+									DeleteCobro(id_cobro);
+									return true;
+								}
+							});
 		}
 		else
 			return false;
@@ -709,31 +709,31 @@ else
 				<td align=right width='30%'><b><?php echo __('Cobro') ?></b></td>
 				<td colspan=2 align=left>
 					<input onkeydown="if (event.keyCode == 13)
-			GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
+								GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13)
-			GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-					<?php if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
+								GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
+								 <?php if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
 						&nbsp;&nbsp;<b><?php echo __('N° Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13)
-				GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
-					<?php } ?>
+									GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
+								 <?php } ?>
 				</td>
 			</tr>
-					<?php
-					if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-						?>
+			<?php
+			if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+				?>
 				<tr>
 					<td align=right width='30%'><b><?php echo __('Documento legal') ?></b></td>
 					<td colspan=2 align=left>
-	<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal', $tipo_documento_legal, '', __('Cualquiera'), 100); ?>
-				<?php echo Html::SelectQuery($sesion, $series_documento->SeriesQuery(), "serie", $serie ? str_pad($serie, 3, '0', STR_PAD_LEFT) : __('Serie'), '', __('Serie'), 60); ?>
+						<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal', $tipo_documento_legal, '', __('Cualquiera'), 100); ?>
+						<?php echo Html::SelectQuery($sesion, $series_documento->SeriesQuery(), "serie", $serie ? str_pad($serie, 3, '0', STR_PAD_LEFT) : __('Serie'), '', __('Serie'), 60); ?>
 						<input onkeydown="if (event.keyCode == 13)
-				GeneraCobros(this.form, '', false)" type="text" size="6" name="factura" id="factura" value="<?php echo $factura ?>">
+									GeneraCobros(this.form, '', false)" type="text" size="6" name="factura" id="factura" value="<?php echo $factura ?>">
 					</td>
 				</tr>
-	<?php
-}
-?>
+				<?php
+			}
+			?>
 			<tbody id="selectclienteasunto">
 				<tr >
 					<td align="right" width='30%'><?php echo '<b>' . __('Nombre Cliente') . '</b>'; ?> </td>
@@ -749,7 +749,7 @@ else
 				<td align=right><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
 				<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
 			</tr>
-<?php if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+			<?php if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
 				<tr>
 					<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
 					<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
@@ -757,7 +757,8 @@ else
 						<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
 					</td>
 				</tr>
-			<?php }
+			<?php
+			}
 
 			($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_seguimiento_cobro') : false;
 			?>
@@ -765,7 +766,7 @@ else
 			<tr>
 				<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 				<td colspan=2 align=left>
-			<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), '210') ?>
+<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), '210') ?>
 				</td>
 			</tr>
 			<tr>
@@ -783,40 +784,40 @@ else
 				<td align=right><input type=checkbox name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
 				<td align=left colspan=2>
 					<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><?php echo __('Otro rango') ?></span>
-<?php
-$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
-?>
+					<?php
+					$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
+					?>
 					<div id=periodo style='display:<?php echo!$rango ? 'inline' : 'none' ?>;'>
 
-					<?php
-					echo Html::SelectArray(array(
-						array('1', __('Enero')),
-						array('2', __('Febrero')),
-						array('3', __('Marzo')),
-						array('4', __('Abril')),
-						array('5', __('Mayo')),
-						array('6', __('Junio')),
-						array('7', __('Julio')),
-						array('8', __('Agosto')),
-						array('9', __('Septiembre')),
-						array('10', __('Octubre')),
-						array('11', __('Noviembre')),
-						array('12', __('Diciembre')),
+						<?php
+						echo Html::SelectArray(array(
+							array('1', __('Enero')),
+							array('2', __('Febrero')),
+							array('3', __('Marzo')),
+							array('4', __('Abril')),
+							array('5', __('Mayo')),
+							array('6', __('Junio')),
+							array('7', __('Julio')),
+							array('8', __('Agosto')),
+							array('9', __('Septiembre')),
+							array('10', __('Octubre')),
+							array('11', __('Noviembre')),
+							array('12', __('Diciembre')),
 							)
 							, 'fecha_mes', $fecha_mes, '', __('Mes'), '80px');
 
-					if (!$fecha_anio)
-						$fecha_anio = date('Y');
-					?>
+						if (!$fecha_anio)
+							$fecha_anio = date('Y');
+						?>
 						<select name="fecha_anio" id='fecha_anio' style='width:55px'>
-						<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
+							<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
 								<option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
-						<?php } ?>
+<?php } ?>
 						</select>
 					</div>
 					<br>
 					<div id=periodo_rango style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
-							<?php echo __('Fecha desde') ?>:
+<?php echo __('Fecha desde') ?>:
 						<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
 						<br />
 <?php echo __('Fecha hasta') ?>:&nbsp;
