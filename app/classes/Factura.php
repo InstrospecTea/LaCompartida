@@ -2090,6 +2090,31 @@ class Factura extends Objeto {
 		$writer->save(__('Reg_Venta'));
 	}
 
+	public function SaldoReporte($orden, $where, $numero, $fecha1, $fecha2
+	, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+	, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+	, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
+
+		// Obtengo la query del reporte
+		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
+
+		// Cambio los select para obtener los saldos de las facturas separados por moneda
+		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, -1 * SUM(cta_cte_fact_mvto.saldo) AS saldo";
+		$query = preg_replace('/(^\s*SELECT\s)[\s\S]+?(\sFROM\s)/mi', "$1 $select $2", $query);
+		$query = preg_replace('/\sORDER BY.+|\sLIMIT.+/mi', '', $query);
+		$query = preg_replace('/\sGROUP BY.+/mi', ' GROUP BY factura.id_moneda ', $query);
+
+		$statement = $this->sesion->pdodbh->prepare($query);
+		$statement->execute();
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 	, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 	, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
