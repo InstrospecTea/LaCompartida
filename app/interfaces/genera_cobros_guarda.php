@@ -23,7 +23,9 @@ if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	list($fecha_ini_cobro) = mysql_fetch_array($resp);
 } else {
-	$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
+	if (!empty($fecha_ini)) {
+		$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
+	}
 }
 
 //si no me llega uno, es 0
@@ -81,7 +83,7 @@ if ($codigo_asunto && !$id_contrato) {
 
 ####### WHERE SQL ########
 if ($print || $emitir) {
-	
+
 	$where = 1;
 	$join_cobro_cliente = "";
 	if ($activo) {
@@ -135,7 +137,7 @@ if ($print || $emitir) {
 	$url = "genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 			"&fecha_fin=$fecha_fin&opc=buscar&rango=$rango&fecha_anio=$fecha_anio&fecha_mes=$fecha_mes&fecha_periodo_ini=$fecha_periodo_ini" .
 			"&fecha_periodo_fin=$fecha_periodo_fin&usar_periodo=$usar_periodo&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto";
-	
+
 }
 ####### END #########
 # IMPRESION
@@ -146,7 +148,7 @@ if ($print) {
 	$mincarta = $mincartas[0];
 
 	$query = "
-		SELECT 
+		SELECT
 			cobro.id_cobro,
 			cobro.id_usuario,
 			cobro.codigo_cliente,
@@ -230,12 +232,12 @@ if ($print) {
 	if (is_object($Pagina)) {
 		$Pagina->Redirect($url);
 	}
-	
+
 } else if ($emitir) {
 
 	$Cobro = new Cobro($Sesion);
 	$query = "
-		SELECT 
+		SELECT
 			cobro.id_cobro,
 			cobro.id_usuario,
 			cobro.codigo_cliente,
@@ -248,9 +250,9 @@ if ($print) {
 			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 				WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' )";
-	
+
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	
+
 	while ($cob = mysql_fetch_array($resp)) {
 		set_time_limit(100);
 		if ($Cobro->Load($cob['id_cobro'])) {
@@ -267,9 +269,9 @@ if ($print) {
 	}
 	$url .= '&cobros_emitidos=1';
 	$Pagina->Redirect($url);
-	
+
 } else { #Creación masiva de cobros
-	
+
 	$where = 1;
 	$join = "";
 	$newcobro = array();
@@ -296,11 +298,11 @@ if ($print) {
 	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	}
-	
+
 	$join .= "LEFT JOIN cobro_pendiente ON ( cobro_pendiente.id_contrato=contrato.id_contrato AND cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.fecha_cobro >= NOW() )";
-	
+
 	$where .= " AND cobro_pendiente.id_cobro_pendiente IS NULL ";
-	
+
 	$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato,cliente.codigo_cliente, contrato.id_moneda, contrato.forma_cobro, contrato.monto, contrato.retainer_horas, contrato.id_moneda, contrato.separar_liquidaciones
 				FROM contrato
 				$join
