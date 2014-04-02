@@ -10234,6 +10234,13 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.65:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TopeUsuariosProfesionales', 0, 'Tope máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TopeUsuariosAdministradores', 0, 'Tope máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
+			ejecutar($queries, $dbh);
+			break;
+
 		}
 }
 
@@ -10243,7 +10250,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.64;
+$max_update = 7.65;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
