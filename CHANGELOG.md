@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.1.8
+Miércoles 2 de Abril 2014
+* **Fixed:** [Corrige montos en listado de tramites](https://github.com/LemontechSA/ttb/pull/467)
+
 ## Hotfix: 14.1.7
 Miércoles 2 de Abril 2014
 * **Fixed:** [Corrige flujo de conf UsaFechaDesde](https://github.com/LemontechSA/ttb/pull/466)
