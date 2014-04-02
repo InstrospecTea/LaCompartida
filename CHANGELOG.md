@@ -1,4 +1,13 @@
 # Changelog
+
+## Hotfix: 14.1.7
+Miércoles 2 de Abril 2014
+* **Fixed:** [Corrige flujo de conf UsaFechaDesde](https://github.com/LemontechSA/ttb/pull/466)
+
+## Hotfix: 14.1.6
+Lunes 31 de Marzo 2014
+* **Fixed:** [Nuevos elementos para Documentos PRWSLAWS](https://github.com/LemontechSA/ttb/pull/465)
+
 ## Hotfix: 14.1.5
 Jueves 27 de Marzo 2014
 * **Fixed:** [Correccion a calculo de columna total trabajos en cobros_xls forma cobro ESCALONADA](https://github.com/LemontechSA/ttb/pull/463)
