@@ -800,7 +800,7 @@ function funcionTR(& $tramite) {
 	}
 
 	$moneda_tramite = new Moneda($sesion);
-	$moneda_tramite->Load($id_tramite);
+	$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
