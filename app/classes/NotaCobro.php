@@ -540,6 +540,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
+				$html = str_replace('%texto_cobro_nr%', __('Cobro N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
@@ -3591,6 +3592,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
+				$html = str_replace('%texto_cobro_nr%', __('Cobro N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
@@ -6709,6 +6711,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
+				$html = str_replace('%texto_cobro_nr%', __('Cobro N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
@@ -10247,6 +10250,8 @@ class NotaCobro extends Cobro {
 		} else {
 			$htmlplantilla = str_replace('%numero_factura%', '', $htmlplantilla);
 		}
+
+		$htmlplantilla = str_replace('%documentos_tributarios%', $this->fields['documento'], $htmlplantilla);
 
 		$htmlplantilla = str_replace('%liquidacion%', __('Liquidación'), $htmlplantilla);
 		$htmlplantilla = str_replace('%solo_num_factura%', $this->fields['id_cobro'], $htmlplantilla);
