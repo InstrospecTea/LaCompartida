@@ -518,7 +518,7 @@ if (!$popup) {
 											<div id="profesional" style="float:left;display:inline-block;" >
 												<b><?php echo __('Profesional') ?>:</b><br/>
 												<?php
-												$query = "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC";
+												$query = "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' and usuario.rut != 99511620 ORDER BY nombre ASC";
 												echo Html::SelectQuery($sesion, $query, "usuarios[]", $usuarios, '', "Todos", "200");
 												?>
 											</div>
@@ -571,7 +571,7 @@ if (!$popup) {
 															<label for="check_profesionales" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'prof_full' style="<?php echo $check_profesionales ? "" : "display:none;" ?>">
-															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' and usuario.rut != 99511620 ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -587,7 +587,7 @@ if (!$popup) {
 															<label for="check_encargados" style="cursor:pointer;" ><hr></label>
 														</div>
 														<div class = 'encargados_full' style="<?php echo $check_encargados ? "" : "display:none;" ?>" >
-															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' and usuario.rut != 99511620 ORDER BY nombre ASC", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
