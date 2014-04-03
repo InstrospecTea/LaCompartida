@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.1.10
+Jueves 03 de abril 2014
+* **Fixed:** [Cambia número de nueva factura al selecionar serie.](https://github.com/LemontechSA/ttb/pull/470)
+
 
 ## Hotfix: 14.1.9
 Miércoles 2 de Abril 2014
