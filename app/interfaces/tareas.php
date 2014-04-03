@@ -38,6 +38,9 @@ if ($fecha_desde) {
 if ($fecha_hasta) {
     $opciones['fecha_hasta'] = $fecha_hasta;
 }
+if ($id_usuario_involucrado) {
+    $opciones['id_usuario_involucrado'] = $id_usuario_involucrado;
+}
 
 if ($estados_elegidos) {
     $estados = explode(',', $estados_elegidos);
@@ -49,10 +52,10 @@ if(is_array($estados)) {
     $opciones['estado'] = $estados;
     $expandido = '';
 }else if(!$incluir_historicas) {
-    $opciones['estado'] = $Tarea->estados;
+    $opciones['estado'] = array_diff($Tarea->estados, array('Lista'));
 }
 
-if($fecha_desde || $fecha_hasta) {
+if($fecha_desde || $fecha_hasta || $id_usuario_involucrado) {
     $expandido = '';
 }
 
@@ -268,6 +271,17 @@ if ($orden_click) {
 									<input type='checkbox' name='opciones[tareas_encargado]' id='tareas_encargado' value='1' <?=$opciones['tareas_encargado'] ? 'checked' : '' ?> />
 									<label for='tareas_revisor'><?=__('Clientes en los que soy encargado')?></label>
 								</td>
+								<td>
+									<?php
+										if(is_array($estados)) {
+											$incluir_historicas_disabled='disabled=disabled';
+										}
+									?>
+									<input type='checkbox' name='incluir_historicas' id='incluir_historicas' <?=$incluir_historicas ? 'checked=checked' : '' ?> />
+									<label for='incluir_historicas' style='font-size:10px;'/>
+										<?=__('Incluir Tareas Históricas')?>
+									</label>
+								</td>
 							</tr>
 							<tr>
 								<td align='right'>
@@ -289,16 +303,6 @@ if ($orden_click) {
 											}
 										}
 									?>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									<?php
-										if(is_array($estados)) {
-											$incluir_historicas_disabled='disabled=disabled';
-										}
-									?>
-									<input type='checkbox' name='incluir_historicas' id='incluir_historicas' <?=$incluir_historicas ? 'checked=checked' : '' ?> />
-									<label for='incluir_historicas' style='font-size:10px;'/>
-										<?=__('Incluir Tareas Históricas')?>
-									</label>
 								</td>
 							</tr>
 							<tr>
@@ -311,6 +315,12 @@ if ($orden_click) {
                                             echo InputId::Imprimir($Sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto ,""," CargarSelectCliente(this.value);", 220,$codigo_cliente);
                                         }
 									?>
+								</td>
+							</tr>
+							<tr class='expandido' <?=$expandido?>>
+								<td align='right'>Usuario:</td>
+								<td align='left' colspan='4'>
+									<?= Html::SelectQuery($Sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_involucrado", $id_usuario_involucrado,"", __('Cualquiera'),'170'); ?>
 								</td>
 							</tr>
 							<tr class='expandido' <?=$expandido?>>
@@ -420,6 +430,10 @@ if ($orden_click) {
 			font-weight: bold;
 			color: #AAA;
 		}
+		.usuario_involucrado
+		{
+			text-decoration: underline;
+		}
 	</style>
 	<?php
 		if($opc == 'buscar') {
@@ -475,10 +489,11 @@ if ($orden_click) {
 			function Relaciones(&$fila) {
 				global $Sesion;
 				global $id_usuario;
+				global $id_usuario_involucrado;
 				if(Conf::GetConf($Sesion,'UsaUsernameEnTodoElSistema')) {
 					$titulo_encargado = 'Responsable: '.$fila->fields['username_encargado'];
 					$titulo_revisor = 'Revisor: '.$fila->fields['username_revisor'];
-					$tilulo_generador = 'Generador: '.$fila->fields['username_generador'];
+					$titulo_generador = 'Mandante: '.$fila->fields['username_generador'];
 				}else{
 					$titulo_encargado = 'Responsable: '.$fila->fields['encargado'];
 					$titulo_revisor = 'Revisor: '.$fila->fields['revisor'];
@@ -508,6 +523,19 @@ if ($orden_click) {
 					$clase_generador = 'relacion_none';
 					$titulo_generador = 'Sin Mandante';
 				}
+
+				if($id_usuario_involucrado){
+					if($fila->fields['id_encargado'] == $id_usuario_involucrado){
+						$clase_encargado .= ' usuario_involucrado';
+					}
+					if($fila->fields['id_revisor'] == $id_usuario_involucrado){
+						$clase_revisor .= ' usuario_involucrado';
+					}
+					if($fila->fields['id_generador'] == $id_usuario_involucrado){
+						$clase_generador .= ' usuario_involucrado';
+					}
+				}
+
 				$h .= "&nbsp;&nbsp;<span class='".$clase_encargado."' title='".$titulo_encargado."'>R</span>&nbsp;";
 				$h .= "<span class='".$clase_revisor."' title='".$titulo_revisor."'>V</span>&nbsp;";
 				$h .= "<span class='".$clase_generador."' title='".$titulo_generador."'>M</span>&nbsp;&nbsp;&nbsp;&nbsp;";
