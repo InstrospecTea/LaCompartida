@@ -229,31 +229,6 @@ class Documento extends Objeto {
 
 		}
 
-		/*
-		 * esto lo movi por que necesito que el pago este creado para que actualice bien los estados y fechas respectivas
-		 */
-		if ($id_cobro) {
-			/* $query="UPDATE cobro SET fecha_cobro='".$fecha." 00:00:00' WHERE id_cobro=".$id_cobro;
-			  $resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh); */
-
-			//revisar si el monto pagado es igual al total, en caso contrario cambiar estado a pago parcial
-			$cobrox = new Cobro($this->sesion);
-			$cobrox->Load($id_cobro);
-
-			if ($cobrox->Loaded()) {
-				$cobrox->CambiarEstadoSegunFacturas();
-
-				if ($cobrox->fields['estado'] == 'PAGADO') {
-					$cobrox->Edit('fecha_cobro', "$fecha 00:00:00");
-				} else if ($cobrox->fields['estado'] == 'PAGO PARCIAL') {
-					if (empty($cobrox->fields['fecha_pago_parcial']) || $cobrox->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00') {
-						$cobrox->Edit('fecha_pago_parcial', "$fecha 00:00:00");
-					}
-				}
-				$cobrox->Write();
-			}
-		}
-
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>" . $out_neteos . "</table>";
 		//echo $out_neteos;
 	/*echo '<pre>';
@@ -340,7 +315,9 @@ class Documento extends Objeto {
 					$cambios_en_saldo_gastos[] = $id_documento_cobro;
 				}
 
-				$neteo_documento->CambiarEstadoCobro($id_cobro_neteado, $documento_cobro_aux->fields['saldo_honorarios'], $documento_cobro_aux->fields['saldo_gastos']);
+				$cobro_neteado = new Cobro($this->sesion);
+				$cobro_neteado->Load($id_cobro_neteado);
+				$cobro_neteado->CambiarEstadoSegunFacturas();
 			}
 		}
 

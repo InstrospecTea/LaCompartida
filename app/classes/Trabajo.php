@@ -54,6 +54,8 @@ class Trabajo extends Objeto
 
 	function QueryHistorial($tipo = 'CREAR', $app_id = 1) {
 		$app_id = !is_null($app_id) ? $app_id : 1;
+		$id_usuario_sesion = !is_null($this->sesion->usuario->fields['id_usuario']) ? $this->sesion->usuario->fields['id_usuario'] : $this->fields['id_usuario'];
+
 		if ($tipo == 'MODIFICAR') {
 			$query = "SELECT
 					fecha,
@@ -73,7 +75,7 @@ class Trabajo extends Objeto
 			$queryHistorial = "INSERT INTO trabajo_historial
 						SET
 							id_trabajo = '{{id_trabajo}}',
-							id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
+							id_usuario = '{$id_usuario_sesion}',
 							fecha = '" . date("Y-m-d H:i:s") . "',
 						 	fecha_trabajo = '$fecha',
 						 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
@@ -98,7 +100,7 @@ class Trabajo extends Objeto
 								SET
 									app_id = {$app_id},
 									id_trabajo = '{{id_trabajo}}',
-									id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
+									id_usuario = '{$id_usuario_sesion}',
 									fecha = '" . date("Y-m-d H:i:s") . "',
 								 	fecha_trabajo = '{$this->fields['fecha']}',
 								 	descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',

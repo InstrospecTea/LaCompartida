@@ -719,7 +719,7 @@ class Asunto extends Objeto {
 		}
 
 		if (!empty($data['forma_cobro']) && $data['forma_cobro'] != 'NULL') {
-			if (!empty($data['monto_tarifa_flat'])) {
+			if (!empty($data['monto_tarifa_flat']) && $data['monto_tarifa_flat'] > 0) {
 				$Tarifa = new Tarifa($this->sesion);
 				$data['id_tarifa'] = $Tarifa->GuardaTarifaFlat($data['monto_tarifa_flat'], $data['id_moneda']);
 			}

@@ -727,6 +727,26 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%fecha_fin_periodo_exacto%', $fecha_diff_ultimo_trabajo, $html2);
 				}
 
+				$query = "SELECT CONCAT_WS (' ',prm_documento_legal.codigo,CONCAT_WS('-',CONCAT('00',factura.serie_documento_legal),factura.numero)) as documentos
+							FROM factura
+							LEFT JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+								WHERE id_cobro = '".$this->fields['id_cobro']."' AND anulado != 1";
+
+				$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($result)){
+			        $documentos_relacionados[] = $data;
+			    }
+
+			    $documentos_rel = '';
+
+			    for ($k = 0; $k < count($documentos_relacionados); $k++) {
+			    	$espace = $k < count($documentos_relacionados) - 1 ? ', ' : '';
+			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
+			    }
+
+				$html2 = str_replace('%documentos_relacionados%', $documentos_rel, $html2);
+
 				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%n_num_factura%', 'N°' . $this->fields['documento'], $html2);
@@ -865,6 +885,26 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%num_letter_baz%', $this->fields['documento'], $html2);
 
+				$query = "SELECT factura.numero as documentos
+							FROM factura
+							LEFT JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+								WHERE id_cobro = '".$this->fields['id_cobro']."' AND anulado != 1";
+
+				$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($result)){
+			        $documentos_relacionados[] = $data;
+			    }
+
+			    $documentos_rel = '';
+
+			    for ($k = 0; $k < count($documentos_relacionados); $k++) {
+			    	$espace = $k < count($documentos_relacionados) - 1 ? ', ' : '';
+			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
+			    }
+
+				$html2 = str_replace('%doc_tributario%', $documentos_rel, $html2);
+
 				if (($this->fields['documento'] != '')) {
 					$html2 = str_replace('%num_letter_rebaza%', __('la factura N°') . ' ' . $this->fields['documento'], $html2);
 				} else {
@@ -927,7 +967,7 @@ class CartaCobro extends NotaCobro {
 
 						}
 
-						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$detalle_cuenta_honorarios_primer_dia_mes .= ' (' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 						$detalle_cuenta_honorarios_primer_dia_mes .= __(', conforme a su equivalencia en pesos al primer día hábil del presente mes') . ')';
 					}
 				}
@@ -1097,6 +1137,26 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
+
+				$query = "SELECT factura.numero as documentos
+							FROM factura
+							LEFT JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+								WHERE id_cobro = '".$this->fields['id_cobro']."' AND anulado != 1";
+
+				$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($result)){
+			        $documentos_relacionados[] = $data;
+			    }
+
+			    $documentos_rel = '';
+
+			    for ($k = 0; $k < count($documentos_relacionados); $k++) {
+			    	$espace = $k < count($documentos_relacionados) - 1 ? ', ' : '';
+			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
+			    }
+
+				$html2 = str_replace('%doc_tributario%', $documentos_rel, $html2);
 
 				if (count($this->asuntos) > 1) {
 					$html2 = str_replace('%detalle_mb%', __('%detalle_mb_asuntos%'), $html2);
@@ -1466,6 +1526,26 @@ class CartaCobro extends NotaCobro {
 
 				setlocale(LC_ALL, "$actual_locale");
 
+				$query = "SELECT factura.numero as documentos
+							FROM factura
+							LEFT JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+								WHERE id_cobro = '".$this->fields['id_cobro']."' AND anulado != 1";
+
+				$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($result)){
+			        $documentos_relacionados[] = $data;
+			    }
+
+			    $documentos_rel = '';
+
+			    for ($k = 0; $k < count($documentos_relacionados); $k++) {
+			    	$espace = $k < count($documentos_relacionados) - 1 ? ', ' : '';
+			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
+			    }
+
+				$html2 = str_replace('%doc_tributario%', $documentos_rel, $html2);
+
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%n_num_factura%', 'N°' . $this->fields['documento'], $html2);
 				$html2 = str_replace('%fecha_primer_trabajo%', $fecha_primer_trabajo, $html2);
@@ -1729,7 +1809,7 @@ class CartaCobro extends NotaCobro {
 								$detalle_cuenta_honorarios_primer_dia_mes = __('. Esta cantidad corresponde a') . __(' (i) ') . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_sin_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							}
 						}
-						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$detalle_cuenta_honorarios_primer_dia_mes .= ' (' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 						$detalle_cuenta_honorarios_primer_dia_mes .= __(', conforme a su equivalencia en pesos al primer día hábil del presente mes') . ')';
 					}
 				}
@@ -1901,6 +1981,15 @@ class CartaCobro extends NotaCobro {
 				$fecha_espanol = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 				$fecha_espanol_del = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B del %Y'));
 
+				// PRSLAWS %texto_segun_serie
+				$query = "SELECT prm_codigo.glosa AS texto_segun_serie
+							FROM factura
+								LEFT JOIN prm_codigo ON factura.serie_documento_legal = prm_codigo.codigo
+									WHERE id_cobro = '".$this->fields['id_cobro']."' AND estado != 'ANULADA' ";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				list($texto_segun_serie) = mysql_fetch_array($resp);
+
+				$html2 = str_replace('%ciudad_segun_serie%', $texto_segun_serie, $html2);
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_especial2%', $fecha_lang_esp, $html2);
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
@@ -1984,6 +2073,7 @@ class CartaCobro extends NotaCobro {
 
 				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
 				$html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
+				$html2 = str_replace('%contrato_solo_apellido_contacto%', $contrato->fields['apellido_contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%nombre_cliente_ucfirst%', ucfirst($glosa_cliente), $html2);
 				$html2 = str_replace('%factura_razon_social_ucfirst%', ucfirst($contrato->fields['factura_razon_social']), $html2);
@@ -2033,22 +2123,15 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
 				$html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%num_letter_baz%', $this->fields['documento'], $html2);
-
-				if (Conf::GetConf($this->sesion, 'TituloContacto')) {
-					$html2 = str_replace('%sr%', __($contrato->fields['titulo_contacto']), $html2);
-				} else {
-					$html2 = str_replace('%sr%', __('Señor'), $html2);
-				}
-
 				$html2 = str_replace('%asunto_mb%', __('%asunto_mb%'), $html2);
 				$html2 = str_replace('%presente%', __('Presente'), $html2);
 
 				if ($contrato->fields['id_pais'] > 0) {
-					$query = "SELECT nombre FROM prm_pais
-										WHERE id_pais=" . $contrato->fields['id_pais'];
+
+					$query = "SELECT nombre FROM prm_pais WHERE id_pais=" . $contrato->fields['id_pais'];
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($nombre_pais) = mysql_fetch_array($resp);
-					$html2 = str_replace('%nombre_pais%', $nombre_pais, $html2);
+					$html2 = str_replace('%nombre_pais%', __($nombre_pais), $html2);
 					$html2 = str_replace('%nombre_pais_mayuscula%', strtoupper($nombre_pais), $html2);
 				} else {
 					$html2 = str_replace('%nombre_pais%', '', $html2);
@@ -2063,6 +2146,26 @@ class CartaCobro extends NotaCobro {
 				} else {
 					$html2 = str_replace('%factura_desc_mta%', 'factura', $html2);
 				}
+
+				$query = "SELECT factura.numero as documentos
+							FROM factura
+							LEFT JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+								WHERE id_cobro = '".$this->fields['id_cobro']."' AND anulado != 1";
+
+				$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while($data = mysql_fetch_assoc($result)){
+			        $documentos_relacionados[] = $data;
+			    }
+
+			    $documentos_rel = '';
+
+			    for ($k = 0; $k < count($documentos_relacionados); $k++) {
+			    	$espace = $k < count($documentos_relacionados) - 1 ? ', ' : '';
+			    	$documentos_rel .= $documentos_relacionados[$k]['documentos'] . '' . $espace;
+			    }
+
+				$html2 = str_replace('%doc_tributario', $documentos_rel, $html2);
 
 				$html2 = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html2);
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);

@@ -28,7 +28,10 @@ if (!empty($id_tarifa_edicion) && !$tarifa->Load($id_tarifa_edicion)) {
 	$Pagina->Redirect('agregar_tarifa.php?id_tarifa_edicion=' . $tarifa->fields['id_tarifa']);
 }
 
-
+/* * * *
+ * NOTA: ¿Por qué existió esto?, ¿Cuándo hace sentido tratar de borrar todas las tarifas?,
+ *       ¿No sería mas correcto tratar de borrar las que no estén asociadas a algún contrato?
+ * * * *
 if ($opc != 'guardar') {
 	$query = "SELECT id_tarifa FROM tarifa WHERE guardado=0";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
@@ -39,6 +42,7 @@ if ($opc != 'guardar') {
 		$tarifa_eliminar->Eliminar();
 	}
 }
+/* */
 
 if ($id_tarifa_previa && !$id_tarifa_edicion && $opc != 'guardar') {
 	$query = "INSERT INTO tarifa(fecha_creacion) VALUES(NOW())";

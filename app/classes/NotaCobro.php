@@ -1447,7 +1447,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%CTA_CORRIENTE%', $this->GenerarDocumento($parser, 'CTA_CORRIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%TIPO_CAMBIO%', $this->GenerarDocumento($parser, 'TIPO_CAMBIO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD%', $this->GenerarDocumento($parser, 'MOROSIDAD', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%MOROSIDAD%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%GLOSA_ESPECIAL%', $this->GenerarDocumentoComun($parser, 'GLOSA_ESPECIAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_POR_CATEGORIA%', $this->GenerarSeccionResumenProfesional($parser, 'RESUMEN_PROFESIONAL_POR_CATEGORIA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL%', $this->GenerarSeccionResumenProfesional($parser, 'RESUMEN_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -1484,6 +1484,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%codigo_contrato%', '', $html);
 				}
 
+				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%factura_o_nd%', 'Factura o ND', $html);
 				$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
 				$html = str_replace('%materia%', __('Materia'), $html);
@@ -1494,6 +1495,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
+				$html = str_replace('%texto_cobro_nr%', __('Cobro N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
@@ -2887,7 +2889,12 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_solicitante%', '', $row);
 					}
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
-					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+
+					if($this->fields['opc_ver_detalles_por_hora_iniciales']) {
+						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+					} else {
+						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					}
 					$row = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $row);
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
@@ -4149,19 +4156,6 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%CTA_CORRIENTE_MOVIMIENTOS_TOTAL%', $this->GenerarDocumentoComun($parser, 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%CTA_CORRIENTE_SALDO_FINAL%', $this->GenerarDocumentoComun($parser, 'CTA_CORRIENTE_SALDO_FINAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
-
-
-			//facturas morosas
-			case 'MOROSIDAD': //GenerarDocumento
-				if ($this->fields['opc_ver_morosidad'] == 0)
-					return '';
-				$html = str_replace('%titulo_morosidad%', __('Saldo Adeudado'), $html);
-				$html = str_replace('%MOROSIDAD_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_FILAS%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_HONORARIOS_TOTAL%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_HONORARIOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_GASTOS%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_TOTAL%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				break;
 		}
 		return $html;
 	}
@@ -4436,7 +4430,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%CTA_CORRIENTE%', $this->GenerarDocumento2($parser, 'CTA_CORRIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%TIPO_CAMBIO%', $this->GenerarDocumentoComun($parser, 'TIPO_CAMBIO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD%', $this->GenerarDocumento2($parser, 'MOROSIDAD', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%MOROSIDAD%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%GLOSA_ESPECIAL%', $this->GenerarDocumentoComun($parser, 'GLOSA_ESPECIAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_POR_CATEGORIA%', $this->GenerarSeccionResumenProfesional($parser, 'RESUMEN_PROFESIONAL_POR_CATEGORIA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 
@@ -4508,6 +4502,7 @@ class NotaCobro extends Cobro {
 					}
 				}
 
+				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%factura_o_nd%', 'Factura o ND', $html);
 				$html = str_replace('%fecha_fin_gastos_liq%', 'Gastos liquidados hasta', $html);
 				$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
@@ -4552,6 +4547,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
+				$html = str_replace('%texto_cobro_nr%', __('Cobro N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
@@ -5502,6 +5498,7 @@ class NotaCobro extends Cobro {
 				$html = '';
 
 				for ($k = 0; $k < count($this->asuntos); $k++) {
+
 					$asunto = new Asunto($this->sesion);
 					$asunto->LoadByCodigo($this->asuntos[$k]);
 
@@ -5555,6 +5552,7 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%asunto%', __('Asunto'), $row);
+
 					if (Conf::GetConf($this->sesion, 'GlosaAsuntoSinCodigo')) {
 						$row = str_replace('%glosa_asunto%', $asunto->fields['glosa_asunto'], $row);
 						$row = str_replace('%glosa_asunto_secundario%', $asunto->fields['glosa_asunto'], $row);
@@ -6184,7 +6182,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
-					if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
+					if ($this->fields['opc_ver_detalles_por_hora_iniciales']) {
 						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
 					} else {
 						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
@@ -7533,19 +7531,6 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%CTA_CORRIENTE_SALDO_FINAL%', $this->GenerarDocumentoComun($parser, 'CTA_CORRIENTE_SALDO_FINAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-
-
-			//facturas morosas
-			case 'MOROSIDAD': //GenerarDocumento2
-				if ($this->fields['opc_ver_morosidad'] == 0)
-					return '';
-				$html = str_replace('%titulo_morosidad%', __('Saldo Adeudado'), $html);
-				$html = str_replace('%MOROSIDAD_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_FILAS%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_HONORARIOS_TOTAL%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_HONORARIOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_GASTOS%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%MOROSIDAD_TOTAL%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				break;
 		}
 		return $html;
 	}
@@ -7645,6 +7630,7 @@ class NotaCobro extends Cobro {
 						$imprimir_asuntos .= '<br />';
 				}
 
+				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
 				$html = str_replace('%materia%', __('Materia'), $html);
 				$html = str_replace('%glosa_asunto_sin_codigo%', $imprimir_asuntos, $html);
@@ -7680,6 +7666,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%cobro%', __('Cobro') . ' ' . __('N°'), $html);
+				$html = str_replace('%texto_cobro_nr%', __('Cobro N°'), $html);
 				$html = str_replace('%reference%', __('%reference_no%'), $html);
 				$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
@@ -9376,7 +9363,11 @@ class NotaCobro extends Cobro {
 					}
 
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
-					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					if($this->fields['opc_ver_detalles_por_hora_iniciales']) {
+						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+					} else {
+						$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					}
 
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
@@ -10855,6 +10846,7 @@ class NotaCobro extends Cobro {
 					return '';
 
 				$html = str_replace('%titulo_morosidad%', __('Saldo Adeudado'), $html);
+				$html = str_replace('%nota_disclaimer2%', __('nota_morosidad'), $html);
 				$html = str_replace('%MOROSIDAD_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%MOROSIDAD_FILAS%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%MOROSIDAD_HONORARIOS_TOTAL%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_HONORARIOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -11010,7 +11002,8 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($totales['saldo_honorarios'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%monto_moroso%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($totales['saldo_honorarios_moneda'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+				//$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+				$html = str_replace('%nota%', __('nota_morosidad_honorarios'), $html);
 				break;
 
 			case 'MOROSIDAD_GASTOS_TOTAL': //GenerarDocumentoComun
@@ -11022,7 +11015,8 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($totales['saldo_gastos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%monto_moroso%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($totales['saldo_gastos_moneda'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+				// $html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+				$html = str_replace('%nota%', __('nota_morosidad_gastos'), $html);
 				break;
 
 			case 'MOROSIDAD_TOTAL': //GenerarDocumentoComun
@@ -11055,7 +11049,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%monto_moroso_documento%', $totales['simbolo_moneda_total'] . $this->espacio . number_format($saldo_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
-				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+				// $html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+				$html = str_replace('%nota%', __('nota_morosidad_total'), $html);
 				break;
 
 			case 'GLOSA_ESPECIAL': //GenerarDocumentoComun
@@ -11210,6 +11205,8 @@ class NotaCobro extends Cobro {
 		} else {
 			$htmlplantilla = str_replace('%numero_factura%', '', $htmlplantilla);
 		}
+
+		$htmlplantilla = str_replace('%documentos_tributarios%', $this->fields['documento'], $htmlplantilla);
 
 		$htmlplantilla = str_replace('%liquidacion%', __('Liquidación'), $htmlplantilla);
 		$htmlplantilla = str_replace('%solo_num_factura%', $this->fields['id_cobro'], $htmlplantilla);
