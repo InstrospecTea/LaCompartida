@@ -546,8 +546,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				$html = str_replace('%boleta%', empty($this->fields['documento']) ? '' : __('Boleta'), $html);
 				$html = str_replace('%encargado%', __('Director proyecto'), $html);
-				$html = str_replace('%instrucciones_pago%', 'INSTRUCCIONES DE PAGO', $html);
-				$html = str_replace('%giro_bancario%', 'Giro bancario a', $html);
+				$html = str_replace('%instrucciones_pago%', __('INSTRUCCIONES DE PAGO'), $html);
+				$html = str_replace('%giro_bancario%', __('Giro bancario a'), $html);
 
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
@@ -3558,8 +3558,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%texto_fecha_emision%', __('Fecha Emisión'), $html);
-				$html = str_replace('%instrucciones_pago%', 'INSTRUCCIONES DE PAGO', $html);
-				$html = str_replace('%giro_bancario%', 'Giro bancario a', $html);
+				$html = str_replace('%instrucciones_pago%', __('INSTRUCCIONES DE PAGO'), $html);
+				$html = str_replace('%giro_bancario%', __('Giro bancario a'), $html);
 
 				if (array_key_exists('codigo_contrato', $contrato->fields)) {
 					$html = str_replace('%glosa_codigo_contrato%', __('Código') . ' ' . __('Contrato'), $html);
@@ -6624,7 +6624,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_total_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
-				$html = str_replace('%texto_instrucciones%', 'texto_instrucciones', $html);
+				$html = str_replace('%texto_instrucciones%', __('texto_instrucciones'), $html);
 
 				if ($lang == 'es') {
 
@@ -6687,8 +6687,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%texto_fecha_emision%', __('Fecha de Emisión'), $html);
-				$html = str_replace('%instrucciones_pago%', 'INSTRUCCIONES DE PAGO', $html);
-				$html = str_replace('%giro_bancario%', 'Giro bancario a', $html);
+				$html = str_replace('%instrucciones_pago%', _('INSTRUCCIONES DE PAGO'), $html);
+				$html = str_replace('%giro_bancario%', _('Giro bancario a'), $html);
 
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
