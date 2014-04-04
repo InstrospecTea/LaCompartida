@@ -217,24 +217,24 @@ if ($orden_click) {
 </script>
 <? echo(Autocompletador::CSS()); ?>
 <form name='formulario' id='formulario' method='post' action='tareas.php' autocomplete='off'>
-    <input type='hidden' name='conf_codigo_primario' id="conf_codigo_primario" value="<?= (Conf::GetConf($Sesion,'CodigoSecundario') ? 'false' : 'true'); ?>"/>
+    <input type='hidden' name='conf_codigo_primario' id="conf_codigo_primario" value="<?php echo  (Conf::GetConf($Sesion,'CodigoSecundario') ? 'false' : 'true'); ?>"/>
     <input type='hidden' name='opc' id='opc' value='buscar' />
-    <input type='hidden' name='id_usuario' id='id_usuario' value=<?=$id_usuario?> />
+    <input type='hidden' name='id_usuario' id='id_usuario' value=<?php echo $id_usuario?> />
     <div id="calendar-container" style="width:221px; position:absolute; display:none;">
         <div class="floating" id="calendar"></div>
     </div>
 	<center>
-		<table <?= (Conf::GetConf($Sesion,'UsaDisenoNuevo') ? 'width="90%"' : 'width="95%"');?>>
+		<table <?php echo  (Conf::GetConf($Sesion,'UsaDisenoNuevo') ? 'width="90%"' : 'width="95%"');?>>
 			<tr>
 				<td>
 					<fieldset class="tb_base" id='field_filtros' style='display:inline;width: 100%;'>
 						<legend>
 							<span style="cursor:pointer" onclick="ToggleExpandido()" >
 								<b>Filtros de Tareas</b>
-								<span id='mas_columnas'   <?= $expandido==''? 'style="display:none"':'' ?> >
+								<span id='mas_columnas'   <?php echo  $expandido==''? 'style="display:none"':'' ?> >
 									<a href='#' style='font-size:9px; color:#184;' >expandir filtros</a>
 								</span>
-								<span id='menos_columnas' <?= $expandido==''? '':'style="display:none"' ?> >
+								<span id='menos_columnas' <?php echo  $expandido==''? '':'style="display:none"' ?> >
 									<a href='#' style='font-size:9px; color:#184;' >ocultar filtros</a>
 								</span>
 							</span>
@@ -244,12 +244,12 @@ if ($orden_click) {
 								<td align='right' width='18%'>
 								</td>
 								<td align='left' colspan='2' valign='top'>
-									<input type='checkbox' name='opciones[tareas_responsable]' id='tareas_responsable' value='1'  <?=$opciones['tareas_responsable'] ? 'checked' : '' ?> />
-									<label for='tareas_responsable'><?=__('Tareas en que soy Reponsable')?></label>
+									<input type='checkbox' name='opciones[tareas_responsable]' id='tareas_responsable' value='1'  <?php echo $opciones['tareas_responsable'] ? 'checked' : '' ?> />
+									<label for='tareas_responsable'><?php echo __('Tareas en que soy Reponsable')?></label>
 								</td>
 								<td>
-									<input type='checkbox' name='opciones[tareas_mandante]' id='tareas_mandante' value='1' <?=$opciones['tareas_mandante'] ? 'checked' : '' ?> />
-									<label for='tareas_mandante'><?=__('Tareas en que soy Mandante')?></label>
+									<input type='checkbox' name='opciones[tareas_mandante]' id='tareas_mandante' value='1' <?php echo $opciones['tareas_mandante'] ? 'checked' : '' ?> />
+									<label for='tareas_mandante'><?php echo __('Tareas en que soy Mandante')?></label>
 								</td>
 							</tr>
 							<tr>
@@ -257,19 +257,19 @@ if ($orden_click) {
 								</td>
 								<td align=left colspan='2' width='36%' valign='top'>
 									<input type='checkbox' name='opciones[tareas_revisor]' id='tareas_revisor' value='1' <?php if($opciones['tareas_revisor']|| $opciones['tareas_encargado']){echo 'checked';} ?> />
-									<label for='tareas_revisor'><?=__('Tareas en que soy Revisor')?></label>
+									<label for='tareas_revisor'><?php echo __('Tareas en que soy Revisor')?></label>
 								</td>
 								<td>
-									<input type='checkbox' name='opciones[otras_tareas]' id='otras_tareas' value='1' <?=$opciones['otras_tareas'] ? 'checked' : '' ?> />
-									<label for='otras_tareas'><?=__('Tareas en las que no estoy relacionado.')?></label>
+									<input type='checkbox' name='opciones[otras_tareas]' id='otras_tareas' value='1' <?php echo $opciones['otras_tareas'] ? 'checked' : '' ?> />
+									<label for='otras_tareas'><?php echo __('Tareas en las que no estoy relacionado.')?></label>
 								</td>
 							</tr>
                             <tr>
 								<td align='right'>
 								</td>
 								<td align=left colspan='2' width='36%' valign='top'>
-									<input type='checkbox' name='opciones[tareas_encargado]' id='tareas_encargado' value='1' <?=$opciones['tareas_encargado'] ? 'checked' : '' ?> />
-									<label for='tareas_revisor'><?=__('Clientes en los que soy encargado')?></label>
+									<input type='checkbox' name='opciones[tareas_encargado]' id='tareas_encargado' value='1' <?php echo $opciones['tareas_encargado'] ? 'checked' : '' ?> />
+									<label for='tareas_revisor'><?php echo __('Clientes en los que soy encargado')?></label>
 								</td>
 								<td>
 									<?php
@@ -277,9 +277,9 @@ if ($orden_click) {
 											$incluir_historicas_disabled='disabled=disabled';
 										}
 									?>
-									<input type='checkbox' name='incluir_historicas' id='incluir_historicas' <?=$incluir_historicas ? 'checked=checked' : '' ?> />
+									<input type='checkbox' name='incluir_historicas' id='incluir_historicas' <?php echo $incluir_historicas ? 'checked=checked' : '' ?> />
 									<label for='incluir_historicas' style='font-size:10px;'/>
-										<?=__('Incluir Tareas Históricas')?>
+										<?php echo __('Incluir Tareas Históricas')?>
 									</label>
 								</td>
 							</tr>
@@ -317,15 +317,15 @@ if ($orden_click) {
 									?>
 								</td>
 							</tr>
-							<tr class='expandido' <?=$expandido?>>
+							<tr class='expandido' <?php echo $expandido?>>
 								<td align='right'>Usuario:</td>
 								<td align='left' colspan='4'>
-									<?= Html::SelectQuery($Sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_involucrado", $id_usuario_involucrado,"", __('Cualquiera'),'170'); ?>
+									<?php echo  Html::SelectQuery($Sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_involucrado", $id_usuario_involucrado,"", __('Cualquiera'),'170'); ?>
 								</td>
 							</tr>
-							<tr class='expandido' <?=$expandido?>>
+							<tr class='expandido' <?php echo $expandido?>>
 								<td align='right'>
-									<?=__('Estado')?>:
+									<?php echo __('Estado')?>:
 								</td>
 								<td align='left' width='20%'>
 									<select name="estados[]" id="estados" multiple size='<?php sizeof($Tarea->estados); ?>' onchange="if(this.selectedIndex==-1) $('incluir_historicas').disabled=false; else $('incluir_historicas').disabled=true; ">
@@ -344,29 +344,29 @@ if ($orden_click) {
 									<table width=100%>
 										<tr>
 											<td align='right' width=26%>
-												<?=__('Plazo desde')?>:
+												<?php echo __('Plazo desde')?>:
 											</td>
 											<td>
-												<input type="text" name="fecha_desde" value="<?=$fecha_desde ? $fecha_desde :''?>" id="fecha_desde" size="11" maxlength="10" readonly/>
+												<input type="text" name="fecha_desde" value="<?php echo $fecha_desde ? $fecha_desde :''?>" id="fecha_desde" size="11" maxlength="10" readonly/>
 												<div style="position:absolute; display:inline; margin-left:5px;">
-													<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_desde" style="cursor:pointer" />
+													<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_desde" style="cursor:pointer" />
 												</div>
 											</td>
 										</tr>
 										<tr>
 											<td align='right'>
-												<?=__('Plazo hasta')?>:
+												<?php echo __('Plazo hasta')?>:
 											</td>
 											<td>
-												<input type="text" name="fecha_hasta" value="<?=$fecha_hasta ? $fecha_hasta :''?>" id="fecha_hasta" size="11" maxlength="10" readonly/>
+												<input type="text" name="fecha_hasta" value="<?php echo $fecha_hasta ? $fecha_hasta :''?>" id="fecha_hasta" size="11" maxlength="10" readonly/>
 												<div style="position:absolute; display:inline; margin-left:5px;">
-													<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_hasta" style="cursor:pointer" />
+													<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_hasta" style="cursor:pointer" />
 												</div>
 											</td>
 										</tr>
 										<tr>
 											<td align='right'>
-												<?=__('Ordenar por')?>:
+												<?php echo __('Ordenar por')?>:
 											</td>
 											<td>
 												<?php $arreglo_orden = array('Prioridad','Plazo','Cliente','Estado','Tarea','Novedad');?>
@@ -393,7 +393,7 @@ if ($orden_click) {
 									<input type='submit' value='Exportar a Excel' class='btn' onclick="return Excel();" >
 								</td>
 								<td align='right'>
-									<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="NuevaTarea()" title="Agregar Tarea"><?=__('Agregar')?> <?=__('tarea')?></a>
+									<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="NuevaTarea()" title="Agregar Tarea"><?php echo __('Agregar')?> <?php echo __('tarea')?></a>
 								</td>
 							</tr>
 						</table>
