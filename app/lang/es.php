@@ -42,6 +42,8 @@ $_LANG['Atención'] = "Atención";
 $_LANG['Giro'] = "Giro";
 $_LANG['Dirección'] = "Dirección";
 $_LANG['Estimado'] = "Estimado";
+$_LANG['texto_instrucciones'] = "No envié cheques por correo aéreo. Existe un serio riesgo de extravío o robo. Siga las instrucciones. De ser posible favor notificarnos el pago de la factura al siguiente e-mail: mariana.peroni@pstbn.com.py indicando los siguientes datos: N° de Factura, monto, y forma de envió del pago"; 
+
 #Monedas
 $_LANG['Tipos de Cambio']="Tipos de Cambio";
 $_LANG['Dólar'] = "Dólar";

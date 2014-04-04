@@ -50,6 +50,12 @@ class Tarea extends Objeto
 		else if($opciones['fecha_hasta'])
 			$where .= " AND tarea.fecha_entrega <= '".Utiles::fecha2sql($opciones['fecha_hasta'])."'";
 
+		if($opciones['id_usuario_involucrado']){
+			$where .= " AND (
+						encargado.id_usuario = {$opciones['id_usuario_involucrado']} OR
+						generador.id_usuario = {$opciones['id_usuario_involucrado']} OR
+						revisor.id_usuario = {$opciones['id_usuario_involucrado']}) ";
+		}
 
 		if(is_array($opciones['estado']))
 		{
