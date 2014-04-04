@@ -45,6 +45,8 @@ $_LANG['Giro'] = "Type of business";
 $_LANG['Dirección'] = "Address";
 $_LANG['Descripción'] = "Matter Summary";
 $_LANG['Título Asunto'] = "Legal Area";
+$_LANG['INSTRUCCIONES DE PAGO'] = "PAYMENT INSTRUCTIONS";
+$_LANG['Giro bancario a'] = "Wire transfer to:";
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
