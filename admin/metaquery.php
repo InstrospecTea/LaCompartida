@@ -34,7 +34,7 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<br/>
 		<div class="controls controls-row">
 			<label class="span3 al">Schemas a utilizar</label>
-			<input type="text" class="span5" name="schema" id="schema" value="'.$_POST['schema'].'" placeholder="acepta match parcial: ej %_tt% cubre tt2 y tt3"/>
+			<input type="text" class="span5" name="schema" id="schema" value="<?php echo $_POST['schema']; ?>" placeholder="acepta match parcial: ej %_tt% cubre tt2 y tt3"/>
 		</div>
 		<br/>
 		<div class="controls controls-row">
@@ -95,7 +95,7 @@ if (isset($_POST['ejecutar']) && $_POST['ejecutar'] == 'ejecutar') {
 			try {
 				$sesion->pdodbh2->exec("use $base;");
 				if ($_POST['detalle']) {
-					echo "<pre style="text-align:left;">use $base;<br><b>$query</b><br></pre>";
+					echo "<pre style='text-align:left;'>use $base;<br><b>$query</b><br></pre>";
 				}
 				if (stripos($query,'select') === false && stripos($query,'show') === false) {
 					$stmt = $sesion->pdodbh2->prepare($query);
