@@ -548,7 +548,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%encargado%', __('Director proyecto'), $html);
 				$html = str_replace('%instrucciones_pago%', 'INSTRUCCIONES DE PAGO', $html);
 				$html = str_replace('%giro_bancario%', 'Giro bancario a', $html);
-				
+
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
 
@@ -6624,6 +6624,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_total_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
+				$html = str_replace('%texto_instrucciones%', 'texto_instrucciones', $html);
 
 				if ($lang == 'es') {
 
