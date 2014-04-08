@@ -216,7 +216,7 @@ if ($print) {
 				 		$doc->newSession($html);
 				 	} else {
 				 	
-				 		$orientacion_papel = UtilesApp::GetConf($Sesion, 'OrientacionPapelPorDefecto');
+				 		$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
 				 		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
 				 			$orientacion_papel = 'PORTRAIT';
