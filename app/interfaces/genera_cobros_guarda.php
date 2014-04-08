@@ -154,6 +154,7 @@ if ($print) {
 			cobro.codigo_cliente,
 			cobro.id_contrato,
 			contrato.id_carta,
+			contrato.codigo_idioma,
 			cobro.estado,
 			cobro.opc_papel,
 			cobro.subtotal_gastos
@@ -198,12 +199,17 @@ if ($print) {
 				}
 
 				$NotaCobro->LoadAsuntos();
+				
+				$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
+
+				require_once Conf::ServerDir() . "/lang/$lang_archivo";
+				
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
 				$opc_papel = $cob['opc_papel'];
 				$id_carta = $cob['id_carta'];
 				$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
-
+				
 				if ($html) {
 					$cssData .= UtilesApp::CSSCobro($Sesion);
 					if (is_object($doc)) {
@@ -214,6 +220,7 @@ if ($print) {
 						if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
 							$orientacion_papel = 'PORTRAIT';
 						}
+						
 						$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
 					}
 					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
