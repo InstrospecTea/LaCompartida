@@ -187,16 +187,9 @@ class NotaCobro extends Cobro {
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 
 		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-		if ($tipo_cambio_moneda_total == 0)
+		if ($tipo_cambio_moneda_total == 0) {
 			$tipo_cambio_moneda_total = 1;
-
-		if ($lang == '') {
-			$lang = 'es';
 		}
-
-		/*
-		 * 	require_once Conf::ServerDir()."/lang/$lang.php";
-		 */
 
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
