@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.1.12
+Martes 08 de abril 2014
+* **Fixed:** [Correccion a generacion de borradores masivos segun el lenguaje correcto](https://github.com/LemontechSA/ttb/pull/472)
+
 ## Hotfix: 14.1.11
 Jueves 03 de abril 2014
 * **Fixed:** [Corrige filtros en módulo de tareas](https://github.com/LemontechSA/ttb/pull/471)
