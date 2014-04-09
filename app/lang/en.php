@@ -585,6 +585,8 @@ $_LANG['Sr.'] = "Mr.";
 $_LANG['Declaración de Honorarios y Gastos'] = "Statement for Fees and Expenses";
 $_LANG['Via Fax'] = "Via Fax";
 $_LANG['y'] = "and";
+$_LANG['por_concepto_de_gastos'] = "for expenses";
+$_LANG['por_concepto_de_honorarios'] = "in fees";
 
 ###### Cartas Clientes ######
 //
