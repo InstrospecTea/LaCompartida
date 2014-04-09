@@ -187,16 +187,9 @@ class NotaCobro extends Cobro {
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 
 		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-		if ($tipo_cambio_moneda_total == 0)
+		if ($tipo_cambio_moneda_total == 0) {
 			$tipo_cambio_moneda_total = 1;
-
-		if ($lang == '') {
-			$lang = 'es';
 		}
-
-		/*
-		 * 	require_once Conf::ServerDir()."/lang/$lang.php";
-		 */
 
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
@@ -379,6 +372,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%direccion%', $PdfLinea3, $html);
 				$html = str_replace('%direccion_blr%', __('%direccion_blr%'), $html);
 				$html = str_replace('%glosa_fecha%', __('Fecha') . ':', $html);
+				$html = str_replace('%glosa_fecha_mayuscula%', __('FECHA'), $html);
+				$html = str_replace('%texto_factura%', __('FACTURA'), $html);
 				$html = str_replace('%fecha_gqmc%', ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL') ? ucwords(strftime(Utiles::FormatoStrfTime("%e %B %Y"), time())) : ucwords(strftime(Utiles::FormatoStrfTime("%e %B %Y"), strtotime($this->fields['fecha_emision']))), $html);
 				$html = str_replace('%fecha%', ($this->fields['fecha_cobro'] == '0000-00-00 00:00:00' or $this->fields['fecha_cobro'] == '' or $this->fields['fecha_cobro'] == 'NULL') ? Utiles::sql2fecha(date('Y-m-d'), $idioma->fields['formato_fecha']) : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 
@@ -529,6 +524,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%codigo_contrato%', '', $html);
 				}
 
+				$html = str_replace('%reporte_servicio%', __('Reporte de Servicios'), $html);
 				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%factura_o_nd%', 'Factura o ND', $html);
 				$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
@@ -546,6 +542,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%total_simbolo%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				$html = str_replace('%boleta%', empty($this->fields['documento']) ? '' : __('Boleta'), $html);
 				$html = str_replace('%encargado%', __('Director proyecto'), $html);
+				$html = str_replace('%instrucciones_pago%', __('INSTRUCCIONES DE PAGO'), $html);
+				$html = str_replace('%giro_bancario%', __('Giro bancario a'), $html);
 
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
@@ -3291,6 +3289,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%subtitulo%', $PdfLinea2, $html);
 				$html = str_replace('%direccion_blr%', __('%direccion_blr%'), $html);
 				$html = str_replace('%glosa_fecha%', __('Fecha') . ':', $html);
+				$html = str_replace('%glosa_fecha_mayuscula%', __('FECHA'), $html);
+				$html = str_replace('%texto_factura%', __('FACTURA'), $html);
 				$html = str_replace('%fecha_gqmc%', ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL') ? ucwords(strftime(Utiles::FormatoStrfTime("%e %B %Y"), time())) : ucwords(strftime(Utiles::FormatoStrfTime("%e %B %Y"), strtotime($this->fields['fecha_emision']))), $html);
 				$html = str_replace('%fecha%', ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL') ? Utiles::sql2fecha(date('Y-m-d'), $idioma->fields['formato_fecha']) : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 
@@ -3556,6 +3556,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%texto_fecha_emision%', __('Fecha Emisión'), $html);
+				$html = str_replace('%instrucciones_pago%', __('INSTRUCCIONES DE PAGO'), $html);
+				$html = str_replace('%giro_bancario%', __('Giro bancario a'), $html);
 
 				if (array_key_exists('codigo_contrato', $contrato->fields)) {
 					$html = str_replace('%glosa_codigo_contrato%', __('Código') . ' ' . __('Contrato'), $html);
@@ -6620,6 +6622,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_total_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
+				$html = str_replace('%texto_instrucciones%', __('texto_instrucciones'), $html);
 
 				if ($lang == 'es') {
 
@@ -6682,6 +6685,9 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%resumen_cobro%', __('Resumen Nota de Cobro'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%texto_fecha_emision%', __('Fecha de Emisión'), $html);
+				$html = str_replace('%instrucciones_pago%', _('INSTRUCCIONES DE PAGO'), $html);
+				$html = str_replace('%giro_bancario%', _('Giro bancario a'), $html);
+
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
