@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.1.13
+Miercoles 09 de abril 2014
+* **Add:** [Traducciones para tags por_concepto_de_gastos y por_concepto_de_honorarios para GFCU](https://github.com/LemontechSA/ttb/pull/473)
+
 ## Hotfix: 14.1.12
 Martes 08 de abril 2014
 * **Fixed:** [Correccion a generacion de borradores masivos segun el lenguaje correcto](https://github.com/LemontechSA/ttb/pull/472)
