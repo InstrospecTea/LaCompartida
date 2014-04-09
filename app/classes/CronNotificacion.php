@@ -51,14 +51,25 @@ class CronNotificacion extends Cron {
 			$DiaMailSemanal = 'Fri';
 		}
 
+		$usuarios_vacaciones = $this->query("SELECT GROUP_CONCAT(U.id_usuario SEPARATOR ',') AS ids
+												FROM usuario U
+												INNER JOIN usuario_permiso UP USING(id_usuario)
+												LEFT JOIN usuario_vacacion UV
+													ON UV.id_usuario = U.id_usuario
+														AND CURDATE() BETWEEN UV.fecha_inicio AND UV.fecha_fin
+												WHERE UP.codigo_permiso = 'PRO'
+													AND U.activo = 1
+													AND UV.id IS NOT NULL");
+		$where_usuarios_vacaciones = empty($usuarios_vacaciones) ? '' : " AND usuario.id_usuario NOT IN ({$usuarios_vacaciones[0]['ids']})";
+
 		if (date('D') == $DiaMailSemanal || ($forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
 			$this->log("  INICIO semanales ({$DiaMailSemanal})");
-			$this->semanales();
+			$this->semanales($where_usuarios_vacaciones);
 		}
 
 		$this->log('  INICIO diarios');
 		$this->Sesion->debug('INICIO diarios');
-		$this->diarios();
+		$this->diarios($where_usuarios_vacaciones);
 
 		if (date('j') == 1) {
 			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
@@ -70,7 +81,7 @@ class CronNotificacion extends Cron {
 		$this->Sesion->debug('FIN CronNotificacion');
 	}
 
-	public function semanales() {
+	public function semanales($where_usuarios_vacaciones) {
 		$dato_semanal = array();
 
 		/* Mensajes */
@@ -95,7 +106,7 @@ class CronNotificacion extends Cron {
 					username AS nombre_usuario
 				FROM usuario
 				JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso = 'PRO' AND activo = 1 ";
+				WHERE codigo_permiso = 'PRO' AND activo = 1 $where_usuarios_vacaciones";
 		$resultados = $this->query($query);
 		$total_resultados = count($resultados);
 		$alerta_semanal_todos_abogadosa_administradores = Conf::GetConf($this->Sesion, 'AlertaSemanalTodosAbogadosaAdministradores');
@@ -164,8 +175,8 @@ class CronNotificacion extends Cron {
 							alerta_semanal, codigo_permiso,
 							GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
 						FROM usuario
-						LEFT JOIN usuario_permiso ON (usuario.id_usuario = usuario_permiso.id_usuario
-							AND ( usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM' ))
+						LEFT JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
+							AND ( usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM' )
 						LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
 						WHERE activo = 1
 							AND alerta_revisor = 1
@@ -230,27 +241,27 @@ class CronNotificacion extends Cron {
 	 * y se registra en el log_correo.
 	 */
 
-	public function diarios() {
+	public function diarios($where_usuarios_vacaciones) {
 		$this->log('    modificacion_contrato');
 		$this->modificacion_contrato();
 		$this->log('    limites_asuntos');
-		$this->limites_asuntos();
+		$this->limites_asuntos($where_usuarios_vacaciones);
 		$this->log('    limites_contrato');
 		$this->limites_contrato();
 		$this->log('    limites_cliente');
 		$this->limites_cliente();
 		$this->log('    cierre_cobranza');
-		$this->cierre_cobranza();
+		$this->cierre_cobranza($where_usuarios_vacaciones);
 		$this->log('    ingreso_horas');
-		$this->ingreso_horas();
+		$this->ingreso_horas($where_usuarios_vacaciones);
 		$this->log('    cobros_pagados');
 		$this->cobros_pagados();
 		$this->log('    hitos_cumplidos');
 		$this->hitos_cumplidos();
 		$this->log('    horas_mensuales');
-		$this->horas_mensuales();
+		$this->horas_mensuales($where_usuarios_vacaciones);
 		$this->log('    horas_por_facturar');
-		$this->horas_por_facturar();
+		$this->horas_por_facturar($where_usuarios_vacaciones);
 
 		// Fin del mail diario. Envío.
 		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
@@ -346,7 +357,7 @@ class CronNotificacion extends Cron {
 	 * 		Alertas de límites de Asuntos.
 	 */
 
-	private function limites_asuntos() {
+	private function limites_asuntos($where_usuarios_vacaciones) {
 		$query_asuntos = "SELECT asunto.codigo_asunto,
 								usuario.id_usuario,
 								usuario.username,
@@ -354,7 +365,7 @@ class CronNotificacion extends Cron {
 							FROM asunto
 							JOIN usuario ON (asunto.id_encargado = usuario.id_usuario)
 							JOIN cliente ON (asunto.codigo_cliente = cliente.codigo_cliente)
-							WHERE asunto.activo = '1' AND cliente.activo = '1'";
+							WHERE asunto.activo = '1' AND cliente.activo = '1' $where_usuarios_vacaciones";
 		$asuntos = $this->query($query_asuntos);
 		$total_asuntos = count($asuntos);
 		for ($x = 0; $x < $total_asuntos; ++$x) {
@@ -753,7 +764,7 @@ class CronNotificacion extends Cron {
 	 * 		Cierre de cobranza.
 	 */
 
-	private function cierre_cobranza() {
+	private function cierre_cobranza($where_usuarios_vacaciones) {
 		if (method_exists('Conf', 'GetConf')) {
 			$adelanto_alerta_fin_de_mes = (int) Conf::GetConf($this->Sesion, 'AdelantoAlertaFinDeMes');
 		}
@@ -770,7 +781,7 @@ class CronNotificacion extends Cron {
 						FROM usuario
 						JOIN usuario_permiso USING (id_usuario)
 						WHERE codigo_permiso='PRO'
-							AND activo=1";
+							AND activo=1 $where_usuarios_vacaciones";
 			$resultados = $this->query($query);
 			$total_resultados = count($resultados);
 			for ($x = 0; $x < $total_resultados; ++$x) {
@@ -814,14 +825,14 @@ class CronNotificacion extends Cron {
 	 * 		Alertas de ingreso de horas.
 	 */
 
-	public function ingreso_horas() {
+	public function ingreso_horas($where_usuarios_vacaciones) {
 		// Solo enviar alertas de Lunes a Viernes
 		if (date('N') < 6) {
 			$query = "SELECT usuario.id_usuario
-				FROM usuario
-					INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
-				WHERE usuario_permiso.codigo_permiso = 'PRO' AND usuario.alerta_diaria = 1
-					AND usuario.activo = 1";
+						FROM usuario
+							INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
+						WHERE usuario_permiso.codigo_permiso = 'PRO' AND usuario.alerta_diaria = 1
+							AND usuario.activo = 1 $where_usuarios_vacaciones";
 			if ($this->correo != 'simular_correo') {
 				$query.=" AND usuario.retraso_max_notificado = 0 ";
 			}
@@ -862,9 +873,9 @@ class CronNotificacion extends Cron {
 				if ($profesional->fields['restriccion_diario'] > 0) {
 					$timezone_offset = UtilesApp::get_offset_os_utc() - UtilesApp::get_utc_offset(Conf::GetConf($this->Sesion, 'ZonaHoraria'));
 					$query = "SELECT SUM(TIME_TO_SEC(trabajo.duracion) / 3600) AS cantidad_horas
-						FROM trabajo
-						WHERE trabajo.id_usuario = '$id_usuario'
-							AND trabajo.fecha = DATE(DATE_ADD(NOW(), INTERVAL $timezone_offset HOUR))";
+								FROM trabajo
+								WHERE trabajo.id_usuario = '$id_usuario'
+									AND trabajo.fecha = DATE(DATE_ADD(NOW(), INTERVAL $timezone_offset HOUR))";
 					$trabajo = $this->query($query);
 					$cantidad_horas = !empty($trabajo[0]['cantidad_horas']) ? $trabajo[0]['cantidad_horas'] : 0;
 
@@ -953,8 +964,8 @@ class CronNotificacion extends Cron {
 		$hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos();
 
 		if (!empty($hitos_cumplidos)) {
-			foreach ($hitos_cumplidos as $usuario_responable => $hito_cumplido) {
-				$this->datoDiario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
+			foreach ($hitos_cumplidos as $usuario_responsable => $hito_cumplido) {
+				$this->datoDiario[$usuario_responsable]['hitos_cumplidos'][] = $hito_cumplido;
 			}
 		}
 	}
@@ -962,13 +973,14 @@ class CronNotificacion extends Cron {
 	/**
 	 * Suma el total de horas generadas por los trabajos ingresados
 	 */
-	public function horas_mensuales() {
+	public function horas_mensuales($where_usuarios_vacaciones) {
 		if (Conf::GetConf($this->Sesion, 'AlertaDiariaHorasMensuales')) {
 			$fecha_trabajo = date('Y-m-01');
+			$where_usuarios_vacaciones = str_replace('usuario.', 'trabajo.', $where_usuarios_vacaciones);
 			$query = "SELECT trabajo.id_usuario, TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(trabajo.duracion))), '%H:%i') AS horas
-				FROM trabajo
-				WHERE trabajo.fecha >= '{$fecha_trabajo}'
-				GROUP BY trabajo.id_usuario";
+						FROM trabajo
+						WHERE trabajo.fecha >= '{$fecha_trabajo}' $where_usuarios_vacaciones
+						GROUP BY trabajo.id_usuario";
 			$horas = $this->query($query);
 
 			$total_horas = count($horas);
@@ -982,7 +994,7 @@ class CronNotificacion extends Cron {
 	/**
 	 * Horas pendientes de liquidar a cada usuario según relación contrato-attache secundario
 	 */
-	public function horas_por_facturar() {
+	public function horas_por_facturar($where_usuarios_vacaciones) {
 		if (Conf::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturar')) {
 			$AtacheSecundarioSoloAsunto = Conf::GetConf($this->Sesion, 'AtacheSecundarioSoloAsunto');
 			$separar_asuntos = 0;
@@ -1007,6 +1019,8 @@ class CronNotificacion extends Cron {
 				$ReporteContrato->MissingEntriesQuery();
 			}
 
+			$wur = str_replace('usuario.', 'usuario_responsable.', $where_usuarios_vacaciones);
+			$wus = str_replace('usuario.', 'usuario_secundario.', $where_usuarios_vacaciones);
 			$querycobros = "SELECT
 					contrato.id_contrato,
 					contrato.codigo_contrato,
@@ -1015,16 +1029,16 @@ class CronNotificacion extends Cron {
 					cliente.codigo_cliente,
 					cliente.glosa_cliente AS cliente,
 					GROUP_CONCAT(asunto.codigo_asunto, '|@|', asunto.glosa_asunto SEPARATOR '|$|') AS asuntos,
-					CONCAT_WS(' ', usuario_responable.nombre, usuario_responable.apellido1) as usuario_responable_nombre,
+					CONCAT_WS(' ', usuario_responsable.nombre, usuario_responsable.apellido1) as usuario_responsable_nombre,
 					CONCAT_WS(' ', usuario_secundario.nombre, usuario_secundario.apellido1) as usuario_secundario_nombre
 				FROM asunto
 					LEFT JOIN contrato ON contrato.id_contrato = asunto.id_contrato
-					LEFT JOIN usuario AS usuario_responable ON usuario_responable.id_usuario = contrato.id_usuario_responsable
-					LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
+					LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable $wur
+					LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario $wus
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				WHERE  1
 					AND contrato.activo = 'SI'
-					AND (usuario_responable.activo = 1 OR usuario_secundario.activo = 1)
+					AND (usuario_responsable.activo = 1 OR usuario_secundario.activo = 1)
 					AND (
 						(SELECT Count(*)
 							FROM trabajo
@@ -1072,7 +1086,7 @@ class CronNotificacion extends Cron {
 
 				if (!empty($cobro['id_usuario_responsable']) && Conf::GetConf($this->Sesion, 'AlertaDiariaHorasPorFacturarEncargadoComercial')) {
 					if (empty($alertas[$cobro['id_usuario_responsable']]['usuario_nombre'])) {
-						$alertas[$cobro['id_usuario_responsable']]['usuario_nombre'] = $cobro['usuario_responable_nombre'];
+						$alertas[$cobro['id_usuario_responsable']]['usuario_nombre'] = $cobro['usuario_responsable_nombre'];
 					}
 
 					if (empty($alertas[$cobro['id_usuario_responsable']]['clientes'][$cobro['codigo_cliente']]['nombre'])) {
