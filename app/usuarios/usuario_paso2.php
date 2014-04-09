@@ -78,6 +78,24 @@ if ($opc == 'edit') {
 	$usuario->Validaciones($arr1, $pagina, $validaciones_segun_config);
 	$errores = $pagina->GetErrors();
 
+	if (empty($errorres) && (!empty($usuario->fields['id_usuario']) && $usuario->changes['activo'] && $activo == '1')) {
+		$UsuarioPermiso = new UsuarioPermiso($sesion);
+		$permitir_activar = true;
+		if ($UsuarioPermiso->esProfesional($usuario->fields['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'PRO')) {
+			$permitir_activar = false;
+		} else if ($UsuarioPermiso->esAdministrativo($usuario->fields['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'ADM')) {
+			$permitir_activar = false;
+		}
+
+		if (!$permitir_activar) {
+			$error = "Atención: Ocurrió un error al activar al usuario.<br>" .
+				"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
+				"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+			$pagina->AddError($error);
+			$errores[] = $error;
+		}
+	}
+
 	if (empty($errores)) {
 
 		//Compara y guarda cambios en los datos del Usuario
@@ -842,10 +860,15 @@ function CargarPermisos() {
 		if ($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']]) {
 			// si agrega el nuevo rol validar si tenemos cupo
 			if ($permiso->fields['permitido'] == 0 && $_POST[$permiso->fields['codigo_permiso']] == 1) {
-				if (!$UsuarioPermiso->puedeAsignarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
-					$error = "Ocurrió un error al asignar el rol '{$permiso->fields['codigo_permiso']}'.<br>" .
-						"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
-						"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+				if ($usuario->fields['activo'] == '1') {
+					if (!$UsuarioPermiso->puedeAsignarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
+						$error = "Ocurrió un error al asignar el rol '{$permiso->fields['codigo_permiso']}'.<br>" .
+							"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
+							"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+						$pagina->AddError($error);
+					}
+				} else {
+					$error = "Atención: Solo a los usuarios activos del sistema se les puede asignar roles.";
 					$pagina->AddError($error);
 				}
 			}
