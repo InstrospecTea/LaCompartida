@@ -1,6 +1,6 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
+// ini_set( 'memory_limit', '512M');
 
 $tini = time();
 

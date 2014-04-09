@@ -247,35 +247,57 @@
 			}
 		});
 
-		jQuery('.permiso').live('click', function() {
-			var Objeto = jQuery(this);
-			var Dato = jQuery(this).attr('rel').split(';');
-			var Act = jQuery(this).attr('alt');
-			var Accion = '';
+		jQuery('input.permiso').live('click', function() {
+			var self = jQuery(this);
+			var src = self.attr('src');
+			var dato = self.attr('rel').split(';');
+			var alt = '';
+			var accion = '';
 
-			if (Act == 'OK') {
-				Accion = 'revocar';
-				jQuery(this).attr('alt', 'NO');
-			} else if (Act == 'NO') {
-				Accion = 'conceder';
-				jQuery(this).attr('alt', 'OK');
+			self.attr('src', 'https://static.thetimebilling.com/images/ico_loading.gif');
 
-			} else if (Act == 'ACTIVO') {
-				Accion = 'desactivar';
-				jQuery(this).attr('alt', 'INACTIVO');
-				jQuery(this).closest('tr').addClass('inactivo');
-			} else {
-				Accion = 'activar';
-				jQuery(this).attr('alt', 'ACTIVO');
-				jQuery(this).closest('tr').removeClass('inactivo');
+			switch (self.attr('alt')) {
+				case 'OK':
+					accion = 'revocar';
+					alt = 'NO';
+					break;
+				case 'NO':
+					accion = 'conceder';
+					alt = 'OK';
+					break;
+				case 'ACTIVO':
+					accion = 'desactivar';
+					alt = 'INACTIVO';
+					break;
+				case 'INACTIVO':
+					accion = 'activar';
+					alt = 'ACTIVO';
+					break;
 			}
 
-			jQuery.post('../interfaces/ajax/permiso_ajax.php', {accion: Accion, userid: Dato[0], permiso: Dato[1]}, function(data) {
-				Objeto.attr('src', data);
-			});
-
-			Objeto.attr('src', 'https://static.thetimebilling.com/images/ico_loading.gif');
-			return false;
+			jQuery.post(
+				'../interfaces/ajax/permiso_ajax.php',
+				{
+					accion: accion,
+					id_usuario: dato[0],
+					permiso: dato[1]
+				},
+				function(data) {
+					data = jQuery.parseJSON(data);
+					if (data.error != '') {
+						alert(data.error);
+						self.attr('src', src);
+					} else {
+						self.attr('src', data.img);
+						self.attr('alt', alt);
+						if (alt == 'ACTIVO') {
+							self.closest('tr').removeClass('inactivo');
+						} else if (alt == 'INACTIVO') {
+							self.closest('tr').addClass('inactivo');
+						}
+					}
+				}
+			);
 		});
 
 		jQuery('.descargaxls').click(function() {

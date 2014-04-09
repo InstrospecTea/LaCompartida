@@ -825,26 +825,40 @@ if($sesion->usuario->TienePermiso('SADM'))  echo '<a style="border:0 none;" href
 }
 
 function CargarPermisos() {
+	global $sesion, $usuario, $pagina, $permiso, $_POST;
 
-	global $usuario, $pagina, $permiso, $_POST;
 	$permisos_inactivos = array();
 	$permisos_activos = array();
 	$permisos_activados = array();
+	$UsuarioPermiso = new UsuarioPermiso($sesion);
+
 	//Obtenemos lista de permisos actual sin considerar ALL
 	$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
 
 	for ($i = 0; $i < $usuario->permisos->num; $i++) {
-
+		$error = '';
 		$permiso = &$usuario->permisos->get($i);
 
 		if ($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']]) {
-			$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
-			$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+			// si agrega el nuevo rol validar si tenemos cupo
+			if ($permiso->fields['permitido'] == 0 && $_POST[$permiso->fields['codigo_permiso']] == 1) {
+				if (!$UsuarioPermiso->puedeAsignarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
+					$error = "Ocurrió un error al asignar el rol '{$permiso->fields['codigo_permiso']}'.<br>" .
+						"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
+						"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+					$pagina->AddError($error);
+				}
+			}
 
-			if (!$usuario->EditPermisos($permiso)) {
-				$pagina->AddError($usuario->error);
-			} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
-				$permisos_activados[] = $permiso->fields['codigo_permiso'];
+			if (empty($error)) {
+				$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
+				$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+
+				if (!$usuario->EditPermisos($permiso)) {
+					$pagina->AddError($usuario->error);
+				} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
+					$permisos_activados[] = $permiso->fields['codigo_permiso'];
+				}
 			}
 
 		} else {
