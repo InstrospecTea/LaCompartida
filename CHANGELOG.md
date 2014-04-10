@@ -1,5 +1,49 @@
 # Changelog
 
+## Hotfix: 14.1.13
+Miercoles 09 de abril 2014
+* **Add:** [Traducciones para tags por_concepto_de_gastos y por_concepto_de_honorarios para GFCU](https://github.com/LemontechSA/ttb/pull/474)
+
+## Hotfix: 14.1.12
+Martes 08 de abril 2014
+* **Fixed:** [Correccion a generacion de borradores masivos segun el lenguaje correcto](https://github.com/LemontechSA/ttb/pull/472)
+
+## Hotfix: 14.1.11
+Jueves 03 de abril 2014
+* **Fixed:** [Corrige filtros en módulo de tareas](https://github.com/LemontechSA/ttb/pull/471)
+
+## Hotfix: 14.1.10
+Jueves 03 de abril 2014
+* **Fixed:** [Cambia número de nueva factura al selecionar serie.](https://github.com/LemontechSA/ttb/pull/470)
+
+## Hotfix: 14.1.9
+Miércoles 2 de Abril 2014
+* **Fixed:** [Corrige comportamientos para la migración de Rebaza](https://github.com/LemontechSA/ttb/pull/469)
+
+## Hotfix: 14.1.8
+Miércoles 2 de Abril 2014
+* **Fixed:** [Corrige montos en listado de tramites](https://github.com/LemontechSA/ttb/pull/467)
+
+## Hotfix: 14.1.7
+Miércoles 2 de Abril 2014
+* **Fixed:** [Corrige flujo de conf UsaFechaDesde](https://github.com/LemontechSA/ttb/pull/466)
+
+## Hotfix: 14.1.6
+Lunes 31 de Marzo 2014
+* **Fixed:** [Nuevos elementos para Documentos PRWSLAWS](https://github.com/LemontechSA/ttb/pull/465)
+
+## Hotfix: 14.1.5
+Jueves 27 de Marzo 2014
+* **Fixed:** [Correccion a calculo de columna total trabajos en cobros_xls forma cobro ESCALONADA](https://github.com/LemontechSA/ttb/pull/463)
+
+## Hotfix: 14.1.4
+Martes 25 de Marzo 2014
+* **Fixed:** [Modificaciones a CartaCobro jdf](https://github.com/LemontechSA/ttb/pull/462)
+
+## Hotfix: 14.1.3
+Lunes 24 de Marzo 2014
+* **Fixed:** [Agrega traducción de asunto](https://github.com/LemontechSA/ttb/pull/461)
+
 ## Hotfix: 14.1.2
 Viernes 21 de Marzo 2014
 * **Fixed:** [Revierte la funcionalidad de iniciales por username](https://github.com/LemontechSA/ttb/pull/457)

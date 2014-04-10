@@ -521,13 +521,13 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		}
 		$estado = $actual;
 
-		if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			$num_facturas = $this->CantidadFacturasSinAnular();
 		} else {
 			$num_facturas = $this->fields['facturado'];
 		}
 
-		if ($num_facturas == 0 && UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+		if ($num_facturas == 0 && Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			if ($actual != 'ENVIADO AL CLIENTE') {
 				$estado = 'EMITIDO';
 			}
@@ -561,7 +561,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 			}
 
 			// Tomar suma de todos los pagos aplicados a facturas
-			if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 				$query = "SELECT ROUND(SUM(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio),m_cobro.cifras_decimales), SUM(IF(ccfmp.id_factura IS NULL,ROUND(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio,m_cobro.cifras_decimales),0))
 							FROM cta_cte_fact_mvto_neteo ccfmn
 								JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
@@ -573,6 +573,14 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 								JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total
 							WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "'";
 			} else {
+				$query = "SELECT
+							ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales ) AS monto_pagado,
+							ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales ) AS monto_pago_menos_ncs
+						FROM documento
+						INNER JOIN neteo_documento nd ON nd.id_documento_cobro = documento.id_documento
+						INNER JOIN prm_moneda moneda ON moneda.id_moneda = '{$this->fields['opc_moneda_total']}'
+						WHERE documento.id_cobro = '{$this->fields['id_cobro']}' AND documento.tipo_doc = 'N'";
+				/*
 				$query = "SELECT ROUND( SUM(-1*docpago.monto), mon.cifras_decimales ), ROUND( SUM(-1*docpago.monto), mon.cifras_decimales )
 							FROM documento doccobro
 								join neteo_documento nd on doccobro.id_documento=nd.id_documento_cobro
@@ -580,6 +588,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 								JOIN prm_moneda as mon ON mon.id_moneda ='" . $this->fields['opc_moneda_total'] . "'
 
 							WHERE doccobro.id_cobro = '" . $this->fields['id_cobro'] . "' and doccobro.tipo_doc='N' AND docpago.tipo_doc != 'N' ";
+				 */
 			}
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($monto_pagado, $monto_pago_menos_ncs) = mysql_fetch_array($resp);
@@ -590,13 +599,13 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				if ($num_facturas > 0) {
 					if (!empty($this->fields['fecha_enviado_cliente']) &&
 						$this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' &&
-						!UtilesApp::GetConf($this->sesion, 'EnviarAlClienteAntesDeFacturar')) {
+						!Conf::GetConf($this->sesion, 'EnviarAlClienteAntesDeFacturar')) {
 						$estado = 'ENVIADO AL CLIENTE';
 					} else {
 						$estado = 'FACTURADO';
 					}
 				} else {
-					if (!empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' && !UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					if (!empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' && !Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 						$estado = 'ENVIADO AL CLIENTE';
 					} else {
 						$estado = 'EMITIDO';
@@ -645,34 +654,35 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		return null;
 	}
 
-	function FechaPrimerPago() {
-		$query = "SELECT MIN(fp.fecha)
+	function FechaPagos($function = 'MAX') {
+		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			$query = "SELECT $function(fp.fecha)
 					FROM cta_cte_fact_mvto_neteo ccfmn
-						JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
-						JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
-						JOIN factura_pago fp ON fp.id_factura_pago = ccfmp.id_factura_pago
-						JOIN factura f ON f.id_factura = ccfm.id_factura
-					WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "' ";
-
+					INNER JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
+					INNER JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
+					INNER JOIN factura_pago fp ON fp.id_factura_pago = ccfmp.id_factura_pago
+					INNER JOIN factura f ON f.id_factura = ccfm.id_factura
+					WHERE f.id_cobro = '{$this->fields['id_cobro']}'";
+		} else {
+			$query = "SELECT $function(doc_pago.fecha)
+					FROM documento doc_cobro
+					INNER JOIN neteo_documento nd ON nd.id_documento_cobro = doc_cobro.id_documento
+					INNER JOIN documento doc_pago ON doc_pago.id_documento = nd.id_documento_pago
+					WHERE doc_cobro.tipo_doc = 'N' AND doc_cobro.id_cobro = '{$this->fields['id_cobro']}'";
+		}
+		
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($fecha_ini) = mysql_fetch_array($resp);
+		list($fecha) = mysql_fetch_array($resp);
 
-		return $fecha_ini;
+		return $fecha;
+	}
+	
+	function FechaPrimerPago() {
+		return $this->FechaPagos('MIN');
 	}
 
 	function FechaUltimoPago() {
-		$query = "SELECT MAX(fp.fecha)
-					FROM cta_cte_fact_mvto_neteo ccfmn
-						JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
-						JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
-						JOIN factura_pago fp ON fp.id_factura_pago = ccfmp.id_factura_pago
-						JOIN factura f ON f.id_factura = ccfm.id_factura
-					WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "' ";
-
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($fecha_ini) = mysql_fetch_array($resp);
-
-		return $fecha_ini;
+		return $this->FechaPagos('MAX');
 	}
 
 	function FechaPrimerTrabajo() {
@@ -1980,12 +1990,14 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 				$moneda->Load($contrato->fields['id_moneda']);
 
-				if (( ( ( method_exists('Conf', 'LoginDesdeSitio') && Conf::LoginDesdeSitio() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'LoginDesdeSitio') ) ) && !$this->sesion->usuario->fields['id_usuario']) || !$this->sesion->usuario->fields['id_usuario']) {
-					if (( method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'TieneTablaVisitante') )) {
+				if ( (Conf::GetConf($this->sesion, 'LoginDesdeSitio') && !$this->sesion->usuario->fields['id_usuario']) || !$this->sesion->usuario->fields['id_usuario']) {
+					
+					if ( Conf::GetConf($this->sesion, 'TieneTablaVisitante') ) {
 						$query = "SELECT id_usuario FROM usuario WHERE id_visitante = 0 ORDER BY id_usuario LIMIT 1";
 					} else {
 						$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario LIMIT 1";
 					}
+					
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($id_usuario_cobro) = mysql_fetch_array($resp);
 
@@ -1993,6 +2005,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				} else {
 					$this->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				}
+				
 				$this->Edit('codigo_cliente', $contrato->fields['codigo_cliente']);
 				$this->Edit('id_contrato', $contrato->fields['id_contrato']);
 				$this->Edit('id_moneda', $contrato->fields['id_moneda']);
@@ -2036,6 +2049,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 
 				$this->Edit('retainer_horas', $contrato->fields['retainer_horas']);
 				$this->Edit('retainer_usuarios', $contrato->fields['retainer_usuarios']);
+				
 				#Opciones
 				$this->Edit('id_carta', $contrato->fields['id_carta']);
 				$this->Edit('id_formato', $contrato->fields['id_formato']);
@@ -2074,17 +2088,17 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				}
 
 				$this->Edit("opc_moneda_total", $moneda_cobro_configurada);
-				/* */
-
 				$this->Edit("opc_ver_asuntos_separados", $contrato->fields['opc_ver_asuntos_separados']);
 				$this->Edit("opc_ver_horas_trabajadas", $contrato->fields['opc_ver_horas_trabajadas']);
 				$this->Edit("opc_ver_cobrable", $contrato->fields['opc_ver_cobrable']);
+				
 				// Guardamos datos de la moneda base
 				$this->Edit('id_moneda_base', $moneda_base['id_moneda']);
 				$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']);
 				$this->Edit('etapa_cobro', '4');
 				$this->Edit('codigo_idioma', $contrato->fields['codigo_idioma'] != '' ? $contrato->fields['codigo_idioma'] : 'es');
 				$this->Edit('id_proceso', $id_proceso);
+
 				#descuento
 				$this->Edit("tipo_descuento", $contrato->fields['tipo_descuento']);
 				$this->Edit("descuento", $contrato->fields['descuento']);
@@ -2092,7 +2106,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 				$this->Edit("id_moneda_monto", $contrato->fields['id_moneda_monto']);
 				$this->Edit("opc_ver_columna_cobrable", $contrato->fields['opc_ver_columna_cobrable']);
 
-				if ($fecha_ini != '' && $fecha_ini != '0000-00-00') {
+				if ($fecha_ini != '') {
 					$this->Edit('fecha_ini', $fecha_ini);
 				}
 

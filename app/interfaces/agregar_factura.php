@@ -242,7 +242,7 @@ if ($opcion == "guardar") {
 				}
 			}
 
-			if (UtilesApp::GetConf($sesion, 'UsarModuloProduccion')) {
+			if (Conf::GetConf($sesion, 'UsarModuloProduccion')) {
 				$factura->ActualizaGeneradores();
 			}
 
@@ -526,16 +526,16 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					</td>
 				</tr>
 			<?php } else { ?>
-				<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+				<input type="hidden" name="id_estudio" id="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
 			<?php } ?>
 
 			<?php
 			$numero_documento = '';
 
-			if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 				$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
-			} else if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
+			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
 			}
 			?>
@@ -543,13 +543,13 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td width="140" align="right"><?php echo __('Número'); ?></td>
 				<td align="left">
 					<?php
-					if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 						$serie_documento_legal = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
-						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), "serie", $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
+						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
 					} else {
 						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
-					?>
-					<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
+						?>
+						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>
 					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
@@ -1613,13 +1613,13 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var estudio_serie_numero = jQuery(document).data('estudio_serie_numero');
 
 		jQuery.each(estudio_series, function(estudio, series) {
-			if (jQuery('#id_estudio').attr('value') == estudio) {
+			if (jQuery('#id_estudio').val() == estudio) {
 				jQuery.each(series, function(serie, numero) {
-					if (jQuery('#serie').attr('value') == serie) {
+					if (jQuery('#serie').val() == serie) {
 						if (estudio_serie_numero.estudio != estudio || estudio_serie_numero.serie != serie) {
-							jQuery('#numero').attr('value', numero);
+							jQuery('#numero').val(numero);
 						} else {
-							jQuery('#numero').attr('value', estudio_serie_numero.numero);
+							jQuery('#numero').val(estudio_serie_numero.numero);
 						}
 						return false;
 					}

@@ -4,13 +4,12 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $tini = time();
 
-
 $Sesion = new Sesion(array('COB', 'DAT'));
 PhpConsole::start(false, true, null, 1);
 
-if (empty($_GET['generar_silenciosamente']))
+if (empty($_GET['generar_silenciosamente'])) {
 	$Pagina = new Pagina($Sesion);
-
+}
 
 if ((!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0 ) && isset($_GET['generar_silenciosamente'])) {
 	$forzar = false;
@@ -18,11 +17,22 @@ if ((!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0 ) && isset($_
 	$forzar = true;
 }
 
+// Retrocompatibilidad con funcionamiento de Conf en GTD Solicitado por @gtigre el 26-03-2014
+if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
+	$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) FROM cobro WHERE id_contrato = '" . $id_contrato . "'";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	list($fecha_ini_cobro) = mysql_fetch_array($resp);
+} else {
+	if (!empty($fecha_ini)) {
+		$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
+	}
+}
 
 //si no me llega uno, es 0
 $incluye_gastos = !empty($incluye_gastos);
 $incluye_honorarios = !empty($incluye_honorarios);
 //si no me llega ninguno, asumo q son los 2 (comportamiento anterior)
+
 if (!$incluye_gastos && !$incluye_honorarios) {
 	$incluye_gastos = $incluye_honorarios = true;
 }
@@ -30,9 +40,11 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_honorarios = $tipo_liquidacion & 1 ? true : false;
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
 }
+
 if ($individual) {
 	$Cobro = new Cobro($Sesion);
 	if ($id_contrato) {
+
 		$id_proceso_nuevo = $Cobro->GeneraProceso();
 
 		if (empty($monto)) {
@@ -41,9 +53,6 @@ if ($individual) {
 		if (empty($id_cobro_pendiente)) {
 			$id_cobro_pendiente = '';
 		}
-
-
-		$fecha_ini_cobro = empty($fecha_ini) ? "" : Utiles::fecha2sql($fecha_ini); // Comentado por SM 28.01.2011 el conf nunca se usa
 
 		$id = $Cobro->PrepararCobro(
 				$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios
@@ -58,8 +67,8 @@ if ($individual) {
 		}
 	}
 }
+
 $Contrato = new Contrato($Sesion);
-//set_time_limit(0);
 
 if ($codigo_cliente_secundario) {
 	$cliente = new Cliente($Sesion);
@@ -74,6 +83,7 @@ if ($codigo_asunto && !$id_contrato) {
 
 ####### WHERE SQL ########
 if ($print || $emitir) {
+
 	$where = 1;
 	$join_cobro_cliente = "";
 	if ($activo) {
@@ -105,10 +115,12 @@ if ($print || $emitir) {
 	} else if ($fecha_periodo_ini != '' && $fecha_periodo_fin != '' && $rango == 1 && $usar_periodo == 1) {
 		$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_periodo_ini) . "' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_periodo_fin) . "' ";
 	} else {
-		if (!empty($fecha_ini))
+		if (!empty($fecha_ini)) {
 			$where .= " AND cobro.fecha_ini >= '" . Utiles::fecha2sql($fecha_ini) . "' ";
-		if (!empty($fecha_fin))
+		}
+		if (!empty($fecha_fin)) {
 			$where .= " AND cobro.fecha_fin <= '" . Utiles::fecha2sql($fecha_fin) . "' ";
+		}
 	}
 	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
@@ -125,6 +137,7 @@ if ($print || $emitir) {
 	$url = "genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 			"&fecha_fin=$fecha_fin&opc=buscar&rango=$rango&fecha_anio=$fecha_anio&fecha_mes=$fecha_mes&fecha_periodo_ini=$fecha_periodo_ini" .
 			"&fecha_periodo_fin=$fecha_periodo_fin&usar_periodo=$usar_periodo&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto";
+
 }
 ####### END #########
 # IMPRESION
@@ -134,12 +147,21 @@ if ($print) {
 	$mincartas = $mincartaST->fetchAll(PDO::FETCH_COLUMN, 0);
 	$mincarta = $mincartas[0];
 
-	$query = "SELECT cobro.id_cobro, cobro.id_usuario, cobro.codigo_cliente, cobro.id_contrato,  contrato.id_carta, cobro.estado, cobro.opc_papel, cobro.subtotal_gastos
-								FROM cobro
-								JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-								LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
-								WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' )
-								ORDER BY cliente.glosa_cliente";
+	$query = "
+		SELECT
+			cobro.id_cobro,
+			cobro.id_usuario,
+			cobro.codigo_cliente,
+			cobro.id_contrato,
+			contrato.id_carta,
+			contrato.codigo_idioma,
+			cobro.estado,
+			cobro.opc_papel,
+			cobro.subtotal_gastos
+		FROM cobro
+			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+			LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
+				WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' ) ORDER BY cliente.glosa_cliente";
 
 	try {
 		$cobroST = $Sesion->pdodbh->query($query);
@@ -150,53 +172,61 @@ if ($print) {
 		$error_logfile = ini_get('error_log');
 		$logdir = dirname($error_logfile);
 
-
-
 		$html = "";
 		if ($totaldecobros > 0) {
 
 			foreach ($cobroRT as $cob) {
 
 				set_time_limit(100);
-				if (!$NotaCobro->Load($cob['id_cobro']))
-					continue;
 
+				if (!$NotaCobro->Load($cob['id_cobro'])) {
+					continue;
+				}
+				
 				if ($opcion != 'cartas') {
-					$NotaCobro->fields['id_carta'] = null;
+				 	$NotaCobro->fields['id_carta'] = null;
 				} else {
-					if (!$NotaCobro->fields['id_carta']) {
-						$NotaCobro->fields['id_carta'] = $mincarta;
-						$NotaCobro->fields['opc_ver_carta'] = 1;
-					}
+				 	if (!$NotaCobro->fields['id_carta']) {
+				 		$NotaCobro->fields['id_carta'] = $mincarta;
+				 		$NotaCobro->fields['opc_ver_carta'] = 1;
+				 	}
 				}
 
-
-
 				if ($cob['subtotal_gastos'] == 0) {
-					$NotaCobro->fields['opc_ver_gastos'] = 0;
+				   $NotaCobro->fields['opc_ver_gastos'] = 0;
 				}
 
 				$NotaCobro->LoadAsuntos();
+
+				$lang_archivo = $cob['codigo_idioma'] . '.php';
+
+				require_once Conf::ServerDir() . "/lang/$lang_archivo";
+				
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
 				$opc_papel = $cob['opc_papel'];
 				$id_carta = $cob['id_carta'];
 				$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
-
+			
 				if ($html) {
+				
 					$cssData .= UtilesApp::CSSCobro($Sesion);
+				 	
 					if (is_object($doc)) {
-						$doc->newSession($html);
-					} else {
-						$orientacion_papel = UtilesApp::GetConf($Sesion, 'OrientacionPapelPorDefecto');
+				 		$doc->newSession($html);
+				 	} else {
+				 	
+				 		$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
-						if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
-							$orientacion_papel = 'PORTRAIT';
-						}
+				 		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
+				 			$orientacion_papel = 'PORTRAIT';
+				 		}
+						
 						$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
-					}
+				 	}
 					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
 				}
+
 			}
 			$doc->endChunkedOutput("cobro_masivo_$id_usuario.doc");
 		} else {
@@ -208,20 +238,30 @@ if ($print) {
 	} catch (Exception $e) {
 		debug($e->getTraceAsString());
 	}
-	if (is_object($Pagina))
+	if (is_object($Pagina)) {
 		$Pagina->Redirect($url);
+	}
+
 } else if ($emitir) {
 
 	$Cobro = new Cobro($Sesion);
-	//JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
-	$query = "SELECT cobro.id_cobro, cobro.id_usuario, cobro.codigo_cliente, cobro.id_contrato, contrato.id_carta, cobro.estado,
-								cobro.opc_papel,contrato.id_carta
-								FROM cobro
-								JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-								LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-								WHERE $where
-								AND cobro.estado IN ( 'CREADO', 'EN REVISION' )";
+	$query = "
+		SELECT
+			cobro.id_cobro,
+			cobro.id_usuario,
+			cobro.codigo_cliente,
+			cobro.id_contrato,
+			contrato.id_carta,
+			cobro.estado,
+			cobro.opc_papel,
+			contrato.id_carta
+		FROM cobro
+			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+				WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' )";
+
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+
 	while ($cob = mysql_fetch_array($resp)) {
 		set_time_limit(100);
 		if ($Cobro->Load($cob['id_cobro'])) {
@@ -238,7 +278,9 @@ if ($print) {
 	}
 	$url .= '&cobros_emitidos=1';
 	$Pagina->Redirect($url);
+
 } else { #Creación masiva de cobros
+
 	$where = 1;
 	$join = "";
 	$newcobro = array();
@@ -265,12 +307,11 @@ if ($print) {
 	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	}
-	/* if ($programados) {
-	  $join .= " INNER JOIN cobro_pendiente ON cobro_pendiente.id_contrato=contrato.id_contrato ";
-	  $where .= " AND cobro_pendiente.hito = '0' ";
-	  } */
+
 	$join .= "LEFT JOIN cobro_pendiente ON ( cobro_pendiente.id_contrato=contrato.id_contrato AND cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.fecha_cobro >= NOW() )";
+
 	$where .= " AND cobro_pendiente.id_cobro_pendiente IS NULL ";
+
 	$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato,cliente.codigo_cliente, contrato.id_moneda, contrato.forma_cobro, contrato.monto, contrato.retainer_horas, contrato.id_moneda, contrato.separar_liquidaciones
 				FROM contrato
 				$join
@@ -305,8 +346,8 @@ if ($print) {
 	} if ($solohh) { // desde genera_cobros.php estoy forzando que solamente incluya honorarios
 		while ($contra = mysql_fetch_array($resp)) {
 			set_time_limit(100);
-			//Mala documentaciÃ³n!!! Que significa $contra? Que hace GeneraProceso??? ICC
-			// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM )
+			//Mala documentación!!! Que significa $contra? Que hace GeneraProceso??? ICC
+			// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM)
 			$Cobro = new Cobro($Sesion);
 			if (!$id_proceso_nuevo) {
 				$id_proceso_nuevo = $Cobro->GeneraProceso();
@@ -332,7 +373,6 @@ if ($print) {
 			if (UtilesApp::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
 				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini); // Comentado por SM 28.01.2011 el conf nunca se usa
 			}
-
 
 			//si se separan pero se piden ambos, se generan 2 cobros
 			if ($contra['separar_liquidaciones'] == '1' && $incluye_gastos && $incluye_honorarios) {

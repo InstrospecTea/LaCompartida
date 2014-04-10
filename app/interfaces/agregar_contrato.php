@@ -109,9 +109,9 @@ if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contra
 
 // CONTRATO GUARDA
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
-	
+
 	$enviar_mail = 1;
-	
+
 	if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 		$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 		$val = true;
@@ -170,7 +170,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 
 		ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 		if (is_array($docs_legales)) {
-			
+
 			foreach ($docs_legales as $doc_legal) {
 				if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
 					continue;
@@ -408,7 +408,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			});
 
 			ActualizarFormaCobro();
-		
+
 			jQuery(".formacobro").click(function() {
 				var laID=jQuery(this).attr('id');
 				ActualizarFormaCobro(laID);
@@ -417,9 +417,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			loadGeneratorForm('NEW', {});
 			loadGenerators();
 		});
-	
+
 	<?php } ?>
-	
+
 	function YoucangonowMichael() {
 
 		<?php if ($contrato->fields['id_cuenta']) echo "SetBanco('id_cuenta','id_banco');"; ?>
@@ -457,7 +457,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function ValidarContrato(form) {
-		
+
 		if(!form) {
 			var form = jQuery('[name="formulario"]').get(0);
 		}
@@ -490,7 +490,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				form.factura_direccion.focus();
 				return false;
 			}
-	
+
 			if(!form.factura_ciudad.value) {
 				alert("<?php echo __('Debe ingresar la cuidad del cliente') ?>");
 				form.factura_cuidad.focus();
@@ -616,13 +616,13 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		return true;
 		//FIN Function:"ValidarContrato";
 	}
-					
+
 	function SetFormatoRut(){
-						
+
 		var rut = $('rut').value;
 
 		if( rut == "" ){
-			return true;	
+			return true;
 		}
 
 		while( rut.indexOf('.') != -1 ){
@@ -684,7 +684,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function ShowTHH() {
-		
+
 		jQuery("#div_forma_cobro").css('width','400px').hide();
 		jQuery("#div_monto").hide();
 		jQuery("#div_horas").show();
@@ -695,7 +695,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function ShowFlatFee() {
-		
+
 		jQuery("#div_forma_cobro").css('width','400px').show();
 		jQuery("#div_monto").show();
 		jQuery("#div_horas").hide();
@@ -718,7 +718,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function ShowProporcional() {
-		
+
 		jQuery("#div_forma_cobro").css('width','400px').show();
 		jQuery("#div_monto").show();
 		jQuery("#div_horas").show();
@@ -755,7 +755,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function ShowEscalonada() {
-		
+
 		jQuery("#div_forma_cobro").css('width','730px').show();
 		jQuery("#div_monto").hide();
 		jQuery("#div_horas").hide();
@@ -767,7 +767,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function ActualizaRango(desde, cant) {
-					
+
 		var aplicar = parseInt(desde.substr(-1,1));
 		var ini = 0;
 		num_escalas = (document.getElementsByName('esc_tiempo[]')).length;
@@ -977,23 +977,23 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function CreaTarifa(form, opcion, id_tarifa) {
-		
+
 		var form = $('formulario');
-		
+
 		if(opcion) {
 			nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1', '' );
 		} else {
 			if(!id_tarifa) {
 				var id_tarifa = jQuery('#id_tarifa').val();
-			}	
+			}
 			nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1&id_tarifa_edicion='+id_tarifa, '' );
 		}
 	}
 
 	function CreaTramiteTarifa(form, opcion, id_tramite_tarifa) {
-		
+
 		var form = $('formulario');
-		
+
 		if(opcion) {
 			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
 		} else {
@@ -1012,11 +1012,11 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		loading("Actualizando campo");
 		http.open('get', url);
 		http.onreadystatechange = function() {
-			
+
 			if(http.readyState == 4){
-				
+
 				var response = http.responseText;
-				
+
 				if( response == "~noexiste" ) {
 					$(destino).options.length = 0;
 				} else {
@@ -1024,11 +1024,11 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					cuentas = response.split('//');
 
 					for(var i=0;i<cuentas.length;i++) {
-						
+
 						valores = cuentas[i].split('|');
 
 						var option = new Option();
-						
+
 						if( valores[0] == "Vacio") {
 							option.value = '';
 						} else {
@@ -1051,12 +1051,12 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function InactivaContrato(alerta, opcion) {
-		
+
 		var form = $('formulario');
 
 		if(!form) {
 			form = jQuery('[name="formulario"]').get(0);
-		} 
+		}
 
 		var activo_contrato = $('activo_contrato');
 
@@ -1075,13 +1075,13 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				buttonClass: "btn",
 				className: "alphacube",
 				id: "myDialogId",
-				
-				cancel:function(win){ 
+
+				cancel:function(win){
 					activo_contrato.checked = true;
 					jQuery('#desactivar_contrato').remove();
-					return false; 
+					return false;
 				},
-	
+
 				ok:function(win){
 					jQuery('[name="formulario"]').append('<input type="hidden" value="1" id="desactivar_contrato" name="desactivar_contrato"/>');
 					ValidarContrato(this.form); return true;
@@ -1193,7 +1193,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			}
 			numero_cobro= <?php echo $numero_cobro ?>+i;
 			$('valor_descripcion_1').value="<?php echo __('Cobro N°'); ?> "+numero_cobro;
-			
+
 			if($('fc3').checked==true){
 				$('valor_monto_estimado_1').value=$('monto').value;
 			} else {
@@ -1209,9 +1209,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function agregarFila() {
-		
+
 		var largo = $('tabla_fechas').rows.length;
-		
+
 		if($('valor_fecha_1').value!='') {
 			var temp1=$('valor_fecha_1').value.split('-');
 			var nueva_fecha_orden=new Date(temp1[2],temp1[1],temp1[0]);
@@ -1232,16 +1232,16 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		var descripcion=fila.insertCell(1);
 		var monto=fila.insertCell(2);
 		var borrar=fila.insertCell(3);
-		
+
 		fecha.innerHTML="<input type='hidden' class='fecha' value='"+$('valor_fecha_1').value+"' />"+$('valor_fecha_1').value;
 		descripcion.innerHTML="<input type='text' class='descripcion' size='40' value='"+$('valor_descripcion_1').value+"' />";
 		monto.innerHTML="<span class='moneda_tabla' align='center'></span>&nbsp;&nbsp;<input type='text' class='monto_estimado' size='7' value='"+$('valor_monto_estimado_1').value+"' />";
 		borrar.innerHTML="<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarFila(this.parentNode.parentNode.rowIndex);' />";
-		
+
 		$('valor_fecha_1').value = '';
 		$('valor_descripcion_1').value = '';
 		$('valor_monto_estimado_1').value = '';
-		
+
 		actualizarTabla();
 	}
 
@@ -1254,22 +1254,22 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function actualizarTabla(){
-		
+
 		var x=2;
-		
+
 		$$('.fecha').each(
-		
+
 			function(item) {
 				item.id="valor_fecha_"+x;
 				item.name="valor_fecha["+x+"]";
 				x++;
 			}
 		);
-		
+
 		x=2;
-		
+
 		$$('.descripcion').each(
-		
+
 			function(item) {
 				item.id="valor_descripcion_"+x;
 				item.name="valor_descripcion["+x+"]";
@@ -1280,7 +1280,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		x=2;
 
 		$$('.monto_estimado').each(
-		
+
 			function(item) {
 				item.id="valor_monto_estimado_"+x;
 				item.name="valor_monto_estimado["+x+"]";
@@ -1291,19 +1291,19 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		var largo = $('tabla_fechas').rows.length;
 
 		for (var i = 2;i < largo;i++) {
-			
+
 			var fila = $('tabla_fechas').rows[i];
 			fila.id="fila_fecha_"+i;
 			var celda_a = fila.cells[0];
 			var celda_b = fila.cells[1];
 			var celda_c = fila.cells[2];
 			var celda_d = fila.cells[3];
-			
+
 			celda_a.style.textAlign="center";
 			celda_b.style.textAlign="left";
 			celda_c.style.textAlign="right";
 			celda_d.style.textAlign="center";
-			
+
 			if($('detalles_tabla_esconder').getStyle('display')=='none' && $('fila_fecha_'+i).getStyle('display')!='none' && i>6 ){
 				$('fila_fecha_'+i).toggle();
 			}
@@ -1313,7 +1313,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			if(i % 2 == 0) {
 				$('fila_fecha_'+i).bgColor="#f0f0f0";
 			} else {
-				$('fila_fecha_'+i).bgColor="#ffffff"; 
+				$('fila_fecha_'+i).bgColor="#ffffff";
 			}
 		}
 
@@ -1323,7 +1323,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 
 	var simbolo = new Array();
 
-	<?php 
+	<?php
 	$query = "SELECT id_moneda,simbolo FROM prm_moneda";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
@@ -1381,20 +1381,20 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	});
 
 	function CargarCuenta( origen, destino ) {
-		
+
 		var http = getXMLHTTP();
 		var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
 
 		loading("Actualizando campo");
 		http.open('get', url);
 		http.onreadystatechange = function() {
-			
+
 			if(http.readyState == 4){
 				var response = http.responseText;
 				if( response == "~noexiste" ) {
 					alert( "Usted no tiene cuentas en este banco." );
 				} else {
-					
+
 					$(destino).options.length = 0;
 					cuentas = response.split('//');
 
@@ -1430,7 +1430,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		loading("Actualizando campo");
 		http.open('get', url);
 		http.onreadystatechange = function() {
-			
+
 			if(http.readyState == 4) {
 				var response = http.responseText;
 				$(destino).value = response;
@@ -1470,7 +1470,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 
 		var http = getXMLHTTP();
 		var url = 'ajax.php?accion=revisar_tarifas&id_tarifa=' + $('id_tarifa').value + '&id_moneda=' + $(moneda).value + cobro_independiente + cliente;
-		
+
 		if(http) {
 			http.open('get',url,false);
 			http.send(null);
@@ -1481,14 +1481,14 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function RevisarTarifas(tarifa, moneda, f, desde_combo) {
-		
+
 		var ejecutar = true;
 
 		if ( !desde_combo )	{
-			
+
 			radio_tarifas = document.getElementsByName('tipo_tarifa');
 			var seleccionado = "";
-			
+
 			for( k=0; k < radio_tarifas.length; k++ ) {
 				if( radio_tarifas[k].checked ) {
 					seleccionado = radio_tarifas[k].value;
@@ -1502,7 +1502,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		}
 
 		if( ejecutar && ( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_contrato' || ( jQuery('#desde').val() == 'agregar_asunto' && jQuery('#cobro_independiente').is(':checked') ) ) ) {
-			
+
 			var text_window = "";
 			var respuesta = RevisarTarifasRequest(tarifa, moneda);
 			var parts = respuesta.split("::");
@@ -1525,9 +1525,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false,'+parts[3]+')"><?php echo __('Modificar tarifa.') ?></a></span>';
 
 				if( todos && !desde_combo )	{
-					
+
 					Dialog.alert(text_window, {
-						
+
 						top:100,
 						left:80,
 						width:400,
@@ -1536,7 +1536,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 						className: "alphacube",
 						id: 'myDialogId',
 						destroyOnClose: true,
-						
+
 						ok:function(win){
 							document.getElementById('id_tarifa').value=document.getElementById('id_tarifa_hidden').value;
 							document.getElementById('id_moneda').value=document.getElementById('id_moneda_hidden').value;
@@ -1547,7 +1547,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					});
 
 				} else {
-					
+
 					Dialog.confirm(text_window,	{
 						top:100,
 						left:80,
@@ -1557,7 +1557,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 						buttonClass: "btn",
 						className: "alphacube",
 						id: "myDialogId",
-						
+
 						cancel:function(win){
 							document.getElementById('id_tarifa').value=document.getElementById('id_tarifa_hidden').value;
 							document.getElementById('id_moneda').value=document.getElementById('id_moneda_hidden').value;
@@ -1567,10 +1567,10 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 						},
 
 						ok:function(win){
-						
+
 							respuesta_revisar_tarifa = true;
 							if( !desde_combo ) {
-								
+
 								if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_cliente') {
 									Validar(f);
 								} else {
@@ -1585,11 +1585,11 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					});
 				}
 			} else {
-				
+
 				respuesta_revisar_tarifa = true;
-				
+
 				if( !desde_combo ) {
-					
+
 					if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_asunto' ) {
 						Validar(f);
 					} else {
@@ -1598,11 +1598,11 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				}
 				return respuesta_revisar_tarifa;
 			}
-		
+
 		} else  {
-			
+
 			if( !desde_combo ) {
-				
+
 				if( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_asunto' ) {
 					Validar(f);
 				} else {
@@ -1621,7 +1621,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 
 		if (CopiarEncargadoAlAsunto && DesdeAgregaCliente) {
 			if (elemento.name == "id_usuario_responsable") {
-				
+
 				if (EncargadoSecundario ) {
 					$('id_usuario_secundario').value = $('id_usuario_responsable').value;
 					if(jQuery('#id_usuario_secundario').length>0) {
@@ -1654,7 +1654,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	}
 
 	function agregarHito(){
-	
+
 		if(!validarHito($('fila_hito_1'))) {
 			return false;
 		}
@@ -1664,7 +1664,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		var nuevo = $($('fila_hito_1').cloneNode(true));
 
 		nuevo.id = 'fila_hito_'+num;
-	
+
 		nuevo.select('[id$="_1"]').each(function(elem){
 			elem.id = elem.id.replace('1', num);
 			elem.name = elem.name.replace('1', num);
@@ -1753,7 +1753,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 
 	<!-- RESPONSABLE -->
 	<table id="responsable">
-		
+
 		<tr class="controls controls-row ">
 			<td class="al">
 				<div class="span4">
@@ -1776,8 +1776,8 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				</label>
 			</td>
 		</tr>
-		
-		<?php 
+
+		<?php
 
 		if (Conf::GetConf($Sesion, 'UsarImpuestoSeparado')) {
 
@@ -1786,7 +1786,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					echo '<div class="span4">';
 						echo __('Usa impuesto a honorario');
 					echo '</div>';
-				
+
 					// Se revisa también el primer contrato del cliente para el valor por defecto.
 					$chk = '';
 					if ($contrato->loaded()) {
@@ -1796,7 +1796,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					} else if (Utiles::Glosa($Sesion, $cliente->fields['id_contrato'], 'usa_impuesto_separado', 'contrato')) {
 						$chk = 'checked="checked"';
 					}
-				
+
 				echo '</td>';
 				echo '<td class="al">';
 
@@ -1805,16 +1805,16 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				echo '</td>';
 
 			echo '</tr>';
-			
+
 		}
-		
+
 		if (Conf::GetConf($Sesion, 'UsarImpuestoPorGastos')) {
 			echo '<tr class="controls controls-row ">';
 				echo '<td class="al">';
 					echo '<div class="span4">';
 						echo __('Usa impuesto a gastos');
 					echo '</div>';
-					
+
 						// Se revisa también el primer contrato del cliente para el valor por defecto.
 						$chk_gastos = '';
 						if ($contrato->loaded()) {
@@ -1831,7 +1831,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					echo '<input class="span1"  type="checkbox" name="usa_impuesto_gastos" id="impuesto_gastos" value="1" '. $chk_gastos .'/>';
 				echo '</td>';
 			echo '</tr>';
-		
+
 		}
 
 		if ($contrato->Loaded()) {
@@ -1860,11 +1860,11 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		</tr>
 
 		<?php
-			
+
 		$query = UsuarioExt::QueryComerciales();
-		
+
 		echo '<tr class="controls controls-row">';
-			
+
 			echo '<td class="al">';
 				echo '<div class="span4">';
 					echo __('Encargado Comercial');
@@ -1908,7 +1908,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		<?php if ($modulo_retribuciones_activo) {
 
 			$usuario_responsable_retrubucion = empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable'];
-			
+
 			echo '<tr>';
 				echo '<td class="al">';
 					echo '<div class="span4">';
@@ -1938,9 +1938,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					<?php echo Html::SelectQuery($Sesion, $query, "id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario'] : '', " class='span3' ", "Vacio", "200"); ?>
 				</td>
 			</tr>
-		
+
 		<?php if ($modulo_retribuciones_activo) { ?>
-			
+
 			<tr>
 				<td class="al">
 					<div class="span4">
@@ -1951,7 +1951,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					<input name="retribucion_usuario_secundario" type="text" size="6" value="<?php echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario']; ?>" />%
 				</td>
 			</tr>
-		
+
 		<?php } ?>
 
 		<?php } if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
@@ -1970,7 +1970,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		<?php } ?>
 
 	</table>
-	
+
 	<br>
 
 	<!-- FIN RESPONSABLE -->
@@ -1987,9 +1987,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		<?php echo!$div_show ? '<span id="datos_factura_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_factura_img"></span>' : '' ?>&nbsp;
 		<?php echo __('Datos Facturación') ?>
 	</legend>
-	
+
 	<table id='datos_factura' style='display:<?php echo $show ?>'>
-		
+
 		<tr>
 			<td align="right" width='20%'>
 				<?php echo __('ROL/RUT') ?>
@@ -1999,7 +1999,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				<input type="text" size=20 name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" onblur="<?php echo $setformato ?>validarUnicoCliente(this.value,'rut');" />
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td align="right" colspan="1">
 				<?php echo __('Razón Social') ?>
@@ -2016,13 +2016,13 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				<?php echo $obligatorio ?>
 			</td>
 			<td align="left" colspan="5">
-				
+
 				<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) {
 					echo Html::SelectQuery($Sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "factura_giro", $contrato->fields['factura_giro'], "", "");
 				} else {
 					echo "<input type='text' name='factura_giro' size='50' value='" . $contrato->fields['factura_giro']. "' />";
 				} ?>
-			
+
 			</td>
 		</tr>
 
@@ -2108,8 +2108,8 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		</tr>
 
 		<!-- SEGMENTO BANCOS-->
-		
-		<?php 
+
+		<?php
 
 			$id_banco = false;
 
@@ -2132,7 +2132,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			}
 
 		?>
-		
+
 		<tr>
 			<td align="right" colspan="1">
 				<?php echo __('Banco') ?>
@@ -2173,7 +2173,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			} else {
 				$where_banco2 = " WHERE 1=2 ";
 			}
-		
+
 			echo '<tr>';
 				echo '<td align="right" colspan="1">';
 						echo __('Banco Secundario');
@@ -2198,7 +2198,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			if (empty($id_estudio)) {
 				$id_estudio = $contrato->fields['id_estudio'];
 			}
-		
+
 			if (count($estudios_array) > 1) {
 				echo '<tr>';
 					echo '<td align="right">';
@@ -2211,7 +2211,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			} else {
 				echo '<input type="hidden" name="id_estudio" value="'. $estudios_array[0]['id_estudio'] . '" />';
 		} ?>
-	
+
 	</table>
 
 	</fieldset>
@@ -2259,7 +2259,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			</tr>
 
 		<?php } else { ?>
-			
+
 			<tr>
 				<td align="right" width='20%'>
 					<?php echo __('Nombre') ?>
@@ -2271,7 +2271,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			</tr>
 
 		<?php } ?>
-		
+
 		<tr>
 			<td align="right" colspan="1">
 				<?php echo __('Teléfono') ?>
@@ -2305,7 +2305,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					<!-- FIN SOLICITANTE -->
 
 	<br>
-	
+
 	<?php
 	$fecha_ini = date('d-m-Y');
 
@@ -2319,18 +2319,23 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		$fecha_ini = Utiles::sql2date($contrato->fields['periodo_fecha_inicio']);
 	}
 
-	if (!$id_moneda)
+	if (!$id_moneda){
 		$id_moneda = Moneda::GetMonedaTarifaPorDefecto($Sesion);
-	if (!$id_moneda)
+	}
+	if (!$id_moneda){
 		$id_moneda = Moneda::GetMonedaBase($Sesion);
+	}
 
-	if (!$id_moneda_tramite)
+	if (!$id_moneda_tramite){
 		$id_moneda_tramite = Moneda::GetMonedaTramitePorDefecto($Sesion);
+	}
 
-	if (!$opc_moneda_total)
+	if (!$opc_moneda_total){
 		$opc_moneda_total = Moneda::GetMonedaTotalPorDefecto($Sesion);
-	if (!$opc_moneda_total)
+	}
+	if (!$opc_moneda_total){
 		$opc_moneda_total = Moneda::GetMonedaBase($Sesion);
+	}
 
 	$config_validar_tarifa = ( Conf::GetConf($Sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 
@@ -2338,12 +2343,12 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 
 	<!-- COBRANZA -->
 	<fieldset style="width: 98%; background-color: #FFFFFF;">
-	
+
 	<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'datos_cobranza\')" style="cursor:pointer"' : '' ?> />
 		<?php echo!$div_show ? '<span id="datos_cobranza_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"></span>' : '' ?>
 		<?php echo __('Datos de Tarificación') ?>
 	</legend>
-		
+
 	<div id='datos_cobranza' style='display:<?php echo $show ?>' width="98%">
 
 		<table width="100%" >
@@ -2365,12 +2370,12 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 								</div>
 
 								<div   class="controls controls-row ">
-	
+
 									 <label for="tipo_tarifa_flat"  class="span2" >
 									 	<input type="radio"  name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
-										 Plana por 
+										 Plana por
 									 </label>
-				
+
 									<input id="tarifa_flat" class="input-small"  type="text" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?php echo $valor_tarifa_flat ?>"/>
 									<input type="hidden" id="id_tarifa_flat"  name="id_tarifa_flat" value="<?php echo $contrato->fields['id_tarifa'] ?>"/>
 								</div>
@@ -2408,7 +2413,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				if (!is_array($usuarios_retainer)) {
 					$usuarios_retainer = explode(',', $contrato->fields['retainer_usuarios']);
 				} ?>
-									
+
 				<td align="left" style="font-size:10pt;">
 					<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/> 
 					<div id="div_cobro" class="buttonset">
@@ -2446,13 +2451,13 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 							<?php echo $obligatorio ?>
 							&nbsp;<?php echo Html::SelectQuery($Sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda_monto", $contrato->fields['id_moneda_monto'] > 0 ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] > 0 ? $contrato->fields['id_moneda'] : $id_moneda_monto), 'onchange="actualizarMonto();"', '', "80");?>
 						</div>
-						
+
 						<div id="div_horas" align="left" style="display:none; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 							&nbsp;<?php echo __('Horas') ?>
 							<?php echo $obligatorio ?>
 							&nbsp;<input name="retainer_horas" size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
 							<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se desuentan las horas con preferencia -->
-							
+
 							<?php if ( Conf::GetConf($Sesion, 'RetainerUsuarios')) { ?>
 								<div id="div_retainer_usuarios" style="display:inline; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 									&nbsp;<?php echo __('Usuarios') ?>
@@ -2460,7 +2465,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 								</div>
 							<?php } ?>
 						</div>
-		
+
 						<div id="div_fecha_cap" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;">
 							<table style='border: 0px solid' bgcolor='#C6DEAD'>
 								<?php if ($cobro) { ?>
@@ -2521,24 +2526,24 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 							</div>
 
 							<div class="template_escalon" id="escalon_2" style="display: <?php echo isset($contrato->fields['esc2_tiempo']) && $contrato->fields['esc2_tiempo'] > 0 ? 'block' : 'none'; ?>;">
-							
+
 								<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
 									<tr>
 										<td valign="bottom" nowrap>
-											
+
 											<div style="display:inline-block; width: 65px;">
 												<?php echo __('Las siguientes'); ?>
 											</div>
-											
+
 											<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="3" value="<?php if (!empty($contrato->fields['esc2_tiempo'])) echo $contrato->fields['esc2_tiempo']; else echo ''; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
-											
+
 											<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango2; ?></div> <span>) <?php echo __('aplicar'); ?></span>
-										
+
 											<select name="esc_selector[]" id="esc_selector_2" onchange="cambia_tipo_forma(this.value, this.id);">
 												<option value="1" <?php echo!isset($contrato->fields['esc2_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 												<option value="2" <?php echo $contrato->fields['esc2_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 											</select>
-										
+
 											<span>
 												<span id="tipo_forma_2_1" <?php echo!isset($contrato->fields['esc2_monto']) || $contrato->fields['esc2_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
 													<?php echo Html::SelectQuery($Sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_2", $contrato->fields['esc2_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
@@ -2573,14 +2578,14 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 											</div>
 
 											<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="3" value="<?php if (!empty($contrato->fields['esc3_tiempo'])) echo $contrato->fields['esc3_tiempo']; else echo ''; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
-											
+
 											<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango3; ?></div> <span>) <?php echo __('aplicar'); ?></span>
-											
+
 											<select name="esc_selector[]" id="esc_selector_3" onchange="cambia_tipo_forma(this.value, this.id);">
 												<option value="1" <?php echo!isset($contrato->fields['esc3_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 												<option value="2" <?php echo $contrato->fields['esc3_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 											</select>
-											
+
 											<span>
 												<span id="tipo_forma_3_1" <?php echo!isset($contrato->fields['esc3_monto']) || $contrato->fields['esc3_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
 													<?php echo Html::SelectQuery($Sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_3", $contrato->fields['esc3_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
@@ -2591,13 +2596,13 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 											</span>
 
 											<span><?php echo __('en'); ?></span>
-											
+
 											<?php echo Html::SelectQuery($Sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_3', $contrato->fields['esc3_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
-											
+
 											<span><?php echo __('con'); ?></span>
-											
+
 											<input type="text" name="esc_descuento[]" id="esc_descuento_3" value="<?php if (!empty($contrato->fields['esc3_descuento'])) echo $contrato->fields['esc3_descuento']; else echo ''; ?>" size="4" />
-											
+
 											<span>
 												<?php echo __('% dcto.'); ?>
 											</span>
@@ -2634,7 +2639,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 								</table>
 							</div>
 						</div>
-						
+
 					</div>
 
 					<table id="tabla_hitos" width='93%' style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:1px solid #454545;' cellpadding="3" cellspacing="3" style="border-collapse:collapse;">
@@ -2646,7 +2651,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 								<td width="5%">&nbsp;</td>
 							</tr>
 						</thead>
-						
+
 						<tbody id="body_hitos">
 							<?php
 							$query = "SELECT fecha_cobro, descripcion, monto_estimado, id_cobro, observaciones FROM cobro_pendiente WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND hito = '1' ORDER BY id_cobro_pendiente";
@@ -2701,11 +2706,11 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					</table>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td colspan="2">&nbsp;</td>
 		</tr>
-		
+
 		<tr>
 			<td class="ar " >
 				<?php echo __('Mostrar total en') ?>:
@@ -2720,7 +2725,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				</span>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td colspan="2">
 				<hr size="1">
@@ -2733,19 +2738,19 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			</td>
 			<td align="left">
 				<div   class="controls controls-row ">
-					<input style="float:left;" type=text class="span2" name=descuento id=descuento size=6 value=<?php echo $contrato->fields['descuento'] ?>> 
-					<div class="span1"> 
+					<input style="float:left;" type=text class="span2" name=descuento id=descuento size=6 value=<?php echo $contrato->fields['descuento'] ?>>
+					<div class="span1">
 						<input type="radio" name="tipo_descuento" id="tipo_descuento" value="VALOR" <?php echo $contrato->fields['tipo_descuento'] == 'VALOR' ? 'checked="checked"' : '' ?> />
 						<span class="inline-help"><?php echo __('Valor') ?></span>
 					</div>
 				</div>
-				
+
 				<br>
 
 				<div   class="controls controls-row ">
-					<input class="span2"   style="float:left;"  type=text name=porcentaje_descuento id=porcentaje_descuento size=6 value=<?php echo $contrato->fields['porcentaje_descuento'] ?>> 
-					<div class="span1"> 
-						<input type=radio name=tipo_descuento id=tipo_descuento value='PORCENTAJE' <?php echo $contrato->fields['tipo_descuento'] == 'PORCENTAJE' ? 'checked="checked"' : '' ?> /> 
+					<input class="span2"   style="float:left;"  type=text name=porcentaje_descuento id=porcentaje_descuento size=6 value=<?php echo $contrato->fields['porcentaje_descuento'] ?>>
+					<div class="span1">
+						<input type=radio name=tipo_descuento id=tipo_descuento value='PORCENTAJE' <?php echo $contrato->fields['tipo_descuento'] == 'PORCENTAJE' ? 'checked="checked"' : '' ?> />
 						<span class="inline-help">
 							<?php echo __('%') ?>
 						</span>
@@ -2772,7 +2777,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		<tr>
 			<td colspan="2"><hr size="1"></td>
 		</tr>
-							
+
 		<tr>
 			<td colspan="2" align="center">
 				<fieldset style="width: 97%; background-color: #FFFFFF;">
@@ -2780,7 +2785,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 						<?php echo!$div_show ? '<span id="datos_tramites_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
 						&nbsp;<?php echo __('Tr&aacute;mites') ?>
 					</legend>
-					
+
 					<div id='datos_tramites' style="display:<?php echo $show ?>;" width="100%">
 						<table width="100%">
 							<tr>
@@ -2890,7 +2895,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 											$color_impar = "#ffffff";
 											$query = "SELECT cp.fecha_cobro,cp.descripcion,cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato='" . $contrato->fields['id_contrato'] . "' AND cp.id_cobro IS NULL AND cp.hito = '0' ORDER BY fecha_cobro";
 											$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-											
+
 											for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 											?>
 
@@ -2950,18 +2955,18 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 								<?php echo __('Encargado Comercial'); ?></label>
 						</td>
 					</tr>
-					
+
 					<?php if (Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
-					
+
 						<tr>
 							<td>
 								<label for="notificar_encargado_secundario"> <input type="hidden" name="notificar_encargado_secundario" value="0"/><input type="checkbox" name="notificar_encargado_secundario" id="notificar_encargado_secundario" value="1" <?php echo $contrato->fields['notificar_encargado_secundario'] == '1' ? 'checked="checked"' : ''; ?> />
 								<?php echo __('Encargado Secundario'); ?></label>
 							</td>
 						</tr>
-					
+
 					<?php } ?>
-					
+
 					<tr>
 						<td>
 							<label for="enviar_alerta_otros_correos"> <input type="hidden" name="enviar_alerta_otros_correos" value="0"/><input type="checkbox" name="enviar_alerta_otros_correos" id="enviar_alerta_otros_correos" value="1" <?php echo $contrato->fields['notificar_otros_correos'] != '' ? 'checked="checked"' : ''; ?> />
@@ -3014,7 +3019,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		<?php echo!$div_show ? '<span id="datos_carta_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_carta_img"></span>' : '' ?>
 		&nbsp;<?php echo __('Carta') ?>
 	</legend>
-	
+
 	<table   id='datos_carta' style='display:<?php echo $show ?>' width="100%">
 
 		<tr>
@@ -3025,7 +3030,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				<?php echo Html::SelectQuery($Sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "codigo_idioma", $contrato->fields['codigo_idioma'] ? $contrato->fields['codigo_idioma'] : $idioma_default, ' class="span3" ', '', 80); ?>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td align="right" colspan='1' width='25%'>
 				<?php echo __('Formato Carta') ?>
@@ -3034,7 +3039,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				<?php echo Html::SelectQuery($Sesion, "SELECT carta.id_carta, carta.descripcion FROM carta ORDER BY id_carta", "id_carta", $contrato->fields['id_carta'], ' class="span3" ' ); ?>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td align="right" colspan='1' width='25%'>
 				<?php echo __('Formato Detalle Carta') ?>
@@ -3043,7 +3048,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				<?php echo Html::SelectQuery($Sesion, "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion FROM cobro_rtf ORDER BY cobro_rtf.id_formato", "id_formato", $contrato->fields['id_formato'], ' class="span3" '); ?>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td align="right" colspan='1'><?php echo __('Tamaño del papel') ?>:</td>
 			<td align="left" colspan='5'>
@@ -3152,7 +3157,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		if ($solicitante == 0) {  // no mostrar
 			echo '<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />';
 		} elseif ($solicitante == 1) { // obligatorio
-			
+
 			echo '<tr>';
 				echo '<td align="right" colspan="1"><input type="hidden" name="opc_ver_solicitante" value="0"/>';
 				?>
@@ -3165,9 +3170,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					echo '</label>';
 				echo '</td>';
 			echo '</tr>';
-		
+
 		} elseif ($solicitante == 2) { // opcional
-			
+
 			echo '<tr>';
 				echo '<td align="right" colspan="1">';
 					echo '<input type="hidden" name="opc_ver_solicitante" value="0"/>';
@@ -3211,10 +3216,9 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					<label><?php echo __('Mostrar detalle retainer') ?></label>
 				</td>
 			</tr>
-		
+
 		<?php } else { ?>
-	
-			<tr>	
+			<tr>
 				<td>
 					<input type="hidden" id="opc_restar_retainer" name="opc_restar_retainer" value="1" />
 				</td>
@@ -3235,13 +3239,13 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		</tr>
 	</table>
 	</fieldset>
-	
+
 	<br>
 	<!-- FIN CARTAS -->
 
 	<!-- DOCUMENTOS -->
 	<?php if ($id_cliente || $id_asunto) { ?>
-		
+
 		<fieldset style="width: 97%; background-color: #FFFFFF;">
 		<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'documentos\')" style="cursor:pointer"' : '' ?> >
 				<?php echo!$div_show ? '<span id="documentos_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="documentos_img"></span>' : '' ?>
@@ -3256,16 +3260,16 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			</tr>
 		</table>
 		</fieldset>
-		
+
 		<br>
 	<?php } ?>
-					
+
 	<!-- FIN DOCUMENTOS -->
 
 	<!-- ASOCIAR DOC LEGALES -->
 
 	<?php if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
-						
+
 		<fieldset style="width: 97%; background-color: #FFFFFF;">
 		<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'div_doc_legales_asociados\')" style="cursor:pointer"' : '' ?>>
 			<?php echo!$div_show ? '<span id="doc_legales_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="doc_legales_img"></span>' : '' ?>
@@ -3277,7 +3281,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 		</div>
 		</fieldset>
 	<?php } ?>
-	
+
 	<br>
 
 	<!-- ASOCIAR DOC LEGALES -->
@@ -3295,9 +3299,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 						<?php echo __('Profesional') ?>
 					</td>
 					<td>
-						<?php
-							
-							echo Html::SelectQuery($Sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso) AND usuario.activo = 1 ORDER BY usuario.apellido1", "id_user_generator", "", "  ", "Seleccione", "200"); ?>
+						<?php echo Html::SelectQuery($Sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso) AND usuario.activo = 1 ORDER BY usuario.apellido1", "id_user_generator", "", "  ", "Seleccione", "200"); ?>
 					</td>
 					<td>
 						Porcentaje Genera:
@@ -3328,7 +3330,6 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	<!-- Fin modulo de generadores -->
 
 	<!-- GUARDAR -->
-	
 	<?php if ($popup && !$motivo) { ?>
 		<fieldset style="width: 97%; background-color: #FFFFFF;">
 		<legend><?php echo __('Guardar datos') ?></legend>

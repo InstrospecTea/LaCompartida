@@ -10254,12 +10254,15 @@ $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
 $max_update = 7.65;
 
 $force = 0;
-if (isset($_GET['maxupdate']))
+if (isset($_GET['maxupdate'])) {
 	$max_update = round($_GET['maxupdate'], 2);
-if (isset($_GET['minupdate']))
+}
+if (isset($_GET['minupdate'])) {
 	$min_update = round($_GET['minupdate'], 2);
-if (isset($_GET['force']))
+}
+if (isset($_GET['force'])) {
 	$force = $_GET['force'];
+}
 for ($version = max($min_update, 2); $version <= $max_update; $version += 0.01) {
 	$VERSIONES[$num++] = round($version, 2);
 }
