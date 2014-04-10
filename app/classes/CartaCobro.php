@@ -786,7 +786,7 @@ class CartaCobro extends NotaCobro {
 				} else {
 					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo%'), $html2);
 					$html2 = str_replace('%monto_honorarios_cuando_hay%', '%monto_sin_gasto%', $html2);
-					$html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios') . ' y ', $html2);
+					$html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios') .' '. __('y') . ' ' , $html2);
 					$html2 = str_replace('%monto_gastos_cuando_hay%', '%monto_gasto%', $html2);
 					$html2 = str_replace('%concepto_gastos_cuando_hay%', __('por_concepto_de_gastos'), $html2);
 				}
@@ -1212,7 +1212,7 @@ class CartaCobro extends NotaCobro {
 				} else {
 					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo%'), $html2);
 					$html2 = str_replace('%monto_honorarios_cuando_hay%', '%monto_sin_gasto%', $html2);
-					$html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios') . ' y ', $html2);
+					$html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios') .' '. __('y') . ' ' , $html2);
 					$html2 = str_replace('%monto_gastos_cuando_hay%', '%monto_gasto%', $html2);
 					$html2 = str_replace('%concepto_gastos_cuando_hay%', __('por_concepto_de_gastos'), $html2);
 				}
