@@ -25,8 +25,8 @@ Class UsuarioPermiso extends Objeto {
 				SUM(IF(`{$this->tabla}`.`codigo_permiso` = 'PRO', 1, 0)) AS `profesional`,
 				SUM(IF(`{$this->tabla}`.`codigo_permiso` = 'SADM', 1, 0)) AS `super_administrador`
 			FROM `{$this->tabla}`
-				INNER JOIN `{$this->tabla_usuario}` ON `{$this->tabla_usuario}`.`id_usuario` = `{$this->tabla}`.`id_usuario`
-			WHERE `{$this->tabla}`.`codigo_permiso` != 'ALL' AND `{$this->tabla}`.`id_usuario` != '{$id_usuario}' AND `{$this->tabla_usuario}`.`activo` = '1'
+				INNER JOIN `{$this->tabla_usuario}` ON `{$this->tabla_usuario}`.`{$this->campo_id}` = `{$this->tabla}`.`{$this->campo_id}`
+			WHERE `{$this->tabla}`.`codigo_permiso` != 'ALL' AND `{$this->tabla}`.`{$this->campo_id}` != '{$id_usuario}' AND `{$this->tabla_usuario}`.`activo` = '1'
 			GROUP BY `{$this->tabla}`.`{$this->campo_id}`";
 
 		switch ($permiso) {
@@ -80,17 +80,17 @@ Class UsuarioPermiso extends Objeto {
 	}
 
 	public function asignarPermiso($id_usuario, $permiso) {
-		$query = "INSERT INTO `{$this->tabla}` SET `{$this->tabla}`.`id_usuario` = '{$id_usuario}', `{$this->tabla}`.`codigo_permiso` = '{$permiso}' ON DUPLICATE KEY UPDATE `{$this->tabla}`.`id_usuario` = '{$id_usuario}';";
+		$query = "INSERT INTO `{$this->tabla}` SET `{$this->tabla}`.`{$this->campo_id}` = '{$id_usuario}', `{$this->tabla}`.`codigo_permiso` = '{$permiso}' ON DUPLICATE KEY UPDATE `{$this->tabla}`.`id_usuario` = '{$id_usuario}';";
 		return $this->Sesion->pdodbh->query($query);
 	}
 
 	public function revocarPermiso($id_usuario, $permiso) {
-		$query = "DELETE FROM `{$this->tabla}` WHERE `{$this->tabla}`.`id_usuario` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` = '{$_POST['permiso']}';";
+		$query = "DELETE FROM `{$this->tabla}` WHERE `{$this->tabla}`.`{$this->campo_id}` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` = '{$_POST['permiso']}';";
 		return $this->Sesion->pdodbh->query($query);
 	}
 
 	public function esAdministrativo($id_usuario) {
-		$query = "SELECT COUNT(*) FROM `{$this->tabla}` WHERE `{$this->tabla}`.`id_usuario` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` NOT IN ('SADM', 'ALL', 'PRO');";
+		$query = "SELECT COUNT(*) FROM `{$this->tabla}` WHERE `{$this->tabla}`.`{$this->campo_id}` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` NOT IN ('SADM', 'ALL', 'PRO');";
 
 		$es_administrativo = (int) $this->Sesion->pdodbh->query($query)->fetch(PDO::FETCH_COLUMN, 0);
 
@@ -98,7 +98,7 @@ Class UsuarioPermiso extends Objeto {
 	}
 
 	public function esProfesional($id_usuario) {
-		$query = "SELECT COUNT(*) FROM `{$this->tabla}` WHERE `{$this->tabla}`.`id_usuario` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` = 'PRO';";
+		$query = "SELECT COUNT(*) FROM `{$this->tabla}` WHERE `{$this->tabla}`.`{$this->campo_id}` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` = 'PRO';";
 
 		$es_profesional = (int) $this->Sesion->pdodbh->query($query)->fetch(PDO::FETCH_COLUMN, 0);
 
@@ -106,7 +106,7 @@ Class UsuarioPermiso extends Objeto {
 	}
 
 	private function tienePermiso($id_usuario, $permiso) {
-		$query = "SELECT COUNT(*) FROM `{$this->tabla}` WHERE `{$this->tabla}`.`id_usuario` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` = '{$permiso}';";
+		$query = "SELECT COUNT(*) FROM `{$this->tabla}` WHERE `{$this->tabla}`.`{$this->campo_id}` = '{$id_usuario}' AND `{$this->tabla}`.`codigo_permiso` = '{$permiso}';";
 		$tiene_permiso = (int) $this->Sesion->pdodbh->query($query)->fetch(PDO::FETCH_COLUMN, 0);
 
 		return !empty($tiene_permiso) ? true : false;
