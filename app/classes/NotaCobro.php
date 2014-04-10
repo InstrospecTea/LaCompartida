@@ -924,7 +924,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
 
 				if ($this->fields['id_carta'] == 3) {
-					$html = str_replace('%nota_disclaimer%', __('Nota Disclaimer'), $html);
+					$html = str_replace('%nota_disclaimer%', __('Nota_Disclaimer'), $html);
 				} else {
 					$html = str_replace('%nota_disclaimer%', ' ', $html);
 				}
@@ -6662,6 +6662,13 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
+
+				if ($this->fields['id_carta'] == 3) {
+					$html = str_replace('%nota_disclaimer%', __('nota_disclaimer'), $html);
+				} else {
+					$html = str_replace('%nota_disclaimer%', ' ', $html);
+				}
+
 
 				break;
 
