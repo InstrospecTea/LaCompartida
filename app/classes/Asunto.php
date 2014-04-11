@@ -856,7 +856,7 @@ class Asunto extends Objeto {
 					'client_code' => $matter->client_code,
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
-					'language' =>  !empty($matter->language) ? $matter->languag : null,
+					'language' =>  !empty($matter->language) ? $matter->language : null,
 					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
 					'active' => (int)$matter->active
 				)
