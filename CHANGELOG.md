@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.1.14
+Viernes 11 de abril 2014
+* **Fix:** [Inconsistencia en el API](https://github.com/LemontechSA/ttb/pull/477)
+
 ## Hotfix: 14.1.13
 Miercoles 09 de abril 2014
 * **Add:** [Traducciones para tags por_concepto_de_gastos y por_concepto_de_honorarios para GFCU](https://github.com/LemontechSA/ttb/pull/474)
