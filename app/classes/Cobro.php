@@ -2409,17 +2409,17 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 												 AND t2.cobrable = 1";
 		}
 		
-		if ($this->fields['codigo_idioma'] != "es"){
-			$lang_glosa_cat = "_lang";
+		if ($this->fields['codigo_idioma'] == "es"){
+			$select_categoria_lang = "cu.glosa_categoria as glosa_categoria,";
 		} else {
-			$lang_glosa_cat = "";
+			$select_categoria_lang = "IF(NULL, cu.glosa_categoria, cu.glosa_categoria_lang ) as glosa_categoria,";
 		}
 
 		$query = "	SELECT
 										t.id_usuario as id_usuario,
 										t.codigo_asunto as codigo_asunto,
 										cu.id_categoria_usuario as id_categoria_usuario,
-										cu.glosa_categoria$lang_glosa_cat as glosa_categoria,
+										$select_categoria_lang
 										u.username as username,
 										CONCAT_WS(' ',u.nombre,u.apellido1) as nombre_usuario,
 										SUM( TIME_TO_SEC(duracion_cobrada)/3600 ) as duracion_cobrada,
