@@ -10234,6 +10234,13 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.65:
+			$queries = array();
+
+			$queries[] = "ALTER TABLE `prm_categoria_usuario` ADD `glosa_categoria_lang` VARCHAR( 40 ) NOT NULL AFTER `glosa_categoria` ";
+			ejecutar($queries, $dbh);
+
+			break;
 		}
 }
 

@@ -5116,6 +5116,12 @@ class NotaCobro extends Cobro {
 					$visible = "AND trabajo.visible = 1";
 				}
 
+				if ($this->fields['codigo_idioma'] != 'es') {
+					$lang_glosa_cat = "_lang";
+				} else {
+					$lang_glosa_cat = "";
+				}
+
 				/*
 				 * 	Contenido de filas de seccion trabajo.
 				 */
@@ -5133,7 +5139,7 @@ class NotaCobro extends Cobro {
 									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
-									prm_categoria_usuario.glosa_categoria AS categoria,
+									prm_categoria_usuario.glosa_categoria$lang_glosa_cat AS categoria,
 									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
 									trabajo.duracion,
 									usuario.username as username $select_categoria
@@ -10473,6 +10479,12 @@ class NotaCobro extends Cobro {
 
 					$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
 
+					if ($this->fields['codigo_idioma'] != 'es') {
+						$lang_glosa_cat = "_lang";
+					} else {
+						$lang_glosa_cat = "";
+					}
+
 					// Se seleccionan todos los trabajos del cobro, se incluye que sea cobrable ya que a los trabajos visibles
 					// tambien se consideran dentro del cobro, tambien se incluye el valor del retainer del trabajo.
 					$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
@@ -10487,7 +10499,7 @@ class NotaCobro extends Cobro {
 									trabajo.visible,
 									trabajo.codigo_asunto,
 									CONCAT_WS(' ', nombre, apellido1) as usr_nombre,
-									prm_categoria_usuario.glosa_categoria as categoria
+									prm_categoria_usuario.glosa_categoria$lang_glosa_cat as categoria
 							FROM trabajo
 							JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 							LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
