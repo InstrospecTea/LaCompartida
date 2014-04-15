@@ -251,10 +251,10 @@ for ($i = 0; $i < $lista->num; $i++) {
 		}
 	}
 	$ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
-	$ws->write($fila_inicial + $i, $col_encargado, $trabajo->fields['encargado_comercial'], $tex);
+	$ws->write($fila_inicial + $i, $col_encargado, $trabajo->fields['encargado_comercial'] ? $trabajo->fields['encargado_comercial'] : '', $tex);
 	$ws->write($fila_inicial + $i, $col_id_cobro, $trabajo->fields['id_cobro'] ? $trabajo->fields['id_cobro'] : '', $tex);
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
-		$ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields[glosa_actividad], $tex);
+		$ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields['glosa_actividad'], $tex);
 	}
 
 	$text_descripcion = addslashes($trabajo->fields['descripcion']);
