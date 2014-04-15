@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.1.15
+Lunes 14 de abril 2014
+* **Fixed:** [Aplica formato decimal a monto_cobrado (para mysql)](https://github.com/LemontechSA/ttb/pull/481)
+
 
 ## Hotfix: 14.1.14
 Viernes 11 de abril 2014
