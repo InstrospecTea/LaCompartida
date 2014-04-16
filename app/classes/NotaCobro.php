@@ -1030,12 +1030,39 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
-				$monto_palabra = new MontoEnPalabra($this->sesion);
+				list($total_parte_entera, $total_parte_decimal) = explode('.',$total_cobro);
 
-				$glosa_moneda_lang = __($glosa_moneda);
-				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				if (strlen($total_parte_decimal) == '2'){
+					$fix_decimal = '1';
+				} else {
+					$fix_decimal = '10';
+				}
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
+
+				if ($lang == 'es') {
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+					}
+
+				} else {
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+					}
+
+				}
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
 				break;
@@ -4036,12 +4063,41 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
-				$monto_palabra = new MontoEnPalabra($this->sesion);
+				list($total_parte_entera, $total_parte_decimal) = explode('.',$total_cobro);
 
-				$glosa_moneda_lang = __($glosa_moneda);
-				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				if (strlen($total_parte_decimal) == '2'){
+					$fix_decimal = '1';
+				} else {
+					$fix_decimal = '10';
+				}
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
+
+				if ($lang == 'es') {
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+					}
+
+				} else {
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+					}
+
+				}
+
+
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
 				break;
@@ -7157,12 +7213,39 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
-				$monto_palabra = new MontoEnPalabra($this->sesion);
+				list($total_parte_entera, $total_parte_decimal) = explode('.',$total_cobro);
 
-				$glosa_moneda_lang = __($glosa_moneda);
-				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				if (strlen($total_parte_decimal) == '2'){
+					$fix_decimal = '1';
+				} else {
+					$fix_decimal = '10';
+				}
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
+
+				if ($lang == 'es') {
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+					}
+
+				} else {
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+					}
+
+				}
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
 				break;
