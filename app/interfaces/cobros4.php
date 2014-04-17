@@ -73,10 +73,9 @@ if ($id_cobro) {
 	}
 }
 
-//if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
+if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
 	$fecha_ini = date("Y-m-d", strtotime($fecha_ini));
-//}
-
+}
 
 $fecha_fin = date("Y-m-d", strtotime($fecha_fin));
 
@@ -99,6 +98,8 @@ $query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
                 LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
                 $join_cobro_asunto 
                 WHERE $where $and AND (egreso > 0 OR ingreso > 0)";
+
+                echo $query;
 
 if ($check_gasto == 1 && isset($cobro)) { //Check_trabajo vale 1 cuando aprietan boton buscar
 	
