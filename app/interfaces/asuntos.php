@@ -120,7 +120,7 @@ if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
 		<table style="border: 0px solid black" width="100%">
 			<tr>
 				<td></td>
-				<td colspan="3" align="right">UtilesApp::CampoAsunto
+				<td colspan="3" align="right">
 					<a href="#" class="btn botonizame" icon="agregar" id="agregar_asunto" title="<?php echo __('Agregar Asunto'); ?>"><?php echo __('Agregar') . ' ' . __('Asunto'); ?></a>
 				</td>
 			</tr>
