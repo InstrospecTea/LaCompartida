@@ -99,8 +99,6 @@ $query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
                 $join_cobro_asunto 
                 WHERE $where $and AND (egreso > 0 OR ingreso > 0)";
 
-                echo $query;
-
 if ($check_gasto == 1 && isset($cobro)) { //Check_trabajo vale 1 cuando aprietan boton buscar
 	
 	$query2 = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
