@@ -194,7 +194,7 @@ if (UtilesApp::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
 	$ws->write($fila_inicial, $col_codigo_asunto, __('Código Asunto'), $tit);
 }
 $ws->write($fila_inicial, $col_asunto, __('Asunto'), $tit);
-$ws->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
+$ws->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
 $ws->write($fila_inicial, $col_id_cobro, __('Cobro'), $tit);
 if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	$ws->write($fila_inicial, $col_actividad, __('Actividad'), $tit);

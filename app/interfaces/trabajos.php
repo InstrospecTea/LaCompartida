@@ -316,6 +316,12 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		$select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	}
 
+	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')){
+		$select_encargado_comercial = "resp_user.username AS encargado_comercial,";
+	} else {
+		$select_encargado_comercial = "CONCAT_WS(' ',resp_user.nombre,resp_user.apellido1) AS encargado_comercial,";
+	}
+
 	#BUSCAR
 	$query = "
 		SELECT  SQL_CALC_FOUND_ROWS
@@ -360,7 +366,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			tramite_tipo.glosa_tramite,
 			trabajo.fecha,
 			prm_idioma.codigo_idioma as codigo_idioma,
-			CONCAT_WS(' ',resp_user.nombre,resp_user.apellido1) AS encargado_comercial,
+			$select_encargado_comercial
 			contrato.id_tarifa
 			$select_glosa_actividad ";
 
