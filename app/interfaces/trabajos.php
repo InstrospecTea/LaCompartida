@@ -316,6 +316,12 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		$select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	}
 
+	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')){
+		$select_encargado_comercial = "resp_user.username AS encargado_comercial,";
+	} else {
+		$select_encargado_comercial = "CONCAT_WS(' ',resp_user.nombre,resp_user.apellido1) AS encargado_comercial,";
+	}
+
 	#BUSCAR
 	$query = "
 		SELECT  SQL_CALC_FOUND_ROWS
@@ -360,8 +366,10 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			tramite_tipo.glosa_tramite,
 			trabajo.fecha,
 			prm_idioma.codigo_idioma as codigo_idioma,
+			$select_encargado_comercial
 			contrato.id_tarifa
 			$select_glosa_actividad ";
+
 
    	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
 
@@ -374,6 +382,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
 			LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+			LEFT JOIN usuario AS resp_user ON resp_user.id_usuario = contrato.id_usuario_responsable
 			LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
 			LEFT JOIN tramite ON trabajo.id_tramite=tramite.id_tramite
 			LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
