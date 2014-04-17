@@ -10239,6 +10239,8 @@ QUERY;
 			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_moneda` ADD `glosa_moneda_plural_lang` VARCHAR( 30 ) NOT NULL AFTER `glosa_moneda_plural` ;";
 			}
+			ejecutar($queries, $dbh);
+			break;
 		}
 }
 
