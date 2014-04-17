@@ -289,11 +289,6 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
                         <input id="boton_buscar" type='submit' class='btn' value='<?php echo __('Buscar') ?>' onclick="this.form.check_gasto.value=1" />
                     </td>
                 </tr>
-                <!-- <tr>
-                    <td></td>
-                    <td colspan='3' align='left'>
-                    </td>
-                </tr> -->
             </table>
 
             <input type="hidden" name="opc" value="boton_buscar" />
@@ -355,7 +350,7 @@ function Cobrable(& $fila) {
 function Opciones(& $fila) {
 	global $where;
 	$id_gasto = $fila->fields['id_movimiento'];
-	$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
+	$prov = $fila->fields['egreso'] != '' ? 'false' : 'true';
 	$html_opcion = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Gasto',730,580,'agregar_gasto.php?id_gasto=$id_gasto&popup=1&prov=$prov', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 	return $html_opcion;
 }
