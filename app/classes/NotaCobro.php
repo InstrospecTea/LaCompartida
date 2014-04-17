@@ -4072,28 +4072,30 @@ class NotaCobro extends Cobro {
 					$fix_decimal = '10';
 				}
 
-				$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
-
 				if ($lang == 'es') {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
 
 					if (empty($total_parte_decimal)){
 						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
-						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
 					} else {
 						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
 						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
-						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
 					}
 
 				} else {
 
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
+
 					if (empty($total_parte_decimal)){
 						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
-						$monto_total_palabra = $monto_palabra_parte_entera.' '.strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
 					} else {
 						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
 						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
-						$monto_total_palabra = $monto_palabra_parte_entera .' '.strtoupper($glosa_moneda_plural_lang).' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
 					}
 
 				}
