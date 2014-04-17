@@ -1,6 +1,6 @@
 # Changelog
 ## Hotfix: 14.1.15
-Lunes 14 de abril 2014
+Jueves 17 de abril 2014
 * **Nuevo:** [Habilita traduccion a monto en palabra para NotaCobro](https://github.com/LemontechSA/ttb/pull/485)
 * **Fixed:** [Correccion a tag %tipo_cuenta% CartCobro](https://github.com/LemontechSA/ttb/pull/485)
 * **Fixed:** [Correccion a tipo de gastos null en listado de gastos](https://github.com/LemontechSA/ttb/pull/485)
