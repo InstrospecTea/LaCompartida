@@ -10234,6 +10234,13 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.65:
+			$queries = array();
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoAsuntoSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
 		}
 }
 
@@ -10243,7 +10250,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.64;
+$max_update = 7.65;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
