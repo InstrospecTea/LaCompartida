@@ -1867,11 +1867,9 @@ class CartaCobro extends NotaCobro {
 					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta) = mysql_fetch_array($resp);
 
 					if (strpos($glosa_cuenta, 'Ah') !== false) {
-					//$glosa_banco = str_replace(' Ah', '', $glosa_cuenta);
-					$tipo_cuenta = 'Cuenta Ahorros';
+						$tipo_cuenta = 'Cuenta Ahorros';
 					} else if (strpos($glosa_cuenta, 'Cte') !== false) {
-					//$glosa_banco = str_replace(' Cte', '', $glosa_cuenta);
-					$tipo_cuenta = 'Cuenta Corriente';
+						$tipo_cuenta = 'Cuenta Corriente';
 					}
 
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
