@@ -30,7 +30,7 @@ $usuario_responsable_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoC
 $usuario_secundario_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto');
 $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1;
 
-$Contrato = new Contrato($Sesion);
+$contrato = new Contrato($Sesion);
 $Cliente = new Cliente($Sesion);
 $Asunto = new Asunto($Sesion);
 
@@ -56,7 +56,7 @@ if ($id_asunto > 0) {
 	}
 
 	if ($Asunto->fields['id_contrato'] > 0) {
-		$Contrato->Load($Asunto->fields['id_contrato']);
+		$contrato->Load($Asunto->fields['id_contrato']);
 	}
 
 	$Cliente->LoadByCodigo($Asunto->fields['codigo_cliente']);
@@ -337,11 +337,11 @@ if ($opcion == "guardar") {
 		if ($cobro_independiente) {
 			#CONTRATO
 			if ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) {
-				$Contrato->Load($Asunto->fields['id_contrato']);
+				$contrato->Load($Asunto->fields['id_contrato']);
 			} else if ($Asunto->fields['id_contrato_indep'] > 0 && ($Asunto->fields['id_contrato_indep'] != $Cliente->fields['id_contrato'])) {
-				$Contrato->Load($Asunto->fields['id_contrato_indep']);
+				$contrato->Load($Asunto->fields['id_contrato_indep']);
 			} else {
-				$Contrato = new Contrato($Sesion);
+				$contrato = new Contrato($Sesion);
 			}
 
 			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == '') {
@@ -366,23 +366,23 @@ if ($opcion == "guardar") {
 				$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
 			}
 
-			$Contrato->Fill($_REQUEST, true);
-			$Contrato->Edit('codigo_cliente', $codigo_cliente);
-			$Contrato->Edit('fecha_inicio_cap',Utiles::fecha2sql($fecha_inicio_cap));
+			$contrato->Fill($_REQUEST, true);
+			$contrato->Edit('codigo_cliente', $codigo_cliente);
+			$contrato->Edit('fecha_inicio_cap',Utiles::fecha2sql($fecha_inicio_cap));
 
-			if ($Contrato->Write()) {
+			if ($contrato->Write()) {
 				#Subiendo Archivo
 				if (!empty($archivo_data)) {
-					$archivo->Edit('id_contrato', $Contrato->fields['id_contrato']);
+					$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
 					$archivo->Edit('descripcion', $descripcion);
 					$archivo->Edit('archivo_data', $archivo_data);
 					$archivo->Write();
 				}
 				#cobro pendiente
-				CobroPendiente::EliminarPorContrato($Sesion, $Contrato->fields['id_contrato'] ? $Contrato->fields['id_contrato'] : $id_contrato);
+				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 					$CobroPendiente = new CobroPendiente($Sesion);
-					$CobroPendiente->Edit("id_contrato", $Contrato->fields['id_contrato'] ? $Contrato->fields['id_contrato'] : $id_contrato);
+					$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 					$CobroPendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
 					$CobroPendiente->Edit("descripcion", $valor_descripcion[$i]);
 					$CobroPendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
@@ -393,7 +393,7 @@ if ($opcion == "guardar") {
 					if (empty($hito_monto_estimado[$i]))
 						continue;
 					$CobroPendiente = new CobroPendiente($Sesion);
-					$CobroPendiente->Edit("id_contrato", $Contrato->fields['id_contrato'] ? $Contrato->fields['id_contrato'] : $id_contrato);
+					$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 					$CobroPendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
 					$CobroPendiente->Edit("descripcion", $hito_descripcion[$i]);
 					$CobroPendiente->Edit("observaciones", $hito_observaciones[$i]);
@@ -402,22 +402,22 @@ if ($opcion == "guardar") {
 					$CobroPendiente->Write();
 				}
 
-				$Asunto->Edit("id_contrato", $Contrato->fields['id_contrato']);
-				$Asunto->Edit("id_contrato_indep", $Contrato->fields['id_contrato']);
+				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
+				$Asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
 
 				if ($Asunto->Write())
 					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 				else
 					$Pagina->AddError($Asunto->error);
 
-				ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $Contrato->fields['id_contrato'] ? $Contrato->fields['id_contrato'] : $id_contrato);
+				ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				if (is_array($docs_legales)) {
 					foreach ($docs_legales as $doc_legal) {
 						if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
 							continue;
 						}
 						$ContratoDocumentoLegal = new ContratoDocumentoLegal($Sesion);
-						$ContratoDocumentoLegal->Edit('id_contrato', $Contrato->fields['id_contrato']);
+						$ContratoDocumentoLegal->Edit('id_contrato', $contrato->fields['id_contrato']);
 						$ContratoDocumentoLegal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
 						if (!empty($doc_legal['honorario'])) {
 							$ContratoDocumentoLegal->Edit('honorarios', 1);
@@ -433,7 +433,7 @@ if ($opcion == "guardar") {
 					}
 				}
 			} else {
-				$Pagina->AddError($Contrato->error);
+				$Pagina->AddError($contrato->error);
 			}
 		} #fin if independiente
 		else {
@@ -458,7 +458,7 @@ if ($opcion == "guardar") {
 	}
 }
 
-$id_idioma_default = $Contrato->IdIdiomaPorDefecto($Sesion);
+$id_idioma_default = $contrato->IdIdiomaPorDefecto($Sesion);
 $AreaProyecto = new AreaProyecto($Sesion);
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
@@ -1070,9 +1070,7 @@ $Pagina->PrintTop($popup);
 				}
 
 				$hide_areas = '';
-				$params_asuntos_array['codigo_permiso'] = 'SASU';
-				$permisos_asuntos = $Sesion->usuario->permisos->Find('FindPermiso', $params_asuntos_array); #tiene permiso de admin de asuntos
-				if ($permisos_asuntos->fields['permitido']) {
+				if ($Sesion->usuario->Es('SASU')) {
 					$hide_areas = 'style="display: none;"';
 				}
 				?>
@@ -1088,13 +1086,10 @@ $Pagina->PrintTop($popup);
 					</tr>
 				</table>
 				<br>
-				<div  id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-
-				<?php if (!$permisos_asuntos->fields['permitido']) {
-					require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
-				} ?>
-
-
+				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
+					<?php if (!$Sesion->usuario->Es('SASU')) {
+						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
+					} ?>
 				</div>
 				<br>
 				<fieldset class="border_plomo tb_base">
