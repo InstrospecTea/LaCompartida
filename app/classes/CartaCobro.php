@@ -1866,11 +1866,9 @@ class CartaCobro extends NotaCobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta) = mysql_fetch_array($resp);
 
-					if (strpos($glosa_banco, 'Ah')) {
-						$glosa_banco = str_replace(' Ah', '', $glosa_banco);
+					if (strpos($glosa_cuenta, 'Ah') !== false) {
 						$tipo_cuenta = 'Cuenta Ahorros';
-					} else if (strpos($glosa_banco, 'Cte')) {
-						$glosa_banco = str_replace(' Cte', '', $glosa_banco);
+					} else if (strpos($glosa_cuenta, 'Cte') !== false) {
 						$tipo_cuenta = 'Cuenta Corriente';
 					}
 

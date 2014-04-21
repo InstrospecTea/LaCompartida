@@ -39,9 +39,7 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<br/>
 		<div class="controls controls-row">
 			<label class="span3 al">Query a ejecutar</label>
-			<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior">
-				<?php echo $_POST['query']; ?>
-			</textarea>			
+			<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior"><?php echo $_POST['query']; ?></textarea>			
 		</div>
 		<br/>
 		<div class="controls controls-row">
