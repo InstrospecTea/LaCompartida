@@ -81,6 +81,10 @@ if ($fecha_ini == ''){
 	$fecha_ini = '0000-00-00';
 }
 
+if ($fecha_ini != '0000-00-00') {
+	$fecha_ini = date("Y-m-d", strtotime($fecha_ini));
+}
+
 $fecha_fin = date("Y-m-d", strtotime($fecha_fin));
 
 $and .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
@@ -168,7 +172,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 	}
 
 	function Refrescar() {
-		
+
 		<?php if ($desde) {
 			echo "var pagina_desde = '&desde=" . $desde . "';";
 		} else {
@@ -297,7 +301,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 	    </fieldset>
 	</div>
 <?php } ?>
-
+ 
 <?php
 $b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 $b->mensaje_sin_resultados = str_replace('%s', __('asuntos'), __('No existen gastos por cobrar en los %s seleccionados'));
