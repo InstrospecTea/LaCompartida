@@ -10234,6 +10234,13 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.65:
+			$queries = array();
+			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_moneda` ADD `glosa_moneda_plural_lang` VARCHAR( 30 ) NOT NULL AFTER `glosa_moneda_plural` ;";
+			}
+			ejecutar($queries, $dbh);
+			break;
 		}
 }
 
@@ -10243,7 +10250,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.64;
+$max_update = 7.65;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
