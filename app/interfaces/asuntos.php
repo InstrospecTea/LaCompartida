@@ -116,7 +116,7 @@ if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
 ?>
 <form method="post" name="form" id="form">
 	<input type="hidden" name="busqueda" value="TRUE">
-	<?php if ($id_cobro == '') { ?>
+	<?php if ($id_cobro == '' && ($Sesion->usuario->Es('DAT') || $Sesion->usuario->Es('SASU'))) { ?>
 		<table style="border: 0px solid black" width="100%">
 			<tr>
 				<td></td>

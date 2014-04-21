@@ -816,7 +816,7 @@ class UsuarioExt extends Usuario {
 			$this->permisos_revisados[$permiso] = false;
 			for ($x = 0; $x < $this->permisos->num; ++$x) {
 				if ($this->permisos->datos[$x]->fields['codigo_permiso'] == $permiso) {
-					$this->permisos_revisados[$permiso] = true;
+					$this->permisos_revisados[$permiso] = $this->permisos->datos[$x]->fields['permitido'] === '1';
 				}
 			}
 		}
@@ -826,16 +826,24 @@ class UsuarioExt extends Usuario {
 	/**
 	 * Crea listado de usuarios activos con llave campo_id y valor campo_glosa
 	 * @param string $where
+	 * @param mixed $con_permisos indica si el usuario debe tener permisos (boolean) o alguno permiso especifico (string), por defecto false (cualquier usuario activo)
 	 * @return array
 	 */
-	public function ListarActivos($where = 1) {
+	public function ListarActivos($where = '', $con_permisos = false) {
 		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
 		if (!$this->Es('SADM')) {
 			$and = "AND usuario.rut != '99511620'";
 		}
-		$query_extra = "WHERE $where
-						AND usuario.activo = 1 $and
-					ORDER BY usuario.apellido1";
+		$permisos = '';
+		if ($con_permisos !== false) {
+			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";
+			$permisos = "INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
+		}
+		$query_extra = "$permisos
+						WHERE usuario.activo = 1
+							$where
+							$and
+						ORDER BY usuario.apellido1";
 		return $Objeto->Listar($query_extra);
 	}
 

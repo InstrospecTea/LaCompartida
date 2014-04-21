@@ -518,7 +518,6 @@ $Pagina->PrintTop($popup);
 		if (!form) {
 			var form = $('formulario');
 		}
-
 		<?php if (Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1) { ?>
 			if (form.id_encargado && !form.id_encargado.value) {
 				alert('<?php echo 'Debe ingresar ' . __('Usuario encargado') ?>');
@@ -768,47 +767,30 @@ $Pagina->PrintTop($popup);
 	}
 
 	function InfoCobro() {
-		campo = document.getElementById("codigo_cliente")
-		cliente = campo.value;
-		var http = getXMLHTTP();
-
-		http.open('get', 'ajax.php?accion=info_cobro&codigo_cliente=' + cliente);
-		http.onreadystatechange = function() {
-			if (http.readyState == 4) {
-				var response = http.responseText;
-				var update = new Array();
-				if (response.indexOf('|') != -1 && response.indexOf('VACIO') != -1) {
-					alert(response);
-				} else if (response.indexOf('|') != -1) {
-					arreglo = response.split("|");
-				}
+		cliente = jQuery('#codigo_cliente').val();
+		jQuery.get('ajax.php', {accion: 'info_cobro', codigo_cliente: cliente}, function(response) {
+			if (response.indexOf('|') != -1 && response.indexOf('VACIO') != -1) {
+				alert(response);
+			} else if (response.indexOf('|') != -1) {
+				arreglo = response.split('|');
 			}
-		};
-		http.send(null);
+		}, 'text');
 	}
 
 	function CheckCodigo() {
-		campo = document.getElementById("codigo_asunto")
-		asunto = campo.value;
-		var http = getXMLHTTP();
-
-		http.open('get', 'ajax.php?accion=check_codigo_asunto&codigo_asunto=' + asunto);
-		http.onreadystatechange = function() {
-			if (http.readyState == 4) {
-				var response = http.responseText;
-				var update = new Array();
-				if (response.indexOf('OK') == -1 && response.indexOf('NO') == -1) {
-					alert(response);
-				} else {
-					if (response.indexOf('NO') != -1) {
-						alert("<?php echo __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
-						campo.value = "";
-						campo.focus();
-					}
+		codigo_asunto = jQuery('#codigo_asunto');
+		asunto = codigo_asunto.val();
+		jQuery.get('ajax.php', {accion: 'check_codigo_asunto', codigo_asunto: asunto}, function(response) {
+			if (response.indexOf('OK') == -1 && response.indexOf('NO') == -1) {
+				alert(response);
+			} else {
+				if (response.indexOf('NO') != -1) {
+					alert("<?php echo __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
+					codigo_asunto.val('');
+					codigo_asunto.focus();
 				}
 			}
-		};
-		http.send(null);
+		}, 'text');
 	}
 
 	function HideMonto() {
@@ -858,18 +840,9 @@ $Pagina->PrintTop($popup);
 	}
 
 	function Contratos(codigo, id_contrato) {
-		var div = $("div_contrato");
-		var http = getXMLHTTP();
-
-		http.open('get', 'ajax.php?accion=lista_contrato&codigo_cliente=' + codigo + '&id_contrato=' + id_contrato, false);
-		http.onreadystatechange = function()
-		{
-			if (http.readyState == 4) {
-				var response = http.responseText;
-				div.innerHTML = response;
-			}
-		};
-		http.send(null);
+		jQuery.get('ajax.php', {accion: 'check_codigo_asunto', codigo_asunto: asunto}, function(response) {
+			jQuery('#div_contrato').html(response);
+		}, 'text');
 	}
 
 	function ShowContrato(form, valor) {
@@ -899,7 +872,9 @@ $Pagina->PrintTop($popup);
 	<input type="hidden" name="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
-	<table width="90%"><tr><td align="center">
+	<table width="90%">
+		<tr>
+			<td align="center">
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Datos generales') ?></legend>
 					<table>
@@ -1008,8 +983,7 @@ $Pagina->PrintTop($popup);
 							</td>
 							<td align="left">
 								<?php
-								$con_permisos = 'usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)';
-								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos($con_permisos), 'id_encargado', $Asunto->fields['id_encargado'], '', 'Seleccione', '200px');
+								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado', $Asunto->fields['id_encargado'], '', 'Seleccione', '200px');
 								if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 									echo $obligatorio;
 								}
@@ -1022,7 +996,7 @@ $Pagina->PrintTop($popup);
 									<?php echo __('Encargado 2'); ?>
 								</td>
 								<td align="left">';
-									<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos($con_permisos), 'id_encargado2', $Asunto->fields['id_encargado2'], '', 'Seleccione', '200'); ?>
+									<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado2', $Asunto->fields['id_encargado2'], '', 'Seleccione', '200'); ?>
 								</td>
 							</tr>';
 						<?php } ?>
@@ -1087,6 +1061,7 @@ $Pagina->PrintTop($popup);
 				</table>
 				<br>
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
+
 					<?php if (!$Sesion->usuario->Es('SASU')) {
 						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
 					} ?>
@@ -1136,9 +1111,9 @@ $Pagina->PrintTop($popup);
 							<td colspan=6 align="center">
 								<?php
 								if (Conf::GetConf($Sesion, 'RevisarTarifas')) {
-									$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario-cliente').get(0), false);";
+									$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
 								} else {
-									$funcion_validar = "return Validar(jQuery('#formulario-cliente').get(0));";
+									$funcion_validar = "return Validar(jQuery('#formulario').get(0));";
 
 								}
 								?>
@@ -1164,14 +1139,12 @@ $Pagina->PrintTop($popup);
 		});
 	});
 	function CambioEncargadoSegunCliente(idcliente) {
-		var CopiarEncargadoAlAsunto =<?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
-		var UsuarioSecundario =<?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
-		var ObligatorioEncargadoSecundarioAsunto =<?php echo (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
+		var CopiarEncargadoAlAsunto = <?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
+		var UsuarioSecundario = <?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
+		var ObligatorioEncargadoSecundarioAsunto = <?php echo (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
 		jQuery('#id_usuario_secundario').removeAttr('disabled');
 		jQuery('#id_usuario_responsable').removeAttr('disabled');
 		jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function(data) {
-			if (window.console)
-				console.debug(data);
 			var ladata = data.split('|');
 			jQuery('#id_usuario_responsable').attr({'disabled': ''}).val(ladata[0]);
 			if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
@@ -1201,113 +1174,101 @@ $Pagina->PrintTop($popup);
 	}
 
 	function CambioDatosFacturacion(id_cliente) {
-		var url = root_dir + '/app/interfaces/ajax.php?accion=cargar_datos_contrato&codigo_cliente=' + id_cliente;
-		var http = getXMLHTTP();
+		var url = root_dir + '/app/interfaces/ajax.php';
 
-		http.open('get', url, true);
-		http.onreadystatechange = function() {
-			if (http.readyState == 4) {
-				var response = http.responseText;
+		jQuery.get(url, {accion: 'cargar_datos_contrato', codigo_cliente: id_cliente}, function (response) {
+			if (response.indexOf('|') != -1) {
+				response = response.split('\\n');
+				response = response[0];
+				var campos = response.split('~');
 
-				if (response.indexOf('|') != -1) {
-					response = response.split('\\n');
-					response = response[0];
-					var campos = response.split('~');
+				if (response.indexOf('VACIO') != -1) {
+					//dejamos los campos en blanco.
+				} else {
+					for (i = 0; i < campos.length; i++) {
+						valores = campos[i].split('|');
 
-					if (response.indexOf('VACIO') != -1) {
-						//dejamos los campos en blanco.
-					} else {
-						for (i = 0; i < campos.length; i++) {
-							valores = campos[i].split('|');
+						// Cliente
+						jQuery('[name="factura_razon_social"]').val('value', valores[0] != '' ? valores[0] : '');
 
-							// Cliente
-							if (valores[0] != '') {
-								jQuery('[name="factura_razon_social"]').attr('value', valores[0]);
-							} else {
-								jQuery('[name="factura_razon_social"]').attr('value', '');
-							}
+						// Dirección
+						if (valores[1] != '') {
+							jQuery('[name="factura_direccion"]').attr('value', valores[1]);
+						} else {
+							jQuery('[name="factura_direccion"]').attr('value', '');
+						}
 
-							// Dirección
-							if (valores[1] != '') {
-								jQuery('[name="factura_direccion"]').attr('value', valores[1]);
-							} else {
-								jQuery('[name="factura_direccion"]').attr('value', '');
-							}
+						// Rut
+						if (valores[2] != '') {
+							jQuery('[name="factura_rut"]').attr('value', valores[2]);
+						} else {
+							jQuery('[name="factura_rut"]').attr('value', '');
+						}
 
-							// Rut
-							if (valores[2] != '') {
-								jQuery('[name="factura_rut"]').attr('value', valores[2]);
-							} else {
-								jQuery('[name="factura_rut"]').attr('value', '');
-							}
+						// Comuna
+						if (valores[3] != '') {
+							jQuery('[name="factura_comuna"]').attr('value', valores[3]);
+						} else {
+							jQuery('[name="factura_comuna"]').attr('value', '');
+						}
 
-							// Comuna
-							if (valores[3] != '') {
-								jQuery('[name="factura_comuna"]').attr('value', valores[3]);
-							} else {
-								jQuery('[name="factura_comuna"]').attr('value', '');
-							}
+						// Ciudad
+						if (valores[4] != '') {
+							jQuery('[name="factura_ciudad"]').attr('value', valores[4]);
+						} else {
+							jQuery('[name="factura_ciudad"]').attr('value', '');
+						}
 
-							// Ciudad
-							if (valores[4] != '') {
-								jQuery('[name="factura_ciudad"]').attr('value', valores[4]);
-							} else {
-								jQuery('[name="factura_ciudad"]').attr('value', '');
-							}
+						// Giro
+						if (valores[5] != '') {
+							jQuery('[name="factura_giro"]').attr('value', valores[5]);
+						} else {
+							jQuery('[name="factura_giro"]').attr('value', '');
+						}
 
-							// Giro
-							if (valores[5] != '') {
-								jQuery('[name="factura_giro"]').attr('value', valores[5]);
-							} else {
-								jQuery('[name="factura_giro"]').attr('value', '');
-							}
+						// Ciudad
+						if (valores[6] != '') {
+							jQuery('[name="factura_codigopostal"]').attr('value', valores[6]);
+						} else {
+							jQuery('[name="factura_codigopostal"]').attr('value', '');
+						}
 
-							// Ciudad
-							if (valores[6] != '') {
-								jQuery('[name="factura_codigopostal"]').attr('value', valores[6]);
-							} else {
-								jQuery('[name="factura_codigopostal"]').attr('value', '');
-							}
+						// País
+						if (valores[7] != '') {
+							jQuery('[name="id_pais"]').attr('value', valores[7]);
+						} else {
+							jQuery('[name="id_pais"]').attr('value', '');
+						}
 
-							// País
-							if (valores[7] != '') {
-								jQuery('[name="id_pais"]').attr('value', valores[7]);
-							} else {
-								jQuery('[name="id_pais"]').attr('value', '');
-							}
+						// Teléfono
+						if (valores[8] != '') {
+							jQuery('[name="cod_factura_telefono"]').attr('value', valores[8]);
+						} else {
+							jQuery('[name="cod_factura_telefono"]').attr('value', '');
+						}
+						if (valores[9] != '') {
+							jQuery('[name="factura_telefono"]').attr('value', valores[8]);
+						} else {
+							jQuery('[name="factura_telefono"]').attr('value', '');
+						}
 
-							// Teléfono
-							if (valores[8] != '') {
-								jQuery('[name="cod_factura_telefono"]').attr('value', valores[8]);
-							} else {
-								jQuery('[name="cod_factura_telefono"]').attr('value', '');
-							}
-							if (valores[9] != '') {
-								jQuery('[name="factura_telefono"]').attr('value', valores[8]);
-							} else {
-								jQuery('[name="factura_telefono"]').attr('value', '');
-							}
-
-							// glosa contrato
-							if (valores[10] != '') {
-								jQuery('[name="glosa_contrato"]').attr('value', valores[10]);
-							} else {
-								jQuery('[name="glosa_contrato"]').attr('value', '');
-							}
+						// glosa contrato
+						if (valores[10] != '') {
+							jQuery('[name="glosa_contrato"]').attr('value', valores[10]);
+						} else {
+							jQuery('[name="glosa_contrato"]').attr('value', '');
 						}
 					}
+				}
+			} else {
+				if (response.indexOf('head') != -1) {
+					alert('Sesión Caducada');
+					top.location.href = '<?php echo Conf::Host(); ?>';
 				} else {
-					if (response.indexOf('head') != -1) {
-						alert('Sesión Caducada');
-						top.location.href = '<?php echo Conf::Host(); ?>';
-					} else {
-						alert(response);
-					}
+					alert(response);
 				}
 			}
-		}
-
-		http.send(null);
+		}, 'text');
 	}
 
 </script>
