@@ -77,11 +77,16 @@ if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
 	$fecha_ini = date("Y-m-d", strtotime($fecha_ini));
 }
 
+if ($fecha_ini == ''){
+	$fecha_ini = '0000-00-00';
+}
+
 $fecha_fin = date("Y-m-d", strtotime($fecha_fin));
 
 $and .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 
 $query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
+				cobro.id_cobro,
 				cta_corriente.id_movimiento,
 				cta_corriente.fecha,
 				cta_corriente.egreso,
@@ -116,16 +121,12 @@ if ($check_gasto == 1 && isset($cobro)) { //Check_trabajo vale 1 cuando aprietan
 	$cobro->GuardarCobro();
 }
 
-// echo $query;
-
 $pagina->PrintTop($popup);
-
-$bgcolor = Conf::GetConf($sesion, 'ColorTituloPagina');
 
 if ($popup) {
 	echo '<table width="100%" border="0" cellspacing="0" cellpadding="2" align="center">';
 		echo '<tr>';
-			echo '<td valign="top" align="left" class="titulo" bgcolor="<?php echo $bgcolor; ?>">';
+			echo '<td valign="top" align="left" class="titulo" bgcolor="#A7DF60">';
 				echo __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de Gastos #') . $id_cobro . __(' ') . $nombre_cliente;
 			echo '</td>';
 		echo '</tr>';
