@@ -2299,7 +2299,6 @@ class NotaCobro extends Cobro {
 							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							AND tramite.cobrable=1
-							AND tramite.fecha BETWEEN '".$this->fields['fecha_ini']."' AND '".$this->fields['fecha_fin']."'
 							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -7929,7 +7928,6 @@ class NotaCobro extends Cobro {
 							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
 								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
 								AND tramite.cobrable=1
-								AND tramite.fecha BETWEEN '".$this->fields['fecha_ini']."' AND '".$this->fields['fecha_fin']."'
 						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -8939,7 +8937,6 @@ class NotaCobro extends Cobro {
 							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
 								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
 								AND tramite.cobrable=1
-								AND tramite.fecha BETWEEN '".$this->fields['fecha_ini']."' AND '".$this->fields['fecha_fin']."'
 							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
