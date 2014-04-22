@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.1.17
+Lunes 21 de Abril 2014
+* **Nuevo:** [Solucion a saldo pendiente vio](https://github.com/LemontechSA/ttb/pull/489)
+
 ## Hotfix: 14.1.15
 Jueves 17 de abril 2014
 * **Nuevo:** [Habilita traduccion a monto en palabra para NotaCobro](https://github.com/LemontechSA/ttb/pull/485)

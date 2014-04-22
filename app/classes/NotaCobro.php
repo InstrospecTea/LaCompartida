@@ -740,7 +740,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_honorarios_demo%', $moneda->fields['simbolo'] . $this->espacio . number_format($valor_trabajos_demo, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial') && ( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' ) && $this->fields['opc_restar_retainer']) {
-					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_honorarios%',$moneda->fields['simbolo'] . $this->espacio . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				if (Conf::GetConf($this->sesion, 'CalculacionCYC')) {
@@ -2277,26 +2277,28 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-							tramite.duracion,
-							tramite_tipo.glosa_tramite as glosa_tramite,
-							tramite.descripcion,
-							tramite.fecha,
-							tramite.id_usuario,
-							tramite.id_tramite,
-							tramite.solicitante,
-							tramite.tarifa_tramite as tarifa,
-							tramite.codigo_asunto,
-							tramite.id_moneda_tramite,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
+				$query = "
+					SELECT SQL_CALC_FOUND_ROWS
+						tramite.duracion,
+						tramite_tipo.glosa_tramite as glosa_tramite,
+						tramite.descripcion,
+						tramite.fecha,
+						tramite.id_usuario,
+						tramite.id_tramite,
+						tramite.solicitante,
+						tramite.tarifa_tramite as tarifa,
+						tramite.codigo_asunto,
+						tramite.id_moneda_tramite,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+					FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
 							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+							AND tramite.cobrable=1
 							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -3826,7 +3828,7 @@ class NotaCobro extends Cobro {
 						$html = str_replace('%valor_honorarios_demo%', $moneda->fields['simbolo'] . $this->espacio . number_format($x_resultados['monto_trabajos'][$this->fields['id_moneda']] - $x_resultados['descuento'][$this->fields['id_moneda']], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
 
-					if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
+					if ( ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) && ( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' ) && $this->fields['opc_restar_retainer']) {
 						$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
 
@@ -7903,27 +7905,29 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-                			tramite.duracion,
-                			tramite_tipo.glosa_tramite as glosa_tramite,
-                			tramite.descripcion,
-                			tramite.fecha,
-                			tramite.id_usuario,
-							tramite.id_tramite,
-							tramite.solicitante,
-							tramite.tarifa_tramite as tarifa,
-							tramite.codigo_asunto,
-							tramite.id_moneda_tramite,
-							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-						FROM tramite
+				$query = "
+					SELECT SQL_CALC_FOUND_ROWS
+            			tramite.duracion,
+            			tramite_tipo.glosa_tramite as glosa_tramite,
+            			tramite.descripcion,
+            			tramite.fecha,
+            			tramite.id_usuario,
+						tramite.id_tramite,
+						tramite.solicitante,
+						tramite.tarifa_tramite as tarifa,
+						tramite.codigo_asunto,
+						tramite.id_moneda_tramite,
+						concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
 						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
 						$join_categoria
-						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
+								AND tramite.cobrable=1
 						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -8910,28 +8914,30 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-							tramite.duracion,
-							tramite_tipo.glosa_tramite as glosa_tramite,
-							tramite.descripcion,
-							tramite.fecha,
-							tramite.id_usuario,
-							tramite.id_tramite,
-							tramite.solicitante,
-							tramite.tarifa_tramite as tarifa,
-							tramite.codigo_asunto,
-							tramite.id_moneda_tramite,
-							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-						FROM tramite
+				$query = "
+					SELECT SQL_CALC_FOUND_ROWS
+						tramite.duracion,
+						tramite_tipo.glosa_tramite as glosa_tramite,
+						tramite.descripcion,
+						tramite.fecha,
+						tramite.id_usuario,
+						tramite.id_tramite,
+						tramite.solicitante,
+						tramite.tarifa_tramite as tarifa,
+						tramite.codigo_asunto,
+						tramite.id_moneda_tramite,
+						concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
 						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
 						$join_categoria
-						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
+								AND tramite.cobrable=1
+							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
 
