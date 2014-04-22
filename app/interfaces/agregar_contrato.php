@@ -2402,8 +2402,8 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 					<?php echo __('Forma de cobro') ?>
 					<?php echo $obligatorio ?>
 				</td>
-
-				<?php if (!$contrato->fields['forma_cobro']){
+				
+				<?php if (!$contrato->fields['forma_cobro']) {
 					$contrato_forma_cobro = 'TASA';
 				} else {
 					$contrato_forma_cobro = $contrato->fields['forma_cobro'];
@@ -2417,20 +2417,20 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 				<td align="left" style="font-size:10pt;">
 					<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/> 
 					<div id="div_cobro" class="buttonset">
-						<input <?php echo TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
+						<input <?php echo TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" onclick="ShowTHH()" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
 						<label for="fc1">Tasas/HH</label>&nbsp;
-						<input <?php echo TTip($tip_retainer) ?> class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
+						<input <?php echo TTip($tip_retainer) ?> class="formacobro" id="fc2" type="radio" name="forma_cobro" onclick="ShowRetainer()" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
 						<label for="fc2">Retainer</label> &nbsp;
-						<input <?php echo TTip($tip_flat) ?>  class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
+						<input <?php echo TTip($tip_flat) ?>  class="formacobro"  id="fc3" type="radio" name="forma_cobro" onclick="ShowFlatFee()" value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
 						<label for="fc3"><?php echo __('Flat fee') ?></label>&nbsp;
-						<input <?php echo TTip($tip_cap) ?>   class="formacobro"  id="fc5" type="radio" name="forma_cobro"  value="CAP" <?php echo $contrato_forma_cobro == "CAP" ? "checked='checked'" : "" ?> />
+						<input <?php echo TTip($tip_cap) ?>   class="formacobro"  id="fc5" type="radio" name="forma_cobro" onclick="ShowCap()" value="CAP" <?php echo $contrato_forma_cobro == "CAP" ? "checked='checked'" : "" ?> />
 						<label for="fc5"><?php echo __('Cap') ?></label>&nbsp;
-						<input <?php echo TTip($tip_proporcional) ?>  class="formacobro"  id="fc6" type="radio" name="forma_cobro"  value="PROPORCIONAL" <?php echo $contrato_forma_cobro == "PROPORCIONAL" ? "checked='checked'" : "" ?> />
+						<input <?php echo TTip($tip_proporcional) ?>  class="formacobro"  id="fc6" type="radio" name="forma_cobro" onclick="ShowProporcional()"  value="PROPORCIONAL" <?php echo $contrato_forma_cobro == "PROPORCIONAL" ? "checked='checked'" : "" ?> />
 						<label for="fc6">Proporcional</label> &nbsp;
-						<input <?php echo TTip($tip_hitos) ?>  class="formacobro"  id="fc7" type="radio" name="forma_cobro"  value="HITOS" <?php echo $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
+						<input <?php echo TTip($tip_hitos) ?>  class="formacobro"  id="fc7" type="radio" name="forma_cobro" onclick="ShowHitos()" value="HITOS" <?php echo $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
 						<label for="fc7"><?php echo __('Hitos') ?></label>
 							<?php if (!Conf::GetConf($Sesion, 'EsconderTarifaEscalonada')) { ?>
-							<input <?php echo TTip($tip_escalonada) ?>  class="formacobro"  id="fc8" type="radio" name="forma_cobro"  value="ESCALONADA" <?php echo $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
+							<input <?php echo TTip($tip_escalonada) ?>  class="formacobro"  id="fc8" type="radio" name="forma_cobro" onclick="ShowProporcional()" value="ESCALONADA" <?php echo $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
 							<label for="fc8"><?php echo __('Escalonada') ?></label>
 					</div>
 				</td>
@@ -2438,7 +2438,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 			</tr>
 
 			<tr>
-				<td colspan="2">
+				<td colspan="2" align="center">
 					<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id="div_forma_cobro">
 						<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 							<span id="span_monto">
@@ -2470,7 +2470,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 							<table style='border: 0px solid' bgcolor='#C6DEAD'>
 								<?php if ($cobro) { ?>
 									<tr>
-										<td>
+										<td align="left">
 											<?php echo __('Monto utilizado') ?>:
 											<?php echo $obligatorio ?>
 										</td>
