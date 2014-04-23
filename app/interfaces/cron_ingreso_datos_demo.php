@@ -18,10 +18,8 @@ if ($argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba'])) {
 $sesion = new Sesion(null, true);
 
 if (Conf::EsAmbientePrueba()) {
-	if (method_exists('Conf', 'GetConf')) {
-		$query = "UPDATE contrato SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "', usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";
-		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	}
+	$query = "UPDATE contrato SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "', usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";
+	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	echo '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
 
@@ -212,6 +210,7 @@ if (Conf::EsAmbientePrueba()) {
 	while ($fecha <= $fecha_mk_fin) {
 		$fecha_trabajo = date("Y-m-d", $fecha);
 		$i++;
+		$values = array();
 		if (date("w", $fecha) != 0 && date("w", $fecha) != 6) {
 			for ($cont_usu = 0; $cont_usu < count($usuarios); $cont_usu++) {
 				$almuerzo = false;
@@ -219,7 +218,6 @@ if (Conf::EsAmbientePrueba()) {
 				$cont_trabajos = 0;
 				$cont_trabajos_total = 0;
 				$horas_maximas = rand(6, 10);
-				$values = array();
 
 				while (Utiles::time2decimal($duracion_en_este_dia) < $horas_maximas && $cont_trabajos_total < ( $max_dia + 4 )) {
 					if (rand(1, 100) < 66 && $cont_trabajos < $max_dia) {
@@ -292,19 +290,20 @@ if (Conf::EsAmbientePrueba()) {
 						$duracion_cobrada = Utiles::subtract_hora($duracion, $duracion_subtract[$duracion_subtract_index]);
 
 						if (Utiles::time2decimal(Utiles::add_hora($duracion_en_este_dia, $duracion)) < $horas_maximas) {
-							$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+							$values[] = "(2,'$fecha_trabajo', '$asunto', '$descripcion_trabajo', '$duracion', '$duracion_cobrada', $usuario)";
+							//$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 							$duracion_en_este_dia = Utiles::add_hora($duracion_en_este_dia, $duracion);
 						}
 						//echo 'fecha: '.$fecha_trabajo.'<br>cliente: '.$cliente.'<br>asunto: '.$asunto.'<br>usuario: '.$usuario.'<br>descripcion: '.$descripcion_trabajo.'<br>duracion: '.$duracion.'<br>Duracion total: '.$duracion_en_este_dia.'<br><br>query:  '.$query.'<br><br><br>';
 						$cont_trabajos_total++;
 					}
-
-					echo "Insertando " . count($values) . " trabajos para el usuario $usuario<br />";
-					$query = "INSERT INTO trabajo(id_moneda,fecha,codigo_asunto,descripcion,duracion,duracion_cobrada,id_usuario) VALUES ";
-					$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 				}
 			}
 		}
+		echo "Insertando " . count($values) . " trabajos para el día $fecha<br />";
+		$query = "INSERT INTO trabajo(id_moneda,fecha,codigo_asunto,descripcion,duracion,duracion_cobrada,id_usuario) VALUES ";
+		$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
 		list($anio, $mes, $dia) = split("-", $fecha_trabajo);
 		$fecha = mktime(0, 0, 0, $mes, $dia + 1, $anio);
 	}
@@ -371,6 +370,7 @@ if (Conf::EsAmbientePrueba()) {
 	$i = 0;
 	while ($fecha <= $fecha_mk_fin) {
 		$fecha_para_pasar = date("Y-m-d", $fecha);
+		$values = array();
 
 		$i++;
 		for ($j = 0; $j < count($asuntos); $j++) {
@@ -404,11 +404,12 @@ if (Conf::EsAmbientePrueba()) {
 				$values[] = "( '$codigo_cliente', '$codigo_asunto', '$fecha_ingreso', 2, $ingreso, $egreso, $monto_cobrable, '$descripcion' )";
 				$cont_gastos++;
 			}
-
-			echo "Insertando " . count($values) . " trabajos para el asunto $codigo_asunto<br />";
-			$query = "INSERT INTO cta_corriente( codigo_cliente, codigo_asunto, fecha, id_moneda, ingreso, egreso, monto_cobrable, descripcion ) VALUES "
-			$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
+
+		echo "Insertando " . count($values) . " gastos para el día $fecha<br />";
+		$query = "INSERT INTO cta_corriente( codigo_cliente, codigo_asunto, fecha, id_moneda, ingreso, egreso, monto_cobrable, descripcion ) VALUES "
+		$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
 		list($anio, $mes, $dia) = split("-", $fecha_para_pasar);
 		$fecha = mktime(0, 0, 0, $mes + 1, $dia, $anio);
 	}
