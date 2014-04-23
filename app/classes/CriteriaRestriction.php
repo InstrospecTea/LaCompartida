@@ -11,13 +11,13 @@
 	class CriteriaRestriction
 	{
 
-		private String $restriction;
+		private $restriction;
 		
 		/**
 		 * Constructor de la clase
 		 * @param String $restriction
 		 */
-		function __construct(String $restriction)
+		function __construct($restriction)
 		{
 			$this->restriction = $restriction;
 		}
@@ -40,7 +40,7 @@
 		 * @param  String $right
 		 * @return CriteriaRestriction
 		 */
-		public static function and_clause(String $left, String $right){
+		public static function and_clause($left, $right){
 			return new CriteriaRestriction("(".$left." AND ".$right.")");
 		}
 
@@ -50,7 +50,7 @@
 		 * @param  String $right
 		 * @return CriteriaRestriction
 		 */
-		public static function or_clause(String $left, String $right){
+		public static function or_clause($left, $right){
 			return new CriteriaRestriction("(".$left." OR ".$right.")");
 		}
 
@@ -60,13 +60,13 @@
 		 * @return CriteriaRestriction
 		 */
 		public static function and_all(array $condition_array){
-		if(is_array($condition_array)){
-			$condition = "";
-			return new CriteriaRestriction(implode(" AND ", $condition_array));
-		}
-		else{
-			throw new Exception("The condition_array parameter is not an array!");
-			
+			if(is_array($condition_array)){
+				$condition = "";
+				return new CriteriaRestriction(implode(" AND ", $condition_array));
+			}
+			else{
+				throw new Exception("The condition_array parameter is not an array!");
+			}
 		}
 
 		/**
@@ -74,20 +74,16 @@
 		 * @param  [type] $condition_array
 		 * @return [type] CriteriaRestriction
 		 */
-		public static function or_all($condition_array){
-		if(is_array($condition_array)){
-			$condition = "";
-			return new CriteriaRestriction(implode(" OR ", $condition_array));
+		public static function or_all(array $condition_array){
+			if(is_array($condition_array)){
+				$condition = "";
+				return new CriteriaRestriction(implode(" OR ", $condition_array));
+			}
+			else{
+				throw new Exception("The condition_array parameter is not an array!");
+			}
 		}
-		else{
-			throw new Exception("The condition_array parameter is not an array!");
-		}
-	}
 
 	}
-
-
-
-	}
-
+	
 ?>

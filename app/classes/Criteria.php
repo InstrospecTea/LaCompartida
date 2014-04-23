@@ -54,11 +54,14 @@ class Criteria
 
 	/**
 	 * Añade un statement de selección al criterio de búsqueda.
-	 * @param String $attribute
-	 * @param String $alias
+	 * @param string $attribute
+	 * @param string $alias
 	 * @return Criteria
 	 */
-	public function add_select(String $attribute, String $alias = ""){
+	public function add_select($attribute, $alias = null){
+		if(is_null($alias)){
+			$alias = "";
+		}
 		$new_clause = "";
 		$new_clause .= $attribute;
 		if($alias != ""){
@@ -70,11 +73,14 @@ class Criteria
 
 	/**
 	 * Añade una tabla al scope de búsqueda al criteria.
-	 * @param String $table
-	 * @param String $alias
+	 * @param string $table
+	 * @param string $alias
 	 * @return Criteria
 	 */
-	public function add_from(String $table, String $alias = ""){
+	public function add_from($table, $alias = null){
+		if(is_null($alias)){
+			$alias = "";
+		}
 		$new_clause = "";
 		$new_clause.= $table." ".$alias;
 		$this->from_clauses[] = $new_clause;
@@ -84,23 +90,23 @@ class Criteria
 	/**
 	 * Añade un criteria al scope de búsqueda de este criteria.
 	 * @param Criteria $criteria
-	 * @param String   $alias
+	 * @param string   $alias
 	 * @return Criteria
 	 */
-	public function add_from_criteria(Criteria $criteria, String $alias){
+	public function add_from_criteria(Criteria $criteria, $alias){
 		$new_clause = "";
-		$new_clause.= '('.$criteria->get_plain_query.') AS '.$alias;
+		$new_clause.= '('.$criteria->get_plain_query().') AS '.$alias;
 		$this->from_clauses[] = $new_clause;
 		return $this;
 	}
 
 	/**
 	 * Añade un scope de búsqueda mediante un LEFT JOIN al criteria.
-	 * @param  String $join_table
-	 * @param  String $join_condition
+	 * @param  string $join_table
+	 * @param  string $join_condition
 	 * @return Criteria
 	 */
-	public function add_left_join_with(String $join_table, String $join_condition){
+	public function add_left_join_with($join_table, $join_condition){
 		$new_clause = "";
 		$new_clause.= $this->left_joining." ";
 		$new_clause.= $join_table." ON ".$join_condition;
@@ -111,11 +117,11 @@ class Criteria
 	/**
 	 * Añade un criteria al scope de búsqueda a través de un left join con este crtieria.
 	 * @param Criteria $criteria
-	 * @param String   $alias
-	 * @param String   $join_condition
+	 * @param string   $alias
+	 * @param string   $join_condition
 	 * @return Criteria
 	 */
-	public function add_left_join_with_criteria(Criteria $criteria, String $alias, String $join_condition){
+	public function add_left_join_with_criteria(Criteria $criteria, $alias, $join_condition){
 		$new_clause = "";
 		$new_clause.= $this->left_joining." ";
 		$new_clause.= "(".$criteria->get_plain_query().") ".$alias." ON ".$join_condition;
@@ -129,27 +135,27 @@ class Criteria
 	 * @return Criteria
 	 */
 	public function add_restriction(CriteriaRestriction $restriction){
-		$this->where_clauses[] = $restriction;
+		$this->where_clauses[] = $restriction->get_restriction();
 		return $this;
 	}
 
 	/**
 	 * Añade una condición de agrupamiento al criterio de búsqueda.
-	 * @param String $group_entity
+	 * @param string $group_entity
 	 * @return Criteria
 	 */
-	public function add_grouping(String $group_entity){
-		$this->grouping_clauses[] = $group;
+	public function add_grouping($group_entity){
+		$this->grouping_clauses[] = $group_entity;
 		return $this;
 	}
 
 	/**
 	 * Añade una condición de ordenamiento al criterio de búsqueda.
-	 * @param String $order
+	 * @param string $order
 	 * @return Criteria
 	 */
-	public function add_ordering($order){
-		$this->ordering_clauses[] = $order;
+	public function add_ordering($order_entity){
+		$this->ordering_clauses[] = $order_entity;
 		return $this;
 	}
 
@@ -159,7 +165,7 @@ class Criteria
 
 	/**
 	 * Genera el statement de SELECT de una query.
-	 * @return String
+	 * @return string
 	 * @throws Exception Cuando no se ha definido un criterio de selección.
 	 */
 	private function generate_select_statement(){
@@ -173,7 +179,7 @@ class Criteria
 
 	/**
 	 * Genera el statement de FROM de una query.
-	 * @return String
+	 * @return string
 	 * @throws Exception  Cuando no se ha definido un scope de búsqueda.
 	 */
 	private function generate_from_statement(){
@@ -187,7 +193,7 @@ class Criteria
 
 	/**
 	 * Genera el statement de JOIN de una query, si hubieren.
-	 * @return String
+	 * @return string
 	 */
 	private function generate_join_statement(){
 		if(count($this->join_clauses) > 0){
@@ -200,7 +206,7 @@ class Criteria
 
 	/**
 	 * Genera el statement WHERE de una query, si hubiere.
-	 * @return String
+	 * @return string
 	 */
 	private function generate_where_statement(){
 		if(count($this->where_clauses) > 0){
@@ -213,7 +219,7 @@ class Criteria
 
 	/**
 	 * Genera el statement GROUP BY de una query, si hubiere.
-	 * @return String
+	 * @return string
 	 */
 	private function generate_grouping_statement(){
 		if(count($this->grouping_clauses) > 0){
@@ -226,7 +232,7 @@ class Criteria
 
 	/**
 	 * Genera el statement ORDER BY de una query, si hubiere.
-	 * @return String
+	 * @return string
 	 */
 	private function generate_ordering_statement(){
 		if(count($this->ordering_clauses) > 0){
@@ -243,7 +249,7 @@ class Criteria
 	
 	/**
 	 * Obtiene la versión 'raw' de la query generada.
-	 * @return String
+	 * @return string
 	 */
 	public function get_plain_query(){
 		return 	$this->generate_select_statement().

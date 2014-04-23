@@ -4,143 +4,138 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
+	
 
-if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
+if (in_array($opcion, array('buscar', 'xls'))) {
 
-	$codigo_cliente = $_REQUEST['codigo_cliente'];
-	$id_contrato = $_REQUEST['id_contrato'];
-	$tipo_liquidacion = $_REQUEST['tipo_liquidacion'];
-
-	$where = '';
-	$join = '';
+	$and_statements = array();
+	$join_sub_select = new Criteria();
+	$sub_query = new Criteria();
+	$query = new Criteria();
 
 	if (!empty($codigo_cliente)) {
-		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
+		$and_statements[] = 'contrato.codigo_cliente = '."$codigo_cliente";
+		//
 	}
 
 	if (!empty($id_contrato)) {
-		$where .= " AND cobro.id_contrato = '$id_contrato' ";
+		$and_statements[] = 'cobro.id_contrato = '."$id_contrato";
+		//
 	}
 
-	if (!empty($tipo_liquidacion)) { //1-2 = honorarios-gastos, 3 = mixtas
+	if (!empty($tipo_liquidacion)) {
 		$honorarios = $tipo_liquidacion & 1;
 		$gastos = $tipo_liquidacion & 2 ? 1 : 0;
-		$where .= "
-			AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "'
-			AND cobro.incluye_honorarios = '$honorarios'
-			AND cobro.incluye_gastos = '$gastos' ";
+		$and_statements[] = 'contrato.separar_liquidaciones = \''.($tipo_liquidacion == '3' ? 0 : 1).'\'';
+		$and_statements[] = 'cobro.incluye_honorarios = \''."$honorarios".'\'';
+		$and_statements[] = 'cobro.incluye_gastos = \''."$gastos".'\'';
 	}
 
-	if ($_POST['solo_monto_facturado']) {
-		$campo_valor = "T.fsaldo";
-		$campo_gvalor = "T.fgsaldo";
-		$campo_hvalor = "T.fhsaldo";
-		$where.="AND  ccfm.saldo!=0 ";
-		$groupby.=" factura.id_factura";
-		$tipo = " pdl.glosa";
-		$fecha_atraso = " factura.fecha";
-		$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+	if ($solo_monto_facturado) {
+		$campo_valor = 'T.fsaldo';
+		$campo_gvalor = 'T.fgsaldo';
+		$campo_hvalor = 'T.fhsaldo';
+		$tipo = 'pdl.glosa';
+		$label = 'concat(pdl.codigo,\' N° \',  lpad(factura.serie_documento_legal,\'3\',\'0\'),'-',lpad(factura.numero,\'7\',\'0\'))';
 		$identificadores = 'facturas';
-		//$linktofile = 'agregar_factura.php?id_factura=';
-		//$identificador = " factura.id_factura";
-		$identificador = " d.id_cobro";
+		$identificador =  'd.id_cobro';
 		$linktofile = 'cobros6.php?id_cobro=';
-	} else {
-		$campo_valor = "T.saldo";
-		$campo_gvalor = "T.gsaldo";
-		$campo_hvalor = "T.hsaldo";
-
-		$where .= " AND d.tipo_doc = 'N' AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE') ";
-		$where .= " AND ((d.saldo_honorarios + d.saldo_gastos) > 0) ";
-
-		$groupby.=" d.id_documento";
-		$tipo = " 'liquidacion'";
-		$fecha_atraso = " cobro.fecha_emision";
-		$label = " d.id_cobro ";
+		$and_statements[] = 'ccfm.saldo != 0';
+		$sub_query->add_grouping('factura.id_factura');
+	}
+	else{
+		$campo_valor = 'T.saldo';
+		$campo_gvalor = 'T.gsaldo';
+		$campo_hvalor = 'T.hsaldo';
+		$and_statements[] = 'd.tipo_doc = \'N\' AND cobro.estado NOT IN (\'CREADO\', \'EN REVISION\', \'INCOBRABLE\')';
+		$and_statements[] = '((d.saldo_honorarios + d.saldo_gastos) > 0)';
+		$tipo = '\'liquidacion\'';
+		$fecha_atraso = 'cobro.fecha_emision';
+		$label = 'd.id_cobro';
 		$identificadores = 'cobros';
-		$identificador = " d.id_cobro";
+		$identificador = 'd.id_cobro';
 		$linktofile = 'cobros6.php?id_cobro=';
+		$sub_query->add_grouping('d.id_documento');
 	}
 
-	$query = "SELECT
-		T.codigo_cliente,
-		T.glosa_cliente,
-		T.moneda,
-		-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, $campo_valor, 0)) AS '0-30',
-		-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60, $campo_valor, 0)) AS '31-60',
-		-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, $campo_valor, 0)) AS '61-90',
-		-SUM(IF(T.dias_atraso_pago > 90, $campo_valor, 0)) AS '91+',
-		-SUM($campo_valor) AS total,
-		-SUM($campo_hvalor) AS htotal,
-		-SUM($campo_gvalor) AS gtotal,
-		CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')  as identificadores,
-		T.cantidad_seguimiento,
-		T.comentario_seguimiento
-	FROM
-		(SELECT 	";
-	/* $query .= " if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
-	  if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+	//Definición de las querys en base a los criterios apropiados.
+	//Definición de las querys en base a los criterios apropiados.
+	$join_sub_select
+				->add_select('codigo_cliente')
+				->add_select('COUNT(*)','cantidad')
+				->add_select("MAX(CONCAT(fecha_creacion, ' | ', comentario))",'comentario')
+				->add_from('cliente_seguimiento')
+				->add_grouping('codigo_cliente');
 
-	  ) as tipo_cobro," */
-	$query .= "		d.fecha,
-				$identificador AS identificador,
-				$tipo AS tipo,
-				d.glosa_documento  AS descripcion,
-				$label as label,
-				cliente.codigo_cliente,
-				cliente.glosa_cliente AS glosa_cliente,
+	$sub_query
+		->add_select('d.fecha')
+		->add_select("$identificador",'identificador')
+		->add_select("$tipo",'tipo')
+		->add_select('d.glosa_documento','descripcion')
+		->add_select("$label",'label')
+		->add_select('cliente.codigo_cliente')
+		->add_select('cliente.glosa_cliente', 'glosa_cliente')
+		->add_select('d.monto', 'monto')
+		->add_select('d.monto * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','monto_base')
+		->add_select('sum(ccfm.monto_bruto)', 'fmonto')
+		->add_select('sum(ccfm.monto_bruto)* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))', 'fmonto_base')
+		->add_select('-1 * (d.saldo_honorarios + d.saldo_gastos)','saldo')
+		->add_select('-1 * (d.saldo_honorarios + d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))', 'saldo_base')
+		->add_select('sum(ccfm.saldo)', 'fsaldo')
+		->add_select('sum(ccfm.saldo)* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))', 'fsaldo_base')
+		->add_select('-1 * (d.saldo_honorarios)','hsaldo')
+		->add_select('-1 * (d.saldo_honorarios ) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))', 'hsaldo_base')
+		->add_select('sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0))','fhsaldo')
+		->add_select('sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0))* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','fhsaldo_base')
+		->add_select('-1 * (d.saldo_gastos)','gsaldo')
+		->add_select('-1 * (d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','gsaldo_base')
+		->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))', 'fgsaldo')
+		->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','fgsaldo_base')
+		->add_select('cobro.fecha_emision')
+		->add_select('DATEDIFF(NOW(), cobro.fecha_emision)','dias_atraso_pago')
+		->add_select('moneda_documento.simbolo','moneda')
+		->add_select('seguimiento.cantidad','cantidad_seguimiento')
+		->add_select('seguimiento.comentario','comentario_seguimiento')
+		->add_select('CONCAT_WS(\' \',u.nombre,u.apellido1,u.apellido2)','encargado_comercial')
+		->add_from('cobro')
+		->add_left_join_with('documento d','cobro.id_cobro = d.id_cobro')
+		->add_left_join_with('prm_moneda moneda_documento','d.id_moneda = moneda_documento.id_moneda')
+		->add_left_join_with('prm_moneda moneda_base','moneda_base.moneda_base = 1')
+		->add_left_join_with('factura','factura.id_cobro=cobro.id_cobro')
+		->add_left_join_with('cta_cte_fact_mvto ccfm','ccfm.id_factura=factura.id_factura')
+		->add_left_join_with('contrato','contrato.id_contrato = cobro.id_contrato')
+		->add_left_join_with('usuario u','contrato.id_usuario_responsable = u.id_usuario')
+		->add_left_join_with('cliente','contrato.codigo_cliente = cliente.codigo_cliente')
+		->add_left_join_with('prm_documento_legal pdl','pdl.id_documento_legal=factura.id_documento_legal')
+		->add_left_join_with_criteria($join_sub_select,'seguimiento','cliente.codigo_cliente = seguimiento.codigo_cliente')
+		->add_restriction(
+			CriteriaRestriction::and_all($and_statements)
+		)
+		->add_grouping('d.id_documento');
 
-				d.monto AS monto,
-				d.monto * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS monto_base,
-				sum(ccfm.monto_bruto) AS fmonto,
-				sum(ccfm.monto_bruto)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fmonto_base,
-
-				-1 * (d.saldo_honorarios + d.saldo_gastos) AS saldo,
-				-1 * (d.saldo_honorarios + d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS saldo_base,
-				sum(ccfm.saldo) AS fsaldo,
-				sum(ccfm.saldo)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fsaldo_base,
-
-				-1 * (d.saldo_honorarios) AS hsaldo,
-				-1 * (d.saldo_honorarios ) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS hsaldo_base,
-				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0)) AS fhsaldo,
-				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fhsaldo_base,
-
-				-1 * (d.saldo_gastos) AS gsaldo,
-				-1 * (d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS gsaldo_base,
-				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0)) AS fgsaldo,
-				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fgsaldo_base,
-
-				DATEDIFF(NOW(), $fecha_atraso) AS dias_atraso_pago,
-				moneda_documento.simbolo AS moneda,
-				seguimiento.cantidad AS cantidad_seguimiento,
-				seguimiento.comentario AS comentario_seguimiento
-
-			FROM cobro
-			LEFT join documento d  ON cobro.id_cobro = d.id_cobro
-			LEFT JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-			LEFT JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
-			LEFT JOIN factura  on factura.id_cobro=cobro.id_cobro
-			LEFT JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
-			LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-			LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
-			LEFT join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
-			LEFT JOIN (
-				SELECT
-					codigo_cliente,
-					COUNT(*) AS cantidad,
-					MAX(CONCAT(fecha_creacion, ' | ', comentario)) AS comentario
-				FROM cliente_seguimiento
-				GROUP BY codigo_cliente
-			) seguimiento ON cliente.codigo_cliente = seguimiento.codigo_cliente
-			$join
-			WHERE
-				d.tipo_doc = 'N' AND
-				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
-				$where
-			GROUP BY $groupby
-		) AS T
-		GROUP BY T.glosa_cliente, T.moneda
-		ORDER BY glosa_cliente";
+	$query
+		->add_select('T.codigo_cliente')
+		->add_select('T.glosa_cliente')
+		->add_select('T.moneda')
+		->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30,'.$campo_valor.', 0))', '0-30')
+		->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60,'.$campo_valor.', 0))', '31-60')
+		->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90,'.$campo_valor.', 0))', '61-90')
+		->add_select('-SUM(IF(T.dias_atraso_pago > 90,'.$campo_valor.', 0))', '91+')
+		->add_select('-SUM('.$campo_valor.')', 'total')
+		->add_select('-SUM('.$campo_hvalor.')', 'htotal')
+		->add_select('-SUM('.$campo_gvalor.')', 'gtotal')
+		->add_select("CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')",'identificadores')
+		->add_select('T.cantidad_seguimiento')
+		->add_select('T.comentario_seguimiento')
+		//Dias atraso pago
+		->add_select('T.dias_atraso_pago')
+		->add_select('T.fecha_emision')
+		//Encargado Comercial
+		->add_select('T.encargado_comercial')
+		->add_from_criteria($sub_query,'T')
+		->add_grouping('T.glosa_cliente')
+		->add_grouping('T.moneda')
+		->add_ordering('glosa_cliente');
 
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
@@ -151,6 +146,20 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 			'extras' => array(
 				'attrs' => 'width="28%" style="text-align:left;"',
 				'groupinline' => true
+			)
+		),
+		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial',
+			'extras' => array(
+				'attrs' => 'width="20%" style="text-align:left;"',
+			)
+		),
+		array(
+			'field' => 'fecha_emision',
+			'title' => 'Días Vencimiento',
+			'extras' => array(
+				'attrs' => 'width="20%" style="text-align:center;"',
 			)
 		),
 		array(
@@ -213,7 +222,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 	);
 
 	// Configuración especial para mostrar el seguimiento del cliente
-	if ($_REQUEST['opcion'] != 'xls') {
+	if ($opcion != 'xls') {
 		$config_reporte[] = array(
 			'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
 			'title' => '&nbsp;',
@@ -231,14 +240,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 
 	$SimpleReport->LoadConfigFromArray($config_reporte);
 
-	//echo $query; exit();
-
-	$statement = $Sesion->pdodbh->prepare($query);
+	$statement = $Sesion->pdodbh->prepare($query->get_plain_query());
 	$statement->execute();
 	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 	$SimpleReport->LoadResults($results);
 
-	if ($_REQUEST['opcion'] == 'xls') {
+	if ($opcion == 'xls') {
 		$new_results = array();
 		foreach ($results as $result) {
 			// Corregir los identificadores
@@ -259,7 +266,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 
 			$new_results[] = $result;
 		}
-
 		$SimpleReport->LoadResults($new_results);
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
 		$writer->save('Reporte_antiguedad_deuda');
@@ -275,7 +281,7 @@ $Pagina->PrintTop();
 <table width="90%">
 	<tr>
 		<td>
-			<form method="POST" name="form_reporte_saldo" action="planilla_deudas.php" id="form_reporte_saldo">
+			<form method="POST" name="form_reporte_saldo" action="" id="form_reporte_saldo">
 				<input  id="xdesde"  name="xdesde" type="hidden" value="">
 				<input type="hidden" name="opcion" id="opcion" value="buscar">
 				<!-- Calendario DIV -->
