@@ -300,9 +300,12 @@ if (Conf::EsAmbientePrueba()) {
 				}
 			}
 		}
-		echo "Insertando " . count($values) . " trabajos para el día $fecha<br />";
-		$query = "INSERT INTO trabajo(id_moneda,fecha,codigo_asunto,descripcion,duracion,duracion_cobrada,id_usuario) VALUES ";
-		$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+		if (count($values) > 0) {
+			echo "Insertando " . count($values) . " trabajos para el día " . date('d-m-Y', $fecha) . "<br />";
+			$query = "INSERT INTO trabajo(id_moneda,fecha,codigo_asunto,descripcion,duracion,duracion_cobrada,id_usuario) VALUES ";
+			$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		}
 
 		list($anio, $mes, $dia) = split("-", $fecha_trabajo);
 		$fecha = mktime(0, 0, 0, $mes, $dia + 1, $anio);
@@ -406,9 +409,11 @@ if (Conf::EsAmbientePrueba()) {
 			}
 		}
 
-		echo "Insertando " . count($values) . " gastos para el día $fecha<br />";
-		$query = "INSERT INTO cta_corriente( codigo_cliente, codigo_asunto, fecha, id_moneda, ingreso, egreso, monto_cobrable, descripcion ) VALUES "
-		$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		if (count($values) > 0) {
+			echo "Insertando " . count($values) . " gastos para el día " . date('d-m-Y', $fecha) . "<br />";
+			$query = "INSERT INTO cta_corriente( codigo_cliente, codigo_asunto, fecha, id_moneda, ingreso, egreso, monto_cobrable, descripcion ) VALUES ";
+			$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		}
 
 		list($anio, $mes, $dia) = split("-", $fecha_para_pasar);
 		$fecha = mktime(0, 0, 0, $mes + 1, $dia, $anio);
