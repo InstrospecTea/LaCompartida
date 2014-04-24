@@ -1,7 +1,7 @@
 <?php
 
 /**
-* 
+*	TODO: Comentar!!
 */
 class ReporteAntiguedadDeudas
 {
@@ -11,7 +11,7 @@ class ReporteAntiguedadDeudas
 	private $sesion;
 	private $criteria;
 	private $and_statements = array();
-	private $repot_details = array();
+	private $report_details = array();
 
 	function __construct($sesion, array $opciones, array $datos)
 	{
@@ -36,7 +36,7 @@ class ReporteAntiguedadDeudas
 		//Genera la instancia de Simple Report a cargo de renderizar el reporte.
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
-		$SimpleReport->LoadConfigFromArray($this->obtieneConfiguracion);
+		$SimpleReport->LoadConfigFromArray($this->obtiene_configuracion());
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -97,7 +97,7 @@ class ReporteAntiguedadDeudas
 				)
 			),
 			array(
-				'field' => 'total',
+				'field' => 'total_final',
 				'title' => __('Total'),
 				'format' => 'number',
 				'extras' => array(
@@ -120,7 +120,8 @@ class ReporteAntiguedadDeudas
 		$this->criteria
 			->add_select('cliente.codigo_cliente')
 		    ->add_select('cliente.glosa_cliente')
-		    ->add_select('CONCAT_WS(\' \' ,u.nombre ,u.apellido1 ,u.apellido2 )','encargado_comercial');
+		    ->add_select('CONCAT_WS(\' \' ,u.nombre ,u.apellido1 ,u.apellido2 )','encargado_comercial')
+		    ->add_select('moneda_documento.simbolo','moneda');
 
 		$this->criteria
 			->add_from('cobro');
@@ -196,8 +197,8 @@ class ReporteAntiguedadDeudas
 				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,saldo_factura.saldo, 0))','0-30')
 				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,saldo_factura.saldo, 0))','31-60')
 				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,saldo_factura.saldo, 0))','61-90')
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0))','90+')
-				    ->add_select('-SUM(saldo_factura.saldo)','total')
+				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0))','91+')
+				    ->add_select('-SUM(saldo_factura.saldo)','total_final')
 		            ->add_grouping('cliente.glosa_cliente');
        		}
        		else{
@@ -233,8 +234,8 @@ class ReporteAntiguedadDeudas
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','0-30')
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','31-60')
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','61-90')
-				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','90+')
-				   ->add_select('-SUM(-1 * (d.saldo_honorarios + d.saldo_gastos))','saldo_total')
+				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','91+')
+				   ->add_select('-SUM(-1 * (d.saldo_honorarios + d.saldo_gastos))','total_final')
 				   ->add_grouping('cliente.glosa_cliente');
 			}
 			else{
@@ -255,8 +256,8 @@ class ReporteAntiguedadDeudas
 						    ->add_select('-IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0)','0-30')
 						    ->add_select('-IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0)','31-60')
 						    ->add_select('-IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0)','61-90')
-						    ->add_select('-IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0)','90+')
-						    ->add_select('-(-1 * (d.saldo_honorarios + d.saldo_gastos))','total');
+						    ->add_select('-IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0)','91+')
+						    ->add_select('-(-1 * (d.saldo_honorarios + d.saldo_gastos))','total_final');
 				$details_criteria
 							->add_from('cobro');
 				$details_criteria
