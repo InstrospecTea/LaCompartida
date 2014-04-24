@@ -41,6 +41,111 @@ class ReporteAntiguedadDeudas
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$SimpleReport->LoadResults($results);
+
+		//
+		//Añade detalle, si existe:
+		//
+		if (!$this->opciones['agrupar_informacion']){
+
+			$SimpleReportDetails = new SimpleReport($this->sesion);
+			$SimpleReportDetails->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
+			//TODO: Añadir langs!! 
+			$configuracion = array(
+				array(
+					'field' => 'id_cobro',
+					'title' => 'N° Cobro',
+					'extras' => array(
+						'attrs' => 'width="10%" style="text-align:right"',
+					)
+				),
+				array(
+					'field' => 'fecha_emision',
+					'title' => 'Fecha Emisión',
+					'extras' => array(
+						'attrs' => 'width="17%" style="text-align:right"',
+					)
+				),
+				array(
+					'field' => 'dias_atraso',
+					'title' => 'Días transcurridos',
+					'extras' => array(
+						'attrs' => 'width="10%" style="text-align:right"',
+					)
+				),
+				array(
+					'field' => '0-30',
+					'title' => '0-30 ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+						'subtotal' => 'moneda',
+						'symbol' => 'moneda',
+						'attrs' => 'width="10%" style="text-align:right"',
+					)
+				),
+				array(
+					'field' => '31-60',
+					'title' => '31-60 ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+						'subtotal' => 'moneda',
+						'symbol' => 'moneda',
+						'attrs' => 'width="10%" style="text-align:right"'
+					)
+				),
+				array(
+					'field' => '61-90',
+					'title' => '61-90 ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+						'subtotal' => 'moneda',
+						'symbol' => 'moneda',
+						'attrs' => 'width="10%" style="text-align:right"'
+					)
+				),
+				array(
+					'field' => '91+',
+					'title' => '91+ ' . utf8_encode(__('días')),
+					'format' => 'number',
+					'extras' => array(
+						'subtotal' => 'moneda',
+						'symbol' => 'moneda',
+						'attrs' => 'width="10%" style="text-align:right"'
+					)
+				),
+				array(
+					'field' => 'total_final',
+					'title' => __('Total'),
+					'format' => 'number',
+					'extras' => array(
+						'subtotal' => 'moneda',
+						'symbol' => 'moneda',
+						'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					)
+				)
+			);
+
+			$statement = $this->sesion->pdodbh->prepare($this->report_details['codigo_cliente']);
+			$statement->execute();
+			$details_all = $statement->fetchAll(PDO::FETCH_ASSOC);
+			$SimpleReportDetails->LoadConfigFromArray($configuracion);
+			foreach ($details_all as $detail) {
+				$details_result[$detail['codigo_cliente']][] = $detail;
+			}
+			$SimpleReportDetails->LoadResults($details_result);
+
+			$SimpleReport->AddSubReport(array(
+				'SimpleReport' => $SimpleReportDetails,
+				'Keys' => array('codigo_cliente'),
+				'Level' => 1
+			));
+
+			$SimpleReport->SetCustomFormat(array(
+				'collapsible' => true
+			));
+
+		}
+
+
 		return $SimpleReport; 
 	}
 
@@ -49,11 +154,17 @@ class ReporteAntiguedadDeudas
 		//Configuración base
 		$configuracion = array(
 			array(
+				'field' => 'codigo_cliente',
+				'title' => 'ID',
+				'extras' => array(
+					'attrs' => 'width="10%" style="text-align:left;"'
+				)
+			),
+			array(
 				'field' => 'glosa_cliente',
 				'title' => __('Cliente'),
 				'extras' => array(
-					'attrs' => 'width="28%" style="text-align:left;"',
-					'groupinline' => true
+					'attrs' => 'width="28%" style="text-align:left;"'
 				)
 			),
 			array(
@@ -187,21 +298,17 @@ class ReporteAntiguedadDeudas
 	       	$this->criteria
        			->add_left_join_with_criteria($sub_query,'saldo_factura','saldo_factura.id_cobro = cobro.id_cobro');
 
-       		//
-       		//Si se está tratando con montos facturados y además se pide agrupar la información, entonces...
-       		//
-       		if($this->opciones['agrupar_informacion']){
-       			$this->criteria
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, saldo_factura.saldo, 0 ))','saldo_normal')
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 30, saldo_factura.saldo, 0 ))','saldo_vencido')
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,saldo_factura.saldo, 0))','0-30')
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,saldo_factura.saldo, 0))','31-60')
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,saldo_factura.saldo, 0))','61-90')
-				    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0))','91+')
-				    ->add_select('-SUM(saldo_factura.saldo)','total_final')
-		            ->add_grouping('cliente.glosa_cliente');
-       		}
-       		else{
+   			$this->criteria
+			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, saldo_factura.saldo, 0 ))','saldo_normal')
+			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 30, saldo_factura.saldo, 0 ))','saldo_vencido')
+			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,saldo_factura.saldo, 0))','0-30')
+			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,saldo_factura.saldo, 0))','31-60')
+			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,saldo_factura.saldo, 0))','61-90')
+			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0))','91+')
+			    ->add_select('-SUM(saldo_factura.saldo)','total_final')
+	            ->add_grouping('cliente.glosa_cliente');
+       		
+       		if(!$this->opciones['agrupar_informacion']){
        			//
        			//No se pide agrupar la información, por lo tanto hay que usar sub-simple-report y crear una query para mostrar el detalle.
        			//
@@ -224,11 +331,7 @@ class ReporteAntiguedadDeudas
 			$label = " d.id_cobro ";
 			$linktofile = 'cobros6.php?id_cobro=';
 
-			//
-			//	Si se agrupa la información en cobros liquidados.
-			//
-			if($this->opciones['agrupar_informacion']){
-				$this->criteria
+			$this->criteria
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, (-1 * (d.saldo_honorarios + d.saldo_gastos)), 0 ))','saldo_normal')
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 30, (-1 * (d.saldo_honorarios + d.saldo_gastos)), 0 ))','saldo_vencido')
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','0-30')
@@ -237,16 +340,20 @@ class ReporteAntiguedadDeudas
 				   ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,(-1 * (d.saldo_honorarios + d.saldo_gastos)), 0))','91+')
 				   ->add_select('-SUM(-1 * (d.saldo_honorarios + d.saldo_gastos))','total_final')
 				   ->add_grouping('cliente.glosa_cliente');
-			}
-			else{
+
+			//
+			//	Si no se agrupa la información en cobros liquidados.
+			//
+			if(!$this->opciones['agrupar_informacion']){
 				//
-       			//No se pide agrupar la información, por lo tanto hay que usar sub-simple-report y crear una query para mostrar el detalle.
-       			//
-       			$details_criteria = new Criteria();
-       			$details_criteria
-       						->add_select('cliente.codigo_cliente')
-       						->add_select('cliente.glosa_cliente')
-       						->add_select('cobro.id_cobro')
+	   			//No se pide agrupar la información, por lo tanto hay que usar sub-simple-report y crear una query para mostrar el detalle.
+	   			//
+	   			$details_criteria = new Criteria();
+	   			$details_criteria
+	   						->add_select('cliente.codigo_cliente')
+	   						->add_select('cliente.glosa_cliente')
+	   						->add_select('moneda_documento.simbolo','moneda')
+	   						->add_select('cobro.id_cobro')
 							->add_select('d.id_documento')
 						    ->add_select('cobro.fecha_emision')
 							->add_select('DATEDIFF(NOW(),'.$fecha_atraso.')','dias_atraso')
@@ -261,9 +368,10 @@ class ReporteAntiguedadDeudas
 				$details_criteria
 							->add_from('cobro');
 				$details_criteria
-							->add_left_join_with('documento d','cobro.id_cobro = d.id_cobro')
 							->add_left_join_with('contrato','contrato.id_contrato = cobro.id_contrato')
-							->add_left_join_with('cliente','contrato.codigo_cliente = cliente.codigo_cliente');
+							->add_left_join_with('cliente','contrato.codigo_cliente = cliente.codigo_cliente')
+							->add_left_join_with('documento d','cobro.id_cobro = d.id_cobro')
+			                ->add_left_join_with('prm_moneda moneda_documento','d.id_moneda = moneda_documento.id_moneda');
 
 				$this->report_details['codigo_cliente'] = $details_criteria->get_plain_query();
 			}
