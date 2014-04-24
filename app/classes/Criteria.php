@@ -2,7 +2,7 @@
 
 /**
  * 
- * Clase que permite generar criterios de búsqueda contra el medio persistente (una query de base de datos).
+ * Clase que permite generar criterios de búsqueda contra el medio persistente (a.k.a una query de base de datos).
  * 
  * TODO Declaration (@dochoaj):
  * 	La implementación está basada en lo mínimo indispensable para resolver el problema de los reportes. No obstante,
