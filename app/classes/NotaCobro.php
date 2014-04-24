@@ -2608,8 +2608,9 @@ class NotaCobro extends Cobro {
 
 			case 'DETALLE_PROFESIONAL': //GenerarDocumento
 
-				if ($this->fields['opc_ver_profesional'] == 0)
+				if ($this->fields['opc_ver_profesional'] == 0){
 					return '';
+				}
 				$html = str_replace('%glosa_profesional%', __('Detalle profesional'), $html);
 				$html = str_replace('%detalle_tiempo_por_abogado%', __('Detalle tiempo por abogado'), $html);
 				$html = str_replace('%detalle_honorarios%', __('Detalle de honorarios profesionales'), $html);
@@ -3029,6 +3030,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
 				} else {
@@ -4824,6 +4826,7 @@ class NotaCobro extends Cobro {
 					}
 
 					$html = str_replace('%texto_servicios_profesionales%', __('Servicios Profesionales por hora'), $html);
+					$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
 					$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 				}
 				break;
@@ -6338,6 +6341,7 @@ class NotaCobro extends Cobro {
 				}
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 
 				$html = str_replace('%GASTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'GASTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%GASTOS_FILAS%', $this->GenerarDocumento2($parser, 'GASTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -10296,7 +10300,9 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%glosa_codigo_postal%', __('Código Postal'), $htmlplantilla);
 		$htmlplantilla = str_replace('%codigo_postal%', $contrato->fields['factura_codigopostal'], $htmlplantilla);
 		$htmlplantilla = str_replace('%cliente%', __('Cliente'), $htmlplantilla);
-
+		$htmlplantilla = str_replace('%nota_cargo%', __('Nota de Cargo'), $htmlplantilla);
+		$htmlplantilla = str_replace('%asunto%', __('Asunto'), $htmlplantilla);
+		
 		$query = "SELECT glosa_cliente FROM cliente
 					WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -10711,13 +10717,14 @@ class NotaCobro extends Cobro {
 				}
 				$columna_hrs_retainer = $this->fields['opc_ver_detalle_retainer'] && ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL');
 
-
 				$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
 
 				$columna_hrs_trabajadas = $this->fields['opc_ver_horas_trabajadas'];
 
-				if ($this->fields['opc_ver_profesional'] == 0)
+				if ($this->fields['opc_ver_profesional'] == 0) {
 					return '';
+				}
+
 				// Encabezado
 				$resumen_encabezado = $this->GenerarSeccionResumenProfesional($parser, 'PROFESIONAL_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
@@ -10771,11 +10778,13 @@ class NotaCobro extends Cobro {
 
 					$html3 = $parser->tags['PROFESIONAL_FILAS'];
 					$html3 = str_replace('%username%', $data['username'], $html3);
+					
 					if ($this->fields['opc_ver_profesional_iniciales'] == 1) {
 						$html3 = str_replace('%nombre%', $data['username'], $html3);
 					} else {
 						$html3 = str_replace('%nombre%', $data['nombre_usuario'] . ' (' . $data['username'] . ')', $html3);
 					}
+					
 					if ($this->fields['opc_ver_profesional_tarifa'] == 1) {
 						$html3 = str_replace('%td_tarifa%', '<td align="center">%tarifa_horas_demo%</td>', $html3);
 						$html3 = str_replace('%td_tarifa_ajustada%', '<td align="center">%tarifa_horas_ajustada%</td>', $html3);
@@ -10783,6 +10792,7 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%td_tarifa%', '', $html3);
 						$html3 = str_replace('%td_tarifa_ajustada%', '', $html3);
 					}
+					
 					if ($this->fields['opc_ver_profesional_importe'] == 1) {
 						$html3 = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $html3);
 						$html3 = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_ajustado%</td>', $html3);
@@ -10790,36 +10800,46 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%td_importe%', '', $html3);
 						$html3 = str_replace('%td_importe_ajustado%', '', $html3);
 					}
+					
 					//muestra las iniciales de los profesionales
 					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $data['nombre_usuario'], 4);
 					$html3 = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $html3);
+					
 					if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['opc_ver_horas_trabajadas'] || ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'NotaDeCobroVFC') ) || ( method_exists('Conf', 'NotaDeCobroVFC') && Conf::NotaDeCobroVFC() ) )) {
 						$html3 = str_replace('%hrs_trabajadas%', $data['glosa_duracion_cobrada'], $html3);
 						$html3 = str_replace('%hrs_trabajadas_vio%', $data['glosa_duracion_cobrada'], $html3);
 					} else if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
-						if ($han_trabajado_menos_del_retainer)
+					
+						if ($han_trabajado_menos_del_retainer) {
 							$html3 = str_replace('%hrs_trabajadas%', $data['glosa_duracion_cobrada'], $html3);
-						else
+						} else {
 							$html3 = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? $data['glosa_duracion_cobrada'] : ''), $html3);
+						}
 						$html3 = str_replace('%hrs_trabajadas_vio%', $data['glosa_duracion_cobrada'], $html3);
-					}
-					else {
+
+					} else {
 						$html3 = str_replace('%hrs_trabajadas%', '', $html3);
 						$html3 = str_replace('%hrs_trabajadas_vio%', ($columna_hrs_trabajadas ? $data['glosa_duracion_cobrada'] : ''), $html3);
 					}
-					if ($han_trabajado_menos_del_retainer)
+
+					if ($han_trabajado_menos_del_retainer) {
 						$html3 = str_replace('%hrs_retainer%', $data['glosa_duracion_retainer'], $html3);
-					else
+					} else {
 						$html3 = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? $data['glosa_duracion_retainer'] : ''), $html3);
-					if ($han_trabajado_menos_del_retainer && !$this->fields['opc_ver_detalle_retainer'])
+					}
+
+					if ($han_trabajado_menos_del_retainer && !$this->fields['opc_ver_detalle_retainer']) {
 						$html3 = str_replace('%hrs_retainer_vio%', '', $html3);
-					else if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
+					} else if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 						$html3 = str_replace('%hrs_retainer_vio%', $data['glosa_duracion_retainer'], $html3);
-					else
+					} else {
 						$html3 = str_replace('%hrs_retainer_vio%', '', $html3);
+					}
+
 					$html3 = str_replace('%hrs_descontadas%', ($columna_hrs_descontadas ? $data['glosa_duracion_descontada'] : ''), $html3);
 
 					if ($this->fields['opc_ver_horas_trabajadas']) {
+						
 						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 							$html3 = str_replace('%hh_trabajada%', number_format($data['duracion_trabajada'], Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html3);
 						} else {
@@ -10836,18 +10856,23 @@ class NotaCobro extends Cobro {
 							$html3 = str_replace('%td_descontada%', '', $html3);
 							$html3 = str_replace('%hh_descontada%', '', $html3);
 						}
+
 					} else {
 						$html3 = str_replace('%td_descontada%', '', $html3);
 						$html3 = str_replace('%hh_trabajada%', '', $html3);
 						$html3 = str_replace('%hh_descontada%', '', $html3);
 					}
+
 					if ($retainer || $flatfee) {
+						
 						$html3 = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html3);
+						
 						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 							$html3 = str_replace('%hh_cobrable%', number_format($data['duracion_cobrada'], Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html3);
 						} else {
 							$html3 = str_replace('%hh_cobrable%', $data['glosa_duracion_cobrada'], $html3);
 						}
+						
 						if ($retainer) {
 							$html3 = str_replace('%td_retainer%', '<td align=\'center\'>%hh_retainer%</td>', $html3);
 							if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -10859,12 +10884,14 @@ class NotaCobro extends Cobro {
 							$html3 = str_replace('%td_retainer%', '', $html3);
 							$html3 = str_replace('%hh_retainer%', '', $html3);
 						}
+
 					} else {
 						$html3 = str_replace('%td_cobrable%', '', $html3);
 						$html3 = str_replace('%td_retainer%', '', $html3);
 						$html3 = str_replace('%hh_cobrable%', '', $html3);
 						$html3 = str_replace('%hh_retainer%', '', $html3);
 					}
+
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 						$html3 = str_replace('%hh_demo%', $data['glosa_duracion_cobrada'], $html3);
 					} else if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -10872,6 +10899,7 @@ class NotaCobro extends Cobro {
 					} else {
 						$html3 = str_replace('%hh_demo%', $data['glosa_duracion_tarificada'], $html3);
 					}
+
 					if ($han_trabajado_menos_del_retainer) {
 						$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto(0), $html3);
 					} else {
@@ -10914,29 +10942,38 @@ class NotaCobro extends Cobro {
 
 					$resumen_filas[$prof] = $html3;
 				}
+
 				// Se escriben después porque necesitan que los totales ya estén calculados para calcular porcentajes.
 				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
+					
 					$total_valor = 0;
+					
 					foreach ($x_resumen_profesional as $prof => $data) {
 						$resumen_hrs_cobradas_temp = $resumen_hrs_cobradas > 0 ? $resumen_hrs_cobradas : 1;
 						$resumen_filas[$prof] = str_replace('%porcentaje_participacion%', number_format($x_resumen_profesional[$prof]['duracion_cobrada'] / $resumen_hrs_cobradas_temp * 100, 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '%', $resumen_filas[$prof]);
 
-						if ($incobrables)
+						if ($incobrables) {
 							$resumen_filas[$prof] = str_replace('%columna_horas_no_cobrables%', '<td align="center">' . $x_resumen_profesional[$prof]['glosa_duracion_incobrables'] . '</td>', $resumen_filas[$prof]);
-						else
+						} else {
 							$resumen_filas[$prof] = str_replace('%columna_horas_no_cobrables%', '', $resumen_filas[$prof]);
+						}
+
 						if ($han_trabajado_menos_del_retainer && !$this->fields['opc_ver_detalle_retainer']) {
 							$resumen_filas[$prof] = str_replace('%valor_retainer%', '', $resumen_filas[$prof]);
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', '', $resumen_filas[$prof]);
-						} else
+						} else {
 							$resumen_filas[$prof] = str_replace('%valor_retainer%', $columna_hrs_retainer ? number_format($x_resumen_profesional[$prof]['duracion_cobrada'] / $resumen_hrs_cobradas_temp * $this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '', $resumen_filas[$prof]);
-						if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
+						}
+
+						if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', number_format($x_resumen_profesional[$prof]['duracion_cobrada'] / $resumen_hrs_cobradas_temp * $this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
-						else
+						} else {
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', '', $resumen_filas[$prof]);
-						if ($han_trabajado_menos_del_retainer)
+						}
+						
+						if ($han_trabajado_menos_del_retainer) {
 							$resumen_filas[$prof] = str_replace('%valor_cobrado_hh%', number_format(0, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
-						else {
+						} else {
 							$resumen_filas[$prof] = str_replace('%valor_cobrado_hh%', number_format($x_resumen_profesional[$prof]['valor_tarificada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
 							$total_valor += $x_resumen_profesional[$prof]['valor_tarificada'];
 						}
@@ -10952,18 +10989,24 @@ class NotaCobro extends Cobro {
 				}
 
 				$html3 = $parser->tags['PROFESIONAL_TOTAL'];
-				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) || ( method_exists('Conf', 'ResumenProfesionalVial') && Conf::ResumenProfesionalVial() )) {
-					if ($han_trabajado_menos_del_retainer)
+				
+				if ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) {
+					
+					if ($han_trabajado_menos_del_retainer) {
 						$html3 = str_replace('%valor_retainer%', number_format($this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-					else
+					} else {
 						$html3 = str_replace('%valor_retainer%', $columna_hrs_retainer ? number_format($this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '', $html3);
+					}
 
-					if ($han_trabajado_menos_del_retainer)
+					if ($han_trabajado_menos_del_retainer) {
 						$html3 = str_replace('%valor_cobrado_hh%', number_format(0, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-					else
+					} else {
 						$html3 = str_replace('%valor_cobrado_hh%', number_format($valor_cobrado_hh, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
+					}
 				}
+
 				$html3 = str_replace('%glosa%', __('Total'), $html3);
+				
 				if ($han_trabajado_menos_del_retainer || $this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['opc_ver_horas_trabajadas']) {
 					$html3 = str_replace('%hrs_trabajadas%', UtilesApp::Hora2HoraMinuto($resumen_hrs_cobradas), $html3);
 				} else {
@@ -10979,16 +11022,21 @@ class NotaCobro extends Cobro {
 				} else {
 					$html3 = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? UtilesApp::Hora2HoraMinuto($this->fields['retainer_horas']) : ''), $html3);
 				}
+
 				$html3 = str_replace('%hrs_descontadas%', ($columna_hrs_descontadas ? UtilesApp::Hora2HoraMinuto($resumen_hrs_descontadas) : ''), $html3);
-				if ($han_trabajado_menos_del_retainer)
+				
+				if ($han_trabajado_menos_del_retainer) {
 					$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto(0), $html3);
+				}
 
 				if ($this->fields['opc_ver_horas_trabajadas']) {
+					
 					if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 						$html3 = str_replace('%hh_trabajada%', number_format($resumen_hrs_trabajadas, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html3);
 					} else {
 						$html3 = str_replace('%hh_trabajada%', UtilesApp::Hora2HoraMinuto(round($resumen_hrs_trabajadas, 2)), $html3);
 					}
+
 					if ($descontado) {
 						$html3 = str_replace('%td_descontada%', '<td align=\'center\'>%hh_descontada%</td>', $html3);
 						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -11000,18 +11048,22 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%td_descontada%', '', $html3);
 						$html3 = str_replace('%hh_descontada%', '', $html3);
 					}
+
 				} else {
 					$html3 = str_replace('%td_descontada%', '', $html3);
 					$html3 = str_replace('%hh_trabajada%', '', $html3);
 					$html3 = str_replace('%hh_descontada%', '', $html3);
 				}
+
 				if ($retainer || $flatfee) {
+					
 					$html3 = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html3);
 					if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 						$html3 = str_replace('%hh_cobrable%', number_format($resumen_hrs_cobradas, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html3);
 					} else {
 						$html3 = str_replace('%hh_cobrable%', UtilesApp::Hora2HoraMinuto(round($resumen_hrs_cobradas, 2)), $html3);
 					}
+
 					if ($retainer) {
 						$html3 = str_replace('%td_retainer%', '<td align=\'center\'>%hh_retainer%</td>', $html3);
 						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -11023,17 +11075,20 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%td_retainer%', '', $html3);
 						$html3 = str_replace('%hh_retainer%', '', $html3);
 					}
+
 				} else {
 					$html3 = str_replace('%td_cobrable%', '', $html3);
 					$html3 = str_replace('%td_retainer%', '', $html3);
 					$html3 = str_replace('%hh_cobrable%', '', $html3);
 					$html3 = str_replace('%hh_retainer%', '', $html3);
 				}
+
 				if ($incobrables) {
 					$html3 = str_replace('%columna_horas_no_cobrables%', '<td align="center">' . UtilesApp::Hora2HoraMinuto(round($resumen_hrs_incobrables, 2)) . '</td>', $html3);
 				} else {
 					$html3 = str_replace('%columna_horas_no_cobrables%', '', $html3);
 				}
+
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 					$html3 = str_replace('%hh_demo%', UtilesApp::Hora2HoraMinuto(round($resumen_hrs_cobradas, 2)), $html3);
 				} else if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -11041,11 +11096,13 @@ class NotaCobro extends Cobro {
 				} else {
 					$html3 = str_replace('%hh_demo%', UtilesApp::Hora2HoraMinuto(round($resumen_hh, 2)), $html3);
 				}
-				if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial') && ( $this->fields['forma_cobro'] == 'PROPORCIONAL' || $this->fields['forma_cobro'] == 'RETAINER' ) && !$han_trabajado_menos_del_retainer) {
+
+				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial') && ( $this->fields['forma_cobro'] == 'PROPORCIONAL' || $this->fields['forma_cobro'] == 'RETAINER' ) && !$han_trabajado_menos_del_retainer) {
 					$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto($resumen_hrs_cobradas - $resumen_hrs_incobrables - $this->fields['retainer_horas']), $html3);
 				} else {
 					$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto(round($resumen_hh, 2)), $html3);
 				}
+				
 				if ($this->fields['opc_ver_profesional_importe'] == 1) {
 					$html3 = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $html3);
 					$html3 = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_ajustado%</td>', $html3);
@@ -11081,6 +11138,9 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $resumen_filas, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
+
+				$html = str_replace('%seccion_resumen_profesional%', __('resumen_raz'), $html);
+
 				break;
 
 			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA': //GenerarDocumento2
@@ -11316,6 +11376,10 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%nombre%', __('Nombre'), $html);
+				$html = str_replace('%abogado%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
+				$html = str_replace('%tarifa_raz%', __('tarifa_raz'), $html);
+				$html = str_replace('%importe_raz%', __('importe_raz'), $html);
 
 				if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
@@ -11491,6 +11555,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%profesional%', __('Biller'), $html);
 					$html = str_replace('%hora_tarificada%', __('Hourly<br>Rate'), $html);
 				}
+
+				
 				break;
 		}
 		return $html;
