@@ -90,9 +90,14 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['fgsaldo'] += $row['fgsaldo'];
 				$results[$row['codigo_cliente']]['fgsaldo_base'] += $row['fgsaldo_base'];
 			}
-			
 		}
-		print_r($results);
+
+		$output = array();
+		foreach ($results as $codigo_cliente => $datos_cliente) {
+			$datos_cliente['codigo_cliente'] = $codigo_cliente;
+			$output[] = $datos_cliente;
+		}
+		print_r($output);
 
 	}
 
