@@ -2412,7 +2412,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		if ($this->fields['codigo_idioma'] == "es"){
 			$select_categoria_lang = "cu.glosa_categoria as glosa_categoria,";
 		} else {
-			$select_categoria_lang = "IF(NULL, cu.glosa_categoria, cu.glosa_categoria_lang ) as glosa_categoria,";
+			$select_categoria_lang = "IFNULL(cu.glosa_categoria_lang, cu.glosa_categoria) as glosa_categoria,";
 		}
 
 		$query = "	SELECT
