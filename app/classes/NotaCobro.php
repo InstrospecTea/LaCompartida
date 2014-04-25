@@ -1580,7 +1580,14 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_categoria%', '', $html);
 
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$query = "SELECT cat.glosa_categoria
+
+					if ($lang == 'es') {
+						$select_categoria = "cat.glosa_categoria";
+					} else {
+						$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) as glosa_categoria";
+					}
+
+					$query = "SELECT $select_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -1731,8 +1738,15 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
-					$query = "SELECT cat.glosa_categoria
+				if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
+					
+					if ($lang == 'es') {
+						$select_categoria = "cat.glosa_categoria";
+					} else {
+						$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) AS glosa_categoria";
+					}
+
+					$query = "SELECT $select_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -1741,6 +1755,7 @@ class NotaCobro extends Cobro {
 									AND trabajo.visible=1
 									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
 									LIMIT 1";
+					
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($categoria) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
@@ -1777,26 +1792,24 @@ class NotaCobro extends Cobro {
 				$html = '';
 				$where_horas_cero = '';
 
-				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
+				if ($lang == 'es') {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				
+				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -2250,22 +2263,22 @@ class NotaCobro extends Cobro {
 				$html = '';
 				$where_horas_cero = '';
 
-				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario')) {
+				if ($lang == 'es') {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+				
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				
+				if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario')) {
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "tramite.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -3394,13 +3407,13 @@ class NotaCobro extends Cobro {
                                 CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado,
                                 usuario.rut,
                                 IFNULL(usuario.dv_rut, 'NA'),
-                                IFNULL( prm_categoria_usuario.glosa_categoria, ' ' ) as categoria_usuario
+                                IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) as categoria_usuario
                             FROM usuario
-                            JOIN contrato ON usuario.id_usuario=contrato.id_usuario_responsable
+                            JOIN contrato ON usuario.id_usuario = contrato.id_usuario_responsable
                             JOIN cobro ON contrato.id_contrato=cobro.id_contrato
                             LEFT JOIN prm_categoria_usuario ON ( usuario.id_categoria_usuario = prm_categoria_usuario.id_categoria_usuario AND usuario.id_categoria_usuario != 0 )
                             WHERE cobro.id_cobro=" . $this->fields['id_cobro'];
-
+				
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado, $rut_usuario, $dv_usuario, $categoria_usuario) = mysql_fetch_array($resp);
 
@@ -4957,7 +4970,14 @@ class NotaCobro extends Cobro {
 						$categoria = $this->siguiente['categoria_abogado'];
 						unset($this->siguiente['categoria_abogado']);
 					} else {
-						$query = "SELECT cat.glosa_categoria
+						
+						if ($lang == 'es') {
+							$select_categoria = "cat.glosa_categoria";
+						} else {
+							$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) as glosa_categoria";
+						}
+						
+						$query = "SELECT $select_categoria
 										FROM trabajo
 										JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 										JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -4966,6 +4986,7 @@ class NotaCobro extends Cobro {
 										AND trabajo.visible=1
 										ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
 										LIMIT 1";
+						
 						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 						list($categoria) = mysql_fetch_array($resp);
 					}
@@ -5108,16 +5129,23 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%abogado%', __('Abogado'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 
-				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )) {
-					$query = "SELECT cat.glosa_categoria
-									FROM trabajo
+				if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
+					if ($lang == 'es') {
+						$select_categoria = "cat.glosa_categoria as glosa_categoria";
+					} else {
+						$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) as glosa_categoria";
+					}
+					
+					$query = "SELECT $select_categoria
+								FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
-									WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-									AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-									AND trabajo.visible=1
-									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
-									LIMIT 1";
+										WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
+											AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+											AND trabajo.visible=1
+												ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
+													LIMIT 1";
+					
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($categoria) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
@@ -5190,6 +5218,12 @@ class NotaCobro extends Cobro {
 				} else {
 					$visible = "AND trabajo.visible = 1";
 				}
+				
+				if ($lang == 'es') {
+					$select_categoria = "prm_categoria_usuario.glosa_categoria AS categoria,";
+				} else {
+					$select_categoria = "IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria,";
+				}
 
 				/*
 				 * 	Contenido de filas de seccion trabajo.
@@ -5208,10 +5242,10 @@ class NotaCobro extends Cobro {
 									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
-									prm_categoria_usuario.glosa_categoria AS categoria,
+									$select_categoria
 									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
 									trabajo.duracion,
-									usuario.username as username $select_categoria
+									usuario.username as username
 							FROM trabajo
 							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 							LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
@@ -5222,7 +5256,7 @@ class NotaCobro extends Cobro {
 							$visible
 							AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
-
+				
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 
 				$asunto->fields['trabajos_total_duracion'] = 0;
@@ -7848,8 +7882,15 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
-					$query = "SELECT cat.glosa_categoria
+				if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
+					
+					if ($lang == 'es') {
+						$select_categoria = "cat.glosa_categoria";
+					} else {
+						$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) AS glosa_categoria";
+					}
+					
+					$query = "SELECT $select_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -7881,23 +7922,23 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 				$where_horas_cero = '';
-
+				
+				if ($lang == 'es') {
+					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+				
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
 				if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "tramite.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -8150,7 +8191,14 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%cobrable%', '', $html);
 
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$query = "SELECT cat.glosa_categoria
+					
+					if ($lang == 'es') {
+						$select_categoria = "cat.glosa_categoria";
+					} else {
+						$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) AS glosa_categoria";
+					}
+					
+					$query = "SELECT $select_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -8305,8 +8353,15 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
-					$query = "SELECT cat.glosa_categoria
+				if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
+					
+					if ($lang == 'es') {
+						$select_categoria = "cat.glosa_categoria AS glosa_categoria";
+					} else {
+						$select_categoria = "IFNULL(cat.glosa_categoria_lang, cat.glosa_categoria) AS glosa_categoria";
+					}
+					
+					$query = "SELECT $select_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -8338,27 +8393,26 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 				$where_horas_cero = '';
+				
+				if ($lang == 'es') {
+					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+				
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -8385,6 +8439,12 @@ class NotaCobro extends Cobro {
 				} else {
 					$and .= "AND trabajo.visible = 1";
 				}
+				
+				if ($lang == 'es') {
+					$select_categoria = "prm_categoria_usuario.glosa_categoria AS categoria,";
+				} else {
+					$select_categoria = "IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria,";
+				}
 
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
@@ -8405,14 +8465,14 @@ class NotaCobro extends Cobro {
 
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
-									prm_categoria_usuario.glosa_categoria AS categoria,
+									$select_categoria
 									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
 									trabajo.duracion,
-									usuario.username as username $select_categoria
+									usuario.username as username
 							FROM trabajo
 							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 							LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
-							LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
+							$join_categoria
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							$and AND trabajo.id_tramite=0 $where_horas_cero
@@ -8890,23 +8950,23 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 				$where_horas_cero = '';
-
+				
+				if ($lang == 'es') {
+					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+		
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
 				if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "tramite.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -10587,7 +10647,12 @@ class NotaCobro extends Cobro {
 
 					$this->CargarEscalonadas();
 					$cobro_valores['datos_escalonadas'] = $this->escalonadas;
-
+					
+					if ($lang == 'es') {
+						$select_categoria = "prm_categoria_usuario.glosa_categoria as categoria";
+					} else {
+						$select_categoria = "IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) as categoria";
+					}
 
 					$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
 
@@ -10605,7 +10670,7 @@ class NotaCobro extends Cobro {
 									trabajo.visible,
 									trabajo.codigo_asunto,
 									CONCAT_WS(' ', nombre, apellido1) as usr_nombre,
-									prm_categoria_usuario.glosa_categoria as categoria
+									$select_categoria
 							FROM trabajo
 							JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 							LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
