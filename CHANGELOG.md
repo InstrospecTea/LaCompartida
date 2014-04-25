@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix: 14.1.19
 viernes 25 de abril 2014
-* **Fixed:** [Envía correos con SES.](#0)
+* **Fixed:** [Actualiza framework](#0)
 
 
 ## Hotfix: 14.1.18
