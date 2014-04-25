@@ -3,25 +3,30 @@ require_once dirname(__FILE__) . '/../../conf.php';
 
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
-$Sesion = new Sesion(array('REP'));
+$sesion = new sesion(array('REP'));
 
 	
 if (in_array($opcion, array('buscar', 'xls'))) {
 
+
+
 	$opciones = array(
 			'solo_monto_facturado' => $solo_monto_facturado,
 			'mostrar_detalle' => $mostrar_detalle,
-			'encargado_comercial' => $encargado_comercial
+			'encargado_comercial' => $encargado_comercial,
 			'opcion_usuario' => $opcion
 		);
 
 	$datos = array(
 			'codigo_cliente' => $codigo_cliente,
 			'id_contrato' => $id_contrato,
-			'tipo_liquidacion' => $tipo_liquidacion
+			'tipo_liquidacion' => $tipo_liquidacion,
+			'codigo_asunto' => $codigo_asunto
 		);
 
-	$reporte = new ReporteAntiguedadDeudas($Sesion, $opciones, $datos);
+	$reporte = new ReporteAntiguedadDeudas($sesion, $opciones, $datos);
+	
+	
 
 	$SimpleReport = $reporte->generar();
 
@@ -53,7 +58,7 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 	}
 }
 
-$Pagina = new Pagina($Sesion);
+$Pagina = new Pagina($sesion);
 $Pagina->titulo = __('Reporte Antigüedad Deudas Clientes');
 $Pagina->PrintTop();
 
@@ -78,10 +83,10 @@ $Pagina->PrintTop();
 								<label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
 							</td>
 							<td colspan="3" align="left">
-<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
+<?php echo UtilesApp::CampoCliente($sesion, $_REQUEST['codigo_cliente']); ?>
 							</td>
 						</tr>
-<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
+<?php UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
 
 						<tr>
 							<td align="right" width="30%">
@@ -199,6 +204,9 @@ echo Html::SelectArray(array(
 		jQuery('#boton_buscar').click(function() {
 			jQuery('#opcion').val('buscar');
 		});
+
+		jQuery('.subreport tr.encabezado td.encabezado').css('background-color','#ddd');
+		jQuery('.subreport tr.encabezado td.encabezado').css('color','#040');
 
 		jQuery('.subtotal td').css('font-weight', 'bold');
 		jQuery('.encabezado').show();
