@@ -740,7 +740,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_honorarios_demo%', $moneda->fields['simbolo'] . $this->espacio . number_format($valor_trabajos_demo, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial') && ( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' ) && $this->fields['opc_restar_retainer']) {
-					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_honorarios%',$moneda->fields['simbolo'] . $this->espacio . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				if (Conf::GetConf($this->sesion, 'CalculacionCYC')) {
@@ -1030,17 +1030,51 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
-				$monto_palabra = new MontoEnPalabra($this->sesion);
+				list($total_parte_entera, $total_parte_decimal) = explode('.',$x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']]);
 
-				$glosa_moneda_lang = __($glosa_moneda);
-				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				if (strlen($total_parte_decimal) == '2'){
+					$fix_decimal = '1';
+				} else {
+					$fix_decimal = '10';
+				}
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				if ($lang == 'es') {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON 00/100 CENTAVOS';
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON '. $total_parte_decimal*$fix_decimal .'/100 CENTAVOS';
+					}
+
+				} else {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON 00/100 CENTAVOS';
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8') .' WITH '. $total_parte_decimal*$fix_decimal .'/100 CENTS';
+					}
+
+				}
+
+				$html = str_replace('%monto_total_palabra_cero_cien%', $monto_total_palabra_cero_cien, $html);
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
-				break;
 
-			// FIN DE ORDEN DE CODIGO ARV 27/06/2013 //
+				break;
 
 			case 'RESTAR_RETAINER': //GenerarDocumento
 
@@ -2243,26 +2277,28 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-							tramite.duracion,
-							tramite_tipo.glosa_tramite as glosa_tramite,
-							tramite.descripcion,
-							tramite.fecha,
-							tramite.id_usuario,
-							tramite.id_tramite,
-							tramite.solicitante,
-							tramite.tarifa_tramite as tarifa,
-							tramite.codigo_asunto,
-							tramite.id_moneda_tramite,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-							FROM tramite
-							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
-							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-							JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-							LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-							$join_categoria
+				$query = "
+					SELECT SQL_CALC_FOUND_ROWS
+						tramite.duracion,
+						tramite_tipo.glosa_tramite as glosa_tramite,
+						tramite.descripcion,
+						tramite.fecha,
+						tramite.id_usuario,
+						tramite.id_tramite,
+						tramite.solicitante,
+						tramite.tarifa_tramite as tarifa,
+						tramite.codigo_asunto,
+						tramite.id_moneda_tramite,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+					FROM tramite
+						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
+						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
+						$join_categoria
 							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+							AND tramite.cobrable=1
 							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -3547,6 +3583,7 @@ class NotaCobro extends Cobro {
 					}
 				}
 
+				$html = str_replace('%reporte_servicio%', __('Reporte de Servicios'), $html);
 				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%factura_o_nd%', 'Factura o ND', $html);
 				$html = str_replace('%fecha_fin_gastos_liq%', 'Gastos liquidados hasta', $html);
@@ -3791,7 +3828,7 @@ class NotaCobro extends Cobro {
 						$html = str_replace('%valor_honorarios_demo%', $moneda->fields['simbolo'] . $this->espacio . number_format($x_resultados['monto_trabajos'][$this->fields['id_moneda']] - $x_resultados['descuento'][$this->fields['id_moneda']], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
 
-					if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
+					if ( ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) && ( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' ) && $this->fields['opc_restar_retainer']) {
 						$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
 
@@ -4036,12 +4073,47 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
-				$monto_palabra = new MontoEnPalabra($this->sesion);
+				list($total_parte_entera, $total_parte_decimal) = explode('.',$x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']]);
 
-				$glosa_moneda_lang = __($glosa_moneda);
-				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				if (strlen($total_parte_decimal) == '2'){
+					$fix_decimal = '1';
+				} else {
+					$fix_decimal = '10';
+				}
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				if ($lang == 'es') {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON 00/100 CENTAVOS';
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON '. $total_parte_decimal*$fix_decimal .'/100 CENTAVOS';
+					}
+
+				} else {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON 00/100 CENTAVOS';
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8') .' WITH '. $total_parte_decimal*$fix_decimal .'/100 CENTS';
+					}
+
+				}
+
+				$html = str_replace('%monto_total_palabra_cero_cien%', $monto_total_palabra_cero_cien, $html);
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
 				break;
@@ -7157,13 +7229,49 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
 				$html = str_replace('%monto_saldo_final%', $monto_saldo_final, $html);
 
-				$monto_palabra = new MontoEnPalabra($this->sesion);
+				list($total_parte_entera, $total_parte_decimal) = explode('.',$x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']]);
 
-				$glosa_moneda_lang = __($glosa_moneda);
-				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				if (strlen($total_parte_decimal) == '2'){
+					$fix_decimal = '1';
+				} else {
+					$fix_decimal = '10';
+				}
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_cobro, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				if ($lang == 'es') {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON 00/100 CENTAVOS';
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'es'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal*$fix_decimal,'es'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' CON '. $monto_palabra_parte_decimal .' '. 'CENTAVOS';
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON '. $total_parte_decimal*$fix_decimal .'/100 CENTAVOS';
+					}
+
+				} else {
+
+					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
+
+					if (empty($total_parte_decimal)){
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang);
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang) .' CON 00/100 CENTAVOS';
+					} else {
+						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera,'en_US'));
+						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal,'en_US'));
+						$monto_total_palabra = $monto_palabra_parte_entera .' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8').' WITH '. $monto_palabra_parte_decimal .' '. 'CENTS';
+						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera.' '.mb_strtoupper($glosa_moneda_plural_lang,'UTF-8') .' WITH '. $total_parte_decimal*$fix_decimal .'/100 CENTS';
+					}
+
+				}
+
+				$html = str_replace('%monto_total_palabra_cero_cien%', $monto_total_palabra_cero_cien, $html);
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
+
 
 				break;
 
@@ -7797,27 +7905,29 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-                			tramite.duracion,
-                			tramite_tipo.glosa_tramite as glosa_tramite,
-                			tramite.descripcion,
-                			tramite.fecha,
-                			tramite.id_usuario,
-							tramite.id_tramite,
-							tramite.solicitante,
-							tramite.tarifa_tramite as tarifa,
-							tramite.codigo_asunto,
-							tramite.id_moneda_tramite,
-							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-						FROM tramite
+				$query = "
+					SELECT SQL_CALC_FOUND_ROWS
+            			tramite.duracion,
+            			tramite_tipo.glosa_tramite as glosa_tramite,
+            			tramite.descripcion,
+            			tramite.fecha,
+            			tramite.id_usuario,
+						tramite.id_tramite,
+						tramite.solicitante,
+						tramite.tarifa_tramite as tarifa,
+						tramite.codigo_asunto,
+						tramite.id_moneda_tramite,
+						concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
 						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
 						$join_categoria
-						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
+								AND tramite.cobrable=1
 						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -8804,28 +8914,30 @@ class NotaCobro extends Cobro {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-							tramite.duracion,
-							tramite_tipo.glosa_tramite as glosa_tramite,
-							tramite.descripcion,
-							tramite.fecha,
-							tramite.id_usuario,
-							tramite.id_tramite,
-							tramite.solicitante,
-							tramite.tarifa_tramite as tarifa,
-							tramite.codigo_asunto,
-							tramite.id_moneda_tramite,
-							concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
-						FROM tramite
+				$query = "
+					SELECT SQL_CALC_FOUND_ROWS
+						tramite.duracion,
+						tramite_tipo.glosa_tramite as glosa_tramite,
+						tramite.descripcion,
+						tramite.fecha,
+						tramite.id_usuario,
+						tramite.id_tramite,
+						tramite.solicitante,
+						tramite.tarifa_tramite as tarifa,
+						tramite.codigo_asunto,
+						tramite.id_moneda_tramite,
+						concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
 						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
 						$join_categoria
-						WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-						AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
-						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' 
+								AND tramite.cobrable=1
+							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
 
