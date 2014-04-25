@@ -61,7 +61,7 @@ class Contrato extends Objeto {
 				'factura_comuna',
 				'factura_codigopostal',
 				'factura_ciudad',
-				'factura_estado',
+				'region_cliente',
 				'cod_factura_telefono',
 				'id_tarifa',
 				'fecha_inicio_cap',

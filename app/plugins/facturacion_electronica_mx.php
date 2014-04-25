@@ -364,8 +364,8 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
 
-	if (!is_null($Factura->fields['estado_cliente']) && !empty($Factura->fields['estado_cliente'])) {
-		$r['DOR'][] = 'estado|' . ($Factura->fields['estado_cliente']);
+	if (!is_null($Factura->fields['factura_estado']) && !empty($Factura->fields['factura_estado'])) {
+		$r['DOR'][] = 'estado|' . ($Factura->fields['factura_estado']);
 	}
 
 	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {

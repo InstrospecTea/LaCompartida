@@ -327,9 +327,9 @@ list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 			}
 
 			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
-				if(!form.factura_estado.value) {
+				if(!form.region_cliente.value) {
 					alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
-					form.factura_estado.focus();
+					form.region_cliente.focus();
 					return false;
 				}
 			<?php } ?>
@@ -1938,7 +1938,7 @@ if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
 										<?php echo __('Región') . $obligatorio; ?>
 									</td>
 									<td align="left" colspan="5">
-										<input type="text" name='factura_estado' size=50 value="<?php echo $contrato->fields['factura_estado'] ?>" />
+										<input type="text" name='region_cliente' size=50 value="<?php echo $contrato->fields['region_cliente'] ?>" />
 									</td>
 								</tr>
 							<?php } ?>

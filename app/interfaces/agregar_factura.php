@@ -158,7 +158,7 @@ if ($opcion == "guardar") {
 		}
 
 		$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
-		$factura->Edit("estado_cliente", $estado_cliente ? addslashes($estado_cliente) : "");
+		$factura->Edit("factura_region", $factura_region ? addslashes($factura_region) : "");
 		$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
@@ -664,7 +664,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		<?php if (conf::GetConf($sesion,'RegionCliente')) { ?>
 		<tr>
 			<td align="right"><?php echo __('Región'); ?></td>
-			<td align="left" colspan="3"><input type="text" name="estado_cliente" value="<?php echo $factura->loaded() ? $factura->fields['estado_cliente'] : $contrato->fields['factura_estado']; ?>" id="estado_cliente" size="70" maxlength="255" />
+			<td align="left" colspan="3"><input type="text" name="factura_region" value="<?php echo $factura->loaded() ? $factura->fields['factura_region'] : $contrato->fields['factura_estado']; ?>" id="factura_region" size="70" maxlength="255" />
 			</td>
 		</tr>
 		<?php } ?>
@@ -951,7 +951,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var direccion_cliente = document.getElementById('direccion_cliente');
 		var comuna_cliente = document.getElementById('comuna_cliente');
 		var ciudad_cliente = document.getElementById('ciudad_cliente');
-		var estado_cliente = document.getElementById('estado_cliente');
+		var factura_region = document.getElementById('factura_region');
 		var giro_cliente = document.getElementById('giro_cliente');
 		var factura_codigopostal = document.getElementById('factura_codigopostal');
 		var dte_id_pais = document.getElementById('dte_id_pais');
@@ -1043,9 +1043,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 							//Estado
 							if(valores[5] != ''){
-								estado_cliente.value = valores[5]
+								factura_region.value = valores[5]
 							} else{
-								estado_cliente.value = '';
+								factura_region.value = '';
 							}
 
 							// Giro

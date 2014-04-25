@@ -10244,11 +10244,11 @@ QUERY;
 
 		case 7.66:
 			$queries = array();
-			if (!ExisteCampo('factura_estado', 'contrato', $dbh)) {
-				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_estado` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
+			if (!ExisteCampo('region_cliente', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE  `contrato` ADD  `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
 			}
-			if (!ExisteCampo('estado_cliente', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE  `factura` ADD  `estado_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
+			if (!ExisteCampo('factura_region', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE  `factura` ADD  `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
 			}
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
 

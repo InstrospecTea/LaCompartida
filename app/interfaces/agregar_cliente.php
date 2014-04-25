@@ -872,8 +872,8 @@ $pagina->PrintTop();
 				return false;
 			}
 
-			<?php if(UtilesApp::existecampo('factura_estado','contrato',$sesion)) { ?>
-					if(!form.factura_estado.value){
+			<?php if(UtilesApp::existecampo('region_cliente','contrato',$sesion)) { ?>
+					if(!form.region_cliente.value){
 						alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
 						MuestraPorValidacion('datos_factura');
 						form.factura_ciudad.focus();

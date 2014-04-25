@@ -470,7 +470,7 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.rut,
 											contrato.factura_comuna,
 											contrato.factura_ciudad,
-											contrato.factura_estado,
+											contrato.region_cliente,
 											contrato.factura_giro,
 											contrato.factura_codigopostal,
 											contrato.id_pais,
