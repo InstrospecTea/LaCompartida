@@ -4217,8 +4217,6 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 
-				echo $this->fields['forma_cobro'];
-
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') { 
 
 					$query = "
