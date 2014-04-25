@@ -23,33 +23,105 @@ class ReporteAntiguedadDeudas
 
 	public function generar(){
 
-		$this->genera_criteria();
-
-		return $reporte;
-
-	}
-	
-	private function genera_criteria(){
-
 		$this->genera_query_criteria();
 
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$agrupacion = $this->generar_agrupacion_de_resultados($results);
-		if(!empty($this->opciones['mostrar_detalle'])){
+		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
+		$reporte = $this->genera_reporte($agrupacion);
+		if (!empty($this->opciones['mostrar_detalle'])) {
 			//Generar agrupación que contenga el detalle.
 		}
 
+		return $reporte;
 	}
+
+
+	private function genera_reporte($agrupacion){
+		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
+		$config_reporte = array(
+			array(
+				'field' => 'glosa_cliente',
+				'title' => __('Cliente'),
+				'extras' => array(
+					'attrs' => 'width="28%" style="text-align:left;"',
+					'groupinline' => true
+				)
+			),
+			array(
+				'field' => 'identificadores',
+				'title' => __(ucfirst($this->opciones['identificadores'])),
+				'extras' => array(
+					'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
+				)
+			),
+			array(
+				'field' => 'rango1',
+				'title' => '0-30 ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"',
+				)
+			),
+			array(
+				'field' => 'rango2',
+				'title' => '31-60 ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"'
+				)
+			),
+			array(
+				'field' => 'rango3',
+				'title' => '61-90 ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"'
+				)
+			),
+			array(
+				'field' => 'rango4',
+				'title' => '91+ ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"'
+				)
+			),
+			array(
+				'field' => 'total',
+				'title' => __('Total'),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+				)
+			)
+		);
+		
+		$SimpleReport->LoadConfigFromArray($config_reporte);
+		$SimpleReport->LoadResults($agrupacion);
+		return $SimpleReport;
+	}
+
 
 	/**
 	 * [generar_agrupacion_de_resultados description]
 	 * @param  [type] $results [description]
 	 * @return [type]          [description]
 	 */
-	private function generar_agrupacion_de_resultados($dataset){
-
+	private function generar_agrupacion_de_resultados($dataset,$parameters){
+		extract($parameters);
 		$results = array();
 		foreach ($dataset as $row) {
 			if(!array_key_exists($row['codigo_cliente'], $results)){
@@ -70,8 +142,29 @@ class ReporteAntiguedadDeudas
 						'gsaldo' => $row['gsaldo'],
 						'gsaldo_base' => $row['gsaldo_base'],
 						'fgsaldo' => $row['fgsaldo'],
-						'fgsaldo_base' => $row['fgsaldo_base'],						
+						'fgsaldo_base' => $row['fgsaldo_base'],	
+						'cantidad_seguimiento' => $row['cantidad_seguimiento'],
+						'comentario_seguimiento' => $row['comentario_seguimiento'],
+						'identificadores' => array()					
 					);
+				$results[$row['codigo_cliente']]['rango1'] = 0;
+				$results[$row['codigo_cliente']]['rango2'] = 0;
+				$results[$row['codigo_cliente']]['rango3'] = 0;
+				$results[$row['codigo_cliente']]['rango4'] = 0;
+				$results[$row['codigo_cliente']]['total'] = 0;
+				if($row['dias_atraso_pago'] <= 30){
+					$results[$row['codigo_cliente']]['rango1'] = -1 * $row["$campo_valor"];
+				}
+				if($row['dias_atraso_pago'] > 30 && $row['dias_atraso_pago'] <=60 ){
+					$results[$row['codigo_cliente']]['rango2'] = -1 * $row["$campo_valor"];
+				}
+				if($row['dias_atraso_pago'] > 60 && $row['dias_atraso_pago'] <=90){
+					$results[$row['codigo_cliente']]['rango3'] = -1 * $row["$campo_valor"];
+				}
+				if($row['dias_atraso_pago'] > 90 ){
+					$results[$row['codigo_cliente']]['rango4'] = -1 * $row["$campo_valor"];
+				}
+				$results[$row['codigo_cliente']]['total'] = -1 * $row["$campo_valor"];
 			}
 			else{
 				$results[$row['codigo_cliente']]['monto'] += $row['monto'];
@@ -89,16 +182,33 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['gsaldo_base'] += $row['gsaldo_base'];
 				$results[$row['codigo_cliente']]['fgsaldo'] += $row['fgsaldo'];
 				$results[$row['codigo_cliente']]['fgsaldo_base'] += $row['fgsaldo_base'];
+				if($row['dias_atraso_pago'] <= 30){
+					$results[$row['codigo_cliente']]['rango1'] += (-1 * $row["$campo_valor"]);
+				}
+				if($row['dias_atraso_pago'] > 30 && $row['dias_atraso_pago'] <=60 ){
+					$results[$row['codigo_cliente']]['rango2'] += (-1 * $row["$campo_valor"]);
+				}
+				if($row['dias_atraso_pago'] > 60 && $row['dias_atraso_pago'] <=90){
+					$results[$row['codigo_cliente']]['rango3'] += (-1 * $row["$campo_valor"]);
+				}
+				if($row['dias_atraso_pago'] > 90 ){
+					$results[$row['codigo_cliente']]['rango4'] += (-1 * $row["$campo_valor"]);
+				}
+				$results[$row['codigo_cliente']]['total'] += (-1 * $row["$campo_valor"]);
 			}
+			$results[$row['codigo_cliente']]['identificadores'][] = '"'.$row['identificador'].'":"'.$row['label'].'"';
 		}
 
 		$output = array();
 		foreach ($results as $codigo_cliente => $datos_cliente) {
 			$datos_cliente['codigo_cliente'] = $codigo_cliente;
+			$dummy_array = $datos_cliente['identificadores'];
+			$result = implode(',', $dummy_array);
+			$result = '{'.$result.'}';
+			$datos_cliente['identificadores'] = $result;
 			$output[] = $datos_cliente;
 		}
-		print_r($output);
-
+		return $output;
 	}
 
 	private function genera_query_criteria(){
@@ -113,7 +223,7 @@ class ReporteAntiguedadDeudas
 		//     ->add_select('T.glosa_cliente')
 		//     ->add_select('T.moneda')
 		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30,'."$campo_valor".', 0))' ,'0-30')
-		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60,'."$campo_valor".', 0))', '31-60')
+		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60,'."$campo_valor".', 0))', 'rango2')
 		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90,'."$campo_valor".', 0))', '61-90')
 		//     ->add_select('-SUM(IF(T.dias_atraso_pago > 90,'."$campo_valor".', 0))','91+')
 		//     ->add_select('-SUM('."$campo_valor".')','total')
@@ -194,24 +304,24 @@ class ReporteAntiguedadDeudas
 	private function define_parametros_query_sin_detalle(){
 		
 		if($this->opciones['solo_monto_facturado']){
-			$campo_valor = "T.fsaldo";
-			$campo_gvalor = "T.fgsaldo";
-			$campo_hvalor = "T.fhsaldo";
+			$campo_valor = "fsaldo";
+			$campo_gvalor = "fgsaldo";
+			$campo_hvalor = "fhsaldo";
 			$tipo = " pdl.glosa";
 			$fecha_atraso = " factura.fecha";
 			$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
-			$identificadores = 'facturas';
+			$this->opciones['identificadores'] = 'facturas';
 			$identificador = " d.id_cobro";
 			$linktofile = 'cobros6.php?id_cobro=';
 		}
 		else{
-			$campo_valor = "T.saldo";
-			$campo_gvalor = "T.gsaldo";
-			$campo_hvalor = "T.hsaldo";
+			$campo_valor = "saldo";
+			$campo_gvalor = "gsaldo";
+			$campo_hvalor = "hsaldo";
 			$tipo = " 'liquidacion'";
 			$fecha_atraso = " cobro.fecha_emision";
 			$label = " d.id_cobro ";
-			$identificadores = 'cobros';
+			$this->opciones['identificadores'] = 'cobros';
 			$identificador = " d.id_cobro";
 			$linktofile = 'cobros6.php?id_cobro=';
 		}
