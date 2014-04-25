@@ -10,7 +10,9 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 
 	$opciones = array(
 			'solo_monto_facturado' => $solo_monto_facturado,
-			'agrupar_informacion' => $agrupar_informacion
+			'mostrar_detalle' => $mostrar_detalle,
+			'encargado_comercial' => $encargado_comercial
+			'opcion_usuario' => $opcion
 		);
 
 	$datos = array(
@@ -93,11 +95,21 @@ $Pagina->PrintTop();
 						<tr>
 							<td align="right" width="30%">
 								<!-- TODO : LANG!! -->
-								<label for="filtro_facturado">Agrupar información</label>
+								<label for="filtro_facturado">Mostrar detalle</label>
 							</td>
 							<td colspan="3" align="left">
-								<input type="checkbox" id="agrupar_informacion" name="agrupar_informacion" value="1" <?php echo $agrupar_informacion ? 'checked' : '' ?>>
-								<div class="inlinehelp" title="Agrupar Información" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="Agrupar información.">?</div>
+								<input type="checkbox" id="mostrar_detalle" name="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked' : '' ?>>
+								<div class="inlinehelp" title="Mostrar Detalle" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="El reporte por defecto solo muestra los totales agrupados para cada resultado que se obtiene. Active esta opción para mostrar el detalle de cada agrupación de totales.">?</div>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" width="30%">
+								<!-- TODO : LANG!! -->
+								<label for="filtro_facturado">Incluir encargado comercial</label>
+							</td>
+							<td colspan="3" align="left">
+								<input type="checkbox" id="encargado_comercial" name="encargado_comercial" value="1" <?php echo $encargado_comercial ? 'checked' : '' ?>>
+								<div class="inlinehelp" title="Incluir encargado comercial" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="Incluye en el reporte información respecto del encargado comercial asociado a los clientes.">?</div>
 							</td>
 						</tr>
 						<tr>

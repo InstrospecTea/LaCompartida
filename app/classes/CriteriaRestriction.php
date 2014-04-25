@@ -33,6 +33,15 @@
 		/*
 			STATIC RESTRICTION GENERATORS
 		 */
+			
+		public static function equals($left, $right){
+			return new CriteriaRestriction("(".$left." = ".$right.")");
+		}
+
+		public static function not_equal($left, $right){
+			return new CriteriaRestriction("(".$left." != ".$right.")");
+		}
+
 		
 		/**
 		 * Genera una sentencia AND entre los argumentos de la izquierda y los de la derecha.

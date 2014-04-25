@@ -45,31 +45,39 @@ class ReporteAntiguedadDeudas
 		//
 		//Añade detalle, si existe:
 		//
-		if (!$this->opciones['agrupar_informacion']){
+		if ($this->opciones['mostrar_detalle']){
 
 			$SimpleReportDetails = new SimpleReport($this->sesion);
 			$SimpleReportDetails->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 			//TODO: Añadir langs!! 
+			
+			if($this->opciones['solo_monto_facturado']){
+				$label = __('Factura');
+			}
+			else{
+				$label = __('Cobro');
+			}
+
 			$configuracion = array(
 				array(
-					'field' => 'id_cobro',
-					'title' => 'N° Cobro',
+					'field' => 'label',
+					'title' => $label,
 					'extras' => array(
-						'attrs' => 'width="10%" style="text-align:right"',
+						'attrs' => 'width="15%" style="text-align:center"',
 					)
 				),
 				array(
 					'field' => 'fecha_emision',
 					'title' => 'Fecha Emisión',
 					'extras' => array(
-						'attrs' => 'width="17%" style="text-align:right"',
+						'attrs' => 'width="15%" style="text-align:center"',
 					)
 				),
 				array(
 					'field' => 'dias_atraso',
 					'title' => 'Días transcurridos',
 					'extras' => array(
-						'attrs' => 'width="10%" style="text-align:right"',
+						'attrs' => 'width="15%" style="text-align:center"',
 					)
 				),
 				array(
@@ -151,23 +159,35 @@ class ReporteAntiguedadDeudas
 
 	private function obtiene_configuracion(){
 
-		//Configuración base
-		$configuracion = array(
-			array(
+		$configuracion = array();
+		$configuracion[] = array(
 				'field' => 'codigo_cliente',
 				'title' => 'ID',
 				'extras' => array(
-					'attrs' => 'width="10%" style="text-align:left;"'
+					'attrs' => 'width="10%" style="text-align:center;"'
 				)
-			),
-			array(
+			);
+
+		$configuracion[] = array(
 				'field' => 'glosa_cliente',
 				'title' => __('Cliente'),
 				'extras' => array(
-					'attrs' => 'width="28%" style="text-align:left;"'
+					'attrs' => 'width="15%" style="text-align:center;"'
 				)
-			),
-			array(
+			);
+
+
+		if($this->opciones['encargado_comercial']){
+			$configuracion[] = array(
+					'field' => 'encargado_comercial',
+					'title' => __('Encargado Comercial'),
+					'extras' => array(
+						'attrs' => 'width="20%" style="text-align:center;'.$display_encargado_comercial.'"'
+					)
+				);
+		}
+
+		$configuracion[] = array(
 				'field' => '0-30',
 				'title' => '0-30 ' . utf8_encode(__('días')),
 				'format' => 'number',
@@ -176,8 +196,9 @@ class ReporteAntiguedadDeudas
 					'symbol' => 'moneda',
 					'attrs' => 'width="10%" style="text-align:right"',
 				)
-			),
-			array(
+			);
+
+		$configuracion[] = array(
 				'field' => '31-60',
 				'title' => '31-60 ' . utf8_encode(__('días')),
 				'format' => 'number',
@@ -186,8 +207,9 @@ class ReporteAntiguedadDeudas
 					'symbol' => 'moneda',
 					'attrs' => 'width="10%" style="text-align:right"'
 				)
-			),
-			array(
+			);
+
+		$configuracion[] = array(
 				'field' => '61-90',
 				'title' => '61-90 ' . utf8_encode(__('días')),
 				'format' => 'number',
@@ -196,8 +218,9 @@ class ReporteAntiguedadDeudas
 					'symbol' => 'moneda',
 					'attrs' => 'width="10%" style="text-align:right"'
 				)
-			),
-			array(
+			);
+
+		$configuracion[] = array(
 				'field' => '91+',
 				'title' => '91+ ' . utf8_encode(__('días')),
 				'format' => 'number',
@@ -206,8 +229,9 @@ class ReporteAntiguedadDeudas
 					'symbol' => 'moneda',
 					'attrs' => 'width="10%" style="text-align:right"'
 				)
-			),
-			array(
+			);
+
+		$configuracion[] = array(
 				'field' => 'total_final',
 				'title' => __('Total'),
 				'format' => 'number',
@@ -216,13 +240,33 @@ class ReporteAntiguedadDeudas
 					'symbol' => 'moneda',
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
-			)
-		);
+			);
 
-		if($opciones['agrupar_informacion']){
-						
+		if ($this->opciones['opcion_usuario'] != 'xls') {
+			$configuracion[] = array(
+				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
+				'title' => '&nbsp;',
+				'extras' => array(
+					'attrs' => 'width="5%" style="text-align:right"',
+					'class' => 'seguimiento'
+				)
+			);
+		} else {
+			$configuracion[] = array(
+				'field' => 'comentario_seguimiento',
+				'title' => 'Comentario Seguimiento'
+			);
 		}
+
 		return $configuracion;
+	}
+
+	private function inserta_configuracion(array $configuracion, array $nueva_configuracion, $posicion){
+		$before = array_slice($configuracion, 0, $posicion);
+		$after = array_slice($configuracion, $posicion);
+
+		$return = array_merge($before, $nueva_configuracion);
+		return array_merge($return, $after);
 	}
 
 	private function genera_criteria(){
@@ -232,7 +276,9 @@ class ReporteAntiguedadDeudas
 			->add_select('cliente.codigo_cliente')
 		    ->add_select('cliente.glosa_cliente')
 		    ->add_select('CONCAT_WS(\' \' ,u.nombre ,u.apellido1 ,u.apellido2 )','encargado_comercial')
-		    ->add_select('moneda_documento.simbolo','moneda');
+		    ->add_select('moneda_documento.simbolo','moneda')
+		    ->add_select('seguimiento.cantidad','cantidad_seguimiento')
+		    ->add_select('seguimiento.comentario','comentario_seguimiento');
 
 		$this->criteria
 			->add_from('cobro');
@@ -264,6 +310,19 @@ class ReporteAntiguedadDeudas
 			->add_left_join_with('usuario u','contrato.id_usuario_responsable = u.id_usuario')
 			->add_left_join_with('cliente','contrato.codigo_cliente = cliente.codigo_cliente')
 			->add_left_join_with('prm_documento_legal pdl','pdl.id_documento_legal=factura.id_documento_legal');
+
+		//Criteria que majena la query encargada de realizar los seguimientos
+		$seguimiento_criteria = new Criteria();
+		$seguimiento_criteria
+			->add_select('codigo_cliente')
+			->add_select('COUNT(*)','cantidad')
+			->add_select('MAX(CONCAT(fecha_creacion,\'|\',comentario))','comentario')
+			->add_from('cliente_seguimiento')
+			->add_grouping('codigo_cliente');
+
+		$this->criteria
+			->add_left_join_with_criteria($seguimiento_criteria,'seguimiento','cliente.codigo_cliente = seguimiento.codigo_cliente');
+
 	}
 
 	private function completa_criteria_segun_opciones(){
@@ -299,19 +358,48 @@ class ReporteAntiguedadDeudas
        			->add_left_join_with_criteria($sub_query,'saldo_factura','saldo_factura.id_cobro = cobro.id_cobro');
 
    			$this->criteria
-			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, saldo_factura.saldo, 0 ))','saldo_normal')
-			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 30, saldo_factura.saldo, 0 ))','saldo_vencido')
-			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,saldo_factura.saldo, 0))','0-30')
-			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,saldo_factura.saldo, 0))','31-60')
-			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,saldo_factura.saldo, 0))','61-90')
-			    ->add_select('-SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0))','91+')
-			    ->add_select('-SUM(saldo_factura.saldo)','total_final')
+			    ->add_select('SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, saldo_factura.saldo, 0 ))','saldo_normal')
+			    ->add_select('SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 30, saldo_factura.saldo, 0 ))','saldo_vencido')
+			    ->add_select('SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,saldo_factura.saldo, 0))','0-30')
+			    ->add_select('SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,saldo_factura.saldo, 0))','31-60')
+			    ->add_select('SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,saldo_factura.saldo, 0))','61-90')
+			    ->add_select('SUM(IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0))','91+')
+			    ->add_select('SUM(saldo_factura.saldo)','total_final')
 	            ->add_grouping('cliente.glosa_cliente');
+
+	        $this->criteria
+	        	->add_restriction(CriteriaRestriction::not_equal('saldo_factura.saldo','0'));
+
        		
-       		if(!$this->opciones['agrupar_informacion']){
-       			//
-       			//No se pide agrupar la información, por lo tanto hay que usar sub-simple-report y crear una query para mostrar el detalle.
-       			//
+       		if($this->opciones['mostrar_detalle']){
+       			$details_criteria = new Criteria();
+	   			$details_criteria
+	   						->add_select('cliente.codigo_cliente')
+	   						->add_select('cliente.glosa_cliente')
+	   						->add_select('moneda_documento.simbolo','moneda')
+	   						->add_select('concat(pdl.codigo,\' No. \',  lpad(factura.serie_documento_legal,\'3\',\'0\'),\'-\',lpad(factura.numero,\'7\',\'0\'))','label')
+	   						->add_select( $fecha_atraso,'fecha_emision')
+	   						->add_select('DATEDIFF(NOW(),'.$fecha_atraso.')','dias_atraso')
+	   						->add_select('IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, saldo_factura.saldo, 0 )','saldo_normal')
+						    ->add_select('IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 30, saldo_factura.saldo, 0 )','saldo_vencido')
+						    ->add_select('IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 0 AND 30,saldo_factura.saldo, 0)','0-30')
+						    ->add_select('IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 31 AND 60,saldo_factura.saldo, 0)','31-60')
+						    ->add_select('IF(DATEDIFF(NOW(),'.$fecha_atraso.') BETWEEN 61 AND 90,saldo_factura.saldo, 0)','61-90')
+						    ->add_select('IF(DATEDIFF(NOW(),'.$fecha_atraso.') > 90,saldo_factura.saldo, 0)','91+')
+						    ->add_select('(saldo_factura.saldo)','total_final');
+			    $details_criteria
+				            ->add_from('cobro');
+				$details_criteria
+							->add_left_join_with('contrato','contrato.id_contrato = cobro.id_contrato')
+							->add_left_join_with('cliente','contrato.codigo_cliente = cliente.codigo_cliente')
+							->add_left_join_with('documento d','cobro.id_cobro = d.id_cobro')
+			                ->add_left_join_with('prm_moneda moneda_documento','d.id_moneda = moneda_documento.id_moneda')
+			                ->add_left_join_with('factura','factura.id_cobro=cobro.id_cobro')
+			                ->add_left_join_with('prm_documento_legal pdl','pdl.id_documento_legal=factura.id_documento_legal');
+				$details_criteria
+       			            ->add_left_join_with_criteria($sub_query,'saldo_factura','saldo_factura.id_cobro = cobro.id_cobro');
+
+	            $this->report_details['codigo_cliente'] = $details_criteria->get_plain_query();
        		}
 		}
 		//
@@ -344,18 +432,16 @@ class ReporteAntiguedadDeudas
 			//
 			//	Si no se agrupa la información en cobros liquidados.
 			//
-			if(!$this->opciones['agrupar_informacion']){
-				//
-	   			//No se pide agrupar la información, por lo tanto hay que usar sub-simple-report y crear una query para mostrar el detalle.
-	   			//
+			if($this->opciones['mostrar_detalle']){
+
 	   			$details_criteria = new Criteria();
 	   			$details_criteria
 	   						->add_select('cliente.codigo_cliente')
 	   						->add_select('cliente.glosa_cliente')
 	   						->add_select('moneda_documento.simbolo','moneda')
-	   						->add_select('cobro.id_cobro')
+	   						->add_select('cobro.id_cobro','label')
 							->add_select('d.id_documento')
-						    ->add_select('cobro.fecha_emision')
+						    ->add_select( $fecha_atraso,'fecha_emision')
 							->add_select('DATEDIFF(NOW(),'.$fecha_atraso.')','dias_atraso')
 							->add_select('cobro.estado','estado_cobro')
 							->add_select('-IF(DATEDIFF(NOW(),'.$fecha_atraso.') <= 30, (-1 * (d.saldo_honorarios + d.saldo_gastos)), 0 )','saldo_normal')
