@@ -585,6 +585,8 @@ $_LANG['Sr.'] = "Mr.";
 $_LANG['Declaración de Honorarios y Gastos'] = "Statement for Fees and Expenses";
 $_LANG['Via Fax'] = "Via Fax";
 $_LANG['y'] = "and";
+$_LANG['por_concepto_de_gastos'] = "for expenses";
+$_LANG['por_concepto_de_honorarios'] = "in fees";
 
 ###### Cartas Clientes ######
 //
@@ -609,6 +611,7 @@ $_LANG['nota_morosidad_honorarios'] = "Please disregard the above mentioned invo
 $_LANG['nota_morosidad_gastos'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
 $_LANG['nota_morosidad_total'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
 $_LANG['nota_morosidad'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
+$_LANG['nota_disclaimer'] = "Note: The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
 
 $_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
 $_LANG['%asunto_mb%'] = "Re.:";
