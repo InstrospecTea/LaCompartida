@@ -3419,6 +3419,8 @@ class NotaCobro extends Cobro {
                             LEFT JOIN prm_categoria_usuario ON ( usuario.id_categoria_usuario = prm_categoria_usuario.id_categoria_usuario AND usuario.id_categoria_usuario != 0 )
                             WHERE cobro.id_cobro=" . $this->fields['id_cobro'];
 
+                            echo $query; exit;
+
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado, $rut_usuario, $dv_usuario, $categoria_usuario) = mysql_fetch_array($resp);
 
