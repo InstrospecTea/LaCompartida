@@ -575,13 +575,19 @@ class Reporte {
 
 		//Datos que se repiten
 		$s_monto_thh_simple = "IF(cobro.monto_thh > 0,
-					cobro.monto_thh + cobro.monto_tramites,
-					IF(cobro.monto_trabajos + cobro.monto_tramites > 0,
-					cobro.monto_trabajos + cobro.monto_tramites, 1))";
+									cobro.monto_thh + cobro.monto_tramites,
+									IF(cobro.monto_trabajos + cobro.monto_tramites > 0,
+											cobro.monto_trabajos + cobro.monto_tramites,
+											1
+									)
+								)";
 		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar > 0,
-					cobro.monto_thh_estandar + cobro.monto_tramites,
-					IF(cobro.monto_trabajos + cobro.monto_tramites > 0,
-					cobro.monto_trabajos + cobro.monto_tramites, 1))";
+										cobro.monto_thh_estandar + cobro.monto_tramites,
+										IF(cobro.monto_trabajos + cobro.monto_tramites > 0,
+											cobro.monto_trabajos + cobro.monto_tramites,
+											1
+										)
+								)";
 
 		//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
 		// A : monto estandar de este trabajo
@@ -600,16 +606,16 @@ class Reporte {
 
 
 		$monto_estandar = "SUM(
-									trabajo.tarifa_hh_estandar
-									* (TIME_TO_SEC( duracion_cobrada)/3600)
-									* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-							  )";
+								trabajo.tarifa_hh_estandar
+								* (TIME_TO_SEC( duracion_cobrada)/3600)
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+							)";
 		$monto_predicho = "SUM(
-									usuario_tarifa.tarifa
-									* TIME_TO_SEC( duracion_cobrada )
-									* moneda_por_cobrar.tipo_cambio
-									/ (moneda_display.tipo_cambio * 3600)
-								)";
+								usuario_tarifa.tarifa
+								* TIME_TO_SEC( duracion_cobrada )
+								* moneda_por_cobrar.tipo_cambio
+								/ (moneda_display.tipo_cambio * 3600)
+							)";
 		$monto_trabajado_estandar = "SUM(
 										trabajo.tarifa_hh_estandar
 										* (TIME_TO_SEC( duracion)/3600)
@@ -619,38 +625,42 @@ class Reporte {
 		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
 		if ($this->tipo_dato != 'valor_por_cobrar') {
 			$monto_honorarios = "SUM(
+										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+										*
 										(
-											" . $s_tarifa . "
-											* TIME_TO_SEC( duracion_cobrada)/3600
+											(documento.subtotal_sin_descuento  * cobro_moneda_documento.tipo_cambio)
+											/
+											({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
 										)
-										*	(
-												( (documento.subtotal_sin_descuento)  * cobro_moneda_documento.tipo_cambio )
-												/   (" . $s_monto_thh . " * cobro_moneda_cobro.tipo_cambio )
-											)
-										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+										*
+										(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 									)";
 		} else {
 			$monto_honorarios = "SUM(
-									(
-										" . $s_tarifa . "
-										* TIME_TO_SEC( duracion_cobrada)/3600
+									IF(
+										cobro.monto_tramites > 0 and cobro.monto_trabajos = 0,
+										cobro.monto_tramites,
+										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+										*
+										(cobro.monto_trabajos / {$s_monto_thh})
 									)
-									*	(cobro.monto_trabajos / " . $s_monto_thh . " )
-									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+									*
+									(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 								)";
 		}
 		//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
 		$monto_por_pagar_parcial = "SUM(
+										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+										*
 										(
-											" . $s_tarifa . "
-											* TIME_TO_SEC( duracion_cobrada)/3600
+											(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)
+											/
+											({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
 										)
-										*	(
-												( documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio )
-												/   (" . $s_monto_thh . " * cobro_moneda_cobro.tipo_cambio )
-											)
-										*   ( documento.saldo_honorarios / documento.honorarios)
-										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+										*
+										(documento.saldo_honorarios / documento.honorarios)
+										*
+										(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 									)";
 		$datos_monedas = "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio";
 
@@ -924,13 +934,6 @@ class Reporte {
 					$this->row[] = $row;
 				}
 		}
-
-		/* UTILIZADO PARA DEBUG */
-		// } else {
-		//  	$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
-		//  	$respt = mysql_query($testimonio, $this->sesion->dbh);
-		// }
-
 	}
 
 	/*
