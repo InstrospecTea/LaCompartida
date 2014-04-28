@@ -1,7 +1,7 @@
 <?php
 
 /**
-*	TODO: Comentar!!
+*	Clase que define un Reporte de Antiguedad de Deudas.
 */
 class ReporteAntiguedadDeudas
 {
@@ -15,7 +15,7 @@ class ReporteAntiguedadDeudas
 	private $report_details = array();
 
 	/**
-	 * [__construct description]
+	 * Constructor de la clase.
 	 * @param [type] $sesion   [description]
 	 * @param array  $opciones [description]
 	 * @param array  $datos    [description]
@@ -27,7 +27,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [generar description]
+	 * Genera el reporte según las opciones que se especifican.
 	 * @return [type] [description]
 	 */
 	public function generar(){
@@ -74,9 +74,9 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [genera_reporte description]
+	 * 
 	 * @param  [type] $agrupacion [description]
-	 * @return [type]             [description]
+	 * @return [SimpleReport] [description]
 	 */
 	private function genera_reporte($agrupacion){
 		$SimpleReport = new SimpleReport($this->sesion);
