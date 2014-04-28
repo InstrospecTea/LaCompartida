@@ -14,13 +14,22 @@ class ReporteAntiguedadDeudas
 	private $and_statements = array();
 	private $report_details = array();
 
-	function __construct($sesion, array $opciones, array $datos)
-	{
+	/**
+	 * [__construct description]
+	 * @param [type] $sesion   [description]
+	 * @param array  $opciones [description]
+	 * @param array  $datos    [description]
+	 */
+	function __construct($sesion, array $opciones, array $datos){
 		$this->opciones = $opciones;
 		$this->datos = $datos;
 		$this->sesion = $sesion;
 	}
 
+	/**
+	 * [generar description]
+	 * @return [type] [description]
+	 */
 	public function generar(){
 
 		$this->genera_query_criteria();
@@ -30,14 +39,44 @@ class ReporteAntiguedadDeudas
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
 		$reporte = $this->genera_reporte($agrupacion);
+		
 		if (!empty($this->opciones['mostrar_detalle'])) {
-			//Generar agrupación que contenga el detalle.
+			$agrupacion_detalle = $this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle());
+			$reporte_detalle = $this->genera_reporte_detalle($agrupacion_detalle);
+			$reporte->AddSubReport(array(
+				'SimpleReport' => $reporte_detalle,
+				'Keys' => array('codigo_cliente'),
+				'Level' => 1
+			));
+			$reporte->SetCustomFormat(array(
+				'collapsible' => true
+			));
+		}
+
+		if($this->opciones['opcion_usuario'] == 'xls'){
+			$new_results = array();
+			foreach ($agrupacion as $result) {
+				$array =  json_decode(utf8_encode($result['identificadores']), true);
+				$identificadores = array();
+				foreach ($array as $key => $value) {
+					$identificadores[] = utf8_decode($value);
+				}
+				$result['identificadores'] = implode(', ', $identificadores);
+				$new_results[] = $result;
+			}
+			$reporte->LoadResults($new_results);
+			$writer = SimpleReport_IOFactory::createWriter($reporte, 'Excel');
+			$writer->save('Reporte_antiguedad_deuda');
 		}
 
 		return $reporte;
 	}
 
-
+	/**
+	 * [genera_reporte description]
+	 * @param  [type] $agrupacion [description]
+	 * @return [type]             [description]
+	 */
 	private function genera_reporte($agrupacion){
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
@@ -46,15 +85,8 @@ class ReporteAntiguedadDeudas
 				'field' => 'glosa_cliente',
 				'title' => __('Cliente'),
 				'extras' => array(
-					'attrs' => 'width="28%" style="text-align:left;"',
+					'attrs' => 'width="20%" style="text-align:left;"',
 					'groupinline' => true
-				)
-			),
-			array(
-				'field' => 'identificadores',
-				'title' => __(ucfirst($this->opciones['identificadores'])),
-				'extras' => array(
-					'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
 				)
 			),
 			array(
@@ -109,11 +141,204 @@ class ReporteAntiguedadDeudas
 			)
 		);
 		
+		if($this->opciones['encargado_comercial']){
+			$configuracion_encargado_comercial = array(
+				'field' => 'encargado_comercial',
+				'title' => __('Encargado Comercial'),
+				'extras' => array(
+					'attrs' => 'width="15%" style="text-align:left;"'
+				)
+			);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion_encargado_comercial, 1);
+		}
+
+		if(!$this->opciones['mostrar_detalle']){
+			$configuracion_cobros = array(
+				'field' => 'identificadores',
+				'title' => __(ucfirst($this->opciones['identificadores'])),
+				'extras' => array(
+					'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
+				)
+			);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion_cobros, 1);
+		}
+
+		if ($this->opciones['totales_especiales']) {
+			$configuracion = array(
+				'field' => 'total_normal',
+				'title' => __('Total Normal'),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+				)
+			);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+			$configuracion = array(
+				'field' => 'total_vencido',
+				'title' => __('Total Vencido'),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+				)
+			);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+		}
+
+
+		//Si es que la es excel.
+		if($this->opciones['opcion_usuario'] != 'xls'){
+			$config_reporte[] = array(
+				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
+				'title' => '&nbsp;',
+				'extras' => array(
+					'attrs' => 'width="5%" style="text-align:right"',
+					'class' => 'seguimiento'
+				)
+			);
+		}
+		else{
+			$config_reporte[] = array(
+				'field' => 'comentario_seguimiento',
+				'title' => 'Comentario Seguimiento'
+			);
+		}
+
 		$SimpleReport->LoadConfigFromArray($config_reporte);
 		$SimpleReport->LoadResults($agrupacion);
 		return $SimpleReport;
 	}
 
+	/**
+	 * [genera_reporte_detalle description]
+	 * @param  [type] $agrupacion_detalle [description]
+	 * @return [type]                     [description]
+	 */
+	private function genera_reporte_detalle($agrupacion_detalle){
+		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
+		$config_reporte = array(
+			array(
+				'field' => 'id',
+				'title' => __(ucfirst($this->opciones['identificador_detalle'])),
+				'extras' => array(
+					'attrs' => 'width="11%" style="text-align:right;"',
+					'class' => 'identificadores'
+				)
+			),
+			array(
+				'field' => 'fecha_atraso',
+				'title' => __('Fecha Emisión'),
+				'format' => 'date',
+				'extras' => array(
+					'attrs' => 'width="11%" style="text-align:right;"'
+				)
+			),
+			array(
+				'field' => 'dias_atraso_pago',
+				'title' => 'Días Atraso',
+				'extras' => array(
+					'attrs' => 'width="11%" style="text-align:right;"'
+				)
+			),
+			array(
+				'field' => 'rango1',
+				'title' => '0-30 ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"',
+				)
+			),
+			array(
+				'field' => 'rango2',
+				'title' => '31-60 ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"'
+				)
+			),
+			array(
+				'field' => 'rango3',
+				'title' => '61-90 ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"'
+				)
+			),
+			array(
+				'field' => 'rango4',
+				'title' => '91+ ' . utf8_encode(__('días')),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="10%" style="text-align:right"'
+				)
+			),
+			array(
+				'field' => 'total',
+				'title' => __('Total'),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+				)
+			)
+		);
+
+		if ($this->opciones['totales_especiales']) {
+			$configuracion = array(
+				'field' => 'total_normal',
+				'title' => __('Total Normal'),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+				)
+			);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+			$configuracion = array(
+				'field' => 'total_vencido',
+				'title' => __('Total Vencido'),
+				'format' => 'number',
+				'extras' => array(
+					'subtotal' => 'moneda',
+					'symbol' => 'moneda',
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+				)
+			);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+		}
+
+		$SimpleReport->LoadConfigFromArray($config_reporte);
+		$SimpleReport->LoadResults($agrupacion_detalle);
+		return $SimpleReport;
+	}
+
+	/**
+	 * [insertar_configuracion description]
+	 * @param  [type] $configuraciones [description]
+	 * @param  [type] $configuracion   [description]
+	 * @param  [type] $posicion        [description]
+	 * @return [type]                  [description]
+	 */
+	private function insertar_configuracion($configuraciones, $configuracion, $posicion){
+		$start = array_slice($configuraciones, 0, $posicion);
+		$end = array_slice($configuraciones, $posicion);
+		$start[] = $configuracion;
+		return array_merge($start, $end);
+	}
 
 	/**
 	 * [generar_agrupacion_de_resultados description]
@@ -152,8 +377,14 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['rango3'] = 0;
 				$results[$row['codigo_cliente']]['rango4'] = 0;
 				$results[$row['codigo_cliente']]['total'] = 0;
+				$results[$row['codigo_cliente']]['total_normal'] = 0;
+				$results[$row['codigo_cliente']]['total_vencido'] = 0;
 				if($row['dias_atraso_pago'] <= 30){
+					$results[$row['codigo_cliente']]['total_normal'] = -1 * $row["$campo_valor"];
 					$results[$row['codigo_cliente']]['rango1'] = -1 * $row["$campo_valor"];
+				}
+				else{
+					$results[$row['codigo_cliente']]['total_vencido'] = -1 * $row["$campo_valor"];
 				}
 				if($row['dias_atraso_pago'] > 30 && $row['dias_atraso_pago'] <=60 ){
 					$results[$row['codigo_cliente']]['rango2'] = -1 * $row["$campo_valor"];
@@ -165,6 +396,18 @@ class ReporteAntiguedadDeudas
 					$results[$row['codigo_cliente']]['rango4'] = -1 * $row["$campo_valor"];
 				}
 				$results[$row['codigo_cliente']]['total'] = -1 * $row["$campo_valor"];
+
+				//Si es que se incluye el encargado comercial en las opciones.
+				if($this->opciones['encargado_comercial']){
+					if(!empty($row['encargado_comercial'])){
+						$results[$row['codigo_cliente']]['encargado_comercial'] = $row['encargado_comercial'];
+					}
+					else{
+						//TODO: Validar con gonzalo la regla para llenar campos vacíos.
+						$results[$row['codigo_cliente']]['encargado_comercial'] = '';
+					}
+				}
+
 			}
 			else{
 				$results[$row['codigo_cliente']]['monto'] += $row['monto'];
@@ -183,7 +426,10 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['fgsaldo'] += $row['fgsaldo'];
 				$results[$row['codigo_cliente']]['fgsaldo_base'] += $row['fgsaldo_base'];
 				if($row['dias_atraso_pago'] <= 30){
+					$results[$row['codigo_cliente']]['total_normal'] += (-1 * $row["$campo_valor"]);
 					$results[$row['codigo_cliente']]['rango1'] += (-1 * $row["$campo_valor"]);
+				}else{
+					$results[$row['codigo_cliente']]['total_vencido'] += (-1 * $row["$campo_valor"]);
 				}
 				if($row['dias_atraso_pago'] > 30 && $row['dias_atraso_pago'] <=60 ){
 					$results[$row['codigo_cliente']]['rango2'] += (-1 * $row["$campo_valor"]);
@@ -211,28 +457,90 @@ class ReporteAntiguedadDeudas
 		return $output;
 	}
 
+	/**
+	 * [genera_agrupacion_detalle description]
+	 * @param  [type] $dataset    [description]
+	 * @param  [type] $parameters [description]
+	 * @return [type]             [description]
+	 */
+	private function genera_agrupacion_detalle($dataset, $parameters){
+		extract($parameters);
+		$results = array();
+
+		foreach ($dataset as $row) {
+			
+			$rango1 = 0;
+			$rango2 = 0;
+			$rango3 = 0;
+			$rango4 = 0;
+			$total = 0;
+			$dias_atraso_pago = $row['dias_atraso_pago'];
+			$normal = 0;
+			$vencido = 0;
+
+			if($dias_atraso_pago <= 30){
+				$rango1 = -1 * $row["$campo_valor"];
+				$normal = -1 * $row["$campo_valor"];
+			}
+			else{
+				$vencido = -1 * $row["$campo_valor"];
+			}
+			if($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
+				$rango2 = -1 * $row["$campo_valor"];
+			}
+			if($dias_atraso_pago > 60 && $dias_atraso_pago <= 90){
+				$rango3 = -1 * $row["$campo_valor"];
+			}
+			if($dias_atraso_pago > 90){
+				$rango4 = -1 * $row["$campo_valor"];
+			}
+			$total = -1 * $row["$campo_valor"];
+
+			$results[$row['codigo_cliente']][] = array(
+				'id' => '{"'.$row['identificador'].'":"'.$row['label'].'"}',
+				'moneda' => $row['moneda'],
+				'glosa_cliente' => $row['glosa_cliente'],
+				'monto' => $row['monto'],
+				'monto_base' => $row['monto_base'],
+				'fmonto' => $row['fmonto'],
+				'fmonto_base' => $row['fmonto_base'],
+				'saldo' => $row['saldo'],
+				'saldo_base' => $row['saldo_base'],
+				'fsaldo' => $row['fsaldo'],
+				'fsaldo_base' => $row['fsaldo_base'],
+				'hsaldo' => $row['hsaldo_base'],
+				'fhsaldo' => $row['fhsaldo'],
+				'fhsaldo_base' => $row['fhsaldo_base'],
+				'gsaldo' => $row['gsaldo'],
+				'gsaldo_base' => $row['gsaldo_base'],
+				'fgsaldo' => $row['fgsaldo'],
+				'fgsaldo_base' => $row['fgsaldo_base'],
+				'fecha_atraso' => $row['fecha_emision'],
+				'rango1' => $rango1,
+				'rango2' => $rango2,
+				'rango3' => $rango3,
+				'rango4' => $rango4,
+				'total' => $total,
+				'total_normal' => $normal,
+				'total_vencido' => $vencido,
+				'dias_atraso_pago' => $row['dias_atraso_pago']		
+			);
+
+		}
+
+		return $results;
+	}
+
+	/**
+	 * [genera_query_criteria description]
+	 * @return [type] [description]
+	 */
 	private function genera_query_criteria(){
 
 		$this->criteria = new Criteria();
 
 		extract($this->define_parametros_query_sin_detalle());
 		$this->agrega_restricciones_segun_tipo_monto();
-
-		// $this->criteria
-		//     ->add_select('T.codigo_cliente')
-		//     ->add_select('T.glosa_cliente')
-		//     ->add_select('T.moneda')
-		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30,'."$campo_valor".', 0))' ,'0-30')
-		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60,'."$campo_valor".', 0))', 'rango2')
-		//     ->add_select('-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90,'."$campo_valor".', 0))', '61-90')
-		//     ->add_select('-SUM(IF(T.dias_atraso_pago > 90,'."$campo_valor".', 0))','91+')
-		//     ->add_select('-SUM('."$campo_valor".')','total')
-		//     ->add_select('-SUM('."$campo_hvalor".')','htotal')
-		//     ->add_select('-SUM('."$campo_gvalor".')','gtotal')
-		//     ->add_select("CONCAT('{',group_concat(concat('" . '"' . "',identificador,'" . '":"' . "',label,'" . '"' . "') separator ','), '}')  as identificadores")
-		//     ->add_select('T.cantidad_seguimiento')
-		//     ->add_select('T.comentario_seguimiento')
-		//     ->add_from('cobro');
 		    
 		$join_sub_select = new Criteria();
 		$join_sub_select
@@ -242,11 +550,26 @@ class ReporteAntiguedadDeudas
 			->add_from('cliente_seguimiento')
 			->add_grouping('codigo_cliente');
 
+		if(!empty($this->datos['encargado_comercial'])){
+			$encargado_comercial = $this->datos['encargado_comercial'];
+			$this->and_statements[] = 'u.id_usuario = '."$encargado_comercial";
+		}
+
+		if(!empty($this->datos['codigo_cliente'])){
+			$cliente = $this->datos['codigo_cliente'];
+			$this->and_statements[] = 'contrato.codigo_cliente = \''."$cliente".'\'';
+		}
+
+		if(!empty($this->datos['id_contrato'])){
+			$contrato = $this->datos['id_contrato'];
+			$this->and_statements[] = 'cobro.id_contrato = \''."$contrato".'\'';
+		}
+
 	    $this->criteria
 	    	->add_select('cobro.id_cobro')
 	    	->add_select('d.fecha')
 			->add_select("$identificador",'identificador')
-			->add_select("$tipo".' AS','tipo')
+			->add_select("$tipo".' AS','and_statementstipo')
 			->add_select('d.glosa_documento','descripcion')
 			->add_select("$label",'label')
 			->add_select('cliente.codigo_cliente')
@@ -267,8 +590,8 @@ class ReporteAntiguedadDeudas
 			->add_select('-1 * (d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','gsaldo_base')
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))', 'fgsaldo')
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','fgsaldo_base')
-			->add_select('cobro.fecha_emision')
-			->add_select('DATEDIFF(NOW(), cobro.fecha_emision)','dias_atraso_pago')
+			->add_select("$fecha_atraso", 'fecha_emision')
+			->add_select('DATEDIFF(NOW(),'."$fecha_atraso".')','dias_atraso_pago')
 			->add_select('moneda_documento.simbolo','moneda')
 			->add_select('seguimiento.cantidad','cantidad_seguimiento')
 			->add_select('seguimiento.comentario','comentario_seguimiento')
@@ -282,6 +605,7 @@ class ReporteAntiguedadDeudas
 			->add_left_join_with('cliente','contrato.codigo_cliente = cliente.codigo_cliente')
 			->add_left_join_with('prm_documento_legal pdl','pdl.id_documento_legal=factura.id_documento_legal')
 			->add_left_join_with_criteria($join_sub_select,'seguimiento','cliente.codigo_cliente = seguimiento.codigo_cliente')
+			->add_left_join_with('usuario u','u.id_usuario = contrato.id_usuario_responsable')
 			->add_restriction(CriteriaRestriction::and_all($this->and_statements))
 			->add_ordering('glosa_cliente');
 
@@ -291,8 +615,7 @@ class ReporteAntiguedadDeudas
 		//
 		if($this->opciones['encargado_comercial']){
 			$this->criteria
-						->add_select('u.username','encargado_comercial')
-						->add_left_join_with('usuario u','u.id_usuario = contrato.id_usuario_responsable');
+						->add_select('u.username','encargado_comercial');	
 		}
 
 	}
@@ -308,9 +631,10 @@ class ReporteAntiguedadDeudas
 			$campo_gvalor = "fgsaldo";
 			$campo_hvalor = "fhsaldo";
 			$tipo = " pdl.glosa";
-			$fecha_atraso = " factura.fecha";
+			$fecha_atraso = "factura.fecha";
 			$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
 			$this->opciones['identificadores'] = 'facturas';
+			$this->opciones['identificador_detalle'] = 'factura';
 			$identificador = " d.id_cobro";
 			$linktofile = 'cobros6.php?id_cobro=';
 		}
@@ -319,9 +643,10 @@ class ReporteAntiguedadDeudas
 			$campo_gvalor = "gsaldo";
 			$campo_hvalor = "hsaldo";
 			$tipo = " 'liquidacion'";
-			$fecha_atraso = " cobro.fecha_emision";
+			$fecha_atraso = "cobro.fecha_emision";
 			$label = " d.id_cobro ";
 			$this->opciones['identificadores'] = 'cobros';
+			$this->opciones['identificador_detalle'] = 'cobro';
 			$identificador = " d.id_cobro";
 			$linktofile = 'cobros6.php?id_cobro=';
 		}

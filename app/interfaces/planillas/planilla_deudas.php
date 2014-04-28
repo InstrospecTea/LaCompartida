@@ -5,23 +5,32 @@ require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $sesion = new sesion(array('REP'));
 
+$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
+			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
 	
 if (in_array($opcion, array('buscar', 'xls'))) {
 
-
+	if($solo_monto_facturado){
+		$linktofile = 'cobros6.php?id_cobro=';
+	}
+	else{
+		$linktofile = 'cobros6.php?id_cobro=';
+	}
 
 	$opciones = array(
 			'solo_monto_facturado' => $solo_monto_facturado,
 			'mostrar_detalle' => $mostrar_detalle,
 			'encargado_comercial' => $encargado_comercial,
-			'opcion_usuario' => $opcion
+			'opcion_usuario' => $opcion,
+			'totales_especiales' => $totales_especiales
 		);
 
 	$datos = array(
 			'codigo_cliente' => $codigo_cliente,
 			'id_contrato' => $id_contrato,
 			'tipo_liquidacion' => $tipo_liquidacion,
-			'codigo_asunto' => $codigo_asunto
+			'codigo_asunto' => $codigo_asunto,
+			'encargado_comercial' => $id_encargado_comercial
 		);
 
 	$reporte = new ReporteAntiguedadDeudas($sesion, $opciones, $datos);
@@ -30,32 +39,32 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 
 	$SimpleReport = $reporte->generar();
 
-	if ($opcion == 'xls') {
-		$new_results = array();
-		foreach ($results as $result) {
-			// Corregir los identificadores
-			$array = json_decode(utf8_encode($result['identificadores']), true);
-			$identificadores = array();
-			foreach ($array as $key => $value) {
-				$identificadores[] = utf8_decode($value);
-			}
-			$result['identificadores'] = implode(', ', $identificadores);
+	// if ($opcion == 'xls') {
+	// 	$new_results = array();
+	// 	foreach ($results as $result) {
+	// 		// Corregir los identificadores
+	// 		$array = json_decode(utf8_encode($result['identificadores']), true);
+	// 		$identificadores = array();
+	// 		foreach ($array as $key => $value) {
+	// 			$identificadores[] = utf8_decode($value);
+	// 		}
+	// 		$result['identificadores'] = implode(', ', $identificadores);
 
-			// Corregir los comentarios de seguimiento
-			$array = explode(' | ', $result['comentario_seguimiento']);
-			if (count($array) > 1) {
-				$result['comentario_seguimiento'] = Utiles::sql2fecha($array[0], "%d/%m/%Y") . " " . $array[1];
-			} else {
-				$result['comentario_seguimiento'] = "";
-			}
+	// 		// Corregir los comentarios de seguimiento
+	// 		$array = explode(' | ', $result['comentario_seguimiento']);
+	// 		if (count($array) > 1) {
+	// 			$result['comentario_seguimiento'] = Utiles::sql2fecha($array[0], "%d/%m/%Y") . " " . $array[1];
+	// 		} else {
+	// 			$result['comentario_seguimiento'] = "";
+	// 		}
 
-			$new_results[] = $result;
-		}
+	// 		$new_results[] = $result;
+	// 	}
 
-		$SimpleReport->LoadResults($new_results);
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
-		$writer->save('Reporte_antiguedad_deuda');
-	}
+	// 	$SimpleReport->LoadResults($new_results);
+	// 	$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+	// 	$writer->save('Reporte_antiguedad_deuda');
+	// }
 }
 
 $Pagina = new Pagina($sesion);
@@ -90,6 +99,15 @@ $Pagina->PrintTop();
 
 						<tr>
 							<td align="right" width="30%">
+								<?php echo __('Encargado Comercial') ?>
+							</td>
+							<td align='left' colspan="2">
+								<?php echo  Html::SelectQuery($sesion, $query_usuario, "id_encargado_comercial", $id_encargado_comercial, "", "Ninguno","width=100px")  ?>
+							</td>
+						</tr>
+
+						<tr>
+							<td align="right" width="30%">
 								<label for="filtro_facturado"><?php echo __('Considerar sólo monto facturado'); ?></label>
 							</td>
 							<td colspan="3" align="left"  >
@@ -99,12 +117,21 @@ $Pagina->PrintTop();
 						</tr>
 						<tr>
 							<td align="right" width="30%">
+								<label for="filtro_facturado">Incluir totales normales y vencidos</label>
+							</td>
+							<td colspan="3" align="left"  >
+								<input type="checkbox" id="totales_especiales" name="totales_especiales"  value="1" <?php echo $totales_especiales ? 'checked' : '' ?>/>
+								<div class="inlinehelp" title="Totales normales y vencidos" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="Incluir en el reporte el cálculo de montos totales, tanto normales como vencidos.">?</div>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" width="30%">
 								<!-- TODO : LANG!! -->
-								<label for="filtro_facturado">Mostrar detalle</label>
+								<label for="filtro_facturado">Desglosar reporte</label>
 							</td>
 							<td colspan="3" align="left">
 								<input type="checkbox" id="mostrar_detalle" name="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked' : '' ?>>
-								<div class="inlinehelp" title="Mostrar Detalle" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="El reporte por defecto solo muestra los totales agrupados para cada resultado que se obtiene. Active esta opción para mostrar el detalle de cada agrupación de totales.">?</div>
+								<div class="inlinehelp" title="Desglosar reporte" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="El reporte por defecto solo muestra los totales agrupados para cada resultado que se obtiene. Active esta opción para mostrar el detalle de cada agrupación de totales.">?</div>
 							</td>
 						</tr>
 						<tr>
