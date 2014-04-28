@@ -37,11 +37,11 @@ class ReporteAntiguedadDeudas
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
+		$agrupacion = UtilesApp::utf8izar($this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle()));
 		$reporte = $this->genera_reporte($agrupacion);
 		
 		if (!empty($this->opciones['mostrar_detalle'])) {
-			$agrupacion_detalle = $this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle());
+			$agrupacion_detalle = UtilesApp::utf8izar($this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle()));
 			$reporte_detalle = $this->genera_reporte_detalle($agrupacion_detalle);
 			$reporte->AddSubReport(array(
 				'SimpleReport' => $reporte_detalle,
@@ -64,8 +64,9 @@ class ReporteAntiguedadDeudas
 				$result['identificadores'] = implode(', ', $identificadores);
 				$new_results[] = $result;
 			}
+
 			$reporte->LoadResults($new_results);
-			$writer = SimpleReport_IOFactory::createWriter($reporte, 'Excel');
+			$writer = SimpleReport_IOFactory::createWriter($reporte, 'Spreadsheet');
 			$writer->save('Reporte_antiguedad_deuda');
 		}
 
@@ -91,7 +92,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango1',
-				'title' => '0-30 ' . utf8_encode(__('días')),
+				'title' => '0-30 ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -101,7 +102,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango2',
-				'title' => '31-60 ' . utf8_encode(__('días')),
+				'title' => '31-60 ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -111,7 +112,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango3',
-				'title' => '61-90 ' . utf8_encode(__('días')),
+				'title' => '61-90 ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -121,7 +122,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango4',
-				'title' => '91+ ' . utf8_encode(__('días')),
+				'title' => '91+ ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -188,8 +189,7 @@ class ReporteAntiguedadDeudas
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 		}
 
-
-		//Si es que la es excel.
+		//Si es que la opción no es excel.
 		if($this->opciones['opcion_usuario'] != 'xls'){
 			$config_reporte[] = array(
 				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
@@ -204,6 +204,10 @@ class ReporteAntiguedadDeudas
 			$config_reporte[] = array(
 				'field' => 'comentario_seguimiento',
 				'title' => 'Comentario Seguimiento'
+			);
+			$config_reporte[] = array(
+				'field' => 'moneda',
+				'title' => __('Moneda'),
 			);
 		}
 
@@ -230,6 +234,11 @@ class ReporteAntiguedadDeudas
 				)
 			),
 			array(
+				'field' => 'moneda',
+				'title' => __('Moneda'),
+				'visible' => false
+			),
+			array(
 				'field' => 'fecha_atraso',
 				'title' => __('Fecha Emisión'),
 				'format' => 'date',
@@ -246,7 +255,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango1',
-				'title' => '0-30 ' . utf8_encode(__('días')),
+				'title' => '0-30 ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -256,7 +265,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango2',
-				'title' => '31-60 ' . utf8_encode(__('días')),
+				'title' => '31-60 ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -266,7 +275,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango3',
-				'title' => '61-90 ' . utf8_encode(__('días')),
+				'title' => '61-90 ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -276,7 +285,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango4',
-				'title' => '91+ ' . utf8_encode(__('días')),
+				'title' => '91+ ' . UtilesApp::utf8izar(__('días')),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -319,6 +328,13 @@ class ReporteAntiguedadDeudas
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+		}
+
+		if($this->opciones['opcion_usuario'] == 'xls'){
+			$config_reporte[] = array(
+				'field' => 'moneda',
+				'title' => __('Moneda'),
+			);
 		}
 
 		$SimpleReport->LoadConfigFromArray($config_reporte);
@@ -496,8 +512,15 @@ class ReporteAntiguedadDeudas
 			}
 			$total = -1 * $row["$campo_valor"];
 
+			if($this->opciones['opcion_usuario'] == 'xls'){
+				$id = $row['label'];
+			}
+			else{
+				$id = '{"'.$row['identificador'].'":"'.$row['label'].'"}';
+			}
+
 			$results[$row['codigo_cliente']][] = array(
-				'id' => '{"'.$row['identificador'].'":"'.$row['label'].'"}',
+				'id' => $id,
 				'moneda' => $row['moneda'],
 				'glosa_cliente' => $row['glosa_cliente'],
 				'monto' => $row['monto'],
@@ -617,7 +640,6 @@ class ReporteAntiguedadDeudas
 			$this->criteria
 						->add_select('u.username','encargado_comercial');	
 		}
-
 	}
 
 	/**
