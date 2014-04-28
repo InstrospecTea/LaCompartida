@@ -248,7 +248,7 @@ class NotaCobro extends Cobro {
 			}
 		}
 
-		if (!empty(Conf::GetConf($this->sesion, 'CSSSoloGastos'))) {
+		if (Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
 			if ($solo_gastos && Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
 				$css_cobro = 2;
 			}
