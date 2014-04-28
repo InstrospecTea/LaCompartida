@@ -60,7 +60,7 @@ class CronNotificacion extends Cron {
 												WHERE UP.codigo_permiso = 'PRO'
 													AND U.activo = 1
 													AND UV.id IS NOT NULL");
-		$where_usuarios_vacaciones = empty($usuarios_vacaciones) ? '' : " AND usuario.id_usuario NOT IN ({$usuarios_vacaciones[0]['ids']})";
+		$where_usuarios_vacaciones = empty($usuarios_vacaciones[0]['ids']) ? '' : " AND usuario.id_usuario NOT IN ({$usuarios_vacaciones[0]['ids']})";
 
 		if (date('D') == $DiaMailSemanal || ($forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
 			$this->log("  INICIO semanales ({$DiaMailSemanal})");
