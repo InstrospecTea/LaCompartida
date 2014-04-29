@@ -760,6 +760,8 @@ $_LANG['mes_emision'] = 'Emisión (mes)';
 $_LANG['mes'] = 'Month';
 $_LANG['estado'] = "Status";
 
+$_LANG['Dias Vencimiento'] = "Expiration days";
+
 // Meses
 $_LANG['Enero'] = 'January';
 $_LANG['Febrero'] = 'February';

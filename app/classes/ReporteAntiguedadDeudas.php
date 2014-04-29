@@ -470,7 +470,7 @@ class ReporteAntiguedadDeudas
 			$datos_cliente['identificadores'] = $result;
 			$output[] = $datos_cliente;
 		}
-		return $output;
+		return UtilesApp::utf8izar($output);
 	}
 
 	/**
@@ -522,7 +522,7 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']][] = array(
 				'id' => $id,
 				'moneda' => $row['moneda'],
-				'glosa_cliente' => $row['glosa_cliente'],
+				'glosa_cliente' => utf8_encode($row['glosa_cliente']),
 				'monto' => $row['monto'],
 				'monto_base' => $row['monto_base'],
 				'fmonto' => $row['fmonto'],
