@@ -37,11 +37,11 @@ class ReporteAntiguedadDeudas
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$agrupacion = UtilesApp::utf8izar($this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle()));
+		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
 		$reporte = $this->genera_reporte($agrupacion);
 		
 		if (!empty($this->opciones['mostrar_detalle'])) {
-			$agrupacion_detalle = UtilesApp::utf8izar($this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle()));
+			$agrupacion_detalle = $this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle());
 			$reporte_detalle = $this->genera_reporte_detalle($agrupacion_detalle);
 			$reporte->AddSubReport(array(
 				'SimpleReport' => $reporte_detalle,
@@ -92,7 +92,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango1',
-				'title' => '0-30 ' . UtilesApp::utf8izar(__('días')),
+				'title' => '0-30 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -102,7 +102,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango2',
-				'title' => '31-60 ' . UtilesApp::utf8izar(__('días')),
+				'title' => '31-60 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -112,7 +112,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango3',
-				'title' => '61-90 ' . UtilesApp::utf8izar(__('días')),
+				'title' => '61-90 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -122,7 +122,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango4',
-				'title' => '91+ ' . UtilesApp::utf8izar(__('días')),
+				'title' => '91+ ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -255,7 +255,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango1',
-				'title' => '0-30 ' . UtilesApp::utf8izar(__('días')),
+				'title' => '0-30 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -265,7 +265,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango2',
-				'title' => '31-60 ' . UtilesApp::utf8izar(__('días')),
+				'title' => '31-60 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -275,7 +275,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango3',
-				'title' => '61-90 ' . UtilesApp::utf8izar(__('días')),
+				'title' => '61-90 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -285,7 +285,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango4',
-				'title' => '91+ ' . UtilesApp::utf8izar(__('días')),
+				'title' => '91+ ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -470,7 +470,7 @@ class ReporteAntiguedadDeudas
 			$datos_cliente['identificadores'] = $result;
 			$output[] = $datos_cliente;
 		}
-		return UtilesApp::utf8izar($output);
+		return $output;
 	}
 
 	/**
