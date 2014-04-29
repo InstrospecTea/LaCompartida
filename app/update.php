@@ -10237,6 +10237,7 @@ QUERY;
 		case 7.65:
 			$queries = array();
 			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoAsuntoSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoClienteSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
 
 			ejecutar($queries, $dbh);
 			break;
