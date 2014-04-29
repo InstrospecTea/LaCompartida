@@ -37,6 +37,7 @@ class ReporteAntiguedadDeudas
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
 		$reporte = $this->genera_reporte($agrupacion);
 		
@@ -175,7 +176,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
 			$configuracion = array(
 				'field' => 'total_vencido',
 				'title' => __('Total Vencido'),
@@ -186,7 +187,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
 		}
 
 		//Si es que la opción no es excel.
@@ -239,8 +240,16 @@ class ReporteAntiguedadDeudas
 				'visible' => false
 			),
 			array(
-				'field' => 'fecha_atraso',
+				'field' => 'fecha_emision',
 				'title' => __('Fecha Emisión'),
+				'format' => 'date',
+				'extras' => array(
+					'attrs' => 'width="11%" style="text-align:right;"'
+				)
+			),
+			array(
+				'field' => 'fecha_vencimiento_pago',
+				'title' => __('Fecha Vencimiento'),
 				'format' => 'date',
 				'extras' => array(
 					'attrs' => 'width="11%" style="text-align:right;"'
@@ -316,7 +325,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
 			$configuracion = array(
 				'field' => 'total_vencido',
 				'title' => __('Total Vencido'),
@@ -327,7 +336,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
 		}
 
 		if($this->opciones['opcion_usuario'] == 'xls'){
@@ -388,6 +397,21 @@ class ReporteAntiguedadDeudas
 						'comentario_seguimiento' => $row['comentario_seguimiento'],
 						'identificadores' => array()					
 					);
+
+				
+
+				if (!empty($row['dias_atraso_pago'])){
+					$dias_atraso_pago = $row['dias_atraso_pago'];
+					$fecha_vencimiento_pago = $row['fecha_facturacion'];
+				} else{
+					if(!empty($row['dias_desde_facturacion'])){
+						$dias_atraso_pago = $row['dias_desde_facturacion'];
+					}
+					else{
+						$dias_atraso_pago = $row['dias_transcurridos'];
+					}
+				}
+
 				$results[$row['codigo_cliente']]['rango1'] = 0;
 				$results[$row['codigo_cliente']]['rango2'] = 0;
 				$results[$row['codigo_cliente']]['rango3'] = 0;
@@ -395,27 +419,31 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['total'] = 0;
 				$results[$row['codigo_cliente']]['total_normal'] = 0;
 				$results[$row['codigo_cliente']]['total_vencido'] = 0;
-				if($row['dias_atraso_pago'] <= 30){
-					$results[$row['codigo_cliente']]['total_normal'] = -1 * $row["$campo_valor"];
-					$results[$row['codigo_cliente']]['rango1'] = -1 * $row["$campo_valor"];
-				}
-				else{
+
+				if ($dias_atraso_pago >= 0){
 					$results[$row['codigo_cliente']]['total_vencido'] = -1 * $row["$campo_valor"];
 				}
-				if($row['dias_atraso_pago'] > 30 && $row['dias_atraso_pago'] <=60 ){
+				else{
+					$results[$row['codigo_cliente']]['total_normal'] = -1 * $row["$campo_valor"];
+				}
+
+				if ($dias_atraso_pago <= 30){
+					$results[$row['codigo_cliente']]['rango1'] = -1 * $row["$campo_valor"];
+				}
+				if ($dias_atraso_pago> 30 && $dias_atraso_pago <=60 ){
 					$results[$row['codigo_cliente']]['rango2'] = -1 * $row["$campo_valor"];
 				}
-				if($row['dias_atraso_pago'] > 60 && $row['dias_atraso_pago'] <=90){
+				if ($dias_atraso_pago > 60 && $dias_atraso_pago <=90){
 					$results[$row['codigo_cliente']]['rango3'] = -1 * $row["$campo_valor"];
 				}
-				if($row['dias_atraso_pago'] > 90 ){
+				if ($dias_atraso_pago > 90 ){
 					$results[$row['codigo_cliente']]['rango4'] = -1 * $row["$campo_valor"];
 				}
 				$results[$row['codigo_cliente']]['total'] = -1 * $row["$campo_valor"];
 
 				//Si es que se incluye el encargado comercial en las opciones.
-				if($this->opciones['encargado_comercial']){
-					if(!empty($row['encargado_comercial'])){
+				if ($this->opciones['encargado_comercial']){
+					if (!empty($row['encargado_comercial'])){
 						$results[$row['codigo_cliente']]['encargado_comercial'] = $row['encargado_comercial'];
 					}
 					else{
@@ -441,19 +469,36 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['gsaldo_base'] += $row['gsaldo_base'];
 				$results[$row['codigo_cliente']]['fgsaldo'] += $row['fgsaldo'];
 				$results[$row['codigo_cliente']]['fgsaldo_base'] += $row['fgsaldo_base'];
-				if($row['dias_atraso_pago'] <= 30){
-					$results[$row['codigo_cliente']]['total_normal'] += (-1 * $row["$campo_valor"]);
-					$results[$row['codigo_cliente']]['rango1'] += (-1 * $row["$campo_valor"]);
-				}else{
+
+				if (!empty($row['dias_atraso_pago'])){
+					$dias_atraso_pago = $row['dias_atraso_pago'];
+					$fecha_vencimiento_pago = $row['fecha_facturacion'];
+				} else{
+					if(!empty($row['dias_desde_facturacion'])){
+						$dias_atraso_pago = $row['dias_desde_facturacion'];
+					}
+					else{
+						$dias_atraso_pago = $row['dias_transcurridos'];
+					}
+				}
+
+				if ($dias_atraso_pago >= 0){
 					$results[$row['codigo_cliente']]['total_vencido'] += (-1 * $row["$campo_valor"]);
 				}
-				if($row['dias_atraso_pago'] > 30 && $row['dias_atraso_pago'] <=60 ){
+				else{
+					$results[$row['codigo_cliente']]['total_normal'] += (-1 * $row["$campo_valor"]);
+				}
+
+				if ($dias_atraso_pago <= 30){
+					$results[$row['codigo_cliente']]['rango1'] += (-1 * $row["$campo_valor"]);
+				}
+				if ($dias_atraso_pago > 30 && $dias_atraso_pago <=60 ){
 					$results[$row['codigo_cliente']]['rango2'] += (-1 * $row["$campo_valor"]);
 				}
-				if($row['dias_atraso_pago'] > 60 && $row['dias_atraso_pago'] <=90){
+				if ($dias_atraso_pago > 60 && $dias_atraso_pago <=90){
 					$results[$row['codigo_cliente']]['rango3'] += (-1 * $row["$campo_valor"]);
 				}
-				if($row['dias_atraso_pago'] > 90 ){
+				if ($dias_atraso_pago > 90 ){
 					$results[$row['codigo_cliente']]['rango4'] += (-1 * $row["$campo_valor"]);
 				}
 				$results[$row['codigo_cliente']]['total'] += (-1 * $row["$campo_valor"]);
@@ -490,16 +535,35 @@ class ReporteAntiguedadDeudas
 			$rango3 = 0;
 			$rango4 = 0;
 			$total = 0;
-			$dias_atraso_pago = $row['dias_atraso_pago'];
 			$normal = 0;
 			$vencido = 0;
 
-			if($dias_atraso_pago <= 30){
-				$rango1 = -1 * $row["$campo_valor"];
-				$normal = -1 * $row["$campo_valor"];
+
+
+			if(!empty($row['dias_atraso_pago'])){
+				$dias_atraso_pago = $row['dias_atraso_pago'];
+				$fecha_vencimiento = $row['fecha_vencimiento_pago'];
+			}else{
+				if (!empty($row['dias_desde_facturacion'])) {
+					$dias_atraso_pago = $row['dias_desde_facturacion'];
+					$fecha_vencimiento = $row['fecha_facturacion'];
+				}
+				else{
+					$dias_atraso_pago = $row['dias_transcurridos'];
+					$fecha_vencimiento = $row['fecha_emision'];
+				}
+			}
+
+			if($dias_atraso_pago >= 0){
+				$vencido = -1 * $row["$campo_valor"];
 			}
 			else{
-				$vencido = -1 * $row["$campo_valor"];
+				$normal = -1 * $row["$campo_valor"];
+			}
+
+			if($dias_atraso_pago <= 30){
+				$rango1 = -1 * $row["$campo_valor"];
+				
 			}
 			if($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
 				$rango2 = -1 * $row["$campo_valor"];
@@ -518,6 +582,8 @@ class ReporteAntiguedadDeudas
 			else{
 				$id = '{"'.$row['identificador'].'":"'.$row['label'].'"}';
 			}
+
+			
 
 			$results[$row['codigo_cliente']][] = array(
 				'id' => $id,
@@ -538,7 +604,7 @@ class ReporteAntiguedadDeudas
 				'gsaldo_base' => $row['gsaldo_base'],
 				'fgsaldo' => $row['fgsaldo'],
 				'fgsaldo_base' => $row['fgsaldo_base'],
-				'fecha_atraso' => $row['fecha_emision'],
+				'fecha_emision' => $row['fecha_emision'],
 				'rango1' => $rango1,
 				'rango2' => $rango2,
 				'rango3' => $rango3,
@@ -546,7 +612,8 @@ class ReporteAntiguedadDeudas
 				'total' => $total,
 				'total_normal' => $normal,
 				'total_vencido' => $vencido,
-				'dias_atraso_pago' => $row['dias_atraso_pago']		
+				'dias_atraso_pago' => $dias_atraso_pago,
+				'fecha_vencimiento_pago' => $fecha_vencimiento	
 			);
 
 		}
@@ -614,10 +681,16 @@ class ReporteAntiguedadDeudas
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))', 'fgsaldo')
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','fgsaldo_base')
 			->add_select("$fecha_atraso", 'fecha_emision')
-			->add_select('DATEDIFF(NOW(),'."$fecha_atraso".')','dias_atraso_pago')
+			->add_select('cobro.fecha_facturacion')
+			->add_select('factura.fecha_vencimiento_pago')
+			->add_select('NOW()','hoy')
+			->add_select('IF(DATEDIFF(NOW(), factura.fecha_vencimiento_pago) <= 0, 0, DATEDIFF(NOW(), factura.fecha_vencimiento_pago))', 'dias_atraso_pago')
+			->add_select('DATEDIFF(NOW(),'."$fecha_atraso".')','dias_transcurridos')
 			->add_select('moneda_documento.simbolo','moneda')
 			->add_select('seguimiento.cantidad','cantidad_seguimiento')
 			->add_select('seguimiento.comentario','comentario_seguimiento')
+			->add_select('IF(DATEDIFF(NOW(),cobro.fecha_facturacion) <= 0, 0 , DATEDIFF(NOW(), cobro.fecha_facturacion))', 'dias_desde_facturacion')
+			->add_select('cobro.estado')
 			->add_from('cobro')
 			->add_left_join_with('documento d','cobro.id_cobro = d.id_cobro')
 			->add_left_join_with('prm_moneda moneda_documento','d.id_moneda = moneda_documento.id_moneda')
@@ -654,7 +727,8 @@ class ReporteAntiguedadDeudas
 			$campo_hvalor = "fhsaldo";
 			$tipo = " pdl.glosa";
 			$fecha_atraso = "factura.fecha";
-			$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+			$label_decorator = 'N°';
+			$label = " concat(pdl.codigo,' $label_decorator ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
 			$this->opciones['identificadores'] = 'facturas';
 			$this->opciones['identificador_detalle'] = 'factura';
 			$identificador = " d.id_cobro";
