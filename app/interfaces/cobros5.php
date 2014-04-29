@@ -44,22 +44,18 @@ if ($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVI
 }
 
 if ($opc == 'anular_emision') {
-	
+
 	if ($estado == 'EN REVISION') {
 		$cobro->AnularEmision('EN REVISION');
 	} else {
 		$cobro->AnularEmision();
 	}
-	
+
 	#Se ingresa la anotación en el historial
 	$estado_anterior = $cobro->fields['estado'];
 	$nuevo_estado = $estado;
 
-	if ($estado_anterior != $nuevo_estado) {
-
-	}
-
-} else if ($opc == 'guardar_cobro' || $opc == 'guardar_cobro_pdf') { 
+} else if ($opc == 'guardar_cobro' || $opc == 'guardar_cobro_pdf') {
 
 	//	Guardamos todos los datos del cobro
 	// 	Si se ajustar el valor del cobro por monto,
@@ -77,12 +73,12 @@ if ($opc == 'anular_emision') {
 
 	/* tarifa escalonada */
 	if (isset($_POST['esc_tiempo'])) {
-		
+
 		for ($i = 1; $i <= sizeof($_POST['esc_tiempo']); $i++) {
-		
+
 			if ($_POST['esc_tiempo'][$i - 1] != '') {
 				$cobro->Edit('esc' . $i . '_tiempo', $_POST['esc_tiempo'][$i - 1]);
-		
+
 				if ($_POST['esc_selector'][$i - 1] != 1) {
 					//caso monto
 					$cobro->Edit('esc' . $i . '_id_tarifa', "NULL");
@@ -97,7 +93,7 @@ if ($opc == 'anular_emision') {
 				$cobro->Edit('esc' . $i . '_descuento', $_POST['esc_descuento'][$i - 1]);
 
 			} else {
-				
+
 				$cobro->Edit('esc' . $i . '_tiempo', "NULL");
 				$cobro->Edit('esc' . $i . '_id_tarifa', "NULL");
 				$cobro->Edit('esc' . $i . '_monto', "NULL");
@@ -115,7 +111,7 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit('id_moneda_monto', $id_moneda_monto);
 	$cobro->Edit('monto_contrato', $cobro_monto_contrato);
 	$cobro->Edit('retainer_horas', $cobro_retainer_horas);
-	
+
 	if (is_array($usuarios_retainer)) {
 		$cobro_retainer_usuarios = implode(',', $usuarios_retainer);
 	} else {
@@ -149,7 +145,7 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
-	
+
 	#################### OPCIONES Vial Olivares #######################
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
@@ -157,14 +153,14 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit('id_carta', $id_carta);
 	$cobro->Edit('id_formato', $id_formato);
 	$cobro->Edit('codigo_idioma', $lang);
-	
+
 	if (trim($se_esta_cobrando) != '') {
 		$cobro->Edit('se_esta_cobrando', $se_esta_cobrando);
 	}
 
 	$cobro->Edit("opc_ver_columna_cobrable", $opc_ver_columna_cobrable);
 	$cobro->Write(); //Se guarda porque despues se necesita para recalcular los datos del cobro
-	
+
 	################### DESCUENTOS #####################
 	if ($tipo_descuento == 'PORCENTAJE') {
 		$total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
@@ -183,12 +179,12 @@ if ($opc == 'anular_emision') {
 
 	##################### EMISION ######################
 
-	if ($accion == 'emitir' && $ret == '') {	 
+	if ($accion == 'emitir' && $ret == '') {
 		/* Guardo el cobro generando los movimientos de cuenta corriente */
 		$query_pagos = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '{$cobro->fields['id_cobro']}'";
 		$resp_pagos = mysql_query($query_pagos, $sesion->dbh) or Utiles::errorSQL($query_pagos, __FILE__, __LINE__, $sesion->dbh);
 		list($cantidad_pagos) = mysql_fetch_array($resp_pagos);
-		
+
 		if ($cantidad_pagos > 0) {
 			$cobro->ReiniciarDocumento();
 		} else {
@@ -237,7 +233,7 @@ if ($opc == 'anular_emision') {
 		}
 
 	#################### IMPRESION #####################
-	} else if ($accion == 'imprimir' && $ret == '') {  
+	} else if ($accion == 'imprimir' && $ret == '') {
 		include dirname(__FILE__) . '/cobro_doc.php';
 		exit;
 	} else if ($accion == 'descargar_excel_especial') {
@@ -250,9 +246,9 @@ if ($opc == 'anular_emision') {
 	} else if ($accion == 'descargar_excel') {
 		require_once Conf::ServerDir() . '/../app/interfaces/cobros_xls.php';
 		exit;
-	
+
 	################## ANTERIOR PASO ###################
-	} else if ($accion == 'anterior') {		 
+	} else if ($accion == 'anterior') {
 		if (!empty($cobro->fields['incluye_gastos'])) {
 			$pagina->Redirect("cobros4.php?id_cobro=" . $id_cobro . "&popup=1&contitulo=true");
 		} else {
@@ -431,7 +427,7 @@ echo $refrescar;
 			document.getElementById('cobro_monto_honorarios').focus();
 
 		} else if( accion == 'cancelar' ) {
-			
+
 			document.getElementById('cobro_monto_honorarios').value = document.getElementById('monto_original').value;
 			document.getElementById('cobro_monto_honorarios').readOnly = true;
 			document.getElementById('ajustar_monto_hide').value = false;
@@ -448,7 +444,7 @@ echo $refrescar;
 		var monto = document.getElementById( id_campo ).value.replace('\,','.');
 		var arr_monto = monto.split('\.');
 		var monto = arr_monto[0];
-		
+
 		for($i=1;$i<arr_monto.length-1;$i++) {
 			monto += arr_monto[$i];
 		}
@@ -542,18 +538,18 @@ echo $refrescar;
 		jQuery('#btn_emitir_cobro').attr("disabled","disabled");
 		var http = getXMLHTTP();
 		http.open('get', 'ajax.php?accion=num_abogados_sin_tarifa&id_cobro='+document.getElementById('id_cobro').value);
-		
+
 		http.onreadystatechange = function()
 		{
 			if(http.readyState == 4)
 			{
 				var response = http.responseText;
 				response = response.split('//');
-				
+
 				<?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) { ?>
 
 					var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-					
+
 					if( response[0] != 0 ) {
 						if( response[0] < 2 ) {
 							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("El siguiente trabajo ") ?></span><br /><br />';
@@ -577,7 +573,7 @@ echo $refrescar;
 					text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?" ?></span><br>';
 					text_window += '<br><table><tr>';
 					text_window += '</table>';
-					
+
 				<?php } else { ?>
 
 					var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
@@ -603,7 +599,7 @@ echo $refrescar;
 					text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?" ?></span><br>';
 					text_window += '<br><table><tr>';
 					text_window += '</table>';
-				
+
 				<?php } ?>
 
 				Dialog.confirm(text_window,
@@ -968,13 +964,13 @@ echo $refrescar;
 
 	/*Array tipo de cambios de prm_moneda JS*/
 	var tipo_cambio = new Array(false);
-	
+
 	<?php
 	$monedas = new ListaMonedas($sesion, '', 'SELECT * FROM prm_moneda');
 	for ($i = 0; $i < $monedas->num; $i++) {
 	$moneda = $monedas->Get($i);
 	?>
-		
+
 	tipo_cambio[<?php echo $moneda->fields['id_moneda'] ?>]= <?php echo $moneda->fields['tipo_cambio'] ?>;
 	<?php } ?>
 
@@ -1155,7 +1151,7 @@ else
 		$pago_gastos = (float) ($cobro->fields['subtotal_gastos']) ? 1 : 0;
 		$cobro_moneda = new ListaMonedas($sesion, '', 'SELECT * FROM cobro_moneda WHERE id_cobro = ' . $id_cobro);
 		$tipo_cambio_cobro = Array();
-		
+
 		for ($i = 0; $i < $monedas->num; $i++) {
 			$cambio_moneda = $cobro_moneda->Get($i);
 			if (empty($cambio_moneda->fields['tipo_cambio'])) {
@@ -1167,7 +1163,7 @@ else
 		}
 
 		echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos, $cobro->fields['opc_moneda_total'], $tipo_cambio_cobro);
-		
+
 		?>" id="saldo_adelantos" />
 	<input type="hidden" name="usar_adelantos" value="" id="usar_adelantos" />
 
@@ -1198,7 +1194,7 @@ else
 	</table>
 
 	<?php if (!empty($cobro->fields['incluye_honorarios'])) { ?>
-	
+
 		<fieldset id="periodo" style="width: 95%">
 			<legend><?php echo __('Periodo') ?></legend>
 			<table width="100%" cellspacing="3" cellpadding="3">
@@ -1236,14 +1232,14 @@ else
 								</table>
 							</td>
 						</tr>
-						
+
 						<tr>
 
 						<?php
 						/* Lista de moneda del cobro */
 						$cobro_moneda = new ListaMonedas($sesion, '', 'SELECT * FROM cobro_moneda WHERE id_cobro = ' . $id_cobro);
 						$tipo_cambio_cobro = Array();
-						
+
 						for ($i = 0; $i < $monedas->num; $i++) {
 							$cambio_moneda = $cobro_moneda->Get($i);
 							$tipo_cambio_cobro[$cambio_moneda->fields['id_moneda']] = $cambio_moneda->fields['tipo_cambio'];
@@ -1256,11 +1252,11 @@ else
 									<input type="radio" id="cobro_id_moneda<?php echo $i ?>" name="cobro_id_moneda"  value="<?php echo $moneda->fields['id_moneda'] ?>" <?php echo $moneda->fields['id_moneda'] == $cobro->fields['id_moneda'] ? 'checked' : '' ?> onclick="ActualizarTipoCambio(this.form, '<?php echo $moneda->fields['tipo_cambio'] ?>');" ><label for="cobro_id_moneda<?php echo $i ?>"><?php echo $moneda->fields['glosa_moneda'] ?></label>
 								</td>
 						<?php } ?>
-						
+
 						</tr>
-						
+
 						<input type="hidden" name="monedas_num" value=<?php echo $monedas->num > 0 ? $monedas->num : 0 ?> id="monedas_num">
-						
+
 						<tr>
 
 						<?php for ($i = 0; $i < $monedas->num; $i++) {
@@ -1320,7 +1316,7 @@ else
 					<?php } ?>
 					<input <?php echo TTip($tip_proporcional) ?> onclick="ShowMonto(true, false);DisplayEscalas(false);" id="fc6" type=radio name="cobro_forma_cobro" value="PROPORCIONAL" <?php echo $cobro_forma_cobro == "PROPORCIONAL" ? "checked" : "" ?> />
 					<label for="fc6">Proporcional</label> &nbsp; &nbsp;
-					
+
 					<?php if (!Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) { ?>
 						<input <?php echo TTip($tip_escalonada) ?> id="fc7" type=radio name="cobro_forma_cobro" onclick="HideMonto();DisplayEscalas(true);" value="ESCALONADA" <?php echo $cobro_forma_cobro == "ESCALONADA" ? "checked" : "" ?> />
 						<label for="fc7">Escalonada</label>
@@ -1350,7 +1346,7 @@ else
 						<table>
 							<tr>
 								<td align=left style="vertical-align: top;">
-									<?php echo __('Horas') ?>			
+									<?php echo __('Horas') ?>
 								</td>
 								<td align=left style="vertical-align: top;">
 									<input name="cobro_retainer_horas" size="7" value="<?php echo $cobro->fields['retainer_horas'] ?>" />
@@ -1383,9 +1379,9 @@ else
 					?>
 
 					<div id="div_escalonada" align="left" style="display:<?php echo ($cobro_forma_cobro == "ESCALONADA") ? "block" : "none" ?>; background-color:#F8FBBD; padding-left:20px">
-						
+
 						<div class="template_escalon" id="escalon_1">
-						
+
 							<table style='padding: 5px; border: 0px solid' bgcolor='#F8FBBD'>
 								<tr>
 									<td valign="bottom">
@@ -1393,9 +1389,9 @@ else
 
 											<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="4" value="<?php if (!empty($cobro->fields['esc1_tiempo'])) echo $cobro->fields['esc1_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
 											<span><?php echo __('horas trabajadas'); ?> (</span>
-											<div id="esc_rango_1" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango1; ?></div> 
+											<div id="esc_rango_1" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango1; ?></div>
 											<span>) <?php echo __('aplicar'); ?></span>
-								
+
 											<select name="esc_selector[]" id="esc_selector_1" onchange="cambia_tipo_forma(this.value, this.id);">
 												<option value="1" <?php echo!isset($cobro->fields['esc1_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 												<option value="2" <?php echo $cobro->fields['esc1_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
@@ -1428,7 +1424,7 @@ else
 						</div>
 
 						<div class="template_escalon" id="escalon_2" style="display: <?php echo isset($cobro->fields['esc2_tiempo']) && $cobro->fields['esc2_tiempo'] > 0 ? 'block' : 'none'; ?>;">
-							
+
 							<table style='padding: 5px; border: 0px solid' bgcolor='#F8FBBD'>
 								<tr>
 									<td valign="bottom">
@@ -1436,12 +1432,12 @@ else
 										<div style="display:inline-block; width: 65px;"><?php echo __('Las siguientes'); ?> </div>
 										<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="4" value="<?php if (!empty($cobro->fields['esc2_tiempo'])) echo $cobro->fields['esc2_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
 										<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango2; ?></div> <span>) <?php echo __('aplicar'); ?></span>
-										
+
 										<select name="esc_selector[]" id="esc_selector_2" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc2_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 											<option value="2" <?php echo $cobro->fields['esc2_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 										</select>
-										
+
 										<span>
 											<span id="tipo_forma_2_1" <?php echo!isset($cobro->fields['esc2_monto']) || $cobro->fields['esc2_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 												<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_2", $cobro->fields['esc2_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
@@ -1450,7 +1446,7 @@ else
 												<input type="text" size="8" style="font-size:9pt; width:116px;" id="esc_monto_2" name="esc_monto[]" value="<?php echo ($cobro->fields['esc2_monto'] > 0) ? $cobro->fields['esc2_monto'] : '0'; ?>" />
 											</span>
 										</span>
-										
+
 										<span><?php echo __('en'); ?></span>
 										<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_2', $cobro->fields['esc2_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
 										<span><?php echo __('con'); ?> </span>
@@ -1468,19 +1464,19 @@ else
 						</div>
 
 						<div class="template_escalon" id="escalon_3" style="display: <?php echo isset($cobro->fields['esc3_tiempo']) && $cobro->fields['esc3_tiempo'] > 0 ? 'block' : 'none'; ?>;">
-							
+
 							<table style='padding: 5px; border: 0px solid' bgcolor='#F8FBBD'>
 								<tr>
 									<td valign="bottom">
 										<div style="display:inline-block; width: 65px;"><?php echo __('Las siguientes'); ?> </div>
 										<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="4" value="<?php if (!empty($cobro->fields['esc3_tiempo'])) echo $cobro->fields['esc3_tiempo']; else echo '0'; ?>" onkeyup="ActualizaRango(this.id , this.value);" />
 										<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango3; ?></div> <span>) <?php echo __('aplicar'); ?></span>
-										
+
 										<select name="esc_selector[]" id="esc_selector_3" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc3_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 											<option value="2" <?php echo $cobro->fields['esc3_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 										</select>
-										
+
 										<span>
 											<span id="tipo_forma_3_1" <?php echo!isset($cobro->fields['esc3_monto']) || $cobro->fields['esc3_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 												<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_3", $cobro->fields['esc3_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
@@ -1489,7 +1485,7 @@ else
 												<input type="text" size="8" style="font-size:9pt; width:116px;" id="esc_monto_3" name="esc_monto[]" value="<?php echo ($cobro->fields['esc3_monto'] > 0) ? $cobro->fields['esc3_monto'] : '0'; ?>" />
 											</span>
 										</span>
-										
+
 										<span><?php echo __('en'); ?></span>
 										<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_3', $cobro->fields['esc3_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?>
 										<span><?php echo __('con'); ?> </span>
@@ -1507,12 +1503,12 @@ else
 										<div style="display:inline-block; width: 170px;"><?php echo __('Para el resto de horas trabajadas'); ?> </div>
 										<?php echo __('aplicar'); ?>
 										<input type="hidden" name="esc_tiempo[]" id="esc_tiempo_4" value="-1" size="4" onkeyup="ActualizaRango(this.id , this.value);" />
-										
+
 										<select name="esc_selector[]" id="esc_selector_4" onchange="cambia_tipo_forma(this.value, this.id);">
 											<option value="1" <?php echo!isset($cobro->fields['esc4_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 											<option value="2" <?php echo $cobro->fields['esc4_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 										</select>
-										
+
 										<span>
 											<span id="tipo_forma_4_1" <?php echo!isset($cobro->fields['esc4_monto']) || $cobro->fields['esc4_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 												<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_4", $cobro->fields['esc4_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
@@ -1574,7 +1570,7 @@ else
 	<table width="100%" cellspacing="3" cellpadding="3">
 		<tr>
 			<td align="left">
-				
+
 				<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
 					<tr>
 						<td colspan="2" bgcolor="#dfdfdf">
@@ -1621,7 +1617,7 @@ else
 							<?php echo __('Descuento') ?> (<span id="divCobroUnidadDescuento" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):
 						</td>
 						<td align="left" nowrap>
-						
+
 							<?php if ($cobro->fields['tipo_descuento'] == '') {
 								$chk = 'VALOR';
 							} else {
@@ -1748,7 +1744,7 @@ else
 				</table>
 
 				<br>
-				
+
 				<table cellspacing="0" cellpadding="3" style='border:1px dotted #bfbfcf'>
 					<tr>
 						<td bgcolor="#dfdfdf">
@@ -1809,7 +1805,7 @@ else
 										<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?php echo $cobro->fields['opc_ver_modalidad'] == '1' ? 'checked' : '' ?>></td>
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_modalidad"><?php echo __('Mostrar modalidad del cobro') ?></label></td>
 									</tr>
-										
+
 									<?php if ($cobro->fields['opc_ver_profesional']) {
 										$display_detalle_profesional = "style='display: table-row;'";
 									} else {
@@ -1821,14 +1817,14 @@ else
 									} else {
 										$display_detalle_por_hora = "style='display: none;'";
 									} ?>
-									
+
 									<tr>
 										<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?php echo $cobro->fields['opc_ver_profesional'] == '1' ? 'checked' : '' ?> onchange="showOpcionDetalle( this.id, 'tr_detalle_profesional');"></td>
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_profesional"><?php echo __('Mostrar detalle por profesional') ?></label></td>
 									</tr>
 
 									<tr id="tr_detalle_profesional" <?php echo $display_detalle_profesional ?> >
-									
+
 										<td align="left" colspan="2" style="font-size: 10px;">
 											<table width="100%">
 												<tr>
@@ -1893,7 +1889,7 @@ else
                                         <td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
                                     </tr>
-									
+
 									<?php if (Conf::GetConf($sesion, 'PrmGastos')) { ?>
 										<tr>
 											<td align="right"><input type="checkbox" name="opc_ver_concepto_gastos" id="opc_ver_concepto_gastos" value="1" <?php echo $cobro->fields['opc_ver_concepto_gastos'] == '1' ? 'checked' : '' ?>></td>
@@ -1921,7 +1917,7 @@ else
                                         <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
                                     </tr>
-									
+
 									<?php
 									$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
 
@@ -1978,10 +1974,10 @@ else
 											<?php echo __('Formato de carta')?>:
 										</td>
 									</tr>
-									
+
 									<tr>
 										<td align="left" colspan="3">
-										<?php 
+										<?php
 										$query_formato_carta = "SELECT carta.id_carta, carta.descripcion FROM carta ORDER BY id_carta";
 										echo  Html::SelectQuery($sesion, $query_formato_carta, "id_carta", $cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta']=='1'?'':'disabled') . ' class="wide"','',200); ?>
 										</td>
@@ -2025,7 +2021,7 @@ else
 							</div>
 						</td>
 			    	</tr>
-					
+
 					<tr>
 						<td align="center" colspan="2">
 							<table width="180">
@@ -2102,7 +2098,7 @@ else
 <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro?>" width=600px height=450px style="border: none;" frameborder=0></iframe>
 
 <script language="javascript" type="text/javascript">
-	
+
 	window.onunload = ActualizarPadre;
 	var form = document.getElementById('form_cobro5');
 
@@ -2143,7 +2139,7 @@ else
 			}
 		}
 	?>
-	
+
 	jQuery("#cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda'] ?>").blur(function(){
 		var str = jQuery(this).val();
 	   	jQuery(this).val( str.replace(',','.') );
