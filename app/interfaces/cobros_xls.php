@@ -1358,8 +1358,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
 									WHERE $where_tramites
 										AND tramite.id_cobro='" . $cobro->fields['id_cobro'] . "'
-										AND tramite.trabajo_si_no = 1";
-
+										AND tramite.trabajo_si_no = 1
+										AND tramite.fecha BETWEEN '".$cobro->fields['fecha_ini']."' AND '".$cobro->fields['fecha_fin']."'";
 
 				$query_tramites_no_trabajos = "SELECT
 											tramite.id_tramite,
@@ -1394,6 +1394,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										WHERE $where_tramites
 											AND tramite.id_cobro='" . $cobro->fields['id_cobro'] . "'
 											AND tramite.trabajo_si_no = 0
+											AND tramite.fecha BETWEEN '".$cobro->fields['fecha_ini']."' AND '".$cobro->fields['fecha_fin']."'
 										GROUP BY tramite_tipo.glosa_tramite, tramite.descripcion, tramite.codigo_asunto, prm_moneda.simbolo";
 
 				$query_tramites = "SELECT SQL_CALC_FOUND_ROWS * FROM (" . $query_tramites_si_trabajos . "  UNION ALL " . $query_tramites_no_trabajos . "  ) a ORDER BY fecha ASC";
