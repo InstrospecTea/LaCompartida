@@ -2083,6 +2083,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%factura_giro%', $contrato->fields['factura_giro'], $html2);
+				$html2 = str_replace('%factura_razon_social%', $contrato->fields['factura_razon_social'], $html2);
 
 				$direccion=explode('//',$contrato->fields['direccion_contacto']);
 
