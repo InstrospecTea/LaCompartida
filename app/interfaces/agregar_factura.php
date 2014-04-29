@@ -147,6 +147,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
+		
 
 		if (UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
 			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
@@ -158,6 +159,7 @@ if ($opcion == "guardar") {
 
 		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
 			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
+			$factura->Edit('fecha_vencimiento_pago', $fecha_vencimiento_pago_input ? Utiles::fecha2sql($fecha_vencimiento_pago_input) : "");
 		}
 
 		if (UtilesApp::existecampo('dte_metodo_pago_cta', 'factura', $sesion)) {
@@ -720,6 +722,10 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					?>
 				</select>
 			</td>
+		</tr>
+		<tr class="fecha_vencimiento_pago" style="visibility: visible;">
+			<td align="right" ><?php echo __('Fecha Pago')?></td>
+			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento_pago'] ? Utiles::sql2date($factura->fields['fecha_vencimiento_pago']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
 		<?php
@@ -1669,6 +1675,27 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		return true;
 	}
 
+	function obtiene_fecha_vencimiento(dias, myDate){
+		var offset = (dias * 24 * 60 * 60 * 1000);
+
+		myDate.setTime(myDate.getTime() + offset);
+
+		//Transformar objeto date a fecha
+		var dia = myDate.getDate();
+		var mes = myDate.getMonth() + 1;
+		if(mes < 10){
+			mes = '0' + mes;
+		}
+		if(dia < 10){
+			dia = '0' + dia;
+		}
+		var anio = myDate.getFullYear();
+
+		var fecha_vencimiento_pago = dia + "-" + mes + "-" + anio;
+
+		return fecha_vencimiento_pago;
+	}
+
 	<?php
 	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		echo "desgloseMontosFactura(document.form_facturas);\n";
@@ -1687,6 +1714,39 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
 			CargarDatosCliente(1);
+		});
+
+		//Manejo de select de condicion de pago.
+		jQuery('#condicion_pago').change(function(){
+			var codigo = jQuery(this).val();
+			if(codigo == 1 || codigo == 21){
+
+				jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
+
+				var dias = 1;
+				var myDate = new Date();
+				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
+				
+				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
+
+			}
+			else{
+
+				jQuery('.fecha_vencimiento_pago').css('visibility', 'hidden');
+
+				var texto = jQuery(this).find(":selected").text();
+				var splitted_text = texto.split(' ');
+				var dias = splitted_text[2];
+				dias++;
+				var fecha_definida = jQuery('#fecha').val();
+				var fecha_definida_split = fecha_definida.split('-');
+				var myDate = new Date(fecha_definida_split[2], fecha_definida_split[1] - 1, fecha_definida_split[0]);
+				
+				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
+				
+				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
+
+			}
 		});
 
 		if (cantidad_decimales != -1) {
