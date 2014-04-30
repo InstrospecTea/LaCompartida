@@ -820,8 +820,8 @@ if (!class_exists('Cobro')) {
 
 			$query = "SELECT SUM(tarifa_tramite)
 						FROM tramite
-							WHERE tramite.id_cobro='" . $cobro->fields['id_cobro'] . "'
-							AND tramite.fecha BETWEEN '" . $cobro->fields['fecha_ini'] . "' AND '" . $cobro->fields['fecha_fin'] . "'
+							WHERE tramite.id_cobro='" . $this->fields['id_cobro'] . "'
+							AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
 							AND tramite.cobrable=1 ";
 
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1121,6 +1121,7 @@ if (!class_exists('Cobro')) {
                                FROM tramite
                                JOIN tramite_tipo USING( id_tramite_tipo )
                                WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+                               AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
                                ORDER BY tramite.fecha ASC";
 			if (!$mantener_porcentaje_impuesto) {
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
