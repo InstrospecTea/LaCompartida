@@ -1054,11 +1054,20 @@ if (!class_exists('Cobro')) {
 			return array($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos);
 		}
 
+		function ActualizaCobroTramite() {
+			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '".$this->fields['id_cobro']."' AND fecha NOT BETWEEN '".$this->fields['fecha_ini']."' AND '".$this->fields['fecha_fin']."'";
+			echo '<hr>';
+			echo $query;
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		}
+
 		// La variable $mantener_porcentaje_impuesto es importante en la migracion de datos donde no importa el datos
 		// actual guardado en la configuracion sino el dato traspasado
 		function GuardarCobro($emitir = false, $mantener_porcentaje_impuesto = false) {
-			if ($this->fields['estado'] != 'CREADO' AND $this->fields['estado'] != 'EN REVISION' AND $this->fields['estado'] != '')
+
+			if ($this->fields['estado'] != 'CREADO' AND $this->fields['estado'] != 'EN REVISION' AND $this->fields['estado'] != '') {
 				return "No se puede guardar " . __('el cobro') . " ya que ya se encuentra emitido. Usted debe volver " . __('el cobro') . " a estado creado o en revisión para poder actualizarlo";
+			}
 			// Carga de asuntos del cobro
 			$this->LoadAsuntos();
 
@@ -1098,17 +1107,19 @@ if (!class_exists('Cobro')) {
 			}
 
 			if (!$mantener_porcentaje_impuesto) {
-				if (( ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado']) {
+
+				if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado']) {
 					$this->Edit('porcentaje_impuesto', (method_exists('Conf', 'GetConf') ? Conf::GetConf($this->sesion, 'ValorImpuesto') : Conf::ValorImpuesto()));
 				} else {
 					$this->Edit('porcentaje_impuesto', '0');
 				}
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoPorGastos') ) || ( method_exists('Conf', 'UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) && $contrato->fields['usa_impuesto_gastos']) {
+				if (Conf::GetConf($this->sesion, 'UsarImpuestoPorGastos') && $contrato->fields['usa_impuesto_gastos']) {
 					$this->Edit('porcentaje_impuesto_gastos', (method_exists('Conf', 'GetConf') ? Conf::GetConf($this->sesion, 'ValorImpuestoGastos') : Conf::ValorImpuestoGastos()));
 				} else {
 					$this->Edit('porcentaje_impuesto_gastos', '0');
 				}
 			}
+
 			$query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
                                    tramite.tarifa_tramite,
                                    tramite.id_moneda_tramite,
@@ -1123,6 +1134,7 @@ if (!class_exists('Cobro')) {
                                WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
                                AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
                                ORDER BY tramite.fecha ASC";
+
 			if (!$mantener_porcentaje_impuesto) {
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
 			}
@@ -1132,17 +1144,18 @@ if (!class_exists('Cobro')) {
 
 				if ($tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'] == '') {
 					$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'] = Funciones::TramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $tramite->fields['codigo_asunto']);
-
 					$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto'] = Funciones::TramiteTarifaDefecto($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda']);
-
 					$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar'] = Funciones::MejorTramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $this->fields['id_cobro']);
 				}
+
 				$tramite->Edit('id_moneda_tramite', $this->fields['id_moneda']);
+
 				if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 					$valor_tramite = number_format($tramite->fields['tarifa_tramite_individual'] * ( $cobro_moneda->moneda[$tramite->fields['id_moneda_tramite_individual']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				} else {
 					$valor_tramite = $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'];
 				}
+
 				$tramite->Edit('tarifa_tramite', $valor_tramite);
 				$tramite->Edit('tarifa_tramite_defecto', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto']);
 				$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
@@ -1151,6 +1164,8 @@ if (!class_exists('Cobro')) {
 					return 'Error, trámite #' . $tramite->fields['id_tramite'] . ' no se pudo guardar';
 				}
 			}
+
+			$this->ActualizaCobroTramite();
 
 			/*
 			 * En el caso de que en un cobro Retainer se definen los usuarios de los cuales
