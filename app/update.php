@@ -10249,11 +10249,7 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
-
 		}
-
-
-
 }
 
 
@@ -10262,7 +10258,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.67;
+$max_update = 7.66;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
