@@ -257,7 +257,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'dias_atraso_pago',
-				'title' => 'Días Atraso',
+				'title' => __('Días Atraso'),
 				'extras' => array(
 					'attrs' => 'width="11%" style="text-align:right;"'
 				)

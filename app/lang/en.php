@@ -439,7 +439,7 @@ $_LANG['Observaciones'] = "Observaciones";
 $_LANG['Debe ingresar observación'] = "Debe ingresar observación";
 $_LANG['Tienes que ingresar el tipo de moneda.'] = "Tienes que ingresar el tipo de moneda.";
 $_LANG['Tipo de cambio'] = "Tipo de cambio";
-
+$_LANG['Días Atraso'] = "Overdue Days";
 
 #Actividad
 $_LANG['Actividad'] = "Actividad";
