@@ -173,7 +173,8 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"',
+					'class' => 'total_normal'
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
@@ -184,7 +185,8 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"',
+					'class' => 'total_vencido'
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
@@ -322,7 +324,8 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"',
+					'class' => 'total_normal'
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
@@ -333,7 +336,8 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"',
+					'class' => 'total_vencido'
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
