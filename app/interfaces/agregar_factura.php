@@ -724,7 +724,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			</td>
 		</tr>
 		<tr class="fecha_vencimiento_pago" style="visibility: visible;">
-			<td align="right" ><?php echo __('Fecha Pago')?></td>
+			<td align="right" ><?php echo __('Fecha Vencimiento')?></td>
 			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
@@ -1716,24 +1716,27 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			CargarDatosCliente(1);
 		});
 
+		jQuery('#fecha').change(function(){
+			jQuery('#condicion_pago').trigger('change');
+		});
+
 		//Manejo de select de condicion de pago.
 		jQuery('#condicion_pago').change(function(){
 			var codigo = jQuery(this).val();
 			if(codigo == 1 || codigo == 21){
 
-				jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
-
+				//jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
+				jQuery('#fecha_vencimiento_pago_input').attr('readonly',false);
 				var dias = 1;
 				var myDate = new Date();
 				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
 				
 				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
-
 			}
 			else{
 
-				jQuery('.fecha_vencimiento_pago').css('visibility', 'hidden');
-
+				//jQuery('.fecha_vencimiento_pago').css('visibility', 'hidden');
+				jQuery('#fecha_vencimiento_pago_input').attr('readonly',true);
 				var texto = jQuery(this).find(":selected").text();
 				var splitted_text = texto.split(' ');
 				var dias = splitted_text[2];
@@ -1745,9 +1748,10 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
 				
 				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
-
 			}
 		});
+
+		jQuery('#condicion_pago').trigger('change');
 
 		if (cantidad_decimales != -1) {
 			jQuery('.aproximable').each(function() {
