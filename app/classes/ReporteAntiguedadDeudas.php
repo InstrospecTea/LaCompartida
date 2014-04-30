@@ -400,11 +400,10 @@ class ReporteAntiguedadDeudas
 
 				
 
-				if (!empty($row['dias_atraso_pago'])){
+				if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 					$dias_atraso_pago = $row['dias_atraso_pago'];
-					$fecha_vencimiento_pago = $row['fecha_facturacion'];
-				} else{
-					if(!empty($row['dias_desde_facturacion'])){
+				}else{
+					if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 						$dias_atraso_pago = $row['dias_desde_facturacion'];
 					}
 					else{
@@ -470,11 +469,11 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['fgsaldo'] += $row['fgsaldo'];
 				$results[$row['codigo_cliente']]['fgsaldo_base'] += $row['fgsaldo_base'];
 
-				if (!empty($row['dias_atraso_pago'])){
+
+				if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 					$dias_atraso_pago = $row['dias_atraso_pago'];
-					$fecha_vencimiento_pago = $row['fecha_facturacion'];
-				} else{
-					if(!empty($row['dias_desde_facturacion'])){
+				}else{
+					if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 						$dias_atraso_pago = $row['dias_desde_facturacion'];
 					}
 					else{
@@ -530,6 +529,9 @@ class ReporteAntiguedadDeudas
 
 		foreach ($dataset as $row) {
 			
+			// print_r($row);
+			// die();
+
 			$rango1 = 0;
 			$rango2 = 0;
 			$rango3 = 0;
@@ -540,11 +542,11 @@ class ReporteAntiguedadDeudas
 
 
 
-			if(!empty($row['dias_atraso_pago'])){
+			if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 				$dias_atraso_pago = $row['dias_atraso_pago'];
 				$fecha_vencimiento = $row['fecha_vencimiento_pago'];
 			}else{
-				if (!empty($row['dias_desde_facturacion'])) {
+				if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 					$dias_atraso_pago = $row['dias_desde_facturacion'];
 					$fecha_vencimiento = $row['fecha_facturacion'];
 				}
