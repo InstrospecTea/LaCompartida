@@ -1,6 +1,10 @@
 # Changelog
+## Hotfix: 14.1.20
+Lunes 28 de abril 2014
+* **Fixed:** [Tramites en nota de cobro](https://github.com/LemontechSA/ttb/pull/495)
+
 ## Hotfix: 14.1.19
-viernes 25 de abril 2014
+Viernes 25 de abril 2014
 * **Fixed:** [Actualiza framework](#0)
 
 
