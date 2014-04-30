@@ -75,9 +75,9 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * 
-	 * @param  [type] $agrupacion [description]
-	 * @return [SimpleReport] [description]
+	 * Genera el reporte principal, sin desglose.
+	 * @param  $agrupacion [Datos obtenidos desde el medio persistente, que han agrupados de manera conveniente.]
+	 * @return [SimpleReport] [Reporte configurado como un simple report.]
 	 */
 	private function genera_reporte($agrupacion){
 		$SimpleReport = new SimpleReport($this->sesion);
@@ -218,9 +218,9 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [genera_reporte_detalle description]
-	 * @param  [type] $agrupacion_detalle [description]
-	 * @return [type]                     [description]
+	 * Genera el desglose del reporte principal.
+	 * @param  $agrupacion_detalle [Datos obtenidos desde el medio persistente, que han agrupados de manera conveniente.]
+	 * @return [SimpleReport] [Reporte configurado como un simple report.]
 	 */
 	private function genera_reporte_detalle($agrupacion_detalle){
 		$SimpleReport = new SimpleReport($this->sesion);
@@ -352,7 +352,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [insertar_configuracion description]
+	 * [Inserta una configuración, en el array de configuraciones, en la posición especificada.]
 	 * @param  [type] $configuraciones [description]
 	 * @param  [type] $configuracion   [description]
 	 * @param  [type] $posicion        [description]
@@ -366,9 +366,10 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [generar_agrupacion_de_resultados description]
-	 * @param  [type] $results [description]
-	 * @return [type]          [description]
+	 * [Genera la agrupación de resultados para el reporte sin desglose.]
+	 * @param  [type] $dataset    [Datos obtenidos desde el medio persistente.]
+	 * @param  [type] $parameters [Parámetros definidos en el reporte.]
+	 * @return [type]             [Array con la agrupación de resultados.]
 	 */
 	private function generar_agrupacion_de_resultados($dataset,$parameters){
 		extract($parameters);
@@ -518,10 +519,10 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [genera_agrupacion_detalle description]
-	 * @param  [type] $dataset    [description]
-	 * @param  [type] $parameters [description]
-	 * @return [type]             [description]
+	 * [Genera la agrupación de resultados para el reporte desglosado.]
+	 * @param  [type] $dataset    [Datos obtenidos desde el medio persistente.]
+	 * @param  [type] $parameters [Parámetros definidos en el reporte.]
+	 * @return [type]             [Array con la agrupación de resultados.]
 	 */
 	private function genera_agrupacion_detalle($dataset, $parameters){
 		extract($parameters);
@@ -623,8 +624,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [genera_query_criteria description]
-	 * @return [type] [description]
+	 * [Genera el Criteria que contiene la query que se realiza al medio persistente para obtener los datos del reporte.]
 	 */
 	private function genera_query_criteria(){
 
@@ -717,8 +717,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [define_parametros_query_sin_detalle description]
-	 * @return [type] [description]
+	 * [Define los parámetros que supondrán el comportamiento del reporte]
 	 */
 	private function define_parametros_query_sin_detalle(){
 		
@@ -752,8 +751,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [agrega_restricciones_segun_tipo_monto description]
-	 * @return [type] [description]
+	 * [Agrega descripciones según el tipo de objeto que se considera en el reporte]
 	 */
 	private function agrega_restricciones_segun_tipo_monto(){
 
@@ -769,7 +767,6 @@ class ReporteAntiguedadDeudas
 			$this->criteria
 				->add_grouping('d.id_documento');
 		}
-
 	}
 
 }
