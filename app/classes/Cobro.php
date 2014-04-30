@@ -2190,6 +2190,7 @@ if (!class_exists('Cobro')) {
 																		LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
 																		WHERE $where_up
 																		AND contrato.id_contrato = '" . $contrato->fields['id_contrato'] . "'
+																		AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
 																		AND cobro.estado IS NULL";
 								$lista_tramites = new ListaTrabajos($this->sesion, '', $query_tramites);
 								for ($y = 0; $y < $lista_tramites->num; $y++) {
