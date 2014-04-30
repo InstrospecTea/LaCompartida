@@ -10241,7 +10241,18 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.66:
+			$queries = array();
+			if(!ExisteCampo('fecha_vencimiento_pago', 'factura', $dbh)){
+				$queries[] = "ALTER TABLE `timetracking`.`factura` ADD COLUMN `fecha_vencimiento_pago` DATE NULL AFTER `dte_metodo_pago`;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
 		}
+
+
 }
 
 
@@ -10250,7 +10261,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.65;
+$max_update = 7.66;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
