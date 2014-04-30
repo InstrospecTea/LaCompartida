@@ -39,32 +39,6 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 
 	$SimpleReport = $reporte->generar();
 
-	// if ($opcion == 'xls') {
-	// 	$new_results = array();
-	// 	foreach ($results as $result) {
-	// 		// Corregir los identificadores
-	// 		$array = json_decode(utf8_encode($result['identificadores']), true);
-	// 		$identificadores = array();
-	// 		foreach ($array as $key => $value) {
-	// 			$identificadores[] = utf8_decode($value);
-	// 		}
-	// 		$result['identificadores'] = implode(', ', $identificadores);
-
-	// 		// Corregir los comentarios de seguimiento
-	// 		$array = explode(' | ', $result['comentario_seguimiento']);
-	// 		if (count($array) > 1) {
-	// 			$result['comentario_seguimiento'] = Utiles::sql2fecha($array[0], "%d/%m/%Y") . " " . $array[1];
-	// 		} else {
-	// 			$result['comentario_seguimiento'] = "";
-	// 		}
-
-	// 		$new_results[] = $result;
-	// 	}
-
-	// 	$SimpleReport->LoadResults($new_results);
-	// 	$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
-	// 	$writer->save('Reporte_antiguedad_deuda');
-	// }
 }
 
 $Pagina = new Pagina($sesion);
@@ -250,6 +224,16 @@ echo Html::SelectArray(array(
 				})).append(' ');
 			});
 		});
+
+		jQuery('.total_normal').each(function(){
+			var td = jQuery(this);
+			td.css('color','blue');
+		})
+
+		jQuery('.total_vencido').each(function(){
+			var td = jQuery(this);
+			td.css('color','red');
+		})
 
 		jQuery('.seguimiento').each(function () {
 			var td = jQuery(this);
