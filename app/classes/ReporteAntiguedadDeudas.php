@@ -248,7 +248,7 @@ class ReporteAntiguedadDeudas
 				)
 			),
 			array(
-				'field' => 'fecha_vencimiento_pago',
+				'field' => 'fecha_vencimiento',
 				'title' => __('Fecha Vencimiento'),
 				'format' => 'date',
 				'extras' => array(
@@ -545,7 +545,7 @@ class ReporteAntiguedadDeudas
 
 			if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 				$dias_atraso_pago = $row['dias_atraso_pago'];
-				$fecha_vencimiento = $row['fecha_vencimiento_pago'];
+				$fecha_vencimiento = $row['fecha_vencimiento'];
 			}else{
 				if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 					$dias_atraso_pago = $row['dias_desde_facturacion'];
@@ -615,7 +615,7 @@ class ReporteAntiguedadDeudas
 				'total_normal' => $normal,
 				'total_vencido' => $vencido,
 				'dias_atraso_pago' => $dias_atraso_pago,
-				'fecha_vencimiento_pago' => $fecha_vencimiento	
+				'fecha_vencimiento' => $fecha_vencimiento	
 			);
 
 		}
@@ -683,9 +683,9 @@ class ReporteAntiguedadDeudas
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','fgsaldo_base')
 			->add_select("$fecha_atraso", 'fecha_emision')
 			->add_select('cobro.fecha_facturacion')
-			->add_select('factura.fecha_vencimiento_pago')
+			->add_select('factura.fecha_vencimiento')
 			->add_select('NOW()','hoy')
-			->add_select('IF(DATEDIFF(NOW(), factura.fecha_vencimiento_pago) <= 0, 0, DATEDIFF(NOW(), factura.fecha_vencimiento_pago))', 'dias_atraso_pago')
+			->add_select('IF(DATEDIFF(NOW(), factura.fecha_vencimiento) <= 0, 0, DATEDIFF(NOW(), factura.fecha_vencimiento))', 'dias_atraso_pago')
 			->add_select('DATEDIFF(NOW(),'."$fecha_atraso".')','dias_transcurridos')
 			->add_select('moneda_documento.simbolo','moneda')
 			->add_select('seguimiento.cantidad','cantidad_seguimiento')

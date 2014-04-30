@@ -159,7 +159,7 @@ if ($opcion == "guardar") {
 
 		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
 			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
-			$factura->Edit('fecha_vencimiento_pago', $fecha_vencimiento_pago_input ? Utiles::fecha2sql($fecha_vencimiento_pago_input) : "");
+			$factura->Edit('fecha_vencimiento', $fecha_vencimiento_pago_input ? Utiles::fecha2sql($fecha_vencimiento_pago_input) : "");
 		}
 
 		if (UtilesApp::existecampo('dte_metodo_pago_cta', 'factura', $sesion)) {
@@ -725,7 +725,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		</tr>
 		<tr class="fecha_vencimiento_pago" style="visibility: visible;">
 			<td align="right" ><?php echo __('Fecha Pago')?></td>
-			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento_pago'] ? Utiles::sql2date($factura->fields['fecha_vencimiento_pago']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
+			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
 		<?php
