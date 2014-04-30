@@ -1056,8 +1056,6 @@ if (!class_exists('Cobro')) {
 
 		function ActualizaCobroTramite() {
 			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '".$this->fields['id_cobro']."' AND fecha NOT BETWEEN '".$this->fields['fecha_ini']."' AND '".$this->fields['fecha_fin']."'";
-			echo '<hr>';
-			echo $query;
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 
