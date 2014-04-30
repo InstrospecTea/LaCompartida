@@ -176,7 +176,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 			$configuracion = array(
 				'field' => 'total_vencido',
 				'title' => __('Total Vencido'),
@@ -187,7 +187,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 		}
 
 		//Si es que la opción no es excel.
@@ -322,10 +322,10 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 			$configuracion = array(
 				'field' => 'total_vencido',
 				'title' => __('Total Vencido'),
@@ -333,10 +333,10 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"'
 				)
 			);
-			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 5);
+			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 		}
 
 		if($this->opciones['opcion_usuario'] == 'xls'){
@@ -419,7 +419,7 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['total_normal'] = 0;
 				$results[$row['codigo_cliente']]['total_vencido'] = 0;
 
-				if ($dias_atraso_pago >= 0){
+				if ($dias_atraso_pago > 0){
 					$results[$row['codigo_cliente']]['total_vencido'] = -1 * $row["$campo_valor"];
 				}
 				else{
@@ -481,7 +481,7 @@ class ReporteAntiguedadDeudas
 					}
 				}
 
-				if ($dias_atraso_pago >= 0){
+				if ($dias_atraso_pago > 0){
 					$results[$row['codigo_cliente']]['total_vencido'] += (-1 * $row["$campo_valor"]);
 				}
 				else{
@@ -556,7 +556,7 @@ class ReporteAntiguedadDeudas
 				}
 			}
 
-			if($dias_atraso_pago >= 0){
+			if($dias_atraso_pago > 0){
 				$vencido = -1 * $row["$campo_valor"];
 			}
 			else{
@@ -565,7 +565,6 @@ class ReporteAntiguedadDeudas
 
 			if($dias_atraso_pago <= 30){
 				$rango1 = -1 * $row["$campo_valor"];
-				
 			}
 			if($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
 				$rango2 = -1 * $row["$campo_valor"];
