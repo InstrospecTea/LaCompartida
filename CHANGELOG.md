@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix: 14.1.20
+Lunes 05 de Mayo 2014
+* **Fixed:** [Correccion a generacion de codigos de asunto](https://github.com/LemontechSA/ttb/pull/496)
+
+## Hotfix: 14.1.20
 Lunes 28 de abril 2014
 * **Fixed:** [Tramites en nota de cobro](https://github.com/LemontechSA/ttb/pull/495)
 
