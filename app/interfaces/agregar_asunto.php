@@ -880,7 +880,7 @@ $pagina->PrintTop($popup);
 				&nbsp;&nbsp;&nbsp;
 				<?php
 				echo __('Código secundario');
-				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				if ($cliente->fields['codigo_cliente_secundario']) {
 					$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;' . $cliente->fields['codigo_cliente_secundario'] . '-';
 				} else {
 					$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;';
