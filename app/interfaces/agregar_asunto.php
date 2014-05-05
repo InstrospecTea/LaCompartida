@@ -880,7 +880,7 @@ $pagina->PrintTop($popup);
 				&nbsp;&nbsp;&nbsp;
 				<?php
 				echo __('Código secundario');
-				if ($cliente->fields['codigo_cliente_secundario']) {
+				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;' . $cliente->fields['codigo_cliente_secundario'] . '-';
 				} else {
 					$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;';
@@ -892,9 +892,9 @@ $pagina->PrintTop($popup);
 				if (empty($opcion)) {
 					$caracteres = strlen($cliente->fields['codigo_cliente']);
 				}
-				$field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], -$caracteres);
+				$field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], - $caracteres + 2);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='color:#FF0000; font-size:10px'>*</span>";
 				} else {
 					if ($asunto->fields['codigo_asunto_secundario'] != '') {
@@ -1141,10 +1141,8 @@ $pagina->PrintTop($popup);
 			<td colspan=6 align="center">
 				<?php
 				if (Conf::GetConf($sesion, 'RevisarTarifas')) {
-					//$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
 					$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario-cliente').get(0), false);";
 				} else {
-					//$funcion_validar = "return Validar(this.form);";
 					$funcion_validar = "return Validar(jQuery('#formulario-cliente').get(0));";
 				}
 				?>
