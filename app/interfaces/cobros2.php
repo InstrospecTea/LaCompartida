@@ -23,6 +23,7 @@ if ($id_cobro) {
 
 	$cobro->Edit('etapa_cobro', '1');
 	$cobro->Write();
+
 } else if ($id_contrato > 0) {
 
 	$contrato = new Contrato($sesion);
@@ -58,6 +59,7 @@ if ($id_cobro) {
 		$cobro_moneda = new CobroMoneda($sesion);
 		$cobro_moneda->ActualizarTipoCambioCobro($id_cobro);
 	}
+
 } else if ($codigo_cliente) {
 
 	if (!$cliente->LoadByCodigo($codigo_cliente)) {
@@ -81,6 +83,7 @@ if ($id_cobro) {
 		$cobro_moneda = new CobroMoneda($sesion);
 		$cobro_moneda->ActualizarTipoCambioCobro($id_cobro);
 	}
+
 } else {
 	$pagina->FatalError(__('Debe especificar un cliente o') . ' ' . __('cobro'));
 }
@@ -108,13 +111,30 @@ if ($opc == "siguiente") {
 		});
 	}
 </script>
+
+<style type="text/css">
+	.titulo_popup
+	{
+		font-size: 16px;
+		font-weight: bold;
+		text-align: left;
+		background-color: rgb(163, 213, 92);
+		height: 25px;
+	}
+	.tabla_titulo
+	{
+		width: 100%;
+		margin-bottom: 15px;
+	}
+</style>
+
 <?php
 $pagina->PrintTop($popup);
 
 if ($popup) {
-	echo '<table width="100%" border="0" cellspacing="0" cellpadding="2">';
+	echo '<table class="tabla_titulo" border="0" cellspacing="0" cellpadding="2" >';
 		echo '<tr>';
-			echo '<td valign="top" align="left" class="titulo" bgcolor="rgb(163, 213, 92)">';
+			echo '<td class="titulo_popup">';
 				echo __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de asuntos #') . $id_cobro . __(' ') . $nombre_cliente;
 			echo '</td>';
 		echo '</tr>';
@@ -131,7 +151,9 @@ $query = "SELECT SQL_CALC_FOUND_ROWS asunto.*,id_moneda,cobro_asunto.id_cobro
 FROM asunto LEFT JOIN cobro_asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto AND cobro_asunto.id_cobro = '$id_cobro' 
 WHERE asunto.activo=1 AND asunto.codigo_cliente = '" . $cliente->fields['codigo_cliente'] . "'
 AND asunto.cobrable = 1";
+
 ?>
+
 <script type="text/javascript">
 
 	function GrabarCampo(accion, asunto, cobro, valor, id_moneda)
@@ -169,54 +191,58 @@ if (!$checkall) {
 }
 ?>
 
-	<form method="post">
+<form method="post">
 	<input type="hidden" name="opc">
 	<input type="hidden" name="id_cobro" value=<?php $id_cobro ?>>
-		<table width=100%>
-			<tr>
-				<td align="right">
-					<input type="button" class="btn" value="<?php echo __('Siguiente >>') ?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
-				</td>
-			</tr>
-			<tr>
-				<td class="cvs" align="center" colspan="2">
-					<iframe name="asuntos" id="asuntos" onload="calcHeight(this.id, 'pagina_body');" src='asuntos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&id_cobro=<?= $id_cobro ?>&popup=1&motivo=cobros&checkall=<?= $checkall ?>' frameborder="0" width="800px" height="320px"></iframe>
-				</td>
-			</tr>
-		</table>
-	</form>
+	<table width="100%">
+		<tr>
+			<td align="right">
+				<input type="button" class="btn" value="<?php echo __('Siguiente >>') ?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
+			</td>
+		</tr>
+		<tr>
+			<td class="cvs" align="center" colspan="2">
+				<iframe name="asuntos" id="asuntos" onload="calcHeight(this.id, 'pagina_body');" src='asuntos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&id_cobro=<?= $id_cobro ?>&popup=1&motivo=cobros&checkall=<?= $checkall ?>' frameborder="0" width="800px" height="320px"></iframe>
+			</td>
+		</tr>
+	</table>
+</form>
 
-	<?php
+<?php
 
-	function Cobrable(& $fila) {
-		global $id_cobro;
-		$checked = '';
-		if ($fila->fields['id_cobro'] == $id_cobro and $id_cobro != '')
-			$checked = "checked";
-		$id_moneda = $fila->fields['id_moneda'];
-		$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','" . $fila->fields['codigo_asunto'] . "','$id_cobro',this.checked,$id_moneda,$monto)>";
-		return $Check;
+function Cobrable(& $fila) {
+	
+	global $id_cobro;
+	$checked = '';
+	
+	if ($fila->fields['id_cobro'] == $id_cobro and $id_cobro != '') {
+		$checked = "checked";
 	}
+	
+	$id_moneda = $fila->fields['id_moneda'];
+	$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','" . $fila->fields['codigo_asunto'] . "','$id_cobro',this.checked,$id_moneda, $monto)>";
+	return $Check;
+}
 
-	function funcionTR(& $asunto) {
-		static $i = 0;
+function funcionTR(& $asunto) {
+	static $i = 0;
 
-		if ($i % 2 == 0) {
-			$color = "#dddddd";
-		} else {
-			$color = "#ffffff";
-		}
-		$formato_fecha = "%d/%m/%y";
-		$fecha = Utiles::sql2fecha($asunto->fields[fecha_ultimo_cobro], $formato_fecha);
-		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B; \">";
-		$html .= "<td align=center>" . $asunto->fields['codigo_asunto'] . "</td>";
-		$html .= "<td align=center>" . $asunto->fields['glosa_asunto'] . "</td>";
-		$html .= "<td align=center>$fecha</td>";
-		$html .= "<td align=center>" . Cobrable($asunto) . "</td>";
-		$html .= "</tr>";
-		$i++;
-		return $html;
+	if ($i % 2 == 0) {
+		$color = "#dddddd";
+	} else {
+		$color = "#ffffff";
 	}
+	$formato_fecha = "%d/%m/%y";
+	$fecha = Utiles::sql2fecha($asunto->fields['fecha_ultimo_cobro'], $formato_fecha);
+	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B; \">";
+	$html .= "<td align=center>" . $asunto->fields['codigo_asunto'] . "</td>";
+	$html .= "<td align=center>" . $asunto->fields['glosa_asunto'] . "</td>";
+	$html .= "<td align=center>" . $fecha . "</td>";
+	$html .= "<td align=center>" . Cobrable($asunto) . "</td>";
+	$html .= "</tr>";
+	$i++;
+	return $html;
+}
 
-	$pagina->PrintBottom($popup);
-	?>
+$pagina->PrintBottom($popup);
+?>
