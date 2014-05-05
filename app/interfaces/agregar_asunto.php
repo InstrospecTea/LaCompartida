@@ -892,7 +892,7 @@ $pagina->PrintTop($popup);
 				if (empty($opcion)) {
 					$caracteres = strlen($cliente->fields['codigo_cliente']);
 				}
-				$field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], - $caracteres + 2);
+				$field_codigo_asunto_secundario = substr($asunto->fields['codigo_asunto_secundario'], - $caracteres);
 
 				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='color:#FF0000; font-size:10px'>*</span>";
