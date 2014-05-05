@@ -347,7 +347,7 @@ function FormatoMoneda($sesion, $numero, $moneda) {
 
 function FormatoTotal($fila) {
 	global $sesion;
-	$subtotal = FormatoMoneda($sesion, $fila->fields['subtotal'], $fila->fields['id_moneda']);
+	$subtotal = FormatoMoneda($sesion, $fila->fields['subtotal'] + $fila->fields['subtotal_gastos'], $fila->fields['id_moneda']);
 	$iva = FormatoMoneda($sesion, $fila->fields['iva'], $fila->fields['id_moneda']);
 	$total = FormatoMoneda($sesion, $fila->fields['total'], $fila->fields['id_moneda']);
 	$glosa_iva = __('IVA');
