@@ -35,11 +35,11 @@
 		 */
 			
 		public static function equals($left, $right){
-			return new CriteriaRestriction("(".$left." = ".$right.")");
+			return new CriteriaRestriction('('.$left.' = '.$right.")");
 		}
 
 		public static function not_equal($left, $right){
-			return new CriteriaRestriction("(".$left." != ".$right.")");
+			return new CriteriaRestriction('('.$left.' != '.$right.")");
 		}
 
 		
@@ -50,7 +50,7 @@
 		 * @return CriteriaRestriction
 		 */
 		public static function and_clause($left, $right){
-			return new CriteriaRestriction("(".$left." AND ".$right.")");
+			return new CriteriaRestriction('('.$left.' AND '.$right.")");
 		}
 
 		/**
@@ -60,7 +60,7 @@
 		 * @return CriteriaRestriction
 		 */
 		public static function or_clause($left, $right){
-			return new CriteriaRestriction("(".$left." OR ".$right.")");
+			return new CriteriaRestriction('('.$left.' OR '.$right.")");
 		}
 
 		/**
@@ -70,11 +70,10 @@
 		 */
 		public static function and_all(array $condition_array){
 			if(is_array($condition_array)){
-				$condition = "";
-				return new CriteriaRestriction(implode(" AND ", $condition_array));
+				return new CriteriaRestriction(implode(' AND ', $condition_array));
 			}
 			else{
-				throw new Exception("The condition_array parameter is not an array!");
+				throw new Exception('The condition_array parameter is not an array!');
 			}
 		}
 
@@ -85,11 +84,10 @@
 		 */
 		public static function or_all(array $condition_array){
 			if(is_array($condition_array)){
-				$condition = "";
-				return new CriteriaRestriction(implode(" OR ", $condition_array));
+				return new CriteriaRestriction(implode(' OR ', $condition_array));
 			}
 			else{
-				throw new Exception("The condition_array parameter is not an array!");
+				throw new Exception('The condition_array parameter is not an array!');
 			}
 		}
 

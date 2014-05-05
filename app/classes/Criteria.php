@@ -21,12 +21,12 @@ class Criteria
 	/*
 		CRITERIA QUERY BUILDER PARAMS.
 	 */
-	private $select = "SELECT";
-	private $from = " FROM";
-	private $where = " WHERE";
-	private $grouping = " GROUP BY";
-	private $ordering = " ORDER BY";
-	private $left_joining = " LEFT JOIN";
+	private $select = 'SELECT';
+	private $from = ' FROM';
+	private $where = ' WHERE';
+	private $grouping = ' GROUP BY';
+	private $ordering = ' ORDER BY';
+	private $left_joining = ' LEFT JOIN';
 
 	/*
 		CRITERIA SCOPE ENVELOPERS.
@@ -51,7 +51,6 @@ class Criteria
 		QUERY BUILDER METHODS
 	 */
 
-
 	/**
 	 * Añade un statement de selección al criterio de búsqueda.
 	 * @param string $attribute
@@ -60,11 +59,11 @@ class Criteria
 	 */
 	public function add_select($attribute, $alias = null){
 		if(is_null($alias)){
-			$alias = "";
+			$alias = '';
 		}
-		$new_clause = "";
+		$new_clause = '';
 		$new_clause .= $attribute;
-		if($alias != ""){
+		if($alias != ''){
 			$new_clause .=" '$alias'";
 		}
 		$this->select_clauses[] = $new_clause;
@@ -79,10 +78,10 @@ class Criteria
 	 */
 	public function add_from($table, $alias = null){
 		if(is_null($alias)){
-			$alias = "";
+			$alias = '';
 		}
-		$new_clause = "";
-		$new_clause.= $table." ".$alias;
+		$new_clause = '';
+		$new_clause .= $table.' '.$alias;
 		$this->from_clauses[] = $new_clause;
 		return $this;
 	}
@@ -94,8 +93,8 @@ class Criteria
 	 * @return Criteria
 	 */
 	public function add_from_criteria(Criteria $criteria, $alias){
-		$new_clause = "";
-		$new_clause.= '('.$criteria->get_plain_query().') AS '.$alias;
+		$new_clause = '';
+		$new_clause .= '('.$criteria->get_plain_query().') AS '.$alias;
 		$this->from_clauses[] = $new_clause;
 		return $this;
 	}
@@ -107,9 +106,9 @@ class Criteria
 	 * @return Criteria
 	 */
 	public function add_left_join_with($join_table, $join_condition){
-		$new_clause = "";
-		$new_clause.= $this->left_joining." ";
-		$new_clause.= $join_table." ON ".$join_condition;
+		$new_clause = '';
+		$new_clause .= $this->left_joining.' ';
+		$new_clause .= $join_table.' ON '.$join_condition;
 		$this->join_clauses[] = $new_clause;
 		return $this;
 	}
@@ -122,9 +121,9 @@ class Criteria
 	 * @return Criteria
 	 */
 	public function add_left_join_with_criteria(Criteria $criteria, $alias, $join_condition){
-		$new_clause = "";
-		$new_clause.= $this->left_joining." ";
-		$new_clause.= "(".$criteria->get_plain_query().") ".$alias." ON ".$join_condition;
+		$new_clause = '';
+		$new_clause .= $this->left_joining." ";
+		$new_clause .= '('.$criteria->get_plain_query().') '.$alias.' ON '.$join_condition;
 		$this->join_clauses[] = $new_clause;
 		return $this;
 	}
@@ -170,10 +169,10 @@ class Criteria
 	 */
 	private function generate_select_statement(){
 		if(count($this->select_clauses) > 0){
-			return $this->select." ".implode(",", $this->select_clauses);
+			return $this->select." ".implode(',', $this->select_clauses);
 		}
 		else{
-			throw new Exception("Criteria dice: No se han definido criterios de selección. No es correcto asumir SELECT *. ");
+			throw new Exception('Criteria dice: No se han definido criterios de selección. No es correcto asumir SELECT *. ');
 		}
 	}
 
@@ -184,10 +183,10 @@ class Criteria
 	 */
 	private function generate_from_statement(){
 		if(count($this->from_clauses) > 0){
-			return $this->from." ".implode(",", $this->from_clauses);
+			return $this->from.' '.implode(',', $this->from_clauses);
 		}
 		else{
-			throw new Exception("Criteria dice: No se ha definido desde que tabla(s) obtener los datos.");
+			throw new Exception('Criteria dice: No se ha definido desde que tabla(s) obtener los datos.');
 		}
 	}
 
@@ -197,10 +196,10 @@ class Criteria
 	 */
 	private function generate_join_statement(){
 		if(count($this->join_clauses) > 0){
-			return implode(" ", $this->join_clauses);
+			return implode(' ', $this->join_clauses);
 		}
 		else{
-			return "";
+			return '';
 		}
 	}
 
@@ -210,10 +209,10 @@ class Criteria
 	 */
 	private function generate_where_statement(){
 		if(count($this->where_clauses) > 0){
-			return $this->where." ".implode(",", $this->where_clauses);
+			return $this->where.' '.implode(',', $this->where_clauses);
 		}
 		else{
-			return "";
+			return '';
 		}
 	}
 
@@ -223,10 +222,10 @@ class Criteria
 	 */
 	private function generate_grouping_statement(){
 		if(count($this->grouping_clauses) > 0){
-			return $this->grouping." ".implode(",", $this->grouping_clauses);
+			return $this->grouping.' '.implode(',', $this->grouping_clauses);
 		}
 		else{
-			return "";
+			return '';
 		}
 	}
 
@@ -236,10 +235,10 @@ class Criteria
 	 */
 	private function generate_ordering_statement(){
 		if(count($this->ordering_clauses) > 0){
-			return $this->ordering." ".implode(",", $this->ordering_clauses);
+			return $this->ordering." ".implode(',', $this->ordering_clauses);
 		}
 		else{
-			return "";
+			return '';
 		}
 	}
 
@@ -260,9 +259,4 @@ class Criteria
 				$this->generate_ordering_statement();
 	}
 
-
-
 }
-
-
-?>
