@@ -22,8 +22,7 @@ class CobroAsunto extends Objeto {
 
 function CheckAll($id_cobro, $codigo_cliente) {
 
-	// $query = "SELECT id_moneda, codigo_asunto FROM asunto WHERE codigo_cliente = '$codigo_cliente' AND activo='1' AND cobrable='1'";
-	$query = "SELECT id_moneda, codigo_asunto FROM asunto WHERE codigo_cliente = '$codigo_cliente' AND activo = 1";
+	$query = "SELECT id_moneda, codigo_asunto FROM asunto WHERE codigo_cliente = '$codigo_cliente' AND activo='1'";
 	$resp = mysql_query($query);
 
 	while ($row = mysql_fetch_array($resp)) {
@@ -39,13 +38,7 @@ function CheckAll($id_cobro, $codigo_cliente) {
 
 function UncheckAll($id_cobro, $codigo_asunto) {
 
-	$query = "SELECT id_cobro, codigo_asunto FROM cobro_asunto WHERE id_cobro = '{$id_cobro}'";
-	$resp = mysql_query($query);
+	$query_delete = "DELETE FROM cobro_asunto WHERE id_cobro = '{$id_cobro}'";
+	mysql_query($query_delete);
 
-	while ($row = mysql_fetch_array($resp)) {
-		$id_cobro = $row['id_cobro'];
-		$codigo_asunto = $row['codigo_asunto'];
-		$query_delete = "DELETE FROM cobro_asunto WHERE codigo_asunto = '{$codigo_asunto}' AND id_cobro = '{$id_cobro}'";
-		mysql_query($query_delete);
-	}
 }
