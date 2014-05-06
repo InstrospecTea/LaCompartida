@@ -2835,6 +2835,7 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	$contrato->Edit('opc_ver_asuntos_separados', Conf::GetConf($Sesion, 'OpcVerAsuntosSeparado') == 1 ? 1 : 0);
 	$contrato->Edit('opc_ver_carta', Conf::GetConf($Sesion, 'OpcVerCarta') == 1 ? 1 : 0);
 	$contrato->Edit('opc_ver_cobrable', Conf::GetConf($Sesion, 'OpcVerCobrable') == 1 ? 1 : 0);
+	$contrato->Edit('opc_ver_columna_cobrable', Conf::GetConf($Sesion, 'OpcVerColumnaCobrable') == 1 ? 1 : 0);
 	$contrato->Edit('opc_ver_descuento', Conf::GetConf($Sesion, 'OpcVerDescuento') == 1 ? 1 : 0);
 	$contrato->Edit('opc_ver_detalle_retainer', Conf::GetConf($Sesion, 'OpcVerDetalleRetainer') == 1 ? 1 : 0);
 	$contrato->Edit('opc_ver_detalles_por_hora', Conf::GetConf($Sesion, 'OpcVerDetallesPorHora') == 1 ? 1 : 0);
