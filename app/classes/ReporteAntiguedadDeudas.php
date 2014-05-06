@@ -32,8 +32,8 @@ class ReporteAntiguedadDeudas
 	 */
 	public function generar(){
 
+		
 		$this->genera_query_criteria();
-
 
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
 		$statement->execute();
@@ -55,7 +55,7 @@ class ReporteAntiguedadDeudas
 			));
 		}
 
-		if($this->opciones['opcion_usuario'] == 'xls'){
+		if ($this->opciones['opcion_usuario'] == 'xls'){
 			$new_results = array();
 			foreach ($agrupacion as $result) {
 				$array =  json_decode(utf8_encode($result['identificadores']), true);
@@ -144,7 +144,7 @@ class ReporteAntiguedadDeudas
 			)
 		);
 		
-		if($this->opciones['encargado_comercial']){
+		if ($this->opciones['encargado_comercial']){
 			$configuracion_encargado_comercial = array(
 				'field' => 'encargado_comercial',
 				'title' => __('Encargado Comercial'),
@@ -155,7 +155,7 @@ class ReporteAntiguedadDeudas
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion_encargado_comercial, 1);
 		}
 
-		if(!$this->opciones['mostrar_detalle']){
+		if (!$this->opciones['mostrar_detalle']){
 			$configuracion_cobros = array(
 				'field' => 'identificadores',
 				'title' => __(ucfirst($this->opciones['identificadores'])),
@@ -194,7 +194,7 @@ class ReporteAntiguedadDeudas
 		}
 
 		//Si es que la opción no es excel.
-		if($this->opciones['opcion_usuario'] != 'xls'){
+		if ($this->opciones['opcion_usuario'] != 'xls'){
 			$config_reporte[] = array(
 				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
 				'title' => '&nbsp;',
@@ -344,7 +344,7 @@ class ReporteAntiguedadDeudas
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 		}
 
-		if($this->opciones['opcion_usuario'] == 'xls'){
+		if ($this->opciones['opcion_usuario'] == 'xls'){
 			$config_reporte[] = array(
 				'field' => 'moneda',
 				'title' => __('Moneda'),
@@ -383,7 +383,7 @@ class ReporteAntiguedadDeudas
 
 			$valor = abs($row["$campo_valor"]);
 
-			if(!array_key_exists($row['codigo_cliente'], $results)){
+			if (!array_key_exists($row['codigo_cliente'], $results)){
 				$results[$row['codigo_cliente']] = array(
 						'moneda' => $row['moneda'],
 						'glosa_cliente' => $row['glosa_cliente'],
@@ -409,7 +409,7 @@ class ReporteAntiguedadDeudas
 
 				
 
-				if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
+				if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 					$dias_atraso_pago = $row['dias_atraso_pago'];
 				}else{
 					if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
@@ -479,7 +479,7 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['fgsaldo_base'] += $row['fgsaldo_base'];
 
 
-				if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
+				if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 					$dias_atraso_pago = $row['dias_atraso_pago'];
 				}else{
 					if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
@@ -550,7 +550,7 @@ class ReporteAntiguedadDeudas
 
 
 
-			if($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
+			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 				$dias_atraso_pago = $row['dias_atraso_pago'];
 				$fecha_vencimiento = $row['fecha_vencimiento'];
 			}else{
@@ -564,28 +564,28 @@ class ReporteAntiguedadDeudas
 				}
 			}
 
-			if($dias_atraso_pago > 0){
+			if ($dias_atraso_pago > 0){
 				$vencido = $row["$campo_valor"];
 			}
 			else{
 				$normal = $row["$campo_valor"];
 			}
 
-			if($dias_atraso_pago <= 30){
+			if ($dias_atraso_pago <= 30){
 				$rango1 = $row["$campo_valor"];
 			}
-			if($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
+			if ($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
 				$rango2 = $row["$campo_valor"];
 			}
-			if($dias_atraso_pago > 60 && $dias_atraso_pago <= 90){
+			if ($dias_atraso_pago > 60 && $dias_atraso_pago <= 90){
 				$rango3 = $row["$campo_valor"];
 			}
-			if($dias_atraso_pago > 90){
+			if ($dias_atraso_pago > 90){
 				$rango4 = $row["$campo_valor"];
 			}
 			$total = $row["$campo_valor"];
 
-			if($this->opciones['opcion_usuario'] == 'xls'){
+			if ($this->opciones['opcion_usuario'] == 'xls'){
 				$id = $row['label'];
 			}
 			else{
@@ -648,19 +648,37 @@ class ReporteAntiguedadDeudas
 			->add_from('cliente_seguimiento')
 			->add_grouping('codigo_cliente');
 
-		if(!empty($this->datos['encargado_comercial'])){
+		if (!empty($this->datos['encargado_comercial'])){
 			$encargado_comercial = $this->datos['encargado_comercial'];
 			$this->and_statements[] = 'u.id_usuario = '."$encargado_comercial";
 		}
 
-		if(!empty($this->datos['codigo_cliente'])){
+		if (!empty($this->datos['codigo_cliente'])){
 			$cliente = $this->datos['codigo_cliente'];
 			$this->and_statements[] = 'contrato.codigo_cliente = \''."$cliente".'\'';
 		}
+		else{
 
-		if(!empty($this->datos['id_contrato'])){
+			if (!empty($this->datos['codigo_cliente_secundario'])) {
+				$cliente = $this->datos['codigo_cliente_secundario'];
+				$this->and_statements[] = 'cliente.codigo_cliente_secundario = \''."$cliente".'\'';
+				$this->and_statemetns[] = 'contrato.codigo_cliente = cliente.codigo_cliente';
+			}
+
+		}
+
+		if (!empty($this->datos['id_contrato'])){
 			$contrato = $this->datos['id_contrato'];
 			$this->and_statements[] = 'cobro.id_contrato = \''."$contrato".'\'';
+		}
+		else{
+			if (!empty($this->datos['codigo_asunto_secundario'])) {
+				$codigo_asunto_secundario = $this->datos['codigo_asunto_secundario'];
+				$this->criteria
+						->add_left_join_with('cobro_asunto ca', 'ca.id_cobro = cobro.id_cobro')
+						->add_left_join_with('asunto', 'asunto.codigo_asunto = ca.codigo_asunto');
+				$this->and_statements[] = 'asunto.codigo_asunto_secundario = \''."$codigo_asunto_secundario".'\'';
+			}
 		}
 
 	    $this->criteria
@@ -717,7 +735,7 @@ class ReporteAntiguedadDeudas
 		//
 		//Hacer select del encargado comercial.
 		//
-		if($this->opciones['encargado_comercial']){
+		if ($this->opciones['encargado_comercial']){
 			$this->criteria
 						->add_select('u.username','encargado_comercial');	
 		}
@@ -728,7 +746,7 @@ class ReporteAntiguedadDeudas
 	 */
 	private function define_parametros_query_sin_detalle(){
 		
-		if($this->opciones['solo_monto_facturado']){
+		if ($this->opciones['solo_monto_facturado']){
 			$campo_valor = "fsaldo";
 			$campo_gvalor = "fgsaldo";
 			$campo_hvalor = "fhsaldo";
@@ -762,7 +780,7 @@ class ReporteAntiguedadDeudas
 	 */
 	private function agrega_restricciones_segun_tipo_monto(){
 
-		if($this->opciones['solo_monto_facturado']){
+		if ($this->opciones['solo_monto_facturado']){
 			$this->and_statements[] = 'ccfm.saldo!=0';
 			$this->criteria
 				->add_grouping('factura.id_factura');

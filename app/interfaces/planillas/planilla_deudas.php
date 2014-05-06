@@ -30,13 +30,13 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 			'id_contrato' => $id_contrato,
 			'tipo_liquidacion' => $tipo_liquidacion,
 			'codigo_asunto' => $codigo_asunto,
-			'encargado_comercial' => $id_encargado_comercial
+			'encargado_comercial' => $id_encargado_comercial,
+			'codigo_cliente_secundario' => $codigo_cliente_secundario,
+			'codigo_asunto_secundario' => $codigo_asunto_secundario
 		);
 
 	$reporte = new ReporteAntiguedadDeudas($sesion, $opciones, $datos);
 	
-	
-
 	$SimpleReport = $reporte->generar();
 
 }
@@ -66,11 +66,10 @@ $Pagina->PrintTop();
 								<label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
 							</td>
 							<td colspan="3" align="left">
-<?php echo UtilesApp::CampoCliente($sesion, $_REQUEST['codigo_cliente']); ?>
+								<?php echo UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario); ?>
 							</td>
 						</tr>
-<?php UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
-
+							<?php UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
 						<tr>
 							<td align="right" width="30%">
 								<?php echo __('Encargado Comercial') ?>
@@ -123,12 +122,12 @@ $Pagina->PrintTop();
 								<label for="tipo_liquidacion"><?php echo __('Tipo de Liquidación') ?></label>
 							</td>
 							<td colspan=2 align=left>
-<?php
-echo Html::SelectArray(array(
-		array('1', __('Sólo Honorarios')),
-		array('2', __('Sólo Gastos')),
-		array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Todas'))
-?>
+								<?php
+									echo Html::SelectArray(array(
+										array('1', __('Sólo Honorarios')),
+										array('2', __('Sólo Gastos')),
+										array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Todas'))
+								?>
 							</td>
 						</tr>
 						<tr>
