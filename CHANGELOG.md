@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.1.22
+martes 06 de mayo 2014
+* **Fixed:** [Corrige opción compara hora cobrables](https://github.com/LemontechSA/ttb/pull/502)
+
 ## Hotfix: 14.1.20
 Lunes 05 de Mayo 2014
 * **Fixed:** [Correccion a generacion de codigos de asunto](https://github.com/LemontechSA/ttb/pull/496)
