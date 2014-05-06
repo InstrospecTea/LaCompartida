@@ -10241,6 +10241,13 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.66:
+			$queries = array();
+			$query[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
 		}
 }
 
@@ -10250,7 +10257,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.65;
+$max_update = 7.66;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
