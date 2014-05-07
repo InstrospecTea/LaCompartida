@@ -14,6 +14,22 @@ class ReporteAntiguedadDeudas
 	private $and_statements = array();
 	private $report_details = array();
 
+	//
+	//Opciones de layout
+	//
+	
+	//Define el ancho que tendrán los campos numéricos del reporte, que tengan que ver con montos.
+	private $ancho_campo_numerico = 69;
+
+	//Define el ancho que tendrá el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
+	//añadan antes de los campos numéricos del reporte.
+	private $ancho_campo = 35;
+
+	private $ancho_campo_numerico_detalle = 70;
+
+	private $ancho_campo_detalle = 35;
+
+
 	/**
 	 * Constructor de la clase.
 	 * @param [type] $sesion   [description]
@@ -81,6 +97,46 @@ class ReporteAntiguedadDeudas
 	 * @return [SimpleReport] [Reporte configurado como un simple report.]
 	 */
 	private function genera_reporte($agrupacion){
+
+		//
+		//TODO -> Refactorizar a su propio método.
+		//
+		
+			$layout = $this->ancho_campo;
+
+			if ($this->opciones['totales_especiales']) {
+				$number_layout = $this->ancho_campo_numerico / 7 ;
+			}
+			else{
+				$number_layout = $this->ancho_campo_numerico / 5 ;
+			}
+			
+
+			$layouts = array();
+			
+			//
+			// Prepara el layout de los campos.
+			//
+			if ($this->opciones['encargado_comercial']){
+				$layouts['encargado_comercial'] = $layout * .5;
+			}
+
+			if (!$this->opciones['mostrar_detalle']){
+				$layouts['lista_detalle'] = $layout * 0.7;
+				$layouts['encargado_comercial'] = $layout * 0.15;
+			}
+
+			foreach ($layouts as $value) {
+				$layout -= $value;
+			}
+
+			$layouts['campo_comun'] = $layout;
+
+		//
+		// Fin segmento de código a refactorizar.
+		//
+
+
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$config_reporte = array(
@@ -88,7 +144,7 @@ class ReporteAntiguedadDeudas
 				'field' => 'glosa_cliente',
 				'title' => __('Cliente'),
 				'extras' => array(
-					'attrs' => 'width="20%" style="text-align:left;"',
+					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:left; "',
 					'groupinline' => true
 				)
 			),
@@ -99,7 +155,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"',
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right; margin-left: 2%;"',
 				)
 			),
 			array(
@@ -109,7 +165,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"'
 				)
 			),
 			array(
@@ -119,7 +175,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"'
 				)
 			),
 			array(
@@ -129,7 +185,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"'
 				)
 			),
 			array(
@@ -139,7 +195,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right;font-weight:bold"'
 				)
 			)
 		);
@@ -149,7 +205,7 @@ class ReporteAntiguedadDeudas
 				'field' => 'encargado_comercial',
 				'title' => __('Encargado Comercial'),
 				'extras' => array(
-					'attrs' => 'width="15%" style="text-align:left;"'
+					'attrs' => 'width="'.$layouts['encargado_comercial'].'%" style="text-align:left; "',
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion_encargado_comercial, 1);
@@ -160,7 +216,8 @@ class ReporteAntiguedadDeudas
 				'field' => 'identificadores',
 				'title' => __(ucfirst($this->opciones['identificadores'])),
 				'extras' => array(
-					'attrs' => 'width="11%" style="text-align:right;display:none;"', 'class' => 'identificadores'
+					'attrs' => 'width="'.$layouts['lista_detalle'].'%" style="text-align:left; "',
+					'class' => 'identificadores'
 				)
 			);
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion_cobros, 1);
@@ -174,7 +231,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"',
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right;font-weight:bold"',
 					'class' => 'total_normal'
 				)
 			);
@@ -186,7 +243,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"',
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right;font-weight:bold"',
 					'class' => 'total_vencido'
 				)
 			);
@@ -199,7 +256,7 @@ class ReporteAntiguedadDeudas
 				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
 				'title' => '&nbsp;',
 				'extras' => array(
-					'attrs' => 'width="5%" style="text-align:right"',
+					'attrs' => 'width="1%" style="text-align:right"',
 					'class' => 'seguimiento'
 				)
 			);
@@ -226,6 +283,33 @@ class ReporteAntiguedadDeudas
 	 * @return [SimpleReport] [Reporte configurado como un simple report.]
 	 */
 	private function genera_reporte_detalle($agrupacion_detalle){
+
+		//
+		//TODO -> Refactorizar a su propio método.
+		//
+		
+			$layout = $this->ancho_campo_detalle;
+
+			if ($this->opciones['totales_especiales']) {
+				$number_layout = $this->ancho_campo_numerico_detalle  / 7 ;
+			}
+			else{
+				$number_layout = $this->ancho_campo_numerico_detalle  / 5 ;
+			}
+			
+
+			$layouts = array();
+			
+			//
+			// Prepara el layout de los campos.
+			//
+			$layouts['campo_comun'] = $layout / 4;
+
+		//
+		// Fin segmento de código a refactorizar.
+		//
+
+
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$config_reporte = array(
@@ -233,7 +317,7 @@ class ReporteAntiguedadDeudas
 				'field' => 'id',
 				'title' => __(ucfirst($this->opciones['identificador_detalle'])),
 				'extras' => array(
-					'attrs' => 'width="11%" style="text-align:right;"',
+					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:left;"',
 					'class' => 'identificadores'
 				)
 			),
@@ -247,7 +331,7 @@ class ReporteAntiguedadDeudas
 				'title' => __('Fecha Emisión'),
 				'format' => 'date',
 				'extras' => array(
-					'attrs' => 'width="11%" style="text-align:right;"'
+					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:left;"',
 				)
 			),
 			array(
@@ -255,14 +339,14 @@ class ReporteAntiguedadDeudas
 				'title' => __('Fecha Vencimiento'),
 				'format' => 'date',
 				'extras' => array(
-					'attrs' => 'width="11%" style="text-align:right;"'
+					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:left;"',
 				)
 			),
 			array(
 				'field' => 'dias_atraso_pago',
 				'title' => __('Días Atraso'),
 				'extras' => array(
-					'attrs' => 'width="11%" style="text-align:right;"'
+					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:right;"',
 				)
 			),
 			array(
@@ -272,7 +356,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"',
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"',
 				)
 			),
 			array(
@@ -282,7 +366,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"',
 				)
 			),
 			array(
@@ -292,7 +376,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"',
 				)
 			),
 			array(
@@ -302,7 +386,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="10%" style="text-align:right"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right"',
 				)
 			),
 			array(
@@ -312,7 +396,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right;"',
 				)
 			)
 		);
@@ -325,7 +409,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"',
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right;font-weight:bold"',
 					'class' => 'total_normal'
 				)
 			);
@@ -337,7 +421,7 @@ class ReporteAntiguedadDeudas
 				'extras' => array(
 					'subtotal' => 'moneda',
 					'symbol' => 'moneda',
-					'attrs' => 'width="20%" style="text-align:right;font-weight:bold"',
+					'attrs' => 'width="'.$number_layout.'%" style="text-align:right;font-weight:bold"',
 					'class' => 'total_vencido'
 				)
 			);
@@ -355,6 +439,9 @@ class ReporteAntiguedadDeudas
 		$SimpleReport->LoadResults($agrupacion_detalle);
 		return $SimpleReport;
 	}
+
+
+
 
 	/**
 	 * [Inserta una configuración, en el array de configuraciones, en la posición especificada.]
@@ -420,6 +507,10 @@ class ReporteAntiguedadDeudas
 					}
 				}
 
+				if (empty($row['fecha_emision'])) {
+					$dias_atraso_pago = 'Desconocidos';
+				}
+
 				$results[$row['codigo_cliente']]['rango1'] = 0;
 				$results[$row['codigo_cliente']]['rango2'] = 0;
 				$results[$row['codigo_cliente']]['rango3'] = 0;
@@ -428,25 +519,35 @@ class ReporteAntiguedadDeudas
 				$results[$row['codigo_cliente']]['total_normal'] = 0;
 				$results[$row['codigo_cliente']]['total_vencido'] = 0;
 
-				if ($dias_atraso_pago > 0){
+				if ($dias_atraso_pago > 0 || is_string($dias_atraso_pago)){
 					$results[$row['codigo_cliente']]['total_vencido'] = $valor;
 				}
 				else{
 					$results[$row['codigo_cliente']]['total_normal'] = $valor;
 				}
 
-				if ($dias_atraso_pago <= 30){
-					$results[$row['codigo_cliente']]['rango1'] = $valor;
-				}
-				if ($dias_atraso_pago> 30 && $dias_atraso_pago <=60 ){
-					$results[$row['codigo_cliente']]['rango2'] = $valor;
-				}
-				if ($dias_atraso_pago > 60 && $dias_atraso_pago <=90){
-					$results[$row['codigo_cliente']]['rango3'] = $valor;
-				}
-				if ($dias_atraso_pago > 90 ){
+				if (is_string($dias_atraso_pago)) {
 					$results[$row['codigo_cliente']]['rango4'] = $valor;
 				}
+				else{
+
+					if ($dias_atraso_pago <= 30){
+						$results[$row['codigo_cliente']]['rango1'] = $valor;
+					}
+					if ($dias_atraso_pago> 30 && $dias_atraso_pago <=60 ){
+						$results[$row['codigo_cliente']]['rango2'] = $valor;
+					}
+					if ($dias_atraso_pago > 60 && $dias_atraso_pago <=90){
+						$results[$row['codigo_cliente']]['rango3'] = $valor;
+					}
+					if ($dias_atraso_pago > 90 ){
+						$results[$row['codigo_cliente']]['rango4'] = $valor;
+					}
+
+				}
+					
+
+
 				$results[$row['codigo_cliente']]['total'] = $valor;
 
 				//Si es que se incluye el encargado comercial en las opciones.
@@ -490,25 +591,38 @@ class ReporteAntiguedadDeudas
 					}
 				}
 
-				if ($dias_atraso_pago > 0){
+				if (empty($row['fecha_emision'])) {
+					$dias_atraso_pago = 'Desconocidos';
+				}
+
+				if ($dias_atraso_pago > 0 || is_string($dias_atraso_pago)){
 					$results[$row['codigo_cliente']]['total_vencido'] += $valor;;
 				}
 				else{
 					$results[$row['codigo_cliente']]['total_normal'] += ($row["$campo_valor"]);
 				}
 
-				if ($dias_atraso_pago <= 30){
-					$results[$row['codigo_cliente']]['rango1'] += $valor;
-				}
-				if ($dias_atraso_pago > 30 && $dias_atraso_pago <=60 ){
-					$results[$row['codigo_cliente']]['rango2'] += $valor;
-				}
-				if ($dias_atraso_pago > 60 && $dias_atraso_pago <=90){
-					$results[$row['codigo_cliente']]['rango3'] += $valor;
-				}
-				if ($dias_atraso_pago > 90 ){
+				if (is_string($dias_atraso_pago)) {
 					$results[$row['codigo_cliente']]['rango4'] += $valor;
 				}
+				else{
+
+					if ($dias_atraso_pago <= 30){
+						$results[$row['codigo_cliente']]['rango1'] += $valor;
+					}
+					if ($dias_atraso_pago > 30 && $dias_atraso_pago <=60 ){
+						$results[$row['codigo_cliente']]['rango2'] += $valor;
+					}
+					if ($dias_atraso_pago > 60 && $dias_atraso_pago <=90){
+						$results[$row['codigo_cliente']]['rango3'] += $valor;
+					}
+					if ($dias_atraso_pago > 90 ){
+						$results[$row['codigo_cliente']]['rango4'] += $valor;
+					}
+
+				}
+
+				
 				$results[$row['codigo_cliente']]['total'] += $valor;
 
 			}
@@ -548,12 +662,13 @@ class ReporteAntiguedadDeudas
 			$normal = 0;
 			$vencido = 0;
 
+			$fecha_emision = $row['fecha_emision'];
 
 
 			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
 				$dias_atraso_pago = $row['dias_atraso_pago'];
 				$fecha_vencimiento = $row['fecha_vencimiento'];
-			}else{
+			} else{
 				if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 					$dias_atraso_pago = $row['dias_desde_facturacion'];
 					$fecha_vencimiento = $row['fecha_facturacion'];
@@ -564,25 +679,41 @@ class ReporteAntiguedadDeudas
 				}
 			}
 
-			if ($dias_atraso_pago > 0){
+			if (empty($fecha_emision)){
+				$dias_atraso_pago = 'Desconocidos';
+			}
+
+			if ($dias_atraso_pago > 0 || is_string($dias_atraso_pago)){
 				$vencido = $row["$campo_valor"];
 			}
 			else{
 				$normal = $row["$campo_valor"];
 			}
 
-			if ($dias_atraso_pago <= 30){
-				$rango1 = $row["$campo_valor"];
-			}
-			if ($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
-				$rango2 = $row["$campo_valor"];
-			}
-			if ($dias_atraso_pago > 60 && $dias_atraso_pago <= 90){
-				$rango3 = $row["$campo_valor"];
-			}
-			if ($dias_atraso_pago > 90){
+			if (is_string($dias_atraso_pago)) {
+				
 				$rango4 = $row["$campo_valor"];
+
 			}
+			else {
+
+				if ($dias_atraso_pago <= 30){
+					$rango1 = $row["$campo_valor"];
+				}
+				if ($dias_atraso_pago > 30 && $dias_atraso_pago <= 60){
+					$rango2 = $row["$campo_valor"];
+				}
+				if ($dias_atraso_pago > 60 && $dias_atraso_pago <= 90){
+					$rango3 = $row["$campo_valor"];
+				}
+				if ($dias_atraso_pago > 90 ){
+					$rango4 = $row["$campo_valor"];
+				}
+
+			}
+
+				
+
 			$total = $row["$campo_valor"];
 
 			if ($this->opciones['opcion_usuario'] == 'xls'){
@@ -613,7 +744,7 @@ class ReporteAntiguedadDeudas
 				'gsaldo_base' => $row['gsaldo_base'],
 				'fgsaldo' => $row['fgsaldo'],
 				'fgsaldo_base' => $row['fgsaldo_base'],
-				'fecha_emision' => $row['fecha_emision'],
+				'fecha_emision' => $fecha_emision,
 				'rango1' => -1 * $rango1,
 				'rango2' => -1 * $rango2,
 				'rango3' => -1 * $rango3,
@@ -629,6 +760,7 @@ class ReporteAntiguedadDeudas
 
 		return $results;
 	}
+
 
 	/**
 	 * [Genera el Criteria que contiene la query que se realiza al medio persistente para obtener los datos del reporte.]
@@ -683,6 +815,7 @@ class ReporteAntiguedadDeudas
 
 	    $this->criteria
 	    	->add_select('cobro.id_cobro')
+	    	->add_select('contrato.id_contrato')
 	    	->add_select('d.fecha')
 			->add_select("$identificador",'identificador')
 			->add_select("$tipo".' AS','and_statementstipo')
