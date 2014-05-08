@@ -45,10 +45,7 @@ $color_impar = "#ffffff";
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
 
-$query_permiso_tarifa = "SELECT count(*)
-							FROM usuario_permiso
-							WHERE id_usuario = '{$Sesion->usuario->fields['id_usuario']}'
-							AND codigo_permiso = 'TAR' ";
+$query_permiso_tarifa = "SELECT count(*) FROM usuario_permiso WHERE id_usuario = '{$Sesion->usuario->fields['id_usuario']}' AND codigo_permiso = 'TAR' ";
 
 $resp_permiso_tarifa = mysql_query($query_permiso_tarifa, $Sesion->dbh) or Utiles::errorSQL($query_permiso_tarifa, __FILE__, __LINE__, $Sesion->dbh);
 list( $cantidad_permisos ) = mysql_fetch_array($resp_permiso_tarifa);
@@ -79,6 +76,7 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 	}
 
 	$contrato = new Contrato($Sesion);
+	
 	if ($id_contrato > 0) {
 		if (!$contrato->Load($id_contrato)) {
 			$pagina->FatalError(__('Código inválido'));

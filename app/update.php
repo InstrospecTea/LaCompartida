@@ -10259,9 +10259,43 @@ QUERY;
 				$queries[] = "ALTER TABLE  `factura` ADD  `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
 			}
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
 
-			ejecutar($queries,$dbh);
-			break;
+			$queries[] = "UPDATE configuracion, (
+					SELECT
+						SUM(IF(_tmp.profesional > 0, 1, 0)) AS cupo
+					FROM (
+						SELECT usuario.id_usuario,
+							SUM(IF(usuario_permiso.codigo_permiso = 'PRO', 1, 0)) AS profesional,
+							SUM(IF(usuario_permiso.codigo_permiso != 'PRO', 1, 0)) AS administrativo
+						FROM usuario
+							LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+						WHERE usuario.activo = 1 AND usuario.rut != '99511620' AND usuario_permiso.codigo_permiso != 'ALL'
+						GROUP BY usuario.id_usuario
+					) AS _tmp
+				) AS tmp
+				SET configuracion.valor_opcion = tmp.cupo
+				WHERE configuracion.glosa_opcion = 'CupoUsuariosProfesionales';";
+			
+			$queries[] = "UPDATE configuracion, (
+					SELECT
+						SUM(IF(_tmp.profesional = 0 AND _tmp.administrativo > 0, 1, 0)) AS cupo
+					FROM (
+						SELECT usuario.id_usuario,
+							SUM(IF(usuario_permiso.codigo_permiso = 'PRO', 1, 0)) AS profesional,
+							SUM(IF(usuario_permiso.codigo_permiso != 'PRO', 1, 0)) AS administrativo
+						FROM usuario
+							LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+						WHERE usuario.activo = 1 AND usuario.rut != '99511620' AND usuario_permiso.codigo_permiso != 'ALL'
+						GROUP BY usuario.id_usuario
+					) AS _tmp
+				) AS tmp
+				SET configuracion.valor_opcion = tmp.cupo
+				WHERE configuracion.glosa_opcion = 'CupoUsuariosAdministrativos';";
+
+			ejecutar($queries, $dbh);
+		break;
 	}
 }
 

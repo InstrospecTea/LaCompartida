@@ -31,8 +31,8 @@ if ($p_profesional->fields['permitido']) {
 }
 
 // Le muestro la tarifa cuando tiene el Conf, es profesional no revisor
-$mostrar_tarifa_al_profesional = 
-	UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') && 
+$mostrar_tarifa_al_profesional =
+	UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') &&
 	$profesionalpermitido && !$revisorpermitido;
 
 
@@ -265,11 +265,11 @@ for ($i = 0; $i < $lista->num; $i++) {
 	} else {
 		$ws->write($fila_inicial + $i, $col_nombre_usuario, $trabajo->fields['usr_nombre'], $tex);
 	}
-	
+
 	if ($solicitante == 1 || $solicitante == 2 ){
 		$ws->write($fila_inicial + $i, $col_solicitante, $trabajo->fields['solicitante'], $tex);
 	}
-	
+
 	list($duracion, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
 	list($h, $m) = split(':', $duracion);
 	$duracion_decimal = number_format($h + $m / 60, 1, '.', '');
@@ -298,14 +298,14 @@ for ($i = 0; $i < $lista->num; $i++) {
 	}
 
 	$ws->write($fila_inicial + $i, $col_cobrable, $trabajo->fields['cobrable'] == 1 ? "SI" : "NO", $tex);
-	
+
 	if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
 		// Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
-		if ($trabajo->fields['tarifa_hh'] > 0 
-			&& !empty($trabajo->fields['estado_cobro']) 
-			&& $trabajo->fields['estado_cobro'] != 'CREADO' 
+		if ($trabajo->fields['tarifa_hh'] > 0
+			&& !empty($trabajo->fields['estado_cobro'])
+			&& $trabajo->fields['estado_cobro'] != 'CREADO'
 			&& $trabajo->fields['estado_cobro'] != 'EN REVISION') {
-			
+
 			$tarifa = $trabajo->fields['tarifa_hh'];
 		} else {
 			if ($trabajo->fields['id_tarifa'] && $trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario']) {
