@@ -10236,6 +10236,21 @@ QUERY;
 
 		case 7.65:
 			$queries = array();
+			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_moneda` ADD `glosa_moneda_plural_lang` VARCHAR( 30 ) NOT NULL AFTER `glosa_moneda_plural` ;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.66:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.67:
+			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
 			$queries[] = "UPDATE configuracion, (
@@ -10271,7 +10286,6 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
-
 		}
 }
 
@@ -10281,7 +10295,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.65;
+$max_update = 7.67;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
