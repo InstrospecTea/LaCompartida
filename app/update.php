@@ -10242,7 +10242,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.66:
+		case 7.67:
 			$queries = array();
 			if(!ExisteCampo('fecha_vencimiento', 'factura', $dbh)){
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_vencimiento` DATE NULL AFTER `dte_metodo_pago`;";
@@ -10258,7 +10258,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.66;
+$max_update = 7.67;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

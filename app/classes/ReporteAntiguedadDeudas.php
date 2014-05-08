@@ -48,6 +48,7 @@ class ReporteAntiguedadDeudas
 	 */
 	public function generar(){
 
+		ini_set("memory_limit", "256M");
 		
 		$this->genera_query_criteria();
 
@@ -72,15 +73,24 @@ class ReporteAntiguedadDeudas
 		}
 
 		if ($this->opciones['opcion_usuario'] == 'xls'){
+
 			$new_results = array();
-			foreach ($agrupacion as $result) {
-				$array =  json_decode(utf8_encode($result['identificadores']), true);
-				$identificadores = array();
-				foreach ($array as $key => $value) {
-					$identificadores[] = utf8_decode($value);
+
+			if(empty($this->opciones['mostrar_detalle'])){
+				foreach ($agrupacion as $result) {
+					$identificadores =  json_decode($result['identificadores'], true);
+					// foreach ($array as $key => $value) {
+					// 	$identificadores[] = $value);
+					// }
+					$result['identificadores'] = implode(',', $identificadores);
+					$new_results[] = $result;
 				}
-				$result['identificadores'] = implode(', ', $identificadores);
-				$new_results[] = $result;
+			}
+			else{
+				foreach ($agrupacion as $result){
+					unset($result['identificadores']);
+					$new_results[] = $result;
+				}
 			}
 
 			$reporte->LoadResults($new_results);
@@ -440,9 +450,6 @@ class ReporteAntiguedadDeudas
 		return $SimpleReport;
 	}
 
-
-
-
 	/**
 	 * [Inserta una configuración, en el array de configuraciones, en la posición especificada.]
 	 * @param  [type] $configuraciones [description]
@@ -466,7 +473,7 @@ class ReporteAntiguedadDeudas
 	private function generar_agrupacion_de_resultados($dataset,$parameters){
 		extract($parameters);
 		$results = array();
-		foreach ($dataset as $row) {
+		foreach ($dataset as &$row) {
 
 			$valor = abs($row["$campo_valor"]);
 
@@ -633,10 +640,7 @@ class ReporteAntiguedadDeudas
 		$output = array();
 		foreach ($results as $codigo_cliente => $datos_cliente) {
 			$datos_cliente['codigo_cliente'] = $codigo_cliente;
-			$dummy_array = $datos_cliente['identificadores'];
-			$result = implode(',', $dummy_array);
-			$result = '{'.$result.'}';
-			$datos_cliente['identificadores'] = $result;
+			$datos_cliente['identificadores'] = '{'.implode(',', $datos_cliente['identificadores']).'}';
 			$output[] = $datos_cliente;
 		}
 		return $output;
@@ -652,7 +656,7 @@ class ReporteAntiguedadDeudas
 		extract($parameters);
 		$results = array();
 
-		foreach ($dataset as $row) {
+		foreach ($dataset as &$row) {
 
 			$rango1 = 0;
 			$rango2 = 0;
