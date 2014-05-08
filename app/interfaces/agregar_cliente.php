@@ -65,7 +65,7 @@ if ($opcion == "guardar") {
 			$resp_codigos = mysql_query($query_codigos, $sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $sesion->dbh);
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$pagina->FatalError('El cÃ³digo ingresado ya existe');
+					$pagina->FatalError('El código ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -78,7 +78,7 @@ if ($opcion == "guardar") {
 			$resp_codigos = mysql_query($query_codigos, $sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $sesion->dbh);
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$pagina->FatalError('El cÃ³digo ingresado ya existe');
+					$pagina->FatalError('El código ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -89,7 +89,7 @@ if ($opcion == "guardar") {
 		$id_usuario_secundario = (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : 0;
 	}
 
-	//	Segmento : "Validaciones segun la configuraciÃ³n";
+	//	Segmento : "Validaciones segun la configuración";
 
 	if ($validaciones_segun_config) {
 		if (empty($glosa_cliente)) {
@@ -102,13 +102,13 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese ROL/RUT de la factura"));
 		}
 		if (empty($factura_razon_social)) {
-			$pagina->AddError(__("Por favor ingrese la razÃ³n social de la factura"));
+			$pagina->AddError(__("Por favor ingrese la razón social de la factura"));
 		}
 		if (empty($factura_giro)) {
 			$pagina->AddError(__("Por favor ingrese el giro de la factura"));
 		}
 		if (empty($factura_direccion)) {
-			$pagina->AddError(__("Por favor ingrese la direcciÃ³n de la factura"));
+			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		}
 		if (empty($factura_ciudad)) {
 			$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
@@ -117,7 +117,7 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
 		}
 		if (empty($factura_telefono)) {
-			$pagina->AddError(__("Por favor ingrese el telÃ©fono de la factura"));
+			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		}
 		if (Conf::GetConf($sesion, 'ClienteReferencia')) {
 			$pagina->AddError(__("Por favor ingrese la referencia"));
@@ -138,63 +138,63 @@ if ($opcion == "guardar") {
 			}
 		}
 		if (empty($fono_contacto_contrato)) {
-			$pagina->AddError(__("Por favor ingrese el telÃ©fono del solicitante"));
+			$pagina->AddError(__("Por favor ingrese el teléfono del solicitante"));
 		}
 		if (empty($email_contacto_contrato)) {
 			$pagina->AddError(__("Por favor ingrese el correo del solicitante"));
 		}
 		if (empty($direccion_contacto_contrato)) {
-			$pagina->AddError(__("Por favor ingrese la direcciÃ³n del solicitante"));
+			$pagina->AddError(__("Por favor ingrese la dirección del solicitante"));
 		}
 		if (empty($id_tarifa)) {
-			$pagina->AddError(__("Por favor ingrese la tarifa en la tarificaciÃ³n"));
+			$pagina->AddError(__("Por favor ingrese la tarifa en la tarificación"));
 		}
 		if (empty($id_moneda)) {
-			$pagina->AddError(__("Por favor ingrese la moneda de la tarifa en la tarificaciÃ³n"));
+			$pagina->AddError(__("Por favor ingrese la moneda de la tarifa en la tarificación"));
 		}
 		if (empty($forma_cobro)) {
-			$pagina->AddError(__("Por favor ingrese la forma de ") . __("cobro") . __(" en la tarificaciÃ³n"));
+			$pagina->AddError(__("Por favor ingrese la forma de ") . __("cobro") . __(" en la tarificación"));
 		} else {
 			switch ($forma_cobro) {
 				case "RETAINER":
 					if ((empty($monto) && $monto != 0) || $monto == '') {
-						$pagina->AddError(__("Por favor ingrese el monto para el retainer en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese el monto para el retainer en la tarificación"));
 					}
 					if ($retainer_horas <= 0) {
-						$pagina->AddError(__("Por favor ingrese las horas para el retainer en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese las horas para el retainer en la tarificación"));
 					}
 					if (empty($id_moneda_monto)) {
-						$pagina->AddError(__("Por favor ingrese la moneda para el retainer en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese la moneda para el retainer en la tarificación"));
 					}
 					break;
 				case "FLAT FEE":
 					if (empty($monto)) {
-						$pagina->AddError(__("Por favor ingrese el monto para el flat fee en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese el monto para el flat fee en la tarificación"));
 					}
 					if (empty($id_moneda_monto)) {
-						$pagina->AddError(__("Por favor ingrese la moneda para el flat fee en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese la moneda para el flat fee en la tarificación"));
 					}
 					break;
 				case "CAP":
 					if (empty($monto)) {
-						$pagina->AddError(__("Por favor ingrese el monto para el cap en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese el monto para el cap en la tarificación"));
 					}
 					if (empty($id_moneda_monto)) {
-						$pagina->AddError(__("Por favor ingrese la moneda para el cap en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese la moneda para el cap en la tarificación"));
 					}
 					if (empty($fecha_inicio_cap)) {
-						$pagina->AddError(__("Por favor ingrese la fecha de inicio para el cap en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese la fecha de inicio para el cap en la tarificación"));
 					}
 					break;
 				case "PROPORCIONAL":
 					if (empty($monto)) {
-						$pagina->AddError(__("Por favor ingrese el monto para el proporcional en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese el monto para el proporcional en la tarificación"));
 					}
 					if ($retainer_horas <= 0) {
-						$pagina->AddError(__("Por favor ingrese las horas para el proporcional en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese las horas para el proporcional en la tarificación"));
 					}
 					if (empty($id_moneda_monto)) {
-						$pagina->AddError(__("Por favor ingrese la moneda para el proporcional en la tarificaciÃ³n"));
+						$pagina->AddError(__("Por favor ingrese la moneda para el proporcional en la tarificación"));
 					}
 					break;
 				case "ESCALONADA":
@@ -206,14 +206,14 @@ if ($opcion == "guardar") {
 				case "HITOS":
 					break;
 				default:
-					$pagina->AddError(__("Por favor ingrese la forma de") . __("cobro") . __("en la tarificaciÃ³n"));
+					$pagina->AddError(__("Por favor ingrese la forma de") . __("cobro") . __("en la tarificación"));
 			}
 		}
 		if (empty($opc_moneda_total)) {
-			$pagina->AddError(__("Por favor ingrese la moneda a mostrar el total de la tarifa en la tarificaciÃ³n"));
+			$pagina->AddError(__("Por favor ingrese la moneda a mostrar el total de la tarifa en la tarificación"));
 		}
 		if (empty($observaciones)) {
-			$pagina->AddError(__("Por favor ingrese la observacion en la tarificaciÃ³n"));
+			$pagina->AddError(__("Por favor ingrese la observacion en la tarificación"));
 		}
 	}
 	if ($usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1')) {
@@ -339,7 +339,7 @@ if ($opcion == "guardar") {
 				}
 
 				if ($cliente->Write()) {
-					$pagina->AddInfo(__('Cliente') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con Ã©xito'));
+					$pagina->AddInfo(__('Cliente') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 					//To S3
 					$archivo->LoadById($contrato->fields['id_contrato']);
 				} else {
@@ -448,7 +448,7 @@ if (Conf::GetConf($sesion, 'ClienteReferencia')) {
 $tip_tasa = __('Tip tasa');
 $tip_suma = __('Tip suma');
 $tip_retainer = __('Tip retainer');
-$tip_proporcional = __('El cliente compra un nÃºmero de horas, el exceso de horas trabajadas se cobra proporcional a la duraciÃ³n de cada trabajo.');
+$tip_proporcional = __('El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.');
 $tip_flat = __('Tip flat');
 $tip_honorarios = __('Tip honorarios');
 $tip_mensual = __('Tip mensual');
@@ -471,7 +471,7 @@ $pagina->PrintTop();
 
 	<fieldset id="formularioinicial" class="tb_base" style="border: 1px solid #BDBDBD;">
 
-		<legend><?php echo __('Agregar Cliente') ?>&nbsp;&nbsp;<?php echo $cliente->fields['activo'] == 0 && $id_cliente ? '<span style="color:#FF0000; font-size:10px">(' . __('Este cliente estÃ¡ Inactivo') . ')</span>' : '' ?></legend>
+		<legend><?php echo __('Agregar Cliente') ?>&nbsp;&nbsp;<?php echo $cliente->fields['activo'] == 0 && $id_cliente ? '<span style="color:#FF0000; font-size:10px">(' . __('Este cliente está Inactivo') . ')</span>' : '' ?></legend>
 
 		<table width="90%" cellspacing="3" cellpadding="3" >
 
@@ -485,7 +485,7 @@ $pagina->PrintTop();
 				<td class="al " width="600">
 					<div   class="controls controls-row " style="white-space:nowrap;">	  
 						<input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
-						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('CÃ³digo secundario') ?>
+						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('Código secundario') ?>
 								<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
 								<?php
 								if ($CodigoSecundario) {
@@ -534,7 +534,7 @@ $pagina->PrintTop();
 				<td class="ar">
 					<div class="span2">
 						<?php
-						echo __('Fecha CreaciÃ³n');
+						echo __('Fecha Creación');
 						$intfechacreacion = intval(date('Ymd', strtotime($cliente->fields['fecha_creacion'])));
 						if ($intfechacreacion > 19990101) {
 							$fecha_creacion = date('d-m-Y', strtotime($cliente->fields['fecha_creacion']));
@@ -589,7 +589,7 @@ $pagina->PrintTop();
 			<td colspan="2" align="center">
 				<fieldset  class="border_plomo tb_base">
 					<legend><?php echo __('Alertas') ?></legend>
-					<p>&nbsp;<?php echo __('El sistema enviarÃ¡ un email de alerta al encargado del cliente si se superan estos lÃ­mites:') ?></p>
+					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado del cliente si se superan estos límites:') ?></p>
 
 					<table>
 						<tr>
@@ -597,13 +597,13 @@ $pagina->PrintTop();
 								<input name="cliente_limite_hh" value="<?php echo $cliente->fields['limite_hh'] ? $cliente->fields['limite_hh'] : '0' ?>" size=5 title="<?php echo __('Total de Horas') ?>"/>
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?php echo __('Total de Horas') ?>"><?php echo __('LÃ­mite de horas') ?></span>
+								<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
 							</td>
 							<td align=right>
-								<input name=cliente_limite_monto value="<?php echo $cliente->fields['limite_monto'] ? $cliente->fields['limite_monto'] : '0' ?>" size=5 title="<?php echo __('Valor Total segÃºn Tarifa Hora Hombre') ?>"/>
+								<input name=cliente_limite_monto value="<?php echo $cliente->fields['limite_monto'] ? $cliente->fields['limite_monto'] : '0' ?>" size=5 title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"/>
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?php echo __('Valor Total segÃºn Tarifa Hora Hombre') ?>"><?php echo __('LÃ­mite de monto') ?></span>
+								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
 							</td>
 						</tr>
 						<tr>
@@ -614,10 +614,10 @@ $pagina->PrintTop();
 								<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
 							</td>
 							<td align=right>
-								<input name=cliente_alerta_monto value="<?php echo $cliente->fields['alerta_monto'] ? $cliente->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total segÃºn Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
+								<input name=cliente_alerta_monto value="<?php echo $cliente->fields['alerta_monto'] ? $cliente->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?php echo __('Valor Total segÃºn Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto segÃºn horas no cobradas') ?>
+								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?>
 							</td>
 						</tr>
 					</table>
@@ -787,7 +787,7 @@ $pagina->PrintTop();
 		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
 		if (plugin_facturacion_mx != '') {
 			if (form.id_pais.options[0].selected == true) {
-				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a FacturaciÃ³n ElectrÃ³nica') ?>");
+				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");
 				form.id_pais.focus();
 				return false;
 			}
@@ -810,7 +810,7 @@ $pagina->PrintTop();
 		if (form.factura_rut.value) {
 			validarUnicoCliente(form.factura_rut.value, 'rut', form.id_cliente.value);
 			if (!rut_cliente_unica) {
-				if (!confirm(("El <?php echo __('ROL/RUT') . ' del ' . __('cliente'); ?> ya existe, Â¿desea continuar de todas formas?"))) {
+				if (!confirm(("El <?php echo __('ROL/RUT') . ' del ' . __('cliente'); ?> ya existe, ¿desea continuar de todas formas?"))) {
 					form.factura_rut.focus();
 					return false;
 				}
@@ -839,7 +839,7 @@ $pagina->PrintTop();
 			}
 
 			if (!form.factura_razon_social.value) {
-				alert("<?php echo __('Debe ingresar la razÃ³n social del cliente') ?>");
+				alert("<?php echo __('Debe ingresar la razón social del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_razon_social.focus();
 				return false;
@@ -851,7 +851,7 @@ $pagina->PrintTop();
 				return false;
 			}
 			if (!form.factura_direccion.value) {
-				alert("<?php echo __('Debe ingresar la direcciÃ³n del cliente') ?>");
+				alert("<?php echo __('Debe ingresar la dirección del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_direccion.focus();
 				return false;
@@ -879,14 +879,14 @@ $pagina->PrintTop();
 				return false;
 			}
 			if (!form.cod_factura_telefono.value) {
-				alert("<?php echo __('Debe ingresar el codigo de area del telÃ©fono') ?>");
+				alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.cod_factura_telefono.focus();
 				return false;
 			}
 
 			if (!form.factura_telefono.value) {
-				alert("<?php echo __('Debe ingresar el nÃºmero de telefono') ?>");
+				alert("<?php echo __('Debe ingresar el número de telefono') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_telefono.focus();
 				return false;
@@ -918,7 +918,7 @@ $pagina->PrintTop();
 
 			var telefonocontacto = jQuery('#email_contacto_contrato');
 			if (!telefonocontacto) {
-				alert("<?php echo __('Debe ingresar el telÃ©fono del solicitante') ?>");
+				alert("<?php echo __('Debe ingresar el teléfono del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.fono_contacto_contrato.focus();
 				return false;
@@ -934,7 +934,7 @@ $pagina->PrintTop();
 
 			var direccioncontacto = jQuery('#direccion_contacto_contrato');
 			if (!direccioncontacto) {
-				alert("<?php echo __('Debe ingresar la direcciÃ³n de envÃ­o del solicitante') ?>");
+				alert("<?php echo __('Debe ingresar la dirección de envío del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
 				form.direccion_contacto_contrato.focus();
 				return false;
@@ -948,7 +948,7 @@ $pagina->PrintTop();
 				return false;
 			}
 
-			/* Revisa antes de enviar, que se haya escrito un monto si seleccionÃ³ tarifa plana */
+			/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
 
 			if (form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0) {
 				alert("<?php echo __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
@@ -973,7 +973,7 @@ $pagina->PrintTop();
 				if (!$$('[id^="hito_monto_"]').any(function(elem) {
 					return Number(elem.value) > 0;
 				})) {
-					alert("<?php echo __('Debe ingresar al menos un hito vÃ¡lido') ?>");
+					alert("<?php echo __('Debe ingresar al menos un hito válido') ?>");
 					$('hito_descripcion_1').focus();
 					return false;
 				}
@@ -1004,7 +1004,7 @@ if (Conf::GetConf($sesion, 'TodoMayuscula')) {
 
 <?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			if (!form.codigo_cliente_secundario.value) {
-				alert("<?php echo __('Debe ingresar el cÃ³digo secundario del cliente') ?>");
+				alert("<?php echo __('Debe ingresar el código secundario del cliente') ?>");
 				form.codigo_cliente_secundario.focus();
 				return false;
 			}
@@ -1027,14 +1027,14 @@ if (Conf::GetConf($sesion, 'TodoMayuscula')) {
 <?php } ?>
 
 		if (form.monto.value < 0) {
-			alert('AtenciÃ³n! Se ha seleccionado la forma de cobro Retainer con un monto 0');
+			alert('Atención! Se ha seleccionado la forma de cobro Retainer con un monto 0');
 			return false;
 		}
 
 		var forma_cobro = jQuery('#div_cobro').children("input:checked").val();
 		if (forma_cobro == 'RETAINER' && form.monto.value == 0 && form.monto.value != ''
 						&& (form.monto_posterior.value != form.monto.value || form.forma_cobro_posterior.value != forma_cobro)) {
-			alert('Se eligiÃ³ Retainer como Forma de Cobro e ingresÃ³ el monto 0');
+			alert('Se eligió Retainer como Forma de Cobro e ingresó el monto 0');
 		}
 
 		form.submit();
@@ -1147,8 +1147,8 @@ if ($_GET['id_cliente']) {
 							var glosa_cliente = objResp.glosa_cliente;
 
 							if (codigo_cliente !== "") {
-								jQuery('#formularioinicial').prepend('<div  class="alert"><span  id="alerta"></span><a class="close" data-dismiss="alert">Ã—</a>  </div>');
-								var MensajeAlerta = "Error: el cÃ³digo secundario " + codigo_cliente_secundario + " ya existe en la Base de Datos y corresponde a <a href='?id_cliente=" + bd_cliente + "'>[" + codigo_cliente + "] " + glosa_cliente + "</a>."
+								jQuery('#formularioinicial').prepend('<div  class="alert"><span  id="alerta"></span><a class="close" data-dismiss="alert">×</a>  </div>');
+								var MensajeAlerta = "Error: el código secundario " + codigo_cliente_secundario + " ya existe en la Base de Datos y corresponde a <a href='?id_cliente=" + bd_cliente + "'>[" + codigo_cliente + "] " + glosa_cliente + "</a>."
 								jQuery('#alerta').html(MensajeAlerta).alert();
 							}
 						}
