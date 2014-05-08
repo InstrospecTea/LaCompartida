@@ -10781,4 +10781,3 @@ class NotaCobro extends Cobro {
 	}
 
 }
-
