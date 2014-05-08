@@ -10244,6 +10244,14 @@ QUERY;
 
 		case 7.66:
 			$queries = array();
+			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.67:
+			$queries = array();
+			
 			if (!ExisteCampo('region_cliente', 'contrato', $dbh)) {
 				$queries[] = "ALTER TABLE  `contrato` ADD  `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
 			}
@@ -10263,7 +10271,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.66;
+$max_update = 7.67;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

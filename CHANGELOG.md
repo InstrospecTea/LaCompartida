@@ -1,4 +1,25 @@
 # Changelog
+## Hotfix: 14.1.22
+martes 06 de mayo 2014
+* **Fixed:** [Corrige opción compara hora cobrables](https://github.com/LemontechSA/ttb/pull/502)
+
+## Hotfix: 14.1.20
+Lunes 05 de Mayo 2014
+* **Fixed:** [Correccion a generacion de codigos de asunto](https://github.com/LemontechSA/ttb/pull/496)
+
+## Hotfix: 14.1.20
+Lunes 28 de abril 2014
+* **Fixed:** [Tramites en nota de cobro](https://github.com/LemontechSA/ttb/pull/495)
+
+## Hotfix: 14.1.19
+Viernes 25 de abril 2014
+* **Fixed:** [Actualiza framework](#0)
+
+
+## Hotfix: 14.1.18
+Martes 22 de Abril 2014
+* **Nuevo:** [Fix problema de facturacion mx (XML mal encodeado)](https://github.com/LemontechSA/ttb/pull/487)
+
 ## Hotfix: 14.1.17
 Lunes 21 de Abril 2014
 * **Nuevo:** [Solucion a saldo pendiente vio](https://github.com/LemontechSA/ttb/pull/489)

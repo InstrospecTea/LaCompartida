@@ -365,6 +365,8 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			contrato.descuento,
 			tramite_tipo.glosa_tramite,
 			trabajo.fecha,
+			trabajo.fecha_creacion,
+			trabajo.fecha_modificacion,
 			prm_idioma.codigo_idioma as codigo_idioma,
 			$select_encargado_comercial
 			contrato.id_tarifa
@@ -1053,14 +1055,17 @@ function funcionTR(& $trabajo) {
 	$dur_cob = "$h:$m";
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
-	$fecha = Utiles::sql2fecha($trabajo->fields['fecha'], $formato_fecha);
 	if ($trabajo->fields['id_tramite_tipo'] > 0) {
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
 		$html .= "<td colspan=9><strong>" . $trabajo->fields['glosa_tramite'] . "</strong></td></tr>";
 	}
 	$html .= "<tr id=\"t" . $trabajo->fields['id_trabajo'] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
 	$html .= '<td><input type="checkbox" class="editartrabajo " onmouseover="ddrivetip(\'Para editar múltiples trabajos haga click aquí.\')" onmouseout="hideddrivetip();" ></td>';
-	$html .= "<td>$fecha</td>";
+	$fecha = Utiles::sql2fecha($trabajo->fields['fecha'], $formato_fecha);
+	$fecha_creacion = Utiles::sql2fecha($trabajo->fields['fecha_creacion'], $formato_fecha);
+	$fecha_modificacion = Utiles::sql2fecha($trabajo->fields['fecha_modificacion'], $formato_fecha);
+	$fecha_html = "<span title=\"Creado el: $fecha_creacion, Modificado el: $fecha_modificacion\">$fecha</span>";
+	$html .= "<td>$fecha_html</td>";
 	$html .= "<td>" . $trabajo->fields['glosa_cliente'] . "</td>";
 	$html .= "<td><a title='" . $trabajo->fields['glosa_asunto'] . "'>" . $trabajo->fields['glosa_asunto'] . "</a></td>";
 	if (Conf::GetConf($sesion, 'UsoActividades')) {
