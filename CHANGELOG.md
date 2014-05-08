@@ -1,4 +1,13 @@
 # Changelog
+## Hotfix: 14.1.19
+viernes 25 de abril 2014
+* **Fixed:** [Actualiza framework](#0)
+
+
+## Hotfix: 14.1.18
+Martes 22 de Abril 2014
+* **Nuevo:** [Fix problema de facturacion mx (XML mal encodeado)](https://github.com/LemontechSA/ttb/pull/487)
+
 ## Hotfix: 14.1.17
 Lunes 21 de Abril 2014
 * **Nuevo:** [Solucion a saldo pendiente vio](https://github.com/LemontechSA/ttb/pull/489)
