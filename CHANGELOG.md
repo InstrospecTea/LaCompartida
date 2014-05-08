@@ -1,25 +1,4 @@
 # Changelog
-## Hotfix: 14.1.17
-Lunes 21 de Abril 2014
-* **Nuevo:** [Solucion a saldo pendiente vio](https://github.com/LemontechSA/ttb/pull/489)
-
-## Hotfix: 14.1.15
-Jueves 17 de abril 2014
-* **Nuevo:** [Habilita traduccion a monto en palabra para NotaCobro](https://github.com/LemontechSA/ttb/pull/485)
-* **Fixed:** [Correccion a tag %tipo_cuenta% CartCobro](https://github.com/LemontechSA/ttb/pull/485)
-* **Fixed:** [Correccion a tipo de gastos null en listado de gastos](https://github.com/LemontechSA/ttb/pull/485)
-
-## Hotfix: 14.1.15
-Lunes 14 de abril 2014
-* **Fixed:** [Aplica formato decimal a monto_cobrado (para mysql)](https://github.com/LemontechSA/ttb/pull/481)
-
-## Hotfix: 14.1.14
-Viernes 11 de abril 2014
-* **Fix:** [Inconsistencia en el API](https://github.com/LemontechSA/ttb/pull/477)
-
-## Hotfix: 14.1.13
-Miercoles 09 de abril 2014
-* **Add:** [Traducciones para tags por_concepto_de_gastos y por_concepto_de_honorarios para GFCU](https://github.com/LemontechSA/ttb/pull/474)
 
 ## Hotfix: 14.1.12
 Martes 08 de abril 2014

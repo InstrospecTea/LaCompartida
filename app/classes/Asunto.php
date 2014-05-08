@@ -817,13 +817,13 @@ class Asunto extends Objeto {
 	public function findAllByClientCode($code, $include_all = 0) {
 		$matters = array();
 		$active = 1;
-		$sql_select_client_code = '`client`.`codigo_cliente`';
 		$sql_select_matter_code = '`matter`.`codigo_asunto`';
+		$sql_where_client_code = '`client`.`codigo_cliente`';
 
 		// find if the client used secondary code
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
-			$sql_select_client_code = '`client`.`codigo_cliente_secundario`';
 			$sql_select_matter_code = '`matter`.`codigo_asunto_secundario`';
+			$sql_where_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
 		if (!$include_all) {
@@ -832,15 +832,14 @@ class Asunto extends Objeto {
 			$sql_include = "";
 		}
 
-		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
-			`matter`.`glosa_asunto` AS `name`,
+		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`,
 		 	`prm_idioma`.`codigo_idioma` AS `language`,
 			`prm_idioma`.`glosa_idioma` AS `language_name`,
 			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE $sql_select_client_code=:code {$sql_include}
+			WHERE $sql_where_client_code=:code {$sql_include}
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -853,10 +852,9 @@ class Asunto extends Objeto {
 		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {
 			array_push($matters,
 				array(
-					'client_code' => $matter->client_code,
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
-					'language' =>  !empty($matter->language) ? $matter->language : null,
+					'language' =>  !empty($matter->language) ? $matter->languag : null,
 					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
 					'active' => (int)$matter->active
 				)
@@ -890,8 +888,7 @@ class Asunto extends Objeto {
 		}
 
 		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
-			`matter`.`glosa_asunto` AS `name`,
-			`prm_idioma`.`codigo_idioma` AS `language`,
+			`matter`.`glosa_asunto` AS `name`, `prm_idioma`.`codigo_idioma` AS `language`,
 			`prm_idioma`.`glosa_idioma` AS `language_name`,
 			`matter`.`activo` AS active
 			FROM `cliente` AS `client`

@@ -113,7 +113,6 @@ if (UtilesApp::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
 	$col_codigo_asunto = $col++;
 }
 $col_asunto = $col++;
-$col_encargado = $col++;
 $col_id_cobro = $col++;
 if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	$col_actividad = $col++;
@@ -151,7 +150,6 @@ if (UtilesApp::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
 	$ws->setColumn($col_codigo_asunto, $col_codigo_asunto, 20);
 }
 $ws->setColumn($col_asunto, $col_asunto, 30);
-$ws->setColumn($col_encargado, $col_encargado, 30);
 $ws->setColumn($col_id_cobro, $col_id_cobro, 15);
 if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	$ws->setColumn($col_actividad, $col_actividad, 30);
@@ -194,7 +192,6 @@ if (UtilesApp::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
 	$ws->write($fila_inicial, $col_codigo_asunto, __('Código Asunto'), $tit);
 }
 $ws->write($fila_inicial, $col_asunto, __('Asunto'), $tit);
-$ws->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
 $ws->write($fila_inicial, $col_id_cobro, __('Cobro'), $tit);
 if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	$ws->write($fila_inicial, $col_actividad, __('Actividad'), $tit);
@@ -217,7 +214,7 @@ $fila_inicial++;
 #La lista viene de la pagina en la cual se incluye esta.
 for ($i = 0; $i < $lista->num; $i++) {
 	$trabajo = $lista->Get($i);
-
+//echo '<pre>'; var_dump($trabajo->fields); exit;
 	$moneda_total = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
 	$moneda_total->Load($trabajo->fields['id_moneda_cobro'] > 0 ? $trabajo->fields['id_moneda_cobro'] : ( $trabajo->fields['id_moneda_asunto'] ? $trabajo->fields['id_moneda_asunto'] : 1 ) );
 
@@ -251,10 +248,9 @@ for ($i = 0; $i < $lista->num; $i++) {
 		}
 	}
 	$ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
-	$ws->write($fila_inicial + $i, $col_encargado, $trabajo->fields['encargado_comercial'] ? $trabajo->fields['encargado_comercial'] : '', $tex);
 	$ws->write($fila_inicial + $i, $col_id_cobro, $trabajo->fields['id_cobro'] ? $trabajo->fields['id_cobro'] : '', $tex);
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
-		$ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields['glosa_actividad'], $tex);
+		$ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields[glosa_actividad], $tex);
 	}
 
 	$text_descripcion = addslashes($trabajo->fields['descripcion']);

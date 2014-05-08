@@ -232,9 +232,8 @@ if ($_GET['totalctacorriente']) { ?>
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
 			$fila['id_contrato'],
-			$fila['tipo'] ? utf8_encode($fila['tipo']) : ' - '
+			$fila['tipo'] ? $fila['tipo'] : ' - '
 		);
-
 		$resultado['aaData'][] = $stringarray;
 		$mas += $fila['egreso'];
 		$mas -= $fila['ingreso'];

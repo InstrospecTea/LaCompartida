@@ -836,7 +836,6 @@ $_LANG['nota_morosidad_honorarios'] = "Nota: Si al recibo de esta carta su cuent
 $_LANG['nota_morosidad_gastos'] = "Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.";
 $_LANG['nota_morosidad_total'] = "Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.";
 $_LANG['nota_morosidad'] = "";
-$_LANG['nota_disclaimer'] = "";
 
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
