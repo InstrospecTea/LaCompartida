@@ -698,7 +698,7 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 			} else {
 				if ($format == 'xml') {
 					$file_name = 'invoice_' . Utiles::sql2date($Invoice->fields['fecha'], "%Y%m%d") . "_{$Invoice->fields['serie_documento_legal']}-{$Invoice->fields['numero']}.xml";
-					downloadFile($file_name, 'text/xml', $Invoice->fields['dte_xml']);
+					downloadFile($file_name, 'text/xml', utf8_decode($Invoice->fields['dte_xml']));
 				} else {
 					halt(__("Invalid document format"), "InvalidDocumentFormat");
 				}

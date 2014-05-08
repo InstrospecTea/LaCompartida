@@ -1,4 +1,42 @@
 # Changelog
+## Hotfix: 14.1.22
+martes 06 de mayo 2014
+* **Fixed:** [Corrige opción compara hora cobrables](https://github.com/LemontechSA/ttb/pull/502)
+
+## Hotfix: 14.1.20
+Lunes 05 de Mayo 2014
+* **Fixed:** [Correccion a generacion de codigos de asunto](https://github.com/LemontechSA/ttb/pull/496)
+
+## Hotfix: 14.1.20
+Lunes 28 de abril 2014
+* **Fixed:** [Tramites en nota de cobro](https://github.com/LemontechSA/ttb/pull/495)
+
+## Hotfix: 14.1.19
+Viernes 25 de abril 2014
+* **Fixed:** [Actualiza framework](#0)
+
+
+## Hotfix: 14.1.18
+Martes 22 de Abril 2014
+* **Nuevo:** [Fix problema de facturacion mx (XML mal encodeado)](https://github.com/LemontechSA/ttb/pull/487)
+
+## Hotfix: 14.1.17
+Lunes 21 de Abril 2014
+* **Nuevo:** [Solucion a saldo pendiente vio](https://github.com/LemontechSA/ttb/pull/489)
+
+## Hotfix: 14.1.15
+Jueves 17 de abril 2014
+* **Nuevo:** [Habilita traduccion a monto en palabra para NotaCobro](https://github.com/LemontechSA/ttb/pull/485)
+* **Fixed:** [Correccion a tag %tipo_cuenta% CartCobro](https://github.com/LemontechSA/ttb/pull/485)
+* **Fixed:** [Correccion a tipo de gastos null en listado de gastos](https://github.com/LemontechSA/ttb/pull/485)
+
+## Hotfix: 14.1.15
+Lunes 14 de abril 2014
+* **Fixed:** [Aplica formato decimal a monto_cobrado (para mysql)](https://github.com/LemontechSA/ttb/pull/481)
+
+## Hotfix: 14.1.14
+Viernes 11 de abril 2014
+* **Fix:** [Inconsistencia en el API](https://github.com/LemontechSA/ttb/pull/477)
 
 ## Hotfix: 14.1.13
 Miercoles 09 de abril 2014
