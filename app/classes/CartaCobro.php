@@ -1049,6 +1049,8 @@ class CartaCobro extends NotaCobro {
 
 		$html2 = $parser_carta->tags[$theTag];
 
+		$_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
+
 		switch ($theTag) {
 			case 'CARTA': //GenerarDocumentoCarta2
 
@@ -1427,9 +1429,13 @@ class CartaCobro extends NotaCobro {
 					$asunto->LoadByCodigo($this->asuntos[$k]);
 					$espace = $k < count($this->asuntos) - 1 ? ', ' : '';
 					$asuntos_doc .= $asunto->fields['glosa_asunto'] . '' . $espace;
-					$codigo_asunto .= $asunto->fields['codigo_asunto'] . '' . $espace;
+					$_codigo_asunto = $_codigo_asunto_secundario != '1' ? $asunto->fields['codigo_asunto'] : $asunto->fields['codigo_asunto_secundario'];
+					$codigo_asunto .= $_codigo_asunto . '' . $espace;
+					$_codigo_asunto = explode('-', $_codigo_asunto);
+					$codigo_asunto_glosa_asunto .= "{$_codigo_asunto[1]}-{$asunto->fields['glosa_asunto']}{$espace}";
 				}
 
+				$html2 = str_replace('%CodigoAsuntoGlosaAsunto%', $codigo_asunto_glosa_asunto, $html2);
 				$html2 = str_replace('%Asunto%', $asuntos_doc, $html2);
 				$asunto_ucwords = ucwords(strtolower($asuntos_doc));
 				$html2 = str_replace('%Asunto_ucwords%', $asunto_ucwords, $html2);
@@ -1602,6 +1608,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_total_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_con_gasto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda_con_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_original%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%monto_subtotal%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_subtotal_completo'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_sin_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_cobro_original'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format(( $x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']] - $x_resultados['monto_cobro_original'][$this->fields['opc_moneda_total']]), $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1858,12 +1865,13 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%SoloNombreContacto%', $nombre_contacto_partes[0], $html2);
 
 				if ($contrato->fields['id_cuenta'] > 0) {
-					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa
+					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa, m.glosa_moneda
 								FROM cuenta_banco cb
 								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
+								LEFT JOIN prm_moneda m ON cb.id_moneda = m.id_moneda
 								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta) = mysql_fetch_array($resp);
+					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta, $glosa_moneda) = mysql_fetch_array($resp);
 
 					if (strpos($glosa_cuenta, 'Ah') !== false) {
 						$tipo_cuenta = 'Cuenta Ahorros';
@@ -1877,6 +1885,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_swift%', $codigo_swift, $html2);
 					$html2 = str_replace('%codigo_cci%', $codigo_cci, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
+					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
@@ -1884,6 +1893,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_swift%', '', $html2);
 					$html2 = str_replace('%codigo_cci%', '', $html2);
 					$html2 = str_replace('%tipo_cuenta%', '', $html2);
+					$html2 = str_replace('%glosa_moneda%', '', $html2);
 				}
 
 				if (UtilesApp::GetConf($this->sesion, 'SegundaCuentaBancaria')) {
