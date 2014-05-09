@@ -10253,11 +10253,12 @@ QUERY;
 			$queries = array();
 			
 			if (!ExisteCampo('region_cliente', 'contrato', $dbh)) {
-				$queries[] = "ALTER TABLE  `contrato` ADD  `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
+				$queries[] = "ALTER TABLE  `contrato` ADD `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
 			}
 			if (!ExisteCampo('factura_region', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE  `factura` ADD  `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
+				$queries[] = "ALTER TABLE  `factura` ADD `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
 			}
+
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
