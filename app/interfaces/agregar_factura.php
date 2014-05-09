@@ -664,7 +664,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		<?php if (conf::GetConf($sesion,'RegionCliente')) { ?>
 		<tr>
 			<td align="right"><?php echo __('Región'); ?></td>
-			<td align="left" colspan="3"><input type="text" name="factura_region" value="<?php echo $factura->loaded() ? $factura->fields['factura_region'] : $contrato->fields['factura_estado']; ?>" id="factura_region" size="70" maxlength="255" />
+			<td align="left" colspan="3"><input type="text" name="factura_region" value="<?php echo $factura->loaded() ? $factura->fields['factura_region'] : $contrato->fields['region_cliente']; ?>" id="factura_region" size="70" maxlength="255" />
 			</td>
 		</tr>
 		<?php } ?>
