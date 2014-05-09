@@ -4506,6 +4506,7 @@ class NotaCobro extends Cobro {
 					}
 
 					$html = str_replace('%texto_servicios_profesionales%', __('Servicios Profesionales por hora'), $html);
+					$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
 					$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 				}
 				break;
