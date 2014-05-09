@@ -338,6 +338,7 @@ $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia po
 $_LANG['Con Impuesto'] = "Con Impuesto";
 $_LANG['detalledegastos'] = "Detalle de Gastos";
 $_LANG['resumen_raz'] = "Resumen";
+$_LANG['total_raz'] = "Total de horas";
 
 #Nota cobro Morales
 $_LANG['Atte'] = "Atte";

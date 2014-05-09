@@ -2294,6 +2294,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_tarifa_ajustada%', '', $html);
 				}
 
+				$html = str_replace('%total_raz%', __('total_raz'), $html);
+
 				break;
 
 			case 'DETALLE_PROFESIONAL': //GenerarDocumento
@@ -5406,6 +5408,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%total_raz%', __('total_raz'), $html);
+				
 				break;
 
 			case 'DETALLE_PROFESIONAL': //GenerarDocumento2
@@ -8557,6 +8561,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%total_raz%', __('total_raz'), $html);
 
 				break;
 

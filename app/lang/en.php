@@ -315,6 +315,7 @@ $_LANG['Nota de Cargo'] = "Bill";
 $_LANG['Asunto'] = "Matter";
 $_LANG['detalledegastos'] = "Expenses";
 $_LANG['resumen_raz'] = "Billing Summary";
+$_LANG['total_raz'] = "Total Hours";
 
 $_LANG['N°Trabajo'] = "Work ID";
 $_LANG['Atte'] = "Attn";
