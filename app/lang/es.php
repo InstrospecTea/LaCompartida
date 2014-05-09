@@ -336,6 +336,10 @@ $_LANG['SOCIO COBRADOR'] = "SOCIO COBRADOR";
 $_LANG['Nota'] = "Nota";
 $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'] = "Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.";
 $_LANG['Con Impuesto'] = "Con Impuesto";
+$_LANG['detalledegastos'] = "Detalle de Gastos";
+$_LANG['resumen_raz'] = "Resumen";
+$_LANG['total_raz'] = "Total de horas";
+
 #Nota cobro Morales
 $_LANG['Atte'] = "Atte";
 $_LANG['Registro de Tiempo'] = "Registro de Tiempo";
@@ -351,6 +355,11 @@ $_LANG['Abogados que trabajaron'] = "Abogados";
 $_LANG['Honorarios'] = "Honorarios";
 $_LANG['Detalle del Trabajo Realizado'] = "Detalle del Trabajo Realizado";
 $_LANG['Abogado'] = "Abogado";
+$_LANG['abogado_raz'] = "Abogado";
+$_LANG['tiempo_raz'] = "Tiempo";
+$_LANG['tiempo_raz'] = "Tiempo";
+$_LANG['tarifa_raz'] = "Tarifa";
+$_LANG['importe_raz'] = "Importe";
 $_LANG['Total Nota de Cobro'] = "Total Nota de Cobro";
 $_LANG['Total Cobro'] = "Total Cobro";
 $_LANG['total_cobro'] = "Total Cobro";
