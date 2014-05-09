@@ -10242,14 +10242,76 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.67:
+		case 7.69:
 			$queries = array();
 			if(!ExisteCampo('fecha_vencimiento', 'factura', $dbh)){
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_vencimiento` DATE NULL AFTER `dte_metodo_pago`;";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_vencimiento` DATE NULL AFTER `condicion_pago`;";
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.70:
+			//Calcula la fecha de vencimiento para las facturas.
+			$queries = array();
+			$resp = mysql_query('SELECT id_factura, condicion_pago, fecha_facturacion, fecha_vencimiento FROM factura LEFT JOIN cobro ON factura.id_cobro = cobro.id_cobro;', $dbh) or Utiles::errorSQL($query_malos, __FILE__, __LINE__, $dbh);
+			while(list($id_factura, $condicion_pago, $fecha_facturacion, $fecha_vencimiento) = mysql_fetch_array($resp)){
+
+				if(empty($fecha_vencimiento)){
+					
+					//Se asume que es contado (fecha de pago al día de facturación), a menos que la condición de pago especifique lo contrario. Se han considerado todos los casos
+					//excepto el de cheque a fecha, ya que no hay como saber para cuándo fue pactado el convenio.
+
+					$dias = 0;
+					
+					if ($condicion_pago == 3) {
+						# 15
+						$dias = 15;
+					}
+
+					if ($condicion_pago == 4 || $condicion_pago == 12 || $condicion_pago == 18) {
+						# 30
+						$dias = 30;
+					}
+
+					if ($condicion_pago == 5 || $condicion_pago == 13 || $condicion_pago == 19) {
+						# 45
+						$dias = 45;
+					}
+
+					if ($condicion_pago == 6 || $condicion_pago == 14 || $condicion_pago == 20) {
+						# 60
+						$dias = 60;
+					}
+
+					if ($condicion_pago == 7) {
+						# 75
+						$dias = 75;
+					}
+
+					if ($condicion_pago == 8 || $condicion_pago == 15) {
+						# 90
+						$dias = 90;
+					}
+
+					if ($condicion_pago == 9) {
+						# 120
+						$dias = 120;
+					}
+
+					$date = new DateTime($fecha_facturacion);
+					$date->add(new DateInterval('P'.$dias.'D'));
+
+					$queries[] = 'UPDATE factura SET fecha_vencimiento = \''.$date->format('Y-m-d').'\' WHERE id_factura = '.$id_factura.';';
+				}
+				
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
 		}
+
+		
 }
 
 
@@ -10258,7 +10320,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.67;
+$max_update = 7.70;
 
 $force = 0;
 if (isset($_GET['maxupdate']))

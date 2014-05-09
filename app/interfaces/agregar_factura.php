@@ -139,6 +139,7 @@ if ($opcion == "guardar") {
 		}
 
 		$factura->Edit('condicion_pago', '' . $condicion_pago);
+		$factura->Edit('fecha_vencimiento', $fecha_vencimiento_pago_input ? Utiles::fecha2sql($fecha_vencimiento_pago_input) : "");
 		$factura->Edit('iva', $iva);
 		$factura->Edit('id_estudio', $id_estudio);
 		$factura->Edit('total', '' . ($monto_neto + $iva));
@@ -159,7 +160,6 @@ if ($opcion == "guardar") {
 
 		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
 			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
-			$factura->Edit('fecha_vencimiento', $fecha_vencimiento_pago_input ? Utiles::fecha2sql($fecha_vencimiento_pago_input) : "");
 		}
 
 		if (UtilesApp::existecampo('dte_metodo_pago_cta', 'factura', $sesion)) {
