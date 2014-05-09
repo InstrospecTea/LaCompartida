@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.1.23
+Viernes 09 de Mayo 2014
+* **Fixed:** [Incorpora feature razguzman a branch master](https://github.com/LemontechSA/ttb/pull/504)
+
 ## Hotfix: 14.1.22
 martes 06 de mayo 2014
 * **Fixed:** [Corrige opción compara hora cobrables](https://github.com/LemontechSA/ttb/pull/502)
