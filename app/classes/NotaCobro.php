@@ -2716,6 +2716,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
 				} else {
@@ -5945,6 +5946,7 @@ class NotaCobro extends Cobro {
 				}
 				$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
 				} else {
@@ -8997,6 +8999,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%factura%', __('Factura'), $html);
 				} else {
@@ -9596,6 +9599,8 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%glosa_codigo_postal%', __('Código Postal'), $htmlplantilla);
 		$htmlplantilla = str_replace('%codigo_postal%', $contrato->fields['factura_codigopostal'], $htmlplantilla);
 		$htmlplantilla = str_replace('%cliente%', __('Cliente'), $htmlplantilla);
+		$htmlplantilla = str_replace('%nota_cargo%', __('Nota de Cargo'), $htmlplantilla);
+		$htmlplantilla = str_replace('%asunto%', __('Asunto'), $htmlplantilla);
 
 		$query = "SELECT glosa_cliente FROM cliente
 					WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
@@ -10365,6 +10370,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $resumen_filas, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
+				
+				$html = str_replace('%seccion_resumen_profesional%', __('resumen_raz'), $html);
 				break;
 
 			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA': //GenerarDocumento2
@@ -10600,6 +10607,10 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%nombre%', __('Nombre'), $html);
+				$html = str_replace('%abogado%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
+				$html = str_replace('%tarifa_raz%', __('tarifa_raz'), $html);
+				$html = str_replace('%importe_raz%', __('importe_raz'), $html);
 
 				if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
