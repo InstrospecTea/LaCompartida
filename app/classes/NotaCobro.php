@@ -1545,6 +1545,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
+				$html = str_replace('%abogado_raz%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
 				$html = str_replace('%duracion_cobrable%', __('Duración cobrable'), $html);
 				$html = str_replace('%monto_total%', __('Monto total'), $html);
 				$html = str_replace('%Total%', __('Total'), $html);
@@ -4624,6 +4626,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%abogado%', __('Abogado'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
+				$html = str_replace('%abogado_raz%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
 
 				if ($this->fields['opc_ver_columna_cobrable']) {
 					$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);  // tAndres Oestemer
@@ -7742,6 +7746,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%monto_total%', __('Monto total'), $html);
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
+				$html = str_replace('%abogado_raz%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
 
