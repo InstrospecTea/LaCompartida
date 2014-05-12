@@ -73,7 +73,7 @@ $seguimientos = $ClienteSeguimiento->FindAll();
 	<body>
 		<div class="seguimiento_container">
 			<div class="contact_data">
-				<div class="title">Datos Contacto</div>
+				<div class="title"><?php echo _('Solicitante') ?></div>
 				<div class="data"><?php echo __('Nombre')?>: <?php echo($contacto.' '.$apellido_contacto) ?></div>
 				<div class="data"><?php echo __('Fono')?>: <?php echo $fono_contacto; ?></div>
 				<div class="data"><?php echo __('E-mail')?>: <?php echo $email_contacto; ?></div>
