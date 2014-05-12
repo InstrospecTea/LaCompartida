@@ -10303,7 +10303,7 @@ QUERY;
 			$queries = array();
 
 			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {			
-				$queries[] = "ALTER TABLE `prm_categoria_usuario` ADD `glosa_categoria_lang` VARCHAR( 40 ) NOT NULL AFTER `glosa_categoria` ";
+				$queries[] = "ALTER TABLE `prm_categoria_usuario` ADD `glosa_categoria_lang` VARCHAR( 20 ) NULL AFTER `glosa_categoria` ` ";
 			}
 
 			ejecutar($queries, $dbh);
