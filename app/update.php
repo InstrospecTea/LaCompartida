@@ -10243,13 +10243,30 @@ QUERY;
 
 		case 7.66:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+			if (!ExisteCampo('factura_estado', 'contrato', $dbh)) {
+			$queries[] = "ALTER TABLE `contrato` ADD `factura_estado` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER `factura_ciudad`;";
+			}
 
-			ejecutar($queries, $dbh);
+			if (!ExisteCampo('estado_cliente', 'factura', $dbh)) {
+			$queries[] = "ALTER TABLE `factura` ADD `estado_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER `ciudad_cliente`;";
+			}
+
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
+			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+			
+			ejecutar($queries,$dbh);
+
 			break;
 
 		case 7.67:
+		
 			$queries = array();
+			if (!ExisteCampo('region_cliente', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE  `contrato` ADD `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
+			}
+			if (!ExisteCampo('factura_region', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE  `factura` ADD `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
+			}
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
 			$queries[] = "UPDATE configuracion, (
@@ -10362,13 +10379,17 @@ $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
 $max_update = 7.69;
 
+
 $force = 0;
-if (isset($_GET['maxupdate']))
+if (isset($_GET['maxupdate'])) {
 	$max_update = round($_GET['maxupdate'], 2);
-if (isset($_GET['minupdate']))
+}
+if (isset($_GET['minupdate'])) {
 	$min_update = round($_GET['minupdate'], 2);
-if (isset($_GET['force']))
+}
+if (isset($_GET['force'])) {
 	$force = $_GET['force'];
+}
 for ($version = max($min_update, 2); $version <= $max_update; $version += 0.01) {
 	$VERSIONES[$num++] = round($version, 2);
 }

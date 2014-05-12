@@ -1,7 +1,5 @@
 <?php
 
-
-
 $_LANG['RUT'] = "RFC";
 $_LANG['ROL/RUT'] = "RFC";
 $_LANG['RUC'] = "RFC";
@@ -10,9 +8,10 @@ $_LANG['Comuna'] = "Municipio";
 $_LANG['codigo_cliente'] = "Codigo Cliente";
 $_LANG['fecha_emision'] = "Fecha Emisi&oacute;n";
 $_LANG['grupo_o_cliente'] = "Grupo o Cliente";
+$_LANG['Regi髇'] = "Estado";
 
-$_LANG['Documento Tributario Electr贸nico Firmado'] = "Documento Tributario Electr贸nico Firmado";
-$_LANG['Error al Firmar el Documento Tributario Electr贸nico'] = "Error al Firmar el Documento Tributario Electr贸nico";
-$_LANG['Documento Tributario Electr贸nico en proceso de Anulaci贸n'] = "Documento Tributario Electr贸nico en proceso de Cancelaci贸n";
-$_LANG['Documento Tributario Electr贸nico Anulado'] = "Documento Tributario Electr贸nico Cancelado";
+$_LANG['Documento Tributario Electr髇ico Firmado'] = "Documento Tributario Electr髇ico Firmado";
+$_LANG['Error al Firmar el Documento Tributario Electr髇ico'] = "Error al Firmar el Documento Tributario Electr髇ico";
+$_LANG['Documento Tributario Electr髇ico en proceso de Anulaci髇'] = "Documento Tributario Electr髇ico en proceso de Cancelaci贸n";
+$_LANG['Documento Tributario Electr髇ico Anulado'] = "Documento Tributario Electr髇ico Cancelado";
 $_LANG['Anular'] = "Cancelar";
