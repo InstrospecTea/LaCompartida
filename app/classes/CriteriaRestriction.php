@@ -23,6 +23,16 @@
 		}
 
 		/**
+		 * Respuesta por defecto de la clase a una conversión a string.
+		 * @return string Restriction del criteria.
+		 */
+		public function __toString()
+		{
+		    return $this->restriction;
+		}
+
+
+		/**
 		 * Obtiene la restricción.
 		 * @return String
 		 */

@@ -501,16 +501,15 @@ class ReporteAntiguedadDeudas
 						'identificadores' => array()					
 					);
 
-				
 
 				if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
-					$dias_atraso_pago = $row['dias_atraso_pago'];
+					$dias_atraso_pago = intval($row['dias_atraso_pago']);
 				}else{
 					if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
-						$dias_atraso_pago = $row['dias_desde_facturacion'];
+						$dias_atraso_pago = intval($row['dias_desde_facturacion']);
 					}
 					else{
-						$dias_atraso_pago = $row['dias_transcurridos'];
+						$dias_atraso_pago = intval($row['dias_transcurridos']);
 					}
 				}
 
@@ -588,13 +587,13 @@ class ReporteAntiguedadDeudas
 
 
 				if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
-					$dias_atraso_pago = $row['dias_atraso_pago'];
+					$dias_atraso_pago = intval($row['dias_atraso_pago']);
 				}else{
 					if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
-						$dias_atraso_pago = $row['dias_desde_facturacion'];
+						$dias_atraso_pago = intval($row['dias_desde_facturacion']);
 					}
 					else{
-						$dias_atraso_pago = $row['dias_transcurridos'];
+						$dias_atraso_pago = intval($row['dias_transcurridos']);
 					}
 				}
 
@@ -603,10 +602,10 @@ class ReporteAntiguedadDeudas
 				}
 
 				if ($dias_atraso_pago > 0 || is_string($dias_atraso_pago)){
-					$results[$row['codigo_cliente']]['total_vencido'] += $valor;;
+					$results[$row['codigo_cliente']]['total_vencido'] += $valor;
 				}
 				else{
-					$results[$row['codigo_cliente']]['total_normal'] += ($row["$campo_valor"]);
+					$results[$row['codigo_cliente']]['total_normal'] += $valor;
 				}
 
 				if (is_string($dias_atraso_pago)) {
@@ -670,15 +669,15 @@ class ReporteAntiguedadDeudas
 
 
 			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
-				$dias_atraso_pago = $row['dias_atraso_pago'];
+				$dias_atraso_pago = intval($row['dias_atraso_pago']);
 				$fecha_vencimiento = $row['fecha_vencimiento'];
 			} else{
 				if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
-					$dias_atraso_pago = $row['dias_desde_facturacion'];
+					$dias_atraso_pago = intval($row['dias_desde_facturacion']);
 					$fecha_vencimiento = $row['fecha_facturacion'];
 				}
 				else{
-					$dias_atraso_pago = $row['dias_transcurridos'];
+					$dias_atraso_pago = intval($row['dias_transcurridos']);
 					$fecha_vencimiento = $row['fecha_emision'];
 				}
 			}

@@ -832,7 +832,7 @@ $_LANG['Factura ACL'] = "Reference";
 $_LANG['Asociado'] = "Associate";
 $_LANG['Procurador'] = "Attorney";
 $_LANG['Socio'] = "Partner";
-$_LANG['Administrativo'] = "Administrative";  
+$_LANG['Administrativo'] = "Administrative";
 
 /* Olvidados */
 $_LANG['Categoría'] = "Category";

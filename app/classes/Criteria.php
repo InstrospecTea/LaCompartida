@@ -27,6 +27,7 @@ class Criteria
 	private $grouping = ' GROUP BY';
 	private $ordering = ' ORDER BY';
 	private $left_joining = ' LEFT JOIN';
+	private $limit = '';
 
 	/*
 		CRITERIA SCOPE ENVELOPERS.
@@ -68,6 +69,20 @@ class Criteria
 		}
 		$this->select_clauses[] = $new_clause;
 		return $this;
+	}
+
+	/**
+	 * Añade un limite a la cantidad de resultados
+	 * @param  $limit Numero de resutlados
+	 */
+	public function add_limit($limit){
+		if(is_numeric($limit) && $limit >= 0){
+			$this->limit = ' LIMIT '.$limit;
+			return $this;
+		}
+		else{
+			throw new Exception('Parámetro asociado al limite de resultados de la query es erróneo. Se esperaba un entero mayor que cero, se obtuvo: '."$limit");
+		}
 	}
 
 	/**
@@ -256,7 +271,8 @@ class Criteria
 				$this->generate_join_statement().
 				$this->generate_where_statement().
 				$this->generate_grouping_statement().
-				$this->generate_ordering_statement();
+				$this->generate_ordering_statement().
+				$this->limit;
 	}
 
 }

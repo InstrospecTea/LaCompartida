@@ -112,8 +112,7 @@ function Actualizaciones(&$dbh, $new_version) {
 
 		case 1.4:
 			echo 'Mensaje de prueba 4.<br>';
-			$query = "ALTER TABLE `cliente` CHANGE `dir_calle` `dir_calle` VARCHAR( 150 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,
-CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
+			$query = "ALTER TABLE `cliente` CHANGE `dir_calle` `dir_calle` VARCHAR( 150 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
@@ -242,7 +241,7 @@ CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 
 		case 1.9:
 			$query = "ALTER TABLE `cta_corriente` CHANGE `codigo_cliente` `codigo_cliente` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
-CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
+			CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
 
@@ -10242,7 +10241,51 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.69:
+		case 7.66:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.67:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
+			$queries[] = "UPDATE configuracion, (
+					SELECT
+						SUM(IF(_tmp.profesional > 0, 1, 0)) AS cupo
+					FROM (
+						SELECT usuario.id_usuario,
+							SUM(IF(usuario_permiso.codigo_permiso = 'PRO', 1, 0)) AS profesional,
+							SUM(IF(usuario_permiso.codigo_permiso != 'PRO', 1, 0)) AS administrativo
+						FROM usuario
+							LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+						WHERE usuario.activo = 1 AND usuario.rut != '99511620' AND usuario_permiso.codigo_permiso != 'ALL'
+						GROUP BY usuario.id_usuario
+					) AS _tmp
+				) AS tmp
+				SET configuracion.valor_opcion = tmp.cupo
+				WHERE configuracion.glosa_opcion = 'CupoUsuariosProfesionales';";
+			$queries[] = "UPDATE configuracion, (
+					SELECT
+						SUM(IF(_tmp.profesional = 0 AND _tmp.administrativo > 0, 1, 0)) AS cupo
+					FROM (
+						SELECT usuario.id_usuario,
+							SUM(IF(usuario_permiso.codigo_permiso = 'PRO', 1, 0)) AS profesional,
+							SUM(IF(usuario_permiso.codigo_permiso != 'PRO', 1, 0)) AS administrativo
+						FROM usuario
+							LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+						WHERE usuario.activo = 1 AND usuario.rut != '99511620' AND usuario_permiso.codigo_permiso != 'ALL'
+						GROUP BY usuario.id_usuario
+					) AS _tmp
+				) AS tmp
+				SET configuracion.valor_opcion = tmp.cupo
+				WHERE configuracion.glosa_opcion = 'CupoUsuariosAdministrativos';";
+
+			ejecutar($queries, $dbh);
+			break;
+		case 7.68:
 			$queries = array();
 			if(!ExisteCampo('fecha_vencimiento', 'factura', $dbh)){
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_vencimiento` DATE NULL AFTER `condicion_pago`;";
@@ -10250,7 +10293,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.70:
+		case 7.69:
 			//Calcula la fecha de vencimiento para las facturas.
 			$queries = array();
 			$resp = mysql_query('SELECT id_factura, condicion_pago, fecha_facturacion, fecha_vencimiento FROM factura LEFT JOIN cobro ON factura.id_cobro = cobro.id_cobro;', $dbh) or Utiles::errorSQL($query_malos, __FILE__, __LINE__, $dbh);
@@ -10308,10 +10351,7 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
-
-		}
-
-		
+		}	
 }
 
 
@@ -10320,7 +10360,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.70;
+$max_update = 7.69;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
