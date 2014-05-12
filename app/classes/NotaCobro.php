@@ -3970,51 +3970,85 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 
-				for ($k = 0; $k < count($this->asuntos); $k++) {
-					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigo($this->asuntos[$k]);
+				if ($this->fields['forma_cobro'] == 'FLAT FEE') { 
 
-					$query = "SELECT
-								asunto.codigo_asunto,
-								asunto.codigo_asunto_secundario,
-								asunto.glosa_asunto,
-								SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada,
-								SUM(monto_cobrado) as importe
-							FROM trabajo
-							JOIN asunto ON asunto.codigo_asunto=trabajo.codigo_asunto
-							WHERE trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-								AND trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-								AND trabajo.cobrable = 1
-								AND id_tramite=0
-								AND duracion_cobrada > 0
-								GROUP BY glosa_asunto ASC";
+					$query = "
+						SELECT
+							asunto.codigo_asunto AS codigo_asunto,
+							asunto.codigo_asunto_secundario AS codigo_asunto_secundario,
+							asunto.glosa_asunto as glosa_asunto
+						FROM cobro						
+							LEFT JOIN cobro_asunto ON cobro.id_cobro = cobro_asunto.id_cobro
+							LEFT JOIN asunto ON cobro_asunto.codigo_asunto = asunto.codigo_asunto
+							WHERE cobro.id_cobro = '".$this->fields['id_cobro']."'";
 
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
-						$row = $row_tmpl;
 
-						$horas = floor($duracion_cobrada / 3600);
-						$minutes = (($duracion_cobrada / 60 ) % 60);
-						$seconds = ($duracion_cobrada % 60);
+					while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto) = mysql_fetch_array($resp)) {
 
 						list($solo_codigo_cliente, $solo_codigo_asunto_secundario) = split("-", $codigo_asunto_secundario);
+						
+						$row = $row_tmpl;
 
 						$row = str_replace('%solo_codigo_asunto_secundario%', $solo_codigo_asunto_secundario, $row);
-
 						$row = str_replace('%codigo_asunto%', $codigo_asunto, $row);
 						$row = str_replace('%codigo_asunto_secundario%', $codigo_asunto_secundario, $row);
 						$row = str_replace('%glosa_asunto%', $glosa_asunto, $row);
-						$row = str_replace('%horas%', $horas . ':' . sprintf("%02d", $minutes), $row);
-
-						if ($this->fields['forma_cobro'] == 'TASA' || $this->fields['forma_cobro'] == 'CAP' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
-							$row = str_replace('%importe%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-						}
-
-						if ($this->fields['forma_cobro'] == 'FLAT FEE') {
-							$row = str_replace('%importe%', '', $row);
-						}
-
+						$row = str_replace('%horas%', '', $row);
+						$row = str_replace('%importe%', '', $row);
+						
 						$html .= $row;
+
+					}
+
+				} else {
+
+					for ($k = 0; $k < count($this->asuntos); $k++) {
+						$asunto = new Asunto($this->sesion);
+						$asunto->LoadByCodigo($this->asuntos[$k]);
+
+						$query = "SELECT
+									asunto.codigo_asunto,
+									asunto.codigo_asunto_secundario,
+									asunto.glosa_asunto,
+									SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada,
+									SUM(monto_cobrado) as importe
+								FROM trabajo
+								JOIN asunto ON asunto.codigo_asunto=trabajo.codigo_asunto
+								WHERE trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+									AND trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
+									AND trabajo.cobrable = 1
+									AND id_tramite=0
+									AND duracion_cobrada > 0
+									GROUP BY glosa_asunto ASC";
+
+						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+						while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
+							$row = $row_tmpl;
+
+							$horas = floor($duracion_cobrada / 3600);
+							$minutes = (($duracion_cobrada / 60 ) % 60);
+							$seconds = ($duracion_cobrada % 60);
+
+							list($solo_codigo_cliente, $solo_codigo_asunto_secundario) = split("-", $codigo_asunto_secundario);
+
+							$row = str_replace('%solo_codigo_asunto_secundario%', $solo_codigo_asunto_secundario, $row);
+
+							$row = str_replace('%codigo_asunto%', $codigo_asunto, $row);
+							$row = str_replace('%codigo_asunto_secundario%', $codigo_asunto_secundario, $row);
+							$row = str_replace('%glosa_asunto%', $glosa_asunto, $row);
+							$row = str_replace('%horas%', $horas . ':' . sprintf("%02d", $minutes), $row);
+
+							if ($this->fields['forma_cobro'] == 'TASA' || $this->fields['forma_cobro'] == 'CAP' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
+								$row = str_replace('%importe%', number_format($importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+							}
+
+							if ($this->fields['forma_cobro'] == 'FLAT FEE') {
+								$row = str_replace('%importe%', '', $row);
+							}
+
+							$html .= $row;
+						}
 					}
 				}
 
