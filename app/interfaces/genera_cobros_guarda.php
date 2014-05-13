@@ -182,7 +182,7 @@ if ($print) {
 				if (!$NotaCobro->Load($cob['id_cobro'])) {
 					continue;
 				}
-				
+
 				if ($opcion != 'cartas') {
 				 	$NotaCobro->fields['id_carta'] = null;
 				} else {
@@ -201,27 +201,27 @@ if ($print) {
 				$lang_archivo = $cob['codigo_idioma'] . '.php';
 
 				require_once Conf::ServerDir() . "/lang/$lang_archivo";
-				
+
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
 				$opc_papel = $cob['opc_papel'];
 				$id_carta = $cob['id_carta'];
 				$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
-			
+
 				if ($html) {
-				
+
 					$cssData .= UtilesApp::CSSCobro($Sesion);
-				 	
+
 					if (is_object($doc)) {
 				 		$doc->newSession($html);
 				 	} else {
-				 	
+
 				 		$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
 				 		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
 				 			$orientacion_papel = 'PORTRAIT';
 				 		}
-						
+
 						$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
 				 	}
 					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
@@ -406,4 +406,3 @@ if ($print) {
 		);
 	}
 }
-

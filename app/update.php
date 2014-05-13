@@ -112,8 +112,7 @@ function Actualizaciones(&$dbh, $new_version) {
 
 		case 1.4:
 			echo 'Mensaje de prueba 4.<br>';
-			$query = "ALTER TABLE `cliente` CHANGE `dir_calle` `dir_calle` VARCHAR( 150 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,
-CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
+			$query = "ALTER TABLE `cliente` CHANGE `dir_calle` `dir_calle` VARCHAR( 150 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
@@ -242,7 +241,7 @@ CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 
 		case 1.9:
 			$query = "ALTER TABLE `cta_corriente` CHANGE `codigo_cliente` `codigo_cliente` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
-CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
+			CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
 
@@ -10234,7 +10233,142 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		}
+		case 7.65:
+			$queries = array();
+			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_moneda` ADD `glosa_moneda_plural_lang` VARCHAR( 30 ) NOT NULL AFTER `glosa_moneda_plural` ;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.66:
+			$queries = array();
+			if (!ExisteCampo('factura_estado', 'contrato', $dbh)) {
+			$queries[] = "ALTER TABLE `contrato` ADD `factura_estado` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER `factura_ciudad`;";
+			}
+
+			if (!ExisteCampo('estado_cliente', 'factura', $dbh)) {
+			$queries[] = "ALTER TABLE `factura` ADD `estado_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER `ciudad_cliente`;";
+			}
+
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
+			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+			
+			ejecutar($queries,$dbh);
+
+			break;
+
+		case 7.67:
+		
+			$queries = array();
+			if (!ExisteCampo('region_cliente', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE  `contrato` ADD `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
+			}
+			if (!ExisteCampo('factura_region', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE  `factura` ADD `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
+			}
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
+			$queries[] = "UPDATE configuracion, (
+					SELECT
+						SUM(IF(_tmp.profesional > 0, 1, 0)) AS cupo
+					FROM (
+						SELECT usuario.id_usuario,
+							SUM(IF(usuario_permiso.codigo_permiso = 'PRO', 1, 0)) AS profesional,
+							SUM(IF(usuario_permiso.codigo_permiso != 'PRO', 1, 0)) AS administrativo
+						FROM usuario
+							LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+						WHERE usuario.activo = 1 AND usuario.rut != '99511620' AND usuario_permiso.codigo_permiso != 'ALL'
+						GROUP BY usuario.id_usuario
+					) AS _tmp
+				) AS tmp
+				SET configuracion.valor_opcion = tmp.cupo
+				WHERE configuracion.glosa_opcion = 'CupoUsuariosProfesionales';";
+			$queries[] = "UPDATE configuracion, (
+					SELECT
+						SUM(IF(_tmp.profesional = 0 AND _tmp.administrativo > 0, 1, 0)) AS cupo
+					FROM (
+						SELECT usuario.id_usuario,
+							SUM(IF(usuario_permiso.codigo_permiso = 'PRO', 1, 0)) AS profesional,
+							SUM(IF(usuario_permiso.codigo_permiso != 'PRO', 1, 0)) AS administrativo
+						FROM usuario
+							LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+						WHERE usuario.activo = 1 AND usuario.rut != '99511620' AND usuario_permiso.codigo_permiso != 'ALL'
+						GROUP BY usuario.id_usuario
+					) AS _tmp
+				) AS tmp
+				SET configuracion.valor_opcion = tmp.cupo
+				WHERE configuracion.glosa_opcion = 'CupoUsuariosAdministrativos';";
+
+			ejecutar($queries, $dbh);
+			break;
+		case 7.68:
+			$queries = array();
+			if(!ExisteCampo('fecha_vencimiento', 'factura', $dbh)){
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_vencimiento` DATE NULL AFTER `condicion_pago`;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.69:
+			//Calcula la fecha de vencimiento para las facturas.
+			$queries = array();
+			$resp = mysql_query('SELECT id_factura, condicion_pago, fecha_facturacion, fecha_vencimiento FROM factura LEFT JOIN cobro ON factura.id_cobro = cobro.id_cobro;', $dbh) or Utiles::errorSQL($query_malos, __FILE__, __LINE__, $dbh);
+			while(list($id_factura, $condicion_pago, $fecha_facturacion, $fecha_vencimiento) = mysql_fetch_array($resp)){
+
+				if(empty($fecha_vencimiento)){
+					
+					//Se asume que es contado (fecha de pago al día de facturación), a menos que la condición de pago especifique lo contrario. Se han considerado todos los casos
+					//excepto el de cheque a fecha, ya que no hay como saber para cuándo fue pactado el convenio.
+
+					$dias = 0;
+					
+					if ($condicion_pago == 3) {
+						# 15
+						$dias = 15;
+					}
+
+					if ($condicion_pago == 4 || $condicion_pago == 12 || $condicion_pago == 18) {
+						# 30
+						$dias = 30;
+					}
+
+					if ($condicion_pago == 5 || $condicion_pago == 13 || $condicion_pago == 19) {
+						# 45
+						$dias = 45;
+					}
+
+					if ($condicion_pago == 6 || $condicion_pago == 14 || $condicion_pago == 20) {
+						# 60
+						$dias = 60;
+					}
+
+					if ($condicion_pago == 7) {
+						# 75
+						$dias = 75;
+					}
+
+					if ($condicion_pago == 8 || $condicion_pago == 15) {
+						# 90
+						$dias = 90;
+					}
+
+					if ($condicion_pago == 9) {
+						# 120
+						$dias = 120;
+					}
+
+					$date = new DateTime($fecha_facturacion);
+					$date->add(new DateInterval('P'.$dias.'D'));
+
+					$queries[] = 'UPDATE factura SET fecha_vencimiento = \''.$date->format('Y-m-d').'\' WHERE id_factura = '.$id_factura.';';
+				}
+				
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+		}	
 }
 
 
@@ -10243,15 +10377,19 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.64;
+$max_update = 7.69;
+
 
 $force = 0;
-if (isset($_GET['maxupdate']))
+if (isset($_GET['maxupdate'])) {
 	$max_update = round($_GET['maxupdate'], 2);
-if (isset($_GET['minupdate']))
+}
+if (isset($_GET['minupdate'])) {
 	$min_update = round($_GET['minupdate'], 2);
-if (isset($_GET['force']))
+}
+if (isset($_GET['force'])) {
 	$force = $_GET['force'];
+}
 for ($version = max($min_update, 2); $version <= $max_update; $version += 0.01) {
 	$VERSIONES[$num++] = round($version, 2);
 }

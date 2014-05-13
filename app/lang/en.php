@@ -308,7 +308,14 @@ $_LANG['SOCIO COBRADOR'] = "BILLING PARTNER";
 $_LANG['Nota'] = "Note";
 $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'] = "Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
 $_LANG['Con Impuesto'] = "With Taxes";
+
 #Nota cobro Morales
+$_LANG['Descripción de Servicios'] = "Description of Services";
+$_LANG['Nota de Cargo'] = "Bill";
+$_LANG['Asunto'] = "Matter";
+$_LANG['detalledegastos'] = "Expenses";
+$_LANG['resumen_raz'] = "Billing Summary";
+
 $_LANG['N°Trabajo'] = "Work ID";
 $_LANG['Atte'] = "Attn";
 $_LANG['Registro de Tiempo'] = "Time Records";
@@ -324,6 +331,10 @@ $_LANG['Abogados que trabajaron'] = "Lawyers Involved";
 $_LANG['Honorarios'] = "Fees";
 $_LANG['Detalle del Trabajo Realizado'] = "Description of Work";
 $_LANG['Abogado'] = "Lawyer";
+$_LANG['abogado_raz'] = "Attorney";
+$_LANG['tiempo_raz'] = "Hours";
+$_LANG['tarifa_raz'] = "Rate";
+$_LANG['importe_raz'] = "Amount";
 $_LANG['Total Cobro'] = "Invoice Total";
 $_LANG['total_cobro'] = "Total";
 $_LANG['Total Cobro:'] = "Invoice Total:";
@@ -439,7 +450,7 @@ $_LANG['Observaciones'] = "Observaciones";
 $_LANG['Debe ingresar observación'] = "Debe ingresar observación";
 $_LANG['Tienes que ingresar el tipo de moneda.'] = "Tienes que ingresar el tipo de moneda.";
 $_LANG['Tipo de cambio'] = "Tipo de cambio";
-
+$_LANG['Días Atraso'] = "Overdue Days";
 
 #Actividad
 $_LANG['Actividad'] = "Actividad";
@@ -760,6 +771,8 @@ $_LANG['mes_emision'] = 'Emisión (mes)';
 $_LANG['mes'] = 'Month';
 $_LANG['estado'] = "Status";
 
+$_LANG['Dias Vencimiento'] = "Expiration days";
+
 // Meses
 $_LANG['Enero'] = 'January';
 $_LANG['Febrero'] = 'February';
@@ -830,7 +843,7 @@ $_LANG['Factura ACL'] = "Reference";
 $_LANG['Asociado'] = "Associate";
 $_LANG['Procurador'] = "Attorney";
 $_LANG['Socio'] = "Partner";
-$_LANG['Administrativo'] = "Administrative";  
+$_LANG['Administrativo'] = "Administrative";
 
 /* Olvidados */
 $_LANG['Categoría'] = "Category";
