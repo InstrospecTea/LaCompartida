@@ -39,7 +39,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 		$groupby.=" factura.id_factura";
 		$tipo = " pdl.glosa";
 		$fecha_atraso = " factura.fecha";
-		$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+		$label = " concat(pdl.codigo,' N° ',  factura.serie_documento_legal,'-',lpad(factura.numero,'7','0')) ";
 		$identificadores = 'facturas';
 		//$linktofile = 'agregar_factura.php?id_factura=';
 		//$identificador = " factura.id_factura";

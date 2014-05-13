@@ -181,7 +181,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
-		$factura->Edit('serie_documento_legal', (int) $serie);
+		$factura->Edit('serie_documento_legal', $serie);
 
 		$factura->Edit("numero", $numero ? $numero : "1");
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
@@ -563,7 +563,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td align="left">
 					<?php
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
-						$serie_documento_legal = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
+						$serie_documento_legal = $factura->fields['serie_documento_legal'];
 						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
 					} else {
 						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
@@ -591,7 +591,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
 
 			if (($codigo_documento_legal == 'NC') && ($id_cobro || $codigo_cliente)) {
-				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', LPAD(factura.serie_documento_legal, 3, '0'), '-', numero" : "prm_documento_legal.glosa,' #',numero";
+				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', factura.serie_documento_legal, '-', numero" : "prm_documento_legal.glosa,' #',numero";
 				if ($id_cobro) {
 					$query_padre = "SELECT id_factura, CONCAT({$glosa_numero_serie}) FROM factura JOIN prm_documento_legal USING (id_documento_legal) WHERE id_cobro = '{$id_cobro}'";
 				} else if ($codigo_cliente) {
@@ -949,7 +949,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
 	function CargarDatosCliente(sin_contrato) {
-		console.log(sin_contrato);
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var id_origen = 'codigo_cliente_secundario';
 		<?php } else { ?>

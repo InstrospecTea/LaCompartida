@@ -42,7 +42,7 @@ if ($exportar_excel) {
 }
 
 $idioma_default = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
-$idioma_default->Load(strtolower(UtilesApp::GetConf($Sesion, 'Idioma')));
+$idioma_default->Load(strtolower(Conf::GetConf($Sesion, 'Idioma')));
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$FacturaPago = new FacturaPago($Sesion);
@@ -204,7 +204,7 @@ function funcionTR(& $fila) {
 	if ($fila->fields['codigo_idioma']) {
 		$idioma->Load($fila->fields['codigo_idioma']);
 	} else {
-		$idioma->Load(strtolower(UtilesApp::GetConf($Sesion, 'Idioma')));
+		$idioma->Load(strtolower(Conf::GetConf($Sesion, 'Idioma')));
 	}
 
 	if ($i % 2 == 0)
@@ -434,7 +434,7 @@ else
 				</td>
 				<td align=left>
 <?php
-if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
+if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="5" onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "190");
 } else {
 	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, ' onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "150");
@@ -455,7 +455,7 @@ if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 					<?php echo __('N° Factura') ?>
 				</td>
 				<td align=left width="18%">
-<?php if (UtilesApp::GetConf($Sesion, 'NumeroFacturaConSerie')) { ?>
+<?php if (Conf::GetConf($Sesion, 'NumeroFacturaConSerie')) { ?>
 						<?php echo Html::SelectQuery($Sesion, $series_documento->SeriesQuery(), "serie", $serie, '', "Vacio", 60); ?>
 						<span style="vertical-align: center;">-</span>
 <?php } ?>
@@ -474,7 +474,7 @@ if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				</td>
 				<td align=left>
 <?php
-if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
+if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="5" ', 'Cualquiera', "190");
 } else {
 	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', 'Cualquiera', "150");
@@ -501,7 +501,7 @@ if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				</td>
 				<td align=left>
 <?php
-if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
+if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 	echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="5" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta[]\', true);"', 'Cualquiera', "190");
 } else {
 	echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, ' onchange="CargarCuenta(\'id_banco\',\'id_cuenta\', false);"', 'Cualquiera', "190");
@@ -518,7 +518,7 @@ if (!empty($id_banco)) {
 } else {
 	$where_banco = " WHERE 1=2 ";
 }
-if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
+if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 	echo Html::SelectQuery($Sesion, "SELECT cuenta_banco.id_cuenta
 				, CONCAT( cuenta_banco.numero,
 					 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
@@ -562,7 +562,7 @@ if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 			</tr>
 		</table>
 	</fieldset>
-<?php if (UtilesApp::GetConf($Sesion, 'UsaDisenoNuevo')) echo "</td></tr></table>"; ?>
+<?php if (Conf::GetConf($Sesion, 'UsaDisenoNuevo')) echo "</td></tr></table>"; ?>
 </form>
 
 <script type="text/javascript">

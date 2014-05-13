@@ -53,7 +53,7 @@ if (!class_exists('Cobro')) {
 		function GlosaSeEstaCobrando() {
 			$se_esta_cobrando = "";
 
-			if (UtilesApp::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
+			if (Conf::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
 				$se_esta_cobrando = "Honorarios Profesionales\nPeriodo Comprendido: \n";
 
 				if ($this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini'])) {
@@ -92,16 +92,16 @@ if (!class_exists('Cobro')) {
 		function BotoneraCobro() {
 			echo "<br /><br />    <a class=\"btn botonizame\" icon=\"ui-icon-doc\" setwidth=\"185\" onclick=\"return VerDetalles(jQuery('#todo_cobro').get(0));\" >" . __('Descargar Archivo') . " Word</a>";
 
-			if (UtilesApp::GetConf($this->sesion, 'MostrarBotonCobroPDF')) {
+			if (Conf::GetConf($this->sesion, 'MostrarBotonCobroPDF')) {
 				echo "<br class=\"clearfix vpx\" /><a class=\"btn botonizame\"  icon=\"ui-icon-pdf\"  setwidth=\"185\" onclick=\"return VerDetallesPDF(jQuery('#todo_cobro').get(0));\">" . __('Descargar Archivo') . " PDF</a>";
 			}
-			if (!UtilesApp::GetConf($this->sesion, 'EsconderExcelCobroModificable')) {
+			if (!Conf::GetConf($this->sesion, 'EsconderExcelCobroModificable')) {
 				echo "<br class=\"clearfix vpx\"/><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0)); \">" . __('descargar_excel_modificable') . " </a>";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) {
+			if (Conf::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) {
 				echo "	<br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); \">" . __('Excel rentabilidad') . "  </a>	";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') {
+			if (Conf::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && Conf::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') {
 				echo "  <br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');\">" . __('Descargar Excel Cobro') . " </a>";
 			}
 		}
@@ -265,20 +265,20 @@ if (!class_exists('Cobro')) {
 					if (!empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00') {
 						$estado_anterior_temp == 'ENVIADO AL CLIENTE';
 					} else {
-						if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+						if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 							if ($this->TieneFacturasSinAnular()) {
 								$estado_anterior_temp = 'FACTURADO';
 							}
 						}
 					}
 				} else if ($codigo_estado_cobro == 'ENVIADO AL CLIENTE') {
-					if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 						if ($this->TieneFacturasSinAnular()) {
 							$estado_anterior_temp = 'FACTURADO';
 						}
 					}
 				} else if ($codigo_estado_cobro == 'FACTURADO') {
-					if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 						if ($this->TieneFacturasSinAnular()) {
 							$estado_anterior_temp = 'FACTURADO';
 						}
@@ -290,7 +290,7 @@ if (!class_exists('Cobro')) {
 		}
 
 		function CambiarEstadoAnterior() {
-			if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 				$this->CambiarEstadoSegunFacturas();
 			} else {
 				$nuevo_estado = $this->CalcularEstadoAnterior();
@@ -339,10 +339,9 @@ if (!class_exists('Cobro')) {
 			$this->ArrayFacturasDelContrato = array();
 			if ($nuevomodulofactura) {
 				$query = "SELECT
-				concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero ,
-				cobro.id_cobro,
-
-				  cobro.fecha_enviado_cliente,cobro.fecha_emision,
+								concat(prm_documento_legal.glosa,' N° ',  factura.serie_documento_legal,'-',lpad(factura.numero,'7','0')) as facturanumero ,
+								cobro.id_cobro,
+								cobro.fecha_enviado_cliente,cobro.fecha_emision,
 								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total,
 								factura.subtotal as subtotal_honorarios,
 								cobro_moneda.tipo_cambio,
@@ -350,38 +349,37 @@ if (!class_exists('Cobro')) {
 								prm_moneda.cifras_decimales,
 
 
-								 cast(factura.total-factura.iva as decimal(10,4)) as total_sin_impuesto ,
+								cast(factura.total-factura.iva as decimal(10,4)) as total_sin_impuesto ,
 								factura.iva,
 								factura.total ,
 								date_format(factura.fecha,'%Y-%m') as periodo,
 								factura.subtotal as subtotal_honorarios,
-									factura.subtotal_gastos,
-									factura.subtotal_gastos_sin_impuesto,
-									ccfm.saldo,
-									ccfm.id_moneda,
-									cobro.incluye_honorarios,
-									cobro.incluye_gastos,
-								(if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)  )) as tasa_cambio
-								, if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+								factura.subtotal_gastos,
+								factura.subtotal_gastos_sin_impuesto,
+								ccfm.saldo,
+								ccfm.id_moneda,
+								cobro.incluye_honorarios,
+								cobro.incluye_gastos,
+								if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)) as tasa_cambio,
+								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
 									) as tipo_cobro
 								FROM cobro
-								LEFT JOIN factura using (id_cobro)
-								LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
-								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
-								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
-								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-								JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
+									LEFT JOIN factura using (id_cobro)
+									LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
+									LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
+									LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
+									JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
                               	WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'
-								 "; //and ccfm.saldo<0  ";
-				//editado: AND cobro.estado!='PAGADO'
+								 ";
 			} else {
 				$query = "SELECT ifnull(cobro.documento,cobro.id_cobro) as facturanumero,
 								cobro.id_cobro,
 								cobro.fecha_enviado_cliente,cobro.fecha_emision,
 								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total, cobro.monto,
 								cobro_moneda.tipo_cambio,cobro.tipo_cambio_moneda,prm_moneda.cifras_decimales,
-								 cast(documento.monto-documento.impuesto as decimal(10,4)) as total_sin_impuesto ,
+								cast(documento.monto-documento.impuesto as decimal(10,4)) as total_sin_impuesto ,
 								documento.impuesto as  iva,
 								documento.monto as total ,
 								date_format(documento.fecha,'%Y-%m') as periodo,
@@ -391,33 +389,32 @@ if (!class_exists('Cobro')) {
 								documento.saldo_honorarios,
 								documento.saldo_gastos,
 								documento.id_moneda,
-									cobro.incluye_honorarios,
-									cobro.incluye_gastos,
-								if(documento.id_moneda= cobro.id_moneda,1,cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
+								cobro.incluye_honorarios,
+								cobro.incluye_gastos,
+								if(documento.id_moneda= cobro.id_moneda, 1, cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
 								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
 									) as tipo_cobro
- 								FROM cobro
+							FROM cobro
 								LEFT join documento on cobro.id_cobro=documento.id_cobro and documento.tipo_doc='N'
-
-				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda
-				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro =cobro.id_cobro AND cm2.id_moneda =cobro.opc_moneda_total
-
+								LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda
+								LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro =cobro.id_cobro AND cm2.id_moneda =cobro.opc_moneda_total
 								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
 								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-								WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
+							WHERE cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
 			}
-//AND cobro.estado!='PAGADO'
 
 			$query .= " AND cobro.id_contrato=" . $this->fields['id_contrato'];
-			if ($id_cobro != null)
+			if ($id_cobro != null) {
 				$query .= " AND cobro.id_cobro=" . $id_cobro;
+			}
 
-			if ($tipo != '')
+			if ($tipo != '') {
 				$query .= " AND if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
 									)='" . $tipo . "'";
+			}
 
 			$facturasST = $sesion->pdodbh->query($query);
 			$this->ArrayFacturasDelContrato = $facturasST->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
@@ -1227,7 +1224,7 @@ if (!class_exists('Cobro')) {
 					// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 					// Si el config "GuardarTarifaAlIngresoDeHora" existe saca la tarifa del registro de tarifas
 					// por trabajo, si no saca lo del contrato actual
-					if (UtilesApp::GetConf($this->sesion, 'GuardarTarifaAlIngresoDeHora')) {
+					if (Conf::GetConf($this->sesion, 'GuardarTarifaAlIngresoDeHora')) {
 						// Según Tarifa del contrato
 						$profesional[$id_usuario]['tarifa'] = Funciones::TrabajoTarifa($this->sesion, $trabajo->fields['id_trabajo'], $this->fields['id_moneda']);
 						// Según Tarifa estándar del sistema
@@ -1401,7 +1398,7 @@ if (!class_exists('Cobro')) {
 			}
 
 			#GASTOS del Cobro
-			if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloGastos')) {
+			if (!Conf::GetConf($this->sesion, 'NuevoModuloGastos')) {
 				$no_generado = '';
 				if ($this->fields['id_gasto_generado']) {
 					$no_generado = ' AND cta_corriente.id_movimiento != ' . $this->fields['id_gasto_generado'];
@@ -1467,7 +1464,7 @@ if (!class_exists('Cobro')) {
 					$monto_provision_restante = number_format(0.00 - $cobro_total_gastos, $moneda_total->fields['cifras_decimales'], '.', '');
 
 
-					if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					if (Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
 						//En vez de generar un gasto ficticio, divido un gasto en dos.
 						//Decido cual es la provision que voy a dividir
@@ -1533,7 +1530,7 @@ if (!class_exists('Cobro')) {
 					$provision->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
 					$provision->Edit('incluir_en_cobro', 'SI');
 					$provision->Edit('fecha', date('Y-m-d 00:00:00'));
-					if (!UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					if (!Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 						$provision->Write();
 					}
 					//debug(print_r($provision));
@@ -1625,7 +1622,7 @@ if (!class_exists('Cobro')) {
 			$this->Edit('total_minutos', $cobro_total_minutos);
 
 
-			if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+			if (Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 				$this->Edit('saldo_final_gastos', number_format($saldo_final_gastos_egreso, 6, ".", ""));
 				$gastos_cobro = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'], array('listar_detalle'), true);
 			} else {
@@ -1647,7 +1644,7 @@ if (!class_exists('Cobro')) {
 
 			if ($this->Write()) {
 				if ($emitir) {
-					if ($provision && $provision_original && UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					if ($provision && $provision_original && Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
 						if ($provision_original) {
 							$provision_original->Write();
@@ -2127,7 +2124,7 @@ if (!class_exists('Cobro')) {
 						$cobro_moneda->ActualizarTipoCambioCobro($this->fields['id_cobro']);
 
 						###### GASTOS ######
-						if (UtilesApp::Getconf($this->sesion, 'UsaFechaDesdeCobranza')) {
+						if (Conf::GetConf($this->sesion, 'UsaFechaDesdeCobranza')) {
 							$and_fecha .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 						} else {
 							$and_fecha .= "AND cta_corriente.fecha <= '$fecha_fin'";
@@ -2396,7 +2393,7 @@ if (!class_exists('Cobro')) {
 				}
 			}
 
-			if (UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC')) {
+			if (Conf::GetConf($this->sesion, 'DejarTarifaCeroRetainerPRC')) {
 				$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
 												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
 												 AND t2.id_usuario = u.id_usuario
@@ -2686,7 +2683,7 @@ if (!class_exists('Cobro')) {
 				$id_cobro = $this->fields[$this->campo_id];
 			}
 
-			$nuevomodulofactura = UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
+			$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
 
 			$queryadelantos = "SELECT
 								IFNULL(documento.id_contrato, 0) AS id_contrato,

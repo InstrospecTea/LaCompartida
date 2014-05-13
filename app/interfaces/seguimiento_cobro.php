@@ -63,7 +63,7 @@ if ($opc == 'buscar') {
 	$where = 1;
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
+	} else if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		//$where .= " AND concat(cobro.documento, ',') LIKE '%$tipo_documento_legal $factura %' ";
@@ -119,19 +119,19 @@ if ($opc == 'buscar') {
 
 
 	// FFF 25-01-2012 el estado de la factura se saca de la tabla factura en el mod viejo, y de prm_estado_factura en el nuevo. Ademas, según el conf sale con o sin N de Serie
-	if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
                              left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
-		if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
-			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
+		if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
+			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', ifnull(serie_documento_legal,'001'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
 		} else {
 			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', numero,if(pef.glosa='Anulado', ' (Anulado)',''))) ";
 		}
-	} else if (UtilesApp::GetConf($sesion, 'PermitirFactura')) {
+	} else if (Conf::GetConf($sesion, 'PermitirFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";
-		$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
+		$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', ifnull(serie_documento_legal,'001'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
 	} else {
 		$joinfactura = "";
 		$documentof = " cobro.documento ";
@@ -274,10 +274,10 @@ if ($opc == 'buscar') {
 		if ($cobro->fields['codigo_idioma'] != '')
 			$idioma->Load($cobro->fields['codigo_idioma']);
 		else
-			$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+			$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 
 		$cols = 4;
-		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) {
+		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 			$cols++;
 		}
 		$contratofields = $cobro->fields;
@@ -318,8 +318,8 @@ if ($opc == 'buscar') {
 			$ht .= "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-			//if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-			if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) {
+			//if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
 							</td>";
@@ -386,7 +386,7 @@ if ($opc == 'buscar') {
 		#$html .= ' -  [Proc. '.$cobro->fields['id_proceso'].'] ';
 		$html .= "<span style='font-size:8px'>- (" . $cobro->fields['estado'] . ")</span>";
 
-		if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+		if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 			$asuntos_separados = explode(', ', $cobro->fields['asuntos_cobro']);
 			$cantidad_asuntos = count($asuntos_separados);
 			$html .= " <div class=\"tip_asuntos_cobro inlinehelp\" title=\"Listado de '. __('Asuntos'); .'\" id=\"tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "\">" . $cantidad_asuntos . "&nbsp;asunto" . ($cantidad_asuntos > 1 ? "s" : "") . "</div>";
@@ -394,7 +394,7 @@ if ($opc == 'buscar') {
 		}
 
 		$html .= "</td>";
-		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) {
+		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
@@ -712,7 +712,7 @@ else
 								GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13)
 								GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-								 <?php if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
+								 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
 						&nbsp;&nbsp;<b><?php echo __('N° Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13)
 									GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
@@ -749,7 +749,7 @@ else
 				<td align=right><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
 				<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
 			</tr>
-			<?php if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+			<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
 				<tr>
 					<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
 					<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>

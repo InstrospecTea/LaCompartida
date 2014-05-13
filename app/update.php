@@ -10248,6 +10248,14 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+		case 7.67:
+			$queries = array();
+			$queries[] = "ALTER TABLE `prm_doc_legal_numero` CHANGE COLUMN `serie` `serie` VARCHAR(6) NOT NULL DEFAULT '';";
+			$queries[] = "ALTER TABLE `factura` CHANGE COLUMN `serie_documento_legal` `serie_documento_legal` VARCHAR(6) NOT NULL DEFAULT '';";
+			$queries[] = "UPDATE factura SET serie_documento_legal = LPAD(serie_documento_legal, 3, '0');";
+			ejecutar($queries, $dbh);
+			break;
+
 		}
 }
 
@@ -10257,7 +10265,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.66;
+$max_update = 7.67;
 
 $force = 0;
 if (isset($_GET['maxupdate']))
