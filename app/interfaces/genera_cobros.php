@@ -290,9 +290,7 @@ $pagina->PrintTop();
 		return true;
 	}
 
-
-	function GeneraCobros(form, desde, opcion, id_formato)
-	{
+	function GeneraCobros(form, desde, opcion, id_formato) {
 		if (!form) {
 			var form = $('form_busca');
 		}
@@ -582,9 +580,6 @@ $pagina->PrintTop();
 		}
 	}
 
-	/*
-	 Impresión de cobros
-	 */
 	function ImpresionCobros(alerta, opcion, id_formato) {
 		
 		var form = jQuery('#form_busca');
@@ -657,9 +652,6 @@ $pagina->PrintTop();
 		});
 	}
 
-	/*
-	 Impresión de cobros
-	 */
 	function ImpresionAsuntosLiquidar(alerta, opcion) {
 		
 		var form = jQuery('#form_busca');
@@ -705,10 +697,8 @@ $pagina->PrintTop();
 		}
 	}
 
-	//refrescar para popup
-	function Refrescar()
-	{
-		//var form = $('form_busca');
+	function Refrescar() {
+
 		$('opc').value = 'buscar';
 		var opc = $('opc').value;
 
@@ -748,12 +738,10 @@ $pagina->PrintTop();
 		self.location.href = url;
 	}
 
-	//fin refrescar para popup
 
 	//Confirmación de generación de cobros individuales
-	function GenerarIndividual(modalidad, id_contrato, fecha_ultimo_cobro, fecha_ini, fecha_fin,
-			monto_estimado, monto_real, moneda, id_cobro_pendiente, incluye_honorarios, incluye_gastos) {
-		//var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
+	function GenerarIndividual(modalidad, id_contrato, fecha_ultimo_cobro, fecha_ini, fecha_fin, monto_estimado, monto_real, moneda, id_cobro_pendiente, incluye_honorarios, incluye_gastos) {
+		
 		interrumpeproceso = 0;
 		var text_window = '<p style="padding:10px;font-size:12px;font-weight:bold;text-align:center;"><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php echo __('Al generar este borrador se eliminarán todos los borradores antiguos asociados a ' . __('este contrato')); ?>.<br>';
 		
@@ -840,109 +828,110 @@ $pagina->PrintTop();
 	</div>
 	<!-- Fin calendario DIV -->
 
-	<table width="90%"><tr><td>
+	<table width="90%">
+		<tr>
+			<td>
 				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-					<legend><?php echo 'Filtros' ?></legend>
-					<table width='720px' style='border:0px dotted #999999'>
-						<tr>
-							<td align=right width='30%'>
-								<b><?php echo __('Grupo') ?></b>&nbsp;
-							</td>
-							<td align=left colspan=2>
-								<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
-							</td>
-						</tr>
-						<tr>
-							<td align=right width='30%'><b><?php echo __('Cliente') ?>&nbsp;</b></td>
-							<td colspan=2 align=left>
-								<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
-								if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-									<input type="hidden" name="codigo_cliente" id="codigo_cliente"/>
-								<?php } ?>
-							</td>
-						</tr>
-						<tr>
-							<td align=right style="font-weight:bold;">
-<?php echo __('Asunto') ?>
-							</td>
-							<td nowrap align=left colspan=2>
-								<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+				<legend><?php echo 'Filtros' ?></legend>
 
-							</td>
-						</tr>
+				<table width='720px' style='border:0px dotted #999999'>
+					<tr>
+						<td align=right width='30%'>
+							<b><?php echo __('Grupo') ?></b>&nbsp;
+						</td>
+						<td align=left colspan=2>
+							<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+						</td>
+					</tr>
+					<tr>
+						<td align=right width='30%'><b><?php echo __('Cliente') ?>&nbsp;</b></td>
+						<td colspan=2 align=left>
+							<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
+							if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+								<input type="hidden" name="codigo_cliente" id="codigo_cliente"/>
+							<?php } ?>
+						</td>
+					</tr>
+					<tr>
+						<td align=right style="font-weight:bold;">
+							<?php echo __('Asunto') ?>
+						</td>
+						<td nowrap align=left colspan=2>
+							<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+						</td>
+					</tr>
+					<tr>
+						<td align=right><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
+						<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
+						</td>
+					</tr>
+
+					<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
 						<tr>
-							<td align=right><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
-							<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
+							<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
+							<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 								<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
 							</td>
 						</tr>
-<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
-							<tr>
-								<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
-								<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
-								</td>
-							</tr>
-	<?php
-}
+					<?php } ?>
 
-($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_generacion_cobro') : false;
-?>
+					<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_generacion_cobro') : false; ?>
 						<tr>
 							<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
-<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), 'width="200"') ?>
+								<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), 'width="200"') ?>
 							</td>
 						</tr>
 						<tr>
 							<td align=right><b><?php echo __('Tipo de Liquidación') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
-<?php
-echo Html::SelectArray(array(
-	array('1', __('Sólo Honorarios')),
-	array('2', __('Sólo Gastos')),
-	array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, ' id="tipo_liquidacion" ', __('Todas'))
-?>
+								<?php
+								echo Html::SelectArray(array(
+									array('1', __('Sólo Honorarios')),
+									array('2', __('Sólo Gastos')),
+									array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, ' id="tipo_liquidacion" ', __('Todas'))
+								?>
 							</td>
 						</tr>
 						<!-- <?php echo __('Incluir Asuntos sin cobros pendientes') ?> <input type="checkbox" name=sin_cobro_pendiente value=1 <?php echo $sin_cobro_pendiente ? 'checked' : '' ?>> -->
-						<tr>
-<?php if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
-	?>
+						
+						<?php if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) { ?>
+							<tr>
 								<td align=right><b><?php echo __('Fecha desde') ?>&nbsp;</b></td>
 								<td align=left>
 									<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo!$fecha_ini ? '' : $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
 								</td>
 							</tr>
-							<tr>
-<?php } ?>
+						<?php } ?>
+						
+						<tr>
 							<td align=right><b><?php echo __('Fecha hasta') ?>&nbsp;</b></td>
 							<td align=left>
-								<input onkeydown="if (event.keyCode == 13)
-			GeneraCobros(this.form, '', false)" type="text" class="fechadiff"  name="fecha_fin" value="<?php echo!$fecha_fin ? date('d-m-Y') : $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
+								<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type="text" class="fechadiff"  name="fecha_fin" value="<?php echo!$fecha_fin ? date('d-m-Y') : $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 							</td>
-									   <?php
-									   if (isset($_POST['activo']) && $_POST['activo'] == 1) {
-										   $chk = 'checked="checked"';
-									   } else {
-										   $chk = '';
-									   }
-									   if (isset($_POST['cobrosencero'])) {
-										   if ($_POST['cobrosencero'] == 1) {
-											   $chk0 = 'checked="checked"';
-										   } else {
-											   $chk0 = '';
-										   }
-									   } else {
-										   if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
-											   $chk0 = '';
-										   } else {
-											   $chk0 = 'checked="checked"';
-										   }
-									   }
-									   ?>
+								<?php
+								if (isset($_POST['activo']) && $_POST['activo'] == 1) {
+								   $chk = 'checked="checked"';
+								} else {
+								   $chk = '';
+								}
+								if (isset($_POST['cobrosencero'])) {
+								   if ($_POST['cobrosencero'] == 1) {
+									   $chk0 = 'checked="checked"';
+								   } else {
+									   $chk0 = '';
+								   }
+								} else {
+								   if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
+									   $chk0 = '';
+								   } else {
+									   $chk0 = 'checked="checked"';
+								   }
+								}
+								?>
 							<td>
 							</td>
 						</tr>
@@ -953,11 +942,8 @@ echo Html::SelectArray(array(
 						</tr>
 						<tr>
 							<td align=right><b><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?>&nbsp;</b></td>
-							<td align=left><input type="hidden" name="cobrosencero" value="0"/><input type="checkbox" name='cobrosencero' id='cobrosencero' value="1" <?php echo $chk0; ?>>
-
-
-
-
+							<td align=left><input type="hidden" name="cobrosencero" value="0"/>
+								<input type="checkbox" name='cobrosencero' id='cobrosencero' value="1" <?php echo $chk0; ?>>
 							</td>
 						</tr>
 						<tr>
@@ -968,20 +954,18 @@ echo Html::SelectArray(array(
 						</tr>
 					</table>
 				</fieldset>
-			</td></td></table>
+			</td>
+		</td>
+	</table>
 
-
-
-<?php
-if ($opc == 'buscar') {
-	?>
+	<?php if ($opc == 'buscar') { ?>
 		<table width="820">
 			<tr>
 				<td align="right" width="680">
 					<a href="javascript:void(0);" style="color: #990000; font-size: 9px; font-weight: normal;" onclick="ToggleDiv('opciones_excel');"><?php echo __('opciones excel') ?></a>
 				</td>
 				<td align="right" nowrap>
-	<?php echo __('Idioma') ?>: <?php echo Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
+					<?php echo __('Idioma') ?>: <?php echo Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
 				</td>
 			</tr>
 			<tr>
@@ -992,29 +976,19 @@ if ($opc == 'buscar') {
 					<label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label>
 					<input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
 					<label for="opc_ver_asuntos_separados"><?php echo __('Ver asuntos por separado') ?></label>
-	<?php
-	if (method_exists('Conf', 'GetConf'))
-		$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
-	else if (method_exists('Conf', 'Ordenado_por'))
-		$solicitante = Conf::Ordenado_por();
-	else
-		$solicitante = 2;
+	
+					<?php
+					
+					$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
 
-	if ($solicitante == 0) {  // no mostrar
-		?>
+					if ($solicitante == 0) { ?>
 						<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
-						<?php
-					} elseif ($solicitante == 1) { // obligatorio
-						?>
+					<?php } elseif ($solicitante == 1) { ?>
 						<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="1" />
-						<?php
-					} elseif ($solicitante == 2) { // opcional
-						?>
+					<?php } elseif ($solicitante == 2) { ?>
 						<input type="checkbox" name="opc_ver_solicitante" id="opc_ver_solicitante" value="1" <?php echo $cobro->fields['opc_ver_solicitante'] == '1' ? 'checked="checked"' : '' ?> />
 						<label for="opc_ver_solicitante"><?php echo __('Mostrar solicitante') ?></label>
-						<?php
-					}
-					?>
+					<?php }	?>
 				</td>
 			</tr>
 			<tr>
@@ -1027,20 +1001,24 @@ if ($opc == 'buscar') {
 				</td>
 			</tr>
 		</table>
-	<?php
-}
-?>
+
+	<?php } ?>
 	<br>
+
 </form>
+
 <br />
 
-
 <a href="#" onclick="SubirExcel();">Subir excel</a>
-<?php
-if ($opc == 'buscar')
+
+<?php 
+
+if ($opc == 'buscar') {
 	$b->Imprimir('');
+}
 
 function funcionTR(& $contrato) {
+
 	global $sesion;
 	global $id_cobro;
 	global $p_revisor;
@@ -1054,100 +1032,117 @@ function funcionTR(& $contrato) {
 	global $formato_fecha;
 	global $html, $contratofields;
 
-	if ($i % 2 == 0)
+	if ($i % 2 == 0) {
 		$color = "#dddddd";
-	else
+	} else {
 		$color = "#ffffff";
+	}
 
 	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-	if ($contrato->fields['codigo_idioma'] != '')
+	
+	if ($contrato->fields['codigo_idioma'] != '') {
 		$idioma->Load($contrato->fields['codigo_idioma']);
-	else
+	} else {
 		$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
+	}
+
 	if (!empty($contrato->fields['fecha_ultimo_cobro'])) {
 		$fecha_ultimo_cobro = Utiles::sql2fecha($contrato->fields['fecha_ultimo_cobro'], $formato_fecha, "-");
 	} else {
 		$fecha_ultimo_cobro = 'N/A';
 	}
+
 	if ($contrato->fields['id_contrato'] > 0) {
 		$where = 1;
-		if ($tipo_liquidacion)
+		
+		if ($tipo_liquidacion) {
 			$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " .
 					" AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
+		}
 
 		$query_pendientes = "SELECT
-									cobro_pendiente.id_cobro_pendiente,
-									cobro_pendiente.monto_estimado,
-									cobro_pendiente.descripcion,
-									cobro_pendiente.fecha_cobro,
-									prm_moneda.simbolo,
-									prm_moneda.cifras_decimales
-								FROM cobro_pendiente
-								JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
-								JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
-								WHERE cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.id_contrato = '" . $contrato->fields['id_contrato'] . "'
-								AND cobro_pendiente.fecha_cobro <= '" . Utiles::fecha2sql($fecha_fin) . "' AND cobro_pendiente.hito = 0 ORDER BY cobro_pendiente.fecha_cobro ASC";
+								cobro_pendiente.id_cobro_pendiente,
+								cobro_pendiente.monto_estimado,
+								cobro_pendiente.descripcion,
+								cobro_pendiente.fecha_cobro,
+								prm_moneda.simbolo,
+								prm_moneda.cifras_decimales
+									FROM cobro_pendiente
+										JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
+										JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+											WHERE cobro_pendiente.id_cobro IS NULL 
+												AND cobro_pendiente.id_contrato = '" . $contrato->fields['id_contrato'] . "'
+												AND cobro_pendiente.fecha_cobro <= '" . Utiles::fecha2sql($fecha_fin) . "' 
+												AND cobro_pendiente.hito = 0 
+												ORDER BY cobro_pendiente.fecha_cobro ASC";
+
 		$lista_pendientes = new ListaCobrosPendientes($sesion, '', $query_pendientes);
 
 		//Hitos
 		$query_hitos = "SELECT
-					cobro_pendiente.id_cobro_pendiente,
-					cobro_pendiente.monto_estimado,
-					cobro_pendiente.descripcion,
-					cobro_pendiente.fecha_cobro,
-					cobro_pendiente.id_cobro,
-					cobro.estado,
-					prm_moneda.simbolo,
-					prm_moneda.cifras_decimales
-				FROM cobro_pendiente
-					JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
-					JOIN prm_moneda ON contrato.id_moneda_monto = prm_moneda.id_moneda
-					LEFT JOIN cobro ON cobro.id_cobro = cobro_pendiente.id_cobro
-				WHERE
-					cobro_pendiente.id_contrato = '" . $contrato->fields['id_contrato'] . "' AND
-					cobro_pendiente.hito = 1
-				ORDER BY cobro_pendiente.id_cobro_pendiente ASC";
+							cobro_pendiente.id_cobro_pendiente,
+							cobro_pendiente.monto_estimado,
+							cobro_pendiente.descripcion,
+							cobro_pendiente.fecha_cobro,
+							cobro_pendiente.id_cobro,
+							cobro.estado,
+							prm_moneda.simbolo,
+							prm_moneda.cifras_decimales
+								FROM cobro_pendiente
+									JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
+									JOIN prm_moneda ON contrato.id_moneda_monto = prm_moneda.id_moneda
+									LEFT JOIN cobro ON cobro.id_cobro = cobro_pendiente.id_cobro
+										WHERE cobro_pendiente.id_contrato = '" . $contrato->fields['id_contrato'] . "'
+										AND cobro_pendiente.hito = 1
+											ORDER BY cobro_pendiente.id_cobro_pendiente ASC";
+
 		$lista_hitos = new ListaCobrosPendientes($sesion, '', $query_hitos);
 
 
 
 		#se dejó igual hasta que todos los clientes esten ordenados... 08-03-09
 		$query_cobros = "SELECT
-													id_cobro,
-													monto,
-													monto_subtotal,
-													descuento,
-													impuesto,
-													cobro.codigo_idioma,
-													monto_gastos,
-													subtotal_gastos,
-													impuesto_gastos,
-													fecha_ini,
-													fecha_fin,
-													prm_moneda.simbolo,
-													prm_moneda.cifras_decimales,
-													moneda_opcion.simbolo as simbolo_moneda_opcion,
-													moneda_opcion.cifras_decimales as cifras_decimales_moneda_opcion,
-													cobro.id_proceso,
-													incluye_gastos,
-													incluye_honorarios
-												FROM cobro
-												JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-												JOIN prm_moneda as moneda_opcion ON moneda_opcion.id_moneda = cobro.opc_moneda_total
-												WHERE $where AND cobro.id_contrato = '" . $contrato->fields['id_contrato'] . "'
-												AND ( cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ORDER BY cobro.fecha_creacion ASC";
+							id_cobro,
+							monto,
+							monto_subtotal,
+							descuento,
+							impuesto,
+							cobro.codigo_idioma,
+							monto_gastos,
+							subtotal_gastos,
+							impuesto_gastos,
+							fecha_ini,
+							fecha_fin,
+							prm_moneda.simbolo,
+							prm_moneda.cifras_decimales,
+							moneda_opcion.simbolo as simbolo_moneda_opcion,
+							moneda_opcion.cifras_decimales as cifras_decimales_moneda_opcion,
+							cobro.id_proceso,
+							incluye_gastos,
+							incluye_honorarios
+								FROM cobro
+									JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
+									JOIN prm_moneda as moneda_opcion ON moneda_opcion.id_moneda = cobro.opc_moneda_total
+										WHERE $where 
+										AND cobro.id_contrato = '" . $contrato->fields['id_contrato'] . "'
+										AND ( cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) 
+											ORDER BY cobro.fecha_creacion ASC";
+
 		$lista_cobros = new ListaCobros($sesion, '', $query_cobros);
 	}
+
 	$contratofields = $contrato->fields;
+
 	$html = "";
 	$html .= "<tr bgcolor=$color style='border-left: 1px solid #409C0B; border-right: 1px solid #409C0B; '>";
-	$html .= "<td style='font-size:10px' valing=top><b>" . $contrato->fields[glosa_cliente];
+	$html .= "<td style='font-size:10px' valing=top><b>" . $contrato->fields['glosa_cliente'];
+
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_imprimir_buscador') : false;
 
 
 	$html .= "</b></td>";
 
-	$html .= "<td style='font-size:10px' align=left id=tip_$i valing=top><b>" . $contrato->fields[asuntos] . "</b></td>";
+	$html .= "<td style='font-size:10px' align=left id=tip_$i valing=top><b>" . $contrato->fields['asuntos'] . "</b></td>";
 	$html .= "<td style='font-size:10px' align=center valing=top><b>" . $fecha_ultimo_cobro . "</b></td>";
 
 	if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
@@ -1163,36 +1158,39 @@ function funcionTR(& $contrato) {
 	$html .= "</tr>";
 
 	if ($lista_cobros->num > 0 && $contrato->fields['id_contrato'] > 0) {
+		
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 		$html .= "<td></td><td align=left colspan=4></td>";
 		$html .= "</tr>\n";
-		#DIV para el borrador..
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 		$html .= "<td style='border-right:1px dashed #999999; border-left:1px dashed #999999; border-top:1px dashed #999999; font-size:10px'>" . __('Borrador') . "</td><td colspan=4 style='border-right:1px dashed #999999; border-left:1px dashed #999999; border-top:1px dashed #999999;'>";
 		$html .= "<div id='cobros_$i'>";
 		$html .= "<table width=100%>";
+		
 		$txt_iva = __('IVA');
+		
 		for ($z = 0; $z < $lista_cobros->num; $z++) {
 			$cobro = $lista_cobros->Get($z);
 			$idioma_cobro = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-			if ($cobro->fields['codigo_idioma'] != '')
+			
+			if ($cobro->fields['codigo_idioma'] != '') {
 				$idioma_cobro->Load($cobro->fields['codigo_idioma']);
-			else
+			} else {
 				$idioma_cobro->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
+			}
+
 			$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
 			$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-") . ' ' . __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 
-			$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
-					(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
+			$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' : (empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
 
 			$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto'], 2, $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']);
+
 			if (!empty($cobro->fields['impuesto'])) {
-				$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto_subtotal'] - $cobro->fields['descuento'], 2, $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']) .
-						" + $txt_iva ($honorarios)";
+				$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto_subtotal'] - $cobro->fields['descuento'], 2, $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']) . " + $txt_iva ($honorarios)";
 			}
 
-			$texto_honorarios = "$honorarios por " .
-					number_format($total_horas, 1, $idioma_cobro->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs. ';
+			$texto_honorarios = "$honorarios por " . number_format($total_horas, 1, $idioma_cobro->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs. ';
 
 			$gastos = $cobro->fields['simbolo_moneda_opcion'] . ' ' . number_format($cobro->fields['monto_gastos'], $cobro->fields['cifras_decimales_moneda_opcion'], $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']);
 
@@ -1200,22 +1198,21 @@ function funcionTR(& $contrato) {
 				$gastos = $cobro->fields['simbolo_moneda_opcion'] . ' ' . number_format($cobro->fields['subtotal_gastos'], $cobro->fields['cifras_decimales_moneda_opcion'], $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']) .
 						" + $txt_iva ($gastos)";
 			}
+
 			$texto_gastos = "$gastos en gastos ";
 
-			$texto_monto = !empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos']) ?
-					$texto_honorarios . ' y ' . $texto_gastos :
-					(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);
-			$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'><td width=3%>&nbsp;<img src='" . Conf::ImgDir() . "/color_amarillo.gif' border=0></td>
-									<td align=center width=5% style='font-size:10px'>#" . $cobro->fields['id_cobro'] . "</td>
-									<td align=left width=82% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
-
-
+			$texto_monto = !empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos']) ? $texto_honorarios . ' y ' . $texto_gastos :	(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);
+			
+			$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'>";
+			$html .= "<td width=3%>&nbsp;<img src='" . Conf::ImgDir() . "/color_amarillo.gif' border=0></td>";
+			$html .= "<td align=center width=5% style='font-size:10px'>#" . $cobro->fields['id_cobro'] . "</td>";
+			$html .= "<td align=left width=82% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
 			$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
 			$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='" . __('Continuar con el cobro') . "' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true', '');\">&nbsp;</a>";
 			$html .= "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='" . __('Eliminar cobro') . "'  onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\">&nbsp;</a>";
 			$html .= UtilesApp::LogDialog($sesion, 'cobro', $cobro->fields['id_cobro']);
-
 			$html .= "</td>";
+
 		}
 
 		$html .= "</tr></table></div>";
