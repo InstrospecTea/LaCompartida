@@ -97,6 +97,7 @@ if ($opc == 'asuntos_liquidar') {
 	*	2 => Gastos
 	*	3 => Mixtas
 	*/
+	
 
 	if ($tipo_liquidacion) {
 		$where .= " AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
@@ -129,7 +130,7 @@ if ($opc == 'asuntos_liquidar') {
 				contrato.forma_cobro,
 				CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
 				contrato.activo,
-				(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro,
+				(SELECT IFNULL(MAX(cobro.fecha_fin), MAX(cobro.fecha_creacion)) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro,
 				tarifa.glosa_tarifa,
 				contrato.incluir_en_cierre,
 				contrato.retainer_horas,
