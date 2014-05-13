@@ -14,6 +14,9 @@ Miércoles 13 de Mayo 2014
 * **Feature:** [Activación de usuarios según cupo](#468)
 * **Feature:** [Feature/estado mx](#451)
 
+## Hotfix: 14.1.23
+Viernes 09 de Mayo 2014
+* **Fixed:** [Incorpora feature razguzman a branch master](https://github.com/LemontechSA/ttb/pull/504)
 
 ## Hotfix: 14.1.22
 martes 06 de mayo 2014
