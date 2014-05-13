@@ -1,4 +1,20 @@
 # Changelog
+## Release: 14.2.0
+Miércoles 13 de Mayo 2014
+
+* **Feature:** [Feature Mod Cobros2](#501)
+* **Feature:** [Feature/mejora reporte antiguedad deuda clientes](#498)
+* **Feature:** [Nuevo orden de columnas y formas de mostrar subtotal](#497)
+* **Feature:** [Feature/correccion datos demo](#493)
+* **Feature:** [habilita opcion monto cero en genera cobro](#484)
+* **Feature:** [habilita columna encargado comercial en listado trabajos excel](#482)
+* **Feature:** [Traducciones custom para categorias de usuario](#480)
+* **Feature:** [Modificacion seccion "RESUMEN_ASUNTOS" (Nota de Cobro)](#476)
+* **Feature:** [No envia alertas al usuario de vacaciones](#473)
+* **Feature:** [Activación de usuarios según cupo](#468)
+* **Feature:** [Feature/estado mx](#451)
+
+
 ## Hotfix: 14.1.22
 martes 06 de mayo 2014
 * **Fixed:** [Corrige opción compara hora cobrables](https://github.com/LemontechSA/ttb/pull/502)
