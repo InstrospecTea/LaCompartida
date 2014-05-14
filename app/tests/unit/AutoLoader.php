@@ -11,7 +11,6 @@ class AutoLoader
 		
 		$di = new DirectoryIterator($directorio);
 		foreach ($di as $file) {
-			
 			if ($file->isDir() && !$file->isLink() && !$file->isDot()) {
 				self::registerDirectory($file->getPathName());
 			} elseif (substr($file->getFilename(), -4) === '.php') {
@@ -23,10 +22,11 @@ class AutoLoader
 	}
 
 	public static function registerClass($className, $fileName) {
-		AutoLoader::$classNames[$className] = $fileName;
+
+		AutoLoader::$classNames[ucfirst($className)] = $fileName;
 	}
 
-	public static function loadClass($className) {;
+	public static function loadClass($className) {
 		if (isset(AutoLoader::$classNames[$className])) {
 			require_once(AutoLoader::$classNames[$className]);
 		}

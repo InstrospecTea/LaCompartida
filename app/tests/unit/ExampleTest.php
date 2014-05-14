@@ -19,7 +19,7 @@ class ExampleTest extends \Codeception\TestCase\Test
     }
 
     // tests
-    public function testMe()
+    public function testASimpleAndNaiveSituation()
     {
         $html = '<strong>Hello World</strong>';
         $this->assertEquals('<strong>Hello World</strong>', $html);
