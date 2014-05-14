@@ -10253,13 +10253,13 @@ QUERY;
 
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
 			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
-			
+
 			ejecutar($queries,$dbh);
 
 			break;
 
 		case 7.67:
-		
+
 			$queries = array();
 			if (!ExisteCampo('region_cliente', 'contrato', $dbh)) {
 				$queries[] = "ALTER TABLE  `contrato` ADD `region_cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `factura_ciudad`;";
@@ -10317,12 +10317,12 @@ QUERY;
 			while(list($id_factura, $condicion_pago, $fecha_facturacion, $fecha_vencimiento) = mysql_fetch_array($resp)){
 
 				if(empty($fecha_vencimiento)){
-					
+
 					//Se asume que es contado (fecha de pago al día de facturación), a menos que la condición de pago especifique lo contrario. Se han considerado todos los casos
 					//excepto el de cheque a fecha, ya que no hay como saber para cuándo fue pactado el convenio.
 
 					$dias = 0;
-					
+
 					if ($condicion_pago == 3) {
 						# 15
 						$dias = 15;
@@ -10363,12 +10363,19 @@ QUERY;
 
 					$queries[] = 'UPDATE factura SET fecha_vencimiento = \''.$date->format('Y-m-d').'\' WHERE id_factura = '.$id_factura.';';
 				}
-				
+
 			}
 
 			ejecutar($queries, $dbh);
 			break;
-		}	
+		case 7.70:
+			$queries = array();
+			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_categoria_usuario` ADD `glosa_categoria_lang` VARCHAR( 20 ) NULL AFTER `glosa_categoria`";
+			}
+			ejecutar($queries, $dbh);
+			break;
+	}
 }
 
 
@@ -10377,7 +10384,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.69;
+$max_update = 7.70;
 
 
 $force = 0;
