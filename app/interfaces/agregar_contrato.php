@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
