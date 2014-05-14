@@ -10,10 +10,12 @@ class ExampleTest extends \Codeception\TestCase\Test
 
     protected function _before()
     {
+
     }
 
     protected function _after()
     {
+
     }
 
     // tests
