@@ -2407,7 +2407,7 @@ if (!class_exists('Cobro')) {
 												 AND t2.id_usuario = u.id_usuario
 												 AND t2.cobrable = 1";
 			}
-		
+
 			if ($this->fields['codigo_idioma'] == "es"){
 				$select_categoria_lang = "cu.glosa_categoria as glosa_categoria,";
 			} else {
@@ -2438,7 +2438,7 @@ if (!class_exists('Cobro')) {
 										$where_horas_cero
 									GROUP BY t.codigo_asunto, t.id_usuario
 									ORDER BY $order_categoria t.fecha ASC, t.descripcion ";
-		
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			$contrato_horas = $this->fields['retainer_horas'];
@@ -2593,7 +2593,6 @@ if (!class_exists('Cobro')) {
 				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
 					$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
-					$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
 					$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
 				} else {
 					$array_profesional_usuario['duracion_tarificada'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
@@ -2614,12 +2613,14 @@ if (!class_exists('Cobro')) {
 				$array_resumen_profesionales[$id_usuario]['duracion_descontada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_descontada']);
 				$array_resumen_profesionales[$id_usuario]['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_incobrables']);
 				$array_resumen_profesionales[$id_usuario]['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_retainer']);
+
 				if ($this->fields['forma_cobro'] == 'FLAT FEE' && $this->fields['opc_ver_valor_hh_flat_fee']) {
 					$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_cobrada'] - $array_resumen_profesional[$id_usuario]['duracion_incobrables'];
 				} else {
-					$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_tarificada']);
-				}$array_resumen_profesionales[$id_usuario]['valor_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
+					$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = $data['duracion_tarificada'];
+				}
 
+				$array_resumen_profesionales[$id_usuario]['valor_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
 				$resumen_valor_hh += $data['duracion_cobrada'] * $data['tarifa'];
 			}
 			if ($resumen_valor_hh > 0) {
