@@ -42,7 +42,7 @@ $_LANG['Atención'] = "Atención";
 $_LANG['Giro'] = "Giro";
 $_LANG['Dirección'] = "Dirección";
 $_LANG['Estimado'] = "Estimado";
-$_LANG['texto_instrucciones'] = "No envié cheques por correo aéreo. Existe un serio riesgo de extravío o robo. Siga las instrucciones. De ser posible favor notificarnos el pago de la factura al siguiente e-mail: mariana.peroni@pstbn.com.py indicando los siguientes datos: N° de Factura, monto, y forma de envió del pago"; 
+$_LANG['texto_instrucciones'] = "No envié cheques por correo aéreo. Existe un serio riesgo de extravío o robo. Siga las instrucciones. De ser posible favor notificarnos el pago de la factura al siguiente e-mail: mariana.peroni@pstbn.com.py indicando los siguientes datos: N° de Factura, monto, y forma de envió del pago";
 
 #Monedas
 $_LANG['Tipos de Cambio']="Tipos de Cambio";
@@ -453,7 +453,7 @@ $_LANG['Observaciones'] = "Observaciones";
 $_LANG['Debe ingresar observación'] = "Debe ingresar observación";
 $_LANG['Tienes que ingresar el tipo de moneda.'] = "Tienes que ingresar el tipo de moneda.";
 $_LANG['Tipo de cambio'] = "Tipo de cambio";
-
+$_LANG['Días Atraso'] = "Días Atraso";
 
 #Actividad
 $_LANG['Actividad'] = "Actividad";
@@ -783,7 +783,7 @@ $_LANG['tipo_asunto'] = "Tipo Asunto";
 $_LANG['area_asunto'] = "Area Asunto";
 $_LANG['glosa_actividad'] = "Actividad";
 $_LANG['area_trabajo'] = "Area Trabajo";
-
+$_LANG['Dias Vencimiento'] = "Días Vencimiento";
 
 ##### MESES
 #Mayuscula

@@ -451,7 +451,7 @@ $_LANG['Observaciones'] = "Observaciones";
 $_LANG['Debe ingresar observación'] = "Debe ingresar observación";
 $_LANG['Tienes que ingresar el tipo de moneda.'] = "Tienes que ingresar el tipo de moneda.";
 $_LANG['Tipo de cambio'] = "Tipo de cambio";
-
+$_LANG['Días Atraso'] = "Overdue Days";
 
 #Actividad
 $_LANG['Actividad'] = "Actividad";
@@ -772,6 +772,8 @@ $_LANG['mes_emision'] = 'Emisión (mes)';
 $_LANG['mes'] = 'Month';
 $_LANG['estado'] = "Status";
 
+$_LANG['Dias Vencimiento'] = "Expiration days";
+
 // Meses
 $_LANG['Enero'] = 'January';
 $_LANG['Febrero'] = 'February';
@@ -842,7 +844,7 @@ $_LANG['Factura ACL'] = "Reference";
 $_LANG['Asociado'] = "Associate";
 $_LANG['Procurador'] = "Attorney";
 $_LANG['Socio'] = "Partner";
-$_LANG['Administrativo'] = "Administrative";  
+$_LANG['Administrativo'] = "Administrative";
 
 /* Olvidados */
 $_LANG['Categoría'] = "Category";

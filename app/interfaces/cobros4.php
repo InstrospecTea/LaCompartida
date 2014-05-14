@@ -51,7 +51,7 @@ if ($orden == "") {
 $where = "1";
 
 if ($id_cobro) {
-	
+
 	$cobro->LoadAsuntos();
 	$query_asuntos = implode("','", $cobro->asuntos);
 
@@ -100,20 +100,20 @@ $query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
 				CONCAT(usuario.apellido1,', ',usuario.nombre) AS nombre,
 				prm_moneda.simbolo,
 				asunto.glosa_asunto
-            FROM cta_corriente  
+            FROM cta_corriente
                 LEFT JOIN asunto USING( codigo_asunto )
-                LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario 
-	            LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda 
+                LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
+	            LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
                 LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
-                $join_cobro_asunto 
+                $join_cobro_asunto
                 WHERE $where $and AND (egreso > 0 OR ingreso > 0)";
 
 if ($check_gasto == 1 && isset($cobro)) { //Check_trabajo vale 1 cuando aprietan boton buscar
-	
+
 	$query2 = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
 	$resp = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 	$lista_gastos = new ListaGastos($sesion, '', $query);
-	
+
 	for ($x = 0; $x < $lista_gastos->num; $x++) {
 		$gasto = $lista_gastos->Get($x);
 		$emitir_gasto = new Gasto($sesion);
@@ -155,9 +155,9 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 		}
 
 		loading("Actualizando opciones");
-		
+
 		http.open('get', 'ajax_grabar_campo.php?accion=' + accion +'&id_gasto=' + id_gasto + '&id_cobro=' + id_cobro + '&valor=' + valor);
-		
+
 		http.onreadystatechange = function() {
 			if(http.readyState == 4) {
 				var response = http.responseText;
@@ -178,7 +178,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 		} else {
 			echo "var pagina_desde = '';";
 		}
-		
+
 		if ($orden) {
 			echo "var orden = '&orden=" . $orden . "';";
 		} else {
@@ -187,7 +187,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 
 		var id_cobro = document.forms["cobro"].elements["id_cobro"].value;
 		var url = "cobros4.php?id_cobro="+id_cobro+"&popup=1&contitulo=true";
-		self.location.href= url; 
+		self.location.href= url;
 	}
 
 	// Basado en http://snipplr.com/view/1696/get-elements-by-class-name/
@@ -196,7 +196,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 		var a = [];
 		var re = new RegExp('\\b' + classname + '\\b');
 		var els = node.getElementsByTagName("*");
-		
+
 		for(var i=0,j=els.length; i<j; i++) {
 			if(re.test(els[i].className))a.push(els[i]);
 		}
@@ -205,7 +205,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 	}
 	// Función para seleccionar todos las filas para editar, basada en la de phpMyAdmin
 	function seleccionarTodo(valor, sinc) {
-		
+
 		var rows = getElementsByClassName('buscador')[0].getElementsByTagName('tr');
 		valores = "";
 		var checkbox;
@@ -221,10 +221,10 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 	}
 
 	function GrabarTodosCampos(id_gastos,id_cobro, valor, sinc)	{
-        
+
         sinc = (sinc == undefined || sinc == null) ? true : false;
 		var http = getXMLHTTP();
-		
+
 		if(valor) {
 			valor = '1';
 		} else {
@@ -233,9 +233,9 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 
 		loading("Actualizando opciones");
 		http.open('get', 'ajax_grabar_campo.php?accion=varios_cobrables&id_gastos=' + id_gastos + '&id_cobro=' + id_cobro + '&valor=' + valor, sinc);
-		
+
 		http.onreadystatechange = function() {
-			
+
 			if(http.readyState == 4) {
 				var response = http.responseText;
 				if(response.indexOf('OK') == -1) {
@@ -278,9 +278,9 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 	<div id="contenedor" >
 	    <fieldset class="tb_base " width="100%" style="border: 1px solid #BDBDBD;">
         <legend> <?php echo __('Filtros') ?></legend>
-	
+
         <form method="post" onsubmit="seleccionarTodo(false, 1);">
-            
+
             <table width="100%">
                 <tr>
                     <td align='center'>
@@ -301,7 +301,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 	    </fieldset>
 	</div>
 <?php } ?>
- 
+
 <?php
 $b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 $b->mensaje_sin_resultados = str_replace('%s', __('asuntos'), __('No existen gastos por cobrar en los %s seleccionados'));
@@ -322,7 +322,7 @@ if (isset($cobro) || $opc == 'buscar') { ?>
 			&nbsp;&nbsp;&nbsp;&nbsp;
 		<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
 	</center>
-	
+
 <?php
 
 }
@@ -386,10 +386,6 @@ function funcionTR(& $gasto) {
 
 if ($solo_gastos && $opc == "boton_buscar") {
 	echo '<script type="text/javascript">	seleccionarTodo(true);		</script>';
-}  
+}
 
 $pagina->PrintBottom($popup);
- 
-
-
-
