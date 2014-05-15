@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.1.23
+Jueves 15 de Mayo 2014
+* **Fixed:** [Modificaciones Turanzas](https://github.com/LemontechSA/ttb/pull/505)
+
 ## Release: 14.2.0
 Miércoles 13 de Mayo 2014
 
