@@ -7,7 +7,6 @@ $contrato = new Contrato($sesion);
 $cobros = new Cobro($sesion);
 
 global $contratofields;
-
 $series_documento = new DocumentoLegalNumero($sesion);
 
 $query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
@@ -25,6 +24,7 @@ $query_forma_cobro = "SELECT forma_cobro, descripcion FROM prm_forma_cobro";
 if ($opc == 'eliminar') {
 
 	if ($cobros->Load($id_cobro_hide)) {
+	
 		$documento_cobro = new Documento($sesion);
 		$documento_cobro->LoadByCobro($id_cobro_hide);
 		$lista_pagos = $documento_cobro->ListaPagos();
@@ -59,10 +59,9 @@ if ($opc == 'buscar') {
 
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
+	} else if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
-
 		$factura_obj = new Factura($sesion);
 		$lista_cobros_x_factura = $factura_obj->GetlistaCobroSoyDatoFactura('', $tipo_documento_legal, $factura, $serie);
 		if ($lista_cobros_x_factura == '') {
@@ -70,7 +69,6 @@ if ($opc == 'buscar') {
 		} else {
 			$where .= " AND cobro.id_cobro IN ($lista_cobros_x_factura)";
 		}
-
 	} else {
 
 		if ($proceso) {
@@ -101,32 +99,28 @@ if ($opc == 'buscar') {
 		if (!empty($estado) && $estado[0] != '-1') {
 			$where .= " AND cobro.estado in ('" . implode("','", $estado) . "') ";
 		}
-
 	}
 
 	if ($codigo_asunto) {
 		$where.=" AND contrato.id_contrato in (select id_contrato from asunto where asunto.codigo_asunto='$codigo_asunto') ";
 	}
-
 	if ($codigo_asunto_secundario) {
 		$where .= " AND contrato.id_contrato in (select id_contrato from asunto WHERE asunto.codigo_asunto_secundario ='" . $codigo_asunto_secundario . "') ";
 	}
-
 	if (!empty($tipo_liquidacion) && $tipo_liquidacion != '') {
 		$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " . " AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
 	}
 
-	if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
                              left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
-		if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+		if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
 		} else {
 			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', numero,if(pef.glosa='Anulado', ' (Anulado)',''))) ";
 		}
-
-	} else if (UtilesApp::GetConf($sesion, 'PermitirFactura')) {
+	} else if (Conf::GetConf($sesion, 'PermitirFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";
 		$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
@@ -136,29 +130,13 @@ if ($opc == 'buscar') {
 	}
 
 	if (isset($_POST['tienehonorario'])) {
-		$where.= " AND (
-			        SELECT count(id_tramite)
-			        FROM  `trabajo` AS t1
-			        WHERE t1.id_cobro = cobro.id_cobro
-			        AND t1.id_tramite = 0
-	    ) > 0 ";
+		$where.= " AND ( SELECT count(id_tramite) FROM  `trabajo` AS t1 WHERE t1.id_cobro = cobro.id_cobro AND t1.id_tramite = 0 ) > 0 ";
 	}
-
 	if (isset($_POST['tienegastos'])) {
-		$where.= " AND (
-					SELECT count(id_movimiento)
-			        FROM cta_corriente c
-			        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null
-			        group by c.id_cobro
-        ) IS NOT NULL ";
+		$where.= " AND ( SELECT count(id_movimiento) FROM cta_corriente c WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null group by c.id_cobro ) IS NOT NULL ";
 	}
-
 	if (isset($_POST['tienetramites'])) {
-		$where.=" AND (
-			           SELECT count(id_tramite)
-			           FROM tramite AS t1
-			           WHERE t1.id_cobro = cobro.id_cobro
-    	) > 0 ";
+		$where.=" AND ( SELECT count(id_tramite) FROM tramite AS t1 WHERE t1.id_cobro = cobro.id_cobro ) > 0 ";
 	}
 
 	$query = "SELECT SQL_CALC_FOUND_ROWS
@@ -195,18 +173,35 @@ if ($opc == 'buscar') {
 				CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
 				tarifa.glosa_tarifa,
 
-				( SELECT count(id_tramite) FROM  `trabajo` AS t1 WHERE t1.id_cobro = cobro.id_cobro AND t1.id_tramite != 0 ) as tramites_count,
-		    	( SELECT count(id_tramite) FROM  `trabajo` AS t1 WHERE t1.id_cobro = cobro.id_cobro AND t1.id_tramite = 0 ) as trabajos_count,
-			    ( SELECT count(id_movimiento) FROM cta_corriente c WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null group by c.id_cobro ) as gastos_SiNo ";
+				(
+			        SELECT count(id_tramite)
+			        FROM  `trabajo` AS t1
+			        WHERE t1.id_cobro = cobro.id_cobro
+			        AND t1.id_tramite != 0
+			    ) as tramites_count,
+			    (
+			        SELECT count(id_tramite)
+			        FROM  `trabajo` AS t1
+			        WHERE t1.id_cobro = cobro.id_cobro
+			        AND t1.id_tramite = 0
+			    ) as trabajos_count,
+			    (
+			    	SELECT count(id_movimiento)
+			        FROM cta_corriente c
+			        WHERE c.id_cobro = cobro.id_cobro AND c.id_cobro is not null
+			        group by c.id_cobro
+				) as gastos_SiNo
+				";
 
-				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_seguimiento_cobro') : false;
+	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_seguimiento_cobro') : false;
 
-				$query.=" FROM contrato JOIN cobro ON cobro.id_contrato = contrato.id_contrato";
-				$query.=" LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda";
-			 	$query.=" LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente";
-				$query.=" LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda";
-				$query.=" LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda";
-				$query.=" LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa";
+	$query.="FROM contrato  
+				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
+			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
+			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
+				LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
+				LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa";
 
 	if (isset($_POST['tieneadelantos'])) {
 		$query.=" left join documento as adelanto on adelanto.es_adelanto=1 AND adelanto.codigo_cliente=contrato.codigo_cliente and (adelanto.id_contrato is null or adelanto.id_contrato=contrato.id_contrato)";
@@ -214,11 +209,10 @@ if ($opc == 'buscar') {
 		$where.=" AND (	(adelanto.pago_honorarios=1 AND cobro.monto>0) OR (adelanto.pago_gastos=1 AND cobro.subtotal_gastos>0) )";
 	}
 
-	$query.=" LEFT JOIN documento on documento.id_cobro=cobro.id_cobro and documento.tipo_doc='N'";
-	$query.=" $joinfactura";
-	$query.=" WHERE $where";
-	$query.=" GROUP BY cobro.id_cobro, cobro.id_contrato";
-
+	$query.=" left join documento on documento.id_cobro=cobro.id_cobro and documento.tipo_doc='N'
+            	$joinfactura
+                    WHERE $where
+						GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
 
@@ -233,7 +227,6 @@ if ($opc == 'buscar') {
 	$b->funcionTR = "funcionTR";
 
 	function funcionTR(&$cobro) {
-
 		global $sesion;
 		global $id_cobro;
 		global $p_revisor;
@@ -257,21 +250,18 @@ if ($opc == 'buscar') {
 		if ($cobro->fields['codigo_idioma'] != '') {
 			$idioma->Load($cobro->fields['codigo_idioma']);
 		} else {
-			$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+			$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 		}
 
 		$cols = 4;
-
-		if (UtilesApp::GetConf($sesion, 'FacturaSeguimientoCobros')) {
+		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 			$cols++;
 		}
-
 		$contratofields = $cobro->fields;
 
 		$html = "";
 
 		if ($cobro->fields['codigo_cliente'] != $codigo_cliente_ultimo || $id_contrato_ultimo != $cobro->fields['id_contrato']) {
-
 			$j++;
 			$html .= $codigo_cliente_ultimo != '' ? "<tr bgcolor=$color style='border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;'><td colspan=4><hr size='1px'></td>" : "";
 
@@ -281,7 +271,7 @@ if ($opc == 'buscar') {
 
 			$html .= "</b></td>";
 			$html .= "<td style='font-size:10px' class='btpopover' title='Listado de " . __('Asuntos') . "' id='tip_{$cobro->fields['id_contrato']}' align=left valing=top></td>";
-			
+
 			if ($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL') {
 				$texto_acuerdo = $cobro->fields['forma_cobro'] . " de " . $cobro->fields['simbolo_moneda_contrato'] . " " . number_format($cobro->fields['monto'], $cobro->fields['cifras_decimales_moneda_contrato'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " por " . number_format($cobro->fields['retainer_horas'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " Hrs.";
 			} else if ($cobro->fields['forma_cobro'] == 'TASA' || $cobro->fields['forma_cobro'] == 'HITOS' || $cobro->fields['forma_cobro'] == 'ESCALONADA') {
@@ -291,7 +281,6 @@ if ($opc == 'buscar') {
 			}
 
 			$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>" . $texto_acuerdo . ', Tarifa: ' . $cobro->fields['glosa_tarifa'] . "</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?popup=1&id_contrato=" . $cobro->fields['id_contrato'] . "');\" title='" . __('Editar Información Comercial') . "'>Editar</a>";
-
 			$html .="</td></tr>";
 
 			$ht = "<tr bgcolor='#F2F2F2'>
@@ -302,7 +291,6 @@ if ($opc == 'buscar') {
 			$ht .= "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-
 			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
@@ -313,12 +301,14 @@ if ($opc == 'buscar') {
 								<b>Opción</b>
 							</td></tr>";
 			$ht .= "<tr bgcolor='#F2F2F2'><td align=center colspan=4><hr size=1px style='font-size:10px; border:1px dashed #CECECE'></td><tr>";
+			
 			$codigo_cliente_ultimo = $cobro->fields['codigo_cliente'];
 			$id_contrato_ultimo = $cobro->fields['id_contrato'];
 
 		}
 
 		$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
+		
 		$html .= "<tr bgcolor='#F2F2F2' style='border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;'>";
 		$html .= "<td align=center colspan=" . $cols . "><div style='font-size:10px; border:1px dashed #CECECE'>";
 		$html .= "<table width='100%' cellSpacing='0' cellPadding='0'>";
@@ -336,6 +326,7 @@ if ($opc == 'buscar') {
 
 		$txt_iva = __('IVA');
 		$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['cobro_monto'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
 		if (!empty($cobro->fields['impuesto'])) {
 			$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto_subtotal'] - $cobro->fields['descuento'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) .
 				" + $txt_iva ($honorarios)";
@@ -366,7 +357,6 @@ if ($opc == 'buscar') {
 		if ($cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_cobro = __('desde') . ' ' . Utiles::sql2date($cobro->fields['fecha_ini']);
 		}
-
 		if ($cobro->fields['fecha_fin'] != '0000-00-00') {
 			$fecha_cobro .= ' ' . __('hasta') . ' ' . Utiles::sql2date($cobro->fields['fecha_fin']) . ' ';
 		}
@@ -381,6 +371,7 @@ if ($opc == 'buscar') {
 		}
 
 		$html .= "</td>";
+
 		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
@@ -391,11 +382,8 @@ if ($opc == 'buscar') {
 
 		$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
 		$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='" . __('Continuar con el cobro') . "' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true&id_foco=" . $j . "', '');\">&nbsp;</a>";
-
 		$html .= "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='" . __('Eliminar cobro') . "'  onclick=\"EliminarCobros('" . $cobro->fields['id_cobro'] . "','" . $cobro->fields['estado'] . "')\">&nbsp;</a>";
-
 		$html .= UtilesApp::LogDialog($sesion, 'cobro', $cobro->fields['id_cobro']);
-
 		$html .= "</td></table>";
 		$html .= "</div></tr>";
 		$ht = '';
@@ -404,6 +392,8 @@ if ($opc == 'buscar') {
 
 }
 
+#Buscar
+
 $pagina->titulo = __('Seguimiento de cobros');
 
 $pagina->PrintTop();
@@ -411,50 +401,44 @@ $pagina->PrintTop();
 
 <script type="text/javascript">
 
-	new Tip('usar_periodo', '<?php echo __('') ?>', {title: '', effect: '', offset: {x: -2, y: 19}});
-
 	jQuery(document).ready(function() {
-
-		<?php
-			if ($_GET['buscar'] == 1) {
-				echo "jQuery('#boton_buscar').click();";
-			}
+		<?php if ($_GET['buscar'] == 1)
+			echo "jQuery('#boton_buscar').click();";
 		?>
-
+		
 		jQueryUI.done(function() {
 
 			jQuery('.btpopover').each(function() {
-				
+
 				var self = jQuery(this);
 				var idContrato = jQuery(this).attr('id').replace('tip_', '');
 				jQuery.ajax({url: 'ajax/ajax_asuntos.php?id_contrato=' + idContrato, dataType: 'json'}).done(function(data) {
 
-					if (data == '' || data == null) {
+				if (data == '' || data == null) {
+					jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'>No hay informaci&oacute;n sobre <?php echo __('Asuntos'); ?></span>");
+				} else {
 
-						jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'>No hay informaci&oacute;n sobre <?php echo __('Asuntos'); ?></span>");
+					var popover = data[idContrato];
+
+					if (popover.length > 10) {
+						var popover2 = popover.slice(0, 10);
+						var sobra = popover.length - 10;
+						popover2.push('<small>(hay otros ' + sobra + ' <?php echo __('asuntos'); ?> ocultos por falta de espacio en pantalla)</small>');
 					} else {
-						var popover = data[idContrato];
-						if (popover.length > 10) {
-							var popover2 = popover.slice(0, 10);
-							var sobra = popover.length - 10;
-							popover2.push('<small>(hay otros ' + sobra + ' <?php echo __('asuntos'); ?> ocultos por falta de espacio en pantalla)</small>');
-						} else {
-							var popover2 = popover;
-						}
-						var contenido = popover2.join('<li>');
-						var contenidofull = popover.join('<li>');
-
-						jQuery('#tip_' + idContrato).data('content', '<li>' + contenido);
-						jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'><li>" + contenidofull + "</span>");
+						var popover2 = popover;
 					}
-
+					var contenido = popover2.join('<li>');
+					var contenidofull = popover.join('<li>');
+					jQuery('#tip_' + idContrato).data('content', '<li>' + contenido);
+					jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'><li>" + contenidofull + "</span>");
+					}
 				});
 			});
 		});
 	});
 
+	//Genera o buisca los cobros.
 	function GeneraCobros(form, desde, opcion) {
-		
 		if (!form) {
 			var form = $('form_busca');
 		}
@@ -470,14 +454,12 @@ $pagina->PrintTop();
 			form.action = 'genera_cobros_guarda.php?print=true&opcion=' + opcion;
 			form.submit();
 		} else if (desde == 'emitir') {
-			
 			if (confirm('<?php echo __("¿Ud. desea emitir los cobros?") ?>')) {
 				form.action = 'genera_cobros_guarda.php?emitir=true';
 				form.submit();
 			} else {
 				return false;
 			}
-
 		} else {
 			form.action = 'seguimiento_cobro.php';
 			form.opc.value = 'buscar';
@@ -489,46 +471,46 @@ $pagina->PrintTop();
 		nuevaVentana("Subir_Excel", 500, 300, "subir_excel.php");
 	}
 
+	//Elimina Cobro
 	function EliminarCobros(id_cobro, estado) {
-	
+		
 		if (estado != 'CREADO' && estado != 'EN REVISION') {
-			
+
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('El cobro seleccionado se encuentra en estado EMITIDO, Ud. debe cambiarlo a estado CREADO o EN REVISION para poder eliminarlo.') ?>.</span><br>';
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
 			
-			Dialog.confirm(text_window, {
+			Dialog.confirm(text_window,
+			{
 				top: 150,
 				left: 290,
 				width: 400,
 				okLabel: "<?php echo __('Continuar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
 				id: "myDialogId",
-				
 				cancel: function(win) {
 					return false;
 				},
-
 				ok: function(win) {
 					nuevaVentana('Editar_Contrato', 1050, 700, 'cobros6.php?id_cobro=' + id_cobro + '&popup=1&contitulo=true');
 					return true;
 				}
 			});
-		
-		} else if (estado == 'CREADO' || estado == 'EN REVISION') {
 
-			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
+		} else if (estado == 'CREADO' || estado == 'EN REVISION') {
 			
+			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('¿Desea eliminar el cobro seleccionado?') ?></span><br>';
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
-			Dialog.confirm(text_window, {
+			
+			Dialog.confirm(text_window,
+			{
 				top: 150,
 				left: 290,
 				width: 400,
 				okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
 				id: "myDialogId",
-				
 				cancel: function(win) {
 					return false;
 				},
@@ -537,19 +519,26 @@ $pagina->PrintTop();
 					return true;
 				}
 			});
+
 		} else {
 			return false;
 		}
 	}
 
 	function DeleteCobro(id_cobro) {
+
 		var form = $('form_busca');
 		form.id_cobro_hide.value = id_cobro;
 		form.opc.value = 'eliminar';
 		form.submit();
+
 	}
 
+	/*
+	 Despliega periodos o rango para filtros
+	 */
 	function Rangos(obj, form) {
+		
 		var td_show = $('periodo_rango');
 		var td_hide = $('periodo');
 
@@ -592,17 +581,18 @@ $pagina->PrintTop();
 		var fecha_fin = $('fecha_fin').value;
 		var estado = $('estado').value;
 
-		<?php if ($orden) {
+		<?php
+		if ($orden) {
 			echo "var orden = '&orden=" . $orden . "';";
 		} else {
 			echo "var orden = '';";
 		}
-
 		if ($desde) {
 			echo "var pagina_desde = '&desde=" . $desde . "';";
 		} else {
 			echo "var pagina_desde = '';";
-		} ?>
+		}
+		?>
 
 		var url = "seguimiento_cobro.php?id_usuario=" + id_usuario + "&tipo_liquidacion=" + tipo_liquidacion + "&forma_cobro=" + forma_cobro + "&id_usuario_secundario=" + id_usuario_secundario + "&id_cobro=" + id_cobro + "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto + "&opc=buscar" + pagina_desde + "&usar_periodo=" + usar_periodo + "&rango=" + rango + "&proceso=" + proceso + "&fecha_ini=" + fecha_ini + "&fecha_mes=" + fecha_mes + "&fecha_anio=" + fecha_anio + "&fecha_fin=" + fecha_fin + "&estado=" + estado + orden + "&id_foco=" + id_foco;
 
@@ -618,12 +608,10 @@ $pagina->PrintTop();
 		var tr = document.getElementById('tr_cliente');
 		var tr2 = document.getElementById('tr_asunto');
 		var al = document.getElementById('al');
-		//var tbl_trabajo = document.getElementById('tbl_trabajo');
 
 		DivClear(div, dvimg);
 
-		if (div == 'tr_asunto' && codigo == '')
-		{
+		if (div == 'tr_asunto' && codigo == '') {
 			tr.style['display'] = 'none';
 			alert("<?php echo __('Debe seleccionar un cliente') ?>");
 			form.codigo_cliente.focus();
@@ -642,6 +630,7 @@ $pagina->PrintTop();
 			Lista('lista_asuntos', 'content_data2', codigo, '2');
 		}
 
+		/*Cambia IMG*/
 		if (valor == 'inline') {
 			WCH.Apply('tr_asunto');
 			WCH.Apply('tr_cliente');
@@ -659,31 +648,28 @@ $pagina->PrintTop();
 </script>
 
 <form name="form_busca" id="form_busca" action="" method="post">
-	
-	<input type="hidden" name="opc" id='opc' value="">
-	<input type="hidden" name="id_cobro_hide" value="">
+	<input type="hidden" name='opc' id='opc' value=''>
+	<input type="hidden" name='id_cobro_hide' value=''>
 
 	<fieldset class="tb_base" style="width:850px;">
 	<legend><?php echo 'Filtros' ?></legend>
-
-	<table>
-		<tr>
-			<td align="right" width="30%">
-				<b><?php echo __('Cobro') ?></b>
-			</td>
-			<td colspan="2" align="left">
-				<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type="text" size="6" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro ?>">
-				<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-				<?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
-					&nbsp;&nbsp;<b><?php echo __('N° Factura') ?></b>&nbsp;
-					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
-				 <?php } ?>
+	
+		<table>
+			<tr>
+				<td align="right" width='30%'><b><?php echo __('Cobro') ?></b></td>
+				<td colspan="2" align="left">
+					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
+					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
+					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
+						&nbsp;&nbsp;<b><?php echo __('N° Factura') ?></b>&nbsp;
+						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
+					 <?php } ?>
 				</td>
 			</tr>
 
 			<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 				<tr>
-					<td align="right" width="30%">
+					<td align="right" width='30%'>
 						<b><?php echo __('Documento legal') ?></b>
 					</td>
 					<td colspan="2" align="left">
@@ -693,7 +679,7 @@ $pagina->PrintTop();
 					</td>
 				</tr>
 			<?php } ?>
-			
+
 			<tbody id="selectclienteasunto">
 				<tr >
 					<td align="right" width='30%'><?php echo '<b>' . __('Nombre Cliente') . '</b>'; ?> </td>
@@ -712,53 +698,43 @@ $pagina->PrintTop();
 
 			<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
 				<tr>
-					<td align="right">
-						<b><?php echo __('Encargado Secundario') ?>&nbsp;</b>
-					</td>
-					<td colspan="2" align="left">
-						<?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
+					<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
+					<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="hidden" size="6" name="id_proceso" id="id_proceso" value="<?php echo $id_proceso ?>" >
+						<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
 					</td>
 				</tr>
 			<?php } ?>
-			
-			<?php
-				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_seguimiento_cobro') : false;
-			?>
+
+			<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_seguimiento_cobro') : false; ?>
 
 			<tr>
-				<td align="right">
-					<b><?php echo __('Forma de Tarificación') ?>&nbsp;</b>
-				</td>
-				<td colspan="2" align="left">
+				<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
+				<td colspan=2 align=left>
 					<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), '210') ?>
 				</td>
 			</tr>
-
 			<tr>
-				<td align="right">
-					<b><?php echo __('Tipo de Liquidación') ?>&nbsp;</b>
-				</td>
-				<td colspan="2" align="left">
+				<td align=right><b><?php echo __('Tipo de Liquidación') ?>&nbsp;</b></td>
+				<td colspan=2 align=left>
 					<?php
-						echo Html::SelectArray(array(
+					echo Html::SelectArray(array(
 						array('1', __('Sólo Honorarios')),
 						array('2', __('Sólo Gastos')),
 						array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, '', __('Todas'))
 					?>
 				</td>
 			</tr>
-
 			<tr>
-				<td align="right"><input type="checkbox" name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
-				<td align="left" colspan="2">
+				<td align=right><input type=checkbox name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
+				<td align=left colspan=2>
 					<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><?php echo __('Otro rango') ?></span>
-					<?php $fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m'); ?>
-					
+					<?php
+					$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
+					?>
 					<div id=periodo style='display:<?php echo!$rango ? 'inline' : 'none' ?>;'>
 
-					<?php
+						<?php
 						echo Html::SelectArray(array(
 							array('1', __('Enero')),
 							array('2', __('Febrero')),
@@ -781,12 +757,10 @@ $pagina->PrintTop();
 						<select name="fecha_anio" id='fecha_anio' style='width:55px'>
 							<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
 								<option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
-							<?php } ?>
+						<?php } ?>
 						</select>
 					</div>
-
 					<br>
-
 					<div id="periodo_rango" style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
 						<?php echo __('Fecha desde') ?>:
 						<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
@@ -796,6 +770,8 @@ $pagina->PrintTop();
 					</div>
 				</td>
 			</tr>
+
+			<script> new Tip('usar_periodo', '<?php echo __('') ?>', {title: '', effect: '', offset: {x: -2, y: 19}});</script>
 
 			<tr>
 				<td align="right">
@@ -816,11 +792,10 @@ $pagina->PrintTop();
 			</tr>
 
 			<tr>
-				<td>&nbsp;</td>
-				<td align="left">
+				<td></td>
+				<td align=left>
 					<a class="btn botonizame"  href="javascript:void(0);" icon="find" name='boton_buscar' id='boton_buscar' onclick="GeneraCobros(jQuery('#form_busca').get(0), '', false)"><?php echo __('Buscar') ?></a>
-					<a style="float:right;margin-right:20px;" class="btn botonizame" href="javascript:void(0);"  icon="upload" onclick="SubirExcel();">Subir excel</a>
-				</td>
+					<a style="float:right;margin-right:20px;" class="btn botonizame" href="javascript:void(0);"  icon="upload" onclick="SubirExcel();">Subir excel</a></td>
 			</tr>
 		</table>
 
@@ -828,11 +803,9 @@ $pagina->PrintTop();
 
 </form>
 
-
-
 <?php
-if ($opc == 'buscar')
+if ($opc == 'buscar') {
 	$b->Imprimir('');
-
+}
 
 $pagina->PrintBottom($popup);
