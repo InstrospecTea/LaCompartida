@@ -80,9 +80,9 @@ if ($opc == 'asuntos_liquidar') {
 
 	$mostrar_codigo_asuntos = "";
 
-	if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+	if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 		$mostrar_codigo_asuntos = "asunto.codigo_asunto";
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 			$mostrar_codigo_asuntos .= "_secundario";
 		}
 		$mostrar_codigo_asuntos .= ", ' ', ";
@@ -277,7 +277,7 @@ if ($opc == 'buscar') {
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
 			text_window += '<input type="radio" name="radio_generacion" id="radio_wip" checked /><?php echo __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
 
-<?php if (UtilesApp::GetConf($sesion, 'SoloGastos')) { ?>
+<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 
 				if (jQuery('#tipo_liquidacion').val() == '') {
 					text_window += '<br><input type="radio" name="radio_generacion" id="radio_gastos" /><?php echo __('Sólo Gastos') ?>';
@@ -336,7 +336,7 @@ if ($opc == 'buscar') {
 						jQuery('#nocerrar').html('Procure no cerrar la pestaña actual de su navegador. Si necesita realizar otras tareas en paralelo, puede hacerlo en otras pestañas.');
 
 						jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?generar_silenciosamente=1');
-<?php if (UtilesApp::GetConf($sesion, 'SoloGastos')) { ?>
+<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 							if (jQuery('#radio_gastos').is(':checked')) {
 								jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?gastos=1&generar_silenciosamente=1');
 							} else if (jQuery('#radio_honorarios').is(':checked')) {
@@ -344,7 +344,7 @@ if ($opc == 'buscar') {
 							}
 <?php } ?>
 
-<?php if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
+<?php if (Conf::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
 
 							var generaGG = function(i) {
 								if (i >= largoGG) {
@@ -677,7 +677,7 @@ if ($opc == 'buscar') {
 		$('opc').value = 'buscar';
 		var opc = $('opc').value;
 
-<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 <?php } else { ?>
 			var codigo_cliente = $('codigo_cliente').value;
@@ -830,7 +830,7 @@ if ($desde) {
 							<td align=right width='30%'><b><?php echo __('Cliente') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
 <?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 									<input type="hidden" name="codigo_cliente" id="codigo_cliente"/>
 								<?php } ?>
 							</td>
@@ -851,7 +851,7 @@ if ($desde) {
 								<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
 							</td>
 						</tr>
-<?php if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
 							<tr>
 								<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
 								<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
@@ -883,7 +883,7 @@ echo Html::SelectArray(array(
 						</tr>
 						<!-- <?php echo __('Incluir Asuntos sin cobros pendientes') ?> <input type="checkbox" name=sin_cobro_pendiente value=1 <?php echo $sin_cobro_pendiente ? 'checked' : '' ?>> -->
 						<tr>
-<?php if (UtilesApp::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
+<?php if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
 	?>
 								<td align=right><b><?php echo __('Fecha desde') ?>&nbsp;</b></td>
 								<td align=left>
@@ -910,7 +910,7 @@ echo Html::SelectArray(array(
 											   $chk0 = '';
 										   }
 									   } else {
-										   if (UtilesApp::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
+										   if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
 											   $chk0 = '';
 										   } else {
 											   $chk0 = 'checked="checked"';
@@ -964,7 +964,7 @@ if ($opc == 'buscar') {
 					<label for="opc_ver_horas_trabajadas"><?php echo __('Mostrar horas trabajadas') ?></label>
 					<input type="checkbox" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" />
 					<label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label>
-					<input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo UtilesApp::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
+					<input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
 					<label for="opc_ver_asuntos_separados"><?php echo __('Ver asuntos por separado') ?></label>
 	<?php
 	if (method_exists('Conf', 'GetConf'))
@@ -1037,7 +1037,7 @@ function funcionTR(& $contrato) {
 	if ($contrato->fields['codigo_idioma'] != '')
 		$idioma->Load($contrato->fields['codigo_idioma']);
 	else
-		$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+		$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 	if (!empty($contrato->fields['fecha_ultimo_cobro'])) {
 		$fecha_ultimo_cobro = Utiles::sql2fecha($contrato->fields['fecha_ultimo_cobro'], $formato_fecha, "-");
 	} else {
@@ -1152,7 +1152,7 @@ function funcionTR(& $contrato) {
 			if ($cobro->fields['codigo_idioma'] != '')
 				$idioma_cobro->Load($cobro->fields['codigo_idioma']);
 			else
-				$idioma_cobro->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+				$idioma_cobro->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 			$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
 			$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-") . ' ' . __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 
