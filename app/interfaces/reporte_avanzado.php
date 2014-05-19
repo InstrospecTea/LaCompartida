@@ -1112,12 +1112,12 @@ if (!$popup) {
 													echo 'checked="checked"';
 												?>
 														 title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
-												<label for="orden_barras_max2min"><?php echo __("Gráficar de Mayor a Menor") ?></label>
+												<label for="orden_barras_max2min"><?php echo __('Gráficar de Mayor a Menor') ?></label>
 											</td>
 											<td>
 												<span id = "limite_check" <?php if (!isset($orden_barras_max2min) && isset($tipo_dato)) echo 'style= "display: none; "'; ?>>
 													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?php echo $limitar ? 'checked="checked"' : '' ?> />
-													<label for="limite_checkbox"><?php echo __("y mostrar sólo") ?></label> &nbsp;
+													<label for="limite_checkbox"><?php echo __('y mostrar sólo') ?></label> &nbsp;
 													<input type="text" name="limite" value="<?php echo $limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
 													<?php echo __("resultados superiores") ?>
 												</span>
@@ -1125,7 +1125,7 @@ if (!$popup) {
 											<td>
 												<span id = "agupador_check">
 													<input type="checkbox" name="agrupar" id="agrupador_checkbox" value="1" <?php echo $agrupar ? 'checked' : '' ?> />
-													<label for="agrupador_checkbox"><?php echo __("agrupando el resto") ?></label>. &nbsp;
+													<label for="agrupador_checkbox"><?php echo __('agrupando el resto') ?></label>. &nbsp;
 												</span>
 											</td>
 										</tr>

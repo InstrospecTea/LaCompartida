@@ -6,6 +6,8 @@ $agrupadores = explode('-', $vista);
 if (!$ajax) {
 	$pagina = new Pagina($sesion);
 	$pagina->PrintTop(1);
+} else {
+	ob_start();
 }
 
 $email_style = array();
@@ -522,4 +524,7 @@ if (sizeof($r) == 2) {
 <?php
 if (!$ajax) {
 	$pagina->PrintBottom($popup);
+} else {
+	$html = ob_get_clean();
+	echo utf8_encode($html);
 }

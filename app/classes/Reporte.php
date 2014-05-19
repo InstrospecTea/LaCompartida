@@ -36,17 +36,13 @@ class Reporte {
 	//Codigo secundario cuando corresponde
 	var $dato_usuario = 'usuario.username';
 	var $dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
-//Cuanto se repite la fila para cada agrupador
+	//Cuanto se repite la fila para cada agrupador
 	var $filas = array();
 
-	function Reporte($sesion) {
+	public function __construct($sesion) {
 		$this->sesion = $sesion;
+		$this->dato_usuario = $this->nombre_usuario('usuario');
 
-		if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema')) {
-			$this->dato_usuario = 'usuario.username';
-		} else {
-			$this->dato_usuario = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
-		}
 		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
 			$this->dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
 		} else {
@@ -320,11 +316,11 @@ class Reporte {
 		}
 	}
 
-	function nombre_usuario($usuario) {
+	function nombre_usuario($tabla) {
 		if (Conf::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema')) {
-			return $usuario . '.username ';
+			return "{$tabla}.username";
 		}
-		return 'CONCAT_WS(\' \',' . $usuario . '.nombre, ' . $usuario . '.apellido1, LEFT(' . $usuario . '.apellido2,1)) ';
+		return "CONCAT_WS(' ', {$tabla}.nombre, {$tabla}.apellido1, LEFT({$tabla}.apellido2, 1))";
 	}
 
 	function cobroQuery() { //Query que añade rows para los datos de Cobros emitidos que no cuentan Trabajos
@@ -691,12 +687,12 @@ class Reporte {
 			case "horas_pagadas":
 			case "horas_por_pagar":
 			case "horas_incobrables":
-				$s .= "SUM(TIME_TO_SEC(trabajo.duracion_cobrada))/3600";
+				$s .= "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 				break;
 
 			case 'valor_por_cobrar':
 				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
-				$s .= " $datos_monedas, IF( cobro.id_cobro IS NOT NULL, $monto_honorarios ,	$monto_predicho)";
+				$s .= " $datos_monedas, IF( cobro.id_cobro IS NOT NULL, $monto_honorarios, $monto_predicho)";
 				break;
 
 			case 'valor_trabajado_estandar':
@@ -762,7 +758,8 @@ class Reporte {
 						LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '" . $this->id_moneda . "'
 					";
 
-		$s = ' FROM trabajo left join usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
+		$s = ' FROM trabajo
+					LEFT JOIN usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
 					LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
 					LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
 					LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
@@ -1478,7 +1475,7 @@ class Reporte {
 
 	//Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
 	function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MostrarSoloMinutos') ) || ( method_exists('Conf', 'MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) ) && strpos($tipo_dato, "oras_")) {
+		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, "oras_")) {
 			$valor_horas = floor($valor);
 			$valor_minutos = number_format((($valor - $valor_horas) * 60), 0);
 			if ($tipo_reporte == "excel") {
