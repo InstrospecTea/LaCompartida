@@ -322,7 +322,6 @@ function FormatoDestinatario($fila) {
 
 function FormatoDatos($fila) {
 	global $sesion;
-
 	$html = '';
 	if (!empty($fila->fields['tipo'])) {
 		$html .= "<b>Tipo</b>: {$fila->fields['tipo']}<br />";

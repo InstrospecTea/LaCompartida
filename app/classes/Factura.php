@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-",numero)');
+define('CONCAT_FACTURA', 'CONCAT(id_documento_legal, "-", serie_documento_legal, "-", numero)');
 
 class Factura extends Objeto {
 

@@ -574,7 +574,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
 
 			if (($codigo_documento_legal == 'NC') && ($id_cobro || $codigo_cliente)) {
-				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', factura.serie_documento_legal, '-', numero" : "prm_documento_legal.glosa,' #',numero";
+				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', factura.serie_documento_legal, '-', numero" : "prm_documento_legal.glosa, ' #', numero";
 				if ($id_cobro) {
 					$query_padre = "SELECT id_factura, CONCAT({$glosa_numero_serie}) FROM factura JOIN prm_documento_legal USING (id_documento_legal) WHERE id_cobro = '{$id_cobro}'";
 				} else if ($codigo_cliente) {
