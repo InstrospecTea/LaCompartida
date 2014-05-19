@@ -72,21 +72,17 @@ class ReporteAntiguedadDeudas
 			));
 		}
 
-		if ($this->opciones['opcion_usuario'] == 'xls'){
+		if ($this->opciones['opcion_usuario'] == 'xls') {
 
 			$new_results = array();
 
-			if(empty($this->opciones['mostrar_detalle'])){
+			if (empty($this->opciones['mostrar_detalle'])) {
 				foreach ($agrupacion as $result) {
 					$identificadores =  json_decode($result['identificadores'], true);
-					// foreach ($array as $key => $value) {
-					// 	$identificadores[] = $value);
-					// }
 					$result['identificadores'] = implode(',', $identificadores);
 					$new_results[] = $result;
 				}
-			}
-			else{
+			} else {
 				foreach ($agrupacion as $result){
 					unset($result['identificadores']);
 					$new_results[] = $result;
@@ -127,11 +123,11 @@ class ReporteAntiguedadDeudas
 			//
 			// Prepara el layout de los campos.
 			//
-			if ($this->opciones['encargado_comercial']){
+			if ($this->opciones['encargado_comercial']) {
 				$layouts['encargado_comercial'] = $layout * .5;
 			}
 
-			if (!$this->opciones['mostrar_detalle']){
+			if (!$this->opciones['mostrar_detalle']) {
 				$layouts['lista_detalle'] = $layout * 0.7;
 				$layouts['encargado_comercial'] = $layout * 0.15;
 			}
@@ -209,7 +205,7 @@ class ReporteAntiguedadDeudas
 			)
 		);
 		
-		if($this->opciones['mostrar_detalle']){
+		if ($this->opciones['mostrar_detalle']) {
 			$configuracion = array(
 				'field' => 'glosa_cliente',
 				'title' => __('Cliente'),
@@ -217,8 +213,7 @@ class ReporteAntiguedadDeudas
 					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:left; "'
 				)
 			);
-		}
-		else{
+		} else {
 			$configuracion = array(
 				'field' => 'glosa_cliente',
 				'title' => __('Cliente'),
@@ -231,7 +226,7 @@ class ReporteAntiguedadDeudas
 
 		$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, 0);
 
-		if ($this->opciones['encargado_comercial']){
+		if ($this->opciones['encargado_comercial']) {
 			$configuracion_encargado_comercial = array(
 				'field' => 'encargado_comercial',
 				'title' => __('Encargado Comercial'),
@@ -242,7 +237,7 @@ class ReporteAntiguedadDeudas
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion_encargado_comercial, 1);
 		}
 
-		if (!$this->opciones['mostrar_detalle']){
+		if (!$this->opciones['mostrar_detalle']) {
 			$configuracion_cobros = array(
 				'field' => 'identificadores',
 				'title' => __(ucfirst($this->opciones['identificadores'])),
@@ -291,8 +286,7 @@ class ReporteAntiguedadDeudas
 					'class' => 'seguimiento'
 				)
 			);
-		}
-		else{
+		} else {
 			$config_reporte[] = array(
 				'field' => 'comentario_seguimiento',
 				'title' => 'Comentario Seguimiento'
@@ -313,28 +307,27 @@ class ReporteAntiguedadDeudas
 	 * @param  $agrupacion_detalle [Datos obtenidos desde el medio persistente, que han agrupados de manera conveniente.]
 	 * @return [SimpleReport] [Reporte configurado como un simple report.]
 	 */
-	private function genera_reporte_detalle($agrupacion_detalle){
+	private function genera_reporte_detalle($agrupacion_detalle) {
 
 		//
 		//TODO -> Refactorizar a su propio método.
 		//
 		
-			$layout = $this->ancho_campo_detalle;
+		$layout = $this->ancho_campo_detalle;
 
-			if ($this->opciones['totales_especiales']) {
-				$number_layout = $this->ancho_campo_numerico_detalle  / 7 ;
-			}
-			else{
-				$number_layout = $this->ancho_campo_numerico_detalle  / 5 ;
-			}
-			
+		if ($this->opciones['totales_especiales']) {
+			$number_layout = $this->ancho_campo_numerico_detalle  / 7 ;
+		} else {
+			$number_layout = $this->ancho_campo_numerico_detalle  / 5 ;
+		}
+		
 
-			$layouts = array();
-			
-			//
-			// Prepara el layout de los campos.
-			//
-			$layouts['campo_comun'] = $layout / 4;
+		$layouts = array();
+		
+		//
+		// Prepara el layout de los campos.
+		//
+		$layouts['campo_comun'] = $layout / 4;
 
 		//
 		// Fin segmento de código a refactorizar.
@@ -454,7 +447,7 @@ class ReporteAntiguedadDeudas
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 		}
 
-		if ($this->opciones['opcion_usuario'] == 'xls'){
+		if ($this->opciones['opcion_usuario'] == 'xls') {
 			$config_reporte[] = array(
 				'field' => 'moneda',
 				'title' => __('Moneda'),
@@ -508,7 +501,7 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']]['comentario_seguimiento'] = $row['comentario_seguimiento'];
 			
 			
-			if(!array_key_exists($row['moneda'], $results[$row['codigo_cliente']]['monedas'])){
+			if (!array_key_exists($row['moneda'], $results[$row['codigo_cliente']]['monedas'])) {
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']] = array();
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['codigo_moneda'] = $row['codigo_moneda'];
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['rango1'] = 0;
@@ -537,13 +530,12 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['fgsaldo'] += $row['fgsaldo'];
 			$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['fgsaldo_base'] += $row['fgsaldo_base'];
 
-			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
+			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != "") {
 				$dias_atraso_pago = intval($row['dias_atraso_pago']);
-			}else{
+			} else {
 				if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 					$dias_atraso_pago = intval($row['dias_desde_facturacion']);
-				}
-				else{
+				} else {
 					$dias_atraso_pago = intval($row['dias_transcurridos']);
 				}
 			}
@@ -554,15 +546,13 @@ class ReporteAntiguedadDeudas
 
 			if ($dias_atraso_pago > 0 || is_string($dias_atraso_pago)){
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['total_vencido'] += $valor;
-			}
-			else{
+			} else {
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['total_normal'] += $valor;
 			}
 
 			if (is_string($dias_atraso_pago)) {
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['rango4'] += $valor;
-			}
-			else{
+			} else {
 
 				if ($dias_atraso_pago <= 30){
 					$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['rango1'] += $valor;
@@ -582,11 +572,10 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['total'] += $valor;
 
 			//Si es que se incluye el encargado comercial en las opciones.
-			if ($this->opciones['encargado_comercial']){
-				if (!empty($row['encargado_comercial'])){
+			if ($this->opciones['encargado_comercial']) {
+				if (!empty($row['encargado_comercial'])) {
 					$results[$row['codigo_cliente']]['encargado_comercial'] = $row['encargado_comercial'];
-				}
-				else{
+				} else{
 					//TODO: Validar con gonzalo la regla para llenar campos vacíos.
 					$results[$row['codigo_cliente']]['encargado_comercial'] = '';
 				}
@@ -605,41 +594,26 @@ class ReporteAntiguedadDeudas
 			$detalle_cliente = array();
 
 			$detalle_cliente['codigo_cliente'] = $codigo_cliente;
-
 			$detalle_cliente['glosa_cliente'] = $detalle['glosa_cliente'];
-			
 			$detalle_cliente['encargado_comercial'] = $detalle['encargado_comercial'];
-
 			$detalle_cliente['cantidad_seguimiento'] = $detalle['cantidad_seguimiento'];
-
 			$detalle_cliente['comentario_seguimiento'] = $detalle['comentario_seguimiento'];
 			
 			foreach ($detalle['monedas'] as $codigo_moneda => $detalle_montos) {
 
 				$detalle_cliente['codigo_padre'] = $codigo_cliente.$detalle_montos['codigo_moneda'];
-
 				$detalle_cliente['identificadores'] = '{'.implode(',', $detalle_montos['identificadores']).'}';
-
 				$detalle_cliente['moneda'] = $codigo_moneda;
-
 				$detalle_cliente['rango1'] = $detalle_montos['rango1'];
-
 				$detalle_cliente['rango2'] = $detalle_montos['rango2'];
-
 				$detalle_cliente['rango3'] = $detalle_montos['rango3'];
-
 				$detalle_cliente['rango4'] = $detalle_montos['rango4'];
-
 				$detalle_cliente['total_normal'] = $detalle_montos['total_normal'];
-
 				$detalle_cliente['total_vencido'] = $detalle_montos['total_vencido'];
-
 				$detalle_cliente['total'] = $detalle_montos['total'];
-
 				$output[] = $detalle_cliente;
 
 			}
-
 		}
 
 		return $output;
@@ -651,7 +625,7 @@ class ReporteAntiguedadDeudas
 	 * @param  [type] $parameters [Parámetros definidos en el reporte.]
 	 * @return [type]             [Array con la agrupación de resultados.]
 	 */
-	private function genera_agrupacion_detalle($dataset, $parameters){
+	private function genera_agrupacion_detalle($dataset, $parameters) {
 		extract($parameters);
 		$results = array();
 
@@ -668,15 +642,14 @@ class ReporteAntiguedadDeudas
 			$fecha_emision = $row['fecha_emision'];
 
 
-			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != ""){
+			if ($row['dias_atraso_pago'] >= 0 && $row['dias_atraso_pago'] != "") {
 				$dias_atraso_pago = intval($row['dias_atraso_pago']);
 				$fecha_vencimiento = $row['fecha_vencimiento'];
 			} else{
 				if ($row['dias_desde_facturacion'] >= 0 && $row['dias_desde_facturacion'] != "") {
 					$dias_atraso_pago = intval($row['dias_desde_facturacion']);
 					$fecha_vencimiento = $row['fecha_facturacion'];
-				}
-				else{
+				} else {
 					$dias_atraso_pago = intval($row['dias_transcurridos']);
 					$fecha_vencimiento = $row['fecha_emision'];
 				}
@@ -688,17 +661,13 @@ class ReporteAntiguedadDeudas
 
 			if ($dias_atraso_pago > 0 || is_string($dias_atraso_pago)){
 				$vencido = $row["$campo_valor"];
-			}
-			else{
+			} else {
 				$normal = $row["$campo_valor"];
 			}
 
 			if (is_string($dias_atraso_pago)) {
-				
 				$rango4 = $row["$campo_valor"];
-
-			}
-			else {
+			} else {
 
 				if ($dias_atraso_pago <= 30){
 					$rango1 = $row["$campo_valor"];
@@ -712,17 +681,13 @@ class ReporteAntiguedadDeudas
 				if ($dias_atraso_pago > 90 ){
 					$rango4 = $row["$campo_valor"];
 				}
-
 			}
-
-				
 
 			$total = $row["$campo_valor"];
 
 			if ($this->opciones['opcion_usuario'] == 'xls'){
 				$id = $row['label'];
-			}
-			else{
+			} else {
 				$id = '{"'.$row['identificador'].'":"'.$row['label'].'"}';
 			}
 
@@ -759,7 +724,6 @@ class ReporteAntiguedadDeudas
 				'dias_atraso_pago' => $dias_atraso_pago,
 				'fecha_vencimiento' => $fecha_vencimiento	
 			);
-
 		}
 
 		return $results;
@@ -769,7 +733,7 @@ class ReporteAntiguedadDeudas
 	/**
 	 * [Genera el Criteria que contiene la query que se realiza al medio persistente para obtener los datos del reporte.]
 	 */
-	private function genera_query_criteria(){
+	private function genera_query_criteria() {
 
 		$this->criteria = new Criteria();
 
@@ -784,16 +748,15 @@ class ReporteAntiguedadDeudas
 			->add_from('cliente_seguimiento')
 			->add_grouping('codigo_cliente');
 
-		if (!empty($this->datos['encargado_comercial'])){
+		if (!empty($this->datos['encargado_comercial'])) {
 			$encargado_comercial = $this->datos['encargado_comercial'];
 			$this->and_statements[] = 'u.id_usuario = '."$encargado_comercial";
 		}
 
-		if (!empty($this->datos['codigo_cliente'])){
+		if (!empty($this->datos['codigo_cliente'])) {
 			$cliente = $this->datos['codigo_cliente'];
 			$this->and_statements[] = 'contrato.codigo_cliente = \''."$cliente".'\'';
-		}
-		else{
+		} else {
 
 			if (!empty($this->datos['codigo_cliente_secundario'])) {
 				$cliente = $this->datos['codigo_cliente_secundario'];
@@ -803,11 +766,10 @@ class ReporteAntiguedadDeudas
 
 		}
 
-		if (!empty($this->datos['id_contrato'])){
+		if (!empty($this->datos['id_contrato'])) {
 			$contrato = $this->datos['id_contrato'];
 			$this->and_statements[] = 'cobro.id_contrato = \''."$contrato".'\'';
-		}
-		else{
+		} else {
 			if (!empty($this->datos['codigo_asunto_secundario'])) {
 				$codigo_asunto_secundario = $this->datos['codigo_asunto_secundario'];
 				$this->criteria
@@ -882,9 +844,9 @@ class ReporteAntiguedadDeudas
 	/**
 	 * [Define los parámetros que supondrán el comportamiento del reporte]
 	 */
-	private function define_parametros_query_sin_detalle(){
+	private function define_parametros_query_sin_detalle() {
 		
-		if ($this->opciones['solo_monto_facturado']){
+		if ($this->opciones['solo_monto_facturado']) {
 			$campo_valor = "fsaldo";
 			$campo_gvalor = "fgsaldo";
 			$campo_hvalor = "fhsaldo";
@@ -896,8 +858,7 @@ class ReporteAntiguedadDeudas
 			$this->opciones['identificador_detalle'] = 'factura';
 			$identificador = " d.id_cobro";
 			$linktofile = 'cobros6.php?id_cobro=';
-		}
-		else{
+		} else {
 			$campo_valor = "saldo";
 			$campo_gvalor = "gsaldo";
 			$campo_hvalor = "hsaldo";
@@ -918,12 +879,11 @@ class ReporteAntiguedadDeudas
 	 */
 	private function agrega_restricciones_segun_tipo_monto(){
 
-		if ($this->opciones['solo_monto_facturado']){
+		if ($this->opciones['solo_monto_facturado']) {
 			$this->and_statements[] = 'ccfm.saldo!=0';
 			$this->criteria
 				->add_grouping('factura.id_factura');
-		}
-		else{
+		} else {
 			$this->and_statements[] = 'd.tipo_doc = \'N\'';
 			$this->and_statements[] = 'cobro.estado NOT IN (\'CREADO\', \'EN REVISION\', \'INCOBRABLE\')';
 			$this->and_statements[] = '((d.saldo_honorarios + d.saldo_gastos) > 0)';
