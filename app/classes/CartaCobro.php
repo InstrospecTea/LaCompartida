@@ -1036,6 +1036,24 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
+
+					$datos_bancarios = '';
+
+					if (!empty($codigo_swift)) {
+						$datos_bancarios .= '<tr><td></td><td>SWIFT</td><td>' . $codigo_swift . '</td></tr>';
+					}
+					if (!empty($codigo_aba)) {
+						$datos_bancarios .= '<tr><td></td><td>ABA</td><td>' . $codigo_aba . '</td></tr>';
+					}
+					if (!empty($codigo_cci)) {
+						$datos_bancarios .= '<tr><td></td><td>CCI</td><td>' . $codigo_cci . '</td></tr>';
+					}
+					if (!empty($codigo_clabe)) {
+						$datos_bancarios .= '<tr><td></td><td>CLABE</td><td>' . $codigo_clabe . '</td></tr>';
+					}
+
+					$html2 = str_replace('%datos_bancarios%', $datos_bancarios, $html2);
+
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
@@ -1905,6 +1923,24 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
+
+					$datos_bancarios = '';
+
+					if (!empty($codigo_swift)) {
+						$datos_bancarios .= '<tr><td></td><td>SWIFT</td><td>' . $codigo_swift . '</td></tr>';
+					}
+					if (!empty($codigo_aba)) {
+						$datos_bancarios .= '<tr><td></td><td>ABA</td><td>' . $codigo_aba . '</td></tr>';
+					}
+					if (!empty($codigo_cci)) {
+						$datos_bancarios .= '<tr><td></td><td>CCI</td><td>' . $codigo_cci . '</td></tr>';
+					}
+					if (!empty($codigo_clabe)) {
+						$datos_bancarios .= '<tr><td></td><td>CLABE</td><td>' . $codigo_clabe . '</td></tr>';
+					}
+
+					$html2 = str_replace('%datos_bancarios%', $datos_bancarios, $html2);
+
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
