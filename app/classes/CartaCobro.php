@@ -1013,13 +1013,13 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
 
 				if ($contrato->fields['id_cuenta'] > 0) {
-					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa, m.glosa_moneda
+					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa, m.glosa_moneda, cb.aba, cb.clabe
 								FROM cuenta_banco cb
 								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
 								LEFT JOIN prm_moneda m ON cb.id_moneda = m.id_moneda
 								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta, $glosa_moneda) = mysql_fetch_array($resp);
+					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta, $glosa_moneda, $codigo_aba, $codigo_clabe) = mysql_fetch_array($resp);
 
 					if (strpos($glosa_cuenta, 'Ah') !== false) {
 						$tipo_cuenta = 'Cuenta Ahorros';
@@ -1029,19 +1029,21 @@ class CartaCobro extends NotaCobro {
 
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
-					$html2 = str_replace('%nombre_banco_contrato%', $nombre_banco, $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
 					$html2 = str_replace('%codigo_swift%', $codigo_swift, $html2);
 					$html2 = str_replace('%codigo_cci%', $codigo_cci, $html2);
+					$html2 = str_replace('%codigo_aba%', $codigo_aba, $html2);
+					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
-					$html2 = str_replace('%nombre_banco_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%codigo_swift%', '', $html2);
 					$html2 = str_replace('%codigo_cci%', '', $html2);
+					$html2 = str_replace('%codigo_aba%', '', $html2);
+					$html2 = str_replace('%codigo_clabe%', '', $html2);
 					$html2 = str_replace('%tipo_cuenta%', '', $html2);
 					$html2 = str_replace('%glosa_moneda%', '', $html2);
 				}
@@ -1880,13 +1882,13 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%SoloNombreContacto%', $nombre_contacto_partes[0], $html2);
 
 				if ($contrato->fields['id_cuenta'] > 0) {
-					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa, m.glosa_moneda
+					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa, m.glosa_moneda, cb.aba, cb.clabe
 								FROM cuenta_banco cb
 								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
 								LEFT JOIN prm_moneda m ON cb.id_moneda = m.id_moneda
 								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta, $glosa_moneda) = mysql_fetch_array($resp);
+					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta, $glosa_moneda, $codigo_aba, $codigo_clabe) = mysql_fetch_array($resp);
 
 					if (strpos($glosa_cuenta, 'Ah') !== false) {
 						$tipo_cuenta = 'Cuenta Ahorros';
@@ -1899,6 +1901,8 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
 					$html2 = str_replace('%codigo_swift%', $codigo_swift, $html2);
 					$html2 = str_replace('%codigo_cci%', $codigo_cci, $html2);
+					$html2 = str_replace('%codigo_aba%', $codigo_aba, $html2);
+					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
 				} else {
@@ -1907,6 +1911,8 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%glosa_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%codigo_swift%', '', $html2);
 					$html2 = str_replace('%codigo_cci%', '', $html2);
+					$html2 = str_replace('%codigo_aba%', '', $html2);
+					$html2 = str_replace('%codigo_clabe%', '', $html2);
 					$html2 = str_replace('%tipo_cuenta%', '', $html2);
 					$html2 = str_replace('%glosa_moneda%', '', $html2);
 				}

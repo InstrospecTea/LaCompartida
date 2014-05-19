@@ -10368,6 +10368,17 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.71:
+			$queries = array();
+			if (!ExisteCampo('cuenta_banco', 'ABA', $dbh)) {
+				$queries[] = "ALTER TABLE `cuenta_banco` ADD `ABA` VARCHAR( 20 ) NOT NULL AFTER `cod_swift`;";
+			}
+			if (!ExisteCampo('cuenta_banco', 'CLABE', $dbh)) {
+				$queries[] = "ALTER TABLE `cuenta_banco` ADD `CLABE` VARCHAR( 20 ) NOT NULL AFTER `ABA`;";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10377,7 +10388,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.70;
+$max_update = 7.71;
 
 
 $force = 0;
