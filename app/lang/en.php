@@ -111,6 +111,8 @@ $_LANG['%fees%'] = "Legal Fees";
 $_LANG['%expenses%'] = "Expenses";
 $_LANG['%reference_no%'] = "Reference N°";
 $_LANG['Saldo Adeudado'] = "Balance Due";
+$_LANG['Saldo adelantos'] = "Balance advances";
+$_LANG['Saldo liquidaciones'] = "Balance settlement";
 $_LANG['Saldo total adeudado'] = "Balance due";
 $_LANG['Saldo del cobro'] = "Invoice balance";
 $_LANG['Solicitado Por'] = "Requested By";
@@ -315,6 +317,7 @@ $_LANG['Nota de Cargo'] = "Bill";
 $_LANG['Asunto'] = "Matter";
 $_LANG['detalledegastos'] = "Expenses";
 $_LANG['resumen_raz'] = "Billing Summary";
+$_LANG['total_raz'] = "Total Hours";
 
 $_LANG['N°Trabajo'] = "Work ID";
 $_LANG['Atte'] = "Attn";

@@ -1007,10 +1007,10 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-    			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
+    			$html = str_replace('%texto_saldo_liquidaciones%', __('Saldo liquidaciones'), $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
-    			$html = str_replace('%texto_saldo_adelantos%', 'Saldo adelantos', $html);
+    			$html = str_replace('%texto_saldo_adelantos%', __('Saldo adelantos'), $html);
 				$html = str_replace('%monto_saldo_adelantos%', $monto_saldo_adelantos, $html);
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
@@ -3756,10 +3756,10 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-    			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
+    			$html = str_replace('%texto_saldo_liquidaciones%', __('Saldo liquidaciones'), $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
-    			$html = str_replace('%texto_saldo_adelantos%', 'Saldo adelantos', $html);
+    			$html = str_replace('%texto_saldo_adelantos%', __('Saldo adelantos'), $html);
 				$html = str_replace('%monto_saldo_adelantos%', $monto_saldo_adelantos, $html);
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);

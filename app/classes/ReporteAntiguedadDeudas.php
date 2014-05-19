@@ -731,7 +731,7 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']][] = array(
 				'id' => $id,
 				'moneda' => $row['moneda'],
-				'glosa_cliente' => utf8_encode($row['glosa_cliente']),
+				'glosa_cliente' => utf8_decode($row['glosa_cliente']),
 				'monto' => $row['monto'],
 				'monto_base' => $row['monto_base'],
 				'fmonto' => $row['fmonto'],
@@ -888,7 +888,7 @@ class ReporteAntiguedadDeudas
 			$campo_hvalor = "fhsaldo";
 			$tipo = " pdl.glosa";
 			$fecha_atraso = "factura.fecha";
-			$label_decorator = 'N°';
+			$label_decorator = utf8_decode('N°');
 			$label = " concat(pdl.codigo,' $label_decorator ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
 			$this->opciones['identificadores'] = 'facturas';
 			$this->opciones['identificador_detalle'] = 'factura';

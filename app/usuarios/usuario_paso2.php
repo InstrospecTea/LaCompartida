@@ -58,7 +58,9 @@ if ($opc == 'edit') {
 	$usuario->Edit('telefono1', $telefono1);
 	$usuario->Edit('telefono2', $telefono2);
 	$usuario->Edit('email', $email);
-	$usuario->Edit('activo', $activo);
+	if ($usuario->fields['activo'] != $activo) {
+		$usuario->Edit('activo', $activo);
+	}
 	$usuario->Edit('visible', $activo == 1 ? 1 : $visible);
 	$usuario->Edit('restriccion_min', $restriccion_min);
 	$usuario->Edit('restriccion_max', $restriccion_max);
@@ -107,8 +109,6 @@ if ($opc == 'edit') {
 				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
-
-				//echo 'Categoria actual <b>'.$id_categoria_usuario.'</b></br>';
 
 				if ( $id_categoria_anterior != $id_categoria_usuario) {
 					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
