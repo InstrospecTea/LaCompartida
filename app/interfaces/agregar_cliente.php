@@ -872,6 +872,13 @@ $pagina->PrintTop();
 				return false;
 			}
 
+			if(!form.region_cliente.value){
+				alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+				MuestraPorValidacion('datos_factura');
+				form.factura_ciudad.focus();
+				return false;
+			}
+
 			if (form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
 				MuestraPorValidacion('datos_factura');

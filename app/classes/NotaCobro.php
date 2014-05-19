@@ -215,10 +215,6 @@ class NotaCobro extends Cobro {
 		return compact('moneda_cliente_cambio', 'moneda_cli', 'lang', 'html2', 'idioma', 'cliente', 'moneda', 'moneda_base', 'trabajo', 'profesionales', 'gasto', 'totales', 'tipo_cambio_moneda_total', 'asunto');
 	}
 
-	/*
-	  Generacion de DOC COBRO
-	 */
-
 	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '') {
 
 		$parametros = $this->ParametrosGeneracion();
@@ -1011,10 +1007,10 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-    			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
+    			$html = str_replace('%texto_saldo_liquidaciones%', __('Saldo liquidaciones'), $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
-    			$html = str_replace('%texto_saldo_adelantos%', 'Saldo adelantos', $html);
+    			$html = str_replace('%texto_saldo_adelantos%', __('Saldo adelantos'), $html);
 				$html = str_replace('%monto_saldo_adelantos%', $monto_saldo_adelantos, $html);
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
@@ -1545,6 +1541,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
+				$html = str_replace('%abogado_raz%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
 				$html = str_replace('%duracion_cobrable%', __('Duración cobrable'), $html);
 				$html = str_replace('%monto_total%', __('Monto total'), $html);
 				$html = str_replace('%Total%', __('Total'), $html);
@@ -1571,7 +1569,13 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_categoria%', '', $html);
 
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$query = "SELECT cat.glosa_categoria
+					if ($lang == 'es') {
+						$query_categoria_lang = "cat.glosa_categoria";
+					} else {
+						$query_categoria_lang = "IFNULL(cat.glosa_categoria_lang , cat.glosa_categoria)";
+					}
+						
+					$query = "SELECT $query_categoria_lang
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -1708,27 +1712,26 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 				$where_horas_cero = '';
+				
+				if ($lang == 'es') {
+					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang,prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+				
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -2292,6 +2295,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_tarifa_ajustada%', '', $html);
 				}
 
+				$html = str_replace('%total_raz%', __('total_raz'), $html);
+
 				break;
 
 			case 'DETALLE_PROFESIONAL': //GenerarDocumento
@@ -2716,6 +2721,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
 				} else {
@@ -3068,12 +3074,18 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%banco%', __('Banco'), $html);
 				$html = str_replace('%direccion%', __('Dirección'), $html);
 				$html = str_replace('%cuenta_bancaria%', __('Cuenta'), $html);
-
+				
+				if ($lang == 'es') {
+					$query_categoria_lang = "IFNULL( prm_categoria_usuario.glosa_categoria, ' ' ) as categoria_usuario";
+				} else {
+					$query_categoria_lang = "IFNULL( prm_categoria_usuario.glosa_categoria_lang, ' ' ) as categoria_usuario";
+				}
+				
 				$query = "SELECT
                                 CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado,
                                 usuario.rut,
                                 IFNULL(usuario.dv_rut, 'NA'),
-                                IFNULL( prm_categoria_usuario.glosa_categoria, ' ' ) as categoria_usuario
+                                $query_categoria_lang
                             FROM usuario
                             JOIN contrato ON usuario.id_usuario=contrato.id_usuario_responsable
                             JOIN cobro ON contrato.id_contrato=cobro.id_contrato
@@ -3246,7 +3258,6 @@ class NotaCobro extends Cobro {
 				}
 
 				break;
-
 
 			case 'DETALLE_COBRO': //GenerarDocumento2
 
@@ -3745,10 +3756,10 @@ class NotaCobro extends Cobro {
 				$monto_saldo_adelantos = $moneda_total->fields['simbolo'] .' '. number_format( $monto_saldo_adelantos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$monto_saldo_final = $moneda_total->fields['simbolo'] .' '. number_format($monto_saldo_moneda_impresion,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-    			$html = str_replace('%texto_saldo_liquidaciones%', 'Saldo liquidaciones', $html);
+    			$html = str_replace('%texto_saldo_liquidaciones%', __('Saldo liquidaciones'), $html);
 				$html = str_replace('%monto_saldo_liquidaciones%', $monto_saldo_liquidaciones, $html);
 
-    			$html = str_replace('%texto_saldo_adelantos%', 'Saldo adelantos', $html);
+    			$html = str_replace('%texto_saldo_adelantos%', __('Saldo adelantos'), $html);
 				$html = str_replace('%monto_saldo_adelantos%', $monto_saldo_adelantos, $html);
 
 				$html = str_replace('%texto_saldo_favor_o_contra%', $texto_saldo_favor_o_contra, $html);
@@ -3799,7 +3810,6 @@ class NotaCobro extends Cobro {
 
 				break;
 
-
 			case 'RESUMEN_ASUNTOS':
 				$html = str_replace('%resumen_asuntos%', __('Resumen Asuntos'), $html);
 				$html = str_replace('%RESUMEN_ASUNTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -3819,7 +3829,6 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%COBROS_ADEUDADOS_FILAS_TOTAL%', $this->GenerarDocumento2($parser, 'COBROS_ADEUDADOS_FILAS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			//FFF DESGLOSE DE HITOS
 			case 'HITOS_ENCABEZADO': //GenerarDocumento2
 				global $total_hitos, $estehito, $cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
 				$html = str_replace('%fecha%', __('Fecha'), $html);
@@ -4505,6 +4514,7 @@ class NotaCobro extends Cobro {
 					}
 
 					$html = str_replace('%texto_servicios_profesionales%', __('Servicios Profesionales por hora'), $html);
+					$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
 					$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 				}
 				break;
@@ -4622,6 +4632,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%abogado%', __('Abogado'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
+				$html = str_replace('%abogado_raz%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
 
 				if ($this->fields['opc_ver_columna_cobrable']) {
 					$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);  // tAndres Oestemer
@@ -4634,7 +4646,14 @@ class NotaCobro extends Cobro {
 						$categoria = $this->siguiente['categoria_abogado'];
 						unset($this->siguiente['categoria_abogado']);
 					} else {
-						$query = "SELECT cat.glosa_categoria
+						
+						if ($lang == 'es') {
+							$query_categoria_lang = "cat.glosa_categoria";
+						} else {
+							$query_categoria_lang = "IFNULL(cat.glosa_categoria_lang , cat.glosa_categoria)";
+						}
+						
+						$query = "SELECT $query_categoria_lang
 										FROM trabajo
 										JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 										JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -4820,6 +4839,12 @@ class NotaCobro extends Cobro {
 				} else {
 					$visible = "AND trabajo.visible = 1";
 				}
+		
+				if ($lang == 'es') {
+					$query_categoria_lang = "prm_categoria_usuario.glosa_categoria AS categoria,";
+				} else {
+					$query_categoria_lang = "IFNULL(prm_categoria_usuario.glosa_categoria_lang ,prm_categoria_usuario.glosa_categoria) AS categoria,";
+				}
 
 				/*
 				 * 	Contenido de filas de seccion trabajo.
@@ -4838,7 +4863,7 @@ class NotaCobro extends Cobro {
 									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
-									prm_categoria_usuario.glosa_categoria AS categoria,
+									$query_categoria_lang
 									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
 									trabajo.duracion,
 									usuario.username as username $select_categoria
@@ -4852,7 +4877,7 @@ class NotaCobro extends Cobro {
 							$visible
 							AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
-
+				
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 
 				$asunto->fields['trabajos_total_duracion'] = 0;
@@ -5266,9 +5291,6 @@ class NotaCobro extends Cobro {
 				}
 				break;
 
-
-
-
 			case 'TRABAJOS_TOTAL': //GenerarDocumento2
 				if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
 					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);
@@ -5400,6 +5422,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%total_raz%', __('total_raz'), $html);
+				
 				break;
 
 			case 'DETALLE_PROFESIONAL': //GenerarDocumento2
@@ -5930,9 +5954,6 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			/*
-			  GASTOS -> esto sólo lista los gastos agregados al cobro obteniendo un total
-			 */
 			case 'GASTOS': //GenerarDocumento2
 				if ($this->fields['opc_ver_gastos'] == 0) {
 					return '';
@@ -5945,6 +5966,7 @@ class NotaCobro extends Cobro {
 				}
 				$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
 				} else {
@@ -6245,10 +6267,6 @@ class NotaCobro extends Cobro {
 
 				break;
 
-			/*
-			  CTA_CORRIENTE -> nuevo tag para la representación de la cuenta corriente (gastos, provisiones)
-			  aparecerá como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
-			 */
 			case 'CTA_CORRIENTE': //GenerarDocumento2
 				if ($this->fields['opc_ver_gastos'] == 0)
 					return '';
@@ -7460,7 +7478,13 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);
 
 				if ( Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) {
-					$query = "SELECT cat.glosa_categoria
+					if ($lang == 'es') {
+						$query_categoria_lang = "cat.glosa_categoria";
+					} else {
+						$query_categoria_lang = "IFNULL(cat.glosa_categoria_lang , cat.glosa_categoria)";
+					}
+						
+					$query = "SELECT $query_categoria_lang
 								FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -7494,7 +7518,12 @@ class NotaCobro extends Cobro {
 				$row_tmpl = $html;
 				$html = '';
 
-				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				if ($lang == 'es') {
+					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang,prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+				
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 
 				if (Conf::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario')) {
@@ -7739,6 +7768,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%monto_total%', __('Monto total'), $html);
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%abogado%', __('Abogado'), $html);
+				$html = str_replace('%abogado_raz%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
 
@@ -7748,7 +7779,14 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%cobrable%', '', $html);
 
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$query = "SELECT cat.glosa_categoria
+					
+					if ($lang == 'es') {
+						$query_categoria_lang = "cat.glosa_categoria";
+					} else {
+						$query_categoria_lang = "IFNULL(cat.glosa_categoria_lang , cat.glosa_categoria)";
+					}
+						
+					$query = "SELECT $query_categoria_lang
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 									JOIN prm_categoria_usuario AS cat ON cat.id_categoria_usuario=usuario.id_categoria_usuario
@@ -7879,26 +7917,25 @@ class NotaCobro extends Cobro {
 				$html = '';
 				$where_horas_cero = '';
 
+				if ($lang == 'es') {
+					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				} else {
+					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+				}
+				
+				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
 					$select_categoria = "";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
 				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
 					$select_categoria = "";
@@ -7925,6 +7962,12 @@ class NotaCobro extends Cobro {
 				} else {
 					$and .= "AND trabajo.visible = 1";
 				}
+				
+				if ($lang == 'es') {
+					$query_categoria_lang = "prm_categoria_usuario.glosa_categoria AS categoria,";
+				} else {
+					$query_categoria_lang = "IFNULL(prm_categoria_usuario.glosa_categoria_lang ,prm_categoria_usuario.glosa_categoria) AS categoria,";
+				}
 
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
@@ -7945,7 +7988,7 @@ class NotaCobro extends Cobro {
 
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
-									prm_categoria_usuario.glosa_categoria AS categoria,
+									$query_categoria_lang
 									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
 									trabajo.duracion,
 									usuario.username as username $select_categoria
@@ -8548,6 +8591,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%total_raz%', __('total_raz'), $html);
 
 				break;
 
@@ -8997,6 +9041,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
+				$html = str_replace('%detalle_gastos_raz%', __('detalledegastos'), $html);
 				if ($lang == 'es') {
 					$html = str_replace('%factura%', __('Factura'), $html);
 				} else {
@@ -9596,6 +9641,8 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%glosa_codigo_postal%', __('Código Postal'), $htmlplantilla);
 		$htmlplantilla = str_replace('%codigo_postal%', $contrato->fields['factura_codigopostal'], $htmlplantilla);
 		$htmlplantilla = str_replace('%cliente%', __('Cliente'), $htmlplantilla);
+		$htmlplantilla = str_replace('%nota_cargo%', __('Nota de Cargo'), $htmlplantilla);
+		$htmlplantilla = str_replace('%asunto%', __('Asunto'), $htmlplantilla);
 
 		$query = "SELECT glosa_cliente FROM cliente
 					WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
@@ -9764,7 +9811,6 @@ class NotaCobro extends Cobro {
 		return $fila_adelantos;
 	}
 
-	// Similar a la seccion detalle pago, pero con un orden distinto, se hizo para FayCa
 	function GenerarSeccionDetallePagoContrato($html, $idioma) {
 		global $cobro_moneda, $x_resultados;
 		/**
@@ -9871,6 +9917,13 @@ class NotaCobro extends Cobro {
 
 					// Se seleccionan todos los trabajos del cobro, se incluye que sea cobrable ya que a los trabajos visibles
 					// tambien se consideran dentro del cobro, tambien se incluye el valor del retainer del trabajo.
+					
+					if ($lang == 'es') {
+						$query_categoria_lang = "prm_categoria_usuario.glosa_categoria as categoria";
+					} else {
+						$query_categoria_lang = "IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) as categoria";
+					}
+					
 					$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
 									trabajo.descripcion,
 									trabajo.fecha,
@@ -9883,7 +9936,7 @@ class NotaCobro extends Cobro {
 									trabajo.visible,
 									trabajo.codigo_asunto,
 									CONCAT_WS(' ', nombre, apellido1) as usr_nombre,
-									prm_categoria_usuario.glosa_categoria as categoria
+									$query_categoria_lang
 							FROM trabajo
 							JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
 							LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
@@ -10365,6 +10418,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $resumen_filas, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
+				
+				$html = str_replace('%seccion_resumen_profesional%', __('resumen_raz'), $html);
 				break;
 
 			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA': //GenerarDocumento2
@@ -10600,6 +10655,10 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%nombre%', __('Nombre'), $html);
+				$html = str_replace('%abogado%', __('abogado_raz'), $html);
+				$html = str_replace('%tiempo_raz%', __('tiempo_raz'), $html);
+				$html = str_replace('%tarifa_raz%', __('tarifa_raz'), $html);
+				$html = str_replace('%importe_raz%', __('importe_raz'), $html);
 
 				if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
