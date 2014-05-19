@@ -33,4 +33,14 @@ class LoginCest
 		$I->see('RUT o password inválidos');
     }
 
+    public function adminLoginTest(WebGuy $I){
+        $I->wantTo('check that login works');
+        $I->amOnPage(LoginPage::$URL);
+        $I->fillField(LoginPage::$rutField, '99511620');
+        $I->fillField(LoginPage::$dvField, '0');
+        $I->fillField(LoginPage::$passwordField, 'admin.asdwsx');
+        $I->click(LoginPage::$submitButton);
+        $I->see('Admin Lemontech LEM');
+    }
+
 }

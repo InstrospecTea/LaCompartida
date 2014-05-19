@@ -22,14 +22,25 @@ class AutoLoader
 	}
 
 	public static function registerClass($className, $fileName) {
+		
+		if (!array_key_exists($className, AutoLoader::$classNames)){
+			AutoLoader::$classNames[ucfirst($className)][] = $fileName;	
+		}
 
-		AutoLoader::$classNames[ucfirst($className)] = $fileName;
+		if(!in_array($fileName, AutoLoader::$classNames[ucfirst($className)])){
+			AutoLoader::$classNames[ucfirst($className)][] = $fileName;
+		}
+
 	}
 
 	public static function loadClass($className) {
+		
 		if (isset(AutoLoader::$classNames[$className])) {
-			require_once(AutoLoader::$classNames[$className]);
+			foreach (AutoLoader::$classNames[$className] as $class) {
+				require_once($class);
+			}
 		}
+
 	}
 
 }

@@ -5,4 +5,7 @@ namespace Codeception\Module;
 
 class WebHelper extends \Codeception\Module
 {
+	public function adminLogin(){
+		
+	}
 }

@@ -1,7 +1,9 @@
 <?php
 use Codeception\Util\Stub;
 
-class CriteriaTest extends \Codeception\TestCase\Test
+// include_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/app/classes/Criteria.php');
+
+class CriteriaTest extends BaseUnitTest
 {
    /**
     * @var \CodeGuy
@@ -11,7 +13,9 @@ class CriteriaTest extends \Codeception\TestCase\Test
 
     protected function _before()
     {
-        $this->criteria = new Criteria(null);
+        $this->setVerboseErrorHandler();
+        $this->criteria = new Criteria(Stub::makeEmpty('Sesion'));
+
     }
 
     protected function _after()
@@ -31,7 +35,6 @@ class CriteriaTest extends \Codeception\TestCase\Test
 
     /**
      * [testCriteriaPlainQueryBadFormed description]
-     * @expectedException 
      */
     public function testThatBadFormedCriteriaPlainQueryThrowsException()
     {
