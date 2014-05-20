@@ -179,7 +179,7 @@ HTML;
 HTML;
 			}
 		} else {
-			echo($data['content']);
+			$html .= $data['content'];
 		}
 		$html .= <<<HTML
 			<img title="Ver pagos para este documento" src="{$img_dir}/ver_persona_nuevo.gif" onclick="MostrarVerDocumentosPagos({$datos_factura['id_factura']});" border="0" alt="Examinar" />
