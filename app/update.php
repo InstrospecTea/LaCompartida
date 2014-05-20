@@ -1156,6 +1156,17 @@ QUERY;
 
 		case 7.71:
 			$queries = array();
+			if (!ExisteCampo('cuenta_banco', 'ABA', $dbh)) {
+				$queries[] = "ALTER TABLE `cuenta_banco` ADD `ABA` VARCHAR( 20 ) NOT NULL AFTER `cod_swift`;";
+			}
+			if (!ExisteCampo('cuenta_banco', 'CLABE', $dbh)) {
+				$queries[] = "ALTER TABLE `cuenta_banco` ADD `CLABE` VARCHAR( 20 ) NOT NULL AFTER `ABA`;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.72:
+			$queries = array();
 			$queries[] = "ALTER TABLE `prm_doc_legal_numero` CHANGE COLUMN `serie` `serie` VARCHAR(6) NOT NULL DEFAULT '';";
 			$queries[] = "ALTER TABLE `factura` CHANGE COLUMN `serie_documento_legal` `serie_documento_legal` VARCHAR(6) NOT NULL DEFAULT '';";
 			$queries[] = "UPDATE factura SET serie_documento_legal = LPAD(serie_documento_legal, 3, '0');";
@@ -1171,7 +1182,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.71;
+$max_update = 7.72;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
