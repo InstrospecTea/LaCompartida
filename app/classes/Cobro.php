@@ -1382,14 +1382,18 @@ if (!class_exists('Cobro')) {
 
 			$cobro_total_honorario_cobrable_original = $cobro_total_honorario_cobrable;
 			if ($this->fields['monto_ajustado'] > 0) {
+				
 				$cobro_total_honorario_cobrable = $this->fields['monto_ajustado'];
+				
 				for ($z = 0; $z < $lista_trabajos->num; ++$z) {
 					$trabajo = $lista_trabajos->Get($z);
+				
 					if ($cobro_total_honorario_cobrable_original > 0) {
 						$factor = $cobro_total_honorario_cobrable / $cobro_total_honorario_cobrable_original;
 					} else {
 						$factor = 1;
 					}
+					
 					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 					$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
@@ -1615,7 +1619,10 @@ if (!class_exists('Cobro')) {
 
 			// Se guarda la información del cobro
 
-			$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			// 22/05/2014 No considera modificacion de monto ajustado 
+			// $this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			
+			$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
