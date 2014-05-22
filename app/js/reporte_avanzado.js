@@ -482,11 +482,11 @@ function Comparar() {
 	ActualizarNuevoReporte();
 }
 
-function TipoDato(valor) {
+function TipoDato(valor, noSet) {
 	var comparar = jQuery('#comparar').is(':checked');
 	var tinta = jQuery('[name="tinta"]:checked').val();
-
-	if (valor) {
+	
+	if (valor || !noSet) {
 		if (jQuery('#' + valor).hasClass('boton_disabled')) {
 			return;
 		}
@@ -777,102 +777,92 @@ function SeleccionarAnual() {
 	$('reporte_envio_selector').hide();
 	ActualizarNuevoReporte();
 }
-(function($) {
-	$(document).ready(function() {
-		if (jQuery('#comparar').is(':checked')) {
-			jQuery('#tabla, #dispersion').css('display', 'inline-block').show();
-		} else {
-			jQuery('#tabla, #dispersion').css('display', 'none').hide();
-		}
 
-		jQuery('#mis_reportes').change(function() {
-			CargarReporte();
-		});
+jQuery(document).ready(function() {
+	if (jQuery('#comparar').is(':checked')) {
+		jQuery('#tabla, #dispersion').css('display', 'inline-block').show();
+	} else {
+		jQuery('#tabla, #dispersion').css('display', 'none').hide();
+	}
 
-		jQuery('#fullfiltrostoggle').click(function() {
-			jQuery('#filtrosimple, #full_filtros').toggle();
-			jQuery('#filtros_check').prop('checked', jQuery('#full_filtros').is(':visible'));
-		});
-
-		jQuery('#runreporte').on('click', function() {
-			if (jQuery('#comparar').is(':checked')) {
-				jQuery('#tipo_dato_comparado').removeAttr('disabled');
-
-			} else {
-				jQuery('#tipo_dato_comparado').attr('disabled', 'disabled');
-			}
-			jQuery('#vista').val("");
-			var vista = [];
-			jQuery('#agrupadores select:visible').each(function(i) {
-				vista[i] = jQuery(this).val();
-			});
-			jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
-
-			jQuery('#vista').val(vista.join('-'));
-			jQuery.ajax({
-				url: "reporte_avanzado_planilla.php?ajax=1&vista=" + jQuery('#vista').val(),
-				data: jQuery('#formulario').serialize(),
-				type: 'POST'
-			}).done(function(data) {
-				jQuery('#iframereporte').html(data);
-			});
-		});
-
-		jQuery('#comparar').change(function() {
-			if (jQuery('#comparar').is(':checked')) {
-				jQuery('#tabla, #dispersion').show();
-			} else {
-				jQuery('#tabla, #dispersion').hide();
-			}
-			Comparar();
-		});
-
-		jQuery('#orden_barras_max2min').change(function() {
-			MostrarLimite(jQuery(this).attr('checked'));
-		});
-
-		jQuery('#tipo_dato, #tipo_dato_comparado').change(function() {
-			var elm = jQuery(this);
-			setFieldsValues({'tinta': elm.data('color')})
-			TipoDato(elm.val());
-		});
-
-		jQuery('input[name="fecha_corta"]').click(function() {
-			switch (jQuery(this).attr('id')) {
-				case 'fecha_corta_semana':
-					SeleccionarSemana();
-					break;
-				case 'fecha_corta_mes':
-					SeleccionarMes();
-					break;
-				case 'fecha_corta_anual':
-					SeleccionarAnual();
-					break;
-				case 'fecha_corta_selector':
-				case 'fecha_periodo':
-					SeleccionarSelector();
-					break;
-			}
-			return;
-
-		});
+	jQuery('#mis_reportes').change(function() {
 		CargarReporte();
-		RevisarMoneda();
-		RevisarCircular();
-		RevisarTabla();
-		Comparar();
-
-		jQuery('.boton_tipo_dato').click(function() {
-			TipoDato(jQuery(this).attr('id'));
-		});
-
-		/***
-		 * quitar
-		 *
-		 */
-		MostrarOculto('tipo_dato');
 	});
-})(jQuery);
 
+	jQuery('#fullfiltrostoggle').click(function() {
+		jQuery('#filtrosimple, #full_filtros').toggle();
+		jQuery('#filtros_check').prop('checked', jQuery('#full_filtros').is(':visible'));
+	});
 
+	jQuery('#runreporte').on('click', function() {
+		if (jQuery('#comparar').is(':checked')) {
+			jQuery('#tipo_dato_comparado').removeAttr('disabled');
 
+		} else {
+			jQuery('#tipo_dato_comparado').attr('disabled', 'disabled');
+		}
+		jQuery('#vista').val("");
+		var vista = [];
+		jQuery('#agrupadores select:visible').each(function(i) {
+			vista[i] = jQuery(this).val();
+		});
+		jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
+
+		jQuery('#vista').val(vista.join('-'));
+		jQuery.ajax({
+			url: "reporte_avanzado_planilla.php?ajax=1&vista=" + jQuery('#vista').val(),
+			data: jQuery('#formulario').serialize(),
+			type: 'POST'
+		}).done(function(data) {
+			jQuery('#iframereporte').html(data);
+		});
+	});
+
+	jQuery('#comparar').change(function() {
+		if (jQuery('#comparar').is(':checked')) {
+			jQuery('#tabla, #dispersion').show();
+		} else {
+			jQuery('#tabla, #dispersion').hide();
+		}
+		Comparar();
+	});
+
+	jQuery('#orden_barras_max2min').change(function() {
+		MostrarLimite(jQuery(this).attr('checked'));
+	});
+
+	jQuery('#tipo_dato, #tipo_dato_comparado').change(function() {
+		var elm = jQuery(this);
+		setFieldsValues({'tinta': elm.data('color')})
+		TipoDato(elm.val(), true);
+	});
+
+	jQuery('input[name="fecha_corta"]').click(function() {
+		switch (jQuery(this).attr('id')) {
+			case 'fecha_corta_semana':
+				SeleccionarSemana();
+				break;
+			case 'fecha_corta_mes':
+				SeleccionarMes();
+				break;
+			case 'fecha_corta_anual':
+				SeleccionarAnual();
+				break;
+			case 'fecha_corta_selector':
+			case 'fecha_periodo':
+				SeleccionarSelector();
+				break;
+		}
+		return;
+
+	});
+	CargarReporte();
+	RevisarMoneda();
+	RevisarCircular();
+	RevisarTabla();
+	Comparar();
+
+	jQuery('.boton_tipo_dato').click(function() {
+		TipoDato(jQuery(this).attr('id'));
+	});
+});

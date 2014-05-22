@@ -12,6 +12,11 @@ class Html extends \Html {
 
 	/**
 	 * Construye un tag html
+	 * @param type $tag
+	 * @param type $content
+	 * @param type $attributes
+	 * @param type $closed
+	 * @return type
 	 */
 	public function tag($tag = 'div', $content = '', $attributes = null, $closed = false) {
 		$html = '';
@@ -27,6 +32,11 @@ class Html extends \Html {
 		return $html;
 	}
 
+	/**
+	 *
+	 * @param type $attributes
+	 * @return type
+	 */
 	public function attributes($attributes) {
 		$html = '';
 		if (is_array($attributes)) {

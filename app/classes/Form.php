@@ -63,4 +63,77 @@ class Form {
 		return $html;
 	}
 
+	/**
+	 *
+	 * @param type $text
+	 * @param type $for
+	 * @return type
+	 */
+	public function label($text, $for = null) {
+		$attrs = array();
+		if (!empty($for)) {
+			$attrs['for'] = $for;
+		}
+		return $this->Html->tag('label', $text, $attrs);
+	}
+	/**
+	 *
+	 * @param type $name
+	 * @param type $value
+	 * @param type $selected
+	 * @param type $attrs
+	 */
+	public function radio($name, $value, $selected = false, $attrs = null) {
+		$attrs = (Array) $attrs + array('type' => 'radio', 'value' => $value, 'label' => true);
+		$label = null;
+
+		if ($attrs['label'] === true) {
+			$label = $this->Utiles->humanize($name);
+		} else if ($attrs['label'] !== false) {
+			$label = $attrs['label'];
+		}
+		unset($attrs['label'], $attrs['checked']);
+		if (empty($attrs['name'])) {
+			$attrs['name'] = $name;
+		}
+		if (empty($attrs['id'])) {
+			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
+		}
+		if ($value === $selected) {
+			$attrs['checked'] = 'checked';
+		}
+		$radio = $this->Html->tag('input', null, $attrs, true);
+		return empty($label) ? $radio : $this->label($radio . $label);
+	}
+
+	/**
+	 *
+	 * @param type $name
+	 * @param type $options
+	 * @param type $selected
+	 * @param type $attrs
+	 * @param type $container
+	 * @param type $container_attrs
+	 * @return type
+	 */
+	public function radio_group($name, $options, $selected = null, $attrs = null, $container = 'div', $container_attrs = null) {
+		$html = '';
+		$x = 1;
+		foreach ((Array) $options as $value => $label) {
+			$attrs = array('label' => true) + (Array) $attrs;
+			if ($attrs['label'] === false) {
+				$value = $label;
+			} else if ($attrs['label'] === true) {
+				$attrs['label'] = $label;
+			}
+			$attrs['id'] = $this->Utiles->pascalize($name . $x);
+			$html .= $this->radio($name, $value, $selected, $attrs);
+			++$x;
+		}
+		if ($container !== false) {
+			$html = $this->Html->tag($container, $html, (Array) $container_attrs);
+		}
+		return $html;
+	}
+
 }

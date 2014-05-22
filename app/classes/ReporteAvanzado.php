@@ -4,17 +4,18 @@
  * Esta clase contiene metodos especificos para creat el html de los Reportes Avanzados
  */
 class ReporteAvanzado {
+
 	protected $Sesion;
 	public $glosa_dato, $comparar, $tipo_dato_comparado, $proporcionalidad,
 			$tipo_dato, $id_moneda,
 			$Html, $Form;
 
-
 	public function __construct(Sesion $Sesion) {
 		$this->Sesion = $Sesion;
-		$this->Html  = new \TTB\Html();
-		$this->Form  = new Form();
+		$this->Html = new \TTB\Html();
+		$this->Form = new Form();
 	}
+
 	public function celda($nombre) {
 		$attr = array(
 			'id' => $nombre,
@@ -133,37 +134,20 @@ class ReporteAvanzado {
 		return $this->visible_moneda(Html::SelectQuery($this->Sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $moneda, '', '', "60"), '_select');
 	}
 
-	public function tinta2() {
-		echo "<td rowspan=3 align=\"center\" style=\"vertical-align: middle; width:70px; height: 20px; \"> ";
-		echo "<table id = \"tipo_tinta\" ";
-		if (!$this->comparar) {
-			echo " style =\" display:none; \" ";
-		} else {
-			echo " ";
-		}
-		echo ">";
-		echo "<tr>";
-		echo '<td> <input type="radio" name="tinta" id="tinta" value="rojo" checked="checked" > </td>';
-		echo "<td style= \"background-color: red;\" >&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		echo "<td> <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"azul\"> </td>";
-		echo "<td style= \"background-color: blue;\" > &nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		echo "</tr>";
-		echo "</table>";
-		echo "&nbsp; </td>";
-	}
-
 	public function tinta() {
-		echo "<td rowspan=3 align=\"center\" style=\"vertical-align: middle; width:100px; height: 20px; \"> ";
-		echo "<span id= \"tipo_tinta\" style =\" width: 100px; ";
-		if (!$this->comparar) {
-			echo " display:none; ";
-		}
-		echo " \" >";
-		echo "<input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"rojo\" checked=\"checked\" >";
-		echo "<span style= \"background-color: red;\" >&nbsp;&nbsp;&nbsp;&nbsp;</span>";
-		echo " <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"azul\"> ";
-		echo "<span style= \"background-color: blue;\" >&nbsp;&nbsp;&nbsp;&nbsp;</span> </span>";
-		echo "&nbsp; </td>";
+		$rojo = $this->Html->tag('span', '', array('class' => 'rojo'));
+		$azul = $this->Html->tag('span', '', array('class' => 'azul'));
+
+		$radios = array(
+			'rojo' => $rojo,
+			'azul' => $azul,
+		);
+		$span = $this->Form->radio_group('tinta', $radios, 'rojo', null, 'span', array('id' => 'tipo_tinta', 'style' => 'width: 100px; display: none'));
+		$attr = array(
+			'rowspan' => 3,
+			'style' => 'vertical-align: middle; width:100px; height: 20px;'
+		);
+		return $this->Html->tag('td', $span, $attr);
 	}
 
 }

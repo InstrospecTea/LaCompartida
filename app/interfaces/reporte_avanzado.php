@@ -273,43 +273,77 @@ if (!$popup) {
 	$pagina->PrintTop($popup);
 	?>
 	<style type="text/css">
-		TD.boton_normal,
-			TD.boton_presionado,
-			TD.boton_comparar,
-			TD.boton_disabled {
-				height:25px;
-				font-size: 11px;
-				vertical-align: middle;
-				text-align: center;
-				cursor:pointer;
-			}
-			TD.boton_normal { width:100px;border: solid 2px #e0ffe0; background-color: #e0ffe0; }
-			TD.boton_presionado { border: solid 2px red; background-color: #e0ffe0; }
-			TD.boton_comparar { border: solid 2px blue; background-color: #e0ffe0; }
-			TD.boton_disabled { border: solid 2px #e5e5e5; background-color: #e5e5e5; color:#444444; cursor: default;}
-			TD.borde_rojo { border: solid 1px red; }
-			TD.borde_azul { border: solid 1px blue; }
-			TD.borde_blanco { border: solid 1px white; }
-			input.btn{ margin:3px;}
-			.visible{display:'block';}
-			.invisible{display: none;}
-			.borde_abajo {
-				width:10px;
-				font-size: 3px;
-				border-bottom-style: dotted;
-				border-width: 1px;
-			}
-			.borde_derecha {
-				font-size: 3px;
-				width:10px;
-				border-right-style: dotted;
-				border-width: 1px;
-			}
-			.nada {
-				font-size: 3px;
-				width:10px;
-				height:7px;
-			}
+		td.boton_tipo_dato {
+			cursor:pointer;
+		}
+		td.boton_tipo_dato,
+		td.boton_disabled{
+			width:100px;
+			height:25px;
+			font-size: 11px;
+			vertical-align: middle;
+			text-align: center;
+			border: solid 2px;
+		}
+		td.boton_tipo_dato {
+			background-color: #e0ffe0;
+		}
+		td.boton_normal {
+			border-color: #e0ffe0;
+		}
+		td.boton_presionado {
+			border-color: red;
+		}
+		td.boton_comparar {
+			border-color: blue;
+		}
+		td.boton_disabled {
+			border-color: #e5e5e5;
+			background-color: #e5e5e5;
+			color: #444444;
+			cursor: default;
+		}
+		td.borde_rojo {
+			border: solid 1px red;
+		}
+		td.borde_azul {
+			border: solid 1px blue;
+		}
+		td.borde_blanco {
+			border: solid 1px white;
+		}
+		input.btn{
+			margin:3px;
+		}
+		.borde_abajo {
+			width:10px;
+			font-size: 3px;
+			border-bottom-style: dotted;
+			border-width: 1px;
+		}
+		.borde_derecha {
+			font-size: 3px;
+			width:10px;
+			border-right-style: dotted;
+			border-width: 1px;
+		}
+		.nada {
+			font-size: 3px;
+			width:10px;
+			height:7px;
+		}
+		span.rojo,
+		span.azul {
+			display: inline-block;
+			width: 1.5em;
+			height: 1.5em;
+		}
+		span.rojo {
+			background: #F00;
+		}
+		span.azul {
+			background: #00F;
+		}
 	</style>
 
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
@@ -851,13 +885,13 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->nada() ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("horas_no_cobrables") ?>
+								<?php echo $ReporteAvanzado->celda('horas_no_cobrables') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("horas_castigadas") ?>
+								<?php echo $ReporteAvanzado->celda('horas_castigadas') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("horas_por_cobrar") ?>
+								<?php echo $ReporteAvanzado->celda('horas_por_cobrar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("horas_por_pagar") ?>
+								<?php echo $ReporteAvanzado->celda('horas_por_pagar') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(6) ?>
@@ -870,7 +904,7 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->nada(8) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("horas_incobrables") ?>
+								<?php echo $ReporteAvanzado->celda('horas_incobrables') ?>
 								<?php echo $ReporteAvanzado->nada(3) ?>
 							</tr>
 							<tr>
@@ -906,13 +940,13 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda_disabled("valor_no_cobrable") ?>
+								<?php echo $ReporteAvanzado->celda_disabled('valor_no_cobrable') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda_disabled("valor_castigado") ?>
+								<?php echo $ReporteAvanzado->celda_disabled('valor_castigado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("valor_por_cobrar") ?>
+								<?php echo $ReporteAvanzado->celda('valor_por_cobrar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("valor_por_pagar") ?>
+								<?php echo $ReporteAvanzado->celda('valor_por_pagar') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(6) ?>
@@ -925,7 +959,7 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->nada(8) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda("valor_incobrable") ?>
+								<?php echo $ReporteAvanzado->celda('valor_incobrable') ?>
 								<?php echo $ReporteAvanzado->nada(3) ?>
 							</tr>
 							<tr>
@@ -939,11 +973,11 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->moneda() ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda("valor_estandar") ?>
+								<?php echo $ReporteAvanzado->celda('valor_estandar') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda("diferencia_valor_estandar") ?>
+								<?php echo $ReporteAvanzado->celda('diferencia_valor_estandar') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda("valor_hora"); ?>
+								<?php echo $ReporteAvanzado->celda('valor_hora'); ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
@@ -959,9 +993,9 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
-								<?php echo $ReporteAvanzado->celda("rentabilidad_base") ?>
+								<?php echo $ReporteAvanzado->celda('rentabilidad_base') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda("rentabilidad") ?>
+								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
@@ -975,9 +1009,9 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->tinta() ?>
 								<?php echo $ReporteAvanzado->nada(8) ?>
-								<?php echo $ReporteAvanzado->celda("costo") ?>
+								<?php echo $ReporteAvanzado->celda('costo') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda("costo_hh") ?>
+								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(9) ?>
