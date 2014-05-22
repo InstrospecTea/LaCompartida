@@ -3,6 +3,8 @@
 ## Release: 14.2.3
 Jueves 22 de Mayo 2014
 * **Fixed:** [Corregir asignación de valores en cron ingreso datos para demo](https://github.com/LemontechSA/ttb/pull/512)
+* **Fixed:** [Problema de cálculo de años bisiestos en el reporte anual de costos](https://github.com/LemontechSA/ttb/pull/512)
+* **Fixed:** [Corrige el problema de ejecutar el evento change y keyup a todos los posibles cobros a pagar, cuando hay muchos se pega el navegador](https://github.com/LemontechSA/ttb/pull/512)
 
 ## Hotfix: 14.2.1
 Jueves 15 de Mayo 2014
