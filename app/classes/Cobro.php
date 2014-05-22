@@ -1618,16 +1618,16 @@ if (!class_exists('Cobro')) {
 			}
 
 			// Se guarda la información del cobro
-
-			// 22/05/2014 No considera modificacion de monto ajustado 
-			// $this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			
-			$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-			$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			
+			//$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			
 			$this->Edit('monto_thh_estandar', number_format($cobro_total_honorario_hh_estandar, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('total_minutos', $cobro_total_minutos);
 
