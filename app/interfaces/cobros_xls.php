@@ -2422,7 +2422,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	}
 }
 
-$query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_contrato=" . $cobro->fields['id_contrato'];
+$query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_contrato='{$cobro->fields['id_contrato']}'";
 $resp_hitos = mysql_query($query_hitos, $sesion->dbh) or Utiles::errorSQL($query_hitos, __FILE__, __LINE__, $sesion->dbh);
 list($cont_hitos) = mysql_fetch_array($resp_hitos);
 
