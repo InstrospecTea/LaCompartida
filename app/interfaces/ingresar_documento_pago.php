@@ -196,9 +196,7 @@ $pagina->PrintTop($popup);
 
 	function Validar(form) {
 		var tipopago=jQuery('#tipodocumento').val();
-		if (tipopago!='adelanto') {
-			jQuery('.saldojq').keyup().change();
-		}
+
 		monto = parseFloat(jQuery('#monto').val());
 		// alert(monto);
 		if (isNaN(monto) || monto == '') {
@@ -328,7 +326,7 @@ $pagina->PrintTop($popup);
 		}
 
 		if (jQuery('#saldo_pago_aux').length>0) {
-			saldopagomaximo=anterior+jQuery('#saldo_pago_aux').val()*1.000;
+			saldopagomaximo=anterior+jQuVery('#saldo_pago_aux').val()*1.000;
 			if (total>saldopagomaximo) {
 				total=saldopagomaximo;
 			}
