@@ -326,7 +326,7 @@ $pagina->PrintTop($popup);
 		}
 
 		if (jQuery('#saldo_pago_aux').length>0) {
-			saldopagomaximo=anterior+jQuVery('#saldo_pago_aux').val()*1.000;
+			saldopagomaximo=anterior+jQuery('#saldo_pago_aux').val()*1.000;
 			if (total>saldopagomaximo) {
 				total=saldopagomaximo;
 			}
