@@ -951,9 +951,9 @@ $_LANG['categoria_usuario'] = "Categoría Profesional";
 
 ### Reportes - Tipo de Dato ###
 $_LANG['horas_trabajadas'] = "Horas Trabajadas";
-$_LANG['horas_cobrables'] = "Horas Cobrables";
-$_LANG['horas_no_cobrables'] = "Horas no Cobrables";
-$_LANG['horas_visibles'] = "Horas Cobrables Corregidas";
+$_LANG['horas_cobrables'] = "Horas Facturables";
+$_LANG['horas_no_cobrables'] = "Horas no Facturables";
+$_LANG['horas_visibles'] = "Horas Facturables Corregidas";
 $_LANG['horas_castigadas'] = "Horas Castigadas";
 $_LANG['horas_cobradas'] = "Horas Cobradas";
 $_LANG['horas_por_cobrar'] = "Horas por Cobrar";

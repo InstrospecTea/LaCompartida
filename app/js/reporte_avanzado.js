@@ -419,6 +419,7 @@ function setFieldsValues(data) {
 				var values = jQuery.isArray(v) ? v : [v];
 				jQuery.each(values, function(k, value) {
 					jQuery('select[name="' + elm_name + '"] option[value="' + value + '"]').attr('selected', true);
+					jQuery('select[name="' + elm_name + '"]').change();
 				});
 
 				break;
@@ -485,7 +486,7 @@ function Comparar() {
 function TipoDato(valor, noSet) {
 	var comparar = jQuery('#comparar').is(':checked');
 	var tinta = jQuery('[name="tinta"]:checked').val();
-	
+
 	if (valor || !noSet) {
 		if (jQuery('#' + valor).hasClass('boton_disabled')) {
 			return;
@@ -593,9 +594,9 @@ function SeleccionarSelector() {
 	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month - 1, 1));
 	jQuery('#fecha_fin').datepicker('setDate', new Date(year, month, 0));
 
-	jQuery('#reporte_envio_selector').show();
-	jQuery('#reporte_envio_semana').hide();
-	jQuery('#reporte_envio_mes').hide();
+//	jQuery('#reporte_envio_selector').show();
+//	jQuery('#reporte_envio_semana').hide();
+//	jQuery('#reporte_envio_mes').hide();
 	ActualizarNuevoReporte();
 }
 
@@ -754,27 +755,27 @@ function ResizeIframe(width, height) {
 function SeleccionarSemana() {
 	var periodo = selector_periodos.semana_pasada;
 	ActualizarPeriodo(periodo[0], periodo[1]);
-	$('reporte_envio_semana').show();
-	$('reporte_envio_mes').hide();
-	$('reporte_envio_selector').hide();
+//	$('reporte_envio_semana').show();
+//	$('reporte_envio_mes').hide();
+//	$('reporte_envio_selector').hide();
 	ActualizarNuevoReporte();
 }
 
 function SeleccionarMes() {
 	var periodo = selector_periodos.mes_pasado;
 	ActualizarPeriodo(periodo[0], periodo[1]);
-	$('reporte_envio_mes').show();
-	$('reporte_envio_semana').hide();
-	$('reporte_envio_selector').hide();
+//	$('reporte_envio_mes').show();
+//	$('reporte_envio_semana').hide();
+//	$('reporte_envio_selector').hide();
 	ActualizarNuevoReporte();
 }
 
 function SeleccionarAnual() {
 	var periodo = selector_periodos.actual;
 	ActualizarPeriodo(periodo[0], periodo[1]);
-	$('reporte_envio_mes').show();
-	$('reporte_envio_semana').hide();
-	$('reporte_envio_selector').hide();
+//	$('reporte_envio_mes').show();
+//	$('reporte_envio_semana').hide();
+//	$('reporte_envio_selector').hide();
 	ActualizarNuevoReporte();
 }
 
@@ -864,5 +865,10 @@ jQuery(document).ready(function() {
 
 	jQuery('.boton_tipo_dato').click(function() {
 		TipoDato(jQuery(this).attr('id'));
+	});
+	jQuery('.agrupador').change(function() {
+		var name = jQuery(this).attr('id').split('_');
+		var num = parseInt(name[1]);
+		CambiarAgrupador(num);
 	});
 });

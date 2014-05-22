@@ -189,8 +189,8 @@ $ReporteAvanzado->id_moneda = $id_moneda;
 
 $ReporteAvanzado->glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
 $ReporteAvanzado->glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
-$ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas en asuntos Cobrables");
-$ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Cobrables");
+$ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas en asuntos Facturables");
+$ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
 $ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro");
 $ReporteAvanzado->glosa_dato['horas_visibles'] = __("Horas que ve el Cliente en nota de cobro (tras revisión)");
 $ReporteAvanzado->glosa_dato['horas_cobradas'] = __("Horas Visibles en Cobros que ya fueron Emitidos");
@@ -344,6 +344,13 @@ if (!$popup) {
 		span.azul {
 			background: #00F;
 		}
+		.agrupador {
+			font-size: 10px;
+			margin-top: 2px;
+			margin-bottom: 2px;
+			margin-left:6px;
+			width:110px;
+		}
 	</style>
 
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
@@ -469,7 +476,7 @@ if (!$popup) {
 											<td  align=right><?php echo __("Según") ?>:</td>
 											<td><span id="segun_nuevo_reporte"></span></td>
 										</tr>
-										<tr id = 'reporte_envio'>
+										<tr id = 'reporte_envio' style="display: none">
 											<td align=right><?php echo __('Enviar cada') ?>:</td>
 											<td>
 												<span id='reporte_envio_selector' style="<?php echo $fecha_corta == 'selector' || !$fecha_corta ? '' : 'display:none;' ?>" ><i><?php echo __("Debe seleccionar un periodo de reporte") ?>.</i></span>
@@ -1043,7 +1050,7 @@ if (!$popup) {
 											if ($i >= $numero_agrupadores)
 												echo ' style="display:none;" ';
 											echo '>';
-											echo '<select name="agrupador[' . $i . ']" id="agrupador_' . $i . '" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" onchange="CambiarAgrupador(' . $i . ');">';
+											echo '<select name="agrupador[' . $i . ']" id="agrupador_' . $i . '" class="agrupador" >';
 											$elegido = false;
 											$valor_previo = '';
 											foreach ($agrupadores as $key => $v) {
