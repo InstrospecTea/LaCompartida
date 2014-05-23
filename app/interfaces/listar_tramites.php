@@ -274,10 +274,17 @@ for ($x = 0; $x < $lista_tramites->num; $x++) {
 	$ids_listado_tramites.="t" . $tramite->fields['id_tramite'];
 }
 if ($orden == "") {
-	if ($opc_orden == 'edit') {
-		$orden = "tramite.fecha_modificacion DESC";
+
+	if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
+		$orden = " cliente.glosa_cliente ASC, tramite.fecha ASC";
 	} else {
-		$orden = "tramite.fecha DESC, tramite.descripcion";
+
+		if ($opc_orden == 'edit') {
+			$orden = "tramite.fecha_modificacion DESC";
+		} else {
+			$orden = "tramite.fecha DESC, tramite.descripcion";
+		}
+		
 	}
 }
 
@@ -793,7 +800,7 @@ function funcionTR(& $tramite) {
 	}
 
 	$moneda_tramite = new Moneda($sesion);
-	$moneda_tramite->Load($id_tramite);
+	$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";

@@ -45,7 +45,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 		if ($exportar_excel) {
 			$factura->DownloadExcel($results);
-		} elseif ($archivo_contabilidad) {
+		} else if ($archivo_contabilidad) {
 			$data = array('Resultados' => $results);
 			$Slim = Slim::getInstance() ? $Slim->applyHook('hook_facturas_genera_archivo_contabilidad', &$data) : false;
 		}
@@ -254,29 +254,22 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 	$where = '';
-	$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
+
+	// Obtengo el saldo de las facturas según la query filtrada
+	$saldos_monedas = $factura->SaldoReporte($orden, $where, $numero, $fecha1, $fecha2
 			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 			, $descripcion_factura, $serie, $desde_asiento_contable);
 
-	$monto_saldo_total = 0;
-	$glosa_monto_saldo_total = '';
-	$where_moneda = ' WHERE moneda_base = 1';
-	if ($id_moneda > 0) {
-		$where_moneda = 'WHERE id_moneda = ' . $id_moneda;
+	$formato_saldos = array();
+	foreach ($saldos_monedas as $i => $saldo_moneda) {
+		$formato_saldos[] = UtilesApp::PrintFormatoMoneda($sesion, $saldo_moneda['saldo'], $saldo_moneda['id_moneda'], $saldo_moneda['simbolo'], $saldo_moneda['cifras_decimales']);
 	}
-	$query_moneda = "SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio FROM prm_moneda {$where_moneda} ORDER BY id_moneda";
-	$resp_moneda = mysql_query($query_moneda, $sesion->dbh) or Utiles::errorSQL($query_moneda, __FILE__, __LINE__, $sesion->dbh);
-
-	while (list($id_moneda_tmp, $simbolo_moneda_tmp, $cifras_decimales_tmp, $moneda_base_tmp, $tipo_cambio_tmp) = mysql_fetch_array($resp_moneda)) {
-		foreach ($results as $row) {
-			$monto_saldo_total += UtilesApp::CambiarMoneda($row['saldo'], $row['tipo_cambio'], $row['cifras_decimales'], $tipo_cambio_tmp, $cifras_decimales_tmp);
-		}
-		$glosa_monto_saldo_total = '<b>' . __('Saldo') . ' ' . $simbolo_moneda_tmp . ' ' . number_format($monto_saldo_total, $cifras_decimales_tmp, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']) . '</b>';
+	if (count($formato_saldos) > 0) {
+		$glosa_monto_saldo_total = "<strong>Saldo: " . implode(' | ', $formato_saldos) . "</strong>";
 	}
 
-	// calcular el saldo en moneda base
 	$SimpleReport = new SimpleReport($sesion);
 	$config = $SimpleReport->LoadConfiguration('FACTURAS');
 
@@ -302,10 +295,8 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	}
 
 	$b->AgregarFuncion(__('Nº Liquidación'), 'FormatoLiquidacion', 'align="center"');
-	$b->AgregarFuncion(__('Total'), 'FormatoTotal', 'align="right"');
-	$b->AgregarFuncion(__('Pagos'), 'FormatoPagos', 'align="right"');
-	$b->AgregarFuncion(__('Saldo adeudado'), 'FormatoSaldo', 'align="right"');
-	$b->AgregarEncabezado('fecha_ultimo_pago', __('Fecha Último Pago'), 'align="center"');
+	$b->AgregarFuncion(__('Total'), 'FormatoTotal', 'align="left"');
+	$b->AgregarFuncion(__('Pagos'), 'FormatoPagos', 'align="left"');
 	$b->AgregarEncabezado('estado', __('Estado'), 'align="center"');
 	$b->AgregarFuncion(__('Opciones'), 'Opciones', 'style="white-space:nowrap" align="right"');
 	$b->color_mouse_over = '#bcff5c';
@@ -351,22 +342,41 @@ function FormatoLiquidacion($fila) {
 }
 
 function FormatoMoneda($sesion, $numero, $moneda) {
-	return UtilesApp::PrintFormatoMoneda($sesion, $numero, $moneda);
+	return UtilesApp::PrintFormatoMoneda($sesion, $numero, $moneda, '', '', '&nbsp;');
 }
 
 function FormatoTotal($fila) {
 	global $sesion;
-	return FormatoMoneda($sesion, $fila->fields['total'], $fila->fields['id_moneda']);
+	$subtotal = FormatoMoneda($sesion, $fila->fields['subtotal'] + $fila->fields['subtotal_gastos'], $fila->fields['id_moneda']);
+	$iva = FormatoMoneda($sesion, $fila->fields['iva'], $fila->fields['id_moneda']);
+	$total = FormatoMoneda($sesion, $fila->fields['total'], $fila->fields['id_moneda']);
+	$glosa_iva = __('IVA');
+
+	$html =<<<HTML
+	<strong>Subtotal:</strong>&nbsp;$subtotal<br />
+	<strong>$glosa_iva:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$iva<br />
+	<strong>Total:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$total
+HTML;
+
+	return $html;
 }
 
 function FormatoPagos($fila) {
 	global $sesion;
-	return FormatoMoneda($sesion, $fila->fields['pagos'], $fila->fields['id_moneda']);
-}
+	$pagos = FormatoMoneda($sesion, $fila->fields['pagos'], $fila->fields['id_moneda']);
+	$saldo = FormatoMoneda($sesion, $fila->fields['saldo'], $fila->fields['id_moneda']);
+	$fecha_ultimo_pago = Utiles::sql2fecha($fila->fields['fecha_ultimo_pago'], "%d/%m/%Y");
+	if ($fecha_ultimo_pago == 'No existe fecha') {
+		$fecha_ultimo_pago = 'N/A';
+	}
 
-function FormatoSaldo($fila) {
-	global $sesion;
-	return FormatoMoneda($sesion, $fila->fields['saldo'], $fila->fields['id_moneda']);
+	$html =<<<HTML
+	<strong>Pagos:</strong>&nbsp;&nbsp;&nbsp;&nbsp;$pagos<br />
+	<strong>Saldo:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$saldo<br />
+	<strong>Últ.&nbsp;Pago:</strong>&nbsp;$fecha_ultimo_pago
+HTML;
+
+	return $html;
 }
 
 function Opciones($fila) {

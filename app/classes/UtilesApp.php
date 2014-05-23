@@ -2092,9 +2092,13 @@ HTML;
 		return $menu_html;
 	}
 
-	public static function PrintFormatoMoneda(&$Sesion, $monto, $id_moneda) {
-		extract(array_pop(Moneda::GetMonedas($Sesion, $id_moneda)));
-		return "$simbolo " . number_format($monto, $cifras_decimales, ',', '.');
+	public static function PrintFormatoMoneda(&$Sesion, $monto, $id_moneda, $simbolo = '', $cifras_decimales = '', $espacio = ' ') {
+		if (empty($simbolo) || empty($cifras_decimales)) {
+			$moneda = array_pop(Moneda::GetMonedas($Sesion, $id_moneda));
+			$simbolo = $moneda['simbolo'];
+			$cifras_decimales = $moneda['cifras_decimales'];
+		}
+		return "{$simbolo}{$espacio}" . number_format($monto, $cifras_decimales, ',', '.');
 	}
 
 	public static function ObtenerFormatoIdioma($sesion) {

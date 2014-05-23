@@ -58,7 +58,9 @@ if ($opc == 'edit') {
 	$usuario->Edit('telefono1', $telefono1);
 	$usuario->Edit('telefono2', $telefono2);
 	$usuario->Edit('email', $email);
-	$usuario->Edit('activo', $activo);
+	if ($usuario->fields['activo'] != $activo) {
+		$usuario->Edit('activo', $activo);
+	}
 	$usuario->Edit('visible', $activo == 1 ? 1 : $visible);
 	$usuario->Edit('restriccion_min', $restriccion_min);
 	$usuario->Edit('restriccion_max', $restriccion_max);
@@ -78,6 +80,24 @@ if ($opc == 'edit') {
 	$usuario->Validaciones($arr1, $pagina, $validaciones_segun_config);
 	$errores = $pagina->GetErrors();
 
+	if (empty($errorres) && (!empty($usuario->fields['id_usuario']) && $usuario->changes['activo'] && $activo == '1')) {
+		$UsuarioPermiso = new UsuarioPermiso($sesion);
+		$permitir_activar = true;
+		if ($UsuarioPermiso->esProfesional($usuario->fields['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'PRO')) {
+			$permitir_activar = false;
+		} else if ($UsuarioPermiso->esAdministrativo($usuario->fields['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'ADM')) {
+			$permitir_activar = false;
+		}
+
+		if (!$permitir_activar) {
+			$error = "Atención: Ocurrió un error al activar al usuario.<br>" .
+				"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
+				"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+			$pagina->AddError($error);
+			$errores[] = $error;
+		}
+	}
+
 	if (empty($errores)) {
 
 		//Compara y guarda cambios en los datos del Usuario
@@ -89,8 +109,6 @@ if ($opc == 'edit') {
 				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
-
-				//echo 'Categoria actual <b>'.$id_categoria_usuario.'</b></br>';
 
 				if ( $id_categoria_anterior != $id_categoria_usuario) {
 					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
@@ -357,7 +375,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 			<tr>
 				<td valign="top" class="texto" align="right">
-					<?php echo __('Nombre Completo') ?><span class="req">*</span>
+					<?php echo __('Nombres') ?><span class="req">*</span>
 				</td>
 				<td valign="top" class="texto" align="left">
 					<input type="text" name="nombre" value="<?php echo $usuario->fields['nombre'] ? $usuario->fields['nombre'] : $nombre ?>" size="30" style=""/>
@@ -825,26 +843,45 @@ if($sesion->usuario->TienePermiso('SADM'))  echo '<a style="border:0 none;" href
 }
 
 function CargarPermisos() {
+	global $sesion, $usuario, $pagina, $permiso, $_POST;
 
-	global $usuario, $pagina, $permiso, $_POST;
 	$permisos_inactivos = array();
 	$permisos_activos = array();
 	$permisos_activados = array();
+	$UsuarioPermiso = new UsuarioPermiso($sesion);
+
 	//Obtenemos lista de permisos actual sin considerar ALL
 	$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
 
 	for ($i = 0; $i < $usuario->permisos->num; $i++) {
-
+		$error = '';
 		$permiso = &$usuario->permisos->get($i);
 
 		if ($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']]) {
-			$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
-			$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+			// si agrega el nuevo rol validar si tenemos cupo
+			if ($permiso->fields['permitido'] == 0 && $_POST[$permiso->fields['codigo_permiso']] == 1) {
+				if ($usuario->fields['activo'] == '1') {
+					if (!$UsuarioPermiso->puedeAsignarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
+						$error = "Ocurrió un error al asignar el rol '{$permiso->fields['codigo_permiso']}'.<br>" .
+							"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
+							"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+						$pagina->AddError($error);
+					}
+				} else {
+					$error = "Atención: Solo a los usuarios activos del sistema se les puede asignar roles.";
+					$pagina->AddError($error);
+				}
+			}
 
-			if (!$usuario->EditPermisos($permiso)) {
-				$pagina->AddError($usuario->error);
-			} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
-				$permisos_activados[] = $permiso->fields['codigo_permiso'];
+			if (empty($error)) {
+				$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
+				$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+
+				if (!$usuario->EditPermisos($permiso)) {
+					$pagina->AddError($usuario->error);
+				} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
+					$permisos_activados[] = $permiso->fields['codigo_permiso'];
+				}
 			}
 
 		} else {

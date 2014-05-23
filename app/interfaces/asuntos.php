@@ -17,6 +17,14 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 }
 
+$query_usuario = "SELECT id_usuario, CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario";
+
+$params_sadmin_array['codigo_permiso'] = 'SADM';
+$permiso_sadmin = $sesion->usuario->permisos->Find('FindPermiso', $params_sadmin_array);
+if ($permiso_sadmin->fields['permitido']) {
+	$query_usuario = "SELECT id_usuario, CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario WHERE rut != '99511620'";
+}
+
 $params_array['codigo_permiso'] = 'DAT';
 $permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array); #tiene permiso de admin de datos
 if ($permisos->fields['permitido'] && $accion == "eliminar") {
@@ -172,7 +180,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 					</td>
 					<td nowrap class="al" colspan=4>
 						<?php
-						if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
+						if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 							echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente,$codigo_cliente_secundario);
 						} else {
 							?>
@@ -201,7 +209,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 						<?php echo __('Usuario'); ?>
 					</td>
 					<td class="al" colspan="3">
-						<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario", "id_usuario", $id_usuario, '', 'Todos', '200'); ?>
+						<?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', 'Todos', '200'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -237,11 +245,18 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 if ($busqueda) {
 	$link = "Opciones";
 } else {
-	$link = __('Cobrar') . " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Todos') . "</a>";
+	$link = __('Cobrar');
+	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
+
 }
 
 if ($checkall == '1') {
 	CheckAll($id_cobro, $codigo_cliente);
+}
+
+if ($uncheckall == '1') {
+	UncheckAll($id_cobro, $codigo_cliente);
 }
 
 global $query, $where,$b;

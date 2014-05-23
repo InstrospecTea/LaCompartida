@@ -77,7 +77,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		$data = array('Factura' => $factura);
 		$Slim->applyHook('hook_anula_factura_electronica', &$data);
 		$error = $data['Error'];
-		if (!$error) {
+		if (!is_null($error)) {
 			$pagina->AddError($error['Message'] ? $error['Message'] : __($error['Code']));
 			$requiere_refrescar = "window.opener.Refrescar();";
 		} else {
@@ -139,6 +139,7 @@ if ($opcion == "guardar") {
 		}
 
 		$factura->Edit('condicion_pago', '' . $condicion_pago);
+		$factura->Edit('fecha_vencimiento', $fecha_vencimiento_pago_input ? Utiles::fecha2sql($fecha_vencimiento_pago_input) : "");
 		$factura->Edit('iva', $iva);
 		$factura->Edit('id_estudio', $id_estudio);
 		$factura->Edit('total', '' . ($monto_neto + $iva));
@@ -147,42 +148,24 @@ if ($opcion == "guardar") {
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
+		
 
-		if (UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
-			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
+		$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
+		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
+		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
+		$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
+
+		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
+			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
 
-		if (UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
-			$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
-		}
-
-		if (UtilesApp::existecampo('dte_metodo_pago', 'factura', $sesion)) {
-			$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
-		}
-
-		if (UtilesApp::existecampo('dte_metodo_pago_cta', 'factura', $sesion)) {
-			$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
-		}
-
-		if (UtilesApp::existecampo('dte_id_pais', 'factura', $sesion)) {
-			if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
-				$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
-			}
-		}
-
-		if (UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
-			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
-		}
-
-		if (UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
-			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
-		}
-
+		$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
+		$factura->Edit("factura_region", $factura_region ? addslashes($factura_region) : "");
+		$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
 		$factura->Edit('serie_documento_legal', (int) $serie);
-
 		$factura->Edit("numero", $numero ? $numero : "1");
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
 		$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
@@ -250,22 +233,22 @@ if ($opcion == "guardar") {
 				$resultado = array('error' => 'El número ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, vuelva a intentar con número: ' . $numero_documento_legal);
 			}
 		} else {
-			$has_errors = false;
 			if ($mensaje_accion == 'anulado') {
 				$data_anular = array('Factura' => $factura);
 				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data_anular) : false;
-				$has_errors = $data_anular['Error'];
-				if ($has_errors) {
-					$pagina->AddError($has_errors['Message'] ? $has_errors['Message'] : __($has_errors['Code']));
+				$error_message = $data_anular['Error'];
+				echo "<!-- {$error_message} -->";
+				if (!is_null($error_message)) {
+					$pagina->AddInfo($factura->fields["dte_estado_descripcion"] . " <br/>Para consultar el estado de su factura, puede dar clic en el ícono i (más información)");
 					$factura->Load($id_factura);
 				}
 			}
 
-			if (UtilesApp::GetConf($sesion, 'UsarModuloProduccion')) {
+			if (Conf::GetConf($sesion, 'UsarModuloProduccion')) {
 				$factura->ActualizaGeneradores();
 			}
 
-			if (!$has_errors && $factura->Escribir()) {
+			if ($factura->Escribir()) {
 				if ($generar_nuevo_numero) {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio);
 				}
@@ -545,16 +528,16 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					</td>
 				</tr>
 			<?php } else { ?>
-				<input type="hidden" name="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
+				<input type="hidden" name="id_estudio" id="id_estudio" value="<?php echo $estudios_array[0]['id_estudio']; ?>" />
 			<?php } ?>
 
 			<?php
 			$numero_documento = '';
 
-			if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 				$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
-			} else if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
+			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
 			}
 			?>
@@ -562,22 +545,23 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td width="140" align="right"><?php echo __('Número'); ?></td>
 				<td align="left">
 					<?php
-					if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 						$serie_documento_legal = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
-						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), "serie", $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
+						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
 					} else {
 						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
-					?>
-					<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
+						?>
+						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>
 					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
 				<td align="right"><?php echo __('Estado'); ?></td>
 				<?php
-					$deshabilita_estado = ($factura->fields['anulado'] == 1 && $factura->FacturaElectronicaCreada() && $factura->FacturaElectronicaAnulada()) ? 'disabled' : '';
+					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
 				<td align="left">
 					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
+					<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
 				</td>
 			</tr>
 
@@ -679,6 +663,13 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<td align="left" colspan="3"><input type="text" name="ciudad_cliente" value="<?php echo $factura->loaded() ? $factura->fields['ciudad_cliente'] : $contrato->fields['factura_ciudad']; ?>" id="ciudad_cliente" size="70" maxlength="255" />
 			</td>
 		</tr>
+		<?php if (conf::GetConf($sesion,'RegionCliente')) { ?>
+		<tr>
+			<td align="right"><?php echo __('Región'); ?></td>
+			<td align="left" colspan="3"><input type="text" name="factura_region" value="<?php echo $factura->loaded() ? $factura->fields['factura_region'] : $contrato->fields['region_cliente']; ?>" id="factura_region" size="70" maxlength="255" />
+			</td>
+		</tr>
+		<?php } ?>
 		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
 			<td align="left" colspan="3">
@@ -719,6 +710,10 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					?>
 				</select>
 			</td>
+		</tr>
+		<tr class="fecha_vencimiento_pago" style="visibility: visible;">
+			<td align="right" ><?php echo __('Fecha Vencimiento')?></td>
+			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
 		<?php
@@ -911,7 +906,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<td align="left">
 				<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void(0);" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
-				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && (!$factura->FacturaElectronicaCreada() || ($factura->FacturaElectronicaCreada() && !$factura->FacturaElectronicaAnulada()))) { ?>
+				<?php if ($factura->loaded() && $factura->fields['anulado'] == 1 && !$factura->DTEAnulado() && !$factura->DTEAnulado() && !$factura->DTEProcesandoAnular()) { ?>
 					<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-restore" onclick="return Cambiar(jQuery('#form_facturas').get(0), 'restaurar');"><?php echo __('Restaurar') ?></a>
 				<?php } ?>
 				<a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio') ?></a>
@@ -948,7 +943,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 // funcion ajax para asignar valores a los campos del cliente en agregar factura
 	function CargarDatosCliente(sin_contrato) {
-		console.log(sin_contrato);
+
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			var id_origen = 'codigo_cliente_secundario';
 		<?php } else { ?>
@@ -962,6 +957,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var direccion_cliente = document.getElementById('direccion_cliente');
 		var comuna_cliente = document.getElementById('comuna_cliente');
 		var ciudad_cliente = document.getElementById('ciudad_cliente');
+		var factura_region = document.getElementById('factura_region');
 		var giro_cliente = document.getElementById('giro_cliente');
 		var factura_codigopostal = document.getElementById('factura_codigopostal');
 		var dte_id_pais = document.getElementById('dte_id_pais');
@@ -982,12 +978,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			var descripcion = document.getElementById('descripcion');
 		<?php } ?>
 		var http = getXMLHTTP();
-		console.log(select_origen.value);
+
 		var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value;
 		if (!sin_contrato) {
 			url += '&id_contrato=' + id_contrato;
 		}
-		console.log(url);
 
 		http.open('get', url, true);
 		http.onreadystatechange = function()
@@ -1051,22 +1046,32 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 							} else {
 								ciudad_cliente.value = '';
 							}
-							// Ciudad
-							if (valores[5] != '') {
-								giro_cliente.value = valores[5];
+
+							//Estado
+							if(valores[5] != ''){
+								factura_region.value = valores[5]
+							} else{
+								factura_region.value = '';
+							}
+
+							// Giro
+							if (valores[6] != '') {
+								giro_cliente.value = valores[6];
 							} else {
 								giro_cliente.value = '';
 							}
-							// Ciudad
-							if (valores[6] != '') {
-								factura_codigopostal.value = valores[6];
+
+							// Codigo Postal
+							if (valores[7] != '') {
+								factura_codigopostal.value = valores[7];
 							} else {
 								factura_codigopostal.value = '';
 							}
 
-							if (valores[7] != '') {
+							// País
+							if (valores[8] != '') {
 								if (dte_id_pais) {
-									dte_id_pais.value = valores[7];
+									dte_id_pais.value = valores[8];
 								}
 							} else {
 								if (dte_id_pais) {
@@ -1614,13 +1619,13 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var estudio_serie_numero = jQuery(document).data('estudio_serie_numero');
 
 		jQuery.each(estudio_series, function(estudio, series) {
-			if (jQuery('#id_estudio').attr('value') == estudio) {
+			if (jQuery('#id_estudio').val() == estudio) {
 				jQuery.each(series, function(serie, numero) {
-					if (jQuery('#serie').attr('value') == serie) {
+					if (jQuery('#serie').val() == serie) {
 						if (estudio_serie_numero.estudio != estudio || estudio_serie_numero.serie != serie) {
-							jQuery('#numero').attr('value', numero);
+							jQuery('#numero').val(numero);
 						} else {
-							jQuery('#numero').attr('value', estudio_serie_numero.numero);
+							jQuery('#numero').val(estudio_serie_numero.numero);
 						}
 						return false;
 					}
@@ -1668,6 +1673,27 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		return true;
 	}
 
+	function obtiene_fecha_vencimiento(dias, myDate){
+		var offset = (dias * 24 * 60 * 60 * 1000);
+
+		myDate.setTime(myDate.getTime() + offset);
+
+		//Transformar objeto date a fecha
+		var dia = myDate.getDate();
+		var mes = myDate.getMonth() + 1;
+		if(mes < 10){
+			mes = '0' + mes;
+		}
+		if(dia < 10){
+			dia = '0' + dia;
+		}
+		var anio = myDate.getFullYear();
+
+		var fecha_vencimiento_pago = dia + "-" + mes + "-" + anio;
+
+		return fecha_vencimiento_pago;
+	}
+
 	<?php
 	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		echo "desgloseMontosFactura(document.form_facturas);\n";
@@ -1687,6 +1713,43 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
 			CargarDatosCliente(1);
 		});
+
+		jQuery('#fecha').change(function(){
+			jQuery('#condicion_pago').trigger('change');
+		});
+
+		//Manejo de select de condicion de pago.
+		jQuery('#condicion_pago').change(function(){
+			var codigo = jQuery(this).val();
+			if(codigo == 1 || codigo == 21){
+
+				//jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
+				jQuery('#fecha_vencimiento_pago_input').attr('readonly',false);
+				var dias = 1;
+				var myDate = new Date();
+				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
+				
+				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
+			}
+			else{
+
+				//jQuery('.fecha_vencimiento_pago').css('visibility', 'hidden');
+				jQuery('#fecha_vencimiento_pago_input').attr('readonly',true);
+				var texto = jQuery(this).find(":selected").text();
+				var splitted_text = texto.split(' ');
+				var dias = splitted_text[2];
+				dias++;
+				var fecha_definida = jQuery('#fecha').val();
+				var fecha_definida_split = fecha_definida.split('-');
+				var myDate = new Date(fecha_definida_split[2], fecha_definida_split[1] - 1, fecha_definida_split[0]);
+				
+				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
+				
+				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
+			}
+		});
+
+		jQuery('#condicion_pago').trigger('change');
 
 		if (cantidad_decimales != -1) {
 			jQuery('.aproximable').each(function() {

@@ -84,12 +84,11 @@ if (Conf::GetConf($sesion, 'BeaconTimer')) {
 
 		<div class="cont_tabla">
 <?php if ($this->num_infos > 0) { ?>
-			<table width="80%" class="info">
+			<table width="100%" class="info">
 				<tr>
 					<td valign="top" align="left" style="font-size: 12px;"><?php echo $this->GetInfos(); ?></td>
 				</tr>
 			</table>
-			<br/><br/>
 <?php } ?>
 
 <?php if ($this->num_errors > 0) { ?>

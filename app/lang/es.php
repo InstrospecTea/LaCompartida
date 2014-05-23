@@ -42,6 +42,8 @@ $_LANG['Atención'] = "Atención";
 $_LANG['Giro'] = "Giro";
 $_LANG['Dirección'] = "Dirección";
 $_LANG['Estimado'] = "Estimado";
+$_LANG['texto_instrucciones'] = "No envié cheques por correo aéreo. Existe un serio riesgo de extravío o robo. Siga las instrucciones. De ser posible favor notificarnos el pago de la factura al siguiente e-mail: mariana.peroni@pstbn.com.py indicando los siguientes datos: N° de Factura, monto, y forma de envió del pago";
+
 #Monedas
 $_LANG['Tipos de Cambio']="Tipos de Cambio";
 $_LANG['Dólar'] = "Dólar";
@@ -334,6 +336,10 @@ $_LANG['SOCIO COBRADOR'] = "SOCIO COBRADOR";
 $_LANG['Nota'] = "Nota";
 $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'] = "Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.";
 $_LANG['Con Impuesto'] = "Con Impuesto";
+$_LANG['detalledegastos'] = "Detalle de Gastos";
+$_LANG['resumen_raz'] = "Resumen";
+$_LANG['total_raz'] = "Total de horas";
+
 #Nota cobro Morales
 $_LANG['Atte'] = "Atte";
 $_LANG['Registro de Tiempo'] = "Registro de Tiempo";
@@ -349,6 +355,11 @@ $_LANG['Abogados que trabajaron'] = "Abogados";
 $_LANG['Honorarios'] = "Honorarios";
 $_LANG['Detalle del Trabajo Realizado'] = "Detalle del Trabajo Realizado";
 $_LANG['Abogado'] = "Abogado";
+$_LANG['abogado_raz'] = "Abogado";
+$_LANG['tiempo_raz'] = "Tiempo";
+$_LANG['tiempo_raz'] = "Tiempo";
+$_LANG['tarifa_raz'] = "Tarifa";
+$_LANG['importe_raz'] = "Importe";
 $_LANG['Total Nota de Cobro'] = "Total Nota de Cobro";
 $_LANG['Total Cobro'] = "Total Cobro";
 $_LANG['total_cobro'] = "Total Cobro";
@@ -442,7 +453,7 @@ $_LANG['Observaciones'] = "Observaciones";
 $_LANG['Debe ingresar observación'] = "Debe ingresar observación";
 $_LANG['Tienes que ingresar el tipo de moneda.'] = "Tienes que ingresar el tipo de moneda.";
 $_LANG['Tipo de cambio'] = "Tipo de cambio";
-
+$_LANG['Días Atraso'] = "Días Atraso";
 
 #Actividad
 $_LANG['Actividad'] = "Actividad";
@@ -772,7 +783,7 @@ $_LANG['tipo_asunto'] = "Tipo Asunto";
 $_LANG['area_asunto'] = "Area Asunto";
 $_LANG['glosa_actividad'] = "Actividad";
 $_LANG['area_trabajo'] = "Area Trabajo";
-
+$_LANG['Dias Vencimiento'] = "Días Vencimiento";
 
 ##### MESES
 #Mayuscula
@@ -830,9 +841,11 @@ $_LANG['%saludo_mb%'] = "De mi consideración:";
 $_LANG['%despedida_mb%'] = "Quedando a su disposición para cualquier comentario sobre el particular, saluda muy atentamente a ustedes,";
 
 #Carta JJR
-$_LANG['Nota Disclaimer'] = "";
-$_LANG['Nota Disclaimer2'] = "";
-
+$_LANG['nota_morosidad_honorarios'] = "Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.";
+$_LANG['nota_morosidad_gastos'] = "Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.";
+$_LANG['nota_morosidad_total'] = "Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.";
+$_LANG['nota_morosidad'] = "";
+$_LANG['nota_disclaimer'] = "";
 
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";

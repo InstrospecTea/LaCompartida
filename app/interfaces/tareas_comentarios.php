@@ -1,23 +1,7 @@
 <?
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	
-	require_once Conf::ServerDir().'/../fw/classes/SelectorHoras.php';
-	require_once Conf::ServerDir().'/classes/Tarea.php';
-	require_once Conf::ServerDir().'/classes/TareaComentario.php';
-	require_once Conf::ServerDir().'/classes/Asunto.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Archivo.php';
 
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-
-	$sesion = new Sesion(array('PRO'));
+	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
@@ -29,7 +13,7 @@
 
 	$arreglo_estados = array('Por Asignar','Asignada','En Desarrollo','Por Revisar','Lista');
 
-	
+
 	$tarea	= new Tarea($sesion);
 	$tarea->Load($id_tarea);
 
@@ -37,7 +21,7 @@
 	{
 		$tarea_comentario = new TareaComentario($sesion);
 		$trabajo = new Trabajo($sesion);
-		
+
 		if($id_comentario)
 		{
 			$tarea_comentario->Load($id_comentario);
@@ -49,16 +33,16 @@
 
 				if($trabajo->Eliminar())
 					$infos[] = __('El Trabajo ha sido eliminado satisfactoriamente');
-				else 
+				else
 					$errors[] = $trabajo->error;
 			}
-			
+
 			if($tarea_comentario->Eliminar())
 			{
 					$infos[] = __('El Detalle ha sido eliminado satisfactoriamente');
 					$js .= "parent.ActualizarTiempoIngresado();";
 			}
-				else 
+				else
 					$errors[] =__('Error al eliminar Detalle');
 		}
 	}
@@ -115,13 +99,13 @@
 		if($duracion_avance)
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 				{
-					$duracion_avance = UtilesApp::Decimal2Time($duracion_avance);	
+					$duracion_avance = UtilesApp::Decimal2Time($duracion_avance);
 				}
 
 		$tarea_comentario->Edit('id_tarea',$id_tarea);
 		$tarea_comentario->Edit('id_usuario',$id_usuario);
 		$tarea_comentario->Edit('comentario',$descripcion_avance);
-		if($duracion_avance)			
+		if($duracion_avance)
 			$tarea_comentario->Edit('duracion_avance',$duracion_avance);
 		$tarea_comentario->Edit('fecha_avance',Utiles::fecha2sql($fecha_avance));
 		$tarea_comentario->Edit('estado',$estado_comentario);
@@ -129,18 +113,26 @@
 		### Subiendo archivo ###
 		if( $archivo_comentario['name'] != '' && !$id_archivo)
 		{
-				$archivo->Edit('archivo_data',$archivo_comentario);
-				$archivo->Edit( 'id_contrato', $asunto->fields['id_contrato']);
+				$archivo_subir = $archivo_comentario['tmp_name'];
+				$subir = fopen($archivo_subir, 'r');
+				$contenido = fread($subir, filesize($archivo_subir));
+				fclose($subir);
 
-				if($archivo->Write())
-				{
-					$tarea_comentario->Edit('id_archivo',$archivo->fields['id_archivo']);
-					$infos[] = __('Archivo').' '.__('Guardado con exito');
-				}
-				else
-					$errors[] = $archivo->error;
+				$archivoname = UtilesApp::slug(substr($archivo_comentario['name'], 0, strpos($archivo_comentario['name'], '.')));
+				$archivoext = substr($archivo_comentario['name'], stripos($archivo_comentario['name'], '.'));
+
+				$name = "/tarea_comentario/{$id_tarea}/{$archivoname}{$archivoext}";
+				$url_file = UtilesApp::UploadToS3($name, $contenido, $archivo_comentario['type']);
+	            if($url_file!=''){
+	            	$id_file = $tarea_comentario->saveEmptyFile($asunto->fields['id_contrato'],$archivo_comentario['name'],$archivo_comentario['type'], '',NULL,$url_file);
+	            	if($id_file!=""){
+						$tarea_comentario->Edit('id_archivo',$id_file);
+						$infos[] = __('Archivo').' '.__('Guardado con exito');
+					}else{
+						$errors[] = $archivo->error;
+					}
+	            }
 		}
-		
 		if($ingresa_trabajo && (!$id_trabajo) && $duracion_avance)
 		{
 			$trabajo->Edit('id_usuario',$id_usuario);
@@ -149,7 +141,7 @@
 			$trabajo->Edit("duracion_cobrada",$duracion_avance);
 			$trabajo->Edit('descripcion',$descripcion_avance);
 			$trabajo->Edit('fecha',Utiles::fecha2sql($fecha_avance));
-			
+
 			if($asunto->fields['cobrable']==0) //Si el asunto no es cobrable, cambia cobrable
 				$trabajo->Edit("cobrable",'0');
 			else
@@ -163,7 +155,7 @@
 				$tarea_comentario->Edit('id_trabajo',$trabajo->fields['id_trabajo']);
 			}
 			else
-			{			
+			{
 				$errors[] = __("Error al ingresar el Trabajo.");
 			}
 		}
@@ -183,7 +175,7 @@
 
 		function EliminarComentario(id_comentario)
 		{
-			var url = 'tareas_comentarios.php?id_tarea=<?=$id_tarea?>'; 
+			var url = 'tareas_comentarios.php?id_tarea=<?=$id_tarea?>';
 			url += '&opcion=eliminar&id_comentario='+id_comentario;
 
 			if(confirm('<?=__('¿Está seguro que desea eliminar el Detalle?')?>'))
@@ -224,7 +216,7 @@
 				if(response != 'FAIL')
 				{
 					var campos = response.split('|');
-					
+
 					$('id_comentario').value = campos[0];
 					$('descripcion_avance').value = campos[3];
 					$('fecha_avance').value = campos[4];
@@ -238,7 +230,7 @@
 						span += "onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'"+url+"','');\" ";
 						span +=	"style = 'cursor:pointer; text-decoration:underline;' >";
 
-			
+
 						$('display_trabajo').innerHTML = span+'Trabajo N° '+campos[6]+'</span>';
 						$('id_trabajo').value = campos[6];
 
@@ -259,7 +251,7 @@
 					{
 						var url = "ver_archivo.php?id_archivo="+campos[7];
 						var anchor = '<a href="'+url+'">';
-						
+
 						$('display_archivo').innerHTML = anchor+campos[8]+'</a>';
 
 						$('id_archivo').value = campos[7];
@@ -273,11 +265,11 @@
 						$('display_archivo').hide();
 					}
 
-					<?  // Por cada estado, 'estado_comentario' puede cambiar a ese estado. 
+					<?  // Por cada estado, 'estado_comentario' puede cambiar a ese estado.
 						$elector = array();
 						foreach($arreglo_estados as $i => $e)
 							$elector[] = "if(campos[9] == '".$e."') $('estado_comentario').selectedIndex = ".$i.";";
-						echo implode(' else ',$elector);	
+						echo implode(' else ',$elector);
 					?>
 
 					$('Nuevo-Editar').innerHTML = '<?=__('Editar Detalle')?>';
@@ -305,9 +297,9 @@
 			$('descripcion_avance').value = '';
 			$('fecha_avance').value = '<?=date('d-m-Y')?>';
 			$('duracion_avance').value = '';
-			
-			$('ingresa_trabajo').disabled = true;	
-			$('ingresa_trabajo').checked = true;	
+
+			$('ingresa_trabajo').disabled = true;
+			$('ingresa_trabajo').checked = true;
 			$('id_comentario').value = '';
 			$('id_trabajo').value = '';
 			$('id_archivo').value = '';
@@ -321,7 +313,7 @@
 
 			$('estado_comentario').selectedIndex = <?=array_search($tarea->fields['estado'],$arreglo_estados)?>;
 		}
-	
+
 		function Validar(form)
 		{
 			if(!form.descripcion_avance.value)
@@ -329,7 +321,7 @@
 				alert('Debe ingresar una descripción.');
 				form.descripcion_avance.focus();
 				return false;
-			}				
+			}
 			<?  //Revisa el Conf si el TipoIngresoHoras es 'decimal': se agrega esta revisión de Duracion a ValidarAvance().
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 				{
@@ -367,12 +359,12 @@
 		if(!empty($infos))
 		{
 			?>
-				<table class="info" width="80%">
+				<table class="info" width="100%">
 					<tbody>
 						<? foreach($infos as $info)
 							{
 								echo '<tr>  <td style="font-size: 12px;" valign="top" align="left">';
-									echo $info;		
+									echo $info;
 								echo '</td> </tr>';
 							}
 						?>
@@ -385,11 +377,11 @@
 		if(!empty($errors))
 		{
 			?>
-				<table class="error" width="80%">
+				<table class="error" width="100%">
 					<tbody>
 						<? foreach($errors as $error)
 							echo '<tr>  <td style="font-size: 12px;" valign="top" align="left">';
-								echo $error;		
+								echo $error;
 							echo '</td> </tr>';
 						?>
 					</tbody>
@@ -488,14 +480,14 @@
 									<td>
 										&nbsp;
 									</td>
-									
+
 									<td align=left>
 										<label for='ingresa_cobrable'><?=__('Estado de Tarea')?>:&nbsp;</label>
 										<select name=estado_comentario id=estado_comentario>
 											<?
 												foreach($arreglo_estados as $e)
 												{
-													$selected = '';				
+													$selected = '';
 													if($tarea->fields['estado'] == $e)
 														$selected = 'selected="selected"';
 													echo "<option value='".$e."' ".$selected.">".$e."</option>";
@@ -508,7 +500,7 @@
 									<td align=right>
 										<label for='descripcion_avance'><?=__('Descripción')?></label>
 									</td>
-									
+
 									<td align=left colspan=3>
 											<textarea name="descripcion_avance" id="descripcion_avance" rows=3 cols=40 style='overflow:auto'></textarea>
 									</td>
@@ -535,7 +527,7 @@
 		</form>
 		</div>
 
-	
+
 <?
 	if($orden == "")
 		$orden = " tarea_comentario.fecha_creacion DESC";
@@ -543,7 +535,7 @@
 	$query = "SELECT		SQL_CALC_FOUND_ROWS *, tarea_comentario.fecha_creacion AS fecha_creacion_comentario,
 							CONCAT(usuario.apellido1,' ',usuario.nombre) as nombre_usuario,
 							IF(tcu.id_comentario IS NULL,1,0) AS novedad
-				FROM		tarea_comentario 
+				FROM		tarea_comentario
 				JOIN		usuario ON (tarea_comentario.id_usuario = usuario.id_usuario)
 				LEFT JOIN	tarea_comentario_usuario AS tcu ON (tcu.id_comentario = tarea_comentario.id_comentario AND tcu.id_usuario = '".$id_usuario."')
 				WHERE		id_tarea = ".$id_tarea;
@@ -554,7 +546,7 @@
 
 	$b->nombre = "busc_comentarios";
 
-    $b->AgregarFuncion(__('Fecha'),			'Fecha',			"align=center");	
+    $b->AgregarFuncion(__('Fecha'),			'Fecha',			"align=center");
 	$b->AgregarFuncion(__('Usuario'),		"NombreUsuario",	"align=center");
 	$b->AgregarFuncion(__('Descripción'),	"Comentario",		"align=center");
 	$b->AgregarFuncion(__(''),				'Estado',			"align=center");
@@ -601,15 +593,15 @@
 		$id_trabajo = $fila->fields['id_trabajo'];
 		if($id_trabajo)
 		{
-			return '<span 
-							class="link_trabajo" 
+			return '<span
+							class="link_trabajo"
 							onclick="nuovaFinestra(\'Editar_Trabajo\',550,450,\'editar_trabajo.php?id_trabajo='.$id_trabajo.'&popup=1\',\'\');"
 							style=" cursor:pointer; text-decoration:underline; "
 							>N° '.$id_trabajo.'</span>';
 		}
 		return '--';
-	
-	
+
+
 	}
 
 	function Fecha(&$fila)
@@ -619,7 +611,7 @@
 		{
 			$h = '<b>'.$h.'</b>';
 		}
-		return $h; 
+		return $h;
 	}
 	function Hora(&$fila)
 	{
@@ -649,10 +641,10 @@
 				$o .= '<a href="ver_archivo.php?id_archivo='.$id_archivo.'">
 							<img src="'.Conf::ImgDir().'/ver_16.gif" border=0 title="Ver documento: '.$nombre_archivo.'" /></a>&nbsp;';
 			}
-						
+
 			$o .= "<a href='javascript:void(0)' onclick=\"CargarComentario(".$id_com.")\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 			$o .= "<a target=_parent href='javascript:void(0)' onclick=\"EliminarComentario(".$id_com.")\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a>";
-		
+
 			return $o;
 	}
 
@@ -665,7 +657,7 @@
 <script type="text/javascript">
 	window.onload=function(){Resize()}
 
-	
+
 	if (document.getElementById('img_fecha_avance'))
 	{
 		Calendar.setup(
