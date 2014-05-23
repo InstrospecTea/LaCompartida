@@ -425,6 +425,14 @@ class Factura extends Objeto {
 		return new ListaFacturas($this->sesion, null, $query);
 	}
 
+	function FacturaElectronicaCreada() {
+		return !is_null($this->fields['dte_fecha_creacion']);
+	}
+
+	function FacturaElectronicaAnulada() {
+		return !is_null($this->fields['dte_fecha_anulacion']);
+	}
+
 	function DTEFirmado() {
 		return (!is_null($this->fields['dte_fecha_creacion']) && $this->fields['dte_estado'] == Factura::$estados_dte['Firmado']);
 	}
@@ -1479,7 +1487,7 @@ class Factura extends Objeto {
 				list($subtotal_honorarios, $subtotal_honorarios_sin_descuento, $descuento_honorarios, $honorarios, $impuesto, $subtotal_gastos, $subtotal_gastos_sin_impuesto,
 						$factura_id_moneda, $descripcion_honorarios_legales, $descripcion_subtotal_gastos, $descripcion_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp_datos_factura);
 
-				//	DATOS ESPECIFICOS INCLUIDOS EN EL DETALLE DEL DOCUMENTO 
+				//	DATOS ESPECIFICOS INCLUIDOS EN EL DETALLE DEL DOCUMENTO
 				$html2 = str_replace('%text_emisor%', 'EMISOR', $html2);
 				$html2 = str_replace('%text_num_documento%', 'N° DOCUMENTO', $html2);
 				$html2 = str_replace('%text_ruc%', 'RUC', $html2);
@@ -1612,7 +1620,7 @@ class Factura extends Objeto {
 
 					//	DESCRIPCION DEL GASTO EN FACTURA
 					$query_detalle_gastos = "
-						SELECT 
+						SELECT
 							cta_corriente.descripcion,
 							cta_corriente.numero_documento,
 							prm_proveedor.glosa,

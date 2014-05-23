@@ -694,6 +694,9 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 			if ($format == 'pdf') {
 				$url = $Invoice->fields['dte_url_pdf'];
 				$name = array_shift(explode('?', basename($url)));
+				if ($name === 'descargar.php') {
+					$name = sprintf('factura_%s.pdf', $Invoice->ObtenerNumero());
+				}
 				downloadFile($name, 'application/pdf', file_get_contents($url));
 			} else {
 				if ($format == 'xml') {

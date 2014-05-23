@@ -30,25 +30,25 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 				}
 			});
 		});
-EOF;
 
-		echo 'jQuery(document).on("click", ".factura-documento", function() {
+		jQuery(document).on("click", ".factura-documento", function() {
 			var self = jQuery(this);
 			var id_factura = self.data("factura");
 			var format = self.data("format") || "pdf";
 			window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
-		});';
+		});
 
-		echo 'jQuery(document).on("change", "#dte_metodo_pago",  function() {
+		jQuery(document).on("change", "#dte_metodo_pago",  function() {
 			var metodo_pago = jQuery("#dte_metodo_pago option:selected").text();
 			if (metodo_pago != "No Identificado") {
 				jQuery("#dte_metodo_pago_cta").show();
 			} else {
 				jQuery("#dte_metodo_pago_cta").hide();
 			}
-		});';
+		});
 
-		echo 'jQuery("#dte_metodo_pago").trigger("change")';
+		jQuery("#dte_metodo_pago").trigger("change");
+EOF;
 	}
 
 	public static function ValidarFactura() {
@@ -79,8 +79,8 @@ EOF;
 			$Estudio = new PrmEstudio($Sesion);
 			$Estudio->Load($Factura->fields['id_estudio']);
 			$rut = $Estudio->GetMetaData('rut');
-			$usuario = $Estudio->getMetadata('facturacion_electronica_cl.usuario');
-			$password = $Estudio->getMetadata('facturacion_electronica_cl.password');
+			$usuario = $Estudio->GetMetadata('facturacion_electronica_cl.usuario');
+			$password = $Estudio->GetMetadata('facturacion_electronica_cl.password');
 			$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
 			if ($WsFacturacionCl->hasError()) {
 				$hookArg['Error'] = array(
@@ -90,7 +90,7 @@ EOF;
 			} else {
 				$arrayDocumento = self::FacturaToArray($Sesion, $Factura ,$Estudio);
 				$hookArg['ExtraData'] = $arrayDocumento;
-				$result = $WsFacturacionCl->emitirFactura(UtilesApp::utf8izar($arrayDocumento), 0);
+				$result = $WsFacturacionCl->emitirFactura($arrayDocumento);
 				if (!$WsFacturacionCl->hasError()) {
 					try {
 						$Factura->Edit('dte_xml', $result['Detalle']['Documento']['xmlDTE']);
@@ -168,10 +168,10 @@ EOF;
 		$arrayFactura = array(
 			'fecha_emision' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
 			'folio' => $Factura->fields['numero'],
-			'monto_neto' => number_format($Factura->fields['subtotal'], 2, '.', ''),
-			'tasa_iva' => number_format($Factura->fields['porcentaje_impuesto'], 2, '.', ''),
-			'monto_iva' => number_format($Factura->fields['iva'], 2, '.', ''),
-			'monto_total' => number_format($Factura->fields['total'], 2, '.', ''),
+			'monto_neto' => intval($Factura->fields['subtotal']),
+			'tasa_iva' => intval($Factura->fields['porcentaje_impuesto']),
+			'monto_iva' => intval($Factura->fields['iva']),
+			'monto_total' => intval($Factura->fields['total']),
 			'emisor' => array(
 				'rut' => $Estudio->GetMetaData('rut'),
 				'razon_social' => $Estudio->GetMetaData('razon_social'),
@@ -183,11 +183,11 @@ EOF;
 			),
 			'receptor' => array(
 				'rut' => $Factura->fields['RUT_cliente'],
-				'razon_social' => $Factura->fields['cliente'],
-				'giro' => $Factura->fields['giro_cliente'],
-				'direccion' => $Factura->fields['direccion_cliente'],
-				'comuna' => $Factura->fields['comuna_cliente'],
-				'cuidad' => $Factura->fields['ciudad_cliente']
+				'razon_social' => UtilesApp::transliteration($Factura->fields['cliente']),
+				'giro' => UtilesApp::transliteration($Factura->fields['giro_cliente']),
+				'direccion' => UtilesApp::transliteration($Factura->fields['direccion_cliente']),
+				'comuna' => UtilesApp::transliteration($Factura->fields['comuna_cliente']),
+				'cuidad' => UtilesApp::transliteration($Factura->fields['ciudad_cliente'])
 			),
 			'detalle' => array()
 		);

@@ -26,7 +26,7 @@ Class FacturacionElectronica {
 	public static function BotonGenerarHTML($id_factura) {
 		$Html = self::getHtml();
 		$img_dir = Conf::ImgDir();
-		$img = $Html->img("$img_dir/invoice.png", array('border' => '0'));
+		$img = $Html->img("{$img_dir}/invoice.png", array('border' => '0'));
 		$attr_a = array(
 			'style' => 'margin-left: 8px;margin-right: 8px;',
 			'title' => 'Generar Factura Electrónica',

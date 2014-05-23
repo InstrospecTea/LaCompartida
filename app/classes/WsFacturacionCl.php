@@ -7,7 +7,7 @@ class WsFacturacionCl {
 
 	protected $tipoCodigo;
 	protected $ValorCodigo;
-	protected $url = 'http://cps.localhost/ttb/web_services/ws_dummy_facturacion_cl.php?wsdl';
+	protected $url = 'http://ws.facturacion.cl/WSDS/wsplano.asmx?wsdl';
 	protected $Client;
 	protected $usuario;
 	protected $password;
@@ -32,7 +32,7 @@ class WsFacturacionCl {
 		$documento = array(
 			'Encabezado' => array(
 				'IdDoc' => array(
-					'TipoDTE' => $afecta ? 34 : 33,
+					'TipoDTE' => $afecta ? 33 : 34,
 					'Folio' => $dataFactura['folio'],
 					'FchEmis' => $dataFactura['fecha_emision']
 				),
@@ -55,6 +55,7 @@ class WsFacturacionCl {
 				),
 				'Totales' => array(
 					'MntNeto' => $dataFactura['monto_neto'],
+					'MntExe' => $afecta ? 0 : $dataFactura['monto_neto'],
 					'TasaIVA' => $afecta ? $dataFactura['tasa_iva'] : 0,
 					'IVA' => $afecta ? $dataFactura['monto_iva'] : 0,
 					'MntTotal' => $dataFactura['monto_total']
@@ -82,28 +83,35 @@ class WsFacturacionCl {
 	}
 
 	public function anularFactura($folio, $afecta = false) {
-		$tipo = $afecta ? 34 : 33;
+		$tipo = $afecta ? 33 : 34;
 		return $this->anularDocumento('V', $folio, $tipo);
 	}
 
 	public function getXmlDte($documento) {
-		$login = $this->getLogin();
-		$tpomov = substr($documento['Operacion'], 0, 1);
-		$folio = $documento['Folio'];
-		$tipo = $documento['TipoDte'];
-		$xml64 = $this->Client->getXMLDte($login, $tpomov, $folio, $tipo);
+		$params = array(
+			'login' => $this->getLogin(),
+			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
+			'folio' => base64_encode($documento['Folio']),
+			'tipo' => base64_encode($documento['TipoDte'])
+		);
+		try {
+			$xml64 = $this->Client->getXMLDte($params);
+		} catch (SoapFault $sf) {
+			$xml64 = base64_encode('');
+		}
 		return base64_decode($xml64);
 	}
 
 	public function getPdfUrl($documento, $original = false) {
-		$login = $this->getLogin();
-		$tpomov = substr($documento['Operacion'], 0, 1);
-		$folio = $documento['Folio'];
-		$tipo = $documento['TipoDte'];
-		$cedible = $original ? 'False' : 'True';
-
-		$respuesta = $this->Client->ObtenerLink($login, $tpomov, $folio, $tipo, $cedible);
-		$sxmle = new SimpleXMLElement($respuesta);
+		$params = array(
+			'login' => $this->getLogin(),
+			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
+			'folio' => base64_encode($documento['Folio']),
+			'tipo' => base64_encode($documento['TipoDte']),
+			'cedible' => base64_encode($original ? 'False' : 'True')
+		);
+		$respuesta = $this->Client->ObtenerLink($params);
+		$sxmle = new SimpleXMLElement($respuesta->ObtenerLinkResult);
 		$xml = self::XML2Array($sxmle);
 		$url64 = $xml['Mensaje'];
 		return base64_decode($url64);
@@ -129,21 +137,32 @@ class WsFacturacionCl {
 	private function enviarDocumento($datosDocumento) {
 		$xmlDocumento = self::crearXML($datosDocumento);
 		$login = $this->getLogin();
-		$respuesta = $this->Client->Procesar($login, base64_encode($xmlDocumento), 2);
-		$sxmle = new SimpleXMLElement($respuesta);
+		$params = array(
+			'login' => $login,
+			'file' => base64_encode($xmlDocumento),
+			'formato' => 2
+		);
+		$respuesta = $this->Client->Procesar($params);
+		$sxmle = new SimpleXMLElement($respuesta->ProcesarResult);
 		$xml = self::XML2Array($sxmle);
 		if ($xml['Resultado'] == 'True') {
 			$xml['Detalle']['Documento']['urlPDF'] = $this->getPdfUrl($xml['Detalle']['Documento']);
 			$xml['Detalle']['Documento']['xmlDTE'] = $this->getXmlDte($xml['Detalle']['Documento']);
 		} else {
-			$this->setError(1, $xml['Mensaje']);
+			$this->setError(1, $xml['Mensaje'] . ' - ' . $xml['Detalle']['Documento']['Error']);
 		}
 		return $xml;
 	}
 
 	private function anularDocumento($tpomov, $folio, $tipo) {
 		$login = $this->getLogin();
-		$respuesta = $this->Client->EliminarDoc($login, $tpomov, $folio, $tipo);
+		$params = array(
+			'login' => $login,
+			'tpomov' => 'V',
+			'folio' => $folio,
+			'tipo' => $tipo
+		);
+		$respuesta = $this->Client->EliminarDoc($params);
 		$sxmle = new SimpleXMLElement($respuesta);
 		$xml = self::XML2Array($sxmle);
 		if ($xml['Resultado'] != 'True') {
@@ -154,10 +173,10 @@ class WsFacturacionCl {
 
 	private function getLogin() {
 		$login = array(
-			'Rut' => $this->rut,
-			'Usuario' => $this->usuario,
-			'Clave' => $this->password,
-			'Puerto' => 0
+			'Rut' => base64_encode($this->rut),
+			'Usuario' => base64_encode($this->usuario),
+			'Clave' => base64_encode($this->password),
+			'Puerto' => base64_encode(0)
 		);
 
 		return $login;
@@ -165,7 +184,7 @@ class WsFacturacionCl {
 
 	private function isOnline() {
 		$respuesta = $this->Client->Online();
-		if ($respuesta != 'Online=1') {
+		if ($respuesta-OnlineResult !== 1) {
 			$this->setError('ServiceUnavailable', 'Servicio temporalmente fuera de servicio, re-intente mas tarde.');
 		}
 	}
@@ -204,40 +223,3 @@ class WsFacturacionCl {
 	}
 
 }
-
-/**
- * Test directo
- */
-//$t = new WsFacturacionCl();
-//$dataFactura = array();
-//$dataFactura['fecha_emision'] = date('Y-m-d');
-//$dataFactura['emisor'] = array();
-//$dataFactura['emisor']['rut'] = '14176614-7';
-//$dataFactura['emisor']['razon_social'] = 'Claudio Peralta';
-//$dataFactura['emisor']['giro'] = '';
-//$dataFactura['emisor']['codigo_actividad'] = '';
-//$dataFactura['emisor']['direccion'] = '';
-//$dataFactura['emisor']['comuna'] = '';
-//$dataFactura['emisor']['cuidad'] = '';
-//$dataFactura['receptor'] = array();
-//$dataFactura['receptor']['rut'] = '';
-//$dataFactura['receptor']['razon_social'] = '';
-//$dataFactura['receptor']['giro'] = '';
-//$dataFactura['receptor']['direccion'] = '';
-//$dataFactura['receptor']['comuna'] = '';
-//$dataFactura['receptor']['cuidad'] = '';
-//$dataFactura['monto_neto'] = 25000;
-//$dataFactura['tasa_iva'] = 19;
-//$dataFactura['monto_iva'] = 25000 * .19;
-//$dataFactura['monto_total'] = 25000 * 1.19;
-//$dataFactura['detalle'] = array(array(
-//		'descripcion' => 'Producto o servicio',
-//		'cantidad' => 1,
-//		'precio_unitario' => 25000
-//		));
-//
-//$r = $t->emitirFactura($dataFactura);
-//pr($r);
-
-// $sesion, $correos, $subject, $body, $envia_admin = true, $id_archivo_anexo = NULL)
-
