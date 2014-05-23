@@ -385,7 +385,6 @@ if (Conf::EsAmbientePrueba()) {
 
 			$cont_gastos = 0;
 			$max_mes = rand(0, 8);
-			$values = array();
 
 			while ($cont_gastos < $max_mes) {
 				$egreso = 5 + 5 * rand(0, 19);
@@ -446,12 +445,12 @@ if (Conf::EsAmbientePrueba()) {
 			$query = "SELECT id_contrato FROM contrato";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			while (list($id_contrato) = mysql_fetch_array($resp)) {
-				$query2 = "SELECT count(*) 
-													FROM trabajo 
-													JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto 
+				$query2 = "SELECT count(*)
+													FROM trabajo
+													JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
 													LEFT JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-													WHERE contrato.id_contrato='$id_contrato' 
-														AND trabajo.fecha < '" . date("Y-m-d", $fecha_mk_fin_periodo) . "' 
+													WHERE contrato.id_contrato='$id_contrato'
+														AND trabajo.fecha < '" . date("Y-m-d", $fecha_mk_fin_periodo) . "'
 														AND trabajo.fecha > '" . date("Y-m-d", $fecha_mk_ini) . "'";
 				$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 				list($cont) = mysql_fetch_array($resp2);
