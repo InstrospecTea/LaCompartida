@@ -36,7 +36,7 @@ if ($tipo_duracion == 'cobrada') {
 if ($comparar == '1') {
 	$duracion_query_comparada = "trabajo.duracion";
 
-	if ($tipo_duracion_comparada == 'cobrable_comparada') {
+	if ($tipo_duracion_comparada == 'cobrable') {
 		$where_comparada .= " AND trabajo.cobrable=1";
 	}
 
@@ -71,7 +71,7 @@ if ($tipo_reporte != 'trabajos_por_estudio') {
 	}
 
 	if ($tipo_reporte == 'trabajos_por_empleado') {
-		
+
 		if (!empty($id_usuario)) {
 			$where .= " AND usuario.id_usuario=$id_usuario";
 			$where_comparada .= " AND usuario.id_usuario=$id_usuario";
@@ -103,21 +103,21 @@ if ($tipo_reporte != 'trabajos_por_estudio') {
 	}
 }
 
-$query_tpl = "SELECT 
+$query_tpl = "SELECT
             DATE_FORMAT(fechas.mes,'%%Y-%%m') as mes_anio,
-            IFNULL(meses_duracion.duracion,0) as duracion_mes 
-            FROM ( SELECT 
+            IFNULL(meses_duracion.duracion,0) as duracion_mes
+            FROM ( SELECT
                         DATE_SUB(DATE_FORMAT(NOW(),'%%Y-%%m-01'),
                         INTERVAL n2.num+n1.num MONTH) AS 'mes'
-                    FROM 
+                    FROM
                         (SELECT 0 AS num UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n1,
                         (SELECT 0 AS num UNION ALL SELECT 10 UNION ALL SELECT 20 UNION ALL SELECT 30 UNION ALL SELECT 40 UNION ALL SELECT 50 UNION ALL SELECT 60 UNION ALL SELECT 70 UNION ALL SELECT 80 UNION ALL SELECT 90) n2
-                    WHERE 
-                        DATE_SUB(DATE_FORMAT(NOW(),'%%Y-%%m-01'),INTERVAL n2.num+n1.num MONTH) >='%s' 
+                    WHERE
+                        DATE_SUB(DATE_FORMAT(NOW(),'%%Y-%%m-01'),INTERVAL n2.num+n1.num MONTH) >='%s'
                         AND DATE_SUB(DATE_FORMAT(NOW(),'%%Y-%%m-01'),INTERVAL n2.num+n1.num MONTH) <='%s'
                         ORDER BY 'mes') as fechas
-				
-                    LEFT JOIN ( SELECT 
+
+                    LEFT JOIN ( SELECT
                                     SUM( TIME_TO_SEC( %s ) ) /3600 AS duracion, DATE_FORMAT( trabajo.fecha,  '%%Y-%%m-01' ) AS periodo
                                 FROM trabajo
                                 JOIN usuario ON usuario.id_usuario=trabajo.id_usuario
@@ -128,8 +128,8 @@ $query_tpl = "SELECT
                                 BETWEEN '%s'
                                 AND '%s'
                                 GROUP BY YEAR( trabajo.fecha ) , MONTH( trabajo.fecha ) %s
-                                ORDER BY YEAR( trabajo.fecha ) , MONTH( trabajo.fecha ) 
-                    ) as meses_duracion ON meses_duracion.periodo=fechas.mes 
+                                ORDER BY YEAR( trabajo.fecha ) , MONTH( trabajo.fecha )
+                    ) as meses_duracion ON meses_duracion.periodo=fechas.mes
             ORDER BY mes_anio ASC";
 
 $query = sprintf($query_tpl, $fecha_desde, $fecha_hasta, $duracion_query, $join, $where, $where_usuario, $where_cliente, $fecha_desde, $fecha_hasta, $groupby);
@@ -212,9 +212,9 @@ $barLayerObj->setBorderColor(-1, 1);
 $barLayerObj->setAggregateLabelStyle("arialbd.ttf", 8, 0x000);
 
 if ($comparar) {
-	
+
 	array_walk($duracion_comparada,'fixNumber');
-	
+
 	$barLayerObj->addDataSet( $duracion_comparada, 0x33FF00, $titulo_tipo[$tipo_duracion_comparada] . ': ' . number_format($total_duracion_comparada,2) . ' en ' . $cant_meses . ' meses', 2);
 	$barLayerObj->setBorderColor(-1, 1);
 	$barLayerObj->setAggregateLabelStyle("arialbd.ttf", 8, 0x000);
