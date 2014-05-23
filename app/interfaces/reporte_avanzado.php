@@ -225,8 +225,6 @@ $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisi
 $explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
 $explica_periodo_facturacion = 'Sólo considera Trabajos en Cobros con fecha de facturación en el Periodo';
 
-$tipos_moneda = Reporte::tiposMoneda();
-
 /* Calculos de fechas */
 $hoy = date("Y-m-d");
 if (!$fecha_anio) {
@@ -1090,7 +1088,7 @@ if (!$popup) {
 									<a href="javascript:void(0)" class="btn botonizame" id="circular" name="circular"  icon="pie-chart" title="Despliega un Gráfico de Torta, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'circular');">Gráfico Torta</a>
 								</td>
 								<td style="width: 100px; font-size: 11px;">
-									<label for="comparar"><?php echo __('Comparar') ?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" <?php echo $comparar ? 'checked="checked"' : '' ?> title='Comparar' />
+									<label for="comparar"><?php echo __('Comparar') ?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" title='Comparar' />
 								</td>
 							</tr>
 							<tr>

@@ -5,39 +5,41 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
 class Reporte {
 
 	// Sesion PHP
-	var $sesion = null;
+	public $sesion = null;
 	// Arreglos con filtros
-	var $filtros = array();
-	var $filtros_especiales = array();
-	var $rango = array();
+	public $filtros = array();
+	public $filtros_especiales = array();
+	public $rango = array();
 	//Arreglo de datos
-	var $tipo_dato = 0;
+	public $tipo_dato = 0;
 	//Arreglo con vista
-	var $vista;
+	public $vista;
 	//Arreglo con resultados
-	var $row;
+	public $row;
 	// String con el último error
-	var $error = '';
+	public $error = '';
 	//El orden de los agrupadores
-	var $agrupador = array();
-	var $id_agrupador = array();
-	var $id_agrupador_cobro = array();
-	var $orden_agrupador = array();
-	var $agrupador_principal = 0;
+	public $agrupador = array();
+	public $id_agrupador = array();
+	public $id_agrupador_cobro = array();
+	public $orden_agrupador = array();
+	public $agrupador_principal = 0;
 	//Campos utilizados para determinar los datos en el periodo. Default: trabajo.
-	var $campo_fecha = 'trabajo.fecha';
-	var $campo_fecha_2 = '';
-	var $campo_fecha_3 = '';
-	var $campo_fecha_cobro = 'cobro.fecha_fin';
-	var $campo_fecha_cobro_2 = 'cobro.fecha_emision';
+	public $campo_fecha = 'trabajo.fecha';
+	public $campo_fecha_2 = '';
+	public $campo_fecha_3 = '';
+	public $campo_fecha_cobro = 'cobro.fecha_fin';
+	public $campo_fecha_cobro_2 = 'cobro.fecha_emision';
 	//Determina como se calcula la proporcionalidad de los montos en Flat Fee
-	var $proporcionalidad = 'estandar';
-	var $conf = array();
+	public $proporcionalidad = 'estandar';
+	public $conf = array();
 	//Codigo secundario cuando corresponde
-	var $dato_usuario = 'usuario.username';
-	var $dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
+	public $dato_usuario = 'usuario.username';
+	public $dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
 	//Cuanto se repite la fila para cada agrupador
-	var $filas = array();
+	public $filas = array();
+
+	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar');
 
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
@@ -50,12 +52,12 @@ class Reporte {
 		}
 	}
 
-	function configuracion($opcs = array()) {
+	public function configuracion($opcs = array()) {
 		$this->conf = array();
 	}
 
 	//Agrega un filtro
-	function addFiltro($tabla, $campo, $valor, $positivo = true) {
+	public function addFiltro($tabla, $campo, $valor, $positivo = true) {
 		if (!isset($this->filtros[$tabla . '.' . $campo])) {
 			$this->filtros[$tabla . '.' . $campo] = array();
 		}
@@ -68,21 +70,16 @@ class Reporte {
 	}
 
 	//Indica si el tipo de dato se calcula usando Moneda.
-	function requiereMoneda($tipo_dato) {
+	public function requiereMoneda($tipo_dato) {
 		$extras = array('rentabilidad', 'rentabilidad_base');
 
-		if (in_array($tipo_dato, array_merge($extras, Reporte::tiposMoneda()))) {
+		if (in_array($tipo_dato, array_merge($extras, self::$tiposMoneda))) {
 			return true;
 		}
 		return false;
 	}
 
-	//Retorna un arreglo con los tipos de datos que requieren especificar Moneda
-	function tiposMoneda() {
-		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar');
-	}
-
-	function usaDivisor() {
+	public function usaDivisor() {
 		if (in_array($this->tipo_dato, array('rentabilidad', 'rentabilidad_base', 'valor_hora', 'costo_hh'))) {
 			return true;
 		}
@@ -90,7 +87,7 @@ class Reporte {
 	}
 
 	//Establece el tipo de dato a buscar, y agrega los filtros correspondientes
-	function setTipoDato($nombre) {
+	public function setTipoDato($nombre) {
 		$this->tipo_dato = $nombre;
 		switch ($nombre) {
 			case "costo":
@@ -169,17 +166,17 @@ class Reporte {
 	}
 
 	//Agrega un Filtro de Rango de Fechas
-	function addRangoFecha($valor1, $valor2) {
+	public function addRangoFecha($valor1, $valor2) {
 		$this->rango['fecha_ini'] = $valor1;
 		$this->rango['fecha_fin'] = $valor2;
 	}
 
-	function setProporcionalidad($valor = 'estandar') {
+	public function setProporcionalidad($valor = 'estandar') {
 		$this->proporcionalidad = $valor;
 	}
 
 	//Establece el Campo de la fecha
-	function setCampoFecha($campo_fecha) {
+	public function setCampoFecha($campo_fecha) {
 		if ($campo_fecha == 'cobro') {
 			$this->campo_fecha = 'cobro.fecha_fin';
 			$this->campo_fecha_2 = 'cobro.fecha_creacion';
@@ -214,7 +211,7 @@ class Reporte {
 	}
 
 	//Los Agrupadores definen GROUP y ORDER en las queries.
-	function addAgrupador($s) {
+	public function addAgrupador($s) {
 		$this->agrupador[] = $s;
 		//Para GROUP BY - Query principal por trabajos
 		switch ($s) {
@@ -284,7 +281,7 @@ class Reporte {
 	}
 
 	//Establece la vista: los agrupadores (y su orden) son la base para la construcción de arreglos de resultado.
-	function setVista($vista) {
+	public function setVista($vista) {
 		$this->vista = $vista;
 		$this->agrupador = array();
 		$this->id_agrupador = array();
@@ -308,7 +305,7 @@ class Reporte {
 		}
 	}
 
-	function alt($opc1, $opc2) {
+	public function alt($opc1, $opc2) {
 		if (!$opc2) {
 			return $opc1;
 		} else {
@@ -316,14 +313,14 @@ class Reporte {
 		}
 	}
 
-	function nombre_usuario($tabla) {
+	public function nombre_usuario($tabla) {
 		if (Conf::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema')) {
 			return "{$tabla}.username";
 		}
 		return "CONCAT_WS(' ', {$tabla}.nombre, {$tabla}.apellido1, LEFT({$tabla}.apellido2, 1))";
 	}
 
-	function cobroQuery() { //Query que añade rows para los datos de Cobros emitidos que no cuentan Trabajos
+	public function cobroQuery() { //Query que añade rows para los datos de Cobros emitidos que no cuentan Trabajos
 		if (empty($this->id_agrupador_cobro)) {
 			return 0;
 		}
@@ -518,7 +515,7 @@ class Reporte {
 	}
 
 	//SELECT en string de Query. Elige el tipo de dato especificado.
-	function sSELECT() {
+	public function sSELECT() {
 
 		$s = 'SELECT	' . $this->dato_usuario . ' as profesional,
 						usuario.username as username,
@@ -613,9 +610,12 @@ class Reporte {
 								/ (moneda_display.tipo_cambio * 3600)
 							)";
 		$monto_trabajado_estandar = "SUM(
-										trabajo.tarifa_hh_estandar
-										* (TIME_TO_SEC( duracion)/3600)
-										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+										(TIME_TO_SEC(duracion) / 3600) *
+										IF(
+											cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
+											usuario_tarifa.tarifa * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+											trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+										)
 									)";
 
 		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
@@ -750,21 +750,21 @@ class Reporte {
 	}
 
 	//FROM en string de Query. Incluye las tablas necesarias.
-	function sFrom() {
+	public function sFrom() {
 		//Calculo de valor por cobrar requiere Tarifa, Tipo de Cambio
 		$join_por_cobrar = "
 						LEFT JOIN usuario_tarifa ON usuario_tarifa.id_tarifa = contrato.id_tarifa AND usuario_tarifa.id_usuario = trabajo.id_usuario AND usuario_tarifa.id_moneda = contrato.id_moneda
 						LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
 						LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '" . $this->id_moneda . "'
 					";
-
+		$add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'));
 		$s = ' FROM trabajo
 					LEFT JOIN usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
 					LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
 					LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
 					LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
 					LEFT JOIN contrato ON ( contrato.id_contrato = IFNULL(cobro.id_contrato, asunto.id_contrato))
-					' . ($this->tipo_dato == 'valor_por_cobrar' ? $join_por_cobrar : '') . '
+					' . ($add_jpc ? $join_por_cobrar : '') . '
 					LEFT JOIN prm_area_proyecto AS area ON asunto.id_area_proyecto = area.id_area_proyecto
 					LEFT JOIN prm_tipo_proyecto AS tipo ON asunto.id_tipo_asunto = tipo.id_tipo_proyecto
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
@@ -807,7 +807,7 @@ class Reporte {
 
 	//WHERE para string de Query. Incluye los filtros agregados anteriormente.
 	//@param from: si viene de la query de trabajo o de cobro.
-	function sWhere($from = 'trabajo') {
+	public function sWhere($from = 'trabajo') {
 		$s = " WHERE 1 ";
 		foreach ($this->filtros as $campo => $filtro) {
 			foreach ($filtro as $booleano => $valor) {
@@ -855,7 +855,7 @@ class Reporte {
 	}
 
 	//GROUP BY en string de Query. Agrupa según la vista. (arreglo de agrupadores se usa al construir los arreglos de resultados.
-	function sGroup() {
+	public function sGroup() {
 		if (!$this->vista) {
 			return ' GROUP BY agrupador_general, id_cobro ';
 		}
@@ -872,12 +872,13 @@ class Reporte {
 		foreach ($this->id_agrupador as $a) {
 			$agrupa[] = $a;
 		}
-		$group_by = ' GROUP BY ' . implode(', ', $agrupa);
+
+		$group_by = ' GROUP BY ' . implode(', ', array_unique($agrupa));
 		return $group_by;
 	}
 
 	//ORDER BY en string de Query.
-	function sOrder() {
+	public function sOrder() {
 		if (!$this->vista) {
 			return '';
 		}
@@ -885,19 +886,18 @@ class Reporte {
 	}
 
 	//String de Query.
-	function sQuery() {
+	public function sQuery() {
 		$s = '';
 		$s .= $this->sSelect();
 		$s .= $this->sFrom();
 		$s .= $this->sWhere();
 		$s .= $this->sGroup();
 		$s .= $this->sOrder();
-
 		return $s;
 	}
 
 	//Ejecuta la Query y guarda internamente las filas de resultado.
-	function Query() {
+	public function Query() {
 		$stringquery = "";
 		$resp = mysql_unbuffered_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(), __FILE__, __LINE__, $this->sesion->dbh);
 
@@ -919,12 +919,6 @@ class Reporte {
 
 				$cobroquery = $this->cobroQuery();
 				$stringquery = " \n\n\n union all \n\n\n $cobroquery";
-
-				/* UTILIZADO PARA DEBUG */
-
-				// $testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='" . mysql_real_escape_string($this->sQuery() . $stringquery . "\n\n --tipo dato es " . $this->tipo_dato, $this->sesion->dbh) . "'";
-				// $respt = mysql_query($testimonio, $this->sesion->dbh);
-
 				$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
 
 				while ($row = mysql_fetch_array($resp)) {
@@ -938,7 +932,7 @@ class Reporte {
 	  Entrega un arreglo lineal de Indices, Valores y Labels. Además indica Total.
 	 */
 
-	function toBars() {
+	public function toBars() {
 		$data = array();
 		$data['total'] = 0;
 		$data['total_divisor'] = 0;
@@ -1008,7 +1002,7 @@ class Reporte {
 	}
 
 	//Arregla espacios vacíos en Barras: retorna data con los labels extra de data2.
-	function fixBar($data, $data2) {
+	public function fixBar($data, $data2) {
 		foreach ($data2 as $k => $d) {
 			if (!isset($data[$k])) {
 				$data[$k]['valor'] = 0;
@@ -1019,7 +1013,7 @@ class Reporte {
 	}
 
 	//divide un valor por su valor_divisor
-	function dividir(&$a) {
+	public function dividir(&$a) {
 		if ($a['valor_divisor'] == 0) {
 			if ($a['valor'] != 0) {
 				$a['valor'] = '99999!*';
@@ -1031,7 +1025,7 @@ class Reporte {
 
 	/* Entrega el label a usar para un agrupador */
 
-	function label($agrupador) {
+	public function label($agrupador) {
 		switch ($agrupador) {
 			case 'id_usuario_responsable':
 				return 'nombre_usuario_responsable';
@@ -1045,7 +1039,7 @@ class Reporte {
 
 	/* Constructor de Arreglo Cruzado: Sólo vista Cliente o Profesional */
 
-	function toCross() {
+	public function toCross() {
 		$r = array();
 		$r['total'] = 0;
 		$r['total_divisor'] = 0;
@@ -1152,7 +1146,7 @@ class Reporte {
 	  Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Además indica Total para cada subgrupo.
 	 */
 
-	function toArray() {
+	public function toArray() {
 		$r = array(); //Arreglo resultado
 		$r['total'] = 0;
 		$r['total_divisor'] = 0;
@@ -1311,7 +1305,7 @@ class Reporte {
 		return $r;
 	}
 
-	function rellenar(&$a, $b) {
+	public function rellenar(&$a, $b) {
 		$a['valor'] = 0;
 		$a['valor_divisor'] = 0;
 		$a['filas'] = 0;
@@ -1320,7 +1314,7 @@ class Reporte {
 	}
 
 	//Arregla espacios vacíos en Arreglos. Retorna data con los campos extra en data2 (rellenando con 0).
-	function fixArray($data, $data2) {
+	public function fixArray($data, $data2) {
 		foreach ($data2 as $ag1 => $a) {
 			if (is_array($a)) {
 				foreach ($a as $ag2 => $b) {
@@ -1379,7 +1373,7 @@ class Reporte {
 	}
 
 	//Indica el Simbolo asociado al tipo de dato.
-	function simboloTipoDato($tipo_dato, $sesion, $id_moneda = '1') {
+	public function simboloTipoDato($tipo_dato, $sesion, $id_moneda = '1') {
 		switch ($tipo_dato) {
 			case "horas_trabajadas":
 			case "horas_no_cobrables":
@@ -1419,7 +1413,7 @@ class Reporte {
 	}
 
 	//Indica el tipo de dato (No especifica moneda: se usa para simple comparación entre datos).
-	function sTipoDato($tipo_dato) {
+	public function sTipoDato($tipo_dato) {
 		switch ($tipo_dato) {
 			case "horas_trabajadas":
 			case "horas_no_cobrables":
@@ -1454,7 +1448,7 @@ class Reporte {
 	}
 
 	//Indica la Moneda, de ser necesaria. Se usa para añadir a un string, si lo necesita.
-	function unidad($tipo_dato, $sesion, $id_moneda = '1') {
+	public function unidad($tipo_dato, $sesion, $id_moneda = '1') {
 		switch ($tipo_dato) {
 			case "valor_por_cobrar":
 			case "valor_cobrado":
@@ -1474,7 +1468,7 @@ class Reporte {
 	}
 
 	//Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
-	function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
+	public function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
 		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, "oras_")) {
 			$valor_horas = floor($valor);
 			$valor_minutos = number_format((($valor - $valor_horas) * 60), 0);
@@ -1491,7 +1485,7 @@ class Reporte {
 		return $valor;
 	}
 
-	function setFiltros($filtros) {
+	public function setFiltros($filtros) {
 		if ($filtros['clientes']) {
 			foreach ($filtros['clientes'] as $cliente) {
 				if ($cliente) {

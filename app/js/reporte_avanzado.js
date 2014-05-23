@@ -468,15 +468,14 @@ function Comparar() {
 	if (comparar.is(':checked')) {
 		jQuery('#dispersion ,#tipo_dato_comparado, #td_dato_comparado, #vs, #tipo_tinta').show();
 		jQuery('#td_dato').removeClass('borde_blanco').addClass('borde_rojo');
-		jQuery('#td_dato_comparado').addClass('borde_azul');
-		jQuery('#' + valor_tipo_dato_comparado).addClass('boton_comparar');
+		jQuery('#td_dato_comparado').removeClass('borde_blanco').addClass('borde_azul');
 	} else {
 		jQuery('#dispersion, #tipo_dato_comparado, #vs, #tipo_tinta').hide();
 		jQuery('#td_dato').removeClass('borde_rojo').addClass('borde_blanco');
-		jQuery('#td_dato_comparado').removeClass('borde_azul');
-		jQuery('#' + valor_tipo_dato_comparado).removeClass('boton_comparar');
+		jQuery('#td_dato_comparado').removeClass('borde_azul').addClass('borde_blanco');
 	}
 
+	TipoDato(valor_tipo_dato_comparado, true);
 	RevisarTabla();
 	RevisarMoneda();
 	RevisarCircular();
@@ -487,7 +486,7 @@ function TipoDato(valor, noSet) {
 	var comparar = jQuery('#comparar').is(':checked');
 	var tinta = jQuery('[name="tinta"]:checked').val();
 
-	if (valor || !noSet) {
+	if (valor && !noSet) {
 		if (jQuery('#' + valor).hasClass('boton_disabled')) {
 			return;
 		}
