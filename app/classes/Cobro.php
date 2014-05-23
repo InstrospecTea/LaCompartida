@@ -110,6 +110,7 @@ if (!class_exists('Cobro')) {
 		function SetPagos($pago_honorarios, $pago_gastos, $id_documento = null) {
 			$nuevo_pago = false;
 			$pagado = false;
+			
 			if ($pago_honorarios) {
 				if ($this->fields['honorarios_pagados'] == 'NO') {
 					if ($id_documento) {
@@ -122,6 +123,7 @@ if (!class_exists('Cobro')) {
 				$this->Edit('id_doc_pago_honorarios', 'NULL');
 				$this->Edit('honorarios_pagados', 'NO');
 			}
+			
 			if ($pago_gastos) {
 				if ($this->fields['gastos_pagados'] == 'NO') {
 					if ($id_documento) {
@@ -134,22 +136,6 @@ if (!class_exists('Cobro')) {
 						$descripcion .= __(" por Documento #") . $id_documento;
 					}
 
-					// Deprecated. El ingreso de este movimiento ficticio ya se maneja en la clase NeteoDocumento.
-					/* if ($this->fields['monto_gastos'] > 0) {
-					  $provision = new Gasto($this->sesion);
-					  $provision->Edit('id_moneda', $this->fields['opc_moneda_total']);
-					  $provision->Edit('ingreso', $this->fields['monto_gastos']);
-					  $provision->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-					  $provision->Edit('id_usuario_orden', $this->sesion->usuario->fields['id_usuario']);
-					  $provision->Edit('id_cobro', $this->fields['id_cobro']);
-					  $provision->Edit('codigo_cliente', $this->fields['codigo_cliente']);
-					  $provision->Edit('codigo_asunto', 'NULL');
-					  $provision->Edit('descripcion', $descripcion);
-					  $provision->Edit('documento_pago', $id_documento);
-					  $provision->Edit('incluir_en_cobro', 'NO');
-					  $provision->Edit('fecha', date('Y-m-d H:i:s'));
-					  $provision->Write();
-					  } */
 					$nuevo_pago = true;
 				}
 			} else {
@@ -167,16 +153,10 @@ if (!class_exists('Cobro')) {
 
 				#Se ingresa la anotación en el historial
 				if ($estado_anterior != 'PAGADO') {
-					/* $his = new Observacion($this->sesion);
-					  $his->Edit('fecha', date('Y-m-d H:i:s'));
-					  $his->Edit('comentario', __('COBRO PAGADO'));
-					  $his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-					  $his->Edit('id_cobro', $this->fields['id_cobro']);
-					  if ($his->Write())
-					  $pagado = true; */
 					$pagado = true;
 				}
 			}
+			
 			$this->Write();
 			return $pagado;
 		}
@@ -240,22 +220,7 @@ if (!class_exists('Cobro')) {
 		}
 
 		function CalcularEstadoAnterior() {
-			/*
-			 * este estado anterior es sólo cuando no tiene pagos.
-			 * cuando si tiene pagos lo calcula en la funcion CambiarEstadoSegunFactura() esta misma clase
-			 */
-			/* $query = "SELECT * FROM prm_estado_cobro WHERE ( codigo_estado_cobro != 'CREADO' AND codigo_estado_cobro != 'EN REVISION' ) ORDER BY orden ASC";
-			  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			  $estado_anterior_temp = "";
-			  while( list( $codigo_estado_cobro, $orden ) = mysql_fetch_array($resp) )
-			  {
-			  if( $codigo_estado_cobro == 'EMITIDO' || $codigo_estado_cobro == 'FACTURADO' || $codigo_estado_cobro == 'ENVIADO AL CLIENTE' )
-			  {
-			  $estado_anterior_temp = ( $this->TieneFacturasSinAnular() ? "ENVIADO AL CLIENTE" : "EMITIDO" );
-			  }
 
-
-			  } */
 			$estado_anterior_temp = 'EMITIDO'; /* estado más atrás que puede llegar al borrar pago */
 			$codigo_estado_cobro = $this->fields['estado'];
 			if ($this->TienePago()) {
@@ -515,9 +480,11 @@ if (!class_exists('Cobro')) {
 			 * PAGO PARCIAL			con facturas && 0 < monto_pagado < monto_total
 			 */
 			$actual = $this->fields['estado'];
+			
 			if ($actual == 'INCOBRABLE') {
 				return;
 			}
+			
 			$estado = $actual;
 
 			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
@@ -816,7 +783,6 @@ if (!class_exists('Cobro')) {
 		}
 
 		function CalculaMontoTramites($cobro, $fecha_ini, $fecha_fin) {
-
 
 			$query = "SELECT SUM(tarifa_tramite)
 						FROM tramite
@@ -1780,7 +1746,6 @@ if (!class_exists('Cobro')) {
 		}
 
 		/* Función One-shot que vuelve a crear un documento como cuando fue emitido */
-
 		function ReiniciarDocumento() {
 			$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro'], array(), 0, false);
 			$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
@@ -1880,17 +1845,15 @@ if (!class_exists('Cobro')) {
 			}
 		}
 
-		/*
-		  Suma de CAP para todos los cobros creados de acuerdo a un contrato
-		  return SUM()
-		 */
-
+		/*	Suma de CAP para todos los cobros creados de acuerdo a un contrato return SUM()	*/
 		function TotalCobrosCap($id_contrato = '', $id_moneda_cobros_cap = 'contrato.id_moneda_monto') {
+			
 			if (!$id_contrato) {
 				$id_contrato = $this->fields['id_contrato'];
 			}
 			$contrato = new Contrato($this->sesion);
 			$contrato->Load($id_contrato);
+			
 			if ($contrato->fields['forma_cobro'] <> 'CAP') {
 				return 0;
 			}
@@ -1916,14 +1879,10 @@ if (!class_exists('Cobro')) {
 			return $monto_total_cap;
 		}
 
-		/*
-		  Retorna total de Horas del cobro
-		  parámetro $id_cobro
-		  retorna $total_horas_cobro
-		 */
-
+		/*	Retorna total de Horas del cobro parámetro $id_cobro retorna $total_horas_cobro	*/
 		function TotalHorasCobro($id_cobro) {
 			$total_horas_cobro = 0;
+
 			if ($id_cobro > 0) {
 				$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 AS total_horas_cobro
 									FROM trabajo AS t2
@@ -1936,10 +1895,7 @@ if (!class_exists('Cobro')) {
 			return $total_horas_cobro;
 		}
 
-		/*
-		  Asocia los trabajos al cobro que se está creando
-		  parametros fecha_ini; fecha_fin; id_contrato
-		 */
+		/*	Asocia los trabajos al cobro que se está creando parametros fecha_ini; fecha_fin; id_contrato	*/
 
 		function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
@@ -2247,7 +2203,6 @@ if (!class_exists('Cobro')) {
 		}
 
 		/* String to number */
-
 		function StrToNumber($str) {
 			$legalChars = "%[^0-9\-\ ]%";
 			$str = preg_replace($legalChars, "", $str);
@@ -2255,7 +2210,6 @@ if (!class_exists('Cobro')) {
 		}
 
 		/*	GeneraProceso, obtiene un id de proceso para cada generacion de cobros.	*/
-
 		function EsCobrado() {
 			if (!$this->fields['estado'] || $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
 				return false;
@@ -2271,7 +2225,6 @@ if (!class_exists('Cobro')) {
 		}
 
 		/*	Obtiene un id_cobro para un asunto y trabajo que se encuentre en el periodo	*/
-
 		function ObtieneCobroByCodigoAsunto($codigo_asunto, $fecha_trabajo) {
 			$query = "SELECT cobro.id_cobro FROM cobro
 								JOIN cobro_asunto ON cobro.id_cobro = cobro_asunto.id_cobro
@@ -2325,7 +2278,6 @@ if (!class_exists('Cobro')) {
 		}
 
 		/*	Calcula el saldo_final_gastos, este corresponde al saldo_inicial - saldo_cobro (suma de gastos - provisiones)	*/
-
 		function SaldoFinalCuentaCorriente() {
 			//Moneda del cobro
 			$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
