@@ -865,9 +865,12 @@ jQuery(document).ready(function() {
 	jQuery('.boton_tipo_dato').click(function() {
 		TipoDato(jQuery(this).attr('id'));
 	});
+	
 	jQuery('.agrupador').change(function() {
 		var name = jQuery(this).attr('id').split('_');
 		var num = parseInt(name[1]);
 		CambiarAgrupador(num);
 	});
+
+	jQuery('#fecha_mes, #fecha_anio').change(SeleccionarSelector);
 });
