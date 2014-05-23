@@ -1579,8 +1579,7 @@ if (!class_exists('Cobro')) {
 			}
 
 			// Se guarda la información del cobro
-
-			$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			
 			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
@@ -1588,8 +1587,10 @@ if (!class_exists('Cobro')) {
 
 			if ($cobro_total_honorario_cobrable != 0) {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+				$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			} else {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+				$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			}
 
 			$this->Edit('monto_thh_estandar', number_format($cobro_total_honorario_hh_estandar, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
