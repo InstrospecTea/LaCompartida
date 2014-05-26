@@ -1,6 +1,10 @@
 # Changelog
 
-## Release: 14.2.3
+## Hotfix: 14.2.3
+Lunes 26 de Mayo 2014
+* **Fixed:** [Correcciones reporte avanzado](https://github.com/LemontechSA/ttb/pull/515)
+
+## Hotfix: 14.2.2
 Jueves 22 de Mayo 2014
 * **Fixed:** [Corregir asignación de valores en cron ingreso datos para demo](https://github.com/LemontechSA/ttb/pull/512)
 * **Fixed:** [Problema de cálculo de años bisiestos en el reporte anual de costos](https://github.com/LemontechSA/ttb/pull/512)
