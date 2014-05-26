@@ -53,7 +53,7 @@ if (!class_exists('Cobro')) {
 		function GlosaSeEstaCobrando() {
 			$se_esta_cobrando = "";
 
-			if (UtilesApp::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
+			if (Conf::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
 				$se_esta_cobrando = "Honorarios Profesionales\nPeriodo Comprendido: \n";
 
 				if ($this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini'])) {
@@ -92,16 +92,16 @@ if (!class_exists('Cobro')) {
 		function BotoneraCobro() {
 			echo "<br /><br />    <a class=\"btn botonizame\" icon=\"ui-icon-doc\" setwidth=\"185\" onclick=\"return VerDetalles(jQuery('#todo_cobro').get(0));\" >" . __('Descargar Archivo') . " Word</a>";
 
-			if (UtilesApp::GetConf($this->sesion, 'MostrarBotonCobroPDF')) {
+			if (Conf::GetConf($this->sesion, 'MostrarBotonCobroPDF')) {
 				echo "<br class=\"clearfix vpx\" /><a class=\"btn botonizame\"  icon=\"ui-icon-pdf\"  setwidth=\"185\" onclick=\"return VerDetallesPDF(jQuery('#todo_cobro').get(0));\">" . __('Descargar Archivo') . " PDF</a>";
 			}
-			if (!UtilesApp::GetConf($this->sesion, 'EsconderExcelCobroModificable')) {
+			if (!Conf::GetConf($this->sesion, 'EsconderExcelCobroModificable')) {
 				echo "<br class=\"clearfix vpx\"/><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0)); \">" . __('descargar_excel_modificable') . " </a>";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) {
+			if (Conf::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) {
 				echo "	<br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); \">" . __('Excel rentabilidad') . "  </a>	";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') {
+			if (Conf::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && Conf::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') {
 				echo "  <br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');\">" . __('Descargar Excel Cobro') . " </a>";
 			}
 		}
@@ -230,20 +230,20 @@ if (!class_exists('Cobro')) {
 					if (!empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00') {
 						$estado_anterior_temp == 'ENVIADO AL CLIENTE';
 					} else {
-						if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+						if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 							if ($this->TieneFacturasSinAnular()) {
 								$estado_anterior_temp = 'FACTURADO';
 							}
 						}
 					}
 				} else if ($codigo_estado_cobro == 'ENVIADO AL CLIENTE') {
-					if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 						if ($this->TieneFacturasSinAnular()) {
 							$estado_anterior_temp = 'FACTURADO';
 						}
 					}
 				} else if ($codigo_estado_cobro == 'FACTURADO') {
-					if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 						if ($this->TieneFacturasSinAnular()) {
 							$estado_anterior_temp = 'FACTURADO';
 						}
@@ -255,7 +255,7 @@ if (!class_exists('Cobro')) {
 		}
 
 		function CambiarEstadoAnterior() {
-			if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 				$this->CambiarEstadoSegunFacturas();
 			} else {
 				$nuevo_estado = $this->CalcularEstadoAnterior();
@@ -1193,7 +1193,7 @@ if (!class_exists('Cobro')) {
 					// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 					// Si el config "GuardarTarifaAlIngresoDeHora" existe saca la tarifa del registro de tarifas
 					// por trabajo, si no saca lo del contrato actual
-					if (UtilesApp::GetConf($this->sesion, 'GuardarTarifaAlIngresoDeHora')) {
+					if (Conf::GetConf($this->sesion, 'GuardarTarifaAlIngresoDeHora')) {
 						// Según Tarifa del contrato
 						$profesional[$id_usuario]['tarifa'] = Funciones::TrabajoTarifa($this->sesion, $trabajo->fields['id_trabajo'], $this->fields['id_moneda']);
 						// Según Tarifa estándar del sistema
@@ -1371,7 +1371,7 @@ if (!class_exists('Cobro')) {
 			}
 
 			#GASTOS del Cobro
-			if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloGastos')) {
+			if (!Conf::GetConf($this->sesion, 'NuevoModuloGastos')) {
 				$no_generado = '';
 				if ($this->fields['id_gasto_generado']) {
 					$no_generado = ' AND cta_corriente.id_movimiento != ' . $this->fields['id_gasto_generado'];
@@ -1437,7 +1437,7 @@ if (!class_exists('Cobro')) {
 					$monto_provision_restante = number_format(0.00 - $cobro_total_gastos, $moneda_total->fields['cifras_decimales'], '.', '');
 
 
-					if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					if (Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
 						//En vez de generar un gasto ficticio, divido un gasto en dos.
 						//Decido cual es la provision que voy a dividir
@@ -1498,7 +1498,7 @@ if (!class_exists('Cobro')) {
 					$provision->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
 					$provision->Edit('incluir_en_cobro', 'SI');
 					$provision->Edit('fecha', date('Y-m-d 00:00:00'));
-					if (!UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					if (!Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 						$provision->Write();
 					}
 
@@ -1586,20 +1586,16 @@ if (!class_exists('Cobro')) {
 			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 
 			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_origina && $cobro_total_honorario_cobrable != 0) {
-
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-				$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			} else {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-				$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-
 			}
 
+			$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_thh_estandar', number_format($cobro_total_honorario_hh_estandar, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('total_minutos', $cobro_total_minutos);
 
-
-			if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+			if (Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 				$this->Edit('saldo_final_gastos', number_format($saldo_final_gastos_egreso, 6, ".", ""));
 				$gastos_cobro = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'], array('listar_detalle'), true);
 			} else {
@@ -1623,7 +1619,7 @@ if (!class_exists('Cobro')) {
 				
 				if ($emitir) {
 					
-					if ($provision && $provision_original && UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					if ($provision && $provision_original && Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
 						if ($provision_original) {
 							$provision_original->Write();
@@ -2087,7 +2083,7 @@ if (!class_exists('Cobro')) {
 						$cobro_moneda->ActualizarTipoCambioCobro($this->fields['id_cobro']);
 
 						###### GASTOS ######
-						if (UtilesApp::Getconf($this->sesion, 'UsaFechaDesdeCobranza')) {
+						if (Conf::GetConf($this->sesion, 'UsaFechaDesdeCobranza')) {
 							$and_fecha .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 						} else {
 							$and_fecha .= "AND cta_corriente.fecha <= '$fecha_fin'";
@@ -2362,7 +2358,7 @@ if (!class_exists('Cobro')) {
 				
 			}
 
-			if (UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC')) {
+			if (Conf::GetConf($this->sesion, 'DejarTarifaCeroRetainerPRC')) {
 				$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
 												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
 												 AND t2.id_usuario = u.id_usuario
@@ -2660,7 +2656,7 @@ if (!class_exists('Cobro')) {
 				$id_cobro = $this->fields[$this->campo_id];
 			}
 
-			$nuevomodulofactura = UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
+			$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
 
 			$queryadelantos = "SELECT
 								IFNULL(documento.id_contrato, 0) AS id_contrato,
