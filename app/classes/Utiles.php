@@ -12,7 +12,7 @@ use \TipoCorreo as TipoCorreo;
 
 class Utiles extends \Utiles {
 
-	function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
+	public function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
 		$mime_boundary = md5(time());
 
@@ -143,12 +143,16 @@ class Utiles extends \Utiles {
 		return json_encode(compact('query', 'count'));
 	}
 
-	function camelize($word) {
+	public function camelize($word) {
 		return preg_replace('/(_)([a-z])/e', 'strtoupper("\\2")', $word);
 	}
 
-	function pascalize($word) {
+	public function pascalize($word) {
 		return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word);
+	}
+
+	public function humanize($word) {
+		return ucfirst(str_replace('_', ' ', strtolower($word)));
 	}
 
 }
