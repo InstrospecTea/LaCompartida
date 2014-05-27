@@ -530,6 +530,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%encargado%', __('Director proyecto'), $html);
 				$html = str_replace('%instrucciones_pago%', __('INSTRUCCIONES DE PAGO'), $html);
 				$html = str_replace('%giro_bancario%', __('Giro bancario a'), $html);
+				$html = str_replace('%fecha_corte%', __('Fecha de Corte'), $html);
 
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
@@ -1513,17 +1514,21 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento
+
 				if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
 					$html = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $html);
 				} else {
 					$html = str_replace('%td_id_trabajo%', '', $html);
 				}
+
 				$html = str_replace('%ntrabajo%', __('N°</br>Trabajo'), $html);
+				
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
 					$html = str_replace('%td_solicitante%', '', $html);
 				}
+
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%ordenado_por_jjr%', $this->fields['opc_ver_solicitante'] ? __('Solicitado Por') : '', $html);
@@ -1546,6 +1551,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%duracion_cobrable%', __('Duración cobrable'), $html);
 				$html = str_replace('%monto_total%', __('Monto total'), $html);
 				$html = str_replace('%Total%', __('Total'), $html);
+
 				if ($lang == 'es') {
 					$html = str_replace('%id_asunto%', __('ID Asunto'), $html);
 					$html = str_replace('%tarifa_hora%', __('Tarifa<br>Hora'), $html);
@@ -1553,22 +1559,24 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%id_asunto%', __('Matter <br> ID'), $html);
 					$html = str_replace('%tarifa_hora%', __('Hourly<br> Rate'), $html);
 				}
+
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
 
-				if ($this->fields['opc_ver_columna_cobrable'])
+				if ($this->fields['opc_ver_columna_cobrable']) {
 					$html = str_replace('%cobrable%', __('<td align="center" width="80">Cobrable</td>'), $html);  // tAndres Oestemer
-				else
+				} else {
 					$html = str_replace('%cobrable%', '', $html);
+				}
 
-
-
-				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1)
+				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 					$html = str_replace('%td_categoria%', '<td>&nbsp;</td>', $html);
-				else
+				} else {
 					$html = str_replace('%td_categoria%', '', $html);
+				}
 
 				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
+					
 					if ($lang == 'es') {
 						$query_categoria_lang = "cat.glosa_categoria";
 					} else {
@@ -1586,16 +1594,22 @@ class NotaCobro extends Cobro {
 									LIMIT 1";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($categoria) = mysql_fetch_array($resp);
+
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
+
 				} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$query = "SELECT CONCAT(usuario.nombre,' ',usuario.apellido1),trabajo.tarifa_hh
-									FROM trabajo
+					
+					$query = "SELECT 
+								CONCAT(usuario.nombre,' ',usuario.apellido1),
+								trabajo.tarifa_hh
+								FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-									WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-									AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-									AND trabajo.visible=1
-									ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
-									LIMIT 1";
+										WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
+											AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+											AND trabajo.visible=1
+												ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
+													LIMIT 1";
+
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($abogado, $tarifa) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($abogado), $html);
@@ -1621,57 +1635,67 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', '', $html);
 					$html = str_replace('%duracion_descontada_bmahj%', '', $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Trabajadas'), $html);
-
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_trabajada%', '', $html);
 					$html = str_replace('%duracion_descontada%', '', $html);
 					$html = str_replace('%duracion%', __('Duración trabajada'), $html);
 				}
+
 				if ($ImprimirDuracionTrabajada && ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' )) {
+					
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
-					if ($descontado)
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
+					
+					if ($descontado) {
 						$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Descontadas'), $html);
-					else
+					} else {
 						$html = str_replace('%duracion_descontada_bmahj%', '', $html);
+					}
 
 					$html = str_replace('%duracion_trabajada%', __('Duración trabajada'), $html);
 					$html = str_replace('%duracion%', __('Duración cobrable'), $html);
-					if ($descontado)
+					
+					if ($descontado) {
 						$html = str_replace('%duracion_descontada%', __('Duración descontada'), $html);
-					else
+					} else {
 						$html = str_replace('%duracion_descontada%', '', $html);
-				}
-				else if ($this->fields['opc_ver_horas_trabajadas']) {
+					}
+
+				} else if ($this->fields['opc_ver_horas_trabajadas']) {
+
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Descontadas'), $html);
 
 					$html = str_replace('%duracion_trabajada%', __('Duración trabajada'), $html);
 					$html = str_replace('%duracion%', __('Duración cobrable'), $html);
 					$html = str_replace('%duracion_descontada%', __('Duración castigada'), $html);
+
 				} else {
+
 					$html = str_replace('%duracion_trabajada_bmahj%', '', $html);
 					$html = str_replace('%duracion_descontada_bmahj%', '', $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
-
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_trabajada%', '', $html);
 					$html = str_replace('%duracion_descontada%', '', $html);
 					$html = str_replace('%duracion%', __('Duración'), $html);
 				}
+
 				$html = str_replace('%duracion_tyc%', __('Duración'), $html);
 				//Por conf se ve si se imprime o no el valor del trabajo
 				$ImprimirValorTrabajo = Conf::GetConf($this->sesion, 'ImprimirValorTrabajo');
 
-				if ($ImprimirValorTrabajo && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION')
+				if ($ImprimirValorTrabajo && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 					$html = str_replace('%valor%', '', $html);
-				else
+				} else {
 					$html = str_replace('%valor%', __('Valor'), $html);
+				}
+
 				$html = str_replace('%valor_siempre%', __('Valor'), $html);
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
-
-
-
-
 
 				if ($this->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 					$html = str_replace('%td_tarifa%', '<td width="80" align="center">%tarifa%</td>', $html);
@@ -1680,6 +1704,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_tarifa%', '', $html);
 					$html = str_replace('%td_tarifa_ajustada%', '', $html);
 				}
+
 				$html = str_replace('%tarifa%', __('Tarifa'), $html);
 
 				if ($this->fields['opc_ver_detalles_por_hora_importe'] == 1) {
@@ -1696,7 +1721,6 @@ class NotaCobro extends Cobro {
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
-
 				global $resumen_profesional_id_usuario;
 				global $resumen_profesional_nombre;
 				global $resumen_profesional_username;
@@ -2742,6 +2766,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%monto_original%', __('Monto'), $html);
 				$html = str_replace('%ordenado_por%', __('Ordenado<br>Por'), $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+
 				if ($lang == 'es') {
 					$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);
 				} else {
@@ -3295,6 +3320,8 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%glosa_codigo_contrato%', '', $html);
 					$html = str_replace('%codigo_contrato%', '', $html);
 				}
+
+				$html = str_replace('%fecha_corte%', __('Fecha de Corte'), $html);
 
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' or $this->fields['fecha_emision'] == '') ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' or $this->fields['fecha_emision'] == '') ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
@@ -4708,7 +4735,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', '', $html);
 					$html = str_replace('%duracion_descontada_bmahj%', '', $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Trabajadas'), $html);
-
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_trabajada%', '', $html);
 					$html = str_replace('%duracion_descontada%', '', $html);
 					$html = str_replace('%duracion%', __('Duración trabajada'), $html);
@@ -4716,6 +4743,7 @@ class NotaCobro extends Cobro {
 				if ($ImprimirDuracionTrabajada && ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' )) {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
 					$html = str_replace('%duracion_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 
@@ -4729,6 +4757,7 @@ class NotaCobro extends Cobro {
 				} else if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
 					$html = str_replace('%duracion_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 
@@ -4739,6 +4768,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', '', $html);
 					$html = str_replace('%duracion_descontada_bmahj%', '', $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 
 					$html = str_replace('%duracion_trabajada%', '', $html);
 					$html = str_replace('%duracion_descontada%', '', $html);
@@ -4758,7 +4788,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 
 				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
-					$html = str_replace('%td_categoria%', '<td width="100" align="left">%categoria%</td>', $html);
+					$html = str_replace('%td_categoria%', '<td class="td_categoria" align="left">%categoria%</td>', $html);
 				} else {
 					$html = str_replace('%td_categoria%', '', $html);
 				}
@@ -6028,10 +6058,12 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $html);
 
 					$html = str_replace('%monto_impuesto_total%', __('Monto Impuesto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+					$html = str_replace('%monto_iva_total%', __('IVA') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 					$html = str_replace('%monto_impuesto_total_cc%', __('Monto_Impuesto_cc') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 					$html = str_replace('%monto_moneda_total_con_impuesto%', __('Monto total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				} else {
 					$html = str_replace('%monto_impuesto_total%', '', $html);
+					$html = str_replace('%monto_iva_total%', '', $html);
 					$html = str_replace('%monto_impuesto_total_cc%', '', $html);
 					$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
 					//si no hay impuesto para los gastos, no dibujo esas celdas
@@ -6398,6 +6430,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_fecha_emision%', __('Fecha de Emisión'), $html);
 				$html = str_replace('%instrucciones_pago%', _('INSTRUCCIONES DE PAGO'), $html);
 				$html = str_replace('%giro_bancario%', _('Giro bancario a'), $html);
+				$html = str_replace('%fecha_corte%', __('Fecha de Corte'), $html);
 
 				$html = str_replace('%fecha_emision_glosa%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : __('Fecha emisión'), $html);
 				$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);
@@ -6624,12 +6657,6 @@ class NotaCobro extends Cobro {
 				if ($this->fields['forma_cobro'] == 'FLAT FEE' && $this->fields['id_moneda'] != $this->fields['id_moneda_monto'] && $this->fields['id_moneda_monto'] == $this->fields['opc_moneda_total'] && empty($this->fields['descuento'])) {
 					$total_en_moneda = $this->fields['monto_contrato'];
 				}
-
-				//Caso cap menor de un valor y distinta tarifa (diferencia por decimales)
-				/* if($this->fields['forma_cobro']=='CAP' && $this->fields['monto_subtotal'] > $this->fields['monto'] && $this->fields['id_moneda']!=$this->fields['id_moneda_monto'] && $this->fields['opc_moneda_total']==$this->fields['id_moneda_monto'])
-				  {
-				  $total_en_moneda = $this->fields['monto_contrato'];
-				  } */
 
 				$html = str_replace('%monedabase%', $this->fields['opc_moneda_total'] == $this->fields['id_moneda'] ? '' : __('Equivalente a'), $html);
 				$html = str_replace('%equivalente_a_la_fecha%', $this->fields['opc_moneda_total'] == $this->fields['id_moneda'] ? '' : __('Equivalente a la fecha'), $html);
@@ -7836,6 +7863,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', '', $html);
 					$html = str_replace('%duracion_descontada_bmahj%', '', $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Trabajadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 
 					$html = str_replace('%duracion_trabajada%', '', $html);
 					$html = str_replace('%duracion_descontada%', '', $html);
@@ -7844,6 +7872,7 @@ class NotaCobro extends Cobro {
 				if ($ImprimirDuracionTrabajada && ( $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION' )) {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
 					$html = str_replace('%duracion_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 
@@ -7857,6 +7886,7 @@ class NotaCobro extends Cobro {
 				else if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
 					$html = str_replace('%duracion_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 
@@ -7867,6 +7897,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', '', $html);
 					$html = str_replace('%duracion_descontada_bmahj%', '', $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
+					$html = str_replace('%tiempo%', __('Tiempo'), $html);
 
 					$html = str_replace('%duracion_trabajada%', '', $html);
 					$html = str_replace('%duracion_descontada%', '', $html);
@@ -7884,7 +7915,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 
 				if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1)
-					$html = str_replace('%td_categoria%', '<td width="100" align="left">%categoria%</td>', $html);
+					$html = str_replace('%td_categoria%', '<td class="td_categoria" align="left">%categoria%</td>', $html);
 				else
 					$html = str_replace('%td_categoria%', '', $html);
 				$html = str_replace('%categoria%', __($this->fields['codigo_idioma'] . '_Categoría'), $html);
@@ -10618,6 +10649,7 @@ class NotaCobro extends Cobro {
 					}
 
 					$html = str_replace('%nombre%', __('ABOGADO'), $html);
+
 					if ($this->fields['opc_ver_profesional_tarifa'] == 1) {
 						$html = str_replace('%valor_hh%', __('TARIFA'), $html);
 					} else {
@@ -10692,7 +10724,6 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%hrs_mins_trabajadas_real%', __('Hrs.:Mins. Trabajadas'), $html);
 					$html = str_replace('%hrs_mins_descontadas_real%', __('Hrs.:Mins. Descontadas'), $html);
 					$html = str_replace('%horas_mins_cobrables%', '', $html);
-					//$html = str_replace('%horas_cobrables%',__('Hrs. Cobrables'),$html);
 				} else {
 					$html = str_replace('%hrs_trabajadas%', '', $html);
 					$html = str_replace('%hrs_trabajadas_real%', '', $html);
@@ -10777,6 +10808,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%hh%', __('Hrs. Tarificadas'), $html);
+				$html = str_replace('%tiempo%', __('Tiempo'), $html);
 				$html = str_replace('%hh_mins%', __('Hrs.:Mins. Tarificadas'), $html);
 				$html = str_replace('%horas%', $retainer ? __('Hrs. Tarificadas') : __('Horas'), $html);
 				$html = str_replace('%horas_retainer%', $retainer ? __('Hrs. Retainer') : '', $html);
@@ -10785,6 +10817,7 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_profesional_tarifa'] == 1) {
 					$html = str_replace('%td_tarifa%', '<td align="center" width="60">%valor_hh%</td>', $html);
+					$html = str_replace('%td_tarifa_min%', '<td align="center" width="60">'.__('Tarifa').'</td>', $html);
 					$html = str_replace('%td_tarifa_simbolo%', '<td align="center" width="60">%valor_hh_simbolo%</td>', $html);
 					$html = str_replace('%valor_horas%', $flatfee ? '' : __('Tarifa'), $html);
 					$html = str_replace('%valor_hh%', __('TARIFA'), $html);
@@ -10795,6 +10828,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_tarifa_simbolo%', '', $html);
 					$html = str_replace('%valor_horas%', '', $html);
 					$html = str_replace('%valor_hh%', '', $html);
+					$html = str_replace('%td_tarifa_min%', '', $html);
 					$html = str_replace('%valor_hh_simbolo%', '', $html);
 					$html = str_replace('%td_tarifa_ajustada%', '', $html);
 				}
@@ -10819,11 +10853,13 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_profesional_categoria'] == 1){
 					$html = str_replace('%categoria%', __($this->fields['codigo_idioma'] . '_CATEGORÍA'), $html);
+					$html = str_replace('%categoria_min%', __('Categoría'), $html);
 				} else {
 					$html = str_replace('%categoria%', '', $html);
+					$html = str_replace('%categoria_min%', '', $html);
 				}
 
-				$html = str_replace('%staff%', __('Staff'), $html);
+								$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%valor_siempre%', __('Valor'), $html);
 				$html = str_replace('%nombre_profesional%', __('Nombre Profesional'), $html);
 
