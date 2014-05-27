@@ -752,11 +752,19 @@ class Reporte {
 	//FROM en string de Query. Incluye las tablas necesarias.
 	public function sFrom() {
 		//Calculo de valor por cobrar requiere Tarifa, Tipo de Cambio
-		$join_por_cobrar = "
-						LEFT JOIN usuario_tarifa ON usuario_tarifa.id_tarifa = contrato.id_tarifa AND usuario_tarifa.id_usuario = trabajo.id_usuario AND usuario_tarifa.id_moneda = contrato.id_moneda
+		$join_tarifa = '';
+		$join_por_cobrar = 'LEFT JOIN usuario_tarifa ON ';
+		if ($this->tipo_dato != 'valor_trabajado_estandar') {
+			$join_por_cobrar .= 'usuario_tarifa.id_tarifa = contrato.id_tarifa AND';
+		} else {
+			$join_tarifa = 'INNER JOIN tarifa ON tarifa.id_tarifa = usuario_tarifa.id_tarifa AND tarifa.tarifa_defecto = 1';
+		}
+		$join_por_cobrar .= "usuario_tarifa.id_usuario = trabajo.id_usuario
+							AND usuario_tarifa.id_moneda = contrato.id_moneda
+							{$join_tarifa}
 						LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
-						LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '" . $this->id_moneda . "'
-					";
+						LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
+
 		$add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'));
 		$s = ' FROM trabajo
 					LEFT JOIN usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
