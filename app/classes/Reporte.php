@@ -755,7 +755,7 @@ class Reporte {
 		$join_tarifa = '';
 		$join_por_cobrar = 'LEFT JOIN usuario_tarifa ON ';
 		if ($this->tipo_dato != 'valor_trabajado_estandar') {
-			$join_por_cobrar .= 'usuario_tarifa.id_tarifa = contrato.id_tarifa AND';
+			$join_por_cobrar .= 'usuario_tarifa.id_tarifa = contrato.id_tarifa AND ';
 		} else {
 			$join_tarifa = 'INNER JOIN tarifa ON tarifa.id_tarifa = usuario_tarifa.id_tarifa AND tarifa.tarifa_defecto = 1';
 		}
