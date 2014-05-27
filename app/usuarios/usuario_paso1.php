@@ -334,15 +334,6 @@
 		});
 	});
 
-	function RevisarRut(form) {
-		if (Rut(form.rut.value, form.dv_rut.value)) {
-			alert('El rut es inválido');
-			return false;
-		}
-
-		return true;
-	}
-
 	function Listar(form, from) {
 		var nom = document.act.nombre.value;
 		var activo = 0;
@@ -493,7 +484,7 @@
 	<tr>
 		<td width="20">&nbsp;</td>
 		<td valign="top">
-			<form action="usuario_paso2.php" method="post" <?php if ($esRut) { echo 'onsubmit="return RevisarRut(this);"'; } ?> >
+			<form action="usuario_paso2.php" method="post" <?php if ($esRut) { echo 'onsubmit="return ValidarRut(this.rut.value, this.dv_rut.value);"'; } ?> >
 				<br class="clearfix"/>
 				<br>
 				<table  width="100%" class="tb_base">
