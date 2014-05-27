@@ -337,6 +337,7 @@ $_LANG['Detalle del Trabajo Realizado'] = "Description of Work";
 $_LANG['Abogado'] = "Lawyer";
 $_LANG['abogado_raz'] = "Attorney";
 $_LANG['tiempo_raz'] = "Hours";
+$_LANG['Tiempo'] = "Time";
 $_LANG['tarifa_raz'] = "Rate";
 $_LANG['importe_raz'] = "Amount";
 $_LANG['Total Cobro'] = "Invoice Total";

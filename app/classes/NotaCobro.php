@@ -6061,11 +6061,13 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%monto_iva_total%', __('IVA') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 					$html = str_replace('%monto_impuesto_total_cc%', __('Monto_Impuesto_cc') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 					$html = str_replace('%monto_moneda_total_con_impuesto%', __('Monto total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+					$html = str_replace('%total_monto_moneda%', __('Total') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				} else {
 					$html = str_replace('%monto_impuesto_total%', '', $html);
 					$html = str_replace('%monto_iva_total%', '', $html);
 					$html = str_replace('%monto_impuesto_total_cc%', '', $html);
 					$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
+					$html = str_replace('%total_monto_moneda%', '', $html);
 					//si no hay impuesto para los gastos, no dibujo esas celdas
 					$html = str_replace('%td_monto_impuesto_total%', '&nbsp;', $html);
 					$html = str_replace('%td_monto_moneda_total_con_impuesto%', '&nbsp;', $html);
