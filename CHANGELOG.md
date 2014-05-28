@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.2.5
+Miercoles 28 de Mayo 2014
+* **Fixed:** [Correccion a Antiguedad deuda cliente](https://github.com/LemontechSA/ttb/pull/519)
+
 ## Hotfix: 14.2.3
 Lunes 26 de Mayo 2014
 * **Fixed:** [Correcciones reporte avanzado](https://github.com/LemontechSA/ttb/pull/515)
