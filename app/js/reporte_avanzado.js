@@ -55,7 +55,7 @@ function TextFromValue(name, value) {
 			var t = [];
 			var counter = 0;
 			jQuery.each(elm, function(k, item) {
-				if (++counter > 5 ) {
+				if (++counter > 5) {
 					return false;
 				}
 				t.push(jQuery(item).text());
@@ -228,6 +228,62 @@ function EditarReporte() {
 	}
 }
 
+/*Carga lo elegido en el deglose del nuevo reporte*/
+function ActualizarNuevoReporte() {
+	var s = __(jQuery('#tipo_dato').val());
+	if ($('comparar').checked == true) {
+		s += ' vs. ' + __($('tipo_dato_comparado').value);
+	}
+
+	jQuery('#tipos_datos_nuevo_reporte').html(s);
+
+	s = '';
+	var numero_agrupadores = parseInt(jQuery('#numero_agrupadores').val());
+	for (i = 0; i < numero_agrupadores; ++i) {
+		if (i != 0 && i != 3) {
+			s += ' - ';
+		}
+		s += __(jQuery('#agrupador_' + i).val());
+		if (i == 2) {
+			s += '<br />';
+		}
+	}
+	jQuery('#agrupadores_nuevo_reporte').html(s);
+
+	s = "<i>Puede seleccionar 'Semana pasada',<br /> 'Mes pasado' o 'Año en curso'.</i>";
+	var fecha_corta = jQuery('#formulario input[name="fecha_corta"]:checked').val();
+
+	if (fecha_corta == 'semanal') {
+		s = __('Semana pasada');
+	} else if (fecha_corta == 'mensual') {
+		s = __('Mes pasado');
+	} else if (fecha_corta == 'anual') {
+		s = __('Año en curso');
+	}
+	jQuery('#periodo_nuevo_reporte').html(s);
+
+	var campo_fecha = jQuery('#formulario input[name="campo_fecha"]:checked').val();
+	if (campo_fecha == 'trabajo') {
+		s = __("Trabajo");
+	} else if (campo_fecha == 'corte') {
+		s = __("Corte");
+	} else if (campo_fecha == 'envio') {
+		s = __("Facturacion");
+	} else if (campo_fecha == 'facturacion') {
+		s = __("Envío");
+	} else {
+		s = __("Emisión");
+	}
+
+	jQuery('#segun_nuevo_reporte').html(s);
+}
+
+jQuery(function() {
+	jQuery("select option").attr("title", "");
+	jQuery("select option").each(function(i) {
+		this.title = this.text;
+	})
+});
 
 /*Carga los datos del reporte elegido en los selectores*/
 function CargarReporte() {
@@ -307,6 +363,7 @@ function CargarReporte() {
 
 		Agrupadores(0);
 		TipoDato();
+		jQuery('input[name="fecha_corta"]:checked').click();
 	}
 }
 
@@ -362,6 +419,7 @@ function setFieldsValues(data) {
 				var values = jQuery.isArray(v) ? v : [v];
 				jQuery.each(values, function(k, value) {
 					jQuery('select[name="' + elm_name + '"] option[value="' + value + '"]').attr('selected', true);
+					jQuery('select[name="' + elm_name + '"]').change();
 				});
 
 				break;
@@ -410,44 +468,50 @@ function Comparar() {
 	if (comparar.is(':checked')) {
 		jQuery('#dispersion ,#tipo_dato_comparado, #td_dato_comparado, #vs, #tipo_tinta').show();
 		jQuery('#td_dato').removeClass('borde_blanco').addClass('borde_rojo');
-		jQuery('#td_dato_comparado').addClass('borde_azul');
-		jQuery('#' + valor_tipo_dato_comparado).addClass('boton_comparar');
+		jQuery('#td_dato_comparado').removeClass('borde_blanco').addClass('borde_azul');
 	} else {
 		jQuery('#dispersion, #tipo_dato_comparado, #vs, #tipo_tinta').hide();
 		jQuery('#td_dato').removeClass('borde_rojo').addClass('borde_blanco');
-		jQuery('#td_dato_comparado').removeClass('borde_azul');
-		jQuery('#' + valor_tipo_dato_comparado).removeClass('boton_comparar');
+		jQuery('#td_dato_comparado').removeClass('borde_azul').addClass('borde_blanco');
 	}
 
+	TipoDato(valor_tipo_dato_comparado, true);
 	RevisarTabla();
 	RevisarMoneda();
 	RevisarCircular();
 	ActualizarNuevoReporte();
 }
 
-function TipoDato(valor) {
+function TipoDato(valor, noSet) {
 	var comparar = jQuery('#comparar').is(':checked');
 	var tinta = jQuery('[name="tinta"]:checked').val();
 
-	if (valor) {
+	if (valor && !noSet) {
 		if (jQuery('#' + valor).hasClass('boton_disabled')) {
 			return;
 		}
-		if (tinta == 'azul') {
+		if (tinta === 'azul') {
 			jQuery('#tipo_dato_comparado option[value="' + valor + '"]').attr('selected', true);
-		} else if (tinta == 'rojo') {
+		} else if (tinta === 'rojo') {
 			jQuery('#tipo_dato option[value="' + valor + '"]').attr('selected', true);
 		}
 	}
 
-	jQuery('#full_tipo_dato td[id][class="boton_comparar"], #full_tipo_dato td[id][class="boton_presionado"]')
-			.removeClass()
+	jQuery('#full_tipo_dato .boton_tipo_dato')
+			.removeClass('boton_presionado')
+			.removeClass('boton_comparar')
 			.addClass('boton_normal');
+
 	valor = jQuery('#tipo_dato').val();
-	jQuery('#' + valor).removeClass().addClass('boton_presionado');
+	jQuery('#' + valor)
+			.addClass('boton_presionado')
+			.removeClass('boton_normal');
+
 	if (comparar) {
 		valor = jQuery('#tipo_dato_comparado').val();
-		jQuery('#' + valor).removeClass().addClass('boton_comparar');
+		jQuery('#' + valor)
+				.addClass('boton_comparar')
+				.removeClass('boton_normal');
 	}
 	RevisarMoneda();
 	RevisarCircular();
@@ -519,19 +583,19 @@ function MostrarLimite(visible) {
 function ActualizarPeriodo(fi, ff) {
 	fi = fi.split('-');
 	ff = ff.split('-');
-	jQuery('#fecha_ini').datepicker('setDate', new Date(fi[2], fi[1]-1, fi[0]));
-	jQuery('#fecha_fin').datepicker('setDate', new Date(ff[2], ff[1]-1, ff[0]));
+	jQuery('#fecha_ini').datepicker('setDate', new Date(fi[2], fi[1] - 1, fi[0]));
+	jQuery('#fecha_fin').datepicker('setDate', new Date(ff[2], ff[1] - 1, ff[0]));
 }
 
 function SeleccionarSelector() {
 	var month = jQuery('#fecha_mes').val();
 	var year = jQuery('#fecha_anio').val();
-	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month-1, 1));
+	jQuery('#fecha_ini').datepicker('setDate', new Date(year, month - 1, 1));
 	jQuery('#fecha_fin').datepicker('setDate', new Date(year, month, 0));
 
-	jQuery('#reporte_envio_selector').show();
-	jQuery('#reporte_envio_semana').hide();
-	jQuery('#reporte_envio_mes').hide();
+//	jQuery('#reporte_envio_selector').show();
+//	jQuery('#reporte_envio_semana').hide();
+//	jQuery('#reporte_envio_mes').hide();
 	ActualizarNuevoReporte();
 }
 
@@ -684,7 +748,34 @@ function ResizeIframe(width, height) {
 		height: height + 'px',
 		width: width + 'px'
 	});
+}
 
+
+function SeleccionarSemana() {
+	var periodo = selector_periodos.semana_pasada;
+	ActualizarPeriodo(periodo[0], periodo[1]);
+//	$('reporte_envio_semana').show();
+//	$('reporte_envio_mes').hide();
+//	$('reporte_envio_selector').hide();
+	ActualizarNuevoReporte();
+}
+
+function SeleccionarMes() {
+	var periodo = selector_periodos.mes_pasado;
+	ActualizarPeriodo(periodo[0], periodo[1]);
+//	$('reporte_envio_mes').show();
+//	$('reporte_envio_semana').hide();
+//	$('reporte_envio_selector').hide();
+	ActualizarNuevoReporte();
+}
+
+function SeleccionarAnual() {
+	var periodo = selector_periodos.actual;
+	ActualizarPeriodo(periodo[0], periodo[1]);
+//	$('reporte_envio_mes').show();
+//	$('reporte_envio_semana').hide();
+//	$('reporte_envio_selector').hide();
+	ActualizarNuevoReporte();
 }
 
 jQuery(document).ready(function() {
@@ -726,6 +817,7 @@ jQuery(document).ready(function() {
 			jQuery('#iframereporte').html(data);
 		});
 	});
+
 	jQuery('#comparar').change(function() {
 		if (jQuery('#comparar').is(':checked')) {
 			jQuery('#tabla, #dispersion').show();
@@ -734,19 +826,51 @@ jQuery(document).ready(function() {
 		}
 		Comparar();
 	});
+
 	jQuery('#orden_barras_max2min').change(function() {
 		MostrarLimite(jQuery(this).attr('checked'));
 	});
+
 	jQuery('#tipo_dato, #tipo_dato_comparado').change(function() {
 		var elm = jQuery(this);
 		setFieldsValues({'tinta': elm.data('color')})
-		TipoDato(elm.val());
+		TipoDato(elm.val(), true);
 	});
 
+	jQuery('input[name="fecha_corta"]').click(function() {
+		switch (jQuery(this).attr('id')) {
+			case 'fecha_corta_semana':
+				SeleccionarSemana();
+				break;
+			case 'fecha_corta_mes':
+				SeleccionarMes();
+				break;
+			case 'fecha_corta_anual':
+				SeleccionarAnual();
+				break;
+			case 'fecha_corta_selector':
+			case 'fecha_periodo':
+				SeleccionarSelector();
+				break;
+		}
+		return;
+
+	});
 	CargarReporte();
 	RevisarMoneda();
 	RevisarCircular();
 	RevisarTabla();
 	Comparar();
-});
 
+	jQuery('.boton_tipo_dato').click(function() {
+		TipoDato(jQuery(this).attr('id'));
+	});
+	
+	jQuery('.agrupador').change(function() {
+		var name = jQuery(this).attr('id').split('_');
+		var num = parseInt(name[1]);
+		CambiarAgrupador(num);
+	});
+
+	jQuery('#fecha_mes, #fecha_anio').change(SeleccionarSelector);
+});

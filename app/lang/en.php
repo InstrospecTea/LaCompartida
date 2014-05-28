@@ -85,6 +85,7 @@ $_LANG['Fecha desde'] = "From";
 $_LANG['Fecha desde:'] = "From:";
 $_LANG['Fecha hasta'] = "To";
 $_LANG['Fecha hasta:'] = "To:";
+$_LANG['Fecha de Corte'] = "Closing Date";
 $_LANG['Fono'] = "Phone";
 $_LANG['E-mail'] = "E-mail";
 $_LANG['Costos'] = "Costs";
@@ -336,6 +337,7 @@ $_LANG['Detalle del Trabajo Realizado'] = "Description of Work";
 $_LANG['Abogado'] = "Lawyer";
 $_LANG['abogado_raz'] = "Attorney";
 $_LANG['tiempo_raz'] = "Hours";
+$_LANG['Tiempo'] = "Time";
 $_LANG['tarifa_raz'] = "Rate";
 $_LANG['importe_raz'] = "Amount";
 $_LANG['Total Cobro'] = "Invoice Total";
@@ -736,6 +738,7 @@ $_LANG['grupo_o_cliente'] = "Group or Client";
 
 $_LANG['area_usuario'] = "Professional Area";
 $_LANG['categoria_usuario'] = "Professional Category";
+$_LANG['Categoría'] = "Category";
 
 ### Reportes - Tipo de Dato ###
 $_LANG['horas_trabajadas'] = "Worked Hours";
