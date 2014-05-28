@@ -3,6 +3,7 @@
 .rvmrc
 /app/miconf.php
 /app/test/spec/conf.rb
+/app/tests/_log/
 
 .svn/
 app/classes/AWSSDKforPHP/
