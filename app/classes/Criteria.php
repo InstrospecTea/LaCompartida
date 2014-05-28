@@ -1,25 +1,25 @@
-<?php
+<?php 
 
 /**
- *
+ * 
  * Clase que permite generar criterios de búsqueda contra el medio persistente (a.k.a una query de base de datos).
- *
+ * 
  * TODO Declaration (@dochoaj):
  * 	La implementación está basada en lo mínimo indispensable para resolver el problema de los reportes. No obstante,
  * a medida de que pase el tiempo y se depure el uso, se puede cambiar a una implementación mediante el uso de reflection en PHP, para
  * reducir la cantidad de querys repartidas por los distintos archivos del software.
- *
+ * 
  */
-class Criteria {
-
+class Criteria
+{
 	/**
 	 * Permite generar una conexión con el medio persistente.
 	 * @var [type]
 	 */
-	private $Sesion;
-
+	private $sesion;
+	
 	/*
-	  CRITERIA QUERY BUILDER PARAMS.
+		CRITERIA QUERY BUILDER PARAMS.
 	 */
 	private $select = 'SELECT';
 	private $from = ' FROM';
@@ -30,7 +30,7 @@ class Criteria {
 	private $limit = '';
 
 	/*
-	  CRITERIA SCOPE ENVELOPERS.
+		CRITERIA SCOPE ENVELOPERS.
 	 */
 	private $select_clauses = array();
 	private $from_clauses = array();
@@ -43,12 +43,27 @@ class Criteria {
 	 * Constructor de la clase.
 	 * @param $sesion
 	 */
-	function __construct(Sesion $Sesion) {
-		$this->Sesion = $Sesion;
+	function __construct($sesion = null)
+	{
+		$this->sesion = $sesion;
+	}
+
+
+	/**
+	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
+	 * @return Array asociativo de resultados.
+	 */
+	public function excecute() {
+		if ($this->sesion == null) {
+			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
+		}
+		$statement = $this->sesion->pdodbh->prepare($this->get_plain_query());
+		$statement->execute();
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/*
-	  QUERY BUILDER METHODS
+		QUERY BUILDER METHODS
 	 */
 
 	/**
@@ -57,14 +72,14 @@ class Criteria {
 	 * @param string $alias
 	 * @return Criteria
 	 */
-	public function add_select($attribute, $alias = null) {
-		if (empty($attribute) && empty($alias)) {
-			return $this;
+	public function add_select($attribute, $alias = null){
+		if(is_null($alias)){
+			$alias = '';
 		}
 		$new_clause = '';
 		$new_clause .= $attribute;
-		if (!empty($alias)) {
-			$new_clause .=" AS '$alias'";
+		if($alias != ''){
+			$new_clause .=" '$alias'";
 		}
 		$this->select_clauses[] = $new_clause;
 		return $this;
@@ -74,12 +89,13 @@ class Criteria {
 	 * Añade un limite a la cantidad de resultados
 	 * @param  $limit Numero de resutlados
 	 */
-	public function add_limit($limit) {
-		if (is_numeric($limit) && $limit >= 0) {
-			$this->limit = ' LIMIT ' . $limit;
+	public function add_limit($limit){
+		if(is_numeric($limit) && $limit >= 0){
+			$this->limit = ' LIMIT '.$limit;
 			return $this;
-		} else {
-			throw new Exception('Parámetro asociado al limite de resultados de la query es erróneo. Se esperaba un entero mayor que cero, se obtuvo: ' . "$limit");
+		}
+		else{
+			throw new Exception('Criteria dice: Parámetro asociado al limite de resultados de la query es erróneo. Se esperaba un entero mayor que cero, se obtuvo: '."$limit");
 		}
 	}
 
@@ -89,12 +105,12 @@ class Criteria {
 	 * @param string $alias
 	 * @return Criteria
 	 */
-	public function add_from($table, $alias = null) {
-		if (is_null($alias)) {
+	public function add_from($table, $alias = null){
+		if(is_null($alias)){
 			$alias = '';
 		}
 		$new_clause = '';
-		$new_clause .= $table . ' ' . $alias;
+		$new_clause .= $table.' '.$alias;
 		$this->from_clauses[] = $new_clause;
 		return $this;
 	}
@@ -105,9 +121,9 @@ class Criteria {
 	 * @param string   $alias
 	 * @return Criteria
 	 */
-	public function add_from_criteria(Criteria $criteria, $alias) {
+	public function add_from_criteria(Criteria $criteria, $alias){
 		$new_clause = '';
-		$new_clause .= '(' . $criteria->get_plain_query() . ') AS ' . $alias;
+		$new_clause .= '('.$criteria->get_plain_query().') AS '.$alias;
 		$this->from_clauses[] = $new_clause;
 		return $this;
 	}
@@ -118,10 +134,10 @@ class Criteria {
 	 * @param  string $join_condition
 	 * @return Criteria
 	 */
-	public function add_left_join_with($join_table, $join_condition) {
+	public function add_left_join_with($join_table, $join_condition){
 		$new_clause = '';
-		$new_clause .= $this->left_joining . ' ';
-		$new_clause .= $join_table . ' ON ' . $join_condition;
+		$new_clause .= $this->left_joining.' ';
+		$new_clause .= $join_table.' ON '.$join_condition;
 		$this->join_clauses[] = $new_clause;
 		return $this;
 	}
@@ -133,10 +149,10 @@ class Criteria {
 	 * @param string   $join_condition
 	 * @return Criteria
 	 */
-	public function add_left_join_with_criteria(Criteria $criteria, $alias, $join_condition) {
+	public function add_left_join_with_criteria(Criteria $criteria, $alias, $join_condition){
 		$new_clause = '';
-		$new_clause .= $this->left_joining . " ";
-		$new_clause .= '(' . $criteria->get_plain_query() . ') ' . $alias . ' ON ' . $join_condition;
+		$new_clause .= $this->left_joining." ";
+		$new_clause .= '('.$criteria->get_plain_query().') '.$alias.' ON '.$join_condition;
 		$this->join_clauses[] = $new_clause;
 		return $this;
 	}
@@ -146,7 +162,7 @@ class Criteria {
 	 * @param CriteriaRestriction $restriction
 	 * @return Criteria
 	 */
-	public function add_restriction(CriteriaRestriction $restriction) {
+	public function add_restriction(CriteriaRestriction $restriction){
 		$this->where_clauses[] = $restriction->get_restriction();
 		return $this;
 	}
@@ -156,7 +172,7 @@ class Criteria {
 	 * @param string $group_entity
 	 * @return Criteria
 	 */
-	public function add_grouping($group_entity) {
+	public function add_grouping($group_entity){
 		$this->grouping_clauses[] = $group_entity;
 		return $this;
 	}
@@ -166,13 +182,13 @@ class Criteria {
 	 * @param string $order
 	 * @return Criteria
 	 */
-	public function add_ordering($order_entity) {
+	public function add_ordering($order_entity){
 		$this->ordering_clauses[] = $order_entity;
 		return $this;
 	}
 
 	/*
-	  PRIVATE QUERY GENERATION METHODS
+		PRIVATE QUERY GENERATION METHODS
 	 */
 
 	/**
@@ -180,10 +196,11 @@ class Criteria {
 	 * @return string
 	 * @throws Exception Cuando no se ha definido un criterio de selección.
 	 */
-	private function generate_select_statement() {
-		if (count($this->select_clauses) > 0) {
-			return $this->select . " " . implode(',', $this->select_clauses);
-		} else {
+	private function generate_select_statement(){
+		if(count($this->select_clauses) > 0){
+			return $this->select." ".implode(',', $this->select_clauses);
+		}
+		else{
 			throw new Exception('Criteria dice: No se han definido criterios de selección. No es correcto asumir SELECT *. ');
 		}
 	}
@@ -193,10 +210,11 @@ class Criteria {
 	 * @return string
 	 * @throws Exception  Cuando no se ha definido un scope de búsqueda.
 	 */
-	private function generate_from_statement() {
-		if (count($this->from_clauses) > 0) {
-			return $this->from . ' ' . implode(',', $this->from_clauses);
-		} else {
+	private function generate_from_statement(){
+		if(count($this->from_clauses) > 0){
+			return $this->from.' '.implode(',', $this->from_clauses);
+		}
+		else{
 			throw new Exception('Criteria dice: No se ha definido desde que tabla(s) obtener los datos.');
 		}
 	}
@@ -205,10 +223,11 @@ class Criteria {
 	 * Genera el statement de JOIN de una query, si hubieren.
 	 * @return string
 	 */
-	private function generate_join_statement() {
-		if (count($this->join_clauses) > 0) {
+	private function generate_join_statement(){
+		if(count($this->join_clauses) > 0){
 			return implode(' ', $this->join_clauses);
-		} else {
+		}
+		else{
 			return '';
 		}
 	}
@@ -217,10 +236,11 @@ class Criteria {
 	 * Genera el statement WHERE de una query, si hubiere.
 	 * @return string
 	 */
-	private function generate_where_statement() {
-		if (count($this->where_clauses) > 0) {
-			return $this->where . ' ' . implode(',', $this->where_clauses);
-		} else {
+	private function generate_where_statement(){
+		if(count($this->where_clauses) > 0){
+			return $this->where.' '.implode(',', $this->where_clauses);
+		}
+		else{
 			return '';
 		}
 	}
@@ -229,10 +249,11 @@ class Criteria {
 	 * Genera el statement GROUP BY de una query, si hubiere.
 	 * @return string
 	 */
-	private function generate_grouping_statement() {
-		if (count($this->grouping_clauses) > 0) {
-			return $this->grouping . ' ' . implode(',', $this->grouping_clauses);
-		} else {
+	private function generate_grouping_statement(){
+		if(count($this->grouping_clauses) > 0){
+			return $this->grouping.' '.implode(',', $this->grouping_clauses);
+		}
+		else{
 			return '';
 		}
 	}
@@ -241,29 +262,32 @@ class Criteria {
 	 * Genera el statement ORDER BY de una query, si hubiere.
 	 * @return string
 	 */
-	private function generate_ordering_statement() {
-		if (count($this->ordering_clauses) > 0) {
-			return $this->ordering . " " . implode(',', $this->ordering_clauses);
-		} else {
+	private function generate_ordering_statement(){
+		if(count($this->ordering_clauses) > 0){
+			return $this->ordering." ".implode(',', $this->ordering_clauses);
+		}
+		else{
 			return '';
 		}
 	}
 
-	/*
-	  QUERY ACCESS METHODS
-	 */
 
+
+	/*
+		QUERY ACCESS METHODS
+	 */
+	
 	/**
 	 * Obtiene la versión 'raw' de la query generada.
 	 * @return string
 	 */
-	public function get_plain_query() {
-		return $this->generate_select_statement() .
-				$this->generate_from_statement() .
-				$this->generate_join_statement() .
-				$this->generate_where_statement() .
-				$this->generate_grouping_statement() .
-				$this->generate_ordering_statement() .
+	public function get_plain_query(){
+		return 	$this->generate_select_statement().
+				$this->generate_from_statement().
+				$this->generate_join_statement().
+				$this->generate_where_statement().
+				$this->generate_grouping_statement().
+				$this->generate_ordering_statement().
 				$this->limit;
 	}
 
