@@ -335,9 +335,9 @@ class SolicitudAdelanto extends Objeto {
 		}
 
 		// template
-//		if ($this->fields['id_template'] == '' || $this->fields['id_template'] == 0) {
-//			$errores[] = __('Se produjo un error al asociar un template');
-//		}
+		//		if ($this->fields['id_template'] == '' || $this->fields['id_template'] == 0) {
+		//			$errores[] = __('Se produjo un error al asociar un template');
+		//		}
 
 		$this->error = $errores;
 
@@ -367,8 +367,7 @@ class SolicitudAdelanto extends Objeto {
 			);
 			$subject = "Solicitud de adelanto disponible";
 			$body = <<<BODY
-Estimado/a {$usuario['nombre']},
-
+					Estimado/a {$usuario['nombre']},
 La solicitud de adelanto N° {$this->fields['id_solicitud_adelanto']},
 se encuentra disponible para su retiro.
 BODY;
