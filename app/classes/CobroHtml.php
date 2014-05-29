@@ -46,7 +46,7 @@ HTML;
 		);
 		$html = <<<HTML
 			<tr style="height: 26px;">
-				<td colspan="12" align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;" colspan=2>
+				<td colspan="12" align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;" colspan="2">
 					<img src="{$img_dir}/imprimir_16.gif" border="0" alt="Imprimir"/>
 					{$titulos['documento_tributario']}
 					$dcf
@@ -133,7 +133,7 @@ HTML;
 				<td>{$datos_factura['estado']}</td>
 				<td align="right">
 					{$datos_factura['f_saldo']}
-					<input type="hidden" name="saldo_{$datos_factura['id_factura']}" id="saldo_{$datos_factura['id_factura']}" value="{$datos_factura['saldo']} />
+					<input type="hidden" name="saldo_{$datos_factura['id_factura']}" id="saldo_{$datos_factura['id_factura']}" value="{$datos_factura['saldo']}" />
 					<input type="hidden" name="id_moneda_factura_{$datos_factura['id_factura']}" id="id_moneda_factura_{$datos_factura['id_factura']}" value="{$datos_factura['id_moneda']}" />
 					<input type="hidden" name="tipo_cambio_factura_{$datos_factura['id_factura']}" id="tipo_cambio_factura_{$datos_factura['id_factura']}" value="{$datos_factura['tipo_cambio']}" />
 					<input type="hidden" name="cifras_decimales_factura_{$datos_factura['id_factura']}" id="cifras_decimales_factura_{$datos_factura['id_factura']}" value="{$datos_factura['cifras_decimales']}" />

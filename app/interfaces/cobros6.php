@@ -640,58 +640,52 @@ if (count($cobro->asuntos)) {
 <script type="text/javascript">
 
     var ciclo = self.setInterval("refrescaestado('estado_contabilidad')", 15000);
-    jQuery(document).ready(function() {
-        var Elidcobro = jQuery("#elidcobro").val();
-       jQuery.post('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'cajafacturas'}, function(data) {
-            jQuery("#cajafacturas").html(data);
-        });
-	   jQuery.post('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'}, function(data) {
-            jQuery("#lista_pagos").html(data);
-        });
-        jQuery("#elidcobro").click(function() {
-            var Elidcobro=jQuery("#elidcobro").val();
-            jQuery.post('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'}, function(data) {
-                jQuery("#lista_pagos").html(data);
-            });
-        });
+	jQuery(document).ready(function() {
+		var Elidcobro = jQuery('#elidcobro').val();
+		jQuery('#cajafacturas').load('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'cajafacturas'});
+		jQuery('#lista_pagos').load('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'});
+		jQuery("#elidcobro").click(function() {
+			var Elidcobro = jQuery('#elidcobro').val();
+			jQuery('#lista_pagos').load('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'});
+		});
 
-        jQuery(".integracion").click(function() {
-            var estado = jQuery(this).attr('rel').toUpperCase();
+		jQuery(".integracion").click(function() {
+			var estado = jQuery(this).attr('rel').toUpperCase();
 
-            var Idcobro = jQuery("#elidcobro").val();
-            var Opc = 'guardar';
-            var Opcic = jQuery(this).attr('id');
-            var Confirma = 0;
+			var Idcobro = jQuery("#elidcobro").val();
+			var Opc = 'guardar';
+			var Opcic = jQuery(this).attr('id');
+			var Confirma = 0;
 
 
-            if (estado == 'INFORMADO' && Opcic == 'parainfo') {
-                if (!confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?')) {
-                    return false;
-                }
-                Confirma = 1;
-            } else if (estado == 'INFORMADO PARA FACTURAR' || estado == 'INFORMADO Y FACTURADO' || estado == 'PARA INFORMAR Y FACTURAR') {
-                if( !confirm('El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar. ¿Está seguro que quiere informar nuevamente?') ) {
-                    return false;
-                }
-                Confirma = 1;
-            }
+			if (estado == 'INFORMADO' && Opcic == 'parainfo') {
+				if (!confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?')) {
+					return false;
+				}
+				Confirma = 1;
+			} else if (estado == 'INFORMADO PARA FACTURAR' || estado == 'INFORMADO Y FACTURADO' || estado == 'PARA INFORMAR Y FACTURAR') {
+				if( !confirm('El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar. ¿Está seguro que quiere informar nuevamente?') ) {
+					return false;
+				}
+				Confirma = 1;
+			}
 
-            jQuery.post('ajax/cobros7.php',{id_cobro: Idcobro, opc: Opc, opc_ic: Opcic, confirma: Confirma},function(data) {
-                if (data.length > 0) {
-                    var respuesta = data.split('|');
-                    jQuery('#estado_contabilidad').html(respuesta[0]).attr('title',respuesta[1]);
-                    jQuery("#retorno").html(respuesta[3]);
-                    jQuery(".integracion").attr('rel',respuesta[2]);
+			jQuery.post('ajax/cobros7.php',{id_cobro: Idcobro, opc: Opc, opc_ic: Opcic, confirma: Confirma},function(data) {
+				if (data.length > 0) {
+					var respuesta = data.split('|');
+					jQuery('#estado_contabilidad').html(respuesta[0]).attr('title',respuesta[1]);
+					jQuery("#retorno").html(respuesta[3]);
+					jQuery(".integracion").attr('rel',respuesta[2]);
 
-                    if (respuesta[4].length > 0) {
-                        jQuery("#nota_venta_contabilidad").html('Nota de venta: '+respuesta[4]).css('display','inline-block');
-                    } else {
-                        jQuery("#nota_venta_contabilidad").fadeOut("slow");
-                    }
-                }
-            });
-        });
-    });
+					if (respuesta[4].length > 0) {
+						jQuery("#nota_venta_contabilidad").html('Nota de venta: '+respuesta[4]).css('display','inline-block');
+					} else {
+						jQuery("#nota_venta_contabilidad").fadeOut("slow");
+					}
+				}
+			});
+		});
+	});
 
     function Refrescarse()
     {
@@ -1204,7 +1198,7 @@ if (count($cobro->asuntos)) {
 		}
 		?>
         var honorarios = jQuery('#honorarios_' + idx).val().replace(',', '').replace(',', '') * 1;
-        
+
         var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val()*1;
         var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1;
 
@@ -1304,9 +1298,9 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 ?>
 
 <!-- Estado del Cobro -->
-<div id="colmask"  >
-    <div id="colleft"  >
-        <form name="todo_cobro" id='todo_cobro' method="post" action="">
+<div id="colmask">
+    <div id="colleft">
+        <form name="todo_cobro" id="todo_cobro" method="post" action="">
             <input type="hidden" name="existe_factura" id="existe_factura" value="<?php echo $existe_factura ?>" />
             <input type="hidden" name="existe_pago" id="existe_pago" value="<?php echo $existe_pago ?>" />
             <input type="hidden" name="id_cobro" value="<?php echo $cobro->fields['id_cobro'] ?>" />
@@ -1317,13 +1311,13 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
             <input type="hidden" name="eliminar_pago" id="eliminar_pago" value="" />
             <input type="hidden" name="opc" id="opc"/>
             <input type="hidden" name="opc_informar_contabilidad" id="opc_informar_contabilidad"/>
-<input type="hidden" name="todopagado" value="<?php echo ($documento_cobro->fields['honorarios_pagados'] == 'SI' && $documento_cobro->fields['honorarios_pagados'] == 'SI')?'SI':'NO';?>" id="todopagado">
+			<input type="hidden" name="todopagado" value="<?php echo ($documento_cobro->fields['honorarios_pagados'] == 'SI' && $documento_cobro->fields['honorarios_pagados'] == 'SI')?'SI':'NO';?>" id="todopagado">
 
-            <div id="tablacabecera"  style="width: 950px;">
-                <!-- Calendario DIV -->
-                <div id="calendar-container" style="width:221px; position:absolute; display:none;">
-                    <div class="floating" id="calendar"></div>
-                </div>
+			<div id="tablacabecera"  style="width: 950px;">
+				<!-- Calendario DIV -->
+				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
+					<div class="floating" id="calendar"></div>
+				</div>
                 <!-- Fin calendario DIV -->
 				<?php
 
@@ -1351,17 +1345,17 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 					}
 				}
 				?>
-                <table id="estadoscobro">
-                    <tr style="height: 26px;  vertical-align: middle;" >
-                        <td style="height: 26px;  vertical-align: top;" align=left nowrap>
-                            <br />
+				<table id="estadoscobro">
+					<tr style="height: 26px;  vertical-align: middle;" >
+						<td style="height: 26px;  vertical-align: top;" align=left nowrap>
+							<br />
 							<?php echo'Estado '. __('Cobro') ?>:
-                          <br /> <br/><?php echo __('Forma Cobro') ?>
-		      <br/><?php echo $cobro->fields['forma_cobro'] ?>
-                        </td>
-                        <td align="left" style="font-size: 11px; font-weight: bold;" >
-                            <table cellpadding="3">
-                                <tr height=3>
+							<br /> <br/><?php echo __('Forma Cobro') ?>
+							<br/><?php echo $cobro->fields['forma_cobro'] ?>
+						</td>
+						<td align="left" style="font-size: 11px; font-weight: bold;" >
+							<table cellpadding="3">
+								<tr height=3>
 									<?php echo TArriba("BORRADOR", $cobro->fields['estado']); ?>
 									<?php echo TArriba("EMITIDO", $cobro->fields['estado']); ?>
 									<?php
@@ -1375,8 +1369,8 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 									?>
 									<?php echo TArriba("PAGO PARCIAL", $cobro->fields['estado']); ?>
 									<?php echo TArriba("PAGADO", $cobro->fields['estado']); ?>
-                                </tr>
-                                <tr height=13>
+								</tr>
+								<tr height=13>
 									<?php echo TMedio("BORRADOR", $cobro->fields['estado']); ?>
 									<?php echo TMedio("EMITIDO", $cobro->fields['estado']); ?>
 									<?php
@@ -1390,8 +1384,8 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 									?>
 									<?php echo TMedio("PAGO PARCIAL", $cobro->fields['estado']); ?>
 									<?php echo TMedio("PAGADO", $cobro->fields['estado']); ?>
-                                </tr>
-                                <tr height=3>
+								</tr>
+								<tr height=3>
 									<?php echo TAbajo("BORRADOR", $cobro->fields['estado']); ?>
 									<?php echo TAbajo("EMITIDO", $cobro->fields['estado']); ?>
 									<?php
@@ -1405,39 +1399,39 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 									?>
 									<?php echo TAbajo("PAGO PARCIAL", $cobro->fields['estado']); ?>
 									<?php echo TAbajo("PAGADO", $cobro->fields['estado']); ?>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input style="margin: 3px 0 0 0;" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_creacion']) ?>" size="11" disabled="disabled" />
-                                    </td>
-                                    <td nowrap>
-                                        <input class="fechadiff" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_emision']) ?>" name="fecha_emision" id="fecha_emision" size="11" maxlength="10" />
+								</tr>
+								<tr>
+									<td>
+										<input style="margin: 3px 0 0 0;" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_creacion']) ?>" size="11" disabled="disabled" />
+									</td>
+									<td nowrap>
+										<input class="fechadiff" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_emision']) ?>" name="fecha_emision" id="fecha_emision" size="11" maxlength="10" />
 
-                                    </td>
+									</td>
 								<?php if (Conf::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) { ?>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
+									<td nowrap>
+										<input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
 
-                                    </td>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+									</td>
+									<td nowrap>
+										<input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
 
-                                    </td>
+									</td>
 								<?php } else { ?>
 									<td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+										<input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
 
-                                    </td>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
+									</td>
+									<td nowrap>
+										<input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
 
-                                    </td>
+									</td>
 								<?php } ?>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_pago_parcial" value="<?php echo Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
+									<td nowrap>
+										<input class="fechadiff"  type="text" name="fecha_pago_parcial" value="<?php echo Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
 
-                                    </td>
-                                    <td nowrap>
+									</td>
+									<td nowrap>
 										<?php
 										if ($cobro->fields['estado'] != 'PAGADO') {
 											$fecha_pago = '';
@@ -1448,19 +1442,19 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 											$fecha_pago = Utiles::sql2date($documento_cobro->FechaPagos());
 										}
 										?>
-                                        <input type="text" name="fecha_pago" value="<?php echo (substr($fecha_pago, 0, 2) != '00' ? $fecha_pago : "") ?>" id="fecha_pago" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_pago" style="cursor:pointer" />
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
+										<input type="text" name="fecha_pago" value="<?php echo (substr($fecha_pago, 0, 2) != '00' ? $fecha_pago : "") ?>" id="fecha_pago" size="11" maxlength="10" />
+										<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_pago" style="cursor:pointer" />
+									</td>
+								</tr>
+							</table>
+						</td>
 
-                        <td align=left style="vertical-align: middle;" colspan="2">
-                            <div style="float:left;text-align:center;width:150px;">
+						<td align=left style="vertical-align: middle;" colspan="2">
+							<div style="float:left;text-align:center;width:150px;">
 								<?php echo __('Cambiar a') ?>:
 								<?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", 'estado', $cobro->fields['estado'], 'onchange="RevisarPagado(this.value);"', '', 150); ?>
-                                <input type="hidden" id="estado_motivo" name="estado_motivo" />
-                            </div>
+								<input type="hidden" id="estado_motivo" name="estado_motivo" />
+							</div>
 							<?php if (Conf::GetConf($sesion, 'InformarContabilidad')) { ?>
 								<div style="float:left;">
 									<input type="button" class="integracion" id="parainfo" value="<?php echo __('Informar a Contabilidad') ?>" rel="<?php echo $cobro->fields['estado_contabilidad'] ?>" />
@@ -1504,20 +1498,20 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 								echo "&nbsp;";
 							}
 							?>
-                        </td>
-                    </tr>
-                </table>
+						</td>
+					</tr>
+				</table>
                 <!-- Fin del Estado del cobro -->
 
                 <!-- Fin Cabecera -->
 
-								<table id="cajafacturas" >
+				<table id="cajafacturas" >
 
-								</table>
+				</table>
 
-                       </div>
-<br class="clearfix"/>
-<div id="historial">
+			</div>
+			<br class="clearfix"/>
+			<div id="historial">
                             <table cellspacing="0" cellpadding="3" style='width:670px;'>
                                 <tr>
                                     <td width="220px"  >
