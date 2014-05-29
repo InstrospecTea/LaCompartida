@@ -1780,12 +1780,14 @@ class Factura extends Objeto {
 		if ($this->Loaded()) {
 			$n = $this->fields['numero'];
 			$serie = $this->fields['serie_documento_legal'];
+
 		} else if (!empty($id_factura)) {
 			$query = "SELECT serie_documento_legal, numero FROM factura WHERE id_factura = {$id_factura}";
 			$serie_numero = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($serie, $n) = mysql_fetch_array($serie_numero);
 		} else if (!empty($numero)) {
 			$n = $numero;
+
 		}
 		if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
 			$serie = empty($serie) ? '001' : $serie;
@@ -2105,10 +2107,10 @@ class Factura extends Objeto {
 
 		// Obtengo la query del reporte
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
-			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
-			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
+				, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+				, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+				, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+				, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		// Cambio los select para obtener los saldos de las facturas separados por moneda
 		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, -1 * SUM(cta_cte_fact_mvto.saldo) AS saldo";
@@ -2129,11 +2131,6 @@ class Factura extends Objeto {
 	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		global $query, $where, $groupby;
-
-		// if ($orden == "") {
-		// 	$orden = "factura.fecha DESC";
-		// 	$orderby = " ORDER BY $orden ";
-		// }
 
 		if ($where == '') {
 			$where = 1;
@@ -2157,7 +2154,6 @@ class Factura extends Objeto {
 			}
 
 			if ($codigo_cliente) {
-				//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
 				$where .= " AND cobro.codigo_cliente='" . $codigo_cliente . "' ";
 			}
 			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
