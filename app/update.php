@@ -10379,6 +10379,15 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.72:
+			$queries = array();
+			if(!ExisteCampo('cta_corriente','nro_seguimiento',$dbh)){
+				$queries[] = "ALTER TABLE `cta_corriente` ADD `nro_seguimiento` INT(11) NULL AFTER `estado_pago`;";
+				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '1', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 

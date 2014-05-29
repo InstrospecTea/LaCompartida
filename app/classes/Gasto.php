@@ -491,6 +491,26 @@ class Gasto extends Objeto {
 		return $query;
 	}
 
+	public static function VerificaIdentificador($sesion, $identificador, $id_gasto = null) {
+		$criteria = new Criteria($sesion);
+		$criteria
+			->add_select('Count(*)', 'existe')
+			->add_from('cta_corriente');
+
+		if (!empty($id_gasto)) {
+			$criteria->add_restriction(CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('nro_seguimiento',$identificador),
+					CriteriaRestriction::not_equal('id_movimiento', $id_gasto)
+				));
+		}
+		else{
+			$criteria->add_restriction(CriteriaRestriction::equals('nro_seguimiento', $identificador));
+		}
+
+		$result = $criteria->run();
+		return $result[0]['existe'];
+	}
+
 	public static function TotalCuentaCorriente($sesion, $where = '1', $cobrable = 1, $array = false) {
 
 		if ($cobrable != '' && Conf::GetConf($sesion, 'UsarGastosCobrable')) {

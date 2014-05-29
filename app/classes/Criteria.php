@@ -53,6 +53,19 @@ class Criteria
 	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
 	 * @return Array asociativo de resultados.
 	 */
+	public function run() {
+		if ($this->sesion == null) {
+			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
+		}
+		$statement = $this->sesion->pdodbh->prepare($this->get_plain_query());
+		$statement->execute();
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
+	 * @return Array asociativo de resultados.
+	 */
 	public function excecute() {
 		if ($this->sesion == null) {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
