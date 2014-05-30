@@ -28,6 +28,7 @@ class Criteria
 	private $ordering = ' ORDER BY';
 	private $left_joining = ' LEFT JOIN';
 	private $limit = '';
+	private $order_criteria = '';
 
 	/*
 		CRITERIA SCOPE ENVELOPERS.
@@ -54,19 +55,6 @@ class Criteria
 	 * @return Array asociativo de resultados.
 	 */
 	public function run() {
-		if ($this->sesion == null) {
-			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
-		}
-		$statement = $this->sesion->pdodbh->prepare($this->get_plain_query());
-		$statement->execute();
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
-	}
-
-	/**
-	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
-	 * @return Array asociativo de resultados.
-	 */
-	public function excecute() {
 		if ($this->sesion == null) {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
 		}
@@ -175,7 +163,7 @@ class Criteria
 	 * @param CriteriaRestriction $restriction
 	 * @return Criteria
 	 */
-	public function add_restriction(CriteriaRestriction $restriction){
+	public function add_restriction(CriteriaRestriction $restriction) {
 		$this->where_clauses[] = $restriction->get_restriction();
 		return $this;
 	}
@@ -185,7 +173,7 @@ class Criteria
 	 * @param string $group_entity
 	 * @return Criteria
 	 */
-	public function add_grouping($group_entity){
+	public function add_grouping($group_entity) {
 		$this->grouping_clauses[] = $group_entity;
 		return $this;
 	}
@@ -195,9 +183,24 @@ class Criteria
 	 * @param string $order
 	 * @return Criteria
 	 */
-	public function add_ordering($order_entity){
+	public function add_ordering($order_entity) {
 		$this->ordering_clauses[] = $order_entity;
 		return $this;
+	}
+
+	/**
+	 * Establece el criterio de ordenamiento para criteria.
+	 * @param [type] $ordering_criteria [description]
+	 */
+	public function add_ordering_criteria($ordering_criteria) {
+		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
+			$this->order_criteria = $ordering_criteria;
+			return $this;
+		} else {
+			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $ordering_criteria. '.');
+		}
+
+		
 	}
 
 	/*
@@ -276,8 +279,15 @@ class Criteria
 	 * @return string
 	 */
 	private function generate_ordering_statement(){
+		
+		$order_criteria = 'ASC';
+
+		if (!empty($this->order_criteria)) {
+			$order_criteria = $this->order_criteria;
+		}
+
 		if(count($this->ordering_clauses) > 0){
-			return $this->ordering." ".implode(',', $this->ordering_clauses);
+			return $this->ordering." ".implode(',', $this->ordering_clauses).' '.$order_criteria;
 		}
 		else{
 			return '';

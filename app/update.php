@@ -10384,7 +10384,18 @@ QUERY;
 			$queries = array();
 			if(!ExisteCampo('cta_corriente','nro_seguimiento',$dbh)){
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `nro_seguimiento` INT(11) NULL AFTER `estado_pago`;";
-				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '1', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
+				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '0', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
+				$queries[] = "CREATE TABLE `prm_nro_seguimiento_gasto` (
+                            `id_nro_seguimiento_gasto` INT NOT NULL AUTO_INCREMENT,
+                            `id_ultimo_gasto_modificado` INT NOT NULL,
+                            `nro_seguimiento` INT NOT NULL,
+                            PRIMARY KEY (`id_nro_seguimiento_gasto`),
+                            INDEX `fk_prm_nro_seguimiento_gasto_1_idx` (`id_ultimo_gasto_modificado` ASC),
+                            CONSTRAINT `fk_prm_nro_seguimiento_gasto_1`
+                            FOREIGN KEY (`id_ultimo_gasto_modificado`)
+                            REFERENCES `cta_corriente` (`id_movimiento`)
+                            ON DELETE NO ACTION
+                           ON UPDATE NO ACTION);";
 			}
 			ejecutar($queries, $dbh);
 			break;
@@ -10397,7 +10408,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.71;
+$max_update = 7.72;
 
 
 $force = 0;

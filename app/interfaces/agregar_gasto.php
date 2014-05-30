@@ -2,6 +2,8 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('OFI'));
+
+
 $pagina = new Pagina($sesion);
 $id_usuario = isset($id_usuario) ? $id_usuario : $sesion->usuario->fields['id_usuario'];
 
@@ -24,6 +26,22 @@ if (($gasto->Loaded() && $gasto->fields['egreso'] > 0 ) || $prov == 'false') {
 	$txt_pagina = $id_gasto ? __('Edición de Provisión') : __('Ingreso de Provisión');
 	$txt_tipo = __('Provisión');
 	$prov = 'true';
+}
+
+if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
+	$criteria = new Criteria($sesion);
+	$criteria
+		->add_select('nro_seguimiento')
+		->add_from('prm_nro_seguimiento_gasto')
+		->add_ordering('id_nro_seguimiento_gasto')
+		->add_ordering_criteria('DESC')
+		->add_limit(1);
+	$result = $criteria->run();
+	if(empty($result)){
+		$proposed = 1;
+	} else {
+		$proposed = $result[0]['nro_seguimiento'] + 1;
+	}
 }
 
 if ($opcion == "guardar") {
@@ -96,6 +114,7 @@ if ($opcion == "guardar") {
 			}
 		}
 
+
 		$gasto->Edit("fecha", Utiles::fecha2sql($fecha));
 		$gasto->Edit("id_usuario", $id_usuario);
 		$gasto->Edit("descripcion", $descripcion);
@@ -108,7 +127,7 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
 		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
-		$gasto->Edit("nro_seguimiento", $autoincrementable ? $autoincrementable : "NULL");
+		
 
 		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
@@ -134,12 +153,19 @@ if ($opcion == "guardar") {
 		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
 		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
 
-		if (!Conf::GetConf($sesion, 'AñadeAutoincrementable')) {
+		if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
 			if (Gasto::VerificaIdentificador($sesion, $autoincrementable, $id_gasto) == "1"){
 				$info = 'No se ha podido guardar los cambios debido a que el identificador ingresado ya está en uso, por favor asigne otro.';
 				$pagina->AddInfo($info);
-
 			} else {
+				if (empty($gasto->fields['nro_seguimiento'])) {
+					Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+				} else {
+					if ($autoincrementable != $gasto->fields['nro_seguimiento'] ) {
+						Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+					}
+				}
+				$gasto->Edit("nro_seguimiento", $autoincrementable ? $autoincrementable : "NULL");
 				if ($gasto->Write()) {
 					$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
 				}
@@ -190,7 +216,7 @@ $pagina->PrintTop($popup);
 			monto = monto_cobrable;
 		}
 
-		<?php if (!Conf::GetConf($sesion, 'AñadeAutoincrementable')) { ?>
+		<?php if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) { ?>
 
 			var identificador = parseInt(jQuery('#autoincrementable').val());
 			jQuery('#autoincrementable').val(identificador);
@@ -502,7 +528,7 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 
-		<?php if (!Conf::GetConf($sesion, 'AñadeAutoincrementable')) { ?>
+		<?php if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) { ?>
 			<tr>
 				<td align="right">
 					<?php echo __('Identificador'); ?>
