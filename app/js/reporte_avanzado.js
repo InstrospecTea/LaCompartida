@@ -362,9 +362,9 @@ function CargarReporte() {
 		}
 
 		Agrupadores(0);
-		TipoDato();
 		jQuery('input[name="fecha_corta"]:checked').click();
 	}
+	TipoDato();
 }
 
 function Agrupadores(num) {
@@ -809,11 +809,7 @@ jQuery(document).ready(function() {
 		jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
 
 		jQuery('#vista').val(vista.join('-'));
-		jQuery.ajax({
-			url: "reporte_avanzado_planilla.php?ajax=1&vista=" + jQuery('#vista').val(),
-			data: jQuery('#formulario').serialize(),
-			type: 'POST'
-		}).done(function(data) {
+		jQuery.post('reporte_avanzado_planilla.php?ajax=1&vista=' + jQuery('#vista').val(), jQuery('#formulario').serialize(), function(data) {
 			jQuery('#iframereporte').html(data);
 		});
 	});
@@ -856,16 +852,14 @@ jQuery(document).ready(function() {
 		return;
 
 	});
+
 	CargarReporte();
-	RevisarMoneda();
-	RevisarCircular();
-	RevisarTabla();
-	Comparar();
+	TipoDato();
 
 	jQuery('.boton_tipo_dato').click(function() {
 		TipoDato(jQuery(this).attr('id'));
 	});
-	
+
 	jQuery('.agrupador').change(function() {
 		var name = jQuery(this).attr('id').split('_');
 		var num = parseInt(name[1]);
