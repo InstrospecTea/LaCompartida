@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.2.6
+Viernes 30 de Mayo 2014
+* **Fixed:** [Corrección formato de fechas para componente Excel](https://github.com/LemontechSA/ttb/pull/522)
+
 ## Hotfix: 14.2.5
 Miercoles 28 de Mayo 2014
 * **Fixed:** [Correccion a Antiguedad deuda cliente](https://github.com/LemontechSA/ttb/pull/519)
