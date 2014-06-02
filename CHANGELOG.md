@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 14.2.7
+Lunes 02 de junio 2014
+* **Fixed:** [Corrige errores reporte avanzado](https://github.com/LemontechSA/ttb/pull/524)
 
 ## Hotfix: 14.2.6
 Viernes 30 de Mayo 2014

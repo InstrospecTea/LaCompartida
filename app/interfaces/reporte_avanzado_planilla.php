@@ -2,12 +2,11 @@
 require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('REP'));
 $agrupadores = explode('-', $vista);
+header('Content-Type: text/html; charset=iso-8859-1');
 
 if (!$ajax) {
 	$pagina = new Pagina($sesion);
 	$pagina->PrintTop(1);
-} else {
-	ob_start();
 }
 
 $email_style = array();
@@ -524,7 +523,4 @@ if (sizeof($r) == 2) {
 <?php
 if (!$ajax) {
 	$pagina->PrintBottom($popup);
-} else {
-	$html = ob_get_clean();
-	echo utf8_encode($html);
 }
