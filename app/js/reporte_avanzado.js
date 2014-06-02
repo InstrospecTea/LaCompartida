@@ -103,7 +103,7 @@ function serializeFormulario() {
 		'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto',
 		'clientesF', 'codigo_contrato', 'comparar', 'encargados', 'estado_cobro', 'proporcionalidad',
 		'moneda_contrato', 'tipo_dato', 'tipo_dato_check', 'tipo_dato_comparado',
-		'tipo_asunto', 'usuariosF', 'usuarios', 'clientes', 'fecha_corta', 'nuevo_reporte_segun', 'id_moneda'];
+		'tipo_asunto', 'usuariosF', 'usuarios', 'clientes', 'fecha_corta', 'nuevo_reporte_segun', 'id_moneda', 'limitar', 'limite', 'agrupar'];
 
 	var datos = jQuery.parseParams(jQuery('#formulario').serialize());
 	var ftt = {};
