@@ -10387,7 +10387,7 @@ QUERY;
 				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '0', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
 				$queries[] = "CREATE TABLE `prm_nro_seguimiento_gasto` (
                             `id_nro_seguimiento_gasto` INT NOT NULL AUTO_INCREMENT,
-                            `id_ultimo_gasto_modificado` INT NOT NULL,
+                            `id_ultimo_gasto_modificado` INT NULL,
                             `nro_seguimiento` INT NOT NULL,
                             PRIMARY KEY (`id_nro_seguimiento_gasto`),
                             INDEX `fk_prm_nro_seguimiento_gasto_1_idx` (`id_ultimo_gasto_modificado` ASC),
@@ -10395,7 +10395,7 @@ QUERY;
                             FOREIGN KEY (`id_ultimo_gasto_modificado`)
                             REFERENCES `cta_corriente` (`id_movimiento`)
                             ON DELETE NO ACTION
-                           ON UPDATE NO ACTION);";
+                            ON UPDATE NO ACTION);";
 			}
 			ejecutar($queries, $dbh);
 			break;

@@ -511,15 +511,19 @@ class Gasto extends Objeto {
 		return $result[0]['existe'];
 	}
 
-	public static function ActualizaUltimoIdentificador($sesion, $id_gasto, $identificador) {
+	public static function ActualizaUltimoIdentificador($sesion, $id_gasto = null, $identificador) {
 		# 
 		# Insertar tracking en tabla prm_nro_seguimiento_gasto
 		# 
 		$insertCriteria = new InsertCriteria($sesion);
 		$insertCriteria
-				->add_pivot_with_value('id_ultimo_gasto_modificado', $id_gasto)
 				->add_pivot_with_value('nro_seguimiento', $identificador)
 				->set_into('prm_nro_seguimiento_gasto');
+		
+		if (!empty($id_gasto)) {
+			$insertCriteria->add_pivot_with_value('id_ultimo_gasto_modificado', $id_gasto);
+		}
+
 		$insertCriteria->run();
 	}
 
