@@ -44,6 +44,7 @@ for ($i = (date('Y') - 5); $i < (date('Y') + 5); ++$i) {
 }
 
 $pagina = new Pagina($sesion);
+$Form = new Form();
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 
 $mis_reportes = array();
@@ -402,7 +403,7 @@ if (!$popup) {
 						<legend><?php echo __('Mis Reportes') ?></legend>
 						<div>
 							<div style="float:right" align=right>
-								<input type=button value="<?php echo __('Nuevo Reporte') ?>" onclick="NuevoReporte()"  />
+								<?php echo $Form->button(__('Nuevo Reporte'), array('onclick' => 'NuevoReporte()')); ?>
 							</div>
 							<div>
 								<select name="mis_reportes_elegido" id="mis_reportes"  >
@@ -1080,12 +1081,15 @@ if (!$popup) {
 							<tr>
 								<td align="center" colspan="5">
 									<br/>
-									<a href="javascript:void(0)" class="btn botonizame" id="runreporte" name="runreporte" icon="code">Planilla</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="excel" name="excel" icon="xls"  title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'excel');">Excel</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="dispersion" name="dispersion" icon="icon-chart"   title="Genera la Planilla como un Documento Excel." onclick="Generar(jQuery('#formulario').get(0), 'dispersion');">Dispersión</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="tabla" name="tabla" icon="icon-table" title="Genera un Documento Excel con una tabla cruzada." onclick="Generar(jQuery('#formulario').get(0), 'tabla');">Tabla</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="barras" name="barras" icon="icon-bar" title="Despliega un Gráfico de Barras, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'barra');">Barras</a>
-									<a href="javascript:void(0)" class="btn botonizame" id="circular" name="circular"  icon="pie-chart" title="Despliega un Gráfico de Torta, usando el primer Agrupador." onclick="Generar(jQuery('#formulario').get(0), 'circular');">Gráfico Torta</a>
+									<?php
+									echo $Form->icon_button('Planilla', 'code', array('name' => 'runreporte', 'id' => 'runreporte'));
+									echo $Form->icon_button('Excel', 'xls', array('name' => 'excel', 'id' => 'excel', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'excel');"));
+									echo $Form->icon_button('Dispersión', 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'dispersion');"));
+									echo $Form->icon_button('Tabla', 'icon-table', array('name' => 'tabla', 'id' => 'tabla', 'title' => 'Genera un Documento Excel con una tabla cruzada.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'tabla');"));
+									echo $Form->icon_button('Barras', 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gráfico de Barras, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'barra');"));
+									echo $Form->icon_button('Gráfico Torta', 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');"));
+									echo $Form->script();
+									?>
 								</td>
 								<td style="width: 100px; font-size: 11px;">
 									<label for="comparar"><?php echo __('Comparar') ?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" title='Comparar' />
