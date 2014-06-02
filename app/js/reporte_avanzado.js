@@ -484,7 +484,7 @@ function Comparar() {
 
 function TipoDato(valor, noSet) {
 	var comparar = jQuery('#comparar').is(':checked');
-	var tinta = jQuery('[name="tinta"]:checked').val();
+	var tinta = comparar ? jQuery('[name="tinta"]:checked').val() : 'rojo';
 
 	if (valor && !noSet) {
 		if (jQuery('#' + valor).hasClass('boton_disabled')) {
