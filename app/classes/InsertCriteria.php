@@ -98,6 +98,5 @@ class InsertCriteria
 		throw new Exception("No implementado aún.");
 	}
 
-}
 
-?>
+}

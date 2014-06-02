@@ -36,6 +36,7 @@ class CriteriaRestriction {
 		return $this->restriction;
 	}
 
+
 	/*
 	  STATIC RESTRICTION GENERATORS
 	 */

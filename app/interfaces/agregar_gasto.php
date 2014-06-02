@@ -178,6 +178,7 @@ if ($opcion == "guardar") {
 	}
 }
 
+
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
 ?>

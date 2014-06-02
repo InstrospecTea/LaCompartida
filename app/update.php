@@ -10397,6 +10397,7 @@ QUERY;
                             ON DELETE NO ACTION
                             ON UPDATE NO ACTION);";
 			}
+			
 			ejecutar($queries, $dbh);
 			break;
 	}

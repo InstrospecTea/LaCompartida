@@ -511,6 +511,7 @@ class Gasto extends Objeto {
 		return $result[0]['existe'];
 	}
 
+
 	public static function ActualizaUltimoIdentificador($sesion, $id_gasto = null, $identificador) {
 		# 
 		# Insertar tracking en tabla prm_nro_seguimiento_gasto
