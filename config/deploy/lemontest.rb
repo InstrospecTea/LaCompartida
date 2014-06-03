@@ -19,15 +19,14 @@ set :deploy_to, "#{base_directory}/#{file_path}"
 namespace :deploy do
  
   task:init_cache_dir do
-    run "if [[ ! -d #{deploy_to}/shared ]; then mkdir -p #{deploy_to}/shared; cp -r /var/www/html/deploy/time_tracking/cached-copy/ #{deploy_to}/shared/cached-copy; fi"
-    #run "cp -r /var/www/html/deploy/time_tracking/cached-copy/ #{deploy_to}/shared/cached-copy"
+    run "/var/www/html/deploy/time_tracking/pre-cache #{deploy_to}"
   end
 
   task :update_symlinks do
     update_symlinks(self)
   end
 
-    task :expose_vars do
+  task :expose_vars do
     expose_vars(self)
   end
 
