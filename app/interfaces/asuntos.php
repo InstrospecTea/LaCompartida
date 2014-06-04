@@ -179,18 +179,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan=4>
-						<?php
-						if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
-							echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente,$codigo_cliente_secundario);
-						} else {
-							?>
-							<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?php echo $codigo_asunto; ?>" onchange="this.value=this.value.toUpperCase();">
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<b><?php echo __('T&iacute;tulo asunto'); ?></b>
-							<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?php echo $glosa_asunto; ?>">
-							<?php
-						}
-						?>
+						<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 					</td>
 				</tr>
 				<tr>
