@@ -1,0 +1,8 @@
+I WANT TO CHECK THAT LOGIN FAILS WITH INCORRECT LOGIN CREDENTIALS
+
+I am on page "/"
+I fill field "input[name=rut]","99511620"
+I fill field "input[name=dvrut]","0"
+I fill field "input[name=password]","admin"
+I click "input[type=submit]"
+I see "RUT o password invu00e1lidos"

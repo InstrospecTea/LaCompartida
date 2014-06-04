@@ -12,12 +12,16 @@ class Html extends \Html {
 
 	/**
 	 * Construye un tag html
+	 * @param type $tag
+	 * @param type $content
+	 * @param type $attributes
+	 * @param type $closed
+	 * @return type
 	 */
-	public static function tag($tag = 'div', $content = '', $attributes = null, $closed = false) {
+	public function tag($tag = 'div', $content = '', $attributes = null, $closed = false) {
 		$html = '';
 
-
-		$attributes = is_array($attributes) ? self::attributes($attributes) : $attributes;
+		$attributes = is_array($attributes) ? $this->attributes($attributes) : $attributes;
 
 		if ($closed) {
 			$html = sprintf('<%s%s />', $tag, $attributes);
@@ -28,6 +32,11 @@ class Html extends \Html {
 		return $html;
 	}
 
+	/**
+	 *
+	 * @param type $attributes
+	 * @return type
+	 */
 	public function attributes($attributes) {
 		$html = '';
 		if (is_array($attributes)) {

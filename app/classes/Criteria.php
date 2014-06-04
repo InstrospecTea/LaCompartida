@@ -2,18 +2,18 @@
 
 /**
  * 
- * Clase que permite generar criterios de bÃºsqueda contra el medio persistente (a.k.a una query de base de datos).
+ * Clase que permite generar criterios de búsqueda contra el medio persistente (a.k.a una query de base de datos).
  * 
  * TODO Declaration (@dochoaj):
- * 	La implementaciÃ³n estÃ¡ basada en lo mÃ­nimo indispensable para resolver el problema de los reportes. No obstante,
- * a medida de que pase el tiempo y se depure el uso, se puede cambiar a una implementaciÃ³n mediante el uso de reflection en PHP, para
+ * 	La implementación está basada en lo mínimo indispensable para resolver el problema de los reportes. No obstante,
+ * a medida de que pase el tiempo y se depure el uso, se puede cambiar a una implementación mediante el uso de reflection en PHP, para
  * reducir la cantidad de querys repartidas por los distintos archivos del software.
  * 
  */
 class Criteria
 {
 	/**
-	 * Permite generar una conexiÃ³n con el medio persistente.
+	 * Permite generar una conexión con el medio persistente.
 	 * @var [type]
 	 */
 	private $sesion;
@@ -43,9 +43,23 @@ class Criteria
 	 * Constructor de la clase.
 	 * @param $sesion
 	 */
-	function __construct($sesion)
+	function __construct($sesion = null)
 	{
 		$this->sesion = $sesion;
+	}
+
+
+	/**
+	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
+	 * @return Array asociativo de resultados.
+	 */
+	public function excecute() {
+		if ($this->sesion == null) {
+			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
+		}
+		$statement = $this->sesion->pdodbh->prepare($this->get_plain_query());
+		$statement->execute();
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/*
@@ -53,7 +67,7 @@ class Criteria
 	 */
 
 	/**
-	 * AÃ±ade un statement de selecciÃ³n al criterio de bÃºsqueda.
+	 * Añade un statement de selección al criterio de búsqueda.
 	 * @param string $attribute
 	 * @param string $alias
 	 * @return Criteria
@@ -72,7 +86,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade un limite a la cantidad de resultados
+	 * Añade un limite a la cantidad de resultados
 	 * @param  $limit Numero de resutlados
 	 */
 	public function add_limit($limit){
@@ -81,12 +95,12 @@ class Criteria
 			return $this;
 		}
 		else{
-			throw new Exception('ParÃ¡metro asociado al limite de resultados de la query es errÃ³neo. Se esperaba un entero mayor que cero, se obtuvo: '."$limit");
+			throw new Exception('Criteria dice: Parámetro asociado al limite de resultados de la query es erróneo. Se esperaba un entero mayor que cero, se obtuvo: '."$limit");
 		}
 	}
 
 	/**
-	 * AÃ±ade una tabla al scope de bÃºsqueda al criteria.
+	 * Añade una tabla al scope de búsqueda al criteria.
 	 * @param string $table
 	 * @param string $alias
 	 * @return Criteria
@@ -102,7 +116,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade un criteria al scope de bÃºsqueda de este criteria.
+	 * Añade un criteria al scope de búsqueda de este criteria.
 	 * @param Criteria $criteria
 	 * @param string   $alias
 	 * @return Criteria
@@ -115,7 +129,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade un scope de bÃºsqueda mediante un LEFT JOIN al criteria.
+	 * Añade un scope de búsqueda mediante un LEFT JOIN al criteria.
 	 * @param  string $join_table
 	 * @param  string $join_condition
 	 * @return Criteria
@@ -129,7 +143,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade un criteria al scope de bÃºsqueda a travÃ©s de un left join con este crtieria.
+	 * Añade un criteria al scope de búsqueda a través de un left join con este crtieria.
 	 * @param Criteria $criteria
 	 * @param string   $alias
 	 * @param string   $join_condition
@@ -144,7 +158,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade una restricciÃ³n al criterio de bÃºsqueda.
+	 * Añade una restricción al criterio de búsqueda.
 	 * @param CriteriaRestriction $restriction
 	 * @return Criteria
 	 */
@@ -154,7 +168,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade una condiciÃ³n de agrupamiento al criterio de bÃºsqueda.
+	 * Añade una condición de agrupamiento al criterio de búsqueda.
 	 * @param string $group_entity
 	 * @return Criteria
 	 */
@@ -164,7 +178,7 @@ class Criteria
 	}
 
 	/**
-	 * AÃ±ade una condiciÃ³n de ordenamiento al criterio de bÃºsqueda.
+	 * Añade una condición de ordenamiento al criterio de búsqueda.
 	 * @param string $order
 	 * @return Criteria
 	 */
@@ -180,21 +194,21 @@ class Criteria
 	/**
 	 * Genera el statement de SELECT de una query.
 	 * @return string
-	 * @throws Exception Cuando no se ha definido un criterio de selecciÃ³n.
+	 * @throws Exception Cuando no se ha definido un criterio de selección.
 	 */
 	private function generate_select_statement(){
 		if(count($this->select_clauses) > 0){
 			return $this->select." ".implode(',', $this->select_clauses);
 		}
 		else{
-			throw new Exception('Criteria dice: No se han definido criterios de selecciÃ³n. No es correcto asumir SELECT *. ');
+			throw new Exception('Criteria dice: No se han definido criterios de selección. No es correcto asumir SELECT *. ');
 		}
 	}
 
 	/**
 	 * Genera el statement de FROM de una query.
 	 * @return string
-	 * @throws Exception  Cuando no se ha definido un scope de bÃºsqueda.
+	 * @throws Exception  Cuando no se ha definido un scope de búsqueda.
 	 */
 	private function generate_from_statement(){
 		if(count($this->from_clauses) > 0){
@@ -257,12 +271,14 @@ class Criteria
 		}
 	}
 
+
+
 	/*
 		QUERY ACCESS METHODS
 	 */
 	
 	/**
-	 * Obtiene la versiÃ³n 'raw' de la query generada.
+	 * Obtiene la versión 'raw' de la query generada.
 	 * @return string
 	 */
 	public function get_plain_query(){
