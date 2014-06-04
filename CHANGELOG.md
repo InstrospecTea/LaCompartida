@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix: 14.2.10
 Miércoles 04 de junio 2014
-* **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/527)
+* **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/528)
 
 ## Hotfix: 14.2.9
 Miércoles 04 de junio 2014
