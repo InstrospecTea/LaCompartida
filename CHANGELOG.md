@@ -1,11 +1,15 @@
 # Changelog
+## Hotfix: 14.2.10
+Miércoles 04 de junio 2014
+* **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/527)
+
 ## Hotfix: 14.2.9
-Lunes 02 de junio 2014
-* **Fixed:** [Agrega lang es_colombia](https://github.com/LemontechSA/ttb/pull/525)
+Miércoles 04 de junio 2014
+* **Fixed:** [Agrega lang es_colombia](https://github.com/LemontechSA/ttb/pull/526)
 
 ## Hotfix: 14.2.8
 Lunes 02 de junio 2014
-* **Fixed:** [Hice cosas pero se me olvido cambiar el changelog](https://github.com/LemontechSA/ttb/pull/525)
+* **Fixed:** [Guarda los campos 'limitar', 'limite' y 'agrupar' del reporte avanzado.](https://github.com/LemontechSA/ttb/pull/525)
 
 ## Hotfix: 14.2.7
 Lunes 02 de junio 2014
