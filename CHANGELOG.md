@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.2.9
+Lunes 02 de junio 2014
+* **Fixed:** [Agrega lang es_colombia](https://github.com/LemontechSA/ttb/pull/525)
+
 ## Hotfix: 14.2.8
 Lunes 02 de junio 2014
 * **Fixed:** [Hice cosas pero se me olvido cambiar el changelog](https://github.com/LemontechSA/ttb/pull/525)
