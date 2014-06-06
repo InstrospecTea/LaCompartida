@@ -179,18 +179,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan=4>
-						<?php
-						if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
-							echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente,$codigo_cliente_secundario);
-						} else {
-							?>
-							<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?php echo $codigo_asunto; ?>" onchange="this.value=this.value.toUpperCase();">
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<b><?php echo __('T&iacute;tulo asunto'); ?></b>
-							<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?php echo $glosa_asunto; ?>">
-							<?php
-						}
-						?>
+						<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 					</td>
 				</tr>
 				<tr>
@@ -245,11 +234,18 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 if ($busqueda) {
 	$link = "Opciones";
 } else {
-	$link = __('Cobrar') . " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Todos') . "</a>";
+	$link = __('Cobrar');
+	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
+
 }
 
 if ($checkall == '1') {
 	CheckAll($id_cobro, $codigo_cliente);
+}
+
+if ($uncheckall == '1') {
+	UncheckAll($id_cobro, $codigo_cliente);
 }
 
 global $query, $where,$b;

@@ -51,6 +51,7 @@ class Factura extends Objeto {
 		'comuna_cliente' => 'Comuna Cliente',
 		'factura_codigopostal' => 'Código Postal Cliente',
 		'ciudad_cliente' => 'Ciudad Cliente',
+		'estado_cliente' => 'Estado Cliente',
 		'giro_cliente' => 'Giro Cliente',
 		'subtotal' => array(
 			'titulo' => 'Subtotal Honorarios',
@@ -344,8 +345,9 @@ class Factura extends Objeto {
 							AND ccfm.id_moneda = ccfmm.id_moneda )
 						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto
 							AND ccfmmbase.id_moneda = fp.id_moneda )
-					WHERE f.id_factura =  '$id_factura'
-						OR ( f.id_factura_padre = '$id_factura' AND pef.glosa NOT LIKE '%ANULADO%' );"; //11357
+					WHERE f.id_factura =  '$id_factura';"; //11357
+                
+                //echo $query; exit;
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $valor_real ) = mysql_fetch_array($resp);
 
@@ -560,23 +562,23 @@ class Factura extends Objeto {
 
 	function ReemplazarMargenes($html) {
 		$espacios_monto_palabra = "";
-		for ($i = 0; $i < UtilesApp::GetConf($this->sesion, 'EspacioMontoPalabra'); $i++) {
+		for ($i = 0; $i < Conf::GetConf($this->sesion, 'EspacioMontoPalabra'); $i++) {
 			$espacios_monto_palabra .= "&nbsp;";
 		}
-		$html = str_replace('%espacio_encabezado%', UtilesApp::GetConf($this->sesion, 'EspacioEncabezado'), $html);
-		$html = str_replace('%margen_izquierda_rsocial%', UtilesApp::GetConf($this->sesion, 'MargenIzquierdaRsocial'), $html);
-		$html = str_replace('%espacio_cuerpo%', UtilesApp::GetConf($this->sesion, 'EspacioCuerpo'), $html);
+		$html = str_replace('%espacio_encabezado%', Conf::GetConf($this->sesion, 'EspacioEncabezado'), $html);
+		$html = str_replace('%margen_izquierda_rsocial%', Conf::GetConf($this->sesion, 'MargenIzquierdaRsocial'), $html);
+		$html = str_replace('%espacio_cuerpo%', Conf::GetConf($this->sesion, 'EspacioCuerpo'), $html);
 		$html = str_replace('%espacios_monto_palabra%', $espacios_monto_palabra, $html);
-		$html = str_replace('%margen_derecha_cuerpo%', UtilesApp::GetConf($this->sesion, 'MargenDerechaCuerpo'), $html);
-		$html = str_replace('%ancho_columna_dia%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaDia'), $html);
-		$html = str_replace('%ancho_columna_mes%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaMes'), $html);
-		$html = str_replace('%ancho_columna_anyo%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaAnyo'), $html);
-		$html = str_replace('%ancho_columna_base_encabezado%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaBaseEncabezado'), $html);
-		$html = str_replace('%ancho_columna_base_cuerpo%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaBaseCuerpo'), $html);
-		$html = str_replace('%margen_izquierda_cuerpo%', UtilesApp::GetConf($this->sesion, 'MargenIzquierdaCuerpo'), $html);
-		$html = str_replace('%ancho_columna_monto_subtotal%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaMontoSubtotal'), $html);
-		$html = str_replace('%ancho_columna_monto_iva%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaMontoIVA'), $html);
-		$html = str_replace('%ancho_columna_monto_total%', UtilesApp::GetConf($this->sesion, 'AnchoColumnaMontoTotal'), $html);
+		$html = str_replace('%margen_derecha_cuerpo%', Conf::GetConf($this->sesion, 'MargenDerechaCuerpo'), $html);
+		$html = str_replace('%ancho_columna_dia%', Conf::GetConf($this->sesion, 'AnchoColumnaDia'), $html);
+		$html = str_replace('%ancho_columna_mes%', Conf::GetConf($this->sesion, 'AnchoColumnaMes'), $html);
+		$html = str_replace('%ancho_columna_anyo%', Conf::GetConf($this->sesion, 'AnchoColumnaAnyo'), $html);
+		$html = str_replace('%ancho_columna_base_encabezado%', Conf::GetConf($this->sesion, 'AnchoColumnaBaseEncabezado'), $html);
+		$html = str_replace('%ancho_columna_base_cuerpo%', Conf::GetConf($this->sesion, 'AnchoColumnaBaseCuerpo'), $html);
+		$html = str_replace('%margen_izquierda_cuerpo%', Conf::GetConf($this->sesion, 'MargenIzquierdaCuerpo'), $html);
+		$html = str_replace('%ancho_columna_monto_subtotal%', Conf::GetConf($this->sesion, 'AnchoColumnaMontoSubtotal'), $html);
+		$html = str_replace('%ancho_columna_monto_iva%', Conf::GetConf($this->sesion, 'AnchoColumnaMontoIVA'), $html);
+		$html = str_replace('%ancho_columna_monto_total%', Conf::GetConf($this->sesion, 'AnchoColumnaMontoTotal'), $html);
 
 		return $html;
 	}
@@ -625,11 +627,11 @@ class Factura extends Objeto {
 
 			case 'ENCABEZADO':
 
-				$PdfLinea1 = UtilesApp::GetConf($this->sesion, 'PdfLinea1');
-				$PdfLinea2 = UtilesApp::GetConf($this->sesion, 'PdfLinea2');
-				$PdfLinea3 = UtilesApp::GetConf($this->sesion, 'PdfLinea3');
-				$CiudadSignatura = UtilesApp::GetConf($this->sesion, 'CiudadSignatura');
-				$logo_doc = UtilesApp::GetConf($this->sesion, 'LogoDoc');
+				$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
+				$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
+				$PdfLinea3 = Conf::GetConf($this->sesion, 'PdfLinea3');
+				$CiudadSignatura = Conf::GetConf($this->sesion, 'CiudadSignatura');
+				$logo_doc = Conf::GetConf($this->sesion, 'LogoDoc');
 
 				$html2 = str_replace('%linea1%', $PdfLinea1, $html2);
 				$html2 = str_replace('%linea2%', $PdfLinea2, $html2);
@@ -714,13 +716,13 @@ class Factura extends Objeto {
 					$giro_cliente = $this->fields['giro_cliente'];
 				}
 
-				$MAX = UtilesApp::GetConf($this->sesion, 'AnchoMaximoGlosaCliente');
+				$MAX = Conf::GetConf($this->sesion, 'AnchoMaximoGlosaCliente');
 
 				if ($MAX > 3 && strlen($glosa_cliente) > $MAX) {
 					$glosa_cliente = substr($glosa_cliente, 0, $MAX - 3) . '...';
 				}
 
-				$MAX = UtilesApp::GetConf($this->sesion, 'AnchoMaximoDireccionCliente');
+				$MAX = Conf::GetConf($this->sesion, 'AnchoMaximoDireccionCliente');
 
 				if ($MAX > 3 && strlen($direccion_cliente) > $MAX) {
 					$direccion_cliente = substr($direccion_cliente, 0, $MAX - 3) . '...';
@@ -743,7 +745,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%comuna_cliente%', $comuna_cliente, $html2);
 				$html2 = str_replace('%ciudad_cliente%', $ciudad_cliente, $html2);
 				$html2 = str_replace('%giro_cliente%', $giro_cliente, $html2);
-				$html2 = str_replace('%lugar_facturacion%', UtilesApp::GetConf($this->sesion, 'LugarFacturacion'), $html2);
+				$html2 = str_replace('%lugar_facturacion%', Conf::GetConf($this->sesion, 'LugarFacturacion'), $html2);
 				$html2 = str_replace('%num_dia%', date('d', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo_es, date('M', strtotime($fecha_factura))), $html2);
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
@@ -808,7 +810,7 @@ class Factura extends Objeto {
 			case 'DATOS_FACTURA':
 
 				$select_col = "";
-				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					$select_col = ",
 									factura.descripcion_subtotal_gastos,
 									factura.descripcion_subtotal_gastos_sin_impuesto,
@@ -844,7 +846,7 @@ class Factura extends Objeto {
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					list($factura_id_moneda, $factura_descripcion, $id_cobro, $cobro_id_moneda, $fecha_ini, $fecha_fin, $porcentaje_impuesto, $glosa_moneda, $glosa_moneda_plural, $simbolo, $cifras_decimales, $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios, $subtotal_gastos, $monto_gastos, $impuesto, $total, $descripcion_subtotal_gastos, $descripcion_subtotal_gastos_sin_impuesto, $subtotal_gastos_con_impuesto, $subtotal_gastos_sin_impuesto) = mysql_fetch_array($resp);
 				} else {
 					list($factura_id_moneda, $factura_descripcion, $id_cobro, $cobro_id_moneda, $fecha_ini, $fecha_fin, $porcentaje_impuesto, $glosa_moneda, $glosa_moneda_plural, $simbolo, $cifras_decimales, $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios, $subtotal_gastos, $monto_gastos, $impuesto, $total) = mysql_fetch_array($resp);
@@ -874,7 +876,7 @@ class Factura extends Objeto {
 				}
 
 
-				if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
+				if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 					/* esto habría que mejorarlo en el caso de que se les ocurriera facturar en más de 1 documento */
 					$query_cyc = "SELECT
 									subtotal_honorarios,
@@ -903,16 +905,16 @@ class Factura extends Objeto {
 							$subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
 					$monto_gastos = $subtotal_gastos;
 					$subtotal_gastos_con_impuesto = $subtotal_gastos;
-					if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					if (!Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 						$honorarios = $monto_subtotal;
 					}
 					/* Fin de lo que hay que mejorar */
 				}
 
 				$mostrar_honorarios = true;
-				$array_docs_ocultar = explode(';;', UtilesApp::GetConf($this->sesion, 'EsconderValoresFacturaEnCero'));
+				$array_docs_ocultar = explode(';;', Conf::GetConf($this->sesion, 'EsconderValoresFacturaEnCero'));
 				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
+					if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 						$mostrar_honorarios = ( number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					} else {
 						$mostrar_honorarios = ( number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
@@ -923,7 +925,7 @@ class Factura extends Objeto {
 
 				$mostrar_gastos_con_impuesto = true;
 				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
+					if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					} else {
 						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
@@ -932,7 +934,7 @@ class Factura extends Objeto {
 
 				$mostrar_gastos_sin_impuesto = true;
 				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
+					if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					} else {
 						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
@@ -949,7 +951,7 @@ class Factura extends Objeto {
 
 				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto), $html2);
 
-				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
+				if (Conf::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
 
 					// Lo separo en lineas
 					//$factura_descripcion_separado = explode("\n", __($factura_descripcion));
@@ -980,7 +982,7 @@ class Factura extends Objeto {
 				// como se imprimen en lineas separadas, llevan 1 salto de linea en vez de 2
 				$descripcion_subtotal_gastos = "<br/>" . __($descripcion_subtotal_gastos);
 				$descripcion_subtotal_gastos_sin_impuesto = "<br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
-				if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
+				if (Conf::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 					$factura_descripcion_separado = strtoupper($factura_descripcion_separado);
 					$descripcion_subtotal_gastos = strtoupper($descripcion_subtotal_gastos);
 					$descripcion_subtotal_gastos_sin_impuesto = strtoupper($descripcion_subtotal_gastos_sin_impuesto);
@@ -1008,7 +1010,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%<br><br>%', '<br><br><br><br>', $html2);
 					}
 					if ($mostrar_honorarios) {
-						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
+						if (Conf::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 							$html2 = str_replace('%servicios_periodo%', strtoupper($factura_descripcion_separado), $html2);
 							$html2 = str_replace('%servicios_periodo%', strtoupper('Honorarios por servicios profesionales prestados %fecha_ini% %fecha_fin%'), $html2);
 						} else {
@@ -1043,7 +1045,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Gastos incurridos en su caso, según relación adjunta.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total servicios profesionales y gastos incurridos', $html2);
 					$html2 = str_replace('%pje_impuesto%', $porcentaje_impuesto . '%', $html2);
-					if (UtilesApp::GetConf($this->sesion, 'UsarImpuestoSeparado')) {
+					if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado')) {
 						if (method_exists('Conf', 'GetConf')) {
 							$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . Conf::GetConf($this->sesion, 'ValorImpuesto') . '%)', $html2);
 						} else if (method_exists('Conf', 'ValorImpuesto')) {
@@ -1096,8 +1098,8 @@ class Factura extends Objeto {
 					$html2 = str_replace('%texto_gastos%', 'EXPENSES', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Expenses incurred in this case.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total legal services and expenses', $html2);
-					if (UtilesApp::GetConf($this->sesion, 'UsarImpuestoSeparado')) {
-						$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . UtilesApp::GetConf($this->sesion, 'ValorImpuesto') . '%)', $html2);
+					if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado')) {
+						$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . Conf::GetConf($this->sesion, 'ValorImpuesto') . '%)', $html2);
 					} else {
 						$html2 = str_replace('%texto_impuesto%', '', $html2);
 					}
@@ -1120,11 +1122,11 @@ class Factura extends Objeto {
 					}
 				}
 
-				if (UtilesApp::GetConf($this->sesion, "DescripcionFacturaConAsuntos")) {
+				if (Conf::GetConf($this->sesion, "DescripcionFacturaConAsuntos")) {
 					// Lo separo en lineas
 					$factura_descripcion_con_asuntos = explode("\n", __($factura_descripcion));
 
-					$max_caracter_por_linea = UtilesApp::GetConf($this->sesion, 'MaximoCaracterPorLineaDescripcion');
+					$max_caracter_por_linea = Conf::GetConf($this->sesion, 'MaximoCaracterPorLineaDescripcion');
 
 					if ($max_caracter_por_linea > 0) {
 						$lineas_factura_descripcion = array();
@@ -1143,7 +1145,7 @@ class Factura extends Objeto {
 						$factura_descripcion_con_asuntos = $lineas_factura_descripcion;
 					}
 
-					$max_lineas = UtilesApp::GetConf($this->sesion, 'MaximoLineasDescripcion');
+					$max_lineas = Conf::GetConf($this->sesion, 'MaximoLineasDescripcion');
 
 					if ($max_lineas > 0 && count($factura_descripcion_con_asuntos) > $max_lineas) {
 						$factura_descripcion_con_asuntos = array_slice($factura_descripcion_con_asuntos, 0, $max_lineas);
@@ -1185,7 +1187,7 @@ class Factura extends Objeto {
 
 
 
-				if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
+				if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%monto_honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1351,7 +1353,7 @@ class Factura extends Objeto {
 				  Montos Rebaza-alcazar
 				 */
 
-				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 
 
 					if ($mostrar_honorarios) {
@@ -1360,7 +1362,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%honorarios%', '', $html2);
 					}
 
-					if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
+					if (Conf::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
 						$descripcion_subtotal_gastos_separado = nl2br(__($descripcion_subtotal_gastos));
 						$descripcion_subtotal_gastos_sin_impuesto_separado = nl2br(__($descripcion_subtotal_gastos_sin_impuesto));
 					} else {
@@ -1370,7 +1372,7 @@ class Factura extends Objeto {
 
 					if ($mostrar_gastos_con_impuesto) {
 						$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', $simbolo, $html2);
-						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
+						if (Conf::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', strtoupper($descripcion_subtotal_gastos_separado), $html2);
 						} else {
 							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', $descripcion_subtotal_gastos_separado, $html2);
@@ -1382,10 +1384,10 @@ class Factura extends Objeto {
 						$html2 = str_replace('%subtotal_gastos_con_impuesto%', '&nbsp;', $html2);
 					}
 
-					if (UtilesApp::GetConf($this->sesion, 'UsarGastosConSinImpuesto')) {
+					if (Conf::GetConf($this->sesion, 'UsarGastosConSinImpuesto')) {
 						if ($mostrar_gastos_sin_impuesto) {
 							$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', $simbolo, $html2);
-							if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
+							if (Conf::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', strtoupper($descripcion_subtotal_gastos_sin_impuesto_separado), $html2);
 							} else {
 								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', $descripcion_subtotal_gastos_sin_impuesto_separado, $html2);
@@ -1665,7 +1667,7 @@ class Factura extends Objeto {
 						$glosa_iva = 'VAT ';
 					}
 
-					$porcentaje_impuesto = UtilesApp::GetConf($this->sesion, 'ValorImpuesto');
+					$porcentaje_impuesto = Conf::GetConf($this->sesion, 'ValorImpuesto');
 
 					if ($this->fields['id_documento_legal'] != '5') {
 						$html2 = str_replace('%factura_monto_impuesto%', number_format($factura_monto_impuesto_pesos, $decim, ',', '.'), $html2);
@@ -1776,7 +1778,7 @@ class Factura extends Objeto {
 
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
 		if ($this->Loaded()) {
-			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
+			if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
 
 				$serie = empty($this->fields['serie_documento_legal']) ? '001' : $this->fields['serie_documento_legal'];
 				$n = str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $this->fields['numero'];
@@ -1794,13 +1796,13 @@ class Factura extends Objeto {
 			$query = "SELECT serie_documento_legal, numero FROM factura WHERE id_factura = " . $id_factura;
 			$serie_numero = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($serie, $numero) = mysql_fetch_array($serie_numero);
-			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
+			if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
 				$serie = empty($serie) ? '001' : $serie;
 				return str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $numero;
 			}
 			return $numero;
 		} else if (!empty($numero)) {
-			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
+			if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
 				$serie = empty($serie) ? '001' : $serie;
 				return str_pad($serie, 3, '0', STR_PAD_LEFT) . '-' . $numero;
 			}
@@ -2014,8 +2016,8 @@ class Factura extends Objeto {
 	}
 
 	function ListaDocumentosLegales($cobro) {
-		if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
-			$formato_numero = UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') ? "CONCAT(LPAD(f.serie_documento_legal, 3, '0'), '-', f.numero)" : "f.numero";
+		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			$formato_numero = Conf::GetConf($this->sesion, 'NumeroFacturaConSerie') ? "CONCAT(LPAD(f.serie_documento_legal, 3, '0'), '-', f.numero)" : "f.numero";
 			$query = "SELECT
                         group_concat(idDocLegal) as listaDocLegal
                         FROM (
@@ -2031,7 +2033,7 @@ class Factura extends Objeto {
 			list($lista) = mysql_fetch_array($resp);
 			return $lista;
 		} else {
-			return UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') ? $this->fields['serie_documento_legal'] . '-' . $this->fields['numero'] : $this->fields['numero'];
+			return Conf::GetConf($this->sesion, 'NumeroFacturaConSerie') ? $this->fields['serie_documento_legal'] . '-' . $this->fields['numero'] : $this->fields['numero'];
 		}
 	}
 
@@ -2117,10 +2119,10 @@ class Factura extends Objeto {
 
 		// Obtengo la query del reporte
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
-			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
-			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
+				, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
+				, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
+				, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+				, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		// Cambio los select para obtener los saldos de las facturas separados por moneda
 		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, -1 * SUM(cta_cte_fact_mvto.saldo) AS saldo";
@@ -2142,11 +2144,6 @@ class Factura extends Objeto {
 
 		global $query, $where, $groupby;
 
-		// if ($orden == "") {
-		// 	$orden = "factura.fecha DESC";
-		// 	$orderby = " ORDER BY $orden ";
-		// }
-
 		if ($where == '') {
 			$where = 1;
 			if ($numero != '' && $numero != null && $numero !== false) {
@@ -2159,7 +2156,7 @@ class Factura extends Objeto {
 			} else if ($fecha2) {
 				$where .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 				$cliente = new Cliente($this->sesion);
 				$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
 				$codigo_cliente = $cliente->fields['codigo_cliente'];
@@ -2169,10 +2166,9 @@ class Factura extends Objeto {
 			}
 
 			if ($codigo_cliente) {
-				//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
 				$where .= " AND cobro.codigo_cliente='" . $codigo_cliente . "' ";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 				$asunto = new Asunto($this->sesion);
 				$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
 				$id_contrato = $asunto->fields['id_contrato'];
@@ -2342,10 +2338,10 @@ class Factura extends Objeto {
 		$formato['Acciones'] .= 'var codigo_cliente=o.aData["codigo_cliente"];';
 
 		$formato['Acciones'] .= 'var 	respuesta="<div style=\"white-space: nowrap;\"><a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"nuovaFinestra(\'Editar_Factura\',730,700,\'agregar_factura.php?id_factura="+id_factura+"=&codigo_cliente="+codigo_cliente+"&popup=1\');\" >&nbsp;</a>&nbsp;";';
-		if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaDoc')) {
+		if (Conf::GetConf($this->sesion, 'ImprimirFacturaDoc')) {
 			$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button doc\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirDocumento('+id_factura+');\" >&nbsp;</a>';";
 		}
-		if (UtilesApp::GetConf($this->sesion, 'ImprimirFacturaPdf')) {
+		if (Conf::GetConf($this->sesion, 'ImprimirFacturaPdf')) {
 			$formato['Acciones'] .= "\nrespuesta+='<a class=\"fl ui-button pdf\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href=\"javascript:void(0)\" onclick=\"ImprimirPDF('+id_factura+');\" >&nbsp;</a>';";
 		}
 		$formato['Acciones'] .="\nrespuesta+='<a  class=\"ui-icon lupa fl logdialog\" rel=\"factura\" id=\"factura_'+id_factura+'\" >&nbsp;</a></div>';";

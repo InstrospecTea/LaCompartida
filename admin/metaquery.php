@@ -34,14 +34,12 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<br/>
 		<div class="controls controls-row">
 			<label class="span3 al">Schemas a utilizar</label>
-			<input type="text" class="span5" name="schema" id="schema" value="'.$_POST['schema'].'" placeholder="acepta match parcial: ej %_tt% cubre tt2 y tt3"/>
+			<input type="text" class="span5" name="schema" id="schema" value="<?php echo $_POST['schema']; ?>" placeholder="acepta match parcial: ej %_tt% cubre tt2 y tt3"/>
 		</div>
 		<br/>
 		<div class="controls controls-row">
 			<label class="span3 al">Query a ejecutar</label>
-			<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior">
-				<?php echo $_POST['query']; ?>
-			</textarea>			
+			<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior"><?php echo $_POST['query']; ?></textarea>
 		</div>
 		<br/>
 		<div class="controls controls-row">
@@ -57,7 +55,7 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<div class="control-group">
 			<div class="controls">
 				<input type="hidden" value="ejecutar" name="ejecutar" id="ejecutar"/><input type="submit"/>
-			</div> 
+			</div>
 		</div>
 	</form>
 </div>
@@ -90,12 +88,12 @@ if (isset($_POST['ejecutar']) && $_POST['ejecutar'] == 'ejecutar') {
 		$arraybases = $bases->fetchAll(PDO::FETCH_COLUMN, 0);
 
 		foreach ($arraybases as $base) {
-			$query = trim($_POST['query']);	
-			
+			$query = trim($_POST['query']);
+
 			try {
 				$sesion->pdodbh2->exec("use $base;");
 				if ($_POST['detalle']) {
-					echo "<pre style="text-align:left;">use $base;<br><b>$query</b><br></pre>";
+					echo "<pre style='text-align:left;'>use $base;<br><b>$query</b><br></pre>";
 				}
 				if (stripos($query,'select') === false && stripos($query,'show') === false) {
 					$stmt = $sesion->pdodbh2->prepare($query);

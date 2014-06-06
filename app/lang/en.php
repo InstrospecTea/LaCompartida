@@ -45,6 +45,11 @@ $_LANG['Giro'] = "Type of business";
 $_LANG['Dirección'] = "Address";
 $_LANG['Descripción'] = "Matter Summary";
 $_LANG['Título Asunto'] = "Legal Area";
+$_LANG['INSTRUCCIONES DE PAGO'] = "PAYMENT INSTRUCTIONS";
+$_LANG['Giro bancario a'] = "Wire transfer to:";
+$_LANG['FECHA'] = "DATE";
+$_LANG['FACTURA'] = "INVOICE";
+$_LANG['texto_instrucciones'] = "There is serious risk of theft in the mail. Do not send checks to us. Follow the payment instructions. If possible please notify payment of Invoice to mariana.peroni@pstbn.com.py, stating: Invoice number, amount & how it was canceled";
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
@@ -73,11 +78,14 @@ $_LANG['total_horas'] = "Hours";
 $_LANG['Total horas:'] = "Total Hours:";
 $_LANG['Cobro'] = "Invoice";
 $_LANG['Cobro N°'] = "Detail No.";
+$_LANG['Aviso de cobro'] = "Billing Statement";
+$_LANG['Reporte de Servicios'] = "Service Report";
 $_LANG['Desde'] = "From";
 $_LANG['Fecha desde'] = "From";
 $_LANG['Fecha desde:'] = "From:";
 $_LANG['Fecha hasta'] = "To";
 $_LANG['Fecha hasta:'] = "To:";
+$_LANG['Fecha de Corte'] = "Closing Date";
 $_LANG['Fono'] = "Phone";
 $_LANG['E-mail'] = "E-mail";
 $_LANG['Costos'] = "Costs";
@@ -104,6 +112,8 @@ $_LANG['%fees%'] = "Legal Fees";
 $_LANG['%expenses%'] = "Expenses";
 $_LANG['%reference_no%'] = "Reference N°";
 $_LANG['Saldo Adeudado'] = "Balance Due";
+$_LANG['Saldo adelantos'] = "Balance advances";
+$_LANG['Saldo liquidaciones'] = "Balance settlement";
 $_LANG['Saldo total adeudado'] = "Balance due";
 $_LANG['Saldo del cobro'] = "Invoice balance";
 $_LANG['Solicitado Por'] = "Requested By";
@@ -301,7 +311,15 @@ $_LANG['SOCIO COBRADOR'] = "BILLING PARTNER";
 $_LANG['Nota'] = "Note";
 $_LANG['Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'] = "Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
 $_LANG['Con Impuesto'] = "With Taxes";
+
 #Nota cobro Morales
+$_LANG['Descripción de Servicios'] = "Description of Services";
+$_LANG['Nota de Cargo'] = "Bill";
+$_LANG['Asunto'] = "Matter";
+$_LANG['detalledegastos'] = "Expenses";
+$_LANG['resumen_raz'] = "Billing Summary";
+$_LANG['total_raz'] = "Total Hours";
+
 $_LANG['N°Trabajo'] = "Work ID";
 $_LANG['Atte'] = "Attn";
 $_LANG['Registro de Tiempo'] = "Time Records";
@@ -317,6 +335,11 @@ $_LANG['Abogados que trabajaron'] = "Lawyers Involved";
 $_LANG['Honorarios'] = "Fees";
 $_LANG['Detalle del Trabajo Realizado'] = "Description of Work";
 $_LANG['Abogado'] = "Lawyer";
+$_LANG['abogado_raz'] = "Attorney";
+$_LANG['tiempo_raz'] = "Hours";
+$_LANG['Tiempo'] = "Time";
+$_LANG['tarifa_raz'] = "Rate";
+$_LANG['importe_raz'] = "Amount";
 $_LANG['Total Cobro'] = "Invoice Total";
 $_LANG['total_cobro'] = "Total";
 $_LANG['Total Cobro:'] = "Invoice Total:";
@@ -432,7 +455,7 @@ $_LANG['Observaciones'] = "Observaciones";
 $_LANG['Debe ingresar observación'] = "Debe ingresar observación";
 $_LANG['Tienes que ingresar el tipo de moneda.'] = "Tienes que ingresar el tipo de moneda.";
 $_LANG['Tipo de cambio'] = "Tipo de cambio";
-
+$_LANG['Días Atraso'] = "Overdue Days";
 
 #Actividad
 $_LANG['Actividad'] = "Actividad";
@@ -578,6 +601,8 @@ $_LANG['Sr.'] = "Mr.";
 $_LANG['Declaración de Honorarios y Gastos'] = "Statement for Fees and Expenses";
 $_LANG['Via Fax'] = "Via Fax";
 $_LANG['y'] = "and";
+$_LANG['por_concepto_de_gastos'] = "for expenses";
+$_LANG['por_concepto_de_honorarios'] = "in fees";
 
 ###### Cartas Clientes ######
 //
@@ -602,6 +627,7 @@ $_LANG['nota_morosidad_honorarios'] = "Please disregard the above mentioned invo
 $_LANG['nota_morosidad_gastos'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
 $_LANG['nota_morosidad_total'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
 $_LANG['nota_morosidad'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
+$_LANG['nota_disclaimer'] = "Note: The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
 
 $_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
 $_LANG['%asunto_mb%'] = "Re.:";
@@ -712,6 +738,7 @@ $_LANG['grupo_o_cliente'] = "Group or Client";
 
 $_LANG['area_usuario'] = "Professional Area";
 $_LANG['categoria_usuario'] = "Professional Category";
+$_LANG['Categoría'] = "Category";
 
 ### Reportes - Tipo de Dato ###
 $_LANG['horas_trabajadas'] = "Worked Hours";
@@ -749,6 +776,8 @@ $_LANG['mes_emision'] = 'Emisión (mes)';
 
 $_LANG['mes'] = 'Month';
 $_LANG['estado'] = "Status";
+
+$_LANG['Dias Vencimiento'] = "Expiration days";
 
 // Meses
 $_LANG['Enero'] = 'January';
@@ -820,7 +849,7 @@ $_LANG['Factura ACL'] = "Reference";
 $_LANG['Asociado'] = "Associate";
 $_LANG['Procurador'] = "Attorney";
 $_LANG['Socio'] = "Partner";
-$_LANG['Administrativo'] = "Administrative";  
+$_LANG['Administrativo'] = "Administrative";
 
 /* Olvidados */
 $_LANG['Categoría'] = "Category";

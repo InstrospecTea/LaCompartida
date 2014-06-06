@@ -154,6 +154,7 @@ if ($print) {
 			cobro.codigo_cliente,
 			cobro.id_contrato,
 			contrato.id_carta,
+			contrato.codigo_idioma,
 			cobro.estado,
 			cobro.opc_papel,
 			cobro.subtotal_gastos
@@ -171,33 +172,36 @@ if ($print) {
 		$error_logfile = ini_get('error_log');
 		$logdir = dirname($error_logfile);
 
-
-
 		$html = "";
 		if ($totaldecobros > 0) {
 
 			foreach ($cobroRT as $cob) {
 
 				set_time_limit(100);
-				if (!$NotaCobro->Load($cob['id_cobro']))
-					continue;
 
-				if ($opcion != 'cartas') {
-					$NotaCobro->fields['id_carta'] = null;
-				} else {
-					if (!$NotaCobro->fields['id_carta']) {
-						$NotaCobro->fields['id_carta'] = $mincarta;
-						$NotaCobro->fields['opc_ver_carta'] = 1;
-					}
+				if (!$NotaCobro->Load($cob['id_cobro'])) {
+					continue;
 				}
 
-
+				if ($opcion != 'cartas') {
+				 	$NotaCobro->fields['id_carta'] = null;
+				} else {
+				 	if (!$NotaCobro->fields['id_carta']) {
+				 		$NotaCobro->fields['id_carta'] = $mincarta;
+				 		$NotaCobro->fields['opc_ver_carta'] = 1;
+				 	}
+				}
 
 				if ($cob['subtotal_gastos'] == 0) {
-					$NotaCobro->fields['opc_ver_gastos'] = 0;
+				   $NotaCobro->fields['opc_ver_gastos'] = 0;
 				}
 
 				$NotaCobro->LoadAsuntos();
+
+				$lang_archivo = $cob['codigo_idioma'] . '.php';
+
+				require_once Conf::ServerDir() . "/lang/$lang_archivo";
+
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
 				$opc_papel = $cob['opc_papel'];
@@ -205,19 +209,24 @@ if ($print) {
 				$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
 
 				if ($html) {
-					$cssData .= UtilesApp::CSSCobro($Sesion);
-					if (is_object($doc)) {
-						$doc->newSession($html);
-					} else {
-						$orientacion_papel = UtilesApp::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
-						if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
-							$orientacion_papel = 'PORTRAIT';
-						}
+					$cssData .= UtilesApp::CSSCobro($Sesion);
+
+					if (is_object($doc)) {
+				 		$doc->newSession($html);
+				 	} else {
+
+				 		$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
+
+				 		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
+				 			$orientacion_papel = 'PORTRAIT';
+				 		}
+
 						$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
-					}
+				 	}
 					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
 				}
+
 			}
 			$doc->endChunkedOutput("cobro_masivo_$id_usuario.doc");
 		} else {
@@ -397,4 +406,3 @@ if ($print) {
 		);
 	}
 }
-
