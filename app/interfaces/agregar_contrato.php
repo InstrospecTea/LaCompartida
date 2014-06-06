@@ -2157,29 +2157,29 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		} else {
 			$fecha_ini = Utiles::sql2date($contrato->fields['periodo_fecha_inicio']);
 		}
-
-		if (!$id_moneda) {
-			$id_moneda = Moneda::GetMonedaTarifaPorDefecto($Sesion);
-		}
-
-		if (!$id_moneda) {
-			$id_moneda = Moneda::GetMonedaBase($Sesion);
-		}
-
-		if (!$id_moneda_tramite) {
-			$id_moneda_tramite = Moneda::GetMonedaTramitePorDefecto($Sesion);
-		}
-
-		if (!$opc_moneda_total) {
-			$opc_moneda_total = Moneda::GetMonedaTotalPorDefecto($Sesion);
-		}
-
-		if (!$opc_moneda_total) {
-			$opc_moneda_total = Moneda::GetMonedaBase($Sesion);
-		}
-
-		$config_validar_tarifa = ( Conf::GetConf($Sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 	}
+
+	if (!$id_moneda) {
+		$id_moneda = Moneda::GetMonedaTarifaPorDefecto($Sesion);
+	}
+
+	if (!$id_moneda) {
+		$id_moneda = Moneda::GetMonedaBase($Sesion);
+	}
+
+	if (!$id_moneda_tramite) {
+		$id_moneda_tramite = Moneda::GetMonedaTramitePorDefecto($Sesion);
+	}
+
+	if (!$opc_moneda_total) {
+		$opc_moneda_total = Moneda::GetMonedaTotalPorDefecto($Sesion);
+	}
+
+	if (!$opc_moneda_total) {
+		$opc_moneda_total = Moneda::GetMonedaBase($Sesion);
+	}
+
+	$config_validar_tarifa = ( Conf::GetConf($Sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 	?>
 
 	<!-- COBRANZA -->
