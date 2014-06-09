@@ -1027,6 +1027,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Corriente';
 					}
 
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
+					}
+
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
 					$html2 = str_replace('%nombre_banco_contrato%', $nombre_banco, $html2);
@@ -1892,6 +1898,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Ahorros';
 					} else if (strpos($glosa_cuenta, 'Cte') !== false) {
 						$tipo_cuenta = 'Cuenta Corriente';
+					}
+
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
 					}
 
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
