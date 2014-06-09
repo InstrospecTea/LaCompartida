@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix: 14.2.13
+Lunes 09 de junio 2014
+* **Fixed:** [Repara query reporte profesional v/s asunto](https://github.com/LemontechSA/ttb/pull/531)
+
+
 ## Hotfix: 14.2.10
 Miércoles 04 de junio 2014
 * **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/528)
