@@ -263,6 +263,18 @@ $Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$works = $Work->findAllWorksByUserId($id, $before, $after);
+
+		if (!empty($works)) {
+			$secondary_code = Conf::GetConf($Session, 'CodigoSecundario');
+			for ($x = 0; $x < count($works); $x++) {
+				if ($secondary_code) {
+					$works[$x]['client_code'] = $works[$x]['secondary_client_code'];
+					$works[$x]['matter_code'] = $works[$x]['secondary_matter_code'];
+				}
+				unset($works[$x]['secondary_client_code']);
+				unset($works[$x]['secondary_matter_code']);
+			}
+		}
 	}
 
 	outputJson($works);
@@ -329,6 +341,12 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 				}
 			} else {
 				$work = $Work->findById($Work->fields['id_trabajo']);
+				if (Conf::GetConf($Session, 'CodigoSecundario')) {
+					$work['client_code'] = $work['secondary_client_code'];
+					$work['matter_code'] = $work['secondary_matter_code'];
+				}
+				unset($work['secondary_client_code']);
+				unset($work['secondary_matter_code']);
 			}
 		}
 	}
@@ -551,7 +569,6 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
-
 $Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
@@ -562,7 +579,6 @@ $Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($c
 
 	$generators = Contrato::contractGenerators($Session, $contract_id);
 	outputJson($generators);
-
 });
 
 $Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session, $Slim) {
@@ -579,7 +595,6 @@ $Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id
 	$percent_generator = $Slim->request()->params('percent_generator');
 	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator);
 	outputJson($generator);
-
 });
 
 $Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session, $Slim) {
@@ -596,8 +611,6 @@ $Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($c
 	outputJson($generator);
 });
 
-
-
 $Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
@@ -611,7 +624,6 @@ $Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_
 	Contrato::deleteContractGenerator($Session, $generator_id);
 	outputJson(array('result' => 'OK'));
 });
-
 
 $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim) {
 
@@ -660,7 +672,6 @@ $Slim->get('/currencies', function () use ($Session, $Slim) {
 	$results = Moneda::GetMonedas($Session, '', false);
 	outputJson(array('results' => $results));
 });
-
 
 $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 	if (isset($id)) {
@@ -758,7 +769,6 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 	}
 
 	outputJson($response);
-
 })->via('GET', 'POST');
 
 $Slim->map('/release-download', function () use ($Session, $Slim) {
