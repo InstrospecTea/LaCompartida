@@ -33,7 +33,11 @@ if($contrato->fields['codigo_cliente'] != '') {
 }
 
 $validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
-$obligatorio = '<span class="req">*</span>';
+if ($validaciones_segun_config) {
+	$obligatorio = '<span class="req">*</span>';
+} else {
+	$obligatorio = '';
+}
 $modulo_retribuciones_activo = Conf::GetConf($Sesion, 'UsarModuloRetribuciones');
 
 if (!defined('HEADERLOADED')) {
@@ -74,9 +78,6 @@ $contrato_defecto = new Contrato($Sesion);
 if (!empty($cliente->fields["id_contrato"])) {
 	$contrato_defecto->Load($cliente->fields["id_contrato"]);
 }
-
-$validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
-$obligatorio = '<span class="req">*</span>';
 
 if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
 	$contrato->fields = $cargar_datos_contrato_cliente_defecto;
@@ -292,23 +293,18 @@ $CobroRtf = new CobroRtf($Sesion);
 				form.factura_direccion.focus();
 				return false;
 			}
-			<?php if (UtilesApp::existecampo('factura_ciudad', 'contrato', $Sesion)) { ?>
-				if(!form.factura_ciudad.value)
-				{
-					alert("<?php echo __('Debe ingresar la cuidad del cliente') ?>");
-					form.factura_cuidad.focus();
-					return false;
-				}
-			<?php } ?>
-
-			<?php if (UtilesApp::existecampo('factura_comuna', 'contrato', $Sesion)) { ?>
-				if(!form.factura_comuna.value)
-				{
-					alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
-					form.factura_comuna.focus();
-					return false;
-				}
-			<?php } ?>
+			if(!form.factura_ciudad.value)
+			{
+				alert("<?php echo __('Debe ingresar la cuidad del cliente') ?>");
+				form.factura_cuidad.focus();
+				return false;
+			}
+			if(!form.factura_comuna.value)
+			{
+				alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
+				form.factura_comuna.focus();
+				return false;
+			}
 
 			if(form.id_pais.options[0].selected == true)
 			{
@@ -1726,12 +1722,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			<table id='datos_factura' style='display:<?php echo $show ?>'>
 				<tr>
 					<td align="right" width='20%'>
-						<?php
-						echo __('ROL/RUT');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('ROL/RUT') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="3">
 						<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" />
@@ -1739,12 +1730,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('Razón Social');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('Razón Social') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<input type="text" name='factura_razon_social' size="50" value="<?php echo $contrato->fields['factura_razon_social'] ?>"  />
@@ -1752,12 +1738,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('Giro');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('Giro') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
@@ -1769,12 +1750,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('Dirección');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('Dirección') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<textarea class="span4" name='factura_direccion' rows=3 cols="55" ><?php echo $contrato->fields['factura_direccion'] ?></textarea>
@@ -1783,12 +1759,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php if (UtilesApp::existecampo('factura_comuna', 'contrato', $Sesion)) { ?>
 					<tr>
 						<td align="right" colspan="1">
-							<?php
-							echo __('Comuna');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Comuna') . $obligatorio; ?>
 						</td>
 						<td align="left" colspan="5">
 							<input  type="text"  name='factura_comuna' size=50 value="<?php echo $contrato->fields['factura_comuna'] ?>"  />
@@ -1808,12 +1779,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php if (UtilesApp::existecampo('factura_ciudad', 'contrato', $Sesion)) { ?>
 					<tr>
 						<td align="right" colspan="1">
-							<?php
-							echo __('Ciudad');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Ciudad') . $obligatorio; ?>
 						</td>
 						<td align="left" colspan="5">
 							<input  type="text"  name='factura_ciudad' size=50 value="<?php echo $contrato->fields['factura_ciudad'] ?>"  />
@@ -1822,12 +1788,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php } ?>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('País');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('País') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan='3'>
 						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia DESC'), 'id_pais', $contrato->fields['id_pais'], 'class ="span3"', 'Vacío', '260px'); ?>
@@ -1835,12 +1796,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('Teléfono');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('Teléfono') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<input type="text" class="span1" name='cod_factura_telefono' size=8 value="<?php echo $contrato->fields['cod_factura_telefono'] ?>" />&nbsp;<input type="text" class="span2" name='factura_telefono' size=30 value="<?php echo $contrato->fields['factura_telefono'] ?>" />
@@ -1927,12 +1883,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php if (Conf::GetConf($Sesion, 'TituloContacto')) { ?>
 					<tr>
 						<td align="right" width="20%">
-							<?php
-							echo __('Titulo');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Titulo') . $obligatorio; ?>
 						</td>
 						<td align="left" colspan='3'>
 							<?php echo Html::SelectArrayDecente($PrmTituloPersona->Listar('ORDER BY id_titulo'), 'titulo_contacto', $contrato->fields['titulo_contacto'], 'class="span3"', 'Vacio', '120px'); ?>&nbsp;&nbsp;
@@ -1940,12 +1891,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td align="right" width='20%'>
-							<?php
-							echo __('Nombre');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Nombre') . $obligatorio; ?>
 						</td>
 						<td align='left' colspan='3'>
 							<input type="text" size='55' name="nombre_contacto" id="nombre_contacto" value="<?php echo $contrato->fields['contacto'] ?>" />
@@ -1953,12 +1899,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td align="right" width='20%'>
-							<?php
-							echo __('Apellido');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Apellido') . $obligatorio; ?>
 						</td>
 						<td align='left' colspan='3'>
 							<input type="text" size='55' name="apellido_contacto" id="apellido_contacto" value="<?php echo $contrato->fields['apellido_contacto'] ?>"  />
@@ -1967,12 +1908,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php } else { ?>
 					<tr>
 						<td align="right" width='20%'>
-							<?php
-							echo __('Nombre');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Nombre') . $obligatorio; ?>
 						</td>
 						<td align='left' colspan='3'>
 							<input type="text" size='55' name="contacto" id="contacto" value="<?php echo $contrato->fields['contacto'] ?>"  />
@@ -1981,12 +1917,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php } ?>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('Teléfono');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('Teléfono') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<input type="text" name='fono_contacto_contrato' size=30 value="<?php echo $contrato->fields['fono_contacto'] ?>" />
@@ -1994,12 +1925,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('E-mail');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('E-mail') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<input type="text" name='email_contacto_contrato' size=55 value="<?php echo $contrato->fields['email_contacto'] ?>"  />
@@ -2007,12 +1933,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php
-						echo __('Dirección envío');
-						if ($validaciones_segun_config) {
-							echo $obligatorio;
-						}
-						?>
+						<?php echo __('Dirección envío') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
 						<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?></textarea>
@@ -2070,12 +1991,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<table width="100%" >
 					<tr id="divthh">
 						<td  class="ar">
-							<?php
-							echo __('Tarifa horas');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Tarifa horas') . $obligatorio; ?>
 						</td>
 						<td align="left" width="80%" style="font-size:10pt;">
 							<table  style="float:left;" class="span7">
@@ -2098,12 +2014,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										</div>
 									</td>
 									<td>
-										<?php
-										echo __('Tarifa en');
-										if ($validaciones_segun_config) {
-											echo $obligatorio;
-										}
-										?>
+										<?php echo __('Tarifa en') . $obligatorio; ?>
 										<?php echo Html::SelectArrayDecente($Moneda->Listar('ORDER BY id_moneda'), 'id_moneda', $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); ' . $config_validar_tarifa . '"', '', '80px'); ?>
 										<input type="hidden" name="id_moneda_hidden" id="id_moneda_hidden" value="<?php echo $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda; ?>" />
 										&nbsp;&nbsp;
@@ -2118,12 +2029,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td  class="ar ">
-							<?php
-							echo __('Forma de cobro');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Forma de cobro') . $obligatorio; ?>
 						</td>
 						<?php
 						if (!$contrato->fields['forma_cobro'])
@@ -2163,22 +2069,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id="div_forma_cobro">
 								<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 									<span id="span_monto">
-										<?php
-										echo __('Monto');
-										if ($validaciones_segun_config) {
-											echo $obligatorio;
-										}
-										?>
+										<?php echo __('Monto') . $obligatorio; ?>
 										<input type="hidden" id="monto_posterior"  name="monto_posterior" value="<?php echo $contrato->fields['monto'] ?>"/>
 										&nbsp;<input id="monto" name="monto" size="7" value="<?php echo $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
 									</span>
 									&nbsp;&nbsp;
-									<?php
-									echo __('Moneda');
-									if ($validaciones_segun_config) {
-										echo $obligatorio;
-									}
-									?>
+									<?php echo __('Moneda') . $obligatorio; ?>
 									&nbsp;
 									<?php
 									$id_moneda_seleccionada = $contrato->fields['id_moneda_monto'] ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda_monto);
@@ -2187,12 +2083,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</div>
 								<div id="div_horas" align="left" style="display:none; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 									&nbsp;
-									<?php
-									echo __('Horas');
-									if ($validaciones_segun_config) {
-										echo $obligatorio;
-									}
-									?>
+									<?php echo __('Horas') . $obligatorio; ?>
 									&nbsp;<input name="retainer_horas" size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
 									<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se
 											 desuentan las horas con preferencia -->
@@ -2208,24 +2099,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										<?php if ($cobro) { ?>
 											<tr>
 												<td>
-													<?php
-													echo __('Monto utilizado');
-													if ($validaciones_segun_config) {
-														echo $obligatorio;
-													}
-													?>
+													<?php echo __('Monto utilizado') . $obligatorio; ?>
 												</td>
 												<td align="left">&nbsp;<label style='background-color:#FFFFFF'> <?php echo $cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0; ?> </label></td>
 											</tr>
 										<?php } ?>
 										<tr>
 											<td>
-												<?php
-												echo __('Fecha inicio');
-												if ($validaciones_segun_config) {
-													echo $obligatorio;
-												}
-												?>
+												<?php echo __('Fecha inicio') . $obligatorio; ?>
 											</td>
 											<td align="left">
 												<input type="text" name="fecha_inicio_cap" value="<?php echo Utiles::sql2date($contrato->fields['fecha_inicio_cap']) ?>" id="fecha_inicio_cap" size="11" maxlength="10" />
@@ -2423,12 +2304,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<tr><td colspan="2">&nbsp;</td></tr>
 					<tr>
 						<td class="ar" >
-							<?php
-							echo __('Mostrar total en');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Mostrar total en') . $obligatorio; ?>
 						</td>
 						<td align="left">
 							<?php echo Html::SelectArrayDecente($Moneda->Listar('ORDER BY id_moneda'), 'opc_moneda_total', $contrato->fields['opc_moneda_total'] ? $contrato->fields['opc_moneda_total'] : $opc_moneda_total, '', '', '60px; font-size:10pt;'); ?>
@@ -2465,12 +2341,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td class="ar ">
-							<?php
-							echo __('Detalle Cobranza');
-							if ($validaciones_segun_config) {
-								echo $obligatorio;
-							}
-							?>
+							<?php echo __('Detalle Cobranza') . $obligatorio; ?>
 						</td>
 						<td align="left">
 							<textarea name="observaciones" rows="3" cols="47"><?php echo $contrato->fields['observaciones'] ? $contrato->fields['observaciones'] : '' ?></textarea>
