@@ -83,7 +83,7 @@ $Form = new Form;
 	<iframe id="previsualizacion_html" style="width:674px;height:730px"></iframe>
 </form>
 
-<script type="text/javascript" src="//localhost/static/js/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>
 <script type="text/javascript">
 	var diccionario = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->diccionario)); ?>;
 	var secciones = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->secciones)); ?>;
