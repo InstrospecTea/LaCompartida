@@ -107,7 +107,7 @@ $Form = new Form;
 			jQuery.post(form.attr('action'), form.serialize(), function(carta) {
 				if (carta.id) {
 					alerta('La carta se guardó correctamente.');
-					if (jQuery('[name="carta[id_carta]"]') != carta.id) {
+					if (jQuery('[name="carta[id_carta]"]').val() != carta.id) {
 						window.location = '?id_carta=' + carta.id;
 					}
 				} else if (carta.error) {
