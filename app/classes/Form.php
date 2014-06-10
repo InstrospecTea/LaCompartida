@@ -22,10 +22,10 @@ class Form {
 	 * @return type
 	 */
 	public function select($name, $options, $selected = null, $attrs = null) {
-		if (empty($attrs['name'])) {
+		if (empty($attrs['name']) && !empty($name)) {
 			$attrs['name'] = $name;
 		}
-		if (empty($attrs['id'])) {
+		if (empty($attrs['id']) && !empty($attrs['name'])) {
 			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
 		}
 		$html_options = '';
@@ -153,7 +153,7 @@ class Form {
 		return $this->button($text, $attrs);
 	}
 
-	public function button($text, $attrs) {
+	public function button($text, $attrs = null) {
 		$_attrs = array(
 			'tag' => 'a',
 			'role' => 'button',

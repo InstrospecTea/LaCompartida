@@ -1,31 +1,30 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM'));
 $CartaCobro = new CartaCobro($sesion);
 
 if ($opc == 'guardar') {
-	$id_carta = $CartaCobro->GuardarCarta($carta);
-}
-else if ($opc == 'prev') {
+	$id_carta = $CartaCobro->GuardarCarta($_POST['carta']);
+	die(json_encode(array('id' => $id_carta)));
+} else if ($opc == 'prev') {
 	$id_carta = $CartaCobro->PrevisualizarDocumento($carta, $id_cobro);
-}
-else{
+} else {
 	$carta = $CartaCobro->ObtenerCarta($id_carta);
 }
 
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Cartas de cobro');
 $pagina->PrintTop();
+$Form = new Form;
 ?>
 
 <form>
-	<?php echo Html::SelectQuery($sesion, "SELECT id_carta, descripcion FROM carta", "id_carta", $id_carta, '', ' '); ?>
-	<button type="submit">Editar</button>
+	<?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, '', ' '); ?>
+	<?php echo $Form->button('Editar', array('id' => 'btn_editar')) ?>
 </form>
 <hr/>
-<form method="POST">
+<form method="post" id="form_carta">
 	<input type="hidden" name="opc" value="guardar"/>
 	<input type="hidden" name="carta[id_carta]" value="<?php echo $carta['id_carta']; ?>"/>
 	<p>
@@ -39,89 +38,119 @@ $pagina->PrintTop();
 	</p>
 	<fieldset id="secciones">
 		<legend>Template</legend>
-		<?php foreach($carta['secciones'] as $seccion => $html){ ?>
-		<div>
-			<h3><?php echo $seccion; ?>:</h3>
-			<textarea class="ckeditor" id="editor_<?php echo $seccion; ?>" name="carta[secciones][<?php echo $seccion; ?>]"><?php echo htmlentities($html); ?></textarea>
-			<label>
-				Insertar Valor:
-				<select class="valores">
-					<?php if (isset($CartaCobro->diccionario[$seccion])) foreach($CartaCobro->diccionario[$seccion] as $tag => $desc) echo "<option value='$tag'>$tag - $desc</option>"; ?>
-				</select>
-				<button class="agregar_valor" type="button">Insertar</button>
-			</label>
-			<?php if(isset($CartaCobro->secciones[$seccion])){ ?>
-			<label>
-				Agregar Sección:
-				<select class="secciones">
-					<?php foreach($CartaCobro->secciones[$seccion] as $tag => $desc) echo "<option value='$tag'>%$tag% - $desc</option>"; ?>
-				</select>
-				<button class="agregar_seccion" type="button">Agregar</button>
-			</label>
-			<?php } ?>
-		</div>
+		<?php
+
+		function mix(&$a, $b, $c = '%s') {
+			$a = sprintf("$c - %s", $b, $a);
+		}
+		array_walk_recursive($CartaCobro->diccionario, 'mix');
+		array_walk_recursive($CartaCobro->secciones, 'mix', '%%%s%%');
+		foreach ($carta['secciones'] as $seccion => $html) {
+			?>
+			<div>
+				<h3><?php echo $seccion; ?>:</h3>
+				<textarea class="ckeditor" id="editor_<?php echo $seccion; ?>" name="carta[secciones][<?php echo $seccion; ?>]"><?php echo htmlentities($html); ?></textarea>
+				<label>
+					Insertar Valor: <?php echo $Form->select(null, $CartaCobro->diccionario[$seccion], null, array('class' => 'valores', 'empty' => false)); ?>
+					<button class="agregar_valor" type="button">Insertar</button>
+				</label>
+				<?php if (isset($CartaCobro->secciones[$seccion])) { ?>
+					<label>
+						Agregar Sección: <?php echo $Form->select(null, $CartaCobro->secciones[$seccion], null, array('class' => 'secciones', 'empty' => false)); ?>
+						<button class="agregar_seccion" type="button">Agregar</button>
+					</label>
+				<?php } ?>
+			</div>
 		<?php } ?>
 	</fieldset>
 	<h4>CSS</h4>
 	<textarea name="carta[formato_css]" rows="10" cols="40"><?php echo $carta['formato_css']; ?></textarea>
 	<div style="padding: 23px">
-		<input type="submit" value="Guardar" id="btn_guardar"/>
-		<input type="submit" value="Guardar como nueva carta" id="btn_guardar_nueva"/>
+		<?php echo $Form->button('Guardar', array('id' => 'btn_guardar')); ?>
+		<?php echo $Form->button('Guardar como nueva carta', array('id' => 'btn_guardar_nueva')); ?>
 		<br/>
 		<br/>
 		<label>Previsualizar con el cobro N° <input name="id_cobro" value="<?php echo $id_cobro; ?>"/></label>
-		<input type="submit" value="Previsualizar carta" id="btn_previsualizar"/>
-		<input type="button" value="Ver valores de tags" id="btn_valores"/>
+		<?php echo $Form->button('Previsualizar carta', array('id' => 'btn_previsualizar')); ?>
+		<?php echo $Form->button('Ver valores de tags', array('id' => 'btn_valores')); ?>
 	</div>
 	<hr/>
-	<h3>
-		Previsualización HTML
-		<button id="btn_previsualizar_html" type="button">Regenerar</button>
-	</h3>
+	<p style="text-align: center">
+		<strong>Previsualización HTML</strong>
+		<?php echo $Form->button('Regenerar', array('id' => 'btn_previsualizar_html')); ?>
+	</p>
+
 	<iframe id="previsualizacion_html" style="width:674px;height:730px"></iframe>
 </form>
 
-<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="//localhost/static/js/ckeditor/ckeditor.js"></script>
 <script type="text/javascript">
 	var diccionario = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->diccionario)); ?>;
 	var secciones = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->secciones)); ?>;
 
-	jQuery(function(){
+	jQuery(function() {
+		CKEDITOR.config.fontSize_sizes = '7/7pt;8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt';
 		CKEDITOR.config.allowedContent = true;
 
-		jQuery('.agregar_valor').live('click', AgregarValor);
-		jQuery('.agregar_seccion').live('click', AgregarSeccion);
-		jQuery('#btn_guardar').click(function(){
-			jQuery('[name=opc]').val('guardar');
+		jQuery('.agregar_valor').click(AgregarValor);
+		jQuery('.agregar_seccion').click(AgregarSeccion);
+		jQuery('#btn_editar').click(function() {
+			window.location = '?id_carta=' + jQuery('[name=id_carta]').val();
 		});
-		jQuery('#btn_guardar_nueva').click(function(){
+		jQuery('#btn_guardar, #btn_guardar_nueva').click(function() {
 			jQuery('[name=opc]').val('guardar');
-			jQuery('[name="carta[id_carta]"]').val('');
+			if (jQuery(this).attr('id') === 'btn_guardar_nueva') {
+				jQuery('[name="carta[id_carta]"]').val('');
+
+			}
+			var form = jQuery('#form_carta');
+			jQuery.post(form.attr('action'), form.serialize(), function(carta) {
+				if (carta.id) {
+					alerta('La carta se guardó correctamente.');
+					if (jQuery('[name="carta[id_carta]"]') != carta.id) {
+						window.location = '?id_carta=' + carta.id;
+					}
+				} else if (carta.error) {
+					alerta(carta.error);
+				}
+			}, 'json');
 		});
-		jQuery('#btn_previsualizar').click(function(){
+		jQuery('#btn_previsualizar').click(function() {
 			jQuery('[name=opc]').val('prev');
+			jQuery('#form_carta').submit();
 		});
-		jQuery('#btn_valores').click(function(){
+		jQuery('#btn_valores').click(function() {
 			window.open('carta_test_valores.php?id_cobro=' + jQuery('[name=id_cobro]').val());
 		});
-		jQuery('#btn_previsualizar_html').click(function(){
+		jQuery('#btn_previsualizar_html').click(function() {
 			PrevisualizarHTML();
 		});
 
 		PrevisualizarHTML();
 	});
 
-	function AgregarValor(){
+	function alerta(msg, type) {
+		var div = jQuery('<div/>', {style: 'margin-top: .5em;'})
+				.addClass('ui-corner-all')
+				.addClass(type == 'error' ? 'ui-state-error' : 'ui-state-highlight')
+				.html(msg);
+		div.insertAfter('#btn_guardar_nueva')
+				.hide()
+				.fadeIn()
+				.delay(5000)
+				.fadeOut();
+	}
+	function AgregarValor() {
 		var div = jQuery(this).closest('div');
 		AgregarHTML(div, div.find('.valores').val());
 		return false;
 	}
 
-	function AgregarHTML(div, valor){
+	function AgregarHTML(div, valor) {
 		var editor = CKEDITOR.instances[div.find('.ckeditor').attr('id')];
 
 		// Check the active editing mode.
-		if ( editor.mode == 'wysiwyg' ) {
+		if (editor.mode == 'wysiwyg') {
 			editor.insertHtml(valor);
 		}
 		else {
@@ -131,47 +160,47 @@ $pagina->PrintTop();
 		return true;
 	}
 
-	function AgregarSeccion(){
+	function AgregarSeccion() {
 		var div = jQuery(this).closest('div');
 		var seccion = div.find('.secciones').val();
-		if(AgregarHTML(div, '%' + seccion + '%') && !document.getElementById('editor_' + seccion)){
+		if (AgregarHTML(div, '%' + seccion + '%') && !document.getElementById('editor_' + seccion)) {
 			var div = jQuery('<div/>')
-				.append(jQuery('<h3/>', {text: seccion}))
-				.append(jQuery('<textarea/>', {
-					'class': 'ckeditor',
-					'name': 'carta[secciones][' + seccion + ']',
-					'id': 'editor_' + seccion
-				}));
+					.append(jQuery('<h3/>', {text: seccion}))
+					.append(jQuery('<textarea/>', {
+				'class': 'ckeditor',
+				'name': 'carta[secciones][' + seccion + ']',
+				'id': 'editor_' + seccion
+			}));
 			jQuery('#secciones').append(div);
 
 			CKEDITOR.replace('editor_' + seccion);
 
-			if(diccionario[seccion]){
+			if (diccionario[seccion]) {
 				div.append(jQuery('<label/>', {text: 'Insertar Valor: '})
-					.append(jQuery('<select/>', {'class': 'valores'}))
-					.append(jQuery('<button/>', {
-						'class': 'agregar_valor',
-						type: 'button',
-						text: 'Insertar'
-					}))
-				)
+						.append(jQuery('<select/>', {'class': 'valores'}))
+						.append(jQuery('<button/>', {
+					'class': 'agregar_valor',
+					type: 'button',
+					text: 'Insertar'
+				}))
+						)
 				var selvals = div.find('.valores');
-				jQuery.each(diccionario[seccion], function(idx, val){
+				jQuery.each(diccionario[seccion], function(idx, val) {
 					selvals.append(jQuery('<option/>', {value: idx, text: idx + ' - ' + val}));
 				});
 			}
 
-			if(secciones[seccion]){
+			if (secciones[seccion]) {
 				div.append(jQuery('<label/>', {text: 'Insertar Seccion: '})
-					.append(jQuery('<select/>', {'class': 'secciones'}))
-					.append(jQuery('<button/>', {
-						'class': 'agregar_seccion',
-						type: 'button',
-						text: 'Agregar'
-					}))
-				)
+						.append(jQuery('<select/>', {'class': 'secciones'}))
+						.append(jQuery('<button/>', {
+					'class': 'agregar_seccion',
+					type: 'button',
+					text: 'Agregar'
+				}))
+						)
 				var selvals = div.find('.secciones');
-				jQuery.each(secciones[seccion], function(idx, val){
+				jQuery.each(secciones[seccion], function(idx, val) {
 					selvals.append(jQuery('<option/>', {value: idx, text: '%' + idx + '% - ' + val}));
 				});
 			}
@@ -179,22 +208,24 @@ $pagina->PrintTop();
 		return false;
 	}
 
-	function PrevisualizarHTML(){
+	function PrevisualizarHTML() {
 		var css = jQuery('[name="carta[formato_css]"]').val();
 		var body = GenerarHTML('CARTA');
-		var html = '<style type="text/css">'+css+'</style>'+body;
+		var html = '<style type="text/css">' + css + '</style>' + body;
 		jQuery('#previsualizacion_html')[0].contentWindow.document.body.innerHTML = html;
 	}
 
-	function GenerarHTML(seccion){
+	function GenerarHTML(seccion) {
 		var id = 'editor_' + seccion;
 
-		var html = CKEDITOR.instances[id] && !v ? CKEDITOR.instances[id].getData() : jQuery('#'+id).val();
-		if(!html) return '';
+		var html = CKEDITOR.instances[id] && !v ? CKEDITOR.instances[id].getData() : jQuery('#' + id).val();
+		if (!html) {
+			return '';
+		}
 
-		jQuery.each(secciones[seccion] || [], function(s){
+		jQuery.each(secciones[seccion] || [], function(s) {
 			var tag = '%' + s + '%';
-			if(html.indexOf(tag) >= 0){
+			if (html.indexOf(tag) >= 0) {
 				html = html.replace(tag, GenerarHTML(s));
 			}
 		});
@@ -203,4 +234,6 @@ $pagina->PrintTop();
 
 </script>
 
-<?php $pagina->PrintBottom($popup);
+<?php
+echo $Form->script();
+$pagina->PrintBottom($popup);
