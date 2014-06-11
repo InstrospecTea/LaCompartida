@@ -465,10 +465,7 @@ $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
 
 if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-	if (empty($opcion)){
-		$caracteres = strlen($Cliente->fields['codigo_cliente']);
-	}
-	$field_codigo_asunto_secundario = substr($Asunto->fields['codigo_asunto_secundario'], -$caracteres);
+	$field_codigo_asunto_secundario = array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario']));
 
 	if (Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) { ?>
 		<script type="text/javascript">
