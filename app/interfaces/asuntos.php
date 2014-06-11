@@ -47,6 +47,7 @@ if ($permisos_asuntos->fields['permitido']) {
 
 $pagina->titulo = __('Listado de') . ' ' . __('Asuntos');
 $pagina->PrintTop($popup);
+$Form = new Form;
 ?>
 
 <script type="text/javascript">
@@ -130,7 +131,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 			<tr>
 				<td></td>
 				<td colspan="3" align="right">
-					<a href="#" class="btn botonizame" icon="agregar" id="agregar_asunto" title="<?php echo __('Agregar Asunto'); ?>"><?php echo __('Agregar') . ' ' . __('Asunto'); ?></a>
+					<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Asunto'), 'agregar', array('id' => 'agregar_asunto')); ?>
 				</td>
 			</tr>
 		</table>
@@ -220,16 +221,16 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 				<tr>
 					<td>&nbsp;</td>
 					<td class="al" colspan="3">
-						<a href="javascript:void(0);" icon="find" class="btn botonizame" name="buscar" onclick="Listar(jQuery('#form').get(0), 'buscar')"><?php echo __('Buscar'); ?></a>
-						<a href="javascript:void(0);" icon="xls" class="btn botonizame" <?php echo $hide_areas; ?> onclick="Listar(jQuery('#form').get(0), 'xls')" ><?php echo __('Descargar listado a Excel'); ?></a>
-						<a href="javascript:void(0);" icon="xls" class="btn botonizame" <?php echo $hide_areas; ?> onclick="Listar(jQuery('#form').get(0), 'facturacion_xls')" ><?php echo __('Descargar Informaci&oacute;n Comercial a Excel'); ?></a>
+						<?php echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form').get(0), 'buscar')")); ?>
+						<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form').get(0), 'xls')")); ?>
+						<?php echo $Form->icon_button(__('Descargar Información Comercial a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form').get(0), 'facturacion_xls')")); ?>
 					</td>
 				</tr>
 			</table>
 		</fieldset>
 	<?php } ?>
 </form>
-
+<?php echo $Form->script(); ?>
 <?php
 if ($busqueda) {
 	$link = "Opciones";
