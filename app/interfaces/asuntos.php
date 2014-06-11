@@ -113,6 +113,7 @@ $Pagina->PrintTop($popup);
 if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
 	echo AutocompletadorAsunto::CSS();
 }
+$Form = new Form;
 ?>
 <form method="post" name="form" id="form">
 	<input type="hidden" name="busqueda" value="TRUE">
@@ -121,7 +122,7 @@ if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
 			<tr>
 				<td></td>
 				<td colspan="3" align="right">
-					<a href="#" class="btn botonizame" icon="agregar" id="agregar_asunto" title="<?php echo __('Agregar Asunto'); ?>"><?php echo __('Agregar') . ' ' . __('Asunto'); ?></a>
+					<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Asunto'), 'agregar', array('id' => 'agregar_asunto', 'title' => __('Agregar Asunto'))); ?>
 				</td>
 			</tr>
 		</table>
@@ -220,19 +221,27 @@ if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
 		</fieldset>
 <?php } ?>
 </form>
-
 <?php
+
+echo $Form->script();
+
 if ($busqueda) {
 	$link = "Opciones";
 } else {
-	$link = sprintf('%s <br /><a href="asuntos.php?codigo_cliente=%s&opc=entregar_asunto&id_cobro=%s&popup=1&motivo=cobros&checkall=1">%s</a>', __('Cobrar'), $codigo_cliente, $id_cobro, __('Todos'));
+	$link = __('Cobrar');
+	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
 }
 
 if ($checkall == '1') {
 	CheckAll($id_cobro, $codigo_cliente);
 }
 
-global $query, $where, $b;
+if ($uncheckall == '1') {
+	UncheckAll($id_cobro, $codigo_cliente);
+}
+
+global $query, $where,$b;
 $where = 1;
 
 if ($buscar || $opc == "entregar_asunto") {

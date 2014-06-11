@@ -9,6 +9,23 @@ if ($_REQUEST['codigo_cliente'] == '') {
 }
 
 $ClienteSeguimiento = new ClienteSeguimiento($Sesion);
+$criteria = new Criteria();
+$criteria
+	->add_select('contacto')
+	->add_select('apellido_contacto')
+	->add_select('fono_contacto')
+	->add_select('email_contacto')
+	->add_limit(1)
+	->add_from('contrato')
+	->add_restriction(
+			CriteriaRestriction::equals('codigo_cliente',$_REQUEST['codigo_cliente'])
+		);
+
+$statement = $Sesion->pdodbh->prepare($criteria->get_plain_query());
+$statement->execute();
+$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+extract($results[0]);
 
 if ($_POST['opcion'] == 'guardar') {
 	$ClienteSeguimiento->Fill($_REQUEST, true);
@@ -31,6 +48,13 @@ $seguimientos = $ClienteSeguimiento->FindAll();
 			.seguimiento_table {
 				padding-bottom: 60px;
 			}
+			.contact_data {
+				font-size: smaller;
+				margin-bottom: 2%;
+			}
+			.contact_data .data{
+				margin-left: 5%;
+			}
 			form {
 				position: fixed;
 				bottom: 0;
@@ -48,6 +72,12 @@ $seguimientos = $ClienteSeguimiento->FindAll();
 	</head>
 	<body>
 		<div class="seguimiento_container">
+			<div class="contact_data">
+				<div class="title"><?php echo _('Solicitante') ?></div>
+				<div class="data"><?php echo __('Nombre')?>: <?php echo($contacto.' '.$apellido_contacto) ?></div>
+				<div class="data"><?php echo __('Fono')?>: <?php echo $fono_contacto; ?></div>
+				<div class="data"><?php echo __('E-mail')?>: <?php echo $email_contacto; ?></div>
+			</div>
 			<?php if (count($seguimientos) > 0) { ?>
 			<div class="seguimiento_table">
 				<table class="buscador" width="98%">

@@ -460,6 +460,7 @@ function TTip($texto) {
 
 $pagina->titulo = __('Ingreso cliente');
 $pagina->PrintTop();
+$Form = new Form;
 ?>
 
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo $_SERVER[PHP_SELF] ?>" >
@@ -657,24 +658,45 @@ $pagina->PrintTop();
 	<table width="100%">
 		<tr>
 			<td class="cvs" align="center">
-				<input type="button" name="asuntos" id='asuntos' class=" botonizame" value="<?php echo __('Asuntos') ?>" onMouseOver="goLite(this.form, this)" onMouseOut="goDim(this.form, this)" onClick="iframeLoad('asuntos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&popup=1&from=agregar_cliente')" />
+				<?php
+				$btn_title = __('Asuntos');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "iframeLoad('asuntos.php?codigo_cliente={$cliente->fields['codigo_cliente']}&opc=entregar_asunto&popup=1&from=agregar_cliente');"
+				);
+				echo $Form->button($btn_title, $attrs);
+				?>
 			</td>
 			<td class="cvs" align="center">
-				<input type="button" name="contratos" id='contratos' class=" botonizame" value="<?php echo __('Contratos') ?>" onMouseOver="goLite(this.form, this.name)" onMouseOut="goDim(this.form, this)" onClick="iframeLoad('contratos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&popup=1&buscar=1&activo=SI')" />
+				<?php
+				$btn_title = __('Contratos');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "iframeLoad('contratos.php?codigo_cliente={$cliente->fields['codigo_cliente']}&popup=1&buscar=1&activo=SI');"
+				);
+				echo $Form->button($btn_title, $attrs);
+				?>
 			</td>
 			<td class="cvs" align="center">
-				<input type="button" name="cobros" id='cobros' class=" botonizame" value="<?php echo __('Cobros') ?>" onMouseOver="goLite(this.form, this)" onMouseOut="goDim(this.form, this)" onClick="iframeLoad('lista_cobros.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&popup=1&opc=buscar&no_mostrar_filtros=1')" />
+				<?php
+				$btn_title = __('Cobros');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "iframeLoad('lista_cobros.php?codigo_cliente={$cliente->fields['codigo_cliente']}&popup=1&opc=buscar&no_mostrar_filtros=1');"
+				);
+				echo $Form->button($btn_title, $attrs);
+				?>
 			</td>
 		</tr>
 		<tr>
 			<td class="cvs" align="center" colspan=3>
-				<iframe name='iframe_asuntos'  class="resizableframe" id='iframe_asuntos' src='about:blank' style="width:100%;border:0 none;">&nbsp;</iframe>
+				<iframe name='iframe_asuntos'  class="resizableframe" id='iframe_asuntos' src='about:blank' style="width:100%; height: 300px; border:none;">&nbsp;</iframe>
 			</td>
 		</tr>
 	</table>
 
 </form>
-
+<?php echo $Form->script(); ?>
 <style type="text/css">
 
 	textarea,
@@ -877,6 +899,13 @@ $pagina->PrintTop();
 				alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_comuna.focus();
+				return false;
+			}
+
+			if(!form.region_cliente.value){
+				alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+				MuestraPorValidacion('datos_factura');
+				form.factura_ciudad.focus();
 				return false;
 			}
 

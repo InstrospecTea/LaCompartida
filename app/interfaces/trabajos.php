@@ -316,6 +316,12 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		$select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	}
 
+	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')){
+		$select_encargado_comercial = "resp_user.username AS encargado_comercial,";
+	} else {
+		$select_encargado_comercial = "CONCAT_WS(' ',resp_user.nombre,resp_user.apellido1) AS encargado_comercial,";
+	}
+
 	#BUSCAR
 	$query = "
 		SELECT  SQL_CALC_FOUND_ROWS
@@ -359,9 +365,13 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			contrato.descuento,
 			tramite_tipo.glosa_tramite,
 			trabajo.fecha,
+			trabajo.fecha_creacion,
+			trabajo.fecha_modificacion,
 			prm_idioma.codigo_idioma as codigo_idioma,
+			$select_encargado_comercial
 			contrato.id_tarifa
 			$select_glosa_actividad ";
+
 
    	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
 
@@ -374,6 +384,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
 			LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+			LEFT JOIN usuario AS resp_user ON resp_user.id_usuario = contrato.id_usuario_responsable
 			LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
 			LEFT JOIN tramite ON trabajo.id_tramite=tramite.id_tramite
 			LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
@@ -1044,14 +1055,17 @@ function funcionTR(& $trabajo) {
 	$dur_cob = "$h:$m";
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
-	$fecha = Utiles::sql2fecha($trabajo->fields['fecha'], $formato_fecha);
 	if ($trabajo->fields['id_tramite_tipo'] > 0) {
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
 		$html .= "<td colspan=9><strong>" . $trabajo->fields['glosa_tramite'] . "</strong></td></tr>";
 	}
 	$html .= "<tr id=\"t" . $trabajo->fields['id_trabajo'] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
 	$html .= '<td><input type="checkbox" class="editartrabajo " onmouseover="ddrivetip(\'Para editar múltiples trabajos haga click aquí.\')" onmouseout="hideddrivetip();" ></td>';
-	$html .= "<td>$fecha</td>";
+	$fecha = Utiles::sql2fecha($trabajo->fields['fecha'], $formato_fecha);
+	$fecha_creacion = Utiles::sql2fecha($trabajo->fields['fecha_creacion'], $formato_fecha);
+	$fecha_modificacion = Utiles::sql2fecha($trabajo->fields['fecha_modificacion'], $formato_fecha);
+	$fecha_html = "<span title=\"Creado el: $fecha_creacion, Modificado el: $fecha_modificacion\">$fecha</span>";
+	$html .= "<td>$fecha_html</td>";
 	$html .= "<td>" . $trabajo->fields['glosa_cliente'] . "</td>";
 	$html .= "<td><a title='" . $trabajo->fields['glosa_asunto'] . "'>" . $trabajo->fields['glosa_asunto'] . "</a></td>";
 	if (Conf::GetConf($sesion, 'UsoActividades')) {

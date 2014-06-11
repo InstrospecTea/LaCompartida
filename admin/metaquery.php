@@ -39,9 +39,7 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<br/>
 		<div class="controls controls-row">
 			<label class="span3 al">Query a ejecutar</label>
-			<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior">
-				<?php echo $_POST['query']; ?>
-			</textarea>			
+			<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior"><?php echo $_POST['query']; ?></textarea>
 		</div>
 		<br/>
 		<div class="controls controls-row">
@@ -57,7 +55,7 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<div class="control-group">
 			<div class="controls">
 				<input type="hidden" value="ejecutar" name="ejecutar" id="ejecutar"/><input type="submit"/>
-			</div> 
+			</div>
 		</div>
 	</form>
 </div>
@@ -90,8 +88,8 @@ if (isset($_POST['ejecutar']) && $_POST['ejecutar'] == 'ejecutar') {
 		$arraybases = $bases->fetchAll(PDO::FETCH_COLUMN, 0);
 
 		foreach ($arraybases as $base) {
-			$query = trim($_POST['query']);	
-			
+			$query = trim($_POST['query']);
+
 			try {
 				$sesion->pdodbh2->exec("use $base;");
 				if ($_POST['detalle']) {

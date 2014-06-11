@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('REP'));
 $agrupadores = explode('-', $vista);
+header('Content-Type: text/html; charset=iso-8859-1');
 
 if (!$ajax) {
 	$pagina = new Pagina($sesion);

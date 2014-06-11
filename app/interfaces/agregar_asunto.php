@@ -285,7 +285,6 @@ if ($opcion == "guardar") {
 		$Asunto->NoEditar("id_usuario_tarifa");
 		$Asunto->NoEditar("id_moneda_tarifa");
 		$Asunto->NoEditar("tarifa_especial");
-		//$Asunto->EditarTodos();
 		$Asunto->Edit("id_usuario", $Sesion->usuario->fields['id_usuario']);
 		$Asunto->Edit("codigo_asunto", $codigo_asunto, true);
 
@@ -368,7 +367,7 @@ if ($opcion == "guardar") {
 
 			$contrato->Fill($_REQUEST, true);
 			$contrato->Edit('codigo_cliente', $codigo_cliente);
-			$contrato->Edit('fecha_inicio_cap',Utiles::fecha2sql($fecha_inicio_cap));
+			$contrato->Edit('fecha_inicio_cap', Utiles::fecha2sql($fecha_inicio_cap));
 
 			if ($contrato->Write()) {
 				#Subiendo Archivo
@@ -390,8 +389,9 @@ if ($opcion == "guardar") {
 				}
 
 				foreach (array_keys($hito_fecha) as $i) {
-					if (empty($hito_monto_estimado[$i]))
+					if (empty($hito_monto_estimado[$i])) {
 						continue;
+					}
 					$CobroPendiente = new CobroPendiente($Sesion);
 					$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 					$CobroPendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
@@ -515,6 +515,7 @@ $Pagina->PrintTop($popup);
 	}
 
 	function Validar(form) {
+
 		if (!form) {
 			var form = $('formulario');
 		}
@@ -596,23 +597,20 @@ $Pagina->PrintTop($popup);
 					form.factura_direccion.focus();
 					return false;
 				}
-				<?php if (UtilesApp::existecampo('factura_comuna', 'contrato', $Sesion)) { ?>
-					if (!form.factura_comuna.value) {
-						alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
-						MuestraPorValidacion('datos_factura');
-						form.factura_comuna.focus();
-						return false;
-					}
-				<?php } ?>
 
-				<?php if (UtilesApp::existecampo('factura_ciudad', 'contrato', $Sesion)) { ?>
-					if (!form.factura_ciudad.value) {
-						alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
-						MuestraPorValidacion('datos_factura');
-						form.factura_ciudad.focus();
-						return false;
-					}
-				<?php } ?>
+				if (!form.factura_comuna.value) {
+					alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
+					MuestraPorValidacion('datos_factura');
+					form.factura_comuna.focus();
+					return false;
+				}
+
+				if (!form.factura_ciudad.value) {
+					alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
+					MuestraPorValidacion('datos_factura');
+					form.factura_ciudad.focus();
+					return false;
+				}
 
 				if (form.id_pais.options[0].selected == true) {
 					alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
@@ -872,6 +870,7 @@ $Pagina->PrintTop($popup);
 	<input type="hidden" name="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
+<<<<<<< HEAD
 	<table width="90%">
 		<tr>
 			<td align="center">
@@ -1035,7 +1034,8 @@ $Pagina->PrintTop($popup);
 						</tr>
 					</table>
 				</fieldset>
-				<br>
+				<br/>
+
 				<?php
 				if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
 					$checked = 'checked';
@@ -1114,7 +1114,6 @@ $Pagina->PrintTop($popup);
 									$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
 								} else {
 									$funcion_validar = "return Validar(jQuery('#formulario').get(0));";
-
 								}
 								?>
 								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
@@ -1125,10 +1124,11 @@ $Pagina->PrintTop($popup);
 			</td>
 		</tr>
 	</table>
-	<br>
+	<br/>
 </form>
 
-<script>
+<script type="text/javascript">
+
 	var form = $('formulario');
 	ShowContrato(form, 'cobro_independiente');
 
@@ -1151,9 +1151,9 @@ $Pagina->PrintTop($popup);
 				if (UsuarioSecundario)
 					jQuery('#id_usuario_secundario').attr({'disabled': ''}).val(ladata[1]);
 			} else {
-				if (ladata[2])
+				if (ladata[2]) {
 					jQuery('#id_usuario_secundario').append('<option value="' + ladata[1] + '" selected="selected">' + ladata[2] + '</option>').attr({'disabled': ''}).val(ladata[1]);
-				;
+				}
 			}
 
 			jQuery('#id_usuario_responsable').removeAttr('disabled');
@@ -1272,12 +1272,14 @@ $Pagina->PrintTop($popup);
 	}
 
 </script>
+
 <?php echo InputId::Javascript($Sesion) ?>
 
 <?php
 $Pagina->PrintBottom($popup);
 
 function EnviarEmail($Asunto) {
+
 	global $Sesion;
 
 	$glosa = $Asunto->fields['glosa_asunto'];

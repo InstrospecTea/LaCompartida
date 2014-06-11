@@ -25,19 +25,15 @@ $color_impar = "#ffffff";
 
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
-$Moneda = new Moneda($Sesion);
-
-if($contrato->fields['codigo_cliente'] != '') {
-	$cliente = new Cliente($Sesion);
-	$cliente->LoadByCodigo($contrato->fields['codigo_cliente']);
-}
 
 $validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
+
 if ($validaciones_segun_config) {
 	$obligatorio = '<span class="req">*</span>';
 } else {
 	$obligatorio = '';
 }
+
 $modulo_retribuciones_activo = Conf::GetConf($Sesion, 'UsarModuloRetribuciones');
 
 if (!defined('HEADERLOADED')) {
@@ -45,6 +41,7 @@ if (!defined('HEADERLOADED')) {
 }
 
 if ($addheaderandbottom || ($popup && !$motivo)) {
+
 	$pagina = new Pagina($Sesion);
 	$show = 'inline';
 
@@ -53,12 +50,18 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 	}
 
 	$contrato = new Contrato($Sesion);
+
 	if($id_contrato > 0) {
 		if(!$contrato->Load($id_contrato)) {
 			$pagina->FatalError(__('Código inválido'));
 		}
 
 		$cobro = new Cobro($Sesion);
+	}
+
+	if($contrato->fields['codigo_cliente'] != '') {
+		$cliente = new Cliente($Sesion);
+		$cliente->LoadByCodigo($contrato->fields['codigo_cliente']);
 	}
 
 	if($contrato->fields['id_moneda'] == '') {
@@ -231,6 +234,7 @@ $resp_plugins = mysql_query($query_plugins, $Sesion->dbh);
 list ($plugins_activos) = mysql_fetch_array($resp_plugins);
 
 
+$Moneda = new Moneda($Sesion);
 $CuentaBanco = new CuentaBanco($Sesion);
 $PrmBanco = new PrmBanco($Sesion);
 $PrmCodigo = new PrmCodigo($Sesion);
@@ -306,7 +310,15 @@ $CobroRtf = new CobroRtf($Sesion);
 				return false;
 			}
 
-			if(form.id_pais.options[0].selected == true)
+			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
+				if (!form.region_cliente.value) {
+					alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+					form.region_cliente.focus();
+					return false;
+				}
+			<?php } ?>
+
+			if(form.id_pais.options[0].selected === true)
 			{
 				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
 				form.id_pais.focus();
@@ -328,7 +340,7 @@ $CobroRtf = new CobroRtf($Sesion);
 			}
 
 			// SOLICITANTE
-			if(form.titulo_contacto.options[0].selected == true)
+			if(form.titulo_contacto.options[0].selected === true)
 			{
 				alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
 				form.titulo_contacto.focus();
@@ -413,6 +425,7 @@ $CobroRtf = new CobroRtf($Sesion);
 			}
 
 		<?php } ?>
+
 		<?php if (Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
 			if ($('id_usuario_secundario').value == '-1')
 			{
@@ -568,6 +581,7 @@ $CobroRtf = new CobroRtf($Sesion);
 
 
 	}
+
 	function ShowHitos()
 	{
 		jQuery("#div_forma_cobro").css('width','91%').show();
@@ -579,9 +593,8 @@ $CobroRtf = new CobroRtf($Sesion);
 		jQuery("#id_moneda_monto").show();
 		jQuery("#span_monto").hide();
 		jQuery("#div_retainer_usuarios").css('display','inline').hide();
-
-
 	}
+
 	function ShowEscalonada()
 	{
 		jQuery("#div_forma_cobro").css('width','730px').show();
@@ -592,9 +605,8 @@ $CobroRtf = new CobroRtf($Sesion);
 		jQuery("#tabla_hitos").hide();
 		jQuery("#span_monto").hide();
 		jQuery("#div_retainer_usuarios").css('display','inline').hide();
-
-
 	}
+
 	function ActualizaRango(desde, cant){
 		var aplicar = parseInt(desde.substr(-1,1));
 		var ini = 0;
@@ -669,7 +681,6 @@ $CobroRtf = new CobroRtf($Sesion);
 			document.getElementById('esc_monto_' + donde).value = monto;
 			document.getElementById('esc_id_moneda_' + donde).value = id_moneda;
 			document.getElementById('esc_descuento_' + donde).value = descuento;
-
 		}
 	}
 
@@ -728,20 +739,21 @@ $CobroRtf = new CobroRtf($Sesion);
 	function ActualizarFormaCobro(laID) {
 
 		if(!laID) {
-			if(jQuery("#fc1").is(':checked')) laID='fc1';
-
-			else if(jQuery("#fc2").is(':checked'))
+			if(jQuery("#fc1").is(':checked')) {
+				laID='fc1';
+			} else if(jQuery("#fc2").is(':checked')) {
 				laID='fc2';
-			else if(jQuery("#fc3").is(':checked'))
+			} else if(jQuery("#fc3").is(':checked')) {
 				laID='fc3';
-			else if(jQuery("#fc5").is(':checked'))
+			} else if(jQuery("#fc5").is(':checked')) {
 				laID='fc5';
-			else if(jQuery("#fc6").is(':checked'))
+			} else if(jQuery("#fc6").is(':checked')) {
 				laID='fc6';
-			else if(jQuery("#fc7").is(':checked'))
+			} else if(jQuery("#fc7").is(':checked')) {
 				laID='fc7';
-			else if(jQuery("#fc8").is(':checked'))
+			} else if(jQuery("#fc8").is(':checked')) {
 				laID='fc8';
+			}
 		}
 
 		jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).hide();
@@ -869,7 +881,9 @@ $CobroRtf = new CobroRtf($Sesion);
 	 */
 	function InactivaContrato(alerta, opcion) {
 		var form = $('formulario');
-		if (!form) form = jQuery('[name="formulario"]').get(0);
+		if (!form) {
+			form = jQuery('[name="formulario"]').get(0);
+		}
 		var activo_contrato = $('activo_contrato');
 		if (!alerta) {
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
@@ -881,19 +895,22 @@ $CobroRtf = new CobroRtf($Sesion);
 			{
 				top:150, left:290, width:400, okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
 				id: "myDialogId",
-				cancel:function(win){ activo_contrato.checked = true;
+				cancel:function(win){
+					activo_contrato.checked = true;
 					jQuery('#desactivar_contrato').remove();
-					return false; },
+					return false;
+				},
 				ok:function(win){
 					jQuery('[name="formulario"]').append('<input type="hidden" value="1" id="desactivar_contrato" name="desactivar_contrato"/>');
-					ValidarContrato(this.form); return true;
-
+					ValidarContrato(this.form);
+					return true;
 				}
 			});
-		}
-		else
+		} else {
 			return false;
+		}
 	}
+
 	//Función que genera la tabla completa
 	function generarFechas()
 	{
@@ -916,12 +933,15 @@ $CobroRtf = new CobroRtf($Sesion);
 		//Se agregan los datos a la tabla
 		addTable();
 	}
+
 	//Borra la tabla completa
 	function eliminarTabla()
 	{
 		var filas = $('id_body').childElements().length;
 		$('id_body').childElements().each(function(item){
-			if(item.id!='fila_fecha_1') item.remove()
+			if (item.id != 'fila_fecha_1') {
+				item.remove();
+			}
 		});
 	}
 
@@ -938,11 +958,16 @@ $CobroRtf = new CobroRtf($Sesion);
 		for (var i = 1; i <= n; i++)
 		{
 			this[i] = 31;
-			if (i==4 || i==6 || i==9 || i==11) {this[i] = 30;}
-			if (i==2) {this[i] = 29;}
+			if (i==4 || i==6 || i==9 || i==11) {
+				this[i] = 30;
+			}
+			if (i==2) {
+				this[i] = 29;
+			}
 		}
 		return this;
 	}
+
 	<?php
 	// numeros de cobros existentes para ver cual sigue
 	$query = "SELECT COUNT(*) FROM cobro_pendiente WHERE id_cobro IS NOT NULL AND id_contrato='" . $contrato->fields['id_contrato'] . "' AND hito = '0'";
@@ -1062,7 +1087,9 @@ $CobroRtf = new CobroRtf($Sesion);
 	{
 		for(var i=$('tabla_fechas').rows.length-1;i>6;i--)
 		{
-			if($('fila_fecha_'+i)) $('fila_fecha_'+i).toggle();
+			if($('fila_fecha_'+i)) {
+				$('fila_fecha_'+i).toggle();
+			}
 		}
 		$('detalles_tabla_mostrar').toggle();
 		$('detalles_tabla_esconder').toggle();
@@ -1113,8 +1140,11 @@ $CobroRtf = new CobroRtf($Sesion);
 				$('fila_fecha_'+i).toggle();
 			if($('detalles_tabla_esconder').getStyle('display')=='none' && $('fila_fecha_'+i).getStyle('display')=='none' && i==6 )
 				$('fila_fecha_'+i).toggle();
-			if(i % 2 == 0) $('fila_fecha_'+i).bgColor="#f0f0f0";
-			else $('fila_fecha_'+i).bgColor="#ffffff";
+			if(i % 2 == 0) {
+				$('fila_fecha_'+i).bgColor="#f0f0f0";
+			} else {
+				$('fila_fecha_'+i).bgColor="#ffffff";
+			}
 		}
 		actualizarMonto();
 		actualizarMoneda();
@@ -1124,12 +1154,10 @@ $CobroRtf = new CobroRtf($Sesion);
 $query = "SELECT id_moneda,simbolo FROM prm_moneda";
 $resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
-	//echo $id_moneda_tabla;
 	?>
 		simbolo[<?php echo $id_moneda_tabla ?>] = "<?php echo $simbolo_tabla ?>";
-	<?php
-}
-?>
+<?php } ?>
+
 	function actualizarMoneda()
 	{
 		var id_moneda=$('id_moneda_monto').value;
@@ -1401,22 +1429,22 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 	function CambioEncargado(elemento){
 
-
 		if (CopiarEncargadoAlAsunto && DesdeAgregaCliente) {
-
-
 
 			if (elemento.name == "id_usuario_responsable") {
 				if (EncargadoSecundario ) {
 					$('id_usuario_secundario').value = $('id_usuario_responsable').value;
-					if(jQuery('#id_usuario_secundario').length>0) jQuery('#id_usuario_secundario').attr('disabled','disabled');
+					if (jQuery('#id_usuario_secundario').length>0) {
+						jQuery('#id_usuario_secundario').attr('disabled', 'disabled');
+					}
 
 				} else {
 
 					$('id_usuario_encargado').value = $('id_usuario_responsable').value;
-					if(jQuery('#id_usuario_encargado').length>0) jQuery('#id_usuario_encargado').attr('disabled','disabled');
+					if(jQuery('#id_usuario_encargado').length>0) {
+						jQuery('#id_usuario_encargado').attr('disabled', 'disabled');
+					}
 				}
-
 
 			} else {
 				if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){
@@ -1431,14 +1459,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					}
 				}
 
-
 			}
 
 		}
 	}
 
 	function agregarHito(){
-		if(!validarHito($('fila_hito_1'))) return false;
+		if(!validarHito($('fila_hito_1'))) {
+			return false;
+		}
 
 		for(var num = 2; $('fila_hito_'+num); num++);
 
@@ -1482,14 +1511,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		var desc = $F('hito_descripcion_'+num);
 		var monto = Number($F('hito_monto_estimado_'+num));
 
-		if($('hito_fecha_'+num).disabled) return true;
-		if(permitirVacio && !fecha && !desc && !monto) return true;
-		/*if(fecha && !(new Date(fecha.replace(/(\d+)-(\d+)-(\d+)/, '$2/$1/$3')).getTime() > new Date().getTime())){
-
-			alert('Ingrese una fecha válida para el hito');
-			$('hito_fecha_'+num).focus();
-			return false;
-		}*/
+		if ($('hito_fecha_' + num).disabled) {
+			return true;
+		}
+		if (permitirVacio && !fecha && !desc && !monto) {
+			return true;
+		}
 		if(!desc){
 			alert('Ingrese una descripción válida para el hito');
 			$('hito_descripcion_'+num).focus();
@@ -1504,7 +1531,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	}
 
 	function eliminarHito(elem){
-		if(confirm('¿Está seguro que desea eliminar este hito?')) $(elem).up('tr').remove();
+		if (confirm('¿Está seguro que desea eliminar este hito?')) {
+			$(elem).up('tr').remove();
+		}
 	}
 
 </script>
@@ -1529,9 +1558,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<!-- RESPONSABLE -->
 		<table id="responsable">
 			<tr   class="controls controls-row ">
-				<td class="al"><div class="span4">
-				<?php echo __('Activo') ?>
-				</div>
+				<td class="al">
+					<div class="span4"><?php echo __('Activo') ?></div>
 				<?php
 				$chk = '';
 				if (!$contrato->loaded()) {
@@ -1540,16 +1568,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				?>
 				</td>
 				<td class="al">
-					<label for="activo_contrato" class="inline-help"><input type="hidden" name="activo_contrato" value="0"/><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick="InactivaContrato(this.checked);" />
+					<label for="activo_contrato" class="inline-help">
+						<input type="hidden" name="activo_contrato" value="0"/>
+						<input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick="InactivaContrato(this.checked);" />
 					&nbsp;<?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></label>
 				 </td>
 			</tr>
 			<?php if (Conf::GetConf($Sesion, 'UsarImpuestoSeparado')) { ?>
 				<tr   class="controls controls-row ">
 					<td class="al">
-						<div class="span4">
-						<?php echo __('Usa impuesto a honorario') ?>
-					</div>
+						<div class="span4"><?php echo __('Usa impuesto a honorario') ?></div>
 					<?php
 						// Se revisa también el primer contrato del cliente para el valor por defecto.
 						$chk = '';
@@ -1561,16 +1589,17 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							$chk = 'checked="checked"';
 						}
 					?>
-					</td><td class="al"><input type="hidden" name="usa_impuesto_separado" value="0"/>
+					</td>
+					<td class="al">
+						<input type="hidden" name="usa_impuesto_separado" value="0"/>
 						<input class="span1" type="checkbox" name="usa_impuesto_separado" id="usa_impuesto_separado" value="1" <?php echo $chk ?> />
 					</td>
 				</tr>
 			<?php } ?>
 			<?php if (Conf::GetConf($Sesion, 'UsarImpuestoPorGastos')) { ?>
 				<tr class="controls controls-row ">
-					<td class="al"><div class="span4">
-					<?php echo __('Usa impuesto a gastos') ?>
-					</div>
+					<td class="al">
+						<div class="span4"><?php echo __('Usa impuesto a gastos') ?></div>
 					<?php
 					// Se revisa también el primer contrato del cliente para el valor por defecto.
 					$chk_gastos = '';
@@ -1582,13 +1611,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						$chk_gastos = 'checked="checked"';
 					}
 					?>
-					</td><td class="al"><input type="hidden" name="usa_impuesto_gastos" value="0"/>
+					</td>
+					<td class="al">
+						<input type="hidden" name="usa_impuesto_gastos" value="0"/>
 						<input class="span1"  type="checkbox" name="usa_impuesto_gastos" id="impuesto_gastos" value="1" <?php echo $chk_gastos ?> />
 					</td>
 				</tr>
-				<?php
-			}
+			<?php } ?>
 
+			<?php
 			if ($contrato->Loaded()) {
 				$separar_liquidaciones = $contrato->fields['separar_liquidaciones'];
 				$exportacion_ledes = $contrato->fields['exportacion_ledes'];
@@ -1646,19 +1677,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					?>
 				</td>
 			</tr>
-			<?php
-			if ($modulo_retribuciones_activo) {
-				?>
+			<?php if ($modulo_retribuciones_activo) { ?>
 				<tr>
-				<td class="al"><div class="span4">
-					<?php
-					echo __('Retribución') . ' ' . __('Encargado Comercial');
-					?>
-				</div></td>
 				<td class="al">
-					<input name="retribucion_usuario_responsable" type="text" size="6" value="<?php
-						echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable'];
-					?>"/>%
+					<div class="span4">
+						<?php echo __('Retribución') . ' ' . __('Encargado Comercial');?>
+					</div>
+				</td>
+				<td class="al">
+					<input name="retribucion_usuario_responsable" type="text" size="6" value="<?php echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable']; ?>"/>%
 				</td>
 				</tr>
 			<?php } ?>
@@ -1687,28 +1714,22 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							</div>
 						</td>
 						<td class="al">
-							<input name="retribucion_usuario_secundario" type="text" size="6" value="<?php
-								echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario'];
-							?>" />%
+							<input name="retribucion_usuario_secundario" type="text" size="6" value="<?php echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario']; ?>" />%
 						</td>
 					</tr>
 				<?php }
 			} ?>
-				<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
-					<tr   class="controls controls-row ">
-						<td class="al">
-							<div class="span4">
-								<?php echo __('Usa exportación LEDES'); ?>
-							</div>
-						</td>
-						<td class="al">
-							<input type="hidden" name="exportacion_ledes" value="0"/>	<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
-						</td>
-				<?php } ?>
-			</tr>
+			<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
+				<tr   class="controls controls-row ">
+					<td class="al">
+						<div class="span4"><?php echo __('Usa exportación LEDES'); ?></div>
+					</td>
+					<td class="al">
+						<input type="hidden" name="exportacion_ledes" value="0"/>	<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
+					</td>
+				</tr>
+			<?php } ?>
 		</table>
-		<br/>
-		<br/>
 		<!-- FIN RESPONSABLE -->
 
 		<!-- DATOS FACTURACION -->
@@ -1756,36 +1777,30 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<textarea class="span4" name='factura_direccion' rows=3 cols="55" ><?php echo $contrato->fields['factura_direccion'] ?></textarea>
 					</td>
 				</tr>
-				<?php if (UtilesApp::existecampo('factura_comuna', 'contrato', $Sesion)) { ?>
-					<tr>
-						<td align="right" colspan="1">
-							<?php echo __('Comuna') . $obligatorio; ?>
-						</td>
-						<td align="left" colspan="5">
-							<input  type="text"  name='factura_comuna' size=50 value="<?php echo $contrato->fields['factura_comuna'] ?>"  />
-						</td>
-					</tr>
-				<?php } ?>
-				<?php if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $Sesion)) { ?>
-					<tr>
-						<td align="right" colspan="1">
-							<?php echo __('Código Postal'); ?>
-						</td>
-						<td align="left" colspan="5">
-							<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
-						</td>
-					</tr>
-				<?php } ?>
-				<?php if (UtilesApp::existecampo('factura_ciudad', 'contrato', $Sesion)) { ?>
-					<tr>
-						<td align="right" colspan="1">
-							<?php echo __('Ciudad') . $obligatorio; ?>
-						</td>
-						<td align="left" colspan="5">
-							<input  type="text"  name='factura_ciudad' size=50 value="<?php echo $contrato->fields['factura_ciudad'] ?>"  />
-						</td>
-					</tr>
-				<?php } ?>
+				<tr>
+					<td align="right" colspan="1">
+						<?php echo __('Comuna') . $obligatorio; ?>
+					</td>
+					<td align="left" colspan="5">
+						<input  type="text"  name='factura_comuna' size=50 value="<?php echo $contrato->fields['factura_comuna'] ?>"  />
+					</td>
+				</tr>
+				<tr>
+					<td align="right" colspan="1">
+						<?php echo __('Código Postal'); ?>
+					</td>
+					<td align="left" colspan="5">
+						<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
+					</td>
+				</tr>
+				<tr>
+					<td align="right" colspan="1">
+						<?php echo __('Ciudad') . $obligatorio; ?>
+					</td>
+					<td align="left" colspan="5">
+						<input  type="text"  name='factura_ciudad' size=50 value="<?php echo $contrato->fields['factura_ciudad'] ?>"  />
+					</td>
+				</tr>
 				<tr>
 					<td align="right" colspan="1">
 						<?php echo __('País') . $obligatorio; ?>
@@ -1794,6 +1809,18 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia DESC'), 'id_pais', $contrato->fields['id_pais'], 'class ="span3"', 'Vacío', '260px'); ?>
 					</td>
 				</tr>
+
+				<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
+					<tr>
+						<td align="right" colspan="1">
+					<?php echo __('Región') . $obligatorio; ?>
+						</td>
+						<td align="left" colspan="5">
+							<input type="text" name='region_cliente' size=50 value="<?php echo $contrato->fields['region_cliente'] ?>" />
+						</td>
+					</tr>
+				<?php } ?>
+
 				<tr>
 					<td align="right" colspan="1">
 						<?php echo __('Teléfono') . $obligatorio; ?>
@@ -1804,7 +1831,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-				<?php echo __('Glosa factura') ?>
+						<?php echo __('Glosa factura') ?>
 					</td>
 					<td align="left" colspan="5">
 						<textarea class="span4" name='glosa_contrato' rows=4 cols="55" ><?php echo $contrato->fields['glosa_contrato'] ?></textarea>
@@ -2651,6 +2678,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$contrato->Edit('opc_ver_valor_hh_flat_fee', Conf::GetConf($Sesion, 'OpcVerValorHHFlatFee') == 1 ? 1 : 0);
 				}
 				?>
+
 				<tr>
 					<td align="right" colspan='1'><input type="hidden" name="opc_ver_asuntos_separados" value="0"/><input type="checkbox" name="opc_ver_asuntos_separados"  value="1" <?php echo $contrato->fields['opc_ver_asuntos_separados'] == '1' ? 'checked="checked"' : '' ?>></td>
 					<td align="left" colspan='5'><label><?php echo __('Ver asuntos por separado') ?></label></td>
@@ -2821,7 +2849,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 		<!-- Modulo de -->
 		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
-			<script>
+			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
 					var generator_url = "<? echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
@@ -3031,7 +3059,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 
 	function YoucangonowMichael() {
-		<?php if ($contrato->fields['id_cuenta']) echo "SetBanco('id_cuenta','id_banco');"; ?>
+		<?php
+		if ($contrato->fields['id_cuenta']) {
+			echo "SetBanco('id_cuenta','id_banco');";
+		}
+		?>
 	}
 
 	Calendar.setup({
@@ -3051,7 +3083,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			button			: elem.id.replace('hito_fecha_', 'img_fecha_hito_')
 		});
 	});
-	$$('tr.esconder').each(function(item){item.hide()});
+	$$('tr.esconder').each(function(item) {
+		item.hide();
+	});
 	actualizarMoneda();
 
 	<?php
