@@ -463,12 +463,23 @@ $AreaProyecto = new AreaProyecto($Sesion);
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
-?>
 
-<script type="text/javascript">
-	<?php if (Conf::GetConf($Sesion, 'CodigoSecundario') && Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) { ?>
-		<?php if (!$Asunto->Loaded()) { ?>
+if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+	if (empty($opcion)){
+		$caracteres = strlen($Cliente->fields['codigo_cliente']);
+	}
+	$field_codigo_asunto_secundario = substr($Asunto->fields['codigo_asunto_secundario'], -$caracteres);
 
+	if (Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) { ?>
+		<script type="text/javascript">
+			var codigo_asunto_secundario = <?php echo $Asunto->Loaded() ? $field_codigo_asunto_secundario : 'null'; ?>;
+			function valueInteger(elm) {
+				var patt = /^(0+)/;
+				var val = elm.val();
+				if (patt.test(val) || val !== Math.abs(val)) {
+					elm.val(Math.abs(val.replace(patt, '')));
+				}
+			}
 			jQuery(document).ready(function() {
 				jQuery.get('ajax/asunto_secundario.php', {'opt': 'ultimo_codigo'}, function(resp) {
 					if (resp.error) {
@@ -476,31 +487,32 @@ $Pagina->PrintTop($popup);
 						return;
 					}
 					jQuery('#codigo_asunto_secundario').val(resp.codigo);
+					codigo_asunto_secundario = resp.codigo;
 				}, 'json');
 
 				jQuery('#codigo_asunto_secundario').change(function() {
 					var me = jQuery(this);
-					var patt = /^(0+)/;
-					if (patt.test(me.val())) {
-						me.val(me.val().replace(patt, ''));
+					valueInteger(me);
+					if (codigo_asunto_secundario != me.val()) {
+						jQuery.get('ajax/asunto_secundario.php', {'opt': 'validar_codigo', codigo: me.val()}, function(resp) {
+							if (resp.error) {
+								alert(resp.error);
+								me.addClass('error-correlativo');
+								me.data('glosa-error', resp.error);
+							} else {
+								me.removeClass('error-correlativo');
+								me.data('glosa-error', 'resp.error');
+							}
+						}, 'json');
 					}
-					jQuery.get('ajax/asunto_secundario.php', {'opt': 'validar_codigo', codigo: me.val()}, function(resp) {
-						if (resp.error) {
-							alert(resp.error);
-							me.addClass('error-correlativo');
-							me.data('glosa-error', resp.error);
-						} else {
-							me.removeClass('error-correlativo');
-							me.data('glosa-error', 'resp.error');
-						}
-					}, 'json');
 				});
-
 			});
-
-		<?php } ?>
-	<?php } ?>
-
+		</script>
+	<?php
+	}
+}
+?>
+<script type="text/javascript">
 	function Volver(form) {
 		window.opener.location = 'agregar_cliente.php?id_cliente=<?php echo $Cliente->fields['id_cliente'] ?>';
 		window.close();
@@ -895,12 +907,6 @@ $Pagina->PrintTop($popup);
 
 								<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
 								<?php
-
-								if (empty($opcion)){
-									$caracteres = strlen($Cliente->fields['codigo_cliente']);
-								}
-								$field_codigo_asunto_secundario = substr($Asunto->fields['codigo_asunto_secundario'], -$caracteres);
-
 								if ( Conf::GetConf($Sesion, 'CodigoSecundario')) {
 									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='color:#FF0000; font-size:10px'>*</span>";
 								} else {
