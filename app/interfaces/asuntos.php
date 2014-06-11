@@ -43,6 +43,7 @@ $GrupoCliente = new GrupoCliente($Sesion);
 
 $Pagina->titulo = __('Listado de') . ' ' . __('Asuntos');
 $Pagina->PrintTop($popup);
+$Form = new Form;
 ?>
 
 <script type="text/javascript">
@@ -122,7 +123,7 @@ $Form = new Form;
 			<tr>
 				<td></td>
 				<td colspan="3" align="right">
-					<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Asunto'), 'agregar', array('id' => 'agregar_asunto', 'title' => __('Agregar Asunto'))); ?>
+					<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Asunto'), 'agregar', array('id' => 'agregar_asunto')); ?>
 				</td>
 			</tr>
 		</table>
@@ -212,9 +213,9 @@ $Form = new Form;
 				<tr>
 					<td>&nbsp;</td>
 					<td class="al" colspan="3">
-						<a href="javascript:void(0);" icon="find" class="btn botonizame" name="buscar" onclick="Listar(jQuery('#form').get(0), 'buscar')"><?php echo __('Buscar'); ?></a>
-						<a href="javascript:void(0);" icon="xls" class="btn botonizame" <?php echo $hide_areas; ?> onclick="Listar(jQuery('#form').get(0), 'xls')" ><?php echo __('Descargar listado a Excel'); ?></a>
-						<a href="javascript:void(0);" icon="xls" class="btn botonizame" <?php echo $hide_areas; ?> onclick="Listar(jQuery('#form').get(0), 'facturacion_xls')" ><?php echo __('Descargar Informaci&oacute;n Comercial a Excel'); ?></a>
+						<?php echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form').get(0), 'buscar')")); ?>
+						<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form').get(0), 'xls')")); ?>
+						<?php echo $Form->icon_button(__('Descargar Información Comercial a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form').get(0), 'facturacion_xls')")); ?>
 					</td>
 				</tr>
 			</table>

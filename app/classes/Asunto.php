@@ -663,17 +663,20 @@ class Asunto extends Objeto {
 		$mostrar_encargado_secundario = UtilesApp::GetConf($this->sesion, 'EncargadoSecundario');
 		$mostrar_encargado2 = UtilesApp::GetConf($this->sesion, 'AsuntosEncargado2');
 		$encargado = $mostrar_encargado_secundario || $mostrar_encargado2;
-
-		$SimpleReport->Config->columns['username']->Visible($usa_username && !$encargado);
-		$SimpleReport->Config->columns['username_ec']->Visible($usa_username && $encargado);
-		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
-		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username && !$encargado);
-		$SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username && $encargado);
+        
+		$SimpleReport->Config->columns['username']->Visible($usa_username);
+		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username);
+        
+        $SimpleReport->Config->columns['username_ec']->Visible($usa_username);
+        $SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
+        		
+        $SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
 		$SimpleReport->Config->columns['nombre_secundario']->Visible(!$usa_username && $encargado);
+        
+        $SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
+        $SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
 
 		if($mostrar_encargado_secundario){
-			$SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
-			$SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
 			$SimpleReport->Config->columns['username_secundario']->Title(__('Encargado Secundario'));
 			$SimpleReport->Config->columns['nombre_secundario']->Title(__('Encargado Secundario'));
 		}
