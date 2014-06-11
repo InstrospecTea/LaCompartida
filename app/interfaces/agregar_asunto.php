@@ -481,14 +481,16 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				}
 			}
 			jQuery(document).ready(function() {
-				jQuery.get('ajax/asunto_secundario.php', {'opt': 'ultimo_codigo'}, function(resp) {
-					if (resp.error) {
-						alert(resp.error);
-						return;
-					}
-					jQuery('#codigo_asunto_secundario').val(resp.codigo);
-					codigo_asunto_secundario = resp.codigo;
-				}, 'json');
+				<?php if (!$Asunto->Loaded()) { ?>
+					jQuery.get('ajax/asunto_secundario.php', {'opt': 'ultimo_codigo'}, function(resp) {
+						if (resp.error) {
+							alert(resp.error);
+							return;
+						}
+						jQuery('#codigo_asunto_secundario').val(resp.codigo);
+						codigo_asunto_secundario = resp.codigo;
+					}, 'json');
+				<?php } ?>
 
 				jQuery('#codigo_asunto_secundario').change(function() {
 					var me = jQuery(this);
