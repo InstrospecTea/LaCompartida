@@ -863,14 +863,12 @@ $Pagina->PrintTop($popup);
 	}
 </script>
 
-<!--onKeyUp="highlight(event)" onClick="highlight(event)"-->
 <form name="formulario" id="formulario" method="post">
 	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name="opc_copiar" value="" />
 	<input type="hidden" name="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
-<<<<<<< HEAD
 	<table width="90%">
 		<tr>
 			<td align="center">
@@ -1115,8 +1113,10 @@ $Pagina->PrintTop($popup);
 								} else {
 									$funcion_validar = "return Validar(jQuery('#formulario').get(0));";
 								}
+								$Form = new Form;
+								echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
+								echo $Form->script();
 								?>
-								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
 							</td>
 						</tr>
 					</table>
