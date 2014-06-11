@@ -166,6 +166,9 @@ class Form {
 		unset($attrs['tag']);
 		if ($tag === 'a') {
 			$attrs['href'] = 'javascript:void(0)';
+			if (empty($attrs['title'])) {
+				$attrs['title'] = $text;
+			}
 		}
 		$span_icon = '';
 		if ($attrs['icon']) {
