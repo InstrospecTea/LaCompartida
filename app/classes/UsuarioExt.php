@@ -57,7 +57,10 @@ class UsuarioExt extends Usuario {
 	);
 	public $tabla = 'usuario';
 	public $campo_id = 'id_usuario';
-	var $secretarios = null;
+	public $campo_glosa = "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
+	public $secretarios = null;
+
+	private $permisos_revisados = array();
 
 	function Loaded() {
 		if ($this->fields['id_usuario']) {
@@ -259,14 +262,8 @@ class UsuarioExt extends Usuario {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($horas) = mysql_fetch_array($resp);
 		list($h, $m, $s) = explode(":", $horas);
-		if (method_exists('Conf', 'GetConf')) {
-			if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
-				return UtilesApp::Time2Decimal("$h:$m");
-			}
-		} else if (method_exists('Conf', 'TipoIngresoHoras')) {
-			if (Conf::TipoIngresoHoras() == 'decimal') {
-				return UtilesApp::Time2Decimal("$h:$m");
-			}
+		if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
+			return UtilesApp::Time2Decimal("$h:$m");
 		}
 		return "$h:$m";
 	}
@@ -287,14 +284,8 @@ class UsuarioExt extends Usuario {
 			$h = '00';
 			$m = '00';
 		}
-		if (method_exists('Conf', 'GetConf')) {
-			if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
-				return UtilesApp::Time2Decimal("$h:$m");
-			}
-		} else if (method_exists('Conf', 'TipoIngresoHoras')) {
-			if (Conf::TipoIngresoHoras() == 'decimal') {
-				return UtilesApp::Time2Decimal("$h:$m");
-			}
+		if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
+			return UtilesApp::Time2Decimal("$h:$m");
 		}
 		return "$h:$m";
 	}
@@ -532,7 +523,7 @@ class UsuarioExt extends Usuario {
 		 *
 		 */
 		$nombre_dato = "";
-		if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'FiltroHistorialUsuarios') != '') {
+		if (Conf::GetConf($this->sesion, 'FiltroHistorialUsuarios') != '') {
 			$filtros = explode(',', Conf::GetConf($this->sesion, 'FiltroHistorialUsuarios'));
 			$filtros = implode("', '", $filtros);
 			$nombre_dato = " AND nombre_dato IN ( '" . $filtros . "' )";
@@ -813,6 +804,47 @@ class UsuarioExt extends Usuario {
 			$this->GuardaCambiosUsuario($arr1, $this->fields);
 		}
 		return $guardado;
+	}
+
+	/**
+	 * Verifica si el usuario cuenta con el permiso indicado.
+	 * @param string $permiso
+	 * @return boolean
+	 */
+	public function Es($permiso) {
+		if (!array_key_exists($permiso, $this->permisos_revisados)) {
+			$this->permisos_revisados[$permiso] = false;
+			for ($x = 0; $x < $this->permisos->num; ++$x) {
+				if ($this->permisos->datos[$x]->fields['codigo_permiso'] == $permiso) {
+					$this->permisos_revisados[$permiso] = $this->permisos->datos[$x]->fields['permitido'] === '1';
+				}
+			}
+		}
+		return $this->permisos_revisados[$permiso];
+	}
+
+	/**
+	 * Crea listado de usuarios activos con llave campo_id y valor campo_glosa
+	 * @param string $where
+	 * @param mixed $con_permisos indica si el usuario debe tener permisos (boolean) o alguno permiso especifico (string), por defecto false (cualquier usuario activo)
+	 * @return array
+	 */
+	public function ListarActivos($where = '', $con_permisos = false) {
+		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
+		if (!$this->Es('SADM')) {
+			$and = "AND usuario.rut != '99511620'";
+		}
+		$permisos = '';
+		if ($con_permisos !== false) {
+			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";
+			$permisos = "INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
+		}
+		$query_extra = "$permisos
+						WHERE usuario.activo = 1
+							$where
+							$and
+						ORDER BY usuario.apellido1";
+		return $Objeto->Listar($query_extra);
 	}
 
 }

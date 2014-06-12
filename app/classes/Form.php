@@ -138,7 +138,7 @@ class Form {
 	}
 
 	/**
-	 *
+	 * Agraga boton con icono de TTB
 	 * @param type $text
 	 * @param type $icon
 	 * @param type $attrs
@@ -153,6 +153,12 @@ class Form {
 		return $this->button($text, $attrs);
 	}
 
+	/**
+	 * Agraga boton estandar de TTB
+	 * @param type $text
+	 * @param type $attrs
+	 * @return type
+	 */
 	public function button($text, $attrs) {
 		$_attrs = array(
 			'tag' => 'a',
@@ -166,6 +172,9 @@ class Form {
 		unset($attrs['tag']);
 		if ($tag === 'a') {
 			$attrs['href'] = 'javascript:void(0)';
+			if (empty($attrs['title'])) {
+				$attrs['title'] = $text;
+			}
 		}
 		$span_icon = '';
 		if ($attrs['icon']) {
@@ -181,7 +190,7 @@ class Form {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public function script() {
 		$scripts = array_unique($this->scripts);

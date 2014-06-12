@@ -1,4 +1,11 @@
 # Changelog
+## Release: 14.3.0
+Jueves 12 de Junio 2014
+
+* **Feature:** [modificaciones a listado asuntos excel](https://github.com/LemontechSA/ttb/pull/533)
+* **Feature:** [suite testing](https://github.com/LemontechSA/ttb/pull/518)
+* **Feature:** [Feature/codigo secundario correlativo](https://github.com/LemontechSA/ttb/pull/489)
+
 ## Hotfix: 14.2.15
 Martes 10 de junio 2014
 * **Fixed:** [Agrega tag sección DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/533)

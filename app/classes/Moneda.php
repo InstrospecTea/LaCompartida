@@ -6,8 +6,9 @@ if(!class_exists('Moneda')) {
 		 public static $llave_carga_masiva = 'codigo';
 
 		function Moneda($sesion, $fields = "", $params = "") {
-			$this->tabla = "prm_moneda";
-			$this->campo_id = "id_moneda";
+			$this->tabla = 'prm_moneda';
+			$this->campo_id = 'id_moneda';
+			$this->campo_glosa = 'glosa_moneda';
 			$this->sesion = $sesion;
 			$this->fields = $fields;
 			$this->guardar_fecha = false;
