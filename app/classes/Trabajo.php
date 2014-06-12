@@ -762,7 +762,8 @@ class Trabajo extends Objeto
 			`work`.`fecha` AS `date`, TIME_TO_SEC(`work`.`duracion`)/60.0 AS `duration`, `work`.`descripcion` AS `notes`,
 			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
 			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
-			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
+			`client`.`codigo_cliente` AS `client_code`, `client`.`codigo_cliente_secundario` AS `secondary_client_code`,
+			`matter`.`codigo_asunto` AS `matter_code`, `matter`.`codigo_asunto_secundario` AS `secondary_matter_code`,
 			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
 			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
 			`work`.`revisado` AS `revised`
@@ -770,6 +771,7 @@ class Trabajo extends Objeto
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
 				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
+				INNER JOIN `cliente` AS `client` ON `client`.`codigo_cliente` = `matter`.`codigo_cliente`
 			WHERE `work`.`id_usuario`=:id AND `work`.`fecha` BETWEEN :after AND :before
 			ORDER BY `work`.`id_trabajo` DESC";
 
@@ -800,17 +802,18 @@ class Trabajo extends Objeto
 			if ($work->revised == '1') {
 				$read_only = 1;
 			}
+
 			$mapped_work = array(
-					'id' => (int) $work->id,
-					'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
-					'date' => !empty($work->date) ? strtotime($work->date) : null,
-					'duration' => !empty($work->duration) ? (float) $work->duration : null,
-					'notes' => !empty($work->notes) ? $work->notes : null,
-					'read_only' => $read_only,
-					'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
-					'billable' => !empty($work->billable) ? (int) $work->billable : 0,
-					'visible' => !empty($work->visible) ? (int) $work->visible : 0
-				);
+				'id' => (int) $work->id,
+				'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
+				'date' => !empty($work->date) ? strtotime($work->date) : null,
+				'duration' => !empty($work->duration) ? (float) $work->duration : null,
+				'notes' => !empty($work->notes) ? $work->notes : null,
+				'read_only' => $read_only,
+				'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
+				'billable' => !empty($work->billable) ? (int) $work->billable : 0,
+				'visible' => !empty($work->visible) ? (int) $work->visible : 0
+			);
 
 			if (!empty($work->rate)) {
 				$mapped_work['rate'] = $work->rate;
@@ -826,9 +829,11 @@ class Trabajo extends Objeto
 			}
 			if (!empty($work->client_code)) {
 				$mapped_work['client_code'] = $work->client_code;
+				$mapped_work['secondary_client_code'] = $work->secondary_client_code;
 			}
 			if (!empty($work->matter_code)) {
 				$mapped_work['matter_code'] = $work->matter_code;
+				$mapped_work['secondary_matter_code'] = $work->secondary_matter_code;
 			}
 			if (!empty($work->task_code)) {
 				$mapped_work['task_code'] = $work->task_code;
@@ -966,7 +971,7 @@ class Trabajo extends Objeto
 			$matter_code = $Matter->fields['codigo_asunto'];
 		} else {
 			$Matter->LoadByCodigo($matter_code);
-			$seconds_matter_code = $Matter->fields['codigo_asunto_secundario'];
+			$secondary_matter_code = $Matter->fields['codigo_asunto_secundario'];
 		}
 
 		if (!empty($data['billable'])) {
@@ -1108,7 +1113,8 @@ class Trabajo extends Objeto
 			`work`.`fecha` AS `date`, TIME_TO_SEC(`work`.`duracion`)/60.0 AS `duration`, `work`.`descripcion` AS `notes`,
 			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
 			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
-			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
+			`client`.`codigo_cliente` AS `client_code`, `client`.`codigo_cliente_secundario` AS `secondary_client_code`,
+			`matter`.`codigo_asunto` AS `matter_code`, `matter`.`codigo_asunto_secundario` AS `secondary_matter_code`,
 			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
 			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
 			`work`.`revisado` AS `revised`
@@ -1116,6 +1122,7 @@ class Trabajo extends Objeto
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
 				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
+				INNER JOIN `cliente` AS `client` ON `client`.`codigo_cliente` = `matter`.`codigo_cliente`
 			WHERE `work`.`id_trabajo`=:id
 			ORDER BY `work`.`id_trabajo` DESC";
 
@@ -1152,7 +1159,9 @@ class Trabajo extends Objeto
 			'activity_code' => !empty($work->activity_code) ? $work->activity_code : null,
 			'area_code' => !empty($work->area_code) ? $work->area_code : null,
 			'client_code' => !empty($work->client_code) ? $work->client_code : null,
+			'secondary_client_code' => !empty($work->secondary_client_code) ? $work->secondary_client_code : null,
 			'matter_code' => !empty($work->matter_code) ? $work->matter_code : null,
+			'secondary_matter_code' => !empty($work->secondary_matter_code) ? $work->secondary_matter_code : null,
 			'task_code' => !empty($work->task_code) ? $work->task_code : null,
 			'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
 			'billable' => !empty($work->billable) ? (int) $work->billable : 0,
