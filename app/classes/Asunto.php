@@ -937,7 +937,7 @@ class Asunto extends Objeto {
 
 	public function CodigoSecundarioValidarCorrelativo($codigo) {
 		if (!preg_match('/^[0-9]+$/', $codigo)) {
-			return __('	Código secundario') . ' invalido';
+			return __('Código secundario') . ' invalido';
 		}
 		$query = "SELECT codigo_asunto_secundario
 					FROM asunto
