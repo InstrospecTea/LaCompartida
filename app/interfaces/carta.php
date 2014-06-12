@@ -103,6 +103,9 @@ $Form = new Form;
 				jQuery('[name="carta[id_carta]"]').val('');
 
 			}
+			jQuery.each(CKEDITOR.instances, function(i){
+				CKEDITOR.instances[i].updateElement();
+			});
 			var form = jQuery('#form_carta');
 			jQuery.post(form.attr('action'), form.serialize(), function(carta) {
 				if (carta.id) {
@@ -218,7 +221,7 @@ $Form = new Form;
 	function GenerarHTML(seccion) {
 		var id = 'editor_' + seccion;
 
-		var html = CKEDITOR.instances[id] && !v ? CKEDITOR.instances[id].getData() : jQuery('#' + id).val();
+		var html = CKEDITOR.instances[id] ? CKEDITOR.instances[id].getData() : jQuery('#' + id).val();
 		if (!html) {
 			return '';
 		}
