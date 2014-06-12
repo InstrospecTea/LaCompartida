@@ -1,8 +1,14 @@
 # Changelog
+## Release: 14.3.0
+Jueves 12 de Junio 2014
+
+* **Feature:** [modificaciones a listado asuntos excel](https://github.com/LemontechSA/ttb/pull/533)
+* **Feature:** [suite testing](https://github.com/LemontechSA/ttb/pull/518)
+* **Feature:** [Feature/codigo secundario correlativo](https://github.com/LemontechSA/ttb/pull/489)
+
 ## Hotfix: 14.2.13
 Lunes 09 de junio 2014
 * **Fixed:** [Repara query reporte profesional v/s asunto](https://github.com/LemontechSA/ttb/pull/531)
-
 
 ## Hotfix: 14.2.10
 Miércoles 04 de junio 2014
