@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.3.2
+Viernes 13 de junio 2014
+* **Fixed:** [Instancia objeto fuera del if](https://github.com/LemontechSA/ttb/pull/537)
+
 ## Hotfix: 14.3.1
 Viernes 13 de junio 2014
 * **Fixed:** [Instancia objeto](https://github.com/LemontechSA/ttb/pull/536)
