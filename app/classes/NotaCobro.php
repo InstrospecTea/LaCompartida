@@ -510,6 +510,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%codigo_contrato%', '', $html);
 				}
 
+				$html = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html);
 				$html = str_replace('%reporte_servicio%', __('Reporte de Servicios'), $html);
 				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%factura_o_nd%', 'Factura o ND', $html);
@@ -3300,6 +3301,7 @@ class NotaCobro extends Cobro {
 					}
 				}
 
+				$html = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html);
 				$html = str_replace('%reporte_servicio%', __('Reporte de Servicios'), $html);
 				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%factura_o_nd%', 'Factura o ND', $html);
@@ -6423,6 +6425,7 @@ class NotaCobro extends Cobro {
 						$imprimir_asuntos .= '<br />';
 				}
 
+				$html = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html);
 				$html = str_replace('%aviso_de_cobro%', 'Aviso de cobro', $html);
 				$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
 				$html = str_replace('%materia%', __('Materia'), $html);

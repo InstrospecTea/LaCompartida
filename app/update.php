@@ -10233,8 +10233,6 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.65:
-			$queries = array();
 			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_moneda` ADD `glosa_moneda_plural_lang` VARCHAR( 30 ) NOT NULL AFTER `glosa_moneda_plural` ;";
 			}
@@ -10382,7 +10380,15 @@ QUERY;
 
 		case 7.72:
 			$queries = array();
-			if(!ExisteCampo('cta_corriente','nro_seguimiento',$dbh)){
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoAsuntoSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoClienteSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.72:
+			$queries = array();
+			if (!ExisteCampo('cta_corriente','nro_seguimiento',$dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `nro_seguimiento` INT(11) NULL AFTER `estado_pago`;";
 				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '0', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
 				$queries[] = "CREATE TABLE `prm_nro_seguimiento_gasto` (
@@ -10397,9 +10403,6 @@ QUERY;
                             ON DELETE NO ACTION
                             ON UPDATE NO ACTION);";
 			}
-			
-			ejecutar($queries, $dbh);
-			break;
 	}
 }
 
@@ -10410,7 +10413,6 @@ QUERY;
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
 $max_update = 7.72;
-
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

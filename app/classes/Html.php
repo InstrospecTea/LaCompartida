@@ -33,9 +33,9 @@ class Html extends \Html {
 	}
 
 	/**
-	 *
+	 * Crea string de atributos HTML a partir de un Array
 	 * @param type $attributes
-	 * @return type
+	 * @return string
 	 */
 	public function attributes($attributes) {
 		$html = '';
@@ -47,6 +47,18 @@ class Html extends \Html {
 			$html = $attributes;
 		}
 		return $html;
+	}
+
+	/**
+	 * Crea un select HTML con opciones Todos, SI y NO
+	 * @param type $name
+	 * @param string $selected
+	 * @param string $opciones
+	 * @return string
+	 */
+	public static function SelectSiNo($name, $selected = '', $opciones = '') {
+		$array = array('SI' => __('SI'), 'NO' => __('NO'));
+		return parent::SelectArrayDecente($array, $name, $selected = '', $opciones = '', 'Todos', '60');
 	}
 
 }

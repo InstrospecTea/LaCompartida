@@ -130,7 +130,8 @@ class SimpleReport_Writer_Json implements SimpleReport_Writer_IWriter {
 				}
 				break;
 			case 'date':
-				$valor = Utiles::sql2fecha($valor, $this->SimpleReport->regional_format['date_format']);
+				// El componente Excel reconoce las fechas sin formato
+				// $valor = Utiles::sql2fecha($valor, $this->SimpleReport->regional_format['date_format']);
 				break;
 			case 'time':
 				$valor = UtilesApp::Hora2HoraMinuto($valor);

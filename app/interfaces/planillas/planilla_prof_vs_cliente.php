@@ -46,11 +46,14 @@ $query = "
 			AND usuario_tarifa_standard.id_moneda = $id_moneda_seleccionada AND usuario_tarifa_standard.id_tarifa = tarifa_defecto.id_tarifa
 
 		LEFT JOIN prm_moneda as mt_contrato ON usuario_tarifa_contrato.id_moneda = mt_contrato.id_moneda
-		LEFT JOIN prm_moneda as mt_defecto ON usuario_tarifa_standard.id_moneda = mt_contrato.id_moneda
+		LEFT JOIN prm_moneda as mt_defecto ON usuario_tarifa_standard.id_moneda = mt_defecto.id_moneda
 
 		WHERE fecha >= '$fecha1' AND fecha <= '$fecha2'
 			GROUP BY trabajo.id_usuario, asunto.codigo_cliente
 			ORDER BY grupo_cliente.glosa_grupo_cliente,usuario.id_categoria_usuario";
+
+// print_r($query);
+// exit;
 
 							
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);

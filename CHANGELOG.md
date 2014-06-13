@@ -1,4 +1,47 @@
 # Changelog
+## Hotfix: 14.3.1
+Viernes 13 de junio 2014
+* **Fixed:** [Instancia objeto](https://github.com/LemontechSA/ttb/pull/536)
+
+## Release: 14.3.0
+Jueves 12 de Junio 2014
+
+* **Feature:** [modificaciones a listado asuntos excel](https://github.com/LemontechSA/ttb/pull/533)
+* **Feature:** [suite testing](https://github.com/LemontechSA/ttb/pull/518)
+* **Feature:** [Feature/codigo secundario correlativo](https://github.com/LemontechSA/ttb/pull/489)
+
+## Hotfix: 14.2.15
+Martes 10 de junio 2014
+* **Fixed:** [Agrega tag sección DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/533)
+
+## Hotfix: 14.2.14
+Martes 10 de junio 2014
+* **Fixed:** [Corrección API para responder de manera correcta con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/532)
+
+## Hotfix: 14.2.13
+Lunes 09 de junio 2014
+* **Fixed:** [Repara query reporte profesional v/s asunto](https://github.com/LemontechSA/ttb/pull/531)
+
+## Hotfix: 14.2.10
+Miércoles 04 de junio 2014
+* **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/528)
+
+## Hotfix: 14.2.9
+Miércoles 04 de junio 2014
+* **Fixed:** [Agrega lang es_colombia](https://github.com/LemontechSA/ttb/pull/526)
+
+## Hotfix: 14.2.8
+Lunes 02 de junio 2014
+* **Fixed:** [Guarda los campos 'limitar', 'limite' y 'agrupar' del reporte avanzado.](https://github.com/LemontechSA/ttb/pull/525)
+
+## Hotfix: 14.2.7
+Lunes 02 de junio 2014
+* **Fixed:** [Corrige errores reporte avanzado](https://github.com/LemontechSA/ttb/pull/524)
+
+## Hotfix: 14.2.6
+Viernes 30 de Mayo 2014
+* **Fixed:** [CorrecciÃ³n formato de fechas para componente Excel](https://github.com/LemontechSA/ttb/pull/522)
+* **Fixed:** [Corrige inicializaciÃ³n de colores en Tipo de dato](https://github.com/LemontechSA/ttb/pull/522)
 
 ## Hotfix: 14.2.5
 Miercoles 28 de Mayo 2014

@@ -6,6 +6,7 @@ class Form {
 
 	public $Utiles;
 	public $Html;
+	protected $scripts = array();
 
 	public function __construct() {
 		$this->Utiles = new \TTB\Utiles();
@@ -136,4 +137,81 @@ class Form {
 		return $html;
 	}
 
+	/**
+	 * Agraga boton con icono de TTB
+	 * @param type $text
+	 * @param type $icon
+	 * @param type $attrs
+	 * @return type
+	 */
+	public function icon_button($text, $icon, $attrs = null) {
+		$_attrs = array(
+			'tag' => 'a'
+		);
+		$attrs = array_merge($_attrs, (array) $attrs);
+		$attrs['icon'] = $icon;
+		return $this->button($text, $attrs);
+	}
+
+	/**
+	 * Agraga boton estandar de TTB
+	 * @param type $text
+	 * @param type $attrs
+	 * @return type
+	 */
+	public function button($text, $attrs) {
+		$_attrs = array(
+			'tag' => 'a',
+			'role' => 'button',
+			'aria-disabled' => 'false',
+			'class' => 'btn ui-button ui-widget ui-state-default ui-corner-all form-btn'
+		);
+		$attrs = array_merge($_attrs, (array) $attrs);
+
+		$tag = $attrs['tag'];
+		unset($attrs['tag']);
+		if ($tag === 'a') {
+			$attrs['href'] = 'javascript:void(0)';
+			if (empty($attrs['title'])) {
+				$attrs['title'] = $text;
+			}
+		}
+		$span_icon = '';
+		if ($attrs['icon']) {
+			$span_icon = $this->Html->tag('span', null, array('class' => "ui-button-icon-primary ui-icon {$attrs['icon']}"));
+			$attrs['class'] .= ' ui-button-text-icon-primary';
+			unset($attrs['icon']);
+		} else {
+			$attrs['class'] .= ' ui-button-text-only';
+		}
+		$span_text = $this->Html->tag('span', $text, array('class' => 'ui-button-text'));
+		$this->scripts[] = 'button';
+		return $this->Html->tag($tag, $span_icon . $span_text, $attrs);
+	}
+
+	/**
+	 * 
+	 */
+	public function script() {
+		$scripts = array_unique($this->scripts);
+		$script_block = '';
+		foreach($scripts as $script) {
+			if (method_exists($this, "{$script}_script")) {
+				$script_block .= $this->{"{$script}_script"}() . "\n";
+			}
+		}
+		return $this->Html->tag('script', $script_block, array('type' => 'text/javascript'));
+	}
+
+	private function button_script() {
+		$script = <<<SCRIPT
+			jQuery('.form-btn').on('mouseover', function() {
+				jQuery(this).addClass('ui-state-hover');
+			});
+			jQuery('.form-btn').on('mouseout', function() {
+				jQuery(this).removeClass('ui-state-hover');
+			});
+SCRIPT;
+		return $script;
+	}
 }

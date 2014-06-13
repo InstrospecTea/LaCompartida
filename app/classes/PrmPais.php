@@ -9,6 +9,7 @@ class PrmPais extends Objeto {
 	function PrmPais($sesion, $fields = '', $params = '') {
 		$this->tabla = 'prm_pais';
 		$this->campo_id = 'id_pais';
+		$this->campo_glosa = 'nombre';
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}

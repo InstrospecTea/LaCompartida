@@ -460,6 +460,7 @@ function TTip($texto) {
 
 $pagina->titulo = __('Ingreso cliente');
 $pagina->PrintTop();
+$Form = new Form;
 ?>
 
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo $_SERVER[PHP_SELF] ?>" >
@@ -483,7 +484,7 @@ $pagina->PrintTop();
 					</div >
 				</td>
 				<td class="al " width="600">
-					<div   class="controls controls-row " style="white-space:nowrap;">	  
+					<div   class="controls controls-row " style="white-space:nowrap;">
 						<input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
 						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('Código secundario') ?>
 								<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
@@ -559,7 +560,7 @@ $pagina->PrintTop();
 					</div>
 				</td>
 				<td class="al">
-					<div class="span4">	
+					<div class="span4">
 						<label for  class="activo">
 							<input type='checkbox' name='activo' id="activo" value='1' <?php echo $cliente->fields['activo'] == 1 ? 'checked="checked"' : !$id_cliente ? 'checked="checked"' : ''  ?>/>
 							&nbsp;<?php echo __('Los clientes inactivos no aparecen en los listados.') ?>
@@ -657,24 +658,45 @@ $pagina->PrintTop();
 	<table width="100%">
 		<tr>
 			<td class="cvs" align="center">
-				<input type="button" name="asuntos" id='asuntos' class=" botonizame" value="<?php echo __('Asuntos') ?>" onMouseOver="goLite(this.form, this)" onMouseOut="goDim(this.form, this)" onClick="iframeLoad('asuntos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&popup=1&from=agregar_cliente')" />
+				<?php
+				$btn_title = __('Asuntos');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "iframeLoad('asuntos.php?codigo_cliente={$cliente->fields['codigo_cliente']}&opc=entregar_asunto&popup=1&from=agregar_cliente');"
+				);
+				echo $Form->button($btn_title, $attrs);
+				?>
 			</td>
 			<td class="cvs" align="center">
-				<input type="button" name="contratos" id='contratos' class=" botonizame" value="<?php echo __('Contratos') ?>" onMouseOver="goLite(this.form, this.name)" onMouseOut="goDim(this.form, this)" onClick="iframeLoad('contratos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&popup=1&buscar=1&activo=SI')" />
+				<?php
+				$btn_title = __('Contratos');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "iframeLoad('contratos.php?codigo_cliente={$cliente->fields['codigo_cliente']}&popup=1&buscar=1&activo=SI');"
+				);
+				echo $Form->button($btn_title, $attrs);
+				?>
 			</td>
 			<td class="cvs" align="center">
-				<input type="button" name="cobros" id='cobros' class=" botonizame" value="<?php echo __('Cobros') ?>" onMouseOver="goLite(this.form, this)" onMouseOut="goDim(this.form, this)" onClick="iframeLoad('lista_cobros.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&popup=1&opc=buscar&no_mostrar_filtros=1')" />
+				<?php
+				$btn_title = __('Cobros');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "iframeLoad('lista_cobros.php?codigo_cliente={$cliente->fields['codigo_cliente']}&popup=1&opc=buscar&no_mostrar_filtros=1');"
+				);
+				echo $Form->button($btn_title, $attrs);
+				?>
 			</td>
 		</tr>
 		<tr>
 			<td class="cvs" align="center" colspan=3>
-				<iframe name='iframe_asuntos'  class="resizableframe" id='iframe_asuntos' src='about:blank' style="width:100%;border:0 none;">&nbsp;</iframe>
+				<iframe name='iframe_asuntos'  class="resizableframe" id='iframe_asuntos' src='about:blank' style="width:100%; height: 300px; border:none;">&nbsp;</iframe>
 			</td>
 		</tr>
 	</table>
 
 </form>
-
+<?php echo $Form->script(); ?>
 <style type="text/css">
 
 	textarea,
@@ -730,7 +752,6 @@ $pagina->PrintTop();
 
 
 <script type="text/javascript">
-
 
 	var CodigoSecundario =<?php echo $CodigoSecundario; ?>;
 	var glosa_cliente_unica = false;
@@ -792,6 +813,15 @@ $pagina->PrintTop();
 				return false;
 			}
 		}
+
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario') && Conf::GetConf($sesion, 'CodigoClienteSecundarioCorrelativo')) { ?>
+			if (jQuery('#codigo_cliente_secundario').hasClass('error-correlativo')) {
+				alert(jQuery('#codigo_cliente_secundario').data('glosa-error'));
+				jQuery('#codigo_cliente_secundario').focus();
+				return false;
+			}
+		<?php } ?>
+
 		form.glosa_cliente.value = form.glosa_cliente.value.trim();
 		if (!form.glosa_cliente.value) {
 			alert("<?php echo __('Debe ingresar el nombre del cliente') ?>");
@@ -1093,13 +1123,13 @@ if (Conf::GetConf($sesion, 'TodoMayuscula')) {
 		window.document.getElementById('iframe_asuntos').src = url;
 	}
 
-<?php
-if ($CodigoSecundario) {
-	echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
-} else {
-	echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
-}
-?>
+	<?php
+	if ($CodigoSecundario) {
+		echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	} else {
+		echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	}
+	?>
 
 	jQuery(document).ready(function() {
 
@@ -1115,17 +1145,51 @@ if ($CodigoSecundario) {
 		url: "//static.thetimebilling.com/js/bootstrap.min.js",
 		dataType: "script",
 		complete: function() {
+		}
+	});
+
+	jQuery(document).ready(function() {
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario') && Conf::GetConf($sesion, 'CodigoClienteSecundarioCorrelativo')) { ?>
+			<?php if (!$cliente->Loaded()) { ?>
+
+				jQuery.get('ajax/cliente.php', {'opt': 'ultimo_codigo'}, function(resp) {
+					if (resp.error) {
+						alert(resp.error);
+						return;
+					}
+					jQuery('#codigo_cliente_secundario').val(resp.codigo);
+				}, 'json');
+
+				jQuery('#codigo_cliente_secundario').change(function() {
+					var me = jQuery(this);
+					var patt = /^(0+)/;
+					if (patt.test(me.val())) {
+						me.val(me.val().replace(patt, ''));
+					}
+					jQuery.get('ajax/cliente.php', {'opt': 'validar_codigo', codigo: me.val()}, function(resp) {
+						if (resp.error) {
+							alert(resp.error);
+							me.addClass('error-correlativo');
+							me.data('glosa-error', resp.error);
+						} else {
+							me.removeClass('error-correlativo');
+							me.data('glosa-error', 'resp.error');
+						}
+					}, 'json');
+				});
+			<?php } ?>
+		<?php } else {?>
 			jQuery('#codigo_cliente_secundario').blur(function() {
 				if (jQuery(this).val() === "") {
 					return;
 				}
-<?php
-if ($_GET['id_cliente']) {
-	echo 'var id_cliente=' . intval($_GET['id_cliente']) . ';';
-} else {
-	echo 'var id_cliente=null;';
-}
-?>
+				<?php
+				if ($_GET['id_cliente']) {
+					echo 'var id_cliente=' . intval($_GET['id_cliente']) . ';';
+				} else {
+					echo 'var id_cliente=null;';
+				}
+				?>
 
 				var dato = jQuery(this).val();
 				var campo = jQuery(this).attr('id');
@@ -1162,16 +1226,16 @@ if ($_GET['id_cliente']) {
 					}
 				});
 			});
-		}
+		<?php } ?>
 	});
 
-<?php
-if ($CodigoSecundario) {
-	echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
-} else {
-	echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
-}
-?>
+	<?php
+	if ($CodigoSecundario) {
+		echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	} else {
+		echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	}
+	?>
 
 </script>
 

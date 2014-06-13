@@ -664,16 +664,19 @@ class Asunto extends Objeto {
 		$mostrar_encargado2 = UtilesApp::GetConf($this->sesion, 'AsuntosEncargado2');
 		$encargado = $mostrar_encargado_secundario || $mostrar_encargado2;
 
-		$SimpleReport->Config->columns['username']->Visible($usa_username && !$encargado);
-		$SimpleReport->Config->columns['username_ec']->Visible($usa_username && $encargado);
-		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
-		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username && !$encargado);
-		$SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username && $encargado);
+		$SimpleReport->Config->columns['username']->Visible($usa_username);
+		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username);
+
+        $SimpleReport->Config->columns['username_ec']->Visible($usa_username);
+        $SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
+
+        $SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
 		$SimpleReport->Config->columns['nombre_secundario']->Visible(!$usa_username && $encargado);
 
+        $SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
+        $SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
+
 		if($mostrar_encargado_secundario){
-			$SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
-			$SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
 			$SimpleReport->Config->columns['username_secundario']->Title(__('Encargado Secundario'));
 			$SimpleReport->Config->columns['nombre_secundario']->Title(__('Encargado Secundario'));
 		}
@@ -924,6 +927,25 @@ class Asunto extends Objeto {
 		return $matters;
 	}
 
+	public function CodigoSecundarioSiguienteCorrelativo() {
+		$query = "SELECT MAX(SUBSTR(codigo_asunto_secundario, INSTR(codigo_asunto_secundario, '-') + 1, LENGTH(codigo_asunto_secundario)) *1) ultimo
+					FROM asunto";
+		$qr = $this->sesion->pdodbh->query($query);
+		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
+		return $ultimo['ultimo'] + 1;
+	}
+
+	public function CodigoSecundarioValidarCorrelativo($codigo) {
+		if (!preg_match('/^[0-9]+$/', $codigo)) {
+			return __('Código secundario') . ' invalido';
+		}
+		$query = "SELECT codigo_asunto_secundario
+					FROM asunto
+					HAVING SUBSTR(codigo_asunto_secundario, INSTR(codigo_asunto_secundario, '-') + 1, LENGTH(codigo_asunto_secundario)) = $codigo";
+		$qr = $this->sesion->pdodbh->query($query);
+		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
+		return empty($ultimo) ? true : __('Código secundario') . ' existente';
+	}
 }
 
 class ListaAsuntos extends Lista {
