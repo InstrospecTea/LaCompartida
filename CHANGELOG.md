@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix: 14.3.1
 Viernes 13 de junio 2014
-* **Fixed:** [Instancia objeto](https://github.com/LemontechSA/ttb/pull/535)
+* **Fixed:** [Instancia objeto](https://github.com/LemontechSA/ttb/pull/536)
 
 ## Release: 14.3.0
 Jueves 12 de Junio 2014
