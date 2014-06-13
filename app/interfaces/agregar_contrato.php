@@ -1913,7 +1913,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<?php echo __('Titulo') . $obligatorio; ?>
 						</td>
 						<td align="left" colspan='3'>
-							<?php echo Html::SelectArrayDecente($PrmTituloPersona->Listar('ORDER BY id_titulo'), 'titulo_contacto', $contrato->fields['titulo_contacto'], 'class="span3"', 'Vacio', '120px'); ?>&nbsp;&nbsp;
+							<?php
+							$PrmTituloPersona = new PrmTituloPersona($Sesion);
+							echo Html::SelectArrayDecente($PrmTituloPersona->Listar('ORDER BY id_titulo'), 'titulo_contacto', $contrato->fields['titulo_contacto'], 'class="span3"', 'Vacio', '120px');
+							?>&nbsp;&nbsp;
 						</td>
 					</tr>
 					<tr>
