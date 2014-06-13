@@ -26,6 +26,8 @@ $color_impar = "#ffffff";
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
 
+$cliente = new Cliente($Sesion);
+
 $validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
 
 if ($validaciones_segun_config) {
@@ -60,7 +62,6 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 	}
 
 	if($contrato->fields['codigo_cliente'] != '') {
-		$cliente = new Cliente($Sesion);
 		$cliente->LoadByCodigo($contrato->fields['codigo_cliente']);
 	}
 
