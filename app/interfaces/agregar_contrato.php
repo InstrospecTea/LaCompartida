@@ -26,7 +26,10 @@ $color_impar = "#ffffff";
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
 
-$cliente = new Cliente($Sesion);
+// previene override del objero, ya que se incluye desde otras interfaces.
+if (empty($cliente)) {
+	$cliente = new Cliente($Sesion);
+}
 
 $validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
 
