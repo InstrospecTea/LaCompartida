@@ -31,7 +31,6 @@ Class UsuarioTarifa extends Objeto {
 			$query = "INSERT usuario_tarifa SET id_tarifa = '$id_tarifa', id_moneda = '$id_moneda',
 								id_usuario = '$id_usuario', tarifa = '$valor'
 								ON DUPLICATE KEY UPDATE tarifa = '$valor'";
-            echo $query.'<hr>';
 		}
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		return true;
