@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.3.6
+Lunes 16 de junio 2014
+* **Fixed:** [CampoCliente (autocomplete) carga los asuntos correctamente.](https://github.com/LemontechSA/ttb/pull/541)
+
 ## Hotfix: 14.3.5
 Lunes 16 de junio 2014
 * **Fixed:** [Agrega alias de $Cliente para el archivo incluido. Corrige nombre de variable.](https://github.com/LemontechSA/ttb/pull/540)
