@@ -235,6 +235,20 @@ class Cliente extends Objeto {
 			)
 		),
 		array(
+			'field' => 'n_cuenta',
+			'title' => 'N° Cuenta',
+			'extras' => array(
+				'width' => 25
+			)
+		),
+		array(
+			'field' => 'glosa_banco',
+			'title' => 'Banco',
+			'extras' => array(
+				'width' => 25
+			)
+		),
+		array(
 			'field' => 'glosa_cliente_referencia',
 			'title' => 'Referencia',
 			'extras' => array(
@@ -671,7 +685,9 @@ class Cliente extends Objeto {
 				cliente.fecha_inactivo,
 				IF(cliente.activo = 1, 'Si', 'No') as activo,
 				moneda_monto.simbolo as simbolo_moneda,
-				moneda_monto.cifras_decimales as decimales_moneda
+			    moneda_monto.cifras_decimales as decimales_moneda,
+				cuenta_banco.numero as n_cuenta,
+				cuenta_banco.glosa as glosa_banco
 			FROM cliente
 				LEFT JOIN grupo_cliente USING (id_grupo_cliente)
 				LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia
@@ -681,8 +697,11 @@ class Cliente extends Objeto {
 				LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
 				LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
 				LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
+				LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
 			$where ORDER BY cliente.glosa_cliente ASC";
+
 		return $query;
+
 	}
 
 	public function DownloadExcel($filtros = array()) {
