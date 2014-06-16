@@ -998,8 +998,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%gastos_con_impuesto_periodo%', '', $html2);
 				}
 				if ($mostrar_gastos_sin_impuesto) {
-					$
-							$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
+					$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
 				} else {
 					$html2 = str_replace('%gastos_sin_impuesto_periodo%', '', $html2);
 				}
