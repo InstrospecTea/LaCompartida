@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix: 14.3.5
+Lunes 16 de junio 2014
+* **Fixed:** [Agrega alias de $Cliente para el archivo incluido. Corrige nombre de variable.](https://github.com/LemontechSA/ttb/pull/540)
+
 ## Hotfix: 14.3.4
 Lunes 16 de junio 2014
 * **Fixed:** [Elimina elementos inecesarios](https://github.com/LemontechSA/ttb/pull/539)
