@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.3.3
+Lunes 16 de junio 2014
+* **Fixed:** [Previene override del objeto](https://github.com/LemontechSA/ttb/pull/538)
+
 ## Hotfix: 14.3.2
 Viernes 13 de junio 2014
 * **Fixed:** [Instancia objeto fuera del if](https://github.com/LemontechSA/ttb/pull/537)
