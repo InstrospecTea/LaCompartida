@@ -139,9 +139,11 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 				->add_restriction($where)
 				->add_select('count(*)', 'total')
 				->execute();
-			$query_asuntos = "UPDATE asunto SET activo = 0, fecha_modificacion = now() WHERE id_contrato = {$contrato->fields['id_contrato']} AND activo";
-			mysql_query($query_asuntos, $Sesion->dbh);
-			$pagina->AddInfo(sprintf(__('Se desactivaron %d asuntos'), $asuntos[0]['total']));
+			if ($asuntos[0]['total'] > 0) {
+				$query_asuntos = "UPDATE asunto SET activo = 0, fecha_modificacion = now() WHERE id_contrato = {$contrato->fields['id_contrato']} AND activo";
+				mysql_query($query_asuntos, $Sesion->dbh);
+				$pagina->AddInfo(sprintf(__('Se desactivaron %d asuntos'), $asuntos[0]['total']));
+			}
 		}
 
 		// cobros pendientes
