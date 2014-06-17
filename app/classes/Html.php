@@ -58,7 +58,35 @@ class Html extends \Html {
 	 */
 	public static function SelectSiNo($name, $selected = '', $opciones = '') {
 		$array = array('SI' => __('SI'), 'NO' => __('NO'));
-		return parent::SelectArrayDecente($array, $name, $selected = '', $opciones = '', 'Todos', '60');
+		return parent::SelectArrayDecente($array, $name, $selected, $opciones, 'Todos', '60');
+	}
+
+	public function link($text, $url, $attrs = '') {
+		$_attrs = array(
+			'href' => $url
+		);
+		$attrs = array_merge($_attrs, (array) $attrs);
+
+		if (empty($attrs['title']) && $attrs['title'] !== false) {
+			$attrs['title'] = $text;
+		}
+		return $this->tag('a', $text, $attrs);
+	}
+
+	/**
+	 *
+	 * @param type $script_block
+	 */
+	public function script_block($script_block) {
+		return $this->tag('script', $script_block, array('type' => 'text/javascript'));
+	}
+
+	/**
+	 *
+	 * @param type $file
+	 */
+	public function script($file) {
+		return $this->tag('script', '', array('type' => 'text/javascript', 'src' => $file));
 	}
 
 }

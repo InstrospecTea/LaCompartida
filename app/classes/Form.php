@@ -172,7 +172,7 @@ class Form {
 		unset($attrs['tag']);
 		if ($tag === 'a') {
 			$attrs['href'] = 'javascript:void(0)';
-			if (empty($attrs['title'])) {
+			if (empty($attrs['title']) && $attrs['title'] !== false) {
 				$attrs['title'] = $text;
 			}
 		}
@@ -190,7 +190,7 @@ class Form {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public function script() {
 		$scripts = array_unique($this->scripts);
@@ -200,7 +200,7 @@ class Form {
 				$script_block .= $this->{"{$script}_script"}() . "\n";
 			}
 		}
-		return $this->Html->tag('script', $script_block, array('type' => 'text/javascript'));
+		return $this->Html->script_block($script_block);
 	}
 
 	private function button_script() {
