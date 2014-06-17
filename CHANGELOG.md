@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.3.7
+Martes 17 de junio 2014
+* **Fixed:** [Añade lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
+
 ## Hotfix: 14.3.6
 Lunes 16 de junio 2014
 * **Fixed:** [CampoCliente (autocomplete) carga los asuntos correctamente.](https://github.com/LemontechSA/ttb/pull/541)
