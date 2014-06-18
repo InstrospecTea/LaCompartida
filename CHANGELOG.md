@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.3.8
+Miércoles 18 de junio 2014
+* **Fixed:** [corrige if y valores para proporcionalidad estandar](https://github.com/LemontechSA/ttb/pull/546)
+
 ## Hotfix: 14.3.7
 Martes 17 de junio 2014
 * **Fixed:** [Añade lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
