@@ -124,6 +124,11 @@ class Factura extends Objeto {
 			)
 		),
 		array(
+			'field' => 'RUT_cliente',
+			'title' => 'RUT',
+			'visible' => false
+		),
+		array(
 			'field' => 'factura_rsocial',
 			'title' => 'Razón Social',
 		),
