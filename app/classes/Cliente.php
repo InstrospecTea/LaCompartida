@@ -237,12 +237,14 @@ class Cliente extends Objeto {
 		array(
 			'field' => 'n_cuenta',
 			'title' => 'N° Cuenta',
+			'visible' => false,
 			'extras' => array(
 				'width' => 25
 			)
 		),
 		array(
 			'field' => 'glosa_banco',
+			'visible' => false,
 			'title' => 'Banco',
 			'extras' => array(
 				'width' => 25
