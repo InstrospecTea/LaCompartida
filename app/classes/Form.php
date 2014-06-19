@@ -14,7 +14,7 @@ class Form {
 	}
 
 	/**
-	 * Construye un select a partir de un arreglo
+	 * Construye un select a partir de un Array
 	 * @param type $name
 	 * @param type $options
 	 * @param type $selected
@@ -22,20 +22,21 @@ class Form {
 	 * @return type
 	 */
 	public function select($name, $options, $selected = null, $attrs = null) {
-		if (empty($attrs['name'])) {
-			$attrs['name'] = $name;
+		$_attrs = (Array) $attrs + array('empty' => '');
+		if (empty($_attrs['name'])) {
+			$_attrs['name'] = $name;
 		}
-		if (empty($attrs['id'])) {
-			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
+		if (empty($_attrs['id'])) {
+			$_attrs['id'] = $this->Utiles->pascalize($_attrs['name']);
 		}
 		$html_options = '';
-		if (!isset($attrs['empty']) || $attrs['empty'] !== false) {
-			$html_options .= $this->Html->tag('option', $attrs['empty'], array('value' => ''), true);
+		if ($_attrs['empty'] !== false) {
+			$html_options .= $this->Html->tag('option', $_attrs['empty'], array('value' => ''));
 		}
-		unset($attrs['empty']);
+		unset($_attrs['empty']);
 		$html_options .= $this->options($options, $selected);
 
-		$select = $this->Html->tag('select', $html_options, $attrs);
+		$select = $this->Html->tag('select', $html_options, $_attrs);
 		return $select;
 	}
 
@@ -65,20 +66,20 @@ class Form {
 	}
 
 	/**
-	 *
+	 * Devuelve elemento label
 	 * @param type $text
 	 * @param type $for
 	 * @return type
 	 */
-	public function label($text, $for = null) {
-		$attrs = array();
+	public function label($text, $for = null, $attrs = null) {
+		$_attrs = (Array) $attrs;
 		if (!empty($for)) {
-			$attrs['for'] = $for;
+			$_attrs['for'] = $for;
 		}
-		return $this->Html->tag('label', $text, $attrs);
+		return $this->Html->tag('label', $text, $_attrs);
 	}
 	/**
-	 *
+	 * Devuelve elemento radio
 	 * @param type $name
 	 * @param type $value
 	 * @param type $selected
@@ -110,18 +111,23 @@ class Form {
 	/**
 	 *
 	 * @param type $name
-	 * @param type $options
+	 * @param type $options Array value => label, label puede ser un Array donde sus valores indican los atributos
 	 * @param type $selected
-	 * @param type $attrs
 	 * @param type $container
 	 * @param type $container_attrs
 	 * @return type
 	 */
-	public function radio_group($name, $options, $selected = null, $attrs = null, $container = 'div', $container_attrs = null) {
+	public function radio_group($name, $options, $selected, $container = 'div', $container_attrs = null) {
 		$html = '';
 		$x = 1;
 		foreach ((Array) $options as $value => $label) {
-			$attrs = array('label' => true) + (Array) $attrs;
+			$_attrs = array();
+			if (is_array($label)) {
+				$_attrs = $label;
+				$label = empty($_attrs['label']) ? $this->Utiles->pascalize($name) : $_attrs['label'];
+				unset($_attrs['label']);
+			}
+			$attrs = array('label' => true) + (Array) $_attrs;
 			if ($attrs['label'] === false) {
 				$value = $label;
 			} else if ($attrs['label'] === true) {
@@ -190,7 +196,7 @@ class Form {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public function script() {
 		$scripts = array_unique($this->scripts);
