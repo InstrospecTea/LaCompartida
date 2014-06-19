@@ -1,4 +1,25 @@
 # Changelog
+
+## Hotfix: 14.3.8
+Miércoles 18 de junio 2014
+* **Fixed:** [corrige if y valores para proporcionalidad estandar](https://github.com/LemontechSA/ttb/pull/546)
+
+## Hotfix: 14.3.7
+Martes 17 de junio 2014
+* **Fixed:** [Añade lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
+
+## Hotfix: 14.3.6
+Lunes 16 de junio 2014
+* **Fixed:** [CampoCliente (autocomplete) carga los asuntos correctamente.](https://github.com/LemontechSA/ttb/pull/541)
+
+## Hotfix: 14.3.5
+Lunes 16 de junio 2014
+* **Fixed:** [Agrega alias de $Cliente para el archivo incluido. Corrige nombre de variable.](https://github.com/LemontechSA/ttb/pull/540)
+
+## Hotfix: 14.3.4
+Lunes 16 de junio 2014
+* **Fixed:** [Elimina elementos inecesarios](https://github.com/LemontechSA/ttb/pull/539)
+
 ## Hotfix: 14.3.3
 Lunes 16 de junio 2014
 * **Fixed:** [Previene override del objeto](https://github.com/LemontechSA/ttb/pull/538)
