@@ -401,12 +401,13 @@ class UsuarioExt extends Usuario {
 	/* Lista de permisos usuario */
 
 	function ListaPermisosUsuario($id_usuario) {
-		$query .= "SELECT codigo_permiso FROM usuario_permiso WHERE id_usuario='" . $id_usuario . "' AND codigo_permiso NOT IN ('ALL')";
+		$query .= "SELECT codigo_permiso FROM usuario_permiso WHERE id_usuario='{$id_usuario}' AND codigo_permiso NOT IN ('ALL')";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$lista = array();
 		while (list($codigo) = mysql_fetch_array($resp)) {
-			$lista[] = $codigo;
+			$lista[$codigo] = true;
 		}
+
 		return $lista;
 	}
 
