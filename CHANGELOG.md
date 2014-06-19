@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.3.9
+Miércoles 19 de junio 2014
+* **Fixed:** [Añade lang en inglés para tags faltantes](https://github.com/LemontechSA/ttb/pull/548)
+
 ## Hotfix: 14.3.8
 Miércoles 18 de junio 2014
 * **Fixed:** [corrige if y valores para proporcionalidad estandar](https://github.com/LemontechSA/ttb/pull/546)
