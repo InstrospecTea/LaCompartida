@@ -579,7 +579,9 @@ $_LANG['Tasa'] = "Tasa";
 $_LANG['Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?'] = "Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?";
 
 
-
+#NOTA COBRO
+$_LANG['HRS TRABAJADAS VALOR RETAINER'] = "WORKED HRS RETAINER VALUE";
+$_LANG['EXTRAORDINARIO'] = "EXTRAORDINARY";
 
 
 
