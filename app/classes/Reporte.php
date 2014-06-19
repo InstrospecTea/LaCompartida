@@ -348,7 +348,7 @@ class Reporte {
 					contrato.id_contrato,
 					\' - \' as tipo_asunto,
 					\' - \' as area_asunto,
-					MONTH(trabajo.fecha) as mes,
+					MONTH('.$campo_fecha.') as mes,
 					grupo_cliente.id_grupo_cliente,
 					IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 					CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
@@ -448,7 +448,6 @@ class Reporte {
 		$s .= ' FROM cobro
 						left join cobro_asunto using (id_cobro)
 						LEFT JOIN asunto using (codigo_asunto)
-						LEFT JOIN 
 						LEFT JOIN (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro
 			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario
 						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato

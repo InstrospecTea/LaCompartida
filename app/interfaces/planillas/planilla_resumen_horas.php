@@ -199,10 +199,10 @@
 	} elseif($vista == 'glosa_cliente') {
 		// Lista de clientes sobre los que se calculan valores. Aparece el encargado comercial
 		$query = "SELECT
-									glosa_cliente,
-									codigo_cliente
-								FROM cliente
-								ORDER BY glosa_cliente, id_cliente";
+					glosa_cliente,
+					codigo_cliente
+				FROM cliente
+				ORDER BY glosa_cliente, id_cliente";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		while(list($nombre_cliente, $id_cli) = mysql_fetch_array($resp)) {
 			$ws->write(++$fila, $offset_columnas, $nombre_cliente, $formato_nombre);
@@ -215,13 +215,15 @@
 		}
 	} elseif($vista == 'mes') {
 		for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a) {
-			for($m = ($a==0?$fecha1_m:0) ; $m <= ($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m) {
-				$ws->write(++$fila, $offset_columnas, ($fecha1_a+$a).' - '.$meses[$m], $formato_nombre);
+			for($m = ($a==0?$fecha1_m[1]:0) ; $m <= ($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m) {
+				$ws->write(++$fila, $offset_columnas, ($fecha1_a+$a).' - '.$meses[$m-1], $formato_nombre);
 				// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
 				// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
-				for($j=0; $j<$numero_columnas_a_llenar; ++$j)
+				for($j=0; $j<$numero_columnas_a_llenar; ++$j) {
 					$vacio[$i][$j] = true;
-				$ids[] = ($m).'-'.($fecha1_a+$a);
+				}
+				$auxmes = ($m < 10 ? '0'.$m : $m);
+				$ids[] = ($auxmes).'-'.($fecha1_a+$a);
 				++$i;
 			}
 		}
@@ -376,7 +378,6 @@
 				}
 			}
 		} elseif($vista=='mes') {
-
 			list($m, $a) = split('-', $ids[$t]);
 			$query3 = "SELECT
 							SUM(costo)
@@ -502,12 +503,7 @@
 		global $offset_columnas;
 
 		$reporte->setTipoDato($tipo_dato);
-		echo "<br/>";
-		echo $reporte->sQuery();
-		echo "<br/>";
 		$reporte->Query();
-		echo "pase";
-		echo "<br/>";
 		$r = $reporte->toArray();
 		foreach($r as $k_a => $a) {
 			if(is_array($a)) {
