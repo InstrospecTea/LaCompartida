@@ -616,7 +616,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
                 </td>
             </tr>
         <?php } ?>
-
+       
         <?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
             <tr>
                 <td colspan="2" align=right>
@@ -630,9 +630,12 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             <input type="hidden" name="codigo_actividad" id="codigo_actividad">
             <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
         <?php } ?>
-
+            <tr>
+                <td><div id="codigo_ledes" ></div></td>
+            </tr>
         <?php
         // Mostrar este campo solo cuando sea un revisor
+        // HERE!!! 
         if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) {
             ?>
             <tr>
@@ -1500,9 +1503,27 @@ if (isset($t) && $t->Loaded() && $opcion != 'nuevo') {
                         googie2.setCurrentLanguage('en');
                     }
                 });
-
-
             }
+
+            //MODIFICANDO
+            if (!codigo) {
+                jQuery('#codigo_ledes').html('');
+            } else {
+                jQuery.ajax({
+                    type: "POST",
+                    url: "ajax/ajax_ledes_trabajos.php",
+                    data: {
+                            opcion: 'ledes', 
+                            codigo_cliente: jQuery('#campo_codigo_cliente').val(), 
+                            conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
+                            permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
+                            permiso_profesional: <?php echo $permiso_profesional->fields['permitido']; ?>
+                        }
+                }).done(function(response) {
+                    jQuery('#codigo_ledes').html(response);
+                });
+            };
+
         });
 
 
