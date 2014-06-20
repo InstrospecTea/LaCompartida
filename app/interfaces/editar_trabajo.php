@@ -633,7 +633,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
 
         <?php
         // Mostrar este campo solo cuando sea un revisor
-        if (Conf::GetConf($sesion, 'ExportacionLedes') && $permiso_revisor->fields['permitido']) {
+        if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) {
             ?>
             <tr>
                 <td colspan="2" align=right>
