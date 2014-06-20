@@ -350,12 +350,12 @@ if ($opcion == "guardar") {
 				$monto = '0';
 
 			if ($tipo_tarifa == 'flat') {
-				if (empty($Tarifa_flat)) {
+				if (empty($tarifa_flat)) {
 					$Pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
 					$val = true;
 				} else {
 					$Tarifa = new Tarifa($Sesion);
-					$id_tarifa = $Tarifa->GuardaTarifaFlat($Tarifa_flat, $id_moneda, $id_tarifa_flat);
+					$id_tarifa = $Tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
 					$_REQUEST['id_tarifa'] = $id_tarifa;
 				}
 			}
