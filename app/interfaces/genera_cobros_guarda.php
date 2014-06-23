@@ -198,7 +198,7 @@ if ($print) {
 
 				$NotaCobro->LoadAsuntos();
 
-				$lang_archivo = 'es.php';
+				$lang_archivo = $cob['codigo_idioma'] . '.php';
 
 				require Conf::ServerDir() . "/lang/$lang_archivo";
 
