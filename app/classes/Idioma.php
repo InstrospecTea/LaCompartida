@@ -15,4 +15,26 @@ class Idioma extends Objeto {
 		$this->guardar_fecha = false;
 	}
 
+	public function Listar($query_extra = '') {
+		
+		if (preg_match('/[\(\.]/', $this->campo_glosa)) { //verifica si es funcion o parte de table.field
+			$glosa = $this->campo_glosa;
+		} else {
+			$glosa = "{$this->tabla}.{$this->campo_glosa}";
+		}
+		$query = "SELECT
+						{$this->tabla}.codigo_idioma AS id,
+						$glosa AS glosa
+					FROM {$this->tabla} {$query_extra}";
+		$qr = $this->sesion->pdodbh->query($query);
+		$usuarios = $qr->fetchAll(PDO::FETCH_ASSOC);
+		$respuesta = array();
+
+		$total_usuarios = count($usuarios);
+		for ($x = 0; $x < $total_usuarios; ++$x) {
+			$respuesta[$usuarios[$x]['id']] = $usuarios[$x]['glosa'];
+		}
+		return $respuesta;
+	}
 }
+
