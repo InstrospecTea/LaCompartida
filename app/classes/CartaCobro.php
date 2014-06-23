@@ -1172,7 +1172,6 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
-				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 
 				$query = "SELECT factura.numero as documentos
 							FROM factura
