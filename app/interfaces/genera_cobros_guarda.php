@@ -200,7 +200,7 @@ if ($print) {
 
 				$lang_archivo = $cob['codigo_idioma'] . '.php';
 
-				require_once Conf::ServerDir() . "/lang/$lang_archivo";
+				require Conf::ServerDir() . "/lang/$lang_archivo";
 
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
