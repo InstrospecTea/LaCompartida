@@ -12,7 +12,6 @@ $respuesta = '';
 
 switch ($opcion) {
 	case 'ledes':
-		echo $controlador->clienteSeExportaComoLedes($codigo_cliente);
 		if ($controlador->clienteSeExportaComoLedes($codigo_cliente)) {
 			$respuesta = $controlador->renderizaControlesLedes(
 					$conf_activa, 
@@ -21,18 +20,27 @@ switch ($opcion) {
 					$permiso_profesional
 				);
 		} else {
-			$respuesta = 'not happening bro';
+			$respuesta = $controlador->respuestaVacia();
 		}
 		break;
-	case 'test':
-		$respuesta = '<p>test</p>';
+	case 'act':
+		if ($controlador->correspondeMostrarActividades($ledes, $actividades, $codigo_cliente)) {
+			$respuesta = $controlador->renderizaControlesActividades(
+				$codigo_actividad,
+				$codigo_asunto
+			);
+		} else {
+			$respuesta = $this->respuestaVacia();
+		}
 		break;
 	default:
-		$respuesta = $controlador->respuestaVacia();
+		$respuesta = $this->respuestaVacia();
 		break;
 }
 
 echo $respuesta;
+
+################################################################################################
 
 /**
 * Controlador que maneja y responde a los request AJAX.
@@ -53,11 +61,17 @@ class AjaxLedes {
 
 		if ($conf_activa && ($permiso_revisor || $permiso_profesional)) {
 			$sesion = new Sesion(array('PRO', 'REV', 'SEC'));
-			return '<tr><td colspan="2" align=right>'.__('Código UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td></tr>';
+			return '<td colspan="2" align=right>'.__('Código UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td>';
 		} else {
-			return 'False! muajajaja';
+			return '';
 		}
 
+	}
+
+	public function renderizaControlesActividades($codigo_actividad, $codigo_asunto) {
+		$sesion = new Sesion(array('PRO', 'REV', 'SEC'));
+		$html = InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto);
+		return '<td colspan="2" align=right>'.__('Actividad').'</td>'.'<td align=left width="440" nowrap>'.$html.'</td>';
 	}
 
 	/**
@@ -71,6 +85,29 @@ class AjaxLedes {
 		$contrato = new Contrato($sesion);
 		$contrato->Load($codigo_cliente);
 		return $contrato->fields['exportacion_ledes'];
+	}
+
+	/**
+	 *  Método que revisa si correpsonde renderizar el control de actividades según la configuración
+	 *	de código LEDES, Actividades y si el cliente se exporta como LEDES.
+	 *	Parámetros:
+	 *		- $ledes: True o False dependiendo de la configuracion LEDES.
+	 *		- $actividades: True o False dependiendo de la configuración de actividades.
+	 *		- $codigo_cliente: Para verificar si el cliente se exporta como LEDES.
+	 */
+	public function correspondeMostrarActividades($ledes, $actividades, $codigo_cliente) {
+
+		if ($ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
+			return true;
+		} 
+
+		if ($actividades) {
+			return true;
+		}
+
+		return false;
+
+		// return true;
 	}
 
 	public function respuestaVacia() { return ''; }

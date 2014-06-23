@@ -593,7 +593,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             <td align=left width="440" nowrap>
         <?php
         $oncambio = '+CargarTarifa();';
-        if (Conf::GetConf($sesion, 'UsoActividades')) {
+        if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
             $oncambio .= 'CargarActividad();';
         }
         UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
@@ -617,34 +617,44 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             </tr>
         <?php } ?>
        
-        <?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
-            <tr>
-                <td colspan="2" align=right>
-                    <?php echo __('Actividad'); ?>
-                </td>
-                <td align=left width="440" nowrap>
-                    <?php echo InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['codigo_asunto']); ?>
-                </td>
+        <?php if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) { ?>
+            <tr id="actividades">
+                <?php 
+                    if ($t->Loaded()) {
+                ?>
+                    <td colspan="2" align=right>
+                        <?php echo __('Actividad'); ?>
+                    </td>
+                    <td align=left width="440" nowrap>
+                        <?php echo InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['codigo_asunto']); ?>
+                    </td>
+                <?php
+                    }
+                ?>
             </tr>
         <?php } else { ?>
             <input type="hidden" name="codigo_actividad" id="codigo_actividad">
             <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
         <?php } ?>
-            <tr>
-                <td><div id="codigo_ledes" ></div></td>
-            </tr>
+            
         <?php
         // Mostrar este campo solo cuando sea un revisor
         // HERE!!! 
         if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) {
             ?>
-            <tr>
-                <td colspan="2" align=right>
-                    <?php echo __('Código UTBMS'); ?>
-                </td>
-                <td align=left width="440" nowrap>
-                    <?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', "codigo_tarea", $t->fields['codigo_tarea']); ?>
-                </td>
+            <tr id="codigo_ledes" >
+                <?php 
+                    if ($t->Loaded()) { 
+                ?>
+                    <td colspan="2" align=right>
+                        <?php echo __('Código UTBMS') ?>
+                    </td>
+                    <td align=left width="440" nowrap>
+                        <?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $t->fields['codigo_tarea']) ?>
+                    </td>
+                <?php
+                    }
+                ?>
             </tr>
         <?php
         }
@@ -1467,6 +1477,55 @@ if (isset($t) && $t->Loaded() && $opcion != 'nuevo') {
 
     jQuery('document').ready(function() {
 
+        jQuery('#codigo_cliente, #codigo_cliente_secundario').change(function() {
+
+            var codigo = jQuery(this).val();
+
+            //MODIFICANDO
+            if (!codigo) {
+                jQuery('#codigo_ledes').html('');
+            } else {
+                jQuery.ajax({
+                    type: "POST",
+                    url: "ajax/ajax_ledes_trabajos.php",
+                    data: {
+                            opcion: 'ledes', 
+                            codigo_cliente: jQuery('#campo_codigo_cliente').val(), 
+                            conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
+                            permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
+                            permiso_profesional: <?php echo $permiso_profesional->fields['permitido']; ?>
+                        }
+                }).done(function(response) {
+                    jQuery('#codigo_ledes').html(response);
+                });
+
+                jQuery.ajax({
+                    type: "POST",
+                    url: "ajax/ajax_ledes_trabajos.php",
+                    data: {
+                        opcion: 'act',
+                        ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
+                        actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
+                        codigo_cliente: jQuery('#campo_codigo_cliente').val(),
+                        <?php 
+
+                        if ($t->fields['codigo_actividad']) {
+                            echo 'codigo_actividad: '. $t->fields['codigo_actividad'].',';
+                        }; 
+
+                        if ($t->fields['codigo_asunto']) {
+                            echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
+                        }; 
+
+                        ?>
+                    }
+                }).done(function(response) {
+                    jQuery('#actividades').html(response);
+                });
+            };
+
+        });
+
         jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
 
             var codigo = jQuery(this).val();
@@ -1505,24 +1564,7 @@ if (isset($t) && $t->Loaded() && $opcion != 'nuevo') {
                 });
             }
 
-            //MODIFICANDO
-            if (!codigo) {
-                jQuery('#codigo_ledes').html('');
-            } else {
-                jQuery.ajax({
-                    type: "POST",
-                    url: "ajax/ajax_ledes_trabajos.php",
-                    data: {
-                            opcion: 'ledes', 
-                            codigo_cliente: jQuery('#campo_codigo_cliente').val(), 
-                            conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
-                            permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
-                            permiso_profesional: <?php echo $permiso_profesional->fields['permitido']; ?>
-                        }
-                }).done(function(response) {
-                    jQuery('#codigo_ledes').html(response);
-                });
-            };
+            
 
         });
 
