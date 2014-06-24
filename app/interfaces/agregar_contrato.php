@@ -126,9 +126,26 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
 	}
 
+	$activo_antes = $contrato->fields['activo'];
 	$contrato->Fill($_REQUEST, true);
 
 	if ($contrato->Write()) {
+		if ($activo_antes != $contrato->fields['activo'] && $contrato->fields['activo'] == 'NO') {
+			// Desactiva asuntos del contrato.
+			$where = new CriteriaRestriction("id_contrato = '{$contrato->fields['id_contrato']}' AND activo");
+			$Criteria = new Criteria($Sesion);
+			$asuntos = $Criteria
+				->add_from('asunto')
+				->add_restriction($where)
+				->add_select('count(*)', 'total')
+				->execute();
+			if ($asuntos[0]['total'] > 0) {
+				$query_asuntos = "UPDATE asunto SET activo = 0, fecha_modificacion = now() WHERE id_contrato = {$contrato->fields['id_contrato']} AND activo";
+				mysql_query($query_asuntos, $Sesion->dbh);
+				$pagina->AddInfo(sprintf(__('Se desactivaron %d asuntos'), $asuntos[0]['total']));
+			}
+		}
+
 		// cobros pendientes
 		CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 		for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
@@ -247,6 +264,7 @@ $Idioma = new Idioma($Sesion);
 $TramiteTarifa = new TramiteTarifa($Sesion);
 $Carta = new Carta($Sesion);
 $CobroRtf = new CobroRtf($Sesion);
+$Form = new Form;
 ?>
 <script type="text/javascript">
 
@@ -884,32 +902,34 @@ $CobroRtf = new CobroRtf($Sesion);
 	 * Desactivar contrato para no verlo en cobros. (generación)
 	 */
 	function InactivaContrato(alerta, opcion) {
-		var form = $('formulario');
-		if (!form) {
-			form = jQuery('[name="formulario"]').get(0);
-		}
+		form = jQuery('[name="formulario"]').get(0);
+
 		var activo_contrato = $('activo_contrato');
 		if (!alerta) {
-			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está desactivando este contrato, por lo tanto este contrato no aparecerá en la lista de la generación de ') . __('cobros') ?>.</span><br>';
-			text_window += '<br><table><tr>';
-			text_window += '<td align="right"><span style="text-align:center; font-size:11px;color:#FF0000; "><?php echo __('¿Está seguro de desactivar este contrato?') ?>:</span></td></tr>';
-			text_window += '</table>';
-			Dialog.confirm(text_window,
-			{
-				top:150, left:290, width:400, okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
-				id: "myDialogId",
-				cancel:function(win){
-					activo_contrato.checked = true;
-					jQuery('#desactivar_contrato').remove();
-					return false;
-				},
-				ok:function(win){
-					jQuery('[name="formulario"]').append('<input type="hidden" value="1" id="desactivar_contrato" name="desactivar_contrato"/>');
-					ValidarContrato(this.form);
-					return true;
-				}
-			});
+			var img = '<center><img src="<?php echo Conf::ImgDir() ?>/ajax_loader.gif" /></center>';
+			jQuery('<p/>')
+					.html(img)
+					.attr('title', '<?php echo __('ALERTA'); ?>')
+					.load('ajax/agregar_contrato.php', {accion: 'msg_desactivar', id_contrato: '<?php echo $contrato->fields['id_contrato']; ?>'})
+					.dialog({
+						resizable: false,
+						modal: true,
+						dialogClass: 'no-close',
+						closeOnEscape: false,
+						width: 350,
+						'buttons': {
+							'Cancelar': function() {
+								activo_contrato.checked = true;
+								jQuery('#desactivar_contrato').remove();
+								jQuery(this).dialog('close');
+							},
+							'Aceptar': function() {
+								jQuery('[name="formulario"]').append('<input type="hidden" value="1" id="desactivar_contrato" name="desactivar_contrato"/>');
+								ValidarContrato(this.form);
+								return true;
+							}
+						}
+					});
 		} else {
 			return false;
 		}
@@ -3015,8 +3035,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<td>
 								<input type="hidden" id="form_generator_status" value="" />
 								<input type="hidden" id="id_contract_generator" value="" />
-								<input type="button" id="add_generator" value='<?php echo __('Agregar') . ' ' . __('Generador') ?>' class='btn' >&nbsp;
-								<input type="button" id="cancel_generator" value='<?php echo __('Cancelar') ?>' class='btn' />
+								<?php
+								echo $Form->button(__('Agregar') . ' ' . __('Generador'), array('id' => 'add_generator'));
+								echo $Form->button(__('Cancelar'), array('id' => 'cancel_generator'));
+								?>
 							</td>
 						<tr>
 					</tbody>
@@ -3037,12 +3059,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<legend><?php echo __('Guardar datos') ?></legend>
 				<table>
 					<tr>
-						<td colspan=6 align="center">
-							<?php if (Conf::GetConf($Sesion, 'RevisarTarifas')) { ?>
-								<input type="button" class=btn value="<?php echo __('Guardar') ?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false);" />
-							<?php } else { ?>
-								<input type="button" class=btn value="<?php echo __('Guardar') ?>" onclick="ValidarContrato(this.form)" />
-							<?php } ?>
+						<td colspan="6" align="center">
+							<?php
+							if (Conf::GetConf($Sesion, 'RevisarTarifas')) {
+								$onclick = "return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false)";
+							} else {
+								$onclick = "ValidarContrato(this.form)";
+							}
+							echo $Form->button(__('Guardar'), array('onclick' => $onclick));
+							?>
 						</td>
 					</tr>
 				</table>
@@ -3054,7 +3079,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<!-- FIN INFORMACION COMERCIAL GENERAL -->
 <?php if ($popup && !$motivo) { ?>
 	</form>
-<?php } ?>
+<?php }
+echo $Form->script();
+?>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		ActualizarFormaCobro();

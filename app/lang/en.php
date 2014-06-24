@@ -1,6 +1,4 @@
 <?php
-require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
-
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
 $_LANG['Fecha'] = "Date";
