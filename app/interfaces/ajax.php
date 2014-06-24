@@ -748,16 +748,23 @@ if ($accion == "consistencia_cliente_asunto") {
 		$Cliente = new Cliente($sesion);
 		if ($Cliente->LoadByCodigo($codigo_cliente)) {
 			$Asunto = new Asunto($sesion);
-			$response['es_primer_asunto'] = $Asunto->esPrimerAsunto($codigo_cliente);
+			if (!empty($id_asunto)) {
+				if (!$Asunto->Load($id_asunto)) {
+					$response['error_glosa'] = utf8_encode('Código asunto inválido');
+				}
+			}
+			if (empty($response['error_glosa'])) {
+				$response['es_primer_asunto'] = $Asunto->esPrimerAsunto($codigo_cliente);
+			}
 		} else {
-			$response['error'] = true;
 			$response['error_glosa'] = utf8_encode('Código cliente inválido');
 		}
 	} else {
-		$response['error'] = true;
 		$response['error_glosa'] = utf8_encode('Código cliente vacío');
 	}
-
+	if (!empty($response['error_glosa'])) {
+		$response['error'] = true;
+	}
 	echo json_encode($response);
 } else {
 	echo utf8_encode("ERROR AJAX. Acción: $accion");

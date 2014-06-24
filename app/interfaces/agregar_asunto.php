@@ -877,7 +877,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 <form name="formulario" id="formulario" method="post">
 	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name="opc_copiar" value="" />
-	<input type="hidden" name="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
+	<input type="hidden" name="id_asunto" id="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
 	<table width="90%">
@@ -942,10 +942,24 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								<?php echo __('Cliente') ?>
 							</td>
 							<td align="left">
-								<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-									echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], '  ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
+								<?php
+								if (!$Asunto->Loaded()) {
+									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
+									} else {
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
+									}
 								} else {
-									echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], '  ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
+									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+										$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
+										$_name = 'codigo_cliente_secundario';
+									} else {
+										$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
+										$_name = 'codigo_cliente';
+									}
+									echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
+									echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
+									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $Asunto->fields['codigo_cliente'] . '">';
 								}
 								?>
 								<span style="color:#FF0000; font-size:10px">*</span>
@@ -1293,7 +1307,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		if (codigo_cliente !== undefined && codigo_cliente != '') {
 			jQuery.get(
 				root_dir + '/app/interfaces/ajax.php',
-				{'accion': 'es_primer_asunto', 'codigo_cliente': codigo_cliente},
+				{'accion': 'es_primer_asunto', 'codigo_cliente': codigo_cliente, 'id_asunto': jQuery('#id_asunto').val()},
 				function (response) {
 					var _response = jQuery.parseJSON(response);
 					if (_response.error == false) {
