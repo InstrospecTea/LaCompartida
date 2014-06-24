@@ -229,8 +229,6 @@ if ($print) {
 				 	}
 					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
 				}
-
-				// echo '<hr>contador ' . $contador++ .'| cobro = '. $cob['id_cobro'].'<hr><style>'.$cssData.'</style>'.$html;
 			}
 
 			$doc->endChunkedOutput("cobro_masivo_$id_usuario.doc");
