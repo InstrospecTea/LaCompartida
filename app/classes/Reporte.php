@@ -589,14 +589,12 @@ class Reporte {
 		// D : monto total de trabajos (tarifa del cliente)
 
 		if ($this->proporcionalidad == 'estandar') {
+			$s_tarifa = 'tarifa_hh_estandar';
+			$s_monto_thh = $s_monto_thh_estandar;
+		} else {
 			$s_tarifa = "IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh)";
 			$s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE'," . $s_monto_thh_estandar . "," . $s_monto_thh_simple . ")";
-		} else {
-			$s_tarifa = "tarifa_hh";
-			$s_monto_thh = $s_monto_thh_simple;
 		}
-
-
 
 		$monto_estandar = "SUM(
 								trabajo.tarifa_hh_estandar

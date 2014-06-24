@@ -1,4 +1,31 @@
 # Changelog
+## Hotfix: 14.3.12
+Lunes 23 de junio 2014
+* **Fixed:** [Corrige impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/557)
+
+## Hotfix: 14.3.11
+Lunes 23 de junio 2014
+* **Fixed:** [Deshabilita impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/556)
+
+## Hotfix: 14.3.10
+Lunes 23 de junio 2014
+* **Fixed:** [Corrige selector de idioma en agregar_contrato](https://github.com/LemontechSA/ttb/pull/554)
+
+## Hotfix: 14.3.9
+Miércoles 19 de junio 2014
+* **Fixed:** [Añade lang en inglés para tags faltantes](https://github.com/LemontechSA/ttb/pull/548)
+
+## Hotfix: 14.3.8
+Miércoles 18 de junio 2014
+* **Fixed:** [corrige if y valores para proporcionalidad estandar](https://github.com/LemontechSA/ttb/pull/546)
+
+## Hotfix: 14.3.7
+Martes 17 de junio 2014
+* **Fixed:** [Añade lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
+
+## Hotfix: 14.3.6
+Lunes 16 de junio 2014
+* **Fixed:** [CampoCliente (autocomplete) carga los asuntos correctamente.](https://github.com/LemontechSA/ttb/pull/541)
 
 ## Hotfix: 14.3.5
 Lunes 16 de junio 2014
