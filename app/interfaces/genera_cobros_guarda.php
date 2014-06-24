@@ -172,9 +172,6 @@ if ($print) {
 		$error_logfile = ini_get('error_log');
 		$logdir = dirname($error_logfile);
 
-		echo $totaldecobros;
-		echo '<hr>';
-
 		$html = "";
 
 		if ($totaldecobros > 0) {
