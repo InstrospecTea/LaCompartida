@@ -898,8 +898,7 @@ class Cliente extends Objeto {
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('	Código secundario') . ' existente';
 	}
-
-		}
+}
 
 class ListaClientes extends Lista {
 

@@ -1046,22 +1046,35 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 					$checked = '';
 				}
 
-				$hide_areas = '';
+				$hide_areas = false;
 				if ($Sesion->usuario->Es('SASU')) {
-					$hide_areas = 'style="display: none;"';
+					$hide_areas = true;
+				} else {
+					if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
+						$codigo_cliente = $Asunto->fields['codigo_cliente'];
+					}
+
+					if ($codigo_cliente != '') {
+						// verificar si es el primer asunto del cliente
+						if ($Asunto->esPrimerAsunto($codigo_cliente) && empty($checked)) {
+							$hide_areas = true;
+						}
+					}
 				}
 				?>
-				<table width='100%' cellspacing='0' cellpadding='0'>
+
+				<table width="100%" cellspacing="0" cellpadding="0">
 					<tr>
-						<td  <?php echo $hide_areas; ?> >
-							<input type="checkbox" name='cobro_independiente' id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
-							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
+						<td <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
+							<input type="checkbox" name="cobro_independiente" id="cobro_independiente" onclick="ShowContrato(this.form, this)" value="1" <?php echo $checked; ?>>
+							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente'); ?></label>
 						</td>
-						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
+						<td id="tbl_copiar_datos" style="display:<?php echo !empty($checked) ? 'inline' : 'none'; ?>;">
 							&nbsp;
 						</td>
 					</tr>
 				</table>
+
 				<br>
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
 
