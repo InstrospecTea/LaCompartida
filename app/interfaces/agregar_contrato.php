@@ -26,6 +26,11 @@ $color_impar = "#ffffff";
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
 
+// previene override del objero, ya que se incluye desde otras interfaces.
+if (empty($cliente)) {
+	$cliente = new Cliente($Sesion);
+}
+
 $validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
 
 if ($validaciones_segun_config) {
@@ -60,7 +65,6 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 	}
 
 	if($contrato->fields['codigo_cliente'] != '') {
-		$cliente = new Cliente($Sesion);
 		$cliente->LoadByCodigo($contrato->fields['codigo_cliente']);
 	}
 
@@ -2855,7 +2859,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
-					var generator_url = "<? echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+					var generator_url = "<?php echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
 					var actionButtons = function(id_contract_generator) {
 						return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
 							<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\

@@ -164,12 +164,12 @@ $Form = new Form;
 						<?php echo __('Cliente'); ?>
 					</td>
 					<td nowrap class="al" colspan="3">
-						<?php UtilesApp::CampoCliente($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, false, 320, '', false); ?>
+						<?php UtilesApp::CampoCliente($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 					</td>
 				</tr>
 				<tr>
 					<td width=25% class="ar" style="font-weight:bold;">
-						<?php echo __('C&oacute;digo asunto'); ?>
+						<?php echo __('Código asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan="4">
 						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>

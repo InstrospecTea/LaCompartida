@@ -23,7 +23,6 @@ if ($id_cobro) {
 
 	$cobro->Edit('etapa_cobro', '1');
 	$cobro->Write();
-
 } else if ($id_contrato > 0) {
 
 	$contrato = new Contrato($sesion);
@@ -99,6 +98,7 @@ if ($opc == "siguiente") {
 		$pagina->Redirect("cobros4.php?id_cobro=" . $id_cobro . "&popup=1&contitulo=true");
 	}
 }
+
 ?>
 
 <script type="text/javascript">
@@ -140,15 +140,13 @@ if ($popup) {
 		echo '</tr>';
 	echo '</table>';
 }
-
 $pagina->PrintPasos($sesion, 1, '', $id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
-
 if ($orden == "") {
 	$orden = "fecha_creacion DESC";
 }
 
-$query = "SELECT SQL_CALC_FOUND_ROWS asunto.*,id_moneda,cobro_asunto.id_cobro  
-FROM asunto LEFT JOIN cobro_asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto AND cobro_asunto.id_cobro = '$id_cobro' 
+$query = "SELECT SQL_CALC_FOUND_ROWS asunto.*,id_moneda,cobro_asunto.id_cobro
+FROM asunto LEFT JOIN cobro_asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto AND cobro_asunto.id_cobro = '$id_cobro'
 WHERE asunto.activo=1 AND asunto.codigo_cliente = '" . $cliente->fields['codigo_cliente'] . "'
 AND asunto.cobrable = 1";
 
@@ -193,7 +191,7 @@ if (!$checkall) {
 
 <form method="post">
 	<input type="hidden" name="opc">
-	<input type="hidden" name="id_cobro" value=<?php $id_cobro ?>>
+	<input type="hidden" name="id_cobro" value=<?php echo $id_cobro ?>>
 	<table width="100%">
 		<tr>
 			<td align="right">
@@ -211,14 +209,14 @@ if (!$checkall) {
 <?php
 
 function Cobrable(& $fila) {
-	
+
 	global $id_cobro;
 	$checked = '';
-	
+
 	if ($fila->fields['id_cobro'] == $id_cobro and $id_cobro != '') {
 		$checked = "checked";
 	}
-	
+
 	$id_moneda = $fila->fields['id_moneda'];
 	$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','" . $fila->fields['codigo_asunto'] . "','$id_cobro',this.checked,$id_moneda, $monto)>";
 	return $Check;

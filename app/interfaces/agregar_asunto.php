@@ -313,7 +313,7 @@ if ($opcion == "guardar") {
 		$Asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
 		$Asunto->Edit("id_encargado2", !empty($id_encargado2) ? $id_encargado2 : "NULL");
-		$Asunto->Edit("contacto", $Asunto_contacto);
+		$Asunto->Edit("contacto", $asunto_contacto);
 		$Asunto->Edit("fono_contacto", $fono_contacto);
 		$Asunto->Edit("email_contacto", $email_contacto);
 		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
@@ -350,12 +350,12 @@ if ($opcion == "guardar") {
 				$monto = '0';
 
 			if ($tipo_tarifa == 'flat') {
-				if (empty($Tarifa_flat)) {
+				if (empty($tarifa_flat)) {
 					$Pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
 					$val = true;
 				} else {
 					$Tarifa = new Tarifa($Sesion);
-					$id_tarifa = $Tarifa->GuardaTarifaFlat($Tarifa_flat, $id_moneda, $id_tarifa_flat);
+					$id_tarifa = $Tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
 					$_REQUEST['id_tarifa'] = $id_tarifa;
 				}
 			}
@@ -1007,7 +1007,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								<?php echo __('Contacto solicitante') ?>
 							</td>
 							<td align="left">
-								<input name="asunto_contacto" size="30" value="<?php echo $Asunto->fields[contacto] ?>" />
+								<input name="asunto_contacto" size="30" value="<?php echo $Asunto->fields['contacto'] ?>" />
 							</td>
 						</tr>
 						<tr>
@@ -1015,10 +1015,10 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								<?php echo __('Teléfono Contacto') ?>
 							</td>
 							<td align="left">
-								<input name="fono_contacto" value="<?php echo $Asunto->fields[fono_contacto] ?>" />
+								<input name="fono_contacto" value="<?php echo $Asunto->fields['fono_contacto'] ?>" />
 								&nbsp;&nbsp;&nbsp;
 								<?php echo __('E-mail contacto') ?>
-								<input name="email_contacto" value="<?php echo $Asunto->fields[email_contacto] ?>" />
+								<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
 							</td>
 						</tr>
 						<tr>
@@ -1066,6 +1066,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
 
 					<?php if (!$Sesion->usuario->Es('SASU')) {
+						$cliente = &$Cliente;
 						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
 					} ?>
 				</div>
