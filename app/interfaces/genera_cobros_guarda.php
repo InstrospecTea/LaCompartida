@@ -176,8 +176,6 @@ if ($print) {
 
 		if ($totaldecobros > 0) {
 
-			$contador = 1;
-
 			foreach ($cobroRT as $cob) {
 
 				set_time_limit(100);
@@ -237,11 +235,13 @@ if ($print) {
 			echo "\n<script type=\"text/javascript\">var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
 			die('No hay datos para su criterio de búsqueda');
 		}
+
 	} catch (PDOException $pdoe) {
 		debug($pdoe->getTraceAsString());
 	} catch (Exception $e) {
 		debug($e->getTraceAsString());
 	}
+	
 	if (is_object($Pagina)) {
 		$Pagina->Redirect($url);
 	}

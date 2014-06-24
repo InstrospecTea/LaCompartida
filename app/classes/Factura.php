@@ -810,6 +810,14 @@ class Factura extends Objeto {
 					$html2 = str_replace('%fee_note%', '&nbsp;', $html2);
 				}
 
+				if ( $this->fields['condicion_pago'] != 1 ) {
+					$html2 = str_replace('%val_contado%',  'CREDITO', $html2);
+					$html2 = str_replace('%val_credito%',  '', $html2);
+				} else {
+					$html2 = str_replace('%val_contado%',  '', $html2);
+					$html2 = str_replace('%val_credito%',  'CONTADO', $html2);
+				}
+
 				break;
 
 			case 'DATOS_FACTURA':
