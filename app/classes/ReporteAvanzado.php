@@ -142,7 +142,7 @@ class ReporteAvanzado {
 			'rojo' => $rojo,
 			'azul' => $azul,
 		);
-		$span = $this->Form->radio_group('tinta', $radios, 'rojo', null, 'span', array('id' => 'tipo_tinta', 'style' => 'width: 100px; display: none'));
+		$span = $this->Form->radio_group('tinta', $radios, 'rojo', 'span', array('id' => 'tipo_tinta', 'style' => 'width: 100px; display: none'));
 		$attr = array(
 			'rowspan' => 3,
 			'style' => 'vertical-align: middle; width:100px; height: 20px;'
