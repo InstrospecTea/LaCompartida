@@ -943,9 +943,9 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 							</td>
 							<td align="left">
 								<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-									echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], '  ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+									echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], '  ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
 								} else {
-									echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], '  ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+									echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], '  ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
 								}
 								?>
 								<span style="color:#FF0000; font-size:10px">*</span>
@@ -1065,7 +1065,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 
 				<table width="100%" cellspacing="0" cellpadding="0">
 					<tr>
-						<td <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
+						<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
 							<input type="checkbox" name="cobro_independiente" id="cobro_independiente" onclick="ShowContrato(this.form, this)" value="1" <?php echo $checked; ?>>
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente'); ?></label>
 						</td>
@@ -1147,16 +1147,15 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 </form>
 
 <script type="text/javascript">
-
 	var form = $('formulario');
 	ShowContrato(form, 'cobro_independiente');
 
 	jQuery('document').ready(function() {
-
 		jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function() {
 			CambioEncargadoSegunCliente(jQuery(this).val());
 		});
 	});
+
 	function CambioEncargadoSegunCliente(idcliente) {
 		var CopiarEncargadoAlAsunto = <?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
 		var UsuarioSecundario = <?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
@@ -1290,6 +1289,26 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		}, 'text');
 	}
 
+	function EsPrimerAsunto(codigo_cliente) {
+		if (codigo_cliente !== undefined && codigo_cliente != '') {
+			jQuery.get(
+				root_dir + '/app/interfaces/ajax.php',
+				{'accion': 'es_primer_asunto', 'codigo_cliente': codigo_cliente},
+				function (response) {
+					var _response = jQuery.parseJSON(response);
+					if (_response.error == false) {
+						if (_response.es_primer_asunto == true) {
+							jQuery('#td_cobro_independiente').hide();
+						} else {
+							jQuery('#td_cobro_independiente').show();
+						}
+					} else {
+						alert(_response.error_glosa);
+					}
+				}
+			);
+		}
+	}
 </script>
 
 <?php echo InputId::Javascript($Sesion) ?>
