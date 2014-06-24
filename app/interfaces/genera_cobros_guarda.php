@@ -173,7 +173,10 @@ if ($print) {
 		$logdir = dirname($error_logfile);
 
 		$html = "";
+
 		if ($totaldecobros > 0) {
+
+			$contador = 1;
 
 			foreach ($cobroRT as $cob) {
 
@@ -198,9 +201,9 @@ if ($print) {
 
 				$NotaCobro->LoadAsuntos();
 
-				// $lang_archivo = $cob['codigo_idioma'] . '.php';
-
-				// require_once Conf::ServerDir() . "/lang/$lang_archivo";
+				$lang_archivo = $cob['codigo_idioma'] . '.php';
+				$_LANG = array();
+				include Conf::ServerDir() . "/lang/$lang_archivo";
 
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
@@ -226,9 +229,10 @@ if ($print) {
 				 	}
 					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
 				}
-
 			}
+
 			$doc->endChunkedOutput("cobro_masivo_$id_usuario.doc");
+
 		} else {
 			echo "\n<script type=\"text/javascript\">var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
 			die('No hay datos para su criterio de búsqueda');
