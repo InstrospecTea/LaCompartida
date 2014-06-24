@@ -28,6 +28,7 @@ class Criteria {
 	private $ordering = ' ORDER BY';
 	private $left_joining = ' LEFT JOIN';
 	private $limit = '';
+	private $order_criteria = '';
 
 	/*
 	  CRITERIA SCOPE ENVELOPERS.
@@ -51,7 +52,7 @@ class Criteria {
 	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
 	 * @return Array asociativo de resultados.
 	 */
-	public function execute() {
+	public function run() {
 		if ($this->sesion == null) {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
 		}
@@ -184,6 +185,21 @@ class Criteria {
 		return $this;
 	}
 
+	/**
+	 * Establece el criterio de ordenamiento para criteria.
+	 * @param [type] $ordering_criteria [description]
+	 */
+	public function add_ordering_criteria($ordering_criteria) {
+		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
+			$this->order_criteria = $ordering_criteria;
+			return $this;
+		} else {
+			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $ordering_criteria. '.');
+		}
+
+		
+	}
+
 	/*
 	  PRIVATE QUERY GENERATION METHODS
 	 */
@@ -254,10 +270,18 @@ class Criteria {
 	 * Genera el statement ORDER BY de una query, si hubiere.
 	 * @return string
 	 */
-	private function generate_ordering_statement() {
-		if (count($this->ordering_clauses) > 0) {
-			return $this->ordering . " " . implode(',', $this->ordering_clauses);
-		} else {
+	private function generate_ordering_statement(){
+		
+		$order_criteria = 'ASC';
+
+		if (!empty($this->order_criteria)) {
+			$order_criteria = $this->order_criteria;
+		}
+
+		if(count($this->ordering_clauses) > 0){
+			return $this->ordering." ".implode(',', $this->ordering_clauses).' '.$order_criteria;
+		}
+		else{
 			return '';
 		}
 	}
@@ -279,5 +303,6 @@ class Criteria {
 				$this->generate_ordering_statement() .
 				$this->limit;
 	}
+
 
 }
