@@ -41,11 +41,11 @@ class CriteriaRestriction {
 	 */
 
 	public static function equals($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' = ' . $right . ")");
+		return new CriteriaRestriction('(' . $left . ' = ' . $right . ')');
 	}
 
 	public static function not_equal($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' != ' . $right . ")");
+		return new CriteriaRestriction('(' . $left . ' != ' . $right . ')');
 	}
 
 	/**
@@ -55,7 +55,7 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function and_clause($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' AND ' . $right . ")");
+		return new CriteriaRestriction('(' . $left . ' AND ' . $right . ')');
 	}
 
 	/**

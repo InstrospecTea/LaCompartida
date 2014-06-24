@@ -640,11 +640,10 @@ $Form = new Form;
 					} else {
 						$funcion_validar = "return Validar(jQuery('#formulario-cliente').get(0));";
 					}
-					?>
 
-					<a href="javascript:void(0);" icon="ui-icon-save" class="btn botonizame" onclick="<?php echo $funcion_validar; ?>" /><?php echo __('Guardar'); ?></a>
+					echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
 
-				<?php } else { ?>
+				} else { ?>
 					<span style="font-size:10px;background-color:#C6DEAD"><?php echo __('No se han configurado encargados comerciales') . '<br>' . __('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.') ?></span>
 				<?php } ?>
 
