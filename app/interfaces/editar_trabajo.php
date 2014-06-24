@@ -1490,7 +1490,7 @@ if (isset($t) && $t->Loaded() && $opcion != 'nuevo') {
                     url: "ajax/ajax_ledes_trabajos.php",
                     data: {
                             opcion: 'ledes', 
-                            codigo_asunto: jQuery('#campo_codigo_asunto').val(),
+                            codigo_cliente: jQuery('#campo_codigo_cliente').val(),
                             conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                             permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
                             permiso_profesional: <?php echo $permiso_profesional->fields['permitido']; ?>
@@ -1506,7 +1506,7 @@ if (isset($t) && $t->Loaded() && $opcion != 'nuevo') {
                         opcion: 'act',
                         ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                         actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
-                        codigo_asunto: jQuery('#campo_codigo_asunto').val(),
+                        codigo_cliente: jQuery('#campo_codigo_cliente').val(),
                         <?php 
 
                         if ($t->fields['codigo_actividad']) {
