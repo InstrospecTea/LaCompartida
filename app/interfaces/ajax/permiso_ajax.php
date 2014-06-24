@@ -21,8 +21,8 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 
 	if ($Usuario->LoadId($_POST['id_usuario'])) {
 		$error_cupo = "Estimado {$Sesion->usuario->fields['nombre']} {$Sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuacion se detalla su cupo actual.\n\n" .
-			"* Usuarios activos con perfil 'Profesional': {$UsuarioPermiso->cupo_profesionales}\n".
-			"* Usuarios activos con perfil 'Administrativos': {$UsuarioPermiso->cupo_administrativos}\n\n" .
+			"* Usuarios activos con perfil <b>Profesional</b>: {$UsuarioPermiso->cupo_profesionales}\n".
+			"* Usuarios activos con perfil <b>Administrativos</b>: {$UsuarioPermiso->cupo_administrativos}\n\n" .
 			"Si desea aumentar su cupo debe contactarse con areacomercial@lemontech.cl o en su defecto puede desactivar usuarios para habilitar cupos.";
 
 		switch ($_POST['accion']) {

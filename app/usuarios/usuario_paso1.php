@@ -500,8 +500,8 @@
 					<td width="20">&nbsp;</td>
 					<td style="text-align:left">
 						<ul>
-							<li>Usuarios activos con perfil "Profesional": <?php echo Conf::GetConf($sesion, 'CupoUsuariosProfesionales'); ?></li>
-							<li>Usuarios activos con perfil "Administrativos": <?php echo Conf::GetConf($sesion, 'CupoUsuariosAdministrativos'); ?></li>
+							<li>Usuarios activos con perfil <b>Profesional</b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosProfesionales'); ?></li>
+							<li>Usuarios activos con perfil <b>Administrativos</b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosAdministrativos'); ?></li>
 						</ul>
 					</td>
 				</tr>

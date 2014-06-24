@@ -832,6 +832,8 @@ function CargarPermisos() {
 	$permisos_activados = array();
 	$permisos_desactivados = array();
 
+	$mailto = '<a href="mailto:areacomercial@lemontech.cl">areacomercial@lemontech.cl</a>';
+
 	if ($usuario->fields['activo'] != '1') {
 		$pagina->AddError('Atención: Solo a los usuarios activos del sistema se les puede asignar roles.');
 	} else {
@@ -840,7 +842,7 @@ function CargarPermisos() {
 		$error_cupo = "Estimado {$sesion->usuario->fields['nombre']} {$sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuacion se detalla su cupo actual.<br><br>" .
 			"* Usuarios activos con perfil 'Profesional': {$UsuarioPermiso->cupo_profesionales}<br>".
 			"* Usuarios activos con perfil 'Administrativos': {$UsuarioPermiso->cupo_administrativos}<br><br>" .
-			"Si desea aumentar su cupo debe contactarse con areacomercial@lemontech.cl o en su defecto puede desactivar usuarios para habilitar cupos.";
+			"Si desea aumentar su cupo debe contactarse con {$mailto} o en su defecto puede desactivar usuarios para habilitar cupos.";
 
 		// lista actual de permisos sin considerar ALL
 		$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
