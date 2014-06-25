@@ -1548,9 +1548,9 @@ function Substring($string) {
             });
         }
         jQuery('#codigo_cliente, #codigo_cliente_secundario').change(loadLedesCliente);
-        jQuery('#codigo_asunto').change(loadLedes);
+        jQuery('#codigo_asunto').change(loadLedesAsunto);
         jQuery('#campo_codigo_cliente').bind('input',loadLedesCliente);
-        jQuery('#campo_codigo_asunto').bind('input',loadLedes);
+        jQuery('#campo_codigo_asunto').bind('input',loadLedesAsunto);
 
         jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
 
