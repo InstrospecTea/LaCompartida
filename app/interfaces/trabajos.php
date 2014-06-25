@@ -321,7 +321,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')){
 		$select_encargado_comercial = "resp_user.username AS encargado_comercial,";
 	} else {
-		$campo_glosa = str_replace('usuario', 'resp_user.', $Usuario->campo_glosa);
+		$campo_glosa = str_replace('usuario.', 'resp_user.', $Usuario->campo_glosa);
 		$select_encargado_comercial = "{$campo_glosa} AS encargado_comercial,";
 	}
 	$select_encargado_comercial .= 'resp_user.id_usuario AS id_encargado_comercial,';
