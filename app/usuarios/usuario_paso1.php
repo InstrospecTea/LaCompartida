@@ -493,7 +493,7 @@
 				<tr>
 					<td width="20">&nbsp;</td>
 					<td style="text-align:left">
-						Estimado <?php echo $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1']; ?>, a continuacion se detalla su cupo actual de usuarios contratados en el sistema.  
+						Estimado <?php echo $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1']; ?>, a continuación se detalla su cupo actual de usuarios contratados en el sistema.  
 					</td>
 				</tr>
 				<tr>
