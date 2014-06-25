@@ -946,6 +946,20 @@ class Asunto extends Objeto {
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
 	}
+
+	public function esPrimerAsunto($codigo_cliente = null) {
+		$primer_asunto = false;
+
+		if (!empty($codigo_cliente)) {
+			$query = "SELECT MIN({$this->tabla}.id_asunto) AS id_asunto FROM {$this->tabla} WHERE {$this->tabla}.codigo_cliente = '{$codigo_cliente}'";
+			$qr = $this->sesion->pdodbh->query($query);
+			$asunto = $qr->fetch(PDO::FETCH_ASSOC);
+
+			$primer_asunto = (empty($asunto) || $asunto['id_asunto'] == $this->fields['id_asunto']) ? true : false;
+		}
+
+		return $primer_asunto;
+	}
 }
 
 class ListaAsuntos extends Lista {
