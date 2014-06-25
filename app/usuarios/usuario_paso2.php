@@ -80,24 +80,6 @@ if ($opc == 'edit') {
 	$usuario->Validaciones($arr1, $pagina, $validaciones_segun_config);
 	$errores = $pagina->GetErrors();
 
-	if (empty($errorres) && (!empty($usuario->fields['id_usuario']) && $usuario->changes['activo'] && $activo == '1')) {
-		$UsuarioPermiso = new UsuarioPermiso($sesion);
-		$permitir_activar = true;
-		if ($UsuarioPermiso->esProfesional($usuario->fields['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'PRO')) {
-			$permitir_activar = false;
-		} else if ($UsuarioPermiso->esAdministrativo($usuario->fields['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'ADM')) {
-			$permitir_activar = false;
-		}
-
-		if (!$permitir_activar) {
-			$error = "Atención: Ocurrió un error al activar al usuario.<br>" .
-				"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
-				"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
-			$pagina->AddError($error);
-			$errores[] = $error;
-		}
-	}
-
 	if (empty($errores)) {
 
 		//Compara y guarda cambios en los datos del Usuario
@@ -106,7 +88,6 @@ if ($opc == 'edit') {
 		if ($usuario->loaded) {
 
 			if ($usuario->Write()) {
-				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
 
@@ -115,24 +96,25 @@ if ($opc == 'edit') {
 				}
 
 				$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
-				$pagina->AddInfo(__('Usuario editado con éxito.'));
+
+				if (CargarPermisos()) {
+					$pagina->AddInfo(__('Usuario editado con éxito.'));
+				}
 			} else {
 				$pagina->AddError($usuario->error);
 			}
-
 		} else {
-
-
 			$new_password = Utiles::NewPassword();
 			$usuario->Edit('password', md5($new_password));
 
 			if ($usuario->Write()) {
-				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
 				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 
-				$pagina->AddInfo(__('Usuario ingresado con éxito, su nuevo password es') . ' ' . $new_password);
+				if (CargarPermisos()) {
+					$pagina->AddInfo(__('Usuario ingresado con éxito, su nuevo password es') . ' ' . $new_password);
+				}
 			} else {
 				$pagina->AddError($usuario->error);
 			}
@@ -752,7 +734,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<input type="button" value="<?php echo __('Cancelar') ?>" onclick="Cancelar(this.form);" class=btn />
 
 			<?php if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0 && $rut != '99511620') { ?>
-				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Usuario') ?>' class="btn_rojo" ></input>
+				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Usuario') ?>' class="btn_rojo" />
 			<?php } ?>
 	</fieldset>
 
@@ -825,7 +807,7 @@ if ($usuario->loaded) {
 						<input type="checkbox" name="force_reset_password" id="force_reset_password" value="1" <?php echo $checked_str ?> />
 						<span>Solicitar un cambio de contraseña al pr&oacute;ximo inicio de sesi&oacute;n</span>
 					</label>
-				<td>
+				</td>
 			</tr>
 
 			<tr>
@@ -843,74 +825,86 @@ if($sesion->usuario->TienePermiso('SADM'))  echo '<a style="border:0 none;" href
 }
 
 function CargarPermisos() {
-	global $sesion, $usuario, $pagina, $permiso, $_POST;
+	global $sesion, $usuario, $pagina, $_POST, $error_cupo;
 
-	$permisos_inactivos = array();
+	$UsuarioPermiso = new UsuarioPermiso($sesion);
 	$permisos_activos = array();
 	$permisos_activados = array();
-	$UsuarioPermiso = new UsuarioPermiso($sesion);
+	$permisos_desactivados = array();
 
-	//Obtenemos lista de permisos actual sin considerar ALL
-	$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
+	$mailto = '<a href="mailto:areacomercial@lemontech.cl">areacomercial@lemontech.cl</a>';
 
-	for ($i = 0; $i < $usuario->permisos->num; $i++) {
-		$error = '';
-		$permiso = &$usuario->permisos->get($i);
+	if ($usuario->fields['activo'] != '1') {
+		$pagina->AddError('Atención: Solo a los usuarios activos del sistema se les puede asignar roles.');
+	} else {
+		$usuario->PermisoALL();
 
-		if ($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']]) {
-			// si agrega el nuevo rol validar si tenemos cupo
-			if ($permiso->fields['permitido'] == 0 && $_POST[$permiso->fields['codigo_permiso']] == 1) {
-				if ($usuario->fields['activo'] == '1') {
-					if (!$UsuarioPermiso->puedeAsignarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
-						$error = "Ocurrió un error al asignar el rol '{$permiso->fields['codigo_permiso']}'.<br>" .
-							"&nbsp;&nbsp;Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}<br>".
-							"&nbsp;&nbsp;Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
-						$pagina->AddError($error);
-					}
-				} else {
-					$error = "Atención: Solo a los usuarios activos del sistema se les puede asignar roles.";
-					$pagina->AddError($error);
+		$error_cupo = "Estimado {$sesion->usuario->fields['nombre']} {$sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuación se detalla su cupo actual.<br><br>" .
+			"* Usuarios activos con perfil <b>Profesional</b>: {$UsuarioPermiso->cupo_profesionales}<br>".
+			"* Usuarios activos con perfil <b>Administrativos</b>': {$UsuarioPermiso->cupo_administrativos}<br><br>" .
+			"Si desea aumentar su cupo debe contactarse con {$mailto} o en su defecto puede desactivar usuarios para habilitar cupos.";
+
+		// lista actual de permisos sin considerar ALL
+		$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
+
+		// recorremos todos los permisos del sistema
+		for ($i = 0; $i < $usuario->permisos->num; $i++) {
+			$permiso = &$usuario->permisos->get($i);
+
+			// permisos activos
+			if (isset($lista_actual_permisos[$permiso->fields['codigo_permiso']])) {
+				array_push($permisos_activos, $permiso->fields['codigo_permiso']);
+			}
+
+			// si le quitaron el permiso
+			if (isset($lista_actual_permisos[$permiso->fields['codigo_permiso']]) && !isset($_POST[$permiso->fields['codigo_permiso']])) {
+				array_push($permisos_desactivados, $permiso->fields['codigo_permiso']);
+				if (!$UsuarioPermiso->puedeRevocarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
+					$pagina->AddError($error_cupo);
+					return false;
 				}
 			}
 
-			if (empty($error)) {
-				$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
-				$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
-
-				if (!$usuario->EditPermisos($permiso)) {
-					$pagina->AddError($usuario->error);
-				} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
-					$permisos_activados[] = $permiso->fields['codigo_permiso'];
+			// si le agregaron el permiso
+			if (!isset($lista_actual_permisos[$permiso->fields['codigo_permiso']]) && isset($_POST[$permiso->fields['codigo_permiso']])) {
+				array_push($permisos_activados, $permiso->fields['codigo_permiso']);
+				if (!$UsuarioPermiso->puedeAsignarPermiso($usuario->fields['id_usuario'], $permiso->fields['codigo_permiso'])) {
+					$pagina->AddError($error_cupo);
+					return false;
 				}
 			}
 
-		} else {
-			$permisos_activos[] = $permiso->fields['codigo_permiso'];
+			$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+			if (!$usuario->EditPermisos($permiso)) {
+				$pagina->AddError($usuario->error);
+				return false;
+			}
 		}
 	}
 
-	$usuario->PermisoALL();
+	if (!empty($permisos_activados) || !empty($permisos_desactivados)) {
+		// eliminar permisos
+		if (!empty($permisos_activos)) {
+			for ($x = 0; $x < count($permisos_desactivados); $x++) {
+				$key = array_search($permisos_desactivados[$x], $permisos_activos);
+				if ($key !== false) {
+					unset($permisos_activos[$key]);
+				}
+			}
+		}
 
-	//Si se agregaron permisos nuevos
-	if (!empty($permisos_activados)) {
-		$permisos_activados = array_merge($permisos_activados, $permisos_activos);
-		$permisos_activados = implode(',', $permisos_activados);
-		$permisos_activos = implode(',', $permisos_activos);
-		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_activos, $permisos_activados);
+		$permisos_activados = implode(',', array_merge($permisos_activados, $permisos_activos));
+		$permisos_actuales = implode(',', array_keys($lista_actual_permisos));
 
-	//Si hay diferencia entre los activos vs los que se econtraban agregados es porque se quitó alguno
-	} else if (count($lista_actual_permisos) <> count($permisos_activos)) {
-		$permisos_activados = implode(',', $permisos_activos);
-		$permisos_activos = implode(',', $lista_actual_permisos);
-		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_activos, $permisos_activados);
+		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_actuales, $permisos_activados);
 	}
+
+	return true;
 }
-
 ?>
+
 <script type="text/javascript">
-
 	jQuery(document).ready(function() {
-
 		jQuery('[name=SADM]').closest('tr').hide();
 		jQuery("#chkpermisos .ui-button").live('change',function() {
 			alert(jQuery(this).attr('class'));
@@ -938,9 +932,7 @@ function CargarPermisos() {
 
 			return false;
 		});
-
 	});
-
 
 	window.onbeforeunload = function(){
 		return preguntarGuardar();
@@ -994,7 +986,6 @@ function CargarPermisos() {
 			}
 		});
 	});
-
 </script>
 
 <?php
