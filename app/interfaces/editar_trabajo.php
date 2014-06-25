@@ -1462,11 +1462,11 @@ function Substring($string) {
 
         // jQuery('#codigo_cliente, #codigo_cliente_secundario').change(function() {
 
-        var loadLedes = function() {
+        var loadLedesAsunto = function() {
             jQuery.ajax({
                 type: "POST",
                 url: "ajax/ajax_ledes_trabajos.php",
-                async:false,
+                async: false,
                 data: {
                         opcion: 'ledes', 
                         codigo_cliente: jQuery('#campo_codigo_asunto').val().split('-').first(),
@@ -1481,7 +1481,7 @@ function Substring($string) {
             jQuery.ajax({
                 type: "POST",
                 url: "ajax/ajax_ledes_trabajos.php",
-                async:false,
+                async: false,
                 data: {
                     opcion: 'act',
                     ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
@@ -1505,8 +1505,52 @@ function Substring($string) {
             });
         }
 
-        jQuery('#codigo_cliente, #codigo_cliente_secundario').change(loadLedes);
-        jQuery('#campo_codigo_cliente, #campo_codigo_asunto').bind('input',loadLedes);
+        var loadLedesCliente = function() {
+            jQuery.ajax({
+                type: "POST",
+                url: "ajax/ajax_ledes_trabajos.php",
+                async: false,
+                data: {
+                        opcion: 'ledes', 
+                        codigo_cliente: jQuery('#campo_codigo_cliente').val(),
+                        conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
+                        permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
+                        permiso_profesional: <?php echo $permiso_profesional->fields['permitido']; ?>
+                }
+            }).done(function(response) {
+                jQuery('#codigo_ledes').html(response);
+            });
+
+            jQuery.ajax({
+                type: "POST",
+                url: "ajax/ajax_ledes_trabajos.php",
+                async: false,
+                data: {
+                    opcion: 'act',
+                    ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
+                    actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
+                    codigo_cliente: jQuery('#campo_codigo_cliente').val(),
+                    <?php 
+
+                    if ($t->fields['codigo_actividad']) {
+                        echo 'codigo_actividad: '. $t->fields['codigo_actividad'].',';
+                    }; 
+
+                    if ($t->fields['codigo_asunto']) {
+                        echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
+                    }; 
+
+                    ?>
+                }
+
+            }).done(function(response) {
+                jQuery('#actividades').html(response);
+            });
+        }
+        jQuery('#codigo_cliente, #codigo_cliente_secundario').change(loadLedesCliente);
+        jQuery('#codigo_asunto').change(loadLedes);
+        jQuery('#campo_codigo_cliente').bind('input',loadLedesCliente);
+        jQuery('#campo_codigo_asunto').bind('input',loadLedes);
 
         jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
 

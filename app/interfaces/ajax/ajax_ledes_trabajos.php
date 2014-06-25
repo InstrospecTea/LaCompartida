@@ -12,23 +12,15 @@ $respuesta = '';
 
 switch ($opcion) {
 	case 'ledes':
-		if ($controlador->clienteSeExportaComoLedes($codigo_cliente)) {
-			$respuesta = $controlador->renderizaControlesLedes(
-					$conf_activa, 
-					$codigo_tarea, 
-					$permiso_revisor, 
-					$permiso_profesional
-				);
+		if ($controlador->correspondeMostrarLedes($conf_activa, $permiso_revisor, $permiso_profesional, $codigo_cliente)) {
+			$respuesta = $controlador->renderizaControlesLedes($codigo_tarea);
 		} else {
 			$respuesta = $controlador->respuestaVacia();
 		}
 		break;
 	case 'act':
 		if ($controlador->correspondeMostrarActividades($ledes, $actividades, $codigo_cliente)) {
-			$respuesta = $controlador->renderizaControlesActividades(
-				$codigo_actividad,
-				$codigo_asunto
-			);
+			$respuesta = $controlador->renderizaControlesActividades($codigo_actividad, $codigo_asunto);
 		} else {
 			$respuesta = $this->respuestaVacia();
 		}
@@ -57,14 +49,10 @@ class AjaxLedes {
 	 *	- $permiso_revisor:  True o False dependiendo si el usuario tiene permiso de revisor o no.
 	 *	- $permiso_profesional: True o False dependiendo si el usuario tiene permiso profesional o no.
 	 */
-	public function renderizaControlesLedes($conf_activa, $codigo_tarea, $permiso_revisor, $permiso_profesional) {
+	public function renderizaControlesLedes($codigo_tarea) {
 
-		if ($conf_activa && ($permiso_revisor || $permiso_profesional)) {
-			$sesion = new Sesion(array('PRO', 'REV', 'SEC'));
-			return '<td colspan="2" align=right>'.__('Código UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td>';
-		} else {
-			return '';
-		}
+		$sesion = new Sesion(array('PRO', 'REV', 'SEC'));
+		return '<td colspan="2" align=right>'.__('Código UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td>';
 
 	}
 
@@ -87,6 +75,17 @@ class AjaxLedes {
 		return $contrato->fields['exportacion_ledes'];
 	}
 
+
+	public function correspondeMostrarLedes($configuracion_ledes, $permiso_revisor, $permiso_profesional, $codigo_cliente) {
+		if ($configuracion_ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
+			if ($permiso_profesional || $permiso_revisor) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 *  Método que revisa si correpsonde renderizar el control de actividades según la configuración
 	 *	de código LEDES, Actividades y si el cliente se exporta como LEDES.
@@ -99,12 +98,12 @@ class AjaxLedes {
 
 		if ($ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
 			return true;
-		} 
-
-		if ($actividades) {
-			return true;
+		} else {
+			if ($actividades) {
+				return true;
+			}
 		}
-
+		
 		return false;
 
 		// return true;
