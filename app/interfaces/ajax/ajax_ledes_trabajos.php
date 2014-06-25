@@ -100,10 +100,10 @@ class AjaxLedes {
 			return true;
 		} 
 
-		if ($actividades && !$ledes && !$this->clienteSeExportaComoLedes($codigo_cliente)) {
+		if ($actividades && !$ledes) {
 			return true;
 		}
-		
+
 		if ($actividades && $ledes && !$this->clienteSeExportaComoLedes($codigo_cliente)) {
 			return false;
 		}
