@@ -351,7 +351,7 @@ class Factura extends Objeto {
 						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto
 							AND ccfmmbase.id_moneda = fp.id_moneda )
 					WHERE f.id_factura =  '$id_factura';"; //11357
-                
+
                 //echo $query; exit;
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $valor_real ) = mysql_fetch_array($resp);
@@ -429,14 +429,6 @@ class Factura extends Objeto {
 				FROM factura AS f
 				WHERE f.dte_estado = $estado_anular";
 		return new ListaFacturas($this->sesion, null, $query);
-	}
-
-	function FacturaElectronicaCreada() {
-		return !is_null($this->fields['dte_fecha_creacion']);
-	}
-
-	function FacturaElectronicaAnulada() {
-		return !is_null($this->fields['dte_fecha_anulacion']);
 	}
 
 	function DTEFirmado() {
@@ -2249,7 +2241,7 @@ class Factura extends Objeto {
                 	) as factura_rsocial
                 , usuario.username AS encargado_comercial
                 , factura.fecha
-                , CONCAT_WS( 
+                , CONCAT_WS(
                     ' ' ,
                     IF (factura.honorarios > 0, factura.descripcion, ''),
                     IF (factura.subtotal_gastos > 0, factura.descripcion_subtotal_gastos, ''),

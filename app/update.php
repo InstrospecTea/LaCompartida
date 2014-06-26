@@ -1,4 +1,4 @@
-<?php
+dte_estado<?php
 
 set_time_limit(0);
 require_once dirname(__FILE__) . '/../app/conf.php';
@@ -10386,7 +10386,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.72:
+		case 7.73:
 			$queries = array();
 			if (!ExisteCampo('cta_corriente','nro_seguimiento',$dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `nro_seguimiento` INT(11) NULL AFTER `estado_pago`;";
@@ -10412,7 +10412,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.72;
+$max_update = 7.73;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

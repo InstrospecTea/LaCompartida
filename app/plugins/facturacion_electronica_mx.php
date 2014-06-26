@@ -14,6 +14,7 @@ $clase = 'FacturacionElectronicaMx';
 
 $Slim->hook('hook_factura_javascript_after', array($clase, 'InsertaJSFacturaElectronica'));
 $Slim->hook('hook_factura_metodo_pago', array($clase, 'InsertaMetodoPago'));
+$Slim->hook('hook_factura_metodo_pago', array($clase, 'InsertaEstadoDTE'));
 $Slim->hook('hook_validar_factura', array($clase, 'ValidarFactura'));
 $Slim->hook('hook_cobro6_javascript_after', array($clase, 'InsertaJSFacturaElectronica'));
 $Slim->hook('hook_cobros7_botones_after',  array($clase, 'AgregarBotonFacturaElectronica'));

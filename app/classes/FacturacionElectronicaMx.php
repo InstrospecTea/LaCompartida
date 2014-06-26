@@ -27,7 +27,6 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		echo "</tr>";
 	}
 
-
 	public static function ValidarFactura() {
 		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago, $dte_id_pais, $dte_metodo_pago_cta;
 		if (empty($RUT_cliente)) {
@@ -67,9 +66,12 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			$result = $client->RecibirTXT($usuario, $password, UtilesApp::utf8izar($strdocumento), 0);
 			if ($result->codigo == 201) {
 				try {
+					$estado_dte = Factura::$estados_dte['Firmado'];
 					$Factura->Edit('dte_xml', $result->descripcion);
 					$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 					$Factura->Edit('dte_firma', $result->timbrefiscal);
+					$Factura->Edit('dte_estado', $estado_dte);
+					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 
 					$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 					$file_data = base64_decode($result->documentopdf);
@@ -90,6 +92,10 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 					'Code' => 'BuildingInvoiceError',
 					'Message' => utf8_decode($result->descripcion)
 				);
+				$estado_dte = Factura::$estados_dte['ErrorFirmado'];
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
+				$Factura->Write();
 			}
 		}
 		return $hookArg;
@@ -99,7 +105,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		$Sesion = new Sesion();
 		$Factura = $hookArg['Factura'];
 
-		if (!$Factura->FacturaElectronicaCreada()) {
+		if (!$Factura->DTEFirmado() && !$Factura->DTEProcesandoAnular()) {
 			return $hookArg;
 		}
 
@@ -117,7 +123,11 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		$result = $client->CancelarCFDI($usuario, $password, $UUID);
 		if ($result->codigo == 201) {
 			try {
+				$estado_dte = Factura::$estados_dte['Anulado'];
 				$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
+				$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
 				$Factura->Write();
 			} catch (Exception $ex) {
 				$hookArg['Error'] = array(
@@ -126,9 +136,14 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 				);
 			}
 		} else {
+			$mensaje = "Usted ha solicitado anular un Documento Tributario Electrónico. Este proceso puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
+			$estado_dte = Factura::$estados_dte['ProcesoAnular'];
+			$Factura->Edit('dte_estado', $estado_dte);
+			$Factura->Edit('dte_estado_descripcion', $mensaje);
+			$Factura->Write();
 			$hookArg['Error'] = array(
 				'Code' => 'CancelGeneratedInvoiceError',
-				'Message' => utf8_decode($result->descripcion . " $UUID")
+				'Message' => utf8_decode($result->descripcion)
 			);
 		}
 		return $hookArg;
@@ -232,6 +247,10 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 		}
 
+		if (!is_null($Factura->fields['factura_estado']) && !empty($Factura->fields['factura_estado'])) {
+			$r['DOR'][] = 'estado|' . ($Factura->fields['factura_region']);
+		}
+
 		if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
 			$r['DOR'][] = 'localidad|' . ($Factura->fields['ciudad_cliente']);
 		}
@@ -288,6 +307,44 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		}
 
 		return $txt;
+	}
+
+	public static function InsertaEstadoDTE() {
+		global $factura;
+		$img_dir = Conf::ImgDir();
+		$mensaje = $factura->fields['dte_estado_descripcion'];
+		if (!is_null($mensaje) && $mensaje != '') {
+			echo "<a class = 'factura-dte-estado' href = 'javascript:alert(\"{$mensaje}\");'><img src='$img_dir/info-icon-24.png' border='0' /></a>";
+		}
+	}
+
+	public static function BotonDescargarEstadoHTML($id_factura, $estado, $icon) {
+		$Html = self::getHtml();
+		$img_dir = Conf::ImgDir();
+		$img = $Html->img("{$img_dir}/{$icon}", array('border' => '0'));
+		$attr_a = array(
+			'title' => $estado,
+			'class' => 'factura-documento',
+			'data-factura' => $id_factura,
+			'href' => '#'
+		);
+		return $Html->tag('a', $img, $attr_a);
+	}
+
+	public static function AgregarBotonFacturaElectronica($hookArg) {
+		$Factura = $hookArg['Factura'];
+		if ($Factura->FacturaElectronicaCreada()) {
+			if ($Factura->DTEFirmado()) {
+				$hookArg['content'] = BotonDescargarHTML($Factura->fields['id_factura']);
+			} elseif (!$Factura->Anulada()) {
+				$hookArg['content'] = BotonGenerarHTML($Factura->fields['id_factura']);
+			} elseif ($Factura->DTEAnulado()) {
+				$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
+			} elseif ($Factura->DTEProcesandoAnular()) {
+				$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
+			}
+			return $hookArg;
+		}
 	}
 
 }
