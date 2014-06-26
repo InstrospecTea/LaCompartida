@@ -1,9 +1,6 @@
 <?php
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 
@@ -33,7 +30,7 @@ if ($p_profesional->fields['permitido']) {
 }
 
 // Le muestro la tarifa cuando tiene el Conf, es profesional no revisor
-$mostrar_tarifa_al_profesional = UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') && $profesionalpermitido && !$revisorpermitido;
+$mostrar_tarifa_al_profesional = Conf::GetConf($sesion, 'MostrarTarifaAlProfesional') && $profesionalpermitido && !$revisorpermitido;
 
 $wb = new Spreadsheet_Excel_Writer();
 
@@ -182,13 +179,8 @@ $ws->setColumn($col_tarifa_hh_normalizado, $col_tarifa_hh_normalizado, 40);
 $ws->setColumn($col_valor_trabajo_normalizado, $col_valor_trabajo_normalizado, 40);
 
 
-if (method_exists('Conf', 'GetConf')) {
-    $PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
-    $PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
-} else {
-    $PdfLinea1 = Conf::PdfLinea1();
-    $PdfLinea2 = Conf::PdfLinea2();
-}
+$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
+$PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
 
 $info_usr1 = str_replace('<br>', ' - ', $PdfLinea1);
 $ws->write(1, 0, $info_usr1, $encabezado);
@@ -253,53 +245,39 @@ for ($i = 0; $i < $lista->num; $i++) {
 
     $moneda_defecto = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
     $moneda_defecto->Load($moneda_base);
-    
+
     // Redefinimos el formato de la moneda, para que sea consistente con la cifra.
     $simbolo_moneda = $moneda_total->fields['simbolo'];
     $cifras_decimales = $moneda_total->fields['cifras_decimales'];
-    
-    if ($cifras_decimales) {
-        $decimales = '.';
-        while ($cifras_decimales--)
-            $decimales .= '0';
-    } else {
-        $decimales = '';
-    }
-    
-    $money_format = & $wb->addFormat(array('Size' => 11,
-                'VAlign' => 'top',
-                'Align' => 'justify',
-                'Border' => 1,
-                'Color' => 'black',
-                'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 
-    $simbolo_moneda_defecto = $moneda_defecto->fields['simbolo'];
+    $money_format = & $wb->addFormat(array(
+		'Size' => 11,
+		'VAlign' => 'top',
+		'Align' => 'justify',
+		'Border' => 1,
+		'Color' => 'black',
+		'NumFormat' => "\"{$simbolo_moneda}\" #,##0" . ($cifras_decimales ? '.' . str_repeat('0', $cifras_decimales) : '')
+	));
+
+	$simbolo_moneda_defecto = $moneda_defecto->fields['simbolo'];
     $cifras_decimales_defecto = $moneda_defecto->fields['cifras_decimales'];
-    
-    if ($cifras_decimales_defecto) {
-        $decimales_defecto = ',';
-        while ($cifras_decimales_defecto--) {
-            $decimales_defecto .= '0';
-        }
-    } else {
-        $decimales_defecto = '';
-    }
-    
-    $default_money_format = & $wb->addFormat(array('Size' => 11,
-                'VAlign' => 'top',
-                'Align' => 'justify',
-                'Border' => 1,
-                'Color' => 'black',
-                'NumFormat' => "[$$simbolo_moneda_defecto] #,###,$decimales_defecto"));
 
+    $default_money_format = & $wb->addFormat(array(
+		'Size' => 11,
+		'VAlign' => 'top',
+		'Align' => 'justify',
+		'Border' => 1,
+		'Color' => 'black',
+		'NumFormat' => "\"{$simbolo_moneda_defecto}\" #,##0" . ($cifras_decimales_defecto ? '.' . str_repeat('0', $cifras_decimales_defecto) : '')
+	));
 
     if (Conf::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
         $ws->write($fila_inicial + $i, $col_id_trabajo, $trabajo->fields['id_trabajo'], $tex);
     }
-    
+
     $ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], "%d-%m-%Y"), $tex);
     $ws->write($fila_inicial + $i, $col_cliente, $trabajo->fields['glosa_cliente'], $tex);
-    
+
     if (Conf::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
         if (Conf::GetConf($sesion, 'CodigoSecundario')) {
             $ws->write($fila_inicial + $i, $col_codigo_asunto, $trabajo->fields['codigo_asunto_secundario'], $tex);
@@ -307,11 +285,11 @@ for ($i = 0; $i < $lista->num; $i++) {
             $ws->write($fila_inicial + $i, $col_codigo_asunto, $trabajo->fields['codigo_asunto'], $tex);
         }
     }
-    
+
     $ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
     $ws->write($fila_inicial + $i, $col_encargado, $trabajo->fields['encargado_comercial'] ? $trabajo->fields['encargado_comercial'] : '', $tex);
     $ws->write($fila_inicial + $i, $col_id_cobro, $trabajo->fields['id_cobro'] ? $trabajo->fields['id_cobro'] : '', $tex);
-    
+
     if (Conf::GetConf($sesion, 'UsoActividades')) {
         $ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields['glosa_actividad'], $tex);
     }
@@ -333,7 +311,7 @@ for ($i = 0; $i < $lista->num; $i++) {
     list($h, $m) = split(':', $duracion);
     $duracion_decimal = number_format($h + $m / 60, 1, '.', '');
     $tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
-    
+
     if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
         $ws->writeNumber($fila_inicial + $i, $col_duracion, $duracion_decimal, $fdd);
     } else {
@@ -360,7 +338,7 @@ for ($i = 0; $i < $lista->num; $i++) {
     $ws->write($fila_inicial + $i, $col_cobrable, $trabajo->fields['cobrable'] == 1 ? "SI" : "NO", $tex);
 
     if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
-        
+
         // Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
 
         if ($trabajo->fields['tarifa_hh'] > 0 && !empty($trabajo->fields['estado_cobro']) && $trabajo->fields['estado_cobro'] != 'CREADO' && $trabajo->fields['estado_cobro'] != 'EN REVISION') {
@@ -375,11 +353,11 @@ for ($i = 0; $i < $lista->num; $i++) {
             } else {
                 $tarifa_normalizada = $tarifa;
             }
-            
+
         } else {
 
             if ($trabajo->fields['id_tarifa'] && $trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario']) {
-                
+
                 $query = "SELECT tarifa
 							FROM usuario_tarifa
 							WHERE id_tarifa=" . $trabajo->fields['id_tarifa'] . "
@@ -393,12 +371,12 @@ for ($i = 0; $i < $lista->num; $i++) {
 
                 $moneda_trabajo = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
                 $moneda_trabajo->Load($trabajo->fields['id_moneda_contrato']);
-                
+
                 $tarifa_normalizada = UtilesApp::CambiarMoneda($tarifa, $moneda_trabajo->fields['tipo_cambio'], $moneda_trabajo->fields['cifras_decimales'], $moneda_defecto->fields['tipo_cambio'], $moneda_defecto->fields['cifras_decimales'], '');
-                
-                
+
+
             } else if ($trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario']) {
-                
+
                 $query = "SELECT id_tarifa FROM tarifa WHERE tarifa_defecto=1";
                 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
                 list($id_tarifa) = mysql_fetch_array($resp);
@@ -414,10 +392,10 @@ for ($i = 0; $i < $lista->num; $i++) {
 
                     $moneda_trabajo = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
                     $moneda_trabajo->Load($trabajo->fields['id_moneda_contrato']);
-                    
+
                     $tarifa_normalizada = UtilesApp::CambiarMoneda($tarifa, $moneda_trabajo->fields['tipo_cambio'], $moneda_trabajo->fields['cifras_decimales'], $moneda_defecto->fields['tipo_cambio'], $moneda_defecto->fields['cifras_decimales'], '');
                 }
-                
+
             } else {
                 $tarifa = 0;
                 $tarifa_normalizada = 0;
@@ -453,7 +431,7 @@ if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
     $ws->writeFormula($fila_inicial + $i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada" . ($fila_inicial + 1) . ":$col_formula_duracion_cobrada" . ($fila_inicial + $i) . ")", $time_format);
 }
 
-// No tiene sentido sumar los totales porque pueden estar en monedas distintas. Please! 
+// No tiene sentido sumar los totales porque pueden estar en monedas distintas. Please!
 // Excepto el total normalizado, el total normalizado siempre debe estar en la misma moneda.
 $ws->writeFormula($fila_inicial + $i, $col_valor_trabajo_normalizado, "=SUM($col_formula_valor_trabajo_normalizado" . ($fila_inicial + 1) . ":$col_formula_valor_trabajo_normalizado" . ($fila_inicial + $i) . ")", $default_money_format);
 
