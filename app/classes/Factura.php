@@ -124,6 +124,11 @@ class Factura extends Objeto {
 			)
 		),
 		array(
+			'field' => 'RUT_cliente',
+			'title' => 'RUT',
+			'visible' => false
+		),
+		array(
 			'field' => 'factura_rsocial',
 			'title' => 'Razón Social',
 		),
@@ -345,8 +350,9 @@ class Factura extends Objeto {
 							AND ccfm.id_moneda = ccfmm.id_moneda )
 						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto
 							AND ccfmmbase.id_moneda = fp.id_moneda )
-					WHERE f.id_factura =  '$id_factura'
-						OR ( f.id_factura_padre = '$id_factura' AND pef.glosa NOT LIKE '%ANULADO%' );"; //11357
+					WHERE f.id_factura =  '$id_factura';"; //11357
+                
+                //echo $query; exit;
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $valor_real ) = mysql_fetch_array($resp);
 
@@ -812,6 +818,14 @@ class Factura extends Objeto {
 					$html2 = str_replace('%fee_note%', '&nbsp;', $html2);
 				}
 
+				if ( $this->fields['condicion_pago'] != 1 ) {
+					$html2 = str_replace('%val_contado%',  'CREDITO', $html2);
+					$html2 = str_replace('%val_credito%',  '', $html2);
+				} else {
+					$html2 = str_replace('%val_contado%',  '', $html2);
+					$html2 = str_replace('%val_credito%',  'CONTADO', $html2);
+				}
+
 				break;
 
 			case 'DATOS_FACTURA':
@@ -1005,8 +1019,7 @@ class Factura extends Objeto {
 					$html2 = str_replace('%gastos_con_impuesto_periodo%', '', $html2);
 				}
 				if ($mostrar_gastos_sin_impuesto) {
-					$
-							$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
+					$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
 				} else {
 					$html2 = str_replace('%gastos_sin_impuesto_periodo%', '', $html2);
 				}
@@ -2222,45 +2235,50 @@ class Factura extends Objeto {
 		$groupby = " GROUP BY factura.id_factura ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
-				prm_documento_legal.codigo as tipo
-			  , factura.numero
-			  , factura.serie_documento_legal
-			  , factura.codigo_cliente
-			  , cliente.glosa_cliente
-			  , contrato.id_contrato as idcontrato
-			  , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
-							OR contrato.factura_razon_social IN ('',' ')
-							OR contrato.factura_razon_social IS NULL,
-						factura.cliente,
-						CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
-					) as factura_rsocial
-			  , usuario.username AS encargado_comercial
-			  , factura.fecha
-			  , factura.descripcion
-			  , prm_estado_factura.codigo as codigo_estado
-			  , prm_estado_factura.glosa as estado
-			  , factura.id_cobro
-			  , cobro.codigo_idioma as codigo_idioma
-			  , prm_moneda.codigo AS codigo_moneda
-			  , prm_moneda.simbolo
-			  , prm_moneda.cifras_decimales
-			  , prm_moneda.tipo_cambio
-			  , factura.id_moneda
-			  , factura.honorarios
-			  , factura.subtotal
-			  , factura.subtotal_gastos
-			  , factura.subtotal_gastos_sin_impuesto
-			  , factura.iva
-			  , factura.total
-			  , '' as saldo_pagos
-			  , -cta_cte_fact_mvto.saldo as saldo
-			  , '' as monto_pagos_moneda_base
-			  , '' as saldo_moneda_base
-			  , factura.id_factura
-			  , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-			  , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
-			  , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-			  , factura.RUT_cliente";
+                prm_documento_legal.codigo as tipo
+                , factura.numero
+                , factura.serie_documento_legal
+                , factura.codigo_cliente
+                , cliente.glosa_cliente
+                , contrato.id_contrato as idcontrato
+                , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
+                			OR contrato.factura_razon_social IN ('',' ')
+                			OR contrato.factura_razon_social IS NULL,
+                		factura.cliente,
+                		CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+                	) as factura_rsocial
+                , usuario.username AS encargado_comercial
+                , factura.fecha
+                , CONCAT_WS( 
+                    ' ' ,
+                    IF (factura.honorarios > 0, factura.descripcion, ''),
+                    IF (factura.subtotal_gastos > 0, factura.descripcion_subtotal_gastos, ''),
+                    IF (factura.subtotal_gastos_sin_impuesto > 0, factura.descripcion_subtotal_gastos_sin_impuesto, '')
+                ) AS descripcion
+                , prm_estado_factura.codigo as codigo_estado
+                , prm_estado_factura.glosa as estado
+                , factura.id_cobro
+                , cobro.codigo_idioma as codigo_idioma
+                , prm_moneda.codigo AS codigo_moneda
+                , prm_moneda.simbolo
+                , prm_moneda.cifras_decimales
+                , prm_moneda.tipo_cambio
+                , factura.id_moneda
+                , factura.honorarios
+                , factura.subtotal
+                , factura.subtotal_gastos
+                , factura.subtotal_gastos_sin_impuesto
+                , factura.iva
+                , factura.total
+                , '' as saldo_pagos
+                , -cta_cte_fact_mvto.saldo as saldo
+                , '' as monto_pagos_moneda_base
+                , '' as saldo_moneda_base
+                , factura.id_factura
+                , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+                , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
+                , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+                , factura.RUT_cliente";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (

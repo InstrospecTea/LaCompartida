@@ -15,8 +15,7 @@
 		$fecha_m = date("m");
 	$meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"),__("Julio"),__("Agosto"),__("Septiembre"),__("Octubre"),__("Noviembre"),__("Diciembre"));
 
-	if($opc=='reporte')
-	{
+	if($opc=='reporte') {
 		// Calcular fechas para resumen horas, en formato dd-mm-aaaa.
 		$duracion_mes = array('31', (Utiles::es_bisiesto($fecha2_a)?'29':'28'), '31', '30', '31', '30', '31', '31', '30', '31', '30', '31');
 		// Revisar el orden de las fechas.
@@ -127,7 +126,7 @@ function ShowSeleccion()
 			<td align="left">
 				<select name="vista" id="vista" onchange="ShowSeleccion();">
 <?
-					$vistas = array('profesional', 'mes_reporte', 'glosa_cliente', 'glosa_asunto');
+					$vistas = array('profesional', 'mes', 'glosa_cliente', 'glosa_asunto');
 					$nombre_vistas = array(__('profesional'), __('mes'), __('glosa_cliente'), __('glosa_cliente').' - '.__('glosa_asunto'));
 					// Las vistas se escriben en el select en el lenguaje actual
 					for($i=0; $i<count($vistas); ++$i)

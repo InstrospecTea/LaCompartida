@@ -1027,6 +1027,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Corriente';
 					}
 
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
+					}
+
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
@@ -1166,7 +1172,6 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
-				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 
 				$query = "SELECT factura.numero as documentos
 							FROM factura
@@ -1894,6 +1899,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Ahorros';
 					} else if (strpos($glosa_cuenta, 'Cte') !== false) {
 						$tipo_cuenta = 'Cuenta Corriente';
+					}
+
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
 					}
 
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);

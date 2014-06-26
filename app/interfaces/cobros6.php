@@ -1204,7 +1204,7 @@ if (count($cobro->asuntos)) {
 		}
 		?>
         var honorarios = jQuery('#honorarios_' + idx).val().replace(',', '').replace(',', '') * 1;
-        
+
         var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val()*1;
         var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1;
 
@@ -1355,9 +1355,9 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                     <tr style="height: 26px;  vertical-align: middle;" >
                         <td style="height: 26px;  vertical-align: top;" align=left nowrap>
                             <br />
-							<?php echo'Estado '. __('Cobro') ?>:
-                          <br /> <br/><?php echo __('Forma Cobro') ?>
-		      <br/><?php echo $cobro->fields['forma_cobro'] ?>
+							<?php echo'Estado ' . __('Cobro') ?>:
+							<br /> <br/><?php echo __('Forma Cobro') ?>
+							<br/><?php echo $cobro->fields['forma_cobro'] ?>
                         </td>
                         <td align="left" style="font-size: 11px; font-weight: bold;" >
                             <table cellpadding="3">
@@ -1414,25 +1414,25 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                         <input class="fechadiff" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_emision']) ?>" name="fecha_emision" id="fecha_emision" size="11" maxlength="10" />
 
                                     </td>
-								<?php if (Conf::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) { ?>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
+									<?php if (Conf::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) { ?>
+	                                    <td nowrap>
+	                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
 
-                                    </td>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+	                                    </td>
+	                                    <td nowrap>
+	                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
 
-                                    </td>
-								<?php } else { ?>
-									<td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+	                                    </td>
+									<?php } else { ?>
+										<td nowrap>
+	                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
 
-                                    </td>
-                                    <td nowrap>
-                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
+	                                    </td>
+	                                    <td nowrap>
+	                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
 
-                                    </td>
-								<?php } ?>
+	                                    </td>
+									<?php } ?>
                                     <td nowrap>
                                         <input class="fechadiff"  type="text" name="fecha_pago_parcial" value="<?php echo Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
 
@@ -1499,7 +1499,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 										<?php echo __('Nota de Venta') ?>: <?php echo $cobro->fields['nota_venta_contabilidad']; ?>
 									</div>
 								</div>
-							<?php
+								<?php
 							} else {
 								echo "&nbsp;";
 							}

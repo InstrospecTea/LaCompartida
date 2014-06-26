@@ -2,6 +2,8 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('OFI'));
+
+
 $pagina = new Pagina($sesion);
 $id_usuario = isset($id_usuario) ? $id_usuario : $sesion->usuario->fields['id_usuario'];
 
@@ -24,6 +26,22 @@ if (($gasto->Loaded() && $gasto->fields['egreso'] > 0 ) || $prov == 'false') {
 	$txt_pagina = $id_gasto ? __('Edición de Provisión') : __('Ingreso de Provisión');
 	$txt_tipo = __('Provisión');
 	$prov = 'true';
+}
+
+if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
+	$criteria = new Criteria($sesion);
+	$criteria
+		->add_select('nro_seguimiento')
+		->add_from('prm_nro_seguimiento_gasto')
+		->add_ordering('id_nro_seguimiento_gasto')
+		->add_ordering_criteria('DESC')
+		->add_limit(1);
+	$result = $criteria->run();
+	if(empty($result)){
+		$proposed = 1;
+	} else {
+		$proposed = $result[0]['nro_seguimiento'] + 1;
+	}
 }
 
 if ($opcion == "guardar") {
@@ -96,6 +114,7 @@ if ($opcion == "guardar") {
 			}
 		}
 
+
 		$gasto->Edit("fecha", Utiles::fecha2sql($fecha));
 		$gasto->Edit("id_usuario", $id_usuario);
 		$gasto->Edit("descripcion", $descripcion);
@@ -108,6 +127,7 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
 		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
+		
 
 		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
@@ -133,11 +153,31 @@ if ($opcion == "guardar") {
 		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
 		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
 
-		if ($gasto->Write()) {
-			$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
+		if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
+			if (Gasto::VerificaIdentificador($sesion, $autoincrementable, $id_gasto) == "1"){
+				$info = 'No se ha podido guardar los cambios debido a que el identificador ingresado ya está en uso, por favor asigne otro.';
+				$pagina->AddInfo($info);
+			} else {
+				if (empty($gasto->fields['nro_seguimiento'])) {
+					Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+				} else {
+					if ($autoincrementable != $gasto->fields['nro_seguimiento'] ) {
+						Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+					}
+				}
+				$gasto->Edit("nro_seguimiento", $autoincrementable ? $autoincrementable : "NULL");
+				if ($gasto->Write()) {
+					$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
+				}
+			}
+		} else {
+			if ($gasto->Write()) {
+				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
+			}
 		}
 	}
 }
+
 
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
@@ -176,6 +216,19 @@ $pagina->PrintTop($popup);
 		if (form.monto_cobrable && (monto <= 0 || isNaN(monto))) {
 			monto = monto_cobrable;
 		}
+
+		<?php if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) { ?>
+
+			var identificador = parseInt(jQuery('#autoincrementable').val());
+			jQuery('#autoincrementable').val(identificador);
+
+			if (identificador == '' || isNaN(identificador) ) {
+				alert('<?php echo __('Debe ingresar un identificador válido.'); ?>');
+				jQuery('#autoincrementable').focus();
+				return false;
+			}
+
+		<?php } ?>
 
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			if ($('codigo_cliente_secundario').value == '') {
@@ -476,6 +529,18 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 
+		<?php if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) { ?>
+			<tr>
+				<td align="right">
+					<?php echo __('Identificador'); ?>
+				</td>
+				<td align="left">
+					<input name="autoincrementable" id="autoincrementable" size="10" value="<?php echo($gasto->fields['nro_seguimiento'] ? $gasto->fields['nro_seguimiento'] : $proposed)  ?>" /> 
+					<span style="color:#FF0000; font-size:10px">*</span>
+				</td>
+			</tr>
+		<?php } ?>
+
 		<?php if (Conf::GetConf($sesion, 'ComisionGastos') && $prov == 'false') { ?>
 			<tr>
 				<td align="right">
@@ -675,6 +740,17 @@ $pagina->PrintTop($popup);
 	<?php if (Conf::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
 		CargaIdioma("<?php echo $codigo_asunto; ?>");
 	<?php } ?>
+
+	jQuery("#autoincrementable").change(function(){
+		jQuery.post('ajax/ajax_gastos.php',{ opc: "identificador", identificador: jQuery("#autoincrementable").val()})
+		.done(function(data){
+			console.log(data);
+			if (data == "1") {
+				alert('<?php echo __('El valor del identificador ya está siendo utilizado.'); ?>');
+				jQuery('#autoincrementable').focus();
+			}
+		});
+	});
 
 	jQuery("#monto, #monto_cobrable").change(function() {
 		var str = jQuery(this).val();
