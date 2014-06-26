@@ -10,8 +10,8 @@ extract($_POST);
 $AjaxLedes = new AjaxLedes();
 $respuesta = '';
 
-$AjaxLedes->clienteSeExportaComoLedes($codigo_cliente);
 exit;
+
 switch ($opcion) {
 	case 'ledes':
 		if ($AjaxLedes->correspondeMostrarLedes($conf_activa, $permiso_revisor, $permiso_profesional, $codigo_cliente)) {
