@@ -69,7 +69,6 @@ class AjaxLedes {
 	}
 
 	public function correspondeMostrarLedes($configuracion_ledes, $permiso_revisor, $permiso_profesional, $codigo_cliente) {
-		echo 'Cliente se exporta como ledes:'.$this->clienteSeExportaComoLedes($codigo_cliente);
 		 if ($configuracion_ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
 		 	if ($permiso_profesional || $permiso_revisor) {
 		 		return true;
