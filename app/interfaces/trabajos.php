@@ -871,8 +871,10 @@ $pagina->PrintTop($popup);
 			<br />
 			<br />
 			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>
-			<?php echo $Form->icon_button(__('Descargar listado agrupado'), 'xls', array('id' => 'descargar_excel_agrupado')); ?>
-			<label><input type="checkbox" value="1" id="por_socio"/> Agrupar por socio</label>
+			<?php if (!empty($id_encargado_comercial) || !empty($id_usuario)) { ?>
+				<?php echo $Form->icon_button(__('Descargar listado agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
+				<label><input type="checkbox" value="1" id="por_socio"/> Agrupar por socio</label>
+			<?php } ?>
 			<br />
 		</center>
 	</form>
@@ -1227,7 +1229,7 @@ echo $Form->script();
 			jQuery('#descargapro').removeAttr('disabled');
 		});
 
-		jQuery('#descargar_excel_agrupado').click(function() {
+		jQuery('#descargar_pdf_agrupado').click(function() {
 			var Where='<?php echo base64_encode($where) ?>';
 			var Idcobro='<?php echo $id_cobro; ?>';
 			var Motivo='<?php echo $motivo; ?>';
@@ -1257,7 +1259,7 @@ echo $Form->script();
 						},
 						buttons: {
 							"<?php echo __('Entiendo y acepto') ?>": function() {
-								window.open('trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio, '_blank');
+								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
 								dialogoconfirma.dialog( "close" );
 							},
 							"<?php echo __('Cancelar') ?>": function() {
@@ -1266,7 +1268,7 @@ echo $Form->script();
 						}
 					});
 				} else {
-					window.open('trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio, '_blank');
+					window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
 				}
 			});
 

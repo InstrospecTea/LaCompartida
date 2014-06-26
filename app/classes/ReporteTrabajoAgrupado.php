@@ -25,7 +25,7 @@ class ReporteTrabajoAgrupado {
 
 		$this->DomPdf->load_html(($html));
 		$this->DomPdf->render();
-		$this->DomPdf->stream('lista_de_cobros.pdf');
+		$this->DomPdf->stream('revision_horas_agrupadas.pdf');
 	}
 
 	public function query($query) {
