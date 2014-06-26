@@ -871,7 +871,12 @@ $pagina->PrintTop($popup);
 			<br />
 			<br />
 			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>
-			<?php if (!empty($id_encargado_comercial) || !empty($id_usuario)) { ?>
+			<?php
+			$fecha_ini = Utiles::fecha2sql($fecha_ini, date('Y-m-d', strtotime('-12 month')));
+			$fecha_fin = Utiles::fecha2sql($fecha_fin);
+			// solo permite periodo de un mes
+			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 month"));
+			if ($fecha_ok && !empty($id_encargado_comercial) || !empty($id_usuario)) { ?>
 				<?php echo $Form->icon_button(__('Descargar listado agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
 				<label><input type="checkbox" value="1" id="por_socio"/> Agrupar por socio</label>
 			<?php } ?>
