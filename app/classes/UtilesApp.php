@@ -62,7 +62,7 @@ class UtilesApp extends Utiles {
     
     public static function ObtenerContratoPrincipal ($sesion, $codigo_asunto) {
         $codigo_cliente = explode("-",$codigo_asunto);
-        $consulta = "SELECT id_contrato FROM cliente WHERE codigo_cliente = {$codigo_cliente[0]}";
+        $consulta = "SELECT id_contrato FROM cliente WHERE codigo_cliente = '{$codigo_cliente[0]}'";
         $respuesta = mysql_query($consulta, $sesion->dbh);
         list($id_contrato) = mysql_fetch_array($respuesta);
         
