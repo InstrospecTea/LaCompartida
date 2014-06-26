@@ -290,7 +290,7 @@ for ($i = 0; $i < $lista->num; $i++) {
                 'Align' => 'justify',
                 'Border' => 1,
                 'Color' => 'black',
-                'NumFormat' => "[$$simbolo_moneda_defecto] #,###,0$decimales_defecto"));
+                'NumFormat' => "[$$simbolo_moneda_defecto] #,###,$decimales_defecto"));
 
 
     if (Conf::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
