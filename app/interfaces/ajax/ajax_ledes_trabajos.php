@@ -2,15 +2,13 @@
 
 require_once dirname(__FILE__).'/../../conf.php';
 ##
-##	Interf√°z AJAX que maneja los request realizados en la interfaz de trabajos.
-##	La l√≥gica es utilizar un controlador llamado AjaxLedes para preparar una respuesta para
+##	Interf·z AJAX que maneja los request realizados en la interfaz de trabajos.
+##	La lÛgica es utilizar un controlador llamado AjaxLedes para preparar una respuesta para
 ##	el request AJAX, la que finalmente se retorna.
 ##
 extract($_POST);
 $AjaxLedes = new AjaxLedes();
 $respuesta = '';
-
-exit;
 
 switch ($opcion) {
 	case 'ledes':

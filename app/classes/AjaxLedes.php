@@ -25,7 +25,7 @@ class AjaxLedes {
 	//  */
 
 	public function renderizaControlesLedes($codigo_tarea) {
-		return '<td colspan="2" align=right>'.__('Código UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($this->Sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td>';
+		return '<td colspan="2" align=right>'.__('C&oacute;digo UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($this->Sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td>';
 	}
 
 	public function renderizaControlesActividades($codigo_actividad, $codigo_asunto) {
