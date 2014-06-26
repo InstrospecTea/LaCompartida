@@ -637,12 +637,15 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
         <?php } ?>
             
-        <!-- Mostrar este campo solo cuando sea un revisor --> 
+        <!-- 
+        - El siguiente segmento es utilizado para renderizar el campo 'codigo_tarea' / 'Código UTBMS'
+        - SOLO CASO "EDITAR TRABAJO DESDE REVISAR HORAS"
+        -->
             
         <?php if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) { ?>
             <tr id="codigo_ledes" >
                 
-                <!-- se muestra elemento si es que el trabajo es cargado --> 
+                <!-- se muestra elemento si es que el trabajo es cargado  --> 
                 
                 <?php if ($t->Loaded() ) {
                     
@@ -659,6 +662,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
                         echo '<td align="left" width="440" nowrap>';
                         echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $t->fields['codigo_tarea']);
                         echo '</td>';
+                        
                     }
                     
                 } ?>
