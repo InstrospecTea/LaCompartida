@@ -271,7 +271,7 @@ for ($i = 0; $i < $lista->num; $i++) {
                 'Align' => 'justify',
                 'Border' => 1,
                 'Color' => 'black',
-                'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+                'NumFormat' => "[$$simbolo_moneda] #,###,$decimales"));
 
     $simbolo_moneda_defecto = $moneda_defecto->fields['simbolo'];
     $cifras_decimales_defecto = $moneda_defecto->fields['cifras_decimales'];
