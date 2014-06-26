@@ -335,13 +335,13 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		$Factura = $hookArg['Factura'];
 		if ($Factura->FacturaElectronicaCreada()) {
 			if ($Factura->DTEFirmado()) {
-				$hookArg['content'] = BotonDescargarHTML($Factura->fields['id_factura']);
+				$hookArg['content'] = $this->BotonDescargarHTML($Factura->fields['id_factura']);
 			} elseif (!$Factura->Anulada()) {
-				$hookArg['content'] = BotonGenerarHTML($Factura->fields['id_factura']);
+				$hookArg['content'] = $this->BotonGenerarHTML($Factura->fields['id_factura']);
 			} elseif ($Factura->DTEAnulado()) {
-				$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
+				$hookArg['content'] = $this->BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
 			} elseif ($Factura->DTEProcesandoAnular()) {
-				$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
+				$hookArg['content'] = $this->BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
 			}
 			return $hookArg;
 		}
