@@ -15,6 +15,7 @@ switch ($opcion) {
 		if ($controlador->correspondeMostrarLedes($conf_activa, $permiso_revisor, $permiso_profesional, $codigo_cliente)) {
 			$respuesta = $controlador->renderizaControlesLedes($codigo_tarea);
 		} else {
+			echo 'falla 1';
 			$respuesta = $controlador->respuestaVacia();
 		}
 		break;
@@ -22,10 +23,12 @@ switch ($opcion) {
 		if ($controlador->correspondeMostrarActividades($ledes, $actividades, $codigo_cliente)) {
 			$respuesta = $controlador->renderizaControlesActividades($codigo_actividad, $codigo_asunto);
 		} else {
+			echo 'falla 2';
 			$respuesta = $this->respuestaVacia();
 		}
 		break;
 	default:
+		echo 'falla 3';
 		$respuesta = $this->respuestaVacia();
 		break;
 }
@@ -73,14 +76,19 @@ class AjaxLedes {
 		$contrato = new Contrato($sesion);
 		$contrato->Load($codigo_cliente);
 		return $contrato->fields['exportacion_ledes'];
+		//hay que seguir...
+		//$criteria = new Criteria($sesion);
+		//$criteria->add_select('exportacion_ledes')->add_from('contrato')->add_left_join_with('cliente')->add_restriction(CriteriaRestriction::and(CriteriaRestriction::equals('cliente.id_contrato', 'contrato.id_contrato'), CriteriaRestriction::equals('cliente.codigo_cliente',$codigo_cliente)));
+		
 	}
 
 
 	public function correspondeMostrarLedes($configuracion_ledes, $permiso_revisor, $permiso_profesional, $codigo_cliente) {
-		if ($configuracion_ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
-			if ($permiso_profesional || $permiso_revisor) {
-				return true;
-			}
+		echo 'Cliente se exporta como ledes:'.$this->clienteSeExportaComoLedes($codigo_cliente);
+		 if ($configuracion_ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
+		 	if ($permiso_profesional || $permiso_revisor) {
+		 		return true;
+		 	} 
 		}
 
 		return false;
@@ -110,7 +118,7 @@ class AjaxLedes {
 
 		return false;
 
-		// return true;
+		//return true;
 	}
 
 	public function respuestaVacia() { return ''; }
