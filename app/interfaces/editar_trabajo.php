@@ -637,36 +637,44 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
         <?php } ?>
             
-        <?php
-        // Mostrar este campo solo cuando sea un revisor
-        // HERE!!! 
-        if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) {
-            ?>
+        <!-- Mostrar este campo solo cuando sea un revisor --> 
+            
+        <?php if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) { ?>
             <tr id="codigo_ledes" >
-                <?php 
-                    if ($t->Loaded()) { 
-                ?>
-                    <td colspan="2" align=right>
-                        <?php echo __('Código UTBMS') ?>
-                    </td>
-                    <td align=left width="440" nowrap>
-                        <?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $t->fields['codigo_tarea']) ?>
-                    </td>
-                <?php
+                
+                <!-- se muestra elemento si es que el trabajo es cargado --> 
+                
+                <?php if ($t->Loaded() ) {
+                    
+                    $contrato_principal = UtilesApp::ObtenerContratoPrincipal($sesion, $t->fields['codigo_asunto']);
+                    $contrato = new Contrato($sesion);
+                    $contrato->LoadById($contrato_principal);
+                    $activo_ledes = $contrato->fields['exportacion_ledes'];
+                    
+                    if ($t->Loaded() && $activo_ledes == 1) {
+                    
+                        echo '<td colspan="2" align="right">';
+                        echo __('Código UTBMS');
+                        echo '</td>';
+                        echo '<td align="left" width="440" nowrap>';
+                        echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $t->fields['codigo_tarea']);
+                        echo '</td>';
                     }
-                ?>
+                    
+                } ?>
+                    
             </tr>
-        <?php
-        }
-        if ($fecha == '') {
+        <?php } ?>
+            
+        <?php if ($fecha == '') {
             $zona_horaria = Conf::GetConf($sesion, 'ZonaHoraria');
             if ($zona_horaria) {
                 date_default_timezone_set($zona_horaria);
             }
             $date = new DateTime();
             $fecha = date('d-m-Y', mktime(0, 0, 0, $date->format('m'), $date->format('d'), $date->format('Y')));
-        }
-        ?>
+        } ?>
+            
         <tr>
             <td colspan="2" align=right>
                 <?php
@@ -840,8 +848,8 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
                 ?>
             </td>
         </tr>
-        <?php
-        if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora') && $permiso_revisor->fields['permitido']) {
+        
+        <?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora') && $permiso_revisor->fields['permitido']) {
             if ($t->fields['id_trabajo'] > 0) {
                 if ($t->fields['id_cobro'] > 0) {
                     $cobro = new Cobro($sesion);
@@ -1459,8 +1467,6 @@ function Substring($string) {
     }
 
     jQuery('document').ready(function() {
-
-        // jQuery('#codigo_cliente, #codigo_cliente_secundario').change(function() {
 
         var loadLedesAsunto = function() {
             jQuery.ajax({
