@@ -17,8 +17,14 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 	$nombre_dato = '';
 	$valor_original = '';
 	$valor_actual = '';
+	$error_cupo = '';
 
 	if ($Usuario->LoadId($_POST['id_usuario'])) {
+		$error_cupo = "Estimado {$Sesion->usuario->fields['nombre']} {$Sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuación se detalla su cupo actual.\n\n" .
+			"* Usuarios activos con perfil <b>Profesional</b>: {$UsuarioPermiso->cupo_profesionales}\n".
+			"* Usuarios activos con perfil <b>Administrativos</b>: {$UsuarioPermiso->cupo_administrativos}\n\n" .
+			"Si desea aumentar su cupo debe contactarse con areacomercial@lemontech.cl o en su defecto puede desactivar usuarios para habilitar cupos.";
+
 		switch ($_POST['accion']) {
 			case 'conceder':
 				if ($Usuario->fields['activo'] == '1') {
@@ -31,9 +37,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 							$error = "Atención: Ocurrió un error al asignar el rol '{$_POST['permiso']}'.";
 						}
 					} else {
-						$error = "Atención: Ocurrió un error al asignar el rol '{$_POST['permiso']}'.\n" .
-							"Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}\n".
-							"Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+						$error = &$error_cupo;
 					}
 				} else {
 					$error = "Atención: Solo a los usuarios activos del sistema se les puede asignar roles.";
@@ -49,7 +53,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 						$error = "Atención: Ocurrió un error al revocar el rol '{$_POST['permiso']}'.";
 					}
 				} else {
-					$error = "Atención: Ocurrió un error al revocar el rol '{$_POST['permiso']}'.\n{$UsuarioPermiso->error}";
+					$error = "{$UsuarioPermiso->error}\n\n{$error_cupo}";
 				}
 				break;
 			case 'activar':
@@ -73,9 +77,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 						$error = 'Atención: Ocurrió un error al activar al usuario';
 					}
 				} else {
-					$error = "Atención: Ocurrió un error al activar al usuario.\n" .
-						"Cupo usuarios profesionales: {$UsuarioPermiso->cupo_profesionales}\n".
-						"Cupo usuarios administrativos: {$UsuarioPermiso->cupo_administrativos}";
+					$error = &$error_cupo;
 				}
 				break;
 			case 'desactivar':
@@ -95,7 +97,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 	}
 
 	if (empty($error)) {
-		$Sesion->pdodbh->query("INSERT INTO usuario_cambio_historial SET id_usuario = '{$_POST['id_usuario']}', id_usuario_creador = '{$sesion->usuario->fields['id_usuario']}', nombre_dato = '{$nombre_dato}', valor_original = '{$valor_original}', valor_actual = '{$valor_actual}', fecha = NOW()");
+		$Sesion->pdodbh->query("INSERT INTO usuario_cambio_historial SET id_usuario = '{$_POST['id_usuario']}', id_usuario_creador = '{$Sesion->usuario->fields['id_usuario']}', nombre_dato = '{$nombre_dato}', valor_original = '{$valor_original}', valor_actual = '{$valor_actual}', fecha = NOW()");
 		$response = array('error' => '', 'img' => "{$url_img}/{$img}");
 	} else {
 		$response = array('error' => $error);

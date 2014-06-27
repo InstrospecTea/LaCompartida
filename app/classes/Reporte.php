@@ -348,6 +348,7 @@ class Reporte {
 					contrato.id_contrato,
 					\' - \' as tipo_asunto,
 					\' - \' as area_asunto,
+					MONTH('.$campo_fecha.') as mes,
 					grupo_cliente.id_grupo_cliente,
 					IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 					CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
@@ -446,8 +447,8 @@ class Reporte {
 		$s .= ' as ' . $this->tipo_dato;
 		$s .= ' FROM cobro
 						left join cobro_asunto using (id_cobro)
-						LEFT JOIN  asunto using (codigo_asunto)
-						LEFT JOIN  (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro
+						LEFT JOIN asunto using (codigo_asunto)
+						LEFT JOIN (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro
 			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario
 						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 						LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
@@ -543,6 +544,7 @@ class Reporte {
 						CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 						trabajo.fecha as fecha_final,
+						MONTH(trabajo.fecha) as mes,
 						trabajo.solicitante as solicitante,
 						' . (in_array('mes_reporte', $this->agrupador) ? 'DATE_FORMAT(trabajo.fecha, \'%m-%Y\') as mes_reporte,' : '') . '
 						' . (in_array('dia_reporte', $this->agrupador) ? 'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,' : '') . '

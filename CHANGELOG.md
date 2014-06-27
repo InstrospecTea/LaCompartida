@@ -1,4 +1,15 @@
 # Changelog
+## Hotfix: 14.3.12
+Lunes 23 de junio 2014
+* **Fixed:** [Corrige impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/557)
+
+## Hotfix: 14.3.11
+Lunes 23 de junio 2014
+* **Fixed:** [Deshabilita impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/556)
+
+## Hotfix: 14.3.10
+Lunes 23 de junio 2014
+* **Fixed:** [Corrige selector de idioma en agregar_contrato](https://github.com/LemontechSA/ttb/pull/554)
 
 ## Hotfix: 14.3.9
 Miércoles 19 de junio 2014
