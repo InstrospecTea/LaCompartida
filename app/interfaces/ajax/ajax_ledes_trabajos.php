@@ -22,11 +22,11 @@ switch ($opcion) {
 		if ($AjaxLedes->correspondeMostrarActividades($ledes, $actividades, $codigo_cliente)) {
 			$respuesta = $AjaxLedes->renderizaControlesActividades($codigo_actividad, $codigo_asunto);
 		} else {
-			$respuesta = $this->respuestaVacia();
+			$respuesta = $AjaxLedes->respuestaVacia();
 		}
 		break;
 	default:
-		$respuesta = $this->respuestaVacia();
+		$respuesta = $AjaxLedes->respuestaVacia();
 		break;
 }
 

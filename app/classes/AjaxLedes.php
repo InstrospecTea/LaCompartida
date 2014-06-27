@@ -19,7 +19,7 @@ class AjaxLedes {
 	//  * Método que renderiza los controladores de LEDES, según corresponda.
 	//  * Parámetros:
 	//  *	- $conf_activa: True o False dependiendo si la configuración ExportacionLedes está activa.
-	//  *	- $codigo_tarea: 
+	//  *	- $codigo_tarea:
 	//  *	- $permiso_revisor:  True o False dependiendo si el usuario tiene permiso de revisor o no.
 	//  *	- $permiso_profesional: True o False dependiendo si el usuario tiene permiso profesional o no.
 	//  */
@@ -50,7 +50,7 @@ class AjaxLedes {
 		 				CriteriaRestriction::equals('cliente.codigo_cliente',$codigo_cliente)
 		 		);
 
-		$result = $criteria->excecute();
+		$result = $criteria->run();
 
 		$exporta_ledes = $result[0]['exportacion_ledes'];
 
@@ -72,7 +72,7 @@ class AjaxLedes {
 		 if ($configuracion_ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
 		 	if ($permiso_profesional || $permiso_revisor) {
 		 		return true;
-		 	} 
+		 	}
 		}
 
 		return false;
@@ -86,12 +86,12 @@ class AjaxLedes {
 	 *		- $actividades: True o False dependiendo de la configuración de actividades.
 	 *		- $codigo_cliente: Para verificar si el cliente se exporta como LEDES.
 	 */
-	
+
 	public function correspondeMostrarActividades($ledes, $actividades, $codigo_cliente) {
 
 		if ($ledes && $this->clienteSeExportaComoLedes($codigo_cliente)) {
 			return true;
-		} 
+		}
 
 		if ($actividades && !$ledes) {
 			return true;

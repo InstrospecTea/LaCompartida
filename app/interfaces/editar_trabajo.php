@@ -419,7 +419,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 }
 $pagina->titulo = __('Modificación de') . ' ' . __('Trabajo');
 $pagina->PrintTop($popup);
-
+$Form = new Form;
 if (($opcion == 'guardar' || $opcion == 'eliminar')) {
     ?>
     <script>
@@ -463,7 +463,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
     <?php if ($id_trabajo == NULL) { ?>
         <input type="hidden" name='nuevo' value="1" id='nuevo' />
     <?php } ?>
-        
+
     <input type="hidden" name=id_cobro id=id_cobro value="<?php echo $t->fields['id_cobro'] != 'NULL' ? $t->fields['id_cobro'] : '' ?>" />
     <input type="hidden" name=popup value='<?php echo $popup ?>' id="popup">
 
@@ -552,7 +552,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
         </tr>
     </table>
 
-    <table style="border:0px solid black" style="display:<?php echo $txt_opcion ? 'inline' : 'none'; ?>" width="90%">
+    <table style="border:0px solid black" style="display:<?php echo $txt_opcion ? 'inline' : 'none'; ?>" width="100%">
         <tr>
             <td align="left">
                 <span style="font-weight:bold; font-size:11px;"><?php echo $txt_opcion; ?></span>
@@ -561,7 +561,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
         <?php if ($id_trabajo > 0) { ?>
             <tr>
                 <td width="40%" align="right">
-                    <img src="<?php echo Conf::ImgDir(); ?>/agregar.gif" border="0"> <a href"javascript:void(0)" onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
+					<?php echo $Form->icon_button(__('Ingresar nuevo Trabajo'), 'agregar', array('onclick' => "AgregarNuevo('trabajo')")); ?>
                 </td>
             </tr>
         <?php } ?>
@@ -591,13 +591,13 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
         <?php echo __('Asunto') ?>
             </td>
             <td align=left width="440" nowrap>
-        <?php
-        $oncambio = '+CargarTarifa();';
-        if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
-            $oncambio .= 'CargarActividad();';
-        }
-        UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
-        ?>
+				<?php
+				$oncambio = '+CargarTarifa();';
+				if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
+					$oncambio .= 'CargarActividad();';
+				}
+				UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
+				?>
             </td>
         </tr>
         <?php if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) { ?>
@@ -610,16 +610,15 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
                 </td>
                 <td align=left width="440" nowrap>
                 <?php
-                //$sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150'
                 echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_trabajo ORDER BY id_area_trabajo ASC", 'id_area_trabajo', $t->fields['id_area_trabajo'], '', 'Elegir', '400');
                 ?>
                 </td>
             </tr>
         <?php } ?>
-       
-        <?php if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) { ?>
+
+        <?php if ((Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) { ?>
             <tr id="actividades">
-                <?php 
+                <?php
                     if ($t->Loaded()) {
                 ?>
                     <td colspan="2" align=right>
@@ -636,40 +635,40 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             <input type="hidden" name="codigo_actividad" id="codigo_actividad">
             <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
         <?php } ?>
-            
-        <!-- 
+
+        <!--
         - El siguiente segmento es utilizado para renderizar el campo 'codigo_tarea' / 'Código UTBMS'
         - SOLO CASO "EDITAR TRABAJO DESDE REVISAR HORAS"
         -->
-            
+
         <?php if (Conf::GetConf($sesion, 'ExportacionLedes') && ($permiso_revisor->fields['permitido'] || $permiso_profesional->fields['permitido'])) { ?>
             <tr id="codigo_ledes" >
-                
-                <!-- se muestra elemento si es que el trabajo es cargado  --> 
-                
+
+                <!-- se muestra elemento si es que el trabajo es cargado  -->
+
                 <?php if ($t->Loaded() ) {
-                    
+
                     $contrato_principal = UtilesApp::ObtenerContratoPrincipal($sesion, $t->fields['codigo_asunto']);
                     $contrato = new Contrato($sesion);
                     $contrato->LoadById($contrato_principal);
                     $activo_ledes = $contrato->fields['exportacion_ledes'];
-                    
+
                     if ($t->Loaded() && $activo_ledes == 1) {
-                    
+
                         echo '<td colspan="2" align="right">';
                         echo __('Código UTBMS');
                         echo '</td>';
                         echo '<td align="left" width="440" nowrap>';
                         echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', 'codigo_tarea', $t->fields['codigo_tarea']);
                         echo '</td>';
-                        
+
                     }
-                    
+
                 } ?>
-                    
+
             </tr>
         <?php } ?>
-            
+
         <?php if ($fecha == '') {
             $zona_horaria = Conf::GetConf($sesion, 'ZonaHoraria');
             if ($zona_horaria) {
@@ -678,7 +677,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             $date = new DateTime();
             $fecha = date('d-m-Y', mktime(0, 0, 0, $date->format('m'), $date->format('d'), $date->format('Y')));
         } ?>
-            
+
         <tr>
             <td colspan="2" align=right>
                 <?php
@@ -852,7 +851,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
                 ?>
             </td>
         </tr>
-        
+
         <?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora') && $permiso_revisor->fields['permitido']) {
             if ($t->fields['id_trabajo'] > 0) {
                 if ($t->fields['id_cobro'] > 0) {
@@ -912,9 +911,11 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
                                             ?>
                                         </tr>
                                         <tr>
-                                            <td colspan=<?php echo $num_monedas ?> align=center>
-                                                <input type=button onclick="ActualizarTrabajosTarifas();" value="<?php echo __('Guardar') ?>" />
-                                                <input type=button onclick="CancelarTrabajoTarifas();" value="<?php echo __('Cancelar') ?>" />
+                                            <td colspan="<?php echo $num_monedas ?>" align="center">
+												<?php
+												echo $Form->button(__('Guardar'), array('onclick' => 'ActualizarTrabajosTarifas();'));
+												echo $Form->button(__('Cancelar'), array('onclick' => 'CancelarTrabajoTarifas();'));
+												?>
                                             </td>
                                         </tr>
                                     </table>
@@ -935,14 +936,10 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
         ?>
         <tr>
             <td colspan='3' align='right'>
-        <?php if ($id_tabajo > 0) {
-            ?>
-                    <input type=submit class=btn value=<?php echo __('Guardar') ?> onclick="return Confirmar(this.form)" />
-                <?php
-                } else {
-                    ?>
-                           <input type=submit class=btn value=<?php echo __('Guardar') ?> onclick="return Validar(this.form)" />
-                <?php } ?>
+				<?php
+				$onclick = ($id_tabajo > 0) ? 'Confirmar' : 'Validar';
+				echo $Form->button(__('Guardar'), array('onclick' => "$onclick(jQuery('#form_editar_trabajo')[0])"));
+				?>
             </td>
         </tr>
     </table>
@@ -950,6 +947,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
 </form>
 
 <?php
+echo $Form->script();
 
 function SplitDuracion($time) {
     list($h, $m, $s) = split(":", $time);
@@ -1045,10 +1043,10 @@ function Substring($string) {
 
         //Revisa el Conf si esta permitido y la función existe
         <?php if ($tipo_ingreso == 'decimal') { ?>
-            
+
             var dur = form.duracion.value.replace(",", ".");
             var dur_cob = form.duracion_cobrada.value.replace(",", ".");
-            
+
             if (isNaN(dur) || isNaN(dur_cob)) {
                 alert("<?php echo __('Solo se aceptan valores numéricos') ?>");
                 form.duracion.focus();
@@ -1064,7 +1062,7 @@ function Substring($string) {
                 return false;
             }
         <?php } ?>
-        
+
         if (!form.descripcion.value) {
             alert("<?php echo __('Debe ingresar la descripción') ?>");
             form.descripcion.focus();
@@ -1093,7 +1091,7 @@ function Substring($string) {
                 }
 
             } else {
-                
+
                 if (ActualizaCobro(form.codigo_asunto.value)) {
                     return true;
                 } else {
@@ -1121,14 +1119,14 @@ function Substring($string) {
             }
 
         }
-        
+
         // Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
         <?php if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) { ?>
             temp = $('fecha').value.split("-");
             fecha = new Date(temp[2] + '//' + temp[1] + '//' + temp[0]);
             hoy = new Date();
             fecha_tope = new Date(hoy.getTime() - (<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?> * 24 * 60 * 60 * 1000));
-            
+
             if (fecha_tope > fecha) {
                 var dia = fecha_tope.getDate();
                 var mes = fecha_tope.getMonth() + 1;
@@ -1139,7 +1137,7 @@ function Substring($string) {
             }
 
         <?php } ?>
-        
+
         //Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
         <?php if (isset($t) && $t->Loaded() && $opcion != 'nuevo') { ?>
             var string = new String(top.location);
@@ -1150,17 +1148,18 @@ function Substring($string) {
                 }
             }
         <?php } ?>
-        
+
         top.window.jQuery('#semanactual').val(jQuery('#fecha').val());
-        return true;
+        form.submit();
+		return false;
     }
 
     function MontoValido(id_campo) {
-        
+
         var monto = document.getElementById(id_campo).value.replace('\,', '.');
         var arr_monto = monto.split('\.');
         var monto = arr_monto[0];
-        
+
         for ($i = 1; $i < arr_monto.length - 1; $i++) {
             monto += arr_monto[$i];
         }
@@ -1236,11 +1235,11 @@ function Substring($string) {
     }
 
     function ShowDiv(div, valor, dvimg) {
-    
+
         var div_id = document.getElementById(div);
         var img = document.getElementById(dvimg);
         var form = document.getElementById('form_editar_trabajo');
-    
+
         if (TipoSelectCliente == "autocompletador") {
             var codigo = document.getElementById('codigo_cliente');
         } else {
@@ -1294,11 +1293,11 @@ function Substring($string) {
      */
 
     function Lista(accion, div, codigo, div_post) {
-        
+
         var form = document.getElementById('form_editar_trabajo');
         var data = document.getElementById(div);
         hideddrivetip();
-        
+
         if (accion == 'lista_asuntos') {
 
             if (TipoSelectCliente == "autocompletador") {
@@ -1315,7 +1314,7 @@ function Substring($string) {
             }
 
         } else if (accion == 'lista_trabajos') {
-            
+
             form.campo_codigo_asunto.value = codigo;
             SetSelectInputId('campo_codigo_asunto', 'codigo_asunto');
 
@@ -1335,7 +1334,7 @@ function Substring($string) {
         var vurl = 'ajax_historial.php?accion=' + accion + '&codigo=' + codigo + '&div_post=' + div_post + '&div=' + div;
         http.open('get', vurl, false);
         http.onreadystatechange = function() {
-            
+
             if (http.readyState == 4) {
                 var response = http.responseText;
                 data.innerHTML = response;
@@ -1346,7 +1345,7 @@ function Substring($string) {
     }
 
     function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, duracion_cobrada, cobrable, visible, fecha) {
-        
+
         var form = document.getElementById('form_editar_trabajo');
         form.campo_codigo_actividad.value = codigo_actividad;
         SetSelectInputId('campo_codigo_actividad', 'codigo_actividad');
@@ -1390,15 +1389,15 @@ function Substring($string) {
         var form = $('form_editar_trabajo');
 
         if (codigo_asunto_hide != valor && id_cobro && id_trabajo) {
-            
+
             var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
             text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece al cobro') ?>:' + id_cobro + ' ';
             text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo ' . __('asunto') . 'en caso de que exista') ?>.</span><br>';
             text_window += '<br><table><tr>';
             text_window += '</table>';
-            
+
             Dialog.confirm(text_window,
-            {   
+            {
                 top: 100,
                 left: 80,
                 width: 400,
@@ -1423,7 +1422,7 @@ function Substring($string) {
     }
 
     function ActualizarCobroAsunto(valor) {
-        
+
         var codigo_asunto_hide = $('codigo_asunto_hide').value;
         var id_cobro = $('id_cobro').value;
         var id_trabajo = $('id_trabajo').value;
@@ -1455,7 +1454,7 @@ function Substring($string) {
     }
 
     function AgregarNuevo(tipo) {
-        
+
         if (CodigoSecundario) {
             var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
             var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
@@ -1478,7 +1477,7 @@ function Substring($string) {
                 url: "ajax/ajax_ledes_trabajos.php",
                 async: false,
                 data: {
-                        opcion: 'ledes', 
+                        opcion: 'ledes',
                         codigo_cliente: jQuery('#campo_codigo_asunto').val().split('-').first(),
                         conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                         permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
@@ -1497,21 +1496,22 @@ function Substring($string) {
                     ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                     actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
                     codigo_cliente: jQuery('#campo_codigo_asunto').val().split('-').first(),
-                    <?php 
+                    <?php
 
                     if ($t->fields['codigo_actividad']) {
                         echo 'codigo_actividad: '. $t->fields['codigo_actividad'].',';
-                    }; 
+                    };
 
                     if ($t->fields['codigo_asunto']) {
                         echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
-                    }; 
+                    };
 
                     ?>
                 }
 
             }).done(function(response) {
                 jQuery('#actividades').html(response);
+				top.window.jQuery('.resizableframe').load();
             });
         }
 
@@ -1521,7 +1521,7 @@ function Substring($string) {
                 url: "ajax/ajax_ledes_trabajos.php",
                 async: false,
                 data: {
-                        opcion: 'ledes', 
+                        opcion: 'ledes',
                         codigo_cliente: jQuery('#campo_codigo_cliente').val(),
                         conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                         permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
@@ -1529,6 +1529,7 @@ function Substring($string) {
                 }
             }).done(function(response) {
                 jQuery('#codigo_ledes').html(response);
+				top.window.jQuery('.resizableframe').load();
             });
 
             jQuery.ajax({
@@ -1540,15 +1541,15 @@ function Substring($string) {
                     ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                     actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
                     codigo_cliente: jQuery('#campo_codigo_cliente').val(),
-                    <?php 
+                    <?php
 
                     if ($t->fields['codigo_actividad']) {
                         echo 'codigo_actividad: '. $t->fields['codigo_actividad'].',';
-                    }; 
+                    };
 
                     if ($t->fields['codigo_asunto']) {
                         echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
-                    }; 
+                    };
 
                     ?>
                 }
