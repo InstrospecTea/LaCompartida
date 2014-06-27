@@ -197,7 +197,7 @@ class Criteria {
 			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $ordering_criteria. '.');
 		}
 
-		
+
 	}
 
 	/*
@@ -271,7 +271,7 @@ class Criteria {
 	 * @return string
 	 */
 	private function generate_ordering_statement(){
-		
+
 		$order_criteria = 'ASC';
 
 		if (!empty($this->order_criteria)) {
