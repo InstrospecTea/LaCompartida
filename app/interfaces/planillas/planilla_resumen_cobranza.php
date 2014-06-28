@@ -85,9 +85,9 @@
 									'Border' => 1,
 									'Locked' => 1,
 									'Color' => 'black'));
-		$time_format =& $wb->addFormat(array('Size' => 10,
+		$time_format =& $wb->addFormat(array('Size' => 11,
 									'VAlign' => 'top',
-									'Align' => 'justify',
+									'Align' => 'right',
 									'Border' => 1,
 									'Color' => 'black',
 									'NumFormat' => '[h]:mm'));

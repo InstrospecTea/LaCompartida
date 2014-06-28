@@ -21,9 +21,9 @@
 
 	if ($opc == 'eliminado') {
 		$pagina->AddInfo(__('Usuario') . ' ' . __('eliminado con éxito'));
-	} else if ($opc == 'cancelar') { //Opción cancelar
+	} else if ($opc == 'cancelar') { // Opción cancelar
 		$pagina->Redirect('usuario_paso1.php');
-	} else if ($opc == 'edit') { //Opción editar
+	} else if ($opc == 'edit') { // Opción editar
 		if ($cambiar_alerta_diaria == 'on') {
 			if ($alerta_diaria == 'on') {
 				$alerta_diaria = 1;
@@ -481,6 +481,39 @@
 </script>
 
 <table width="96%" align="left">
+	<tr>
+		<td width="20">&nbsp;</td>
+		<td valign="top">
+			<table class="info" style="width:100%">
+				<tr>
+					<td colspan="2" style="text-align:left">
+						<b>Administraci&oacute;n de cupos para usuarios activos en el sistema:</b>
+					</td>
+				</tr>
+				<tr>
+					<td width="20">&nbsp;</td>
+					<td style="text-align:left">
+						Estimado <?php echo $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1']; ?>, a continuación se detalla su cupo actual de usuarios contratados en el sistema.  
+					</td>
+				</tr>
+				<tr>
+					<td width="20">&nbsp;</td>
+					<td style="text-align:left">
+						<ul>
+							<li>Usuarios activos con perfil <b>Profesional</b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosProfesionales'); ?></li>
+							<li>Usuarios activos con perfil <b>Administrativos</b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosAdministrativos'); ?></li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td width="20">&nbsp;</td>
+					<td style="text-align:left">
+						Si desea aumentar su cupo debe contactarse con <a href="mailto:areacomercial@lemontech.cl">areacomercial@lemontech.cl</a> o en su defecto puede desactivar usuarios para habilitar cupos.
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
 	<tr>
 		<td width="20">&nbsp;</td>
 		<td valign="top">
