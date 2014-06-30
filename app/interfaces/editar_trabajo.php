@@ -1473,8 +1473,15 @@ function Substring($string) {
 
         if (tipo_ingreso_hrs == 'decimal') {
 
-            jQuery("#duracion, #duracion_cobrada").change(function() {
+            jQuery('#duracion').change(function() {
                 var str = jQuery(this).val();
+                jQuery(this).val(str.replace(',', '.'));
+                jQuery(this).parseNumber({format:"0.0", locale:"us"});
+                jQuery(this).formatNumber({format:"0.0", locale:"us"});
+            });
+
+            jQuery('#duracion_cobrada').focus(function() {
+                 var str = jQuery(this).val();
                 jQuery(this).val(str.replace(',', '.'));
                 jQuery(this).parseNumber({format:"0.0", locale:"us"});
                 jQuery(this).formatNumber({format:"0.0", locale:"us"});
