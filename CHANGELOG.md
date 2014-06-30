@@ -2,6 +2,7 @@
 ## Hotfix: 14.4.2
 Lunes 30 de Junio 2014
 * **Fixed:** [Corrige ingreso de horas formato decimal](https://github.com/LemontechSA/ttb/pull/564)
+* **Fixed:** [Corrige comportamiento de actividades en ingresso trabajo](https://github.com/LemontechSA/ttb/pull/564)
 
 ## Hotfix: 14.4.1
 Lunes 30 de Junio 2014
