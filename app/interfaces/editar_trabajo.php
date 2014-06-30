@@ -1469,6 +1469,33 @@ function Substring($string) {
 
     jQuery('document').ready(function() {
 
+        var tipo_ingreso_hrs = new String("<?php echo Conf::GetConf($sesion, 'TipoIngresoHoras'); ?>");
+
+        if (tipo_ingreso_hrs == 'decimal') {
+
+            jQuery('#duracion').change(function() {
+                var str = jQuery(this).val();
+                jQuery(this).val(str.replace(',', '.'));
+                jQuery(this).parseNumber({format:"0.0", locale:"us"});
+                jQuery(this).formatNumber({format:"0.0", locale:"us"});
+            });
+
+            jQuery('#duracion_cobrada').focus(function() {
+                 var str = jQuery(this).val();
+                jQuery(this).val(str.replace(',', '.'));
+                jQuery(this).parseNumber({format:"0.0", locale:"us"});
+                jQuery(this).formatNumber({format:"0.0", locale:"us"});
+            });
+
+            jQuery('#descripcion').focus(function() {
+                var str = jQuery('#duracion_cobrada').val();
+                jQuery('#duracion_cobrada').val(str.replace(',', '.'));
+                jQuery('#duracion_cobrada').parseNumber({format:"0.0", locale:"us"});
+                jQuery('#duracion_cobrada').formatNumber({format:"0.0", locale:"us"});
+            });
+
+        }
+
         var loadLedesAsunto = function() {
             jQuery.ajax({
                 type: "POST",
@@ -1495,15 +1522,11 @@ function Substring($string) {
                     actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
                     codigo_cliente: jQuery('#campo_codigo_asunto').val().split('-').first(),
                     <?php
-
-                    if ($t->fields['codigo_actividad']) {
-                        echo 'codigo_actividad: '. $t->fields['codigo_actividad'].',';
-                    };
-
-                    if ($t->fields['codigo_asunto']) {
-                        echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
-                    };
-
+                        if ($t->fields['codigo_asunto']) {
+                            echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
+                        } else {
+                            echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val(),';
+                        }
                     ?>
                 }
 
@@ -1529,35 +1552,9 @@ function Substring($string) {
                 jQuery('#codigo_ledes').html(response);
 				top.window.jQuery('.resizableframe').load();
             });
-
-            jQuery.ajax({
-                type: "POST",
-                url: "ajax/ajax_ledes_trabajos.php",
-                async: false,
-                data: {
-                    opcion: 'act',
-                    ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
-                    actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
-                    codigo_cliente: jQuery('#campo_codigo_cliente').val(),
-                    <?php
-
-                    if ($t->fields['codigo_actividad']) {
-                        echo 'codigo_actividad: '. $t->fields['codigo_actividad'].',';
-                    };
-
-                    if ($t->fields['codigo_asunto']) {
-                        echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
-                    };
-
-                    ?>
-                }
-
-            }).done(function(response) {
-                jQuery('#actividades').html(response);
-            });
         }
         jQuery('#codigo_cliente, #codigo_cliente_secundario').change(loadLedesCliente);
-        jQuery('#codigo_asunto').change(loadLedesAsunto);
+        jQuery('#codigo_asunto, #codigo_asunto_secundario').change(loadLedesAsunto);
         jQuery('#campo_codigo_cliente').bind('input',loadLedesCliente);
         jQuery('#campo_codigo_asunto').bind('input',loadLedesAsunto);
 

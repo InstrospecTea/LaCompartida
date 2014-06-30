@@ -1,4 +1,11 @@
 # Changelog
+## Hotfix: 14.4.2
+Lunes 30 de Junio 2014
+* **Fixed:** [Corrige ingreso de horas formato decimal](https://github.com/LemontechSA/ttb/pull/564)
+
+## Hotfix: 14.4.1
+Lunes 30 de Junio 2014
+* **Fixed:** [Refactorizacion de flujo al agregar un trabajo](https://github.com/LemontechSA/ttb/pull/563)
 
 ## Release: 14.3.0
 Lunes 30 de Junio 2014
