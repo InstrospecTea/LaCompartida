@@ -1487,6 +1487,13 @@ function Substring($string) {
                 jQuery(this).formatNumber({format:"0.0", locale:"us"});
             });
 
+            jQuery('#descripcion').focus(function() {
+                var str = jQuery('#duracion_cobrada').val();
+                jQuery('#duracion_cobrada').val(str.replace(',', '.'));
+                jQuery('#duracion_cobrada').parseNumber({format:"0.0", locale:"us"});
+                jQuery('#duracion_cobrada').formatNumber({format:"0.0", locale:"us"});
+            });
+
         }
 
         var loadLedesAsunto = function() {
