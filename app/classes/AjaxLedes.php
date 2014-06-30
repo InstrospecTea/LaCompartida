@@ -29,7 +29,7 @@ class AjaxLedes {
 	}
 
 	public function renderizaControlesActividades($codigo_actividad, $codigo_asunto) {
-		$html = InputId::ImprimirActividad($this->Sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto);
+		$html = InputId::Imprimir($this->Sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto);
 		return '<td colspan="2" align=right>'.__('Actividad').'</td>'.'<td align=left width="440" nowrap>'.$html.'</td>';
 	}
 
