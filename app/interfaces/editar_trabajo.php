@@ -1084,17 +1084,15 @@ function Substring($string) {
 
             if (CodigoSecundario) {
 
-                if (ActualizaCobro(form.codigo_asunto_secundario.value)) {
-                    return true;
-                } else {
+                if (!ActualizaCobro(form.codigo_asunto_secundario.value)) {
+                    //MENSAJE DE ERROR
                     return false;
-                }
+                } 
 
             } else {
 
-                if (ActualizaCobro(form.codigo_asunto.value)) {
-                    return true;
-                } else {
+                if (!ActualizaCobro(form.codigo_asunto.value)) {
+                    //MENSAJE DE ERROR
                     return false;
                 }
             }
