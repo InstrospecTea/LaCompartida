@@ -1469,6 +1469,21 @@ function Substring($string) {
 
     jQuery('document').ready(function() {
 
+        var tipo_ingreso_hrs = new String("<?php echo Conf::GetConf($sesion, 'TipoIngresoHoras'); ?>");
+
+        if (tipo_ingreso_hrs == 'decimal') {
+
+            console.log(tipo_ingreso_hrs);
+        
+            jQuery("#duracion, #duracion_cobrada").change(function() {
+                var str = jQuery(this).val();
+                jQuery(this).val(str.replace(',', '.'));
+                jQuery(this).parseNumber({format:"0.0", locale:"us"});
+                jQuery(this).formatNumber({format:"0.0", locale:"us"});
+            });
+
+        }
+
         var loadLedesAsunto = function() {
             jQuery.ajax({
                 type: "POST",
