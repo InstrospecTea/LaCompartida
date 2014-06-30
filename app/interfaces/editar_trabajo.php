@@ -1473,8 +1473,6 @@ function Substring($string) {
 
         if (tipo_ingreso_hrs == 'decimal') {
 
-            console.log(tipo_ingreso_hrs);
-        
             jQuery("#duracion, #duracion_cobrada").change(function() {
                 var str = jQuery(this).val();
                 jQuery(this).val(str.replace(',', '.'));
