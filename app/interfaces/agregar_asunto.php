@@ -60,6 +60,11 @@ if ($id_asunto > 0) {
 	}
 
 	$Cliente->LoadByCodigo($Asunto->fields['codigo_cliente']);
+
+	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+		$codigo_cliente = $codigo_cliente_secundario;
+	}
+	
 	if (!$Cliente->Loaded()) {
 		if ($codigo_cliente != '') {
 			$Cliente->LoadByCodigo($codigo_cliente);
