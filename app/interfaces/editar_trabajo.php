@@ -1532,6 +1532,17 @@ function Substring($string) {
 
             }).done(function(response) {
                 jQuery('#actividades').html(response);
+                if (response) {
+                    if (PrellenarTrabajoConActividad) {
+                        $('codigo_actividad').observe('change', function(evento) {
+                            actividad_seleccionada = this.options[this.selectedIndex];
+                            if (actividad_seleccionada.value != '') {
+                                descripcion_textarea = document.getElementById('descripcion');
+                                descripcion_textarea.value = actividad_seleccionada.text + '\n' + descripcion_textarea.value;
+                            }
+                        });
+                    }
+                };
 				top.window.jQuery('.resizableframe').load();
             });
         }
@@ -1553,6 +1564,7 @@ function Substring($string) {
 				top.window.jQuery('.resizableframe').load();
             });
         }
+
         jQuery('#codigo_cliente, #codigo_cliente_secundario').change(loadLedesCliente);
         jQuery('#codigo_asunto, #codigo_asunto_secundario').change(loadLedesAsunto);
         jQuery('#campo_codigo_cliente').bind('input',loadLedesCliente);
