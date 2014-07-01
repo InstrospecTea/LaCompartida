@@ -1,8 +1,11 @@
 # Changelog
+## Hotfix: 14.4.4
+Martes 1 de Julio 2014
+* **Fixed:** [Corrige activacion de asunto con codigo_secundario](https://github.com/LemontechSA/ttb/pull/569)
+
 ## Hotfix: 14.4.3
 Martes 1 de Julio 2014
 * **Fixed:** [Añade rutina JS en respuesta a request AJAX, si aplica un selector de actividades para el cliente](https://github.com/LemontechSA/ttb/pull/567)
-
 
 ## Hotfix: 14.4.2
 Lunes 30 de Junio 2014
