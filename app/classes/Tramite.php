@@ -14,19 +14,19 @@ class Tramite extends Objeto
 		$this->campo_id = "id_tramite";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
-		
+
 		if( $this->fields['duracion']=='00:00:00' ) $this->fields['duracion']='-';
 	}
-	
+
 	function Eliminar()
 	{
 		if($this->Estado() == "Abierto") {
-			
+
 			if($this->fields['trabajo_si_no']==1) {
 				$query = "DELETE FROM trabajo WHERE id_tramite='".$this->fields['id_tramite']."'";
 				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
-			
+
 			$query = "DELETE FROM tramite WHERE id_tramite='".$this->fields['id_tramite']."'";;
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			// Si se pudo eliminar, loguear el cambio.
@@ -37,35 +37,38 @@ class Tramite extends Objeto
 
 		return true;
 	}
-	
+
 	function get_codigo_cliente()
 	{
 		$query = "SELECT codigo_cliente FROM tramite JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 						WHERE id_tramite='".$this->fields['id_tramite']."'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		$row = mysql_fetch_assoc($resp);
-		
+
 		return $row['codigo_cliente'];
 	}
-	
-	function Estado()
-	{
-		if(!$this->fields['estado_cobro'] && $this->fields['id_cobro']) {
+
+	function Estado() {
+		if (!$this->fields['estadocobro'] && $this->fields['id_cobro']) {
 			$cobro= new Cobro($this->sesion);
 			$cobro->Load($this->fields['id_cobro']);
-			$this->fields['estado_cobro'] = $cobro->fields['estado'];
+			$this->fields['estadocobro'] = $cobro->fields['estado'];
 		}
 
-		if($this->fields['estado_cobro'] <> "CREADO" && $this->fields['estado_cobro'] <> "EN REVISION" && $this->fields['estado_cobro'] != '' && $this->fields['estado_cobro'] != 'SIN COBRO') {
-			return __("Cobrado");
+		if ($this->fields['estadocobro'] <> 'CREADO'
+			&& $this->fields['estado_cobro'] <> 'EN REVISION'
+			&& $this->fields['estado_cobro'] != ''
+			&& $this->fields['estado_cobro'] != 'SIN COBRO') {
+			return __('Cobrado');
 		}
 
-		if($this->fields['revisado'] == 1) {
-			return __("Revisado");
+		if ($this->fields['revisado'] == 1) {
+			return __('Revisado');
 		}
-			return __("Abierto");
+
+		return __('Abierto');
 	}
-	
+
 	function LoadId( $id_tramite )
     {
         $query = "SELECT * FROM tramite WHERE id_tramite='$id_tramite'";
@@ -88,4 +91,4 @@ if(!class_exists('ListaTramites')) {
 		}
 	}
 }
- 
+

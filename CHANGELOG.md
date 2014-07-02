@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.4.8
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignación de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
+
 ## Hotfix: 14.4.7
 Miércoles 2 de Julio 2014
 * **Fixed:** [Repara elementos extraños en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)

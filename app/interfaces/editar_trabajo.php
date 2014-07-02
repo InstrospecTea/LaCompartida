@@ -1087,7 +1087,7 @@ function Substring($string) {
                 if (!ActualizaCobro(form.codigo_asunto_secundario.value)) {
                     //MENSAJE DE ERROR
                     return false;
-                } 
+                }
 
             } else {
 
@@ -1495,7 +1495,7 @@ function Substring($string) {
             });
 
         }
-        
+
 
         var loadLedesAsunto = function() {
 
@@ -1519,7 +1519,7 @@ function Substring($string) {
                 jQuery('#codigo_ledes').html(response);
             });
 
-            
+
             jQuery.ajax({
                 type: "POST",
                 url: "ajax/ajax_ledes_trabajos.php",
