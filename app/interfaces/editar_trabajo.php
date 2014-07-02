@@ -1498,13 +1498,19 @@ function Substring($string) {
         
 
         var loadLedesAsunto = function() {
+
+            var campo_asuntos = jQuery('#campo_codigo_asunto');
+            if (CodigoSecundario) {
+                campo_asuntos = jQuery('#campo_codigo_asunto_secundario');
+            }
+
             jQuery.ajax({
                 type: "POST",
                 url: "ajax/ajax_ledes_trabajos.php",
                 async: false,
                 data: {
                         opcion: 'ledes',
-                        codigo_cliente: jQuery('#campo_codigo_asunto').val().split('-').first(),
+                        codigo_cliente: campo_asuntos.val().split('-').first(),
                         conf_activa: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                         permiso_revisor: <?php echo $permiso_revisor->fields['permitido']; ?>,
                         permiso_profesional: <?php echo $permiso_profesional->fields['permitido']; ?>
@@ -1513,6 +1519,7 @@ function Substring($string) {
                 jQuery('#codigo_ledes').html(response);
             });
 
+            
             jQuery.ajax({
                 type: "POST",
                 url: "ajax/ajax_ledes_trabajos.php",
@@ -1521,7 +1528,7 @@ function Substring($string) {
                     opcion: 'act',
                     ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
                     actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
-                    codigo_cliente: jQuery('#campo_codigo_asunto').val().split('-').first(),
+                    codigo_cliente: campo_asuntos.val().split('-').first(),
                     <?php
                         if ($t->fields['codigo_asunto']) {
                             echo 'codigo_asunto: '. $t->fields['codigo_asunto'];

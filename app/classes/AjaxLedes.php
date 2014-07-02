@@ -51,7 +51,11 @@ class AjaxLedes {
 		 				CriteriaRestriction::equals('cliente.codigo_cliente',$codigo_cliente)
 		 		);
 
-		$result = $criteria->run();
+		try{
+			$result = $criteria->run();
+		} catch (PDOException $ex) {
+			return false;
+		}
 
 		$exporta_ledes = $result[0]['exportacion_ledes'];
 
