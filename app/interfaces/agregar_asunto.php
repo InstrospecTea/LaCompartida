@@ -50,6 +50,10 @@ if ($codigo_cliente_secundario != '') {
 	}
 }
 
+if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+	$codigo_cliente = $codigo_cliente_secundario;
+}
+
 if ($id_asunto > 0) {
 	if (!$Asunto->Load($id_asunto)) {
 		$Pagina->FatalError('Código inválido');
@@ -61,9 +65,6 @@ if ($id_asunto > 0) {
 
 	$Cliente->LoadByCodigo($Asunto->fields['codigo_cliente']);
 
-	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-		$codigo_cliente = $codigo_cliente_secundario;
-	}
 	
 	if (!$Cliente->Loaded()) {
 		if ($codigo_cliente != '') {
@@ -97,7 +98,9 @@ if ($id_asunto > 0) {
 			}
 		}
 	} else if ($Cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && Conf::GetConf($Sesion, 'CodigoSecundario')) {
-		$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
+		if (empty($codigo_cliente)) {
+			$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);	
+		}
 	}
 }
 
@@ -281,9 +284,17 @@ if ($opcion == "guardar") {
 		if (!$Cliente) {
 			$Cliente = new Cliente($Sesion);
 		}
-		if (!$codigo_cliente_secundario) {
-			$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+
+		if (Conf::GetConf($Sesion,'CodigoSecundario')) {
+			if ($codigo_cliente_secundario && ($codigo_cliente == $codigo_cliente_secundario)) {
+				$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+			}		
+		} else {
+			if (!$codigo_cliente_secundario) {
+				$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+			}		
 		}
+		
 		$Asunto->NoEditar("opcion");
 		$Asunto->NoEditar("popup");
 		$Asunto->NoEditar("motivo");
