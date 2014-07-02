@@ -50,10 +50,6 @@ if ($codigo_cliente_secundario != '') {
 	}
 }
 
-if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-	$codigo_cliente = $codigo_cliente_secundario;
-}
-
 if ($id_asunto > 0) {
 	if (!$Asunto->Load($id_asunto)) {
 		$Pagina->FatalError('Código inválido');
@@ -65,7 +61,6 @@ if ($id_asunto > 0) {
 
 	$Cliente->LoadByCodigo($Asunto->fields['codigo_cliente']);
 
-	
 	if (!$Cliente->Loaded()) {
 		if ($codigo_cliente != '') {
 			$Cliente->LoadByCodigo($codigo_cliente);
@@ -98,9 +93,7 @@ if ($id_asunto > 0) {
 			}
 		}
 	} else if ($Cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && Conf::GetConf($Sesion, 'CodigoSecundario')) {
-		if (empty($codigo_cliente)) {
-			$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);	
-		}
+		$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 	}
 }
 
@@ -284,17 +277,9 @@ if ($opcion == "guardar") {
 		if (!$Cliente) {
 			$Cliente = new Cliente($Sesion);
 		}
-
-		if (Conf::GetConf($Sesion,'CodigoSecundario')) {
-			if ($codigo_cliente_secundario && ($codigo_cliente == $codigo_cliente_secundario)) {
-				$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
-			}		
-		} else {
-			if (!$codigo_cliente_secundario) {
-				$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
-			}		
+		if (!$codigo_cliente_secundario) {
+			$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
 		}
-		
 		$Asunto->NoEditar("opcion");
 		$Asunto->NoEditar("popup");
 		$Asunto->NoEditar("motivo");
@@ -975,7 +960,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 									}
 									echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
 									echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
-									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $Asunto->fields['codigo_cliente'] . '">';
+									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
 								}
 								?>
 								<span style="color:#FF0000; font-size:10px">*</span>
