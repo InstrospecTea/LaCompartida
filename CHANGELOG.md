@@ -1,9 +1,12 @@
 # Changelog
 
+## Hotfix: 14.4.6
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/571)
+
 ## Hotfix: 14.4.5
 Miércoles 2 de Julio 2014
 * **Fixed:** [Aumenta tiempo de tolerancia para generación del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
-
 
 ## Hotfix: 14.4.4
 Martes 1 de Julio 2014
