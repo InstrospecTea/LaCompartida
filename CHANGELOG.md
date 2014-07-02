@@ -1,4 +1,10 @@
 # Changelog
+
+## Hotfix: 14.4.5
+Miércoles 2 de Julio 2014
+* **Fixed:** [Aumenta tiempo de tolerancia para generación del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
+
+
 ## Hotfix: 14.4.4
 Martes 1 de Julio 2014
 * **Fixed:** [Corrige activacion de asunto con codigo_secundario](https://github.com/LemontechSA/ttb/pull/569)
