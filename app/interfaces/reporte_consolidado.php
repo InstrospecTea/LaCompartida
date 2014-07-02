@@ -9,7 +9,6 @@
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
-
 	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
 
