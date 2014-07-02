@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.4.6
 Miércoles 2 de Julio 2014
-* **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/571)
+* **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/572)
 
 ## Hotfix: 14.4.5
 Miércoles 2 de Julio 2014
