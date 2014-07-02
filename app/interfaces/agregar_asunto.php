@@ -284,9 +284,17 @@ if ($opcion == "guardar") {
 		if (!$Cliente) {
 			$Cliente = new Cliente($Sesion);
 		}
-		if (!$codigo_cliente_secundario) {
-			$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+
+		if (Conf::GetConf($Sesion,'CodigoSecundario')) {
+			if ($codigo_cliente_secundario && ($codigo_cliente == $codigo_cliente_secundario)) {
+				$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+			}		
+		} else {
+			if (!$codigo_cliente_secundario) {
+				$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
+			}		
 		}
+		
 		$Asunto->NoEditar("opcion");
 		$Asunto->NoEditar("popup");
 		$Asunto->NoEditar("motivo");
