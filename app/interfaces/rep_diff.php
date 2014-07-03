@@ -29,9 +29,9 @@ foreach($currency as $key=>$value) {
 }*/
 ?>
     <style type="text/css">
-      @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
+      @import "//static.thetimebilling.com/css/jquery.dataTables.css";
     </style>
-   <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+   <script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 	
 <script type="text/javascript">	
 

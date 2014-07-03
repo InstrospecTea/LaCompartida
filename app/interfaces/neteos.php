@@ -15,7 +15,7 @@
 	$pagina->PrintTop();
 
 ?>
-   <script  src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+   <script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 	
 <script type="text/javascript">	
 jQuery(document).ready(function() {
