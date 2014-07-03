@@ -1,4 +1,51 @@
 # Changelog
+
+## Hotfix: 14.4.7
+Miércoles 2 de Julio 2014
+* **Fixed:** [Repara elementos extraños en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)
+
+## Hotfix: 14.4.6
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/572)
+
+## Hotfix: 14.4.5
+Miércoles 2 de Julio 2014
+* **Fixed:** [Aumenta tiempo de tolerancia para generación del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
+
+## Hotfix: 14.4.4
+Martes 1 de Julio 2014
+* **Fixed:** [Corrige activacion de asunto con codigo_secundario](https://github.com/LemontechSA/ttb/pull/569)
+
+## Hotfix: 14.4.3
+Martes 1 de Julio 2014
+* **Fixed:** [Añade rutina JS en respuesta a request AJAX, si aplica un selector de actividades para el cliente](https://github.com/LemontechSA/ttb/pull/567)
+
+## Hotfix: 14.4.2
+Lunes 30 de Junio 2014
+* **Fixed:** [Corrige ingreso de horas formato decimal](https://github.com/LemontechSA/ttb/pull/564)
+* **Fixed:** [Corrige comportamiento de actividades en ingresso trabajo](https://github.com/LemontechSA/ttb/pull/564)
+
+## Hotfix: 14.4.1
+Lunes 30 de Junio 2014
+* **Fixed:** [Refactorizacion de flujo al agregar un trabajo](https://github.com/LemontechSA/ttb/pull/563)
+
+## Release: 14.3.0
+Lunes 30 de Junio 2014
+* **Feature:** [Reporte pdf en revisar horas](https://github.com/LemontechSA/ttb/pull/561)
+* **Feature:** [Builder HTML](https://github.com/LemontechSA/ttb/pull/560)
+* **Feature:** [Agrega columnas a excel de revisar horas con valores normalizados segun moneda defecto](https://github.com/LemontechSA/ttb/pull/559)
+* **Feature:** [Primer asunto de un cliente no puede ser marcado como "cobrar de forma independiente"](https://github.com/LemontechSA/ttb/pull/558)
+* **Feature:** [Mejora uso codigo ledes](https://github.com/LemontechSA/ttb/pull/555)
+* **Fixed:** [Repara reporte financiero](https://github.com/LemontechSA/ttb/pull/553)
+* **Fixed:** [Repara error de validacion en agregar_asunto cobros3.php](https://github.com/LemontechSA/ttb/pull/552)
+* **Fixed:** [Repara error que impedia generacion de un cobro forma cobro "HITOS"](https://github.com/LemontechSA/ttb/pull/551)
+* **Fixed:** [Correccion a validaciones, modificaciones a mensajes en : usuario_paso1 y usuario_paso2](https://github.com/LemontechSA/ttb/pull/550)
+* **Feature:** [Agrega columna RUT CLIENTE a excel de facturas](https://github.com/LemontechSA/ttb/pull/549)
+* **Feature:** [Correccion a seleccion de ausntos de un cobro](https://github.com/LemontechSA/ttb/pull/547)
+* **Feature:** [Inhabilita asuntos cuando un cliente es desactivado](https://github.com/LemontechSA/ttb/pull/544)
+* **Feature:** [Agrega columnas numero cuenta banco y nombre de banco a excel de clientes](https://github.com/LemontechSA/ttb/pull/544)
+* **Feature:** [Agrega "Numero Identificador autoincremental" para gastos](https://github.com/LemontechSA/ttb/pull/544)
+
 ## Hotfix: 14.3.12
 Lunes 23 de junio 2014
 * **Fixed:** [Corrige impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/557)

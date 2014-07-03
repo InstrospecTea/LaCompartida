@@ -60,6 +60,7 @@ if ($id_asunto > 0) {
 	}
 
 	$Cliente->LoadByCodigo($Asunto->fields['codigo_cliente']);
+
 	if (!$Cliente->Loaded()) {
 		if ($codigo_cliente != '') {
 			$Cliente->LoadByCodigo($codigo_cliente);
@@ -959,7 +960,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 									}
 									echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
 									echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
-									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $Asunto->fields['codigo_cliente'] . '">';
+									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
 								}
 								?>
 								<span style="color:#FF0000; font-size:10px">*</span>
