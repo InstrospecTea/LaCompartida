@@ -431,6 +431,10 @@ class Factura extends Objeto {
 		return new ListaFacturas($this->sesion, null, $query);
 	}
 
+	function FacturaElectronicaCreada() {
+		return (!is_null($this->fields['dte_fecha_creacion']));
+	}
+
 	function DTEFirmado() {
 		return (!is_null($this->fields['dte_fecha_creacion']) && $this->fields['dte_estado'] == Factura::$estados_dte['Firmado']);
 	}

@@ -27,6 +27,16 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		echo "</tr>";
 	}
 
+	public static function BotonDescargarHTML($id_factura) {
+		$img_dir = Conf::ImgDir();
+		$Html = self::getHtml();
+		$img_pdf = $Html->img("{$img_dir}/pdf.gif", array('border' => 0));
+		$a1 = $Html->tag('a', $img_pdf, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'href' => '#'));
+		$img_xml = $Html->img("{$img_dir}/xml.gif", array('border' => 0));
+		$a2 = $Html->tag('a', $img_xml, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'data-format' => 'xml', 'href' => '#'));
+		return $a1 . $a2;
+	}
+
 	public static function ValidarFactura() {
 		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago, $dte_id_pais, $dte_metodo_pago_cta;
 		if (empty($RUT_cliente)) {
@@ -333,15 +343,16 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 
 	public static function AgregarBotonFacturaElectronica($hookArg) {
 		$Factura = $hookArg['Factura'];
+
 		if ($Factura->FacturaElectronicaCreada()) {
 			if ($Factura->DTEFirmado()) {
-				$hookArg['content'] = $this->BotonDescargarHTML($Factura->fields['id_factura']);
+				$hookArg['content'] = self::BotonDescargarHTML($Factura->fields['id_factura']);
 			} elseif (!$Factura->Anulada()) {
-				$hookArg['content'] = $this->BotonGenerarHTML($Factura->fields['id_factura']);
+				$hookArg['content'] = self::BotonGenerarHTML($Factura->fields['id_factura']);
 			} elseif ($Factura->DTEAnulado()) {
-				$hookArg['content'] = $this->BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
+				$hookArg['content'] = self::BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
 			} elseif ($Factura->DTEProcesandoAnular()) {
-				$hookArg['content'] = $this->BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
+				$hookArg['content'] = self::BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
 			}
 			return $hookArg;
 		}

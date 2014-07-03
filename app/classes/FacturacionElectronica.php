@@ -17,10 +17,7 @@ Class FacturacionElectronica {
 		$img_dir = Conf::ImgDir();
 		$Html = self::getHtml();
 		$img_pdf = $Html->img("{$img_dir}/pdf.gif", array('border' => 0));
-		$a1 = $Html->tag('a', $img_pdf, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'href' => '#'));
-		$img_xml = $Html->img("{$img_dir}/xml.gif", array('border' => 0));
-		$a2 = $Html->tag('a', $img_xml, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'data-format' => 'xml', 'href' => '#'));
-		return $a1 . $a2;
+		return $Html->tag('a', $img_pdf, array('class' => 'factura-documento', 'data-factura' => $id_factura, 'href' => '#'));
 	}
 
 	public static function BotonGenerarHTML($id_factura) {
