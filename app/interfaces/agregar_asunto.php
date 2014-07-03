@@ -759,17 +759,18 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 					return false;
 				}
 			<?php } ?>
-		}
 
-		if (form.monto.value < 0) {
-			alert('Atención! Se ha seleccionado la forma de cobro Retainer con un monto 0');
-			return false;
-		}
+			var forma_cobro = jQuery('#div_cobro').children("input:checked").val();
 
-		var forma_cobro = jQuery('#div_cobro').children("input:checked").val();
-		if (forma_cobro == 'RETAINER' && form.monto.value == 0 && form.monto.value != ''
-				&& (form.monto_posterior.value != form.monto.value || form.forma_cobro_posterior.value != forma_cobro)) {
-			alert('Se eligió Retainer como Forma de Cobro e ingresó el monto 0');
+			if (forma_cobro == 'RETAINER' && (form.monto.value <= 0 || form.monto.value == '') && (form.monto_posterior.value != form.monto.value || form.forma_cobro_posterior.value != forma_cobro)) {
+				alert('Ha seleccionado la forma de cobro ' + forma_cobro + ' e ingresó el monto en 0');
+				return false;
+			}
+
+			if ((forma_cobro == 'RETAINER' || forma_cobro == 'FLAT FEE' || forma_cobro == 'CAP' || forma_cobro == 'PROPORCIONAL') && (form.monto.value <= 0 || form.monto.value == '')) {
+				alert('Atención: Ha seleccionado la forma de cobro ' + forma_cobro + ' e ingresó el monto en 0');
+				return false;
+			}
 		}
 
 		form.submit();
