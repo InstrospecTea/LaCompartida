@@ -56,9 +56,9 @@ class Tramite extends Objeto
 		}
 
 		if ($this->fields['estadocobro'] <> 'CREADO'
-			&& $this->fields['estado_cobro'] <> 'EN REVISION'
-			&& $this->fields['estado_cobro'] != ''
-			&& $this->fields['estado_cobro'] != 'SIN COBRO') {
+			&& $this->fields['estadocobro'] <> 'EN REVISION'
+			&& $this->fields['estadocobro'] != ''
+			&& $this->fields['estadocobro'] != 'SIN COBRO') {
 			return __('Cobrado');
 		}
 
