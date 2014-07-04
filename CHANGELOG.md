@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.4.9
+Viernes 4 de Julio 2014
+* **Fixed:** [Corrige asignación de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
+
 ## Hotfix: 14.4.8
 Miércoles 2 de Julio 2014
 * **Fixed:** [Corrige asignación de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
