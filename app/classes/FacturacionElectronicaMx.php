@@ -98,8 +98,9 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 					);
 				}
 			} else {
+				$error_code = $result->codigo >= 501 ? null : "ERROR_{$result->codigo}";
 				$hookArg['Error'] = array(
-					'Code' => 'BuildingInvoiceError',
+					'Code' => $error_code,
 					'Message' => utf8_decode($result->descripcion)
 				);
 				$estado_dte = Factura::$estados_dte['ErrorFirmado'];
