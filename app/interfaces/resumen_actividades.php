@@ -748,6 +748,7 @@ $agrupadores = explode('-', $vista);
 }
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
+
 	$reporte->setCampoFecha($campo_fecha);
 	$reporte->setTipoDato($tipo_dato);
 	$reporte->setVista($vista);
@@ -763,9 +764,15 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 
 	/* CLIENTES */
 	$clients = explode(',', $clientes);
+
+
 	foreach ($clients as $cliente) {
 		if ($cliente) {
-			$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				$reporte->addFiltro('cliente', 'codigo_cliente_secundario', $cliente);
+			} else {
+				$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
+			}
 		}
 	}
 

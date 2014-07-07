@@ -1018,8 +1018,6 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.65:
-			$queries = array();
 			if (!ExisteCampo('prm_moneda', 'glosa_moneda_plural_lang', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_moneda` ADD `glosa_moneda_plural_lang` VARCHAR( 30 ) NOT NULL AFTER `glosa_moneda_plural` ;";
 			}
@@ -1167,12 +1165,39 @@ QUERY;
 
 		case 7.72:
 			$queries = array();
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoAsuntoSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CodigoClienteSecundarioCorrelativo', '0', 'Requiere activo <em><b>CodigoSecundario</b></em>', 'boolean', '6', '-1');";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.73:
+			if (!ExisteCampo('cta_corriente', 'nro_seguimiento', $dbh)) {
+				$queries = array();
+				$queries[] = "ALTER TABLE `cta_corriente` ADD `nro_seguimiento` INT(11) NULL AFTER `estado_pago`;";
+				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '0', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
+				$queries[] = "CREATE TABLE `prm_nro_seguimiento_gasto` (
+					`id_nro_seguimiento_gasto` INT NOT NULL AUTO_INCREMENT,
+					`id_ultimo_gasto_modificado` INT NULL,
+					`nro_seguimiento` INT NOT NULL,
+					PRIMARY KEY (`id_nro_seguimiento_gasto`),
+					INDEX `fk_prm_nro_seguimiento_gasto_1_idx` (`id_ultimo_gasto_modificado` ASC),
+					CONSTRAINT `fk_prm_nro_seguimiento_gasto_1`
+					FOREIGN KEY (`id_ultimo_gasto_modificado`)
+					REFERENCES `cta_corriente` (`id_movimiento`)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION);";
+				ejecutar($queries, $dbh);
+				break;
+			}
+
+		case 7.74:
+			$queries = array();
 			$queries[] = "ALTER TABLE `prm_doc_legal_numero` CHANGE COLUMN `serie` `serie` VARCHAR(6) NOT NULL DEFAULT '';";
 			$queries[] = "ALTER TABLE `factura` CHANGE COLUMN `serie_documento_legal` `serie_documento_legal` VARCHAR(6) NOT NULL DEFAULT '';";
 			$queries[] = "UPDATE factura SET serie_documento_legal = LPAD(serie_documento_legal, 3, '0');";
 			ejecutar($queries, $dbh);
 			break;
-
 	}
 }
 
@@ -1182,7 +1207,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.72;
+$max_update = 7.74;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

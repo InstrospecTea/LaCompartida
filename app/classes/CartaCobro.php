@@ -505,6 +505,24 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+                
+                /* Monto honorarios en moneda CLP UF*/
+				$query_uf = "SELECT cifras_decimales, tipo_cambio FROM prm_moneda WHERE glosa_moneda = 'UF'";
+				$resp_uf = mysql_query($query_uf, $this->sesion->dbh) or Utiles::errorSQL($query_uf, __FILE__, __LINE__, $this->sesion->dbh);
+				list($cifras_decimales_uf, $tipo_cambio_uf) = mysql_fetch_array($resp_uf);
+
+				$monto_honorarios_uf = UtilesApp::CambiarMoneda($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda_cobro['tipo_cambio'], $cobro_moneda->moneda_cobro['cifras_decimales'], $tipo_cambio_uf, $cifras_decimales_uf);
+
+				$html2 = str_replace('%monto_honorarios_uf%', $monto_honorarios_uf, $html2);
+
+				/* Monto honorarios en moneda USD*/
+				$query_usd = "SELECT cifras_decimales, tipo_cambio FROM prm_moneda WHERE glosa_moneda = 'USD'";
+				$resp_usd = mysql_query($query_usd, $this->sesion->dbh) or Utiles::errorSQL($query_usd, __FILE__, __LINE__, $this->sesion->dbh);
+				list($cifras_decimales_usd, $tipo_cambio_usd) = mysql_fetch_array($resp_usd);
+
+				$monto_honorarios_usd = UtilesApp::CambiarMoneda($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda_cobro['tipo_cambio'], $cobro_moneda->moneda_cobro['cifras_decimales'], $tipo_cambio_usd, $cifras_decimales_usd);
+
+				$html2 = str_replace('%monto_honorarios_usd%', $monto_honorarios_usd, $html2);
 
 				/* MONTOS SEGUN MONEDA TOTAL IMPRESION */
 				$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
@@ -1027,6 +1045,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Corriente';
 					}
 
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
+					}
+
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
@@ -1184,7 +1208,6 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
-				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 
 				$query = "SELECT factura.numero as documentos
 							FROM factura
@@ -1332,6 +1355,24 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_impuesto%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 
 				$html2 = str_replace('%monto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+                
+                /* Monto honorarios en moneda CLP UF*/
+				$query_uf = "SELECT cifras_decimales, tipo_cambio FROM prm_moneda WHERE glosa_moneda = 'UF'";
+				$resp_uf = mysql_query($query_uf, $this->sesion->dbh) or Utiles::errorSQL($query_uf, __FILE__, __LINE__, $this->sesion->dbh);
+				list($cifras_decimales_uf, $tipo_cambio_uf) = mysql_fetch_array($resp_uf);
+
+				$monto_honorarios_uf = UtilesApp::CambiarMoneda($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda_cobro['tipo_cambio'], $cobro_moneda->moneda_cobro['cifras_decimales'], $tipo_cambio_uf, $cifras_decimales_uf);
+
+				$html2 = str_replace('%monto_honorarios_uf%', $monto_honorarios_uf, $html2);
+
+				/* Monto honorarios en moneda USD*/
+				$query_usd = "SELECT cifras_decimales, tipo_cambio FROM prm_moneda WHERE glosa_moneda = 'USD'";
+				$resp_usd = mysql_query($query_usd, $this->sesion->dbh) or Utiles::errorSQL($query_usd, __FILE__, __LINE__, $this->sesion->dbh);
+				list($cifras_decimales_usd, $tipo_cambio_usd) = mysql_fetch_array($resp_usd);
+
+				$monto_honorarios_usd = UtilesApp::CambiarMoneda($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda_cobro['tipo_cambio'], $cobro_moneda->moneda_cobro['cifras_decimales'], $tipo_cambio_usd, $cifras_decimales_usd);
+
+				$html2 = str_replace('%monto_honorarios_usd%', $monto_honorarios_usd, $html2);
 
 				$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$monto_moneda = ((double) $aproximacion_monto * (double) $this->fields['tipo_cambio_moneda']) / ($tipo_cambio_moneda_total > 0 ? $tipo_cambio_moneda_total : $moneda_total->fields['tipo_cambio']);
@@ -1912,6 +1953,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Ahorros';
 					} else if (strpos($glosa_cuenta, 'Cte') !== false) {
 						$tipo_cuenta = 'Cuenta Corriente';
+					}
+
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
 					}
 
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);

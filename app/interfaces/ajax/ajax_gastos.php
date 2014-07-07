@@ -9,6 +9,7 @@ $limitcantidad = isset($_REQUEST['iDisplayLength']) ? $_REQUEST['iDisplayLength'
 $arrayorden = array(0 => 'fecha', 1 => 'glosa_cliente', 5 => 'egreso', 6 => 'ingreso', 7 => 'con_impuesto', 8 => 'estado', 10 => 'cobrable');
 $orden = $arrayorden[intval($_REQUEST['iSortCol_0'])] . " " . $_REQUEST['sSortDir_0'];
 
+
 if (!isset($where) || (isset($where) && $where == '')) {
 	$where = 1;
 }

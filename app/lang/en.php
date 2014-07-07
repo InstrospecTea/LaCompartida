@@ -1,6 +1,4 @@
 <?php
-require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
-
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
 $_LANG['Fecha'] = "Date";
@@ -33,7 +31,16 @@ $_LANG['Detalle Cobro'] = "Invoice Details";
 $_LANG['Servicios prestados'] = "Services";
 $_LANG['Profesional'] = "Professional";
 $_LANG['Detalle profesional'] = "Summary of fees";
+$_LANG['Liquidación de honorarios profesionales %desde% hasta %hasta%'] = 'Settlement of professional fees from %desde% to %hasta%';
+$_LANG['HRS TRABAJADAS VALOR TARIFA'] = 'HOURS WORKED FEE VALUE';
 $_LANG['Resumen detalle profesional'] = "Global summary of fees";
+$_LANG['ABOGADO'] = 'LAWYER';
+$_LANG['HRS TOT TRABAJADAS'] = 'TOT WORKED HRS';
+$_LANG['PARTICIPACIÓN POR ABOGADO'] = 'PARTICIPATION PER LAWYER';
+$_LANG['HRS NO<br>COBRABLES'] = 'NOT CHARGEABLE<br> HOURS';
+$_LANG['COBRO'] = 'INVOICE';
+$_LANG[' HRS VALOR TARIFA'] = ' <br/>CHARGE FEE';
+$_LANG['Saldo por pagar'] = 'Unpaid balance';
 $_LANG['HH'] = "Hours";
 $_LANG['Valor HH'] = "Hourly Rate";
 $_LANG['Teléfono'] = "Phone Number";
@@ -570,7 +577,9 @@ $_LANG['Tasa'] = "Tasa";
 $_LANG['Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?'] = "Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?";
 
 
-
+#NOTA COBRO
+$_LANG['HRS TRABAJADAS VALOR RETAINER'] = "WORKED HRS RETAINER VALUE";
+$_LANG['EXTRAORDINARIO'] = "EXTRAORDINARY";
 
 
 
@@ -1100,3 +1109,8 @@ $_LANG['Yemen'] = 'Yemen';
 $_LANG['Yibuti'] = 'Djibouti';
 $_LANG['Zambia'] = 'Zambia';
 $_LANG['Zimbabue'] = 'Zimbabwe';
+
+$_LANG['Detalle Cobro'] = "Debit Note Details";
+$_LANG['Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
+$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable."; 
+$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices."; 

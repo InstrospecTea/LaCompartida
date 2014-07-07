@@ -1,4 +1,4 @@
-<?
+<?php 
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -7,6 +7,7 @@
 	require_once Conf::ServerDir().'/classes/PrmExcelCobro.php';
 	require_once Conf::ServerDir().'/classes/Reporte.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
+	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
@@ -15,8 +16,9 @@
 
 	if($opc=='generar')
 	{
+		set_time_limit(150);
 		require_once Conf::ServerDir().'/fpdf/PDF_ReporteConsolidado.php';
-		$glosa_cliente = ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )?'codigo_cliente_secundario':'glosa_cliente';
+		$glosa_cliente = UtilesApp::GetConf($sesion,'CodigoSecundario')? 'codigo_cliente_secundario':'glosa_cliente';
 
 		$max_por_grafico = 10; // Posible parámetro
 
@@ -273,17 +275,17 @@
 	<table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545; border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 		<tr bgcolor="#6CA522">
 			<td colspan="3" align="center">
-				<img src='<?=Conf::ImgDir()."/izquierda.gif"?>' <?=$tip_anterior?> class='mano_on' onclick="CambiaFecha('<?=$anio_tabla-1?>')" alt="Ir al año anterior.">
-				<b><?=__('Reportes año ').$anio_tabla?></b>
-				<img src='<?=Conf::ImgDir()."/derecha.gif"?>' <?=$tip_siguiente?> class='mano_on' onclick="CambiaFecha('<?=$anio_tabla+1?>')" alt="Ir al año siguiente.">
+				<img src='<?php echo Conf::ImgDir()."/izquierda.gif"?>' <?php echo $tip_anterior?> class='mano_on' onclick="CambiaFecha('<?php echo $anio_tabla-1?>')" alt="Ir al año anterior.">
+				<b><?php echo __('Reportes año ').$anio_tabla?></b>
+				<img src='<?php echo Conf::ImgDir()."/derecha.gif"?>' <?php echo $tip_siguiente?> class='mano_on' onclick="CambiaFecha('<?php echo $anio_tabla+1?>')" alt="Ir al año siguiente.">
 			</td>
 		</tr>
 		<tr bgcolor="#6CA522">
-			<td><b><?=__('Mes')?></b></td>
-			<td><b><?=__('Fecha generación')?></b></td>
+			<td><b><?php echo __('Mes')?></b></td>
+			<td><b><?php echo __('Fecha generación')?></b></td>
 			<td></td>
 		</tr>
-<?
+<?php 
 	for($m=1; $m<13; ++$m)
 	{
 		echo '<tr>';
@@ -292,100 +294,35 @@
 		{
 ?>
 			<td>
-				<?="$fecha_generacion ($moneda)"?>
-				<?=$glosa_reporte? $glosa_reporte:''?>
-				<form method="post" name="formulario<?=$id_reporte_consolidado?>" action="reporte_consolidado.php">
+				<?php echo "$fecha_generacion ($moneda)"?>
+				<?php echo $glosa_reporte? $glosa_reporte:''?>
+				<form method="post" name="formulario<?php echo $id_reporte_consolidado?>" action="reporte_consolidado.php">
 					<input type="hidden" id="opc" name="opc" value="descargar" />
-					<input type="hidden" id="id" name="id" value="<?=$id_reporte_consolidado?>" />
-					<input type="submit" class="btn" value="<?=__('Descargar')?>" />
+					<input type="hidden" id="id" name="id" value="<?php echo $id_reporte_consolidado?>" />
+					<input type="submit" class="btn" value="<?php echo __('Descargar')?>" />
 				</form>
 			</td>
-<?
+<?php 
 			list($id_reporte_consolidado, $fecha_generacion, $mes, $moneda, $glosa_reporte) = mysql_fetch_array($resp);
 		}
 		else
 			echo '<td>--</td>';
 ?>
 			<td>
-				<form method="post" name="formulario<?=$id_reporte_consolidado?>" action="reporte_consolidado.php<?=$anio_tabla?"?anio_tabla=$anio_tabla":''?>">
+				<form method="post" name="formulario<?php echo $id_reporte_consolidado?>" action="reporte_consolidado.php<?php echo $anio_tabla?"?anio_tabla=$anio_tabla":''?>">
 					<input type="hidden" id="opc" name="opc" value="generar" />
-					<input type="hidden" id="fecha_anio" name="fecha_anio" value="<?=$anio_tabla?>" />
-					<input type="hidden" id="fecha_mes" name="fecha_mes" value="<?=$m?>" />
-					<?=Html::SelectQuery($sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda', 'id_moneda', $id_moneda?$id_moneda:'3', '', '', 60);?>
-					&nbsp;<?=__('Excluir').' '.__('prm_area_proyecto.glosa')?>:&nbsp;
-					<?=Html::SelectQuery($sesion, 'SELECT prm_area_proyecto.id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY glosa', 'id_area_proyecto_excluido[]','','class="selectMultiple" multiple="multiple" size="2" ', '', 130);?>
-					<input type="submit" class="btn" value="<?=__('Generar')?>" />
+					<input type="hidden" id="fecha_anio" name="fecha_anio" value="<?php echo $anio_tabla?>" />
+					<input type="hidden" id="fecha_mes" name="fecha_mes" value="<?php echo $m?>" />
+					<?php echo Html::SelectQuery($sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda', 'id_moneda', $id_moneda?$id_moneda:'3', '', '', 60);?>
+					&nbsp;<?php echo __('Excluir').' '.__('prm_area_proyecto.glosa')?>:&nbsp;
+					<?php echo Html::SelectQuery($sesion, 'SELECT prm_area_proyecto.id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY glosa', 'id_area_proyecto_excluido[]','','class="selectMultiple" multiple="multiple" size="2" ', '', 130);?>
+					<input type="submit" class="btn" value="<?php echo __('Generar')?>" />
 				</form>
 			</td>
-<?
+<?php 
 		echo '</tr>';
 	}
 ?>
 	</table>
-<?
+<?php 
 	$pagina->PrintBottom();
-
-/*	Formulario para generar un reporte consolidado, eligiendo filtros, fecha y moneda.
-	Se mantiene comentado por si se decide agregar filtros a la generación de reportes.
-
-	<form method="post" name="formulario" action="reporte_consolidado.php">
-		<input type="hidden" name="opc" id="opc" value="generar" />
-		<table style="border: 1px solid black;">
-			<tr>
-				<td align="right">
-					<?=__('Periodo')?>
-				</td>
-			</tr>
-			<tr>
-				<td align="left">
-					<?
-						$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
-					?>
-					<select name="fecha_mes" id="fecha_mes">
-						<option value="1" <?=$fecha_mes=="1" ? 'selected="selected"':'' ?>><?=__('Enero') ?></option>
-						<option value="2" <?=$fecha_mes=="2" ? 'selected="selected"':'' ?>><?=__('Febrero') ?></option>
-						<option value="3" <?=$fecha_mes=="3" ? 'selected="selected"':'' ?>><?=__('Marzo') ?></option>
-						<option value="4" <?=$fecha_mes=="4" ? 'selected="selected"':'' ?>><?=__('Abril') ?></option>
-						<option value="5" <?=$fecha_mes=="5" ? 'selected="selected"':'' ?>><?=__('Mayo') ?></option>
-						<option value="6" <?=$fecha_mes=="6" ? 'selected="selected"':'' ?>><?=__('Junio') ?></option>
-						<option value="7" <?=$fecha_mes=="7" ? 'selected="selected"':'' ?>><?=__('Julio') ?></option>
-						<option value="8" <?=$fecha_mes=="8" ? 'selected="selected"':'' ?>><?=__('Agosto') ?></option>
-						<option value="9" <?=$fecha_mes=="9" ? 'selected="selected"':'' ?>><?=__('Septiembre') ?></option>
-						<option value="10" <?=$fecha_mes=="10" ? 'selected="selected"':'' ?>><?=__('Octubre') ?></option>
-						<option value="11" <?=$fecha_mes=="11" ? 'selected="selected"':'' ?>><?=__('Noviembre') ?></option>
-						<option value="12" <?=$fecha_mes=="12" ? 'selected="selected"':'' ?>><?=__('Diciembre') ?></option>
-					</select>
-					<?
-						if(!$fecha_anio)
-							$fecha_anio = date('Y');
-					?>
-					<select name="fecha_anio" id="fecha_anio">
-						<? for($i=(date('Y')-5);$i <= date('Y');$i++){ ?>
-							<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected="selected"' : '' ?>><?=$i ?></option>
-						<? } ?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>Moneda</td>
-				<td>
-					<?=Html::SelectQuery($sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda', 'id_moneda', $id_moneda?$id_moneda:'3', '', '', 60);?>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b><?=__('Área')?>:</b><br />
-					<?=Html::SelectQuery($sesion, 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa', 'areas[]', $areas, 'class="selectMultiple" multiple="multiple" size="6" ', '', 200); ?>
-				</td>
-				<td>
-					<b><?=__('Categoría')?>:</b><br />
-					<?=Html::SelectQuery($sesion, 'SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria', 'categorias[]', $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', '', 200); ?>
-				</td>
-			</tr>
-		</table>
-		<input type="submit" class="btn" value="<?=__('Generar reporte')?>" />
-	</form>
-	<br />
-	<br />
-*/
-?>

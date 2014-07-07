@@ -1,7 +1,5 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
-
 
 if (!class_exists('Cobro')) {
 
@@ -24,12 +22,20 @@ if (!class_exists('Cobro')) {
 		function Write() {
 			$ingreso_historial = false;
 
-			if ($this->fields['estado'] != $this->valor_antiguo['estado'] &&
-					!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
+			if ($this->fields['estado'] != $this->valor_antiguo['estado'] && !empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 				$ingreso_historial = true;
 			}
 
 			if (parent::Write()) {
+				// actualizar campo estadocobro de los trabajos según estado del cobro
+				$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
+				$trabajos = new ListaTrabajos($this->sesion, '', $query);
+				for ($x = 0; $x < $trabajos->num; $x++) {
+					$trabajo = $trabajos->Get($x);
+					$trabajo->Edit('estadocobro', $this->fields['estado']);
+					$trabajo->Write();
+				}
+
 				if ($ingreso_historial) {
 					// Esa linea es necesaria para que el estado no se guardará dos veces
 					$this->valor_antiguo['estado'] = $this->fields['estado'];
@@ -46,6 +52,7 @@ if (!class_exists('Cobro')) {
 						}
 					}
 				}
+
 				return true;
 			}
 		}
@@ -1606,6 +1613,7 @@ if (!class_exists('Cobro')) {
 			if ($this->Write()) {
 
 				if ($emitir) {
+
 					if ($provision && $provision_original && Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
 						if ($provision_original) {

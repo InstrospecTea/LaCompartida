@@ -35,7 +35,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 ?>
 
 <link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />
-<script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+<script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
 <script type="text/javascript">

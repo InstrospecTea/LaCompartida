@@ -103,7 +103,7 @@ function serializeFormulario() {
 		'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto',
 		'clientesF', 'codigo_contrato', 'comparar', 'encargados', 'estado_cobro', 'proporcionalidad',
 		'moneda_contrato', 'tipo_dato', 'tipo_dato_check', 'tipo_dato_comparado',
-		'tipo_asunto', 'usuariosF', 'usuarios', 'clientes', 'fecha_corta', 'nuevo_reporte_segun', 'id_moneda'];
+		'tipo_asunto', 'usuariosF', 'usuarios', 'clientes', 'fecha_corta', 'nuevo_reporte_segun', 'id_moneda', 'limitar', 'limite', 'agrupar'];
 
 	var datos = jQuery.parseParams(jQuery('#formulario').serialize());
 	var ftt = {};
@@ -362,9 +362,9 @@ function CargarReporte() {
 		}
 
 		Agrupadores(0);
-		TipoDato();
 		jQuery('input[name="fecha_corta"]:checked').click();
 	}
+	TipoDato();
 }
 
 function Agrupadores(num) {
@@ -484,7 +484,7 @@ function Comparar() {
 
 function TipoDato(valor, noSet) {
 	var comparar = jQuery('#comparar').is(':checked');
-	var tinta = jQuery('[name="tinta"]:checked').val();
+	var tinta = comparar ? jQuery('[name="tinta"]:checked').val() : 'rojo';
 
 	if (valor && !noSet) {
 		if (jQuery('#' + valor).hasClass('boton_disabled')) {
@@ -809,11 +809,7 @@ jQuery(document).ready(function() {
 		jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
 
 		jQuery('#vista').val(vista.join('-'));
-		jQuery.ajax({
-			url: "reporte_avanzado_planilla.php?ajax=1&vista=" + jQuery('#vista').val(),
-			data: jQuery('#formulario').serialize(),
-			type: 'POST'
-		}).done(function(data) {
+		jQuery.post('reporte_avanzado_planilla.php?ajax=1&vista=' + jQuery('#vista').val(), jQuery('#formulario').serialize(), function(data) {
 			jQuery('#iframereporte').html(data);
 		});
 	});
@@ -856,16 +852,14 @@ jQuery(document).ready(function() {
 		return;
 
 	});
+
 	CargarReporte();
-	RevisarMoneda();
-	RevisarCircular();
-	RevisarTabla();
-	Comparar();
+	TipoDato();
 
 	jQuery('.boton_tipo_dato').click(function() {
 		TipoDato(jQuery(this).attr('id'));
 	});
-	
+
 	jQuery('.agrupador').change(function() {
 		var name = jQuery(this).attr('id').split('_');
 		var num = parseInt(name[1]);

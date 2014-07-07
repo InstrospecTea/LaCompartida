@@ -50,7 +50,8 @@ function Refrescar()
 </script>
 <form method=post>
 <input type="hidden" name="busqueda" value="TRUE">
-<?
+<?php
+$Form = new Form;
 if($mostrar_filtros)
 {
 ?>
@@ -108,8 +109,14 @@ if($mostrar_filtros)
 		</tr>
 	<tr>
 				<td align=right colspan=4>
-						<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='agregar_contrato.php' title="Agregar <?=__('contrato');?>">Agregar <?=__('contrato')?></a>
-
+					<?php
+					$btn_title = __('Agregar') . ' ' . __('contrato');
+					$attrs = array(
+						'title' => $btn_title,
+						'onclick' => "window.location = 'agregar_contrato.php';"
+					);
+					echo $Form->icon_button($btn_title, 'agregar', $attrs);
+					?>
 				</td>
 		</tr>
 	<tr>
@@ -117,63 +124,68 @@ if($mostrar_filtros)
 				</td>
 		</tr>
 </table>
-<?
+<?php
 }
 ?>
 </form>
 </fieldset>
-<?
-if($codigo_cliente)
-{
+<?php
+if ($codigo_cliente) {
 ?>
 
 <table width=100%>
 <tr>
 		<td align=right>
-				<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href=# onclick="nuovaFinestra('Agregar_Contrato',730,600,'agregar_contrato.php?popup=1&codigo_cliente=<?=$codigo_cliente?>');" title="<?=__('Agregar contrato')?>"><?=__('Agregar contrato')?></a>
+				<?php
+				$btn_title = __('Agregar') . ' ' . __('contrato');
+				$attrs = array(
+					'title' => $btn_title,
+					'onclick' => "nuovaFinestra('Agregar_Contrato',730,600,'agregar_contrato.php?popup=1&codigo_cliente={$codigo_cliente}');"
+				);
+				echo $Form->icon_button($btn_title, 'agregar', $attrs);
+				?>
 		</td>
 </tr>
 </table>
-<?
+<?php
 }
-		if ($busqueda)
-		$link ="Opciones";
 
-		$where = 1;
-		if($buscar)
-		{
-			if($activo)
-				$where .= " AND contrato.activo = '$activo' ";
+echo $Form->script();
 
-		if($id_contrato != "")
-		{
-			$where .= " AND contrato.id_contrato Like '$id_contrato%'";
-		}
+if ($busqueda) {
+	$link = "Opciones";
+}
+$where = 1;
+if ($buscar) {
+	if ($activo)
+		$where .= " AND contrato.activo = '$activo' ";
 
-		if($glosa_contrato != "")
-		{
-			$nombre = strtr($glosa_contrato, ' ', '%' );
-			$where .= " AND glosa_contrato Like '%$glosa_contrato%'";
-		}
+	if ($id_contrato != "") {
+		$where .= " AND contrato.id_contrato Like '$id_contrato%'";
+	}
 
-		if($glosa_cliente != "")
-		{
-			$nombre = strtr($glosa_cliente, ' ', '%' );
-			$where .= " AND cliente.glosa_cliente Like '%$nombre%'";
-		}
+	if ($glosa_contrato != "") {
+		$nombre = strtr($glosa_contrato, ' ', '%');
+		$where .= " AND glosa_contrato Like '%$glosa_contrato%'";
+	}
 
-		if($codigo_cliente != "")
-			$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
+	if ($glosa_cliente != "") {
+		$nombre = strtr($glosa_cliente, ' ', '%');
+		$where .= " AND cliente.glosa_cliente Like '%$nombre%'";
+	}
 
-		if($fecha1 || $fecha2)
-			$where .= " AND contrato.fecha_creacion BETWEEN '$fecha1' AND '$fecha2'";
+	if ($codigo_cliente != "")
+		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
 
-		if($id_usuario)
-			$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
+	if ($fecha1 || $fecha2)
+		$where .= " AND contrato.fecha_creacion BETWEEN '$fecha1' AND '$fecha2'";
 
-			#a1.id_encargado
+	if ($id_usuario)
+		$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato, contrato.codigo_cliente, cliente.glosa_cliente,
+	#a1.id_encargado
+
+	$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato, contrato.codigo_cliente, cliente.glosa_cliente,
 			GROUP_CONCAT('<li>', glosa_asunto SEPARATOR '</li><br>')  as asuntos, contrato.forma_cobro, CONCAT(simbolo, ' ', contrato.monto) AS monto_total,  contrato.activo,
 			(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro
 			FROM contrato
@@ -183,61 +195,59 @@ if($codigo_cliente)
 			WHERE $where
 			GROUP BY contrato.id_contrato";
 
-		#, IF(contrato.es_periodico = 'NO', periodo_fecha_inicio, DATE_ADD(fecha_ultimo_cobro, INTERVAL contrato.periodo_intervalo contrato.periodo_unidad)) as fecha_prox_cobro
-		if($orden == "")
-			$orden = "contrato.codigo_cliente";
+	#, IF(contrato.es_periodico = 'NO', periodo_fecha_inicio, DATE_ADD(fecha_ultimo_cobro, INTERVAL contrato.periodo_intervalo contrato.periodo_unidad)) as fecha_prox_cobro
+	if ($orden == "")
+		$orden = "contrato.codigo_cliente";
 
-		$x_pag = 7;
-		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
-		$b->mensaje_error_fecha = "N/A";
-		$b->nombre = "";
-		$b->titulo = __('Listado de').' '.__('Contratos');
-		$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"align=left");
-		$b->AgregarEncabezado("asuntos",__('Asunto'), "align=left");
-		$b->AgregarEncabezado("forma_cobro",__('Modalidad'),"align=left");
-		$b->AgregarEncabezado("monto_total",__('Monto total'),"align=left");
-		$b->AgregarEncabezado("fecha_ultimo_cobro",__('Fecha último cobro'));
-		$b->AgregarEncabezado("fecha_prox_cobro",__('Fecha Prox. Cobro'),"align=left");
+	$x_pag = 7;
+	$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
+	$b->mensaje_error_fecha = "N/A";
+	$b->nombre = "";
+	$b->titulo = __('Listado de') . ' ' . __('Contratos');
+	$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "align=left");
+	$b->AgregarEncabezado("asuntos", __('Asunto'), "align=left");
+	$b->AgregarEncabezado("forma_cobro", __('Modalidad'), "align=left");
+	$b->AgregarEncabezado("monto_total", __('Monto total'), "align=left");
+	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
+	$b->AgregarEncabezado("fecha_prox_cobro", __('Fecha Prox. Cobro'), "align=left");
 
-		if($permisos->fields['permitido'])
-			$b->AgregarFuncion("$link",'Opciones',"align=center nowrap");
+	if ($permisos->fields['permitido'])
+		$b->AgregarFuncion("$link", 'Opciones', "align=center nowrap");
 
-		$b->color_mouse_over = "#DF9862";
+	$b->color_mouse_over = "#DF9862";
 
-		$b->Imprimir();
+	$b->Imprimir();
+}
+
+function Cobrable(& $fila) {
+	global $id_cobro;
+	$checked = '';
+
+	if ($fila->fields['id_cobro_asunto'] == $id_cobro and $id_cobro != '')
+		$checked = "checked";
+	$id_moneda = $fila->fields['id_moneda'];
+	$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','" . $fila->fields['codigo_asunto'] . "','$id_cobro',this.checked,'$id_moneda')>";
+	return $Check;
+}
+
+function Opciones(& $fila) {
+	global $checkall;
+	global $motivo;
+
+
+
+
+	if ($motivo == 'cobros') {
+		return Cobrable($fila, $checkall);
 	}
-	function Cobrable(& $fila)
-	{
-				global $id_cobro;
-				$checked = '';
+	$id_contrato = $fila->fields['id_contrato'];
+	return
+			"<a href=# onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?id_contrato=$id_contrato&popup=1');\" title='Editar Contrato'><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar Contrato></a>"
+			. "<a href='javascript:void
+		(0);' onclick=\"if(confirm('¿Desea generar este cobro individualmente?'))nuevaVentana('Cobrar',750,660,'genera_cobros_guarda.php?id_contrato=$id_contrato&individual=true');\"><img src='" . Conf::ImgDir() . "/coins_16.png' border=0 title=Cobrar></a>";
+	#<a target='_top' onclick=\"return confirm('¿Está seguro de eliminar este contrato?');\" href=contratos.php?id_contrato=$id_contrato&accion=eliminar&buscar=1&mostrar_filtros=1><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' /></a>
+}
 
-				if($fila->fields['id_cobro_asunto'] == $id_cobro and $id_cobro != '')
-						$checked = "checked";
-						$id_moneda = $fila->fields['id_moneda'];
-				$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','".$fila->fields['codigo_asunto']."','$id_cobro',this.checked,'$id_moneda')>";
-				return $Check;
-
-	}
-
-		function Opciones(& $fila)
-		{
-		global $checkall;
-		global $motivo;
-
-
-
-
-		if($motivo == 'cobros')
-		{
-			return Cobrable($fila,$checkall);
-		}
-		$id_contrato = $fila->fields['id_contrato'];
-				return
-		"<a href=# onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?id_contrato=$id_contrato&popup=1');\" title='Editar Contrato'><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Contrato></a>"
-		. "<a href='javascript:void
-		(0);' onclick=\"if(confirm('¿Desea generar este cobro individualmente?'))nuevaVentana('Cobrar',750,660,'genera_cobros_guarda.php?id_contrato=$id_contrato&individual=true');\"><img src='".Conf::ImgDir()."/coins_16.png' border=0 title=Cobrar></a>";
-			#<a target='_top' onclick=\"return confirm('¿Está seguro de eliminar este contrato?');\" href=contratos.php?id_contrato=$id_contrato&accion=eliminar&buscar=1&mostrar_filtros=1><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' /></a>
-		}
-		echo(InputId::Javascript($sesion));
-	$pagina->PrintBottom($popup);
+echo(InputId::Javascript($sesion));
+$pagina->PrintBottom($popup);
 ?>

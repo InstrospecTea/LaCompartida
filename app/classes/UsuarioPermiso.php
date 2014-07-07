@@ -70,7 +70,7 @@ Class UsuarioPermiso extends Objeto {
 			case 'PRO':
 				// si es profesional y tiene otros permisos hay que revisar si existe cupo para otro administrativo
 				if ($this->esAdministrativo($id_usuario) && !$this->existeCupo($id_usuario, 'ADM')) {
-					$this->error = "No se puede revocar el permiso 'PRO', no quedan cupos para usuarios administrativos";
+					$this->error = "No se puede revocar el perfil Profesional, no quedan cupos para usuarios administrativos.";
 					$retorno = false;
 				}
 				break;
