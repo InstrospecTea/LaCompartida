@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.4.10
+Lunes 7 de Julio 2014
+* **Fixed:** [Muestra `Ejecutar llenado inicial de datos` solo al admin](https://github.com/LemontechSA/ttb/pull/577)
+
 ## Hotfix: 14.4.9
 Viernes 4 de Julio 2014
 * **Fixed:** [Corrige asignación de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
