@@ -317,17 +317,16 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 		$select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	}
 
-	$Usuario = new UsuarioExt;
 	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')){
 		$select_encargado_comercial = "resp_user.username AS encargado_comercial,";
 	} else {
-		$campo_glosa = str_replace('usuario.', 'resp_user.', $Usuario->campo_glosa);
+		$campo_glosa = str_replace('usuario.', 'resp_user.', $sesion->usuario->campo_glosa);
 		$select_encargado_comercial = "{$campo_glosa} AS encargado_comercial,";
 	}
 	$select_encargado_comercial .= 'resp_user.id_usuario AS id_encargado_comercial,';
 
 	#BUSCAR
-	$usr_nombre = $Usuario->campo_glosa;
+	$usr_nombre = $sesion->usuario->campo_glosa;
 	$query = "
 		SELECT  SQL_CALC_FOUND_ROWS
 			trabajo.id_trabajo,
