@@ -344,19 +344,20 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 
 	public static function AgregarBotonFacturaElectronica($hookArg) {
 		$Factura = $hookArg['Factura'];
-
 		if ($Factura->FacturaElectronicaCreada()) {
 			if ($Factura->DTEFirmado()) {
 				$hookArg['content'] = self::BotonDescargarHTML($Factura->fields['id_factura']);
-			} elseif (!$Factura->Anulada()) {
-				$hookArg['content'] = self::BotonGenerarHTML($Factura->fields['id_factura']);
 			} elseif ($Factura->DTEAnulado()) {
 				$hookArg['content'] = self::BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
 			} elseif ($Factura->DTEProcesandoAnular()) {
 				$hookArg['content'] = self::BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
 			}
-			return $hookArg;
+		} else {
+			if (!$Factura->Anulada()) {
+				$hookArg['content'] = self::BotonGenerarHTML($Factura->fields['id_factura']);
+			}
 		}
+		return $hookArg;
 	}
 
 }
