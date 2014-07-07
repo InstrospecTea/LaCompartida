@@ -148,7 +148,7 @@ if ($opcion == "guardar") {
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
-		
+
 
 		$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
@@ -559,7 +559,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<?php
 					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
-				<td align="left">
+				<td align="left" nowrap>
 					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
 					<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
 				</td>
@@ -1728,7 +1728,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				var dias = 1;
 				var myDate = new Date();
 				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
-				
+
 				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
 			}
 			else{
@@ -1742,9 +1742,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				var fecha_definida = jQuery('#fecha').val();
 				var fecha_definida_split = fecha_definida.split('-');
 				var myDate = new Date(fecha_definida_split[2], fecha_definida_split[1] - 1, fecha_definida_split[0]);
-				
+
 				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
-				
+
 				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
 			}
 		});
