@@ -116,10 +116,11 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 	 * @return array
 	 */
 	public static function FacturaToArray(Sesion $Sesion, Factura $Factura, PrmEstudio $Estudio) {
+		$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
 		$arrayFactura = array(
 			'fecha_emision' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
 			'folio' => $Factura->fields['numero'],
-			'monto_neto' => intval($Factura->fields['subtotal']),
+			'monto_neto' => intval($subtotal_factura),
 			'tasa_iva' => intval($Factura->fields['porcentaje_impuesto']),
 			'monto_iva' => intval($Factura->fields['iva']),
 			'monto_total' => intval($Factura->fields['total']),

@@ -233,17 +233,17 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			)
 		);
 
-		if ($Factura->fields['subtotal'] > 0) {
-			$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', '');
-		}
 
-		if ($Factura->fields['subtotal_gastos'] > 0) {
-			$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', '');
-		}
+		/*
+		*	El monto subtotal de la factura debe ser la suma de los subtotales
+		*	subtotal = Monto Horararios;
+		*	subtotal_gastos = Monto Gastos con impuestos;
+		*	subtotal_gastos_sin_impuesto = Monto Gastos sin impuestos;
+		*/
 
-		if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
-			$r['COM'][] = 'subTotal|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', '');
-		}
+		$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
+
+		$r['COM'][] = 'subTotal|' . number_format($subtotal_factura, 2, '.', '');
 
 		if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int) $Factura->fields['dte_metodo_pago_cta'] > 0) {
 			$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
