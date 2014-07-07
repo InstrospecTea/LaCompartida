@@ -41,15 +41,11 @@ class DocumentoLegalNumero extends Objeto {
 	function UltimosNumerosSerie($tipo_documento_legal) {
 		$lista = array();
 		$tipo_documento_legal = mysql_real_escape_string($tipo_documento_legal);
-		$query = "SELECT serie, numero_inicial, id_estudio FROM {$this->tabla} WHERE id_documento_legal = $tipo_documento_legal";
+		$query = "SELECT serie, numero_inicial AS numero, id_estudio AS estudio FROM {$this->tabla} WHERE id_documento_legal = $tipo_documento_legal";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while($fields = mysql_fetch_assoc($resp)) {
-			$lista[] = array(
-				'serie' => $fields['serie'],
-				'numero' => $fields['numero_inicial'],
-				'estudio' => $fields['id_estudio']
-			);
+			$lista[] = $fields;
 		}
 
 		return $lista;

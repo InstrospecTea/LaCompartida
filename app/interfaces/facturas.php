@@ -322,14 +322,12 @@ function FormatoDestinatario($fila) {
 
 function FormatoDatos($fila) {
 	global $sesion;
-
 	$html = '';
 	if (!empty($fila->fields['tipo'])) {
 		$html .= "<b>Tipo</b>: {$fila->fields['tipo']}<br />";
 	}
 	if (Conf::GetConf($sesion, 'NumeroFacturaConSerie') && !empty($fila->fields['serie_documento_legal'])) {
-		$serie = str_pad($fila->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
-		$html .= "<b>Serie</b>: $serie<br />";
+		$html .= "<b>Serie</b>: {$fila->fields['serie_documento_legal']}<br />";
 	}
 
 	$html .= "<b>Número</b>: {$fila->fields['numero']}";

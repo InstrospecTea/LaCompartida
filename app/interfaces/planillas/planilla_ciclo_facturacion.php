@@ -1,19 +1,6 @@
 <?php
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Reporte.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Factura.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
@@ -181,10 +168,12 @@ if ($xls) {
 			$where .= " AND f.id_documento_legal !=  2 ";
 		}
 
-		$query = "SELECT 
-						f.numero, 
-						f.fecha, 
-						f.cliente, 
+		$Factura = new Factura($sesion);
+		$query = "SELECT
+						f.serie_documento_legal,
+						f.numero,
+						f.fecha,
+						f.cliente,
 						dl.codigo,
 						pef.glosa as estado_factura,
 						(SELECT fp.fecha
@@ -201,10 +190,10 @@ if ($xls) {
 											LEFT JOIN cta_cte_fact_mvto ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 										WHERE ccfm2.id_factura =  f.id_factura
 										ORDER BY fp.fecha DESC,fp.id_factura_pago DESC LIMIT 1) , NULL )) as fecha_pago_total
-					FROM factura f 
-						JOIN prm_documento_legal dl USING ( id_documento_legal ) 
+					FROM factura f
+						JOIN prm_documento_legal dl USING ( id_documento_legal )
 						JOIN cta_cte_fact_mvto ccfm3 ON ( f.id_factura = ccfm3.id_factura )
-						LEFT JOIN prm_estado_factura pef ON ( f.id_estado = pef.id_estado ) 
+						LEFT JOIN prm_estado_factura pef ON ( f.id_estado = pef.id_estado )
 					WHERE $where ";
 		# echo $query; exit;
 
@@ -221,7 +210,7 @@ if ($xls) {
 			++$filas;
 
 			$ws1->write($filas, $col_cliente, $factura['cliente'], $formato_texto);
-			$ws1->write($filas, $col_factura, $factura['codigo'] . " " . $factura['numero'], $formato_texto);
+			$ws1->write($filas, $col_factura, $factura['codigo'] . " " . $Factura->ObtenerNumero(null, $factura['serie_documento_legal'], $factura['numero']), $formato_texto);
 			$ws1->write($filas, $col_fecha_factura, Utiles::sql2fecha($factura['fecha'], $formato_fecha, " "), $formato_texto);
 			$ws1->write($filas, $col_fecha_primer_pago, !empty($factura['fecha_primer_pago']) ? Utiles::sql2fecha($factura['fecha_primer_pago'], $formato_fecha, " ") : " ", $formato_texto);
 			$ws1->write($filas, $col_fecha_pago_total, !empty($factura['fecha_pago_total']) ? Utiles::sql2fecha($factura['fecha_pago_total'], $formato_fecha, " ") : " ", $formato_texto);
@@ -268,31 +257,31 @@ if ($xls) {
 			$where .= " AND d.fecha <= '{$_POST['fecha2']}' ";
 		}
 
-		
-		$query = "SELECT 
-						d.glosa_documento, 
-						d.fecha, 
-						c.glosa_cliente, 
+
+		$query = "SELECT
+						d.glosa_documento,
+						d.fecha,
+						c.glosa_cliente,
 						cob.estado as estado_cobro,
 						(SELECT dp.fecha
 							FROM documento dp
 								JOIN neteo_documento nd ON ( dp.id_documento = nd.id_documento_pago)
-								JOIN documento dc ON (nd.id_documento_cobro = dc.id_documento) 
+								JOIN documento dc ON (nd.id_documento_cobro = dc.id_documento)
 							WHERE nd.id_documento_cobro = d.id_documento
-								AND dp.tipo_doc != 'N'				
+								AND dp.tipo_doc != 'N'
 							ORDER BY dp.fecha ASC, dp.id_documento ASC LIMIT 1) as fecha_primer_pago,
 						( IF( (d.saldo_honorarios + d.saldo_gastos) = 0 , (SELECT dp.fecha
 								FROM documento dp
 									JOIN neteo_documento nd ON ( dp.id_documento = nd.id_documento_pago)
-									JOIN documento dc ON (nd.id_documento_cobro = dc.id_documento) 
+									JOIN documento dc ON (nd.id_documento_cobro = dc.id_documento)
 								WHERE nd.id_documento_cobro = d.id_documento
-									AND dp.tipo_doc != 'N'				
+									AND dp.tipo_doc != 'N'
 								ORDER BY dp.fecha DESC, dp.id_documento DESC LIMIT 1) , NULL ) ) as fecha_pago_total
-					FROM documento d 
+					FROM documento d
 						JOIN cliente c ON ( d.codigo_cliente = c.codigo_cliente )
 						JOIN cobro cob ON ( d.id_cobro = cob.id_cobro )
 						WHERE $where ";
-		
+
 		$fila_inicial = $filas + 2;
 		$num_facturas_primer = 0;
 		$num_facturas_total = 0;
@@ -380,7 +369,7 @@ $pagina->PrintTop();
 				<?php echo __('Tipo Documento legal'); ?>
 			</td>
 			<td align=left>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa 
+				<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa
 					FROM prm_documento_legal WHERE codigo != 'NC' ORDER BY id_documento_legal ASC", "id_documento_legal", $id_documento_legal, "", "Todos", "150"); ?>
 			</td>
 		</tr>

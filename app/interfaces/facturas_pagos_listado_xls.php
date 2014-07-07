@@ -52,7 +52,7 @@ if ($where == '') {
 	 */
 	$lista_facturas_con_pagos = '';
 	$where = 1;
-	if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
+	if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 		if (isset($_REQUEST['id_concepto'])) {
 			$condiciones = "";
 			foreach ($_REQUEST['id_concepto'] as $key => $value) {
@@ -176,8 +176,8 @@ if ($where == '') {
 }
 
 $numero_factura = "";
-if (UtilesApp::GetConf($Sesion, 'NumeroFacturaConSerie')) {
-	$numero_factura = "CONCAT(LPAD(factura.serie_documento_legal, 3, '0'), '-', factura.numero) as numero";
+if (Conf::GetConf($Sesion, 'NumeroFacturaConSerie')) {
+	$numero_factura = "CONCAT(factura.serie_documento_legal, '-', factura.numero) as numero";
 } else {
 	$numero_factura = "factura.numero";
 }
@@ -188,7 +188,7 @@ $query = "SELECT
 					, prm_documento_legal.codigo as tipo
 					, $numero_factura";
 
-if (UtilesApp::GetConf($Sesion, 'NuevoModuloFactura')) {
+if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) {
 	$query .= "			, cliente as cliente_facturable";
 }
 
@@ -226,11 +226,11 @@ $query .= "			, cliente.glosa_cliente
 				LEFT JOIN cuenta_banco cta ON fp.id_cuenta = cta.id_cuenta
 				WHERE $where";
 
- 
+
 
 ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_cobro_factura_pago') : false;
 
- 
+
 $lista_suntos_liquidar = new ListaAsuntos($Sesion, "", $query);
 if ($lista_suntos_liquidar->num == 0) {
 	 echo "\n<script type=\"text/javascript\">	var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
@@ -330,9 +330,9 @@ $col_name['numero'] = $factura->ObtenerNumero(null, $col_name['serie_documento_l
 $arr_col = array();
 $col = 0;
 for ($i = 0; $i < $col_num; ++$i) {
-	// ocultar celdas con PHP	
+	// ocultar celdas con PHP
 	$cols_para_ocultar = array(  'cifras_decimales', 'id_moneda', 'id_factura', 'id_moneda_factura_pago', 'mostrar_diferencia_razon_social');
-	if (!UtilesApp::GetConf($Sesion, 'FacturaPagoSubtotalIva')) {
+	if (!Conf::GetConf($Sesion, 'FacturaPagoSubtotalIva')) {
 		$cols_para_ocultar[] = "subtotal_factura";
 		$cols_para_ocultar[] = "iva";
 	}
@@ -362,7 +362,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 	$para_ocultar = array('id_moneda_factura_pago', 'descripcion', 'monto_pagos_moneda_base', 'saldo_moneda_base', 'tipo_cambio', 'codigo_asunto', 'honorarios');
 
 	//FacturaPagoSubtotalIva
-	if (!UtilesApp::GetConf($Sesion, 'FacturaPagoSubtotalIva')) {
+	if (!Conf::GetConf($Sesion, 'FacturaPagoSubtotalIva')) {
 		$para_ocultar[] = "subtotal_factura";
 		$para_ocultar[] = "iva";
 	}
