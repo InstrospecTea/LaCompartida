@@ -96,6 +96,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 						'Code' => 'SaveGeneratedInvoiceError',
 						'Message' => print_r($ex, true)
 					);
+					Log::write(trim($ex->getTraceAsString()), "FacturacionElectronicaMx");
 				}
 			} else {
 				$error_code = $result->codigo >= 501 ? null : "ERROR_{$result->codigo}";
@@ -145,6 +146,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 					'Code' => 'SaveCanceledInvoiceError',
 					'Message' => print_r($ex, true)
 				);
+				Log::write(trim($ex->getTraceAsString()), "FacturacionElectronicaMx");
 			}
 		} else {
 			$mensaje = "Usted ha solicitado anular un Documento Tributario Electrónico. Este proceso puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
