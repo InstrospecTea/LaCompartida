@@ -85,6 +85,10 @@ $Pagina->PrintTop($popup);
 			document.getElementById('glosa_actividad').focus();
 			return false;
 		}
+		if (jQuery('#codigo_cliente').val() && !jQuery('#codigo_asunto').val()) {
+			alert('Si selecciona un cliente debe seleccionar un asunto.');
+			return false;
+		}
 
 		document.getElementById('form_actividades').submit();
 

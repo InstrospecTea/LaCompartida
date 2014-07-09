@@ -108,11 +108,6 @@ class Actividad extends Objeto {
 	function Check() {
 		$errores = array();
 
-		// asunto
-		if ($this->fields['codigo_asunto'] == '') {
-			$errores[] = __('Debe seleccionar un ') . __('asunto');
-		}
-
 		// glosa
 		if ($this->fields['glosa_actividad'] == '') {
 			$errores[] = __('Debe ingresar un título');
