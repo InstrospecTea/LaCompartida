@@ -309,17 +309,14 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 											option.value = valores[0];
 											option.text = valores[1];
 
-											if(i == 0) {
+											if (i == 0 && typeof(select_destino.options) != 'undefined') {
 												select_destino.options.length = 1;
-
 											}
 
 											try {
 												select_destino.add(option);
-											}
-
-											catch(err) {
-													select_destino.add(option,null);
+											} catch(err) {
+												select_destino.add(option,null);
 											}
 										}
 

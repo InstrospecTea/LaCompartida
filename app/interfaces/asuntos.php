@@ -13,11 +13,11 @@ $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
  */
 
 # Descripción = Habilita autocompletador de asuntos.
-$selectclienteasuntoespecial = Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial');
+$selectclienteasuntoespecial = Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial') == '1' ? true : false;
 
 # Descripcion = El ambiente del cliente utiliza un codigo personalizado para...
 # manejo de codígos de cliente y asunto en interfaces.
-$usocodigosecundario = Conf::GetConf($Sesion, 'CodigoSecundario');
+$usocodigosecundario = Conf::GetConf($Sesion, 'CodigoSecundario') == '1' ? true : false;
 
 $Html = new \TTB\Html;
 
@@ -28,7 +28,7 @@ if ($excel) {
 	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
 }
 
-if ($selectclienteasuntoespecial = 1) {
+if ($selectclienteasuntoespecial) {
 	require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
 } else {
 	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
@@ -121,12 +121,7 @@ $Form = new Form;
 		return true;
 	}
 </script>
-<?php
-if ($selectclienteasuntoespecial) {
-	echo AutocompletadorAsunto::CSS();
-}
-$Form = new Form;
-?>
+
 <form method="post" name="form" id="form" autocomplete="OFF">
 	<input type="hidden" name="busqueda" value="TRUE">
 	<?php if ($id_cobro == '' && ($Sesion->usuario->Es('DAT') || $Sesion->usuario->Es('SASU'))) { ?>
@@ -178,25 +173,16 @@ $Form = new Form;
 						<?php UtilesApp::CampoCliente($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 					</td>
 				</tr>
-                
-                <tr>
-					<td width=25% class="ar" style="font-weight:bold;">
+
+				<tr>
+					<td width="25%" class="ar" style="font-weight:bold;">
 						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
-					<td nowrap class="al" colspan=4>
-						<?php
-						if ($selectclienteasuntoespecial == 1) {
-							echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente,$codigo_cliente_secundario);
-						} else { ?>
-							<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?php echo $codigo_asunto; ?>" onchange="this.value=this.value.toUpperCase();">
-							&nbsp;&nbsp;&nbsp;
-							<b><?php echo __('T&iacute;tulo asunto'); ?></b>
-							<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?php echo $glosa_asunto; ?>">
-                        <?php } ?>
+					<td nowrap class="al" colspan="4">
+						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320); ?>
 					</td>
 				</tr>
-                
-                
+
 				<tr>
 					<td class="ar" style="font-weight:bold;">
 						<?php echo __('Fecha creaci&oacute;n'); ?>
@@ -242,7 +228,7 @@ $Form = new Form;
 				</tr>
 			</table>
 		</fieldset>
-<?php } ?>
+	<?php } ?>
 </form>
 <?php
 

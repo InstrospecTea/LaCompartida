@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 class AutocompletadorAsunto {
@@ -55,8 +54,7 @@ class AutocompletadorAsunto {
 	}
 
 	function CSS() {
-
-		return;
+		return null;
 	}
 
 	function Javascript($Sesion, $cargar_select = true) {
@@ -65,18 +63,19 @@ class AutocompletadorAsunto {
 		} else {
 			$lasid = array('codigo_cliente', 'codigo_asunto', 'codigo_cliente');
 		}
+
 		$id_usuario = intval($Sesion->usuario->fields['id_usuario']);
 		$root_dir = Conf::RootDir();
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 			$bloque_codigo_secundario = "var codigo_asunto = document.getElementById('codigo_asunto_secundario').value;
-										if(document.getElementById('codigo_cliente_secundario')) {
-											var codigo_cliente=document.getElementById('codigo_cliente_secundario').value;
-										}";
+				if(document.getElementById('codigo_cliente_secundario')) {
+					var codigo_cliente=document.getElementById('codigo_cliente_secundario').value;
+				}";
 		} else {
 			$bloque_codigo_secundario = "var codigo_asunto = document.getElementById('codigo_asunto').value;
-										if(document.getElementById('codigo_cliente')) {
-											var codigo_cliente=document.getElementById('codigo_cliente').value;
-										}";
+				if(document.getElementById('codigo_cliente')) {
+					var codigo_cliente=document.getElementById('codigo_cliente').value;
+				}";
 		}
 
 		$bloque_cargar_select = '';
@@ -147,9 +146,7 @@ class AutocompletadorAsunto {
 					return 'glosa_asunto='  + glosa_asunto + '&codigo_cliente=' + codigo_cliente;
 				}
 			</script>
-
 EOF;
 		return $output;
 	}
-
 }

@@ -59,13 +59,13 @@ class UtilesApp extends Utiles {
 			echo "var $conf = '$v';\n";
 		}
 	}
-    
+
     public static function ObtenerContratoPrincipal ($sesion, $codigo_asunto) {
         $codigo_cliente = explode("-",$codigo_asunto);
         $consulta = "SELECT id_contrato FROM cliente WHERE codigo_cliente = '{$codigo_cliente[0]}'";
         $respuesta = mysql_query($consulta, $sesion->dbh);
         list($id_contrato) = mysql_fetch_array($respuesta);
-        
+
         return $id_contrato;
     }
 
@@ -113,16 +113,22 @@ class UtilesApp extends Utiles {
 	}
 
 	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '') {
-		if ($oncambio == '') {
-			$oncambio = "CargarSelectCliente(this.value);";
-		} elseif (substr($oncambio, 0, 1) == '+') {
-			$oncambio = "CargarSelectCliente(this.value);" . str_replace('+', '', $oncambio);
-		}
 
-		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
+		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
+			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente, $codigo_cliente_secundario);
 		} else {
-			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+			if ($oncambio == '') {
+				$oncambio = "CargarSelectCliente(this.value);";
+			} elseif (substr($oncambio, 0, 1) == '+') {
+				$oncambio = "CargarSelectCliente(this.value);" . str_replace('+', '', $oncambio);
+			}
+
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
+			} else {
+				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+			}
 		}
 	}
 
