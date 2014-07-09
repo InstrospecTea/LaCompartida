@@ -421,7 +421,7 @@ if (!UtilesApp::GetConf($sesion, 'NumeroOT')) {
 //if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 
 if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
-	echo ' { "bVisible": false, "aTargets": [ 7 ] },';
+	echo ' { "bVisible": false, "aTargets": [ 8 ] },';
 }
 if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 	echo ' { "bVisible": false, "aTargets": [10 ] },';

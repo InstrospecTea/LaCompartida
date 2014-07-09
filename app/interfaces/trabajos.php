@@ -444,6 +444,9 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	//Esta comentado hasta encontrar una buena manera de encriptarlo
 	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
 
+	// Reinicio la paginación cada vez que se haga click en el botón buscar
+	$desde = ($check_trabajo == 1) ? 0 : $desde;
+
 	if ($orden == "") {
 		if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
 			$orden = " cliente.glosa_cliente ASC, trabajo.fecha ASC";
