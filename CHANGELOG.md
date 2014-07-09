@@ -2,7 +2,8 @@
 
 ## Hotfix: 14.4.12
 Martes 8 de Julio 2014
-* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos según Config](https://github.com/LemontechSA/ttb/pull/579)
+* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos según Config](https://github.com/LemontechSA/ttb/pull/580)
+* **Fixed:** [Se reinicia la paginación al buscar trabajos](https://github.com/LemontechSA/ttb/pull/580)
 
 ## Hotfix: 14.4.11
 Lunes 7 de Julio 2014
