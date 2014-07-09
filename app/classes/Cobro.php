@@ -1,7 +1,5 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
-
 
 if (!class_exists('Cobro')) {
 
@@ -24,12 +22,20 @@ if (!class_exists('Cobro')) {
 		function Write() {
 			$ingreso_historial = false;
 
-			if ($this->fields['estado'] != $this->valor_antiguo['estado'] &&
-					!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
+			if ($this->fields['estado'] != $this->valor_antiguo['estado'] && !empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 				$ingreso_historial = true;
 			}
 
 			if (parent::Write()) {
+				// actualizar campo estadocobro de los trabajos según estado del cobro
+				$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
+				$trabajos = new ListaTrabajos($this->sesion, '', $query);
+				for ($x = 0; $x < $trabajos->num; $x++) {
+					$trabajo = $trabajos->Get($x);
+					$trabajo->Edit('estadocobro', $this->fields['estado']);
+					$trabajo->Write();
+				}
+
 				if ($ingreso_historial) {
 					// Esa linea es necesaria para que el estado no se guardará dos veces
 					$this->valor_antiguo['estado'] = $this->fields['estado'];
@@ -46,6 +52,7 @@ if (!class_exists('Cobro')) {
 						}
 					}
 				}
+
 				return true;
 			}
 		}
@@ -110,7 +117,7 @@ if (!class_exists('Cobro')) {
 		function SetPagos($pago_honorarios, $pago_gastos, $id_documento = null) {
 			$nuevo_pago = false;
 			$pagado = false;
-			
+
 			if ($pago_honorarios) {
 				if ($this->fields['honorarios_pagados'] == 'NO') {
 					if ($id_documento) {
@@ -123,7 +130,7 @@ if (!class_exists('Cobro')) {
 				$this->Edit('id_doc_pago_honorarios', 'NULL');
 				$this->Edit('honorarios_pagados', 'NO');
 			}
-			
+
 			if ($pago_gastos) {
 				if ($this->fields['gastos_pagados'] == 'NO') {
 					if ($id_documento) {
@@ -156,7 +163,7 @@ if (!class_exists('Cobro')) {
 					$pagado = true;
 				}
 			}
-			
+
 			$this->Write();
 			return $pagado;
 		}
@@ -304,7 +311,7 @@ if (!class_exists('Cobro')) {
 			$this->ArrayFacturasDelContrato = array();
 			if ($nuevomodulofactura) {
 				$query = "SELECT
-								concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
+								concat(prm_documento_legal.glosa,' N° ',  factura.serie_documento_legal,'-',lpad(factura.numero,'7','0')) as facturanumero ,
 								cobro.id_cobro,
 								cobro.fecha_enviado_cliente,cobro.fecha_emision,
 								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total,
@@ -323,16 +330,19 @@ if (!class_exists('Cobro')) {
 								ccfm.id_moneda,
 								cobro.incluye_honorarios,
 								cobro.incluye_gastos,
-								(if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)  )) as tasa_cambio,
-								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H', if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')) as tipo_cobro
-							FROM cobro
-								LEFT JOIN factura using (id_cobro)
-								LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
-								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
-								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
-								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-								JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
-									WHERE cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
+								if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)) as tasa_cambio,
+								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									) as tipo_cobro
+								FROM cobro
+									LEFT JOIN factura using (id_cobro)
+									LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
+									LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
+									LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
+									JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
+                              	WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'
+								 ";
 			} else {
 				$query = "SELECT
 								ifnull(cobro.documento,cobro.id_cobro) as facturanumero,
@@ -352,8 +362,10 @@ if (!class_exists('Cobro')) {
 								documento.id_moneda,
 								cobro.incluye_honorarios,
 								cobro.incluye_gastos,
-								if(documento.id_moneda= cobro.id_moneda,1,cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
-								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H', if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')) as tipo_cobro
+								if(documento.id_moneda= cobro.id_moneda, 1, cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
+								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									) as tipo_cobro
 							FROM cobro
 								LEFT join documento on cobro.id_cobro=documento.id_cobro and documento.tipo_doc='N'
 								LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda
@@ -361,17 +373,19 @@ if (!class_exists('Cobro')) {
 								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
 								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-								WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
+							WHERE cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
 			}
 
 			$query .= " AND cobro.id_contrato=" . $this->fields['id_contrato'];
-			if ($id_cobro != null)
+			if ($id_cobro != null) {
 				$query .= " AND cobro.id_cobro=" . $id_cobro;
+			}
 
-			if ($tipo != '')
+			if ($tipo != '') {
 				$query .= " AND if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
 									)='" . $tipo . "'";
+			}
 
 			$facturasST = $sesion->pdodbh->query($query);
 			$this->ArrayFacturasDelContrato = $facturasST->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
@@ -469,11 +483,11 @@ if (!class_exists('Cobro')) {
 			 * PAGO PARCIAL			con facturas && 0 < monto_pagado < monto_total
 			 */
 			$actual = $this->fields['estado'];
-			
+
 			if ($actual == 'INCOBRABLE') {
 				return;
 			}
-			
+
 			$estado = $actual;
 
 			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
@@ -1487,7 +1501,7 @@ if (!class_exists('Cobro')) {
 
 					$this->Edit('id_provision_generada', $provision->fields['id_movimiento']);
 				} else {
-					
+
 					$gas = new Gasto($this->sesion);
 					if ($this->fields['id_gasto_generado']) {
 						if ($gas->Load($this->fields['id_gasto_generado'])) {
@@ -1560,7 +1574,7 @@ if (!class_exists('Cobro')) {
 			}
 
 			// Se guarda la información del cobro
-			
+
 			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
@@ -1597,9 +1611,9 @@ if (!class_exists('Cobro')) {
 			$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']); #revisar 15-05-2009
 
 			if ($this->Write()) {
-				
+
 				if ($emitir) {
-					
+
 					if ($provision && $provision_original && Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
 						if ($provision_original) {
@@ -1609,7 +1623,7 @@ if (!class_exists('Cobro')) {
 						if ($provision) {
 							$provision->Write();
 						}
-						
+
 						$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro'], array(), 0, true, true);
 						$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'], array('listar_detalle'), true);
 					} else {
@@ -1687,11 +1701,11 @@ if (!class_exists('Cobro')) {
 					$documento->Edit('fecha', date('Y-m-d'));
 
 					if ($documento->Write()) {
-						
+
 						$documento->BorrarDocumentoMoneda();
 						$query_documento_moneda = "REPLACE INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
 														SELECT :iddocumento, cobro_moneda.id_moneda, cobro_moneda.tipo_cambio
-															FROM cobro	
+															FROM cobro
 																JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
 																	WHERE cobro.id_cobro =:idcobro";
 
@@ -1761,7 +1775,7 @@ if (!class_exists('Cobro')) {
 				$this->Edit('honorarios_pagados', 'SI');
 				$documento->Edit('honorarios_pagados', 'SI');
 			}
-			
+
 			$documento->Edit('impuesto', $x_resultados['monto_iva'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('subtotal_honorarios', $x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('subtotal_gastos', $x_gastos['subtotal_gastos_con_impuestos'] ? number_format($x_gastos['subtotal_gastos_con_impuestos'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', '') : '0');
@@ -1771,23 +1785,23 @@ if (!class_exists('Cobro')) {
 			$documento->Edit('honorarios', $x_resultados['monto'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('saldo_honorarios', $x_resultados['monto'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
-			
+
 			if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 				$documento->Edit('monto_trabajos', number_format($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
 			} else {
 				$documento->Edit('monto_trabajos', number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
 			}
-			
+
 			$documento->Edit('monto_tramites', number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
 			$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
 			$documento->Edit('fecha', date('Y-m-d'));
-			
+
 			if (!$documento->Loaded()) {
 				$documento->Write();
 			}
-			
+
 			$query = "SELECT nd.id_neteo_documento, dp.id_moneda
 			FROM neteo_documento nd JOIN documento dp ON nd.id_documento_pago = dp.id_documento
 			WHERE nd.id_documento_cobro = '{$documento->fields['id_documento']}'";
@@ -1827,13 +1841,13 @@ if (!class_exists('Cobro')) {
 
 		/*	Suma de CAP para todos los cobros creados de acuerdo a un contrato return SUM()	*/
 		function TotalCobrosCap($id_contrato = '', $id_moneda_cobros_cap = 'contrato.id_moneda_monto') {
-			
+
 			if (!$id_contrato) {
 				$id_contrato = $this->fields['id_contrato'];
 			}
 			$contrato = new Contrato($this->sesion);
 			$contrato->Load($id_contrato);
-			
+
 			if ($contrato->fields['forma_cobro'] <> 'CAP') {
 				return 0;
 			}
@@ -1973,14 +1987,14 @@ if (!class_exists('Cobro')) {
 
 					//este es el monto fijo, pero si no se inclyen honorarios no va
 					$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
-					
+
 					if (empty($incluye_honorarios)) {
 						$monto = '0';
 					}
 					if ($hito) {
 						$monto = $monto_hito;
 					}
-					
+
 					$this->Edit('monto_contrato', $monto);
 					$this->Edit('retainer_horas', $contrato->fields['retainer_horas']);
 					$this->Edit('retainer_usuarios', $contrato->fields['retainer_usuarios']);
@@ -2012,7 +2026,7 @@ if (!class_exists('Cobro')) {
 					$this->Edit("opc_ver_profesional_categoria", $contrato->fields['opc_ver_profesional_categoria']);
 					$this->Edit("opc_ver_profesional_tarifa", $contrato->fields['opc_ver_profesional_tarifa']);
 					$this->Edit("opc_ver_profesional_importe", $contrato->fields['opc_ver_profesional_importe']);
-					
+
 					/*	Configuración moneda del cobro	*/
 					$moneda_cobro_configurada = $contrato->fields['opc_moneda_total'];
 
@@ -2102,18 +2116,18 @@ if (!class_exists('Cobro')) {
 
 						### TRABAJOS ###
 						if (!empty($incluye_honorarios)) {
-						
+
 							if ($solo_gastos != true) {
-							
+
 								$emitir_trabajo = new Objeto($this->sesion, '', '', 'trabajo', 'id_trabajo');
 								$where_up = '1';
-								
+
 								if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
 									$where_up .= " AND fecha <= '$fecha_fin' ";
 								} else {
 									$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 								}
-								
+
 								$query2 = "SELECT * FROM trabajo
 													JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 													JOIN contrato ON asunto.id_contrato = contrato.id_contrato
@@ -2121,9 +2135,9 @@ if (!class_exists('Cobro')) {
 													WHERE	$where_up
 													AND contrato.id_contrato = '" . $contrato->fields['id_contrato'] . "'
 													AND cobro.estado IS NULL";
-								
+
 								$lista_trabajos = new ListaTrabajos($this->sesion, '', $query2);
-								
+
 								for ($x = 0; $x < $lista_trabajos->num; $x++) {
 									$trabajo = $lista_trabajos->Get($x);
 									$emitir_trabajo->Load($trabajo->fields['id_trabajo']);
@@ -2146,9 +2160,9 @@ if (!class_exists('Cobro')) {
 																AND contrato.id_contrato = '" . $contrato->fields['id_contrato'] . "'
 																AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
 																AND cobro.estado IS NULL";
-								
+
 								$lista_tramites = new ListaTrabajos($this->sesion, '', $query_tramites);
-								
+
 								for ($y = 0; $y < $lista_tramites->num; $y++) {
 									$tramite = $lista_tramites->Get($y);
 									$emitir_tramite->Load($tramite->fields['id_tramite']);
@@ -2231,7 +2245,7 @@ if (!class_exists('Cobro')) {
 		 */
 
 		function SaldoInicialCuentaCorriente() {
-			
+
 			/*	El tipo de moneda de la vista de este cobro	*/
 			$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 			$moneda->Load($this->fields['opc_moneda_total']);
@@ -2241,11 +2255,11 @@ if (!class_exists('Cobro')) {
 							AND codigo_cliente = '" . $this->fields['codigo_cliente'] . "'
 							AND fecha_emision < '" . $this->fields['fecha_emision'] . "'
 							AND id_contrato = '" . $this->fields['id_contrato'] . "' ";
-			
+
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$lista_cobros = new ListaCobros($this->sesion, '', $query);
 			$saldo_inicial_gastos = 0;
-			
+
 			for ($i = 0; $i < $lista_cobros->num; $i++) {
 				$cobro_list = $lista_cobros->Get($i);
 				$moneda_cobro = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
@@ -2253,7 +2267,7 @@ if (!class_exists('Cobro')) {
 
 				$saldo_inicial_gastos += $cobro_list->fields['saldo_final_gastos'] * $moneda_cobro->fields['tipo_cambio'] / $moneda->fields['tipo_cambio']; #error gasto 12
 			}
-			
+
 			return $saldo_inicial_gastos ? $saldo_inicial_gastos : 0;
 		}
 
@@ -2266,10 +2280,10 @@ if (!class_exists('Cobro')) {
 			$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
 							WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND (egreso > 0 OR ingreso > 0) AND cta_corriente.incluir_en_cobro = 'SI'
 							ORDER BY fecha ASC";
-			
+
 			$lista_gastos = new ListaGastos($this->sesion, '', $query);
 			$saldo_gastos = 0;
-			
+
 			for ($i = 0; $i < $lista_gastos->num; $i++) {
 				$gasto = $lista_gastos->Get($i);
 				//sacamos el valor del tipo de cambio usado en el cobro
@@ -2285,7 +2299,7 @@ if (!class_exists('Cobro')) {
 					$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio']; #error gasto 15
 				}
 			}
-			
+
 			$saldo_inicial = 0;
 			$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 			$saldo_final_gastos = $saldo_inicial - $saldo_gastos;
@@ -2298,7 +2312,7 @@ if (!class_exists('Cobro')) {
 							JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
 							JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
 								WHERE doc.id_cobro = " . $this->fields['id_cobro'];
-			
+
 			$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$nro_pagos = mysql_fetch_assoc($pagos);
 			return $nro_pagos['nro_pagos'] > 0;
@@ -2306,7 +2320,7 @@ if (!class_exists('Cobro')) {
 
 		function DetalleProfesional() {
 			global $contrato;
-			
+
 			if (Conf::GetConf($this->sesion, 'OrdenarPorTarifa')) {
 				$order_categoria = "t.tarifa_hh DESC, ";
 			} else if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) {
@@ -2326,17 +2340,17 @@ if (!class_exists('Cobro')) {
 			$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) FROM trabajo WHERE cobrable = 1 AND id_cobro = '" . $this->fields['id_cobro'] . "'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($total_horas_cobro) = mysql_fetch_array($resp);
-			
+
 			$mostrarhorascero = Conf::GetConf($this->sesion, 'MostrarHorasCero');
-			
+
 			if (!$mostrarhorascero) {
-				
+
 				if ($this->fields['opc_ver_horas_trabajadas']) {
 					$where_horas_cero = " AND t.duracion > '0000-00-00 00:00:00' ";
 				} else {
 					$where_horas_cero = " AND t.duracion_cobrada > '0000-00-00 00:00:00' ";
 				}
-				
+
 			}
 
 			if (Conf::GetConf($this->sesion, 'DejarTarifaCeroRetainerPRC')) {
@@ -2389,11 +2403,11 @@ if (!class_exists('Cobro')) {
 			} else {
 				$factor_proporcional = 1;
 			}
-			
+
 			if ($factor_proporcional < 0) {
 				$factor_proporcional = 0;
 			}
-			
+
 			$array_profesionales = array();
 			$array_resumen_profesionales = array();
 			while ($row = mysql_fetch_assoc($resp)) {

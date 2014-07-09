@@ -15,6 +15,7 @@ class AjaxLedes {
 		$this->Sesion = New Sesion();
 	}
 
+
 	// /**
 	//  * Método que renderiza los controladores de LEDES, según corresponda.
 	//  * Parámetros:
@@ -29,7 +30,7 @@ class AjaxLedes {
 	}
 
 	public function renderizaControlesActividades($codigo_actividad, $codigo_asunto) {
-		$html = InputId::ImprimirActividad($this->Sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto);
+		$html = InputId::Imprimir($this->Sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto);
 		return '<td colspan="2" align=right>'.__('Actividad').'</td>'.'<td align=left width="440" nowrap>'.$html.'</td>';
 	}
 
@@ -50,7 +51,11 @@ class AjaxLedes {
 		 				CriteriaRestriction::equals('cliente.codigo_cliente',$codigo_cliente)
 		 		);
 
-		$result = $criteria->run();
+		try{
+			$result = $criteria->run();
+		} catch (PDOException $ex) {
+			return false;
+		}
 
 		$exporta_ledes = $result[0]['exportacion_ledes'];
 

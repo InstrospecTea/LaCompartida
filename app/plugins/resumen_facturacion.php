@@ -71,19 +71,13 @@ function Descarga_Planilla_Resumen_Facturacion() {
 			$llave = $results[$key]['tipo'] . '_' . $results[$key]['serie_documento_legal'] . '_' . $results[$key]['estado'];
 			$results[$key]['neto'] = $results[$key]['honorarios'] + $results[$key]['subtotal_gastos'] + $results[$key]['subtotal_gastos_sin_impuesto'];
 			$resumen[$llave]['tipo'] = $results[$key]['tipo'];
-			$resumen[$llave]['serie'] = sprintf("%03d", $results[$key]['serie_documento_legal']);
+			$resumen[$llave]['serie'] = $results[$key]['serie_documento_legal'];
 			$resumen[$llave]['estado'] = $results[$key]['estado'];
 
 
-			//$resumen[$llave]['totalreal_' . $results[$key]['id_moneda']]+=$results[$key]['monto_real'] * ($results[$key]['tipo'] == 'NC' ? 0 : 1); //$results[$key]['monto_real'];
 			$resumen[$llave]['iva_' . $results[$key]['id_moneda']]+=$results[$key]['iva'] * ($results[$key]['tipo'] == 'NC' ? -1 : 1);
 			$resumen[$llave]['neto_' . $results[$key]['id_moneda']]+=$results[$key]['neto'] * ($results[$key]['tipo'] == 'NC' ? -1 : 1);
-			//$resumen[$llave]['total_' . $results[$key]['id_moneda']]+=$results[$key]['total'] * ($results[$key]['tipo'] == 'NC' ? -1 : 1); //$results[$key]['monto_real'];
 		}
-		/* 	echo '<pre>';
-		  print_r($resumen);
-		  echo '</pre>';
-		  die(); */
 
 		function ordenaresumen($filaA, $filaB) {
 			if ($filaA['serie'] == $filaB['serie']) {

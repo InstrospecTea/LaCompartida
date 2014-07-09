@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-",numero)');
+define('CONCAT_FACTURA', 'CONCAT(id_documento_legal, "-", serie_documento_legal, "-", numero)');
 
 class Factura extends Objeto {
 
@@ -344,7 +344,7 @@ class Factura extends Objeto {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
 					FROM cta_cte_fact_mvto ccfm
 						JOIN factura f USING ( id_factura )
-                                                JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado
+                        JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado
 						JOIN factura fp ON ( fp.id_factura = IF( ( f.id_factura_padre IS NULL OR f.id_factura_padre = 0)	, f.id_factura, f.id_factura_padre ) )
 						JOIN cta_cte_fact_mvto_moneda ccfmm ON ( ccfm.id_cta_cte_mvto = ccfmm.id_cta_cte_fact_mvto
 							AND ccfm.id_moneda = ccfmm.id_moneda )
@@ -1492,7 +1492,7 @@ class Factura extends Objeto {
 				list($subtotal_honorarios, $subtotal_honorarios_sin_descuento, $descuento_honorarios, $honorarios, $impuesto, $subtotal_gastos, $subtotal_gastos_sin_impuesto,
 						$factura_id_moneda, $descripcion_honorarios_legales, $descripcion_subtotal_gastos, $descripcion_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp_datos_factura);
 
-				//	DATOS ESPECIFICOS INCLUIDOS EN EL DETALLE DEL DOCUMENTO 
+				//	DATOS ESPECIFICOS INCLUIDOS EN EL DETALLE DEL DOCUMENTO
 				$html2 = str_replace('%text_emisor%', 'EMISOR', $html2);
 				$html2 = str_replace('%text_num_documento%', 'N° DOCUMENTO', $html2);
 				$html2 = str_replace('%text_ruc%', 'RUC', $html2);
@@ -1625,7 +1625,7 @@ class Factura extends Objeto {
 
 					//	DESCRIPCION DEL GASTO EN FACTURA
 					$query_detalle_gastos = "
-						SELECT 
+						SELECT
 							cta_corriente.descripcion,
 							cta_corriente.numero_documento,
 							prm_proveedor.glosa,
@@ -1789,38 +1789,27 @@ class Factura extends Objeto {
 	}
 
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
+		$n = null;
 		if ($this->Loaded()) {
-			if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
+			$n = $this->fields['numero'];
+			$serie = $this->fields['serie_documento_legal'];
 
-				$serie = empty($this->fields['serie_documento_legal']) ? '001' : $this->fields['serie_documento_legal'];
-				$n = str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $this->fields['numero'];
-			} else {
-
-				$n = $this->fields['numero'];
-			}
-
-			if ($mostrar_comprobante && $this->fields['comprobante_erp']) {
-				$n = '<span title="' . __('Comprobante') . ': ' . $this->fields['comprobante_erp'] . '"><b>' . $n . '</b></span>';
-			}
-
-			return $n;
 		} else if (!empty($id_factura)) {
-			$query = "SELECT serie_documento_legal, numero FROM factura WHERE id_factura = " . $id_factura;
+			$query = "SELECT serie_documento_legal, numero FROM factura WHERE id_factura = {$id_factura}";
 			$serie_numero = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($serie, $numero) = mysql_fetch_array($serie_numero);
-			if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
-				$serie = empty($serie) ? '001' : $serie;
-				return str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $numero;
-			}
-			return $numero;
+			list($serie, $n) = mysql_fetch_array($serie_numero);
 		} else if (!empty($numero)) {
-			if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
-				$serie = empty($serie) ? '001' : $serie;
-				return str_pad($serie, 3, '0', STR_PAD_LEFT) . '-' . $numero;
-			}
-			return $numero;
+			$n = $numero;
+
 		}
-		return false;
+		if (Conf::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
+			$serie = empty($serie) ? '001' : $serie;
+			$n = $serie . '-' . $n;
+		}
+		if ($this->Loaded() && $mostrar_comprobante && $this->fields['comprobante_erp']) {
+			$n = '<span title="' . __('Comprobante') . ': ' . $this->fields['comprobante_erp'] . '"><b>' . $n . '</b></span>';
+		}
+		return empty($n) ? false : $n;
 	}
 
 	function ObtieneNumeroFactura() {
@@ -2029,7 +2018,7 @@ class Factura extends Objeto {
 
 	function ListaDocumentosLegales($cobro) {
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-			$formato_numero = Conf::GetConf($this->sesion, 'NumeroFacturaConSerie') ? "CONCAT(LPAD(f.serie_documento_legal, 3, '0'), '-', f.numero)" : "f.numero";
+			$formato_numero = Conf::GetConf($this->sesion, 'NumeroFacturaConSerie') ? "CONCAT(f.serie_documento_legal, '-', f.numero)" : "f.numero";
 			$query = "SELECT
                         group_concat(idDocLegal) as listaDocLegal
                         FROM (
@@ -2551,6 +2540,42 @@ class Factura extends Objeto {
 		}
 	}
 
+	public static function ListarDelCobro($Sesion, $id_cobro) {
+		$query = "SELECT
+						factura.id_factura,
+						factura_cobro.monto_factura,
+						factura.serie_documento_legal,
+						factura.numero,
+						prm_documento_legal.glosa as tipo,
+						prm_estado_factura.glosa AS estado,
+						prm_estado_factura.codigo,
+						factura.subtotal_sin_descuento,
+						honorarios,
+						ccfm.saldo as saldo,
+						subtotal_gastos,
+						subtotal_gastos_sin_impuesto,
+						iva,
+						prm_documento_legal.codigo as cod_tipo,
+						factura.id_moneda,
+						pm.tipo_cambio,
+						pm.cifras_decimales
+					FROM factura
+						JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
+						LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura
+						JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+						JOIN prm_estado_factura ON factura.id_estado = prm_estado_factura.id_estado
+						LEFT JOIN factura_cobro ON factura_cobro.id_factura = factura.id_factura
+					WHERE factura_cobro.id_cobro = '$id_cobro'
+				";
+
+		try {
+			$resp = $Sesion->pdodbh->query($query);
+			return $resp->fetchAll(PDO::FETCH_ASSOC);
+		} catch (PDOException $e) {
+			Utiles::errorSQL($query, '', '', NULL, '', $e);
+			return false;
+		}
+	}
 }
 
 #end Class

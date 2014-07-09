@@ -1,5 +1,58 @@
 # Changelog
 
+## Hotfix: 14.4.12
+Martes 8 de Julio 2014
+* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos según Config](https://github.com/LemontechSA/ttb/pull/580)
+* **Fixed:** [Se reinicia la paginación al buscar trabajos](https://github.com/LemontechSA/ttb/pull/580)
+
+## Hotfix: 14.4.11
+Lunes 7 de Julio 2014
+* **Fixed:** [Corrige hotfix anterior, por error sintáctico JS](https://github.com/LemontechSA/ttb/pull/578)
+
+## Hotfix: 14.4.10
+Lunes 7 de Julio 2014
+* **Fixed:** [Muestra `Ejecutar llenado inicial de datos` solo al admin](https://github.com/LemontechSA/ttb/pull/577)
+* **Fixed:** [Repara error sintáctico de JS al parsear el código del asunto al editar trabajo](https://github.com/LemontechSA/ttb/pull/577)
+
+## Hotfix: 14.4.9
+Viernes 4 de Julio 2014
+* **Fixed:** [Corrige asignación de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
+
+## Hotfix: 14.4.8
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignación de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Cambia los CDN de aspnet a static (varios módulos)](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Corrige validación de monto según tipo de cobro y monto en cero en creación de asuntos.](https://github.com/LemontechSA/ttb/pull/574)
+
+## Hotfix: 14.4.7
+Miércoles 2 de Julio 2014
+* **Fixed:** [Repara elementos extraños en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)
+
+## Hotfix: 14.4.6
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/572)
+
+## Hotfix: 14.4.5
+Miércoles 2 de Julio 2014
+* **Fixed:** [Aumenta tiempo de tolerancia para generación del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
+
+## Hotfix: 14.4.4
+Martes 1 de Julio 2014
+* **Fixed:** [Corrige activacion de asunto con codigo_secundario](https://github.com/LemontechSA/ttb/pull/569)
+
+## Hotfix: 14.4.3
+Martes 1 de Julio 2014
+* **Fixed:** [Añade rutina JS en respuesta a request AJAX, si aplica un selector de actividades para el cliente](https://github.com/LemontechSA/ttb/pull/567)
+
+## Hotfix: 14.4.2
+Lunes 30 de Junio 2014
+* **Fixed:** [Corrige ingreso de horas formato decimal](https://github.com/LemontechSA/ttb/pull/564)
+* **Fixed:** [Corrige comportamiento de actividades en ingresso trabajo](https://github.com/LemontechSA/ttb/pull/564)
+
+## Hotfix: 14.4.1
+Lunes 30 de Junio 2014
+* **Fixed:** [Refactorizacion de flujo al agregar un trabajo](https://github.com/LemontechSA/ttb/pull/563)
+
 ## Release: 14.3.0
 Lunes 30 de Junio 2014
 * **Feature:** [Reporte pdf en revisar horas](https://github.com/LemontechSA/ttb/pull/561)

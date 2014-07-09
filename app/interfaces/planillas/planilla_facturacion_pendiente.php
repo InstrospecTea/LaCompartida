@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
-$AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
+$AtacheSecundarioSoloAsunto = Conf::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
 
 if ($AtacheSecundarioSoloAsunto) {
 
@@ -40,43 +40,43 @@ if ($xls) {
 	$wb->setCustomColor(36, 255, 255, 220);
 
 	$formato_encabezado = & $wb->addFormat(array('Size' => 12,
-							'VAlign' => 'top',
-							'Align' => 'left',
-							'Bold' => '1',
-							'underline' => 1,
-							'Color' => 'black'));
+				'VAlign' => 'top',
+				'Align' => 'left',
+				'Bold' => '1',
+				'underline' => 1,
+				'Color' => 'black'));
 
 	$formato_texto = & $wb->addFormat(array('Size' => 11,
-							'Valign' => 'top',
-							'Align' => 'left',
-							'Border' => 1,
-							'Color' => 'black',
-							'TextWrap' => 1));
+				'Valign' => 'top',
+				'Align' => 'left',
+				'Border' => 1,
+				'Color' => 'black',
+				'TextWrap' => 1));
 	$formato_tiempo = & $wb->addFormat(array('Size' => 11,
-							'VAlign' => 'top',
-							'Border' => 1,
-							'Color' => 'black',
-							'NumFormat' => '[h]:mm'));
+				'VAlign' => 'top',
+				'Border' => 1,
+				'Color' => 'black',
+				'NumFormat' => '[h]:mm'));
 	$formato_numero = & $wb->addFormat(array('Size' => 11,
-							'VAlign' => 'top',
-							'Border' => 1,
-							'Color' => 'black',
-							'NumFormat' => 0));
+				'VAlign' => 'top',
+				'Border' => 1,
+				'Color' => 'black',
+				'NumFormat' => 0));
 	$formato_titulo = & $wb->addFormat(array('Size' => 12,
-							'Align' => 'center',
-							'Bold' => '1',
-							'FgColor' => '35',
-							'Border' => 1,
-							'Locked' => 1,
-							'Color' => 'black'));
+				'Align' => 'center',
+				'Bold' => '1',
+				'FgColor' => '35',
+				'Border' => 1,
+				'Locked' => 1,
+				'Color' => 'black'));
 	$fdd = & $wb->addFormat(array('Size' => 11,
-							'VAlign' => 'top',
-							'Align' => 'justify',
-							'Border' => 1,
-							'Color' => 'black'));
+				'VAlign' => 'top',
+				'Align' => 'justify',
+				'Border' => 1,
+				'Color' => 'black'));
 	$fdd->setNumFormat(0.0);
 
-	$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+	$mostrar_encargado_secundario = Conf::GetConf($sesion, 'EncargadoSecundario');
 
 	$formatos_moneda = array();
 	foreach ($arreglo_monedas as $id_m => $m) {
@@ -90,11 +90,11 @@ if ($xls) {
 			$decimales = '';
 		}
 		$formatos_moneda[$id_m] = & $wb->addFormat(array('Size' => 11,
-								'VAlign' => 'top',
-								'Align' => 'right',
-								'Border' => '1',
-								'Color' => 'black',
-								'NumFormat' => "[$" . $m['simbolo'] . "] #,###,0$decimales"));
+					'VAlign' => 'top',
+					'Align' => 'right',
+					'Border' => '1',
+					'Color' => 'black',
+					'NumFormat' => "[$" . $m['simbolo'] . "] #,###,0$decimales"));
 	}
 
 	$formatos_moneda_tc = array();
@@ -109,11 +109,11 @@ if ($xls) {
 			$decimales = '';
 		}
 		$formatos_moneda_tc[$id_m] = & $wb->addFormat(array('Size' => 11,
-								'VAlign' => 'top',
-								'Align' => 'right',
-								'Border' => '1',
-								'Color' => 'black',
-								'NumFormat' => "[$" . $m['simbolo'] . "] #,###,0.00"));
+					'VAlign' => 'top',
+					'Align' => 'right',
+					'Border' => '1',
+					'Color' => 'black',
+					'NumFormat' => "[$" . $m['simbolo'] . "] #,###,0.00"));
 	}
 
 	$cifras_decimales = $moneda_base['cifras_decimales'];
@@ -127,11 +127,11 @@ if ($xls) {
 		$decimales = '';
 	}
 	$formato_moneda_base_rojo = & $wb->addFormat(array('Size' => 11,
-							'VAlign' => 'top',
-							'Align' => 'right',
-							'Border' => 1,
-							'Color' => 'red',
-							'NumFormat' => '[$' . $moneda_base['simbolo'] . "] #,###,0$decimales"));
+				'VAlign' => 'top',
+				'Align' => 'right',
+				'Border' => 1,
+				'Color' => 'red',
+				'NumFormat' => '[$' . $moneda_base['simbolo'] . "] #,###,0$decimales"));
 
 	$ws1 = & $wb->addWorksheet(__('Facturacion'));
 	$ws1->setInputEncoding('utf-8');
@@ -157,19 +157,19 @@ if ($xls) {
 		$col_usuario_encargado_secundario = ++$col;
 	}
 
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
 		$col_codigo_asunto = ++$col;
 	}
 	$col_glosa_asunto = ++$col;
 
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
 		$col_asunto_cobrable = ++$col;
 	}
 	if (!$ocultar_ultimo_trabajo) {
 		$col_ultimo_trabajo = ++$col;
 	}
 
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
 		$col_ultimo_gasto = ++$col;
 		$col_monto_gastos = ++$col;
 		$col_monto_gastos_mb = ++$col;
@@ -214,17 +214,17 @@ if ($xls) {
 			$ws1->setColumn($col_usuario_encargado_secundario, $col_usuario_encargado_secundario, 40);
 		}
 	}
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
 		$ws1->setColumn($col_codigo_asunto, $col_codigo_asunto, 16);
 	}
 	$ws1->setColumn($col_glosa_asunto, $col_glosa_asunto, 40);
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
 		$ws1->setColumn($col_asunto_cobrable, $col_asunto_cobrable, 13);
 	}
 	if (!$ocultar_ultimo_trabajo) {
 		$ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
 	}
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
 		$ws1->setColumn($col_ultimo_gasto, $col_ultimo_gasto, 15);
 		$ws1->setColumn($col_monto_gastos, $col_monto_gastos, 18);
 		$ws1->setColumn($col_monto_gastos_mb, $col_monto_gastos_mb, 18);
@@ -274,16 +274,16 @@ if ($xls) {
 			}
 		}
 	}
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
 		$ws1->write($filas, $col_codigo_asunto, __('Código Asunto'), $formato_titulo);
 	}
 	$ws1->write($filas, $col_glosa_asunto, __('Asunto'), $formato_titulo);
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
 		$ws1->write($filas, $col_asunto_cobrable, __('Cobrable'), $formato_titulo);
 	}
 	if (!$ocultar_ultimo_trabajo)
 		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
-	if (UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
+	if (Conf::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
 		$ws1->write($filas, $col_ultimo_gasto, __('Último gasto'), $formato_titulo);
 		$ws1->write($filas, $col_monto_gastos, __('Monto gastos'), $formato_titulo);
 		$ws1->write($filas, $col_monto_gastos_mb, __('Monto gastos ' . $moneda_base['simbolo']), $formato_titulo);
@@ -347,7 +347,7 @@ if ($xls) {
 		$group_by = "contrato.id_contrato";
 	}
 
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$codigos_asuntos_secundarios = "GROUP_CONCAT( asunto.codigo_asunto_secundario ) as codigos_asuntos_secundarios, ";
 		$codigo_asunto_secundario_sep = "asunto.codigo_asunto_secundario, ";
 	} else {
@@ -442,22 +442,22 @@ if ($xls) {
 			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$cobro['codigo_asunto']];
 		} else {
 			$ReporteContrato->LoadContrato($id_contrato, '', $fecha1, $fecha2, false);
-			list($monto_estimado_gastos, $simbolo_moneda_gastos , $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$id_contrato];
+			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos, $horas_no_cobradas, $fecha_ultimo_trabajo, $fecha_ultimo_gasto) = $arrayolap[$id_contrato];
 		}
 
 
 		list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos,
-						$cantidad_asuntos,
-						$monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato,
-						$monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $ReporteContrato->arraymonto;
+				$cantidad_asuntos,
+				$monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato,
+				$monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $ReporteContrato->arraymonto;
 
 
 		//si no hay horas (solo hay gastos) pero no se muestran los gastos, saltarse esta fila
-		if (!UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar') && $horas_no_cobradas <= 0) {
+		if (!Conf::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar') && $horas_no_cobradas <= 0) {
 			continue;
 		}
 
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 			$codigos_asuntos = implode("\n", explode(',', $cobro['codigos_asuntos_secundarios']));
 		} else {
 			$codigos_asuntos = implode("\n", explode(',', $cobro['codigos_asuntos']));
@@ -472,7 +472,7 @@ if ($xls) {
 
 		$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
 		if (!$ocultar_encargado) {
-			if (UtilesApp::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
+			if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 				$ws1->write($filas, $col_usuario_encargado, $cobro['username_encargado_comercial'], $formato_texto);
 				if ($mostrar_encargado_secundario) {
 					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['username_encargado_secundario'], $formato_texto);
@@ -484,11 +484,11 @@ if ($xls) {
 				}
 			}
 		}
-		if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
+		if (Conf::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
 			$ws1->write($filas, $col_codigo_asunto, $codigos_asuntos, $formato_texto);
 		}
 		$ws1->write($filas, $col_glosa_asunto, $asuntos, $formato_texto);
-		if (UtilesApp::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
+		if (Conf::GetConf($sesion, 'MostrarColumnaAsuntoCobrableHorasPorFacturar')) {
 			$ws1->write($filas, $col_asunto_cobrable, $asuntos_cobrables, $formato_texto);
 		}
 		if (!$ocultar_ultimo_trabajo) {
@@ -497,7 +497,7 @@ if ($xls) {
 
 		$monto_estimado_gastos_monedabase = UtilesApp::CambiarMoneda($monto_estimado_gastos, number_format($arreglo_monedas[$id_moneda_gastos]['tipo_cambio'], $arreglo_monedas[$id_moneda_gastos]['cifras_decimales'], '.', ''), $arreglo_monedas[$id_moneda_gastos]['cifras_decimales'], number_format($arreglo_monedas[$moneda_base['id_moneda']]['tipo_cambio'], $arreglo_monedas[$moneda_base['id_moneda']]['cifras_decimales'], '.', ''), $arreglo_monedas[$moneda_base['id_moneda']]['cifras_decimales']);
 
-		if (UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
+		if (Conf::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
 			$ws1->write($filas, $col_ultimo_gasto, empty($fecha_ultimo_gasto) ? "" : Utiles::sql2fecha($fecha_ultimo_gasto, $formato_fecha, "-"), $formato_texto);
 			$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
 			$ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
@@ -517,7 +517,6 @@ if ($xls) {
 			} else {
 				$ws1->write($filas, $col_estado_ultimo_cobro, $ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
 			}
-
 		}
 
 		if (!$ocultar_fecha_corte) {
@@ -528,7 +527,7 @@ if ($xls) {
 			}
 		}
 
-		if (UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
+		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas, 1, '.', ''), $fdd);
 		} else {
 			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas / 24, 6, '.', ''), $formato_tiempo);
@@ -684,7 +683,7 @@ if ($xls) {
 
 		$col_formula_horas_trabajadas = Utiles::NumToColumnaExcel($col_horas_trabajadas);
 
-		if (UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
+		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $fdd);
 		} else {
 			$ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $formato_tiempo);
@@ -727,38 +726,39 @@ $pagina->PrintTop();
 	<table  class="border_plomo tb_base" style="width:<?php echo ($AtacheSecundarioSoloAsunto ? 650 : 400); ?>px;">
 		<tr><td>&nbsp;&nbsp;&nbsp;</td>
 			<td  >
-<?php echo __('Fecha desde') ?>
+				<?php echo __('Fecha desde') ?>
 			</td> <td   colspan="2">
 				<input type="text" class="fechadiff" name="fecha1" id="fecha1" value="<?php echo ($fecha1 ? $fecha1 : date('d-m-Y', strtotime('-1 year'))); ?>"/>			</td>
 			<td>&nbsp;</td>
-		</tr><tr><td>&nbsp;</td>
-			<td   >
-<?php echo __('Fecha hasta') ?>
-			</td> <td   colspan="2">
-				<input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2 ? $fecha2 : date('d-m-Y')); ?>"/>
-			</td><td>&nbsp;</td>
-		</tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+		</tr>
 		<tr>
-
-
-<?php
-echo '<td style="text-align:center;" colspan="' . ($AtacheSecundarioSoloAsunto ? 2 : 5) . '">';
-echo 'Filtrar por ' . __('Encargado Comercial') . '<br/>(Opcional)<br/>';
-echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios, "class=\"selectMultiple\" multiple size=12 ", "", "260");
-?>
+			<td>&nbsp;</td>
+			<td><?php echo __('Fecha hasta') ?></td>
+			<td   colspan="2">
+				<input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2 ? $fecha2 : date('d-m-Y')); ?>"/>
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+		<tr>
+			<td style="text-align:center;" colspan="<?php echo $AtacheSecundarioSoloAsunto ? 2 : 5; ?>">
+				Filtrar por <?php printf('%s<br/>(%s)<br/>', __('Encargado Comercial'), __('Opcional')); ?>
+				<?php
+				$usuarios = $sesion->usuario->ListarActivos('', 'SOC');
+				echo Html::SelectArrayDecente($usuarios, 'socios[]', $socios, 'class="selectMultiple" multiple size="12" ', '', '260px');
+				?>
 			</td>
 			<?php if ($AtacheSecundarioSoloAsunto) { ?>
-				<td>&nbsp;</td><td style="text-align:center;" colspan="2">
-				<?php
-				echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
-				echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario  join prm_categoria_usuario using (id_categoria_usuario) JOIN usuario_permiso USING(id_usuario)
-					WHERE prm_categoria_usuario.id_categoria_lemontech in (1,2) and  codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
-				?>
+				<td>&nbsp;</td>
+				<td style="text-align:center;" colspan="2">
+					Filtrar por <?php printf('%s del %s<br/>(%s)<br/>', __('Encargado Secundario'), __('Asunto'), __('Opcional')); ?>
+					<?php
+					echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+							FROM usuario  join prm_categoria_usuario using (id_categoria_usuario) JOIN usuario_permiso USING(id_usuario)
+							WHERE prm_categoria_usuario.id_categoria_lemontech in (1,2) and  codigo_permiso='PRO' ORDER BY apellido1", 'encargados[]', $encargados, 'class="selectMultiple" multiple size="12" ', '', '260');
+					?>
 				</td>
-				<?php } ?>
+			<?php } ?>
 		</tr>
 		<tr><td>&nbsp;</td>
 			<td  align="left" colspan="4">
@@ -784,22 +784,24 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 		</tr>
 		<tr  id="tr_opciones_ocultar" style="display:none;">
 			<td>&nbsp;</td> <td align="left" colspan="4">
-<?php
-if ($_POST['reporte'] != 'generar') {
-	$ocultar_encargado = UtilesApp::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
-	$ocultar_ultimo_trabajo = UtilesApp::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
-	$ocultar_ultimo_cobro = UtilesApp::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
-	$ocultar_estado_ultimo_cobro = UtilesApp::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
-}
-?>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('encargado') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo trabajo') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo cobro') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?php echo $ocultar_estado_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna estado') . ' ' . __('ultimo cobro') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('fecha de corte') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="llenar_olap" <?php echo $llenar_olap ? 'checked="checked"' : '' ?> /><?php echo __('Ejecutar llenado inicial de datos') ?><br/>
-<?php if ($sesion->usuario->TienePermiso('SADM')) echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/>Enviar correo al admin<br/>'; ?>
+				<?php
+				if ($_POST['reporte'] != 'generar') {
+					$ocultar_encargado = Conf::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
+					$ocultar_ultimo_trabajo = Conf::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
+					$ocultar_ultimo_cobro = Conf::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
+					$ocultar_estado_ultimo_cobro = Conf::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
+				}
+				?>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('encargado') ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo trabajo') ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo cobro') ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?php echo $ocultar_estado_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna estado') . ' ' . __('ultimo cobro') ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('fecha de corte') ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?></label><br/>
+				<?php if ($sesion->usuario->Es('SADM')) { ?>
+					&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value="1" name="llenar_olap" /><?php echo __('Ejecutar llenado inicial de datos'); ?></label><br/>
+					&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="enviamail" id="enviamail"/><?php echo __('Enviar correo al admin') ?></label><br/>
+				<?php } ?>
 			</td>
 		</tr>
 		<tr>

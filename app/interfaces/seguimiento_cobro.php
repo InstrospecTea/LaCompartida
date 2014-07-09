@@ -24,7 +24,7 @@ $query_forma_cobro = "SELECT forma_cobro, descripcion FROM prm_forma_cobro";
 if ($opc == 'eliminar') {
 
 	if ($cobros->Load($id_cobro_hide)) {
-	
+
 		$documento_cobro = new Documento($sesion);
 		$documento_cobro->LoadByCobro($id_cobro_hide);
 		$lista_pagos = $documento_cobro->ListaPagos();
@@ -116,14 +116,14 @@ if ($opc == 'buscar') {
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
                              left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
 		if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
-			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
+			$documentof = " GROUP_CONCAT(DISTINCT CONCAT(' ', prm.codigo, ' ', IFNULL(serie_documento_legal, '001'), '-', numero, IF(pef.glosa='Anulado', ' (Anulado)', '')))    ";
 		} else {
-			$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', numero,if(pef.glosa='Anulado', ' (Anulado)',''))) ";
+			$documentof = " GROUP_CONCAT(DISTINCT CONCAT(' ', prm.codigo, ' ', numero, IF(pef.glosa='Anulado', ' (Anulado)', ''))) ";
 		}
 	} else if (Conf::GetConf($sesion, 'PermitirFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";
-		$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
+		$documentof = " group_concat(DISTINCT concat(' ',prm.codigo,' ', ifnull(serie_documento_legal,'001'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
 	} else {
 		$joinfactura = "";
 		$documentof = " cobro.documento ";
@@ -195,7 +195,7 @@ if ($opc == 'buscar') {
 
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_seguimiento_cobro') : false;
 
-	$query.="FROM contrato  
+	$query.="FROM contrato
 				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
 			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
@@ -246,7 +246,7 @@ if ($opc == 'buscar') {
 		}
 
 		$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-		
+
 		if ($cobro->fields['codigo_idioma'] != '') {
 			$idioma->Load($cobro->fields['codigo_idioma']);
 		} else {
@@ -301,14 +301,14 @@ if ($opc == 'buscar') {
 								<b>Opción</b>
 							</td></tr>";
 			$ht .= "<tr bgcolor='#F2F2F2'><td align=center colspan=4><hr size=1px style='font-size:10px; border:1px dashed #CECECE'></td><tr>";
-			
+
 			$codigo_cliente_ultimo = $cobro->fields['codigo_cliente'];
 			$id_contrato_ultimo = $cobro->fields['id_contrato'];
 
 		}
 
 		$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
-		
+
 		$html .= "<tr bgcolor='#F2F2F2' style='border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;'>";
 		$html .= "<td align=center colspan=" . $cols . "><div style='font-size:10px; border:1px dashed #CECECE'>";
 		$html .= "<table width='100%' cellSpacing='0' cellPadding='0'>";
@@ -353,7 +353,7 @@ if ($opc == 'buscar') {
 		}
 
 		$html .= "<td align=left style='font-size:10px; ' >&nbsp;" . $texto_tipo . " de " . $texto_monto . $texto_horas . ' ';
-		
+
 		if ($cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_cobro = __('desde') . ' ' . Utiles::sql2date($cobro->fields['fecha_ini']);
 		}
@@ -405,7 +405,7 @@ $pagina->PrintTop();
 		<?php if ($_GET['buscar'] == 1)
 			echo "jQuery('#boton_buscar').click();";
 		?>
-		
+
 		jQueryUI.done(function() {
 
 			jQuery('.btpopover').each(function() {
@@ -473,14 +473,14 @@ $pagina->PrintTop();
 
 	//Elimina Cobro
 	function EliminarCobros(id_cobro, estado) {
-		
+
 		if (estado != 'CREADO' && estado != 'EN REVISION') {
 
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('El cobro seleccionado se encuentra en estado EMITIDO, Ud. debe cambiarlo a estado CREADO o EN REVISION para poder eliminarlo.') ?>.</span><br>';
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
-			
+
 			Dialog.confirm(text_window,
 			{
 				top: 150,
@@ -498,12 +498,12 @@ $pagina->PrintTop();
 			});
 
 		} else if (estado == 'CREADO' || estado == 'EN REVISION') {
-			
+
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('¿Desea eliminar el cobro seleccionado?') ?></span><br>';
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
-			
+
 			Dialog.confirm(text_window,
 			{
 				top: 150,
@@ -538,7 +538,7 @@ $pagina->PrintTop();
 	 Despliega periodos o rango para filtros
 	 */
 	function Rangos(obj, form) {
-		
+
 		var td_show = $('periodo_rango');
 		var td_hide = $('periodo');
 
@@ -562,7 +562,7 @@ $pagina->PrintTop();
 		var id_usuario = $('id_usuario').value;
 		var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
 		var id_cobro = $('id_cobro').value;
-		
+
 		if ($('usar_periodo').checked == true) {
 			var usar_periodo = $('usar_periodo').value;
 		} else {
@@ -600,7 +600,7 @@ $pagina->PrintTop();
 	}
 
 	function ShowDiv(div, valor, dvimg) {
-		
+
 		var div_id = document.getElementById(div);
 		var img = document.getElementById(dvimg);
 		var form = document.getElementById('form_editar_trabajo');
@@ -653,7 +653,7 @@ $pagina->PrintTop();
 
 	<fieldset class="tb_base" style="width:850px;">
 	<legend><?php echo 'Filtros' ?></legend>
-	
+
 		<table>
 			<tr>
 				<td align="right" width='30%'><b><?php echo __('Cobro') ?></b></td>
