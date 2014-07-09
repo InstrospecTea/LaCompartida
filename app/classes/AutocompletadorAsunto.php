@@ -17,9 +17,9 @@ class AutocompletadorAsunto {
 	function ImprimirSelector($Sesion, $codigo_asunto = '', $codigo_asunto_secundario = '', $codigo_cliente = '', $codigo_cliente_secundario = '', $mas_recientes = false, $width = '', $oncambio = '') {
 
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$output .= sprintf('<input type="text" maxlength="10" size="10" id="codigo_asunto_secundario" name="codigo_asunto_secundario" onChange="CargarGlosaAsunto(); %s" value="%s" />', $oncambio, $codigo_asunto_secundario);
+			$output .= sprintf('<input type="text" maxlength="20" size="10" id="codigo_asunto_secundario" name="codigo_asunto_secundario" onChange="CargarGlosaAsunto(); %s" value="%s" />', $oncambio, $codigo_asunto_secundario);
 		} else {
-			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_asunto\" name=\"codigo_asunto\" onChange=\"CargarGlosaAsunto(); $oncambio\" value=\"" . $codigo_asunto . "\" />";
+			$output .= "<input type=\"text\" maxlength=\"20\" size=\"10\" id=\"codigo_asunto\" name=\"codigo_asunto\" onChange=\"CargarGlosaAsunto(); $oncambio\" value=\"" . $codigo_asunto . "\" />";
 		}
 		$glosa_asunto = '';
 		if ($codigo_asunto || $codigo_asunto_secundario) {
@@ -121,9 +121,7 @@ class AutocompletadorAsunto {
 					var url = root_dir + '/app/ajax.php?accion=cargar_glosa_asunto&id=' + codigo_asunto + '&id_cliente=' + codigo_cliente;
 
 					cargando = true;
-					jQuery.get(url, {}, function(resp) {
-						console.log(resp);return;
-						var response = http.responseText;
+					jQuery.get(url, {}, function(response) {
 						response = response.split('/');
 						response[0] = response[0].replace('|#slash|','/');
 						campo_glosa_asunto.value=response[0];

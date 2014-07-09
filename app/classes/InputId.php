@@ -245,6 +245,9 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 							var select_origen = document.getElementById(id_origen);
 							var select_destino = document.getElementById(id_destino);
+							if(select_destino.tagName != 'SELECT'){
+								return;
+							}
 							var valor_original_destino = select_destino.value;
 							var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value+'&soloactivos='+soloactivos ;
 
