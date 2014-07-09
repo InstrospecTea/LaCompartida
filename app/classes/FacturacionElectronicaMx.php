@@ -133,9 +133,10 @@ EOF;
 					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 
 					$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
+					Log::write("Filename: $file_name", "FacturacionElectronicaMx");
 					$file_data = base64_decode($result->documentopdf);
-					$file_url = UtilesApp::UploadToS3($Sesion, $file_name, $file_data, 'application/pdf');
-
+					$file_url = UtilesApp::UploadToS3($Sesion, $file_name, "helloa", 'application/pdf');
+					Log::write("URL: $file_url", "FacturacionElectronicaMx");
 					$Factura->Edit('dte_url_pdf', $file_url);
 					if ($Factura->Write()) {
 						$hookArg['InvoiceURL'] = $file_url;
