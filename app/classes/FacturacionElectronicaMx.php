@@ -37,6 +37,55 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		return $a1 . $a2;
 	}
 
+	public static function InsertaJSFacturaElectronica() {
+		$BotonDescargarHTML = self::BotonDescargarHTML('0');
+		echo <<<EOF
+			jQuery(document).on("click", ".factura-electronica", function() {
+				if (!confirm("¿Confirma la generación de Factura electrónica?")) {
+					return;
+				}
+				var self = jQuery(this);
+				var id_factura = self.data("factura");
+				var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:95px;height:20px;margin-left:-90px;"});
+				self.parent().append(loading);
+				jQuery.ajax({url: root_dir + "/api/index.php/invoices/" + id_factura +  "/build",
+					type: "POST"
+				}).success(function(data) {
+					loading.remove();
+					buttons = jQuery('{$BotonDescargarHTML}');
+					buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
+					self.replaceWith(buttons);
+					window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=pdf"
+				}).error(function(error_data){
+					loading.remove();
+					response = JSON.parse(error_data.responseText);
+					if (response.errors) {
+						error_message = response.errors[0].message;
+						alert(error_message);
+					}
+				});
+			});
+
+			jQuery(document).on("click", ".factura-documento", function() {
+				var self = jQuery(this);
+				var id_factura = self.data("factura");
+				var format = self.data("format") || "pdf";
+				window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
+			});
+
+			jQuery(document).on("change", "#dte_metodo_pago",  function() {
+				var metodo_pago = jQuery("#dte_metodo_pago option:selected").text();
+				if (metodo_pago != "No Identificado") {
+					jQuery("#dte_metodo_pago_cta").show();
+				} else {
+					jQuery("#dte_metodo_pago_cta").hide();
+				}
+			});
+
+			jQuery("#dte_metodo_pago").trigger("change");
+EOF;
+	}
+
 	public static function ValidarFactura() {
 		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $dte_metodo_pago, $dte_id_pais, $dte_metodo_pago_cta;
 		if (empty($RUT_cliente)) {
@@ -93,7 +142,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 					}
 				} catch (Exception $ex) {
 					$hookArg['Error'] = array(
-						'Code' => 'SaveGeneratedInvoiceError',
+						'Code' => 'BuildingInvoiceError',
 						'Message' => print_r($ex, true)
 					);
 					Log::write(trim($ex->getTraceAsString()), "FacturacionElectronicaMx");
@@ -101,13 +150,14 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			} else {
 				$error_code = $result->codigo >= 501 ? null : "ERROR_{$result->codigo}";
 				$hookArg['Error'] = array(
-					'Code' => $error_code,
+					'Code' =>  $error_code,
 					'Message' => utf8_decode($result->descripcion)
 				);
 				$estado_dte = Factura::$estados_dte['ErrorFirmado'];
 				$Factura->Edit('dte_estado', $estado_dte);
 				$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
 				$Factura->Write();
+				Log::write(utf8_decode($result->descripcion), "FacturacionElectronicaMx");
 			}
 		}
 		return $hookArg;
@@ -158,6 +208,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 				'Code' => 'CancelGeneratedInvoiceError',
 				'Message' => utf8_decode($result->descripcion)
 			);
+			Log::write(utf8_decode($result->descripcion), "FacturacionElectronicaMx");
 		}
 		return $hookArg;
 	}
@@ -199,8 +250,10 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 	 */
 	public static function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$monedas = Moneda::GetMonedas($Sesion, '', true);
-		$mx_timezone = -6;
-		$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
+
+		$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
+		date_default_timezone_set($zona_horaria);
+		$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
 
 		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
