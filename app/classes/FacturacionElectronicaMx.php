@@ -143,9 +143,9 @@ EOF;
 				} catch (Exception $ex) {
 					$hookArg['Error'] = array(
 						'Code' => 'BuildingInvoiceError',
-						'Message' => print_r($ex, true)
+						'Message' => $ex->__toString()
 					);
-					Log::write(trim($ex->getTraceAsString()), "FacturacionElectronicaMx");
+					Log::write(trim($ex->__toString()), "FacturacionElectronicaMx");
 				}
 			} else {
 				$error_code = $result->codigo >= 501 ? null : "ERROR_{$result->codigo}";
