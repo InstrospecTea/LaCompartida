@@ -14,9 +14,16 @@ if ($opcion == 'guardar') {
 	} else {
 		$Actividad->Edit("activo", "0");
 	}
+	if(empty($Actividad->fields['codigo_asunto'])){
+		$Actividad->Edit('codigo_asunto', 'NULL');
+	}
+
 
 	if ($Actividad->Write()) {
 		$Pagina->AddInfo(__('Actividad guardada con éxito'));
+		if($Actividad->fields['codigo_asunto'] == 'NULL'){
+			$Actividad->Edit('codigo_asunto', null);
+		}
 
 		echo '<script type="text/javascript">
 			if (window.opener !== undefined && window.opener.Refrescar) {
