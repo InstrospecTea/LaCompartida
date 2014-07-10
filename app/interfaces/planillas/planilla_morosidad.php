@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -88,15 +88,15 @@
 		$ws1->hideGridlines();
 		$ws1->setLandscape();
 
-		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
-		$mostrar_columna_codigo_asunto = UtilesApp::GetConf($sesion,'CodigoAsuntoEnColumnasSeparadas');
+		$mostrar_encargado_secundario = Conf::GetConf($sesion, 'EncargadoSecundario');
+		$mostrar_columna_codigo_asunto = Conf::GetConf($sesion,'CodigoAsuntoEnColumnasSeparadas');
 		$mostrar_columna_estudio = count(PrmEstudio::GetEstudios($sesion)) > 1;
 
 		// Definir columnas a usar
 		$indice_columnas = 1;
 		$col_cliente = $indice_columnas++;
 		$col_total_pesos = $indice_columnas++;
-		if( $mostrar_columna_codigo_asunto ) 
+		if( $mostrar_columna_codigo_asunto )
 			$col_codigo_asuntos = $indice_columnas++;
 		$col_asuntos = $indice_columnas++;
 		if(!$desglosar_por_encargado)
@@ -132,7 +132,7 @@
 		$ws1->setColumn($col_fecha_envio, $col_fecha_envio, 14);
 		$ws1->setColumn($col_fecha_facturacion, $col_fecha_facturacion, 20);
 		$ws1->setColumn($col_cobro, $col_cobro, 14);
-		if( $mostrar_columna_codigo_asunto ) 
+		if( $mostrar_columna_codigo_asunto )
 			$ws1->setColumn($col_codigo_asuntos, $col_codigo_asuntos, 30);
 		$ws1->setColumn($col_asuntos, $col_asuntos, 30);
 		if(!$desglosar_por_encargado)
@@ -220,7 +220,7 @@
 		$query = "SELECT
 					cobro.fecha_enviado_cliente,
 					cobro.fecha_emision,
-					cobro.fecha_facturacion, 
+					cobro.fecha_facturacion,
 					cliente.glosa_cliente,
 					cobro.documento,
 					CONCAT(usuario.nombre, ' ', usuario.apellido1) AS nombre,
@@ -250,11 +250,11 @@
 				ORDER BY $orderby;";
 		// Obtener los asuntos de cada cobro
 
-		
+
 		$query_asuntos = "SELECT cobro.id_cobro,
-												GROUP_CONCAT(distinct asunto.codigo_asunto SEPARATOR '\n') as codigos_asuntos, 
-												GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos, 
-												GROUP_CONCAT(distinct CONCAT(asunto.codigo_asunto, ' ', glosa_asunto) SEPARATOR '\n') as asuntos 
+												GROUP_CONCAT(distinct asunto.codigo_asunto SEPARATOR '\n') as codigos_asuntos,
+												GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos,
+												GROUP_CONCAT(distinct CONCAT(asunto.codigo_asunto, ' ', glosa_asunto) SEPARATOR '\n') as asuntos
 											FROM cobro
 												LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 												LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
@@ -264,7 +264,7 @@
 											GROUP BY cobro.id_cobro";
 
 		$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-		
+
 		if( $mostrar_columna_codigo_asunto ) {
 			$glosa_asuntos = array();
 			$codigo_asuntos = array();
@@ -305,7 +305,7 @@
 				//se ponen los titulos por tabla
 				$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 				$ws1->write($filas, $col_total_pesos, __('Total en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
-				if( $mostrar_columna_codigo_asunto ) 
+				if( $mostrar_columna_codigo_asunto )
 					$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				if(!$desglosar_por_encargado)
@@ -353,7 +353,7 @@
 					//se ponen los titulos por tabla
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total en Pesos'), $titulo_filas);
-					if( $mostrar_columna_codigo_asunto ) 
+					if( $mostrar_columna_codigo_asunto )
 						$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 					if(!$desglosar_por_encargado)
@@ -578,7 +578,7 @@
 				$facturas = "";
 				$clientes_factura = "";
 				$estudio_factura = "";
-				$query_obtener_facturas = "SELECT 
+				$query_obtener_facturas = "SELECT
 						pdl.codigo,
 						f.serie_documento_legal,
 						f.numero,
@@ -652,7 +652,7 @@
 			$ws1->write($filas, $col_fecha_envio, Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_fecha_facturacion,  Utiles::sql2fecha($cobro['fecha_facturacion'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
-			
+
 			if( $mostrar_columna_codigo_asunto )
 				$ws1->write($filas, $col_codigo_asuntos, $codigo_asuntos[$cobro['id_cobro']], $txt_izquierda);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
@@ -819,7 +819,7 @@ Calendar.setup(
 );
 </script>
 
-<?php 
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

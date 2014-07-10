@@ -11,7 +11,7 @@ $Slim->hook('hook_factura_inicio', 'Descarga_Planilla_Registro_Ventas');
 
 function Ofrece_Planilla_Registro_Ventas() {
 	$text = '<script>if(jQuery(\'#fecha1\').val()==\'\') { jQuery(\'#fecha1\').val(\'01-' . date("m-Y", strtotime("-1 MONTH")) . '\');}</script>';
-	$text.='<a class="btn botonizame" icon="ui-icon-invoice2"    id="boton_registro_ventas" name="boton_registro_ventas" 
+	$text.='<a class="btn botonizame" icon="ui-icon-invoice2"    id="boton_registro_ventas" name="boton_registro_ventas"
 					onclick="jQuery(\'#form_facturas\').attr(\'action\',\'facturas.php?opc=buscar&descargar_excel=1&planilla=registro_ventas\').submit();">' . __('Registro Ventas') . '</a>';
 	echo $text;
 }
@@ -46,7 +46,7 @@ function Descarga_Planilla_Registro_Ventas() {
 			$results[$key]['estado'] = strtoupper($results[$key]['estado']);
 			$results[$key]['fechax'] = strftime("%Y%m%d", strtotime($result['fecha']));
 
-			$results[$key]['codigodocumento'] = str_replace(array('FA', 'BO', 'NC', 'ND'), array('FAC', 'BOL', 'NAB', 'NDB'), $results[$key]['tipo']) . sprintf("%03d%07d", $results[$key]['serie_documento_legal'], $results[$key]['numero']);
+			$results[$key]['codigodocumento'] = str_replace(array('FA', 'BO', 'NC', 'ND'), array('FAC', 'BOL', 'NAB', 'NDB'), $results[$key]['tipo']) . sprintf("%s%07d", $results[$key]['serie_documento_legal'], $results[$key]['numero']);
 			$results[$key]['tipo_doc'] = str_replace(array('FA', 'BO', 'NC', 'ND'), array('01', '03', '07', '08'), $results[$key]['tipo']);
 			$results[$key]['neto'] = $results[$key]['honorarios'] + $results[$key]['subtotal_gastos'] + $results[$key]['subtotal_gastos_sin_impuesto'];
 			$results[$key]['moneda'] = str_replace(array('1', '2', '3'), array('PEN', 'DOL', 'EUR'), $results[$key]['id_moneda']);

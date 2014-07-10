@@ -1,5 +1,24 @@
 # Changelog
 
+## Hotfix: 14.4.11
+Lunes 7 de Julio 2014
+* **Fixed:** Corrige hotfix anterior, por error sintáctico JS
+
+## Hotfix: 14.4.10
+Lunes 7 de Julio 2014
+* **Fixed:** [Muestra `Ejecutar llenado inicial de datos` solo al admin](https://github.com/LemontechSA/ttb/pull/577)
+* **Fixed:** [Repara error sintáctico de JS al parsear el código del asunto al editar trabajo](https://github.com/LemontechSA/ttb/pull/577)
+
+## Hotfix: 14.4.9
+Viernes 4 de Julio 2014
+* **Fixed:** [Corrige asignación de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
+
+## Hotfix: 14.4.8
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignación de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Cambia los CDN de aspnet a static (varios módulos)](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Corrige validación de monto según tipo de cobro y monto en cero en creación de asuntos.](https://github.com/LemontechSA/ttb/pull/574)
+
 ## Hotfix: 14.4.7
 Miércoles 2 de Julio 2014
 * **Fixed:** [Repara elementos extraños en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)

@@ -1087,7 +1087,7 @@ function Substring($string) {
                 if (!ActualizaCobro(form.codigo_asunto_secundario.value)) {
                     //MENSAJE DE ERROR
                     return false;
-                } 
+                }
 
             } else {
 
@@ -1495,7 +1495,7 @@ function Substring($string) {
             });
 
         }
-        
+
 
         var loadLedesAsunto = function() {
 
@@ -1519,7 +1519,7 @@ function Substring($string) {
                 jQuery('#codigo_ledes').html(response);
             });
 
-            
+
             jQuery.ajax({
                 type: "POST",
                 url: "ajax/ajax_ledes_trabajos.php",
@@ -1531,9 +1531,9 @@ function Substring($string) {
                     codigo_cliente: campo_asuntos.val().split('-').first(),
                     <?php
                         if ($t->fields['codigo_asunto']) {
-                            echo 'codigo_asunto: '. $t->fields['codigo_asunto'];
+                            echo 'codigo_asunto: \''. $t->fields['codigo_asunto'].'\'';
                         } else {
-                            echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val(),';
+                            echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val()';
                         }
                     ?>
                 }

@@ -201,7 +201,6 @@ if ($opc == 'refrescar') {
 
 	if ($cobro->fields['modalidad_calculo'] == 1) {
 		$saldo_honorarios = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
-
 		$saldo_disponible_trabajos = $saldo_trabajos = $x_resultados['monto_trabajos'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
 		if ($saldo_disponible_trabajos < 0) {
 			$saldo_disponible_tramites = $saldo_tramites = $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']] + $saldo_disponible_trabajos;
@@ -243,256 +242,133 @@ if ($opc == 'refrescar') {
 		$saldo_gastos_sin_impuestos = 0;
 	}
 
-	echo '<tr style="height: 26px;">
-										<td colspan="12" align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;" colspan=2>
-											<img src="' . Conf::ImgDir() . '/imprimir_16.gif" border="0" alt="Imprimir"/> ' . __('Documentos Tributarios');
-	if (Conf::GetConf($sesion, 'NuevoModuloFactura') && $cobro->DiferenciaCobroConFactura() != '') {
-		echo '<span style="border: 1px solid #bfbfcf; color: #ffffff; background-color: #ff0000; float: right; padding: 2px">' . $cobro->DiferenciaCobroConFactura() . '</span>';
-	}
-	?>
-	</td>
-	</tr>
-	<tr>
-		<?php
-		echo
-		'<th>' . __('Tipo ') . __('Documento') . '</th>
-												<th>' . __('Número') . '</th>
-												<th style="white-space:nowrap; width:78px;">' . __('Fecha') . '</th>';
+	$diferencia_cobro_factura = Conf::GetConf($sesion, 'NuevoModuloFactura') ? $cobro->DiferenciaCobroConFactura() : null;
+		CobroHtml::setMoneda($moneda_documento);
+		CobroHtml::setIdioma($idioma);
 
-		echo '<th>' . __('Honorarios') . '</th>
-												<th>' . __('Gasto ') . __('c/IVA') . '</th>
-												<th>' . __('Gasto ') . __('s/IVA') . '</th>';
-		echo '<th>Impuesto</th>
-												<th>Total</th>
-												<th>Estado</th>
-
-												<th>Saldo<br>por pagar</th>
-												<th>' . __('Agregar Pago') . '</th>
-												<th>Acciones</th></tr>
-
-													<tr style="background:#EFE;">
-														<td>' . __('Cobro') . '</td>
-
-										<td>' . $cobro->fields['id_cobro'] . '</td>
-														<td style="width:78px;">' . date('d-m-Y', strtotime($cobro->fields['fecha_emision'])) . '</td>
-														<td>';
-		echo $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-		echo '<input type="hidden" name="honorarios_total" id="honorarios_total" value="' . $saldo_honorarios . '" />
-														</td>';
-
-		echo '<td>' . $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-		echo '<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="' . $saldo_gastos_con_impuestos . '" /></td>';
-
-
-		echo '<td>' . $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-		echo '	<input type="hidden" name="gastos_sin_iva_total" id="gastos_sin_iva_total" value="' . $saldo_gastos_sin_impuestos . '" /></td>';
-
-		echo ' <td>';
+		$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos');
+		$data_cobro['fecha'] = date('d-m-Y', strtotime($cobro->fields['fecha_emision']));
 		if ($cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0) {
-			echo $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']], $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+			$data_cobro['iva'] = $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']];
+		} else {
+			$data_cobro['iva'] = 0;
 		}
-		echo '</td>';
-		echo '<td>	<b>' . $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($saldo_honorarios + $saldo_gastos_con_impuestos + $saldo_gastos_sin_impuestos + $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']], $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</b>';
-		echo '		</td>					<td/>						<td/>						<td/>				<td/>											</tr>';
+
+		echo CobroHtml::cajafacturasHead($diferencia_cobro_factura);
+		echo CobroHtml::cajafacturasCobro($data_cobro);
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			//documentos existentes. usar funcion magica (???)
-			$query = "SELECT
-                factura.id_factura,
-                SUM(factura_cobro.monto_factura) as monto_factura,
-                factura.serie_documento_legal,
-                factura.numero,
-                prm_documento_legal.glosa as tipo,
-                prm_estado_factura.glosa,
-                prm_estado_factura.codigo,
-                factura.subtotal_sin_descuento,
-                honorarios,
-                ccfm.saldo as saldo,
-                subtotal_gastos,
-                subtotal_gastos_sin_impuesto,
-                iva,
-                prm_documento_legal.codigo as cod_tipo,
-                factura.id_moneda,
-                pm.tipo_cambio,
-                pm.cifras_decimales
-        FROM factura
-        JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
-        LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura
-        JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
-        JOIN prm_estado_factura ON factura.id_estado = prm_estado_factura.id_estado
-        LEFT JOIN factura_cobro ON factura_cobro.id_factura = factura.id_factura
-        WHERE factura_cobro.id_cobro = '$id_cobro'
-        GROUP BY factura.id_factura";
+			$facturas = Factura::ListarDelCobro($sesion, $id_cobro);
 
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			$fila = 0;
-			while (list( $id_factura, $monto, $serie, $numero, $tipo, $estado, $cod_estado, $subtotal_honorarios, $honorarios, $saldo, $subtotal_gastos, $subtotal_gastos_sin_impuesto, $impuesto, $cod_tipo, $id_moneda_factura, $tipo_cambio_factura, $cifras_decimales_factura ) = mysql_fetch_array($resp)) {
+			$total_facturas = count($facturas);
+			while ($fila < $total_facturas) {
+				$datos_factura = $facturas[$fila];
 				//si el documento no esta anulado, lo cuento para el saldo disponible a facturar (notas de credito suman, los demas restan)
-				if ($cod_estado != 'A') {
-					$mult = $cod_tipo == 'NC' ? 1 : -1;
-					$saldo_honorarios += $subtotal_honorarios * $mult;
-					$saldo_gastos_con_impuestos += $subtotal_gastos * $mult;
-					$saldo_gastos_sin_impuestos += $subtotal_gastos_sin_impuesto * $mult;
+				if ($datos_factura['codigo'] != 'A') {
+					$mult = $datos_factura['cod_tipo'] == 'NC' ? 1 : -1;
+					$saldo_honorarios += $datos_factura['subtotal_sin_descuento'] * $mult;
+					$saldo_gastos_con_impuestos += $datos_factura['subtotal_gastos'] * $mult;
+					$saldo_gastos_sin_impuestos += $datos_factura['subtotal_gastos_sin_impuesto'] * $mult;
 				}
-				$factura = new Factura($sesion);
-				$factura->Load($id_factura);
+
+				$Factura = new Factura($sesion);
+				$Factura->Load($datos_factura['id_factura']);
 
 				$moneda_factura = new Moneda($sesion);
-				$moneda_factura->Load($id_moneda_factura);
-				?>
-			<tr bgcolor="<?php echo $fila++ % 2 ? '#f2f2ff' : '#ffffff' ?>">
-				<td><?php echo $tipo ?></td>
+				$moneda_factura->Load($datos_factura['id_moneda']);
 
-				<td style="width:78px;white-space:nowrap;"><?php echo $factura->ObtenerNumero(null, null, null, true) ?></td>
+				CobroHtml::setMoneda($moneda_factura);
 
-				<td><?php echo date('d-m-Y', strtotime($factura->fields['fecha'])); ?></td>
-				<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-				<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-				<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-				<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-				<td><b><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_honorarios + $subtotal_gastos + $subtotal_gastos_sin_impuesto + $impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></b></td>
-				<td><?php echo $estado ?></td>
+				echo CobroHtml::cajafacturasFilaFactura($Factura, $documento_cobro, $fila++, $datos_factura);
+			}
 
+			//agregar docs, defaulteando segun conf
 
-				<td align="right">
-			<?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format(-$saldo, $moneda_factura->fields['cifras_decimales'], $idioma->fieldls['separador_decimales'], $idioma->fields['separador_miles']) ?>
-			<?php $saldo_tmp = -$saldo; ?>
-					<input type="hidden" name="saldo_<?php echo $id_factura ?>" id="saldo_<?php echo $id_factura ?>" value="<?php echo str_replace(',', '.', $saldo_tmp); ?>" />
-					<input type="hidden" name="id_moneda_factura_<?php echo $id_factura ?>" id="id_moneda_factura_<?php echo $id_factura ?>" value="<?php echo $id_moneda_factura ?>" />
-					<input type="hidden" name="tipo_cambio_factura_<?php echo $id_factura ?>" id="tipo_cambio_factura_<?php echo $id_factura ?>" value="<?php echo $tipo_cambio_factura ?>" />
-					<input type="hidden" name="cifras_decimales_factura_<?php echo $id_factura ?>" id="cifras_decimales_factura_<?php echo $id_factura ?>" value="<?php echo $cifras_decimales_factura ?>" />
-				</td>
-				<td align="center">
-					<input type="checkbox" name="pagar_factura_<?php echo $id_factura ?>" id="pagar_factura_<?php echo $id_factura ?>" value="<?php echo $saldo ?>"   class="tooltip" alt="Active esta casilla y luego pinche en 'Pagar' para añadir pagos" />
-				</td>
-				<td style="white-space:nowrap;cursor:pointer;">
-					<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 800, 600, 'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1&id_cobro=<?php echo $id_cobro ?>', 'top=100, left=155, scrollbars=yes');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border="0" title="Editar"/></a>
-					<?php if (Conf::GetConf($sesion, 'ImprimirFacturaDoc')) { ?>
-						<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir');" ><img src='<?php echo Conf::ImgDir() ?>/doc.gif' border="0" title="Descargar Word"/></a>
-					<?php } ?>
-						<?php
-							$data = array('Factura' => $factura);
-							if ($Slim = Slim::getInstance('default', true)) {
-								$Slim->applyHook('hook_cobros7_botones_after', &$data);
-							}
-							if (!($data && $data['content'])) {
-								if (Conf::GetConf($sesion, 'ImprimirFacturaPdf')) {
-									?><a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir_pdf');" ><img src='<?php echo Conf::ImgDir() ?>/pdf.gif' border="0" title="Descargar Pdf"/></a><?
-								}
-							} else {
-								echo($data['content']);
-							}
-						 ?>
-					<img title="Ver pagos para este documento" src="<?php echo Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="MostrarVerDocumentosPagos(<?php echo $id_factura ?>);" border="0" alt="Examinar" />
-				</td>
-			</tr>
-			<tr>
-				<td align=right colspan="12">
-					<div id="VerDocumentosPagos_<?php echo $id_factura ?>" style="display:none; left: 100px; top: 250px; background-color: white; position:absolute; z-index: 4;">
-						<fieldset style="background-color:white;">
-							<legend><?php echo __('Lista de pagos asociados a documento #') . $numero ?></legend>
-							<div id="contenedor_tipo_load">&nbsp;</div>
-							<div id="contenedor_tipo_cambio">
-			<?php echo FacturaPago::HtmlListaPagos($sesion, $factura, $documento_cobro->fields['id_documento']); ?>
-								<table style='border-collapse:collapse;' cellpadding='3'>
-									<tr>
-										<td colspan=<?php echo $num_monedas ?> align=center>
-											<input type="button" onclick="CancelarVerDocumentosPagos(<?php echo $id_factura ?>)" value="<?php echo __('Cancelar') ?>" />
-										</td>
-									</tr>
-								</table>
-							</div>
-						</fieldset>
-					</div>
-				</td>
-			</tr>
-			<?php
-		} // end while
-		//agregar docs, defaulteando segun conf
-
-		$query_contrato_docs_legales = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos
+			$query_contrato_docs_legales = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos
                                     FROM contrato_documento_legal
                                     WHERE id_contrato = " . $contrato->fields['id_contrato'];
 
-		$contrato_docs_legales = mysql_query($query_contrato_docs_legales, $sesion->dbh) or Utiles::errorSQL($query_contrato_docs_legales, __FILE__, __LINE__, $sesion->dbh);
-		$nro_docs_legales = mysql_num_rows($contrato_docs_legales);
+			$contrato_docs_legales = mysql_query($query_contrato_docs_legales, $sesion->dbh) or Utiles::errorSQL($query_contrato_docs_legales, __FILE__, __LINE__, $sesion->dbh);
+			$nro_docs_legales = mysql_num_rows($contrato_docs_legales);
 
-		if (!$nro_docs_legales) {
-			$query_contrato_docs_legales = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos
+			if (!$nro_docs_legales) {
+				$query_contrato_docs_legales = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos
                                         FROM contrato_documento_legal
                                         WHERE id_contrato IS NULL";
 
-			$contrato_docs_legales = mysql_query($query_contrato_docs_legales, $sesion->dbh) or Utiles::errorSQL($query_contrato_docs_legales, __FILE__, __LINE__, $sesion->dbh);
-		}
+				$contrato_docs_legales = mysql_query($query_contrato_docs_legales, $sesion->dbh) or Utiles::errorSQL($query_contrato_docs_legales, __FILE__, __LINE__, $sesion->dbh);
+			}
 
-		if (($saldo_honorarios) < 0.0001) {
-			$saldo_honorarios = 0;
-		}
-		if (($saldo_gastos_con_impuestos) < 0.0001) {
-			$saldo_gastos_con_impuestos = 0;
-		}
-		if (($saldo_gastos_sin_impuestos) < 0.0001) {
-			$saldo_gastos_sin_impuestos = 0;
-		}
+			if (($saldo_honorarios) < 0.0001) {
+				$saldo_honorarios = 0;
+			}
+			if (($saldo_gastos_con_impuestos) < 0.0001) {
+				$saldo_gastos_con_impuestos = 0;
+			}
+			if (($saldo_gastos_sin_impuestos) < 0.0001) {
+				$saldo_gastos_sin_impuestos = 0;
+			}
 
-		$saldo_disponible_honorarios = $saldo_honorarios;
-		$saldo_disponible_gastos_con_impuestos = $saldo_gastos_con_impuestos;
-		$saldo_disponible_gastos_sin_impuestos = $saldo_gastos_sin_impuestos;
+			$saldo_disponible_honorarios = $saldo_honorarios;
+			$saldo_disponible_gastos_con_impuestos = $saldo_gastos_con_impuestos;
+			$saldo_disponible_gastos_sin_impuestos = $saldo_gastos_sin_impuestos;
 
-		$boton_pagar = '<button type="button" onclick="AgregarPagoFactura()" >' . __('Pagar') . '</button>';
+			$boton_pagar = '<button type="button" onclick="AgregarPagoFactura()" >' . __('Pagar') . '</button>';
 
-		$idx = 0;
-		while (list($agregar_tipo, $agregar_honorarios, $agregar_gastos_con_impuestos, $agregar_gastos_sin_impuestos) = mysql_fetch_array($contrato_docs_legales)) {
-			if ($agregar_honorarios && $saldo_honorarios ||
-					$agregar_gastos_con_impuestos && $saldo_gastos_con_impuestos ||
-					$agregar_gastos_sin_impuestos && $saldo_gastos_sin_impuestos) {
+			$idx = 0;
+			while (list($agregar_tipo, $agregar_honorarios, $agregar_gastos_con_impuestos, $agregar_gastos_sin_impuestos) = $f = mysql_fetch_array($contrato_docs_legales)) {
+				if ($agregar_honorarios && $saldo_honorarios ||
+						$agregar_gastos_con_impuestos && $saldo_gastos_con_impuestos ||
+						$agregar_gastos_sin_impuestos && $saldo_gastos_sin_impuestos) {
 
-				$idx++;
-				$honorarios_doc = 0;
+					$idx++;
+					$honorarios_doc = 0;
 
-				if ($agregar_honorarios) {
-					$honorarios_doc = number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$saldo_honorarios = 0;
-				}
+					if ($agregar_honorarios) {
+						$honorarios_doc = number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$saldo_honorarios = 0;
+					}
 
-				$gastos_con_impuestos_doc = 0;
-				if ($agregar_gastos_con_impuestos) {
-					$gastos_con_impuestos_doc = number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$saldo_gastos_con_impuestos = 0;
-				}
-				$gastos_sin_impuestos_doc = 0;
-				if ($agregar_gastos_sin_impuestos) {
-					$gastos_sin_impuestos_doc = number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$saldo_gastos_sin_impuestos = 0;
-				}
-				?>
-				<tr>
-					<td colspan="3">
-						<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_' . $idx, $agregar_tipo, '', '', 100); ?>
-					</td>
-					<td nowrap>
-						<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input  class="mini_input"  type="text" id="honorarios_<?php echo $idx ?>" value="<?php echo $honorarios_doc ?>" size="8" onkeydown="MontoValido(this.id);"/>
-					</td>
-					<td nowrap>
-						<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input  class="mini_input"  type="text" id="gastos_con_impuestos_<?php echo $idx ?>" value="<?php echo $gastos_con_impuestos_doc ?>" size="8" onkeydown="MontoValido(this.id);"/>
-					</td>
-					<td nowrap>
+					$gastos_con_impuestos_doc = 0;
+					if ($agregar_gastos_con_impuestos) {
+						$gastos_con_impuestos_doc = number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$saldo_gastos_con_impuestos = 0;
+					}
+					$gastos_sin_impuestos_doc = 0;
+					if ($agregar_gastos_sin_impuestos) {
+						$gastos_sin_impuestos_doc = number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$saldo_gastos_sin_impuestos = 0;
+					}
+					?>
+								<tr>
+									<td colspan="3">
+				<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_' . $idx, $agregar_tipo, '', '', 100); ?>
+									</td>
+									<td nowrap>
+				<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input  class="mini_input"  type="text" id="honorarios_<?php echo $idx ?>" value="<?php echo $honorarios_doc ?>" size="8" onkeydown="MontoValido(this.id);"/>
+									</td>
+									<td nowrap>
+				<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input  class="mini_input"  type="text" id="gastos_con_impuestos_<?php echo $idx ?>" value="<?php echo $gastos_con_impuestos_doc ?>" size="8" onkeydown="MontoValido(this.id);"/>
+									</td>
+									<td nowrap>
 				<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" class="mini_input" id="gastos_sin_impuestos_<?php echo $idx ?>" value="<?php echo $gastos_sin_impuestos_doc ?>" size="8" onkeydown="MontoValido(this.id);"/>
-					</td>
-					<td align="center">
-						<button type="button" onclick="AgregarFactura(<?php echo $idx ?>)" ><?php echo __('Emitir'); ?></button>
-					</td>
-					<td/>
-					<td/>
-					<td/>
-					<td/>
-					<td align="center">
-						<?php
-						echo $boton_pagar;
-						$boton_pagar = '';
-						?>
-					</td>
-				</tr>
+									</td>
+									<td align="center">
+										<button type="button" onclick="AgregarFactura(<?php echo $idx ?>)" ><?php echo __('Emitir'); ?></button>
+									</td>
+									<td/>
+									<td/>
+									<td/>
+									<td/>
+									<td align="center">
+				<?php
+				echo $boton_pagar;
+				$boton_pagar = '';
+				?>
+									</td>
+								</tr>
 
 				<?php
 			}
@@ -501,38 +377,38 @@ if ($opc == 'refrescar') {
 		//si quedaron saldos o no se genero nada default, tiro uno mas
 		if (!$idx || $saldo_honorarios || $saldo_gastos_con_impuestos || $saldo_gastos_sin_impuestos) {
 			?>
-			<tr>
-				<td colspan="3">
-					<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_0', '', '', '', 100); ?>
-				</td>
-				<td nowrap>
-					<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" class="mini_input" id="honorarios_0" value="<?php echo number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], '') ?>" size="8" onkeydown="MontoValido(this.id);"/>
-				</td>
-				<td nowrap>
-					<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" class="mini_input"  id="gastos_con_impuestos_0" value="<?php echo number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], '') ?>" size="8" onkeydown="MontoValido(this.id);"/>
-				</td>
-				<td nowrap>
+						<tr>
+							<td colspan="3">
+			<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_0', '', '', '', 100); ?>
+							</td>
+							<td nowrap>
+			<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" class="mini_input" id="honorarios_0" value="<?php echo number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], '') ?>" size="8" onkeydown="MontoValido(this.id);"/>
+							</td>
+							<td nowrap>
+			<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" class="mini_input"  id="gastos_con_impuestos_0" value="<?php echo number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], '') ?>" size="8" onkeydown="MontoValido(this.id);"/>
+							</td>
+							<td nowrap>
 			<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" id="gastos_sin_impuestos_0" class="mini_input"  value="<?php echo number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], '') ?>" size="8" onkeydown="MontoValido(this.id);"/>
-				</td>
-				<td align="center">
-					<button type="button"  onclick="AgregarFactura(0)" ><?php echo __('Emitir') ?></button>
-					<input type="hidden" id="honorarios_disponibles" value="<?php echo number_format($saldo_disponible_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
-					<input type="hidden" id="trabajos_disponibles" value="<?php echo number_format($saldo_disponible_trabajos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
-					<input type="hidden" id="tramites_disponibles" value="<?php echo number_format($saldo_disponible_tramites, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
-					<input type="hidden" id="gastos_con_iva_disponibles" value="<?php echo $saldo_disponible_gastos_con_impuestos ?>"/>
-					<input type="hidden" id="gastos_sin_iva_disponibles" value="<?php echo $saldo_disponible_gastos_sin_impuestos ?>"/>
-				</td>
-				<td/>
-				<td/>
-				<td/>
+							</td>
+							<td align="center">
+								<button type="button"  onclick="AgregarFactura(0)" ><?php echo __('Emitir') ?></button>
+								<input type="hidden" id="honorarios_disponibles" value="<?php echo number_format($saldo_disponible_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
+								<input type="hidden" id="trabajos_disponibles" value="<?php echo number_format($saldo_disponible_trabajos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
+								<input type="hidden" id="tramites_disponibles" value="<?php echo number_format($saldo_disponible_tramites, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
+								<input type="hidden" id="gastos_con_iva_disponibles" value="<?php echo $saldo_disponible_gastos_con_impuestos ?>"/>
+								<input type="hidden" id="gastos_sin_iva_disponibles" value="<?php echo $saldo_disponible_gastos_sin_impuestos ?>"/>
+							</td>
+							<td/>
+							<td/>
+							<td/>
 
-				<td align="center">
-					<?php
-					echo $boton_pagar;
-					$boton_pagar = '';
-					?>
-				</td><td/>
-			</tr>
+							<td align="center">
+			<?php
+			echo $boton_pagar;
+			$boton_pagar = '';
+			?>
+							</td><td/>
+						</tr>
 			<?php
 		}
 	}

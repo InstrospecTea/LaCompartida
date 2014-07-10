@@ -28,22 +28,24 @@ class Trabajo extends Objeto
 	}
 
 	function Estado() {
-		if (!$this->fields['estado_cobro'] && $this->fields['id_cobro'] && $this->fields['id_cobro']) {
-			$cobro= new Cobro($this->sesion);
+		if (!$this->fields['estadocobro'] && $this->fields['id_cobro']) {
+			$cobro = new Cobro($this->sesion);
 			$cobro->Load($this->fields['id_cobro']);
-			$this->fields['estado_cobro'] = $cobro->fields['estado'];
-		}
-		if ($this->fields['estado_cobro'] <> "CREADO"
-				&& $this->fields['estado_cobro'] <> "EN REVISION"
-				&& $this->fields['estado_cobro'] != ''
-				&& $this->fields['estado_cobro'] <> 'SIN COBRO') {
-			return __("Cobrado");
-		}
-		if ($this->fields['revisado'] == 1) {
-			return __("Revisado");
+			$this->fields['estadocobro'] = $cobro->fields['estado'];
 		}
 
-		return __("Abierto");
+		if ($this->fields['estadocobro'] <> 'CREADO'
+			&& $this->fields['estadocobro'] <> 'EN REVISION'
+			&& $this->fields['estadocobro'] != ''
+			&& $this->fields['estadocobro'] <> 'SIN COBRO') {
+			return __('Cobrado');
+		}
+
+		if ($this->fields['revisado'] == 1) {
+			return __('Revisado');
+		}
+
+		return __('Abierto');
 	}
 
 	function GuardarHistorial($id_trabajo, $queryHistorial) {

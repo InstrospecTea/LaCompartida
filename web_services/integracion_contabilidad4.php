@@ -14,7 +14,7 @@ apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 $Sesion = new Sesion();
 $ns = "urn:TimeTracking";
 
-if (UtilesApp::GetConf($Sesion, 'NuevaLibreriaNusoap')) {
+if (Conf::GetConf($Sesion, 'NuevaLibreriaNusoap')) {
 	require_once("lib2/nusoap.php");
 } else {
 	require_once("lib/nusoap.php");
@@ -586,7 +586,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 				$factura_cobro['descripcion'] = $descripcion;
 				$factura_cobro['moneda'] = $codigo_moneda_factura;
 
-				if (UtilesApp::GetConf($Sesion, 'NumeroFacturaConSerie')) {
+				if (Conf::GetConf($Sesion, 'NumeroFacturaConSerie')) {
 					$serie = $serie ? $serie : '001';
 					$factura_cobro['serie'] = str_pad($serie, 3, '0', STR_PAD_LEFT);
 				} else {

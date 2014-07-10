@@ -1060,6 +1060,24 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
+
+					$datos_bancarios = '';
+
+					if (!empty($codigo_swift)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">SWIFT</td><td class="detalle">' . $codigo_swift . '</td></tr>';
+					}
+					if (!empty($codigo_aba)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">ABA</td><td class="detalle">' . $codigo_aba . '</td></tr>';
+					}
+					if (!empty($codigo_cci)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CCI</td><td class="detalle">' . $codigo_cci . '</td></tr>';
+					}
+					if (!empty($codigo_clabe)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CLABE</td><td class="detalle">' . $codigo_clabe . '</td></tr>';
+					}
+
+					$html2 = str_replace('%datos_bancarios%', $datos_bancarios, $html2);
+
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
@@ -1952,6 +1970,24 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
+
+					$datos_bancarios = '';
+
+					if (!empty($codigo_swift)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">SWIFT</td><td class="detalle">' . $codigo_swift . '</td></tr>';
+					}
+					if (!empty($codigo_aba)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">ABA</td><td class="detalle">' . $codigo_aba . '</td></tr>';
+					}
+					if (!empty($codigo_cci)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CCI</td><td class="detalle">' . $codigo_cci . '</td></tr>';
+					}
+					if (!empty($codigo_clabe)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CLABE</td><td class="detalle">' . $codigo_clabe . '</td></tr>';
+					}
+
+					$html2 = str_replace('%datos_bancarios%', $datos_bancarios, $html2);
+
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
