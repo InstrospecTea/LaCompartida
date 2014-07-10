@@ -79,6 +79,36 @@ class Form {
 		return $this->Html->tag('label', $text, $_attrs);
 	}
 	/**
+	 * Devuelve elemento checkbox
+	 * @param type $name
+	 * @param type $value
+	 * @param type $checked
+	 * @param type $attrs
+	 */
+	public function checkbox($name, $value, $checked = false, $attrs = null) {
+		$attrs = (Array) $attrs + array('type' => 'checkbox', 'value' => $value, 'label' => true);
+		$label = null;
+
+		if ($attrs['label'] === true) {
+			$label = $this->Utiles->humanize($name);
+		} else if ($attrs['label'] !== false) {
+			$label = $attrs['label'];
+		}
+		unset($attrs['label'], $attrs['checked']);
+		if (empty($attrs['name'])) {
+			$attrs['name'] = $name;
+		}
+		if (empty($attrs['id'])) {
+			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
+		}
+		if ($checked === true) {
+			$attrs['checked'] = 'checked';
+		}
+		$radio = $this->Html->tag('input', null, $attrs, true);
+		return empty($label) ? $radio : $this->label($radio . $label);
+	}
+
+	/**
 	 * Devuelve elemento radio
 	 * @param type $name
 	 * @param type $value
@@ -165,13 +195,17 @@ class Form {
 	 * @param type $attrs
 	 * @return type
 	 */
-	public function button($text, $attrs) {
+	public function button($text, $attrs = null) {
 		$_attrs = array(
 			'tag' => 'a',
 			'role' => 'button',
 			'aria-disabled' => 'false',
 			'class' => 'btn ui-button ui-widget ui-state-default ui-corner-all form-btn'
 		);
+		if (isset($attrs['class'])) {
+			$_attrs['class'] .= " {$attrs['class']}";
+			unset($attrs['class']);
+		}
 		$attrs = array_merge($_attrs, (array) $attrs);
 
 		$tag = $attrs['tag'];
@@ -193,6 +227,11 @@ class Form {
 		$span_text = $this->Html->tag('span', $text, array('class' => 'ui-button-text'));
 		$this->scripts[] = 'button';
 		return $this->Html->tag($tag, $span_icon . $span_text, $attrs);
+	}
+
+	public function submit($text, $attrs = null) {
+		$attrs['onclick'] = "jQuery(this).closest('form').submit()";
+		return $this->button($text, $attrs);
 	}
 
 	/**
