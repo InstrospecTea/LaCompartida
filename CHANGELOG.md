@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 14.4.13
+Jueves 10 de Julio 2014
+* **Fixed:** [Agrega nuevo tag para morales y besa](https://github.com/LemontechSA/ttb/pull/581)
 
 ## Hotfix: 14.4.12
 Martes 8 de Julio 2014
