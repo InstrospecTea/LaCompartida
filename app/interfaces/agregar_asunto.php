@@ -327,10 +327,10 @@ if ($opcion == "guardar") {
 		}
 		$Asunto->Edit("cobrable", intval($cobrable), true);
 		$Asunto->Edit("mensual", $mensual ? "SI" : "NO");
-		$Asunto->Edit("alerta_hh", $Asunto_alerta_hh);
-		$Asunto->Edit("alerta_monto", $Asunto_alerta_monto);
-		$Asunto->Edit("limite_hh", $Asunto_limite_hh);
-		$Asunto->Edit("limite_monto", $Asunto_limite_monto);
+		$Asunto->Edit("alerta_hh", $asunto_alerta_hh);
+		$Asunto->Edit("alerta_monto", $asunto_alerta_monto);
+		$Asunto->Edit("limite_hh", $asunto_limite_hh);
+		$Asunto->Edit("limite_monto", $asunto_limite_monto);
 
 		//if($Asunto->Write())
 		//{
