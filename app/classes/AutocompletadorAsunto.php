@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 class AutocompletadorAsunto {
@@ -18,9 +17,9 @@ class AutocompletadorAsunto {
 	function ImprimirSelector($Sesion, $codigo_asunto = '', $codigo_asunto_secundario = '', $codigo_cliente = '', $codigo_cliente_secundario = '', $mas_recientes = false, $width = '', $oncambio = '') {
 
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$output .= sprintf('<input type="text" maxlength="10" size="10" id="codigo_asunto_secundario" name="codigo_asunto_secundario" onChange="CargarGlosaAsunto(); %s" value="%s" />', $oncambio, $codigo_asunto_secundario);
+			$output .= sprintf('<input type="text" maxlength="20" size="10" id="codigo_asunto_secundario" name="codigo_asunto_secundario" onChange="CargarGlosaAsunto(); %s" value="%s" />', $oncambio, $codigo_asunto_secundario);
 		} else {
-			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_asunto\" name=\"codigo_asunto\" onChange=\"CargarGlosaAsunto(); $oncambio\" value=\"" . $codigo_asunto . "\" />";
+			$output .= "<input type=\"text\" maxlength=\"20\" size=\"10\" id=\"codigo_asunto\" name=\"codigo_asunto\" onChange=\"CargarGlosaAsunto(); $oncambio\" value=\"" . $codigo_asunto . "\" />";
 		}
 		$glosa_asunto = '';
 		if ($codigo_asunto || $codigo_asunto_secundario) {
@@ -55,8 +54,7 @@ class AutocompletadorAsunto {
 	}
 
 	function CSS() {
-
-		return;
+		return null;
 	}
 
 	function Javascript($Sesion, $cargar_select = true) {
@@ -65,18 +63,19 @@ class AutocompletadorAsunto {
 		} else {
 			$lasid = array('codigo_cliente', 'codigo_asunto', 'codigo_cliente');
 		}
+
 		$id_usuario = intval($Sesion->usuario->fields['id_usuario']);
 		$root_dir = Conf::RootDir();
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 			$bloque_codigo_secundario = "var codigo_asunto = document.getElementById('codigo_asunto_secundario').value;
-										if(document.getElementById('codigo_cliente_secundario')) {
-											var codigo_cliente=document.getElementById('codigo_cliente_secundario').value;
-										}";
+				if(document.getElementById('codigo_cliente_secundario')) {
+					var codigo_cliente=document.getElementById('codigo_cliente_secundario').value;
+				}";
 		} else {
 			$bloque_codigo_secundario = "var codigo_asunto = document.getElementById('codigo_asunto').value;
-										if(document.getElementById('codigo_cliente')) {
-											var codigo_cliente=document.getElementById('codigo_cliente').value;
-										}";
+				if(document.getElementById('codigo_cliente')) {
+					var codigo_cliente=document.getElementById('codigo_cliente').value;
+				}";
 		}
 
 		$bloque_cargar_select = '';
@@ -122,9 +121,7 @@ class AutocompletadorAsunto {
 					var url = root_dir + '/app/ajax.php?accion=cargar_glosa_asunto&id=' + codigo_asunto + '&id_cliente=' + codigo_cliente;
 
 					cargando = true;
-					jQuery.get(url, {}, function(resp) {
-						console.log(resp);return;
-						var response = http.responseText;
+					jQuery.get(url, {}, function(response) {
 						response = response.split('/');
 						response[0] = response[0].replace('|#slash|','/');
 						campo_glosa_asunto.value=response[0];
@@ -147,9 +144,7 @@ class AutocompletadorAsunto {
 					return 'glosa_asunto='  + glosa_asunto + '&codigo_cliente=' + codigo_cliente;
 				}
 			</script>
-
 EOF;
 		return $output;
 	}
-
 }
