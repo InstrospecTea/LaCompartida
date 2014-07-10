@@ -457,7 +457,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					?>
 					<br/>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;"><?php echo __('(sólo los usuarios activos pueden ingresar al sistema)') ?></span>
-					<div id="activo_status" class="alert alert-error" style="display:none;"></div>
+					<div id="activo_status" class="alert alert-error" style="display:none;width:300px;margin-top:20px;padding:5px;"></div>
 				</td>
 			</tr>
 
@@ -945,6 +945,32 @@ function CargarPermisos() {
 
 			return false;
 		});
+
+		<?php if ($usuario->loaded) { ?>
+			jQuery('#activo.btn').click(function() {
+				var id = <?php echo $usuario->fields['id_usuario']; ?>;
+				var activar = '<?php echo __('Activar'); ?>';
+				var me = this;
+				var accion = jQuery(me).find('span').html() == activar ? 'activar' : 'desactivar';
+				var label = jQuery(this).prev();
+				jQuery.post('../interfaces/ajax/permiso_ajax.php', {accion: accion, id_usuario: id, permiso: 'ACT'}, function(resp) {
+					resp = jQuery.parseJSON(resp);
+					if (resp.error) {
+						jQuery('#activo_status').html(resp.error.replace(/\n/g, '<br/>')).show();
+						return;
+					}
+					jQuery('#activo_status').html('').hide();
+					jQuery(me).attr('title', resp.estado);
+					jQuery(me).find('span').html(resp.estado);
+					label.html(resp.label + ' ');
+					if (jQuery(me).find('span').html() == activar) {
+						jQuery('#divVisible').show();
+					} else {
+						jQuery('#divVisible').hide();
+					}
+				});
+			});
+		<?php } ?>
 	});
 
 	window.onbeforeunload = function(){
@@ -999,35 +1025,7 @@ function CargarPermisos() {
 			}
 		});
 	});
-
-	<?php if ($usuario->loaded) { ?>
-
-		jQuery('#activo.btn').click(function() {
-			var id = <?php echo $usuario->fields['id_usuario']; ?>;
-			var activar = '<?php echo __('Activar'); ?>';
-			var me = this;
-			var accion = jQuery(me).find('span').html() == activar ? 'activar' : 'desactivar';
-			var label = jQuery(this).prev();
-			jQuery.post('../interfaces/ajax/permiso_ajax.php', {accion: accion, id_usuario: id, permiso: 'ACT'}, function(resp) {
-				resp = jQuery.parseJSON(resp);
-				if (resp.error) {
-					jQuery('#activo_status').html(resp.error).show();
-					return;
-				}
-				jQuery('#activo_status').html('').hide();
-				jQuery(me).attr('title', resp.estado);
-				jQuery(me).find('span').html(resp.estado);
-				label.html(resp.label + ' ');
-				if (jQuery(me).find('span').html() == activar) {
-					jQuery('#divVisible').show();
-				} else {
-					jQuery('#divVisible').hide();
-				}
-			});
-		});
-	<?php } ?>
 </script>
 
 <?php
 $pagina->PrintBottom();
-

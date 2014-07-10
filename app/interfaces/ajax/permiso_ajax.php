@@ -22,8 +22,8 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 
 	if ($Usuario->LoadId($_POST['id_usuario'])) {
 		$error_cupo = "Estimado {$Sesion->usuario->fields['nombre']} {$Sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuación se detalla su cupo actual.\n\n" .
-			"* Usuarios activos con perfil <b>Profesional</b>: {$UsuarioPermiso->cupo_profesionales}\n".
-			"* Usuarios activos con perfil <b>Administrativos</b>: {$UsuarioPermiso->cupo_administrativos}\n\n" .
+			"* Usuarios activos con perfil Profesional: {$UsuarioPermiso->cupo_profesionales}\n".
+			"* Usuarios activos con perfil Administrativos: {$UsuarioPermiso->cupo_administrativos}\n\n" .
 			"Si desea aumentar su cupo debe contactarse con areacomercial@lemontech.cl o en su defecto puede desactivar usuarios para habilitar cupos.";
 
 		switch ($_POST['accion']) {
@@ -59,10 +59,12 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 				break;
 			case 'activar':
 				$permitir_activar = true;
+				$es_profesional = $UsuarioPermiso->esProfesional($_POST['id_usuario']);
+				$es_administrativo = $UsuarioPermiso->esAdministrativo($_POST['id_usuario']);
 
-				if ($UsuarioPermiso->esProfesional($_POST['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'PRO')) {
+				if ($es_profesional && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'PRO')) {
 					$permitir_activar = false;
-				} else if ($UsuarioPermiso->esAdministrativo($_POST['id_usuario']) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'ADM')) {
+				} else if ((!$es_profesional && $es_administrativo) && !$UsuarioPermiso->existeCupo($_POST['id_usuario'], 'ADM')) {
 					$permitir_activar = false;
 				}
 

@@ -195,7 +195,7 @@ class Form {
 	 * @param type $attrs
 	 * @return type
 	 */
-	public function button($text, $attrs) {
+	public function button($text, $attrs = null) {
 		$_attrs = array(
 			'tag' => 'a',
 			'role' => 'button',
@@ -229,7 +229,7 @@ class Form {
 		return $this->Html->tag($tag, $span_icon . $span_text, $attrs);
 	}
 
-	public function submit($text, $attrs) {
+	public function submit($text, $attrs = null) {
 		$attrs['onclick'] = "jQuery(this).closest('form').submit()";
 		return $this->button($text, $attrs);
 	}
