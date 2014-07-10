@@ -684,7 +684,7 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 			$Slim->applyHook('hook_genera_factura_electronica', &$data);
 			$error = $data['Error'];
 			if ($error) {
-				halt($error['Code'] ? __($error['Code']) : __($error['Message']), $error['Code'], 400, $data['ExtraData']);
+				halt($error['Message'] ? __($error['Message']) : __($error['Code']), $error['Code'], 400, $data['ExtraData']);
 			} else {
 				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData']));
 			}

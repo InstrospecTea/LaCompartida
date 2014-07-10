@@ -83,10 +83,7 @@ EOF;
 			$password = $Estudio->GetMetadata('facturacion_electronica_cl.password');
 			$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
 			if ($WsFacturacionCl->hasError()) {
-				$hookArg['Error'] = array(
-					'Code' => $WsFacturacionCl->getErrorCode(),
-					'Message' => $WsFacturacionCl->getErrorMessage()
-				);
+				$hookArg['Error'] = self::ParseError($WsFacturacionCl, $WsFacturacionCl->getErrorCode());
 			} else {
 				$arrayDocumento = self::FacturaToArray($Sesion, $Factura ,$Estudio);
 				$hookArg['ExtraData'] = $arrayDocumento;
@@ -101,20 +98,30 @@ EOF;
 							$hookArg['InvoiceURL'] = $file_url;
 						}
 					} catch (Exception $ex) {
-						$hookArg['Error'] = array(
-							'Code' => 'SaveGeneratedInvoiceError',
-							'Message' => print_r($ex, true)
-						);
+						$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 					}
 				} else {
-					$hookArg['Error'] = array(
-						'Code' => 'BuildingInvoiceError',
-						'Message' => utf8_decode($WsFacturacionCl->getErrorMessage())
-					);
+					$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'BuildingInvoiceError');
 				}
 			}
 		}
 		return $hookArg;
+	}
+
+
+	public static function ParseError($result, $error_code) {
+		$error_description = null;
+		if (is_a($result, 'Exception')) {
+			$error_log = $result->__toString();
+		} else {
+			$error_description = utf8_decode($result->getErrorMessage());
+			$error_log = $error_description;
+		}
+		Log::write($error_log, "FacturacionElectronicaCl");
+		return array(
+			'Code' =>  $error_code,
+			'Message' => $error_description
+		);
 	}
 
 	public static function AnulaFacturaElectronica($hookArg) {
@@ -143,16 +150,10 @@ EOF;
 					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
 					$Factura->Write();
 				} catch (Exception $ex) {
-					$hookArg['Error'] = array(
-						'Code' => 'SaveCanceledInvoiceError',
-						'Message' => print_r($ex, true)
-					);
+					$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
 				}
 			} else {
-				$hookArg['Error'] = array(
-					'Code' => 'CancelGeneratedInvoiceError',
-					'Message' => $WsFacturacionCl->getErrorMessage()
-				);
+				$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
 			}
 		}
 		return $hookArg;

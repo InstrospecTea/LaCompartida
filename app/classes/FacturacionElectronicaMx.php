@@ -140,26 +140,32 @@ EOF;
 						$hookArg['InvoiceURL'] = $file_url;
 					}
 				} catch (Exception $ex) {
-					$hookArg['Error'] = array(
-						'Code' => 'BuildingInvoiceError',
-						'Message' => $ex->__toString()
-					);
-					Log::write(trim($ex->__toString()), "FacturacionElectronicaMx");
+					self::ParseError($ex, 'BuildingInvoiceError');
 				}
 			} else {
-				$error_code = $result->codigo >= 501 ? null : "ERROR_{$result->codigo}";
-				$hookArg['Error'] = array(
-					'Code' =>  $error_code,
-					'Message' => utf8_decode($result->descripcion)
-				);
+				$hookArg['Error'] = self::ParseError($result, 'BuildingInvoiceError');
 				$estado_dte = Factura::$estados_dte['ErrorFirmado'];
 				$Factura->Edit('dte_estado', $estado_dte);
 				$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
 				$Factura->Write();
-				Log::write(utf8_decode($result->descripcion), "FacturacionElectronicaMx");
 			}
 		}
 		return $hookArg;
+	}
+
+	public static function ParseError($result, $error_code) {
+		$error_description = null;
+		if (is_a($result, 'Exception')) {
+			$error_log = $result->__toString();
+		} else {
+			$error_description = $result->codigo >= 501 ? null : "ERROR_{$result->codigo}";
+			$error_log = utf8_decode($result->descripcion);
+		}
+		Log::write($error_log, "FacturacionElectronicaMx");
+		return array(
+			'Code' =>  $error_code,
+			'Message' => $error_description
+		);
 	}
 
 	public static function AnulaFacturaElectronica($hookArg) {
@@ -191,11 +197,7 @@ EOF;
 				$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
 				$Factura->Write();
 			} catch (Exception $ex) {
-				$hookArg['Error'] = array(
-					'Code' => 'SaveCanceledInvoiceError',
-					'Message' => print_r($ex, true)
-				);
-				Log::write(trim($ex->getTraceAsString()), "FacturacionElectronicaMx");
+				$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
 			}
 		} else {
 			$mensaje = "Usted ha solicitado anular un Documento Tributario Electrónico. Este proceso puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
@@ -203,11 +205,7 @@ EOF;
 			$Factura->Edit('dte_estado', $estado_dte);
 			$Factura->Edit('dte_estado_descripcion', $mensaje);
 			$Factura->Write();
-			$hookArg['Error'] = array(
-				'Code' => 'CancelGeneratedInvoiceError',
-				'Message' => utf8_decode($result->descripcion)
-			);
-			Log::write(utf8_decode($result->descripcion), "FacturacionElectronicaMx");
+			$hookArg['Error'] = self::ParseError($result, 'CancelGeneratedInvoiceError');
 		}
 		return $hookArg;
 	}
