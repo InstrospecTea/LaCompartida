@@ -856,7 +856,7 @@ function CargarPermisos() {
 
 		$error_cupo = "Estimado {$sesion->usuario->fields['nombre']} {$sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuación se detalla su cupo actual.<br><br>" .
 			"* Usuarios activos con perfil <b>Profesional</b>: {$UsuarioPermiso->cupo_profesionales}<br>".
-			"* Usuarios activos con perfil <b>Administrativos</b>': {$UsuarioPermiso->cupo_administrativos}<br><br>" .
+			"* Usuarios activos con perfil <b>Administrativos</b>: {$UsuarioPermiso->cupo_administrativos}<br><br>" .
 			"Si desea aumentar su cupo debe contactarse con {$mailto} o en su defecto puede desactivar usuarios para habilitar cupos.";
 
 		// lista actual de permisos sin considerar ALL
