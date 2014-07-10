@@ -1201,8 +1201,11 @@ QUERY;
 
 		case 7.75:
 			$queries = array();
-			if (!ExisteCampo('prm_documento_legal', 'codigo_dte', $dbh)) {
+			if (!ExisteCampo('codigo_dte', 'prm_documento_legal', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_documento_legal` ADD `codigo_dte` VARCHAR(20) NULL;";
+			}
+			if (!ExisteCampo('documento_afecto', 'prm_documento_legal', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_documento_legal` ADD `documento_afecto` TINYINT( 1 ) NOT NULL DEFAULT '0';";
 			}
 			ejecutar($queries, $dbh);
 			break;

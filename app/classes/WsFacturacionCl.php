@@ -28,6 +28,7 @@ class WsFacturacionCl {
 	 * @param type $dataFactura datos de la factura
 	 */
 	public function emitirFactura($dataFactura) {
+		$afecto = $dataFactura['afecto'];
 		$documento = array(
 			'Encabezado' => array(
 				'IdDoc' => array(
@@ -53,11 +54,11 @@ class WsFacturacionCl {
 					'CiudadRecep' => $dataFactura['receptor']['cuidad']
 				),
 				'Totales' => array(
-					'MntNeto' => $dataFactura['monto_neto'],
-					'MntExe' => $dataFactura['monto_neto'],
-					'TasaIVA' => $dataFactura['tasa_iva'],
-					'IVA' => $dataFactura['monto_iva'],
-					'MntTotal' => $dataFactura['monto_total']
+					'MntNeto' => $afecto ? $dataFactura['monto_neto'] : 0,
+					'MntExe' => $afecto ? 0 : $dataFactura['monto_neto'],
+					'TasaIVA' => $afecto ? $dataFactura['tasa_iva'] : 0,
+					'IVA' => $afecto ? $dataFactura['monto_iva'] : 0,
+					'MntTotal' => $afecto ? $dataFactura['monto_total'] : $dataFactura['monto_neto']
 				)
 			)
 		);
@@ -77,7 +78,7 @@ class WsFacturacionCl {
 				'MontoItem' => $detalle['cantidad'] * $detalle['precio_unitario']
 			);
 		}
-
+		Log::write(print_r($documento, true), 'FacturacionElectronicaCl');
 		return $this->enviarDocumento($documento);
 	}
 
@@ -108,10 +109,15 @@ class WsFacturacionCl {
 			'tipo' => base64_encode($documento['TipoDte']),
 			'cedible' => base64_encode($original ? 'False' : 'True')
 		);
-		$respuesta = $this->Client->ObtenerLink($params);
-		$sxmle = new SimpleXMLElement($respuesta->ObtenerLinkResult);
-		$xml = self::XML2Array($sxmle);
-		$url64 = $xml['Mensaje'];
+		try {
+			$respuesta = $this->Client->ObtenerLink($params);
+			$sxmle = new SimpleXMLElement($respuesta->ObtenerLinkResult);
+			$xml = self::XML2Array($sxmle);
+			$url64 = $xml['Mensaje'];
+		} catch (SoapFault $sf) {
+			$url64 = '';
+			$this->setError(1, $sf->getMessage());
+		}
 		return base64_decode($url64);
 	}
 

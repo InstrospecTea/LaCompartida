@@ -87,21 +87,25 @@ EOF;
 			} else {
 				$arrayDocumento = self::FacturaToArray($Sesion, $Factura ,$Estudio);
 				$hookArg['ExtraData'] = $arrayDocumento;
-				$result = $WsFacturacionCl->emitirFactura($arrayDocumento);
-				if (!$WsFacturacionCl->hasError()) {
-					try {
-						$Factura->Edit('dte_xml', $result['Detalle']['Documento']['xmlDTE']);
-						$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
-						$file_url = $result['Detalle']['Documento']['urlPDF'];
-						$Factura->Edit('dte_url_pdf', $file_url);
-						if ($Factura->Write()) {
-							$hookArg['InvoiceURL'] = $file_url;
+				try {
+					$result = $WsFacturacionCl->emitirFactura($arrayDocumento);
+					if (!$WsFacturacionCl->hasError()) {
+						try {
+							$Factura->Edit('dte_xml', $result['Detalle']['Documento']['xmlDTE']);
+							$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
+							$file_url = $result['Detalle']['Documento']['urlPDF'];
+							$Factura->Edit('dte_url_pdf', $file_url);
+							if ($Factura->Write()) {
+								$hookArg['InvoiceURL'] = $file_url;
+							}
+						} catch (Exception $ex) {
+							$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 						}
-					} catch (Exception $ex) {
-						$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
+					} else {
+						$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'BuildingInvoiceError');
 					}
-				} else {
-					$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'BuildingInvoiceError');
+				} catch  (Exception $ex) {
+					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 				}
 			}
 		}
@@ -174,9 +178,10 @@ EOF;
 		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
 		$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-
+		$afecto = $PrmDocumentoLegal->fields['documento_afecto'];
 		$arrayFactura = array(
 			'tipo_dte' => $tipoDTE,
+			'afecto' => $afecto,
 			'fecha_emision' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
 			'folio' => $Factura->fields['numero'],
 			'monto_neto' => intval($subtotal_factura),
