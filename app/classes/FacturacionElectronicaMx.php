@@ -255,7 +255,7 @@ EOF;
 		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
 		$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
-		$tipoComprobante = $tipo_documento_legal == 'NC' ? 'egreso' : 'ingreso';
+		$tipoComprobante = $PrmDocumentoLegal->fields['codigo_dte'];
 
 		$r = array(
 			'COM' => array(

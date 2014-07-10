@@ -144,7 +144,10 @@ EOF;
 				'Message' => $WsFacturacionCl->getErrorMessage()
 			);
 		} else {
-			$WsFacturacionCl->anularFactura($Factura->fields['numero']);
+			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
+			$WsFacturacionCl->anularFactura($Factura->fields['numero'], $tipoDTE);
 			if (!$WsFacturacionCl->hasError()) {
 				try {
 					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
@@ -167,7 +170,13 @@ EOF;
 	 */
 	public static function FacturaToArray(Sesion $Sesion, Factura $Factura, PrmEstudio $Estudio) {
 		$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
+
+		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+		$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
+
 		$arrayFactura = array(
+			'tipo_dte' => $tipoDTE,
 			'fecha_emision' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
 			'folio' => $Factura->fields['numero'],
 			'monto_neto' => intval($subtotal_factura),

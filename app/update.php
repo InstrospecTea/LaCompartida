@@ -1198,6 +1198,14 @@ QUERY;
 			$queries[] = "UPDATE factura SET serie_documento_legal = LPAD(serie_documento_legal, 3, '0');";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.75:
+			$queries = array();
+			if (!ExisteCampo('prm_documento_legal', 'codigo_dte', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_documento_legal` ADD `codigo_dte` VARCHAR(20) NULL;";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -1207,7 +1215,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.74;
+$max_update = 7.75;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

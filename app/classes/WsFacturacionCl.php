@@ -26,13 +26,12 @@ class WsFacturacionCl {
 	/**
 	 *
 	 * @param type $dataFactura datos de la factura
-	 * @param type $afecta indica si la factura es afecta, defaul false
 	 */
-	public function emitirFactura($dataFactura, $afecta = false) {
+	public function emitirFactura($dataFactura) {
 		$documento = array(
 			'Encabezado' => array(
 				'IdDoc' => array(
-					'TipoDTE' => $afecta ? 33 : 34,
+					'TipoDTE' => $dataFactura['tipo_dte'],
 					'Folio' => $dataFactura['folio'],
 					'FchEmis' => $dataFactura['fecha_emision']
 				),
@@ -55,9 +54,9 @@ class WsFacturacionCl {
 				),
 				'Totales' => array(
 					'MntNeto' => $dataFactura['monto_neto'],
-					'MntExe' => $afecta ? 0 : $dataFactura['monto_neto'],
-					'TasaIVA' => $afecta ? $dataFactura['tasa_iva'] : 0,
-					'IVA' => $afecta ? $dataFactura['monto_iva'] : 0,
+					'MntExe' => $dataFactura['monto_neto'],
+					'TasaIVA' => $dataFactura['tasa_iva'],
+					'IVA' => $dataFactura['monto_iva'],
 					'MntTotal' => $dataFactura['monto_total']
 				)
 			)
@@ -82,8 +81,7 @@ class WsFacturacionCl {
 		return $this->enviarDocumento($documento);
 	}
 
-	public function anularFactura($folio, $afecta = false) {
-		$tipo = $afecta ? 33 : 34;
+	public function anularFactura($folio, $tipo) {
 		return $this->anularDocumento('V', $folio, $tipo);
 	}
 
