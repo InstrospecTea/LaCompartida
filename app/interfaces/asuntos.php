@@ -28,9 +28,7 @@ if ($excel) {
 	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
 }
 
-if ($selectclienteasuntoespecial) {
-	require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
-} else {
+if (!$selectclienteasuntoespecial) {
 	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 }
 
@@ -449,12 +447,6 @@ function funcionTR(& $Asunto) {
 	$html .= "</tr>";
 	$i++;
 	return $html;
-}
-
-if ($selectclienteasuntoespecial) {
-	if (empty($_REQUEST['id_cobro']) && $from != 'agregar_cliente') {
-		echo(AutocompletadorAsunto::Javascript($Sesion, false));
-	}
 }
 
 $Pagina->PrintBottom($popup);
