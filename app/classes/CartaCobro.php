@@ -1696,7 +1696,7 @@ class CartaCobro extends NotaCobro {
 				}
 
 				if ($this->fields['opc_moneda_total'] != $this->fields['id_moneda']) {
-					$html2 = str_replace('%equivalente_a_baz%', ', equivalentes a ' . $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%equivalente_a_baz%', __(', equivalentes a ') . $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
 					$html2 = str_replace('%equivalente_a_baz%', '', $html2);
 				}
