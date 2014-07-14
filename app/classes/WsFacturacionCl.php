@@ -162,16 +162,16 @@ class WsFacturacionCl {
 		$login = $this->getLogin();
 		$params = array(
 			'login' => $login,
-			'tpomov' => base64_encode('V'),
+			'tpomov' => base64_encode($tpomov),
 			'folio' => base64_encode($folio),
 			'tipo' => base64_encode($tipo)
 		);
 		$respuesta = $this->Client->EliminarDoc($params);
 		Log::write(print_r($respuesta, true), 'FacturacionElectronicaCl');
-		$sxmle = new SimpleXMLElement($respuesta);
+		$sxmle = new SimpleXMLElement($respuesta->EliminarDocResult);
 		$xml = self::XML2Array($sxmle);
-		if ($xml['Resultado'] != 'OK') {
-			$this->setError(1, $xml['Mensaje']);
+		if ($xml['Mensaje']['Resultado'] != 'OK') {
+			$this->setError(1, $xml['Mensaje']['Resultado']);
 		}
 		return $xml;
 	}

@@ -8,7 +8,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
 		}
 		if (empty($direccion_cliente)) {
-			$pagina->AddError(__('Debe ingresar Direcci髇 del cliente.'));
+			$pagina->AddError(__('Debe ingresar Direcci贸n del cliente.'));
 		}
 		if (empty($comuna_cliente)) {
 			$pagina->AddError(__('Debe ingresar Comuna del cliente.'));
@@ -25,7 +25,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 		$BotonDescargarHTML = self::BotonDescargarHTML('0');
 		echo <<<EOF
 			jQuery(document).on("click", ".factura-electronica", function() {
-				if (!confirm("緾onfirma la generaci髇 de Factura electr髇ica?")) {
+				if (!confirm("驴Confirma la generaci贸n de Factura electr贸nica?")) {
 					return;
 				}
 				var self = jQuery(this);
@@ -118,6 +118,7 @@ EOF;
 		if (is_a($result, 'Exception')) {
 			$error_log = $result->__toString();
 		} else {
+
 			$error_description = utf8_decode($result->getErrorMessage());
 			$error_log = $error_description;
 		}
@@ -154,13 +155,21 @@ EOF;
 			$WsFacturacionCl->anularFactura($Factura->fields['numero'], $tipoDTE);
 			if (!$WsFacturacionCl->hasError()) {
 				try {
+					$estado_dte = Factura::$estados_dte['Anulado'];
 					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+					$Factura->Edit('dte_estado', $estado_dte);
+					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 					$Factura->Write();
 				} catch (Exception $ex) {
 					$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
 				}
 			} else {
 				$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
+				$mensaje = "Usted ha solicitado anular un Documento Tributario Electr贸nico. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
+				$estado_dte = Factura::$estados_dte['ProcesoAnular'];
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', $mensaje);
+				$Factura->Write();
 			}
 		}
 		return $hookArg;
