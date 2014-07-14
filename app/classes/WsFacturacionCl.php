@@ -170,7 +170,7 @@ class WsFacturacionCl {
 		Log::write(print_r($respuesta, true), 'FacturacionElectronicaCl');
 		$sxmle = new SimpleXMLElement($respuesta);
 		$xml = self::XML2Array($sxmle);
-		if ($xml['Resultado'] != 'True') {
+		if ($xml['Resultado'] != 'OK') {
 			$this->setError(1, $xml['Mensaje']);
 		}
 		return $xml;
