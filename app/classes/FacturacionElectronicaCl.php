@@ -8,7 +8,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
 		}
 		if (empty($direccion_cliente)) {
-			$pagina->AddError(__('Debe ingresar Direcci贸n del cliente.'));
+			$pagina->AddError(__('Debe ingresar Direcci髇 del cliente.'));
 		}
 		if (empty($comuna_cliente)) {
 			$pagina->AddError(__('Debe ingresar Comuna del cliente.'));
@@ -25,7 +25,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 		$BotonDescargarHTML = self::BotonDescargarHTML('0');
 		echo <<<EOF
 			jQuery(document).on("click", ".factura-electronica", function() {
-				if (!confirm("驴Confirma la generaci贸n de Factura electr贸nica?")) {
+				if (!confirm("緾onfirma la generaci髇 de Factura electr髇ica?")) {
 					return;
 				}
 				var self = jQuery(this);
@@ -165,7 +165,7 @@ EOF;
 				}
 			} else {
 				$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
-				$mensaje = "Usted ha solicitado anular un Documento Tributario Electr贸nico. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
+				$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
 				$estado_dte = Factura::$estados_dte['ProcesoAnular'];
 				$Factura->Edit('dte_estado', $estado_dte);
 				$Factura->Edit('dte_estado_descripcion', $mensaje);
