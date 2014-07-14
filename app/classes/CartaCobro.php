@@ -663,7 +663,7 @@ class CartaCobro extends NotaCobro {
 					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					} else {
-						$fecha_diff_periodo_exacto = __('from') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
+						$fecha_diff_periodo_exacto = __('from') . ' ' . date("m-d-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					}
 
 					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
@@ -682,7 +682,7 @@ class CartaCobro extends NotaCobro {
 				if ($lang == 'es') {
 					$fecha_diff_periodo_exacto .= __('hasta el día') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
 				} else {
-					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
+					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%m-%d-%Y');
 				}
 
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
@@ -1474,7 +1474,7 @@ class CartaCobro extends NotaCobro {
 					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					} else {
-						$fecha_diff_periodo_exacto = __('from') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
+						$fecha_diff_periodo_exacto = __('from') . ' ' . date("m-d-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					}
 
 					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
@@ -1495,7 +1495,7 @@ class CartaCobro extends NotaCobro {
 				if ($lang == 'es') {
 					$fecha_diff_periodo_exacto .= __('hasta el día') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
 				} else {
-					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
+					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%m-%d-%Y');
 				}
 
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
