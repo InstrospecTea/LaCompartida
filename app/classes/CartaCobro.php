@@ -809,7 +809,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				if ($this->fields['opc_moneda_total'] != $this->fields['id_moneda']) {
-					$html2 = str_replace('%equivalente_a_baz%', ', equivalentes a ' . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%equivalente_a_baz%', __(', equivalentes a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
 					$html2 = str_replace('%equivalente_a_baz%', '', $html2);
 				}
