@@ -1188,6 +1188,7 @@ class Factura extends Objeto {
 				}
 
 				$html2 = str_replace('%Euro%', 'EUROS', $html2);
+				$html2 = str_replace('%Colones%', 'COLON', $html2);
 				if (method_exists('Conf', 'GetConf')) {
 					$html2 = str_replace('%porcentaje%', Conf::GetConf($this->sesion, 'ValorImpuesto') . '%', $html2);
 				} else if (method_exists('Conf', 'ValorImpuesto')) {
