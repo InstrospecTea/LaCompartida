@@ -14,7 +14,7 @@ apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 $sesion = new Sesion();
 $ns = "urn:TimeTracking";
 
-if (UtilesApp::GetConf($sesion, 'NuevaLibreriaNusoap')) {
+if (Conf::GetConf($sesion, 'NuevaLibreriaNusoap')) {
 	require_once("lib2/nusoap.php");
 } else {
 	require_once("lib/nusoap.php");
@@ -208,15 +208,15 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
                     carta.descripcion as glosa_carta,
                     cobro.documento
                     FROM cobro
-                    JOIN cobro_moneda as cobro_moneda_mt ON cobro_moneda_mt.id_cobro = cobro.id_cobro AND cobro_moneda_mt.id_moneda = cobro.opc_moneda_total 
-                    JOIN cobro_moneda as cobro_moneda_tarifa ON cobro_moneda_tarifa.id_cobro = cobro.id_cobro AND cobro_moneda_tarifa.id_moneda = cobro.id_moneda 
-                    LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda 
-                    LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total 
-                    LEFT JOIN carta ON carta.id_carta=cobro.id_carta 
-                    LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato 
-                    LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario 
-                    LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario 
-                    WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR') 
+                    JOIN cobro_moneda as cobro_moneda_mt ON cobro_moneda_mt.id_cobro = cobro.id_cobro AND cobro_moneda_mt.id_moneda = cobro.opc_moneda_total
+                    JOIN cobro_moneda as cobro_moneda_tarifa ON cobro_moneda_tarifa.id_cobro = cobro.id_cobro AND cobro_moneda_tarifa.id_moneda = cobro.id_moneda
+                    LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
+                    LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total
+                    LEFT JOIN carta ON carta.id_carta=cobro.id_carta
+                    LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+                    LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
+                    LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+                    WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
                     $query_timestamp
         GROUP BY cobro.id_cobro";
 
@@ -411,7 +411,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 				$factura_cobro['descripcion'] = $descripcion;
 				$factura_cobro['moneda'] = $codigo_moneda_factura;
 
-				if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+				if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 					$serie = $serie ? $serie : '001';
 					$factura_cobro['serie'] = str_pad($serie, 3, '0', STR_PAD_LEFT);
 				} else {
@@ -465,7 +465,7 @@ class PaginaFalsa {
 
 }
 
-//Wrapper para agregar_pago_factura.php (esto impide que se pisen variables). Todo outbut se guarda en out. 
+//Wrapper para agregar_pago_factura.php (esto impide que se pisen variables). Todo outbut se guarda en out.
 function AgregarPagoFactura($p, $sesion) {
 	$opcion = 'guardar';
 	$desde_webservice = true;
@@ -663,7 +663,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 								}
 							} else {
 								//Agregar nueva factura
-								//$id_cobro 
+								//$id_cobro
 								$codigo_cliente = $cobro->fields['codigo_cliente'];
 
 								$tipo = '';
@@ -777,10 +777,10 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 
 											//Reviso que la cuenta exista para la moneda.
 											$query_cuenta =
-													"SELECT cuenta_banco.id_cuenta, cuenta_banco.numero AS NUMERO, CONCAT( cuenta_banco.numero, IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT('(',prm_moneda.codigo,')'),  '' ) ) AS NUMERO_MONEDA, 
+													"SELECT cuenta_banco.id_cuenta, cuenta_banco.numero AS NUMERO, CONCAT( cuenta_banco.numero, IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT('(',prm_moneda.codigo,')'),  '' ) ) AS NUMERO_MONEDA,
 											cuenta_banco.id_moneda
 											FROM cuenta_banco
-											LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda 
+											LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda
 											WHERE id_banco = '$id_banco'";
 											$resp_cuenta = mysql_query($query_cuenta, $sesion->dbh) or Utiles::errorSQL($query_cuenta, __FILE__, __LINE__, $sesion->dbh);
 
@@ -859,5 +859,5 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 #Then we invoke the service using the following line of code:
 
 $server->service($HTTP_RAW_POST_DATA);
-#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL: 
+#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL:
 ?>

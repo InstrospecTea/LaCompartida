@@ -1,19 +1,14 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/classes/UsuarioExt.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
 
 $sesion = new Sesion(array('ADM'));
 $pagina = new Pagina($sesion);
-$rut_limpio = Utiles::LimpiarRut($rut);
+$esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut';
+$rut_limpio = $esRut ? Utiles::LimpiarRut($rut) : preg_replace('/[,\.-]+/', '', $rut);
 $usuario = new UsuarioExt($sesion, $rut_limpio);
 
-$validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValidacionesCliente');
+$validaciones_segun_config = Conf::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span style="color:#ff0000;font-size:10px;vertical-align:top;">*</span>';
 
 if ($opc == "eliminar") {
@@ -35,7 +30,7 @@ if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
 	$arr1 = $usuario->fields;
 
-	$usuario->Edit('rut', Utiles::LimpiarRut($rut));
+	$usuario->Edit('rut', $rut_limpio);
 	$usuario->Edit('dv_rut', $dv_rut);
 	$usuario->Edit('nombre', $nombre);
 	$usuario->Edit('apellido1', $apellido1);
@@ -57,7 +52,9 @@ if ($opc == 'edit') {
 	$usuario->Edit('telefono1', $telefono1);
 	$usuario->Edit('telefono2', $telefono2);
 	$usuario->Edit('email', $email);
-	$usuario->Edit('activo', $activo);
+	if (isset($activo) && $usuario->fields['activo'] != $activo) {
+		$usuario->Edit('activo', $activo);
+	}
 	$usuario->Edit('visible', $activo == 1 ? 1 : $visible);
 	$usuario->Edit('restriccion_min', $restriccion_min);
 	$usuario->Edit('restriccion_max', $restriccion_max);
@@ -85,35 +82,33 @@ if ($opc == 'edit') {
 		if ($usuario->loaded) {
 
 			if ($usuario->Write()) {
-				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
-
-				//echo 'Categoria actual <b>'.$id_categoria_usuario.'</b></br>';
 
 				if ( $id_categoria_anterior != $id_categoria_usuario) {
 					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 				}
 
 				$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
-				$pagina->AddInfo(__('Usuario editado con éxito.'));
+
+				if (CargarPermisos()) {
+					$pagina->AddInfo(__('Usuario editado con éxito.'));
+				}
 			} else {
 				$pagina->AddError($usuario->error);
 			}
-
 		} else {
-
-
 			$new_password = Utiles::NewPassword();
 			$usuario->Edit('password', md5($new_password));
 
 			if ($usuario->Write()) {
-				CargarPermisos();
 				$usuario->GuardarSecretario($usuario_secretario);
 				$usuario->GuardarRevisado($arreglo_revisados);
 				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 
-				$pagina->AddInfo(__('Usuario ingresado con éxito, su nuevo password es') . ' ' . $new_password);
+				if (CargarPermisos()) {
+					$pagina->AddInfo(__('Usuario ingresado con éxito, su nuevo password es') . ' ' . $new_password);
+				}
 			} else {
 				$pagina->AddError($usuario->error);
 			}
@@ -176,7 +171,7 @@ if ($usuario->loaded) {
 
 $pagina->titulo = __('Administración - Usuarios');
 $pagina->PrintTop();
-
+$Form = new Form;
 if ($usuario->loaded) {
 	$dv_rut = $usuario->fields['dv_rut'];
 }
@@ -188,19 +183,6 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 <script type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 
 <script type="text/javascript">
-
-	<?php if ($usuario->loaded) { ?>
-
-	function CheckActivo(activo)
-	{
-		if (!activo.checked) {
-			$('divVisible').style['display']="inline";
-		} else {
-			$('divVisible').style['display']="none";
-			}
-	}
-	<?php } ?>
-
 	function Cancelar(form)
 	{
 		form.opc.value = 'cancelar';
@@ -345,31 +327,18 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<tr>
 				<td valign="top" class="texto" align="right">
 					<strong>
-
-						<?php
-						$nombre_identificador = ( method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'NombreIdentificador') : Conf::NombreIdentificador() );
-						echo $nombre_identificador
-						?>
-
+						<?php echo Conf::GetConf($sesion, 'NombreIdentificador'); ?>
 					</strong>
 				</td>
 				<td valign="top" class="texto" align="left">
-
-					<?php
-
-					if ( $nombre_identificador == 'RUT' ) {
-						$separador = '-';
-					} else {
-						$separador = '';
-					} ?>
-
+					<?php $separador = $esRut ? '-' : ''; ?>
 					<strong> <?php echo $rut ?> <?php echo $separador ?> <?php echo $dv_rut ?> </strong>
 				</td>
 			</tr>
 
 			<tr>
 				<td valign="top" class="texto" align="right">
-					<?php echo __('Nombre Completo') ?><span class="req">*</span>
+					<?php echo __('Nombres') ?><span class="req">*</span>
 				</td>
 				<td valign="top" class="texto" align="left">
 					<input type="text" name="nombre" value="<?php echo $usuario->fields['nombre'] ? $usuario->fields['nombre'] : $nombre ?>" size="30" style=""/>
@@ -430,17 +399,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 				<td valign="top" class="texto" align="left">
-
-					<?php
-					$query_areas = 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa';
-					if ($modulo_retribuciones_activo) {
-						$query_areas = 'SELECT area.id, CONCAT(REPEAT("&nbsp;", IF(ISNULL(padre.id), 0, 5)), area.glosa) FROM prm_area_usuario AS area
-										LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
-										ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
-					}
-
-					echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario)
- 					?>
+					<?php echo AreaUsuario::SelectAreas($sesion, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario); ?>
 				</td>
 			</tr>
 
@@ -487,24 +446,33 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					&nbsp;
 				</td>
 				<td valign="top" class="texto" align="left">
-					<input id="activo" type="checkbox" name="activo" value="1" <?php echo (($usuario->fields['activo'] || $activo || !$usuario->loaded ) ? 'checked' : '') ?> <?php if ($usuario->loaded) { ?> onClick="CheckActivo(this);" <?php } ?>/>
-					<label for="activo"><?php echo __('Usuario Activo') ?></label><br/>
+					<?php
+					if ($usuario->loaded) {
+						$label = $usuario->fields['activo'] ? __('Usuario Activo') : __('Usuario Inactivo');
+						echo $Form->label("$label ", null, array('style' => 'font-weight: bold'));
+						echo $Form->button($usuario->fields['activo'] ? __('Desactivar') : __('Activar'), array('id' => 'activo'));
+					} else {
+						echo $Form->checkbox('activo', 1, true, array('label' => __('Usuario Activo'), 'id' => 'activo'));
+					}
+					?>
+					<br/>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;"><?php echo __('(sólo los usuarios activos pueden ingresar al sistema)') ?></span>
+					<div id="activo_status" class="alert alert-error" style="display:none;width:300px;margin-top:20px;padding:5px;"></div>
 				</td>
 			</tr>
 
 			<?php if ($usuario->loaded) { ?>
-			<tr>
-				<td valign="top" class="texto" align="right">
-					&nbsp;
-				</td>
-				<td valign="top" class="texto" align="left">
-					<div id=divVisible <?php if ($usuario->fields['activo'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"' ?>>
-						<input type=checkbox name=visible value=1 <?php echo $usuario->fields['visible'] == 1 ? "checked" : "" ?> id="chkVisible" onMouseover="ddrivetip('Usuario visible en listados')" onMouseout="hideddrivetip()">
-						<label for="visible"><?php echo __('Visible en Listados') ?></label>
-					</div>
-				</td>
-			</tr>
+				<tr>
+					<td valign="top" class="texto" align="right">
+						&nbsp;
+					</td>
+					<td valign="top" class="texto" align="left">
+						<div id="divVisible" style="display:<?php echo ($usuario->fields['activo'] == 1) ? 'none' : 'inline' ?>">
+							<input type="checkbox" name="visible" value="1" <?php echo $usuario->fields['visible'] == 1 ? "checked" : "" ?> id="chkVisible" onMouseover="ddrivetip('Usuario visible en listados')" onMouseout="hideddrivetip()">
+							<label for="visible"><?php echo __('Visible en Listados') ?></label>
+						</div>
+					</td>
+				</tr>
 			<?php } ?>
 
 		</table>
@@ -570,7 +538,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo $usuario->select_no_revisados() ?>
 				</td>
 				<td>
-					<input type="button" class="btn" value="<?php echo __('Añadir') ?>" onclick="AgregarUsuarioRevisado()"/>
+					<?php echo $Form->button(__('Añadir'), array('onclick' => 'AgregarUsuarioRevisado()')); ?>
 				</td>
 			</tr>
 			<tr>
@@ -581,7 +549,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo $usuario->select_revisados(); ?>
 				</td>
 				<td>
-					<input type="button" class="btn" value="<?php echo __('Eliminar') ?>" onclick="EliminarUsuarioRevisado()"/>
+					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioRevisado()')); ?>
 				</td>
 			</tr>
 		</table>
@@ -702,7 +670,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				<td colspan="2" align="left">
 					<input type="text" name="vacaciones_fecha_fin" value="" id="vacaciones_fecha_fin" class="cls_fecha_vacaciones" size="11" maxlength="10"/>
 					<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_vacaciones_fecha_fin" style="cursor:pointer" />
-					&nbsp;&nbsp;<input type="button" value="<?php echo __('Guardar') ?>" id="btn_guardar_vacacion" class=btn />
+					&nbsp;&nbsp;<?php echo $Form->button(__('Guardar'), array('id' => 'btn_guardar_vacacion')); ?>
 				</td>
 			</tr>
 			<tr>
@@ -748,15 +716,15 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	<fieldset>
 		<legend><?php echo __('Guardar datos') ?></legend>
 			<?php if ($sesion->usuario->fields['id_visitante'] == 0) { ?>
-				<input type="submit" value="<?php echo __('Guardar') ?>" class=btn /> &nbsp;&nbsp;
+				<?php echo $Form->submit(__('Guardar')); ?>
 			<?php } else { ?>
-				<input type="button" onclick="alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.');" value="<?php echo __('Guardar') ?>" class=btn /> &nbsp;&nbsp;
+				<?php echo $Form->button(__('Guardar'), array('onclick' => "alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.')")); ?>
 			<?php } ?>
 
-			<input type="button" value="<?php echo __('Cancelar') ?>" onclick="Cancelar(this.form);" class=btn />
+			<?php echo $Form->button(__('Cancelar'), array('onclick' => "Cancelar(jQuery('#form_usuario')[0])")); ?>
 
 			<?php if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0 && $rut != '99511620') { ?>
-				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Usuario') ?>' class="btn_rojo" ></input>
+				<?php echo $Form->button(__('Eliminar Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo')); ?>
 			<?php } ?>
 	</fieldset>
 
@@ -829,12 +797,12 @@ if ($usuario->loaded) {
 						<input type="checkbox" name="force_reset_password" id="force_reset_password" value="1" <?php echo $checked_str ?> />
 						<span>Solicitar un cambio de contraseña al pr&oacute;ximo inicio de sesi&oacute;n</span>
 					</label>
-				<td>
+				</td>
 			</tr>
 
 			<tr>
 				<td align="right" colspan="2">
-					<input type="submit" value="<?php echo __('Cambiar Contraseña') ?>" size="16"/>
+					<?php echo $Form->submit(__('Cambiar Contraseña')); ?>
 				</td>
 			</tr>
 
@@ -843,59 +811,113 @@ if ($usuario->loaded) {
 </form>
 
 <?php
+echo $Form->script();
 if($sesion->usuario->TienePermiso('SADM'))  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
 }
 
 function CargarPermisos() {
+	global $sesion, $usuario, $pagina, $_POST, $error_cupo;
 
-	global $usuario, $pagina, $permiso, $_POST;
-	$permisos_inactivos = array();
+	$UsuarioPermiso = new UsuarioPermiso($sesion);
 	$permisos_activos = array();
 	$permisos_activados = array();
-	//Obtenemos lista de permisos actual sin considerar ALL
+	$permisos_desactivados = array();
+
+	$mailto = '<a href="mailto:areacomercial@lemontech.cl">areacomercial@lemontech.cl</a>';
 	$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
-
 	for ($i = 0; $i < $usuario->permisos->num; $i++) {
-
 		$permiso = &$usuario->permisos->get($i);
 
-		if ($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']]) {
-			$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
-			$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+		// permisos activos
+		if (isset($lista_actual_permisos[$permiso->fields['codigo_permiso']])) {
+			array_push($permisos_activos, $permiso->fields['codigo_permiso']);
+		}
 
-			if (!$usuario->EditPermisos($permiso)) {
-				$pagina->AddError($usuario->error);
-			} else if (!empty($_POST[$permiso->fields['codigo_permiso']])) {
-				$permisos_activados[] = $permiso->fields['codigo_permiso'];
-			}
+		// si le quitaron el permiso
+		if (isset($lista_actual_permisos[$permiso->fields['codigo_permiso']]) && !isset($_POST[$permiso->fields['codigo_permiso']])) {
+			array_push($permisos_desactivados, $permiso->fields['codigo_permiso']);
+		}
 
-		} else {
-			$permisos_activos[] = $permiso->fields['codigo_permiso'];
+		// si le agregaron el permiso
+		if (!isset($lista_actual_permisos[$permiso->fields['codigo_permiso']]) && isset($_POST[$permiso->fields['codigo_permiso']])) {
+			array_push($permisos_activados, $permiso->fields['codigo_permiso']);
 		}
 	}
-
-	$usuario->PermisoALL();
-
-	//Si se agregaron permisos nuevos
-	if (!empty($permisos_activados)) {
-		$permisos_activados = array_merge($permisos_activados, $permisos_activos);
-		$permisos_activados = implode(',', $permisos_activados);
-		$permisos_activos = implode(',', $permisos_activos);
-		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_activos, $permisos_activados);
-
-	//Si hay diferencia entre los activos vs los que se econtraban agregados es porque se quitó alguno
-	} else if (count($lista_actual_permisos) <> count($permisos_activos)) {
-		$permisos_activados = implode(',', $permisos_activos);
-		$permisos_activos = implode(',', $lista_actual_permisos);
-		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_activos, $permisos_activados);
+	// no hay cambios
+	if (empty($permisos_desactivados) && empty($permisos_activados)) {
+		return;
 	}
+
+	$id_usuario = $usuario->fields['id_usuario'];
+	if ($usuario->fields['activo'] != '1') {
+		$pagina->AddError('Atención: Solo a los usuarios activos del sistema se les puede asignar roles.');
+	} else {
+		$usuario->PermisoALL();
+
+		$error_cupo = "Estimado {$sesion->usuario->fields['nombre']} {$sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuación se detalla su cupo actual.<br><br>" .
+			"* Usuarios activos con perfil <b>Profesional</b>: {$UsuarioPermiso->cupo_profesionales}<br>".
+			"* Usuarios activos con perfil <b>Administrativos</b>: {$UsuarioPermiso->cupo_administrativos}<br><br>" .
+			"Si desea aumentar su cupo debe contactarse con {$mailto} o en su defecto puede desactivar usuarios para habilitar cupos.";
+
+		// lista actual de permisos sin considerar ALL
+		$lista_actual_permisos = $usuario->ListaPermisosUsuario($id_usuario);
+
+		// recorremos todos los permisos del sistema
+		foreach ($permisos_desactivados as $codigo_permiso) {
+			// si le quitaron el permiso
+			if (isset($lista_actual_permisos[$codigo_permiso]) && !isset($_POST[$codigo_permiso])) {
+				if (!$UsuarioPermiso->puedeRevocarPermiso($id_usuario, $codigo_permiso)) {
+					$pagina->AddError($error_cupo);
+					return false;
+				}
+			}
+		}
+
+		foreach ($permisos_activados as $codigo_permiso) {
+			// si le agregaron el permiso
+			if (!isset($lista_actual_permisos[$codigo_permiso]) && isset($_POST[$codigo_permiso])) {
+				if (!$UsuarioPermiso->puedeAsignarPermiso($id_usuario, $codigo_permiso)) {
+					$pagina->AddError($error_cupo);
+					return false;
+				}
+			}
+		}
+
+		for ($i = 0; $i < $usuario->permisos->num; $i++) {
+			$permiso = &$usuario->permisos->get($i);
+
+			$permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+			if (!$usuario->EditPermisos($permiso)) {
+				$pagina->AddError($usuario->error);
+				return false;
+			}
+		}
+
+	}
+
+	if (!empty($permisos_activados) || !empty($permisos_desactivados)) {
+		// eliminar permisos
+		if (!empty($permisos_activos)) {
+			for ($x = 0; $x < count($permisos_desactivados); $x++) {
+				$key = array_search($permisos_desactivados[$x], $permisos_activos);
+				if ($key !== false) {
+					unset($permisos_activos[$key]);
+				}
+			}
+		}
+
+		$permisos_activados = implode(',', array_merge($permisos_activados, $permisos_activos));
+		$permisos_actuales = implode(',', array_keys($lista_actual_permisos));
+
+		$usuario->GuardaCambiosRelacionUsuario($id_usuario, 'permisos', $permisos_actuales, $permisos_activados);
+	}
+
+	return true;
 }
-
 ?>
+
 <script type="text/javascript">
-
 	jQuery(document).ready(function() {
-
 		jQuery('[name=SADM]').closest('tr').hide();
 		jQuery("#chkpermisos .ui-button").live('change',function() {
 			alert(jQuery(this).attr('class'));
@@ -924,8 +946,32 @@ function CargarPermisos() {
 			return false;
 		});
 
+		<?php if ($usuario->loaded) { ?>
+			jQuery('#activo.btn').click(function() {
+				var id = <?php echo $usuario->fields['id_usuario']; ?>;
+				var activar = '<?php echo __('Activar'); ?>';
+				var me = this;
+				var accion = jQuery(me).find('span').html() == activar ? 'activar' : 'desactivar';
+				var label = jQuery(this).prev();
+				jQuery.post('../interfaces/ajax/permiso_ajax.php', {accion: accion, id_usuario: id, permiso: 'ACT'}, function(resp) {
+					resp = jQuery.parseJSON(resp);
+					if (resp.error) {
+						jQuery('#activo_status').html(resp.error.replace(/\n/g, '<br/>')).show();
+						return;
+					}
+					jQuery('#activo_status').html('').hide();
+					jQuery(me).attr('title', resp.estado);
+					jQuery(me).find('span').html(resp.estado);
+					label.html(resp.label + ' ');
+					if (jQuery(me).find('span').html() == activar) {
+						jQuery('#divVisible').show();
+					} else {
+						jQuery('#divVisible').hide();
+					}
+				});
+			});
+		<?php } ?>
 	});
-
 
 	window.onbeforeunload = function(){
 		return preguntarGuardar();
@@ -979,9 +1025,7 @@ function CargarPermisos() {
 			}
 		});
 	});
-
 </script>
 
 <?php
 $pagina->PrintBottom();
-

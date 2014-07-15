@@ -3,38 +3,37 @@
 require_once dirname(__FILE__) . '/../../conf.php';
 require_once(Conf::RutaGraficos());
 
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-
 require_once Conf::ServerDir() . '/../app/interfaces/graficos/GraficoBarras.php';
 
 
-$sesion = new Sesion();
+$Sesion = new Sesion();
 // The data for the pie chart
 
-$ancho = (UtilesApp::GetConf($sesion, 'AnchoGraficoReporteGeneral')) ? UtilesApp::GetConf($sesion, 'AnchoGraficoReporteGeneral') : 900;
+$ancho = Conf::GetConf($Sesion, 'AnchoGraficoReporteGeneral') ? Conf::GetConf($Sesion, 'AnchoGraficoReporteGeneral') : 900;
 
-$alto = (UtilesApp::GetConf($sesion, 'AltoGraficoReporteGeneral')) ? UtilesApp::GetConf($sesion, 'AltoGraficoReporteGeneral') : 900;
+$alto = Conf::GetConf($Sesion, 'AltoGraficoReporteGeneral') ? Conf::GetConf($Sesion, 'AltoGraficoReporteGeneral') : 900;
 
 $radio = 100;
 
+$data = UtilesApp::utf8izar(json_decode(base64_decode($_GET['datos']), true), false);
 
-$data = $tiempo;
-// The labels for the pie chart
-$labels = array();
-foreach ($nombres as $label) {
-	$labels[] = urldecode($label);
+$datos = array_combine($data['nombres'], $data['tiempo']);
+function dort_desc($a, $b) {
+	return $a < $b;
 }
+uasort($datos, 'dort_desc');
 
-$total = array_sum($data);
+$total = array_sum($datos);
 $derecha = 0;
-foreach ($data as $k => $v) {
-	$derecha += $v;
+$total_tiempo = count($datos);
+$k = 0;
+foreach ($datos as $key => $value) {
+	$derecha += $value;
 	if ($derecha * 2 > $total) {
-		$alto = max($alto, 19 * ($k > count($data) / 2 ? $k + 2 : count($data) - $k) + 50);
+		$alto = max($alto, 19 * ($k > $total_tiempo / 2 ? $k + 2 : $total_tiempo - $k) + 50);
 		break;
 	}
+	++$k;
 }
 
 // Create a PieChart object of size 560 x 270 pixels, with a golden background and a 1
@@ -74,7 +73,7 @@ $c->setLineColor(SameAsMainColor, 0x000000);
 $c->setStartAngle(0);
 
 // Set the pie data and the pie labels
-$c->setData($data, $labels);
+$c->setData(array_values($datos), array_keys($datos));
 
 // output the chart
 header("Content-type: image/png");

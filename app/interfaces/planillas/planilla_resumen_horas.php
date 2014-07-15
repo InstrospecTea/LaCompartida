@@ -11,7 +11,7 @@
 		Necesita las liguientes variables para funcionar:
 		$sesion
 		$fecha1	: fecha inicio periodo consulta, en formato dd-mm-aaaa.
-		$fecha2	: fecha término periodo consulta, en formato dd-mm-aaaa.
+		$fecha2	: fecha tÃ©rmino periodo consulta, en formato dd-mm-aaaa.
 		$vista	: varible que indica la forma de agrupar los datos. Puede tomar los siguientes valores:
 					- 'profesional'
 					- 'mes'
@@ -45,14 +45,16 @@
 	$formato_nombre =& $wb->addFormat(array('Border' => 1, 'Size' => 12, 'VAlign' => 'top'));
 	$formato_porcentaje =& $wb->addFormat(array('NumFormat' => '0.##%', 'Border' => 1, 'Size' => 12, 'Align' => 'right'));
 	$formato_porcentaje_total =& $wb->addFormat(array('NumFormat' => '0.##%', 'Border' => 1, 'Size' => 12, 'Align' => 'right', 'Bold' => '1'));
-	if($cifras_decimales)
-	{
+	
+	if($cifras_decimales) {
 		$decimales = '.';
-		while($cifras_decimales--)
+		while($cifras_decimales--) {
 			$decimales .= '#';
-	}
-	else
+		}
+	} else {
 		$decimales = '';
+	}
+
 	$formato_moneda =& $wb->addFormat(array('NumFormat' => "[$$simbolo_moneda] #,###,0$decimales", 'Border' => 1, 'Size' => 12, 'Align' => 'right'));
 	$formato_moneda_total =& $wb->addFormat(array('NumFormat' => "[$$simbolo_moneda] #,###,0$decimales", 'Border' => 1, 'Size' => 12, 'Align' => 'right', 'Bold' => '1'));
 	$formato_numero =& $wb->addFormat(array('NumFormat' => "#,###,0.##", 'Border' => 1, 'Size' => 12, 'Align' => 'right'));
@@ -76,34 +78,34 @@
 	$ws->write($offset_filas+3, $offset_columnas+1, "$fecha1 - $fecha2", $formato_encabezado);
 
 	// Setear el ancho de las columnas y unir celdas del encabezado.
-	if($offset_columnas>0)
+	if($offset_columnas>0) {
 		$ws->setColumn(0 , $offset_columnas-1, 5);
-	if($vista == 'glosa_asunto')
-	{
+	}
+
+	if($vista == 'glosa_asunto') {
 		$ws->setColumn($offset_columnas, $offset_columnas, 30);
 		$ws->setColumn($offset_columnas+1, $offset_columnas+1, 15);
 		$ws->setColumn($offset_columnas+2, $offset_columnas+2, 30);
 		$ws->setColumn($offset_columnas+3, $offset_columnas+13, 15);
-	}
-	else
-	{
+	} else {
 		$ws->setColumn($offset_columnas, $offset_columnas, 30);
 		$ws->setColumn($offset_columnas+1, $offset_columnas+11, 15);
 	}
+
 	$ws->mergeCells($offset_filas, $offset_columnas, $offset_filas, $offset_columnas+5);
 	$ws->mergeCells($offset_filas+2, $offset_columnas+1, $offset_filas+2, $offset_columnas+5);
 	$ws->mergeCells($offset_filas+3, $offset_columnas+1, $offset_filas+3, $offset_columnas+5);
 
 	$offset_filas += 7;
 
-	// Imprimir títulos de la tabla
-	if($vista == 'glosa_asunto')
-	{
+	// Imprimir tÃ­tulos de la tabla
+	if($vista == 'glosa_asunto') {
 		$ws->write($offset_filas, $offset_columnas, __('glosa_cliente'), $formato_titulo_1);
 		++$offset_columnas;
-		$ws->write($offset_filas, $offset_columnas, __('Código'), $formato_titulo_1);
+		$ws->write($offset_filas, $offset_columnas, __('CÃ³digo'), $formato_titulo_1);
 		++$offset_columnas;
 	}
+
 	$ws->write($offset_filas, $offset_columnas, __($vista), $formato_titulo_1);
 	$ws->write($offset_filas, $offset_columnas+1, __('Horas trabajadas'), $formato_titulo_2);
 	$ws->write($offset_filas, $offset_columnas+2, __('Horas cobrables'), $formato_titulo_2);
@@ -134,7 +136,7 @@
 	$tipo_dato[] = 'valor_pagado';
 	$tipo_dato[] = 'valor_por_pagar';
 
-	// Número de columnas para rellenar con ceros al final, 5 de horas y 1 de valor cobrado
+	// NÃºmero de columnas para rellenar con ceros al final, 5 de horas y 1 de valor cobrado
 	$numero_columnas_a_llenar = 6;
 
 	$fila = $offset_filas;
@@ -148,17 +150,16 @@
 	$fecha1_m = substr($fecha1, 3, 2);
 	$fecha2_m = substr($fecha2, 3, 2);
 
-	if($vista == 'profesional')
-	{
+	if($vista == 'profesional') {
 
 		$fecha_ini = "{$fecha1_a}-{$fecha1_m}-01";
 		$largo_meses = cal_days_in_month(CAL_GREGORIAN, $fecha2_m, $fecha2_a);
 		$fecha_fin = "{$fecha2_a}-{$fecha2_m}-{$largo_meses}";
 
 
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 			$dato_profesional = "username";
-		else
+		} else{
 			$dato_profesional = "CONCAT(apellido1,' ',apellido2,', ',nombre)";
                 
                 if( $seleccion == 'profesionales' ) {
@@ -173,6 +174,7 @@
                                             WHERE trabajo.id_usuario = usuario.id_usuario 
                                             AND trabajo.fecha >= '$fecha_ini' 
                                             AND trabajo.fecha <= '$fecha_fin' ) > 0 ) "; 
+		}
                 
 		// Lista de abogados sobre los que se calculan valores.
 		$query = "SELECT
@@ -185,53 +187,47 @@
 
 		//echo '<pre>'; echo $query; exit;							
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while(list($nombre_usuario, $id_usr) = mysql_fetch_array($resp))
-		{
+		while(list($nombre_usuario, $id_usr) = mysql_fetch_array($resp)) {
 			$ws->write(++$fila, $offset_columnas, $nombre_usuario, $formato_nombre);
-			// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
+			// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
 			// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
 			for($j=0; $j<$numero_columnas_a_llenar; ++$j)
 				$vacio[$i][$j] = true;
 			$ids[] = $id_usr;
 			++$i;
 		}
-	}
-	elseif($vista == 'glosa_cliente')
-	{
+	} elseif($vista == 'glosa_cliente') {
 		// Lista de clientes sobre los que se calculan valores. Aparece el encargado comercial
 		$query = "SELECT
-									glosa_cliente,
-									codigo_cliente
-								FROM cliente
-								ORDER BY glosa_cliente, id_cliente";
+					glosa_cliente,
+					codigo_cliente
+				FROM cliente
+				ORDER BY glosa_cliente, id_cliente";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while(list($nombre_cliente, $id_cli) = mysql_fetch_array($resp))
-		{
+		while(list($nombre_cliente, $id_cli) = mysql_fetch_array($resp)) {
 			$ws->write(++$fila, $offset_columnas, $nombre_cliente, $formato_nombre);
-			// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
+			// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
 			// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
 			for($j=0; $j<$numero_columnas_a_llenar; ++$j)
 				$vacio[$i][$j] = true;
 			$ids[] = sprintf("%04d", $id_cli);
 			++$i;
 		}
-	}
-	elseif($vista == 'mes')
-	{
-		for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a)
-			for($m=($a==0?$fecha1_m:0); $m<($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m)
-			{
-				$ws->write(++$fila, $offset_columnas, ($fecha1_a+$a).' - '.$meses[$m], $formato_nombre);
-				// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
+	} elseif($vista == 'mes') {
+		for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a) {
+			for($m = ($a==0?$fecha1_m[1]:0) ; $m <= ($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m) {
+				$ws->write(++$fila, $offset_columnas, ($fecha1_a+$a).' - '.$meses[$m-1], $formato_nombre);
+				// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
 				// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
-				for($j=0; $j<$numero_columnas_a_llenar; ++$j)
+				for($j=0; $j<$numero_columnas_a_llenar; ++$j) {
 					$vacio[$i][$j] = true;
-				$ids[] = ($m+1).'-'.($fecha1_a+$a);
+				}
+				$auxmes = ($m < 10 ? '0'.$m : $m);
+				$ids[] = ($auxmes).'-'.($fecha1_a+$a);
 				++$i;
 			}
-	}
-	elseif($vista == 'glosa_asunto')
-	{
+		}
+	} elseif ($vista == 'glosa_asunto') {
 		$query = "SELECT DISTINCT
 									trabajo.codigo_asunto,
 									cliente.glosa_cliente,
@@ -244,14 +240,11 @@
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$nombre_temp = '';
 		$n_clientes = 0;
-		while(list($codigo_asunto, $nombre_cliente, $nombre_asunto) = mysql_fetch_array($resp))
-		{
+		while (list($codigo_asunto, $nombre_cliente, $nombre_asunto) = mysql_fetch_array($resp)) {
 			++$fila;
-			if($nombre_temp != $nombre_cliente)
-			{
+			if($nombre_temp != $nombre_cliente) {
 				// Revisar si hay que fusionar varias celdas verticalmente.
-				if($n_clientes>0)
-				{
+				if($n_clientes>0) {
 					$ws->mergeCells($fila-$n_clientes, $offset_columnas-2, $fila-1, $offset_columnas-2);
 					$n_clientes = 0;
 				}
@@ -259,21 +252,19 @@
 				$nombre_temp = $nombre_cliente;
 			}
 			++$n_clientes;
-
 			$ws->write($fila, $offset_columnas-1, $codigo_asunto, $formato_nombre);
 			$ws->write($fila, $offset_columnas, $nombre_asunto, $formato_nombre);
-			// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
+			// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
 			// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
-			for($j=0; $j<$numero_columnas_a_llenar; ++$j)
+			for($j=0; $j<$numero_columnas_a_llenar; ++$j) {
 				$vacio[$i][$j] = true;
+			}
 			$ids[] = $codigo_asunto;
 			++$i;
 		}
 	}
 
-	// Imprimir las horas que existen en el sistema
-	for($i=0; $i<5; ++$i)
-	{
+	for($i=0; $i<5; ++$i) {
 		$reporte = new Reporte($sesion);
 		$reporte->id_moneda = $id_moneda;
 		// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
@@ -283,7 +274,7 @@
 		imprimir_datos_columna($ws, $reporte, $tipo_dato[$i], $ids, $offset_columnas+1+$i, $formato_numero, $vista);
 	}
 
-	// Imprimir valor cobrado
+	// Imprimir valor valor_cobrado
 	$reporte = new Reporte($sesion);
 	$reporte->id_moneda = $id_moneda;
 	// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
@@ -291,7 +282,7 @@
 	$reporte->setVista($vista);
 	imprimir_datos_columna($ws, $reporte, $tipo_dato[5], $ids, $offset_columnas+1+$i, $formato_moneda, $vista);
 
-	// variables para usar en las fórmulas
+	// variables para usar en las fÃ³rmulas
 	$col_trabajadas = 			Utiles::NumToColumnaExcel($offset_columnas+1);
 	$col_cobrables = 			Utiles::NumToColumnaExcel($offset_columnas+2);
 	$col_cobrables_corregidas =	Utiles::NumToColumnaExcel($offset_columnas+3);
@@ -302,59 +293,67 @@
 	$col_margen_bruto = 		Utiles::NumToColumnaExcel($offset_columnas+10);
 
 	// Imprimir costo
-	for($t=0; $t<count($ids); ++$t)
-	{
-		if($vista=='profesional')
-		{
+	for ($t=0; $t<count($ids); ++$t) {
+
+		if ($vista=='profesional') {
 			$query3 = "SELECT SUM(costo)
 						FROM usuario_costo
 						WHERE id_usuario=$ids[$t] AND fecha >= '".Utiles::fecha2sql($fecha1)."' AND fecha <= '".Utiles::fecha2sql($fecha2)."'";
 			$resp3 = mysql_query($query3, $sesion->dbh) or Utiles::errorSQL($query3, __FILE__, __LINE__, $sesion->dbh);
 			list($costo) = mysql_fetch_array($resp3);
-		}
-		elseif($vista=='glosa_cliente')
-		{
+		} elseif($vista=='glosa_cliente') {
+
 			// $ids[$t] guarda codigo_cliente
 			$duracion_mes = array('31', (Utiles::es_bisiesto($fecha2_a)?'29':'28'), '31', '30', '31', '30', '31', '31', '30', '31', '30', '31');
 			$costo = 0;
-			for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a)
-				for($m=($a==0?$fecha1_m:0); $m<($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m)
-				{
-					$f1 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-01";
-					$f2 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-".$duracion_mes[$m];
+			for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a) {
+				
+				for ($m=($a==0?$fecha1_m:0); $m<=($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m) {
+
+					$f1 = "{$fecha1_a}-{$fecha1_m}-01";
+					$largo_meses = cal_days_in_month(CAL_GREGORIAN, $fecha2_m, $fecha2_a);
+					$f2 = "{$fecha2_a}-{$fecha2_m}-{$largo_meses}";
+					
+
+
 					// ids de los profesionales que trabajaron para el cliente $ids[$t] en cada mes
 					$query_cliente_1 = "SELECT DISTINCT
-																	trabajo.id_usuario,
-																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
-																FROM trabajo
-																	LEFT JOIN cobro ON trabajo.id_cobro=cobro.id_cobro
-																	LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-																WHERE (cobro.codigo_cliente=$ids[$t] OR asunto.codigo_cliente=$ids[$t])
-																	AND '$f1'<=trabajo.fecha AND trabajo.fecha<='$f2'
-																GROUP BY trabajo.id_usuario
-																ORDER BY trabajo.id_usuario";
+										trabajo.id_usuario,
+										SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
+									FROM trabajo
+										LEFT JOIN cobro ON trabajo.id_cobro=cobro.id_cobro
+										LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+									WHERE (cobro.codigo_cliente=$ids[$t] OR asunto.codigo_cliente=$ids[$t])
+										AND '$f1'<=trabajo.fecha AND trabajo.fecha<='$f2'
+									GROUP BY trabajo.id_usuario
+									ORDER BY trabajo.id_usuario";
+
+
 					$resp_cliente_1 = mysql_query($query_cliente_1, $sesion->dbh) or Utiles::errorSQL($query_cliente_1, __FILE__, __LINE__, $sesion->dbh);
 
-					// duración total trabajada por cada profesional en cada mes
+					// duraciÃ³n total trabajada por cada profesional en cada mes
 					$query_cliente_2 = "SELECT DISTINCT
-																	id_usuario,
-																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
-																FROM trabajo
-																WHERE '$f1'<=fecha AND fecha<='$f2'
-																GROUP BY id_usuario
-																ORDER BY id_usuario";
+										id_usuario,
+										SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
+									FROM trabajo
+									WHERE '$f1'<=fecha AND fecha<='$f2'
+									GROUP BY id_usuario
+									ORDER BY id_usuario";
+
 					$resp_cliente_2 = mysql_query($query_cliente_2, $sesion->dbh) or Utiles::errorSQL($query_cliente_2, __FILE__, __LINE__, $sesion->dbh);
 
 					$query_cliente_3 = "SELECT
-																	id_usuario,
-																	costo
-																FROM usuario_costo
-																WHERE MONTH(fecha)=" . ($m+1) . " AND YEAR(fecha)=" . ($a+$fecha1_a) . "
-																ORDER BY id_usuario";
+										id_usuario,
+										costo
+									FROM usuario_costo
+									WHERE MONTH(fecha)=" . ($m+1) . " AND YEAR(fecha)=" . ($a+$fecha1_a) . "
+									ORDER BY id_usuario";
+
+					//exit;
+
 					$resp_cliente_3 = mysql_query($query_cliente_3, $sesion->dbh) or Utiles::errorSQL($query_cliente_3, __FILE__, __LINE__, $sesion->dbh);
 
-					while(list($id_usuario, $dur_trabajada) = mysql_fetch_array($resp_cliente_1))
-					{
+					while(list($id_usuario, $dur_trabajada) = mysql_fetch_array($resp_cliente_1)) {
 						$id_2 = -23; // cualquier id que sea distinto a $id_usuario funciona
 						$id_3 = -23;
 						if(mysql_num_rows($resp_cliente_2))
@@ -377,26 +376,25 @@
 							$costo += $costo_mes*$dur_trabajada/$dur_total;
 					}
 				}
-		}
-		elseif($vista=='mes')
-		{
+			}
+		} elseif($vista=='mes') {
 			list($m, $a) = split('-', $ids[$t]);
 			$query3 = "SELECT
-										SUM(costo)
-									FROM usuario_costo
-									WHERE MONTH(fecha)=$m AND YEAR(fecha)=$a";
+							SUM(costo)
+						FROM usuario_costo
+						WHERE MONTH(fecha)=$m AND YEAR(fecha)=$a";
 			$resp3 = mysql_query($query3, $sesion->dbh) or Utiles::errorSQL($query3, __FILE__, __LINE__, $sesion->dbh);
 			list($costo) = mysql_fetch_array($resp3);
-		}
-		elseif($vista=='glosa_asunto')
-		{
+		} elseif($vista=='glosa_asunto') {
 			$duracion_mes = array('31', (Utiles::es_bisiesto($fecha2_a)?'29':'28'), '31', '30', '31', '30', '31', '31', '30', '31', '30', '31');
 			$costo = 0;
-			for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a)
-				for($m=($a==0?$fecha1_m:0); $m<($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m)
-				{
-					$f1 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-01";
-					$f2 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-".$duracion_mes[$m];
+
+			for($a=0; $a<$fecha2_a-$fecha1_a+1; ++$a) {
+				for($m=($a==0?$fecha1_m:0); $m<=($a==$fecha2_a-$fecha1_a?$fecha2_m:12); ++$m) {
+					$f1 = "{$fecha1_a}-{$fecha1_m}-01";
+					$largo_meses = cal_days_in_month(CAL_GREGORIAN, $fecha2_m, $fecha2_a);
+					$f2 = "{$fecha2_a}-{$fecha2_m}-{$largo_meses}";
+
 					// ids de los profesionales que trabajaron para el asunto $ids[$t] en cada mes
 					$query_cliente_1 = "SELECT DISTINCT
 																	trabajo.id_usuario,
@@ -406,9 +404,10 @@
 																	AND '$f1'<=trabajo.fecha AND trabajo.fecha<='$f2'
 																GROUP BY trabajo.id_usuario
 																ORDER BY trabajo.id_usuario";
+					
 					$resp_cliente_1 = mysql_query($query_cliente_1, $sesion->dbh) or Utiles::errorSQL($query_cliente_1, __FILE__, __LINE__, $sesion->dbh);
 
-					// duración total trabajada por cada profesional en cada mes
+					// duraciÃ³n total trabajada por cada profesional en cada mes
 					$query_cliente_2 = "SELECT DISTINCT
 																	id_usuario,
 																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
@@ -419,37 +418,42 @@
 					$resp_cliente_2 = mysql_query($query_cliente_2, $sesion->dbh) or Utiles::errorSQL($query_cliente_2, __FILE__, __LINE__, $sesion->dbh);
 
 					$query_cliente_3 = "SELECT
-																id_usuario,
-																costo
-															FROM usuario_costo
-															WHERE MONTH(fecha)=" . ($m+1) . " AND YEAR(fecha)=" . ($a+$fecha1_a) . "
-															ORDER BY id_usuario";
+											id_usuario,
+											costo
+										FROM usuario_costo
+										WHERE MONTH(fecha)=" . ($m+1) . " AND YEAR(fecha)=" . ($a+$fecha1_a) . "
+										ORDER BY id_usuario";
 					$resp_cliente_3 = mysql_query($query_cliente_3, $sesion->dbh) or Utiles::errorSQL($query_cliente_3, __FILE__, __LINE__, $sesion->dbh);
 
-					while(list($id_usuario, $dur_trabajada) = mysql_fetch_array($resp_cliente_1))
-					{
+					while(list($id_usuario, $dur_trabajada) = mysql_fetch_array($resp_cliente_1)) {
 						$id_2 = -23; // cualquier id que sea distinto a $id_usuario funciona
 						$id_3 = -23;
-						if(mysql_num_rows($resp_cliente_2))
+						if(mysql_num_rows($resp_cliente_2)) {
 							mysql_data_seek($resp_cliente_2, 0);
-						if(mysql_num_rows($resp_cliente_3))
+						}
+						if(mysql_num_rows($resp_cliente_3)) {
 							mysql_data_seek($resp_cliente_3, 0);
+						}
 						while($resp_cliente_2 && $id_2!=$id_usuario && list($id_2, $dur_total) = mysql_fetch_array($resp_cliente_2))
 							;
 						while($resp_cliente_3 && $id_3!=$id_usuario && list($id_3, $costo_mes) = mysql_fetch_array($resp_cliente_3))
 							;
 
-						if($id_2!=$id_usuario)
+						if($id_2!=$id_usuario) {
 							$dur_total = 0;
-						if($id_3!=$id_usuario)
+						}
+						if($id_3!=$id_usuario) {
 							$costo_mes = 0;
+						}
 
-						if($dur_total == 0)
+						if($dur_total == 0) {
 							$costo = 0;
-						else
+						} else {
 							$costo += $costo_mes*$dur_trabajada/$dur_total;
+						}
 					}
 				}
+			}
 		}
 
 		// Imprimir valor cobrado por hora
@@ -464,7 +468,7 @@
 		$ws->writeFormula($offset_filas+$t+1, $offset_columnas+11, "=IF($col_valor_cobrado".($offset_filas+$t+2).">0, $col_margen_bruto".($offset_filas+$t+2)."/$col_valor_cobrado".($offset_filas+$t+2) . ", \"- \")", $formato_porcentaje);
 	}
 
-	// Imprimir totales, están afuera del 'for' porque usan otro formato
+	// Imprimir totales, estÃ¡n afuera del 'for' porque usan otro formato
 	++$fila;
 	$ws->write($fila, $offset_columnas, __("Total"), $formato_nombre);
 	$ws->writeFormula($fila, $offset_columnas+1, "=SUM($col_trabajadas".($offset_filas+2).":$col_trabajadas".($fila).")", $formato_numero_total);
@@ -479,19 +483,21 @@
 	$ws->writeFormula($offset_filas+$t+1, $offset_columnas+10, "=$col_valor_cobrado".($offset_filas+$t+2)."-$col_costo".($offset_filas+$t+2), $formato_moneda_total);
 	$ws->writeFormula($offset_filas+$t+1, $offset_columnas+11, "=IF($col_valor_cobrado".($offset_filas+$t+2).">0, $col_margen_bruto".($offset_filas+$t+2)."/$col_valor_cobrado".($offset_filas+$t+2) . ", \"- \")", $formato_porcentaje_total);
 
-	// Rellenar con ceros los espacios vacíos
-	for($i=0; $i<count($ids); ++$i)
-		for($j=0; $j<$numero_columnas_a_llenar; ++$j)
-			if($vacio[$i][$j])
+	// Rellenar con ceros los espacios vacÃ­os
+	for($i=0; $i<count($ids); ++$i) {
+		for($j=0; $j<$numero_columnas_a_llenar; ++$j) {
+			if($vacio[$i][$j]) {
 				$ws->writeNumber($offset_filas+1+$i, $offset_columnas+1+$j, 0, $j<5?$formato_numero:$formato_moneda);
+			}
+		}
+	}
 
 	// Terminar de imprimir
 	$wb->send("Planilla resumen horas.xls");
 	$wb->close();
 
 	// Sirve para imprimir una columna, usando la clase Reporte
-	function imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $columna, $formato, $vista)
-	{
+	function imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $columna, $formato, $vista) {
 		global $vacio;
 		global $offset_filas;
 		global $offset_columnas;
@@ -499,19 +505,21 @@
 		$reporte->setTipoDato($tipo_dato);
 		$reporte->Query();
 		$r = $reporte->toArray();
-		foreach($r as $k_a => $a)
-			if(is_array($a))
-				foreach($a as $filtro)
-					if($filtro['filtro_campo'] == 'id_usuario' || $filtro['filtro_campo'] == 'codigo_cliente' || $filtro['filtro_campo'] == 'mes' || $filtro['filtro_campo'] == 'codigo_asunto')
-					{
-						for($t=0; $t<count($ids); ++$t)
-							if($filtro['filtro_valor'] == $ids[$t])
-							{
+		foreach($r as $k_a => $a) {
+			if(is_array($a)) {
+				foreach($a as $filtro) {
+					if($filtro['filtro_campo'] == 'id_usuario' || $filtro['filtro_campo'] == 'codigo_cliente' || $filtro['filtro_campo'] == 'mes' || $filtro['filtro_campo'] == 'codigo_asunto') {
+						for($t=0; $t<count($ids); ++$t) {
+							if($filtro['filtro_valor'] == $ids[$t]) {
 								$ws->writeNumber($offset_filas+1+$t, $columna, $a['valor']?$a['valor']:0, $formato);
 								$vacio[$t][$columna-$offset_columnas-1] = false;
 								break;
 							}
+						}
 						break;
 					}
+				}
+			}
+		}
 	}
 ?>

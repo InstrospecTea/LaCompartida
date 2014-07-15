@@ -77,6 +77,10 @@ class Cliente extends Objeto {
 			'titulo' => 'Usuario Encargado',
 			'relacion' => 'UsuarioExt'
 		),
+		'id_pais' => array(
+			'titulo' => 'Pais',
+			'relacion' => 'PrmPais'
+		),
 	);
 	public static $configuracion_reporte = array(
 		array(
@@ -228,6 +232,22 @@ class Cliente extends Objeto {
 			'title' => 'Dirección contacto',
 			'extras' => array(
 				'width' => 40
+			)
+		),
+		array(
+			'field' => 'n_cuenta',
+			'title' => 'N° Cuenta',
+			'visible' => false,
+			'extras' => array(
+				'width' => 25
+			)
+		),
+		array(
+			'field' => 'glosa_banco',
+			'visible' => false,
+			'title' => 'Banco',
+			'extras' => array(
+				'width' => 25
 			)
 		),
 		array(
@@ -667,7 +687,9 @@ class Cliente extends Objeto {
 				cliente.fecha_inactivo,
 				IF(cliente.activo = 1, 'Si', 'No') as activo,
 				moneda_monto.simbolo as simbolo_moneda,
-				moneda_monto.cifras_decimales as decimales_moneda
+			    moneda_monto.cifras_decimales as decimales_moneda,
+				cuenta_banco.numero as n_cuenta,
+				cuenta_banco.glosa as glosa_banco
 			FROM cliente
 				LEFT JOIN grupo_cliente USING (id_grupo_cliente)
 				LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia
@@ -677,8 +699,11 @@ class Cliente extends Objeto {
 				LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
 				LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
 				LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
+				LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
 			$where ORDER BY cliente.glosa_cliente ASC";
+
 		return $query;
+
 	}
 
 	public function DownloadExcel($filtros = array()) {
@@ -736,7 +761,7 @@ class Cliente extends Objeto {
 
 		//no intento guardar los campos que son de la tabla contrato
 		$campos_contrato = array('id_moneda_monto', 'id_tarifa', 'factura_ciudad', 'factura_comuna', 'id_cuenta',
-			'forma_cobro', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total');
+			'forma_cobro', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_pais');
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
 
 		//copio algunos datos de la tabla cliente a su equivalente en contrato
@@ -853,6 +878,26 @@ class Cliente extends Objeto {
 
 		return $clients;
 	}
+
+	public function CodigoSecundarioSiguienteCorrelativo() {
+		$query = "SELECT MAX(codigo_cliente_secundario * 1) ultimo
+					FROM cliente";
+		$qr = $this->sesion->pdodbh->query($query);
+		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
+		return $ultimo['ultimo'] + 1;
+	}
+
+	public function CodigoSecundarioValidarCorrelativo($codigo) {
+		if (!preg_match('/^[0-9]+$/', $codigo)) {
+			return __('	Código secundario') . ' invalido';
+		}
+		$query = "SELECT codigo_cliente_secundario
+					FROM cliente
+					WHERE codigo_cliente_secundario = $codigo";
+		$qr = $this->sesion->pdodbh->query($query);
+		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
+		return empty($ultimo) ? true : __('	Código secundario') . ' existente';
+	}
 }
 
 class ListaClientes extends Lista {
@@ -862,3 +907,4 @@ class ListaClientes extends Lista {
 	}
 
 }
+

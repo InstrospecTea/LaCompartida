@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
-
 require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
@@ -149,7 +148,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			d.codigo_cliente = '$codigo_cliente'
 			$where_adelantos
 		)";
-//		$where_gastos .= "";
+		//$where_gastos .= "";
+	}
+
+	$concat_asunto = '';
+	$join_asunto = '';
+	$group_by = '';
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", GROUP_CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+		$join_asunto = "LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro";
+		$join_asunto .= " LEFT JOIN asunto ON cobro_asunto.codigo_asunto = asunto.codigo_asunto";
+		$group_by = "GROUP BY cobro.id_cobro";
 	}
 
 	$query_liquidaciones = "SELECT
@@ -172,6 +182,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				IF(contrato.separar_liquidaciones = 0,
 					'$tipo_liq_mixtas', IF(cobro.incluye_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
+				$concat_asunto
 			FROM
 				documento d
 			INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
@@ -182,6 +193,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
+			$join_asunto
 			$join_liquidaciones
 			WHERE
 				cliente.activo = 1
@@ -189,7 +201,14 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				AND d.tipo_doc = 'N'
 				AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')
 				$where_liquidaciones
+			$group_by
 			ORDER BY fecha";
+
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+		$join_asunto = "LEFT JOIN asunto ON asunto.codigo_asunto = d.codigo_asunto";
+	}
 
 	$query_adelantos = "SELECT
 				$select_adelantos
@@ -211,6 +230,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				IF(d.pago_honorarios = 1 AND d.pago_gastos = 1,
 					'$tipo_liq_mixtas', IF(d.pago_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
+				$concat_asunto
 			FROM
 				documento d
 			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
@@ -218,6 +238,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 			LEFT JOIN contrato ON d.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
+			$join_asunto
 			$join_adelantos
 			WHERE
 				cliente.activo = 1
@@ -226,6 +247,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				AND d.saldo_pago < 0
 				$where_adelantos
 			ORDER BY fecha";
+
+	if (Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+		$concat_asunto = ", CONCAT(asunto.codigo_asunto, '|', asunto.glosa_asunto) AS asunto";
+	}
 
 	$query_gastos = "SELECT
 				$select_gastos
@@ -253,9 +278,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 				) AS saldo_gastos,
 				0 AS saldo_adelantos,
 				'$tipo_liq_gastos' AS tipo_liq
+				$concat_asunto
 			FROM
 				cta_corriente cc
-			INNER JOIN prm_moneda moneda_gasto ON cc.id_moneda=moneda_gasto.id_moneda
+			INNER JOIN prm_moneda moneda_gasto ON cc.id_moneda = moneda_gasto.id_moneda
 			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			INNER JOIN cliente ON cliente.codigo_cliente = cc.codigo_cliente
 			INNER JOIN asunto ON asunto.codigo_asunto = cc.codigo_asunto
@@ -330,8 +356,13 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$SimpleReportDetails->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 		$SimpleReportDetails->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 
+
 		$SimpleReportDetails->Config->columns['monto_base']->Title(__('Monto') . " ($simbolo_base)");
 		// $SimpleReportDetails->Config->columns['saldo_base']->Title(__('Saldo') . " ($simbolo_base)");
+
+		if (!Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
+			unset($SimpleReportDetails->Config->columns['asunto']);
+		}
 
 		$statement = $Sesion->pdodbh->prepare($details_query);
 		$statement->execute();
@@ -361,6 +392,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save('Reporte_saldo');
 	}
+
 	if ($_REQUEST['opcion'] == 'json') {
 		foreach ($results as $fila) {
 			$saldo_total += $fila['saldo_liquidaciones'] + $fila['saldo_gastos'] + $fila['saldo_adelantos'];
@@ -379,145 +411,145 @@ $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Reporte Saldo');
 $Pagina->PrintTop($popup);
 ?>
-<style>
-    .subreport {
-        padding-bottom: 40px;
-    }
-    .subreport h1 {
-        font-size: 12px;
-        margin-left: 5%;
-        color: #777;
-        font-weight: normal;
-    }
-    .subreport td.encabezado {
-        background-color: #ddd;
-        color: #040;
-    }
+<style type="text/css">
+	.subreport {
+		padding-bottom: 40px;
+	}
+	.subreport h1 {
+		font-size: 12px;
+		margin-left: 5%;
+		color: #777;
+		font-weight: normal;
+	}
+	.subreport td.encabezado {
+		background-color: #ddd;
+		color: #040;
+	}
 
-    .subreport .buscador {
-        border-bottom: 1px solid #BDBDBD;
-    }
-    .subreport .buscador > tbody > tr {
-        border-left: 1px solid #BDBDBD;
-        border-right: 1px solid #BDBDBD;
-    }
-    .subreport .buscador > tbody > tr.subtotal {
-        border-left: none;
-        border-right: none;
-    }
-    .subreport .buscador > tbody > tr.subtotal td.level2 {
-        text-align: left;
-        color: #777;
-        font-weight: normal !important;
-    }
+	.subreport .buscador {
+		border-bottom: 1px solid #BDBDBD;
+	}
+	.subreport .buscador > tbody > tr {
+		border-left: 1px solid #BDBDBD;
+		border-right: 1px solid #BDBDBD;
+	}
+	.subreport .buscador > tbody > tr.subtotal {
+		border-left: none;
+		border-right: none;
+	}
+	.subreport .buscador > tbody > tr.subtotal td.level2 {
+		text-align: left;
+		color: #777;
+		font-weight: normal !important;
+	}
 </style>
 <table width="100%">
-    <tr>
-        <td>
-            <form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
-                <input  id="xdesde"  name="xdesde" type="hidden" value="">
-                <input type="hidden" name="opcion" id="opcion" value="buscar">
-                <!-- Calendario DIV -->
-                <div id="calendar-container" style="width:221px; position:absolute; display:none;">
-                    <div class="floating" id="calendar"></div>
-                </div>
-                <!-- Fin calendario DIV -->
-                <fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-                    <legend><?php echo __('Filtros') ?></legend>
-                    <table style="border: 0px solid black" width='720px'>
-                        <tr>
-                            <td align="right" width="30%">
-                                <label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
-                            </td>
-                            <td colspan="3" align="left">
+	<tr>
+		<td>
+			<form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
+				<input id="xdesde" name="xdesde" type="hidden" value="">
+				<input type="hidden" name="opcion" id="opcion" value="buscar">
+				<!-- Calendario DIV -->
+				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
+					<div class="floating" id="calendar"></div>
+				</div>
+				<!-- Fin calendario DIV -->
+				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
+					<legend><?php echo __('Filtros') ?></legend>
+					<table style="border: 0px solid black" width='720px'>
+						<tr>
+							<td align="right" width="30%">
+								<label for="codigo_cliente"><?php echo __('Cliente'); ?></label>
+							</td>
+							<td colspan="3" align="left">
 								<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
-                            </td>
-                        </tr>
+							</td>
+						</tr>
 						<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
-                        <tr>
-                            <td align="right">
-                                <label for="tipo_liquidacion"><?php echo __('Mostrar Saldo') ?></label>
-                            </td>
-                            <td colspan="2" align="left">
+						<tr>
+							<td align="right">
+								<label for="tipo_liquidacion"><?php echo __('Mostrar Saldo') ?></label>
+							</td>
+							<td colspan="2" align="left">
 								<?php
 								echo Html::SelectArrayDecente($tipos_liquidacion, 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Total'))
 								?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="right">
-                                <label for="moneda_mostrar"><?php echo __('Mostrar Montos en') ?></label>
-                            </td>
-                            <td colspan="2" align="left">
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<label for="moneda_mostrar"><?php echo __('Mostrar Montos en') ?></label>
+							</td>
+							<td colspan="2" align="left">
 								<?php
 								echo Html::SelectQuery($Sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda', 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
 								?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="right">
-                                <label for="encargado_comercial"><?php echo __('Encargado Comercial') ?></label>
-                            </td>
-                            <td colspan="2" align="left">
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<label for="encargado_comercial"><?php echo __('Encargado Comercial') ?></label>
+							</td>
+							<td colspan="2" align="left">
 								<?php
 								echo Html::SelectQuery($Sesion, UsuarioExt::QueryComerciales(), 'encargado_comercial', $_REQUEST['encargado_comercial'], '', __('Cualquiera'));
 								?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="right"><?php echo __('Fecha Desde') ?></td>
-                            <td nowrap align="left">
-                                <input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-                            </td>
-                            <td nowrap align="left" colspan="2">
-                                &nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
-                                <input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td colspan="3" align="left">
-                                <label>
-                                    <input type="hidden" name="mostrar_sin_saldo" value="0" />
-                                    <input type="checkbox" name="mostrar_sin_saldo" id="mostrar_sin_saldo" value="1" <?php echo $mostrar_sin_saldo ? 'checked="checked"' : '' ?> />
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Fecha Desde') ?></td>
+							<td nowrap align="left">
+								<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+							</td>
+							<td nowrap align="left" colspan="2">
+								&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
+								<input class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="left">
+								<label>
+									<input type="hidden" name="mostrar_sin_saldo" value="0" />
+									<input type="checkbox" name="mostrar_sin_saldo" id="mostrar_sin_saldo" value="1" <?php echo $mostrar_sin_saldo ? 'checked="checked"' : '' ?> />
 									<?php echo __('Mostrar liquidaciones y adelantos sin saldo'); ?>
-                                </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td colspan="3" align="left">
-                                <label>
-                                    <input type="hidden" name="mostrar_detalle" value="0" />
-                                    <input type="checkbox" name="mostrar_detalle" id="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked="checked"' : '' ?> />
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="left">
+								<label>
+									<input type="hidden" name="mostrar_detalle" value="0" />
+									<input type="checkbox" name="mostrar_detalle" id="mostrar_detalle" value="1" <?php echo $mostrar_detalle ? 'checked="checked"' : '' ?> />
 									<?php echo __('Mostrar detalle del saldo'); ?>
-                                </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td colspan="3" align="left">
-                                <label>
-                                    <input type="hidden" name="ocultar_clientes_sin_saldo" value="0" />
-                                    <input type="checkbox" name="ocultar_clientes_sin_saldo" id="ocultar_clientes_sin_saldo" value="1" <?php echo $ocultar_clientes_sin_saldo ? 'checked="checked"' : '' ?> />
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="left">
+								<label>
+									<input type="hidden" name="ocultar_clientes_sin_saldo" value="0" />
+									<input type="checkbox" name="ocultar_clientes_sin_saldo" id="ocultar_clientes_sin_saldo" value="1" <?php echo $ocultar_clientes_sin_saldo ? 'checked="checked"' : '' ?> />
 									<?php echo __('Ocultar clientes sin saldo'); ?>
-                                </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td colspan="2" align="left">
-                                <input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn" />
-                            </td>
-                            <td width="40%" align="right">
-                                <input name="boton_xls" id="boton_xls" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn" />
-                            </td>
-                        </tr>
-                    </table>
-                </fieldset>
-            </form>
-        </td>
-    </tr>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td colspan="2" align="left">
+								<input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn" />
+							</td>
+							<td width="40%" align="right">
+								<input name="boton_xls" id="boton_xls" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn" />
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</td>
+	</tr>
 </table>
 <link rel="stylesheet" type="text/css" media="print" href="https://static.thetimebilling.com/css/imprimir.css" />
 <script type="text/javascript">
@@ -533,15 +565,31 @@ $Pagina->PrintTop($popup);
 		jQuery('.saldo:not(:contains(-))').css('color', '#00f');
 		jQuery('.subtotal td').css('font-weight', 'bold');
 
-		/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
-		 var td = jQuery(el);
-		 var contenido = td.html();
-		 td.html('');
-		 td.append(jQuery('<a/>', {
-		 text: contenido,
-		 href: 'planilla_saldo.php?codigo_cliente='
-		 })).append(' ');
-		 });*/
+		jQuery('td.asunto').each(function() {
+			var td = jQuery(this);
+			var contenido = td.html();
+			td.html('');
+			try {
+				if (contenido.length > 0 && contenido != 'asunto') {
+					var _contenido = contenido.split(',');
+					if (_contenido.length > 5) {
+						td.append(_contenido.length + ' asuntos');
+					} else {
+						jQuery.each(_contenido, function(k,v) {
+						var _v = v.split('|');
+							td.append(jQuery('<a/>', {
+								text: _v[0],
+								style: 'white-space:nowrap;',
+								href: 'javascript:void(0)',
+								onMouseover: 'ddrivetip("' + _v[1] + '")',
+								onMouseout: 'hideddrivetip()'
+							})).append(' ');
+						});
+					}
+				}
+			} catch (err) {
+			}
+		});
 	});
 </script>
 <?php
@@ -557,14 +605,6 @@ if ($_REQUEST['opcion'] == 'buscar') {
 
 	$color = $saldo_total < 0 ? 'red' : 'blue';
 	$resultado = '<span style="color: ' . $color . '">' . $moneda_base . ' ' . number_format($saldo_total, 2, ',', '.') . '</span>';
-
-	// echo '<pre style="text-align: left; color: red;">' . $query_gastos . "</pre>";
-	// echo '<pre style="text-align: left; color: blue;">' . $query_liquidaciones . "</pre>";
-	// echo '<pre style="text-align: left; color: green;">' . $query_adelantos . "</pre>";
-	// echo '<pre style="text-align: left; color: grey;">' . $query . "</pre>";
-	// echo '<div style="text-align: right; font-size: 2em;">Saldo total: ' . $resultado . '</h1>';
 }
-
-//echo '<pre>' . print_r($query, true) . '</pre>';
 
 $Pagina->PrintBottom();

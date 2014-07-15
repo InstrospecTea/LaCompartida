@@ -359,46 +359,6 @@ echo "cambioCobro:".$cambio_cobro."<br>";*/
 		}
 		return $out;
 	}
-
-	function CambiarEstadoCobro($id_cobro,$saldo_cobro_honorarios,$saldo_cobro_gastos)
-	{
-		$cobro = new Cobro($this->sesion);
-		$cobro->Load($id_cobro);
-		if($cobro->Loaded())
-		{
-			//echo $cobro->fields['estado'] . "<br>" . $saldo_cobro_honorarios . "<br>" . $saldo_cobro_gastos;
-			if( ( ( $cobro->fields['estado']=='PAGADO')  || ($cobro->fields['estado']=='PAGO PARCIAL') ) && (($saldo_cobro_honorarios!=0) || ($saldo_cobro_gastos!=0)))
-			{
-				if( $cobro->TienePago() )
-				{
-					$cobro->Edit('estado','PAGO PARCIAL');
-				}
-				elseif( $cobro->TieneFacturasSinAnular() )
-				{
-					if( !empty($cobro->fields['fecha_enviado_cliente']) && $cobro->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' ) {
-						$cobro->Edit('estado','ENVIADO AL CLIENTE');
-					} else {
-						if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
-						{
-							$cobro->Edit('estado','FACTURADO');
-						} else {
-							$cobro->Edit('estado','EMITIDO');
-						}
-					}
-				}
-				else {
-					$cobro->Edit('estado','EMITIDO');
-				}
-                $cobro->Write();
-			}
-			elseif((($cobro->fields['estado']=='EMITIDO') || ($cobro->fields['estado']=='ENVIADO AL CLIENTE') || ($cobro->fields['estado']=='FACTURADO') || ($cobro->fields['estado']=='PAGO PARCIAL') ) && (($saldo_cobro_honorarios<=0) && ($saldo_cobro_gastos<=0)))
-			{
-				$cobro->Edit('estado','PAGADO');
-                $cobro->Write();
-			}
-		}
-	}
-
 }
 
 

@@ -133,7 +133,7 @@ class AlertaCron {
 
 		$to = $email; // Mail a Usuario
 
-		Utiles::InsertarPlus($sesion, "Alerta $from", $_mensaje, $to, $nombre, ($tipo == 'diario'), $id_usuario, $tipo, $simular);
+		return Utiles::InsertarPlus($sesion, "Alerta $from", $_mensaje, $to, $nombre, ($tipo == 'diario'), $id_usuario, $tipo, $simular);
 	}
 
 	function AlertaProfesional($id_persona, $opc_mail, $sesion) {

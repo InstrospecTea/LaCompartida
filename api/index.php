@@ -60,7 +60,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/clients', function () use ($Session, $Slim) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$timestamp = $Slim->request()->params('timestamp');
 	$include = $Slim->request()->params('include');
@@ -80,7 +80,7 @@ $Slim->get('/clients/:code/matters', function ($code) use ($Session) {
 		halt(__("Invalid client code"), "InvalidClientCode");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$Client = new Cliente($Session);
 	$Matter = new Asunto($Session);
@@ -103,7 +103,7 @@ $Slim->get('/clients/:code/matters', function ($code) use ($Session) {
 });
 
 $Slim->get('/matters', function () use ($Session, $Slim) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$timestamp = $Slim->request()->params('timestamp');
 	$include = $Slim->request()->params('include');
@@ -119,7 +119,7 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/activities', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$Activity = new Actividad($Session);
 	$activities = $Activity->findAll();
@@ -128,7 +128,7 @@ $Slim->get('/activities', function () use ($Session) {
 });
 
 $Slim->get('/areas', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$WorkArea = new AreaTrabajo($Session);
 	$work_areas = $WorkArea->findAll();
@@ -137,7 +137,7 @@ $Slim->get('/areas', function () use ($Session) {
 });
 
 $Slim->get('/tasks', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$Task = new Tarea($Session);
 	$tasks = $Task->findAll();
@@ -146,7 +146,7 @@ $Slim->get('/tasks', function () use ($Session) {
 });
 
 $Slim->get('/translations', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$translations = array();
 	array_push($translations, array('code' => 'Matters', 'value' => __('Asuntos')));
@@ -157,7 +157,7 @@ $Slim->get('/translations', function () use ($Session) {
 });
 
 $Slim->get('/settings', function () use ($Session) {
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$settings = array();
 
@@ -209,7 +209,7 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 	$User = new Usuario($Session);
 	$user = array();
 
@@ -241,7 +241,7 @@ $Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -263,6 +263,18 @@ $Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$works = $Work->findAllWorksByUserId($id, $before, $after);
+
+		if (!empty($works)) {
+			$secondary_code = Conf::GetConf($Session, 'CodigoSecundario');
+			for ($x = 0; $x < count($works); $x++) {
+				if ($secondary_code) {
+					$works[$x]['client_code'] = $works[$x]['secondary_client_code'];
+					$works[$x]['matter_code'] = $works[$x]['secondary_matter_code'];
+				}
+				unset($works[$x]['secondary_client_code']);
+				unset($works[$x]['secondary_matter_code']);
+			}
+		}
 	}
 
 	outputJson($works);
@@ -273,8 +285,9 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
-
+	$auth_token = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = $auth_token->user_id;
+	$app_id = getAppIdByAppKey($auth_token->app_key);
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
 
@@ -293,6 +306,7 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 	$work['user_id'] = (int) $Slim->request()->params('user_id');
 	$work['billable'] = (int) $Slim->request()->params('billable');
 	$work['visible'] = (int) $Slim->request()->params('visible');
+	$work['app_id'] =  $app_id;
 
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
@@ -327,6 +341,12 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 				}
 			} else {
 				$work = $Work->findById($Work->fields['id_trabajo']);
+				if (Conf::GetConf($Session, 'CodigoSecundario')) {
+					$work['client_code'] = $work['secondary_client_code'];
+					$work['matter_code'] = $work['secondary_matter_code'];
+				}
+				unset($work['secondary_client_code']);
+				unset($work['secondary_matter_code']);
 			}
 		}
 	}
@@ -343,7 +363,9 @@ $Slim->post('/users/:user_id/works/:id', function ($user_id, $id) use ($Session,
 		halt(__("Invalid work ID"), "InvalidWorkID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = $auth_token->user_id;
+	$app_id = getAppIdByAppKey($auth_token->app_key);
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -363,6 +385,7 @@ $Slim->post('/users/:user_id/works/:id', function ($user_id, $id) use ($Session,
 	$work['user_id'] = (int) $user_id;
 	$work['billable'] = (int) $Slim->request()->params('billable');
 	$work['visible'] = (int) $Slim->request()->params('visible');
+	$work['app_id'] = $app_id;
 
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
@@ -411,7 +434,7 @@ $Slim->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Sessi
 		halt(__("Invalid work ID"), "InvalidWorkID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
@@ -440,7 +463,7 @@ $Slim->put('/users/:user_id/device', function ($user_id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
@@ -484,7 +507,7 @@ $Slim->delete('/users/:user_id/device/:token', function ($user_id, $token) use (
 		halt(__("Invalid token device"), "InvalidTokenDevice");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
@@ -510,7 +533,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$auth_token_user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders()->user_id;
 
 	$User = new Usuario($Session);
 	$receive_alerts = (int) $Slim->request()->params('receive_alerts');
@@ -546,7 +569,6 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	}
 });
 
-
 $Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
@@ -557,7 +579,6 @@ $Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($c
 
 	$generators = Contrato::contractGenerators($Session, $contract_id);
 	outputJson($generators);
-
 });
 
 $Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session, $Slim) {
@@ -574,7 +595,6 @@ $Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id
 	$percent_generator = $Slim->request()->params('percent_generator');
 	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator);
 	outputJson($generator);
-
 });
 
 $Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session, $Slim) {
@@ -591,8 +611,6 @@ $Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($c
 	outputJson($generator);
 });
 
-
-
 $Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session) {
 	if (is_null($client_id) || empty($client_id)) {
 		halt(__("Invalid client ID"), "InvalidClientId");
@@ -606,7 +624,6 @@ $Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_
 	Contrato::deleteContractGenerator($Session, $generator_id);
 	outputJson(array('result' => 'OK'));
 });
-
 
 $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim) {
 
@@ -646,7 +663,7 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 
 $Slim->get('/reports', function () use ($Session, $Slim) {
 	require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
-	$user_id = validateAuthTokenSendByHeaders('REP');
+	$user_id = validateAuthTokenSendByHeaders('REP')->user_id;
 	$results = SimpleReport::LoadApiReports($Session);
 	outputJson(array('results' => $results));
 });
@@ -655,7 +672,6 @@ $Slim->get('/currencies', function () use ($Session, $Slim) {
 	$results = Moneda::GetMonedas($Session, '', false);
 	outputJson(array('results' => $results));
 });
-
 
 $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 	if (isset($id)) {
@@ -693,7 +709,7 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 			} else {
 				if ($format == 'xml') {
 					$file_name = 'invoice_' . Utiles::sql2date($Invoice->fields['fecha'], "%Y%m%d") . "_{$Invoice->fields['serie_documento_legal']}-{$Invoice->fields['numero']}.xml";
-					downloadFile($file_name, 'text/xml', $Invoice->fields['dte_xml']);
+					downloadFile($file_name, 'text/xml', utf8_decode($Invoice->fields['dte_xml']));
 				} else {
 					halt(__("Invalid document format"), "InvalidDocumentFormat");
 				}
@@ -753,7 +769,6 @@ $Slim->map('/release-list', function () use ($Session, $Slim) {
 	}
 
 	outputJson($response);
-
 })->via('GET', 'POST');
 
 $Slim->map('/release-download', function () use ($Session, $Slim) {
@@ -789,7 +804,13 @@ function downloadFile($name, $type, $content) {
 	echo $content;
 }
 
-function validateAuthTokenSendByHeaders($permission = null) {
+function getAppIdByAppKey($app_key) {
+	global $Session;
+	$UserToken = new UserToken($Session);
+	return $UserToken->getAppIdByAppKey($app_key);
+}
+
+function validateAuthTokenSendByHeaders($permission = null, $includes_app_id = false) {
 	global $Session, $Slim;
 
 	$UserToken = new UserToken($Session);
@@ -834,7 +855,7 @@ function validateAuthTokenSendByHeaders($permission = null) {
 			}
 		}
 
-		return $user_token->user_id;
+		return $user_token;
 	}
 }
 

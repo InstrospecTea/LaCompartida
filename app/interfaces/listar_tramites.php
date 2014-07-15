@@ -204,53 +204,53 @@ if ($usuarios) {
 
 #TOTAL HORAS
 #BUSCAR
-$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
+$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
 				tramite.id_cobro,
-				tramite.id_tramite, 
-				tramite.id_moneda_tramite, 
-				tramite.fecha, 
-				tramite.codigo_asunto, 
+				tramite.id_tramite,
+				tramite.id_moneda_tramite,
+				tramite.fecha,
+				tramite.codigo_asunto,
 				tramite.revisado,
 				prm_moneda.simbolo as simbolo,
-				asunto.codigo_cliente as codigo_cliente, 
-				contrato.id_moneda as id_moneda_asunto, 
+				asunto.codigo_cliente as codigo_cliente,
+				contrato.id_moneda as id_moneda_asunto,
 				asunto.id_asunto AS id,
-				cobro.fecha_cobro as fecha_cobro_orden, 
-				IF(tramite.cobrable=1,'SI','NO') as glosa_cobrable, 
-				cobro.estado as estado_cobro, 
+				cobro.fecha_cobro as fecha_cobro_orden,
+				IF(tramite.cobrable=1,'SI','NO') as glosa_cobrable,
+				cobro.estado as estado_cobro,
 				usuario.username,
 				usuario.nombre,
 				usuario.apellido1,
 				usuario.apellido2,
-				CONCAT_WS(' ',usuario.nombre,usuario.apellido1, usuario.apellido2) as usr_nombre, 
-				tramite.id_tramite_tipo, 
-				DATE_FORMAT(tramite.fecha,'%e-%c-%x') AS fecha_cobro, 
-				cobro.estado, 
-				asunto.forma_cobro, 
-				asunto.monto, 
-				asunto.glosa_asunto, 
-				tramite.descripcion, 
+				CONCAT_WS(' ',usuario.nombre,usuario.apellido1, usuario.apellido2) as usr_nombre,
+				tramite.id_tramite_tipo,
+				DATE_FORMAT(tramite.fecha,'%e-%c-%x') AS fecha_cobro,
+				cobro.estado,
+				asunto.forma_cobro,
+				asunto.monto,
+				asunto.glosa_asunto,
+				tramite.descripcion,
 				contrato.id_contrato,
-				contrato.descuento, 
-				tramite_tipo.glosa_tramite, 
-				tramite.tarifa_tramite, 
-				tramite.id_moneda_tramite_individual, 
-				tramite.tarifa_tramite_individual, 
-				tramite.duracion, 
-				prm_idioma.codigo_idioma, 
+				contrato.descuento,
+				tramite_tipo.glosa_tramite,
+				tramite.tarifa_tramite,
+				tramite.id_moneda_tramite_individual,
+				tramite.tarifa_tramite_individual,
+				tramite.duracion,
+				prm_idioma.codigo_idioma,
 				tramite.cobrable
-				
+
 	            FROM tramite
-				  
+
 				JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
-				LEFT JOIN prm_idioma ON prm_idioma.id_idioma = asunto.id_idioma 
+				LEFT JOIN prm_idioma ON prm_idioma.id_idioma = asunto.id_idioma
 				JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 				JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 				LEFT JOIN cobro ON tramite.id_cobro = cobro.id_cobro
 				LEFT JOIN usuario ON tramite.id_usuario = usuario.id_usuario
 				LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
-	              
+
 			WHERE $where ";
 
 if ($check_tramite == 1 && isset($cobro) && !$excel) { //check_tramite vale 1 cuando aprietan boton buscar
@@ -274,10 +274,17 @@ for ($x = 0; $x < $lista_tramites->num; $x++) {
 	$ids_listado_tramites.="t" . $tramite->fields['id_tramite'];
 }
 if ($orden == "") {
-	if ($opc_orden == 'edit') {
-		$orden = "tramite.fecha_modificacion DESC";
+
+	if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
+		$orden = " cliente.glosa_cliente ASC, tramite.fecha ASC";
 	} else {
-		$orden = "tramite.fecha DESC, tramite.descripcion";
+
+		if ($opc_orden == 'edit') {
+			$orden = "tramite.fecha_modificacion DESC";
+		} else {
+			$orden = "tramite.fecha DESC, tramite.descripcion";
+		}
+		
 	}
 }
 
@@ -442,7 +449,7 @@ $pagina->PrintTop($popup);
 		}
 		return true;
 	}
-	
+
 	// Encuentra los id de los trabajos seleccionados para editar, depende del id del primer <tr> que contiene al trabajo.
 	// Los id quedan en un string separados por el caracter 't'.
 	function getIdTrabajosSeleccionados()
@@ -489,7 +496,7 @@ $pagina->PrintTop($popup);
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
 	</div>
-	
+
 	<?php
 	if ($motivo != "cobros") {
 		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
@@ -510,7 +517,7 @@ $pagina->PrintTop($popup);
 										<td align="right">
 											<?php echo __('Trabajo') ?>
 										</td>
-										<td align='left'> 
+										<td align='left'>
 											<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no", "trabajo_si_no", $trabajo_si_no, '', 'Todos', '60') ?>
 										</td>
 									</tr>
@@ -594,7 +601,7 @@ if (isset($cobro) || $opc == 'buscar') {
 
 	<a href="#" onclick="nuovaFinestra('Editar_listado_trámites', 700, 450, 'editar_multiples_tramites.php?ids=<?php echo $ids_listado_tramites ?>&popup=1&listado_completo=1', '');" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
 
-	<br /> 
+	<br />
 	<input type="button" class="btn" value="<?php echo __('Descargar listado a Excel') ?>" onclick="window.open('listar_tramites.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>')">
 	<br />
 	</center>
@@ -610,7 +617,7 @@ function Cobrable(& $fila) {
 	} else {
 		$checked = "";
 	}
-		
+
 	$Check = "<input type='checkbox' $checked onclick=GrabarCampo('cobrar_tramite','" . $fila->fields['id_tramite'] . "',$id_cobro,'');>";
 	return $Check;
 }
@@ -648,7 +655,7 @@ function Opciones(& $tramite) {
 		} else {
 			$opc_html.= "<a href=# onclick=\"alert('" . __('No se puede modificar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\"><img src=$img_dir/editar_off.gif border=0></a>";
 		}
-		
+
 		if ( Conf::GetConf($sesion, 'UsaDisenoNuevo') ) {
 			if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($tramite->fields['id_cobro'])) {
 				$opc_html.= "<a href='javascript:void(0);' onclick=\"if (confirm('¿" . __('Est&aacute; seguro de eliminar el') . " " . __('trámite') . "?'))EliminaTramite(" . $tramite->fields['id_tramite'] . ");\"><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
@@ -662,30 +669,30 @@ function Opciones(& $tramite) {
 				$opc_html.= "<a href=# onclick=\"alert('" . __('No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\"><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 			}
 		}
-		
+
 	} elseif ($p_profesional->fields['permitido']) {
-	
+
 		if ($tramite->Estado() == 'Revisado') {
 			$opc_html .= "<img src=$img_dir/candado_16.gif border=0 title='" . __('Este trabajo ya ha sido revisado') . "'>";
 		} else {
-			
+
 			if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($tramite->fields['id_cobro'])) {
 				$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trámite',550,450,'ingreso_tramite.php?id_cobro=" . $id_cobro . "&id_tramite=" . $tramite->fields['id_tramite'] . "&popup=1opcion=edit','');\" title=" . __('Editar') . "><img src=$img_dir/editar_on.gif border=0></a>";
 			} else {
 				$opc_html.= "<a href=# onclick=\"alert('" . __('No se puede modificar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\" ><img src=$img_dir/editar_off.gif border=0></a>";
 			}
-			
+
 			if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($tramite->fields['id_cobro'])) {
 				$opc_html.= "<a href='javascript:void(0);' onclick=\"if (confirm('¿" . __('Est&aacute; seguro de eliminar el') . " " . __('trámite') . "?'))EliminaTramite(" . $tramite->fields['id_tramite'] . ");\"><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 			} else {
 				$opc_html.= "<a href=# onclick=\"alert('" . __('No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\"><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 			}
 		}
-		
+
 	} else {
 		$opc_html .= "<img src=$img_dir/candado_16.gif border=0 title='" . __('Usted no tiene permiso de Revisor') . "'>";
 	}
-		
+
 	return $opc_html;
 }
 
@@ -694,7 +701,7 @@ function SplitDuracion($time) {
 	if ($h > 0 || $s > 0) {
 		return $h . ":" . $m;
 	}
-		
+
 }
 
 function funcionTR(& $tramite) {
@@ -724,7 +731,7 @@ function funcionTR(& $tramite) {
 	} else {
 		$tarifa = $tramite->fields['tarifa_tramite'];
 	}
-	
+
 	list($h, $m, $s) = split(":", $tramite->fields['duracion_defecto']);
 
 	$duracion = $h + ($m > 0 ? ($m / 60) : '0');
@@ -738,7 +745,7 @@ function funcionTR(& $tramite) {
 	$html .= '<td><input type="checkbox" onmouseover="ddrivetip(\'Para editar múltiples trámites haga click aquí.\')" onmouseout="hideddrivetip();" ></td>';
 	$glosa_tramite = $tramite->fields['glosa_tramite'];
 	$descripcion = $tramite->fields['descripcion'];
-	
+
 	if (strlen($glosa_tramite) > 18 && strlen($descripcion) > 18) {
 		$html .= "<td width=120 nowrap><div onmouseover=\"ddrivetip('<b>$glosa_tramite</b><br>$descripcion');\" onmouseout=\"hideddrivetip();\" style=\"max-width: 100px;\"><strong>" . substr($glosa_tramite, 0, 16) . "..</strong><br>" . substr($descripcion, 0, 16) . "..</div></td>";
 	} else if (strlen($glosa_tramite) > 18) {
@@ -748,7 +755,7 @@ function funcionTR(& $tramite) {
 	} else{
 		$html .= "<td width=120 nowrap><div style=\"max-width: 100px;\"><strong>" . $glosa_tramite . "</strong><br>" . $descripcion . "</div></td>";
 	}
-	
+
 	$html .= "<td>$fecha</td>";
 
 	$codigo_cliente = $tramite->fields['codigo_cliente'];
@@ -787,11 +794,12 @@ function funcionTR(& $tramite) {
 		$editar_cobro = $tramite->fields['id_cobro'];
 	}
 
-	$moneda_tramite = new Moneda($sesion);
+	$id_tramite = $tramite->fields['id_moneda_tramite'];
+	if (!empty($tramite->fields['id_moneda_tramite_individual']) && $tramite->fields['id_moneda_tramite_individual'] != $tramite->fields['id_moneda_tramite']) {
+		$id_tramite = $tramite->fields['id_moneda_tramite_individual'];
+	}
 
-	//	$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
-	//	Lo comentado de la linea anterior a esta fue reemplazado por el siguiente despues del comentario
-	//	debido a que no se obtenian los formatos ni los simbolos para las monedas que correspondian
+	$moneda_tramite = new Moneda($sesion);
 	$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
 
 	$html .= "<td align=center>" . $duracion . "</td>";

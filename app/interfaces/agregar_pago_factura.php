@@ -58,13 +58,14 @@ if ($desde_webservice) {
 		$pago_retencion = $pago->fields['pago_retencion'];
 	} else if (!empty($lista_facturas)) {
 		$numeros_facturas_tmp = array();
-		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
+		$query_num_facturas = "SELECT numero, serie_documento_legal FROM factura WHERE id_factura IN ($lista_facturas) ";
 		$resunf = mysql_query($query_num_facturas, $sesion->dbh) or Utiles::errorSQL($query_num_facturas, __FILE__, __LINE__, $sesion->dbh);
 		if (mysql_num_rows($resunf) > 0) {
+			$Factura = new Factura($sesion);
 			while ($numfact = mysql_fetch_array($resunf)) {
-				array_push($numeros_facturas_tmp, $numfact['numero']);
+				$numeros_facturas_tmp[] = $Factura->ObtenerNumero(null, $numfact['serie_documento_legal'], $numfact['numero']);
 			}
-			$numeros_facturas = implode(',', $numeros_facturas_tmp);
+			$numeros_facturas = implode(', ', $numeros_facturas_tmp);
 		}
 
 		$query_montos_facturas = "SELECT SUM(honorarios) as honorarios, SUM(subtotal_gastos+subtotal_gastos_sin_impuesto) as gastos
@@ -300,6 +301,7 @@ $query__listado = "SELECT SQL_CALC_FOUND_ROWS
 						f.id_cobro,
 						f.id_factura,
 						f.numero,
+						f.serie_documento_legal,
 						pdl.glosa AS glosa_documento_legal,
 						IF(ccfm.saldo-ccfmn.monto=0, 0, IF(ccfmn.monto > 0,-ccfm.saldo+ccfmn.monto,-ccfm.saldo)) as saldo_factura,
 						ccfmn.monto AS monto_pago,
@@ -812,10 +814,10 @@ if ($id_adelanto) {
 				$saldo_gastos = $gastos_facturas > 0 ? '&pago_gastos=1' : '';
 				$saldo_honorarios = $honorarios_facturas > 0 ? '&pago_honorarios=1' : '';
 				?>
-				<td>
+				<td align="right" width="25%">
 					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>&desde_factura_pago=1', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');
 			return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
-				</td align=right width="25%">
+				</td>
 			<?php } ?>
 
 
@@ -1083,16 +1085,21 @@ if ($id_adelanto) {
 	$b->mensaje_error_fecha = "N/A";
 	$b->nombre = "busc_facturas";
 	$b->titulo = __('Listado de') . ' ' . __('documentos legales');
-	$b->AgregarEncabezado("id_cobro", __('N° Cobro'), "align=center");
-	$b->AgregarEncabezado("numero", __('N° Documento'), "align=center");
-	$b->AgregarEncabezado("glosa_documento_legal", __('Tipo Documento'), "align=center");
-	$b->AgregarEncabezado("simbolo", __('Moneda'), "align=center");
-	$b->AgregarEncabezado("saldo_factura", __('Saldo por pagar'), "align=center");
-	$b->AgregarFuncion("Pagar", 'Opciones', "align=center nowrap");
-	$b->color_mouse_over = "#bcff5c";
+	$b->AgregarEncabezado("id_cobro", __('N° Cobro'), 'align="center"');
+	$b->AgregarFuncion(__('N° Documento'), 'NumeroFactura1', 'align="center"');
+	$b->AgregarEncabezado('glosa_documento_legal', __('Tipo Documento'), 'align="center"');
+	$b->AgregarEncabezado('simbolo', __('Moneda'), 'align="center"');
+	$b->AgregarEncabezado('saldo_factura', __('Saldo por pagar'), 'align="center"');
+	$b->AgregarFuncion('Pagar', 'Opciones', 'align="center" nowrap="nowrap"');
+	$b->color_mouse_over = '#bcff5c';
 
-	$b->Imprimir("", array(), false);
+	$b->Imprimir('', array(), false);
 
+	function NumeroFactura1(& $fila) {
+		global $sesion;
+		$Factura = new Factura($sesion);
+		return $Factura->ObtenerNumero(null, $fila->fields['serie_documento_legal'], $fila->fields['numero']);
+	}
 	function Opciones(& $fila) {
 		global $lista_facturas;
 		global $saldo_pago;

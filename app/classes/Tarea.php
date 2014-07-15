@@ -1,17 +1,13 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../app/classes/Cobro.php';
+require_once Conf::ServerDir().'/modulos/ical_Creator/ICS_Creation.php';
 
 //Tarea implementa un buscador con columnas dinámicas
 class Tarea extends Objeto
 {
 	// Sesion PHP
     var $sesion = null;
-
+    public $estados = array('Por Asignar','Asignada','En Desarrollo','Por Revisar','Lista');
 
 	function Tarea($sesion, $fields = "", $params = "")
 	{
@@ -54,6 +50,12 @@ class Tarea extends Objeto
 		else if($opciones['fecha_hasta'])
 			$where .= " AND tarea.fecha_entrega <= '".Utiles::fecha2sql($opciones['fecha_hasta'])."'";
 
+		if($opciones['id_usuario_involucrado']){
+			$where .= " AND (
+						encargado.id_usuario = {$opciones['id_usuario_involucrado']} OR
+						generador.id_usuario = {$opciones['id_usuario_involucrado']} OR
+						revisor.id_usuario = {$opciones['id_usuario_involucrado']}) ";
+		}
 
 		if(is_array($opciones['estado']))
 		{
@@ -166,7 +168,7 @@ class Tarea extends Objeto
 	}
 
 
-function Write()
+	function Write()
 	{
 		$this->error = "";
 		if(!$this->Check())
@@ -198,7 +200,7 @@ function Write()
 			{
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
-			else //Retorna true ya que si no quiere hacer update la función corrió bien
+			else //Retorna true ya que si no quiere hacer update la función corría bien
 				return true;
 		}
 		else
@@ -222,6 +224,7 @@ function Write()
 			}
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			$this->fields[$this->campo_id] = mysql_insert_id($this->sesion->dbh);
+			$this->enviarMailNotificaciones();
 		}
 		if( $this->fields['orden_estado']==2 || $this->fields['estado'] == 'Asignada')
 		{
@@ -264,7 +267,7 @@ function Write()
                         */
 
 			$subject = "[Tarea] ".$this->fields['nombre'];
-			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí</a>).";
+			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí­</a>).";
 
 			Utiles::Insertar($this->sesion,$subject,$mensaje,$email,$nombre,false);
 		}
@@ -299,6 +302,99 @@ function Write()
 		}
 
 		return $tasks;
+	}
+
+	/**
+	* Busca las novedades dada una tarea $id_tarea
+	* @param id_usuario
+	* @param id_tarea
+	**/
+	function getNovedades($id_usuario,$id_tarea){
+		$query = sprintf("SELECT
+								tarea.id_tarea,
+								COUNT(tarea_comentario.id_comentario) AS comentarios,
+								COUNT(tarea_comentario_usuario.id_comentario) AS vistos
+							FROM tarea
+								JOIN tarea_comentario ON (tarea_comentario.id_tarea = tarea.id_tarea)
+								JOIN usuario
+								LEFT JOIN tarea_comentario_usuario ON (tarea_comentario_usuario.id_comentario = tarea_comentario.id_comentario AND tarea_comentario_usuario.id_usuario = '%d')
+							WHERE usuario.id_usuario = '%d' AND tarea.id_tarea = '%d'
+							GROUP BY tarea.id_tarea",$id_usuario,$id_usuario,$id_tarea);
+		$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		return mysql_fetch_array($result);
+	}
+
+	/**
+	* Se envia un mail con una invitación para google calendar al registrar una nueva Tarea
+	**/
+	function enviarMailNotificaciones(){
+		$invitados = array();
+		if($this->fields['usuario_registro']!='NULL')
+			$invitados[] = $this->fields['usuario_registro'];
+		if($this->fields['usuario_encargado']!='NULL')
+			$invitados[] = $this->fields['usuario_encargado'];
+		if($this->fields['usuario_revisor']!='NULL')
+			$invitados[] = $this->fields['usuario_revisor'];
+		if($this->fields['usuario_generador']!='NULL')
+			$invitados[] = $this->fields['usuario_generador'];
+		$invitados = array_unique($invitados);
+		if(sizeof($invitados)>0){
+			$query_usuarios_emails = sprintf("SELECT
+												u.email,
+												CONCAT_WS(' ',u.nombre, u.apellido1) nombre
+											FROM usuario u
+											WHERE
+												u.id_usuario IN (%s);",implode(",",$invitados));
+			$result = mysql_query($query_usuarios_emails) or Utiles::errorSQL($query_usuarios_emails,__FILE__,__LINE__,$sesion->dbh);
+			$correos = array();
+			while ($row = mysql_fetch_array($result)) {
+			    $correos[] = array('nombre' => $row['nombre'],'mail' => trim($row['email']));
+			}
+			$ICS_data = NEW ICS_Creation();
+			$nombre_tarea = $this->fields['nombre'];
+			$detalle = $this->fields['detalle'];
+            $ICS_data->addEvent($this->fields['fecha_entrega'], $this->fields['fecha_entrega'], "Nueva tarea ".$nombre_tarea, $detalle, '');
+            $event_data = utf8_encode($ICS_data->render_Event());
+            $attachment = array(
+            	'data_string' => $event_data,
+            	'filename'	  => 'invitacion.ics',
+		        'base_encode' => '7bit'
+            );
+            $query = sprintf("SELECT glosa_cliente FROM cliente WHERE codigo_cliente='%s'",$this->fields['codigo_cliente']);
+            $result_cliente = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result_cliente)) {
+			   $glosa_cliente = $row['glosa_cliente'];
+			}
+
+			$query = sprintf("SELECT glosa_asunto FROM asunto WHERE codigo_asunto='%s'",$this->fields['codigo_asunto']);
+			$result_asunto = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result_asunto)) {
+			   $glosa_asunto = $row['glosa_asunto'];
+			}
+
+			$query = sprintf("SELECT CONCAT_WS(' ',nombre, apellido1) as nombre FROM usuario WHERE id_usuario=%d",$this->fields['usuario_encargado']);
+			$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result)) {
+			   $usuario_encargado_nombre = $row['nombre'];
+			}
+
+			$query = sprintf("SELECT CONCAT_WS(' ',nombre, apellido1) as nombre FROM usuario WHERE id_usuario=%d",$this->fields['usuario_revisor']);
+			$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result)) {
+			   $usuario_revisor_nombre = $row['nombre'];
+			}
+
+			$query = sprintf("SELECT CONCAT_WS(' ',nombre, apellido1) as nombre FROM usuario WHERE id_usuario=%d",$this->fields['usuario_generador']);
+			$result = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            while ($row = mysql_fetch_array($result)) {
+			   $usuario_generador_nombre = $row['nombre'];
+			}
+
+            $subject = sprintf('Se ha creado una nueva tarea (%s) para el cliente (%s)',$nombre_tarea,$glosa_cliente);
+            $body = sprintf("Estimado usuario,<br><br> Se ha registrado una nueva tarea <b>%s</b> para el cliente %s (%s) y asunto %s (%s).<br><br> Responsable: %s<br>Revisor: %s<br>Mandante: %s<br><br>Mensaje generado por The Time Billing.",$nombre_tarea,$glosa_cliente,$this->fields['codigo_cliente'],$glosa_asunto,$this->fields['codigo_asunto'],$usuario_encargado_nombre,$usuario_revisor_nombre,$usuario_generador_nombre);
+            mysql_free_result($result);
+            return Utiles::EnviarMail($this->sesion,$correos,$subject,$body,false, NULL,$attachment);
+		}
 	}
 }
 

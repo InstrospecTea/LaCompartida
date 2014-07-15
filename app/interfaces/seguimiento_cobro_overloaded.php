@@ -76,7 +76,7 @@
 		$where = 1;
 		if($id_cobro) {
 			$where .= " AND cobro.id_cobro = '$id_cobro' ";
-		} else if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') && !empty($numero_factura) ) {
+		} else if( Conf::GetConf($sesion,'FacturaSeguimientoCobros') && !Conf::GetConf($sesion,'NuevoModuloFactura') && !empty($numero_factura) ) {
 			$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 		}
 		else if( $factura || $tipo_documento_legal || $serie ){
@@ -143,29 +143,29 @@
 			$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ". 	" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
 
 		$mostrar_codigo_asuntos = "";
-		if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+		if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 			$mostrar_codigo_asuntos = "asunto.codigo_asunto";
-			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 				$mostrar_codigo_asuntos .= "_secundario";
 			}
 			$mostrar_codigo_asuntos .= ", ' ', ";
 		}
                         // FFF 25-01-2012 el estado de la factura se saca de la tabla factura en el mod viejo, y de prm_estado_factura en el nuevo. Ademas, según el conf sale con o sin N de Serie
-                                                        if(UtilesApp::GetConf($sesion,'NuevoModuloFactura')) {
+                                                        if(Conf::GetConf($sesion,'NuevoModuloFactura')) {
 
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
                                                                           left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
-                                                            if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
-                                                                $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
+                                                            if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
+                                                                $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', ifnull(serie_documento_legal,'001'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
 															}  else {
                                                                 $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', numero,if(pef.glosa='Anulado', ' (Anulado)',''))) ";
 															}
-							}  else if(UtilesApp::GetConf($sesion,'PermitirFactura')) {
+							}  else if(Conf::GetConf($sesion,'PermitirFactura')) {
 
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";
-                                                            $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
+                                                            $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', ifnull(serie_documento_legal,'001'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
 														}   else {
 															$joinfactura = "";
 															$documentof = " cobro.documento ";
@@ -212,7 +212,7 @@
 								cobro.incluye_honorarios as incluye_honorarios,
 								cobro.incluye_gastos as incluye_gastos, ";
 
-							if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+							if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 								$query.=" GROUP_CONCAT(DISTINCT " . str_replace('asunto.', 'a2.', $mostrar_codigo_asuntos) . " a2.glosa_asunto SEPARATOR ', ') as asuntos_cobro,";
 							}
 
@@ -228,7 +228,7 @@
 							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
 							left JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro ";
 
-							if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+							if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 									$query.=" LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
 							} else if ($codigo_asunto_secundario){
 								$query.=" JOIN asunto as a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
@@ -273,10 +273,10 @@
 			if( $cobro->fields['codigo_idioma'] != '' )
 				$idioma->Load($cobro->fields['codigo_idioma']);
 			else
-				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+				$idioma->Load(strtolower(Conf::GetConf($sesion,'Idioma')));
 
 			$cols = 4;
-			if (  UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') )
+			if (  Conf::GetConf($sesion,'FacturaSeguimientoCobros') )
 				{
 					$cols++;
 				}
@@ -309,7 +309,7 @@
 				$ht .=	    "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
+				if( 	Conf::GetConf($sesion,'FacturaSeguimientoCobros'))
 				{
 				$ht .=	"<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
@@ -375,7 +375,7 @@
 			#$html .= ' -  [Proc. '.$cobro->fields['id_proceso'].'] ';
 			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span>";
 
-			if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+			if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 				$asuntos_separados = explode(', ',$cobro->fields['asuntos_cobro']);
 				$cantidad_asuntos = count($asuntos_separados);
 				$html .= " <strong id=\"tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "\">" . $cantidad_asuntos . "&nbsp;asunto" . ($cantidad_asuntos > 1 ? "s" : "") . "</strong>";
@@ -383,7 +383,7 @@
 			}
 
 			$html .= "</td>";
-			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
+			if( Conf::GetConf($sesion,'FacturaSeguimientoCobros'))
 			{
 					$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 					if($cobro->fields['documento'])
@@ -392,7 +392,7 @@
 			}
 			$html .= "<td align=center style=\"width: 52px;\"><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Contrato',1050,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;";
 			#if($cobro->fields['estado'] == 'EMITIDO' || $cobro->fields['estado'] == 'CREADO')
-			if(  UtilesApp::GetConf($sesion,'UsaDisenoNuevo') ) {
+			if(  Conf::GetConf($sesion,'UsaDisenoNuevo') ) {
 				$html .=  "<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' title='".__('Eliminar cobro')."' border=0 style='cursor:pointer' onclick=\"EliminarCobros('".$cobro->fields['id_cobro']."','".$cobro->fields['estado']."')\">";
 			} else {
 				$html .=  "<img src='".Conf::ImgDir()."/cruz_roja.gif' title='".__('Eliminar cobro')."' border=0 style='cursor:pointer' onclick=\"EliminarCobros('".$cobro->fields['id_cobro']."','".$cobro->fields['estado']."')\">";
@@ -409,7 +409,7 @@
 	$pagina->PrintTop();
 
 ?>
- 
+
 <script type="text/javascript">
 	var AsuntosContrato=new Array();
 	<?php
@@ -426,7 +426,7 @@
   jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.com/js/bootstrap.min.js"  ,
                 dataType: "script",
                 complete: function() {
-                
+
 
 			jQuery('.btpopover').each(function() {
 				var idContrato=jQuery(this).attr('id').replace('tip_','');
@@ -434,7 +434,7 @@
 
 				jQuery(this).append("<span class='asuntos_del_contrato' style='font-weight:bold;'>"+AsuntosContrato[idContrato]+"</span>");
 			}  );
-  
+
                 }
             });
 
@@ -671,7 +671,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 			<td colspan=2 align=left>
 				<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 				<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-				<?php if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) { ?>
+				<?php if( Conf::GetConf($sesion,'FacturaSeguimientoCobros') && !Conf::GetConf($sesion,'NuevoModuloFactura') ) { ?>
 					&nbsp;&nbsp;<b><?php echo __('N° Factura')?></b>&nbsp;
 					<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
 				<?php } ?>
@@ -709,7 +709,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 			<td align=right><b><?php echo __('Encargado comercial')?>&nbsp;</b></td>
 			<td colspan=2 align=left><?php echo Html::SelectQuery($sesion,$query_usuario,"id_usuario",$id_usuario,'',__('Cualquiera'),'210')?>
 		</tr>
-		<?php if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){ ?>
+		<?php if(Conf::GetConf($sesion, 'EncargadoSecundario')){ ?>
 		<tr>
 			<td align=right><b><?php echo __('Encargado Secundario')?>&nbsp;</b></td>
 			<td colspan=2 align=left><?php echo Html::SelectQuery($sesion,$query_usuario_activo,"id_usuario_secundario",$id_usuario_secundario, '',__('Cualquiera'),'210')?>
@@ -750,7 +750,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 
 	<?php
 
- 
+
 	  echo Html::SelectArray(array(
 					array('1', __('Enero')),
 					array('2', __('Febrero')),

@@ -9,6 +9,7 @@ $limitcantidad = isset($_REQUEST['iDisplayLength']) ? $_REQUEST['iDisplayLength'
 $arrayorden = array(0 => 'fecha', 1 => 'glosa_cliente', 5 => 'egreso', 6 => 'ingreso', 7 => 'con_impuesto', 8 => 'estado', 10 => 'cobrable');
 $orden = $arrayorden[intval($_REQUEST['iSortCol_0'])] . " " . $_REQUEST['sSortDir_0'];
 
+
 if (!isset($where) || (isset($where) && $where == '')) {
 	$where = 1;
 }
@@ -172,14 +173,9 @@ if ($_GET['totalctacorriente']) { ?>
 
 	$selectfrom = $gasto::SelectFromQuery();
 
-
 	$query = $gasto->SearchQuery($sesion,$where." order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
-
 	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where ";
-//echo $selectcount;
-
-
 
 	try {
 		$rows = $sesion->pdodbh->query($selectcount)->fetch();
@@ -214,13 +210,20 @@ if ($_GET['totalctacorriente']) { ?>
 	);
 	$mas = 0;
 	foreach ($resp as $fila) {
+		if (strlen($fila['descripcion']) > 200) {
+			$aDescripcion = explode(' ', substr($fila['descripcion'], 0, 187));
+			array_pop($aDescripcion);
+			$descripcion = implode(' ', $aDescripcion) . '...';
+		} else {
+			$descripcion = $fila['descripcion'];
+		}
 		$stringarray = array(
 			$fila['id_movimiento'],
 			date('d-m-Y', strtotime($fila['fecha'])),
 			$fila['numero_ot'],
 			$fila['glosa_cliente']  ? utf8_encode($fila['codigo_cliente'].'|'.$fila['glosa_cliente']) : ' - ',
 			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
-			$fila['descripcion'] ? utf8_encode($fila['descripcion']) : ' ',
+			$fila['descripcion'] ? utf8_encode($descripcion) : ' ',
 			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
 			$fila['ingresooegreso']=='ingreso' ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
 			$fila['con_impuesto'] ? $fila['con_impuesto'] : ' ',
@@ -230,8 +233,9 @@ if ($_GET['totalctacorriente']) { ?>
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
 			$fila['id_contrato'],
-			$fila['tipo'] ? $fila['tipo'] : ' - '
+			$fila['tipo'] ? utf8_encode($fila['tipo']) : ' - '
 		);
+
 		$resultado['aaData'][] = $stringarray;
 		$mas += $fila['egreso'];
 		$mas -= $fila['ingreso'];

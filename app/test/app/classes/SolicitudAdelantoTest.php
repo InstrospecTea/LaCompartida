@@ -20,25 +20,7 @@ class SolicitudAdelantoTest extends PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-		$Sesion = $this->getMock('Sesion');
-		$this->object = new SolicitudAdelanto($Sesion);
-		$this->default_fixture = array(
-			'id_solicitud_adelanto' => 1,
-			'monto' => 100.00,
-			'id_moneda' => 1,
-			'descripcion' => 'Descripción de prueba',
-			'fecha' => '01-02-2012',
-			'codigo_cliente' => '0001-0001',
-			'estado' => 'CREADO',
-			'id_usuario_solicitante' => 1,
-			'id_usuario_ingreso' => 1
-		);
 		
-		$this->estados = array(
-			'CREADO',
-			'SOLICITADO',
-			'DEPOSITADO'
-		);
 	}
 
 	/**

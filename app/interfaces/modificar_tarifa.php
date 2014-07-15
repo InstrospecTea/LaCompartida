@@ -107,7 +107,7 @@
 			{
 				foreach ($arr_categoria_moneda as $id_moneda => $tarifa_categoria_monto)
 				{
-					$categoria_tarifa->GuardarTarifaCategoria($tarifa->fields['id_tarifa'], $id_categoria_usuario, $id_moneda, $tarifa_categoria_monto);
+					$categoria_tarifa->GuardarTarifa($tarifa->fields['id_tarifa'], $id_categoria_usuario, $id_moneda, $tarifa_categoria_monto);
 				}
 			}
 			$id_tarifa_edicion = $tarifa->fields['id_tarifa'];

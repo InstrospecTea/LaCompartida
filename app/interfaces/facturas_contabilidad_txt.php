@@ -8,16 +8,6 @@ header('Content-Disposition: attachment; filename="' . $nombre . '.txt"');
 $MARCA_CONTABILIDAD = 'INFORMADO A CONTABILIDAD';
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
-require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 $where_cobro = ' 1 ';
@@ -52,7 +42,7 @@ if ($where == '') {
 	} else if ($fecha2) {
 		$where .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 	}
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
 		$codigo_cliente = $cliente->fields['codigo_cliente'];
@@ -64,7 +54,7 @@ if ($where == '') {
 		//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
 		$where .= " AND cobro.codigo_cliente='$codigo_cliente' ";
 	}
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 		$asunto = new Asunto($sesion);
 		$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
 		$id_contrato = $asunto->fields['id_contrato'];
@@ -110,8 +100,8 @@ $where .= " ORDER BY factura.mes_contable ASC, factura.asiento_contable ASC";
 $query = "SELECT cliente.glosa_cliente
 						, DATE_FORMAT(fecha, '$formato_fechas') as fecha
 						, prm_documento_legal.codigo as tipo
-						, CONCAT_WS('-', LPAD(factura.serie_documento_legal, 3, '0'), factura.numero) AS numero";
-if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+						, CONCAT_WS('-', factura.serie_documento_legal, factura.numero) AS numero";
+if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 	$query .= "			, cliente as cliente_facturable";
 }
 $query .= "				, '' glosa_asunto

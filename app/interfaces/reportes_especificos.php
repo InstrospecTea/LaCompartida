@@ -232,6 +232,7 @@ $pagina->PrintTop();
 			</tr>
 		</tbody>
 	</table>
+
 </form>
 <?php
 $pagina->PrintBottom();

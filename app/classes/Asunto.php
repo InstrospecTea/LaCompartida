@@ -80,6 +80,10 @@ class Asunto extends Objeto {
 		'opc_moneda_total' => array(
 			'titulo' => 'Moneda Liquidación',
 			'relacion' => 'Moneda'
+		),
+		'id_cuenta' => array(
+			'titulo' => 'Cuenta Bancaria',
+			'relacion' => 'CuentaBanco'
 		)
 	);
 
@@ -660,16 +664,19 @@ class Asunto extends Objeto {
 		$mostrar_encargado2 = UtilesApp::GetConf($this->sesion, 'AsuntosEncargado2');
 		$encargado = $mostrar_encargado_secundario || $mostrar_encargado2;
 
-		$SimpleReport->Config->columns['username']->Visible($usa_username && !$encargado);
-		$SimpleReport->Config->columns['username_ec']->Visible($usa_username && $encargado);
-		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
-		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username && !$encargado);
-		$SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username && $encargado);
+		$SimpleReport->Config->columns['username']->Visible($usa_username);
+		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username);
+
+        $SimpleReport->Config->columns['username_ec']->Visible($usa_username);
+        $SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
+
+        $SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
 		$SimpleReport->Config->columns['nombre_secundario']->Visible(!$usa_username && $encargado);
 
+        $SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
+        $SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
+
 		if($mostrar_encargado_secundario){
-			$SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
-			$SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
 			$SimpleReport->Config->columns['username_secundario']->Title(__('Encargado Secundario'));
 			$SimpleReport->Config->columns['nombre_secundario']->Title(__('Encargado Secundario'));
 		}
@@ -715,7 +722,7 @@ class Asunto extends Objeto {
 		}
 
 		if (!empty($data['forma_cobro']) && $data['forma_cobro'] != 'NULL') {
-			if (!empty($data['monto_tarifa_flat'])) {
+			if (!empty($data['monto_tarifa_flat']) && $data['monto_tarifa_flat'] > 0) {
 				$Tarifa = new Tarifa($this->sesion);
 				$data['id_tarifa'] = $Tarifa->GuardaTarifaFlat($data['monto_tarifa_flat'], $data['id_moneda']);
 			}
@@ -749,7 +756,7 @@ class Asunto extends Objeto {
 		unset($data['monto_tarifa_flat']);
 
 		$campos_contrato = array('id_contrato_cliente', 'id_moneda_monto', 'id_tarifa', 'forma_cobro', 'id_moneda_tramite',
-			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total');
+			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_cuenta');
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
 		$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
 
@@ -764,7 +771,7 @@ class Asunto extends Objeto {
 		//copiar contrato del cliente y agregar datos especificados aca
 		$Contrato = new Contrato($this->sesion);
 		$Contrato->Load($this->fields['id_contrato']);
-		if($this->fields['id_contrato'] == $this->extra_fields['id_contrato_cliente']){
+		if($this->fields['id_contrato'] == $this->extra_fields['id_contrato_cliente']) {
 			unset($Contrato->fields['id_contrato']);
 		}
 		unset($this->extra_fields['id_contrato_cliente']);
@@ -813,13 +820,13 @@ class Asunto extends Objeto {
 	public function findAllByClientCode($code, $include_all = 0) {
 		$matters = array();
 		$active = 1;
+		$sql_select_client_code = '`client`.`codigo_cliente`';
 		$sql_select_matter_code = '`matter`.`codigo_asunto`';
-		$sql_where_client_code = '`client`.`codigo_cliente`';
 
 		// find if the client used secondary code
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
+			$sql_select_client_code = '`client`.`codigo_cliente_secundario`';
 			$sql_select_matter_code = '`matter`.`codigo_asunto_secundario`';
-			$sql_where_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
 		if (!$include_all) {
@@ -828,14 +835,15 @@ class Asunto extends Objeto {
 			$sql_include = "";
 		}
 
-		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`,
+		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
+			`matter`.`glosa_asunto` AS `name`,
 		 	`prm_idioma`.`codigo_idioma` AS `language`,
 			`prm_idioma`.`glosa_idioma` AS `language_name`,
 			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE $sql_where_client_code=:code {$sql_include}
+			WHERE $sql_select_client_code=:code {$sql_include}
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -848,9 +856,10 @@ class Asunto extends Objeto {
 		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {
 			array_push($matters,
 				array(
+					'client_code' => $matter->client_code,
 					'code' => $matter->code,
 					'name' => !empty($matter->name) ? $matter->name : null,
-					'language' =>  !empty($matter->language) ? $matter->languag : null,
+					'language' =>  !empty($matter->language) ? $matter->language : null,
 					'language_name' => !empty($matter->language_name) ? $matter->language_name : null,
 					'active' => (int)$matter->active
 				)
@@ -884,7 +893,8 @@ class Asunto extends Objeto {
 		}
 
 		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
-			`matter`.`glosa_asunto` AS `name`, `prm_idioma`.`codigo_idioma` AS `language`,
+			`matter`.`glosa_asunto` AS `name`,
+			`prm_idioma`.`codigo_idioma` AS `language`,
 			`prm_idioma`.`glosa_idioma` AS `language_name`,
 			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
@@ -917,6 +927,39 @@ class Asunto extends Objeto {
 		return $matters;
 	}
 
+	public function CodigoSecundarioSiguienteCorrelativo() {
+		$query = "SELECT MAX(SUBSTR(codigo_asunto_secundario, INSTR(codigo_asunto_secundario, '-') + 1, LENGTH(codigo_asunto_secundario)) *1) ultimo
+					FROM asunto";
+		$qr = $this->sesion->pdodbh->query($query);
+		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
+		return $ultimo['ultimo'] + 1;
+	}
+
+	public function CodigoSecundarioValidarCorrelativo($codigo) {
+		if (!preg_match('/^[0-9]+$/', $codigo)) {
+			return __('Código secundario') . ' invalido';
+		}
+		$query = "SELECT codigo_asunto_secundario
+					FROM asunto
+					HAVING SUBSTR(codigo_asunto_secundario, INSTR(codigo_asunto_secundario, '-') + 1, LENGTH(codigo_asunto_secundario)) = $codigo";
+		$qr = $this->sesion->pdodbh->query($query);
+		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
+		return empty($ultimo) ? true : __('Código secundario') . ' existente';
+	}
+
+	public function esPrimerAsunto($codigo_cliente = null) {
+		$primer_asunto = false;
+
+		if (!empty($codigo_cliente)) {
+			$query = "SELECT MIN({$this->tabla}.id_asunto) AS id_asunto FROM {$this->tabla} WHERE {$this->tabla}.codigo_cliente = '{$codigo_cliente}'";
+			$qr = $this->sesion->pdodbh->query($query);
+			$asunto = $qr->fetch(PDO::FETCH_ASSOC);
+
+			$primer_asunto = (empty($asunto) || $asunto['id_asunto'] == $this->fields['id_asunto']) ? true : false;
+		}
+
+		return $primer_asunto;
+	}
 }
 
 class ListaAsuntos extends Lista {

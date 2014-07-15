@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 $Slim = Slim::getInstance('default', true);
 $Slim->hook('hook_factura_javascript_after', 'InsertaJSFacturaElectronica');
 $Slim->hook('hook_factura_metodo_pago', 'InsertaMetodoPago');
+$Slim->hook('hook_factura_dte_estado', 'InsertaEstadoDTE');
 $Slim->hook('hook_validar_factura', 'ValidarFactura');
 $Slim->hook('hook_cobro6_javascript_after', 'InsertaJSFacturaElectronica');
 
@@ -70,6 +71,17 @@ function InsertaMetodoPago() {
 	echo "</tr>";
 }
 
+
+function InsertaEstadoDTE() {
+	global $factura;
+	$img_dir = Conf::ImgDir();
+	$mensaje = $factura->fields['dte_estado_descripcion'];
+	if (!is_null($mensaje) && $mensaje != '') {
+		echo "<a class = 'factura-dte-estado' href = 'javascript:alert(\"{$mensaje}\");'><img src='$img_dir/info-icon-24.png' border='0' /></a>";
+	}
+}
+
+
 function InsertaJSFacturaElectronica() {
 	echo 'jQuery(document).on("click", ".factura-electronica", function() {
 		if (!confirm("¿Confirma la generación de Factura electrónica?")) {
@@ -125,6 +137,12 @@ function BotonGenerarHTML($id_factura) {
 	return $content;
 }
 
+function BotonDescargarEstadoHTML($id_factura, $estado, $icon) {
+	$img_dir = Conf::ImgDir();
+	$content  = "<a class = 'factura-documento' data-factura = '$id_factura' href = '#' title='{$estado}' >	<img src='$img_dir/{$icon}' border='0' /></a>";
+	return $content;
+}
+
 function BotonDescargarHTML($id_factura) {
 	$img_dir = Conf::ImgDir();
 	$content  = "<a class = 'factura-documento' data-factura = '$id_factura' href = '#' >	<img src='$img_dir/pdf.gif' border='0' /></a>";
@@ -134,10 +152,14 @@ function BotonDescargarHTML($id_factura) {
 
 function AgregarBotonFacturaElectronica($hookArg) {
 	$Factura = $hookArg['Factura'];
-	if ($Factura->FacturaElectronicaCreada()){
+	if ($Factura->DTEFirmado()){
 		$hookArg['content'] = BotonDescargarHTML($Factura->fields['id_factura']);
 	} elseif (!$Factura->Anulada()) {
 		$hookArg['content'] = BotonGenerarHTML($Factura->fields['id_factura']);
+	} elseif ($Factura->DTEAnulado()) {
+		$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris.gif');
+	} elseif ($Factura->DTEProcesandoAnular()) {
+		$hookArg['content'] = BotonDescargarEstadoHTML($Factura->fields['id_factura'], $Factura->fields['dte_estado_descripcion'], 'pdf-gris-error.gif');
 	}
 	return $hookArg;
 }
@@ -159,10 +181,12 @@ function GeneraFacturaElectronica($hookArg) {
 		$result = $client->RecibirTXT($usuario, $password, UtilesApp::utf8izar($strdocumento), 0);
 		if ($result->codigo == 201) {
 			try {
+				$estado_dte = Factura::$estados_dte['Firmado'];
 				$Factura->Edit('dte_xml', $result->descripcion);
 				$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 				$Factura->Edit('dte_firma', $result->timbrefiscal);
-
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 				$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 				$file_data = base64_decode($result->documentopdf);
 				$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
@@ -182,6 +206,10 @@ function GeneraFacturaElectronica($hookArg) {
 				'Code' => 'BuildingInvoiceError',
 				'Message' => utf8_decode($result->descripcion)
 			);
+			$estado_dte = Factura::$estados_dte['ErrorFirmado'];
+			$Factura->Edit('dte_estado', $estado_dte);
+			$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
+			$Factura->Write();
 		}
 	}
 	return $hookArg;
@@ -191,7 +219,7 @@ function AnulaFacturaElectronica($hookArg) {
 	$Sesion = new Sesion();
 	$Factura = $hookArg['Factura'];
 
-	if (!$Factura->FacturaElectronicaCreada()) {
+	if (!$Factura->DTEFirmado() && !$Factura->DTEProcesandoAnular()) {
 		return $hookArg;
 	}
 
@@ -200,7 +228,6 @@ function AnulaFacturaElectronica($hookArg) {
 	$estudio_data = $estudio->getMetadata('facturacion_electronica_mx');
 	$usuario = $estudio_data['usuario'];
 	$password = $estudio_data['password'];
-
 	$firma = $Factura->fields['dte_firma'];
 	$firma_parts = explode("|", $firma);
 	$UUID = $firma_parts[1];
@@ -209,7 +236,12 @@ function AnulaFacturaElectronica($hookArg) {
 	$result = $client->CancelarCFDI($usuario, $password, $UUID);
 	if ($result->codigo == 201) {
 		try {
+			$estado_dte = Factura::$estados_dte['Anulado'];
 			$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+			$Factura->Edit('dte_estado', $estado_dte);
+			$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
+
+			$Factura->Edit('dte_estado_descripcion', utf8_decode($result->descripcion));
 			$Factura->Write();
 		} catch (Exception $ex) {
 			$hookArg['Error'] = array(
@@ -218,9 +250,14 @@ function AnulaFacturaElectronica($hookArg) {
 			);
 		}
 	} else {
+		$mensaje = "Usted ha solicitado anular un Documento Tributario Electrónico. Este proceso puede tardar hasta 72 horas por lo que mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
+		$estado_dte = Factura::$estados_dte['ProcesoAnular'];
+		$Factura->Edit('dte_estado', $estado_dte);
+		$Factura->Edit('dte_estado_descripcion', $mensaje);
+		$Factura->Write();
 		$hookArg['Error'] = array(
 			'Code' => 'CancelGeneratedInvoiceError',
-			'Message' => utf8_decode($result->descripcion . " $UUID")
+			'Message' => utf8_decode($result->descripcion)
 		);
 	}
 	return $hookArg;
@@ -263,8 +300,21 @@ function PaymentMethod(Sesion $Sesion, Factura $Factura) {
 //
 function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 	$monedas = Moneda::GetMonedas($Sesion, '', true);
-	$mx_timezone = -6;
-	$mx_hour = date("H:i:s", time() + 3600 * ($mx_timezone + date("I")));
+
+	//	Se ajusta zona horaria segun el timezone del servidor
+	$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
+	date_default_timezone_set($zona_horaria);
+	$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
+
+	$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+	$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+	$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
+	$tipoComprobante = $tipo_documento_legal == 'NC' ? 'egreso' : 'ingreso';
+
+	$Estudio = new PrmEstudio($Sesion);
+	$Estudio->Load($Factura->fields['id_estudio']);
+	$estudio_data = $Estudio->getMetadata('facturacion_electronica_mx');
+
 	$r = array(
 		'COM' => array(
 			'version|3.2',
@@ -274,13 +324,13 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 			'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
 			'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
 			'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
-			'subTotal|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 			'metodoDePago|' . PaymentMethod($Sesion, $Factura),
 			'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 			'LugarExpedicion|' . 'México Distrito Federal',
-			'tipoDeComprobante|ingreso'
+			'tipoDeComprobante|' . $tipoComprobante
 		),
+
 		'REF' => array(
 			'Regimen|' . 'Régimen General de Ley, Personas Morales'
 		),
@@ -295,15 +345,33 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		)
 	);
 
+	/*
+	*	El monto subtotal de la factura debe ser la suma de los subtotales
+	*	subtotal = Monto Horararios;
+	*	subtotal_gastos = Monto Gastos con impuestos;
+	*	subtotal_gastos_sin_impuesto = Monto Gastos sin impuestos;
+	*/
+
+	$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
+
+	$r['COM'][] = 'subTotal|' . number_format($subtotal_factura, 2, '.', '');
+
 	if (!is_null($Factura->fields['dte_metodo_pago_cta']) && !empty($Factura->fields['dte_metodo_pago_cta']) && (int)$Factura->fields['dte_metodo_pago_cta'] > 0) {
 		$r['COM'][] = 'NumCtaPago|' . $Factura->fields['dte_metodo_pago_cta'];
 	}
+
 	if (!is_null($Factura->fields['direccion_cliente']) && !empty($Factura->fields['direccion_cliente'])) {
 		$r['DOR'][] = 'calle|' . ($Factura->fields['direccion_cliente']);
 	}
+
 	if (!is_null($Factura->fields['comuna_cliente']) && !empty($Factura->fields['comuna_cliente'])) {
 		$r['DOR'][] = 'municipio|' . ($Factura->fields['comuna_cliente']);
 	}
+
+	if (!is_null($Factura->fields['factura_estado']) && !empty($Factura->fields['factura_estado'])) {
+		$r['DOR'][] = 'estado|' . ($Factura->fields['factura_region']);
+	}
+
 	if (!is_null($Factura->fields['ciudad_cliente']) && !empty($Factura->fields['ciudad_cliente'])) {
 		$r['DOR'][] = 'localidad|' . ($Factura->fields['ciudad_cliente']);
 	}
@@ -317,30 +385,34 @@ function FacturaToTXT(Sesion $Sesion, Factura $Factura) {
 		$r['DOR'][] = 'codigoPostal|' . ($Factura->fields['factura_codigopostal']);
 	}
 
+	$unidad = empty($estudio_data['unidad_medida']) ? 'un' : $estudio_data['unidad_medida'];
+	
 	if ($Factura->fields['subtotal'] > 0) {
 		$r['CON_honorarios'] = array(
 			'cantidad|1.00',
-			'unidad|un',
+			"unidad|$unidad",
 			'descripcion|' . ($Factura->fields['descripcion']),
 			'valorUnitario|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 			'descuento|0.00'
 		);
 	}
+
 	if ($Factura->fields['subtotal_gastos'] > 0) {
 		$r['CON_gastos_con_iva'] = array(
 			'cantidad|1.00',
-			'unidad|un',
+			"unidad|$unidad",
 			'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos']),
 			'valorUnitario|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
 			'descuento|0.00'
 		);
 	}
+
 	if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
 		$r['CON_gastos_sin_iva'] = array(
 			'cantidad|1.00',
-			'unidad|un',
+			"unidad|$unidad",
 			'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
 			'valorUnitario|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
 			'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),

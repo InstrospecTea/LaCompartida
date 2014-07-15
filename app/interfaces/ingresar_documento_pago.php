@@ -196,9 +196,7 @@ $pagina->PrintTop($popup);
 
 	function Validar(form) {
 		var tipopago=jQuery('#tipodocumento').val();
-		if (tipopago!='adelanto') {
-			jQuery('.saldojq').keyup().change();
-		}
+
 		monto = parseFloat(jQuery('#monto').val());
 		// alert(monto);
 		if (isNaN(monto) || monto == '') {
