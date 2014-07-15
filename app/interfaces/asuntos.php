@@ -177,7 +177,7 @@ $Form = new Form;
 						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan="4">
-						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320); ?>
+						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto); ?>
 					</td>
 				</tr>
 
@@ -270,17 +270,15 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.cobrable=0 ";
 	}
 
-	if ($codigo_asunto != "" || $codigo_asunto_secundario != "") {
+	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
 		if ($usocodigosecundario) {
 			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto_secundario%'";
 		} else {
 			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
 		}
-	}
-
-	if ($glosa_asunto != "") {
+	} else if ($glosa_asunto != '') {
 		$nombre = strtr($glosa_asunto, ' ', '%');
-		$where .= " AND a1.glosa_asunto Like '%$glosa_asunto%'";
+		$where .= " AND a1.glosa_asunto Like '%{$glosa_asunto}%'";
 	}
 
 	if ($codigo_cliente || $codigo_cliente_secundario) {
