@@ -2212,6 +2212,20 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $html2);
 				$html2 = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $html2);
+
+				$comuna_cuidad_cliente = '';
+
+				if ($contrato->fields['factura_comuna'] != '') {
+					$comuna_cuidad_cliente .= $contrato->fields['factura_comuna'];
+				}
+				if ($contrato->fields['factura_comuna'] != '' && $contrato->fields['factura_ciudad'] != '') {
+					$comuna_cuidad_cliente .= ', ';
+				}
+				if ($contrato->fields['factura_ciudad'] != '') {
+					$comuna_cuidad_cliente .= $contrato->fields['factura_ciudad'];
+				}
+
+				$html2 = str_replace('%comuna_cuidad_cliente%', $comuna_cuidad_cliente, $html2);
 				$html2 = str_replace('%codigo_postal_cliente%', $contrato->fields['factura_codigopostal'], $html2);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 				$html2 = str_replace('%cliente_fax%', $contrato->fields['fono_contacto'], $html2);
