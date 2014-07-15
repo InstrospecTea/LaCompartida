@@ -124,13 +124,18 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	if ($revisado == 'SI') {
 		$where.= " AND trabajo.revisado = 1 ";
 	}
-	if ($codigo_asunto != '' || $codigo_asunto_secundario != "") {
+
+	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
 		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-			$where.= " AND asunto.codigo_asunto_secundario = '$codigo_asunto_secundario' ";
+			$where .= " AND asunto.codigo_asunto_secundario = '{$codigo_asunto_secundario}' ";
 		} else {
-			$where.= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
+			$where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
 		}
+	} else if ($glosa_asunto != '') {
+		$nombre = strtr($glosa_asunto, ' ', '%');
+		$where .= " AND asunto.glosa_asunto Like '%{$glosa_asunto}%'";
 	}
+
 	if ($cobrado == 'NO') {
 		$where .= " AND ( trabajo.id_cobro is null OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
 	}
@@ -766,19 +771,19 @@ $pagina->PrintTop($popup);
 
 					</td>
 				</tr>
+
 				<tr>
-					<td class="buscadorlabel"><?php echo __('Asunto') ?></td>
+					<td class="buscadorlabel"><?php echo __('Asunto'); ?></td>
 					<td nowrap align='left' colspan="2">
-
 						<?php
-						if (Conf::GetConf($sesion,'UsoActividades')) {
-							$oncambio .= 'CargarActividad();';
-						}?>
-
-						<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320,$oncambio); ?>
-
+							if (Conf::GetConf($sesion, 'UsoActividades')) {
+								$oncambio .= 'CargarActividad();';
+							}
+							UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio, $glosa_asunto);
+						?>
 					</td>
 				</tr>
+
 				<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_filtros_trabajos'):false; ?>
 
 				<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>

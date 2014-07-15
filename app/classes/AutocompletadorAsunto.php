@@ -14,8 +14,7 @@ class AutocompletadorAsunto {
 	 * @param string $oncambio funciones que realizará en el evento onchange del selector.
 	 * @return void nada por que imprime.
 	 */
-	public function ImprimirSelector($Sesion, $codigo_asunto = '', $codigo_asunto_secundario = '', $mas_recientes = false, $width = '', $oncambio = '') {
-		$glosa_asunto = '';
+	public function ImprimirSelector($Sesion, $codigo_asunto = '', $codigo_asunto_secundario = '', $glosa_asunto = '', $mas_recientes = false, $width = 320, $oncambio = '') {
 		$input_id = 'codigo_asunto';
 		$input_value = $codigo_asunto;
 
@@ -33,10 +32,6 @@ class AutocompletadorAsunto {
 			if ($row = mysql_fetch_array($resp)) {
 				$glosa_asunto = $row['glosa_asunto'];
 			}
-		}
-
-		if ($width == '') {
-			$width = '310';
 		}
 
 		$output .= "<input type=\"text\" id=\"glosa_asunto\" name=\"glosa_asunto\" value=\"{$glosa_asunto}\" style=\"width:{$width}px\" />";
@@ -85,6 +80,7 @@ class AutocompletadorAsunto {
 								jQuery('#{$campo_codigo_asunto}').val(ui.item.id);
 								jQuery('#glosa_asunto').val(ui.item.value);
 								CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
+								jQuery('#{$campo_codigo_asunto}').change();
 							}
 						});
 					});
