@@ -1,4 +1,145 @@
 # Changelog
+## Hotfix: 14.4.13
+Jueves 10 de Julio 2014
+* **Fixed:** [Agrega nuevo tag para morales y besa](https://github.com/LemontechSA/ttb/pull/581)
+
+## Hotfix: 14.4.12
+Martes 8 de Julio 2014
+* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos según Config](https://github.com/LemontechSA/ttb/pull/580)
+* **Fixed:** [Se reinicia la paginación al buscar trabajos](https://github.com/LemontechSA/ttb/pull/580)
+
+## Hotfix: 14.4.11
+Lunes 7 de Julio 2014
+* **Fixed:** [Corrige hotfix anterior, por error sintáctico JS](https://github.com/LemontechSA/ttb/pull/578)
+
+## Hotfix: 14.4.10
+Lunes 7 de Julio 2014
+* **Fixed:** [Muestra `Ejecutar llenado inicial de datos` solo al admin](https://github.com/LemontechSA/ttb/pull/577)
+* **Fixed:** [Repara error sintáctico de JS al parsear el código del asunto al editar trabajo](https://github.com/LemontechSA/ttb/pull/577)
+
+## Hotfix: 14.4.9
+Viernes 4 de Julio 2014
+* **Fixed:** [Corrige asignación de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
+
+## Hotfix: 14.4.8
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignación de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Cambia los CDN de aspnet a static (varios módulos)](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Corrige validación de monto según tipo de cobro y monto en cero en creación de asuntos.](https://github.com/LemontechSA/ttb/pull/574)
+
+## Hotfix: 14.4.7
+Miércoles 2 de Julio 2014
+* **Fixed:** [Repara elementos extraños en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)
+
+## Hotfix: 14.4.6
+Miércoles 2 de Julio 2014
+* **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/572)
+
+## Hotfix: 14.4.5
+Miércoles 2 de Julio 2014
+* **Fixed:** [Aumenta tiempo de tolerancia para generación del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
+
+## Hotfix: 14.4.4
+Martes 1 de Julio 2014
+* **Fixed:** [Corrige activacion de asunto con codigo_secundario](https://github.com/LemontechSA/ttb/pull/569)
+
+## Hotfix: 14.4.3
+Martes 1 de Julio 2014
+* **Fixed:** [Añade rutina JS en respuesta a request AJAX, si aplica un selector de actividades para el cliente](https://github.com/LemontechSA/ttb/pull/567)
+
+## Hotfix: 14.4.2
+Lunes 30 de Junio 2014
+* **Fixed:** [Corrige ingreso de horas formato decimal](https://github.com/LemontechSA/ttb/pull/564)
+* **Fixed:** [Corrige comportamiento de actividades en ingresso trabajo](https://github.com/LemontechSA/ttb/pull/564)
+
+## Hotfix: 14.4.1
+Lunes 30 de Junio 2014
+* **Fixed:** [Refactorizacion de flujo al agregar un trabajo](https://github.com/LemontechSA/ttb/pull/563)
+
+## Release: 14.3.0
+Lunes 30 de Junio 2014
+* **Feature:** [Reporte pdf en revisar horas](https://github.com/LemontechSA/ttb/pull/561)
+* **Feature:** [Builder HTML](https://github.com/LemontechSA/ttb/pull/560)
+* **Feature:** [Agrega columnas a excel de revisar horas con valores normalizados segun moneda defecto](https://github.com/LemontechSA/ttb/pull/559)
+* **Feature:** [Primer asunto de un cliente no puede ser marcado como "cobrar de forma independiente"](https://github.com/LemontechSA/ttb/pull/558)
+* **Feature:** [Mejora uso codigo ledes](https://github.com/LemontechSA/ttb/pull/555)
+* **Fixed:** [Repara reporte financiero](https://github.com/LemontechSA/ttb/pull/553)
+* **Fixed:** [Repara error de validacion en agregar_asunto cobros3.php](https://github.com/LemontechSA/ttb/pull/552)
+* **Fixed:** [Repara error que impedia generacion de un cobro forma cobro "HITOS"](https://github.com/LemontechSA/ttb/pull/551)
+* **Fixed:** [Correccion a validaciones, modificaciones a mensajes en : usuario_paso1 y usuario_paso2](https://github.com/LemontechSA/ttb/pull/550)
+* **Feature:** [Agrega columna RUT CLIENTE a excel de facturas](https://github.com/LemontechSA/ttb/pull/549)
+* **Feature:** [Correccion a seleccion de ausntos de un cobro](https://github.com/LemontechSA/ttb/pull/547)
+* **Feature:** [Inhabilita asuntos cuando un cliente es desactivado](https://github.com/LemontechSA/ttb/pull/544)
+* **Feature:** [Agrega columnas numero cuenta banco y nombre de banco a excel de clientes](https://github.com/LemontechSA/ttb/pull/544)
+* **Feature:** [Agrega "Numero Identificador autoincremental" para gastos](https://github.com/LemontechSA/ttb/pull/544)
+
+## Hotfix: 14.3.12
+Lunes 23 de junio 2014
+* **Fixed:** [Corrige impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/557)
+
+## Hotfix: 14.3.11
+Lunes 23 de junio 2014
+* **Fixed:** [Deshabilita impresion según lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/556)
+
+## Hotfix: 14.3.10
+Lunes 23 de junio 2014
+* **Fixed:** [Corrige selector de idioma en agregar_contrato](https://github.com/LemontechSA/ttb/pull/554)
+
+## Hotfix: 14.3.9
+Miércoles 19 de junio 2014
+* **Fixed:** [Añade lang en inglés para tags faltantes](https://github.com/LemontechSA/ttb/pull/548)
+
+## Hotfix: 14.3.8
+Miércoles 18 de junio 2014
+* **Fixed:** [corrige if y valores para proporcionalidad estandar](https://github.com/LemontechSA/ttb/pull/546)
+
+## Hotfix: 14.3.7
+Martes 17 de junio 2014
+* **Fixed:** [Añade lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
+
+## Hotfix: 14.3.6
+Lunes 16 de junio 2014
+* **Fixed:** [CampoCliente (autocomplete) carga los asuntos correctamente.](https://github.com/LemontechSA/ttb/pull/541)
+
+## Hotfix: 14.3.5
+Lunes 16 de junio 2014
+* **Fixed:** [Agrega alias de $Cliente para el archivo incluido. Corrige nombre de variable.](https://github.com/LemontechSA/ttb/pull/540)
+
+## Hotfix: 14.3.4
+Lunes 16 de junio 2014
+* **Fixed:** [Elimina elementos inecesarios](https://github.com/LemontechSA/ttb/pull/539)
+
+## Hotfix: 14.3.3
+Lunes 16 de junio 2014
+* **Fixed:** [Previene override del objeto](https://github.com/LemontechSA/ttb/pull/538)
+
+## Hotfix: 14.3.2
+Viernes 13 de junio 2014
+* **Fixed:** [Instancia objeto fuera del if](https://github.com/LemontechSA/ttb/pull/537)
+
+## Hotfix: 14.3.1
+Viernes 13 de junio 2014
+* **Fixed:** [Instancia objeto](https://github.com/LemontechSA/ttb/pull/536)
+
+## Release: 14.3.0
+Jueves 12 de Junio 2014
+
+* **Feature:** [modificaciones a listado asuntos excel](https://github.com/LemontechSA/ttb/pull/533)
+* **Feature:** [suite testing](https://github.com/LemontechSA/ttb/pull/518)
+* **Feature:** [Feature/codigo secundario correlativo](https://github.com/LemontechSA/ttb/pull/489)
+
+## Hotfix: 14.2.15
+Martes 10 de junio 2014
+* **Fixed:** [Agrega tag sección DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/533)
+
+## Hotfix: 14.2.14
+Martes 10 de junio 2014
+* **Fixed:** [Corrección API para responder de manera correcta con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/532)
+
+## Hotfix: 14.2.13
+Lunes 09 de junio 2014
+* **Fixed:** [Repara query reporte profesional v/s asunto](https://github.com/LemontechSA/ttb/pull/531)
+
 ## Hotfix: 14.2.10
 Miércoles 04 de junio 2014
 * **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/528)

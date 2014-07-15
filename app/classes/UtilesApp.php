@@ -60,6 +60,15 @@ class UtilesApp extends Utiles {
 		}
 	}
 
+    public static function ObtenerContratoPrincipal ($sesion, $codigo_asunto) {
+        $codigo_cliente = explode("-",$codigo_asunto);
+        $consulta = "SELECT id_contrato FROM cliente WHERE codigo_cliente = '{$codigo_cliente[0]}'";
+        $respuesta = mysql_query($consulta, $sesion->dbh);
+        list($id_contrato) = mysql_fetch_array($respuesta);
+
+        return $id_contrato;
+    }
+
 	public static function GetSimboloMonedaBase($sesion) {
 		$querypreparar = "select simbolo from prm_moneda where moneda_base=1 limit 0,1";
 		$query = $sesion->pdodbh->prepare($querypreparar);
@@ -70,7 +79,7 @@ class UtilesApp extends Utiles {
 
 	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $mas_recientes = false, $width = 320, $oncambio = '', $cargar_selectores = true) {
 		echo InputId::Javascript($sesion);
-		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
+		if (Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			echo Autocompletador::CSS();
 			if ($oncambio == '') {
 				$oncambio = "CargarGlosaCliente();";
@@ -79,13 +88,13 @@ class UtilesApp extends Utiles {
 			}
 			echo Autocompletador::Javascript($sesion, $cargar_selectores, $oncambio);
 
-			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario, $mas_recientes, $width);
 			} else {
 				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null, $mas_recientes, $width);
 			}
 		} else {
-			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 				if ($oncambio == '') {
 					$oncambio = "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
 				} elseif (substr($oncambio, 0, 1) == '+') {
@@ -104,16 +113,22 @@ class UtilesApp extends Utiles {
 	}
 
 	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '') {
-		if ($oncambio == '') {
-			$oncambio = "CargarSelectCliente(this.value);";
-		} elseif (substr($oncambio, 0, 1) == '+') {
-			$oncambio.="CargarSelectCliente(this.value);";
-		}
 
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
+		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
+			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente, $codigo_cliente_secundario);
 		} else {
-			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+			if ($oncambio == '') {
+				$oncambio = "CargarSelectCliente(this.value);";
+			} elseif (substr($oncambio, 0, 1) == '+') {
+				$oncambio = "CargarSelectCliente(this.value);" . str_replace('+', '', $oncambio);
+			}
+
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
+			} else {
+				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+			}
 		}
 	}
 
@@ -830,7 +845,7 @@ class UtilesApp extends Utiles {
 		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
 		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
 
-		$bitmap = UtilesApp::GetConf($sesion, 'LogoExcel');
+		$bitmap = Conf::GetConf($sesion, 'LogoExcel');
 		if (!$bitmap) {
 			return 0;
 		}
@@ -864,7 +879,7 @@ class UtilesApp extends Utiles {
 	public static function PrintMenuDisenoNuevojQuery($sesion, $url_actual) {
 		$actual = explode("?", $url_actual);
 		$url_actual = $actual[0];
-		$bitmodfactura = UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
+		$bitmodfactura = Conf::GetConf($sesion, 'NuevoModuloFactura');
 		switch ($url_actual) {
 			case '/app/interfaces/agregar_tarifa.php': $url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';
 				break;
@@ -944,7 +959,7 @@ HTML;
 			for ($j = 0; $row2 = mysql_fetch_assoc($resp2); $j++) {
 				$glosa_submenu = __($row2['glosa']);
 				$codigo_submenu = $row2['codigo'];
-				if (($codigo_submenu == 'MPDF' && UtilesApp::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
+				if (($codigo_submenu == 'MPDF' && Conf::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
 					//era mas fácil escribir el filtro de esta forma
 					continue;
 				} else {
@@ -992,7 +1007,7 @@ HTML;
 		for ($j = 0; $row3 = mysql_fetch_assoc($resp3); $j++) {
 			$glosa_submenu = __($row3['glosa']);
 			$codigo_submenu = $row3['codigo'];
-			if (($codigo_submenu == 'MPDF' && UtilesApp::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
+			if (($codigo_submenu == 'MPDF' && Conf::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
 				//era mas fácil escribir el filtro de esta forma
 				continue;
 			} else {
@@ -1924,7 +1939,7 @@ HTML;
 	function PrintMenuDisenoNuevoPrototype($sesion, $url_actual) {
 		$actual = split('\?', $url_actual);
 		$url_actual = $actual[0];
-		$bitmodfactura = UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
+		$bitmodfactura = Conf::GetConf($sesion, 'NuevoModuloFactura');
 		switch ($url_actual) {
 			case '/app/interfaces/agregar_tarifa.php':
 				$url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';

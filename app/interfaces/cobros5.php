@@ -349,8 +349,13 @@ $tip_total = __("El monto total") . " " . __("del cobro") . " " . __("hasta el m
 $tip_actualizar = __("Actualizar los montos");
 $tip_refresh = __("Actualizar a cambio actual");
 
-function TTip($texto) {
-	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
+function TTip($texto, $as_array = false) {
+	$Html = new \TTB\Html;
+	$attrs = array(
+		'onmouseover' => "ddrivetip('$texto');",
+		'onmouseout' => "hideddrivetip('$texto');"
+	);
+	return $as_array ? $attrs : $Html->attributes($attrs);
 }
 
 echo $refrescar;
@@ -1301,27 +1306,43 @@ else
 					if (!is_array($usuarios_retainer)) {
 						$usuarios_retainer = explode(',', $cobro->fields['retainer_usuarios']);
 					}
+					$formas_cobro = array(
+						'TASA' => array(
+							'label' => __('Tasas/HH'),
+							'onclick' => 'HideMonto(); DisplayEscalas(false);'
+						) + TTip($tip_tasa, true),
+						'RETAINER' => array(
+							'label' => __('Retainer'),
+							'onclick' => 'ShowMonto(true, true); DisplayEscalas(false);'
+						) + TTip($tip_retainer, true),
+						'FLAT FEE' => array(
+							'label' => __('Flat fee'),
+							'onclick' => 'ShowMonto(false, false); DisplayEscalas(false);'
+						) + TTip($tip_flat, true)
+					);
+					if ($cobro->fields['id_contrato']) {
+						$formas_cobro['CAP'] = array(
+							'label' => __('Cap'),
+							'onclick' => 'ShowMonto(false, false); DisplayEscalas(false);'
+						) + TTip($tip_cap, true);
+					}
+					$formas_cobro['PROPORCIONAL'] = array(
+						'label' => __('Proporcional'),
+						'onclick' => 'HideMonto(); DisplayEscalas(true);'
+					) + TTip($tip_proporcional, true);
 
+					if (!Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) {
+						$formas_cobro['ESCALONADA'] = array(
+							'label' => __('Escalonada'),
+							'onclick' => 'HideMonto(); DisplayEscalas(true);'
+						) + TTip($tip_escalonada, true);
+					}
+					$Form = new Form;
+					if ($cobro_forma_cobro == 'HITOS') {
+						$cobro_forma_cobro = 'FLAT FEE';
+					}
+					echo $Form->radio_group('cobro_forma_cobro', $formas_cobro, $cobro_forma_cobro, false);
 					?>
-
-					<input <?php echo TTip($tip_tasa) ?> onclick="HideMonto();DisplayEscalas(false);" id="fc1" type="radio" name="cobro_forma_cobro" value="TASA" <?php echo $cobro_forma_cobro == "TASA" ? "checked" : "" ?> />
-					<label for="fc1">Tasas/HH</label>&nbsp; &nbsp;
-					<input <?php echo TTip($tip_retainer) ?> onclick="ShowMonto(true, true);DisplayEscalas(false);" id="fc3" type="radio" name="cobro_forma_cobro" value="RETAINER" <?php echo $cobro_forma_cobro == "RETAINER" ? "checked" : "" ?> />
-					<label for="fc3">Retainer</label> &nbsp; &nbsp;
-					<input <?php echo TTip($tip_flat) ?> onclick="ShowMonto(false, false);DisplayEscalas(false);" id="fc4" type="radio" name="cobro_forma_cobro" value="FLAT FEE" <?php echo $cobro_forma_cobro == "FLAT FEE" ? "checked" : "" ?> />
-					<label for="fc4">Flat fee</label>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-					<?php if($cobro->fields['id_contrato']){ ?>
-					<input <?php echo TTip($tip_cap) ?> onclick="ShowMonto(false, false);DisplayEscalas(false);" id="fc5" type="radio" name="cobro_forma_cobro" value="CAP" <?php echo $cobro_forma_cobro == "CAP" ? "checked" : "" ?> />
-					<label for="fc5"><?php echo __('Cap') ?></label>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-					<?php } ?>
-					<input <?php echo TTip($tip_proporcional) ?> onclick="ShowMonto(true, false);DisplayEscalas(false);" id="fc6" type=radio name="cobro_forma_cobro" value="PROPORCIONAL" <?php echo $cobro_forma_cobro == "PROPORCIONAL" ? "checked" : "" ?> />
-					<label for="fc6">Proporcional</label> &nbsp; &nbsp;
-
-					<?php if (!Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) { ?>
-						<input <?php echo TTip($tip_escalonada) ?> id="fc7" type=radio name="cobro_forma_cobro" onclick="HideMonto();DisplayEscalas(true);" value="ESCALONADA" <?php echo $cobro_forma_cobro == "ESCALONADA" ? "checked" : "" ?> />
-						<label for="fc7">Escalonada</label>
-					<?php } ?>
-					&nbsp; &nbsp;
 
 					<div id="div_monto" align="left" style="display:none; background-color:#F8FBBD; padding-left:20px">
 						<table>

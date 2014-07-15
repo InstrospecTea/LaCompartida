@@ -9,6 +9,7 @@ class Tarifa extends Objeto {
 	function Tarifa($sesion, $fields = "", $params = "") {
 		$this->tabla = "tarifa";
 		$this->campo_id = "id_tarifa";
+		$this->campo_glosa = "glosa_tarifa";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}

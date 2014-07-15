@@ -202,7 +202,7 @@ if ($preparar_cobro == 1) {
 }
 ?>
 <style type="text/css">
-    @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
+    @import "//static.thetimebilling.com/css/jquery.dataTables.css";
     #tablon {border-spacing:0;border-collapse:collapse;}
     #tablon th {font-size:10px;}
     .dataTables_paginate {clear: both; margin: -20px 350px 15px 0;width:390px;vertical-align:middle;}
@@ -224,7 +224,7 @@ if ($preparar_cobro == 1) {
     #totalcta {float: left;position: relative;top: 15px;}
 </style>
 
-<script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+<script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
 <script type="text/javascript">
@@ -421,7 +421,7 @@ if (!UtilesApp::GetConf($sesion, 'NumeroOT')) {
 //if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 
 if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
-	echo ' { "bVisible": false, "aTargets": [ 7 ] },';
+	echo ' { "bVisible": false, "aTargets": [ 8 ] },';
 }
 if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 	echo ' { "bVisible": false, "aTargets": [10 ] },';

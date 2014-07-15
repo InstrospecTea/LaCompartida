@@ -60,7 +60,7 @@ if ($where == '') {
 		//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
 		$where .= " AND cobro.codigo_cliente='" . $codigo_cliente . "' ";
 	}
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 		$asunto = new Asunto($sesion);
 		$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
 		$id_contrato = $asunto->fields['id_contrato'];
@@ -101,8 +101,8 @@ if ($where == '') {
 }
 
 $numero_factura = "";
-if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
-	$numero_factura = "CONCAT(LPAD(factura.serie_documento_legal, 3, '0'), '-', factura.numero) as numero";
+if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
+	$numero_factura = "CONCAT(factura.serie_documento_legal, '-', factura.numero) as numero";
 } else {
 	$numero_factura = "factura.numero";
 }
@@ -111,7 +111,7 @@ $query = "SELECT cliente.glosa_cliente
 						, DATE_FORMAT(fecha, '" . $formato_fechas . "') as fecha
 						, prm_documento_legal.codigo as tipo
 						, $numero_factura";
-if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 	$query .= "			, cliente as cliente_facturable";
 }
 $query .= "			, '' glosa_asunto
@@ -154,7 +154,7 @@ $query .= "			, '' glosa_asunto
 $lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
 
 if ($lista_suntos_liquidar->num == 0) {
-	
+
 	 echo "\n<script type=\"text/javascript\">	var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
 	 die('No hay datos para su criterio de búsqueda');
 }
@@ -235,8 +235,8 @@ while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_
 	}
 }
 // Columnas a mostrar
-if (UtilesApp::GetConf($sesion, 'MostrarColumnaReporteFacturacion')) {
-	$columnas = explode(',', UtilesApp::GetConf($sesion, 'MostrarColumnaReporteFacturacion'));
+if (Conf::GetConf($sesion, 'MostrarColumnaReporteFacturacion')) {
+	$columnas = explode(',', Conf::GetConf($sesion, 'MostrarColumnaReporteFacturacion'));
 } else {
 	$columnas = array('glosa_cliente', 'fecha', 'tipo', 'numero', 'cliente_facturable', 'glosa_asunto', 'codigo_asunto', 'encargado_comercial',
 		'descripcion', 'id_cobro','iva', 'total', 'monto_real', 'observaciones', 'saldo_pagos', 'saldo', 'fecha_ultimo_pago', 'estado_glosa');
@@ -402,7 +402,7 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
 			} elseif ($col_name[$i] == 'monto_real') {
 				if (strtoupper($proc->fields['estado']) == 'A') {
-					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], '0', $formatos_moneda[$proc->fields['id_moneda']]);					
+					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], '0', $formatos_moneda[$proc->fields['id_moneda']]);
 				} else {
 					$fact = new Factura($sesion);
 					$total_facturas = $fact->ObtenerValorReal($proc->fields['id_factura']);

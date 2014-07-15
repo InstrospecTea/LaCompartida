@@ -499,7 +499,11 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-
+                
+                // Monto honorario moneda cobro
+                $html2 = str_replace('%simbolo_moneda_cobro%', $moneda->fields['simbolo'], $html2);
+                $html2 = str_replace('%monto_honorarios_moneda_cobro%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+                
 				/* MONTOS SEGUN MONEDA TOTAL IMPRESION */
 				$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$aproximacion_monto_subtotal = number_format($this->fields['monto_subtotal'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
@@ -653,7 +657,7 @@ class CartaCobro extends NotaCobro {
 					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					} else {
-						$fecha_diff_periodo_exacto = __('from') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
+						$fecha_diff_periodo_exacto = __('from') . ' ' . date("m-d-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					}
 
 					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
@@ -672,7 +676,7 @@ class CartaCobro extends NotaCobro {
 				if ($lang == 'es') {
 					$fecha_diff_periodo_exacto .= __('hasta el día') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
 				} else {
-					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
+					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%m-%d-%Y');
 				}
 
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
@@ -799,7 +803,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_total_espacio%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				if ($this->fields['opc_moneda_total'] != $this->fields['id_moneda']) {
-					$html2 = str_replace('%equivalente_a_baz%', ', equivalentes a ' . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%equivalente_a_baz%', __(', equivalentes a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
 					$html2 = str_replace('%equivalente_a_baz%', '', $html2);
 				}
@@ -1021,6 +1025,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Corriente';
 					}
 
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
+					}
+
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
@@ -1030,6 +1040,24 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
+
+					$datos_bancarios = '';
+
+					if (!empty($codigo_swift)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">SWIFT</td><td class="detalle">' . $codigo_swift . '</td></tr>';
+					}
+					if (!empty($codigo_aba)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">ABA</td><td class="detalle">' . $codigo_aba . '</td></tr>';
+					}
+					if (!empty($codigo_cci)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CCI</td><td class="detalle">' . $codigo_cci . '</td></tr>';
+					}
+					if (!empty($codigo_clabe)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CLABE</td><td class="detalle">' . $codigo_clabe . '</td></tr>';
+					}
+
+					$html2 = str_replace('%datos_bancarios%', $datos_bancarios, $html2);
+
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
@@ -1160,7 +1188,6 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%solo_num_factura%',  ereg_replace("[^0-9]", "", $this->fields['documento']), $html2);
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
-				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 
 				$query = "SELECT factura.numero as documentos
 							FROM factura
@@ -1308,7 +1335,11 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_impuesto%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 
 				$html2 = str_replace('%monto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-
+                
+                // monto honorario moneda
+                $html2 = str_replace('%simbolo_moneda_cobro%', $moneda->fields['simbolo'], $html2);
+                $html2 = str_replace('%monto_honorarios_moneda_cobro%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+                
 				$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$monto_moneda = ((double) $aproximacion_monto * (double) $this->fields['tipo_cambio_moneda']) / ($tipo_cambio_moneda_total > 0 ? $tipo_cambio_moneda_total : $moneda_total->fields['tipo_cambio']);
 				$monto_moneda_sin_gasto = ((double) $aproximacion_monto * (double) $this->fields['tipo_cambio_moneda']) / ($tipo_cambio_moneda_total > 0 ? $tipo_cambio_moneda_total : $moneda_total->fields['tipo_cambio']);
@@ -1455,7 +1486,7 @@ class CartaCobro extends NotaCobro {
 					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					} else {
-						$fecha_diff_periodo_exacto = __('from') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
+						$fecha_diff_periodo_exacto = __('from') . ' ' . date("m-d-Y", strtotime($fecha_primer_trabajo)) . ' ';
 					}
 
 					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
@@ -1476,7 +1507,7 @@ class CartaCobro extends NotaCobro {
 				if ($lang == 'es') {
 					$fecha_diff_periodo_exacto .= __('hasta el día') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
 				} else {
-					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
+					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%m-%d-%Y');
 				}
 
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
@@ -1659,7 +1690,7 @@ class CartaCobro extends NotaCobro {
 				}
 
 				if ($this->fields['opc_moneda_total'] != $this->fields['id_moneda']) {
-					$html2 = str_replace('%equivalente_a_baz%', ', equivalentes a ' . $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%equivalente_a_baz%', __(', equivalentes a ') . $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
 					$html2 = str_replace('%equivalente_a_baz%', '', $html2);
 				}
@@ -1890,6 +1921,12 @@ class CartaCobro extends NotaCobro {
 						$tipo_cuenta = 'Cuenta Corriente';
 					}
 
+					if (!empty($codigo_swift)) {
+						$html2 = str_replace('%glosa_swift%', 'SWIFT', $html2);
+					} else {
+						$html2 = str_replace('%glosa_swift%', '', $html2);
+					}
+
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
@@ -1899,6 +1936,24 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%codigo_clabe%', $codigo_clabe, $html2);
 					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 					$html2 = str_replace('%glosa_moneda%', $glosa_moneda, $html2);
+
+					$datos_bancarios = '';
+
+					if (!empty($codigo_swift)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">SWIFT</td><td class="detalle">' . $codigo_swift . '</td></tr>';
+					}
+					if (!empty($codigo_aba)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">ABA</td><td class="detalle">' . $codigo_aba . '</td></tr>';
+					}
+					if (!empty($codigo_cci)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CCI</td><td class="detalle">' . $codigo_cci . '</td></tr>';
+					}
+					if (!empty($codigo_clabe)) {
+						$datos_bancarios .= '<tr><td class="detalle"></td><td class="detalle">CLABE</td><td class="detalle">' . $codigo_clabe . '</td></tr>';
+					}
+
+					$html2 = str_replace('%datos_bancarios%', $datos_bancarios, $html2);
+
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);

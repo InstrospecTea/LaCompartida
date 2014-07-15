@@ -4,6 +4,7 @@ require_once dirname(dirname(__FILE__)).'/conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
+$Form = new Form;
 
 $params_array['codigo_permiso'] = 'REV';
 $p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
@@ -103,12 +104,12 @@ if ($p_revisor->fields['permitido']) {
 
 $select_usuario = Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' " . $where_usuario . " ORDER BY nombre ASC", "id_usuario", $id_usuario, '', 'Todos', '200');
 
-if (isset($cobro) || $opc == 'buscar' || $excel) {
+if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$where = base64_decode($where);
 	$where_gastos = " 1 ";
 	$where_gastos .= " AND cta_corriente.incluir_en_cobro = 'SI' AND cta_corriente.cobrable = 1 ";
 	if ($where == '') {
-		$where .= 1;
+		$where = 1;
 	}
 	if ($id_usuario != '') {
 		$where .= " AND trabajo.id_usuario= " . $id_usuario;
@@ -319,10 +320,13 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')){
 		$select_encargado_comercial = "resp_user.username AS encargado_comercial,";
 	} else {
-		$select_encargado_comercial = "CONCAT_WS(' ',resp_user.nombre,resp_user.apellido1) AS encargado_comercial,";
+		$campo_glosa = str_replace('usuario.', 'resp_user.', $sesion->usuario->campo_glosa);
+		$select_encargado_comercial = "{$campo_glosa} AS encargado_comercial,";
 	}
+	$select_encargado_comercial .= 'resp_user.id_usuario AS id_encargado_comercial,';
 
 	#BUSCAR
+	$usr_nombre = $sesion->usuario->campo_glosa;
 	$query = "
 		SELECT  SQL_CALC_FOUND_ROWS
 			trabajo.id_trabajo,
@@ -345,7 +349,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			cobro.estado as estado_cobro,
 			cobro.id_moneda as id_moneda_cobro,
 			contrato.id_moneda as id_moneda_contrato,
-			CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre,
+			$usr_nombre as usr_nombre,
 			usuario.username,
 			usuario.id_usuario,
 			usuario.nombre,
@@ -390,13 +394,17 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 			WHERE $where ";
 
-	if ($excel && $simplificado) {
+	if (($excel && $simplificado) || $excel_agrupado) {
 		$query = str_replace('SELECT  SQL_CALC_FOUND_ROWS', 'SELECT  SQL_BIG_RESULT SQL_NO_CACHE  ', $query);
 		$query = str_replace('WHERE 1', ' join tarifa  on tarifa.tarifa_defecto=1 left join usuario_tarifa ut on  ut.id_moneda=contrato.id_moneda and ut.id_usuario=trabajo.id_usuario and ut.id_tarifa=ifnull(contrato.id_tarifa, tarifa.id_tarifa) WHERE 1  ', $query);
 		$query = str_replace('FROM trabajo', ' ,ut.tarifa as tarifa2 FROM trabajo  ', $query);
 
-
-		require('ajax/cobros3.simplificado.xls.php');
+		if ($excel_agrupado) {
+			$ReporteTrabajoAgrupado = new ReporteTrabajoAgrupado($sesion);
+			$ReporteTrabajoAgrupado->imprimir($query, $por_socio);
+		} else {
+			require('ajax/cobros3.simplificado.xls.php');
+		}
 		exit();
 	}
 	if ($check_trabajo == 1 && isset($cobro) && !$excel) { //Check_trabajo vale 1 cuando aprietan boton buscar
@@ -435,6 +443,9 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	//de esta manera no se sobrecarga esta página
 	//Esta comentado hasta encontrar una buena manera de encriptarlo
 	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
+
+	// Reinicio la paginación cada vez que se haga click en el botón buscar
+	$desde = ($check_trabajo == 1) ? 0 : $desde;
 
 	if ($orden == "") {
 		if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
@@ -490,7 +501,6 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	$b->color_mouse_over = "#bcff5c";
 	$b->funcionTR = "funcionTR";
 }
-
 if ($excel) {
 
 	if ($p_cobranza->fields['permitido']) {
@@ -840,9 +850,7 @@ $pagina->PrintTop($popup);
 			<tr>
 				<td></td>
 				<td colspan="2"  align=left>
-
-					<a name='boton_buscar' id='boton_buscar'  class="btn botonizame" icon="find" onclick="jQuery('#check_trabajo').attr('checked','checked').val(1);jQuery('#form_trabajos').submit();"><?php echo __('Buscar') ?></a>
-
+					<?php echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar')); ?>
 				</td>
 			</tr>
 		</table>
@@ -850,29 +858,35 @@ $pagina->PrintTop($popup);
 
 </form>
 
+<?php if (isset($cobro) || $opc == 'buscar') { ?>
+	<?php $b->Imprimir('', array('check_trabajo')); //Excluyo Checktrabajo); ?>
+	<form>
+		<center>
+			<a href="#" onclick="seleccionarTodo(true); return false;">Seleccionar todo</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos">Editar seleccionados</a>
+			<br />
+			<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where)) ?>'>
+			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
+			<br />
+			<br />
+			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>
+			<?php
+			$fecha_ini = Utiles::fecha2sql($fecha_ini, date('Y-m-d', strtotime('-12 month')));
+			$fecha_fin = Utiles::fecha2sql($fecha_fin);
+			// solo permite periodo de un mes
+			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 month"));
+			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario))) { ?>
+				<?php echo $Form->icon_button(__('Descargar listado agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
+				<label><input type="checkbox" value="1" id="por_socio"/> Agrupar por socio</label>
+			<?php } ?>
+			<br />
+		</center>
+	</form>
+
 <?php
-
-if (isset($cobro) || $opc == 'buscar') {
-	echo "<center>";
-	$b->Imprimir('', array('check_trabajo')); //Excluyo Checktrabajo);
-	?>
-	<a href="#" onclick="seleccionarTodo(true); return false;">Seleccionar todo</a>
-	&nbsp;&nbsp;&nbsp;&nbsp;
-	<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
-	&nbsp;&nbsp;&nbsp;&nbsp;
-	<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos">Editar seleccionados</a>
-	<br />
-	<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where)) ?>'>
-	<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
-	<br />
-
-
-	<input type="button" class="btn" id="descargapro" value="<?php echo __('Descargar listado a Excel'); ?>" />
-
-	<br />
-	</center>
-
-	<?php
 }
 
 function Cobrable(& $fila) {
@@ -1154,6 +1168,8 @@ function funcionTR(& $trabajo) {
 	$i++;
 	return $html;
 }
+
+echo $Form->script();
 ?>
 <script type="text/javascript">
 
@@ -1162,7 +1178,10 @@ function funcionTR(& $trabajo) {
 	}
 
 	jQuery(document).ready(function() {
-
+		jQuery('#boton_buscar').click(function() {
+			jQuery('#check_trabajo').attr('checked','checked').val(1);
+			jQuery('#form_trabajos').submit();
+		});
 		jQuery('#campo_codigo_actividad').hide();
 
 		jQuery('#descargapro').click(function() {
@@ -1176,14 +1195,14 @@ function funcionTR(& $trabajo) {
 				if(parseInt(data)>15000) {
 
 					var formated=data/1000;
-					var dialogoconfirma=top.window.jQuery( "#dialog-confirm" );
+					var dialogoconfirma = top.window.jQuery( "<div/>" );
 					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
 					jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
 
 					dialogoconfirma.dialog({
 						resizable: false,
 						autoOpen:true,
-						height:200,
+						height:220,
 						width:450,
 						modal: true,
 						close:function(ev,ui) {
@@ -1192,7 +1211,7 @@ function funcionTR(& $trabajo) {
 						buttons: {
 							"<?php echo __('Entiendo y acepto') ?>": function() {
 								jQuery('#descargapro').removeAttr('disabled');
-								window.location.href='trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&simplificado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
+								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&simplificado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
 								dialogoconfirma.dialog( "close" );
 
 								return true;
@@ -1215,6 +1234,51 @@ function funcionTR(& $trabajo) {
 			});
 
 			jQuery('#descargapro').removeAttr('disabled');
+		});
+
+		jQuery('#descargar_pdf_agrupado').click(function() {
+			var Where='<?php echo base64_encode($where) ?>';
+			var Idcobro='<?php echo $id_cobro; ?>';
+			var Motivo='<?php echo $motivo; ?>';
+			var por_socio = jQuery('#por_socio:checked').val();
+			jQuery.post('ajax/estimar_datos.php', {
+				where: Where,
+				id_cobro: Idcobro,
+				motivo:Motivo
+			},
+			function(data) {
+
+				if(parseInt(data)>15000) {
+
+					var formated=data/1000;
+					var dialogoconfirma = top.window.jQuery( "<div/>" );
+					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
+					jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
+
+					dialogoconfirma.dialog({
+						resizable: false,
+						autoOpen: true,
+						height: 220,
+						width: 450,
+						modal: true,
+						close: function(ev,ui) {
+							dialogoconfirma.html('');
+						},
+						buttons: {
+							"<?php echo __('Entiendo y acepto') ?>": function() {
+								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
+								dialogoconfirma.dialog( "close" );
+							},
+							"<?php echo __('Cancelar') ?>": function() {
+								dialogoconfirma.dialog( "close" );
+							}
+						}
+					});
+				} else {
+					window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
+				}
+			});
+
 		});
 
 	});
