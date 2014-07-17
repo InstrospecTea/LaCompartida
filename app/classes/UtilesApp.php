@@ -112,22 +112,23 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '') {
+	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '', $glosa_asunto = '') {
 		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
 			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
-			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, true);
+
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, true, $width, $oncambio);
 			echo AutocompletadorAsunto::Javascript($sesion);
 		} else {
 			if ($oncambio == '') {
-				$oncambio = "CargarSelectCliente(this.value);";
+				$oncambio = 'CargarSelectCliente(this.value);';
 			} elseif (substr($oncambio, 0, 1) == '+') {
-				$oncambio = "CargarSelectCliente(this.value);" . str_replace('+', '', $oncambio);
+				$oncambio = 'CargarSelectCliente(this.value);' . str_replace('+', '', $oncambio);
 			}
 
 			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
+				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto_secundario', 'glosa_asunto', 'codigo_asunto_secundario', $codigo_asunto_secundario, '', $oncambio, $width, $codigo_cliente_secundario);
 			} else {
-				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto', 'glosa_asunto', 'codigo_asunto', $codigo_asunto, '', $oncambio, $width, $codigo_cliente);
 			}
 		}
 	}

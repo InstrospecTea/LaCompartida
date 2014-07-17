@@ -583,23 +583,25 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
         ?>
             </td>
         </tr>
+
         <tr>
-            <td align='center'>
-                <span <?php echo Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ? 'style="display:none"' : '' ?> id="img_asunto"><img src="<?php echo Conf::ImgDir() ?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto', 'inline', 'img_asunto');"></span>&nbsp;&nbsp;
-            </td>
-            <td align='right'>
-        <?php echo __('Asunto') ?>
-            </td>
-            <td align=left width="440" nowrap>
-				<?php
-				$oncambio = '+CargarTarifa();';
-				if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
-					$oncambio .= 'CargarActividad();';
-				}
-				UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
-				?>
-            </td>
+          <td align='center'>
+            <span <?php echo Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ? 'style="display:none"' : ''; ?> id="img_asunto"><img src="<?php echo Conf::ImgDir() ?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto', 'inline', 'img_asunto');"></span>&nbsp;&nbsp;
+          </td>
+          <td align='right'>
+            <?php echo __('Asunto'); ?>
+          </td>
+          <td align=left width="440" nowrap>
+            <?php
+            $oncambio = '+CargarTarifa();';
+            if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
+              $oncambio .= 'CargarActividad();';
+            }
+            UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
+            ?>
+          </td>
         </tr>
+
         <?php if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) { ?>
             <tr>
                 <td align='center'>
