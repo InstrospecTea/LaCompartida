@@ -402,7 +402,6 @@ $pagina->PrintTop($popup);
 			<td align="left"><b><?php echo $txt_pagina; ?></b></td>
 		</tr>
 	</table>
-
 	<?php
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		if (!$codigo_cliente_secundario) {
@@ -470,7 +469,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Asunto'); ?>
 			</td>
 			<td align="left">
-				<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+				<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
@@ -744,7 +743,6 @@ $pagina->PrintTop($popup);
 	jQuery("#autoincrementable").change(function(){
 		jQuery.post('ajax/ajax_gastos.php',{ opc: "identificador", identificador: jQuery("#autoincrementable").val()})
 		.done(function(data){
-			console.log(data);
 			if (data == "1") {
 				alert('<?php echo __('El valor del identificador ya está siendo utilizado.'); ?>');
 				jQuery('#autoincrementable').focus();
