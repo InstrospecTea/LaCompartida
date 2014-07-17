@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 14.4.14
+Lunes 14 de Julio 2014
+* **Fixed:** [Corrige sumar monto tramite del cobro.](https://github.com/LemontechSA/ttb/pull/586)
+
 ## Hotfix: 14.4.13
 Jueves 10 de Julio 2014
 * **Fixed:** [Agrega nuevo tag para morales y besa](https://github.com/LemontechSA/ttb/pull/581)
