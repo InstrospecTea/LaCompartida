@@ -174,6 +174,28 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit('tipo_descuento', $tipo_descuento);
 	$cobro_moneda_cambio = new CobroMoneda($sesion);
 	$cobro_moneda_cambio->UpdateTipoCambioCobro($cobro_id_moneda, $cobro_tipo_cambio, $id_cobro);
+    $observacion = new Observacion($sesion);
+    $moneda = new Moneda($sesion);
+    $moneda->Load($cobro_id_moneda);
+    $tipo_cambio_original = $moneda->fields['tipo_cambio'];
+    $ultimaObservacion = $observacion->UltimaObservacion($id_cobro);
+
+
+    $comentario = __('Moneda').' seleccionada '.$moneda->fields['codigo'].'';
+
+    if ($moneda->fields['tipo_cambio'] != $cobro_tipo_cambio) {
+        $comentario .= __(', con tipo de cambio modificado a ')."$cobro_tipo_cambio".'.';
+    }
+
+
+    if ($comentario != $ultimaObservacion['comentario']) {
+        $observacion->Edit('fecha', date('Y-m-d H:i:s'));
+        $observacion->Edit('comentario', $comentario);
+        $observacion->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+        $observacion->Edit('id_cobro', $id_cobro);
+        $observacion->Write();
+    }
+
 
 	$ret = $cobro->GuardarCobro();
 
