@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix: 14.4.15
+Viernes 18 de Julio 2014
+* **Fixed:** [Agrega desglose de gastos a factura.](https://github.com/LemontechSA/ttb/pull/590)
+
+## Hotfix: 14.4.15
 Jueves 17 de Julio 2014
 * **Fixed:** [Repara la rutina que muestra los identificadores de las facturas en el reporte de antiguedad de deudas.](https://github.com/LemontechSA/ttb/pull/589)
 
