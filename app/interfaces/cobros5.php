@@ -180,13 +180,11 @@ if ($opc == 'anular_emision') {
     $tipo_cambio_original = $moneda->fields['tipo_cambio'];
     $ultimaObservacion = $observacion->UltimaObservacion($id_cobro);
 
-
     $comentario = __('Moneda').' seleccionada '.$moneda->fields['codigo'].'';
 
     if ($moneda->fields['tipo_cambio'] != $cobro_tipo_cambio) {
         $comentario .= __(', con tipo de cambio modificado a ')."$cobro_tipo_cambio".'.';
     }
-
 
     if ($comentario != $ultimaObservacion['comentario']) {
         $observacion->Edit('fecha', date('Y-m-d H:i:s'));
