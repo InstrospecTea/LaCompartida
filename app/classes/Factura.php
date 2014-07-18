@@ -1804,15 +1804,6 @@ class Factura extends Objeto {
 
                 $html2 = str_replace('%texto_pie%', $texto_pie_pagina, $html2);
                 break;
-
-            case 'DESGLOSE_GASTOS':
-
-
-                pr($desglose_gastos);
-
-
-
-                break;
         }
 
         return $html2;
