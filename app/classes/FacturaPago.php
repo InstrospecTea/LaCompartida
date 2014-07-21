@@ -294,7 +294,7 @@ class FacturaPago extends Objeto {
 		}
 		$html .= "</table>";
 
-		echo $html;
+		return $html;
 	}
 
 	function GeneraHTMLFacturaPago($id_formato_factura_pago = null) {
@@ -361,7 +361,6 @@ class FacturaPago extends Objeto {
 
 		switch ($theTag) {
 			case 'VOUCHER':
-
 				$html = str_replace('%ENCABEZADO%', $this->generarDocumentoPago($parser_factura_pago, 'ENCABEZADO', $lang), $html);
 				$html = str_replace('%CLIENTE%', $this->generarDocumentoPago($parser_factura_pago, 'CLIENTE', $lang), $html);
 				$html = str_replace('%DATOS_FACTURA_PAGO%', $this->generarDocumentoPago($parser_factura_pago, 'DATOS_FACTURA_PAGO', $lang), $html);
@@ -370,8 +369,8 @@ class FacturaPago extends Objeto {
 
 			case 'ENCABEZADO':
 
-				if (UtilesApp::GetConf($this->sesion, 'PdfLinea1'))
-					$PdfLinea1 = UtilesApp::GetConf($this->sesion, 'PdfLinea1');
+				if (Conf::GetConf($this->sesion, 'PdfLinea1'))
+					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 				$html = str_replace('%estudio_valor%', $PdfLinea1, $html);
 
 				break;
@@ -523,7 +522,7 @@ class FacturaPago extends Objeto {
 		/*
 		 * Verificar si la factura_pago saldo la deuda de la Factura
 		 * de ser asi retornanr mensaje
-		 * 
+		 *
 		 * Para esto se debe cumplir:
 		 * 		ser el ultimo factura_pago asociado
 		 * 		saldo >= 0
@@ -584,14 +583,20 @@ class FacturaPago extends Objeto {
 			$col_seleccion = 'id_factura';
 		}
 		$lista_facturas = $this->GetFacturasSoyPago($id, $col_condicion);
+		$lista_ids = array();
+		if ($col_seleccion == 'numero') {
+			$Factura = new Factura($this->sesion);
+		}
 		for ($i = 0; $i < $lista_facturas->num; $i++) {
 			$item = $lista_facturas->Get($i);
-			if ($i == 0)
-				$lista_ids = $item->fields[$col_seleccion];
-			else
-				$lista_ids .= ',' . $item->fields[$col_seleccion];
+			if ($col_seleccion == 'numero') {
+				$valor = $Factura->ObtenerNumero(null, $item->fields['serie_documento_legal'], $item->fields['numero']);
+			} else {
+				$valor = $item->fields[$col_seleccion];
+			}
+			$lista_ids[] = $valor;
 		}
-		return $lista_ids;
+		return implode(',', $lista_ids);
 	}
 
 	/**
@@ -617,7 +622,7 @@ class FacturaPago extends Objeto {
 		if ($where == '') {
 			$where = 1;
 
-			if (UtilesApp::GetConf($this->sesion, 'SelectMultipleFacturasPago')) {
+			if (Conf::GetConf($this->sesion, 'SelectMultipleFacturasPago')) {
 				if (isset($_REQUEST['id_concepto'])) {
 					$condiciones = "";
 					foreach ($_REQUEST['id_concepto'] as $key => $value) {
@@ -690,7 +695,7 @@ class FacturaPago extends Objeto {
 			if ($numero != '')
 				$where .= " AND factura.numero*1 = $numero*1 ";
 
-			if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 				$cliente = new Cliente($this->sesion);
 				$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
 				$codigo_cliente = $cliente->fields['codigo_cliente'];
@@ -701,7 +706,7 @@ class FacturaPago extends Objeto {
 			if ($codigo_cliente) {
 				$where .= " AND fp.codigo_cliente='$codigo_cliente' ";
 			}
-			if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 				$asunto = new Asunto($this->sesion);
 				$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
 				$id_contrato = $asunto->fields['id_contrato'];
@@ -759,10 +764,9 @@ class FacturaPago extends Objeto {
 				, fp.codigo_cliente as cliente_pago
 				, fp.id_factura_pago
 				, prm_documento_legal.codigo as tipo
-				, factura.serie_documento_legal
 				, cliente.glosa_cliente
-				, prm_banco.nombre as nombre_banco 
-				, cuenta_banco.numero as numero_cuenta 
+				, prm_banco.nombre as nombre_banco
+				, cuenta_banco.numero as numero_cuenta
 				, co.glosa as concepto_pago
 				, usuario.username AS encargado_comercial
 				, prm_estado_factura.glosa as estado
@@ -787,8 +791,8 @@ class FacturaPago extends Objeto {
 			JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 			LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 			LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
-			LEFT JOIN prm_banco ON fp.id_banco = prm_banco.id_banco 
-			LEFT JOIN cuenta_banco ON fp.id_cuenta = cuenta_banco.id_cuenta 
+			LEFT JOIN prm_banco ON fp.id_banco = prm_banco.id_banco
+			LEFT JOIN cuenta_banco ON fp.id_cuenta = cuenta_banco.id_cuenta
 			LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
 			left join factura_cobro fc ON fc.id_factura=factura.id_factura and fc.id_cobro=cobro.id_cobro
 			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente

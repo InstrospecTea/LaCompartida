@@ -491,7 +491,7 @@ if ($accion == "consistencia_cliente_asunto") {
 		if ($i > 0) {
 			echo("~");
 		}
-		echo(join("|", $fila));
+		echo utf8_encode((join("|", $fila)));
 	}
 	if ($i == 0) {
 		echo("VACIO|");

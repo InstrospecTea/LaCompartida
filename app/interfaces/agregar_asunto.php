@@ -327,10 +327,10 @@ if ($opcion == "guardar") {
 		}
 		$Asunto->Edit("cobrable", intval($cobrable), true);
 		$Asunto->Edit("mensual", $mensual ? "SI" : "NO");
-		$Asunto->Edit("alerta_hh", $Asunto_alerta_hh);
-		$Asunto->Edit("alerta_monto", $Asunto_alerta_monto);
-		$Asunto->Edit("limite_hh", $Asunto_limite_hh);
-		$Asunto->Edit("limite_monto", $Asunto_limite_monto);
+		$Asunto->Edit("alerta_hh", $asunto_alerta_hh);
+		$Asunto->Edit("alerta_monto", $asunto_alerta_monto);
+		$Asunto->Edit("limite_hh", $asunto_limite_hh);
+		$Asunto->Edit("limite_monto", $asunto_limite_monto);
 
 		//if($Asunto->Write())
 		//{
@@ -1221,77 +1221,17 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				} else {
 					for (i = 0; i < campos.length; i++) {
 						valores = campos[i].split('|');
-
-						// Cliente
-						jQuery('[name="factura_razon_social"]').val('value', valores[0] != '' ? valores[0] : '');
-
-						// Dirección
-						if (valores[1] != '') {
-							jQuery('[name="factura_direccion"]').attr('value', valores[1]);
-						} else {
-							jQuery('[name="factura_direccion"]').attr('value', '');
-						}
-
-						// Rut
-						if (valores[2] != '') {
-							jQuery('[name="factura_rut"]').attr('value', valores[2]);
-						} else {
-							jQuery('[name="factura_rut"]').attr('value', '');
-						}
-
-						// Comuna
-						if (valores[3] != '') {
-							jQuery('[name="factura_comuna"]').attr('value', valores[3]);
-						} else {
-							jQuery('[name="factura_comuna"]').attr('value', '');
-						}
-
-						// Ciudad
-						if (valores[4] != '') {
-							jQuery('[name="factura_ciudad"]').attr('value', valores[4]);
-						} else {
-							jQuery('[name="factura_ciudad"]').attr('value', '');
-						}
-
-						// Giro
-						if (valores[5] != '') {
-							jQuery('[name="factura_giro"]').attr('value', valores[5]);
-						} else {
-							jQuery('[name="factura_giro"]').attr('value', '');
-						}
-
-						// Ciudad
-						if (valores[6] != '') {
-							jQuery('[name="factura_codigopostal"]').attr('value', valores[6]);
-						} else {
-							jQuery('[name="factura_codigopostal"]').attr('value', '');
-						}
-
-						// País
-						if (valores[7] != '') {
-							jQuery('[name="id_pais"]').attr('value', valores[7]);
-						} else {
-							jQuery('[name="id_pais"]').attr('value', '');
-						}
-
-						// Teléfono
-						if (valores[8] != '') {
-							jQuery('[name="cod_factura_telefono"]').attr('value', valores[8]);
-						} else {
-							jQuery('[name="cod_factura_telefono"]').attr('value', '');
-						}
-						if (valores[9] != '') {
-							jQuery('[name="factura_telefono"]').attr('value', valores[8]);
-						} else {
-							jQuery('[name="factura_telefono"]').attr('value', '');
-						}
-
-						// glosa contrato
-						if (valores[10] != '') {
-							jQuery('[name="glosa_contrato"]').attr('value', valores[10]);
-						} else {
-							jQuery('[name="glosa_contrato"]').attr('value', '');
-						}
+						jQuery('[name="factura_razon_social"]').val(valores[0] != '' ? valores[0] : '');
+						jQuery('[name="factura_direccion"]').val(valores[1] != '' ? valores[1] : '');
+						jQuery('[name="factura_rut"]').val(valores[2] != '' ? valores[2] : '');
+						jQuery('[name="factura_comuna"]').val(valores[3] != '' ? valores[3] : '');
+						jQuery('[name="factura_ciudad"]').val(valores[4] != '' ? valores[4] : '');
+						jQuery('[name="factura_giro"]').val(valores[6] != '' ? valores[6] : '');
+						jQuery('[name="factura_codigopostal"]').val(valores[7] != '' ? valores[7] : '');
+						jQuery('[name="id_pais"]').val(valores[8] != '' ? valores[8] : '');
+						jQuery('[name="cod_factura_telefono"]').val(valores[9] != '' ? valores[9] : '');
+						jQuery('[name="factura_telefono"]').val(valores[10] != '' ? valores[10] : '');
+						jQuery('[name="glosa_contrato"]').val(valores[11] != '' ? valores[11] : '');
 					}
 				}
 			} else {

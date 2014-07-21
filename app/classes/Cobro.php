@@ -311,7 +311,7 @@ if (!class_exists('Cobro')) {
 			$this->ArrayFacturasDelContrato = array();
 			if ($nuevomodulofactura) {
 				$query = "SELECT
-								concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
+								concat(prm_documento_legal.glosa,' N° ',  factura.serie_documento_legal,'-',lpad(factura.numero,'7','0')) as facturanumero ,
 								cobro.id_cobro,
 								cobro.fecha_enviado_cliente,cobro.fecha_emision,
 								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total,
@@ -330,16 +330,19 @@ if (!class_exists('Cobro')) {
 								ccfm.id_moneda,
 								cobro.incluye_honorarios,
 								cobro.incluye_gastos,
-								(if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)  )) as tasa_cambio,
-								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H', if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')) as tipo_cobro
-							FROM cobro
-								LEFT JOIN factura using (id_cobro)
-								LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
-								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
-								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
-								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-								JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
-									WHERE cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
+								if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)) as tasa_cambio,
+								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									) as tipo_cobro
+								FROM cobro
+									LEFT JOIN factura using (id_cobro)
+									LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
+									LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
+									LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
+									JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
+                              	WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'
+								 ";
 			} else {
 				$query = "SELECT
 								ifnull(cobro.documento,cobro.id_cobro) as facturanumero,
@@ -359,8 +362,10 @@ if (!class_exists('Cobro')) {
 								documento.id_moneda,
 								cobro.incluye_honorarios,
 								cobro.incluye_gastos,
-								if(documento.id_moneda= cobro.id_moneda,1,cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
-								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H', if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')) as tipo_cobro
+								if(documento.id_moneda= cobro.id_moneda, 1, cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
+								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									) as tipo_cobro
 							FROM cobro
 								LEFT join documento on cobro.id_cobro=documento.id_cobro and documento.tipo_doc='N'
 								LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda
@@ -368,17 +373,19 @@ if (!class_exists('Cobro')) {
 								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
 								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-								WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
+							WHERE cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
 			}
 
 			$query .= " AND cobro.id_contrato=" . $this->fields['id_contrato'];
-			if ($id_cobro != null)
+			if ($id_cobro != null) {
 				$query .= " AND cobro.id_cobro=" . $id_cobro;
+			}
 
-			if ($tipo != '')
+			if ($tipo != '') {
 				$query .= " AND if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
 									)='" . $tipo . "'";
+			}
 
 			$facturasST = $sesion->pdodbh->query($query);
 			$this->ArrayFacturasDelContrato = $facturasST->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
@@ -777,13 +784,12 @@ if (!class_exists('Cobro')) {
 			return $monto_total;
 		}
 
-		function CalculaMontoTramites($cobro, $fecha_ini, $fecha_fin) {
-
+		function CalculaMontoTramites() {
 			$query = "SELECT SUM(tarifa_tramite)
-						FROM tramite
-							WHERE tramite.id_cobro='" . $this->fields['id_cobro'] . "'
-							AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
-							AND tramite.cobrable=1 ";
+				FROM tramite
+				WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+					AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
+					AND tramite.cobrable = 1 ";
 
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($total_monto_tramites) = mysql_fetch_array($resp);
@@ -1531,14 +1537,14 @@ if (!class_exists('Cobro')) {
 
 			#DESCUENTOS
 			if ($this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$cobro_descuento = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
-				$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - $cobro_descuento;
+				$cobro_descuento = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
+				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - $cobro_descuento;
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
 				$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
 			} else {
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
-				$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
+				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 			}
 			//Valido CAP
@@ -1568,10 +1574,10 @@ if (!class_exists('Cobro')) {
 
 			// Se guarda la información del cobro
 
-			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites(), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 
 			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_origina && $cobro_total_honorario_cobrable != 0) {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
