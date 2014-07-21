@@ -28,9 +28,7 @@ if ($excel) {
 	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
 }
 
-if ($selectclienteasuntoespecial) {
-	require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
-} else {
+if (!$selectclienteasuntoespecial) {
 	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 }
 
@@ -179,7 +177,7 @@ $Form = new Form;
 						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan="4">
-						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320); ?>
+						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto, false); ?>
 					</td>
 				</tr>
 
@@ -272,17 +270,15 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.cobrable=0 ";
 	}
 
-	if ($codigo_asunto != "" || $codigo_asunto_secundario != "") {
+	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
 		if ($usocodigosecundario) {
 			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto_secundario%'";
 		} else {
 			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
 		}
-	}
-
-	if ($glosa_asunto != "") {
+	} else if ($glosa_asunto != '') {
 		$nombre = strtr($glosa_asunto, ' ', '%');
-		$where .= " AND a1.glosa_asunto Like '%$glosa_asunto%'";
+		$where .= " AND a1.glosa_asunto Like '%{$glosa_asunto}%'";
 	}
 
 	if ($codigo_cliente || $codigo_cliente_secundario) {
@@ -449,12 +445,6 @@ function funcionTR(& $Asunto) {
 	$html .= "</tr>";
 	$i++;
 	return $html;
-}
-
-if ($selectclienteasuntoespecial) {
-	if (empty($_REQUEST['id_cobro']) && $from != 'agregar_cliente') {
-		echo(AutocompletadorAsunto::Javascript($Sesion, false));
-	}
 }
 
 $Pagina->PrintBottom($popup);

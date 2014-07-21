@@ -1,4 +1,11 @@
 # Changelog
+
+## Release: 14.5.0
+Jueves 10 de Julio 2014
+* **Feature:** [Errores Usuarios](https://github.com/LemontechSA/ttb/pull/581)
+* **Feature:** [Recupera autocompletador asuntos](https://github.com/LemontechSA/ttb/pull/565)
+* **Feature:** [Serie documento](https://github.com/LemontechSA/ttb/pull/520)
+
 ## Hotfix: 14.4.17
 Lunes 21 de Julio 2014
 * **Fixed:** [Corrige errores SQL en Factura](https://github.com/LemontechSA/ttb/pull/591)
