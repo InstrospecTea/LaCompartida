@@ -112,11 +112,23 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '', $glosa_asunto = '') {
+	/**
+	 * Inserta Campo de Asuntos autocomplete o select según Conf
+	 * @param type $sesion
+	 * @param type $codigo_cliente
+	 * @param type $codigo_cliente_secundario
+	 * @param type $codigo_asunto
+	 * @param type $codigo_asunto_secundario
+	 * @param type $width
+	 * @param type $oncambio
+	 * @param type $glosa_asunto
+	 * @param type $forceMatch
+	 */
+	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '', $glosa_asunto = '', $forceMatch = true) {
 		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
 			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
 
-			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, true, $width, $oncambio);
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, true, $width, $oncambio, $forceMatch);
 			echo AutocompletadorAsunto::Javascript($sesion);
 		} else {
 			if ($oncambio == '') {

@@ -57,7 +57,7 @@ class Form {
 					'value' => $value
 				);
 				if ("$value" == "$selected") {
-					$op_attr['selected'] = 'selected';
+					$op_attr['selected'] = true;
 				}
 				$html .= $this->Html->tag('option', $text, $op_attr);
 			}
@@ -78,6 +78,34 @@ class Form {
 		}
 		return $this->Html->tag('label', $text, $_attrs);
 	}
+	
+	/**
+	 * 
+	 * @param type $name
+	 * @param type $value
+	 * @param type $attrs
+	 * @return type
+	 */
+	public function input($name, $value, $attrs = null) {
+		$attrs = (Array) $attrs + array('type' => 'text', 'value' => $value, 'label' => true, 'name' => null);
+		$label = null;
+
+		if ($attrs['label'] === true) {
+			$label = $this->Utiles->humanize($name);
+		} else if ($attrs['label'] !== false) {
+			$label = $attrs['label'];
+		}
+		if (empty($attrs['name']) && !empty($name)) {
+			$attrs['name'] = $name;
+		}
+		if (empty($attrs['id']) && !empty($attrs['name'])) {
+			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
+		}
+		unset($attrs['label']);
+		$input = $this->Html->tag('input', null, $attrs, true);
+		return empty($label) ? $input : $this->label($label, $attrs['name']) . $input;
+	
+	}
 	/**
 	 * Devuelve elemento checkbox
 	 * @param type $name
@@ -94,16 +122,14 @@ class Form {
 		} else if ($attrs['label'] !== false) {
 			$label = $attrs['label'];
 		}
-		unset($attrs['label'], $attrs['checked']);
+		unset($attrs['label']);
 		if (empty($attrs['name'])) {
 			$attrs['name'] = $name;
 		}
 		if (empty($attrs['id'])) {
 			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
 		}
-		if ($checked === true) {
-			$attrs['checked'] = 'checked';
-		}
+		$attrs['checked'] = $checked;
 		$radio = $this->Html->tag('input', null, $attrs, true);
 		return empty($label) ? $radio : $this->label($radio . $label);
 	}
@@ -112,10 +138,10 @@ class Form {
 	 * Devuelve elemento radio
 	 * @param type $name
 	 * @param type $value
-	 * @param type $selected
+	 * @param type $checked
 	 * @param type $attrs
 	 */
-	public function radio($name, $value, $selected = false, $attrs = null) {
+	public function radio($name, $value, $checked = false, $attrs = null) {
 		$attrs = (Array) $attrs + array('type' => 'radio', 'value' => $value, 'label' => true);
 		$label = null;
 
@@ -124,16 +150,15 @@ class Form {
 		} else if ($attrs['label'] !== false) {
 			$label = $attrs['label'];
 		}
-		unset($attrs['label'], $attrs['checked']);
+		unset($attrs['label']);
 		if (empty($attrs['name'])) {
 			$attrs['name'] = $name;
 		}
 		if (empty($attrs['id'])) {
 			$attrs['id'] = $this->Utiles->pascalize($attrs['name']);
 		}
-		if ($value === $selected) {
-			$attrs['checked'] = 'checked';
-		}
+		$attrs['checked'] = $checked;
+
 		$radio = $this->Html->tag('input', null, $attrs, true);
 		return empty($label) ? $radio : $this->label($radio . $label);
 	}
@@ -164,7 +189,7 @@ class Form {
 				$attrs['label'] = $label;
 			}
 			$attrs['id'] = $this->Utiles->pascalize($name . $x);
-			$html .= $this->radio($name, $value, $selected, $attrs);
+			$html .= $this->radio($name, $value, $value == $selected, $attrs);
 			++$x;
 		}
 		if ($container !== false) {
@@ -187,6 +212,22 @@ class Form {
 		$attrs = array_merge($_attrs, (array) $attrs);
 		$attrs['icon'] = $icon;
 		return $this->button($text, $attrs);
+	}
+
+	/**
+	 * Agraga boton submit con icono de TTB
+	 * @param type $text
+	 * @param type $icon
+	 * @param type $attrs
+	 * @return type
+	 */
+	public function icon_submit($text, $icon, $attrs = null) {
+		$_attrs = array(
+			'tag' => 'a'
+		);
+		$attrs = array_merge($_attrs, (array) $attrs);
+		$attrs['icon'] = $icon;
+		return $this->submit($text, $attrs);
 	}
 
 	/**

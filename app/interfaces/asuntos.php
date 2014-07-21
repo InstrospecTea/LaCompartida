@@ -177,7 +177,7 @@ $Form = new Form;
 						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan="4">
-						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto); ?>
+						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto, false); ?>
 					</td>
 				</tr>
 

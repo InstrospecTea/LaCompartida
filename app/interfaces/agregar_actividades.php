@@ -9,7 +9,7 @@ $Actividad = new Actividad($Sesion);
 if ($opcion == 'guardar') {
 	$Actividad->Fill($_REQUEST, true);
 
-	if ($_REQUEST['activo'] == 1){
+	if ($_REQUEST['activo'] == 1) {
 		$Actividad->Edit("activo", "1");
 	} else {
 		$Actividad->Edit("activo", "0");
@@ -58,39 +58,8 @@ if ($Actividad->Loaded()) {
 }
 
 $Pagina->PrintTop($popup);
+$Form = new Form;
 ?>
-
-<script type="text/javascript">
-
-	jQuery(document).ready(function() {
-		var glosa_actividad = jQuery('#glosa_actividad').val();
-		if (!glosa_actividad){
-			jQuery('#td_check_activo').hide();
-			jQuery('#td_text_activo').hide();
-		} else {
-			jQuery('#td_check_activo').show();
-			jQuery('#td_text_activo').show();
-		}
-	});
-
-
-	function Validar(p) {
-		if (document.getElementById('codigo_actividad').value == '') {
-			alert('Debe ingresar un código.');
-			document.getElementById('codigo_actividad').focus();
-			return false;
-		}
-		if (document.getElementById('glosa_actividad').value == '') {
-			alert('Debe ingresar un título.');
-			document.getElementById('glosa_actividad').focus();
-			return false;
-		}
-
-		document.getElementById('form_actividades').submit();
-
-		return true;
-	}
-</script>
 
 <form method="POST" action="#" name="form_actividades" id="form_actividades">
 	<input type="hidden"  name="opcion" id="opcion" value="guardar">
@@ -131,25 +100,45 @@ $Pagina->PrintTop($popup);
 					<?php UtilesApp::CampoAsunto($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
 				</td>
 			</tr>
-			<tr>
-				<td align="right" id="td_text_activo">
-					<?php echo __('Activa'); ?>
-				</td>
-				<td align="left" id="td_check_activo">
-					<?php if ($Actividad->fields['activo'] == '1') {
-						$Habilitada = 'checked="checked"';
-					} else {
-						$Habilitada = '';
-					} ?>
-					<input type="checkbox" title="Al inactivar no sera listada en ingreso de horas" id="activo" name="activo" value="1" <?php echo $Habilitada ;?> onClick="CheckActivo();" >
-				</td>
-			</tr>
+			<?php if ($Actividad->Loaded()) { ?>
+				<tr>
+					<td><?php echo __('Activa'); ?></td>
+					<td>
+						<?php
+						$activo = ($Actividad->fields['activo'] == 1);
+						echo $Form->checkbox('activo', 1, $activo, array('id' => 'activo', 'onclick' => 'CheckActivo();', 'title' => 'Al inactivar no sera listada en ingreso de horas', 'label' => false));
+						?>
+					</td>
+				</tr>
+			<?php } ?>
 		</table>
 	</fieldset>
 	<br />
 	<div class="fl">
-		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="Validar(jQuery('#form_actividades').get(0))"><?php echo __('Guardar'); ?></a>
-		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-exit" onclick="window.close();" ><?php echo __('Cancelar'); ?></a>
+		<?php
+		echo $Form->icon_submit(__('Guardar'), 'save');
+		echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => "window.close();"));
+		?>
 	</div>
 </form>
-<?php $Pagina->PrintBottom($popup);
+<script type="text/javascript">
+	jQuery('#form_actividades').submit(function() {
+		return Validar();
+	});
+	function Validar() {
+		if (!jQuery('#codigo_actividad').val()) {
+			alert('Debe ingresar un código.');
+			jQuery('codigo_actividad').focus();
+			return false;
+		}
+		if (!jQuery('#glosa_actividad').val()) {
+			alert('Debe ingresar un título.');
+			jQuery('#glosa_actividad').focus();
+			return false;
+		}
+		return true;
+	}
+</script>
+
+<?php
+$Pagina->PrintBottom($popup);
