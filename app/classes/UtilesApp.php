@@ -2340,5 +2340,18 @@ HTML;
 		$map = $map + self::$_transliteration + $merge;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
+	
+	/**
+	 * 
+	 * @param type $array
+	 * @param type $template
+	 */
+	public static function mergeKeyValue($array, $template = '%s - %s') {
+		$result = array();
+		foreach ($array as $key => $value) {
+			$result[$key] = sprintf($template, $key, $value);
+		}
+		return $result;
+	}
 
 }

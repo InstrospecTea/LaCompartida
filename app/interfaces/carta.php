@@ -18,6 +18,10 @@ $pagina->titulo = __('Cartas de cobro');
 $pagina->PrintTop();
 $Form = new Form;
 ?>
+<div class="loader-overlay" style="z-index: 1000; opacity:.8; background: #fff; top: 0; left: 0; right: 0; bottom: 0; position: fixed;"></div>
+<div class="loader-overlay" style="z-index: 1001; top: 0; left: 0; right: 0; bottom: 0; position: fixed; height: 100%; width: 100%;">
+	<img alt="cargando" src="//estaticos.thetimebilling.com/templates/cargando.gif" style="background: #fff; margin:150px; padding: 20px; border: 1px solid #eee;"/>
+</div>
 
 <form>
 	<?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, '', ' '); ?>
@@ -36,35 +40,39 @@ $Form = new Form;
 		<label>Margen Encabezado: <input name="carta[margen_encabezado]" value="<?php echo $carta['margen_encabezado']; ?>"/></label><br/>
 		<label>Margen Pie de página: <input name="carta[margen_pie_de_pagina]" value="<?php echo $carta['margen_pie_de_pagina']; ?>"/></label><br/>
 	</p>
-	<fieldset id="secciones">
-		<legend>Template</legend>
-		<?php
 
-		function mix(&$a, $b, $c = '%s') {
-			$a = sprintf("$c - %s", $b, $a);
-		}
-		array_walk_recursive($CartaCobro->diccionario, 'mix');
-		array_walk_recursive($CartaCobro->secciones, 'mix', '%%%s%%');
+	<div id="tabs-secciones" class="tabs">
+		<ul>
+			<?php foreach ($carta['secciones'] as $seccion => $html) { ?>
+				<li><a href="#tab-<?php echo $seccion; ?>"><?php echo $seccion; ?></a></li>
+			<?php } ?>
+		</ul>
+		<?php
 		foreach ($carta['secciones'] as $seccion => $html) {
+			$valores = UtilesApp::mergeKeyValue($NotaCobro->diccionario[$seccion]);
 			?>
-			<div>
-				<h3><?php echo $seccion; ?>:</h3>
+			<div id="tab-<?php echo $seccion; ?>">
 				<textarea class="ckeditor" id="editor_<?php echo $seccion; ?>" name="carta[secciones][<?php echo $seccion; ?>]"><?php echo htmlentities($html); ?></textarea>
-				<label>
-					Insertar Valor: <?php echo $Form->select(null, $CartaCobro->diccionario[$seccion], null, array('class' => 'valores', 'empty' => false)); ?>
-					<button class="agregar_valor" type="button">Insertar</button>
-				</label>
+				<?php
+				$valores = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$seccion]);
+				echo $Form->label(__('Insertar Valor:'), "valores_$seccion");
+				echo $Form->select(null, $valores, null, array('id' => "valores_$seccion", 'class' => 'valores', 'empty' => false));
+				echo $Form->button(__('Insertar'), array('class' => 'agregar_valor'));
+				?>
 				<?php if (isset($CartaCobro->secciones[$seccion])) { ?>
-					<label>
-						Agregar Sección: <?php echo $Form->select(null, $CartaCobro->secciones[$seccion], null, array('class' => 'secciones', 'empty' => false)); ?>
-						<button class="agregar_seccion" type="button">Agregar</button>
-					</label>
+					<br/>
+					<?php
+					$valores = UtilesApp::mergeKeyValue($CartaCobro->secciones[$seccion]);
+					echo $Form->label(__('Agregar Sección:'), "secciones_$seccion");
+					echo $Form->select(null, $valores, null, array('id' => "secciones_$seccion", 'class' => 'secciones', 'empty' => false));
+					echo $Form->button(__('Agregar'), array('class' => 'agregar_seccion'));
+					?>
 				<?php } ?>
 			</div>
 		<?php } ?>
-	</fieldset>
+	</div>
 	<h4>CSS</h4>
-	<textarea name="carta[formato_css]" rows="10" cols="40"><?php echo $carta['formato_css']; ?></textarea>
+	<textarea name="carta[formato_css]" rows="12" cols="40" style="width: 98%"><?php echo $carta['formato_css']; ?></textarea>
 	<div style="padding: 23px">
 		<?php echo $Form->button('Guardar', array('id' => 'btn_guardar')); ?>
 		<?php echo $Form->button('Guardar como nueva carta', array('id' => 'btn_guardar_nueva')); ?>
@@ -83,6 +91,8 @@ $Form = new Form;
 	<iframe id="previsualizacion_html" style="width:674px;height:730px"></iframe>
 </form>
 
+<?php echo $Form->script(); ?>
+<script type="text/javascript" src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 <script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>
 <script type="text/javascript">
 	var diccionario = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->diccionario)); ?>;
@@ -92,8 +102,8 @@ $Form = new Form;
 		CKEDITOR.config.fontSize_sizes = '7/7pt;8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt';
 		CKEDITOR.config.allowedContent = true;
 
-		jQuery('.agregar_valor').click(AgregarValor);
-		jQuery('.agregar_seccion').click(AgregarSeccion);
+		jQuery('.agregar_valor').live('click', AgregarValor);
+		jQuery('.agregar_seccion').live('click', AgregarSeccion);
 		jQuery('#btn_editar').click(function() {
 			window.location = '?id_carta=' + jQuery('[name=id_carta]').val();
 		});
@@ -103,7 +113,7 @@ $Form = new Form;
 				jQuery('[name="carta[id_carta]"]').val('');
 
 			}
-			jQuery.each(CKEDITOR.instances, function(i){
+			jQuery.each(CKEDITOR.instances, function(i) {
 				CKEDITOR.instances[i].updateElement();
 			});
 			var form = jQuery('#form_carta');
@@ -130,18 +140,26 @@ $Form = new Form;
 		});
 
 		PrevisualizarHTML();
+
+		jQuery('.tabs').tabs();
+
+		CKEDITOR.on('instanceReady', function() {
+			jQuery('.loader-overlay').fadeOut(300, function() {
+				jQuery(this).remove();
+			});
+		});
 	});
 
 	function alerta(msg, type) {
 		var div = jQuery('<div/>', {style: 'margin-top: .5em;'})
-				.addClass('ui-corner-all')
-				.addClass(type == 'error' ? 'ui-state-error' : 'ui-state-highlight')
-				.html(msg);
+			.addClass('ui-corner-all')
+			.addClass(type == 'error' ? 'ui-state-error' : 'ui-state-highlight')
+			.html(msg);
 		div.insertAfter('#btn_guardar_nueva')
-				.hide()
-				.fadeIn()
-				.delay(5000)
-				.fadeOut();
+			.hide()
+			.fadeIn()
+			.delay(5000)
+			.fadeOut();
 	}
 	function AgregarValor() {
 		var div = jQuery(this).closest('div');
@@ -167,26 +185,32 @@ $Form = new Form;
 		var div = jQuery(this).closest('div');
 		var seccion = div.find('.secciones').val();
 		if (AgregarHTML(div, '%' + seccion + '%') && !document.getElementById('editor_' + seccion)) {
-			var div = jQuery('<div/>')
-					.append(jQuery('<h3/>', {text: seccion}))
-					.append(jQuery('<textarea/>', {
-				'class': 'ckeditor',
-				'name': 'carta[secciones][' + seccion + ']',
-				'id': 'editor_' + seccion
-			}));
-			jQuery('#secciones').append(div);
+			var tabs = jQuery('#tabs-secciones');
+			var li = jQuery('<li/>')
+				.append(jQuery('<a/>', {text: seccion, href: '#tab-' + seccion}));
+
+			var div = jQuery('<div/>', {id: 'tab-' + seccion})
+				.append(jQuery('<textarea/>', {
+					'class': 'ckeditor',
+					'name': 'carta[secciones][' + seccion + ']',
+					'id': 'editor_' + seccion
+				}));
+
+			tabs.find('.ui-tabs-nav').append(li);
+			tabs.append(div);
+			tabs.tabs('refresh');
 
 			CKEDITOR.replace('editor_' + seccion);
 
 			if (diccionario[seccion]) {
 				div.append(jQuery('<label/>', {text: 'Insertar Valor: '})
-						.append(jQuery('<select/>', {'class': 'valores'}))
-						.append(jQuery('<button/>', {
-					'class': 'agregar_valor',
-					type: 'button',
-					text: 'Insertar'
-				}))
-						)
+					.append(jQuery('<select/>', {'class': 'valores'}))
+					.append(jQuery('<button/>', {
+						'class': 'agregar_valor',
+						type: 'button',
+						text: 'Insertar'
+					}))
+					)
 				var selvals = div.find('.valores');
 				jQuery.each(diccionario[seccion], function(idx, val) {
 					selvals.append(jQuery('<option/>', {value: idx, text: idx + ' - ' + val}));
@@ -194,14 +218,15 @@ $Form = new Form;
 			}
 
 			if (secciones[seccion]) {
+				div.append(jQuery('<br/>'));
 				div.append(jQuery('<label/>', {text: 'Insertar Seccion: '})
-						.append(jQuery('<select/>', {'class': 'secciones'}))
-						.append(jQuery('<button/>', {
-					'class': 'agregar_seccion',
-					type: 'button',
-					text: 'Agregar'
-				}))
-						)
+					.append(jQuery('<select/>', {'class': 'secciones'}))
+					.append(jQuery('<button/>', {
+						'class': 'agregar_seccion',
+						type: 'button',
+						text: 'Agregar'
+					}))
+				);
 				var selvals = div.find('.secciones');
 				jQuery.each(secciones[seccion], function(idx, val) {
 					selvals.append(jQuery('<option/>', {value: idx, text: '%' + idx + '% - ' + val}));
@@ -238,5 +263,4 @@ $Form = new Form;
 </script>
 
 <?php
-echo $Form->script();
 $pagina->PrintBottom($popup);

@@ -23,10 +23,10 @@ class Form {
 	 */
 	public function select($name, $options, $selected = null, $attrs = null) {
 		$_attrs = (Array) $attrs + array('empty' => '');
-		if (empty($_attrs['name'])) {
+		if (empty($_attrs['name']) && !empty($name)) {
 			$_attrs['name'] = $name;
 		}
-		if (empty($_attrs['id'])) {
+		if (empty($_attrs['id']) && !empty($_attrs['name'])) {
 			$_attrs['id'] = $this->Utiles->pascalize($_attrs['name']);
 		}
 		$html_options = '';
