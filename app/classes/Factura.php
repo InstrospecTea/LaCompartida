@@ -1911,14 +1911,14 @@ class Factura extends Objeto {
             $where = " WHERE ccfm2.id_factura IN (" . $id . ") ";
         }
 
-        $query = "SELECT 
+        $query = "SELECT
                         fp.id_factura_pago
                     FROM factura_pago AS fp
                         JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
                         JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
                         LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-                        '{$where}'
-                            ORDER BY fp.fecha,fp.id_factura_pago DESC	";
+                        {$where}
+                        ORDER BY fp.fecha,fp.id_factura_pago DESC";
 
         $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
         list($ultimo_id_factura_pago) = mysql_fetch_array($resp);
@@ -1929,16 +1929,16 @@ class Factura extends Objeto {
         if (!$id) {
             $id = $this->Id();
         }
-        $query = "SELECT 
+        $query = "SELECT
                         fp.*,
                         SUM(IF( ccfm2.id_factura = '$id', ccfmn.monto, 0)) AS monto_aporte
                     FROM factura_pago AS fp
-                        JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-                        LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-                        LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-                        LEFT JOIN neteo_documento AS nd ON fp.id_neteo_documento_adelanto = nd.id_neteo_documento
-                            WHERE ccfm2.id_factura = '$id' OR nd.id_documento_cobro = '$doc_cobro'
-                                GROUP BY fp.id_factura_pago";
+                    JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+                    LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+                    LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+                    LEFT JOIN neteo_documento AS nd ON fp.id_neteo_documento_adelanto = nd.id_neteo_documento
+                    WHERE ccfm2.id_factura = '$id' OR nd.id_documento_cobro = '$doc_cobro'
+                    GROUP BY fp.id_factura_pago";
         return new ListaFacturaPago($this->sesion, null, $query);
     }
 
@@ -2033,7 +2033,7 @@ class Factura extends Objeto {
             $where .= " AND f.id_factura = '{$id}'";
         }
         if ($tipo) {
-            $where .= " AND f.id_documento_legal = '{$tipo}";
+            $where .= " AND f.id_documento_legal = '{$tipo}'";
         }
         if ($numero) {
             $where .= " AND f.numero = '{$numero}'";
@@ -2042,7 +2042,7 @@ class Factura extends Objeto {
             $where .= " AND f.serie_documento_legal = '{$serie}'";
         }
 
-        $query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f '{$where}' GROUP BY grupo";
+        $query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f {$where} GROUP BY grupo";
         $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
         list($lista_cobros, $grupo) = mysql_fetch_array($resp);
         return $lista_cobros;
