@@ -72,7 +72,7 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 				<?php echo __('Asunto'); ?>
 			</td>
 			<td align="left">
-				<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto); ?>
+				<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto, false); ?>
 			</td>
 		</tr>
 		<tr>

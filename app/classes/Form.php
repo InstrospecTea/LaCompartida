@@ -215,6 +215,22 @@ class Form {
 	}
 
 	/**
+	 * Agraga boton submit con icono de TTB
+	 * @param type $text
+	 * @param type $icon
+	 * @param type $attrs
+	 * @return type
+	 */
+	public function icon_submit($text, $icon, $attrs = null) {
+		$_attrs = array(
+			'tag' => 'a'
+		);
+		$attrs = array_merge($_attrs, (array) $attrs);
+		$attrs['icon'] = $icon;
+		return $this->submit($text, $attrs);
+	}
+
+	/**
 	 * Agraga boton estandar de TTB
 	 * @param type $text
 	 * @param type $attrs

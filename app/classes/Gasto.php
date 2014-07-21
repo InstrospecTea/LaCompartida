@@ -340,11 +340,14 @@ class Gasto extends Objeto {
 		if ($request['cobrado'] == 'SI') {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
-		if ($request['codigo_asunto'] && $lista_asuntos) {
+		if (!empty($lista_asuntos)) {
 			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 		}
-		if ($request['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
+		if (!empty($lista_asuntos_secundario)) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
+		}
+		if (!empty($request['glosa_asunto']) && empty($lista_asuntos) && empty($lista_asuntos_secundario)) {
+			$where .= " AND asunto.glosa_asunto LIKE '%{$request['glosa_asunto']}%'";
 		}
 		if ($request['id_usuario_orden']) {
 			$where .= " AND cta_corriente.id_usuario_orden = '{$request['id_usuario_orden']}'";

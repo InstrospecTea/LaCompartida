@@ -116,7 +116,7 @@ if ($opc == 'buscar') {
 
 $pagina->titulo = __('Revisar Gastos');
 $pagina->PrintTop();
-
+$Form = new Form;
 if ($preparar_cobro == 1) {
 	$where = 1;
 
@@ -690,14 +690,18 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 
             </table>
             <div  style="padding:10px;text-align:right;">
-                <a name="boton_buscar" id='boton_buscar' icon="find" class="btn botonizame buscargastos" rel="buscar" ><?php echo __('Buscar') ?></a>
-                <a name="boton_xls" id="boton_excel"  icon="xls" class="btn botonizame buscargastos"  rel="excel" ><?php echo __('Descargar Excel') ?></a>
-                <a name="boton_xls_resumen"  icon="xls" rel="excel_resumen" class="btn botonizame buscargastos" ><?php echo __('Descargar Resumen Excel') ?></a>
+				<?php
+				echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'buscar'));
+				echo $Form->icon_button(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'class' => 'buscargastos', 'rel' => 'excel'));
+				echo $Form->icon_button(__('Descargar Resumen Excel'), 'xls', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'excel_resumen'));
+				?>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<?php if (!$nuevo_modulo_gastos) { ?>
-					&nbsp;<a href='javascript:void(0)' class="btn botonizame" icon="agregar" onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?php echo __('Agregar provisión') ?></a>
+					&nbsp;
+					<?php echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')")); ?>
 				<?php } ?>
-                &nbsp;<a href='javascript:void(0)' class="btn botonizame"  icon="agregar"  onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?php echo __('Agregar') ?> <?php echo __('gasto') ?></a>
+                &nbsp;
+				<?php echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')")); ?>
             </div>
 
         </fieldset>
@@ -715,7 +719,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 
 </tr>
 </table>
-
+<?php echo $Form->script(); ?>
 <div id="totalcta" style='font-size:11px;z-index:999;'><b>
 		<?php
 		if ($opc == 'buscar') {

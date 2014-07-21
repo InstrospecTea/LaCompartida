@@ -5,7 +5,7 @@ $sesion = new Sesion(array('COB', 'DAT'));
 $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
 $cobros = new Cobro($sesion);
-
+$Form = new Form;
 global $contratofields;
 $series_documento = new DocumentoLegalNumero($sesion);
 
@@ -106,6 +106,9 @@ if ($opc == 'buscar') {
 	}
 	if ($codigo_asunto_secundario) {
 		$where .= " AND contrato.id_contrato in (select id_contrato from asunto WHERE asunto.codigo_asunto_secundario ='" . $codigo_asunto_secundario . "') ";
+	}
+	if (!empty($glosa_asunto) && empty($codigo_asunto) && empty($codigo_asunto_secundario)) {
+		$where .= " AND contrato.id_contrato in (select id_contrato from asunto WHERE asunto.glosa_asunto  LIKE '%{$glosa_asunto}%') ";
 	}
 	if (!empty($tipo_liquidacion) && $tipo_liquidacion != '') {
 		$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " . " AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
@@ -687,7 +690,7 @@ $pagina->PrintTop();
 				</tr>
 				<tr>
 					<td align="right"> <?php echo '<b>' . __('Asunto') . '</b>'; ?> </td>
-					<td nowrap colspan="3" align="left"> <?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?> </td>
+					<td nowrap colspan="3" align="left"> <?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, '', '', false); ?> </td>
 				</tr>
 			</tbody>
 
@@ -793,16 +796,19 @@ $pagina->PrintTop();
 
 			<tr>
 				<td></td>
-				<td align=left>
-					<a class="btn botonizame"  href="javascript:void(0);" icon="find" name='boton_buscar' id='boton_buscar' onclick="GeneraCobros(jQuery('#form_busca').get(0), '', false)"><?php echo __('Buscar') ?></a>
-					<a style="float:right;margin-right:20px;" class="btn botonizame" href="javascript:void(0);"  icon="upload" onclick="SubirExcel();">Subir excel</a></td>
+				<td align="left">
+					<?php
+					echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'onclick' => "GeneraCobros(jQuery('#form_busca').get(0), '', false);"));
+					echo $Form->icon_button(__('Subir excel'), 'upload', array('id' => 'boton_buscar', 'onclick' => "SubirExcel();", 'style' => 'float:right;margin-right:20px;'));
+					?>
+				</td>
 			</tr>
 		</table>
 
 	</fieldset>
 
 </form>
-
+<?php echo $Form->script(); ?>
 <?php
 if ($opc == 'buscar') {
 	$b->Imprimir('');
