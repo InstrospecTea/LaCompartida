@@ -4,9 +4,9 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
 $gasto = new Gasto($sesion);
-$nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos');
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
+$conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
 $conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
 
 set_time_limit(300);
@@ -352,7 +352,7 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			return true;
 	} else if (from == 'datatables' || from == 'buscar') {
 	contratos = {};
-<?php if ($nuevo_modulo_gastos) { ?>
+<?php if ($conf_nuevo_modulo_gastos) { ?>
 		var id_contrato = jQuery('#id_contrato').val();
 				var params = jQuery('#form_gastos').serialize();
 				var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
@@ -652,7 +652,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
                     </td>
                     <td></td>
                 </tr>
-				<?php if (!$nuevo_modulo_gastos) { ?>
+				<?php if (!$conf_nuevo_modulo_gastos) { ?>
 					<tr>
 						<td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
 						<td colspan="2" align="left">
@@ -702,10 +702,9 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 						</div>
 						<div style="padding:10px;text-align:right;float:right;">
 							<?php
-								if (!$nuevo_modulo_gastos) {
+								if (!$conf_nuevo_modulo_gastos) {
 									echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')"));
 								}
-
 								echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('gasto')"));
 							?>
 						</div>
