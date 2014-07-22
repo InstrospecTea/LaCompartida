@@ -1169,7 +1169,7 @@ function Substring($string) {
 
     function CargarTarifa() {
 
-        var id_usuario = $('id_usuario').value;
+        var id_usuario = jQuery('#id_usuario').val();
 
         if (CodigoSecundario) {
             var codigo_asunto = jQuery('#codigo_asunto_secundario').val();

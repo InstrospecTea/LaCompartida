@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion();
 
-$asuntos = array('id' => 'cualquiera', 'value' => __('Cualquiera'));
+$asuntos = array();
 $codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
 
 $id_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : $sesion->usuario->fields['id_usuario'];
@@ -32,12 +32,21 @@ if (empty($glosa_asunto)) 	{
 } else	{
 	$query_filter = 1;
 
-	if ($codigo_cliente) {
-		$query_filter = "{$campo_codigo_cliente} = '{$codigo_cliente}'";
+	$tabla = 'asunto';
+	$fields = "asunto.{$campo_codigo_asunto} AS id, asunto.glosa_asunto AS value";
+	$join = '';
+	if ($codigo_secundario) {
+		$join = "INNER JOIN cliente ON cliente.codigo_cliente = asunto.codigo_cliente";
+		$tabla = 'cliente';
 	}
 
-	$query = "SELECT asunto.{$campo_codigo_asunto} AS id, asunto.glosa_asunto AS value
+	if ($codigo_cliente) {
+		$query_filter = "{$tabla}.{$campo_codigo_cliente} = '{$codigo_cliente}'";
+	}
+	
+	$query = "SELECT $fields
 		FROM asunto
+		$join
 		WHERE asunto.activo = 1 AND LOWER(asunto.glosa_asunto) LIKE '%{$glosa_asunto}%' AND {$query_filter}
 		ORDER BY asunto.glosa_asunto
 		LIMIT 10";

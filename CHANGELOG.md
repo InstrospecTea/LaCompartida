@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.5.1
+Martes 22 de Julio 2014
+* **Fixed:** [Corrige seleccionar Asunto.](https://github.com/LemontechSA/ttb/pull/594)
+
 ## Release: 14.5.0
 Jueves 10 de Julio 2014
 * **Feature:** [Errores Usuarios](https://github.com/LemontechSA/ttb/pull/581)
