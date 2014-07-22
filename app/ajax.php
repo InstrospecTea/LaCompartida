@@ -514,7 +514,6 @@ switch ($accion) {
 												WHERE cliente.codigo_cliente=$id AND cobro.documento IS NULL LIMIT 1";
 
 
-		//SELECT * FROM cliente WHERE id_cliente = $id";
 		$query = "SELECT * FROM cobro WHERE documento IS NULL AND codigo_cliente = '$id'";
 		$resp = mysql_query($query_clientes, $sesion->dbh) or Utiles::errorSQL($query_clientes, __FILE__, __LINE__, $sesion->dbh);
 
@@ -572,7 +571,7 @@ switch ($accion) {
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			$asunto = mysql_fetch_array($resp);
 
-			echo json_encode($asunto);
+			echo json_encode(UtilesApp::utf8izar($asunto));
 		}
 		break;
 
