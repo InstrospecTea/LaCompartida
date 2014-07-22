@@ -271,7 +271,8 @@ class Form {
 	}
 
 	public function submit($text, $attrs = null) {
-		$attrs['onclick'] = "jQuery(this).closest('form').submit()";
+		$attrs['onclick'] = isset($attrs['onclick']) ? $attrs['onclick'] : '';
+		$attrs['onclick'] .= ";jQuery(this).closest('form').submit();";
 		return $this->button($text, $attrs);
 	}
 
