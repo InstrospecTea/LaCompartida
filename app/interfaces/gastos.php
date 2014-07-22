@@ -86,7 +86,7 @@ if ($id_gasto != "") {
 }
 
 if ($opc == 'buscar') {
-	
+
 	if ($orden == "") {
 		$orden = "fecha DESC";
 	}
@@ -259,27 +259,28 @@ if ($preparar_cobro == 1) {
 	}
 
 	function AgregarNuevo(tipo) {
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-		var codigo_cliente = $('codigo_cliente_secundario').value;
-				var codigo_asunto = $('codigo_asunto_secundario').value;
-				var url_extension = "&codigo_cliente_secundario=" + codigo_cliente + "&codigo_asunto_secundario=" + codigo_asunto;
-<?php } else { ?>
-		var codigo_cliente = $('codigo_cliente').value;
-				var codigo_asunto = $('codigo_asunto').value;
-				var url_extension = "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto;
-<?php } ?>
+		var ancho = 730;
+		var alto = 560;
+		var provision = 'false';
 
-	if (tipo == 'provision') {
-	var urlo = "agregar_gasto.php?popup=1&prov=true" + url_extension;
-			var ancho = 730;
-			var alto = 400;
-	} else if (tipo == 'gasto') {
-	var urlo = "agregar_gasto.php?popup=1&prov=false" + url_extension;
-			var ancho = 730;
-			var alto = 570;
-	}
+		<?php if ($conf_codigo_secundario) { ?>
+			var codigo_cliente = $('codigo_cliente_secundario').value;
+			var codigo_asunto = $('codigo_asunto_secundario').value;
+			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente + "&codigo_asunto_secundario=" + codigo_asunto;
+		<?php } else { ?>
+			var codigo_cliente = $('codigo_cliente').value;
+			var codigo_asunto = $('codigo_asunto').value;
+			var url_extension = "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto;
+		<?php } ?>
 
-	nuovaFinestra('Agregar_Gasto', ancho, alto, urlo);
+		if (tipo == 'provision') {
+			provision = 'true';
+			alto = 500;
+		}
+
+		var urlo = "agregar_gasto.php?popup=1&prov=" + provision + url_extension;
+
+		nuovaFinestra('Agregar_Gasto', ancho, alto, urlo);
 	}
 
 	jQuery('document').ready(function() {
@@ -689,20 +690,23 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 				<?php } ?>
 
             </table>
-            <div  style="padding:10px;text-align:right;">
-				<?php
-				echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'buscar'));
-				echo $Form->icon_button(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'class' => 'buscargastos', 'rel' => 'excel'));
-				echo $Form->icon_button(__('Descargar Resumen Excel'), 'xls', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'excel_resumen'));
-				?>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<?php if (!$nuevo_modulo_gastos) { ?>
-					&nbsp;
-					<?php echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')")); ?>
-				<?php } ?>
-                &nbsp;
-				<?php echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')")); ?>
-            </div>
+
+            <div style="padding:10px;text-align:right;float:left;margin-left:120px">
+							<?php
+								echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'buscar'));
+								echo $Form->icon_button(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'class' => 'buscargastos', 'rel' => 'excel'));
+								echo $Form->icon_button(__('Descargar Resumen Excel'), 'xls', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'excel_resumen'));
+							?>
+						</div>
+						<div style="padding:10px;text-align:right;float:right;">
+							<?php
+								if (!$nuevo_modulo_gastos) {
+									echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')"));
+								}
+
+								echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('gasto')"));
+							?>
+						</div>
 
         </fieldset>
         <br>
