@@ -7,6 +7,8 @@ $gasto = new Gasto($sesion);
 $nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos');
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
+$conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
+
 set_time_limit(300);
 
 function FechaFactura(& $fila) {
@@ -124,7 +126,7 @@ if ($preparar_cobro == 1) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
 	}
 
-	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	if ($conf_codigo_secundario) {
 		if ($codigo_cliente_secundario) {
 			$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario' ";
 		}
@@ -134,7 +136,7 @@ if ($preparar_cobro == 1) {
 		}
 	}
 
-	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	if ($conf_codigo_secundario) {
 
 		if ($codigo_asunto_secundario) {
 			$asunto = new Asunto($sesion);
@@ -238,7 +240,7 @@ if ($preparar_cobro == 1) {
 
 	function EliminaGasto(id) {
 	var form = document.getElementById('form_gastos');
-<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+<?php if ($conf_codigo_secundario) { ?>
 		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente_secundario').value + '&codigo_asunto=' + $('codigo_asunto_secundario').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo Conf::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
 <?php } else { ?>
 		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente').value + '&codigo_asunto=' + $('codigo_asunto').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo Conf::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
