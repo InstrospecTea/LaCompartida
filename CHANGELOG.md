@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.5.2
 Martes 22 de Julio 2014
-* **Fixed:** [Corrige generación de botones en Gastos](https://github.com/LemontechSA/ttb/pull/596)
+* **Fixed:** [Corrige generación de botones en Gastos](https://github.com/LemontechSA/ttb/pull/597)
 
 ## Hotfix: 14.5.1
 Martes 22 de Julio 2014
