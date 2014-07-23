@@ -323,114 +323,114 @@ $where .= " AND usuario.visible = 1";
 				Refrescasemana(lastweek,usuario,'lastweek');
 				calendario(semana);
 
-				jQuery('.trabajoabierto').draggable({
-					cursor: 'move',
-					containment: '#contienehoras',
-					revert: 'true',
-					helper:'clone'
-				});
+				jQueryUI.done(function() {
+					jQuery('.trabajoabierto').draggable({
+						cursor: 'move',
+						containment: '#contienehoras',
+						revert: 'true',
+						helper:'clone'
+					});
 
-				jQuery('.celdadias').droppable({
-					greedy: true,
-					accept: '.cajatrabajo',
-					addClasses: 'false',
-					drop: function (event,ui) {
-						var cuadrodestino = jQuery(this);
-						var cuando = cuadrodestino.attr('rel');
-						var idtrabajo = ui.draggable.attr('id');
-						jQuery(ui.draggable).children('span').remove();
+					jQuery('.celdadias').droppable({
+						greedy: true,
+						accept: '.cajatrabajo',
+						addClasses: 'false',
+						drop: function (event,ui) {
+							var cuadrodestino = jQuery(this);
+							var cuando = cuadrodestino.attr('rel');
+							var idtrabajo = ui.draggable.attr('id');
+							jQuery(ui.draggable).children('span').remove();
 
-						if (event.ctrlKey || event.altKey) {
-							ui.draggable.addClass('clon');
-							var Option = 'clonar';
-						} else {
-							var Option = 'cambiofecha';
+							if (event.ctrlKey || event.altKey) {
+								ui.draggable.addClass('clon');
+								var Option = 'clonar';
+							} else {
+								var Option = 'cambiofecha';
+							}
+
+							jQuery.ajax({
+								url: 'editar_trabajo.php',
+								data: {
+									id_trabajo: idtrabajo,
+									fecha: cuando,
+									opcion: Option,
+									popup: 1
+								},
+								type:'POST'
+							}).complete(function(dataresponse) {
+								var data = dataresponse.responseText;
+								var status = dataresponse.status;
+								if (status == 200) {
+									var arreglo = data.split('|');
+									if (event.ctrlKey || event.altKey) {
+										cuadrodestino.append(ui.draggable.clone());
+										jQuery('.clon').draggable({
+											cursor: 'move',
+											containment: '#contienehoras',
+											revert: 'true',
+											helper: 'clone'
+										}).attr({
+											'alt': 'clonado',
+											'id': arreglo[1]
+										}).removeClass('clon');
+									} else {
+										cuadrodestino.append(ui.draggable);
+									}
+
+									var maxaltura = 0;
+
+									jQuery('.totaldia').each(function() {
+										var time = 0;
+										var sumaaltura = 0;
+										jQuery('.cajatrabajo', jQuery(this).parent()).each(function() {
+											time = 1 * time + 1 * jQuery(this).attr('duracion');
+											sumaaltura = 1 * sumaaltura + 1 * jQuery(this).height();
+										});
+
+										maxaltura = sumaaltura > maxaltura ? sumaaltura : maxaltura;
+										jQuery(this).attr('duracion', time).attr('altura', sumaaltura).html(SecToTime(time));
+									});
+
+									jQuery(".celdadias").css({'height': maxaltura + 20});
+									jQuery("#contienehoras").css({'height': maxaltura + 120});
+
+									if (Option == 'clonar') {
+										jQuery('#totalsemana').html(arreglo[2]);
+										jQuery('#totalmes').html(arreglo[3]);
+									}
+								} else {
+									jQuery('#respuesta').html('<div  class="alert alert-error">' + dataresponse.responseText + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+								}
+							});
 						}
+					});
 
-						jQuery.ajax({
-							url: 'editar_trabajo.php',
-							data: {
+					jQuery('#hiddensemanasiguiente,#hiddensemanaanterior').droppable({
+						accept: '.cajatrabajo',
+						addClasses: 'false',
+						hoverClass: "ui-state-active",
+						drop: function (event,ui) {
+							var cuando = jQuery(this).attr('title');
+							var idtrabajo = ui.draggable.attr('id');
+							jQuery(ui.draggable).children('span').remove();
+							if(event.ctrlKey || event.altKey) {
+								var Option = 'clonar';
+							} else {
+							jQuery(this).append(ui.draggable);
+								var Option = 'cambiofecha';
+							}
+							jQuery.post('editar_trabajo.php', {
 								id_trabajo: idtrabajo,
 								fecha: cuando,
 								opcion: Option,
 								popup: 1
-							},
-							type:'POST'
-						}).complete(function(dataresponse) {
-							var data = dataresponse.responseText;
-							var status = dataresponse.status;
-							if (status == 200) {
+							}, function(data) {
 								var arreglo = data.split('|');
-								if (event.ctrlKey || event.altKey) {
-									cuadrodestino.append(ui.draggable.clone());
-									jQuery('.clon').draggable({
-										cursor: 'move',
-										containment: '#contienehoras',
-										revert: 'true',
-										helper: 'clone'
-									}).attr({
-										'alt': 'clonado',
-										'id': arreglo[1]
-									}).removeClass('clon');
-								} else {
-									cuadrodestino.append(ui.draggable);
-								}
-
-								var maxaltura = 0;
-
-								jQuery('.totaldia').each(function() {
-									var time = 0;
-									var sumaaltura = 0;
-									jQuery('.cajatrabajo', jQuery(this).parent()).each(function() {
-										time = 1 * time + 1 * jQuery(this).attr('duracion');
-										sumaaltura = 1 * sumaaltura + 1 * jQuery(this).height();
-									});
-
-									maxaltura = sumaaltura > maxaltura ? sumaaltura : maxaltura;
-									jQuery(this).attr('duracion', time).attr('altura', sumaaltura).html(SecToTime(time));
-								});
-
-								jQuery(".celdadias").css({'height': maxaltura + 20});
-								jQuery("#contienehoras").css({'height': maxaltura + 120});
-
-								if (Option == 'clonar') {
-									jQuery('#totalsemana').html(arreglo[2]);
-									jQuery('#totalmes').html(arreglo[3]);
-								}
-							} else {
-								jQuery('#respuesta').html('<div  class="alert alert-error">' + dataresponse.responseText + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
-							}
-						});
-					}
-				});
-
-				jQuery('#hiddensemanasiguiente,#hiddensemanaanterior').droppable({
-					accept: '.cajatrabajo',
-					addClasses: 'false',
-					hoverClass: "ui-state-active",
-					drop: function (event,ui) {
-						var cuando = jQuery(this).attr('title');
-						var idtrabajo = ui.draggable.attr('id');
-						jQuery(ui.draggable).children('span').remove();
-						if(event.ctrlKey || event.altKey) {
-							var Option = 'clonar';
-						} else {
-
-						jQuery(this).append(ui.draggable);
-							var Option = 'cambiofecha';
+								jQuery('#semanactual').val(cuando);
+								jQuery('#versemana').click();
+							});
 						}
-
-						jQuery.post('editar_trabajo.php', {
-							id_trabajo: idtrabajo,
-							fecha: cuando,
-							opcion: Option,
-							popup: 1
-						}, function(data) {
-							var arreglo = data.split('|');
-							jQuery('#semanactual').val(cuando);
-							jQuery('#versemana').click();
-						});
-					}
+					});
 				});
 			}
 		});
