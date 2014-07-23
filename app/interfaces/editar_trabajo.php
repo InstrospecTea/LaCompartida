@@ -434,9 +434,9 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
 }
 ?>
 <style>
-    A:link,A:visited {font-size:9px;text-decoration: none}
-    A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
-    A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
+  a:link, a:visited { text-decoration:none; }
+  a:hover { text-decoration:none; color:#990000; background-color:#D9F5D3; }
+  a:active { text-decoration:none; color:#990000; background-color:#D9F5D3; }
 </style>
 
 <!-- Calendario DIV -->
@@ -593,7 +593,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
               $oncambio .= 'CargarActividad();';
             }
-            UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
+            UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 300, $oncambio);
             ?>
           </td>
         </tr>
