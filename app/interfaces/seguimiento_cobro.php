@@ -808,8 +808,8 @@ $pagina->PrintTop();
 	</fieldset>
 
 </form>
-<?php echo $Form->script(); ?>
 <?php
+echo $Form->script();
 if ($opc == 'buscar') {
 	$b->Imprimir('');
 }

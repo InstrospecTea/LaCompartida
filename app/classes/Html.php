@@ -44,7 +44,7 @@ class Html extends \Html {
 				if ($value === true) {
 					$value = $name;
 				} else if ($value === false) {
-					$value = '';
+					continue;
 				}
 				$html .= sprintf(' %s="%s"', $name, $value);
 			}
@@ -82,7 +82,7 @@ class Html extends \Html {
 	 *
 	 * @param type $script_block
 	 */
-	public function script_block($script_block, $attrs = array()) {
+	public function script_block($script_block, $attrs = null) {
 		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs));
 	}
 
