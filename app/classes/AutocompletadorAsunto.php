@@ -45,9 +45,11 @@ class AutocompletadorAsunto {
 		}
 
 		$output .= $Form->input('glosa_asunto', $glosa_asunto, array('label' => false, 'id' => 'glosa_asunto', 'style' => "width:{$width}px;", 'data-all' => '0'));
+
 		if ($forceMatch) {
 			$output .= $Form->button('&#9660;', array('id' => 'glosa_asunto_btn', 'title' => false, 'style' => 'margin-right: 1px'));
 		}
+
 		if ($mas_recientes) {
 			$output .= $Form->button(__('Más recientes'), array('id' => 'asuntos_recientes'));
 		}
