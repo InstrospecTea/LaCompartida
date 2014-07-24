@@ -1,5 +1,4 @@
 <?php
-
 require_once('../../conf.php');
 
 $Sesion = new Sesion();
@@ -23,8 +22,6 @@ switch ($_GET['opt']) {
 
 	default:
 		$respuesta['error'] = 'Consulta no válida';
-
-
 }
 
 echo json_encode(UtilesApp::utf8izar($respuesta));

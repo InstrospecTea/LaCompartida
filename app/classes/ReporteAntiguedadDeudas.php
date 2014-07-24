@@ -5,7 +5,7 @@
 */
 class ReporteAntiguedadDeudas
 {
-	
+
 	private $opciones = array();
 	private $datos = array();
 	private $sesion;
@@ -49,7 +49,7 @@ class ReporteAntiguedadDeudas
 	public function generar(){
 
 		ini_set("memory_limit", "256M");
-		
+
 		$this->genera_query_criteria();
 
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
@@ -58,7 +58,7 @@ class ReporteAntiguedadDeudas
 
 		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
 		$reporte = $this->genera_reporte($agrupacion);
-		
+
 		if (!empty($this->opciones['mostrar_detalle'])) {
 			$agrupacion_detalle = $this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle());
 			$reporte_detalle = $this->genera_reporte_detalle($agrupacion_detalle);
@@ -114,7 +114,7 @@ class ReporteAntiguedadDeudas
 		//
 		//TODO -> Refactorizar a su propio método.
 		//
-		
+
 			$layout = $this->ancho_campo;
 
 			if ($this->opciones['totales_especiales']) {
@@ -123,10 +123,10 @@ class ReporteAntiguedadDeudas
 			else{
 				$number_layout = $this->ancho_campo_numerico / 5 ;
 			}
-			
+
 
 			$layouts = array();
-			
+
 			//
 			// Prepara el layout de los campos.
 			//
@@ -211,7 +211,7 @@ class ReporteAntiguedadDeudas
 				)
 			)
 		);
-		
+
 		if ($this->opciones['mostrar_detalle']) {
 			$configuracion = array(
 				'field' => 'glosa_cliente',
@@ -323,7 +323,7 @@ class ReporteAntiguedadDeudas
 		//
 		//TODO -> Refactorizar a su propio método.
 		//
-		
+
 		$layout = $this->ancho_campo_detalle;
 
 		if ($this->opciones['totales_especiales']) {
@@ -331,10 +331,10 @@ class ReporteAntiguedadDeudas
 		} else {
 			$number_layout = $this->ancho_campo_numerico_detalle  / 5 ;
 		}
-		
+
 
 		$layouts = array();
-		
+
 		//
 		// Prepara el layout de los campos.
 		//
@@ -491,7 +491,7 @@ class ReporteAntiguedadDeudas
 	 * @return [type]             [Array con la agrupación de resultados.]
 	 */
 	private function generar_agrupacion_de_resultados($dataset,$parameters){
-		
+
 		extract($parameters);
 
 		// $dataset = UtilesApp::utf8izar($dataset);
@@ -512,8 +512,8 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']]['glosa_cliente'] = $row['glosa_cliente'];
 			$results[$row['codigo_cliente']]['cantidad_seguimiento'] = $row['cantidad_seguimiento'];
 			$results[$row['codigo_cliente']]['comentario_seguimiento'] = $row['comentario_seguimiento'];
-			
-			
+
+
 			if (!array_key_exists($row['moneda'], $results[$row['codigo_cliente']]['monedas'])) {
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']] = array();
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['codigo_moneda'] = $row['codigo_moneda'];
@@ -601,7 +601,7 @@ class ReporteAntiguedadDeudas
 		//Generar una tupla única por cada combinación cliente-moneda.
 		//
 		$output = array();
-		
+
 		foreach ($results as $codigo_cliente => $detalle) {
 
 			$detalle_cliente = array();
@@ -611,7 +611,7 @@ class ReporteAntiguedadDeudas
 			$detalle_cliente['encargado_comercial'] = $detalle['encargado_comercial'];
 			$detalle_cliente['cantidad_seguimiento'] = $detalle['cantidad_seguimiento'];
 			$detalle_cliente['comentario_seguimiento'] = $detalle['comentario_seguimiento'];
-			
+
 			foreach ($detalle['monedas'] as $codigo_moneda => $detalle_montos) {
 
 				$detalle_cliente['codigo_padre'] = $codigo_cliente.$detalle_montos['codigo_moneda'];
@@ -736,7 +736,7 @@ class ReporteAntiguedadDeudas
 				'total_normal' => -1 * $normal,
 				'total_vencido' => -1 * $vencido,
 				'dias_atraso_pago' => $dias_atraso_pago,
-				'fecha_vencimiento' => $fecha_vencimiento	
+				'fecha_vencimiento' => $fecha_vencimiento
 			);
 		}
 
@@ -753,7 +753,7 @@ class ReporteAntiguedadDeudas
 
 		extract($this->define_parametros_query_sin_detalle());
 		$this->agrega_restricciones_segun_tipo_monto();
-		    
+
 		$join_sub_select = new Criteria();
 		$join_sub_select
 			->add_select('codigo_cliente')
@@ -851,7 +851,7 @@ class ReporteAntiguedadDeudas
 		//
 		if ($this->opciones['encargado_comercial']){
 			$this->criteria
-						->add_select('u.username','encargado_comercial');	
+						->add_select('u.username','encargado_comercial');
 		}
 	}
 
@@ -859,7 +859,7 @@ class ReporteAntiguedadDeudas
 	 * [Define los parámetros que supondrán el comportamiento del reporte]
 	 */
 	private function define_parametros_query_sin_detalle() {
-		
+
 		if ($this->opciones['solo_monto_facturado']) {
 			$campo_valor = "fsaldo";
 			$campo_gvalor = "fgsaldo";

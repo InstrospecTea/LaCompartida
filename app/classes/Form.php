@@ -78,9 +78,9 @@ class Form {
 		}
 		return $this->Html->tag('label', $text, $_attrs);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param type $name
 	 * @param type $value
 	 * @param type $attrs
@@ -104,8 +104,8 @@ class Form {
 		unset($attrs['label']);
 		$input = $this->Html->tag('input', null, $attrs, true);
 		return empty($label) ? $input : $this->label($label, $attrs['name']) . $input;
-	
 	}
+
 	/**
 	 * Devuelve elemento checkbox
 	 * @param type $name
@@ -282,7 +282,7 @@ class Form {
 	public function script() {
 		$scripts = array_unique($this->scripts);
 		$script_block = '';
-		foreach($scripts as $script) {
+		foreach ($scripts as $script) {
 			if (method_exists($this, "{$script}_script")) {
 				$script_block .= $this->{"{$script}_script"}() . "\n";
 			}
@@ -301,4 +301,5 @@ class Form {
 SCRIPT;
 		return $script;
 	}
+
 }
