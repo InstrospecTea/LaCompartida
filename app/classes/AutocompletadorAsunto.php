@@ -50,7 +50,7 @@ class AutocompletadorAsunto {
 			$output .= $Form->button('&#9660;', array('id' => 'glosa_asunto_btn', 'title' => false, 'style' => 'margin-right: 1px'));
 		}
 
-		if ($mas_recientes) {
+		if (false && $mas_recientes) {
 			$output .= $Form->button(__('Más recientes'), array('id' => 'asuntos_recientes'));
 		}
 
