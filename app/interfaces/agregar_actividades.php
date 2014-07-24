@@ -76,7 +76,6 @@ $Form = new Form;
 
 <script type="text/javascript">
 
-
 	jQuery(document).ready(function() {
 		if (window.opener !== undefined && window.opener.Refrescar) {
 			window.opener.Refrescar();
