@@ -344,7 +344,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		WHERE $where
 		GROUP BY a1.codigo_asunto";
 
-	if ($orden == "") {
+	if (empty($orden)) {
 		$orden = "a1.activo DESC, horas_no_cobradas DESC, a1.glosa_asunto";
 	}
 
@@ -427,10 +427,7 @@ function funcionTR(& $Asunto) {
 	global $formato_fecha;
 	static $i = 0;
 
-	if ($i % 2 == 0)
-		$color = "#dddddd";
-	else
-		$color = "#ffffff";
+	$color = ($i % 2 == 0) ? '#DDDDDD' : '#FFFFFF';
 
 	$fecha = Utiles::sql2fecha($Asunto->fields['fecha_ultimo_cobro'], $formato_fecha, "N/A");
 	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B; \">";
