@@ -6,7 +6,15 @@ $Pagina = new Pagina($Sesion);
 
 $Actividad = new Actividad($Sesion);
 
+
 if ($opcion == 'guardar') {
+
+	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+		$asunto = new Asunto($Sesion);
+		$codigo_asunto = $asunto->CodigoSecundarioACodigo($codigo_asunto_secundario);
+		$_REQUEST['codigo_asunto'] = $codigo_asunto;
+	}
+
 	$Actividad->Fill($_REQUEST, true);
 
 	if ($_REQUEST['activo'] == 1) {
@@ -14,10 +22,12 @@ if ($opcion == 'guardar') {
 	} else {
 		$Actividad->Edit("activo", "0");
 	}
-	if(empty($Actividad->fields['codigo_asunto'])){
-		$Actividad->Edit('codigo_asunto', 'NULL');
-	}
 
+	if (empty($Actividad->fields['codigo_asunto'])){
+		$Actividad->Edit('codigo_asunto', 'NULL');
+	} else {
+		$Actividad->Edit('codigo_asunto', $codigo_asunto);
+	}
 
 	if ($Actividad->Write()) {
 		$Pagina->AddInfo(__('Actividad guardada con éxito'));
@@ -25,15 +35,11 @@ if ($opcion == 'guardar') {
 			$Actividad->Edit('codigo_asunto', null);
 		}
 
-		echo '<script type="text/javascript">
-			if (window.opener !== undefined && window.opener.Refrescar) {
-				window.opener.Refrescar();
-			}
-			</script>';
 	} else {
 		$Pagina->AddError(__('Por favor corrija lo siguiente: ') . implode(', ', $Actividad->error));
 	}
 } else {
+
 	if ($id_actividad != '') {
 		$Actividad->Load($id_actividad);
 	} else {
@@ -70,7 +76,11 @@ $Form = new Form;
 
 <script type="text/javascript">
 
+
 	jQuery(document).ready(function() {
+		if (window.opener !== undefined && window.opener.Refrescar) {
+			window.opener.Refrescar();
+		}
 		var glosa_actividad = jQuery('#glosa_actividad').val();
 		if (!glosa_actividad){
 			jQuery('#td_check_activo').hide();
@@ -79,16 +89,20 @@ $Form = new Form;
 			jQuery('#td_check_activo').show();
 			jQuery('#td_text_activo').show();
 		}
+
+		jQuery('#form_actividades').submit(function() {
+			return Validar();
+		});
+
 	});
 
-
-	function Validar(p) {
-		if (document.getElementById('codigo_actividad').value == '') {
+	function Validar() {
+		if (jQuery('#codigo_actividad').val() == '') {
 			alert('Debe ingresar un código.');
 			document.getElementById('codigo_actividad').focus();
 			return false;
 		}
-		if (document.getElementById('glosa_actividad').value == '') {
+		if (jQuery('#glosa_actividad').val() == '') {
 			alert('Debe ingresar un título.');
 			document.getElementById('glosa_actividad').focus();
 			return false;
@@ -97,6 +111,13 @@ $Form = new Form;
 			alert('Si selecciona un cliente debe seleccionar un asunto.');
 			return false;
 		}
+		if (jQuery('#codigo_cliente_secundario').size() && jQuery('#codigo_asunto_secundario').size()) {
+			if (jQuery('#codigo_cliente_secundario').val() && !jQuery('#codigo_asunto_secundario').val()) {
+				alert('Si selecciona un cliente debe seleccionar un asunto.');
+				return false;
+			}
+		}
+
 
 		document.getElementById('form_actividades').submit();
 
@@ -164,24 +185,6 @@ $Form = new Form;
 		?>
 	</div>
 </form>
-<script type="text/javascript">
-	jQuery('#form_actividades').submit(function() {
-		return Validar();
-	});
-	function Validar() {
-		if (!jQuery('#codigo_actividad').val()) {
-			alert('Debe ingresar un código.');
-			jQuery('codigo_actividad').focus();
-			return false;
-		}
-		if (!jQuery('#glosa_actividad').val()) {
-			alert('Debe ingresar un título.');
-			jQuery('#glosa_actividad').focus();
-			return false;
-		}
-		return true;
-	}
-</script>
 
 <?php
 $Form->script();
