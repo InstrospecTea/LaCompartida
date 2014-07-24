@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 $Sesion = new Sesion(array('DAT'));
 $Pagina = new Pagina($Sesion);
 $Actividad = new Actividad($Sesion);
-
+$refresh_parent = false;
 if ($opcion == 'guardar') {
 	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		$asunto = new Asunto($Sesion);
@@ -31,6 +31,7 @@ if ($opcion == 'guardar') {
 		if ($Actividad->fields['codigo_asunto'] == 'NULL') {
 			$Actividad->Edit('codigo_asunto', null);
 		}
+		$refresh_parent = true;
 	} else {
 		$Pagina->AddError(__('Por favor corrija lo siguiente: ') . implode(', ', $Actividad->error));
 	}
@@ -67,6 +68,10 @@ if ($Actividad->Loaded()) {
 
 $Pagina->PrintTop($popup);
 $Form = new Form;
+
+if ($refresh_parent) {
+	$Form->Html->script_block('if (window.opener !== undefined && window.opener.Refrescar) {window.opener.Refrescar();}');
+}
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
@@ -182,5 +187,5 @@ $Form = new Form;
 </form>
 
 <?php
-$Form->script();
+echo $Form->script();
 $Pagina->PrintBottom($popup);
