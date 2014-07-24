@@ -87,7 +87,8 @@ class AutocompletadorAsunto {
 						.autocomplete('option', 'minLength', 0)
 						.autocomplete('search', '')
 						.autocomplete('option', 'minLength', 3)
-						.focus().data('all', 1);
+						.data('all', 0)
+						.focus();
 				});
 EOF;
 		}
