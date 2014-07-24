@@ -102,7 +102,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 					$id_contrato[] = $fila['id_contrato'];
 				}
 			}
-		} 
+		}
 		$wic = is_array($id_contrato) ? "IN ('" . implode("','", $id_contrato) . "')" : "= '$id_contrato'";
 		$where_adelantos .= " AND d.id_contrato $wic ";
 		$where_liquidaciones .= " AND cobro.id_contrato $wic ";

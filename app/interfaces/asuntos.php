@@ -28,10 +28,6 @@ if ($excel) {
 	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
 }
 
-if (!$selectclienteasuntoespecial) {
-	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-}
-
 if ($Sesion->usuario->Es('DAT') && $accion == "eliminar") {
 	$Asunto = new Asunto($Sesion);
 	$Asunto->Load($id_asunto);
@@ -271,7 +267,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	}
 
 	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
-		if ($usocodigosecundario) {
+		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto_secundario%'";
 		} else {
 			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
@@ -410,14 +406,14 @@ function Opciones(& $fila) {
 
 	$id_asunto = $fila->fields['id_asunto'];
 
-    if ($Sesion->usuario->Es('SASU')) {
-        return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
-    } else {
-        $opciones = "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
-        $opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
-        $opciones .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
-        return $opciones;
-    }
+	if ($Sesion->usuario->Es('SASU')) {
+		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
+	} else {
+		$opciones = "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
+		$opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+		$opciones .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+		return $opciones;
+	}
 }
 
 function SplitDuracion($time) {
