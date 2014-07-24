@@ -1,8 +1,47 @@
 # Changelog
 
+## Hotfix: 14.5.2
+Martes 22 de Julio 2014
+* **Fixed:** [Corrige generación de botones en Gastos](https://github.com/LemontechSA/ttb/pull/597)
+
+## Hotfix: 14.5.1
+Martes 22 de Julio 2014
+* **Fixed:** [Corrige seleccionar Asunto.](https://github.com/LemontechSA/ttb/pull/594)
+
+## Release: 14.5.0
+Jueves 10 de Julio 2014
+* **Feature:** [Errores Usuarios](https://github.com/LemontechSA/ttb/pull/581)
+* **Feature:** [Recupera autocompletador asuntos](https://github.com/LemontechSA/ttb/pull/565)
+* **Feature:** [Serie documento](https://github.com/LemontechSA/ttb/pull/520)
+
+## Hotfix: 14.4.17
+Lunes 21 de Julio 2014
+* **Fixed:** [Corrige errores SQL en Factura](https://github.com/LemontechSA/ttb/pull/591)
+
+## Hotfix: 14.4.16
+Viernes 18 de Julio 2014
+* **Fixed:** [Agrega desglose de gastos a factura.](https://github.com/LemontechSA/ttb/pull/590)
+
+## Hotfix: 14.4.15
+Jueves 17 de Julio 2014
+* **Fixed:** [Repara la rutina que muestra los identificadores de las facturas en el reporte de antiguedad de deudas.](https://github.com/LemontechSA/ttb/pull/589)
+
+## Hotfix: 14.4.14
+Lunes 14 de Julio 2014
+* **Fixed:** [Corrige sumar monto tramite del cobro.](https://github.com/LemontechSA/ttb/pull/586)
+
+## Hotfix: 14.4.13
+Jueves 10 de Julio 2014
+* **Fixed:** [Agrega nuevo tag para morales y besa](https://github.com/LemontechSA/ttb/pull/581)
+
+## Hotfix: 14.4.12
+Martes 8 de Julio 2014
+* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos según Config](https://github.com/LemontechSA/ttb/pull/580)
+* **Fixed:** [Se reinicia la paginación al buscar trabajos](https://github.com/LemontechSA/ttb/pull/580)
+
 ## Hotfix: 14.4.11
 Lunes 7 de Julio 2014
-* **Fixed:** Corrige hotfix anterior, por error sintáctico JS
+* **Fixed:** [Corrige hotfix anterior, por error sintáctico JS](https://github.com/LemontechSA/ttb/pull/578)
 
 ## Hotfix: 14.4.10
 Lunes 7 de Julio 2014

@@ -64,32 +64,34 @@ class Actividad extends Objeto {
 	 */
 	function SearchQuery() {
 		$query = "SELECT SQL_CALC_FOUND_ROWS
-					actividad.id_actividad,
-					actividad.glosa_actividad,
-					cliente.glosa_cliente,
-					asunto.glosa_asunto,
-					actividad.codigo_actividad,
-					IF (actividad.activo = 1, 'SI','NO') AS activo
-				FROM actividad
-				LEFT JOIN asunto ON actividad.codigo_asunto = asunto.codigo_asunto
-				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente";
+			actividad.id_actividad,
+			actividad.glosa_actividad,
+			cliente.glosa_cliente,
+			asunto.glosa_asunto,
+			actividad.codigo_actividad,
+			IF (actividad.activo = 1, 'SI','NO') AS activo
+		FROM actividad
+			LEFT JOIN asunto ON actividad.codigo_asunto = asunto.codigo_asunto
+			LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente";
 
 		$wheres = array();
 
 		if (!empty($this->fields['codigo_actividad'])) {
-				$wheres[] = "actividad.codigo_actividad = '{$this->fields['codigo_actividad']}'";
+			$wheres[] = "actividad.codigo_actividad = '{$this->fields['codigo_actividad']}'";
 		}
 
 		if (!empty($this->fields['glosa_actividad'])) {
-				$wheres[] = "actividad.glosa_actividad LIKE '%{$this->fields['glosa_actividad']}%'";
+			$wheres[] = "actividad.glosa_actividad LIKE '%{$this->fields['glosa_actividad']}%'";
 		}
 
 		if (!empty($this->extra_fields['codigo_cliente'])) {
-				$wheres[] = "cliente.codigo_cliente = '{$this->extra_fields['codigo_cliente']}'";
+			$wheres[] = "cliente.codigo_cliente = '{$this->extra_fields['codigo_cliente']}'";
 		}
 
 		if (!empty($this->fields['codigo_asunto'])) {
-				$wheres[] = "actividad.codigo_asunto = '{$this->fields['codigo_asunto']}'";
+			$wheres[] = "actividad.codigo_asunto = '{$this->fields['codigo_asunto']}'";
+		} else if (empty($this->fields['codigo_asunto']) && !empty($this->fields['glosa_asunto'])) {
+			$wheres[] = "asunto.glosa_asunto LIKE '%{$this->fields['glosa_asunto']}%'";
 		}
 
 		if (count($wheres) > 0) {

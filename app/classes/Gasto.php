@@ -1,11 +1,5 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once 'Cliente.php';
-require_once 'Asunto.php';
 
 class Gasto extends Objeto {
 
@@ -221,12 +215,12 @@ class Gasto extends Objeto {
 	function Eliminar() {
 
 		if ($this->Loaded()) {
-			
+
 			$query = "DELETE FROM cta_corriente WHERE id_movimiento=" . $this->fields['id_movimiento'];
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		
+
 			if ($resp) {
-			
+
 				if ($this->fields['egreso'] > 0) {
 					$query_tipo_ingreso = $this->fields['egreso'];
 				} else if ($this->fields['ingreso'] > 0) {
@@ -332,7 +326,7 @@ class Gasto extends Objeto {
 				}
 			}
 		}
-		
+
 
 		if ($request['cobrado'] == 'NO') {
 			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
@@ -340,11 +334,14 @@ class Gasto extends Objeto {
 		if ($request['cobrado'] == 'SI') {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
-		if ($request['codigo_asunto'] && $lista_asuntos) {
+		if (!empty($lista_asuntos)) {
 			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 		}
-		if ($request['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
+		if (!empty($lista_asuntos_secundario)) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
+		}
+		if (!empty($request['glosa_asunto']) && empty($lista_asuntos) && empty($lista_asuntos_secundario)) {
+			$where .= " AND asunto.glosa_asunto LIKE '%{$request['glosa_asunto']}%'";
 		}
 		if ($request['id_usuario_orden']) {
 			$where .= " AND cta_corriente.id_usuario_orden = '{$request['id_usuario_orden']}'";
@@ -513,14 +510,14 @@ class Gasto extends Objeto {
 
 
 	public static function ActualizaUltimoIdentificador($sesion, $id_gasto = null, $identificador) {
-		# 
+		#
 		# Insertar tracking en tabla prm_nro_seguimiento_gasto
-		# 
+		#
 		$insertCriteria = new InsertCriteria($sesion);
 		$insertCriteria
 				->add_pivot_with_value('nro_seguimiento', $identificador)
 				->set_into('prm_nro_seguimiento_gasto');
-		
+
 		if (!empty($id_gasto)) {
 			$insertCriteria->add_pivot_with_value('id_ultimo_gasto_modificado', $id_gasto);
 		}
@@ -554,7 +551,7 @@ class Gasto extends Objeto {
 		}
 
 		$total = $total_ingresos - $total_egresos;
-		
+
 		if ($array) {
 			return array($total, $total_ingresos, $total_egresos, $egresos_borrador);
 		} else {
@@ -564,13 +561,9 @@ class Gasto extends Objeto {
 }
 
 if (!class_exists('ListaGastos')) {
-
 	class ListaGastos extends Lista {
-
 		function ListaGastos($sesion, $params, $query) {
 			$this->Lista($sesion, 'Gasto', $params, $query);
 		}
-
 	}
-
 }

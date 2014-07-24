@@ -310,6 +310,7 @@ $_LANG['Emitir cobro :: Selección del Cliente'] = "Emitir cobro :: Selección del
 $_LANG['Equivalente a'] = "Equivalent to";
 $_LANG['Equivalente a:'] = "Equivalent to:";
 $_LANG['Equivalente a la fecha'] = "Equivalent to";
+$_LANG[', equivalentes a '] = ", equivalent to ";
 $_LANG['A'] = "To";
 $_LANG['a'] = "to";
 $_LANG['Servicios Paralegales'] = "Paralegal Services";

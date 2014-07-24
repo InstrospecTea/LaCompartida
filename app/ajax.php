@@ -514,7 +514,6 @@ switch ($accion) {
 												WHERE cliente.codigo_cliente=$id AND cobro.documento IS NULL LIMIT 1";
 
 
-		//SELECT * FROM cliente WHERE id_cliente = $id";
 		$query = "SELECT * FROM cobro WHERE documento IS NULL AND codigo_cliente = '$id'";
 		$resp = mysql_query($query_clientes, $sesion->dbh) or Utiles::errorSQL($query_clientes, __FILE__, __LINE__, $sesion->dbh);
 
@@ -556,23 +555,26 @@ switch ($accion) {
 		$glosa = str_replace('/', '|#slash|', $glosa);
 		echo $glosa . '/' . $codigo_cliente;
 		break;
-	case "cargar_glosa_asunto":
 
-		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-			$codigo = 'codigo_asunto_secundario';
-		} else {
-			$codigo = 'codigo_asunto';
-		}
-		if ($id_cliente > 0) {
-			$query = "SELECT glosa_asunto FROM asunto WHERE activo=1 AND " . $codigo . "='$id' AND codigo_cliente='$id_cliente'";
+	case 'cargar_glosa_asunto':
+		$asunto = array();
+		if (!empty($codigo_asunto)) {
+			$campo_codigo_asunto = 'codigo_asunto';
+
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				$campo_codigo_asunto = 'codigo_asunto_secundario';
+			}
+
+			$query = "SELECT asunto.id_asunto, asunto.codigo_asunto, asunto.codigo_asunto_secundario, asunto.glosa_asunto, asunto.codigo_cliente
+				FROM asunto
+				WHERE asunto.activo = 1 AND asunto.{$campo_codigo_asunto} = '{$codigo_asunto}'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			list($glosa) = mysql_fetch_array($resp);
-			$glosa = str_replace('/', '|#slash|', $glosa);
-			echo $glosa . '/' . $id;
-		} else {
-			echo "";
+			$asunto = mysql_fetch_array($resp);
+
+			echo json_encode(UtilesApp::utf8izar($asunto));
 		}
 		break;
+
 	case "cargar_cuenta_banco":
 
 		$query = "SELECT id_cuenta, numero FROM cuenta_banco
