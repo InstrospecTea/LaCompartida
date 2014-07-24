@@ -30,7 +30,7 @@ class AutocompletadorAsunto {
 		}
 
 		$output = $Form->input($input_id, $input_value, array('label' => false, 'id' => $input_id, 'maxlength' => 20, 'size' => 10, 'onchange' => "CargarGlosaAsunto(); {$oncambio}"));
-		
+
 		if ($codigo_asunto || $codigo_asunto_secundario) {
 			$query = "SELECT glosa_asunto FROM asunto WHERE {$input_id} = '{$input_value}'";
 
