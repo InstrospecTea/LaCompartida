@@ -274,6 +274,10 @@ $where .= " AND usuario.visible = 1";
 		}, function() {
 			jQuery(this).css({'background':'#FFF'});
 		});
+
+		jQuery('#asuntos').load(function() {
+			jQuery(this).css('height', this.contentWindow.document.body.offsetHeight + 'px');
+		});
 	});
 
 	function Refrescasemana(semana, usuario, eldiv, slide) {
@@ -478,7 +482,7 @@ $where .= " AND usuario.visible = 1";
 					<table width='90%'>
 						<tr>
 							<td align='left' width='3%'>
-								<?php if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
+								<?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
 									<input type="image" src='<?php echo Conf::ImgDir() . "/izquierda_nuevo.gif"; ?>' class='mano_on cambiasemana' id="antsemana" value="">
 								<?php } else { ?>
 									<img src='<?php echo Conf::ImgDir() . "/izquierda.gif"; ?>' <?php echo $tip_anterior; ?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_anterior; ?>')">
@@ -507,7 +511,7 @@ $where .= " AND usuario.visible = 1";
 								<input type='button' class='btn' value="Ver semana" id="versemana">
 							</td>
 							<td align='right' width='3%'>
-								<?php if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
+								<?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
 									<input type="image" src='<?php echo Conf::ImgDir() . "/derecha_nuevo.gif" ?>'  class='mano_on cambiasemana'  id="proxsemana" value="">
 								<?php } else { ?>
 									<img src='<?php echo Conf::ImgDir() . "/derecha.gif" ?>' <?php echo $tip_siguiente ?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_siguiente ?>')">
