@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.5.3
+Miercoles 23 de Julio 2014
+* **Fixed:** [Agrega código perdido de un commit.](https://github.com/LemontechSA/ttb/pull/604)
+
 ## Hotfix: 14.5.2
 Martes 22 de Julio 2014
 * **Fixed:** [Corrige generación de botones en Gastos](https://github.com/LemontechSA/ttb/pull/597)
