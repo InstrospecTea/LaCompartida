@@ -9735,7 +9735,7 @@ class NotaCobro extends Cobro {
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
 									FROM factura
-									WHERE id_cobro =" . $this->fields['id_cobro'];
+									WHERE id_cobro ='{$this->fields['id_cobro']}'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($numero_factura) = mysql_fetch_array($resp);
 
