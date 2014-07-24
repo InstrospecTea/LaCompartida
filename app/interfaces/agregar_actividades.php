@@ -184,4 +184,5 @@ $Form = new Form;
 </script>
 
 <?php
+$Form->script();
 $Pagina->PrintBottom($popup);

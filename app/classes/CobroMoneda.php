@@ -1,14 +1,11 @@
 <?php
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-	require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+
+ require_once dirname(__FILE__).'/../conf.php';
 
 class CobroMoneda extends Objeto {
 	var $moneda = null;
 	var $moneda_cobro = null;
-	
+
 	function CobroMoneda($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro_moneda";
 		$this->campo_id = "id_cobro";
@@ -16,17 +13,17 @@ class CobroMoneda extends Objeto {
 		$this->fields = $fields;
 		$this->guardar_fecha = false;
 	}
-	
+
 	function Load($id_cobro) {
 
-        $query = "SELECT cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo, prm_moneda.codigo, prm_moneda.glosa_moneda_plural
-                            FROM cobro_moneda
-                            JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
-                            WHERE id_cobro ='$id_cobro'";
-        $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+    $query = "SELECT cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo, prm_moneda.codigo, prm_moneda.glosa_moneda_plural
+    					FROM cobro_moneda
+    					JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
+					    WHERE id_cobro ='$id_cobro'";
+    $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
-        while( list($id_moneda, $tipo_cambio, $cifras_decimales,$glosa_moneda, $simbolo, $codigo,$glosa_moneda_plural) = mysql_fetch_array($resp) ){
-    	$this->moneda[$id_moneda]['tipo_cambio'] 	= $tipo_cambio;
+	while (list($id_moneda, $tipo_cambio, $cifras_decimales, $glosa_moneda, $simbolo, $codigo, $glosa_moneda_plural) = mysql_fetch_array($resp) ) {
+		$this->moneda[$id_moneda]['tipo_cambio'] 	= $tipo_cambio;
     	$this->moneda[$id_moneda]['glosa_moneda'] 	= $glosa_moneda;
     	$this->moneda[$id_moneda]['cifras_decimales'] 		= $cifras_decimales;
     	$this->moneda[$id_moneda]['simbolo'] 			= $simbolo;
@@ -42,10 +39,10 @@ class CobroMoneda extends Objeto {
 
     return true;
   }
-	
-	
+
+
 	/*
-		Monedas del cobro -> se guardan en cobro_moneda cada tipo 
+		Monedas del cobro -> se guardan en cobro_moneda cada tipo
 		cambio de las monedas al monento de crear el cobro
 	*/
 	function ActualizarTipoCambioCobro($id_cobro)
@@ -66,10 +63,10 @@ class CobroMoneda extends Objeto {
 			return true;
 		}
 	}
-	
-	/* 
-		Obtiene el tipo cambio de la moneda del cobro 
-		segï¿½n el ID_MONEDA e ID_COBRO 
+
+	/*
+		Obtiene el tipo cambio de la moneda del cobro
+		según el ID_MONEDA e ID_COBRO
 	*/
 	function GetTipoCambio($id_cobro,$id_moneda) {
 		$sql = "SELECT tipo_cambio FROM cobro_moneda WHERE id_moneda = ".$id_moneda." AND id_cobro = ".$id_cobro;
@@ -77,7 +74,7 @@ class CobroMoneda extends Objeto {
 		list($tipo_cambio) = mysql_fetch_array($resp);
 		return $tipo_cambio;
 	}
-	
+
 	/*
 		UPDATE tipo cambio de cobro
 	*/
@@ -85,6 +82,5 @@ class CobroMoneda extends Objeto {
 		$sql = "UPDATE cobro_moneda SET tipo_cambio = $tipo_cambio WHERE id_cobro = $id_cobro AND id_moneda = $id_moneda LIMIT 1";
 		mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
-	}	
+	}
 }
-?>
