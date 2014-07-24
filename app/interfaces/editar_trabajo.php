@@ -1051,10 +1051,9 @@ function Substring($string) {
                 return false;
             }
 
-            var decimales = dur.split(".");
-            var decimales_cobrada = dur_cob.split(".");
-
-            if (decimales[1].length > 1 || decimales_cobrada[1].length > 1) {
+            var decimales = dur.split('.');
+            var decimales_cobrada = dur_cob.split('.');
+            if ((decimales.length > 1 && decimales[1].length > 1) || (decimales_cobrada.length > 1 && decimales_cobrada[1].length > 1)) {
                 alert("<?php echo __('Solo se permite ingresar un decimal') ?>");
                 form.duracion.focus();
                 return false;
