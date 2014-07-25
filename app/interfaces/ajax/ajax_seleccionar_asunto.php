@@ -13,13 +13,13 @@ $codigo_cliente = isset($_POST['codigo_cliente']) ? $_POST['codigo_cliente'] : n
 
 $campo_codigo_asunto = $codigo_secundario ? 'codigo_asunto_secundario' : 'codigo_asunto';
 $campo_codigo_cliente = $codigo_secundario ? 'codigo_cliente_secundario' : 'codigo_cliente';
-
-if (empty($glosa_asunto)) {
+$find_all = $_POST['all'] == 'true';
+if (empty($glosa_asunto) && !$find_all) {
 	$query = "(
 		SELECT DISTINCT asunto.{$campo_codigo_asunto} AS id, asunto.glosa_asunto AS value
 		FROM trabajo
 			JOIN asunto using (codigo_asunto)
-		WHERE trabajo.id_usuario = {$id_usuario}
+		WHERE trabajo.id_usuario = {$id_usuario} AND asunto.activo = 1
 		ORDER BY trabajo.fecha DESC
 		LIMIT 0,5
 	)
@@ -31,8 +31,8 @@ if (empty($glosa_asunto)) {
 		LIMIT 0,5
 	)";
 } else {
-	$query_filter = 1;
-
+	$query_filter = '';
+	$limit = 10;
 	$tabla = 'asunto';
 	$fields = "asunto.{$campo_codigo_asunto} AS id, asunto.glosa_asunto AS value";
 	$join = '';
@@ -42,15 +42,20 @@ if (empty($glosa_asunto)) {
 	}
 
 	if ($codigo_cliente) {
-		$query_filter = "{$tabla}.{$campo_codigo_cliente} = '{$codigo_cliente}'";
+		$query_filter = "AND {$tabla}.{$campo_codigo_cliente} = '{$codigo_cliente}'";
 	}
 
+	if ($find_all && empty($glosa_asunto)) {
+		$limit = 50;
+	} else {
+		$query_filter .= "AND LOWER(asunto.glosa_asunto) LIKE '%{$glosa_asunto}%' ";
+	}
 	$query = "SELECT $fields
-						FROM asunto
+		FROM asunto
 		$join
-		WHERE asunto.activo = 1 AND LOWER(asunto.glosa_asunto) LIKE '%{$glosa_asunto}%' AND {$query_filter}
+		WHERE asunto.activo = 1 {$query_filter}
 		ORDER BY asunto.glosa_asunto
-		LIMIT 10";
+		LIMIT $limit";
 }
 
 $resp = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);

@@ -100,6 +100,7 @@ class UtilesApp extends Utiles {
 				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
 				}
+				$oncambio .= "jQuery('#codigo_asunto_secundario').val('');jQuery('#glosa_asunto').val('');";
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "  ", $oncambio, $width, $codigo_asunto_secundario);
 			} else {
 				if ($oncambio == '') {
@@ -107,6 +108,7 @@ class UtilesApp extends Utiles {
 				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
 				}
+				$oncambio .= "jQuery('#codigo_asunto').val('');jQuery('#glosa_asunto').val('');";
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 			}
 		}

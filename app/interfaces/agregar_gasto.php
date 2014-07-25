@@ -255,7 +255,7 @@ $Form = new Form;
 		<?php } ?>
 
 		if (typeof  RevisarConsistenciaClienteAsunto == 'function') {
-			RevisarConsistenciaClienteAsunto(jQuery(this)[0]);
+			RevisarConsistenciaClienteAsunto(jQuery('#form_gastos')[0]);
 		}
 
 		<?php if ($prov == 'false' && Conf::GetConf($sesion, 'UsaMontoCobrable')) { ?>
