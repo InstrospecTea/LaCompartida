@@ -46,7 +46,7 @@ if (empty($glosa_asunto) && !$find_all) {
 	}
 
 	if ($find_all && empty($glosa_asunto)) {
-		$limit = 50;
+		$limit = 500;
 	} else {
 		$query_filter .= "AND LOWER(asunto.glosa_asunto) LIKE '%{$glosa_asunto}%' ";
 	}
