@@ -13,7 +13,7 @@ $permiso_secretaria = $sesion->usuario->Es('SEC');
 $tipo_ingreso = Conf::GetConf($sesion, 'TipoIngresoHoras');
 $actualizar_trabajo_tarifa = true;
 $permiso_revisor_usuario = false;
-
+$refresh_parent = false;
 if ($id_trabajo > 0) {
     $actualizar_trabajo_tarifa = false;
     $t->Load($id_trabajo);
@@ -296,13 +296,7 @@ if ($opcion == "guardar") {
                 }
                 $pagina->AddInfo(__('Trabajo') . ' ' . ($nuevo ? __('guardado con éxito') : __('editado con éxito')));
                 // refresca el listado de horas.php cuando se graba la informacion desde el popup
-                ?>
-                <script>
-                    if (window.opener) {
-                        window.opener.Refrescar();
-                    }
-                </script>
-                <?php
+                $refresh_parent = true;
             } else {
                 $pagina->AddError($t->error);
             }
@@ -329,13 +323,7 @@ if ($opcion == "guardar") {
       refresh al form
      */
     if ($nuevo || $edit) {
-        ?>
-        <script>
-            if (window.opener && window.opener.document.form_semana.submit()) {
-                window.close();
-            }
-        </script>
-        <?php
+        $refresh_parent = true;
     }
 } else if ($opcion == "eliminar") {
     // ELIMINAR TRABAJO
@@ -345,13 +333,7 @@ if ($opcion == "guardar") {
     if (!$t->Eliminar()) {
         $pagina->AddError($t->error);
     } else {
-        ?>
-        <script>
-            if (window.opener) {
-                window.opener.Refrescar();
-            }
-        </script>
-        <?php
+        $refresh_parent = true;
     }
     unset($t);
     unset($codigo_asunto_secundario);
@@ -387,13 +369,7 @@ if ($opcion == "guardar") {
         $t->Edit("tarifa_hh", $valores[$contrato->fields['id_moneda']]);
         $t->Write();
     }
-    ?>
-    <script>
-        if (window.opener) {
-            window.opener.Refrescar();
-        }
-    </script>
-    <?php
+    $refresh_parent = true;
     $pagina->AddInfo(__('Tarifas') . ' ' . __('guardado con éxito'));
 }
 
@@ -419,13 +395,11 @@ $Form = new Form;
 if (($opcion == 'guardar' || $opcion == 'eliminar')) {
     ?>
     <script>
-        var str_url = new String(top.location);
-        if (str_url.search('/trabajo.php') > 0) {
-            //Si la página está siendo llamada desde trabajo.php
-            // if (top.frames.semana!==undefined) {
-            // 	top.frames.semana.location.reload();
-            // }
-        }
+		<?php
+		if ($refresh_parent) {
+			echo 'if (window.opener) {window.opener.Refrescar();}';
+		}
+		?>
         if (top.Refrescar !== undefined) {
             top.Refrescar();
         }
@@ -434,9 +408,9 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
 }
 ?>
 <style>
-    A:link,A:visited {font-size:9px;text-decoration: none}
-    A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
-    A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
+  a:link, a:visited { text-decoration:none; }
+  a:hover { text-decoration:none; color:#990000; background-color:#D9F5D3; }
+  a:active { text-decoration:none; color:#990000; background-color:#D9F5D3; }
 </style>
 
 <!-- Calendario DIV -->
@@ -593,7 +567,7 @@ if (($opcion == 'guardar' || $opcion == 'eliminar')) {
             if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
               $oncambio .= 'CargarActividad();';
             }
-            UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio);
+            UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 300, $oncambio);
             ?>
           </td>
         </tr>

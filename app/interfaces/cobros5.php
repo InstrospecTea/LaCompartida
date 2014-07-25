@@ -162,14 +162,15 @@ if ($opc == 'anular_emision') {
 	$cobro->Write(); //Se guarda porque despues se necesita para recalcular los datos del cobro
 
 	################### DESCUENTOS #####################
-	if ($tipo_descuento == 'PORCENTAJE') {
-		$total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
-		$cobro->Edit('descuento', $total_descuento);
-		$cobro->Edit('porcentaje_descuento', $porcentaje_descuento);
-	} elseif ($tipo_descuento == 'VALOR') {
-		$cobro->Edit('descuento', $cobro_descuento);
-		$cobro->Edit('porcentaje_descuento', '0');
-	}
+    if ($tipo_descuento == 'PORCENTAJE') {
+        $total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
+        $cobro->Edit('descuento', $total_descuento);
+        $cobro->Edit('porcentaje_descuento', $porcentaje_descuento);
+    } elseif ($tipo_descuento == 'VALOR') {
+        $cobro->Edit('descuento', $cobro_descuento);
+        $cobro->Edit('porcentaje_descuento', '0');
+    }
+
 
 	$cobro->Edit('tipo_descuento', $tipo_descuento);
 	$cobro_moneda_cambio = new CobroMoneda($sesion);

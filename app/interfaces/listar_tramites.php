@@ -1,19 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
-
+$Form = new Form;
 $params_array['codigo_permiso'] = 'REV';
 $p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
@@ -102,8 +92,11 @@ if ($revisado == 'SI') {
 	$where.= " AND tramite.revisado = 1 ";
 }
 
-if ($codigo_asunto != '') {
-	$where.= " AND tramite.codigo_asunto = '$codigo_asunto' ";
+$campo_codigo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto';
+if ($$campo_codigo_asunto != '') {
+	$where.= " AND tramite.$campo_codigo_asunto = '$$campo_codigo_asunto' ";
+} else if (trim($glosa_asunto) != '') {
+	$where.= " AND asunto.glosa_asunto LIKE '%{$glosa_asunto}%' ";
 }
 
 if ($cobrado == 'NO') {
@@ -156,7 +149,7 @@ if ($activo) {
 	$where .= " AND a1.activo = $activo ";
 }
 
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	if ($codigo_cliente_secundario != "") {
 		$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario' ";
 	}
@@ -284,7 +277,7 @@ if ($orden == "") {
 		} else {
 			$orden = "tramite.fecha DESC, tramite.descripcion";
 		}
-		
+
 	}
 }
 
@@ -334,7 +327,7 @@ if ($excel) {
 	$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 	$lista = $b1->lista;
 
-	if ($p_cobranza->fields['permitido'] && ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CobranzaExcel') ) || ( method_exists('Conf', 'CobranzaExcel') && Conf::CobranzaExcel() ) )) {
+	if ($p_cobranza->fields['permitido'] && Conf::GetConf($sesion, 'CobranzaExcel')) {
 		require_once('cobros_generales_tramites.xls.php');
 	} else {
 		require_once('cobros3_tramites.xls.php');
@@ -486,7 +479,7 @@ $pagina->PrintTop($popup);
 </script>
 
 
-<form method='get' name="form_tramites" id="form_tramites">
+<form method='post' name="form_tramites" id="form_tramites">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
 	<input type='hidden' name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>'>
 	<input type='hidden' name='popup' id='popup' value='<?php echo $popup ?>'>
@@ -499,7 +492,7 @@ $pagina->PrintTop($popup);
 
 	<?php
 	if ($motivo != "cobros") {
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
+		if (Conf::GetConf($sesion, 'UsaDisenoNuevo'))
 			$width_tabla = 'width="90%"';
 		else
 			$width_tabla = 'width="100%"';
@@ -535,7 +528,7 @@ $pagina->PrintTop($popup);
 										<?php echo __('Asunto') ?>
 									</td>
 									<td nowrap align='left' colspan="3">
-										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, '', $glosa_asunto, false); ?>
 
 									</td>
 								</tr>
@@ -569,10 +562,10 @@ $pagina->PrintTop($popup);
 								<tr>
 									<td>&nbsp;</td>
 									<td colspan='3'  align="left">
-										<input name='boton_buscar' id='boton_buscar' type='submit' class="btn" onclick="this.form.check_tramite.value = 1"  value=<?php echo __('Buscar') ?>>
+										<?php echo $Form->submit(__('Buscar'), array('onclick' => "jQuery('#check_tramite').val(1)")); ?>
 									</td>
 									<td>
-										<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border="0"> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?php echo __('Agregar') ?> <?php echo __('trámite') ?></a>
+										<?php echo $Form->icon_button(__('Agregar') . ' ' . __('trámite'), 'agregar', array('onclick' => "AgregarNuevo('tramite')")); ?>
 									</td>
 								</tr>
 							</table>
@@ -585,6 +578,7 @@ $pagina->PrintTop($popup);
 </form>
 
 <?php
+echo $Form->script();
 if (isset($cobro) || $opc == 'buscar') {
 	echo "<center>";
 	$b->Imprimir('', array('check_tramite')); //Excluyo Checktramite);
@@ -778,11 +772,11 @@ function funcionTR(& $tramite) {
 		$duracion_trabajada = $tramite->fields['duracion'];
 
 		$duracion = $duracion_trabajada;
-		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal' ) || ( method_exists('Conf', 'TipoIngresoHoras') && Conf::TipoIngresoHoras() == 'decimal' )) {
+		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$duracion = UtilesApp::Time2Decimal($duracion_trabajada);
 		}
 	} else {
-		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal' ) || ( method_exists('Conf', 'TipoIngresoHoras') && Conf::TipoIngresoHoras() == 'decimal' )) {
+		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$duracion_trabajada = $tramite->fields['duracion'];
 			$duracion = UtilesApp::Time2Decimal($duracion_trabajada);
 		}
@@ -805,7 +799,7 @@ function funcionTR(& $tramite) {
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
 	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164) {
-		if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
+		if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 			$html .= "<td align=center>" . $tramite->fields['username'] . "</td>";
 		} else {
 			$html .= "<td align=center>" . substr($tramite->fields['nombre'], 0, 1) . substr($tramite->fields['apellido1'], 0, 1) . substr($tramite->fields['apellido2'], 0, 1) . "</td>";
