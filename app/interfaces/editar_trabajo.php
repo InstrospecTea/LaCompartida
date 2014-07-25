@@ -392,25 +392,14 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 $pagina->titulo = __('Modificación de') . ' ' . __('Trabajo');
 $pagina->PrintTop($popup);
 $Form = new Form;
-if (($opcion == 'guardar' || $opcion == 'eliminar')) {
-    ?>
-    <script>
-		<?php
-		if ($refresh_parent) {
-			echo 'if (window.opener) {window.opener.Refrescar();}';
-		}
-		?>
-        if (top.Refrescar !== undefined) {
-            top.Refrescar();
-        }
-    </script>
-    <?php
+if ($refresh_parent) {
+	echo $Form->Html->script_block('if (window.opener) {window.opener.Refrescar();}');
 }
 ?>
-<style>
-  a:link, a:visited { text-decoration:none; }
-  a:hover { text-decoration:none; color:#990000; background-color:#D9F5D3; }
-  a:active { text-decoration:none; color:#990000; background-color:#D9F5D3; }
+<style type="text/css">
+	a:link, a:visited { text-decoration:none; }
+	a:hover { text-decoration:none; color:#990000; background-color:#D9F5D3; }
+	a:active { text-decoration:none; color:#990000; background-color:#D9F5D3; }
 </style>
 
 <!-- Calendario DIV -->
@@ -947,7 +936,11 @@ function Substring($string) {
     UtilesApp::GetConfJS($sesion, 'IdiomaGrande');
     UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
     ?>
-
+	function AutosizeFrame() {
+		if (top.ResizeFrame !== undefined) {
+			top.ResizeFrame();
+		}
+   }
     function CargarActividad() {
         CargarSelect('codigo_asunto', 'codigo_actividad', 'cargar_actividades_activas');
     }
@@ -1155,8 +1148,9 @@ function Substring($string) {
         var vurl = 'ajax.php?accion=cargar_tarifa_trabajo&id_usuario=' + id_usuario + '&codigo_asunto=' + codigo_asunto + '&codigo_cliente=' + codigo_cliente;
 
         jQuery.get(vurl, function(response) {
-            if (jQuery('#tarifa_trabajo').length > 0)
+            if (jQuery('#tarifa_trabajo').length > 0) {
                 jQuery('#tarifa_trabajo').val(response);
+			}
         });
 
         return true;
@@ -1488,6 +1482,7 @@ function Substring($string) {
                 }
             }).done(function(response) {
                 jQuery('#codigo_ledes').html(response);
+				AutosizeFrame();
             });
 
 
@@ -1522,7 +1517,7 @@ function Substring($string) {
                         });
                     }
                 };
-				top.window.jQuery('.resizableframe').load();
+				AutosizeFrame();
             });
         }
 
@@ -1540,7 +1535,7 @@ function Substring($string) {
                 }
             }).done(function(response) {
                 jQuery('#codigo_ledes').html(response);
-				top.window.jQuery('.resizableframe').load();
+				AutosizeFrame();;
             });
         }
 
