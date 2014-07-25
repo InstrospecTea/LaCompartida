@@ -276,9 +276,13 @@ $where .= " AND usuario.visible = 1";
 		});
 
 		jQuery('#asuntos').load(function() {
-			jQuery(this).css('height', this.contentWindow.document.body.offsetHeight + 'px');
+			ResizeFrame();
 		});
 	});
+	function ResizeFrame() {
+		frame = jQuery('#asuntos');
+		frame.css('height', frame[0].contentWindow.document.body.offsetHeight + 'px');
+	}
 
 	function Refrescasemana(semana, usuario, eldiv, slide) {
 		semanaplus = semana.split('-');
