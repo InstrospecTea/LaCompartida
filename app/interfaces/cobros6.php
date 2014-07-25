@@ -1241,7 +1241,7 @@ if (count($cobro->asuntos)) {
             }
         }
 
-        nuovaFinestra('Agregar_Factura',800, 600, '<?php echo $url_agregar_factura; ?>' +
+        nuovaFinestra('Agregar_Factura',800, 610, '<?php echo $url_agregar_factura; ?>' +
             '&honorario=' + honorarios +
             '&gastos_con_iva=' + gastos_con_impuestos +
             '&gastos_sin_iva=' + gastos_sin_impuestos +

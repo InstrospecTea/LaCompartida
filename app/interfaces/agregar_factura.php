@@ -149,7 +149,6 @@ if ($opcion == "guardar") {
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
 
-
 		$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
@@ -1001,8 +1000,8 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 						rut.value = '';
 						direccion_cliente.value = '';
 						cliente.value = '';
-						select_destino.options.length = 1;
-						offLoading();
+						// select_destino.options.length = 1;
+						// offLoading();
 						alert('No existen <?php echo __('cobros'); ?> para este cliente.');
 					}
 					else
@@ -1185,7 +1184,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				jQuery('#gastos_con_impuestos_disp').val(jQuery('#gastos_con_impuestos_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[1], {format: "###.000", locale: "us"}));
 				jQuery('#gastos_sin_impuestos_disp').val(jQuery('#gastos_sin_impuestos_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[1], {format: "###.000", locale: "us"}));
 
-				offLoading();
+				// offLoading();
 			}
 		};
 		http.send(null);

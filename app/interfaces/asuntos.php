@@ -49,6 +49,7 @@ $GrupoCliente = new GrupoCliente($Sesion);
 $Pagina->titulo = __('Listado de') . ' ' . __('Asuntos');
 $Pagina->PrintTop($popup);
 $Form = new Form;
+
 ?>
 
 <script type="text/javascript">
@@ -229,22 +230,24 @@ $Form = new Form;
 echo $Form->script();
 
 if ($busqueda) {
-	$link = "Opciones";
+	$link = 'Opciones';
 } else {
 	$link = __('Cobrar');
-	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
-	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente={$codigo_cliente}&opc=entregar_asunto&id_cobro={$id_cobro}&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente={$codigo_cliente}&opc=entregar_asunto&id_cobro={$id_cobro}&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
 }
 
+$CobroAsunto = new CobroAsunto($Sesion);
+
 if ($checkall == '1') {
-	CheckAll($id_cobro, $codigo_cliente);
+	$CobroAsunto->agregarAsuntos($id_cobro, $codigo_cliente, true);
 }
 
 if ($uncheckall == '1') {
-	UncheckAll($id_cobro, $codigo_cliente);
+	$CobroAsunto->eliminarAsuntos($id_cobro);
 }
 
-global $query, $where,$b;
+global $query, $where, $b;
 $where = 1;
 
 if ($buscar || $opc == "entregar_asunto") {
@@ -401,7 +404,7 @@ function Opciones(& $fila) {
 	global $motivo, $from;
 
 	if ($motivo == 'cobros') {
-		return Cobrable($fila, $checkall);
+		return Cobrable($fila);
 	}
 
 	$id_asunto = $fila->fields['id_asunto'];
