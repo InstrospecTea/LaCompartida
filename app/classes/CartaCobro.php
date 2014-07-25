@@ -2077,7 +2077,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_especial2%', $fecha_lang_esp, $html2);
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
 				$html2 = str_replace('%fecha_espanol_del%', $fecha_espanol_del, $html2);
-				$html2 = str_replace('%fecha_slash%', date('d/m/ Y'), $html2);
+				$html2 = str_replace('%fecha_slash%', date('d/m/Y'), $html2);
 
 				if ($lang == 'es') {
 					$fecha_lang_con_de = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %d de %Y'));
@@ -2148,6 +2148,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
 				}
 
+				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
 				$html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%contrato_solo_apellido_contacto%', $contrato->fields['apellido_contacto'], $html2);
