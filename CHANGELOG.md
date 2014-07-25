@@ -1,5 +1,15 @@
 # Changelog
 
+## Hotfix: 14.6.1
+Viernes 25 de Julio 2014
+* **Fixed:** [Corrige validación en CargarSelect.](https://github.com/LemontechSA/ttb/pull/606)
+
+## Release: 14.6.0
+Jueves 24 de Julio 2014
+* **Feature:** [Agrega comportamiento de combobox al autocompleter de asuntos.](https://github.com/LemontechSA/ttb/pull/599)
+* **Feature:** [Feature/indicador cambio tarifa.](https://github.com/LemontechSA/ttb/pull/591)
+* **Feature:** [Hace opcional el asunto al crear actividades.](https://github.com/LemontechSA/ttb/pull/582)
+
 ## Hotfix: 14.5.3
 Miercoles 23 de Julio 2014
 * **Fixed:** [Agrega código perdido de un commit.](https://github.com/LemontechSA/ttb/pull/604)
