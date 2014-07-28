@@ -1000,8 +1000,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 						rut.value = '';
 						direccion_cliente.value = '';
 						cliente.value = '';
-						// select_destino.options.length = 1;
-						// offLoading();
 						alert('No existen <?php echo __('cobros'); ?> para este cliente.');
 					}
 					else
@@ -1183,8 +1181,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				jQuery('#honorario_disp').val(jQuery('#honorario_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[0], {format: "###.000", locale: "us"}));
 				jQuery('#gastos_con_impuestos_disp').val(jQuery('#gastos_con_impuestos_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[1], {format: "###.000", locale: "us"}));
 				jQuery('#gastos_sin_impuestos_disp').val(jQuery('#gastos_sin_impuestos_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[1], {format: "###.000", locale: "us"}));
-
-				// offLoading();
 			}
 		};
 		http.send(null);
