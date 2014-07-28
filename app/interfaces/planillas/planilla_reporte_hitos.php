@@ -10,74 +10,63 @@ set_time_limit(3600);
 
 if ($xls) {
 
+	$criteria = new Criteria($sesion);
+
 	if ($codigo_cliente_secundario) {
 		$cliente = new Cliente($sesion);
 		$codigo_cliente = $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario);
 	}
 
-	if ($codigo_cliente) {
-		$cliente = new Cliente($sesion);
-		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
-	}
-
-	$where = 1;
-
 	if (!empty($fecha1)){
-		$fecha1 = date('Y-m-d', strtotime($fecha1));	
+		$fecha1 = date('Y-m-d', strtotime($fecha1));
 	}
 
 	if (!empty($fecha2)){
-		$fecha2 = date('Y-m-d', strtotime($fecha2));	
+		$fecha2 = date('Y-m-d', strtotime($fecha2));
 	}
 
+
 	if (!empty($codigo_cliente)) {
-		$where .= " AND cli.codigo_cliente = '$codigo_cliente' ";
+		$criteria->add_restriction(CriteriaRestriction::equals('cli.codigo_cliente', "'{$codigo_cliente}'"));
 	}
 
 	if (!empty($fecha1)) {
-		$where .=' AND cp.fecha_cobro >= \''.$fecha1.'\'';
+		$criteria->add_restriction(CriteriaRestriction::greater_or_equals_than('cp.fecha_cobro', $fecha1));
 	}
 
 	if (!empty($fecha2)) {
-		$where .=' AND cp.fecha_cobro <= \''.$fecha2.'\'';
+		$criteria->add_restriction(CriteriaRestriction::lower_or_equals_than('cp.fecha_cobro', $fecha2));
 	}
 
 	if ($mostrar_con_cobro){
-		$where .=" AND cp.id_cobro IS NOT NULL";
+		$criteria->add_restriction(CriteriaRestriction::is_not_null('cp.id_cobro'));
 	}
 
-	$query_excel = "SELECT
-    				cli.glosa_cliente AS glosa_cliente,
-    				GROUP_CONCAT(DISTINCT asu.glosa_asunto ORDER BY asu.glosa_asunto SEPARATOR ', ') AS glosa_asunto,
-    				cp.monto_estimado AS monto_estimado,
-    				pmcp.simbolo AS moneda_estimada,
-    				IF(cp.fecha_cobro IS NULL, DATE_FORMAT(cob.fecha_emision,'%d-%m-%Y'), DATE_FORMAT(cp.fecha_cobro,'%d-%m-%Y')) AS fecha_cobro,
-    				asu.codigo_asunto AS codigo_asunto,
-    				cp.descripcion AS descripcion,
-    				cp.observaciones AS observaciones,
-    				IF(cp.id_cobro IS NULL, 'SIN COBRO', cob.estado) AS estado_cobro,
-    				cp.id_cobro AS numero_cobro,
-    				cob.monto as monto_cobrado,
-    				IF(cob.id_cobro IS NULL,'', pmcob.simbolo) AS moneda_cobrada,
-    				cob.documento as numero_factura,
-    				con.id_moneda
-
-					FROM cobro_pendiente as cp
-					    
-					LEFT JOIN contrato AS con ON cp.id_contrato = con.id_contrato
-					LEFT JOIN prm_moneda as pmcp ON con.id_moneda = pmcp.id_moneda
-					LEFT JOIN cobro AS cob ON cp.id_cobro = cob.id_cobro
-					LEFT JOIN prm_moneda AS pmcob ON cob.id_moneda = pmcob.id_moneda
-					LEFT JOIN asunto AS asu ON con.id_contrato = asu.id_contrato
-					LEFT JOIN cliente AS cli ON con.codigo_cliente = cli.codigo_cliente
-
-					WHERE $where
-					AND monto_estimado != 0
-					GROUP BY cli.codigo_cliente
-					#AND cp.hito = 1";
+	$criteria
+		->add_select('cli.glosa_cliente', 'glosa_cliente')
+		->add_select("GROUP_CONCAT(DISTINCT asu.glosa_asunto ORDER BY asu.glosa_asunto SEPARATOR ', ')", 'glosa_asunto')
+		->add_select('cp.monto_estimado', 'monto_estimado')
+		->add_select('pmcp.simbolo', 'moneda_estimada')
+		->add_select("IF(cp.fecha_cobro IS NULL, DATE_FORMAT(cob.fecha_emision,'%d-%m-%Y'), DATE_FORMAT(cp.fecha_cobro,'%d-%m-%Y'))", 'fecha_cobro')
+		->add_select('asu.codigo_asunto', 'codigo_asunto')
+		->add_select('cp.descripcion', 'descripcion')
+		->add_select('cp.observaciones', 'observaciones')
+		->add_select("IF(cp.id_cobro IS NULL, 'SIN COBRO', cob.estado)", 'estado_cobro')
+		->add_select('cp.id_cobro', 'numero_cobro')
+		->add_select('cob.monto', 'monto_cobrado')
+		->add_select("IF(cob.id_cobro IS NULL,'', pmcob.simbolo)", 'moneda_cobrada')
+		->add_select('cob.documento', 'numero_factura')
+		->add_select('con.id_moneda')
+		->add_from('cobro_pendiente', 'cp')
+		->add_left_join_with('contrato as con', CriteriaRestriction::equals('cp.id_contrato', 'con.id_contrato'))
+		->add_left_join_with('prm_moneda as pmcp', CriteriaRestriction::equals('con.id_moneda', 'pmcp.id_moneda'))
+		->add_left_join_with('cobro AS cob', CriteriaRestriction::equals('cp.id_cobro', 'cob.id_cobro'))
+		->add_left_join_with('prm_moneda AS pmcob', CriteriaRestriction::equals('cob.id_moneda', 'pmcob.id_moneda'))
+		->add_left_join_with('asunto AS asu', CriteriaRestriction::equals('con.id_contrato', 'asu.id_contrato'))
+		->add_left_join_with('cliente AS cli', CriteriaRestriction::equals('con.codigo_cliente', 'cli.codigo_cliente'));
 
 
-	$resultado = mysql_query($query_excel, $sesion->dbh) or Utiles::errorSQL($query_excel, __FILE__, __LINE__, $sesion->dbh);
+	$resultado = $criteria->run();
 
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
@@ -296,13 +285,12 @@ $pagina->PrintTop();
 				<input type="checkbox" name="mostrar_con_cobro" id="mostrar_con_cobro" value="1" <?php echo $mostrar_con_cobro ? 'checked="checked"' : '' ?> />
 			</td>
 			<td align="left">
-				<?php echo __('Considerar sólo hitos cobrados'); ?></td>
+				<label for="mostrar_con_cobro"><?php echo __('Considerar sólo hitos cobrados'); ?></label>
 			</td>
 		</tr>
 		
 		<tr>
 			<td align=center colspan="4">
-				<input type="hidden" name="debug" value="<?php echo $debug ?>" />
 				<input type="submit" class=btn value="<?php echo __('Generar reporte') ?>" name="btn_reporte">
 			</td><td>&nbsp;</td>
 		</tr>
