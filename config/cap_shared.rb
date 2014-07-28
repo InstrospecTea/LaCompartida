@@ -24,6 +24,7 @@ set :deploy_via, :remote_cache
 
 set :base_directory, "/var/www/html"
 set :deploy_to, "#{base_directory}"
+set :copy_exclude, [ '.git' ]
 
 set :deploy_dir_name, "deploy"
 set :virtual_directory, "/var/www/virtual"
