@@ -115,7 +115,7 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function greater_or_equals_than($column, $pivot) {
-		return new CriteriaRestriction('('.$column.' >= \''.$pivot.'\')');
+		return new CriteriaRestriction('('.$column.' >= '.$pivot.')');
 	}
 
 	/**
@@ -125,7 +125,7 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function lower_or_equals_than($column, $pivot) {
-		return new CriteriaRestriction('('.$column.' <= \''.$pivot.'\')');
+		return new CriteriaRestriction('('.$column.' <= '.$pivot.')');
 	}
 
 	/**
