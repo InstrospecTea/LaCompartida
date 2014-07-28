@@ -296,7 +296,7 @@ $pagina->PrintTop();
 				<input type="checkbox" name="mostrar_con_cobro" id="mostrar_con_cobro" value="1" <?php echo $mostrar_con_cobro ? 'checked="checked"' : '' ?> />
 			</td>
 			<td align="left">
-				<?php echo __('Mostrar hitos con cobros asociados'); ?></td>
+				<?php echo __('Considerar sólo hitos cobrados'); ?></td>
 			</td>
 		</tr>
 		
