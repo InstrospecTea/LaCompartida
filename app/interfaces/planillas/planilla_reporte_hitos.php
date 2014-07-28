@@ -25,17 +25,16 @@ if ($xls) {
 		$fecha2 = date('Y-m-d', strtotime($fecha2));
 	}
 
-
 	if (!empty($codigo_cliente)) {
 		$criteria->add_restriction(CriteriaRestriction::equals('cli.codigo_cliente', "'{$codigo_cliente}'"));
 	}
 
 	if (!empty($fecha1)) {
-		$criteria->add_restriction(CriteriaRestriction::greater_or_equals_than('cp.fecha_cobro', $fecha1));
+		$criteria->add_restriction(CriteriaRestriction::greater_or_equals_than('cp.fecha_cobro', "'{$fecha1}'"));
 	}
 
 	if (!empty($fecha2)) {
-		$criteria->add_restriction(CriteriaRestriction::lower_or_equals_than('cp.fecha_cobro', $fecha2));
+		$criteria->add_restriction(CriteriaRestriction::lower_or_equals_than('cp.fecha_cobro', "'{$fecha2}'"));
 	}
 
 	if ($mostrar_con_cobro){
@@ -63,7 +62,9 @@ if ($xls) {
 		->add_left_join_with('cobro AS cob', CriteriaRestriction::equals('cp.id_cobro', 'cob.id_cobro'))
 		->add_left_join_with('prm_moneda AS pmcob', CriteriaRestriction::equals('cob.id_moneda', 'pmcob.id_moneda'))
 		->add_left_join_with('asunto AS asu', CriteriaRestriction::equals('con.id_contrato', 'asu.id_contrato'))
-		->add_left_join_with('cliente AS cli', CriteriaRestriction::equals('con.codigo_cliente', 'cli.codigo_cliente'));
+		->add_left_join_with('cliente AS cli', CriteriaRestriction::equals('con.codigo_cliente', 'cli.codigo_cliente'))
+		->add_grouping('cli.codigo_cliente');
+
 
 
 	$resultado = $criteria->run();
@@ -186,21 +187,11 @@ if ($xls) {
 	$worksheet->write($fila_encabezado, $columna_moneda_cobrada, __('Moneda'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_numero_factura, __('Numero Factura'), $encabezados_borde);
 
+
 	// Filas del documento
-	while ( list (	$glosa_cliente,
-					$glosa_asunto,
-					$monto_estimado,
-					$moneda_estimada,
-					$fecha_cobro,
-					$codigo_asunto,
-					$descripcion,
-					$observaciones,
-					$estado_cobro,
-					$numero_cobro,
-					$monto_cobrado,
-					$moneda_cobrada,
-					$numero_factura,
-					$id_moneda_contrato ) = mysql_fetch_array($resultado)) {
+	foreach($resultado as $row) {
+
+		extract($row);
 
 		$cifras_decimales = Utiles::glosa($sesion, $id_moneda_contrato, 'cifras_decimales', 'prm_moneda', 'id_moneda');
 
@@ -270,15 +261,17 @@ $pagina->PrintTop();
 			</td>
 			<td align="left">
 				<?php
-					$criteria = new Criteria($sesion);
-					$criteria->add_from('cliente')->add_ordering('nombre')->add_ordering_criteria('ASC');
-					$criteria->add_select('glosa_cliente', 'nombre');
+					$userCriteria = new Criteria($sesion);
+					$userCriteria->add_from('cliente')->add_ordering('nombre')->add_ordering_criteria('ASC');
 					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-						$criteria->add_select('codigo_cliente_secundario');
+						$userCriteria->add_select('codigo_cliente_secundario');
+						$nombre_variable = "codigo_cliente_secundario";
 					} else {
-						$criteria->add_select('codigo_cliente');
+						$userCriteria->add_select('codigo_cliente');
+						$nombre_variable = "codigo_cliente";
 					}
-					echo Html::SelectQuery($sesion, $criteria->get_plain_query(), "codigo_cliente", $codigo_cliente, '', "Todos", "200");
+					$userCriteria->add_select('glosa_cliente', 'nombre');
+					echo Html::SelectQuery($sesion, $userCriteria->get_plain_query(), $nombre_variable, $codigo_cliente, '', "Todos", "200");
 				?>
 			</td>
 		</tr>
