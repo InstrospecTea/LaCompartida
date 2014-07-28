@@ -33,7 +33,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 									
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 										<tr>
-											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>/usuarios_32.gif" alt=''/></td>
+											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style="font-weight:bold; height: 15px;" width="85%"><?php echo __('Clientes') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -57,7 +57,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 									
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 										<tr>
-											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>/usuarios_32.gif" alt=''/></td>
+											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Profesionales') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -86,7 +86,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 										<tr>
-											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>/usuarios_32.gif" alt=''/></td>
+											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Cobranza') ?></td>
 										</tr>
 										<tr valign=top align="left" style="height: 5px;">
@@ -115,7 +115,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 								<td>
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 										<tr>
-											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>/usuarios_32.gif" alt=''/></td>
+											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style='font-weight:bold; height:15px;' width="85%"><?php echo __('Varios') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -148,7 +148,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 								
 										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 											<tr>
-												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>/usuarios_32.gif" alt=''/></td>
+												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 												<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Avanzados') ?></td>
 											</tr>
 											<tr valign="top" align="left" style="height: 5px;">
@@ -176,7 +176,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 									<td>
 										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 											<tr>
-												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>/usuarios_32.gif" alt=''/></td>
+												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 												<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Experimentales') ?></td>
 											</tr>
 											<tr valign="top" align="left" style="height: 5px;">
