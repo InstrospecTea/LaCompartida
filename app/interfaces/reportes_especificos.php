@@ -1,10 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
@@ -14,6 +9,12 @@ $id_usuario = $sesion->usuario->fields['id_usuario'];
 $pagina->titulo = __('Reportes espec&iacute;ficos');
 $modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones');
 $pagina->PrintTop();
+
+$img_dir = Conf::ImgDir().'/usuarios_32.gif';
+
+if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
+	$img_dir = Conf::ImgDir().'/usuarios_32_nuevo.gif';
+}
 
 ?>
 <form name="formulario" id="formulario" method="post">
@@ -32,11 +33,7 @@ $pagina->PrintTop();
 									
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 										<tr>
-											<?php if ( Conf::GetConf($sesion,'UsaDisenoNuevo')) { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/usuarios_32_nuevo.gif" alt=''/></td>
-											<?php } else { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/usuarios_32.gif" alt=''/></td>
-											<?php } ?>
+											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style="font-weight:bold; height: 15px;" width="85%"><?php echo __('Clientes') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -60,11 +57,7 @@ $pagina->PrintTop();
 									
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 										<tr>
-											<?php if ( Conf::GetConf($sesion,'UsaDisenoNuevo')) { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/contact_32_nuevo.gif" alt=''/></td>
-											<?php } else { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/contact_32.gif" alt=''/></td>
-											<?php } ?>
+											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Profesionales') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -93,11 +86,7 @@ $pagina->PrintTop();
 
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 										<tr>
-											<?php if ( Conf::GetConf($sesion,'UsaDisenoNuevo')) { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/coins_32_nuevo.gif" alt=''/></td>
-											<?php } else { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/coins_32.gif" alt=''/></td>
-											<?php } ?>
+											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Cobranza') ?></td>
 										</tr>
 										<tr valign=top align="left" style="height: 5px;">
@@ -126,11 +115,7 @@ $pagina->PrintTop();
 								<td>
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 										<tr>
-											<?php if ( Conf::GetConf($sesion,'UsaDisenoNuevo')) { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/proyectos_32_nuevo.gif" alt=''/></td>
-											<?php } else { ?>
-												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/proyectos_32.gif" alt=''/></td>
-											<?php } ?>
+											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 											<td valign="center" style='font-weight:bold; height:15px;' width="85%"><?php echo __('Varios') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -163,11 +148,7 @@ $pagina->PrintTop();
 								
 										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 											<tr>
-												<?php if ( Conf::GetConf($sesion,'UsaDisenoNuevo')) { ?>
-													<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/proyectos_32_nuevo.gif" alt=''/></td>
-												<?php } else { ?>
-													<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/proyectos_32.gif" alt=''/></td>
-												<?php } ?>
+												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 												<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Avanzados') ?></td>
 											</tr>
 											<tr valign="top" align="left" style="height: 5px;">
@@ -195,11 +176,7 @@ $pagina->PrintTop();
 									<td>
 										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 											<tr>
-												<?php if ( Conf::GetConf($sesion,'UsaDisenoNuevo')) { ?>
-													<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/proyectos_32_nuevo.gif" alt=''/></td>
-												<?php } else { ?>
-													<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() ?>/proyectos_32.gif" alt=''/></td>
-												<?php } ?>
+												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
 												<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Experimentales') ?></td>
 											</tr>
 											<tr valign="top" align="left" style="height: 5px;">
