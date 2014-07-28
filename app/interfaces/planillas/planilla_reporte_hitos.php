@@ -269,8 +269,16 @@ $pagina->PrintTop();
 				<b><?php echo __('Clientes')?>:</b>
 			</td>
 			<td align="left">
-				<?php $query = 'SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC';
-					echo Html::SelectQuery($sesion, $query, "codigo_cliente", $codigo_cliente, '', "Todos", "200");
+				<?php
+					$criteria = new Criteria($sesion);
+					$criteria->add_from('cliente')->add_ordering('nombre')->add_ordering_criteria('ASC');
+					$criteria->add_select('glosa_cliente', 'nombre');
+					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+						$criteria->add_select('codigo_cliente_secundario');
+					} else {
+						$criteria->add_select('codigo_cliente');
+					}
+					echo Html::SelectQuery($sesion, $criteria->get_plain_query(), "codigo_cliente", $codigo_cliente, '', "Todos", "200");
 				?>
 			</td>
 		</tr>
