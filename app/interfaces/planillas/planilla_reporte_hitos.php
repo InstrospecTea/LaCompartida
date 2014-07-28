@@ -48,11 +48,10 @@ if ($xls) {
 
 	$query_excel = "SELECT
     				cli.glosa_cliente AS glosa_cliente,
-    				GROUP_CONCAT(DISTINCT asu.glosa_asunto ORDER BY asu.glosa_asunto) AS glosa_asunto,
+    				GROUP_CONCAT(DISTINCT asu.glosa_asunto ORDER BY asu.glosa_asunto SEPARATOR ', ') AS glosa_asunto,
     				cp.monto_estimado AS monto_estimado,
     				pmcp.simbolo AS moneda_estimada,
-    				IF(cp.fecha_cobro IS NULL, DATE_FORMAT(cob.fecha_emision,'%d-%m-%Y'), DATE_FORMAT(cp.fecha_cobro,'%d-%m-%Y')) AS fecha_cobro, 
-    				cli.codigo_cliente AS codigo_cliente,
+    				IF(cp.fecha_cobro IS NULL, DATE_FORMAT(cob.fecha_emision,'%d-%m-%Y'), DATE_FORMAT(cp.fecha_cobro,'%d-%m-%Y')) AS fecha_cobro,
     				asu.codigo_asunto AS codigo_asunto,
     				cp.descripcion AS descripcion,
     				cp.observaciones AS observaciones,
@@ -148,14 +147,13 @@ if ($xls) {
 	$worksheet->setColumn(3,3,10);
 	$worksheet->setColumn(4,4,20);
 	$worksheet->setColumn(5,5,20);
-	$worksheet->setColumn(6,6,20);
+	$worksheet->setColumn(6,6,50);
 	$worksheet->setColumn(7,7,50);
-	$worksheet->setColumn(8,8,50);
-	$worksheet->setColumn(9,9,20);
+	$worksheet->setColumn(8,8,20);
+	$worksheet->setColumn(9,9,15);
 	$worksheet->setColumn(10,10,15);
 	$worksheet->setColumn(11,11,15);
-	$worksheet->setColumn(12,12,15);
-	$worksheet->setColumn(13,13,20);
+	$worksheet->setColumn(12,12,20);
 
 	$worksheet->writeString(1,0,'Reporte Hitos',$titulo);
 
@@ -169,15 +167,14 @@ if ($xls) {
 	$columna_monto_estimado = 2;
 	$columna_moneda_estimada = 3;
 	$columna_fecha_cobro = 4;
-	$columna_codigo_cliente = 5;
-	$columna_codigo_asunto = 6;
-	$columna_descripcion = 7;
-	$columna_observaciones = 8;
-	$columna_estado_cobro = 9;
-	$columna_numero_cobro = 10;
-	$columna_monto_cobrado = 11;
-	$columna_moneda_cobrada = 12;
-	$columna_numero_factura = 13;
+	$columna_codigo_asunto = 5;
+	$columna_descripcion = 6;
+	$columna_observaciones = 7;
+	$columna_estado_cobro = 8;
+	$columna_numero_cobro = 9;
+	$columna_monto_cobrado = 10;
+	$columna_moneda_cobrada = 11;
+	$columna_numero_factura = 12;
 
 	//Worksheet::write ( integer $row , integer $col , mixed $token , mixed $format=0 )
 	$worksheet->write($celda_fecha_creacion,0, 'Fecha Creación : '.date('d-m-Y'),$glosa_detalle_documento_left);
@@ -191,8 +188,7 @@ if ($xls) {
 	$worksheet->write($fila_encabezado, $columna_monto_estimado, __('Monto Estimado'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_moneda_estimada, __('Moneda'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_fecha_cobro, __('Fecha Cobro'), $encabezados_borde);
-	$worksheet->write($fila_encabezado, $columna_codigo_cliente, __('Codigo Cliente'), $encabezados_borde);
-	$worksheet->write($fila_encabezado, $columna_codigo_asunto, __('Codigo Asunto'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_codigo_asunto, __('Cliente').'-'.__('Asunto'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_descripcion, __('Descripcion'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_observaciones, __('Observaciones'), $encabezados_borde);
 	$worksheet->Write($fila_encabezado, $columna_estado_cobro, __('Estado Cobro'), $encabezados_borde);
@@ -207,7 +203,6 @@ if ($xls) {
 					$monto_estimado,
 					$moneda_estimada,
 					$fecha_cobro,
-					$codigo_cliente,
 					$codigo_asunto,
 					$descripcion,
 					$observaciones,
@@ -243,7 +238,6 @@ if ($xls) {
 		$worksheet->write($fila_encabezado, $columna_monto_estimado, $monto_estimado, $formato_moneda_monto);
 		$worksheet->write($fila_encabezado, $columna_moneda_estimada, $moneda_estimada, $general);
 		$worksheet->write($fila_encabezado, $columna_fecha_cobro, $fecha_cobro, $general);
-		$worksheet->write($fila_encabezado, $columna_codigo_cliente, $codigo_cliente, $fcodigo_cliente);
 		$worksheet->write($fila_encabezado, $columna_codigo_asunto, $codigo_asunto, $general);
 		$worksheet->write($fila_encabezado, $columna_descripcion, $descripcion, $general_izquierda);
 		$worksheet->write($fila_encabezado, $columna_observaciones, $observaciones, $general_izquierda);
