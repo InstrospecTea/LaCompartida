@@ -18,19 +18,14 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 
 ?>
 <form name="formulario" id="formulario" method="post">
-	<br>
-	
 	<table width="850px" style='border:0px solid #ccc' cellspacing="4" cellpadding="4">
 		<tbody>
 			<tr>
 				<td align="center">
-					
 					<table width="85%" style='border:0px solid #ccc' cellspacing="2" cellpadding="2">
 						<tbody>
-
 							<tr>
 								<td width="50%">
-									
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 										<tr>
 											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
@@ -48,16 +43,12 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 											</td>
 										</tr>
 									</table>
-									
 									<br/>
-								
 								</td>
-								
 								<td width="50%">
-									
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 										<tr>
-											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
+											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=""></td>
 											<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Profesionales') ?></td>
 										</tr>
 										<tr valign="top" align="left" style="height: 5px;">
@@ -75,18 +66,14 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 											</td>
 										</tr>
 									</table>
-									
 									<br/>
 								</td>
-								
 							</tr>
-
 							<tr style='font-weight:bold'>
 								<td>
-
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 										<tr>
-											<td rowspan="2" width="15%"><img src="<img src="<?php echo $img_dir ?>" alt=''/></td>
+											<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=""/></td>
 											<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Cobranza') ?></td>
 										</tr>
 										<tr valign=top align="left" style="height: 5px;">
@@ -109,9 +96,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 											</td>
 										</tr>
 									</table>
-									
 								</td>
-								
 								<td>
 									<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 										<tr>
@@ -132,20 +117,16 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/reporte_retribuciones_b.php' style="color:#000;text-decoration: none;"><?php echo 'Detalle de ' . __('Retribuciones') . ' por ' . __('Cobro'); ?></a></li>
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/reporte_retribuciones_resumen_b.php' style="color:#000;text-decoration: none;"><?php echo 'Resumen de ' . __('Retribuciones') . ' por ' . __('Profesional'); ?></a></li>
 													<?php } ?>
-
 												</ul>
 											</td>
 										</tr>
 									</table>
-									
 									<br/>
 								</td>
 							</tr>
-							
 							<?php if ( Conf::GetConf($sesion, 'ReportesAvanzados')) { ?>
 								<tr style='font-weight:bold'>
 									<td>
-								
 										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 											<tr>
 												<td rowspan="2" width="15%"><img src="<?php echo $img_dir ?>" alt=''/></td>
@@ -164,15 +145,12 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_participacion_abogado.php' style="color:#000;text-decoration: none;"><?php echo __('Participacion Abogado') ?></a></li>
 														<li><a href='reporte_consolidado.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte consolidado') ?></a></li>
 														<li><a href='reporte_anual.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte anual') ?></a></li>
-
 													</ul>
 												</td>
-
 											</tr>
 										</table>
 										<br/>
 									</td>
-
 									<td>
 										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 											<tr>
@@ -190,16 +168,13 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_alertas_graficas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Alertas') ?></a></li>
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_saldo.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Saldo Clientes') ?></a></li>
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_deudas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Antigüedad Deudas Clientes') ?></a></li>
-
 													</ul>
 												</td>
-
 											</tr>
 										</table>
 										<br/>
 									</td>
 								</tr>
-								
 							<?php } else {
 								$pagina->AddInfo(__('Hay un error con ese reporte por favor comunicarse con soporte.'));
 							} ?>
@@ -209,8 +184,6 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 			</tr>
 		</tbody>
 	</table>
-
 </form>
 <?php
 $pagina->PrintBottom();
-?>
