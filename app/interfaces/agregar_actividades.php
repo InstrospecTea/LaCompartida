@@ -3,26 +3,35 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('DAT'));
 $Pagina = new Pagina($Sesion);
-
 $Actividad = new Actividad($Sesion);
-
+$refresh_parent = false;
 if ($opcion == 'guardar') {
+	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+		$asunto = new Asunto($Sesion);
+		$codigo_asunto = $asunto->CodigoSecundarioACodigo($codigo_asunto_secundario);
+		$_REQUEST['codigo_asunto'] = $codigo_asunto;
+	}
+
 	$Actividad->Fill($_REQUEST, true);
 
-	if ($_REQUEST['activo'] == 1){
-		$Actividad->Edit("activo", "1");
+	if ($_REQUEST['activo'] == 1) {
+		$Actividad->Edit('activo', '1');
 	} else {
-		$Actividad->Edit("activo", "0");
+		$Actividad->Edit('activo', '0');
+	}
+
+	if (empty($Actividad->fields['codigo_asunto'])){
+		$Actividad->Edit('codigo_asunto', 'NULL');
+	} else {
+		$Actividad->Edit('codigo_asunto', $codigo_asunto);
 	}
 
 	if ($Actividad->Write()) {
 		$Pagina->AddInfo(__('Actividad guardada con éxito'));
-
-		echo '<script type="text/javascript">
-			if (window.opener !== undefined && window.opener.Refrescar) {
-				window.opener.Refrescar();
-			}
-			</script>';
+		if ($Actividad->fields['codigo_asunto'] == 'NULL') {
+			$Actividad->Edit('codigo_asunto', null);
+		}
+		$refresh_parent = true;
 	} else {
 		$Pagina->AddError(__('Por favor corrija lo siguiente: ') . implode(', ', $Actividad->error));
 	}
@@ -58,12 +67,20 @@ if ($Actividad->Loaded()) {
 }
 
 $Pagina->PrintTop($popup);
+$Form = new Form;
+
+if ($refresh_parent) {
+	$Form->Html->script_block('if (window.opener !== undefined && window.opener.Refrescar) {window.opener.Refrescar();}');
+}
 ?>
-
 <script type="text/javascript">
-
 	jQuery(document).ready(function() {
 		var glosa_actividad = jQuery('#glosa_actividad').val();
+
+		if (window.opener !== undefined && window.opener.Refrescar) {
+			window.opener.Refrescar();
+		}
+
 		if (!glosa_actividad){
 			jQuery('#td_check_activo').hide();
 			jQuery('#td_text_activo').hide();
@@ -71,22 +88,38 @@ $Pagina->PrintTop($popup);
 			jQuery('#td_check_activo').show();
 			jQuery('#td_text_activo').show();
 		}
+
+		jQuery('#form_actividades').submit(function(e) {
+			if (!Validar()) {
+				e.preventDefault();
+			}
+		});
 	});
 
-
-	function Validar(p) {
-		if (document.getElementById('codigo_actividad').value == '') {
+	function Validar() {
+		if (jQuery('#codigo_actividad').val() == '') {
 			alert('Debe ingresar un código.');
-			document.getElementById('codigo_actividad').focus();
-			return false;
-		}
-		if (document.getElementById('glosa_actividad').value == '') {
-			alert('Debe ingresar un título.');
-			document.getElementById('glosa_actividad').focus();
+			jQuery('#codigo_actividad').focus();
 			return false;
 		}
 
-		document.getElementById('form_actividades').submit();
+		if (jQuery('#glosa_actividad').val() == '') {
+			alert('Debe ingresar un título.');
+			jQuery('#glosa_actividad').focus();
+			return false;
+		}
+
+		if (jQuery('#codigo_cliente').val() && !jQuery('#codigo_asunto').val()) {
+			alert('Si selecciona un cliente debe seleccionar un asunto.');
+			return false;
+		}
+
+		if (jQuery('#codigo_cliente_secundario').size() && jQuery('#codigo_asunto_secundario').size()) {
+			if (jQuery('#codigo_cliente_secundario').val() && !jQuery('#codigo_asunto_secundario').val()) {
+				alert('Si selecciona un cliente debe seleccionar un asunto.');
+				return false;
+			}
+		}
 
 		return true;
 	}
@@ -131,25 +164,28 @@ $Pagina->PrintTop($popup);
 					<?php UtilesApp::CampoAsunto($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
 				</td>
 			</tr>
-			<tr>
-				<td align="right" id="td_text_activo">
-					<?php echo __('Activa'); ?>
-				</td>
-				<td align="left" id="td_check_activo">
-					<?php if ($Actividad->fields['activo'] == '1') {
-						$Habilitada = 'checked="checked"';
-					} else {
-						$Habilitada = '';
-					} ?>
-					<input type="checkbox" title="Al inactivar no sera listada en ingreso de horas" id="activo" name="activo" value="1" <?php echo $Habilitada ;?> onClick="CheckActivo();" >
-				</td>
-			</tr>
+			<?php if ($Actividad->Loaded()) { ?>
+				<tr>
+					<td><label for="activo"><?php echo __('Activa'); ?></label></td>
+					<td style="text-align:left">
+						<?php
+						$activo = ($Actividad->fields['activo'] == 1);
+						echo $Form->checkbox('activo', 1, $activo, array('id' => 'activo', 'title' => 'Al inactivar no sera listada en ingreso de horas', 'label' => false));
+						?>
+					</td>
+				</tr>
+			<?php } ?>
 		</table>
 	</fieldset>
 	<br />
 	<div class="fl">
-		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-save" onclick="Validar(jQuery('#form_actividades').get(0))"><?php echo __('Guardar'); ?></a>
-		<a class="btn botonizame" href="javascript:void(0);" icon="ui-icon-exit" onclick="window.close();" ><?php echo __('Cancelar'); ?></a>
+		<?php
+		echo $Form->icon_submit(__('Guardar'), 'save');
+		echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => "window.close();"));
+		?>
 	</div>
 </form>
-<?php $Pagina->PrintBottom($popup);
+
+<?php
+echo $Form->script();
+$Pagina->PrintBottom($popup);

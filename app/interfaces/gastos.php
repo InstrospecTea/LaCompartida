@@ -4,8 +4,10 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
 $gasto = new Gasto($sesion);
-$nuevo_modulo_gastos = UtilesApp::GetConf($sesion, 'NuevoModuloGastos');
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+
+$conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
+$conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
 
 set_time_limit(300);
 
@@ -35,7 +37,7 @@ function Opciones(& $fila) {
 	if ($editar) {
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Gasto',730,580,'agregar_gasto.php?id_gasto=$id_gasto&popup=1&prov=$prov');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 
-		if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) {
+		if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) {
 			$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 title=Eliminar></a>";
 		} else {
 			$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 title=Eliminar></a>";
@@ -55,7 +57,7 @@ function Monto(& $fila) {
 	if ($fila->fields['codigo_idioma'] != '') {
 		$idioma->Load($fila->fields['codigo_idioma']);
 	} else {
-		$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+		$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 	}
 
 	return $fila->fields['egreso'] > 0 ? $fila->fields[simbolo] . " " . number_format($fila->fields['monto_cobrable'], $fila->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '';
@@ -68,7 +70,7 @@ function Ingreso(& $fila) {
 	if ($fila->fields['codigo_idioma'] != '') {
 		$idioma->Load($fila->fields['codigo_idioma']);
 	} else {
-		$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+		$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 	}
 
 	return $fila->fields['ingreso'] > 0 ? $fila->fields['simbolo'] . " " . number_format($fila->fields['monto_cobrable'], $fila->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '';
@@ -86,7 +88,7 @@ if ($id_gasto != "") {
 }
 
 if ($opc == 'buscar') {
-	
+
 	if ($orden == "") {
 		$orden = "fecha DESC";
 	}
@@ -103,7 +105,7 @@ if ($opc == 'buscar') {
 	}
 
 	$idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-	$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+	$idioma_default->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 
 	$total_cta = number_format($gasto::TotalCuentaCorriente($sesion, $where), 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
 } else if ($opc == 'xls') {
@@ -116,7 +118,7 @@ if ($opc == 'buscar') {
 
 $pagina->titulo = __('Revisar Gastos');
 $pagina->PrintTop();
-
+$Form = new Form;
 if ($preparar_cobro == 1) {
 	$where = 1;
 
@@ -124,7 +126,7 @@ if ($preparar_cobro == 1) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
 	}
 
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if ($conf_codigo_secundario) {
 		if ($codigo_cliente_secundario) {
 			$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario' ";
 		}
@@ -134,7 +136,7 @@ if ($preparar_cobro == 1) {
 		}
 	}
 
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if ($conf_codigo_secundario) {
 
 		if ($codigo_asunto_secundario) {
 			$asunto = new Asunto($sesion);
@@ -193,7 +195,7 @@ if ($preparar_cobro == 1) {
 		}
 		//Por conf se permite el uso de la fecha desde
 		$fecha_ini_cobro = "";
-		if (UtilesApp::GetConf($sesion, 'UsarFechaDesdeCobranza') && $fecha_ini) {
+		if (Conf::GetConf($sesion, 'UsarFechaDesdeCobranza') && $fecha_ini) {
 			$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
 		}
 
@@ -238,10 +240,10 @@ if ($preparar_cobro == 1) {
 
 	function EliminaGasto(id) {
 	var form = document.getElementById('form_gastos');
-<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
-		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente_secundario').value + '&codigo_asunto=' + $('codigo_asunto_secundario').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo UtilesApp::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
+<?php if ($conf_codigo_secundario) { ?>
+		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente_secundario').value + '&codigo_asunto=' + $('codigo_asunto_secundario').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo Conf::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
 <?php } else { ?>
-		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente').value + '&codigo_asunto=' + $('codigo_asunto').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo UtilesApp::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
+		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente').value + '&codigo_asunto=' + $('codigo_asunto').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo Conf::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
 <?php } ?>
 
 	if (parseInt(id) > 0 && confirm('¿Desea eliminar el gasto seleccionado?') == true) {
@@ -250,36 +252,37 @@ if ($preparar_cobro == 1) {
 	}
 
 	function CargarContrato(asunto) {
-	var ajax_url = './ajax/ajax_gastos.php?opc=contratoasunto&codigo_asunto=' + asunto;
-			jQuery.getJSON(ajax_url, function(data) {
+		var ajax_url = './ajax/ajax_gastos.php?opc=contratoasunto&codigo_asunto=' + asunto;
+		jQuery.getJSON(ajax_url, function(data) {
 			if (data) {
-			jQuery('#id_contrato').val(data.id_contrato);
+				jQuery('#id_contrato').val(data.id_contrato);
 			}
-			});
+		});
 	}
 
 	function AgregarNuevo(tipo) {
-<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
-		var codigo_cliente = $('codigo_cliente_secundario').value;
-				var codigo_asunto = $('codigo_asunto_secundario').value;
-				var url_extension = "&codigo_cliente_secundario=" + codigo_cliente + "&codigo_asunto_secundario=" + codigo_asunto;
-<?php } else { ?>
-		var codigo_cliente = $('codigo_cliente').value;
-				var codigo_asunto = $('codigo_asunto').value;
-				var url_extension = "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto;
-<?php } ?>
+		var ancho = 730;
+		var alto = 560;
+		var provision = 'false';
 
-	if (tipo == 'provision') {
-	var urlo = "agregar_gasto.php?popup=1&prov=true" + url_extension;
-			var ancho = 730;
-			var alto = 400;
-	} else if (tipo == 'gasto') {
-	var urlo = "agregar_gasto.php?popup=1&prov=false" + url_extension;
-			var ancho = 730;
-			var alto = 570;
-	}
+		<?php if ($conf_codigo_secundario) { ?>
+			var codigo_cliente = $('codigo_cliente_secundario').value;
+			var codigo_asunto = $('codigo_asunto_secundario').value;
+			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente + "&codigo_asunto_secundario=" + codigo_asunto;
+		<?php } else { ?>
+			var codigo_cliente = $('codigo_cliente').value;
+			var codigo_asunto = $('codigo_asunto').value;
+			var url_extension = "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto;
+		<?php } ?>
 
-	nuovaFinestra('Agregar_Gasto', ancho, alto, urlo);
+		if (tipo == 'provision') {
+			provision = 'true';
+			alto = 500;
+		}
+
+		var urlo = "agregar_gasto.php?popup=1&prov=" + provision + url_extension;
+
+		nuovaFinestra('Agregar_Gasto', ancho, alto, urlo);
 	}
 
 	jQuery('document').ready(function() {
@@ -297,10 +300,10 @@ if ($preparar_cobro == 1) {
 			//jQuery(this).attr('disabled','disabled');
 <?php
 $pagina_excel = " jQuery('#form_gastos').attr('action','gastos.php?exportar_excel=1').submit();";
-if (UtilesApp::GetConf($sesion, 'ExcelGastosSeparado')) {
+if (Conf::GetConf($sesion, 'ExcelGastosSeparado')) {
 	$pagina_excel = "jQuery('#form_gastos').attr('action','gastos_xls_separado.php').submit();";
 }
-if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
+if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 	$pagina_excel = "jQuery('#form_gastos').attr('action','gastos_xls_por_encargado.php').submit();  ";
 }
 ?>
@@ -349,7 +352,7 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			return true;
 	} else if (from == 'datatables' || from == 'buscar') {
 	contratos = {};
-<?php if ($nuevo_modulo_gastos) { ?>
+<?php if ($conf_nuevo_modulo_gastos) { ?>
 		var id_contrato = jQuery('#id_contrato').val();
 				var params = jQuery('#form_gastos').serialize();
 				var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
@@ -411,19 +414,18 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			{ "bSortable":false, "aTargets": [ 2, 3, 4, 11, 12] },
 			{ "bVisible": false, "aTargets": [ 5, 10, 12, 14] },
 <?php
-if (!UtilesApp::GetConf($sesion, 'NumeroGasto')) {
+if (!Conf::GetConf($sesion, 'NumeroGasto')) {
 	echo ' { "bVisible": false, "aTargets": [ 0 ] },';
 }
 
-if (!UtilesApp::GetConf($sesion, 'NumeroOT')) {
+if (!Conf::GetConf($sesion, 'NumeroOT')) {
 	echo ' { "bVisible": false, "aTargets": [ 2 ] },';
 }
-//if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 
-if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
+if (!Conf::GetConf($sesion, 'UsarImpuestoPorGastos')) {
 	echo ' { "bVisible": false, "aTargets": [ 8 ] },';
 }
-if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
+if (!Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 	echo ' { "bVisible": false, "aTargets": [10 ] },';
 }
 ?>
@@ -513,9 +515,6 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 					top.window.jQuery('#dialogomodal').dialog('open').dialog('open').dialog('option', 'title', ' Editar Gastos Masivamente ').dialog("option", "buttons", {
 					"Modificar": function() {
 					jQuery.post('ajax/ajax_gastos.php?opc=actualizagastos', jQuery('#form_edita_gastos_masivos').serialize(), function(data) {
-					if (window.console) {
-					console.log(data);
-					}
 
 					}, 'jsonp');
 							jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
@@ -600,7 +599,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
                     <tr>
                         <td align=right><?php echo __('Asunto') ?></td>
                         <td nowrap colspan=3 align=left>
-							<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+							<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, 'CargarContrato(this.value)', '', false); ?>
                             <input type="hidden" name='id_contrato' id='id_contrato' value='<?php $id_contrato ?>' />
                         </td>
                     </tr>
@@ -634,7 +633,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 						<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ', apellido1,apellido2,',',nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $id_usuario_orden, "", __('Ninguno'), '200'); ?>
                     </td>
                 </tr>
-				<?php if (UtilesApp::GetConf($sesion, 'TipoGasto')) { ?>
+				<?php if (Conf::GetConf($sesion, 'TipoGasto')) { ?>
 					<tr>
 						<td align=right><?php echo __('Tipo de Gasto') ?></td>
 						<td align=left colspan=3>
@@ -653,7 +652,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
                     </td>
                     <td></td>
                 </tr>
-				<?php if (!$nuevo_modulo_gastos) { ?>
+				<?php if (!$conf_nuevo_modulo_gastos) { ?>
 					<tr>
 						<td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
 						<td colspan="2" align="left">
@@ -678,7 +677,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
                     </td>
                     <td></td>
                 </tr>
-				<?php if (UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) { ?>
+				<?php if (Conf::GetConf($sesion, 'UsarGastosCobrable')) { ?>
 					<tr>
 						<td align='right'><?php echo __('Cobrable') ?></td>
 						<td  align="left">
@@ -693,16 +692,22 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 				<?php } ?>
 
             </table>
-            <div  style="padding:10px;text-align:right;">
-                <a name="boton_buscar" id='boton_buscar' icon="find" class="btn botonizame buscargastos" rel="buscar" ><?php echo __('Buscar') ?></a>
-                <a name="boton_xls" id="boton_excel"  icon="xls" class="btn botonizame buscargastos"  rel="excel" ><?php echo __('Descargar Excel') ?></a>
-                <a name="boton_xls_resumen"  icon="xls" rel="excel_resumen" class="btn botonizame buscargastos" ><?php echo __('Descargar Resumen Excel') ?></a>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<?php if (!$nuevo_modulo_gastos) { ?>
-					&nbsp;<a href='javascript:void(0)' class="btn botonizame" icon="agregar" onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?php echo __('Agregar provisión') ?></a>
-				<?php } ?>
-                &nbsp;<a href='javascript:void(0)' class="btn botonizame"  icon="agregar"  onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?php echo __('Agregar') ?> <?php echo __('gasto') ?></a>
-            </div>
+
+            <div style="padding:10px;text-align:right;float:left;margin-left:120px">
+							<?php
+								echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'buscar'));
+								echo $Form->icon_button(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'class' => 'buscargastos', 'rel' => 'excel'));
+								echo $Form->icon_button(__('Descargar Resumen Excel'), 'xls', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'excel_resumen'));
+							?>
+						</div>
+						<div style="padding:10px;text-align:right;float:right;">
+							<?php
+								if (!$conf_nuevo_modulo_gastos) {
+									echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')"));
+								}
+								echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('gasto')"));
+							?>
+						</div>
 
         </fieldset>
         <br>
@@ -719,7 +724,7 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 
 </tr>
 </table>
-
+<?php echo $Form->script(); ?>
 <div id="totalcta" style='font-size:11px;z-index:999;'><b>
 		<?php
 		if ($opc == 'buscar') {

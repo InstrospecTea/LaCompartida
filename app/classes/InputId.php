@@ -196,95 +196,67 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		return $output;
 	}
 
-	function Javascript($sesion, $desde = "", $mje_error = "No existen asuntos para este cliente.")
-	{
+	function Javascript($sesion, $desde = "", $mje_error = "No existen asuntos para este cliente.") {
+
 		$output .= "<script type=\"text/javascript\">
 						cargando = false;
-
-						function SetSelectInputId(campo,select)
-						{
+						function SetSelectInputId(campo, select) {
 							var obj_select = document.getElementById(select);
 							var obj_campo = document.getElementById(campo);
 							obj_select.value = obj_campo.value;
-
-							if( obj_select.value != obj_campo.value && select != \"codigo_cliente\" && select != \"codigo_cliente_secundario\" ) {
-								CargarSelect(campo,select,\"cargar_asuntos_desde_campo\",jQuery('#soloasuntosactivos').is(':checked')?1:0);
+							if (obj_select.value != obj_campo.value && select != 'codigo_cliente' && select != 'codigo_cliente_secundario') {
+								CargarSelect(campo, select, 'cargar_asuntos_desde_campo', jQuery('#soloasuntosactivos').is(':checked') ? 1 : 0);
 							}
 						}
 
-						function SetCampoInputId(select,campo)
-						{
+						function SetCampoInputId(select, campo) {
 							var obj_select = document.getElementById(select);
 							var obj_campo = document.getElementById(campo);
 							obj_campo.value = obj_select.value;
 						}
 
-						function getHTTPObject()
-						{
-
-							if (typeof XMLHttpRequest != 'undefined') {
-								return new XMLHttpRequest();
-							}
-
-							try {
-								return new ActiveXObject(\"Msxml2.XMLHTTP\");
-							} catch (e) {
-
-								try {
-									return new ActiveXObject(\"Microsoft.XMLHTTP\");
-								} catch (e) {
-
-								}
-							}
-							return false;
-						}
-
-						function CargarSelect(id_origen,id_destino,accion,soloactivos)
-						{
+						function CargarSelect(id_origen, id_destino, accion, soloactivos) {
 							soloactivos = typeof soloactivos !== 'undefined' ? soloactivos : 1;
 
 							var select_origen = document.getElementById(id_origen);
 							var select_destino = document.getElementById(id_destino);
-							if(select_destino.tagName != 'SELECT'){
+							if (!jQuery('#' + id_destino).length || select_destino.tagName != 'SELECT') {
 								return;
 							}
 							var valor_original_destino = select_destino.value;
-							var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value+'&soloactivos='+soloactivos ;
+							var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value + '&soloactivos=' + soloactivos;
 
-							jQuery('#'+id_destino).addClass('loadingbar');
+							jQuery('#' + id_destino).addClass('loadingbar');
+							
+							jQuery.get(url, function(response) {
 
-							jQuery.get(url, function(response)
-							{
-
-								if(response.indexOf('|') != -1) {
+								if (response.indexOf('|') != -1) {
 									response = response.split('\\n');
-
-									if(response[0] != '') {
+									if (response[0] != '') {
 										response = response[0];
 									} else {
 										response = response[1];
 									}
 
 									var campos = response.split('~');
+									if (response.indexOf('VACIO|') != -1) {
 
-									if(response.indexOf('VACIO|') != -1) {
-
-										if( accion != \"cargar_asuntos_desde_campo\" ) {
+										if (accion != 'cargar_asuntos_desde_campo') {
 											select_destino.options.length = 1;
 										}
 
-										jQuery('#'+id_destino).removeClass('loadingbar');
+										jQuery('#' + id_destino).removeClass('loadingbar');
 
-										if( accion ==\"cargar_asuntos_desde_campo\" ) {
+										if (accion == 'cargar_asuntos_desde_campo') {
 
 											alert('".__('El código ingresado no existe')."');
-											jQuery('#'+id_origen).val('');
-											jQuery('#'+id_destino).val('');
+											jQuery('#' + id_origen).val('');
+											jQuery('#' + id_destino).val('');
 
-										} else if ( jQuery('#'+id_origen).val() != '') {
+										} else if (jQuery('#' + id_origen).val() != '') {
 											switch (accion) {
-												case \"cargar_actividades\":
-												case \"cargar_actividades_activas\":
+												case 'cargar_actividades':
+												case 'cargar_actividades_activas':
 													alert('No existen actividades activas para este cliente');
 													break;
 												default:
@@ -294,17 +266,17 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 									} else {
 
-										if(response.indexOf('noexiste') != -1 ) {
+										if (response.indexOf('noexiste') != -1) {
 											alert('".__('El código ingresado no existe')."');
 										}
 
-										jQuery('#'+id_destino).length = 1;
+										jQuery('#' + id_destino).length = 1;
 
-										for(i = 0; i < campos.length; i++) {
+										for (i = 0; i < campos.length; i++) {
 
 											valores = campos[i].split('|');
 
-											if( valores[0] == 'noexiste' ) {
+											if (valores[0] == 'noexiste') {
 												continue;
 											}
 
@@ -312,43 +284,39 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 											option.value = valores[0];
 											option.text = valores[1];
 
-											if (i == 0 && typeof(select_destino.options) != 'undefined') {
+											if (i == 0 && typeof (select_destino.options) != 'undefined') {
 												select_destino.options.length = 1;
 											}
 
 											try {
 												select_destino.add(option);
-											} catch(err) {
-												select_destino.add(option,null);
+											} catch (err) {
+												select_destino.add(option, null);
 											}
 										}
 
-										if( accion == \"cargar_asuntos_desde_campo\" ) {
+										if (accion == 'cargar_asuntos_desde_campo') {
 											select_destino.value = select_origen.value;
-										} else if(valor_original_destino) {
+										} else if (valor_original_destino) {
 											select_destino.value = valor_original_destino;
 										}
 
-										jQuery('#'+id_destino).removeClass('loadingbar');
+										jQuery('#' + id_destino).removeClass('loadingbar');
 
 										select_destino.onchange();
 									}
 
 								} else {
 
-									if(response.indexOf('head')!=-1) {
+									if (response.indexOf('head') != -1) {
 										alert('Sesión Caducada');
-										top.location.href='".Conf::Host()."';
+										top.location.href = '".Conf::Host()."';
 									} else {
 										alert(response);
 									}
 								}
 							});
-						};
-
-
-
-
+						}
 
 						function CargarSelectCliente(codigo)
 						{

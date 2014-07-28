@@ -274,7 +274,15 @@ $where .= " AND usuario.visible = 1";
 		}, function() {
 			jQuery(this).css({'background':'#FFF'});
 		});
+
+		jQuery('#asuntos').load(function() {
+			ResizeFrame();
+		});
 	});
+	function ResizeFrame() {
+		frame = jQuery('#asuntos');
+		frame.css('height', frame[0].contentWindow.document.body.offsetHeight + 'px');
+	}
 
 	function Refrescasemana(semana, usuario, eldiv, slide) {
 		semanaplus = semana.split('-');
@@ -323,114 +331,114 @@ $where .= " AND usuario.visible = 1";
 				Refrescasemana(lastweek,usuario,'lastweek');
 				calendario(semana);
 
-				jQuery('.trabajoabierto').draggable({
-					cursor: 'move',
-					containment: '#contienehoras',
-					revert: 'true',
-					helper:'clone'
-				});
+				jQueryUI.done(function() {
+					jQuery('.trabajoabierto').draggable({
+						cursor: 'move',
+						containment: '#contienehoras',
+						revert: 'true',
+						helper:'clone'
+					});
 
-				jQuery('.celdadias').droppable({
-					greedy: true,
-					accept: '.cajatrabajo',
-					addClasses: 'false',
-					drop: function (event,ui) {
-						var cuadrodestino = jQuery(this);
-						var cuando = cuadrodestino.attr('rel');
-						var idtrabajo = ui.draggable.attr('id');
-						jQuery(ui.draggable).children('span').remove();
+					jQuery('.celdadias').droppable({
+						greedy: true,
+						accept: '.cajatrabajo',
+						addClasses: 'false',
+						drop: function (event,ui) {
+							var cuadrodestino = jQuery(this);
+							var cuando = cuadrodestino.attr('rel');
+							var idtrabajo = ui.draggable.attr('id');
+							jQuery(ui.draggable).children('span').remove();
 
-						if (event.ctrlKey || event.altKey) {
-							ui.draggable.addClass('clon');
-							var Option = 'clonar';
-						} else {
-							var Option = 'cambiofecha';
+							if (event.ctrlKey || event.altKey) {
+								ui.draggable.addClass('clon');
+								var Option = 'clonar';
+							} else {
+								var Option = 'cambiofecha';
+							}
+
+							jQuery.ajax({
+								url: 'editar_trabajo.php',
+								data: {
+									id_trabajo: idtrabajo,
+									fecha: cuando,
+									opcion: Option,
+									popup: 1
+								},
+								type:'POST'
+							}).complete(function(dataresponse) {
+								var data = dataresponse.responseText;
+								var status = dataresponse.status;
+								if (status == 200) {
+									var arreglo = data.split('|');
+									if (event.ctrlKey || event.altKey) {
+										cuadrodestino.append(ui.draggable.clone());
+										jQuery('.clon').draggable({
+											cursor: 'move',
+											containment: '#contienehoras',
+											revert: 'true',
+											helper: 'clone'
+										}).attr({
+											'alt': 'clonado',
+											'id': arreglo[1]
+										}).removeClass('clon');
+									} else {
+										cuadrodestino.append(ui.draggable);
+									}
+
+									var maxaltura = 0;
+
+									jQuery('.totaldia').each(function() {
+										var time = 0;
+										var sumaaltura = 0;
+										jQuery('.cajatrabajo', jQuery(this).parent()).each(function() {
+											time = 1 * time + 1 * jQuery(this).attr('duracion');
+											sumaaltura = 1 * sumaaltura + 1 * jQuery(this).height();
+										});
+
+										maxaltura = sumaaltura > maxaltura ? sumaaltura : maxaltura;
+										jQuery(this).attr('duracion', time).attr('altura', sumaaltura).html(SecToTime(time));
+									});
+
+									jQuery(".celdadias").css({'height': maxaltura + 20});
+									jQuery("#contienehoras").css({'height': maxaltura + 120});
+
+									if (Option == 'clonar') {
+										jQuery('#totalsemana').html(arreglo[2]);
+										jQuery('#totalmes').html(arreglo[3]);
+									}
+								} else {
+									jQuery('#respuesta').html('<div  class="alert alert-error">' + dataresponse.responseText + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+								}
+							});
 						}
+					});
 
-						jQuery.ajax({
-							url: 'editar_trabajo.php',
-							data: {
+					jQuery('#hiddensemanasiguiente,#hiddensemanaanterior').droppable({
+						accept: '.cajatrabajo',
+						addClasses: 'false',
+						hoverClass: "ui-state-active",
+						drop: function (event,ui) {
+							var cuando = jQuery(this).attr('title');
+							var idtrabajo = ui.draggable.attr('id');
+							jQuery(ui.draggable).children('span').remove();
+							if(event.ctrlKey || event.altKey) {
+								var Option = 'clonar';
+							} else {
+							jQuery(this).append(ui.draggable);
+								var Option = 'cambiofecha';
+							}
+							jQuery.post('editar_trabajo.php', {
 								id_trabajo: idtrabajo,
 								fecha: cuando,
 								opcion: Option,
 								popup: 1
-							},
-							type:'POST'
-						}).complete(function(dataresponse) {
-							var data = dataresponse.responseText;
-							var status = dataresponse.status;
-							if (status == 200) {
+							}, function(data) {
 								var arreglo = data.split('|');
-								if (event.ctrlKey || event.altKey) {
-									cuadrodestino.append(ui.draggable.clone());
-									jQuery('.clon').draggable({
-										cursor: 'move',
-										containment: '#contienehoras',
-										revert: 'true',
-										helper: 'clone'
-									}).attr({
-										'alt': 'clonado',
-										'id': arreglo[1]
-									}).removeClass('clon');
-								} else {
-									cuadrodestino.append(ui.draggable);
-								}
-
-								var maxaltura = 0;
-
-								jQuery('.totaldia').each(function() {
-									var time = 0;
-									var sumaaltura = 0;
-									jQuery('.cajatrabajo', jQuery(this).parent()).each(function() {
-										time = 1 * time + 1 * jQuery(this).attr('duracion');
-										sumaaltura = 1 * sumaaltura + 1 * jQuery(this).height();
-									});
-
-									maxaltura = sumaaltura > maxaltura ? sumaaltura : maxaltura;
-									jQuery(this).attr('duracion', time).attr('altura', sumaaltura).html(SecToTime(time));
-								});
-
-								jQuery(".celdadias").css({'height': maxaltura + 20});
-								jQuery("#contienehoras").css({'height': maxaltura + 120});
-
-								if (Option == 'clonar') {
-									jQuery('#totalsemana').html(arreglo[2]);
-									jQuery('#totalmes').html(arreglo[3]);
-								}
-							} else {
-								jQuery('#respuesta').html('<div  class="alert alert-error">' + dataresponse.responseText + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
-							}
-						});
-					}
-				});
-
-				jQuery('#hiddensemanasiguiente,#hiddensemanaanterior').droppable({
-					accept: '.cajatrabajo',
-					addClasses: 'false',
-					hoverClass: "ui-state-active",
-					drop: function (event,ui) {
-						var cuando = jQuery(this).attr('title');
-						var idtrabajo = ui.draggable.attr('id');
-						jQuery(ui.draggable).children('span').remove();
-						if(event.ctrlKey || event.altKey) {
-							var Option = 'clonar';
-						} else {
-
-						jQuery(this).append(ui.draggable);
-							var Option = 'cambiofecha';
+								jQuery('#semanactual').val(cuando);
+								jQuery('#versemana').click();
+							});
 						}
-
-						jQuery.post('editar_trabajo.php', {
-							id_trabajo: idtrabajo,
-							fecha: cuando,
-							opcion: Option,
-							popup: 1
-						}, function(data) {
-							var arreglo = data.split('|');
-							jQuery('#semanactual').val(cuando);
-							jQuery('#versemana').click();
-						});
-					}
+					});
 				});
 			}
 		});
@@ -467,7 +475,7 @@ $where .= " AND usuario.visible = 1";
 	<tr>
 		<td align=center>
 			<div id="Iframe" class="tb_base" style="width:750px;">
-				<iframe id='asuntos' name='asuntos' target="asuntos"  class="resizableframe" id='asuntos' scrolling="no" src="editar_trabajo.php?popup=1&id_trabajo=<?php echo $id_trab; ?>&opcion=<?php echo $opcion; ?>" frameborder="0" style="width: 90%; height: 370px;"></iframe>
+				<iframe id="asuntos" name="asuntos" target="asuntos" class="" scrolling="no" src="editar_trabajo.php?popup=1&id_trabajo=<?php echo $id_trab; ?>&opcion=<?php echo $opcion; ?>" frameborder="0" style="width:90%; height:370px;"></iframe>
 			</div>
 			<br/>
 		</td>
@@ -478,7 +486,7 @@ $where .= " AND usuario.visible = 1";
 					<table width='90%'>
 						<tr>
 							<td align='left' width='3%'>
-								<?php if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
+								<?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
 									<input type="image" src='<?php echo Conf::ImgDir() . "/izquierda_nuevo.gif"; ?>' class='mano_on cambiasemana' id="antsemana" value="">
 								<?php } else { ?>
 									<img src='<?php echo Conf::ImgDir() . "/izquierda.gif"; ?>' <?php echo $tip_anterior; ?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_anterior; ?>')">
@@ -507,7 +515,7 @@ $where .= " AND usuario.visible = 1";
 								<input type='button' class='btn' value="Ver semana" id="versemana">
 							</td>
 							<td align='right' width='3%'>
-								<?php if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
+								<?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
 									<input type="image" src='<?php echo Conf::ImgDir() . "/derecha_nuevo.gif" ?>'  class='mano_on cambiasemana'  id="proxsemana" value="">
 								<?php } else { ?>
 									<img src='<?php echo Conf::ImgDir() . "/derecha.gif" ?>' <?php echo $tip_siguiente ?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_siguiente ?>')">

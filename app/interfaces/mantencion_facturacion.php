@@ -1,8 +1,5 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 require_once Conf::ServerDir().'/../fw/funciones/funciones.php';
 require_once Conf::ServerDir().'/../fw/tablas/funciones_mantencion_tablas.php';
 $sesion = new Sesion('');
@@ -25,7 +22,7 @@ if($tabla == "")
 var cols_no_edit='<?php echo $columnas_no_editables[$tabla];?>';
 
 var valor_original = '';
-function editCell(id, cellSpan, tabla) 
+function editCell(id, cellSpan, tabla)
 {
 	var inputWidth = (document.getElementById(id).offsetWidth / 40);
 	var oldCellSpan = cellSpan.innerHTML;
@@ -46,21 +43,21 @@ function editCell(id, cellSpan, tabla)
 	document.getElementById(id+"input").value = oldCellSpan;
 	document.getElementById(id+"input").focus();
 }
-function parseForm(cellID, inputID, tabla) 
+function parseForm(cellID, inputID, tabla)
 {
 	var temp = document.getElementById(inputID).value;
 	var obj = /^(\s*)([\W\w]*)(\b\s*$)/;
-	if (obj.test(temp)) 
-	{ 
-		temp = temp.replace(obj, '$2'); 
+	if (obj.test(temp))
+	{
+		temp = temp.replace(obj, '$2');
 	}
 	var obj = /  /g;
 	while (temp.match(obj)) { temp = temp.replace(obj, " "); }
-	if (temp == " ") 
-	{ 
-		temp = ""; 
+	if (temp == " ")
+	{
+		temp = "";
 	}
-	if (! temp) 
+	if (! temp)
 	{
 		alert("Este campo debe contener al menos un carácter visible.");
 		return;
@@ -80,15 +77,15 @@ function GuardarCampo(id_celda, valor_actual, tabla)
 	//si no ha modificado nada, no realiza ningun cambio
 	if(valor_actual == valor_original)
 		return false;
-	
-	
+
+
 	aux = id_celda.split("-|-");
 	campo = aux[0];
 	pkey = aux[1];
-	
+
 	// verificar si la columna no es editable
 	col_no_edit = cols_no_edit.split(",");
-	for(var x = 0; x < col_no_edit.length; x++) {	
+	for(var x = 0; x < col_no_edit.length; x++) {
 		if(campo == col_no_edit[x]){
 			alert('Este dato no es editable');
 			document.getElementById(id_celda).innerHTML = "<div class='dynaDiv'>" + valor_original  + "</div>";
@@ -104,7 +101,7 @@ function GuardarCampo(id_celda, valor_actual, tabla)
 			document.getElementById(id_celda).innerHTML = "<div class='dynaDiv' onclick=\"editCell('" + id_celda + "',this);\">" + valor_original + "</div>";
 		return false;
 	}
-	
+
 	var http = getXMLHTTP();
 	url = '<?=Conf::Host()?>/fw/tablas/ajax_tablas.php?accion=guardar_campo&campo=' + campo + '&pkey=' + pkey + '&valor=' + valor_actual + '&tabla=<?= $tabla ?>';
 	http.open('get', url);
@@ -120,7 +117,7 @@ function GuardarCampo(id_celda, valor_actual, tabla)
 
 		offLoading();
 
-		if(response.indexOf('OK') == -1) 
+		if(response.indexOf('OK') == -1)
 		{
 			alert(sacarHTML(response));
 			location.reload();
@@ -130,7 +127,7 @@ function GuardarCampo(id_celda, valor_actual, tabla)
 http.send(null);
 return;
 }
-function sacarHTML( strSrc ) 
+function sacarHTML( strSrc )
 {
 	return ( strSrc.replace( /<[^<|>]+?>/gi,'' ) );
 }
@@ -157,7 +154,7 @@ function AgregarOpciones(id_select , tabla_punto_id, selected)
 		response = response.split('\n');
 		resp = response[0];
 
-		if(resp.indexOf('|') != -1) 
+		if(resp.indexOf('|') != -1)
 		{
 			opciones = resp.split('|');
 			select = document.getElementById(id_select);
@@ -178,7 +175,7 @@ return;
 }
 </script>
 <style type="text/css">
-.dynaInput 
+.dynaInput
 {
 	border: none;
 	background: #ffc;
@@ -187,7 +184,7 @@ return;
 	height: 100%;
 }
 
-.dynaDiv 
+.dynaDiv
 {
 	display: block;
 	height: 100%;
@@ -199,7 +196,7 @@ return;
 </style>
 <?
 	$tooltip_agregar = __('Haga clic sobre esta imagen para ingresar una nueva fila a esta tabla.');
-	 if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) 
+	 if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) )
 			{
 				$width = '90%';
 				$width_adentro = '20%';
@@ -210,7 +207,7 @@ return;
 		 		$width = '90%';
 				$width_adentro = '80%';
 				$width_adentro_2 = '100%';
-		 	} 
+		 	}
 ?>
 
 <table width=<?=$width ?> align="center">
