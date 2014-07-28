@@ -1214,7 +1214,7 @@ else
 	<table width="100%" cellspacing="3" cellpadding="3">
 		<tr>
 			<td align="left" style="background-color: #A3D55C; color: #000000; font-size: 14px; font-weight: bold;">
-				<?php echo __('parámetros del Cobro') ?>
+				<?php echo __('Parámetros del Cobro') ?>
 			</td>
 		</tr>
 	</table>
