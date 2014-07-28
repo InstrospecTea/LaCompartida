@@ -34,8 +34,12 @@ if ($xls) {
 		$where .= " AND cli.codigo_cliente = '$codigo_cliente' ";
 	}
 
-	if (!empty($fecha1) && !empty($fecha2)){
-		$where .=" AND cp.fecha_cobro BETWEEN '".$fecha1."' AND '".$fecha2."' ";
+	if (!empty($fecha1)) {
+		$where .=' AND cp.fecha_cobro >= \''.$fecha1.'\'';
+	}
+
+	if (!empty($fecha2)) {
+		$where .=' AND cp.fecha_cobro <= \''.$fecha2.'\'';
 	}
 
 	if ($mostrar_con_cobro){
@@ -44,7 +48,7 @@ if ($xls) {
 
 	$query_excel = "SELECT
     				cli.glosa_cliente AS glosa_cliente,
-    				asu.glosa_asunto AS glosa_asunto,
+    				GROUP_CONCAT(DISTINCT asu.glosa_asunto ORDER BY asu.glosa_asunto) AS glosa_asunto,
     				cp.monto_estimado AS monto_estimado,
     				pmcp.simbolo AS moneda_estimada,
     				IF(cp.fecha_cobro IS NULL, DATE_FORMAT(cob.fecha_emision,'%d-%m-%Y'), DATE_FORMAT(cp.fecha_cobro,'%d-%m-%Y')) AS fecha_cobro, 
@@ -70,7 +74,9 @@ if ($xls) {
 
 					WHERE $where
 					AND monto_estimado != 0
+					GROUP BY cli.codigo_cliente
 					#AND cp.hito = 1";
+
 
 	$resultado = mysql_query($query_excel, $sesion->dbh) or Utiles::errorSQL($query_excel, __FILE__, __LINE__, $sesion->dbh);
 
@@ -181,7 +187,7 @@ if ($xls) {
 	$worksheet->write($celda_periodo_reporte,0, $periodo,$glosa_detalle_documento_left);
 
 	$worksheet->write($fila_encabezado, $columna_glosa_cliente, __('Glosa Cliente'), $encabezados_borde);
-	$worksheet->write($fila_encabezado, $columna_glosa_asunto, __('Glosa Asunto'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_glosa_asunto, __('Asuntos'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_monto_estimado, __('Monto Estimado'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_moneda_estimada, __('Moneda'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_fecha_cobro, __('Fecha Cobro'), $encabezados_borde);
