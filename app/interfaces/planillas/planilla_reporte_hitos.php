@@ -68,7 +68,8 @@ if ($xls) {
 		->add_left_join_with('prm_moneda AS pmcob', CriteriaRestriction::equals('cob.id_moneda', 'pmcob.id_moneda'))
 		->add_left_join_with('asunto AS asu', CriteriaRestriction::equals('con.id_contrato', 'asu.id_contrato'))
 		->add_left_join_with('cliente AS cli', CriteriaRestriction::equals('con.codigo_cliente', 'cli.codigo_cliente'))
-		->add_grouping('cli.codigo_cliente');
+		->add_grouping('cli.codigo_cliente')
+		->add_restriction(CriteriaRestriction::equals('cp.hito', '1'));
 
 	$resultado = $criteria->run();
 
