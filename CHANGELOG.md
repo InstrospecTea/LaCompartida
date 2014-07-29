@@ -1,5 +1,10 @@
 # Changelog
 
+## Release: 14.7.0
+Martes 29 de Julio 2014
+* **Fixed:** [Feature/combobox asuntos](https://github.com/LemontechSA/ttb/pull/608)
+* **Fixed:** [Feature/reporte hitos](https://github.com/LemontechSA/ttb/pull/587)
+
 ## Hotfix: 14.6.2
 Viernes 25 de Julio 2014
 * **Fixed:** [Corrige seleccion de asuntos al generar cobro](https://github.com/LemontechSA/ttb/pull/606)
