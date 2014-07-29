@@ -97,24 +97,19 @@ EOF;
 								},
 								function (data) {
 									response(data);
-									if (jQuery('#glosa_asunto').data('autoselect')) {
-										var am = jQuery('#glosa_asunto').data('autocomplete').menu.activeMenu;
-										jQuery(am).find('li.ui-menu-item a').click();
-									}
 								}, 'json'
 							);
 						},
 						select: function(event, ui) {
-							jQuery('#glosa_asunto').val(ui.item.value);
-							if (jQuery('#glosa_asunto').data('autoselect')) {
-								jQuery('#glosa_asunto').data('autoselect', 0);
-								return;
-							}
 							jQuery('#{$campo_codigo_asunto}').val(ui.item.id);
 							CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 							jQuery('#{$campo_codigo_asunto}').change();
 						},
 						change: function (event, ui) {
+							if (jQuery(this).data('autoselect')) {
+								jQuery(this).data('autoselect', 0);
+								return;
+							}
 							if(!ui.item){
 								$borra_glosa
 								jQuery('#{$campo_codigo_asunto}').val('');
@@ -135,9 +130,7 @@ EOF;
 				var url = root_dir + '/app/ajax.php';
 				jQuery.get(url, {accion:'cargar_glosa_asunto', codigo_asunto: codigo_asunto}, function(response) {
 					if (response) {
-						jQuery('#glosa_asunto')
-							.data('autoselect', 1)
-							.autocomplete('search', response.glosa_asunto);
+						jQuery('#glosa_asunto').val(response.glosa_asunto).data('autoselect', 1);
 					} else {
 						jQuery('#glosa_asunto').val();
 					}
