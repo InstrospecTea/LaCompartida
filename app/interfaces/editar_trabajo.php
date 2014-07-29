@@ -424,7 +424,7 @@ if ($refresh_parent) {
     <?php } ?>
 
     <input type="hidden" name=id_cobro id=id_cobro value="<?php echo $t->fields['id_cobro'] != 'NULL' ? $t->fields['id_cobro'] : '' ?>" />
-    <input type="hidden" name=popup value='<?php echo $popup ?>' id="popup">
+    <input type="hidden" name=popup value='<?php echo $popup ?>' id="popup"/>
 
     <!-- TABLA HISTORIAL -->
     <?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) {
@@ -579,22 +579,22 @@ if ($refresh_parent) {
 
         <?php if ((Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) && ($permiso_revisor || $permiso_profesional)) { ?>
             <tr id="actividades">
-                <?php
-                    if ($t->Loaded()) {
-                ?>
+                <?php if ($t->Loaded()) { ?>
                     <td colspan="2" align=right>
                         <?php echo __('Actividad'); ?>
                     </td>
                     <td align=left width="440" nowrap>
                         <?php echo InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['codigo_asunto']); ?>
                     </td>
-                <?php
-                    }
-                ?>
+                <?php } ?>
             </tr>
         <?php } else { ?>
-            <input type="hidden" name="codigo_actividad" id="codigo_actividad">
-            <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
+			<tr style="display:none">
+				<td>
+					<input type="hidden" name="codigo_actividad" id="codigo_actividad"/>
+					<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad"/>
+				</td>
+			</tr>
         <?php } ?>
 
         <!--
@@ -722,7 +722,7 @@ if ($refresh_parent) {
 
                             $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
                             list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();", $sesion->dbh));
-                            $select_usuario = Html::SelectResultado($sesion, $resp, "id_usuario", $id_usuario, 'onchange="CargarTarifa();" id="id_usuario"', '', 'width="200"');
+                            $select_usuario = Html::SelectResultado($sesion, $resp, "id_usuario", $id_usuario, 'onchange="CargarTarifa();"', '', 200);
 
                             if ($permiso_revisor || Conf::GetConf($sesion, 'AbogadoVeDuracionCobrable') || $permiso_revisor_usuario) {
 
@@ -742,13 +742,13 @@ if ($refresh_parent) {
                                 }
                                 ?>
                             </td>
-                            <?php
-                        } else {
-                            echo '<input type="hidden" name="duracion_cobrada" id="duracion_cobrada" value="" />';
-                            echo '<input type="hidden" name="hora_duracion_cobrada" id="hora_duracion_cobrada" value="" />';
-                            echo '<input type="hidden" name="minuto_duracion_cobrada" id="minuto_duracion_cobrada" value="" />';
-                        }
-                        ?>
+						<?php } else { ?>
+							<td>
+								<input type="hidden" name="duracion_cobrada" id="duracion_cobrada" value="" />
+								<input type="hidden" name="hora_duracion_cobrada" id="hora_duracion_cobrada" value="" />
+								<input type="hidden" name="minuto_duracion_cobrada" id="minuto_duracion_cobrada" value="" />
+							</td>
+                        <?php } ?>
                     </tr>
                 </table>
             </td>
@@ -768,9 +768,8 @@ if ($refresh_parent) {
                 ?>
             </td>
             <td align=left>
-                <textarea id="descripcion" cols=45 rows=4 name=descripcion><?php echo stripslashes($t->fields[descripcion]) ?></textarea></td>
-
-
+                <textarea id="descripcion" cols=45 rows=4 name=descripcion><?php echo stripslashes($t->fields[descripcion]) ?></textarea>
+			</td>
         </tr>
         <tr>
             <?php
@@ -786,9 +785,9 @@ if ($refresh_parent) {
             </td>
             <td align=left>
                 <?php if ($mostrar_cobrable) { ?>
-                    <input type="checkbox" style="display:inline;" name="cobrable" <?php echo ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
+                    <input type="checkbox" style="display:inline;" name="cobrable" <?php echo ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();"/>
                 <?php } else { ?>
-                    <input type="hidden" name="cobrable" id="chkCobrable" value='1' >
+                    <input type="hidden" name="cobrable" id="chkCobrable" value='1' />
                 <?php } ?>
                 &nbsp;&nbsp;
                 <div id=divVisible style="display:inline">
@@ -804,17 +803,17 @@ if ($refresh_parent) {
                 <?php
                 // Depende de que no cambie la función Html::SelectQuery(...)
                 if ($cantidad_usuarios > 1 || $permiso_secretaria) {
-                    echo(__('Usuario'));
-                    echo($select_usuario);
+                    echo __('Usuario');
+                    echo $select_usuario;
                 } else {
-                    echo("<input type='hidden' id='id_usuario' name='id_usuario' value='" . $sesion->usuario->fields['id_usuario'] . "' />");
+                    echo $Form->input('id_usuario', $sesion->usuario->fields['id_usuario'], array('id' => 'id_usuario'));
                 }
                 ?>
             </td>
         </tr>
 
         <?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora') && $permiso_revisor) {
-            if ($t->fields['id_trabajo'] > 0) {
+            if ($t->Loaded()) {
                 if ($t->fields['id_cobro'] > 0) {
                     $cobro = new Cobro($sesion);
                     $cobro->Load($t->fields['id_cobro']);
@@ -889,15 +888,14 @@ if ($refresh_parent) {
                 <?php
             }
         }
-        if (isset($t) && $t->Loaded() && $opcion != 'nuevo') {
-            echo("<tr><td colspan=5 align=center>");
-            echo("<a onclick=\"return confirm('" . __('¿Desea eliminar este trabajo?') . "')\" href=?opcion=eliminar&id_trabajo=" . $t->fields['id_trabajo'] . "&popup=$popup><span style=\"border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar este trabajo&nbsp;</span></a>");
-            echo("</td></tr>");
-        }
         ?>
         <tr>
             <td colspan='3' align='right'>
+				<?php if (isset($t) && $t->Loaded() && $opcion != 'nuevo') { ?>
+					<?php echo $Form->button(__('Eliminar este trabajo'), array('onclick' => "return confirm('" . __('¿Desea eliminar este trabajo?') . "')", 'href' => "?opcion=eliminar&id_trabajo={$t->fields['id_trabajo']}&popup={$popup}", 'class' => 'btn_rojo', 'style' => 'margin-right: 2em;')); ?>
 				<?php
+				}
+
 				$onclick = ($id_tabajo > 0) ? 'Confirmar' : 'Validar';
 				echo $Form->button(__('Guardar'), array('onclick' => "$onclick(jQuery('#form_editar_trabajo')[0])"));
 				?>
@@ -1652,4 +1650,3 @@ function Substring($string) {
 <?php
 echo SelectorHoras::Javascript();
 $pagina->PrintBottom($popup);
-?>
