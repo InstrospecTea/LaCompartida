@@ -28,7 +28,7 @@ if ($codigo_cliente) {
 	$query_filter = "AND {$tabla}.{$campo_codigo_cliente} = '{$codigo_cliente}'";
 }
 
-if ($find_all && empty($glosa_asunto)) {
+if (empty($glosa_asunto)) {
 	$limit = 500;
 } else {
 	$query_filter .= "AND LOWER(asunto.glosa_asunto) LIKE '%{$glosa_asunto}%' ";
