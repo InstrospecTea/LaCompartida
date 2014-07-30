@@ -248,7 +248,7 @@ class Criteria {
 	 */
 	private function generate_where_statement() {
 		if (count($this->where_clauses) > 0) {
-			return $this->where . ' ' . implode(',', $this->where_clauses);
+			return $this->where . ' ' . implode(' AND ', $this->where_clauses);
 		} else {
 			return '';
 		}

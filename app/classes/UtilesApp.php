@@ -130,7 +130,7 @@ class UtilesApp extends Utiles {
 		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
 			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
 
-			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, true, $width, $oncambio, $forceMatch);
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $width, $oncambio, $forceMatch);
 			echo AutocompletadorAsunto::Javascript($sesion);
 		} else {
 			if ($oncambio == '') {
