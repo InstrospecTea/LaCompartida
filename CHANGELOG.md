@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.7.1
+Miércoles 30 de Julio 2014
+* **Fixed:** [Elimina variable que no se envía.](https://github.com/LemontechSA/ttb/pull/610)
+
 ## Release: 14.7.0
 Martes 29 de Julio 2014
 * **Fixed:** [Feature/combobox asuntos](https://github.com/LemontechSA/ttb/pull/608)
