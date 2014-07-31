@@ -168,7 +168,6 @@ if ($xls) {
 	if (!$ocultar_ultimo_trabajo) {
 		$col_ultimo_trabajo = ++$col;
 	}
-
 	if (Conf::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar')) {
 		$col_ultimo_gasto = ++$col;
 		$col_monto_gastos = ++$col;
@@ -176,6 +175,7 @@ if ($xls) {
 	}
 	if (!$ocultar_ultimo_cobro) {
 		$col_ultimo_cobro = ++$col;
+		$col_id_ultimo_cobro = ++$col;
 	}
 	if (!$ocultar_estado_ultimo_cobro) {
 		$col_estado_ultimo_cobro = ++$col;
@@ -231,6 +231,7 @@ if ($xls) {
 	}
 	if (!$ocultar_ultimo_cobro) {
 		$ws1->setColumn($col_ultimo_cobro, $col_ultimo_cobro, 14);
+		$ws1->setColumn($col_id_ultimo_cobro, $col_id_ultimo_cobro, 14);
 	}
 	if (!$ocultar_estado_ultimo_cobro) {
 		$ws1->setColumn($col_estado_ultimo_cobro, $col_estado_ultimo_cobro, 22);
@@ -290,6 +291,7 @@ if ($xls) {
 	}
 	if (!$ocultar_ultimo_cobro) {
 		$ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
+		$ws1->write($filas, $col_id_ultimo_cobro, 'Nº '. __('Último cobro'), $formato_titulo);
 	}
 	if (!$ocultar_estado_ultimo_cobro) {
 		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
@@ -502,11 +504,14 @@ if ($xls) {
 			$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
 			$ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
 		}
+
 		if (!$ocultar_ultimo_cobro) {
 			if ($separar_asuntos) {
 				$ws1->write($filas, $col_ultimo_cobro, $ultimocobro[$cobro['codigo_asunto']]['fecha_emision'] != '' ? Utiles::sql2fecha($ultimocobro[$cobro['codigo_asunto']]['fecha_emision'], $formato_fecha, "-") : '', $formato_texto);
+				$ws1->write($filas, $col_id_ultimo_cobro, $ultimocobro[$cobro['codigo_asunto']]['id_cobro'] != '' ? $ultimocobro[$cobro['codigo_asunto']]['id_cobro'] : '',  $formato_texto);
 			} else {
 				$ws1->write($filas, $col_ultimo_cobro, $ultimocobro[$id_contrato]['fecha_emision'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_emision'], $formato_fecha, "-") : '', $formato_texto);
+				$ws1->write($filas, $col_id_ultimo_cobro, $ultimocobro[$id_contrato]['id_cobro'] != '' ? $ultimocobro[$id_contrato]['id_cobro'] : '',  $formato_texto);
 			}
 		}
 
@@ -672,6 +677,7 @@ if ($xls) {
 		// paso si todavia estamos en el mismo contrato, importante por el tema del descuento
 		$id_contrato_anterior = $id_contrato;
 	}
+
 
 	if ($fila_inicial != ($filas + 2)) {
 		// Escribir totales
