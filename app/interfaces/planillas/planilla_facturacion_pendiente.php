@@ -77,7 +77,6 @@ if ($xls) {
 	$fdd->setNumFormat(0.0);
 
 	$mostrar_encargado_secundario = Conf::GetConf($sesion, 'EncargadoSecundario');
-
 	$formatos_moneda = array();
 	foreach ($arreglo_monedas as $id_m => $m) {
 		$cifras_decimales = $m['cifras_decimales'];
@@ -145,10 +144,8 @@ if ($xls) {
 	$filas +=2;
 	$ws1->write($filas, 1, __('GENERADO EL:'), $formato_texto);
 	$ws1->write($filas, 2, date("d-m-Y H:i:s"), $formato_texto);
-
 	$filas +=4;
 	$col = 0;
-
 	$col_cliente = ++$col;
 	if (!$ocultar_encargado) {
 		$col_usuario_encargado = ++$col;
@@ -382,48 +379,48 @@ if ($xls) {
 	}
 
 	$querycobros = "SELECT
-										GROUP_CONCAT( asunto.codigo_asunto ) AS codigos_asuntos,
-										$codigos_asuntos_secundarios
-										asunto.glosa_asunto,
-										GROUP_CONCAT( asunto.glosa_asunto ) AS asuntos,
-										asunto.codigo_asunto,
-										$codigo_asunto_secundario_sep
-										GROUP_CONCAT( IF(asunto.cobrable = 1, 'SI', 'NO') ) AS asuntos_cobrables,
-										cliente.glosa_cliente,
-										GROUP_CONCAT( cliente.glosa_cliente ) AS clientes,
-										CONCAT_WS(' ', ec.nombre, ec.apellido1, ec.apellido2) AS nombre_encargado_comercial,
-										ec.username as username_encargado_comercial,
-										CONCAT_WS(' ', es.nombre, es.apellido1, es.apellido2) AS nombre_encargado_secundario,
-										es.username as username_encargado_secundario,
-										contrato.id_contrato,
-										contrato.monto,
-										contrato.forma_cobro,
-										contrato.id_moneda as id_moneda_contrato,
-										contrato.opc_moneda_total as id_moneda_total
-									FROM asunto
-									LEFT JOIN contrato USING( id_contrato )
-									LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-									LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
-									LEFT JOIN usuario as es ON es.id_usuario = " . ($AtacheSecundarioSoloAsunto ? "asunto.id_encargado" : "contrato.id_usuario_secundario") . "
-									WHERE $where
-									AND (
-										( SELECT count(*)
-											FROM trabajo
-											 WHERE trabajo.codigo_asunto = asunto.codigo_asunto
-												AND trabajo.cobrable = 1
-												AND trabajo.id_tramite = 0
-												AND trabajo.duracion_cobrada != '00:00:00'
-												AND $where_trabajo
-										) > 0
-										OR ( SELECT count(*)
-											FROM cta_corriente
-											WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto
-												AND cta_corriente.cobrable = 1
-												AND cta_corriente.monto_cobrable > 0
-												AND $where_gasto
-										) > 0
-									)
-									GROUP BY $group_by ";
+					GROUP_CONCAT( asunto.codigo_asunto ) AS codigos_asuntos,
+					$codigos_asuntos_secundarios
+					asunto.glosa_asunto,
+					GROUP_CONCAT( asunto.glosa_asunto ) AS asuntos,
+					asunto.codigo_asunto,
+					$codigo_asunto_secundario_sep
+					GROUP_CONCAT( IF(asunto.cobrable = 1, 'SI', 'NO') ) AS asuntos_cobrables,
+					cliente.glosa_cliente,
+					GROUP_CONCAT( cliente.glosa_cliente ) AS clientes,
+					CONCAT_WS(' ', ec.nombre, ec.apellido1, ec.apellido2) AS nombre_encargado_comercial,
+					ec.username as username_encargado_comercial,
+					CONCAT_WS(' ', es.nombre, es.apellido1, es.apellido2) AS nombre_encargado_secundario,
+					es.username as username_encargado_secundario,
+					contrato.id_contrato,
+					contrato.monto,
+					contrato.forma_cobro,
+					contrato.id_moneda as id_moneda_contrato,
+					contrato.opc_moneda_total as id_moneda_total
+				FROM asunto
+				LEFT JOIN contrato USING( id_contrato )
+				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+				LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+				LEFT JOIN usuario as es ON es.id_usuario = " . ($AtacheSecundarioSoloAsunto ? "asunto.id_encargado" : "contrato.id_usuario_secundario") . "
+				WHERE $where
+				AND (
+					( SELECT count(*)
+						FROM trabajo
+						 WHERE trabajo.codigo_asunto = asunto.codigo_asunto
+							AND trabajo.cobrable = 1
+							AND trabajo.id_tramite = 0
+							AND trabajo.duracion_cobrada != '00:00:00'
+							AND $where_trabajo
+					) > 0
+					OR ( SELECT count(*)
+						FROM cta_corriente
+						WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto
+							AND cta_corriente.cobrable = 1
+							AND cta_corriente.monto_cobrable > 0
+							AND $where_gasto
+					) > 0
+				)
+				GROUP BY $group_by ";
 
 	$fila_inicial = $filas + 2;
 	$tiempomatriz = array();
@@ -504,7 +501,6 @@ if ($xls) {
 			$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
 			$ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
 		}
-
 		if (!$ocultar_ultimo_cobro) {
 			if ($separar_asuntos) {
 				$ws1->write($filas, $col_ultimo_cobro, $ultimocobro[$cobro['codigo_asunto']]['fecha_emision'] != '' ? Utiles::sql2fecha($ultimocobro[$cobro['codigo_asunto']]['fecha_emision'], $formato_fecha, "-") : '', $formato_texto);
@@ -514,8 +510,6 @@ if ($xls) {
 				$ws1->write($filas, $col_id_ultimo_cobro, $ultimocobro[$id_contrato]['id_cobro'] != '' ? $ultimocobro[$id_contrato]['id_cobro'] : '',  $formato_texto);
 			}
 		}
-
-
 		if (!$ocultar_estado_ultimo_cobro) {
 			if ($separar_asuntos) {
 				$ws1->write($filas, $col_estado_ultimo_cobro, $ultimocobro[$cobro['codigo_asunto']]['estado'] != '' ? $ultimocobro[$cobro['codigo_asunto']]['estado'] : '', $formato_texto);
@@ -523,7 +517,6 @@ if ($xls) {
 				$ws1->write($filas, $col_estado_ultimo_cobro, $ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
 			}
 		}
-
 		if (!$ocultar_fecha_corte) {
 			if ($separar_asuntos) {
 				$ws1->write($filas, $col_fecha_corte, $ultimocobro[$cobro['codigo_asunto']]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$cobro['codigo_asunto']]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
@@ -531,7 +524,6 @@ if ($xls) {
 				$ws1->write($filas, $col_fecha_corte, $ultimocobro[$id_contrato]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
 			}
 		}
-
 		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas, 1, '.', ''), $fdd);
 		} else {
@@ -593,7 +585,6 @@ if ($xls) {
 		} else {
 			$valor_estimado = $monto_estimado_trabajos;
 		}
-
 		// Aplicar descuentos del contrato al valor estimado
 		if ($cobro['porcentaje_descuento'] > 0) {
 			$valor_descuento = $valor_estimado * $cobro['porcentaje_descuento'];
@@ -607,17 +598,14 @@ if ($xls) {
 				$valor_estimado = 0;
 			}
 		}
-
 		if ($valor_descuento > 0) {
 			$comentario_descuento = "Incluye descuento por {$arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo']} ";
 			$comentario_descuento.= number_format($valor_descuento, $arreglo_monedas[$cobro['id_moneda_contrato']]['cifras_decimales'], '.', '');
 			$ws1->writeNote($filas, $col_valor_estimado, $comentario_descuento);
 		}
-
 		$valor_estimado = UtilesApp::CambiarMoneda($valor_estimado, number_format($arreglo_monedas[$id_moneda_trabajos]['tipo_cambio'], $arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'], '.', ''), $arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'], number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], '.', ''), $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales']);
 		$valor_estimado_moneda_base = UtilesApp::CambiarMoneda($valor_estimado, number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], '.', ''), $arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], number_format($moneda_base['tipo_cambio'], $moneda_base['cifras_decimales'], '.', ''), $moneda_base['cifras_decimales']);
 		$valor_thh_moneda_base = UtilesApp::CambiarMoneda($monto_estimado_thh, number_format($arreglo_monedas[$id_moneda_thh]['tipo_cambio'], $arreglo_monedas[$id_moneda_thh]['cifras_decimales'], '.', ''), $arreglo_monedas[$id_moneda_thh]['cifras_decimales'], number_format($moneda_base['tipo_cambio'], $moneda_base['cifras_decimales'], '.', ''), $moneda_base['cifras_decimales']);
-
 		if ($desglosar_moneda) {
 			foreach ($arreglo_monedas as $id_moneda => $moneda) {
 				if ($id_moneda == $cobro['id_moneda_total']) {
@@ -633,16 +621,13 @@ if ($xls) {
 		if ($id_moneda_base != $id_moneda_referencia) {
 			$ws1->writeNumber($filas, $col_tipo_cambio_moneda_base, number_format($arreglo_monedas[$id_moneda_base]['tipo_cambio'], $arreglo_monedas[$id_moneda_base]['cifras_decimales'], '.', ''), $formatos_moneda_tc[$id_moneda_referencia]);
 		}
-
 		$ws1->write($filas, $col_valor_en_moneda_base, $valor_estimado_moneda_base, $formatos_moneda[$moneda_base['id_moneda']]);
-
 		if ($valor_estimado_moneda_base < $valor_thh_moneda_base) {
 			$formato = $formato_moneda_base_rojo;
 		} else {
 			$formato = $formatos_moneda[$moneda_base['id_moneda']];
 		}
 		$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, $valor_thh_moneda_base, $formato);
-
 		// $tact=microtime(true);
 		/* $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+1, round($ReporteContrato->tiempos[0]-$tant,4) , $formato_numero );
 		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+2, round($ReporteContrato->tiempos[1]-$ReporteContrato->tiempos[0],4) , $formato_numero );
@@ -651,8 +636,6 @@ if ($xls) {
 		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+5, round($ReporteContrato->tiempos[4]-$ReporteContrato->tiempos[3],4) , $formato_numero );
 		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+6, round($ReporteContrato->tiempos[5]-$ReporteContrato->tiempos[4],4) , $formato_numero );
 		  $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+7, round($tact-$ReporteContrato->tiempos[5],4) , $formato_numero ); */
-
-
 		//$tant=$tact;
 		// Excel guarda los tiempos en base a días, por eso se divide en 24.
 		//$ws1->writeNumber($filas, $col_horas_trabajadas, $cobro['horas_por_cobrar']/24, $formato_tiempo);
@@ -670,25 +653,19 @@ if ($xls) {
 			if ($cobro['forma_cobro'] == 'PROPORCIONAL' || $cobro['forma_cobro'] == 'RETAINER') {
 				$ws1->write($filas, $col_porcentaje_retainer, $porcentaje_retainer, $formato_numero);
 			}
-
 			$ws1->write($filas, $col_porcentaje_retainer + 1, $cobro['horas_por_cobrar'], $formato_numero);
 		}
 		// Memorizarse el id_contrato para ver en el proximo
 		// paso si todavia estamos en el mismo contrato, importante por el tema del descuento
 		$id_contrato_anterior = $id_contrato;
 	}
-
-
 	if ($fila_inicial != ($filas + 2)) {
 		// Escribir totales
 		$col_formula_valor_en_moneda_base = Utiles::NumToColumnaExcel($col_valor_en_moneda_base);
 		$ws1->writeFormula(++$filas, $col_valor_en_moneda_base, "=SUM($col_formula_valor_en_moneda_base$fila_inicial:$col_formula_valor_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
-
 		$col_formula_valor_en_moneda_base_segun_THH = Utiles::NumToColumnaExcel($col_valor_en_moneda_base_segun_THH);
 		$ws1->writeFormula($filas, $col_valor_en_moneda_base_segun_THH, "=SUM($col_formula_valor_en_moneda_base_segun_THH$fila_inicial:$col_formula_valor_en_moneda_base_segun_THH$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
-
 		$col_formula_horas_trabajadas = Utiles::NumToColumnaExcel($col_horas_trabajadas);
-
 		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $fdd);
 		} else {
@@ -700,7 +677,6 @@ if ($xls) {
 	$ws1->write(3, 4, "desde " . $fecha1 . " a " . $fecha2, $formato_texto);
 	$wb->send("Planilla horas por facturar.xls");
 	$wb->close();
-
 	//   mail('ffigueroa@lemontech.cl','gen reporte',"Demoró mas o menos ".($tfin-$tini)." segundos y esta es la query \n".$query);
 	exit;
 }

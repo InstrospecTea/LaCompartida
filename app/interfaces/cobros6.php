@@ -891,7 +891,7 @@ if (count($cobro->asuntos)) {
         //Significa que estoy anulando la emisión
         if( form.estado.value == 'EN REVISION' ) {
 
-<?php if (Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
+		<?php if (Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 				if (form.estado_original.value == 'PAGADO' && trim(form.estado_motivo.value) == "") {
 					jQuery('#dialogomodal').html(jQuery('#div_motivo_cambio_estado').html());
 					jQuery('#dialogomodal').dialog('open').dialog('option','title','Ingresar Motivo').dialog('option', 'height', '170');
@@ -912,16 +912,13 @@ if (count($cobro->asuntos)) {
 					onSuccess: function(transport){},
 					onFailure: function(e){}
 				});
-<?php } ?>
-
+		<?php } ?>
 	        var texto = '';
-
             if (form.existe_pago.value == 1) {
                 texto = '¡Este cobro tiene pagos asociados! ';
             } else if (form.existe_factura.value == 1) {
                 texto = '¡Este cobro tiene facturas asociadas! ';
             }
-
             if (!confirm(texto + '<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
                 return false;
             } else {
