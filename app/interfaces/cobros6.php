@@ -1970,25 +1970,14 @@ if ($solicitante == 0) {  // no mostrar
 
 <!-- Fin Tipo Cambio -->
 <div id="clip" style="background:url('https://static.thetimebilling.com/images/clip.png') no-repeat;position:absolute;top:250px;left:500px;display:none;height: 200px;width: 250px;"></div>
+
 <script type="text/javascript">
-
-
-<?php if ($cobro->fields['estado'] == "PAGADO" && Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
+	<?php if ($cobro->fields['estado'] == "PAGADO" && Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 		$("estado").value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		$("estado").observe("change", function() {
 			this.value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		});
-<?php } ?>
-	jQuery('.iframeinterno').load(function() {
-		console.log(jQuery('.iframeinterno'));
-
-
-
-	});
-
-	// var t=setTimeout("jQuery('#clip').fadeIn(1000);",6000);
-
-
+	<?php } ?>
 </script>
 
 <?php

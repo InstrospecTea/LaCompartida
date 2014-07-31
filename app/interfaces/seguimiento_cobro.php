@@ -555,11 +555,20 @@ $pagina->PrintTop();
 	}
 
 	function Refrescar(id_foco) {
+		var _codigo_cliente = 'codigo_cliente';
+		var _codigo_asunto = 'codigo_asunto';
+
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+			_codigo_cliente = 'codigo_cliente_secundario';
+			_codigo_asunto = 'codigo_asunto_secundario';
+		<?php } ?>
 
 		var factura = $('factura').value;
 		var proceso = $('proceso').value;
-		var codigo_cliente = $('codigo_cliente').value;
-		var codigo_asunto = $('codigo_asunto').value;
+
+		var codigo_cliente = jQuery('#' + _codigo_cliente).val();
+		var codigo_asunto = jQuery('#' + _codigo_asunto).val();
+
 		var forma_cobro = $('forma_cobro').value;
 		var tipo_liquidacion = $('tipo_liquidacion') ? $('tipo_liquidacion').value : '';
 		var id_usuario = $('id_usuario').value;
