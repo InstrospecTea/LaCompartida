@@ -914,10 +914,12 @@ if (count($cobro->asuntos)) {
 				});
 <?php } ?>
 
+	        var texto = '';
+
             if (form.existe_pago.value == 1) {
-                var texto = '¡Este cobro tiene pagos asociados! ';
+                texto = '¡Este cobro tiene pagos asociados! ';
             } else if (form.existe_factura.value == 1) {
-                var texto = '¡Este cobro tiene facturas asociadas! ';
+                texto = '¡Este cobro tiene facturas asociadas! ';
             }
 
             if (!confirm(texto + '<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
