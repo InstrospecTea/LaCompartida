@@ -334,7 +334,10 @@ if ($opcion == "guardar") {
   if (!$t->Eliminar()) {
     $pagina->AddError($t->error);
   } else {
-    $refresh_parent = true;
+    if ($orphan == '0') {
+      $refresh_parent = true;
+    }
+
     $pagina->AddInfo(__('Trabajo') . ' ' . __('eliminado con éxito'));
 
     $t = new Trabajo($sesion);
@@ -808,7 +811,7 @@ if ($refresh_parent) {
                     echo __('Usuario');
                     echo $select_usuario;
                 } else {
-                    echo $Form->input('id_usuario', $sesion->usuario->fields['id_usuario'], array('id' => 'id_usuario'));
+                    echo $Form->input('id_usuario', $sesion->usuario->fields['id_usuario'], array('id' => 'id_usuario', 'type' => 'hidden', 'label' => false));
                 }
                 ?>
             </td>
@@ -943,7 +946,11 @@ function Substring($string) {
   }
 
   function CargarActividad() {
-    CargarSelect('codigo_asunto', 'codigo_actividad', 'cargar_actividades_activas');
+    var _codigo_asunto = 'codigo_asunto';
+    if (CodigoSecundario) {
+      _codigo_asunto = 'codigo_asunto_secundario';
+    }
+    CargarSelect(_codigo_asunto, 'codigo_actividad', 'cargar_actividades_activas');
   }
 
   function MostrarTrabajoTarifas() {
@@ -1591,19 +1598,24 @@ function Substring($string) {
   <?php } ?>
 
   if (PrellenarTrabajoConActividad) {
-    $('codigo_actividad').observe('change', function(evento) {
-      actividad_seleccionada = this.options[this.selectedIndex];
+    jQuery('#codigo_actividad').change(function() {
+      var actividad_seleccionada = this.options[this.selectedIndex];
       if (actividad_seleccionada.value != '') {
-        descripcion_textarea = document.getElementById('descripcion');
-        descripcion_textarea.value = actividad_seleccionada.text + '\n' + descripcion_textarea.value;
+        jQuery('#descripcion').val(actividad_seleccionada.text + '\n' + jQuery('#descripcion').val());
       }
     });
   }
 
   function eliminarTrabajo(id_trabajo, popup) {
+    var orphan = parentExists() ? '0' : '1';
+
     if (confirm("<?php echo __('¿Desea eliminar este trabajo?'); ?>")) {
-      window.location = "editar_trabajo?opcion=eliminar&id_trabajo=" + id_trabajo + "&popup=" + popup;
+      window.location = "editar_trabajo?opcion=eliminar&id_trabajo=" + id_trabajo + "&popup=" + popup + "&orphan=" + orphan;
     }
+  }
+
+  function parentExists() {
+    return (window.opener != null && !window.opener.closed);
   }
 </script>
 
