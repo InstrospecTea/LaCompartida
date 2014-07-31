@@ -197,6 +197,7 @@ class WsFacturacionCl {
 	private static function crearXML($data) {
 		$xml = new SimpleXMLElement('<DTE/>');
 		$node = $xml->addChild('Documento');
+		$data = UtilesApp::utf8izar($data);
 		self::array_to_xml($data, $node);
 		return $xml->asXML();
 	}

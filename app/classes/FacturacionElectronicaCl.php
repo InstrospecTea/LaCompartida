@@ -17,7 +17,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 			$pagina->AddError(__('Debe ingresar Ciudad del cliente.'));
 		}
 		if (empty($giro_cliente)) {
-			$pagina->AddError(__('Debe ingresar Giro del cliente.'));
+			$pagina->AddError(__('Debe ingresar ' . __('Giro') . ' del cliente.'));
 		}
 	}
 

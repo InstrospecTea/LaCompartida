@@ -871,8 +871,9 @@ function halt($error_message = null, $error_code = null, $halt_code = 400, $data
 			break;
 
 		default:
-			array_push($errors, array('message' => UtilesApp::utf8izar($error_message), 'code' => $error_code));
-			$Slim->halt($halt_code, json_encode(array('errors' => $errors, 'extra_data' => $data)));
+			array_push($errors, array('message' => $error_message, 'code' => $error_code));
+			$data = UtilesApp::utf8izar(array('errors' => $errors, 'extra_data' => $data));
+			$Slim->halt($halt_code, json_encode($data));
 			break;
 	}
 }

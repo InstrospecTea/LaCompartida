@@ -2356,4 +2356,9 @@ HTML;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
+	public static function transliteration($string) {
+		$map = self::$_transliteration;
+		return preg_replace(array_keys($map), array_values($map), $string);
+	}
+
 }
