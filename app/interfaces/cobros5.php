@@ -162,18 +162,39 @@ if ($opc == 'anular_emision') {
 	$cobro->Write(); //Se guarda porque despues se necesita para recalcular los datos del cobro
 
 	################### DESCUENTOS #####################
-	if ($tipo_descuento == 'PORCENTAJE') {
-		$total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
-		$cobro->Edit('descuento', $total_descuento);
-		$cobro->Edit('porcentaje_descuento', $porcentaje_descuento);
-	} elseif ($tipo_descuento == 'VALOR') {
-		$cobro->Edit('descuento', $cobro_descuento);
-		$cobro->Edit('porcentaje_descuento', '0');
-	}
+    if ($tipo_descuento == 'PORCENTAJE') {
+        $total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
+        $cobro->Edit('descuento', $total_descuento);
+        $cobro->Edit('porcentaje_descuento', $porcentaje_descuento);
+    } elseif ($tipo_descuento == 'VALOR') {
+        $cobro->Edit('descuento', $cobro_descuento);
+        $cobro->Edit('porcentaje_descuento', '0');
+    }
+
 
 	$cobro->Edit('tipo_descuento', $tipo_descuento);
 	$cobro_moneda_cambio = new CobroMoneda($sesion);
 	$cobro_moneda_cambio->UpdateTipoCambioCobro($cobro_id_moneda, $cobro_tipo_cambio, $id_cobro);
+	$observacion = new Observacion($sesion);
+	$moneda = new Moneda($sesion);
+	$moneda->Load($cobro_id_moneda);
+	$tipo_cambio_original = $moneda->fields['tipo_cambio'];
+	$ultimaObservacion = $observacion->UltimaObservacion($id_cobro);
+
+	$comentario = __('Moneda') . ' seleccionada ' . $moneda->fields['codigo'] . '';
+
+	if ($moneda->fields['tipo_cambio'] != $cobro_tipo_cambio) {
+	    $comentario .= __(', con tipo de cambio modificado a ') . "$cobro_tipo_cambio".'.';
+	}
+
+	if ($comentario != $ultimaObservacion['comentario']) {
+	    $observacion->Edit('fecha', date('Y-m-d H:i:s'));
+	    $observacion->Edit('comentario', $comentario);
+	    $observacion->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+	    $observacion->Edit('id_cobro', $id_cobro);
+	    $observacion->Write();
+	}
+
 
 	$ret = $cobro->GuardarCobro();
 
@@ -1193,7 +1214,7 @@ else
 	<table width="100%" cellspacing="3" cellpadding="3">
 		<tr>
 			<td align="left" style="background-color: #A3D55C; color: #000000; font-size: 14px; font-weight: bold;">
-				<?php echo __('parámetros del Cobro') ?>
+				<?php echo __('Parámetros del Cobro') ?>
 			</td>
 		</tr>
 	</table>

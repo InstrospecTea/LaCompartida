@@ -8,7 +8,6 @@ $Pagina = new Pagina($Sesion);
 $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
 $SolicitudAdelanto->Fill($_REQUEST);
 
-var_dump($_REQUEST);
 switch ($_REQUEST['accion']) {
 	case 'eliminar':
 		if ($SolicitudAdelanto->Delete()) {

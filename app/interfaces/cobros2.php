@@ -10,7 +10,6 @@ $nombre_cliente = $cliente->fields['glosa_cliente'];
 $pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de asuntos #') . $id_cobro . __(' ') . $nombre_cliente;
 
 if ($id_cobro) {
-
 	$cobro = new Cobro($sesion);
 
 	if (!$cobro->Load($id_cobro)) {
@@ -24,7 +23,6 @@ if ($id_cobro) {
 	$cobro->Edit('etapa_cobro', '1');
 	$cobro->Write();
 } else if ($id_contrato > 0) {
-
 	$contrato = new Contrato($sesion);
 
 	if (!$contrato->Load($id_contrato)) {
@@ -200,7 +198,7 @@ if (!$checkall) {
 		</tr>
 		<tr>
 			<td class="cvs" align="center" colspan="2">
-				<iframe name="asuntos" id="asuntos" onload="calcHeight(this.id, 'pagina_body');" src='asuntos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&id_cobro=<?= $id_cobro ?>&popup=1&motivo=cobros&checkall=<?= $checkall ?>' frameborder="0" width="800px" height="320px"></iframe>
+				<iframe name="asuntos" id="asuntos" onload="calcHeight('asuntos', 'pagina_body');" src='asuntos.php?codigo_cliente=<?php echo $cliente->fields['codigo_cliente']; ?>&opc=entregar_asunto&id_cobro=<?php echo $id_cobro; ?>&popup=1&motivo=cobros&checkall=<?php echo $checkall; ?>' frameborder="0" width="800px" height="320px"></iframe>
 			</td>
 		</tr>
 	</table>

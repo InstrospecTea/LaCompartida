@@ -8,6 +8,17 @@ $Pagina = new Pagina($Sesion);
 $AreaProyecto = new AreaProyecto($Sesion);
 $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 
+/*
+ * Configuraciones utilizadas en la interfaz
+ */
+
+# Descripción = Habilita autocompletador de asuntos.
+$selectclienteasuntoespecial = Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial') == '1' ? true : false;
+
+# Descripcion = El ambiente del cliente utiliza un codigo personalizado para...
+# manejo de codígos de cliente y asunto en interfaces.
+$usocodigosecundario = Conf::GetConf($Sesion, 'CodigoSecundario') == '1' ? true : false;
+
 $Html = new \TTB\Html;
 
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($Sesion);
@@ -15,12 +26,6 @@ $formato_fecha = UtilesApp::ObtenerFormatoFecha($Sesion);
 if ($excel) {
 	$Asunto = new Asunto($Sesion);
 	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
-}
-
-if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
-	require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
-} else {
-	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 }
 
 if ($Sesion->usuario->Es('DAT') && $accion == "eliminar") {
@@ -44,6 +49,7 @@ $GrupoCliente = new GrupoCliente($Sesion);
 $Pagina->titulo = __('Listado de') . ' ' . __('Asuntos');
 $Pagina->PrintTop($popup);
 $Form = new Form;
+
 ?>
 
 <script type="text/javascript">
@@ -110,13 +116,8 @@ $Form = new Form;
 		return true;
 	}
 </script>
-<?php
-if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
-	echo AutocompletadorAsunto::CSS();
-}
-$Form = new Form;
-?>
-<form method="post" name="form" id="form">
+
+<form method="post" name="form" id="form" autocomplete="OFF">
 	<input type="hidden" name="busqueda" value="TRUE">
 	<?php if ($id_cobro == '' && ($Sesion->usuario->Es('DAT') || $Sesion->usuario->Es('SASU'))) { ?>
 		<table style="border: 0px solid black" width="100%">
@@ -167,14 +168,16 @@ $Form = new Form;
 						<?php UtilesApp::CampoCliente($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 					</td>
 				</tr>
+
 				<tr>
-					<td width=25% class="ar" style="font-weight:bold;">
-						<?php echo __('Código asunto'); ?>
+					<td width="25%" class="ar" style="font-weight:bold;">
+						<?php echo __('C&oacute;digo asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan="4">
-						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto, false); ?>
 					</td>
 				</tr>
+
 				<tr>
 					<td class="ar" style="font-weight:bold;">
 						<?php echo __('Fecha creaci&oacute;n'); ?>
@@ -220,29 +223,31 @@ $Form = new Form;
 				</tr>
 			</table>
 		</fieldset>
-<?php } ?>
+	<?php } ?>
 </form>
 <?php
 
 echo $Form->script();
 
 if ($busqueda) {
-	$link = "Opciones";
+	$link = 'Opciones';
 } else {
 	$link = __('Cobrar');
-	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
-	$link.= " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente={$codigo_cliente}&opc=entregar_asunto&id_cobro={$id_cobro}&popup=1&motivo=cobros&checkall=1'>" . __('Marcar Todos') . "</a>";
+	$link.= " <br /><a href='asuntos.php?codigo_cliente={$codigo_cliente}&opc=entregar_asunto&id_cobro={$id_cobro}&popup=1&motivo=cobros&uncheckall=1'>" . __('Desmarcar Todos') . "</a>";
 }
 
+$CobroAsunto = new CobroAsunto($Sesion);
+
 if ($checkall == '1') {
-	CheckAll($id_cobro, $codigo_cliente);
+	$CobroAsunto->agregarAsuntos($id_cobro, $codigo_cliente, true);
 }
 
 if ($uncheckall == '1') {
-	UncheckAll($id_cobro, $codigo_cliente);
+	$CobroAsunto->eliminarAsuntos($id_cobro);
 }
 
-global $query, $where,$b;
+global $query, $where, $b;
 $where = 1;
 
 if ($buscar || $opc == "entregar_asunto") {
@@ -264,21 +269,19 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.cobrable=0 ";
 	}
 
-	if ($codigo_asunto != "" || $codigo_asunto_secundario != "") {
+	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto_secundario%'";
 		} else {
 			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
 		}
-	}
-
-	if ($glosa_asunto != "") {
+	} else if ($glosa_asunto != '') {
 		$nombre = strtr($glosa_asunto, ' ', '%');
-		$where .= " AND a1.glosa_asunto Like '%$glosa_asunto%'";
+		$where .= " AND a1.glosa_asunto Like '%{$glosa_asunto}%'";
 	}
 
 	if ($codigo_cliente || $codigo_cliente_secundario) {
-		if (Conf::GetConf($Sesion, 'CodigoSecundario') && !$codigo_cliente) {
+		if ($usocodigosecundario && !$codigo_cliente) {
 			$cliente = new Cliente($Sesion);
 			if ($cliente->LoadByCodigoSecundario($codigo_cliente_secundario)) {
 				$codigo_cliente = $cliente->fields['codigo_cliente'];
@@ -344,7 +347,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		WHERE $where
 		GROUP BY a1.codigo_asunto";
 
-	if ($orden == "") {
+	if (empty($orden)) {
 		$orden = "a1.activo DESC, horas_no_cobradas DESC, a1.glosa_asunto";
 	}
 
@@ -360,7 +363,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('Asuntos');
 
-	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+	if ($usocodigosecundario) {
 		$b->AgregarEncabezado("codigo_asunto_secundario", __('Código'), " class='al'  style='white-space:nowrap;' ");
 	} else {
 		$b->AgregarEncabezado("codigo_asunto", __('Código'), " class='al' style='white-space:nowrap;' ");
@@ -401,27 +404,18 @@ function Opciones(& $fila) {
 	global $motivo, $from;
 
 	if ($motivo == 'cobros') {
-		return Cobrable($fila, $checkall);
+		return Cobrable($fila);
 	}
 
 	$id_asunto = $fila->fields['id_asunto'];
 
-	if (Conf::GetConf($Sesion, 'UsaDisenoNuevo')) {
-		if ($Sesion->usuario->Es('SASU')) {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
-		} else {
-			$opciones = "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
-			$opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
-			$opciones .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
-			return $opciones;
-		}
+	if ($Sesion->usuario->Es('SASU')) {
+		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
 	} else {
-		if ($Sesion->usuario->Es('SASU')) {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
-		} else {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>"
-					. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
-		}
+		$opciones = "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
+		$opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+		$opciones .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+		return $opciones;
 	}
 }
 
@@ -436,10 +430,7 @@ function funcionTR(& $Asunto) {
 	global $formato_fecha;
 	static $i = 0;
 
-	if ($i % 2 == 0)
-		$color = "#dddddd";
-	else
-		$color = "#ffffff";
+	$color = ($i % 2 == 0) ? '#DDDDDD' : '#FFFFFF';
 
 	$fecha = Utiles::sql2fecha($Asunto->fields['fecha_ultimo_cobro'], $formato_fecha, "N/A");
 	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B; \">";
@@ -450,12 +441,6 @@ function funcionTR(& $Asunto) {
 	$html .= "</tr>";
 	$i++;
 	return $html;
-}
-
-if (Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial')) {
-	if (empty($_REQUEST['id_cobro']) && $from != 'agregar_cliente') {
-		echo(AutocompletadorAsunto::Javascript($Sesion, false));
-	}
 }
 
 $Pagina->PrintBottom($popup);

@@ -127,7 +127,7 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
 		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
-		
+
 
 		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
@@ -181,6 +181,7 @@ if ($opcion == "guardar") {
 
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
+$Form = new Form;
 ?>
 
 <script type="text/javascript">
@@ -206,19 +207,17 @@ $pagina->PrintTop($popup);
 		<?php } ?>
 	}
 
-	function Validar(form) {
-		monto = parseFloat(form.monto.value);
+	function Validar() {
+		monto = parseFloat(jQuery('#monto').val());
 
 		if (jQuery('#monto_cobrable').length > 0) {
 			monto_cobrable = parseFloat(jQuery('#monto_cobrable').val());
-		}
-
-		if (form.monto_cobrable && (monto <= 0 || isNaN(monto))) {
-			monto = monto_cobrable;
+			if (monto <= 0 || isNaN(monto)) {
+				monto = monto_cobrable;
+			}
 		}
 
 		<?php if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) { ?>
-
 			var identificador = parseInt(jQuery('#autoincrementable').val());
 			jQuery('#autoincrementable').val(identificador);
 
@@ -227,74 +226,60 @@ $pagina->PrintTop($popup);
 				jQuery('#autoincrementable').focus();
 				return false;
 			}
-
 		<?php } ?>
 
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-			if ($('codigo_cliente_secundario').value == '') {
+			if (!jQuery('#codigo_cliente_secundario').val()) {
 				alert('<?php echo __('Debe seleccionar un cliente'); ?>');
-				form.codigo_cliente_secundario.focus();
+				jQuery('#codigo_cliente_secundario').focus();
 				return false;
 			}
 
-			if ($('campo_codigo_asunto_secundario').value == '') {
+			if (!jQuery('#codigo_asunto_secundario').val()) {
 				alert('<?php echo __('Ud. debe seleccionar un') . ' ' . __('asunto'); ?>');
-				form.codigo_asunto_secundario.focus();
+				jQuery('#codigo_asunto_secundario').focus();
 				return false;
 			}
 		<?php } else { ?>
-			if ($('codigo_cliente').value == '') {
+			if (!jQuery('#codigo_cliente').val()) {
 				alert('<?php echo __('Debe seleccionar un cliente'); ?>');
-				form.codigo_cliente.focus();
+				jQuery('#codigo_cliente').focus();
 				return false;
 			}
 
-			if ($('campo_codigo_asunto').value == '') {
+			if (!jQuery('#codigo_asunto').val()) {
 				alert('<?php echo __('Ud. debe seleccionar un') . ' ' . __('asunto'); ?>');
-				form.codigo_asunto.focus();
+				jQuery('#codigo_asunto').focus();
 				return false;
 			}
 		<?php } ?>
 
-			if (typeof  RevisarConsistenciaClienteAsunto == 'function') {
-				RevisarConsistenciaClienteAsunto(form);
-			}
+		if (typeof  RevisarConsistenciaClienteAsunto == 'function') {
+			RevisarConsistenciaClienteAsunto(jQuery('#form_gastos')[0]);
+		}
 
-		<?php if (Conf::GetConf($sesion, 'UsaMontoCobrable')) { ?>
+		<?php if ($prov == 'false' && Conf::GetConf($sesion, 'UsaMontoCobrable')) { ?>
 			if ((monto <= 0 || isNaN(monto)) && (monto_cobrable <= 0 || isNaN(monto_cobrable))) {
 				alert('<?php echo __('Debe ingresar un monto para el gasto'); ?>');
-				form.monto.focus();
+				jQuery('#monto').focus();
 				return false;
 			}
 		<?php } else { ?>
 			if ((monto <= 0 || isNaN(monto))) {
 				alert('<?php echo __('Debe ingresar un monto para el gasto'); ?>');
-				form.monto.focus();
+				jQuery('#monto').focus();
 				return false;
 			}
 		<?php } ?>
 
-		if (form.descripcion.value == "") {
-			alert('<?php echo __('Debe ingresar una descripción'); ?>');
-			form.descripcion.focus();
+		if (jQuery('#id_moneda option:selected').length == 0) {
+			alert('<?php echo __('Debe seleccionar una Moneda'); ?>');
 			return false;
 		}
 
-		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
-			if (form.descripcion.value != "") {
-				form.descripcion.value=form.descripcion.value.toUpperCase();
-			}
-		<?php } ?>
-
-		var radio_choice = false;
-		for (i = 0; i < form.id_moneda.options.length; i++) {
-			if (form.id_moneda.options[i].selected == true && form.id_moneda.value != '') {
-				radio_choice = true;
-			}
-		}
-
-		if (!radio_choice) {
-			alert('<?php echo __('Debe seleccionar una Moneda'); ?>');
+		if (!jQuery('#descripcion').val()) {
+			alert('<?php echo __('Debe ingresar una descripción'); ?>');
+			jQuery('#descripcion').focus();
 			return false;
 		}
 
@@ -302,7 +287,13 @@ $pagina->PrintTop($popup);
 			jQuery('#id_usuario').val(<?php echo $id_usuario; ?>);
 		}
 
-		form.submit();
+		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
+			if (jQuery('#descripcion').val()) {
+				jQuery('#descripcion').val(jQuery('#descripcion').val().toUpperCase());
+			}
+		<?php } ?>
+
+		return true
 	}
 
 	function CheckEliminaIngreso(chk) {
@@ -402,7 +393,6 @@ $pagina->PrintTop($popup);
 			<td align="left"><b><?php echo $txt_pagina; ?></b></td>
 		</tr>
 	</table>
-
 	<?php
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		if (!$codigo_cliente_secundario) {
@@ -441,7 +431,7 @@ $pagina->PrintTop($popup);
 			<b><?php echo __('Información de'); ?> <?php echo $prov == 'true' ? __('provisión') : __('gasto'); ?></b>
 		</span>
 
-		<a href='javascript:void(0)' class="fr btn botonizame" icon="agregar" style="margin:2px;" onclick="AgregarNuevo('gasto',<?php echo $prov ?>);" title="Agregar Gasto"><?php echo $prov == 'true' ? __('Nueva provisión') : __('Nuevo gasto'); ?></a>
+		<?php echo $Form->icon_button($prov == 'true' ? __('Nueva provisión') : __('Nuevo gasto'), 'agregar', array('onclick' => "AgregarNuevo('gasto', {$prov});", 'class' => 'fr', 'style' => 'margin: 2px;')); ?>
 		<?php ($Slim = Slim::getInstance('default',true)) ? $Slim->applyHook('hook_agregar_gasto_inicio') : false; ?>
 	</div>
 
@@ -470,7 +460,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Asunto'); ?>
 			</td>
 			<td align="left">
-				<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+				<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
@@ -535,7 +525,7 @@ $pagina->PrintTop($popup);
 					<?php echo __('Identificador'); ?>
 				</td>
 				<td align="left">
-					<input name="autoincrementable" id="autoincrementable" size="10" value="<?php echo($gasto->fields['nro_seguimiento'] ? $gasto->fields['nro_seguimiento'] : $proposed)  ?>" /> 
+					<input name="autoincrementable" id="autoincrementable" size="10" value="<?php echo($gasto->fields['nro_seguimiento'] ? $gasto->fields['nro_seguimiento'] : $proposed)  ?>" />
 					<span style="color:#FF0000; font-size:10px">*</span>
 				</td>
 			</tr>
@@ -732,10 +722,13 @@ $pagina->PrintTop($popup);
 
 	<br/>
 	<div class="fl">
-		<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_gastos').get(0));"><?php echo  __('Guardar'); ?></a>
-		<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar'); ?></a>
+		<?php
+		echo $Form->icon_submit(__('Guardar'), 'save');
+		echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => 'window.close();'));
+		?>
 	</div>
 </form>
+<?php echo $Form->script(); ?>
 <script type="text/javascript">
 	<?php if (Conf::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
 		CargaIdioma("<?php echo $codigo_asunto; ?>");
@@ -744,7 +737,6 @@ $pagina->PrintTop($popup);
 	jQuery("#autoincrementable").change(function(){
 		jQuery.post('ajax/ajax_gastos.php',{ opc: "identificador", identificador: jQuery("#autoincrementable").val()})
 		.done(function(data){
-			console.log(data);
 			if (data == "1") {
 				alert('<?php echo __('El valor del identificador ya está siendo utilizado.'); ?>');
 				jQuery('#autoincrementable').focus();
@@ -760,6 +752,9 @@ $pagina->PrintTop($popup);
 		if (jQuery(this).attr('id') == 'monto') {
 			CambiaMonto(this.form, this.id);
 		}
+	});
+	jQuery('#form_gastos').submit(function() {
+		return Validar();
 	});
 </script>
 

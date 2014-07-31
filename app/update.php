@@ -1201,6 +1201,12 @@ QUERY;
 
 		case 7.75:
 			$queries = array();
+			$queries[] = "ALTER TABLE `factura` DROP INDEX `id_documento_legal`, ADD UNIQUE INDEX `id_documento_legal` (`id_documento_legal` ASC, `numero` ASC, `serie_documento_legal` ASC, `id_estudio` ASC);";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.76:
+			$queries = array();
 			if (!ExisteCampo('codigo_dte', 'prm_documento_legal', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_documento_legal` ADD `codigo_dte` VARCHAR(20) NULL;";
 			}
@@ -1218,7 +1224,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.75;
+$max_update = 7.76;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

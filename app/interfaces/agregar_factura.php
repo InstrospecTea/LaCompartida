@@ -149,7 +149,6 @@ if ($opcion == "guardar") {
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
 
-
 		$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
@@ -663,7 +662,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<td align="left" colspan="3"><input type="text" name="ciudad_cliente" value="<?php echo $factura->loaded() ? $factura->fields['ciudad_cliente'] : $contrato->fields['factura_ciudad']; ?>" id="ciudad_cliente" size="70" maxlength="255" />
 			</td>
 		</tr>
-		<?php if (conf::GetConf($sesion,'RegionCliente')) { ?>
+		<?php if (Conf::GetConf($sesion, 'RegionCliente')) { ?>
 		<tr>
 			<td align="right"><?php echo __('Región'); ?></td>
 			<td align="left" colspan="3"><input type="text" name="factura_region" value="<?php echo $factura->loaded() ? $factura->fields['factura_region'] : $contrato->fields['region_cliente']; ?>" id="factura_region" size="70" maxlength="255" />
@@ -956,7 +955,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var direccion_cliente = document.getElementById('direccion_cliente');
 		var comuna_cliente = document.getElementById('comuna_cliente');
 		var ciudad_cliente = document.getElementById('ciudad_cliente');
-		var factura_region = document.getElementById('factura_region');
+
+		<?php if (Conf::GetConf($sesion, 'RegionCliente')) { ?>
+			var factura_region = document.getElementById('factura_region');
+		<?php } ?>
+
 		var giro_cliente = document.getElementById('giro_cliente');
 		var factura_codigopostal = document.getElementById('factura_codigopostal');
 		var dte_id_pais = document.getElementById('dte_id_pais');
@@ -1001,8 +1004,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 						rut.value = '';
 						direccion_cliente.value = '';
 						cliente.value = '';
-						select_destino.options.length = 1;
-						offLoading();
 						alert('No existen <?php echo __('cobros'); ?> para este cliente.');
 					}
 					else
@@ -1047,11 +1048,13 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 							}
 
 							//Estado
-							if(valores[5] != ''){
-								factura_region.value = valores[5]
-							} else{
-								factura_region.value = '';
-							}
+							<?php if (Conf::GetConf($sesion, 'RegionCliente')) { ?>
+								if(valores[5] != ''){
+									factura_region.value = valores[5]
+								} else{
+									factura_region.value = '';
+								}
+							<?php } ?>
 
 							// Giro
 							if (valores[6] != '') {
@@ -1184,8 +1187,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				jQuery('#honorario_disp').val(jQuery('#honorario_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[0], {format: "###.000", locale: "us"}));
 				jQuery('#gastos_con_impuestos_disp').val(jQuery('#gastos_con_impuestos_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[1], {format: "###.000", locale: "us"}));
 				jQuery('#gastos_sin_impuestos_disp').val(jQuery('#gastos_sin_impuestos_total').parseNumber({format: "###.000", locale: "us"}) + jQuery.parseNumber(saldos[1], {format: "###.000", locale: "us"}));
-
-				offLoading();
 			}
 		};
 		http.send(null);

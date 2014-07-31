@@ -784,13 +784,12 @@ if (!class_exists('Cobro')) {
 			return $monto_total;
 		}
 
-		function CalculaMontoTramites($cobro, $fecha_ini, $fecha_fin) {
-
+		function CalculaMontoTramites() {
 			$query = "SELECT SUM(tarifa_tramite)
-						FROM tramite
-							WHERE tramite.id_cobro='" . $this->fields['id_cobro'] . "'
-							AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
-							AND tramite.cobrable=1 ";
+				FROM tramite
+				WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+					AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
+					AND tramite.cobrable = 1 ";
 
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($total_monto_tramites) = mysql_fetch_array($resp);
@@ -1538,14 +1537,14 @@ if (!class_exists('Cobro')) {
 
 			#DESCUENTOS
 			if ($this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$cobro_descuento = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
-				$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - $cobro_descuento;
+				$cobro_descuento = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
+				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - $cobro_descuento;
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
 				$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
 			} else {
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
-				$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
+				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 			}
 			//Valido CAP
@@ -1575,10 +1574,10 @@ if (!class_exists('Cobro')) {
 
 			// Se guarda la información del cobro
 
-			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites(), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 
 			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_origina && $cobro_total_honorario_cobrable != 0) {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));

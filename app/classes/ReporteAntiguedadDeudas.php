@@ -5,7 +5,7 @@
 */
 class ReporteAntiguedadDeudas
 {
-	
+
 	private $opciones = array();
 	private $datos = array();
 	private $sesion;
@@ -18,11 +18,11 @@ class ReporteAntiguedadDeudas
 	//Opciones de layout
 	//
 	
-	//Define el ancho que tendrÃ¡n los campos numÃ©ricos del reporte, que tengan que ver con montos.
+	//Define el ancho que tendrán los campos numéricos del reporte, que tengan que ver con montos.
 	private $ancho_campo_numerico = 69;
 
-	//Define el ancho que tendrÃ¡ el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
-	//aÃ±adan antes de los campos numÃ©ricos del reporte.
+	//Define el ancho que tendrá el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
+	//añadan antes de los campos numéricos del reporte.
 	private $ancho_campo = 35;
 
 	private $ancho_campo_numerico_detalle = 70;
@@ -43,13 +43,13 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * Genera el reporte segÃºn las opciones que se especifican.
+	 * Genera el reporte según las opciones que se especifican.
 	 * @return [type] [description]
 	 */
 	public function generar(){
 
 		ini_set("memory_limit", "256M");
-		
+
 		$this->genera_query_criteria();
 
 		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
@@ -58,7 +58,7 @@ class ReporteAntiguedadDeudas
 
 		$agrupacion = $this->generar_agrupacion_de_resultados($results, $this->define_parametros_query_sin_detalle());
 		$reporte = $this->genera_reporte($agrupacion);
-		
+
 		if (!empty($this->opciones['mostrar_detalle'])) {
 			$agrupacion_detalle = $this->genera_agrupacion_detalle($results, $this->define_parametros_query_sin_detalle());
 			$reporte_detalle = $this->genera_reporte_detalle($agrupacion_detalle);
@@ -78,8 +78,15 @@ class ReporteAntiguedadDeudas
 
 			if (empty($this->opciones['mostrar_detalle'])) {
 				foreach ($agrupacion as $result) {
-					$identificadores =  json_decode($result['identificadores'], true);
+					//@dochoa auto-blame:
+					//No pude encontrar una manera de hacer esto de otra forma. En el excel mostraba de manera incorrecta el caracter degree.
+					//Se aceptan sugerencias para reparar esta aberración.
+					$ids = utf8_decode($result['identificadores']);
+					$ids = str_replace('?', 'º', $ids);
+					$ids = UtilesApp::utf8izar($ids);
+					$identificadores =  json_decode($ids, true);
 					$result['identificadores'] = implode(',', $identificadores);
+					$result['identificadores'] = (utf8_decode($result['identificadores']));
 					$new_results[] = $result;
 				}
 			} else {
@@ -105,9 +112,9 @@ class ReporteAntiguedadDeudas
 	private function genera_reporte($agrupacion){
 
 		//
-		//TODO -> Refactorizar a su propio mÃ©todo.
+		//TODO -> Refactorizar a su propio método.
 		//
-		
+
 			$layout = $this->ancho_campo;
 
 			if ($this->opciones['totales_especiales']) {
@@ -116,10 +123,10 @@ class ReporteAntiguedadDeudas
 			else{
 				$number_layout = $this->ancho_campo_numerico / 5 ;
 			}
-			
+
 
 			$layouts = array();
-			
+
 			//
 			// Prepara el layout de los campos.
 			//
@@ -139,7 +146,7 @@ class ReporteAntiguedadDeudas
 			$layouts['campo_comun'] = $layout;
 
 		//
-		// Fin segmento de cÃ³digo a refactorizar.
+		// Fin segmento de código a refactorizar.
 		//
 
 
@@ -155,7 +162,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango1',
-				'title' => '0-30 ' . __('dÃ­as'),
+				'title' => '0-30 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -165,7 +172,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango2',
-				'title' => '31-60 ' . __('dÃ­as'),
+				'title' => '31-60 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -175,7 +182,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango3',
-				'title' => '61-90 ' . __('dÃ­as'),
+				'title' => '61-90 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -185,7 +192,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango4',
-				'title' => '91+ ' . __('dÃ­as'),
+				'title' => '91+ ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -204,7 +211,7 @@ class ReporteAntiguedadDeudas
 				)
 			)
 		);
-		
+
 		if ($this->opciones['mostrar_detalle']) {
 			$configuracion = array(
 				'field' => 'glosa_cliente',
@@ -238,6 +245,7 @@ class ReporteAntiguedadDeudas
 		}
 
 		if (!$this->opciones['mostrar_detalle']) {
+
 			$configuracion_cobros = array(
 				'field' => 'identificadores',
 				'title' => __(ucfirst($this->opciones['identificadores'])),
@@ -276,7 +284,7 @@ class ReporteAntiguedadDeudas
 			$config_reporte = $this->insertar_configuracion($config_reporte, $configuracion, count($config_reporte) - 1);
 		}
 
-		//Si es que la opciÃ³n no es excel.
+		//Si es que la opción no es excel.
 		if ($this->opciones['opcion_usuario'] != 'xls'){
 			$config_reporte[] = array(
 				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
@@ -297,6 +305,9 @@ class ReporteAntiguedadDeudas
 			);
 		}
 
+		
+
+
 		$SimpleReport->LoadConfigFromArray($config_reporte);
 		$SimpleReport->LoadResults($agrupacion);
 		return $SimpleReport;
@@ -310,9 +321,9 @@ class ReporteAntiguedadDeudas
 	private function genera_reporte_detalle($agrupacion_detalle) {
 
 		//
-		//TODO -> Refactorizar a su propio mÃ©todo.
+		//TODO -> Refactorizar a su propio método.
 		//
-		
+
 		$layout = $this->ancho_campo_detalle;
 
 		if ($this->opciones['totales_especiales']) {
@@ -320,17 +331,17 @@ class ReporteAntiguedadDeudas
 		} else {
 			$number_layout = $this->ancho_campo_numerico_detalle  / 5 ;
 		}
-		
+
 
 		$layouts = array();
-		
+
 		//
 		// Prepara el layout de los campos.
 		//
 		$layouts['campo_comun'] = $layout / 4;
 
 		//
-		// Fin segmento de cÃ³digo a refactorizar.
+		// Fin segmento de código a refactorizar.
 		//
 
 
@@ -347,7 +358,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'fecha_emision',
-				'title' => __('Fecha EmisiÃ³n'),
+				'title' => __('Fecha Emisión'),
 				'format' => 'date',
 				'extras' => array(
 					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:left;"',
@@ -363,14 +374,14 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'dias_atraso_pago',
-				'title' => __('DÃ­as Atraso'),
+				'title' => __('Días Atraso'),
 				'extras' => array(
 					'attrs' => 'width="'.$layouts['campo_comun'].'%" style="text-align:right;"',
 				)
 			),
 			array(
 				'field' => 'rango1',
-				'title' => '0-30 ' . __('dÃ­as'),
+				'title' => '0-30 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -380,7 +391,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango2',
-				'title' => '31-60 ' . __('dÃ­as'),
+				'title' => '31-60 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -390,7 +401,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango3',
-				'title' => '61-90 ' . __('dÃ­as'),
+				'title' => '61-90 ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -400,7 +411,7 @@ class ReporteAntiguedadDeudas
 			),
 			array(
 				'field' => 'rango4',
-				'title' => '91+ ' . __('dÃ­as'),
+				'title' => '91+ ' . __('días'),
 				'format' => 'number',
 				'extras' => array(
 					'subtotal' => 'moneda',
@@ -460,7 +471,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [Inserta una configuraciÃ³n, en el array de configuraciones, en la posiciÃ³n especificada.]
+	 * [Inserta una configuración, en el array de configuraciones, en la posición especificada.]
 	 * @param  [type] $configuraciones [description]
 	 * @param  [type] $configuracion   [description]
 	 * @param  [type] $posicion        [description]
@@ -474,18 +485,20 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [Genera la agrupaciÃ³n de resultados para el reporte sin desglose.]
+	 * [Genera la agrupación de resultados para el reporte sin desglose.]
 	 * @param  [type] $dataset    [Datos obtenidos desde el medio persistente.]
-	 * @param  [type] $parameters [ParÃ¡metros definidos en el reporte.]
-	 * @return [type]             [Array con la agrupaciÃ³n de resultados.]
+	 * @param  [type] $parameters [Parámetros definidos en el reporte.]
+	 * @return [type]             [Array con la agrupación de resultados.]
 	 */
 	private function generar_agrupacion_de_resultados($dataset,$parameters){
-		
+
 		extract($parameters);
+
+		// $dataset = UtilesApp::utf8izar($dataset);
 
 		$results = array();
 
-		//Preprocesar y agrupar los resultados segÃºn la moneda.
+		//Preprocesar y agrupar los resultados según la moneda.
 
 		foreach ($dataset as &$row) {
 
@@ -499,8 +512,8 @@ class ReporteAntiguedadDeudas
 			$results[$row['codigo_cliente']]['glosa_cliente'] = $row['glosa_cliente'];
 			$results[$row['codigo_cliente']]['cantidad_seguimiento'] = $row['cantidad_seguimiento'];
 			$results[$row['codigo_cliente']]['comentario_seguimiento'] = $row['comentario_seguimiento'];
-			
-			
+
+
 			if (!array_key_exists($row['moneda'], $results[$row['codigo_cliente']]['monedas'])) {
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']] = array();
 				$results[$row['codigo_cliente']]['monedas'][$row['moneda']]['codigo_moneda'] = $row['codigo_moneda'];
@@ -576,7 +589,7 @@ class ReporteAntiguedadDeudas
 				if (!empty($row['encargado_comercial'])) {
 					$results[$row['codigo_cliente']]['encargado_comercial'] = $row['encargado_comercial'];
 				} else{
-					//TODO: Validar con gonzalo la regla para llenar campos vacÃ­os.
+					//TODO: Validar con gonzalo la regla para llenar campos vacíos.
 					$results[$row['codigo_cliente']]['encargado_comercial'] = '';
 				}
 			}
@@ -585,10 +598,10 @@ class ReporteAntiguedadDeudas
 
 
 		//
-		//Generar una tupla Ãºnica por cada combinaciÃ³n cliente-moneda.
+		//Generar una tupla única por cada combinación cliente-moneda.
 		//
 		$output = array();
-		
+
 		foreach ($results as $codigo_cliente => $detalle) {
 
 			$detalle_cliente = array();
@@ -598,7 +611,7 @@ class ReporteAntiguedadDeudas
 			$detalle_cliente['encargado_comercial'] = $detalle['encargado_comercial'];
 			$detalle_cliente['cantidad_seguimiento'] = $detalle['cantidad_seguimiento'];
 			$detalle_cliente['comentario_seguimiento'] = $detalle['comentario_seguimiento'];
-			
+
 			foreach ($detalle['monedas'] as $codigo_moneda => $detalle_montos) {
 
 				$detalle_cliente['codigo_padre'] = $codigo_cliente.$detalle_montos['codigo_moneda'];
@@ -620,14 +633,15 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [Genera la agrupaciÃ³n de resultados para el reporte desglosado.]
+	 * [Genera la agrupación de resultados para el reporte desglosado.]
 	 * @param  [type] $dataset    [Datos obtenidos desde el medio persistente.]
-	 * @param  [type] $parameters [ParÃ¡metros definidos en el reporte.]
-	 * @return [type]             [Array con la agrupaciÃ³n de resultados.]
+	 * @param  [type] $parameters [Parámetros definidos en el reporte.]
+	 * @return [type]             [Array con la agrupación de resultados.]
 	 */
 	private function genera_agrupacion_detalle($dataset, $parameters) {
 		extract($parameters);
 		$results = array();
+		// $dataset = UtilesApp::utf8izar($dataset);
 
 		foreach ($dataset as &$row) {
 
@@ -722,7 +736,7 @@ class ReporteAntiguedadDeudas
 				'total_normal' => -1 * $normal,
 				'total_vencido' => -1 * $vencido,
 				'dias_atraso_pago' => $dias_atraso_pago,
-				'fecha_vencimiento' => $fecha_vencimiento	
+				'fecha_vencimiento' => $fecha_vencimiento
 			);
 		}
 
@@ -739,7 +753,7 @@ class ReporteAntiguedadDeudas
 
 		extract($this->define_parametros_query_sin_detalle());
 		$this->agrega_restricciones_segun_tipo_monto();
-		    
+
 		$join_sub_select = new Criteria();
 		$join_sub_select
 			->add_select('codigo_cliente')
@@ -831,29 +845,29 @@ class ReporteAntiguedadDeudas
 			->add_restriction(CriteriaRestriction::and_all($this->and_statements))
 			->add_ordering('glosa_cliente');
 
-		//SELECT EN BASE A PARÃMETROS:
+		//SELECT EN BASE A PARÁMETROS:
 		//
 		//Hacer select del encargado comercial.
 		//
 		if ($this->opciones['encargado_comercial']){
 			$this->criteria
-						->add_select('u.username','encargado_comercial');	
+						->add_select('u.username','encargado_comercial');
 		}
 	}
 
 	/**
-	 * [Define los parÃ¡metros que supondrÃ¡n el comportamiento del reporte]
+	 * [Define los parámetros que supondrán el comportamiento del reporte]
 	 */
 	private function define_parametros_query_sin_detalle() {
-		
+
 		if ($this->opciones['solo_monto_facturado']) {
 			$campo_valor = "fsaldo";
 			$campo_gvalor = "fgsaldo";
 			$campo_hvalor = "fhsaldo";
 			$tipo = " pdl.glosa";
 			$fecha_atraso = "factura.fecha";
-			$label_decorator = utf8_decode('NÂ°');
-			$label = " concat(pdl.codigo,' $label_decorator ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+			$label_decorator = 'Nº';
+			$label = " concat(pdl.codigo,' $label_decorator ',lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
 			$this->opciones['identificadores'] = 'facturas';
 			$this->opciones['identificador_detalle'] = 'factura';
 			$identificador = " d.id_cobro";
@@ -875,7 +889,7 @@ class ReporteAntiguedadDeudas
 	}
 
 	/**
-	 * [Agrega descripciones segÃºn el tipo de objeto que se considera en el reporte]
+	 * [Agrega descripciones según el tipo de objeto que se considera en el reporte]
 	 */
 	private function agrega_restricciones_segun_tipo_monto(){
 

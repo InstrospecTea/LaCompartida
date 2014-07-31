@@ -310,6 +310,7 @@ $_LANG['Emitir cobro :: Selección del Cliente'] = "Emitir cobro :: Selección del
 $_LANG['Equivalente a'] = "Equivalent to";
 $_LANG['Equivalente a:'] = "Equivalent to:";
 $_LANG['Equivalente a la fecha'] = "Equivalent to";
+$_LANG[', equivalentes a '] = ", equivalent to ";
 $_LANG['A'] = "To";
 $_LANG['a'] = "to";
 $_LANG['Servicios Paralegales'] = "Paralegal Services";
@@ -1112,5 +1113,5 @@ $_LANG['Zimbabue'] = 'Zimbabwe';
 
 $_LANG['Detalle Cobro'] = "Debit Note Details";
 $_LANG['Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
-$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable."; 
-$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices."; 
+$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
+$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
