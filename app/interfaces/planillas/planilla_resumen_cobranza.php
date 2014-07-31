@@ -75,9 +75,9 @@ if ($xls) {
 				'Border' => 1,
 				'Locked' => 1,
 				'Color' => 'black'));
-	$time_format = & $wb->addFormat(array('Size' => 10,
+	$time_format = & $wb->addFormat(array('Size' => 11,
 				'VAlign' => 'top',
-				'Align' => 'justify',
+				'Align' => 'right',
 				'Border' => 1,
 				'Color' => 'black',
 				'NumFormat' => '[h]:mm'));
@@ -180,6 +180,8 @@ if ($xls) {
 	// Para las fórmulas de la hoja
 	$col_formula_honorarios = Utiles::NumToColumnaExcel($col_honorarios);
 	$col_formula_gastos = Utiles::NumToColumnaExcel($col_gastos);
+	$col_formula_horas_cobradas = Utiles::NumToColumnaExcel($col_horas_cobradas);
+	$col_formula_horas_trabajadas = Utiles::NumToColumnaExcel($col_horas_trabajadas);
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 		$col_formula_iva = Utiles::NumToColumnaExcel($col_iva);
 		$col_formula_total_con_iva = Utiles::NumToColumnaExcel($col_total_con_iva);
@@ -855,6 +857,9 @@ if ($xls) {
 		}
 		$ws1->writeFormula($filas, $col_honorarios, "=SUM($col_formula_honorarios$fila_inicial:$col_formula_honorarios$filas)", $formatos_moneda[$moneda]);
 		$ws1->writeFormula($filas, $col_gastos, "=SUM($col_formula_gastos$fila_inicial:$col_formula_gastos$filas)", $formatos_moneda[$moneda]);
+		$ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $time_format);
+		$ws1->writeFormula($filas, $col_horas_cobradas, "=SUM($col_formula_horas_cobradas$fila_inicial:$col_formula_horas_cobradas$filas)", $time_format);
+
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeFormula($filas, $col_iva, "=SUM($col_formula_iva$fila_inicial:$col_formula_iva$filas)", $formatos_moneda[$moneda]);
 		}
@@ -896,7 +901,7 @@ $pagina->PrintTop();
 	<?php
 	$hoy = date("Y-m-d");
 	?>
-	<table class="border_plomo tb_base" width:650px" cellpadding="0" cellspacing="3" align="center">
+	<table class="border_plomo tb_base" width="650px" cellpadding="0" cellspacing="3" align="center">
 		   <tr>
 			<td align="center">
 				<table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3" >
@@ -1036,8 +1041,7 @@ $pagina->PrintTop();
 </form>
 <script type="text/javascript">
 <!-- //
-	function Rangos(obj, form)
-	{
+	function Rangos(obj, form) {
 		var td_show = $('periodo_rango');
 		var td_hide = $('periodo');
 
