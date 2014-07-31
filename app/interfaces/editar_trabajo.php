@@ -1610,7 +1610,7 @@ function Substring($string) {
     var orphan = parentExists() ? '0' : '1';
 
     if (confirm("<?php echo __('¿Desea eliminar este trabajo?'); ?>")) {
-      window.location = "editar_trabajo?opcion=eliminar&id_trabajo=" + id_trabajo + "&popup=" + popup + "&orphan=" + orphan;
+      window.location = "editar_trabajo.php?opcion=eliminar&id_trabajo=" + id_trabajo + "&popup=" + popup + "&orphan=" + orphan;
     }
   }
 
