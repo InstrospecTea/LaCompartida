@@ -540,7 +540,7 @@ class ReporteContrato extends Contrato {
 
 		$resp = mysql_query($querycobros, $this->sesion->dbh) or Utiles::errorSQL($querycobros, __FILE__, __LINE__, $this->sesion->dbh);
 		while ($listacobro = mysql_fetch_array($resp)):
-			$this->arrayultimocobro[$listacobro[0]] = array('fecha_fin' => $listacobro[3], 'estado' => $listacobro[2], 'fecha_emision' => $listacobro[4]);
+			$this->arrayultimocobro[$listacobro[0]] = array('id_cobro' => $listacobro[1], 'fecha_fin' => $listacobro[3], 'estado' => $listacobro[2], 'fecha_emision' => $listacobro[4]);
 		endwhile;
 		//mail('ffigueroa@lemontech.cl','UltimosCobros',json_encode($this->arrayultimocobro));
 	}
