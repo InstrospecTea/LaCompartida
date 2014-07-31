@@ -1,5 +1,11 @@
 # Changelog
 
+## Hotfix: 14.7.2
+Miércoles 31 de Julio 2014
+* **Fixed:** [Corrige eliminación de trabajo](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige asignación de usuario en ingreso de trabajo](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige asignación de codigo asunto secundario al cargar actividades por JS](https://github.com/LemontechSA/ttb/pull/612)
+
 ## Hotfix: 14.7.1
 Miércoles 30 de Julio 2014
 * **Fixed:** [Elimina variable que no se envía.](https://github.com/LemontechSA/ttb/pull/610)
