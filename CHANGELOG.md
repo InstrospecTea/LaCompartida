@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.8.1
 Viernes 1 de Agosto 2014
-* **Fixed:** [Evita errores de codificacion en respuesta ajax](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Evita errores de codificacion en respuesta ajax](https://github.com/LemontechSA/ttb/pull/618)
 
 ## Release: 14.8.0
 Jueves 31 de Julio 2014
