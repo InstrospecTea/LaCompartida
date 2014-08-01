@@ -1087,7 +1087,7 @@ HTML;
 	}
 
 	//Calcula cambio de moneda
-	function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
+	public function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
 		if ($monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini)) {
 			$monto_ini = (double) 0;
 		}
