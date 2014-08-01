@@ -67,7 +67,7 @@ foreach ($datos as $dato) {
 }
 $wb = new Spreadsheet_Excel_Writer();
 
-$wb->send("Planilla Horas por Cliente.xls");
+$wb->send('Planilla Horas por Cliente.xls');
 
 /* FORMATOS */
 $wb->setCustomColor(35, 220, 255, 220);
@@ -131,21 +131,21 @@ $numeros = & $wb->addFormat(array('Size' => 12,
 		'Align' => 'right',
 		'Border' => 1,
 		'Color' => 'black'));
-$numeros->setNumFormat("0");
+$numeros->setNumFormat('0');
 $numeros_bold = & $wb->addFormat(array('Size' => 12,
 		'VAlign' => 'top',
 		'Align' => 'right',
 		'Border' => 1,
 		'Bold' => 1,
 		'Color' => 'black'));
-$numeros_bold->setNumFormat("0");
+$numeros_bold->setNumFormat('0');
 
 $horas_minutos = & $wb->addFormat(array('Size' => 12,
 		'VAlign' => 'top',
 		'Align' => 'right',
 		'Border' => 1,
 		'Color' => 'black'));
-$horas_minutos->setNumFormat("[h]:mm");
+$horas_minutos->setNumFormat('[h]:mm');
 
 $horas_minutos_bold = & $wb->addFormat(array('Size' => 12,
 		'VAlign' => 'top',
@@ -153,7 +153,7 @@ $horas_minutos_bold = & $wb->addFormat(array('Size' => 12,
 		'Border' => 1,
 		'Bold' => 1,
 		'Color' => 'black'));
-$horas_minutos_bold->setNumFormat("[hh]:mm");
+$horas_minutos_bold->setNumFormat('[hh]:mm');
 
 $titulo_filas = & $wb->addFormat(array('Size' => 12,
 		'Align' => 'center',
@@ -168,7 +168,7 @@ $formato_moneda = & $wb->addFormat(array('Size' => 11,
 		'Align' => 'right',
 		'Border' => 1,
 		'Color' => 'black'));
-$formato_moneda->setNumFormat("#,##0.00");
+$formato_moneda->setNumFormat('#,##0.00');
 
 
 /* TITULOS */
@@ -191,15 +191,15 @@ $ws1->write($fila, 3, '');
 $ws1->mergeCells($fila, 1, $fila, 3);
 
 $fila += 1;
-$ws1->write($fila, 0, __('PERIODO RESUMEN') . ":", $titulo);
+$ws1->write($fila, 0, __('PERIODO RESUMEN') . ':', $titulo);
 
-$ws1->write($fila, 1, $fecha_ini . " " . __("al") . " " . $fecha_fin, $titulo);
+$ws1->write($fila, 1, $fecha_ini . ' ' . __('al') . ' ' . $fecha_fin, $titulo);
 $ws1->write($fila, 2, '');
 $ws1->mergeCells($fila, 1, $fila, 2);
 
 $fila += 1;
 
-$hoy = date("d-m-Y");
+$hoy = date('d-m-Y');
 
 $ws1->write($fila, 0, __('FECHA REPORTE'), $titulo);
 $ws1->write($fila, 1, $hoy, $titulo);
@@ -242,8 +242,8 @@ function total($fila, $columna, $valor) {
 	global $tipo_dato;
 	global $sesion;
 
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MostrarSoloMinutos') ) || ( method_exists('Conf', 'MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) ) && (strpos($tipo_dato, "oras_") || strpos($tipo_dato_comparado, "oras_"))) {
-		$ws1->write($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, "excel"), $horas_minutos_bold);
+	if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && (strpos($tipo_dato, 'oras_') || strpos($tipo_dato_comparado, 'oras_'))) {
+		$ws1->write($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $horas_minutos_bold);
 	} else {
 		$ws1->write($fila, $columna, $valor, $numeros_bold);
 	}
@@ -265,10 +265,10 @@ function dato($fila, $columna, $valor, $bold = false) {
 
 	if ($valor === '99999!*') {
 		$ws1->write($fila, $columna, '99999!*', $txt_rojo);
-		$ws1->writeNote($fila, $columna, __("Valor Indeterminado: denominador de fÃ³rmula es 0."));
+		$ws1->writeNote($fila, $columna, __('Valor Indeterminado: denominador de fórmula es 0.'));
 	} else {
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MostrarSoloMinutos') ) || ( method_exists('Conf', 'MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) ) && (strpos($tipo_dato, "oras_") || strpos($tipo_dato_comparado, "oras_"))) {
-			$ws1->writeNumber($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, "excel"), $hm);
+		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && (strpos($tipo_dato, 'oras_') || strpos($tipo_dato_comparado, 'oras_'))) {
+			$ws1->writeNumber($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $hm);
 		} else {
 			$ws1->writeNumber($fila, $columna, $valor, $n);
 		}
@@ -280,7 +280,7 @@ function texto($fila, $columna, $valor) {
 	global $txt_opcion;
 	if ($valor == __('Indefinido')) {
 		$ws1->write($fila, $columna, $valor, $txt_opcion);
-		$ws1->writeNote($fila, $columna, __("Agrupador no existe, o no estÃ¡ definido para estos datos."));
+		$ws1->writeNote($fila, $columna, __('Agrupador no existe, o no está definido para estos datos.'));
 	} else {
 		$ws1->write($fila, $columna, $valor, $txt_opcion);
 	}
@@ -304,7 +304,7 @@ for ($i = 0; $i < sizeof($agrupadores); $i++) {
 
 $fila++;
 
-/* 	CELDAS Y VALORES. Se indica Total despuÃ©s del agrupador principal (nombre de la vista) y el agrupador mÃ¡s pequeÃ±o.
+/* 	CELDAS Y VALORES. Se indica Total después del agrupador principal (nombre de la vista) y el agrupador más pequeño.
   Usa el resultado del Reporte en forma de Planilla (toArray), recorriendo en las 4 profundidades.
  */
 $fila_a = $fila;
@@ -444,7 +444,7 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 }
 $col_c = $cantidad_columnas - ($comparar ? 3 : 2);
 //TOTALES
-$ws1->write($fila_a, $columna + $col_c, "TOTAL", $txt_derecha_bold);
+$ws1->write($fila_a, $columna + $col_c, 'TOTAL', $txt_derecha_bold);
 
 total($fila_a, $col_c + 1, '=SUM(' . fila_col($fila, $col_c + 1) . ':' . fila_col($fila_a - 1, $col_c + 1) . ')');
 
