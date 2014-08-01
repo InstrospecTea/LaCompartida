@@ -94,7 +94,7 @@ if ($revisado == 'SI') {
 
 $campo_codigo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto';
 if ($$campo_codigo_asunto != '') {
-	$where.= " AND tramite.$campo_codigo_asunto = '$$campo_codigo_asunto' ";
+	$where.= " AND tramite.$campo_codigo_asunto = '".$$campo_codigo_asunto."' ";
 } else if (trim($glosa_asunto) != '') {
 	$where.= " AND asunto.glosa_asunto LIKE '%{$glosa_asunto}%' ";
 }
@@ -341,8 +341,7 @@ $pagina->PrintTop($popup);
 
 <script type="text/javascript">
 
-	function GrabarCampo(accion, id_tramite, cobro, valor)
-	{
+	function GrabarCampo(accion, id_tramite, cobro, valor) {
 		var http = getXMLHTTP();
 		if (valor) {
 			valor = '1';
@@ -370,8 +369,7 @@ $pagina->PrintTop($popup);
 	}
 
 
-	function AgregarNuevo(name)
-	{
+	function AgregarNuevo(name) {
 		var usuario = jQuery('#id_usuario').length > 0 ? jQuery('#id_usuario').val() : <?php echo $sesion->usuario->fields[id_usuario]; ?>;
 
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) {	?>
@@ -390,14 +388,12 @@ $pagina->PrintTop($popup);
 	}
 
 
-	function EliminaTramite(id)
-	{
+	function EliminaTramite(id) {
 		self.location.href = "listar_tramites.php?accion=eliminar&popup=1&opc=buscar&id_tramite=" + id;
 		return true;
 	}
 
-	function GuardarCampoTrabajo(id, campo, valor)
-	{
+	function GuardarCampoTrabajo(id, campo, valor) {
 		var http = getXMLHTTP();
 		var url = '_ajax.php?accion=actualizar_trabajo&id=' + id + '&campo=' + campo + '&valor=' + valor;
 
@@ -416,8 +412,7 @@ $pagina->PrintTop($popup);
 	}
 
 	// Basado en http://snipplr.com/view/1696/get-elements-by-class-name/
-	function getElementsByClassName(classname)
-	{
+	function getElementsByClassName(classname) {
 		node = document.getElementsByTagName("body")[0];
 		var a = [];
 		var re = new RegExp('\\b' + classname + '\\b');
@@ -428,8 +423,7 @@ $pagina->PrintTop($popup);
 		return a;
 	}
 	// Función para seleccionar todos las filas para editar, basada en la de phpMyAdmin
-	function seleccionarTodo(valor)
-	{
+	function seleccionarTodo(valor) {
 		var rows = getElementsByClassName('buscador')[0].getElementsByTagName('tr');
 		var checkbox;
 		// Se selecciona fila por medio porque cada trabajo ocupa dos filas de la tabla y el checkbox para editar está en la primera fila de cada trabajo.
@@ -445,8 +439,7 @@ $pagina->PrintTop($popup);
 
 	// Encuentra los id de los trabajos seleccionados para editar, depende del id del primer <tr> que contiene al trabajo.
 	// Los id quedan en un string separados por el caracter 't'.
-	function getIdTrabajosSeleccionados()
-	{
+	function getIdTrabajosSeleccionados() {
 		var rows = getElementsByClassName('buscador')[0].getElementsByTagName('tr');
 		var checkbox;
 		var ids = '';
@@ -465,8 +458,7 @@ $pagina->PrintTop($popup);
 		return ids;
 	}
 	// Intenta editar múltiples trabajos, genera un error si no hay trabajos seleccionados.
-	function editarMultiplesArchivos()
-	{
+	function editarMultiplesArchivos() {
 		// Los id de los trabajos seleccionados están en un solo string separados por el caracter 't'.
 		// La página editar_multiples_trabajos.php se encarga de parsear este string.
 		var ids = getIdTrabajosSeleccionados();
@@ -717,7 +709,7 @@ function funcionTR(& $tramite) {
 	if ($tramite->fields['codigo_idioma'] != '') {
 		$idioma->Load($tramite->fields['codigo_idioma']);
 	} else {
-		$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+		$idioma->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 	}
 
 	if ($tramite->fields['tarifa_tramite_individual'] > 0) {
