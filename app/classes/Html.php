@@ -54,6 +54,11 @@ class Html extends \Html {
 		return $html;
 	}
 
+	public function img($image, $attributes) {
+		$attr = array_merge(array('src' => $image), $attributes);
+		return $this->tag('img', '', $attr, true);
+	}
+
 	/**
 	 * Crea un select HTML con opciones Todos, SI y NO
 	 * @param type $name
@@ -95,4 +100,3 @@ class Html extends \Html {
 	}
 
 }
-

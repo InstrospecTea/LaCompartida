@@ -1141,6 +1141,15 @@ $_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %H
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
 $_LANG["Not allowed"] = "Esta opción no está permitida";
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+
+/* Langs específicos para facturación electrónica */
 $_LANG["SaveGeneratedInvoiceError"] = "Error guardar la factura electrónica";
 $_LANG["SaveCanceledInvoiceError"] = "Error al guardar el estado de la Factura electrónica anulada";
 $_LANG["CancelGeneratedInvoiceError"] = "Error anular la factura electrónica";
+$_LANG["Posee documentos con error. - El R.U.T. del cliente es inválido en la información del documento XML.-"] = "Error en la factura: El R.U.T del cliente ingresado no es válido";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 33"] = "No hay folios disponibles para Facturas Electrónicas";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 34"] = "No hay folios disponibles para Facturas Excentas Electrónicas";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 46"] = "No hay folios disponibles para Factura De Compra Electronica";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 52"] = "No hay folios disponibles para Guia De Despacho Electronica";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 56"] = "No hay folios disponibles para Nota De Debito Electronica";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 61"] = "No hay folios disponibles para Nota De Credito Electronica";
