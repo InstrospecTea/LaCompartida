@@ -1036,10 +1036,9 @@ $pagina->PrintTop();
 </form>
 <script type="text/javascript">
 <!-- //
-	function Rangos(obj, form)
-	{
-		var td_show = $('periodo_rango');
-		var td_hide = $('periodo');
+	function Rangos(obj, form) {
+		var td_show = jQuery('periodo_rango');
+		var td_hide = jQuery('periodo');
 
 		if (obj.checked)
 		{

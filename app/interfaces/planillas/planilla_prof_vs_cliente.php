@@ -15,7 +15,7 @@ if(Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema')) {
 	$dato_usuario = "CONCAT_WS(' ',nombre,apellido1)";
 }
 
-$id_moneda_seleccionada=3;
+$id_moneda_seleccionada = 3;
 
 if ($horas == 'duracion_cobrada') {
 	$horas = 'if(trabajo.cobrable=1,duracion_cobrada,0)';
@@ -26,10 +26,11 @@ $id_moneda_seleccionada = $moneda_mostrar;
 $query = "
 	SELECT 
 		trabajo.id_usuario, 
-		cliente.codigo_cliente, 
+		cliente.codigo_cliente,
+		contrato.id_moneda as 'id_moneda_contrato',
 		SUM(TIME_TO_SEC( $horas )) AS duracion,
-		(mt_contrato.tipo_cambio * usuario_tarifa_contrato.tarifa) * (SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600) AS valor_hh,
-    	(mt_defecto.tipo_cambio * usuario_tarifa_standard.tarifa) * (SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600) AS valor_standard,
+		(moneda_contrato.tipo_cambio * usuario_tarifa_contrato.tarifa) * (SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600) AS valor_hh,
+    	(moneda_defecto.tipo_cambio * usuario_tarifa_standard.tarifa) * (SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600) AS valor_standard,
 		glosa_grupo_cliente
 	FROM trabajo
 		
@@ -40,34 +41,45 @@ $query = "
 		LEFT JOIN contrato ON contrato.id_contrato = cliente.id_contrato
 		LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
 		
-		LEFT JOIN usuario_tarifa as usuario_tarifa_contrato ON trabajo.id_usuario = usuario_tarifa_contrato.id_usuario=1 
-			AND usuario_tarifa_contrato.id_moneda = $id_moneda_seleccionada AND	contrato.id_tarifa = usuario_tarifa_contrato.id_tarifa
-		LEFT JOIN usuario_tarifa as usuario_tarifa_standard ON trabajo.id_usuario = usuario_tarifa_standard.id_usuario
-			AND usuario_tarifa_standard.id_moneda = $id_moneda_seleccionada AND usuario_tarifa_standard.id_tarifa = tarifa_defecto.id_tarifa
+		LEFT JOIN usuario_tarifa as usuario_tarifa_contrato ON trabajo.id_usuario = usuario_tarifa_contrato.id_usuario
+			AND usuario_tarifa_contrato.id_moneda = contrato.id_moneda AND contrato.id_tarifa = usuario_tarifa_contrato.id_tarifa
 
-		LEFT JOIN prm_moneda as mt_contrato ON usuario_tarifa_contrato.id_moneda = mt_contrato.id_moneda
-		LEFT JOIN prm_moneda as mt_defecto ON usuario_tarifa_standard.id_moneda = mt_defecto.id_moneda
+		LEFT JOIN usuario_tarifa as usuario_tarifa_standard ON trabajo.id_usuario = usuario_tarifa_standard.id_usuario
+			AND usuario_tarifa_standard.id_moneda = contrato.id_moneda AND usuario_tarifa_standard.id_tarifa = tarifa_defecto.id_tarifa
+
+		LEFT JOIN prm_moneda as moneda_contrato ON usuario_tarifa_contrato.id_moneda = moneda_contrato.id_moneda
+		LEFT JOIN prm_moneda as moneda_defecto ON usuario_tarifa_standard.id_moneda = moneda_defecto.id_moneda
 
 		WHERE fecha >= '$fecha1' AND fecha <= '$fecha2'
 			GROUP BY trabajo.id_usuario, asunto.codigo_cliente
 			ORDER BY grupo_cliente.glosa_grupo_cliente,usuario.id_categoria_usuario";
 
-// print_r($query);
-// exit;
-
 							
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
-for($i = 0; list($id_usuario, $cliente, $duracion, $valor_hh, $valor_standard, $glosa_grupo_cliente) = mysql_fetch_array($resp); $i++) {
-	
+
+for($i = 0; list($id_usuario, $cliente, $id_moneda_contrato, $duracion, $valor_hh, $valor_standard, $glosa_grupo_cliente) = mysql_fetch_array($resp); $i++) {
 	$usuarios[$i] = $id_usuario;
 	$clientes[$i] = $cliente;
 	$grupos[$cliente] = $glosa_grupo_cliente;
 	# En excel el tiempo se mide en dias, por eso los segundos se dividen por 60*60*24
 	$arreglo[$id_usuario][$cliente] = $duracion / (60*60*24);
+	//Conversion de monedas
+	//Instanciar las monedas del contrato y la moneda seleccionada
+	$monedaContrato = new Moneda($sesion);
+	$monedaContrato->Load($id_moneda_contrato);
+
+	$monedaSeleccionada = new Moneda($sesion);
+	$monedaSeleccionada->Load($id_moneda_seleccionada);
+	//Realizar el tipo de cambio para el valor HH y el valor standard desde la moneda del contrato hacia la moneda seleccionada.
+	$utiles = new UtilesApp();
+	$valor_hh = $utiles->CambiarMoneda($valor_hh, $monedaContrato->fields['tipo_cambio'], $monedaContrato->fields['cifras_decimales'], $monedaSeleccionada->fields['tipo_cambio'], $monedaSeleccionada->fields['cifras_decimales']);
+	$valor_standard = $utiles->CambiarMoneda($valor_standard, $monedaContrato->fields['tipo_cambio'], $monedaContrato->fields['cifras_decimales'], $monedaSeleccionada->fields['tipo_cambio'], $monedaSeleccionada->fields['cifras_decimales']);
+	//Asignar los nuevos valores al array.
 	$arreglo_valor_hh[$id_usuario][$cliente] = $valor_hh;
 	$arreglo_valor_standard[$id_usuario][$cliente] = $valor_standard;
 }
+die();
 
 $usuarios = array_values(array_unique($usuarios));
 $clientes = array_values(array_unique($clientes));
