@@ -47,6 +47,9 @@ if (!$filtros_check) {
 	}
 }
 
+// Cuando es tabla dinamica se repiten los resultados en vez de hacer merge de celdas
+$extender_con_merge = $formato_tabla_dinamica == 0;
+
 if ($comparar) {
 	$titulo_reporte = __('Resumen - ') . ' ' . __($tipo_dato) . ' vs. ' . __($tipo_dato_comparado) . ' ' . __('en vista por') . ' ' . __($agrupadores[0]);
 } else {
@@ -214,13 +217,18 @@ if ($comparar) {
 	$resultado[$tipo_dato_comparado] = Reporte::fixArray($resultado[$tipo_dato_comparado], $resultado[$tipo_dato]);
 }
 
-function extender($fila, $columna, $filas) {
+function extender($fila, $columna, $filas, $valor = '') {
 	global $ws1;
 	global $txt_opcion;
+	global $extender_con_merge;
+
+	$valor = $extender_con_merge ? '' : $valor;
 	for ($f = 1; $f < $filas; $f++) {
-		$ws1->write($fila + $f, $columna, '', $txt_opcion);
+		$ws1->write($fila + $f, $columna, $valor, $txt_opcion);
 	}
-	$ws1->mergeCells($fila, $columna, $fila + $filas - 1, $columna);
+	if ($extender_con_merge) {
+		$ws1->mergeCells($fila, $columna, $fila + $filas - 1, $columna);
+	}
 }
 
 function fila_col($fila, $col) {
@@ -257,7 +265,7 @@ function dato($fila, $columna, $valor, $bold = false) {
 
 	if ($valor === '99999!*') {
 		$ws1->write($fila, $columna, '99999!*', $txt_rojo);
-		$ws1->writeNote($fila, $columna, __("Valor Indeterminado: denominador de fórmula es 0."));
+		$ws1->writeNote($fila, $columna, __("Valor Indeterminado: denominador de fÃ³rmula es 0."));
 	} else {
 		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MostrarSoloMinutos') ) || ( method_exists('Conf', 'MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) ) && (strpos($tipo_dato, "oras_") || strpos($tipo_dato_comparado, "oras_"))) {
 			$ws1->writeNumber($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, "excel"), $hm);
@@ -272,7 +280,7 @@ function texto($fila, $columna, $valor) {
 	global $txt_opcion;
 	if ($valor == __('Indefinido')) {
 		$ws1->write($fila, $columna, $valor, $txt_opcion);
-		$ws1->writeNote($fila, $columna, __("Agrupador no existe, o no está definido para estos datos."));
+		$ws1->writeNote($fila, $columna, __("Agrupador no existe, o no estÃ¡ definido para estos datos."));
 	} else {
 		$ws1->write($fila, $columna, $valor, $txt_opcion);
 	}
@@ -296,7 +304,7 @@ for ($i = 0; $i < sizeof($agrupadores); $i++) {
 
 $fila++;
 
-/* 	CELDAS Y VALORES. Se indica Total después del agrupador principal (nombre de la vista) y el agrupador más pequeño.
+/* 	CELDAS Y VALORES. Se indica Total despuÃ©s del agrupador principal (nombre de la vista) y el agrupador mÃ¡s pequeÃ±o.
   Usa el resultado del Reporte en forma de Planilla (toArray), recorriendo en las 4 profundidades.
  */
 $fila_a = $fila;
@@ -306,16 +314,16 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 
 		if (sizeof($agrupadores) > 5) {
 			texto($fila_a, $col_a, $k_a);
-			extender($fila_a, $col_a, $a['filas']);
+			extender($fila_a, $col_a, $a['filas'], $k_a);
 			$col_a++;
 
 			dato($fila_a, $col_a, $resultado[$tipo_dato][$k_a]['valor']);
-			extender($fila_a, $col_a, $a['filas']);
+			extender($fila_a, $col_a, $a['filas'], '');
 			$col_a++;
 
 			if ($comparar) {
 				dato($fila_a, $col_a, $resultado[$tipo_dato_comparado][$k_a]['valor']);
-				extender($fila_a, $col_a, $a['filas']);
+				extender($fila_a, $col_a, $a['filas'], '');
 				$col_a++;
 			}
 		}
@@ -327,16 +335,16 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 
 				if (sizeof($agrupadores) > 4) {
 					texto($fila_b, $col_b, $k_b);
-					extender($fila_b, $col_b, $b['filas']);
+					extender($fila_b, $col_b, $b['filas'], $k_b);
 					$col_b++;
 
 					dato($fila_b, $col_b, $resultado[$tipo_dato][$k_a][$k_b]['valor']);
-					extender($fila_b, $col_b, $b['filas']);
+					extender($fila_b, $col_b, $b['filas'], '');
 					$col_b++;
 
 					if ($comparar) {
 						dato($fila_b, $col_b, $resultado[$tipo_dato_comparado][$k_a][$k_b]['valor']);
-						extender($fila_b, $col_b, $b['filas']);
+						extender($fila_b, $col_b, $b['filas'], '');
 						$col_b++;
 					}
 				}
@@ -348,16 +356,16 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 
 						if (sizeof($agrupadores) > 3) {
 							texto($fila_c, $col_c, $k_c);
-							extender($fila_c, $col_c, $c['filas']);
+							extender($fila_c, $col_c, $c['filas'], $k_c);
 							$col_c++;
 
 							dato($fila_c, $col_c, $resultado[$tipo_dato][$k_a][$k_b][$k_c]['valor']);
-							extender($fila_c, $col_c, $c['filas']);
+							extender($fila_c, $col_c, $c['filas'], '');
 							$col_c++;
 
 							if ($comparar) {
 								dato($fila_c, $col_c, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c]['valor']);
-								extender($fila_c, $col_c, $c['filas']);
+								extender($fila_c, $col_c, $c['filas'], '');
 								$col_c++;
 							}
 						}
@@ -368,16 +376,16 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 								$col_d = $col_c;
 								if (sizeof($agrupadores) > 2) {
 									texto($fila_d, $col_d, $k_d);
-									extender($fila_d, $col_d, $d['filas']);
+									extender($fila_d, $col_d, $d['filas'], $k_d);
 									$col_d++;
 
 									dato($fila_d, $col_d, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d]['valor']);
-									extender($fila_d, $col_d, $d['filas']);
+									extender($fila_d, $col_d, $d['filas'], '');
 									$col_d++;
 
 									if ($comparar) {
 										dato($fila_d, $col_d, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d]['valor']);
-										extender($fila_d, $col_d, $d['filas']);
+										extender($fila_d, $col_d, $d['filas'], '');
 										$col_d++;
 									}
 								}
@@ -388,16 +396,16 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 										$col_e = $col_d;
 										if (sizeof($agrupadores) > 1) {
 											texto($fila_e, $col_e, $k_e);
-											extender($fila_e, $col_e, $e['filas']);
+											extender($fila_e, $col_e, $e['filas'], $k_e);
 											$col_e++;
 
 											dato($fila_e, $col_e, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d][$k_e]['valor']);
-											extender($fila_e, $col_e, $e['filas']);
+											extender($fila_e, $col_e, $e['filas'], '');
 											$col_e++;
 
 											if ($comparar) {
 												dato($fila_e, $col_e, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d][$k_e]['valor']);
-												extender($fila_e, $col_e, $e['filas']);
+												extender($fila_e, $col_e, $e['filas'], '');
 												$col_e++;
 											}
 										}

@@ -1082,12 +1082,12 @@ if (!$popup) {
 								<td align="center" colspan="5">
 									<br/>
 									<?php
-									echo $Form->icon_button('Planilla', 'code', array('name' => 'runreporte', 'id' => 'runreporte'));
-									echo $Form->icon_button('Excel', 'xls', array('name' => 'excel', 'id' => 'excel', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'excel');"));
-									echo $Form->icon_button('Dispersión', 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'dispersion');"));
-									echo $Form->icon_button('Tabla', 'icon-table', array('name' => 'tabla', 'id' => 'tabla', 'title' => 'Genera un Documento Excel con una tabla cruzada.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'tabla');"));
-									echo $Form->icon_button('Barras', 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gráfico de Barras, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'barra');"));
-									echo $Form->icon_button('Gráfico Torta', 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');"));
+									echo $Form->icon_button('Planilla', 'code', array('name' => 'runreporte', 'id' => 'runreporte', 'class' => 'submit_buttons', 'rel' => 'planilla'));
+									echo $Form->icon_button('Excel', 'xls', array('name' => 'excel', 'id' => 'excel', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'excel');", 'class' => 'submit_buttons', 'rel' => 'excel'));
+									echo $Form->icon_button('Dispersión', 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'dispersion');", 'class' => 'submit_buttons', 'rel' => 'dispersion'));
+									echo $Form->icon_button('Tabla', 'icon-table', array('name' => 'tabla', 'id' => 'tabla', 'title' => 'Genera un Documento Excel con una tabla cruzada.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'tabla');", 'class' => 'submit_buttons', 'rel' => 'tabla'));
+									echo $Form->icon_button('Barras', 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gráfico de Barras, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'barra');", 'class' => 'submit_buttons', 'rel' => 'barras'));
+									echo $Form->icon_button('Gráfico Torta', 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');", 'class' => 'submit_buttons', 'rel' => 'torta'));
 									echo $Form->script();
 									?>
 								</td>
@@ -1100,16 +1100,19 @@ if (!$popup) {
 									<table cellpadding="2" cellspacing="5">
 										<tr>
 											<td>
-												<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1"
-												<?php
-												if (isset($orden_barras_max2min) || !isset($tipo_dato))
-													echo 'checked="checked"';
-												?>
-													   title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
-												<label for="orden_barras_max2min"><?php echo __('Gráficar de Mayor a Menor') ?></label>
+												<span class="submit_options barras torta">
+													<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1" <?php echo (isset($orden_barras_max2min) || !isset($tipo_dato)) ? 'checked="checked"' : ''; ?> title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?>/>
+													<label for="orden_barras_max2min"><?php echo __('Gráficar de Mayor a Menor') ?></label>
+												</span>
+												<span class="submit_options excel">
+													<label>
+														<input type="checkbox" name="formato_tabla_dinamica" value="1" <?php echo $formato_tabla_dinamica ? 'checked="checked"' : ''; ?> />
+														Formato para tabla dinámica
+													</label>
+												</span>
 											</td>
 											<td>
-												<span id = "limite_check" <?php if (!isset($orden_barras_max2min) && isset($tipo_dato)) echo 'style= "display: none; "'; ?>>
+												<span class="submit_options barras torta" id="limite_check" <?php if (!isset($orden_barras_max2min) && isset($tipo_dato)) echo 'style= "display: none; "'; ?>>
 													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?php echo $limitar ? 'checked="checked"' : '' ?> />
 													<label for="limite_checkbox"><?php echo __('y mostrar sólo') ?></label> &nbsp;
 													<input type="text" name="limite" value="<?php echo $limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
@@ -1117,9 +1120,9 @@ if (!$popup) {
 												</span>
 											</td>
 											<td>
-												<span id = "agupador_check">
+												<span class="submit_options barras torta" id="agupador_check">
 													<input type="checkbox" name="agrupar" id="agrupador_checkbox" value="1" <?php echo $agrupar ? 'checked' : '' ?> />
-													<label for="agrupador_checkbox"><?php echo __('agrupando el resto') ?></label>. &nbsp;
+													<label for="agrupador_checkbox"><?php echo __('agrupando el resto') ?></label>
 												</span>
 											</td>
 										</tr>
