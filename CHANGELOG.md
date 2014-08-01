@@ -1,7 +1,12 @@
 # Changelog
 
+## Release: 14.8.0
+Jueves 31 de Julio 2014
+* **Fixed:** [Feature/agrupacion_por_cobro](https://github.com/LemontechSA/ttb/pull/611)
+* **Fixed:** [Feature/facturacion_cl](https://github.com/LemontechSA/ttb/pull/513)
+
 ## Hotfix: 14.7.2
-Miércoles 31 de Julio 2014
+Jueves 31 de Julio 2014
 * **Fixed:** [Corrige eliminación de trabajo](https://github.com/LemontechSA/ttb/pull/612)
 * **Fixed:** [Corrige asignación de usuario en ingreso de trabajo](https://github.com/LemontechSA/ttb/pull/612)
 * **Fixed:** [Corrige asignación de codigo asunto secundario al cargar actividades por JS](https://github.com/LemontechSA/ttb/pull/612)

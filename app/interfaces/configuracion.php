@@ -217,17 +217,17 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 							echo "<input type='hidden' id='opcion[$id]' name='opcion[$id]' value='" . $valor_opcion . "' />";
 							$valores_array = explode(';', $valor_opcion);
 							echo "<input type='checkbox'  id='usa_asuntos_por_defecto' " . ($valores_array[0] == "true" ? "checked='checked'" : "") . " rel='opcion[$id]' />";
-							
+
 							$valores_array2 = explode(';', $valor_opcion);
 							$elementos_en_array = count($valores_array2);
 							if ($elementos_en_array > 1) {
 								if ($elementos_en_array == 1) {
-									$query = "update `configuracion` set valor_opcion = concat('false;', SUBSTRING( valor_opcion, LOCATE(';', valor_opcion) +1 )) WHERE id = 41"; 
-								} else { 
-									$query = "update `configuracion` set valor_opcion = concat('true;', SUBSTRING( valor_opcion, LOCATE(';', valor_opcion) +1 )) WHERE id = 41"; 
+									$query = "update `configuracion` set valor_opcion = concat('false;', SUBSTRING( valor_opcion, LOCATE(';', valor_opcion) +1 )) WHERE id = 41";
+								} else {
+									$query = "update `configuracion` set valor_opcion = concat('true;', SUBSTRING( valor_opcion, LOCATE(';', valor_opcion) +1 )) WHERE id = 41";
 								}
-								mysql_query($query, $Sesion->dbh);	
-							} 							
+								mysql_query($query, $Sesion->dbh);
+							}
 
 							echo "<table id='tabla_asuntos' " . ((!$valor_opcion) ? "style='display: none;'" : "") . ">";
 							for ($i = 1; $i < count($valores_array); ++$i)
@@ -341,6 +341,7 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 			});
 			jQuery('#mensaje').append('Enviando configuracion...');
 		});
+
 		jQuery('#usa_asuntos_por_defecto').click(function() {
 			hiddenid = jQuery(this).attr('rel');
 			var string_asuntos = document.getElementById(hiddenid).value;
@@ -351,8 +352,7 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 				string_asuntos = 'false';
 			}
 
-			for (var i = 1; i < array_asuntos.length; i++)
-			{
+			for (var i = 1; i < array_asuntos.length; i++) {
 				string_asuntos += ';' + array_asuntos[i];
 			}
 
@@ -375,6 +375,7 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 				});
 				jQuery('#formulariolang').html('');
 			});
+			return false;
 		});
 
 		jQuery('#guardaplugins').click(function() {
@@ -387,9 +388,10 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 				});
 				jQuery('#formularioplugins').html('');
 			});
+			return false;
 		});
 
-		jQuery('#configuracion').bind("tabsselect", function(event, ui) {
+		jQuery('#configuracion').bind('tabsselect', function(event, ui) {
 
 			if (ui.tab.textContent == 'Lang') {
 				jQuery('#enviarconf').hide();
@@ -419,7 +421,6 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
 	});
 	</script>
-	<!-- <script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>-->
 
 	<?php
 	$pagina->PrintBottom($popup, true);

@@ -1,10 +1,12 @@
 <?php
+
 require_once dirname(__FILE__) . '/../conf.php';
 
-class PrmEstudio extends Objeto
-{
-	function PrmEstudio($sesion, $fields = "", $params = "")
-	{
+class PrmEstudio extends Objeto {
+
+	private $metaData;
+
+	function PrmEstudio($sesion, $fields = "", $params = "") {
 		$this->tabla = "prm_estudio";
 		$this->campo_id = "id_estudio";
 		$this->sesion = $sesion;
@@ -58,21 +60,45 @@ class PrmEstudio extends Objeto
 
 	/**
 	 * Obtiene la metadata asociada a una key existente en el JSON
+	 * Permite lectura multi-nivel ej: key = nivel1.nivel2.nivel3
 	 *
-	 * @param string $key
+	 * @param string $key defaul ''
 	 * @return array Arreglo asociativo o String dependiendo del contenido
 	 * de la key
 	 */
-	public function GetMetaData($key) {
-		$metadata = $this->fields['metadata_estudio'];
+	public function GetMetaData($key = '') {
+		$all_data = $this->__getMetaDataArray();
 		$data = null;
-		if (!is_null($metadata)) {
-			$all_data = json_decode(utf8_encode($metadata), true);
-			if (isset($all_data[$key]) && !is_null($all_data[$key])) {
-				$data = $all_data[$key];
+		if (empty($key)) {
+			$data = $all_data;
+		} else if(preg_match('/^[^\.]+\..+$/', $key)) {
+			$keys = explode('.', $key);
+			$preValue = $all_data;
+			foreach ($keys as $k) {
+				if (isset($preValue[$k]) && !is_null($preValue[$k])) {
+					$preValue = $preValue[$k];
+				} else {
+					$preValue = null;
+					break;
+				}
 			}
+			$data = $preValue;
+		} else if (isset($all_data[$key]) && !is_null($all_data[$key])) {
+			$data = $all_data[$key];
 		}
 		return $data;
+	}
+
+	private function __getMetaDataArray() {
+		if (!empty($this->metaData)) {
+			return $this->metaData;
+		}
+		$metadata = $this->fields['metadata_estudio'];
+		if (!empty($metadata)) {
+			$this->metaData = json_decode(utf8_encode($metadata), true);
+			return $this->metaData;
+		}
+		return null;
 	}
 
 }

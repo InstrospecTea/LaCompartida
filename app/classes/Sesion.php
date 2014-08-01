@@ -14,14 +14,14 @@ private static $_instance;
 		$existememcache =isset($memcache) && is_object($memcache);
 
 		if(!$existememcache || !$langs=@unserialize($memcache->get('cachedlangs'.LLAVE))) {
-			
+
 			$query = 'select archivo_nombre from prm_lang where activo=1 order by orden ASC';
 			try {
 				$langs = $this->pdodbh->query($query)->FetchAll(PDO::FETCH_COLUMN,0);
 				if($existememcache) $memcache->set('cachedlangs'.LLAVE, serialize($archivos),false,60);
 			} catch (PDOException $e) {
 				if(strpos($e->getMessage(),'SQLSTATE[42S02]: Base table or view not found')===0) {
-				
+
 					$this->pdodbh->exec("CREATE TABLE IF NOT EXISTS `prm_lang` (
 							  `id_lang` smallint(3) NOT NULL AUTO_INCREMENT,
 							  `archivo_nombre` varchar(100) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'archivo.php' COMMENT 'relativo al path app/lang',
@@ -33,7 +33,7 @@ private static $_instance;
 					echo 'Creando tabla de langs...';
 				}
 			}
-			
+
 		}
 		if(count($langs)==0) return;
 			foreach ($langs as $lang)  {
@@ -55,7 +55,7 @@ private static $_instance;
 		$existememcache =isset($memcache) && is_object($memcache);
 
 		if(!$existememcache || !$archivos=@unserialize($memcache->get('cachedplugins'.LLAVE))) {
-			
+
 			$query = 'select archivo_nombre from prm_plugin where activo=1 order by orden ASC';
 			try {
 				$plugins = $this->pdodbh->query($query)->FetchAll(PDO::FETCH_COLUMN,0);

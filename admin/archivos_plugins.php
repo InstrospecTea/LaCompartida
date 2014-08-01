@@ -1,56 +1,49 @@
 <?php
-require_once dirname(__FILE__).'/../app/conf.php';
 
- require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-	$sesion = new Sesion(array('ADM'));
-	
- $sesion->pdodbh->exec("CREATE TABLE IF NOT EXISTS `prm_plugin` (
-						`id_plugin` smallint(3) NOT NULL AUTO_INCREMENT,
-						`archivo_nombre` varchar(100) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'plugin.php' ,
-						`orden` smallint(3) NOT NULL DEFAULT '1',
-						`activo` tinyint(1) NOT NULL,
-						PRIMARY KEY (`id_plugin`),
-						UNIQUE KEY `archivo_nombre` (`archivo_nombre`)
-						) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci");
-	
-	echo 'Hemos detectado los siguientes plugins<br><br>';
-        echo '<form id="formplugins"><ul class="buttonset" id="plugins" style="list-style:none;">';
-				
+require_once dirname(__FILE__) . '/../app/conf.php';
 
-        $archivos=array();
-        $maxid=0;
-        $orden=0;
-        
-         foreach($sesion->pdodbh->query("select * from prm_plugin order by orden ASC") as $archivo)  {
-	$maxid=$archivo[0];
-        $orden=$archivo[2];
-           $archivos[$archivo[1]]=$archivo[1];
-        //   echo '<tr><td> <input type="checkbox" class="checkbox"  id="'.$archivo[1].'_'.$archivo[1].'" name="'.$archivo[1].'" value="'.$archivo[3].'" /><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>'.$archivo[1].'</td></tr>';
+$Sesion = new Sesion(array('ADM'));
 
-         echo '<li > <input type="checkbox" class="checkbox"  id="'.$archivo[0].'_'.$archivo[1].'" name="'.$archivo[1].'" value="1" '.($archivo[3]? 'checked="checked"':'').'" /><label for="'.$archivo[0].'_'.$archivo[1].'">'.$archivo[1].'</label>  <span class="updown ui-icon ui-icon-arrowthick-2-n-s"></span></li>';
-        
-        }
-		
-   $eldirectorio=Conf::ServerDir().'/plugins/';
-		 
-       if ($myDirectory = opendir( $eldirectorio)) {
+echo 'Hemos detectado los siguientes plugins<br><br>';
+echo '<form id="formplugins">';
+echo '<ul class="buttonset" id="plugins" style="list-style:none;">';
 
-while($entryName = readdir($myDirectory)) {
-	if(!array_key_exists($entryName, $archivos) && is_file(Conf::ServerDir().'/plugins/'.$entryName))  {
-		echo '<li > <input type="checkbox" class="checkbox"  id="'.++$maxid.'_'.$entryName.'" name="'.$entryName.'" value="1" />';
-		echo '<label for="'.$maxid.'_'.$entryName.'">'.$entryName.'</label> <span class="updown ui-icon ui-icon-arrowthick-2-n-s"></span></li>';
-		$sesion->pdodbh->exec("insert into prm_plugin (archivo_nombre, orden, activo) values ('$entryName',0,0)");
-	}
+
+$archivos = array();
+$maxid = 0;
+$orden = 0;
+
+$plugins = $Sesion->pdodbh->query('select * from prm_plugin order by activo desc, orden ASC, archivo_nombre');
+
+$plugin_html = '<li><input type="checkbox" class="checkbox" id="%s_%s" name="%s" value="1" %s/><label for="%s_%s">%s</label><span class="updown ui-icon ui-icon-arrowthick-2-n-s"></span></li>' . "\n";
+
+while ($plugin = $plugins->fetch(PDO::FETCH_ASSOC)) {
+	$id = $plugin['id_plugin'];
+	$orden = $plugin['orden'];
+	$archivo = $plugin['archivo_nombre'];
+	$activo = $plugin['activo'];
+	$archivos[] = $archivo;
+	$hEntryName = ucwords(str_replace('_', ' ', $archivo));
+	printf($plugin_html, $id, $archivo, $archivo, ($activo ? 'checked="checked"' : ''), $id, $archivo, $hEntryName);
 }
 
-// close directory
-closedir($myDirectory); 
-	   }
- 
-	echo '</ul>';
-        echo '<input type="hidden" id="cantidad" name="cantidad" value="'.$maxid.'"/>';
-        echo '<input type="hidden" id="accion" name="accion" value="actualiza_plugins"/>';
-        echo '</form>';
+$eldirectorio = Conf::ServerDir() . '/plugins/';
 
-        
-        
+if ($myDirectory = opendir($eldirectorio)) {
+
+	while ($entryName = readdir($myDirectory)) {
+		if (!in_array($entryName, $archivos) && is_file(Conf::ServerDir() . '/plugins/' . $entryName)) {
+			$Sesion->pdodbh->exec("insert into prm_plugin (archivo_nombre, orden, activo) values ('$entryName',0,0)");
+			$lastId = $Sesion->pdodbh->lastInsertId();
+			$hEntryName = ucwords(str_replace('_', ' ', $entryName));
+			printf($plugin_html, $lastId, $entryName, $entryName, '', $lastId, $entryName, $hEntryName);
+		}
+	}
+
+	closedir($myDirectory);
+}
+
+echo '</ul>';
+echo '<input type="hidden" id="cantidad" name="cantidad" value="' . $maxid . '"/>';
+echo '<input type="hidden" id="accion" name="accion" value="actualiza_plugins"/>';
+echo '</form>';
