@@ -75,9 +75,9 @@ if ($xls) {
 				'Border' => 1,
 				'Locked' => 1,
 				'Color' => 'black'));
-	$time_format = & $wb->addFormat(array('Size' => 10,
+	$time_format = & $wb->addFormat(array('Size' => 11,
 				'VAlign' => 'top',
-				'Align' => 'justify',
+				'Align' => 'right',
 				'Border' => 1,
 				'Color' => 'black',
 				'NumFormat' => '[h]:mm'));
@@ -855,6 +855,7 @@ if ($xls) {
 		}
 		$ws1->writeFormula($filas, $col_honorarios, "=SUM($col_formula_honorarios$fila_inicial:$col_formula_honorarios$filas)", $formatos_moneda[$moneda]);
 		$ws1->writeFormula($filas, $col_gastos, "=SUM($col_formula_gastos$fila_inicial:$col_formula_gastos$filas)", $formatos_moneda[$moneda]);
+		
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeFormula($filas, $col_iva, "=SUM($col_formula_iva$fila_inicial:$col_formula_iva$filas)", $formatos_moneda[$moneda]);
 		}
@@ -896,7 +897,7 @@ $pagina->PrintTop();
 	<?php
 	$hoy = date("Y-m-d");
 	?>
-	<table class="border_plomo tb_base" width:650px" cellpadding="0" cellspacing="3" align="center">
+	<table class="border_plomo tb_base" width="650px" cellpadding="0" cellspacing="3" align="center">
 		   <tr>
 			<td align="center">
 				<table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3" >
