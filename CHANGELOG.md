@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 14.8.3
+Lunes 4 de Agosto 2014
+* **Fixed:** [Agrega dato solicitante del contrato a mantenedor de factura](https://github.com/LemontechSA/ttb/pull/620)
 
 ## Hotfix: 14.8.2
 Viernes 1 de Agosto 2014
