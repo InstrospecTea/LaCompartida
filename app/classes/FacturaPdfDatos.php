@@ -331,6 +331,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'texto_impuesto':
 				$glosa_dato = $texto_impuesto;
 				break;
+			case 'solicitante':
+				$glosa_dato = $contrato->fields['contacto'];
+				break;
 
 			default:
 			
@@ -440,6 +443,7 @@ class FacturaPdfDatos extends Objeto {
 		);
 		$fila['glosa_detraccion'] = $factura_texto_detraccion;
 		$fila['texto_impuesto'] = $texto_impuesto;
+		$fila['solicitante'] = $contrato->fields['contacto'];
 
 		return $fila;
 	}

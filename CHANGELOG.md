@@ -1,7 +1,23 @@
 # Changelog
+## Hotfix: 14.8.3
+Lunes 4 de Agosto 2014
+* **Fixed:** [Agrega dato solicitante del contrato a mantenedor de factura](https://github.com/LemontechSA/ttb/pull/620)
+
+## Hotfix: 14.8.2
+Viernes 1 de Agosto 2014
+* **Fixed:** [Repara buscador por asuntos en tramites](https://github.com/LemontechSA/ttb/pull/619)
+
+## Hotfix: 14.8.1
+Viernes 1 de Agosto 2014
+* **Fixed:** [Evita errores de codificacion en respuesta ajax](https://github.com/LemontechSA/ttb/pull/618)
+
+## Release: 14.8.0
+Jueves 31 de Julio 2014
+* **Fixed:** [Feature/agrupacion_por_cobro](https://github.com/LemontechSA/ttb/pull/611)
+* **Fixed:** [Feature/facturacion_cl](https://github.com/LemontechSA/ttb/pull/513)
 
 ## Hotfix: 14.7.2
-Miércoles 31 de Julio 2014
+Jueves 31 de Julio 2014
 * **Fixed:** [Corrige eliminación de trabajo](https://github.com/LemontechSA/ttb/pull/612)
 * **Fixed:** [Corrige asignación de usuario en ingreso de trabajo](https://github.com/LemontechSA/ttb/pull/612)
 * **Fixed:** [Corrige asignación de codigo asunto secundario al cargar actividades por JS](https://github.com/LemontechSA/ttb/pull/612)

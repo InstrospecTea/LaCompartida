@@ -1864,7 +1864,7 @@ class Factura extends Objeto {
 		if (empty($tipo_documento_legal) || empty($numero) || empty($serie) || empty($id_estudio)) {
 			return false;
 		}
-		
+
 		$query = "SELECT COUNT(*) FROM factura WHERE numero = '$numero' AND id_documento_legal = '$tipo_documento_legal' AND serie_documento_legal = '$serie' AND id_estudio = '{$id_estudio}'";
 		$cantidad_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cantidad) = mysql_fetch_array($cantidad_resp);
@@ -2592,6 +2592,10 @@ class Factura extends Objeto {
 			Utiles::errorSQL($query, '', '', NULL, '', $e);
 			return false;
 		}
+	}
+
+	public function FacturaElectronicaCreada() {
+		return (!is_null($this->fields['dte_fecha_creacion']));
 	}
 
 }
