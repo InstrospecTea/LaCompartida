@@ -1672,7 +1672,7 @@ class Factura extends Objeto {
 					$segmento = '';
 
 					for ($K = 0; $k < $diff_gastos; $k++) { 
-						$segmento.='<tr><td>1&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
+						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					}
 
 					for ($k = 0; $k < count($desglose_gasto); $k++) {
