@@ -73,19 +73,17 @@ for($i = 0; list($id_usuario, $cliente, $duracion, $glosa_grupo_cliente, $id_mon
 	//Instanciar la moneda de tarifa standard.
 	$monedaStandard = new Moneda($sesion);
 	$monedaStandard->Load($id_moneda_standard);
-	//(moneda_contrato.tipo_cambio * usuario_tarifa_contrato.tarifa) * (SUM(TIME_TO_SEC($horas)) / 3600) AS valor_hh,
-	//(moneda_defecto.tipo_cambio * usuario_tarifa_standard.tarifa) * (SUM(TIME_TO_SEC($horas)) / 3600) AS valor_standard,
 	//Realizar el tipo de cambio para el valor HH y el valor standard desde la moneda del contrato hacia la moneda seleccionada.
 	$utiles = new UtilesApp();
 	$valor_hh = $utiles->CambiarMoneda(
-		$duracion / 3600 * $usuario_tarifa_contrato,
+		($duracion / 3600) * $usuario_tarifa_contrato,
 		$monedaContrato->fields['tipo_cambio'],
 		$monedaContrato->fields['cifras_decimales'],
 		$monedaSeleccionada->fields['tipo_cambio'],
 		$monedaSeleccionada->fields['cifras_decimales']
 	);
 	$valor_standard = $utiles->CambiarMoneda(
-		$duracion / 3600 * $usuario_tarifa_standard,
+		($duracion / 3600) * $usuario_tarifa_standard,
 		$monedaStandard->fields['tipo_cambio'],
 		$monedaStandard->fields['cifras_decimales'],
 		$monedaSeleccionada->fields['tipo_cambio'],
