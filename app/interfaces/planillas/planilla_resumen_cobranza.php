@@ -180,8 +180,6 @@ if ($xls) {
 	// Para las fórmulas de la hoja
 	$col_formula_honorarios = Utiles::NumToColumnaExcel($col_honorarios);
 	$col_formula_gastos = Utiles::NumToColumnaExcel($col_gastos);
-	$col_formula_horas_cobradas = Utiles::NumToColumnaExcel($col_horas_cobradas);
-	$col_formula_horas_trabajadas = Utiles::NumToColumnaExcel($col_horas_trabajadas);
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 		$col_formula_iva = Utiles::NumToColumnaExcel($col_iva);
 		$col_formula_total_con_iva = Utiles::NumToColumnaExcel($col_total_con_iva);
