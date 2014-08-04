@@ -1037,18 +1037,12 @@ $pagina->PrintTop();
 <script type="text/javascript">
 <!-- //
 	function Rangos(obj, form) {
-		var td_show = jQuery('periodo_rango');
-		var td_hide = jQuery('periodo');
-
-		if (obj.checked)
-		{
-			td_hide.style['display'] = 'none';
-			td_show.style['display'] = 'inline';
-		}
-		else
-		{
-			td_hide.style['display'] = 'inline';
-			td_show.style['display'] = 'none';
+		if (obj.checked) {
+			jQuery('#periodo').hide();
+			jQuery('#periodo_rango').show();
+		} else {
+			jQuery('#periodo').show();
+			jQuery('#periodo_rango').hide();
 		}
 	}
 	Calendar.setup(
