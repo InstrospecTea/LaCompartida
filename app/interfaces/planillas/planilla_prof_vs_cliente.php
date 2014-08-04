@@ -79,7 +79,7 @@ for($i = 0; list($id_usuario, $cliente, $id_moneda_contrato, $duracion, $valor_h
 	$arreglo_valor_hh[$id_usuario][$cliente] = $valor_hh;
 	$arreglo_valor_standard[$id_usuario][$cliente] = $valor_standard;
 }
-die();
+
 
 $usuarios = array_values(array_unique($usuarios));
 $clientes = array_values(array_unique($clientes));
