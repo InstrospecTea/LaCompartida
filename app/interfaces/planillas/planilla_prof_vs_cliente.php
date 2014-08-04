@@ -23,6 +23,8 @@ if ($horas == 'duracion_cobrada') {
 
 $id_moneda_seleccionada = $moneda_mostrar;
 
+
+
 $query = "
 	SELECT 
 		trabajo.id_usuario, 
@@ -45,7 +47,7 @@ $query = "
 			AND usuario_tarifa_contrato.id_moneda = contrato.id_moneda AND contrato.id_tarifa = usuario_tarifa_contrato.id_tarifa
 
 		LEFT JOIN usuario_tarifa as usuario_tarifa_standard ON trabajo.id_usuario = usuario_tarifa_standard.id_usuario
-			AND usuario_tarifa_standard.id_moneda = contrato.id_moneda AND usuario_tarifa_standard.id_tarifa = tarifa_defecto.id_tarifa
+			AND usuario_tarifa_standard.id_moneda = contrato.id_moneda AND tarifa_defecto.id_tarifa = usuario_tarifa_standard.id_tarifa
 
 		LEFT JOIN prm_moneda as moneda_contrato ON usuario_tarifa_contrato.id_moneda = moneda_contrato.id_moneda
 		LEFT JOIN prm_moneda as moneda_defecto ON usuario_tarifa_standard.id_moneda = moneda_defecto.id_moneda
@@ -74,7 +76,7 @@ for($i = 0; list($id_usuario, $cliente, $id_moneda_contrato, $duracion, $valor_h
 	//Realizar el tipo de cambio para el valor HH y el valor standard desde la moneda del contrato hacia la moneda seleccionada.
 	$utiles = new UtilesApp();
 	$valor_hh = $utiles->CambiarMoneda($valor_hh, $monedaContrato->fields['tipo_cambio'], $monedaContrato->fields['cifras_decimales'], $monedaSeleccionada->fields['tipo_cambio'], $monedaSeleccionada->fields['cifras_decimales']);
-	$valor_standard = $utiles->CambiarMoneda($valor_standard, $monedaContrato->fields['tipo_cambio'], $monedaContrato->fields['cifras_decimales'], $monedaSeleccionada->fields['tipo_cambio'], $monedaSeleccionada->fields['cifras_decimales']);
+	$valor_standard = $utiles->CambiarMoneda($valor_standard, $monedaContrato->fields['tipo_cambio'], $monedaSeleccionada->fields['cifras_decimales'], $monedaSeleccionada->fields['tipo_cambio'], $monedaSeleccionada->fields['cifras_decimales']);
 	//Asignar los nuevos valores al array.
 	$arreglo_valor_hh[$id_usuario][$cliente] = $valor_hh;
 	$arreglo_valor_standard[$id_usuario][$cliente] = $valor_standard;
