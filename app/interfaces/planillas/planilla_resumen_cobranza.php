@@ -1036,20 +1036,13 @@ $pagina->PrintTop();
 </form>
 <script type="text/javascript">
 <!-- //
-	function Rangos(obj, form)
-	{
-		var td_show = $('periodo_rango');
-		var td_hide = $('periodo');
-
-		if (obj.checked)
-		{
-			td_hide.style['display'] = 'none';
-			td_show.style['display'] = 'inline';
-		}
-		else
-		{
-			td_hide.style['display'] = 'inline';
-			td_show.style['display'] = 'none';
+	function Rangos(obj, form) {
+		if (obj.checked) {
+			jQuery('#periodo').hide();
+			jQuery('#periodo_rango').show();
+		} else {
+			jQuery('#periodo').show();
+			jQuery('#periodo_rango').hide();
 		}
 	}
 	Calendar.setup(
