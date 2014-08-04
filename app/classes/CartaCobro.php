@@ -826,6 +826,9 @@ class CartaCobro extends NotaCobro {
 				$fecha_hasta_cobro = strftime(Utiles::FormatoStrfTime('%e de %B'), mktime(0, 0, 0, date("m", strtotime($this->fields['fecha_fin'])), date("d", strtotime($this->fields['fecha_fin'])), date("Y", strtotime($this->fields['fecha_fin']))));
 				$html2 = str_replace('%fecha_hasta%', $fecha_hasta_cobro, $html2);
 
+				$fecha_hasta_dmy = strftime(Utiles::FormatoStrfTime('%e de %B del %Y'), strtotime($this->fields['fecha_fin']));
+				$html2 = str_replace('%fecha_hasta_dmy%', $fecha_hasta_dmy, $html2);
+
 				if ($this->fields['id_moneda'] > 1 && $moneda_total->fields['id_moneda'] > 1) { #!= $moneda_cli->fields['id_moneda']
 					$en_pesos = (double) $this->fields['monto'] * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_moneda_base_cobro);
 					$html2 = str_replace('%monto_en_pesos%', __(', equivalentes a esta fecha a $ ') . number_format($en_pesos, 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2);
@@ -1709,6 +1712,9 @@ class CartaCobro extends NotaCobro {
 
 				$fecha_hasta_cobro = strftime(Utiles::FormatoStrfTime('%e de %B'), mktime(0, 0, 0, date("m", strtotime($this->fields['fecha_fin'])), date("d", strtotime($this->fields['fecha_fin'])), date("Y", strtotime($this->fields['fecha_fin']))));
 				$html2 = str_replace('%fecha_hasta%', $fecha_hasta_cobro, $html2);
+
+				$fecha_hasta_dmy = strftime(Utiles::FormatoStrfTime('%e de %B del %Y'), strtotime($this->fields['fecha_fin']));
+				$html2 = str_replace('%fecha_hasta_dmy%', $fecha_hasta_dmy, $html2);
 
 				if ($this->fields['id_moneda'] > 1 && $moneda_total->fields['id_moneda'] > 1) { #!= $moneda_cli->fields['id_moneda']
 					$en_pesos = (double) $this->fields['monto'] * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_moneda_base_cobro);
