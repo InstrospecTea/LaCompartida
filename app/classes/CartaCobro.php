@@ -921,7 +921,7 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%num_letter_rebaza%', __('el cobro N°') . ' ' . $this->fields['id_cobro'], $html2);
 				}
 
-				$html2 = str_replace('%si_gastos%', $total_gastos > 0 ? __('y reembolso de gastos') : '', $html2);
+				$html2 = str_replace('%si_gastos%', $total_gastos > 0 ? __('y gastos') : '', $html2);
 
 				$detalle_cuenta_honorarios = '(i) ' . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda_sin_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 
@@ -1817,7 +1817,7 @@ class CartaCobro extends NotaCobro {
 				}
 
 				# datos detalle carta mb y ebmo
-				$html2 = str_replace('%si_gastos%', $total_gastos > 0 ? __('y reembolso de gastos') : '', $html2);
+				$html2 = str_replace('%si_gastos%', $total_gastos > 0 ? __('y gastos') : '', $html2);
 
 				$detalle_cuenta_honorarios = '(i) ' . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda_sin_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 
