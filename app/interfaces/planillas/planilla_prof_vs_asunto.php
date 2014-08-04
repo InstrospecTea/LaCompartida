@@ -227,7 +227,7 @@ $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__
 	$ws1->writeFormula($fila_final, $columna_final+1, "=SUM($col_formula_valor_contrato".($fila_inicial+2).":$col_formula_valor_contrato$fila_final)", $formato_moneda_total);
 	$ws1->writeFormula($fila_final, $columna_final+2, "=SUM($col_formula_valor_defecto".($fila_inicial+2).":$col_formula_valor_defecto$fila_final)", $formato_moneda_total);
 
-	$wb->send("Planilla Profesional vs $vs.xls");
+	$wb->send("Planilla Profesional vs Asunto.xls");
 	$wb->close();
 	exit;
 ?>
