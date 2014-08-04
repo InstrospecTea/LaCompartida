@@ -1567,7 +1567,7 @@ class Factura extends Objeto {
 					// Segmento de codigo para factura word expertise
 					$segmento = '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					$cantidad = 1;
-					for ($cantidad = 0; $cantidad < 22; $cantidad++) { 
+					for ($cantidad = 0; $cantidad < 21; $cantidad++) { 
 						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					}
 					$html2 = str_replace('%desglose_gastos%', $segmento, $html2);
