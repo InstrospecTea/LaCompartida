@@ -381,12 +381,9 @@ if ($xls) {
 	$querycobros = "SELECT
 					GROUP_CONCAT( asunto.codigo_asunto ) AS codigos_asuntos,
 					$codigos_asuntos_secundarios
-					asunto.glosa_asunto,
 					GROUP_CONCAT( asunto.glosa_asunto ) AS asuntos,
-					asunto.codigo_asunto,
 					$codigo_asunto_secundario_sep
 					GROUP_CONCAT( IF(asunto.cobrable = 1, 'SI', 'NO') ) AS asuntos_cobrables,
-					cliente.glosa_cliente,
 					GROUP_CONCAT( cliente.glosa_cliente ) AS clientes,
 					CONCAT_WS(' ', ec.nombre, ec.apellido1, ec.apellido2) AS nombre_encargado_comercial,
 					ec.username as username_encargado_comercial,
@@ -469,7 +466,7 @@ if ($xls) {
 		}
 		++$filas;
 
-		$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
+		$ws1->write($filas, $col_cliente, $cobro['clientes'], $formato_texto);
 		if (!$ocultar_encargado) {
 			if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 				$ws1->write($filas, $col_usuario_encargado, $cobro['username_encargado_comercial'], $formato_texto);
