@@ -1215,6 +1215,12 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+		case 7.77:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO factura_pdf_tipo_datos (id_tipo_dato, id_factura_pdf_datos_categoria, codigo_tipo_dato, glosa_tipo_dato) VALUES (NULL, '2', 'solicitante', 'Solicitante');";
+			$queries[] = "INSERT IGNORE INTO factura_pdf_datos ( id_dato , id_tipo_dato , id_documento_legal , activo , coordinateX , coordinateY , cellW , cellH , font , style , mayuscula , tamano , Ejemplo , align ) VALUES ( NULL , '41', '1', '0', '0', '0', '0', '0', '', '', '', '8', 'Alberto Botero', 'L' );";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -1224,7 +1230,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.76;
+$max_update = 7.77;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
