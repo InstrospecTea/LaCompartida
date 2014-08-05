@@ -1563,8 +1563,8 @@ class Factura extends Objeto {
 			    	$asuntosrelacionados = '';
 
 			    	for ($k = 0; $k < count($asuntos_rel); $k++) {
-				    	$espace_rel = $k < count($asuntos_rel) - 1 ? '' : '';
-			    		$asuntosrelacionados .= $asuntos_rel[$k]['glosa_asunto'] . '<br>' . $espace_rel;
+				    	$salto_rel = $k < count($asuntos_rel) - 1 ? '<br>' : '';
+			    		$asuntosrelacionados .= $asuntos_rel[$k]['glosa_asunto'] . $salto_rel;
 			    	}
 
 					$html2 = str_replace('%factura_descripcion_honorarios%', $descripcion_honorarios_legales, $html2);
