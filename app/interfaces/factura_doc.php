@@ -47,7 +47,7 @@ if ( !$papel || $papel=='' ) {
 
 $doc = new DocGenerator($html, $cssData, $papel, false, 'PORTRAIT', $docm_top, $docm_right, $docm_bottom, $docm_left, 'EMITIDO', '', $configuracion);
 
-//echo '<style>'.$cssData.'</style>'.$html; exit;
+// echo '<style>'.$cssData.'</style>'.$html; exit;
 
 $valor_unico = substr(time(), -3);
 
