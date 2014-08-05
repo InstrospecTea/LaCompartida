@@ -1516,7 +1516,6 @@ class Factura extends Objeto {
 				if (($factura_monto_honorarios_con_impuesto == '0' ) && ( $factura_monto_honorarios_sin_impuesto == '0' )) {
 					$html2 = str_replace('%factura_monto_honorarios%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_descripcion_honorarios%', '&nbsp;', $html2);
-					$html2 = str_replace('%factura_descripcion_honorarios_asunto_asociado%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
 					$html2 = str_replace('%xmonto_honorarios%', '&nbsp;', $html2);
 					$html2 = str_replace('%cant%', '&nbsp;', $html2);
@@ -1552,23 +1551,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%factura_tipo_cambio_honorarios%', '&nbsp;', $html2);
 					}
 
-					// Obtiene glosa de asuntos asociados al cobro
-					$queryasuntosrel = "SELECT asunto.glosa_asunto FROM cobro_asunto LEFT JOIN asunto ON (cobro_asunto.codigo_asunto = asunto.codigo_asunto) WHERE id_cobro='" . $this->fields['id_cobro'] . "' GROUP BY asunto.glosa_asunto ";
-					$resultado = mysql_query($queryasuntosrel, $this->sesion->dbh) or Utiles::errorSQL($queryasuntosrel, __FILE__, __LINE__, $this->sesion->dbh);
-
-					while($data = mysql_fetch_assoc($resultado)){
-			        	$asuntos_rel[] = $data;
-			    	}
-
-			    	$asuntosrelacionados = '';
-
-			    	for ($k = 0; $k < count($asuntos_rel); $k++) {
-				    	$salto_rel = $k < count($asuntos_rel) - 1 ? '<br>' : '';
-			    		$asuntosrelacionados .= $asuntos_rel[$k]['glosa_asunto'] . $salto_rel;
-			    	}
-
 					$html2 = str_replace('%factura_descripcion_honorarios%', $descripcion_honorarios_legales, $html2);
-					$html2 = str_replace('%factura_descripcion_honorarios_asunto_asociado%', $descripcion_honorarios_legales . '<br>' . $asuntosrelacionados, $html2);
 					$html2 = str_replace('%factura_tipo_cambio_honorarios%', $factura_tipo_cambio_honorarios, $html2);
 					$html2 = str_replace('%cant%', '1.00', $html2);
 				}
