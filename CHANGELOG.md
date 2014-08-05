@@ -1,4 +1,12 @@
 # Changelog
+
+## Release: 14.9.0
+Lunes 4 de Agosto 2014
+* **Fixed:** [Feature/agrega columna reporte horas por facturar](https://github.com/LemontechSA/ttb/pull/613)
+* **Fixed:** [Feature/Reporte liquidaciones total horas](https://github.com/LemontechSA/ttb/pull/614)
+* **Fixed:** [Feature/tipo cambio prof vs cliente](https://github.com/LemontechSA/ttb/pull/617)
+* **Fixed:** [Feature/asigna nombre de usuario en reporte excel](https://github.com/LemontechSA/ttb/pull/621)
+
 ## Hotfix: 14.8.3
 Lunes 4 de Agosto 2014
 * **Fixed:** [Agrega dato solicitante del contrato a mantenedor de factura](https://github.com/LemontechSA/ttb/pull/620)
