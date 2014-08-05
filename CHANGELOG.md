@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 14.9.1
+Martes 5 de Agosto 2014
+* **New:** [Modificaciones para generar documentos expertise](https://github.com/LemontechSA/ttb/pull/624)
+* **New:** [Agrega Campo id_estudio a cargador masivo](https://github.com/LemontechSA/ttb/pull/624)
+
 ## Release: 14.9.0
 Lunes 4 de Agosto 2014
 * **Fixed:** [Feature/agrega columna reporte horas por facturar](https://github.com/LemontechSA/ttb/pull/613)
