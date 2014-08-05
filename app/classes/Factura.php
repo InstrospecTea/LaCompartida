@@ -89,6 +89,10 @@ class Factura extends Objeto {
 			'titulo' => 'Tipo documento asociado (FA,NC,ND,BO)',
 			'relacion' => 'PrmDocumentoLegal'
 		),
+		'id_estudio' => array(
+			'titulo' => 'Id estudio',
+			'unico' => 'id_estudio'
+		),
 		'id_factura_padre' => 'Factura Asociada'
 	);
 	public static $configuracion_reporte = array(
