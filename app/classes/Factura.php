@@ -1563,7 +1563,16 @@ class Factura extends Objeto {
 					$html2 = str_replace('%factura_descripcion_gastos%', '&nbsp;', $html2);
 					$html2 = str_replace('%factura_tipo_cambio_gastos%', '&nbsp;', $html2);
 					$html2 = str_replace('%xmonto_gastos%', '&nbsp;', $html2);
-					$html2 = str_replace('%desglose_gastos%', '&nbsp;', $html2);
+
+					// Segmento de codigo para factura word expertise
+					$segmento = '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
+					$cantidad = 1;
+					for ($cantidad = 0; $cantidad < 18; $cantidad++) { 
+						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
+					}
+					$html2 = str_replace('%desglose_gastos%', $segmento, $html2);
+					// Fin expertise;
+
 				} else {
 
 					if ($factura_monto_gastos_sin_impuesto == '0') {
@@ -1641,6 +1650,7 @@ class Factura extends Objeto {
                                     ORDER BY fecha ASC";
 					$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
+					// Segmento de codigo para factura word expertise
 					$desglose_g = '';
 					$desglose_g.='<tr>';
 					$desglose_g.='<td class="default">&nbsp</td>';
@@ -1653,6 +1663,18 @@ class Factura extends Objeto {
 						$desglose_gasto[] = $data;
 					}
 
+					// Expertise Cantidad maxima de gastos por factura 5
+					$cant_gastos = count($desglose_gasto);
+					$max_cant_gastos = 4;
+
+					$diff_gastos = ($max_cant_gastos - $cant_gastos) * 3;
+
+					$segmento = '';
+
+					for ($K = 0; $k < $diff_gastos; $k++) { 
+						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
+					}
+
 					for ($k = 0; $k < count($desglose_gasto); $k++) {
 						$desglose_g.="<tr>";
 						$desglose_g.="<td class='default'>&nbsp</td>";
@@ -1662,7 +1684,11 @@ class Factura extends Objeto {
 						$desglose_g.="</tr>";
 					}
 
+					$desglose_g.= $segmento;
+
 					$html2 = str_replace('%desglose_gastos%', $desglose_g, $html2);
+
+					// Fin expertise;
 				}
 
 				// IMPUESTO
