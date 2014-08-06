@@ -848,7 +848,7 @@ $_LANG['nota_morosidad'] = "";
 $_LANG['nota_disclaimer'] = "";
 
 #Carta MB Chile
-$_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%nro_cobro% %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha% en relaciÃ³n al encargo profesional de la referencia. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
+$_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%num_letter% %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha% en relación al encargo profesional de la referencia. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
 $_LANG['%detalle_mb_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
 $_LANG['%cuenta_mb%'] = "";
 #Carta MB NY (NY)
