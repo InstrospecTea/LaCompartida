@@ -76,7 +76,7 @@ class AutocompletadorAsunto {
 				jQuery('#glosa_asunto')
 					.autocomplete('option', 'minLength', 0)
 					.autocomplete('search', '')
-					.autocomplete('option', 'minLength', 3)
+					.autocomplete('option', 'minLength', jQuery('#{$campo_codigo_cliente}').val() == '' ? 3 : 1)
 					.focus();
 			});
 EOF;
@@ -119,6 +119,10 @@ EOF;
 				});
 
 				$script_button
+
+				jQuery('#{$campo_codigo_cliente}').change(function() {
+					jQuery('#glosa_asunto').autocomplete('option', 'minLength', jQuery(this).val() == '' ? 3 : 1);
+				});
 			});
 
 			function CargarGlosaAsunto() {

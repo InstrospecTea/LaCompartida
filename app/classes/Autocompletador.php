@@ -66,12 +66,12 @@ class Autocompletador {
 
 				 		jQuery(\"#" . $lasid[0] . "\").change(function() {
 				 			" . $onchange . ";
+							jQuery('#codigo_asunto, #codigo_asunto_secundario').val('').change();
 				 		});
 
 
 						jQuery( \"#glosa_cliente\" ).autocomplete({
 						         source: function( request, response ) {
-							      //  console.log(request,response);
 							        jQuery.ajax({url: \"" . Conf::RootDir() . "/app/interfaces/ajax/ajax_seleccionar_cliente.php\",
 							        	data: {term:request.term,  id_usuario:id_usuario_original },
 							        	dataType:\"json\",
