@@ -49,6 +49,7 @@ class Autocompletador {
 	}
 
 	function Javascript($sesion, $cargar_select = true, $onchange = '') {
+		$campo_codigo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto';
 		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 			$lasid = array('codigo_cliente_secundario', 'codigo_asunto_secundario');
 		} else {
@@ -66,7 +67,11 @@ class Autocompletador {
 
 				 		jQuery(\"#" . $lasid[0] . "\").change(function() {
 				 			" . $onchange . ";
-							jQuery('#codigo_asunto, #codigo_asunto_secundario').val('').change();
+							if (!jQuery('#$campo_codigo_asunto').data('no-clear')) {
+								jQuery('#$campo_codigo_asunto').val('').change();
+							}
+							jQuery('#$campo_codigo_asunto').data('no-clear', 0);
+
 				 		});
 
 
@@ -86,7 +91,7 @@ class Autocompletador {
         						jQuery('#" . $lasid[0] . "').change();
         						jQuery('#glosa_cliente').val(ui.item.value);
         						";
-        						//$output.= $onchange;
+
 								if ($cargar_select) {
 									$output.= "CargarSelect('" . $lasid[0] . "','" . $lasid[1] . "','cargar_asuntos');";
 								}
