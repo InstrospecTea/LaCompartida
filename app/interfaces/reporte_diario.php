@@ -29,9 +29,9 @@
 	else
 		header("location: reportes_especificos.php");
 	$pagina = new Pagina($sesion);
-	
-	
-	
+
+
+
 
 	/*REPORTE DIARIO.*/
 	$pagina->titulo = __('Resumen actividades profesionales');
@@ -87,11 +87,11 @@
 	$glosa_dato['valor_por_pagar'] = __("Valor Cobrado en Cobros Incobrables");
 	$glosa_dato['rentabilidad'] = __("Razón entre el Valor Cobrado, y lo que se habría cobrado usando THHs Estándar");
 	$glosa_dato['valor_hora'] = __("Valor Cobrado por cada Hora Cobrada");
-	$glosa_dato['diferencia_valor_estandar'] = __("Diferencia entre el Valor Cobrado, y lo que se habría cobrado usando THHs Estándar");	
+	$glosa_dato['diferencia_valor_estandar'] = __("Diferencia entre el Valor Cobrado, y lo que se habría cobrado usando THHs Estándar");
 	$glosa_dato['valor_estandar'] = __("Valor que se habría cobrado usando THHs Estándar");
 
 	$glosa_boton['tabla'] = "Genera un Documento Excel con una tabla cruzada.";
-	
+
 	$tipos_moneda = array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar');
 
 	$hoy = date("Y-m-d");
@@ -141,7 +141,7 @@ input.btn{ margin:3px;}
 
 function Generar(form, valor)
 {
-	
+
 	form.vista.value = $('agrupador_0').value;
 	for(i=1;i<$('numero_agrupadores').value;i++)
 	{
@@ -226,8 +226,8 @@ function RevisarMoneda()
 function SelectValueSet(SelectName, Value)
 {
   SelectObject = $(SelectName);
-  for(index = 0; 
-    index < SelectObject.length; 
+  for(index = 0;
+    index < SelectObject.length;
     index++) {
    if(SelectObject[index].value == Value)
      SelectObject.selectedIndex = index;
@@ -505,10 +505,10 @@ if(!$popup)
 	</tr>
 	<tr>
 		<td colspan=2>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto","tipos_asunto[]",$tipos_asunto,"class=\"selectMultiple\" multiple size=5 ","","110"); ?>
+			<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto ORDER BY orden ASC","tipos_asunto[]", $tipos_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "110"); ?>
 		</td>
 		<td colspan=2>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto","areas_asunto[]", $areas_asunto,"class=\"selectMultiple\" multiple size=5 ","","140");?>
+			<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto ORDER BY orden ASC","areas_asunto[]", $areas_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "140");?>
 		</td>
 	</tr>
 	<?}
@@ -847,7 +847,7 @@ if(!$popup)
 								{
 									if($agrupador[$i] == $v)
 									{
-										echo 'selected';	
+										echo 'selected';
 										$valor_previo = '<select style="display:none;" id="agrupador_valor_previo_'.$i.'"><option value = "'.$v.'">'.__($v).'</option></select>';
 										$ya_elegidos[] = $v;
 									}
@@ -866,7 +866,7 @@ if(!$popup)
 						echo '</select></span>';
 						echo $valor_previo;
 				}
-		?>	
+		?>
 		<input type="button" class="btn" title="<?=__($glosa_boton['tabla'])?>" id="tabla" value="<?=__('Generar Excel')?>" onclick="Generar(this.form,'tabla');">
 	</div>
 </fieldset>
