@@ -3314,7 +3314,10 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_fecha_emision%', __('Fecha Emisión'), $html);
 				$html = str_replace('%instrucciones_pago%', __('INSTRUCCIONES DE PAGO'), $html);
 				$html = str_replace('%giro_bancario%', __('Giro bancario a'), $html);
-
+				$html = str_replace('%descuento_liquidacion%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['descuento'] , $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%impuesto_liquidacion%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%subtotal_gastos_honorarios_liquidacion%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($this->fields['monto_subtotal'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				
 				if (array_key_exists('codigo_contrato', $contrato->fields)) {
 					$html = str_replace('%glosa_codigo_contrato%', __('Código') . ' ' . __('Contrato'), $html);
 					$html = str_replace('%codigo_contrato%', $contrato->fields['codigo_contrato'], $html);
