@@ -101,7 +101,10 @@ EOF;
 							);
 						},
 						select: function(event, ui) {
-							jQuery('#{$campo_codigo_asunto}').data('no-clear', 1).val(ui.item.id);
+							if (jQuery('#{$campo_codigo_cliente}').val() == '') {
+								jQuery('#{$campo_codigo_asunto}').data('no-clear', 1);
+							}
+							jQuery('#{$campo_codigo_asunto}').val(ui.item.id);
 							CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 							jQuery('#{$campo_codigo_asunto}').change();
 						},
