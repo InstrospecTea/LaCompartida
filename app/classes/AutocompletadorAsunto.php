@@ -119,6 +119,10 @@ EOF;
 				});
 
 				$script_button
+
+				jQuery('#{$campo_codigo_cliente}').change(function() {
+					jQuery('#glosa_asunto').autocomplete('option', 'minLength', jQuery(this).val() == '' ? 3 : 1);
+				});
 			});
 
 			function CargarGlosaAsunto() {
