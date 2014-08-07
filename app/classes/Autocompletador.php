@@ -49,6 +49,7 @@ class Autocompletador {
 	}
 
 	function Javascript($sesion, $cargar_select = true, $onchange = '') {
+		$campo_codigo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto';
 		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 			$lasid = array('codigo_cliente_secundario', 'codigo_asunto_secundario');
 		} else {
@@ -66,12 +67,16 @@ class Autocompletador {
 
 				 		jQuery(\"#" . $lasid[0] . "\").change(function() {
 				 			" . $onchange . ";
+							if (!jQuery('#$campo_codigo_asunto').data('no-clear')) {
+								jQuery('#$campo_codigo_asunto').val('').change();
+							}
+							jQuery('#$campo_codigo_asunto').data('no-clear', 0);
+
 				 		});
 
 
 						jQuery( \"#glosa_cliente\" ).autocomplete({
 						         source: function( request, response ) {
-							      //  console.log(request,response);
 							        jQuery.ajax({url: \"" . Conf::RootDir() . "/app/interfaces/ajax/ajax_seleccionar_cliente.php\",
 							        	data: {term:request.term,  id_usuario:id_usuario_original },
 							        	dataType:\"json\",
@@ -86,7 +91,7 @@ class Autocompletador {
         						jQuery('#" . $lasid[0] . "').change();
         						jQuery('#glosa_cliente').val(ui.item.value);
         						";
-        						//$output.= $onchange;
+
 								if ($cargar_select) {
 									$output.= "CargarSelect('" . $lasid[0] . "','" . $lasid[1] . "','cargar_asuntos');";
 								}
