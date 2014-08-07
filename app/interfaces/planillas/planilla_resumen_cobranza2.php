@@ -588,7 +588,7 @@
 
 			if($cobro['estado']!='CREADO' && $cobro['estado']!='EN REVISION'){
 				$comentario="";
-				$query_historial="SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=".$cobro['id_cobro'];
+				$query_historial="SELECT fecha, comentario FROM cobro_observacion WHERE id_cobro=".$cobro['id_cobro'];
 				$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
 
 				$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
@@ -645,7 +645,7 @@
 <?
 $hoy = date("Y-m-d");
 ?>
-<table class="border_plomo tb_base" width:650px" cellpadding="0" cellspacing="3" align="center">
+<table class="border_plomo tb_base" width="650px" cellpadding="0" cellspacing="3" align="center">
 	<tr>
 		<td align="center">
 <table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3">
@@ -752,22 +752,15 @@ $hoy = date("Y-m-d");
 </form>
 <script type="text/javascript">
 <!-- //
-function Rangos(obj, form)
-{
-	var td_show = $('periodo_rango');
-	var td_hide = $('periodo');
-
-	if(obj.checked)
-	{
-		td_hide.style['display'] = 'none';
-		td_show.style['display'] = 'inline';
+	function Rangos(obj, form) {
+		if (obj.checked) {
+			jQuery('#periodo').hide();
+			jQuery('#periodo_rango').show();
+		} else {
+			jQuery('#periodo').show();
+			jQuery('#periodo_rango').hide();
+		}
 	}
-	else
-	{
-		td_hide.style['display'] = 'inline';
-		td_show.style['display'] = 'none';
-	}
-}
 Calendar.setup(
 	{
 		inputField	: "fecha_ini",		// ID of the input field
