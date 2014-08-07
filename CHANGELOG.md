@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 14.9.2
+Miércoles 6 de Agosto 2014
+* **Fix:** [limpia asuntos cuando cambia cliente en autocomplete](https://github.com/LemontechSA/ttb/pull/625)
+* **New:** [Al seleccionar un cliente el asunto comeinza a buscar con el primer caracter, de lo contrario necesita 3 caracteres.](https://github.com/LemontechSA/ttb/pull/625)
+
 ## Hotfix: 14.9.1
 Martes 5 de Agosto 2014
 * **New:** [Modificaciones para generar documentos expertise](https://github.com/LemontechSA/ttb/pull/624)
