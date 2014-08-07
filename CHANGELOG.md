@@ -1,5 +1,9 @@
 # Changelog
 
+## Release: 14.10.0
+Jueve 7 de Agosto 2014
+* **Fixed:** [Feature/agrega columna reporte horas por facturar](https://github.com/LemontechSA/ttb/pull/613)
+
 ## Hotfix: 14.9.4
 Jueves 7 de Agosto 2014
 * **Fixed:** [Validación ingreso de horas](https://github.com/LemontechSA/ttb/pull/629)
