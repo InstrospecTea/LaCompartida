@@ -1,17 +1,9 @@
 <?php
-
 require_once 'Spreadsheet/Excel/Writer.php';
-
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
+
 set_time_limit(400);
 ini_set("memory_limit", "256M");
 $where_cobro = ' 1 ';
@@ -813,6 +805,23 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 	$ws->write($filas, $col_abogado, $contrato->fields['fono_contacto'], $formato_encabezado);
 	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+	++$filas;
+
+	if (in_array($cobro->fields['estado'], array('EMITIDO', 'FACTURADO'))) {
+		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'glosa_factura', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+		$ws->write($filas, $col_abogado, $contrato->fields['glosa_contrato'], $formato_encabezado);
+		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+		++$filas;
+	}
+
+	$usuario = new Usuario($sesion);
+	$usuario->LoadId($contrato->fields['id_usuario_responsable']);
+	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'encargado_comercial', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+	$ws->write($filas, $col_abogado, $usuario->fields['nombre'] . ' ' . $usuario->fields['apellido1'] . ' ' . $usuario->fields['apellido2'], $formato_encabezado);
+	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+
 	$filas += 2;
 
 	if ($opc_ver_resumen_cobro || $borradores) {
