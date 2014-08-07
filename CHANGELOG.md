@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.9.3
+Jueves 7 de Agosto 2014
+* **Fix:** [Repara reporte de horas por facturar, al seleccionar separar asuntos el reporte estaba vacío](https://github.com/LemontechSA/ttb/pull/628)
+
 ## Hotfix: 14.9.2
 Miércoles 6 de Agosto 2014
 * **Fix:** [limpia asuntos cuando cambia cliente en autocomplete](https://github.com/LemontechSA/ttb/pull/625)
