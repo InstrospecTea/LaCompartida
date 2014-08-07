@@ -1221,6 +1221,12 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO factura_pdf_datos ( id_dato , id_tipo_dato , id_documento_legal , activo , coordinateX , coordinateY , cellW , cellH , font , style , mayuscula , tamano , Ejemplo , align ) VALUES ( NULL , LAST_INSERT_ID(), '1', '0', '0', '0', '0', '0', '', '', '', '8', 'Alberto Botero', 'L' );";
 			ejecutar($queries, $dbh);
 			break;
+		case 7.78:
+			$queries = array();
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'glosa_factura', 'Encabezado', 'Glosa Factura', 'Invoice Detail', 0)";
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -1230,7 +1236,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.77;
+$max_update = 7.78;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
