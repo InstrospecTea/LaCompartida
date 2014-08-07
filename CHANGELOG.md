@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.9.4
+Jueves 7 de Agosto 2014
+* **Fixed:** [Validación ingreso de horas](https://github.com/LemontechSA/ttb/pull/629)
+
 ## Hotfix: 14.9.3
 Jueves 7 de Agosto 2014
 * **Fix:** [Repara reporte de horas por facturar, al seleccionar separar asuntos el reporte estaba vacío](https://github.com/LemontechSA/ttb/pull/628)
