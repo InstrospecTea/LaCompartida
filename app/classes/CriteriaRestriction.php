@@ -109,13 +109,38 @@ class CriteriaRestriction {
 	}
 
 	/**
+	 * Añade sentencia IN para una columna y un conjunto de matches posibles.
+	 * @param       $column
+	 * @param array $comparsion_group
+	 * @return CriteriaRestriction
+	 * @throws Exception
+	 */
+	public static function in($column, array $comparsion_group) {
+		if (is_array($comparsion_group)) {
+			return new CriteriaRestriction(' '.$column.' IN ('.implode(',', $comparsion_group).')');
+		} else {
+			throw new Exception('The condition_array parameter is not an array!');
+		}
+	}
+
+	/**
+	 * Añade sentencia IN para una columna y una instancia de criteria que determina los valores.
+	 * @param          $column
+	 * @param Criteria $criteria
+	 * @return CriteriaRestriction
+	 */
+	public static function in_from_criteria($column, Criteria $criteria) {
+		return new CriteriaRestriction(' '.$column.' IN ('.$criteria->get_plain_query().')');
+	}
+
+	/**
 	 * Añade sentencia Mayor Igual Que, para una Columna >= pivote
 	 * @param $column
 	 * @param $pivot
 	 * @return CriteriaRestriction
 	 */
-	public static function greater_or_equals_than($column, $pivot) {
-		return new CriteriaRestriction('('.$column.' >= '.$pivot.')');
+	public static function greater_or_equals_than($column , $pivot) {
+		return new CriteriaRestriction('('.$column.' >= \''.$pivot.'\')');
 	}
 
 	/**
@@ -124,8 +149,8 @@ class CriteriaRestriction {
 	 * @param $pivot
 	 * @return CriteriaRestriction
 	 */
-	public static function lower_or_equals_than($column, $pivot) {
-		return new CriteriaRestriction('('.$column.' <= '.$pivot.')');
+	public static function lower_or_equals_than($column , $pivot) {
+		return new CriteriaRestriction('('.$column.' <= \''.$pivot.'\')');
 	}
 
 	/**

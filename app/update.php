@@ -1198,13 +1198,11 @@ QUERY;
 			$queries[] = "UPDATE factura SET serie_documento_legal = LPAD(serie_documento_legal, 3, '0');";
 			ejecutar($queries, $dbh);
 			break;
-
 		case 7.75:
 			$queries = array();
 			$queries[] = "ALTER TABLE `factura` DROP INDEX `id_documento_legal`, ADD UNIQUE INDEX `id_documento_legal` (`id_documento_legal` ASC, `numero` ASC, `serie_documento_legal` ASC, `id_estudio` ASC);";
 			ejecutar($queries, $dbh);
 			break;
-
 		case 7.76:
 			$queries = array();
 			if (!ExisteCampo('codigo_dte', 'prm_documento_legal', $dbh)) {
@@ -1221,6 +1219,104 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO factura_pdf_datos ( id_dato , id_tipo_dato , id_documento_legal , activo , coordinateX , coordinateY , cellW , cellH , font , style , mayuscula , tamano , Ejemplo , align ) VALUES ( NULL , LAST_INSERT_ID(), '1', '0', '0', '0', '0', '0', '', '', '', '8', 'Alberto Botero', 'L' );";
 			ejecutar($queries, $dbh);
 			break;
+		case 7.78:
+			$queries = array();
+			$queries[] = "CREATE TABLE `tramite_historial` (
+			  `id_tramite_historial` INT(11) NOT NULL AUTO_INCREMENT,
+			  `id_tramite` INT(11) NOT NULL,
+			  `id_usuario` INT(11) NOT NULL,
+			  `fecha` DATETIME NOT NULL,
+			  `fecha_tramite` DATETIME NOT NULL,
+			  `fecha_tramite_modificado` DATETIME NOT NULL,
+			  `descripcion` MEDIUMTEXT NULL,
+			  `descripcion_modificado` MEDIUMTEXT NULL,
+			  `codigo_asunto` VARCHAR(20) NULL,
+			  `codigo_asunto_modificado` VARCHAR(20) NULL,
+			  `codigo_actividad` VARCHAR(5) NULL,
+			  `codigo_actividad_modificado` VARCHAR(5) NULL,
+			  `codigo_tarea` VARCHAR(100) NULL,
+			  `codigo_tarea_modificado` VARCHAR(100) NULL,
+			  `id_tramite_tipo` INT(11) NOT NULL,
+			  `id_tramite_tipo_modificado` INT(11) NOT NULL,
+			  `solicitante` VARCHAR(255) NULL,
+			  `solicitante_modificado` VARCHAR(255) NULL,
+			  `id_moneda_tramite` INT(11) NULL,
+			  `id_moneda_tramite_modificado` INT(11) NULL,
+			  `tarifa_tramite` DOUBLE NULL,
+			  `tarifa_tramite_modificado` DOUBLE NULL,
+			  `id_moneda_tramite_individual` INT(11) NULL,
+			  `id_moneda_tramite_individual_modificado` INT(11) NULL,
+			  `tarifa_tramite_individual` DOUBLE NULL,
+			  `tarifa_tramite_individual_modificado` DOUBLE NULL,
+			  `cobrable` TINYINT(4) NOT NULL,
+			  `cobrable_modificado` TINYINT(4) NOT NULL,
+			  `trabajo_si_no` INT(1) NOT NULL,
+			  `trabajo_si_no_modificado` INT(1) NOT NULL,
+			  `duracion` TIME NOT NULL DEFAULT '00:00:00',
+			  `duracion_modificado` TIME NOT NULL DEFAULT '00:00:00',
+			  PRIMARY KEY (`id_tramite_historial`));";
+
+			$queries[] = "ALTER TABLE `tramite_historial`
+			ADD COLUMN `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `duracion_modificado`;";
+
+			$queries[] = "ALTER TABLE `tramite_historial`
+			ADD COLUMN `app_id` INT(3) NOT NULL DEFAULT '1' AFTER `accion`;";
+
+			$queries[] = "ALTER TABLE `tramite_historial`
+			CHANGE COLUMN `fecha_tramite_modificado` `fecha_tramite_modificado` DATETIME NULL ,
+			CHANGE COLUMN `id_tramite_tipo_modificado` `id_tramite_tipo_modificado` INT(11) NULL ,
+			CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL ,
+			CHANGE COLUMN `trabajo_si_no_modificado` `trabajo_si_no_modificado` INT(1) NULL ,
+			CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT '00:00:00' ;";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.79:
+			$queries = array();
+			$queries[] = "ALTER TABLE `cobro_historial` CHANGE COLUMN `id_cobro_historial` `id_cobro_observacion` INT(11) NOT NULL AUTO_INCREMENT , RENAME TO  `cobro_observacion`";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.80:
+			$queries = array();
+			$queries[] = "CREATE TABLE `cobro_historial` (
+			  `id_cobro_historial` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_cobro` int(11) DEFAULT NULL,
+			  `id_usuario` int(11) DEFAULT NULL,
+			  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `accion` varchar(9) DEFAULT '',
+			  `app_id` int(3) DEFAULT NULL,
+			  `estado` varchar(20) DEFAULT NULL,
+			  `estado_modificado` varchar(20) DEFAULT NULL,
+			  `codigo_cliente` varchar(10) DEFAULT '',
+			  `codigo_cliente_modificado` varchar(10) DEFAULT '',
+			  `id_contrato` int(11) DEFAULT NULL,
+			  `fecha_cobro` datetime DEFAULT NULL,
+			  `fecha_cobro_modificado` datetime DEFAULT NULL,
+			  `id_contrato_modificado` int(11) DEFAULT NULL,
+			  `id_moneda` int(11) DEFAULT NULL,
+			  `id_moneda_modificado` int(11) DEFAULT NULL,
+			  `tipo_cambio_moneda` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+			  `tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+			  `fecha_creacion` datetime DEFAULT NULL,
+			  `fecha_en_revision` datetime DEFAULT NULL,
+			  `fecha_modificacion` datetime DEFAULT NULL,
+			  `fecha_emision` datetime DEFAULT NULL,
+			  `fecha_facturacion` datetime DEFAULT NULL,
+			  `fecha_enviado_cliente` datetime DEFAULT NULL,
+			  `fecha_pago_parcial` datetime DEFAULT NULL,
+			  `fecha_creacion_modificado` datetime DEFAULT NULL,
+			  `fecha_en_revision_modificado` datetime DEFAULT NULL,
+			  `fecha_modificacion_modificado` datetime DEFAULT NULL,
+			  `fecha_emision_modificado` datetime DEFAULT NULL,
+			  `fecha_facturacion_modificado` datetime DEFAULT NULL,
+			  `fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
+			  `fecha_pago_parcial_modificado` datetime DEFAULT NULL,
+			  PRIMARY KEY (`id_cobro_historial`),
+			  KEY(`id_cobro`)
+			) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;";
+			ejecutar($queries, $dbh);
+			break;
+
+
 	}
 }
 
@@ -1230,7 +1326,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.77;
+$max_update = 7.80;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

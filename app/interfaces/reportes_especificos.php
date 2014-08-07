@@ -58,6 +58,9 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 											<td>&nbsp;</td>
 											<td>
 												<ul style="list-style-position: outside; text-align: left;">
+													<?php if($sesion->usuario->TienePermiso('ADM')){ ?>
+													<li><a href='reporte_historial_movimientos.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte historial movimientos') ?></a></li>
+													<?php } ?>
 													<li><a href='usuario_vacaciones.php' style="color:#000;text-decoration: none;"><?php echo __('Usuario vacaciones') ?></a></li>
 													<li><a href='resumen_abogado.php' style="color:#000;text-decoration: none;"><?php echo __('Rendimiento profesionales') ?></a></li>
 													<li><a href='reportes_usuarios.php' style="color:#000;text-decoration: none;"><?php echo __('Gr&aacute;fico profesionales') ?></a></li>
