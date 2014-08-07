@@ -3,11 +3,13 @@
 /**
  * Class Entity
  * Clase abstracta que define todas aquellas propiedades y métodos comunes a toda entidad del sistema.
- *
+ * TODO:
+ *  - Todo cambio realizado mediante el método set, debe generar un array de campos cambiados.
  */
 abstract class Entity {
 
 	public $fields = array();
+	public $changes = array();
     /**
      * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
      * @return string
@@ -58,6 +60,15 @@ abstract class Entity {
 		foreach ($properties as $propertyName => $propertyValue) {
 			$this->set($propertyName, $propertyValue);
 		}
+	}
+
+	/**
+	 * Completa el array de los cambios que han ocurrido en las propiedades del objeto. Será deprecado para cuando todos los campos
+	 * se asignen mediante el método set.
+	 * @param array $changed
+	 */
+	public function fillChangedFields(array $changed) {
+		$this->changes = $changed;
 	}
 
 

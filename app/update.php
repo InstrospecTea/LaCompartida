@@ -1298,21 +1298,22 @@ QUERY;
 			  `tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
 			  `fecha_creacion` datetime DEFAULT NULL,
 			  `fecha_en_revision` datetime DEFAULT NULL,
-			  `fecha_modificacion` datetime DEFAULT NULL,
 			  `fecha_emision` datetime DEFAULT NULL,
 			  `fecha_facturacion` datetime DEFAULT NULL,
 			  `fecha_enviado_cliente` datetime DEFAULT NULL,
 			  `fecha_pago_parcial` datetime DEFAULT NULL,
 			  `fecha_creacion_modificado` datetime DEFAULT NULL,
 			  `fecha_en_revision_modificado` datetime DEFAULT NULL,
-			  `fecha_modificacion_modificado` datetime DEFAULT NULL,
 			  `fecha_emision_modificado` datetime DEFAULT NULL,
 			  `fecha_facturacion_modificado` datetime DEFAULT NULL,
 			  `fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
 			  `fecha_pago_parcial_modificado` datetime DEFAULT NULL,
 			  PRIMARY KEY (`id_cobro_historial`),
-			  KEY(`id_cobro`)
-			) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;";
+			  INDEX(`id_cobro`)
+			);";
+
+			$queries[] = "ALTER TABLE `cobro_historial` DROP FOREIGN KEY `cobro_historial_fk`;";
+
 			ejecutar($queries, $dbh);
 			break;
 

@@ -45,7 +45,6 @@ class Charge extends LoggeableEntity {
 			'tipo_cambio_moneda',
 			'fecha_creacion',
 			'fecha_en_revision',
-			'fecha_modificacion',
 			'fecha_emision',
 			'fecha_facturacion',
 			'fecha_enviado_cliente',

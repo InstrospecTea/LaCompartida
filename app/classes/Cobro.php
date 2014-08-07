@@ -26,35 +26,46 @@ if (!class_exists('Cobro')) {
 				$ingreso_historial = true;
 			}
 
-			if (parent::Write()) {
-				// actualizar campo estadocobro de los trabajos según estado del cobro
-				$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
-				$trabajos = new ListaTrabajos($this->sesion, '', $query);
-				for ($x = 0; $x < $trabajos->num; $x++) {
-					$trabajo = $trabajos->Get($x);
-					$trabajo->Edit('estadocobro', $this->fields['estado']);
-					$trabajo->Write();
-				}
+			$chargeService = new ChargeService($this->sesion);
+			$charge = new Charge();
+			$charge->fillFromArray($this->fields);
+			$charge->fillChangedFields($this->changes);
+			try {
+				$charge = $chargeService->saveOrUpdate($charge);
+				$this->fields[$charge->getIdentity()] = $charge->get($charge->getIdentity());
+			} catch(Exception $ex) {
+				print_r('Upsi');
+			}
 
-				if ($ingreso_historial) {
-					// Esa linea es necesaria para que el estado no se guardará dos veces
-					$this->valor_antiguo['estado'] = $this->fields['estado'];
 
-					$his = new Observacion($this->sesion);
+			// actualizar campo estadocobro de los trabajos según estado del cobro
+			$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
+			$trabajos = new ListaTrabajos($this->sesion, '', $query);
+			for ($x = 0; $x < $trabajos->num; $x++) {
+				$trabajo = $trabajos->Get($x);
+				$trabajo->Edit('estadocobro', $this->fields['estado']);
+				$trabajo->Write();
+			}
 
-					if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
-						if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
-							$his->Edit('fecha', date('Y-m-d H:i:s'));
-							$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
-							$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-							$his->Edit('id_cobro', $this->fields['id_cobro']);
-							$his->Write();
-						}
+			if ($ingreso_historial) {
+				// Esa linea es necesaria para que el estado no se guardará dos veces
+				$this->valor_antiguo['estado'] = $this->fields['estado'];
+
+				$his = new Observacion($this->sesion);
+
+				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
+					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+						$his->Edit('fecha', date('Y-m-d H:i:s'));
+						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+						$his->Edit('id_cobro', $this->fields['id_cobro']);
+						$his->Write();
 					}
 				}
-
-				return true;
 			}
+
+			return true;
+
 		}
 
 		function GlosaSeEstaCobrando() {
@@ -646,8 +657,13 @@ if (!class_exists('Cobro')) {
 		}
 
 		function Eliminar() {
-			$id_cobro = $this->fields[id_cobro];
+			$id_cobro = $this->fields['id_cobro'];
+
 			if ($id_cobro) {
+				$chargeService = new ChargeService($this->sesion);
+				$charge = new Charge();
+				$charge->fillFromArray($this->fields);
+				$chargeService->delete($charge);
 				//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
 				if ($this->fields['id_provision_generada']) {
 					$provision_generada = new Gasto($this->sesion);

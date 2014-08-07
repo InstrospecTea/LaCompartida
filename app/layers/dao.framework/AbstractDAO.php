@@ -27,6 +27,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
      * @throws Exception Cuando la inserción falla.
      */
     private function writeLogFromAnotations($action, $object, $legacy, $app = 1) {
+
+	    if ($action == 'MODIFICAR') {
+		    $object = $this->mergeFields($legacy, $object);
+	    }
+
 	    if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
 			return;
 	    }
@@ -73,6 +78,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	 * @throws Exception Cuando la inserción falla.
 	 */
 	private function writeLogFromArray($action, $object, $legacy, $app = 1) {
+
+		if ($action == 'MODIFICAR') {
+			$object = $this->mergeFields($legacy, $object);
+		}
+
 		if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
 			return;
 		}
@@ -97,8 +107,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			);
 		}
 		try {
+			//die($insertCriteria->get_plain_query());
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
+			print_r($ex->getMessage());
 			throw new Exception('No se pudo guardar el log. Ex: ' . $ex->getTraceAsString());
 		}
 	}
@@ -130,18 +142,50 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 			//que crear un nuevo registro.
 		    if(empty($id)) {
+			    $object = $this->save($object);
 		        if (is_subclass_of($object, 'LoggeableEntity')){
 		            $this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
 		        }
 		    } else {
+			    $object = $this->update($object);
 		        if (is_subclass_of($object, 'LoggeableEntity')){
 		            $this->writeLogFromArray('MODIFICAR', $object, $this->get($object->get($object->getIdentity())));
 		        }
 		    }
+			return $object;
 		} catch(PDOException $e){
 		    throw new Exception('No se ha podido persistir el objeto de tipo '.$this->getClass().'.');
 		}
     }
+
+	/**
+	 * @param Entity $object
+	 * @return Entity
+	 * @throws Exception
+	 */
+	private function save(Entity $object) {
+		$this->tabla = $object->getPersistenceTarget();
+		$this->campo_id = $object->getIdentity();
+		$this->sesion = $this->sesion;
+		$this->fields = $object->fields;
+		$this->changes = $object->changes;
+		$this->log_update = true;
+		$this->guardar_fecha = true;
+		if ($this->Write()) {
+			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
+			return $object;
+		} else {
+			throw new Exception('No se ha podido persistir la entidad.');
+		}
+	}
+
+	/**
+	 * @param Entity $object
+	 * @return Entity
+	 */
+	private function update(Entity $object) {
+		return $this->save($object);
+	}
 
     public function get($id) {
 	    $criteria = new Criteria($this->sesion);
@@ -171,8 +215,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
     }
 
     public function delete($object) {
+	    $reflected = new ReflectionClass($this->getClass());
         if (is_subclass_of($object, 'LoggeableEntity')){
-            $this->writeLogFromArray('ELIMINAR', $object, $this->get($object->get($object->getIdentity())));
+	        $newInstance = $reflected->newInstance();
+	        $newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
+            $this->writeLogFromArray('ELIMINAR', $newInstance, $object);
         }
     }
 
@@ -213,6 +260,16 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		$c = str_replace(' ','',$c);
 		preg_match_all('/@\w+/', $c, $tags);
 		return $tags[0];
+	}
+
+	private function mergeFields(Entity $legacy, Entity $new) {
+		foreach ($legacy->fields as $property => $value) {
+			$newProperty = $new->get($property);
+			if (empty($newProperty)) {
+				$new->set($property, $value);
+			}
+		}
+		return $new;
 	}
 
 }
