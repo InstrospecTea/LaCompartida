@@ -663,7 +663,7 @@ $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
                                 <tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
                                 <tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
                             </table>";
-$_LANG['y gastos'] = "and expenses";
+$_LANG['y gastos'] = "and disbursements";
 #Carta MB Boleta (boleta)
 $_LANG['%detalle_mb_boleta%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%detalle_mb_boleta_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
