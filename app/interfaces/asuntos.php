@@ -210,7 +210,7 @@ $Form = new Form;
 						<?php echo __('Categoría de asunto'); ?>
 					</td>
 					<td class="al" colspan="3">
-						<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar(), 'id_tipo_asunto', $id_tipo_asunto, '', 'Todos', '300px'); ?>
+						<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden ASC'), 'id_tipo_asunto', $id_tipo_asunto, '', 'Todos', '300px'); ?>
 					</td>
 				</tr>
 				<tr>
