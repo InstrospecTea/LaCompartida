@@ -40,7 +40,6 @@ class Charge extends LoggeableEntity {
 		return array(
 			'estado',
 			'codigo_cliente',
-			'id_contrato',
 			'id_moneda',
 			'tipo_cambio_moneda',
 			'fecha_creacion',
@@ -54,7 +53,7 @@ class Charge extends LoggeableEntity {
 
 	public function getInmutableLoggeableProperties() {
 		return array(
-			'id_cobro'
+			'id_cobro', 'id_contrato'
 		);
 	}
 

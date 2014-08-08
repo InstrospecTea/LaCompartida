@@ -31,7 +31,7 @@ abstract class Entity {
     public function get($property) {
 		$reflected = new ReflectionClass(get_class($this));
 	    $fields = $reflected->getProperty('fields')->getValue($this);
-		return (empty($fields[$property])? null : $fields[$property]);
+		return (empty($fields[$property])? NULL : $fields[$property]);
     }
 
     /**

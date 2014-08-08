@@ -1312,12 +1312,8 @@ QUERY;
 			  INDEX(`id_cobro`)
 			);";
 
-			$queries[] = "ALTER TABLE `cobro_historial` DROP FOREIGN KEY `cobro_historial_fk`;";
-
 			ejecutar($queries, $dbh);
 			break;
-
-
 	}
 }
 
