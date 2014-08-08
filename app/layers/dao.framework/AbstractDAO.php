@@ -74,7 +74,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	 * @throws Exception Cuando la inserción falla.
 	 */
 	private function writeLogFromArray($action, $object, $legacy, $app = 1) {
-
 		if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
 			return;
 		}
@@ -99,7 +98,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			);
 		}
 		try {
-			//die($insertCriteria->get_plain_query());
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
 			print_r($ex->getMessage());
@@ -120,12 +118,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		$properties = $newObject->getLoggeableProperties();
 		foreach ($properties as $mutableProperty) {
 			if ($newObject->get($mutableProperty) != $legacyObject->get($mutableProperty)) {
-				print_r($mutableProperty);
-				echo '<br/>';
-				print_r($newObject->get($mutableProperty));
-				echo '<br/>';
-				print_r($legacyObject->get($mutableProperty));
-				echo '<br/>';
 				return true;
 			}
 		}

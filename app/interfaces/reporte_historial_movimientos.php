@@ -159,7 +159,6 @@ $pagina->PrintTop();
 						<div class="buscadorlabel" style="margin-bottom: 3px;width:70px;display:inline-block;" ><?php echo __('Fecha hasta') ?></div>
 						<input type="text" name="fecha_fin"  class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 					</td>
-
 				</tr>
 				<tr>
 					<td></td>

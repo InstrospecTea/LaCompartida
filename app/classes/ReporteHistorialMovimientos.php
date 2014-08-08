@@ -160,13 +160,21 @@ class ReporteHistorialMovimientos
 					->add_select($creation_date,'fecha_creacion')
 					->add_left_join_with($main_table, CriteriaRestriction::equals($main_table.'.'.$key, $table_name.'.'.$key));
 
-		if (!empty($this->since)) {
-			$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than($table_name.'.fecha', $this->since));
+		if (!empty($this->since) && !empty($this->until)) {
+			$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
+			$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
+			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.'.fecha'.')', $this->since, $this->until));
+		} else {
+			if (!empty($this->since)) {
+				$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
+				$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than('date('.$table_name.'.fecha'.')', $this->since));
+			}
+			if (!empty($this->until)) {
+				$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
+				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.'.fecha'.')', $this->until));
+			}
 		}
 
-		if (!empty($this->until)) {
-			$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than($table_name.'.fecha', $this->until));
-		}
 
 		//Filtra por cliente
 		if (!empty($this->client)) {
@@ -358,7 +366,7 @@ class ReporteHistorialMovimientos
 					->add_select_not_null($table_name.'.'.'trabajo_si_no', 'trabajo_si_no')
 					->add_select_not_null($table_name.'.'.'trabajo_si_no_modificado', 'trabajo_si_no_modificado')
 					->add_select_not_null($table_name.'.'.'duracion', 'duracion')
-					->add_select_not_null($table_name.'.'.'duracion', 'duracion_modificado')
+					->add_select_not_null($table_name.'.'.'duracion_modificado', 'duracion_modificado')
 					->add_select_not_null($table_name.'.'.'accion', 'accion')
 					->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', $main_table.'.codigo_asunto'));
 

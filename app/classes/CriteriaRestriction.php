@@ -162,4 +162,8 @@ class CriteriaRestriction {
 		return new CriteriaRestriction($column.' IS NOT NULL');
 	}
 
+	public static function between($column, $left, $right) {
+		return new CriteriaRestriction('('.$column.' BETWEEN '.'\''.$left.'\''.' AND '.'\''.$right.'\''.')');
+	}
+
 }
