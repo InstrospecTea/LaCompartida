@@ -1311,7 +1311,11 @@ QUERY;
 			  PRIMARY KEY (`id_cobro_historial`),
 			  INDEX(`id_cobro`)
 			);";
-
+			break;
+		case 7.81:
+			$queries = array();
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'glosa_factura', 'Encabezado', 'Glosa Factura', 'Invoice Detail', 0)";
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
 			ejecutar($queries, $dbh);
 			break;
 	}
@@ -1323,7 +1327,8 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.80;
+$max_update = 7.81;
+
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

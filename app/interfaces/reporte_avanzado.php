@@ -626,7 +626,7 @@ if (!$popup) {
 															<label for="check_area_asunto" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'area_asunto_full' style="<?php echo $check_area_asunto ? "" : "display:none;" ?>" >
-															<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto", "areas_asunto[]", $areas_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto ORDER BY orden ASC", "areas_asunto[]", $areas_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>

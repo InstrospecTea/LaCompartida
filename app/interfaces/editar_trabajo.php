@@ -1047,20 +1047,27 @@ function Substring($string) {
       }
     }
 
-    //Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-    if (form.id_cobro.value != '' && $('id_trabajo').value != '') {
-      if (CodigoSecundario) {
-        if (!ActualizaCobro(form.codigo_asunto_secundario.value)) {
-          //MENSAJE DE ERROR
-          return false;
-        }
-      } else {
-        if (!ActualizaCobro(form.codigo_asunto.value)) {
-          //MENSAJE DE ERROR
-          return false;
+    <?php
+    // Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo que pasa
+    if ($opcion != 'nuevo') {
+      // solo cuando la opción es distinto a 'nuevo' se crea el campo hidden 'id_trabajo'
+      ?>
+      if (form.id_cobro.value != '' && $('id_trabajo').value != '') {
+        if (CodigoSecundario) {
+          if (!ActualizaCobro(form.codigo_asunto_secundario.value)) {
+            //MENSAJE DE ERROR
+            return false;
+          }
+        } else {
+          if (!ActualizaCobro(form.codigo_asunto.value)) {
+            //MENSAJE DE ERROR
+            return false;
+          }
         }
       }
+      <?php
     }
+    ?>
 
     if (OrdenadoPor == 1) {
       if (form.solicitante.value == '') {
