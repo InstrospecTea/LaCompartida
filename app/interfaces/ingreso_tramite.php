@@ -11,6 +11,10 @@ if ($id_tramite > 0) {
 	$tramite->Load($id_tramite);
 }
 
+if (empty($como_trabajo)) {
+	$como_trabajo = 0;
+}
+
 if ($tramite->fields['trabajo_si_no'] == 1 || $como_trabajo == 1) {
 	$trabajo = new Trabajo($sesion);
 }
@@ -242,7 +246,8 @@ if ($opcion == "guardar") {
 	$contrato = new Contrato($sesion);
 	$contrato->Load($asunto->fields['id_contrato']);
 	$tramite->Edit('id_moneda_tramite', $contrato->fields['id_moneda_tramite']);
-	$tramite->Edit('tarifa_tramite', Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto));
+	$tramite_tarifa = Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto);
+	$tramite->Edit('tarifa_tramite', (empty($tramite_tarifa)? 'NULL' : $tramite_tarifa));
 
 	if ($trabajo) {
 		if (!$trabajo->fields['tarifa_hh']) {
