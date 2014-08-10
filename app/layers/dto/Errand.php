@@ -37,7 +37,7 @@ class Errand extends LoggeableEntity {
 	 */
 	public function getLoggeableProperties(){
 		return array(
-			'fecha_tramite',
+			'fecha',
 			'descripcion',
 			'codigo_asunto',
 			'codigo_actividad',

@@ -88,20 +88,21 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		}
 		$properties = $object->getLoggeableProperties();
 		foreach($properties as $property) {
+			$legacyProperty = $legacy->get($property);
+			$newProperty = $object->get($property);
 			$insertCriteria->add_pivot_with_value(
 				$property,
-				$legacy->get($property)
+				(empty($legacyProperty)? NULL : $legacyProperty)
 			);
 			$insertCriteria->add_pivot_with_value(
 				$property.'_modificado',
-				$object->get($property)
+				(empty($newProperty)? NULL : $newProperty)
 			);
 		}
 		try {
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
-			print_r($ex->getMessage());
-			throw new Exception('No se pudo guardar el log. Ex: ' . $ex->getTraceAsString());
+			throw new Exception('No se pudo guardar el log. Msg: ' . $ex->getMessage());
 		}
 	}
 
