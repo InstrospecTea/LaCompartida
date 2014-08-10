@@ -105,7 +105,9 @@ class Tramite extends Objeto
 		$errand->fillChangedFields($this->changes);
 		try {
 			$errandService->saveOrUpdate($errand);
+			$this->fields = $errand->fields;
 		} catch(Exception $ex) {
+			print_r($ex->getMessage());
 			return false;
 		}
 		return true;

@@ -78,7 +78,7 @@ class Trabajo extends Objeto
 						SET
 							id_trabajo = '{{id_trabajo}}',
 							id_usuario = '{$id_usuario_sesion}',
-							fecha = '" . date("Y-m-d H:i:s") . "',
+							fecha_accion = '" . date("Y-m-d H:i:s") . "',
 						 	fecha_trabajo = '$fecha',
 						 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
 						 	descripcion = '" . mysql_real_escape_string(empty($descripcion) ? ' Sin descripcion' : $descripcion) . "',
@@ -103,7 +103,7 @@ class Trabajo extends Objeto
 									app_id = {$app_id},
 									id_trabajo = '{{id_trabajo}}',
 									id_usuario = '{$id_usuario_sesion}',
-									fecha = '" . date("Y-m-d H:i:s") . "',
+									fecha_accion = '" . date("Y-m-d H:i:s") . "',
 								 	fecha_trabajo = '{$this->fields['fecha']}',
 								 	descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
 								 	duracion = '{$this->fields['duracion']}',
@@ -114,7 +114,6 @@ class Trabajo extends Objeto
 								 	codigo_asunto = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
 								 	cobrable_modificado = '{$this->fields['cobrable']}'";
 		}
-
 		return $queryHistorial;
 	}
 
@@ -289,7 +288,7 @@ class Trabajo extends Objeto
 				$query = "INSERT INTO trabajo_historial SET
 					id_trabajo = '{$this->fields['id_trabajo']}',
 					id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-					fecha = '" . date("Y-m-d H:i:s") . "',
+					fecha_accion = '" . date("Y-m-d H:i:s") . "',
 					fecha_trabajo = '{$this->fields['fecha']}',
 					descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
 					duracion = '{$this->fields['duracion']}',

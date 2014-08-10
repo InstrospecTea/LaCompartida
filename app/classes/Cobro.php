@@ -32,9 +32,9 @@ if (!class_exists('Cobro')) {
 			$charge->fillChangedFields($this->changes);
 			try {
 				$charge = $chargeService->saveOrUpdate($charge);
-				$this->fields[$charge->getIdentity()] = $charge->get($charge->getIdentity());
+				$this->fields = $charge->fields;
 			} catch(Exception $ex) {
-				print_r('Upsi');
+				//Todo: Handle Exception!
 			}
 
 

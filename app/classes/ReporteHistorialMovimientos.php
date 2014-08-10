@@ -154,7 +154,7 @@ class ReporteHistorialMovimientos
 		$reportCriteria
 					->add_select('id_'.$table_name)
 					->add_select_not_null($table_name.'.'.$key,'story_key')
-					->add_select($table_name.'.fecha', 'fecha_accion')
+					->add_select($table_name.'.fecha_accion', 'fecha_accion')
 					->add_select($table_name.'.id_usuario')
 					->add_select('CONCAT(usuario.nombre,\' \',usuario.apellido1)', 'usuario')
 					->add_select($creation_date,'fecha_creacion')
@@ -163,15 +163,15 @@ class ReporteHistorialMovimientos
 		if (!empty($this->since) && !empty($this->until)) {
 			$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
 			$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.'.fecha'.')', $this->since, $this->until));
+			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.'.fecha_accion'.')', $this->since, $this->until));
 		} else {
 			if (!empty($this->since)) {
 				$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
-				$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than('date('.$table_name.'.fecha'.')', $this->since));
+				$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than('date('.$table_name.'.fecha_accion'.')', $this->since));
 			}
 			if (!empty($this->until)) {
 				$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.'.fecha'.')', $this->until));
+				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.'.fecha_accion'.')', $this->until));
 			}
 		}
 
@@ -215,7 +215,7 @@ class ReporteHistorialMovimientos
 
 		//Ordena por id y por fecha.
 		$reportCriteria
-					->add_ordering('fecha_accion', 'DESC')
+					->add_ordering($table_name.'.id_'.$table_name, 'DESC')
 					->add_ordering('story_key', 'DESC');
 
 		$reportCriteria->add_select('accion');
@@ -339,8 +339,8 @@ class ReporteHistorialMovimientos
 			case 'tramite':
 
 				$reportCriteria
-					->add_select_not_null($table_name.'.'.'fecha_tramite', 'fecha_tramite')
-					->add_select_not_null($table_name.'.'.'fecha_tramite_modificado', 'fecha_tramite_modificado')
+					->add_select_not_null($table_name.'.'.'fecha', 'fecha')
+					->add_select_not_null($table_name.'.'.'fecha_modificado', 'fecha_tramite')
 					->add_select_not_null($table_name.'.'.'descripcion', 'descripcion')
 					->add_select_not_null($table_name.'.'.'descripcion_modificado', 'descripcion_modificado')
 					->add_select_not_null($table_name.'.'.'codigo_asunto', 'codigo_asunto')
@@ -422,15 +422,15 @@ class ReporteHistorialMovimientos
 	private function generateGastoReportConfiguration($report) {
 		$configuracion = array(
 			array(
-				'field' => 'story_key',
-				'title' => __('Código Movimiento'),
+				'field' => 'usuario',
+				'title' => __('Usuario'),
 				'extras' => array(
 					'attrs' => 'style="text-align:left;"'
 				)
 			),
 			array(
-				'field' => 'usuario',
-				'title' => __('Usuario'),
+				'field' => 'story_key',
+				'title' => __('Código Gasto'),
 				'extras' => array(
 					'attrs' => 'style="text-align:left;"'
 				)
@@ -490,20 +490,6 @@ class ReporteHistorialMovimientos
 			array(
 				'field' => 'codigo_asunto_modificado',
 				'title' => __('Código Asunto').' (M)',
-				'extras' => array(
-					'attrs' => 'style="text-align:right;color:green;"'
-				)
-			),
-			array(
-				'field' => 'egreso',
-				'title' => __('Egreso'),
-				'extras' => array(
-					'attrs' => 'style="text-align:right;color:red;"'
-				)
-			),
-			array(
-				'field' => 'egreso_modificado',
-				'title' => __('Egreso').' (M)',
 				'extras' => array(
 					'attrs' => 'style="text-align:right;color:green;"'
 				)

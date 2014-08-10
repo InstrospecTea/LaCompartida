@@ -47,7 +47,11 @@ class InsertCriteria
 		if (array_key_exists($column_key, $this->insert_value_clause)){
 			throw new Exception("Criteria dice: Usted está sobrescribiendo un valor para la columna $column_key que ya está definido");
 		} else {
-			$this->insert_value_clause[$column_key] = "'".$value."'";
+			if (is_null($value) || $value == 'NULL' ) {
+				$this->insert_value_clause[$column_key] = 'NULL';
+			} else {
+				$this->insert_value_clause[$column_key] = "'".$value."'";
+			}
 			return $this;
 		}
 	}
