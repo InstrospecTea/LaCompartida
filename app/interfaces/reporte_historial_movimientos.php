@@ -14,6 +14,7 @@ $pagina->titulo = __('Reporte Historial Movimientos');
 
 if (!empty($_POST)) {
 
+
 	if (empty($entity_code) && empty($charge) && empty($id_usuario) && empty($fecha_ini) && empty($fecha_fin) && empty($codigo_cliente) && empty($codigo_asunto)) {
 
 		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').','.__('Cliente').','.__('Asunto').','.__('Usuario').'o código de entidad. O bien, establecer un rango de fechas para la búsqueda.'));
@@ -22,6 +23,11 @@ if (!empty($_POST)) {
 
 		$controller = new ReporteHistorialMovimientos($sesion);
 		$controller->setFocus($selected_entity);
+
+		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+			$codigo_cliente = $codigo_cliente_secundario;
+			$codigo_asunto = $codigo_asunto_secundario;
+		}
 
 		//Configuración del controlador del reporte.
 
