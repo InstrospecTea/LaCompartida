@@ -1221,11 +1221,17 @@ QUERY;
 			break;
 		case 7.78:
 			$queries = array();
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'glosa_factura', 'Encabezado', 'Glosa Factura', 'Invoice Detail', 0)";
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.79:
+			$queries = array();
 			$queries[] = "CREATE TABLE `tramite_historial` (
 			  `id_tramite_historial` INT(11) NOT NULL AUTO_INCREMENT,
 			  `id_tramite` INT(11) NOT NULL,
 			  `id_usuario` INT(11) NOT NULL,
-			  `fecha` DATETIME NOT NULL,
+			  `fecha_accion` DATETIME NOT NULL,
 			  `fecha_tramite` DATETIME NOT NULL,
 			  `fecha_tramite_modificado` DATETIME NOT NULL,
 			  `descripcion` MEDIUMTEXT NULL,
@@ -1270,18 +1276,18 @@ QUERY;
 			CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT '00:00:00' ;";
 			ejecutar($queries, $dbh);
 			break;
-		case 7.79:
+		case 7.80:
 			$queries = array();
 			$queries[] = "ALTER TABLE `cobro_historial` CHANGE COLUMN `id_cobro_historial` `id_cobro_observacion` INT(11) NOT NULL AUTO_INCREMENT , RENAME TO  `cobro_observacion`";
 			ejecutar($queries, $dbh);
 			break;
-		case 7.80:
+		case 7.81:
 			$queries = array();
 			$queries[] = "CREATE TABLE `cobro_historial` (
 			  `id_cobro_historial` int(11) NOT NULL AUTO_INCREMENT,
 			  `id_cobro` int(11) DEFAULT NULL,
 			  `id_usuario` int(11) DEFAULT NULL,
-			  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			  `accion` varchar(9) DEFAULT '',
 			  `app_id` int(3) DEFAULT NULL,
 			  `estado` varchar(20) DEFAULT NULL,
@@ -1311,13 +1317,19 @@ QUERY;
 			  PRIMARY KEY (`id_cobro_historial`),
 			  INDEX(`id_cobro`)
 			);";
-			break;
-		case 7.81:
-			$queries = array();
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'glosa_factura', 'Encabezado', 'Glosa Factura', 'Invoice Detail', 0)";
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
 			ejecutar($queries, $dbh);
 			break;
+		case 7.82:
+			$queries = array();
+			$queries[] = "ALTER TABLE `gasto_historial` CHANGE COLUMN `fecha` `fecha_accion` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' ;";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.83:
+			$queries = array();
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
 
@@ -1327,7 +1339,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.81;
+$max_update = 7.83;
 
 
 $force = 0;

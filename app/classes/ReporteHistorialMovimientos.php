@@ -327,13 +327,15 @@ class ReporteHistorialMovimientos
 				
 				$reportCriteria
 					->add_select_not_null('asunto.'.'codigo_asunto', 'codigo_asunto')
-					->add_select($table_name.'.'.'tipo_cambio_moneda', 'tipo_cambio_moneda')
-					->add_select($table_name.'.'.'tipo_cambio_moneda_modificado','tipo_cambio_moneda_modificado')
+					->add_select_not_null($table_name.'.'.'tipo_cambio_moneda', 'tipo_cambio_moneda')
+					->add_select_not_null($table_name.'.'.'tipo_cambio_moneda_modificado','tipo_cambio_moneda_modificado')
+					->add_select_not_null($table_name.'.'.'estado', 'estado')
+					->add_select_not_null($table_name.'.'.'estado_modificado','estado_modificado')
 					->add_left_join_with('cobro_asunto', CriteriaRestriction::equals('cobro_asunto.'.$key, $main_table.'.'.$key))
 					->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', 'cobro_asunto.codigo_asunto'))
 					->add_select_not_null_from_criteria($moneyCriteria, CriteriaRestriction::equals('id_moneda',$table_name.'.'.'id_moneda'), 'id_moneda')
-					->add_select_not_null_from_criteria($moneyCriteria, CriteriaRestriction::equals('id_moneda',$table_name.'.'.'id_moneda_modificado'), 'id_moneda_modificado');
-
+					->add_select_not_null_from_criteria($moneyCriteria, CriteriaRestriction::equals('id_moneda',$table_name.'.'.'id_moneda_modificado'), 'id_moneda_modificado')
+					->add_grouping($table_name.'.id_'.$table_name);
 				break;
 
 			case 'tramite':
@@ -752,9 +754,23 @@ class ReporteHistorialMovimientos
 			),
 			array(
 				'field' => 'story_key',
-				'title' => __('Código Cobro'),
+				'title' => __('Nº Cobro'),
 				'extras' => array(
 					'attrs' => 'style="text-align:left;"'
+				)
+			),
+			array(
+				'field' => 'estado',
+				'title' => __('Estado'),
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'estado_modificado',
+				'title' => __('Estado').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
 				)
 			),
 			array(

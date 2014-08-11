@@ -68,8 +68,8 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	/**
 	 * Método que realiza la escritura de un log respecto a una entidad.
 	 * @param $action String que se guardará en el campo accion de la tabla de logs.
-	 * @param $object Object hereda de LoggeableEntity y por ende tiene definido el método getLoggingTable().
-	 * @param $legacy Object legado que es la versión anterior del que se guardará ahora.
+	 * @param $object Entity hereda de LoggeableEntity y por ende tiene definido el método getLoggingTable().
+	 * @param $legacy Entity legado que es la versión anterior del que se guardará ahora.
 	 * @param int $app Identificador de la aplicación que está realizando la operación.
 	 * @throws Exception Cuando la inserción falla.
 	 */
@@ -134,13 +134,14 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			//que crear un nuevo registro.
 		    if(empty($id)) {
 			    $object = $this->save($object);
-		        if (is_subclass_of($object, 'LoggeableEntity')){
+		        if (is_subclass_of($object, 'LoggeableEntity')) {
 		            $this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
 		        }
 		    } else {
 			    $legacy = $this->get($object->get($object->getIdentity()));
 			    $object = $this->update($object);
 		        if (is_subclass_of($object, 'LoggeableEntity')){
+			        $object = $this->merge($legacy, $object);
 		            $this->writeLogFromArray('MODIFICAR', $object, $legacy);
 		        }
 		    }
@@ -177,6 +178,20 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	 */
 	private function update(Entity $object) {
 		return $this->save($object);
+	}
+
+	private function merge(Entity $legacy, Entity $new) {
+		$properties = array_keys($legacy->fields);
+		foreach ($properties as $property) {
+			$newProperty = $new->get($property);
+			if (empty($newProperty)) {
+				$legacyProperty = $legacy->get($property);
+				if (!empty($legacyProperty)){
+					$new->set($property, $legacy->get($property));
+				}
+			}
+		}
+		return $new;
 	}
 
     public function get($id) {

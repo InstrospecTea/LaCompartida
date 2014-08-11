@@ -41,13 +41,8 @@ class Charge extends LoggeableEntity {
 			'estado',
 			'codigo_cliente',
 			'id_moneda',
-			'tipo_cambio_moneda',
-			'fecha_creacion',
-			'fecha_en_revision',
-			'fecha_emision',
-			'fecha_facturacion',
-			'fecha_enviado_cliente',
-			'fecha_pago_parcial'
+			'tipo_cambio_moneda'
+
 		);
 	}
 

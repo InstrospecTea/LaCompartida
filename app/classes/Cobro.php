@@ -34,7 +34,7 @@ if (!class_exists('Cobro')) {
 				$charge = $chargeService->saveOrUpdate($charge);
 				$this->fields = $charge->fields;
 			} catch(Exception $ex) {
-				//Todo: Handle Exception!
+				print_r($ex->getMessage());
 			}
 
 
@@ -611,6 +611,7 @@ if (!class_exists('Cobro')) {
 			}
 			$estado_anterior = $this->fields['estado'];
 			$this->Edit('estado', $estado);
+
 			if ($this->Write() && $estado_anterior != $estado) {
 				return $estado;
 			}
