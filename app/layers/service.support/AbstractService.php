@@ -50,7 +50,6 @@ abstract class AbstractService implements BaseService{
         try{
             $dao->delete($object);
         } catch (Exception $ex) {
-	        print_r('upsi');
             throw new Exception($ex);
         }
     }

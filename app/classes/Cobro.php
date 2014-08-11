@@ -34,7 +34,7 @@ if (!class_exists('Cobro')) {
 				$charge = $chargeService->saveOrUpdate($charge);
 				$this->fields = $charge->fields;
 			} catch(Exception $ex) {
-				print_r($ex->getMessage());
+
 			}
 
 
