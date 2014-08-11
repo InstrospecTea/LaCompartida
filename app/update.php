@@ -1343,7 +1343,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.83;
+$max_update = 7.84;
 
 
 $force = 0;
