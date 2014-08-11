@@ -1329,7 +1329,11 @@ QUERY;
 			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
 			ejecutar($queries, $dbh);
 			break;
-
+		case 7.84:
+			$queries = array();
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `codigo_asunto_modificado` `codigo_asunto_modificado` VARCHAR(20) NULL DEFAULT NULL ;";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
