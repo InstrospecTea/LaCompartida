@@ -45,8 +45,7 @@ class Charge extends LoggeableEntity {
 			'fecha_ini',
 			'fecha_fin',
 			'forma_cobro',
-			'monto',
-			'monto_gastos'
+			'monto'
 		);
 	}
 

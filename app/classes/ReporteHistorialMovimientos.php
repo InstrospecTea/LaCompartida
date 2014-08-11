@@ -842,20 +842,6 @@ class ReporteHistorialMovimientos
 				)
 			),
 			array(
-				'field' => 'monto_gastos',
-				'title' => __('Monto Gastos').' (M)',
-				'extras' => array(
-					'attrs' => 'style="text-align:left;color:red;"'
-				)
-			),
-			array(
-				'field' => 'monto_gastos_modificado',
-				'title' => __('Monto Gastos').' (M)',
-				'extras' => array(
-					'attrs' => 'style="text-align:left;color:green;"'
-				)
-			),
-			array(
 				'field' => 'tipo_cambio_moneda_modificado',
 				'title' => __('Tipo Cambio').' (M)',
 				'extras' => array(
