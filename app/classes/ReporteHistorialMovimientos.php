@@ -380,16 +380,13 @@ class ReporteHistorialMovimientos
 					->add_select_not_null($table_name.'.'.'trabajo_si_no_modificado', 'trabajo_si_no_modificado')
 					->add_select_not_null($table_name.'.'.'duracion', 'duracion')
 					->add_select_not_null($table_name.'.'.'duracion_modificado', 'duracion_modificado')
-					->add_select_not_null($table_name.'.'.'accion', 'accion')
-					->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', $main_table.'.codigo_asunto'));
-
+					->add_select_not_null($table_name.'.'.'accion', 'accion');
 				break;
 
 			default:
 				throw new Exception('There is no criteria completion handler defined for the selected entity '.$entity.' .');
 				break;
 		}
-
 		return $reportCriteria;
 	}
 
