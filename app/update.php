@@ -1198,13 +1198,11 @@ QUERY;
 			$queries[] = "UPDATE factura SET serie_documento_legal = LPAD(serie_documento_legal, 3, '0');";
 			ejecutar($queries, $dbh);
 			break;
-
 		case 7.75:
 			$queries = array();
 			$queries[] = "ALTER TABLE `factura` DROP INDEX `id_documento_legal`, ADD UNIQUE INDEX `id_documento_legal` (`id_documento_legal` ASC, `numero` ASC, `serie_documento_legal` ASC, `id_estudio` ASC);";
 			ejecutar($queries, $dbh);
 			break;
-
 		case 7.76:
 			$queries = array();
 			if (!ExisteCampo('codigo_dte', 'prm_documento_legal', $dbh)) {
@@ -1227,6 +1225,117 @@ QUERY;
 			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
 			ejecutar($queries, $dbh);
 			break;
+		case 7.79:
+			$queries = array();
+			$queries[] = "CREATE TABLE `tramite_historial` (
+			  `id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_tramite` int(11) NOT NULL,
+			  `id_usuario` int(11) NOT NULL,
+			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `fecha` datetime DEFAULT NULL,
+			  `fecha_modificado` datetime DEFAULT NULL,
+			  `descripcion` mediumtext,
+			  `descripcion_modificado` mediumtext,
+			  `codigo_asunto` varchar(20) DEFAULT NULL,
+			  `codigo_asunto_modificado` varchar(20) DEFAULT NULL,
+			  `codigo_actividad` varchar(5) DEFAULT NULL,
+			  `codigo_actividad_modificado` varchar(5) DEFAULT NULL,
+			  `codigo_tarea` varchar(100) DEFAULT NULL,
+			  `codigo_tarea_modificado` varchar(100) DEFAULT NULL,
+			  `id_tramite_tipo` int(11) DEFAULT NULL,
+			  `id_tramite_tipo_modificado` int(11) DEFAULT NULL,
+			  `solicitante` varchar(255) DEFAULT NULL,
+			  `solicitante_modificado` varchar(255) DEFAULT NULL,
+			  `id_moneda_tramite` int(11) DEFAULT NULL,
+			  `id_moneda_tramite_modificado` int(11) DEFAULT NULL,
+			  `tarifa_tramite` double DEFAULT NULL,
+			  `tarifa_tramite_modificado` double DEFAULT NULL,
+			  `id_moneda_tramite_individual` int(11) DEFAULT NULL,
+			  `id_moneda_tramite_individual_modificado` int(11) DEFAULT NULL,
+			  `tarifa_tramite_individual` double DEFAULT NULL,
+			  `tarifa_tramite_individual_modificado` double DEFAULT NULL,
+			  `cobrable` tinyint(4) DEFAULT NULL,
+			  `cobrable_modificado` tinyint(4) DEFAULT NULL,
+			  `trabajo_si_no` int(1) DEFAULT NULL,
+			  `trabajo_si_no_modificado` int(1) DEFAULT NULL,
+			  `duracion` time DEFAULT '00:00:00',
+			  `duracion_modificado` time DEFAULT '00:00:00',
+			  `accion` varchar(9) NOT NULL DEFAULT '',
+			  `app_id` int(3) NOT NULL DEFAULT '1',
+			  PRIMARY KEY (`id_tramite_historial`)
+			);";
+
+			ejecutar($queries, $dbh);
+			break;
+		case 7.80:
+			$queries = array();
+			$queries[] = "ALTER TABLE `cobro_historial` CHANGE COLUMN `id_cobro_historial` `id_cobro_observacion` INT(11) NOT NULL AUTO_INCREMENT , RENAME TO  `cobro_observacion`";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.81:
+			$queries = array();
+			$queries[] = "CREATE TABLE `cobro_historial` (
+			  `id_cobro_historial` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_cobro` int(11) DEFAULT NULL,
+			  `id_usuario` int(11) DEFAULT NULL,
+			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `accion` varchar(9) DEFAULT '',
+			  `app_id` int(3) DEFAULT NULL,
+			  `estado` varchar(20) DEFAULT NULL,
+			  `estado_modificado` varchar(20) DEFAULT NULL,
+			  `codigo_cliente` varchar(10) DEFAULT '',
+			  `codigo_cliente_modificado` varchar(10) DEFAULT '',
+			  `id_contrato` int(11) DEFAULT NULL,
+			  `fecha_cobro` datetime DEFAULT NULL,
+			  `fecha_cobro_modificado` datetime DEFAULT NULL,
+			  `id_contrato_modificado` int(11) DEFAULT NULL,
+			  `id_moneda` int(11) DEFAULT NULL,
+			  `id_moneda_modificado` int(11) DEFAULT NULL,
+			  `tipo_cambio_moneda` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+			  `tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+			  `fecha_creacion` datetime DEFAULT NULL,
+			  `fecha_en_revision` datetime DEFAULT NULL,
+			  `fecha_emision` datetime DEFAULT NULL,
+			  `fecha_facturacion` datetime DEFAULT NULL,
+			  `fecha_enviado_cliente` datetime DEFAULT NULL,
+			  `fecha_pago_parcial` datetime DEFAULT NULL,
+			  `fecha_creacion_modificado` datetime DEFAULT NULL,
+			  `fecha_en_revision_modificado` datetime DEFAULT NULL,
+			  `fecha_emision_modificado` datetime DEFAULT NULL,
+			  `fecha_facturacion_modificado` datetime DEFAULT NULL,
+			  `fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
+			  `fecha_pago_parcial_modificado` datetime DEFAULT NULL,
+			  PRIMARY KEY (`id_cobro_historial`),
+			  INDEX(`id_cobro`)
+			);";
+			$queries[] = "ALTER TABLE `cobro_historial`
+				ADD COLUMN `fecha_ini` DATE NULL DEFAULT NULL AFTER `fecha_pago_parcial_modificado`,
+				ADD COLUMN `fecha_fin` DATE NULL DEFAULT NULL AFTER `fecha_ini`,
+				ADD COLUMN `fecha_ini_modificado` DATE NULL DEFAULT NULL AFTER `fecha_fin`,
+				ADD COLUMN `fecha_fin_modificado` DATE NULL DEFAULT NULL AFTER `fecha_ini_modificado`,
+				ADD COLUMN `forma_cobro` VARCHAR(20) NULL DEFAULT NULL AFTER `fecha_fin_modificado`,
+				ADD COLUMN `forma_cobro_modificado` VARCHAR(20) NULL DEFAULT NULL AFTER `forma_cobro`,
+				ADD COLUMN `monto` DOUBLE NULL DEFAULT NULL AFTER `forma_cobro_modificado`,
+				ADD COLUMN `monto_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto`,
+				ADD COLUMN `monto_gastos` DOUBLE NULL DEFAULT NULL AFTER `monto_modificado`,
+				ADD COLUMN `monto_gastos_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto_gastos`;";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.82:
+			$queries = array();
+			$queries[] = "ALTER TABLE `gasto_historial` CHANGE COLUMN `fecha` `fecha_accion` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' ;";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.83:
+			$queries = array();
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
+			ejecutar($queries, $dbh);
+			break;
+		case 7.84:
+			$queries = array();
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `codigo_asunto_modificado` `codigo_asunto_modificado` VARCHAR(20) NULL DEFAULT NULL ;";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -1236,7 +1345,8 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.78;
+$max_update = 7.84;
+
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

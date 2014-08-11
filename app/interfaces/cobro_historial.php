@@ -45,7 +45,7 @@ if($buscar == 1)
 									 ch.comentario as comentario, 
 									 cl.glosa_cliente as glosa_cliente, 
 									 ch.es_modificable 
-						FROM cobro_historial AS ch  
+						FROM cobro_observacion AS ch
 						JOIN cobro AS c ON c.id_cobro = ch.id_cobro 
 						JOIN contrato AS co ON c.id_contrato=co.id_contrato 
 						JOIN usuario AS u ON u.id_usuario=ch.id_usuario 

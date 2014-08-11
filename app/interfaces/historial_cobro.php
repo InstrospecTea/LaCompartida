@@ -45,16 +45,16 @@
     if($x_pag=="")
         $x_pag=5;
     if($orden == '')
-        $orden= 'cobro_historial.fecha_creacion DESC';
+        $orden= 'cobro_observacion.fecha_creacion DESC';
 
 
 	$where = '';
 	if(!$where)
 		$where = 1;
 
-    $query = "SELECT SQL_CALC_FOUND_ROWS id_cobro_historial, fecha, comentario, CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as nombre 
-											FROM cobro_historial
-                                            LEFT JOIN usuario ON usuario.id_usuario = cobro_historial.id_usuario
+    $query = "SELECT SQL_CALC_FOUND_ROWS id_cobro_observacion, fecha, comentario, CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as nombre
+											FROM cobro_observacion
+                                            LEFT JOIN usuario ON usuario.id_usuario = cobro_observacion.id_usuario
                                             WHERE id_cobro = '$id_cobro' AND $where";
 
     $pagina->PrintHeaders();
