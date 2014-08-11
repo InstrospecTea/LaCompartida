@@ -797,20 +797,6 @@ class ReporteHistorialMovimientos
 				)
 			),
 			array(
-				'field' => 'forma_cobro',
-				'title' => __('Forma Cobro'),
-				'extras' => array(
-					'attrs' => 'style="text-align:left;color:red;"'
-				)
-			),
-			array(
-				'field' => 'forma_cobro_modificado',
-				'title' => __('Forma Cobro').' (M)',
-				'extras' => array(
-					'attrs' => 'style="text-align:left;color:green;"'
-				)
-			),
-			array(
 				'field' => 'tipo_cambio_moneda',
 				'title' => __('Tipo Cambio'),
 				'extras' => array(
@@ -820,6 +806,20 @@ class ReporteHistorialMovimientos
 			array(
 				'field' => 'tipo_cambio_moneda_modificado',
 				'title' => __('Tipo Cambio').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
+				'field' => 'forma_cobro',
+				'title' => __('Forma Cobro'),
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'forma_cobro_modificado',
+				'title' => __('Forma Cobro').' (M)',
 				'extras' => array(
 					'attrs' => 'style="text-align:left;color:green;"'
 				)
