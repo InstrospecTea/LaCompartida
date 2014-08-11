@@ -17,7 +17,7 @@ if (!empty($_POST)) {
 
 	if (empty($entity_code) && empty($charge) && empty($id_usuario) && empty($codigo_cliente) && empty($codigo_asunto)) {
 
-		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').','.__('Cliente').','.__('Asunto').','.__('Usuario').' o código de entidad.'));
+		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').', '.__('Cliente').', '.__('Asunto').', '.__('Usuario').' o código de entidad.'));
 
 	} else {
 
