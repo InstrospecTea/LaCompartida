@@ -31,6 +31,7 @@ class ReporteHistorialMovimientos
 	 *
 	 */
 	function __construct($sesion) {
+		ini_set("memory_limit", "256M");
 		$this->sesion = $sesion;
 	}
 
