@@ -1228,52 +1228,43 @@ QUERY;
 		case 7.79:
 			$queries = array();
 			$queries[] = "CREATE TABLE `tramite_historial` (
-			  `id_tramite_historial` INT(11) NOT NULL AUTO_INCREMENT,
-			  `id_tramite` INT(11) NOT NULL,
-			  `id_usuario` INT(11) NOT NULL,
-			  `fecha_accion` DATETIME NOT NULL,
-			  `fecha_tramite` DATETIME NOT NULL,
-			  `fecha_tramite_modificado` DATETIME NOT NULL,
-			  `descripcion` MEDIUMTEXT NULL,
-			  `descripcion_modificado` MEDIUMTEXT NULL,
-			  `codigo_asunto` VARCHAR(20) NULL,
-			  `codigo_asunto_modificado` VARCHAR(20) NULL,
-			  `codigo_actividad` VARCHAR(5) NULL,
-			  `codigo_actividad_modificado` VARCHAR(5) NULL,
-			  `codigo_tarea` VARCHAR(100) NULL,
-			  `codigo_tarea_modificado` VARCHAR(100) NULL,
-			  `id_tramite_tipo` INT(11) NOT NULL,
-			  `id_tramite_tipo_modificado` INT(11) NOT NULL,
-			  `solicitante` VARCHAR(255) NULL,
-			  `solicitante_modificado` VARCHAR(255) NULL,
-			  `id_moneda_tramite` INT(11) NULL,
-			  `id_moneda_tramite_modificado` INT(11) NULL,
-			  `tarifa_tramite` DOUBLE NULL,
-			  `tarifa_tramite_modificado` DOUBLE NULL,
-			  `id_moneda_tramite_individual` INT(11) NULL,
-			  `id_moneda_tramite_individual_modificado` INT(11) NULL,
-			  `tarifa_tramite_individual` DOUBLE NULL,
-			  `tarifa_tramite_individual_modificado` DOUBLE NULL,
-			  `cobrable` TINYINT(4) NOT NULL,
-			  `cobrable_modificado` TINYINT(4) NOT NULL,
-			  `trabajo_si_no` INT(1) NOT NULL,
-			  `trabajo_si_no_modificado` INT(1) NOT NULL,
-			  `duracion` TIME NOT NULL DEFAULT '00:00:00',
-			  `duracion_modificado` TIME NOT NULL DEFAULT '00:00:00',
-			  PRIMARY KEY (`id_tramite_historial`));";
+			  `id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_tramite` int(11) NOT NULL,
+			  `id_usuario` int(11) NOT NULL,
+			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `fecha` datetime DEFAULT NULL,
+			  `fecha_modificado` datetime DEFAULT NULL,
+			  `descripcion` mediumtext,
+			  `descripcion_modificado` mediumtext,
+			  `codigo_asunto` varchar(20) DEFAULT NULL,
+			  `codigo_asunto_modificado` varchar(20) DEFAULT NULL,
+			  `codigo_actividad` varchar(5) DEFAULT NULL,
+			  `codigo_actividad_modificado` varchar(5) DEFAULT NULL,
+			  `codigo_tarea` varchar(100) DEFAULT NULL,
+			  `codigo_tarea_modificado` varchar(100) DEFAULT NULL,
+			  `id_tramite_tipo` int(11) DEFAULT NULL,
+			  `id_tramite_tipo_modificado` int(11) DEFAULT NULL,
+			  `solicitante` varchar(255) DEFAULT NULL,
+			  `solicitante_modificado` varchar(255) DEFAULT NULL,
+			  `id_moneda_tramite` int(11) DEFAULT NULL,
+			  `id_moneda_tramite_modificado` int(11) DEFAULT NULL,
+			  `tarifa_tramite` double DEFAULT NULL,
+			  `tarifa_tramite_modificado` double DEFAULT NULL,
+			  `id_moneda_tramite_individual` int(11) DEFAULT NULL,
+			  `id_moneda_tramite_individual_modificado` int(11) DEFAULT NULL,
+			  `tarifa_tramite_individual` double DEFAULT NULL,
+			  `tarifa_tramite_individual_modificado` double DEFAULT NULL,
+			  `cobrable` tinyint(4) DEFAULT NULL,
+			  `cobrable_modificado` tinyint(4) DEFAULT NULL,
+			  `trabajo_si_no` int(1) DEFAULT NULL,
+			  `trabajo_si_no_modificado` int(1) DEFAULT NULL,
+			  `duracion` time DEFAULT '00:00:00',
+			  `duracion_modificado` time DEFAULT '00:00:00',
+			  `accion` varchar(9) NOT NULL DEFAULT '',
+			  `app_id` int(3) NOT NULL DEFAULT '1',
+			  PRIMARY KEY (`id_tramite_historial`)
+			);";
 
-			$queries[] = "ALTER TABLE `tramite_historial`
-			ADD COLUMN `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `duracion_modificado`;";
-
-			$queries[] = "ALTER TABLE `tramite_historial`
-			ADD COLUMN `app_id` INT(3) NOT NULL DEFAULT '1' AFTER `accion`;";
-
-			$queries[] = "ALTER TABLE `tramite_historial`
-			CHANGE COLUMN `fecha_tramite_modificado` `fecha_tramite_modificado` DATETIME NULL ,
-			CHANGE COLUMN `id_tramite_tipo_modificado` `id_tramite_tipo_modificado` INT(11) NULL ,
-			CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL ,
-			CHANGE COLUMN `trabajo_si_no_modificado` `trabajo_si_no_modificado` INT(1) NULL ,
-			CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT '00:00:00' ;";
 			ejecutar($queries, $dbh);
 			break;
 		case 7.80:
@@ -1317,6 +1308,17 @@ QUERY;
 			  PRIMARY KEY (`id_cobro_historial`),
 			  INDEX(`id_cobro`)
 			);";
+			$queries[] = "ALTER TABLE `cobro_historial`
+				ADD COLUMN `fecha_ini` DATE NULL DEFAULT NULL AFTER `fecha_pago_parcial_modificado`,
+				ADD COLUMN `fecha_fin` DATE NULL DEFAULT NULL AFTER `fecha_ini`,
+				ADD COLUMN `fecha_ini_modificado` DATE NULL DEFAULT NULL AFTER `fecha_fin`,
+				ADD COLUMN `fecha_fin_modificado` DATE NULL DEFAULT NULL AFTER `fecha_ini_modificado`,
+				ADD COLUMN `forma_cobro` VARCHAR(20) NULL DEFAULT NULL AFTER `fecha_fin_modificado`,
+				ADD COLUMN `forma_cobro_modificado` VARCHAR(20) NULL DEFAULT NULL AFTER `forma_cobro`,
+				ADD COLUMN `monto` DOUBLE NULL DEFAULT NULL AFTER `forma_cobro_modificado`,
+				ADD COLUMN `monto_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto`,
+				ADD COLUMN `monto_gastos` DOUBLE NULL DEFAULT NULL AFTER `monto_modificado`,
+				ADD COLUMN `monto_gastos_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto_gastos`;";
 			ejecutar($queries, $dbh);
 			break;
 		case 7.82:

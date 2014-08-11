@@ -127,7 +127,7 @@ $pagina->PrintTop();
 				
 				<tr>
 					<td class="buscadorlabel">
-						<?php echo __('Entidad') ?>
+						<?php echo __('Dato') ?>
 					</td>
 					<td align='left' colspan="2">
 						<?php echo $form->select('selected_entity', $entities, $selected_entity, array('empty' => false, 'id' => 'selected_entity')); ?>
@@ -135,7 +135,7 @@ $pagina->PrintTop();
 				</tr>
 				<tr>
 					<td class="buscadorlabel">
-						<?php echo __('Código Entidad') ?>
+						<?php echo __('Código') ?>
 					</td>
 					<td align='left' colspan="2">
 						<input type="text" id="entity_code" name="entity_code" value="<?php echo $entity_code ?>">

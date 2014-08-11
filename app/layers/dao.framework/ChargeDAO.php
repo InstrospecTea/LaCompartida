@@ -7,4 +7,6 @@ class ChargeDAO extends AbstractDAO implements IChargeDAO{
         return 'Charge';
     }
 
+
+
 }

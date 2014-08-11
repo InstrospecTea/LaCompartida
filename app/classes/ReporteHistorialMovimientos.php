@@ -331,7 +331,17 @@ class ReporteHistorialMovimientos
 					->add_select_not_null($table_name.'.'.'tipo_cambio_moneda', 'tipo_cambio_moneda')
 					->add_select_not_null($table_name.'.'.'tipo_cambio_moneda_modificado','tipo_cambio_moneda_modificado')
 					->add_select_not_null($table_name.'.'.'estado', 'estado')
+					->add_select_not_null($table_name.'.'.'fecha_ini','fecha_ini')
+					->add_select_not_null($table_name.'.'.'fecha_ini_modificado','fecha_ini_modificado')
+					->add_select_not_null($table_name.'.'.'fecha_fin','fecha_fin')
+					->add_select_not_null($table_name.'.'.'fecha_fin_modificado','fecha_fin_modificado')
 					->add_select_not_null($table_name.'.'.'estado_modificado','estado_modificado')
+					->add_select_not_null($table_name.'.'.'forma_cobro','forma_cobro')
+					->add_select_not_null($table_name.'.'.'forma_cobro_modificado','forma_cobro_modificado')
+					->add_select_not_null($table_name.'.'.'monto','monto')
+					->add_select_not_null($table_name.'.'.'monto_modificado','monto_modificado')
+					->add_select_not_null($table_name.'.'.'monto_gastos','monto_gastos')
+					->add_select_not_null($table_name.'.'.'monto_gastos_modificado','monto_gastos_modificado')
 					->add_left_join_with('cobro_asunto', CriteriaRestriction::equals('cobro_asunto.'.$key, $main_table.'.'.$key))
 					->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', 'cobro_asunto.codigo_asunto'))
 					->add_select_not_null_from_criteria($moneyCriteria, CriteriaRestriction::equals('id_moneda',$table_name.'.'.'id_moneda'), 'id_moneda')
@@ -379,6 +389,7 @@ class ReporteHistorialMovimientos
 				throw new Exception('There is no criteria completion handler defined for the selected entity '.$entity.' .');
 				break;
 		}
+
 		return $reportCriteria;
 	}
 
@@ -789,6 +800,20 @@ class ReporteHistorialMovimientos
 				)
 			),
 			array(
+				'field' => 'forma_cobro',
+				'title' => __('Forma Cobro'),
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'forma_cobro_modificado',
+				'title' => __('Forma Cobro').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
 				'field' => 'tipo_cambio_moneda',
 				'title' => __('Tipo Cambio'),
 				'extras' => array(
@@ -798,6 +823,73 @@ class ReporteHistorialMovimientos
 			array(
 				'field' => 'tipo_cambio_moneda_modificado',
 				'title' => __('Tipo Cambio').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
+				'field' => 'monto',
+				'title' => __('Monto').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'monto_modificado',
+				'title' => __('Monto').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
+				'field' => 'monto_gastos',
+				'title' => __('Monto Gastos').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'monto_gastos_modificado',
+				'title' => __('Monto Gastos').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
+				'field' => 'tipo_cambio_moneda_modificado',
+				'title' => __('Tipo Cambio').' (M)',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
+				'field' => 'fecha_ini',
+				'title' => __('Fecha Desde'),
+				'format' => 'date',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'fecha_ini_modificado',
+				'title' => __('Fecha Desde').' (M)',
+				'format' => 'date',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:green;"'
+				)
+			),
+			array(
+				'field' => 'fecha_fin',
+				'title' => __('Fecha Hasta'),
+				'format' => 'date',
+				'extras' => array(
+					'attrs' => 'style="text-align:left;color:red;"'
+				)
+			),
+			array(
+				'field' => 'fecha_fin_modificado',
+				'title' => __('Fecha Hasta').' (M)',
+				'format' => 'date',
 				'extras' => array(
 					'attrs' => 'style="text-align:left;color:green;"'
 				)
