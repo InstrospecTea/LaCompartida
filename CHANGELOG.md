@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.10.1
+Lunes 11 de Agosto 2014
+* **Added:** [Agrega tags a segmento resumen asuntos](https://github.com/LemontechSA/ttb/pull/633)
+
 ## Release: 14.10.0
 Jueve 7 de Agosto 2014
 * **Fixed:** [Feature/modificaciones lloredacamacho](https://github.com/LemontechSA/ttb/pull/626)
