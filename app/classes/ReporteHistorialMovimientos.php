@@ -826,7 +826,7 @@ class ReporteHistorialMovimientos
 			),
 			array(
 				'field' => 'monto',
-				'title' => __('Monto').' (M)',
+				'title' => __('Monto'),
 				'extras' => array(
 					'attrs' => 'style="text-align:left;color:red;"'
 				)
@@ -834,13 +834,6 @@ class ReporteHistorialMovimientos
 			array(
 				'field' => 'monto_modificado',
 				'title' => __('Monto').' (M)',
-				'extras' => array(
-					'attrs' => 'style="text-align:left;color:green;"'
-				)
-			),
-			array(
-				'field' => 'tipo_cambio_moneda_modificado',
-				'title' => __('Tipo Cambio').' (M)',
 				'extras' => array(
 					'attrs' => 'style="text-align:left;color:green;"'
 				)
