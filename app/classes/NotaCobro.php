@@ -4062,6 +4062,21 @@ class NotaCobro extends Cobro {
 					}
 				}
 
+				//	Asuntos Flat Fee : Lista asuntos asociados al cobro tabla "cobro_asuntos"
+
+				$query = "SELECT asunto.codigo_asunto, asunto.codigo_asunto_secundario, asunto.glosa_asunto FROM cobro_asunto LEFT JOIN asunto ON ( cobro_asunto.codigo_asunto = asunto.codigo_asunto ) WHERE id_cobro ='{$this->fields['id_cobro']}'";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto) = mysql_fetch_array($resp)) {
+					$row = $row_tmpl;
+
+					$row = str_replace('%codigo_asunto_ff%', $codigo_asunto, $row);
+					$row = str_replace('%codigo_asunto_secundario_ff%', $codigo_asunto_secundario, $row);
+					$row = str_replace('%glosa_asunto_ff%', $glosa_asunto, $row);
+
+					$html .= $row;
+				}
+
 				break;
 
 			case 'RESUMEN_ASUNTOS_TOTAL':
