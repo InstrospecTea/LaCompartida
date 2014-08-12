@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.11.1
+Martes 12 de Agosto 2014
+* **Added:** [Actualiza con usuario admin.](https://github.com/LemontechSA/ttb/pull/635)
+
 ## Release: 14.11.0
 Lunes 11 de Agosto 2014
 * **Fixed:** [Feature/reporte historial movimientos 2](https://github.com/LemontechSA/ttb/pull/627)
