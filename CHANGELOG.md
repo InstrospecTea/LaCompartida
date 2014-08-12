@@ -1,5 +1,9 @@
 # Changelog
 
+## Release: 14.11.0
+Lunes 11 de Agosto 2014
+* **Fixed:** [Feature/reporte historial movimientos 2](https://github.com/LemontechSA/ttb/pull/627)
+
 ## Hotfix: 14.10.1
 Lunes 11 de Agosto 2014
 * **Added:** [Agrega tags a segmento resumen asuntos](https://github.com/LemontechSA/ttb/pull/633)
