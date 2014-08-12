@@ -155,24 +155,29 @@ class ReporteHistorialMovimientos
 		$reportCriteria
 					->add_select('id_'.$table_name)
 					->add_select_not_null($table_name.'.'.$key,'story_key')
-					->add_select($table_name.'.fecha_accion', 'fecha_accion')
 					->add_select($table_name.'.id_usuario')
 					->add_select('CONCAT(usuario.nombre,\' \',usuario.apellido1)', 'usuario')
 					->add_select($creation_date,'fecha_creacion')
 					->add_left_join_with($main_table, CriteriaRestriction::equals($main_table.'.'.$key, $table_name.'.'.$key));
 
+		$fecha_field = '.fecha';
+		if ($main_table == 'tramite') {
+			$fecha_field = '.fecha_accion';
+		}
+
 		if (!empty($this->since) && !empty($this->until)) {
 			$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
 			$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.'.fecha_accion'.')', $this->since, $this->until));
+
+			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.$fecha_field.')', $this->since, $this->until));
 		} else {
 			if (!empty($this->since)) {
 				$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
-				$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than('date('.$table_name.'.fecha_accion'.')', $this->since));
+				$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than('date('.$table_name.$fecha_field.')', $this->since));
 			}
 			if (!empty($this->until)) {
 				$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.'.fecha_accion'.')', $this->until));
+				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.$fecha_field.')', $this->until));
 			}
 		}
 
@@ -285,6 +290,7 @@ class ReporteHistorialMovimientos
 			case 'trabajo':
 				
 				$reportCriteria
+					->add_select($table_name.'.fecha', 'fecha_accion')
 					->add_select_not_null($table_name.'.'.'descripcion', 'descripcion')
 					->add_select_not_null($table_name.'.'.'descripcion_modificado', 'descripcion_modificado')
 					->add_select_not_null($table_name.'.'.'duracion_cobrada', 'duracion_cobrada')
@@ -307,6 +313,7 @@ class ReporteHistorialMovimientos
 			case 'cta_corriente':
 
 				$reportCriteria
+					->add_select($table_name.'.fecha', 'fecha_accion')
 					->add_select_not_null($table_name.'.'.'fecha_movimiento', 'fecha_movimiento')
 					->add_select_not_null($table_name.'.'.'fecha_movimiento_modificado', 'fecha_movimiento_modificado')
 					->add_select_not_null($table_name.'.'.'codigo_cliente', 'codigo_cliente')
@@ -327,6 +334,7 @@ class ReporteHistorialMovimientos
 			case 'cobro':
 				
 				$reportCriteria
+					->add_select($table_name.'.fecha', 'fecha_accion')
 					->add_select_not_null('asunto.'.'codigo_asunto', 'codigo_asunto')
 					->add_select_not_null($table_name.'.'.'tipo_cambio_moneda', 'tipo_cambio_moneda')
 					->add_select_not_null($table_name.'.'.'tipo_cambio_moneda_modificado','tipo_cambio_moneda_modificado')
@@ -352,7 +360,7 @@ class ReporteHistorialMovimientos
 			case 'tramite':
 
 				$reportCriteria
-					->add_select_not_null($table_name.'.'.'fecha', 'fecha')
+					->add_select_not_null($table_name.'.'.'fecha_accion', 'fecha_accion')
 					->add_select_not_null($table_name.'.'.'fecha_modificado', 'fecha_tramite')
 					->add_select_not_null($table_name.'.'.'descripcion', 'descripcion')
 					->add_select_not_null($table_name.'.'.'descripcion_modificado', 'descripcion_modificado')

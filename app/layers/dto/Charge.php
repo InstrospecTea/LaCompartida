@@ -28,7 +28,7 @@ class Charge extends LoggeableEntity {
      * @return string
      */
     public function getLoggingTable() {
-        return 'cobro_historial';
+        return 'cobro_movimiento';
     }
 
 	/**
