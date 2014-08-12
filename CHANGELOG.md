@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.11.2
+Martes 12 de Agosto 2014
+* **Fixed:** [Reporte historial de movimientos con querys no costosas computacionalmente.](https://github.com/LemontechSA/ttb/pull/636)
+
 ## Hotfix: 14.11.1
 Martes 12 de Agosto 2014
 * **Added:** [Actualiza con usuario admin.](https://github.com/LemontechSA/ttb/pull/635)
