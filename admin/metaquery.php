@@ -25,8 +25,8 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 				'rdsdb2.thetimebilling.com',
 				'rdsdb3.thetimebilling.com',
 				'rdsdb4.thetimebilling.com',
-				'rdsdb5.thetimebilling.com',
-				'rdsdb6.thetimebilling.com'
+				'rdsdb6.thetimebilling.com',
+				'rdsvip1.thetimebilling.com',
 			);
 			echo Html::SelectArray($servers, 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px');
 			?>

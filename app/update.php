@@ -7,20 +7,17 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 /*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
 
 /* IMPORTANTE:
-	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
-if (!function_exists('ExisteCampo')) {
+  Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
 
-	function ExisteCampo($campo, $tabla, $dbh) {
+function ExisteCampo($campo, $tabla, $dbh) {
 
-		$existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
-		if (!$existencampos):
-			return false;
-		elseif (mysql_num_rows($existencampos) > 0):
-			return true;
-		endif;
+	$existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
+	if (!$existencampos) {
 		return false;
+	} else if (mysql_num_rows($existencampos) > 0) {
+		return true;
 	}
-
+	return false;
 }
 
 function ExisteIndex($campo, $tabla, $dbh) {
@@ -34,29 +31,32 @@ function ExisteIndex($campo, $tabla, $dbh) {
 }
 
 function cuentaregistros($tabla, $dbh) {
-
 	$registros = mysql_query("select count(*)  from $tabla", $dbh);
-	if (!$registros):
+	if (!$registros) {
 		return 0;
-	elseif ($cantidad = mysql_fetch_field($registros)):
+	} elseif ($cantidad = mysql_fetch_field($registros)) {
 		return $cantidad;
-	endif;
+	}
 	return 0;
 }
 
 function ExisteLlaveForanea($tabla, $columna, $tabla_referenciada, $columna_referenciada, $dbh) {
-	if (!DEFINED('DBNAME'))
-		define('DBNAME', Conf::dbName());
-	$foraneaquery = "SELECT constraint_name  FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '" . DBNAME . "'AND REFERENCED_TABLE_NAME='$tabla_referenciada'
-AND table_name='$tabla' AND referenced_column_name ='$columna_referenciada'  and column_name='$columna'";
-//echo '<pre>';echo $foraneaquery;echo '</pre>';
+	$db_name = Conf::dbName();
+	$foraneaquery = "SELECT constraint_name
+						FROM information_schema.KEY_COLUMN_USAGE
+						WHERE REFERENCED_TABLE_SCHEMA = '$db_name'
+						AND REFERENCED_TABLE_NAME='$tabla_referenciada'
+						AND table_name='$tabla'
+						AND referenced_column_name ='$columna_referenciada'
+						AND column_name='$columna'";
+
 	$ExisteLlaveForanea = mysql_query($foraneaquery, $dbh);
-	if (!$ExisteLlaveForanea):
+	if (!$ExisteLlaveForanea) {
 		return false;
-	else:
+	} else {
 		$llave = mysql_fetch_assoc($ExisteLlaveForanea);
 		return $llave['constraint_name'];
-	endif;
+	}
 }
 
 /**
@@ -70,7 +70,7 @@ function ejecutar($queries, $dbh) {
 	}
 	foreach ($queries as $q) {
 		if (!($res = mysql_query($q, $dbh) )) {
-			throw new Exception($q . "---" . mysql_error());
+			throw new Exception($q . '---' . mysql_error());
 		}
 	}
 }
@@ -446,7 +446,7 @@ QUERY;
 			if (!ExisteCampo('factura_codigopostal', 'contrato', $dbh)) {
 				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `factura_comuna`;";
 			}
-				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
+			if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `comuna_cliente`;";
 			}
 
@@ -483,7 +483,7 @@ QUERY;
 			break;
 		case 7.31:
 			$queries = array();
-			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+			if (!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
@@ -547,10 +547,10 @@ QUERY;
 						cc.documento_pago=nd.id_documento_pago
 					WHERE cc.incluir_en_cobro = 'NO' ";
 
-			if (!ExisteIndex('id_neteo_documento', $tabla, $dbh))	{
+			if (!ExisteIndex('id_neteo_documento', $tabla, $dbh)) {
 				$queries[] = "ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
 			}
-			if (!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) ) {
+			if (!ExisteLlaveForanea('cta_corriente', 'id_neteo_documento', 'neteo_documento', 'id_neteo_documento', $dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			}
 
@@ -570,7 +570,7 @@ QUERY;
 				}
 			}
 
-		break;
+			break;
 
 		case 7.37:
 			$queries = array();
@@ -703,7 +703,7 @@ QUERY;
 		case 7.43:
 			$queries = array();
 
-			$queries[]="CREATE TABLE IF NOT EXISTS `prm_estudio` (
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_estudio` (
 				`id_estudio` smallint(3) NOT NULL AUTO_INCREMENT,
 				`glosa_estudio` varchar(120) NOT NULL,
 				`metadata_estudio` text NOT NULL COMMENT 'Opcionalmente, este campo puede tener dirección, fono, etc de cada sub_estudio',
@@ -714,7 +714,7 @@ QUERY;
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Las empresas que componen el estudio. Por defecto es una sola: el estudio mismo.' AUTO_INCREMENT=1 ;";
 
 			// Inserto como primera (y probablemente única) compañía, al nombre del estudio. Lo intento obtener de PdfLinea1, y si no del archivo Conf.
-			$NombreEstudio = trim(Conf::GetConf($sesion,'PdfLinea1')) ? Conf::GetConf($sesion,'PdfLinea1') : Conf::AppName();
+			$NombreEstudio = trim(Conf::GetConf($sesion, 'PdfLinea1')) ? Conf::GetConf($sesion, 'PdfLinea1') : Conf::AppName();
 
 			$queries[] = "REPLACE INTO prm_estudio (id_estudio, glosa_estudio) VALUES (1, '$NombreEstudio')";
 
@@ -760,7 +760,6 @@ QUERY;
 						 AND configuracion.glosa_opcion = 'NumeroFacturaConSerie'
 						 SET prm_doc_legal_numero.numero_inicial = prm_documento_legal.numero_inicial
 					 WHERE prm_doc_legal_numero.numero_inicial < prm_documento_legal.numero_inicial;";
-
 			}
 
 			if (!ExisteCampo('id_estudio', 'factura_pdf_datos', $dbh)) {
@@ -833,7 +832,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `estado_pago` VARCHAR( 255 ) NULL DEFAULT NULL";
 			}
 			ejecutar($queries, $dbh);
-		break;
+			break;
 
 		case 7.50:
 			$queries = array();
@@ -1029,7 +1028,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`) VALUES (NULL , 'RegionCliente', '0', 'El cliente Utiliza Region', 'boolean', '10', '230');";
 			$queries[] = "INSERT IGNORE INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerColumnaCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
 
-			ejecutar($queries,$dbh);
+			ejecutar($queries, $dbh);
 
 			break;
 
@@ -1080,7 +1079,7 @@ QUERY;
 
 		case 7.68:
 			$queries = array();
-			if(!ExisteCampo('fecha_vencimiento', 'factura', $dbh)){
+			if (!ExisteCampo('fecha_vencimiento', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_vencimiento` DATE NULL AFTER `condicion_pago`;";
 			}
 			ejecutar($queries, $dbh);
@@ -1090,9 +1089,9 @@ QUERY;
 			//Calcula la fecha de vencimiento para las facturas.
 			$queries = array();
 			$resp = mysql_query('SELECT id_factura, condicion_pago, fecha_facturacion, fecha_vencimiento FROM factura LEFT JOIN cobro ON factura.id_cobro = cobro.id_cobro;', $dbh) or Utiles::errorSQL($query_malos, __FILE__, __LINE__, $dbh);
-			while(list($id_factura, $condicion_pago, $fecha_facturacion, $fecha_vencimiento) = mysql_fetch_array($resp)){
+			while (list($id_factura, $condicion_pago, $fecha_facturacion, $fecha_vencimiento) = mysql_fetch_array($resp)) {
 
-				if(empty($fecha_vencimiento)){
+				if (empty($fecha_vencimiento)) {
 
 					//Se asume que es contado (fecha de pago al día de facturación), a menos que la condición de pago especifique lo contrario. Se han considerado todos los casos
 					//excepto el de cheque a fecha, ya que no hay como saber para cuándo fue pactado el convenio.
@@ -1135,11 +1134,10 @@ QUERY;
 					}
 
 					$date = new DateTime($fecha_facturacion);
-					$date->add(new DateInterval('P'.$dias.'D'));
+					$date->add(new DateInterval('P' . $dias . 'D'));
 
-					$queries[] = 'UPDATE factura SET fecha_vencimiento = \''.$date->format('Y-m-d').'\' WHERE id_factura = '.$id_factura.';';
+					$queries[] = 'UPDATE factura SET fecha_vencimiento = \'' . $date->format('Y-m-d') . '\' WHERE id_factura = ' . $id_factura . ';';
 				}
-
 			}
 
 			ejecutar($queries, $dbh);
@@ -1339,9 +1337,8 @@ QUERY;
 	}
 }
 
-
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
-	(No olvidar agregar la notificacion de los cambios) */
+  (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
@@ -1369,24 +1366,26 @@ if (isset($_GET['lastver'])) {
 	/*	 * ********************************************** LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA ****************************************************** */
 
 	require_once dirname(__FILE__) . '/../app/conf.php';
-	require_once dirname(__FILE__) . '/../fw/classes/Sesion.php';
-	require_once dirname(__FILE__) . '/../app/classes/Cliente.php';
-	require_once dirname(__FILE__) . '/../app/classes/Asunto.php';
-	require_once dirname(__FILE__) . '/../app/classes/Cobro.php';
-	require_once dirname(__FILE__) . '/../app/classes/Documento.php';
 
-	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1])
+	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1]) {
 		die('Credenciales inválidas.');
+	}
 	$sesion = new Sesion();
-	$versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
-	$dato = $versiondb->fetch();
-	$VERSION = $dato[0];
+	$sesion->dbh = @mysql_connect(Conf::dbHost(), 'admin', 'admin1awdx') or die(mysql_error());
+	mysql_select_db(Conf::dbName(), $sesion->dbh) or mysql_error($sesion->dbh);
 
+	$versiondb = mysql_query('SELECT MAX(version) AS version FROM version_db', $sesion->dbh);
+	$dato = mysql_fetch_assoc($versiondb);
 
-	if (!isset($VERSION) or $VERSION < 0.01)
+	if (is_null($dato)) {
+		$VERSION = InitVersion($min_update, $sesion);
+	} else {
+		$VERSION = $dato['version'];
+	}
+
+	if (!isset($VERSION) or $VERSION < 0.01) {
 		die('Error en la versión del software.');
-
-
+	}
 
 	foreach ($VERSIONES as $key => $new_version) {
 		if ($VERSION < $new_version || $force == 1) {
@@ -1395,22 +1394,26 @@ if (isset($_GET['lastver'])) {
 
 			try {
 
-				if (!mysql_query("START TRANSACTION", $sesion->dbh))
+				if (!mysql_query("START TRANSACTION", $sesion->dbh)) {
 					throw new Exception(mysql_error($sesion->dbh));
+				}
 
-				if (!mysql_query("BEGIN", $sesion->dbh))
+				if (!mysql_query("BEGIN", $sesion->dbh)) {
 					throw new Exception(mysql_error($sesion->dbh));
+				}
 
 				Actualizaciones($sesion->dbh, $new_version);
-				if (!mysql_query("COMMIT", $sesion->dbh))
+				if (!mysql_query("COMMIT", $sesion->dbh)) {
 					throw new Exception(mysql_error($sesion->dbh));
+				}
 			} catch (Exception $exc) {
 				$error_message = '';
 				if (!mysql_query("ROLLBACK", $sesion->dbh)) {
-					$error_message .= 'Error en ROLLBACK: ' . '<br />' ;
+					$error_message .= 'Error en ROLLBACK: <br />';
 				}
 				$error_message .= 'Error en proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br />';
 				$error_message .= 'Se encontró un error: ' . $exc->getMessage() . '<br />';
+
 				echo($error_message);
 
 				EnviarLogError($error_message, $exc, $sesion);
@@ -1418,11 +1421,13 @@ if (isset($_GET['lastver'])) {
 				exit(1);
 			}
 
-			GuardarVersion($versionFileName, $new_version, $sesion);
+			GuardarVersion($new_version, $sesion);
 			echo 'Proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . ' finalizado<br>';
+
 		} else {
-			if ($VERSION == $new_version)
+			if ($VERSION == $new_version) {
 				echo '<p>Su software está corriendo la versi&oacute;n ' . number_format($VERSION, 2, '.', '') . '</p>';
+			}
 		}
 	}
 }
@@ -1430,13 +1435,13 @@ if (isset($_GET['lastver'])) {
 function EnviarLogError($error_message, $e, $sesion) {
 	$array_correo = array(
 		array('mail' => 'implementacion@lemontech.cl',
-				'nombre' => 'Implementación Lemontech'
+			'nombre' => 'Implementación Lemontech'
 		),
 		array('mail' => 'soporte@lemontech.cl',
-				'nombre' => 'Soporte Lemontech'
+			'nombre' => 'Soporte Lemontech'
 		),
 	);
-	$mail =<<<MAIL
+	$mail = <<<MAIL
 <p>Ha ocurrido un error al actualizar</p>
 
 <p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
@@ -1447,17 +1452,26 @@ MAIL;
 	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
-function GuardarVersion($versionFileName, $new_version, $sesion) {
-
+function InitVersion($version, $sesion) {
+	echo '<hr>Inicializando tabla para versión.<br>';
 	mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (
-	`version` decimal(3,2) NOT NULL DEFAULT '0.00',
-	`version_ct` decimal(3,2) NOT NULL DEFAULT '0.00',
+	`version` decimal(3,1) NOT NULL DEFAULT '0.0',
+	`version_ct` decimal(3,1) NOT NULL DEFAULT '0.0',
 	`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (`version`,`version_ct`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
-	mysql_query("insert ignore INTO version_db (version) values (" . number_format($new_version, 2, '.', '') . ");", $sesion->dbh);
-	$data = '<?php	$VERSION = ' . number_format($new_version, 2, '.', '') . ' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
-	//file_put_contents( $versionFileName, $data );
+	$file_name = dirname(__FILE__) . '/version.php';
+	if (file_exists($file_name)) {
+		require_once $file_name;
+		GuardarVersion($VERSION, $sesion);
+		return $VERSION;
+	}
+	return 0;
+}
+
+function GuardarVersion($new_version, $sesion) {
+	$version = number_format($new_version, 2, '.', '');
+	mysql_query("INSERT IGNORE INTO version_db (version) VALUES ($version);", $sesion->dbh);
 }
 
 function IngresarNotificacion($notificacion, $permisos = array('ALL')) {
