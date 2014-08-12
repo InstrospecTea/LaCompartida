@@ -8,8 +8,8 @@
 		{
 			function CobroHistorial($sesion, $fields = "", $params = "")
 				{
-					$this->tabla = "cobro_historial";
-					$this->campo_id = "id_cobro_historial";
+					$this->tabla = "cobro_observacion";
+					$this->campo_id = "id_cobro_observacion";
 					$this->sesion = $sesion;
 					$this->fields = $fields;
 				}

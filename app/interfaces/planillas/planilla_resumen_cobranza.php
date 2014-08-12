@@ -819,7 +819,7 @@ if ($xls) {
 
 		if ($cobro['estado'] != 'CREADO' && $cobro['estado'] != 'EN REVISION') {
 			$comentario = "";
-			$query_historial = "SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=" . $cobro['id_cobro'];
+			$query_historial = "SELECT fecha, comentario FROM cobro_observacion WHERE id_cobro=" . $cobro['id_cobro'];
 			$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
 
 			$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
