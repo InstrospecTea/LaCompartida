@@ -187,7 +187,7 @@ class Gasto extends Objeto {
 			}
 
 			$query = "INSERT INTO gasto_historial
-						( id_movimiento, fecha_accion, id_usuario, accion, fecha_movimiento, fecha_movimiento_modificado, codigo_cliente, codigo_cliente_modificado, codigo_asunto, codigo_asunto_modificado, ingreso, ingreso_modificado, monto_cobrable, monto_cobrable_modificado, descripcion, descripcion_modificado, id_moneda, id_moneda_modificado)
+						( id_movimiento, fecha, id_usuario, accion, fecha_movimiento, fecha_movimiento_modificado, codigo_cliente, codigo_cliente_modificado, codigo_asunto, codigo_asunto_modificado, ingreso, ingreso_modificado, monto_cobrable, monto_cobrable_modificado, descripcion, descripcion_modificado, id_moneda, id_moneda_modificado)
 					VALUES( " . $this->fields['id_movimiento'] . ", NOW(), '" . $this->sesion->usuario->fields['id_usuario'] . "', 'MODIFICAR', '" . $fecha . "', '" . $this->fields['fecha'] . "', '" . $codigo_cliente . "', '" . $this->fields['codigo_cliente'] . "', '" . $codigo_asunto . "', '" . $this->fields['codigo_asunto'] . "', '" . $query_valor_ingreso . "', '" . $query_tipo_ingreso . "', '" . $monto_cobrable . "', '" . $this->fields['monto_cobrable'] . "', '" . addslashes($descripcion) . "', '" . addslashes($this->fields['descripcion']) . "', " . $id_moneda . ", " . $this->fields['id_moneda'] . ")";
 		} else {
 			$query = "SELECT MAX(id_movimiento) FROM cta_corriente";
@@ -202,7 +202,7 @@ class Gasto extends Objeto {
 			}
 
 			$query = "INSERT INTO gasto_historial
-						( id_movimiento, fecha_accion, id_usuario, accion, fecha_movimiento_modificado, codigo_cliente_modificado, codigo_asunto_modificado, ingreso_modificado, monto_cobrable_modificado, descripcion_modificado, id_moneda_modificado)
+						( id_movimiento, fecha, id_usuario, accion, fecha_movimiento_modificado, codigo_cliente_modificado, codigo_asunto_modificado, ingreso_modificado, monto_cobrable_modificado, descripcion_modificado, id_moneda_modificado)
 					VALUES( " . $id_movimiento . ", NOW(), '" . $this->sesion->usuario->fields['id_usuario'] . "', 'CREAR', '" . $this->fields['fecha'] . "', '" . $this->fields['codigo_cliente'] . "', '" . $this->fields['codigo_asunto'] . "','" . $query_tipo_ingreso . "', '" . $this->fields['monto_cobrable'] . "', '" . addslashes($this->fields['descripcion']) . "', " . $this->fields['id_moneda'] . ")";
 		}
 		if (parent::Write()) {
@@ -216,21 +216,19 @@ class Gasto extends Objeto {
 
 		if ($this->Loaded()) {
 
-			$query = "DELETE FROM cta_corriente WHERE id_movimiento=" . $this->fields['id_movimiento'];
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-			if ($resp) {
-
-				if ($this->fields['egreso'] > 0) {
-					$query_tipo_ingreso = $this->fields['egreso'];
-				} else if ($this->fields['ingreso'] > 0) {
-					$query_tipo_ingreso = $this->fields['ingreso'];
-				}
-
-				$query = "INSERT INTO gasto_historial ( id_movimiento, fecha_accion, accion, id_usuario, fecha_movimiento, codigo_cliente, codigo_asunto, ingreso, monto_cobrable, descripcion, id_moneda)
-							VALUES( " . $this->fields['id_movimiento'] . ", NOW(), 'ELIMINAR', " . $this->sesion->usuario->fields['id_usuario'] . ", '" . $this->fields['fecha'] . "', '" . $this->fields['codigo_cliente'] . "', '" . $this->fields['codigo_asunto'] . "', '" . $query_tipo_ingreso . "', '" . $this->fields['monto_cobrable'] . "', '" . addslashes($this->fields['descripcion']) . "', " . $this->fields['id_moneda'] . ")";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			if ($this->fields['egreso'] > 0) {
+				$query_tipo_ingreso = $this->fields['egreso'];
+			} else if ($this->fields['ingreso'] > 0) {
+				$query_tipo_ingreso = $this->fields['ingreso'];
 			}
+
+			$query = "INSERT INTO gasto_historial ( id_movimiento, fecha, accion, id_usuario, fecha_movimiento, codigo_cliente, codigo_asunto, ingreso, monto_cobrable, descripcion, id_moneda)
+							VALUES( " . $this->fields['id_movimiento'] . ", NOW(), 'ELIMINAR', " . $this->sesion->usuario->fields['id_usuario'] . ", '" . $this->fields['fecha'] . "', '" . $this->fields['codigo_cliente'] . "', '" . $this->fields['codigo_asunto'] . "', '" . $query_tipo_ingreso . "', '" . $this->fields['monto_cobrable'] . "', '" . addslashes($this->fields['descripcion']) . "', " . $this->fields['id_moneda'] . ")";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+			$query = "DELETE FROM cta_corriente WHERE id_movimiento=" . $this->fields['id_movimiento'];
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
 		} else {
 			return false;
 		}

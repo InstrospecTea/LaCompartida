@@ -14,7 +14,7 @@ abstract class TipoHistorialEnum extends BasicEnumeration {
 	const gastoCreationDate = 'cta_corriente.fecha_creacion';
 
 	//Cobros
-	const cobroStoryTable = 'cobro_historial';
+	const cobroStoryTable = 'cobro_movimiento';
 	const cobroMainTable = 'cobro';
 	const cobroStoryKey = 'id_cobro';
 	const cobroCreationDate = 'cobro.fecha_creacion';

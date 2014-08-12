@@ -78,7 +78,7 @@ class Trabajo extends Objeto
 						SET
 							id_trabajo = '{{id_trabajo}}',
 							id_usuario = '{$id_usuario_sesion}',
-							fecha_accion = '" . date("Y-m-d H:i:s") . "',
+							fecha = '" . date("Y-m-d H:i:s") . "',
 						 	fecha_trabajo = '$fecha',
 						 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
 						 	descripcion = '" . mysql_real_escape_string(empty($descripcion) ? ' Sin descripcion' : $descripcion) . "',
@@ -103,7 +103,7 @@ class Trabajo extends Objeto
 									app_id = {$app_id},
 									id_trabajo = '{{id_trabajo}}',
 									id_usuario = '{$id_usuario_sesion}',
-									fecha_accion = '" . date("Y-m-d H:i:s") . "',
+									fecha = '" . date("Y-m-d H:i:s") . "',
 								 	fecha_trabajo = '{$this->fields['fecha']}',
 								 	descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
 								 	duracion = '{$this->fields['duracion']}',
@@ -277,18 +277,11 @@ class Trabajo extends Objeto
 			return false;
 		}*/
 		if ($this->Estado() == "Abierto") {
-			// Eliminar el Trabajo del Comentario asociado
-			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";;
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
-			$query = "DELETE FROM trabajo WHERE id_trabajo = '{$this->fields['id_trabajo']}'";;
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			// Si se pudo eliminar, loguear el cambio.
-			if ($resp) {
-				$query = "INSERT INTO trabajo_historial SET
+			$query = "INSERT INTO trabajo_historial SET
 					id_trabajo = '{$this->fields['id_trabajo']}',
 					id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-					fecha_accion = '" . date("Y-m-d H:i:s") . "',
+					fecha = '" . date("Y-m-d H:i:s") . "',
 					fecha_trabajo = '{$this->fields['fecha']}',
 					descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
 					duracion = '{$this->fields['duracion']}',
@@ -297,8 +290,15 @@ class Trabajo extends Objeto
 					accion = 'ELIMINAR',
 					codigo_asunto = '{$this->fields['codigo_asunto']}',
 					cobrable = '{$this->fields['cobrable']}'";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			}
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			// Eliminar el Trabajo del Comentario asociado
+			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";;
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+
+			$query = "DELETE FROM trabajo WHERE id_trabajo = '{$this->fields['id_trabajo']}'";;
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			// Si se pudo eliminar, loguear el cambio.
+
 		} else {
 			$this->error = __("No se puede eliminar un trabajo que no está abierto");
 			return false;

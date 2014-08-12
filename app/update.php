@@ -1267,16 +1267,11 @@ QUERY;
 			break;
 		case 7.80:
 			$queries = array();
-			$queries[] = "ALTER TABLE `cobro_historial` CHANGE COLUMN `id_cobro_historial` `id_cobro_observacion` INT(11) NOT NULL AUTO_INCREMENT , RENAME TO  `cobro_observacion`";
-			ejecutar($queries, $dbh);
-			break;
-		case 7.81:
-			$queries = array();
-			$queries[] = "CREATE TABLE `cobro_historial` (
-			  `id_cobro_historial` int(11) NOT NULL AUTO_INCREMENT,
+			$queries[] = "CREATE TABLE `cobro_movimiento` (
+			  `id_cobro_movimiento` int(11) NOT NULL AUTO_INCREMENT,
 			  `id_cobro` int(11) DEFAULT NULL,
 			  `id_usuario` int(11) DEFAULT NULL,
-			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			  `accion` varchar(9) DEFAULT '',
 			  `app_id` int(3) DEFAULT NULL,
 			  `estado` varchar(20) DEFAULT NULL,
@@ -1303,10 +1298,10 @@ QUERY;
 			  `fecha_facturacion_modificado` datetime DEFAULT NULL,
 			  `fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
 			  `fecha_pago_parcial_modificado` datetime DEFAULT NULL,
-			  PRIMARY KEY (`id_cobro_historial`),
+			  PRIMARY KEY (`id_cobro_movimiento`),
 			  INDEX(`id_cobro`)
 			);";
-			$queries[] = "ALTER TABLE `cobro_historial`
+			$queries[] = "ALTER TABLE `cobro_movimiento`
 				ADD COLUMN `fecha_ini` DATE NULL DEFAULT NULL AFTER `fecha_pago_parcial_modificado`,
 				ADD COLUMN `fecha_fin` DATE NULL DEFAULT NULL AFTER `fecha_ini`,
 				ADD COLUMN `fecha_ini_modificado` DATE NULL DEFAULT NULL AFTER `fecha_fin`,
@@ -1319,17 +1314,7 @@ QUERY;
 				ADD COLUMN `monto_gastos_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto_gastos`;";
 			ejecutar($queries, $dbh);
 			break;
-		case 7.82:
-			$queries = array();
-			$queries[] = "ALTER TABLE `gasto_historial` CHANGE COLUMN `fecha` `fecha_accion` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' ;";
-			ejecutar($queries, $dbh);
-			break;
-		case 7.83:
-			$queries = array();
-			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
-			ejecutar($queries, $dbh);
-			break;
-		case 7.84:
+		case 7.81:
 			$queries = array();
 			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `codigo_asunto_modificado` `codigo_asunto_modificado` VARCHAR(20) NULL DEFAULT NULL ;";
 			ejecutar($queries, $dbh);
@@ -1342,7 +1327,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.84;
+$max_update = 7.81;
 
 
 $force = 0;
