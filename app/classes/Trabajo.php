@@ -292,10 +292,10 @@ class Trabajo extends Objeto
 					cobrable = '{$this->fields['cobrable']}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			// Eliminar el Trabajo del Comentario asociado
-			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";;
+			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
-			$query = "DELETE FROM trabajo WHERE id_trabajo = '{$this->fields['id_trabajo']}'";;
+			$query = "DELETE FROM trabajo WHERE id_trabajo = '{$this->fields['id_trabajo']}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			// Si se pudo eliminar, loguear el cambio.
 

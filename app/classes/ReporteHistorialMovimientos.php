@@ -177,7 +177,7 @@ class ReporteHistorialMovimientos
 			}
 			if (!empty($this->until)) {
 				$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.$fecha_field.'.fecha'.')', $this->until));
+				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.$fecha_field.')', $this->until));
 			}
 		}
 
