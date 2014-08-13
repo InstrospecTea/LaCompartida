@@ -26,7 +26,7 @@ if (!empty($_POST)) {
 		$controller = new ReporteHistorialMovimientos($sesion);
 		$controller->setFocus($selected_entity);
 
-		if (Conf::GetConf($sesion, 'codigosecundario')) {
+		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 			$codigo_cliente = $codigo_cliente_secundario;
 			$codigo_asunto = $codigo_asunto_secundario;
 		}
@@ -72,32 +72,32 @@ if (!empty($_POST)) {
 				$pagina->AddError(__('el rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
 				$showReport = false;
 			} else {
-				$controller->since($sinceObject->format('y-m-d'));
-				$controller->until($untilObject->format('y-m-d'));
+				$controller->since($sinceObject->format('Y-m-d'));
+				$controller->until($untilObject->format('Y-m-d'));
 			}
 		} else {
 			$dateInterval = new DateInterval('p31d');
 			if (!empty($fecha_ini)) {
 				$sinceObject = new DateTime($fecha_ini);
-				$controller->since($sinceObject->format('y-m-d'));
+				$controller->since($sinceObject->format('Y-m-d'));
 				$untilObject = $sinceObject->add($dateInterval);
-				$controller->until($untilObject->format('y-m-d'));
+				$controller->until($untilObject->format('Y-m-d'));
 			}
 			if (!empty($fecha_fin)) {
 				$untilObject = new DateTime($fecha_fin);
-				$controller->until($untilObject->format('y-m-d'));
+				$controller->until($untilObject->format('Y-m-d'));
 				$sinceObject = $untilObject->sub($dateInterval);
-				$controller->since($sinceObject->format('y-m-d'));
+				$controller->since($sinceObject->format('Y-m-d'));
 			}
 		}
 
 		if ($showReport) {
 			$report = $controller->generate();
 			if ($to_do == 'excel') {
-				$writer = SimpleReport_IOFactory::createWriter($report, 'spreadsheet');
+				$writer = SimpleReport_IOFactory::createWriter($report, 'Spreadsheet');
 				$writer->save('reporte_historial_movimientos');
 			} else {
-				$writer = SimpleReport_IOFactory::createWriter($report, 'html');
+				$writer = SimpleReport_IOFactory::createWriter($report, 'Html');
 			}
 		}
 	}
