@@ -6,7 +6,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
 $form = new Form();
-$pagina->titulo = __('Reporte Historial Movimientos');
+$pagina->titulo = __('Auditoría');
 
 //
 //Post handler
@@ -21,26 +21,28 @@ if (!empty($_POST)) {
 
 	} else {
 
-		$controller = new ReporteHistorialMovimientos($sesion);
-		$controller->setFocus($selected_entity);
+		$showreport = true;
 
-		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+		$controller = new reportehistorialmovimientos($sesion);
+		$controller->setfocus($selected_entity);
+
+		if (conf::getconf($sesion, 'codigosecundario')) {
 			$codigo_cliente = $codigo_cliente_secundario;
 			$codigo_asunto = $codigo_asunto_secundario;
 		}
 
-		//Configuración del controlador del reporte.
+		//configuración del controlador del reporte.
 
 		if (!empty($selected_action)) {
-			$controller->filterByMovement($selected_action);
+			$controller->filterbymovement($selected_action);
 		}
 
 		if (!empty($id_usuario)) {
-			$controller->setProtagonist($id_usuario);
+			$controller->setprotagonist($id_usuario);
 		}
 
 		if (!empty($entity_code)) {
-			$controller->setEntity($entity_code);
+			$controller->setentity($entity_code);
 		}
 
 		if (!empty($fecha_ini)) {
@@ -52,25 +54,52 @@ if (!empty($_POST)) {
 		}
 
 		if (!empty($codigo_cliente)) {
-			$controller->setClient($codigo_cliente);
+			$controller->setclient($codigo_cliente);
 		}
 
 		if (!empty($codigo_asunto)) {
-			$controller->setMatter($codigo_asunto);
+			$controller->setmatter($codigo_asunto);
 		}
 
 		if (!empty($charge)) {
-			$controller->setCharge($charge);
+			$controller->setcharge($charge);
 		}
 
-		$report = $controller->generate();
-		if ($to_do == 'excel') {
-			$writer = SimpleReport_IOFactory::createWriter($report, 'Spreadsheet');
-			$writer->save('Reporte_historial_movimientos');
+		if (!empty($fecha_ini) && !empty($fecha_fin)) {
+			$sinceobject = new datetime($fecha_ini);
+			$untilobject = new datetime($fechrea_fin);
+			if ($sinceobject->diff($untilobject)->format('%a') > 31) {
+				$pagina->adderror(__('el rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
+				$showreport = false;
+			} else {
+				$controller->since($sinceobject->format('y-m-d'));
+				$controller->until($untilobject->format('y-m-d'));
+			}
 		} else {
-			$writer = SimpleReport_IOFactory::createWriter($report, 'Html');
+			$dateinterval = new dateinterval('p31d');
+			if (!empty($fecha_ini)) {
+				$sinceobject = new datetime($fecha_ini);
+				$controller->since($sinceobject->format('y-m-d'));
+				$untilobject = $sinceobject->add($dateinterval);
+				$controller->until($untilobject->format('y-m-d'));
+			}
+			if (!empty($fecha_fin)) {
+				$untilobject = new datetime($fecha_fin);
+				$controller->until($untilobject->format('y-m-d'));
+				$sinceobject = $untilobject->sub($dateinterval);
+				$controller->since($sinceobject->format('y-m-d'));
+			}
 		}
-		
+
+		if ($showreport) {
+			$report = $controller->generate();
+			if ($to_do == 'excel') {
+				$writer = simplereport_iofactory::createwriter($report, 'spreadsheet');
+				$writer->save('reporte_historial_movimientos');
+			} else {
+				$writer = simplereport_iofactory::createwriter($report, 'html');
+			}
+		}
 	}
 }
 

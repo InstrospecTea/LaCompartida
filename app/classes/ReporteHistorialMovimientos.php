@@ -166,21 +166,8 @@ class ReporteHistorialMovimientos
 		}
 
 		if (!empty($this->since) && !empty($this->until)) {
-			$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
-			$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-
 			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.$fecha_field.')', $this->since, $this->until));
-		} else {
-			if (!empty($this->since)) {
-				$this->since = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->since);
-				$reportCriteria->add_restriction(CriteriaRestriction::greater_or_equals_than('date('.$table_name.$fecha_field.')', $this->since));
-			}
-			if (!empty($this->until)) {
-				$this->until = preg_replace('/(\d{4}-\d{2}-\d{2}).*/', '$1', $this->until);
-				$reportCriteria->add_restriction(CriteriaRestriction::lower_or_equals_than('date('.$table_name.$fecha_field.')', $this->until));
-			}
 		}
-
 
 		//Filtra por cliente
 		if (!empty($this->client)) {
