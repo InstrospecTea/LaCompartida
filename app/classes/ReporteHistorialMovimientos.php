@@ -55,14 +55,12 @@ class ReporteHistorialMovimientos
 	}
 
 	public function since($since) {
-		$since = Utiles::fecha2sql($since);
-		$this->since = $since.' 00:00:00';
+		$this->since = $since;
 		return $this;
 	}
 
 	public function until($until) {
-		$until = Utiles::fecha2sql($until);
-		$this->until = $until.' 00:00:00';
+		$this->until = $until;
 		return $this;
 	}
 
@@ -224,7 +222,6 @@ class ReporteHistorialMovimientos
 
 		//Completa el reporte segun la entidad.
 		$reportCriteria = $this->completeReportCriteria($reportCriteria, $main_table);
-		
 		return $reportCriteria;
 	}
 

@@ -65,6 +65,8 @@ if (!empty($_POST)) {
 			$controller->setCharge($charge);
 		}
 
+		$showReport = true;
+
 		if (!empty($fecha_ini) && !empty($fecha_fin)) {
 			$sinceObject = new DateTime($fecha_ini);
 			$untilObject = new DateTime($fecha_fin);
@@ -76,7 +78,7 @@ if (!empty($_POST)) {
 				$controller->until($untilObject->format('Y-m-d'));
 			}
 		} else {
-			$dateInterval = new DateInterval('p31d');
+			$dateInterval = new DateInterval('P31D');
 			if (!empty($fecha_ini)) {
 				$sinceObject = new DateTime($fecha_ini);
 				$controller->since($sinceObject->format('Y-m-d'));
