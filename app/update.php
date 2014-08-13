@@ -1322,7 +1322,7 @@ QUERY;
 		case 7.82:
 			$queries = array();
 			$queries[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES ('AUDIT', 'Auditoría', '/app/interfaces/reporte_historial_movimientos.php', '0', '99999', 'ADMIN_SIS', '0');";
-			$queries[] = "INSERT INTO `menu_permiso` (`codigo_permiso`) VALUES ('ADM');";
+			$queries[] = "INSERT INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES ('ADM', 'AUDIT');";
 			ejecutar($queries, $dbh);
 	}
 }
