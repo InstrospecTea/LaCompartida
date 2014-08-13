@@ -23,10 +23,10 @@ if (!empty($_POST)) {
 
 		$showreport = true;
 
-		$controller = new reportehistorialmovimientos($sesion);
-		$controller->setfocus($selected_entity);
+		$controller = new ReporteHistorialMovimientos($sesion);
+		$controller->setFocus($selected_entity);
 
-		if (conf::getconf($sesion, 'codigosecundario')) {
+		if (Conf::GetConf($sesion, 'codigosecundario')) {
 			$codigo_cliente = $codigo_cliente_secundario;
 			$codigo_asunto = $codigo_asunto_secundario;
 		}
@@ -34,15 +34,15 @@ if (!empty($_POST)) {
 		//configuración del controlador del reporte.
 
 		if (!empty($selected_action)) {
-			$controller->filterbymovement($selected_action);
+			$controller->filterByMovement($selected_action);
 		}
 
 		if (!empty($id_usuario)) {
-			$controller->setprotagonist($id_usuario);
+			$controller->setProtagonist($id_usuario);
 		}
 
 		if (!empty($entity_code)) {
-			$controller->setentity($entity_code);
+			$controller->setEntity($entity_code);
 		}
 
 		if (!empty($fecha_ini)) {
@@ -54,50 +54,50 @@ if (!empty($_POST)) {
 		}
 
 		if (!empty($codigo_cliente)) {
-			$controller->setclient($codigo_cliente);
+			$controller->setClient($codigo_cliente);
 		}
 
 		if (!empty($codigo_asunto)) {
-			$controller->setmatter($codigo_asunto);
+			$controller->setMatter($codigo_asunto);
 		}
 
 		if (!empty($charge)) {
-			$controller->setcharge($charge);
+			$controller->setCharge($charge);
 		}
 
 		if (!empty($fecha_ini) && !empty($fecha_fin)) {
-			$sinceobject = new datetime($fecha_ini);
-			$untilobject = new datetime($fechrea_fin);
-			if ($sinceobject->diff($untilobject)->format('%a') > 31) {
-				$pagina->adderror(__('el rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
-				$showreport = false;
+			$sinceObject = new DateTime($fecha_ini);
+			$untilObject = new DateTime($fecha_fin);
+			if ($sinceObject->diff($untilObject)->format('%a') > 31) {
+				$pagina->AddError(__('el rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
+				$showReport = false;
 			} else {
-				$controller->since($sinceobject->format('y-m-d'));
-				$controller->until($untilobject->format('y-m-d'));
+				$controller->since($sinceObject->format('y-m-d'));
+				$controller->until($untilObject->format('y-m-d'));
 			}
 		} else {
-			$dateinterval = new dateinterval('p31d');
+			$dateInterval = new DateInterval('p31d');
 			if (!empty($fecha_ini)) {
-				$sinceobject = new datetime($fecha_ini);
-				$controller->since($sinceobject->format('y-m-d'));
-				$untilobject = $sinceobject->add($dateinterval);
-				$controller->until($untilobject->format('y-m-d'));
+				$sinceObject = new DateTime($fecha_ini);
+				$controller->since($sinceObject->format('y-m-d'));
+				$untilObject = $sinceObject->add($dateInterval);
+				$controller->until($untilObject->format('y-m-d'));
 			}
 			if (!empty($fecha_fin)) {
-				$untilobject = new datetime($fecha_fin);
-				$controller->until($untilobject->format('y-m-d'));
-				$sinceobject = $untilobject->sub($dateinterval);
-				$controller->since($sinceobject->format('y-m-d'));
+				$untilObject = new DateTime($fecha_fin);
+				$controller->until($untilObject->format('y-m-d'));
+				$sinceObject = $untilObject->sub($dateInterval);
+				$controller->since($sinceObject->format('y-m-d'));
 			}
 		}
 
-		if ($showreport) {
+		if ($showReport) {
 			$report = $controller->generate();
 			if ($to_do == 'excel') {
-				$writer = simplereport_iofactory::createwriter($report, 'spreadsheet');
+				$writer = SimpleReport_IOFactory::createWriter($report, 'spreadsheet');
 				$writer->save('reporte_historial_movimientos');
 			} else {
-				$writer = simplereport_iofactory::createwriter($report, 'html');
+				$writer = SimpleReport_IOFactory::createWriter($report, 'html');
 			}
 		}
 	}
