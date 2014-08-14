@@ -1319,6 +1319,11 @@ QUERY;
 			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `codigo_asunto_modificado` `codigo_asunto_modificado` VARCHAR(20) NULL DEFAULT NULL ;";
 			ejecutar($queries, $dbh);
 			break;
+		case 7.82:
+			$queries = array();
+			$queries[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES ('AUDIT', 'Auditoría', '/app/interfaces/reporte_historial_movimientos.php', '0', '99999', 'ADMIN_SIS', '0');";
+			$queries[] = "INSERT INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES ('ADM', 'AUDIT');";
+			ejecutar($queries, $dbh);
 	}
 }
 
@@ -1327,7 +1332,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.81;
+$max_update = 7.82;
 
 
 $force = 0;
