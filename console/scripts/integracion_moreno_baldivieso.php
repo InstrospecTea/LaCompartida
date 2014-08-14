@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../../app/conf.php';
 
 $matters = array();
 
-/*$server = '200.87.127.179';
+$server = '200.87.127.179';
 $user = 'lemontech';
 $password = '20emba14';
 $database_name = 'EMBA_PROD';
@@ -31,11 +31,9 @@ while ($matter = mssql_fetch_assoc($rs)) {
 }
 
 //close the connection
-mssql_close($dbhandle);*/
+mssql_close($dbhandle);
 
-// var_dump($matters); exit;
-
-$matters = array(
+/*$matters = array(
 	array(
 		'client_code' => 'cli01',
 		'client_name' => 'cliente 10',
@@ -54,7 +52,7 @@ $matters = array(
 		'matter_code' => 'cli02-002',
 		'matter_name' => 'cliente 2 asunto 2'
 	)
-);
+);*/
 
 if (_empty($matters)) {
 	exit('Matters empty! ' . __LINE__);
