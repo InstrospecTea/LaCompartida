@@ -386,19 +386,22 @@ class Cliente extends Objeto {
 	//funcion que asigna el nuevo codigo automatico para un cliente
 	function AsignarCodigoCliente() {
 		if (UtilesApp::GetConf($this->sesion, 'EsPRC')) {
-			$query = "SELECT 1*codigo_cliente AS x FROM cliente WHERE codigo_cliente NOT IN ('2000','2001','2002','2003') ORDER BY x DESC LIMIT 1";
+			$query = "SELECT 1 * codigo_cliente AS x FROM cliente WHERE codigo_cliente NOT IN ('2000', '2001', '2002', '2003') ORDER BY x DESC LIMIT 1";
 		} else {
-			$query = "SELECT 1*codigo_cliente AS x FROM cliente ORDER BY x DESC LIMIT 1";
+			$query = "SELECT 1 * codigo_cliente AS x FROM cliente ORDER BY x DESC LIMIT 1";
 		}
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
-		$f = $codigo + 1;
 
-        if ( UtilesApp::GetConf($this->sesion, 'MascaraCodigoCliente')) {
-            $codigo_cliente = sprintf("%04d", $f);
-        } else {
-            $codigo_cliente = sprintf("%06d", $f);
-        }
+		$codigo++;
+
+		if (UtilesApp::GetConf($this->sesion, 'MascaraCodigoCliente')) {
+			$codigo_cliente = sprintf("%04d", $codigo);
+		} else {
+			$codigo_cliente = sprintf("%06d", $codigo);
+		}
+
 		return $codigo_cliente;
 	}
 
