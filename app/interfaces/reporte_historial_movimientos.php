@@ -122,6 +122,12 @@ $actions = array(
 
 $pagina->PrintTop();
 ?>
+<h3>Consideraciones:</h3>
+<ul style="text-align: left;">
+	<li>Antes de filtrar, <b>debe siempre establecer</b> o el inicio o el fin del rango de fechas. La completitud del rango se definirá en 31 días hacia el pasado o el futuro, dependiendo de si ha seleccionado la fecha desde o la fecha hasta, respectivamente.</li>
+	<li>Además, <b>debe filtrar por al menos uno</b> de los siguientes datos: <?php echo __('Cliente') ?>, <?php echo __('Asunto') ?>, <?php echo __('Usuario') ?>, <?php echo __('Código') ?> o Nº de <?php echo __('Cobro') ?>.</li>
+	<li><b>No es posible</b> realizar consultas por un rango superior a 31 días.</li>
+</ul>
 <form id="form_reporte" method="POST">
 	<fieldset class="tb_base" style="border: 1px solid #BDBDBD;" width="100%">
 		<legend>Filtros</legend>
