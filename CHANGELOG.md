@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.11.4
+Jueves 14 de Agosto 2014
+* **Fixed:** [Corrige uso de tarifa plana.](https://github.com/LemontechSA/ttb/pull/640)
+
 ## Hotfix: 14.11.3
 Miércoles 13 de Agosto 2014
 * **Fixed:** [Cambios, reubicación y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)
