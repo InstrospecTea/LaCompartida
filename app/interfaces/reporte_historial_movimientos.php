@@ -21,8 +21,6 @@ if (!empty($_POST)) {
 
 	} else {
 
-		$showreport = true;
-
 		$controller = new ReporteHistorialMovimientos($sesion);
 		$controller->setFocus($selected_entity);
 
