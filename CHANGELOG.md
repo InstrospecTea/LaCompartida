@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.11.3
+Miércoles 13 de Agosto 2014
+* **Fixed:** [Cambios, reubicación y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)
+
 ## Hotfix: 14.11.2
 Martes 12 de Agosto 2014
 * **Fixed:** [Reporte historial de movimientos con querys no costosas computacionalmente.](https://github.com/LemontechSA/ttb/pull/636)

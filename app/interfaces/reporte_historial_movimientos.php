@@ -6,7 +6,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
 $form = new Form();
-$pagina->titulo = __('Reporte Historial Movimientos');
+$pagina->titulo = __('Auditoría');
 
 //
 //Post handler
@@ -14,10 +14,13 @@ $pagina->titulo = __('Reporte Historial Movimientos');
 
 if (!empty($_POST)) {
 
+	if (empty($fecha_ini) && empty($fecha_fin)) {
 
-	if (empty($entity_code) && empty($charge) && empty($id_usuario) && empty($codigo_cliente) && empty($codigo_asunto)) {
+		$pagina->AddError(__('Para filtrar, debe establecer al menos una sección del rango de fechas.'));
 
-		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').', '.__('Cliente').', '.__('Asunto').', '.__('Usuario').' o código de entidad.'));
+	} else if (empty($entity_code) && empty($charge) && empty($id_usuario) && empty($codigo_cliente) && empty($codigo_asunto)) {
+
+		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').', '.__('Cliente').', '.__('Asunto').', '.__('Usuario').' o código de entidad. Además, debe establecer al menos un filtro de fechas.'));
 
 	} else {
 
@@ -29,7 +32,7 @@ if (!empty($_POST)) {
 			$codigo_asunto = $codigo_asunto_secundario;
 		}
 
-		//Configuración del controlador del reporte.
+		//configuración del controlador del reporte.
 
 		if (!empty($selected_action)) {
 			$controller->filterByMovement($selected_action);
@@ -63,14 +66,43 @@ if (!empty($_POST)) {
 			$controller->setCharge($charge);
 		}
 
-		$report = $controller->generate();
-		if ($to_do == 'excel') {
-			$writer = SimpleReport_IOFactory::createWriter($report, 'Spreadsheet');
-			$writer->save('Reporte_historial_movimientos');
+		$showReport = true;
+
+		if (!empty($fecha_ini) && !empty($fecha_fin)) {
+			$sinceObject = new DateTime($fecha_ini);
+			$untilObject = new DateTime($fecha_fin);
+			if ($sinceObject->diff($untilObject)->format('%a') > 31) {
+				$pagina->AddError(__('El rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
+				$showReport = false;
+			} else {
+				$controller->since($sinceObject->format('Y-m-d'));
+				$controller->until($untilObject->format('Y-m-d'));
+			}
 		} else {
-			$writer = SimpleReport_IOFactory::createWriter($report, 'Html');
+			$dateInterval = new DateInterval('P31D');
+			if (!empty($fecha_ini)) {
+				$sinceObject = new DateTime($fecha_ini);
+				$controller->since($sinceObject->format('Y-m-d'));
+				$untilObject = $sinceObject->add($dateInterval);
+				$controller->until($untilObject->format('Y-m-d'));
+			}
+			if (!empty($fecha_fin)) {
+				$untilObject = new DateTime($fecha_fin);
+				$controller->until($untilObject->format('Y-m-d'));
+				$sinceObject = $untilObject->sub($dateInterval);
+				$controller->since($sinceObject->format('Y-m-d'));
+			}
 		}
-		
+
+		if ($showReport) {
+			$report = $controller->generate();
+			if ($to_do == 'excel') {
+				$writer = SimpleReport_IOFactory::createWriter($report, 'Spreadsheet');
+				$writer->save('reporte_historial_movimientos');
+			} else {
+				$writer = SimpleReport_IOFactory::createWriter($report, 'Html');
+			}
+		}
 	}
 }
 
@@ -90,6 +122,12 @@ $actions = array(
 
 $pagina->PrintTop();
 ?>
+<h3>Consideraciones:</h3>
+<ul style="text-align: left;">
+	<li>Antes de filtrar, <b>debe siempre</b> establecer o el inicio o el fin del rango de fechas a consultar. El rango de fecha se completará según lo definido, 31 días hacia adelante o hacia atrás, dependiendo de si ha seleccionado la fecha desde o la fecha hasta, respectivamente.</li>
+	<li>Además, <b>debe filtrar por al menos uno</b> de los siguientes datos: <?php echo __('Cliente') ?>, <?php echo __('Asunto') ?>, <?php echo __('Usuario') ?>, <?php echo __('Código') ?> o Nº de <?php echo __('Cobro') ?>.</li>
+	<li><b>No es posible</b> realizar consultas por un rango superior a 31 días.</li>
+</ul>
 <form id="form_reporte" method="POST">
 	<fieldset class="tb_base" style="border: 1px solid #BDBDBD;" width="100%">
 		<legend>Filtros</legend>
