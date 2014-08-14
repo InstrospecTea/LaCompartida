@@ -14,10 +14,13 @@ $pagina->titulo = __('Auditoría');
 
 if (!empty($_POST)) {
 
+	if (empty($fecha_ini) && empty($fecha_fin)) {
 
-	if (empty($entity_code) && empty($charge) && empty($id_usuario) && empty($codigo_cliente) && empty($codigo_asunto)) {
+		$pagina->AddError(__('Para filtrar, debe establecer al menos una sección del rango de fechas.'));
 
-		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').', '.__('Cliente').', '.__('Asunto').', '.__('Usuario').' o código de entidad.'));
+	} else if (empty($entity_code) && empty($charge) && empty($id_usuario) && empty($codigo_cliente) && empty($codigo_asunto)) {
+
+		$pagina->AddError(__('Debe filtrar al menos por Nº '.__('Cobro').', '.__('Cliente').', '.__('Asunto').', '.__('Usuario').' o código de entidad. Además, debe establecer al menos un filtro de fechas.'));
 
 	} else {
 
@@ -69,7 +72,7 @@ if (!empty($_POST)) {
 			$sinceObject = new DateTime($fecha_ini);
 			$untilObject = new DateTime($fecha_fin);
 			if ($sinceObject->diff($untilObject)->format('%a') > 31) {
-				$pagina->AddError(__('el rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
+				$pagina->AddError(__('El rango de fechas establecido es superior a un mes, por favor realice una búsqueda en un rango de hasta 31 días.'));
 				$showReport = false;
 			} else {
 				$controller->since($sinceObject->format('Y-m-d'));
