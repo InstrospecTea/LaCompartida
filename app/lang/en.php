@@ -663,6 +663,7 @@ $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
                                 <tr><td width='35%'>Swift Beneficiary Bank:</td><td width='65%'>BLICCLRM</td></tr>
                                 <tr><td width='35%'>Beneficiary A/c #:</td><td width='65%'>000-020552-060</td></tr>
                             </table>";
+$_LANG['y gastos'] = "and disbursements";
 #Carta MB Boleta (boleta)
 $_LANG['%detalle_mb_boleta%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%detalle_mb_boleta_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. This amount corresponds to %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%. Please contact me with any questions or comments in this regard. To make payment, please send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -1113,5 +1114,5 @@ $_LANG['Zimbabue'] = 'Zimbabwe';
 
 $_LANG['Detalle Cobro'] = "Debit Note Details";
 $_LANG['Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'] = "Please disregard the above mentioned invoice(s) if by the time you receive this invoice your account has been settled.";
-$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable."; 
-$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices."; 
+$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
+$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";

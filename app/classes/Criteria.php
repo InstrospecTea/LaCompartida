@@ -85,6 +85,47 @@ class Criteria {
 	}
 
 	/**
+	 * Añade un statement de selección no nulo al criterio de búsqueda.
+	 * @param string $attribute
+	 * @param string $alias
+	 * @param string $default
+	 * @return Criteria
+	 */
+	public function add_select_not_null($attribute, $alias = null, $default = '-') {
+		if (is_null($alias)) {
+			$alias = $attribute;
+		}
+		$new_clause = 'IFNULL('.$attribute.', '."'$default'".')';
+		if ($alias != '') {
+			$new_clause .= " '$alias'";
+		}
+		$this->select_clauses[] = $new_clause;
+		return $this;
+	}
+
+	/**
+	 * [add_select_from_criteria description]
+	 * @param Criteria            $criteria    [description]
+	 * @param CriteriaRestriction $restriction [description]
+	 * @param [type]              $alias       [description]
+	 */
+	public function add_select_from_criteria(Criteria $toCloneCriteria, CriteriaRestriction $restriction, $alias) {
+		$criteria = clone $toCloneCriteria;
+		$criteria->add_restriction($restriction);
+		$new_clause = '('.$criteria->get_plain_query().') '."'$alias'";
+		$this->select_clauses[] = $new_clause;
+		return $this;
+	}
+
+	public function add_select_not_null_from_criteria(Criteria $toCloneCriteria, CriteriaRestriction $restriction, $alias, $default = '-') {
+		$criteria = clone $toCloneCriteria;
+		$criteria->add_restriction($restriction);
+		$new_clause = 'IFNULL(('.$criteria->get_plain_query().'), \''.$default.'\' ) '."'$alias'";
+		$this->select_clauses[] = $new_clause;
+		return $this;
+	}
+
+	/**
 	 * Añade un limite a la cantidad de resultados
 	 * @param  $limit Numero de resutlados
 	 */
@@ -178,26 +219,34 @@ class Criteria {
 	/**
 	 * Añade una condición de ordenamiento al criterio de búsqueda.
 	 * @param string $order
+	 * @param ordering_criteria
 	 * @return Criteria
 	 */
-	public function add_ordering($order_entity) {
-		$this->ordering_clauses[] = $order_entity;
+	public function add_ordering($order_entity, $ordering_criteria = 'ASC') {
+
+		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
+			$this->ordering_clauses[] = $order_entity.' '.$ordering_criteria;
+		} else {
+			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido "'. $order_criteria. '".');
+		}
+		
 		return $this;
 	}
 
 	/**
+	 *
 	 * Establece el criterio de ordenamiento para criteria.
 	 * @param [type] $ordering_criteria [description]
+	 * @deprecated
+	 *
 	 */
 	public function add_ordering_criteria($ordering_criteria) {
 		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
 			$this->order_criteria = $ordering_criteria;
 			return $this;
 		} else {
-			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $ordering_criteria. '.');
+			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $order_criteria. '.');
 		}
-
-
 	}
 
 	/*
@@ -243,12 +292,12 @@ class Criteria {
 	}
 
 	/**
-	 * Genera el statement WHERE de una query, si hubiere.
+	 * Genera el statement WHERE de una query, si hubiere. Por defecto considera AND para unir statements.
 	 * @return string
 	 */
 	private function generate_where_statement() {
 		if (count($this->where_clauses) > 0) {
-			return $this->where . ' ' . implode(',', $this->where_clauses);
+			return $this->where . ' ' . implode(' AND ', $this->where_clauses);
 		} else {
 			return '';
 		}
@@ -266,6 +315,7 @@ class Criteria {
 		}
 	}
 
+
 	/**
 	 * Genera el statement ORDER BY de una query, si hubiere.
 	 * @return string
@@ -274,16 +324,13 @@ class Criteria {
 
 		$order_criteria = 'ASC';
 
-		if (!empty($this->order_criteria)) {
-			$order_criteria = $this->order_criteria;
-		}
+		if (!empty($this->ordering_clauses)) {
+			return $this->ordering.' '.implode(',', $this->ordering_clauses);
 
-		if(count($this->ordering_clauses) > 0){
-			return $this->ordering." ".implode(',', $this->ordering_clauses).' '.$order_criteria;
-		}
-		else{
+		} else {
 			return '';
 		}
+
 	}
 
 	/*

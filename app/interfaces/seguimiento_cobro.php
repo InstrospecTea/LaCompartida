@@ -555,11 +555,20 @@ $pagina->PrintTop();
 	}
 
 	function Refrescar(id_foco) {
+		var _codigo_cliente = 'codigo_cliente';
+		var _codigo_asunto = 'codigo_asunto';
+
+		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
+			_codigo_cliente = 'codigo_cliente_secundario';
+			_codigo_asunto = 'codigo_asunto_secundario';
+		<?php } ?>
 
 		var factura = $('factura').value;
 		var proceso = $('proceso').value;
-		var codigo_cliente = $('codigo_cliente').value;
-		var codigo_asunto = $('codigo_asunto').value;
+
+		var codigo_cliente = jQuery('#' + _codigo_cliente).val();
+		var codigo_asunto = jQuery('#' + _codigo_asunto).val();
+
 		var forma_cobro = $('forma_cobro').value;
 		var tipo_liquidacion = $('tipo_liquidacion') ? $('tipo_liquidacion').value : '';
 		var id_usuario = $('id_usuario').value;
@@ -582,22 +591,16 @@ $pagina->PrintTop();
 		var fecha_anio = $('fecha_anio').value;
 		var fecha_ini = $('fecha_ini').value;
 		var fecha_fin = $('fecha_fin').value;
-		var estado = $('estado').value;
 
-		<?php
-		if ($orden) {
-			echo "var orden = '&orden=" . $orden . "';";
-		} else {
-			echo "var orden = '';";
-		}
-		if ($desde) {
-			echo "var pagina_desde = '&desde=" . $desde . "';";
-		} else {
-			echo "var pagina_desde = '';";
-		}
-		?>
+		var orden = "<?php echo $orden ? '&orden=' . $orden : ''; ?>";
+		var pagina_desde = "<?php echo $desde ? '&desde=' . $desde : ''; ?>";
 
-		var url = "seguimiento_cobro.php?id_usuario=" + id_usuario + "&tipo_liquidacion=" + tipo_liquidacion + "&forma_cobro=" + forma_cobro + "&id_usuario_secundario=" + id_usuario_secundario + "&id_cobro=" + id_cobro + "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto + "&opc=buscar" + pagina_desde + "&usar_periodo=" + usar_periodo + "&rango=" + rango + "&proceso=" + proceso + "&fecha_ini=" + fecha_ini + "&fecha_mes=" + fecha_mes + "&fecha_anio=" + fecha_anio + "&fecha_fin=" + fecha_fin + "&estado=" + estado + orden + "&id_foco=" + id_foco;
+		var estado = '';
+		jQuery("select[name*=estado] option:selected").each(function() {
+      estado += "&estado[]=" + jQuery(this).text();
+    });
+
+		var url = "seguimiento_cobro.php?id_usuario=" + id_usuario + "&tipo_liquidacion=" + tipo_liquidacion + "&forma_cobro=" + forma_cobro + "&id_usuario_secundario=" + id_usuario_secundario + "&id_cobro=" + id_cobro + "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto + "&opc=buscar" + pagina_desde + "&usar_periodo=" + usar_periodo + "&rango=" + rango + "&proceso=" + proceso + "&fecha_ini=" + fecha_ini + "&fecha_mes=" + fecha_mes + "&fecha_anio=" + fecha_anio + "&fecha_fin=" + fecha_fin + estado + orden + "&id_foco=" + id_foco;
 
 		self.location.href = url;
 	}
@@ -752,7 +755,7 @@ $pagina->PrintTop();
 							array('11', __('Noviembre')),
 							array('12', __('Diciembre')),
 							)
-							, 'fecha_mes', $fecha_mes, '', __('Mes'), '80px');
+							, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', __('Mes'), '80px');
 
 						if (!$fecha_anio)
 							$fecha_anio = date('Y');
@@ -808,8 +811,8 @@ $pagina->PrintTop();
 	</fieldset>
 
 </form>
-<?php echo $Form->script(); ?>
 <?php
+echo $Form->script();
 if ($opc == 'buscar') {
 	$b->Imprimir('');
 }

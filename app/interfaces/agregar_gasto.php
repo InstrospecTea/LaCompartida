@@ -127,14 +127,14 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
 		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
-		
+
 
 		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
 		}
 
 		$gasto->Edit("codigo_factura_gasto", $numero_factura_asociada ? $numero_factura_asociada : "NULL");
-		$gasto->Edit("fecha_factura", $fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "");
+		$gasto->Edit("fecha_factura", $fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "NULL");
 		$gasto->Edit("numero_ot", $numero_ot ? $numero_ot : "NULL");
 
 		if ($elimina_ingreso != '') {
@@ -255,7 +255,7 @@ $Form = new Form;
 		<?php } ?>
 
 		if (typeof  RevisarConsistenciaClienteAsunto == 'function') {
-			RevisarConsistenciaClienteAsunto(jQuery(this)[0]);
+			RevisarConsistenciaClienteAsunto(jQuery('#form_gastos')[0]);
 		}
 
 		<?php if ($prov == 'false' && Conf::GetConf($sesion, 'UsaMontoCobrable')) { ?>
@@ -525,7 +525,7 @@ $Form = new Form;
 					<?php echo __('Identificador'); ?>
 				</td>
 				<td align="left">
-					<input name="autoincrementable" id="autoincrementable" size="10" value="<?php echo($gasto->fields['nro_seguimiento'] ? $gasto->fields['nro_seguimiento'] : $proposed)  ?>" /> 
+					<input name="autoincrementable" id="autoincrementable" size="10" value="<?php echo($gasto->fields['nro_seguimiento'] ? $gasto->fields['nro_seguimiento'] : $proposed)  ?>" />
 					<span style="color:#FF0000; font-size:10px">*</span>
 				</td>
 			</tr>

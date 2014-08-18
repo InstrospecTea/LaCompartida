@@ -12,6 +12,8 @@ use \TipoCorreo as TipoCorreo;
 
 class Utiles extends \Utiles {
 
+
+
 	public function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
 		$mime_boundary = md5(time());

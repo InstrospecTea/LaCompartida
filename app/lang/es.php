@@ -848,7 +848,7 @@ $_LANG['nota_morosidad'] = "";
 $_LANG['nota_disclaimer'] = "";
 
 #Carta MB Chile
-$_LANG['%detalle_mb%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
+$_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%num_letter% %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha% en relación al encargo profesional de la referencia. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
 $_LANG['%detalle_mb_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
 $_LANG['%cuenta_mb%'] = "";
 #Carta MB NY (NY)
@@ -869,7 +869,13 @@ $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
 #Carta MB Chile con Boleta Adjunta (Boleta)
 $_LANG['%detalle_mb_boleta%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%.";
 $_LANG['%detalle_mb_boleta_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%.";
-$_LANG['%cuenta_mb_boleta%'] = "";
+$_LANG['%cuenta_mb_boleta%'] = "<table width='100%'>
+	                                <tr><td width='35%'>Titular:</td><td width='65%'>Morales Besa y CompaÃ±ia Limitada</td></tr>
+                                	<tr><td width='35%'>R.U.T.:</td><td width='65%'>76.940.700-6</td></tr>
+                                	<tr><td width='35%'>Banco :</td><td width='65%'>Banco de Chile</td></tr>
+                                	<tr><td width='35%'>Cuenta N:</td><td width='65%'>0490268110</td></tr>
+	                                <tr><td width='35%'>E-mail:</td><td width='65%'>cobranza@moralesybesa.cl</td></tr>
+                                </table>";
 
 #Carta L&R
 $_LANG['%direccion_blr%'] = "Avda. Apoquindo 3001 Piso 9<br>Las Condes<br>Santiago - Chile<br>Tel: (56 2) 411 9200<br>Fax:(56 2) 411 9300";
@@ -1141,6 +1147,15 @@ $_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %H
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
 $_LANG["Not allowed"] = "Esta opción no está permitida";
 $_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";
+
+/* Langs específicos para facturación electrónica */
 $_LANG["SaveGeneratedInvoiceError"] = "Error guardar la factura electrónica";
 $_LANG["SaveCanceledInvoiceError"] = "Error al guardar el estado de la Factura electrónica anulada";
 $_LANG["CancelGeneratedInvoiceError"] = "Error anular la factura electrónica";
+$_LANG["Posee documentos con error. - El R.U.T. del cliente es inválido en la información del documento XML.-"] = "Error en la factura: El R.U.T del cliente ingresado no es válido";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 33"] = "No hay folios disponibles para Facturas Electrónicas";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 34"] = "No hay folios disponibles para Facturas Excentas Electrónicas";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 46"] = "No hay folios disponibles para Factura De Compra Electronica";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 52"] = "No hay folios disponibles para Guia De Despacho Electronica";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 56"] = "No hay folios disponibles para Nota De Debito Electronica";
+$_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 61"] = "No hay folios disponibles para Nota De Credito Electronica";

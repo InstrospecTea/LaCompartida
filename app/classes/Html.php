@@ -44,7 +44,7 @@ class Html extends \Html {
 				if ($value === true) {
 					$value = $name;
 				} else if ($value === false) {
-					$value = '';
+					continue;
 				}
 				$html .= sprintf(' %s="%s"', $name, $value);
 			}
@@ -52,6 +52,11 @@ class Html extends \Html {
 			$html = $attributes;
 		}
 		return $html;
+	}
+
+	public function img($image, $attributes) {
+		$attr = array_merge(array('src' => $image), $attributes);
+		return $this->tag('img', '', $attr, true);
 	}
 
 	/**
@@ -82,7 +87,7 @@ class Html extends \Html {
 	 *
 	 * @param type $script_block
 	 */
-	public function script_block($script_block, $attrs = array()) {
+	public function script_block($script_block, $attrs = null) {
 		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs));
 	}
 
@@ -95,4 +100,3 @@ class Html extends \Html {
 	}
 
 }
-

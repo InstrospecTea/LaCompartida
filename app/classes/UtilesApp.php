@@ -100,6 +100,7 @@ class UtilesApp extends Utiles {
 				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
 				}
+				$oncambio .= "jQuery('#codigo_asunto_secundario').val('');jQuery('#glosa_asunto').val('');";
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "  ", $oncambio, $width, $codigo_asunto_secundario);
 			} else {
 				if ($oncambio == '') {
@@ -107,6 +108,7 @@ class UtilesApp extends Utiles {
 				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
 				}
+				$oncambio .= "jQuery('#codigo_asunto').val('');jQuery('#glosa_asunto').val('');";
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 			}
 		}
@@ -128,7 +130,7 @@ class UtilesApp extends Utiles {
 		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
 			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
 
-			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, true, $width, $oncambio, $forceMatch);
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $width, $oncambio, $forceMatch);
 			echo AutocompletadorAsunto::Javascript($sesion);
 		} else {
 			if ($oncambio == '') {
@@ -1085,7 +1087,7 @@ HTML;
 	}
 
 	//Calcula cambio de moneda
-	function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
+	public function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
 		if ($monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini)) {
 			$monto_ini = (double) 0;
 		}
@@ -2351,6 +2353,11 @@ HTML;
 		);
 
 		$map = $map + self::$_transliteration + $merge;
+		return preg_replace(array_keys($map), array_values($map), $string);
+	}
+
+	public static function transliteration($string) {
+		$map = self::$_transliteration;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 

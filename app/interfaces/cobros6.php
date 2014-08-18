@@ -891,7 +891,7 @@ if (count($cobro->asuntos)) {
         //Significa que estoy anulando la emisión
         if( form.estado.value == 'EN REVISION' ) {
 
-<?php if (Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
+		<?php if (Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 				if (form.estado_original.value == 'PAGADO' && trim(form.estado_motivo.value) == "") {
 					jQuery('#dialogomodal').html(jQuery('#div_motivo_cambio_estado').html());
 					jQuery('#dialogomodal').dialog('open').dialog('option','title','Ingresar Motivo').dialog('option', 'height', '170');
@@ -912,14 +912,13 @@ if (count($cobro->asuntos)) {
 					onSuccess: function(transport){},
 					onFailure: function(e){}
 				});
-<?php } ?>
-
+		<?php } ?>
+	        var texto = '';
             if (form.existe_pago.value == 1) {
-                var texto = '¡Este cobro tiene pagos asociados! ';
+                texto = '¡Este cobro tiene pagos asociados! ';
             } else if (form.existe_factura.value == 1) {
-                var texto = '¡Este cobro tiene facturas asociadas! ';
+                texto = '¡Este cobro tiene facturas asociadas! ';
             }
-
             if (!confirm(texto + '<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
                 return false;
             } else {
@@ -1241,7 +1240,7 @@ if (count($cobro->asuntos)) {
             }
         }
 
-        nuovaFinestra('Agregar_Factura',800, 600, '<?php echo $url_agregar_factura; ?>' +
+        nuovaFinestra('Agregar_Factura',800, 610, '<?php echo $url_agregar_factura; ?>' +
             '&honorario=' + honorarios +
             '&gastos_con_iva=' + gastos_con_impuestos +
             '&gastos_sin_iva=' + gastos_sin_impuestos +
@@ -1970,25 +1969,14 @@ if ($solicitante == 0) {  // no mostrar
 
 <!-- Fin Tipo Cambio -->
 <div id="clip" style="background:url('https://static.thetimebilling.com/images/clip.png') no-repeat;position:absolute;top:250px;left:500px;display:none;height: 200px;width: 250px;"></div>
+
 <script type="text/javascript">
-
-
-<?php if ($cobro->fields['estado'] == "PAGADO" && Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
+	<?php if ($cobro->fields['estado'] == "PAGADO" && Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 		$("estado").value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		$("estado").observe("change", function() {
 			this.value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		});
-<?php } ?>
-	jQuery('.iframeinterno').load(function() {
-		console.log(jQuery('.iframeinterno'));
-
-
-
-	});
-
-	// var t=setTimeout("jQuery('#clip').fadeIn(1000);",6000);
-
-
+	<?php } ?>
 </script>
 
 <?php

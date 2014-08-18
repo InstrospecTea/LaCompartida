@@ -8,8 +8,8 @@ class Observacion extends Objeto
 {
 	function Observacion($sesion, $fields = "", $params = "")
 	{
-		$this->tabla = "cobro_historial";
-		$this->campo_id = "id_cobro_historial";
+		$this->tabla = 'cobro_historial';
+		$this->campo_id = 'id_cobro_historial';
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
