@@ -1,22 +1,22 @@
 #!/bin/bash
 if [ $# -eq 0 ];then
-  echo "use: $0 script_name [--arg=value]"
+  echo "use: $0 script_name --domain=local [--debug]"
   exit
 fi
 
 canonicalize() {
-        NAME="$1"
-        if [ -f "$NAME" ]
-        then
-                DIR=$(dirname -- "$NAME")
-                NAME=$(cd -P "$DIR" && pwd -P)/$(basename -- "$NAME")
-        fi
-        while [ -h "$NAME" ]; do
-                DIR=$(dirname -- "$NAME")
-                SYM=$(readlink "$NAME")
-                NAME=$(cd "$DIR" && cd $(dirname -- "$SYM") && pwd)/$(basename -- "$SYM")
-        done
-        echo "$NAME"
+	NAME="$1"
+	if [ -f "$NAME" ]
+	then
+		DIR=$(dirname -- "$NAME")
+		NAME=$(cd -P "$DIR" && pwd -P)/$(basename -- "$NAME")
+	fi
+	while [ -h "$NAME" ]; do
+		DIR=$(dirname -- "$NAME")
+		SYM=$(readlink "$NAME")
+		NAME=$(cd "$DIR" && cd $(dirname -- "$SYM") && pwd)/$(basename -- "$SYM")
+	done
+	echo "$NAME"
 }
 
 CONSOLE=$(dirname -- "$(canonicalize "$0")")
