@@ -1,9 +1,4 @@
 #!/bin/bash
-if [ $# -eq 0 ];then
-  echo "use: $0 script_name --domain=local [--debug]"
-  exit
-fi
-
 canonicalize() {
 	NAME="$1"
 	if [ -f "$NAME" ]
