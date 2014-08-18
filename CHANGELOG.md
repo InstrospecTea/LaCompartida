@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.11.5
+Lunes 18 de Agosto 2014
+* **Fixed:** [Corrección a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/641)
+
 ## Hotfix: 14.11.4
 Jueves 14 de Agosto 2014
 * **Fixed:** [Corrige uso de tarifa plana.](https://github.com/LemontechSA/ttb/pull/640)
