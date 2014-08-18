@@ -6628,8 +6628,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] . number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-
-			case 'DETALLE_COBRO_MONEDA_TOTAL': //GenerarDocumentoComun
+            case 'DETALLE_COBRO_MONEDA_TOTAL': //GenerarDocumentoComun
                 
                 global $x_resultados;
                 
@@ -6644,13 +6643,12 @@ class NotaCobro extends Cobro {
 					$tipo_cambio_cobro_moneda_base = $this->fields['tipo_cambio_moneda_base'];
 				}
 
-				$moneda_base_tenant = Utiles::MonedaBase($this->sesion);
-
 				if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
 					$aproximacion_monto = number_format($this->fields['monto_subtotal'] - $this->fields['descuento'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 					$total_en_moneda = $aproximacion_monto * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_cobro_moneda_base) / ($tipo_cambio_moneda_total / $tipo_cambio_cobro_moneda_base);
 				} else {
-                    $total_en_moneda = $x_resultados['monto'][$this->fields['opc_moneda_total']];
+					$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
+					$total_en_moneda = $aproximacion_monto * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_cobro_moneda_base) / ($tipo_cambio_moneda_total / $tipo_cambio_cobro_moneda_base);
 				}
 				//Caso retainer menor de un valor y distinta tarifa (diferencia por decimales)
 				if ((($this->fields['total_minutos'] / 60) < $this->fields['retainer_horas']) && ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') && $this->fields['id_moneda'] != $this->fields['id_moneda_monto']) {
@@ -6671,9 +6669,10 @@ class NotaCobro extends Cobro {
 				if ( (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado')) && $contrato->fields['usa_impuesto_separado'] && (!Conf::GetConf($this->sesion, 'CalculacionCyC'))) {
 					$total_en_moneda -= $this->fields['impuesto'] * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_cobro_moneda_base) / ($tipo_cambio_moneda_total / $tipo_cambio_cobro_moneda_base);
 				}
-                
+
 				$html = str_replace('%valor_honorarios_monedabase_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($valor_trabajos_demo_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+                $html = str_replace('%valor_honorarios_monedabase_mb%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_gastos'][$this->fields['opc_moneda_total']] + $x_resultados['monto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				break;
 
