@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
+$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 
 $tip_tasa = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
@@ -975,7 +976,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 							<td align="left">
 								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
 								<?php echo __('Categoría de asunto') ?>
-								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_tipo_proyecto", 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
+								<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
 							</td>
 						</tr>
 						<tr>
@@ -983,7 +984,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								<?php echo __('Área') . ' ' . __('asunto') ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
+								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden ASC'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
 							</td>
 						</tr>
 						<tr>
@@ -1221,77 +1222,17 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				} else {
 					for (i = 0; i < campos.length; i++) {
 						valores = campos[i].split('|');
-
-						// Cliente
-						jQuery('[name="factura_razon_social"]').val('value', valores[0] != '' ? valores[0] : '');
-
-						// Dirección
-						if (valores[1] != '') {
-							jQuery('[name="factura_direccion"]').attr('value', valores[1]);
-						} else {
-							jQuery('[name="factura_direccion"]').attr('value', '');
-						}
-
-						// Rut
-						if (valores[2] != '') {
-							jQuery('[name="factura_rut"]').attr('value', valores[2]);
-						} else {
-							jQuery('[name="factura_rut"]').attr('value', '');
-						}
-
-						// Comuna
-						if (valores[3] != '') {
-							jQuery('[name="factura_comuna"]').attr('value', valores[3]);
-						} else {
-							jQuery('[name="factura_comuna"]').attr('value', '');
-						}
-
-						// Ciudad
-						if (valores[4] != '') {
-							jQuery('[name="factura_ciudad"]').attr('value', valores[4]);
-						} else {
-							jQuery('[name="factura_ciudad"]').attr('value', '');
-						}
-
-						// Giro
-						if (valores[5] != '') {
-							jQuery('[name="factura_giro"]').attr('value', valores[5]);
-						} else {
-							jQuery('[name="factura_giro"]').attr('value', '');
-						}
-
-						// Ciudad
-						if (valores[6] != '') {
-							jQuery('[name="factura_codigopostal"]').attr('value', valores[6]);
-						} else {
-							jQuery('[name="factura_codigopostal"]').attr('value', '');
-						}
-
-						// País
-						if (valores[7] != '') {
-							jQuery('[name="id_pais"]').attr('value', valores[7]);
-						} else {
-							jQuery('[name="id_pais"]').attr('value', '');
-						}
-
-						// Teléfono
-						if (valores[8] != '') {
-							jQuery('[name="cod_factura_telefono"]').attr('value', valores[8]);
-						} else {
-							jQuery('[name="cod_factura_telefono"]').attr('value', '');
-						}
-						if (valores[9] != '') {
-							jQuery('[name="factura_telefono"]').attr('value', valores[8]);
-						} else {
-							jQuery('[name="factura_telefono"]').attr('value', '');
-						}
-
-						// glosa contrato
-						if (valores[10] != '') {
-							jQuery('[name="glosa_contrato"]').attr('value', valores[10]);
-						} else {
-							jQuery('[name="glosa_contrato"]').attr('value', '');
-						}
+						jQuery('[name="factura_razon_social"]').val(valores[0] != '' ? valores[0] : '');
+						jQuery('[name="factura_direccion"]').val(valores[1] != '' ? valores[1] : '');
+						jQuery('[name="factura_rut"]').val(valores[2] != '' ? valores[2] : '');
+						jQuery('[name="factura_comuna"]').val(valores[3] != '' ? valores[3] : '');
+						jQuery('[name="factura_ciudad"]').val(valores[4] != '' ? valores[4] : '');
+						jQuery('[name="factura_giro"]').val(valores[6] != '' ? valores[6] : '');
+						jQuery('[name="factura_codigopostal"]').val(valores[7] != '' ? valores[7] : '');
+						jQuery('[name="id_pais"]').val(valores[8] != '' ? valores[8] : '');
+						jQuery('[name="cod_factura_telefono"]').val(valores[9] != '' ? valores[9] : '');
+						jQuery('[name="factura_telefono"]').val(valores[10] != '' ? valores[10] : '');
+						jQuery('[name="glosa_contrato"]').val(valores[11] != '' ? valores[11] : '');
 					}
 				}
 			} else {

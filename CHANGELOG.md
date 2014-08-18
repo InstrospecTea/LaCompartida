@@ -1,4 +1,142 @@
 # Changelog
+
+## Hotfix: 14.11.5
+Lunes 18 de Agosto 2014
+* **Fixed:** [Corrección a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/641)
+
+## Hotfix: 14.11.4
+Jueves 14 de Agosto 2014
+* **Fixed:** [Corrige uso de tarifa plana.](https://github.com/LemontechSA/ttb/pull/640)
+
+## Hotfix: 14.11.3
+Miércoles 13 de Agosto 2014
+* **Fixed:** [Cambios, reubicación y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)
+
+## Hotfix: 14.11.2
+Martes 12 de Agosto 2014
+* **Fixed:** [Reporte historial de movimientos con querys no costosas computacionalmente.](https://github.com/LemontechSA/ttb/pull/636)
+
+## Hotfix: 14.11.1
+Martes 12 de Agosto 2014
+* **Added:** [Actualiza con usuario admin.](https://github.com/LemontechSA/ttb/pull/635)
+
+## Release: 14.11.0
+Lunes 11 de Agosto 2014
+* **Fixed:** [Feature/reporte historial movimientos 2](https://github.com/LemontechSA/ttb/pull/627)
+
+## Hotfix: 14.10.1
+Lunes 11 de Agosto 2014
+* **Added:** [Agrega tags a segmento resumen asuntos](https://github.com/LemontechSA/ttb/pull/633)
+
+## Release: 14.10.0
+Jueve 7 de Agosto 2014
+* **Fixed:** [Feature/modificaciones lloredacamacho](https://github.com/LemontechSA/ttb/pull/626)
+
+## Hotfix: 14.9.4
+Jueves 7 de Agosto 2014
+* **Fixed:** [Validación ingreso de horas](https://github.com/LemontechSA/ttb/pull/629)
+
+## Hotfix: 14.9.3
+Jueves 7 de Agosto 2014
+* **Fix:** [Repara reporte de horas por facturar, al seleccionar separar asuntos el reporte estaba vacío](https://github.com/LemontechSA/ttb/pull/628)
+
+## Hotfix: 14.9.2
+Miércoles 6 de Agosto 2014
+* **Fix:** [limpia asuntos cuando cambia cliente en autocomplete](https://github.com/LemontechSA/ttb/pull/625)
+* **New:** [Al seleccionar un cliente el asunto comeinza a buscar con el primer caracter, de lo contrario necesita 3 caracteres.](https://github.com/LemontechSA/ttb/pull/625)
+
+## Hotfix: 14.9.1
+Martes 5 de Agosto 2014
+* **New:** [Modificaciones para generar documentos expertise](https://github.com/LemontechSA/ttb/pull/624)
+* **New:** [Agrega Campo id_estudio a cargador masivo](https://github.com/LemontechSA/ttb/pull/624)
+
+## Release: 14.9.0
+Lunes 4 de Agosto 2014
+* **Fixed:** [Feature/agrega columna reporte horas por facturar](https://github.com/LemontechSA/ttb/pull/613)
+* **Fixed:** [Feature/Reporte liquidaciones total horas](https://github.com/LemontechSA/ttb/pull/614)
+* **Fixed:** [Feature/tipo cambio prof vs cliente](https://github.com/LemontechSA/ttb/pull/617)
+* **Fixed:** [Feature/asigna nombre de usuario en reporte excel](https://github.com/LemontechSA/ttb/pull/621)
+
+## Hotfix: 14.8.3
+Lunes 4 de Agosto 2014
+* **Fixed:** [Agrega dato solicitante del contrato a mantenedor de factura](https://github.com/LemontechSA/ttb/pull/620)
+
+## Hotfix: 14.8.2
+Viernes 1 de Agosto 2014
+* **Fixed:** [Repara buscador por asuntos en tramites](https://github.com/LemontechSA/ttb/pull/619)
+
+## Hotfix: 14.8.1
+Viernes 1 de Agosto 2014
+* **Fixed:** [Evita errores de codificacion en respuesta ajax](https://github.com/LemontechSA/ttb/pull/618)
+
+## Release: 14.8.0
+Jueves 31 de Julio 2014
+* **Fixed:** [Feature/agrupacion_por_cobro](https://github.com/LemontechSA/ttb/pull/611)
+* **Fixed:** [Feature/facturacion_cl](https://github.com/LemontechSA/ttb/pull/513)
+
+## Hotfix: 14.7.2
+Jueves 31 de Julio 2014
+* **Fixed:** [Corrige eliminación de trabajo](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige asignación de usuario en ingreso de trabajo](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige asignación de codigo asunto secundario al cargar actividades por JS](https://github.com/LemontechSA/ttb/pull/612)
+
+## Hotfix: 14.7.1
+Miércoles 30 de Julio 2014
+* **Fixed:** [Elimina variable que no se envía.](https://github.com/LemontechSA/ttb/pull/610)
+
+## Release: 14.7.0
+Martes 29 de Julio 2014
+* **Fixed:** [Feature/combobox asuntos](https://github.com/LemontechSA/ttb/pull/608)
+* **Fixed:** [Feature/reporte hitos](https://github.com/LemontechSA/ttb/pull/587)
+
+## Hotfix: 14.6.2
+Viernes 25 de Julio 2014
+* **Fixed:** [Corrige seleccion de asuntos al generar cobro](https://github.com/LemontechSA/ttb/pull/606)
+
+## Hotfix: 14.6.1
+Viernes 25 de Julio 2014
+* **Fixed:** [Corrige validación en CargarSelect.](https://github.com/LemontechSA/ttb/pull/606)
+
+## Release: 14.6.0
+Jueves 24 de Julio 2014
+* **Feature:** [Agrega comportamiento de combobox al autocompleter de asuntos.](https://github.com/LemontechSA/ttb/pull/599)
+* **Feature:** [Feature/indicador cambio tarifa.](https://github.com/LemontechSA/ttb/pull/591)
+* **Feature:** [Hace opcional el asunto al crear actividades.](https://github.com/LemontechSA/ttb/pull/582)
+
+## Hotfix: 14.5.3
+Miercoles 23 de Julio 2014
+* **Fixed:** [Agrega código perdido de un commit.](https://github.com/LemontechSA/ttb/pull/604)
+
+## Hotfix: 14.5.2
+Martes 22 de Julio 2014
+* **Fixed:** [Corrige generación de botones en Gastos](https://github.com/LemontechSA/ttb/pull/597)
+
+## Hotfix: 14.5.1
+Martes 22 de Julio 2014
+* **Fixed:** [Corrige seleccionar Asunto.](https://github.com/LemontechSA/ttb/pull/594)
+
+## Release: 14.5.0
+Jueves 10 de Julio 2014
+* **Feature:** [Errores Usuarios](https://github.com/LemontechSA/ttb/pull/581)
+* **Feature:** [Recupera autocompletador asuntos](https://github.com/LemontechSA/ttb/pull/565)
+* **Feature:** [Serie documento](https://github.com/LemontechSA/ttb/pull/520)
+
+## Hotfix: 14.4.17
+Lunes 21 de Julio 2014
+* **Fixed:** [Corrige errores SQL en Factura](https://github.com/LemontechSA/ttb/pull/591)
+
+## Hotfix: 14.4.16
+Viernes 18 de Julio 2014
+* **Fixed:** [Agrega desglose de gastos a factura.](https://github.com/LemontechSA/ttb/pull/590)
+
+## Hotfix: 14.4.15
+Jueves 17 de Julio 2014
+* **Fixed:** [Repara la rutina que muestra los identificadores de las facturas en el reporte de antiguedad de deudas.](https://github.com/LemontechSA/ttb/pull/589)
+
+## Hotfix: 14.4.14
+Lunes 14 de Julio 2014
+* **Fixed:** [Corrige sumar monto tramite del cobro.](https://github.com/LemontechSA/ttb/pull/586)
+
 ## Hotfix: 14.4.13
 Jueves 10 de Julio 2014
 * **Fixed:** [Agrega nuevo tag para morales y besa](https://github.com/LemontechSA/ttb/pull/581)

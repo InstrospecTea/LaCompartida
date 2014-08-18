@@ -26,35 +26,46 @@ if (!class_exists('Cobro')) {
 				$ingreso_historial = true;
 			}
 
-			if (parent::Write()) {
-				// actualizar campo estadocobro de los trabajos según estado del cobro
-				$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
-				$trabajos = new ListaTrabajos($this->sesion, '', $query);
-				for ($x = 0; $x < $trabajos->num; $x++) {
-					$trabajo = $trabajos->Get($x);
-					$trabajo->Edit('estadocobro', $this->fields['estado']);
-					$trabajo->Write();
-				}
+			$chargeService = new ChargeService($this->sesion);
+			$charge = new Charge();
+			$charge->fillFromArray($this->fields);
+			$charge->fillChangedFields($this->changes);
+			try {
+				$charge = $chargeService->saveOrUpdate($charge);
+				$this->fields = $charge->fields;
+			} catch(Exception $ex) {
 
-				if ($ingreso_historial) {
-					// Esa linea es necesaria para que el estado no se guardará dos veces
-					$this->valor_antiguo['estado'] = $this->fields['estado'];
+			}
 
-					$his = new Observacion($this->sesion);
 
-					if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
-						if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
-							$his->Edit('fecha', date('Y-m-d H:i:s'));
-							$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
-							$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-							$his->Edit('id_cobro', $this->fields['id_cobro']);
-							$his->Write();
-						}
+			// actualizar campo estadocobro de los trabajos según estado del cobro
+			$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
+			$trabajos = new ListaTrabajos($this->sesion, '', $query);
+			for ($x = 0; $x < $trabajos->num; $x++) {
+				$trabajo = $trabajos->Get($x);
+				$trabajo->Edit('estadocobro', $this->fields['estado']);
+				$trabajo->Write();
+			}
+
+			if ($ingreso_historial) {
+				// Esa linea es necesaria para que el estado no se guardará dos veces
+				$this->valor_antiguo['estado'] = $this->fields['estado'];
+
+				$his = new Observacion($this->sesion);
+
+				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
+					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+						$his->Edit('fecha', date('Y-m-d H:i:s'));
+						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+						$his->Edit('id_cobro', $this->fields['id_cobro']);
+						$his->Write();
 					}
 				}
-
-				return true;
 			}
+
+			return true;
+
 		}
 
 		function GlosaSeEstaCobrando() {
@@ -600,6 +611,7 @@ if (!class_exists('Cobro')) {
 			}
 			$estado_anterior = $this->fields['estado'];
 			$this->Edit('estado', $estado);
+
 			if ($this->Write() && $estado_anterior != $estado) {
 				return $estado;
 			}
@@ -646,8 +658,13 @@ if (!class_exists('Cobro')) {
 		}
 
 		function Eliminar() {
-			$id_cobro = $this->fields[id_cobro];
+			$id_cobro = $this->fields['id_cobro'];
+
 			if ($id_cobro) {
+				$chargeService = new ChargeService($this->sesion);
+				$charge = new Charge();
+				$charge->fillFromArray($this->fields);
+				$chargeService->delete($charge);
 				//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
 				if ($this->fields['id_provision_generada']) {
 					$provision_generada = new Gasto($this->sesion);
@@ -784,13 +801,12 @@ if (!class_exists('Cobro')) {
 			return $monto_total;
 		}
 
-		function CalculaMontoTramites($cobro, $fecha_ini, $fecha_fin) {
-
+		function CalculaMontoTramites() {
 			$query = "SELECT SUM(tarifa_tramite)
-						FROM tramite
-							WHERE tramite.id_cobro='" . $this->fields['id_cobro'] . "'
-							AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
-							AND tramite.cobrable=1 ";
+				FROM tramite
+				WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
+					AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
+					AND tramite.cobrable = 1 ";
 
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($total_monto_tramites) = mysql_fetch_array($resp);
@@ -1538,14 +1554,14 @@ if (!class_exists('Cobro')) {
 
 			#DESCUENTOS
 			if ($this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$cobro_descuento = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
-				$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - $cobro_descuento;
+				$cobro_descuento = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
+				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - $cobro_descuento;
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
 				$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
 			} else {
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
-				$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
+				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 			}
 			//Valido CAP
@@ -1575,10 +1591,10 @@ if (!class_exists('Cobro')) {
 
 			// Se guarda la información del cobro
 
-			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites(), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 
 			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_origina && $cobro_total_honorario_cobrable != 0) {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));

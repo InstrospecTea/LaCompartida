@@ -1,12 +1,18 @@
 <?php
+
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 $pagina = new Pagina($sesion);
 $tramite = new Tramite($sesion);
+$Form = new Form;
 
 if ($id_tramite > 0) {
 	$tramite->Load($id_tramite);
+}
+
+if (empty($como_trabajo)) {
+	$como_trabajo = 0;
 }
 
 if ($tramite->fields['trabajo_si_no'] == 1 || $como_trabajo == 1) {
@@ -21,18 +27,18 @@ $permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_arra
 if ($id_tramite > 0) {
 
 	if ($tramite->fields['trabajo_si_no'] == 1 || $como_trabajo == 1) {
-		
+
 		$query = "SELECT id_trabajo FROM trabajo WHERE id_tramite = '{$id_tramite}'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_trabajo) = mysql_fetch_array($resp);
-	
+
 		if ($id_trabajo > 0){
 			$trabajo->Load($id_trabajo);
 		}
 	}
 
 	if ($tramite->Estado() == 'Cobrado' && $opcion != 'nuevo') {
-		
+
 		$pagina->AddError(__(__('Trámite') . ' ya cobrado'));
 		$pagina->PrintTop($popup);
 		$pagina->PrintBottom($popup);
@@ -40,7 +46,7 @@ if ($id_tramite > 0) {
 	}
 
 	if ($tramite->Estado() == 'Revisado' && $opcion != 'nuevo') {
-		
+
 		if (!$permisos->fields['permitido']) {
 			$pagina->AddError(__(__('Trámite') . ' ya revisado'));
 			$pagina->PrintTop($popup);
@@ -104,7 +110,7 @@ if ($opcion == "guardar") {
 
 		$cobro = new Cobro($sesion);
 		$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($codigo_asunto, $tramite->fields['fecha']);
-		
+
 		if ($id_cobro_cambio) {
 			if ($trabajo) {
 				$trabajo->Edit('id_cobro', $id_cobro_cambio);
@@ -240,7 +246,8 @@ if ($opcion == "guardar") {
 	$contrato = new Contrato($sesion);
 	$contrato->Load($asunto->fields['id_contrato']);
 	$tramite->Edit('id_moneda_tramite', $contrato->fields['id_moneda_tramite']);
-	$tramite->Edit('tarifa_tramite', Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto));
+	$tramite_tarifa = Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto);
+	$tramite->Edit('tarifa_tramite', (empty($tramite_tarifa)? 'NULL' : $tramite_tarifa));
 
 	if ($trabajo) {
 		if (!$trabajo->fields['tarifa_hh']) {
@@ -402,16 +409,16 @@ $pagina->PrintTop($popup);
 		}
 	}
 
-	function Confirmar(form, id_trab) {
+	function Confirmar(id_trab) {
 		if (confirm('Está modificando un ' + langtramite + ', desea continuar?')) {
 			if ($('como_trabajo').checked == false && id_trab != '') {
 				if (confirm('Se va a borrar el trabajo correspondiente al ' + langtramite + ', desea continuar?')) {
-					return Validar(form);
+					return Validar();
 				} else {
 					return false;
 				}
 			} else {
-				return Validar(form);
+				return Validar();
 			}
 		} else {
 			return false;
@@ -512,7 +519,8 @@ $pagina->PrintTop($popup);
 		self.location.href = url;
 	}
 
-	function Validar(form) {
+	function Validar() {
+		var form = jQuery('#form_editar_trabajo')[0];
 		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 			if (!form.codigo_asunto_secundario.value) {
 				alert("<?php echo __('Debe seleccionar un') . ' ' . __('asunto') ?>");
@@ -598,7 +606,7 @@ $pagina->PrintTop($popup);
 		<?php } ?>
 
 		pasavalidacion = validaCantidad(document.getElementById('multiplicador').value, 'validandoform');
-		
+
 		if (!pasavalidacion) {
 			return false;
 		}
@@ -718,10 +726,10 @@ $pagina->PrintTop($popup);
 			} ?>
 
 		} else if (accion == 'lista_trabajos') {
-			
+
 			form.campo_codigo_asunto.value = codigo;
 			SetSelectInputId('campo_codigo_asunto', 'codigo_asunto');
-			
+
 			<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
 				CargarSelect('codigo_asunto', 'codigo_actividad', 'cargar_actividades');
 			<?php } ?>
@@ -1199,11 +1207,10 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td colspan="2" align="right">
-				<?php if ($id_tramite > 0) { ?>
-					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Confirmar(this.form, '<?php echo $id_trabajo; ?>')" />
-				<?php } else { ?>
-					<input type="button" class="btn" value="<?php echo __('Guardar'); ?>" onclick="Validar(this.form)" />
-				<?php } ?>
+				<?php
+				$onclick = $id_tramite > 0 ? "Confirmar('$id_trabajo')" : 'Validar()';
+				echo $Form->button(__('Guardar'), array('onclick' => $onclick));
+				?>
 			</td>
 		</tr>
 
@@ -1272,4 +1279,5 @@ function Substring($string) {
 </script>
 
 <?php
+echo $Form->script();
 $pagina->PrintBottom($popup);

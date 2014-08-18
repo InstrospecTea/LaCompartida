@@ -1,5 +1,5 @@
 <?php
-//Clase UtilesApp
+
 require_once dirname(__FILE__) . '/../conf.php';
 
 class UtilesApp extends Utiles {
@@ -100,6 +100,7 @@ class UtilesApp extends Utiles {
 				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
 				}
+				$oncambio .= "jQuery('#codigo_asunto_secundario').val('');jQuery('#glosa_asunto').val('');";
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "  ", $oncambio, $width, $codigo_asunto_secundario);
 			} else {
 				if ($oncambio == '') {
@@ -107,27 +108,41 @@ class UtilesApp extends Utiles {
 				} elseif (substr($oncambio, 0, 1) == '+') {
 					$oncambio.="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
 				}
+				$oncambio .= "jQuery('#codigo_asunto').val('');jQuery('#glosa_asunto').val('');";
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 			}
 		}
 	}
 
-	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '') {
-
+	/**
+	 * Inserta Campo de Asuntos autocomplete o select según Conf
+	 * @param type $sesion
+	 * @param type $codigo_cliente
+	 * @param type $codigo_cliente_secundario
+	 * @param type $codigo_asunto
+	 * @param type $codigo_asunto_secundario
+	 * @param type $width
+	 * @param type $oncambio
+	 * @param type $glosa_asunto
+	 * @param type $forceMatch
+	 */
+	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width = 320, $oncambio = '', $glosa_asunto = '', $forceMatch = true) {
 		if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
 			require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
-			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente, $codigo_cliente_secundario);
+
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $width, $oncambio, $forceMatch);
+			echo AutocompletadorAsunto::Javascript($sesion);
 		} else {
 			if ($oncambio == '') {
-				$oncambio = "CargarSelectCliente(this.value);";
+				$oncambio = 'CargarSelectCliente(this.value);';
 			} elseif (substr($oncambio, 0, 1) == '+') {
-				$oncambio = "CargarSelectCliente(this.value);" . str_replace('+', '', $oncambio);
+				$oncambio = 'CargarSelectCliente(this.value);' . str_replace('+', '', $oncambio);
 			}
 
 			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
+				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto_secundario', 'glosa_asunto', 'codigo_asunto_secundario', $codigo_asunto_secundario, '', $oncambio, $width, $codigo_cliente_secundario);
 			} else {
-				echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto', 'glosa_asunto', 'codigo_asunto', $codigo_asunto, '', $oncambio, $width, $codigo_cliente);
 			}
 		}
 	}
@@ -2340,9 +2355,14 @@ HTML;
 		$map = $map + self::$_transliteration + $merge;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
-	
+
+	public static function transliteration($string) {
+		$map = self::$_transliteration;
+		return preg_replace(array_keys($map), array_values($map), $string);
+	}
+
 	/**
-	 * 
+	 *
 	 * @param type $array
 	 * @param type $template
 	 */

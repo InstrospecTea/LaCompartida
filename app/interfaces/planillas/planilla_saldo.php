@@ -90,12 +90,25 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$tipo_liq_honorarios = 'H';
 	$tipo_liq_mixtas = 'M';
 
-	if (!empty($id_contrato)) {
-		$where_adelantos .= " AND d.id_contrato = '$id_contrato' ";
-		$where_liquidaciones .= " AND cobro.id_contrato = '$id_contrato' ";
+	// Viene asunto o contrato
+	$glosa_asunto = trim($_REQUEST['glosa_asunto']);
+	if (!empty($id_contrato) || !empty($codigo_asunto) || !empty($codigo_asunto_secundario) || !empty($glosa_asunto)) {
+		if (empty($codigo_asunto) && empty($codigo_asunto_secundario) && !empty($glosa_asunto)) {
+			$id_contrato = array();
+			$query_asuntos = "SELECT DISTINCT id_contrato FROM asunto WHERE glosa_asunto LIKE '%$glosa_asunto%'";
+			$resp_query_asuntos = mysql_query($query_asuntos);
+			if ($resp_query_asuntos !== false) {
+				while ($fila = mysql_fetch_assoc($resp_query_asuntos)) {
+					$id_contrato[] = $fila['id_contrato'];
+				}
+			}
+		}
+		$wic = is_array($id_contrato) ? "IN ('" . implode("','", $id_contrato) . "')" : "= '$id_contrato'";
+		$where_adelantos .= " AND d.id_contrato $wic ";
+		$where_liquidaciones .= " AND cobro.id_contrato $wic ";
 
 		$join_gastos .= ' JOIN asunto a ON a.codigo_asunto = cc.codigo_asunto ';
-		$where_gastos .= " AND a.id_contrato = '$id_contrato' ";
+		$where_gastos .= " AND a.id_contrato $wic ";
 	}
 
 	if (!empty($encargado_comercial)) {
@@ -148,7 +161,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			d.codigo_cliente = '$codigo_cliente'
 			$where_adelantos
 		)";
-		//$where_gastos .= "";
 	}
 
 	$concat_asunto = '';

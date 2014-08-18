@@ -273,8 +273,6 @@ if ($opc == 'refrescar') {
 					$saldo_gastos_sin_impuestos += $datos_factura['subtotal_gastos_sin_impuesto'] * $mult;
 				}
 
-
-
 				$Factura = new Factura($sesion);
 				$Factura->Load($datos_factura['id_factura']);
 

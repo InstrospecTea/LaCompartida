@@ -41,12 +41,22 @@ class Html extends \Html {
 		$html = '';
 		if (is_array($attributes)) {
 			foreach ($attributes as $name => $value) {
+				if ($value === true) {
+					$value = $name;
+				} else if ($value === false) {
+					continue;
+				}
 				$html .= sprintf(' %s="%s"', $name, $value);
 			}
 		} else {
 			$html = $attributes;
 		}
 		return $html;
+	}
+
+	public function img($image, $attributes) {
+		$attr = array_merge(array('src' => $image), $attributes);
+		return $this->tag('img', '', $attr, true);
 	}
 
 	/**
@@ -77,8 +87,8 @@ class Html extends \Html {
 	 *
 	 * @param type $script_block
 	 */
-	public function script_block($script_block) {
-		return $this->tag('script', $script_block, array('type' => 'text/javascript'));
+	public function script_block($script_block, $attrs = null) {
+		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs));
 	}
 
 	/**
@@ -90,4 +100,3 @@ class Html extends \Html {
 	}
 
 }
-
