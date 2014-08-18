@@ -69,6 +69,7 @@ class integracion_moreno_baldivieso extends AppShell {
 
 					$Agreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
 					$Agreement->Edit('forma_cobro', 'FLAT FEE');
+					$Agreement->Edit('id_tarifa', 1);
 
 					if ($Agreement->Write()) {
 						$Client->Edit('id_contrato', $Agreement->fields['id_contrato']);
