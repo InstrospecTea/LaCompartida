@@ -135,53 +135,11 @@ EOF;
 	}
 
 	public static function AnulaFacturaElectronica($hookArg) {
-		$Sesion = new Sesion();
-		$Factura = $hookArg['Factura'];
-
-		if (!$Factura->FacturaElectronicaCreada()) {
-			return $hookArg;
-		}
-
-		$Estudio = new PrmEstudio($Sesion);
-		$Estudio->Load($Factura->fields['id_estudio']);
-		$rut = $Estudio->GetMetaData('rut');
-		$usuario = $Estudio->getMetadata('facturacion_electronica_cl.usuario');
-		$password = $Estudio->getMetadata('facturacion_electronica_cl.password');
-		$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
-		if ($WsFacturacionCl->hasError()) {
-			$hookArg['Error'] = array(
-				'Code' => $WsFacturacionCl->getErrorCode(),
-				'Message' => $WsFacturacionCl->getErrorMessage()
-			);
-		} else {
-			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
-			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
-			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-			$WsFacturacionCl->anularFactura($Factura->fields['numero'], $tipoDTE);
-			if (!$WsFacturacionCl->hasError()) {
-				try {
-					$estado_dte = Factura::$estados_dte['Anulado'];
-					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
-					$Factura->Edit('dte_estado', $estado_dte);
-					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
-					$Factura->Write();
-				} catch (Exception $ex) {
-					$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
-				}
-			} else {
-				$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
-				$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
-				$estado_dte = Factura::$estados_dte['ProcesoAnular'];
-				$Factura->Edit('dte_estado', $estado_dte);
-				$Factura->Edit('dte_estado_descripcion', $mensaje);
-				$Factura->Write();
-			}
-		}
 		return $hookArg;
 	}
 
 	/**
-	 * Genera CSV de datos de la factura para enviar a NuBox
+	 * Genera CSV de datos de la factura para enviar a Nubox
 	 * @param Sesion $Sesion
 	 * @param Factura $Factura
 	 * @return array
@@ -233,10 +191,9 @@ EOF;
 				'FOLIO' => $Factura->fields['numero'],
 				'SECUENCIA' => ++$item,
 				'FECHA' => Utiles::sql2date($Factura->fields['fecha'], '%d-%m-%Y'),
-				//'razon_social' => $Estudio->GetMetaData('razon_social'),
 				'RUT' => preg_replace('/\./', '', $Factura->fields['RUT_cliente']),
 				'RAZONSOCIAL' => UtilesApp::transliteration($Factura->fields['cliente']),
-				'GIRO' => UtilesApp::transliteration($Factura->fields['giro_cliente']),
+				'GIRO' => substr(UtilesApp::transliteration($Factura->fields['giro_cliente']), 0, 40),
 				'COMUNA' => UtilesApp::transliteration($Factura->fields['comuna_cliente']),
 				'DIRECCION' => UtilesApp::transliteration($Factura->fields['direccion_cliente']),
 				'AFECTO' => $afecto,
@@ -265,20 +222,10 @@ EOF;
 				'TERMINOSPAGOSDIAS' => '',
 				'TERMINOSPAGOCODIGO' => '',
 				'COMUNADESTINO' => '',
-				'RUTSOLICITANTEFACTURA' => '',
-//				'Sub Total' => $Moneda->getFloat($detalle_factura['precio_unitario'] * $detalle_factura['cantidad']),
-//				'monto_iva' => $Moneda->getFloat($Factura->fields['iva']),
-//				'monto_total' => $Moneda->getFloat($Factura->fields['total']),
-//				'moneda' => $Moneda->fields['codigo'],
-//				'tasa_iva' => $Factura->fields['porcentaje_impuesto'],
-//				'tipo_cambio' => $Moneda->getFloat($Moneda->fields['tipo_cambio']),
-//				'Precio' => $Moneda->getFloat($Factura->fields['total'] * $Moneda->fields['tipo_cambio']),
-//				'moneda_precio' => $Moneda->fields['codigo'],
-//				'fecha_vencimiento' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
-
+				'RUTSOLICITANTEFACTURA' => ''
 			);
 		}
-		pr($arrayFactura);
+
 		if (!empty($arrayFactura)) {
 			array_unshift($arrayFactura, array_keys($arrayFactura[0]));
 		}

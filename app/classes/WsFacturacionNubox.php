@@ -48,26 +48,6 @@ class WsFacturacionNubox {
 		$respuesta = $this->Client->CargarYEmitir($datos);
 		pr($this->Client->__getLastRequest());
 		return $respuesta;
-		exit;
-	}
-
-	public function anularFactura($folio, $tipo) {
-		return $this->anularDocumento('V', $folio, $tipo);
-	}
-
-	public function getXmlDte($documento) {
-		$params = array(
-			'login' => $this->getLogin(),
-			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
-			'folio' => base64_encode($documento['Folio']),
-			'tipo' => base64_encode($documento['TipoDte'])
-		);
-		try {
-			$xml64 = $this->Client->getXMLDte($params);
-		} catch (SoapFault $sf) {
-			$xml64 = base64_encode('');
-		}
-		return base64_decode($xml64);
 	}
 
 	public function getPdfUrl($documento, $original = false) {
@@ -107,24 +87,10 @@ class WsFacturacionNubox {
 		$this->errorMessage = $message;
 	}
 
-	private function anularDocumento($tpomov, $folio, $tipo) {
-		$login = $this->getLogin();
-		$params = array(
-			'login' => $login,
-			'tpomov' => base64_encode($tpomov),
-			'folio' => base64_encode($folio),
-			'tipo' => base64_encode($tipo)
-		);
-		$respuesta = $this->Client->EliminarDoc($params);
-		Log::write(print_r($respuesta, true), 'FacturacionElectronicaCl');
-		$sxmle = new SimpleXMLElement($respuesta->EliminarDocResult);
-		$xml = self::XML2Array($sxmle);
-		if ($xml['Mensaje']['Resultado'] != 'OK') {
-			$this->setError(1, $xml['Mensaje']['Resultado']);
-		}
-		return $xml;
-	}
-
+	/**
+	 * Obtiene un hash de acceso desde el WS de Nubox
+	 * @return boolean
+	 */
 	private function login() {
 		$login = array(
 			'rutCliente' => $this->rutCliente,
@@ -135,9 +101,8 @@ class WsFacturacionNubox {
 		);
 
 		try {
-			$loginClient = new SoapClient($this->url_login, array('trace' => 1));
+			$loginClient = new SoapClient($this->url_login, array('trace' => 0));
 			$resultado = $loginClient->Autenticar($login);
-			pr($loginClient->__getLastRequest());
 			$this->token = $resultado->AutenticarResult;
 		} catch (Exception $se) {
 			$this->setError(530, __('Acceso denegado.'));
