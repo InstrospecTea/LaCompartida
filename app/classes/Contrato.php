@@ -1294,7 +1294,6 @@ class Contrato extends Objeto {
 						$this->fields['id_contrato']=$insertid;
 						$this->Edit('id_contrato',$insertid);
 						$this->Load($insertid);
-						print_r($contrato->fields);
 					} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);

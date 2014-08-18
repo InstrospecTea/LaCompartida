@@ -134,7 +134,7 @@ if ($opcion == "guardar") {
 		}
 
 		$gasto->Edit("codigo_factura_gasto", $numero_factura_asociada ? $numero_factura_asociada : "NULL");
-		$gasto->Edit("fecha_factura", $fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "");
+		$gasto->Edit("fecha_factura", $fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "NULL");
 		$gasto->Edit("numero_ot", $numero_ot ? $numero_ot : "NULL");
 
 		if ($elimina_ingreso != '') {

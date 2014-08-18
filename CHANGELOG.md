@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix: 14.11.3
+Miércoles 13 de Agosto 2014
+* **Fixed:** [Cambios, reubicación y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)
+
+## Hotfix: 14.11.2
+Martes 12 de Agosto 2014
+* **Fixed:** [Reporte historial de movimientos con querys no costosas computacionalmente.](https://github.com/LemontechSA/ttb/pull/636)
+
+## Hotfix: 14.11.1
+Martes 12 de Agosto 2014
+* **Added:** [Actualiza con usuario admin.](https://github.com/LemontechSA/ttb/pull/635)
+
+## Release: 14.11.0
+Lunes 11 de Agosto 2014
+* **Fixed:** [Feature/reporte historial movimientos 2](https://github.com/LemontechSA/ttb/pull/627)
+
+## Hotfix: 14.10.1
+Lunes 11 de Agosto 2014
+* **Added:** [Agrega tags a segmento resumen asuntos](https://github.com/LemontechSA/ttb/pull/633)
+
 ## Release: 14.10.0
 Jueve 7 de Agosto 2014
 * **Fixed:** [Feature/modificaciones lloredacamacho](https://github.com/LemontechSA/ttb/pull/626)

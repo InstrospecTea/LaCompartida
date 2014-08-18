@@ -52,7 +52,7 @@
 	if(!$where)
 		$where = 1;
 
-    $query = "SELECT SQL_CALC_FOUND_ROWS id_cobro_historial, fecha, comentario, CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as nombre 
+    $query = "SELECT SQL_CALC_FOUND_ROWS id_cobro_historial, fecha, comentario, CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as nombre
 											FROM cobro_historial
                                             LEFT JOIN usuario ON usuario.id_usuario = cobro_historial.id_usuario
                                             WHERE id_cobro = '$id_cobro' AND $where";
