@@ -137,9 +137,10 @@ EOF;
 				var url = root_dir + '/app/ajax.php';
 				jQuery.get(url, {accion:'cargar_glosa_asunto', codigo_asunto: codigo_asunto}, function(response) {
 					if (response) {
+						jQuery('#{$campo_codigo_asunto}').data('no-clear', 1);
 						jQuery('#glosa_asunto').val(response.glosa_asunto).data('autoselect', 1);
 					} else {
-						jQuery('#glosa_asunto').val();
+						jQuery('#glosa_asunto').val('');
 					}
 					CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 				}, 'json');
