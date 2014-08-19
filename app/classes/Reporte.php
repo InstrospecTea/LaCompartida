@@ -39,7 +39,7 @@ class Reporte {
 	//Cuanto se repite la fila para cada agrupador
 	public $filas = array();
 
-	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar');
+	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar');
 
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
@@ -116,6 +116,7 @@ class Reporte {
 				break;
 
 			case "horas_cobradas":
+			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
 			case "valor_hora":
 			case "rentabilidad":
@@ -667,7 +668,7 @@ class Reporte {
 
 		switch ($this->tipo_dato) {
 			case "valor_cobrado_no_estandar":
-				$s .= "SUM((IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600))";
+				$s .= "SUM((IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 				break;
 			case "horas_trabajadas":
 			case "horas_no_cobrables":
@@ -1405,6 +1406,7 @@ class Reporte {
 			case "horas_incobrables":
 				return "Hrs.";
 			case "valor_por_cobrar":
+			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
 			case "valor_pagado":
 			case "valor_por_pagar":
@@ -1468,6 +1470,7 @@ class Reporte {
 		switch ($tipo_dato) {
 			case "valor_por_cobrar":
 			case "valor_cobrado":
+			case "valor_cobrado_no_estandar":
 			case "valor_pagado":
 			case "valor_por_pagar":
 			case "valor_incobrable":
