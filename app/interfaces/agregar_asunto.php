@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
+$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 
 $tip_tasa = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
@@ -975,7 +976,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 							<td align="left">
 								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
 								<?php echo __('Categoría de asunto') ?>
-								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_tipo_proyecto", 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
+								<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
 							</td>
 						</tr>
 						<tr>
@@ -983,7 +984,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								<?php echo __('Área') . ' ' . __('asunto') ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
+								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden ASC'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
 							</td>
 						</tr>
 						<tr>

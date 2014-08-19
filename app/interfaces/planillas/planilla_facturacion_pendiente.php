@@ -379,11 +379,14 @@ if ($xls) {
 	}
 
 	$querycobros = "SELECT
+					asunto.codigo_asunto,
 					GROUP_CONCAT( asunto.codigo_asunto ) AS codigos_asuntos,
 					$codigos_asuntos_secundarios
+					asunto.glosa_asunto,
 					GROUP_CONCAT( asunto.glosa_asunto ) AS asuntos,
 					$codigo_asunto_secundario_sep
 					GROUP_CONCAT( IF(asunto.cobrable = 1, 'SI', 'NO') ) AS asuntos_cobrables,
+					cliente.glosa_cliente,
 					GROUP_CONCAT( cliente.glosa_cliente ) AS clientes,
 					CONCAT_WS(' ', ec.nombre, ec.apellido1, ec.apellido2) AS nombre_encargado_comercial,
 					ec.username as username_encargado_comercial,

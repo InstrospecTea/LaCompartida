@@ -86,15 +86,18 @@ class Funciones {
 	}
 
 	function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {
-		if ($id__tramite_tarifa == "") {
+		if ($id_tramite_tarifa == "") {
 			$query = "SELECT contrato.id_tramite_tarifa FROM asunto JOIN contrato ON asunto.id_contrato=contrato.id_contrato WHERE asunto.codigo_asunto = '$codigo_asunto' ";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			list($id_tramite_tarifa) = mysql_fetch_array($resp);
 		}
 
+		if (empty($id_tramite_tarifa)) {
+			return null;
+		}
+
 		$query = "SELECT tarifa FROM tramite_valor JOIN tramite_tarifa ON tramite_valor.id_tramite_tarifa=tramite_tarifa.id_tramite_tarifa
 							WHERE id_tramite_tipo='$id_tramite_tipo' AND id_moneda='$id_moneda' AND tramite_valor.id_tramite_tarifa='$id_tramite_tarifa'";
-
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$checktarifa = mysql_num_rows($resp);
 		if ($checktarifa > 0) {
@@ -109,6 +112,7 @@ class Funciones {
 						WHERE tv.id_tramite_tipo = '$id_tramite_tipo'
 						  AND tv.id_tramite_tarifa = '$id_tramite_tarifa'
 						GROUP BY tv.id_tramite_tipo;";
+
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			$arreglo = mysql_fetch_array($resp);
 			return $arreglo['valor_tramite'];
