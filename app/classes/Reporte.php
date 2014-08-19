@@ -666,6 +666,9 @@ class Reporte {
 		$datos_monedas = "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio";
 
 		switch ($this->tipo_dato) {
+			case "valor_cobrado_no_estandar":
+				$s .= "SUM((IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600))";
+				break;
 			case "horas_trabajadas":
 			case "horas_no_cobrables":
 				$s .= "SUM(TIME_TO_SEC( trabajo.duracion ))/3600.0";

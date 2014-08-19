@@ -203,7 +203,7 @@ if ($lista_usuarios == "")
 	$lista_usuarios = 'NULL';
 
 //Inicializo el arreglo de resultados
-$tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado');
+$tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado_no_estandar', 'valor_cobrado');
 foreach ($usuarios as $usuario) {
 	foreach ($tipo_dato as $td) {
 		$reporte = new Reporte($sesion);
@@ -296,7 +296,7 @@ function Print_Prof(& $ws1, $td) {
 	global $formatos_moneda_morado;
 	global $formatos_moneda_asunto;
 	global $formatos_moneda_asunto2;
-	$fila_titulos = 13;
+	$fila_titulos = 14;
 	$time_periodo = strtotime($fecha_ini);
 
 
@@ -310,9 +310,11 @@ function Print_Prof(& $ws1, $td) {
 	$ws1->write(++$filas, 1, __('FECHA REPORTE'), $formato_morado);
 	$ws1->write($filas, 2, "$hoy", $formato_morado);
 	$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 	$ws1->write(++$filas, 1, __('PERIODO'), $formato_morado);
 	$ws1->write($filas, 2, Utiles::sql2date($fecha_ini) . ' a ' . Utiles::sql2date($fecha_fin), $formato_morado);
 	$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 	$ws1->setColumn(1, 2, 28);
 	//Aqui normalmente debería rellenar, pero como tengo el resultado 'Horas Trabajadas', este tiene siempre el universo de resultados.
 	//(Si un mes aparece en alguno, aparecerá en Horas Trabajadas).
@@ -323,28 +325,38 @@ function Print_Prof(& $ws1, $td) {
 		$ws1->write($fila_titulos, 1, __('Horas Trabajadas'), $formato_titulo);
 		$ws1->write($fila_titulos, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos, 1, $fila_titulos, 2);
+
 		$ws1->write($fila_titulos + 1, 1, __('Hrs. Liquidadas'), $formato_titulo);
 		$ws1->write($fila_titulos + 1, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 1, 1, $fila_titulos + 1, 2);
+
 		$ws1->write($fila_titulos + 2, 1, __('Hrs. por Liquidar'), $formato_titulo);
 		$ws1->write($fila_titulos + 2, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 2, 1, $fila_titulos + 2, 2);
+
 		$ws1->write($fila_titulos + 3, 1, __('Hrs. Castigadas'), $formato_titulo);
 		$ws1->write($fila_titulos + 3, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 3, 1, $fila_titulos + 3, 2);
+
 		$ws1->write($fila_titulos + 4, 1, __('Hrs. no Cobrables'), $formato_titulo);
 		$ws1->write($fila_titulos + 4, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 4, 1, $fila_titulos + 4, 2);
+
 		$ws1->write($fila_titulos + 5, 1, __('monto_facturado'), $formato_titulo);
 		$ws1->write($fila_titulos + 5, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 5, 1, $fila_titulos + 5, 2);
-		$ws1->write($fila_titulos + 6, 1, __('Cliente - Asunto'), $formato_titulo);
-		$ws1->write($fila_titulos + 6, 2, __('Encargado Comercial'), $formato_titulo);
+
+		$ws1->write($fila_titulos + 6, 1, __('monto_facturado').__('(E)'), $formato_titulo);
+		$ws1->write($fila_titulos + 6, 2, '', $formato_titulo);
+		$ws1->mergeCells($fila_titulos + 6, 1, $fila_titulos + 6, 2);
+
+		$ws1->write($fila_titulos + 7, 1, __('Cliente - Asunto'), $formato_titulo);
+		$ws1->write($fila_titulos + 7, 2, __('Encargado Comercial'), $formato_titulo);
 
 
 
 
-		$fila_base = 20;
+		$fila_base = 22;
 		foreach ($r['labels'] as $id_lab => $label) {
 			if ($fila_base % 2) {
 				$formato = $formato_cliente_asunto2;
@@ -379,34 +391,45 @@ function Print_Prof(& $ws1, $td) {
 		foreach ($arr_col as $columna) {
 			$id_col = $columna['id'];
 			$fecha = $columna['fecha'];
+
 			$ws1->write($fila_titulos - 1, $col, date('M Y', $fecha), $formato_periodo); //Se imprime el titulo del periodo
-			extender($ws1, $fila_titulos - 1, $col, 5, $formato_periodo);
+			extender($ws1, $fila_titulos - 1, $col, 6, $formato_periodo);
+
 			$ws1->write($fila_titulos, $col, n($td['horas_trabajadas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
-			extender($ws1, $fila_titulos, $col, 5, $formato_periodo);
+			extender($ws1, $fila_titulos, $col, 6, $formato_periodo);
+
 			$ws1->write($fila_titulos + 1, $col, n($td['horas_cobradas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
-			extender($ws1, $fila_titulos + 1, $col, 5, $formato_periodo);
+			extender($ws1, $fila_titulos + 1, $col, 6, $formato_periodo);
+
 			$ws1->write($fila_titulos + 2, $col, n($td['horas_por_cobrar']['labels_col'][$id_col]['total']), $formato_duracion_totales);
-			extender($ws1, $fila_titulos + 2, $col, 5, $formato_periodo);
+			extender($ws1, $fila_titulos + 2, $col, 6, $formato_periodo);
+
 			$ws1->write($fila_titulos + 3, $col, n($td['horas_castigadas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
-			extender($ws1, $fila_titulos + 3, $col, 5, $formato_periodo);
+			extender($ws1, $fila_titulos + 3, $col, 6, $formato_periodo);
+
 			$ws1->write($fila_titulos + 4, $col, n($td['horas_no_cobrables']['labels_col'][$id_col]['total']), $formato_duracion_totales);
-			extender($ws1, $fila_titulos + 4, $col, 5, $formato_periodo);
-			$ws1->write($fila_titulos + 5, $col, n($td['valor_cobrado']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
-			extender($ws1, $fila_titulos + 5, $col, 5, $formato_periodo);
+			extender($ws1, $fila_titulos + 4, $col, 6, $formato_periodo);
+
+			$ws1->write($fila_titulos + 5, $col, n($td['valor_cobrado_no_estandar']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
+			extender($ws1, $fila_titulos + 5, $col, 6, $formato_periodo);
+
+			$ws1->write($fila_titulos + 6, $col, n($td['valor_cobrado']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
+			extender($ws1, $fila_titulos + 6, $col, 6, $formato_periodo);
 
 
 			#Títulos columnas verticales
-			$ws1->write($fila_titulos + 6, $col, __('Hrs. Liquidadas'), $formato_titulo_rotado);
-			$ws1->write($fila_titulos + 6, $col + 1, __('Hrs. por Liquidar'), $formato_titulo_rotado);
-			$ws1->write($fila_titulos + 6, $col + 2, __('Hrs. Castigadas'), $formato_titulo_rotado);
-			$ws1->write($fila_titulos + 6, $col + 3, __('Hrs. no Cobrables'), $formato_titulo_rotado);
-			$ws1->write($fila_titulos + 6, $col + 4, __('Cobrado'), $formato_titulo_rotado);
-			$ws1->setColumn($col + 4, $col + 4, 15);
+			$ws1->write($fila_titulos + 7, $col, __('Hrs. Liquidadas'), $formato_titulo_rotado);
+			$ws1->write($fila_titulos + 7, $col + 1, __('Hrs. por Liquidar'), $formato_titulo_rotado);
+			$ws1->write($fila_titulos + 7, $col + 2, __('Hrs. Castigadas'), $formato_titulo_rotado);
+			$ws1->write($fila_titulos + 7, $col + 3, __('Hrs. no Cobrables'), $formato_titulo_rotado);
+			$ws1->write($fila_titulos + 7, $col + 4, __('Cobrado'), $formato_titulo_rotado);
+			$ws1->write($fila_titulos + 7, $col + 5, __('Cobrado').__(' (E)'), $formato_titulo_rotado);
+			$ws1->setColumn($col + 5, $col + 5, 15);
 
 
 			#celdas
-			$fila_inicio = 20;
-			$fila_base = 20;
+			$fila_inicio = 22;
+			$fila_base = 22;
 			foreach ($r['labels'] as $id_lab => $label) {
 				if ($fila_base % 2) {
 					$formato = $formato_cliente_asunto2;
@@ -419,8 +442,8 @@ function Print_Prof(& $ws1, $td) {
 				$ws1->writeNumber($fila_base, $col + 1, Reporte::FormatoValor($sesion, number_format($td['horas_por_cobrar']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato);
 				$ws1->writeNumber($fila_base, $col + 2, Reporte::FormatoValor($sesion, number_format($td['horas_castigadas']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato);
 				$ws1->writeNumber($fila_base, $col + 3, Reporte::FormatoValor($sesion, number_format($td['horas_no_cobrables']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato);
-				$ws1->writeNumber($fila_base, $col + 4, n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
-
+				$ws1->writeNumber($fila_base, $col + 4, n($td['valor_cobrado_no_estandar']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
+				$ws1->writeNumber($fila_base, $col + 5, n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
 				$fila_base++;
 			}
 			#totales
@@ -430,7 +453,7 @@ function Print_Prof(& $ws1, $td) {
 			$ws1->WriteFormula($fila_base, $col + 2, '=SUM(' . excel_column($col + 2) . "$fila_inicio:" . excel_column($col + 2) . ($fila_base) . ')', $formato_duracion_totales);
 			$ws1->WriteFormula($fila_base, $col + 3, '=SUM(' . excel_column($col + 3) . "$fila_inicio:" . excel_column($col + 3) . ($fila_base) . ')', $formato_duracion_totales);
 			$ws1->WriteFormula($fila_base, $col + 4, '=SUM(' . excel_column($col + 4) . "$fila_inicio:" . excel_column($col + 4) . ($fila_base) . ')', $formatos_moneda_totales[CTEMONEDA]);
-
+			$ws1->WriteFormula($fila_base, $col + 5, '=SUM(' . excel_column($col + 5) . "$fila_inicio:" . excel_column($col + 5) . ($fila_base) . ')', $formatos_moneda_totales[CTEMONEDA]);
 			#FIN de una columna
 			$col+=5;
 		}
@@ -438,25 +461,33 @@ function Print_Prof(& $ws1, $td) {
 		$ws1->write(++$filas, 1, __('HORAS TRABAJADAS'), $formato_morado);
 		$ws1->write($filas, 2, $td['horas_trabajadas']['total'], $formato_duracion_morado);
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 		$ws1->write(++$filas, 1, __('MONTO FACTURADO'), $formato_morado);
 		//$ws1->write($filas, 2, $td['valor_cobrado']['total'], $formatos_moneda_morado[CTEMONEDA]);
 		$ws1->write($filas, 2, '=SUM(D' . ($fila_titulos + 6) . ':FF' . ($fila_titulos + 6) . ')', $formatos_moneda_morado[CTEMONEDA]); // ojo, para la clase la fila titulos+6 es la 20, para el excel es la 19
-
-
-
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
+		$ws1->write(++$filas, 1, __('MONTO FACTURADO').__(' (E)'), $formato_morado);
+		//$ws1->write($filas, 2, $td['valor_cobrado']['total'], $formatos_moneda_morado[CTEMONEDA]);
+		$ws1->write($filas, 2, '=SUM(D' . ($fila_titulos + 7) . ':FF' . ($fila_titulos + 7) . ')', $formatos_moneda_morado[CTEMONEDA]); // ojo, para la clase la fila titulos+6 es la 20, para el excel es la 19
+		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 		$ws1->write(++$filas, 1, __('HORAS LIQUIDADAS'), $formato_morado);
 		$ws1->write($filas, 2, $td['horas_cobradas']['total'], $formato_duracion_morado);
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 		$ws1->write(++$filas, 1, __('HORAS POR LIQUIDAR'), $formato_morado);
 		$ws1->write($filas, 2, $td['horas_por_cobrar']['total'], $formato_duracion_morado);
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 		$ws1->write(++$filas, 1, __('HORAS CASTIGADAS'), $formato_morado);
 		$ws1->write($filas, 2, $td['horas_castigadas']['total'], $formato_duracion_morado);
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 		$ws1->write(++$filas, 1, __('HORAS NO COBRABLES'), $formato_morado);
 		$ws1->write($filas, 2, $td['horas_no_cobrables']['total'], $formato_duracion_morado);
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
+
 	} else {
 		$filas+=3;
 		$ws1->write($filas, 1, __('No se encontraron Trabajos.'), $formato_cliente_asunto);
