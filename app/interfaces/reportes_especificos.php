@@ -168,6 +168,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_alertas_graficas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Alertas') ?></a></li>
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_saldo.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Saldo Clientes') ?></a></li>
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_deudas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Antigüedad Deudas Clientes') ?></a></li>
+														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_rentabilidad_profesional.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Rentabilidad Profesional')?></a></li>
 													</ul>
 												</td>
 											</tr>
