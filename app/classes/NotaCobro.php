@@ -10334,22 +10334,45 @@ class NotaCobro extends Cobro {
 		$monto_total += (float) $saldo;
 		$monto_total_simbolo = $moneda['simbolo'] . $this->espacio . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-		$saldo_total_contrato = $seccion_detalle_pago_contrato['saldo_total_contrato'];
+		//	Obtiene moneda base para hacer calculos segun la moneda opc_moneda_total
+		$moneda_base = Utiles::MonedaBase($this->sesion);
+
+		//	Calculo de monto segun opc_moneda_total
+		//	$saldo_total_contrato = $seccion_detalle_pago_contrato['saldo_total_contrato']; Esto No considera montos en "opc_moneda_total"
+		
+		$saldo_total_contrato = UtilesApp::CambiarMoneda(
+			$seccion_detalle_pago_contrato['saldo_total_contrato'],
+			$moneda_base['tipo_cambio'],
+			$moneda_base['cifras_decimales'],
+			$x_resultados['tipo_cambio_opc_moneda_total'],
+			$x_resultados['cifras_decimales_opc_moneda_total']
+		);
+
 		$saldo_total_cobro = $seccion_detalle_pago_contrato['saldo_total_cobro'];
-		$saldo_total_adeudado = $seccion_detalle_pago_contrato['saldo_total_adeudado'];
+
+		//$saldo_total_adeudado = $seccion_detalle_pago_contrato['saldo_total_adeudado']; Esto No considera montos en "opc_moneda_total"
+		$saldo_total_adeudado = UtilesApp::CambiarMoneda(
+			$seccion_detalle_pago_contrato['saldo_total_adeudado'],
+			$moneda_base['tipo_cambio'],
+			$moneda_base['cifras_decimales'],
+			$x_resultados['tipo_cambio_opc_moneda_total'],
+			$x_resultados['cifras_decimales_opc_moneda_total']
+		);
 
 		$documentos_de_pago .=number_format($saldo_pagos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		$documentos_de_adelanto .=number_format($saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		$pagos_liquidacion .=number_format($saldo_pagos + $saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
-
 		if (($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') && $saldo_total_cobro == 0) {
 			$saldo_total_cobro = $monto_total;
 		}
+
+		// Saldo Total Adeudado debe considerar el total del cobro
+		$saldo_total_adeudado = $saldo_total_adeudado + $saldo_total_cobro;
+
 		$saldo_total_cobro = number_format($saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		$saldo_total_contrato = number_format($saldo_total_contrato, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		$saldo_total_adeudado = number_format($saldo_total_adeudado, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
 
 		$htmltemporal = str_replace('%documentos_de_pago%', '<tr class="tr_total"><td>' . __('Pagos Realizados') . '</td><td align="right">' . $moneda['simbolo'] . $this->espacio . $documentos_de_pago . '</td></tr>', $htmltemporal);
 		$htmltemporal = str_replace('%documentos_de_adelanto%', '<tr class="tr_total"><td>' . __('Adelantos Utilizados') . '</td><td align="right">' . $moneda['simbolo'] . $this->espacio . $documentos_de_adelanto . '</td></tr>', $htmltemporal);
