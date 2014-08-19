@@ -63,10 +63,10 @@ class Autocompletador {
 
 				jQuery('#{$campo_codigo_cliente}').change(function() {
 					$onchange;
-					if (!jQuery('#{$campo_codigo_asunto}').data('no-clear')) {
+					var codigo = jQuery('#{$campo_codigo_asunto}').val().split('-').shift();
+					if (jQuery(this).val() != codigo) {
 						jQuery('#{$campo_codigo_asunto}').val('').change();
 					}
-					jQuery('#{$campo_codigo_asunto}').data('no-clear', 0);
 				});
 
 				jQuery('#glosa_cliente').autocomplete({

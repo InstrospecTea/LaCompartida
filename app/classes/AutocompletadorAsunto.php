@@ -101,9 +101,6 @@ EOF;
 							);
 						},
 						select: function(event, ui) {
-							if (jQuery('#{$campo_codigo_cliente}').val() == '') {
-								jQuery('#{$campo_codigo_asunto}').data('no-clear', 1);
-							}
 							jQuery('#{$campo_codigo_asunto}').val(ui.item.id);
 							CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 							jQuery('#{$campo_codigo_asunto}').change();
@@ -137,7 +134,6 @@ EOF;
 				var url = root_dir + '/app/ajax.php';
 				jQuery.get(url, {accion:'cargar_glosa_asunto', codigo_asunto: codigo_asunto}, function(response) {
 					if (response) {
-						jQuery('#{$campo_codigo_asunto}').data('no-clear', 1);
 						jQuery('#glosa_asunto').val(response.glosa_asunto).data('autoselect', 1);
 					} else {
 						jQuery('#glosa_asunto').val('');
