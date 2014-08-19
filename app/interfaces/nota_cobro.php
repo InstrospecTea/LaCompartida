@@ -6,6 +6,7 @@ $NotaCobro = new NotaCobro($sesion);
 
 if ($opc == 'guardar') {
 	$id_formato = $NotaCobro->GuardarCarta($nota);
+	die(json_encode(array('id' => $id_formato)));
 } else if ($opc == 'prev') {
 	$id_formato = $NotaCobro->PrevisualizarDocumento($nota, $id_cobro);
 } else {
@@ -33,7 +34,7 @@ $template_parts = array(
 	<?php echo $Form->submit(__('Editar')); ?>
 </form>
 <hr/>
-<form method="POST">
+<form method="POST" id="form_nota_cobro">
 	<input type="hidden" name="opc" value="guardar"/>
 	<input type="hidden" name="nota[id_formato]" value="<?php echo $nota['id_formato']; ?>"/>
 	<p>
@@ -84,19 +85,20 @@ $template_parts = array(
 		<?php } ?>
 	</div>
 	<div style="padding: 23px">
-		<input type="submit" value="Guardar" id="btn_guardar"/>
-		<input type="submit" value="Guardar como nueva carta" id="btn_guardar_nueva"/>
+		<?php echo $Form->button('Guardar', array('id' => 'btn_guardar')); ?>
+		<?php echo $Form->button('Guardar como nueva carta', array('id' => 'btn_guardar_nueva')); ?>
 		<br/>
 		<br/>
 		<label>Previsualizar con el cobro N° <input name="id_cobro" value="<?php echo $id_cobro; ?>"/></label>
-		<input type="submit" value="Previsualizar documento" id="btn_previsualizar"/>
-		<input type="button" value="Ver valores de tags" id="btn_valores"/>
+		<?php echo $Form->button('Previsualizar documento', array('id' => 'btn_previsualizar')); ?>
+		<?php echo $Form->button('Ver valores de tags', array('id' => 'btn_valores')); ?>
 	</div>
 	<hr/>
-	<h3>
-		Previsualización HTML
-		<button id="btn_previsualizar_html" type="button">Regenerar</button>
-	</h3>
+	<p style="text-align: center">
+		<strong>Previsualización HTML</strong>
+		<?php echo $Form->button('Regenerar', array('id' => 'btn_previsualizar_html')); ?>
+	</p>
+
 	<iframe id="previsualizacion_html" style="width:674px;height:730px"></iframe>
 </form>
 
@@ -113,15 +115,30 @@ $template_parts = array(
 
 		jQuery('.agregar_valor').live('click', AgregarValor);
 		jQuery('.agregar_seccion').live('click', AgregarSeccion);
-		jQuery('#btn_guardar').click(function() {
+		jQuery('#btn_guardar, #btn_guardar_nueva').click(function() {
 			jQuery('[name=opc]').val('guardar');
-		});
-		jQuery('#btn_guardar_nueva').click(function() {
-			jQuery('[name=opc]').val('guardar');
-			jQuery('[name="nota[id_formato]"]').val('');
+			if (jQuery(this).attr('id') === 'btn_guardar_nueva') {
+				jQuery('[name="nota[id_formato]"]').val('');
+
+			}
+			jQuery.each(CKEDITOR.instances, function(i) {
+				CKEDITOR.instances[i].updateElement();
+			});
+			var form = jQuery('#form_nota_cobro');
+			jQuery.post(form.attr('action'), form.serialize(), function(carta) {
+				if (carta.id) {
+					alerta('La nota de cobro se guardó correctamente.');
+					if (jQuery('[name="nota[id_formato]"]').val() != carta.id) {
+						window.location = '?id_formato=' + carta.id;
+					}
+				} else if (carta.error) {
+					alerta(carta.error);
+				}
+			}, 'json');
 		});
 		jQuery('#btn_previsualizar').click(function() {
 			jQuery('[name=opc]').val('prev');
+			jQuery('#form_nota_cobro').submit();
 		});
 		jQuery('#btn_valores').click(function() {
 			window.open('carta_test_valores.php?tipo=nota&id_cobro=' + jQuery('[name=id_cobro]').val());
@@ -133,14 +150,14 @@ $template_parts = array(
 		PrevisualizarHTML();
 
 		jQuery('.tabs').tabs();
-		
+
 		CKEDITOR.on('instanceReady', function() {
 			jQuery('.loader-overlay').fadeOut(300, function() {
 				jQuery(this).remove();
 			});
 		});
 	});
-	
+
 	function alerta(msg, type) {
 		var div = jQuery('<div/>', {style: 'margin-top: .5em;'})
 			.addClass('ui-corner-all')
@@ -152,7 +169,7 @@ $template_parts = array(
 			.delay(5000)
 			.fadeOut();
 	}
-	
+
 	function AgregarValor() {
 		var div = jQuery(this).closest('div');
 		AgregarHTML(div, div.find('.valores').val());

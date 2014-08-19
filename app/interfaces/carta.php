@@ -25,7 +25,7 @@ $Form = new Form;
 
 <form>
 	<?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, '', ' '); ?>
-	<?php echo $Form->button('Editar', array('id' => 'btn_editar')) ?>
+	<?php echo $Form->submit('Editar') ?>
 </form>
 <hr/>
 <form method="post" id="form_carta">
@@ -71,8 +71,10 @@ $Form = new Form;
 			</div>
 		<?php } ?>
 	</div>
-	<h4>CSS</h4>
-	<textarea name="carta[formato_css]" rows="12" cols="40" style="width: 98%"><?php echo $carta['formato_css']; ?></textarea>
+	<div>
+		<strong><?php echo $nombre; ?></strong>
+		<textarea name="nota[formato_css]" rows="15" cols="40" style="width: 98%"><?php echo $carta['formato_css']; ?></textarea>
+	</div>
 	<div style="padding: 23px">
 		<?php echo $Form->button('Guardar', array('id' => 'btn_guardar')); ?>
 		<?php echo $Form->button('Guardar como nueva carta', array('id' => 'btn_guardar_nueva')); ?>
@@ -104,9 +106,6 @@ $Form = new Form;
 
 		jQuery('.agregar_valor').live('click', AgregarValor);
 		jQuery('.agregar_seccion').live('click', AgregarSeccion);
-		jQuery('#btn_editar').click(function() {
-			window.location = '?id_carta=' + jQuery('[name=id_carta]').val();
-		});
 		jQuery('#btn_guardar, #btn_guardar_nueva').click(function() {
 			jQuery('[name=opc]').val('guardar');
 			if (jQuery(this).attr('id') === 'btn_guardar_nueva') {
