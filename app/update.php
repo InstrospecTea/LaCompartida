@@ -1329,6 +1329,7 @@ QUERY;
 			$queries[] = "ALTER TABLE `prm_excel_cobro` CHANGE glosa_es glosa_es VARCHAR(255), CHANGE glosa_en glosa_en VARCHAR(255)";
 			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto', 'Encabezado', 'Concepto', 'Concept', 0)";
 			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto_glosa', 'Encabezado', 'Servicios profesionales prestados a la compañía durante el mes de %s', 'Professional services provided to the company during %s', 0)";
+			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'detalle_cobranza', 'Encabezado', 'Detalle Cobranza', 'Detail Billing', 0)";
 			ejecutar($queries, $dbh);
 			break;
 	}

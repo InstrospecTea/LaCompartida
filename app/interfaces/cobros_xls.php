@@ -979,6 +979,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $contrato->fields['glosa_contrato'], $formato_encabezado);
 		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+		++$filas;
+
+		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'detalle_cobranza', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+		$ws->write($filas, $col_abogado, $contrato->fields['observaciones'], $formato_encabezado);
+		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 		$filas += 2;
 	}
 
