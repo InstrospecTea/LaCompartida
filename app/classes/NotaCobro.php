@@ -3871,6 +3871,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%resumen_asuntos%', __('Resumen Asuntos'), $html);
 				$html = str_replace('%RESUMEN_ASUNTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%RESUMEN_ASUNTOS_FILAS%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%RESUMEN_ASUNTOS_FILAS_FLAT_FEE%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_FILAS_FLAT_FEEa', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%RESUMEN_ASUNTOS_TOTAL%', $this->GenerarDocumento2($parser, 'RESUMEN_ASUNTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
@@ -4084,17 +4085,24 @@ class NotaCobro extends Cobro {
 					}
 				}
 
+				break;
+
+			case 'RESUMEN_ASUNTOS_FILAS_FLAT_FEE':
+
+				$row_tmpl = $html;
+				$html = '';
+
 				//	Asuntos Flat Fee : Lista asuntos asociados al cobro tabla "cobro_asuntos"
 
 				$query = "SELECT asunto.codigo_asunto, asunto.codigo_asunto_secundario, asunto.glosa_asunto FROM cobro_asunto LEFT JOIN asunto ON ( cobro_asunto.codigo_asunto = asunto.codigo_asunto ) WHERE id_cobro ='{$this->fields['id_cobro']}'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-				while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto) = mysql_fetch_array($resp)) {
+				while (list($codigo_asunto_secundario_ff, $codigo_asunto_secundario_ff, $glosa_asunto_ff) = mysql_fetch_array($resp)) {
 					$row = $row_tmpl;
 
-					$row = str_replace('%codigo_asunto_ff%', $codigo_asunto, $row);
-					$row = str_replace('%codigo_asunto_secundario_ff%', $codigo_asunto_secundario, $row);
-					$row = str_replace('%glosa_asunto_ff%', $glosa_asunto, $row);
+					$row = str_replace('%codigo_asunto_ff%', $codigo_asunto_secundario_ff, $row);
+					$row = str_replace('%codigo_asunto_secundario_ff%', $codigo_asunto_secundario_ff, $row);
+					$row = str_replace('%glosa_asunto_ff%', $glosa_asunto_ff, $row);
 
 					$html .= $row;
 				}
