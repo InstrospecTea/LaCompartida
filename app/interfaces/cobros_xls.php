@@ -982,7 +982,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		++$filas;
 	}
 
-	if (in_array($cobro->fields['estado'], array('CREADO', 'REVISION'))) {
+	if (in_array($cobro->fields['estado'], array('CREADO', 'EN REVISION'))) {
 		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'detalle_cobranza', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $contrato->fields['observaciones'], $formato_encabezado);
