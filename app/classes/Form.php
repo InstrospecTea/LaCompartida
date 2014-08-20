@@ -90,6 +90,9 @@ class Form {
 		$attrs = (Array) $attrs + array('type' => 'text', 'value' => $value, 'label' => true, 'name' => null);
 		$label = null;
 
+		if ($attrs['type'] == 'hidden') {
+			$attrs['label'] = false;
+		}
 		if ($attrs['label'] === true) {
 			$label = $this->Utiles->humanize($name);
 		} else if ($attrs['label'] !== false) {

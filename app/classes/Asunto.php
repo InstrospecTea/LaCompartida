@@ -947,18 +947,16 @@ class Asunto extends Objeto {
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
 	}
 
-	public function esPrimerAsunto($codigo_cliente = null) {
-		$primer_asunto = false;
-
+	public function permiteAsuntoIndependiente($codigo_cliente){
+		$permiso  = false;
 		if (!empty($codigo_cliente)) {
-			$query = "SELECT MIN({$this->tabla}.id_asunto) AS id_asunto FROM {$this->tabla} WHERE {$this->tabla}.codigo_cliente = '{$codigo_cliente}'";
+			$query = "SELECT COUNT(id_contrato_indep) as Total from {$this->tabla} WHERE {$this->tabla}.codigo_cliente= '{$codigo_cliente}' AND {$this->tabla}.id_contrato_indep=''";
 			$qr = $this->sesion->pdodbh->query($query);
-			$asunto = $qr->fetch(PDO::FETCH_ASSOC);
+			$total = $qr->fetch(PDO::FETCH_ASSOC);
+			$permiso = ($total['Total'] > 1 );
 
-			$primer_asunto = (empty($asunto) || $asunto['id_asunto'] == $this->fields['id_asunto']) ? true : false;
 		}
-
-		return $primer_asunto;
+		return $permiso;
 	}
 }
 
