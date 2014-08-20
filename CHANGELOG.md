@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.12.2
+Miercoles 20 de Agosto 2014
+* **New:** [Fusiona Carta Solo Gastos en formato Carta General](https://github.com/LemontechSA/ttb/pull/649)
+
 ## Hotfix: 14.12.1
 Miercoles 20 de Agosto 2014
 * **Fixed:** [Corrección a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/648)
