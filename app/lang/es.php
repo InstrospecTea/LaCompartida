@@ -838,7 +838,7 @@ $_LANG[', conforme a su equivalencia al '] = ", conforme a su equivalencia al ";
 $_LANG['%nombre_contacto_mb%'] = "%sr%<br>%NombreContacto%";
 $_LANG['%asunto_mb%'] = "Ref.:";
 $_LANG['%saludo_mb%'] = "De mi consideración:";
-$_LANG['%despedida_mb%'] = "Quedando a su disposición para cualquier comentario sobre el particular, saluda muy atentamente a ustedes,";
+$_LANG['%despedida_mb%'] = "Quedando a su disposición para cualquier comentario sobre el particular, saludan muy atentamente a ustedes,";
 
 #Carta JJR
 $_LANG['nota_morosidad_honorarios'] = "Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.";
@@ -854,7 +854,7 @@ $_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%num_letter% po
 #GASTOS
 $_LANG['%detalle_mb_gastos%'] ="<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>Adjunto ruego encontrar Nota de Cobro #%num_letter% de gastos por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los gastos asociados a servicios legales prestados %fecha% en relación al encargo profesional de la referencia, conforme a Boleta de Recuperación de Gastos adjunta.</td><td width='5%'>&nbsp;</td></tr>
 								<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>&nbsp;</td><td width='5%'>&nbsp;</td></tr>
-								<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>El pago se puede hacer mediante cheque, vale vista, depésito en cuenta corriente o transferencia electrónica a la siguiente cuenta corriente bancaria:</td><td width='5%'>&nbsp;</td></tr>";
+								<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>El pago se puede hacer mediante cheque, vale vista, depósito en cuenta corriente o transferencia electrónica a la siguiente cuenta corriente bancaria:</td><td width='5%'>&nbsp;</td></tr>";
 #DATOS DE CUENTA
 $_LANG['%cuenta_mb%'] = "<table width='100%' class='tabla_carta'>
 	<tr><td width='5%'>&nbsp;</td><td width='25%'>Titular</td><td width='75%'>: Morales Besa y Compañía Limitada</td></tr>
