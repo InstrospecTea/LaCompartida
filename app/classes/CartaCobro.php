@@ -1223,9 +1223,15 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%detalle_mb_ny%', __('%detalle_mb_ny_asuntos%'), $html2);
 					$html2 = str_replace('%detalle_mb_boleta%', __('%detalle_mb_boleta_asuntos%'), $html2);
 				} else {
-					$html2 = str_replace('%detalle_mb%', __('%detalle_mb%'), $html2);
 					$html2 = str_replace('%detalle_mb_ny%', __('%detalle_mb_ny%'), $html2);
 					$html2 = str_replace('%detalle_mb_boleta%', __('%detalle_mb_boleta%'), $html2);
+					if ($this->fields['monto_gastos'] > 0 && $this->fields['monto'] == 0) {
+						$html2 = str_replace('%detalle_mb%', __('%detalle_mb_gastos%'), $html2);
+						$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
+					} else {
+						$html2 = str_replace('%detalle_mb%', __('%detalle_mb%'), $html2);
+						$html2 = str_replace('%cuenta_mb%', '', $html2);
+					}
 				}
 
 				$this->LoadGlosaAsuntos();
@@ -1245,7 +1251,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%FILAS_FACTURAS_DEL_COBRO%', $this->GenerarDocumentoCartaComun($parser_carta, 'FILAS_FACTURAS_DEL_COBRO', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%FILA_FACTURAS_PENDIENTES%', $this->GenerarDocumentoCartaComun($parser_carta, 'FILA_FACTURAS_PENDIENTES', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 
-				$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
+				
 				$html2 = str_replace('%despedida_mb%', __('%despedida_mb%'), $html2);
 				$html2 = str_replace('%cuenta_mb_ny%', __('%cuenta_mb_ny%'), $html2);
 				$html2 = str_replace('%cuenta_mb_boleta%', __('%cuenta_mb_boleta%'), $html2);

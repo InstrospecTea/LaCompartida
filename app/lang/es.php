@@ -848,9 +848,24 @@ $_LANG['nota_morosidad'] = "";
 $_LANG['nota_disclaimer'] = "";
 
 #Carta MB Chile
-$_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%num_letter% %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha% en relación al encargo profesional de la referencia. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
+#HONORARIOS
+$_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%num_letter% por honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha% en relación al encargo profesional de la referencia. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
+
+#GASTOS
+$_LANG['%detalle_mb_gastos%'] ="<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>Adjunto ruego encontrar Nota de Cobro #%num_letter% de gastos por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los gastos asociados a servicios legales prestados %fecha% en relación al encargo profesional de la referencia, conforme a Boleta de Recuperación de Gastos adjunta.</td><td width='5%'>&nbsp;</td></tr>
+								<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>&nbsp;</td><td width='5%'>&nbsp;</td></tr>
+								<tr><td width='5%'>&nbsp;</td><td valign='top' align='left' class='detalle_mb' colspan='2'>El pago se puede hacer mediante cheque, vale vista, depésito en cuenta corriente o transferencia electrónica a la siguiente cuenta corriente bancaria:</td><td width='5%'>&nbsp;</td></tr>";
+#DATOS DE CUENTA
+$_LANG['%cuenta_mb%'] = "<table width='100%' class='tabla_carta'>
+	<tr><td width='5%'>&nbsp;</td><td width='25%'>Titular</td><td width='75%'>: Morales Besa y Compañía Limitada</td></tr>
+	<tr><td width='5%'>&nbsp;</td><td width='25%'>R.U.T.</td><td width='75%'>: 76.940.700-6</td></tr>
+	<tr><td width='5%'>&nbsp;</td><td width='25%'>Banco</td><td width='75%'>: Banco de Chile</td></tr>
+	<tr><td width='5%'>&nbsp;</td><td width='25%'>Cuenta N°</td><td width='75%'>: 0490268110</td></tr>
+	<tr><td width='5%'>&nbsp;</td><td width='25%'>E-mail</td><td width='75%'>: <span style='color:blue;'><u>cobranza@moralesybesa.cl</u></span></td></tr>
+</table>";
+#MAS DE UN ASUNTO
 $_LANG['%detalle_mb_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
-$_LANG['%cuenta_mb%'] = "";
+
 #Carta MB NY (NY)
 $_LANG['%detalle_mb_ny%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, por los servicios legales prestados a ustedes %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%. Agradeceremos efectuar el pago mediante transferencia bancaria a la siguiente cuenta:";
 $_LANG['%detalle_mb_ny_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, por los servicios legales prestados a ustedes %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%. Agradeceremos efectuar el pago mediante transferencia bancaria a la siguiente cuenta:";
