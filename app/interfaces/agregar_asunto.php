@@ -465,7 +465,7 @@ $AreaProyecto = new AreaProyecto($Sesion);
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
-
+$Form = new Form;
 if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 	$field_codigo_asunto_secundario = array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario']));
 
@@ -1058,9 +1058,9 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 
 				<?php
 				if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
-					$checked = 'checked';
+					$checked = true;
 				} else {
-					$checked = '';
+					$checked = false;
 				}
 
 				$hide_areas = false;
@@ -1073,7 +1073,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 
 					if ($codigo_cliente != '') {
 						// verificar si es el primer asunto del cliente
-						if ($Asunto->esPrimerAsunto($codigo_cliente) && empty($checked)) {
+						if ($Asunto->esPrimerAsunto($codigo_cliente) && !$checked) {
 							$hide_areas = true;
 						}
 					}
@@ -1083,8 +1083,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				<table width="100%" cellspacing="0" cellpadding="0">
 					<tr>
 						<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
-							<input type="checkbox" name="cobro_independiente" id="cobro_independiente" onclick="ShowContrato(this.form, this)" value="1" <?php echo $checked; ?>>
-							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente'); ?></label>
+							<?php echo $Form->checkbox('cobro_independiente', 1, $checked, array('label' =>__('Se cobrará de forma independiente'), 'onclick' => 'ShowContrato(this.form, this)')); ?>
 						</td>
 						<td id="tbl_copiar_datos" style="display:<?php echo !empty($checked) ? 'inline' : 'none'; ?>;">
 							&nbsp;
@@ -1092,15 +1091,15 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 					</tr>
 				</table>
 
-				<br>
+				<br/>
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-
 					<?php if (!$Sesion->usuario->Es('SASU')) {
 						$cliente = &$Cliente;
 						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
 					} ?>
 				</div>
-				<br>
+
+				<br/>
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
 					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
