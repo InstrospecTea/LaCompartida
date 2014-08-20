@@ -84,40 +84,42 @@ class Tarifa extends Objeto {
 		return $id_tarifa;
 	}
 
-	// Crea (o edita) una tarifa donde todos los usuarios tienen el mismo valor. retorna el id de la tarifa
+	/**
+	 * Crea o retorna una tarifa donde todos los usuarios tienen el mismo valor.
+	 * @param type $valor
+	 * @param type $id_moneda
+	 * @param type $id_tarifa
+	 * @return int id de la tarifa
+	 */
 	function GuardaTarifaFlat($valor, $id_moneda, $id_tarifa = null) {
-		/* logica pro?
-		  existe = se busca una tarifa con ese valor/moneda
-		  mia = si me pasaron un id y solo 1 contrato la esta usando (el q llamo la func)
-		  if(existe){
-		  if(mia) borro la q me pasaron
-		  return existe
-		  }
-		  else{
-		  if(mia) edito la q me pasaron
-		  else creo una nueva
-		  }
-		 */
-		$valor = str_replace(',', '.', $valor);
 
+		$valor = str_replace(',', '.', $valor);
 		$moneda = new Moneda($this->sesion);
 		$moneda->Load($id_moneda);
 		$glosa = 'Tarifa Flat por ' . $moneda->fields['simbolo'] . number_format($valor, $moneda->fields['cifras_decimales'], '.', '');
 
-		//si existe la tarifa y es flat, se edita, si no se crea
 		if (!empty($id_tarifa)) {
 			$this->Load($id_tarifa);
-			if (empty($this->fields['tarifa_flat'])) {
-				$this->fields[$this->campo_id] = null;
-				$id_tarifa = null;
+			if ($this->Loaded() && $this->fields['tarifa_flat'] == $valor && $this->fields['glosa_tarifa'] == $glosa) {
+				return $id_tarifa;
 			}
 		}
 
+		$query = "SELECT {$this->campo_id} FROM {$this->tabla} where glosa_tarifa = '{$glosa}' AND tarifa_flat = $valor ";
+		$resp = mysql_query($query, $this->sesion->dbh);
+		$tarifa = mysql_fetch_assoc($resp);
+
+		if ($tarifa !== false) {
+			return $tarifa[$this->campo_id];
+		}
+
+		$this->fields[$this->campo_id] = null;
 		$this->Edit('tarifa_flat', $valor);
 		$this->Edit('guardado', 1);
 		$this->Edit('glosa_tarifa', $glosa);
-		if (!$this->Write())
+		if (!$this->Write()) {
 			return false;
+		}
 
 		$id_tarifa = $this->fields[$this->campo_id];
 
@@ -140,8 +142,9 @@ class Tarifa extends Objeto {
 		$query = "SELECT t.id_tarifa FROM tarifa t LEFT JOIN contrato c ON t.id_tarifa = c.id_tarifa WHERE c.id_contrato IS NULL AND t.tarifa_flat IS NOT NULL";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while (list($id_tarifa_eliminar) = mysql_fetch_array($resp)) {
-			if ($id_tarifa_eliminar == $id_tarifa)
+			if ($id_tarifa_eliminar == $id_tarifa) {
 				continue;
+			}
 			$this->Load($id_tarifa_eliminar);
 			$this->Eliminar();
 		}

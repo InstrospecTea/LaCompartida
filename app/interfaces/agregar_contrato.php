@@ -2052,19 +2052,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<tr>
 									<td class="span4">
 										<div   class="controls controls-row ">
-											<input   type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?php echo empty($valor_tarifa_flat) ? 'checked' : '' ?>/>
+											<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?php echo empty($valor_tarifa_flat) ? 'checked' : '' ?>/>
 											<?php echo Html::SelectArrayDecente($tarifa->Listar('WHERE tarifa.tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa'), 'id_tarifa', $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true;" ' . ( strlen($config_validar_tarifa) > 0 ? 'onchange="' . $config_validar_tarifa . '"' : '')); ?>
-										<input type="hidden" name="id_tarifa_hidden" id="id_tarifa_hidden" value="<?php echo $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default; ?>" />
+											<input type="hidden" name="id_tarifa_hidden" id="id_tarifa_hidden" value="<?php echo $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default; ?>" />
 										</div>
 
 										<div   class="controls controls-row ">
-
-
-											 <label for="tipo_tarifa_flat"  class="span2" >	<input type="radio"  name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
+											 <label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
 												 Plana por </label>
-											<input id="tarifa_flat" class="input-small"  type="text" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?php echo $valor_tarifa_flat ?>"/>
-
-											<input type="hidden" id="id_tarifa_flat"  name="id_tarifa_flat" value="<?php echo $contrato->fields['id_tarifa'] ?>"/>
+											<input id="tarifa_flat" class="input-small" type="text" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?php echo $valor_tarifa_flat ?>"/>
+											<input type="hidden" id="id_tarifa_flat"  name="id_tarifa_flat" value="<?php echo empty($valor_tarifa_flat) ? '' : $contrato->fields['id_tarifa'] ?>"/>
 										</div>
 									</td>
 									<td>
