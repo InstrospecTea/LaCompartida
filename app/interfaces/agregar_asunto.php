@@ -99,7 +99,13 @@ if ($id_asunto > 0) {
 }
 
 if ($codigo_cliente != '') {
-	$Cliente->LoadByCodigo($codigo_cliente);
+	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
+		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
+		$Cliente->LoadByCodigo($codigo_cliente);
+
+	if ($loaded) {
+		$codigo_cliente = $Cliente->fields['codigo_cliente'];
+	}
 }
 
 if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "guardar")) {

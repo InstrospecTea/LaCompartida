@@ -904,10 +904,8 @@ class Cliente extends Objeto {
 }
 
 class ListaClientes extends Lista {
-
 	function ListaClientes($sesion, $params, $query) {
 		$this->Lista($sesion, 'Cliente', $params, $query);
 	}
-
 }
 
