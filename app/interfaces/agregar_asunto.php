@@ -511,6 +511,9 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								me.data('glosa-error', 'resp.error');
 							}
 						}, 'json');
+					} else {
+						me.removeClass('error-correlativo');
+						me.data('glosa-error', 'resp.error');
 					}
 				});
 			});
