@@ -980,13 +980,16 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $col_abogado, $contrato->fields['glosa_contrato'], $formato_encabezado);
 		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 		++$filas;
+	}
 
+	if (in_array($cobro->fields['estado'], array('CREADO', 'REVISION'))) {
 		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'detalle_cobranza', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $contrato->fields['observaciones'], $formato_encabezado);
 		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
-		$filas += 2;
 	}
+
+	$filas += 2;
 
 	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro=" . $cobro->fields['id_cobro'];
 	$resp_num_usuarios = mysql_query($query_num_usuarios, $sesion->dbh) or Utiles::errorSQL($query_num_usuarios, __FILE__, __LINE__, $sesion->dbh);
