@@ -999,7 +999,7 @@ class CartaCobro extends NotaCobro {
 				if ($total_gastos != 0) {
 
 					if ($this->fields['monto_subtotal'] > 0) {
-						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período') . '.';
+						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período');
 						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.';
 					} else {
 						$detalle_cuenta_gastos = __(' por concepto de gastos incurridos por nuestro Estudio en dicho período');
@@ -1905,8 +1905,8 @@ class CartaCobro extends NotaCobro {
 				$boleta_honorarios = __('según Boleta de Honorarios adjunta');
 				if ($total_gastos != 0) {
 					if ($this->fields['monto_subtotal'] > 0) {
-						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período') .'.';
-						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período');
+						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']).'.';
 					} else {
 						$detalle_cuenta_gastos = __(' por concepto de gastos incurridos por nuestro Estudio en dicho período');
 						$detalle_cuenta_gastos_cl_boleta = ".";
