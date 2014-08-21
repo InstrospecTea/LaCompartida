@@ -101,9 +101,6 @@ EOF;
 							);
 						},
 						select: function(event, ui) {
-							if (jQuery('#{$campo_codigo_cliente}').val() == '') {
-								jQuery('#{$campo_codigo_asunto}').data('no-clear', 1);
-							}
 							jQuery('#{$campo_codigo_asunto}').val(ui.item.id);
 							CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 							jQuery('#{$campo_codigo_asunto}').change();
@@ -139,7 +136,7 @@ EOF;
 					if (response) {
 						jQuery('#glosa_asunto').val(response.glosa_asunto).data('autoselect', 1);
 					} else {
-						jQuery('#glosa_asunto').val();
+						jQuery('#glosa_asunto').val('');
 					}
 					CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 				}, 'json');
