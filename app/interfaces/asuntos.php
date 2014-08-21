@@ -53,6 +53,8 @@ $Form = new Form;
 ?>
 
 <script type="text/javascript">
+	var usocodigosecundario = '<?php echo $usocodigosecundario; ?>';
+
 	jQuery(document).ready(function() {
 		jQuery("#agregar_asunto").click(function() {
 			var codigo_cliente = '<?php echo $codigo_cliente; ?>';
