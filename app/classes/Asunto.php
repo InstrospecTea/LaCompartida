@@ -475,10 +475,16 @@ class Asunto extends Objeto {
 	}
 
 	function Eliminar() {
-		if (!$this->Loaded())
+		if (!$this->Loaded()) {
 			return false;
+		}
+		if(!$this->permiteAsuntoIndependiente($this->fields['codigo_cliente'], $this->fields['id_asunto'])) {
+			$this->error = __('Debe tener al menos un asunto que no se cobre de forma independiente.');
+			return false;
+		}
+
 		#Valida si no tiene algún trabajo relacionado
-		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
 		if ($count > 0) {
@@ -947,16 +953,16 @@ class Asunto extends Objeto {
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
 	}
 
-	public function permiteAsuntoIndependiente($codigo_cliente){
-		$permiso  = false;
-		if (!empty($codigo_cliente)) {
-			$query = "SELECT COUNT(id_contrato_indep) as Total from {$this->tabla} WHERE {$this->tabla}.codigo_cliente= '{$codigo_cliente}' AND {$this->tabla}.id_contrato_indep=''";
-			$qr = $this->sesion->pdodbh->query($query);
-			$total = $qr->fetch(PDO::FETCH_ASSOC);
-			$permiso = ($total['Total'] > 1 );
-
-		}
-		return $permiso;
+	public function permiteAsuntoIndependiente($codigo_cliente, $id_asunto = null){
+		$and_id_asunto = empty($id_asunto) ? '' : "AND NOT id_asunto = $id_asunto";
+		$query = "SELECT COUNT(id_contrato_indep) AS total
+					FROM {$this->tabla}
+					WHERE codigo_cliente= '{$codigo_cliente}'
+					AND id_contrato_indep=''
+					{$and_id_asunto}";
+		$qr = $this->sesion->pdodbh->query($query);
+		$total = $qr->fetch(PDO::FETCH_ASSOC);
+		return empty($id_asunto) ? $total['total'] > 1 : $total['total'] >= 1;
 	}
 }
 

@@ -7,6 +7,7 @@ class Form {
 	public $Utiles;
 	public $Html;
 	protected $scripts = array();
+	protected $image_path = '//static.thetimebilling.com/images/';
 
 	public function __construct() {
 		$this->Utiles = new \TTB\Utiles();
@@ -277,6 +278,15 @@ class Form {
 		$attrs['onclick'] = isset($attrs['onclick']) ? $attrs['onclick'] : '';
 		$attrs['onclick'] .= ";jQuery(this).closest('form').submit();";
 		return $this->button($text, $attrs);
+	}
+
+	public function image_link($image, $link, $attrs = array()) {
+		$image = $this->Html->img("{$this->image_path}{$image}");
+		$_attrs = array(
+			'href' => $link === false ? 'javascript:void(0)' : $link
+		);
+		$attrs = array_merge($_attrs, (array) $attrs);
+		return $this->Html->tag('a', $image, $attrs);
 	}
 
 	/**
