@@ -1,5 +1,31 @@
 # Changelog
 
+## Release: 14.13.0
+Miercoles 20 de Agosto 2014
+* **Fixed:** [feature/autoselector_cliente](https://github.com/LemontechSA/ttb/pull/630)
+
+## Hotfix: 14.12.2
+Miercoles 20 de Agosto 2014
+* **New:** [Fusiona Carta Solo Gastos en formato Carta General](https://github.com/LemontechSA/ttb/pull/649)
+
+## Hotfix: 14.12.1
+Miercoles 20 de Agosto 2014
+* **Fixed:** [Corrección a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/648)
+
+## Release: 14.12.0
+Martes 19 de Agosto 2014
+* **Fixed:** [feature/excel_cobro](https://github.com/LemontechSA/ttb/pull/645)
+* **Fixed:** [feature/fix_saldo_adeudado](https://github.com/LemontechSA/ttb/pull/631)
+* **Fixed:** [feature/fix_creacion_asunto](https://github.com/LemontechSA/ttb/pull/600)
+
+## Hotfix: 14.11.5
+Lunes 18 de Agosto 2014
+* **Fixed:** [Corrección a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/641)
+
+## Hotfix: 14.11.4
+Jueves 14 de Agosto 2014
+* **Fixed:** [Corrige uso de tarifa plana.](https://github.com/LemontechSA/ttb/pull/640)
+
 ## Hotfix: 14.11.3
 Miércoles 13 de Agosto 2014
 * **Fixed:** [Cambios, reubicación y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)

@@ -746,7 +746,10 @@ if ($accion == "consistencia_cliente_asunto") {
 	$response = array('error' => false, 'error_glosa' => '');
 	if ($codigo_cliente != '') {
 		$Cliente = new Cliente($sesion);
-		if ($Cliente->LoadByCodigo($codigo_cliente)) {
+		$loaded = Conf::GetConf($sesion, 'CodigoSecundario') ?
+			$Cliente->LoadByCodigoSecundario($codigo_cliente) :
+			$Cliente->LoadByCodigo($codigo_cliente);
+		if ($loaded) {
 			$Asunto = new Asunto($sesion);
 			if (!empty($id_asunto)) {
 				if (!$Asunto->Load($id_asunto)) {
