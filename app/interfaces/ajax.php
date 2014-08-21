@@ -757,7 +757,7 @@ if ($accion == "consistencia_cliente_asunto") {
 				}
 			}
 			if (empty($response['error_glosa'])) {
-				$response['es_primer_asunto'] = $Asunto->esPrimerAsunto($codigo_cliente);
+				$response['es_primer_asunto'] = $Asunto->esPrimerAsunto($Cliente->fields['codigo_cliente']);
 			}
 		} else {
 			$response['error_glosa'] = utf8_encode('Código cliente inválido');
