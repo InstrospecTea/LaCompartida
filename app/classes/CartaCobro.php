@@ -940,7 +940,11 @@ class CartaCobro extends NotaCobro {
 						$detalle_cuenta_honorarios .= __('retainer ');
 					}
 					$detalle_cuenta_honorarios .= __('equivalente en pesos a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					if ($this->fields['id_moneda'] == 2) {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado') . ')';
+					} else {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					}
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
@@ -1844,7 +1848,11 @@ class CartaCobro extends NotaCobro {
 						$detalle_cuenta_honorarios .= __('retainer ');
 					}
 					$detalle_cuenta_honorarios .= __('equivalente en pesos a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					if ($this->fields['id_moneda'] == 2) {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado') . ')';
+					} else {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					}
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
