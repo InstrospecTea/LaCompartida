@@ -1,5 +1,9 @@
 # Changelog
 
+## Release: 14.13.0
+Miercoles 20 de Agosto 2014
+* **Fixed:** [feature/autoselector_cliente](https://github.com/LemontechSA/ttb/pull/630)
+
 ## Hotfix: 14.12.2
 Miercoles 20 de Agosto 2014
 * **New:** [Fusiona Carta Solo Gastos en formato Carta General](https://github.com/LemontechSA/ttb/pull/649)
