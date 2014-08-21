@@ -34,11 +34,11 @@ if ($opc == 'eliminar') {
 		list($cont_facturas) = mysql_fetch_array($resp);
 
 		if ($lista_pagos) {
-			$pagina->AddError(__('El cobro NÂ°') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un pago asociado.'));
+			$pagina->AddError(__('El cobro Nº') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un pago asociado.'));
 		} else if ($cont_facturas > 0) {
-			$pagina->AddError(__('El cobro NÂ°') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un documento tributario asociado.'));
+			$pagina->AddError(__('El cobro Nº') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un documento tributario asociado.'));
 		} else if ($cobros->Eliminar()) {
-			$pagina->AddInfo(__('Cobro eliminado con Ã©xito'));
+			$pagina->AddInfo(__('Cobro eliminado con éxito'));
 		}
 	}
 }
@@ -296,25 +296,25 @@ if ($opc == 'buscar') {
 				$texto_acuerdo = $cobro->fields['forma_cobro'] . " por " . $cobro->fields['simbolo_moneda_contrato'] . " " . number_format($cobro->fields['monto'], $cobro->fields['cifras_decimales_moneda_contrato'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 			}
 
-			$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>" . $texto_acuerdo . ', Tarifa: ' . $cobro->fields['glosa_tarifa'] . "</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?popup=1&id_contrato=" . $cobro->fields['id_contrato'] . "');\" title='" . __('Editar InformaciÃ³n Comercial') . "'>Editar</a>";
+			$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>" . $texto_acuerdo . ', Tarifa: ' . $cobro->fields['glosa_tarifa'] . "</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?popup=1&id_contrato=" . $cobro->fields['id_contrato'] . "');\" title='" . __('Editar Información Comercial') . "'>Editar</a>";
 			$html .="</td></tr>";
 
 			$ht = "<tr bgcolor='#F2F2F2'>
 							<td align=center style='font-size:10px; width: 70px;'>
-								<b>" . __('NÂ° Cobro') . "</b>
+								<b>" . __('Nº Cobro') . "</b>
 							</td>";
 
 			$ht .= "<td style='font-size:10px; ' align=left>
-								<b>&nbsp;&nbsp;&nbsp;DescripciÃ³n " . __('del cobro') . "</b>
+								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
 			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
-								<b>NÂ° Factura</b>
+								<b>Nº Factura</b>
 							</td>";
 			}
 
 			$ht .= "<td style='font-size:10px; width: 52px;' align=center>
-								<b>OpciÃ³n</b>
+								<b>Opción</b>
 							</td></tr>";
 			$ht .= "<tr bgcolor='#F2F2F2'><td align=center colspan=4><hr size=1px style='font-size:10px; border:1px dashed #CECECE'></td><tr>";
 
@@ -333,9 +333,9 @@ if ($opc == 'buscar') {
 				<td align=right style='font-size:10px; width: 70px;'>#" . $cobro->fields['id_cobro'] . "</td>";
 
 		if (empty($cobro->fields['incluye_honorarios'])) {
-			$texto_tipo = '(sÃ³lo gastos)';
+			$texto_tipo = '(sólo gastos)';
 		} else if (empty($cobro->fields['incluye_gastos'])) {
-			$texto_tipo = '(sÃ³lo honorarios)';
+			$texto_tipo = '(sólo honorarios)';
 		} else {
 			$texto_tipo = '';
 		}
@@ -460,7 +460,7 @@ $pagina->PrintTop();
 		}
 
 		if (desde == 'genera') {
-			if (confirm('<?php echo __("Â¿Ud. desea generar los cobros?") ?>')) {
+			if (confirm('<?php echo __("¿Ud. desea generar los cobros?") ?>')) {
 				form.action = 'genera_cobros_guarda.php';
 				form.submit();
 			} else {
@@ -470,7 +470,7 @@ $pagina->PrintTop();
 			form.action = 'genera_cobros_guarda.php?print=true&opcion=' + opcion;
 			form.submit();
 		} else if (desde == 'emitir') {
-			if (confirm('<?php echo __("Â¿Ud. desea emitir los cobros?") ?>')) {
+			if (confirm('<?php echo __("¿Ud. desea emitir los cobros?") ?>')) {
 				form.action = 'genera_cobros_guarda.php?emitir=true';
 				form.submit();
 			} else {
@@ -516,7 +516,7 @@ $pagina->PrintTop();
 		} else if (estado == 'CREADO' || estado == 'EN REVISION') {
 
 			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Â¿Desea eliminar el cobro seleccionado?') ?></span><br>';
+			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('¿Desea eliminar el cobro seleccionado?') ?></span><br>';
 			text_window += '<br><table><tr>';
 			text_window += '</table>';
 
@@ -660,8 +660,8 @@ $pagina->PrintTop();
 		}
 	}
 
-	function DescargarLiquidaciones()ï¿½{
-		var text_window = '<strong><center><?php echo __('Â¿Desea descargar los cobros del periodo?') ?><center></strong><br><br>';
+	function DescargarLiquidaciones() {
+		var text_window = '<strong><center><?php echo __('¿Desea descargar los cobros del periodo?') ?><center></strong><br><br>';
 		text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:160px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
 		text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
 
@@ -725,7 +725,7 @@ $pagina->PrintTop();
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
 					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
-						&nbsp;&nbsp;<b><?php echo __('NÂ° Factura') ?></b>&nbsp;
+						&nbsp;&nbsp;<b><?php echo __('Nº Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
 					 <?php } ?>
 				</td>
@@ -773,24 +773,24 @@ $pagina->PrintTop();
 			<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_seguimiento_cobro') : false; ?>
 
 			<tr>
-				<td align=right><b><?php echo __('Forma de TarificaciÃ³n') ?>&nbsp;</b></td>
+				<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 				<td colspan=2 align=left>
 					<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), '210') ?>
 				</td>
 			</tr>
 			<tr>
-				<td align=right><b><?php echo __('Tipo de LiquidaciÃ³n') ?>&nbsp;</b></td>
+				<td align=right><b><?php echo __('Tipo de Liquidación') ?>&nbsp;</b></td>
 				<td colspan=2 align=left>
 					<?php
 					echo Html::SelectArray(array(
-						array('1', __('SÃ³lo Honorarios')),
-						array('2', __('SÃ³lo Gastos')),
-						array('3', __('SÃ³lo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, '', __('Todas'))
+						array('1', __('Sólo Honorarios')),
+						array('2', __('Sólo Gastos')),
+						array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, '', __('Todas'))
 					?>
 				</td>
 			</tr>
 			<tr>
-				<td align=right><input type=checkbox name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opciÃ³n para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creaciÃ³n') ?></b></td>
+				<td align=right><input type=checkbox name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
 				<td align=left colspan=2>
 					<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><?php echo __('Otro rango') ?></span>
 					<?php
@@ -850,7 +850,7 @@ $pagina->PrintTop();
 				<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
 					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios'); ?>
 					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos'); ?>
-					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('TrÃ¡mites'); ?>
+					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites'); ?>
 					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> Hay <?php echo __('Adelantos'); ?>  disponibles
 				</div>
 			</tr>
