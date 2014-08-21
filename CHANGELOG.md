@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.13.1
+Jueves 21 de Agosto 2014
+* **Fixed:** [Corregir asignación de cobro independiente para los asuntos con código secundario](https://github.com/LemontechSA/ttb/pull/652)
+
 ## Release: 14.13.0
 Miercoles 20 de Agosto 2014
 * **Fixed:** [feature/autoselector_cliente](https://github.com/LemontechSA/ttb/pull/630)
