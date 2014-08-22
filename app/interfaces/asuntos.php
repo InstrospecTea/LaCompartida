@@ -53,13 +53,21 @@ $Form = new Form;
 ?>
 
 <script type="text/javascript">
+	var usocodigosecundario = '<?php echo $usocodigosecundario; ?>';
+
 	jQuery(document).ready(function() {
 		jQuery("#agregar_asunto").click(function() {
-			var CODCLIENTE = '<?php echo $codigo_cliente; ?>';
-			if (CODCLIENTE == '') {
-				CODCLIENTE = jQuery("#campo_codigo_cliente").val();
-			}
-			nuovaFinestra('Agregar_Asunto', 850, 600, 'agregar_asunto.php?codigo_cliente=' + CODCLIENTE + '&popup=1&motivo=agregar_proyecto');
+			var codigo_cliente = '<?php echo $codigo_cliente; ?>';
+
+			if (codigo_cliente == '') {
+				if (usocodigosecundario != '1') {
+					codigo_cliente = jQuery("#campo_codigo_cliente").val();
+				} else {
+					codigo_cliente = jQuery("#campo_codigo_cliente_secundario").val();
+				}
+ 			}
+
+			nuovaFinestra('Agregar_Asunto', 850, 600, 'agregar_asunto.php?codigo_cliente=' + codigo_cliente + '&popup=1&motivo=agregar_proyecto');
 		});
 	});
 
