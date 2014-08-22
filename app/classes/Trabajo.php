@@ -48,84 +48,16 @@ class Trabajo extends Objeto
 		return __('Abierto');
 	}
 
-	function GuardarHistorial($id_trabajo, $queryHistorial) {
-		$queryHistorial = str_replace('{{id_trabajo}}', $id_trabajo, $queryHistorial);
-		$resp = mysql_query($queryHistorial, $this->sesion->dbh) or Utiles::errorSQL($queryHistorial, __FILE__, __LINE__, $this->sesion->dbh);
-		return $resp;
-	}
-
-	function QueryHistorial($tipo = 'CREAR', $app_id = 1) {
-		$app_id = !is_null($app_id) ? $app_id : 1;
-		$id_usuario_sesion = !is_null($this->sesion->usuario->fields['id_usuario']) ? $this->sesion->usuario->fields['id_usuario'] : $this->fields['id_usuario'];
-
-		if ($tipo == 'MODIFICAR') {
-			$query = "SELECT
-					fecha,
-					descripcion,
-					duracion,
-					duracion_cobrada,
-					id_usuario,
-					codigo_asunto,
-					cobrable,
-					tarifa_hh
-				FROM trabajo
-				WHERE id_trabajo = {$this->fields['id_trabajo']}";
-
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($fecha, $descripcion, $duracion, $duracion_cobrada, $id_usuario, $codigo_asunto, $cobrable, $tarifa_hh) = mysql_fetch_array($resp);
-
-			$queryHistorial = "INSERT INTO trabajo_historial
-						SET
-							id_trabajo = '{{id_trabajo}}',
-							id_usuario = '{$id_usuario_sesion}',
-							fecha = '" . date("Y-m-d H:i:s") . "',
-						 	fecha_trabajo = '$fecha',
-						 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
-						 	descripcion = '" . mysql_real_escape_string(empty($descripcion) ? ' Sin descripcion' : $descripcion) . "',
-						 	descripcion_modificado = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
-						 	duracion = '".mysql_real_escape_string($duracion)."',
-						 	duracion_modificado = '{$this->fields['duracion']}',
-						 	duracion_cobrada = '" . mysql_real_escape_string($duracion_cobrada) . "',
-						 	duracion_cobrada_modificado = '{$this->fields['duracion_cobrada']}',
-						 	id_usuario_trabajador = '" . mysql_real_escape_string($id_usuario) . "',
-						 	id_usuario_trabajador_modificado = '{$this->fields['id_usuario']}',
-						 	accion = 'MODIFICAR',
-						 	codigo_asunto = '" . mysql_real_escape_string($codigo_asunto) . "',
-						 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
-						 	tarifa_hh = '{$this->fields['tarifa_hh']}',
-						 	tarifa_hh_modificado = '{$tarifa_hh}',
-						 	cobrable = '$cobrable',
-						 	app_id = {$app_id},
-						 	cobrable_modificado = '{$this->fields['cobrable']}'";
-		} else {
-			$queryHistorial = "INSERT INTO trabajo_historial
-								SET
-									app_id = {$app_id},
-									id_trabajo = '{{id_trabajo}}',
-									id_usuario = '{$id_usuario_sesion}',
-									fecha = '" . date("Y-m-d H:i:s") . "',
-								 	fecha_trabajo = '{$this->fields['fecha']}',
-								 	descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
-								 	duracion = '{$this->fields['duracion']}',
-								 	duracion_cobrada = '{$this->fields['duracion_cobrada']}',
-								 	id_usuario_trabajador =  '{$this->fields['id_usuario']}',
-								 	accion = 'CREAR',
-								 	tarifa_hh = '{$this->fields['tarifa_hh']}',
-								 	codigo_asunto = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
-								 	cobrable_modificado = '{$this->fields['cobrable']}'";
-		}
-		return $queryHistorial;
-	}
-
 	function Write($historialOnWrite = true, $app_id = null) {
-		$accionHistorial = $this->Loaded() ? 'MODIFICAR' : 'CREAR';
-		$queryHistorial = $historialOnWrite ? $this->QueryHistorial($accionHistorial, $app_id) : null;
-		if (parent::Write()) {
-			if ($historialOnWrite && !is_null($queryHistorial)) {
-				$this->GuardarHistorial($this->fields['id_trabajo'], $queryHistorial);
-			}
+		$workService = new WorkService($this->sesion);
+		$work = new Work();
+		$work->fillFromArray($this->fields);
+		$work->fillChangedFields($this->changes);
+		try {
+			$work = $workService->saveOrUpdate($charge);
+			$this->fields = $work->fields;
 			return true;
-		} else {
+		} catch(Exception $ex) {
 			return false;
 		}
 	}

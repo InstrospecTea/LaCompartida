@@ -408,26 +408,16 @@ echo $refrescar;
 		return true;
 	}
 
-	function ActualizarTarifas( form )
-	{
-		var http = getXMLHTTP();
-		http.open('get', 'ajax.php?accion=actualizar_tarifas&id_cobro='+document.getElementById('id_cobro').value);
-		http.onreadystatechange = function()
-		{
-			if(http.readyState == 4)
-			{
-				response = http.responseText;
-				if( response == "OK" ) {
-					alert('Tarifas actualizados con éxito.');
-					$('form_cobro5').submit();
-					return true;
-				} else {
-					alert('No se pudieron actualizar las tarifas.')
-					return false;
-				}
+	function ActualizarTarifas(form) {
+		jQuery.get('ajax.php', {'accion': 'actualizar_tarifas', 'id_cobro': jQuery('#id_cobro').val()}, function(response) {
+			if(response.success) {
+				alert('Tarifas actualizados con éxito.');
+				jQuery('#form_cobro5').submit();
+			} else {
+				alert('No se pudieron actualizar las tarifas.');
 			}
-		}
-		http.send(null);
+		}, 'json');
+		return false;
 	}
 
 	function showOpcionDetalle( id, bloqueDetalle )
@@ -1575,7 +1565,7 @@ else
 			</tr>
 
 			<tr>
-				<td align="center" colspan="2"><a href="#" onclick="ActualizarTarifas();" title="Actualizar las tarifas de todos los trabajos de este cobro">Actualizar tarifas</a></td>
+				<td align="center" colspan="2"><a href="javascript:void(0)" onclick="ActualizarTarifas();" title="Actualizar las tarifas de todos los trabajos de este cobro">Actualizar tarifas</a></td>
 			</tr>
 
 		</table>

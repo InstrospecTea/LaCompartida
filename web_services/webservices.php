@@ -1,6 +1,6 @@
 <?php
 
-require_once('../app/conf.php');
+require_once(dirname(__file__) . '/../app/conf.php');
 
 apache_setenv('force-response-1.0', 'TRUE');
 apache_setenv('downgrade-1.0', 'TRUE'); #Esto es lo más importante
@@ -469,35 +469,29 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 
 		$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : 'NULL';
 
-		$descripcion = addslashes($descripcion);
-		$ordenado_por = addslashes($ordenado_por);
-		$query = "INSERT INTO trabajo SET
-					id_usuario='$id_usuario',
-					id_categoria_usuario='$id_categoria_usuario',
-					id_trabajo_local='$id_trabajo_local',
-					codigo_asunto='$codigo_asunto',
-					codigo_actividad=$codigo_actividad,
-					descripcion='$descripcion',
-					solicitante='$ordenado_por',
-					id_moneda=$id_moneda,
-					cobrable='$cobrable',
-					fecha_creacion=NOW(),
-					fecha=DATE_SUB('$fecha', INTERVAL $duracion SECOND),
-					duracion='$hora:$min:00',
-					duracion_cobrada='$hora:$min:00',
-					id_area_trabajo = $id_area_trabajo
-				";
+		$trabajo = new Trabajo();
+		$date_time = new DateTime($fecha);
+		$fecha = $date_time->sub(date_interval_create_from_date_string("$duracion seconds"));
 
-		if (!($resp = mysql_query($query, $sesion->dbh))) {
+		$trabajo->fields = array(
+			'id_usuario' => $id_usuario,
+			'id_categoria_usuario' => $id_categoria_usuario,
+			'id_trabajo_local' => $id_trabajo_local,
+			'codigo_asunto' => $codigo_asunto,
+			'codigo_actividad' => $codigo_actividad,
+			'descripcion' => $descripcion,
+			'solicitante' => $ordenado_por,
+			'id_moneda' => $id_moneda,
+			'cobrable' => $cobrable,
+			'fecha' => $fecha->date,
+			'duracion' => "$hora:$min:00",
+			'duracion_cobrada' => "$hora:$min:00",
+			'id_area_trabajo' => $id_area_trabajo
+		);
+
+		if (!$trabajo->Write()) {
 			return new soap_fault('Client', '', mysql_error() . ". Query: $query", '');
 		} else {
-			$trabajo = new Trabajo($sesion);
-			$id_trabajo = mysql_insert_id($sesion->dbh);
-			$trabajo->Load($id_trabajo);
-			$queryHistorial = $trabajo->QueryHistorial('CREAR', $app_id);
-			if (!is_null($queryHistorial)) {
-				$trabajo->GuardarHistorial($id_trabajo , $queryHistorial);
-			}
 			$trabajo->InsertarTrabajoTarifa($app_id);
 			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
