@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.13.2
+Viernes 22 de Agosto 2014
+* **Fixed:** [permite mostrar asuntos inactivos](https://github.com/LemontechSA/ttb/pull/654)
+
 ## Hotfix: 14.13.1
 Jueves 21 de Agosto 2014
 * **Fixed:** [Corregir asignación de cobro independiente para los asuntos con código secundario](https://github.com/LemontechSA/ttb/pull/652)
