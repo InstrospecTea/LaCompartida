@@ -66,7 +66,7 @@ class AutocompletadorAsunto {
 		$campo_codigo_asunto = $codigo_secundario ? 'codigo_asunto_secundario' : 'codigo_asunto';
 		$campo_codigo_cliente = $codigo_secundario ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$borra_glosa = self::$forceMatch ? "jQuery('#glosa_asunto').val('');" : '';
-		$todos = !self::$forceMatch;
+		$todos = self::$forceMatch ? '0' : '1';
 		$script_button = '';
 		$script_button = <<<EOF
 			jQuery('#glosa_asunto_btn').click(function() {
