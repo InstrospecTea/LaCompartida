@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.13.3
+Viernes 22 de Agosto 2014
+* **Fixed:** [asigna valor para el print](https://github.com/LemontechSA/ttb/pull/655)
+
 ## Hotfix: 14.13.2
 Viernes 22 de Agosto 2014
 * **Fixed:** [permite mostrar asuntos inactivos](https://github.com/LemontechSA/ttb/pull/654)
