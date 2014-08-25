@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.13.4
+Domingo 24 de Agosto 2014
+* **Fixed:** [Corrige la asignación a cliente errónea al crear un asunto con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/656)
+
 ## Hotfix: 14.13.3
 Viernes 22 de Agosto 2014
 * **Fixed:** [asigna valor para el print](https://github.com/LemontechSA/ttb/pull/655)
