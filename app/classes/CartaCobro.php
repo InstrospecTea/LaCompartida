@@ -941,7 +941,11 @@ class CartaCobro extends NotaCobro {
 						$detalle_cuenta_honorarios .= __('retainer ');
 					}
 					$detalle_cuenta_honorarios .= __('equivalente en pesos a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					if ($this->fields['id_moneda'] == 2) {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado') . ')';
+					} else {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					}
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
@@ -996,9 +1000,11 @@ class CartaCobro extends NotaCobro {
 				if ($total_gastos != 0) {
 
 					if ($this->fields['monto_subtotal'] > 0) {
-							$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período');
+						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período');
+						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.';
 					} else {
 						$detalle_cuenta_gastos = __(' por concepto de gastos incurridos por nuestro Estudio en dicho período');
+						$detalle_cuenta_gastos_cl_boleta = ".";
 					}
 
 					$boleta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por gastos a reembolsar') . __(', según Boleta de Recuperación de Gastos adjunta');
@@ -1012,6 +1018,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%detalle_cuenta_honorarios_primer_dia_mes%', $detalle_cuenta_honorarios_primer_dia_mes, $html2);
 				$html2 = str_replace('%detalle_cuenta_gastos%', $detalle_cuenta_gastos, $html2);
 				$html2 = str_replace('%detalle_cuenta_gastos2%', $detalle_cuenta_gastos2, $html2);
+				$html2 = str_replace('%detalle_cuenta_gastos_cl_boleta%', $detalle_cuenta_gastos_cl_boleta, $html2);
 
 				$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado
 							FROM usuario
@@ -1845,7 +1852,11 @@ class CartaCobro extends NotaCobro {
 						$detalle_cuenta_honorarios .= __('retainer ');
 					}
 					$detalle_cuenta_honorarios .= __('equivalente en pesos a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-					$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					if ($this->fields['id_moneda'] == 2) {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado') . ')';
+					} else {
+						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
+					}
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
@@ -1896,8 +1907,10 @@ class CartaCobro extends NotaCobro {
 				if ($total_gastos != 0) {
 					if ($this->fields['monto_subtotal'] > 0) {
 						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período');
+						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']).'.';
 					} else {
 						$detalle_cuenta_gastos = __(' por concepto de gastos incurridos por nuestro Estudio en dicho período');
+						$detalle_cuenta_gastos_cl_boleta = ".";
 					}
 
 					$boleta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por gastos a reembolsar') . __(', según Boleta de Recuperación de Gastos adjunta');
@@ -1910,6 +1923,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%detalle_cuenta_honorarios_primer_dia_mes%', $detalle_cuenta_honorarios_primer_dia_mes, $html2);
 				$html2 = str_replace('%detalle_cuenta_gastos%', $detalle_cuenta_gastos, $html2);
 				$html2 = str_replace('%detalle_cuenta_gastos2%', $detalle_cuenta_gastos2, $html2);
+				$html2 = str_replace('%detalle_cuenta_gastos_cl_boleta%', $detalle_cuenta_gastos_cl_boleta, $html2);
 
 				$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado, IFNULL( prm_categoria_usuario.glosa_categoria, ' ' ) as categoria_usuario
 										FROM usuario
