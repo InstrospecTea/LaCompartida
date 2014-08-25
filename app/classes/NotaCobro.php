@@ -10484,6 +10484,8 @@ class NotaCobro extends Cobro {
 		}
 
 		if ($agrupar_cartas) {
+			$Carta = new Carta($this->sesion);
+			$carta_multiple = $Carta->LoadByDescripcion('MULTIPLE') ? $Carta->fields['id_carta'] : 1;
 			$totales_cobros = array();
 			$primer_cliente = '';
 
@@ -10537,7 +10539,7 @@ class NotaCobro extends Cobro {
 
 				if ($codigo_cliente != $primer_cliente) {
 					$primer_cliente = $codigo_cliente;
-					$NotaCobro->fields['id_carta'] = 1;
+					$NotaCobro->fields['id_carta'] = $carta_multiple;
 					$NotaCobro->fields['opc_ver_carta'] = 1;
 					$NotaCobro->DetalleLiquidaciones = $totales_cobros[$codigo_cliente];
 				}
