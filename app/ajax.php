@@ -518,10 +518,10 @@ switch ($accion) {
 			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 				$campo_codigo_asunto = 'codigo_asunto_secundario';
 			}
-
+			$activo_and = $todos ? '' : 'asunto.activo = 1 AND';
 			$query = "SELECT asunto.id_asunto, asunto.codigo_asunto, asunto.codigo_asunto_secundario, asunto.glosa_asunto, asunto.codigo_cliente
 				FROM asunto
-				WHERE asunto.activo = 1 AND asunto.{$campo_codigo_asunto} = '{$codigo_asunto}'";
+				WHERE {$activo_and} asunto.{$campo_codigo_asunto} = '{$codigo_asunto}'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			$asunto = mysql_fetch_array($resp);
 
