@@ -34,7 +34,7 @@ if (empty($fecha_hasta)) {
 }
 
 $Pagina = new Pagina($sesion);
-$Pagina->titulo = __('Reporte Horas por Facturar / Profesional');
+$Pagina->titulo = __('Reporte Producción por Profesional');
 $Pagina->PrintTop();
 
 ?>
