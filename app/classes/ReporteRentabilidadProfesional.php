@@ -318,13 +318,19 @@ class ReporteRentabilidadProfesional
       ->add_select('0', 't_valor_exceso_retainer')
       ->add_select('0', 't_valor_flat_fee')
       ->add_select('0', 't_valor_tarifa_defecto')
-      ->add_select('t.tarifa_tramite * moneda_contrato.tipo_cambio AS t_valor_tramites')
+      ->add_select('SUM( IF(
+                      t.tarifa_tramite_individual > 0,
+                      t.tarifa_tramite_individual * moneda_tramite_individual.tipo_cambio,
+                      tv.tarifa * moneda_tramite.tipo_cambio
+                    )) AS t_valor_tramites')
       ->add_select('0 AS t_valor_flat_fee_encargado')
       // FROM
       ->add_from('tramite', 't')
       ->add_inner_join_with('asunto a', 'a.codigo_asunto = t.codigo_asunto')
       ->add_inner_join_with('contrato c', "c.id_contrato = a.id_contrato AND c.activo = 'SI' $where_contrato")
+      ->add_left_join_with('tramite_valor tv', 'tv.id_tramite_tipo = t.id_tramite_tipo AND tv.id_moneda = t.id_moneda_tramite')
       ->add_left_join_with('prm_moneda moneda_tramite', "moneda_tramite.id_moneda = t.id_moneda_tramite")
+      ->add_left_join_with('prm_moneda moneda_tramite_individual', "moneda_tramite_individual.id_moneda = t.id_moneda_tramite_individual")
       // WHERE
       ->add_restriction(new CriteriaRestriction("t.estadocobro IN ('SIN COBRO', 'CREADO', 'EN REVISION') AND t.cobrable = 1 $where_fecha"))
       // GROUP
