@@ -98,7 +98,7 @@ if ($id_asunto > 0) {
 	}
 }
 
-if ($codigo_cliente != '') {
+if ($codigo_cliente != '' && !$Cliente->Loaded()) {
 	$Cliente->LoadByCodigo($codigo_cliente);
 	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
 		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
