@@ -66,6 +66,7 @@ class AutocompletadorAsunto {
 		$campo_codigo_asunto = $codigo_secundario ? 'codigo_asunto_secundario' : 'codigo_asunto';
 		$campo_codigo_cliente = $codigo_secundario ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$borra_glosa = self::$forceMatch ? "jQuery('#glosa_asunto').val('');" : '';
+		$todos = self::$forceMatch ? '0' : '1';
 		$script_button = '';
 		$script_button = <<<EOF
 			jQuery('#glosa_asunto_btn').click(function() {
@@ -132,7 +133,7 @@ EOF;
 					return;
 				}
 				var url = root_dir + '/app/ajax.php';
-				jQuery.get(url, {accion:'cargar_glosa_asunto', codigo_asunto: codigo_asunto}, function(response) {
+				jQuery.get(url, {accion:'cargar_glosa_asunto', codigo_asunto: codigo_asunto, todos: {$todos}}, function(response) {
 					if (response) {
 						jQuery('#glosa_asunto').val(response.glosa_asunto).data('autoselect', 1);
 					} else {
