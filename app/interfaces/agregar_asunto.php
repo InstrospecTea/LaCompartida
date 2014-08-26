@@ -98,7 +98,8 @@ if ($id_asunto > 0) {
 	}
 }
 
-if ($codigo_cliente != '') {
+if ($codigo_cliente != '' && !$Cliente->Loaded()) {
+	$Cliente->LoadByCodigo($codigo_cliente);
 	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
 		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
 		$Cliente->LoadByCodigo($codigo_cliente);
@@ -1153,7 +1154,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 						<tr>
 							<td colspan=6 align="center">
 								<?php
-								if (Conf::GetConf($Sesion, 'RevisarTarifas')) {
+								if (!$Sesion->usuario->Es('SASU') && Conf::GetConf($Sesion, 'RevisarTarifas')) {
 									$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
 								} else {
 									$funcion_validar = "return Validar(jQuery('#formulario').get(0));";

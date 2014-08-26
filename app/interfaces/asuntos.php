@@ -65,7 +65,7 @@ $Form = new Form;
 				} else {
 					codigo_cliente = jQuery("#campo_codigo_cliente_secundario").val();
 				}
-			}
+ 			}
 
 			nuovaFinestra('Agregar_Asunto', 850, 600, 'agregar_asunto.php?codigo_cliente=' + codigo_cliente + '&popup=1&motivo=agregar_proyecto');
 		});
