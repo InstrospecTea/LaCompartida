@@ -847,6 +847,9 @@ $_LANG['nota_morosidad_total'] = "Nota: Si al recibo de esta carta su cuenta se 
 $_LANG['nota_morosidad'] = "";
 $_LANG['nota_disclaimer'] = "";
 
+// Solicitado por @Gtigre
+$_LANG['lang_mb_detalle_chile_boleta'] = " Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios% equivalentes a %monto_honorarios_moneda_cobro% conforme a su equivalencia al %fecha_hasta_dmy%";
+
 #Carta MB Chile
 #HONORARIOS
 $_LANG['%detalle_mb%'] = "Adjunto ruego encontrar Nota de Cobro #%num_letter% por honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha% en relación al encargo profesional de la referencia. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
