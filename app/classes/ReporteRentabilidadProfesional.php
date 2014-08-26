@@ -17,17 +17,16 @@ class ReporteRentabilidadProfesional
   // Opciones de layout
   //
 
-  //Define el ancho que tendrÃ¡n los campos numÃ©ricos del reporte, que tengan que ver con montos.
+  //Define el ancho que tendrán los campos numéricos del reporte, que tengan que ver con montos.
   private $ancho_campo_numerico = 69;
 
-  //Define el ancho que tendrÃ¡ el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
-  //aÃ±adan antes de los campos numÃ©ricos del reporte.
+  //Define el ancho que tendrá el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
+  //añadan antes de los campos numéricos del reporte.
   private $ancho_campo = 35;
 
   private $ancho_campo_numerico_detalle = 70;
 
   private $ancho_campo_detalle = 35;
-
 
   /**
    * Constructor de la clase.
@@ -42,13 +41,11 @@ class ReporteRentabilidadProfesional
   }
 
   /**
-   * Genera el reporte segÃºn las opciones que se especifican.
+   * Genera el reporte según las opciones que se especifican.
    * @return SimpleReport Reporte configurado en SimpleReport
    */
   public function generar() {
     $this->genera_query_criteria();
-
-    //pr($this->criteria->get_plain_query()); exit;
 
     $statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
     $statement->execute();
@@ -140,7 +137,7 @@ class ReporteRentabilidadProfesional
       ),
       array(
         'field' => 'valor_tramites',
-        'title' => __('TrÃ¡mites'),
+        'title' => __('Trámites'),
         'format' => 'number',
         'extras' => array(
           'symbol' => 'moneda',
@@ -167,7 +164,7 @@ class ReporteRentabilidadProfesional
       ),
       array(
         'field' => 'valor_tarifa_defecto',
-        'title' => __('Total segÃºn Tarifa Defecto'),
+        'title' => __('Total según Tarifa Defecto'),
         'format' => 'number',
         'extras' => array(
           'symbol' => 'moneda',
