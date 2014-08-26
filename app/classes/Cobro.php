@@ -2545,7 +2545,6 @@ if (!class_exists('Cobro')) {
 				$array_profesional_usuario['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_incobrables']);
 				$array_profesional_usuario['duracion_retainer'] = $row['duracion_retainer'];
 				$array_profesional_usuario['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_retainer']);
-				// $array_profesional_usuario['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_retainer']);
 				$array_profesional_usuario['tarifa'] = $row['tarifa'];
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
