@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.13.6
+Lunes 25 de Agosto 2014
+* **Fixed:** [Corrige cálculo de Horas Tarificadas en Word](https://github.com/LemontechSA/ttb/pull/660)
+
 ## Hotfix: 14.13.5
 Lunes 25 de Agosto 2014
 * **Fixed:** [Evita error en javascript con function RevisarTarifas](https://github.com/LemontechSA/ttb/pull/657)
