@@ -274,7 +274,6 @@ class CartaCobro extends NotaCobro {
 			$valorsinespacio = '';
 		}
 		$this->espacio = $valorsinespacio;
-		$this->monedas = Moneda::GetMonedas($sesion, '', true);
 	}
 
 	function NuevoRegistro(){
@@ -526,6 +525,7 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 
                 // Monto honorario moneda cobro
+                $html2 = str_replace('%simbolo_moneda_cobro%', $moneda->fields['simbolo'], $html2);
                 $html2 = str_replace('%monto_honorarios_moneda_cobro%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
                 if ($this->fields['id_moneda'] != $this->fields['opc_moneda_total']) {
                 	$html2 = str_replace('%mb_monto_honorarios_moneda_cobro%', ' equivalentes a '. $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' conforme a su equivalencia al %fecha_hasta_dmy%.', $html2);
