@@ -742,13 +742,11 @@ if ($accion == "consistencia_cliente_asunto") {
 		$password = $_POST['password'];
 	}
 	echo PasswordStrength::Rate($password);
-} else if ($accion == 'es_primer_asunto') {
+} else if ($accion == 'permite_asunto_independiente') {
 	$response = array('error' => false, 'error_glosa' => '');
 	if ($codigo_cliente != '') {
 		$Cliente = new Cliente($sesion);
-		$loaded = Conf::GetConf($sesion, 'CodigoSecundario') ?
-			$Cliente->LoadByCodigoSecundario($codigo_cliente) :
-			$Cliente->LoadByCodigo($codigo_cliente);
+		$loaded = Conf::GetConf($sesion, 'CodigoSecundario') ? $Cliente->LoadByCodigoSecundario($codigo_cliente) : $Cliente->LoadByCodigo($codigo_cliente);
 		if ($loaded) {
 			$Asunto = new Asunto($sesion);
 			if (!empty($id_asunto)) {
@@ -757,7 +755,7 @@ if ($accion == "consistencia_cliente_asunto") {
 				}
 			}
 			if (empty($response['error_glosa'])) {
-				$response['es_primer_asunto'] = $Asunto->esPrimerAsunto($Cliente->fields['codigo_cliente']);
+				$response['permite_asunto_independiente'] = $Asunto->permiteAsuntoIndependiente($Cliente->fields['codigo_cliente']);
 			}
 		} else {
 			$response['error_glosa'] = utf8_encode('Código cliente inválido');

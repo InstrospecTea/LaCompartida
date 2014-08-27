@@ -1122,14 +1122,6 @@ if (Conf::GetConf($sesion, 'TodoMayuscula')) {
 		window.document.getElementById('iframe_asuntos').src = url;
 	}
 
-	<?php
-	if ($CodigoSecundario) {
-		echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
-	} else {
-		echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
-	}
-	?>
-
 	jQuery(document).ready(function() {
 
 		setTimeout(function() {
@@ -1236,6 +1228,10 @@ if (Conf::GetConf($sesion, 'TodoMayuscula')) {
 	}
 	?>
 
+	jQuery('#iframe_asuntos').load(function() {
+		frame = jQuery(this);
+		frame.css('height', frame[0].contentWindow.document.body.offsetHeight + 'px');
+	});
 </script>
 
 <?php

@@ -346,6 +346,10 @@ if ($xls) {
 		$group_by = "contrato.id_contrato";
 	}
 
+	if (!$incluir_contratos_inactivos) {
+		$where .= " AND contrato.activo = 'SI' ";
+	}
+
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$codigos_asuntos_secundarios = "GROUP_CONCAT( asunto.codigo_asunto_secundario ) as codigos_asuntos_secundarios, ";
 		$codigo_asunto_secundario_sep = "asunto.codigo_asunto_secundario, ";
@@ -774,6 +778,7 @@ $pagina->PrintTop();
 					$ocultar_estado_ultimo_cobro = Conf::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
 				}
 				?>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="incluir_contratos_inactivos" <?php echo $incluir_contratos_inactivos ? 'checked="checked"' : '' ?> /><?php echo __('Incluir los acuerdos comerciales inactivos'); ?><br/>
 				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('encargado') ?></label><br/>
 				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo trabajo') ?></label><br/>
 				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo cobro') ?></label><br/>

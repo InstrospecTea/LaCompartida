@@ -274,6 +274,7 @@ class CartaCobro extends NotaCobro {
 			$valorsinespacio = '';
 		}
 		$this->espacio = $valorsinespacio;
+		$this->monedas = Moneda::GetMonedas($sesion, '', true);
 	}
 
 	function NuevoRegistro(){
@@ -2071,6 +2072,8 @@ class CartaCobro extends NotaCobro {
 
 				// FIN cuenta segun contrato
 
+				$html2 = str_replace('%DETALLE_LIQUIDACIONES%', $this->GenerarDocumentoCartaComun($parser_carta, 'DETALLE_LIQUIDACIONES', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+
 				break;
 
 		}
@@ -2538,6 +2541,64 @@ class CartaCobro extends NotaCobro {
 					$filas++;
 				}
 
+
+				break;
+
+				case 'DETALLE_LIQUIDACIONES':
+					if (empty($this->DetalleLiquidaciones)) {
+						$this->DetalleLiquidaciones = array(
+							"{$this->fields['id_cobro']}" => array(
+								'totales' => $x_resultados,
+								'campos' => $this->fields,
+								'asuntos' => $this->asuntos
+							)
+						);
+					}
+
+					$totales = array();
+					foreach ($this->DetalleLiquidaciones as $id_cobro => $detalle) {
+						$opc_moneda_total = $detalle['campos']['opc_moneda_total'];
+						if (!array_key_exists($opc_moneda_total, $totales)) {
+							$totales[$opc_moneda_total] = 0;
+						}
+						$totales[$opc_moneda_total] += $detalle['totales']['monto_cobro_original_con_iva'][$opc_moneda_total];
+					}
+					$total = '';
+					foreach ($totales as $id_moneda => $total) {
+						$totales[$id_moneda] = $this->monedas[$id_moneda]['simbolo'] . $this->espacio . number_format($total, $this->monedas[$id_moneda]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+					}
+
+					$html2 = str_replace('%detalle_liquidaciones_total%', implode('<br />', $totales), $html2);
+					$html2 = str_replace('%DETALLE_LIQUIDACIONES_FILAS%', $this->GenerarDocumentoCartaComun($parser_carta, 'DETALLE_LIQUIDACIONES_FILAS', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				break;
+
+				case 'DETALLE_LIQUIDACIONES_FILAS':
+					$row_template = $html2;
+					$html2 = '';
+
+					foreach ($this->DetalleLiquidaciones as $id_cobro => $detalle) {
+						$row = $row_template;
+
+						$row = str_replace('%detalle_liquidacion_numero%', $detalle['campos']['id_cobro'], $row);
+						
+						$modalidad = __($detalle['campos']['forma_cobro']);
+						$detalle_modalidad = $this->ObtenerDetalleModalidad($detalle['campos'], $this->monedas[$detalle['campos']['opc_moneda_total']], $idioma);
+						$modalidad .= !empty($detalle_modalidad) ? "<br/>$detalle_modalidad" : "";
+						$row = str_replace('%detalle_liquidacion_forma_cobro%', $modalidad, $row);
+
+						$asuntos = array();
+						$Asunto = new Asunto($this->sesion);
+						foreach ($detalle['asuntos'] as $codigo_asunto) {
+							$Asunto->LoadByCodigo($codigo_asunto);
+							$asuntos[] = $Asunto->fields['glosa_asunto'];
+						}
+						$row = str_replace('%detalle_liquidacion_asuntos%', implode('<br/>', $asuntos), $row);
+
+						$opc_moneda_total = $detalle['campos']['opc_moneda_total'];
+						$row = str_replace('%detalle_liquidacion_valor%', $this->monedas[$opc_moneda_total]['simbolo'] . $this->espacio . number_format($detalle['totales']['monto_cobro_original_con_iva'][$opc_moneda_total], $this->monedas[$opc_moneda_total]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+						$html2 .= $row;
+					}
 
 				break;
 

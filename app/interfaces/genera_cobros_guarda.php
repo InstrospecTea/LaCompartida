@@ -11,6 +11,10 @@ if (empty($_GET['generar_silenciosamente'])) {
 	$Pagina = new Pagina($Sesion);
 }
 
+$opcion = explode(',', $opcion);
+$imprimir_cartas = $opcion[0] == 'cartas';
+$agrupar_cartas = $opcion[1] == 'agrupar';
+
 if ((!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0 ) && isset($_GET['generar_silenciosamente'])) {
 	$forzar = false;
 } else {
@@ -175,61 +179,61 @@ if ($print) {
 		$html = "";
 
 		if ($totaldecobros > 0) {
+			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas);
+			// foreach ($cobroRT as $cob) {
 
-			foreach ($cobroRT as $cob) {
+			// 	set_time_limit(100);
 
-				set_time_limit(100);
+			// 	if (!$NotaCobro->Load($cob['id_cobro'])) {
+			// 		continue;
+			// 	}
 
-				if (!$NotaCobro->Load($cob['id_cobro'])) {
-					continue;
-				}
+			// 	if ($opcion != 'cartas') {
+			// 	 	$NotaCobro->fields['id_carta'] = null;
+			// 	} else {
+			// 	 	if (!$NotaCobro->fields['id_carta']) {
+			// 	 		$NotaCobro->fields['id_carta'] = $mincarta;
+			// 	 		$NotaCobro->fields['opc_ver_carta'] = 1;
+			// 	 	}
+			// 	}
 
-				if ($opcion != 'cartas') {
-				 	$NotaCobro->fields['id_carta'] = null;
-				} else {
-				 	if (!$NotaCobro->fields['id_carta']) {
-				 		$NotaCobro->fields['id_carta'] = $mincarta;
-				 		$NotaCobro->fields['opc_ver_carta'] = 1;
-				 	}
-				}
+			// 	if ($cob['subtotal_gastos'] == 0) {
+			// 	   $NotaCobro->fields['opc_ver_gastos'] = 0;
+			// 	}
 
-				if ($cob['subtotal_gastos'] == 0) {
-				   $NotaCobro->fields['opc_ver_gastos'] = 0;
-				}
+			// 	$NotaCobro->LoadAsuntos();
 
-				$NotaCobro->LoadAsuntos();
+			// 	$lang_archivo = $cob['codigo_idioma'] . '.php';
+			// 	$_LANG = array();
+			// 	include Conf::ServerDir() . "/lang/$lang_archivo";
 
-				$lang_archivo = $cob['codigo_idioma'] . '.php';
-				$_LANG = array();
-				include Conf::ServerDir() . "/lang/$lang_archivo";
+			// 	$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
-				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
+			// 	$opc_papel = $cob['opc_papel'];
+			// 	$id_carta = $cob['id_carta'];
+			// 	$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
 
-				$opc_papel = $cob['opc_papel'];
-				$id_carta = $cob['id_carta'];
-				$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
+			// 	if ($html) {
 
-				if ($html) {
+			// 		$cssData .= UtilesApp::CSSCobro($Sesion);
 
-					$cssData .= UtilesApp::CSSCobro($Sesion);
+			// 		if (is_object($doc)) {
+			// 	 		$doc->newSession($html);
+			// 	 	} else {
 
-					if (is_object($doc)) {
-				 		$doc->newSession($html);
-				 	} else {
+			// 	 		$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
-				 		$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
+			// 	 		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
+			// 	 			$orientacion_papel = 'PORTRAIT';
+			// 	 		}
 
-				 		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
-				 			$orientacion_papel = 'PORTRAIT';
-				 		}
+			// 			$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
+			// 	 	}
+			// 		$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
+			// 	}
+			// }
 
-						$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
-				 	}
-					$doc->chunkedOutput("cobro_masivo_$id_usuario.doc");
-				}
-			}
-
-			$doc->endChunkedOutput("cobro_masivo_$id_usuario.doc");
+			// $doc->endChunkedOutput("cobro_masivo_$id_usuario.doc");
 
 		} else {
 			echo "\n<script type=\"text/javascript\">var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";

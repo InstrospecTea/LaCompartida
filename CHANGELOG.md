@@ -1,5 +1,11 @@
 # Changelog
 
+## Release: 14.14.0
+Miércoles 27 de Agosto 2014
+* **Fixed:** [Feature asuntos independientes](https://github.com/LemontechSA/ttb/pull/650)
+* **New:** [Feature/mejoras garciabodan](https://github.com/LemontechSA/ttb/pull/643)
+* **New:** [Feature/integracion moreno baldivieso](https://github.com/LemontechSA/ttb/pull/639)
+
 ## Hotfix: 14.13.6
 Lunes 25 de Agosto 2014
 * **Fixed:** [Corrige cálculo de Horas Tarificadas en Word](https://github.com/LemontechSA/ttb/pull/660)

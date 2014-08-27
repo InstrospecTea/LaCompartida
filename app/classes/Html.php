@@ -54,8 +54,8 @@ class Html extends \Html {
 		return $html;
 	}
 
-	public function img($image, $attributes) {
-		$attr = array_merge(array('src' => $image), $attributes);
+	public function img($image, $attributes = null) {
+		$attr = array_merge(array('src' => $image), (array) $attributes);
 		return $this->tag('img', '', $attr, true);
 	}
 
