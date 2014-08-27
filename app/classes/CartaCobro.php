@@ -512,9 +512,14 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 
+
                 // Monto honorario moneda cobro
-                $html2 = str_replace('%simbolo_moneda_cobro%', $moneda->fields['simbolo'], $html2);
                 $html2 = str_replace('%monto_honorarios_moneda_cobro%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+                if ($this->fields['id_moneda'] != $this->fields['opc_moneda_total']) {
+                	$html2 = str_replace('%mb_monto_honorarios_moneda_cobro%', ' equivalentes a '. $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' conforme a su equivalencia al %fecha_hasta_dmy%.', $html2);
+                } else {
+                	$html2 = str_replace('%mb_monto_honorarios_moneda_cobro%', '.', $html2);
+                }
 
 				/* MONTOS SEGUN MONEDA TOTAL IMPRESION */
 				$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
@@ -937,15 +942,19 @@ class CartaCobro extends NotaCobro {
 				if ($this->fields['id_moneda'] == 2 && $moneda_total->fields['id_moneda'] == 1) {
 
 					$detalle_cuenta_honorarios .= ' (';
+
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 						$detalle_cuenta_honorarios .= __('retainer ');
 					}
+
 					$detalle_cuenta_honorarios .= __('equivalente en pesos a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
 					if ($this->fields['id_moneda'] == 2) {
 						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado') . ')';
 					} else {
 						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
 					}
+
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
@@ -957,15 +966,18 @@ class CartaCobro extends NotaCobro {
 							} else {
 								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							}
+
 						} else {
 							$detalle_cuenta_honorarios_primer_dia_mes .= ' ' . __('correspondiente a') . ' ' . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 						}
 
 						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('conforme a su equivalencia en peso según el Dólar Observado publicado por el Banco Central de Chile, el primer día hábil del presente mes') . ' )';
+
 					}
 				}
 
 				if ($this->fields['id_moneda'] == 3 && $moneda_total->fields['id_moneda'] == 1) {
+
 					$detalle_cuenta_honorarios .= ' (';
 
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
@@ -1354,12 +1366,19 @@ class CartaCobro extends NotaCobro {
 					$total_gastos = $this->fields['monto_gastos'];
 				}
 
+				$mb_monto_honorarios = $this->fields['monto'];
+				$mb_monto_gastos = $this->fields['monto_gastos'];
+
 				// Utilizado por Morales y Besa Solicitado por @Gtigre
-				if ($this->fields['monto'] > 0) {
+				if ($mb_monto_honorarios > 0 && $mb_monto_gastos > 0) {
 					$mb_detalle_chile_boleta = "lang_mb_detalle_chile_boleta_hyg";
-				} else {
+				} elseif ($mb_monto_honorarios == 0 && $mb_monto_gastos > 0) { 
 					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_g';
+				} else {
+					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_h';
 				}
+
+				echo $mb_detalle_chile_boleta;
 
 				$html2 = str_replace('%honorarios_y%', $honorarios_y, $html2);
 				$html2 = str_replace('%mb_detalle_chile_boleta%', __($mb_detalle_chile_boleta), $html2);
@@ -1371,12 +1390,17 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 				$html2 = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
 				$html2 = str_replace('%monto_impuesto%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ',-', $html2);
-
 				$html2 = str_replace('%monto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+                $html2 = str_replace('%simbolo_moneda_cobro%', $moneda->fields['simbolo'], $html2);
 
                 // monto honorario moneda
-                $html2 = str_replace('%simbolo_moneda_cobro%', $moneda->fields['simbolo'], $html2);
                 $html2 = str_replace('%monto_honorarios_moneda_cobro%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+                
+                if ($this->fields['id_moneda'] != $this->fields['opc_moneda_total']) {
+                	$html2 = str_replace('%mb_monto_honorarios_moneda_cobro%', ' equivalentes a '. $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' conforme a su equivalencia al %fecha_hasta_dmy%.', $html2);
+                } else {
+                	$html2 = str_replace('%mb_monto_honorarios_moneda_cobro%', '.', $html2);
+                }
 
 				$aproximacion_monto = number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$monto_moneda = ((double) $aproximacion_monto * (double) $this->fields['tipo_cambio_moneda']) / ($tipo_cambio_moneda_total > 0 ? $tipo_cambio_moneda_total : $moneda_total->fields['tipo_cambio']);
@@ -1857,30 +1881,37 @@ class CartaCobro extends NotaCobro {
 				$detalle_cuenta_honorarios = '(i) ' . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda_sin_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 
 				if ($this->fields['id_moneda'] == 2 && $moneda_total->fields['id_moneda'] == 1) {
+
 					$detalle_cuenta_honorarios .= ' (';
-					if ($this->fields['forma_cobro'] == 'FLAT FEE'){
+
+					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 						$detalle_cuenta_honorarios .= __('retainer ');
 					}
+
 					$detalle_cuenta_honorarios .= __('equivalente en pesos a ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
 					if ($this->fields['id_moneda'] == 2) {
 						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado') . ')';
 					} else {
 						$detalle_cuenta_honorarios .= __(', conforme al tipo de cambio observado del día de hoy') . ')';
 					}
+
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
+
 						if ($this->fields['monto_gastos'] > 0) {
 
 							if ($this->fields['monto'] == round($this->fields['monto'])) {
-								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . number_format($this->fields['monto'], 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
+								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							} else {
-								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
+								$detalle_cuenta_honorarios_primer_dia_mes .= __('. Esta cantidad corresponde a') . __(' (i) ') . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							}
 
 						} else {
-							$detalle_cuenta_honorarios_primer_dia_mes .= ' ' . __('correspondiente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
+							$detalle_cuenta_honorarios_primer_dia_mes .= ' ' . __('correspondiente a') . ' ' . $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 						}
+
 						$detalle_cuenta_honorarios_primer_dia_mes .= ' ( ' . __('conforme a su equivalencia en peso según el Dólar Observado publicado por el Banco Central de Chile, el primer día hábil del presente mes') . ' )';
 
 					}
@@ -1901,23 +1932,29 @@ class CartaCobro extends NotaCobro {
 					$detalle_cuenta_honorarios_primer_dia_mes = '';
 
 					if ($this->fields['monto_subtotal'] > 0) {
+
 						if ($this->fields['monto_gastos'] > 0) {
+
 							if ($this->fields['monto'] == round($this->fields['monto'])) {
 								$detalle_cuenta_honorarios_primer_dia_mes = __('. Esta cantidad corresponde a') . __(' (i) ') . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_sin_gasto, 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							} else {
 								$detalle_cuenta_honorarios_primer_dia_mes = __('. Esta cantidad corresponde a') . __(' (i) ') . $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($monto_moneda_sin_gasto, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de honorarios');
 							}
+
 						}
+
 						$detalle_cuenta_honorarios_primer_dia_mes .= ' (' . __('equivalente a') . ' ' . $moneda->fields['simbolo'] . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 						$detalle_cuenta_honorarios_primer_dia_mes .= __(', conforme a su equivalencia en pesos al primer día hábil del presente mes') . ')';
 					}
 				}
 
 				$boleta_honorarios = __('según Boleta de Honorarios adjunta');
+
 				if ($total_gastos != 0) {
+
 					if ($this->fields['monto_subtotal'] > 0) {
 						$detalle_cuenta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio en dicho período');
-						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']).'.';
+						$detalle_cuenta_gastos_cl_boleta = __('; más') . ' (ii) Boleta de Recuperación de Gastos adjunta por ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.';
 					} else {
 						$detalle_cuenta_gastos = __(' por concepto de gastos incurridos por nuestro Estudio en dicho período');
 						$detalle_cuenta_gastos_cl_boleta = ".";
@@ -1925,6 +1962,7 @@ class CartaCobro extends NotaCobro {
 
 					$boleta_gastos = __('; más') . ' (ii) ' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por gastos a reembolsar') . __(', según Boleta de Recuperación de Gastos adjunta');
 					$detalle_cuenta_gastos2 = __('; más') . ' (ii) CH' . $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' ' . __('por concepto de gastos incurridos por nuestro Estudio');
+
 				}
 
 				$html2 = str_replace('%boleta_honorarios%', $boleta_honorarios, $html2);
