@@ -33,7 +33,7 @@ if (empty($pedazo)) {
 		FROM cliente
 		WHERE activo = 1 AND lcase(glosa_cliente) LIKE '%$pedazo%'
 		ORDER BY glosa_cliente
-		LIMIT 10";
+		LIMIT 20";
 }
 
 $resp = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
@@ -41,5 +41,5 @@ $resp = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 if (count($resp) > 0) {
 	echo json_encode(UtilesApp::utf8izar($resp));
 } else {
-	echo json_encode(array("id" => "cualquiera", "value" => __('Cualquiera')));
+	echo json_encode(array('id' => 'cualquiera', 'value' => __('Cualquiera')));
 }

@@ -127,6 +127,7 @@ EOF;
 			});
 
 			function CargarGlosaAsunto() {
+				jQuery('#{$campo_codigo_asunto}').val(jQuery('#{$campo_codigo_asunto}').val().trim());
 				var codigo_asunto = jQuery('#{$campo_codigo_asunto}').val();
 				if (!codigo_asunto) {
 					jQuery('#glosa_asunto').val('');
