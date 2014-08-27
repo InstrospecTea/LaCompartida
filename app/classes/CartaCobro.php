@@ -274,6 +274,7 @@ class CartaCobro extends NotaCobro {
 			$valorsinespacio = '';
 		}
 		$this->espacio = $valorsinespacio;
+		$this->monedas = Moneda::GetMonedas($sesion, '', true);
 	}
 
 	function NuevoRegistro(){
