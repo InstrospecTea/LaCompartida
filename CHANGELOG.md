@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 14.14.1
+Miercoles 27 de Agosto 2014
+* **Fixed:** [Modificaciones CartaCobro MB](https://github.com/LemontechSA/ttb/pull/664)
 
 ## Release: 14.14.0
 Miércoles 27 de Agosto 2014
