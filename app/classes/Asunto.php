@@ -474,15 +474,11 @@ class Asunto extends Objeto {
 		return true;
 	}
 
-	function Eliminar() {
-		if (!$this->Loaded()) {
-			return false;
-		}
-		if(!$this->permiteAsuntoIndependiente($this->fields['codigo_cliente'], $this->fields['id_asunto'])) {
-			$this->error = __('Debe tener al menos un asunto que no se cobre de forma independiente.');
-			return false;
-		}
-
+	/**
+	 * Verifica si el asunto puede ser eliminado
+	 * @return boolean
+	 */
+	public function CheckDelete() {
 		#Valida si no tiene algún trabajo relacionado
 		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -492,7 +488,7 @@ class Asunto extends Objeto {
 			return false;
 		}
 
-		$query = "SELECT Count(*) FROM cta_corriente WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$query = "SELECT Count(*) FROM cta_corriente WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
 		if ($count > 0) {
@@ -501,14 +497,14 @@ class Asunto extends Objeto {
 		}
 
 		#solo se puede eliminar asuntos que no tengan cobros asociados
-		$query = "SELECT COUNT(*) FROM cobro_asunto WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$query = "SELECT COUNT(*) FROM cobro_asunto WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
 		if ($count > 0) {
 			$query = "SELECT cobro.id_cobro
 									FROM cobro_asunto
 									JOIN cobro ON cobro.id_cobro = cobro_asunto.id_cobro
-									WHERE cobro_asunto.codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+									WHERE cobro_asunto.codigo_asunto = '{$this->fields['codigo_asunto']}'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($cobro) = mysql_fetch_array($resp);
 			$this->error = __('No se puede eliminar un') . ' ' . __('asunto') . ' ' . __('que tiene cobros asociados') . ". " .
@@ -517,19 +513,34 @@ class Asunto extends Objeto {
 		}
 
 		#solo se pueden eliminar asuntos que no tengan carpetas asociados
-		$query = "SELECT COUNT(*) FROM carpeta WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$query = "SELECT COUNT(*) FROM carpeta WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
 		if ($count > 0) {
-			$query = "SELECT id_carpeta, glosa_carpeta FROM carpeta WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+			$query = "SELECT id_carpeta, glosa_carpeta FROM carpeta WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utile::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($id_carpeta, $glosa_carpeta) = mysql_fetch_array($resp);
 			$this->error = __('No se puede eliminar un') . ' ' . __('asunto') . ' ' . __('que tiene carpetas asociados. Carpeta asociado: #' . $id_carpeta . ' ( ' . $glosa_carpeta . ' )');
 			return false;
 		}
 
-		$query = "DELETE FROM asunto WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		return true;
+	}
+
+	public function Eliminar() {
+		$id_contrato_indep = $this->fields['id_contrato_indep'];
+		if ($this->Delete()) {
+			if (!empty($id_contrato_indep)) {
+				$ContratoIndependiente = new Contrato($this->sesion);
+				$ContratoIndependiente->Load($this->fields['id_contrato_indep']);
+				if ($ContratoIndependiente->Loaded()) {
+					if (!$ContratoIndependiente->Eliminar()) {
+						$ContratoIndependiente->Edit('activo', 0);
+						$ContratoIndependiente->Write();
+					}
+				}
+			}
+		}
 		return true;
 	}
 
@@ -951,18 +962,6 @@ class Asunto extends Objeto {
 		$qr = $this->sesion->pdodbh->query($query);
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
-	}
-
-	public function permiteAsuntoIndependiente($codigo_cliente, $id_asunto = null){
-		$and_id_asunto = empty($id_asunto) ? '' : "AND NOT id_asunto = $id_asunto";
-		$query = "SELECT COUNT(id_contrato_indep) AS total
-					FROM {$this->tabla}
-					WHERE codigo_cliente= '{$codigo_cliente}'
-					AND id_contrato_indep=''
-					{$and_id_asunto}";
-		$qr = $this->sesion->pdodbh->query($query);
-		$total = $qr->fetch(PDO::FETCH_ASSOC);
-		return empty($id_asunto) ? $total['total'] > 1 : $total['total'] >= 1;
 	}
 }
 
