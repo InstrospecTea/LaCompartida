@@ -5914,8 +5914,9 @@ class NotaCobro extends Cobro {
 				$minutos_trabajadas = sprintf("%02d", round($totales['tiempo_trabajado']) % 60);
 				$horas_trabajadas_real = floor(($totales['tiempo_trabajado_real']) / 60);
 				$minutos_trabajadas_real = sprintf("%02d", round($totales['tiempo_trabajado_real']) % 60);
+				#RETAINER
 				$horas_retainer = floor(($totales['tiempo_retainer']) / 60);
-				$minutos_retainer = sprintf("%02d", round($totales['tiempo_retainer']) % 60);
+				$minutos_retainer = sprintf("%02d", round($totales['tiempo_retainer'] % 60));
 				$segundos_retainer = sprintf("%02d", round(60 * ($totales['tiempo_retainer'] - floor($totales['tiempo_retainer']))));
 				$horas_flatfee = floor(($totales['tiempo_flatfee']) / 60);
 				$minutos_flatfee = sprintf("%02d", round($totales['tiempo_flatfee']) % 60);
