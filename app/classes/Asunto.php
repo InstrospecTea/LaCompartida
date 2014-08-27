@@ -532,7 +532,7 @@ class Asunto extends Objeto {
 		if ($this->Delete()) {
 			if (!empty($id_contrato_indep)) {
 				$ContratoIndependiente = new Contrato($this->sesion);
-				$ContratoIndependiente->Load($this->fields['id_contrato_indep']);
+				$ContratoIndependiente->Load($id_contrato_indep);
 				if ($ContratoIndependiente->Loaded()) {
 					if (!$ContratoIndependiente->Eliminar()) {
 						$ContratoIndependiente->Edit('activo', 0);
