@@ -1356,11 +1356,9 @@ class CartaCobro extends NotaCobro {
 
 				// Utilizado por Morales y Besa Solicitado por @Gtigre
 				if ($this->fields['monto'] > 0) {
-					$honorarios_y = 'por honorarios y de gastos ';
-					$mb_detalle_chile_boleta = "lang_mb_detalle_chile_boleta";
+					$mb_detalle_chile_boleta = "lang_mb_detalle_chile_boleta_hyg";
 				} else {
-					$honorarios_y = ' de gastos';
-					$mb_detalle_chile_boleta = '';
+					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_g';
 				}
 
 				$html2 = str_replace('%honorarios_y%', $honorarios_y, $html2);
