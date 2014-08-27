@@ -517,6 +517,7 @@ class CartaCobro extends NotaCobro {
 					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_h';
 				}
 
+                $html2 = str_replace('%mb_detalle_chile_boleta%', __($mb_detalle_chile_boleta), $html2);
 				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_egreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
 				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_ingreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
 				$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2);
@@ -1389,7 +1390,6 @@ class CartaCobro extends NotaCobro {
 					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_h';
 				}
 
-				$html2 = str_replace('%honorarios_y%', $honorarios_y, $html2);
 				$html2 = str_replace('%mb_detalle_chile_boleta%', __($mb_detalle_chile_boleta), $html2);
 
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
