@@ -548,6 +548,7 @@ $Form = new Form;
 				<td class="al">
 					<div class="span3">
 						<input type="text" name="fecha_creacion" class="span2 fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo $fecha_creacion; ?>"  />
+						<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_creacion" style="cursor:pointer" />
 					</div>
 
 				</td>
@@ -1232,6 +1233,9 @@ if (Conf::GetConf($sesion, 'TodoMayuscula')) {
 		frame = jQuery(this);
 		frame.css('height', frame[0].contentWindow.document.body.offsetHeight + 'px');
 	});
+
+	Calendar.setup({ inputField: "fecha_creacion", ifFormat: "%d-%m-%Y", button: "fecha_creacion" });
+	Calendar.setup({ inputField: "fecha_creacion", ifFormat: "%d-%m-%Y", button: "img_fecha_creacion" });
 </script>
 
 <?php
