@@ -505,13 +505,24 @@ class CartaCobro extends NotaCobro {
 
 				$saldo_balance_gastos_moneda_total = max(0, $saldo_ingreso_moneda_total - $saldo_egreso_moneda_total);
 
+				$mb_monto_honorarios = $this->fields['monto'];
+				$mb_monto_gastos = $this->fields['monto_gastos'];
+
+				// Utilizado por Morales y Besa Solicitado por @Gtigre
+				if ($mb_monto_honorarios > 0 && $mb_monto_gastos > 0) {
+					$mb_detalle_chile_boleta = "lang_mb_detalle_chile_boleta_hyg";
+				} elseif ($mb_monto_honorarios == 0 && $mb_monto_gastos > 0) { 
+					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_g';
+				} else {
+					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_h';
+				}
+
 				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_egreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
 				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_ingreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
 				$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2);
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-
 
                 // Monto honorario moneda cobro
                 $html2 = str_replace('%monto_honorarios_moneda_cobro%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1377,8 +1388,6 @@ class CartaCobro extends NotaCobro {
 				} else {
 					$mb_detalle_chile_boleta = 'lang_mb_detalle_chile_boleta_h';
 				}
-
-				echo $mb_detalle_chile_boleta;
 
 				$html2 = str_replace('%honorarios_y%', $honorarios_y, $html2);
 				$html2 = str_replace('%mb_detalle_chile_boleta%', __($mb_detalle_chile_boleta), $html2);
