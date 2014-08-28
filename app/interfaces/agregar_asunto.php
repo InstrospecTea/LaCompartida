@@ -98,8 +98,15 @@ if ($id_asunto > 0) {
 	}
 }
 
-if ($codigo_cliente != '') {
+if ($codigo_cliente != '' && !$Cliente->Loaded()) {
 	$Cliente->LoadByCodigo($codigo_cliente);
+	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
+		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
+		$Cliente->LoadByCodigo($codigo_cliente);
+
+	if ($loaded) {
+		$codigo_cliente = $Cliente->fields['codigo_cliente'];
+	}
 }
 
 if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "guardar")) {
@@ -108,7 +115,7 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 	$cargar_datos_contrato_cliente_defecto = $ContratoCliente->fields;
 }
 
-if ($opcion == "guardar") {
+if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
 	// Validaciones
@@ -465,7 +472,7 @@ $AreaProyecto = new AreaProyecto($Sesion);
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
-
+$Form = new Form;
 if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 	$field_codigo_asunto_secundario = array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario']));
 
@@ -522,7 +529,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		window.close();
 	}
 
-	function MuestraPorValidacion(divID) {
+function MuestraPorValidacion(divID) {
 		var divArea = $(divID);
 		var divAreaImg = $(divID + "_img");
 		var divAreaVisible = divArea.style['display'] != "none";
@@ -531,7 +538,6 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 	}
 
 	function Validar(form) {
-
 		if (!form) {
 			var form = $('formulario');
 		}
@@ -776,8 +782,7 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				return false;
 			}
 		}
-
-		form.submit();
+		jQuery(form).submit();
 		return true;
 	}
 
@@ -951,9 +956,9 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 								<?php
 								if (!$Asunto->Loaded()) {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
 									} else {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); EsPrimerAsunto(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
 									}
 								} else {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
@@ -1061,9 +1066,9 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 
 				<?php
 				if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
-					$checked = 'checked';
+					$checked = true;
 				} else {
-					$checked = '';
+					$checked = false;
 				}
 
 				$hide_areas = false;
@@ -1073,21 +1078,13 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 					if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
 						$codigo_cliente = $Asunto->fields['codigo_cliente'];
 					}
-
-					if ($codigo_cliente != '') {
-						// verificar si es el primer asunto del cliente
-						if ($Asunto->esPrimerAsunto($codigo_cliente) && empty($checked)) {
-							$hide_areas = true;
-						}
-					}
 				}
 				?>
 
 				<table width="100%" cellspacing="0" cellpadding="0">
 					<tr>
 						<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
-							<input type="checkbox" name="cobro_independiente" id="cobro_independiente" onclick="ShowContrato(this.form, this)" value="1" <?php echo $checked; ?>>
-							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente'); ?></label>
+							<?php echo $Form->checkbox('cobro_independiente', 1, $checked, array('label' =>__('Se cobrará de forma independiente'), 'onclick' => 'ShowContrato(this.form, this)', 'id' => 'cobro_independiente')); ?>
 						</td>
 						<td id="tbl_copiar_datos" style="display:<?php echo !empty($checked) ? 'inline' : 'none'; ?>;">
 							&nbsp;
@@ -1095,15 +1092,15 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 					</tr>
 				</table>
 
-				<br>
+				<br/>
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-
 					<?php if (!$Sesion->usuario->Es('SASU')) {
 						$cliente = &$Cliente;
 						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
 					} ?>
 				</div>
-				<br>
+
+				<br/>
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
 					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
@@ -1147,10 +1144,10 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 						<tr>
 							<td colspan=6 align="center">
 								<?php
-								if (Conf::GetConf($Sesion, 'RevisarTarifas')) {
+								if (!$Sesion->usuario->Es('SASU') && Conf::GetConf($Sesion, 'RevisarTarifas')) {
 									$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
 								} else {
-									$funcion_validar = "return Validar(jQuery('#formulario').get(0));";
+									$funcion_validar = "return Validar(jQuery('#formulario')[0]);";
 								}
 								$Form = new Form;
 								echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
@@ -1247,27 +1244,6 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				}
 			}
 		}, 'text');
-	}
-
-	function EsPrimerAsunto(codigo_cliente) {
-		if (codigo_cliente !== undefined && codigo_cliente != '') {
-			jQuery.get(
-				root_dir + '/app/interfaces/ajax.php',
-				{'accion': 'es_primer_asunto', 'codigo_cliente': codigo_cliente, 'id_asunto': jQuery('#id_asunto').val()},
-				function (response) {
-					var _response = jQuery.parseJSON(response);
-					if (_response.error == false) {
-						if (_response.es_primer_asunto == true) {
-							jQuery('#td_cobro_independiente').hide();
-						} else {
-							jQuery('#td_cobro_independiente').show();
-						}
-					} else {
-						alert(_response.error_glosa);
-					}
-				}
-			);
-		}
 	}
 </script>
 

@@ -26,7 +26,6 @@ class Criteria {
 	private $where = ' WHERE';
 	private $grouping = ' GROUP BY';
 	private $ordering = ' ORDER BY';
-	private $left_joining = ' LEFT JOIN';
 	private $limit = '';
 	private $order_criteria = '';
 
@@ -77,9 +76,7 @@ class Criteria {
 		}
 		$new_clause = '';
 		$new_clause .= $attribute;
-		if ($alias != '') {
-			$new_clause .=" '$alias'";
-		}
+		$new_clause .= (strlen($alias) > 0) ? " AS $alias" : '';
 		$this->select_clauses[] = $new_clause;
 		return $this;
 	}
@@ -149,7 +146,8 @@ class Criteria {
 			$alias = '';
 		}
 		$new_clause = '';
-		$new_clause .= $table . ' ' . $alias;
+		$new_clause .= $table;
+		$new_clause .= (strlen($alias) > 0) ? " AS $alias" : '';
 		$this->from_clauses[] = $new_clause;
 		return $this;
 	}
@@ -168,32 +166,72 @@ class Criteria {
 	}
 
 	/**
+	 * Añade un scope de búsqueda mediante un JOIN genérico configurable.
+	 * @param  string $join_table
+	 * @param  string $join_condition
+	 * @return Criteria
+	 */
+	public function add_custom_join_with($join_table, $join_condition, $join_type = 'LEFT') {
+		$new_clause = " $join_type JOIN $join_table ON $join_condition ";
+		$this->join_clauses[] = $new_clause;
+		return $this;
+	}
+
+	/**
 	 * Añade un scope de búsqueda mediante un LEFT JOIN al criteria.
 	 * @param  string $join_table
 	 * @param  string $join_condition
 	 * @return Criteria
 	 */
 	public function add_left_join_with($join_table, $join_condition) {
-		$new_clause = '';
-		$new_clause .= $this->left_joining . ' ';
-		$new_clause .= $join_table . ' ON ' . $join_condition;
+		return $this->add_custom_join_with($join_table, $join_condition, 'LEFT');
+	}
+
+
+	/**
+	 * Añade un scope de búsqueda mediante un INNER JOIN al criteria.
+	 * @param  string $join_table
+	 * @param  string $join_condition
+	 * @return Criteria
+	 */
+	public function add_inner_join_with($join_table, $join_condition) {
+		return $this->add_custom_join_with($join_table, $join_condition, 'INNER');
+	}
+
+	/**
+	 * Añade un criteria al scope de búsqueda a través de un join configurable
+	 * @param Criteria $criteria
+	 * @param string   $alias
+	 * @param string   $join_condition
+	 * @param string   $join_type
+	 * @return Criteria
+	 */
+	public function add_custom_join_with_criteria(Criteria $criteria, $alias, $join_condition, $join_type = 'LEFT') {
+		$new_clause = " $join_type JOIN ({$criteria->get_plain_query()}) AS $alias ON $join_condition ";
 		$this->join_clauses[] = $new_clause;
 		return $this;
 	}
 
 	/**
-	 * Añade un criteria al scope de búsqueda a través de un left join con este crtieria.
+	 * Añade un criteria al scope de búsqueda a través de un left join con este criteria.
 	 * @param Criteria $criteria
 	 * @param string   $alias
 	 * @param string   $join_condition
 	 * @return Criteria
 	 */
 	public function add_left_join_with_criteria(Criteria $criteria, $alias, $join_condition) {
-		$new_clause = '';
-		$new_clause .= $this->left_joining . " ";
-		$new_clause .= '(' . $criteria->get_plain_query() . ') ' . $alias . ' ON ' . $join_condition;
-		$this->join_clauses[] = $new_clause;
-		return $this;
+		return $this->add_custom_join_with_criteria($criteria, $alias, $join_condition, 'LEFT');
+	}
+
+	/**
+	 * Añade un criteria al scope de búsqueda a través de un inner join con este criteria.
+	 * @param Criteria $criteria
+	 * @param string   $alias
+	 * @param string   $join_condition
+	 * @return Criteria
+	 */
+	public function add_inner_join_with_criteria(Criteria $criteria, $alias, $join_condition) {
+		return $this->add_custom_join_with_criteria($criteria, $alias, $join_condition, 'INNER');
 	}
 
 	/**
