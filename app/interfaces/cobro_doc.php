@@ -46,14 +46,8 @@ for ($k = 0; $k < count($cobro->asuntos); $k++) {
     }
 }
 
-if (method_exists('Conf', 'GetConf')) {
-    if ($solo_gastos && Conf::GetConf($Sesion, 'CSSSoloGastos')) {
-        $css_cobro = 2;
-    }
-} else if (method_exists('Conf', 'CSSSoloGastos')) {
-    if ($solo_gastos && Conf::CSSSoloGastos()) {
-        $css_cobro = 2;
-    }
+if ($solo_gastos && Conf::GetConf($Sesion, 'CSSSoloGastos')) {
+	$css_cobro = 2;
 }
 
 if (empty($cobro->fields['id_formato'])) {
@@ -72,8 +66,8 @@ if (isset($_GET['notacobro'])) {
     die();
 }
 
-if (UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') && UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') != 0 && UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') != $id_formato) {
-    $nuevo_id = UtilesApp::GetConf($Sesion, 'SegundaNotaCobro');
+if (Conf::GetConf($Sesion, 'SegundaNotaCobro') && Conf::GetConf($Sesion, 'SegundaNotaCobro') != 0 && Conf::GetConf($Sesion, 'SegundaNotaCobro') != $id_formato) {
+    $nuevo_id = Conf::GetConf($Sesion, 'SegundaNotaCobro');
     $html2 .= $cobro->GeneraHTMLCobro(false, $nuevo_id);
     $cssData2 = UtilesApp::TemplateCartaCSS($Sesion, $cobro->fields['id_carta']);
     $cssData2 .= UtilesApp::CSSCobro($Sesion, $nuevo_id);
@@ -83,7 +77,7 @@ if (UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') && UtilesApp::GetConf($Sesio
 }
 
 // margenes 1.5, 2.0, 2.0, 2.0
-$orientacion_papel = UtilesApp::GetConf($Sesion, 'OrientacionPapelPorDefecto');
+$orientacion_papel = Conf::GetConf($Sesion, 'OrientacionPapelPorDefecto');
 
 if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
     $orientacion_papel = 'PORTRAIT';

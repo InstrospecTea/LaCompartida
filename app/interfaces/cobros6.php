@@ -451,7 +451,7 @@ if ($cambiar_estado && $estado!='') {
 }
 
 if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_documento_pdf') {
-//	print_r($_REQUEST);
+
 	$cobro->Edit("opc_ver_detalles_por_hora", $opc_ver_detalles_por_hora);
 	$cobro->Edit("opc_ver_modalidad", $opc_ver_modalidad);
 	$cobro->Edit("opc_ver_profesional", $opc_ver_profesional);
@@ -476,9 +476,9 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
-       	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
+	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
 
-// Opciones especificos para Vial Olivares
+	// Opciones especificos para Vial Olivares
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
 	$cobro->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
@@ -537,12 +537,6 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 
 	if ($cobro->Write()) {
 		$desde_cobros_emitidos = true;
-		/*
-		  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
-		  require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
-		  else
-		  require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
-		 */
 		if ($opc == 'descargar_excel_especial') {
 			require_once Conf::ServerDir() . '/../app/interfaces/' . Conf::GetConf($sesion, 'XLSFormatoEspecial');
 		} else if ($opc == 'descargar_excel_rentabilidad') {
