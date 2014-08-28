@@ -21,7 +21,6 @@ if (!class_exists('Cobro')) {
 
 		function Write() {
 			$ingreso_historial = false;
-
 			if ($this->fields['estado'] != $this->valor_antiguo['estado'] && !empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 				$ingreso_historial = true;
 			}
@@ -33,10 +32,9 @@ if (!class_exists('Cobro')) {
 			try {
 				$charge = $chargeService->saveOrUpdate($charge);
 				$this->fields = $charge->fields;
-			} catch(Exception $ex) {
+			} catch (Exception $ex) {
 
 			}
-
 
 			// actualizar campo estadocobro de los trabajos según estado del cobro
 			$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
