@@ -1,4 +1,8 @@
 # Changelog
+## Release: 14.15.0
+Miércoles 27 de Agosto 2014
+* **Fixed:** [Permite que cualquier asunto se cobre independiente](https://github.com/LemontechSA/ttb/pull/665)
+
 ## Hotfix: 14.14.2
 Miercoles 27 de Agosto 2014
 * **Fixed:** [Modificaciones CartaCobro MB](https://github.com/LemontechSA/ttb/pull/664)
