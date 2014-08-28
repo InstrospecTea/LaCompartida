@@ -21,40 +21,49 @@ if (!class_exists('Cobro')) {
 
 		function Write() {
 			$ingreso_historial = false;
-
 			if ($this->fields['estado'] != $this->valor_antiguo['estado'] && !empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 				$ingreso_historial = true;
 			}
 
-			if (parent::Write()) {
-				// actualizar campo estadocobro de los trabajos según estado del cobro
-				$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
-				$trabajos = new ListaTrabajos($this->sesion, '', $query);
-				for ($x = 0; $x < $trabajos->num; $x++) {
-					$trabajo = $trabajos->Get($x);
-					$trabajo->Edit('estadocobro', $this->fields['estado']);
-					$trabajo->Write();
-				}
+			$chargeService = new ChargeService($this->sesion);
+			$charge = new Charge();
+			$charge->fillFromArray($this->fields);
+			$charge->fillChangedFields($this->changes);
+			try {
+				$charge = $chargeService->saveOrUpdate($charge);
+				$this->fields = $charge->fields;
+			} catch (Exception $ex) {
 
-				if ($ingreso_historial) {
-					// Esa linea es necesaria para que el estado no se guardará dos veces
-					$this->valor_antiguo['estado'] = $this->fields['estado'];
+			}
 
-					$his = new Observacion($this->sesion);
+			// actualizar campo estadocobro de los trabajos según estado del cobro
+			$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
+			$trabajos = new ListaTrabajos($this->sesion, '', $query);
+			for ($x = 0; $x < $trabajos->num; $x++) {
+				$trabajo = $trabajos->Get($x);
+				$trabajo->Edit('estadocobro', $this->fields['estado']);
+				$trabajo->Write();
+			}
 
-					if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
-						if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
-							$his->Edit('fecha', date('Y-m-d H:i:s'));
-							$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
-							$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-							$his->Edit('id_cobro', $this->fields['id_cobro']);
-							$his->Write();
-						}
+			if ($ingreso_historial) {
+				// Esa linea es necesaria para que el estado no se guardará dos veces
+				$this->valor_antiguo['estado'] = $this->fields['estado'];
+
+				$his = new Observacion($this->sesion);
+
+				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
+					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+						$his->Edit('fecha', date('Y-m-d H:i:s'));
+						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+						$his->Edit('id_cobro', $this->fields['id_cobro']);
+						$his->Write();
 					}
 				}
-
-				return true;
 			}
+
+			return true;
+
 		}
 
 		function GlosaSeEstaCobrando() {
@@ -600,6 +609,7 @@ if (!class_exists('Cobro')) {
 			}
 			$estado_anterior = $this->fields['estado'];
 			$this->Edit('estado', $estado);
+
 			if ($this->Write() && $estado_anterior != $estado) {
 				return $estado;
 			}
@@ -646,8 +656,13 @@ if (!class_exists('Cobro')) {
 		}
 
 		function Eliminar() {
-			$id_cobro = $this->fields[id_cobro];
+			$id_cobro = $this->fields['id_cobro'];
+
 			if ($id_cobro) {
+				$chargeService = new ChargeService($this->sesion);
+				$charge = new Charge();
+				$charge->fillFromArray($this->fields);
+				$chargeService->delete($charge);
 				//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
 				if ($this->fields['id_provision_generada']) {
 					$provision_generada = new Gasto($this->sesion);
@@ -2528,7 +2543,6 @@ if (!class_exists('Cobro')) {
 				$array_profesional_usuario['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_incobrables']);
 				$array_profesional_usuario['duracion_retainer'] = $row['duracion_retainer'];
 				$array_profesional_usuario['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_retainer']);
-				$array_profesional_usuario['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_retainer']);
 				$array_profesional_usuario['tarifa'] = $row['tarifa'];
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
@@ -2549,6 +2563,7 @@ if (!class_exists('Cobro')) {
 				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
 					$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
+					$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
 					$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
 				} else {
 					$array_profesional_usuario['duracion_tarificada'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];

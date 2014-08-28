@@ -238,77 +238,47 @@ class Contrato extends Objeto {
 		return true;
 	}
 
-	/* function AddCobroAsuntos($id_cobro)
-	  {
-	  #Genero la parte values a través de queries
-	  $query = "SELECT CONCAT('(', '$id_cobro',',\'',codigo_asunto,'\')') as value FROM asunto WHERE id_contrato = '".$this->fields['id_contrato']."'";
-	  $query = "SELECT GROUP_CONCAT(value) FROM ($query) as tabla";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-	  list($values) = mysql_fetch_array($resp);
-
-	  if($values != "")
-	  {
-	  $query = "INSERT INTO cobro_asunto (id_cobro, codigo_asunto) values $values";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-	  }
-	  return true;
-	  } */
-
-	/*
-	  Elimianr contrato
+	/**
+	 * Verifica si el contrato puede ser eliminado
+	 * @return boolean
 	 */
-
-	function Eliminar() {
-		$id_contrato = $this->fields[id_contrato];
-		if ($id_contrato) {
-			$sql = "SELECT COUNT(*) FROM cobro WHERE id_contrato = $id_contrato";
-			$resp = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
-			list($count) = mysql_fetch_array($resp);
-			if ($count > 0) {
-				$this->error = __('No se puede eliminar un contrato que tenga cobro(s) asociado(s)');
-				return false;
-			} else {
-				$query = "DELETE FROM modificaciones_contrato WHERE id_contrato = " . $id_contrato;
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "DELETE FROM contrato WHERE id_contrato = " . $id_contrato;
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				return true;
-			}
-		}
-		else
+	function CheckDelete() {
+		if (!$this->Loaded()) {
 			return false;
+		}
+		$id_contrato = $this->fields[$this->campo_id];
+		$sql = "SELECT COUNT(*) FROM cobro WHERE id_contrato = $id_contrato";
+		$resp = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+		if ($count > 0) {
+			$this->error = __('No se puede eliminar un contrato que tenga cobro(s) asociado(s)');
+			return false;
+		}
+		return true;
 	}
 
-	/*
-	  Funcion fecha inicio cobro, recupera la fecha del más antiguo cobro o del más viejo trabajo, cobrable no cobrado
+	/**
+	 * Elimina Contrato
+	 * @return boolean
 	 */
-	/*
-	  function FechaInicioCobro()
-	  {
-	  $query = "SELECT
-	  LEAST(trabajo.fecha, (SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato AND cobro.estado <> 'CREADO')) AS fecha_inicio
-	  FROM trabajo
-	  JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
-	  JOIN contrato on asunto.id_contrato = contrato.id_contrato
-	  JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
-	  LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario AND contrato.id_moneda=usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
-	  LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-	  WHERE
-	  (cobro.estado IS NULL)
-	  AND trabajo.cobrable = 1 AND contrato.id_contrato = '".$this->fields['id_contrato']."'
-	  GROUP BY contrato.id_contrato";
-	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-	  list($fecha_inicio) = mysql_fetch_array($resp);
-	  return $fecha_inicio;
-	  }
-	 */
+	function Eliminar() {
+		$id_contrato = $this->fields[$this->campo_id];
+		if ($this->Delete()) {
+			$query = "DELETE FROM modificaciones_contrato WHERE id_contrato = $id_contrato";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			return true;
+		}
+		return false;
+	}
 
-	/*
-	  Funcion cobro estimado en periodo
-	  Parametros: fecha_ini, fecha_fin, id_contrato
+	/**
+	 * Funcion cobro estimado en periodo
+	 * @param type $fecha_ini
+	 * @param type $fecha_fin
+	 * @param type $id_contrato
+	 * @param type $horas_castigadas
+	 * @return array
 	 */
-
 	function ProximoCobroEstimado($fecha_ini, $fecha_fin, $id_contrato, $horas_castigadas = NULL) {
 
 		$wheretramite=$wheregasto=$wheretrabajo=$where = '1';
@@ -1091,11 +1061,11 @@ class Contrato extends Objeto {
 		$this->Edit("monto", str_replace(',','.',$this->fields['monto']), true);
 		$this->Edit("id_usuario_responsable", (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL");
 
-		if (UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')) {
+		if (Conf::GetConf($this->sesion, 'EncargadoSecundario')) {
 			$this->Edit("id_usuario_secundario", (!empty($this->fields['id_usuario_secundario']) && $this->fields['id_usuario_secundario'] != -1 ) ? $this->fields['id_usuario_secundario'] : "NULL");
 		}
 
-		if (UtilesApp::GetConf($this->sesion, 'CopiarEncargadoAlAsunto')) {
+		if (Conf::GetConf($this->sesion, 'CopiarEncargadoAlAsunto')) {
 			$id_usuario_responsable_def = (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL";
 			$sql_cambia = "UPDATE contrato SET id_usuario_responsable = $id_usuario_responsable_def  WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
 			if (!($res = mysql_query($sql_cambia, $this->sesion->dbh) )) {
@@ -1205,7 +1175,7 @@ class Contrato extends Objeto {
 			} else {
 				$notificar_otros_correos = '';
 			}
-			if (UtilesApp::GetConf($this->sesion, 'ExportacionLedes')) {
+			if (Conf::GetConf($this->sesion, 'ExportacionLedes')) {
 				$this->Edit('exportacion_ledes', empty($this->extra_fields['exportacion_ledes']) ? '0': '1');
 			}
 			if(isset($this->extra_fields['factura_rut']) && $this->extra_fields['factura_rut']!='') {
@@ -1219,8 +1189,9 @@ class Contrato extends Objeto {
 		$this->error = "";
 		$this->Prepare();
 
-		if (!$this->Check())
+		if (!$this->Check()) {
 			return false;
+		}
 		if (empty($this->sesion->usuario->fields['id_usuario2'])) {
 			$sql = "SELECT id_usuario FROM usuario WHERE rut LIKE '%99511620%' LIMIT 1";
 			$resp = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1230,8 +1201,9 @@ class Contrato extends Objeto {
 		}
 		if ($this->Loaded()) {
 			$query = "UPDATE " . $this->tabla . " SET ";
-			if ($this->guardar_fecha )
+			if ($this->guardar_fecha) {
 				$query .= "fecha_modificacion=NOW(),";
+			}
 
 			$c = 0;
 			foreach ($this->fields as $key => $val) {
@@ -1246,10 +1218,8 @@ class Contrato extends Objeto {
 					$c++;
 				}
 				if ($this->logear[$key]) {   // log data
-
-
 					$query_log = "INSERT INTO log_db SET id_field = '" . $this->fields[$this->campo_id] . "', titulo_tabla = '" . $this->tabla . "', campo_tabla = '" . $key . "', fecha = NOW(), usuario = '" . $this->sesion->usuario->fields['id_usuario'] . "',
-						valor_antiguo = '" . mysql_real_escape_string($this->valor_antiguo[$key], $this->sesion->dbh) . "', valor_nuevo ='" . mysql_real_escape_string($val, $this->sesion->dbh)."'"  ;
+						valor_antiguo = '" . mysql_real_escape_string($this->valor_antiguo[$key], $this->sesion->dbh) . "', valor_nuevo ='" . mysql_real_escape_string($val, $this->sesion->dbh) . "'";
 					$resp_log = mysql_query($query_log, $this->sesion->dbh) or Utiles::errorSQL($query_log, __FILE__, __LINE__, $this->sesion->dbh);
 					$this->logear[$key] = false;
 				}
@@ -1261,18 +1231,17 @@ class Contrato extends Objeto {
 
 				//Guarda ultimo cambio en la tabla historial de modificaciones
 				$query3 = " INSERT INTO modificaciones_contrato
-										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
-                                                                           VALUES ( '" . $this->fields['id_contrato'] . "', '" . $this->fields['fecha_creacion'] . "',
-                                                                                    NOW(), '" . $id_usuario_modificador . "',
-                                                                                    " . (!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" ) . " )";
+								(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
+							VALUES ( '" . $this->fields['id_contrato'] . "', '" . $this->fields['fecha_creacion'] . "',
+								NOW(), '" . $id_usuario_modificador . "',
+								" . (!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" ) . " )";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3, __FILE__, __LINE__, $this->sesion->dbh);
-			}
-			else //Retorna true ya que si no quiere hacer update la función corrió bien
+			} else //Retorna true ya que si no quiere hacer update la función corrió bien
 				return true;
 		}
 		else {
 			$query = "INSERT INTO " . $this->tabla . " SET ";
-			if ($this->guardar_fecha && empty($this->fields['fecha_creacion']) )
+			if ($this->guardar_fecha && empty($this->fields['fecha_creacion']))
 				$query .= "fecha_creacion=NOW(),";
 			$c = 0;
 			foreach ($this->fields as $key => $val) {
@@ -1286,95 +1255,91 @@ class Contrato extends Objeto {
 					$c++;
 				}
 			}
-				try {
-						$arrayparams=null;
-						$insertstatement=$this->sesion->pdodbh->prepare($query);
-						$insertstatement->execute($arrayparams);
-						$insertid=$this->sesion->pdodbh->lastInsertId();
-						$this->fields['id_contrato']=$insertid;
-						$this->Edit('id_contrato',$insertid);
-						$this->Load($insertid);
-						print_r($contrato->fields);
-					} catch (PDOException $e) {
-						 if($this->sesion->usuario->fields['rut'] == '99511620') {
-							$Slim=Slim::getInstance('default',true);
-							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($arrayparamsdebug) );
-							$Slim->view()->setData($arrayPDOException);
-							 $Slim->applyHook('hook_error_sql');
-					 }
-						 Utiles::errorSQL($query, "", "",  NULL,"",$e );
-						return false;
+			try {
+				$arrayparams = null;
+				$insertstatement = $this->sesion->pdodbh->prepare($query);
+				$insertstatement->execute($arrayparams);
+				$insertid = $this->sesion->pdodbh->lastInsertId();
+				$this->fields['id_contrato'] = $insertid;
+				$this->Edit('id_contrato', $insertid);
+				$this->Load($insertid);
+			} catch (PDOException $e) {
+				if ($this->sesion->usuario->fields['rut'] == '99511620') {
+					$Slim = Slim::getInstance('default', true);
+					$arrayPDOException = array('File' => $e->getFile(), 'Line' => $e->getLine(), 'Mensaje' => $e->getMessage(), 'Query' => $query, 'Trace' => json_encode($e->getTrace()), 'Parametros' => json_encode($arrayparamsdebug));
+					$Slim->view()->setData($arrayPDOException);
+					$Slim->applyHook('hook_error_sql');
+				}
+				Utiles::errorSQL($query, "", "", NULL, "", $e);
+				return false;
 			}
 
-
-
 			$query3 = " INSERT INTO modificaciones_contrato
-										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
-                                                                           VALUES ( '" . $this->fields['id_contrato'] . "', NOW(),
-                                                                                    NOW(), '" . $id_usuario_modificador . "',
-                                                                                    " . (!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" ) . " )";
+							(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
+						VALUES ( '" . $this->fields['id_contrato'] . "', NOW(),
+								 NOW(), '" . $id_usuario_modificador . "',
+								 " . (!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" ) . " )";
 			$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3, __FILE__, __LINE__, $this->sesion->dbh);
 
 			if ($enviar_mail_asunto_nuevo) {
 				// Mandar un email al encargado comercial
-				if ( UtilesApp::GetConf($this->sesion, 'CorreosModificacionAdminDatos')){
-					$CorreosModificacionAdminDatos = UtilesApp::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
-                                } else {
+				if (Conf::GetConf($this->sesion, 'CorreosModificacionAdminDatos')) {
+					$CorreosModificacionAdminDatos = Conf::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
+				} else {
 					$CorreosModificacionAdminDatos = '';
 				}
 				if ($CorreosModificacionAdminDatos != '') {
 					// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
-                                        $id_responsable = $this->fields['id_usuario_responsable'];
+					$id_responsable = $this->fields['id_usuario_responsable'];
 
-                                        if (empty($id_responsable)){
-                                            $email = $CorreosModificacionAdminDatos;
-                                            $nombre = 'Usuario';
+					if (empty($id_responsable)) {
+						$email = $CorreosModificacionAdminDatos;
+						$nombre = 'Usuario';
 
-                                            $subject = 'Creación de contrato';
+						$subject = 'Creación de contrato';
 
-                                            // Obtener el nombre del cliente asociado al contrato.
-                                            $query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
-                                            $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
-                                            list($nombre_cliente) = mysql_fetch_array($resp2);
+						// Obtener el nombre del cliente asociado al contrato.
+						$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
+						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+						list($nombre_cliente) = mysql_fetch_array($resp2);
 
-                                            // Revisar si el contrato está asociado a algún asunto.
-                                            $query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
-                                            $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
-                                            if (list($glosa_asunto) = mysql_fetch_array($resp2))
-                                                    $asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
-                                            else
-                                                    $asunto_contrato = '';
-                                            $mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
+						// Revisar si el contrato está asociado a algún asunto.
+						$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
+						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+						if (list($glosa_asunto) = mysql_fetch_array($resp2))
+							$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
+						else
+							$asunto_contrato = '';
+						$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
 
-                                            Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
+						Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
+					} else {
 
-                                        } else {
+						$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $id_responsable;
+						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+						if (list($nombre, $email) = mysql_fetch_array($resp)) {
 
-                                            $query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $id_responsable;
-                                            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-                                            if (list($nombre, $email) = mysql_fetch_array($resp)) {
+							$email .= ',' . $CorreosModificacionAdminDatos;
 
-                                                    $email .= ',' . $CorreosModificacionAdminDatos;
+							$subject = 'Creación de contrato';
 
-                                                    $subject = 'Creación de contrato';
+							// Obtener el nombre del cliente asociado al contrato.
+							$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
+							$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+							list($nombre_cliente) = mysql_fetch_array($resp2);
 
-                                                    // Obtener el nombre del cliente asociado al contrato.
-                                                    $query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
-                                                    $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
-                                                    list($nombre_cliente) = mysql_fetch_array($resp2);
+							// Revisar si el contrato está asociado a algún asunto.
+							$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
+							$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
+							if (list($glosa_asunto) = mysql_fetch_array($resp2))
+								$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
+							else
+								$asunto_contrato = '';
+							$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
 
-                                                    // Revisar si el contrato está asociado a algún asunto.
-                                                    $query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
-                                                    $resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
-                                                    if (list($glosa_asunto) = mysql_fetch_array($resp2))
-                                                            $asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
-                                                    else
-                                                            $asunto_contrato = '';
-                                                    $mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
-
-                                                    Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
-                                            }
-                                    }
+							Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
+						}
+					}
 				}
 			}
 		}

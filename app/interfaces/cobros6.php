@@ -451,7 +451,7 @@ if ($cambiar_estado && $estado!='') {
 }
 
 if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_documento_pdf') {
-//	print_r($_REQUEST);
+
 	$cobro->Edit("opc_ver_detalles_por_hora", $opc_ver_detalles_por_hora);
 	$cobro->Edit("opc_ver_modalidad", $opc_ver_modalidad);
 	$cobro->Edit("opc_ver_profesional", $opc_ver_profesional);
@@ -476,9 +476,9 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
-       	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
+	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
 
-// Opciones especificos para Vial Olivares
+	// Opciones especificos para Vial Olivares
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
 	$cobro->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
@@ -537,12 +537,6 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 
 	if ($cobro->Write()) {
 		$desde_cobros_emitidos = true;
-		/*
-		  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
-		  require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
-		  else
-		  require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
-		 */
 		if ($opc == 'descargar_excel_especial') {
 			require_once Conf::ServerDir() . '/../app/interfaces/' . Conf::GetConf($sesion, 'XLSFormatoEspecial');
 		} else if ($opc == 'descargar_excel_rentabilidad') {
@@ -891,7 +885,7 @@ if (count($cobro->asuntos)) {
         //Significa que estoy anulando la emisión
         if( form.estado.value == 'EN REVISION' ) {
 
-<?php if (Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
+		<?php if (Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 				if (form.estado_original.value == 'PAGADO' && trim(form.estado_motivo.value) == "") {
 					jQuery('#dialogomodal').html(jQuery('#div_motivo_cambio_estado').html());
 					jQuery('#dialogomodal').dialog('open').dialog('option','title','Ingresar Motivo').dialog('option', 'height', '170');
@@ -912,14 +906,13 @@ if (count($cobro->asuntos)) {
 					onSuccess: function(transport){},
 					onFailure: function(e){}
 				});
-<?php } ?>
-
+		<?php } ?>
+	        var texto = '';
             if (form.existe_pago.value == 1) {
-                var texto = '¡Este cobro tiene pagos asociados! ';
+                texto = '¡Este cobro tiene pagos asociados! ';
             } else if (form.existe_factura.value == 1) {
-                var texto = '¡Este cobro tiene facturas asociadas! ';
+                texto = '¡Este cobro tiene facturas asociadas! ';
             }
-
             if (!confirm(texto + '<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
                 return false;
             } else {
@@ -1970,25 +1963,14 @@ if ($solicitante == 0) {  // no mostrar
 
 <!-- Fin Tipo Cambio -->
 <div id="clip" style="background:url('https://static.thetimebilling.com/images/clip.png') no-repeat;position:absolute;top:250px;left:500px;display:none;height: 200px;width: 250px;"></div>
+
 <script type="text/javascript">
-
-
-<?php if ($cobro->fields['estado'] == "PAGADO" && Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
+	<?php if ($cobro->fields['estado'] == "PAGADO" && Conf::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 		$("estado").value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		$("estado").observe("change", function() {
 			this.value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		});
-<?php } ?>
-	jQuery('.iframeinterno').load(function() {
-		console.log(jQuery('.iframeinterno'));
-
-
-
-	});
-
-	// var t=setTimeout("jQuery('#clip').fadeIn(1000);",6000);
-
-
+	<?php } ?>
 </script>
 
 <?php

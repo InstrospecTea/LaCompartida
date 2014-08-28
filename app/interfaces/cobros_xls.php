@@ -1,17 +1,9 @@
 <?php
-
 require_once 'Spreadsheet/Excel/Writer.php';
-
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
+
 set_time_limit(400);
 ini_set("memory_limit", "256M");
 $where_cobro = ' 1 ';
@@ -813,6 +805,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 	$ws->write($filas, $col_abogado, $contrato->fields['fono_contacto'], $formato_encabezado);
 	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+	++$filas;
+
+	$usuario = new Usuario($sesion);
+	$usuario->LoadId($contrato->fields['id_usuario_responsable']);
+	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'encargado_comercial', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+	$ws->write($filas, $col_abogado, $usuario->fields['nombre'] . ' ' . $usuario->fields['apellido1'] . ' ' . $usuario->fields['apellido2'], $formato_encabezado);
+	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+
 	$filas += 2;
 
 	if ($opc_ver_resumen_cobro || $borradores) {
@@ -904,32 +905,34 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
             $ws->writeNumber($filas2++, $col_valor_trabajo, round($monto_equivalente_a), $formato_moneda_resumen);
 		}
 
-		if ($cobro->fields['descuento'] > 0) {
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+		if ($cobro->fields['descuento'] > 0 && $opc_ver_descuento) {
+			$porcentaje_descuento = " ({$cobro->fields['porcentaje_descuento']}%)";
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo') . $porcentaje_descuento, $formato_encabezado_derecha);
 			$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['descuento'] * $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 			$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo" . ($filas2 - 2) . "-$col_formula_valor_trabajo" . ($filas2 - 1), $formato_moneda_resumen);
 		}
 
 		if ($cobro->fields['porcentaje_impuesto'] > 0 && UtilesApp::GetConf($sesion, 'ValorImpuesto') > 0) {
+			$porcentaje_impuesto = " ({$cobro->fields['porcentaje_impuesto']}%)";
 			if ($cobro->fields['porcentaje_impuesto_gastos'] > 0 && UtilesApp::GetConf($sesion, 'ValorImpuestoGastos') > 0) {
 				if ($opc_ver_gastos) {
 					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 					$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['subtotal_gastos'], $formato_moneda_resumen);
-					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo') . $porcentaje_impuesto, $formato_encabezado_derecha);
 					$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro']);
 					$ws->write($filas2++, $col_valor_trabajo, $x_resultados_tmp['monto_iva'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen);
 					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 					$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo" . ($filas2 - 3) . ":$col_formula_valor_trabajo" . ($filas2 - 1) . ")", $formato_moneda_resumen);
 				} else {
-					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo') . $porcentaje_impuesto, $formato_encabezado_derecha);
 					$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro']);
 					$ws->write($filas2++, $col_valor_trabajo, $x_resultados_tmp['monto_iva'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen);
 					$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 					$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo" . ($filas2 - 2) . " + $col_formula_valor_trabajo" . ($filas2 - 1), $formato_moneda_resumen);
 				}
 			} else {
-				$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+				$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo') . $porcentaje_impuesto, $formato_encabezado_derecha);
 				$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro']);
 				$ws->write($filas2++, $col_valor_trabajo, $x_resultados_tmp['monto_iva'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen);
 				if ($opc_ver_gastos) {
@@ -961,6 +964,32 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$filas = max($filas, $filas2);
 		++$filas;
 	}
+
+	if (in_array($cobro->fields['estado'], array('EMITIDO', 'FACTURADO'))) {
+		$mes_concepto = ucfirst(Utiles::sql3fecha($cobro->fields['fecha_fin'], '%B %Y'));
+		$concepto = Utiles::GlosaMult($sesion, 'concepto_glosa', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo');
+		$concepto = sprintf($concepto, $mes_concepto);
+		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'concepto', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+		$ws->write($filas, $col_abogado, $concepto, $formato_encabezado);
+		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+		++$filas;
+
+		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'glosa_factura', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+		$ws->write($filas, $col_abogado, $contrato->fields['glosa_contrato'], $formato_encabezado);
+		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+		++$filas;
+	}
+
+	if (in_array($cobro->fields['estado'], array('CREADO', 'EN REVISION'))) {
+		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'detalle_cobranza', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
+		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+		$ws->write($filas, $col_abogado, $contrato->fields['observaciones'], $formato_encabezado);
+		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+	}
+
+	$filas += 2;
 
 	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro=" . $cobro->fields['id_cobro'];
 	$resp_num_usuarios = mysql_query($query_num_usuarios, $sesion->dbh) or Utiles::errorSQL($query_num_usuarios, __FILE__, __LINE__, $sesion->dbh);

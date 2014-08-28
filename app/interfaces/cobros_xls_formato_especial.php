@@ -14,7 +14,7 @@ if ($id_cobro) {
 } else {
 	$where_cobro = '';
 }
-	
+
 if (!$opc_ver_columna_cobrable) {
 	$where_cobro .= " AND trabajo.visible=1 AND trabajo.cobrable != 0";
 }
@@ -149,16 +149,16 @@ if ($glosa_moneda == "Euro") {
 $cifras_decimales = Utiles::glosa($sesion, $lista->Get(0)->fields['id_moneda_asunto'] ? $lista->Get(0)->fields['id_moneda_asunto'] : $cobro->fields['id_moneda'], 'cifras_decimales', 'prm_moneda', 'id_moneda');
 
 if ($cifras_decimales > 0) {
-	
+
 	$decimales = '.';
 	while ($cifras_decimales-- > 0) {
 		$decimales .= '0';
 	}
-		
+
 } else {
 	$decimales = '';
 }
-	
+
 $formato_moneda_titulo = & $wb->addFormat(array('Size' => 12,
 			'VAlign' => 'vcenter',
 			'Align' => 'center',
@@ -187,25 +187,26 @@ $nombres = array();
 
 // Calcular cuántos abogados hay para dejar espacio para saber donde poner el total.
 // Primero van los socios, luego el resto en orden alfabético por apellido.
-$query = "SELECT DISTINCT usuario.id_usuario,
-				usuario.nombre,
-				usuario.apellido1
-			FROM trabajo
-				JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-				JOIN cobro ON trabajo.id_cobro = cobro.id_cobro AND cobro.estado='" . $cobro->fields['estado'] . "'
-				LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-				LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-				LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-			WHERE 1 $where_cobro
-			ORDER BY usuario.id_categoria_usuario=1 DESC, usuario.id_categoria_usuario=4 DESC, usuario.apellido1";
+$query = "SELECT DISTINCT usuario.id_usuario, usuario.nombre, usuario.apellido1, usuario.username
+	FROM trabajo
+		JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		JOIN cobro ON trabajo.id_cobro = cobro.id_cobro AND cobro.estado = '{$cobro->fields['estado']}'
+		LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+		LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+		LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
+	WHERE 1 {$where_cobro}
+	ORDER BY usuario.id_categoria_usuario = 1 DESC, usuario.id_categoria_usuario = 4 DESC, usuario.apellido1";
+
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 $col_formula_primer_abogado = Utiles::NumToColumnaExcel($col);
-while (list($id_usuario, $nombre, $apellido1) = mysql_fetch_array($resp)) {
+
+while (list($id_usuario, $nombre, $apellido1, $username) = mysql_fetch_array($resp)) {
 	$col_formula_ultimo_abogado = Utiles::NumToColumnaExcel($col);
 	$col_abogados[$id_usuario] = $col++;
-	$nombres[$id_usuario] = $nombre[0] . ". $apellido1";
+	$nombres[$id_usuario] = $username;
 }
+
 $col_total_horas = $col++;
 $col_total = $col++;
 unset($col);
@@ -260,7 +261,7 @@ if ( $cobro->fields['fecha_ini'] == '0000-00-00' ) {
 list($primer_trabajo) = mysql_fetch_array($resp_fecha_primer_trabajo);
 	$fecha_primer_trabajo = date('d-m-Y', strtotime($primer_trabajo));
 } else {
-	$fecha_primer_trabajo = date('d-m-Y', strtotime($cobro->fields['fecha_ini']));	
+	$fecha_primer_trabajo = date('d-m-Y', strtotime($cobro->fields['fecha_ini']));
 }
 
 $ws->write($filas, $col_asunto + 1, $fecha_primer_trabajo . " hasta " . Utiles::sql2date($cobro->fields['fecha_fin'], "%d-%m-%Y"), $formato_encabezado);

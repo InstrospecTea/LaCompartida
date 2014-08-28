@@ -5,7 +5,7 @@ $sesion = new Sesion('');
 #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
 
 if ($accion == "consistencia_cliente_asunto") {
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$query = "SELECT codigo_cliente_secundario FROM asunto JOIN cliente USING( codigo_cliente ) WHERE codigo_asunto_secundario = '$codigo_asunto' ";
 	} else {
 		$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '$codigo_asunto' ";
@@ -14,7 +14,7 @@ if ($accion == "consistencia_cliente_asunto") {
 	list($codigo_cliente_segun_asunto) = mysql_fetch_array($resp);
 
 	if ($codigo_cliente_segun_asunto == $codigo_cliente) {
-		echo utf8_encode("OK");
+		echo 'OK';
 	}
 } else if ($accion == "actualizar_tarifas") {
 	$query = "UPDATE trabajo
@@ -30,9 +30,9 @@ if ($accion == "consistencia_cliente_asunto") {
                                 WHERE trabajo.id_cobro = '$id_cobro'
                                 ";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	echo utf8_encode("OK");
+	echo 'OK';
 } else if ($accion == "cargar_tarifa_trabajo") {
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$dato_cliente = "codigo_cliente_secundario";
 		$dato_asunto = "codigo_asunto_secundario";
 	} else {
@@ -63,7 +63,7 @@ if ($accion == "consistencia_cliente_asunto") {
 
 	echo "$simbolo $tarifa";
 } else if ($accion == "cargar_moneda_contrato") {
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$dato_cliente = "codigo_cliente_secundario";
 		$dato_asunto = "codigo_asunto_secundario";
 	} else {
@@ -275,16 +275,16 @@ if ($accion == "consistencia_cliente_asunto") {
 					";
 
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	echo(utf8_encode("OK"));
+	echo 'OK';
 } else if ($accion == "check_codigo_asunto") {
 	$query = "SELECT COUNT(*) FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
 
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($count) = mysql_fetch_array($resp);
 	if ($count == 0) {
-		echo(utf8_encode("OK"));
+		echo 'OK';
 	} else {
-		echo(utf8_encode("NO"));
+		echo 'NO';
 	}
 } else if ($accion == "info_cobro") {
 	$query = "SELECT razon_social,rut,giro,direccion_contacto FROM asunto LEFT JOIN cliente USING (codigo_cliente) WHERE cliente.codigo_cliente = '$codigo_cliente' ORDER BY id_asunto DESC";
@@ -295,7 +295,7 @@ if ($accion == "consistencia_cliente_asunto") {
 		echo("VACIO");
 	}
 } else if ($accion == "idioma") {
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$where = "codigo_asunto_secundario = '$codigo_asunto'";
 	} else {
 		$where = "codigo_asunto = '$codigo_asunto'";
@@ -335,9 +335,9 @@ if ($accion == "consistencia_cliente_asunto") {
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($count) = mysql_fetch_array($resp);
 	if ($count == 0) {
-		echo(utf8_encode("OK"));
+		echo 'OK';
 	} else {
-		echo(utf8_encode("NO"));
+		echo 'NO';
 	}
 } else if ($accion == 'update_cobro_moneda') {
 	$sql = "DELETE FROM cobro_moneda WHERE id_cobro = " . $id_cobro;
@@ -452,7 +452,7 @@ if ($accion == "consistencia_cliente_asunto") {
 		if ($i > 0) {
 			echo("~");
 		}
-		echo(join("|", $fila));
+		echo implode('|', $fila);
 	}
 	if ($i == 0) {
 		echo("VACIO|");
@@ -491,7 +491,7 @@ if ($accion == "consistencia_cliente_asunto") {
 		if ($i > 0) {
 			echo("~");
 		}
-		echo utf8_encode((join("|", $fila)));
+		echo implode('|', $fila);
 	}
 	if ($i == 0) {
 		echo("VACIO|");
@@ -686,7 +686,7 @@ if ($accion == "consistencia_cliente_asunto") {
 } else if ($accion == 'revisar_tarifas') {
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 	if (isset($_GET["cobro_independiente"]) && $_GET["cobro_independiente"] == "NO" && !empty($_GET["codigo_cliente"])) {
-		$codigo_cliente_texto = UtilesApp::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
+		$codigo_cliente_texto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$query = "SELECT id_tarifa FROM contrato JOIN cliente USING( id_contrato ) WHERE cliente.$codigo_cliente_texto = '" . $_GET['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_tarifa) = mysql_fetch_array($resp);
@@ -742,30 +742,6 @@ if ($accion == "consistencia_cliente_asunto") {
 		$password = $_POST['password'];
 	}
 	echo PasswordStrength::Rate($password);
-} else if ($accion == 'es_primer_asunto') {
-	$response = array('error' => false, 'error_glosa' => '');
-	if ($codigo_cliente != '') {
-		$Cliente = new Cliente($sesion);
-		if ($Cliente->LoadByCodigo($codigo_cliente)) {
-			$Asunto = new Asunto($sesion);
-			if (!empty($id_asunto)) {
-				if (!$Asunto->Load($id_asunto)) {
-					$response['error_glosa'] = utf8_encode('Código asunto inválido');
-				}
-			}
-			if (empty($response['error_glosa'])) {
-				$response['es_primer_asunto'] = $Asunto->esPrimerAsunto($codigo_cliente);
-			}
-		} else {
-			$response['error_glosa'] = utf8_encode('Código cliente inválido');
-		}
-	} else {
-		$response['error_glosa'] = utf8_encode('Código cliente vacío');
-	}
-	if (!empty($response['error_glosa'])) {
-		$response['error'] = true;
-	}
-	echo json_encode($response);
 } else {
-	echo utf8_encode("ERROR AJAX. Acción: $accion");
+	echo "ERROR AJAX. Acción: $accion";
 }
