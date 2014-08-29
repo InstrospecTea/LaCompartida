@@ -181,16 +181,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	}
 
 	private function merge(Entity $legacy, Entity $new) {
-		$properties = array_keys($legacy->fields);
-		foreach ($properties as $property) {
-			$newProperty = $new->get($property);
-			if (empty($newProperty)) {
-				$legacyProperty = $legacy->get($property);
-				if (!empty($legacyProperty)){
-					$new->set($property, $legacy->get($property));
-				}
-			}
-		}
+		$new->fields = array_merge($legacy->fields, $new->fields);
 		return $new;
 	}
 

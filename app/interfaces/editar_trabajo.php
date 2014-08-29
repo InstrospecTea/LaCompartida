@@ -144,17 +144,21 @@ if ($opcion == "guardar") {
     if ($duracion == '00:00:00') {
         $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
     }
-    if ((!$codigo_asunto || $codigo_asunto == '') && (!$codigo_asunto_secundario || $codigo_asunto_secundario == '')) {
-        $pagina->AddError("Debe seleccionar un " . __('Asunto'));
+	$codigo_cliente = trim($codigo_cliente);
+	$codigo_cliente_secundario = trim($codigo_cliente_secundario);
+    if (empty($codigo_cliente) && empty($codigo_cliente_secundario)) {
+        $pagina->AddError('Debe seleccionar un ' . __('Cliente'));
+    }
+	$codigo_asunto = trim($codigo_asunto);
+	$codigo_asunto_secundario = trim($codigo_asunto_secundario);
+    if (empty($codigo_asunto) && empty($codigo_asunto_secundario)) {
+        $pagina->AddError('Debe seleccionar un ' . __('Asunto'));
     }
     if (Conf::GetConf($sesion, 'UsarAreaTrabajos') && (!$id_area_trabajo || $id_area_trabajo == '')) {
         $pagina->AddError("Debe seleccionar una area de trabajo");
     }
     if (!$descripcion || $descripcion == '') {
         $pagina->AddError("Debe Agregar una descripcion");
-    }
-    if ((!$codigo_cliente || $codigo_cliente == '') && (!$codigo_cliente_secundario || $codigo_cliente_secundario == '')) {
-        $pagina->AddError("Debe seleccionar un cliente");
     }
     $errores = $pagina->GetErrors();
 
@@ -228,8 +232,8 @@ if ($opcion == "guardar") {
 
             $cambio_fecha = strtotime($t->fields['fecha']) != strtotime(Utiles::fecha2sql($fecha));
             $t->Edit('fecha', Utiles::fecha2sql($fecha));
-            // $t->Edit('fecha',$fecha);
-            if (isset($codigo_actividad)) {
+
+			if (isset($codigo_actividad)) {
                 $t->Edit('codigo_actividad', $codigo_actividad ? $codigo_actividad : 'NULL');
             }
             if (isset($codigo_tarea)) {

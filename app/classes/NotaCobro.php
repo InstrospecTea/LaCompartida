@@ -330,6 +330,11 @@ class NotaCobro extends Cobro {
 				include_once ('CartaCobro.php');
 
 				$CartaCobro = new CartaCobro($this->sesion, $this->fields, $this->ArrayFacturasDelContrato, $this->ArrayTotalesDelContrato);
+
+				if (isset($this->DetalleLiquidaciones)) {
+					$CartaCobro->DetalleLiquidaciones = $this->DetalleLiquidaciones;
+				}
+
 				$textocarta = $CartaCobro->GenerarDocumentoCarta($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 				$html = str_replace('%COBRO_CARTA%', $textocarta, $html);
 
@@ -539,8 +544,8 @@ class NotaCobro extends Cobro {
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
 
-				$detalle_modalidad = $this->fields['forma_cobro'] == 'TASA' ? '' : __('POR') . $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$detalle_modalidad_lowercase = $this->fields['forma_cobro'] == 'TASA' ? '' : __('por') . $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$detalle_modalidad = $this->ObtenerDetalleModalidad($this->fields, $cobro_moneda->moneda[$this->fields['id_moneda_monto']], $idioma);
+				$detalle_modalidad_lowercase = strtolower($detalle_modalidad);
 
 				if (($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') and $this->fields['retainer_horas'] != '') {
 					$detalle_modalidad .= '<br>' . sprintf(__('Hasta') . ' %s ' . __('Horas'), $this->fields['retainer_horas']);
@@ -2754,6 +2759,7 @@ class NotaCobro extends Cobro {
 			case 'DETALLE_PROFESIONAL_RETAINER': //GenerarDocumento
 				$html = str_replace('%retainer%', __('Retainer'), $html);
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				break;
 
 			/*
@@ -3030,6 +3036,11 @@ class NotaCobro extends Cobro {
 				require_once('CartaCobro.php');
 
 				$CartaCobro = new CartaCobro($this->sesion, $this->fields, $this->ArrayFacturasDelContrato, $this->ArrayTotalesDelContrato);
+
+				if (isset($this->DetalleLiquidaciones)) {
+					$CartaCobro->DetalleLiquidaciones = $this->DetalleLiquidaciones;
+				}
+
 				$textocarta = $CartaCobro->GenerarDocumentoCarta2($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 				$html = str_replace('%COBRO_CARTA%', $textocarta, $html);
 
@@ -3353,8 +3364,8 @@ class NotaCobro extends Cobro {
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
 
-				$detalle_modalidad = $this->fields['forma_cobro'] == 'TASA' ? '' : __('POR') . $this->espacio . $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$detalle_modalidad_lowercase = $this->fields['forma_cobro'] == 'TASA' ? '' : __('por') . $this->espacio . $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$detalle_modalidad = $this->ObtenerDetalleModalidad($this->fields, $cobro_moneda->moneda[$this->fields['id_moneda_monto']], $idioma);
+				$detalle_modalidad_lowercase = strtolower($detalle_modalidad);
 
 				if (($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') and $this->fields['retainer_horas'] != '') {
 					$detalle_modalidad .= '<br>' . sprintf(__('Hasta') . ' %s ' . __('Horas'), $this->fields['retainer_horas']);
@@ -4351,6 +4362,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%total_honorarios%', __('Total Honorarios'), $html);
 
 				$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				break;
 
 			case 'RESUMEN_CAP': //GenerarDocumento2
@@ -5902,8 +5914,9 @@ class NotaCobro extends Cobro {
 				$minutos_trabajadas = sprintf("%02d", round($totales['tiempo_trabajado']) % 60);
 				$horas_trabajadas_real = floor(($totales['tiempo_trabajado_real']) / 60);
 				$minutos_trabajadas_real = sprintf("%02d", round($totales['tiempo_trabajado_real']) % 60);
+				#RETAINER
 				$horas_retainer = floor(($totales['tiempo_retainer']) / 60);
-				$minutos_retainer = sprintf("%02d", round($totales['tiempo_retainer']) % 60);
+				$minutos_retainer = sprintf("%02d", round($totales['tiempo_retainer'] % 60));
 				$segundos_retainer = sprintf("%02d", round(60 * ($totales['tiempo_retainer'] - floor($totales['tiempo_retainer']))));
 				$horas_flatfee = floor(($totales['tiempo_flatfee']) / 60);
 				$minutos_flatfee = sprintf("%02d", round($totales['tiempo_flatfee']) % 60);
@@ -6054,6 +6067,7 @@ class NotaCobro extends Cobro {
 			case 'DETALLE_PROFESIONAL_RETAINER': //GenerarDocumento2
 				$html = str_replace('%retainer%', __('Retainer'), $html);
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				break;
 
 			case 'GASTOS': //GenerarDocumento2
@@ -6724,8 +6738,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%valor_honorarios_monedabase_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($valor_trabajos_demo_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format(floor($total_en_moneda), $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-                $html = str_replace('%valor_honorarios_monedabase_mb%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-
+				$html = str_replace('%valor_honorarios_monedabase_mb%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);						
 				break;
 
 			case 'DETALLE_COBRO_DESCUENTO': //GenerarDocumentoComun
@@ -6759,9 +6772,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%honorarios%', __('Subtotal Honorarios'), $html);
-
 				$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto_subtotal'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-
 				$html = str_replace('%descuento%', __('Descuento'), $html);
 
 				if ($this->fields['monto_trabajos'] > 0){
@@ -6775,12 +6786,10 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%porcentaje_descuento%', ' (' . number_format($porcentaje, 0) . '%)', $html);
-
 				$html = str_replace('%valor_descuento%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['descuento'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-
 				$html = str_replace('%total_honorarios%', __('Total Honorarios'), $html);
-
 				$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 
 				break;
 
@@ -8600,6 +8609,7 @@ class NotaCobro extends Cobro {
 			case 'DETALLE_PROFESIONAL_RETAINER': //GenerarDocumentoComun
 				$html = str_replace('%retainer%', __('Retainer'), $html);
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				break;
 
 			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO': //GenerarDocumentoComun
@@ -10451,6 +10461,116 @@ class NotaCobro extends Cobro {
 				break;
 		}
 		return $html;
+	}
+
+	public function ObtenerDetalleModalidad($campos, $moneda, $idioma) {
+		$detalle_modalidad = $campos['forma_cobro'] == 'TASA' ? '' : __('POR') . ' ' . $moneda['simbolo'] . $this->espacio . number_format($campos['monto_contrato'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
+		if (($campos['forma_cobro'] == 'RETAINER' || $campos['forma_cobro'] == 'PROPORCIONAL') and $campos['retainer_horas'] != '') {
+			$detalle_modalidad .= '<br>' . sprintf(__('Hasta') . ' %s ' . __('Horas'), $campos['retainer_horas']);
+		}
+
+		return $detalle_modalidad;
+	}
+
+	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas) {
+		set_time_limit(300);
+
+		$NotaCobro = new NotaCobro($this->sesion);
+
+		$orientacion_papel = Conf::GetConf($this->sesion, 'OrientacionPapelPorDefecto');
+
+		if (empty($orientacion_papel) || !in_array($orientacion_papel, array('PORTRAIT', 'LANDSCAPE'))) {
+			$orientacion_papel = 'PORTRAIT';
+		}
+
+		if ($agrupar_cartas) {
+			$Carta = new Carta($this->sesion);
+			$carta_multiple = $Carta->LoadByDescripcion('MULTIPLE') ? $Carta->fields['id_carta'] : 1;
+			$totales_cobros = array();
+			$primer_cliente = '';
+
+			foreach ($cobros as $cobro) {
+				if (!is_numeric($cobro)) {
+					$cobro = $cobro['id_cobro'];
+				}
+
+				if (!$NotaCobro->Load($cobro)) {
+					continue;
+				}
+
+				$NotaCobro->LoadAsuntos();
+
+				$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
+				$_LANG = array();
+				include Conf::ServerDir() . "/lang/$lang_archivo";
+
+				$html = $NotaCobro->GeneraHTMLCobro(true);
+
+				$totales_cobros[$NotaCobro->fields['codigo_cliente']][$cobro]['totales'] = $NotaCobro->x_resultados;
+				$totales_cobros[$NotaCobro->fields['codigo_cliente']][$cobro]['campos'] = $NotaCobro->fields;
+				$totales_cobros[$NotaCobro->fields['codigo_cliente']][$cobro]['asuntos'] = $NotaCobro->asuntos;
+			}
+		}
+
+		foreach ($cobros as $cobro) {
+			if (!is_numeric($cobro)) {
+				$cobro = $cobro['id_cobro'];
+			}
+
+			if (!$NotaCobro->Load($cobro)) {
+				continue;
+			}
+
+			if ($imprimir_cartas) {
+			 	if (!$NotaCobro->fields['id_carta']) {
+					$NotaCobro->fields['id_carta'] = 1;
+					$NotaCobro->fields['opc_ver_carta'] = 1;
+				}
+			} else {
+				$NotaCobro->fields['id_carta'] = null;
+			}
+
+			if ($NotaCobro->fields['subtotal_gastos'] == 0) {
+			   $NotaCobro->fields['opc_ver_gastos'] = 0;
+			}
+
+			if ($agrupar_cartas) {
+				$codigo_cliente = $NotaCobro->fields['codigo_cliente'];
+
+				if ($codigo_cliente != $primer_cliente) {
+					$primer_cliente = $codigo_cliente;
+					$NotaCobro->fields['id_carta'] = $carta_multiple;
+					$NotaCobro->fields['opc_ver_carta'] = 1;
+					$NotaCobro->DetalleLiquidaciones = $totales_cobros[$codigo_cliente];
+				}
+			}
+
+			$NotaCobro->LoadAsuntos();
+
+			$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
+			$_LANG = array();
+			include Conf::ServerDir() . "/lang/$lang_archivo";
+
+			$html = $NotaCobro->GeneraHTMLCobro(true);
+
+			$opc_papel = $NotaCobro->fields['opc_papel'];
+			$id_carta = $NotaCobro->fields['id_carta'];
+			$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
+
+			if ($html) {
+				$cssData .= UtilesApp::CSSCobro($this->sesion);
+
+				if (is_object($doc)) {
+					$doc->newSession($html);
+				} else {
+					$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
+				}
+				$doc->chunkedOutput("cobro_masivo.doc");
+			}
+		}
+
+		$doc->endChunkedOutput("cobro_masivo.doc");
 	}
 
 }

@@ -353,7 +353,13 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 	private function parse_field($field, $row, $isnum = false){
 		$valor = '';
 		if (strpos($field, '=') !== 0) {
-			$valor = isset($row[$field]) ? $row[$field] : $field;
+			if (isset($row[$field])) {
+				$valor = $row[$field];
+			} else if ($isnum) {
+				$valor = 0;
+			} else {
+				$valor = '';
+			}
 		} else {
 			if (preg_match('/=(.+)\/(.+)/', $field, $matches)) {
 				return $this->parse_field('=' . $matches[1], $row, true) / $this->parse_field('=' . $matches[2], $row, true);

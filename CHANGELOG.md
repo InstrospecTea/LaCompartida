@@ -1,5 +1,55 @@
 # Changelog
 
+## Hotfix: 14.15.2
+Viernes 29 de Agosto 2014
+* **Fixed:** [Recuperar versiones anteriores](https://github.com/LemontechSA/ttb/pull/668)
+
+## Hotfix: 14.15.1
+Jueves 28 de Agosto 2014
+* **Fixed:** [Guarda las opciones de impresión de los documentos del cobro](https://github.com/LemontechSA/ttb/pull/667)
+
+## Release: 14.15.0
+Miércoles 27 de Agosto 2014
+* **Fixed:** [Permite que cualquier asunto se cobre independiente](https://github.com/LemontechSA/ttb/pull/665)
+
+## Hotfix: 14.14.2
+Miercoles 27 de Agosto 2014
+* **Fixed:** [Modificaciones CartaCobro MB](https://github.com/LemontechSA/ttb/pull/664)
+
+## Hotfix: 14.14.1
+Miercoles 27 de Agosto 2014
+* **Fixed:** [amplia el resultado de clientes a 20 en autocompletador, valida código de clientes y asunto al guardar trabajo con trim en ambos](https://github.com/LemontechSA/ttb/pull/663)
+
+## Release: 14.14.0
+Miércoles 27 de Agosto 2014
+* **Fixed:** [Feature asuntos independientes](https://github.com/LemontechSA/ttb/pull/650)
+* **New:** [Feature/mejoras garciabodan](https://github.com/LemontechSA/ttb/pull/643)
+* **New:** [Feature/integracion moreno baldivieso](https://github.com/LemontechSA/ttb/pull/639)
+
+## Hotfix: 14.13.6
+Lunes 25 de Agosto 2014
+* **Fixed:** [Corrige cálculo de Horas Tarificadas en Word](https://github.com/LemontechSA/ttb/pull/660)
+
+## Hotfix: 14.13.5
+Lunes 25 de Agosto 2014
+* **Fixed:** [Evita error en javascript con function RevisarTarifas](https://github.com/LemontechSA/ttb/pull/657)
+
+## Hotfix: 14.13.4
+Domingo 24 de Agosto 2014
+* **Fixed:** [Corrige la asignación a cliente errónea al crear un asunto con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/656)
+
+## Hotfix: 14.13.3
+Viernes 22 de Agosto 2014
+* **Fixed:** [asigna valor para el print](https://github.com/LemontechSA/ttb/pull/655)
+
+## Hotfix: 14.13.2
+Viernes 22 de Agosto 2014
+* **Fixed:** [permite mostrar asuntos inactivos](https://github.com/LemontechSA/ttb/pull/654)
+
+## Hotfix: 14.13.1
+Jueves 21 de Agosto 2014
+* **Fixed:** [Corregir asignación de cobro independiente para los asuntos con código secundario](https://github.com/LemontechSA/ttb/pull/652)
+
 ## Release: 14.13.0
 Miercoles 20 de Agosto 2014
 * **Fixed:** [feature/autoselector_cliente](https://github.com/LemontechSA/ttb/pull/630)
