@@ -243,9 +243,6 @@ if ($opcion == "guardar") {
 				}
 			}
 
-			if (Conf::GetConf($sesion, 'UsarModuloProduccion')) {
-				$factura->ActualizaGeneradores();
-			}
 
 			if ($factura->Escribir()) {
 				if ($generar_nuevo_numero) {
@@ -258,6 +255,9 @@ if ($opcion == "guardar") {
 				$cta_cte_fact = new CtaCteFact($sesion);
 				$mvto_guardado = $cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'], $signo * ($factura->fields['total'] - $factura->fields['iva']), $signo * $factura->fields['iva'], $signo * $factura->fields['total'], $factura->fields['fecha'], $neteos, $factura->fields['id_factura'], null, $codigo_tipo_doc, $ids_monedas_documento, $tipo_cambios_documento, !empty($factura->fields['anulado']));
 
+				if (Conf::GetConf($sesion, 'UsarModuloProduccion')) {
+					$factura->ActualizaGeneradores();
+				}
 
 				if ($mvto_guardado->fields['tipo_mvto'] != 'NC' && $mvto_guardado->fields['saldo'] == 0 && $mvto_guardado->fields['anulado'] != 1) {
 					$query = "SELECT id_estado FROM prm_estado_factura WHERE codigo = 'C'";
