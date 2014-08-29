@@ -6,6 +6,10 @@ Viernes 29 de Agosto 2014
 
 ## Hotfix: 14.15.2
 Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Morales y Besa](https://github.com/LemontechSA/ttb/pull/670)
+
+## Hotfix: 14.15.2
+Viernes 29 de Agosto 2014
 * **Fixed:** [Recuperar versiones anteriores](https://github.com/LemontechSA/ttb/pull/668)
 
 ## Hotfix: 14.15.1
