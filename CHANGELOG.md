@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.15.4
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Finders Fee / Informe produccion](https://github.com/LemontechSA/ttb/pull/670)
+
 ## Hotfix: 14.15.3
 Viernes 29 de Agosto 2014
 * **Fixed:** [Correcciones Morales y Besa](https://github.com/LemontechSA/ttb/pull/670)
