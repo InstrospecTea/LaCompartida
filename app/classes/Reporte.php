@@ -642,7 +642,7 @@ class Reporte {
                                                             *
                                                             (cobro.monto_trabajos / {$s_monto_thh})
                                                         )
-                                                    ) 
+                                                    )
                                                     + cobro.monto_tramites
                                                 )
                                                 *

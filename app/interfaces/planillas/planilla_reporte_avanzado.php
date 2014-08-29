@@ -2,8 +2,10 @@
 
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
+
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
+
 $agrupadores = explode('-', $vista);
 
 $datos = array();
@@ -14,10 +16,7 @@ if ($comparar) {
 $reporte = array();
 $resultado = array();
 
-if (!$filtros_check) {
-	$fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
-	$fecha_m = '' . $fecha_mes;
-} else {
+if ($filtros_check) {
 	$clientes = null;
 	$usuarios = null;
 
@@ -190,14 +189,14 @@ $ws1->write($fila, 2, '');
 $ws1->write($fila, 3, '');
 $ws1->mergeCells($fila, 1, $fila, 3);
 
-$fila += 1;
+++$fila;
 $ws1->write($fila, 0, __('PERIODO RESUMEN') . ':', $titulo);
 
 $ws1->write($fila, 1, $fecha_ini . ' ' . __('al') . ' ' . $fecha_fin, $titulo);
 $ws1->write($fila, 2, '');
 $ws1->mergeCells($fila, 1, $fila, 2);
 
-$fila += 1;
+++$fila;
 
 $hoy = date('d-m-Y');
 
