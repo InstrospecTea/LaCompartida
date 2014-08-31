@@ -644,6 +644,11 @@ $_LANG['%asunto_mb%'] = "Re.:";
 $_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
 $_LANG['%despedida_mb%'] = "Cordially yours,";
 
+// Solicitado por @Gtigre
+$_LANG['lang_mb_detalle_chile_boleta_hyg'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% por honorarios y gastos por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios% equivalentes a %monto_honorarios_moneda_cobro% conforme a su equivalencia al %fecha_hasta_dmy%%detalle_cuenta_gastos%.";
+$_LANG['lang_mb_detalle_chile_boleta_g'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% de gastos por la cantidad total de %monto_total_demo% correspondiente a los gastos asociados a servicios legales prestados %fecha_con_de% en relación al encargo profesional de la referencia, conforme a Boleta de Recuperación de Gastos adjunta.";
+$_LANG['lang_mb_detalle_chile_boleta_h'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% de honorarios por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios%%mb_monto_honorarios_moneda_cobro%";
+
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%detalle_mb_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";

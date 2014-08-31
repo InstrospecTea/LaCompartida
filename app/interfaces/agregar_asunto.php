@@ -118,12 +118,6 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
-	if($cobro_independiente){
-		if (!$Asunto->permiteAsuntoIndependiente($codigo_cliente)) {
-			$Pagina->AddError(__('Debe tener al menos un asunto que no se cobre de forma independiente.'));
-		}
-	}
-
 	// Validaciones
 	if ($validaciones_segun_config && $cobro_independiente) {
 		if (empty($glosa_asunto)) {
@@ -962,9 +956,9 @@ function MuestraPorValidacion(divID) {
 								<?php
 								if (!$Asunto->Loaded()) {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); PermiteAsuntoIndependiente(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
 									} else {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value); PermiteAsuntoIndependiente(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
 									}
 								} else {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
@@ -1083,12 +1077,6 @@ function MuestraPorValidacion(divID) {
 				} else {
 					if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
 						$codigo_cliente = $Asunto->fields['codigo_cliente'];
-					}
-
-					if ($codigo_cliente != '') {
-						if (!$Asunto->permiteAsuntoIndependiente($codigo_cliente) && !$checked) {
-							$hide_areas = true;
-						}
 					}
 				}
 				?>
@@ -1256,25 +1244,6 @@ function MuestraPorValidacion(divID) {
 				}
 			}
 		}, 'text');
-	}
-
-	function PermiteAsuntoIndependiente(codigo_cliente) {
-		if (codigo_cliente !== undefined && codigo_cliente != '') {
-			var url = root_dir + '/app/interfaces/ajax.php';
-			var data = {'accion': 'permite_asunto_independiente', 'codigo_cliente': codigo_cliente, 'id_asunto': jQuery('#id_asunto').val()};
-			jQuery.get(url, data, function (response) {
-					if (response.error) {
-						alert(response.error_glosa);
-						return;
-					}
-					if (response.permite_asunto_independiente) {
-						jQuery('#td_cobro_independiente').show();
-					} else {
-						jQuery('#td_cobro_independiente').hide();
-					}
-				}, 'json'
-			);
-		}
 	}
 </script>
 

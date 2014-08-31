@@ -1,5 +1,37 @@
 # Changelog
 
+## Hotfix: 14.15.4
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Finders Fee / Informe produccion](https://github.com/LemontechSA/ttb/pull/670)
+
+## Hotfix: 14.15.3
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Morales y Besa](https://github.com/LemontechSA/ttb/pull/670)
+
+## Hotfix: 14.15.2
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Morales y Besa](https://github.com/LemontechSA/ttb/pull/670)
+
+## Hotfix: 14.15.2
+Viernes 29 de Agosto 2014
+* **Fixed:** [Recuperar versiones anteriores](https://github.com/LemontechSA/ttb/pull/668)
+
+## Hotfix: 14.15.1
+Jueves 28 de Agosto 2014
+* **Fixed:** [Guarda las opciones de impresión de los documentos del cobro](https://github.com/LemontechSA/ttb/pull/667)
+
+## Release: 14.15.0
+Miércoles 27 de Agosto 2014
+* **Fixed:** [Permite que cualquier asunto se cobre independiente](https://github.com/LemontechSA/ttb/pull/665)
+
+## Hotfix: 14.14.2
+Miercoles 27 de Agosto 2014
+* **Fixed:** [Modificaciones CartaCobro MB](https://github.com/LemontechSA/ttb/pull/664)
+
+## Hotfix: 14.14.1
+Miercoles 27 de Agosto 2014
+* **Fixed:** [amplia el resultado de clientes a 20 en autocompletador, valida código de clientes y asunto al guardar trabajo con trim en ambos](https://github.com/LemontechSA/ttb/pull/663)
+
 ## Release: 14.14.0
 Miércoles 27 de Agosto 2014
 * **Fixed:** [Feature asuntos independientes](https://github.com/LemontechSA/ttb/pull/650)
