@@ -458,9 +458,14 @@ if (!Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 			return respuesta;
 			}, "bUseRendered": false, "aTargets": [13]},
 			{"fnRender": function (o, val) {
-			if (o.aData[13]) {
-			return o.aData[13] + '<br/><small>' + o.aData[13] + '</small>';
-			}
+				var respuesta = '';
+				if (o.aData[13]) {
+					respuesta = o.aData[13];
+					if (o.aData[6]) {
+						respuesta += '<br/><small>' + o.aData[6] + '</small>';
+					}
+				}
+				return respuesta;
 			}, "aTargets": [6]},
 			{"fnRender": function (o, val) {
 			var tipo = (o.aData[15] != ' - ')? o.aData[15] + ' ':'';
