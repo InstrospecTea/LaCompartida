@@ -34,9 +34,9 @@ if ($opc == 'eliminar') {
 		list($cont_facturas) = mysql_fetch_array($resp);
 
 		if ($lista_pagos) {
-			$pagina->AddError(__('El cobro N°') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un pago asociado.'));
+			$pagina->AddError(__('El cobro Nº') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un pago asociado.'));
 		} else if ($cont_facturas > 0) {
-			$pagina->AddError(__('El cobro N°') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un documento tributario asociado.'));
+			$pagina->AddError(__('El cobro Nº') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un documento tributario asociado.'));
 		} else if ($cobros->Eliminar()) {
 			$pagina->AddInfo(__('Cobro eliminado con éxito'));
 		}
@@ -219,6 +219,19 @@ if ($opc == 'buscar') {
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
 
+	if ($print) {
+		$cobros_stmt = $sesion->pdodbh->query($query);
+		$cobros_result = $cobros_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+		$opcion = explode(',', $opcion);
+		$imprimir_cartas = $opcion[0] == 'cartas';
+		$agrupar_cartas = $opcion[1] == 'agrupar';
+
+		$NotaCobro = new NotaCobro($sesion);
+		$NotaCobro->GeneraCobrosMasivos($cobros_result, $imprimir_cartas, $agrupar_cartas);
+		die();
+	}
+
 	$b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 	$b->mensaje_error_fecha = "N/A";
 	$b->nombre = "busc_gastos";
@@ -288,7 +301,7 @@ if ($opc == 'buscar') {
 
 			$ht = "<tr bgcolor='#F2F2F2'>
 							<td align=center style='font-size:10px; width: 70px;'>
-								<b>" . __('N° Cobro') . "</b>
+								<b>" . __('Nº Cobro') . "</b>
 							</td>";
 
 			$ht .= "<td style='font-size:10px; ' align=left>
@@ -296,7 +309,7 @@ if ($opc == 'buscar') {
 							</td>";
 			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
-								<b>N° Factura</b>
+								<b>Nº Factura</b>
 							</td>";
 			}
 
@@ -647,6 +660,51 @@ $pagina->PrintTop();
 		}
 	}
 
+	function DescargarLiquidaciones() {
+		var text_window = '<strong><center><?php echo __('¿Desea descargar los cobros del periodo?') ?><center></strong><br><br>';
+		text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:160px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
+		text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
+
+		jQuery('<p/>')
+			.attr('title', 'Advertencia')
+			.html(text_window)
+			.dialog({
+				resizable: true,
+				height: 260,
+				width: 500,
+				modal: true,
+				close: function(ev, ui) {
+					interrumpeproceso = 1;
+				},
+				open: function() {
+					jQuery('.ui-dialog-title').addClass('ui-icon-warning');
+					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+				},
+				buttons: {
+					"<?php echo __('Descargar') ?>": function() {
+						var opciones = '';
+						if (jQuery('#cartas').is(':checked')) {
+							opciones += 'cartas';
+						}
+						if (jQuery('#agrupar').is(':checked')) {
+							opciones += ',agrupar';
+						}
+
+						jQuery("#opc").val('buscar');
+						jQuery('#form_busca').attr('action', 'seguimiento_cobro.php?print=true&opcion=' + opciones);
+						jQuery('#form_busca').submit();
+
+						jQuery(this).dialog("close");
+						return true;
+					},
+					"<?php echo __('Cancelar') ?>": function() {
+						jQuery(this).dialog('close');
+						return false;
+					}
+				}
+			});
+	}
+
 	<?php if ($id_foco) { ?>
 		self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</script>
 	<?php } ?>
@@ -667,7 +725,7 @@ $pagina->PrintTop();
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
 					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
-						&nbsp;&nbsp;<b><?php echo __('N° Factura') ?></b>&nbsp;
+						&nbsp;&nbsp;<b><?php echo __('Nº Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
 					 <?php } ?>
 				</td>
@@ -802,6 +860,8 @@ $pagina->PrintTop();
 				<td align="left">
 					<?php
 					echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'onclick' => "GeneraCobros(jQuery('#form_busca').get(0), '', false);"));
+					echo "&nbsp;&nbsp;&nbsp;&nbsp;";
+					echo $Form->icon_button(__('Descargar Liquidaciones'), 'download', array('href' => "javascript:void(0);", 'onclick' => "DescargarLiquidaciones()"));
 					echo $Form->icon_button(__('Subir excel'), 'upload', array('id' => 'boton_buscar', 'onclick' => "SubirExcel();", 'style' => 'float:right;margin-right:20px;'));
 					?>
 				</td>

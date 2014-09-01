@@ -798,7 +798,7 @@ class ReporteAntiguedadDeudas
 	    	->add_select('contrato.id_contrato')
 	    	->add_select('d.fecha')
 			->add_select("$identificador",'identificador')
-			->add_select("$tipo".' AS','and_statementstipo')
+			->add_select("$tipo",'tipo')
 			->add_select('d.glosa_documento','descripcion')
 			->add_select("$label",'label')
 			->add_select('cliente.codigo_cliente')

@@ -2,87 +2,78 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM'));
-$NotaCobro = new NotaCobro($sesion);
+$CartaCobro = new CartaCobro($sesion);
 
 if ($opc == 'guardar') {
-	$id_formato = $NotaCobro->GuardarCarta($nota);
-	die(json_encode(array('id' => $id_formato)));
+	$id_carta = $CartaCobro->GuardarCarta($_POST['carta']);
+	die(json_encode(array('id' => $id_carta)));
 } else if ($opc == 'prev') {
-	$id_formato = $NotaCobro->PrevisualizarDocumento($nota, $id_cobro);
+	$id_carta = $CartaCobro->PrevisualizarDocumento($carta, $id_cobro);
 } else {
-	$nota = $NotaCobro->ObtenerCarta($id_formato);
+	$carta = $CartaCobro->ObtenerCarta($id_carta);
 }
 
 $pagina = new Pagina($sesion);
-$pagina->titulo = __('Notas de cobro');
+$pagina->titulo = __('Cartas de cobro');
 $pagina->PrintTop();
 $Form = new Form;
-$template_parts = array(
-	'html_header' => 'Header',
-	'html_pie' => 'Pie',
-	'cobro_css' => 'CSS',
-	'pdf_encabezado_imagen' => 'Imagen Encabezado PDF',
-	'pdf_encabezado_texto' => 'Texto Encabezado PDF'
-);
 ?>
 <div class="loader-overlay" style="z-index: 1000; opacity:.8; background: #fff; top: 0; left: 0; right: 0; bottom: 0; position: fixed;"></div>
 <div class="loader-overlay" style="z-index: 1001; top: 0; left: 0; right: 0; bottom: 0; position: fixed; height: 100%; width: 100%;">
 	<img alt="cargando" src="//estaticos.thetimebilling.com/templates/cargando.gif" style="background: #fff; margin:150px; padding: 20px; border: 1px solid #eee;"/>
 </div>
+
 <form>
-	<?php echo Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", $id_formato, '', ' '); ?>
-	<?php echo $Form->submit(__('Editar')); ?>
+	<?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, '', ' '); ?>
+	<?php echo $Form->submit('Editar') ?>
 </form>
 <hr/>
-<form method="POST" id="form_nota_cobro">
+<form method="post" id="form_carta">
 	<input type="hidden" name="opc" value="guardar"/>
-	<input type="hidden" name="nota[id_formato]" value="<?php echo $nota['id_formato']; ?>"/>
+	<input type="hidden" name="carta[id_carta]" value="<?php echo $carta['id_carta']; ?>"/>
 	<p>
-		<label>Descripcion: <input name="nota[descripcion]" value="<?php echo $nota['descripcion']; ?>"/></label><br/>
+		<label>Descripcion: <input name="carta[descripcion]" value="<?php echo $carta['descripcion']; ?>"/></label><br/>
+		<label>Margen Superior: <input name="carta[margen_superior]" value="<?php echo $carta['margen_superior']; ?>"/></label><br/>
+		<label>Margen Inferior: <input name="carta[margen_inferior]" value="<?php echo $carta['margen_inferior']; ?>"/></label><br/>
+		<label>Margen Izquierdo: <input name="carta[margen_izquierdo]" value="<?php echo $carta['margen_izquierdo']; ?>"/></label><br/>
+		<label>Margen Derecho: <input name="carta[margen_derecho]" value="<?php echo $carta['margen_derecho']; ?>"/></label><br/>
+		<label>Margen Encabezado: <input name="carta[margen_encabezado]" value="<?php echo $carta['margen_encabezado']; ?>"/></label><br/>
+		<label>Margen Pie de página: <input name="carta[margen_pie_de_pagina]" value="<?php echo $carta['margen_pie_de_pagina']; ?>"/></label><br/>
 	</p>
-	<h3>Template</h3>
+
 	<div id="tabs-secciones" class="tabs">
 		<ul>
-			<?php foreach ($nota['secciones'] as $seccion => $html) { ?>
+			<?php foreach ($carta['secciones'] as $seccion => $html) { ?>
 				<li><a href="#tab-<?php echo $seccion; ?>"><?php echo $seccion; ?></a></li>
 			<?php } ?>
 		</ul>
-		<?php foreach ($nota['secciones'] as $seccion => $html) { ?>
+		<?php
+		foreach ($carta['secciones'] as $seccion => $html) {
+			$valores = UtilesApp::mergeKeyValue($NotaCobro->diccionario[$seccion]);
+			?>
 			<div id="tab-<?php echo $seccion; ?>">
-				<textarea class="ckeditor" id="editor_<?php echo $seccion; ?>" name="nota[secciones][<?php echo $seccion; ?>]"><?php echo htmlentities($html); ?></textarea>
-				<?php if (isset($NotaCobro->diccionario[$seccion])) { ?>
-					<?php
-					$valores = UtilesApp::mergeKeyValue($NotaCobro->diccionario[$seccion]);
-					echo $Form->label(__('Insertar Valor:'), "valores_$seccion");
-					echo $Form->select(null, $valores, null, array('id' => "valores_$seccion", 'class' => 'valores', 'empty' => false));
-					echo $Form->button(__('Insertar'), array('class' => 'agregar_valor'));
-					?>
-				<?php } ?>
-				<?php if (isset($NotaCobro->secciones[$seccion])) { ?>
+				<textarea class="ckeditor" id="editor_<?php echo $seccion; ?>" name="carta[secciones][<?php echo $seccion; ?>]"><?php echo htmlentities($html); ?></textarea>
+				<?php
+				$valores = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$seccion]);
+				echo $Form->label(__('Insertar Valor:'), "valores_$seccion");
+				echo $Form->select(null, $valores, null, array('id' => "valores_$seccion", 'class' => 'valores', 'empty' => false));
+				echo $Form->button(__('Insertar'), array('class' => 'agregar_valor'));
+				?>
+				<?php if (isset($CartaCobro->secciones[$seccion])) { ?>
 					<br/>
 					<?php
+					$valores = UtilesApp::mergeKeyValue($CartaCobro->secciones[$seccion]);
 					echo $Form->label(__('Agregar Sección:'), "secciones_$seccion");
-					echo $Form->select(null, $NotaCobro->secciones[$seccion], null, array('id' => "secciones_$seccion", 'class' => 'secciones', 'empty' => false));
+					echo $Form->select(null, $valores, null, array('id' => "secciones_$seccion", 'class' => 'secciones', 'empty' => false));
 					echo $Form->button(__('Agregar'), array('class' => 'agregar_seccion'));
 					?>
 				<?php } ?>
 			</div>
 		<?php } ?>
 	</div>
-	<br/>
-	<br/>
-	<br/>
-	<div id="tabs-parts" class="tabs">
-		<ul>
-			<?php foreach ($template_parts as $campo => $nombre) { ?>
-				<li><a href="#tab-<?php echo $campo; ?>"><?php echo $nombre; ?></a></li>
-			<?php } ?>
-		</ul>
-		<?php foreach ($template_parts as $campo => $nombre) { ?>
-			<div id="tab-<?php echo $campo; ?>">
-				<textarea name="nota[<?php echo $campo; ?>]" class="<?php echo strpos($campo, 'html_') === 0 ? 'ckeditor' : ''; ?>" rows="12" cols="40" style="width: 98%"><?php echo $nota[$campo]; ?></textarea>
-			</div>
-		<?php } ?>
+	<div>
+		<strong><?php echo $nombre; ?></strong>
+		<textarea name="nota[formato_css]" rows="15" cols="40" style="width: 98%"><?php echo $carta['formato_css']; ?></textarea>
 	</div>
 	<div style="padding: 23px">
 		<?php echo $Form->button('Guardar', array('id' => 'btn_guardar')); ?>
@@ -90,7 +81,7 @@ $template_parts = array(
 		<br/>
 		<br/>
 		<label>Previsualizar con el cobro N° <input name="id_cobro" value="<?php echo $id_cobro; ?>"/></label>
-		<?php echo $Form->button('Previsualizar documento', array('id' => 'btn_previsualizar')); ?>
+		<?php echo $Form->button('Previsualizar carta', array('id' => 'btn_previsualizar')); ?>
 		<?php echo $Form->button('Ver valores de tags', array('id' => 'btn_valores')); ?>
 	</div>
 	<hr/>
@@ -106,8 +97,8 @@ $template_parts = array(
 <script type="text/javascript" src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 <script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>
 <script type="text/javascript">
-	var diccionario = <?php echo json_encode(UtilesApp::utf8izar($NotaCobro->diccionario)); ?>;
-	var secciones = <?php echo json_encode(UtilesApp::utf8izar($NotaCobro->secciones)); ?>;
+	var diccionario = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->diccionario)); ?>;
+	var secciones = <?php echo json_encode(UtilesApp::utf8izar($CartaCobro->secciones)); ?>;
 
 	jQuery(function() {
 		CKEDITOR.config.fontSize_sizes = '7/7pt;8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt';
@@ -118,18 +109,18 @@ $template_parts = array(
 		jQuery('#btn_guardar, #btn_guardar_nueva').click(function() {
 			jQuery('[name=opc]').val('guardar');
 			if (jQuery(this).attr('id') === 'btn_guardar_nueva') {
-				jQuery('[name="nota[id_formato]"]').val('');
+				jQuery('[name="carta[id_carta]"]').val('');
 
 			}
 			jQuery.each(CKEDITOR.instances, function(i) {
 				CKEDITOR.instances[i].updateElement();
 			});
-			var form = jQuery('#form_nota_cobro');
+			var form = jQuery('#form_carta');
 			jQuery.post(form.attr('action'), form.serialize(), function(carta) {
 				if (carta.id) {
-					alerta('La nota de cobro se guardó correctamente.');
-					if (jQuery('[name="nota[id_formato]"]').val() != carta.id) {
-						window.location = '?id_formato=' + carta.id;
+					alerta('La carta se guardó correctamente.');
+					if (jQuery('[name="carta[id_carta]"]').val() != carta.id) {
+						window.location = '?id_carta=' + carta.id;
 					}
 				} else if (carta.error) {
 					alerta(carta.error);
@@ -138,10 +129,10 @@ $template_parts = array(
 		});
 		jQuery('#btn_previsualizar').click(function() {
 			jQuery('[name=opc]').val('prev');
-			jQuery('#form_nota_cobro').submit();
+			jQuery('#form_carta').submit();
 		});
 		jQuery('#btn_valores').click(function() {
-			window.open('carta_test_valores.php?tipo=nota&id_cobro=' + jQuery('[name=id_cobro]').val());
+			window.open('carta_test_valores.php?id_cobro=' + jQuery('[name=id_cobro]').val());
 		});
 		jQuery('#btn_previsualizar_html').click(function() {
 			PrevisualizarHTML();
@@ -169,7 +160,6 @@ $template_parts = array(
 			.delay(5000)
 			.fadeOut();
 	}
-
 	function AgregarValor() {
 		var div = jQuery(this).closest('div');
 		AgregarHTML(div, div.find('.valores').val());
@@ -201,7 +191,7 @@ $template_parts = array(
 			var div = jQuery('<div/>', {id: 'tab-' + seccion})
 				.append(jQuery('<textarea/>', {
 					'class': 'ckeditor',
-					'name': 'nota[secciones][' + seccion + ']',
+					'name': 'carta[secciones][' + seccion + ']',
 					'id': 'editor_' + seccion
 				}));
 
@@ -235,10 +225,10 @@ $template_parts = array(
 						type: 'button',
 						text: 'Agregar'
 					}))
-					);
+				);
 				var selvals = div.find('.secciones');
 				jQuery.each(secciones[seccion], function(idx, val) {
-					selvals.append(jQuery('<option/>', {value: idx, text: val}));
+					selvals.append(jQuery('<option/>', {value: idx, text: '%' + idx + '% - ' + val}));
 				});
 			}
 		}
@@ -246,8 +236,8 @@ $template_parts = array(
 	}
 
 	function PrevisualizarHTML() {
-		var css = jQuery('[name="nota[cobro_css]"]').val();
-		var body = GenerarHTML('INFORME');
+		var css = jQuery('[name="carta[formato_css]"]').val();
+		var body = GenerarHTML('CARTA');
 		var html = '<style type="text/css">' + css + '</style>' + body;
 		jQuery('#previsualizacion_html')[0].contentWindow.document.body.innerHTML = html;
 	}
@@ -256,8 +246,9 @@ $template_parts = array(
 		var id = 'editor_' + seccion;
 
 		var html = CKEDITOR.instances[id] ? CKEDITOR.instances[id].getData() : jQuery('#' + id).val();
-		if (!html)
+		if (!html) {
 			return '';
+		}
 
 		jQuery.each(secciones[seccion] || [], function(s) {
 			var tag = '%' + s + '%';

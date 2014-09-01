@@ -565,9 +565,10 @@ if ($opc == 'buscar') {
 									text_window += '<strong><center>No hay datos para los filtros que Ud. ha seleccionado</center></strong>';
 								} else {
 
-									text_window += '<div style="padding-left:40px; text-align:left; color:red; "><label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:150px;">Formato del borrador:</label>';
+									text_window += '<div style="padding-left:40px; text-align:left; color:red; "><label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:160px;">Formato del borrador:</label>';
 									text_window += '<?php echo str_replace(array("'", "\n"), array('"', ''), Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", "", "", "Según opciones del " . __('Contrato'), '200px')); ?>';
-									text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:150px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  /></div>';
+									text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:160px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
+									text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
 								}
 
 
@@ -589,11 +590,14 @@ if ($opc == 'buscar') {
 											buttons: {
 												"<?php echo __('Descargar') ?>": function() {
 													var id_formato = jQuery('#id_formato').val();
+													opciones = '';
 													if (jQuery('#cartas').is(':checked')) {
-														ImpresionCobros(false, 'cartas', id_formato);
-													} else {
-														ImpresionCobros(false, '', id_formato);
+														opciones += 'cartas';
 													}
+													if (jQuery('#agrupar').is(':checked')) {
+														opciones += ',agrupar';
+			 										}
+			 										ImpresionCobros(false, opciones, id_formato);
 													jQuery(this).dialog("close");
 													return true;
 												},
