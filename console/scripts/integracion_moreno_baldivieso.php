@@ -19,8 +19,9 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 	public function main() {
 		// Declare the SQL statement that will query the database
+		// SELECT TOP 1
 		$query =
-			"SELECT TOP 1
+			"SELECT
 				OCRD.CardCode AS 'client_code',
 				OCRD.CardName AS 'client_name',
 				(CASE WHEN (OCRD.frozenFor = 'N') THEN 1 ELSE 0 END) AS 'client_active',
