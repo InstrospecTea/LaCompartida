@@ -27,7 +27,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				(CASE WHEN (OCRD.frozenFor = 'N') THEN 1 ELSE 0 END) AS 'client_active',
 				OPRJ.PrjCode AS 'matter_code',
 				OPRJ.PrjName AS 'matter_name',
-				OPRJ.Active AS 'matter_active',
+				(CASE WHEN (OPRJ.Active = 'Y') THEN 1 ELSE 0 END) AS 'matter_active',
 				OSLP.SlpCode AS 'trade_manager_code',
 				OSLP.Slpname AS 'trade_manager_name',
 				OPRJ.U_AbogadoEncargado AS 'lawyer_manager_name',
