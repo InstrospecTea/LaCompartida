@@ -1,5 +1,22 @@
 # Changelog
 
+
+## Hotfix: 14.15.5
+Lunes 01 de Septiembre 2014
+* **Fixed:** [Correcciones Reporte Antiguedad de Deudas](https://github.com/LemontechSA/ttb/pull/671)
+
+## Hotfix: 14.15.4
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Finders Fee / Informe produccion](https://github.com/LemontechSA/ttb/pull/670)
+
+## Hotfix: 14.15.3
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Morales y Besa](https://github.com/LemontechSA/ttb/pull/670)
+
+## Hotfix: 14.15.2
+Viernes 29 de Agosto 2014
+* **Fixed:** [Correcciones Morales y Besa](https://github.com/LemontechSA/ttb/pull/670)
+
 ## Hotfix: 14.15.2
 Viernes 29 de Agosto 2014
 * **Fixed:** [Recuperar versiones anteriores](https://github.com/LemontechSA/ttb/pull/668)
