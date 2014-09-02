@@ -21,7 +21,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		// Declare the SQL statement that will query the database
 		// SELECT TOP 1
 		$query =
-			"SELECT
+			"SELECT TOP 1
 				OCRD.CardCode AS 'client_code',
 				OCRD.CardName AS 'client_name',
 				(CASE WHEN (OCRD.frozenFor = 'N') THEN 1 ELSE 0 END) AS 'client_active',
@@ -44,7 +44,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCPR.Tel1 AS 'applicant_phone',
 				OCPR.E_MailL AS 'applicant_email',
 				OCRD.U_Tarifa AS 'charging_data_rate',
+				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
+				OCRD.U_MonHonor AS 'charging_data_currency_fees',
+				OCRD.U_MonGastos AS 'charging_data_currency_expenses'
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
 					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
@@ -141,10 +144,20 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				// Matter: values by default
 				$client['matter_code'] = strtoupper($client['matter_code']);
 				$billing_form = $this->_empty($client['charging_data_billing_form']) ? 'FLAT FEE' : $client['charging_data_billing_form'];
-				// $rate = $this->_empty($client['charging_data_rate']) ? 1 : $client['charging_data_rate'];
-				$rate = 1; // Rate by default
-				// $currency_rate = $this->_empty($client['charging_data_currency_rate']) ? 1 : $client['charging_data_currency_rate'];
-				$currency_rate = 1; // Currency rate by default
+
+				$Rate = new Tarifa($Session);
+
+				if (!$this->_empty($client['charging_data_rate'])) {
+					$Rate->LoadById($client['charging_data_rate']);
+				} else {
+					$Rate->LoadDefault(); // Find rate by default
+				}
+
+				$rate_id = $Rate->Loaded() ? $Rate->fields['id_tarifa'] : 1;
+
+				// buscar moneda base si no se especifica
+				$currency_rate_id = $this->_empty($client['charging_data_currency_rate']) ? 1 : $client['charging_data_currency_rate'];
+
 				$user_id = 'NULL';
 				$matter_agreement_active = $client['matter_active'] == '1' ? 'SI' : 'NO';
 				$lawyer_manager_id = 'NULL';
@@ -152,6 +165,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$country_id = 'NULL';
 				$language = $this->_empty($client['language']) ? 1 : $client['language'];
 				$chargeable = $this->_empty($client['chargeable']) ? 1 : $client['chargeable']; // Chargeable by default
+				$separate_settlements = 1; // Separate settlements by default
 
 				$Matter = new Asunto($Session);
 				$MatterAgreement = new Contrato($Session);
@@ -199,6 +213,8 @@ class IntegracionMorenoBaldivieso extends AppShell {
 						$MatterAgreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
 					}
 
+					$MatterAgreement->Edit('separar_liquidaciones', $separate_settlements);
+
 					// Find trade manager
 					if (!$this->_empty($client['trade_manager_code'])) {
 						$TradeManager = new UsuarioExt($Session);
@@ -236,7 +252,8 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 					$MatterAgreement->Edit('activo', $matter_agreement_active);
 					$MatterAgreement->Edit('forma_cobro', $billing_form);
-					$MatterAgreement->Edit('id_tarifa', $rate);
+					$MatterAgreement->Edit('id_tarifa', $rate_id);
+					$MatterAgreement->Edit('id_moneda', $currency_rate_id);
 
 					if ($MatterAgreement->Write()) {
 						$Matter->Edit('id_contrato', $MatterAgreement->fields['id_contrato']);
