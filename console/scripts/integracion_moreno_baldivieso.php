@@ -28,9 +28,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OPRJ.PrjCode AS 'matter_code',
 				OPRJ.PrjName AS 'matter_name',
 				(CASE WHEN (OPRJ.Active = 'Y') THEN 1 ELSE 0 END) AS 'matter_active',
-				OSLP.SlpCode AS 'trade_manager_code',
-				OSLP.Slpname AS 'trade_manager_name',
-				OPRJ.U_AbogadoEncargado AS 'lawyer_manager_name',
+				OCRD.SlpCode AS 'trade_manager_code',
+				OPRJ.U_Idioma AS 'language',
+				(CASE WHEN (OPRJ.U_Factur = 'Y') THEN 1 ELSE 0 END) AS 'chargeable',
+				OPRJ.U_AbogadoEncargado AS 'lawyer_manager_code',
 				OCRD.LicTradNum AS 'billing_data_identification_number',
 				OCRG.GroupName AS 'billing_data_activity',
 				CRD1.Street AS 'billing_data_address',
@@ -43,7 +44,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCPR.Tel1 AS 'applicant_phone',
 				OCPR.E_MailL AS 'applicant_email',
 				OCRD.U_Tarifa AS 'charging_data_rate',
-				OCRD.U_TarPlana AS 'charging_data_flat_rate',
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
@@ -54,7 +54,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				END) AS 'charging_data_billing_form'
 			FROM OCRD
 				INNER JOIN OPRJ ON OPRJ.U_ClienCode = OCRD.CardCode
-				INNER JOIN OSLP ON OSLP.SlpCode = OCRD.SlpCode
 				INNER JOIN OCRG ON OCRG.GroupCode = OCRD.GroupCode
 				INNER JOIN CRD1 ON CRD1.CardCode = OCRD.CardCode
 				INNER JOIN OCPR ON OCPR.CardCode = OCRD.CardCode
@@ -142,12 +141,17 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				// Matter: values by default
 				$client['matter_code'] = strtoupper($client['matter_code']);
 				$billing_form = $this->_empty($client['charging_data_billing_form']) ? 'FLAT FEE' : $client['charging_data_billing_form'];
-				$rate = $this->_empty($client['charging_data_rate']) ? 1 : $client['charging_data_rate'];
-				$currency_rate = $this->_empty($client['charging_data_currency_rate']) ? 1 : $client['charging_data_currency_rate'];
+				// $rate = $this->_empty($client['charging_data_rate']) ? 1 : $client['charging_data_rate'];
+				$rate = 1; // Rate by default
+				// $currency_rate = $this->_empty($client['charging_data_currency_rate']) ? 1 : $client['charging_data_currency_rate'];
+				$currency_rate = 1; // Currency rate by default
 				$user_id = 'NULL';
 				$matter_agreement_active = $client['matter_active'] == '1' ? 'SI' : 'NO';
-				$manager_id = 'NULL';
 				$lawyer_manager_id = 'NULL';
+				$trade_manager_id = 'NULL';
+				$country_id = 'NULL';
+				$language = $this->_empty($client['language']) ? 1 : $client['language'];
+				$chargeable = $this->_empty($client['chargeable']) ? 1 : $client['chargeable']; // Chargeable by default
 
 				$Matter = new Asunto($Session);
 				$MatterAgreement = new Contrato($Session);
@@ -164,14 +168,16 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				}
 
 				$Matter->Edit('glosa_asunto', utf8_decode($client['matter_name']));
+				$Matter->Edit('id_idioma', $language);
 				$Matter->Edit('activo', $client['matter_active']);
+				$Matter->Edit('cobrable', $chargeable);
 
 				// Find lawyer manager
-				$lawyer_manager_name = utf8_decode($client['lawyer_manager_name']);
-				if (!$this->_empty($lawyer_manager_name)) {
-					$LawyerManager = new Usuario($Session);
-					$LawyerManager->LoadByNick($lawyer_manager_name);
-					if ($LawyerManager->loaded) {
+				$lawyer_manager_code = utf8_decode($client['lawyer_manager_code']);
+				if (!$this->_empty($lawyer_manager_code)) {
+					$LawyerManager = new UsuarioExt($Session);
+					$LawyerManager->LoadByNick($lawyer_manager_code);
+					if ($LawyerManager->Loaded()) {
 						$lawyer_manager_id = $LawyerManager->fields['id_usuario'];
 					}
 				}
@@ -184,6 +190,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					// falta verificar si el asunto se cobra de forma independiente
 					// $Matter->Edit('id_contrato', $ClientAgreement->fields['id_contrato']);
 					// $Matter->Edit('id_contrato_indep', 'NULL');
+					// eliminar contrato actual del asunto
 
 					// Find a matter agreement
 					$MatterAgreement->loadById($Matter->fields['id_contrato']);
@@ -192,6 +199,17 @@ class IntegracionMorenoBaldivieso extends AppShell {
 						$MatterAgreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
 					}
 
+					// Find trade manager
+					if (!$this->_empty($client['trade_manager_code'])) {
+						$TradeManager = new UsuarioExt($Session);
+						$TradeManager->LoadByNick($client['trade_manager_code']);
+						if ($TradeManager->Loaded()) {
+							$trade_manager_id = $TradeManager->fields['id_usuario'];
+						}
+					}
+
+					$MatterAgreement->Edit('id_usuario_responsable', $trade_manager_id);
+
 					$MatterAgreement->Edit('rut', $client['billing_data_identification_number']);
 					$MatterAgreement->Edit('factura_razon_social', utf8_decode($client['client_name']));
 					$MatterAgreement->Edit('factura_giro', utf8_decode($client['billing_data_activity']));
@@ -199,6 +217,17 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('factura_comuna', utf8_decode($client['billing_data_commune']));
 					$MatterAgreement->Edit('factura_ciudad', utf8_decode($client['billing_data_city']));
 					$MatterAgreement->Edit('factura_telefono', utf8_decode($client['billing_data_phone']));
+
+					// Find country
+					if (!$this->_empty($client['billing_data_country'])) {
+						$Country = new PrmPais($Session);
+						$Country->LoadByISO($client['billing_data_country']);
+						if ($Country->Loaded()) {
+							$country_id = $Country->fields['id_pais'];
+						}
+					}
+
+					$MatterAgreement->Edit('id_pais', $country_id);
 
 					$applicant_full_name = utf8_decode($client['applicant_first_name'] . ' ' . $client['applicant_last_name']);
 					$MatterAgreement->Edit('contacto', $applicant_full_name);
