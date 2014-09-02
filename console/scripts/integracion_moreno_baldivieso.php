@@ -47,7 +47,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonHonor AS 'charging_data_currency_fees',
-				OCRD.U_MonGastos AS 'charging_data_currency_expenses'
+				OCRD.U_MonGastos AS 'charging_data_currency_expenses',
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
 					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
