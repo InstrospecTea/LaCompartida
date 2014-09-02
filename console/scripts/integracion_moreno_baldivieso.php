@@ -82,6 +82,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		if (!$this->_empty($clients)) {
 			$Session = new Sesion(null, true);
 			$currency_base_id = Moneda::GetMonedaBase($Session);
+			$clients = UtilesApp::utf8izar($clients);
 
 			foreach ($clients as $client) {
 				$this->_debug($client);
@@ -108,7 +109,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$Client->Edit('id_usuario_encargado', $client_user_manager_id);
 				}
 
-				$Client->Edit('glosa_cliente', utf8_decode($client['client_name']));
+				$Client->Edit('glosa_cliente', $client['client_name']);
 				$Client->Edit('activo', $client['client_active']);
 
 				if ($Client->Write()) {
@@ -226,13 +227,13 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$Matter->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
 				}
 
-				$Matter->Edit('glosa_asunto', utf8_decode($client['matter_name']));
+				$Matter->Edit('glosa_asunto', $client['matter_name']);
 				$Matter->Edit('id_idioma', $language);
 				$Matter->Edit('activo', $client['matter_active']);
 				$Matter->Edit('cobrable', $chargeable);
 
 				// Find a lawyer manager
-				$lawyer_manager_code = utf8_decode($client['lawyer_manager_code']);
+				$lawyer_manager_code = $client['lawyer_manager_code'];
 				if (!$this->_empty($lawyer_manager_code)) {
 					$LawyerManager = new UsuarioExt($Session);
 					$LawyerManager->LoadByNick($lawyer_manager_code);
@@ -267,12 +268,12 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('id_usuario_responsable', $trade_manager_id);
 
 					$MatterAgreement->Edit('rut', $client['billing_data_identification_number']);
-					$MatterAgreement->Edit('factura_razon_social', utf8_decode($client['client_name']));
-					$MatterAgreement->Edit('factura_giro', utf8_decode($client['billing_data_activity']));
-					$MatterAgreement->Edit('factura_direccion', utf8_decode($client['billing_data_address']));
-					$MatterAgreement->Edit('factura_comuna', utf8_decode($client['billing_data_commune']));
-					$MatterAgreement->Edit('factura_ciudad', utf8_decode($client['billing_data_city']));
-					$MatterAgreement->Edit('factura_telefono', utf8_decode($client['billing_data_phone']));
+					$MatterAgreement->Edit('factura_razon_social', $client['client_name']);
+					$MatterAgreement->Edit('factura_giro', $client['billing_data_activity']);
+					$MatterAgreement->Edit('factura_direccion', $client['billing_data_address']);
+					$MatterAgreement->Edit('factura_comuna', $client['billing_data_commune']);
+					$MatterAgreement->Edit('factura_ciudad', $client['billing_data_city']);
+					$MatterAgreement->Edit('factura_telefono', $client['billing_data_phone']);
 
 					// Find a country
 					if (!$this->_empty($client['billing_data_country'])) {
@@ -285,10 +286,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 					$MatterAgreement->Edit('id_pais', $country_id);
 
-					$applicant_full_name = utf8_decode($client['applicant_first_name'] . ' ' . $client['applicant_last_name']);
+					$applicant_full_name = $client['applicant_first_name'] . ' ' . $client['applicant_last_name'];
 					$MatterAgreement->Edit('contacto', $applicant_full_name);
 					$MatterAgreement->Edit('fono_contacto', $client['applicant_phone']);
-					$MatterAgreement->Edit('email_contacto', utf8_decode($client['applicant_email']));
+					$MatterAgreement->Edit('email_contacto', $client['applicant_email']);
 
 					$MatterAgreement->Edit('activo', $matter_agreement_active);
 					$MatterAgreement->Edit('forma_cobro', $billing_form);
