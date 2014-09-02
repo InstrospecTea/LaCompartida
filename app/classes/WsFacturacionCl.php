@@ -3,20 +3,15 @@
 require_once(dirname(__FILE__) . '/../conf.php');
 ini_set('soap.wsdl_cache_enabled', 0);
 
-class WsFacturacionCl {
+class WsFacturacionCl extends WsFacturacion {
 
-	protected $tipoCodigo;
-	protected $ValorCodigo;
 	protected $url = 'http://ws.facturacion.cl/WSDS/wsplano.asmx?wsdl';
-	protected $Client;
 	protected $usuario;
 	protected $password;
 	protected $rut;
-	protected $errorCode;
-	protected $errorMessage;
 
 	public function __construct($rut, $usuario, $password) {
-		$this->Client = new SoapClient($this->url, array('trace' => 1));
+		parent::__construct();
 		$this->isOnline();
 		$this->rut = $rut;
 		$this->usuario = $usuario;
@@ -121,23 +116,6 @@ class WsFacturacionCl {
 		return base64_decode($url64);
 	}
 
-	public function hasError() {
-		return !is_null($this->errorCode);
-	}
-
-	public function getErrorCode() {
-		return $this->errorCode;
-	}
-
-	public function getErrorMessage() {
-		return $this->errorMessage;
-	}
-
-	private function setError($code, $message) {
-		$this->errorCode = $code;
-		$this->errorMessage = $message;
-	}
-
 	private function enviarDocumento($datosDocumento) {
 		$xmlDocumento = self::crearXML($datosDocumento);
 		$login = $this->getLogin();
@@ -200,32 +178,6 @@ class WsFacturacionCl {
 		$data = UtilesApp::utf8izar($data);
 		self::array_to_xml($data, $node);
 		return $xml->asXML();
-	}
-
-	private static function array_to_xml($array, SimpleXMLElement &$xml) {
-		foreach ($array as $key => $value) {
-			if (is_array($value)) {
-				if (!is_numeric($key)) {
-					$subnode = $xml->addChild("$key");
-					self::array_to_xml($value, $subnode);
-				} else {
-					self::array_to_xml($value, $xml);
-				}
-			} else {
-				$xml->addChild("$key", "$value");
-			}
-		}
-	}
-
-	private static function XML2Array(SimpleXMLElement $parent) {
-		$array = array();
-
-		foreach ($parent as $name => $element) {
-			($node = & $array[$name]) && (1 === count($node) ? $node = array($node) : 1) && $node = & $node[];
-			$node = $element->count() ? self::XML2Array($element) : trim($element);
-		}
-
-		return $array;
 	}
 
 }

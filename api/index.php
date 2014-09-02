@@ -678,7 +678,7 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 		$Invoice = new Factura($Session);
 		$Invoice->Load($id);
 		if (!$Invoice->Loaded()) {
-			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+			halt(__('Invalid invoice Number'), "InvalidInvoiceNumber");
 		}	else {
 			$data = array('Factura' => $Invoice, 'ExtraData' => 'TextoInvoice');
 			$Slim->applyHook('hook_genera_factura_electronica', &$data);
@@ -690,33 +690,39 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 			}
 		}
 	} else {
-		halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
+		halt(__('Invalid invoice Number'), 'InvalidInvoiceNumber');
 	}
 });
 
 $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 	$format = is_null($Slim->request()->params('format')) ? 'pdf' : $Slim->request()->params('format');
 	if (isset($id)) {
-		$Invoice = new Factura($Session);
-		$Invoice->Load($id);
-		if (!$Invoice->Loaded()) {
-			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
-		}	else {
-			if ($format == 'pdf') {
-				$url = $Invoice->fields['dte_url_pdf'];
-				$name = array_shift(explode('?', basename($url)));
-				if ($name === 'descargar.php') {
-					$name = sprintf('factura_%s.pdf', $Invoice->ObtenerNumero());
-				}
-				downloadFile($name, 'application/pdf', file_get_contents($url));
+		try {
+			$Invoice = new Factura($Session);
+			$Invoice->Load($id);
+			$data = array('Factura' => $Invoice);
+			$Slim->applyHook('hook_descargar_pdf_factura_electronica', $data);
+			if (!$Invoice->Loaded()) {
+				throw new Exception('');
 			} else {
-				if ($format == 'xml') {
-					$file_name = 'invoice_' . Utiles::sql2date($Invoice->fields['fecha'], "%Y%m%d") . "_{$Invoice->fields['serie_documento_legal']}-{$Invoice->fields['numero']}.xml";
-					downloadFile($file_name, 'text/xml', utf8_decode($Invoice->fields['dte_xml']));
+				if ($format == 'pdf') {
+					$url = $Invoice->fields['dte_url_pdf'];
+					$name = array_shift(explode('?', basename($url)));
+					if ($name === 'descargar.php') {
+						$name = sprintf('factura_%s.pdf', $Invoice->ObtenerNumero());
+					}
+					downloadFile($name, 'application/pdf', file_get_contents($url));
 				} else {
-					halt(__("Invalid document format"), "InvalidDocumentFormat");
+					if ($format == 'xml') {
+						$file_name = 'invoice_' . Utiles::sql2date($Invoice->fields['fecha'], "%Y%m%d") . "_{$Invoice->fields['serie_documento_legal']}-{$Invoice->fields['numero']}.xml";
+						downloadFile($file_name, 'text/xml', utf8_decode($Invoice->fields['dte_xml']));
+					} else {
+						throw new Exception('');
+					}
 				}
 			}
+		} catch (Exception $ex) {
+			halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");
 		}
 	} else {
 		halt(__("Invalid invoice Number"), "InvalidInvoiceNumber");

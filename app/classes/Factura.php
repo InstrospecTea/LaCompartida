@@ -1571,7 +1571,7 @@ class Factura extends Objeto {
 					// Segmento de codigo para factura word expertise
 					$segmento = '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					$cantidad = 1;
-					for ($cantidad = 0; $cantidad < 18; $cantidad++) { 
+					for ($cantidad = 0; $cantidad < 18; $cantidad++) {
 						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					}
 					$html2 = str_replace('%desglose_gastos%', $segmento, $html2);
@@ -1675,7 +1675,7 @@ class Factura extends Objeto {
 
 					$segmento = '';
 
-					for ($K = 0; $k < $diff_gastos; $k++) { 
+					for ($K = 0; $k < $diff_gastos; $k++) {
 						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					}
 
@@ -1830,6 +1830,14 @@ class Factura extends Objeto {
 		return $html2;
 	}
 
+	/**
+	 * Devuelve numero de factura incluyendo serie si corresponde.
+	 * @param type $id_factura
+	 * @param type $serie
+	 * @param type $numero
+	 * @param type $mostrar_comprobante
+	 * @return type
+	 */
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
 		$n = null;
 		if ($this->Loaded()) {

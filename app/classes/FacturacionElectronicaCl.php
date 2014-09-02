@@ -118,7 +118,6 @@ EOF;
 		if (is_a($result, 'Exception')) {
 			$error_log = $result->__toString();
 		} else {
-
 			$error_description = utf8_decode($result->getErrorMessage());
 			$error_log = $error_description;
 		}

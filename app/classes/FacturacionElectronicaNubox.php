@@ -80,10 +80,9 @@ EOF;
 			$Estudio->Load($Factura->fields['id_estudio']);
 			$rut = $Estudio->GetMetaData('rut');
 			$login = $Estudio->GetMetadata('facturacion_electronica');
-			$WsFacturacionCl = new WsFacturacionNubox($rut, $login);
-			pr($WsFacturacionCl);
-			if ($WsFacturacionCl->hasError()) {
-				$hookArg['Error'] = self::ParseError($WsFacturacionCl, $WsFacturacionCl->getErrorCode());
+			$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
+			if ($WsFacturacionNubox->hasError()) {
+				$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
 			} else {
 				$archivo = self::FacturaToCsv($Sesion, $Factura, $Estudio);
 				$opcionFolios = 1; //los folios son asignados por nubox
@@ -91,26 +90,22 @@ EOF;
 				$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
 				$hookArg['ExtraData'] = $csv_documento;
 				try {
-					$result = $WsFacturacionCl->emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
-				pr($result);
-				exit;
-					if (!$WsFacturacionCl->hasError()) {
+					$result = $WsFacturacionNubox->emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
+					if ($WsFacturacionNubox->hasError()) {
+						$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
+					} else {
 						try {
-							$Factura->Edit('dte_xml', $result['Detalle']['Documento']['xmlDTE']);
+							$Factura->Edit('numero', $result['FolioCargado']);
+							$Factura->Edit('dte_url_pdf', $result['Identificador']);
 							$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
-							$file_url = $result['Detalle']['Documento']['urlPDF'];
-							$Factura->Edit('dte_url_pdf', $file_url);
 							if ($Factura->Write()) {
 								$hookArg['InvoiceURL'] = $file_url;
 							}
 						} catch (Exception $ex) {
 							$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 						}
-					} else {
-						$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'BuildingInvoiceError');
 					}
 				} catch (Exception $ex) {
-					pr($ex->__toString());
 					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 				}
 			}
@@ -124,7 +119,7 @@ EOF;
 			$error_log = $result->__toString();
 		} else {
 
-			$error_description = utf8_decode($result->getErrorMessage());
+			$error_description = $result->getErrorMessage();
 			$error_log = $error_description;
 		}
 		Log::write($error_log, "FacturacionElectronicaCl");
@@ -132,10 +127,6 @@ EOF;
 			'Code' => $error_code,
 			'Message' => $error_description
 		);
-	}
-
-	public static function AnulaFacturaElectronica($hookArg) {
-		return $hookArg;
 	}
 
 	/**
@@ -233,6 +224,38 @@ EOF;
 			$arrayFactura[$key] = implode(';', $item);
 		}
 		return implode("\n", $arrayFactura);
+	}
+
+	/**
+	 * Descarga archivo PDF
+	 * @param type $hookArg
+	 */
+	public static function DescargarPdf($hookArg) {
+		$Factura = $hookArg['Factura'];
+		$id = $Factura->fields['dte_url_pdf'];
+		if (empty($id)) {
+			throw new Exception('Identificador no valido.');
+		}
+		$Estudio = new PrmEstudio($Factura->sesion);
+		$Estudio->Load($Factura->fields['id_estudio']);
+		$rut = $Estudio->GetMetaData('rut');
+		$login = $Estudio->GetMetadata('facturacion_electronica');
+		$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
+		if ($WsFacturacionNubox->hasError()) {
+			throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+		}
+		$result = $WsFacturacionNubox->getPdf($id);
+		if ($WsFacturacionNubox->hasError()) {
+			throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+		}
+
+		$name = sprintf('Factura_%s.pdf', $Factura->obtenerNumero());
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Type: application/pdf");
+		header('Content-Description: File Transfer');
+		header("Content-Disposition: attachment; filename=$name");
+		echo $result;
+		exit;
 	}
 
 }

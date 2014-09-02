@@ -1,6 +1,6 @@
 <?php
 /**
- * Ofrece exportar las facturas al WS de Facturación electrónica México
+ * Ofrece exportar las facturas al WS de Facturación electrónica Nubox (http://nubox.com/)
  *
  * @package The Time Billing
  * @subpackage Plugins
@@ -17,6 +17,7 @@ $Slim->hook('hook_factura_metodo_pago', array($clase, 'InsertaMetodoPago'));
 $Slim->hook('hook_factura_dte_estado', array($clase, 'InsertaEstadoDTE'));
 $Slim->hook('hook_validar_factura', array($clase, 'ValidarFactura'));
 $Slim->hook('hook_cobro6_javascript_after', array($clase, 'InsertaJSFacturaElectronica'));
+$Slim->hook('hook_descargar_pdf_factura_electronica', array($clase, 'DescargarPdf'));
 
 $Slim->hook('hook_cobros7_botones_after', function($hookArg) {
   return FacturacionElectronicaNubox::AgregarBotonFacturaElectronica($hookArg);

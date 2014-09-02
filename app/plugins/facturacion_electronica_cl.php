@@ -1,6 +1,6 @@
 <?php
 /**
- * Ofrece exportar las facturas al WS de Facturación electrónica México
+ * Ofrece exportar las facturas al WS de Facturación electrónica Chile (http://facturacion.cl/)
  *
  * @package The Time Billing
  * @subpackage Plugins
