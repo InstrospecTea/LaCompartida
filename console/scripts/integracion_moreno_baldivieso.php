@@ -9,7 +9,8 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		// $this->connection['server'] = '200.87.127.179';
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
-		$this->connection['database_name'] = 'EMBA_PRUEBAS';
+		// $this->connection['database_name'] = 'EMBA_PRUEBAS';
+		$this->connection['database_name'] = 'EMBA_PROD';
 
 		// Connection to the database
 		$this->dbhandle = mssql_connect($this->connection['server'], $this->connection['user'], $this->connection['password']) or exit("Error connection to server {$connection['server']}");
@@ -20,7 +21,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	public function main() {
 		// Declare the SQL statement that will query the database
 		// SELECT TOP 1
-		// WHERE OCRD.CardCode = 'CUSSC00016'
+		// WHERE OCRD.CardCode = 'CBSLP00020'
 		$query =
 			"SELECT
 				OCRD.CardCode AS 'client_code',
@@ -82,7 +83,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		if (!$this->_empty($clients)) {
 			$Session = new Sesion(null, true);
 			$currency_base_id = Moneda::GetMonedaBase($Session);
-			$clients = UtilesApp::utf8izar($clients);
+			$clients = UtilesApp::utf8izar($clients, false);
 
 			foreach ($clients as $client) {
 				$this->_debug($client);
