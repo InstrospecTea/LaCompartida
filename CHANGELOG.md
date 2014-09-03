@@ -1,5 +1,8 @@
 # Changelog
 
+## Hotfix: 14.15.6
+Martes 03 de Septiembre 2014
+* **Fixed:** [Rango de fechas en el reporte de ventas](https://github.com/LemontechSA/ttb/pull/675)
 
 ## Hotfix: 14.15.5
 Lunes 01 de Septiembre 2014
