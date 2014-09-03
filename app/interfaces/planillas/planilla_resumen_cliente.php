@@ -175,7 +175,7 @@ $fila_debug = 20;
 						LEFT JOIN cliente AS cliente ON cobro.codigo_cliente=cliente.codigo_cliente
 						WHERE cobro.estado <> 'CREADO' 
 						AND cobro.estado <> 'EN REVISION'
-						AND cobro.fecha_emision BETWEEN '$fecha_ini 00:00:01' AND '$fecha_fin 23:59:59' $where 
+						AND cobro.fecha_emision BETWEEN '$fecha_ini 00:00:00' AND '$fecha_fin 23:59:59' $where
 						)ZZ
 						GROUP BY codigo_cliente
 						ORDER BY glosa_cliente";
