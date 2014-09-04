@@ -1,24 +1,29 @@
 <?php
 class IntegracionMorenoBaldivieso extends AppShell {
 	private $connection;
-	private $dbhandle;
+	private $dbh;
 	public $debug;
 
 	public function __construct() {
-		$this->connection['server'] = '200.87.127.182';
-		// $this->connection['server'] = '200.87.127.179';
+		// $this->connection['server'] = '200.87.127.182';
+		$this->connection['server'] = 'embaMSSql';
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
 		// $this->connection['database_name'] = 'EMBA_PRUEBAS';
 		$this->connection['database_name'] = 'EMBA_PROD';
 
-		// Connection to the database
-		$this->dbhandle = mssql_connect($this->connection['server'], $this->connection['user'], $this->connection['password']) or exit("Error connection to server {$connection['server']}");
-		// Select a database to work with
-		mssql_select_db($this->connection['database_name'], $this->dbhandle) or exit("Error selecting database {$this->connection['database_name']}");
+		try {
+			// Connection to the database and select a database
+			$this->dbh = new PDO("dblib:host={$this->connection['server']};dbname={$this->connection['database_name']}", $this->connection['user'], $this->connection['password']);
+		} catch (PDOException $e) {
+			echo "Failed to get DB handle: " . $e->getMessage() . "\n";
+			exit;
+		}
 	}
 
 	public function main() {
+		$clients = array();
+
 		// Declare the SQL statement that will query the database
 		// SELECT TOP 1
 		// WHERE OCRD.CardCode = 'CBSLP00020'
@@ -65,18 +70,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 			ORDER BY OCRD.CardCode, OPRJ.PrjCode";
 
 		// Execute the SQL query and return records
-		$rs = mssql_query($query, $this->dbhandle);
-
-		$clients = array();
-
-		if (!$this->_empty($rs)) {
-			while ($client = mssql_fetch_assoc($rs)) {
-				array_push($clients, $client);
-			}
-		}
-
-		// Close the connection
-		mssql_close($this->dbhandle);
+		$clients = $this->dbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
 		// print_r($clients); exit;
 
