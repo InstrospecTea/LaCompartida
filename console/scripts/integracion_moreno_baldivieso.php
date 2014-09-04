@@ -16,7 +16,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 			// Connection to the database and select a database
 			$this->dbh = new PDO("dblib:host={$this->connection['server']};dbname={$this->connection['database_name']}", $this->connection['user'], $this->connection['password']);
 		} catch (PDOException $e) {
-			echo "Failed to get DB handle: " . $e->getMessage() . "\n";
+			echo 'Failed to get DB handle: ' . $e->getMessage() . "\n";
 			exit;
 		}
 	}
@@ -39,6 +39,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OPRJ.U_Idioma AS 'language',
 				(CASE WHEN (OPRJ.U_Factur = 'Y') THEN 1 ELSE 0 END) AS 'chargeable',
 				OPRJ.U_AbogadoEncargado AS 'lawyer_manager_code',
+				OPRJ.U_AreaProyecto AS 'matter_area',
 				OCRD.LicTradNum AS 'billing_data_identification_number',
 				OCRG.GroupName AS 'billing_data_activity',
 				CRD1.Street AS 'billing_data_address',
@@ -208,6 +209,13 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$currency_expenses_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
 				}
 
+				$ProjectArea = new AreaProyecto($Session);
+				$ProjectArea->LoadByGlosa($client['matter_area']);
+				$project_area_id = 'NULL';
+				if ($ProjectArea->Loaded()) {
+					$project_area_id = $ProjectArea->fields['id_area_proyecto'];
+				}
+
 				$Matter = new Asunto($Session);
 				$MatterAgreement = new Contrato($Session);
 
@@ -226,6 +234,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$Matter->Edit('id_idioma', $language);
 				$Matter->Edit('activo', $client['matter_active']);
 				$Matter->Edit('cobrable', $chargeable);
+				$Matter->Edit('id_area_proyecto', $project_area_id);
 
 				// Find a lawyer manager
 				$lawyer_manager_code = $client['lawyer_manager_code'];
