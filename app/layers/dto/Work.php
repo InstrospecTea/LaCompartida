@@ -6,6 +6,9 @@
  */
 class Work extends LoggeableEntity {
 
+	function __construct() {
+		$this->set('cobrable', '0');
+	}
     /**
      * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
      * @return string
@@ -38,23 +41,19 @@ class Work extends LoggeableEntity {
 	 */
 	public function getLoggeableProperties(){
 		return array(
-			'fecha',
-			'fecha_trabajo',
+			array('fecha', 'fecha_trabajo'),
 			'descripcion',
 			'duracion',
 			'duracion_cobrada',
 			'id_usuario_trabajador',
-			'accion',
 			'tarifa_hh',
 			'codigo_asunto',
-			'cobrable_modificado'
+			'cobrable'
 		);
 	}
 
 	public function getInmutableLoggeableProperties() {
-		return array(
-			'id_cobro', 'id_contrato'
-		);
+		return array();
 	}
 
 }

@@ -88,15 +88,20 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		}
 		$properties = $object->getLoggeableProperties();
 		foreach($properties as $property) {
+			$alias = $property;
+			if (is_array($property)) {
+				$alias = $property[1];
+				$property = $property[0];
+			}
 			$legacyProperty = $legacy->get($property);
 			$newProperty = $object->get($property);
 			$insertCriteria->add_pivot_with_value(
-				$property,
-				(empty($legacyProperty)? NULL : $legacyProperty)
+				$alias,
+				$legacyProperty
 			);
 			$insertCriteria->add_pivot_with_value(
-				$property.'_modificado',
-				(empty($newProperty)? NULL : $newProperty)
+				$alias.'_modificado',
+				$newProperty
 			);
 		}
 		try {

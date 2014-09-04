@@ -256,7 +256,6 @@ class Trabajo extends Objeto
 		}
 
 		$minutos_dia_total = Conf::GetConf($sesion, 'CantidadHorasDia') ? Conf::GetConf($sesion, 'CantidadHorasDia') : 1439;
-
 		if ($total_minutos > $minutos_dia_total) {
 			return false;
 		} else {
