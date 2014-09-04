@@ -54,7 +54,7 @@ class Trabajo extends Objeto
 		$work->fillFromArray($this->fields);
 		$work->fillChangedFields($this->changes);
 		try {
-			$work = $workService->saveOrUpdate($charge);
+			$work = $workService->saveOrUpdate($work);
 			$this->fields = $work->fields;
 			return true;
 		} catch(Exception $ex) {
