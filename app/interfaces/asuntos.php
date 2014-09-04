@@ -410,6 +410,7 @@ function Opciones(& $fila) {
 	global $Sesion;
 	global $checkall;
 	global $motivo, $from;
+	global $Form;
 
 	if ($motivo == 'cobros') {
 		return Cobrable($fila);
@@ -420,9 +421,10 @@ function Opciones(& $fila) {
 	if ($Sesion->usuario->Es('SASU')) {
 		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
 	} else {
-		$opciones = "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
-		$opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
-		$opciones .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+		$opciones = $Form->image_link('editar_on.gif', "agregar_asunto.php?id_asunto=$id_asunto", array('title' => 'Editar actividad', 'target' => '_parent'));
+		$adb = __('Está seguro de eliminar el') . ' ' . __('asunto');
+		$opciones .= $Form->image_link('cruz_roja_nuevo.gif', false, array('title' => 'Eliminar actividad', 'onclick' => "if  (confirm('¿$adb?')) EliminaAsunto('{$from}', {$id_asunto});"));
+		$opciones .= $Form->image_link('lupa.gif', false, array('title' => 'Ver historial', 'id' => "asunto_{$fila->fields['id_asunto']}", 'class' => 'logdialog', 'rel' => 'asunto'));
 		return $opciones;
 	}
 }

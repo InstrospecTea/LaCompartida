@@ -27,11 +27,7 @@ $contrato->Load($cobro->fields['id_contrato']);
 // Idioma
 $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 
-if (method_exists('Conf', 'GetConf')) {
-	$idioma->Load(Conf::GetConf($sesion, 'Idioma'));
-} else {
-	$idioma->Load(Conf::Idioma());
-}
+$idioma->Load(Conf::GetConf($sesion, 'Idioma'));
 
 // Moneda
 $moneda_base = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
@@ -141,10 +137,12 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit("opc_ver_numpag", $opc_ver_numpag);
 	$cobro->Edit("opc_papel", $opc_papel);
 	$cobro->Edit("opc_ver_solicitante", $opc_ver_solicitante);
+
 	$cobro->Edit('opc_ver_carta', $opc_ver_carta);
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
+	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
 
 	#################### OPCIONES Vial Olivares #######################
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
@@ -171,7 +169,6 @@ if ($opc == 'anular_emision') {
         $cobro->Edit('porcentaje_descuento', '0');
     }
 
-
 	$cobro->Edit('tipo_descuento', $tipo_descuento);
 	$cobro_moneda_cambio = new CobroMoneda($sesion);
 	$cobro_moneda_cambio->UpdateTipoCambioCobro($cobro_id_moneda, $cobro_tipo_cambio, $id_cobro);
@@ -194,7 +191,6 @@ if ($opc == 'anular_emision') {
 	    $observacion->Edit('id_cobro', $id_cobro);
 	    $observacion->Write();
 	}
-
 
 	$ret = $cobro->GuardarCobro();
 
@@ -523,9 +519,6 @@ echo $refrescar;
 		}
 
 		return true;
-
-		// alert("<?php echo __('Error al procesar los parámetros.') ?>");
-		// return false;
 	}
 
 	function EnRevision( form )
@@ -1998,7 +1991,10 @@ else
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?php echo __('Mostrar tarifa proporcional en base a HH')?></label></td>
 									</tr>
 									<tr>
-										<td align="right"><input type="checkbox" name="opc_ver_carta" id="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?php echo $cobro->fields['opc_ver_carta']=='1'?'checked':''?>></td>
+										<td align="right">
+											<input type="hidden" name="opc_ver_carta" value="0" />
+											<input type="checkbox" name="opc_ver_carta" id="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?php echo $cobro->fields['opc_ver_carta'] == '1' ? 'checked' : '' ?> />
+										</td>
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_carta"><?php echo __('Mostrar Carta')?></label></td>
 									</tr>
 									<tr>
@@ -2023,7 +2019,8 @@ else
 										<td align="left" colspan="3">
 										<?php
 										$query_formato_ncobro = "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion	FROM cobro_rtf ORDER BY cobro_rtf.id_formato";
-										echo  Html::SelectQuery($sesion, $query_formato_ncobro,"id_formato", $cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"','Seleccione',200); ?>
+										echo Html::SelectQuery($sesion, $query_formato_ncobro, "id_formato", $cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"', 'Seleccione', 200);
+										?>
 										</td>
 									</tr>
 									<tr>
