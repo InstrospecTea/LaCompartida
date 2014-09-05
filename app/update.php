@@ -10539,6 +10539,12 @@ QUERY;
 			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'detalle_cobranza', 'Encabezado', 'Detalle Cobranza', 'Detail Billing', 0)";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.84:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarModalidadCalculo', '0', 'Mostrar opción para modificar modalidad de cálculo en Cobros6', 'boolean', '6', '-1');";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10547,7 +10553,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.83;
+$max_update = 7.84;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
