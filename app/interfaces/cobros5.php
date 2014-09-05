@@ -1164,6 +1164,7 @@ else
 	<input type="hidden" name="cobro_tipo_cambio" value="<?php echo $cobro->fields['tipo_cambio_moneda'] ?>" size="8">
 	<input type="hidden" name="id_tarifa" id="id_tarifa" value="<?php echo $contrato->fields['id_tarifa'] ?>" />
 	<input type="hidden" name="accion" value="" id="accion">
+	<input type="hidden" name="modalidad_calculo" id="modalidad_calculo" value="1">
 	<input type="hidden" name="saldo_adelantos" value="<?php
 		$documento = new Documento($sesion);
 		$pago_honorarios = (float) ($cobro->fields['monto_subtotal']) ? 1 : 0;
