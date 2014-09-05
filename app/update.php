@@ -10543,6 +10543,7 @@ QUERY;
 			$queries = array();
 			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;"
 			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
