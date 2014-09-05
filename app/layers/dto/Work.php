@@ -53,7 +53,9 @@ class Work extends LoggeableEntity {
 	}
 
 	public function getInmutableLoggeableProperties() {
-		return array();
+		return array(
+			'id_trabajo'
+		);
 	}
 
 }
