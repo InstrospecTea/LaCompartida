@@ -15,8 +15,6 @@ class ChargeService extends AbstractService implements IChargeService {
 			$charge->set('estado', 'CREADO');
 		}
 
-		$charge->set('modalidad_calculo', 1);
-
 		return parent::saveOrUpdate($charge);
 	}
 
