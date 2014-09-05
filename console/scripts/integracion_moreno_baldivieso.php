@@ -5,11 +5,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	public $debug;
 
 	public function __construct() {
-		// $this->connection['server'] = '200.87.127.182';
-		$this->connection['server'] = 'embaMSSql';
+		// $this->connection['server'] = '200.87.127.182'; // Test and develop
+		$this->connection['server'] = 'embaMSSql'; // Only production
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
-		// $this->connection['database_name'] = 'EMBA_PRUEBAS';
 		$this->connection['database_name'] = 'EMBA_PROD';
 
 		try {
@@ -72,8 +71,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 		// Execute the SQL query and return records
 		$clients = $this->dbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
-
-		// print_r($clients); exit;
 
 		if (!$this->_empty($clients)) {
 			$Session = new Sesion(null, true);
