@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.15.9
+Viernes 06 de Septiembre 2014
+* **Fixed:** [Corregir asignación de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)
+
 ## Hotfix: 14.15.8
 Viernes 06 de Septiembre 2014
 * **Fixed:** [Deprecar modalidad_calculo 0](https://github.com/LemontechSA/ttb/pull/680)
