@@ -6,7 +6,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 	public function __construct() {
 		// $this->connection['server'] = '200.87.127.182'; // Test and develop
-		$this->connection['server'] = 'embaMSSql'; // Only production
+		$this->connection['server'] = 'embaMSSql'; // Production Only
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
 		$this->connection['database_name'] = 'EMBA_PROD';
