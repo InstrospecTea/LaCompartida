@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.15.8
+Viernes 06 de Septiembre 2014
+* **Fixed:** [Deprecar modalidad_calculo 0](https://github.com/LemontechSA/ttb/pull/680)
+
 ## Hotfix: 14.15.7
 Viernes 05 de Septiembre 2014
 * **Fixed:** [Correcciones a reporte de hitos](https://github.com/LemontechSA/ttb/pull/679)
