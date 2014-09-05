@@ -61,9 +61,9 @@ $Form = new Form;
 
 			if (codigo_cliente == '') {
 				if (usocodigosecundario != '1') {
-					codigo_cliente = jQuery("#campo_codigo_cliente").val();
+					codigo_cliente = jQuery("#campo_codigo_cliente, #codigo_cliente").val();
 				} else {
-					codigo_cliente = jQuery("#campo_codigo_cliente_secundario").val();
+					codigo_cliente = jQuery("#campo_codigo_cliente_secundario, #codigo_cliente_secundario").val();
 				}
  			}
 
