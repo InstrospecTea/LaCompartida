@@ -142,7 +142,7 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
-	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
+	$cobro->Edit("modalidad_calculo", 1); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
 
 	#################### OPCIONES Vial Olivares #######################
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
