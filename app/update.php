@@ -64,7 +64,7 @@ function ExisteLlaveForanea($tabla, $columna, $tabla_referenciada, $columna_refe
  * @param mixed $queries
  * @throws Exception
  */
-function ejecutar($queries, $dbh) {
+function ejecutar(&$queries, $dbh) {
 	if (!is_array($queries)) {
 		$queries = array($queries);
 	}
@@ -73,10 +73,12 @@ function ejecutar($queries, $dbh) {
 			throw new Exception($q . '---' . mysql_error());
 		}
 	}
+	$queries = null;
 }
 
 function Actualizaciones(&$dbh, $new_version) {
 	global $sesion;
+	$queries = array();
 	switch ($new_version) {
 		case 1.0:
 			echo 'Mensaje de prueba 1.<br>';
@@ -10539,11 +10541,19 @@ QUERY;
 			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'detalle_cobranza', 'Encabezado', 'Detalle Cobranza', 'Detail Billing', 0)";
 			ejecutar($queries, $dbh);
 			break;
+
 		case 7.84:
 			$queries = array();
-			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarModalidadCalculo', '0', 'Mostrar opción para modificar modalidad de cálculo en Cobros6', 'boolean', '6', '-1');";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.85:
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
+			break;
+	}
+	if (!empty($queries)) {
+		ejecutar($queries, $dbh);
 	}
 }
 
@@ -10552,7 +10562,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.84;
+$max_update = 7.85;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
