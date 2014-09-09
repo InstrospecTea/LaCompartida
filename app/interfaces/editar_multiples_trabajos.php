@@ -656,11 +656,6 @@ function CheckVisible()
 	}
 }
 </script>
-<style>
-A:link,A:visited {font-size:9px;text-decoration: none}
-A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
-A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
-</style>
 <?php
 echo(Autocompletador::CSS());
 if($opcion == "eliminar")
@@ -794,29 +789,32 @@ if($txt_opcion)
 	<tr>
 		<td>&nbsp;</td>
 		<td align="right">
-			 <?php echo __('Asunto')?>
+			 <?php echo __('Asunto'); ?>
 		</td>
 		<td align="left">
-			<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, '', $glosa_asunto, false); ?>
+			<?php
+			$oncambio = '';
+			if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
+				$oncambio .= 'CargarActividad();';
+			}
+			UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio, $glosa_asunto, false); ?>
 		</td>
 	</tr>
 
-	<?php   if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
-			{ ?>
-				<tr>
-					<td colspan="2" align=right>
-						<?php echo __('Actividad')?>
-					</td>
-					<td align=left>
-						<?php echo  InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t[0]->fields[codigo_actividad]) ?>
-					</td>
-				</tr>
-	<?php    }
-		else
-			{ ?>
-	<input type="hidden" name="codigo_actividad" id="codigo_actividad">
-	<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
-	<?php   }?>
+	<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
+		<tr>
+			<td colspan="2" align=right>
+				<?php echo __('Actividad'); ?>
+			</td>
+			<td align=left>
+				<?php echo  InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t[0]->fields[codigo_actividad]); ?>
+			</td>
+		</tr>
+	<?php } else { ?>
+		<input type="hidden" name="codigo_actividad" id="codigo_actividad">
+		<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
+	<?php } ?>
+
 <?php
 	if($permisos->fields['permitido'])
 	{
