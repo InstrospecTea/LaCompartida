@@ -13,6 +13,15 @@ class Moneda extends Objeto {
 		$this->guardar_fecha = false;
 	}
 
+	function LoadByCode($code) {
+		$query = "SELECT id_moneda FROM prm_moneda WHERE codigo = '{$code}'";
+		$rs = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($currency_id) = mysql_fetch_array($rs);
+		if (!empty($currency_id)) {
+			$this->Load($currency_id);
+		}
+	}
+
 	function GuardaHistorial($sesion, $fecha) {
 		$query = "INSERT INTO moneda_historial (id_moneda, fecha, valor, moneda_base, id_usuario)
 					VALUES('" . $this->fields["id_moneda"] . "', '" . $fecha . "', '" . $this->fields["tipo_cambio"] . "', '" .
