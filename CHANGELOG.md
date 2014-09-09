@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.15.10
+Martes 10 de Septiembre 2014
+* **Fixed:** [Editar multiples trabajos al revisar horas](https://github.com/LemontechSA/ttb/pull/684)
+
 ## Hotfix: 14.15.9
 Viernes 06 de Septiembre 2014
 * **Fixed:** [Corregir asignación de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)
