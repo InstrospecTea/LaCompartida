@@ -49,6 +49,11 @@ class Trabajo extends Objeto
 	}
 
 	function Write($historialOnWrite = true, $app_id = null) {
+		$this->Prepare();
+		if (!$this->Check()) {
+			return false;
+		}
+
 		$workService = new WorkService($this->sesion);
 		$work = new Work();
 		$work->fillFromArray($this->fields);
