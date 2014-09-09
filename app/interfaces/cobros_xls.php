@@ -1158,7 +1158,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->write($filas, $col_cobrable, Utiles::GlosaMult($sesion, 'horas_tarificadas', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 				$ws->write($filas, $col_tarifa_hh, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'tarifa_hh', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
 				$ws->write($filas, $col_valor_trabajo, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'valor_trabajo', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
-				$ws->write($filas, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
+
+				$ws->write($filas-1, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
+				$ws->write($filas, $col_id_abogado, '#' . Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 
 				if (!$primera_fila_primer_asunto) {
 					$primera_fila_primer_asunto = $filas;
@@ -1609,8 +1611,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 		$filas+=2;
 		$contador = 0;
+		$detalle_profesional_glosa = '#' . Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo');
 		foreach ($detalle_profesional as $id => $data) {
-			$ws->write($filas, $col_fecha_ini + $contador, __('NO MODIFICAR ESTA COLUMNA'));
+			$ws->write($filas, $col_fecha_ini + $contador, $detalle_profesional_glosa);
 			$ws->write($filas + 1, $col_fecha_ini + $contador, "$id");
 			++$contador;
 		}

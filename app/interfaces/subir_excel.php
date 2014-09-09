@@ -1,9 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
 
 $sesion = new Sesion();
 $pagina = new Pagina($sesion);
@@ -14,10 +10,8 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
-	function confirmar(form)
-	{
-		if (confirm("Esta modificando algunos trabajos con el excel,\n ¿Desea continuar?"))
-		{
+	function confirmar(form) {
+		if (confirm("Esta modificando algunos trabajos con el excel,\n ¿Desea continuar?")) {
 			form.submit();
 			window.opener.Refrescar();
 		}
@@ -38,7 +32,7 @@ $pagina->PrintTop($popup);
 			<form name="form_archivo" id="form_archivo" method="post" action="" enctype="multipart/form-data">
 				<input type="hidden" name="opc" id="opc" value="subir_excel" />
 				Subir excel modificado: <input type="file" name="archivo_data" />
-				<input type="button" value="<?php echo  __('Cargar Documento') ?>" class="btn" onclick="confirmar(this.form);" />
+				<input type="button" value="<?php echo __('Cargar Documento'); ?>" class="btn" onclick="confirmar(this.form);" />
 				<br />
 				<?php
 				if ($opc == 'subir_excel') {
@@ -51,4 +45,4 @@ $pagina->PrintTop($popup);
 	</tr>
 </table>
 
-<?php $pagina->PrintBottom($popup); ?>
+<?php $pagina->PrintBottom($popup);
