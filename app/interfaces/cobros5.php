@@ -310,15 +310,6 @@ if ($opc == 'anular_emision') {
 		$historial_comentario = __('REVISION ANULADO');
 		##Historial##
 		$estado_anterior = $cobro->fields['estado'];
-
-		if ($estado_anterior != 'CREADO') {
-			/* $his = new Observacion($sesion);
-			  $his->Edit('fecha',date('Y-m-d H:i:s'));
-			  $his->Edit('comentario',$historial_comentario);
-			  $his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
-			  $his->Edit('id_cobro',$cobro->fields['id_cobro']);
-			  $his->Write(); */
-		}
 	}
 }
 
