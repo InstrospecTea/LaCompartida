@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.15.11
 Miércoles 10 de Septiembre 2014
-* **Fixed:** [Corregir carta MB](https://github.com/LemontechSA/ttb/pull/685)
+* **Fixed:** [Corregir carta MB](https://github.com/LemontechSA/ttb/pull/686)
 
 ## Hotfix: 14.15.10
 Martes 09 de Septiembre 2014
