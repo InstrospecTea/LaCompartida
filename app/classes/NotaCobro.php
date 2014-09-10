@@ -6247,9 +6247,9 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%solicitante%', '', $row);
 					}
 
-					if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
+                    if ( (substr($detalle['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') || (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #')) {
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
 					} else {
 						$row = str_replace('%descripcion%', __($detalle['descripcion']), $row);
 						$row = str_replace('%descripcion_b%', __($detalle['descripcion']), $row); #Ojo, este no debería existir
