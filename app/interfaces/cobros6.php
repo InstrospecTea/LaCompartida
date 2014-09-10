@@ -1794,10 +1794,14 @@ if ($solicitante == 0) {  // no mostrar
                                         <td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" id="opc_ver_valor_hh_flat_fee" value="1"  <?php echo $cobro->fields['opc_ver_valor_hh_flat_fee'] == '1' ? 'checked="checked"' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?php echo __('Mostrar valor HH en caso de flat fee') ?></label></td>
                                     </tr>
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="modalidad_calculo" id="modalidad_calculo" value="1"  <?php echo $cobro->fields['modalidad_calculo'] == '1' ? 'checked="checked"' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="modalidad_calculo" title="Activa etiquetas avanzadas (adelantos, pagos, hitos)"><?php echo  __('Desglose Extendido'); ?></label></td>
-                                    </tr>
+                                    <?php if (Conf::GetConf($sesion, 'MostrarModalidadCalculo')) { ?>
+	                                    <tr>
+	                                        <td align="right"><input type="checkbox" name="modalidad_calculo" id="modalidad_calculo" value="1" <?php echo $cobro->fields['modalidad_calculo'] == '1' ? 'checked="checked"' : '' ?>></td>
+	                                        <td align="left" style="font-size: 10px;"><label for="modalidad_calculo" title="Activa etiquetas avanzadas (adelantos, pagos, hitos)"><?php echo  __('Desglose Extendido'); ?></label></td>
+	                                    </tr>
+                                    <?php } else { ?>
+                                    	<input type="hidden" name="modalidad_calculo" id="modalidad_calculo" value="<?php echo $cobro->fields['modalidad_calculo']; ?>">
+                                    <?php } ?>
                                     <tr>
                                         <td align="right"><input type="checkbox" name="opc_ver_carta" id="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?php echo $cobro->fields['opc_ver_carta'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_carta"><?php echo __('Mostrar Carta') ?></label></td>

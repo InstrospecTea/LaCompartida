@@ -867,4 +867,12 @@ jQuery(document).ready(function() {
 	});
 
 	jQuery('#fecha_mes, #fecha_anio').change(SeleccionarSelector);
+
+	jQuery('.submit_options').hide();
+	jQuery('.submit_buttons').on('hover', function (e) {
+		el = jQuery(this);
+		jQuery('.submit_options').hide();
+		selector = '.submit_options.' + el.attr('rel');
+		jQuery(selector).show();
+	});
 });
