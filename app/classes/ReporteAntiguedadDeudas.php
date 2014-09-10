@@ -14,16 +14,6 @@ class ReporteAntiguedadDeudas
 	private $and_statements = array();
 	private $report_details = array();
 	
-	//Define las constantes que representan si las liquidaciones que:
-	// 1: Incluyen Honorarios
-	// 2: Incluyen Gastos
-	// 3: Incluyen Honorarios y Gastos
-	private $tipos_liquidacion = array(
-		'INCLUYE_HONORARIOS' => 1,
-		'INCLUYE_GASTOS' => 2,
-		'MIXTO' => 3
-	);
-
 	//
 	//Opciones de layout
 	//
@@ -794,7 +784,7 @@ class ReporteAntiguedadDeudas
 			$tipo_liquidacion = intval($this->datos['tipo_liquidacion']);
 			$honorarios = $tipo_liquidacion & 1;
 			$gastos = $tipo_liquidacion & 2 ? 1 : 0;
-			$separar_liquidaciones = ($tipo_liquidacion == $tipos_liquidacion['MIXTO'] ? 0 : 1);
+			$separar_liquidaciones = ($tipo_liquidacion == '3' ? 0 : 1);
 			$this->and_statements[] = "contrato.separar_liquidaciones  = '$separar_liquidaciones'";
 			$this->and_statemetns[] = "cobro.incluye_honorarios = '$honorarios'";
 			$this->and_statemetns[] = "cobro.incluye_gastos = '$gastos'";
