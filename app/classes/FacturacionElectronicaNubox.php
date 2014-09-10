@@ -2,22 +2,43 @@
 
 class FacturacionElectronicaNubox extends FacturacionElectronica {
 
-	public static function ValidarFactura() {
-		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
+	public static function ValidarFactura(Factura $Factura = null) {
+		if (empty($Factura)) {
+			global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
+		} else {
+			$campos = array(
+				'RUT_cliente' => null,
+				'direccion_cliente' => null,
+				'ciudad_cliente' => null,
+				'comuna_cliente' => null,
+				'giro_cliente' => null
+			);
+			$datos = array_intersect_key($Factura->fields, $campos);
+			extract($datos);
+		}
+		$errors = array();
 		if (empty($RUT_cliente)) {
-			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
+			$errors[] = __('Debe ingresar RUT del cliente.');
 		}
 		if (empty($direccion_cliente)) {
-			$pagina->AddError(__('Debe ingresar Dirección del cliente.'));
+			$errors[] = __('Debe ingresar Dirección del cliente.');
 		}
 		if (empty($comuna_cliente)) {
-			$pagina->AddError(__('Debe ingresar Comuna del cliente.'));
+			$errors[] = __('Debe ingresar Comuna del cliente.');
 		}
 		if (empty($ciudad_cliente)) {
-			$pagina->AddError(__('Debe ingresar Ciudad del cliente.'));
+			$errors[] = __('Debe ingresar Ciudad del cliente.');
 		}
 		if (empty($giro_cliente)) {
-			$pagina->AddError(__('Debe ingresar ' . __('Giro') . ' del cliente.'));
+			$errors[] = __('Debe ingresar ' . __('Giro') . ' del cliente.');
+		}
+
+		if (isset($pagina)) {
+			foreach ($errors as $msg) {
+				$pagina->AddError($msg);
+			}
+		} else {
+			return $errors;
 		}
 	}
 
@@ -70,44 +91,52 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 EOF;
 	}
 
-	public static function GeneraFacturaElectronica($hookArg) {
+	public static function GeneraFacturaElectronica(&$hookArg) {
 		$Sesion = new Sesion();
 		$Factura = $hookArg['Factura'];
 		if (!empty($Factura->fields['dte_url_pdf'])) {
 			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
 		} else {
-			$Estudio = new PrmEstudio($Sesion);
-			$Estudio->Load($Factura->fields['id_estudio']);
-			$rut = $Estudio->GetMetaData('rut');
-			$login = $Estudio->GetMetadata('facturacion_electronica');
-			$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
-			if ($WsFacturacionNubox->hasError()) {
-				$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
-			} else {
-				$archivo = self::FacturaToCsv($Sesion, $Factura, $Estudio);
-				$opcionFolios = 1; //los folios son asignados por nubox
-				$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
-				$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
-				$hookArg['ExtraData'] = $csv_documento;
-				try {
-					$result = $WsFacturacionNubox->emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
-					if ($WsFacturacionNubox->hasError()) {
-						$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
-					} else {
-						try {
-							$Factura->Edit('numero', $result['FolioCargado']);
-							$Factura->Edit('dte_url_pdf', $result['Identificador']);
-							$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
-							if ($Factura->Write()) {
-								$hookArg['InvoiceURL'] = $file_url;
-							}
-						} catch (Exception $ex) {
-							$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
-						}
-					}
-				} catch (Exception $ex) {
-					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
+			try {
+				$errores = self::ValidarFactura($Factura);
+				if (!empty($errores)) {
+					throw new Exception(implode("\n", $errores), 0);
 				}
+				$Estudio = new PrmEstudio($Sesion);
+				$Estudio->Load($Factura->fields['id_estudio']);
+				$rut = $Estudio->GetMetaData('rut');
+				$login = $Estudio->GetMetadata('facturacion_electronica');
+				$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
+				if ($WsFacturacionNubox->hasError()) {
+					$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
+				} else {
+					$archivo = self::FacturaToCsv($Sesion, $Factura, $Estudio);
+					$opcionFolios = 1; //los folios son asignados por nubox
+					$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
+					$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
+					$hookArg['ExtraData'] = $csv_documento;
+					try {
+						$result = $WsFacturacionNubox->emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
+						if ($WsFacturacionNubox->hasError()) {
+							$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
+						} else {
+							try {
+								$Factura->Edit('numero', $result['FolioCargado']);
+								$Factura->Edit('dte_url_pdf', $result['Identificador']);
+								$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
+								if ($Factura->Write()) {
+									$hookArg['InvoiceURL'] = $file_url;
+								}
+							} catch (Exception $ex) {
+								$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
+							}
+						}
+					} catch (Exception $ex) {
+						throw $ex;
+					}
+				}
+			} catch (Exception $ex) {
+				$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 			}
 		}
 		return $hookArg;
@@ -117,8 +146,10 @@ EOF;
 		$error_description = null;
 		if (is_a($result, 'Exception')) {
 			$error_log = $result->__toString();
+			if ($result->getCode() === 0) {
+				$error_description = $result->getMessage();
+			}
 		} else {
-
 			$error_description = $result->getErrorMessage();
 			$error_log = $error_description;
 		}

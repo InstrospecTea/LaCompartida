@@ -48,13 +48,13 @@ class WsFacturacionNubox extends WsFacturacion{
 			try {
 				$respuesta = $this->Client->CargarYEmitir($datos);
 			} catch (SoapFault $sf) {
-				throw new Exception('Acurrió un error al generar el documento.');
+				throw new Exception('Ocurrió un error al generar el documento.');
 			}
 
 			$sxmle = new SimpleXMLElement($respuesta->CargarYEmitirResult->any);
 			$xml = self::XML2Array($sxmle);
 			if ($xml['Resultado'] != 'OK') {
-				throw new Exception('Acurrió un error al generar el documento.');
+				throw new Exception('Ocurrió un error al generar el documento.');
 			}
 			return $xml['Documentos']['Documento']['_attributes'] + array('Identificador' => $xml['Identificador']);
 		} catch (Exception $ex) {
