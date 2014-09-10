@@ -60,7 +60,6 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 					buttons = jQuery('{$BotonDescargarHTML}');
 					buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
 					self.replaceWith(buttons);
-					window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=pdf"
 				}).error(function(error_data){
 					loading.remove();
 					response = JSON.parse(error_data.responseText);
