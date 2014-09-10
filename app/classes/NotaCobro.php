@@ -6247,17 +6247,17 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%solicitante%', '', $row);
 					}
 
-                    if ( substr($detalle['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #' ) {
-                        $row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
+                    if (substr($detalle['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
 						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
-                    } else if ( substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-                        $row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
+					} else if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
 						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
 					} else {
 						$row = str_replace('%descripcion%', __($detalle['descripcion']), $row);
 						$row = str_replace('%descripcion_b%', __($detalle['descripcion']), $row); #Ojo, este no debería existir
 					}
-                    
+
 					if ($detalle['id_moneda'] != $this->fields['opc_moneda_total'] && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta')) {
 						$row = str_replace('%monto_original%', $cobro_moneda->moneda[$detalle['id_moneda']]['simbolo'] . $this->espacio . number_format($detalle['monto_original'], $cobro_moneda->moneda[$detalle['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_miles']), $row);
 					} else {
