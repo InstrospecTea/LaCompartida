@@ -1,7 +1,12 @@
 # Changelog
-## Hotfix: 14.15.11
+
+## Hotfix: 14.15.13
 Miércoles 10 de Septiembre 2014
-* **Fixed:** [Corregir Nota Cobro MB](https://github.com/LemontechSA/ttb/pull/687)
+* **Fixed:** [Corregir Lógica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
+
+## Hotfix: 14.15.12
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Nota Cobro MB Inglés. Monto Saldo aprovisionado](https://github.com/LemontechSA/ttb/pull/687)
 
 ## Hotfix: 14.15.11
 Miércoles 10 de Septiembre 2014
