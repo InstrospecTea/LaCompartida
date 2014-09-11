@@ -1,5 +1,12 @@
 # Changelog
 
+## Release: 14.16.0
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
+* **Fixed:** [Agrega opción para descargar excel con formato para tablas dinámicas](https://github.com/LemontechSA/ttb/pull/616)
+* **Fixed:** [Agrega columna monto cobrado al reporte de rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/644)
+* **Fixed:** [Integración Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
+
 ## Hotfix: 14.15.13
 Miércoles 10 de Septiembre 2014
 * **Fixed:** [Corregir Lógica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
