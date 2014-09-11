@@ -786,8 +786,8 @@ class ReporteAntiguedadDeudas
 			$gastos = $tipo_liquidacion & 2 ? 1 : 0;
 			$separar_liquidaciones = ($tipo_liquidacion == '3' ? 0 : 1);
 			$this->and_statements[] = "contrato.separar_liquidaciones  = '$separar_liquidaciones'";
-			$this->and_statemetns[] = "cobro.incluye_honorarios = '$honorarios'";
-			$this->and_statemetns[] = "cobro.incluye_gastos = '$gastos'";
+			$this->and_statements[] = "cobro.incluye_honorarios = '$honorarios'";
+			$this->and_statements[] = "cobro.incluye_gastos = '$gastos'";
 		}
 
 		if (!empty($this->datos['id_contrato'])) {
