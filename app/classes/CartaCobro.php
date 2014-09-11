@@ -7,6 +7,8 @@ class CartaCobro extends NotaCobro {
     var $carta_tabla = 'carta';
     var $carta_id = 'id_carta';
     var $carta_formato = 'formato';
+    // Twig, the flexible, fast, and secure template language for PHP
+    var $twig;
     public $secciones = array(
         'CARTA' => array(
             'FECHA' => 'Sección FECHA',
@@ -274,6 +276,9 @@ class CartaCobro extends NotaCobro {
         }
         $this->espacio = $valorsinespacio;
         $this->monedas = Moneda::GetMonedas($sesion, '', true);
+				$this->template_data = array(
+					'Cobro' => $fields
+				);
     }
 
     function NuevoRegistro() {
@@ -304,7 +309,8 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $html2 = $parser_carta->tags[$theTag];
+				$this->template_data['Idioma'] = $idioma->fields['codigo'];
+				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'CARTA':
@@ -1136,7 +1142,8 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $html2 = $parser_carta->tags[$theTag];
+        $this->template_data['Idioma'] = $idioma->fields['codigo'];
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -2133,7 +2140,8 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $html2 = $parser_carta->tags[$theTag];
+        $this->template_data['Idioma'] = $idioma->fields['codigo'];
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'FECHA': //GenerarDocumentoCartaComun
@@ -2649,4 +2657,12 @@ class CartaCobro extends NotaCobro {
         return $html2;
     }
 
+	function RenderTemplate($template) {
+		if (!$this->twig) {
+			$loader = new Twig_Loader_String();
+			$this->twig = new Twig_Environment($loader);
+		}
+
+		return $this->twig->render($template, $this->template_data);
+	}
 }

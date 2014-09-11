@@ -192,3 +192,10 @@ sftp-config*
 config.ru
 
 .ruby-version
+
+#############
+## Composer
+#############
+composer.lock
+vendor/autoload.php
+vendor/**/

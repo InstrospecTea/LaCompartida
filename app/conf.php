@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../vendor/autoload.php';
+require_once dirname(__FILE__) . '/../vendor/ttbloader.php';
 
 ini_set('display_errors', 'Off');
 error_reporting(0);
