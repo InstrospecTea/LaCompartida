@@ -9,44 +9,11 @@ $query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
 	
 if (in_array($opcion, array('buscar', 'xls'))) {
-
 	$codigo_cliente = $_REQUEST['codigo_cliente'];
 	$id_contrato = $_REQUEST['id_contrato'];
 	$tipo_liquidacion = $_REQUEST['tipo_liquidacion'];
 
-	$where = '';
-	$join = '';
-
-	if (!empty($codigo_cliente)) {
-		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
-	}
-
-	if (!empty($id_contrato)) {
-		$where .= " AND cobro.id_contrato = '$id_contrato' ";
-	}
-
-	if (!empty($tipo_liquidacion)) { //1-2 = honorarios-gastos, 3 = mixtas
-		$honorarios = $tipo_liquidacion & 1;
-		$gastos = $tipo_liquidacion & 2 ? 1 : 0;
-		$where .= "
-			AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "'
-			AND cobro.incluye_honorarios = '$honorarios'
-			AND cobro.incluye_gastos = '$gastos' ";
-	}
-
 	if ($_POST['solo_monto_facturado']) {
-		$campo_valor = "T.fsaldo";
-		$campo_gvalor = "T.fgsaldo";
-		$campo_hvalor = "T.fhsaldo";
-		$where.="AND  ccfm.saldo!=0 ";
-		$groupby.=" factura.id_factura";
-		$tipo = " pdl.glosa";
-		$fecha_atraso = " factura.fecha";
-		$label = " concat(pdl.codigo,' N° ',  factura.serie_documento_legal,'-',lpad(factura.numero,'7','0')) ";
-		$identificadores = 'facturas';
-		//$linktofile = 'agregar_factura.php?id_factura=';
-		//$identificador = " factura.id_factura";
-		$identificador = " d.id_cobro";
 		$linktofile = 'cobros6.php?id_cobro=';
 	}
 	else{
@@ -54,25 +21,24 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 	}
 
 	$opciones = array(
-			'solo_monto_facturado' => $solo_monto_facturado,
-			'mostrar_detalle' => $mostrar_detalle,
-			'encargado_comercial' => $encargado_comercial,
-			'opcion_usuario' => $opcion,
-			'totales_especiales' => $totales_especiales
-		);
+		'solo_monto_facturado' => $solo_monto_facturado,
+		'mostrar_detalle' => $mostrar_detalle,
+		'encargado_comercial' => $encargado_comercial,
+		'opcion_usuario' => $opcion,
+		'totales_especiales' => $totales_especiales
+	);
 
 	$datos = array(
-			'codigo_cliente' => $codigo_cliente,
-			'id_contrato' => $id_contrato,
-			'tipo_liquidacion' => $tipo_liquidacion,
-			'codigo_asunto' => $codigo_asunto,
-			'encargado_comercial' => $id_encargado_comercial,
-			'codigo_cliente_secundario' => $codigo_cliente_secundario,
-			'codigo_asunto_secundario' => $codigo_asunto_secundario
-		);
+		'codigo_cliente' => $codigo_cliente,
+		'id_contrato' => $id_contrato,
+		'tipo_liquidacion' => $tipo_liquidacion,
+		'codigo_asunto' => $codigo_asunto,
+		'encargado_comercial' => $id_encargado_comercial,
+		'codigo_cliente_secundario' => $codigo_cliente_secundario,
+		'codigo_asunto_secundario' => $codigo_asunto_secundario
+	);
 
 	$reporte = new ReporteAntiguedadDeudas($sesion, $opciones, $datos);
-	
 	$SimpleReport = $reporte->generar();
 
 }
