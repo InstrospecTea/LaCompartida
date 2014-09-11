@@ -85,7 +85,7 @@ class ReporteAvanzado {
 			'estandar' => __('Estándar'),
 			'cliente' => __('Cliente')
 		);
-		$select = $this->Form->select('proporcionalidad', $options, $this->proporcionalidad, array('empty' => false));
+		$select = $this->Form->select('prop', $options, $this->proporcionalidad, array('empty' => false));
 
 		$attr_div = array(
 			'id' => 'select_proporcionalidad',
