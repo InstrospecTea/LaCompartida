@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.15.14
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir filtros Reporte antigüedad de deuda](https://github.com/LemontechSA/ttb/pull/689)
+
 ## Hotfix: 14.15.13
 Miércoles 10 de Septiembre 2014
 * **Fixed:** [Corregir Lógica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
