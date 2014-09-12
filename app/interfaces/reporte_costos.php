@@ -1,28 +1,12 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once 'Spreadsheet/Excel/Writer.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
-	if( method_exists('Conf','GetConf') )
-	{
-		if( !Conf::GetConf($sesion,'ReportesAvanzados') )
-		{
-			header("location: reportes_especificos.php");
-		}
-	}
-	else if( method_exists('Conf','ReportesAvanzados') )
-	{
-		if( !Conf::ReportesAvanzados() )
-		{
-			header("location: reportes_especificos.php");
-		}
-	}
-	else
+	if (!Conf::GetConf($sesion,'ReportesAvanzados')) {
 		header("location: reportes_especificos.php");
+	}
+
 	$pagina = new Pagina($sesion);
 
 	if(!$fecha_a || $fecha_a<1)
@@ -136,3 +120,5 @@
 <?
 	$pagina->PrintBottom($popup);
 ?>
+
+
