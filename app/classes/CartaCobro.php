@@ -309,7 +309,8 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields['codigo'];
+				$this->template_data['Idioma'] = $idioma->fields;
+				$this->template_data['Moneda'] = $moneda->fields;
 				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
@@ -1142,8 +1143,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $this->template_data['Idioma'] = $idioma->fields['codigo'];
-        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+				$this->template_data['Idioma'] = $idioma->fields;
+				$this->template_data['Moneda'] = $moneda->fields;
+				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -2140,8 +2142,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $this->template_data['Idioma'] = $idioma->fields['codigo'];
-        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+				$this->template_data['Idioma'] = $idioma->fields;
+				$this->template_data['Moneda'] = $moneda->fields;
+				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'FECHA': //GenerarDocumentoCartaComun
