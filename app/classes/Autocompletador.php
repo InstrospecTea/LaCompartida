@@ -83,7 +83,7 @@ class Autocompletador {
 						$script_cargar_select
 					},
 					change: function (event, ui) {
-						if(!ui.item){
+						if (!ui.item && !jQuery('#glosa_cliente').val().length) {
 							jQuery('#{$campo_codigo_cliente}').val('').change();
 						}
 					}
