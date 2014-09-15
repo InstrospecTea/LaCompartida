@@ -2469,7 +2469,7 @@ if ($cont_hitos > 0) {
 					SELECT COUNT(*) total FROM cobro_pendiente cp2
 					WHERE cp2.id_contrato = cp.id_contrato
 				) total,
-				@a: = @a + 1 as rowid,
+				@a:=@a+1 as rowid,
 				ROUND(IF(cbr.id_cobro = cp.id_cobro, @a, 0), 0) as thisid,
 				DATE_FORMAT(CAST(IFNULL(cp.fecha_cobro,IFNULL(cbr.fecha_emision,'00000000')) as DATE),'%d/%m/%y') as fecha_hito,
 				cp.descripcion,
@@ -2489,7 +2489,7 @@ if ($cont_hitos > 0) {
 			INNER JOIN contrato c USING (id_contrato)
 			INNER JOIN prm_moneda pm USING (id_moneda)
 			LEFT JOIN cobro cbr on cbr.id_contrato = c.id_contrato and cbr.id_cobro = cp.id_cobro
-			INNER JOIN (SELECT @a: = 0) FFF
+			INNER JOIN (SELECT @a:=0) FFF
 			WHERE cp.hito = 1
 		) hitos
 	WHERE
