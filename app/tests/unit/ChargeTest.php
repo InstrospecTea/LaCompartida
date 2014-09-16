@@ -25,6 +25,7 @@ class ChargeTest extends BaseUnitTest
       $charge->fillFromArray($legacy_charge->fields);
       $charge->fillChangedFields($legacy_charge->changes);
       $charge = $chargeService->saveOrUpdate($charge); 
+      $charge = $chargeService->get($charge->get($charge->getIdentity()));
       return $charge;
     }
 
@@ -36,6 +37,7 @@ class ChargeTest extends BaseUnitTest
       $modalidad_calculo = null;
       $legacy_charge->Edit("id_cobro", null);
       $legacy_charge->Edit("estado", null);
+      $legacy_charge->Edit("codigo_cliente", null);
       $legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
       $charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
 
@@ -49,6 +51,7 @@ class ChargeTest extends BaseUnitTest
       $modalidad_calculo = 0;
       $legacy_charge->Edit("id_cobro", null);
       $legacy_charge->Edit("estado", null);
+      $legacy_charge->Edit("codigo_cliente", null);
       $legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
       $charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);      
 
@@ -62,6 +65,7 @@ class ChargeTest extends BaseUnitTest
       $modalidad_calculo = 1;
       $legacy_charge->Edit("id_cobro", null);
       $legacy_charge->Edit("estado", null);
+      $legacy_charge->Edit("codigo_cliente", null);
       $legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
       $charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
 
@@ -74,6 +78,7 @@ class ChargeTest extends BaseUnitTest
       
       $modalidad_calculo = null;
       $legacy_charge->Edit("id_cobro", null);
+      $legacy_charge->Edit("codigo_cliente", null);
       $legacy_charge->Edit("estado", null);
       $charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
 

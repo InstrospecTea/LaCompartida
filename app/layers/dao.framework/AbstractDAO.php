@@ -166,8 +166,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		$this->guardar_fecha = true;
 		if ($this->Write()) {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
-			$this->Load($this->fields[$object->getIdentity()]);
-			$object->fillFromArray($this->fields);
 			return $object;
 		} else {
 			throw new Exception('No se ha podido persistir la entidad.');
