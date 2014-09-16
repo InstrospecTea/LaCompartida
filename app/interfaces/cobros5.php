@@ -160,14 +160,14 @@ if ($opc == 'anular_emision') {
 	$cobro->Write(); //Se guarda porque despues se necesita para recalcular los datos del cobro
 
 	################### DESCUENTOS #####################
-    if ($tipo_descuento == 'PORCENTAJE') {
-        $total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
-        $cobro->Edit('descuento', $total_descuento);
-        $cobro->Edit('porcentaje_descuento', $porcentaje_descuento);
-    } elseif ($tipo_descuento == 'VALOR') {
-        $cobro->Edit('descuento', $cobro_descuento);
-        $cobro->Edit('porcentaje_descuento', '0');
-    }
+		if ($tipo_descuento == 'PORCENTAJE') {
+				$total_descuento = ($cobro->fields['monto_subtotal'] * $porcentaje_descuento) / 100;
+				$cobro->Edit('descuento', $total_descuento);
+				$cobro->Edit('porcentaje_descuento', $porcentaje_descuento);
+		} elseif ($tipo_descuento == 'VALOR') {
+				$cobro->Edit('descuento', $cobro_descuento);
+				$cobro->Edit('porcentaje_descuento', '0');
+		}
 
 	$cobro->Edit('tipo_descuento', $tipo_descuento);
 	$cobro_moneda_cambio = new CobroMoneda($sesion);
@@ -181,15 +181,15 @@ if ($opc == 'anular_emision') {
 	$comentario = __('Moneda') . ' seleccionada ' . $moneda->fields['codigo'] . '';
 
 	if ($moneda->fields['tipo_cambio'] != $cobro_tipo_cambio) {
-	    $comentario .= __(', con tipo de cambio modificado a ') . "$cobro_tipo_cambio".'.';
+			$comentario .= __(', con tipo de cambio modificado a ') . "$cobro_tipo_cambio".'.';
 	}
 
 	if ($comentario != $ultimaObservacion['comentario']) {
-	    $observacion->Edit('fecha', date('Y-m-d H:i:s'));
-	    $observacion->Edit('comentario', $comentario);
-	    $observacion->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-	    $observacion->Edit('id_cobro', $id_cobro);
-	    $observacion->Write();
+			$observacion->Edit('fecha', date('Y-m-d H:i:s'));
+			$observacion->Edit('comentario', $comentario);
+			$observacion->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+			$observacion->Edit('id_cobro', $id_cobro);
+			$observacion->Write();
 	}
 
 	$ret = $cobro->GuardarCobro();
@@ -1155,7 +1155,6 @@ else
 	<input type="hidden" name="cobro_tipo_cambio" value="<?php echo $cobro->fields['tipo_cambio_moneda'] ?>" size="8">
 	<input type="hidden" name="id_tarifa" id="id_tarifa" value="<?php echo $contrato->fields['id_tarifa'] ?>" />
 	<input type="hidden" name="accion" value="" id="accion">
-	<input type="hidden" name="modalidad_calculo" id="modalidad_calculo" value="1">
 	<input type="hidden" name="saldo_adelantos" value="<?php
 		$documento = new Documento($sesion);
 		$pago_honorarios = (float) ($cobro->fields['monto_subtotal']) ? 1 : 0;
@@ -1912,10 +1911,10 @@ else
 											</table>
 										</td>
 									</tr>
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
-                                    </tr>
+																		<tr>
+																				<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?php echo $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
+																				<td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?php echo __('Mostrar gastos del cobro') ?></label></td>
+																		</tr>
 
 									<?php if (Conf::GetConf($sesion, 'PrmGastos')) { ?>
 										<tr>
@@ -1924,26 +1923,26 @@ else
 										</tr>
 									<?php } ?>
 
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?php echo $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_morosidad"><?php echo __('Mostrar saldo adeudado') ?></label></td>
-                                    </tr>
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?php echo $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?php echo __('Mostrar tipos de cambio') ?></label></td>
-                                    </tr>
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="opc_ver_descuento" id="opc_ver_descuento" value="1" <?php echo $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?php echo __('Mostrar el descuento del cobro') ?></label></td>
-                                    </tr>
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
-                                    </tr>
-                                    <tr>
-                                        <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
-                                    </tr>
+																		<tr>
+																				<td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?php echo $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
+																				<td align="left" style="font-size: 10px;"><label for="opc_ver_morosidad"><?php echo __('Mostrar saldo adeudado') ?></label></td>
+																		</tr>
+																		<tr>
+																				<td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?php echo $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
+																				<td align="left" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?php echo __('Mostrar tipos de cambio') ?></label></td>
+																		</tr>
+																		<tr>
+																				<td align="right"><input type="checkbox" name="opc_ver_descuento" id="opc_ver_descuento" value="1" <?php echo $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
+																				<td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?php echo __('Mostrar el descuento del cobro') ?></label></td>
+																		</tr>
+																		<tr>
+																				<td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?php echo $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
+																				<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar números de página') ?></label></td>
+																		</tr>
+																		<tr>
+																				<td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
+																				<td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
+																		</tr>
 
 									<?php
 									$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -1992,6 +1991,14 @@ else
 										<td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" id="opc_ver_valor_hh_flat_fee" value="1" <?php echo $cobro->fields['opc_ver_valor_hh_flat_fee']=='1'?'checked':''?>></td>
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?php echo __('Mostrar tarifa proporcional en base a HH')?></label></td>
 									</tr>
+									<?php if (Conf::GetConf($sesion, 'MostrarModalidadCalculo')) { ?>
+									<tr>
+										<td align="right"><input type="checkbox" name="modalidad_calculo" id="modalidad_calculo" value="1" <?php echo $cobro->fields['modalidad_calculo'] == '1' ? 'checked="checked"' : '' ?>></td>
+										<td align="left" style="font-size: 10px;"><label for="modalidad_calculo" title="Activa etiquetas avanzadas (adelantos, pagos, hitos)"><?php echo  __('Desglose Extendido'); ?></label></td>
+									</tr>
+									<?php } else { ?>
+										<input type="hidden" name="modalidad_calculo" id="modalidad_calculo" value="<?php echo $cobro->fields['modalidad_calculo']; ?>">
+									<?php } ?>
 									<tr>
 										<td align="right">
 											<input type="hidden" name="opc_ver_carta" value="0" />
@@ -2051,7 +2058,7 @@ else
 							</table>
 							</div>
 						</td>
-			    	</tr>
+						</tr>
 
 					<tr>
 						<td align="center" colspan="2">
@@ -2096,9 +2103,9 @@ else
 										<?php } ?>
 
 										<?php if( !Conf::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador')  && Conf::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && Conf::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
-										 	<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185" onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'especial');" /><?php echo __('Descargar Excel Cobro')?></a>
+											<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185" onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'especial');" /><?php echo __('Descargar Excel Cobro')?></a>
 										<?php } ?>
-								 	</td>
+									</td>
 								</tr>
 							</table>
 						</td>
@@ -2112,7 +2119,7 @@ else
 <table width="100%">
 	<tr>
 		<td align='center'>
-            <a style="margin:auto;display:block;" href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="GuardaCobro(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
+						<a style="margin:auto;display:block;" href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="GuardaCobro(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
 		</td>
 	</tr>
 	<tr>
@@ -2173,9 +2180,9 @@ else
 
 	jQuery("#cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda'] ?>").blur(function(){
 		var str = jQuery(this).val();
-	   	jQuery(this).val( str.replace(',','.') );
-	   	jQuery(this).parseNumber({format:"#.0000000", locale:"us"});
-	   	jQuery(this).formatNumber({format:"#.0000000", locale:"us"});
+			jQuery(this).val( str.replace(',','.') );
+			jQuery(this).parseNumber({format:"#.0000000", locale:"us"});
+			jQuery(this).formatNumber({format:"#.0000000", locale:"us"});
 	});
 
 <?php } ?>
