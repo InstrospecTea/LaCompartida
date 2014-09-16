@@ -101,7 +101,7 @@ function serializeFormulario() {
 		'numero_agrupadores', 'areas', 'areas_asunto', 'campo_fecha', 'categorias', 'tipos_asunto',
 		'check_area_asunto', 'check_area_prof', 'check_cat_prof', 'check_clientes', 'check_encargados',
 		'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto',
-		'clientesF', 'codigo_contrato', 'comparar', 'encargados', 'estado_cobro', 'proporcionalidad',
+		'clientesF', 'codigo_contrato', 'comparar', 'encargados', 'estado_cobro', 'prop',
 		'moneda_contrato', 'tipo_dato', 'tipo_dato_check', 'tipo_dato_comparado',
 		'tipo_asunto', 'usuariosF', 'usuarios', 'clientes', 'fecha_corta', 'nuevo_reporte_segun', 'id_moneda', 'limitar', 'limite', 'agrupar'];
 
@@ -867,4 +867,12 @@ jQuery(document).ready(function() {
 	});
 
 	jQuery('#fecha_mes, #fecha_anio').change(SeleccionarSelector);
+
+	jQuery('.submit_options').hide();
+	jQuery('.submit_buttons').on('hover', function (e) {
+		el = jQuery(this);
+		jQuery('.submit_options').hide();
+		selector = '.submit_options.' + el.attr('rel');
+		jQuery(selector).show();
+	});
 });
