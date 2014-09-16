@@ -7,6 +7,10 @@ Jueves 11 de Septiembre 2014
 * **Fixed:** [Agrega columna monto cobrado al reporte de rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/644)
 * **Fixed:** [Integración Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
 
+## Hotfix: 14.15.15
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Eliminar asignación de modalidad de cálculo en cobros 5](https://github.com/LemontechSA/ttb/pull/693)
+
 ## Hotfix: 14.15.14
 Miércoles 10 de Septiembre 2014
 * **Fixed:** [Corregir filtros Reporte antigüedad de deuda](https://github.com/LemontechSA/ttb/pull/689)
