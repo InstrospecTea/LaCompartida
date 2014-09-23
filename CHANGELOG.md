@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.2
+Martes 23 de Septiembre 2014
+* **Fixed:** [Corrige suma mal hecha en saldo adeudado (Nota de cobro)](https://github.com/LemontechSA/ttb/pull/695)
+
 ## Hotfix: 14.16.1
 Lunes 22 de Septiembre 2014
 * **Fixed:** [Corrige edición de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
