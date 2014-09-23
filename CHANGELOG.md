@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.1
+Lunes 22 de Septiembre 2014
+* **Fixed:** [Corrige edición de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
+
 ## Release: 14.16.0
 Jueves 11 de Septiembre 2014
 * **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
