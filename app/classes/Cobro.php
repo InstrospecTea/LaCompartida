@@ -2773,6 +2773,12 @@ if (!class_exists('Cobro')) {
 			$saldo_contrato_sinfactura = $saldo_contrato - $saldo_total_cobro + $monto_total_cobro + $saldo_pagos;
 			$saldo_otras_liquidaciones_sinfactura = $saldo_contrato_sinfactura - $saldo_total_cobro_sinfactura;
 
+			if (($this->fields['estado']== 'CREADO' || $this->fields['estado']=='EN REVISION') && $saldo_total_cobro == 0) {
+				$saldo_total_cobro = $saldo_total_cobro_sinfactura;
+				$saldo_contrato = $saldo_contrato_sinfactura;
+				$saldo_otras_liquidaciones = $saldo_otras_liquidaciones_sinfactura;
+			}
+
 			return array(
 				'montoadelantosinasignar' => $monto_adelantos_sin_asignar['legacy'],
 				'monto_adelantos_sin_asignar_total' => $monto_adelantos_sin_asignar['total'],
