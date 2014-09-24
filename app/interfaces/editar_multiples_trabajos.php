@@ -76,7 +76,9 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 	$mismos_asuntos = true;
 	$codigo_asunto_tmp = null;
 
-	for ($i = 0; $i < count($id); $i++) {
+	$total_id = count($id);
+
+	for ($i = 0; $i < $total_id; $i++) {
 		if (empty($codigo_asunto_tmp)) {
 			$codigo_asunto_tmp = $t[$i]->fields['codigo_asunto'];
 		}
