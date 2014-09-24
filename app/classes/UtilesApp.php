@@ -1900,13 +1900,6 @@ HTML;
 			}
 		}
 
-		// Si utiliza el nuevo módulo, agrego el saldo de adelantos para gastos a
-		// if (Conf::GetConf($sesion, 'NuevoModuloGastos')) {
-		// 	$detalle_pagos_contrato = Cobro::DetallePagoContrato($sesion, $id_cobro);
-		// 	$subtotal_gastos_solo_provision += -1 * $detalle_pagos_contrato['saldo_adelantos'];
-		// 	$subtotal_gastos_solo_provision += $detalle_pagos_contrato['monto_adelantos_sin_asignar_gastos'];
-		// }
-
 		$resultados = array(
 			'gasto_total' => $cobro_total_gasto,
 			'gasto_base' => $cobro_base_gastos,
@@ -1918,6 +1911,7 @@ HTML;
 			'subtotal_gastos_solo_provision' => $subtotal_gastos_solo_provision,
 			'subtotal_gastos_sin_provision' => $subtotal_gastos_sin_provision,
 			'subtotal_gastos_diff_con_sin_provision' => $subtotal_gastos_solo_provision + $subtotal_gastos_sin_provision);
+		
 		return $resultados;
 	}
 
