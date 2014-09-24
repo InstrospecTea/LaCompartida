@@ -257,6 +257,9 @@ EOF;
 		$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
 		$tipoComprobante = $PrmDocumentoLegal->fields['codigo_dte'];
 
+		$igv = $Factura->fields['iva'];
+		$tasa = ($igv > 0 ? $Factura->fields['porcentaje_impuesto'] : 0);
+
 		$r = array(
 			'COM' => array(
 				'version|3.2',
@@ -281,8 +284,8 @@ EOF;
 			),
 			'TRA' => array(
 				'impuesto|IVA',
-				'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', ''),
-				'importe|' . number_format($Factura->fields['iva'], 2, '.', '')
+				'tasa|' . number_format($tasa, 2, '.', ''),
+				'importe|' . number_format($igv, 2, '.', '')
 			)
 		);
 
