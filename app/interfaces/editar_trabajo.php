@@ -1599,7 +1599,9 @@ function Substring($string) {
       googie2.setSpellContainer("spell_container");
       googie2.decorateTextarea("descripcion");
 
+      <?php if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) { ?>
       CargarActividadSilent();
+      <?php } ?>
   });
 
   var formObj = $('form_editar_trabajo');
