@@ -949,6 +949,18 @@ function Substring($string) {
     }
   }
 
+  function CargarActividadSilent() {
+    var _codigo_asunto = 'codigo_asunto';
+    if (CodigoSecundario) {
+      _codigo_asunto = 'codigo_asunto_secundario';
+    }
+    var actividad = jQuery('#codigo_actividad').val();
+    CargarSelect(_codigo_asunto, 'codigo_actividad', 'cargar_actividades_activas', null, true);
+    if (actividad.length > 0) {
+      jQuery('#codigo_actividad').val(actividad);
+    }
+  }
+
   function CargarActividad() {
     var _codigo_asunto = 'codigo_asunto';
     if (CodigoSecundario) {
@@ -1586,6 +1598,8 @@ function Substring($string) {
       googie2.dontUseCloseButtons();
       googie2.setSpellContainer("spell_container");
       googie2.decorateTextarea("descripcion");
+
+      CargarActividadSilent();
   });
 
   var formObj = $('form_editar_trabajo');

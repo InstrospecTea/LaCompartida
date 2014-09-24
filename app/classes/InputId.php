@@ -215,9 +215,9 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							obj_campo.value = obj_select.value;
 						}
 
-						function CargarSelect(id_origen, id_destino, accion, soloactivos) {
+						function CargarSelect(id_origen, id_destino, accion, soloactivos, silent) {
 							soloactivos = typeof soloactivos !== 'undefined' ? soloactivos : 1;
-
+							silent = typeof silent !== 'undefined' ? silent : 0;
 							var select_origen = document.getElementById(id_origen);
 							var select_destino = document.getElementById(id_destino);
 							if (!jQuery('#' + id_destino).length || select_destino.tagName != 'SELECT') {
@@ -257,7 +257,9 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 											switch (accion) {
 												case 'cargar_actividades':
 												case 'cargar_actividades_activas':
-													alert('No existen actividades activas para este cliente');
+													if (!silent) {
+														alert('No existen actividades activas para este cliente');
+													}
 													break;
 												default:
 													alert('No existen asuntos para este cliente');
