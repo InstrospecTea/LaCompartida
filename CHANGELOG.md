@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.3
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige problema con IVA en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/693)
+
 ## Hotfix: 14.16.2
 Martes 23 de Septiembre 2014
 * **Fixed:** [Corrige suma mal hecha en saldo adeudado (Nota de cobro)](https://github.com/LemontechSA/ttb/pull/695)
