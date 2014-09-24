@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.16.4
 Miércoles 24 de Septiembre 2014
-* **Fixed:** [Mejora edición de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/694)
+* **Fixed:** [Mejora edición de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/697)
 
 ## Hotfix: 14.16.3
 Miércoles 24 de Septiembre 2014
