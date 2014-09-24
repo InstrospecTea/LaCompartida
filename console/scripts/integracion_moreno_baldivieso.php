@@ -1,155 +1,315 @@
 <?php
-class integracion_moreno_baldivieso extends AppShell {
+class IntegracionMorenoBaldivieso extends AppShell {
 	private $connection;
-	private $dbhandle;
-
+	private $dbh;
 	public $debug;
 
 	public function __construct() {
-		$this->connection['server'] = '200.87.127.179';
+		// $this->connection['server'] = '200.87.127.182'; // Test and develop
+		$this->connection['server'] = 'embaMSSql'; // Production Only
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
 		$this->connection['database_name'] = 'EMBA_PROD';
 
-		// Connection to the database
-		$this->dbhandle = mssql_connect($this->connection['server'], $this->connection['user'], $this->connection['password']) or exit("Error connection to server {$connection['server']}");
-		// Select a database to work with
-		mssql_select_db($this->connection['database_name'], $this->dbhandle) or exit("Error selecting database {$this->connection['database_name']}");
+		try {
+			// Connection to the database and select a database
+			$this->dbh = new PDO("dblib:host={$this->connection['server']};dbname={$this->connection['database_name']}", $this->connection['user'], $this->connection['password']);
+		} catch (PDOException $e) {
+			echo 'Failed to get DB handle: ' . $e->getMessage() . "\n";
+			exit;
+		}
 	}
 
 	public function main() {
+		$clients = array();
+
 		// Declare the SQL statement that will query the database
-		$query = "SELECT
-			OPRJ.U_ClienCode AS client_code,
-			OPRJ.U_ClienNom AS client_name,
-			OPRJ.PrjCode AS matter_code,
-			OPRJ.PrjName AS matter_name
-		FROM OPRJ
-		ORDER BY OPRJ.U_ClienCode, OPRJ.PrjCode";
+		// SELECT TOP 1
+		// WHERE OCRD.CardCode = 'CBSLP00020'
+		$query =
+			"SELECT
+				OCRD.CardCode AS 'client_code',
+				OCRD.CardName AS 'client_name',
+				(CASE WHEN (OCRD.frozenFor = 'N') THEN 1 ELSE 0 END) AS 'client_active',
+				OPRJ.PrjCode AS 'matter_code',
+				OPRJ.PrjName AS 'matter_name',
+				(CASE WHEN (OPRJ.Active = 'Y') THEN 1 ELSE 0 END) AS 'matter_active',
+				OCRD.SlpCode AS 'trade_manager_code',
+				OPRJ.U_Idioma AS 'language',
+				(CASE WHEN (OPRJ.U_Factur = 'Y') THEN 1 ELSE 0 END) AS 'chargeable',
+				OPRJ.U_AbogadoEncargado AS 'lawyer_manager_code',
+				OPRJ.U_AreaProyecto AS 'matter_area',
+				OCRD.LicTradNum AS 'billing_data_identification_number',
+				OCRG.GroupName AS 'billing_data_activity',
+				CRD1.Street AS 'billing_data_address',
+				CRD1.Block AS 'billing_data_commune',
+				CRD1.City AS 'billing_data_city',
+				CRD1.Country AS 'billing_data_country',
+				OCRD.Phone1 AS 'billing_data_phone',
+				OCPR.FirstName AS 'applicant_first_name',
+				OCPR.LastName AS 'applicant_last_name',
+				OCPR.Tel1 AS 'applicant_phone',
+				OCPR.E_MailL AS 'applicant_email',
+				OCRD.U_Tarifa AS 'charging_data_rate',
+				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
+				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
+				OCRD.U_MonHonor AS 'charging_data_currency_fees',
+				OCRD.U_MonGastos AS 'charging_data_currency_expenses',
+				(CASE
+					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
+					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
+					WHEN (OPRJ.U_FormaCobro = '3') THEN 'FLAT FEE'
+					WHEN (OPRJ.U_FormaCobro = '4') THEN 'CAP'
+					ELSE ''
+				END) AS 'charging_data_billing_form'
+			FROM OCRD
+				INNER JOIN OPRJ ON OPRJ.U_ClienCode = OCRD.CardCode
+				INNER JOIN OCRG ON OCRG.GroupCode = OCRD.GroupCode
+				INNER JOIN CRD1 ON CRD1.CardCode = OCRD.CardCode
+				INNER JOIN OCPR ON OCPR.CardCode = OCRD.CardCode
+			ORDER BY OCRD.CardCode, OPRJ.PrjCode";
 
 		// Execute the SQL query and return records
-		$rs = mssql_query($query, $this->dbhandle);
+		$clients = $this->dbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
-		$matters = array();
+		if (!$this->_empty($clients)) {
+			$Session = new Sesion(null, true);
+			$currency_base_id = Moneda::GetMonedaBase($Session);
+			$clients = UtilesApp::utf8izar($clients, false);
 
-		while ($matter = mssql_fetch_assoc($rs)) {
-			array_push($matters, $matter);
-		}
+			foreach ($clients as $client) {
+				$this->_debug($client);
 
-		// Close the connection
-		mssql_close($this->dbhandle);
+				if ($this->_empty($client['client_code'])) {
+					$this->_debug('The client code is empty');
+					continue;
+				}
 
-		$Session = new Sesion(null, true);
+				// Client: values by default
+				$client['client_code'] = strtoupper($client['client_code']);
+				$client_currency = 1;
+				$client_user_manager_id = 'NULL';
 
-		foreach ($matters as $matter) {
-			$this->_debug($matter);
+				$Client = new Cliente($Session);
+				$ClientAgreement = new Contrato($Session);
+				$Client->loadByCodigoSecundario($client['client_code']);
 
-			if ($this->_empty($matter['client_code']) || $this->_empty($matter['matter_code'])) {
-				$this->_debug('The client code or the matter code is empty');
-				continue;
-			}
+				if (!$Client->Loaded()) {
+					// New client
+					$Client->Edit('codigo_cliente', $Client->AsignarCodigoCliente());
+					$Client->Edit('codigo_cliente_secundario', $client['client_code']);
+					$Client->Edit('id_moneda', $client_currency);
+					$Client->Edit('id_usuario_encargado', $client_user_manager_id);
+				}
 
-			$matter['client_code'] = strtoupper($matter['client_code']);
-			$matter['matter_code'] = strtoupper($matter['matter_code']);
-
-			$Client = new Cliente($Session);
-			$ClientAgreement = new Contrato($Session);
-			$Client->loadByCodigoSecundario($matter['client_code']);
-
-			if (!$Client->Loaded()) {
-				// New client
-				$Client->Edit('codigo_cliente', $Client->AsignarCodigoCliente());
-				$Client->Edit('codigo_cliente_secundario', $matter['client_code']);
-				$Client->Edit('glosa_cliente', utf8_decode($matter['client_name']));
-				$Client->Edit('id_moneda', 1);
-				$Client->Edit('activo', 1);
+				$Client->Edit('glosa_cliente', $client['client_name']);
+				$Client->Edit('activo', $client['client_active']);
 
 				if ($Client->Write()) {
 					$this->_debug('Client save!');
 
-					$ClientAgreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
-					$ClientAgreement->Edit('forma_cobro', 'FLAT FEE');
-					$ClientAgreement->Edit('id_tarifa', 1);
+					// Client agreement: values by default
+					$client_agreement_active = 'NO';
+					$client_agreement_billing_form = 'FLAT FEE';
+					$client_agreement_rate = 1;
+
+					// Find a client agreement
+					$ClientAgreement->loadById($Client->fields['id_contrato']);
+
+					if (!$ClientAgreement->Loaded()) {
+						$ClientAgreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
+						$ClientAgreement->Edit('activo', $client_agreement_active);
+						$ClientAgreement->Edit('forma_cobro', $client_agreement_billing_form);
+						$ClientAgreement->Edit('id_tarifa', $client_agreement_rate);
+					}
 
 					if ($ClientAgreement->Write()) {
-						$Client->Edit('id_contrato', $ClientAgreement->fields['id_contrato']);
-						if (!$Client->Write()) {
-							exit('Error save! ' . __LINE__);
+						if ($this->_empty($Client->fields['id_contrato'])) {
+							$Client->Edit('id_contrato', $ClientAgreement->fields['id_contrato']);
+							if (!$Client->Write()) {
+								exit('Error client save! ' . __LINE__);
+							}
 						}
 					} else {
-						exit('Error save! ' . __LINE__);
+						exit('Error client agreement save! ' . __LINE__);
 					}
 				} else {
-					exit('Error save! ' . __LINE__);
+					exit('Error client save! ' . __LINE__);
 				}
-			} else {
-				if ($Client->fields['glosa_cliente'] != $matter['client_name']) {
-					// Update client
-					$Client->Edit('glosa_cliente', utf8_decode($matter['client_name']));
-					if (!$Client->Write()) {
-						exit('Error save! ' . __LINE__);
+
+				// Matter: values by default
+				$client['matter_code'] = strtoupper($client['matter_code']);
+				$billing_form = $this->_empty($client['charging_data_billing_form']) ? 'FLAT FEE' : $client['charging_data_billing_form'];
+
+				$Rate = new Tarifa($Session);
+				if (!$this->_empty($client['charging_data_rate'])) {
+					$Rate->LoadById($client['charging_data_rate']);
+				} else {
+					$Rate->LoadDefault(); // Find rate by default
+				}
+
+				$rate_id = $Rate->Loaded() ? $Rate->fields['id_tarifa'] : 1;
+
+				// Find a currency rate, if not exist select one by default
+				$CurrencyRate = new Moneda($Session);
+				$currency_rate_id = null;
+				if (!$this->_empty($client['charging_data_currency_rate'])) {
+					$CurrencyRate->LoadByCode($client['charging_data_currency_rate']);
+					if ($CurrencyRate->Loaded()) {
+						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
 					}
-
-					$this->_debug('Modified client!');
 				}
-			}
 
-			if (!$ClientAgreement->Loaded()) {
-				$ClientAgreement->loadById($Client->fields['id_contrato']);
-				if (!$ClientAgreement->Loaded()) {
-					exit('Client agreement doesn\'t exist!' . __LINE__);
+				if ($this->_empty($currency_rate_id)) {
+					$currency_rate_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
 				}
-			}
 
-			$Matter = new Asunto($Session);
-			$Matter->loadByCodigoSecundario($matter['matter_code']);
-			$MatterAgreement = new Contrato($Session);
-			$Matter->log_update = false;
+				// If flat rate is greater than zero
+				$charging_data_flat_rate = floatval($client['charging_data_flat_rate']);
+				if ($charging_data_flat_rate > 0) {
+					$FlatRate = new Tarifa($Session);
+					$rate_id = $FlatRate->GuardaTarifaFlat($charging_data_flat_rate, $currency_rate_id);
+				}
 
-			if (!$Matter->Loaded()) {
-				// New matter
-				$Matter->Edit('codigo_asunto', $Matter->AsignarCodigoAsunto($Client->fields['codigo_cliente']));
-				$Matter->Edit('codigo_asunto_secundario', $matter['matter_code']);
-				$Matter->Edit('id_usuario', 'NULL');
-				$Matter->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
-				$Matter->Edit('glosa_asunto', utf8_decode($matter['matter_name']));
+				$user_id = 'NULL';
+				$matter_agreement_active = $client['matter_active'] == '1' ? 'SI' : 'NO';
+				$lawyer_manager_id = 'NULL';
+				$trade_manager_id = 'NULL';
+				$country_id = 'NULL';
+				$language = $this->_empty($client['language']) ? 1 : $client['language'];
+				$chargeable = $this->_empty($client['chargeable']) ? 1 : $client['chargeable']; // Chargeable by default
+				$separate_settlements = 1; // Separate settlements by default
+
+				$CurrencyFees = new Moneda($Session);
+				$currency_fees_id = null;
+				if (!$this->_empty($client['charging_data_currency_fees'])) {
+					$CurrencyFees->LoadByCode($client['charging_data_currency_fees']);
+					if ($CurrencyFees->Loaded()) {
+						$currency_fees_id = $CurrencyFees->fields['id_moneda'];
+					}
+				}
+
+				if ($this->_empty($currency_fees_id)) {
+					$currency_fees_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
+				}
+
+				$CurrencyExpenses = new Moneda($Session);
+				$currency_expenses_id = null;
+				if (!$this->_empty($client['charging_data_currency_expenses'])) {
+					$CurrencyExpenses->LoadByCode($client['charging_data_currency_expenses']);
+					if ($CurrencyExpenses->Loaded()) {
+						$currency_expenses_id = $CurrencyExpenses->fields['id_moneda'];
+					}
+				}
+
+				if ($this->_empty($currency_expenses_id)) {
+					$currency_expenses_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
+				}
+
+				$ProjectArea = new AreaProyecto($Session);
+				$ProjectArea->LoadByGlosa($client['matter_area']);
+				$project_area_id = 'NULL';
+				if ($ProjectArea->Loaded()) {
+					$project_area_id = $ProjectArea->fields['id_area_proyecto'];
+				}
+
+				$Matter = new Asunto($Session);
+				$MatterAgreement = new Contrato($Session);
+
+				$Matter->log_update = false;
+				$Matter->loadByCodigoSecundario($client['matter_code']);
+
+				if (!$Matter->Loaded()) {
+					// New matter
+					$Matter->Edit('codigo_asunto', $Matter->AsignarCodigoAsunto($Client->fields['codigo_cliente']));
+					$Matter->Edit('codigo_asunto_secundario', $client['matter_code']);
+					$Matter->Edit('id_usuario', $user_id);
+					$Matter->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
+				}
+
+				$Matter->Edit('glosa_asunto', $client['matter_name']);
+				$Matter->Edit('id_idioma', $language);
+				$Matter->Edit('activo', $client['matter_active']);
+				$Matter->Edit('cobrable', $chargeable);
+				$Matter->Edit('id_area_proyecto', $project_area_id);
+
+				// Find a lawyer manager
+				$lawyer_manager_code = $client['lawyer_manager_code'];
+				if (!$this->_empty($lawyer_manager_code)) {
+					$LawyerManager = new UsuarioExt($Session);
+					$LawyerManager->LoadByNick($lawyer_manager_code);
+					if ($LawyerManager->Loaded()) {
+						$lawyer_manager_id = $LawyerManager->fields['id_usuario'];
+					}
+				}
+
+				$Matter->Edit('id_encargado', $lawyer_manager_id);
 
 				if ($Matter->Write()) {
-					$first_matter = $Matter->esPrimerAsunto($Client->fields['codigo_cliente']);
-					if ($first_matter) {
-						$Matter->Edit('id_contrato', $ClientAgreement->fields['id_contrato']);
-						$Matter->Edit('id_contrato_indep', 'NULL');
-					} else {
-						$MatterAgreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
-						$MatterAgreement->Edit('forma_cobro', 'FLAT FEE');
-						$MatterAgreement->Edit('id_tarifa', 1);
+					$this->_debug('Matter save!');
 
-						if ($MatterAgreement->Write()) {
-							$Matter->Edit('id_contrato', $MatterAgreement->fields['id_contrato']);
-							$Matter->Edit('id_contrato_indep', $MatterAgreement->fields['id_contrato']);
-						} else {
-							exit('Error save! ' . __LINE__);
+					// Find a matter agreement
+					$MatterAgreement->loadById($Matter->fields['id_contrato']);
+
+					if (!$MatterAgreement->Loaded()) {
+						$MatterAgreement->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
+					}
+
+					$MatterAgreement->Edit('separar_liquidaciones', $separate_settlements);
+
+					// Find a trade manager
+					if (!$this->_empty($client['trade_manager_code'])) {
+						$TradeManager = new UsuarioExt($Session);
+						$TradeManager->LoadByNick($client['trade_manager_code']);
+						if ($TradeManager->Loaded()) {
+							$trade_manager_id = $TradeManager->fields['id_usuario'];
 						}
 					}
 
-					if (!$Matter->Write()) {
+					$MatterAgreement->Edit('id_usuario_responsable', $trade_manager_id);
+
+					$MatterAgreement->Edit('rut', $client['billing_data_identification_number']);
+					$MatterAgreement->Edit('factura_razon_social', $client['client_name']);
+					$MatterAgreement->Edit('factura_giro', $client['billing_data_activity']);
+					$MatterAgreement->Edit('factura_direccion', $client['billing_data_address']);
+					$MatterAgreement->Edit('factura_comuna', $client['billing_data_commune']);
+					$MatterAgreement->Edit('factura_ciudad', $client['billing_data_city']);
+					$MatterAgreement->Edit('factura_telefono', $client['billing_data_phone']);
+
+					// Find a country
+					if (!$this->_empty($client['billing_data_country'])) {
+						$Country = new PrmPais($Session);
+						$Country->LoadByISO($client['billing_data_country']);
+						if ($Country->Loaded()) {
+							$country_id = $Country->fields['id_pais'];
+						}
+					}
+
+					$MatterAgreement->Edit('id_pais', $country_id);
+
+					$applicant_full_name = $client['applicant_first_name'] . ' ' . $client['applicant_last_name'];
+					$MatterAgreement->Edit('contacto', $applicant_full_name);
+					$MatterAgreement->Edit('fono_contacto', $client['applicant_phone']);
+					$MatterAgreement->Edit('email_contacto', $client['applicant_email']);
+
+					$MatterAgreement->Edit('activo', $matter_agreement_active);
+					$MatterAgreement->Edit('forma_cobro', $billing_form);
+					$MatterAgreement->Edit('id_tarifa', $rate_id);
+					$MatterAgreement->Edit('id_moneda', $currency_rate_id);
+					$MatterAgreement->Edit('opc_moneda_total', $currency_fees_id);
+					$MatterAgreement->Edit('opc_moneda_gastos', $currency_expenses_id);
+
+					if ($MatterAgreement->Write()) {
+						$Matter->Edit('id_contrato', $MatterAgreement->fields['id_contrato']);
+						$Matter->Edit('id_contrato_indep', $MatterAgreement->fields['id_contrato']);
+						if (!$Matter->Write()) {
+							exit('Error matter save! ' . __LINE__);
+						}
+					} else {
 						exit('Error save! ' . __LINE__);
 					}
 				} else {
-					exit('Error save! ' . __LINE__);
-				}
-
-				$this->_debug('Matter save!');
-			} else {
-				if ($Matter->fields['glosa_asunto'] != $matter['matter_name']) {
-					$Matter->Edit('glosa_asunto', utf8_decode($matter['matter_name']));
-
-					// Update matter
-					if (!$Matter->Write()) {
-						exit('Error save! ' . __LINE__);
-					}
-
-					$this->_debug('Modified matter!');
+					exit('Error matter save! ' . __LINE__);
 				}
 			}
 		}

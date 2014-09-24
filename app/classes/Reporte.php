@@ -1235,7 +1235,7 @@ class Reporte {
 			//En Planilla, la rentabilidad se presenta como porcentaje.
 			$resultado = $row[$this->tipo_dato];
 			if (is_numeric($resultado)) {
-				$resultado = number_format($resultado, 2, ".", "");
+				$resultado = number_format($resultado, 2, '.', '');
 				if ($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'rentabilidad_base') {
 					$resultado *= 100;
 				}

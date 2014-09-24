@@ -1,5 +1,48 @@
 # Changelog
 
+## Release: 14.16.0
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
+* **Fixed:** [Agrega opción para descargar excel con formato para tablas dinámicas](https://github.com/LemontechSA/ttb/pull/616)
+* **Fixed:** [Agrega columna monto cobrado al reporte de rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/644)
+* **Fixed:** [Integración Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
+
+## Hotfix: 14.15.15
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Eliminar asignación de modalidad de cálculo en cobros 5](https://github.com/LemontechSA/ttb/pull/693)
+
+## Hotfix: 14.15.14
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir filtros Reporte antigüedad de deuda](https://github.com/LemontechSA/ttb/pull/689)
+
+## Hotfix: 14.15.13
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Lógica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
+
+## Hotfix: 14.15.12
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Nota Cobro MB Inglés. Monto Saldo aprovisionado](https://github.com/LemontechSA/ttb/pull/687)
+
+## Hotfix: 14.15.11
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir carta MB](https://github.com/LemontechSA/ttb/pull/686)
+
+## Hotfix: 14.15.10
+Martes 09 de Septiembre 2014
+* **Fixed:** [Editar multiples trabajos al revisar horas](https://github.com/LemontechSA/ttb/pull/684)
+
+## Hotfix: 14.15.9
+Viernes 06 de Septiembre 2014
+* **Fixed:** [Corregir asignación de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)
+
+## Hotfix: 14.15.8
+Viernes 06 de Septiembre 2014
+* **Fixed:** [Deprecar modalidad_calculo 0](https://github.com/LemontechSA/ttb/pull/680)
+
+## Hotfix: 14.15.7
+Viernes 05 de Septiembre 2014
+* **Fixed:** [Correcciones a reporte de hitos](https://github.com/LemontechSA/ttb/pull/679)
+
 ## Hotfix: 14.15.6
 Miércoles 03 de Septiembre 2014
 * **Fixed:** [Ampliación del rango de fechas en el reporte de ventas](https://github.com/LemontechSA/ttb/pull/676)
