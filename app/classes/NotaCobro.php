@@ -10383,7 +10383,7 @@ class NotaCobro extends Cobro {
 		$moneda_base = Utiles::MonedaBase($this->sesion);
 
 		$seccion_detalle_pago_contrato = $this->DetallePagoContrato($this->sesion, $this->fields['id_cobro']);
-		
+
 		$montoadelantosinasignar = $seccion_detalle_pago_contrato['montoadelantosinasignar'];
 		$saldo = $seccion_detalle_pago_contrato['saldo'];
 		$saldo_adelantos = $seccion_detalle_pago_contrato['saldo_adelantos'];
