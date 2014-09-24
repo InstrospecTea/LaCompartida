@@ -757,6 +757,7 @@ $_LANG['Declaración de Honorarios y Gastos'] = "Declaración de Honorarios y Gast
 $_LANG['Via Fax'] = "Via Fax";
 $_LANG['y'] = "y";
 $_LANG['durante el mes de'] = "durante el mes de";
+$_LANG['%B de %Y'] = '%B de %Y';
 ####### CARTA 1 ########
 $_LANG['parrafo_gasto1_1'] = "Asimismo, se agregan los gastos correspondientes al mismo periodo, por la suma total de %monto_gasto%.-.";
 
