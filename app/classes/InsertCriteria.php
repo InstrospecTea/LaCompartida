@@ -50,7 +50,7 @@ class InsertCriteria
 			if (is_null($value) || $value == 'NULL' ) {
 				$this->insert_value_clause[$column_key] = 'NULL';
 			} else {
-				$this->insert_value_clause[$column_key] = "'".$value."'";
+				$this->insert_value_clause[$column_key] = "'".addslashes($value)."'";
 			}
 			return $this;
 		}
