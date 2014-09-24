@@ -257,9 +257,6 @@ EOF;
 		$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
 		$tipoComprobante = $PrmDocumentoLegal->fields['codigo_dte'];
 
-		$igv = $Factura->fields['iva'];
-		$tasa = ($igv > 0 ? $Factura->fields['porcentaje_impuesto'] : 0);
-
 		$r = array(
 			'COM' => array(
 				'version|3.2',
@@ -282,13 +279,15 @@ EOF;
 				'rfc|' . $Factura->fields['RUT_cliente'],
 				'nombre|' . ($Factura->fields['cliente'])
 			),
-			'TRA' => array(
-				'impuesto|IVA',
-				'tasa|' . number_format($tasa, 2, '.', ''),
-				'importe|' . number_format($igv, 2, '.', '')
-			)
 		);
 
+		$tra = array();
+		if ($Factura->fields['iva'] > 0) {
+			$tra[] = 'impuesto|IVA';
+			$tra[] = 'importe|' . number_format($Factura->fields['iva'], 2, '.', '');
+			$tra[] = 'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', '');
+			$r['TRA'] = $tra ;
+		}
 
 		/*
 		*	El monto subtotal de la factura debe ser la suma de los subtotales
