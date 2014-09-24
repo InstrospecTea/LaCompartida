@@ -250,7 +250,7 @@ EOF;
 
 		$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
 		date_default_timezone_set($zona_horaria);
-		$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
+		$mx_hour = date("H:i:s", time());
 
 		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
