@@ -52,7 +52,6 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 		}
 	}
 
-
 	// Parsear el string con la lista de ids, vienen separados por el caracter 't'.
 	$i=0;
 	$id = array();
@@ -70,52 +69,63 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 	// Para cargar los valores del primer trabajo en el form.
 	$id_trabajo = $id[0];
 
-	//$cobrable = 0;
-	$total_minutos_cobrables=0;
-	$total_minutos_trabajados=0;
-	$horas_cobrables=0;
-	$minutos_cobrables=0;
-	for($i=0; $i<count($id); ++$i)
-	{
-		if($t[$i]->Estado() == __('Cobrado') && $opcion != 'nuevo')
-		{
+	$total_minutos_cobrables = 0;
+	$total_minutos_trabajados = 0;
+	$horas_cobrables = 0;
+	$minutos_cobrables = 0;
+	$mismos_asuntos = true;
+	$codigo_asunto_tmp = null;
+
+	for ($i = 0; $i < count($id); $i++) {
+		if (empty($codigo_asunto_tmp)) {
+			$codigo_asunto_tmp = $t[$i]->fields['codigo_asunto'];
+		}
+
+		if ($mismos_asuntos === true && $codigo_asunto_tmp != $t[$i]->fields['codigo_asunto']) {
+			$mismos_asuntos = false;
+		}
+
+		if ($t[$i]->Estado() == __('Cobrado') && $opcion != 'nuevo') {
 			$pagina->AddError(__('Trabajos masivos ya cobrados'));
 			$pagina->PrintTop($popup);
 			$pagina->PrintBottom($popup);
 			exit;
 		}
-		if($t[$i]->Estado() == 'Revisado' && $opcion != 'nuevo')
-		{
-			if(!$permisos->fields['permitido'])
-			{
+
+		if ($t[$i]->Estado() == 'Revisado' && $opcion != 'nuevo') {
+			if (!$permisos->fields['permitido']) {
 				$pagina->AddError(__('Trabajo ya revisado'));
 				$pagina->PrintTop($popup);
 				$pagina->PrintBottom($popup);
 				exit;
 			}
 		}
-		if($codigo_asunto != $t[$i]->fields['codigo_asunto'])
-		{
+
+		if ($codigo_asunto != $t[$i]->fields['codigo_asunto']) {
 			$cambio_asunto[$i] = true;
 		}
-		list($h,$m,$s)=split(':',$t[$i]->fields['duracion_cobrada']);
-		$minutos=($h*60)+$m;
-		$total_minutos_cobrables+=$minutos;//se calcula en minutos porque el intervalo es en minutos
 
-		list($h,$m,$s)=split(':',$t[$i]->fields['duracion']);
-		$minutos=($h*60)+$m;
-		//echo $minutos.' min. <br>';
+		list($h, $m, $s) = split(':', $t[$i]->fields['duracion_cobrada']);
+		$minutos = ($h * 60) + $m;
+		$total_minutos_cobrables += $minutos; // se calcula en minutos porque el intervalo es en minutos
 
-		$total_minutos_trabajados+=$minutos;//se calcula en minutos porque el intervalo es en minutos
+		list($h, $m, $s) = split(':', $t[$i]->fields['duracion']);
+		$minutos = ($h * 60) + $m;
+
+		$total_minutos_trabajados += $minutos; // se calcula en minutos porque el intervalo es en minutos
 	}
+
+	if (empty($codigo_asunto) && $mismos_asuntos === true && !empty($codigo_asunto_tmp)) {
+		$codigo_asunto = $codigo_asunto_tmp;
+	}
+
 	if(!isset($total_duracion_cobrable_horas) && !isset($total_duracion_cobrable_minutos))
 	{
 		$total_duracion_cobrable_horas=floor($total_minutos_cobrables/60);
 		$total_duracion_cobrable_minutos=floor($total_minutos_cobrables%60);
 	}
 
-	if(!$codigo_asunto_secundario && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-	{
+	if(!$codigo_asunto_secundario && Conf::GetConf($sesion,'CodigoSecundario')) {
 		//se carga el codigo secundario
 		$asunto = new Asunto($sesion);
 		$asunto->LoadByCodigo($t[0]->fields['codigo_asunto']);
@@ -131,13 +141,11 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 	{
 		$valida = true;
 		$asunto = new Asunto($sesion);
-		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-		{
+
+		if (Conf::GetConf($sesion,'CodigoSecundario')) {
 			$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
 			$codigo_asunto=$asunto->fields['codigo_asunto'];
-		}
-		else
-		{
+		} else {
 			$asunto->LoadByCodigo($codigo_asunto);
 		}
 
@@ -313,23 +321,17 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 function Validar(form)
 {
 <?php
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			{
+			if (Conf::GetConf($sesion,'CodigoSecundario')) {
 				echo "if(!form.codigo_asunto_secundario.value){";
-			}
-			else
-			{
+			} else {
 				echo "if(!form.codigo_asunto.value){";
 			}
 ?>
 			alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
 <?php
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			{
+			if (Conf::GetConf($sesion,'CodigoSecundario')) {
 				echo "form.codigo_asunto_secundario.focus();";
-			}
-			else
-			{
+			} else {
 				echo "form.codigo_asunto.focus();";
 			}
 ?>
@@ -473,12 +475,9 @@ function Lista(accion, div, codigo, div_post)
 		form.campo_codigo_cliente.value = codigo;
 		SetSelectInputId('campo_codigo_cliente','codigo_cliente');
 <?php
-		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-		{
+		if (Conf::GetConf($sesion,'CodigoSecundario')) {
 			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
-		}
-		else
-		{
+		} else {
 			echo "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos');";
 		}
 ?>
@@ -925,16 +924,13 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectClient
 			return $string;
 	}
 ?>
-<script language="javascript" type="text/javascript">
-$('chkCobrable').observe('click',
-	function(evento){
-		if(!this.checked)
-		{
-			$('divVisible').style['display']="inline";
-		}
-		else
-		{
-			$('divVisible').style['display']="none";
+
+<script type="text/javascript">
+	$('chkCobrable').observe('click', function(evento) {
+		if(!this.checked) {
+			$('divVisible').style['display'] = "inline";
+		} else {
+			$('divVisible').style['display'] = "none";
 		}
 	});
 </script>

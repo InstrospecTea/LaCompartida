@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.4
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Mejora edición de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/694)
+
 ## Hotfix: 14.16.3
 Miércoles 24 de Septiembre 2014
 * **Fixed:** [Corrige problema con IVA en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/693)
