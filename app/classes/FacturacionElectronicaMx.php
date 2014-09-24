@@ -278,7 +278,7 @@ EOF;
 			'REC' => array(
 				'rfc|' . $Factura->fields['RUT_cliente'],
 				'nombre|' . ($Factura->fields['cliente'])
-			),
+			)
 		);
 
 		$tra = array();
