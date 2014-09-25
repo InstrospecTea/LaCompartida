@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.7
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige problemas de visualizacion de IVA en DTE](https://github.com/LemontechSA/ttb/pull/700)
+
 ## Hotfix: 14.16.6
 Jueves 25 de Septiembre 2014
 * **Fixed:** [Corrige Modificación de tareas](https://github.com/LemontechSA/ttb/pull/699)
