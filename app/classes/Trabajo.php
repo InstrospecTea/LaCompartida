@@ -410,8 +410,8 @@ class Trabajo extends Objeto
 		$nombre_duracion_trabajada_en = Utiles::glosa($sesion, 'duracion_trabajada', 'glosa_en', 'prm_excel_cobro', 'nombre_interno');
 		$nombre_asunto_es = Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "glosa_es", 'prm_excel_cobro', 'nombre_interno', 'grupo');
 		$nombre_asunto_en = Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "glosa_en", 'prm_excel_cobro', 'nombre_interno', 'grupo');
-		$nombre_abogado_es = '#' . Utiles::glosa($sesion, 'abogado', 'glosa_es', 'prm_excel_cobro', 'nombre_interno');
-		$nombre_abogado_en = '#' . Utiles::glosa($sesion, 'abogado', 'glosa_en', 'prm_excel_cobro', 'nombre_interno');
+		$nombre_abogado_es = Utiles::glosa($sesion, 'abogado', 'glosa_es', 'prm_excel_cobro', 'nombre_interno');
+		$nombre_abogado_en = Utiles::glosa($sesion, 'abogado', 'glosa_en', 'prm_excel_cobro', 'nombre_interno');
 
 		for ($i = 1; $i <= $excel->sheets[0]['numCols']; $i++) {
 			$nombre_columna = $excel->sheets[0]['cells'][$fila_base][$i];
@@ -579,7 +579,7 @@ class Trabajo extends Objeto
 				$abogado = $hoja['cells'][$fila][$col_abogado];
 				// cargar usuario con su username
 				$usuario = new Usuario($sesion);
-				$usuario->LoadId($abogado);
+				$usuario->LoadByNick($abogado);
 
 				if (!$usuario->fields['id_usuario'] || $abogado == '') {
 					$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque el $nombre_abogado_es ingresado no existe.<br />";

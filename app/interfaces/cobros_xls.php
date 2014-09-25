@@ -1158,9 +1158,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->write($filas, $col_cobrable, Utiles::GlosaMult($sesion, 'horas_tarificadas', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 				$ws->write($filas, $col_tarifa_hh, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'tarifa_hh', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
 				$ws->write($filas, $col_valor_trabajo, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'valor_trabajo', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
-
-				$ws->write($filas-1, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
-				$ws->write($filas, $col_id_abogado, '#' . Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+				$ws->write($filas, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
 
 				if (!$primera_fila_primer_asunto) {
 					$primera_fila_primer_asunto = $filas;
@@ -1489,11 +1487,16 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, $col_fecha_mes, $f[1], $formato_normal);
 					$ws->write($filas, $col_fecha_anyo, $f[0], $formato_normal);
 
-					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+					if (!isset($forzar_username)) {
+						$forzar_username = false;
+					}
+
+					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema') || $forzar_username === true) {
 						$nombre = $tramite->fields['usr_nombre'];
 					} else {
 						$nombre = $tramite->fields['nombre_usuario'];
 					}
+
 					$ws->write($filas, $col_abogado, $nombre, $formato_normal);
 
 					if (!$opc_ver_asuntos_separados) {
@@ -1611,9 +1614,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 		$filas+=2;
 		$contador = 0;
-		$detalle_profesional_glosa = '#' . Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo');
 		foreach ($detalle_profesional as $id => $data) {
-			$ws->write($filas, $col_fecha_ini + $contador, $detalle_profesional_glosa);
+			$ws->write($filas, $col_fecha_ini + $contador, __('NO MODIFICAR ESTA COLUMNA'));
 			$ws->write($filas + 1, $col_fecha_ini + $contador, "$id");
 			++$contador;
 		}
