@@ -1,5 +1,56 @@
 # Changelog
 
+## Hotfix: 14.16.5
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige eliminación y búsqueda de trámites](https://github.com/LemontechSA/ttb/pull/698)
+
+## Hotfix: 14.16.4
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Mejora edición de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/697)
+
+## Hotfix: 14.16.3
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige problema con IVA en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/693)
+
+## Hotfix: 14.16.2
+Martes 23 de Septiembre 2014
+* **Fixed:** [Corrige suma mal hecha en saldo adeudado (Nota de cobro)](https://github.com/LemontechSA/ttb/pull/695)
+
+## Hotfix: 14.16.1
+Lunes 22 de Septiembre 2014
+* **Fixed:** [Corrige edición de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
+
+## Release: 14.16.0
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
+* **Fixed:** [Agrega opción para descargar excel con formato para tablas dinámicas](https://github.com/LemontechSA/ttb/pull/616)
+* **Fixed:** [Agrega columna monto cobrado al reporte de rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/644)
+* **Fixed:** [Integración Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
+
+## Hotfix: 14.15.15
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Eliminar asignación de modalidad de cálculo en cobros 5](https://github.com/LemontechSA/ttb/pull/693)
+
+## Hotfix: 14.15.14
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir filtros Reporte antigüedad de deuda](https://github.com/LemontechSA/ttb/pull/689)
+
+## Hotfix: 14.15.13
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Lógica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
+
+## Hotfix: 14.15.12
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Nota Cobro MB Inglés. Monto Saldo aprovisionado](https://github.com/LemontechSA/ttb/pull/687)
+
+## Hotfix: 14.15.11
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir carta MB](https://github.com/LemontechSA/ttb/pull/686)
+
+## Hotfix: 14.15.10
+Martes 09 de Septiembre 2014
+* **Fixed:** [Editar multiples trabajos al revisar horas](https://github.com/LemontechSA/ttb/pull/684)
+
 ## Hotfix: 14.15.9
 Viernes 06 de Septiembre 2014
 * **Fixed:** [Corregir asignación de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)
