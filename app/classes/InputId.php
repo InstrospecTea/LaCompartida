@@ -60,12 +60,16 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		return $output;
 	}
 
-
 	function ImprimirActividad($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '') {
 		if ($selected === 'NULL') {
 			$selected = null;
 		}
 		$join = '';
+		if ($otro_filtro == '') {
+			$where = 'WHERE actividad.codigo_asunto IS NULL';
+		} else {
+			$where = "WHERE (actividad.codigo_asunto = '{$otro_filtro}' OR actividad.codigo_asunto IS NULL)";
+		}
 		$output .= "<input maxlength=\"15\" id=\"campo_{$name}\" size=\"15\" value=\"{$selected}\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_{$name}','{$name}'); {$oncambio}\" " . str_replace("class='comboplus'", '', $opciones) . " />";
 		$output .= Html::SelectQuery($sesion, "SELECT {$campo_id}, {$campo_glosa} FROM {$tabla} {$join} {$where} ORDER BY {$campo_glosa}", $name, $selected,	"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones", __("Cualquiera"), $width);
 		return $output;
@@ -215,9 +219,8 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							obj_campo.value = obj_select.value;
 						}
 
-						function CargarSelect(id_origen, id_destino, accion, soloactivos, silent) {
+						function CargarSelect(id_origen, id_destino, accion, soloactivos) {
 							soloactivos = typeof soloactivos !== 'undefined' ? soloactivos : 1;
-							silent = typeof silent !== 'undefined' ? silent : 0;
 							var select_origen = document.getElementById(id_origen);
 							var select_destino = document.getElementById(id_destino);
 							if (!jQuery('#' + id_destino).length || select_destino.tagName != 'SELECT') {
@@ -257,9 +260,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 											switch (accion) {
 												case 'cargar_actividades':
 												case 'cargar_actividades_activas':
-													if (!silent) {
-														alert('No existen actividades activas para este cliente');
-													}
+													alert('No existen actividades activas para este cliente');
 													break;
 												default:
 													alert('No existen asuntos para este cliente');

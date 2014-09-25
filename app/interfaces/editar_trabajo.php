@@ -585,15 +585,21 @@ if ($refresh_parent) {
                 </td>
             </tr>
         <?php } ?>
-
         <?php if ((Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) && ($permiso_revisor || $permiso_profesional)) { ?>
             <tr id="actividades">
-                <?php if ($t->Loaded()) { ?>
+                <?php if ($t->Loaded()) { 
+                    $codigo_asunto_actividad = $t->fields['codigo_asunto'];
+                    if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+                        $asunto = new Asunto($sesion);
+                        $asunto->LoadByCodigo($codigo_asunto_actividad);
+                        $codigo_asunto_actividad = $asunto->fields['codigo_asunto_secundario'];
+                    }
+                ?>
                     <td colspan="2" align=right>
                         <?php echo __('Actividad'); ?>
                     </td>
                     <td align=left width="440" nowrap>
-                        <?php echo InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $t->fields['codigo_asunto']); ?>
+                        <?php echo InputId::ImprimirActividad($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $t->fields['codigo_actividad'], '', '', 320, $codigo_asunto_actividad); ?>
                     </td>
                 <?php } ?>
             </tr>
@@ -946,18 +952,6 @@ function Substring($string) {
   function AutosizeFrame() {
     if (top.ResizeFrame !== undefined) {
       top.ResizeFrame();
-    }
-  }
-
-  function CargarActividadSilent() {
-    var _codigo_asunto = 'codigo_asunto';
-    if (CodigoSecundario) {
-      _codigo_asunto = 'codigo_asunto_secundario';
-    }
-    var actividad = jQuery('#codigo_actividad').val();
-    CargarSelect(_codigo_asunto, 'codigo_actividad', 'cargar_actividades_activas', null, true);
-    if (actividad.length > 0) {
-      jQuery('#codigo_actividad').val(actividad);
     }
   }
 
@@ -1598,10 +1592,6 @@ function Substring($string) {
       googie2.dontUseCloseButtons();
       googie2.setSpellContainer("spell_container");
       googie2.decorateTextarea("descripcion");
-
-      <?php if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) { ?>
-      CargarActividadSilent();
-      <?php } ?>
   });
 
   var formObj = $('form_editar_trabajo');
