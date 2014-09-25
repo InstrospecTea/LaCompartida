@@ -5377,7 +5377,7 @@ class NotaCobro extends Cobro {
 					$query = "SELECT count(*) FROM trabajo
 									WHERE id_cobro=" . $this->fields['id_cobro'] . "
 										AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'
-										AND id_tramite=0";
+										AND id_tramite=0 " . ($this->fields['opc_ver_cobrable'] ? "" : "AND trabajo.visible = 1");
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($cont_trabajos) = mysql_fetch_array($resp);
 
