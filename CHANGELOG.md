@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.6
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige Modificación de tareas](https://github.com/LemontechSA/ttb/pull/699)
+
 ## Hotfix: 14.16.5
 Miércoles 24 de Septiembre 2014
 * **Fixed:** [Corrige eliminación y búsqueda de trámites](https://github.com/LemontechSA/ttb/pull/698)
