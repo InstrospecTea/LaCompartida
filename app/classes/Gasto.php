@@ -85,6 +85,16 @@ class Gasto extends Objeto {
 			),
 		),
 		array(
+			'field' => 'monto_facturable',
+			'format' => 'number',
+			'title' => 'Monto Facturable',
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			),
+		),
+		array(
 			'field' => 'con_impuesto',
 			'title' => 'Con Impuesto',
 		),
@@ -443,7 +453,8 @@ class Gasto extends Objeto {
 				moneda_gasto.simbolo,
 				IFNULL(cta_corriente.egreso, 0) egreso,
 				IFNULL(cta_corriente.ingreso, 0) ingreso,
-				IF(IFNULL(cta_corriente.ingreso, 0) = 0, 'egreso', 'ingreso') as ingresooegreso,";
+				IF(IFNULL(cta_corriente.ingreso, 0) = 0, 'egreso', 'ingreso') as ingresooegreso,
+				monto_cobrable AS monto_facturable,";
 
 		if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
 			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0,IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable)) AS monto_cobrable,
