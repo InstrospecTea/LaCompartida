@@ -250,12 +250,21 @@ EOF;
 
 		$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
 		date_default_timezone_set($zona_horaria);
-		$mx_hour = date("H:i:s", time() + 3600 * (date("I")));
+		$mx_hour = date("H:i:s", time());
 
 		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
 		$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
 		$tipoComprobante = $PrmDocumentoLegal->fields['codigo_dte'];
+
+		$tra = array();
+		if ($Factura->fields['iva'] > 0) {
+			$tra = array( 
+				'impuesto|IVA',
+				'importe|' . number_format($Factura->fields['iva'], 2, '.', ''),
+				'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', '')
+			);
+		}
 
 		$r = array(
 			'COM' => array(
@@ -279,12 +288,9 @@ EOF;
 				'rfc|' . $Factura->fields['RUT_cliente'],
 				'nombre|' . ($Factura->fields['cliente'])
 			),
-			'TRA' => array(
-				'impuesto|IVA',
-				'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', ''),
-				'importe|' . number_format($Factura->fields['iva'], 2, '.', '')
-			)
+			'TRA' => $tra
 		);
+
 
 
 		/*
