@@ -361,6 +361,11 @@ if (!empty($factura->fields['id_factura'])) {
 }
 
 $cifras_decimales_opc_moneda_total = $x_resultados['cifras_decimales_opc_moneda_total'];
+$cifras_decimales_factura_conf = Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura');
+if ($cifras_decimales_factura_conf != -1) {
+	$cifras_decimales_opc_moneda_total = $cifras_decimales_factura_conf;
+}
+
 $subtotal_honorarios = $x_resultados['monto_honorarios'][$opc_moneda_total];
 $subtotal_gastos_sin_impuestos = $x_resultados['subtotal_gastos_sin_impuesto'][$opc_moneda_total];
 $subtotal_gastos = $x_resultados['subtotal_gastos'][$opc_moneda_total] - $subtotal_gastos_sin_impuestos;
@@ -1458,7 +1463,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		jQuery('#iva').val(jQuery('#monto_iva_honorarios_legales').parseNumber() + jQuery('#monto_iva_gastos_con_iva').parseNumber());
 		var total = Number($('monto_neto').value.replace(',', '.')) + Number($('iva').value.replace(',', '.'));
 		$('total').value = total.toFixed(decimales);
-
 
 		if (cantidad_decimales != -1) {
 
