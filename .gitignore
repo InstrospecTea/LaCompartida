@@ -197,5 +197,5 @@ config.ru
 ## Composer
 #############
 composer.lock
-vendor/autoload.php
+vendor
 vendor/**/
