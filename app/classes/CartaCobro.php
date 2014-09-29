@@ -270,14 +270,20 @@ class CartaCobro extends NotaCobro {
         $this->fields = $fields;
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
-        $valorsinespacio = '&nbsp;';
+
+        $this->espacio = '&nbsp;';
         if (Conf::GetConf($this->sesion, 'ValorSinEspacio')) {
-            $valorsinespacio = '';
+            $this->espacio = '';
         }
-        $this->espacio = $valorsinespacio;
+
         $this->monedas = Moneda::GetMonedas($sesion, '', true);
+
+        $Contrato = new Contrato($this->sesion);
+        $Contrato->Load($this->fields['id_contrato']);
+
 				$this->template_data = array(
-					'Cobro' => $fields,
+					'Cobro' => $this->fields,
+					'Contrato' => $Contrato->fields,
 					'UsuarioActual' => $this->sesion->usuario->fields
 				);
     }
