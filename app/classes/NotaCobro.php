@@ -10392,35 +10392,36 @@ class NotaCobro extends Cobro {
 		$monto_total_cobro = $seccion_detalle_pago_contrato['monto_total_cobro'];
 		$saldo_total_cobro = $seccion_detalle_pago_contrato['saldo_total_cobro'];
 		$saldo_total_cobro_sinfactura = $seccion_detalle_pago_contrato['saldo_total_cobro_sinfactura'];
-			
+		$moneda_saldo = $cobro_moneda->moneda[$seccion_detalle_pago_contrato['moneda_saldo']];
+
 		$saldo_otras_liquidaciones = UtilesApp::CambiarMoneda(
 			$seccion_detalle_pago_contrato['saldo_otras_liquidaciones'],
-			$moneda_base['tipo_cambio'],
-			$moneda_base['cifras_decimales'],
+			$moneda_saldo['tipo_cambio'],
+			$moneda_saldo['cifras_decimales'],
 			$x_resultados['tipo_cambio_opc_moneda_total'],
 			$x_resultados['cifras_decimales_opc_moneda_total']
 		);
 
 		$saldo_total_adeudado = UtilesApp::CambiarMoneda(
 			$seccion_detalle_pago_contrato['saldo_contrato'],
-			$moneda_base['tipo_cambio'],
-			$moneda_base['cifras_decimales'],
+			$moneda_saldo['tipo_cambio'],
+			$moneda_saldo['cifras_decimales'],
 			$x_resultados['tipo_cambio_opc_moneda_total'],
 			$x_resultados['cifras_decimales_opc_moneda_total']
 		);
 
 		$saldo_otras_liquidaciones_sinfactura = UtilesApp::CambiarMoneda(
 			$seccion_detalle_pago_contrato['saldo_otras_liquidaciones_sinfactura'],
-			$moneda_base['tipo_cambio'],
-			$moneda_base['cifras_decimales'],
+			$moneda_saldo['tipo_cambio'],
+			$moneda_saldo['cifras_decimales'],
 			$x_resultados['tipo_cambio_opc_moneda_total'],
 			$x_resultados['cifras_decimales_opc_moneda_total']
 		);
 
 		$saldo_contrato_sinfactura = UtilesApp::CambiarMoneda(
 			$seccion_detalle_pago_contrato['saldo_contrato_sinfactura'],
-			$moneda_base['tipo_cambio'],
-			$moneda_base['cifras_decimales'],
+			$moneda_saldo['tipo_cambio'],
+			$moneda_saldo['cifras_decimales'],
 			$x_resultados['tipo_cambio_opc_moneda_total'],
 			$x_resultados['cifras_decimales_opc_moneda_total']
 		);

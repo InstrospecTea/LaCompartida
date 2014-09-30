@@ -446,7 +446,7 @@ if (!class_exists('Cobro')) {
 					$totales['contrato']['monto_honorarios+gastos_moneda']+=$monto_gastos_moneda + $monto_honorarios_moneda;
 					$totales['contrato']['saldo_honorarios']+=$saldo_honorarios;
 					$totales['contrato']['saldo_gastos']+=$saldo_gastos;
-
+					$totales['contrato']['moneda_saldo'] = $factura['id_moneda'];
 					$totales['contrato']['simbolo_moneda_total'] = $factura['simbolo_moneda_total'];
 
 					if ($id_cobro != null && $factura['id_cobro'] == $id_cobro) {
@@ -465,6 +465,7 @@ if (!class_exists('Cobro')) {
 						$totales[$id_cobro]['saldo_honorarios']+=$saldo_honorarios;
 						$totales[$id_cobro]['saldo_gastos']+=$saldo_gastos;
 						$totales[$id_cobro]['simbolo_moneda_total'] = $factura['simbolo_moneda_total'];
+						$totales[$id_cobro]['moneda_saldo'] = $factura['id_moneda'];
 					}
 				}
 			}
@@ -2728,7 +2729,8 @@ if (!class_exists('Cobro')) {
 							doc_pago.glosa_documento,
 							(neteo_documento.valor_cobro_honorarios + neteo_documento.valor_cobro_gastos) * -1 AS monto,
 							doc_pago.fecha,
-							prm_moneda.tipo_cambio
+							prm_moneda.tipo_cambio,
+							prm_moneda.id_moneda
 						FROM documento AS doc_pago
 						INNER JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
 						INNER JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
@@ -2763,10 +2765,13 @@ if (!class_exists('Cobro')) {
 			if (empty($this->x_resultados)) { #Generar totales del cobro si no han sido generados
 				$this->x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
 			}
-
 			$saldo_total_cobro = $totales[$id_cobro]['saldo_honorarios'] + $totales[$id_cobro]['saldo_gastos'];
 			$saldo_contrato = $totales['contrato']['saldo_honorarios'] + $totales['contrato']['saldo_gastos'];
-			$monto_total_cobro = (float) $this->x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
+			$moneda_saldo = $totales['contrato']['moneda_saldo']; 
+			if (empty($moneda_saldo)) {
+				$moneda_saldo = $this->fields['opc_moneda_total'];
+			}
+			$monto_total_cobro = (float) $this->x_resultados['monto_cobro_original_con_iva'][$moneda_saldo];
 			$saldo_otras_liquidaciones = $saldo_contrato - $saldo_total_cobro;
 
 			$saldo_total_cobro_sinfactura = $monto_total_cobro + $saldo_pagos;
@@ -2794,7 +2799,8 @@ if (!class_exists('Cobro')) {
 				'monto_total_cobro' => $monto_total_cobro,
 				'saldo_total_cobro_sinfactura' => $saldo_total_cobro_sinfactura,
 				'saldo_contrato_sinfactura' => $saldo_contrato_sinfactura,
-				'saldo_otras_liquidaciones_sinfactura' => $saldo_otras_liquidaciones_sinfactura
+				'saldo_otras_liquidaciones_sinfactura' => $saldo_otras_liquidaciones_sinfactura,
+				'moneda_saldo' => $moneda_saldo
 			);
 		}
 
