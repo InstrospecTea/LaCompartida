@@ -8,13 +8,18 @@ require_once dirname(__FILE__) . '/../conf.php';
 class Adelanto extends Documento {
 
 	public static $configuracion_reporte = array(
-		array('field' => 'id_documento', 'title' => 'N° Adelanto'),
-		array('field' => 'glosa_cliente', 'title' => 'Cliente'),
 		array('field' => 'fecha', 'title' => 'Fecha'),
+		array('field' => 'glosa_cliente', 'title' => 'Cliente'),
 		array('field' => 'asuntos', 'title' => 'Asunto'),
 		array('field' => 'tipo_moneda', 'title' => 'Moneda'),
 		array('field' => 'monto', 'title' => 'Monto'),
-		array('field' => 'saldo_pago', 'title' => 'Saldo')
+		array('field' => 'saldo_pago', 'title' => 'Saldo'),
+		array('field' => 'tipo_pago_glosa', 'title' => 'Tipo'),
+		array('field' => 'banco_nombre', 'title' => 'Banco'),
+		array('field' => 'numero_cuenta', 'title' => 'Cuenta'),
+		array('field' => 'uso', 'title' => 'Uso'),
+		array('field' => 'cobros', 'title' => 'Cobros'),
+		array('field' => 'facturas', 'title' => 'Facturas')
 	);
 
 	function formatoFecha($fecha) {
@@ -23,55 +28,82 @@ class Adelanto extends Documento {
 	}
 
 	function searchQuery() {
-		$where = (isset($this->extra_fields['eliminados']) ? 'es_adelanto = -1' : 'es_adelanto = 1');
+		$where = 'adelanto.es_adelanto = ' . (isset($this->extra_fields['eliminados']) ? -1 : 1);
 
 		if (isset($this->extra_fields['tiene_saldo']) && $this->extra_fields['tiene_saldo'] == 1) {
-			$where .= ' AND saldo_pago < 0 ';
+			$where .= ' AND adelanto.saldo_pago < 0 ';
 		}
-		if (!empty($this->fields['id_documento'])) {
-			$id_documento = intval($this->fields['id_documento']);
-			$where .= " AND documento.id_documento = {$id_documento}";
+		if (!empty($this->extra_fields['id_documento'])) {
+			$id_documento = intval($this->extra_fields['id_documento']);
+			$where .= " AND adelanto.id_documento = {$id_documento}";
 		}
-		if (!empty($this->extra_fields['campo_codigo_asunto'])) {
-			$where .= " AND asuntos.codigo_asuntos like '%{$this->extra_fields['campo_codigo_asunto']}%'";
+		if (!empty($this->fields['codigo_asunto'])) {
+			$where .= " AND asuntos.codigo_asuntos like '%{$this->fields['codigo_asunto']}%'";
 		}
-		if (!empty($this->extra_fields['codigo_cliente'])) {
-			$where .= " AND cliente.codigo_cliente = '{$this->extra_fields['codigo_cliente']}' ";
+		if (!empty($this->fields['codigo_cliente'])) {
+			$where .= " AND cliente.codigo_cliente = '{$this->fields['codigo_cliente']}' ";
 		}
 		if (!empty($this->fields['id_contrato'])) {
 			$id_contrato = intval($this->fields['id_contrato']);
-			$where .= " AND (documento.id_contrato = '{$id_contrato}' OR documento.id_contrato IS NULL)";
+			$where .= " AND (adelanto.id_contrato = '{$id_contrato}' OR adelanto.id_contrato IS NULL)";
 		}
 		if (!empty($this->extra_fields['fecha1'])) {
 			$fecha1 = $this->formatoFecha($this->extra_fields['fecha1']);
-			$where .= " AND documento.fecha >= {$fecha1}";
+			$where .= " AND adelanto.fecha >= {$fecha1}";
 		}
 		if (!empty($this->extra_fields['fecha2'])) {
 			$fecha2 = $this->formatoFecha($this->extra_fields['fecha2']);
-			$where .= " AND documento.fecha <= {$fecha2}";
+			$where .= " AND adelanto.fecha <= {$fecha2}";
 		}
 		if (!empty($this->extra_fields['moneda_adelanto'])) {
 			$id_moneda = intval($this->extra_fields['moneda']);
-			$where .= " AND documento.id_moneda = {$id_moneda}";
+			$where .= " AND adelanto.id_moneda = {$id_moneda}";
+		}
+
+		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			$select_group_concat = "GROUP_CONCAT(factura_cobro.id_cobro) AS cobros,
+				GROUP_CONCAT(factura.id_factura) AS facturas";
+			$left_join = "LEFT JOIN neteo_documento ON neteo_documento.id_documento_pago = adelanto.id_documento
+				LEFT JOIN factura_pago ON factura_pago.id_neteo_documento_adelanto = neteo_documento.id_neteo_documento
+				LEFT JOIN factura ON factura.id_factura = factura_pago.id_factura_pago
+				LEFT JOIN factura_cobro ON factura.id_factura = factura_cobro.id_factura";
+		} else {
+			$select_group_concat = "GROUP_CONCAT(documento_cobro.id_cobro) AS cobros,
+				GROUP_CONCAT(cobro.documento) AS facturas";
+			$left_join = "LEFT JOIN neteo_documento ON neteo_documento.id_documento_pago = adelanto.id_documento
+				LEFT JOIN documento AS documento_cobro ON documento_cobro.id_documento = neteo_documento.id_documento_cobro
+				LEFT JOIN cobro ON cobro.id_cobro = documento_cobro.id_cobro";
 		}
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
-			documento.id_documento,
+			adelanto.id_documento,
 			cliente.glosa_cliente,
-			documento.fecha,
-			IF(documento.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(glosa_asunto)) AS asuntos,
-			IF(documento.monto = 0, 0, documento.monto * -1) AS monto,
-			IF(documento.saldo_pago = 0, 0, documento.saldo_pago * -1) AS saldo_pago,
-			documento.glosa_documento,
+			adelanto.fecha,
+			IF(adelanto.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(glosa_asunto)) AS asuntos,
+			IF(adelanto.monto = 0, 0, adelanto.monto * -1) AS monto,
+			IF(adelanto.saldo_pago = 0, 0, adelanto.saldo_pago * -1) AS saldo_pago,
+			adelanto.glosa_documento,
 			prm_moneda.id_moneda,
-			prm_moneda.simbolo AS tipo_moneda,
-			prm_moneda.cifras_decimales
-		FROM documento
-			JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
-			JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
-			LEFT JOIN asunto ON documento.codigo_cliente = asunto.codigo_cliente AND (documento.id_contrato = asunto.id_contrato)
+			prm_moneda.glosa_moneda AS tipo_moneda,
+			prm_moneda.cifras_decimales,
+			prm_tipo_pago.glosa AS tipo_pago_glosa,
+			prm_banco.nombre AS banco_nombre,
+			cuenta_banco.numero AS numero_cuenta,
+			IF(adelanto.pago_honorarios = 1 AND adelanto.pago_gastos = 1, 'HyG',
+			IF(adelanto.pago_honorarios = 1 AND adelanto.pago_gastos = 0, 'H',
+			IF(adelanto.pago_honorarios = 0 AND adelanto.pago_gastos = 1, 'G',
+			''))) AS uso,
+			{$select_group_concat}
+		FROM documento AS adelanto
+			JOIN prm_moneda ON prm_moneda.id_moneda = adelanto.id_moneda
+			JOIN cliente ON cliente.codigo_cliente = adelanto.codigo_cliente
+			LEFT JOIN asunto ON asunto.codigo_cliente = adelanto.codigo_cliente AND asunto.id_contrato = adelanto.id_contrato
+			LEFT JOIN prm_tipo_pago ON prm_tipo_pago.codigo = adelanto.tipo_doc
+			LEFT JOIN prm_banco ON prm_banco.id_banco = adelanto.id_banco
+			LEFT JOIN cuenta_banco ON cuenta_banco.id_banco = adelanto.id_banco
+			{$left_join}
 		WHERE {$where}
-		GROUP BY documento.id_documento, cliente.glosa_cliente, documento.fecha, documento.monto, documento.saldo_pago, documento.glosa_documento, prm_moneda.id_moneda";
+		GROUP BY adelanto.id_documento";
 
 		return $query;
 	}
