@@ -38,7 +38,7 @@ class Adelanto extends Documento {
 			$where .= " AND adelanto.id_documento = {$id_documento}";
 		}
 		if (!empty($this->fields['codigo_asunto'])) {
-			$where .= " AND asuntos.codigo_asuntos like '%{$this->fields['codigo_asunto']}%'";
+			$where .= " AND asunto.codigo_asunto like '%{$this->fields['codigo_asunto']}%'";
 		}
 		if (!empty($this->fields['codigo_cliente'])) {
 			$where .= " AND cliente.codigo_cliente = '{$this->fields['codigo_cliente']}' ";
@@ -56,7 +56,7 @@ class Adelanto extends Documento {
 			$where .= " AND adelanto.fecha <= {$fecha2}";
 		}
 		if (!empty($this->extra_fields['moneda_adelanto'])) {
-			$id_moneda = intval($this->extra_fields['moneda']);
+			$id_moneda = intval($this->extra_fields['moneda_adelanto']);
 			$where .= " AND adelanto.id_moneda = {$id_moneda}";
 		}
 
