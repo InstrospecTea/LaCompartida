@@ -8,6 +8,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 class Adelanto extends Documento {
 
 	public static $configuracion_reporte = array(
+		array('field' => 'id_documento', 'title' => 'Nº Adelanto'),
 		array('field' => 'fecha', 'title' => 'Fecha'),
 		array('field' => 'glosa_cliente', 'title' => 'Cliente'),
 		array('field' => 'asuntos', 'title' => 'Asunto'),
@@ -15,6 +16,7 @@ class Adelanto extends Documento {
 		array('field' => 'monto', 'title' => 'Monto'),
 		array('field' => 'saldo_pago', 'title' => 'Saldo'),
 		array('field' => 'tipo_pago_glosa', 'title' => 'Tipo'),
+		array('field' => 'glosa_documento', 'title' => 'Descripción'),
 		array('field' => 'banco_nombre', 'title' => 'Banco'),
 		array('field' => 'numero_cuenta', 'title' => 'Cuenta'),
 		array('field' => 'uso', 'title' => 'Uso'),
@@ -61,12 +63,15 @@ class Adelanto extends Documento {
 		}
 
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-			$select_group_concat = "GROUP_CONCAT(factura_cobro.id_cobro) AS cobros,
-				GROUP_CONCAT(factura.id_factura) AS facturas";
+			$select_group_concat = "GROUP_CONCAT(documento_cobro.id_cobro) AS cobros,
+				GROUP_CONCAT(factura.numero) AS facturas";
 			$left_join = "LEFT JOIN neteo_documento ON neteo_documento.id_documento_pago = adelanto.id_documento
+				LEFT JOIN documento AS documento_cobro ON documento_cobro.id_documento = neteo_documento.id_documento_cobro
 				LEFT JOIN factura_pago ON factura_pago.id_neteo_documento_adelanto = neteo_documento.id_neteo_documento
-				LEFT JOIN factura ON factura.id_factura = factura_pago.id_factura_pago
-				LEFT JOIN factura_cobro ON factura.id_factura = factura_cobro.id_factura";
+				LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura_pago.id_factura_pago = ccfm.id_factura_pago
+				LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+				LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+				LEFT JOIN factura ON factura.id_factura = ccfm2.id_factura";
 		} else {
 			$select_group_concat = "GROUP_CONCAT(documento_cobro.id_cobro) AS cobros,
 				GROUP_CONCAT(cobro.documento) AS facturas";
@@ -79,7 +84,7 @@ class Adelanto extends Documento {
 			adelanto.id_documento,
 			cliente.glosa_cliente,
 			adelanto.fecha,
-			IF(adelanto.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(glosa_asunto)) AS asuntos,
+			IF(adelanto.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(DISTINCT asunto.glosa_asunto ORDER BY asunto.glosa_asunto ASC)) AS asuntos,
 			IF(adelanto.monto = 0, 0, adelanto.monto * -1) AS monto,
 			IF(adelanto.saldo_pago = 0, 0, adelanto.saldo_pago * -1) AS saldo_pago,
 			adelanto.glosa_documento,
