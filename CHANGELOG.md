@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.10
+Martes 30 de Septiembre 2014
+* **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+
 ## Hotfix: 14.16.9
 Lunes 29 de Septiembre 2014
 * **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)

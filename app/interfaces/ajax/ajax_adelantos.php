@@ -6,64 +6,14 @@ $sesion = new Sesion(array('OFI', 'COB', 'SEC'));
 $params_array['codigo_permiso'] = 'COB';
 $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
-function formatofecha($fechasucia) {
-	$fechasucia = explode('-', str_replace('/', '-', $fechasucia));
-	$fechalimpia = intval($fechasucia[2] . $fechasucia[1] . $fechasucia[0]);
-	return $fechalimpia;
-}
-
 if ($_REQUEST['accion'] == 'listaadelanto') {
 	$limitdesde = isset($_REQUEST['iDisplayStart']) ? $_REQUEST['iDisplayStart'] : '0';
 	$limitcantidad = isset($_REQUEST['iDisplayLength']) ? $_REQUEST['iDisplayLength'] : '25';
 
-	if (empty($where)) {
-		$where = 1;
-	}
-
-	$where .= ' AND ' . (isset($_GET['eliminados']) ? 'es_adelanto = -1' : 'es_adelanto = 1');
-	if (isset($_GET['tiene_saldo']) && $_GET['tiene_saldo'] == 1) {
-		$where .= ' AND saldo_pago < 0 ';
-	}
-	if (!empty($_GET['id_documento'])) {
-		$where .= ' AND documento.id_documento = ' . intval($_GET['id_documento']);
-	}
-	if (!empty($_GET['campo_codigo_asunto'])) {
-		$where .= " AND asuntos.codigo_asuntos like '%{$_GET['campo_codigo_asunto']}%'";
-	}
-	if (!empty($_GET['codigo_cliente'])) {
-		$where .= " AND cliente.codigo_cliente = '{$_GET['codigo_cliente']}' ";
-	}
-	if (!empty($_GET['id_contrato'])) {
-		$where .= " AND (documento.id_contrato = '" . intval($_GET['id_contrato']) . "' OR documento.id_contrato IS NULL)";
-	}
-	if (!empty($_GET['fecha1'])) {
-		$where .= ' AND documento.fecha >= ' . formatofecha($_GET['fecha1']);
-	}
-	if (!empty($_GET['fecha2'])) {
-		$where .= ' AND documento.fecha <=  ' . formatofecha($_GET['fecha2']);
-	}
-	if (!empty($_GET['moneda_adelanto'])) {
-		$where .= ' AND documento.id_moneda = ' . intval($_GET['moneda']);
-	}
-
-	$query = "SELECT SQL_CALC_FOUND_ROWS
-		documento.id_documento,
-		cliente.glosa_cliente,
-		documento.fecha,
-		IF(documento.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(glosa_asunto)) AS asuntos,
-		IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
-		IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
-		documento.glosa_documento,
-		prm_moneda.id_moneda,
-		prm_moneda.cifras_decimales
-		FROM
-			documento
-			JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
-			JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
-			LEFT JOIN asunto ON documento.codigo_cliente = asunto.codigo_cliente AND (documento.id_contrato = asunto.id_contrato)
-		WHERE $where
-		GROUP BY documento.id_documento, cliente.glosa_cliente, documento.fecha, documento.monto, documento.saldo_pago, documento.glosa_documento, prm_moneda.id_moneda
-		LIMIT $limitdesde, $limitcantidad";
+	$Adelanto = new Adelanto($sesion);
+	$Adelanto->Fill($_REQUEST);
+	$query = $Adelanto->searchQuery();
+	$query .= " LIMIT {$limitdesde}, {$limitcantidad}";
 
 	try {
 		$resp = $sesion->pdodbh->query($query);
@@ -81,6 +31,7 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 			'iTotalDisplayRecords' => 0,
 			'aaData' => array()
 		);
+
 		echo json_encode($resultado);
 		exit;
 	}
@@ -92,16 +43,7 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 	);
 
 	foreach ($resp as $fila) {
-		$data['aaData'][] = array(
-			$fila[0],
-			$fila[1],
-			$fila[2],
-			$fila[3],
-			$fila[4],
-			$fila[5],
-			$fila[6],
-			$fila[7]
-		);
+		$data['aaData'][] = array($fila[0], $fila[1], $fila[2], $fila[3], $fila[4], $fila[5], $fila[6], $fila[7]);
 	}
 	echo json_encode(UtilesApp::utf8izar($data));
 } else if ($_REQUEST['accion'] == 'desborraadelanto') {
@@ -119,7 +61,6 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 		}
 	}
 } else if ($_REQUEST['accion'] == 'borraadelanto') {
-
 	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	if ($p_cobranza) {
 		$documento = new Documento($sesion);
@@ -134,7 +75,6 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 				echo "jQuery('#mensaje').html('El adelanto no puede eliminarse: ha sido utilizado en al menos  " . __('un cobro') . "'); ";
 			} else {
 				echo "jQuery('#mensaje').html('borrando adelanto...'); ";
-				//$documento->Delete();
 				$documento->Edit('es_adelanto', '-1');
 				$documento->Write();
 			}
@@ -145,4 +85,3 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 		echo "jQuery('#mensaje').html('Usted no tiene permiso para eliminar o editar adelantos'); ";
 	}
 }
-
