@@ -310,7 +310,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$query = "SELECT SUM( IF( trabajo.cobrable =1, trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) /3600, 0 ) ) FROM trabajo WHERE id_cobro = '" . $Cobro->fields['id_cobro'] . "' ";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($monto_thh) = mysql_fetch_array($resp);
-	$monto_thh = number_format($monto_thh, 2, '.', '');
 
 	if ($monto_thh > 0) {
 		$factor_proporcional_forma_cobro =
