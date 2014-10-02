@@ -267,6 +267,7 @@ class CartaCobro extends NotaCobro {
             '%logo_carta%' => 'Obtiene logo carta desde el Conf::Server(). Conf::ImgDir() (no utilizar deprecado)',
             '%num_letter%' => 'Obtiene campo id_cobro desde tabla cobro',
             '%num_letter_documento%' => 'Obtiene campo documento desde tabla cobro',
+            '%salto_pagina%' => 'Inserta salto de pagina',
         ),
         'DATOS_CLIENTE' => array(
             '%ApellidoContacto%' => 'Obtiene campo apellido_contacto desde tabla contrato',
@@ -2456,6 +2457,7 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%direccion%', $pie_pagina, $html2);
                 $html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
                 $html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
+                $html2 = str_replace('%salto_pagina%', '<br style="page-break-after:always;">', $html2);
                 break;
 
             case 'DATOS_CLIENTE': //GenerarDocumentoCartaComun
