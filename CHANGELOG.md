@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.11
+Jueves 2 de Octubre 2014
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
+
 ## Hotfix: 14.16.10
 Martes 30 de Septiembre 2014
 * **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
