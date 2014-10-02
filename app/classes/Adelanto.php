@@ -21,7 +21,7 @@ class Adelanto extends Documento {
 		array('field' => 'numero_cuenta', 'title' => 'Cuenta'),
 		array('field' => 'uso', 'title' => 'Uso'),
 		array('field' => 'cobros', 'title' => 'Cobros'),
-		array('field' => 'facturas', 'title' => 'Facturas')
+		array('field' => 'facturas', 'title' => 'Documentos Legales')
 	);
 
 	function formatoFecha($fecha) {
