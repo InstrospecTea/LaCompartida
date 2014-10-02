@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.16.12
 Jueves 2 de Octubre 2014
-* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/705)
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
 
 ## Hotfix: 14.16.11
 Jueves 2 de Octubre 2014
