@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix: 14.16.9
+Lunes 29 de Septiembre 2014
+* **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)
+
+## Hotfix: 14.16.8
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige NotaCobro para mostrar trabajos segun opcion](https://github.com/LemontechSA/ttb/pull/701)
+
 ## Hotfix: 14.16.7
 Jueves 25 de Septiembre 2014
 * **Fixed:** [Corrige problemas de visualizacion de IVA en DTE](https://github.com/LemontechSA/ttb/pull/700)
