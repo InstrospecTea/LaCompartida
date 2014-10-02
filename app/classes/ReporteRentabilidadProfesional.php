@@ -374,6 +374,8 @@ class ReporteRentabilidadProfesional {
 			->add_from('usuario', 'u')
 			->add_inner_join_with('usuario_permiso up', "up.id_usuario = u.id_usuario AND up.codigo_permiso = 'PRO'")
 			->add_left_join_with_criteria($resumen_usuarios, 'ru', 'ru.id_usuario = u.id_usuario')
+			// WHERE
+			->add_restriction(new CriteriaRestriction("u.visible = 1"))
 			// GROUP
 			->add_grouping('u.id_usuario');
 
