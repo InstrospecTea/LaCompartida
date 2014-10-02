@@ -5,6 +5,10 @@ $sesion = new Sesion(array('OFI', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
 $documento = new Documento($sesion);
 $cliente = new Cliente($sesion);
+$Form = new Form();
+
+$Adelanto = new Adelanto($sesion);
+$Adelanto->Fill($_REQUEST);
 
 $pagina->titulo = __('Revisar Adelantos');
 
@@ -26,6 +30,10 @@ if ($opc == "eliminar" and !empty($id_documento_e)) {
 	}
 }
 
+if ($opc == 'descargar_excel') {
+	$Adelanto->DownloadExcel();
+}
+
 $pagina->PrintTop();
 
 $codigo_cliente = empty($codigo_cliente) && $codigo_cliente_secundario ? $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario) : $codigo_cliente;
@@ -35,7 +43,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 ?>
 
 <link rel="stylesheet" href="//static.thetimebilling.com/css/jquery.dataTables.css" />
-<script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
+<script src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
 <script type="text/javascript">
@@ -158,8 +166,8 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 				"sPaginationType": "full_numbers",
 				"sDom":  'T<"top"ip>rt<"bottom">',
 				"oTableTools": {
-					"sSwfPath": "../js/copy_cvs_xls.swf",
-					"aButtons": [ "xls","copy" ]
+					"sSwfPath": "",
+					"aButtons": []
 				}
 			}).show();
 		});
@@ -190,8 +198,8 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	<tr>
 		<td>
 			<form method='post' name="form_adelantos" action='adelantos.php' id="form_adelantos">
-				<input  id="xdesde"  name="xdesde" type="hidden" value="">
-				<input type='hidden' name='opc' id='opc' value=buscar>
+				<input id="xdesde"  name="xdesde" type="hidden" value="">
+				<input type="hidden" name="opc" id="opc" value="buscar">
 				<!-- Calendario DIV -->
 				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 					<div class="floating" id="calendar"></div>
@@ -252,13 +260,18 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 						</tr>
 						<tr>
 							<td></td>
-							<td colspan=2 align=left>
-								<input name="boton_buscar" id="boton_buscar" type="button" value="<?php echo __('Buscar') ?>" class="btn">
+							<td colspan="2" align="left">
+								<?php
+									echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar'));
+									echo $Form->icon_submit(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'onclick' => "jQuery('#opc').val('descargar_excel')"));
+								 ?>
 							</td>
 							<td width='40%' align="right">
-								<?php if ($p_cobranza->fields['permitido']) { ?>
-									<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('adelanto')" title="Agregar Adelanto"><?php echo __('Agregar') ?> <?php echo __('adelanto') ?></a>
-								<?php } ?>
+								<?php
+									if ($p_cobranza->fields['permitido']) {
+										echo $Form->icon_button(__('Agregar') . ' ' . __('adelanto'), 'agregar', array('id' => 'boton_excel', 'onclick' => "AgregarNuevo('adelanto')"));
+									}
+								?>
 							</td>
 						</tr>
 					</table>
@@ -286,5 +299,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 		<tbody></tbody>
 	</table>
 </div>
+
 <?php
+echo $Form->script();
 $pagina->PrintBottom();
