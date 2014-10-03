@@ -12,11 +12,11 @@ class Adelanto extends Documento {
 		array('field' => 'fecha', 'title' => 'Fecha'),
 		array('field' => 'glosa_cliente', 'title' => 'Cliente'),
 		array('field' => 'asuntos', 'title' => 'Asunto'),
+		array('field' => 'glosa_documento', 'title' => 'Descripción'),
 		array('field' => 'tipo_moneda', 'title' => 'Moneda'),
 		array('field' => 'monto', 'title' => 'Monto'),
 		array('field' => 'saldo_pago', 'title' => 'Saldo'),
 		array('field' => 'tipo_pago_glosa', 'title' => 'Tipo'),
-		array('field' => 'glosa_documento', 'title' => 'Descripción'),
 		array('field' => 'banco_nombre', 'title' => 'Banco'),
 		array('field' => 'numero_cuenta', 'title' => 'Cuenta'),
 		array('field' => 'uso', 'title' => 'Uso'),
@@ -63,8 +63,8 @@ class Adelanto extends Documento {
 		}
 
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-			$select_group_concat = "GROUP_CONCAT(documento_cobro.id_cobro) AS cobros,
-				GROUP_CONCAT(factura.numero) AS facturas";
+			$select_group_concat = "GROUP_CONCAT(DISTINCT documento_cobro.id_cobro ORDER BY documento_cobro.id_cobro ASC) AS cobros,
+				GROUP_CONCAT(DISTINCT factura.numero ORDER BY factura.numero ASC) AS facturas";
 			$left_join = "LEFT JOIN neteo_documento ON neteo_documento.id_documento_pago = adelanto.id_documento
 				LEFT JOIN documento AS documento_cobro ON documento_cobro.id_documento = neteo_documento.id_documento_cobro
 				LEFT JOIN factura_pago ON factura_pago.id_neteo_documento_adelanto = neteo_documento.id_neteo_documento
@@ -73,8 +73,8 @@ class Adelanto extends Documento {
 				LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 				LEFT JOIN factura ON factura.id_factura = ccfm2.id_factura";
 		} else {
-			$select_group_concat = "GROUP_CONCAT(documento_cobro.id_cobro) AS cobros,
-				GROUP_CONCAT(cobro.documento) AS facturas";
+			$select_group_concat = "GROUP_CONCAT(DISTINCT documento_cobro.id_cobro ORDER BY documento_cobro.id_cobro ASC) AS cobros,
+				GROUP_CONCAT(DISTINCT cobro.documento ORDER BY cobro.documento ASC) AS facturas";
 			$left_join = "LEFT JOIN neteo_documento ON neteo_documento.id_documento_pago = adelanto.id_documento
 				LEFT JOIN documento AS documento_cobro ON documento_cobro.id_documento = neteo_documento.id_documento_cobro
 				LEFT JOIN cobro ON cobro.id_cobro = documento_cobro.id_cobro";
