@@ -540,8 +540,14 @@ class Asunto extends Objeto {
 					}
 				}
 			}
+			return true;
+		} else {
+			#Nota:
+			#Si la eliminación del asunto salió mal, es por algo que ocurre en CheckDelete. EL llamado
+			#del mencionado método se realiza en Objeto.php, ya que esta clase lo sobrecarga, y efectivamente contiene
+			#reglas de negocio respecto a cuando se puede eliminar un asunto.
+			return false;
 		}
-		return true;
 	}
 
 	public function QueryReporte($filtros = array()) {

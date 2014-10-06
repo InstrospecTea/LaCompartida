@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
 ## Hotfix: 14.16.12
 Jueves 2 de Octubre 2014
 * **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
