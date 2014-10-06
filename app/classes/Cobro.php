@@ -403,7 +403,6 @@ if (!class_exists('Cobro')) {
 
 		function TotalesDelContrato($facturas, $nuevomodulofactura = false, $id_cobro = null) {
 			$totales = array();
-
 			if (count($facturas) > 0) {
 				foreach ($facturas as $facturaarray) {
 
@@ -447,7 +446,7 @@ if (!class_exists('Cobro')) {
 					$totales['contrato']['monto_honorarios+gastos_moneda']+=$monto_gastos_moneda + $monto_honorarios_moneda;
 					$totales['contrato']['saldo_honorarios']+=$saldo_honorarios;
 					$totales['contrato']['saldo_gastos']+=$saldo_gastos;
-
+					$totales['contrato']['moneda_saldo'] = $factura['id_moneda'];
 					$totales['contrato']['simbolo_moneda_total'] = $factura['simbolo_moneda_total'];
 
 					if ($id_cobro != null && $factura['id_cobro'] == $id_cobro) {
@@ -466,6 +465,7 @@ if (!class_exists('Cobro')) {
 						$totales[$id_cobro]['saldo_honorarios']+=$saldo_honorarios;
 						$totales[$id_cobro]['saldo_gastos']+=$saldo_gastos;
 						$totales[$id_cobro]['simbolo_moneda_total'] = $factura['simbolo_moneda_total'];
+						$totales[$id_cobro]['moneda_saldo'] = $factura['id_moneda'];
 					}
 				}
 			}
@@ -2722,19 +2722,20 @@ if (!class_exists('Cobro')) {
 			}
 			$saldo_pagos = 0;
 			$saldo_adelantos = 0;
-
+			$saldo = 0;
 			if ($this->TienePagosAdelantos()) {
 				$query = "SELECT
 							doc_pago.es_adelanto,
 							doc_pago.glosa_documento,
 							(neteo_documento.valor_cobro_honorarios + neteo_documento.valor_cobro_gastos) * -1 AS monto,
 							doc_pago.fecha,
-							prm_moneda.tipo_cambio
+							prm_moneda.tipo_cambio,
+							prm_moneda.id_moneda
 						FROM documento AS doc_pago
 						INNER JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
 						INNER JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
 						INNER JOIN prm_moneda ON prm_moneda.id_moneda = doc_pago.id_moneda
-						WHERE doc.id_cobro = " . $this->fields['id_cobro'];
+						WHERE doc.id_cobro = " . $id_cobro;
 				$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				while ($pago = mysql_fetch_assoc($pagos)) {
 					$fila_adelanto_ = str_replace('%descripcion%', substr($pago['glosa_documento'], 0, 30 + strpos(' ', substr($pago['glosa_documento'], 30, 50))) . ' (' . $pago['fecha'] . ')', $html);
@@ -2752,12 +2753,36 @@ if (!class_exists('Cobro')) {
 				}
 			}
 
-			//$facturasRS=$this->ArrayFacturasDelContrato($this->sesion,$nuevomodulofactura);
 			$totales = $this->ArrayTotalesDelContrato;
-
+			if (empty($totales)) { #Generar totales del contrato si no han sido generados
+				$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
+				$facturas = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);	
+				# TotalesDelContrato() solo entrega valores del Cobro si es que existen facturas
+				# TotalesDelContrato() solo entrega valores del Contrato si es que existen facturas
+				$totales = $this->TotalesDelContrato($facturas, $nuevomodulofactura, $id_cobro);
+			}
+			
+			if (empty($this->x_resultados)) { #Generar totales del cobro si no han sido generados
+				$this->x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+			}
 			$saldo_total_cobro = $totales[$id_cobro]['saldo_honorarios'] + $totales[$id_cobro]['saldo_gastos'];
-			$saldo_total_adeudado = $totales['contrato']['saldo_honorarios'] + $totales['contrato']['saldo_gastos'];
-			$saldo_total_contrato = $saldo_total_adeudado - $saldo_total_cobro;
+			$saldo_contrato = $totales['contrato']['saldo_honorarios'] + $totales['contrato']['saldo_gastos'];
+			$moneda_saldo = $totales['contrato']['moneda_saldo']; 
+			if (empty($moneda_saldo)) {
+				$moneda_saldo = $this->fields['opc_moneda_total'];
+			}
+			$monto_total_cobro = (float) $this->x_resultados['monto_cobro_original_con_iva'][$moneda_saldo];
+			$saldo_otras_liquidaciones = $saldo_contrato - $saldo_total_cobro;
+
+			$saldo_total_cobro_sinfactura = $monto_total_cobro + $saldo_pagos;
+			$saldo_contrato_sinfactura = $saldo_contrato - $saldo_total_cobro + $monto_total_cobro + $saldo_pagos;
+			$saldo_otras_liquidaciones_sinfactura = $saldo_contrato_sinfactura - $saldo_total_cobro_sinfactura;
+
+			if (($this->fields['estado']== 'CREADO' || $this->fields['estado']=='EN REVISION') && $saldo_total_cobro == 0) {
+				$saldo_total_cobro = $saldo_total_cobro_sinfactura;
+				$saldo_contrato = $saldo_contrato_sinfactura;
+				$saldo_otras_liquidaciones = $saldo_otras_liquidaciones_sinfactura;
+			}
 
 			return array(
 				'montoadelantosinasignar' => $monto_adelantos_sin_asignar['legacy'],
@@ -2768,9 +2793,14 @@ if (!class_exists('Cobro')) {
 				'saldo_adelantos' => $saldo_adelantos,
 				'saldo_pagos' => $saldo_pagos,
 				'fila_adelantos' => $fila_adelantos,
-				'saldo_total_contrato' => $saldo_total_contrato,
+				'saldo_otras_liquidaciones' => $saldo_otras_liquidaciones,
 				'saldo_total_cobro' => $saldo_total_cobro,
-				'saldo_total_adeudado' => $saldo_total_adeudado,
+				'saldo_contrato' => $saldo_contrato,
+				'monto_total_cobro' => $monto_total_cobro,
+				'saldo_total_cobro_sinfactura' => $saldo_total_cobro_sinfactura,
+				'saldo_contrato_sinfactura' => $saldo_contrato_sinfactura,
+				'saldo_otras_liquidaciones_sinfactura' => $saldo_otras_liquidaciones_sinfactura,
+				'moneda_saldo' => $moneda_saldo
 			);
 		}
 

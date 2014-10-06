@@ -1571,7 +1571,7 @@ class Factura extends Objeto {
 					// Segmento de codigo para factura word expertise
 					$segmento = '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					$cantidad = 1;
-					for ($cantidad = 0; $cantidad < 18; $cantidad++) { 
+					for ($cantidad = 0; $cantidad < 18; $cantidad++) {
 						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					}
 					$html2 = str_replace('%desglose_gastos%', $segmento, $html2);
@@ -1675,7 +1675,7 @@ class Factura extends Objeto {
 
 					$segmento = '';
 
-					for ($K = 0; $k < $diff_gastos; $k++) { 
+					for ($K = 0; $k < $diff_gastos; $k++) {
 						$segmento.='<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 					}
 
@@ -2604,7 +2604,8 @@ class Factura extends Objeto {
 					prm_documento_legal.codigo as cod_tipo,
 					factura.id_moneda,
 					pm.tipo_cambio,
-					pm.cifras_decimales
+					pm.cifras_decimales,
+					factura_cobro.id_cobro
 					FROM factura
 					JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
 					LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura

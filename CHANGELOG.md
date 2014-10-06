@@ -1,5 +1,57 @@
 # Changelog
 
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
+## Hotfix: 14.16.12
+Jueves 2 de Octubre 2014
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
+
+## Hotfix: 14.16.11
+Jueves 2 de Octubre 2014
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
+
+## Hotfix: 14.16.10
+Martes 30 de Septiembre 2014
+* **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+
+## Hotfix: 14.16.9
+Lunes 29 de Septiembre 2014
+* **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)
+
+## Hotfix: 14.16.8
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige NotaCobro para mostrar trabajos segun opcion](https://github.com/LemontechSA/ttb/pull/701)
+
+## Hotfix: 14.16.7
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige problemas de visualizacion de IVA en DTE](https://github.com/LemontechSA/ttb/pull/700)
+
+## Hotfix: 14.16.6
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige Modificación de tareas](https://github.com/LemontechSA/ttb/pull/699)
+
+## Hotfix: 14.16.5
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige eliminación y búsqueda de trámites](https://github.com/LemontechSA/ttb/pull/698)
+
+## Hotfix: 14.16.4
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Mejora edición de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/697)
+
+## Hotfix: 14.16.3
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige problema con IVA en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/693)
+
+## Hotfix: 14.16.2
+Martes 23 de Septiembre 2014
+* **Fixed:** [Corrige suma mal hecha en saldo adeudado (Nota de cobro)](https://github.com/LemontechSA/ttb/pull/695)
+
+## Hotfix: 14.16.1
+Lunes 22 de Septiembre 2014
+* **Fixed:** [Corrige edición de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
+
 ## Release: 14.16.0
 Jueves 11 de Septiembre 2014
 * **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
