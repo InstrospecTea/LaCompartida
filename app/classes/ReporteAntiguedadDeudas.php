@@ -12,6 +12,7 @@ class ReporteAntiguedadDeudas
 	private $criteria;
 	private $sub_criteria;
 	private $and_statements = array();
+	private $or_statements = array();
 	private $report_details = array();
 	
 	//
@@ -790,10 +791,11 @@ class ReporteAntiguedadDeudas
 			# Referencia: http://php.net/manual/es/language.operators.bitwise.php			
 			$honorarios = $tipo_liquidacion & 1;
 			$gastos = $tipo_liquidacion & 2 ? 1 : 0;
+			#Ocasiona un problema de conjunto disjunto contra 3 grupos de cobros. Desactivado.
 			$separar_liquidaciones = ($tipo_liquidacion == '3' ? 0 : 1);
-			$this->and_statements[] = "contrato.separar_liquidaciones  = '$separar_liquidaciones'";
 			$this->and_statements[] = "cobro.incluye_honorarios = '$honorarios'";
 			$this->and_statements[] = "cobro.incluye_gastos = '$gastos'";
+
 		}
 
 		if (!empty($this->datos['id_contrato'])) {
