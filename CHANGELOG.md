@@ -1,5 +1,46 @@
 # Changelog
 
+## Hotfix: 14.17.1
+Martes 7 de Octubre 2014
+* **Fixed:** [Condicion de filtrado por contrato en el reporte de antiguedad de deudas generaba un conjunto disjunto.](https://github.com/LemontechSA/ttb/pull/713)
+
+## Release: 14.17.0
+Lunes 6 de Octubre 2014
+* **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
+* **Fixed:** [Agregar columna Monto Facturable al reporte excel](https://github.com/LemontechSA/ttb/pull/702)
+
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
+## Hotfix: 14.16.12
+Jueves 2 de Octubre 2014
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
+
+## Hotfix: 14.16.11
+Jueves 2 de Octubre 2014
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
+
+## Hotfix: 14.16.10
+Martes 30 de Septiembre 2014
+* **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+
+## Hotfix: 14.16.9
+Lunes 29 de Septiembre 2014
+* **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)
+
+## Hotfix: 14.16.8
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige NotaCobro para mostrar trabajos segun opcion](https://github.com/LemontechSA/ttb/pull/701)
+
+## Hotfix: 14.16.7
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige problemas de visualizacion de IVA en DTE](https://github.com/LemontechSA/ttb/pull/700)
+
+## Hotfix: 14.16.6
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige Modificación de tareas](https://github.com/LemontechSA/ttb/pull/699)
+
 ## Hotfix: 14.16.5
 Miércoles 24 de Septiembre 2014
 * **Fixed:** [Corrige eliminación y búsqueda de trámites](https://github.com/LemontechSA/ttb/pull/698)

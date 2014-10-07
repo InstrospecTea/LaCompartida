@@ -31,15 +31,15 @@ class SimpleReport extends Objeto {
 	 * Define los tipos posibles de reportes excel
 	 *
 	 * @var array('SOLICITUD_ADELANTO',
-	  'FACTURAS',
-	  'FACTURAS_PAGOS',
-	  'HORAS',
-	  'TRAMITES',
-	  'ADELANTOS',
-	  'GASTOS',
-	  'ASUNTOS',
-	  'CLIENTES',
-	  'USUARIOS')
+	 * 'FACTURAS',
+	 * 'FACTURAS_PAGOS',
+	 * 'HORAS',
+	 * 'TRAMITES',
+	 * 'ADELANTOS',
+	 * 'GASTOS',
+	 * 'ASUNTOS',
+	 * 'CLIENTES',
+	 * 'USUARIOS')
 	 */
 	private static $tipos = array(
 		'SOLICITUDES_ADELANTO' => 'SolicitudAdelanto',
@@ -58,10 +58,10 @@ class SimpleReport extends Objeto {
 		'FACTURA_PRODUCCION' => 'FacturaProduccion',
 		'FACTURA_COBRANZA' => 'FacturaProduccion.configuracion_cobranza',
 		'FACTURA_COBRANZA_APLICADA' => 'FacturaProduccion.configuracion_cobranza_aplicada',
-		'GASTOS_NO_COBRABLES' => 'FacturaProduccion.configuracion_gastos'
-//		'TRAMITES' => 'Tramite',
-//		'ADELANTOS' => '',
-//		'USUARIOS' => 'Usuario'
+		'GASTOS_NO_COBRABLES' => 'FacturaProduccion.configuracion_gastos',
+		'ADELANTOS' => 'Adelanto'
+		// 'TRAMITES' => 'Tramite',
+		// 'USUARIOS' => 'Usuario'
 	);
 	public $filters = array();
 
