@@ -38,7 +38,8 @@ class CartaCobro extends NotaCobro {
             '%xnro_factura%' => 'N° del cobro',
             '%glosa_cliente%' => 'Razón social Factura',
             '%xdireccion%' => 'Dirección Factura',
-            '%xrut%' => 'RUT contrato'
+            '%xrut%' => 'RUT contrato',
+            '%page_break%' => 'Agrega un salto de pagina'
         ),
         'FECHA' => array(
             '%fecha_especial%' => 'Ciudad (país), día de mes de año',
@@ -403,6 +404,7 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DATOS_CLIENTE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
                 $html2 = str_replace('%SALTO_PAGINA%', $this->GenerarDocumentoCartaComun($parser_carta, 'SALTO_PAGINA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 
+                $html2 = str_replace('%page_break%', '<br style=""page-break-before: always;/>', $html2);
                 break;
 
             case 'DETALLE': //GenerarDocumentoCarta
