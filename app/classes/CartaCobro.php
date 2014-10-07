@@ -252,7 +252,7 @@ class CartaCobro extends NotaCobro {
             '%subtotal_gastos_sin_provision%' => 'monto gastos sin las provisiones',
             '%subtotal_gastos_solo_provision%' => 'monto gastos solo contando las provisiones',
             '%tipo_cuenta%' => 'tipo_cuenta considera Cuenta Corriente o Cuenta de ahorro segun lo definido en el contrato',
-            '%tipo_gbp_segun_moneda%' => 'Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (gbplegal)',
+            '%tipo_gbp_segun_moneda%' => 'Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (gbplegal)'
         ),
         'ADJ' => array(
             '%cliente_correo%' => 'Obtiene campo email_contacto tabla cobro',
@@ -263,14 +263,13 @@ class CartaCobro extends NotaCobro {
             '%num_letter%' => 'Obtiene campo id_cobro tabla cobro',
             '%num_letter_baz%' => 'Obtiene campo documento tabla cobro',
             '%num_letter_documento%' => 'Obtiene campo documento tabla cobro',
-            '%nro_factura%' => 'Obtiene campo documento tabla cobro',
+            '%nro_factura%' => 'Obtiene campo documento tabla cobro'
         ),
         'PIE' => array(
             '%direccion%' => 'Generado por (Conf PdfLinea2 + Conf PdfLinea3 + Conf SitioWeb + Conf::Email)',
             '%logo_carta%' => 'Obtiene logo carta desde el Conf::Server(). Conf::ImgDir() (no utilizar deprecado)',
             '%num_letter%' => 'Obtiene campo id_cobro desde tabla cobro',
-            '%num_letter_documento%' => 'Obtiene campo documento desde tabla cobro',
-            '%salto_pagina%' => 'Inserta salto de pagina',
+            '%num_letter_documento%' => 'Obtiene campo documento desde tabla cobro'
         ),
         'DATOS_CLIENTE' => array(
             '%ApellidoContacto%' => 'Obtiene campo apellido_contacto desde tabla contrato',
@@ -279,7 +278,7 @@ class CartaCobro extends NotaCobro {
             '%estimado%' => 'estimado(a)',
             '%glosa_cliente%' => 'Obtiene campo factura_razon_social desde tabla contrato',
             '%sr%' => 'Señor',
-            '%SR%' => 'Obtiene campo titulo_contacto desde contrato',
+            '%SR%' => 'Obtiene campo titulo_contacto desde contrato'
         ),
         'FILAS_FACTURAS_DEL_COBRO' => array(
             '%factura_impuesto%' => 'factura_impuesto',
@@ -287,7 +286,7 @@ class CartaCobro extends NotaCobro {
             '%factura_numero%' => 'factura_numero',
             '%factura_periodo%' => 'factura_periodo',
             '%factura_total%' => 'factura_total',
-            '%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto',
+            '%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto'
         ),
         'FILAS_FACTURAS_DEL_COBRO' => array(
             '%factura_pendiente%' => 'factura_pendiente',
@@ -304,10 +303,10 @@ class CartaCobro extends NotaCobro {
             '%simbolo%' => 'simbolo segun id_moneda',
             '%simbolo_mi%' => 'simbolo segun opc_ver_moneda',
             '%total_asunto%' => 'total_asunto',
-            '%total_asunto_mi%' => 'total del asunto segun opc_ver_moneda',
+            '%total_asunto_mi%' => 'total del asunto segun opc_ver_moneda'
         ),
         'FILA_FACTURAS_PENDIENTES' => array(
-            '%facturas_pendientes%' => 'facturas_pendientes',
+            '%facturas_pendientes%' => 'facturas_pendientes'
         ),
         'SALTO_PAGINA' => array()
     );
@@ -395,6 +394,7 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
                 $html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
                 $html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
+                $html2 = str_replace('%page_break%', '<br style=""page-break-before: always;/>', $html2);
 
                 $html2 = str_replace('%FECHA%', $this->GenerarDocumentoCartaComun($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
                 $html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCartaComun($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
@@ -404,7 +404,6 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DATOS_CLIENTE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
                 $html2 = str_replace('%SALTO_PAGINA%', $this->GenerarDocumentoCartaComun($parser_carta, 'SALTO_PAGINA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 
-                $html2 = str_replace('%page_break%', '<br style=""page-break-before: always;/>', $html2);
                 break;
 
             case 'DETALLE': //GenerarDocumentoCarta
@@ -2475,7 +2474,6 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%direccion%', $pie_pagina, $html2);
                 $html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
                 $html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
-                $html2 = str_replace('%salto_pagina%', '<br style="page-break-after:always;">', $html2);
                 break;
 
             case 'DATOS_CLIENTE': //GenerarDocumentoCartaComun
