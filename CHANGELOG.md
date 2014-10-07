@@ -1,5 +1,26 @@
 # Changelog
 
+## Hotfix: 14.17.2
+Martes 7 de Octubre 2014
+* **Fixed:** [Define valores de tabla para cuando no están definidos.](https://github.com/LemontechSA/ttb/pull/714)
+
+## Hotfix: 14.17.1
+Martes 7 de Octubre 2014
+* **Fixed:** [Condicion de filtrado por contrato en el reporte de antiguedad de deudas generaba un conjunto disjunto.](https://github.com/LemontechSA/ttb/pull/713)
+
+## Release: 14.17.0
+Lunes 6 de Octubre 2014
+* **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
+* **Fixed:** [Agregar columna Monto Facturable al reporte excel](https://github.com/LemontechSA/ttb/pull/702)
+
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
+## Hotfix: 14.16.12
+Jueves 2 de Octubre 2014
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
+
 ## Hotfix: 14.16.11
 Jueves 2 de Octubre 2014
 * **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
