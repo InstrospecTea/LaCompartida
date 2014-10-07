@@ -312,8 +312,7 @@ class CartaCobro extends NotaCobro {
     );
 
     function __construct($sesion, $fields, $ArrayFacturasDelContrato, $ArrayTotalesDelContrato) {
-        $this->sesion = $sesion;
-        $this->fields = $fields;
+		parent::__construct($sesion, $fields);
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
 
