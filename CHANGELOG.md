@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.17.3
+Martes 7 de Octubre 2014
+* **Fixed:** [Ancho de columnas en el reporte de rendimiento de profesionales.](https://github.com/LemontechSA/ttb/pull/715)
+
 ## Hotfix: 14.17.2
 Martes 7 de Octubre 2014
 * **Fixed:** [Define valores de tabla para cuando no están definidos.](https://github.com/LemontechSA/ttb/pull/714)
