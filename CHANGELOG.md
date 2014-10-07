@@ -1,5 +1,26 @@
 # Changelog
 
+## Release: 14.17.0
+Lunes 6 de Octubre 2014
+* **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
+* **Fixed:** [Agregar columna Monto Facturable al reporte excel](https://github.com/LemontechSA/ttb/pull/702)
+
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
+## Hotfix: 14.16.12
+Jueves 2 de Octubre 2014
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
+
+## Hotfix: 14.16.11
+Jueves 2 de Octubre 2014
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
+
+## Hotfix: 14.16.10
+Martes 30 de Septiembre 2014
+* **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+
 ## Hotfix: 14.16.9
 Lunes 29 de Septiembre 2014
 * **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)

@@ -10,19 +10,6 @@ class ReporteRentabilidadProfesional {
 	private $sesion;
 	private $criteria;
 	private $sub_criteria;
-	private $and_statements = array();
-	private $report_details = array();
-	//
-	// Opciones de layout
-	//
-
-  //Define el ancho que tendrán los campos numéricos del reporte, que tengan que ver con montos.
-	private $ancho_campo_numerico = 69;
-	//Define el ancho que tendrá el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
-	//añadan antes de los campos numéricos del reporte.
-	private $ancho_campo = 35;
-	private $ancho_campo_numerico_detalle = 70;
-	private $ancho_campo_detalle = 35;
 
 	/**
 	 * Constructor de la clase.
@@ -374,6 +361,8 @@ class ReporteRentabilidadProfesional {
 			->add_from('usuario', 'u')
 			->add_inner_join_with('usuario_permiso up', "up.id_usuario = u.id_usuario AND up.codigo_permiso = 'PRO'")
 			->add_left_join_with_criteria($resumen_usuarios, 'ru', 'ru.id_usuario = u.id_usuario')
+			// WHERE
+			->add_restriction(CriteriaRestriction::equals('u.visible', 1))
 			// GROUP
 			->add_grouping('u.id_usuario');
 
