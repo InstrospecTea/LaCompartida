@@ -1,5 +1,10 @@
 # Changelog
 
+## Release: 14.17.0
+Lunes 6 de Octubre 2014
+* **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
+* **Fixed:** [Agregar columna Monto Facturable al reporte excel](https://github.com/LemontechSA/ttb/pull/702)
+
 ## Hotfix: 14.16.13
 Lunes 6 de Octubre 2014
 * **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
