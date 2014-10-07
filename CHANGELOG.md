@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.17.1
+Martes 7 de Octubre 2014
+* **Fixed:** [Condicion de filtrado por contrato en el reporte de antiguedad de deudas generaba un conjunto disjunto.](https://github.com/LemontechSA/ttb/pull/713)
+
 ## Release: 14.17.0
 Lunes 6 de Octubre 2014
 * **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
