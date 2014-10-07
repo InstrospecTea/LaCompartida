@@ -1079,14 +1079,6 @@ class NotaCobro extends Cobro {
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($id_cobro) = mysql_fetch_array($resp);
 		}
-		if (isset($this->tabla)) {
-			$this->tabla = 'cobro';
-		}
-
-		if (isset($this->campo_id)) {
-			$this->campo_id = 'id_cobro';
-		}
-
 		$this->Load($id_cobro);
 
 		return $this->GenerarEjemplo($parser);
