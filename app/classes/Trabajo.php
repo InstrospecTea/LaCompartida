@@ -661,7 +661,7 @@ class Trabajo extends Objeto
 											SET
 												codigo_asunto = '$codigo_asunto',
 												id_cobro = '$id_cobro',
-												id_usuario = {$usuario->fields['id_usuario']}'',
+												id_usuario = '{$usuario->fields['id_usuario']}',
 												descripcion = '$descripcion',
 												fecha = '$fecha',
 												duracion = '$duracion_trabajada',
