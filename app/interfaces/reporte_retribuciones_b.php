@@ -5,7 +5,7 @@ $sesion = new Sesion();
 $pagina = new Pagina($sesion);
 
 /*
- * El usuario sebe tener los permisos RET y REP para acceder a este reporte.
+ * El usuario debe tener los permisos RET y REP para acceder a este reporte.
  */
 if (!$sesion->usuario->Es('REP') || !$sesion->usuario->Es('RET')) {
 	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a Detalle de ' . __('Retribuciones') . ' por ' . __('Cobro') . '.';

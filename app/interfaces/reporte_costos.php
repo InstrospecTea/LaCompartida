@@ -6,7 +6,7 @@ $sesion = new Sesion();
 $pagina = new Pagina($sesion);
 
 /*
- * Debe tener habilitado la Conf ReportesAvanzados y el usuario sebe tener los permisos ADM y REP para acceder a este reporte.
+ * Debe tener habilitado la Conf ReportesAvanzados y el usuario debe tener los permisos ADM y REP para acceder a este reporte.
  */
 if (!Conf::GetConf($sesion, 'ReportesAvanzados') || !$sesion->usuario->Es('ADM') || !$sesion->usuario->Es('REP')) {
 	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reporte costos') . '.';

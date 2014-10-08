@@ -8,7 +8,7 @@ $moneda_base = Utiles::MonedaBase($sesion);
 $pagina = new Pagina($sesion);
 
 /*
- * El usuario sebe tener los permisos RET y REP para acceder a este reporte.
+ * El usuario debe tener los permisos RET y REP para acceder a este reporte.
  */
 if (!$sesion->usuario->Es('REP') || !$sesion->usuario->Es('RET')) {
 	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a Resumen de ' . __('Retribuciones') . ' por ' . __('Profesional') . '.';
