@@ -1,12 +1,5 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
@@ -20,12 +13,12 @@
 		$fecha_anio = date('Y');
 		$fecha_mes = date('m');
 		$dia_fin_mes = date('t');
-	
+
 		$fecha_fin = $dia_fin_mes."-".$fecha_mes."-".$fecha_anio;
 		$fecha_ini = "01-".$fecha_mes."-".$fecha_anio;
 	}
 
-	
+
 ?>
 
 <form method='post' name='formulario'>
@@ -97,7 +90,7 @@
 	</tr>
 
 </table>
-	
+
 </form>
 <script>
 </script>
@@ -119,7 +112,7 @@
 			$url_usuarios .= $usuarios;
 		else
 			$url_usuarios = '';
-			
+
 		$url_activos = "&solo_activos=".$solo_activos;
 ?>
 		<br />
