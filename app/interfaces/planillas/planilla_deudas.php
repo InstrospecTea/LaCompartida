@@ -1,13 +1,12 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
-
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $sesion = new sesion(array('REP'));
 
 $query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
-	
+
 if (in_array($opcion, array('buscar', 'xls'))) {
 	$codigo_cliente = $_REQUEST['codigo_cliente'];
 	$id_contrato = $_REQUEST['id_contrato'];

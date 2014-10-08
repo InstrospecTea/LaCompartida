@@ -1,13 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Reporte.php';
 
 $sesion = new Sesion(array('REP'));
 
@@ -42,7 +34,7 @@ $pagina->PrintTop($popup);
 <form method=post name=formulario action="planillas/planilla_reporte_anual.php" id=formulario autocomplete='off'>
     <input type=hidden name=opc id=opc value='print'>
 
-    <!-- Calendario DIV -->	
+    <!-- Calendario DIV -->
     <div id="calendar-container" style="width:221px; position:absolute; display:none;">
         <div class="floating" id="calendar"></div>
     </div>
@@ -70,16 +62,16 @@ $pagina->PrintTop($popup);
                     <?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>	  </td>
                 <td rowspan="2" align=left>
                     <?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]", $clientesF, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
-                </td>	
-                <td colspan="2" align=left>	
+                </td>
+                <td colspan="2" align=left>
                     <div id=periodo_rango>
-                        <?php echo __('Año') ?>:	
+                        <?php echo __('Año') ?>:
                         <select name="fecha_anio" style='width:55px'>
                             <?php for ($i = (date('Y') - 10); $i < (date('Y') + 1); $i++) { ?>
                                 <option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
                             <?php } ?>
                         </select>
-                        <!-- PERIODOS 
+                        <!-- PERIODOS
                         <?php echo __('Desde') ?>:
                                 <div id=periodo style='display:<?php echo !$rango ? 'inline' : 'none' ?>;'>
                                         <select name="fecha_mes_ini" style='width:60px'>
@@ -101,7 +93,7 @@ $pagina->PrintTop($popup);
                                                     <option value='<?php echo $i ?>' <?php echo $fecha_anio_ini == $i ? 'selected' : '' ?>><?php echo $i ?></option>
                         <?php } ?>
                                         </select>
-                                </div>	
+                                </div>
                         <br />
                         <?php echo __('Hasta') ?>:
                         <div id=periodo style='display:<?php echo !$rango ? 'inline' : 'none' ?>;'>

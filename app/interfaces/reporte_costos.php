@@ -1,28 +1,31 @@
 <?php
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once 'Spreadsheet/Excel/Writer.php';
+require_once dirname(__FILE__).'/../conf.php';
+require_once 'Spreadsheet/Excel/Writer.php';
 
-	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
-	if (!Conf::GetConf($sesion,'ReportesAvanzados')) {
-		header("location: reportes_especificos.php");
-	}
+$sesion = new Sesion();
+$pagina = new Pagina($sesion);
 
-	$pagina = new Pagina($sesion);
+/*
+ * Debe tener habilitado la Conf ReportesAvanzados y el usuario sebe tener los permisos ADM y REP para acceder a este reporte.
+ */
+if (!Conf::GetConf($sesion, 'ReportesAvanzados') || !$sesion->usuario->Es('ADM') || !$sesion->usuario->Es('REP')) {
+	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reporte costos') . '.';
+	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
+}
 
-	if(!$fecha_a || $fecha_a<1)
-		$fecha_a = date("Y");
-	if(!$fecha_m || $fecha_m<1 || $fecha_m>12)
-		$fecha_m = date("m");
-	$meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"),__("Julio"),__("Agosto"),__("Septiembre"),__("Octubre"),__("Noviembre"),__("Diciembre"));
+if(!$fecha_a || $fecha_a<1)
+	$fecha_a = date("Y");
+if(!$fecha_m || $fecha_m<1 || $fecha_m>12)
+	$fecha_m = date("m");
+$meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"),__("Julio"),__("Agosto"),__("Septiembre"),__("Octubre"),__("Noviembre"),__("Diciembre"));
 
-	if($opc == 'excel_anual' || $opc=='reporte')
-	{
-		require_once('planillas/planilla_resumen_costos.php');
-		exit;
-	}
+if($opc == 'excel_anual' || $opc=='reporte') {
+	require_once('planillas/planilla_resumen_costos.php');
+	exit;
+}
 
-	$pagina->titulo = __('Reporte costo por profesional');
-	$pagina->PrintTop();
+$pagina->titulo = __('Reporte costo por profesional');
+$pagina->PrintTop();
 ?>
 <style>
 #tbl_tarifa

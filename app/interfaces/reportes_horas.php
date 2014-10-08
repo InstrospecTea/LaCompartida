@@ -1,13 +1,6 @@
 <?php
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
 
 $sesion = new Sesion(array('REP'));
 //Revisa el Conf si esta permitido
@@ -63,17 +56,17 @@ $pagina->PrintTop();
         }
         return form.submit();
     }
-    
+
 jQuery(document).ready(function() {
-    
+
     var disable_selector = function(){
         if( jQuery('#comparar').is(':checked')) {
             jQuery("#tipo_duracion_comparada").prop('disabled', false);
         } else {
             jQuery("#tipo_duracion_comparada").prop('disabled', 'disabled');
         }
-    }; 
-    
+    };
+
     jQuery(disable_selector);
     jQuery("#comparar").change(disable_selector);
 });
@@ -82,13 +75,13 @@ jQuery(document).ready(function() {
 
 <style type="text/css">
     #fecha_mes_desde,#fecha_mes_hasta,#tipo_reporte,#tipo_duracion,#tipo_duracion_comparada{
-        width: 100px; 
+        width: 100px;
         margin-left: 10px;
     }
     .selectMultiple{
         margin-left: 10px;
     }
-    
+
     #comparar{
         margin-left: 10px;
     }
@@ -275,7 +268,7 @@ if ($opcion == "desplegar") {
         $datos .= '&comparar='. $comparar;
         $datos .= '&tipo_duracion_comparada=' . $tipo_duracion_comparada;
     }
-    
+
     //en caso de que el tipo de reporte sea por el estudio
     //se imprime un grafico resumen de los clientes y/o usuarios seleccionados
 

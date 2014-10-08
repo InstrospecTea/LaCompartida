@@ -1,15 +1,8 @@
-<?php 
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/PrmExcelCobro.php';
-	require_once Conf::ServerDir().'/classes/Reporte.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
-	$sesion = new Sesion();
+	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 
 	$nombre_mes = array(__('Enero'), __('Febrero'), __('Marzo'), __('Abril'), __('Mayo'), __('Junio'), __('Julio'), __('Agosto'), __('Septiembre'), __('Octubre'), __('Noviembre'), __('Diciembre'));
@@ -285,7 +278,7 @@
 			<td><b><?php echo __('Fecha generación')?></b></td>
 			<td></td>
 		</tr>
-<?php 
+<?php
 	for($m=1; $m<13; ++$m)
 	{
 		echo '<tr>';
@@ -302,7 +295,7 @@
 					<input type="submit" class="btn" value="<?php echo __('Descargar')?>" />
 				</form>
 			</td>
-<?php 
+<?php
 			list($id_reporte_consolidado, $fecha_generacion, $mes, $moneda, $glosa_reporte) = mysql_fetch_array($resp);
 		}
 		else
@@ -319,10 +312,10 @@
 					<input type="submit" class="btn" value="<?php echo __('Generar')?>" />
 				</form>
 			</td>
-<?php 
+<?php
 		echo '</tr>';
 	}
 ?>
 	</table>
-<?php 
+<?php
 	$pagina->PrintBottom();
