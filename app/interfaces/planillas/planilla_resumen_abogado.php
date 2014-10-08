@@ -394,25 +394,18 @@ function Print_Prof(& $ws1, $td) {
 
 			$ws1->write($fila_titulos - 1, $col, date('M Y', $fecha), $formato_periodo); //Se imprime el titulo del periodo
 			extender($ws1, $fila_titulos - 1, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos, $col, n($td['horas_trabajadas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 1, $col, n($td['horas_cobradas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 1, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 2, $col, n($td['horas_por_cobrar']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 2, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 3, $col, n($td['horas_castigadas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 3, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 4, $col, n($td['horas_no_cobrables']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 4, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 5, $col, n($td['valor_cobrado_no_estandar']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
 			extender($ws1, $fila_titulos + 5, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 6, $col, n($td['valor_cobrado']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
 			extender($ws1, $fila_titulos + 6, $col, 6, $formato_periodo);
 
@@ -455,7 +448,7 @@ function Print_Prof(& $ws1, $td) {
 			$ws1->WriteFormula($fila_base, $col + 4, '=SUM(' . excel_column($col + 4) . "$fila_inicio:" . excel_column($col + 4) . ($fila_base) . ')', $formatos_moneda_totales[CTEMONEDA]);
 			$ws1->WriteFormula($fila_base, $col + 5, '=SUM(' . excel_column($col + 5) . "$fila_inicio:" . excel_column($col + 5) . ($fila_base) . ')', $formatos_moneda_totales[CTEMONEDA]);
 			#FIN de una columna
-			$col+=5;
+			$col+=6;
 		}
 
 		$ws1->write(++$filas, 1, __('HORAS TRABAJADAS'), $formato_morado);
