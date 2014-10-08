@@ -7,7 +7,7 @@ $sesion = new Sesion();
 $pagina = new Pagina($sesion);
 
 /*
- * El usuario sebe tener los permisos ADM y REP para acceder a este reporte.
+ * El usuario debe tener los permisos ADM y REP para acceder a este reporte.
  */
 if (!$sesion->usuario->Es('ADM') || !$sesion->usuario->Es('REP')) {
 	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reporte financiero') . '.';
