@@ -59,6 +59,9 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/auditoria/index.php"/>Auditoría</a>';
+                
+                echo ' <br/>&nbsp;&nbsp;&nbsp; <a href="' . Conf::RootDir() . '/app/mantenedor_cartas/doc_manager.php"/>Doc Manager</a>';
+                
 				if ($Slim = Slim::getInstance('default', true)) {
 					$Slim->applyHook('hook_link_shell_convertir_adelanto');
 				}
