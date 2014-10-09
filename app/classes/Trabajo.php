@@ -413,8 +413,14 @@ class Trabajo extends Objeto
 		$nombre_abogado_es = Utiles::glosa($sesion, 'abogado', 'glosa_es', 'prm_excel_cobro', 'nombre_interno');
 		$nombre_abogado_en = Utiles::glosa($sesion, 'abogado', 'glosa_en', 'prm_excel_cobro', 'nombre_interno');
 
-		for ($i = 2; $i < $excel->sheets[0]['numCols']; ++$i) {
-			switch ($excel->sheets[0]['cells'][$fila_base][$i]) {
+		for ($i = 1; $i <= $excel->sheets[0]['numCols']; $i++) {
+			$nombre_columna = $excel->sheets[0]['cells'][$fila_base][$i];
+
+			if (is_null($nombre_columna) || empty($nombre_columna)) {
+				continue;
+			}
+
+			switch ($nombre_columna) {
 				case $nombre_descripcion_es:
 					$col_descripcion = $i;
 					break;
@@ -573,7 +579,7 @@ class Trabajo extends Objeto
 				$abogado = $hoja['cells'][$fila][$col_abogado];
 				// cargar usuario con su username
 				$usuario = new Usuario($sesion);
-				$usuario->LoadByNick( $abogado );
+				$usuario->LoadByNick($abogado);
 
 				if (!$usuario->fields['id_usuario'] || $abogado == '') {
 					$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque el $nombre_abogado_es ingresado no existe.<br />";
@@ -655,7 +661,7 @@ class Trabajo extends Objeto
 											SET
 												codigo_asunto = '$codigo_asunto',
 												id_cobro = '$id_cobro',
-												id_usuario = {$usuario->fields['id_usuario']}'',
+												id_usuario = '{$usuario->fields['id_usuario']}',
 												descripcion = '$descripcion',
 												fecha = '$fecha',
 												duracion = '$duracion_trabajada',
