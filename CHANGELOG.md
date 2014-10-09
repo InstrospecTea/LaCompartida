@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.17.4
+Jueves 9 de Octubre 2014
+* **Fixed:** [Quita mensaje del excel `Error en el archivo los datos pueden haberse perdido`.](https://github.com/LemontechSA/ttb/pull/717)
+
 ## Hotfix: 14.17.3
 Martes 7 de Octubre 2014
 * **Fixed:** [Ancho de columnas en el reporte de rendimiento de profesionales.](https://github.com/LemontechSA/ttb/pull/715)

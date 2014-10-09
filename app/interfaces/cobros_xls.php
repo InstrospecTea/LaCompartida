@@ -1341,7 +1341,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->writeFormula($filas, $col_cobrable, "=SUM($col_formula_cobrable$primera_fila_asunto:$col_formula_cobrable$filas)", $formato_tiempo_total);
 				$ws->write($filas, $col_tarifa_hh, '', $formato_total);
 				$ws->writeFormula($filas, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo$primera_fila_asunto:$col_formula_valor_trabajo$filas)", $formato_moneda_total);
-				$ws->writeFormula($filas, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo$primera_fila_asunto:$col_formula_valor_trabajo$filas)", $formato_moneda_total);
 				$filas += 2;
 			}
 
@@ -1494,13 +1493,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					}
 					$ws->write($filas, $col_abogado, $nombre, $formato_normal);
 
-					if (!$opc_ver_asuntos_separados) {
-						$ws->write($filas, $col_abogado + 1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
-					}
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
 						$ws->write($filas, $col_abogado + 1, $trabajo->fields['solicitante'], $formato_descripcion);
+					} else if (!$opc_ver_asuntos_separados) {
+						$ws->write($filas, $col_abogado + 1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
 					}
-					//var_dump($trabajo->fields['solicitante']); exit;
+
 					$ws->write($filas, $col_solicitante, '', $formato_normal);
 					$descripcion_tramite_con_cantidad = "";
 
