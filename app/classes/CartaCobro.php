@@ -11,9 +11,9 @@ class CartaCobro extends NotaCobro {
     var $twig;
     public $secciones = array(
         'CARTA' => array(
-            'FECHA' => 'Sección FECHA',
-            'ENVIO_DIRECCION' => 'Sección ENVIO_DIRECCION',
-            'DETALLE' => 'Sección DETALLE',
+            'FECHA' => 'Seccion contiene fechas relacionadas con el cobro',
+            'ENVIO_DIRECCION' => 'Sección contiene datos de facturacion del cliente',
+            'DETALLE' => 'Sección contiene tags con montos, fechas relacionadas con el cobro*',
             'ADJ' => 'Sección ADJ',
             'PIE' => 'Sección PIE',
             'DATOS_CLIENTE' => 'Sección DATOS_CLIENTE',
