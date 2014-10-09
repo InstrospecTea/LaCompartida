@@ -1,12 +1,5 @@
-<?
+<?php
     require_once dirname(__FILE__).'/../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Html.php';
-    require_once Conf::ServerDir().'/../app/classes/InputId.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-    require_once Conf::ServerDir().'/classes/Funciones.php';
 
     $sesion = new Sesion(array('REP'));
     $pagina = new Pagina($sesion);
@@ -32,33 +25,33 @@
     $operacion2 = $operaciones[$operacion];
 
 
-    $query1 = "SELECT 
-    							CONCAT_WS(', ',usuario.apellido1,usuario.nombre) as nombre_usuario, 
+    $query1 = "SELECT
+    							CONCAT_WS(', ',usuario.apellido1,usuario.nombre) as nombre_usuario,
     							usuario.username as username_usuario,
-    							prm_moneda.glosa_moneda, 
-    							trabajo.codigo_asunto, 
-    							trabajo.codigo_actividad, 
+    							prm_moneda.glosa_moneda,
+    							trabajo.codigo_asunto,
+    							trabajo.codigo_actividad,
     							prm_tipo_proyecto.*,
-                	asunto.forma_cobro, 
+                	asunto.forma_cobro,
                 	asunto.cobrable as asunto_cobrable,
-                	asunto.glosa_asunto, 
-                	cliente.glosa_cliente, 
-                	actividad.glosa_actividad, 
-                	trabajo.duracion, 
-                	trabajo.duracion_cobrada, 
-                	trabajo.cobrable 
+                	asunto.glosa_asunto,
+                	cliente.glosa_cliente,
+                	actividad.glosa_actividad,
+                	trabajo.duracion,
+                	trabajo.duracion_cobrada,
+                	trabajo.cobrable
                 FROM trabajo LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
-                JOIN contrato  ON asunto.id_contrato = contrato.id_contrato 
-                LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente 
-                LEFT JOIN actividad ON trabajo.codigo_actividad = actividad.`codigo_actividad` 
-                LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario 
-                LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda 
+                JOIN contrato  ON asunto.id_contrato = contrato.id_contrato
+                LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+                LEFT JOIN actividad ON trabajo.codigo_actividad = actividad.`codigo_actividad`
+                LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+                LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
                 LEFT JOIN prm_tipo_proyecto ON asunto.id_tipo_asunto = prm_tipo_proyecto.id_tipo_proyecto
                 WHERE trabajo.fecha BETWEEN '$fecha1' AND '$fecha2'";
 
 
     if($accion == "mostrar")
-    { 
+    {
 		$query = "SELECT $dimension1,$dimension2,$operacion2 FROM ( $query1 ) AS olap
                     GROUP BY $dimension1,$dimension2";
 
@@ -88,7 +81,7 @@
             $encabezado .= "<td>".$d2s[$i]."</td>";
         $tabla = "<div style=\"width: 900px; display:block; overflow: scroll;\"><table border=1 style=\"border-collapse: collapse; border: 1px solid black\"><tr><td></td>$encabezado</tr>";
 
-        
+
         for($i = 0; $i < count($d1s); $i++)
         {
             $tabla .= "<tr>";

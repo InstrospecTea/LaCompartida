@@ -1,15 +1,6 @@
 <?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Cliente.php';
-	require_once Conf::ServerDir().'/classes/Moneda.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
@@ -177,11 +168,11 @@
 		if(is_array($usuarios))
 			$query_usuarios = " AND usuario.id_usuario IN (".implode(',',$usuarios).") ";
 
-		
+
 		//FFF se quita esto de la query:
-		//,ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base 
+		//,ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base
 		// no hay que redondear en la moneda origen!
-		
+
 		$filas +=4;
 		$query ="SELECT		asunto.id_area_proyecto
 							,cobro.fecha_creacion
@@ -191,12 +182,12 @@
 							,CONCAT(usuario.nombre,' ', usuario.apellido1) AS nombre
 							,cobro.saldo_final_gastos
 							,cobro.estado
-							,cobro.documento as numero 
+							,cobro.documento as numero
 							,cobro.forma_cobro
 							,cobro.id_cobro
 							,cobro.opc_moneda_total
 							,area.glosa
-							,moneda_base.id_moneda as id_moneda_base 
+							,moneda_base.id_moneda as id_moneda_base
 							,moneda_cobro.simbolo
 							,moneda_cobro.id_moneda
 							,cobro.total_minutos
@@ -204,7 +195,7 @@
 							,(SUM( TIME_TO_SEC(duracion_cobrada))/60) AS duracion_cobrada
 							,(SUM( TIME_TO_SEC(duracion))/60) AS duracion
 							,ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) AS monto_proporcional
-							,ROUND( (cobro.monto_subtotal-cobro.descuento ) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base 
+							,ROUND( (cobro.monto_subtotal-cobro.descuento ) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base
 							FROM cobro
 							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
@@ -214,11 +205,11 @@
 							LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 							LEFT JOIN prm_area_proyecto AS area ON area.id_area_proyecto = asunto.id_area_proyecto
 							LEFT JOIN prm_moneda as moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
-							LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda 
-							LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
-							LEFT JOIN cobro_moneda as cobro_moneda_moneda_base ON cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda 
-							WHERE 1 $query_fecha $query_estado $query_usuarios 
-							GROUP BY cobro.id_cobro, asunto.id_area_proyecto 
+							LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda
+							LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
+							LEFT JOIN cobro_moneda as cobro_moneda_moneda_base ON cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda
+							WHERE 1 $query_fecha $query_estado $query_usuarios
+							GROUP BY cobro.id_cobro, asunto.id_area_proyecto
 							ORDER BY asunto.id_area_proyecto, cliente.glosa_cliente, cobro.id_cobro;";
 
 		#Clientes
@@ -232,12 +223,12 @@
 		{
 			$cobro_moneda = new CobroMoneda($sesion);
 			$cobro_moneda->Load( $cobro['id_cobro'] );
-			$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente 
+			$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
 								 WHERE id_cobro=".$cobro['id_cobro']." AND ( ingreso > 0 OR egreso > 0 ) AND cta_corriente.incluir_en_cobro='SI'
 								 ORDER BY fecha ASC";
 			$lista_gastos = new ListaGastos($sesion,'',$query);
 			$saldo_gastos=0;
-			
+
 			$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro['id_cobro']);
 			$saldo_monto=$x_resultados['monto'][$cobro['opc_moneda_total']];
 			$saldo_honorarios=$x_resultados['monto_honorarios'][$cobro['opc_moneda_total']];
@@ -310,7 +301,7 @@
 				for($x=2;$x<4;$x++)
 					$ws1->write($filas, $x, '', $formato_encabezado);
 				$filas +=1;
-				
+
 				$ws1->write($filas, $col_numero_factura,__('N° Factura'),$formato_titulo);
 				$ws1->write($filas, $col_fecha_creacion,__('Fecha Creación'),$formato_titulo);
 				$ws1->write($filas, $col_cliente,__('Cliente'),$formato_titulo);
