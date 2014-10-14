@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.17.5
+Martes 14 de Octubre 2014
+* **Fixed:** [Sincroniza valores de montos cobrados del reporte de rendimiento de profesionales con el reporte avanzado.](https://github.com/LemontechSA/ttb/pull/720)
+
 ## Hotfix: 14.17.4
 Jueves 9 de Octubre 2014
 * **Fixed:** [Quita mensaje del excel `Error en el archivo los datos pueden haberse perdido`.](https://github.com/LemontechSA/ttb/pull/717)
