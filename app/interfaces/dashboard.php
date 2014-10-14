@@ -23,23 +23,23 @@ $opciones = array(
 
 switch ($period) {
   case 'this_week':
-    $fecha_desde = date('Y-m-d', strtotime('this monday'));
-    $fecha_hasta = date('Y-m-d', strtotime('this sunday'));
+    $fecha_desde = date('d-m-Y', strtotime('this monday'));
+    $fecha_hasta = date('d-m-Y', strtotime('this sunday'));
     break;
 
   case 'last_week':
-    $fecha_desde = date('Y-m-d', strtotime('last monday'));
-    $fecha_hasta = date('Y-m-d', strtotime('last sunday'));
+    $fecha_desde = date('d-m-Y', strtotime('last monday'));
+    $fecha_hasta = date('d-m-Y', strtotime('last sunday'));
     break;
 
   case 'this_month':
-    $fecha_desde = date('Y-m-d', strtotime('first day of this month'));
-    $fecha_hasta = date('Y-m-d', strtotime('last day of this month'));
+    $fecha_desde = date('d-m-Y', strtotime('first day of this month'));
+    $fecha_hasta = date('d-m-Y', strtotime('last day of this month'));
     break;
 
   case 'last_month':
-    $fecha_desde = date('Y-m-d', strtotime('first day of last month'));
-    $fecha_hasta = date('Y-m-d', strtotime('last day of last month'));
+    $fecha_desde = date('d-m-Y', strtotime('first day of last month'));
+    $fecha_hasta = date('d-m-Y', strtotime('last day of last month'));
     break;
 
   default:
@@ -56,7 +56,7 @@ $reporte = new ReporteRentabilidadProfesional($Sesion, $opciones, $datos);
 
 $SimpleReport = $reporte->generar();
 
-$date_range_text = "Desde el " . Utiles::sql2date($fecha_desde) . " hasta el " . Utiles::sql2date($fecha_hasta);
+$date_range_text = "Desde el $fecha_desde hasta el $fecha_hasta";
 
 $Pagina->titulo = __('Producción Personal');
 $Pagina->PrintTop();
@@ -75,7 +75,7 @@ $Pagina->PrintTop();
 <?php
 // $writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Html');
 // echo $writer->save();
-//echo pr($SimpleReport->results);
+// echo pr($SimpleReport->results);
 $result = $SimpleReport->results[0];
 ?>
 <ul class="thumbnails">
