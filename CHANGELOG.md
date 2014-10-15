@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.17.6
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Elimina los registros asociados al cobro en la tabla cobro_asunto.](https://github.com/LemontechSA/ttb/pull/721)
+
 ## Hotfix: 14.17.5
 Martes 14 de Octubre 2014
 * **Fixed:** [Sincroniza valores de montos cobrados del reporte de rendimiento de profesionales con el reporte avanzado.](https://github.com/LemontechSA/ttb/pull/720)
