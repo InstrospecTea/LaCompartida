@@ -702,6 +702,9 @@ if (!class_exists('Cobro')) {
 				$his->Edit('id_cobro', $id_cobro);
 				$his->Write();
 
+				$CobroAsunto = new CobroAsunto($this->sesion);
+				$CobroAsunto->eliminarAsuntos($id_cobro);
+
 				$query = "DELETE FROM cobro WHERE id_cobro = $id_cobro";
 				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
