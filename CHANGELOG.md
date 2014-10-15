@@ -1,5 +1,11 @@
 # Changelog
 
+## Release: 14.18.0
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Corrige modificación de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
+* **Fixed:** [Permisos reporte financiero](https://github.com/LemontechSA/ttb/pull/716)
+* **New:** [Primera versión reporte personal de producción](https://github.com/LemontechSA/ttb/pull/719)
+
 ## Hotfix: 14.17.6
 Miércoles 15 de Octubre 2014
 * **Fixed:** [Elimina los registros asociados al cobro en la tabla cobro_asunto.](https://github.com/LemontechSA/ttb/pull/721)
