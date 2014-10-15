@@ -13,6 +13,8 @@ if ($opc == 'guardar') {
 	$carta = $CartaCobro->ObtenerCarta($id_carta);
 }
 
+echo $CartaCobro->PrevisualizarDocumento($id_carta, $id_cobro);
+
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Cartas de cobro');
 $pagina->PrintTop();

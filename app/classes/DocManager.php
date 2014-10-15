@@ -17,6 +17,8 @@ class DocManager extends Objeto {
         $htmlheader = '';
         $htmlheader.= '<!DOCTYPE html>';
         $htmlheader.= '<html lang="en">';
+        $htmlheader.= '<head>';
+        $htmlheader.= '<meta http-equiv="Content-type" content="text/html;charset=ISO-8859-1">';
         $htmlheader.= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>';
         $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">';
         $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">';
@@ -37,18 +39,8 @@ class DocManager extends Objeto {
         return $html_footer;
     }
 
-    public function GetFormats($sesion, $id_carta) {
-        $formatselector = Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, 'class="form-control"', ' ', '');
-        return $formatselector;
-    }
-
-    public function ImprimirSelector($array, $name, $selected = '') {
-        $select = "<select class='form-control' name='$name' id='$name'>";
-        if ($titulo == 'Vacio') {
-            $select .= "<option value='-1'>&nbsp;</option>\n";
-        } else if ($titulo != '') {
-            $select .= "<option value=''>" . $titulo . "</option>\n";
-        }
+    public function ImprimirSelector($array, $name, $selected = ' ',$class, $placeholder) {
+        $select = "<select class='$class' name='$name' id='$name' placeholder='$placeholder'>";
 
         foreach ($array as $value => $key) {
             if ($value == $selected) {
