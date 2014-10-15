@@ -1030,7 +1030,7 @@ class NotaCobro extends Cobro {
 		return false;
 	}
 
-	function PrevisualizarDocumento($data, $id_cobro) {
+	function PrevisualizarDocumento($data, $id_cobro, $prev_doc) {
 		$formato = '';
 		foreach ($data['secciones'] as $seccion => $html) {
 			$formato .= "\n###$seccion###\n$html\n";
@@ -1038,7 +1038,13 @@ class NotaCobro extends Cobro {
 		$html = $this->ReemplazarHTML($formato, $id_cobro);
 		$doc = new DocGenerator($html, $data['cobro_css'], $this->fields['opc_papel'], $this->fields['opc_ver_numpag'], 'PORTRAIT', 1.5, 2, 2, 2, $this->fields['estado']);
 		libxml_use_internal_errors(true);
-		$doc->output('previsualizacion_carta.doc');
+
+        if ($prev_doc) {
+            return $html;
+        } else {
+            $doc->output('previsualizacion_carta.doc');
+        }
+		
 		exit;
 	}
 

@@ -8,10 +8,6 @@ $DocManager = new DocManager($sesion);
 // Imprime encabezado html con librerias requeridas.
 echo $DocManager->GetHtmlHeader();
 
-pr($_POST);
-//$opc = 'prev';
-//$id_carta = 1;
-
 if ($opc == 'guardar') {
     $id_carta = $CartaCobro->GuardarCarta($_POST['carta']);
     die(json_encode(array('id' => $id_carta)));
@@ -22,18 +18,20 @@ if ($opc == 'guardar') {
     if (!empty($id_carta)) {
         $cobros_asociados = $DocManager->GetNumOfAsociatedCharges($sesion, $id_carta);
     }
+    // Obtiene previsualizacion de documentos
+    if (!empty($id_cobro)) {
+        $preview_doc = $CartaCobro->PrevisualizarDocumento($carta, 4, 1);
+    }
 }
-
-echo $CartaCobro->GenerarDocumentoCarta2($parser_carta, $theTag = '', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 
 // Obtiene Secciones y tags.
 $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
-$tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
+$tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
 ?>
 
 <script type="text/javascript">
 
-    jQuery(document).ready(function($) {
+    jQuery(document).ready(function ($) {
         $('#tabs').tab();
 
         // Segmento de codigo solo incremnta el largo de el plugin CKEDITOR
@@ -49,49 +47,26 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
         // });
     });
 
-    function GenerarHTML(seccion) {
-        var id = 'editor_' + seccion;
-
-        var html = CKEDITOR.instances[id] ? CKEDITOR.instances[id].getData() : jQuery('#' + id).val();
-        if (!html) {
-            return '';
-        }
-
-        jQuery.each(secciones[seccion] || [], function(s) {
-            var tag = '%' + s + '%';
-            if (html.indexOf(tag) >= 0) {
-                html = html.replace(tag, GenerarHTML(s));
-            }
-        });
-        return html;
-    }
-
-    $(function() {
-        $('#id_carta').change(function() {
+    $(function () {
+        $('#id_carta').change(function () {
             this.form.submit();
         });
 
-        jQuery('#btn_previsualizar_html').click(function() {
-            PrevisualizarHTML();
+        $('#id_cobro').change(function () {
+            this.form.submit();
         });
-        function PrevisualizarHTML() {
-            var css = jQuery('[name="formato_css"]').val();
-            var body = GenerarHTML('CARTA');
-            var html = '<style type="text/css">' + css + '</style>' + body;
-            jQuery('#previsualizacion_html')[0].contentWindow.document.body.innerHTML = html;
-        }
     });
 
 </script>
 
 <!-- Encabezado pagina -->
 
-<div class="container">
-    <form>
+
+<div class="container" style="margin-top: 1%;">
+    <form id="formato_doc" method="post">    
         <div class="col-sm-4"><h4>Mantenedor de Cartas</h4></div>
         <div class="col-sm-4"><?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, 'class="form-control"', ' ', ''); ?></div>
-        <div class="col-sm-4"><button id="btn_previsualizar_html" type="button" class="btn btn-primary btn-sm">Previsualizar</button></div>
-    </form>
+        <div class="col-sm-4"></div>
 </div>
 
 <div class="col-md-6">
@@ -134,7 +109,6 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
                     </div>
 
                     <div class="tab-pane" id="css_code">
-
                         <textarea name="formato_css" style="width:100%; height: 605px;"><?php echo $carta['formato_css']; ?></textarea>
                     </div>
                 </div>
@@ -143,8 +117,6 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
         </div>
     </div>
 </div>
-
-
 
 <div class="col-md-6">
     <div class="panel panel-default">
@@ -156,18 +128,19 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
                 </div>
                 <div class="col-md-5">
                     <div class="input-group">
-                        <input type="text" class="form-control" maxlength="10">
+                        <input id="id_cobro" name="id_cobro" type="text" class="form-control" maxlength="10" value="<?php echo $id_cobro ?>">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button">Descargar Word</button>
                         </span>
+
                     </div><!-- /input-group -->
                 </div>
                 <div class="col-md-2"></div>
             </div>
         </div>
 
-        <div class="panel-body">
-            <iframe id="previsualizacion_html" style="width:100%;height:536px"></iframe>
+        <div class="panel-body" style="height:575px; overflow-y:scroll;">
+            <?php echo $preview_doc ?>
         </div>
 
         <div class="row">
@@ -209,21 +182,21 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
             <div class="row">
                 <div class="col-md-4"></div>
                 <div class="col-md-2"><h5>Inferior :</h5></div>
-                <div class="col-md-2"><input type="text" class="form-control" name="carta[margen_superior]" value="<?php echo $carta['margen_superior']; ?>"/></div>
+                <div class="col-md-2"><input type="text" class="form-control" name="carta[margen_inferior]" value="<?php echo $carta['margen_inferior']; ?>"/></div>
                 <div class="col-md-4"></div>
             </div>
 
             <div class="row">
                 <div class="col-md-4"></div>
                 <div class="col-md-2"><h5>Izquierdo :</h5></div>
-                <div class="col-md-2"><input type="text" class="form-control" name="carta[margen_superior]" value="<?php echo $carta['margen_superior']; ?>"/></div>
+                <div class="col-md-2"><input type="text" class="form-control" name="carta[margen_derecho]" value="<?php echo $carta['margen_derecho']; ?>"/></div>
                 <div class="col-md-4"></div>
             </div>
 
             <div class="row">
                 <div class="col-md-4"></div>
                 <div class="col-md-2"><h5>Derecho :</h5></div>
-                <div class="col-md-2"><input type="text" class="form-control" name="carta[margen_superior]" value="<?php echo $carta['margen_superior']; ?>"/></div>
+                <div class="col-md-2"><input type="text" class="form-control" name="carta[margen_izquierdo]" value="<?php echo $carta['margen_izquierdo']; ?>"/></div>
                 <div class="col-md-4"></div>
             </div>
 
@@ -235,7 +208,9 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
         </div>
 
     </div>
+</form>
 </div>
+
 
 <?php
 echo $DocManager->GetHtmlFooter();

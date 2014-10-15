@@ -20,10 +20,13 @@ class DocManager extends Objeto {
         $htmlheader.= '<head>';
         $htmlheader.= '<meta http-equiv="Content-type" content="text/html;charset=ISO-8859-1">';
         $htmlheader.= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>';
-        $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">';
-        $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">';
-        $htmlheader.= '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>';
-//        $htmlheader.= '<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>'; <---- Habilitar CKEDITOR
+//      $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">'; <--- recurso remoto
+        $htmlheader.= '<link rel="stylesheet" href="'.Conf::RootDir().'/app/doc_manager/css/bootstrap-theme.min.css">';
+//      $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">'; <--- recurso remoto
+        $htmlheader.= '<link rel="stylesheet" href="'.Conf::RootDir().'/app/doc_manager/css/bootstrap.min.css">';
+//      $htmlheader.= '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>'; <--- recurso remoto
+        $htmlheader.= '<script src="'.Conf::RootDir().'/app/doc_manager/js/bootstrap.min.js"></script>';
+//      $htmlheader.= '<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>'; <---- Habilitar CKEDITOR
         $htmlheader.= '</head>';
         $htmlheader.= '<body>';
 
