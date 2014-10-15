@@ -31,7 +31,6 @@ class ReporteRentabilidadProfesional {
 		$this->genera_query_criteria();
 
 		$query = $this->criteria->get_plain_query();
-		//pr($query); exit;
 
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
