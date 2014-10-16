@@ -4,6 +4,11 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
+if(isset($_SESSION['flash_msg'])) {
+	$pagina->AddError($_SESSION['flash_msg']);
+	unset($_SESSION['flash_msg']);
+}
+
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 
 $pagina->titulo = __('Reportes espec&iacute;ficos');

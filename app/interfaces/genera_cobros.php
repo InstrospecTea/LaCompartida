@@ -25,6 +25,7 @@ if ($opc == 'excel') {
 	// Es necesaria esta bestialidad para que no se caiga cuando es llamada desde otro lado.
 	$no_activo = !$activo;
 	$multiple = true;
+	$forzar_username = true;
 	require_once Conf::ServerDir() . '/interfaces/cobros_xls.php';
 	exit;
 }
