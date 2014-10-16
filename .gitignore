@@ -199,3 +199,6 @@ config.ru
 composer.lock
 vendor
 vendor/**/
+
+# Vagrant
+vagrant/.vagrant
