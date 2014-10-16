@@ -1,5 +1,23 @@
 # Changelog
 
+## Release: 14.18.0
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Corrige modificación de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
+* **Fixed:** [Permisos reporte financiero](https://github.com/LemontechSA/ttb/pull/716)
+* **New:** [Primera versión reporte personal de producción](https://github.com/LemontechSA/ttb/pull/719)
+
+## Hotfix: 14.17.6
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Elimina los registros asociados al cobro en la tabla cobro_asunto.](https://github.com/LemontechSA/ttb/pull/721)
+
+## Hotfix: 14.17.5
+Martes 14 de Octubre 2014
+* **Fixed:** [Sincroniza valores de montos cobrados del reporte de rendimiento de profesionales con el reporte avanzado.](https://github.com/LemontechSA/ttb/pull/720)
+
+## Hotfix: 14.17.4
+Jueves 9 de Octubre 2014
+* **Fixed:** [Quita mensaje del excel `Error en el archivo los datos pueden haberse perdido`.](https://github.com/LemontechSA/ttb/pull/717)
+
 ## Hotfix: 14.17.3
 Martes 7 de Octubre 2014
 * **Fixed:** [Ancho de columnas en el reporte de rendimiento de profesionales.](https://github.com/LemontechSA/ttb/pull/715)

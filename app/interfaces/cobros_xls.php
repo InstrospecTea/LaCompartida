@@ -12,6 +12,10 @@ if ($id_cobro) {
 	$where_cobro .= " AND cobro.id_cobro=$id_cobro ";
 }
 
+if (!isset($forzar_username)) {
+	$forzar_username = false;
+}
+
 $ingreso_via_decimales = false;
 $formato_duraciones = '[h]:mm';
 if (UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
@@ -1195,13 +1199,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					 *  Se guarda el nombre en una variable porque se usa en el detalle profesional.
 					 */
 
-					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema') || $forzar_username === true) {
 						$nombre = $trabajo->fields['username'];
 					} else {
 						$nombre = $trabajo->fields['nombre_usuario'];
 					}
 
-					if ($cobro->fields['opc_ver_profesional_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+					if ($cobro->fields['opc_ver_profesional_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema') || $forzar_username === true) {
 						$nombreresumen = $trabajo->fields['username'];
 					} else {
 						$nombreresumen = $trabajo->fields['nombre_usuario'];
@@ -1340,7 +1344,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 				$ws->writeFormula($filas, $col_cobrable, "=SUM($col_formula_cobrable$primera_fila_asunto:$col_formula_cobrable$filas)", $formato_tiempo_total);
 				$ws->write($filas, $col_tarifa_hh, '', $formato_total);
-				$ws->writeFormula($filas, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo$primera_fila_asunto:$col_formula_valor_trabajo$filas)", $formato_moneda_total);
 				$ws->writeFormula($filas, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo$primera_fila_asunto:$col_formula_valor_trabajo$filas)", $formato_moneda_total);
 				$filas += 2;
 			}
@@ -1487,20 +1490,20 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, $col_fecha_mes, $f[1], $formato_normal);
 					$ws->write($filas, $col_fecha_anyo, $f[0], $formato_normal);
 
-					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema') || $forzar_username === true) {
 						$nombre = $tramite->fields['usr_nombre'];
 					} else {
 						$nombre = $tramite->fields['nombre_usuario'];
 					}
+
 					$ws->write($filas, $col_abogado, $nombre, $formato_normal);
 
-					if (!$opc_ver_asuntos_separados) {
-						$ws->write($filas, $col_abogado + 1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
-					}
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
 						$ws->write($filas, $col_abogado + 1, $trabajo->fields['solicitante'], $formato_descripcion);
+					} else if (!$opc_ver_asuntos_separados) {
+						$ws->write($filas, $col_abogado + 1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
 					}
-					//var_dump($trabajo->fields['solicitante']); exit;
+
 					$ws->write($filas, $col_solicitante, '', $formato_normal);
 					$descripcion_tramite_con_cantidad = "";
 
