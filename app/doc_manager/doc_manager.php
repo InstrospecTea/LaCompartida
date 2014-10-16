@@ -18,15 +18,16 @@ if ($opc == 'guardar') {
     if (!empty($id_carta)) {
         $cobros_asociados = $DocManager->GetNumOfAsociatedCharges($sesion, $id_carta);
     }
-    // Obtiene previsualizacion de documentos
+// Obtiene previsualizacion de documentos
     if (!empty($id_cobro)) {
         $preview_doc = $CartaCobro->PrevisualizarDocumento($carta, 4, 1);
     }
 }
 
 // Obtiene Secciones y tags.
-$secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
-$tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
+//$secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
+//$tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
+
 ?>
 
 <script type="text/javascript">
@@ -55,14 +56,18 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
         $('#id_cobro').change(function () {
             this.form.submit();
         });
+        $('#btn_previsualizar').click(function () {
+            alert('OK');
+            $('[name=opc]').val('prev');
+            this.form.submit();
+        });
     });
 
 </script>
 
 <!-- Encabezado pagina -->
 
-
-<div class="container" style="margin-top: 1%;">
+<div class="container" style="margin-top: 0.5%;">
     <form id="formato_doc" method="post">    
         <div class="col-sm-4"><h4>Mantenedor de Cartas</h4></div>
         <div class="col-sm-4"><?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, 'class="form-control"', ' ', ''); ?></div>
@@ -84,6 +89,7 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
                     <div class="tab-pane active" id="html_code">
 
                         <div class="row">
+
                             <div class="col-md-1"></div>
                             <div class="col-md-9">
                                 <?php echo $DocManager->ImprimirSelector($secciones, 'secciones', ' ', 'form-control', ''); ?>
@@ -97,7 +103,7 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
 
                             <div class="col-md-1"></div>
                             <div class="col-md-9">
-                                <?php echo $DocManager->ImprimirSelector($tags, '$tags', ' ', 'form-control', ''); ?>
+                                <?php echo $DocManager->ImprimirSelector($tags, 'tags', ' ', 'form-control', ''); ?>
                             </div>
                             <div class="col-md-1">
                                 <button type="button" class="btn btn-primary btn-sm">Insertar</button>
@@ -130,17 +136,19 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
                     <div class="input-group">
                         <input id="id_cobro" name="id_cobro" type="text" class="form-control" maxlength="10" value="<?php echo $id_cobro ?>">
                         <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Descargar Word</button>
+                            <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-default" type="button">Descargar Word</button>
                         </span>
-
-                    </div><!-- /input-group -->
+                    </div>
                 </div>
                 <div class="col-md-2"></div>
             </div>
         </div>
 
+
         <div class="panel-body" style="height:575px; overflow-y:scroll;">
-            <?php echo $preview_doc ?>
+            <div class="col-md-12">
+                <?php echo $preview_doc ?>
+            </div>
         </div>
 
         <div class="row">
@@ -151,7 +159,7 @@ $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$secciones]);
             <div class="col-md-5">
                 <div class="alert alert-warning alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <p style="text-align: right;"><strong> Cobros asociados </strong> <?php echo!empty($cobros_asociados) ? $cobros_asociados : "0"; ?></p>
+                    <p style="text-align: right;"><strong> N° Cobros asociados </strong> <?php echo!empty($cobros_asociados) ? $cobros_asociados : "0"; ?></p>
                 </div>
             </div>
             <div class="col-md-4">
