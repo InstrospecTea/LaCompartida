@@ -44,7 +44,7 @@ class DocManager extends Objeto {
 
     public function ImprimirSelector($array, $name, $selected = ' ', $class, $placeholder) {
         $select = "<select class='$class' name='$name' id='$name' placeholder='$placeholder'>";
-
+        
         foreach ($array as $value => $key) {
             if ($value == $selected) {
                 $select .= "<option value='$value' selected>$key</option>\n";

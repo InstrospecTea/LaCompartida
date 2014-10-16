@@ -25,9 +25,8 @@ if ($opc == 'guardar') {
 }
 
 // Obtiene Secciones y tags.
-//$secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
+$secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 //$tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario['FECHA']);
-
 ?>
 
 <script type="text/javascript">
@@ -61,10 +60,20 @@ if ($opc == 'guardar') {
             $('[name=opc]').val('prev');
             this.form.submit();
         });
+        $("#secciones").on('change', function () {
+            var seccion = $(this).val();
+            console.log('se esta evaluando '+seccion);
+            //Make an ajax call 
+            $("#tags").html('<option>Cargando...</option>');
+            $.get("ajax_doc_manager.php?seccion=" + encodeURIComponent(seccion), function (data) {
+                //Update the files dropdown 
+                $("#tag_selector").html(data);
+            });
+        });
+
     });
 
 </script>
-
 <!-- Encabezado pagina -->
 
 <div class="container" style="margin-top: 0.5%;">
@@ -103,7 +112,7 @@ if ($opc == 'guardar') {
 
                             <div class="col-md-1"></div>
                             <div class="col-md-9">
-                                <?php echo $DocManager->ImprimirSelector($tags, 'tags', ' ', 'form-control', ''); ?>
+                                <select id="tag_selector" class="form-control"></select>
                             </div>
                             <div class="col-md-1">
                                 <button type="button" class="btn btn-primary btn-sm">Insertar</button>
