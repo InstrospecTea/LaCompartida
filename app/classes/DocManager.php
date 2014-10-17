@@ -18,6 +18,7 @@ class DocManager extends Objeto {
         $htmlheader.= '<!DOCTYPE html>';
         $htmlheader.= '<html lang="en">';
         $htmlheader.= '<head>';
+        $htmlheader.= '<link rel="shortcut icon" type="image/png" href="' . Conf::RootDir() . '/favicon.i"/>';
         $htmlheader.= '<meta http-equiv="Content-type" content="text/html;charset=ISO-8859-1">';
         $htmlheader.= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>';
 //      $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">'; <--- recurso remoto
@@ -26,6 +27,7 @@ class DocManager extends Objeto {
         $htmlheader.= '<link rel="stylesheet" href="' . Conf::RootDir() . '/app/doc_manager/css/bootstrap.min.css">';
 //      $htmlheader.= '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>'; <--- recurso remoto
         $htmlheader.= '<script src="' . Conf::RootDir() . '/app/doc_manager/js/bootstrap.min.js"></script>';
+        $htmlheader.= '<script src="' . Conf::RootDir() . '/app/doc_manager/js/doc_manager.js"></script>';
 //      $htmlheader.= '<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>'; <---- Habilitar CKEDITOR
         $htmlheader.= '</head>';
         $htmlheader.= '<body>';
@@ -44,6 +46,7 @@ class DocManager extends Objeto {
 
     public function ImprimirSelector($array, $name, $selected = ' ', $class, $placeholder) {
         $select = "<select class='$class' name='$name' id='$name' placeholder='$placeholder'>";
+        $select .= "<option value=''>Seleccione una seccion para insertar</option>\n";
         
         foreach ($array as $value => $key) {
             if ($value == $selected) {
