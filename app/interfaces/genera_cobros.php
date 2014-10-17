@@ -572,8 +572,12 @@ if ($opc == 'buscar') {
 									text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
 								}
 
+								if (jQuery('#advertencia_descargar_borradores').length > 0) {
+									jQuery('#advertencia_descargar_borradores').remove();
+								}
 
 								jQuery('<p/>')
+										.attr('id', 'advertencia_descargar_borradores')
 										.attr('title', 'Advertencia')
 										.html(text_window)
 										.dialog({
