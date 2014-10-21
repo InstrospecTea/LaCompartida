@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.18.1
+Jueves 16 de Octubre 2014
+* **Fixed:** [Corregir despliegue de carta al descargar borradores](https://github.com/LemontechSA/ttb/pull/724)
+
 ## Release: 14.18.0
 Miércoles 15 de Octubre 2014
 * **Fixed:** [Corrige modificación de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
