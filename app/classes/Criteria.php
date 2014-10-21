@@ -50,14 +50,14 @@ class Criteria {
 	/**
 	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
 	 * @return Array asociativo de resultados.
+	 * @throws Exception
+	 *
 	 */
 	public function run() {
 		if ($this->sesion == null) {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
 		}
-		$statement = $this->sesion->pdodbh->prepare($this->get_plain_query());
-		$statement->execute();
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
+		return self::query($this->get_plain_query(), $this->sesion);
 	}
 
 	/*
@@ -101,10 +101,10 @@ class Criteria {
 	}
 
 	/**
-	 * [add_select_from_criteria description]
-	 * @param Criteria            $criteria    [description]
-	 * @param CriteriaRestriction $restriction [description]
-	 * @param [type]              $alias       [description]
+	 * @param Criteria            $toCloneCriteria
+	 * @param CriteriaRestriction $restriction
+	 * @param                     $alias
+	 * @return $this
 	 */
 	public function add_select_from_criteria(Criteria $toCloneCriteria, CriteriaRestriction $restriction, $alias) {
 		$criteria = clone $toCloneCriteria;
@@ -114,6 +114,13 @@ class Criteria {
 		return $this;
 	}
 
+	/**
+	 * @param Criteria            $toCloneCriteria
+	 * @param CriteriaRestriction $restriction
+	 * @param                     $alias
+	 * @param string              $default
+	 * @return $this
+	 */
 	public function add_select_not_null_from_criteria(Criteria $toCloneCriteria, CriteriaRestriction $restriction, $alias, $default = '-') {
 		$criteria = clone $toCloneCriteria;
 		$criteria->add_restriction($restriction);
@@ -123,8 +130,9 @@ class Criteria {
 	}
 
 	/**
-	 * Añade un limite a la cantidad de resultados
-	 * @param  $limit Numero de resutlados
+	 * @param $limit
+	 * @return $this
+	 * @throws Exception
 	 */
 	public function add_limit($limit) {
 		if (is_numeric($limit) && $limit >= 0) {
@@ -167,11 +175,15 @@ class Criteria {
 
 	/**
 	 * Añade un scope de búsqueda mediante un JOIN genérico configurable.
-	 * @param  string $join_table
-	 * @param  string $join_condition
-	 * @return Criteria
+	 * @param        $join_table
+	 * @param        $join_condition
+	 * @param string $join_type
+	 * @return $this
 	 */
 	public function add_custom_join_with($join_table, $join_condition, $join_type = 'LEFT') {
+		if (is_array($join_table)) {
+			$join_table = implode(' AS ', $join_table);
+		}
 		$new_clause = " $join_type JOIN $join_table ON $join_condition ";
 		$this->join_clauses[] = $new_clause;
 		return $this;
@@ -240,7 +252,10 @@ class Criteria {
 	 * @return Criteria
 	 */
 	public function add_restriction(CriteriaRestriction $restriction) {
-		$this->where_clauses[] = $restriction->get_restriction();
+		$string_restriction = $restriction->get_restriction();
+		if (!empty($string_restriction)) {
+			$this->where_clauses[] = $restriction->get_restriction();
+		}
 		return $this;
 	}
 
@@ -250,33 +265,38 @@ class Criteria {
 	 * @return Criteria
 	 */
 	public function add_grouping($group_entity) {
-		$this->grouping_clauses[] = $group_entity;
+		if (!in_array($group_entity, $this->grouping_clauses)) {
+			$this->grouping_clauses[] = $group_entity;
+		}
 		return $this;
 	}
 
 	/**
 	 * Añade una condición de ordenamiento al criterio de búsqueda.
-	 * @param string $order
-	 * @param ordering_criteria
-	 * @return Criteria
+	 * @param        $order_entity
+	 * @param string $ordering_criteria
+	 * @return $this
+	 * @throws Exception
 	 */
 	public function add_ordering($order_entity, $ordering_criteria = 'ASC') {
 
 		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
-			$this->ordering_clauses[] = $order_entity.' '.$ordering_criteria;
+			$order = $order_entity.' '.$ordering_criteria;
+			if (!in_array($order, $this->ordering_clauses)) {
+				$this->ordering_clauses[] = $order;
+			}
 		} else {
 			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido "'. $order_criteria. '".');
 		}
-		
+
 		return $this;
 	}
 
 	/**
-	 *
 	 * Establece el criterio de ordenamiento para criteria.
-	 * @param [type] $ordering_criteria [description]
-	 * @deprecated
-	 *
+	 * @param $ordering_criteria
+	 * @return $this
+	 * @throws Exception
 	 */
 	public function add_ordering_criteria($ordering_criteria) {
 		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
@@ -387,6 +407,20 @@ class Criteria {
 				$this->generate_grouping_statement() .
 				$this->generate_ordering_statement() .
 				$this->limit;
+	}
+
+	public function __toString() {
+		try {
+			return $this->get_plain_query();
+		} catch(Exception $e) {
+			return $e->getLine() . ': ' . $e->getMessage();
+		}
+	}
+
+	public static function query($query, Sesion $sesion) {
+		$statement = $sesion->pdodbh->prepare($query);
+		$statement->execute();
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 

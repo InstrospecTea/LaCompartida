@@ -47,7 +47,7 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function equals($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' = ' . $right . ')');
+		return new CriteriaRestriction("{$left} = {$right}");
 	}
 
 	/**
@@ -57,55 +57,59 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function not_equal($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' != ' . $right . ')');
+		return new CriteriaRestriction("{$left} != {$right}");
 	}
 
 	/**
-	 * Genera una sentencia AND entre los argumentos de la izquierda y los de la derecha.
-	 * @param  String $left
-	 * @param  String $right
+	 * Genera una sentencia AND entre los argumentos pasados.
 	 * @return CriteriaRestriction
 	 */
-	public static function and_clause($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' AND ' . $right . ')');
+	public static function and_clause() {
+		$args = func_get_args();
+		$total_args = count($args);
+        for($key = 0; $key < $total_args; ++$key) {
+			$arg = $args[$key];
+			if (is_array($arg)) {
+				$args[$key] = call_user_func_array(array('CriteriaRestriction', 'and_clause'), $arg);
+			}
+		}
+		return new CriteriaRestriction('(' . implode(' AND ', $args) . ')');
 	}
 
 	/**
-	 * Genera una sentencia OR entre los argumentos de la izquierda y los de la derecha.
-	 * @param  String $left
-	 * @param  String $right
+	 * Genera una sentencia OR entre los argumentos pasados.
 	 * @return CriteriaRestriction
 	 */
-	public static function or_clause($left, $right) {
-		return new CriteriaRestriction('(' . $left . ' OR ' . $right . ")");
+	public static function or_clause() {
+		$args = func_get_args();
+        $total_args = count($args);
+        for($key = 0; $key < $total_args; ++$key) {
+			$arg = $args[$key];
+			if (is_array($arg)) {
+				$args[$key] = call_user_func_array(array('CriteriaRestriction', 'and_clause'), $arg);
+			}
+		}
+		return new CriteriaRestriction('(' . implode(' OR ', $args) . ')');
 	}
 
 	/**
-	 * Añade sentencias AND para anidar todas las condiciones en el array $condition_array.
+	 * Deprecado usar and_clause.
 	 * @param array $condition_array
 	 * @return CriteriaRestriction
-	 * @throws Exception
+	 * @deprecated
 	 */
-	public static function and_all(array $condition_array) {
-		if (is_array($condition_array)) {
-			return new CriteriaRestriction(implode(' AND ', $condition_array));
-		} else {
-			throw new Exception('The condition_array parameter is not an array!');
-		}
+	public static function and_all(Array $condition_array) {
+		return call_user_func_array(array('CriteriaRestriction', 'and_clause'), $condition_array);
 	}
 
 	/**
-	 * Añade sentencias OR para anidar todas las condiciones en el array $condition_array.
+	 * Deprecado usar or_clause.
 	 * @param array $condition_array
 	 * @return CriteriaRestriction
-	 * @throws Exception
+	 * @deprecated
 	 */
-	public static function or_all(array $condition_array) {
-		if (is_array($condition_array)) {
-			return new CriteriaRestriction(implode(' OR ', $condition_array));
-		} else {
-			throw new Exception('The condition_array parameter is not an array!');
-		}
+	public static function or_all(Array $condition_array) {
+		return call_user_func_array(array('CriteriaRestriction', 'or_clause'), $condition_array);
 	}
 
 	/**
@@ -117,7 +121,22 @@ class CriteriaRestriction {
 	 */
 	public static function in($column, array $comparsion_group) {
 		if (is_array($comparsion_group)) {
-			return new CriteriaRestriction(' '.$column.' IN ('.implode(',', $comparsion_group).')');
+			return new CriteriaRestriction("$column IN ('" . implode("','", $comparsion_group) . "')");
+		} else {
+			throw new Exception('The condition_array parameter is not an array!');
+		}
+	}
+
+	/**
+	 * Añade sentencia NOT IN para una columna y un conjunto de matches posibles.
+	 * @param       $column
+	 * @param array $comparsion_group
+	 * @return CriteriaRestriction
+	 * @throws Exception
+	 */
+	public static function not_in($column, array $comparsion_group) {
+		if (is_array($comparsion_group)) {
+			return new CriteriaRestriction(' '.$column.' NOT IN ('.implode("','", $comparsion_group).')');
 		} else {
 			throw new Exception('The condition_array parameter is not an array!');
 		}
@@ -140,7 +159,17 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function greater_or_equals_than($column , $pivot) {
-		return new CriteriaRestriction('('.$column.' >= \''.$pivot.'\')');
+		return new CriteriaRestriction("{$column} >= {$pivot}");
+	}
+
+	/**
+	 * Añade sentencia Mayor Que, para una Columna > pivote
+	 * @param $column
+	 * @param $pivot
+	 * @return CriteriaRestriction
+	 */
+	public static function greater_than($column , $pivot) {
+		return new CriteriaRestriction("{$column} > {$pivot}");
 	}
 
 	/**
@@ -150,7 +179,17 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function lower_or_equals_than($column , $pivot) {
-		return new CriteriaRestriction('('.$column.' <= \''.$pivot.'\')');
+		return new CriteriaRestriction("{$column} <= {$pivot}");
+	}
+
+	/**
+	 * Añade sentencia Menor Que, para una Columna < pivote
+	 * @param $column
+	 * @param $pivot
+	 * @return CriteriaRestriction
+	 */
+	public static function lower_than($column , $pivot) {
+		return new CriteriaRestriction("{$column} < {$pivot}");
 	}
 
 	/**
@@ -162,8 +201,24 @@ class CriteriaRestriction {
 		return new CriteriaRestriction($column.' IS NOT NULL');
 	}
 
+	/**
+	 * Añade sentencia que compara si una columna tiene un valor nulo.
+	 * @param $column
+	 * @return CriteriaRestriction
+	 */
+	public static function is_null($column) {
+		return new CriteriaRestriction("{$column} IS NULL");
+	}
+
+	/**
+	 *
+	 * @param type $column
+	 * @param type $left
+	 * @param type $right
+	 * @return \CriteriaRestriction
+	 */
 	public static function between($column, $left, $right) {
-		return new CriteriaRestriction('('.$column.' BETWEEN '.'\''.$left.'\''.' AND '.'\''.$right.'\''.')');
+		return new CriteriaRestriction("({$column} BETWEEN {$left} AND {$right})");
 	}
 
 }
