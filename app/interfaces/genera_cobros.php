@@ -25,6 +25,7 @@ if ($opc == 'excel') {
 	// Es necesaria esta bestialidad para que no se caiga cuando es llamada desde otro lado.
 	$no_activo = !$activo;
 	$multiple = true;
+	$forzar_username = true;
 	require_once Conf::ServerDir() . '/interfaces/cobros_xls.php';
 	exit;
 }
@@ -571,8 +572,12 @@ if ($opc == 'buscar') {
 									text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
 								}
 
+								if (jQuery('#advertencia_descargar_borradores').length > 0) {
+									jQuery('#advertencia_descargar_borradores').remove();
+								}
 
 								jQuery('<p/>')
+										.attr('id', 'advertencia_descargar_borradores')
 										.attr('title', 'Advertencia')
 										.html(text_window)
 										.dialog({

@@ -2,9 +2,14 @@
 require_once dirname(dirname(__FILE__)) . '/conf.php';
 
 $sesion = new Sesion(array('REP'));
-//Revisa el Conf si esta permitido
+$pagina = new Pagina($sesion);
+
+/*
+ * Debe tener habilitado la Conf ReportesAvanzados para acceder a este reporte.
+ */
 if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
-	header("location: reportes_especificos.php");
+	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reportes Avanzados') . '.';
+	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
 }
 
 $dias_semana = array(
@@ -43,7 +48,6 @@ for ($i = (date('Y') - 5); $i < (date('Y') + 5); ++$i) {
 	$anios[$i] = $i;
 }
 
-$pagina = new Pagina($sesion);
 $Form = new Form();
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 

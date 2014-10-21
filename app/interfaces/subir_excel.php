@@ -1,9 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
 
 $sesion = new Sesion();
 $pagina = new Pagina($sesion);
@@ -12,17 +8,6 @@ $popup = true;
 $pagina->titulo = __('Subir excel modificado');
 $pagina->PrintTop($popup);
 ?>
-
-<script type="text/javascript">
-	function confirmar(form)
-	{
-		if (confirm("Esta modificando algunos trabajos con el excel,\n ¿Desea continuar?"))
-		{
-			form.submit();
-			window.opener.Refrescar();
-		}
-	}
-</script>
 
 <table width="480">
 	<tr>
@@ -38,17 +23,39 @@ $pagina->PrintTop($popup);
 			<form name="form_archivo" id="form_archivo" method="post" action="" enctype="multipart/form-data">
 				<input type="hidden" name="opc" id="opc" value="subir_excel" />
 				Subir excel modificado: <input type="file" name="archivo_data" />
-				<input type="button" value="<?php echo  __('Cargar Documento') ?>" class="btn" onclick="confirmar(this.form);" />
-				<br />
+				<input type="button" value="<?php echo __('Cargar Documento'); ?>" class="btn" onclick="confirmar(this.form);" />
+			</form>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>
+			<span align="center">
 				<?php
 				if ($opc == 'subir_excel') {
-					// Esta función actualiza los trabajos y entrega feedback del resultado.
-					echo '<br /><span align="center">' . Trabajo::ActualizarConExcel($archivo_data, $sesion) . '</span>';
+					// Sólo se permiten xls "%\.(xls|xlsx)$%i"
+					if (preg_match('%\.(xls)$%i', $archivo_data['name']) == 1) {
+						// Esta función actualiza los trabajos y entrega feedback del resultado.
+						echo Trabajo::ActualizarConExcel($archivo_data, $sesion);
+					} else {
+						echo '<b>La extenci&oacute;n del excel fue adjuntado es inv&aacute;lido.</b>';
+					}
 				}
 				?>
-			</form>
+			</span>
 		</td>
 	</tr>
 </table>
 
-<?php $pagina->PrintBottom($popup); ?>
+<script type="text/javascript">
+	function confirmar(form) {
+		if (confirm("Esta modificando algunos trabajos con el excel,\n ¿Desea continuar?")) {
+			form.submit();
+			window.opener.Refrescar();
+		}
+	}
+</script>
+
+<?php $pagina->PrintBottom($popup);
