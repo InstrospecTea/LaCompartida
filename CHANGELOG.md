@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.18.3
 Martes 21 de Octubre 2014
-* **Fixed:** [Corrige inconsistencia en la presentación del tipo de cambio](https://github.com/LemontechSA/ttb/pull/726)
+* **Fixed:** [Corrige inconsistencia en la presentación del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)
 
 ## Hotfix: 14.18.2
 Lunes 20 de Octubre 2014
