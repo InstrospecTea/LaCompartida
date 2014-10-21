@@ -938,14 +938,12 @@ $Form = new Form;
 	//Función que genera la tabla completa
 	function generarFechas()
 	{
-		if($('periodo_fecha_inicio').value=='')
-		{
+		if($('periodo_fecha_inicio').value == '') {
 			alert('No se ha seleccionado una fecha inicial');
 			$('periodo_fecha_inicio').focus();
 			return;
 		}
-		if($('periodo_intervalo').value=='0' || $('periodo_intervalo').value=='')
-		{
+		if($('periodo_intervalo').value == '0' || $('periodo_intervalo').value == '') {
 			alert('No se ha seleccionado una periodicidad');
 			$('periodo_intervalo').focus();
 			return;
@@ -2461,7 +2459,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												<?php echo __('Cobrar cada') ?>
 											</td>
 											<td align="left">
-												<input type="text" name="periodo_intervalo" value="<?php echo empty($contrato->fields['periodo_intervalo']) ? '1' : $contrato->fields['periodo_intervalo'] ?>" id="periodo_intervalo" size="3" maxlength="2" />
+												<input type="text" name="periodo_intervalo" value="<?php echo empty($contrato->fields['periodo_intervalo']) ? '' : $contrato->fields['periodo_intervalo'] ?>" id="periodo_intervalo" size="3" maxlength="2" />
 												<span style='font-size:10px'><?php echo __('meses') ?></span>
 											</td>
 										</tr>
