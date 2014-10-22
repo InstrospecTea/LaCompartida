@@ -28,7 +28,7 @@ class DocManager extends Objeto {
 //      $htmlheader.= '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>'; <--- recurso remoto
         $htmlheader.= '<script src="' . Conf::RootDir() . '/app/doc_manager/js/bootstrap.min.js"></script>';
         $htmlheader.= '<script src="' . Conf::RootDir() . '/app/doc_manager/js/doc_manager.js"></script>';
-//      $htmlheader.= '<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>'; <---- Habilitar CKEDITOR
+//        $htmlheader.= '<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>'; #<---- Habilitar CKEDITOR
         $htmlheader.= '</head>';
         $htmlheader.= '<body>';
 
@@ -47,7 +47,7 @@ class DocManager extends Objeto {
     public function ImprimirSelector($array, $name, $selected = ' ', $class, $placeholder) {
         $select = "<select class='$class' name='$name' id='$name' placeholder='$placeholder'>";
         $select .= "<option value=''>Seleccione una seccion para insertar</option>\n";
-        
+
         foreach ($array as $value => $key) {
             if ($value == $selected) {
                 $select .= "<option value='$value' selected>$key</option>\n";
@@ -72,6 +72,7 @@ class DocManager extends Objeto {
     public function Deleteformat($session, $id_carta) {
         $query = "DELETE FROM carta WHERE id_carta = {$id_carta}";
         $resp = mysql_query($query, $session->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $session->dbh);
+        return true;
     }
 
 }

@@ -24,14 +24,14 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 <!-- Encabezado mantenedor -->
 
 <div class="container" style="margin-top: 0.5%;">
-    <form role="form" id="formato_doc" method="post">    
+    <form role="form" id="form_doc" method="post">    
         <div class="col-sm-4"><h4>Mantenedor de Cartas</h4></div>
         <div class="col-sm-4"><?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'id_carta', $id_carta, 'class="form-control"', ' ', ''); ?></div>
         <div class="col-sm-4" id="nrel_charges"></div>
+        <input type="hidden" name="opc" id="opc" value=""/>
 </div>
 
 <!-- Panel HTML-CSS del mantenedor -->
-
 
 <div class="col-md-6">
     <div class="panel panel-default">
@@ -55,7 +55,7 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
                                 <?php echo $DocManager->ImprimirSelector($secciones, 'secciones', ' ', 'form-control', ''); ?>
                             </div>
                             <div class="col-md-1">
-                                <button type="button" class="btn btn-primary btn-sm">Insertar</button>
+                                <button id="insrt_seccion" type="button" class="btn btn-primary btn-sm">Insertar</button>
                             </div>
 
                         </div>
@@ -67,7 +67,7 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
                                 <select id="tag_selector" class="form-control"></select>
                             </div>
                             <div class="col-md-1">
-                                <button type="button" class="btn btn-primary btn-sm">Insertar</button>
+                                <button id="insrt_tag" type="button" class="btn btn-primary btn-sm">Insertar</button>
                             </div>
 
                         </div>
@@ -110,20 +110,16 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 
         <div class="panel-footer">
             <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target=".margenes">Margenes</button>
-                </div>
-                <div class="col-md-5">
-
+                <div class="col-md-8">
+                    <button type="button" class="btn btn-default pull-left" data-toggle="modal" data-target=".margenes">Margenes</button>
                 </div>
                 <div class="col-md-4">
-                    <button type="button" class="btn btn-danger">Eliminar</button>
-                    <button type="button" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-danger" id="eliminar_formato">Eliminar</button>
+                    <button type="button" class="btn btn-success" id="guardar_formato">Guardar</button>
                 </div>
             </div>
         </div>
-        
+
     </div>
 </div>
 
@@ -170,13 +166,13 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
                 <button value="1" name="guardar" id="guardar" class="btn btn-success">Confirmar</button>
             </div>
-
         </div>
-
     </div>
-</form>
 </div>
 
+
+
+</form>
 
 <?php
 echo $DocManager->GetHtmlFooter();

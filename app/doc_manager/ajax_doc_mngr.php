@@ -16,6 +16,7 @@ switch ($accion) {
 
         $output = '';
         $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$seccion]);
+        
         foreach ($tags as $val => $key) {
             $output .= '<option value="' . $val . '">' . basename($key) . "</option>\n";
         }
@@ -23,21 +24,28 @@ switch ($accion) {
         break;
 
     case 'obtener_carta':
-
-        $carta = $CartaCobro->ObtenerCarta($id_carta);
-        $preview_carta = $CartaCobro->PrevisualizarDocumento($carta, $id_cobro, 1);
+        $formato_html =  utf8_decode($formato_html);
+        $preview_carta = $CartaCobro->PrevisualizarDocumentoHtml($formato_html, $id_cobro);
         exit($preview_carta);
 
         break;
 
     case 'obtener_html':
+        
         $carta = $CartaCobro->ObtenerCarta($id_carta);
         exit($carta['formato']);
         break;
 
     case 'obtener_css':
+        
         $carta = $CartaCobro->ObtenerCarta($id_carta);
         exit($carta['formato_css']);
+        break;
+    
+    case 'eliminar_formato':
+        $DocManager->Deleteformat($session, $id_carta);
+        exit('TRUE');
+        
         break;
 
     case 'obtenenrelncobros':
@@ -48,13 +56,7 @@ switch ($accion) {
 
         exit('<h4>(N° liquidaciones relacionadas ' . $cobros_asociados . ')</h4>');
         break;
-
-    case 'eliminar_formato':
-
-        $query = "DELETE FROM carta WHERE id_carta = {$id_carta}";
-        echo $query;
-        break;
-
+        
     default :
         echo ("ERROR");
 }
