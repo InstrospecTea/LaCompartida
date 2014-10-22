@@ -109,13 +109,13 @@ EOF;
 				if ($WsFacturacionNubox->hasError()) {
 					$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
 				} else {
-					$archivo = self::FacturaToCsv($Sesion, $Factura, $Estudio);
+					$csv_documento = self::FacturaToCsv($Sesion, $Factura, $Estudio);
 					$opcionFolios = 1; //los folios son asignados por nubox
 					$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
 					$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
 					$hookArg['ExtraData'] = $csv_documento;
 					try {
-						$result = $WsFacturacionNubox->emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
+						$result = $WsFacturacionNubox->emitirFactura($csv_documento, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
 						if ($WsFacturacionNubox->hasError()) {
 							$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
 						} else {
