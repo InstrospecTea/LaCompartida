@@ -36,10 +36,10 @@ class CriteriaRestriction {
 		return $this->restriction;
 	}
 
-
 	/*
 	  STATIC RESTRICTION GENERATORS
 	 */
+
 	/**
 	 * Sentencia equals entre dos argumentos.
 	 * @param $left
@@ -67,7 +67,7 @@ class CriteriaRestriction {
 	public static function and_clause() {
 		$args = func_get_args();
 		$total_args = count($args);
-        for($key = 0; $key < $total_args; ++$key) {
+		for ($key = 0; $key < $total_args; ++$key) {
 			$arg = $args[$key];
 			if (is_array($arg)) {
 				$args[$key] = call_user_func_array(array('CriteriaRestriction', 'and_clause'), $arg);
@@ -82,8 +82,8 @@ class CriteriaRestriction {
 	 */
 	public static function or_clause() {
 		$args = func_get_args();
-        $total_args = count($args);
-        for($key = 0; $key < $total_args; ++$key) {
+		$total_args = count($args);
+		for ($key = 0; $key < $total_args; ++$key) {
 			$arg = $args[$key];
 			if (is_array($arg)) {
 				$args[$key] = call_user_func_array(array('CriteriaRestriction', 'and_clause'), $arg);
@@ -136,7 +136,7 @@ class CriteriaRestriction {
 	 */
 	public static function not_in($column, array $comparsion_group) {
 		if (is_array($comparsion_group)) {
-			return new CriteriaRestriction(' '.$column.' NOT IN ('.implode("','", $comparsion_group).')');
+			return new CriteriaRestriction(' ' . $column . ' NOT IN (' . implode("','", $comparsion_group) . ')');
 		} else {
 			throw new Exception('The condition_array parameter is not an array!');
 		}
@@ -149,7 +149,7 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function in_from_criteria($column, Criteria $criteria) {
-		return new CriteriaRestriction(' '.$column.' IN ('.$criteria->get_plain_query().')');
+		return new CriteriaRestriction(' ' . $column . ' IN (' . $criteria->get_plain_query() . ')');
 	}
 
 	/**
@@ -158,7 +158,7 @@ class CriteriaRestriction {
 	 * @param $pivot
 	 * @return CriteriaRestriction
 	 */
-	public static function greater_or_equals_than($column , $pivot) {
+	public static function greater_or_equals_than($column, $pivot) {
 		return new CriteriaRestriction("{$column} >= {$pivot}");
 	}
 
@@ -168,7 +168,7 @@ class CriteriaRestriction {
 	 * @param $pivot
 	 * @return CriteriaRestriction
 	 */
-	public static function greater_than($column , $pivot) {
+	public static function greater_than($column, $pivot) {
 		return new CriteriaRestriction("{$column} > {$pivot}");
 	}
 
@@ -178,7 +178,7 @@ class CriteriaRestriction {
 	 * @param $pivot
 	 * @return CriteriaRestriction
 	 */
-	public static function lower_or_equals_than($column , $pivot) {
+	public static function lower_or_equals_than($column, $pivot) {
 		return new CriteriaRestriction("{$column} <= {$pivot}");
 	}
 
@@ -188,7 +188,7 @@ class CriteriaRestriction {
 	 * @param $pivot
 	 * @return CriteriaRestriction
 	 */
-	public static function lower_than($column , $pivot) {
+	public static function lower_than($column, $pivot) {
 		return new CriteriaRestriction("{$column} < {$pivot}");
 	}
 
@@ -198,7 +198,7 @@ class CriteriaRestriction {
 	 * @return CriteriaRestriction
 	 */
 	public static function is_not_null($column) {
-		return new CriteriaRestriction($column.' IS NOT NULL');
+		return new CriteriaRestriction($column . ' IS NOT NULL');
 	}
 
 	/**

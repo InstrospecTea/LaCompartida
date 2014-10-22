@@ -71,12 +71,7 @@ class Criteria {
 	 * @return Criteria
 	 */
 	public function add_select($attribute, $alias = null) {
-		if (is_null($alias)) {
-			$alias = '';
-		}
-		$new_clause = '';
-		$new_clause .= $attribute;
-		$new_clause .= (strlen($alias) > 0) ? " AS $alias" : '';
+		$new_clause = $attribute . (!empty($alias) ? " AS $alias" : '');
 		$this->select_clauses[] = $new_clause;
 		return $this;
 	}
@@ -176,6 +171,9 @@ class Criteria {
 	/**
 	 * Añade un scope de búsqueda mediante un JOIN genérico configurable.
 	 * @param        $join_table
+	 *		Posibles llamadas:
+	 *		 - string nombre_table
+	 *		 - array [nombre_tabla, alias]
 	 * @param        $join_condition
 	 * @param string $join_type
 	 * @return $this
@@ -191,7 +189,10 @@ class Criteria {
 
 	/**
 	 * Añade un scope de búsqueda mediante un LEFT JOIN al criteria.
-	 * @param  string $join_table
+	 * @param        $join_table
+	 *		Posibles llamadas:
+	 *		 - string nombre_table
+	 *		 - array [nombre_tabla, alias]
 	 * @param  string $join_condition
 	 * @return Criteria
 	 */
@@ -202,7 +203,10 @@ class Criteria {
 
 	/**
 	 * Añade un scope de búsqueda mediante un INNER JOIN al criteria.
-	 * @param  string $join_table
+	 * @param        $join_table
+	 *		Posibles llamadas:
+	 *		 - string nombre_table
+	 *		 - array [nombre_tabla, alias]
 	 * @param  string $join_condition
 	 * @return Criteria
 	 */
