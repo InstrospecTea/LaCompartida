@@ -23,6 +23,9 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 		if (empty($direccion_cliente)) {
 			$errors[] = __('Debe ingresar Dirección del cliente.');
 		}
+		if (strlen($direccion_cliente) > 60) {
+			$errors[] = __('La Dirección del cliente supera los 60 caracteres.');
+		}
 		if (empty($comuna_cliente)) {
 			$errors[] = __('Debe ingresar Comuna del cliente.');
 		}
@@ -120,7 +123,7 @@ EOF;
 							$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
 						} else {
 							try {
-								$Factura->Edit('numero', $result['FolioCargado']);
+								$Factura->Edit('numero', $result['Folio']);
 								$Factura->Edit('dte_url_pdf', $result['Identificador']);
 								$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 								if ($Factura->Write()) {
@@ -152,7 +155,7 @@ EOF;
 			$error_description = $result->getErrorMessage();
 			$error_log = $error_description;
 		}
-		Log::write($error_log, "FacturacionElectronicaCl");
+		Log::write($error_log, "FacturacionElectronicaNubox");
 		return array(
 			'Code' => $error_code,
 			'Message' => $error_description
