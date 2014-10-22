@@ -67,7 +67,7 @@ class CriteriaTest extends BaseUnitTest {
 			$this->criteria->add_from('usuario');
 			$this->criteria->add_restriction(
 				CriteriaRestriction::or_clause(
-					CriteriaRestriction::equals('activo', 1), CriteriaRestriction::equals('fecha_creacion', '01-01-2014')
+					CriteriaRestriction::equals('activo', 1), CriteriaRestriction::equals('fecha_creacion', "'01-01-2014'")
 				)
 			);
 			$this->criteria->get_plain_query();
@@ -117,7 +117,7 @@ class CriteriaTest extends BaseUnitTest {
 			$this->criteria->add_from('usuario');
 			$this->criteria->add_restriction(
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('activo', 1), CriteriaRestriction::equals('fecha_creacion', '01-01-2014')
+					CriteriaRestriction::equals('activo', 1), CriteriaRestriction::equals('fecha_creacion', "'01-01-2014'")
 				)
 			);
 			$this->criteria->get_plain_query();

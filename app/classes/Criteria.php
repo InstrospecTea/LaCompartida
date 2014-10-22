@@ -172,7 +172,7 @@ class Criteria {
 	 * Añade un scope de búsqueda mediante un JOIN genérico configurable.
 	 * @param        $join_table
 	 *		Posibles llamadas:
-	 *		 - string nombre_table
+	 *		 - string nombre_tabla
 	 *		 - array [nombre_tabla, alias]
 	 * @param        $join_condition
 	 * @param string $join_type
@@ -191,7 +191,7 @@ class Criteria {
 	 * Añade un scope de búsqueda mediante un LEFT JOIN al criteria.
 	 * @param        $join_table
 	 *		Posibles llamadas:
-	 *		 - string nombre_table
+	 *		 - string nombre_tabla
 	 *		 - array [nombre_tabla, alias]
 	 * @param  string $join_condition
 	 * @return Criteria
@@ -205,7 +205,7 @@ class Criteria {
 	 * Añade un scope de búsqueda mediante un INNER JOIN al criteria.
 	 * @param        $join_table
 	 *		Posibles llamadas:
-	 *		 - string nombre_table
+	 *		 - string nombre_tabla
 	 *		 - array [nombre_tabla, alias]
 	 * @param  string $join_condition
 	 * @return Criteria
