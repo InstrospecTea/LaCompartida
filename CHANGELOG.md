@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix: 14.18.3
+Martes 21 de Octubre 2014
+* **Fixed:** [Corrige inconsistencia en la presentación del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)
+
+## Hotfix: 14.18.2
+Lunes 20 de Octubre 2014
+* **Fixed:** [Corrige la condición de creación de cobros programados](https://github.com/LemontechSA/ttb/pull/725)
+
 ## Hotfix: 14.18.1
 Jueves 16 de Octubre 2014
 * **Fixed:** [Corregir despliegue de carta al descargar borradores](https://github.com/LemontechSA/ttb/pull/724)
