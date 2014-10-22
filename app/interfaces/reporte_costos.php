@@ -1,44 +1,31 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once 'Spreadsheet/Excel/Writer.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+<?php
+require_once dirname(__FILE__).'/../conf.php';
+require_once 'Spreadsheet/Excel/Writer.php';
 
-	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
-	if( method_exists('Conf','GetConf') )
-	{
-		if( !Conf::GetConf($sesion,'ReportesAvanzados') )
-		{
-			header("location: reportes_especificos.php");
-		}
-	}
-	else if( method_exists('Conf','ReportesAvanzados') )
-	{
-		if( !Conf::ReportesAvanzados() )
-		{
-			header("location: reportes_especificos.php");
-		}
-	}
-	else
-		header("location: reportes_especificos.php");
-	$pagina = new Pagina($sesion);
+$sesion = new Sesion();
+$pagina = new Pagina($sesion);
 
-	if(!$fecha_a || $fecha_a<1)
-		$fecha_a = date("Y");
-	if(!$fecha_m || $fecha_m<1 || $fecha_m>12)
-		$fecha_m = date("m");
-	$meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"),__("Julio"),__("Agosto"),__("Septiembre"),__("Octubre"),__("Noviembre"),__("Diciembre"));
+/*
+ * Debe tener habilitado la Conf ReportesAvanzados y el usuario debe tener los permisos ADM y REP para acceder a este reporte.
+ */
+if (!Conf::GetConf($sesion, 'ReportesAvanzados') || !$sesion->usuario->Es('ADM') || !$sesion->usuario->Es('REP')) {
+	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reporte costos') . '.';
+	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
+}
 
-	if($opc == 'excel_anual' || $opc=='reporte')
-	{
-		require_once('planillas/planilla_resumen_costos.php');
-		exit;
-	}
+if(!$fecha_a || $fecha_a<1)
+	$fecha_a = date("Y");
+if(!$fecha_m || $fecha_m<1 || $fecha_m>12)
+	$fecha_m = date("m");
+$meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"),__("Julio"),__("Agosto"),__("Septiembre"),__("Octubre"),__("Noviembre"),__("Diciembre"));
 
-	$pagina->titulo = __('Reporte costo por profesional');
-	$pagina->PrintTop();
+if($opc == 'excel_anual' || $opc=='reporte') {
+	require_once('planillas/planilla_resumen_costos.php');
+	exit;
+}
+
+$pagina->titulo = __('Reporte costo por profesional');
+$pagina->PrintTop();
 ?>
 <style>
 #tbl_tarifa
@@ -136,3 +123,5 @@
 <?
 	$pagina->PrintBottom($popup);
 ?>
+
+

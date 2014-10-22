@@ -10,19 +10,6 @@ class ReporteRentabilidadProfesional {
 	private $sesion;
 	private $criteria;
 	private $sub_criteria;
-	private $and_statements = array();
-	private $report_details = array();
-	//
-	// Opciones de layout
-	//
-
-  //Define el ancho que tendrán los campos numéricos del reporte, que tengan que ver con montos.
-	private $ancho_campo_numerico = 69;
-	//Define el ancho que tendrá el detalle de cada fila del reporte. Este ancho debe repartirse entre todos los detalles que se
-	//añadan antes de los campos numéricos del reporte.
-	private $ancho_campo = 35;
-	private $ancho_campo_numerico_detalle = 70;
-	private $ancho_campo_detalle = 35;
 
 	/**
 	 * Constructor de la clase.
@@ -43,15 +30,18 @@ class ReporteRentabilidadProfesional {
 	public function generar() {
 		$this->genera_query_criteria();
 
-		$statement = $this->sesion->pdodbh->prepare($this->criteria->get_plain_query());
+		$query = $this->criteria->get_plain_query();
+
+		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 		$reporte = $this->genera_reporte($results);
 
-		if ($this->opciones['opcion_usuario'] == 'xls') {
+		if (in_array($this->opciones['opcion_usuario'], array('xls', 'json'))) {
 			$reporte->LoadResults($results);
-			$writer = SimpleReport_IOFactory::createWriter($reporte, 'Spreadsheet');
+			$writer_type = $this->opciones['opcion_usuario'] == 'xls' ? 'Spreadsheet' : 'Json';
+			$writer = SimpleReport_IOFactory::createWriter($reporte, $writer_type);
 			$writer->save('Reporte_rentabilidad_profesional');
 		}
 
@@ -155,7 +145,8 @@ class ReporteRentabilidadProfesional {
 				'format' => 'number',
 				'extras' => array(
 					'symbol' => 'moneda',
-					'attrs' => 'style="text-align:right"'
+					'attrs' => 'style="text-align:right"',
+					'alias' => 'suma_total_trabajado'
 				)
 			),
 			array(
@@ -199,6 +190,15 @@ class ReporteRentabilidadProfesional {
 		}
 
 		$where_fecha = "$where_fecha_desde $where_fecha_hasta";
+
+		$user_restrictions = array();
+		$user_restrictions[] = CriteriaRestriction::equals('u.visible', 1);
+
+		if (!empty($this->datos['id_usuario'])) {
+			$user_restrictions[] = CriteriaRestriction::equals('u.id_usuario', $this->datos['id_usuario']);
+		}
+
+		$user_restrictions = CriteriaRestriction::and_all($user_restrictions);
 
 		$moneda_base = new Moneda($this->sesion);
 		$moneda_base->Load(Moneda::GetMonedaBase($this->sesion));
@@ -374,6 +374,8 @@ class ReporteRentabilidadProfesional {
 			->add_from('usuario', 'u')
 			->add_inner_join_with('usuario_permiso up', "up.id_usuario = u.id_usuario AND up.codigo_permiso = 'PRO'")
 			->add_left_join_with_criteria($resumen_usuarios, 'ru', 'ru.id_usuario = u.id_usuario')
+			// WHERE
+			->add_restriction($user_restrictions)
 			// GROUP
 			->add_grouping('u.id_usuario');
 

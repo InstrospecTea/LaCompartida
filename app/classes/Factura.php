@@ -2612,7 +2612,8 @@ class Factura extends Objeto {
 					prm_documento_legal.codigo as cod_tipo,
 					factura.id_moneda,
 					pm.tipo_cambio,
-					pm.cifras_decimales
+					pm.cifras_decimales,
+					factura_cobro.id_cobro
 					FROM factura
 					JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
 					LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura

@@ -935,11 +935,12 @@ $pagina->PrintTop($popup);
 					$tipos[$codigo] = $glosa;
 				}
 
-				echo Html::SelectArrayDecente($tipos, 'tipo_doc', $tipo_doc, 'id="tipo_doc" onchange="ShowCheque();"', '', '100px');
+				echo Html::SelectArrayDecente($tipos, 'tipo_doc', $documento->fields['tipo_doc'], 'id="tipo_doc" onchange="ShowCheque();"', '', '100px');
 				echo __('N° Documento:');
 				?>
 				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $numero_doc); ?>" />
 			</td>
+		</tr>
 
 		<tr>
 			<td align="right">
@@ -1055,8 +1056,9 @@ $pagina->PrintTop($popup);
 											$tipo_cambios[] = $tipo_cambio;
 										}
 										?>
+									</tr>
 									<tr>
-										<td colspan=<?php echo $num_monedas ?> align="center">
+										<td colspan="<?php echo $num_monedas ?>" align="center">
 											<input type="button" onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?php echo __('Guardar') ?>" />
 											<input type="button" onclick="CancelarDocumentoMonedaPago()" value="<?php echo __('Cancelar') ?>" />
 											<input type="hidden" id="tipo_cambios_documento" name="tipo_cambios_documento" value="<?php echo implode(',', $tipo_cambios) ?>" />
@@ -1133,14 +1135,17 @@ if (empty($adelanto) || $id_documento) {
 	</script>
 
 </form>
+
 <script type="text/javascript">
 	jQuery('.oculto').hide();
-	if(window.location!=parent.window.location) jQuery('#txt_pagina').hide();
-
+	if (window.location != parent.window.location) {
+		jQuery('#txt_pagina').hide();
+	}
 </script>
 <?php
 if ($autocompletador) {
 	echo Autocompletador::Javascript($sesion, false, 'CargarTabla(1);');
 }
+
 echo InputId::Javascript($sesion, "", "No existen N° de cuenta asociadas a este banco.");
 $pagina->PrintBottom($popup);

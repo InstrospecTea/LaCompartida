@@ -148,10 +148,12 @@ class SimpleReport_Writer_Json implements SimpleReport_Writer_IWriter {
 			$class .= ' ' . $column->extras['class'];
 		}
 
+		$element_key = !empty($column->extras['alias']) ? $column->extras['alias'] : $column->field;
+
 		if ($column->format == 'number') {
-			return array($column->field =>  (float) $valor);
+			return array($element_key =>  (float) $valor);
 		} else {
-			return array($column->field => "$extras$valor");
+			return array($element_key => "$extras$valor");
 		}
 
 	}

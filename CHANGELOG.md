@@ -1,5 +1,135 @@
 # Changelog
 
+## Hotfix: 14.18.3
+Martes 21 de Octubre 2014
+* **Fixed:** [Corrige inconsistencia en la presentación del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)
+
+## Hotfix: 14.18.2
+Lunes 20 de Octubre 2014
+* **Fixed:** [Corrige la condición de creación de cobros programados](https://github.com/LemontechSA/ttb/pull/725)
+
+## Hotfix: 14.18.1
+Jueves 16 de Octubre 2014
+* **Fixed:** [Corregir despliegue de carta al descargar borradores](https://github.com/LemontechSA/ttb/pull/724)
+
+## Release: 14.18.0
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Corrige modificación de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
+* **Fixed:** [Permisos reporte financiero](https://github.com/LemontechSA/ttb/pull/716)
+* **New:** [Primera versión reporte personal de producción](https://github.com/LemontechSA/ttb/pull/719)
+
+## Hotfix: 14.17.6
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Elimina los registros asociados al cobro en la tabla cobro_asunto.](https://github.com/LemontechSA/ttb/pull/721)
+
+## Hotfix: 14.17.5
+Martes 14 de Octubre 2014
+* **Fixed:** [Sincroniza valores de montos cobrados del reporte de rendimiento de profesionales con el reporte avanzado.](https://github.com/LemontechSA/ttb/pull/720)
+
+## Hotfix: 14.17.4
+Jueves 9 de Octubre 2014
+* **Fixed:** [Quita mensaje del excel `Error en el archivo los datos pueden haberse perdido`.](https://github.com/LemontechSA/ttb/pull/717)
+
+## Hotfix: 14.17.3
+Martes 7 de Octubre 2014
+* **Fixed:** [Ancho de columnas en el reporte de rendimiento de profesionales.](https://github.com/LemontechSA/ttb/pull/715)
+
+## Hotfix: 14.17.2
+Martes 7 de Octubre 2014
+* **Fixed:** [Define valores de tabla para cuando no están definidos.](https://github.com/LemontechSA/ttb/pull/714)
+
+## Hotfix: 14.17.1
+Martes 7 de Octubre 2014
+* **Fixed:** [Condicion de filtrado por contrato en el reporte de antiguedad de deudas generaba un conjunto disjunto.](https://github.com/LemontechSA/ttb/pull/713)
+
+## Release: 14.17.0
+Lunes 6 de Octubre 2014
+* **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
+* **Fixed:** [Agregar columna Monto Facturable al reporte excel](https://github.com/LemontechSA/ttb/pull/702)
+
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
+## Hotfix: 14.16.12
+Jueves 2 de Octubre 2014
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
+
+## Hotfix: 14.16.11
+Jueves 2 de Octubre 2014
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
+
+## Hotfix: 14.16.10
+Martes 30 de Septiembre 2014
+* **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+
+## Hotfix: 14.16.9
+Lunes 29 de Septiembre 2014
+* **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)
+
+## Hotfix: 14.16.8
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige NotaCobro para mostrar trabajos segun opcion](https://github.com/LemontechSA/ttb/pull/701)
+
+## Hotfix: 14.16.7
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige problemas de visualizacion de IVA en DTE](https://github.com/LemontechSA/ttb/pull/700)
+
+## Hotfix: 14.16.6
+Jueves 25 de Septiembre 2014
+* **Fixed:** [Corrige Modificación de tareas](https://github.com/LemontechSA/ttb/pull/699)
+
+## Hotfix: 14.16.5
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige eliminación y búsqueda de trámites](https://github.com/LemontechSA/ttb/pull/698)
+
+## Hotfix: 14.16.4
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Mejora edición de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/697)
+
+## Hotfix: 14.16.3
+Miércoles 24 de Septiembre 2014
+* **Fixed:** [Corrige problema con IVA en facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/693)
+
+## Hotfix: 14.16.2
+Martes 23 de Septiembre 2014
+* **Fixed:** [Corrige suma mal hecha en saldo adeudado (Nota de cobro)](https://github.com/LemontechSA/ttb/pull/695)
+
+## Hotfix: 14.16.1
+Lunes 22 de Septiembre 2014
+* **Fixed:** [Corrige edición de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
+
+## Release: 14.16.0
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
+* **Fixed:** [Agrega opción para descargar excel con formato para tablas dinámicas](https://github.com/LemontechSA/ttb/pull/616)
+* **Fixed:** [Agrega columna monto cobrado al reporte de rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/644)
+* **Fixed:** [Integración Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
+
+## Hotfix: 14.15.15
+Jueves 11 de Septiembre 2014
+* **Fixed:** [Eliminar asignación de modalidad de cálculo en cobros 5](https://github.com/LemontechSA/ttb/pull/693)
+
+## Hotfix: 14.15.14
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir filtros Reporte antigüedad de deuda](https://github.com/LemontechSA/ttb/pull/689)
+
+## Hotfix: 14.15.13
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Lógica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
+
+## Hotfix: 14.15.12
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Nota Cobro MB Inglés. Monto Saldo aprovisionado](https://github.com/LemontechSA/ttb/pull/687)
+
+## Hotfix: 14.15.11
+Miércoles 10 de Septiembre 2014
+* **Fixed:** [Corregir carta MB](https://github.com/LemontechSA/ttb/pull/686)
+
+## Hotfix: 14.15.10
+Martes 09 de Septiembre 2014
+* **Fixed:** [Editar multiples trabajos al revisar horas](https://github.com/LemontechSA/ttb/pull/684)
+
 ## Hotfix: 14.15.9
 Viernes 06 de Septiembre 2014
 * **Fixed:** [Corregir asignación de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)

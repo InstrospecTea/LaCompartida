@@ -18,6 +18,7 @@ $params_array['codigo_permiso'] = 'PRO';
 $p_profesional = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
 if ($p_revisor->fields['permitido'] && $accion == "eliminar") {
+	$accion = '';
 	$tramite = new Tramite($sesion);
 	$tramite->Load($id_tramite);
 	if ($tramite->Estado() == "Abierto") {
@@ -389,7 +390,9 @@ $pagina->PrintTop($popup);
 
 
 	function EliminaTramite(id) {
-		self.location.href = "listar_tramites.php?accion=eliminar&popup=1&opc=buscar&id_tramite=" + id;
+		jQuery('#accion').val('eliminar');
+		jQuery('#id_tramite').val(id);
+		jQuery('#form_tramites').submit();
 		return true;
 	}
 
@@ -473,6 +476,8 @@ $pagina->PrintTop($popup);
 
 <form method='post' name="form_tramites" id="form_tramites">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
+	<input type='hidden' name='accion' id='accion'>
+	<input type='hidden' name='id_tramite' id='id_tramite'>
 	<input type='hidden' name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>'>
 	<input type='hidden' name='popup' id='popup' value='<?php echo $popup ?>'>
 	<input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo ?>'>
