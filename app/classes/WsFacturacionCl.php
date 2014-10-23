@@ -3,17 +3,12 @@
 require_once(dirname(__FILE__) . '/../conf.php');
 ini_set('soap.wsdl_cache_enabled', 0);
 
-class WsFacturacionCl {
+class WsFacturacionCl extends WsFacturacion {
 
-	protected $tipoCodigo;
-	protected $ValorCodigo;
 	protected $url = 'http://ws.facturacion.cl/WSDS/wsplano.asmx?wsdl';
-	protected $Client;
 	protected $usuario;
 	protected $password;
 	protected $rut;
-	protected $errorCode;
-	protected $errorMessage;
 
 	public function __construct() {
 		$this->Client = new SoapClient($this->url, array('trace' => 1));
@@ -215,32 +210,6 @@ class WsFacturacionCl {
 		$data = UtilesApp::utf8izar($data);
 		self::array_to_xml($data, $node);
 		return $xml->asXML();
-	}
-
-	private static function array_to_xml($array, SimpleXMLElement &$xml) {
-		foreach ($array as $key => $value) {
-			if (is_array($value)) {
-				if (!is_numeric($key)) {
-					$subnode = $xml->addChild("$key");
-					self::array_to_xml($value, $subnode);
-				} else {
-					self::array_to_xml($value, $xml);
-				}
-			} else {
-				$xml->addChild("$key", "$value");
-			}
-		}
-	}
-
-	private static function XML2Array(SimpleXMLElement $parent) {
-		$array = array();
-
-		foreach ($parent as $name => $element) {
-			($node = & $array[$name]) && (1 === count($node) ? $node = array($node) : 1) && $node = & $node[];
-			$node = $element->count() ? self::XML2Array($element) : trim($element);
-		}
-
-		return $array;
 	}
 
 }
