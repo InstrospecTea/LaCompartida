@@ -87,7 +87,7 @@ if (!class_exists('Conf')) {
 				// 2.1) Usar variable desde caching
 				$arrayconf = $Sesion->arrayconf;
 				//error_log("CACHE HIT! $conf = {$arrayconf[$conf]}");
-				return $arrayconf[$conf];
+				return empty($arrayconf[$conf]) ? null : $arrayconf[$conf];
 
 			// 3) Tercera prioridad: existe memcache y la llave de configuración está vigente.
 			} else if ($existememcache && $arrayconf = UtilesApp::utf8izar(json_decode($memcache->get(DBNAME . '_config'), true), false)) {
