@@ -1011,11 +1011,16 @@ class NotaCobro extends Cobro {
     }
 
     function GuardarCarta($data) {
-        $formato = '';
-        foreach ($data['secciones'] as $seccion => $html) {
-            $formato .= "\n###$seccion###\n$html\n";
-        }
-        $data[$this->carta_formato] = $formato;
+        
+//        if ( empty($data["id_carta"]) ) {
+//            $query = "SELECT max(id_carta) FROM carta";
+//            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+//            $id_carta = mysql_fetch_assoc($resp);
+//        }
+//        
+//        echo pr(array_keys($data)); exit;
+
+        $data[$this->carta_formato] = $data["formato"];
         unset($data['secciones']);
 
         $Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);

@@ -1,89 +1,123 @@
 // Obtiene previsualizacion del formato html
 
-function ObtenerCarta() {
+var intrvl = 0;
+
+function guardar() {
+    $('#opc').val('guardar');
+    $('#form_doc').submit();
+}
+
+function PrevisualizarCarta() {
 
     var id_cobro = $("#id_cobro").val();
-    var formato_html = $('#formato_html').val();
+    var formato = $('#carta\\[formato\\]').val();
+    var existecobro = ExisteCobro(id_cobro);
 
     if (id_cobro === '') {
         alert('Es necesario definir un numero de cobro para previsualizar una carta');
     } else {
-        $.post("ajax_doc_mngr.php", {
-            accion: "obtener_carta",
-            id_cobro: id_cobro,
-            formato_html: formato_html
-        })
-                .done(function (data) {
-                    $("#letter_preview").html(data);
-                });
+
+        if (existecobro === false) {
+            $("#errmsg").html("No existe cobro").show().fadeOut(1600);
+        } else {
+
+            $.post("ajax_doc_mngr.php", {
+                accion: "obtener_carta",
+                id_cobro: id_cobro,
+                formato: formato
+            }).done(function (data) {
+                $("#letter_preview").html(data);
+            });
+        }
     }
 }
 
-function InsertarValor() {
-    $('#formato_html').val('%'+$('#secciones').val()+'%');
+function Cargarformato(id_carta) {
+    var urlajaxnrelcharges = 'ajax_doc_mngr.php?accion=obtenenrelncobros&id_carta=' + id_carta;
+    var urlajaxgethtml = 'ajax_doc_mngr.php?accion=obtener_html&id_carta=' + id_carta;
+    var urlajaxgetcss = 'ajax_doc_mngr.php?accion=obtener_css&id_carta=' + id_carta;
+
+    $.get(urlajaxnrelcharges, function (data) {
+        $("#nrel_charges").html(data);
+    });
+    $.get(urlajaxgethtml, function (data) {
+        $("#carta\\[formato\\]").html(data);
+    });
+    $.get(urlajaxgetcss, function (data) {
+        $("#carta\\[formato_css\\]").html(data);
+    });
+}
+
+function ExisteCobro(id_cobro) {
+
+    var existecobro;
+    var urlajax = 'ajax_doc_mngr.php?accion=existe_cobro&id_cobro=' + id_cobro;
+    $.ajax(urlajax, {
+        method: 'get',
+        async: false,
+        dataType: 'json',
+        success: function (data) {
+            existecobro = data.existe;
+        }
+    });
+
+    return existecobro;
+
 }
 
 $(function () {
 
-    // Observa si hay cambios en el selector de formatos.
-    // Carga formato_html y formato_css. Además obtiene cantida de cobros asociados.
+// Observa si hay cambios en el selector de formatos.
+// Carga carta[formato] y carta[formato_css]. Además obtiene cantidad de cobros asociados.
 
-    $('#id_carta').change(function () {
-
-        var id_carta = $('#id_carta').val();
-
-        var urlajaxnrelcharges = 'ajax_doc_mngr.php?accion=obtenenrelncobros&id_carta=' + id_carta;
-        var urlajaxgethtml = 'ajax_doc_mngr.php?accion=obtener_html&id_carta=' + id_carta;
-        var urlajaxgetcss = 'ajax_doc_mngr.php?accion=obtener_css&id_carta=' + id_carta;
-
-        $.get(urlajaxnrelcharges, function (data) {
-            $("#nrel_charges").html(data);
-        });
-        $.get(urlajaxgethtml, function (data) {
-            $("#formato_html").html(data);
-        });
-        $.get(urlajaxgetcss, function (data) {
-            $("#formato_css").html(data);
-        });
+    $('#carta\\[id_carta\\]').change(function () {
+        var id_carta = $('#carta\\[id_carta\\]').val();
+        Cargarformato(id_carta);
     });
 
     // Observa si hay cambios en el selector de seccion para mostrar tags relacionados a esta.
-
     $("#secciones").on('change', function () {
         var seccion = $(this).val();
         var urlajax = 'ajax_doc_mngr.php?accion=obtener_tags&seccion=' + seccion;
-
         $("#tags").html('<option>Cargando...</option>');
         $.get(urlajax, function (data) {
             $("#tag_selector").html(data);
         });
     });
 
-    // Obteniendo Previsualizacion desde base de datos
+    // Obteniendo Previsualizacion ( formato, formato_css )
     $('#id_cobro').change(function () {
-        ObtenerCarta();
+        PrevisualizarCarta();
     });
 
-    $('#formato_html').on('input', function () {
-        ObtenerCarta();
+    // Obteniendo Previsualizacion (formato)
+    $('#carta\\[formato\\]').on('input', function () {
+        clearInterval(intrvl);
+        intrvl = setInterval(PrevisualizarCarta, 1000);
     });
 
-    // Obtiene Documento Word desde la base de datos
-    $('#btn_previsualizar').click(function () {
-        $('#opc').val('prev');
-        $('#form_doc').submit();
+    $('#id_new_formato').change(function () {
+        var id_formato = $('#id_new_formato').val();
+        Cargarformato(id_formato);
     });
 
     // Elimina Formato seleccionado.
     $('#eliminar_formato').click(function () {
-        var id_carta = $('#id_carta').val();
-        var nombre_formato = $("#id_carta option:selected").text();
+        var id_carta = $('#carta\\[id_carta\\]').val();
+        var nombre_formato = $("#carta\\[id_carta\\] option:selected").text();
         var urlajax = 'ajax_doc_mngr.php?accion=eliminar_formato&id_carta=' + id_carta;
-        console.log(urlajax);
         $.get(urlajax, function (data) {
             alert('El formato ' + nombre_formato + ' fue eliminado satisfactoriamente');
         });
         location.reload();
+    });
+
+    $('#guardar_nuevo').click(function () {
+        guardar();
+    });
+
+    $('#guardar_formato').click(function () {
+        guardar();
     });
 
 });
@@ -91,15 +125,13 @@ $(function () {
 jQuery(document).ready(function ($) {
     $('#tabs').tab();
 
-    // Segmento de codigo solo incremnta el largo de el plugin CKEDITOR
-    // Descomentar y definir alto.
-
-//     CKEDITOR.on('instanceReady', function () {
-//         var textEditHeight = $(".textPanel").height();
-//         var ckTopHeight = $("#cke_1_top").height();
-//         var ckContentsHeight = $("#cke_1_contents").height();
-//         for (var i = 1; i < 10; i++) {
-//             $("#cke_" + i + "_contents").height("400px");
-//         }
-//     });
+    // Verifica que input solo acepte numeros y no letras.
+    $("#id_cobro").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            $("#errmsg").html("Ingrese Solo Numeros").show().fadeOut(1600);
+            return false;
+        }
+    });
 });

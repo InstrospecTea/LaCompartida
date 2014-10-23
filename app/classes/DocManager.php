@@ -69,6 +69,20 @@ class DocManager extends Objeto {
         return $numofasociatedcharges;
     }
 
+    public function ExisteCobro($sesion, $id_cobro) {
+
+        if (empty($id_cobro)) {
+            return false;
+        } else {
+            $query = "SELECT count(*) FROM cobro WHERE id_cobro = {$id_cobro}";
+            $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+            list($existe_ncobro) = mysql_fetch_array($resp);
+
+            return $existe_ncobro != 0;
+        }
+    }
+
     public function Deleteformat($session, $id_carta) {
         $query = "DELETE FROM carta WHERE id_carta = {$id_carta}";
         $resp = mysql_query($query, $session->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $session->dbh);
