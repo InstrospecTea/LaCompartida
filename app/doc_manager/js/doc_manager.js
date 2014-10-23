@@ -159,7 +159,7 @@ $(function () {
     });
     
     $('#btn_previsualizar').click(function () {
-        
+         $('#opc').val('prev');
         $('#form_doc').submit();
     });
 

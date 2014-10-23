@@ -1026,7 +1026,6 @@ class NotaCobro extends Cobro {
     }
 
     function PrevisualizarDocumento($data, $id_cobro) {
-        pr($data); exit;
         $formato = $data['formato'];
         $html = $this->ReemplazarHTML($formato, $id_cobro);
         $doc = new DocGenerator(
@@ -1035,10 +1034,10 @@ class NotaCobro extends Cobro {
             $this->fields['opc_papel'],
             $this->fields['opc_ver_numpag'],
             'PORTRAIT',
-            1.5,
-            2,
-            2,
-            2,
+            $data['margen_superior'],
+            $data['margen_derecho'],
+            $data['margen_inferior'],
+            $data['margen_izquierdo'],
             $this->fields['estado']
         );
         libxml_use_internal_errors(true);
