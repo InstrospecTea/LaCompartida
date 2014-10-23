@@ -81,7 +81,8 @@ EOF;
 			$rut = $Estudio->GetMetaData('rut');
 			$usuario = $Estudio->GetMetadata('facturacion_electronica_cl.usuario');
 			$password = $Estudio->GetMetadata('facturacion_electronica_cl.password');
-			$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
+			$WsFacturacionCl = new WsFacturacionCl;
+			$WsFacturacionCl->setLogin($rut, $usuario, $password);
 			if ($WsFacturacionCl->hasError()) {
 				$hookArg['Error'] = self::ParseError($WsFacturacionCl, $WsFacturacionCl->getErrorCode());
 			} else {
@@ -141,7 +142,8 @@ EOF;
 		$rut = $Estudio->GetMetaData('rut');
 		$usuario = $Estudio->getMetadata('facturacion_electronica_cl.usuario');
 		$password = $Estudio->getMetadata('facturacion_electronica_cl.password');
-		$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
+		$WsFacturacionCl = new WsFacturacionCl;
+		$WsFacturacionCl->setLogin($rut, $usuario, $password);
 		if ($WsFacturacionCl->hasError()) {
 			$hookArg['Error'] = array(
 				'Code' => $WsFacturacionCl->getErrorCode(),
@@ -187,6 +189,10 @@ EOF;
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
 		$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
 		$afecto = $PrmDocumentoLegal->fields['documento_afecto'];
+
+		$Contrato = new Contrato($Sesion);
+		$Contrato->Load($Factura->fields['id_contrato']);
+
 		$arrayFactura = array(
 			'tipo_dte' => $tipoDTE,
 			'afecto' => $afecto,
@@ -200,6 +206,7 @@ EOF;
 				'rut' => $Estudio->GetMetaData('rut'),
 				'razon_social' => $Estudio->GetMetaData('razon_social'),
 				'giro' => $Estudio->GetMetaData('giro'),
+				'correo' => $Contrato->fields['email_contacto'],
 				'codigo_actividad' => $Estudio->GetMetaData('codigo_actividad'),
 				'direccion' => $Estudio->GetMetaData('direccion'),
 				'comuna' => $Estudio->GetMetaData('comuna'),
