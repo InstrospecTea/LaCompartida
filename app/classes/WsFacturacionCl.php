@@ -143,7 +143,7 @@ class WsFacturacionCl extends WsFacturacion {
 		$this->password = $password;
 	}
 
-	private function setError($code, $message) {
+	protected function setError($code, $message) {
 		$this->errorCode = $code;
 		$this->errorMessage = $message;
 	}
