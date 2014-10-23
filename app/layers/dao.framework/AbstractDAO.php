@@ -126,12 +126,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	}
 
 		public function saveOrUpdate($object) {
-		$this->checkClass($object, $this->getClass());
+			$this->checkClass($object, $this->getClass());
 			$reflected = new ReflectionClass($this->getClass());
-		try{
+			try{
 				$id = $object->get($object->getIdentity());
-			//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
-			//que crear un nuevo registro.
+				//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
+				//que crear un nuevo registro.
 				if(empty($id)) {
 					$object = $this->save($object);
 						if (is_subclass_of($object, 'LoggeableEntity')) {
@@ -145,10 +145,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 								$this->writeLogFromArray('MODIFICAR', $object, $legacy);
 						}
 				}
-			return $object;
-		} catch(PDOException $e){
+				return $object;
+			} catch(PDOException $e){
 				throw new Exception('No se ha podido persistir el objeto de tipo '.$this->getClass().'.');
-		}
+			}
 		}
 
 	/**
@@ -237,8 +237,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	 * Realiza la encapsulación de un resultado de una query a la base de datos en una instancia de un objeto.
 	 * @param $arrayResult
 	 * @param $instance
+	 * @return
 	 */
-	private function encapsulate($arrayResult, $instance) {
+	protected function encapsulate($arrayResult, $instance) {
+		if (empty($arrayResult)) {
+			return null;
+		}
 		foreach ($arrayResult as $property => $value) {
 			$instance->set($property, $value);
 		}
