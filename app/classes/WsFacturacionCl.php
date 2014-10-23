@@ -15,12 +15,9 @@ class WsFacturacionCl {
 	protected $errorCode;
 	protected $errorMessage;
 
-	public function __construct($rut, $usuario, $password) {
+	public function __construct() {
 		$this->Client = new SoapClient($this->url, array('trace' => 1));
 		$this->isOnline();
-		$this->rut = $rut;
-		$this->usuario = $usuario;
-		$this->password = $password;
 	}
 
 	/**
@@ -49,6 +46,7 @@ class WsFacturacionCl {
 					'RUTRecep' => $dataFactura['receptor']['rut'],
 					'RznSocRecep' => $dataFactura['receptor']['razon_social'],
 					'GiroRecep' => $dataFactura['receptor']['giro'],
+					'CorreoRecep' => $dataFactura['receptor']['correo'],
 					'DirRecep' => $dataFactura['receptor']['direccion'],
 					'CmnaRecep' => $dataFactura['receptor']['comuna'],
 					'CiudadRecep' => $dataFactura['receptor']['cuidad']
@@ -66,18 +64,29 @@ class WsFacturacionCl {
 		$documento['Detalle'] = array();
 		$lin = 0;
 		foreach ($dataFactura['detalle'] as $detalle) {
-			$documento['Detalle'][] = array(
+			if (strlen($detalle['descripcion']) > 80) {
+				$ad = explode("\n", wordwrap($detalle['descripcion'], 80, "\n"));
+				$descripcion1 = array_shift($ad);
+				$descripcion2 = implode(' ', $ad);
+			} else {
+				$descripcion1 = $detalle['descripcion'];
+				$descripcion2 = null;
+			}
+			$linea_detalle = array(
 				'NroLinDet' => ++$lin,
 				'CdgItem' => array(
 					'TpoCodigo' => $this->tipoCodigo,
 					'VlrCodigo' => $this->ValorCodigo
 				),
-				'NmbItem' => $detalle['descripcion'],
+				'NmbItem' => $descripcion1,
+				'dscitem' => $descripcion2,
 				'QtyItem' => $detalle['cantidad'],
 				'PrcItem' => $detalle['precio_unitario'],
 				'MontoItem' => $detalle['cantidad'] * $detalle['precio_unitario']
 			);
+			$documento['Detalle'][] = $linea_detalle;
 		}
+
 		Log::write(print_r($documento, true), 'FacturacionElectronicaCl');
 		return $this->enviarDocumento($documento);
 	}
@@ -101,7 +110,7 @@ class WsFacturacionCl {
 		return base64_decode($xml64);
 	}
 
-	public function getPdfUrl($documento, $original = false) {
+	public function getPdfUrl($documento, $original = true) {
 		$params = array(
 			'login' => $this->getLogin(),
 			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
@@ -131,6 +140,12 @@ class WsFacturacionCl {
 
 	public function getErrorMessage() {
 		return $this->errorMessage;
+	}
+
+	public function setLogin($rut, $usuario, $password) {
+		$this->rut = $rut;
+		$this->usuario = $usuario;
+		$this->password = $password;
 	}
 
 	private function setError($code, $message) {

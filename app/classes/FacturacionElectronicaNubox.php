@@ -134,52 +134,6 @@ EOF;
 		);
 	}
 
-	public static function AnulaFacturaElectronica($hookArg) {
-		$Sesion = new Sesion();
-		$Factura = $hookArg['Factura'];
-
-		if (!$Factura->FacturaElectronicaCreada()) {
-			return $hookArg;
-		}
-
-		$Estudio = new PrmEstudio($Sesion);
-		$Estudio->Load($Factura->fields['id_estudio']);
-		$rut = $Estudio->GetMetaData('rut');
-		$usuario = $Estudio->getMetadata('facturacion_electronica_cl.usuario');
-		$password = $Estudio->getMetadata('facturacion_electronica_cl.password');
-		$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
-		if ($WsFacturacionCl->hasError()) {
-			$hookArg['Error'] = array(
-				'Code' => $WsFacturacionCl->getErrorCode(),
-				'Message' => $WsFacturacionCl->getErrorMessage()
-			);
-		} else {
-			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
-			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
-			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-			$WsFacturacionCl->anularFactura($Factura->fields['numero'], $tipoDTE);
-			if (!$WsFacturacionCl->hasError()) {
-				try {
-					$estado_dte = Factura::$estados_dte['Anulado'];
-					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
-					$Factura->Edit('dte_estado', $estado_dte);
-					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
-					$Factura->Write();
-				} catch (Exception $ex) {
-					$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
-				}
-			} else {
-				$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
-				$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
-				$estado_dte = Factura::$estados_dte['ProcesoAnular'];
-				$Factura->Edit('dte_estado', $estado_dte);
-				$Factura->Edit('dte_estado_descripcion', $mensaje);
-				$Factura->Write();
-			}
-		}
-		return $hookArg;
-	}
-
 	/**
 	 * Genera CSV de datos de la factura para enviar a NuBox
 	 * @param Sesion $Sesion
