@@ -3,9 +3,11 @@
 abstract class AbstractService implements BaseService{
 
     var $sesion;
+    private $loadedClass = array();
 
     public function __construct(Sesion $sesion) {
         $this->sesion = $sesion;
+		$this->loadDAO($this->getDaoLayer());
     }
 
     public function saveOrUpdate($object) {
@@ -21,7 +23,13 @@ abstract class AbstractService implements BaseService{
 
     }
 
-    public function get($id) {
+	/**
+	 * Obtiene una instancia del objeto manejado por la capa, a partir de su identificador primario.
+	 * @param $id
+	 * @return Entity
+	 * @throws Exception
+	 */
+	public function get($id) {
         $this->checkNullity($id);
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
@@ -78,4 +86,22 @@ abstract class AbstractService implements BaseService{
         }
     }
 
+	/**
+	 * Carga un DAO al vuelo
+	 * @param      $classname
+	 * @param null $alias
+	 */
+	protected function loadDAO($classname, $alias = null) {
+		if (!preg_match('/DAO$/', $classname)) {
+			$classname = "{$classname}DAO";
+		}
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->sesion);
+		$this->loadedClass[] = $alias;
+	}
 }
