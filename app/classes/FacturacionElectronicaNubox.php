@@ -2,22 +2,46 @@
 
 class FacturacionElectronicaNubox extends FacturacionElectronica {
 
-	public static function ValidarFactura() {
-		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
+	public static function ValidarFactura(Factura $Factura = null) {
+		if (empty($Factura)) {
+			global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
+		} else {
+			$campos = array(
+				'RUT_cliente' => null,
+				'direccion_cliente' => null,
+				'ciudad_cliente' => null,
+				'comuna_cliente' => null,
+				'giro_cliente' => null
+			);
+			$datos = array_intersect_key($Factura->fields, $campos);
+			extract($datos);
+		}
+		$errors = array();
 		if (empty($RUT_cliente)) {
-			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
+			$errors[] = __('Debe ingresar RUT del cliente.');
 		}
 		if (empty($direccion_cliente)) {
-			$pagina->AddError(__('Debe ingresar Dirección del cliente.'));
+			$errors[] = __('Debe ingresar Dirección del cliente.');
+		}
+		if (strlen($direccion_cliente) > 60) {
+			$errors[] = __('La Dirección del cliente supera los 60 caracteres.');
 		}
 		if (empty($comuna_cliente)) {
-			$pagina->AddError(__('Debe ingresar Comuna del cliente.'));
+			$errors[] = __('Debe ingresar Comuna del cliente.');
 		}
 		if (empty($ciudad_cliente)) {
-			$pagina->AddError(__('Debe ingresar Ciudad del cliente.'));
+			$errors[] = __('Debe ingresar Ciudad del cliente.');
 		}
 		if (empty($giro_cliente)) {
-			$pagina->AddError(__('Debe ingresar ' . __('Giro') . ' del cliente.'));
+			$errors[] = __('Debe ingresar ' . __('Giro') . ' del cliente.');
+		}
+
+		if (isset($pagina)) {
+			foreach ($errors as $msg) {
+				$pagina->AddError($msg);
+			}
+		} else {
+			return $errors;
 		}
 	}
 
@@ -39,7 +63,6 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 					buttons = jQuery('{$BotonDescargarHTML}');
 					buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
 					self.replaceWith(buttons);
-					window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=pdf"
 				}).error(function(error_data){
 					loading.remove();
 					response = JSON.parse(error_data.responseText);
@@ -70,49 +93,52 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 EOF;
 	}
 
-	public static function GeneraFacturaElectronica($hookArg) {
+	public static function GeneraFacturaElectronica(&$hookArg) {
 		$Sesion = new Sesion();
 		$Factura = $hookArg['Factura'];
 		if (!empty($Factura->fields['dte_url_pdf'])) {
 			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
 		} else {
-			$Estudio = new PrmEstudio($Sesion);
-			$Estudio->Load($Factura->fields['id_estudio']);
-			$rut = $Estudio->GetMetaData('rut');
-			$login = $Estudio->GetMetadata('facturacion_electronica');
-			$WsFacturacionCl = new WsFacturacionNubox($rut, $login);
-			pr($WsFacturacionCl);
-			if ($WsFacturacionCl->hasError()) {
-				$hookArg['Error'] = self::ParseError($WsFacturacionCl, $WsFacturacionCl->getErrorCode());
-			} else {
-				$archivo = self::FacturaToCsv($Sesion, $Factura, $Estudio);
-				$opcionFolios = 1; //los folios son asignados por nubox
-				$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
-				$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
-				$hookArg['ExtraData'] = $csv_documento;
-				try {
-					$result = $WsFacturacionCl->emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
-				pr($result);
-				exit;
-					if (!$WsFacturacionCl->hasError()) {
-						try {
-							$Factura->Edit('dte_xml', $result['Detalle']['Documento']['xmlDTE']);
-							$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
-							$file_url = $result['Detalle']['Documento']['urlPDF'];
-							$Factura->Edit('dte_url_pdf', $file_url);
-							if ($Factura->Write()) {
-								$hookArg['InvoiceURL'] = $file_url;
-							}
-						} catch (Exception $ex) {
-							$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
-						}
-					} else {
-						$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'BuildingInvoiceError');
-					}
-				} catch (Exception $ex) {
-					pr($ex->__toString());
-					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
+			try {
+				$errores = self::ValidarFactura($Factura);
+				if (!empty($errores)) {
+					throw new Exception(implode("\n", $errores), 0);
 				}
+				$Estudio = new PrmEstudio($Sesion);
+				$Estudio->Load($Factura->fields['id_estudio']);
+				$rut = $Estudio->GetMetaData('rut');
+				$login = $Estudio->GetMetadata('facturacion_electronica');
+				$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
+				if ($WsFacturacionNubox->hasError()) {
+					$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
+				} else {
+					$csv_documento = self::FacturaToCsv($Sesion, $Factura, $Estudio);
+					$opcionFolios = 1; //los folios son asignados por nubox
+					$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
+					$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
+					$hookArg['ExtraData'] = $csv_documento;
+					try {
+						$result = $WsFacturacionNubox->emitirFactura($csv_documento, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste);
+						if ($WsFacturacionNubox->hasError()) {
+							$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
+						} else {
+							try {
+								$Factura->Edit('numero', $result['Folio']);
+								$Factura->Edit('dte_url_pdf', $result['Identificador']);
+								$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
+								if ($Factura->Write()) {
+									$hookArg['InvoiceURL'] = $file_url;
+								}
+							} catch (Exception $ex) {
+								$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
+							}
+						}
+					} catch (Exception $ex) {
+						throw $ex;
+					}
+				}
+			} catch (Exception $ex) {
+				$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 			}
 		}
 		return $hookArg;
@@ -122,66 +148,22 @@ EOF;
 		$error_description = null;
 		if (is_a($result, 'Exception')) {
 			$error_log = $result->__toString();
+			if ($result->getCode() === 0) {
+				$error_description = $result->getMessage();
+			}
 		} else {
-
-			$error_description = utf8_decode($result->getErrorMessage());
+			$error_description = $result->getErrorMessage();
 			$error_log = $error_description;
 		}
-		Log::write($error_log, "FacturacionElectronicaCl");
+		Log::write($error_log, "FacturacionElectronicaNubox");
 		return array(
 			'Code' => $error_code,
 			'Message' => $error_description
 		);
 	}
 
-	public static function AnulaFacturaElectronica($hookArg) {
-		$Sesion = new Sesion();
-		$Factura = $hookArg['Factura'];
-
-		if (!$Factura->FacturaElectronicaCreada()) {
-			return $hookArg;
-		}
-
-		$Estudio = new PrmEstudio($Sesion);
-		$Estudio->Load($Factura->fields['id_estudio']);
-		$rut = $Estudio->GetMetaData('rut');
-		$usuario = $Estudio->getMetadata('facturacion_electronica_cl.usuario');
-		$password = $Estudio->getMetadata('facturacion_electronica_cl.password');
-		$WsFacturacionCl = new WsFacturacionCl($rut, $usuario, $password);
-		if ($WsFacturacionCl->hasError()) {
-			$hookArg['Error'] = array(
-				'Code' => $WsFacturacionCl->getErrorCode(),
-				'Message' => $WsFacturacionCl->getErrorMessage()
-			);
-		} else {
-			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
-			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
-			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-			$WsFacturacionCl->anularFactura($Factura->fields['numero'], $tipoDTE);
-			if (!$WsFacturacionCl->hasError()) {
-				try {
-					$estado_dte = Factura::$estados_dte['Anulado'];
-					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
-					$Factura->Edit('dte_estado', $estado_dte);
-					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
-					$Factura->Write();
-				} catch (Exception $ex) {
-					$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
-				}
-			} else {
-				$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
-				$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
-				$estado_dte = Factura::$estados_dte['ProcesoAnular'];
-				$Factura->Edit('dte_estado', $estado_dte);
-				$Factura->Edit('dte_estado_descripcion', $mensaje);
-				$Factura->Write();
-			}
-		}
-		return $hookArg;
-	}
-
 	/**
-	 * Genera CSV de datos de la factura para enviar a NuBox
+	 * Genera CSV de datos de la factura para enviar a Nubox
 	 * @param Sesion $Sesion
 	 * @param Factura $Factura
 	 * @return array
@@ -233,10 +215,9 @@ EOF;
 				'FOLIO' => $Factura->fields['numero'],
 				'SECUENCIA' => ++$item,
 				'FECHA' => Utiles::sql2date($Factura->fields['fecha'], '%d-%m-%Y'),
-				//'razon_social' => $Estudio->GetMetaData('razon_social'),
 				'RUT' => preg_replace('/\./', '', $Factura->fields['RUT_cliente']),
 				'RAZONSOCIAL' => UtilesApp::transliteration($Factura->fields['cliente']),
-				'GIRO' => UtilesApp::transliteration($Factura->fields['giro_cliente']),
+				'GIRO' => substr(UtilesApp::transliteration($Factura->fields['giro_cliente']), 0, 40),
 				'COMUNA' => UtilesApp::transliteration($Factura->fields['comuna_cliente']),
 				'DIRECCION' => UtilesApp::transliteration($Factura->fields['direccion_cliente']),
 				'AFECTO' => $afecto,
@@ -265,20 +246,10 @@ EOF;
 				'TERMINOSPAGOSDIAS' => '',
 				'TERMINOSPAGOCODIGO' => '',
 				'COMUNADESTINO' => '',
-				'RUTSOLICITANTEFACTURA' => '',
-//				'Sub Total' => $Moneda->getFloat($detalle_factura['precio_unitario'] * $detalle_factura['cantidad']),
-//				'monto_iva' => $Moneda->getFloat($Factura->fields['iva']),
-//				'monto_total' => $Moneda->getFloat($Factura->fields['total']),
-//				'moneda' => $Moneda->fields['codigo'],
-//				'tasa_iva' => $Factura->fields['porcentaje_impuesto'],
-//				'tipo_cambio' => $Moneda->getFloat($Moneda->fields['tipo_cambio']),
-//				'Precio' => $Moneda->getFloat($Factura->fields['total'] * $Moneda->fields['tipo_cambio']),
-//				'moneda_precio' => $Moneda->fields['codigo'],
-//				'fecha_vencimiento' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
-
+				'RUTSOLICITANTEFACTURA' => ''
 			);
 		}
-		pr($arrayFactura);
+
 		if (!empty($arrayFactura)) {
 			array_unshift($arrayFactura, array_keys($arrayFactura[0]));
 		}
@@ -286,6 +257,38 @@ EOF;
 			$arrayFactura[$key] = implode(';', $item);
 		}
 		return implode("\n", $arrayFactura);
+	}
+
+	/**
+	 * Descarga archivo PDF
+	 * @param type $hookArg
+	 */
+	public static function DescargarPdf($hookArg) {
+		$Factura = $hookArg['Factura'];
+		$id = $Factura->fields['dte_url_pdf'];
+		if (empty($id)) {
+			throw new Exception('Identificador no valido.');
+		}
+		$Estudio = new PrmEstudio($Factura->sesion);
+		$Estudio->Load($Factura->fields['id_estudio']);
+		$rut = $Estudio->GetMetaData('rut');
+		$login = $Estudio->GetMetadata('facturacion_electronica');
+		$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
+		if ($WsFacturacionNubox->hasError()) {
+			throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+		}
+		$result = $WsFacturacionNubox->getPdf($id);
+		if ($WsFacturacionNubox->hasError()) {
+			throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+		}
+
+		$name = sprintf('Factura_%s.pdf', $Factura->obtenerNumero());
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Type: application/pdf");
+		header('Content-Description: File Transfer');
+		header("Content-Disposition: attachment; filename=$name");
+		echo $result;
+		exit;
 	}
 
 }
