@@ -20,8 +20,6 @@ if ($opc == 'guardar') {
 $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 ?>
 
-
-
 <form role="form" id="form_doc" method="post">
 
     <input type="hidden" name="opc1" id="opc1" value="2"/>
@@ -179,7 +177,7 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
             </div>
         </div>
     </div>
-    
+
     <!-- Modal para agregar un nuevo formato-->
 
     <div class="modal fade nuevo_formato" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">

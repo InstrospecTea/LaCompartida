@@ -5,6 +5,7 @@ var intrvl = 0;
 function guardar() {
     $('#opc').val('guardar');
     $('#form_doc').submit();
+    window.location.reload();
 }
 
 function PrevisualizarCarta() {
@@ -48,6 +49,7 @@ function Cargarformato(id_carta) {
     });
 }
 
+// Function Existe
 function ExisteCobro(id_cobro) {
 
     var existecobro;
@@ -65,10 +67,36 @@ function ExisteCobro(id_cobro) {
 
 }
 
+function InsertarEnTextArea(text, type) {
+
+    if (type === 'seccion') {
+        var inserttxt = '%' + text + '%';
+    } else if (type === 'tag') {
+        var inserttxt = text;
+    }
+
+    var txtarea = $('#carta\\[formato\\]')[0];
+    var scrollPos = txtarea.scrollTop;
+    var strPos = 0;
+    var br = ((txtarea.selectionStart || txtarea.selectionStart == '0') ?
+            "ff" : (document.selection ? "ie" : false));
+    strPos = txtarea.selectionStart;
+
+    var front = (txtarea.value).substring(0, strPos);
+    var back = (txtarea.value).substring(strPos, txtarea.value.length);
+    txtarea.value = front + inserttxt + back;
+    strPos = strPos + inserttxt.length;
+
+    txtarea.selectionStart = strPos;
+    txtarea.selectionEnd = strPos;
+    txtarea.focus();
+    txtarea.scrollTop = scrollPos;
+}
+
 $(function () {
 
-// Observa si hay cambios en el selector de formatos.
-// Carga carta[formato] y carta[formato_css]. Además obtiene cantidad de cobros asociados.
+    // Observa si hay cambios en el selector de formatos.
+    // Carga carta[formato] y carta[formato_css]. Además obtiene cantidad de cobros asociados.
 
     $('#carta\\[id_carta\\]').change(function () {
         var id_carta = $('#carta\\[id_carta\\]').val();
@@ -90,7 +118,7 @@ $(function () {
         PrevisualizarCarta();
     });
 
-    // Obteniendo Previsualizacion (formato)
+    // Obteniendo Previsualizacion del formato (live)
     $('#carta\\[formato\\]').on('input', function () {
         clearInterval(intrvl);
         intrvl = setInterval(PrevisualizarCarta, 1000);
@@ -118,6 +146,21 @@ $(function () {
 
     $('#guardar_formato').click(function () {
         guardar();
+    });
+
+    $('#insrt_seccion').click(function () {
+        var seccion = $("#secciones option:selected").val();
+        InsertarEnTextArea(seccion, 'seccion');
+    });
+
+    $('#insrt_tag').click(function () {
+        var seccion = $("#tag_selector option:selected").val();
+        InsertarEnTextArea(seccion, 'tag');
+    });
+    
+    $('#btn_previsualizar').click(function () {
+        
+        $('#form_doc').submit();
     });
 
 });

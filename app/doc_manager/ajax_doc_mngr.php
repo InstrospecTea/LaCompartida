@@ -13,6 +13,8 @@ if (isset($_POST['accion'])) {
 switch ($accion) {
 
     case 'obtener_tags':
+        
+        pr($seccion);
 
         $output = '';
         $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$seccion]);
