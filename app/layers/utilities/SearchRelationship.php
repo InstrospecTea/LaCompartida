@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * Class SearchRelationship
+ * Establece una relación entre dos entidades. Depende de una instancia de {@link SearchCriteria}.
+ */
 class SearchRelationship extends AbstractUtility{
 
 	protected $entity;
 	protected $property;
 	protected $condition;
+
 
 	function __construct($entity) {
 		if (empty($entity)) {
@@ -15,6 +20,7 @@ class SearchRelationship extends AbstractUtility{
 	}
 
 	/**
+	 * Establece la propiedad que se utilizará para construir la relación entre la entidad principal y la secundaria.
 	 * @param $property
 	 * @return $this
 	 * @throws Exception
@@ -28,6 +34,8 @@ class SearchRelationship extends AbstractUtility{
 	}
 
 	/**
+	 * Establece la condición mediante la cuál se establecerá la relación. Debe ser uno de los métodos de
+	 * {@link CriteriaRestriction}.
 	 * @param $condition
 	 * @return $this
 	 * @throws Exception
@@ -39,11 +47,6 @@ class SearchRelationship extends AbstractUtility{
 		$this->condition = $condition;
 		return $this;
 	}
-
-
-
-
-
 
 
 } 

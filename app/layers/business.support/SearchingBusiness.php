@@ -28,6 +28,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	}
 
 	/**
+	 *
 	 * @param SearchCriteria $searchCriteria
 	 * @param Criteria       $criteria
 	 * @return Criteria|mixed
