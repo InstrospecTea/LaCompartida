@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix: 14.19.2
+Jueves 23 de Octubre 2014
+* **Fixed:** [Corrige definición del método](https://github.com/LemontechSA/ttb/pull/734)
+
+## Hotfix: 14.19.1
+Jueves 23 de Octubre 2014
+* **Fixed:** [Selección de cliente al agregar asuntos desde el mantenedor del cliente](https://github.com/LemontechSA/ttb/pull/733)
+
 ## Release: 14.19.0
 Jueves 23 de Octubre 2014
 * **Fixed:** [Feature modificación facturación cl](https://github.com/LemontechSA/ttb/pull/709)
