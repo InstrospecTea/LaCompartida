@@ -159,7 +159,9 @@ if ($opcion == "guardar") {
 		}
 
 		$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
-		$factura->Edit("factura_region", $factura_region ? addslashes($factura_region) : "");
+		if (Conf::GetConf($sesion, 'RegionCliente')) {
+			$factura->Edit("factura_region", $factura_region ? addslashes($factura_region) : "");
+		}
 		$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);

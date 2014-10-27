@@ -1830,6 +1830,14 @@ class Factura extends Objeto {
 		return $html2;
 	}
 
+	/**
+	 * Devuelve numero de factura incluyendo serie si corresponde.
+	 * @param type $id_factura
+	 * @param type $serie
+	 * @param type $numero
+	 * @param type $mostrar_comprobante
+	 * @return type
+	 */
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
 		$n = null;
 		if ($this->Loaded()) {

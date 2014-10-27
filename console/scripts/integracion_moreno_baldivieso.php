@@ -1,8 +1,9 @@
 <?php
+
 class IntegracionMorenoBaldivieso extends AppShell {
+
 	private $connection;
 	private $dbh;
-	public $debug;
 
 	public function __construct() {
 		// $this->connection['server'] = '200.87.127.182'; // Test and develop
@@ -78,10 +79,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 			$clients = UtilesApp::utf8izar($clients, false);
 
 			foreach ($clients as $client) {
-				$this->_debug($client);
+				$this->debug($client);
 
 				if ($this->_empty($client['client_code'])) {
-					$this->_debug('The client code is empty');
+					$this->debug('The client code is empty');
 					continue;
 				}
 
@@ -106,7 +107,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$Client->Edit('activo', $client['client_active']);
 
 				if ($Client->Write()) {
-					$this->_debug('Client save!');
+					$this->debug('Client save!');
 
 					// Client agreement: values by default
 					$client_agreement_active = 'NO';
@@ -246,7 +247,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$Matter->Edit('id_encargado', $lawyer_manager_id);
 
 				if ($Matter->Write()) {
-					$this->_debug('Matter save!');
+					$this->debug('Matter save!');
 
 					// Find a matter agreement
 					$MatterAgreement->loadById($Matter->fields['id_contrato']);
@@ -314,16 +315,11 @@ class IntegracionMorenoBaldivieso extends AppShell {
 			}
 		}
 
-		$this->_debug('Finished!');
+		$this->debug('Finished!');
 	}
 
 	private function _empty($var) {
 		return empty($var);
 	}
 
-	private function _debug($var) {
-		if ($this->debug) {
-			$this->out($var);
-		}
-	}
 }

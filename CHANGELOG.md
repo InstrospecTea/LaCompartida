@@ -1,5 +1,23 @@
 # Changelog
 
+## Hotfix: 14.19.2
+Jueves 23 de Octubre 2014
+* **Fixed:** [Corrige definición del método](https://github.com/LemontechSA/ttb/pull/734)
+
+## Hotfix: 14.19.1
+Jueves 23 de Octubre 2014
+* **Fixed:** [Selección de cliente al agregar asuntos desde el mantenedor del cliente](https://github.com/LemontechSA/ttb/pull/733)
+
+## Release: 14.19.0
+Jueves 23 de Octubre 2014
+* **Fixed:** [Feature modificación facturación cl](https://github.com/LemontechSA/ttb/pull/709)
+* **New:** [Feature facturación nubox](https://github.com/LemontechSA/ttb/pull/674)
+* **Updated** [Actualización Framework](https://github.com/LemontechSA/framework/pull/33)
+
+## Hotfix: 14.18.4
+Jueves 23 de Octubre 2014
+* **Fixed:** [Para los montos Flat Fee sin HH del reporte Producción Profesional se incluye la restricción de las horas](https://github.com/LemontechSA/ttb/pull/731)
+
 ## Hotfix: 14.18.3
 Martes 21 de Octubre 2014
 * **Fixed:** [Corrige inconsistencia en la presentación del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)

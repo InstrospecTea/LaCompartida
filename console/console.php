@@ -16,7 +16,8 @@ require __BASEDIR__ . '/app/conf.php';
 require __DIR__ . '/scripts/AppShell.php';
 require __DIR__ . "/scripts/{$args['script']}.php";
 
-$class_name = \TTB\Utiles::pascalize($args['script']);
+$Utiles = new \TTB\Utiles;
+$class_name = $Utiles->pascalize($args['script']);
 
 $script = new $class_name;
 $script->debug = isset($args['debug']);
