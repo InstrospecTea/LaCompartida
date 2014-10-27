@@ -5,7 +5,6 @@ var intrvl = 0;
 function guardar() {
     $('#opc').val('guardar');
     $('#form_doc').submit();
-    window.location.reload();
 }
 
 function PrevisualizarCarta() {
@@ -129,23 +128,17 @@ $(function () {
         Cargarformato(id_formato);
     });
 
-    // Elimina Formato seleccionado.
-    $('#eliminar_formato').click(function () {
-        var id_carta = $('#carta\\[id_carta\\]').val();
-        var nombre_formato = $("#carta\\[id_carta\\] option:selected").text();
-        var urlajax = 'ajax_doc_mngr.php?accion=eliminar_formato&id_carta=' + id_carta;
-        $.get(urlajax, function (data) {
-            alert('El formato ' + nombre_formato + ' fue eliminado satisfactoriamente');
-        });
-        location.reload();
-    });
-
     $('#guardar_nuevo').click(function () {
         guardar();
     });
 
     $('#guardar_formato').click(function () {
         guardar();
+    });
+
+    $('#eliminar_formato').click(function () {
+        $('#opc').val('eliminar');
+        $('#form_doc').submit();
     });
 
     $('#insrt_seccion').click(function () {
@@ -157,9 +150,9 @@ $(function () {
         var seccion = $("#tag_selector option:selected").val();
         InsertarEnTextArea(seccion, 'tag');
     });
-    
+
     $('#btn_previsualizar').click(function () {
-         $('#opc').val('prev');
+        $('#opc').val('prev');
         $('#form_doc').submit();
     });
 

@@ -62,7 +62,7 @@ class DocManager extends Objeto {
 
     public function GetNumOfAsociatedCharges($sesion, $id_carta) {
         $query = "SELECT count(*) FROM cobro WHERE id_carta = {$id_carta}";
-        $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+        $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
         list($numofasociatedcharges) = mysql_fetch_array($resp);
 
@@ -75,7 +75,7 @@ class DocManager extends Objeto {
             return false;
         } else {
             $query = "SELECT count(*) FROM cobro WHERE id_cobro = {$id_cobro}";
-            $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
             list($existe_ncobro) = mysql_fetch_array($resp);
 
@@ -85,7 +85,7 @@ class DocManager extends Objeto {
 
     public function Deleteformat($session, $id_carta) {
         $query = "DELETE FROM carta WHERE id_carta = {$id_carta}";
-        $resp = mysql_query($query, $session->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $session->dbh);
+        $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
         return true;
     }
 

@@ -10,8 +10,11 @@ echo $DocManager->GetHtmlHeader();
 
 if ($opc == 'guardar') {
     $id_carta = $CartaCobro->GuardarCarta($_POST['carta']);
+    header('Location: '.$_SERVER['REQUEST_URI']);
 } else if ($opc == 'prev') {
     $id_carta = $CartaCobro->PrevisualizarDocumento($carta, $id_cobro);
+} else if ($opc == 'eliminar') {
+    $DocManager->Deleteformat($session,$carta['id_carta']);
 } else {
     $carta = $CartaCobro->ObtenerCarta($id_carta);
 }
@@ -22,7 +25,6 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 
 <form role="form" id="form_doc" method="post">
 
-    <input type="hidden" name="opc1" id="opc1" value="2"/>
     <input type="hidden" name="opc" id="opc" value=""/>
 
     <!-- Encabezado mantenedor -->
@@ -172,7 +174,7 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                    <button value="1" name="guardar" id="guardar" class="btn btn-success">Confirmar</button>
+                    <button class="btn btn-success" data-dismiss="modal">Confirmar</button>
                 </div>
             </div>
         </div>

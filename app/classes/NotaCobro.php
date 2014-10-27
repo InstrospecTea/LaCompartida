@@ -1012,8 +1012,7 @@ class NotaCobro extends Cobro {
 
     function GuardarCarta($data) {
 
-        $formato = $data['formato'];
-        $data[$this->carta_formato] = $formato;
+        $data[$this->carta_formato] = $data['formato'];
 
         $Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);
         $Carta->guardar_fecha = false;
