@@ -31,7 +31,6 @@ class SearchService implements ISearchService{
 	 * @return array
 	 */
 	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
-		//$criteria = $this->translateCriteria($searchCriteria, $filter_properties , $criteria);
 		$entity = $searchCriteria->entity();
 		$entity = new ReflectionClass($entity);
 		$entity = $entity->newInstance();
