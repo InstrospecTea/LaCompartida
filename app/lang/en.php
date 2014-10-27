@@ -109,6 +109,9 @@ $_LANG['Total Gastos'] = "Total Disbursements";
 $_LANG['Folio Carta'] = "Invoice";
 $_LANG['Honorarios por asesorías prestadas'] = "Legal services rendered";
 $_LANG['durante el mes de'] = "during the month of";
+$_LANG['%B de %Y'] = '%B %Y';
+$_LANG['entre los meses de'] = 'between the months of';
+$_LANG['hasta el mes de'] = 'until';
 $_LANG['No hay facturas adeudadas'] = "There are no invoices due";
 $_LANG['Total Honorarios Adeudados'] = "Total legal fees due";
 $_LANG['Total Gastos Adeudados'] = "Total disbursements due";
@@ -645,7 +648,7 @@ $_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
 $_LANG['%despedida_mb%'] = "Cordially yours,";
 
 // Solicitado por @Gtigre
-$_LANG['lang_mb_detalle_chile_boleta_hyg'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% por honorarios y gastos por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios% equivalentes a %monto_honorarios_moneda_cobro% conforme a su equivalencia al %fecha_hasta_dmy%%detalle_cuenta_gastos%.";
+$_LANG['lang_mb_detalle_chile_boleta_hyg'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% por honorarios y gastos por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios% equivalentes a %monto_honorarios_moneda_cobro% conforme a su equivalencia al %fecha_hasta_dmy%%detalle_cuenta_gastos_cl_boleta%";
 $_LANG['lang_mb_detalle_chile_boleta_g'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% de gastos por la cantidad total de %monto_total_demo% correspondiente a los gastos asociados a servicios legales prestados %fecha_con_de% en relación al encargo profesional de la referencia, conforme a Boleta de Recuperación de Gastos adjunta.";
 $_LANG['lang_mb_detalle_chile_boleta_h'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% de honorarios por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios%%mb_monto_honorarios_moneda_cobro%";
 

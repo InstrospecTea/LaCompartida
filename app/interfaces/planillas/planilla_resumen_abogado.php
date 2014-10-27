@@ -203,21 +203,30 @@ if ($lista_usuarios == "")
 	$lista_usuarios = 'NULL';
 
 //Inicializo el arreglo de resultados
-$tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado_no_estandar', 'valor_cobrado');
+$tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado');
 foreach ($usuarios as $usuario) {
 	foreach ($tipo_dato as $td) {
 		$reporte = new Reporte($sesion);
 		if (is_array($forma_cobro))
-			foreach ($forma_cobro as $fc)
+			foreach ($forma_cobro as $fc){
 				$reporte->addFiltro('cobro', 'forma_cobro', $fc);
+			}
 		$reporte->addFiltro('usuario', 'id_usuario', $usuario);
-		$reporte->setTipoDato($td);
 		$reporte->id_moneda = CTEMONEDA;
 		$reporte->ignorar_cobros_sin_horas = true;
 		$reporte->setVista('glosa_cliente_asunto-mes_reporte');
 		$reporte->addRangoFecha(Utiles::fecha2sql($fecha_ini), Utiles::fecha2sql($fecha_fin));
-		$reporte->Query();
-		$resultado[$usuario][$td] = $reporte->toCross();
+		$reporte->setTipoDato($td);
+		if ($td == 'valor_cobrado') {
+			$reporte->Query();
+			$resultado[$usuario]['valor_cobrado_estandar'] = $reporte->toCross();
+			$reporte->setProporcionalidad('no_estandar');
+			$reporte->Query();
+			$resultado[$usuario]['valor_cobrado'] = $reporte->toCross();
+		} else {
+			$reporte->Query();
+			$resultado[$usuario][$td] = $reporte->toCross();
+		}
 	}
 }
 
@@ -253,7 +262,6 @@ foreach ($resultado as $u => $tipo_dato) {
 	$ws1->setMarginLeft(0.25);
 	$ws1->setLandscape();
 	$fila = 19;
-
 	Print_Prof($ws1, $tipo_dato);
 }
 
@@ -394,26 +402,19 @@ function Print_Prof(& $ws1, $td) {
 
 			$ws1->write($fila_titulos - 1, $col, date('M Y', $fecha), $formato_periodo); //Se imprime el titulo del periodo
 			extender($ws1, $fila_titulos - 1, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos, $col, n($td['horas_trabajadas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 1, $col, n($td['horas_cobradas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 1, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 2, $col, n($td['horas_por_cobrar']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 2, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 3, $col, n($td['horas_castigadas']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 3, $col, 6, $formato_periodo);
-
 			$ws1->write($fila_titulos + 4, $col, n($td['horas_no_cobrables']['labels_col'][$id_col]['total']), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 4, $col, 6, $formato_periodo);
-
-			$ws1->write($fila_titulos + 5, $col, n($td['valor_cobrado_no_estandar']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
+			$ws1->write($fila_titulos + 5, $col, n($td['valor_cobrado']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
 			extender($ws1, $fila_titulos + 5, $col, 6, $formato_periodo);
-
-			$ws1->write($fila_titulos + 6, $col, n($td['valor_cobrado']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
+			$ws1->write($fila_titulos + 6, $col, n($td['valor_cobrado_estandar']['labels_col'][$id_col]['total']), $formatos_moneda_totales[CTEMONEDA]);
 			extender($ws1, $fila_titulos + 6, $col, 6, $formato_periodo);
 
 
@@ -442,8 +443,8 @@ function Print_Prof(& $ws1, $td) {
 				$ws1->writeNumber($fila_base, $col + 1, Reporte::FormatoValor($sesion, number_format($td['horas_por_cobrar']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato);
 				$ws1->writeNumber($fila_base, $col + 2, Reporte::FormatoValor($sesion, number_format($td['horas_castigadas']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato);
 				$ws1->writeNumber($fila_base, $col + 3, Reporte::FormatoValor($sesion, number_format($td['horas_no_cobrables']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato);
-				$ws1->writeNumber($fila_base, $col + 4, n($td['valor_cobrado_no_estandar']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
-				$ws1->writeNumber($fila_base, $col + 5, n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
+				$ws1->writeNumber($fila_base, $col + 4, n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
+				$ws1->writeNumber($fila_base, $col + 5, n($td['valor_cobrado_estandar']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
 				$fila_base++;
 			}
 			#totales
@@ -455,7 +456,7 @@ function Print_Prof(& $ws1, $td) {
 			$ws1->WriteFormula($fila_base, $col + 4, '=SUM(' . excel_column($col + 4) . "$fila_inicio:" . excel_column($col + 4) . ($fila_base) . ')', $formatos_moneda_totales[CTEMONEDA]);
 			$ws1->WriteFormula($fila_base, $col + 5, '=SUM(' . excel_column($col + 5) . "$fila_inicio:" . excel_column($col + 5) . ($fila_base) . ')', $formatos_moneda_totales[CTEMONEDA]);
 			#FIN de una columna
-			$col+=5;
+			$col+=6;
 		}
 
 		$ws1->write(++$filas, 1, __('HORAS TRABAJADAS'), $formato_morado);

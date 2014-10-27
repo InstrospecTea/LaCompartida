@@ -10,10 +10,8 @@ class ReporteAntiguedadDeudas
 	private $datos = array();
 	private $sesion;
 	private $criteria;
-	private $sub_criteria;
 	private $and_statements = array();
-	private $report_details = array();
-
+	
 	//
 	//Opciones de layout
 	//
@@ -777,6 +775,23 @@ class ReporteAntiguedadDeudas
 				$this->and_statements[] = 'cliente.codigo_cliente_secundario = \''."$cliente".'\'';
 				$this->and_statemetns[] = 'contrato.codigo_cliente = cliente.codigo_cliente';
 			}
+
+		}
+
+		if (!empty($this->datos['tipo_liquidacion'])) {
+			$tipo_liquidacion = intval($this->datos['tipo_liquidacion']);
+			/** Eficiencias amebísticas:
+			El uso del operador de comparación bit a bit & no debe ser modificado
+			Para cada tipo de liquidación 1 (Solo honorarios), 2 (Solo Gastos) y 3 (Solo Mixtas)
+			se debe cumplir que 1 y 2 son excluyentes; y 3 incluye a 1 y 2
+			por lo que el operador actuá resolviendo dichas condiciones
+			Referencia: http://php.net/manual/es/language.operators.bitwise.php **/
+			$honorarios = $tipo_liquidacion & 1;
+			$gastos = $tipo_liquidacion & 2 ? 1 : 0;
+			/** Ocasiona un problema de conjunto disjunto contra 3 grupos de cobros. Desactivado.
+			$separar_liquidaciones = ($tipo_liquidacion == '3' ? 0 : 1); **/
+			$this->and_statements[] = "cobro.incluye_honorarios = '$honorarios'";
+			$this->and_statements[] = "cobro.incluye_gastos = '$gastos'";
 
 		}
 

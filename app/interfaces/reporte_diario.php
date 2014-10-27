@@ -1,37 +1,16 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Reporte.php';
+<?php
+require_once dirname(__FILE__).'/../conf.php';
 
-	$sesion = new Sesion(array('REP'));
-	//Revisa el Conf si esta permitido
-	if( method_exists('Conf','GetConf') )
-	{
-		if( !Conf::GetConf($sesion,'ReportesAvanzados') )
-		{
-			header("location: reportes_especificos.php");
-		}
-	}
-	else if( method_exists('Conf','ReportesAvanzados') )
-	{
-		if( !Conf::ReportesAvanzados() )
-		{
-			header("location: reportes_especificos.php");
-		}
-	}
-	else
-		header("location: reportes_especificos.php");
-	$pagina = new Pagina($sesion);
+$sesion = new Sesion(array('REP'));
+$pagina = new Pagina($sesion);
 
-
-
+/*
+ * Debe tener habilitado la Conf ReportesAvanzados para acceder a este reporte.
+ */
+if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
+	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reporte Diario') . '.';
+	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
+}
 
 	/*REPORTE DIARIO.*/
 	$pagina->titulo = __('Resumen actividades profesionales');

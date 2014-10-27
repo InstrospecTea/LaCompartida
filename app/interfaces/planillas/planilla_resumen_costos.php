@@ -1,5 +1,10 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
+
+if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
+	header("location: reportes_especificos.php");
+}
+
 require_once 'Spreadsheet/Excel/Writer.php';
 
 set_time_limit(300);
@@ -15,10 +20,6 @@ set_time_limit(300);
   "reporte": se usa el rango de fechas especificado por el usuario (fecha1 y fecha2).
   "excel_anual": se genera un reporte anual, con una hoja detallada por mes, un resumen por mes y un resumen por abogado.
  */
-
-if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
-	exit;
-}
 
 $query = 'SELECT simbolo, cifras_decimales FROM prm_moneda WHERE moneda_base = 1';
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -60,7 +61,7 @@ $formato_encabezado = & $wb->addFormat(array('Bold' => '1', 'Size' => 12, 'Align
 if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 	$dato_usuario = "username";
 } else {
-	$dato_usuario = "CONCAT(apellido1,' ',apellido2,', ',nombre)";
+	$dato_usuario = UsuarioExt::$campo_glosa;
 }
 
 if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
@@ -68,23 +69,25 @@ if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 } else {
 	$dato_usuario_valor = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
 }
+
 // Lista de abogados sobre los que se calculan valores. Calculado aquí por eficiencia.
 if ($solo_pro) {
-	$query = "SELECT " . $dato_usuario . " AS nombre_usuario,
-						 " . $dato_usuario_valor . " AS codigo_usuario,
-							usuario.id_usuario
-						FROM usuario
-						JOIN usuario_permiso USING( id_usuario )
-						WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso = 'PRO'
-						ORDER BY nombre_usuario, usuario.id_usuario";
+	$query = "SELECT {$dato_usuario} AS nombre_usuario,
+					{$dato_usuario_valor} AS codigo_usuario,
+					usuario.id_usuario
+				FROM usuario
+				JOIN usuario_permiso USING( id_usuario )
+				WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso = 'PRO'
+				ORDER BY nombre_usuario, usuario.id_usuario";
 } else {
-	$query = "SELECT " . $dato_usuario . " AS nombre_usuario,
-						 " . $dato_usuario_valor . " AS codigo_usuario,
-							id_usuario
-						FROM usuario
-						WHERE usuario.visible=1
-						ORDER BY nombre_usuario, id_usuario";
+	$query = "SELECT {$dato_usuario} AS nombre_usuario,
+					{$dato_usuario_valor} AS codigo_usuario,
+					id_usuario
+				FROM usuario
+				WHERE usuario.visible=1
+				ORDER BY nombre_usuario, id_usuario";
 }
+
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 $nombres = array();
@@ -210,8 +213,8 @@ function generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids, $codigos_us
 		$reporte->id_moneda = $id_moneda_base;
 		$reporte->Query();
 
-		$resultado = $reporte->toArray();
-		$total = number_format($resultado[$codigos_usuarios[$i]]['valor'], 2, '.', '');
+		$resultado = $reporte->toBars();
+		$total = number_format($resultado[$ids[$i]]['valor'], 2, '.', '');
 
 		$reporte = new Reporte($sesion);
 		$reporte->AddFiltro('usuario', 'id_usuario', $ids[$i]);

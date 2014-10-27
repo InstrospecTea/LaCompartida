@@ -757,6 +757,7 @@ $_LANG['Declaración de Honorarios y Gastos'] = "Declaración de Honorarios y Gast
 $_LANG['Via Fax'] = "Via Fax";
 $_LANG['y'] = "y";
 $_LANG['durante el mes de'] = "durante el mes de";
+$_LANG['%B de %Y'] = '%B de %Y';
 ####### CARTA 1 ########
 $_LANG['parrafo_gasto1_1'] = "Asimismo, se agregan los gastos correspondientes al mismo periodo, por la suma total de %monto_gasto%.-.";
 
@@ -848,7 +849,7 @@ $_LANG['nota_morosidad'] = "";
 $_LANG['nota_disclaimer'] = "";
 
 // Solicitado por @Gtigre
-$_LANG['lang_mb_detalle_chile_boleta_hyg'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% por honorarios y gastos por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios% equivalentes a %monto_honorarios_moneda_cobro% conforme a su equivalencia al %fecha_hasta_dmy%%detalle_cuenta_gastos%.";
+$_LANG['lang_mb_detalle_chile_boleta_hyg'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% por honorarios y gastos por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios% equivalentes a %monto_honorarios_moneda_cobro% conforme a su equivalencia al %fecha_hasta_dmy%%detalle_cuenta_gastos_cl_boleta%";
 $_LANG['lang_mb_detalle_chile_boleta_g'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% de gastos por la cantidad total de %monto_total_demo% correspondiente a los gastos asociados a servicios legales prestados %fecha_con_de% en relación al encargo profesional de la referencia, conforme a Boleta de Recuperación de Gastos adjunta.";
 $_LANG['lang_mb_detalle_chile_boleta_h'] = "Adjunto ruego encontrar Nota de Cobro %num_letter% de honorarios por la cantidad total de %monto_total_demo% correspondiente a los servicios legales prestados  %fecha_con_de% en relación al encargo profesional de la referencia. Esta cantidad corresponde a (i) Boleta de Honorarios adjunta por %monto_honorarios%%mb_monto_honorarios_moneda_cobro%";
 
