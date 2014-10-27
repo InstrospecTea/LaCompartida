@@ -18,7 +18,7 @@ class DocManager extends Objeto {
         $htmlheader.= '<!DOCTYPE html>';
         $htmlheader.= '<html lang="en">';
         $htmlheader.= '<head>';
-        $htmlheader.= '<link rel="shortcut icon" type="image/png" href="' . Conf::RootDir() . '/favicon.i"/>';
+        $htmlheader.= '<link rel="shortcut icon" type="image/png" href="' . Conf::RootDir() . '/favicon.ico"/>';
         $htmlheader.= '<meta http-equiv="Content-type" content="text/html;charset=ISO-8859-1">';
         $htmlheader.= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>';
 //      $htmlheader.= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">'; <--- recurso remoto

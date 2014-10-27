@@ -6,7 +6,7 @@ $CartaCobro = new CartaCobro($sesion);
 $DocManager = new DocManager($sesion);
 
 // Imprime encabezado html con librerias requeridas.
-echo $DocManager->GetHtmlHeader();
+
 
 if ($opc == 'guardar') {
     $id_carta = $CartaCobro->GuardarCarta($_POST['carta']);
@@ -21,6 +21,8 @@ if ($opc == 'guardar') {
 
 // Obtiene arreglo que contiene secciones.
 $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
+
+echo $DocManager->GetHtmlHeader();
 ?>
 
 <form role="form" id="form_doc" method="post">
