@@ -13,7 +13,7 @@ class SearchRelationship extends AbstractUtility{
 
 	function __construct($entity) {
 		if (empty($entity)) {
-			throw new Exception('La entidad de la relación no puede ser vacía.');
+			throw new UtilityException('La entidad de la relación no puede ser vacía.');
 		}
 		$this->entity = $entity;
 		$this->condition = 'equals';
@@ -27,7 +27,7 @@ class SearchRelationship extends AbstractUtility{
 	 */
 	function on_property($property) {
 		if (empty($property)) {
-			throw new Exception('La propiedad mediante la cual se establece de la relación, cuando se explicita, no puede ser vacía.');
+			throw new UtilityException('La propiedad mediante la cual se establece de la relación, cuando se explicita, no puede ser vacía.');
 		}
 		$this->property = $property;
 		return $this;
@@ -42,7 +42,7 @@ class SearchRelationship extends AbstractUtility{
 	 */
 	function by_condition($condition) {
 		if (empty($condition)) {
-			throw new Exception('La condición que establece la relación entre dos entidades, cuando se explicita, no puede ser vacía.');
+			throw new UtilityException('La condición que establece la relación entre dos entidades, cuando se explicita, no puede ser vacía.');
 		}
 		$this->condition = $condition;
 		return $this;

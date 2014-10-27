@@ -56,10 +56,10 @@ class ViewRenderer {
 		require LAYER_PATH . $file;
 		return ob_get_clean();
 	}
+
 	/**
 	 * Setea las variables internas
-	 * @param type $var
-	 * @param type $value
+	 * @param $var
 	 */
 	public function set($var) {
 		$this->vars = array_merge($this->vars, $var);

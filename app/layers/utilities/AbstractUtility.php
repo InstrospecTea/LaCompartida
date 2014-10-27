@@ -22,7 +22,7 @@ abstract class AbstractUtility {
 				return $property->getValue($this);
 			}
 			else {
-				throw new Exception("No existe referencia a $name");
+				throw new UtilityException("No existe referencia a $name");
 			}
 		}
 	}

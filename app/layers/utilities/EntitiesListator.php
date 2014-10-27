@@ -8,12 +8,11 @@ class EntitiesListator {
 
 	/**
 	 * @param array $entities
-	 * @throws Exception
 	 */
 	function __construct(array $entities) {
 		foreach ($entities as $element) {
 			if (!$this->checkElementClass($element)) {
-				throw new Exception('One of the elements on the EntitiesListator class is not a subclass of Entity class.');
+				throw new UtilityException('One of the elements on the Listator is not a subclass of Entity.');
 			}
 		}
 		$this->entities = $entities;
@@ -84,7 +83,11 @@ class EntitiesListator {
 
 		foreach ($this->columnHandler as $columnHandler) {
 			$th = new HtmlBuilder();
-			$th->set_tag('td')->set_closure(true)->add_attribute('class', 'encabezado')->set_html($columnHandler['columnName']);
+			$th->set_tag('td')
+				->set_closure(true)
+				->add_attribute('class', 'encabezado')
+				->add_attribute('style','padding-left:10px;padding-right:10px;')
+				->set_html($columnHandler['columnName']);
 			$tr->add_child($th);
 		}
 		$thead->add_child($tr);
@@ -107,7 +110,7 @@ class EntitiesListator {
 				->set_closure(true);
 			foreach ($this->columnHandler as $columnHandler) {
 				$th = new HtmlBuilder();
-				$th->set_tag('th')->set_closure(true);
+				$th->set_tag('th')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
 				if (is_callable($columnHandler['calculationExpression'])) {
 					$th->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
 				} else {

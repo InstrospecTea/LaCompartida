@@ -45,7 +45,7 @@ class SearchFilter extends AbstractUtility {
 	 */
 	function by_condition($condition) {
 		if ($condition != 'AND' && $condition != 'OR') {
-			throw new Exception('La condicion de filtrado debe ser AND u OR.');
+			throw new UtilityException('La condicion de filtrado debe ser AND u OR.');
 		}
 		$this->condition = $condition;
 		return $this;
@@ -60,7 +60,7 @@ class SearchFilter extends AbstractUtility {
 	 */
 	function restricted_by($restriction) {
 		if (empty($restriction)) {
-			throw new Exception('Se está agregando un filtro vacío.');
+			throw new UtilityException('Se está agregando un filtro vacío.');
 		}
 		$this->restriction = $restriction;
 		return $this;

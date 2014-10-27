@@ -1,5 +1,5 @@
 <?php
 
-class CouldNotAddEntityException extends DAOException{
+class CouldNotSaveEntityException extends DAOException{
 
 } 

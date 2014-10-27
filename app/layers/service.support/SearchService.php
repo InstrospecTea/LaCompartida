@@ -98,8 +98,12 @@ class SearchService implements ISearchService{
 				$or_filters[] = $constructedRestriction;
 			}
 		}
-		$criteria->add_restriction(CriteriaRestriction::and_all($and_filters));
-		$criteria->add_restriction(CriteriaRestriction::or_all($or_filters));
+		if (count($and_filters)) {
+			$criteria->add_restriction(CriteriaRestriction::and_all($and_filters));
+		}
+		if (count($or_filters)) {
+			$criteria->add_restriction(CriteriaRestriction::or_all($or_filters));
+		}
 		return $criteria;
 	}
 

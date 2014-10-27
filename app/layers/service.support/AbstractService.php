@@ -10,24 +10,30 @@ abstract class AbstractService implements BaseService{
 		$this->loadDAO($this->getDaoLayer());
     }
 
-    public function saveOrUpdate($object) {
+	/**
+	 * @param $object
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function saveOrUpdate($object) {
         $this->checkNullity($object);
         $this->checkClass($object, $this->getClass());
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
         try {
             return $dao->saveOrUpdate($object);
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        } catch (CouldNotAddEntityException $ex) {
+            throw new ServiceException($ex);
+        } catch (CouldNotUpdateEntityException $ex) {
+	        throw new ServiceException($ex);
         }
 
     }
 
 	/**
-	 * Obtiene una instancia del objeto manejado por la capa, a partir de su identificador primario.
 	 * @param $id
-	 * @return Entity
-	 * @throws Exception
+	 * @return mixed
+	 * @throws ServiceException
 	 */
 	public function get($id) {
         $this->checkNullity($id);
@@ -35,8 +41,8 @@ abstract class AbstractService implements BaseService{
         $dao = new $daoClass($this->sesion);
         try {
             return $dao->get($id);
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        } catch (CouldNotFindEntityException $ex) {
+            throw new ServiceException($ex);
         }
     }
 
@@ -50,15 +56,19 @@ abstract class AbstractService implements BaseService{
         }
     }
 
-    public function delete($object) {
+	/**
+	 * @param $object
+	 * @throws ServiceException
+	 */
+	public function delete($object) {
         $this->checkNullity($object);
         $this->checkClass($object, $this->getClass());
         $daoClass = $this->getDaoLayer($this->sesion);
         $dao = new $daoClass($this->sesion);
         try{
             $dao->delete($object);
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        } catch (CouldNotDeleteEntityException $ex) {
+            throw new ServiceException($ex);
         }
     }
 
@@ -66,11 +76,12 @@ abstract class AbstractService implements BaseService{
      * Comprueba si un objeto es parte de la jerarquía de clases definida en la capa.
      * @param $object Objeto que se comprobará.
      * @param $className string Jerarquía de clases a la que debe pertenecer.
-     * @throws Exception Cuando no pertenece a la jerarquía de clases correspondiente.
+     * @throws ServiceException Cuando no pertenece a la jerarquía de clases correspondiente.
      */
     protected function checkClass($object, $className) {
         if (!is_a($object, $className)) {
-            throw new Exception('Dao Exception: El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
+            throw new ServiceException('Dao Exception: El objeto entregado no
+             pertenece ni hereda a la clase definida en DAO.');
         }
     }
 
@@ -78,11 +89,12 @@ abstract class AbstractService implements BaseService{
      * Comprueba si un objeto es nulo o está vacío. Esto es necesario para arrojar la excepción correspondiente para cuando
      * sean realizadas operaciones de CRUD.
      * @param $object
-     * @throws Exception
+     * @throws ServiceException
      */
     protected function checkNullity($object) {
         if (empty($object)) {
-            throw new Exception('El identificador que está siendo utilizado para obtener el objeto '.$this->getClass().' está vacío o es nulo.');
+            throw new ServiceException('El identificador que está siendo utilizado para obtener el objeto
+            '.$this->getClass().' está vacío o es nulo.');
         }
     }
 

@@ -92,9 +92,9 @@ abstract class AbstractController {
 		$this->messageManager->addMessage(new FlashMessage('S', $message));
 	}
 
-	abstract protected function beforeRender();
+	protected function beforeRender() {}
 
-	abstract protected function afterRender();
+	protected function afterRender() {}
 
 
 

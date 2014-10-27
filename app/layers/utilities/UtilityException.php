@@ -3,6 +3,6 @@
 /**
  * Class UtilityException
  */
-class UtilityException {
+class UtilityException extends Exception{
 
 } 

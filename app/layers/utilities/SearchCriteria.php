@@ -21,10 +21,10 @@ class SearchCriteria extends AbstractUtility{
 	 */
 	function __construct($entity_name) {
 		if (empty($entity_name)) {
-			throw new Exception('El nombre de la entidad está vacío.');
+			throw new UtilityException('El nombre de la entidad está vacío.');
 		}
 		if (!class_exists($entity_name)) {
-			throw new Exception('El search criteria no puede ser definido en base a una clase que no existe.');
+			throw new UtilityException('El search criteria no puede ser definido en base a una clase que no existe.');
 		}
 		$this->entity = $entity_name;
 		$this->filters = array();

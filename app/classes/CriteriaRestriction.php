@@ -144,6 +144,16 @@ class CriteriaRestriction {
 	}
 
 	/**
+	 * Añade sentencia Mayor Que, para una Columna > pivote
+	 * @param $column
+	 * @param $pivot
+	 * @return CriteriaRestriction
+	 */
+	public static function greater_than($column , $pivot) {
+		return new CriteriaRestriction('('.$column.' > '.$pivot.')');
+	}
+
+	/**
 	 * Añade sentencia Menor Igual Que, para una Columna <= pivote
 	 * @param $column
 	 * @param $pivot
@@ -154,12 +164,31 @@ class CriteriaRestriction {
 	}
 
 	/**
+	 * Añade sentencia Menor Que, para una Columna < pivote
+	 * @param $column
+	 * @param $pivot
+	 * @return CriteriaRestriction
+	 */
+	public static function lower_than($column , $pivot) {
+		return new CriteriaRestriction('('.$column.' < '.$pivot.')');
+	}
+
+	/**
 	 * Añade sentencia que compara si una columna no tiene un valor nulo.
 	 * @param $column
 	 * @return CriteriaRestriction
 	 */
 	public static function is_not_null($column) {
 		return new CriteriaRestriction($column.' IS NOT NULL');
+	}
+
+	/**
+	 * Añade sentencia que compara si una columna tiene un valor nulo.
+	 * @param $column
+	 * @return CriteriaRestriction
+	 */
+	public static function is_null($column) {
+		return new CriteriaRestriction($column.' IS NULL');
 	}
 
 	public static function between($column, $left, $right) {

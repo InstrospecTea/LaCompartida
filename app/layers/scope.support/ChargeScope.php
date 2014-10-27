@@ -57,7 +57,7 @@ class ChargeScope implements IChargeScope{
 	}
 
 	/**
-	 * Añade un filtro que considera a aquellos cobros que adelantos disponibles.
+	 * Añade un filtro que considera a aquellos cobros que tienen adelantos disponibles.
 	 * @param Criteria $criteria
 	 * @return mixed
 	 */
