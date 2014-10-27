@@ -83,10 +83,18 @@ class DocManager extends Objeto {
         }
     }
 
-    public function Deleteformat($session, $id_carta) {
+    public function Deleteformat($sesion, $id_carta) {
         $query = "DELETE FROM carta WHERE id_carta = {$id_carta}";
         $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
         return true;
+    }
+    
+    public function ObtenerMargenes($sesion, $id_carta) {
+        $query = "SELECT margen_superior as '0', margen_inferior as '1', margen_izquierdo as '2', margen_derecho as '3' FROM carta WHERE id_carta = {$id_carta} ";
+        $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+        
+        $margenes = mysql_fetch_assoc($resp);
+        return $margenes;
     }
 
 }

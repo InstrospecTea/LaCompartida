@@ -31,12 +31,12 @@ echo $DocManager->GetHtmlHeader();
 
     <!-- Encabezado mantenedor -->
 
-    <div class="container" style="margin-top: 0.5%;">
+    <div class="container-fluid "style="margin-top: 0.5%;">
         <div class="row">
             <div class="col-sm-4"><h4>Mantenedor de Cartas</h4></div>
             <div class="col-sm-4"><?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'carta[id_carta]', $id_carta, 'class="form-control"', ' ', ''); ?></div>
             <div class="col-sm-3" id="nrel_charges"></div>
-            <div class="col-sm-1"><button type="button" id="nueva_carta" name="nueva_carta" class="btn btn-default pull-left" data-toggle="modal" data-target=".nuevo_formato">Nueva Carta</button></div>
+            <div class="col-sm-1"><button type="button" id="nueva_carta" name="nueva_carta" class="btn btn-primary pull-primary pull-right" data-toggle="modal" data-target=".nuevo_formato">+ Crear Carta</button></div>
         </div>
     </div>
 
@@ -57,31 +57,21 @@ echo $DocManager->GetHtmlHeader();
                     <div id="my-tab-content" class="tab-content">
                         <div class="tab-pane active" id="html_code">
 
-                            <div class="row">
-
-                                <div class="col-md-1"></div>
-                                <div class="col-md-9">
-                                    <?php echo $DocManager->ImprimirSelector($secciones, 'secciones', ' ', 'form-control', ''); ?>
-                                </div>
-                                <div class="col-md-1">
-                                    <button id="insrt_seccion" type="button" class="btn btn-primary btn-sm">Insertar</button>
-                                </div>
-
-                            </div>
-
                             <div class="row" style="margin-bottom: 2%;">
 
-                                <div class="col-md-1"></div>
-                                <div class="col-md-9">
+                                <div class="col-md-5">
+                                    <?php echo $DocManager->ImprimirSelector($secciones, 'secciones', ' ', 'form-control', ''); ?>
+                                </div>
+                                <div class="col-md-5">
                                     <select id="tag_selector" class="form-control"></select>
                                 </div>
-                                <div class="col-md-1">
-                                    <button id="insrt_tag" type="button" class="btn btn-primary btn-sm">Insertar</button>
+                                <div class="col-md-2">
+                                    <button id="insrt_seccion" type="button" class="btn btn-primary pull-right">Insertar</button>
                                 </div>
 
                             </div>
 
-                            <textarea class="ckeditor" id="carta[formato]" name="carta[formato]" style="width:100%; height: 550px;"></textarea>
+                            <textarea class="ckeditor" id="carta[formato]" name="carta[formato]" style="width:100%; height: 580px;"></textarea>
                         </div>
 
                         <div class="tab-pane" id="css_code">
@@ -111,13 +101,13 @@ echo $DocManager->GetHtmlHeader();
                         <h5 id="errmsg" style="color:red; font-weight: bold;"></h5>
                     </div>
                     <div class="col-md-2">
-                        <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-default pull-right" type="button">Descargar Word</button>
+                        <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-primary pull-right" type="button">Descargar Word</button>
                     </div>
                 </div>
             </div>
 
             <div class="panel-body" style="height:618px; overflow-y:scroll;">
-                <div id="letter_preview" class="col-md-12"></div>
+                <div id="letter_preview" class="col-md-12" style="height:100%"></div>
             </div>
 
             <div class="panel-footer">

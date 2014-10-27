@@ -9,6 +9,7 @@ function guardar() {
 
 function PrevisualizarCarta() {
 
+    clearInterval(intrvl);
     var id_cobro = $("#id_cobro").val();
     var formato = $('#carta\\[formato\\]').val();
     var existecobro = ExisteCobro(id_cobro);
@@ -36,6 +37,7 @@ function Cargarformato(id_carta) {
     var urlajaxnrelcharges = 'ajax_doc_mngr.php?accion=obtenenrelncobros&id_carta=' + id_carta;
     var urlajaxgethtml = 'ajax_doc_mngr.php?accion=obtener_html&id_carta=' + id_carta;
     var urlajaxgetcss = 'ajax_doc_mngr.php?accion=obtener_css&id_carta=' + id_carta;
+    var urlajaxgetmargin = 'ajax_doc_mngr.php?accion=obtener_margenes&id_carta=' + id_carta;
 
     $.get(urlajaxnrelcharges, function (data) {
         $("#nrel_charges").html(data);
@@ -46,6 +48,16 @@ function Cargarformato(id_carta) {
     $.get(urlajaxgetcss, function (data) {
         $("#carta\\[formato_css\\]").html(data);
     });
+//    $.get(urlajaxgetmargin, function (data) {
+//        var valor = [];
+//        valor = data;
+//        console.log(valor.forEach( valor ));
+////        $("#carta\\[margen_superior\\]").html(data);
+////        $("#carta\\[margen_inferior\\]").html(data);
+////        $("#carta\\[margen_izquierdo\\]").html(data);
+////        $("#carta\\[margen_derecho\\]").html(data);
+//    });
+
 }
 
 // Function Existe
@@ -121,6 +133,7 @@ $(function () {
     $('#carta\\[formato\\]').on('input', function () {
         clearInterval(intrvl);
         intrvl = setInterval(PrevisualizarCarta, 1000);
+        
     });
 
     $('#id_new_formato').change(function () {
