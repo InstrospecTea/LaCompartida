@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.3
+Martes 28 de Octubre 2014
+* **Fixed:** [Corrige generación de query en el listado de trámites](https://github.com/LemontechSA/ttb/pull/735)
+
 ## Hotfix: 14.19.2
 Jueves 23 de Octubre 2014
 * **Fixed:** [Corrige definición del método](https://github.com/LemontechSA/ttb/pull/734)
