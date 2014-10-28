@@ -9,8 +9,7 @@ class SandboxController extends AbstractController {
 		$listator = $this->SandboxingBusiness->getSandboxListator($results);
 		$this->set('listator', $listator);
 		$this->set('cant_results', count($results));
+		$this->info('Esto es un sandbox... de gato!', 'I');
 	}
 
-
-
-} 
+}

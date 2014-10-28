@@ -1,37 +1,30 @@
 <?php
+
 $messageManager = new MessageManager();
 
 foreach($messageManager->getMessages() as $message) {
 
 	switch($message->type()) {
 		case 'I':
-			$alertMessage = 'Información:';
+			$alertTitle = __('Información');
+			$alertType = 'info';
 			break;
 		case 'E':
-			$alertMessage = 'Error:';
+			$alertTitle = __('Error');
+			$alertType = 'error';
 			break;
 		case 'S':
-			$alertMessage = 'Éxito:';
+			$alertTitle = __('Éxito');
+			$alertType = 'success';
 			break;
 		default:
-			$alertMessage = '';
+			$alertTitle = '';
+			$alertType = '';
 			break;
 	}
 
-?>
-
-	<table width="80%" class="alerta">
-		<tbody>
-			<tr>
-				<td valign="top" align="left" style="font-size: 12px;">
-					<strong><?php echo $alertMessage ?></strong>
-					<br/>
-					<?php echo $message->content(); ?>
-					<br/>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<br/>
-<?php }
+	$title = $this->Html->tag('span', $alertTitle, array('class' => 'alert-title'));
+	$content = $this->Html->tag('span', $message->content(), array('class' => 'alert-content'));
+	echo $this->Html->tag('div', $title . $content, array('class' => "alert alert-{$alertType}"));
+}
 $messageManager->cleanMessageQueue();

@@ -17,7 +17,7 @@ abstract class AbstractController {
 	protected $autoRender = true;
 	private $vars = array();
 	private $loadedClass = array();
-	public $helpers = array('Form');
+	public $helpers = array('Form', array('\TTB\Html', 'Html'));
 
 
 	public function __construct() {
