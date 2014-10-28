@@ -48,7 +48,7 @@ class Trabajo extends Objeto
 		return __('Abierto');
 	}
 
-	function Write($historialOnWrite = true, $app_id = null) {
+	function Write() {
 		$this->Prepare();
 		if (!$this->Check()) {
 			return false;
