@@ -1045,9 +1045,7 @@ class NotaCobro extends Cobro {
     }
 
     function PrevisualizarDocumentoHtml($formato_html, $id_cobro) {
-        $html = $this->ReemplazarHTML($formato_html, $id_cobro);
-        return $html;
-        exit;
+        return $this->ReemplazarHTML($formato_html, $id_cobro);
     }
 
     function PrevisualizarValores($id_cobro) {
@@ -1088,7 +1086,6 @@ class NotaCobro extends Cobro {
             list($id_cobro) = mysql_fetch_array($resp);
         }
         $this->Load($id_cobro);
-
         return $this->GenerarEjemplo($parser);
     }
 
@@ -3928,7 +3925,7 @@ class NotaCobro extends Cobro {
         }
         return $html;
     }
-
+    
     function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
 
         global $contrato;

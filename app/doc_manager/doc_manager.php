@@ -10,11 +10,11 @@ $DocManager = new DocManager($sesion);
 
 if ($opc == 'guardar') {
     $id_carta = $CartaCobro->GuardarCarta($_POST['carta']);
-    header('Location: '.$_SERVER['REQUEST_URI']);
+    header('Location: ' . $_SERVER['REQUEST_URI']);
 } else if ($opc == 'prev') {
     $id_carta = $CartaCobro->PrevisualizarDocumento($carta, $id_cobro);
 } else if ($opc == 'eliminar') {
-    $DocManager->Deleteformat($session,$carta['id_carta']);
+    $DocManager->Deleteformat($session, $carta['id_carta']);
 } else {
     $carta = $CartaCobro->ObtenerCarta($id_carta);
 }
@@ -25,103 +25,106 @@ $secciones = UtilesApp::mergeKeyValue($CartaCobro->secciones['CARTA']);
 echo $DocManager->GetHtmlHeader();
 ?>
 
-<form role="form" id="form_doc" method="post">
+<form role="form" id="form_doc" method="post" style="display:block; position: absolute; width: 100%; height: 100vh; left: 0px; top: 0px; margin: 0px; padding: 0px;">
 
     <input type="hidden" name="opc" id="opc" value=""/>
 
     <!-- Encabezado mantenedor -->
 
-    <div class="container-fluid "style="margin-top: 0.5%;">
-        <div class="row">
+    <div class="container-fluid">
+        <div class="row" style="padding: 15px 0;">
             <div class="col-sm-4"><h4>Mantenedor de Cartas</h4></div>
             <div class="col-sm-4"><?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'carta[id_carta]', $id_carta, 'class="form-control"', ' ', ''); ?></div>
             <div class="col-sm-3" id="nrel_charges"></div>
-            <div class="col-sm-1"><button type="button" id="nueva_carta" name="nueva_carta" class="btn btn-primary pull-primary pull-right" data-toggle="modal" data-target=".nuevo_formato">+ Crear Carta</button></div>
+            <div class="col-sm-1"><button type="button" id="nueva_carta" name="nueva_carta" class="btn btn-primary pull-primary pull-right" data-toggle="modal" data-target=".nuevo_formato"><span class="glyphicon glyphicon-plus"> Crear Carta</span></button></div>
         </div>
     </div>
 
     <!-- Panel HTML-CSS del mantenedor -->
+    <div class="container-fluid" style="height: calc(100vh - 70px);">
+        <div class="row" style="height: calc(100vh - 70px);">
 
-    <div class="col-md-6">
-        <div class="panel panel-default">
+            <div class="col-md-6"  style="height:calc(100vh - 70px);">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <ul id="tabs" class="nav nav-tabs" role="tablist" data-tabs="tabs" style="margin-bottom:-1.3%;">
+                            <li class="active"><a href="#html_code" data-toggle="tab">HTML</a></li>
+                            <li><a href="#css_code" data-toggle="tab">CSS</a></li>
+                        </ul>
+                    </div>
 
-            <div class="panel-heading">
-                <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-                    <li class="active"><a href="#html_code" data-toggle="tab">HTML</a></li>
-                    <li><a href="#css_code" data-toggle="tab">CSS</a></li>
-                </ul>
-            </div>
+                    <div class="panel-body" style="height:calc(100vh - 70px - 60px);">
+                        <div id="content" style="height: calc(100vh - 70px - 60px - 30px);">
+                            <div id="my-tab-content" class="tab-content">
+                                <div class="tab-pane active" id="html_code">
 
-            <div class="panel-body">
-                <div id="content">
-                    <div id="my-tab-content" class="tab-content">
-                        <div class="tab-pane active" id="html_code">
+                                    <div class="row">
 
-                            <div class="row" style="margin-bottom: 2%;">
+                                        <div class="col-md-5">
+                                            <?php echo $DocManager->ImprimirSelector($secciones, 'secciones', ' ', 'form-control', ''); ?>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <select id="tag_selector" class="form-control"></select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button id="insrt_seccion" type="button" class="btn btn-primary pull-right">Insertar</button>
+                                        </div>
 
-                                <div class="col-md-5">
-                                    <?php echo $DocManager->ImprimirSelector($secciones, 'secciones', ' ', 'form-control', ''); ?>
+                                    </div>
+
+                                    <textarea class="ckeditor" id="carta[formato]" name="carta[formato]" style="width:100%; height: calc(100vh - 70px - 60px - 30px - 45px); margin-top: 10px;"></textarea>
                                 </div>
-                                <div class="col-md-5">
-                                    <select id="tag_selector" class="form-control"></select>
-                                </div>
-                                <div class="col-md-2">
-                                    <button id="insrt_seccion" type="button" class="btn btn-primary pull-right">Insertar</button>
-                                </div>
 
+                                <div class="tab-pane" id="css_code">
+                                    <textarea id="carta[formato_css]" name="carta[formato_css]" style="width:100%; height: calc(100vh - 70px - 60px - 30px); min-height: calc(100vh - 70px - 60px - 30px"></textarea>
+                                </div>
                             </div>
 
-                            <textarea class="ckeditor" id="carta[formato]" name="carta[formato]" style="width:100%; height: 580px;"></textarea>
-                        </div>
-
-                        <div class="tab-pane" id="css_code">
-                            <textarea id="carta[formato_css]" name="carta[formato_css]" style="width:100%; height: 630px;"></textarea>
                         </div>
                     </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Panel Previsualizacion HTML -->
-
-    <div class="col-md-6">
-        <div class="panel panel-default">
-
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-md-4">
-                        <h5>Previsualizando liquidación N°</h5>
-                    </div>
-                    <div class="col-md-3">
-                        <input id="id_cobro" name="id_cobro" type="text" class="form-control" maxlength="10" value="<?php echo $id_cobro ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <h5 id="errmsg" style="color:red; font-weight: bold;"></h5>
-                    </div>
-                    <div class="col-md-2">
-                        <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-primary pull-right" type="button">Descargar Word</button>
-                    </div>
                 </div>
             </div>
 
-            <div class="panel-body" style="height:618px; overflow-y:scroll;">
-                <div id="letter_preview" class="col-md-12" style="height:100%"></div>
-            </div>
+            <!-- Panel Previsualizacion HTML -->
 
-            <div class="panel-footer">
-                <div class="row">
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target=".margenes">Margenes</button>
+            <div class="col-md-6" style="height:calc(100vh - 70px);">
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h5>Previsualizando liquidación N°</h5>
+                            </div>
+                            <div class="col-md-3">
+                                <input id="id_cobro" name="id_cobro" type="text" class="form-control" maxlength="10" value="<?php echo $id_cobro ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <h5 id="errmsg" style="color:red; font-weight: bold;"></h5>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-primary pull-right" type="button"><span class="glyphicon glyphicon-print"> Descargar Word</span></button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-10">
-                        <button type="button" class="btn btn-success pull-right" id="guardar_formato" style="margin-right: 1%;">Guardar</button>
-                        <button type="button" class="btn btn-danger pull-right" id="eliminar_formato" style="margin-right: 1%;">Eliminar</button>
+
+                    <div class="panel-body" style="overflow-y:auto; height: calc(100vh - 70px - 60px - 57px);">
+                        <div id="letter_preview" class="col-md-12" style="height:100%"></div>
                     </div>
+
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target=".margenes">Margenes</button>
+                            </div>
+                            <div class="col-md-10">
+                                <button type="button" class="btn btn-success pull-right" id="guardar_formato" style="margin-right: 1%;">Guardar</button>
+                                <button type="button" class="btn btn-danger pull-right" id="eliminar_formato" style="margin-right: 1%;">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-
         </div>
     </div>
 

@@ -30,7 +30,7 @@ class DocManager extends Objeto {
         $htmlheader.= '<script src="' . Conf::RootDir() . '/app/doc_manager/js/doc_manager.js"></script>';
 //        $htmlheader.= '<script type="text/javascript" src="//static.thetimebilling.com/js/ckeditor/ckeditor.js"></script>'; #<---- Habilitar CKEDITOR
         $htmlheader.= '</head>';
-        $htmlheader.= '<body>';
+        $htmlheader.= '<body style="overflow:hidden;">';
 
         return $htmlheader;
     }
