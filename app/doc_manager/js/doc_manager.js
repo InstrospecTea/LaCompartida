@@ -143,14 +143,16 @@ $(function () {
         $('#form_doc').submit();
     });
 
-    $('#insrt_seccion').click(function () {
+    $('#insertar_elemento').click(function () {
         var seccion = $("#secciones option:selected").val();
-        InsertarEnTextArea(seccion, 'seccion');
-    });
+        var tag = $("#tag_selector option:selected").val();
 
-    $('#insrt_tag').click(function () {
-        var seccion = $("#tag_selector option:selected").val();
-        InsertarEnTextArea(seccion, 'tag');
+        if (tag == '' || tag === 'Undefinded') {
+            InsertarEnTextArea(seccion, 'seccion');
+        } else {
+            InsertarEnTextArea(tag, 'tag');
+        }
+        
     });
 
     $('#btn_previsualizar').click(function () {

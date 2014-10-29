@@ -36,7 +36,7 @@ echo $DocManager->GetHtmlHeader();
             <div class="col-sm-4"><h4>Mantenedor de Cartas</h4></div>
             <div class="col-sm-4"><?php echo Html::SelectQuery($sesion, 'SELECT id_carta, descripcion FROM carta', 'carta[id_carta]', $id_carta, 'class="form-control"', ' ', ''); ?></div>
             <div class="col-sm-3" id="nrel_charges"></div>
-            <div class="col-sm-1"><button type="button" id="nueva_carta" name="nueva_carta" class="btn btn-primary pull-primary pull-right" data-toggle="modal" data-target=".nuevo_formato"><span class="glyphicon glyphicon-plus"> Crear Carta</span></button></div>
+            <div class="col-sm-1"><button type="button" id="nueva_carta" name="nueva_carta" class="btn btn-primary pull-primary pull-right" data-toggle="modal" data-target=".nuevo_formato"><span class="glyphicon glyphicon-plus"></span>&nbsp; Crear Carta</button></div>
         </div>
     </div>
 
@@ -67,7 +67,7 @@ echo $DocManager->GetHtmlHeader();
                                             <select id="tag_selector" class="form-control"></select>
                                         </div>
                                         <div class="col-md-2">
-                                            <button id="insrt_seccion" type="button" class="btn btn-primary pull-right">Insertar</button>
+                                            <button id="insertar_elemento" type="button" class="btn btn-primary pull-right">Insertar</button>
                                         </div>
 
                                     </div>
@@ -102,7 +102,7 @@ echo $DocManager->GetHtmlHeader();
                                 <h5 id="errmsg" style="color:red; font-weight: bold;"></h5>
                             </div>
                             <div class="col-md-2">
-                                <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-primary pull-right" type="button"><span class="glyphicon glyphicon-print"> Descargar Word</span></button>
+                                <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-default pull-right" type="button"><span class="glyphicon glyphicon-print"></span>&nbsp; Descargar Word</button>
                             </div>
                         </div>
                     </div>

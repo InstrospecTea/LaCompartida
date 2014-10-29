@@ -27,6 +27,7 @@ class CartaCobro extends NotaCobro {
     );
     public $diccionario = array(
         'CARTA' => array(
+            '' => '',
             '%cuenta_banco%' => 'Cuenta bancaria',
             '%logo_carta%' => 'Imagen logo',
             '%direccion%' => 'Dirección',
@@ -42,6 +43,7 @@ class CartaCobro extends NotaCobro {
             '%page_break%' => 'Agrega un salto de pagina'
         ),
         'FECHA' => array(
+            '' => '',
             '%fecha_especial%' => 'Ciudad (país), día de mes de año',
             '%fecha_especial2%' => 'Santiago, dia de Mes de año',
             '%fecha_espanol%' => 'dia De Mes De año',
@@ -60,6 +62,7 @@ class CartaCobro extends NotaCobro {
             '%ciudad_estudio%' => 'Definido en Conf PaisEstudio'
         ),
         'ENVIO_DIRECCION' => array(
+            '' => '',
             '%SR%' => 'Por defecto (SR.) o el titulo_contacto definido en el contrato',
             '%glosa_codigo_postal%' => 'Texto segun lenguaje (Código Postal/Postal Code)',
             '%codigo_postal%' => 'campo factura_codigopostal definido en el contrato',
@@ -100,6 +103,7 @@ class CartaCobro extends NotaCobro {
             '%asuntos_relacionados%' => 'Imprime segmento de parrafo con los asuntos relaionados'
         ),
         'DETALLE' => array(
+            '' => '',
             '%ApellidoContacto%' => 'Apellido del contacto',
             '%Asunto%' => 'Lista de asuntos',
             '%Asunto_ucwords%' => 'Lista de asuntos con primeros letras en mayuscula',
@@ -255,6 +259,7 @@ class CartaCobro extends NotaCobro {
             '%tipo_gbp_segun_moneda%' => 'Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (gbplegal)'
         ),
         'ADJ' => array(
+            '' => '',
             '%cliente_correo%' => 'Obtiene campo email_contacto tabla cobro',
             '%cliente_fax%' => 'Obtiene campo fono_contacto tabla contrato',
             '%firma_careyallende%' => 'firma_careyallende elemento generado por lang',
@@ -266,12 +271,14 @@ class CartaCobro extends NotaCobro {
             '%nro_factura%' => 'Obtiene campo documento tabla cobro'
         ),
         'PIE' => array(
+            '' => '',
             '%direccion%' => 'Generado por (Conf PdfLinea2 + Conf PdfLinea3 + Conf SitioWeb + Conf::Email)',
             '%logo_carta%' => 'Obtiene logo carta desde el Conf::Server(). Conf::ImgDir() (no utilizar deprecado)',
             '%num_letter%' => 'Obtiene campo id_cobro desde tabla cobro',
             '%num_letter_documento%' => 'Obtiene campo documento desde tabla cobro'
         ),
         'DATOS_CLIENTE' => array(
+            '' => '',
             '%ApellidoContacto%' => 'Obtiene campo apellido_contacto desde tabla contrato',
             '%NombrePilaContacto%' => 'obtiene campo contacto desde tabla contrato',
             '%encargado_comercial_mayusculas%' => 'encargado_comercial_mayusculas',
@@ -281,6 +288,7 @@ class CartaCobro extends NotaCobro {
             '%SR%' => 'Obtiene campo titulo_contacto desde contrato'
         ),
         'FILAS_FACTURAS_DEL_COBRO' => array(
+            '' => '',
             '%factura_impuesto%' => 'factura_impuesto',
             '%factura_moneda%' => 'factura_moneda',
             '%factura_numero%' => 'factura_numero',
@@ -289,9 +297,11 @@ class CartaCobro extends NotaCobro {
             '%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto'
         ),
         'FILAS_FACTURAS_DEL_COBRO' => array(
+            '' => '',
             '%factura_pendiente%' => 'factura_pendiente',
         ),
         'FILAS_ASUNTOS_RESUMEN' => array(
+            '' => '',
             '%fecha_mta%' => 'fecha de facturacion',
             '%gastos_asunto%' => 'monto de gastos segun la id_moneda',
             '%gastos_asunto_mi%' => 'monto gastos del asunto opc_ver_moneda',
@@ -306,13 +316,14 @@ class CartaCobro extends NotaCobro {
             '%total_asunto_mi%' => 'total del asunto segun opc_ver_moneda'
         ),
         'FILA_FACTURAS_PENDIENTES' => array(
+            '' => '',
             '%facturas_pendientes%' => 'facturas_pendientes'
         ),
         'SALTO_PAGINA' => array()
     );
 
     function __construct($sesion, $fields, $ArrayFacturasDelContrato, $ArrayTotalesDelContrato) {
-		parent::__construct($sesion, $fields);
+        parent::__construct($sesion, $fields);
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
 
@@ -326,11 +337,11 @@ class CartaCobro extends NotaCobro {
         $Contrato = new Contrato($this->sesion);
         $Contrato->Load($this->fields['id_contrato']);
 
-				$this->template_data = array(
-					'Cobro' => $this->fields,
-					'Contrato' => $Contrato->fields,
-					'UsuarioActual' => $this->sesion->usuario->fields
-				);
+        $this->template_data = array(
+            'Cobro' => $this->fields,
+            'Contrato' => $Contrato->fields,
+            'UsuarioActual' => $this->sesion->usuario->fields
+        );
     }
 
     function NuevoRegistro() {
@@ -361,9 +372,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields;
-				$this->template_data['Moneda'] = $moneda->fields;
-				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'CARTA':
@@ -878,11 +889,7 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
 
                 $monto_honorarios = UtilesApp::CambiarMoneda(
-                    $this->fields['monto'],
-                    $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
-                    $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],
-                    $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'],
-                    $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
+                                $this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
                 );
 
                 $html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1196,9 +1203,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields;
-				$this->template_data['Moneda'] = $moneda->fields;
-				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -2195,9 +2202,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields;
-				$this->template_data['Moneda'] = $moneda->fields;
-				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'FECHA': //GenerarDocumentoCartaComun
@@ -2712,12 +2719,12 @@ class CartaCobro extends NotaCobro {
         return $html2;
     }
 
-	function RenderTemplate($template) {
-		if (!$this->twig) {
-			$loader = new Twig_Loader_String();
-			$this->twig = new Twig_Environment($loader);
-		}
+    function RenderTemplate($template) {
+        if (!$this->twig) {
+            $loader = new Twig_Loader_String();
+            $this->twig = new Twig_Environment($loader);
+        }
 
-		return $this->twig->render($template, $this->template_data);
-	}
+        return $this->twig->render($template, $this->template_data);
+    }
 }
