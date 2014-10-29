@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.6
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Ordena los asuntos por glosa para la Nota de cobro.](https://github.com/LemontechSA/ttb/pull/738)
+
 ## Hotfix: 14.19.5
 Miércoles 29 de Octubre 2014
 * **Fixed:** [Modificar orden combobox países al agregar clientes](https://github.com/LemontechSA/ttb/pull/737)
