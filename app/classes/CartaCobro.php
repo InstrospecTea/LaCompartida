@@ -375,6 +375,7 @@ class CartaCobro extends NotaCobro {
 
         $this->template_data['Idioma'] = $idioma->fields;
         $this->template_data['Moneda'] = $moneda->fields;
+        
         $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
@@ -1206,6 +1207,9 @@ class CartaCobro extends NotaCobro {
 
         $this->template_data['Idioma'] = $idioma->fields;
         $this->template_data['Moneda'] = $moneda->fields;
+        $this->template_data['Cobro'] = $this->fields;
+        $this->template_data['Contrato'] = $Contrato->fields;
+        
         $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
@@ -2721,6 +2725,7 @@ class CartaCobro extends NotaCobro {
     }
 
     function RenderTemplate($template) {
+        
         if (!$this->twig) {
             $loader = new Twig_Loader_String();
             $this->twig = new Twig_Environment($loader);
@@ -2728,4 +2733,17 @@ class CartaCobro extends NotaCobro {
 
         return $this->twig->render($template, $this->template_data);
     }
+
+    function ReemplazarTemplateHTML($template, $id_cobro) {
+        if (empty($id_cobro)) {
+            $query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
+            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+            list($id_cobro) = mysql_fetch_array($resp);
+        }
+        
+        $this->Load($id_cobro);
+        $parser = new TemplateParser($template);
+        return $this->GenerarEjemplo($parser);
+    }
+
 }

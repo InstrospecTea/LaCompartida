@@ -25,9 +25,8 @@ switch ($accion) {
 
     case 'obtener_carta':
         $formato_html = utf8_decode($formato);
-        $preview_carta = $CartaCobro->PrevisualizarDocumentoHtml($formato_html, $id_cobro);
-        exit($preview_carta);
-
+        $previsualizacion_carta = $CartaCobro->ReemplazarTemplateHTML($formato_html, $id_cobro);
+        exit($previsualizacion_carta);
         break;
 
     case 'obtener_html':
