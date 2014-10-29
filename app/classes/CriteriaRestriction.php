@@ -117,7 +117,7 @@ class CriteriaRestriction {
 	 */
 	public static function in($column, array $comparsion_group) {
 		if (is_array($comparsion_group)) {
-			return new CriteriaRestriction(' '.$column.' IN ('.implode(',', $comparsion_group).')');
+			return new CriteriaRestriction(" {$column} IN ('" . implode("','", $comparsion_group) . "')");
 		} else {
 			throw new Exception('The condition_array parameter is not an array!');
 		}
