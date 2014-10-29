@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.5
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Modificar orden combobox países al agregar clientes](https://github.com/LemontechSA/ttb/pull/737)
+
 ## Hotfix: 14.19.4
 Miércoles 29 de Octubre 2014
 * **Fixed:** [Corrige asignación de mes en nota de cobro cuando selecciona idioma ingles](https://github.com/LemontechSA/ttb/pull/736)
