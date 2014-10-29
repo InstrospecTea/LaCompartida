@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.4
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Corrige asignación de mes en nota de cobro cuando selecciona idioma ingles](https://github.com/LemontechSA/ttb/pull/736)
+
 ## Hotfix: 14.19.3
 Martes 28 de Octubre 2014
 * **Fixed:** [Corrige generación de query en el listado de trámites](https://github.com/LemontechSA/ttb/pull/735)
