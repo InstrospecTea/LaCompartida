@@ -99,7 +99,7 @@ echo $DocManager->GetHtmlHeader();
                                 <input id="id_cobro" name="id_cobro" type="text" class="form-control" maxlength="10" value="<?php echo $id_cobro ?>">
                             </div>
                             <div class="col-md-3">
-                                <h5 id="errmsg" style="color:red; font-weight: bold;"></h5>
+                                <h6 id="errmsg" style="color:red; font-weight: bold;"></h6>
                             </div>
                             <div class="col-md-2">
                                 <button id="btn_previsualizar" name="btn_previsualizar" class="btn btn-default pull-right" type="button"><span class="glyphicon glyphicon-print"></span>&nbsp; Descargar Word</button>
