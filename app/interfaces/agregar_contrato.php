@@ -1828,7 +1828,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('País') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan='3'>
-						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia DESC'), 'id_pais', $contrato->fields['id_pais'], 'class ="span3"', 'Vacío', '260px'); ?>
+						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia ASC'), 'id_pais', $contrato->fields['id_pais'], 'class ="span3"', 'Vacío', '260px'); ?>
 					</td>
 				</tr>
 
