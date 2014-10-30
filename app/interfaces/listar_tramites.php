@@ -798,7 +798,11 @@ function funcionTR(& $tramite) {
 	}
 
 	$moneda_tramite = new Moneda($sesion);
-	$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
+	if ($tramite->fields['tarifa_tramite_individual'] > 0) {
+		$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
+	} else {
+		$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
+	}
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
