@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.7
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Corrige simbolo de moneda en lista de trámites.](https://github.com/LemontechSA/ttb/pull/739)
+
 ## Hotfix: 14.19.6
 Miércoles 29 de Octubre 2014
 * **Fixed:** [Ordena los asuntos por glosa para la Nota de cobro.](https://github.com/LemontechSA/ttb/pull/738)
