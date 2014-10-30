@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.8
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Ordena los asuntos por glosa al imprimir los borradores de las pre-liquidaciones.](https://github.com/LemontechSA/ttb/pull/740)
+
 ## Hotfix: 14.19.7
 Miércoles 29 de Octubre 2014
 * **Fixed:** [Corrige simbolo de moneda en lista de trámites.](https://github.com/LemontechSA/ttb/pull/739)
