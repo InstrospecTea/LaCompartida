@@ -11508,6 +11508,19 @@ class NotaCobro extends Cobro {
 
 			$NotaCobro->LoadAsuntos();
 
+			$Criteria = new Criteria($this->sesion);
+			$asuntos = $Criteria
+				->add_from('asunto')
+				->add_select('codigo_asunto')
+				->add_select('glosa_asunto')
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $NotaCobro->asuntos))
+				->add_ordering('glosa_asunto')
+				->run();
+			$NotaCobro->asuntos = array();
+			foreach ($asuntos as $asunto) {
+				$NotaCobro->asuntos[] = $asunto['codigo_asunto'];
+			}
+
 			$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
 			$_LANG = array();
 			include Conf::ServerDir() . "/lang/$lang_archivo";
