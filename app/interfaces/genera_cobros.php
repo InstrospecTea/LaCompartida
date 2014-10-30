@@ -553,7 +553,7 @@ if ($opc == 'buscar') {
 													.css({'font-weight':'bold', 'margin-bottom':'15px'})
 													.html("Emitiendo <?php echo __('cobros'); ?>")
 											)
-											.append(jQuery('<div/>').html('Procure no cerrar la pestaña actual de su navegador. Si 	necesita realizar otras tareas en paralelo, puede hacerlo en otras pestañas.'));
+											.append(jQuery('<div/>').html('Procure no cerrar la pestaña actual de su navegador.'));
 
 										jQuery('#modal_emitir_cobros_resumen')
 											.append(
