@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM'));
 $DocManager = new DocManager($sesion);
-$CartaCobro = new CartaCobro($sesion);
+
 
 if (isset($_POST['accion'])) {
     $accion = $_POST['accion'];
@@ -13,7 +13,7 @@ if (isset($_POST['accion'])) {
 switch ($accion) {
 
     case 'obtener_tags':
-        
+
         $output = '';
         $tags = UtilesApp::mergeKeyValue($CartaCobro->diccionario[$seccion]);
 
@@ -24,19 +24,22 @@ switch ($accion) {
         break;
 
     case 'obtener_carta':
+        $Cobro = new Cobro($sesion);
+        $Cobro->Load($id_cobro);
+        $CartaCobro = new CartaCobro($Cobro->sesion, $Cobro->fields, $Cobro->ArrayFacturasDelContrato, $Cobro->ArrayTotalesDelContrato);
         $formato_html = utf8_decode($formato);
         $previsualizacion_carta = $CartaCobro->ReemplazarTemplateHTML($formato_html, $id_cobro);
         exit($previsualizacion_carta);
         break;
 
     case 'obtener_html':
-
+        $CartaCobro = new CartaCobro($sesion);
         $carta = $CartaCobro->ObtenerCarta($id_carta);
         exit($carta['formato']);
         break;
 
     case 'obtener_css':
-
+        $CartaCobro = new CartaCobro($sesion);
         $carta = $CartaCobro->ObtenerCarta($id_carta);
         exit($carta['formato_css']);
         break;

@@ -324,6 +324,7 @@ class CartaCobro extends NotaCobro {
     );
 
     function __construct($sesion, $fields, $ArrayFacturasDelContrato, $ArrayTotalesDelContrato) {
+        
         parent::__construct($sesion, $fields);
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
@@ -337,7 +338,7 @@ class CartaCobro extends NotaCobro {
 
         $Contrato = new Contrato($this->sesion);
         $Contrato->Load($this->fields['id_contrato']);
-
+        
         $this->template_data = array(
             'Cobro' => $this->fields,
             'Contrato' => $Contrato->fields,
@@ -1207,8 +1208,6 @@ class CartaCobro extends NotaCobro {
 
         $this->template_data['Idioma'] = $idioma->fields;
         $this->template_data['Moneda'] = $moneda->fields;
-        $this->template_data['Cobro'] = $this->fields;
-        $this->template_data['Contrato'] = $Contrato->fields;
         
         $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
