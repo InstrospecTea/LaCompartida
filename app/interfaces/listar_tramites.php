@@ -93,12 +93,19 @@ if ($revisado == 'SI') {
 	$where.= " AND tramite.revisado = 1 ";
 }
 
-$campo_codigo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto';
-if ($$campo_codigo_asunto != '') {
-	$where.= " AND tramite.$campo_codigo_asunto = '".$$campo_codigo_asunto."' ";
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	if (!empty($codigo_asunto_secundario)) {
+		$asunto = new Asunto($sesion);
+		$codigo_asunto = $asunto->CodigoSecundarioACodigo($codigo_asunto_secundario);
+	}
+}
+
+if ($codigo_asunto != '') {
+	$where.= " AND tramite.codigo_asunto = '".$codigo_asunto."' ";
 } else if (trim($glosa_asunto) != '') {
 	$where.= " AND asunto.glosa_asunto LIKE '%{$glosa_asunto}%' ";
 }
+
 
 if ($cobrado == 'NO') {
 	$where .= " AND tramite.id_cobro is null ";
@@ -791,7 +798,11 @@ function funcionTR(& $tramite) {
 	}
 
 	$moneda_tramite = new Moneda($sesion);
-	$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
+	if ($tramite->fields['tarifa_tramite_individual'] > 0) {
+		$moneda_tramite->Load($tramite->fields['id_moneda_tramite_individual']);
+	} else {
+		$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
+	}
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
