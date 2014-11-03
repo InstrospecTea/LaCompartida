@@ -479,7 +479,7 @@ class Reporte {
 				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
 										* SUM(
 											IF(
-												cobro.estado NOT = 'INCOBRABLE',
+												cobro.estado != 'INCOBRABLE',
 												0,
 												(
 													cobro.monto_subtotal
@@ -931,11 +931,13 @@ class Reporte {
 			->add_left_join_with('usuario', CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario'))
 			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto'))
 			->add_left_join_with('cobro', CriteriaRestriction::equals('trabajo.id_cobro', 'cobro.id_cobro'))
-			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'IFNULL(cobro.id_contrato, asunto.id_contrato)'))
-			->add_left_join_with(array('prm_moneda', 'moneda_por_cobrar'), CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
-			->add_left_join_with(array('prm_moneda', 'moneda_display'), CriteriaRestriction::equals('moneda_display.id_moneda', $this->id_moneda));
+			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'IFNULL(cobro.id_contrato, asunto.id_contrato)'));
 
 		if (in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'))) {
+			$this->Criteria
+				->add_left_join_with(array('prm_moneda', 'moneda_por_cobrar'), CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
+				->add_left_join_with(array('prm_moneda', 'moneda_display'), CriteriaRestriction::equals('moneda_display.id_moneda', $this->id_moneda));
+
 			$on_usuario_tarifa = CriteriaRestriction::and_clause(
 				CriteriaRestriction::equals('usuario_tarifa.id_usuario', 'trabajo.id_usuario'),
 				CriteriaRestriction::equals('usuario_tarifa.id_moneda', 'contrato.id_moneda')
