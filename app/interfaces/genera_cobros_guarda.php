@@ -1,11 +1,7 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
-$tini = time();
-
 $Sesion = new Sesion(array('COB', 'DAT'));
-PhpConsole::start(false, true, null, 1);
 
 if (empty($_GET['generar_silenciosamente'])) {
 	$Pagina = new Pagina($Sesion);
@@ -196,10 +192,12 @@ if ($print) {
 	}
 
 } else if ($emitir) {
-
 	$Cobro = new Cobro($Sesion);
-	$query = "
-		SELECT
+	$errores_cobro = array();
+	$total_cobros_procesados = 0;
+	$total_cobros_emitidos = 0;
+
+	$query = "SELECT
 			cobro.id_cobro,
 			cobro.id_usuario,
 			cobro.codigo_cliente,
@@ -210,28 +208,48 @@ if ($print) {
 			contrato.id_carta
 		FROM cobro
 			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-				WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' )";
+			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION')";
 
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
-	while ($cob = mysql_fetch_array($resp)) {
+	while ($cobro = mysql_fetch_array($resp)) {
 		set_time_limit(100);
-		if ($Cobro->Load($cob['id_cobro'])) {
-			$Cobro->Edit('id_carta', $cob['id_carta']);
-			$ret = $Cobro->GuardarCobro(true);
+		$total_cobros_procesados++;
+
+		if ($Cobro->Load($cobro['id_cobro'])) {
+			$Cobro->Edit('id_carta', $cobro['id_carta']);
+			$retorno_guardar_cobro = $Cobro->GuardarCobro(true);
 			$Cobro->Edit('etapa_cobro', '5');
 			$Cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
 			$estado_anterior = $Cobro->fields['estado'];
 			$Cobro->Edit('estado', 'EMITIDO');
-			if ($ret == '' && $estado_anterior != 'EMITIDO') {
+			if ($retorno_guardar_cobro == '' && $estado_anterior != 'EMITIDO') {
 				$Cobro->Write();
+				$total_cobros_emitidos++;
+			} else {
+				array_push($errores_cobro, utf8_encode('#' . $cobro['id_cobro'] . ': ' . $retorno_guardar_cobro));
 			}
 		}
 	}
-	$url .= '&cobros_emitidos=1';
-	$Pagina->Redirect($url);
 
+	$url .= '&cobros_emitidos=1';
+
+	if (isset($return_json) && $return_json == 'true') {
+		$json = array(
+			'url_redirect' => $url,
+			'total_cobros_procesados' => $total_cobros_procesados,
+			'total_cobros_emitidos' => $total_cobros_emitidos,
+			'total_cobros_error' => $total_cobros_procesados - $total_cobros_emitidos
+		);
+
+		if (!empty($errores_cobro)) {
+			$json['errores'] = $errores_cobro;
+		}
+		echo json_encode($json);
+	} else {
+		$Pagina->Redirect($url);
+	}
 } else { #Creación masiva de cobros
 
 	$where = 1;
