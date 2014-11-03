@@ -1081,7 +1081,6 @@ class NotaCobro extends Cobro {
 		}
 		$this->Load($id_cobro);
 
-
 		return $this->GenerarEjemplo($parser);
 	}
 
@@ -1567,7 +1566,7 @@ class NotaCobro extends Cobro {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				$row = mysql_fetch_row($resp);
 				$descripcion_forma_cobro = $row[0];
-                
+
 				if ($this->fields['forma_cobro'] == 'TASA') {
 					$html = str_replace('%valor_modalidad_ucfirst%', $this->fields['opc_ver_modalidad'] == 1 ? __('Tarifa por Hora') : '', $html);
 				} else {
@@ -1832,7 +1831,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor_tipo_cambio_moneda%', '', $html);
 				} else {
 					$html = str_replace('%glosa_tipo_cambio_moneda%', __('Tipo de Cambio'), $html);
-					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$moneda->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$this->fields['id_moneda_base']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -4629,7 +4628,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor_tipo_cambio_moneda%', '', $html);
 				} else {
 					$html = str_replace('%glosa_tipo_cambio_moneda%', __('Tipo de Cambio'), $html);
-					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$moneda->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$this->fields['id_moneda_base']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -7685,7 +7684,7 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%valor_honorarios_monedabase_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($valor_trabajos_demo_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format(floor($total_en_moneda), $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%valor_honorarios_monedabase_mb%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);						
+				$html = str_replace('%valor_honorarios_monedabase_mb%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
 			case 'DETALLE_COBRO_DESCUENTO': //GenerarDocumentoComun
@@ -10368,7 +10367,7 @@ class NotaCobro extends Cobro {
 		 * %saldo_del_cobro% El total facturado menos los pagos que se hayan hecho
 		 * %saldo_anterior% La suma de los %saldo_del_cobro% de OTRAS liquidaciones que pertenezcan al mismo contrato
 		 * %saldo_total_adeudado% La suma %saldo_del_cobro% de todas las liquiedaciones que pertenezcan al contrato incluida la actual
-		 * 
+		 *
 		 * %saldo_total_cobro_sinfactura% Homólogo de %saldo_del_cobro% pero considera el monto total de la liquidación, en vez de lo facturado
 		 * %saldo_otras_liquidaciones_sinfactura% La suma de los saldos de OTRAS liquidaciones que pertenezcan al mismo contrato
 		 * %saldo_contrato_sinfactura% La suma de los saldos de OTRAS liquidaciones que pertenezcan al mismo contrato + %saldo_total_cobro_sinfactura%
@@ -10378,7 +10377,7 @@ class NotaCobro extends Cobro {
 		$fila = $html;
 		$fila_adelantos = "";
 		$htmltemporal = $html;
-		
+
 		$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
 		$moneda_base = Utiles::MonedaBase($this->sesion);
 
@@ -10425,7 +10424,7 @@ class NotaCobro extends Cobro {
 			$x_resultados['tipo_cambio_opc_moneda_total'],
 			$x_resultados['cifras_decimales_opc_moneda_total']
 		);
- 		
+
 		$documentos_de_pago .=number_format($saldo_pagos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		$documentos_de_adelanto .=number_format($saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		$pagos_liquidacion .=number_format($saldo_pagos + $saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
@@ -11508,6 +11507,19 @@ class NotaCobro extends Cobro {
 			}
 
 			$NotaCobro->LoadAsuntos();
+
+			$Criteria = new Criteria($this->sesion);
+			$asuntos = $Criteria
+				->add_from('asunto')
+				->add_select('codigo_asunto')
+				->add_select('glosa_asunto')
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $NotaCobro->asuntos))
+				->add_ordering('glosa_asunto')
+				->run();
+			$NotaCobro->asuntos = array();
+			foreach ($asuntos as $asunto) {
+				$NotaCobro->asuntos[] = $asunto['codigo_asunto'];
+			}
 
 			$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
 			$_LANG = array();

@@ -231,7 +231,13 @@ $Form = new Form;
 				</tr>
 			</table>
 		</fieldset>
-	<?php } ?>
+	<?php } else {
+		if ($usocodigosecundario) {
+			echo $Form->input('campo_codigo_cliente_secundario', $codigo_cliente_secundario, array('label' => false, 'id' => 'campo_codigo_cliente_secundario', 'type' => 'hidden'));
+		} else {
+			echo $Form->input('campo_codigo_cliente', $codigo_cliente, array('label' => false, 'id' => 'campo_codigo_cliente', 'type' => 'hidden'));
+		}
+	} ?>
 </form>
 <?php
 
@@ -288,12 +294,10 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.glosa_asunto Like '%{$glosa_asunto}%'";
 	}
 
-	if ($codigo_cliente || $codigo_cliente_secundario) {
-		if ($usocodigosecundario && !$codigo_cliente) {
-			$cliente = new Cliente($Sesion);
-			if ($cliente->LoadByCodigoSecundario($codigo_cliente_secundario)) {
-				$codigo_cliente = $cliente->fields['codigo_cliente'];
-			}
+	if (!empty($codigo_cliente_secundario) && $usocodigosecundario == true) {
+		$cliente = new Cliente($Sesion);
+		if ($cliente->LoadByCodigoSecundario($codigo_cliente_secundario)) {
+			$codigo_cliente = $cliente->fields['codigo_cliente'];
 		}
 	}
 

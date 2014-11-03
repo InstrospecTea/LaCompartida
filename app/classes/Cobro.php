@@ -87,7 +87,7 @@ if (!class_exists('Cobro')) {
 				$m = $monedas[$this->fields['id_moneda']];
 				$se_esta_cobrando .= "Tarifa Cobrada: {$m['simbolo']} " . number_format($this->fields['monto'], $m['cifras_decimales'], '.', '') . "\n";
 
-				$mb = $monedas[Moneda::GetMonedaBase($this->sesion)];
+				$mb = $monedas[$this->fields['id_moneda_base']];
 				$se_esta_cobrando .= "Tipo de cambio: {$mb['simbolo']} " . number_format($this->fields['tipo_cambio_moneda'], $m['cifras_decimales'], '.', '');
 			} else {
 				$se_esta_cobrando = __('Periodo') . ': ';
@@ -701,6 +701,9 @@ if (!class_exists('Cobro')) {
 				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				$his->Edit('id_cobro', $id_cobro);
 				$his->Write();
+
+				$CobroAsunto = new CobroAsunto($this->sesion);
+				$CobroAsunto->eliminarAsuntos($id_cobro);
 
 				$query = "DELETE FROM cobro WHERE id_cobro = $id_cobro";
 				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -2756,18 +2759,18 @@ if (!class_exists('Cobro')) {
 			$totales = $this->ArrayTotalesDelContrato;
 			if (empty($totales)) { #Generar totales del contrato si no han sido generados
 				$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
-				$facturas = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);	
+				$facturas = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
 				# TotalesDelContrato() solo entrega valores del Cobro si es que existen facturas
 				# TotalesDelContrato() solo entrega valores del Contrato si es que existen facturas
 				$totales = $this->TotalesDelContrato($facturas, $nuevomodulofactura, $id_cobro);
 			}
-			
+
 			if (empty($this->x_resultados)) { #Generar totales del cobro si no han sido generados
 				$this->x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
 			}
 			$saldo_total_cobro = $totales[$id_cobro]['saldo_honorarios'] + $totales[$id_cobro]['saldo_gastos'];
 			$saldo_contrato = $totales['contrato']['saldo_honorarios'] + $totales['contrato']['saldo_gastos'];
-			$moneda_saldo = $totales['contrato']['moneda_saldo']; 
+			$moneda_saldo = $totales['contrato']['moneda_saldo'];
 			if (empty($moneda_saldo)) {
 				$moneda_saldo = $this->fields['opc_moneda_total'];
 			}

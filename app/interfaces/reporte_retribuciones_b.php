@@ -1,17 +1,17 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Retribuciones.php';
 
-$sesion = new Sesion(array('RET'));
+$sesion = new Sesion();
+$pagina = new Pagina($sesion);
+
+/*
+ * El usuario debe tener los permisos RET y REP para acceder a este reporte.
+ */
+if (!$sesion->usuario->Es('REP') || !$sesion->usuario->Es('RET')) {
+	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a Detalle de ' . __('Retribuciones') . ' por ' . __('Cobro') . '.';
+	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
+}
+
 $moneda_base = Utiles::MonedaBase($sesion);
 
 if (!empty($_POST)) {
@@ -28,7 +28,6 @@ if (!empty($_POST)) {
 
 }
 
-$pagina = new Pagina($sesion);
 $pagina->titulo = 'Detalle de ' . __('Retribuciones') . ' por ' . __('Cobro');
 $pagina->PrintTop();
 

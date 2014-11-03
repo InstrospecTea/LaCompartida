@@ -7,6 +7,8 @@ class CartaCobro extends NotaCobro {
     var $carta_tabla = 'carta';
     var $carta_id = 'id_carta';
     var $carta_formato = 'formato';
+    // Twig, the flexible, fast, and secure template language for PHP
+    var $twig;
     public $secciones = array(
         'CARTA' => array(
             'FECHA' => 'Sección FECHA',
@@ -264,16 +266,25 @@ class CartaCobro extends NotaCobro {
     );
 
     function __construct($sesion, $fields, $ArrayFacturasDelContrato, $ArrayTotalesDelContrato) {
-        $this->sesion = $sesion;
-        $this->fields = $fields;
+		parent::__construct($sesion, $fields);
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
-        $valorsinespacio = '&nbsp;';
+
+        $this->espacio = '&nbsp;';
         if (Conf::GetConf($this->sesion, 'ValorSinEspacio')) {
-            $valorsinespacio = '';
+            $this->espacio = '';
         }
-        $this->espacio = $valorsinespacio;
+
         $this->monedas = Moneda::GetMonedas($sesion, '', true);
+
+        $Contrato = new Contrato($this->sesion);
+        $Contrato->Load($this->fields['id_contrato']);
+
+				$this->template_data = array(
+					'Cobro' => $this->fields,
+					'Contrato' => $Contrato->fields,
+					'UsuarioActual' => $this->sesion->usuario->fields
+				);
     }
 
     function NuevoRegistro() {
@@ -304,7 +315,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $html2 = $parser_carta->tags[$theTag];
+				$this->template_data['Idioma'] = $idioma->fields;
+				$this->template_data['Moneda'] = $moneda->fields;
+				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'CARTA':
@@ -598,7 +611,7 @@ class CartaCobro extends NotaCobro {
                 if ($lang == 'es') {
                     $fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
                     $fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
-                    $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+                    $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], __('%B de %Y')));
                     $fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? __('prestada ') . $texto_fecha_es : __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
                 } else {
                     $fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
@@ -608,9 +621,9 @@ class CartaCobro extends NotaCobro {
 
                 if (( $fecha_diff == 'durante el mes de No existe fecha' || $fecha_diff == 'hasta el mes de No existe fecha' ) && $lang == 'es') {
                     $fecha_diff = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
-                    $fecha_al = __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
-                    $fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
-                    $fecha_diff_prestada = __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
+                    $fecha_al = __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), __('%B de %Y')));
+                    $fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), __('%B de %Y')));
+                    $fecha_diff_prestada = __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), __('%B de %Y')));
                 }
 
                 /* FECHA PERIODO EXACTO PARA COBROS SOLO GASTOS */
@@ -689,14 +702,14 @@ class CartaCobro extends NotaCobro {
 
                     if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
                         $texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
-                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
                     } else {
                         $texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
-                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
                     }
                 } else {
                     $texto_fecha_es = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y')));
-                    $texto_fecha_es_de = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y')));
+                    $texto_fecha_es_de = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y'))));
                 }
 
                 if ($lang == 'es') {
@@ -727,7 +740,7 @@ class CartaCobro extends NotaCobro {
                 }
 
                 if ($lang == 'es') {
-                    $fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+                    $fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
                 } else {
                     $fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
                 }
@@ -1136,7 +1149,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $html2 = $parser_carta->tags[$theTag];
+				$this->template_data['Idioma'] = $idioma->fields;
+				$this->template_data['Moneda'] = $moneda->fields;
+				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -1481,7 +1496,7 @@ class CartaCobro extends NotaCobro {
                     $fecha_mes = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('realizados el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B'));
                     $fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
                     $fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
-                    $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+                    $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], __('%B de %Y')));
                     $fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? __('prestada ') . $texto_fecha_es : __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
                     $fecha_diff_prestada_durante = $datediff > 0 && $datediff < 12 ? $texto_fecha_es_durante : __('prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
                 } else {
@@ -1489,14 +1504,14 @@ class CartaCobro extends NotaCobro {
                     $fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('to') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
                     $fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
                     $fecha_diff_prestada_durante = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
-                    $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('during the month of') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+                    $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('during the month of') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], __('%B de %Y')));
                 }
 
                 if (( $fecha_diff == 'durante el mes de No existe fecha' || $fecha_diff == 'hasta el mes de No existe fecha' ) && $lang == 'es') {
                     $fecha_diff = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
                     $fecha_al = __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
-                    $fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
-                    $fecha_diff_prestada = __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
+                    $fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), __('%B de %Y')));
+                    $fecha_diff_prestada = __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), __('%B de %Y')));
                     $fecha_diff_prestada_durante = __('prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
                 }
 
@@ -1561,17 +1576,17 @@ class CartaCobro extends NotaCobro {
 
                     if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
                         $texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
-                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
-                        $texto_fecha_es_durante = __('prestados durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
+                        $texto_fecha_es_durante = __('prestados durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
                     } else {
                         $texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
-                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
-                        $texto_fecha_es_durante = __('prestados durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+                        $texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
+                        $texto_fecha_es_durante = __('prestados durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
                     }
                 } else {
                     $texto_fecha_es = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y')));
-                    $texto_fecha_es_de = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y')));
-                    $texto_fecha_es_durante = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y')));
+                    $texto_fecha_es_de = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y'))));
+                    $texto_fecha_es_durante = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y'))));
                 }
 
                 if ($lang == 'es') {
@@ -1592,8 +1607,8 @@ class CartaCobro extends NotaCobro {
 
                 if ($lang == 'es') {
                     $fecha_primer_trabajo = $datediff > 0 && $datediff < 48 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
-                    $fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
-                    $fecha_primer_trabajo_durante = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __(' prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+                    $fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
+                    $fecha_primer_trabajo_durante = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __(' prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, __('%B de %Y')));
                 } else {
                     $fecha_primer_trabajo = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
                     $fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
@@ -2133,7 +2148,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-        $html2 = $parser_carta->tags[$theTag];
+				$this->template_data['Idioma'] = $idioma->fields;
+				$this->template_data['Moneda'] = $moneda->fields;
+				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'FECHA': //GenerarDocumentoCartaComun
@@ -2301,7 +2318,7 @@ class CartaCobro extends NotaCobro {
                     $html2 = str_replace('%nombre_pais_mayuscula%', '', $html2);
                 }
 
-                $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('correspondientes al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+                $fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('correspondientes al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], __('%B de %Y')));
                 $html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);
 
                 if (strtolower($nombre_pais) != 'colombia') {
@@ -2380,8 +2397,7 @@ class CartaCobro extends NotaCobro {
                 $query = "SELECT CONCAT(a.nombre, ' ', a.apellido1, ' ', a.apellido2) FROM usuario AS a JOIN contrato ON a.id_usuario=contrato.id_usuario_responsable JOIN cobro ON cobro.id_contrato=contrato.id_contrato WHERE cobro.id_cobro=" . $this->fields['id_cobro'];
                 $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
                 list($nombre_encargado) = mysql_fetch_array($resp);
-                list( $nombre, $apellido1, $apellido2 ) = explode(' ', $nombre_encargado);
-                $iniciales = substr($nombre, 0, 1) . substr($apellido1, 0, 1) . substr($apellido2, 0, 1);
+                $iniciales = $this->iniciales($nombre_encargado);
                 $html2 = str_replace('%iniciales_encargado_comercial%', $iniciales, $html2);
                 $html2 = str_replace('%nombre_encargado_comercial%', $nombre_encargado, $html2);
 
@@ -2649,4 +2665,12 @@ class CartaCobro extends NotaCobro {
         return $html2;
     }
 
+	function RenderTemplate($template) {
+		if (!$this->twig) {
+			$loader = new Twig_Loader_String();
+			$this->twig = new Twig_Environment($loader);
+		}
+
+		return $this->twig->render($template, $this->template_data);
+	}
 }

@@ -31,6 +31,27 @@ set :virtual_directory, "/var/www/virtual"
 set :file_path, "#{deploy_dir_name}/#{application}"
 set :deploy_to, "#{base_directory}/#{file_path}"
  
+namespace :composer do
+  desc "Setup composer dir and install"
+  task :setup do
+    run "mkdir -p #{shared_path}/composer"
+    run "cp -f #{release_path}/composer.json #{shared_path}/composer"
+    composer.install
+    composer.update_symlinks
+  end
+
+  desc "Install libs"
+  task :install do
+    run "cd #{shared_path}/composer && sudo /usr/local/bin/composer update"
+  end
+
+  desc "Update composer symlinks"
+  task :update_symlinks do
+    run "ln -s #{shared_path}/composer/vendor #{release_path}/vendor"
+  end
+
+end
+
 def update_database(cap_vars)
   puts "\n\e[0;31m  *** configuring db updates for #{cap_vars.file_path}/current \e[0m\n"
   dynamo_db = AWS::DynamoDB.new(
@@ -80,3 +101,4 @@ def update_symlinks(cap_vars)
   puts "\n Finished!! \n"
 end
 
+after "deploy:update_code", "composer:setup"

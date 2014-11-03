@@ -1,5 +1,110 @@
 # Changelog
 
+## Hotfix: 14.19.8
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Ordena los asuntos por glosa al imprimir los borradores de las pre-liquidaciones.](https://github.com/LemontechSA/ttb/pull/740)
+
+## Hotfix: 14.19.7
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Corrige simbolo de moneda en lista de trámites.](https://github.com/LemontechSA/ttb/pull/739)
+
+## Hotfix: 14.19.6
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Ordena los asuntos por glosa para la Nota de cobro.](https://github.com/LemontechSA/ttb/pull/738)
+
+## Hotfix: 14.19.5
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Modificar orden combobox países al agregar clientes](https://github.com/LemontechSA/ttb/pull/737)
+
+## Hotfix: 14.19.4
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Corrige asignación de mes en nota de cobro cuando selecciona idioma ingles](https://github.com/LemontechSA/ttb/pull/736)
+
+## Hotfix: 14.19.3
+Martes 28 de Octubre 2014
+* **Fixed:** [Corrige generación de query en el listado de trámites](https://github.com/LemontechSA/ttb/pull/735)
+
+## Hotfix: 14.19.2
+Jueves 23 de Octubre 2014
+* **Fixed:** [Corrige definición del método](https://github.com/LemontechSA/ttb/pull/734)
+
+## Hotfix: 14.19.1
+Jueves 23 de Octubre 2014
+* **Fixed:** [Selección de cliente al agregar asuntos desde el mantenedor del cliente](https://github.com/LemontechSA/ttb/pull/733)
+
+## Release: 14.19.0
+Jueves 23 de Octubre 2014
+* **Fixed:** [Feature modificación facturación cl](https://github.com/LemontechSA/ttb/pull/709)
+* **New:** [Feature facturación nubox](https://github.com/LemontechSA/ttb/pull/674)
+* **Updated** [Actualización Framework](https://github.com/LemontechSA/framework/pull/33)
+
+## Hotfix: 14.18.4
+Jueves 23 de Octubre 2014
+* **Fixed:** [Para los montos Flat Fee sin HH del reporte Producción Profesional se incluye la restricción de las horas](https://github.com/LemontechSA/ttb/pull/731)
+
+## Hotfix: 14.18.3
+Martes 21 de Octubre 2014
+* **Fixed:** [Corrige inconsistencia en la presentación del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)
+
+## Hotfix: 14.18.2
+Lunes 20 de Octubre 2014
+* **Fixed:** [Corrige la condición de creación de cobros programados](https://github.com/LemontechSA/ttb/pull/725)
+
+## Hotfix: 14.18.1
+Jueves 16 de Octubre 2014
+* **Fixed:** [Corregir despliegue de carta al descargar borradores](https://github.com/LemontechSA/ttb/pull/724)
+
+## Release: 14.18.0
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Corrige modificación de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
+* **Fixed:** [Permisos reporte financiero](https://github.com/LemontechSA/ttb/pull/716)
+* **New:** [Primera versión reporte personal de producción](https://github.com/LemontechSA/ttb/pull/719)
+
+## Hotfix: 14.17.6
+Miércoles 15 de Octubre 2014
+* **Fixed:** [Elimina los registros asociados al cobro en la tabla cobro_asunto.](https://github.com/LemontechSA/ttb/pull/721)
+
+## Hotfix: 14.17.5
+Martes 14 de Octubre 2014
+* **Fixed:** [Sincroniza valores de montos cobrados del reporte de rendimiento de profesionales con el reporte avanzado.](https://github.com/LemontechSA/ttb/pull/720)
+
+## Hotfix: 14.17.4
+Jueves 9 de Octubre 2014
+* **Fixed:** [Quita mensaje del excel `Error en el archivo los datos pueden haberse perdido`.](https://github.com/LemontechSA/ttb/pull/717)
+
+## Hotfix: 14.17.3
+Martes 7 de Octubre 2014
+* **Fixed:** [Ancho de columnas en el reporte de rendimiento de profesionales.](https://github.com/LemontechSA/ttb/pull/715)
+
+## Hotfix: 14.17.2
+Martes 7 de Octubre 2014
+* **Fixed:** [Define valores de tabla para cuando no están definidos.](https://github.com/LemontechSA/ttb/pull/714)
+
+## Hotfix: 14.17.1
+Martes 7 de Octubre 2014
+* **Fixed:** [Condicion de filtrado por contrato en el reporte de antiguedad de deudas generaba un conjunto disjunto.](https://github.com/LemontechSA/ttb/pull/713)
+
+## Release: 14.17.0
+Lunes 6 de Octubre 2014
+* **Fixed:** [Template conditionals](https://github.com/LemontechSA/ttb/pull/692)
+* **Fixed:** [Agregar columna Monto Facturable al reporte excel](https://github.com/LemontechSA/ttb/pull/702)
+
+## Hotfix: 14.16.13
+Lunes 6 de Octubre 2014
+* **Fixed:** [Condiciones para cuando validacion de negocio falla al eliminar un trabajo.](https://github.com/LemontechSA/ttb/pull/710)
+
+## Hotfix: 14.16.12
+Jueves 2 de Octubre 2014
+* **Fixed:** [Aplicar DISTINCT en GROUP_CONCAT al generar reporte de adelantos](https://github.com/LemontechSA/ttb/pull/706)
+
+## Hotfix: 14.16.11
+Jueves 2 de Octubre 2014
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producción profesional](https://github.com/LemontechSA/ttb/pull/705)
+
+## Hotfix: 14.16.10
+Martes 30 de Septiembre 2014
+* **Fixed:** [Corrige creación reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+
 ## Hotfix: 14.16.9
 Lunes 29 de Septiembre 2014
 * **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)
