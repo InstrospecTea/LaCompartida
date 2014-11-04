@@ -539,9 +539,12 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			<?php
 			$numero_documento = '';
-
 			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-				$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
+				if ($factura->Loaded()) {
+					$serie = $factura->fields['serie_documento_legal'];
+				} else {
+					$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
+				}
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
@@ -552,12 +555,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td align="left">
 					<?php
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
-						$serie_documento_legal = $factura->fields['serie_documento_legal'];
-						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
-					} else {
-						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
-						?>
-						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
+						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', null, 60);
+					} else { ?>
+						<input type="hidden" name="serie" id="serie" value="<?php echo $serie; ?>">
 					<?php } ?>
 					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
@@ -1711,9 +1711,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 	jQuery(document).ready(function() {
 		jQuery(document).data('estudio_serie_numero', {
-			'estudio': jQuery('#id_estudio').attr('value'),
-			'serie': jQuery('#serie').attr('value'),
-			'numero': jQuery('#numero').attr('value')
+			'estudio': jQuery('#id_estudio').val(),
+			'serie': jQuery('#serie').val(),
+			'numero': jQuery('#numero').val()
 		});
 
 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
