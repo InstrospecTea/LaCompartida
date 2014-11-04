@@ -86,7 +86,7 @@ class CriteriaRestriction {
 		for ($key = 0; $key < $total_args; ++$key) {
 			$arg = $args[$key];
 			if (is_array($arg)) {
-				$args[$key] = call_user_func_array(array('CriteriaRestriction', 'and_clause'), $arg);
+				$args[$key] = call_user_func_array(array('CriteriaRestriction', 'or_clause'), $arg);
 			}
 		}
 		return new CriteriaRestriction('(' . implode(' OR ', $args) . ')');

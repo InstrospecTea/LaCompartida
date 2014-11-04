@@ -118,8 +118,7 @@ if ($opc == 'asuntos_liquidar') {
 						GROUP BY contrato.id_contrato";
 
 	###### BUSCADOR ######
-	// if($sesion->usuario->fields['rut']=='99511620') echo $query;
-	$link = __('Opción'); #__('Opción')." <br /><a href='javascript:void(0)' onclick='SeleccionaTodos(document.form_busca.opc, this.checked);'>".__('Todos');
+	$link = __('Opción');
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente, asunto_lista';
 	$b = new Buscador($sesion, $query, "Contrato", $desde, $x_pag, $orden);
@@ -507,30 +506,102 @@ if ($opc == 'buscar') {
 
 
 					} else if (desde == 'emitir') {
+						if (jQuery('#modal_emitir_cobros').length == 1) {
+							jQuery('#modal_emitir_cobros').remove();
+						}
 
-						var text_window = '<strong><center><?php echo __('Ud. está realizando la emisión masiva de cobros, asegúrese de haber verificado sus datos o cobros en proceso.') ?>';
-						text_window += '<br/><br/>';
-						text_window += '<?php echo __('¿Desea emitir los cobros?') ?></center></strong>';
-						jQuery('<p/>')
-								.attr('title', '<?php echo __('ALERTA') ?>')
-								.html(text_window)
-								.dialog({
-									width: 400,
-									modal: true,
-									open: function() {
-										jQuery('.ui-dialog-title').addClass('ui-icon-warning');
-										jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+						jQuery('<div/>')
+							.attr('id', 'modal_emitir_cobros')
+							.attr('title', "<?php echo __('ALERTA'); ?>")
+							.append(
+								jQuery('<div/>')
+									.attr('id', 'modal_emitir_cobros_resumen')
+									.css({'text-align':'center', 'padding':'10px', 'font-size':'12px'})
+									.append(jQuery('<div/>').html("<?php echo __('Ud. está realizando la emisión masiva de cobros, asegúrese de haber verificado sus datos o cobros en proceso.') ?>"))
+									.append(
+										jQuery('<div/>')
+										.css({'font-weight':'bold', 'margin-top':'15px'})
+										.html("<?php echo __('¿Desea emitir los cobros?'); ?>")
+									)
+							)
+							.dialog({
+								width: 400,
+								height: 'auto',
+								modal: true,
+								closeOnEscape: false,
+								dialogClass: 'no-close',
+								draggable: false,
+								resizable: false,
+								open: function() {
+									jQuery('.ui-dialog-title').addClass('ui-icon-warning');
+									jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+								},
+								buttons: {
+									"<?php echo __('Cancelar'); ?>": function() {
+										jQuery(this).dialog('close');
 									},
-									buttons: {
-										'<?php echo __('Cancelar') ?>': function() {
-											jQuery(this).dialog('close');
-										},
-										'<?php echo __('Continuar') ?>': function() {
-											form.action = 'genera_cobros_guarda.php?emitir=true';
-											form.submit();
-										}
+									"<?php echo __('Continuar'); ?>": function() {
+										form.action = 'genera_cobros_guarda.php?emitir=true&return_json=true';
+										jQuery('.ui-dialog-buttonpane button:contains("<?php echo __('Cancelar'); ?>")').button().hide();
+										jQuery('.ui-dialog-buttonpane button:contains("<?php echo __('Continuar'); ?>")').button().hide();
+										jQuery('.ui-dialog-buttonpane').hide();
+
+										jQuery('#modal_emitir_cobros_resumen')
+											.html('')
+											.append(
+												jQuery('<div/>')
+													.css({'font-weight':'bold', 'margin-bottom':'15px'})
+													.html("Emitiendo <?php echo __('cobros'); ?>")
+											)
+											.append(jQuery('<div/>').html('Procure no cerrar la pestaña actual de su navegador.'));
+
+										jQuery('#modal_emitir_cobros_resumen')
+											.append(
+												jQuery('<div/>')
+													.css({'margin':'10px auto', 'width':'100px', 'background':'url(https://static.thetimebilling.com/images/loading_bar.gif) no-repeat'})
+													.html('&nbsp;')
+											);
+
+										jQuery.ajax({
+											url: form.action,
+											data: jQuery('#form_busca').serialize()
+										}).fail(function(data) {
+											alert(data);
+										}).complete(function(data) {
+											var data = jQuery.parseJSON(data.responseText);
+
+											jQuery('#modal_emitir_cobros_resumen')
+												.html('')
+												.append(jQuery('<div/>').css({'margin-bottom':'15px', 'font-weight':'bold', 'text-align':'left', 'border-bottom':'1px solid #ccc'}).html("Resumen del proceso emisión de <?php echo __('cobros'); ?>"))
+												.append(
+													jQuery('<div/>')
+														.css({'border':'1px dotted #ccc'})
+														.append(jQuery('<div/>').css({'float':'left', 'text-align':'right', 'width':'180px'}).html('Procesados:'))
+														.append(jQuery('<div/>').css({'float':'right', 'padding-right':'130px'}).html(data.total_cobros_procesados))
+														.append(jQuery('<div/>').css({'clear':'both'}).html(''))
+														.append(jQuery('<div/>').css({'float':'left', 'text-align':'right', 'width':'180px'}).html('Emitidos:'))
+														.append(jQuery('<div/>').css({'float':'right', 'padding-right':'130px'}).html(data.total_cobros_emitidos))
+														.append(jQuery('<div/>').css({'clear':'both'}).html(''))
+														.append(jQuery('<div/>').css({'float':'left', 'text-align':'right', 'width':'180px'}).html('Con error:'))
+														.append(jQuery('<div/>').css({'float':'right', 'padding-right':'130px'}).html(data.total_cobros_error))
+														.append(jQuery('<div/>').css({'clear':'both'}).html(''))
+												);
+
+											if (data.total_cobros_error > 0) {
+												jQuery('#modal_emitir_cobros_resumen').append(jQuery('<div/>').css({'font-weight':'bold', 'margin':'10px 0 10px 0', 'text-align':'left', 'border-bottom':'1px solid #ccc'}).html('Detalles'));
+
+												jQuery.each(data.errores, function(k, v) {
+													jQuery('#modal_emitir_cobros_resumen').append(jQuery('<div/>').css({'text-align':'left', 'margin-bottom':'10px'}).html(v));
+												});
+											}
+
+											jQuery('#modal_emitir_cobros').dialog('option', 'buttons', { "<?php echo __('Aceptar'); ?>": function() { jQuery(this).dialog('close'); } });
+											jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+											jQuery('.ui-dialog-buttonpane').show();
+										});
 									}
-								});
+								}
+							});
 					} else if (desde == 'asuntos_liquidar') {
 						form.action = 'genera_cobros.php';
 						form.opc.value = 'asuntos_liquidar';
@@ -682,7 +753,6 @@ if ($opc == 'buscar') {
 				//refrescar para popup
 				function Refrescar()
 				{
-					//var form = $('form_busca');
 					$('opc').value = 'buscar';
 					var opc = $('opc').value;
 
@@ -728,7 +798,7 @@ if ($desde) {
 				//Confirmación de generación de cobros individuales
 				function GenerarIndividual(modalidad, id_contrato, fecha_ultimo_cobro, fecha_ini, fecha_fin,
 						monto_estimado, monto_real, moneda, id_cobro_pendiente, incluye_honorarios, incluye_gastos) {
-					//var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
+
 					interrumpeproceso = 0;
 					var text_window = '<p style="padding:10px;font-size:12px;font-weight:bold;text-align:center;"><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php echo __('Al generar este borrador se eliminarán todos los borradores antiguos asociados a ' . __('este contrato')); ?>.<br>';
 					if (modalidad == 'FLAT FEE' && monto_estimado > 0 && monto_real != monto_estimado)
@@ -790,9 +860,6 @@ if ($desde) {
 													"&individual=true"
 													);
 										}
-
-
-
 
 										jQuery(this).dialog("close");
 										jQuery('#boton_buscar').click();
@@ -897,7 +964,6 @@ if ($desde) {
 								?>
 							</td>
 						</tr>
-						<!-- <?php echo __('Incluir Asuntos sin cobros pendientes') ?> <input type="checkbox" name=sin_cobro_pendiente value=1 <?php echo $sin_cobro_pendiente ? 'checked' : '' ?>> -->
 						<tr>
 							<?php if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
 								?>
@@ -959,8 +1025,6 @@ if ($desde) {
 			</td>
 			</td>
 	</table>
-
-
 
 	<?php if ($opc == 'buscar') { ?>
 		<table width="820">
@@ -1095,8 +1159,6 @@ function funcionTR(& $contrato) {
 				ORDER BY cobro_pendiente.id_cobro_pendiente ASC";
 		$lista_hitos = new ListaCobrosPendientes($sesion, '', $query_hitos);
 
-
-
 		#se dejó igual hasta que todos los clientes esten ordenados... 08-03-09
 		$query_cobros = "SELECT
 													id_cobro,
@@ -1129,7 +1191,6 @@ function funcionTR(& $contrato) {
 	$html .= "<tr bgcolor=$color style='border-left: 1px solid #409C0B; border-right: 1px solid #409C0B; '>";
 	$html .= "<td style='font-size:10px' valing=top><b>" . $contrato->fields[glosa_cliente];
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_imprimir_buscador') : false;
-
 
 	$html .= "</b></td>";
 
@@ -1329,7 +1390,7 @@ function funcionTR(& $contrato) {
 
 	#WIP
 	$wip = $contrato->ProximoCobroEstimado($fecha_ini ? Utiles::fecha2sql($fecha_ini) : '', Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
-	// echo '<pre>';print_r($wip);echo '</pre>';
+
 	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 	$html .= "<td style='border:1px dashed #999999; font-size:10px'>" . __('WIP (Work in progress)') . "</td><td colspan=4 style='border:1px dashed #999999'>";
 	$html .= "<div id='wip_$i'>";
