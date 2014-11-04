@@ -164,7 +164,7 @@ class ReporteHistorialMovimientos
 		}
 
 		if (!empty($this->since) && !empty($this->until)) {
-			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.$fecha_field.')', $this->since, $this->until));
+			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.$fecha_field.')', "'$this->since'", "'$this->until'"));
 		}
 
 		//Filtra por cliente

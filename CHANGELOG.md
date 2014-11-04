@@ -1,5 +1,33 @@
 # Changelog
 
+## Hotfix: 14.19.9
+Jueves 30 de Octubre 2014
+* **Fixed:** [Mejora en el generador  masivo de cobros](https://github.com/LemontechSA/ttb/pull/741)
+
+## Hotfix: 14.19.8
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Ordena los asuntos por glosa al imprimir los borradores de las pre-liquidaciones.](https://github.com/LemontechSA/ttb/pull/740)
+
+## Hotfix: 14.19.7
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Corrige simbolo de moneda en lista de trámites.](https://github.com/LemontechSA/ttb/pull/739)
+
+## Hotfix: 14.19.6
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Ordena los asuntos por glosa para la Nota de cobro.](https://github.com/LemontechSA/ttb/pull/738)
+
+## Hotfix: 14.19.5
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Modificar orden combobox países al agregar clientes](https://github.com/LemontechSA/ttb/pull/737)
+
+## Hotfix: 14.19.4
+Miércoles 29 de Octubre 2014
+* **Fixed:** [Corrige asignación de mes en nota de cobro cuando selecciona idioma ingles](https://github.com/LemontechSA/ttb/pull/736)
+
+## Hotfix: 14.19.3
+Martes 28 de Octubre 2014
+* **Fixed:** [Corrige generación de query en el listado de trámites](https://github.com/LemontechSA/ttb/pull/735)
+
 ## Hotfix: 14.19.2
 Jueves 23 de Octubre 2014
 * **Fixed:** [Corrige definición del método](https://github.com/LemontechSA/ttb/pull/734)
