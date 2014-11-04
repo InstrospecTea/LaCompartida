@@ -555,8 +555,7 @@ $pagina->PrintTop($popup);
 			<?php
 
 			if ($motivo != "cobros") {
-				if ($p_revisor) {
-					?>
+				if ($p_revisor) { ?>
 					<tr>
 
 						<td style="width:180px;" class="buscadorlabel"><?php echo __('Cobrado') ?></td>
@@ -573,9 +572,14 @@ $pagina->PrintTop($popup);
 							?>
 						</td>
 					</tr>
-					<?php
-				}
-				?>
+				<?php } else { ?>
+					<tr>
+						<td style="width:180px;" class="buscadorlabel"><?php echo __('Cobrable') ?></td>
+						<td align='left' colspan="2">
+							<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrable", $cobrable, ' class="fl" ', 'Todos', '60') ?>
+						</td>
+					</tr>
+				<?php } ?>
 				<tr>
 					<td class="buscadorlabel" align="right">
 						<?php echo __('Grupo Cliente')?>
