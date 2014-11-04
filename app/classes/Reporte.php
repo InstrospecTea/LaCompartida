@@ -333,7 +333,7 @@ class Reporte {
 		$campo_fecha = $this->alt($this->campo_fecha_cobro, $this->campo_fecha_cobro_2);
 
 		$indefinido = sprintf("'%s'", __('Indefinido'));
-		$por_emitir = sprintf("'%s'", __('Por Emitir'));
+		$por_emitir = __('Por Emitir');
 		$Criteria = new Criteria($this->sesion);
 		$Criteria
 			->add_select($indefinido, 'profesional')
@@ -387,10 +387,10 @@ class Reporte {
 			$Criteria->add_select("DATE_FORMAT(cobro.fecha_fin, '%d-%m-%Y')", 'dia_corte');
 		}
 		if (in_array('dia_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL,'{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))", 'dia_emision');
+			$Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))", 'dia_emision');
 		}
 		if (in_array('mes_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL,'{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))", 'mes_emision');
+			$Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))", 'mes_emision');
 		}
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
