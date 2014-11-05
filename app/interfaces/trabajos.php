@@ -93,7 +93,7 @@ if ($cobro) {
 if ($p_revisor) {
 	$where_usuario = '';
 } else {
-	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields[id_usuario] . ") OR usuario.id_usuario=" . $sesion->usuario->fields[id_usuario] . ")";
+	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ")";
 }
 
 $select_usuario = Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' " . $where_usuario . " ORDER BY nombre ASC", "id_usuario", $id_usuario, '', 'Todos', '200');
@@ -109,7 +109,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 		$where .= " AND trabajo.id_usuario= " . $id_usuario;
 	} else if (!$p_revisor) {
 		// Se buscan trabajos de los usuarios a los que se puede revisar.
-		$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields[id_usuario] . ") OR usuario.id_usuario=" . $sesion->usuario->fields[id_usuario] . ") ";
+		$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ") ";
 	}
 
 	if ($revisado == 'NO') {
@@ -464,11 +464,9 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('trabajos');
 
-	if ($p_revisor) {
-		$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas trabajadas') . ": </b>" . number_format($total_duracion_trabajada, 1) . "</span></td></tr></table>";
-	}
-
+	$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas trabajadas') . ": </b>" . number_format($total_duracion_trabajada, 1) . "</span></td></tr></table>";
 	$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas cobrables corregidas') . ": </b>" . number_format($total_duracion, 1) . "</span></td></tr></table>";
+
 	$b->AgregarFuncion("Editar", 'Editar', "align=center nowrap");
 	$b->AgregarEncabezado("trabajo.fecha", __('Fecha'));
 	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "align=left");
