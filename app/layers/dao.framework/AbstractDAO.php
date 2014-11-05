@@ -102,7 +102,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		try {
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
-			throw new Exception('No se pudo guardar el log. Msg: ' . $ex->getMessage());
+			throw new CouldNotWriteLogException('No se pudo guardar el log. Msg: ' . $ex->getMessage());
 		}
 	}
 
@@ -125,36 +125,33 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		return false;
 	}
 
-		public function saveOrUpdate($object) {
+	public function saveOrUpdate($object) {
 		$this->checkClass($object, $this->getClass());
-			$reflected = new ReflectionClass($this->getClass());
-		try{
-				$id = $object->get($object->getIdentity());
-			//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
-			//que crear un nuevo registro.
-				if(empty($id)) {
-					$object = $this->save($object);
-						if (is_subclass_of($object, 'LoggeableEntity')) {
-								$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
-						}
-				} else {
-					$legacy = $this->get($object->get($object->getIdentity()));
-					$object = $this->update($object);
-						if (is_subclass_of($object, 'LoggeableEntity')){
-							$object = $this->merge($legacy, $object);
-								$this->writeLogFromArray('MODIFICAR', $object, $legacy);
-						}
-				}
-			return $object;
-		} catch(PDOException $e){
-				throw new Exception('No se ha podido persistir el objeto de tipo '.$this->getClass().'.');
+		$reflected = new ReflectionClass($this->getClass());
+		$id = $object->get($object->getIdentity());
+		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
+		//que crear un nuevo registro.
+		if(empty($id)) {
+			$object = $this->save($object);
+			if (is_subclass_of($object, 'LoggeableEntity')) {
+				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
+			}
+		} else {
+			$legacy = $this->get($object->get($object->getIdentity()));
+			$object = $this->update($object);
+			if (is_subclass_of($object, 'LoggeableEntity')){
+				$object = $this->merge($legacy, $object);
+				$this->writeLogFromArray('MODIFICAR', $object, $legacy);
+			}
 		}
-		}
+		return $object;
+
+	}
 
 	/**
 	 * @param Entity $object
 	 * @return Entity
-	 * @throws Exception
+	 * @throws CouldNotSaveEntityException
 	 */
 	private function save(Entity $object) {
 		$this->tabla = $object->getPersistenceTarget();
@@ -168,16 +165,23 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
 			return $object;
 		} else {
-			throw new Exception('No se ha podido persistir la entidad.');
+			throw new CouldNotSaveEntityException('No se ha podido persistir la entidad de tipo .'.$this->getClass());
 		}
 	}
 
 	/**
 	 * @param Entity $object
 	 * @return Entity
+	 * @throws CouldNotUpdateEntityException
 	 */
 	private function update(Entity $object) {
-		return $this->save($object);
+		try{
+			return $this->save($object);
+		} catch (Exception $ex){
+			throw new CouldNotUpdateEntityException('No se ha podido encontrar la entidad de tipo '.$this->getClass().'
+			con identificador primario '.$object->get($object->getIdentity()).'.');
+		}
+
 	}
 
 	private function merge(Entity $legacy, Entity $new) {
@@ -194,6 +198,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		$criteria->add_restriction(CriteriaRestriction::equals($instance->getIdentity(), $id));
 		$resultArray = $criteria->run();
 		$resultArray = $resultArray[0];
+		if (empty($resultArray)) {
+			throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
+			'.$this->getClass().' con identificador primario '.$id.'.');
+		}
 		return $this->encapsulate($resultArray, $instance);
 	}
 
@@ -210,35 +218,39 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			$output[] = $instance;
 		}
 		return $output;
-		}
+	}
 
-		public function delete($object) {
-			$reflected = new ReflectionClass($this->getClass());
-				if (is_subclass_of($object, 'LoggeableEntity')){
-					$newInstance = $reflected->newInstance();
-					$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
-						$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
-				}
+	public function delete($object) {
+		$reflected = new ReflectionClass($this->getClass());
+		if (is_subclass_of($object, 'LoggeableEntity')){
+			$newInstance = $reflected->newInstance();
+			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
+			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
+	}
 
-		/**
-		 * Comprueba si un objeto es parte de la jerarquía de clases definida en la capa.
-		 * @param $object Objeto que se comprobará.
-		 * @param $className string de clases a la que debe pertenecer.
-		 * @throws Exception Cuando no pertenece a la jerarquía de clases correspondiente.
-		 */
-		protected function checkClass($object, $className) {
-				if (!is_a($object, $className)) {
-						throw new Exception('Dao Exception: El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
-				}
+	/**
+	 * Comprueba si un objeto es parte de la jerarquía de clases definida en la capa.
+	 * @param $object Objeto que se comprobará.
+	 * @param $className string de clases a la que debe pertenecer.
+	 * @throws Exception Cuando no pertenece a la jerarquía de clases correspondiente.
+	 */
+	protected function checkClass($object, $className) {
+		if (!is_a($object, $className)) {
+			throw new Exception('Dao Exception: El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
 		}
+	}
 
 	/**
 	 * Realiza la encapsulación de un resultado de una query a la base de datos en una instancia de un objeto.
 	 * @param $arrayResult
 	 * @param $instance
+	 * @return
 	 */
-	private function encapsulate($arrayResult, $instance) {
+	protected function encapsulate($arrayResult, $instance) {
+		if (empty($arrayResult)) {
+			return null;
+		}
 		foreach ($arrayResult as $property => $value) {
 			$instance->set($property, $value);
 		}

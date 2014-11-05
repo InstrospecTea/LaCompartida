@@ -4,6 +4,8 @@ require_once dirname(__FILE__) . '/../ttbloader.php';
 ini_set('display_errors', 'Off');
 error_reporting(0);
 
+defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
+
 if (file_exists('/var/www/html/addbd.php')) {
 	require_once '/var/www/html/addbd.php';
 } else if (file_exists(dirname(__FILE__) . '/miconf.php')) {

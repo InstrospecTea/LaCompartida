@@ -322,7 +322,7 @@ class ReporteRentabilidadProfesional {
 			->add_from('contrato', 'c')
 			->add_inner_join_with('asunto a', 'a.id_contrato = c.id_contrato')
 			->add_left_join_with('prm_moneda moneda_contrato', "moneda_contrato.id_moneda = c.id_moneda")
-			->add_left_join_with('trabajo t', "t.codigo_asunto = a.codigo_asunto $where_fecha")
+			->add_left_join_with('trabajo t', "t.codigo_asunto = a.codigo_asunto AND t.estadocobro IN ('SIN COBRO', 'CREADO', 'EN REVISION') AND t.cobrable = 1 AND t.id_tramite = 0 $where_fecha")
 			// WHERE
 			->add_restriction(new CriteriaRestriction("c.forma_cobro IN ('FLAT FEE', 'RETAINER', 'PROPORCIONAL') AND c.id_usuario_responsable IS NOT NULL AND t.id_trabajo IS NULL AND c.activo = 'SI' $where_contrato"));
 

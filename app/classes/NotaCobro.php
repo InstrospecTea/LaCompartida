@@ -1831,7 +1831,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor_tipo_cambio_moneda%', '', $html);
 				} else {
 					$html = str_replace('%glosa_tipo_cambio_moneda%', __('Tipo de Cambio'), $html);
-					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$moneda->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$this->fields['id_moneda_base']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -4628,7 +4628,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor_tipo_cambio_moneda%', '', $html);
 				} else {
 					$html = str_replace('%glosa_tipo_cambio_moneda%', __('Tipo de Cambio'), $html);
-					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$moneda->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_tipo_cambio_moneda%', $cobro_moneda->moneda[$this->fields['id_moneda_base']]['simbolo'] . $this->espacio . number_format($cobro_moneda->moneda[$moneda->fields['id_moneda']]['tipo_cambio'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -11507,6 +11507,19 @@ class NotaCobro extends Cobro {
 			}
 
 			$NotaCobro->LoadAsuntos();
+
+			$Criteria = new Criteria($this->sesion);
+			$asuntos = $Criteria
+				->add_from('asunto')
+				->add_select('codigo_asunto')
+				->add_select('glosa_asunto')
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $NotaCobro->asuntos))
+				->add_ordering('glosa_asunto')
+				->run();
+			$NotaCobro->asuntos = array();
+			foreach ($asuntos as $asunto) {
+				$NotaCobro->asuntos[] = $asunto['codigo_asunto'];
+			}
 
 			$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
 			$_LANG = array();

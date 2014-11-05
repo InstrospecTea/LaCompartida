@@ -11,6 +11,20 @@ if (!$cobro->Load($id_cobro)) {
 }
 
 $cobro->LoadAsuntos();
+
+$Criteria = new Criteria($Sesion);
+$asuntos = $Criteria
+	->add_from('asunto')
+	->add_select('codigo_asunto')
+	->add_select('glosa_asunto')
+	->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos))
+	->add_ordering('glosa_asunto')
+	->run();
+$cobro->asuntos = array();
+foreach ($asuntos as $asunto) {
+	$cobro->asuntos[] = $asunto['codigo_asunto'];
+}
+
 $comma_separated = implode("','", $cobro->asuntos);
 
 if ($lang == '') {

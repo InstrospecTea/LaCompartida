@@ -3,24 +3,16 @@
 require_once(dirname(__FILE__) . '/../conf.php');
 ini_set('soap.wsdl_cache_enabled', 0);
 
-class WsFacturacionCl {
+class WsFacturacionCl extends WsFacturacion {
 
-	protected $tipoCodigo;
-	protected $ValorCodigo;
 	protected $url = 'http://ws.facturacion.cl/WSDS/wsplano.asmx?wsdl';
-	protected $Client;
 	protected $usuario;
 	protected $password;
 	protected $rut;
-	protected $errorCode;
-	protected $errorMessage;
 
-	public function __construct($rut, $usuario, $password) {
+	public function __construct() {
 		$this->Client = new SoapClient($this->url, array('trace' => 1));
 		$this->isOnline();
-		$this->rut = $rut;
-		$this->usuario = $usuario;
-		$this->password = $password;
 	}
 
 	/**
@@ -49,6 +41,7 @@ class WsFacturacionCl {
 					'RUTRecep' => $dataFactura['receptor']['rut'],
 					'RznSocRecep' => $dataFactura['receptor']['razon_social'],
 					'GiroRecep' => $dataFactura['receptor']['giro'],
+					'CorreoRecep' => $dataFactura['receptor']['correo'],
 					'DirRecep' => $dataFactura['receptor']['direccion'],
 					'CmnaRecep' => $dataFactura['receptor']['comuna'],
 					'CiudadRecep' => $dataFactura['receptor']['cuidad']
@@ -66,18 +59,29 @@ class WsFacturacionCl {
 		$documento['Detalle'] = array();
 		$lin = 0;
 		foreach ($dataFactura['detalle'] as $detalle) {
-			$documento['Detalle'][] = array(
+			if (strlen($detalle['descripcion']) > 80) {
+				$ad = explode("\n", wordwrap($detalle['descripcion'], 80, "\n"));
+				$descripcion1 = array_shift($ad);
+				$descripcion2 = implode(' ', $ad);
+			} else {
+				$descripcion1 = $detalle['descripcion'];
+				$descripcion2 = null;
+			}
+			$linea_detalle = array(
 				'NroLinDet' => ++$lin,
 				'CdgItem' => array(
 					'TpoCodigo' => $this->tipoCodigo,
 					'VlrCodigo' => $this->ValorCodigo
 				),
-				'NmbItem' => $detalle['descripcion'],
+				'NmbItem' => $descripcion1,
+				'dscitem' => $descripcion2,
 				'QtyItem' => $detalle['cantidad'],
 				'PrcItem' => $detalle['precio_unitario'],
 				'MontoItem' => $detalle['cantidad'] * $detalle['precio_unitario']
 			);
+			$documento['Detalle'][] = $linea_detalle;
 		}
+
 		Log::write(print_r($documento, true), 'FacturacionElectronicaCl');
 		return $this->enviarDocumento($documento);
 	}
@@ -101,7 +105,7 @@ class WsFacturacionCl {
 		return base64_decode($xml64);
 	}
 
-	public function getPdfUrl($documento, $original = false) {
+	public function getPdfUrl($documento, $original = true) {
 		$params = array(
 			'login' => $this->getLogin(),
 			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
@@ -133,7 +137,13 @@ class WsFacturacionCl {
 		return $this->errorMessage;
 	}
 
-	private function setError($code, $message) {
+	public function setLogin($rut, $usuario, $password) {
+		$this->rut = $rut;
+		$this->usuario = $usuario;
+		$this->password = $password;
+	}
+
+	protected function setError($code, $message) {
 		$this->errorCode = $code;
 		$this->errorMessage = $message;
 	}
@@ -200,32 +210,6 @@ class WsFacturacionCl {
 		$data = UtilesApp::utf8izar($data);
 		self::array_to_xml($data, $node);
 		return $xml->asXML();
-	}
-
-	private static function array_to_xml($array, SimpleXMLElement &$xml) {
-		foreach ($array as $key => $value) {
-			if (is_array($value)) {
-				if (!is_numeric($key)) {
-					$subnode = $xml->addChild("$key");
-					self::array_to_xml($value, $subnode);
-				} else {
-					self::array_to_xml($value, $xml);
-				}
-			} else {
-				$xml->addChild("$key", "$value");
-			}
-		}
-	}
-
-	private static function XML2Array(SimpleXMLElement $parent) {
-		$array = array();
-
-		foreach ($parent as $name => $element) {
-			($node = & $array[$name]) && (1 === count($node) ? $node = array($node) : 1) && $node = & $node[];
-			$node = $element->count() ? self::XML2Array($element) : trim($element);
-		}
-
-		return $array;
 	}
 
 }

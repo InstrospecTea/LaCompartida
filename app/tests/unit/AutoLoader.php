@@ -1,14 +1,14 @@
 <?php
 
 /**
-* 	
+*
 */
 class AutoLoader
 {
 	static private $classNames = array();
 
 	public static function registerDirectory($directorio){
-		
+
 		$di = new DirectoryIterator($directorio);
 		foreach ($di as $file) {
 			if ($file->isDir() && !$file->isLink() && !$file->isDot()) {
@@ -22,9 +22,9 @@ class AutoLoader
 	}
 
 	public static function registerClass($className, $fileName) {
-		
+
 		if (!array_key_exists($className, AutoLoader::$classNames)){
-			AutoLoader::$classNames[ucfirst($className)][] = $fileName;	
+			AutoLoader::$classNames[ucfirst($className)][] = $fileName;
 		}
 
 		if(!in_array($fileName, AutoLoader::$classNames[ucfirst($className)])){
@@ -34,7 +34,7 @@ class AutoLoader
 	}
 
 	public static function loadClass($className) {
-		
+
 		if (isset(AutoLoader::$classNames[$className])) {
 			foreach (AutoLoader::$classNames[$className] as $class) {
 				require_once($class);
@@ -46,5 +46,3 @@ class AutoLoader
 }
 
 spl_autoload_register(array('AutoLoader', 'loadClass'));
-
-?>

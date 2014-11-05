@@ -50,12 +50,15 @@ namespace :deploy do
   end
 
   task :create_database do
-    dirname=branch.tr('/','_')
-    dbname='lemontest_' << dirname.tr('_','').tr('.','')
+	set :isHotfix, branch.match(/^hotfix/)
 
-    existedb = `mysql -h192.168.1.24 -uroot -pasdwsx -e "show databases like '#{dbname}'";`
+	if (!isHotfix)
+	  dirname=branch.tr('/','_')
+      dbname='lemontest_' << dirname.tr('_','').tr('.','')
+      existedb = `mysql -h192.168.1.24 -uroot -pasdwsx -e "show databases like '#{dbname}'";`
+	end
 
-    if(existedb=='')
+    if(!isHotfix && existedb=='')
       puts "\n\e[0;31m   ##########################################################################"
       puts           "   #    No existe la base \e[01;37m #{dbname}\e[0;31m, desea crearla? (y/N) #"
       puts           "   #########################################################################\e[0m\n"
