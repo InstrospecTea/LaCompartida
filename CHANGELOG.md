@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.10
+Miercoles 5 de Noviembre 2014
+* **New:** [Agrega filtro Cobrable para los usuarios no revisores.](https://github.com/LemontechSA/ttb/pull/742)
+
 ## Hotfix: 14.19.9
 Jueves 30 de Octubre 2014
 * **Fixed:** [Mejora en el generador  masivo de cobros](https://github.com/LemontechSA/ttb/pull/741)
