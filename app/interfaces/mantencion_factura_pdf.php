@@ -83,7 +83,7 @@ $pagina->PrintTop();
 			if (e.keyCode ==39) x=1;
 			if (e.keyCode ==40) y=1;
 
-			if (Actual.length>0)	{
+			if (Actual.length>0) {
 				var ancho=jQuery('#pizarra').width();
 				var pgx=parseInt(jQuery('#ancho').val());
 				var pgy=parseInt(jQuery('#alto').val());
@@ -217,19 +217,9 @@ $pagina->PrintTop();
 			jQuery('#caja_' + ID).css({width:Width, height:Height});
 		});
 
-		jQuery('#papersize').live('change',function() {
-			if (jQuery(this).val() == '0x0') {
-				jQuery('#papersize').hide()
-				jQuery('#ancho').show()
-				jQuery('#alto').show()
-				return true;
-			}
-
-			var llaves = jQuery(this).val().split('x');
-
-			jQuery('#ancho').val(llaves[0]);
-			jQuery('#alto').val(llaves[1]);
-
+		jQuery('#ancho, #alto').live('change',function() {
+			jQuery('#pizarra').width(jQuery('#ancho').val() + 'mm');
+			jQuery('#pizarra').height(jQuery('#alto').val() + 'mm');
 			var ancho = jQuery('#pizarra').width();
 			var pgx = parseInt(jQuery('#ancho').val());
 			var pgy = parseInt(jQuery('#alto').val());
@@ -607,7 +597,7 @@ $pagina->PrintTop();
 	#tabla_coordenadas li.rd3cellx,  td.rd3cell {width:40px;text-align:center;}
 
 	#tabla_coordenadas li.dimcellsx {width:244px;text-align:left;}
-	#tabla_coordenadas li.dimcellsx  input {width:41px;margin:0 14px 0 0;text-align:left;height:13px;}
+	#tabla_coordenadas li.dimcells input {width:41px; margin:0 12px 0 0; text-align:left; height:13px;}
 	#tabla_coordenadas li.dimcellsx .papercell {width:108px;}
 	#tabla_coordenadas li.th4cellx {width:60px;text-align:center;}
 	#tabla_coordenadas li.th5cellx {width:60px;text-align:center;}
@@ -633,32 +623,33 @@ if (defined('SUBDOMAIN') && defined('ROOTDIR')) {
 	define('CURROOTDIR', $rootbeer[1]);
 	$underscan = CURHOST.'/'.CURROOTDIR;
 }
+?>
+<form id="datospdf" action="#" style="display:none;" method="POST">
+	<input type="hidden" value="<?php echo $underscan ?>" name="underscan" id="underscan"/>
+	<input type="hidden" name="opc" id="opc" value="guardar" />
+	<input type="hidden" name="id_estudio" id="id_estudio" value="<?php echo $id_estudio ?>" />
+	<input type="hidden" name="id_documento_legal" id="id_documento_legal" value="<?php echo $id_documento_legal ?>" />
+	<input type="hidden" name="id_factura_pdf_datos_categoria" id="id_factura_pdf_datos_categoria" value="<?php echo $id_factura_pdf_datos_categoria ?>" />
+	<table align="center" style="width:1100px" cellpadding="0" cellspacing="0">
+		<div class="cabecerax"><ul>
+			<li class="st1cellx encabezado">Tipo Dato</li>
+			<li class="nd2cellx encabezado">Activo</li>
+			<li class="rd3cellx encabezado">Posici&oacute;n<br>Horizontal</li>
+			<li class="rd3cellx encabezado">Posici&oacute;n<br>Vertical</li>
+			<li class="rd3cellx encabezado">Ancho<br>[mm]</li>
+			<li class="rd3cellx encabezado">Alto<br>[mm]</li>
+			<li style="width:110px;" class="encabezado">Tipograf&iacute;a</li>
+			<li style="width:100px;" class="encabezado">Estilo</li>
+			<li style="width:90px;" class="encabezado">Mayúscula</li>
+			<li style="width:80px;" class="encabezado">Alineacion</li>
+			<li style="width:60px;text-align:left;" class="encabezado">Tamaño</li>
+		</ul></div>
+		<div id="contienecoordenadas"><div id="tabla_coordenadas"></div></div>
+	</table>
+</form>
 
-echo "<form id='datospdf' action=\"#\" style='display:none;' method=\"POST\">";
-	echo '<input type="hidden" value="'. $underscan .'" name="underscan" id="underscan"/>';
-	echo "<input type=\"hidden\" name=\"opc\" id=\"opc\" value=\"guardar\" />";
-	echo "<input type=\"hidden\" name=\"id_estudio\" id=\"id_estudio\" value=\"$id_estudio\" />";
-	echo "<input type=\"hidden\" name=\"id_documento_legal\" id=\"id_documento_legal\" value=\"$id_documento_legal\" />";
-	echo "<input type=\"hidden\" name=\"id_factura_pdf_datos_categoria\" id=\"id_factura_pdf_datos_categoria\" value=\"$id_factura_pdf_datos_categoria\" />";
-	echo "<table align=\"center\" style='width:1100px'; cellpadding=\"0\" cellspacing=\"0\">";
-		echo "<div class='cabecerax'><ul>";
-			echo "<li class=\"st1cellx encabezado\">Tipo Dato</li>";
-			echo "<li class=\"nd2cellx encabezado\">Activo</li>";
-			echo "<li class=\"rd3cellx encabezado\">Posici&oacute;n<br>Horizontal</li>";
-			echo "<li class=\"rd3cellx encabezado\">Posici&oacute;n<br>Vertical</li>";
-			echo "<li class=\"rd3cellx encabezado\">Ancho<br>[mm]</li>";
-			echo "<li class=\"rd3cellx encabezado\">Alto<br>[mm]</li>";
-			echo "<li style='width:110px;' class=\"encabezado\">Tipograf&iacute;a</li>";
-			echo "<li style='width:100px;' class=\"encabezado\">Estilo</li>";
-			echo "<li style='width:90px;' class=\"encabezado\">Mayúscula</li>";
-			echo "<li style='width:80px;' class=\"encabezado\">Alineacion</li>";
-			echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaño</li>";
-		echo "</ul></div>";
-		echo "<div id='contienecoordenadas'><div id='tabla_coordenadas'></div></div>";
-	echo "</table>";
-echo "</form>";
+<div id="mensaje" style="clear:both; display:block; margin:10px auto; color:#999; font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>
+<div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC; width:800px; height:300px;margin:10px auto;">&nbsp;</div>
 
-echo '<div id="mensaje" style="clear:both;display:block;margin:10px auto ;color:#999;font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>';
-echo '<div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC;width:800px;height:300px;margin:10px auto;">&nbsp;</div>';
-
+<?php
 $pagina->PrintBottom();

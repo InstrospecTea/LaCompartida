@@ -11,6 +11,7 @@ class XmlGenerator {
 	private $mmX = 0;
 	private $mmY = 0;
 	static $mm2pt = 2.8346456692895527;
+	static $mmtotwip = 56.692913;
 
 	public function __construct($session) {
 		$this->Session = $session;
@@ -40,11 +41,18 @@ class XmlGenerator {
 		$this->xmlBody = sprintf('<w:pict>%s</w:pict>', $this->xmlBody);
 		$xml = str_replace('%app_name%', APPNAME, $xmlTemplate);
 		$xml = str_replace('%created%', date(DATE_ISO8601), $xml);
+		$this->addPageSize($pdf->papel);
 		$xml = str_replace('%xml_body%', $this->xmlBody, $xml);
 
 		header("Content-Type: application/msword; charset=ISO-8859-1");
 		header("Content-Disposition: attachment; filename=\"$filename\"");
 		echo $xml;
+	}
+
+	private function addPageSize($size) {
+		$w = $this->mm2twip($size['cellW']);
+		$h = $this->mm2twip($size['cellH']);
+		$this->xmlBody .= sprintf('<w:sectPr><w:pgSz w:w="%d" w:h="%d" w:orient="landscape"/></w:sectPr>', $w, $h);
 	}
 
 	private function addShape($data) {
@@ -138,6 +146,10 @@ class XmlGenerator {
 
 	private function mm2pt($v) {
 		return $v * self::$mm2pt;
+	}
+
+	private function mm2twip($v) {
+		return $v * self::$mmtotwip;
 	}
 
 }
