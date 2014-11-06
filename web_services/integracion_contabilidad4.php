@@ -1,6 +1,6 @@
 <?php
+require_once('../app/conf.php');
 
-require_once("../app/conf.php");
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
@@ -19,15 +19,15 @@ if (Conf::GetConf($Sesion, 'NuevaLibreriaNusoap')) {
 } else {
 	require_once("lib/nusoap.php");
 }
-#First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
 
+#First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
 
 $server = new soap_server();
 $server->configureWSDL('IntegracionSAPWebServices', $ns);
 $server->wsdl->schemaTargetNamespace = $ns;
 
 $server->wsdl->addComplexType(
-		'UsuarioCobro', 'complexType', 'struct', 'all', '', array(
+	'UsuarioCobro', 'complexType', 'struct', 'all', '', array(
 	'username' => array('name' => 'username', 'type' => 'xsd:string'),
 	'valor' => array('name' => 'valor', 'type' => 'xsd:decimal'),
 	'horas_trabajadas' => array('name' => 'horas_trabajadas', 'type' => 'xsd:decimal'),
@@ -36,7 +36,7 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'Asunto', 'complexType', 'struct', 'all', '', array(
+	'Asunto', 'complexType', 'struct', 'all', '', array(
 	'codigo' => array('name' => 'codigo', 'type' => 'xsd:string'),
 	'codigo_secundario' => array('name' => 'codigo_secundario', 'type' => 'xsd:string'),
 	'glosa' => array('name' => 'glosa', 'type' => 'xsd:string'),
@@ -46,7 +46,7 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'FacturaCobro', 'complexType', 'struct', 'all', '', array(
+	'FacturaCobro', 'complexType', 'struct', 'all', '', array(
 	'codigo_factura_lemontech' => array('name' => 'codigo_factura_lemontech', 'type' => 'xsd:integer'),
 	'codigo_factura_asociada_lemontech' => array('name' => 'codigo_factura_asociada_lemontech', 'type' => 'xsd:integer'),
 	'comprobante_erp' => array('name' => 'comprobante_erp', 'type' => 'xsd:string'),
@@ -72,21 +72,21 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'UsuarioFactura', 'complexType', 'struct', 'all', '', array(
+	'UsuarioFactura', 'complexType', 'struct', 'all', '', array(
 	'username' => array('name' => 'username', 'type' => 'xsd:string'),
 	'valor' => array('name' => 'valor', 'type' => 'xsd:decimal')
 ));
 
 $server->wsdl->addComplexType(
-		'ListaUsuariosFactura', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:UsuarioFactura[]')), 'tns:UsuarioFactura'
+	'ListaUsuariosFactura', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:UsuarioFactura[]')), 'tns:UsuarioFactura'
 );
 
 $server->wsdl->addComplexType(
-		'ListaPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Pago[]')), 'tns:Pago'
+	'ListaPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Pago[]')), 'tns:Pago'
 );
 
 $server->wsdl->addComplexType(
-		'Pago', 'complexType', 'struct', 'all', '', array(
+	'Pago', 'complexType', 'struct', 'all', '', array(
 	'id' => array('name' => 'id', 'type' => 'xsd:integer'),
 	'fecha' => array('name' => 'fecha', 'type' => 'xsd:string'),
 	'monto' => array('name' => 'monto', 'type' => 'xsd:decimal'),
@@ -103,11 +103,11 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'ListaDocumentosPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DocumentoPago[]')), 'tns:DocumentoPago'
+	'ListaDocumentosPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DocumentoPago[]')), 'tns:DocumentoPago'
 );
 
 $server->wsdl->addComplexType(
-		'DocumentoPago', 'complexType', 'struct', 'all', '', array(
+	'DocumentoPago', 'complexType', 'struct', 'all', '', array(
 	'id' => array('name' => 'id', 'type' => 'xsd:integer'),
 	'fecha' => array('name' => 'fecha', 'type' => 'xsd:string'),
 	'monto' => array('name' => 'monto', 'type' => 'xsd:decimal'),
@@ -126,11 +126,11 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'ListaFacturasPagadas', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:FacturaPagada[]')), 'tns:FacturaPagada'
+	'ListaFacturasPagadas', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:FacturaPagada[]')), 'tns:FacturaPagada'
 );
 
 $server->wsdl->addComplexType(
-		'FacturaPagada', 'complexType', 'struct', 'all', '', array(
+	'FacturaPagada', 'complexType', 'struct', 'all', '', array(
 	'id_cobro' => array('name' => 'id_cobro', 'type' => 'xsd:integer'),
 	'codigo_factura_lemontech' => array('name' => 'codigo_factura_lemontech', 'type' => 'xsd:integer'),
 	'comprobante_erp' => array('name' => 'comprobante_erp', 'type' => 'xsd:string'),
@@ -148,19 +148,19 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'ListaAsuntos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Asunto[]')), 'tns:Asunto'
+	'ListaAsuntos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Asunto[]')), 'tns:Asunto'
 );
 
 $server->wsdl->addComplexType(
-		'ListaUsuariosCobro', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:UsuarioCobro[]')), 'tns:UsuarioCobro'
+	'ListaUsuariosCobro', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:UsuarioCobro[]')), 'tns:UsuarioCobro'
 );
 
 $server->wsdl->addComplexType(
-		'ListaFacturasCobro', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:FacturaCobro[]')), 'tns:FacturaCobro'
+	'ListaFacturasCobro', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:FacturaCobro[]')), 'tns:FacturaCobro'
 );
 
 $server->wsdl->addComplexType(
-		'DatosCobro', 'complexType', 'struct', 'all', '', array(
+	'DatosCobro', 'complexType', 'struct', 'all', '', array(
 	'id_cobro' => array('name' => 'id_cobro', 'type' => 'xsd:integer'),
 	'nota_venta' => array('name' => 'nota_venta', 'type' => 'xsd:integer'),
 	'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:string'),
@@ -189,40 +189,40 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'ListaCobros', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosCobro[]')), 'tns:DatosCobro'
+	'ListaCobros', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosCobro[]')), 'tns:DatosCobro'
 );
 
 $server->wsdl->addComplexType(
 	'Gasto', 'complexType', 'struct', 'all', '', array(
-		'id' => array('name' => 'id', 'type' => 'xsd:integer'),
-		'usuario_ingresa' => array('name' => 'usuario_ingreso', 'type' => 'xsd:string'),
-		'usuario_ordena' => array('name' => 'usuario_orden', 'type' => 'xsd:string'),
-		'codigo_cliente' => array('name' => 'codigo_cliente', 'type' => 'xsd:string'),
-		'codigo_asunto' => array('name' => 'codigo_asunto', 'type' => 'xsd:string'),
-		'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:string'),
-		'glosa_gasto' => array('name' => 'glosa_gasto', 'type' => 'xsd:string'),
-		'ingreso' => array('name' => 'ingreso', 'type' => 'xsd:decimal'),
-		'egreso' => array('name' => 'egreso', 'type' => 'xsd:decimal'),
-		'codigo_moneda' => array('name' => 'moneda', 'type' => 'xsd:string'),
-		'fecha' => array('name' => 'fecha', 'type' => 'xsd:string'),
-		'cobrable' => array('name' => 'cobrable', 'type' => 'xsd:boolean'),
-		'monto_cobrable' => array('name' => 'monto_cobrable', 'type' => 'xsd:decimal'),
-		'impuesto' => array('name' => 'impuesto', 'type' => 'xsd:decimal'),
-		'numero_documento' => array('name' => 'numero_documento', 'type' => 'xsd:string'),
-		'numero_ot' => array('name' => 'numero_ot', 'type' => 'xsd:string'),
-		'con_impuesto' => array('name' => 'con_impuesto', 'type' => 'xsd:boolean'),
-		'codigo_proveedor' => array('name' => 'codigo_proveedor', 'type' => 'xsd:string'),
-		'nombre_proveedor' => array('name' => 'nombre_proveedor', 'type' => 'xsd:string'),
-		'tipo_documento_asociado' => array('name' => 'tipo_documento_asociado', 'type' => 'xsd:string'),
-		'codigo_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
+	'id' => array('name' => 'id', 'type' => 'xsd:integer'),
+	'usuario_ingresa' => array('name' => 'usuario_ingreso', 'type' => 'xsd:string'),
+	'usuario_ordena' => array('name' => 'usuario_orden', 'type' => 'xsd:string'),
+	'codigo_cliente' => array('name' => 'codigo_cliente', 'type' => 'xsd:string'),
+	'codigo_asunto' => array('name' => 'codigo_asunto', 'type' => 'xsd:string'),
+	'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:string'),
+	'glosa_gasto' => array('name' => 'glosa_gasto', 'type' => 'xsd:string'),
+	'ingreso' => array('name' => 'ingreso', 'type' => 'xsd:decimal'),
+	'egreso' => array('name' => 'egreso', 'type' => 'xsd:decimal'),
+	'codigo_moneda' => array('name' => 'moneda', 'type' => 'xsd:string'),
+	'fecha' => array('name' => 'fecha', 'type' => 'xsd:string'),
+	'cobrable' => array('name' => 'cobrable', 'type' => 'xsd:boolean'),
+	'monto_cobrable' => array('name' => 'monto_cobrable', 'type' => 'xsd:decimal'),
+	'impuesto' => array('name' => 'impuesto', 'type' => 'xsd:decimal'),
+	'numero_documento' => array('name' => 'numero_documento', 'type' => 'xsd:string'),
+	'numero_ot' => array('name' => 'numero_ot', 'type' => 'xsd:string'),
+	'con_impuesto' => array('name' => 'con_impuesto', 'type' => 'xsd:boolean'),
+	'codigo_proveedor' => array('name' => 'codigo_proveedor', 'type' => 'xsd:string'),
+	'nombre_proveedor' => array('name' => 'nombre_proveedor', 'type' => 'xsd:string'),
+	'tipo_documento_asociado' => array('name' => 'tipo_documento_asociado', 'type' => 'xsd:string'),
+	'codigo_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
 ));
 
 $server->wsdl->addComplexType(
-		'ListaGastos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Gasto[]')), 'tns:Gasto'
+	'ListaGastos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Gasto[]')), 'tns:Gasto'
 );
 
 $server->wsdl->addComplexType(
-		'DatosResultado', 'complexType', 'struct', 'all', '', array(
+	'DatosResultado', 'complexType', 'struct', 'all', '', array(
 	'id_cobro' => array('name' => 'id_cobro', 'type' => 'xsd:integer'),
 	'resultado' => array('name' => 'resultado', 'type' => 'xsd:string'),
 	'ResultadoFacturas' => array('name' => 'ResultadoFacturas', 'type' => 'tns:ResultadoFacturas'),
@@ -230,31 +230,31 @@ $server->wsdl->addComplexType(
 ));
 
 $server->wsdl->addComplexType(
-		'DatosResultadoFactura', 'complexType', 'struct', 'all', '', array(
+	'DatosResultadoFactura', 'complexType', 'struct', 'all', '', array(
 	'codigo_factura_lemontech' => array('name' => 'codigo_factura_lemontech', 'type' => 'xsd:integer'),
 	'resultado_factura' => array('name' => 'resultado_factura', 'type' => 'xsd:string')
 ));
 
 $server->wsdl->addComplexType(
-		'DatosResultadoPago', 'complexType', 'struct', 'all', '', array(
+	'DatosResultadoPago', 'complexType', 'struct', 'all', '', array(
 	'id_pago' => array('name' => 'id_pago', 'type' => 'xsd:integer'),
 	'resultado_pago' => array('name' => 'resultado_pago', 'type' => 'xsd:string')
 ));
 
 $server->wsdl->addComplexType(
-		'ResultadoCobros', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultado[]')), 'tns:DatosResultado'
+	'ResultadoCobros', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultado[]')), 'tns:DatosResultado'
 );
 
 $server->wsdl->addComplexType(
-		'ResultadoFacturas', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultadoFactura[]')), 'tns:DatosResultadoFactura'
+	'ResultadoFacturas', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultadoFactura[]')), 'tns:DatosResultadoFactura'
 );
 
 $server->wsdl->addComplexType(
-		'ResultadoPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultadoPago[]')), 'tns:DatosResultadoPago'
+	'ResultadoPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultadoPago[]')), 'tns:DatosResultadoPago'
 );
 
 $server->wsdl->addComplexType(
-		'ResultadoDocumentosPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultado[]')), 'tns:DatosResultado'
+	'ResultadoDocumentosPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultado[]')), 'tns:DatosResultado'
 );
 
 $server->register('ListaCobrosFacturados', array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'timestamp' => 'xsd:integer'), array('lista_cobros_emitidos' => 'tns:ListaCobros'), $ns);
@@ -273,45 +273,45 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$query_timestamp = " OR cobro.id_cobro IN (SELECT DISTINCT id_cobro FROM log_contabilidad WHERE timestamp >= " . intval(mysql_real_escape_string($timestamp)) . " ) ";
 		}
 		$query = "SELECT cobro.id_cobro,
-										cobro.codigo_cliente,
-										cobro.estado,
-										cobro.opc_moneda_total,
-										cobro.fecha_ini,
-										cobro.fecha_fin,
-										contrato.factura_razon_social,
-										contrato.factura_direccion,
-										contrato.rut,
-										cobro.monto_subtotal,
-										cobro.subtotal_gastos,
-										cobro.descuento,
-										cobro.monto,
-										cobro.monto_gastos,
-										cobro.fecha_emision,
-										cobro_moneda_tarifa.tipo_cambio as tipo_cambio_moneda,
-										cobro.tipo_cambio_moneda_base,
-										cobro.nota_venta_contabilidad,
-										cobro.se_esta_cobrando,
-										usuario.username AS encargado_comercial,
-										usuario_secundario.username AS encargado_secundario,
-										cobro.estado_contabilidad,
-										prm_moneda.cifras_decimales,
-										cobro_moneda_mt.tipo_cambio as tipo_cambio_moneda_total,
-										prm_moneda_total.cifras_decimales as cifras_decimales_total,
-										prm_moneda_total.codigo as codigo,
-										carta.descripcion as glosa_carta,
-										cobro.documento
-										FROM cobro
-										JOIN cobro_moneda as cobro_moneda_mt ON cobro_moneda_mt.id_cobro = cobro.id_cobro AND cobro_moneda_mt.id_moneda = cobro.opc_moneda_total
-										JOIN cobro_moneda as cobro_moneda_tarifa ON cobro_moneda_tarifa.id_cobro = cobro.id_cobro AND cobro_moneda_tarifa.id_moneda = cobro.id_moneda
-										LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
-										LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total
-										LEFT JOIN carta ON carta.id_carta=cobro.id_carta
-										LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-										LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-										LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-										WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
-										$query_timestamp
-				GROUP BY cobro.id_cobro";
+				cobro.codigo_cliente,
+				cobro.estado,
+				cobro.opc_moneda_total,
+				cobro.fecha_ini,
+				cobro.fecha_fin,
+				contrato.factura_razon_social,
+				contrato.factura_direccion,
+				contrato.rut,
+				cobro.monto_subtotal,
+				cobro.subtotal_gastos,
+				cobro.descuento,
+				cobro.monto,
+				cobro.monto_gastos,
+				cobro.fecha_emision,
+				cobro_moneda_tarifa.tipo_cambio as tipo_cambio_moneda,
+				cobro.tipo_cambio_moneda_base,
+				cobro.nota_venta_contabilidad,
+				cobro.se_esta_cobrando,
+				usuario.username AS encargado_comercial,
+				usuario_secundario.username AS encargado_secundario,
+				cobro.estado_contabilidad,
+				prm_moneda.cifras_decimales,
+				cobro_moneda_mt.tipo_cambio as tipo_cambio_moneda_total,
+				prm_moneda_total.cifras_decimales as cifras_decimales_total,
+				prm_moneda_total.codigo as codigo,
+				carta.descripcion as glosa_carta,
+				cobro.documento
+			FROM cobro
+				JOIN cobro_moneda as cobro_moneda_mt ON cobro_moneda_mt.id_cobro = cobro.id_cobro AND cobro_moneda_mt.id_moneda = cobro.opc_moneda_total
+				JOIN cobro_moneda as cobro_moneda_tarifa ON cobro_moneda_tarifa.id_cobro = cobro.id_cobro AND cobro_moneda_tarifa.id_moneda = cobro.id_moneda
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
+				LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total
+				LEFT JOIN carta ON carta.id_carta=cobro.id_carta
+				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+				LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
+				LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+			WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
+				$query_timestamp
+			GROUP BY cobro.id_cobro";
 
 		if (!($resp = mysql_query($query, $Sesion->dbh))) {
 			return new soap_fault('Client', '', 'Error SQL.' . $query, '');
@@ -368,8 +368,6 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$cobro['glosa_carta'] = $temp['glosa_carta'];
 			$cobro['numero_factura'] = $temp['documento'];
 
-
-
 			/* Se crea una instancia de Reporte para ver el peso de cada usuario */
 			$reporte = new Reporte($Sesion);
 			$reporte->id_moneda = $temp['opc_moneda_total'];
@@ -380,10 +378,18 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$r = $reporte->toArray();
 
 			/* Se obtienen además las horas de cada usuario. */
+			$reporte = new Reporte($Sesion);
+			$reporte->id_moneda = $temp['opc_moneda_total'];
+			$reporte->setVista('id_cobro-username');
+			$reporte->addFiltro('cobro', 'id_cobro', $id_cobro);
 			$reporte->setTipoDato('horas_cobrables');
 			$reporte->Query();
 			$r_cobradas = $reporte->toArray();
 
+			$reporte = new Reporte($Sesion);
+			$reporte->id_moneda = $temp['opc_moneda_total'];
+			$reporte->setVista('id_cobro-username');
+			$reporte->addFiltro('cobro', 'id_cobro', $id_cobro);
 			$reporte->setTipoDato('horas_trabajadas');
 			$reporte->Query();
 			$r_trabajadas = $reporte->toArray();
@@ -437,7 +443,9 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$total_horas_cobradas = $r_cobradas[$id_cobro][$id_cobro][$id_cobro][$id_cobro][$id_cobro]['valor'];
 
 			foreach ($asuntos_array as $cod_asunto => $valores) {
-				$valores['valor'] = ($valores['horas_cobradas'] / $total_horas_cobradas) * $total_cobrado;
+				if ($total_horas_cobradas > 0) {
+					$valores['valor'] = ($valores['horas_cobradas'] / $total_horas_cobradas) * $total_cobrado;
+				}
 
 				// Formateo
 				$valores['valor'] = number_format($valores['valor'], 2, '.', '');
@@ -470,7 +478,6 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 						$usuario_cobro['horas_trabajadas'] = number_format($r_trabajadas[$id_cobro][$id_cobro][$id_cobro][$id_cobro][$id_cobro][$key]['valor'], 2, '.', '');
 						$usuario_cobro['horas_cobradas'] = number_format($r_cobradas[$id_cobro][$id_cobro][$id_cobro][$id_cobro][$id_cobro][$key]['valor'], 2, '.', '');
 
-
 						if ($total_cobrado) {
 							$usuario_cobro['peso'] = $dato['valor'] / $total_cobrado;
 						} else {
@@ -485,7 +492,10 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 							$as['horas_trabajadas'] = $participacion_asunto[$cod_asunto][$key]['horas_trabajadas'];
 							$as['horas_cobradas'] = $participacion_asunto[$cod_asunto][$key]['horas_cobradas'];
 
-							$as['valor'] = ($as['horas_cobradas'] / $usuario_cobro['horas_cobradas']) * $usuario_cobro['valor'];
+							if ($usuario_cobro['horas_cobradas'] > 0) {
+								$as['valor'] = ($as['horas_cobradas'] / $usuario_cobro['horas_cobradas']) * $usuario_cobro['valor'];
+							}
+
 							$as['valor'] = number_format($as['valor'], 2, '.', '');
 
 							$usuario_asuntos[] = $as;
@@ -497,6 +507,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 					}
 				}
 			}
+			
 			$cobro['ListaUsuariosCobro'] = $usuarios_cobro;
 
 			//Actualizo los datos:
@@ -650,7 +661,6 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 $server->register('InformarNotaVenta', array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'lista_cobros' => 'tns:ListaCobros'), array('resultados' => 'tns:ResultadoCobros'), $ns);
 
 class PaginaFalsa {
-
 	function PaginaFalsa() {
 		$this->info = array();
 		$this->error = array();
@@ -674,7 +684,6 @@ class PaginaFalsa {
 			return 'Nada';
 		return $out;
 	}
-
 }
 
 //Wrapper para agregar_pago_factura.php (esto impide que se pisen variables). Todo outbut se guarda en out.
@@ -744,7 +753,7 @@ function AgregarFactura($p) {
 	$monto_neto = $p['monto_neto'];
 	$porcentaje_impuesto = $p['porcentaje_impuesto'];
 	$iva = $p['iva'];
-	//(total = monto_neto+iva)
+
 	$id_factura_padre = $p['id_factura_padre'];
 	$fecha = $p['fecha'];
 	$RUT_cliente = $p['RUT_cliente'];
@@ -756,7 +765,7 @@ function AgregarFactura($p) {
 	$serie = $p['serie'];
 	$id_estado = $p['id_estado'];
 	$id_moneda_factura = $p['id_moneda_factura'];
-	//Para Conf::GetConf($Sesion,'DesgloseFactura')=='con_desglose'
+
 	$descripcion_honorarios_legales = $p['descripcion_honorarios_legales'];
 	$monto_honorarios_legales = $p['monto_honorarios_legales'];
 	$descripcion_gastos_con_iva = $p['descripcion_gastos_con_iva'];
@@ -774,7 +783,7 @@ function AgregarFactura($p) {
 	ob_start();
 	require Conf::ServerDir() . '/../app/interfaces/agregar_factura.php';
 	$out = ob_get_clean();
-	//echo 'out:('.$out.')';
+
 	return $resultado;
 }
 
@@ -782,34 +791,44 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 	$Sesion = new Sesion();
 	$time = mktime();
 
-
 	//Cargo los tipos de documento legal
 	$query_tipos_documentos_legales = "SELECT id_documento_legal, codigo, glosa FROM prm_documento_legal WHERE 1";
 	$resp_tipos_documentos_legales = mysql_query($query_tipos_documentos_legales, $Sesion->dbh) or Utiles::errorSQL($query_tipos_documentos_legales, __FILE__, __LINE__, $Sesion->dbh);
 	$tipo_documento_legal = array();
 	$helper_tipo_documento_legal = array();
+
 	while (list( $id_documento_legal, $codigo, $glosa ) = mysql_fetch_array($resp_tipos_documentos_legales)) {
 		$tipo_documento_legal[$id_documento_legal] = array('codigo' => $codigo, 'glosa' => $glosa);
 		$helper_tipo_documento_legal[] = $codigo . ' (' . $glosa . ')';
 	}
+
 	$helper_tipo_documento_legal = implode(', ', $helper_tipo_documento_legal);
+	
 	//Para revisar campos de Pagos:
 	//Cargo los tipos de bancos
 	$query_bancos = "SELECT id_banco, nombre FROM prm_banco";
 	$resp_bancos = mysql_query($query_bancos, $Sesion->dbh) or Utiles::errorSQL($query_bancos, __FILE__, __LINE__, $Sesion->dbh);
 	$banco = array();
 	$helper_banco = array();
-	while (list( $id_banco, $nombre ) = mysql_fetch_array($resp_bancos))
+	
+	while (list( $id_banco, $nombre ) = mysql_fetch_array($resp_bancos)) {
 		$banco[$id_banco] = $nombre;
+	}
+	
 	$helper_banco = implode(', ', $banco);
+
 	//Cargo los conceptos
 	$query_conceptos = "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden";
 	$resp_conceptos = mysql_query($query_conceptos, $Sesion->dbh) or Utiles::errorSQL($query_conceptos, __FILE__, __LINE__, $Sesion->dbh);
 	$concepto = array();
 	$helper_concepto = array();
-	while (list( $id_concepto, $glosa ) = mysql_fetch_array($resp_conceptos))
+
+	while (list( $id_concepto, $glosa ) = mysql_fetch_array($resp_conceptos)) {
 		$concepto[$id_concepto] = $glosa;
+	}
+
 	$helper_concepto = implode(', ', $concepto);
+	
 	//Cargo los tipos (de documentos de pago)
 	$tipo_pago = array(
 		'T' => 'Transferencia',
@@ -817,6 +836,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 		'C' => 'Cheque',
 		'O' => 'Otro');
 	$helper_tipo_pago = implode(', ', $tipo_pago);
+	
 	//Cargo las monedas (su codigo: CLP, USD, etc).
 	$query_monedas = "SELECT id_moneda,codigo FROM prm_moneda";
 	$resp_monedas = mysql_query($query_monedas, $Sesion->dbh) or Utiles::errorSQL($query_monedas, __FILE__, __LINE__, $Sesion->dbh);
@@ -826,8 +846,8 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 	while (list( $id_moneda, $codigo ) = mysql_fetch_array($resp_monedas)) {
 		$lista_moneda[$id_moneda] = $codigo;
 	}
-	$helper_moneda = implode(', ', $lista_moneda);
 
+	$helper_moneda = implode(', ', $lista_moneda);
 
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		$resultado_cobros = array();
@@ -891,39 +911,32 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 								if (!$tipo) {
 									$resultado_facturas[] = array('codigo_factura_lemontech' => $id_factura, 'resultado_factura' => "Error en nueva factura: tipo no reconocido. Los tipos de documento legal son: $helper_tipo_documento_legal");
 								} else {
-									//parametros que se pasan a la pagina
+									// parametros que se pasan a la pagina
 									$p = array();
 
 									$p['usuario'] = $usuario;
 									$p['password'] = $password;
-
 									$p['comprobante_erp'] = mysql_real_escape_string($datos_factura['comprobante_erp']);
 									$p['condicion_pago'] = intval($datos_factura['condicion_pago']);
-
 									$p['cliente'] = mysql_real_escape_string($datos_factura['cliente']);
 									$p['monto_honorarios_legales'] = round(floatval($datos_factura['honorarios']), $decimales);
 									$p['monto_gastos_con_iva'] = round(floatval($datos_factura['gastos_con_iva']), $decimales);
 									$p['monto_gastos_sin_iva'] = round(floatval($datos_factura['gastos_sin_iva']), $decimales);
 									$p['decimales'] = $decimales;
-
 									$p['monto_neto'] = $p['monto_honorarios_legales'] + $p['monto_gastos_con_iva'] + $p['monto_gastos_sin_iva'];
 									$p['porcentaje_impuesto'] = $cobro->fields['porcentaje_impuesto'];
 									$p['porcentaje_impuesto_gastos'] = $cobro->fields['porcentaje_impuesto_gastos'];
-
-									//$monto_impuesto_honorarios = $p['monto_honorarios_legales']*($p['porcentaje_impuesto']/100);
-									//$monto_impuesto_gastos = $p['monto_gastos_con_iva']*($p['porcentaje_impuesto_gastos']/100);
-									//$p['iva'] = $monto_impuesto_honorarios + $monto_impuesto_gastos;
 									$p['iva'] = $datos_factura['impuestos'];
-
 									$p['id_factura_padre'] = null;
 									$p['fecha'] = mysql_real_escape_string($datos_factura['fecha']);
 									$p['RUT_cliente'] = mysql_real_escape_string($datos_factura['rut_cliente']);
 									$p['direccion_cliente'] = mysql_real_escape_string($datos_factura['direccion_cliente']);
 
-
 									$p['codigo_cliente'] = null;
-									if ($datos_factura['codigo_cliente'])
+
+									if ($datos_factura['codigo_cliente']) {
 										$p['codigo_cliente'] = mysql_real_escape_string($datos_factura['codigo_cliente']);
+									}
 
 									$p['id_cobro'] = $id_cobro;
 									$p['id_documento_legal'] = $id_tipo;
@@ -932,17 +945,6 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 									$p['numero'] = mysql_real_escape_string($datos_factura['numero']);
 									$p['id_estado'] = 1;
 									$p['id_moneda_factura'] = $cobro->fields['opc_moneda_total'];
-									//Para Conf::GetConf($Sesion,'DesgloseFactura')=='con_desglose'
-									/*
-										$p['descripcion_honorarios_legales'];
-										$p['monto_honorarios_legales'];
-										$p['descripcion_gastos_con_iva'];
-										$p['monto_gastos_con_iva'];
-										$p['descripcion_gastos_sin_iva'];
-										$p['monto_gastos_sin_iva'];
-										$p['total'];
-										$p['iva_hidden'];
-									 */
 									$p['total'] = $p['monto_neto'] + $p['iva'];
 									$p['descripcion'] = $datos_factura['descripcion'];
 									$p['letra'] = '';
@@ -952,17 +954,17 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 									if ($resultado['id_factura']) {
 										$id_factura = $resultado['id_factura'];
 										$resultado_facturas[] = array('codigo_factura_lemontech' => $id_factura, 'resultado_factura' => 'Factura guardada con éxito');
-									}
-									else
+									} else {
 										$resultado_facturas[] = array('codigo_factura_lemontech' => '-', 'resultado_factura' => $resultado['error']);
+									}
 								}
+
 								//Ingresar nueva factura?
 							}
+
 							//Terminó ingreso de factura correcto, ingreso pago.
 							if ($datos_factura['ListaPagos']) {
 								foreach ($datos_factura['ListaPagos'] as $datos_pago) {
-									//print_r($datos_pago);
-
 									if (!$id_factura) {
 										$resultado_pagos[] = array('id_pago' => $datos_pago['id'], 'resultado_pago' => "Error en nuevo pago: No se existe la factura.");
 										break;
@@ -974,9 +976,9 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 									$cuenta = mysql_real_escape_string($datos_pago['cuenta']);
 
 									//Reviso si existe (y obtengo) la moneda del pago.
-									if (!in_array($datos_pago['moneda'], $lista_moneda))
+									if (!in_array($datos_pago['moneda'], $lista_moneda)) {
 										$error_pago = 'debe ingresar una moneda del listado: ' . $helper_moneda . '.';
-									else {
+									} else {
 										$id_moneda_pago = array_keys($lista_moneda, $datos_pago['moneda']);
 										$id_moneda_pago = $id_moneda_pago[0];
 
@@ -989,7 +991,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 
 											//Reviso que la cuenta exista para la moneda.
 											$query_cuenta =
-													"SELECT cuenta_banco.id_cuenta, cuenta_banco.numero AS NUMERO, CONCAT( cuenta_banco.numero, IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT('(',prm_moneda.codigo,')'),  '' ) ) AS NUMERO_MONEDA,
+													"SELECT cuenta_banco.id_cuenta, cuenta_banco.numero AS NUMERO, CONCAT(cuenta_banco.numero, IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT('(',prm_moneda.codigo,')'), '' )) AS NUMERO_MONEDA,
 											cuenta_banco.id_moneda
 											FROM cuenta_banco
 											LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda
@@ -998,30 +1000,35 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 
 											$id_cuenta_encontrada = '';
 											$otras_cuentas_banco = array();
+
 											while (list( $id_cuenta, $numero, $numero_moneda, $id_moneda_cuenta) = mysql_fetch_array($resp_cuenta)) {
-												if ($numero == $cuenta && ($id_moneda_cuenta == $id_moneda_pago || !$id_moneda_cuenta))
+												if ($numero == $cuenta && ($id_moneda_cuenta == $id_moneda_pago || !$id_moneda_cuenta)) {
 													$id_cuenta_encontrada = $id_cuenta;
-												else
+												} else {
 													$otras_cuentas_banco[] = $numero_moneda;
+												}
 											}
+
 											if (!$id_cuenta_encontrada) {
 												$error_pago = "no existe la cuenta N° $cuenta ($datos_pago[moneda]), $datos_pago[banco] posee las siguientes cuentas: " . join(', ', $otras_cuentas_banco);
 											}
 										}
-									}//Fin revision moneda
+									} //Fin revision moneda
 
-									if (!in_array($datos_pago['concepto'], $concepto))
+									if (!in_array($datos_pago['concepto'], $concepto)) {
 										$error_pago = 'debe ingresar un concepto del listado: ' . $helper_concepto . '.';
-									else {
+									} else {
 										$id_concepto = array_keys($concepto, $datos_pago['concepto']);
 										$id_concepto = $id_concepto[0];
 									}
 
-									if (!in_array($datos_pago['tipo_documento'], $tipo_pago))
+									if (!in_array($datos_pago['tipo_documento'], $tipo_pago)) {
 										$error_pago = 'debe ingresar un tipo de documento del listado: ' . $helper_tipo_pago . '.';
+									}
 
-									if (!$id_contabilidad)
+									if (!$id_contabilidad) {
 										$error_pago = 'debe ingresar el id del pago.';
+									}
 
 									if ($error_pago) {
 										$resultado_pagos[] = array('id_pago' => $datos_pago['id'], 'resultado_pago' => "Error en nuevo pago: $error_pago");
@@ -1045,8 +1052,11 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 										$p['glosa_documento'] = mysql_real_escape_string($datos_pago['descripcion']);
 										$p['id_banco'] = $id_banco;
 										$p['id_cuenta'] = $id_cuenta_encontrada;
-										if ($datos_pago['pago_retencion'])
+
+										if ($datos_pago['pago_retencion']) {
 											$p['pago_retencion'] = true;
+										}
+
 										$p['id_concepto'] = $id_concepto;
 										$p['id_factura'] = $id_factura;
 										$p['id_contabilidad'] = $id_contabilidad;
@@ -1056,15 +1066,16 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 								}
 							}
 						}
-			}
-			else {
+			} else {
 				$r = 'Error: no existe cobro';
 			}
 
 			$resultado_cobros[] = array('id_cobro' => $id_cobro, 'resultado' => $r, 'ResultadoFacturas' => $resultado_facturas, 'ResultadoPagos' => $resultado_pagos);
 		}
+
 		return $resultado_cobros;
 	}
+
 	return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 }
 
@@ -1074,7 +1085,7 @@ function ListaDocumentosPagos($usuario, $password, $timestamp) {
 	$Sesion = new Sesion();
 	$time = mktime();
 
-	//Mapeo usernames a centro_de_costos
+	// Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
 	if (!UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
@@ -1142,8 +1153,8 @@ function ListaDocumentosPagos($usuario, $password, $timestamp) {
 
 	$result_pagos = mysql_query($query_pagos, $Sesion->dbh) or Utiles::errorSQL($query_pagos, __FILE__, __LINE__, $Sesion->dbh);
 	$documentos_pagos = array();
-	while ($dp = mysql_fetch_assoc($result_pagos)) {
 
+	while ($dp = mysql_fetch_assoc($result_pagos)) {
 		$query_facturas_pagadas = "
 				SELECT
 					f.id_cobro,
@@ -1194,6 +1205,7 @@ function ListaDocumentosPagos($usuario, $password, $timestamp) {
 
 		$result_facturas_pagadas = mysql_query($query_facturas_pagadas, $Sesion->dbh) or Utiles::errorSQL($query_facturas_pagadas, __FILE__, __LINE__, $Sesion->dbh);
 		$facturas_pagadas = array();
+		
 		while ($fp = mysql_fetch_assoc($result_facturas_pagadas)) {
 			$facturas_pagadas[] = $fp;
 		}
@@ -1204,7 +1216,6 @@ function ListaDocumentosPagos($usuario, $password, $timestamp) {
 	}
 
 	return $documentos_pagos;
-
 }
 
 $server->register(
@@ -1217,7 +1228,7 @@ function ListaGastos($usuario, $password, $timestamp) {
 	$Sesion = new Sesion();
 	$time = mktime();
 
-	//Mapeo usernames a centro_de_costos
+	// Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
 	if (!UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
@@ -1266,7 +1277,6 @@ function ListaGastos($usuario, $password, $timestamp) {
 	}
 
 	return $gastos;
-
 }
 
 #Then we invoke the service using the following line of code:
