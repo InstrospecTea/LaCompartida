@@ -15,7 +15,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 	//Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
-	
+
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		$lista_cobros = array();
 
@@ -129,7 +129,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$reporte->Query();
 			$r = $reporte->toArray();
 
-			/* Se obtienen ademÃ¡s las horas de cada usuario. */
+			/* Se obtienen además las horas de cada usuario. */
 			$reporte = new Reporte($Sesion);
 			$reporte->id_moneda = $temp['opc_moneda_total'];
 			$reporte->setVista('id_cobro-username');
@@ -216,7 +216,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 					if (is_array($dato)) {
 						$usuario_cobro = array();
 						$usuario_cobro['username'] = $key;
-						
+
 						if (!isset($username_centro_de_costo[$key])) {
 							$usuario_temp = new UsuarioExt($Sesion);
 							$usuario_temp->LoadByNick($key);
@@ -261,7 +261,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 					}
 				}
 			}
-			
+
 			$cobro['ListaUsuariosCobro'] = $usuarios_cobro;
 
 			//Actualizo los datos:
@@ -272,7 +272,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 			$query_actualiza = "UPDATE cobro SET fecha_contabilidad = NOW(), estado_contabilidad = '{$nuevo_estado}' WHERE id_cobro = '{$id_cobro}'";
 			$respuesta = mysql_query($query_actualiza, $Sesion->dbh) or Utiles::errorSQL($query_actualiza, __FILE__, __LINE__, $Sesion->dbh);
-			
+
 			// $query_ingresa = "INSERT INTO log_contabilidad (id_cobro,timestamp) VALUES (" . $id_cobro . "," . $time . ");";
 			// $respuesta_in = mysql_query($query_ingresa, $Sesion->dbh) or Utiles::errorSQL($query_ingresa, __FILE__, __LINE__, $Sesion->dbh);
 
@@ -409,7 +409,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 		return new soapval('lista_cobros_emitidos', 'ListaCobros', $lista_cobros);
 	}
 
-	return new soap_fault('Client', '', 'Usuario o contraseÃ±a incorrecta.', '');
+	return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 }
 
 try {

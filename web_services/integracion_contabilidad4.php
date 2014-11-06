@@ -256,7 +256,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 	//Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
-	
+
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		$lista_cobros = array();
 
@@ -457,7 +457,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 					if (is_array($dato)) {
 						$usuario_cobro = array();
 						$usuario_cobro['username'] = $key;
-						
+
 						if (!isset($username_centro_de_costo[$key])) {
 							$usuario_temp = new UsuarioExt($Sesion);
 							$usuario_temp->LoadByNick($key);
@@ -502,7 +502,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 					}
 				}
 			}
-			
+
 			$cobro['ListaUsuariosCobro'] = $usuarios_cobro;
 
 			//Actualizo los datos:
@@ -513,7 +513,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 			$query_actualiza = "UPDATE cobro SET fecha_contabilidad = NOW(), estado_contabilidad = '{$nuevo_estado}' WHERE id_cobro = '{$id_cobro}'";
 			$respuesta = mysql_query($query_actualiza, $Sesion->dbh) or Utiles::errorSQL($query_actualiza, __FILE__, __LINE__, $Sesion->dbh);
-			
+
 			// $query_ingresa = "INSERT INTO log_contabilidad (id_cobro,timestamp) VALUES (" . $id_cobro . "," . $time . ");";
 			// $respuesta_in = mysql_query($query_ingresa, $Sesion->dbh) or Utiles::errorSQL($query_ingresa, __FILE__, __LINE__, $Sesion->dbh);
 
@@ -576,7 +576,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 				$factura_cobro['comprobante_erp'] = $comprobante_erp;
 				$factura_cobro['condicion_pago'] = $condicion_pago;
 				$factura_cobro['tipo'] = $tipo;
-				$factura_cobro['numero'] = $numero;
+				$factura_cobro['numero'] = intval($numero);
 				$factura_cobro['honorarios'] = number_format($subtotal_honorarios, 2, '.', '');
 				$factura_cobro['gastos_sin_iva'] = number_format($subtotal_gastos_sin_impuesto, 2, '.', '');
 				$factura_cobro['gastos_con_iva'] = number_format($subtotal_gastos, 2, '.', '');
@@ -798,18 +798,18 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 	}
 
 	$helper_tipo_documento_legal = implode(', ', $helper_tipo_documento_legal);
-	
+
 	//Para revisar campos de Pagos:
 	//Cargo los tipos de bancos
 	$query_bancos = "SELECT id_banco, nombre FROM prm_banco";
 	$resp_bancos = mysql_query($query_bancos, $Sesion->dbh) or Utiles::errorSQL($query_bancos, __FILE__, __LINE__, $Sesion->dbh);
 	$banco = array();
 	$helper_banco = array();
-	
+
 	while (list( $id_banco, $nombre ) = mysql_fetch_array($resp_bancos)) {
 		$banco[$id_banco] = $nombre;
 	}
-	
+
 	$helper_banco = implode(', ', $banco);
 
 	//Cargo los conceptos
@@ -823,7 +823,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 	}
 
 	$helper_concepto = implode(', ', $concepto);
-	
+
 	//Cargo los tipos (de documentos de pago)
 	$tipo_pago = array(
 		'T' => 'Transferencia',
@@ -831,7 +831,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 		'C' => 'Cheque',
 		'O' => 'Otro');
 	$helper_tipo_pago = implode(', ', $tipo_pago);
-	
+
 	//Cargo las monedas (su codigo: CLP, USD, etc).
 	$query_monedas = "SELECT id_moneda,codigo FROM prm_moneda";
 	$resp_monedas = mysql_query($query_monedas, $Sesion->dbh) or Utiles::errorSQL($query_monedas, __FILE__, __LINE__, $Sesion->dbh);
@@ -1200,7 +1200,7 @@ function ListaDocumentosPagos($usuario, $password, $timestamp) {
 
 		$result_facturas_pagadas = mysql_query($query_facturas_pagadas, $Sesion->dbh) or Utiles::errorSQL($query_facturas_pagadas, __FILE__, __LINE__, $Sesion->dbh);
 		$facturas_pagadas = array();
-		
+
 		while ($fp = mysql_fetch_assoc($result_facturas_pagadas)) {
 			$facturas_pagadas[] = $fp;
 		}
