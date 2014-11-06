@@ -50,6 +50,7 @@ class XmlGenerator {
 	}
 
 	private function addPageSize($size) {
+		return '';
 		$w = $this->mm2twip($size['cellW']);
 		$h = $this->mm2twip($size['cellH']);
 		$this->xmlBody .= sprintf('<w:sectPr><w:pgSz w:w="%d" w:h="%d" w:orient="portrait"/></w:sectPr>', $w, $h);
