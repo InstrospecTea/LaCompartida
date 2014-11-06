@@ -942,13 +942,13 @@ class Reporte {
 				);
 			}
 			$this->Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
-		}
 
-		if ($this->tipo_dato == 'valor_trabajado_estandar') {
-			$this->Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
-				CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
-			));
+			if ($this->tipo_dato == 'valor_trabajado_estandar') {
+				$this->Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
+					CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
+				));
+			}
 		}
 
 		$this->Criteria
