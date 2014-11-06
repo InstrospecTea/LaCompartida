@@ -1,5 +1,7 @@
 # Changelog
 
+* **Feature**: Agregar campos al cliente
+
 ## Hotfix: 14.19.9
 Jueves 30 de Octubre 2014
 * **Fixed:** [Mejora en el generador  masivo de cobros](https://github.com/LemontechSA/ttb/pull/741)
