@@ -1,13 +1,6 @@
 <?php
 require_once('../app/conf.php');
 
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Moneda.php';
-require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
-
 apache_setenv("force-response-1.0", "TRUE");
 apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 
@@ -19,8 +12,6 @@ if (Conf::GetConf($Sesion, 'NuevaLibreriaNusoap')) {
 } else {
 	require_once("lib/nusoap.php");
 }
-
-#First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
 
 $server = new soap_server();
 $server->configureWSDL('IntegracionSAPWebServices', $ns);
@@ -265,13 +256,16 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 	//Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
+	
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		$lista_cobros = array();
 
-		$query_timestamp = "";
 		if ($timestamp) {
-			$query_timestamp = " OR cobro.id_cobro IN (SELECT DISTINCT id_cobro FROM log_contabilidad WHERE timestamp >= " . intval(mysql_real_escape_string($timestamp)) . " ) ";
+			$query_timestamp = ' OR cobro.id_cobro IN (SELECT DISTINCT id_cobro FROM log_contabilidad WHERE timestamp >= ' . intval(mysql_real_escape_string($timestamp)) . " ) ";
+		} else {
+			$query_timestamp = '';
 		}
+
 		$query = "SELECT cobro.id_cobro,
 				cobro.codigo_cliente,
 				cobro.estado,
@@ -303,14 +297,14 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			FROM cobro
 				JOIN cobro_moneda as cobro_moneda_mt ON cobro_moneda_mt.id_cobro = cobro.id_cobro AND cobro_moneda_mt.id_moneda = cobro.opc_moneda_total
 				JOIN cobro_moneda as cobro_moneda_tarifa ON cobro_moneda_tarifa.id_cobro = cobro.id_cobro AND cobro_moneda_tarifa.id_moneda = cobro.id_moneda
-				LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
 				LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total
-				LEFT JOIN carta ON carta.id_carta=cobro.id_carta
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+				LEFT JOIN carta ON carta.id_carta = cobro.id_carta
+				LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 				LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
 				LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-			WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
-				$query_timestamp
+			WHERE cobro.estado_contabilidad IN ('PARA INFORMAR', 'PARA INFORMAR Y FACTURAR')
+				{$query_timestamp}
 			GROUP BY cobro.id_cobro";
 
 		if (!($resp = mysql_query($query, $Sesion->dbh))) {
@@ -318,9 +312,8 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 		}
 
 		while ($temp = mysql_fetch_array($resp)) {
-			$id_cobro = $temp['id_cobro'];
-
 			$cobro = array();
+			$id_cobro = $temp['id_cobro'];
 
 			$cobro['id_cobro'] = $id_cobro;
 			$cobro['nota_venta'] = $temp['nota_venta_contabilidad'];
@@ -407,7 +400,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 				FROM trabajo t
 				INNER JOIN asunto a ON a.codigo_asunto = t.codigo_asunto
 				INNER JOIN usuario u ON u.id_usuario = t.id_usuario
-				WHERE t.id_cobro = '$id_cobro' AND t.cobrable = 1
+				WHERE t.id_cobro = '{$id_cobro}' AND t.cobrable = 1
 				GROUP BY t.id_usuario";
 			$stmt = $Sesion->pdodbh->prepare($query_asuntos);
 			$stmt->execute();
@@ -464,6 +457,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 					if (is_array($dato)) {
 						$usuario_cobro = array();
 						$usuario_cobro['username'] = $key;
+						
 						if (!isset($username_centro_de_costo[$key])) {
 							$usuario_temp = new UsuarioExt($Sesion);
 							$usuario_temp->LoadByNick($key);
@@ -473,6 +467,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 								$username_centro_de_costo[$key] = '';
 							}
 						}
+
 						$usuario_cobro['centro_de_costo'] = $username_centro_de_costo[$key];
 						$usuario_cobro['valor'] = number_format($dato['valor'], 2, '.', '');
 						$usuario_cobro['horas_trabajadas'] = number_format($r_trabajadas[$id_cobro][$id_cobro][$id_cobro][$id_cobro][$id_cobro][$key]['valor'], 2, '.', '');
@@ -516,50 +511,50 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 				$nuevo_estado = 'INFORMADO Y FACTURADO';
 			}
 
-			$query_actualiza = "UPDATE cobro SET fecha_contabilidad = NOW(), estado_contabilidad = '" . $nuevo_estado . "' WHERE id_cobro = '" . $id_cobro . "'";
+			$query_actualiza = "UPDATE cobro SET fecha_contabilidad = NOW(), estado_contabilidad = '{$nuevo_estado}' WHERE id_cobro = '{$id_cobro}'";
 			$respuesta = mysql_query($query_actualiza, $Sesion->dbh) or Utiles::errorSQL($query_actualiza, __FILE__, __LINE__, $Sesion->dbh);
-			$query_ingresa = "INSERT INTO log_contabilidad (id_cobro,timestamp) VALUES (" . $id_cobro . "," . $time . ");";
-			$respuesta_in = mysql_query($query_ingresa, $Sesion->dbh) or Utiles::errorSQL($query_ingresa, __FILE__, __LINE__, $Sesion->dbh);
-
-
+			
+			// $query_ingresa = "INSERT INTO log_contabilidad (id_cobro,timestamp) VALUES (" . $id_cobro . "," . $time . ");";
+			// $respuesta_in = mysql_query($query_ingresa, $Sesion->dbh) or Utiles::errorSQL($query_ingresa, __FILE__, __LINE__, $Sesion->dbh);
 
 			$query_facturas = " SELECT
-																factura.id_factura,
-																factura.id_factura_padre,
-																factura.codigo_cliente,
-																factura.comprobante_erp,
-																factura.condicion_pago,
-																SUM(factura_cobro.monto_factura) as monto_factura,
-																factura.numero,
-																prm_documento_legal.glosa as tipo,
-																prm_estado_factura.glosa,
-																prm_estado_factura.codigo,
-																factura.subtotal_sin_descuento,
-																honorarios,
-																ccfm.saldo as saldo,
-																subtotal_gastos,
-																subtotal_gastos_sin_impuesto,
-																iva,
-																prm_documento_legal.codigo as cod_tipo,
-																cliente,
-																RUT_cliente,
-																direccion_cliente,
-																fecha,
-																descripcion,
-																factura.id_moneda,
-																pm.tipo_cambio,
-																pm.cifras_decimales,
-																prm_moneda.codigo as codigo_moneda_factura,
-																factura.serie_documento_legal as serie
-												FROM factura
-												JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
-												LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura
-												JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
-												JOIN prm_estado_factura ON factura.id_estado = prm_estado_factura.id_estado
-												JOIN prm_moneda ON prm_moneda.id_moneda = factura.id_moneda
-												LEFT JOIN factura_cobro ON factura_cobro.id_factura = factura.id_factura
-												WHERE factura.id_cobro = '" . $id_cobro . "'
-												GROUP BY factura.id_factura";
+				factura.id_factura,
+				factura.id_factura_padre,
+				factura.codigo_cliente,
+				factura.comprobante_erp,
+				factura.condicion_pago,
+				SUM(factura_cobro.monto_factura) as monto_factura,
+				factura.numero,
+				prm_documento_legal.glosa as tipo,
+				prm_estado_factura.glosa,
+				prm_estado_factura.codigo,
+				factura.subtotal_sin_descuento,
+				honorarios,
+				ccfm.saldo as saldo,
+				subtotal_gastos,
+				subtotal_gastos_sin_impuesto,
+				iva,
+				prm_documento_legal.codigo as cod_tipo,
+				cliente,
+				RUT_cliente,
+				direccion_cliente,
+				fecha,
+				descripcion,
+				factura.id_moneda,
+				pm.tipo_cambio,
+				pm.cifras_decimales,
+				prm_moneda.codigo as codigo_moneda_factura,
+				factura.serie_documento_legal as serie
+			FROM factura
+				JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
+				LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura
+				JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
+				JOIN prm_estado_factura ON factura.id_estado = prm_estado_factura.id_estado
+				JOIN prm_moneda ON prm_moneda.id_moneda = factura.id_moneda
+				LEFT JOIN factura_cobro ON factura_cobro.id_factura = factura.id_factura
+			WHERE factura.id_cobro = '{$id_cobro}'
+			GROUP BY factura.id_factura";
+
 			$respu = mysql_query($query_facturas, $Sesion->dbh) or Utiles::errorSQL($query_facturas, __FILE__, __LINE__, $Sesion->dbh);
 
 			$facturas_cobro = Array();
@@ -606,6 +601,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 				$uc = $usuarios_cobro;
 				$factura_cobro['ListaUsuariosFactura'] = $uc;
+
 				foreach ($factura_cobro['ListaUsuariosFactura'] as $key => $user) {
 					$factura_cobro['ListaUsuariosFactura'][$key]['valor'] = number_format($user['peso'] * $factura_cobro['honorarios'], 2, '.', '');
 				}
@@ -626,17 +622,15 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 						fp.pago_retencion,
 						pfpc.glosa AS concepto
 					FROM factura_pago fp
-					LEFT JOIN cta_cte_fact_mvto ccfm_pago ON ccfm_pago.id_factura_pago = fp.id_factura_pago
-					LEFT JOIN cta_cte_fact_mvto_neteo ccfmn ON ccfmn.id_mvto_pago = ccfm_pago.id_cta_cte_mvto
-					LEFT JOIN cta_cte_fact_mvto ccfm_deuda ON ccfm_deuda.id_cta_cte_mvto = ccfmn.id_mvto_deuda
-					LEFT JOIN factura f ON f.id_factura = ccfm_deuda.id_factura
-
-					LEFT JOIN prm_moneda ON prm_moneda.id_moneda = fp.id_moneda
-					LEFT JOIN prm_banco ON prm_banco.id_banco = fp.id_banco
-					LEFT JOIN cuenta_banco ON cuenta_banco.id_cuenta = fp.id_cuenta
-					LEFT JOIN prm_factura_pago_concepto pfpc ON pfpc.id_concepto = fp.id_concepto
-					WHERE
-						f.id_factura = $id_factura";
+						LEFT JOIN cta_cte_fact_mvto ccfm_pago ON ccfm_pago.id_factura_pago = fp.id_factura_pago
+						LEFT JOIN cta_cte_fact_mvto_neteo ccfmn ON ccfmn.id_mvto_pago = ccfm_pago.id_cta_cte_mvto
+						LEFT JOIN cta_cte_fact_mvto ccfm_deuda ON ccfm_deuda.id_cta_cte_mvto = ccfmn.id_mvto_deuda
+						LEFT JOIN factura f ON f.id_factura = ccfm_deuda.id_factura
+						LEFT JOIN prm_moneda ON prm_moneda.id_moneda = fp.id_moneda
+						LEFT JOIN prm_banco ON prm_banco.id_banco = fp.id_banco
+						LEFT JOIN cuenta_banco ON cuenta_banco.id_cuenta = fp.id_cuenta
+						LEFT JOIN prm_factura_pago_concepto pfpc ON pfpc.id_concepto = fp.id_concepto
+					WHERE f.id_factura = '{$id_factura}'";
 
 				$result_pagos = mysql_query($query_pagos, $Sesion->dbh) or Utiles::errorSQL($query_pagos, __FILE__, __LINE__, $Sesion->dbh);
 				$facturas_pagos = array();
@@ -655,6 +649,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 		return new soapval('lista_cobros_emitidos', 'ListaCobros', $lista_cobros);
 	}
+
 	return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 }
 
