@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.12
+Jueves 6 de Noviembre 2014
+* **New:** [Se eliminan los espacios en blanco en tags %](https://github.com/LemontechSA/ttb/pull/745)
+
 ## Hotfix: 14.19.10
 Miercoles 5 de Noviembre 2014
 * **New:** [Agrega filtro Cobrable para los usuarios no revisores.](https://github.com/LemontechSA/ttb/pull/742)
