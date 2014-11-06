@@ -10,7 +10,9 @@ try {
 		'password' => 'prc',
 		'timestamp' => '1414713600'
 	));
-	print_r($result);
+
+	var_dump(count($result));
+	var_dump($result);
 } catch(Exception $e) {
 	echo $client->__getLastResponse();
 	echo $e->getTraceAsString();
