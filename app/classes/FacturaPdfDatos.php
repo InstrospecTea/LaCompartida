@@ -13,10 +13,6 @@ class FacturaPdfDatos extends Objeto {
 	}
 
 	function CargarDatos($id_factura, $id_documento_legal, $id_estudio) {
-		if (!UtilesApp::ExisteCampo('align', 'factura_pdf_datos', $this->sesion)) {
-			mysql_query("ALTER TABLE `factura_pdf_datos` ADD `align` VARCHAR(1) NOT NULL DEFAULT 'L' COMMENT 'J justifica, tb puede ser R C o L';", $this->sesion->dbh);
-		}
-
 		$query = "SELECT SQL_CALC_FOUND_ROWS codigo_tipo_dato, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, align
 			FROM factura_pdf_datos
 				JOIN factura_pdf_tipo_datos USING( id_tipo_dato )
@@ -140,7 +136,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
-		
+
 		$tipo_cambio_usd = $arreglo_monedas[2]['tipo_cambio'];
 		$cifras_decimales_usd = $arreglo_monedas[2]['cifras_decimales'];
 
@@ -336,7 +332,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 
 			default:
-			
+
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
