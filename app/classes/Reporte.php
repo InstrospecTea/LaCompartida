@@ -916,13 +916,6 @@ class Reporte {
 		$this->Criteria->add_from('trabajo');
 		//Calculo de valor por cobrar requiere Tarifa, Tipo de Cambio
 
-		if ($this->tipo_dato == 'valor_trabajado_estandar') {
-			$this->Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
-				CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
-			));
-		}
-
 		$this->Criteria->add_left_join_with(array('usuario_costo_hh', 'cut'), CriteriaRestriction::and_clause(
 			CriteriaRestriction::equals('trabajo.id_usuario', 'cut.id_usuario'),
 			CriteriaRestriction::equals("date_format(trabajo.fecha, '%Y%m')", 'cut.yearmonth')
@@ -949,6 +942,13 @@ class Reporte {
 				);
 			}
 			$this->Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
+		}
+
+		if ($this->tipo_dato == 'valor_trabajado_estandar') {
+			$this->Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
+				CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
+				CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
+			));
 		}
 
 		$this->Criteria
