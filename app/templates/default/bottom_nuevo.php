@@ -1,7 +1,6 @@
 
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
-	    <script src="//static.thetimebilling.com/js/vendor/modernizr-2.6.1.min.js"></script>
 		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.js"></script>
 </div>
 

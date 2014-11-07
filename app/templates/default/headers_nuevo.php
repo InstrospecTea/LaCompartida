@@ -56,6 +56,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery-ui.css" />
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css" />
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/vendor/modernizr-2.6.1.min.js"></script>
 		<script type="text/javascript" src="//www.google.com/jsapi"></script>
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script type="text/javascript">
