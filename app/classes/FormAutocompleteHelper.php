@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../../app/conf.php';
 
-class AutocompleteHelper {
+class FormAutocompleteHelper {
 
   public $Utiles;
   public $Html;
@@ -41,7 +41,11 @@ class AutocompleteHelper {
         jQueryUI.done(function() {
           jQuery('#{$name}').autocomplete({
             source: function(request, response) {
-              $source
+              jQuery.post("$source", {term: request.term}, 
+                function(data) {
+                  response(data);
+                }, 
+              "json");
             },
             minLength: $minLength,
             select: function(event, ui) {
