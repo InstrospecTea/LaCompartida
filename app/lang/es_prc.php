@@ -71,5 +71,6 @@ $_LANG['Para agregar un nuevo usuario ingresa su RUT aquí.'] = 'Para agregar un 
 $_LANG['Honorarios Legales'] = 'Asesoría Legal';
 $_LANG['Pago de Documentos tributarios'] = 'Reporte de Recaudación';
 
+$_LANG['Giro'] = 'Sector económico';
 
 ?>
