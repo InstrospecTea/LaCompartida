@@ -839,9 +839,9 @@ class Reporte {
 				break;
 			case 'horas_trabajadas':
 			case 'horas_no_cobrables':
+			case 'horas_cobrables':
 				$this->Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion)) / 3600', $this->tipo_dato);
 				break;
-			case 'horas_cobrables':
 			case 'horas_spot':
 			case 'horas_convenio':
 				$this->Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
