@@ -25,7 +25,7 @@ $color_impar = "#ffffff";
 
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
-
+$AutocompleteHelper = new AutocompleteHelper();
 // previene override del objero, ya que se incluye desde otras interfaces.
 if (empty($cliente)) {
 	$cliente = new Cliente($Sesion);
@@ -1787,7 +1787,19 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
 							<?php echo Html::SelectArrayDecente($PrmCodigo->Listar("WHERE prm_codigo.grupo = 'GIRO_CLIENTE' ORDER BY prm_codigo.glosa ASC"), 'id_pais', $contrato->fields['factura_giro']); ?>
 						<?php } else { ?>
-							<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
+							<?php 
+								echo $AutocompleteHelper->simple_complete('factura_giro', 
+											$contrato->fields['factura_giro'], 
+											array('size' => '50', 'label' => false), 
+											array('source' => '
+													jQuery.post("ajax/ajax_seleccionar_codigo.php?codigo=GIRO_CLIENTE", {term: request.term}, 
+														function(data) {
+															response(data);
+														}, 
+													"json");'
+											)
+										);
+							?>
 						<?php } ?>
 					</td>
 				</tr>
