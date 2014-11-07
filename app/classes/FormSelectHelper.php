@@ -24,7 +24,7 @@ class FormSelectHelper {
   public function ajax_select($name, $selected, $attrs = array(), $options = array(), $default_list = array()) {
     $id = empty($attrs['id']) ? $this->Utiles->pascalize($name) : $attrs['id'];
     $attrs['empty'] = 'Cargando...';
-    $output = $this->Form->select($id, $default_list, $selected, $attrs);
+    $output = $this->Form->select($name, $default_list, $selected, $attrs);
     $output .= $this->Html->script_block($this->scripts($id, $selected, $options));
     return $output;
   }

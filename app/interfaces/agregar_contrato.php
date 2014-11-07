@@ -25,7 +25,7 @@ $color_impar = "#ffffff";
 
 $Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
-$AutocompleteHelper = new AutocompleteHelper();
+$AutocompleteHelper = new FormAutocompleteHelper();
 // previene override del objero, ya que se incluye desde otras interfaces.
 if (empty($cliente)) {
 	$cliente = new Cliente($Sesion);
@@ -1789,16 +1789,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php } else { ?>
 							<?php 
 								echo $AutocompleteHelper->simple_complete('factura_giro', 
-											$contrato->fields['factura_giro'], 
-											array('size' => '50', 'label' => false), 
-											array('source' => '
-													jQuery.post("ajax/ajax_seleccionar_codigo.php?codigo=GIRO_CLIENTE", {term: request.term}, 
-														function(data) {
-															response(data);
-														}, 
-													"json");'
-											)
-										);
+									$contrato->fields['factura_giro'], 
+									array('size' => '50', 'label' => false), 
+									array('source' => "ajax/ajax_seleccionar_codigo.php?codigo=GIRO_CLIENTE")
+								);
 							?>
 						<?php } ?>
 					</td>

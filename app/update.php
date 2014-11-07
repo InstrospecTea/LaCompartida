@@ -10545,6 +10545,17 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarModalidadCalculo', '0', 'Mostrar opción para modificar modalidad de cálculo en Cobros6', 'boolean', '6', '-1');";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.85:
+			$queries = array();
+			if (!ExisteCampo('referencia_adicional', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente` ADD `referencia_adicional` VARCHAR(255) NULL COMMENT 'este campo contiene una referencia del cliente adicional' AFTER `id_cliente_referencia` ;";
+			}
+			if (!ExisteCampo('requiere_adicional', 'prm_cliente_referencia', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_cliente_referencia` ADD `requiere_adicional` TINYINT(1) NOT NULL DEFAULT '0';";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10553,7 +10564,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.84;
+$max_update = 7.85;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

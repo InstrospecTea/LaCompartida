@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('DAT'));
+$SelectHelper = new FormSelectHelper();
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 $desde_agrega_cliente = true;
@@ -10,6 +11,7 @@ $cliente = new Cliente($sesion);
 $contrato = new Contrato($sesion);
 $archivo = new Archivo($sesion);
 $codigo_obligatorio = true;
+$Form = new Form;
 
 if (Conf::GetConf($sesion, 'CodigoObligatorio')) {
 	if (!Conf::CodigoObligatorio()) {
@@ -256,6 +258,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("alerta_monto", $cliente_alerta_monto);
 		$cliente->Edit("limite_hh", $cliente_limite_hh);
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
+		$cliente->Edit("referencia_adicional", $referencia_adicional);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 
 
@@ -437,7 +440,32 @@ if (Conf::GetConf($sesion, 'ClienteReferencia')) {
 	$segmento_cliente_referencia .= '</td>';
 	$segmento_cliente_referencia .= '<td class="al">';
 	$segmento_cliente_referencia .= '<div class="span2">';
-	$segmento_cliente_referencia .= Html::SelectQuery($sesion, "SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC", "id_cliente_referencia", $cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', " class='span3' ", "Vacio");
+
+	$segmento_cliente_referencia .= $SelectHelper->ajax_select(
+		'id_cliente_referencia',
+		$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', 
+		array('class' => 'span3', 'style' => 'display:inline'), 
+		array(
+			'source' => 'ajax/ajax_prm.php?prm=ClienteReferencia&fields=orden,requiere_adicional',
+			'onLoad' => '
+				var element = selected_IdClienteReferencia;
+				jQuery("#referencia_adicional").hide();
+				if (element && element.requiere_adicional == "1") {
+					jQuery("#referencia_adicional").show();
+				}
+			',
+			'onChange' => '
+				var element = selected_IdClienteReferencia;
+				jQuery("#referencia_adicional").hide();
+				if (element && element.requiere_adicional == "1") {
+					jQuery("#referencia_adicional").show();
+				}
+			'
+		)
+	);
+
+	$segmento_cliente_referencia .= '&nbsp;';
+	$segmento_cliente_referencia .= $Form->input('referencia_adicional', $cliente->fields['referencia_adicional'], array('placeholder' => 'Referido', 'style' => 'display:none', 'class' => 'span5', 'label' => false, 'id' => 'referencia_adicional'));
 	$segmento_cliente_referencia .= '</div>';
 	$segmento_cliente_referencia .= '</td>';
 	$segmento_cliente_referencia .= '</tr>';
@@ -460,7 +488,7 @@ function TTip($texto) {
 
 $pagina->titulo = __('Ingreso cliente');
 $pagina->PrintTop();
-$Form = new Form;
+
 ?>
 
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo $_SERVER[PHP_SELF] ?>" >
