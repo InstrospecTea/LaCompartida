@@ -10548,7 +10548,9 @@ QUERY;
 
 		case 7.85:
 			$queries = array();
-			$queries[] = "ALTER TABLE `usuario` CHANGE `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0;";
+			$queries[] = "ALTER TABLE `usuario`
+				CHANGE COLUMN `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0,
+				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
 			ejecutar($queries, $dbh);
 			break;
 	}
