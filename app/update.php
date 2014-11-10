@@ -10545,6 +10545,12 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarModalidadCalculo', '0', 'Mostrar opción para modificar modalidad de cálculo en Cobros6', 'boolean', '6', '-1');";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.85:
+			$queries = array();
+			$queries[] = "ALTER TABLE `usuario` CHANGE `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0;";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -10553,7 +10559,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.84;
+$max_update = 7.85;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

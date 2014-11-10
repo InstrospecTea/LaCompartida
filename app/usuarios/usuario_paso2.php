@@ -66,7 +66,11 @@ if ($opc == 'edit') {
 
 	$usuario->Edit('dias_ingreso_trabajo', $dias_ingreso_trabajo);
 	$usuario->Edit('retraso_max', $retraso_max);
+
+	$restriccion_diario = str_replace(',', '.', $restriccion_diario);
+	$restriccion_diario = number_format($restriccion_diario, Conf::GetConf($sesion, 'CantidadDecimalesIngresoHoras'), '.', '');
 	$usuario->Edit('restriccion_diario', $restriccion_diario);
+
 	$usuario->Edit('alerta_diaria', $alerta_diaria);
 	$usuario->Edit('alerta_semanal', $alerta_semanal);
 	$usuario->Edit('alerta_revisor', $alerta_revisor);
