@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.13
+Viernes 7 de Noviembre 2014
+* **Fixed:** [Fix typo que echaba a perder el monto_thh](https://github.com/LemontechSA/ttb/pull/746)
+
 ## Hotfix: 14.19.12
 Jueves 6 de Noviembre 2014
 * **New:** [Se eliminan los espacios en blanco en tags %](https://github.com/LemontechSA/ttb/pull/745)
