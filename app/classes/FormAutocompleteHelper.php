@@ -33,6 +33,7 @@ class FormAutocompleteHelper {
  
   private function scripts($name, $options = array()) {
     $onChange = $options['onChange'] ? $options['onChange'] : '';
+    $onSource = $options['onSource'] ? $options['onSource'] : '';
     $onSelect = $options['onSelect'] ? $options['onSelect'] : '';
     $source = $options['source'] ? $options['source'] : '';
     $minLength = $options['minLength'] ? $options['minLength'] : '1';
@@ -41,7 +42,9 @@ class FormAutocompleteHelper {
         jQueryUI.done(function() {
           jQuery('#{$name}').autocomplete({
             source: function(request, response) {
-              jQuery.post("$source", {term: request.term}, 
+              source = "$source";
+              $onSource;
+              jQuery.post(source, {term: request.term}, 
                 function(data) {
                   response(data);
                 }, 

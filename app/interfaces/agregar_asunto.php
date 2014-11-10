@@ -1,9 +1,12 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
+use TTB\Pagina as Pagina;
 
 $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
 $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
+$SelectHelper = new FormSelectHelper();
+$AutocompleteHelper = new FormAutocompleteHelper();
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 
 $tip_tasa = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
@@ -318,6 +321,9 @@ if ($opcion == 'guardar') {
 		}
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
 		$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
+		if (!is_null($desglose_area)) {
+			$Asunto->Edit("desglose_area", $desglose_area);
+		}
 		$Asunto->Edit("id_idioma", $id_idioma);
 		$Asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
@@ -992,7 +998,45 @@ function MuestraPorValidacion(divID) {
 								<?php echo __('Área') . ' ' . __('asunto') ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden ASC'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
+
+							<?php echo $SelectHelper->ajax_select(
+									'id_area_proyecto',
+									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : '', 
+									array('class' => 'span3', 'style' => 'display:inline'), 
+									array(
+										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
+										'onLoad' => '
+											var element = selected_IdAreaProyecto;
+											jQuery("#desglose_area").hide();
+											if (element && element.requiere_desglose == "1") {
+												jQuery("#desglose_area").show();
+											} else {
+												jQuery("#desglose_area").val("");
+											}
+										',
+										'onChange' => '
+											var element = selected_IdAreaProyecto;
+											jQuery("#desglose_area").hide();
+											jQuery("#desglose_area").val("");
+											if (element && element.requiere_desglose == "1") {
+												jQuery("#desglose_area").show();
+											}
+										'
+									)
+								);
+								?>
+							&nbsp;
+							<?php echo $AutocompleteHelper->simple_complete('desglose_area', 
+									$Asunto->fields['desglose_area'], 
+									array('size' => '30', 'label' => false, 'placeholder' => 'Desglose Área', 'style' => 'display:none', 'id' => 'desglose_area'), 
+									array(
+										'source' => "ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1",
+										'onSource' => '
+											source = source + "&q=id_area_proyecto:" + jQuery("#IdAreaProyecto").val();
+										'
+									)
+								);
+								?>
 							</td>
 						</tr>
 						<tr>
@@ -1250,7 +1294,7 @@ function MuestraPorValidacion(divID) {
 <?php echo InputId::Javascript($Sesion) ?>
 
 <?php
-$Pagina->PrintBottom($popup);
+$Pagina->PrintBottom($popup, false, true);
 
 function EnviarEmail($Asunto) {
 
