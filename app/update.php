@@ -10548,11 +10548,17 @@ QUERY;
 
 		case 7.85:
 			$queries = array();
-			if (!ExisteCampo('referencia_adicional', 'cliente', $dbh)) {
-				$queries[] = "ALTER TABLE `cliente` ADD `referencia_adicional` VARCHAR(255) NULL COMMENT 'este campo contiene una referencia del cliente adicional' AFTER `id_cliente_referencia` ;";
+			if (!ExisteCampo('desglose_referencia', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente` ADD `desglose_referencia` VARCHAR(255) NULL COMMENT 'este campo contiene una referencia del cliente adicional' AFTER `id_cliente_referencia` ;";
 			}
-			if (!ExisteCampo('requiere_adicional', 'prm_cliente_referencia', $dbh)) {
-				$queries[] = "ALTER TABLE `prm_cliente_referencia` ADD `requiere_adicional` TINYINT(1) NOT NULL DEFAULT '0';";
+			if (!ExisteCampo('requiere_desglose', 'prm_cliente_referencia', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_cliente_referencia` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
+			}
+			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
+			}
+			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
 			}
 			ejecutar($queries, $dbh);
 			break;

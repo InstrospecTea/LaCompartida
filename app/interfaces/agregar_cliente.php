@@ -258,7 +258,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("alerta_monto", $cliente_alerta_monto);
 		$cliente->Edit("limite_hh", $cliente_limite_hh);
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
-		$cliente->Edit("referencia_adicional", $referencia_adicional);
+		$cliente->Edit("desglose_referencia", $desglose_referencia);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 
 
@@ -446,26 +446,26 @@ if (Conf::GetConf($sesion, 'ClienteReferencia')) {
 		$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', 
 		array('class' => 'span3', 'style' => 'display:inline'), 
 		array(
-			'source' => 'ajax/ajax_prm.php?prm=ClienteReferencia&fields=orden,requiere_adicional',
+			'source' => 'ajax/ajax_prm.php?prm=ClienteReferencia&fields=orden,requiere_desglose',
 			'onLoad' => '
 				var element = selected_IdClienteReferencia;
-				jQuery("#referencia_adicional").hide();
-				if (element && element.requiere_adicional == "1") {
-					jQuery("#referencia_adicional").show();
+				jQuery("#desglose_referencia").hide();
+				if (element && element.requiere_desglose == "1") {
+					jQuery("#desglose_referencia").show();
 				}
 			',
 			'onChange' => '
 				var element = selected_IdClienteReferencia;
-				jQuery("#referencia_adicional").hide();
-				if (element && element.requiere_adicional == "1") {
-					jQuery("#referencia_adicional").show();
+				jQuery("#desglose_referencia").hide();
+				if (element && element.requiere_desglose == "1") {
+					jQuery("#desglose_referencia").show();
 				}
 			'
 		)
 	);
 
 	$segmento_cliente_referencia .= '&nbsp;';
-	$segmento_cliente_referencia .= $Form->input('referencia_adicional', $cliente->fields['referencia_adicional'], array('placeholder' => 'Referido', 'style' => 'display:none', 'class' => 'span5', 'label' => false, 'id' => 'referencia_adicional'));
+	$segmento_cliente_referencia .= $Form->input('desglose_referencia', $cliente->fields['desglose_referencia'], array('placeholder' => 'Referido', 'style' => 'display:none', 'class' => 'span5', 'label' => false, 'id' => 'desglose_referencia'));
 	$segmento_cliente_referencia .= '</div>';
 	$segmento_cliente_referencia .= '</td>';
 	$segmento_cliente_referencia .= '</tr>';
