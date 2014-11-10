@@ -11528,6 +11528,10 @@ class NotaCobro extends Cobro {
 			// asignar formato detalle de carta según cobro
 			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
 
+			if (empty($html)) {
+				throw new Exception("HTML nulo o Vacio", 1);
+			}
+
 			$opc_papel = $NotaCobro->fields['opc_papel'];
 			$id_carta = $NotaCobro->fields['id_carta'];
 			$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
