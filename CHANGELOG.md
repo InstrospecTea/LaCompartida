@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.14
+Lunes 10 de Noviembre 2014
+* **Fixed:** [Corregir formato detalle carta por defecto al generar borradores](https://github.com/LemontechSA/ttb/pull/748)
+
 ## Hotfix: 14.19.13
 Viernes 7 de Noviembre 2014
 * **Fixed:** [Fix typo que echaba a perder el monto_thh](https://github.com/LemontechSA/ttb/pull/746)
