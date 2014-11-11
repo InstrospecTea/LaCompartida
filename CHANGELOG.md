@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.15
+Martes 11 de Noviembre 2014
+* **Fixed:** [Busqueda de tarifa según glosa en integración moreno baldivieso](https://github.com/LemontechSA/ttb/pull/749)
+
 ## Hotfix: 14.19.14
 Lunes 10 de Noviembre 2014
 * **Fixed:** [Corregir formato detalle carta por defecto al generar borradores](https://github.com/LemontechSA/ttb/pull/748)
