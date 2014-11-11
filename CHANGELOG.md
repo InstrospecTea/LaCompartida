@@ -1,9 +1,12 @@
 # Changelog
 
+## Hotfix: 14.19.17
+Martes 11 de Noviembre 2014
+* **Fixed:** [Modificar query para obtener tarifa en integración emba.](https://github.com/LemontechSA/ttb/pull/751)
+
 ## Hotfix: 14.19.16
 Martes 11 de Noviembre 2014
 * **Fixed:** [Restablecimiento de filtros de interfaz en la generacion masiva de cobros. Corrige inicialización de mecanismo de generación masiva.](https://github.com/LemontechSA/ttb/pull/750)
-
 
 ## Hotfix: 14.19.15
 Martes 11 de Noviembre 2014
