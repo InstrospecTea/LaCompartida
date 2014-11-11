@@ -54,7 +54,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCPR.LastName AS 'applicant_last_name',
 				OCPR.Tel1 AS 'applicant_phone',
 				OCPR.E_MailL AS 'applicant_email',
-				OCRD.U_Tarifa AS 'charging_data_rate',
+				OPRJ.U_Tarifa AS 'charging_data_rate',
 				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonHonor AS 'charging_data_currency_fees',
