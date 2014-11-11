@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 14.19.16
+Martes 11 de Noviembre 2014
+* **Fixed:** [Restablecimiento de filtros de interfaz en la generacion masiva de cobros. Corrige inicialización de mecanismo de generación masiva.](https://github.com/LemontechSA/ttb/pull/750)
+
+
 ## Hotfix: 14.19.15
 Martes 11 de Noviembre 2014
 * **Fixed:** [Busqueda de tarifa según glosa en integración moreno baldivieso](https://github.com/LemontechSA/ttb/pull/749)
