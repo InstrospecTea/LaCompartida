@@ -1,15 +1,16 @@
 <?php
 	require_once dirname(__FILE__).'/../../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/../app/classes/Aviso.php';
+	restore_error_handler();
 	$sesion = new Sesion( array() );
+
+
 ?>
+
 <body class="non_popup" <?php if (Conf::GetConf($sesion, 'UsarOverlay')) echo 'title="overlay"'; ?>>
 <?php
+
+
+
 if (!Conf::GetConf($sesion,'ActualizacionTerminado')) {
 	echo "<div style='display:block;margin:auto;text-align:center;'><h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
 	echo "<br/><br/><img src='https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png' />";
@@ -20,7 +21,10 @@ if (!Conf::GetConf($sesion,'ActualizacionTerminado')) {
 	echo '</div>';
 	exit;
 }
+
 ?>
+
+
 	<div  class="tb_facebook">
 		<div style="position:absolute;top:0px;left:50%;margin-left:-485px;width:485px;text-align:left;">
 			<a style="border:0 none;" href="<?php echo Conf::RootDir().'/app/usuarios/index.php';?>" style="border:0 none;text-decoration:none;">

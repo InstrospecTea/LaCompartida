@@ -1,13 +1,14 @@
 <?php
 
 /**
-* 		
+*
 */
-class HtmlBuilder 
+class HtmlBuilder
 {
-	
+
 	public $childs;
 	private $attributes;
+	private $plain_attributes;
 	private $closure;
 	private $tag;
 	private $value;
@@ -16,6 +17,7 @@ class HtmlBuilder
 	function __construct(){
 		$this->childs = array();
 		$this->attributes = array();
+		$this->plain_attributes = array();
 		$this->closure = true;
 		$this->tag = 'div';
 		$this->value = null;
@@ -26,7 +28,7 @@ class HtmlBuilder
 	    return $this->render();
 	}
 
-	public function add_child(HtmlBuilder $child){
+	public function add_child($child){
 		$this->childs[] = $child;
 		return $this;
 	}
@@ -34,6 +36,10 @@ class HtmlBuilder
 	public function add_attribute($key, $value){
 		$this->attributes[$key] = $value;
 		return $this;
+	}
+
+	public function add_plain_attribute($attribute) {
+		$this->plain_attributes[] = $attribute;
 	}
 
 	public function set_closure($is_closed){
@@ -59,13 +65,18 @@ class HtmlBuilder
 		foreach ($this->attributes as $key => $value) {
 			$html .= ' '.$key.'="'.$value.'"';
 		}
+		//añade los atributos de tipo plain
+		foreach ($this->plain_attributes as $plain_attribute) {
+			$html .= ' '.$plain_attribute;
+		}
 		//verifica si cierra, entonces puede tener valor e hijos.
 		if ($this->closure) {
 			$html .= '>';
 			//Renderiza a los hijos
-			foreach ($this->childs as $child) {
-				$html .= $child->render();
-			}
+			$html .= implode('', $this->childs);
+//			foreach ($this->childs as $child) {
+//				$html .= $child->render();
+//			}
 			//Agrega el valor
 			$html .= $this->value;
 			//Cierra el tag

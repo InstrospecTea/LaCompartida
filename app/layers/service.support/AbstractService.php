@@ -3,32 +3,46 @@
 abstract class AbstractService implements BaseService{
 
     var $sesion;
+    private $loadedClass = array();
 
     public function __construct(Sesion $sesion) {
         $this->sesion = $sesion;
+		$this->loadDAO($this->getDaoLayer());
     }
 
-    public function saveOrUpdate($object) {
+	/**
+	 * @param $object
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function saveOrUpdate($object) {
         $this->checkNullity($object);
         $this->checkClass($object, $this->getClass());
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
         try {
             return $dao->saveOrUpdate($object);
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        } catch (CouldNotAddEntityException $ex) {
+            throw new ServiceException($ex);
+        } catch (CouldNotUpdateEntityException $ex) {
+	        throw new ServiceException($ex);
         }
 
     }
 
-    public function get($id) {
+	/**
+	 * @param $id
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function get($id) {
         $this->checkNullity($id);
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
         try {
             return $dao->get($id);
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        } catch (CouldNotFindEntityException $ex) {
+            throw new ServiceException($ex);
         }
     }
 
@@ -42,15 +56,19 @@ abstract class AbstractService implements BaseService{
         }
     }
 
-    public function delete($object) {
+	/**
+	 * @param $object
+	 * @throws ServiceException
+	 */
+	public function delete($object) {
         $this->checkNullity($object);
         $this->checkClass($object, $this->getClass());
         $daoClass = $this->getDaoLayer($this->sesion);
         $dao = new $daoClass($this->sesion);
         try{
             $dao->delete($object);
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        } catch (CouldNotDeleteEntityException $ex) {
+            throw new ServiceException($ex);
         }
     }
 
@@ -58,11 +76,12 @@ abstract class AbstractService implements BaseService{
      * Comprueba si un objeto es parte de la jerarquía de clases definida en la capa.
      * @param $object Objeto que se comprobará.
      * @param $className string Jerarquía de clases a la que debe pertenecer.
-     * @throws Exception Cuando no pertenece a la jerarquía de clases correspondiente.
+     * @throws ServiceException Cuando no pertenece a la jerarquía de clases correspondiente.
      */
     protected function checkClass($object, $className) {
         if (!is_a($object, $className)) {
-            throw new Exception('Dao Exception: El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
+            throw new ServiceException('Dao Exception: El objeto entregado no
+             pertenece ni hereda a la clase definida en DAO.');
         }
     }
 
@@ -70,12 +89,31 @@ abstract class AbstractService implements BaseService{
      * Comprueba si un objeto es nulo o está vacío. Esto es necesario para arrojar la excepción correspondiente para cuando
      * sean realizadas operaciones de CRUD.
      * @param $object
-     * @throws Exception
+     * @throws ServiceException
      */
     protected function checkNullity($object) {
         if (empty($object)) {
-            throw new Exception('El identificador que está siendo utilizado para obtener el objeto '.$this->getClass().' está vacío o es nulo.');
+            throw new ServiceException('El identificador que está siendo utilizado para obtener el objeto
+            '.$this->getClass().' está vacío o es nulo.');
         }
     }
 
+	/**
+	 * Carga un DAO al vuelo
+	 * @param      $classname
+	 * @param null $alias
+	 */
+	protected function loadDAO($classname, $alias = null) {
+		if (!preg_match('/DAO$/', $classname)) {
+			$classname = "{$classname}DAO";
+		}
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->sesion);
+		$this->loadedClass[] = $alias;
+	}
 }
