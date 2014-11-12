@@ -17,8 +17,7 @@ abstract class AppShell {
 	 * @param string $text
 	 */
 	public function out($text) {
-		$me = get_class($this);
-		printf("%s: %s\n", $me, print_r($text, true));
+		echo "{$text}\n";
 	}
 
 	/**
@@ -48,7 +47,9 @@ abstract class AppShell {
 	 */
 	protected function debug($text) {
 		if ($this->debug) {
-			$this->out($text);
+			$bt = debug_backtrace();
+			$caller = array_shift($bt);
+			$this->out("L[{$caller['line']}] " . print_r($text, true));
 		}
 	}
 }
