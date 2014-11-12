@@ -1095,8 +1095,6 @@ HTML;
 		if ($monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini)) {
 			$monto_ini = (double) 0;
 		}
-		//FFF: no se debe redondear antes de hacer la división, la siguiente linea generaba un error:
-		$monto_ini = number_format($monto_ini, $decimales1, ".", "");
 
 		if ($tipo_cambio1 == $tipo_cambio2) {// si no es el mismo tipo de moneda, que haga el calculo
 			$monto_fin = $monto_ini;
