@@ -28,4 +28,4 @@ if ($hasFields && (method_exists($prmClass, 'ListarExt'))) {
   $list = $PrmPrm->Listar($queryExtra);
 }
 
-echo json_encode(UtilesApp::utf8izar($list));
+echo empty($list) ? '{}' : json_encode(UtilesApp::utf8izar($list));

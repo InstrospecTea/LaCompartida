@@ -3,6 +3,8 @@
 <div id="dialog-confirm" style="display:none;" ></div>  
 <div id="lttooltip"></div>
 <script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.js"></script>
+<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/chosen.css" />
+<script type="text/javascript" src="//static.thetimebilling.com/js/chosen.jquery.min.js"></script>
 <script type="text/javascript">
 /* <![CDATA[   */
 <?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_footer_popup') : false; ?>

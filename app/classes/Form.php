@@ -139,6 +139,29 @@ class Form {
 	}
 
 	/**
+	 *
+	 * @param type $name
+	 * @param type $options Array
+	 * @param type $selected Array
+	 * @param type $container
+	 * @param type $container_attrs
+	 * @return type
+	 */
+	public function checkbox_group($name, $options, $selected, $container = 'div', $container_attrs = null) {
+		$html = '';
+		foreach ((Array) $options as $value => $element) {
+			$attrs['id'] = $this->Utiles->pascalize($name);
+			$attrs['label'] = is_array($element) ? $element['glosa'] : $element;
+			$html .= $this->checkbox($name, $element, in_array($value, $selected), $attrs);
+		}
+		if ($container !== false) {
+			$html = $this->Html->tag($container, $html, (Array) $container_attrs);
+		}
+		return $html;
+	}
+
+
+	/**
 	 * Devuelve elemento radio
 	 * @param type $name
 	 * @param type $value

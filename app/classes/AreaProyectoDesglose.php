@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-class AreaProyectoDesglose extends Objeto {
+class AreaProyectoDesglose extends ObjetoExt {
   
   function AreaProyectoDesglose($Sesion, $fields = '', $params = '') {
     $this->tabla = 'prm_area_proyecto_desglose';

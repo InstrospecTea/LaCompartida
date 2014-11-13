@@ -969,6 +969,46 @@ class Asunto extends Objeto {
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
 	}
+
+
+	/**
+		 * Método que realiza la escritura del desglose de áreas para el asunto
+		 * @param $details Array que contiene los Ids de desgloses de áreas a agregar
+		 */
+	public function writeAreaDetails($details) {
+		$sql = "DELETE FROM `asunto_area_proyecto_desglose` WHERE id_asunto=:id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $this->fields[$this->campo_id]);
+		if ($Statement->execute()) {
+			if (is_null($details) || empty($details)){
+				return;
+			}
+			foreach($details as $id_area_proyecto_desglose) {
+				$sql = "INSERT INTO `asunto_area_proyecto_desglose`
+				SET id_asunto=:id_asunto, id_area_proyecto_desglose=:id_area_proyecto_desglose";
+				$Statement = $this->sesion->pdodbh->prepare($sql);
+				$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+				$Statement->bindParam('id_area_proyecto_desglose', $id_area_proyecto_desglose);
+				$Statement->execute();
+			}
+		}
+	}
+
+
+	/**
+		 * Método que realiza la escritura del desglose de áreas para el asunto
+		 * @param $details Array que contiene los Ids de desgloses de áreas a agregar
+		 */
+	public function getAreaDetails() {
+		$sql = "SELECT `asunto_area_proyecto_desglose`.`id_area_proyecto_desglose`
+			FROM `asunto_area_proyecto_desglose`
+			WHERE `asunto_area_proyecto_desglose`.`id_asunto`=:id_asunto";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+		$Statement->execute();
+		$details = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+		return $details;
+	}
 }
 
 class ListaAsuntos extends Lista {

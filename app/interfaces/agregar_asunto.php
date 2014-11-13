@@ -420,8 +420,10 @@ if ($opcion == 'guardar') {
 				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
 
-				if ($Asunto->Write())
+				if ($Asunto->Write()) {
+					$Asunto->writeAreaDetails($id_desglose_area);
 					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+				}
 				else
 					$Pagina->AddError($Asunto->error);
 
@@ -457,6 +459,7 @@ if ($opcion == 'guardar') {
 			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 			$Asunto->Edit("id_contrato_indep", null);
 			if ($Asunto->Write()) {
+				$Asunto->writeAreaDetails($id_desglose_area);
 				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito'));
 				$ContratoObj = new Contrato($Sesion);
 				$ContratoObj->Load($Contrato_indep);
@@ -1005,37 +1008,43 @@ function MuestraPorValidacion(divID) {
 									array('class' => 'span3', 'style' => 'display:inline'), 
 									array(
 										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
-										'onLoad' => '
-											var element = selected_IdAreaProyecto;
-											jQuery("#desglose_area").hide();
-											if (element && element.requiere_desglose == "1") {
-												jQuery("#desglose_area").show();
-											} else {
-												jQuery("#desglose_area").val("");
-											}
-										',
 										'onChange' => '
 											var element = selected_IdAreaProyecto;
-											jQuery("#desglose_area").hide();
-											jQuery("#desglose_area").val("");
+											jQuery("#id_desglose_area_container").hide();
+											jQuery("#desglose_area").hide()
 											if (element && element.requiere_desglose == "1") {
-												jQuery("#desglose_area").show();
+												jQuery("#id_desglose_area_container").show();
+												FormSelectHelper.reload_id_desglose_area();
 											}
 										'
 									)
 								);
 								?>
-							&nbsp;
-							<?php echo $AutocompleteHelper->simple_complete('desglose_area', 
-									$Asunto->fields['desglose_area'], 
-									array('size' => '30', 'label' => false, 'placeholder' => 'Desglose Área', 'style' => 'display:none', 'id' => 'desglose_area'), 
-									array(
-										'source' => "ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1",
-										'onSource' => '
-											source = source + "&q=id_area_proyecto:" + jQuery("#IdAreaProyecto").val();
-										'
-									)
-								);
+						
+								<?php echo $SelectHelper->checkboxes(
+										'id_desglose_area', 
+										array(),
+									 	$Asunto->getAreaDetails(),
+									 	array('class' => 'span6', 'style' => 'display:inline'),
+									 	array(
+										 	'autoload' => false,
+											'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
+											'onSource' => '
+												source = source + "&q=id_area_proyecto:" + jQuery("#IdAreaProyecto").val();
+											',
+											'onChange' => '
+												var element = selected_id_desglose_area;
+												if (element && element.requiere_desglose == "1") {
+													if (checked) {
+														jQuery("#desglose_area").show();
+													} else {
+														jQuery("#desglose_area").val("").hide();
+													}
+												} 
+											'
+										)
+									); 
+								echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
 								?>
 							</td>
 						</tr>

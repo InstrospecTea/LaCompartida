@@ -10565,11 +10565,22 @@ QUERY;
 				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
 				`id_area_proyecto` int(11) NOT NULL,
 				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
 				`orden` int(11) NOT NULL DEFAULT '0',
 				PRIMARY KEY (`id_area_proyecto_desglose`),
 				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
 				CONSTRAINT `fk_prm_area_proyecto_id` 
 				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_area_proyecto_desglose` (
+				`id_asunto` INT(11) NOT NULL,
+				`id_area_proyecto_desglose` INT(11) NOT NULL,
+				INDEX `fk_asunto_area_proyecto_desglose` (`id_asunto` ASC),
+				INDEX `fk_prm_rea_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
+				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`) 
+					REFERENCES `asunto` (`id_asunto`),
+				CONSTRAINT `fk_prm_rea_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`) 
+					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`));";
 
 			ejecutar($queries, $dbh);
 			break;
