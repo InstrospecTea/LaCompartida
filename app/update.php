@@ -10549,6 +10549,12 @@ QUERY;
 			break;
 
 		case 7.85:
+			$queries = array();
+			$queries[] = "ALTER TABLE `usuario`
+				CHANGE COLUMN `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0,
+				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
+			break;
+		case 7.86:
 			$queries[] = "ALTER TABLE trabajo_historial ADD fecha_accion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;";
 			$queries[] = "UPDATE trabajo_historial SET fecha_accion = fecha;";
 			$queries[] = "ALTER TABLE trabajo_historial DROP COLUMN fecha;";

@@ -1597,7 +1597,7 @@ if (!class_exists('Cobro')) {
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites(), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 
-			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_origina && $cobro_total_honorario_cobrable != 0) {
+			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_original && $cobro_total_honorario_cobrable != 0) {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			} else {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));

@@ -38,15 +38,24 @@ if ($opc == 'asuntos_liquidar') {
 	require_once Conf::ServerDir() . '/interfaces/asuntos_liquidar_xls.php';
 	exit;
 } elseif ($opc == 'buscar') {
-	if ($cobros_generado)
+	if ($cobros_generado) {
 		$pagina->AddInfo(__('Cobros generado con &eacute;xito'));
-	else if ($cobros_emitidos)
+	}
+	else if ($cobros_emitidos) {
 		$pagina->AddInfo(__('Cobros emitidos con &eacute;xito'));
+	}
 	if ($codigo_cliente_secundario) {
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
 		$codigo_cliente = $cliente->fields['codigo_cliente'];
 	}
+
+	if ($codigo_asunto_secundario) {
+		$asunto = new Asunto($sesion);
+		$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
+		$codigo_asunto = $asunto->fields['codigo_asunto'];
+	}
+
 	if ($codigo_cliente) {
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigo($codigo_cliente);
@@ -54,24 +63,32 @@ if ($opc == 'asuntos_liquidar') {
 	}
 
 	$where = 1;
-	if ($activo)
+	if ($activo) {
 		$where .= " AND contrato.activo = 'SI' ";
-	else
+	} else {
 		$where .= " AND contrato.activo = 'NO' ";
-	if ($id_usuario)
+	}
+	if ($id_usuario) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
-	if ($id_usuario_secundario)
+	}
+	if ($id_usuario_secundario) {
 		$where .= " AND contrato.id_usuario_secundario = '$id_usuario_secundario' ";
-	if ($codigo_asunto)
+	}
+	if ($codigo_asunto) {
 		$where .= " AND asunto.codigo_asunto ='" . $codigo_asunto . "' ";
-	if ($codigo_cliente)
+	}
+	if ($codigo_cliente) {
 		$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
-	if ($id_grupo_cliente)
+	}
+	if ($id_grupo_cliente) {
 		$where .= " AND (cliente.id_grupo_cliente = '$id_grupo_cliente' OR grupo_cliente.id_grupo_cliente = '$id_grupo_cliente' )";
-	if ($forma_cobro)
+	}
+	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
-	if ($tipo_liquidacion) //1-2 = honorarios-gastos, 3 = mixtas
+	}
+	if ($tipo_liquidacion) {//1-2 = honorarios-gastos, 3 = mixtas
 		$where .= " AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
+	}
 
 	$mostrar_codigo_asuntos = "";
 
@@ -417,14 +434,14 @@ if ($opc == 'buscar') {
 
 												// Si hay liquidaciones de gastos y no se ha elegido "solo honorarios"
 												if (arrayGG[0] && !jQuery('#radio_honorarios').is(':checked')) {
-													jQuery.ajax({url: arrayGG[1]}).complete(function(data) {
+													jQuery.ajax({url: arrayGG[0]}).complete(function(data) {
 														jQuery('#respuestagg').html('Procesando ' + 1 + ' de ' + largoGG + ' liquidaciones de gastos');
 														generaGG(1);
 													});
 												}
 												// Si hay liquidaciones de honorarios y no se ha elegido "solo gastos"
 												if (arrayHH[0] && !jQuery('#radio_gastos').is(':checked')) {
-													jQuery.ajax({url: arrayHH[1]}).complete(function(data) {
+													jQuery.ajax({url: arrayHH[0]}).complete(function(data) {
 														jQuery('#respuestahh').html('Procesando ' + 1 + ' de ' + largoHH + ' liquidaciones de honorarios');
 														generaHH(1);
 													});
