@@ -331,6 +331,8 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
 		$Asunto->Edit("id_encargado2", !empty($id_encargado2) ? $id_encargado2 : "NULL");
 		$Asunto->Edit("contacto", $asunto_contacto);
+		$Asunto->Edit("contraparte", $contraparte);
+		$Asunto->Edit("cotizado_con", $cotizado_con);
 		$Asunto->Edit("fono_contacto", $fono_contacto);
 		$Asunto->Edit("email_contacto", $email_contacto);
 		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
@@ -1112,6 +1114,22 @@ function MuestraPorValidacion(divID) {
 								</td>
 							</tr>';
 						<?php } ?>
+						<tr>
+							<td align="right">
+								<?php echo __('Contraparte') ?>
+							</td>
+							<td align="left">
+								<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<?php echo __('Cotizado conjuntamente con') ?>
+							</td>
+							<td align="left">
+								<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<?php echo __('Contacto solicitante') ?>

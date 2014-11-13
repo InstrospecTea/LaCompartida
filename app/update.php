@@ -10557,8 +10557,11 @@ QUERY;
 			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
 				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
 			}
-			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
-				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
+			if (!ExisteCampo('contraparte', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `contraparte` VARCHAR(255) NULL COMMENT 'este campo contiene un texto libre para el nombre de la contraparte' AFTER `contacto` ;";
+			}
+			if (!ExisteCampo('cotizado_con', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `cotizado_con` VARCHAR(255) NULL COMMENT 'contiene una descripción de otro asunto cotizado en conjunto' AFTER `contraparte` ;";
 			}
 			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
