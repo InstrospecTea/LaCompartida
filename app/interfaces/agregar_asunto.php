@@ -8,7 +8,6 @@ $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
-
 $tip_tasa = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
 $tip_suma = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de " . __('cobro') . " que no puede tener límites.";
 $tip_retainer = "El cliente compra un número de HH. El límite puede ser por horas o por un monto.";
@@ -324,6 +323,9 @@ if ($opcion == 'guardar') {
 		if (!is_null($desglose_area)) {
 			$Asunto->Edit("desglose_area", $desglose_area);
 		}
+		if (!is_null($giro)) {
+			$Asunto->Edit("giro", $giro);
+		}
 		$Asunto->Edit("id_idioma", $id_idioma);
 		$Asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
@@ -422,6 +424,7 @@ if ($opcion == 'guardar') {
 
 				if ($Asunto->Write()) {
 					$Asunto->writeAreaDetails($id_desglose_area);
+					$Asunto->writeEconomicActivities($id_asunto_giro);
 					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 				}
 				else
@@ -460,6 +463,7 @@ if ($opcion == 'guardar') {
 			$Asunto->Edit("id_contrato_indep", null);
 			if ($Asunto->Write()) {
 				$Asunto->writeAreaDetails($id_desglose_area);
+				$Asunto->writeEconomicActivities($id_asunto_giro);
 				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito'));
 				$ContratoObj = new Contrato($Sesion);
 				$ContratoObj->Load($Contrato_indep);
@@ -1056,7 +1060,35 @@ function MuestraPorValidacion(divID) {
 								<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
-
+						<tr>
+							<td align="right">
+								<?php echo __('Giro') ?>
+							</td>
+							<td align="left">						
+								<?php echo $SelectHelper->checkboxes(
+										'id_asunto_giro', 
+										array(),
+									 	$Asunto->getEconomicActivities(),
+									 	array('class' => 'span6', 'style' => 'display:inline'),
+									 	array(
+										 	'autoload' => true,
+											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
+											'onChange' => '
+												var element = selected_id_asunto_giro;
+												if (element && element.requiere_desglose == "1") {
+													if (checked) {
+														jQuery("#giro").show();
+													} else {
+														jQuery("#giro").val("").hide();
+													}
+												} 
+											'
+										)
+									); 
+								echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
+								?>
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<?php echo __('Usuario responsable'); ?>

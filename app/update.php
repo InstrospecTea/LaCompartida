@@ -10557,6 +10557,9 @@ QUERY;
 			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
 				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
 			}
+			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
+			}
 			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
 			}
@@ -10576,11 +10579,41 @@ QUERY;
 				`id_asunto` INT(11) NOT NULL,
 				`id_area_proyecto_desglose` INT(11) NOT NULL,
 				INDEX `fk_asunto_area_proyecto_desglose` (`id_asunto` ASC),
-				INDEX `fk_prm_rea_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
+				INDEX `fk_prm_area_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
 				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`) 
 					REFERENCES `asunto` (`id_asunto`),
-				CONSTRAINT `fk_prm_rea_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`) 
+				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`) 
 					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`));";
+
+			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
+				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
+				`id_area_proyecto` int(11) NOT NULL,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_area_proyecto_desglose`),
+				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
+				CONSTRAINT `fk_prm_area_proyecto_id` 
+				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_giro` (
+				`id_giro` int(11) NOT NULL AUTO_INCREMENT,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_giro`),
+				INDEX `fk_prm_giro_id` (`id_giro` ASC));";
+ 
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_giro` (
+				`id_asunto` INT(11) NOT NULL,
+				`id_giro` INT(11) NOT NULL,
+				INDEX `fk_asunto_asunto_giro` (`id_asunto` ASC),
+				INDEX `fk_prm_giro_asunto_giro` (`id_giro` ASC),
+				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`) 
+					REFERENCES `asunto` (`id_asunto`),
+				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`) 
+					REFERENCES `prm_giro` (`id_giro`));";
 
 			ejecutar($queries, $dbh);
 			break;

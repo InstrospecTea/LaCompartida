@@ -1791,7 +1791,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								echo $AutocompleteHelper->simple_complete('factura_giro', 
 									$contrato->fields['factura_giro'], 
 									array('size' => '50', 'label' => false), 
-									array('source' => "ajax/ajax_seleccionar_codigo.php?codigo=GIRO_CLIENTE")
+									array('source' => "ajax/ajax_prm.php?prm=Giro&q=requiere_desglose:0")
 								);
 							?>
 						<?php } ?>
