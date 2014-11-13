@@ -112,6 +112,27 @@ class Cliente extends Objeto {
 			)
 		),
 		array(
+			'field' => 'username_encargado',
+			'title' => 'Usuario Encargado',
+			'extras' => array(
+				'width' => 25
+			)
+		),
+		array(
+			'field' => 'nombre_encargado',
+			'title' => 'Usuario Encargado',
+			'extras' => array(
+				'width' => 25
+			)
+		),
+		array(
+			'field' => 'username',
+			'title' => 'Encargado Comercial',
+			'extras' => array(
+				'width' => 25
+			)
+		),
+		array(
 			'field' => 'username_secundario',
 			'title' => 'Encargado Secundario',
 			'extras' => array(
@@ -635,7 +656,8 @@ class Cliente extends Objeto {
 		return $datos;
 	}
 
-	public function QueryReporte($filtros = array()) {
+
+	public function QueryReporteCriteria($filtros = array()) {
 		extract($filtros);
 		$wheres = array();
 		if ($glosa_cliente != '') {
@@ -646,7 +668,7 @@ class Cliente extends Objeto {
 			$wheres[] = "cliente.codigo_cliente = '$codigo'";
 		}
 		if ($id_grupo_cliente > 0) {
-			$wheres[] = "cliente.id_grupo_cliente = " . $id_grupo_cliente;
+			$wheres[] = "cliente.id_grupo_cliente = $id_grupo_cliente";
 		}
 		if (!empty($fecha1)) {
 			$wheres[] = "cliente.fecha_creacion >= '" . Utiles::fecha2sql($fecha1) . "'";
@@ -660,59 +682,66 @@ class Cliente extends Objeto {
 		if (!empty($giro)) {
 			$wheres[] = "contrato.factura_giro LIKE '%$giro%'";
 		}
-
-		$where = empty($wheres) ? '' : (' WHERE ' . implode(' AND ', $wheres));
-		$query = "SELECT SQL_CALC_FOUND_ROWS
-				cliente.codigo_cliente as codigo_cliente,
-				cliente.codigo_cliente_secundario,
-				cliente.glosa_cliente,
-				grupo_cliente.glosa_grupo_cliente,
-				moneda.glosa_moneda,
-				CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario_nombre,
-				usuario.username,
-				CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1) as usuario_secundario_nombre,
-				usuario_secundario.username as username_secundario,
-				contrato.factura_razon_social,
-				contrato.factura_giro,
-				CONCAT(contrato.cod_factura_telefono,' ',contrato.factura_telefono) as telefono,
-				contrato.factura_direccion,
-				contrato.rut,
-				CONCAT_WS(' ',contrato.contacto,contrato.apellido_contacto) as contacto,
-				contrato.fono_contacto,
-				contrato.email_contacto,
-				contrato.direccion_contacto,
-				contrato.forma_cobro,
-				contrato.monto,
-				prm_cliente_referencia.glosa_cliente_referencia,
-				tarifa.glosa_tarifa,
-				contrato.id_moneda_monto,
-				cliente.fecha_creacion,
-				cliente.fecha_inactivo,
-				IF(cliente.activo = 1, 'Si', 'No') as activo,
-				moneda_monto.simbolo as simbolo_moneda,
-			    moneda_monto.cifras_decimales as decimales_moneda,
-				cuenta_banco.numero as n_cuenta,
-				cuenta_banco.glosa as glosa_banco
-			FROM cliente
-				LEFT JOIN grupo_cliente USING (id_grupo_cliente)
-				LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia
-				LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato
-				LEFT JOIN prm_moneda AS moneda ON contrato.id_moneda = moneda.id_moneda
-				LEFT JOIN prm_moneda AS moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
-				LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-				LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-				LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
-				LEFT JOIN cuenta_banco ON contrato.id_cuenta = cuenta_banco.id_cuenta
-			$where ORDER BY cliente.glosa_cliente ASC";
-
-		return $query;
-
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_select('cliente.codigo_cliente', 'codigo_cliente')
+			->add_select('cliente.codigo_cliente_secundario')
+			->add_select('cliente.glosa_cliente')
+			->add_select('grupo_cliente.glosa_grupo_cliente')
+			->add_select('moneda.glosa_moneda')
+			->add_select("CONCAT(usuario.nombre,' ',usuario.apellido1)", 'usuario_nombre')
+			->add_select('usuario.username')
+			->add_select("CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1)", 'usuario_secundario_nombre')
+			->add_select('usuario_secundario.username', 'username_secundario')
+			->add_select('contrato.factura_razon_social')
+			->add_select('contrato.factura_giro')
+			->add_select("CONCAT(contrato.cod_factura_telefono,' ',contrato.factura_telefono)", 'telefono')
+			->add_select('contrato.factura_direccion')
+			->add_select('contrato.rut')
+			->add_select("CONCAT_WS(' ',contrato.contacto,contrato.apellido_contacto)", 'contacto')
+			->add_select('contrato.fono_contacto')
+			->add_select('contrato.email_contacto')
+			->add_select('contrato.direccion_contacto')
+			->add_select('contrato.forma_cobro')
+			->add_select('contrato.monto')
+			->add_select('prm_cliente_referencia.glosa_cliente_referencia')
+			->add_select('tarifa.glosa_tarifa')
+			->add_select('contrato.id_moneda_monto')
+			->add_select('cliente.fecha_creacion')
+			->add_select('cliente.fecha_inactivo')
+			->add_select("IF(cliente.activo = 1, 'Si', 'No')", 'activo')
+			->add_select('moneda_monto.simbolo', 'simbolo_moneda')
+			->add_select('moneda_monto.cifras_decimales', 'decimales_moneda')
+			->add_select('cuenta_banco.numero', 'n_cuenta')
+			->add_select('cuenta_banco.glosa', 'glosa_banco')
+			->add_from('cliente')
+			->add_left_join_with('grupo_cliente', 'cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente')
+			->add_left_join_with('prm_cliente_referencia', 'cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia')
+			->add_left_join_with('contrato', 'cliente.id_contrato = contrato.id_contrato')
+			->add_left_join_with('prm_moneda AS moneda', 'contrato.id_moneda = moneda.id_moneda')
+			->add_left_join_with('prm_moneda AS moneda_monto', 'contrato.id_moneda_monto = moneda_monto.id_moneda')
+			->add_left_join_with('usuario', 'contrato.id_usuario_responsable = usuario.id_usuario')
+			->add_left_join_with('usuario as usuario_secundario', 'contrato.id_usuario_secundario = usuario_secundario.id_usuario')
+			->add_left_join_with('tarifa', 'contrato.id_tarifa=tarifa.id_tarifa')
+			->add_left_join_with('cuenta_banco', 'contrato.id_cuenta = cuenta_banco.id_cuenta')
+			->add_ordering('cliente.glosa_cliente');
+		if (!empty($wheres)) {
+			$Criteria->add_restriction(CriteriaRestriction::and_clause($wheres));
+		}
+		if (Conf::GetConf($this->sesion, 'VerCampoUsuarioEncargado') != 1) {
+			if (!Conf::GetConf($this->sesion, 'EncargadoSecundario')) {
+				if (Conf::GetConf($this->sesion, 'AtacheSecundarioSoloAsunto') == 0) {
+					$Criteria->add_select("CONCAT(usuario_encargado.nombre,' ',usuario_encargado.apellido1)", 'nombre_encargado')
+						->add_select('usuario_encargado.username', 'username_encargado')
+						->add_left_join_with('usuario as usuario_encargado', 'cliente.id_usuario_encargado = usuario_encargado.id_usuario');
+				}
+			}
+		}
+		return $Criteria;
 	}
 
 	public function DownloadExcel($filtros = array()) {
-		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
-		$statement->execute();
-		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$Criteria = $this->QueryReporteCriteria($filtros);
+		$results = $Criteria->run();
 
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
