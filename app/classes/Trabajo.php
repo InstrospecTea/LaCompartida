@@ -134,7 +134,7 @@ class Trabajo extends Objeto
 		return $duracion[0];
 	}
 
-	function InsertarTrabajoTarifa($app_id = null) {
+	function InsertarTrabajoTarifa() {
 		$id_trabajo = $this->fields['id_trabajo'];
 		$codigo_asunto = $this->fields['codigo_asunto'];
 		$id_usuario = $this->fields['id_usuario'];
@@ -174,7 +174,7 @@ class Trabajo extends Objeto
 
 			if ($contrato->fields['id_moneda'] == $id_moneda) {
 				$this->Edit("tarifa_hh", $valor);
-				$this->Write(true, $app_id);
+				$this->Write();
 			}
 		}
 	}
@@ -1022,7 +1022,7 @@ class Trabajo extends Objeto
 
 		$this->Edit('tarifa_hh', $data['rate']);
 
-		if ($this->Write(true, $data['app_id'])) {
+		if ($this->Write()) {
 			if (!empty($data['user_id'])) {
 				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`= 0 WHERE `user`.`id_usuario`=:user_id";
 				$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -1031,7 +1031,7 @@ class Trabajo extends Objeto
 			}
 
 			if ($update_rate_work == true) {
-				$this->InsertarTrabajoTarifa($data['app_id']);
+				$this->InsertarTrabajoTarifa();
 			}
 
 			return true;

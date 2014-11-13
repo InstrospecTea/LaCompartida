@@ -412,6 +412,7 @@ function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $
 
 function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id) {
 	$sesion = new Sesion();
+	$_SESSION['app_id'] = $app_id;
 
 	if ($usuario == '' || $password == '') {
 		return new soap_fault('Client', '', 'Debe entregar el usuario y el password.', '');
@@ -492,7 +493,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		if (!$trabajo->Write()) {
 			return new soap_fault('Client', '', mysql_error() . ". Query: $query", '');
 		} else {
-			$trabajo->InsertarTrabajoTarifa($app_id);
+			$trabajo->InsertarTrabajoTarifa();
 			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
