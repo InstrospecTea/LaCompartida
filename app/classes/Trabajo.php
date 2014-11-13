@@ -53,7 +53,6 @@ class Trabajo extends Objeto
 		if (!$this->Check()) {
 			return false;
 		}
-
 		$workService = new WorkService($this->sesion);
 		$work = new Work();
 		$work->fillFromArray($this->fields);
@@ -1022,6 +1021,8 @@ class Trabajo extends Objeto
 		}
 
 		$this->Edit('tarifa_hh', $data['rate']);
+
+		pr('asd');
 
 		if ($this->Write(true, $data['app_id'])) {
 			if (!empty($data['user_id'])) {

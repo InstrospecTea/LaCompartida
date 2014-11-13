@@ -10553,7 +10553,7 @@ QUERY;
 			break;
 
 		case 7.86:
-			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NOT NULL DEFAULT '0000-00-00' ;";
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NULL DEFAULT NULL ;";
 			break;
 	}
 	if (!empty($queries)) {

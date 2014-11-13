@@ -6,9 +6,6 @@
  */
 class Work extends LoggeableEntity {
 
-	function __construct() {
-		$this->set('cobrable', '0');
-	}
     /**
      * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
      * @return string
