@@ -1022,11 +1022,9 @@ class Trabajo extends Objeto
 
 		$this->Edit('tarifa_hh', $data['rate']);
 
-		pr('asd');
-
 		if ($this->Write(true, $data['app_id'])) {
 			if (!empty($data['user_id'])) {
-				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`=0 WHERE `user`.`id_usuario`=:user_id";
+				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`= 0 WHERE `user`.`id_usuario`=:user_id";
 				$Statement = $this->sesion->pdodbh->prepare($sql);
 				$Statement->bindParam('user_id', $data['user_id']);
 				$Statement->execute();
