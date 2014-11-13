@@ -274,7 +274,7 @@ class ReporteHistorialMovimientos
 			case 'trabajo':
 
 				$reportCriteria
-					->add_select($table_name.'.fecha', 'fecha_accion')
+					->add_select($table_name.'.fecha_accion', 'fecha_accion')
 					->add_select_not_null($table_name.'.'.'descripcion', 'descripcion')
 					->add_select_not_null($table_name.'.'.'descripcion_modificado', 'descripcion_modificado')
 					->add_select_not_null($table_name.'.'.'duracion_cobrada', 'duracion_cobrada')

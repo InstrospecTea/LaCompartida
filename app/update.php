@@ -10549,11 +10549,9 @@ QUERY;
 			break;
 
 		case 7.85:
-			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha` `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ;";
-			break;
-
-		case 7.86:
-			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NULL DEFAULT NULL ;";
+			$queries[] = "ALTER TABLE trabajo_historial ADD fecha_accion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;";
+			$queries[] = "UPDATE trabajo_historial SET fecha_accion = fecha;";
+			$queries[] = "ALTER TABLE trabajo_historial DROP COLUMN fecha;";
 			break;
 	}
 	if (!empty($queries)) {
@@ -10566,7 +10564,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.86;
+$max_update = 7.85;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
