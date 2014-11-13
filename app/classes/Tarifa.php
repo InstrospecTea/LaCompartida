@@ -23,6 +23,13 @@ class Tarifa extends Objeto {
 		return $this->Load($id);
 	}
 
+	function LoadByGlosa($glosa) {
+		$query = "SELECT id_tarifa FROM tarifa WHERE glosa_tarifa = '$glosa'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($id) = mysql_fetch_array($resp);
+		return $this->Load($id);
+	}
+
 	// Cargar la tarifa por defecto
 	function LoadDefault() {
 		$query = " SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1";
