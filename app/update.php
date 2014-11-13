@@ -10555,9 +10555,7 @@ QUERY;
 				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
 			break;
 		case 7.86:
-			$queries[] = "ALTER TABLE trabajo_historial ADD fecha_accion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;";
-			$queries[] = "UPDATE trabajo_historial SET fecha_accion = fecha;";
-			$queries[] = "ALTER TABLE trabajo_historial DROP COLUMN fecha;";
+			$queries[] = "ALTER TABLE trabajo_historial CHANGE COLUMN fecha fecha_accion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;";
 			break;
 	}
 	if (!empty($queries)) {
