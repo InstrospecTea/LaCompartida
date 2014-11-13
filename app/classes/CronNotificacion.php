@@ -179,7 +179,7 @@ class CronNotificacion extends Cron {
 							AND ( usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM' )
 						LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
 						WHERE activo = 1
-							AND alerta_revisor = 1
+							AND (alerta_revisor = 1 OR usuario_permiso.codigo_permiso = 'ADM')
 						GROUP BY usuario.id_usuario
 						HAVING 1 $having";
 		$resultados = $this->query($query);
