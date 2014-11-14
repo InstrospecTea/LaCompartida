@@ -112,6 +112,8 @@ class UtilesApp extends Utiles {
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 			}
 		}
+		$Form = new Form;
+		echo $Form->error_label(Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente');
 	}
 
 	/**
@@ -145,6 +147,8 @@ class UtilesApp extends Utiles {
 				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto', 'glosa_asunto', 'codigo_asunto', $codigo_asunto, '', $oncambio, $width, $codigo_cliente);
 			}
 		}
+		$Form = new Form;
+		echo $Form->error_label(Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto');
 	}
 
 	public static function FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato = '', $width = 320) {
@@ -1091,8 +1095,6 @@ HTML;
 		if ($monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini)) {
 			$monto_ini = (double) 0;
 		}
-		//FFF: no se debe redondear antes de hacer la división, la siguiente linea generaba un error:
-		$monto_ini = number_format($monto_ini, $decimales1, ".", "");
 
 		if ($tipo_cambio1 == $tipo_cambio2) {// si no es el mismo tipo de moneda, que haga el calculo
 			$monto_fin = $monto_ini;
@@ -1911,7 +1913,7 @@ HTML;
 			'subtotal_gastos_solo_provision' => $subtotal_gastos_solo_provision,
 			'subtotal_gastos_sin_provision' => $subtotal_gastos_sin_provision,
 			'subtotal_gastos_diff_con_sin_provision' => $subtotal_gastos_solo_provision + $subtotal_gastos_sin_provision);
-		
+
 		return $resultados;
 	}
 

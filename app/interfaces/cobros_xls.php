@@ -970,9 +970,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	}
 
 	if (in_array($cobro->fields['estado'], array('EMITIDO', 'FACTURADO'))) {
-		$mes_concepto = ucfirst(Utiles::sql3fecha($cobro->fields['fecha_fin'], '%B %Y'));
+		if ($lang == 'es') {
+			$mes_concepto = ucfirst(Utiles::sql3fecha($cobro->fields['fecha_fin'], '%B %Y'));
+		} else {
+			$mes_concepto = date('F Y', strtotime($cobro->fields['fecha_fin']));
+		}
+
 		$concepto = Utiles::GlosaMult($sesion, 'concepto_glosa', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo');
 		$concepto = sprintf($concepto, $mes_concepto);
+
 		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'concepto', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $concepto, $formato_encabezado);

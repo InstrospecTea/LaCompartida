@@ -22,11 +22,14 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	}
 
 	public function main() {
+		$Session = new Sesion(null, true);
 		$clients = array();
+
+		$this->debug('Start: ' . date('Y-m-d H:i:s'));
 
 		// Declare the SQL statement that will query the database
 		// SELECT TOP 1
-		// WHERE OCRD.CardCode = 'CBSLP00020'
+		// WHERE OCRD.CardCode = 'CBSSC00001'
 		$query =
 			"SELECT
 				OCRD.CardCode AS 'client_code',
@@ -51,7 +54,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCPR.LastName AS 'applicant_last_name',
 				OCPR.Tel1 AS 'applicant_phone',
 				OCPR.E_MailL AS 'applicant_email',
-				OCRD.U_Tarifa AS 'charging_data_rate',
+				OPRJ.U_Tarifa AS 'charging_data_rate',
 				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonHonor AS 'charging_data_currency_fees',
@@ -74,7 +77,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		$clients = $this->dbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
 		if (!$this->_empty($clients)) {
-			$Session = new Sesion(null, true);
 			$currency_base_id = Moneda::GetMonedaBase($Session);
 			$clients = UtilesApp::utf8izar($clients, false);
 
@@ -143,8 +145,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$billing_form = $this->_empty($client['charging_data_billing_form']) ? 'FLAT FEE' : $client['charging_data_billing_form'];
 
 				$Rate = new Tarifa($Session);
+
+				// Find by name
 				if (!$this->_empty($client['charging_data_rate'])) {
-					$Rate->LoadById($client['charging_data_rate']);
+					$Rate->LoadByGlosa($client['charging_data_rate']);
 				} else {
 					$Rate->LoadDefault(); // Find rate by default
 				}
@@ -316,6 +320,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		}
 
 		$this->debug('Finished!');
+		$this->debug('End: ' . date('Y-m-d H:i:s'));
 	}
 
 	private function _empty($var) {
