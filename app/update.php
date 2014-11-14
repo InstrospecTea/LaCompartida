@@ -10566,7 +10566,10 @@ QUERY;
 			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
 			}
-
+			if (!ExisteCampo('id_pais', 'grupo_cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `grupo_cliente` ADD `id_pais` int(11) NULL;";
+			}
+			
 			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
 				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
 				`id_area_proyecto` int(11) NOT NULL,

@@ -77,7 +77,7 @@ class FormSelectHelper {
         var data_$name = [];
         var selected_$name = {};
         var selected_values_$name = $selected_values;
-        FormSelectHelper.reload_$name = function() {
+        FormSelectHelper.reload_$name = function(callback) {
           var source = "$source";
           $onSource;
           jQuery.post(source, {}, 
@@ -103,6 +103,9 @@ class FormSelectHelper {
                 }
               }
               $onLoad
+              if (callback) { 
+                callback()
+              }
             }, 
           "json");
         }
@@ -127,15 +130,17 @@ SCRIPT;
     $onSource = $options['onSource'] ? $options['onSource'] : '';
     $source = $options['source'] ? $options['source'] : '';
     $extra_script = $options['multiple'] ? "jQuery('#{$name}').chosen()" : '';
+    $selected_name = $options['selectedName'] ? $options['selectedName'] : 'selected_' . $name;
     $script = <<<SCRIPT
       if (typeof FormSelectHelper == 'undefined') {
         var FormSelectHelper = {}
       }
       jQuery(document).ready(function() {
         var data_$name = [];
-        var selected_$name = {};
+        var $selected_name = {};
         FormSelectHelper.reload_$name = function() {
           var source = "$source";
+          var exists_selected = jQuery("#{$name}").val();
           $onSource;
           jQuery.post(source, {}, 
             function(data) {
@@ -143,13 +148,13 @@ SCRIPT;
               jQuery('#{$name}').empty().append(jQuery('<option/>'));
               for (key in data_$name) {
                 var option = jQuery('<option/>').val(key).text(data_{$name}[key].glosa || data_{$name}[key]);
-                if ('$selected' == key) {
+                if ('$selected' == key || exists_selected == key) {
                   option.attr('selected', 'selected')
-                  selected_$name = data_{$name}[key];
+                  $selected_name = data_{$name}[key];
                 }
                 jQuery('#{$name}').append(option);
               }
-              if (selected_$name) {
+              if ($selected_name) {
                 $onChange
               }
               $extra_script;
@@ -158,7 +163,7 @@ SCRIPT;
         }
         jQuery('#{$name}').change(function() {
           key = jQuery('#{$name} option:selected').val();
-          selected_$name = data_{$name}[key];
+          $selected_name = data_{$name}[key];
           $onChange
         });
         FormSelectHelper.reload_$name();

@@ -543,7 +543,99 @@ $pagina->PrintTop();
 					<div class="span2"><?php echo __('Grupo') ?></div>
 				</td>
 				<td class="al">
-					<?php echo Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], " class='span3' ", __('Ninguno')) ?>
+					<?php echo $SelectHelper->ajax_select(
+            'id_grupo_cliente',
+            $cliente->fields['id_grupo_cliente'], 
+            array('id' => 'id_grupo_cliente', 'class' => 'span3', 'style' => 'display:inline'), 
+            array(
+              'source' => 'ajax/ajax_prm.php?prm=GrupoCliente&single_class=1&fields=glosa_grupo_cliente,codigo_cliente,id_pais,id_grupo_cliente',
+              'selectedName' => 'selected_group',
+              'onLoad' => '
+                var element = selected_group;
+                jQuery("#edit_group").hide()
+                if (element && element.id_grupo_cliente) {
+                	jQuery("#edit_group").show()
+                }
+              ',
+              'onChange' => '
+                var element = selected_group;
+                jQuery("#edit_group").hide()
+                if (element && element.id_grupo_cliente) {
+                	jQuery("#edit_group").show()
+                }
+              '
+            )
+          );
+          ?>
+
+					<a href="#" id="add_group" ><img border="0" src="<?php echo Conf::ImgDir()?>/agregar.gif"></a>
+					<a href="#" id="edit_group" style="display:none;"><img border="0" src="<?php echo Conf::ImgDir()?>/editar_on.gif"></a>
+					<script>
+					jQuery(document).ready(function() {
+						var closeModalGrupo = function() {
+							jQuery('#guardar_grupo').closest('.ui-dialog-content').dialog('destroy').remove();
+						};
+
+						var saveGroup = function() { 
+							var url = '../../fw/tablas/ajax_tablas.php';
+							jQuery.post(url, jQuery('#formulario-grupo').serialize(), function(data) {
+								if (data.success) {
+									FormSelectHelper.reload_id_grupo_cliente();
+								} else {
+									alert('Ocurrio un error al guardar.');
+								}
+								closeModalGrupo();
+							}, 'json');
+              return false;
+            };
+
+            var deleteGroup = function(id) {
+            	if (!confirm('¿Está seguro de eliminar el grupo seleccionado?')) {
+            		return;
+            	}
+            	var url = '../../fw/tablas/ajax_tablas.php'; 
+            	jQuery('#formulario-grupo input[name="accion"]').val('eliminar_registro');
+							jQuery.post(url, jQuery('#formulario-grupo').serialize(), function(data) {
+								if (data.success) {
+									FormSelectHelper.reload_id_grupo_cliente();
+								} else {
+									alert('Ocurrio un error al eliminar. Quizá el grupo esté asociado a otro cliente');
+								}
+								closeModalGrupo();
+							}, 'json');
+              return false;
+            }
+
+            var editGroup = function(id) {
+							var url = 'editar_grupo.php';
+							jQuery.post(url, {'tabla': 'grupo_cliente', id: id}, function(html) {
+								jQuery('<div/>').html(html).dialog({title: 'Agregar/Modificar Grupo', width: 400, height: 300, modal: true});
+								jQuery('#guardar_grupo').click(function() {
+		              saveGroup();
+		            });
+		            jQuery('#cancelar_grupo').click(function() {
+		              closeModalGrupo();
+		            });
+		            jQuery('#eliminar_grupo').click(function() {
+		            	deleteGroup(jQuery('#id_grupo_cliente').val());
+		              closeModalGrupo();
+		            });
+							}, 'html');
+							return false;
+            };
+            
+						jQuery('#add_group').click(function() {
+							editGroup();
+							return false;
+						})
+
+						jQuery('#edit_group').click(function() {
+							editGroup(jQuery('#id_grupo_cliente').val());
+							return false;
+						});
+
+					});
+					</script>
 				</td>
 			</tr>
 
@@ -576,7 +668,6 @@ $pagina->PrintTop();
 				<td class="al">
 					<div class="span3">
 						<input type="text" name="fecha_creacion" class="span2 fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo $fecha_creacion; ?>"  />
-						<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_creacion" style="cursor:pointer" />
 					</div>
 
 				</td>
