@@ -10,6 +10,8 @@ if (isset($_POST['accion'])) {
     $accion = $_POST['accion'];
 }
 
+// TODO formato json
+
 switch ($accion) {
 
     case 'obtener_tags':

@@ -323,9 +323,9 @@ class CartaCobro extends NotaCobro {
         'SALTO_PAGINA' => array()
     );
 
-    function __construct($sesion, $fields, $ArrayFacturasDelContrato, $ArrayTotalesDelContrato) {
-        
+    function __construct($sesion, $fields = array(), $ArrayFacturasDelContrato = array(), $ArrayTotalesDelContrato = array()) {
         parent::__construct($sesion, $fields);
+
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
 
@@ -338,7 +338,7 @@ class CartaCobro extends NotaCobro {
 
         $Contrato = new Contrato($this->sesion);
         $Contrato->Load($this->fields['id_contrato']);
-        
+
         $this->template_data = array(
             'Cobro' => $this->fields,
             'Contrato' => $Contrato->fields,
@@ -376,7 +376,7 @@ class CartaCobro extends NotaCobro {
 
         $this->template_data['Idioma'] = $idioma->fields;
         $this->template_data['Moneda'] = $moneda->fields;
-        
+
         $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
@@ -1208,7 +1208,7 @@ class CartaCobro extends NotaCobro {
 
         $this->template_data['Idioma'] = $idioma->fields;
         $this->template_data['Moneda'] = $moneda->fields;
-        
+
         $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
@@ -2724,7 +2724,7 @@ class CartaCobro extends NotaCobro {
     }
 
     function RenderTemplate($template) {
-        
+
         if (!$this->twig) {
             $loader = new Twig_Loader_String();
             $this->twig = new Twig_Environment($loader);
@@ -2739,7 +2739,7 @@ class CartaCobro extends NotaCobro {
             $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
             list($id_cobro) = mysql_fetch_array($resp);
         }
-        
+
         $this->Load($id_cobro);
         $parser = new TemplateParser($template);
         return $this->GenerarEjemplo($parser);
