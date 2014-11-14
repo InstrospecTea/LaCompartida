@@ -756,6 +756,8 @@ class Cliente extends Objeto {
 		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username);
 		$SimpleReport->Config->columns['usuario_nombre']->Visible(!$usa_username);
 		$SimpleReport->Config->columns['usuario_secundario_nombre']->Visible(!$usa_username);
+		$SimpleReport->Config->columns['username_encargado']->Visible($usa_username);
+		$SimpleReport->Config->columns['nombre_encargado']->Visible(!$usa_username);
 
 		//swapear codigo y codigo_secundario
 		if(UtilesApp::GetConf($this->sesion, 'CodigoSecundario')){
