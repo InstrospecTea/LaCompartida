@@ -3318,7 +3318,7 @@ class NotaCobro extends Cobro {
 
 			case 'IMPUESTO': //GenerarDocumento
 				$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '%)', $html);
-				$html = str_replace('%impuesto_mta%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% )', $html);
+				$html = str_replace('%impuesto_mta%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '%)', $html);
 
 				if ($this->fields['tipo_cambio_moneda_base'] <= 0) {
 					$tipo_cambio_cobro_moneda_base = 1;
@@ -6500,13 +6500,13 @@ class NotaCobro extends Cobro {
 				if ($this->fields['porcentaje_impuesto'] > 0 && $this->fields['porcentaje_impuesto_gastos'] > 0 && $this->fields['porcentaje_impuesto'] != $this->fields['porcentaje_impuesto_gastos'])
 					$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% / ' . $this->fields['porcentaje_impuesto_gastos'] . '% )', $html);
 				else if ($this->fields['porcentaje_impuesto'] > 0)
-					$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% )', $html);
+					$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '%)', $html);
 				else if ($this->fields['porcentaje_impuesto_gastos'] > 0)
-					$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto_gastos'] . '% )', $html);
+					$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto_gastos'] . '%)', $html);
 				else
 					$html = str_replace('%impuesto%', '', $html);
 
-				$html = str_replace('%impuesto_mta%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% )', $html);
+				$html = str_replace('%impuesto_mta%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '%)', $html);
 
 				$impuesto_moneda_total = $x_resultados['monto_iva'][$this->fields['opc_moneda_total']];
 
@@ -11525,7 +11525,12 @@ class NotaCobro extends Cobro {
 			$_LANG = array();
 			include Conf::ServerDir() . "/lang/$lang_archivo";
 
-			$html = $NotaCobro->GeneraHTMLCobro(true);
+			// asignar formato detalle de carta según cobro
+			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
+
+			if (empty($html)) {
+				throw new Exception("HTML nulo o Vacio", 1);
+			}
 
 			$opc_papel = $NotaCobro->fields['opc_papel'];
 			$id_carta = $NotaCobro->fields['id_carta'];

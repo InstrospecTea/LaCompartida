@@ -1,6 +1,36 @@
 # Changelog
 
-* **Feature**: Agregar campos al cliente
+## Hotfix: 14.19.18
+Miércoles 12 de Noviembre 2014
+* **Fixed:** [Corregir cálculo cambio de moneda](https://github.com/LemontechSA/ttb/pull/752)
+
+## Hotfix: 14.19.17
+Martes 11 de Noviembre 2014
+* **Fixed:** [Modificar query para obtener tarifa en integración emba.](https://github.com/LemontechSA/ttb/pull/751)
+
+## Hotfix: 14.19.16
+Martes 11 de Noviembre 2014
+* **Fixed:** [Restablecimiento de filtros de interfaz en la generacion masiva de cobros. Corrige inicialización de mecanismo de generación masiva.](https://github.com/LemontechSA/ttb/pull/750)
+
+## Hotfix: 14.19.15
+Martes 11 de Noviembre 2014
+* **Fixed:** [Busqueda de tarifa según glosa en integración moreno baldivieso](https://github.com/LemontechSA/ttb/pull/749)
+
+## Hotfix: 14.19.14
+Lunes 10 de Noviembre 2014
+* **Fixed:** [Corregir formato detalle carta por defecto al generar borradores](https://github.com/LemontechSA/ttb/pull/748)
+
+## Hotfix: 14.19.13
+Viernes 7 de Noviembre 2014
+* **Fixed:** [Fix typo que echaba a perder el monto_thh](https://github.com/LemontechSA/ttb/pull/746)
+
+## Hotfix: 14.19.12
+Jueves 6 de Noviembre 2014
+* **New:** [Se eliminan los espacios en blanco en tags %](https://github.com/LemontechSA/ttb/pull/745)
+
+## Hotfix: 14.19.10
+Miercoles 5 de Noviembre 2014
+* **New:** [Agrega filtro Cobrable para los usuarios no revisores.](https://github.com/LemontechSA/ttb/pull/742)
 
 ## Hotfix: 14.19.9
 Jueves 30 de Octubre 2014

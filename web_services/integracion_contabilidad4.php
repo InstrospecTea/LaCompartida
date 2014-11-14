@@ -514,8 +514,8 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$query_actualiza = "UPDATE cobro SET fecha_contabilidad = NOW(), estado_contabilidad = '{$nuevo_estado}' WHERE id_cobro = '{$id_cobro}'";
 			$respuesta = mysql_query($query_actualiza, $Sesion->dbh) or Utiles::errorSQL($query_actualiza, __FILE__, __LINE__, $Sesion->dbh);
 
-			// $query_ingresa = "INSERT INTO log_contabilidad (id_cobro,timestamp) VALUES (" . $id_cobro . "," . $time . ");";
-			// $respuesta_in = mysql_query($query_ingresa, $Sesion->dbh) or Utiles::errorSQL($query_ingresa, __FILE__, __LINE__, $Sesion->dbh);
+			$query_ingresa = "INSERT INTO log_contabilidad (id_cobro, timestamp) VALUES ('{$id_cobro}', '{$time}');";
+			$respuesta_in = mysql_query($query_ingresa, $Sesion->dbh) or Utiles::errorSQL($query_ingresa, __FILE__, __LINE__, $Sesion->dbh);
 
 			$query_facturas = " SELECT
 				factura.id_factura,
