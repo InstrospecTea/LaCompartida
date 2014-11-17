@@ -573,7 +573,7 @@ $pagina->PrintTop();
 					<script>
 					jQuery(document).ready(function() {
 						var closeModalGrupo = function() {
-							jQuery('#guardar_grupo').closest('.ui-dialog-content').dialog('destroy').remove();
+							jQuery('#formulario-grupo').closest('.ui-dialog-content').dialog('destroy').remove();
 						};
 
 						var saveGroup = function() { 
