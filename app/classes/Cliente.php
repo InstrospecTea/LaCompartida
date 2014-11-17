@@ -727,16 +727,27 @@ class Cliente extends Objeto {
 		if (!empty($wheres)) {
 			$Criteria->add_restriction(CriteriaRestriction::and_clause($wheres));
 		}
-		if (Conf::GetConf($this->sesion, 'VerCampoUsuarioEncargado') != 1) {
-			if (!Conf::GetConf($this->sesion, 'EncargadoSecundario')) {
-				if (Conf::GetConf($this->sesion, 'AtacheSecundarioSoloAsunto') == 0) {
-					$Criteria->add_select("CONCAT(usuario_encargado.nombre,' ',usuario_encargado.apellido1)", 'nombre_encargado')
-						->add_select('usuario_encargado.username', 'username_encargado')
-						->add_left_join_with('usuario as usuario_encargado', 'cliente.id_usuario_encargado = usuario_encargado.id_usuario');
-				}
-			}
+		if ($this->mostrarUsuarioEncargado()) {
+			$Criteria->add_select("CONCAT(usuario_encargado.nombre,' ',usuario_encargado.apellido1)", 'nombre_encargado')
+				->add_select('usuario_encargado.username', 'username_encargado')
+				->add_left_join_with('usuario as usuario_encargado', 'cliente.id_usuario_encargado = usuario_encargado.id_usuario');
 		}
 		return $Criteria;
+	}
+
+	/**
+	 * Verifica si se debe mostrar la columna usuario_encargado
+	 * @return bool
+	 */
+	private function mostrarUsuarioEncargado() {
+		$result = false;
+		if (Conf::GetConf($this->sesion, 'VerCampoUsuarioEncargado') != 1 &&
+			!Conf::GetConf($this->sesion, 'EncargadoSecundario') &&
+			Conf::GetConf($this->sesion, 'AtacheSecundarioSoloAsunto') == 0
+		) {
+			$result = true;
+		}
+		return $result;
 	}
 
 	public function DownloadExcel($filtros = array()) {
@@ -756,8 +767,14 @@ class Cliente extends Objeto {
 		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username);
 		$SimpleReport->Config->columns['usuario_nombre']->Visible(!$usa_username);
 		$SimpleReport->Config->columns['usuario_secundario_nombre']->Visible(!$usa_username);
-		$SimpleReport->Config->columns['username_encargado']->Visible($usa_username);
-		$SimpleReport->Config->columns['nombre_encargado']->Visible(!$usa_username);
+		//usuario encargado
+		if ($this->mostrarUsuarioEncargado()) {
+			$SimpleReport->Config->columns['username_encargado']->Visible($usa_username);
+			$SimpleReport->Config->columns['nombre_encargado']->Visible(!$usa_username);
+		} else {
+			$SimpleReport->Config->columns['username_encargado']->Visible(false);
+			$SimpleReport->Config->columns['nombre_encargado']->Visible(false);
+		}
 
 		//swapear codigo y codigo_secundario
 		if(UtilesApp::GetConf($this->sesion, 'CodigoSecundario')){
