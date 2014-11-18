@@ -265,10 +265,10 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
 $Slim->map('/CargarTrabajoApp(/:callback)', 'CargarTrabajo')->via('GET', 'POST');
 $Slim->map('/CargarTrabajo(/:callback)', 'CargarTrabajo')->via('GET', 'POST');
 
-function getAppIdByAppKey($app_key) {
+function setAppIdByAppKey($app_key) {
 	global $sesion;
 	$UserToken = new UserToken($sesion);
-	return $UserToken->getAppIdByAppKey($app_key);
+	$_SESSION['app_id'] = $UserToken->getAppIdByAppKey($app_key);
 }
 
 function CargarTrabajo($callback = '') {
@@ -285,20 +285,12 @@ function CargarTrabajo($callback = '') {
 	$codigo_actividad = $Slim->request()->params('codigo_actividad');  // opcional, puede venir vacio, NO Cero
 	$area_trabajo = $Slim->request()->params('area_trabajo');  // opcional, puede venir vacio, NO Cero
 	$fecha = $Slim->request()->params('fecha');  // opcional, puede venir vacio, NO Cero
-	$app_id = getAppIdByAppKey($Slim->request()->params('app_key'));
+	setAppIdByAppKey($Slim->request()->params('app_key'));
 	if ($fecha == "")		$fecha = date('Y-m-d', strtotime($starttimer / 1000) + 86400);
-
-
-
-
-
-
 	if ($usuario == "" || $password == "") {
-
-		  $Slim->halt(401, '["Debe entregar el usuario y el password."]');
+		$Slim->halt(401, '["Debe entregar el usuario y el password."]');
 	} else if (!$sesion->VerificarPassword($usuario, $password)) {
-
-		  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+		$Slim->halt(401, '["Usuario o Password incorrectos"]');
 	}
 	if (!isset($id_usuario) || !$id_usuario) $id_usuario=$sesion->usuario->fields['id_usuario'];
 
@@ -383,7 +375,7 @@ $trabajo->Edit('descripcion', $descripcion);
 	$trabajo->Edit("fecha", $fecha); // si intenta ingresar un trabajo con fecha más antigua que su límite, lo ingresa con fecha de hoy
 	//$trabajo->Edit('fecha_creacion', date('Y-m-d H:i:s')); // el sistema le añade NOW de por si, mala cosa.
 
-	if ($trabajo->Write(true, $app_id)) {
+	if ($trabajo->Write(true)) {
 		try {
 		$sesion->pdodbh->exec("UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'");
 		} catch (Exception $e) {
