@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.22
+Martes 18 de Noviembre 2014
+* **Fixed:** [Revertir corrección cálculo cambio de moneda (falla con clientes sin modulo de facturación)](https://github.com/LemontechSA/ttb/pull/757)
+
 ## Hotfix: 14.19.21
 Martes 18 de Noviembre 2014
 * **Fixed:** [Revertir corrección cálculo cambio de moneda (falla con clientes sin modulo de facturación)](https://github.com/LemontechSA/ttb/pull/756)
