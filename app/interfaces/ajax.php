@@ -365,55 +365,19 @@ if ($accion == "consistencia_cliente_asunto") {
 
 	echo "OK";
 } else if ($accion == 'elimina_cobro') {
-	if ($id_cobro && $id_contrato) {
-		$cobros = new Cobro($sesion);
-
-		$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
-		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-		$cobro_eliminado = new Cobro($sesion);
-		if ($cobro_eliminado->Load($id_cobro)) {
-			$cobro_eliminado->Eliminar();
-		}
-
-		$query = "DELETE FROM cobro WHERE id_cobro = $id_cobro";
-		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-		#Tabla con datos..
-		$where = 1;
-
-		if ($fecha_ini != '') {
-			$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_ini) . "' ";
-		} elseif ($fecha_fin != '') {
-			$where .= " AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_fin) . "' ";
-		}
-
-		$query_cobros = "SELECT id_cobro,monto,fecha_ini,fecha_fin,prm_moneda.simbolo,prm_moneda.cifras_decimales, cobro.id_proceso
-												FROM cobro
-												JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-												WHERE $where AND id_contrato = '" . $id_contrato . "'
-												AND estado IN ( 'CREADO', 'EN REVISION' ) ORDER BY fecha_creacion ASC";
-		$resp = mysql_query($query_cobros, $sesion->dbh) or Utiles::errorSQL($query_cobros, __FILE__, __LINE__, $sesion->dbh);
-		$html .="<table width=100%><tr valign='middle'>
-							<td colspan=4 bgcolor='#CC3300'><span style='font-size:10px; color:#FFF;font-weight:bold'>Cobro eliminado con &eacute;xito</span></td></tr>"; #revisar tema de traducción, no queda bien la tilde
-		while ($cobro = mysql_fetch_array($resp)) {
-			$total_horas = $cobros->TotalHorasCobro($cobro['id_cobro']);
-			$texto_horas = $cobro['fecha_ini'] != '0000-00-00' ? __('desde') . ' ' . Utiles::sql2date($cobro['fecha_ini']) . ' ' . __('hasta') . ' ' . Utiles::sql2date($cobro['fecha_fin']) : __('hasta') . ' ' . Utiles::sql2date($cobro['fecha_fin']);
-			$html .= "<tr valign='middle'>
-															<td width=2%><img src='" . Conf::ImgDir() . "/color_rojo.gif' border=0></td>
-															<td align=center style='font-size:10px' width=5%>#" . $cobro['id_cobro'] . "</td>
-															<td align=left style='font-size:10px' width=85%>&nbsp;de " . $cobro['simbolo'] . ' ' . number_format($cobro['monto'], 2, ',', '.')
-				. ' por ' . $total_horas . ' Hrs. ' . $texto_horas . "</td>";
-			$html .= "<td align=center width=8%><img src='" . Conf::ImgDir() . "/coins_16.png' title='" . __('Continuar con el cobro') . "' border=0 style='cursor:pointer' onclick='self.location.href=\"cobros5.php?id_cobro=" . $cobro['id_cobro'] . "&popup=false\"'>&nbsp;";
-			$html .= "<img src='" . Conf::ImgDir() . "/cruz_roja.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro['id_cobro'] . "','" . $div . "','" . $id_contrato . "')\"></td></tr>";
-		}
-		$html .= "</tr>
-    						</table>";
-
-		echo $html;
-	} else {
-		return false;
+	$respuesta = array(
+		'error' => false,
+		'message' => __('Cobro eliminado con éxito') . '.'
+	);
+	$cobro_eliminado = new Cobro($sesion);
+	try {
+		$cobro_eliminado->Eliminar($id_cobro);
+	} catch (Exception $e) {
+		$respuesta['message'] = $e->getMessage() . '.';
 	}
+	$respuesta['message'] = utf8_encode($respuesta['message']);
+	echo json_encode($respuesta);
+
 } else if ($accion == 'update_contrato') {
 	if ($id_contrato) {
 		$query = "UPDATE contrato SET incluir_en_cierre = '$incluir_en_cierre' WHERE id_contrato = '$id_contrato' LIMIT 1";

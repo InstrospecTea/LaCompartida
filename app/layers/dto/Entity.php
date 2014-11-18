@@ -86,8 +86,6 @@ abstract class Entity {
 		}
 	}
 
-
-
 }
 
 

@@ -215,7 +215,7 @@ if ($opc == 'buscar') {
 					.attr('title', 'Confirmación')
 					.html(text_window)
 					.dialog({
-						resizable: true, autoOpen: true, height: 130, width: 350, modal: true,
+						resizable: true, autoOpen: true, height: 150, width: 350, modal: true,
 						close: function(ev, ui) {
 							jQuery(this).html('');
 							interrumpeproceso = 1;
@@ -225,16 +225,21 @@ if ($opc == 'buscar') {
 							jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
 						},
 						buttons: {
-							"<?php echo __('Continuar') ?>": function() {
+							'<?php echo __('Continuar') ?>': function() {
 
 								if ($('fecha_ini'))
 									var fecha_ini = jQuery('#fecha_ini').val();
 								if ($('fecha_fin'))
 									var fecha_fin = jQuery('#fecha_fin').val();
 								var uurl = 'ajax.php?accion=elimina_cobro&id_cobro=' + id + '&div=' + i + '&id_contrato=' + id_contrato + '&id_proceso=' + form.id_proceso.value + '&fecha_ini=' + fecha_ini + '&fecha_fin=' + fecha_fin;
-								jQuery.get(uurl, function(response) {
-									jQuery('#cobros_' + i).html(response);
-								});
+								jQuery.get(uurl, function(deleting) {
+									if (deleting.error) {
+										alert(deleting.message);
+									} else {
+										var div = jQuery('<div/>').addClass('alert alert-danger alert-thin').html(deleting.message);
+										jQuery('#cobros_' + i).html(div);
+									}
+								}, 'json');
 								jQuery(this).dialog("close");
 								return true;
 							},
