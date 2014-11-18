@@ -86,6 +86,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));
 		}
 		$properties = $object->getLoggeableProperties();
+		$legacy->fillDefaults();
 		foreach ($properties as $property) {
 			$alias = $property;
 			if (is_array($property)) {
@@ -132,7 +133,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return false;
 	}
 
-	public function saveOrUpdate(Entity $object) {
+	public function saveOrUpdate($object) {
 		//Llena los defaults de cada entidad.
 		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());

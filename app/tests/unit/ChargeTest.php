@@ -30,75 +30,27 @@ class ChargeTest extends BaseUnitTest
     }
 
     // tests
-    public function testWhenModalidadCalculoIsNullTheAsignedValueIsZero() {
-		try {
-			$charge = new Charge();
-			$legacy_charge = new Cobro($this->session);
-
-			$modalidad_calculo = null;
-			$legacy_charge->Edit("id_cobro", null);
-			$legacy_charge->Edit("estado", null);
-			$legacy_charge->Edit("codigo_cliente", null);
-			$legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
-			$charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
-
-			$this->assertEquals($charge->get('modalidad_calculo'), 0);
-		} catch (Exception $e) {
-			$this->assertTrue(false);
-		}
-    }
-
-    public function testWhenModalidadCalculoIsZeroTheAsignedValueIsZero() {
-		try {
-			$charge = new Charge();
-			$legacy_charge = new Cobro($this->session);
-
-			$modalidad_calculo = 0;
-			$legacy_charge->Edit("id_cobro", null);
-			$legacy_charge->Edit("estado", null);
-			$legacy_charge->Edit("codigo_cliente", null);
-			$legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
-			$charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
-
-			$this->assertEquals($charge->get('modalidad_calculo'), 0);
-		} catch (Exception $e) {
-			$this->assertTrue(false);
-		}
-    }
-
     public function testWhenModalidadCalculoIsOneTheAsignedValueIsOne() {
-		try {
-			$charge = new Charge();
-			$legacy_charge = new Cobro($this->session);
-
-			$modalidad_calculo = 1;
-			$legacy_charge->Edit("id_cobro", null);
-			$legacy_charge->Edit("estado", null);
-			$legacy_charge->Edit("codigo_cliente", null);
-			$legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
-			$charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
-
-			$this->assertEquals($charge->get('modalidad_calculo'), 1);
-		} catch (Exception $e) {
-			$this->assertTrue(false);
-		}
+		$charge = new Charge();
+		$legacy_charge = new Cobro($this->session);
+		$modalidad_calculo = 1;
+		$legacy_charge->Edit("id_cobro", null);
+		$legacy_charge->Edit("estado", null);
+		$legacy_charge->Edit("codigo_cliente", null);
+		$legacy_charge->Edit("modalidad_calculo", $modalidad_calculo);
+		$charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
+		$this->assertEquals($charge->get('modalidad_calculo'), 1);
     }
 
     public function testWhenModalidadCalculoIsNotSettedTheAsignedValueIsOne() {
-		try {
-			$charge = new Charge();
-			$legacy_charge = new Cobro($this->session);
-
-			$modalidad_calculo = null;
-			$legacy_charge->Edit("id_cobro", null);
-			$legacy_charge->Edit("codigo_cliente", null);
-			$legacy_charge->Edit("estado", null);
-			$charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
-
-			$this->assertEquals($charge->get('modalidad_calculo'), 1);
-		} catch (Exception $e) {
-			$this->assertTrue(false);
-		}
+		$charge = new Charge();
+		$legacy_charge = new Cobro($this->session);
+		$modalidad_calculo = null;
+		$legacy_charge->Edit("id_cobro", null);
+		$legacy_charge->Edit("codigo_cliente", null);
+		$legacy_charge->Edit("estado", null);
+		$charge = $this->fillFromLegacyAndPersistCharge($charge, $legacy_charge);
+		$this->assertEquals($charge->get('modalidad_calculo'), 1);
     }
 
 }
