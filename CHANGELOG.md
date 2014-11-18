@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.19.23
 Martes 18 de Noviembre 2014
-* **Fixed:** [Escapa caracteres de html de los *string*](https://github.com/LemontechSA/ttb/pull/757)
+* **Fixed:** [Escapa caracteres de html de los *string*](https://github.com/LemontechSA/ttb/pull/759)
 
 ## Hotfix: 14.19.22
 Martes 18 de Noviembre 2014
