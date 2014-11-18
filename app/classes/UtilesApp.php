@@ -1092,6 +1092,8 @@ HTML;
 			$monto_ini = (double) 0;
 		}
 
+		$monto_ini = number_format($monto_ini, $decimales1, ".", "");
+
 		if ($tipo_cambio1 == $tipo_cambio2) {// si no es el mismo tipo de moneda, que haga el calculo
 			$monto_fin = $monto_ini;
 		} else if (empty($tipo_cambio2) || ($tipo_cambio2 == 0)) {
