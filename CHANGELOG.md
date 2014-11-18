@@ -1,6 +1,10 @@
 # Changelog
 
 ## Hotfix: 14.19.20
+Martes 18 de Noviembre 2014
+* **Fixed:** [Corregir cálculo cambio de moneda.](https://github.com/LemontechSA/ttb/pull/756)
+
+## Hotfix: 14.19.20
 Lunes 17 de Noviembre 2014
 * **Fixed:** [Corregir cálculo cambio de moneda.](https://github.com/LemontechSA/ttb/pull/755)
 
