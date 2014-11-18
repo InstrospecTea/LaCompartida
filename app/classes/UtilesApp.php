@@ -1619,12 +1619,6 @@ HTML;
 					  );
 
 					  $arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
-
-
-					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
-					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
-					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
-					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 				}
 			}
 			/*			 * *
