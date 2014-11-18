@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.19.20
+Lunes 17 de Noviembre 2014
+* **Fixed:** [Corregir cálculo cambio de moneda.](https://github.com/LemontechSA/ttb/pull/755)
+
 ## Hotfix: 14.19.19
 Jueves 13 de Noviembre 2014
 * **Fixed:** [Agrega indice al arreglo de usuarios que identifica que es administrador.](https://github.com/LemontechSA/ttb/pull/753)
