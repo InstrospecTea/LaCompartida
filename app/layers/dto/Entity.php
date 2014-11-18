@@ -25,6 +25,12 @@ abstract class Entity {
 	 */
 	abstract public function getPersistenceTarget();
 
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad.
+	 * @return array
+	 */
+	abstract protected function getDefaults(); 
+
 
     /**
      * Obtiene el valor de una propiedad del objeto que es instancia de la clase que hereda este abstracto.
@@ -78,6 +84,23 @@ abstract class Entity {
 		$this->changes = $changed;
 	}
 
+	/**
+	 * Completa el objeto con los valores por defecto definidos para cada entidad.
+	 */
+	public function fillDefaults() {
+		$defaults = $this->getDefaults();
+		foreach                     ($defaults as $default => $value) {
+			if (is_null($this->get($default))) {
+				$this->set($default, $value);
+			}
+		}
+	}
+
+
+	/**
+	 * Verifica si el objeto está cargado mediante la obtención del identificador primario.
+	 * @return boolean
+	 */
 	public function isLoaded() {
 		if ($this->get($this->getIdentity())) {
 			return true;
@@ -85,6 +108,8 @@ abstract class Entity {
 			return false;
 		}
 	}
+
+
 
 
 

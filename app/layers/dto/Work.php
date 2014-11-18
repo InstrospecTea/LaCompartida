@@ -55,4 +55,10 @@ class Work extends LoggeableEntity {
 		);
 	}
 
+	protected function getDefaults() {
+		return array(
+			'cobrable' => '1'
+		);
+	}
+
 }

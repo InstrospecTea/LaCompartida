@@ -26,7 +26,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	 * @throws Exception Cuando la inserción falla.
 	 */
 	private function writeLogFromAnotations($action, $object, $legacy) {
-
 		if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
 			return;
 		}
@@ -61,7 +60,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		try {
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
-			throw new Exception('No se pudo guardar el log. Ex: ' . $ex->getTraceAsString());
+			throw new CouldNotWriteLogException('No se pudo guardar el log. Msg: ' . $ex->getMessage());
 		}
 	}
 
@@ -107,7 +106,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		try {
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
-			throw new CouldNotWriteLogException('No se pudo guardar el log. Msg: ' . $ex->getMessage());
+			throw new CouldNotWriteLogException('No se pudo guardar el log.'.$ex->getMessage());
 		}
 	}
 
@@ -133,30 +132,28 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return false;
 	}
 
-	public function saveOrUpdate($object) {
+	public function saveOrUpdate(Entity $object) {
+		//Llena los defaults de cada entidad.
+		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());
 		$reflected = new ReflectionClass($this->getClass());
-		try {
-			$id = $object->get($object->getIdentity());
-			//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
-			//que crear un nuevo registro.
-			if (empty($id)) {
-				$object = $this->save($object);
-				if (is_subclass_of($object, 'LoggeableEntity')) {
-					$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
-				}
-			} else {
-				$legacy = $this->get($object->get($object->getIdentity()));
-				$object = $this->update($object);
-				if (is_subclass_of($object, 'LoggeableEntity')) {
-					$object = $this->merge($legacy, $object);
-					$this->writeLogFromArray('MODIFICAR', $object, $legacy);
-				}
+		$id = $object->get($object->getIdentity());
+		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
+		//que crear un nuevo registro.
+		if (empty($id)) {
+			$object = $this->save($object);
+			if (is_subclass_of($object, 'LoggeableEntity')) {
+				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
 			}
-			return $object;
-		} catch (PDOException $e) {
-			throw new Exception('No se ha podido persistir el objeto de tipo ' . $this->getClass() . '.');
+		} else {
+			$legacy = $this->get($object->get($object->getIdentity()));
+			$object = $this->update($object);
+			if (is_subclass_of($object, 'LoggeableEntity')) {
+				$object = $this->merge($legacy, $object);
+				$this->writeLogFromArray('MODIFICAR', $object, $legacy);
+			}
 		}
+		return $object;
 	}
 
 	/**
@@ -248,7 +245,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	 */
 	protected function checkClass($object, $className) {
 		if (!is_a($object, $className)) {
-			throw new Exception('Dao Exception: El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
+			throw new DAOException('El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
 		}
 	}
 
