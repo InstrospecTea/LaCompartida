@@ -310,7 +310,7 @@ function CargarTrabajo($callback = '') {
 		$asunto->LoadByCodigo($codigo_asunto);
 	}
 	$trabajo->Edit('codigo_asunto', $codigo_asunto);
-$trabajo->Edit('descripcion', $descripcion);
+	  $trabajo->Edit('descripcion', $descripcion);
 
 	if ($asunto->fields['cobrable'] == 0) {
 		$trabajo->Edit("cobrable", '0');

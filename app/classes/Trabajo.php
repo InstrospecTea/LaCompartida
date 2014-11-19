@@ -61,7 +61,7 @@ class Trabajo extends Objeto
 			$work = $workService->saveOrUpdate($work);
 			$this->fields = $work->fields;
 			return true;
-		} catch(Exception $ex) {
+		} catch(DAOException $ex) {
 			return false;
 		}
 	}
@@ -72,22 +72,22 @@ class Trabajo extends Objeto
 			$this->error = 'No se puede mover un trabajo cobrado';
 			return false;
 		}
-
-		if ($this->changes['fecha'] || $this->changes['id_usuario']
-			|| $this->changes['id_trabajo'] || $this->changes['duracion']) {
-			$horasenfecha = $this->HorasEnFecha($this->fields['fecha'],
-				$this->fields['id_usuario'], $this->fields['id_trabajo']);
-
-			$duracion = $this->fields['duracion'];
-			$duracionsegundos = strtotime($duracion) - strtotime('today');
-			$totaldiacondicional = ($horasenfecha['duracion'] + $duracionsegundos);
-
-			if ($totaldiacondicional >= 86400) {
-				$this->error = 'No se puede trabajar más de 24 horas diarias';
-				return false;
-			}
+		if 	($this->changes['fecha'] || $this->changes['id_usuario'] || 
+				$this->changes['id_trabajo'] || $this->changes['duracion']
+			) {
+				$horasenfecha = $this->HorasEnFecha(
+					$this->fields['fecha'],
+					$this->fields['id_usuario'], 
+					$this->fields['id_trabajo']
+				);
+				$duracion = $this->fields['duracion'];
+				$duracionsegundos = strtotime($duracion) - strtotime('today');
+				$totaldiacondicional = ($horasenfecha['duracion'] + $duracionsegundos);
+				if ($totaldiacondicional >= 86400) {
+					$this->error = 'No se puede trabajar más de 24 horas diarias';
+					return false;
+				}
 		}
-
 		return true;
 	}
 
@@ -114,24 +114,25 @@ class Trabajo extends Objeto
 	 * return array $duracion, un array con llaves duracion y duracion_cobrada
 	 */
 	function HorasEnFecha($fecha = null, $id_usuario = null, $id_trabajo = null) {
-		if ($fecha == null) {
+		if (is_null($fecha)) {
 			$fecha = date('Y-m-d');
 		}
-
-		$queryhoras = "SELECT
-										SUM(TIME_TO_SEC(duracion)) AS duracion,
-										SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada
-									FROM trabajo
-									WHERE fecha = '$fecha'";
-
-		if ($id_usuario != null) {
-			$queryhoras .= " AND id_usuario = '$id_usuario'";
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('SUM(TIME_TO_SEC(duracion))', 'duracion');
+		$criteria->add_select('SUM(TIME_TO_SEC(duracion_cobrada))', 'duracion_cobrada');
+		$criteria->add_from('trabajo');
+		$clauses[] = CriteriaRestriction::equals('fecha', "'$fecha'");
+		if (!is_null($id_usuario)) {
+			$clauses[] = CriteriaRestriction::equals('id_usuario', "'$id_usuario'");
 		}
 		if (!empty($id_trabajo)) {
-			$queryhoras .= " AND id_trabajo != '$id_trabajo'";
+			$clauses[] = CriteriaRestriction::equals('id_trabajo', "'$id_trabajo'");
 		}
- 		$duracion = $this->sesion->pdodbh->query($queryhoras)->fetchAll(PDO::FETCH_ASSOC);
-		return $duracion[0];
+		$criteria->add_restriction(
+			CriteriaRestriction::and_clause($clauses)
+		);
+		$result = $criteria->run();
+		return $result[0];
 	}
 
 	function InsertarTrabajoTarifa() {
