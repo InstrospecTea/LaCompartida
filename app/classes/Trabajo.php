@@ -207,26 +207,31 @@ class Trabajo extends Objeto
 	}
 
 	function Eliminar() {
-		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario])
-		{
+		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario]) {
 			$this->error = $this->sesion->usuario->fields[id_usuario]." A ".$this->fields[id_usuario]." No puede eliminar un trabajo que no fue agregado por usted";
 			return false;
 		}*/
 		if ($this->Estado() == "Abierto") {
 
-			$query = "INSERT INTO trabajo_historial SET
-					id_trabajo = '{$this->fields['id_trabajo']}',
-					id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-					fecha = '" . date("Y-m-d H:i:s") . "',
-					fecha_trabajo = '{$this->fields['fecha']}',
-					descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
-					duracion = '{$this->fields['duracion']}',
-					duracion_cobrada = '{$this->fields['duracion_cobrada']}',
-					id_usuario_trabajador = '{$this->fields['id_usuario']}',
-					accion = 'ELIMINAR',
-					codigo_asunto = '{$this->fields['codigo_asunto']}',
-					cobrable = '{$this->fields['cobrable']}'";
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			$workService = new WorkService($this->sesion);
+			$work = new Work();
+			$work->fillFromArray($this->fields);
+			$workService->delete($work);
+
+			// $query = "INSERT INTO trabajo_historial SET
+			// 		id_trabajo = '{$this->fields['id_trabajo']}',
+			// 		id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
+			// 		fecha = '" . date("Y-m-d H:i:s") . "',
+			// 		fecha_trabajo = '{$this->fields['fecha']}',
+			// 		descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
+			// 		duracion = '{$this->fields['duracion']}',
+			// 		duracion_cobrada = '{$this->fields['duracion_cobrada']}',
+			// 		id_usuario_trabajador = '{$this->fields['id_usuario']}',
+			// 		accion = 'ELIMINAR',
+			// 		codigo_asunto = '{$this->fields['codigo_asunto']}',
+			// 		cobrable = '{$this->fields['cobrable']}'";
+			// mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+
 			// Eliminar el Trabajo del Comentario asociado
 			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -640,7 +645,7 @@ class Trabajo extends Objeto
 										SET
 											id_trabajo = '$id_trabajo',
 											id_usuario = '{$sesion->usuario->fields['id_usuario']}',
-											fecha = '" . date("Y-m-d H:i:s") . "',
+											fecha_accion = '" . date("Y-m-d H:i:s") . "',
 											fecha_trabajo = '{$trabajo_original->fields['fecha']}',
 											fecha_trabajo_modificado = '$fecha',
 											descripcion = '" . addslashes($trabajo_original->fields['descripcion']) . "',
