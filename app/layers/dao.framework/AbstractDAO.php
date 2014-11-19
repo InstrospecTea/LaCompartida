@@ -234,6 +234,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
+			$newInstance->fillDefaults();
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
 	}
