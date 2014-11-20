@@ -73,4 +73,6 @@ $_LANG['Pago de Documentos tributarios'] = 'Reporte de Recaudación';
 
 $_LANG['Giro'] = 'Sector económico';
 $_LANG['Referencia'] = 'Cliente referido por';
+$_LANG['Grupo'] = 'Grupo económico';
+
 ?>
