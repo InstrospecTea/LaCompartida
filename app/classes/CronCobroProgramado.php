@@ -19,11 +19,11 @@ class CronCobroProgramado extends Cron {
 	public function cobrosPendientes() {
 		$this->log('< INICIO cobrosPendientes >');
 
-		$query = "SELECT cobro_pendiente.id_cobro_pendiente, cobro_pendiente.id_contrato, cobro_pendiente.descripcion
+		$query = "SELECT cobro_pendiente.id_cobro_pendiente, cobro_pendiente.id_contrato, cobro_pendiente.descripcion, cobro_pendiente.monto_estimado
 			FROM cobro_pendiente
 			WHERE cobro_pendiente.id_cobro IS NULL
 				AND DATE_FORMAT(cobro_pendiente.fecha_cobro, '%Y-%m-%d') = '{$this->fecha_cron}'
-				AND cobro_pendiente.hito != 1
+				AND cobro_pendiente.hito = 0
 			ORDER BY cobro_pendiente.fecha_cobro";
 
 		$cobros_pendientes = $this->query($query);
@@ -46,7 +46,8 @@ class CronCobroProgramado extends Cron {
 
 				$contrato = $this->query($query);
 
-				if (!empty($contrato)) {
+				if (!empty($contrato[0])) {
+					$contrato = $contrato[0];
 					$this->log("Seleccionando contrato #{$cobro_pendiente['id_contrato']} y preparando cobro");
 					// generamos nueva id para el cobro
 					$id_proceso_nuevo = $Cobro->GeneraProceso();
@@ -57,7 +58,7 @@ class CronCobroProgramado extends Cron {
 						$cobro_pendiente['id_contrato'],
 						true,
 						$id_proceso_nuevo,
-						($contrato['forma_cobro'] != 'FLAT FEE' ? null : $contrato['monto_programado']),
+						($contrato['forma_cobro'] != 'FLAT FEE' ? null : $cobro_pendiente['monto_estimado']),
 						$cobro_pendiente['id_cobro_pendiente'],
 						false,
 						false,
@@ -68,9 +69,8 @@ class CronCobroProgramado extends Cron {
 
 					$this->log("Cobro preparado #{$id_cobro}");
 
-					if ($id_cobro != null && $id_cobro != '') {
+					if (!empty($id_cobro)) {
 						$Cobro->Load($id_cobro);
-						$Cobro->GuardarCobro();
 
 						$this->log("Cobro guardado #{$id_cobro}");
 
@@ -103,14 +103,13 @@ class CronCobroProgramado extends Cron {
 				// genera cuerpo del mensaje a enviar
 				$mensajes = $Notificacion->mensajeProgramados($datos_aviso);
 
-				$this->log("Generando Mensaje");
+				$this->log('Generando Mensaje');
 
 				if (!empty($mensajes)) {
 					$Alerta = new AlertaCron($this->Sesion);
 					// encola correo con los datos del mensaje
 					$Alerta->enviarAvisoCobrosProgramados($mensajes, $this->Sesion);
-
-					$this->log("Generando Correo");
+					$this->log('Generando Correo');
 				}
 			}
 		}
