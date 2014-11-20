@@ -671,7 +671,8 @@ class Factura extends Objeto {
 								contrato.factura_ciudad,
 								prm_pais.nombre as nombre_pais,
 								contrato.fono_contacto as fono_contacto,
-								contrato.factura_telefono
+								CONCAT(contrato.cod_factura_telefono, ' - ', contrato.factura_telefono) AS factura_telefono,
+								contrato.email_contacto
 							FROM contrato
 							LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
 							LEFT JOIN factura ON cobro.id_cobro=factura.id_cobro
@@ -695,7 +696,8 @@ class Factura extends Objeto {
 					$factura_ciudad,
 					$nombre_pais,
 					$contrato_fono_contacto,
-					$contrato_factura_telefono ) = mysql_fetch_array($resp);
+					$contrato_factura_telefono,
+					$contrato_email_contacto) = mysql_fetch_array($resp);
 
 				$glosa_tipo_doc_mayus = str_replace('é', 'É', strtoupper($glosa_tipo_doc));
 
@@ -769,6 +771,8 @@ class Factura extends Objeto {
 				$html2 = str_replace('%contrato_nombre_ciudad%', strtoupper($factura_ciudad), $html2);
 				$html2 = str_replace('%contrato_nombre_pais%', strtoupper(__($nombre_pais)), $html2);
 				$html2 = str_replace('%contrato_factura_telefono%', strtoupper($contrato_factura_telefono), $html2);
+				$html2 = str_replace('%contrato_fono_contacto%', $contrato_fono_contacto, $html2);
+				$html2 = str_replace('%contrato_email_contacto%', strtoupper($contrato_email_contacto), $html2);
 				$html2 = str_replace('%factura_direccion_cliente%', strtoupper($this->fields['direccion_cliente']), $html2);
 
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
@@ -872,7 +876,25 @@ class Factura extends Objeto {
 					list($factura_id_moneda, $factura_descripcion, $id_cobro, $cobro_id_moneda, $fecha_ini, $fecha_fin, $porcentaje_impuesto, $glosa_moneda, $glosa_moneda_plural, $simbolo, $cifras_decimales, $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios, $subtotal_gastos, $monto_gastos, $impuesto, $total) = mysql_fetch_array($resp);
 				}
 
+				$html2 = str_replace('%nombre_cliente%', $this->fields['cliente'], $html2);
+				$html2 = str_replace('%direccion_cliente%', $this->fields['direccion_cliente'], $html2);
 				$html2 = str_replace('%encargado_comercial%', $this->ObtenerEncargadoComercial($this->fields['id_contrato']), $html2);
+
+				$query = "SELECT contrato.fono_contacto as fono_contacto,
+					CONCAT(contrato.cod_factura_telefono, ' - ', contrato.factura_telefono) AS factura_telefono,
+					contrato.email_contacto
+					FROM contrato
+						LEFT JOIN cobro ON contrato.id_contrato=cobro.id_contrato
+						LEFT JOIN factura ON cobro.id_cobro=factura.id_cobro
+					WHERE id_factura = {$this->fields['id_factura']}";
+
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+				list($contrato_fono_contacto, $contrato_factura_telefono, $contrato_email_contacto) = mysql_fetch_array($resp);
+
+				$html2 = str_replace('%contrato_factura_telefono%', $contrato_factura_telefono, $html2);
+				$html2 = str_replace('%contrato_fono_contacto%', $contrato_fono_contacto, $html2);
+				$html2 = str_replace('%contrato_email_contacto%', $contrato_email_contacto, $html2);
 
 				// FFF 2012-09-15 normaliza saltos de linea en la descripcion. Y sí, ya probé con preg_replace y tiene comportamiento impredecible.
 				$factura_descripcion = str_replace(array('\r\n', '\n\r', "\r\n", "\n\r", '\n', '\r'), "\n", $factura_descripcion);
