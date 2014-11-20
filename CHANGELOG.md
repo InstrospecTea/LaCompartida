@@ -1,5 +1,14 @@
 # Changelog
 
+## Releas: 14.20.0
+Jueves 20 de Noviembre 2014
+* **Feature:** [Optimización Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
+* **Feature:** [Usuario Encargado lista de clientes](https://github.com/LemontechSA/ttb/pull/754)
+* **Feature:** [Agregar decimales a restricción diaria de usuarios](https://github.com/LemontechSA/ttb/pull/747)
+* **Feature:** [Arquitectura](https://github.com/LemontechSA/ttb/pull/730)
+* **Feature:** [Posibilidad de uso de Vagrant en TTB](https://github.com/LemontechSA/ttb/pull/723)
+
+
 ## Hotfix: 14.19.23
 Martes 18 de Noviembre 2014
 * **Fixed:** [Escapa caracteres de html de los *string*](https://github.com/LemontechSA/ttb/pull/759)
