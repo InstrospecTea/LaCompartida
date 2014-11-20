@@ -61,7 +61,7 @@ class Trabajo extends Objeto
 			$work = $workService->saveOrUpdate($work);
 			$this->fields = $work->fields;
 			return true;
-		} catch(DAOException $ex) {
+		} catch(ServiceException $ex) {
 			return false;
 		}
 	}
@@ -72,12 +72,12 @@ class Trabajo extends Objeto
 			$this->error = 'No se puede mover un trabajo cobrado';
 			return false;
 		}
-		if 	($this->changes['fecha'] || $this->changes['id_usuario'] || 
+		if 	($this->changes['fecha'] || $this->changes['id_usuario'] ||
 				$this->changes['id_trabajo'] || $this->changes['duracion']
 			) {
 				$horasenfecha = $this->HorasEnFecha(
 					$this->fields['fecha'],
-					$this->fields['id_usuario'], 
+					$this->fields['id_usuario'],
 					$this->fields['id_trabajo']
 				);
 				$duracion = $this->fields['duracion'];
