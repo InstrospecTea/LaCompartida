@@ -8,6 +8,9 @@ Jueves 20 de Noviembre 2014
 * **Feature:** [Arquitectura](https://github.com/LemontechSA/ttb/pull/730)
 * **Feature:** [Posibilidad de uso de Vagrant en TTB](https://github.com/LemontechSA/ttb/pull/723)
 
+## Hotfix: 14.19.24
+Jueves 20 de Noviembre 2014
+* **Fixed:** [Agregar nuevos tags a la factura](https://github.com/LemontechSA/ttb/pull/761)
 
 ## Hotfix: 14.19.23
 Martes 18 de Noviembre 2014

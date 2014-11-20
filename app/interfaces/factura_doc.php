@@ -20,7 +20,7 @@ if ( !$factura->Load($id_factura_grabada) ) {
 if ( $lang == '' ) {
 	$lang = 'es';
 }
-	
+
 if ( file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
 	$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
 } else {
@@ -58,4 +58,3 @@ if ( $xmlbit == 1) {
 }
 
 exit;
-?>
