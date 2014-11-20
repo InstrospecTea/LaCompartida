@@ -159,7 +159,7 @@ class ReporteHistorialMovimientos
 					->add_left_join_with($main_table, CriteriaRestriction::equals($main_table.'.'.$key, $table_name.'.'.$key));
 
 		$fecha_field = 'fecha';
-		if ($main_table == 'tramite') {
+		if ($main_table == 'tramite' || $main_table == 'trabajo') {
 			$fecha_field = 'fecha_accion';
 		}
 
