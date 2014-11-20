@@ -1908,6 +1908,22 @@ if (!class_exists('Cobro')) {
 
 		/*	Asocia los trabajos al cobro que se está creando parametros fecha_ini; fecha_fin; id_contrato	*/
 
+		/**
+		 *
+		 * @param type $fecha_ini
+		 * @param type $fecha_fin
+		 * @param type $id_contrato
+		 * @param boolean $emitir_obligatoriamente
+		 * @param type $id_proceso
+		 * @param type $monto
+		 * @param type $id_cobro_pendiente
+		 * @param type $con_gastos
+		 * @param type $solo_gastos
+		 * @param type $incluye_gastos
+		 * @param type $incluye_honorarios
+		 * @param type $cobro_programado
+		 * @return type
+		 */
 		function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
