@@ -555,13 +555,17 @@ $_LANG['La tarifa debe ser mayor a cero'] = "La tarifa debe ser mayor a cero";
 $_LANG['Al ingresar una nueva tarifa, esta se actualizará automáticamente.'] = "Al ingresar una nueva tarifa, esta se actualizará automáticamente.";
 $_LANG['Haga clic sobre esta imagen para ingresar una nueva fila a esta tabla.'] = "Haga clic sobre esta imagen para ingresar una nueva fila a esta tabla.";
 $_LANG['Tip tasa'] = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
-$_LANG['Tip suma'] = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de cobro que no puede tener límites.";
-$_LANG['Tip retainer'] = "El cliente compra un número de HH. El límite puede ser por horas o por un monto.";
-$_LANG['Tip flat'] = "El cliente acuerda cancelar un <strong>monto fijo mensual</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total";
+$_LANG['Tip suma'] = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalidad de cobro que no puede tener límites.";
+$_LANG['Tip retainer'] = "El cliente compra un número de HH. El lí­mite puede ser por horas o por un monto.";
+$_LANG['Tip flat'] = "El cliente acuerda cancelar un <strong>monto fijo mensual</strong> por atender todos los trabajos de este asunto. Puede tener lí­mites por HH o monto total";
 $_LANG['Tip honorarios'] = "Sólamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.";
 $_LANG['Tip mensual'] = "El cobro se hará de forma mensual.";
 $_LANG['Tip tarifa especial'] = "Al ingresar una nueva tarifa, esta se actualizará automáticamente.";
 $_LANG['Tip individual'] = "El cobro se hará de forma individual de acuerdo al monto definido por Cliente.";
+$_LANG['Tip proporcional'] = "El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.";
+$_LANG['Tip cap'] = 'Esta forma de cobro permite determinar un tope o techo de monto para un proyecto, de manera tal que con el cliente se pueda pactar un monto máximo en este tipo de contratos el cual se alcanzará en la medida que se vaya liquidando las horas, siempre en THH según la tarifa seleccionada.';
+$_LANG['Tip hitos'] = 'Esta forma de cobro permite programar liquidaciones en un proyecto o juicio. Se debe definir una fecha, descripción y monto en cada hito del proyecto o juicio. El día de cada hito el sistema gatillará un correo al Encargado Comercial para que él determine si corresponde facturar dicho hito. Los contratos del tipo hitos, no serán parte de una generación masiva de liquidaciones';
+$_LANG['Tip escalonada'] = 'Esta forma de cobro permite definir distintos tarifarios por tramo, los cuales se pueden definir como THH o montos fijos';
 $_LANG['Para agregar un nuevo usuario ingresa su RUT aquí.'] = "Para agregar un nuevo usuario ingresa su RUT aquí.";
 
 

@@ -10620,6 +10620,8 @@ QUERY;
 					REFERENCES `asunto` (`id_asunto`),
 				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`) 
 					REFERENCES `prm_giro` (`id_giro`));";
+			
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
 
 			ejecutar($queries, $dbh);
 			break;
