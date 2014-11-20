@@ -1027,7 +1027,6 @@ class Trabajo extends Objeto
 		}
 
 		$this->Edit('tarifa_hh', $data['rate']);
-		$this->Edit('id_usuario_trabajador', $data['user_id']);
 
 		if ($this->Write()) {
 			if (!empty($data['user_id'])) {

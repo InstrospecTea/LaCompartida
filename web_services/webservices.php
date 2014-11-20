@@ -480,7 +480,6 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		$fecha = $date_time->sub(date_interval_create_from_date_string("$duracion seconds"));
 
 		$trabajo->Edit('id_usuario', $id_usuario);
-		$trabajo->Edit('id_usuario_trabajador', $id_usuario);
 		$trabajo->Edit('id_categoria_usuario', $id_categoria_usuario);
 		$trabajo->Edit('id_trabajo_local', $id_trabajo_local);
 		$trabajo->Edit('codigo_asunto', $codigo_asunto);
