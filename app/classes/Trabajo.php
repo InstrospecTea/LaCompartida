@@ -973,7 +973,7 @@ class Trabajo extends Objeto
 
 		$sql = "SELECT `user`.`id_categoria_usuario` FROM `usuario` AS `user` WHERE `user`.`id_usuario`=:user_id";
 		$Statement = $this->sesion->pdodbh->prepare($sql);
-		$Statement->bindParam('user_id', $user_id);
+		$Statement->bindParam('user_id', $user_id );
 		$Statement->execute();
 		$user_data = $Statement->fetchObject();
 		if (is_object($user_data)) {
@@ -1027,6 +1027,7 @@ class Trabajo extends Objeto
 		}
 
 		$this->Edit('tarifa_hh', $data['rate']);
+		$this->Edit('id_usuario_trabajador', $data['user_id']);
 
 		if ($this->Write()) {
 			if (!empty($data['user_id'])) {
