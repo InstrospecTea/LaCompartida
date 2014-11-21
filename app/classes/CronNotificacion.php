@@ -179,20 +179,19 @@ class CronNotificacion extends Cron {
 							AND ( usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM' )
 						LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
 						WHERE activo = 1
-							AND alerta_revisor = 1
+							AND (alerta_revisor = 1 OR usuario_permiso.codigo_permiso = 'ADM')
 						GROUP BY usuario.id_usuario
 						HAVING 1 $having";
 		$resultados = $this->query($query);
 		$total_resultados = count($resultados);
 		for ($x = 0; $x < $total_resultados; ++$x) {
 			$resultado = $resultados[$x];
-			$profesional = new Usuario($this->Sesion);
-			$profesional->LoadId($resultado['id_usuario']);
 			$id_usuario = $resultado['id_usuario'];
 			$revisados = $resultado['revisados'];
 			$dato_semanal[$id_usuario]['nombre_pila'] = $resultado['nombre_pila'];
 			if ($alerta_semanal_todos_abogadosa_administradores) {
 				if ($resultado['codigo_permiso'] == 'ADM') {
+					$dato_semanal[$id_usuario]['admin'] = 1;
 					$revisados = $ids_usuarios_profesionales;
 				} else {
 					$revisados = $id_usuario;
@@ -211,7 +210,7 @@ class CronNotificacion extends Cron {
 
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
 		$dato_semanal = array_filter($dato_semanal, function ($i) {
-			return !empty($i['alerta_propia']);
+			return !empty($i['alerta_propia']) || $i['admin'];
 		});
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
 

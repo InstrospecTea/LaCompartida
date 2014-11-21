@@ -430,8 +430,9 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		switch ($format) {
 			case 'text':
 				if (strpos($valor, ";")) {
-					$valor = str_replace(";", "<br />", $valor);
+					$valor = str_replace(';', "\n", $valor);
 				}
+				$valor = nl2br(htmlentities($valor));
 				break;
 			case 'number':
 				$decimals = 2;

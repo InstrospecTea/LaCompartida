@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Class Charge
- * Clase que representa un cobro en TheTimeBilling.
+ * Class Work
+ * Clase que representa un trabajo en TheTimeBilling.
  */
-class Charge extends LoggeableEntity {
+class Work extends LoggeableEntity {
 
     /**
      * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
      * @return string
      */
     public function getIdentity() {
-        return 'id_cobro';
+        return 'id_trabajo';
     }
 
     /**
@@ -20,7 +20,7 @@ class Charge extends LoggeableEntity {
      * @return string
      */
     public function getPersistenceTarget() {
-        return 'cobro';
+        return 'trabajo';
     }
 
     /**
@@ -28,7 +28,7 @@ class Charge extends LoggeableEntity {
      * @return string
      */
     public function getLoggingTable() {
-        return 'cobro_movimiento';
+        return 'trabajo_historial';
     }
 
 	/**
@@ -38,25 +38,27 @@ class Charge extends LoggeableEntity {
 	 */
 	public function getLoggeableProperties(){
 		return array(
-			'estado',
-			'codigo_cliente',
-			'id_moneda',
-			'tipo_cambio_moneda',
-			'fecha_ini',
-			'fecha_fin',
-			'forma_cobro',
-			'monto'
+			array('fecha', 'fecha_trabajo'),
+			'descripcion',
+			'duracion',
+			'duracion_cobrada',
+			array('id_usuario','id_usuario_trabajador'),
+			'tarifa_hh',
+			'codigo_asunto',
+			'cobrable'
 		);
 	}
 
 	public function getInmutableLoggeableProperties() {
 		return array(
-			'id_cobro', 'id_contrato'
+			'id_trabajo'
 		);
 	}
 
 	protected function getDefaults() {
-		return array();
+		return array(
+			'cobrable' => '1'
+		);
 	}
 
 }
