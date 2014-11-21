@@ -85,6 +85,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		foreach ($inmutableProperties as $inmutableProperty) {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));
 		}
+		$object->fillDefaults();
 		$properties = $object->getLoggeableProperties();
 		$legacy->fillDefaults();
 		foreach ($properties as $property) {
