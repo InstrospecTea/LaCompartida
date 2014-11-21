@@ -1,5 +1,9 @@
 {
   "require": {
     "twig/twig": "1.*"
+  },
+  "require-dev": {
+    "phpdocumentor/phpdocumentor": "2.*",
+    "evert/phpdoc-md" : "~0.0.7"
   }
 }

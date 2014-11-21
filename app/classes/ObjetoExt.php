@@ -4,10 +4,18 @@ require_once dirname(__FILE__) . '/../conf.php';
 use \Conf;
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 
+ /**
+  * Esta clase extiende de Objeto 
+  * 
+  * De esta forma se puede agregar funcionalidad sin romper las 
+  * bases del sistema (llámese framework)
+  */
 class ObjetoExt extends Objeto {
+
    /**
    * Lista la tabla con los campos indicados en la clase
    * devuelve un array con llave campo_id y valor campo_glosa
+   * 
    * @param string $query_extra
    * @param string $fields
    * @return array

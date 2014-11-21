@@ -2,6 +2,10 @@
 
 require_once dirname(__FILE__) . '/../../app/conf.php';
 
+ /**
+  * Esta clase prove helpers para crear autocompletadores 
+  * en formularios HTML
+  */
 class FormAutocompleteHelper {
 
   public $Utiles;
@@ -15,11 +19,21 @@ class FormAutocompleteHelper {
 
   /**
    * Construye un autocompletador simple
-   * @param type $name
-   * @param type $value
-   * @param type $attrs
-   * @param type $options
-   * @return type
+   * 
+   * Que consiste en un input text que al escribir 
+   * presenta un listado de opciones seleccionables
+   * 
+   * @param string $name Es el nombre del elemento HTML
+   * @param string $value Es el valor por defecto al presentarlo
+   * @param array $attrs Son los atributos del elemento HTML Ej. id, class, type
+   * @param array $options Son opciones entre las que se encuentran
+   *                       * onChange: string de código js a ejecutar cuando cambia el elemento
+   *                       * onSource: string de código js a ejecutar antes del request de data
+   *                       * onSelect: string de código js a ejecutar cuando usuario selecciona
+   *                       * source: string url del endpoint donde se obtiene la data
+   *                       * minLenght: mínimo de caracteres necesarios para autocompeltar
+   * 
+   * @return string
    */
   public function simple_complete($name, $value, $attrs = null, $options = array()) {
     $attrs = is_null($attrs) ? array() : $attrs;
