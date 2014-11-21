@@ -1007,11 +1007,7 @@ class Trabajo extends Objeto
 		$cambio_fecha = strtotime($this->fields['fecha']) != strtotime($data['date']);
 		$this->Edit('fecha', $data['date']);
 		$this->Edit('codigo_tarea', !empty($data['task_code']) ? $data['task_code'] : 'NULL');
-
-		if (empty($data['id'])) {
-			$this->Edit('id_usuario', $data['user_id']);
-		}
-
+		$this->Edit('id_usuario', $data['user_id']);
 		$this->Edit('tarifa_hh', $data['rate']);
 
 		if ($this->Write()) {

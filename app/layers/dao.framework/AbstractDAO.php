@@ -34,7 +34,9 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$insertCriteria->set_into($object->getLoggingTable());
 		$insertCriteria->add_pivot_with_value('accion', $action);
 		$insertCriteria->add_pivot_with_value('app_id', $app_id);
-		$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+		if (!is_null($this->sesion->usuario->fields['id_usuario'])) {
+			$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+		}
 		$reflected = new ReflectionClass($this->getClass());
 		$properties = $reflected->getProperties();
 		foreach ($properties as $property) {
@@ -80,7 +82,9 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$insertCriteria->set_into($object->getLoggingTable());
 		$insertCriteria->add_pivot_with_value('accion', $action);
 		$insertCriteria->add_pivot_with_value('app_id', $app_id);
-		$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+		if (!is_null($this->sesion->usuario->fields['id_usuario'])) {
+			$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+		}
 		$inmutableProperties = $object->getInmutableLoggeableProperties();
 		foreach ($inmutableProperties as $inmutableProperty) {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));

@@ -42,6 +42,7 @@ class Work extends LoggeableEntity {
 			'descripcion',
 			'duracion',
 			'duracion_cobrada',
+      'id_usuario',
 			array('id_usuario','id_usuario_trabajador'),
 			'tarifa_hh',
 			'codigo_asunto',

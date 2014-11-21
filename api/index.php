@@ -824,6 +824,9 @@ function validateAuthTokenSendByHeaders($permission = null) {
 	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
 	$user_token = $UserToken->findByAuthToken($auth_token);
+	$app_id = $user_token->getAppIdByAppKey($app_key);
+	$_SESSION['app_id'] = is_null($app_id) ? 1 : $app_id;
+
 	// if not exist the auth_token then return error
 	if (!is_object($user_token)) {
 		halt(__('Invalid AUTH TOKEN'), "SecurityError", 401);
