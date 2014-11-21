@@ -236,6 +236,20 @@ class Asunto extends Objeto {
 			)
 		),
 		array(
+			'field' => 'desglose_area',
+			'title' => 'Desglose área',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'sector_economico',
+			'title' => 'Sector económico',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
 			'field' => 'fecha_creacion',
 			'title' => 'Fecha Creación',
 			'format' => 'date',
@@ -629,6 +643,26 @@ class Asunto extends Objeto {
 			cliente.id_grupo_cliente,
 			prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
 			prm_area_proyecto.glosa AS area_proyecto,
+			(SELECT GROUP_CONCAT(DISTINCT CASE
+    					WHEN prm_area_proyecto_desglose.requiere_desglose = 1 
+    					THEN CONCAT(prm_area_proyecto_desglose.glosa, ': ', a1.desglose_area) 
+    					ELSE prm_area_proyecto_desglose.glosa END) 
+				 FROM asunto_area_proyecto_desglose
+				INNER JOIN prm_area_proyecto_desglose 
+				   ON asunto_area_proyecto_desglose.id_area_proyecto_desglose = prm_area_proyecto_desglose.id_area_proyecto_desglose
+				WHERE prm_area_proyecto_desglose.id_area_proyecto = prm_area_proyecto.id_area_proyecto
+				  AND asunto_area_proyecto_desglose.id_asunto = a1.id_asunto
+				ORDER BY prm_area_proyecto_desglose.glosa ASC) AS desglose_area,
+			
+			(SELECT GROUP_CONCAT(DISTINCT CASE
+    					WHEN prm_giro.requiere_desglose = 1 
+    					THEN CONCAT(prm_giro.glosa, ': ', a1.giro) 
+    					ELSE prm_giro.glosa END) 
+				 FROM asunto_giro
+				INNER JOIN prm_giro 
+				   ON asunto_giro.id_giro = prm_giro.id_giro
+				WHERE asunto_giro.id_asunto = a1.id_asunto
+				ORDER BY prm_giro.glosa ASC) AS sector_economico,
 			prm_idioma.glosa_idioma,
 			contrato.monto,
 			contrato.forma_cobro,
@@ -969,6 +1003,82 @@ class Asunto extends Objeto {
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
 	}
+
+
+	/**
+		 * Método que realiza la escritura del desglose de áreas para el asunto
+		 * @param $details Array que contiene los Ids de desgloses de áreas a agregar
+		 */
+	public function writeAreaDetails($details) {
+		$sql = "DELETE FROM `asunto_area_proyecto_desglose` WHERE id_asunto=:id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $this->fields[$this->campo_id]);
+		if ($Statement->execute()) {
+			if (is_null($details) || empty($details)){
+				return;
+			}
+			foreach($details as $id_area_proyecto_desglose) {
+				$sql = "INSERT INTO `asunto_area_proyecto_desglose`
+				SET id_asunto=:id_asunto, id_area_proyecto_desglose=:id_area_proyecto_desglose";
+				$Statement = $this->sesion->pdodbh->prepare($sql);
+				$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+				$Statement->bindParam('id_area_proyecto_desglose', $id_area_proyecto_desglose);
+				$Statement->execute();
+			}
+		}
+	}
+
+	/**
+		 * Método que realiza la escritura de los giros asociados al asunto
+		 * @param $details Array que contiene los Ids de cada giro
+		 */
+	public function writeEconomicActivities($details) {
+		$sql = "DELETE FROM `asunto_giro` WHERE id_asunto=:id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $this->fields[$this->campo_id]);
+		if ($Statement->execute()) {
+			if (is_null($details) || empty($details)){
+				return;
+			}
+			foreach($details as $id_giro) {
+				$sql = "INSERT INTO asunto_giro
+				SET id_asunto=:id_asunto, id_giro=:id_giro";
+				$Statement = $this->sesion->pdodbh->prepare($sql);
+				$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+				$Statement->bindParam('id_giro', $id_giro);
+				$Statement->execute();
+			}
+		}
+	}
+
+	/**
+		 * Método que obtiene todos los desgloses de áreas 
+		 */
+	public function getAreaDetails() {
+		$sql = "SELECT `asunto_area_proyecto_desglose`.`id_area_proyecto_desglose`
+			FROM `asunto_area_proyecto_desglose`
+			WHERE `asunto_area_proyecto_desglose`.`id_asunto`=:id_asunto";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+		$Statement->execute();
+		$details = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+		return $details;
+	}
+
+		/**
+		 * Método que obtiene los giros del asunto
+		 */
+	public function getEconomicActivities() {
+		$sql = "SELECT id_giro
+			FROM asunto_giro
+			WHERE id_asunto=:id_asunto";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+		$Statement->execute();
+		$details = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+		return $details;
+	}
+
 }
 
 class ListaAsuntos extends Lista {

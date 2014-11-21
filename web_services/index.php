@@ -286,6 +286,7 @@ function CargarTrabajo($callback = '') {
 	$area_trabajo = $Slim->request()->params('area_trabajo');  // opcional, puede venir vacio, NO Cero
 	$fecha = $Slim->request()->params('fecha');  // opcional, puede venir vacio, NO Cero
 	$app_id = getAppIdByAppKey($Slim->request()->params('app_key'));
+	
 	if ($fecha == "")		$fecha = date('Y-m-d', strtotime($starttimer / 1000) + 86400);
 
 

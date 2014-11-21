@@ -1,32 +1,28 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
+use TTB\Pagina as Pagina;
 
 $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
-$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 
-$tip_tasa = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
-$tip_suma = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de " . __('cobro') . " que no puede tener límites.";
-$tip_retainer = "El cliente compra un número de HH. El límite puede ser por horas o por un monto.";
-$tip_flat = "El cliente acuerda cancelar un <strong>monto fijo mensual</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total";
-$tip_honorarios = "Sólamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.";
-$tip_mensual = __('El cobro') . " se hará de forma mensual.";
-$tip_tarifa_especial = "Al ingresar una nueva tarifa, esta se actualizará automáticamente.";
-$tip_individual = __('El cobro') . " se hará de forma individual de acuerdo al monto definido por Cliente.";
+$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 
-function TTip($texto) {
-	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
-}
-
+$Form = new Form;
+$SelectHelper = new FormSelectHelper();
+$AutocompleteHelper = new FormAutocompleteHelper();
+ 
 if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
 	$codigo_obligatorio = true;
 } else {
 	$codigo_obligatorio = false;
 }
 
-$validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
-$obligatorio = '<span class="req">*</span>';
+$validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente') && $cobro_independiente;
+$validacionesClienteJS = Conf::GetConf($Sesion, 'ValidacionesCliente') ? "(document.getElementById('cobro_independiente').checked)" : 'false';
+
+require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
+
 $usuario_responsable_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoComercial');
 $usuario_secundario_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto');
 $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1;
@@ -118,150 +114,19 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
-	// Validaciones
-	if ($validaciones_segun_config && $cobro_independiente) {
+	if ($validacionesCliente) {
 		if (empty($glosa_asunto)) {
 			$Pagina->AddError(__("Por favor ingrese el nombre del cliente"));
 		}
 		if (empty($codigo_cliente)) {
 			$Pagina->AddError(__("Por favor ingrese el codigo del cliente"));
 		}
-		if (empty($factura_rut)) {
-			$Pagina->AddError(__("Por favor ingrese ROL/RUT de la factura"));
-		}
-		if (empty($factura_razon_social)) {
-			$Pagina->AddError(__("Por favor ingrese la razón social de la factura"));
-		}
-		if (empty($factura_giro)) {
-			$Pagina->AddError(__("Por favor ingrese el giro de la factura"));
-		}
-		if (empty($factura_direccion)) {
-			$Pagina->AddError(__("Por favor ingrese la dirección de la factura"));
-		}
-		if (UtilesApp::existecampo('factura_comuna', 'contrato', $Sesion)) {
-			if (empty($factura_comuna)) {
-				$Pagina->AddError(__("Por favor ingrese la comuna de la factura"));
-			}
-		}
-
-		if (UtilesApp::existecampo('factura_ciudad', 'contrato', $Sesion)) {
-			if (empty($factura_ciudad)) {
-				$Pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
-			}
-		}
-
-		if (empty($factura_telefono)) {
-			$Pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
-		}
-
-		if (Conf::GetConf($Sesion, 'TituloContacto')) {
-			if (empty($titulo_contacto)) {
-				$Pagina->AddError(__("Por favor ingrese titulo del solicitante"));
-			}
-			if (empty($nombre_contacto)) {
-				$Pagina->AddError(__("Por favor ingrese nombre del solicitante"));
-			}
-			if (empty($apellido_contacto)) {
-				$Pagina->AddError(__("Por favor ingrese apellido del solicitante"));
-			}
-		} else {
-			if (empty($contacto)) {
-				$Pagina->AddError(__("Por favor ingrese contanto del solicitante"));
-			}
-		}
-
-		if (empty($fono_contacto_contrato)) {
-			$Pagina->AddError(__("Por favor ingrese el teléfono del solicitante"));
-		}
-		if (empty($email_contacto_contrato)) {
-			$Pagina->AddError(__("Por favor ingrese el correo del solicitante"));
-		}
-		if (empty($direccion_contacto_contrato)) {
-			$Pagina->AddError(__("Por favor ingrese la dirección del solicitante"));
-		}
-
-		if (empty($id_tarifa)) {
-			$Pagina->AddError(__("Por favor ingrese la tarifa en la tarificación"));
-		}
-		if (empty($id_moneda)) {
-			$Pagina->AddError(__("Por favor ingrese la moneda de la tarifa en la tarificación"));
-		}
-
-		if (empty($forma_cobro)) {
-			$Pagina->AddError(__("Por favor ingrese la forma de ") . __("cobro") . __(" en la tarificación"));
-		} else {
-			switch ($forma_cobro) {
-				case "RETAINER":
-					if ( (empty($monto) && $monto != 0) || $monto == '' ) {
-						$Pagina->AddError(__("Por favor ingrese el monto para el retainer en la tarificación"));
-					}
-					if ($retainer_horas <= 0) {
-						$Pagina->AddError(__("Por favor ingrese las horas para el retainer en la tarificación"));
-					}
-					if (empty($id_moneda_monto)) {
-						$Pagina->AddError(__("Por favor ingrese la moneda para el retainer en la tarificación"));
-					}
-					break;
-				case "FLAT FEE":
-					if (empty($monto)) {
-						$Pagina->AddError(__("Por favor ingrese el monto para el flat fee en la tarificación"));
-					}
-					if (empty($id_moneda_monto)) {
-						$Pagina->AddError(__("Por favor ingrese la moneda para el flat fee en la tarificación"));
-					}
-					break;
-				case "CAP":
-					if (empty($monto)) {
-						$Pagina->AddError(__("Por favor ingrese el monto para el cap en la tarificación"));
-					}
-					if (empty($id_moneda_monto)) {
-						$Pagina->AddError(__("Por favor ingrese la moneda para el cap en la tarificación"));
-					}
-					if (empty($fecha_inicio_cap)) {
-						$Pagina->AddError(__("Por favor ingrese la fecha de inicio para el cap en la tarificación"));
-					}
-					break;
-				case "PROPORCIONAL":
-					if (empty($monto)) {
-						$Pagina->AddError(__("Por favor ingrese el monto para el proporcional en la tarificación"));
-					}
-					if ($retainer_horas <= 0) {
-						$Pagina->AddError(__("Por favor ingrese las horas para el proporcional en la tarificación"));
-					}
-					if (empty($id_moneda_monto)) {
-						$Pagina->AddError(__("Por favor ingrese la moneda para el proporcional en la tarificación"));
-					}
-					break;
-				case "ESCALONADA":
-					if (empty($_POST['esc_tiempo'][0])) {
-						$Pagina->AddError(__("Por favor ingrese el tiempo para la primera escala"));
-					}
-					break;
-				case "TASA":
-				case "HITOS":
-					break;
-				default:
-					$Pagina->AddError(__("Por favor ingrese la forma de ") . __("cobro") . __(" en la tarificación"));
-			}
-		}
-
-		if (empty($opc_moneda_total)) {
-			$Pagina->AddError(__("Por favor ingrese la moneda a mostrar el total de la tarifa en la tarificación"));
-		}
-		if (empty($observaciones)) {
-			$Pagina->AddError(__("Por favor ingrese la observacion en la tarificación"));
+		if (empty($id_area_proyecto)) {
+			$Pagina->AddError(__("Por favor ingrese el área del asunto"));	
 		}
 	}
 
-	if ($cobro_independiente) {
-		if ($usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1') && $desde_agrega_cliente) {
-			$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Comercial'));
-		}
-
-		if ($usuario_secundario_obligatorio && Conf::GetConf($Sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
-			$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
-		}
-	}
+	$contractValidation->validate();
 
 	$errores = $Pagina->GetErrors();
 	if (!empty($errores)) {
@@ -317,12 +182,25 @@ if ($opcion == 'guardar') {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		}
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
-		$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
+		if (!empty($id_area_proyecto)) {
+			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
+		} else {
+			$Asunto->Edit("id_area_proyecto", "NULL");
+		} 
+
+		if (!is_null($desglose_area)) {
+			$Asunto->Edit("desglose_area", $desglose_area);
+		}
+		if (!is_null($giro)) {
+			$Asunto->Edit("giro", $giro);
+		}
 		$Asunto->Edit("id_idioma", $id_idioma);
 		$Asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
 		$Asunto->Edit("id_encargado2", !empty($id_encargado2) ? $id_encargado2 : "NULL");
 		$Asunto->Edit("contacto", $asunto_contacto);
+		$Asunto->Edit("contraparte", $contraparte);
+		$Asunto->Edit("cotizado_con", $cotizado_con);
 		$Asunto->Edit("fono_contacto", $fono_contacto);
 		$Asunto->Edit("email_contacto", $email_contacto);
 		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
@@ -414,8 +292,11 @@ if ($opcion == 'guardar') {
 				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
 
-				if ($Asunto->Write())
+				if ($Asunto->Write()) {
+					$Asunto->writeAreaDetails($id_desglose_area);
+					$Asunto->writeEconomicActivities($id_asunto_giro);
 					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+				}
 				else
 					$Pagina->AddError($Asunto->error);
 
@@ -451,6 +332,8 @@ if ($opcion == 'guardar') {
 			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 			$Asunto->Edit("id_contrato_indep", null);
 			if ($Asunto->Write()) {
+				$Asunto->writeAreaDetails($id_desglose_area);
+				$Asunto->writeEconomicActivities($id_asunto_giro);
 				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito'));
 				$ContratoObj = new Contrato($Sesion);
 				$ContratoObj->Load($Contrato_indep);
@@ -472,7 +355,7 @@ $AreaProyecto = new AreaProyecto($Sesion);
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
-$Form = new Form;
+
 if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 	$field_codigo_asunto_secundario = array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario']));
 
@@ -563,6 +446,12 @@ function MuestraPorValidacion(divID) {
 			return false;
 		}
 
+		if (!form.id_area_proyecto.value) {
+			alert("Debe ingresar el área del asunto");
+			form.id_area_proyecto.focus();
+			return false;
+		}
+		
 		<?php
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
@@ -588,200 +477,8 @@ function MuestraPorValidacion(divID) {
 			}
 		<?php } ?>
 
-		if (document.getElementById('cobro_independiente').checked) {
-			<?php if ($validaciones_segun_config) { ?>
-				// DATOS FACTURACION
-
-				if (!form.factura_rut.value) {
-					alert("<?php echo __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_rut.focus();
-					return false;
-				}
-
-				if (!form.factura_razon_social.value) {
-					alert("<?php echo __('Debe ingresar la razón social del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_razon_social.focus();
-					return false;
-				}
-
-				if (!form.factura_giro.value) {
-					alert("<?php echo __('Debe ingresar el giro del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_giro.focus();
-					return false;
-				}
-
-				if (!form.factura_direccion.value) {
-					alert("<?php echo __('Debe ingresar la dirección del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_direccion.focus();
-					return false;
-				}
-
-				if (!form.factura_comuna.value) {
-					alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_comuna.focus();
-					return false;
-				}
-
-				if (!form.factura_ciudad.value) {
-					alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_ciudad.focus();
-					return false;
-				}
-
-				if (form.id_pais.options[0].selected == true) {
-					alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.id_pais.focus();
-					return false;
-				}
-
-				if (!form.cod_factura_telefono.value) {
-					alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.cod_factura_telefono.focus();
-					return false;
-				}
-
-				if (!form.factura_telefono.value) {
-					alert("<?php echo __('Debe ingresar el número de telefono') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_telefono.focus();
-					return false;
-				}
-
-				// SOLICITANTE
-				var titulocontacto = jQuery('#contacto');
-				if (!titulocontacto) {
-					alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
-					MuestraPorValidacion('datos_solicitante');
-					form.titulo_contacto.focus();
-					return false;
-				}
-
-				var nombrecontacto = jQuery('#nombre_contacto');
-				if (!nombrecontacto) {
-					alert("<?php echo __('Debe ingresar el nombre del solicitante') ?>");
-					MuestraPorValidacion('datos_solicitante');
-					form.nombre_contacto.focus();
-					return false;
-				}
-
-				var apellidocontacto = jQuery('#apellido_contacto');
-				if (!apellidocontacto) {
-					alert("<?php echo __('Debe ingresar el apellido del solicitante') ?>");
-					MuestraPorValidacion('datos_solicitante');
-					form.apellido_contacto.focus();
-					return false;
-				}
-
-				var telefonocontacto = jQuery('#email_contacto_contrato');
-				if (!telefonocontacto) {
-					alert("<?php echo __('Debe ingresar el teléfono del solicitante') ?>");
-					MuestraPorValidacion('datos_solicitante');
-					form.fono_contacto_contrato.focus();
-					return false;
-				}
-
-				var emailcontacto = jQuery('#email_contacto_contrato');
-				if (!emailcontacto) {
-					alert("<?php echo __('Debe ingresar el email del solicitante') ?>");
-					MuestraPorValidacion('datos_solicitante');
-					form.email_contacto_contrato.focus();
-					return false;
-				}
-
-				var direccioncontacto = jQuery('#direccion_contacto_contrato');
-				if (!direccioncontacto) {
-					alert("<?php echo __('Debe ingresar la dirección de envío del solicitante') ?>");
-					MuestraPorValidacion('datos_solicitante');
-					form.direccion_contacto_contrato.focus();
-					return false;
-				}
-
-				// DATOS DE TARIFICACION
-				if (!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked)) {
-					alert("<?php echo __('Debe seleccionar un tipo de tarifa') ?>");
-					MuestraPorValidacion('datos_cobranza');
-					form.tipo_tarifa[0].focus();
-					return false;
-				}
-
-				/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
-
-				if (form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0) {
-					alert("<?php echo __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
-					MuestraPorValidacion('datos_cobranza');
-					form.tarifa_flat.focus();
-					return false;
-				}
-
-				if (!$$('[name="forma_cobro"]').any(function(elem) {
-					return elem.checked;
-				}))
-				{
-					alert("<?php echo __('Debe seleccionar una forma de cobro') . ' ' . __('para la tarifa') ?>");
-					form.forma_cobro[0].focus();
-					return false;
-				}
-
-				if ($('fc7').checked) {
-					if ($$('[id^="fila_hito_"]').any(function(elem) {
-						return !validarHito(elem, true);
-					})) {
-						return false;
-					}
-					if (!$$('[id^="hito_monto_"]').any(function(elem) {
-						return Number(elem.value) > 0;
-					})) {
-						alert("<?php echo __('Debe ingresar al menos un hito válido') ?>");
-						$('hito_descripcion_1').focus();
-						return false;
-					}
-				}
-
-				if (!form.observaciones.value) {
-					alert("<?php echo __('Debe ingresar un detalle para la cobranza') ?>");
-					MuestraPorValidacion('datos_cobranza');
-					form.observaciones.focus();
-					return false;
-				}
-
-			<?php } ?>
-
-			<?php if ($usuario_responsable_obligatorio) { ?>
-				if ($('id_usuario_responsable').value == '-1' && $('cobro_independiente').checked) {
-					alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Comercial') ?>");
-					$('id_usuario_responsable').focus();
-					return false;
-				}
-			<?php } ?>
-
-			<?php if ($usuario_secundario_obligatorio && Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
-				if ($('id_usuario_secundario').value == '-1' && $('cobro_independiente').checked) {
-					alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
-					$('id_usuario_secundario').focus();
-					return false;
-				}
-			<?php } ?>
-
-			var forma_cobro = jQuery('#div_cobro').children("input:checked").val();
-
-			if (forma_cobro == 'RETAINER' && (form.monto.value <= 0 || form.monto.value == '') && (form.monto_posterior.value != form.monto.value || form.forma_cobro_posterior.value != forma_cobro)) {
-				alert('Ha seleccionado la forma de cobro ' + forma_cobro + ' e ingresó el monto en 0');
-				return false;
-			}
-
-			if ((forma_cobro == 'RETAINER' || forma_cobro == 'FLAT FEE' || forma_cobro == 'CAP' || forma_cobro == 'PROPORCIONAL') && (form.monto.value <= 0 || form.monto.value == '')) {
-				alert('Atención: Ha seleccionado la forma de cobro ' + forma_cobro + ' e ingresó el monto en 0');
-				return false;
-			}
-		}
+		<?php echo $contractValidation->getClientValidationsScripts(); ?>
+ 
 		jQuery(form).submit();
 		return true;
 	}
@@ -992,7 +689,51 @@ function MuestraPorValidacion(divID) {
 								<?php echo __('Área') . ' ' . __('asunto') ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden ASC'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
+
+							<?php echo $SelectHelper->ajax_select(
+									'id_area_proyecto',
+									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto, 
+									array('class' => 'span3', 'style' => 'display:inline'), 
+									array(
+										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
+										'onChange' => '
+											var element = selected_IdAreaProyecto;
+											jQuery("#id_desglose_area_container").hide();
+											jQuery("#desglose_area").hide()
+											if (element && element.requiere_desglose == "1") {
+												jQuery("#id_desglose_area_container").show();
+												FormSelectHelper.reload_id_desglose_area();
+											}
+										'
+									)
+								);
+								?>
+								<span style="color:#FF0000; font-size:10px">*</span>
+								<?php echo $SelectHelper->checkboxes(
+										'id_desglose_area', 
+										array(),
+									 	$Asunto->getAreaDetails(),
+									 	array('class' => 'span6', 'style' => 'display:inline'),
+									 	array(
+										 	'autoload' => false,
+											'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
+											'onSource' => '
+												source = source + "&q=id_area_proyecto:" + jQuery("#IdAreaProyecto").val();
+											',
+											'onChange' => '
+												var element = selected_id_desglose_area;
+												if (element && element.requiere_desglose == "1") {
+													if (checked) {
+														jQuery("#desglose_area").show();
+													} else {
+														jQuery("#desglose_area").val("").hide();
+													}
+												} 
+											'
+										)
+									); 
+								echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
+								?>
 							</td>
 						</tr>
 						<tr>
@@ -1003,7 +744,35 @@ function MuestraPorValidacion(divID) {
 								<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
-
+						<tr>
+							<td align="right">
+								<?php echo __('Giro') ?>
+							</td>
+							<td align="left">						
+								<?php echo $SelectHelper->checkboxes(
+										'id_asunto_giro', 
+										array(),
+									 	$Asunto->getEconomicActivities(),
+									 	array('class' => 'span6', 'style' => 'display:inline'),
+									 	array(
+										 	'autoload' => true,
+											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
+											'onChange' => '
+												var element = selected_id_asunto_giro;
+												if (element && element.requiere_desglose == "1") {
+													if (checked) {
+														jQuery("#giro").show();
+													} else {
+														jQuery("#giro").val("").hide();
+													}
+												} 
+											'
+										)
+									); 
+								echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
+								?>
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<?php echo __('Usuario responsable'); ?>
@@ -1027,6 +796,22 @@ function MuestraPorValidacion(divID) {
 								</td>
 							</tr>';
 						<?php } ?>
+						<tr>
+							<td align="right">
+								<?php echo __('Contraparte') ?>
+							</td>
+							<td align="left">
+								<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<?php echo __('Cotizado conjuntamente con') ?>
+							</td>
+							<td align="left">
+								<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<?php echo __('Contacto solicitante') ?>
@@ -1250,7 +1035,7 @@ function MuestraPorValidacion(divID) {
 <?php echo InputId::Javascript($Sesion) ?>
 
 <?php
-$Pagina->PrintBottom($popup);
+$Pagina->PrintBottom($popup, false, true);
 
 function EnviarEmail($Asunto) {
 

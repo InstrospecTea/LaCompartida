@@ -1,7 +1,9 @@
 <?php
 
 require_once dirname(__FILE__) . '/../../app/conf.php';
-
+/**
+ * Esta clase provee helpers para crear elementos de formularios HTML
+ */
 class Form {
 
 	public $Utiles;
@@ -16,11 +18,13 @@ class Form {
 
 	/**
 	 * Construye un select a partir de un Array
-	 * @param type $name
-	 * @param type $options
-	 * @param type $selected
-	 * @param type $attrs
-	 * @return type
+	 * 
+	 * @param string $name Nombre del selector en el formulario
+	 * @param array $options Opciones para crear elementos <option/>
+	 * @param string $selected Opción seleccionada por default
+	 * @param array $attrs Atributos del elemento HTML, ej: id, type, etc.
+	 * 
+	 * @return string HTML que contiene el selector
 	 */
 	public function select($name, $options, $selected = null, $attrs = null) {
 		$_attrs = (Array) $attrs + array('empty' => '');
@@ -137,6 +141,31 @@ class Form {
 		$radio = $this->Html->tag('input', null, $attrs, true);
 		return empty($label) ? $radio : $this->label($radio . $label);
 	}
+
+	/**
+	 * Construye un grupo de elementos checkbox 
+	 * 
+	 * @param string $name Nombre del elemento en el formulario
+	 * @param array $options cada una de las opciones para crear <input type=check />
+	 * @param array $selected Checkboxes seleccionados por default
+	 * @param string $containr Contenedor para el grupo de checkbox. Default: div
+	 * @param array $containr_attrs Atributos del elemento HTML, ej: id, type, etc.
+	 * 
+	 * @return string HTML que contiene el grupo de checkboxes
+	 */
+	public function checkbox_group($name, $options, $selected, $container = 'div', $container_attrs = null) {
+		$html = '';
+		foreach ((Array) $options as $value => $element) {
+			$attrs['id'] = $this->Utiles->pascalize($name);
+			$attrs['label'] = is_array($element) ? $element['glosa'] : $element;
+			$html .= $this->checkbox($name, $element, in_array($value, $selected), $attrs);
+		}
+		if ($container !== false) {
+			$html = $this->Html->tag($container, $html, (Array) $container_attrs);
+		}
+		return $html;
+	}
+
 
 	/**
 	 * Devuelve elemento radio
