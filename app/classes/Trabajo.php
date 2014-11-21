@@ -61,7 +61,7 @@ class Trabajo extends Objeto
 			$work = $workService->saveOrUpdate($work);
 			$this->fields = $work->fields;
 			return true;
-		} catch(DAOException $ex) {
+		} catch(ServiceException $ex) {
 			return false;
 		}
 	}
@@ -72,12 +72,12 @@ class Trabajo extends Objeto
 			$this->error = 'No se puede mover un trabajo cobrado';
 			return false;
 		}
-		if 	($this->changes['fecha'] || $this->changes['id_usuario'] || 
+		if 	($this->changes['fecha'] || $this->changes['id_usuario'] ||
 				$this->changes['id_trabajo'] || $this->changes['duracion']
 			) {
 				$horasenfecha = $this->HorasEnFecha(
 					$this->fields['fecha'],
-					$this->fields['id_usuario'], 
+					$this->fields['id_usuario'],
 					$this->fields['id_trabajo']
 				);
 				$duracion = $this->fields['duracion'];
@@ -218,20 +218,6 @@ class Trabajo extends Objeto
 			$work = new Work();
 			$work->fillFromArray($this->fields);
 			$workService->delete($work);
-
-			// $query = "INSERT INTO trabajo_historial SET
-			// 		id_trabajo = '{$this->fields['id_trabajo']}',
-			// 		id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-			// 		fecha = '" . date("Y-m-d H:i:s") . "',
-			// 		fecha_trabajo = '{$this->fields['fecha']}',
-			// 		descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
-			// 		duracion = '{$this->fields['duracion']}',
-			// 		duracion_cobrada = '{$this->fields['duracion_cobrada']}',
-			// 		id_usuario_trabajador = '{$this->fields['id_usuario']}',
-			// 		accion = 'ELIMINAR',
-			// 		codigo_asunto = '{$this->fields['codigo_asunto']}',
-			// 		cobrable = '{$this->fields['cobrable']}'";
-			// mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
 			// Eliminar el Trabajo del Comentario asociado
 			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";
