@@ -646,6 +646,10 @@ class Factura extends Objeto {
 
 			case 'ENCABEZADO':
 
+				$PrmEstudio = new PrmEstudio($this->sesion);
+				$PrmEstudio->Load($this->fields['id_estudio']);
+				$html2 = str_replace('%estudio%', $PrmEstudio->fields['glosa_estudio'], $html2);
+
 				$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 				$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
 				$PdfLinea3 = Conf::GetConf($this->sesion, 'PdfLinea3');
