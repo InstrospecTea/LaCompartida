@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.19.24
 Viernes 21 de Noviembre 2014
-* **Fixed:** [Agregar nuevos tags a la factura](https://github.com/LemontechSA/ttb/pull/765)
+* **Fixed:** [Agregar nuevos tags a la factura](https://github.com/LemontechSA/ttb/pull/763)
 
 ## Hotfix: 14.19.24
 Jueves 18 de Noviembre 2014
