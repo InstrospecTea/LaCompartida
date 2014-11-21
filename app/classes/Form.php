@@ -139,7 +139,7 @@ class Form {
 	}
 
 	/**
-	 *
+	 * Devuelve un grupo de elementos checkbox 
 	 * @param type $name
 	 * @param type $options Array
 	 * @param type $selected Array
