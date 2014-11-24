@@ -10555,7 +10555,16 @@ QUERY;
 				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
 			break;
 		case 7.86:
-			$queries[] = "ALTER TABLE trabajo_historial CHANGE COLUMN fecha fecha_accion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;";
+			$queries[] = "ALTER TABLE `trabajo_historial`
+							CHANGE COLUMN `accion` `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `fecha_accion`,
+							CHANGE COLUMN `app_id` `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' AFTER `accion`,
+							CHANGE COLUMN `id_trabajo_respaldo_excel` `id_trabajo_respaldo_excel` INT(11) NULL DEFAULT NULL AFTER `app_id`,
+							CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+							CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NULL DEFAULT NULL ,
+							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
+							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
+							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
+							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
 			break;
 	}
 	if (!empty($queries)) {

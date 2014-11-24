@@ -82,14 +82,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$insertCriteria->set_into($object->getLoggingTable());
 		$insertCriteria->add_pivot_with_value('accion', $action);
 		$insertCriteria->add_pivot_with_value('app_id', $app_id);
-		if (!is_null($this->sesion->usuario->fields['id_usuario'])) {
-			$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-		}
+		$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 		$inmutableProperties = $object->getInmutableLoggeableProperties();
 		foreach ($inmutableProperties as $inmutableProperty) {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));
 		}
-		$object->fillDefaults();
 		$properties = $object->getLoggeableProperties();
 		$legacy->fillDefaults();
 		foreach ($properties as $property) {
@@ -112,7 +109,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		try {
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
-			throw new CouldNotWriteLogException('No se pudo guardar el log.'.$ex->getMessage());
+			throw new CouldNotWriteLogException('No se pudo guardar el log.' . $ex->getMessage());
 		}
 	}
 
@@ -179,7 +176,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
 			return $object;
 		} else {
-			throw new CouldNotSaveEntityException('No se ha podido persistir la entidad de tipo .'.$this->getClass());
+			throw new CouldNotSaveEntityException('No se ha podido persistir la entidad de tipo .' . $this->getClass());
 		}
 	}
 
@@ -189,13 +186,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	 * @throws CouldNotUpdateEntityException
 	 */
 	private function update(Entity $object) {
-		try{
+		try {
 			return $this->save($object);
-		} catch (Exception $ex){
-			throw new CouldNotUpdateEntityException('No se ha podido encontrar la entidad de tipo '.$this->getClass().'
-			con identificador primario '.$object->get($object->getIdentity()).'.');
+		} catch (Exception $ex) {
+			throw new CouldNotUpdateEntityException('No se ha podido encontrar la entidad de tipo ' . $this->getClass() . '
+			con identificador primario ' . $object->get($object->getIdentity()) . '.');
 		}
-
 	}
 
 	private function merge(Entity $legacy, Entity $new) {
@@ -214,7 +210,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$resultArray = $resultArray[0];
 		if (empty($resultArray)) {
 			throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
-			'.$this->getClass().' con identificador primario '.$id.'.');
+			' . $this->getClass() . ' con identificador primario ' . $id . '.');
 		}
 		return $this->encapsulate($resultArray, $instance);
 	}
