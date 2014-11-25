@@ -10579,7 +10579,7 @@ QUERY;
 				PRIMARY KEY (`id_area_proyecto_desglose`),
 				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
 				CONSTRAINT `fk_prm_area_proyecto_id` 
-				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
+				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`) ON DELETE CASCADE);";
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_area_proyecto_desglose` (
 				`id_asunto` INT(11) NOT NULL,
@@ -10587,9 +10587,9 @@ QUERY;
 				INDEX `fk_asunto_area_proyecto_desglose` (`id_asunto` ASC),
 				INDEX `fk_prm_area_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
 				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`) 
-					REFERENCES `asunto` (`id_asunto`),
+					REFERENCES `asunto` (`id_asunto`)  ON DELETE CASCADE,
 				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`) 
-					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`));";
+					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`)  ON DELETE CASCADE);";
 
 			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
 				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
@@ -10617,9 +10617,9 @@ QUERY;
 				INDEX `fk_asunto_asunto_giro` (`id_asunto` ASC),
 				INDEX `fk_prm_giro_asunto_giro` (`id_giro` ASC),
 				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`) 
-					REFERENCES `asunto` (`id_asunto`),
+					REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
 				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`) 
-					REFERENCES `prm_giro` (`id_giro`));";
+					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
 			
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
 
