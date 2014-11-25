@@ -2366,7 +2366,7 @@ HTML;
 	public static function mergeKeyValue($array, $template = '%s - %s') {
 		$result = array();
 		foreach ($array as $key => $value) {
-			$result[$key] = sprintf($template, $key, $value);
+			$result[$key] = empty($key) ? $value : sprintf($template, $key, $value);
 		}
 		return $result;
 	}
