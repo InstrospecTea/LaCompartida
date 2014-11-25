@@ -10562,6 +10562,9 @@ QUERY;
 							CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 							CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NULL DEFAULT NULL ,
 							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
+							CHANGE COLUMN `descripcion` `descripcion` MEDIUMTEXT NULL DEFAULT NULL ,
+							CHANGE COLUMN `descripcion_modificado` `descripcion_modificado` MEDIUMTEXT NULL DEFAULT NULL ,
+							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL , 
 							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
