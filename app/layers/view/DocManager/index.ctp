@@ -88,8 +88,8 @@
                         </div>
                     </div>
 
-                    <div class="panel-body" style="overflow-y:auto; height: calc(100vh - 70px - 60px);">
-                        <div id="letter_preview" class="col-md-12" style="height:100%"></div>
+                    <div class="panel-body noPad" style="overflow-y:auto; height: calc(100vh - 70px - 60px);">
+                        <iframe id="letter_preview" name="letter_preview" class="col-md-12 noPad" style="height:100%; width: 100%; border: 0;"></iframe>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,6 @@
     </div>
 
     <!-- Modal para definir margenes -->
-
     <div class="modal fade" id="margenes" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

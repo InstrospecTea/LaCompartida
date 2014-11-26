@@ -41,18 +41,20 @@ class DocManagerController extends AbstractController {
 
 	public function guardar() {
 		$this->loadModel('Carta');
+		$saved = false;
 		$error = '';
 		if (!$this->Carta->Load($this->data['carta']['id_carta'])) {
 			$error = 'El formato indicado no existe.';
 		} else {
 			$data = UtilesApp::utf8izar($this->data['carta'], false);
 			$this->Carta->Fill($data, true);
-			if (!$this->Carta->Write()) {
+			$saved = $this->Carta->Write();
+			if (!$saved) {
 				$error = 'No se pudo crear la carta.';
 			}
 		}
 
-		$this->renderJSON(array('success' => true, 'id' => $this->Carta->fields[$this->Carta->campo_id], 'error' => $error));
+		$this->renderJSON(array('success' => $saved, 'id' => $this->Carta->fields[$this->Carta->campo_id], 'error' => $error));
 	}
 
 	public function eliminar() {
@@ -68,13 +70,14 @@ class DocManagerController extends AbstractController {
 			if (!$this->Cobro->Loaded()) {
 				throw new Exception('');
 			}
+
 			$CartaCobro = new CartaCobro($this->Session, $this->Cobro->fields, $this->Cobro->ArrayFacturasDelContrato, $this->Cobro->ArrayTotalesDelContrato);
-			$formato_html = utf8_decode($this->data['formato']);
-			$this->data = $CartaCobro->ReemplazarTemplateHTML($formato_html, $id_cobro);
+			$this->data = $this->data['carta'];
+			$this->data['formato'] = $CartaCobro->ReemplazarTemplateHTML($this->data['formato'], $id_cobro);
 		} catch (Exception $e) {
 			$this->data = '';
 		}
-		$this->render('/elements/plain_text', 'ajax');
+		$this->layout = 'ajax';
 	}
 
 	public function previsualizar($id_cobro) {
