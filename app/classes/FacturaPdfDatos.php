@@ -67,33 +67,33 @@ class FacturaPdfDatos extends Objeto {
 		switch ($condicion_pago) {
 			case '1': $condicion_pago = __('CONTADO');
 				break;
-			case '3': $condicion_pago = __('Vencimiento 15 días	');
+			case '3': $condicion_pago = __('Vencimiento 15 dï¿½as	');
 				break;
-			case '4': $condicion_pago = __('Vencimiento 30 días	');
+			case '4': $condicion_pago = __('Vencimiento 30 dï¿½as	');
 				break;
-			case '5': $condicion_pago = __('Vencimiento 45 días	');
+			case '5': $condicion_pago = __('Vencimiento 45 dï¿½as	');
 				break;
-			case '6': $condicion_pago = __('Vencimiento 60 días	');
+			case '6': $condicion_pago = __('Vencimiento 60 dï¿½as	');
 				break;
-			case '7': $condicion_pago = __('Vencimiento 75 días	');
+			case '7': $condicion_pago = __('Vencimiento 75 dï¿½as	');
 				break;
-			case '8': $condicion_pago = __('Vencimiento 90 días	');
+			case '8': $condicion_pago = __('Vencimiento 90 dï¿½as	');
 				break;
-			case '9': $condicion_pago = __('Vencimiento 120 días');
+			case '9': $condicion_pago = __('Vencimiento 120 dï¿½as');
 				break;
-			case '12': $condicion_pago = __('Letra 30 días');
+			case '12': $condicion_pago = __('Letra 30 dï¿½as');
 				break;
-			case '13': $condicion_pago = __('Letra 45 días');
+			case '13': $condicion_pago = __('Letra 45 dï¿½as');
 				break;
-			case '14': $condicion_pago = __('Letra 60 días');
+			case '14': $condicion_pago = __('Letra 60 dï¿½as');
 				break;
-			case '15': $condicion_pago = __('Letra 90 días');
+			case '15': $condicion_pago = __('Letra 90 dï¿½as');
 				break;
-			case '18': $condicion_pago = __('Cheque 30 días');
+			case '18': $condicion_pago = __('Cheque 30 dï¿½as');
 				break;
-			case '19': $condicion_pago = __('Cheque 45 días');
+			case '19': $condicion_pago = __('Cheque 45 dï¿½as');
 				break;
-			case '20': $condicion_pago = __('Cheque 60 días');
+			case '20': $condicion_pago = __('Cheque 60 dï¿½as');
 				break;
 			case '21': $condicion_pago = __('Cheque a fecha');
 				break;
@@ -198,6 +198,24 @@ class FacturaPdfDatos extends Objeto {
 			case 'fecha_ano_dos_ultimas_cifras':
 				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2);
 				break;
+			case 'fecha_venc_dia':
+				$glosa_dato = date("d", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_mes':
+				$glosa_dato = strftime("%B", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_ano':
+				$glosa_dato = date("Y", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_ano_ultima_cifra':
+                $glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-1);
+                break;
+			case 'fecha_venc_ano_dos_cifras':
+                $glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-2);
+				break;
+            case 'fecha_venc_numero_mes':
+                $glosa_dato = strftime("%m", strtotime($factura->fields['fecha_vencimiento']));
+                break;
 			case 'direccion':
 				$glosa_dato = $factura->fields['direccion_cliente'];
 				break;
@@ -334,7 +352,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
-
+            case 'lbl_fecha_vencimiento':
+                $glosa_dato = 'Fecha Vencimiento / Due Date:';
+                break;
 			default:
 			
 				if (array_key_exists($tipo_dato, $array_comodines)) {
@@ -462,7 +482,7 @@ class FacturaPdfDatos extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id_documento_legal, $codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 
-		$this->CargarDatos($id_factura, $id_documento_legal, $factura->fields['id_estudio']); // esto trae la posicion, tamaño y glosa de todos los campos más los datos del papel en la variable $this->papel;
+		$this->CargarDatos($id_factura, $id_documento_legal, $factura->fields['id_estudio']); // esto trae la posicion, tamaï¿½o y glosa de todos los campos mï¿½s los datos del papel en la variable $this->papel;
 
 		if(count($this->papel)) {
 			$pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'], $this->papel['cellH']));
@@ -470,7 +490,7 @@ class FacturaPdfDatos extends Objeto {
 			$pdf->SetAutoPageBreak(true, $margin);
 		} else {
 			// P: hoja vertical
-			// mm: todo se mide en milímetros
+			// mm: todo se mide en milï¿½metros
 			// Letter: formato de hoja
 			$pdf = new FPDF($orientacion, 'mm', $format);
 		}
@@ -481,7 +501,7 @@ class FacturaPdfDatos extends Objeto {
 
 		$pdf->SetTitle($glosa_documento_legal . ' ' . $factura->fields['numero']);
 
-		// La orientación y formato de la página son los mismos que del documento
+		// La orientaciï¿½n y formato de la pï¿½gina son los mismos que del documento
 		$pdf->AddPage();
 		$datos['dato_letra'] = str_replace(array("<br>\n", "<br/>\n", "<br />\n" ), "\n", $datos['dato_letra']);
 

@@ -114,7 +114,7 @@ $pagina->PrintTop();
 			jQuery('#id_factura_pdf_datos_categoria').val(Id_categoria);
 			var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 			jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
-			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 		});
 
 		jQuery('#botonguardar').click(function() {
@@ -153,7 +153,7 @@ $pagina->PrintTop();
 			var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 			jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
 			jQuery("#fila_"+Actual).css({'background':'#CFC'});
-			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 			jQuery("#fila_"+Actual).animate({'backgroundColor':'#FFF'},2000);
 		});
 
@@ -405,7 +405,7 @@ $pagina->PrintTop();
 				jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
 				jQuery("#fila_"+ID).css({'background':'#CFC'});
 				//  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
 			},
 			stop:function(event,ui) {
@@ -425,7 +425,7 @@ $pagina->PrintTop();
 				Pos = jQuery(".cat_"+Cat).first().attr('rel');
 				jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
 				jQuery("#fila_"+ID).css({'background':'#CFC'});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
 			},
 			stop: function(event,ui) {
@@ -452,7 +452,7 @@ $pagina->PrintTop();
 				filasporcat();
 				var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 				jQuery( "#tabla_coordenadas" ).css({'top':24*(1-Pos)} );
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery('#datospdf').show();
 				pizarron();
 				jQuery('#uploadify').appendTo('#fatcell').show();
@@ -529,7 +529,7 @@ $pagina->PrintTop();
 
 				var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#tabla_coordenadas").css({'top':24*(1-Pos)});
 				jQuery('#uploadify').appendTo('#fatcell').show();
 				jQuery("#contienecoordenadas").removeClass('divloading');
@@ -559,7 +559,7 @@ $pagina->PrintTop();
 			<?php echo __('Tipo dato:'); ?>&nbsp;
 		</td>
 		<td align="left">
-			<?php echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $id_factura_pdf_datos_categoria, 'style="width:100px;"'); ?>
+			<?php echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $select_id_factura_pdf_datos_categoria, 'style="width:100px;"'); ?>
 		</td>
 		<td>
 			<input type="button" id="botonguardar" value="Guardar" style="width:80px;">&nbsp;
