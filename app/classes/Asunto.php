@@ -258,6 +258,20 @@ class Asunto extends Objeto {
 			)
 		),
 		array(
+			'field' => 'contraparte',
+			'title' => 'Contraparte',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'cotizado_con',
+			'title' => 'Cotizado Conjuntamente con',
+			'extras' => array(
+				'width' => 40
+			)
+		),
+		array(
 			'field' => 'contacto',
 			'title' => 'Nombre Contacto',
 			'extras' => array(
@@ -683,8 +697,9 @@ class Asunto extends Objeto {
 			SUM(IF(cobro_trabajo.estado IS NULL OR cobro_trabajo.estado = 'CREADO' OR cobro_trabajo.estado = 'EN REVISION',
 				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas,
 
-			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento
-
+			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
+			contraparte,
+			cotizado_con
 			FROM asunto AS a1
 			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
 			LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato

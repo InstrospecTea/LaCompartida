@@ -105,6 +105,13 @@ class Cliente extends Objeto {
 			)
 		),
 		array(
+			'field' => 'nombre_pais_grupo',
+			'title' => 'País Grupo',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
 			'field' => 'username',
 			'title' => 'Encargado Comercial',
 			'extras' => array(
@@ -667,6 +674,8 @@ class Cliente extends Objeto {
 				cliente.codigo_cliente_secundario,
 				cliente.glosa_cliente,
 				grupo_cliente.glosa_grupo_cliente,
+				pais_grupo.id_pais as id_pais_grupo,
+				pais_grupo.nombre as nombre_pais_grupo,
 				moneda.glosa_moneda,
 				CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario_nombre,
 				usuario.username,
@@ -683,7 +692,10 @@ class Cliente extends Objeto {
 				contrato.direccion_contacto,
 				contrato.forma_cobro,
 				contrato.monto,
-				prm_cliente_referencia.glosa_cliente_referencia,
+				(CASE
+    			WHEN prm_cliente_referencia.requiere_desglose = 1 
+    			THEN CONCAT(prm_cliente_referencia.glosa_cliente_referencia, ': ', cliente.desglose_referencia) 
+    			ELSE prm_cliente_referencia.glosa_cliente_referencia END) as glosa_cliente_referencia,
 				tarifa.glosa_tarifa,
 				contrato.id_moneda_monto,
 				cliente.fecha_creacion,
@@ -695,6 +707,7 @@ class Cliente extends Objeto {
 				cuenta_banco.glosa as glosa_banco
 			FROM cliente
 				LEFT JOIN grupo_cliente USING (id_grupo_cliente)
+				LEFT JOIN prm_pais AS pais_grupo ON grupo_cliente.id_pais = pais_grupo.id_pais
 				LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia
 				LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato
 				LEFT JOIN prm_moneda AS moneda ON contrato.id_moneda = moneda.id_moneda
