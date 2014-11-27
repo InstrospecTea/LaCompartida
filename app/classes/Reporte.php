@@ -41,8 +41,6 @@ class Reporte {
 
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar');
 
-	protected $Criteria;
-
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
 		$this->dato_usuario = $this->nombre_usuario('usuario');
@@ -52,8 +50,6 @@ class Reporte {
 		} else {
 			$this->dato_codigo_asunto = 'asunto.codigo_asunto';
 		}
-
-		$this->Criteria = new Criteria($this-sesion);
 	}
 
 	public function configuracion($opcs = array()) {
@@ -332,73 +328,50 @@ class Reporte {
 
 		$campo_fecha = $this->alt($this->campo_fecha_cobro, $this->campo_fecha_cobro_2);
 
-		$indefinido = sprintf("'%s'", __('Indefinido'));
-		$por_emitir = __('Por Emitir');
-		$Criteria = new Criteria($this->sesion);
-		$Criteria
-			->add_select($indefinido, 'profesional')
-			->add_select($indefinido, 'username')
-			->add_select($indefinido, 'categoria_usuario')
-			->add_select($indefinido, 'area_usuario')
-			->add_select(-1, 'id_usuario')
-			->add_select('cliente.id_cliente')
-			->add_select('cliente.codigo_cliente')
-			->add_select('cliente.glosa_cliente')
-			->add_select('asunto.glosa_asunto')
-			->add_select("CONCAT({$this->dato_codigo_asunto}, ': ', asunto.glosa_asunto)", 'glosa_asunto_con_codigo')
-			->add_select('asunto.codigo_asunto')
-			->add_select('contrato.id_contrato')
-			->add_select("' - '", 'tipo_asunto')
-			->add_select("' - '", 'area_asunto')
-			->add_select("MONTH({$campo_fecha})", 'mes')
-			->add_select('grupo_cliente.id_grupo_cliente')
-			->add_select("IFNULL(grupo_cliente.glosa_grupo_cliente, '-')", 'glosa_grupo_cliente')
-			->add_select("CONCAT(cliente.glosa_cliente, ' - ', asunto.codigo_asunto, ' ', asunto.glosa_asunto)", 'glosa_cliente_asunto')
-			->add_select('IFNULL(grupo_cliente.glosa_grupo_cliente, cliente.glosa_cliente)', 'grupo_o_cliente')
-			->add_select($campo_fecha, 'fecha_final')
-			->add_select("DATE_FORMAT({$campo_fecha}, '%m-%Y')", 'mes_reporte')
-			->add_select("DATE_FORMAT({$campo_fecha}, '%d-%m-%Y')", 'dia_reporte')
-			->add_select('cobro.id_cobro')
-			->add_select('cobro.estado', 'estado')
-			->add_select('cobro.forma_cobro', 'forma_cobro');
+		$s = 'SELECT \'' . __('Indefinido') . '\' as profesional,
+					\'' . __('Indefinido') . '\' as username,
+					-1 as id_usuario,
+					cliente.id_cliente,
+					cliente.codigo_cliente,
+					' . (in_array('codigo_cliente_secundario', $this->agrupador) ? 'cliente.codigo_cliente_secundario,' : '') . '
+					' . (in_array('prm_area_proyecto.glosa', $this->agrupador) ? "'" . __('Indefinido') . "' AS glosa," : '') . '
+					\'' . __('Indefinido') . '\' as categoria_usuario,
+					\'' . __('Indefinido') . '\' as area_usuario,
+					' . (in_array('id_usuario_responsable', $this->agrupador) ? $this->nombre_usuario('usuario_responsable') . ' AS nombre_usuario_responsable,' : '') . '
+					' . (in_array('id_usuario_responsable', $this->agrupador) ? ' usuario_responsable.id_usuario AS id_usuario_responsable,' : '') . '
+					' . (in_array('id_usuario_secundario', $this->agrupador) ? ' usuario_secundario.id_usuario AS id_usuario_secundario,' : '') . '
+					' . (!$this->vista ? "'Indefinido' AS agrupador_general," : '') . '
+					' . (in_array('id_usuario_secundario', $this->agrupador) ? $this->nombre_usuario('usuario_secundario') . ' AS nombre_usuario_secundario,' : '') . '
+					cliente.glosa_cliente,
+					asunto.glosa_asunto,
+					CONCAT(' . $this->dato_codigo_asunto . ',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
+					asunto.codigo_asunto,
+					contrato.id_contrato,
+					\' - \' as tipo_asunto,
+					\' - \' as area_asunto,
+					MONTH('.$campo_fecha.') as mes,
+					grupo_cliente.id_grupo_cliente,
+					IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
+					CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
+					IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 
-		if (in_array('codigo_cliente_secundario', $this->agrupador)) {
-			$Criteria->add_select('cliente.codigo_cliente_secundario', '');
-		}
-		if (in_array('prm_area_proyecto.glosa', $this->agrupador)) {
-			$Criteria->add_select($indefinido, 'glosa');
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$Criteria->add_select($this->nombre_usuario('usuario_responsable'), 'nombre_usuario_responsable');
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$Criteria->add_select('usuario_responsable.id_usuario', 'id_usuario_responsable');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$Criteria->add_select('usuario_secundario.id_usuario', 'id_usuario_secundario');
-		}
-		if (!$this->vista) {
-			$Criteria->add_select($indefinido, 'agrupador_general');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$Criteria->add_select($this->nombre_usuario('usuario_secundario'), 'nombre_usuario_secundario');
-		}
-		if (in_array('dia_corte', $this->agrupador)) {
-			$Criteria->add_select("DATE_FORMAT(cobro.fecha_fin, '%d-%m-%Y')", 'dia_corte');
-		}
-		if (in_array('dia_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))", 'dia_emision');
-		}
-		if (in_array('mes_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))", 'mes_emision');
-		}
+					' . $campo_fecha . ' as fecha_final,
+					DATE_FORMAT( ' . $campo_fecha . ' , \'%m-%Y\') as mes_reporte,
+					DATE_FORMAT( ' . $campo_fecha . ' , \'%d-%m-%Y\') as dia_reporte,
+					' . (in_array('dia_corte', $this->agrupador) ? 'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,' : '') . '
+					' . (in_array('dia_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,' : '') . '
+					' . (in_array('mes_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,' : '') . '
+					cobro.id_cobro,
+					cobro.estado AS estado,
+					cobro.forma_cobro AS forma_cobro,
+				';
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$Criteria->add_select(' - ', 'glosa_actividad');
+			$s .= " ' - ' as glosa_actividad, ";
 		}
 
 		if (in_array('area_trabajo', $this->agrupador)) {
-			$Criteria->add_select(' - ', 'area_trabajo');
+			$s.= " ' - ' as area_trabajo, ";
 		}
 
 		// TIPO DE DATO
@@ -406,162 +379,100 @@ class Reporte {
 			case 'valor_cobrado':
 			case 'valor_por_cobrar':
 			case 'valor_hora':
-				$Criteria->add_select('0', 'valor_divisor');
-				$Criteria->add_select('(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
-											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-										)', $this->tipo_dato);
+				$s .= ' 0 as valor_divisor, (1/ifnull(ca2.cant_asuntos,1))*SUM( cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 				break;
 
 			case 'rentabilidad_base':
-				$Criteria->add_select('0', 'valor_divisor');
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(
-											IF(
-												cobro.estado NOT IN ('CREADO', 'EN REVISION'),
-												cobro.monto_subtotal
-													* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-												, 0
-											)
-										)", $this->tipo_dato);
+				$s .= ' 0 as valor_divisor, (1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio), 0 ))';
 				break;
 
 			case 'valor_pagado':
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(
-											IF(
-												cobro.estado = 'PAGADO',
-												(cobro.monto_subtotal
-													* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-												),
-												0
-											)
-										)", $this->tipo_dato);
+				$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado = \'PAGADO\',
+								(cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								),
+								0) )';
 				break;
 
 			case 'valor_pagado_parcial':
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
-											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-											* (1 - documento.saldo_honorarios / documento.honorarios)
-											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-										)");
+				$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( (cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								*  ( 1 - documento.saldo_honorarios / documento.honorarios)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
 				break;
 
 			case 'valor_por_pagar_parcial':
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
-											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-											* (documento.saldo_honorarios / documento.honorarios)
-											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-										)", $this->tipo_dato);
+				$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( (cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								*  ( documento.saldo_honorarios / documento.honorarios)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
 				break;
 
 			case 'valor_por_pagar':
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(
-											IF(
-												cobro.estado IN ('PAGADO', 'INCOBRABLE'),
-												0,
-												(
-													cobro.monto_subtotal
-													* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-												)
-											)
-										)", $this->tipo_dato);
+				$s .= '(1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
+								(cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								)) )';
 				break;
 
 			case 'valor_incobrable':
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(
-											IF(
-												cobro.estado != 'INCOBRABLE',
-												0,
-												(
-													cobro.monto_subtotal
-													* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-												)
-											)
-										)", $this->tipo_dato);
-				$s .= '';
+				$s .= '(1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
+								(cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								)) )';
 				break;
 
 			case 'rentabilidad':
-				$Criteria->add_select('0', 'valor_divisor');
-				$Criteria->add_select("(1 / ifnull(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
-											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-										)", $this->tipo_dato);
+				$s .= ' 0 AS valor_divisor,
+								(1/ifnull(ca2.cant_asuntos,1))*SUM(cobro.monto_subtotal * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 				break;
 			case 'diferencia_valor_estandar':
-				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
-											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-										)", $this->tipo_dato);
+				$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( cobro.monto_subtotal
+								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+								/ (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 				break;
 
 			case 'valor_estandar':
 			case 'valor_trabajado_estandar':
 			case 'costo_hh':
-				$Criteria->add_select('0', $this->tipo_dato);
+				$s .= ' SUM( 0 )';
 				break;
 		}
-		$Criteria->add_from('cobro')
-			->add_left_join_with('cobro_asunto', CriteriaRestriction::equals('cobro.id_cobro', 'cobro_asunto.id_cobro'))
-			->add_left_join_with('asunto', CriteriaRestriction::equals('cobro_asunto.codigo_asunto', 'asunto.codigo_asunto'));
-
-		$SubCriteria = new Criteria();
-		$SubCriteria->add_from('cobro_asunto')
-			->add_select('id_cobro')
-			->add_select('count(codigo_asunto)', 'cant_asuntos')
-			->add_grouping('id_cobro');
-
-		$Criteria->add_left_join_with_criteria($SubCriteria, 'ca2', CriteriaRestriction::equals('ca2.id_cobro', 'cobro.id_cobro'))
-			->add_left_join_with('usuario', CriteriaRestriction::equals('cobro.id_usuario', 'usuario.id_usuario'))
-			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'cobro.id_contrato'))
-			->add_left_join_with('cliente', CriteriaRestriction::equals('contrato.codigo_cliente', 'cliente.codigo_cliente'))
-			->add_left_join_with('grupo_cliente', CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
-
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$Criteria->add_left_join_with(array('usuario', 'usuario_responsable'), CriteriaRestriction::equals('usuario_responsable.id_usuario', 'contrato.id_usuario_responsable'));
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$Criteria->add_left_join_with(array('usuario', 'usuario_secundario'), CriteriaRestriction::equals('usuario_secundario.id_usuario', 'contrato.id_usuario_secundario'));
-		}
-
-		$Criteria->add_left_join_with(array('prm_moneda', 'moneda_base'), CriteriaRestriction::equals('moneda_base.moneda_base', '1'));
+		$s .= ' as ' . $this->tipo_dato;
+		$s .= ' FROM cobro
+						left join cobro_asunto using (id_cobro)
+						LEFT JOIN asunto using (codigo_asunto)
+						LEFT JOIN (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro
+						LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario
+						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+						LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
+						' . (in_array('id_usuario_responsable', $this->agrupador) ? ' LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable' : '') . '
+						' . (in_array('id_usuario_secundario', $this->agrupador) ? ' LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario' : '') . '
+						LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
+					';
 
 		if ($this->tipo_dato == 'valor_por_cobrar') {
 			$tabla = 'cobro';
 		} else {
-			$Criteria->add_left_join_with('documento', CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('documento.id_cobro', 'cobro.id_cobro'),
-				CriteriaRestriction::equals('documento.tipo_doc', "'N'")
-			));
+			$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";
 			$tabla = 'documento';
 		}
 		//moneda buscada
-		$Criteria->add_left_join_with(array("{$tabla}_moneda", 'cobro_moneda'), CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals("cobro_moneda.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-			CriteriaRestriction::equals('cobro_moneda.id_moneda', "'{$this->id_moneda}'")
-		));
+		$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda ON (cobro_moneda.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda.id_moneda = '" . $this->id_moneda . "' )";
 		//moneda del cobro
-		$Criteria->add_left_join_with(array("{$tabla}_moneda", 'cobro_moneda_cobro'), CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals("cobro_moneda_cobro.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-			CriteriaRestriction::equals('cobro_moneda_cobro.id_moneda', 'cobro.id_moneda')
-		));
+		$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda_cobro.id_moneda = cobro.id_moneda )";
 		//moneda_base
-		$Criteria->add_left_join_with(array("{$tabla}_moneda", 'cobro_moneda_base'), CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals("cobro_moneda_base.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-			CriteriaRestriction::equals('cobro_moneda_base.id_moneda', 'moneda_base.id_moneda')
-		));
+		$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda_base on (cobro_moneda_base.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
+
+
 
 		/* WHERE SIN USUARIOS NI TRABAJOS */
 		unset($this->filtros['trabajo.cobrable']);
@@ -570,162 +481,109 @@ class Reporte {
 		unset($this->filtros['asunto.id_area_proyecto']);
 		unset($this->filtros['asunto.id_tipo_asunto']);
 
-		$and_wheres = array(
-			$this->sWhere('cobro', $Criteria),
-			CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
-			CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
-		);
+		$s .= $this->sWhere('cobro');
 
-		$or_wheres = array(
-			CriteriaRestriction::equals('cobro.total_minutos', '0'),
-			CriteriaRestriction::is_null('cobro.total_minutos')
-		);
+
+		$s .= '  AND cobro.incluye_honorarios=1 AND cobro.monto_subtotal>0  AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL  ';
 
 		// FFF: Si se saca el reporte a proporcionalidad cliente, esta query debe traer los cobros con monto_thh=0. Si no, los con monto_thh_estandar=0
 		if ($this->proporcionalidad == 'estandar') {
-			$or_wheres[] = CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('cobro.monto_thh_estandar', '0'),
-				CriteriaRestriction::equals('cobro.forma_cobro', "'FLAT FEE'")
-			);
+			$s .= ' OR (cobro.monto_thh_estandar = 0 AND cobro.forma_cobro = \'FLAT FEE\') ';
 		} else {
-			$or_wheres[] = CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('cobro.monto_thh', '0'),
-				CriteriaRestriction::equals('cobro.forma_cobro', "'FLAT FEE'")
-			);
+			$s .= ' OR (cobro.monto_thh = 0 AND cobro.forma_cobro = \'FLAT FEE\') ';
 		}
-		$or_wheres[] = CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals('cobro.monto_thh', '0'),
-			CriteriaRestriction::not_equal('cobro.forma_cobro', "'FLAT FEE'")
-		);
-
-		$and_wheres[] = CriteriaRestriction::or_clause($or_wheres);
-
-		$Criteria->add_restriction(CriteriaRestriction::and_clause($and_wheres));
+		$s .= ' OR (cobro.forma_cobro <> \'FLAT FEE\' AND cobro.monto_thh = 0) )';
 
 		if (!$this->vista) {
-			$Criteria->add_grouping('agrupador_general')
-				->add_grouping('id_cobro');
+			$s .= ' GROUP BY agrupador_general, id_cobro ';
 		} else {
-			$Criteria->add_grouping('id_usuario')
-				->add_grouping('id_cliente')
-				->add_grouping('codigo_asunto');
+			$agrupa_cobro = array();
+			$agrupa_cobro[] = "id_usuario";
+			$agrupa_cobro[] = "id_cliente";
+			$agrupa_cobro[] = "codigo_asunto";
 
 			if ($this->requiereMoneda($this->tipo_dato)) {
-				$Criteria->add_grouping('id_cobro');
+				$agrupa_cobro[] = "id_cobro";
 			}
 
 			foreach ($this->id_agrupador_cobro as $a) {
-				$Criteria->add_grouping($a);
+				$agrupa_cobro[] = $a;
 			}
+
+
+			$s .= ' GROUP BY ' . implode(', ', $agrupa_cobro);
 		}
-		return $Criteria->get_plain_query();
+		return $s;
 	}
 
 	//SELECT en string de Query. Elige el tipo de dato especificado.
 	public function sSELECT() {
-		$this->Criteria
-			->add_select($this->dato_usuario, 'profesional')
-			->add_select('usuario.username', 'username')
-			->add_select('usuario.id_usuario')
-			->add_select('cliente.id_cliente')
-			->add_select('cliente.codigo_cliente');
 
-		if (in_array('codigo_cliente_secundario', $this->agrupador)) {
-			$this->Criteria->add_select('cliente.codigo_cliente_secundario');
-		}
-		if (in_array('prm_area_proyecto.glosa', $this->agrupador)) {
-			$this->Criteria->add_select('prm_area_proyecto.glosa');
-		}
-		if (in_array('area_usuario', $this->agrupador)) {
-			$this->Criteria->add_select('IFNULL(prm_area_usuario.glosa,\'-\')', 'area_usuario');
-		}
-		if (in_array('categoria_usuario', $this->agrupador)) {
-			$this->Criteria->add_select('IFNULL(prm_categoria_usuario.glosa_categoria,\'-\')', 'categoria_usuario');
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$usuario_responsable = $this->nombre_usuario('usuario_responsable');
-			$this->Criteria->add_select("IF(usuario_responsable.id_usuario IS NULL, 'Sin Resposable', {$usuario_responsable})", 'nombre_usuario_responsable');
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$this->Criteria->add_select('usuario_responsable.id_usuario', 'id_usuario_responsable');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$this->Criteria->add_select('usuario_secundario.id_usuario', 'id_usuario_secundario');
-		}
-		if (!$this->vista) {
-			$this->Criteria->add_select("'Indefinido'", 'agrupador_general');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$usuario_secundario = $this->nombre_usuario('usuario_secundario');
-			$this->Criteria->add_select("IF(usuario_secundario.id_usuario IS NULL, 'Sin Resposable Secundario', {$usuario_secundario})", 'nombre_usuario_secundario');
-		}
-
-		$this->Criteria
-			->add_select('cliente.glosa_cliente')
-			->add_select('asunto.glosa_asunto', '')
-			->add_select("CONCAT({$this->dato_codigo_asunto}, ': ', asunto.glosa_asunto)", 'glosa_asunto_con_codigo')
-			->add_select($this->dato_codigo_asunto, 'codigo_asunto')
-			->add_select('contrato.id_contrato', '')
-			->add_select('tipo.glosa_tipo_proyecto', 'tipo_asunto')
-			->add_select('area.glosa', 'area_asunto')
-			->add_select('grupo_cliente.id_grupo_cliente', '')
-			->add_select("IFNULL(grupo_cliente.glosa_grupo_cliente, '-')", 'glosa_grupo_cliente')
-			->add_select("CONCAT(cliente.glosa_cliente, ' - ', asunto.codigo_asunto, ' ', asunto.glosa_asunto)", 'glosa_cliente_asunto')
-			->add_select('IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente)', 'grupo_o_cliente')
-			->add_select('trabajo.fecha', 'fecha_final')
-			->add_select('MONTH(trabajo.fecha)', 'mes')
-			->add_select('trabajo.solicitante', 'solicitante');
-
-		$_por_emitir = __('Por Emitir');
-		if (in_array('mes_reporte', $this->agrupador)) {
-			$this->Criteria->add_select("DATE_FORMAT(trabajo.fecha, '%m-%Y')", 'mes_reporte');
-		}
-		if (in_array('dia_reporte', $this->agrupador)) {
-			$this->Criteria->add_select("DATE_FORMAT(trabajo.fecha, '%d-%m-%Y')", 'dia_reporte');
-		}
-		if (in_array('dia_corte', $this->agrupador)) {
-			$this->Criteria->add_select("DATE_FORMAT(cobro.fecha_fin , '%d-%m-%Y')", 'dia_corte');
-		}
-		if (in_array('dia_emision', $this->agrupador)) {
-			$this->Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$_por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))", 'dia_emision');
-		}
-		if (in_array('mes_emision', $this->agrupador)) {
-			$this->Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$_por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))", 'mes_emision');
-		}
-
-		$this->Criteria
-			->add_select("IFNULL(cobro.id_cobro, 'Indefinido')", 'id_cobro')
-			->add_select("IFNULL(cobro.estado, 'Indefinido')", 'estado')
-			->add_select("IFNULL(cobro.forma_cobro, 'Indefinido')", 'forma_cobro');
-
+		$s = 'SELECT  ' . $this->dato_usuario . ' as profesional,
+						usuario.username as username,
+						usuario.id_usuario,
+						cliente.id_cliente,
+						cliente.codigo_cliente,
+						' . (in_array('codigo_cliente_secundario', $this->agrupador) ? 'cliente.codigo_cliente_secundario,' : '') . '
+						' . (in_array('prm_area_proyecto.glosa', $this->agrupador) ? 'prm_area_proyecto.glosa,' : '') . '
+						' . (in_array('area_usuario', $this->agrupador) ? 'IFNULL(prm_area_usuario.glosa,\'-\') as area_usuario,' : '') . '
+						' . (in_array('categoria_usuario', $this->agrupador) ? 'IFNULL(prm_categoria_usuario.glosa_categoria,\'-\') as categoria_usuario,' : '') . '
+						' . (in_array('id_usuario_responsable', $this->agrupador) ? 'IF(usuario_responsable.id_usuario IS NULL,\'Sin Resposable\', ' . $this->nombre_usuario('usuario_responsable') . ') AS nombre_usuario_responsable,' : '') . '
+						' . (in_array('id_usuario_responsable', $this->agrupador) ? ' usuario_responsable.id_usuario AS id_usuario_responsable,' : '') . '
+						' . (in_array('id_usuario_secundario', $this->agrupador) ? ' usuario_secundario.id_usuario AS id_usuario_secundario,' : '') . '
+						' . (!$this->vista ? "'Indefinido' AS agrupador_general," : '') . '
+						' . (in_array('id_usuario_secundario', $this->agrupador) ? 'IF(usuario_secundario.id_usuario IS NULL,\'Sin Resposable Secundario\',' . $this->nombre_usuario('usuario_secundario') . ') AS nombre_usuario_secundario,' : '') . '
+						cliente.glosa_cliente,
+						asunto.glosa_asunto,
+						CONCAT(' . $this->dato_codigo_asunto . ',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
+						' . $this->dato_codigo_asunto . ' as codigo_asunto,
+						contrato.id_contrato,
+						tipo.glosa_tipo_proyecto AS tipo_asunto,
+						area.glosa AS area_asunto,
+						grupo_cliente.id_grupo_cliente,
+						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
+						CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
+						IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
+						trabajo.fecha as fecha_final,
+						MONTH(trabajo.fecha) as mes,
+						trabajo.solicitante as solicitante,
+						' . (in_array('mes_reporte', $this->agrupador) ? 'DATE_FORMAT(trabajo.fecha, \'%m-%Y\') as mes_reporte,' : '') . '
+						' . (in_array('dia_reporte', $this->agrupador) ? 'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,' : '') . '
+						' . (in_array('dia_corte', $this->agrupador) ? 'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,' : '') . '
+						' . (in_array('dia_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,' : '') . '
+						' . (in_array('mes_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,' : '') . '
+						IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
+						IFNULL(cobro.estado,\'Indefinido\') as estado,
+						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
+						';
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$this->Criteria->add_select("IFNULL(NULLIF(IFNULL(actividad.glosa_actividad, 'Indefinido' ), ' '), 'Indefinido' )", 'glosa_actividad');
+			$s .= " IFNULL( NULLIF( IFNULL( actividad.glosa_actividad, 'Indefinido' ), ' ' ), 'Indefinido' ) as glosa_actividad, ";
 		}
 
 		if (in_array('area_trabajo', $this->agrupador)) {
-			$this->Criteria->add_select("IFNULL(prm_area_trabajo.glosa, 'Indefinido')", 'area_trabajo');
+			$s.= " IFNULL( prm_area_trabajo.glosa, 'Indefinido' ) as area_trabajo, ";
 		}
 		if (in_array('id_trabajo', $this->agrupador)) {
-			$this->Criteria->add_select('trabajo.id_trabajo');
+			$s.= ' trabajo.id_trabajo, ';
 		}
 
 
 
 		//Datos que se repiten
 		$s_monto_thh_simple = "IF(cobro.monto_thh > 0,
-                                            cobro.monto_thh,
-                                            IF(cobro.monto_trabajos > 0,
-                                                cobro.monto_trabajos,
-                                                1
-                                            )
-                                        )";
+																						cobro.monto_thh,
+																						IF(cobro.monto_trabajos > 0,
+																								cobro.monto_trabajos,
+																								1
+																						)
+																				)";
 		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar > 0,
-                                            cobro.monto_thh_estandar,
-                                            IF(cobro.monto_trabajos > 0,
-                                                cobro.monto_trabajos,
-                                                1
-                                            )
-                                        )";
+																						cobro.monto_thh_estandar,
+																						IF(cobro.monto_trabajos > 0,
+																								cobro.monto_trabajos,
+																								1
+																						)
+																				)";
 
 		//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
 		// A : monto estandar de este trabajo
@@ -742,304 +600,247 @@ class Reporte {
 		}
 
 		$monto_estandar = "SUM(
-								trabajo.tarifa_hh_estandar
-								* (TIME_TO_SEC( duracion_cobrada)/3600)
-								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-							)";
+																				trabajo.tarifa_hh_estandar
+																				* (TIME_TO_SEC( duracion_cobrada)/3600)
+																				* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+																		)";
 		$monto_predicho = "SUM(
-								usuario_tarifa.tarifa
-								* TIME_TO_SEC( duracion_cobrada )
-								* moneda_por_cobrar.tipo_cambio
-								/ (moneda_display.tipo_cambio * 3600)
-							)";
+																				usuario_tarifa.tarifa
+																				* TIME_TO_SEC( duracion_cobrada )
+																				* moneda_por_cobrar.tipo_cambio
+																				/ (moneda_display.tipo_cambio * 3600)
+																		)";
 		$monto_trabajado_estandar = "SUM(
-										(TIME_TO_SEC(duracion) / 3600) *
-										IF(
-											cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
-											usuario_tarifa.tarifa * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
-											trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-										)
-									)";
+																								(TIME_TO_SEC(duracion) / 3600) *
+																								IF(
+																										cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
+																										usuario_tarifa.tarifa * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+																										trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+																								)
+																						)";
 
 		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
 		if ($this->tipo_dato != 'valor_por_cobrar') {
 			$monto_honorarios = "SUM(
-									({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-									*
-									(
-										(documento.subtotal_sin_descuento  * cobro_moneda_documento.tipo_cambio)
-										/
-										({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
-									)
-									*
-									(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-								)";
+																								({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+																								*
+																								(
+																										(documento.subtotal_sin_descuento  * cobro_moneda_documento.tipo_cambio)
+																										/
+																										({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
+																								)
+																								*
+																								(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+																						)";
 		} else {
 			$monto_honorarios = "SUM(
-									(
-										IF(
-											cobro.monto_tramites > 0 and cobro.monto_trabajos = 0,
-											cobro.monto_tramites,
-											(
-												({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-												*
-												(cobro.monto_trabajos / {$s_monto_thh})
-											)
-										)
-										+ cobro.monto_tramites
-									)
-									*
-									(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-								)";
+																								(
+																										IF(
+																												cobro.monto_tramites > 0 and cobro.monto_trabajos = 0,
+																												cobro.monto_tramites,
+																												(
+																														({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+																														*
+																														(cobro.monto_trabajos / {$s_monto_thh})
+																												)
+																										)
+																										+ cobro.monto_tramites
+																								)
+																								*
+																								(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+																						)";
 		}
 		//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
 		$monto_por_pagar_parcial = "SUM(
-										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-										*
-										(
-											(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)
-											/
-											({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
-										)
-										*
-										(documento.saldo_honorarios / documento.honorarios)
-										*
-										(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-									)";
+																								({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+																								*
+																								(
+																										(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)
+																										/
+																										({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
+																								)
+																								*
+																								(documento.saldo_honorarios / documento.honorarios)
+																								*
+																								(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+																						)";
+		$datos_monedas = "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio";
 
 		switch ($this->tipo_dato) {
-			case 'costo':
-			case 'valor_por_cobrar':
-			case 'valor_trabajado_estandar':
-			case 'valor_cobrado':
-			case 'valor_pagado':
-			case 'valor_por_pagar':
-			case 'valor_incobrable':
-			case 'valor_por_pagar_parcial':
-			case 'valor_pagado_parcial':
-			case 'valor_estandar':
-			case 'diferencia_valor_estandar':
-			case 'rentabilidad':
-			case 'rentabilidad_base':
-			case 'valor_hora':
-			case 'costo_hh':
-				$this->Criteria
-					->add_select('cobro_moneda.id_moneda')
-					->add_select('cobro_moneda.tipo_cambio')
-					->add_select('cobro_moneda_base.id_moneda')
-					->add_select('cobro_moneda_base.tipo_cambio')
-					->add_select('cobro_moneda_cobro.id_moneda')
-					->add_select('cobro_moneda_cobro.tipo_cambio');
-		}
-
-
-		switch ($this->tipo_dato) {
-			case 'valor_cobrado_no_estandar':
-				$this->Criteria->add_select("SUM((IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))", $this->tipo_dato);
+			case "valor_cobrado_no_estandar":
+				$s .= "SUM((IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 				break;
-			case 'horas_trabajadas':
-			case 'horas_no_cobrables':
-			case 'horas_cobrables':
-				$this->Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion)) / 3600', $this->tipo_dato);
+			case "horas_trabajadas":
+			case "horas_no_cobrables":
+				$s .= "SUM(TIME_TO_SEC( trabajo.duracion ))/3600.0";
 				break;
+
+			case "horas_cobrables":
 			case 'horas_spot':
 			case 'horas_convenio':
-				$this->Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
+				$s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600.0";
 				break;
-			case 'costo':
-				$this->Criteria->add_select('IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * SUM(cut.costo_hh * TIME_TO_SEC(trabajo.duracion ) / 3600', $this->tipo_dato);
+
+			case "costo":
+				$s .= $datos_monedas . ", ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*SUM(cut.costo_hh*TIME_TO_SEC( trabajo.duracion ))/3600";
+
 				break;
-			case 'horas_castigadas':
-				$this->Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion) - TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
+
+			case "horas_castigadas":
+				$s .= "SUM(TIME_TO_SEC(trabajo.duracion)-TIME_TO_SEC(trabajo.duracion_cobrada))/3600";
 				break;
-			case 'horas_visibles':
-			case 'horas_cobradas':
-			case 'horas_por_cobrar':
-			case 'horas_pagadas':
-			case 'horas_por_pagar':
-			case 'horas_incobrables':
-				$this->Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
+
+			case "horas_visibles":
+			case "horas_cobradas":
+			case "horas_por_cobrar":
+			case "horas_pagadas":
+			case "horas_por_pagar":
+			case "horas_incobrables":
+				$s .= "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 				break;
+
 			case 'valor_por_cobrar':
 				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
-				$this->Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios}, {$monto_predicho})", $this->tipo_dato);
+				$s .= " $datos_monedas, IF( cobro.id_cobro IS NOT NULL, $monto_honorarios, $monto_predicho)";
 				break;
+
 			case 'valor_trabajado_estandar':
-				$this->Criteria->add_select($monto_trabajado_estandar, $this->tipo_dato);
+				$s .= " $datos_monedas, $monto_trabajado_estandar";
 				break;
-			case 'valor_cobrado':
-			case 'valor_pagado':
-			case 'valor_por_pagar':
-			case 'valor_incobrable':
-				$this->Criteria->add_select($monto_honorarios, $this->tipo_dato);
+
+			case "valor_cobrado":
+			case "valor_pagado":
+			case "valor_por_pagar":
+			case "valor_incobrable":
+				$s .= " $datos_monedas, $monto_honorarios";
 				break;
-			case 'valor_por_pagar_parcial':
-				$this->Criteria->add_select($monto_por_pagar_parcial, $this->tipo_dato);
+
+			case "valor_por_pagar_parcial":
+				$s .= " $datos_monedas, $monto_por_pagar_parcial";
 				break;
-			case 'valor_pagado_parcial':
-				$this->Criteria->add_select("$monto_honorarios - $monto_por_pagar_parcial", $this->tipo_dato);
+
+			case "valor_pagado_parcial":
+				$s .= " $datos_monedas, $monto_honorarios - $monto_por_pagar_parcial";
 				break;
-			case 'valor_estandar':
-				$this->Criteria->add_select($monto_estandar, $this->tipo_dato);
+
+			case "valor_estandar":
+				$s .= " $datos_monedas, $monto_estandar ";
 				break;
-			case 'diferencia_valor_estandar':
-				$this->Criteria->add_select("$monto_honorarios - $monto_estandar", $this->tipo_dato);
+
+			case "diferencia_valor_estandar":
+				$s .= " $datos_monedas, ( $monto_honorarios - $monto_estandar )";
 				break;
+
 			case 'rentabilidad':
 				/* Se necesita resultado extra: lo que se habría cobrado */
-				$this->Criteria
-					->add_select($monto_estandar, 'valor_divisor')
-					->add_select($monto_honorarios, $this->tipo_dato);
+				$s .= " $monto_estandar  AS valor_divisor, ";
+				$s .= " $datos_monedas, $monto_honorarios ";
 				break;
 			case 'rentabilidad_base':
-				$this->Criteria
-					->add_select($monto_trabajado_estandar, 'valor_divisor')
-					->add_select("IF( cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') , $monto_honorarios, 0)", $this->tipo_dato);
+				$s .= " $monto_trabajado_estandar AS valor_divisor, ";
+				$s .= " $datos_monedas, IF( cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO'),$monto_honorarios, 0)";
 				break;
-			case 'valor_hora':
+
+			case "valor_hora":
 				/* Se necesita resultado extra: las horas cobradas */
-				$this->Criteria
-					->add_select('SUM((TIME_TO_SEC(duracion_cobrada) / 3600))', 'valor_divisor')
-					->add_select($monto_honorarios , $this->tipo_dato);
+				$s .= "SUM((TIME_TO_SEC( duracion_cobrada)/3600)) as valor_divisor, ";
+				$s .= " $datos_monedas, $monto_honorarios ";
 				break;
-			case 'costo_hh':
-				$this->Criteria
-					->add_select('SUM((TIME_TO_SEC(duracion) / 3600))', 'valor_divisor')
-					->add_select('SUM(IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * cut.costo_hh * (TIME_TO_SEC(duracion) / 3600))', $this->tipo_dato);
+
+			case "costo_hh":
+				$s .= "SUM((TIME_TO_SEC( duracion)/3600)) as valor_divisor, ";
+				$s .= $datos_monedas . ",SUM( ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*cut.costo_hh * (TIME_TO_SEC( duracion)/3600)) ";
+
 				break;
 
 		}
+		$s .= ' as ' . $this->tipo_dato;
+		return $s;
 	}
 
 	//FROM en string de Query. Incluye las tablas necesarias.
 	public function sFrom() {
-		$this->Criteria->add_from('trabajo');
 		//Calculo de valor por cobrar requiere Tarifa, Tipo de Cambio
-
-		$this->Criteria->add_left_join_with(array('usuario_costo_hh', 'cut'), CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals('trabajo.id_usuario', 'cut.id_usuario'),
-			CriteriaRestriction::equals("date_format(trabajo.fecha, '%Y%m')", 'cut.yearmonth')
-		));
-		$this->Criteria
-			->add_left_join_with('usuario', CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario'))
-			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto'))
-			->add_left_join_with('cobro', CriteriaRestriction::equals('trabajo.id_cobro', 'cobro.id_cobro'))
-			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'IFNULL(cobro.id_contrato, asunto.id_contrato)'));
-
-		if (in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'))) {
-			$this->Criteria
-				->add_left_join_with(array('prm_moneda', 'moneda_por_cobrar'), CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
-				->add_left_join_with(array('prm_moneda', 'moneda_display'), CriteriaRestriction::equals('moneda_display.id_moneda', $this->id_moneda));
-
-			$on_usuario_tarifa = CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('usuario_tarifa.id_usuario', 'trabajo.id_usuario'),
-				CriteriaRestriction::equals('usuario_tarifa.id_moneda', 'contrato.id_moneda')
-			);
-			if ($this->tipo_dato != 'valor_trabajado_estandar') {
-				$on_usuario_tarifa = CriteriaRestriction::and_clause(
-					$on_usuario_tarifa,
-					CriteriaRestriction::equals('usuario_tarifa.id_tarifa', 'contrato.id_tarifa')
-				);
-			}
-			$this->Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
-
-			if ($this->tipo_dato == 'valor_trabajado_estandar') {
-				$this->Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
-					CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
-				));
-			}
+		$join_tarifa = '';
+		$join_por_cobrar = 'LEFT JOIN usuario_tarifa ON ';
+		if ($this->tipo_dato != 'valor_trabajado_estandar') {
+			$join_por_cobrar .= 'usuario_tarifa.id_tarifa = contrato.id_tarifa AND ';
+		} else {
+			$join_tarifa = 'INNER JOIN tarifa ON tarifa.id_tarifa = usuario_tarifa.id_tarifa AND tarifa.tarifa_defecto = 1';
 		}
+		$join_por_cobrar .= "usuario_tarifa.id_usuario = trabajo.id_usuario
+							AND usuario_tarifa.id_moneda = contrato.id_moneda
+							{$join_tarifa}
+						LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
+						LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
 
-		$this->Criteria
-			->add_left_join_with(array('prm_area_proyecto', 'area'), CriteriaRestriction::equals('asunto.id_area_proyecto', 'area.id_area_proyecto'))
-			->add_left_join_with(array('prm_tipo_proyecto', 'tipo'), CriteriaRestriction::equals('asunto.id_tipo_asunto', 'tipo.id_tipo_proyecto'))
-			->add_left_join_with('cliente', CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente'))
-			->add_left_join_with('grupo_cliente', CriteriaRestriction::equals('cliente.id_grupo_cliente', 'grupo_cliente.id_grupo_cliente'));
-
-		if (in_array('prm_area_proyecto.glosa', $this->agrupador)) {
-			$this->Criteria->add_left_join_with('prm_area_proyecto', CriteriaRestriction::equals('prm_area_proyecto.id_area_proyecto', 'asunto.id_area_proyecto'));
-		}
-		if (in_array('area_usuario', $this->agrupador)) {
-			$this->Criteria->add_left_join_with('prm_area_usuario', CriteriaRestriction::equals('prm_area_usuario.id', 'usuario.id_area_usuario'));
-		}
-		if (in_array('categoria_usuario', $this->agrupador)) {
-			$this->Criteria->add_left_join_with('prm_categoria_usuario', CriteriaRestriction::equals('prm_categoria_usuario.id_categoria_usuario', 'usuario.id_categoria_usuario'));
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$this->Criteria->add_left_join_with(array('usuario', 'usuario_responsable'), CriteriaRestriction::equals('usuario_responsable.id_usuario', 'contrato.id_usuario_responsable'));
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$this->Criteria->add_left_join_with(array('usuario', 'usuario_secundario'), CriteriaRestriction::equals('usuario_secundario.id_usuario', 'contrato.id_usuario_secundario'));
-		}
-
+		$add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'));
+		$s = ' FROM trabajo
+					LEFT JOIN usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
+					LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
+					LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
+					LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
+					LEFT JOIN contrato ON ( contrato.id_contrato = IFNULL(cobro.id_contrato, asunto.id_contrato))
+					' . ($add_jpc ? $join_por_cobrar : '') . '
+					LEFT JOIN prm_area_proyecto AS area ON asunto.id_area_proyecto = area.id_area_proyecto
+					LEFT JOIN prm_tipo_proyecto AS tipo ON asunto.id_tipo_asunto = tipo.id_tipo_proyecto
+					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+					LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+					' . (in_array('prm_area_proyecto.glosa', $this->agrupador) ? 'LEFT JOIN prm_area_proyecto ON prm_area_proyecto.id_area_proyecto = asunto.id_area_proyecto' : '') . '
+					' . (in_array('area_usuario', $this->agrupador) ? 'LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario' : '') . '
+					' . (in_array('categoria_usuario', $this->agrupador) ? 'LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario' : '') . '
+					' . (in_array('id_usuario_responsable', $this->agrupador) ? 'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable' : '') . '
+					' . (in_array('id_usuario_secundario', $this->agrupador) ? 'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario' : '') . '
+					';
 		//Se requiere: Moneda Buscada (en el reporte), Moneda Original (del cobro), Moneda Base.
 		//Se usa CobroMoneda (cobros por cobrar) o DocumentoMoneda (cobros cobrados).
 		if ($this->requiereMoneda($this->tipo_dato)) {
-			$this->Criteria->add_left_join_with(array('prm_moneda', 'moneda_base'), CriteriaRestriction::equals('moneda_base.moneda_base', 1));
+			$s .= " LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = '1' ";
 			if ($this->tipo_dato == 'valor_por_cobrar') {
 				$tabla = 'cobro';
 			} else {
 				$tabla = 'documento';
-				$this->Criteria->add_left_join_with('documento', CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('documento.id_cobro', 'cobro.id_cobro'),
-					CriteriaRestriction::equals('documento.tipo_doc', "'N'")
-				));
+				$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";
 				//moneda_del_documento
-				$this->Criteria->add_left_join_with(array('documento_moneda', 'cobro_moneda_documento'), CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals("cobro_moneda_documento.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-					CriteriaRestriction::equals('cobro_moneda_documento.id_moneda', 'documento.id_moneda')
-				));
+				$s .= " LEFT JOIN documento_moneda as cobro_moneda_documento on (cobro_moneda_documento.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda_documento.id_moneda = documento.id_moneda )";
 			}
 			//moneda buscada
-			$this->Criteria->add_left_join_with(array("{$tabla}_moneda", 'cobro_moneda'), CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals("cobro_moneda.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-				CriteriaRestriction::equals('cobro_moneda.id_moneda', $this->id_moneda)
-			));
+			$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda ON (cobro_moneda.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda.id_moneda = '" . $this->id_moneda . "' )";
 			//moneda del cobro
-			$this->Criteria->add_left_join_with(array("{$tabla}_moneda", 'cobro_moneda_cobro'), CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals("cobro_moneda_cobro.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-				CriteriaRestriction::equals('cobro_moneda_cobro.id_moneda', 'cobro.id_moneda')
-			));
+			$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda_cobro.id_moneda = cobro.id_moneda )";
 			//moneda_base
-			$this->Criteria->add_left_join_with(array("{$tabla}_moneda", 'cobro_moneda_base'), CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals("cobro_moneda_base.id_{$tabla}", "{$tabla}.id_{$tabla}"),
-				CriteriaRestriction::equals('cobro_moneda_base.id_moneda', 'moneda_base.id_moneda')
-			));
+			$s .= " LEFT JOIN " . $tabla . "_moneda as cobro_moneda_base on (cobro_moneda_base.id_" . $tabla . " = " . $tabla . ".id_" . $tabla . " AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
 		}
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$this->Criteria->add_left_join_with('actividad', CriteriaRestriction::equals('trabajo.codigo_actividad', 'actividad.codigo_actividad'));
+			$s .= " LEFT JOIN actividad ON ( trabajo.codigo_actividad = actividad.codigo_actividad ) ";
 		}
 
 		if (in_array('area_trabajo', $this->agrupador)) {
-			$this->Criteria->add_left_join_with('prm_area_trabajo', CriteriaRestriction::equals('trabajo.id_area_trabajo', 'prm_area_trabajo.id_area_trabajo'));
+			$s .= " LEFT JOIN prm_area_trabajo ON ( trabajo.id_area_trabajo = prm_area_trabajo.id_area_trabajo ) ";
 		}
+		return $s;
 	}
 
 	//WHERE para string de Query. Incluye los filtros agregados anteriormente.
 	//@param from: si viene de la query de trabajo o de cobro.
 	public function sWhere($from = 'trabajo') {
-		$and_wheres = array();
+		$s = " WHERE 1 ";
 		foreach ($this->filtros as $campo => $filtro) {
 			foreach ($filtro as $booleano => $valor) {
 				if ($booleano == 'positivo') {
 					if (sizeof($filtro['positivo']) > 1) {
-						$and_wheres[] = CriteriaRestriction::in($campo, $valor);
+						$lista_opciones = join("','", $valor);
+						$s .= " AND " . $campo . " IN ('" . $lista_opciones . "')";
 					} else {
-						$and_wheres[] = CriteriaRestriction::equals($campo, "'{$valor[0]}'");
+						$s .= " AND " . $campo . " = '" . $valor[0] . "'";
 					}
 				} else {
 					if (sizeof($filtro['negativo']) > 1) {
-						$and_wheres[] = CriteriaRestriction::or_clause(
-							CriteriaRestriction::not_in($campo, $valor),
-							CriteriaRestriction::is_null($campo)
-						);
+						$lista_opciones = join("','", $valor);
+						$s .= " AND (" . $campo . " NOT IN ('" . $lista_opciones . "') OR " . $campo . " IS NULL)";
 					} else {
-						$and_wheres[] = CriteriaRestriction::or_clause(
-							CriteriaRestriction::not_equal($campo, "'{$valor[0]}'"),
-							CriteriaRestriction::is_null($campo)
-						);
+						$s .= " AND (" . $campo . " <> '" . $valor[0] . "' OR " . $campo . " IS NULL)";
 					}
 				}
 			}
@@ -1053,76 +854,63 @@ class Reporte {
 			$campo_fecha_2 = $this->campo_fecha_cobro_2;
 		}
 		if (!empty($this->rango)) {
-			$ini = Utiles::fecha2sql($this->rango['fecha_ini']);
-			$fin = Utiles::fecha2sql($this->rango['fecha_fin']) . ' 23:59:59';
-			$and_fecha = CriteriaRestriction::between($campo_fecha, "'$ini'", "'$fin'");
+			$s .= " AND ( " . $campo_fecha . " BETWEEN '" . Utiles::fecha2sql($this->rango['fecha_ini']) . "' AND '" . Utiles::fecha2sql($this->rango['fecha_fin']) . " 23:59:59' ";
 			if ($campo_fecha_2) {
-				$and_fecha = CriteriaRestriction::or_clause(
-					$and_fecha,
-					CriteriaRestriction::and_clause(
-						CriteriaRestriction::or_clause(
-							CriteriaRestriction::is_null($campo_fecha),
-							CriteriaRestriction::equals($campo_fecha, "'00-00-0000'")
-						),
-						CriteriaRestriction::between($campo_fecha_2, "'$ini'", "'$fin'")
-					)
-				);
+				$s.= " OR ( (" . $campo_fecha . " IS NULL OR " . $campo_fecha . " = '00-00-0000') AND " . $campo_fecha_2 . " BETWEEN '" . Utiles::fecha2sql($this->rango['fecha_ini']) . "' AND '" . Utiles::fecha2sql($this->rango['fecha_fin']) . " 23:59:59' ) ";
 			}
-			$and_wheres[] = $and_fecha;
+			$s.=') ';
 		}
 		/* Si se filtra el periodo por cobro, los trabajos sin cobro emitido (y posteriores) no se ven */
-		if (($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo') {
-			$and_wheres[] = CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO'));
-		}
+		if (($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo')
+			$s .= " AND cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') ";
 
 		foreach ($this->filtros_especiales as $fe) {
-			$and_wheres[] = $fe;
+			$s .= " AND (" . $fe . ") ";
 		}
 
-		return CriteriaRestriction::and_clause($and_wheres);
+		return $s;
 	}
 
 	//GROUP BY en string de Query. Agrupa según la vista. (arreglo de agrupadores se usa al construir los arreglos de resultados.
 	public function sGroup() {
 		if (!$this->vista) {
-			$this->Criteria
-				->add_grouping('agrupador_general')
-				->add_grouping('id_cobro');
+			return ' GROUP BY agrupador_general, id_cobro ';
 		}
 
 		$agrupa = array();
-		$this->Criteria->add_grouping('id_usuario');
-		$this->Criteria->add_grouping('id_cliente');
-		$this->Criteria->add_grouping('codigo_asunto');
+		$agrupa[] = "id_usuario";
+		$agrupa[] = "id_cliente";
+		$agrupa[] = "codigo_asunto";
 
 		if ($this->requiereMoneda($this->tipo_dato)) {
-			$this->Criteria->add_grouping('id_cobro');
+			$agrupa[] = "id_cobro";
 		}
 
 		foreach ($this->id_agrupador as $a) {
-			$this->Criteria->add_grouping($a);
+			$agrupa[] = $a;
 		}
+
+		$group_by = ' GROUP BY ' . implode(', ', array_unique($agrupa));
+		return $group_by;
 	}
 
 	//ORDER BY en string de Query.
 	public function sOrder() {
-		if (!$this->vista || empty($this->orden_agrupador)) {
-			return '';
-		}
-		foreach ($this->orden_agrupador as $campo) {
-			$this->Criteria->add_ordering($campo);
-		}
+						if (!$this->vista) {
+								return '';
+						}
+						return ' ORDER BY ' . implode(', ', $this->orden_agrupador);
 	}
 
 	//String de Query.
 	public function sQuery() {
-		$criteria = new Criteria($this->sesion);
-		$this->sSelect();
-		$this->sFrom();
-		$this->Criteria->add_restriction($this->sWhere());
-		$this->sGroup();
-		$this->sOrder();
-		return $this->Criteria->get_plain_query();
+		$s = '';
+		$s .= $this->sSelect();
+		$s .= $this->sFrom();
+		$s .= $this->sWhere();
+		$s .= $this->sGroup();
+		$s .= $this->sOrder();
+		return $s;
 	}
 
 	//Ejecuta la Query y guarda internamente las filas de resultado.
@@ -1131,32 +919,34 @@ class Reporte {
 		$resp = mysql_unbuffered_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(), __FILE__, __LINE__, $this->sesion->dbh);
 
 		$this->row = array();
-		while ($row = mysql_fetch_assoc($resp)) {
+		while ($row = mysql_fetch_array($resp)) {
 			$this->row[] = $row;
 		}
 
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
-		$cobroquery = $this->cobroQuery();
-	 	if (
-		 	$this->requiereMoneda($this->tipo_dato)
-		 	&& $this->tipo_dato != 'valor_hora'
-		 	&& $this->tipo_dato != 'costo'
-		 	&& $this->tipo_dato != 'costo_hh'
-		 	&& !empty($cobroquery)
-		 	&& !$this->filtros['usuario.id_area_usuario']['positivo'][0]
-		 	&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
-		 	&& !$this->ignorar_cobros_sin_horas ) {
+		if (
+			$this->requiereMoneda($this->tipo_dato)
+			&& $this->tipo_dato != 'valor_hora'
+			&& $this->tipo_dato != 'costo'
+			&& $this->tipo_dato != 'costo_hh'
+			&& $this->cobroQuery()
+			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0]
+			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
+			&& !$this->ignorar_cobros_sin_horas ) {
+
+				$cobroquery = $this->cobroQuery();
+				$stringquery = " \n\n\n union all \n\n\n $cobroquery";
 				$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
 
-				while ($row = mysql_fetch_assoc($resp)) {
+				while ($row = mysql_fetch_array($resp)) {
 					$this->row[] = $row;
 				}
 		}
 	}
 
 	/*
-	  Constructor de Arreglo Resultado. TIPO BARRAS.
-	  Entrega un arreglo lineal de Indices, Valores y Labels. Además indica Total.
+		Constructor de Arreglo Resultado. TIPO BARRAS.
+		Entrega un arreglo lineal de Indices, Valores y Labels. Además indica Total.
 	 */
 
 	public function toBars() {
@@ -1369,8 +1159,8 @@ class Reporte {
 	}
 
 	/*
-	  Constructor de Arreglo Resultado. TIPO PLANILLA.
-	  Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Además indica Total para cada subgrupo.
+		Constructor de Arreglo Resultado. TIPO PLANILLA.
+		Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Además indica Total para cada subgrupo.
 	 */
 
 	public function toArray() {
