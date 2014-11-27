@@ -8,7 +8,7 @@
 */
 class ReporteHistorialMovimientos
 {
-	
+
 	private $sesion;
 	private $reportFocus;
 	private $reportProtagonist;
@@ -45,7 +45,7 @@ class ReporteHistorialMovimientos
 	}
 
 	/**
-	 * 
+	 *
 	 *	Asigna el usuario que es protagonista del análisis.
 	 *
 	 */
@@ -80,7 +80,7 @@ class ReporteHistorialMovimientos
 	}
 
 	/**
-	 * 
+	 *
 	 *	Asigna la entidad en particular que será analizada, corresponde a un id en específico de un {@link TipoHistorialEnum}.
 	 *
 	 */
@@ -95,7 +95,7 @@ class ReporteHistorialMovimientos
 	}
 
 	/**
-	 * 
+	 *
 	 *	Asigna el tipo de objeto desde el cual se quiere obtener un reporte. Puede ser cualquiera definido en {@link TipoHistorialEnum}.
 	 *
 	 */
@@ -133,7 +133,7 @@ class ReporteHistorialMovimientos
 	}
 
 	/**
-	 * 
+	 *
 	 *	Construye la query correspondiente al reporte definido.
 	 *
 	 */
@@ -158,13 +158,13 @@ class ReporteHistorialMovimientos
 					->add_select($creation_date,'fecha_creacion')
 					->add_left_join_with($main_table, CriteriaRestriction::equals($main_table.'.'.$key, $table_name.'.'.$key));
 
-		$fecha_field = '.fecha';
-		if ($main_table == 'tramite') {
-			$fecha_field = '.fecha_accion';
+		$fecha_field = 'fecha';
+		if ($main_table == 'tramite' || $main_table == 'trabajo') {
+			$fecha_field = 'fecha_accion';
 		}
 
 		if (!empty($this->since) && !empty($this->until)) {
-			$reportCriteria->add_restriction(CriteriaRestriction::between('date('.$table_name.$fecha_field.')', $this->since, $this->until));
+			$reportCriteria->add_restriction(CriteriaRestriction::between("date({$table_name}.{$fecha_field})", "'{$this->since}'", "'{$this->until}'"));
 		}
 
 		//Filtra por cliente
@@ -178,7 +178,7 @@ class ReporteHistorialMovimientos
 					->add_restriction(CriteriaRestriction::equals('asunto.codigo_cliente', '\''.$this->client.'\''));
 			}
 
-			
+
 		}
 
 		//Filtra por asunto
@@ -214,7 +214,7 @@ class ReporteHistorialMovimientos
 		$reportCriteria
 				->add_from($table_name)
 				->add_left_join_with('usuario', CriteriaRestriction::equals('usuario.id_usuario', $table_name.'.id_usuario'));
-				
+
 
 
 		//Establece los criterios de filtrado. Si apican.
@@ -226,7 +226,7 @@ class ReporteHistorialMovimientos
 	}
 
 	/**
-	 * 
+	 *
 	 *	Establece los criterios de filtrado, que permite refinar o especializar la información desplegada en el reporte.
 	 *
 	 */
@@ -272,9 +272,9 @@ class ReporteHistorialMovimientos
 
 		switch ($entity) {
 			case 'trabajo':
-				
+
 				$reportCriteria
-					->add_select($table_name.'.fecha', 'fecha_accion')
+					->add_select($table_name.'.fecha_accion', 'fecha_accion')
 					->add_select_not_null($table_name.'.'.'descripcion', 'descripcion')
 					->add_select_not_null($table_name.'.'.'descripcion_modificado', 'descripcion_modificado')
 					->add_select_not_null($table_name.'.'.'duracion_cobrada', 'duracion_cobrada')
@@ -316,7 +316,7 @@ class ReporteHistorialMovimientos
 				break;
 
 			case 'cobro':
-				
+
 				$reportCriteria
 					->add_select($table_name.'.fecha', 'fecha_accion')
 					->add_select_not_null('asunto.'.'codigo_asunto', 'codigo_asunto')
@@ -383,7 +383,7 @@ class ReporteHistorialMovimientos
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private function constructReport(Criteria $criteria) {
 		extract($this->reportFocus);
@@ -863,11 +863,11 @@ class ReporteHistorialMovimientos
 				)
 			)
 
-			
+
 		);
 		$report->LoadConfigFromArray($configuracion);
 		return $report;
-	} 
+	}
 
 
 

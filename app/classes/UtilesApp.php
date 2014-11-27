@@ -112,6 +112,8 @@ class UtilesApp extends Utiles {
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 			}
 		}
+		$Form = new Form;
+		echo $Form->error_label(Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente');
 	}
 
 	/**
@@ -145,6 +147,8 @@ class UtilesApp extends Utiles {
 				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto', 'glosa_asunto', 'codigo_asunto', $codigo_asunto, '', $oncambio, $width, $codigo_cliente);
 			}
 		}
+		$Form = new Form;
+		echo $Form->error_label(Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto');
 	}
 
 	public static function FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato = '', $width = 320) {

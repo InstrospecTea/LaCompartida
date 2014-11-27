@@ -28,7 +28,8 @@ The Time Billing - Time Tracking
         character-set-server = latin1
         character-set-client = latin1
 
-###LibrerÌas
+###Librer√≠as
+* [Pear Fix on OS X](https://github.com/LemontechSA/ttb/wiki/Fix-pear-OS-X)
 * [Numbers_Words][3]:
 
         $ sudo pear install Numbers_Words-0.16.4
@@ -37,7 +38,7 @@ The Time Billing - Time Tracking
 
         $ sudo pear install Spreadsheet_Excel_Writer-beta
 
-> Recuerda reiniciar Apache cada vez que hagas cambios en la configuraciÛn o instalciÛn de nuevos paquetes
+> Recuerda reiniciar Apache cada vez que hagas cambios en la configuraci√≥n o instalci√≥n de nuevos paquetes
 
  * OLE (0.5)
 
@@ -59,7 +60,7 @@ The Time Billing - Time Tracking
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
 * Crear un login
-* La aplicaciÛn no carga un modelo por defecto, por lo tanto, necesitas tener un dump y cargarlo.
+* La aplicaci√≥n no carga un modelo por defecto, por lo tanto, necesitas tener un dump y cargarlo.
 
 ###Workspace y setup Proyecto
 * Clonar el proyecto desde GitHub
@@ -68,7 +69,7 @@ The Time Billing - Time Tracking
 
 * Abrir el proyecto con tu editor favorito
 * Recuerda que el charset para el editor (Eclipse/[Sublime Text 2][10]/NetBeans) debe ser: "iso-8859-1"
-  > En Sublime Text 2 hay que editar el proyecto y agregar las siguientes lÌneas:
+  > En Sublime Text 2 hay que editar el proyecto y agregar las siguientes l√≠neas:
 
   >       "settings":
   >       [
@@ -81,18 +82,18 @@ The Time Billing - Time Tracking
 * Edita el archivo **miconf.php** para configurar
   * dbHost: Servidor de base de datos
   * dbName: Nombre de la base de datos creada anteriormente
-  * dbUser: Usuario de inicio de sesiÛn con acceso full a la base de datos **dbName**
+  * dbUser: Usuario de inicio de sesi√≥n con acceso full a la base de datos **dbName**
   * dbPass: El password del usuario **dbUser**
   * Agrega la siguiente linea para no desplegar ciertos mensajes:
     error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
 
-* [Probar configuraciÛn][6]
+* [Probar configuraci√≥n][6]
 
-> Si AWSSDK arroja un error de certificado SSL, buscar el archivo ```curl-ca-bundle.crt``` (si se instalÛ Git usando RailsInstaller, deberÌa estar en C:\RailsInstaller\Git\bin\curl-ca-bundle.crt) y agregar la siguiente lÌnea al php.ini: ```curl.cainfo="(path del archivo)"```
+> Si AWSSDK arroja un error de certificado SSL, buscar el archivo ```curl-ca-bundle.crt``` (si se instal√≥ Git usando RailsInstaller, deber√≠a estar en C:\RailsInstaller\Git\bin\curl-ca-bundle.crt) y agregar la siguiente l√≠nea al php.ini: ```curl.cainfo="(path del archivo)"```
 
 > **Opcional**: Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio del repositorio
 
-> Recuerda reiniciar Apache cada vez que hagas cambios en la configuraciÛn y tener el servidor Mysql iniciado
+> Recuerda reiniciar Apache cada vez que hagas cambios en la configuraci√≥n y tener el servidor Mysql iniciado
 
 
 ###Tips y Troubleshooting en MacOS X
@@ -100,7 +101,7 @@ The Time Billing - Time Tracking
 * Instalar [Autoconf y automake][4]
 * Compilar e instalar [xDebug][5]
 
-* **file or directory not found**: Si eres un usuario OSX e instalaste mysql a travÈs de Homebrew, lo m·s probable es que el socket por defecto de mysql en la configuraciÛn de php no corresponda ya que brew lo deja en /tmp/:
+* **file or directory not found**: Si eres un usuario OSX e instalaste mysql a trav√©s de Homebrew, lo m√°s probable es que el socket por defecto de mysql en la configuraci√≥n de php no corresponda ya que brew lo deja en /tmp/:
   * Para verificar el socket haz phpinfo(), luego en una consola abre mysql y ejecuta el comando STATUS;
   * Busca el socket y reemplaza la ruta en php.ini
 
@@ -123,7 +124,7 @@ The Time Billing - Time Tracking
   * Copy server definition file
 
         $ cp config/cap_servers.rb.default config/cap_servers.rb
-        (Es necesario modificar este archivo. Dejar solo el servidor al que se realizar· el deployeo)
+        (Es necesario modificar este archivo. Dejar solo el servidor al que se realizar√° el deployeo)
 
 ###Deploy in local machinne
 
@@ -151,14 +152,14 @@ The Time Billing - Time Tracking
 
 ##API
 
-Activar el mÛdulo del RewriteEngine de Apache2.
+Activar el m√≥dulo del RewriteEngine de Apache2.
 $ sudo a2enmod rewrite
 
-Reiniciar Apache2 para que tenga en cuenta al mÛdulo reciÈn activado.
+Reiniciar Apache2 para que tenga en cuenta al m√≥dulo reci√©n activado.
 $ sudo service apache2 restart
 
 ##Test
-###Pruebas de IntegraciÛn
+###Pruebas de Integraci√≥n
   * Duplica el archivo app/test/spec/conf.rb.default con el nombre app/test/spec/conf.rb y configura tu sitio local
   * (Opcional) instalar el [driver de Chrome][11].
   * Ejecutar pruebas
@@ -168,7 +169,7 @@ $ sudo service apache2 restart
 
 
 ##HubFlow
-Es como [GitFlow][7] pero con m·s flow. Descargar de [ac·][8].
+Es como [GitFlow][7] pero con m√°s flow. Descargar de [ac√°][8].
 
 Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archivo msysgit-install.cmd reemplazando "git-flow" por "git-hf" y "gitflow" por "hubflow".
 

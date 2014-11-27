@@ -57,4 +57,8 @@ class Errand extends LoggeableEntity {
 	public function getInmutableLoggeableProperties() {
 		return array('id_tramite');
 	}
+
+	protected function getDefaults() {
+		return array();
+	}
 }
