@@ -56,7 +56,7 @@ if( $opc == 'imprimir_factura' ) {
 	$factura_pdf_datos->generarFacturaPDF( $id_factura );
 }
 
-$pagina->titulo = __('Mantención factura PDF');
+$pagina->titulo = __('Mantenciï¿½n factura PDF');
 $pagina->PrintTop();
 
  ?>
@@ -544,7 +544,7 @@ $pagina->PrintTop();
 <table width="90%" border="0">
 	<tr>
 		<td style="text-align:right;vertical-align: middle;">
-			<?php echo __('Companía'); ?>
+			<?php echo __('Companï¿½a'); ?>
 		</td>
 		<td align="left">
 			<?php echo Html::SelectArray($estudios_array, 'select_id_estudio', $id_estudio, 'id="select_id_estudio" onchange="" style="width:100px;"'); ?>
@@ -559,7 +559,7 @@ $pagina->PrintTop();
 			<?php echo __('Tipo dato:'); ?>&nbsp;
 		</td>
 		<td align="left">
-			<?php echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $select_id_factura_pdf_datos_categoria, 'style="width:100px;"'); ?>
+			<?php echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $id_factura_pdf_datos_categoria, 'style="width:100px;"'); ?>
 		</td>
 		<td>
 			<input type="button" id="botonguardar" value="Guardar" style="width:80px;">&nbsp;
@@ -650,9 +650,9 @@ echo "<form id='datospdf' action=\"#\" style='display:none;' method=\"POST\">";
 			echo "<li class=\"rd3cellx encabezado\">Alto<br>[mm]</li>";
 			echo "<li style='width:110px;' class=\"encabezado\">Tipograf&iacute;a</li>";
 			echo "<li style='width:100px;' class=\"encabezado\">Estilo</li>";
-			echo "<li style='width:90px;' class=\"encabezado\">Mayúscula</li>";
+			echo "<li style='width:90px;' class=\"encabezado\">Mayï¿½scula</li>";
 			echo "<li style='width:80px;' class=\"encabezado\">Alineacion</li>";
-			echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaño</li>";
+			echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaï¿½o</li>";
 		echo "</ul></div>";
 		echo "<div id='contienecoordenadas'><div id='tabla_coordenadas'></div></div>";
 	echo "</table>";

@@ -208,14 +208,14 @@ class FacturaPdfDatos extends Objeto {
 				$glosa_dato = date("Y", strtotime($factura->fields['fecha_vencimiento']));
 				break;
 			case 'fecha_venc_ano_ultima_cifra':
-                $glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-1);
-                break;
+				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-1);
+				 break;
 			case 'fecha_venc_ano_dos_cifras':
-                $glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-2);
+				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-2);
 				break;
-            case 'fecha_venc_numero_mes':
-                $glosa_dato = strftime("%m", strtotime($factura->fields['fecha_vencimiento']));
-                break;
+			case 'fecha_venc_numero_mes':
+				$glosa_dato = strftime("%m", strtotime($factura->fields['fecha_vencimiento']));
+				break;
 			case 'direccion':
 				$glosa_dato = $factura->fields['direccion_cliente'];
 				break;
