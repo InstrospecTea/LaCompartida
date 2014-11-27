@@ -82,6 +82,18 @@ class WsFacturacionCl extends WsFacturacion {
 			$documento['Detalle'][] = $linea_detalle;
 		}
 
+		if (!empty($dataFactura['referencia'])) {
+			$ref = $dataFactura['referencia'];
+			$documento['Referencia'] = array(
+				'NroLinRef'	=> 1, // Por el momento solo se puede referir a un DTE
+				'TpoDocRef'	=> $ref['tipo_dte'],
+				'FolioRef'	=> $ref['folio'],
+				'FchRef'	=> $ref['fecha_emision'],
+				'CodRef'	=> $ref['codigo'],
+				'RazonRef'	=> $ref['razon'],
+			);
+		}
+
 		Log::write(print_r($documento, true), 'FacturacionElectronicaCl');
 		return $this->enviarDocumento($documento);
 	}

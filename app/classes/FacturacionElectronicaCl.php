@@ -247,6 +247,41 @@ EOF;
 			);
 		}
 
+		if ($Factura->fields['id_factura_padre'] > 0) {
+			$FacturaPadre = new Factura($Sesion);
+			$FacturaPadre->Load($Factura->fields['id_factura_padre']);
+			$arrayPadre = self::FacturaToArray($Sesion, $FacturaPadre, $Estudio);
+
+			$PrmDocumentoLegal->Load($FacturaPadre->fields['id_documento_legal']);
+			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
+
+			$arrayFactura['referencia'] = array(
+				'tipo_dte'	=> $tipoDTE,
+				'folio'	=> $FacturaPadre->fields['numero'],
+				'fecha_emision'	=> Utiles::sql2date($FacturaPadre->fields['fecha'], '%Y-%m-%d'),
+				/**
+				 * CodRef: Indica los distintos casos de referencia, los cuales pueden ser:
+				 * a) Nota de Crédito que elimina documento de referencia en forma completa
+				 *    (Factura de venta, Nota de débito, o Factura de compra)
+				 * b) Nota de crédito que corrige un texto del documento de referencia
+				 * c) Nota de Débito que elimina una Nota de Crédito en la referencia en forma completa
+				 * d) Notas de crédito o débito que corrigen montos de otro documento
+				 * Casos a) b) y c) deben tener un único documento de referencia, es decir una sola línea de referencia.
+				 * Sus valores pueden ser:
+				 *   1: Anula Documento de Referencia.
+				 *   2: Corrige Texto Documento de Referencia.
+				 *   3: Corrige Montos.
+				 */
+				'codigo'	=> 1,
+				/**
+				 * RazonRef: Explicitar razon. Ejemplo una Nota de Credito que hacer referencia a una factura,
+				 * indica "descuento por pronto pago", "error en precio" o “anula factura”, etc.
+				 * El campo tiene un largo maximo de 90 caracteres.
+				 */
+				'razon'	=> "something",
+			);
+		}
+
 		return $arrayFactura;
 	}
 
