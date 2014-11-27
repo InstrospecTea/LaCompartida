@@ -22,10 +22,10 @@ if( $opc == 'guardar' || $opc == 'imprimir_factura' ) {
 	foreach($_POST as $key => $value) {
 		list($indicador, $campo, $id) = explode("_",$key);
 
-				if( $id == 'documento' ) {
-						list($e1,$e2,$e3,$e4,$id) = explode("_",$key);
-						$campo = 'id_documento_legal';
-				}
+		if( $id == 'documento' ) {
+			list($e1,$e2,$e3,$e4,$id) = explode("_",$key);
+			$campo = 'id_documento_legal';
+		}
 
 		if( $indicador != 'fac' ) {
 			continue;
@@ -35,7 +35,7 @@ if( $opc == 'guardar' || $opc == 'imprimir_factura' ) {
 		$factura_pdf_datos->Load($id);
 
 		if(strtolower($campo)=='ejemplo') {
-			$value=utf8_decode($value);
+			$value = utf8_decode($value);
 		}
 
 		$factura_pdf_datos->Edit($campo, $value);

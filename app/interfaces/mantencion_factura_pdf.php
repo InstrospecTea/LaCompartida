@@ -56,7 +56,7 @@ if( $opc == 'imprimir_factura' ) {
 	$factura_pdf_datos->generarFacturaPDF( $id_factura );
 }
 
-$pagina->titulo = __('Mantención factura PDF');
+$pagina->titulo = __('Mantenciï¿½n factura PDF');
 $pagina->PrintTop();
 
  ?>
@@ -114,7 +114,7 @@ $pagina->PrintTop();
 			jQuery('#id_factura_pdf_datos_categoria').val(Id_categoria);
 			var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 			jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
-			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 		});
 
 		jQuery('#botonguardar').click(function() {
@@ -153,7 +153,7 @@ $pagina->PrintTop();
 			var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 			jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
 			jQuery("#fila_"+Actual).css({'background':'#CFC'});
-			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 			jQuery("#fila_"+Actual).animate({'backgroundColor':'#FFF'},2000);
 		});
 
@@ -405,7 +405,7 @@ $pagina->PrintTop();
 				jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
 				jQuery("#fila_"+ID).css({'background':'#CFC'});
 				//  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
 			},
 			stop:function(event,ui) {
@@ -425,7 +425,7 @@ $pagina->PrintTop();
 				Pos = jQuery(".cat_"+Cat).first().attr('rel');
 				jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
 				jQuery("#fila_"+ID).css({'background':'#CFC'});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
 			},
 			stop: function(event,ui) {
@@ -452,7 +452,7 @@ $pagina->PrintTop();
 				filasporcat();
 				var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 				jQuery( "#tabla_coordenadas" ).css({'top':24*(1-Pos)} );
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery('#datospdf').show();
 				pizarron();
 				jQuery('#uploadify').appendTo('#fatcell').show();
@@ -529,7 +529,7 @@ $pagina->PrintTop();
 
 				var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#tabla_coordenadas").css({'top':24*(1-Pos)});
 				jQuery('#uploadify').appendTo('#fatcell').show();
 				jQuery("#contienecoordenadas").removeClass('divloading');
@@ -544,7 +544,7 @@ $pagina->PrintTop();
 <table width="90%" border="0">
 	<tr>
 		<td style="text-align:right;vertical-align: middle;">
-			<?php echo __('Companía'); ?>
+			<?php echo __('Companï¿½a'); ?>
 		</td>
 		<td align="left">
 			<?php echo Html::SelectArray($estudios_array, 'select_id_estudio', $id_estudio, 'id="select_id_estudio" onchange="" style="width:100px;"'); ?>
@@ -650,9 +650,9 @@ echo "<form id='datospdf' action=\"#\" style='display:none;' method=\"POST\">";
 			echo "<li class=\"rd3cellx encabezado\">Alto<br>[mm]</li>";
 			echo "<li style='width:110px;' class=\"encabezado\">Tipograf&iacute;a</li>";
 			echo "<li style='width:100px;' class=\"encabezado\">Estilo</li>";
-			echo "<li style='width:90px;' class=\"encabezado\">Mayúscula</li>";
+			echo "<li style='width:90px;' class=\"encabezado\">Mayï¿½scula</li>";
 			echo "<li style='width:80px;' class=\"encabezado\">Alineacion</li>";
-			echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaño</li>";
+			echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaï¿½o</li>";
 		echo "</ul></div>";
 		echo "<div id='contienecoordenadas'><div id='tabla_coordenadas'></div></div>";
 	echo "</table>";
