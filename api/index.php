@@ -852,12 +852,12 @@ function validateAuthTokenSendByHeaders($permission = null) {
 		}
 
 		$Session->usuario = new UsuarioExt($Session);
-		$Session->usuario->LoadId($user_token->id);
+		$Session->usuario->LoadId($user_token->user_id);
 		if (!is_null($permission)) {
 			if (!$Session->usuario->Loaded()) {
 				halt(__("The user doesn't exist"), 'UserDoesntExist');
 			} else {
-				$Session->usuario->LoadPermisos($user_token->id);
+				$Session->usuario->LoadPermisos($user_token->user_id);
 			 	$params_array['codigo_permiso'] = $permission;
 				$p = $Session->usuario->permisos->Find('FindPermiso', $params_array);
 				if (!$p->fields['permitido']) {

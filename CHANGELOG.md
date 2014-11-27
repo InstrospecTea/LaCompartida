@@ -1,11 +1,15 @@
 # Changelog
 
-## Hotfix: 14.20.1
+## Hotfix: 14.20.3
 Jueves 27 de Noviembre 2014
 * **Feature:** [Agrega notas de crédito/débito con Facturacion.cl](https://github.com/LemontechSA/ttb/pull/765)
 
+## Hotfix: 14.20.2
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige guardado de trabajos desde API REST](https://github.com/LemontechSA/ttb/pull/767)
+
 ## Release: 14.20.0
-Jueves 20 de Noviembre 2014
+Jueves 26 de Noviembre 2014
 * **Feature:** [Optimización Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
 * **Feature:** [Usuario Encargado lista de clientes](https://github.com/LemontechSA/ttb/pull/754)
 * **Feature:** [Agregar decimales a restricción diaria de usuarios](https://github.com/LemontechSA/ttb/pull/747)
