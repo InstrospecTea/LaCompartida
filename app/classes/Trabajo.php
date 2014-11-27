@@ -48,84 +48,20 @@ class Trabajo extends Objeto
 		return __('Abierto');
 	}
 
-	function GuardarHistorial($id_trabajo, $queryHistorial) {
-		$queryHistorial = str_replace('{{id_trabajo}}', $id_trabajo, $queryHistorial);
-		$resp = mysql_query($queryHistorial, $this->sesion->dbh) or Utiles::errorSQL($queryHistorial, __FILE__, __LINE__, $this->sesion->dbh);
-		return $resp;
-	}
-
-	function QueryHistorial($tipo = 'CREAR', $app_id = 1) {
-		$app_id = !is_null($app_id) ? $app_id : 1;
-		$id_usuario_sesion = !is_null($this->sesion->usuario->fields['id_usuario']) ? $this->sesion->usuario->fields['id_usuario'] : $this->fields['id_usuario'];
-
-		if ($tipo == 'MODIFICAR') {
-			$query = "SELECT
-					fecha,
-					descripcion,
-					duracion,
-					duracion_cobrada,
-					id_usuario,
-					codigo_asunto,
-					cobrable,
-					tarifa_hh
-				FROM trabajo
-				WHERE id_trabajo = {$this->fields['id_trabajo']}";
-
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($fecha, $descripcion, $duracion, $duracion_cobrada, $id_usuario, $codigo_asunto, $cobrable, $tarifa_hh) = mysql_fetch_array($resp);
-
-			$queryHistorial = "INSERT INTO trabajo_historial
-						SET
-							id_trabajo = '{{id_trabajo}}',
-							id_usuario = '{$id_usuario_sesion}',
-							fecha = '" . date("Y-m-d H:i:s") . "',
-						 	fecha_trabajo = '$fecha',
-						 	fecha_trabajo_modificado = '{$this->fields['fecha']}',
-						 	descripcion = '" . mysql_real_escape_string(empty($descripcion) ? ' Sin descripcion' : $descripcion) . "',
-						 	descripcion_modificado = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
-						 	duracion = '".mysql_real_escape_string($duracion)."',
-						 	duracion_modificado = '{$this->fields['duracion']}',
-						 	duracion_cobrada = '" . mysql_real_escape_string($duracion_cobrada) . "',
-						 	duracion_cobrada_modificado = '{$this->fields['duracion_cobrada']}',
-						 	id_usuario_trabajador = '" . mysql_real_escape_string($id_usuario) . "',
-						 	id_usuario_trabajador_modificado = '{$this->fields['id_usuario']}',
-						 	accion = 'MODIFICAR',
-						 	codigo_asunto = '" . mysql_real_escape_string($codigo_asunto) . "',
-						 	codigo_asunto_modificado = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
-						 	tarifa_hh = '{$this->fields['tarifa_hh']}',
-						 	tarifa_hh_modificado = '{$tarifa_hh}',
-						 	cobrable = '$cobrable',
-						 	app_id = {$app_id},
-						 	cobrable_modificado = '{$this->fields['cobrable']}'";
-		} else {
-			$queryHistorial = "INSERT INTO trabajo_historial
-								SET
-									app_id = {$app_id},
-									id_trabajo = '{{id_trabajo}}',
-									id_usuario = '{$id_usuario_sesion}',
-									fecha = '" . date("Y-m-d H:i:s") . "',
-								 	fecha_trabajo = '{$this->fields['fecha']}',
-								 	descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion']) . "',
-								 	duracion = '{$this->fields['duracion']}',
-								 	duracion_cobrada = '{$this->fields['duracion_cobrada']}',
-								 	id_usuario_trabajador =  '{$this->fields['id_usuario']}',
-								 	accion = 'CREAR',
-								 	tarifa_hh = '{$this->fields['tarifa_hh']}',
-								 	codigo_asunto = '".mysql_real_escape_string($this->fields['codigo_asunto'])."',
-								 	cobrable_modificado = '{$this->fields['cobrable']}'";
+	function Write() {
+		$this->Prepare();
+		if (!$this->Check()) {
+			return false;
 		}
-		return $queryHistorial;
-	}
-
-	function Write($historialOnWrite = true, $app_id = null) {
-		$accionHistorial = $this->Loaded() ? 'MODIFICAR' : 'CREAR';
-		$queryHistorial = $historialOnWrite ? $this->QueryHistorial($accionHistorial, $app_id) : null;
-		if (parent::Write()) {
-			if ($historialOnWrite && !is_null($queryHistorial)) {
-				$this->GuardarHistorial($this->fields['id_trabajo'], $queryHistorial);
-			}
+		$workService = new WorkService($this->sesion);
+		$work = new Work();
+		$work->fillFromArray($this->fields);
+		$work->fillChangedFields($this->changes);
+		try {
+			$work = $workService->saveOrUpdate($work);
+			$this->fields = $work->fields;
 			return true;
-		} else {
+		} catch(ServiceException $ex) {
 			return false;
 		}
 	}
@@ -136,22 +72,22 @@ class Trabajo extends Objeto
 			$this->error = 'No se puede mover un trabajo cobrado';
 			return false;
 		}
-
-		if ($this->changes['fecha'] || $this->changes['id_usuario']
-			|| $this->changes['id_trabajo'] || $this->changes['duracion']) {
-			$horasenfecha = $this->HorasEnFecha($this->fields['fecha'],
-				$this->fields['id_usuario'], $this->fields['id_trabajo']);
-
-			$duracion = $this->fields['duracion'];
-			$duracionsegundos = strtotime($duracion) - strtotime('today');
-			$totaldiacondicional = ($horasenfecha['duracion'] + $duracionsegundos);
-
-			if ($totaldiacondicional >= 86400) {
-				$this->error = 'No se puede trabajar más de 24 horas diarias';
-				return false;
-			}
+		if 	($this->changes['fecha'] || $this->changes['id_usuario'] ||
+				$this->changes['id_trabajo'] || $this->changes['duracion']
+			) {
+				$horasenfecha = $this->HorasEnFecha(
+					$this->fields['fecha'],
+					$this->fields['id_usuario'],
+					$this->fields['id_trabajo']
+				);
+				$duracion = $this->fields['duracion'];
+				$duracionsegundos = strtotime($duracion) - strtotime('today');
+				$totaldiacondicional = ($horasenfecha['duracion'] + $duracionsegundos);
+				if ($totaldiacondicional >= 86400) {
+					$this->error = 'No se puede trabajar más de 24 horas diarias';
+					return false;
+				}
 		}
-
 		return true;
 	}
 
@@ -178,27 +114,28 @@ class Trabajo extends Objeto
 	 * return array $duracion, un array con llaves duracion y duracion_cobrada
 	 */
 	function HorasEnFecha($fecha = null, $id_usuario = null, $id_trabajo = null) {
-		if ($fecha == null) {
+		if (is_null($fecha)) {
 			$fecha = date('Y-m-d');
 		}
-
-		$queryhoras = "SELECT
-										SUM(TIME_TO_SEC(duracion)) AS duracion,
-										SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada
-									FROM trabajo
-									WHERE fecha = '$fecha'";
-
-		if ($id_usuario != null) {
-			$queryhoras .= " AND id_usuario = '$id_usuario'";
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('SUM(TIME_TO_SEC(duracion))', 'duracion');
+		$criteria->add_select('SUM(TIME_TO_SEC(duracion_cobrada))', 'duracion_cobrada');
+		$criteria->add_from('trabajo');
+		$clauses[] = CriteriaRestriction::equals('fecha', "'$fecha'");
+		if (!is_null($id_usuario)) {
+			$clauses[] = CriteriaRestriction::equals('id_usuario', "'$id_usuario'");
 		}
 		if (!empty($id_trabajo)) {
-			$queryhoras .= " AND id_trabajo != '$id_trabajo'";
+			$clauses[] = CriteriaRestriction::equals('id_trabajo', "'$id_trabajo'");
 		}
- 		$duracion = $this->sesion->pdodbh->query($queryhoras)->fetchAll(PDO::FETCH_ASSOC);
-		return $duracion[0];
+		$criteria->add_restriction(
+			CriteriaRestriction::and_clause($clauses)
+		);
+		$result = $criteria->run();
+		return $result[0];
 	}
 
-	function InsertarTrabajoTarifa($app_id = null) {
+	function InsertarTrabajoTarifa() {
 		$id_trabajo = $this->fields['id_trabajo'];
 		$codigo_asunto = $this->fields['codigo_asunto'];
 		$id_usuario = $this->fields['id_usuario'];
@@ -238,7 +175,7 @@ class Trabajo extends Objeto
 
 			if ($contrato->fields['id_moneda'] == $id_moneda) {
 				$this->Edit("tarifa_hh", $valor);
-				$this->Write(true, $app_id);
+				$this->Write();
 			}
 		}
 	}
@@ -271,26 +208,17 @@ class Trabajo extends Objeto
 	}
 
 	function Eliminar() {
-		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario])
-		{
+		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario]) {
 			$this->error = $this->sesion->usuario->fields[id_usuario]." A ".$this->fields[id_usuario]." No puede eliminar un trabajo que no fue agregado por usted";
 			return false;
 		}*/
 		if ($this->Estado() == "Abierto") {
 
-			$query = "INSERT INTO trabajo_historial SET
-					id_trabajo = '{$this->fields['id_trabajo']}',
-					id_usuario = '{$this->sesion->usuario->fields['id_usuario']}',
-					fecha = '" . date("Y-m-d H:i:s") . "',
-					fecha_trabajo = '{$this->fields['fecha']}',
-					descripcion = '" . mysql_real_escape_string(empty($this->fields['descripcion']) ? ' Sin descripcion' : $this->fields['descripcion']) . "',
-					duracion = '{$this->fields['duracion']}',
-					duracion_cobrada = '{$this->fields['duracion_cobrada']}',
-					id_usuario_trabajador = '{$this->fields['id_usuario']}',
-					accion = 'ELIMINAR',
-					codigo_asunto = '{$this->fields['codigo_asunto']}',
-					cobrable = '{$this->fields['cobrable']}'";
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			$workService = new WorkService($this->sesion);
+			$work = new Work();
+			$work->fillFromArray($this->fields);
+			$workService->delete($work);
+
 			// Eliminar el Trabajo del Comentario asociado
 			$query = "UPDATE tarea_comentario SET id_trabajo = NULL WHERE id_trabajo = '{$this->fields['id_trabajo']}'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -324,7 +252,6 @@ class Trabajo extends Objeto
 		}
 
 		$minutos_dia_total = Conf::GetConf($sesion, 'CantidadHorasDia') ? Conf::GetConf($sesion, 'CantidadHorasDia') : 1439;
-
 		if ($total_minutos > $minutos_dia_total) {
 			return false;
 		} else {
@@ -705,7 +632,7 @@ class Trabajo extends Objeto
 										SET
 											id_trabajo = '$id_trabajo',
 											id_usuario = '{$sesion->usuario->fields['id_usuario']}',
-											fecha = '" . date("Y-m-d H:i:s") . "',
+											fecha_accion = '" . date("Y-m-d H:i:s") . "',
 											fecha_trabajo = '{$trabajo_original->fields['fecha']}',
 											fecha_trabajo_modificado = '$fecha',
 											descripcion = '" . addslashes($trabajo_original->fields['descripcion']) . "',
@@ -1032,7 +959,7 @@ class Trabajo extends Objeto
 
 		$sql = "SELECT `user`.`id_categoria_usuario` FROM `usuario` AS `user` WHERE `user`.`id_usuario`=:user_id";
 		$Statement = $this->sesion->pdodbh->prepare($sql);
-		$Statement->bindParam('user_id', $user_id);
+		$Statement->bindParam('user_id', $user_id );
 		$Statement->execute();
 		$user_data = $Statement->fetchObject();
 		if (is_object($user_data)) {
@@ -1080,23 +1007,19 @@ class Trabajo extends Objeto
 		$cambio_fecha = strtotime($this->fields['fecha']) != strtotime($data['date']);
 		$this->Edit('fecha', $data['date']);
 		$this->Edit('codigo_tarea', !empty($data['task_code']) ? $data['task_code'] : 'NULL');
-
-		if (empty($data['id'])) {
-			$this->Edit('id_usuario', $data['user_id']);
-		}
-
+		$this->Edit('id_usuario', $data['user_id']);
 		$this->Edit('tarifa_hh', $data['rate']);
 
-		if ($this->Write(true, $data['app_id'])) {
+		if ($this->Write()) {
 			if (!empty($data['user_id'])) {
-				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`=0 WHERE `user`.`id_usuario`=:user_id";
+				$sql = "UPDATE `usuario` AS `user` SET `user`.`retraso_max_notificado`= 0 WHERE `user`.`id_usuario`=:user_id";
 				$Statement = $this->sesion->pdodbh->prepare($sql);
 				$Statement->bindParam('user_id', $data['user_id']);
 				$Statement->execute();
 			}
 
 			if ($update_rate_work == true) {
-				$this->InsertarTrabajoTarifa($data['app_id']);
+				$this->InsertarTrabajoTarifa();
 			}
 
 			return true;

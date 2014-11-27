@@ -30,7 +30,7 @@ if ($accion == "consistencia_cliente_asunto") {
                                 WHERE trabajo.id_cobro = '$id_cobro'
                                 ";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	echo 'OK';
+	echo json_encode(array('success' => $resp !== false));
 } else if ($accion == "cargar_tarifa_trabajo") {
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$dato_cliente = "codigo_cliente_secundario";

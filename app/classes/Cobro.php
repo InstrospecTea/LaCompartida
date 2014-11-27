@@ -1253,6 +1253,7 @@ if (!class_exists('Cobro')) {
 					// Se guarda la información del cobro para este trabajo. se incluye minutos retainer en el trabajo
 					$horas_retainer = floor(($retainer_trabajo_minutos) / 60);
 					$minutos_retainer = sprintf("%02d", $retainer_trabajo_minutos % 60);
+
 					$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
 					$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
@@ -1261,7 +1262,6 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
-
 					if (!$trabajo->Write(false)) {
 						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
 					}
@@ -1712,6 +1712,7 @@ if (!class_exists('Cobro')) {
 			if (!$this->Write()) {
 				return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
 			}
+
 			return '';
 		}
 

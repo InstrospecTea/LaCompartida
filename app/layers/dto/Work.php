@@ -1,16 +1,17 @@
 <?php
 
 /**
- * Class Errand
- * Clase que representa un trámite en TheTimeBilling.
+ * Class Work
+ * Clase que representa un trabajo en TheTimeBilling.
  */
-class Errand extends LoggeableEntity {
+class Work extends LoggeableEntity {
+
 	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
 	 * @return string
 	 */
 	public function getIdentity() {
-		return 'id_tramite';
+		return 'id_trabajo';
 	}
 
 	/**
@@ -19,7 +20,7 @@ class Errand extends LoggeableEntity {
 	 * @return string
 	 */
 	public function getPersistenceTarget() {
-		return 'tramite';
+		return 'trabajo';
 	}
 
 	/**
@@ -27,7 +28,7 @@ class Errand extends LoggeableEntity {
 	 * @return string
 	 */
 	public function getLoggingTable() {
-		return 'tramite_historial';
+		return 'trabajo_historial';
 	}
 
 	/**
@@ -35,30 +36,27 @@ class Errand extends LoggeableEntity {
 	 * entidad.
 	 * @return array
 	 */
-	public function getLoggeableProperties(){
+	public function getLoggeableProperties() {
 		return array(
-			'fecha',
+			array('fecha', 'fecha_trabajo'),
 			'descripcion',
+			'duracion',
+			'duracion_cobrada',
+			array('id_usuario', 'id_usuario_trabajador'),
+			'tarifa_hh',
 			'codigo_asunto',
-			'codigo_actividad',
-			'codigo_tarea',
-			'id_tramite_tipo',
-			'solicitante',
-			'id_moneda_tramite',
-			'tarifa_tramite',
-			'id_moneda_tramite_individual',
-			'tarifa_tramite_individual',
-			'cobrable',
-			'trabajo_si_no',
-			'duracion'
+			'cobrable'
 		);
 	}
 
 	public function getInmutableLoggeableProperties() {
-		return array('id_tramite');
+		return array(
+			'id_trabajo'
+		);
 	}
 
 	protected function getDefaults() {
 		return array();
 	}
+
 }

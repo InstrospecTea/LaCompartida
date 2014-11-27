@@ -394,11 +394,11 @@ class Reporte {
 		}
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$Criteria->add_select(' - ', 'glosa_actividad');
+			$Criteria->add_select("' - '", 'glosa_actividad');
 		}
 
 		if (in_array('area_trabajo', $this->agrupador)) {
-			$Criteria->add_select(' - ', 'area_trabajo');
+			$Criteria->add_select("' - '", 'area_trabajo');
 		}
 
 		// TIPO DE DATO

@@ -62,27 +62,26 @@ class Funciones {
 
 	function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "") {
 		if ($id_tarifa == "") {
-			$query = "SELECT 
-						contrato.id_tarifa 
-					FROM asunto 
-					JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+			$query = "SELECT
+						contrato.id_tarifa
+					FROM asunto
+					JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 					WHERE asunto.codigo_asunto = '$codigo_asunto' ";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			list($id_tarifa) = mysql_fetch_array($resp);
 		}
 
-		$query = "SELECT 
-					tarifa 
-				FROM usuario_tarifa 
-				JOIN tarifa ON (usuario_tarifa.id_tarifa = tarifa.id_tarifa) 
-				WHERE 
-					id_usuario = '$id_usuario' AND 
-					id_moneda = '$id_moneda' AND 
+		$query = "SELECT
+					tarifa
+				FROM usuario_tarifa
+				JOIN tarifa ON (usuario_tarifa.id_tarifa = tarifa.id_tarifa)
+				WHERE
+					id_usuario = '$id_usuario' AND
+					id_moneda = '$id_moneda' AND
 					usuario_tarifa.id_tarifa = '$id_tarifa'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$arreglo = mysql_fetch_array($resp);
-
-		return $arreglo['tarifa'];
+		$arreglo = mysql_fetch_assoc($resp);
+		return empty($arreglo['tarifa']) ? 0 : $arreglo['tarifa'];
 	}
 
 	function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {
@@ -105,7 +104,7 @@ class Funciones {
 			return $arreglo['tarifa'];
 		} else {
 			$query = "SELECT MAX( tv.tarifa * mon.tipo_cambio / montram.tipo_cambio ) as valor_tramite
-						FROM tramite_tarifa tt 
+						FROM tramite_tarifa tt
 						JOIN tramite_valor tv ON ( tv.id_tramite_tarifa=tt.id_tramite_tarifa)
 						JOIN prm_moneda mon ON ( tv.id_moneda = mon.id_moneda )
 						JOIN prm_moneda montram ON ( montram.id_moneda = '$id_moneda' )
@@ -119,22 +118,22 @@ class Funciones {
 		}
 	}
 
-	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda. 
+	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda.
 
 	function TarifaDefecto($sesion, $id_usuario, $id_moneda) {
 		$query = "SELECT tarifa FROM usuario_tarifa JOIN tarifa ON (usuario_tarifa.id_tarifa = tarifa.id_tarifa)
-								WHERE id_usuario=$id_usuario AND id_moneda='$id_moneda'  AND 
+								WHERE id_usuario=$id_usuario AND id_moneda='$id_moneda'  AND
 								tarifa.tarifa_defecto = '1' ";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$arreglo = mysql_fetch_array($resp);
 		return $arreglo[tarifa];
 	}
 
-	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda. 
+	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda.
 
 	function TramiteTarifaDefecto($sesion, $id_tramite_tipo, $id_moneda) {
 		$query = "SELECT tarifa FROM tramite_valor JOIN tramite_tarifa ON (tramite_valor.id_tramite_tarifa = tramite_tarifa.id_tramite_tarifa)
-								WHERE id_tramite_tipo=$id_tramite_tipo AND id_moneda='$id_moneda'  AND 
+								WHERE id_tramite_tipo=$id_tramite_tipo AND id_moneda='$id_moneda'  AND
 								tramite_tarifa.tarifa_defecto = '1' ";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$arreglo = mysql_fetch_array($resp);
@@ -148,9 +147,9 @@ class Funciones {
 								JOIN tarifa AS t ON (u_t.id_tarifa = t.id_tarifa)
 								JOIN cobro AS c ON (c.id_cobro = $id_cobro)
 								JOIN cobro_moneda AS c_m ON (c_m.id_cobro = $id_cobro AND c_m.id_moneda = u_t.id_moneda)
-								JOIN prm_moneda AS moneda_de_cobro ON (moneda_de_cobro.id_moneda = c.id_moneda) 
-								WHERE	u_t.id_usuario = $id_usuario 
-										AND 
+								JOIN prm_moneda AS moneda_de_cobro ON (moneda_de_cobro.id_moneda = c.id_moneda)
+								WHERE	u_t.id_usuario = $id_usuario
+										AND
 										t.tarifa_defecto = '1'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
@@ -176,9 +175,9 @@ class Funciones {
 								JOIN tramite_tarifa AS t ON (t_v.id_tramite_tarifa = t.id_tramite_tarifa)
 								JOIN cobro AS c ON (c.id_cobro = $id_cobro)
 								JOIN cobro_moneda AS c_m ON (c_m.id_cobro = $id_cobro AND c_m.id_moneda = t_v.id_moneda)
-								JOIN prm_moneda AS moneda_de_cobro ON (moneda_de_cobro.id_moneda = c.id_moneda) 
-								WHERE	t_v.id_tramite_tipo = $id_tramite_tipo 
-										AND 
+								JOIN prm_moneda AS moneda_de_cobro ON (moneda_de_cobro.id_moneda = c.id_moneda)
+								WHERE	t_v.id_tramite_tipo = $id_tramite_tipo
+										AND
 										t.tarifa_defecto = '1'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 

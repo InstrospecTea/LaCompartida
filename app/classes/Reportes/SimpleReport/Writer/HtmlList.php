@@ -147,9 +147,7 @@ class SimpleReport_Writer_HtmlList implements SimpleReport_Writer_IWriter {
 
 		switch ($column->format) {
 			case 'text':
-				if (strpos($valor, ";")) {
-					//$valor = str_replace("", "<br />", $valor);
-				}
+				$valor = nl2br(htmlentities($valor));
 				break;
 			case 'number':
 				$valor = number_format($valor, 2, ',', '.');
