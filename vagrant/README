@@ -1,4 +1,4 @@
-* Instalar VirtualBox y Vagrant 1.6.5
+* Instalar VirtualBox y Vagrant 1.6.5 *(descargar desde https://www.vagrantup.com/downloads.html)*
 * vagrant up
 * Configurar miconfig.php con usuario root y password admin.asdwsx y nombre base de datos ttb
 * Ingresar a 127.0.0.1:8080/phpmyadmin con usuario root y password admin.asdwsx crear la base de datos ttb

@@ -1,12 +1,9 @@
 <?php
 
-class WorkDAO extends AbstractDAO implements IWorkDAO{
+class WorkDAO extends AbstractDAO implements IWorkDAO {
 
-
-    public function getClass() {
-        return 'Work';
-    }
-
-
+	public function getClass() {
+		return 'Work';
+	}
 
 }
