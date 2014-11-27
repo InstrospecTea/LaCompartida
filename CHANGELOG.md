@@ -1,6 +1,10 @@
 # Changelog
 
-## Releas: 14.20.0
+## Hotfix: 14.20.2
+Jueves 21 de Noviembre 2014
+* **Fixed:** [Corrige guardado de trabajos desde API REST](https://github.com/LemontechSA/ttb/pull/767)
+
+## Release: 14.20.0
 Jueves 20 de Noviembre 2014
 * **Feature:** [Optimización Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
 * **Feature:** [Usuario Encargado lista de clientes](https://github.com/LemontechSA/ttb/pull/754)
