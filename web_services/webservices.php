@@ -473,7 +473,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			}
 		}
 
-		$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : 'NULL';
+		$id_area_trabajo = !empty($area_trabajo) ? $area_trabajo : 'NULL';
 
 		$trabajo = new Trabajo($sesion);
 		$date_time = new DateTime($fecha);

@@ -154,10 +154,8 @@ class UserToken extends Objeto {
 		$Statement->execute();
 		$app_data = $Statement->fetchObject();
 		if (is_object($app_data)) {
-			$_SESSION['app_id'] = $app_data->id;
 			return $app_data->id;
 		} else {
-			$_SESSION['app_id'] = 1;
 			return 1; //default app id = TimeBilling.
 		}
 	}
