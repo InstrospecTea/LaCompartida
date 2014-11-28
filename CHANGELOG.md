@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix: 14.20.4
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige problema con sesion en cron demo](https://github.com/LemontechSA/ttb/pull/771)
+
 ## Hotfix: 14.20.3
 Jueves 27 de Noviembre 2014
-* **Feature:** [Agrega notas de crédito/débito con Facturacion.cl](https://github.com/LemontechSA/ttb/pull/765)
+* **Fixed:** [Corrige problema reportes](https://github.com/LemontechSA/ttb/pull/770)
 
 ## Hotfix: 14.20.2
 Jueves 27 de Noviembre 2014
