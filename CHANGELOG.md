@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.20.6
+Viernes 28 de Noviembre 2014
+* **Change:** [Agrega tags a petición de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
+
 ## Hotfix: 14.20.5
 Viernes 27 de Noviembre 2014
 * **Change:** Cambia path tmp del respaldo.

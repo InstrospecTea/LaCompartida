@@ -140,7 +140,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
-		
+
 		$tipo_cambio_usd = $arreglo_monedas[2]['tipo_cambio'];
 		$cifras_decimales_usd = $arreglo_monedas[2]['cifras_decimales'];
 
@@ -169,6 +169,12 @@ class FacturaPdfDatos extends Objeto {
 		} else {
 			$texto_impuesto = $FacturaTextoImpuesto;
 		}
+
+		$honorarios_sin_impuesto = 0;
+		if ($factura->fields['porcentaje_impuesto'] == 0) {
+			$honorarios_sin_impuesto = $factura->fields['honorarios'];
+		}
+
 
 		switch( $tipo_dato ) {
 			case 'razon_social':
@@ -334,9 +340,27 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
+			case 'monto_honorarios_con_iva':
+				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+			case 'subtotal_exento':
+				$glosa_dato = number_format($factura->fields['subtotal_gastos_sin_impuesto'] + $honorarios_sin_impuesto,
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+			case 'subtotal_impuesto':
+				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)) + $factura->fields['subtotal_gastos_sin_impuesto'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
 
 			default:
-			
+
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
@@ -444,6 +468,22 @@ class FacturaPdfDatos extends Objeto {
 		$fila['glosa_detraccion'] = $factura_texto_detraccion;
 		$fila['texto_impuesto'] = $texto_impuesto;
 		$fila['solicitante'] = $contrato->fields['contacto'];
+		$fila['monto_honorarios_con_iva'] = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
+		$honorarios_sin_impuesto = 0;
+		if ($factura->fields['porcentaje_impuesto'] == 0) {
+			$honorarios_sin_impuesto = $factura->fields['honorarios'];
+		}
+		$fila['subtotal_exento'] = number_format($factura->fields['subtotal_gastos_sin_impuesto'] + $honorarios_sin_impuesto,
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
+		$fila['subtotal_impuesto'] = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)) + $factura->fields['subtotal_gastos_sin_impuesto'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)),
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
 
 		return $fila;
 	}
