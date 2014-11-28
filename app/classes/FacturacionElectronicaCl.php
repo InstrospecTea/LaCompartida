@@ -3,7 +3,7 @@
 class FacturacionElectronicaCl extends FacturacionElectronica {
 
 	public static function ValidarFactura() {
-		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
+		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente, $id_factura_padre, $dte_codigo_referencia, $dte_razon_referencia;
 		if (empty($RUT_cliente)) {
 			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
 		}
@@ -19,6 +19,33 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 		if (empty($giro_cliente)) {
 			$pagina->AddError(__('Debe ingresar ' . __('Giro') . ' del cliente.'));
 		}
+		if ($id_factura_padre  > 0) {
+			if (empty($dte_codigo_referencia)) {
+				$pagina->AddError(__('Debe seleccionar Referencia'));
+			}
+			if (empty($dte_razon_referencia)) {
+				$pagina->AddError(__('Debe ingresar razón de la Referencia'));
+			}
+		}
+	}
+
+	public static function InsertaMetodoPago() {
+		global $factura, $contrato;
+		$Sesion = new Sesion();
+		# if ND/NT
+		echo "<tr>";
+		echo "<td align='right'>Referencia</td>";
+		echo "<td align='left' colspan='3'>";
+		echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_CL_REF' ORDER BY glosa ASC", "dte_codigo_referencia", $factura->fields['dte_codigo_referencia'], "", "Sleccione", "300");
+		echo "</td>";
+		echo "</tr>";
+
+		echo '<tr>';
+		echo '<td align="right" colspan="1">Raz&oacute;n Referencia';
+		echo '<td align="left" colspan="3">';
+		echo "<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='" . $factura->fields['dte_razon_referencia'] . "' id='dte_razon_referencia' size='40' maxlength='90'>";
+		echo '</td>';
+		echo '</tr>';
 	}
 
 	public static function InsertaJSFacturaElectronica() {
@@ -272,13 +299,13 @@ EOF;
 				 *   2: Corrige Texto Documento de Referencia.
 				 *   3: Corrige Montos.
 				 */
-				'codigo'	=> 1,
+				'codigo'	=> $Factura->fields['dte_codigo_referencia'],
 				/**
 				 * RazonRef: Explicitar razon. Ejemplo una Nota de Credito que hacer referencia a una factura,
 				 * indica "descuento por pronto pago", "error en precio" o “anula factura”, etc.
 				 * El campo tiene un largo maximo de 90 caracteres.
 				 */
-				'razon'	=> "something",
+				'razon'	=> $Factura->fields['dte_razon_referencia'],
 			);
 		}
 

@@ -153,7 +153,8 @@ if ($opcion == "guardar") {
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
 		$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
-
+		$factura->Edit("dte_codigo_referencia", $dte_codigo_referencia ? $dte_codigo_referencia : "");
+		$factura->Edit("dte_razon_referencia", $dte_razon_referencia ? $dte_razon_referencia : "");
 		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
 			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
