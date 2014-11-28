@@ -64,7 +64,7 @@ function ExisteLlaveForanea($tabla, $columna, $tabla_referenciada, $columna_refe
  * @param mixed $queries
  * @throws Exception
  */
-function ejecutar($queries, $dbh) {
+function ejecutar(&$queries, $dbh) {
 	if (!is_array($queries)) {
 		$queries = array($queries);
 	}
@@ -73,10 +73,12 @@ function ejecutar($queries, $dbh) {
 			throw new Exception($q . '---' . mysql_error());
 		}
 	}
+	$queries = null;
 }
 
 function Actualizaciones(&$dbh, $new_version) {
 	global $sesion;
+	$queries = array();
 	switch ($new_version) {
 		case 1.0:
 			echo 'Mensaje de prueba 1.<br>';
@@ -10551,8 +10553,25 @@ QUERY;
 			$queries[] = "ALTER TABLE `usuario`
 				CHANGE COLUMN `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0,
 				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
-			ejecutar($queries, $dbh);
 			break;
+		case 7.86:
+			$queries[] = "ALTER TABLE `trabajo_historial`
+							CHANGE COLUMN `accion` `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `fecha_accion`,
+							CHANGE COLUMN `app_id` `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' AFTER `accion`,
+							CHANGE COLUMN `id_trabajo_respaldo_excel` `id_trabajo_respaldo_excel` INT(11) NULL DEFAULT NULL AFTER `app_id`,
+							CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+							CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NULL DEFAULT NULL ,
+							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
+							CHANGE COLUMN `descripcion` `descripcion` MEDIUMTEXT NULL DEFAULT NULL ,
+							CHANGE COLUMN `descripcion_modificado` `descripcion_modificado` MEDIUMTEXT NULL DEFAULT NULL ,
+							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL , 
+							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
+							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
+							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
+			break;
+	}
+	if (!empty($queries)) {
+		ejecutar($queries, $dbh);
 	}
 }
 
@@ -10561,7 +10580,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.85;
+$max_update = 7.86;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

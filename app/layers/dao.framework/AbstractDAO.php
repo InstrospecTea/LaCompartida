@@ -7,102 +7,109 @@
  * TODO:
  *  - Persistencia para save or update.
  */
-abstract class AbstractDAO extends Objeto implements BaseDAO{
+abstract class AbstractDAO extends Objeto implements BaseDAO {
 
-		var $sesion;
+	var $sesion;
 
-		public function __construct(Sesion $sesion) {
-				$this->sesion = $sesion;
-		}
+	public function __construct(Sesion $sesion) {
+		$this->sesion = $sesion;
+	}
 
-		/**
-		 * Método que realiza la escritura de un log respecto a la entidad.
-		 * Si la propiedad tiene anotado '@log' entonces es una propiedad que debe ser logeada.
-		 * Si la pripiedad tiene anotado '@inmutable' entonces es una propiedad que no varía en el log, por ende
-		 * no tiene una columna [Nombre columna]_modificado.
-		 * @param $action String que se guardará en el campo accion de la tabla de logs.
-		 * @param $object Object hereda de LoggeableEntity y por ende tiene definido el método getLoggingTable().
-		 * @param $legacy Object legado que es la versión anterior del que se guardará ahora.
-		 * @param int $app Identificador de la aplicación que está realizando la operación.
-		 * @throws Exception Cuando la inserción falla.
-		 */
-		private function writeLogFromAnotations($action, $object, $legacy, $app = 1) {
-
-			if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
+	/**
+	 * Método que realiza la escritura de un log respecto a la entidad.
+	 * Si la propiedad tiene anotado '@log' entonces es una propiedad que debe ser logeada.
+	 * Si la pripiedad tiene anotado '@inmutable' entonces es una propiedad que no varía en el log, por ende
+	 * no tiene una columna [Nombre columna]_modificado.
+	 * @param $action String que se guardará en el campo accion de la tabla de logs.
+	 * @param $object Object hereda de LoggeableEntity y por ende tiene definido el método getLoggingTable().
+	 * @param $legacy Object legado que es la versión anterior del que se guardará ahora.
+	 * @throws Exception Cuando la inserción falla.
+	 */
+	private function writeLogFromAnotations($action, $object, $legacy) {
+		if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
 			return;
-			}
-			$insertCriteria = new InsertCriteria($this->sesion);
-			$insertCriteria->set_into($object->getLoggingTable());
-			$insertCriteria->add_pivot_with_value('accion', $action);
-			$insertCriteria->add_pivot_with_value('app_id', $app);
+		}
+		$app_id = empty($_SESSION['app_id']) ? 1 : $_SESSION['app_id'];
+		$insertCriteria = new InsertCriteria($this->sesion);
+		$insertCriteria->set_into($object->getLoggingTable());
+		$insertCriteria->add_pivot_with_value('accion', $action);
+		$insertCriteria->add_pivot_with_value('app_id', $app_id);
+		if (!is_null($this->sesion->usuario->fields['id_usuario'])) {
 			$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-			$reflected = new ReflectionClass($this->getClass());
-			$properties = $reflected->getProperties();
-			foreach($properties as $property) {
-				$annotations = $this->getAnnotations($property);
-				if(is_numeric(array_search('@log', $annotations))) {
-					if (is_numeric(array_search('@inmutable', $annotations))) {
-						$insertCriteria->add_pivot_with_value(
-							$property->getName(),
-							$object->get($property->getName())
-						);
-					} else {
-						$insertCriteria->add_pivot_with_value(
-							$property->getName(),
-							$legacy->get($property->getName())
-						);
-						$insertCriteria->add_pivot_with_value(
-							$property->getName().'_modificado',
-							$object->get($property->getName())
-						);
-					}
+		}
+		$reflected = new ReflectionClass($this->getClass());
+		$properties = $reflected->getProperties();
+		foreach ($properties as $property) {
+			$annotations = $this->getAnnotations($property);
+			if (is_numeric(array_search('@log', $annotations))) {
+				if (is_numeric(array_search('@inmutable', $annotations))) {
+					$insertCriteria->add_pivot_with_value(
+						$property->getName(),
+						$object->get($property->getName())
+					);
+				} else {
+					$insertCriteria->add_pivot_with_value(
+						$property->getName(),
+						$legacy->get($property->getName())
+					);
+					$insertCriteria->add_pivot_with_value(
+						$property->getName() . '_modificado',
+						$object->get($property->getName())
+					);
 				}
 			}
-			try {
-				$insertCriteria->run();
-			} catch (PDOException $ex) {
-				throw new Exception('No se pudo guardar el log. Ex: ' . $ex->getTraceAsString());
-			}
 		}
+		try {
+			$insertCriteria->run();
+		} catch (PDOException $ex) {
+			throw new CouldNotWriteLogException('No se pudo guardar el log. Msg: ' . $ex->getMessage());
+		}
+	}
 
 	/**
 	 * Método que realiza la escritura de un log respecto a una entidad.
 	 * @param $action String que se guardará en el campo accion de la tabla de logs.
 	 * @param $object Entity hereda de LoggeableEntity y por ende tiene definido el método getLoggingTable().
 	 * @param $legacy Entity legado que es la versión anterior del que se guardará ahora.
-	 * @param int $app Identificador de la aplicación que está realizando la operación.
 	 * @throws Exception Cuando la inserción falla.
 	 */
-	private function writeLogFromArray($action, $object, $legacy, $app = 1) {
+	private function writeLogFromArray($action, $object, $legacy) {
 		if ($action == 'MODIFICAR' && !$this->isReallyLoggingNecessary($object, $legacy)) {
 			return;
 		}
+		$app_id = empty($_SESSION['app_id']) ? 1 : $_SESSION['app_id'];
 		$insertCriteria = new InsertCriteria($this->sesion);
 		$insertCriteria->set_into($object->getLoggingTable());
 		$insertCriteria->add_pivot_with_value('accion', $action);
-		$insertCriteria->add_pivot_with_value('app_id', $app);
+		$insertCriteria->add_pivot_with_value('app_id', $app_id);
 		$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 		$inmutableProperties = $object->getInmutableLoggeableProperties();
 		foreach ($inmutableProperties as $inmutableProperty) {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));
 		}
 		$properties = $object->getLoggeableProperties();
-		foreach($properties as $property) {
+		$legacy->fillDefaults();
+		foreach ($properties as $property) {
+			$alias = $property;
+			if (is_array($property)) {
+				$alias = $property[1];
+				$property = $property[0];
+			}
 			$legacyProperty = $legacy->get($property);
 			$newProperty = $object->get($property);
 			$insertCriteria->add_pivot_with_value(
-				$property,
-				(empty($legacyProperty)? NULL : $legacyProperty)
+				$alias,
+				$legacyProperty
 			);
 			$insertCriteria->add_pivot_with_value(
-				$property.'_modificado',
-				(empty($newProperty)? NULL : $newProperty)
+				$alias . '_modificado',
+				$newProperty
 			);
 		}
 		try {
 			$insertCriteria->run();
 		} catch (PDOException $ex) {
-			throw new CouldNotWriteLogException('No se pudo guardar el log. Msg: ' . $ex->getMessage());
+			throw new CouldNotWriteLogException('No se pudo guardar el log.' . $ex->getMessage());
 		}
 	}
 
@@ -118,6 +125,9 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	private function isReallyLoggingNecessary($newObject, $legacyObject) {
 		$properties = $newObject->getLoggeableProperties();
 		foreach ($properties as $mutableProperty) {
+			if (is_array($mutableProperty)) {
+				$mutableProperty = $mutableProperty[0];
+			}
 			if ($newObject->get($mutableProperty) != $legacyObject->get($mutableProperty)) {
 				return true;
 			}
@@ -126,12 +136,14 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	}
 
 	public function saveOrUpdate($object) {
+		//Llena los defaults de cada entidad.
+		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());
 		$reflected = new ReflectionClass($this->getClass());
 		$id = $object->get($object->getIdentity());
 		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 		//que crear un nuevo registro.
-		if(empty($id)) {
+		if (empty($id)) {
 			$object = $this->save($object);
 			if (is_subclass_of($object, 'LoggeableEntity')) {
 				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
@@ -139,13 +151,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		} else {
 			$legacy = $this->get($object->get($object->getIdentity()));
 			$object = $this->update($object);
-			if (is_subclass_of($object, 'LoggeableEntity')){
+			if (is_subclass_of($object, 'LoggeableEntity')) {
 				$object = $this->merge($legacy, $object);
 				$this->writeLogFromArray('MODIFICAR', $object, $legacy);
 			}
 		}
 		return $object;
-
 	}
 
 	/**
@@ -165,7 +176,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
 			return $object;
 		} else {
-			throw new CouldNotSaveEntityException('No se ha podido persistir la entidad de tipo .'.$this->getClass());
+			throw new CouldNotSaveEntityException('No se ha podido persistir la entidad de tipo .' . $this->getClass());
 		}
 	}
 
@@ -175,13 +186,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	 * @throws CouldNotUpdateEntityException
 	 */
 	private function update(Entity $object) {
-		try{
+		try {
 			return $this->save($object);
-		} catch (Exception $ex){
-			throw new CouldNotUpdateEntityException('No se ha podido encontrar la entidad de tipo '.$this->getClass().'
-			con identificador primario '.$object->get($object->getIdentity()).'.');
+		} catch (Exception $ex) {
+			throw new CouldNotUpdateEntityException('No se ha podido encontrar la entidad de tipo ' . $this->getClass() . '
+			con identificador primario ' . $object->get($object->getIdentity()) . '.');
 		}
-
 	}
 
 	private function merge(Entity $legacy, Entity $new) {
@@ -200,7 +210,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		$resultArray = $resultArray[0];
 		if (empty($resultArray)) {
 			throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
-			'.$this->getClass().' con identificador primario '.$id.'.');
+			' . $this->getClass() . ' con identificador primario ' . $id . '.');
 		}
 		return $this->encapsulate($resultArray, $instance);
 	}
@@ -222,9 +232,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 
 	public function delete($object) {
 		$reflected = new ReflectionClass($this->getClass());
-		if (is_subclass_of($object, 'LoggeableEntity')){
+		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
+			$newInstance->fillDefaults();
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
 	}
@@ -237,7 +248,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 	 */
 	protected function checkClass($object, $className) {
 		if (!is_a($object, $className)) {
-			throw new Exception('Dao Exception: El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
+			throw new DAOException('El objeto entregado no pertenece ni hereda a la clase definida en DAO.');
 		}
 	}
 
@@ -267,11 +278,9 @@ abstract class AbstractDAO extends Objeto implements BaseDAO{
 		$c = str_replace('/*', '', $c);
 		$c = str_replace('*/', '', $c);
 		$c = str_replace('*', '', $c);
-		$c = str_replace(' ','',$c);
+		$c = str_replace(' ', '', $c);
 		preg_match_all('/@\w+/', $c, $tags);
 		return $tags[0];
 	}
-
-
 
 }
