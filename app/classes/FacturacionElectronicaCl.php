@@ -282,6 +282,11 @@ EOF;
 			$PrmDocumentoLegal->Load($FacturaPadre->fields['id_documento_legal']);
 			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
 
+			$referenciaId = $Factura->fields['dte_codigo_referencia'];
+			$Referencia = new PrmCodigo($Sesion);
+			$Referencia->Load($referenciaId);
+			$codigoReferencia = $Referencia->Loaded() ? $Referencia->fields['codigo'] : 1;
+
 			$arrayFactura['referencia'] = array(
 				'tipo_dte'	=> $tipoDTE,
 				'folio'	=> $FacturaPadre->fields['numero'],
@@ -299,7 +304,7 @@ EOF;
 				 *   2: Corrige Texto Documento de Referencia.
 				 *   3: Corrige Montos.
 				 */
-				'codigo'	=> $Factura->fields['dte_codigo_referencia'],
+				'codigo'	=> $codigoReferencia,
 				/**
 				 * RazonRef: Explicitar razon. Ejemplo una Nota de Credito que hacer referencia a una factura,
 				 * indica "descuento por pronto pago", "error en precio" o “anula factura”, etc.
