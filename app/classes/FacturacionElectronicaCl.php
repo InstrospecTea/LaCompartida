@@ -29,6 +29,26 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 		}
 	}
 
+	public static function BotonDescargarHTML($id_factura) {
+		$img_dir = Conf::ImgDir();
+		$Html = self::getHtml();
+		$img_pdf_copia = $Html->img("{$img_dir}/pdf.gif", array('border' => 0, 'style' => 'opacity:0.5;'));
+		$img_pdf = $Html->img("{$img_dir}/pdf.gif", array('border' => 0));
+		$output = $Html->tag('a', $img_pdf, array('title' => 'Descargar original', 'class' => 'factura-documento', 'data-factura' => $id_factura, 'data-original' => 1, 'href' => '#'));
+		$output .= $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));
+		return $output;
+	}
+
+	public static function AgregarBotonFacturaElectronica($hookArg) {
+		$Factura = $hookArg['Factura'];
+		if ($Factura->FacturaElectronicaCreada()) {
+			$hookArg['content'] = self::BotonDescargarHTML($Factura->fields['id_factura']);
+		} elseif (!$Factura->Anulada()) {
+			$hookArg['content'] = self::BotonGenerarHTML($Factura->fields['id_factura']);
+		}
+		return $hookArg;
+	}
+
 	public static function InsertaMetodoPago() {
 		global $factura, $contrato;
 		$Sesion = new Sesion();
@@ -80,8 +100,9 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 			jQuery(document).on("click", ".factura-documento", function() {
 				var self = jQuery(this);
 				var id_factura = self.data("factura");
+				var original = self.data("original");
 				var format = self.data("format") || "pdf";
-				window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
+				window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format  + "&original=" + original
 			});
 
 			jQuery(document).on("change", "#dte_metodo_pago",  function() {
@@ -96,6 +117,55 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 			jQuery("#dte_metodo_pago").trigger("change");
 EOF;
 	}
+
+	/**
+  * Descarga archivo PDF
+  * @param type $hookArg
+	*/
+	public static function DescargarPdf($hookArg) {
+		$Factura = $hookArg['Factura'];
+		if (!empty($Factura->fields['dte_url_pdf']) && $hookArg['original'] == true) {
+			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
+		} else {
+			$Sesion = new Sesion();
+			$Estudio = new PrmEstudio($Sesion);
+			$Estudio->Load($Factura->fields['id_estudio']);
+			
+			$rut = $Estudio->GetMetaData('rut');
+			$usuario = $Estudio->GetMetadata('facturacion_electronica_cl.usuario');
+			$password = $Estudio->GetMetadata('facturacion_electronica_cl.password');
+				
+			$WsFacturacionCl = new WsFacturacionCl;
+			$WsFacturacionCl->setLogin($rut, $usuario, $password);
+			if ($WsFacturacionCl->hasError()) {
+				$hookArg['Error'] = self::ParseError($WsFacturacionCl, $WsFacturacionCl->getErrorCode());
+			} else {
+				$arrayDocumento = self::FacturaToArray($Sesion, $Factura ,$Estudio);
+				try {
+					$result = $WsFacturacionCl->obtenerLink($arrayDocumento['folio'], $arrayDocumento['tipo_dte'], $hookArg['original']);
+					if (!$WsFacturacionCl->hasError()) {
+						$hookArg['InvoiceURL'] = $result;
+					} else {
+						$hookArg['Error'] = self::ParseError($WsFacturacionCl, 'BuildingInvoiceError');
+					}
+				} catch  (Exception $ex) {
+					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
+				}
+			}
+		}
+		if (!is_null($hookArg['Error'])) {
+			return $hookArg;
+		} else {
+			$name = sprintf('Factura_%s.pdf', $Factura->obtenerNumero());
+			header("Content-Transfer-Encoding: binary");
+			header("Content-Type: application/pdf");
+			header('Content-Description: File Transfer');
+			header("Content-Disposition: attachment; filename=$name");
+			echo file_get_contents($hookArg['InvoiceURL']);
+			exit;
+		}
+	}
+
 
 	public static function GeneraFacturaElectronica($hookArg) {
 		$Sesion = new Sesion();

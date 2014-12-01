@@ -117,6 +117,15 @@ class WsFacturacionCl extends WsFacturacion {
 		return base64_decode($xml64);
 	}
 
+	public function obtenerLink($folio, $tipo_dte, $original = true) {
+		$params = array(
+			'Operacion' => 'V',
+			'Folio' => $folio,
+			'TipoDte' => $tipo_dte
+		);
+		return $this->getPdfUrl($params, $original);
+	}
+
 	public function getPdfUrl($documento, $original = true) {
 		$params = array(
 			'login' => $this->getLogin(),
