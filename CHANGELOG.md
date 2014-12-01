@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix: 14.20.6
+Viernes 28 de Noviembre 2014
+* **Change:** [Agrega tags a petición de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
+
+## Hotfix: 14.20.5
+Viernes 27 de Noviembre 2014
+* **Change:** Cambia path tmp del respaldo.
+
 ## Hotfix: 14.20.4
 Jueves 27 de Noviembre 2014
 * **Fixed:** [Corrige problema con sesion en cron demo](https://github.com/LemontechSA/ttb/pull/771)

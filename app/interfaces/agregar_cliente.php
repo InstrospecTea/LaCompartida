@@ -291,6 +291,9 @@ if ($opcion == "guardar") {
 			if ($contrato->Write()) {
 				// Segmento "Cobros pendientes";
 				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
+				if ($contrato->fields['forma_cobro'] !== 'FLAT FEE') {
+					$valor_fecha = array();
+				}
 				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 					$cobro_pendiente = new CobroPendiente($sesion);
 					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato']);

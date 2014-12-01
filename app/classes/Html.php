@@ -131,6 +131,30 @@ class Html extends \Html {
 	}
 
 	/**
+	 *
+	 * Devuelve una alerta html
+	 * @param atring $alert
+	 * @param string $type success, info, danger, error o vacio
+	 * @param array $attrs
+	 * @return type
+	 */
+	public function alert($alert, $type = '', Array $attrs = array()) {
+		$extra_class = '';
+		if (!empty($attrs['class'])) {
+			$extra_class = $attrs['class'];
+			unset($attrs['class']);
+		}
+		if (!empty($type)) {
+			$type = "alert-$type";
+		}
+		$_attrs = array_merge(
+			array('class' => trim("alert $type $extra_class")),
+			(array) $arrts
+		);
+		return $this->tag('div', $alert, $_attrs, false);
+	}
+
+	/**
 	 * Devuelve ruta del archivo indicado
 	 * @param type $file
 	 * @param type $type
