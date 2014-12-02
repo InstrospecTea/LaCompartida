@@ -10569,7 +10569,7 @@ QUERY;
 			if (!ExisteCampo('id_pais', 'grupo_cliente', $dbh)) {
 				$queries[] = "ALTER TABLE `grupo_cliente` ADD `id_pais` int(11) NULL;";
 			}
-			
+
 			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
 				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
 				`id_area_proyecto` int(11) NOT NULL,
@@ -10578,7 +10578,7 @@ QUERY;
 				`orden` int(11) NOT NULL DEFAULT '0',
 				PRIMARY KEY (`id_area_proyecto_desglose`),
 				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
-				CONSTRAINT `fk_prm_area_proyecto_id` 
+				CONSTRAINT `fk_prm_area_proyecto_id`
 				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`) ON DELETE CASCADE);";
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_area_proyecto_desglose` (
@@ -10586,9 +10586,9 @@ QUERY;
 				`id_area_proyecto_desglose` INT(11) NOT NULL,
 				INDEX `fk_asunto_area_proyecto_desglose` (`id_asunto` ASC),
 				INDEX `fk_prm_area_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
-				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`) 
+				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`)
 					REFERENCES `asunto` (`id_asunto`)  ON DELETE CASCADE,
-				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`) 
+				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`)
 					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`)  ON DELETE CASCADE);";
 
 			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
@@ -10599,7 +10599,7 @@ QUERY;
 				`orden` int(11) NOT NULL DEFAULT '0',
 				PRIMARY KEY (`id_area_proyecto_desglose`),
 				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
-				CONSTRAINT `fk_prm_area_proyecto_id` 
+				CONSTRAINT `fk_prm_area_proyecto_id`
 				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_giro` (
@@ -10609,18 +10609,18 @@ QUERY;
 				`orden` int(11) NOT NULL DEFAULT '0',
 				PRIMARY KEY (`id_giro`),
 				INDEX `fk_prm_giro_id` (`id_giro` ASC));";
- 
+
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_giro` (
 				`id_asunto` INT(11) NOT NULL,
 				`id_giro` INT(11) NOT NULL,
 				INDEX `fk_asunto_asunto_giro` (`id_asunto` ASC),
 				INDEX `fk_prm_giro_asunto_giro` (`id_giro` ASC),
-				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`) 
+				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`)
 					REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
-				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`) 
+				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`)
 					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
-			
+
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
 
 			ejecutar($queries, $dbh);
@@ -10639,28 +10639,36 @@ $force = 0;
 if (isset($_GET['maxupdate'])) {
 	$max_update = round($_GET['maxupdate'], 2);
 }
+
 if (isset($_GET['minupdate'])) {
 	$min_update = round($_GET['minupdate'], 2);
 }
+
 if (isset($_GET['force'])) {
 	$force = $_GET['force'];
 }
+
 for ($version = max($min_update, 2); $version <= $max_update; $version += 0.01) {
 	$VERSIONES[$num++] = round($version, 2);
 }
+
 if (isset($_GET['lastver'])) {
 	$lastver = array_pop($VERSIONES);
 	echo number_format($lastver, 2, '.', '');
 } else {
-
-	/*	 * ********************************************** LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA ****************************************************** */
+	/**
+	 * LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA
+	 */
 
 	require_once dirname(__FILE__) . '/../app/conf.php';
 
 	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1]) {
 		die('Credenciales inválidas.');
 	}
+
 	$sesion = new Sesion();
+
+	// este usuario y contraseña son necesarios para la actualización de tablas
 	$sesion->dbh = @mysql_connect(Conf::dbHost(), 'admin', 'admin1awdx') or die(mysql_error());
 	mysql_select_db(Conf::dbName(), $sesion->dbh) or mysql_error($sesion->dbh);
 
@@ -10680,10 +10688,10 @@ if (isset($_GET['lastver'])) {
 	foreach ($VERSIONES as $key => $new_version) {
 		if ($VERSION < $new_version || $force == 1) {
 			flush();
+
 			echo '<hr>Comienzo de proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
 
 			try {
-
 				if (!mysql_query("START TRANSACTION", $sesion->dbh)) {
 					throw new Exception(mysql_error($sesion->dbh));
 				}
@@ -10708,7 +10716,7 @@ if (isset($_GET['lastver'])) {
 
 				EnviarLogError($error_message, $exc, $sesion);
 
-				exit(1);
+				exit;
 			}
 
 			GuardarVersion($new_version, $sesion);
@@ -10731,25 +10739,23 @@ function EnviarLogError($error_message, $e, $sesion) {
 			'nombre' => 'Soporte Lemontech'
 		),
 	);
-	$mail = <<<MAIL
-<p>Ha ocurrido un error al actualizar</p>
-
-<p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
-
-<p>$error_message</p>
-MAIL;
+	$mail = "<p>Ha ocurrido un error al actualizar</p>
+		<p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
+		<p>$error_message</p>";
 
 	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
 function InitVersion($version, $sesion) {
 	echo '<hr>Inicializando tabla para versión.<br>';
+
 	mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (
-	`version` decimal(3,1) NOT NULL DEFAULT '0.0',
-	`version_ct` decimal(3,1) NOT NULL DEFAULT '0.0',
-	`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (`version`,`version_ct`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
+		`version` decimal(3,1) NOT NULL DEFAULT '0.0',
+		`version_ct` decimal(3,1) NOT NULL DEFAULT '0.0',
+		`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		PRIMARY KEY (`version`,`version_ct`)
+	) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
+
 	$file_name = dirname(__FILE__) . '/version.php';
 	if (file_exists($file_name)) {
 		require_once $file_name;
@@ -10766,19 +10772,22 @@ function GuardarVersion($new_version, $sesion) {
 
 function IngresarNotificacion($notificacion, $permisos = array('ALL')) {
 	global $sesion;
-	$q = "INSERT INTO notificacion SET fecha=NOW(),texto_notificacion='" . $notificacion . "'";
-	if (!($resp = mysql_query($q, $sesion->dbh)))
-		throw new Exception($q . "---" . mysql_error());
+	$q = "INSERT INTO notificacion SET fecha=NOW(), texto_notificacion = '{$notificacion}'";
+
+	if (!($resp = mysql_query($q, $sesion->dbh))) {
+		throw new Exception($q . '---' . mysql_error());
+	}
 
 	$where = "usuario_permiso.codigo_permiso='ADM'";
 	foreach ($permisos as $p) {
-		$where .= " OR usuario_permiso.codigo_permiso='" . $p . "'";
+		$where .= " OR usuario_permiso.codigo_permiso='{$p}'";
 	}
 
 	$query = "UPDATE usuario
-						SET usuario.id_notificacion_tt=LAST_INSERT_ID()
-						WHERE usuario.id_usuario NOT IN
-						(SELECT usuario_permiso.id_usuario FROM usuario_permiso WHERE $where)";
-	if (!($resp = mysql_query($query, $sesion->dbh)))
-		throw new Exception($query . "---" . mysql_error());
+		SET usuario.id_notificacion_tt = LAST_INSERT_ID()
+		WHERE usuario.id_usuario NOT IN (SELECT usuario_permiso.id_usuario FROM usuario_permiso WHERE {$where})";
+
+	if (!($resp = mysql_query($query, $sesion->dbh))) {
+		throw new Exception($query . '---' . mysql_error());
+	}
 }
