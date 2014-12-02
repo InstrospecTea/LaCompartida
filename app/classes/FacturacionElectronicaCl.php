@@ -50,22 +50,23 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 	}
 
 	public static function InsertaMetodoPago() {
-		global $factura, $contrato;
+		global $factura, $contrato, $buscar_padre;
 		$Sesion = new Sesion();
-		# if ND/NT
-		echo "<tr>";
-		echo "<td align='right'>Referencia</td>";
-		echo "<td align='left' colspan='3'>";
-		echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_CL_REF' ORDER BY glosa ASC", "dte_codigo_referencia", $factura->fields['dte_codigo_referencia'], "", "Sleccione", "300");
-		echo "</td>";
-		echo "</tr>";
+		if ($buscar_padre) {
+			echo "<tr>";
+			echo "<td align='right'>Referencia</td>";
+			echo "<td align='left' colspan='3'>";
+			echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_CL_REF' ORDER BY glosa ASC", "dte_codigo_referencia", $factura->fields['dte_codigo_referencia'], "", "Sleccione", "300");
+			echo "</td>";
+			echo "</tr>";
 
-		echo '<tr>';
-		echo '<td align="right" colspan="1">Raz&oacute;n Referencia';
-		echo '<td align="left" colspan="3">';
-		echo "<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='" . $factura->fields['dte_razon_referencia'] . "' id='dte_razon_referencia' size='40' maxlength='90'>";
-		echo '</td>';
-		echo '</tr>';
+			echo '<tr>';
+			echo '<td align="right" colspan="1">Raz&oacute;n Referencia';
+			echo '<td align="left" colspan="3">';
+			echo "<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='" . $factura->fields['dte_razon_referencia'] . "' id='dte_razon_referencia' size='40' maxlength='90'>";
+			echo '</td>';
+			echo '</tr>';
+		}
 	}
 
 	public static function InsertaJSFacturaElectronica() {
