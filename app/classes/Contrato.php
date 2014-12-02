@@ -963,6 +963,22 @@ class Contrato extends Objeto {
 		return $cantidad_asuntos;
 	}
 
+	/**
+	 * Obtiene los datos del solicitante
+	 *
+	 * @return string 
+	 */
+	function ObtenerSolicitante() {
+		if (Conf::GetConf($this->sesion, 'TituloContacto')) { 
+			$solicitante = $this->fields['titulo_contacto'] . ' ' . 
+			$this->fields['contacto'] . ' ' . 
+			$this->fields['apellido_contacto'];
+		} else {
+			$solicitante = $this->fields['contacto'];
+		}
+		return $solicitante;
+	}
+
 	function MontoHHTarifaSTD($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '') {
 		if (!$emitido) {
 			$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";

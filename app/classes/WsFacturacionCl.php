@@ -26,7 +26,8 @@ class WsFacturacionCl extends WsFacturacion {
 				'IdDoc' => array(
 					'TipoDTE' => $dataFactura['tipo_dte'],
 					'Folio' => $dataFactura['folio'],
-					'FchEmis' => $dataFactura['fecha_emision']
+					'FchEmis' => $dataFactura['fecha_emision'],
+					'FchVenc' => $dataFactura['fecha_vencimiento']
 				),
 				'Emisor' => array(
 					'RUTEmisor' => $dataFactura['emisor']['rut'],
@@ -41,6 +42,7 @@ class WsFacturacionCl extends WsFacturacion {
 					'RUTRecep' => $dataFactura['receptor']['rut'],
 					'RznSocRecep' => $dataFactura['receptor']['razon_social'],
 					'GiroRecep' => $dataFactura['receptor']['giro'],
+					'Contacto' => $dataFactura['receptor']['contacto'],
 					'CorreoRecep' => $dataFactura['receptor']['correo'],
 					'DirRecep' => $dataFactura['receptor']['direccion'],
 					'CmnaRecep' => $dataFactura['receptor']['comuna'],
@@ -91,6 +93,12 @@ class WsFacturacionCl extends WsFacturacion {
 				'FchRef'	=> $ref['fecha_emision'],
 				'CodRef'	=> $ref['codigo'],
 				'RazonRef'	=> $ref['razon'],
+			);
+		}
+
+		if (!empty($dataFactura['condicion_pago'])) {
+			$documento['Adicional'] = array(
+				'A3'	=> $dataFactura['condicion_pago']
 			);
 		}
 

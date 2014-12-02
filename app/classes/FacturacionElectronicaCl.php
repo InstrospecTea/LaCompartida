@@ -294,11 +294,13 @@ EOF;
 			'tipo_dte' => $tipoDTE,
 			'afecto' => $afecto,
 			'fecha_emision' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
+			'fecha_vencimiento' => Utiles::sql2date($Factura->fields['fecha_vencimiento'], '%Y-%m-%d'),
 			'folio' => $Factura->fields['numero'],
 			'monto_neto' => intval($subtotal_factura),
 			'tasa_iva' => intval($Factura->fields['porcentaje_impuesto']),
 			'monto_iva' => intval($Factura->fields['iva']),
 			'monto_total' => intval($Factura->fields['total']),
+			'condicion_pago' => $Factura->ObtieneGlosaCondicionPago(),
 			'emisor' => array(
 				'rut' => $Estudio->GetMetaData('rut'),
 				'razon_social' => $Estudio->GetMetaData('razon_social'),
@@ -315,7 +317,8 @@ EOF;
 				'giro' => UtilesApp::transliteration($Factura->fields['giro_cliente']),
 				'direccion' => UtilesApp::transliteration($Factura->fields['direccion_cliente']),
 				'comuna' => UtilesApp::transliteration($Factura->fields['comuna_cliente']),
-				'cuidad' => UtilesApp::transliteration($Factura->fields['ciudad_cliente'])
+				'cuidad' => UtilesApp::transliteration($Factura->fields['ciudad_cliente']),
+				'contacto' => $Contrato->ObtenerSolicitante()
 			),
 			'detalle' => array()
 		);
