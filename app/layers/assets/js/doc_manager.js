@@ -6,7 +6,6 @@ var tags_cache = {'':[]};
 window.modified = false;
 
 /**
- * 
  * @param string text texto que mostrará la notificación
  * @param string type tipo de notificación, por defecto 'info' success|info|warning|danger
  * @param string title título de la notificación, por defecto vacío.
@@ -48,18 +47,18 @@ function notify(text, type, title) {
  * @returns {undefined}
  */
 $.ctrl = function(key, callback, args) {
-    var isCtrl = false;
-    $(document).keydown(function(e) {
-        if(!args) args=[]; // IE barks when args is null
-        
-        if(e.ctrlKey) isCtrl = true;
-        if(e.keyCode == key.charCodeAt(0) && isCtrl) {
-            callback.apply(this, args);
-            return false;
-        }
-    }).keyup(function(e) {
-        if(e.ctrlKey) isCtrl = false;
-    });        
+	var isCtrl = false;
+	$(document).keydown(function(e) {
+		if(!args) args=[]; // IE barks when args is null
+
+		if(e.ctrlKey) isCtrl = true;
+		if(e.keyCode == key.charCodeAt(0) && isCtrl) {
+			callback.apply(this, args);
+			return false;
+		}
+	}).keyup(function(e) {
+		if(e.ctrlKey) isCtrl = false;
+	});
 };
 
 function showError(msg) {
@@ -119,13 +118,13 @@ function PrevisualizarCarta() {
 		showError('Es necesario definir un numero de cobro para previsualizar una carta');
 		return;
 	}
-	
+
 	var existecobro = ExisteCobro(id_cobro);
 	if (existecobro === false) {
 		showError('No existe cobro');
 		return;
 	}
-	
+
 	var formato = $('#carta_formato').val();
 	$('#form_doc')
 		.attr('target', 'letter_preview')
@@ -218,7 +217,7 @@ $('#carta_id_carta').on('change', function(event) {
 	$('#carta_formato').val('');
 	$('#carta_formato_css').val('');
 	$('#nrel_charges').html('');
-	
+
 	$('#letter_preview').attr('src', 'about:blank');
 
 	var margenes = ['margen_superior', 'margen_inferior', 'margen_izquierdo', 'margen_derecho'];
@@ -243,8 +242,9 @@ $('#carta_id_carta').on('change', function(event) {
 	var urlajaxgetmargins = dm_root + '/obtener_margenes/' + id_carta;
 
 	$.get(urlajaxnrelcharges, function(data) {
-		$('#nrel_charges').html(data);
-	});
+		$('#nrel_charges').html('').append($('<h5/>').html('(N&deg; cobros asociados: ' + data.cobros_asociados + ')'));
+	}, 'json');
+
 	$.get(urlajaxgethtml, function(data) {
 		$('#carta_formato').val(data);
 		loading.stop('formato');

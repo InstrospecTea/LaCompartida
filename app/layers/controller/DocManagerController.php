@@ -122,6 +122,8 @@ class DocManagerController extends AbstractController {
 
 	public function obtenenrelncobros($id_carta) {
 		$this->layout = false;
+		$cobros_asociados = 0;
+
 		if (!empty($id_carta)) {
 			$query = "SELECT count(*) AS total FROM cobro WHERE id_carta = {$id_carta}";
 			$resp = mysql_query($query, $this->Session->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Session->dbh);
@@ -129,8 +131,7 @@ class DocManagerController extends AbstractController {
 			$cobros_asociados = $cobros['total'];
 		}
 
-		echo '<h5>(N° liquidaciones relacionadas ' . $cobros_asociados . ')</h5>';
-		$this->autoRender = false;
+		$this->renderJSON(array('cobros_asociados' => $cobros_asociados));
 	}
 
 }
