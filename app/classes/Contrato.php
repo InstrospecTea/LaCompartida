@@ -966,7 +966,10 @@ class Contrato extends Objeto {
 	/**
 	 * Obtiene los datos del solicitante
 	 *
-	 * @return string 
+	 * @return string Si está activa la configuración TituloContacto
+	 *         entonces devuelva la información del título, nombre y apellido
+	 *         de lo contrario devuelve lo que se haya escrito en el atributo
+	 *         contacto.
 	 */
 	function ObtenerSolicitante() {
 		if (Conf::GetConf($this->sesion, 'TituloContacto')) { 
