@@ -3,7 +3,7 @@
 /**
  * Class SearchService
  */
-class SearchService implements ISearchService{
+class SearchService implements ISearchService {
 
 	/**
 	 * Retorna un arreglo de instancias que pertenezcan a la jerarquía de {@link Entity}, que estén denotadas
@@ -20,6 +20,16 @@ class SearchService implements ISearchService{
 		$criteria = $this->prepareRelationships($criteria, $searchCriteria);
 		$criteria = $this->prepareRestrictions($criteria, $searchCriteria);
 		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties);
+		$criteria = $this->prepareGrouping($criteria, $searchCriteria);
+		return $criteria;
+	}
+
+	public function counterCriteria(SearchCriteria $searchCriteria, Criteria $criteria = null) {
+		$filter_properties = array('count(1) as total');
+		$criteria = $this->prepareRelationships($criteria, $searchCriteria);
+		$criteria = $this->prepareRestrictions($criteria, $searchCriteria);
+		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties, false);
+		$criteria = $this->prepareGrouping($criteria, $searchCriteria);
 		return $criteria;
 	}
 
@@ -30,13 +40,21 @@ class SearchService implements ISearchService{
 	 * @param Criteria       $criteria
 	 * @return array
 	 */
-	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
+	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null, Sesion $sesion = null) {
+		if ($searchCriteria->paginate()) {
+			$criteria->add_limit($searchCriteria->Pagination->rows_per_page(), $searchCriteria->Pagination->current_row());
+		}
 		$entity = $searchCriteria->entity();
 		$entity = new ReflectionClass($entity);
 		$entity = $entity->newInstance();
-		return $this->encapsulateArray($criteria->run(), $entity);
+		$data = $this->encapsulateArray($criteria->run(), $entity);
+		if ($searchCriteria->paginate()) {
+			$criteria->reset_limits()->reset_selection()->add_select('count(1)', 'total');
+			$counter = $criteria->run();
+			$searchCriteria->Pagination->total_rows($counter[0]['total']);
+		}
+		return $data;
 	}
-
 
 	/**
 	 *
@@ -48,7 +66,7 @@ class SearchService implements ISearchService{
 		$usedEntities = array();
 		foreach ($searchCriteria->relationships() as $relationship) {
 			$relatedEntity = $relationship->entity();
-			if (!in_array($relatedEntity, $usedEntities)) {
+			if (!in_array($relationship->alias(), $usedEntities)) {
 				$usedEntities[] = $relatedEntity;
 				$relatedCondition = $relationship->condition();
 				if (class_exists($relationship->entity())) {
@@ -65,13 +83,22 @@ class SearchService implements ISearchService{
 					$relatedProperty = $reflectedEntity->getIdentity();
 					$relatedTarget = $relationship->entity();
 				}
-				$constructedRestriction = CriteriaRestriction::$relatedCondition($relationship->entity().'.'.$relatedProperty, $searchCriteria->entity().'.'.$relatedProperty)->__toString();
-				$criteria->add_custom_join_with($relatedTarget." {$relationship->entity()}", $constructedRestriction, 'LEFT');
+				if ($relationship->with_entity()) {
+					$relatedEntity = $relationship->with_entity();
+				} else {
+					$relatedEntity = $searchCriteria->entity();
+				}
+				if ($relationship->with_property()) {
+					$entityProperty = $relationship->with_property();
+				} else {
+					$entityProperty = $relatedProperty;
+				}
+				$constructedRestriction = CriteriaRestriction::$relatedCondition($relationship->alias() . '.' . $relatedProperty, $relatedEntity . '.' . $entityProperty)->__toString();
+				$criteria->add_custom_join_with("$relatedTarget AS {$relationship->alias()}", $constructedRestriction, strtoupper($relationship->join()));
 			}
 		}
 		return $criteria;
 	}
-
 
 	/**
 	 * @param Criteria       $criteria
@@ -91,7 +118,7 @@ class SearchService implements ISearchService{
 			if ($for == '') {
 				$for = $searchCriteria->entity();
 			}
-			$constructedRestriction = CriteriaRestriction::$restriction($for.'.'.$filter->property(), $filter->value())->__toString();
+			$constructedRestriction = CriteriaRestriction::$restriction($for . '.' . $filter->property(), $filter->value())->__toString();
 			if ($filter->condition() == 'AND') {
 				$and_filters[] = $constructedRestriction;
 			} else {
@@ -99,10 +126,10 @@ class SearchService implements ISearchService{
 			}
 		}
 		if (count($and_filters)) {
-			$criteria->add_restriction(CriteriaRestriction::and_all($and_filters));
+			$criteria->add_restriction(CriteriaRestriction::and_clause($and_filters));
 		}
 		if (count($or_filters)) {
-			$criteria->add_restriction(CriteriaRestriction::or_all($or_filters));
+			$criteria->add_restriction(CriteriaRestriction::or_clause($or_filters));
 		}
 		return $criteria;
 	}
@@ -114,22 +141,24 @@ class SearchService implements ISearchService{
 	 * @param array          $filterProperties
 	 * @return Criteria
 	 */
-	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties) {
+	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $widthIdentity = true) {
 		$entity = $searchCriteria->entity();
 		$entity = new ReflectionClass($entity);
 		$entity = $entity->newInstance();
 		if (empty($filterProperties)) {
-			$criteria->add_select($searchCriteria->entity().'.*');
+			$criteria->add_select($searchCriteria->entity() . '.*');
 		} else {
-			$criteria->add_select($searchCriteria->entity().'.'.$entity->getIdentity());
+			if ($widthIdentity) {
+				$criteria->add_select($searchCriteria->entity() . '.' . $entity->getIdentity());
+			}
 			foreach ($filterProperties as $filter_property) {
-				$criteria->add_select($searchCriteria->entity().'.'.$filter_property);
+				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property);
+				$criteria->add_select($field_name);
 			}
 		}
 		$criteria->add_from($entity->getPersistenceTarget(), $searchCriteria->entity());
 		return $criteria;
 	}
-
 
 	/**
 	 * Realiza la encapsulación de un resultado de una query a la base de datos en una instancia de un objeto.
@@ -162,6 +191,23 @@ class SearchService implements ISearchService{
 		return $result;
 	}
 
+	private function makeFieldName($entity, $property) {
+		if (preg_match('/^[a-z][a-z0-9_]+\(.*/i', $property)) { //is a function
+			return $property;
+		} else if (preg_match('/^\([A-Za-z0-9_]+/', $property)) { //maybe it's a subselect
+			return $property;
+		} else if (preg_match('/^[a-z0-9_]+\.[a-z0-9_]+/i', $property)) { //already include entity or table
+			return $property;
+		} else {
+			return "{$entity}.{$property}";
+		}
+	}
 
+	private function prepareGrouping(Criteria $criteria, SearchCriteria $searchCriteria) {
+		foreach ($searchCriteria->groups() as $group) {
+			$criteria->add_grouping($this->makeFieldName($searchCriteria->entity(), $group));
+		}
+		return $criteria;
+	}
 
 }

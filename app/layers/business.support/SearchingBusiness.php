@@ -12,7 +12,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 * @param array          $filter_properties
 	 * @return mixed|void
 	 */
-	function searchByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array()) {
+	public function searchByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array()) {
 		$this->loadService('Search');
 		$criteria = new Criteria($this->sesion);
 		$criteria = $this->SearchService->translateCriteria(
@@ -23,8 +23,25 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 		$criteria = $this->addScopes($searchCriteria, $criteria);
 		return $this->SearchService->getResults(
 			$searchCriteria,
-			$criteria
+			$criteria,
+			$this->sesion
 		);
+	}
+
+	/**
+	 * Devuelve el resultado de searchByCriteria() paginado.
+	 * @param SearchCriteria $searchCriteria
+	 * @param array $filter_properties
+	 * @param type $page
+	 * @return \stdClass
+	 */
+	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1) {
+		$searchCriteria->Pagination->current_page($page);
+		$searchCriteria->paginate(true);
+		$ret = new stdClass();
+		$ret->data = $this->searchByCriteria($searchCriteria, $filter_properties);
+		$ret->Pagination = $searchCriteria->Pagination;
+		return $ret;
 	}
 
 	/**
@@ -35,6 +52,9 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 */
 	private function addScopes(SearchCriteria $searchCriteria, Criteria $criteria) {
 		$scopes = $searchCriteria->scopes();
+		if (empty($scopes)) {
+			return $criteria;
+		}
 		//Instanciar la clase correspondiente mediante reflection.
 		$scopeClass = $searchCriteria->entity().'Scope';
 		$scopeInstance = new $scopeClass();
@@ -45,4 +65,4 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 		return $criteria;
 	}
 
-} 
+}
