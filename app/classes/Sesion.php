@@ -14,7 +14,9 @@ class Sesion extends \Sesion {
 
 	private static $_instance;
 
-	function LoadLang() {
+
+	public function LoadLang() {
+
 		global $_LANG, $memcache;
 		$existememcache = isset($memcache) && is_object($memcache);
 
@@ -28,6 +30,7 @@ class Sesion extends \Sesion {
 				}
 			} catch (PDOException $e) {
 				if (strpos($e->getMessage(), 'SQLSTATE[42S02]: Base table or view not found') === 0) {
+
 					$this->pdodbh->exec("CREATE TABLE IF NOT EXISTS `prm_lang` (
 							  `id_lang` smallint(3) NOT NULL AUTO_INCREMENT,
 							  `archivo_nombre` varchar(100) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'archivo.php' COMMENT 'relativo al path app/lang',
@@ -40,6 +43,7 @@ class Sesion extends \Sesion {
 				}
 			}
 		}
+
 		if (count($langs) == 0) {
 			return;
 		}
@@ -57,7 +61,7 @@ class Sesion extends \Sesion {
 		return self::$_instance;
 	}
 
-	function LoadPlugin() {
+	public function LoadPlugin() {
 		global $memcache;
 		$existememcache = isset($memcache) && is_object($memcache);
 
@@ -91,6 +95,43 @@ class Sesion extends \Sesion {
 				include_once Conf::ServerDir() . '/plugins/' . $plugin;
 			}
 		}
+	}
+
+
+	/**
+	 * Lee un valor  desde $_SESSION
+	 * @param $key
+	 * @return null
+	 */
+	public function read($key) {
+		return $this->has($key) ? $_SESSION[$key] : null;
+	}
+
+	/**
+	 * Escribe un valor en $_SESSION
+	 * @param type $key
+	 * @param type $value
+	 */
+	public function write($key, $value) {
+		$_SESSION[$key] = $value;
+	}
+
+
+	/**
+	 * Verifica existencia de un valor en $_SESSION
+	 * @param $key
+	 * @return bool
+	 */
+	public function has($key) {
+		return isset($_SESSION[$key]) && !is_null($_SESSION[$key]);
+	}
+
+	/**
+	 * Elimina un valor desde $_SESSION
+	 * @param type $key
+	 */
+	public function drop($key) {
+		unset($_SESSION[$key]);
 	}
 
 }

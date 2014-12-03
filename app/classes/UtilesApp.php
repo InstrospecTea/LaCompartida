@@ -112,6 +112,8 @@ class UtilesApp extends Utiles {
 				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 			}
 		}
+		$Form = new Form;
+		echo $Form->error_label(Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente');
 	}
 
 	/**
@@ -145,6 +147,8 @@ class UtilesApp extends Utiles {
 				echo InputId::Imprimir($sesion, 'asunto', 'codigo_asunto', 'glosa_asunto', 'codigo_asunto', $codigo_asunto, '', $oncambio, $width, $codigo_cliente);
 			}
 		}
+		$Form = new Form;
+		echo $Form->error_label(Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto');
 	}
 
 	public static function FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato = '', $width = 320) {
@@ -1092,6 +1096,8 @@ HTML;
 			$monto_ini = (double) 0;
 		}
 
+		$monto_ini = number_format($monto_ini, $decimales1, ".", "");
+
 		if ($tipo_cambio1 == $tipo_cambio2) {// si no es el mismo tipo de moneda, que haga el calculo
 			$monto_fin = $monto_ini;
 		} else if (empty($tipo_cambio2) || ($tipo_cambio2 == 0)) {
@@ -1615,7 +1621,6 @@ HTML;
 					  );
 
 					  $arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
-
 
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);

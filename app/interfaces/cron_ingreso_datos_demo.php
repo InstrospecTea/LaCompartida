@@ -16,6 +16,7 @@ if ($argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba'])) {
 }
 
 $sesion = new Sesion(null, true);
+$sesion->usuario = new Usuario($sesion, '99511620');
 
 if (Conf::EsAmbientePrueba()) {
 	$query = "UPDATE contrato SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "', usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";

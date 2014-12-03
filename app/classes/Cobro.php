@@ -1294,6 +1294,7 @@ if (!class_exists('Cobro')) {
 					// Se guarda la información del cobro para este trabajo. se incluye minutos retainer en el trabajo
 					$horas_retainer = floor(($retainer_trabajo_minutos) / 60);
 					$minutos_retainer = sprintf("%02d", $retainer_trabajo_minutos % 60);
+
 					$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
 					$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
@@ -1302,7 +1303,6 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
-
 					if (!$trabajo->Write(false)) {
 						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
 					}
@@ -1753,6 +1753,7 @@ if (!class_exists('Cobro')) {
 			if (!$this->Write()) {
 				return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
 			}
+
 			return '';
 		}
 
@@ -1908,6 +1909,22 @@ if (!class_exists('Cobro')) {
 
 		/*	Asocia los trabajos al cobro que se está creando parametros fecha_ini; fecha_fin; id_contrato	*/
 
+		/**
+		 *
+		 * @param type $fecha_ini
+		 * @param type $fecha_fin
+		 * @param type $id_contrato
+		 * @param boolean $emitir_obligatoriamente
+		 * @param type $id_proceso
+		 * @param type $monto
+		 * @param type $id_cobro_pendiente
+		 * @param type $con_gastos
+		 * @param type $solo_gastos
+		 * @param type $incluye_gastos
+		 * @param type $incluye_honorarios
+		 * @param type $cobro_programado
+		 * @return type
+		 */
 		function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';

@@ -1,5 +1,61 @@
 # Changelog
 
+## Hotfix: 14.20.6
+Viernes 28 de Noviembre 2014
+* **Change:** [Agrega tags a petición de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
+
+## Hotfix: 14.20.5
+Viernes 27 de Noviembre 2014
+* **Change:** Cambia path tmp del respaldo.
+
+## Hotfix: 14.20.4
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige problema con sesion en cron demo](https://github.com/LemontechSA/ttb/pull/771)
+
+## Hotfix: 14.20.3
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige problema reportes](https://github.com/LemontechSA/ttb/pull/770)
+
+## Hotfix: 14.20.2
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige guardado de trabajos desde API REST](https://github.com/LemontechSA/ttb/pull/767)
+
+## Release: 14.20.0
+Jueves 26 de Noviembre 2014
+* **Feature:** [Optimización Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
+* **Feature:** [Usuario Encargado lista de clientes](https://github.com/LemontechSA/ttb/pull/754)
+* **Feature:** [Agregar decimales a restricción diaria de usuarios](https://github.com/LemontechSA/ttb/pull/747)
+* **Feature:** [Arquitectura](https://github.com/LemontechSA/ttb/pull/730)
+* **Feature:** [Posibilidad de uso de Vagrant en TTB](https://github.com/LemontechSA/ttb/pull/723)
+
+## Hotfix: 14.19.25
+Viernes 21 de Noviembre 2014
+* **Fixed:** [Agregar nuevos tags a la factura](https://github.com/LemontechSA/ttb/pull/763)
+
+## Hotfix: 14.19.24
+Jueves 20 de Noviembre 2014
+* **Fixed:** [Agregar nuevos tags a la factura](https://github.com/LemontechSA/ttb/pull/761)
+
+## Hotfix: 14.19.23
+Martes 18 de Noviembre 2014
+* **Fixed:** [Escapa caracteres de html de los *string*](https://github.com/LemontechSA/ttb/pull/759)
+
+## Hotfix: 14.19.22
+Martes 18 de Noviembre 2014
+* **Fixed:** [Revertir corrección cálculo cambio de moneda (falla con clientes sin modulo de facturación)](https://github.com/LemontechSA/ttb/pull/757)
+
+## Hotfix: 14.19.21
+Martes 18 de Noviembre 2014
+* **Fixed:** [Revertir corrección cálculo cambio de moneda (falla con clientes sin modulo de facturación)](https://github.com/LemontechSA/ttb/pull/756)
+
+## Hotfix: 14.19.20
+Lunes 17 de Noviembre 2014
+* **Fixed:** [Corregir cálculo cambio de moneda.](https://github.com/LemontechSA/ttb/pull/755)
+
+## Hotfix: 14.19.19
+Jueves 13 de Noviembre 2014
+* **Fixed:** [Agrega indice al arreglo de usuarios que identifica que es administrador.](https://github.com/LemontechSA/ttb/pull/753)
+
 ## Hotfix: 14.19.18
 Miércoles 12 de Noviembre 2014
 * **Fixed:** [Corregir cálculo cambio de moneda](https://github.com/LemontechSA/ttb/pull/752)

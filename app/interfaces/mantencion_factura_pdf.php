@@ -56,7 +56,7 @@ if( $opc == 'imprimir_factura' ) {
 	$factura_pdf_datos->generarFacturaPDF( $id_factura );
 }
 
-$pagina->titulo = __('Mantención factura PDF');
+$pagina->titulo = __('Mantenciï¿½n factura PDF');
 $pagina->PrintTop();
 
  ?>
@@ -114,7 +114,7 @@ $pagina->PrintTop();
 			jQuery('#id_factura_pdf_datos_categoria').val(Id_categoria);
 			var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 			jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
-			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 		});
 
 		jQuery('#botonguardar').click(function() {
@@ -153,7 +153,7 @@ $pagina->PrintTop();
 			var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 			jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
 			jQuery("#fila_"+Actual).css({'background':'#CFC'});
-			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 			jQuery("#fila_"+Actual).animate({'backgroundColor':'#FFF'},2000);
 		});
 
@@ -395,7 +395,7 @@ $pagina->PrintTop();
 				jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
 				jQuery("#fila_"+ID).css({'background':'#CFC'});
 				//  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
 			},
 			stop:function(event,ui) {
@@ -415,7 +415,7 @@ $pagina->PrintTop();
 				Pos = jQuery(".cat_"+Cat).first().attr('rel');
 				jQuery("#tabla_coordenadas").css({'top':(24*(1-Pos))});
 				jQuery("#fila_"+ID).css({'background':'#CFC'});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
 			},
 			stop: function(event,ui) {
@@ -442,7 +442,7 @@ $pagina->PrintTop();
 				filasporcat();
 				var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 				jQuery( "#tabla_coordenadas" ).css({'top':24*(1-Pos)} );
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery('#datospdf').show();
 				pizarron();
 				jQuery('#uploadify').appendTo('#fatcell').show();
@@ -519,7 +519,7 @@ $pagina->PrintTop();
 
 				var Pos = jQuery(".cat_"+Id_categoria).first().attr('rel');
 				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+				jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
 				jQuery("#tabla_coordenadas").css({'top':24*(1-Pos)});
 				jQuery('#uploadify').appendTo('#fatcell').show();
 				jQuery("#contienecoordenadas").removeClass('divloading');
@@ -534,7 +534,7 @@ $pagina->PrintTop();
 <table width="90%" border="0">
 	<tr>
 		<td style="text-align:right;vertical-align: middle;">
-			<?php echo __('Companía'); ?>
+			<?php echo __('Companï¿½a'); ?>
 		</td>
 		<td align="left">
 			<?php echo Html::SelectArray($estudios_array, 'select_id_estudio', $id_estudio, 'id="select_id_estudio" onchange="" style="width:100px;"'); ?>
@@ -652,4 +652,31 @@ if (defined('SUBDOMAIN') && defined('ROOTDIR')) {
 <div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC; width:800px; height:300px;margin:10px auto;">&nbsp;</div>
 
 <?php
+	echo "<form id='datospdf' action=\"#\" style='display:none;' method=\"POST\">";
+	echo '<input type="hidden" value="'. $underscan .'" name="underscan" id="underscan"/>';
+	echo "<input type=\"hidden\" name=\"opc\" id=\"opc\" value=\"guardar\" />";
+	echo "<input type=\"hidden\" name=\"id_estudio\" id=\"id_estudio\" value=\"$id_estudio\" />";
+	echo "<input type=\"hidden\" name=\"id_documento_legal\" id=\"id_documento_legal\" value=\"$id_documento_legal\" />";
+	echo "<input type=\"hidden\" name=\"id_factura_pdf_datos_categoria\" id=\"id_factura_pdf_datos_categoria\" value=\"$id_factura_pdf_datos_categoria\" />";
+	echo "<table align=\"center\" style='width:1100px'; cellpadding=\"0\" cellspacing=\"0\">";
+		echo "<div class='cabecerax'><ul>";
+			echo "<li class=\"st1cellx encabezado\">Tipo Dato</li>";
+			echo "<li class=\"nd2cellx encabezado\">Activo</li>";
+			echo "<li class=\"rd3cellx encabezado\">Posici&oacute;n<br>Horizontal</li>";
+			echo "<li class=\"rd3cellx encabezado\">Posici&oacute;n<br>Vertical</li>";
+			echo "<li class=\"rd3cellx encabezado\">Ancho<br>[mm]</li>";
+			echo "<li class=\"rd3cellx encabezado\">Alto<br>[mm]</li>";
+			echo "<li style='width:110px;' class=\"encabezado\">Tipograf&iacute;a</li>";
+			echo "<li style='width:100px;' class=\"encabezado\">Estilo</li>";
+			echo "<li style='width:90px;' class=\"encabezado\">Mayï¿½scula</li>";
+			echo "<li style='width:80px;' class=\"encabezado\">Alineacion</li>";
+			echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaï¿½o</li>";
+		echo "</ul></div>";
+		echo "<div id='contienecoordenadas'><div id='tabla_coordenadas'></div></div>";
+	echo "</table>";
+echo "</form>";
+
+echo '<div id="mensaje" style="clear:both;display:block;margin:10px auto ;color:#999;font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>';
+echo '<div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC;width:800px;height:300px;margin:10px auto;">&nbsp;</div>';
+
 $pagina->PrintBottom();

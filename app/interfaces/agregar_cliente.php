@@ -100,7 +100,7 @@ if ($opcion == "guardar") {
 		}
 		if (Conf::GetConf($Sesion, 'ClienteReferencia') && empty($id_cliente_referencia)) {
 			$Pagina->AddError(__("Por favor ingrese la referencia"));
-		}	  
+		}
 	}
 
 	$contractValidation->validate();
@@ -173,7 +173,10 @@ if ($opcion == "guardar") {
 
 			if ($contrato->Write()) {
 				// Segmento "Cobros pendientes";
-				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato']);
+				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
+				if ($contrato->fields['forma_cobro'] !== 'FLAT FEE') {
+					$valor_fecha = array();
+				}
 				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 					$cobro_pendiente = new CobroPendiente($Sesion);
 					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato']);
@@ -329,8 +332,8 @@ if (Conf::GetConf($Sesion, 'ClienteReferencia')) {
 
 	$segmento_cliente_referencia .= $SelectHelper->ajax_select(
 		'id_cliente_referencia',
-		$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : $id_cliente_referencia, 
-		array('class' => 'span3', 'style' => 'display:inline'), 
+		$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : $id_cliente_referencia,
+		array('class' => 'span3', 'style' => 'display:inline'),
 		array(
 			'source' => 'ajax/ajax_prm.php?prm=ClienteReferencia&fields=orden,requiere_desglose',
 			'onLoad' => '
@@ -358,7 +361,7 @@ if (Conf::GetConf($Sesion, 'ClienteReferencia')) {
 }
 
 // TIPS DEL FORMULARIO
- 
+
 $Pagina->titulo = __('Ingreso cliente');
 $Pagina->PrintTop();
 
@@ -418,8 +421,8 @@ $Pagina->PrintTop();
 				<td class="al">
 					<?php echo $SelectHelper->ajax_select(
             'id_grupo_cliente',
-            $cliente->fields['id_grupo_cliente'] ? $cliente->fields['id_grupo_cliente'] : $id_grupo_cliente, 
-            array('id' => 'id_grupo_cliente', 'class' => 'span3', 'style' => 'display:inline'), 
+            $cliente->fields['id_grupo_cliente'] ? $cliente->fields['id_grupo_cliente'] : $id_grupo_cliente,
+            array('id' => 'id_grupo_cliente', 'class' => 'span3', 'style' => 'display:inline'),
             array(
               'source' => 'ajax/ajax_prm.php?prm=GrupoCliente&single_class=1&fields=glosa_grupo_cliente,codigo_cliente,id_pais,id_grupo_cliente',
               'selectedName' => 'selected_group',
@@ -449,7 +452,7 @@ $Pagina->PrintTop();
 							jQuery('#formulario-grupo').closest('.ui-dialog-content').dialog('destroy').remove();
 						};
 
-						var saveGroup = function() { 
+						var saveGroup = function() {
 							var url = '../../fw/tablas/ajax_tablas.php';
 							jQuery.post(url, jQuery('#formulario-grupo').serialize(), function(data) {
 								if (data.success) {
@@ -466,7 +469,7 @@ $Pagina->PrintTop();
             	if (!confirm('¿Está seguro de eliminar el grupo seleccionado?')) {
             		return;
             	}
-            	var url = '../../fw/tablas/ajax_tablas.php'; 
+            	var url = '../../fw/tablas/ajax_tablas.php';
             	jQuery('#formulario-grupo input[name="accion"]').val('eliminar_registro');
 							jQuery.post(url, jQuery('#formulario-grupo').serialize(), function(data) {
 								if (data.success) {
@@ -496,7 +499,7 @@ $Pagina->PrintTop();
 							}, 'html');
 							return false;
             };
-            
+
 						jQuery('#add_group').click(function() {
 							editGroup();
 							return false;
@@ -851,7 +854,7 @@ $Pagina->PrintTop();
 	<?php } ?>
 
 	<?php echo $contractValidation->getClientValidationsScripts(); ?>
-    
+
 
 <?php } ?>
 

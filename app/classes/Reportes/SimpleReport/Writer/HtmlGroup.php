@@ -113,7 +113,7 @@ class SimpleReport_Writer_HtmlGroup implements SimpleReport_Writer_IWriter {
 	private function escape($s){
 		return urlencode(str_replace(array('á', 'é', 'í', 'ó', 'ú', 'ñ', '°', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ñ'), array('a', 'e', 'i', 'o', 'u', 'n', '', 'A', 'E', 'I', 'O', 'U', 'N'), $s));
 	}
-	
+
 	private function rowspan(&$data) {
 		if (empty($data)) {
 			return 1;
@@ -201,8 +201,9 @@ class SimpleReport_Writer_HtmlGroup implements SimpleReport_Writer_IWriter {
 		switch ($column->format) {
 			case 'text':
 				if (strpos($valor, ";")) {
-					$valor = str_replace(";", "<br />", $valor);
+					$valor = str_replace(';', "\n", $valor);
 				}
+				$valor = nl2br(htmlentities($valor));
 				break;
 			case 'number':
 				$decimals = 2;

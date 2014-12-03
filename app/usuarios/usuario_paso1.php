@@ -30,14 +30,21 @@
 			} else {
 				$alerta_diaria = 0;
 			}
+
 			if ($retraso_max == '') {
 				$retraso_max = 0;
+			} else {
+				$retraso_max = str_replace(',', '.', $retraso_max);
+				$retraso_max = number_format($retraso_max, Conf::GetConf($sesion, 'CantidadDecimalesIngresoHoras'), '.', '');
 			}
 		}
 
 		if ($cambiar_restriccion_diario == 'on') {
 			if ($restriccion_diario == '') {
 				$restriccion_diario = 0;
+			} else {
+				$restriccion_diario = str_replace(',', '.', $restriccion_diario);
+				$restriccion_diario = number_format($restriccion_diario, Conf::GetConf($sesion, 'CantidadDecimalesIngresoHoras'), '.', '');
 			}
 		}
 

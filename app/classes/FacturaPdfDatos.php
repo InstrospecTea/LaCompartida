@@ -13,6 +13,10 @@ class FacturaPdfDatos extends Objeto {
 	}
 
 	function CargarDatos($id_factura, $id_documento_legal, $id_estudio) {
+		if (!UtilesApp::ExisteCampo('align', 'factura_pdf_datos', $this->sesion)) {
+			mysql_query("ALTER TABLE `factura_pdf_datos` ADD `align` VARCHAR(1) NOT NULL DEFAULT 'L' COMMENT 'J justifica, tb puede ser R C o L';", $this->sesion->dbh);
+		}
+
 		$query = "SELECT SQL_CALC_FOUND_ROWS codigo_tipo_dato, activo, coordinateX, coordinateY, cellW, cellH, font, style, mayuscula, tamano, align
 			FROM factura_pdf_datos
 				JOIN factura_pdf_tipo_datos USING( id_tipo_dato )
@@ -166,6 +170,11 @@ class FacturaPdfDatos extends Objeto {
 			$texto_impuesto = $FacturaTextoImpuesto;
 		}
 
+		$honorarios_sin_impuesto = 0;
+		if ($factura->fields['porcentaje_impuesto'] == 0) {
+			$honorarios_sin_impuesto = $factura->fields['honorarios'];
+		}
+
 		switch( $tipo_dato ) {
 			case 'razon_social':
 				$glosa_dato = $factura->fields['cliente'];
@@ -193,6 +202,24 @@ class FacturaPdfDatos extends Objeto {
 				break;
 			case 'fecha_ano_dos_ultimas_cifras':
 				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2);
+				break;
+			case 'fecha_venc_dia':
+				$glosa_dato = date("d", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_mes':
+				$glosa_dato = strftime("%B", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_ano':
+				$glosa_dato = date("Y", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_ano_ultima_cifra':
+				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-1);
+				 break;
+			case 'fecha_venc_ano_dos_cifras':
+				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-2);
+				break;
+			case 'fecha_venc_numero_mes':
+				$glosa_dato = strftime("%m", strtotime($factura->fields['fecha_vencimiento']));
 				break;
 			case 'direccion':
 				$glosa_dato = $factura->fields['direccion_cliente'];
@@ -330,6 +357,27 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
+			case 'lbl_fecha_vencimiento':
+				$glosa_dato = 'Fecha Vencimiento / Due Date:';
+				break;
+			case 'monto_honorarios_con_iva':
+				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+			case 'subtotal_exento':
+				$glosa_dato = number_format($factura->fields['subtotal_gastos_sin_impuesto'] + $honorarios_sin_impuesto,
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+			case 'subtotal_impuesto':
+				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)) + $factura->fields['subtotal_gastos_sin_impuesto'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
 
 			default:
 
@@ -440,6 +488,22 @@ class FacturaPdfDatos extends Objeto {
 		$fila['glosa_detraccion'] = $factura_texto_detraccion;
 		$fila['texto_impuesto'] = $texto_impuesto;
 		$fila['solicitante'] = $contrato->fields['contacto'];
+		$fila['monto_honorarios_con_iva'] = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
+		$honorarios_sin_impuesto = 0;
+		if ($factura->fields['porcentaje_impuesto'] == 0) {
+			$honorarios_sin_impuesto = $factura->fields['honorarios'];
+		}
+		$fila['subtotal_exento'] = number_format($factura->fields['subtotal_gastos_sin_impuesto'] + $honorarios_sin_impuesto,
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
+		$fila['subtotal_impuesto'] = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)) + $factura->fields['subtotal_gastos_sin_impuesto'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)),
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
 
 		return $fila;
 	}

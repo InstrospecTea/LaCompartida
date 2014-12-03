@@ -10,6 +10,9 @@ require_once Conf::ServerDir() . '/../fw/classes/Html.php';
 
 class Html extends \Html {
 
+	protected $jsPath = '//static.thetimebilling.com/js/';
+	protected $cssPath = '//static.thetimebilling.com/css/';
+
 	/**
 	 * Construye un tag html
 	 * @param type $tag
@@ -71,6 +74,13 @@ class Html extends \Html {
 		return parent::SelectArrayDecente($array, $name, $selected, $opciones, 'Todos', '60');
 	}
 
+	/**
+	 *
+	 * @param type $text
+	 * @param type $url
+	 * @param type $attrs
+	 * @return type
+	 */
 	public function link($text, $url, $attrs = '') {
 		$_attrs = array(
 			'href' => $url
@@ -92,11 +102,70 @@ class Html extends \Html {
 	}
 
 	/**
-	 *
+	 * Devuelve tag script con src a archivo JS
 	 * @param type $file
+	 * @param type $attrs
+	 * @return string
 	 */
-	public function script($file) {
-		return $this->tag('script', '', array('type' => 'text/javascript', 'src' => $file));
+	public function script($file, $attrs = null) {
+		if (is_array($file)) {
+			$html = '';
+			foreach ($file as $f) {
+				$html .= $this->script($f, $attrs);
+			}
+			return $html;
+		}
+		$_attrs = array_merge(array('type' => 'text/javascript', 'src' => $this->path($file, 'js')), (array) $attrs);
+		return $this->tag('script', '', $_attrs);
+	}
+
+	/**
+	 * Devuelve link con href a archivo CSS
+	 * @param type $file
+	 * @param type $attrs
+	 * @return string
+	 */
+	public function css($file, Array $attrs = array()) {
+		$_attrs = array_merge(array('type' => 'text/css', 'rel' => 'stylesheet', 'src' => $this->path($file, 'css')), $attrs);
+		return $this->tag('link', '', $_attrs, true);
+	}
+
+	/**
+	 *
+	 * Devuelve una alerta html
+	 * @param atring $alert
+	 * @param string $type success, info, danger, error o vacio
+	 * @param array $attrs
+	 * @return type
+	 */
+	public function alert($alert, $type = '', Array $attrs = array()) {
+		$extra_class = '';
+		if (!empty($attrs['class'])) {
+			$extra_class = $attrs['class'];
+			unset($attrs['class']);
+		}
+		if (!empty($type)) {
+			$type = "alert-$type";
+		}
+		$_attrs = array_merge(
+			array('class' => trim("alert $type $extra_class")),
+			(array) $arrts
+		);
+		return $this->tag('div', $alert, $_attrs, false);
+	}
+
+	/**
+	 * Devuelve ruta del archivo indicado
+	 * @param type $file
+	 * @param type $type
+	 * @return type
+	 */
+	protected function path($file, $type) {
+		if (preg_match('/^(\/|https?:\/\/)/', $file)) {
+			return $file;
+		}
+		$filename = preg_match("/\.{$type}$|\.{$type}\?/", $file) ? $file : "{$file}.{$type}";
+		return $this->{"{$type}Path"} . $filename;
 	}
 
 }

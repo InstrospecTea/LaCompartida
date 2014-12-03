@@ -1,6 +1,6 @@
 <?php
 
-require_once('../app/conf.php');
+require_once(dirname(__file__) . '/../app/conf.php');
 
 apache_setenv('force-response-1.0', 'TRUE');
 apache_setenv('downgrade-1.0', 'TRUE'); #Esto es lo más importante
@@ -412,6 +412,9 @@ function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $
 
 function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id) {
 	$sesion = new Sesion();
+	
+
+	$_SESSION['app_id'] = $app_id;
 
 	if ($usuario == '' || $password == '') {
 		return new soap_fault('Client', '', 'Debe entregar el usuario y el password.', '');
@@ -444,6 +447,9 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		}
 		list($id_usuario, $id_categoria_usuario, $dias_ingreso_trabajo) = mysql_fetch_array($resp);
 
+		$id_usuario_sesion = !is_null($sesion->usuario->fields['id_usuario']) ? $sesion->usuario->fields['id_usuario'] : $id_usuario;
+		$sesion->usuario->fields['id_usuario'] = $id_usuario_sesion;
+
 		if ($codigo_actividad == '') {
 			$codigo_actividad = 'NULL';
 		} else {
@@ -451,9 +457,9 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		}
 
 		if ($id_moneda == '') {
-			$id_moneda = '1';
+			$id_moneda = 1;
 		} else {
-			$id_moneda = "'$id_moneda'";
+			$id_moneda = $id_moneda;
 		}
 		//Todo a mayusculas segun conf
 		if (Conf::GetConf($sesion, 'TodoMayuscula')) {
@@ -467,44 +473,39 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			}
 		}
 
-		$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : 'NULL';
+		$id_area_trabajo = !empty($area_trabajo) ? $area_trabajo : 'NULL';
 
-		$descripcion = addslashes($descripcion);
-		$ordenado_por = addslashes($ordenado_por);
-		$query = "INSERT INTO trabajo SET
-					id_usuario='$id_usuario',
-					id_categoria_usuario='$id_categoria_usuario',
-					id_trabajo_local='$id_trabajo_local',
-					codigo_asunto='$codigo_asunto',
-					codigo_actividad=$codigo_actividad,
-					descripcion='$descripcion',
-					solicitante='$ordenado_por',
-					id_moneda=$id_moneda,
-					cobrable='$cobrable',
-					fecha_creacion=NOW(),
-					fecha=DATE_SUB('$fecha', INTERVAL $duracion SECOND),
-					duracion='$hora:$min:00',
-					duracion_cobrada='$hora:$min:00',
-					id_area_trabajo = $id_area_trabajo
-				";
+		$trabajo = new Trabajo($sesion);
+		$date_time = new DateTime($fecha);
+		$fecha = $date_time->sub(date_interval_create_from_date_string("$duracion seconds"));
 
-		if (!($resp = mysql_query($query, $sesion->dbh))) {
+		$trabajo->Edit('id_usuario', $id_usuario);
+		$trabajo->Edit('id_categoria_usuario', $id_categoria_usuario);
+		$trabajo->Edit('id_trabajo_local', $id_trabajo_local);
+		$trabajo->Edit('codigo_asunto', $codigo_asunto);
+		$trabajo->Edit('codigo_actividad', $codigo_actividad);
+		$trabajo->Edit('descripcion', $descripcion);
+		$trabajo->Edit('solicitante', $ordenado_por);
+		$trabajo->Edit('id_moneda', $id_moneda);
+		$trabajo->Edit('cobrable', $cobrable);
+		$trabajo->Edit('fecha', $fecha->format('Y-m-d'));
+		$trabajo->Edit('duracion', "$hora:$min:00");
+		$trabajo->Edit('duracion_cobrada', "$hora:$min:00");
+		$trabajo->Edit('id_area_trabajo', $id_area_trabajo);
+
+
+		if (!$trabajo->Write()) {
 			return new soap_fault('Client', '', mysql_error() . ". Query: $query", '');
 		} else {
-			$trabajo = new Trabajo($sesion);
-			$id_trabajo = mysql_insert_id($sesion->dbh);
-			$trabajo->Load($id_trabajo);
-			$queryHistorial = $trabajo->QueryHistorial('CREAR', $app_id);
-			if (!is_null($queryHistorial)) {
-				$trabajo->GuardarHistorial($id_trabajo , $queryHistorial);
-			}
-			$trabajo->InsertarTrabajoTarifa($app_id);
+			$trabajo->InsertarTrabajoTarifa();
 			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
+
 	} else {
 		return new soap_fault('Client', '', 'Error de login.', '');
 	}
+
 	return new soapval('resultado', 'xsd:string', "OK");
 }
 

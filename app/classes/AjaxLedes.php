@@ -48,7 +48,7 @@ class AjaxLedes {
 				->add_from('contrato')
 				->add_left_join_with('cliente',CriteriaRestriction::equals('cliente.id_contrato', 'contrato.id_contrato'))
 		 		->add_restriction(
-		 				CriteriaRestriction::equals('cliente.codigo_cliente',$codigo_cliente)
+		 				CriteriaRestriction::equals('cliente.codigo_cliente', "'{$codigo_cliente}'")
 		 		);
 
 		try{
