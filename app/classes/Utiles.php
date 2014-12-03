@@ -153,6 +153,15 @@ class Utiles extends \Utiles {
 		return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word);
 	}
 
+	/**
+	 * Convierte PascalCase en underscore_case
+	 * @param type $word
+	 * @return type
+	 */
+	public function underscoreize($word) {
+		return str_replace(' ', '_', strtolower(trim(preg_replace('/([A-Z])/', ' $1', $word))));
+	}
+
 	public function humanize($word) {
 		return ucfirst(str_replace('_', ' ', strtolower($word)));
 	}

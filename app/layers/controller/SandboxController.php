@@ -12,5 +12,5 @@ class SandboxController extends AbstractController {
 		$this->info('Esto es un sandbox... de gato!', 'I');
 		$this->error('Nop, no es un sandbox de perro...', 'E');
 	}
-	
+
 }

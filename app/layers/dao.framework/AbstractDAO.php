@@ -215,10 +215,23 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $this->encapsulate($resultArray, $instance);
 	}
 
-	public function findAll() {
+	/**
+	 * Busca todos los registros según las restricciones dadas
+	 * @param CriteriaRestriction|String $restrictions
+	 * @param type $fields
+	 * @param type $order
+	 * @param type $limit
+	 * @return type
+	 */
+	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
 		$criteria = new Criteria($this->sesion);
 		$reflected = new ReflectionClass($this->getClass());
-		$criteria->add_select('*');
+
+		$this->add_fields($criteria, $fields);
+		$this->add_restriction($criteria, $restrictions);
+		$this->add_ordering($criteria, $order);
+		$this->add_limits($criteria, $limit);
+
 		$criteria->add_from($reflected->getMethod('getPersistenceTarget')->invoke($reflected->newInstance()));
 		$output = array();
 		$results = $criteria->run();
@@ -228,6 +241,36 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$output[] = $instance;
 		}
 		return $output;
+	}
+
+	private function add_fields($criteria, $fields) {
+		if (is_null($fields) || !is_array($fields)) {
+			$criteria->add_select(empty($fields) ? '*' : $fields);
+		} else {
+			foreach ($fields as $field) {
+				$criteria->add_select($field);
+			}
+		}
+	}
+
+	private function add_restriction($criteria, $restrictions) {
+		$criteria->add_restriction(new CriteriaRestriction($restrictions));
+	}
+
+	private function add_ordering($criteria, $order) {
+		if (is_array($order)) {
+			foreach ($order as $field) {
+				$criteria->add_ordering($field);
+			}
+		} else if (!is_null($order)) {
+			$criteria->add_ordering($order);
+		}
+	}
+
+	private function add_limits($criteria, $limit) {
+		if (!is_null($limit)) {
+			$criteria->add_limit($limit);
+		}
 	}
 
 	public function delete($object) {

@@ -1,7 +1,15 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-$Sesion = new Sesion(array('COB', 'DAT'));
+Log::write("Cliente {$_POST['codigo_cliente']}", Cobro::PROCESS_NAME);
+
+if ($_POST['autologin'] && $_POST['hash'] == Conf::hash()) {
+	$Sesion = new Sesion();
+	$Sesion->usuario = new Usuario($Sesion);
+	$Sesion->usuario->LoadId($_POST['id_usuario_login']);
+} else {
+	$Sesion = new Sesion(array('COB', 'DAT'));
+}
 
 if (empty($_GET['generar_silenciosamente'])) {
 	$Pagina = new Pagina($Sesion);
@@ -31,8 +39,8 @@ if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
 //si no me llega uno, es 0
 $incluye_gastos = !empty($incluye_gastos);
 $incluye_honorarios = !empty($incluye_honorarios);
-//si no me llega ninguno, asumo q son los 2 (comportamiento anterior)
 
+//si no me llega ninguno, asumo q son los 2 (comportamiento anterior)
 if (!$incluye_gastos && !$incluye_honorarios) {
 	$incluye_gastos = $incluye_honorarios = true;
 }
@@ -295,81 +303,67 @@ if ($print) {
 				GROUP BY contrato.id_contrato";
 
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	//cobros solo gastos
-	if ($gastos) { // desde genera_cobros.php estoy forzando que solamente incluya gastos
-		while ($contra = mysql_fetch_array($resp)) {
-			set_time_limit(100);
-			//Mala documentaciÃ³n!!! Que significa $contra? Que hace GeneraProceso??? ICC
-			// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM )
-			$Cobro = new Cobro($Sesion);
-			if (!$id_proceso_nuevo) {
-				$id_proceso_nuevo = $Cobro->GeneraProceso();
-			}
-			//Por conf se permite el uso de la fecha desde
-			$fecha_ini_cobro = "";
-			if (UtilesApp::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
-				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
-			}
+	while ($contra = mysql_fetch_array($resp)) {
 
-			$newcobro[] = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', true, true, true, false);
-		}
-		//fin gastos
-	} if ($solohh) { // desde genera_cobros.php estoy forzando que solamente incluya honorarios
-		while ($contra = mysql_fetch_array($resp)) {
-			set_time_limit(100);
-			//Mala documentación!!! Que significa $contra? Que hace GeneraProceso??? ICC
-			// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM)
-			$Cobro = new Cobro($Sesion);
-			if (!$id_proceso_nuevo) {
-				$id_proceso_nuevo = $Cobro->GeneraProceso();
-			}
-			//Por conf se permite el uso de la fecha desde
-			$fecha_ini_cobro = "";
-			if (UtilesApp::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
-				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
-			}
+		Log::write(" |- Contrato: {$contra['id_contrato']}", Cobro::PROCESS_NAME);
 
-			$newcobro[] = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, false, true);
-		}
-		//fin gastos
-	} else {
-		//cobros wip
-		while ($contra = mysql_fetch_array($resp)) {
-			$Cobro = new Cobro($Sesion);
-			if (!$id_proceso_nuevo) {
-				$id_proceso_nuevo = $Cobro->GeneraProceso();
-			}
-			//Por conf se permite el uso de la fecha desde
-			$fecha_ini_cobro = "";
-			if (UtilesApp::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
-				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini); // Comentado por SM 28.01.2011 el conf nunca se usa
-			}
+		set_time_limit(100);
+		//Mala documentación!!! Que significa $contra? Que hace GeneraProceso??? ICC
+		// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM)
+		$Cobro = new Cobro($Sesion);
 
-			//si se separan pero se piden ambos, se generan 2 cobros
-			if ($contra['separar_liquidaciones'] == '1' && $incluye_gastos && $incluye_honorarios) {
-				$newcobro[] = $Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, false, true);
-				$Cobro = new Cobro($Sesion);
-				$id_proceso_nuevo = $Cobro->GeneraProceso();
-				$newcobro[] = $Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, true, false);
-			} else { //no se separan y se piden los 2, o se separan y se pide 1 (no+1 se filtra en la query)
-				$newcobro[] = $Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
-			}
+		//Por conf se permite el uso de la fecha desde
+		$fecha_ini_cobro = '';
+		if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
+			$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
 		}
+
+		if (!$id_proceso_nuevo) {
+			$id_proceso_nuevo = $Cobro->GeneraProceso();
+		}
+
+		$con_gastos = $solo_gastos = false;
+		//cobros solo gastos
+		Log::write(" |  |- Gastos: {$gastos}, SoloHH: {$solohh}", Cobro::PROCESS_NAME);
+		if ($gastos) { // desde genera_cobros.php estoy forzando que solamente incluya gastos
+			$con_gastos = $solo_gastos = true;
+			$incluye_gastos = true;
+			$incluye_honorarios = false;
+			$forzar = false;
+		} if ($solohh) { // desde genera_cobros.php estoy forzando que solamente incluya honorarios
+			$incluye_gastos = false;
+			$incluye_honorarios = true;
+			$forzar = false;
+		}
+
+		if (!$solohh && !$gastos && ($contra['separar_liquidaciones'] == '1' && $incluye_gastos && $incluye_honorarios)) {
+			Log::write(' |  |- separar_liquidaciones', Cobro::PROCESS_NAME);
+			$newcobro[] = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, false, true);
+			$Cobro = new Cobro($Sesion);
+			$id_proceso_nuevo = $Cobro->GeneraProceso();
+			$newcobro[] = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, true, false);
+		} else { //no se separan y se piden los 2, o se separan y se pide 1 (no+1 se filtra en la query)
+			Log::write(' |  |- no separar_liquidaciones', Cobro::PROCESS_NAME);
+			$newcobro[] = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', $con_gastos, $solo_gastos, $incluye_gastos, $incluye_honorarios);
+		}
+
+		Log::write(' |  -', Cobro::PROCESS_NAME);
 	}
-	#fin cobros wip
 
+	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
 
 	if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
+		Log::write(' |- generar_silenciosamente', Cobro::PROCESS_NAME);
+		Log::write(' -', Cobro::PROCESS_NAME);
 
 		unset($Sesion);
 		unset($Cobro);
 		unset($Contrato);
-		die('Proceso ' . $id_proceso_nuevo . ' Cobros ' . implode($newcobro));
+		die('Proceso ' . $id_proceso_nuevo . ' Cobros ' . implode(', ', $newcobro));
 	} else {
+		Log::write(' |- redirect', Cobro::PROCESS_NAME);
+		Log::write(' -', Cobro::PROCESS_NAME);
 		$Pagina->Redirect(
 				"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 				"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .

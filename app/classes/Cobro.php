@@ -10,6 +10,8 @@ if (!class_exists('Cobro')) {
 		var $ArrayTotalesDelContrato = array();
 		var $ArrayStringFacturasDelContrato = array();
 
+		const PROCESS_NAME = 'GeneracionMasivaCobros';
+
 		function __construct($sesion, $fields = "", $params = "") {
 			$this->tabla = "cobro";
 			$this->campo_id = "id_cobro";
@@ -586,7 +588,6 @@ if (!class_exists('Cobro')) {
 							WHERE tipo_doc = 'N' AND id_cobro = '" . $this->fields['id_cobro'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					$monto_total = mysql_result($resp, 0, 0);
-					//  echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
 					$estado = (round($monto_pagado, 2) < round($monto_total, 2)) ? 'PAGO PARCIAL' : 'PAGADO';
 					if ($estado == 'PAGO PARCIAL' && ( empty($this->fields['fecha_pago_parcial']) || $this->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' )) {
 						$fecha_primer_pago = $this->FechaPrimerPago();
@@ -1156,7 +1157,7 @@ if (!class_exists('Cobro')) {
 			 * con el cual se recorre la lista de los trabajos.
 			 * Eso vamos a conseguir con la definición de las variables $select_retainer_usuarios y $orden_retainer_usuarios
 			 */
-			if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'RetainerUsuarios') && $this->fields['retainer_usuarios'] != "" && $this->fields['forma_cobro'] == 'RETAINER') {
+			if (Conf::GetConf($this->sesion, 'RetainerUsuarios') && $this->fields['retainer_usuarios'] != "" && $this->fields['forma_cobro'] == 'RETAINER') {
 				$select_retainer_usuarios = "IF( trabajo.id_usuario IN ( " . $this->fields['retainer_usuarios'] . " ), '1', '2' ) as incluir_en_retainer, ";
 				$orden_retainer_usuarios = "incluir_en_retainer, ";
 			} else {
@@ -1201,7 +1202,7 @@ if (!class_exists('Cobro')) {
 			} else {
 				for ($z = 0; $z < $lista_trabajos->num; $z++) {
 					$trabajo = $lista_trabajos->Get($z);
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+					list($h, $m, $s) = split(':', $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 					$duracion_minutos = $h * 60 + $m;
 					$id_usuario = $trabajo->fields['id_usuario'];
@@ -1303,7 +1304,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
-					if (!$trabajo->Write(false)) {
+					if (!$trabajo->Write()) {
 						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
 					}
 				} #End for cobros
@@ -1568,8 +1569,6 @@ if (!class_exists('Cobro')) {
 			//Valido CAP
 			if ($this->fields['forma_cobro'] == 'CAP') {
 				$cap_descuento = 0;
-				$contrato = new Contrato($this->sesion);
-				$contrato->Load($this->fields['id_contrato']);
 				$sumatoria_cobros = $this->TotalCobrosCap('', $this->fields['id_moneda']) + $cobro_honorarios_menos_descuento;
 
 				if ($sumatoria_cobros > $cobro_monto_moneda_cobro) { //Es decir que lo cobrado ha superado el valor del cap
@@ -1585,7 +1584,7 @@ if (!class_exists('Cobro')) {
 
 			// Si es necesario calcular el impuesto por separado
 			$contrato = new Contrato($this->sesion);
-			$contrato->Load($this->fields['id_contrato']);
+			$contrato->Load($this->fields['id_contrato'], array('usa_impuesto_separado'));
 			if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado']) {
 				$cobro_total *= 1 + $this->fields['porcentaje_impuesto'] / 100.0;
 			}
@@ -1864,7 +1863,7 @@ if (!class_exists('Cobro')) {
 				$id_contrato = $this->fields['id_contrato'];
 			}
 			$contrato = new Contrato($this->sesion);
-			$contrato->Load($id_contrato);
+			$contrato->Load($id_contrato, array('forma_cobro'));
 
 			if ($contrato->fields['forma_cobro'] <> 'CAP') {
 				return 0;
@@ -1907,8 +1906,22 @@ if (!class_exists('Cobro')) {
 			return $total_horas_cobro;
 		}
 
-		/*	Asocia los trabajos al cobro que se está creando parametros fecha_ini; fecha_fin; id_contrato	*/
-
+		/**
+		 * Asocia los trabajos al cobro que se está creando
+		 * @param type $fecha_ini
+		 * @param type $fecha_fin
+		 * @param type $id_contrato
+		 * @param boolean $emitir_obligatoriamente
+		 * @param type $id_proceso
+		 * @param type $monto
+		 * @param type $id_cobro_pendiente
+		 * @param type $con_gastos
+		 * @param type $solo_gastos
+		 * @param type $incluye_gastos
+		 * @param type $incluye_honorarios
+		 * @param type $cobro_programado
+		 * @return type
+		 */
 		function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
@@ -2109,7 +2122,7 @@ if (!class_exists('Cobro')) {
 								$where = '1';
 							}
 
-							$query_gastos = "SELECT cta_corriente.* FROM cta_corriente
+							$query_gastos = "SELECT cta_corriente.id_movimiento FROM cta_corriente
 												LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto OR cta_corriente.codigo_asunto IS NULL
 												WHERE $where
 												AND (cta_corriente.id_cobro IS NULL)
@@ -2118,14 +2131,15 @@ if (!class_exists('Cobro')) {
 												AND cta_corriente.codigo_cliente = '" . $contrato->fields['codigo_cliente'] . "'
 												AND (asunto.id_contrato = '" . $contrato->fields['id_contrato'] . "')
 												AND cta_corriente.fecha <= '$fecha_fin'";
-							if ($fecha_ini != '')
+							if ($fecha_ini != '') {
 								$query_gastos.="AND cta_corriente.fecha >= '$fecha_ini'";
+							}
 							$lista_gastos = new ListaGastos($this->sesion, '', $query_gastos);
 							for ($v = 0; $v < $lista_gastos->num; $v++) {
 								$gasto = $lista_gastos->Get($v);
 
 								$cta_gastos = new Objeto($this->sesion, '', '', 'cta_corriente', 'id_movimiento');
-								if ($cta_gastos->Load($gasto->fields['id_movimiento'])) {
+								if ($cta_gastos->Load($gasto->fields['id_movimiento'], array('id_movimiento', 'id_cobro'))) {
 									$cta_gastos->Edit('id_cobro', $this->fields['id_cobro']);
 									$cta_gastos->Write();
 								}
@@ -2146,44 +2160,44 @@ if (!class_exists('Cobro')) {
 									$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 								}
 
-								$query2 = "SELECT * FROM trabajo
+								$query2 = "SELECT trabajo.id_trabajo FROM trabajo
 													JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 													JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 													LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-													WHERE	$where_up
-													AND contrato.id_contrato = '" . $contrato->fields['id_contrato'] . "'
+													WHERE {$where_up}
+													AND contrato.id_contrato = '{$contrato->fields['id_contrato']}'
 													AND cobro.estado IS NULL";
 
 								$lista_trabajos = new ListaTrabajos($this->sesion, '', $query2);
 
 								for ($x = 0; $x < $lista_trabajos->num; $x++) {
 									$trabajo = $lista_trabajos->Get($x);
-									$emitir_trabajo->Load($trabajo->fields['id_trabajo']);
+									$emitir_trabajo->Load($trabajo->fields['id_trabajo'], array('id_trabajo', 'id_cobro'));
 									$emitir_trabajo->Edit('id_cobro', $this->fields['id_cobro']);
 									$emitir_trabajo->Write();
 								}
 
-								$emitir_tramite = new Objeto($this->sesion, '', '', 'tramite', 'id_tramite');
+								$emitir_tramite = new Tramite($this->sesion);
 								$where_up = '1';
 								if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
 									$where_up .= " AND fecha <= '$fecha_fin' ";
 								} else {
 									$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 								}
-								$query_tramites = "SELECT * FROM tramite
+								$query_tramites = "SELECT tramite.id_tramite FROM tramite
 														JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
 														JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 														LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
-															WHERE $where_up
-																AND contrato.id_contrato = '" . $contrato->fields['id_contrato'] . "'
-																AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
+															WHERE {$where_up}
+																AND contrato.id_contrato = '{$contrato->fields['id_contrato']}'
+																AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']}' AND '{$this->fields['fecha_fin']}'
 																AND cobro.estado IS NULL";
 
-								$lista_tramites = new ListaTrabajos($this->sesion, '', $query_tramites);
+								$lista_tramites = new ListaTramites($this->sesion, '', $query_tramites);
 
 								for ($y = 0; $y < $lista_tramites->num; $y++) {
 									$tramite = $lista_tramites->Get($y);
-									$emitir_tramite->Load($tramite->fields['id_tramite']);
+									$emitir_tramite->Load($tramite->fields['id_tramite'], array('id_tramite', 'id_cobro'));
 									$emitir_tramite->Edit('id_cobro', $this->fields['id_cobro']);
 									$emitir_tramite->Write();
 								}

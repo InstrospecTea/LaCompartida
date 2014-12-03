@@ -63,7 +63,7 @@ abstract class AbstractController {
 
 	protected function renderJSON($data = null) {
 		if (!is_null($data)) {
-			$this->data = $data;
+			$this->data = UtilesApp::utf8izar($data);
 		}
 		$this->render('/elements/json', 'ajax');
 	}
