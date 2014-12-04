@@ -1911,6 +1911,51 @@ class Factura extends Objeto {
 		}
 	}
 
+	/**
+	 * Obtiene la glosa de la condición de pago
+	 *
+	 * @return String Glosa, o nulo si no existe
+	 * 
+	 */
+	function ObtieneGlosaCondicionPago() {
+		$condicion_pago = $this->fields['condicion_pago'];
+		switch ($condicion_pago) {
+			case '1': $condicion_pago = __('CONTADO');
+				break;
+			case '3': $condicion_pago = __('Vencimiento 15 días	');
+				break;
+			case '4': $condicion_pago = __('Vencimiento 30 días	');
+				break;
+			case '5': $condicion_pago = __('Vencimiento 45 días	');
+				break;
+			case '6': $condicion_pago = __('Vencimiento 60 días	');
+				break;
+			case '7': $condicion_pago = __('Vencimiento 75 días	');
+				break;
+			case '8': $condicion_pago = __('Vencimiento 90 días	');
+				break;
+			case '9': $condicion_pago = __('Vencimiento 120 días');
+				break;
+			case '12': $condicion_pago = __('Letra 30 días');
+				break;
+			case '13': $condicion_pago = __('Letra 45 días');
+				break;
+			case '14': $condicion_pago = __('Letra 60 días');
+				break;
+			case '15': $condicion_pago = __('Letra 90 días');
+				break;
+			case '18': $condicion_pago = __('Cheque 30 días');
+				break;
+			case '19': $condicion_pago = __('Cheque 45 días');
+				break;
+			case '20': $condicion_pago = __('Cheque 60 días');
+				break;
+			case '21': $condicion_pago = __('Cheque a fecha');
+				break;
+		}
+		return $condicion_pago;
+	}
+
 	function ObtieneNumeroDocumentoLegal($tipo_documento_legal) {
 		return $this->ObtenerNumeroDocLegal($tipo_documento_legal);
 	}

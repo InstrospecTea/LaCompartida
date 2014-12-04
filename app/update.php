@@ -10649,6 +10649,14 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
 			break;
 
+		case 7.88:
+			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
+			}
+			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
+			}
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10661,7 +10669,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.87;
+$max_update = 7.88;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

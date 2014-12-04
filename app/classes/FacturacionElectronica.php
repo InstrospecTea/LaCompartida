@@ -44,7 +44,6 @@ Class FacturacionElectronica {
 		return $hookArg;
 	}
 
-
 	public static function InsertaMetodoPago() {
 
 	}
