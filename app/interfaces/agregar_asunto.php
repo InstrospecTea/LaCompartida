@@ -11,7 +11,7 @@ $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 $Form = new Form;
 $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
- 
+
 if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
 	$codigo_obligatorio = true;
 } else {
@@ -122,7 +122,7 @@ if ($opcion == 'guardar') {
 			$Pagina->AddError(__("Por favor ingrese el codigo del cliente"));
 		}
 		if (empty($id_area_proyecto)) {
-			$Pagina->AddError(__("Por favor ingrese el área del asunto"));	
+			$Pagina->AddError(__("Por favor ingrese el área del asunto"));
 		}
 	}
 
@@ -186,7 +186,7 @@ if ($opcion == 'guardar') {
 			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
 		} else {
 			$Asunto->Edit("id_area_proyecto", "NULL");
-		} 
+		}
 
 		if (!is_null($desglose_area)) {
 			$Asunto->Edit("desglose_area", $desglose_area);
@@ -451,7 +451,7 @@ function MuestraPorValidacion(divID) {
 			form.id_area_proyecto.focus();
 			return false;
 		}
-		
+
 		<?php
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
@@ -478,7 +478,7 @@ function MuestraPorValidacion(divID) {
 		<?php } ?>
 
 		<?php echo $contractValidation->getClientValidationsScripts(); ?>
- 
+
 		jQuery(form).submit();
 		return true;
 	}
@@ -692,12 +692,12 @@ function MuestraPorValidacion(divID) {
 
 							<?php echo $SelectHelper->ajax_select(
 									'id_area_proyecto',
-									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto, 
-									array('class' => 'span3', 'style' => 'display:inline'), 
+									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto,
+									array('class' => 'span3', 'style' => 'display:inline'),
 									array(
 										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
 										'onChange' => '
-											var element = selected_IdAreaProyecto;
+											var element = selected_id_area_proyecto;
 											jQuery("#id_desglose_area_container").hide();
 											jQuery("#desglose_area").hide()
 											if (element && element.requiere_desglose == "1") {
@@ -710,7 +710,7 @@ function MuestraPorValidacion(divID) {
 								?>
 								<span style="color:#FF0000; font-size:10px">*</span>
 								<?php echo $SelectHelper->checkboxes(
-										'id_desglose_area', 
+										'id_desglose_area',
 										array(),
 									 	$Asunto->getAreaDetails(),
 									 	array('class' => 'span6', 'style' => 'display:inline'),
@@ -718,7 +718,7 @@ function MuestraPorValidacion(divID) {
 										 	'autoload' => false,
 											'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
 											'onSource' => '
-												source = source + "&q=id_area_proyecto:" + jQuery("#IdAreaProyecto").val();
+												source = source + "&q=id_area_proyecto:" + jQuery("#id_area_proyecto").val();
 											',
 											'onChange' => '
 												var element = selected_id_desglose_area;
@@ -728,10 +728,10 @@ function MuestraPorValidacion(divID) {
 													} else {
 														jQuery("#desglose_area").val("").hide();
 													}
-												} 
+												}
 											'
 										)
-									); 
+									);
 								echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
 								?>
 							</td>
@@ -748,9 +748,9 @@ function MuestraPorValidacion(divID) {
 							<td align="right">
 								<?php echo __('Giro') ?>
 							</td>
-							<td align="left">						
+							<td align="left">
 								<?php echo $SelectHelper->checkboxes(
-										'id_asunto_giro', 
+										'id_asunto_giro',
 										array(),
 									 	$Asunto->getEconomicActivities(),
 									 	array('class' => 'span6', 'style' => 'display:inline'),
@@ -765,10 +765,10 @@ function MuestraPorValidacion(divID) {
 													} else {
 														jQuery("#giro").val("").hide();
 													}
-												} 
+												}
 											'
 										)
-									); 
+									);
 								echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
 								?>
 							</td>

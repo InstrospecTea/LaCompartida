@@ -182,24 +182,32 @@ class Form {
 
 	/**
 	 * Construye un grupo de elementos checkbox
-	 *
-	 * @param string $name Nombre del elemento en el formulario
-	 * @param array $options cada una de las opciones para crear <input type=check />
-	 * @param array $selected Checkboxes seleccionados por default
-	 * @param string $containr Contenedor para el grupo de checkbox. Default: div
-	 * @param array $containr_attrs Atributos del elemento HTML, ej: id, type, etc.
-	 *
+	 * @param type $options Array name => label, label puede ser un Array donde sus valores indican los atributos
+	 * @param type $checkeds Checkboxes seleccionados por defecto
+	 * @param type $container Contenedor para el grupo de checkbox. Default: div
+	 * @param type $container_attrs Atributos del elemento contenedor, ej: id, class, etc.
 	 * @return string HTML que contiene el grupo de checkboxes
 	 */
-	public function checkbox_group($name, $options, $selected, $container = 'div', $container_attrs = null) {
+	public function checkbox_group($options, Array $checkeds = array(), $container = 'div', Array $container_attrs = array()) {
 		$html = '';
-		foreach ((Array) $options as $value => $element) {
-			$attrs['id'] = $this->Utiles->pascalize($name);
-			$attrs['label'] = is_array($element) ? $element['glosa'] : $element;
-			$html .= $this->checkbox($name, $element, in_array($value, $selected), $attrs);
+		$x = 1;
+		foreach ((Array) $options as $name => $label) {
+			$_attrs = array();
+			if (is_array($label)) {
+				$_attrs = $label;
+				$label = empty($_attrs['label']) ? $this->Utiles->humanize($name) : $_attrs['label'];
+				unset($_attrs['label']);
+			}
+			$attrs = array('label' => $this->defaultLabel) + $_attrs;
+			if ($attrs['label'] === true) {
+				$attrs['label'] = $label;
+			}
+			$attrs['id'] = "{$name}_{$x}";
+			$html .= $this->checkbox($name, 1, in_array($name, $checkeds), $attrs);
+			++$x;
 		}
 		if ($container !== false) {
-			$html = $this->Html->tag($container, $html, (Array) $container_attrs);
+			$html = $this->Html->tag($container, $html,  $container_attrs);
 		}
 		return $html;
 	}
