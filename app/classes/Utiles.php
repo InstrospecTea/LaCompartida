@@ -104,7 +104,7 @@ class Utiles extends \Utiles {
 		$mensaje = mysql_real_escape_string($mensaje);
 		$query = "SELECT COUNT(id_log_correo) total
 					FROM log_correo
-					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo='{$id_tipo_correo}'  {$where_dia}";
+					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo={$id_tipo_correo}  {$where_dia}";
 
 		$query .=" AND mensaje= '{$mensaje}' ";
 		$resp = mysql_query($query, $sesion->dbh);
