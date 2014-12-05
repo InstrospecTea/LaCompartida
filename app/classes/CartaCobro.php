@@ -2250,8 +2250,6 @@ class CartaCobro extends NotaCobro {
                     $html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
                 }
 
-                $html2 = str_replace('%fecha%', $fecha, $html2);
-
                 $html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
                 $html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
                 $html2 = str_replace('%contrato_solo_nombre_contacto%', $contrato->fields['contacto'], $html2);
