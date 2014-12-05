@@ -6,7 +6,7 @@ class DateTwigExtension extends AbstractTwigExtension {
 		return 'TtbDateExtension';
 	}
 
-	public function extStrfTime($d, $format = 'Y-m-d', $locale = 'es_CL') {
+	public function extStrfTime($d, $format = 'Y-m-d', $locale = 'es_ES') {
 		if ($d instanceof \DateTime) {
     	$d = $d->format('Y-m-d H:i:s');
     }
