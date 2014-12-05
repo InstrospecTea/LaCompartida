@@ -2665,12 +2665,13 @@ class CartaCobro extends NotaCobro {
         return $html2;
     }
 
-	function RenderTemplate($template) {
-		if (!$this->twig) {
-			$loader = new Twig_Loader_String();
-			$this->twig = new Twig_Environment($loader);
-		}
+    function RenderTemplate($template) {
+      if (!$this->twig) {
+        $loader = new Twig_Loader_String();
+        $this->twig = new Twig_Environment($loader);
+        $this->twig->addExtension(new DateTwigExtension());
+      }
 
-		return $this->twig->render($template, $this->template_data);
-	}
+      return $this->twig->render($template, $this->template_data);
+    }
 }

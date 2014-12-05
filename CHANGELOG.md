@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.20.7
+Jueves 4 de Diciembre 2014
+* **New:** [Agregar filtros para twig](https://github.com/LemontechSA/ttb/pull/778)
+
 ## Hotfix: 14.20.6
 Viernes 28 de Noviembre 2014
 * **Change:** [Agrega tags a petición de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
