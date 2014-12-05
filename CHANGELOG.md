@@ -1,7 +1,31 @@
 # Changelog
 
-## Releas: 14.20.0
-Jueves 20 de Noviembre 2014
+## Hotfix: 14.20.7
+Jueves 4 de Diciembre 2014
+* **New:** [Agregar filtros para twig](https://github.com/LemontechSA/ttb/pull/778)
+
+## Hotfix: 14.20.6
+Viernes 28 de Noviembre 2014
+* **Change:** [Agrega tags a petición de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
+
+## Hotfix: 14.20.5
+Viernes 27 de Noviembre 2014
+* **Change:** Cambia path tmp del respaldo.
+
+## Hotfix: 14.20.4
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige problema con sesion en cron demo](https://github.com/LemontechSA/ttb/pull/771)
+
+## Hotfix: 14.20.3
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige problema reportes](https://github.com/LemontechSA/ttb/pull/770)
+
+## Hotfix: 14.20.2
+Jueves 27 de Noviembre 2014
+* **Fixed:** [Corrige guardado de trabajos desde API REST](https://github.com/LemontechSA/ttb/pull/767)
+
+## Release: 14.20.0
+Jueves 26 de Noviembre 2014
 * **Feature:** [Optimización Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
 * **Feature:** [Usuario Encargado lista de clientes](https://github.com/LemontechSA/ttb/pull/754)
 * **Feature:** [Agregar decimales a restricción diaria de usuarios](https://github.com/LemontechSA/ttb/pull/747)
