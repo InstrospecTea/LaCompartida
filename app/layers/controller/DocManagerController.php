@@ -116,7 +116,8 @@ class DocManagerController extends AbstractController {
 	}
 
 	public function existe_cobro($id_cobro) {
-		$existecobro = $DocManager->ExisteCobro($sesion, $id_cobro);
+		$DocManager = new DocManager($this->Session);
+		$existecobro = $DocManager->ExisteCobro($this->Session, $id_cobro);
 		$this->renderJSON(array('existe' => $existecobro));
 	}
 
