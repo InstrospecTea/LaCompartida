@@ -1,6 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
+require_once dirname(__FILE__) . '/../../fw/classes/Buscador.php';
+require_once dirname(__FILE__) . '/../classes/Trabajo.php';
+
 $sesion = new Sesion(array('COB', 'DAT'));
 $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
