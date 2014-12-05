@@ -63,7 +63,6 @@ class CartaCobro extends NotaCobro {
             '%SR%' => 'SR',
             '%asunto_mb%' => 'asunto_mb',
             '%asunto_salto_linea%' => 'asunto_salto_linea',
-            '%fecha%' => 'mes dia, año',
             '%factura_desc_mta%' => 'factura_desc_mta',
             '%fecha_con_de%' => 'fecha_con_de',
             '%fecha_especial%' => 'fecha_especial',
@@ -2249,12 +2248,6 @@ class CartaCobro extends NotaCobro {
                 } else {
                     $html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
                     $html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
-                }
-
-                if ($lang == 'es') {
-                  $fecha = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %d, %Y'));
-                } else {
-                  $fecha = date('F d, Y');
                 }
 
                 $html2 = str_replace('%fecha%', $fecha, $html2);
