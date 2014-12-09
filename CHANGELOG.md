@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.20.8
+Martes 9 de Diciembre 2014
+* **New:** [No genera excepción si una de las notas de cobro devuelve vacío, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
+
 ## Hotfix: 14.20.7
 Jueves 4 de Diciembre 2014
 * **New:** [Agregar filtros para twig](https://github.com/LemontechSA/ttb/pull/778)

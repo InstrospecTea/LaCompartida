@@ -11529,7 +11529,7 @@ class NotaCobro extends Cobro {
 			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
 
 			if (empty($html)) {
-				throw new Exception("HTML nulo o Vacio", 1);
+				continue;
 			}
 
 			$opc_papel = $NotaCobro->fields['opc_papel'];
