@@ -521,7 +521,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			$estudios_array = PrmEstudio::GetEstudios($sesion);
 			if (count($estudios_array) > 1) {
-			?>
+				?>
 				<tr>
 					<td align="right"><?php echo __('Companía'); ?></td>
 					<td align="left" colspan="3">
@@ -536,7 +536,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			$numero_documento = '';
 
 			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-				$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
+				$serie = $factura->Loaded() ? $factura->fields['serie_documento_legal'] : $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
@@ -547,8 +547,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td align="left">
 					<?php
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
-						$serie_documento_legal = $factura->fields['serie_documento_legal'];
-						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
+						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', null, 60);
 					} else {
 						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
 						?>
