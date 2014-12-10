@@ -541,11 +541,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			<?php
 			$numero_documento = '';
 			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-				if ($factura->Loaded()) {
-					$serie = $factura->fields['serie_documento_legal'];
-				} else {
-					$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
-				}
+				$serie = $factura->Loaded() ? $factura->fields['serie_documento_legal'] : $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
