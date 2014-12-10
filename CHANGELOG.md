@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix: 14.20.9
+Miercoles 10 de Diciembre 2014
+* **Fix:** [Selecciona serie y número de documento correctamente al editar o agregar.](https://github.com/LemontechSA/ttb/pull/786)
+
 ## Hotfix: 14.20.8
 Martes 9 de Diciembre 2014
-* **New:** [No genera excepción si una de las notas de cobro devuelve vacío, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
+* **Fix:** [No genera excepción si una de las notas de cobro devuelve vacío, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
 
 ## Hotfix: 14.20.7
 Jueves 4 de Diciembre 2014
