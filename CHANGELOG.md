@@ -1,9 +1,17 @@
 # Changelog
 
 ## Hotfix: 14.21.0
-Jueves 4 de Diciembre 2014
+Miércoles 10 de Diciembre 2014
 * **Feature:** [Notas de Crédito/Débito FacturacionCL](https://github.com/LemontechSA/ttb/pull/774)
 * **Feature:** [Fecha de vencimiento en PDF Facturas](https://github.com/LemontechSA/ttb/pull/764)
+
+## Hotfix: 14.20.9
+Miercoles 10 de Diciembre 2014
+* **Fix:** [Selecciona serie y número de documento correctamente al editar o agregar.](https://github.com/LemontechSA/ttb/pull/786)
+
+## Hotfix: 14.20.8
+Martes 9 de Diciembre 2014
+* **Fix:** [No genera excepción si una de las notas de cobro devuelve vacío, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
 
 ## Hotfix: 14.20.7
 Jueves 4 de Diciembre 2014
