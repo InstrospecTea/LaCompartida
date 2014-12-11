@@ -357,6 +357,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 			DATE_FORMAT(duracion_cobrada,'%H:%i')) as duracion,
 			TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas,
 			trabajo.tarifa_hh,
+			trabajo.tarifa_hh_estandar,
 			tramite_tipo.id_tramite_tipo,
 			DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro,
 			cobro.estado,
@@ -399,8 +400,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 		$query = str_replace('FROM trabajo', ' ,ut.tarifa as tarifa2 FROM trabajo  ', $query);
 
 		if ($excel_agrupado) {
+			if (!isset($abogado)) {
+				$abogado = 0;
+			}
 			$ReporteTrabajoAgrupado = new ReporteTrabajoAgrupado($sesion);
-			$ReporteTrabajoAgrupado->imprimir($query, $por_socio);
+			$ReporteTrabajoAgrupado->imprimir($query, $por_socio, $abogado);
 		} else {
 			require('ajax/cobros3.simplificado.xls.php');
 		}
@@ -717,8 +721,10 @@ $pagina->PrintTop($popup);
 			// solo permite periodo de un mes
 			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 month"));
 			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario))) { ?>
-				<?php echo $Form->icon_button(__('Descargar listado agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
-				<label><input type="checkbox" value="1" id="por_socio"/> Agrupar por socio</label>
+				<?php echo $Form->icon_button(__('Descargar listado agrupado por cliente'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
+				<label><input type="checkbox" value="1" id="por_socio" /> Agrupar por socio</label>
+				<br/>
+				<?php echo $Form->icon_button(__('Descargar listado agrupado por abogado'), 'pdf', array('id' => 'descargar_pdf_agrupado_abogado')); ?>
 			<?php } ?>
 			<br />
 		</center>
@@ -1277,6 +1283,51 @@ echo $Form->script();
 					});
 				} else {
 					window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
+				}
+			});
+
+		});
+
+		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
+			var Where='<?php echo base64_encode($where) ?>';
+			var Idcobro='<?php echo $id_cobro; ?>';
+			var Motivo='<?php echo $motivo; ?>';
+			var por_socio = jQuery('#por_socio:checked').val();
+			jQuery.post('ajax/estimar_datos.php', {
+				where: Where,
+				id_cobro: Idcobro,
+				motivo:Motivo
+			},
+			function(data) {
+
+				if(parseInt(data)>15000) {
+
+					var formated=data/1000;
+					var dialogoconfirma = top.window.jQuery( "<div/>" );
+					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
+					jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
+
+					dialogoconfirma.dialog({
+						resizable: false,
+						autoOpen: true,
+						height: 220,
+						width: 450,
+						modal: true,
+						close: function(ev,ui) {
+							dialogoconfirma.html('');
+						},
+						buttons: {
+							"<?php echo __('Entiendo y acepto') ?>": function() {
+								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
+								dialogoconfirma.dialog( "close" );
+							},
+							"<?php echo __('Cancelar') ?>": function() {
+								dialogoconfirma.dialog( "close" );
+							}
+						}
+					});
+				} else {
+					window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio+'&abogado=1';
 				}
 			});
 

@@ -36,11 +36,13 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	private function addScopes(SearchCriteria $searchCriteria, Criteria $criteria) {
 		$scopes = $searchCriteria->scopes();
 		//Instanciar la clase correspondiente mediante reflection.
-		$scopeClass = $searchCriteria->entity().'Scope';
-		$scopeInstance = new $scopeClass();
-		foreach ($scopes as $scope) {
-			$scopeMethod = new ReflectionMethod($scopeClass, $scope);
-			$criteria = $scopeMethod->invoke($scopeInstance, $criteria);
+		if (count($scopes)) {
+			$scopeClass = $searchCriteria->entity() . 'Scope';
+			$scopeInstance = new $scopeClass();
+			foreach ($scopes as $scope) {
+				$scopeMethod = new ReflectionMethod($scopeClass, $scope);
+				$criteria = $scopeMethod->invoke($scopeInstance, $criteria);
+			}
 		}
 		return $criteria;
 	}

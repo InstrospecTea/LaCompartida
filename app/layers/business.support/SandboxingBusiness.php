@@ -27,4 +27,18 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		return $listator->render();
 	}
 
+	function generateTemporalFile() {
+		try {
+			$temp = new SplFileObject('example.txt', 'rw+');
+			$temp->setFlags(SPLFileObject::READ_AHEAD);
+			$temp->fwrite("This is the first line\n");
+			$temp->fwrite("And this is the second.\n");
+			$temp->rewind();
+			return $temp;
+		} catch (Exception $ex) {
+			throw new BusinessException('Can not create file');
+		}
+
+	}
+
 } 
