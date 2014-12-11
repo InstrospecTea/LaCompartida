@@ -688,7 +688,10 @@ if ($opc == 'buscar') {
 														opciones += 'cartas';
 													}
 													if (jQuery('#agrupar').is(':checked')) {
-														opciones += ',agrupar';
+														if (opciones != '') {
+															opciones += ',';
+														}
+														opciones += 'agrupar';
 			 										}
 			 										ImpresionCobros(false, opciones, id_formato);
 													jQuery(this).dialog("close");
