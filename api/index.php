@@ -694,16 +694,17 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 
 $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 	$format = is_null($Slim->request()->params('format')) ? 'pdf' : $Slim->request()->params('format');
+	$original = (is_null($Slim->request()->params('original')) || $Slim->request()->params('original') == 1) ? true : false;
 	if (isset($id)) {
 		try {
 			$Invoice = new Factura($Session);
 			$Invoice->Load($id);
-			$data = array('Factura' => $Invoice);
-			$Slim->applyHook('hook_descargar_pdf_factura_electronica', $data);
 			if (!$Invoice->Loaded()) {
 				throw new Exception('');
 			} else {
+				$data = array('Factura' => $Invoice, 'original' => $original);
 				if ($format == 'pdf') {
+					$Slim->applyHook('hook_descargar_pdf_factura_electronica', $data);
 					$url = $Invoice->fields['dte_url_pdf'];
 					$name = array_shift(explode('?', basename($url)));
 					if ($name === 'descargar.php') {

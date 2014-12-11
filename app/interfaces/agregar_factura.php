@@ -153,7 +153,8 @@ if ($opcion == "guardar") {
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
 		$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
-
+		$factura->Edit("dte_codigo_referencia", $dte_codigo_referencia ? $dte_codigo_referencia : "");
+		$factura->Edit("dte_razon_referencia", $dte_razon_referencia ? $dte_razon_referencia : "");
 		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
 			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
@@ -569,11 +570,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			//Se debe elegir un documento legal padre si:
 			$buscar_padre = false;
 
-			$query_doc = "SELECT codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+			$query_doc = "SELECT codigo, codigo_dte FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
 			$resp_doc = mysql_query($query_doc, $sesion->dbh) or Utiles::errorSQL($query_doc, __FILE__, __LINE__, $sesion->dbh);
-			list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
+			list($codigo_documento_legal, $codigo_dte) = mysql_fetch_array($resp_doc);
 
-			if (($codigo_documento_legal == 'NC') && ($id_cobro || $codigo_cliente)) {
+			if (($codigo_documento_legal == 'NC' || ($codigo_documento_legal == 'ND' && !is_null($codigo_dte))) && ($id_cobro || $codigo_cliente)) {
 				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', factura.serie_documento_legal, '-', numero" : "prm_documento_legal.glosa, ' #', numero";
 				if ($id_cobro) {
 					$query_padre = "SELECT id_factura, CONCAT({$glosa_numero_serie}) FROM factura JOIN prm_documento_legal USING (id_documento_legal) WHERE id_cobro = '{$id_cobro}'";

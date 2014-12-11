@@ -10569,6 +10569,14 @@ QUERY;
 							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
 			break;
+		case 7.87:
+			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
+			}
+			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
+			}
+			break;
 	}
 	if (!empty($queries)) {
 		ejecutar($queries, $dbh);
@@ -10580,7 +10588,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.86;
+$max_update = 7.87;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

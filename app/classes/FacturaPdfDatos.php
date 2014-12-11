@@ -62,42 +62,7 @@ class FacturaPdfDatos extends Objeto {
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
 		// Segmento Condiciones de pago
-		$condicion_pago = $factura->fields['condicion_pago'];
-
-		switch ($condicion_pago) {
-			case '1': $condicion_pago = __('CONTADO');
-				break;
-			case '3': $condicion_pago = __('Vencimiento 15 días	');
-				break;
-			case '4': $condicion_pago = __('Vencimiento 30 días	');
-				break;
-			case '5': $condicion_pago = __('Vencimiento 45 días	');
-				break;
-			case '6': $condicion_pago = __('Vencimiento 60 días	');
-				break;
-			case '7': $condicion_pago = __('Vencimiento 75 días	');
-				break;
-			case '8': $condicion_pago = __('Vencimiento 90 días	');
-				break;
-			case '9': $condicion_pago = __('Vencimiento 120 días');
-				break;
-			case '12': $condicion_pago = __('Letra 30 días');
-				break;
-			case '13': $condicion_pago = __('Letra 45 días');
-				break;
-			case '14': $condicion_pago = __('Letra 60 días');
-				break;
-			case '15': $condicion_pago = __('Letra 90 días');
-				break;
-			case '18': $condicion_pago = __('Cheque 30 días');
-				break;
-			case '19': $condicion_pago = __('Cheque 45 días');
-				break;
-			case '20': $condicion_pago = __('Cheque 60 días');
-				break;
-			case '21': $condicion_pago = __('Cheque a fecha');
-				break;
-		}
+		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 
 		// Segmento Comodines. Solicitados por @gtigre
 		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
@@ -203,6 +168,24 @@ class FacturaPdfDatos extends Objeto {
 				break;
 			case 'fecha_ano_dos_ultimas_cifras':
 				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2);
+				break;
+			case 'fecha_venc_dia':
+				$glosa_dato = date("d", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_mes':
+				$glosa_dato = strftime("%B", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_ano':
+				$glosa_dato = date("Y", strtotime($factura->fields['fecha_vencimiento']));
+				break;
+			case 'fecha_venc_ano_ultima_cifra':
+				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-1);
+				 break;
+			case 'fecha_venc_ano_dos_cifras':
+				$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha_vencimiento'])),-2);
+				break;
+			case 'fecha_venc_numero_mes':
+				$glosa_dato = strftime("%m", strtotime($factura->fields['fecha_vencimiento']));
 				break;
 			case 'direccion':
 				$glosa_dato = $factura->fields['direccion_cliente'];
@@ -340,6 +323,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
+            case 'lbl_fecha_vencimiento':
+                $glosa_dato = 'Fecha Vencimiento / Due Date:';
+                break;
 			case 'monto_honorarios_con_iva':
 				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -360,7 +346,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 
 			default:
-
+			
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
@@ -502,7 +488,7 @@ class FacturaPdfDatos extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id_documento_legal, $codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 
-		$this->CargarDatos($id_factura, $id_documento_legal, $factura->fields['id_estudio']); // esto trae la posicion, tamaño y glosa de todos los campos más los datos del papel en la variable $this->papel;
+		$this->CargarDatos($id_factura, $id_documento_legal, $factura->fields['id_estudio']); // esto trae la posicion, tamaío y glosa de todos los campos mís los datos del papel en la variable $this->papel;
 
 		if(count($this->papel)) {
 			$pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'], $this->papel['cellH']));
