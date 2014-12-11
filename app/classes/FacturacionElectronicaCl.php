@@ -29,22 +29,39 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 		}
 	}
 
-	public static function BotonDescargarHTML($id_factura) {
+	public static function BotonDescargarHTMLCedible($id_factura) {
 		$img_dir = Conf::ImgDir();
 		$Html = self::getHtml();
 		$img_pdf_copia = $Html->img("{$img_dir}/pdf.gif", array('border' => 0, 'style' => 'opacity:0.5;'));
+		if (!empty($id_factura) && $id_factura != 0) {
+			$sesion = new Sesion();
+			$factura = new Factura($sesion);
+			$factura->Load($id_factura);
+			$tipo_doc = $factura->CodigoTipoDocumentoLegal();
+			if (!empty($tipo_doc) && $tipo_doc != 'NC' && $tipo_doc != 'ND') {
+				$output = $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento factura-cedible', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));
+			}
+		} else {
+			$output = $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento factura-cedible', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));			
+		}
+		return $output;
+	}
+
+	public static function BotonDescargarHTML($id_factura) {
+		$img_dir = Conf::ImgDir();
+		$Html = self::getHtml();
 		$img_pdf = $Html->img("{$img_dir}/pdf.gif", array('border' => 0));
 		$output = $Html->tag('a', $img_pdf, array('title' => 'Descargar original', 'class' => 'factura-documento', 'data-factura' => $id_factura, 'data-original' => 1, 'href' => '#'));
-		$output .= $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));
 		return $output;
 	}
 
 	public static function AgregarBotonFacturaElectronica($hookArg) {
 		$Factura = $hookArg['Factura'];
+		$id_factura = $Factura->fields['id_factura'];
 		if ($Factura->FacturaElectronicaCreada()) {
-			$hookArg['content'] = self::BotonDescargarHTML($Factura->fields['id_factura']);
+			$hookArg['content'] = self::BotonDescargarHTML($id_factura) . self::BotonDescargarHTMLCedible($id_factura);
 		} elseif (!$Factura->Anulada()) {
-			$hookArg['content'] = self::BotonGenerarHTML($Factura->fields['id_factura']);
+			$hookArg['content'] = self::BotonGenerarHTML($id_factura);
 		}
 		return $hookArg;
 	}
@@ -71,21 +88,29 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 
 	public static function InsertaJSFacturaElectronica() {
 		$BotonDescargarHTML = self::BotonDescargarHTML('0');
+		$BotonDescargarCedible = self::BotonDescargarHTMLCedible('0');
 		echo <<<EOF
 			jQuery(document).on("click", ".factura-electronica", function() {
-				if (!confirm("¿Confirma la generación de Factura electrónica?")) {
+				if (!confirm("¿Confirma la generación del documento electrónico?")) {
 					return;
 				}
 				var self = jQuery(this);
 				var id_factura = self.data("factura");
+				var codigo_tipo_doc = self.data("codigo-tipo");
 				var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:95px;height:20px;margin-left:-90px;"});
 				self.parent().append(loading);
 				jQuery.ajax({url: root_dir + "/api/index.php/invoices/" + id_factura +  "/build",
 					type: "POST"
 				}).success(function(data) {
 					loading.remove();
-					buttons = jQuery('{$BotonDescargarHTML}');
-					buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
+					if (codigo_tipo_doc == 'NC' || codigo_tipo_doc == 'ND') {
+						buttons = jQuery('{$BotonDescargarHTML}');
+					} else {
+						buttons = jQuery('{$BotonDescargarHTML}{$BotonDescargarCedible}');
+					}
+					buttons.each(function(i, e) { 
+						jQuery(e).attr("data-factura", id_factura);
+					});
 					self.replaceWith(buttons);
 					window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=pdf"
 				}).error(function(error_data){
