@@ -901,12 +901,14 @@ $Form = new Form;
 				return false;
 			}
 
-			if(!form.region_cliente.value){
-				alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
-				MuestraPorValidacion('datos_factura');
-				form.factura_ciudad.focus();
-				return false;
-			}
+			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
+				if(!form.region_cliente.value){
+					alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+					MuestraPorValidacion('datos_factura');
+					form.factura_ciudad.focus();
+					return false;
+				}
+			<?php } ?>
 
 			if (form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
