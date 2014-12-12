@@ -1170,18 +1170,17 @@ class NotaCobro extends Cobro {
 	}
 
 	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '') {
+		global $masi;
+		$masi = $masivo;
 
 		$parametros = $this->ParametrosGeneracion();
 		extract($parametros);
 
-		global $masi;
-		$masi = $masivo;
-
 		//Usa el segundo formato de nota de cobro
 		//solo si lo tiene definido en el conf y solo tiene gastos
 
-		$css_cobro = 1;
 		$solo_gastos = true;
+
 		for ($k = 0; $k < count($this->asuntos); $k++) {
 			$asunto = new Asunto($this->sesion);
 			$asunto->LoadByCodigo($this->asuntos[$k]);
@@ -1200,7 +1199,7 @@ class NotaCobro extends Cobro {
 
 		if (Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
 			if ($solo_gastos && Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
-				$css_cobro = 2;
+				$formato = 2;
 			}
 		}
 
@@ -1208,11 +1207,17 @@ class NotaCobro extends Cobro {
 		$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $this->fields['id_carta']);
 		$parser_carta = new TemplateParser($templateData_carta);
 
-		if ($formato == '' || $formato == 0) {
-			$formato = $css_cobro;
-		}
+		if (is_numeric($formato) || $formato == '') {
+			// buscar formato, de no existir buscar el primero
+			$CobroRtf = new CobroRtf($this->sesion);
+			$CobroRtf->Load($formato);
 
-		if (is_numeric($formato)) {
+			if (!$CobroRtf->Loaded()) {
+				if ($CobroRtf->loadFirst()) {
+					$formato = $CobroRtf->fields['id_formato'];
+				}
+			}
+
 			$templateData = UtilesApp::TemplateCobro($this->sesion, $formato);
 			$cssData .= UtilesApp::CSSCobro($this->sesion, $formato);
 			$parser = new TemplateParser($templateData);
