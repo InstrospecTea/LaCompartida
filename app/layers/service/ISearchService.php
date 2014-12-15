@@ -25,6 +25,6 @@ interface ISearchService {
 	 * @param Criteria       $criteria
 	 * @return array
 	 */
-	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null, Sesion $sesion = null);
+	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null);
 
 }

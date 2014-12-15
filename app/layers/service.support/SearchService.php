@@ -40,7 +40,7 @@ class SearchService implements ISearchService {
 	 * @param Criteria       $criteria
 	 * @return array
 	 */
-	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null, Sesion $sesion = null) {
+	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
 		if ($searchCriteria->paginate()) {
 			$criteria->add_limit($searchCriteria->Pagination->rows_per_page(), $searchCriteria->Pagination->current_row());
 		}

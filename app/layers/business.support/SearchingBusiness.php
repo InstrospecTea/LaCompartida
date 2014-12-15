@@ -21,11 +21,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$criteria
 		);
 		$criteria = $this->addScopes($searchCriteria, $criteria);
-		return $this->SearchService->getResults(
-			$searchCriteria,
-			$criteria,
-			$this->sesion
-		);
+		return $this->SearchService->getResults($searchCriteria, $criteria);
 	}
 
 	/**
