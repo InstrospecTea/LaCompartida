@@ -119,7 +119,7 @@ if ($opcion == "guardar") {
 		if (empty($factura_telefono)) {
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		}
-		if (Conf::GetConf($sesion, 'ClienteReferencia')) {
+		if (Conf::GetConf($sesion, 'ClienteReferencia') && empty($id_cliente_referencia)) {
 			$pagina->AddError(__("Por favor ingrese la referencia"));
 		}
 		if (Conf::GetConf($sesion, 'TituloContacto')) {
