@@ -119,7 +119,7 @@ if ($opcion == "guardar") {
 		if (empty($factura_telefono)) {
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		}
-		if (Conf::GetConf($sesion, 'ClienteReferencia')) {
+		if (Conf::GetConf($sesion, 'ClienteReferencia') && empty($id_cliente_referencia)) {
 			$pagina->AddError(__("Por favor ingrese la referencia"));
 		}
 		if (Conf::GetConf($sesion, 'TituloContacto')) {
@@ -886,14 +886,6 @@ $Form = new Form;
 				return false;
 			}
 
-			if (!form.factura_ciudad.value) {
-				alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
-				MuestraPorValidacion('datos_factura');
-				form.factura_ciudad.focus();
-				return false;
-
-			}
-
 			if (!form.factura_comuna.value) {
 				alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
 				MuestraPorValidacion('datos_factura');
@@ -901,19 +893,29 @@ $Form = new Form;
 				return false;
 			}
 
-			if(!form.region_cliente.value){
-				alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+			if (!form.factura_ciudad.value) {
+				alert("<?php echo __('Debe ingresar la ciudad del cliente'); ?>");
 				MuestraPorValidacion('datos_factura');
 				form.factura_ciudad.focus();
 				return false;
 			}
 
 			if (form.id_pais.options[0].selected == true) {
-				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
+				alert("<?php echo __('Debe ingresar el pais del cliente'); ?>");
 				MuestraPorValidacion('datos_factura');
 				form.id_pais.focus();
 				return false;
 			}
+
+			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
+				if(!form.region_cliente.value){
+					alert("<?php echo __('Debe ingresar la región del cliente'); ?>");
+					MuestraPorValidacion('datos_factura');
+					form.region_cliente.focus();
+					return false;
+				}
+			<?php } ?>
+
 			if (!form.cod_factura_telefono.value) {
 				alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
 				MuestraPorValidacion('datos_factura');
@@ -928,51 +930,54 @@ $Form = new Form;
 				return false;
 			}
 
-			var titulocontacto = jQuery('#contacto');
-			if (!titulocontacto) {
-				alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
+			<?php if (Conf::GetConf($Sesion, 'TituloContacto')) { ?>
+				if (jQuery('#titulo_contacto').val() == '' || jQuery('#titulo_contacto').val() == '-1') {
+					alert("<?php echo __('Debe ingresar el titulo del solicitante'); ?>");
+					MuestraPorValidacion('datos_solicitante');
+					jQuery('#titulo_contacto').focus();
+					return false;
+				}
+
+				if (jQuery('#nombre_contacto').val() == '') {
+					alert("<?php echo __('Debe ingresar el nombre del solicitante'); ?>");
+					MuestraPorValidacion('datos_solicitante');
+					jQuery('#nombre_contacto').focus();
+					return false;
+				}
+
+				if (jQuery('#apellido_contacto').val() == '') {
+					alert("<?php echo __('Debe ingresar el apellido del solicitante'); ?>");
+					MuestraPorValidacion('datos_solicitante');
+					jQuery('#apellido_contacto').focus();
+					return false;
+				}
+			<?php } else { ?>
+				if (jQuery('#contacto').val() == '') {
+					alert("<?php echo __('Debe ingresar el nombre del solicitante'); ?>");
+					MuestraPorValidacion('datos_solicitante');
+					jQuery('#contacto').focus();
+					return false;
+				}
+			<?php } ?>
+
+			if (jQuery('#fono_contacto_contrato').val() == '') {
+				alert("<?php echo __('Debe ingresar el teléfono del solicitante'); ?>");
 				MuestraPorValidacion('datos_solicitante');
-				form.titulo_contacto.focus();
+				jQuery('#fono_contacto_contrato').focus();
 				return false;
 			}
 
-			var nombrecontacto = jQuery('#nombre_contacto');
-			if (!nombrecontacto) {
-				alert("<?php echo __('Debe ingresar el nombre del solicitante') ?>");
-				MuestraPorValidacion('datos_solicitante');
-				form.nombre_contacto.focus();
-				return false;
-			}
-
-			var apellidocontacto = jQuery('#apellido_contacto');
-			if (!apellidocontacto) {
-				alert("<?php echo __('Debe ingresar el apellido del solicitante') ?>");
-				MuestraPorValidacion('datos_solicitante');
-				form.apellido_contacto.focus();
-				return false;
-			}
-
-			var telefonocontacto = jQuery('#email_contacto_contrato');
-			if (!telefonocontacto) {
-				alert("<?php echo __('Debe ingresar el teléfono del solicitante') ?>");
-				MuestraPorValidacion('datos_solicitante');
-				form.fono_contacto_contrato.focus();
-				return false;
-			}
-
-			var emailcontacto = jQuery('#email_contacto_contrato');
-			if (!emailcontacto) {
+			if (jQuery('#email_contacto_contrato').val() == '') {
 				alert("<?php echo __('Debe ingresar el email del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
-				form.email_contacto_contrato.focus();
+				jQuery('#email_contacto_contrato').focus();
 				return false;
 			}
 
-			var direccioncontacto = jQuery('#direccion_contacto_contrato');
-			if (!direccioncontacto) {
+			if (jQuery('#direccion_contacto_contrato').val() == '') {
 				alert("<?php echo __('Debe ingresar la dirección de envío del solicitante') ?>");
 				MuestraPorValidacion('datos_solicitante');
-				form.direccion_contacto_contrato.focus();
+				jQuery('#direccion_contacto_contrato').focus();
 				return false;
 			}
 

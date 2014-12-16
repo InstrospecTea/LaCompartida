@@ -11,12 +11,15 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 	/**
 	 * @return mixed
 	 */
-	function getSandboxResults() {
+	function getSandboxResults($per_page = null, $page = null) {
 		$searchCriteria = new SearchCriteria('Charge');
 		$searchCriteria->add_scope('canBeInvoiced');
 		$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with('1');
+		if ($x_page) {
+			$searchCriteria->Pagination->rows_per_page($per_page);
+		}
 		$this->loadBusiness('Searching');
-		return $this->SearchingBusiness->searchByCriteria($searchCriteria);
+		return $this->SearchingBusiness->paginateByCriteria($searchCriteria, array('codigo_cliente', 'estado'), $page);
 	}
 
 	function getSandboxListator($data) {

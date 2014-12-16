@@ -1,6 +1,14 @@
 # Changelog
 
-## Hotfix: 14.21.0
+## Hotfix: 14.21.2
+Viernes 12 de Diciembre 2014
+* **Fix:** [Corregir validación de región en formulario de cliente](https://github.com/LemontechSA/ttb/pull/791)
+
+## Hotfix: 14.21.1
+Jueves 11 de Diciembre 2014
+* **Fix:** [Selección de formato de nota de cobro por defecto](https://github.com/LemontechSA/ttb/pull/788)
+
+## Release: 14.21.0
 Miércoles 10 de Diciembre 2014
 * **Feature:** [Notas de Crédito/Débito FacturacionCL](https://github.com/LemontechSA/ttb/pull/774)
 * **Feature:** [Fecha de vencimiento en PDF Facturas](https://github.com/LemontechSA/ttb/pull/764)

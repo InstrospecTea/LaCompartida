@@ -2,6 +2,7 @@
 
 interface ISearchService {
 
+
 	/**
 	 * Retorna un arreglo de instancias que pertenezcan a la jerarquía de {@link Entity}, que estén denotadas
 	 * por los criterios establecidos en una instancia de {@link SearchCriteria}.
@@ -11,9 +12,11 @@ interface ISearchService {
 	 * @param SearchCriteria $searchCriteria
 	 * @param array          $filter_properties
 	 * @param Criteria       $criteria
-	 * @return Criteria
+	 * @return array
 	 */
-	function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null);
+	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null);
+
+	public function counterCriteria(SearchCriteria $searchCriteria, Criteria $criteria = null);
 
 	/**
 	 * Retorna un arreglo de instancias que pertenezcan a la jerarquía de {@link Entity}, que estén denotadas
@@ -24,4 +27,4 @@ interface ISearchService {
 	 */
 	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null);
 
-} 
+}
