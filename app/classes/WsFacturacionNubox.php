@@ -35,7 +35,8 @@ class WsFacturacionNubox extends WsFacturacion{
 	 * @return array
 	 * @throws Exception
 	 */
-	public function emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste) {
+	public function emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste, $archivoReferencias = null) {
+		$referencias = !is_null($archivoReferencias);
 		$datos = array(
 			'token' => $this->token,
 			'archivo' => $archivo,
@@ -44,15 +45,18 @@ class WsFacturacionNubox extends WsFacturacion{
 			'opcionRutClienteNoExiste' => $opcionRutClienteNoExiste
 		);
 
+		if ($referencias) {
+			$datos['archivoReferencias'] = $archivoReferencias;
+		}
+
 		try {
 			try {
-				$respuesta = $this->Client->CargarYEmitir($datos);
+				$respuesta = $this->Client->CargarYEmitir2($datos);
 			} catch (SoapFault $sf) {
 				Log::write($sf->__toString(), 'FacturacionElectronicaNubox');
 				throw new Exception('Ocurrió un error al generar el documento.');
 			}
-
-			$sxmle = new SimpleXMLElement($respuesta->CargarYEmitirResult->any);
+			$sxmle = new SimpleXMLElement($respuesta->CargarYEmitir2Result->any);
 			$xml = self::XML2Array($sxmle);
 			if ($xml['Resultado'] != 'OK') {
 				Log::write($xml['Descripcion'], 'FacturacionElectronicaNubox');
