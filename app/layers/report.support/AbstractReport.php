@@ -6,14 +6,14 @@ abstract class AbstractReport implements BaseReport {
 	var $reportEngine;
 
 	/*
-	* Exporta los datos segË™n el tipo de {@link ReportEngine} configurado.
+	* Exporta los datos según el tipo de {@link ReportEngine} configurado.
 	* @param $type
 	* @return mixed
 	* @throws ReportException
 	*/
 	function render() {
 		if (!empty($this->reportEngine)) {
-			$this->reportEngine->render();
+			$this->reportEngine->render($this->data);
 		} else {
 			throw new ReportException('This report instance does not have an instance of ReportEngine.');
 		}
