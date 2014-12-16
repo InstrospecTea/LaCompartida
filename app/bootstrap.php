@@ -2,7 +2,8 @@
 
 require_once dirname(__FILE__) . '/conf.php';
 
-define('APP_PATH', dirname(__FILE__) . '/layers');
+define('ROOT_PATH', dirname(dirname(__FILE__)));
+define('APP_PATH', dirname(__FILE__));
 define('LAYER_PATH', dirname(__FILE__) . '/layers');
 
 $uri = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
