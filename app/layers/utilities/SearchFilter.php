@@ -7,6 +7,7 @@
 class SearchFilter extends AbstractUtility {
 
 	protected $property;
+	protected $function;
 	protected $restriction;
 	protected $condition;
 	protected $value;
@@ -44,7 +45,7 @@ class SearchFilter extends AbstractUtility {
 	 * @throws Exception
 	 */
 	function by_condition($condition) {
-		if ($condition != 'AND' && $condition != 'OR') {
+		if (!preg_match('/AND|OR/i', $condition)) {
 			throw new UtilityException('La condicion de filtrado debe ser AND u OR.');
 		}
 		$this->condition = $condition;
@@ -67,6 +68,21 @@ class SearchFilter extends AbstractUtility {
 	}
 
 	/**
+	 * Establece un método de refinamiento, basado en SQL, para el filtro de búsqueda.
+	 * @Needings Crear un mecanismo para agregar functions de una manera más elegante, quizá otra clase.
+	 * @param $function
+	 * @return $this
+	 * @throws UtilityException
+	 */
+	function with_function($function) {
+		if (empty($function)) {
+			throw new UtilityException('Se está agregando una función vacía.');
+		}
+		$this->function = $function;
+		return $this;
+	}
+
+	/**
 	 * Establece el valor con el que se compara la propiedad filtrada, bajo las condiciones y restricciones definidas.
 	 * @param $value
 	 * @return $this
@@ -76,9 +92,4 @@ class SearchFilter extends AbstractUtility {
 		return $this;
 	}
 
-
-
-
-
-
-} 
+}

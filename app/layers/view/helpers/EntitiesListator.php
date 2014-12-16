@@ -4,12 +4,13 @@ class EntitiesListator {
 
 	private $entities;
 	private $columnHandler;
-
+	private $trWriter;
 
 	/**
 	 * @param array $entities
+	 * @throws UtilityException
 	 */
-	function __construct(array $entities) {
+	public function loadEntities(array $entities) {
 		foreach ($entities as $element) {
 			if (!$this->checkElementClass($element)) {
 				throw new UtilityException('One of the elements on the Listator is not a subclass of Entity.');
@@ -103,20 +104,24 @@ class EntitiesListator {
 			->set_tag('tbody')
 			->set_tag('class', 'cuerpobuscador')
 			->set_closure(true);
-		foreach ($this->entities as $entity) {
-			$tr = new HtmlBuilder();
-			$tr
-				->set_tag('tr')
-				->set_closure(true);
-			foreach ($this->columnHandler as $columnHandler) {
-				$th = new HtmlBuilder();
-				$th->set_tag('th')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
-				if (is_callable($columnHandler['calculationExpression'])) {
-					$th->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
-				} else {
-					$th->set_html($entity->get($columnHandler['calculationExpression']));
+		foreach ($this->entities as $key => $entity) {
+			if (!empty($this->trWriter)) {
+				$tr = call_user_func($this->trWriter, $entity, $key);
+			} else {
+				$tr = new HtmlBuilder();
+				$tr
+					->set_tag('tr')
+					->set_closure(true);
+				foreach ($this->columnHandler as $columnHandler) {
+					$th = new HtmlBuilder();
+					$th->set_tag('th')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
+					if (is_callable($columnHandler['calculationExpression'])) {
+						$th->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
+					} else {
+						$th->set_html($entity->get($columnHandler['calculationExpression']));
+					}
+					$tr->add_child($th);
 				}
-				$tr->add_child($th);
 			}
 			$tbody->add_child($tr);
 		}
@@ -132,13 +137,24 @@ class EntitiesListator {
 			->set_tag('table')
 			->add_attribute('class', 'buscador')
 			->add_attribute('cellpading', 2)
+			->add_attribute('style', 'width: 100%')
 			->set_closure(true);
 		$table->add_child($this->generateHeader());
 		$table->add_child($this->generateBody());
 		return $table->render();
 	}
 
+	/**
+	 * Redefine la función para escribir las filas del listado.
+	 * @param type $callable
+	 * @throws Exception
+	 */
+	public function trWriter($callable) {
+		if (!is_callable($callable)) {
+			throw new Exception('El valor definido en trWriter debe ser una función válida.');
+		}
+		$this->trWriter = $callable;
+	}
 
 
-
-} 
+}
