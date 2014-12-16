@@ -204,8 +204,10 @@ class SearchService implements ISearchService {
 	}
 
 	private function prepareGrouping(Criteria $criteria, SearchCriteria $searchCriteria) {
-		foreach ($searchCriteria->groups() as $group) {
-			$criteria->add_grouping($this->makeFieldName($searchCriteria->entity(), $group));
+		if (is_array($searchCriteria->groups())) {
+			foreach ($searchCriteria->groups() as $group) {
+				$criteria->add_grouping($this->makeFieldName($searchCriteria->entity(), $group));
+			}
 		}
 		return $criteria;
 	}
