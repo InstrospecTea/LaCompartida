@@ -71,11 +71,15 @@ function autocargattb($class_name) {
 
 		require_once dirname(__FILE__) . '/app/layers/report.support/' . $class_name . '.php';
 
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report/engine/' . $class_name . '.php')){
+
+		require_once dirname(__FILE__) . '/app/layers/report/engine/' . $class_name . '.php';
+
 	} else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/engine/' . $class_name . '.php')){
 
 		require_once dirname(__FILE__) . '/app/layers/report.support/engine/' . $class_name . '.php';
 
-	}  else {
+	}   else {
 
 		return false;
 
