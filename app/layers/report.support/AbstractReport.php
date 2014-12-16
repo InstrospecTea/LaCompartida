@@ -5,7 +5,7 @@ abstract class AbstractReport implements BaseReport {
 	var $data;
 	var $reportEngine;
 
-	/*
+	/**
 	* Exporta los datos según el tipo de {@link ReportEngine} configurado.
 	* @param $type
 	* @return mixed
@@ -36,7 +36,7 @@ abstract class AbstractReport implements BaseReport {
 		}
 	}
 
-	/*
+	/**
 	* Asigna los datos a la instancia de reporte. Estos datos son los que el reporte utiliza para generar agrupaciones
 	* y totalizaciones.
 	* @param array $data
@@ -62,10 +62,9 @@ abstract class AbstractReport implements BaseReport {
 
 	}
 
-	/*
+	/**
 	* Retorna una instancia que pertenece a la jerarquía de {@link ReportEngine} según el tipo indicado como parametro.
-	* @param string $type
-	* @return type
+	* @return mixed
 	* @throws ReportException
 	*/
 	protected function getReportEngine() {
