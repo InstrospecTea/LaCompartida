@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix: 14.21.3
+Martes 12 de Diciembre 2014
+* **Add:** [Agrega filtros encargado asunto y encargado comercial en listado de tramites](https://github.com/LemontechSA/ttb/pull/795)
+* **Add:** [Agrega filtro encargado asunto en listado de horas](https://github.com/LemontechSA/ttb/pull/795)
+
 ## Hotfix: 14.21.2
 Viernes 12 de Diciembre 2014
 * **Fix:** [Corregir validación de región en formulario de cliente](https://github.com/LemontechSA/ttb/pull/791)
