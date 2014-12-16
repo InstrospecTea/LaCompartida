@@ -173,7 +173,7 @@ if ($opcion == "guardar") {
 
 			if ($contrato->Write()) {
 				// Segmento "Cobros pendientes";
-				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
+				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato']);
 				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 					$cobro_pendiente = new CobroPendiente($Sesion);
 					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato']);
@@ -334,14 +334,14 @@ if (Conf::GetConf($Sesion, 'ClienteReferencia')) {
 		array(
 			'source' => 'ajax/ajax_prm.php?prm=ClienteReferencia&fields=orden,requiere_desglose',
 			'onLoad' => '
-				var element = selected_IdClienteReferencia;
+				var element = selected_id_cliente_referencia;
 				jQuery("#desglose_referencia").hide();
 				if (element && element.requiere_desglose == "1") {
 					jQuery("#desglose_referencia").show();
 				}
 			',
 			'onChange' => '
-				var element = selected_IdClienteReferencia;
+				var element = selected_id_cliente_referencia;
 				jQuery("#desglose_referencia").hide();
 				if (element && element.requiere_desglose == "1") {
 					jQuery("#desglose_referencia").show();
