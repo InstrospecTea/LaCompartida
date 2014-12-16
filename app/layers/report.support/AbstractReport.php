@@ -6,14 +6,14 @@ abstract class AbstractReport implements BaseReport {
 	var $reportEngine;
 
 	/**
-	* Exporta los datos según el tipo de {@link ReportEngine} configurado.
-	* @param $type
-	* @return mixed
-	* @throws ReportException
-	*/
+	 * Exporta los datos según el tipo de {@link ReportEngine} configurado.
+	 * @return mixed
+	 * @throws ReportException
+	 */
 	function render() {
 		if (!empty($this->reportEngine)) {
-			$this->reportEngine->render($this->data);
+			$this->present();
+			return $this->reportEngine->render($this->data);
 		} else {
 			throw new ReportException('This report instance does not have an instance of ReportEngine.');
 		}
@@ -27,6 +27,7 @@ abstract class AbstractReport implements BaseReport {
 	 * @throws ReportException
 	 */
 	function setOutputType($type) {
+		$type = strtoupper($type);
 		$classname = "{$type}ReportEngine";
 		try {
 			$class = new ReflectionClass($classname);
@@ -50,12 +51,13 @@ abstract class AbstractReport implements BaseReport {
 	/**
 	 * Establece la configuración del reporte. Será utilizado, según corresponda, por el {@link ReportEngine} asigando
 	 * al reporte.
+	 * @param $configurationKey
 	 * @param $configuration
 	 * @throws ReportException
 	 */
-	function setConfiguration($configuration) {
+	function setConfiguration($configurationKey, $configuration) {
 		if (!empty($this->reportEngine)) {
-			$this->reportEngine->setConfiguration($configuration);
+			$this->reportEngine->setConfiguration($configurationKey, $configuration);
 		} else {
 			throw new ReportException('This report instance does not have an instance of ReportEngine.');
 		}
@@ -89,6 +91,8 @@ abstract class AbstractReport implements BaseReport {
 	 * @return array
 	 */
 	abstract protected function agrupateData($data);
+
+	abstract protected function present();
 
 
 }
