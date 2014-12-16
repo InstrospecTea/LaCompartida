@@ -6,7 +6,7 @@ abstract class AbstractReport implements BaseReport {
 	var $reportEngine;
 
 	/*
-	* Exporta los datos en el formato indicado como parametro.
+	* Exporta los datos seg˙n el tipo de {@link ReportEngine} configurado.
 	* @param $type
 	* @return mixed
 	* @throws ReportException
