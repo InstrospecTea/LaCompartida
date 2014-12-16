@@ -4,6 +4,7 @@ abstract class Helper {
 
 	public $helpers = array();
 	private $filePath = '/view/helpers';
+	protected $loadedClass = array();
 
 	public function __construct() {
 		$this->loadHelpers();
