@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.21.2
+Viernes 12 de Diciembre 2014
+* **Fix:** [Corregir validación de región en formulario de cliente](https://github.com/LemontechSA/ttb/pull/791)
+
 ## Hotfix: 14.21.1
 Jueves 11 de Diciembre 2014
 * **Fix:** [Selección de formato de nota de cobro por defecto](https://github.com/LemontechSA/ttb/pull/788)
