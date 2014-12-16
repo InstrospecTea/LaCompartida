@@ -1827,7 +1827,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Teléfono') . $obligatorios('fono_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='fono_contacto_contrato' size=30 value="<?php echo $contrato->fields['fono_contacto'] ? $contrato->fields['fono_contacto'] : $fono_contacto_contrato ?>" />
+						<input type="text" name="fono_contacto_contrato" id="fono_contacto_contrato" size="30" value="<?php echo $contrato->fields['fono_contacto'] ? $contrato->fields['fono_contacto'] : $fono_contacto_contrato ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -1835,7 +1835,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('E-mail') . $obligatorios('email_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='email_contacto_contrato' size=55 value="<?php echo $contrato->fields['email_contacto'] ? $contrato->fields['email_contacto'] : $email_contacto_contrato ?>"  />
+						<input type="text" name="email_contacto_contrato" id="email_contacto_contrato" size="55" value="<?php echo $contrato->fields['email_contacto'] ? $contrato->fields['email_contacto'] : $email_contacto_contrato ?>"  />
 					</td>
 				</tr>
 				<tr>
@@ -1843,10 +1843,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Dirección envío') . $obligatorios('direccion_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?  $contrato->fields['direccion_contacto'] : $direccion_contacto_contrato ?></textarea>
+						<textarea name="direccion_contacto_contrato" id="direccion_contacto_contrato" rows="4" cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?  $contrato->fields['direccion_contacto'] : $direccion_contacto_contrato ?></textarea>
 					</td>
 				</tr>
-
 			</table>
 		</fieldset>
 		<!-- FIN SOLICITANTE -->

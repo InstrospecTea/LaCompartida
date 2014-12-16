@@ -22,6 +22,9 @@ Class FacturacionElectronica {
 
 	public static function BotonGenerarHTML($id_factura) {
 		$Html = self::getHtml();
+		$Sesion = new Sesion();
+		$Factura = new Factura($Sesion);
+		$Factura->Load($id_factura);
 		$img_dir = Conf::ImgDir();
 		$img = $Html->img("{$img_dir}/invoice.png", array('border' => '0'));
 		$attr_a = array(
@@ -29,6 +32,7 @@ Class FacturacionElectronica {
 			'title' => 'Generar Factura Electrónica',
 			'class' => 'factura-electronica',
 			'data-factura' => $id_factura,
+			'data-codigo-tipo' => $Factura->CodigoTipoDocumentoLegal(),
 			'href' => '#'
 		);
 		return  $Html->tag('a', $img, $attr_a);

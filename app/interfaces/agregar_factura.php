@@ -527,7 +527,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			$estudios_array = PrmEstudio::GetEstudios($sesion);
 			if (count($estudios_array) > 1) {
-			?>
+				?>
 				<tr>
 					<td align="right"><?php echo __('Companía'); ?></td>
 					<td align="left" colspan="3">
@@ -553,8 +553,10 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					<?php
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', null, 60);
-					} else { ?>
-						<input type="hidden" name="serie" id="serie" value="<?php echo $serie; ?>">
+					} else {
+						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
+						?>
+						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>
 					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
@@ -572,11 +574,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			//Se debe elegir un documento legal padre si:
 			$buscar_padre = false;
 
-			$query_doc = "SELECT codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+			$query_doc = "SELECT codigo, codigo_dte FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
 			$resp_doc = mysql_query($query_doc, $sesion->dbh) or Utiles::errorSQL($query_doc, __FILE__, __LINE__, $sesion->dbh);
-			list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
+			list($codigo_documento_legal, $codigo_dte) = mysql_fetch_array($resp_doc);
 
-			if (($codigo_documento_legal == 'NC') && ($id_cobro || $codigo_cliente)) {
+			if (($codigo_documento_legal == 'NC' || ($codigo_documento_legal == 'ND' && !is_null($codigo_dte))) && ($id_cobro || $codigo_cliente)) {
 				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', factura.serie_documento_legal, '-', numero" : "prm_documento_legal.glosa, ' #', numero";
 				if ($id_cobro) {
 					$query_padre = "SELECT id_factura, CONCAT({$glosa_numero_serie}) FROM factura JOIN prm_documento_legal USING (id_documento_legal) WHERE id_cobro = '{$id_cobro}'";

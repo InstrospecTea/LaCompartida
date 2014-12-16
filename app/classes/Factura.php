@@ -493,6 +493,14 @@ class Factura extends Objeto {
 		return $id_documento_legal;
 	}
 
+	function CodigoTipoDocumentoLegal() {
+		$id_documento_legal = $this->fields['id_documento_legal'];
+		$query_doc = "SELECT codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+		$resp_doc = mysql_query($query_doc, $this->sesion->dbh) or Utiles::errorSQL($query_doc, __FILE__, __LINE__, $this->sesion->dbh);
+		list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
+		return $codigo_documento_legal;
+	}
+
 	function GeneraHTMLFactura($id_formato_factura = null) {
 		if ($this->fields['id_moneda'] != 2 && ( ( method_exists('Conf', 'InfoBancariaCYC') && Conf::InfoBancariaCYC() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'InfoBancariaCYC') ) )) {
 			$templateData = UtilesApp::TemplateFactura($this->sesion, 2);

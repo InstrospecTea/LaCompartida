@@ -852,7 +852,6 @@ $Pagina->PrintTop();
 
 	<?php echo $contractValidation->getClientValidationsScripts(); ?>
 
-
 <?php } ?>
 
 

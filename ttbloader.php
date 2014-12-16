@@ -8,6 +8,7 @@ function autocargattb($class_name) {
 	$class_name = str_replace('_', DIRECTORY_SEPARATOR, end($class_name));
 
 	$filename = null;
+
 	if (is_readable(dirname(__FILE__) . '/app/layers/dao/' . $class_name . '.php')) {
 		$filename = dirname(__FILE__) . '/app/layers/dao/' . $class_name . '.php';
 	} if (is_readable(dirname(__FILE__) . '/app/layers/dao/exceptions/' . $class_name . '.php')) {
@@ -26,7 +27,9 @@ function autocargattb($class_name) {
 		$filename = dirname(__FILE__) . '/fw/classes/' . $class_name . '.php';
 	} else if (is_readable(dirname(__FILE__) . '/app/layers/utilities/' . $class_name . '.php')) {
 		$filename = dirname(__FILE__) . '/app/layers/utilities/' . $class_name . '.php';
-	} else if (is_readable(dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php')) {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/utilities/twig/' . $class_name . '.php')) {
+		$filename = dirname(__FILE__) . '/app/layers/utilities/twig/' . $class_name . '.php';
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php')){
 		$filename = dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php';
 	} else if (is_readable(dirname(__FILE__) . '/app/layers/business.support/' . $class_name . '.php')) {
 		$filename = dirname(__FILE__) . '/app/layers/business.support/' . $class_name . '.php';
@@ -39,6 +42,7 @@ function autocargattb($class_name) {
 	if (empty($filename)) {
 		return false;
 	}
+
 	require_once $filename;
 }
 
