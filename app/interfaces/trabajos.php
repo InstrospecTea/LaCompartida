@@ -623,7 +623,7 @@ $pagina->PrintTop($popup);
 
 				<tr>
 					<td class="buscadorlabel">
-						<?php echo __('Usuario Responsable'); ?>
+						<?php echo __('Responsable Asunto'); ?>
 					</td>
 					<td align="left" colspan="2">
 						<?php echo $Form->select('id_encargado_asunto', $sesion->usuario->ListarActivos('', true), $id_encargado_asunto, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
