@@ -334,7 +334,7 @@ $Form = new Form;
 
 			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
 				if (!form.region_cliente.value) {
-					alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
+					alert("<?php echo __('Debe ingresar la región del cliente'); ?>");
 					form.region_cliente.focus();
 					return false;
 				}
@@ -1972,7 +1972,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Teléfono') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='fono_contacto_contrato' size=30 value="<?php echo $contrato->fields['fono_contacto'] ?>" />
+						<input type="text" name="fono_contacto_contrato" id="fono_contacto_contrato" size="30" value="<?php echo $contrato->fields['fono_contacto']; ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -1980,7 +1980,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('E-mail') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='email_contacto_contrato' size=55 value="<?php echo $contrato->fields['email_contacto'] ?>"  />
+						<input type="text" name="email_contacto_contrato" id="email_contacto_contrato" size="55" value="<?php echo $contrato->fields['email_contacto']; ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -1988,10 +1988,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Dirección envío') . $obligatorio; ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?></textarea>
+						<textarea name="direccion_contacto_contrato" id="direccion_contacto_contrato" rows="4" cols="55"><?php echo $contrato->fields['direccion_contacto']; ?></textarea>
 					</td>
 				</tr>
-
 			</table>
 		</fieldset>
 		<!-- FIN SOLICITANTE -->
