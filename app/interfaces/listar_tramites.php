@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
-$Form = new Form;
+$Form = new Form();
 $params_array['codigo_permiso'] = 'REV';
 $p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
@@ -23,7 +23,7 @@ if ($p_revisor->fields['permitido'] && $accion == "eliminar") {
 	$tramite->Load($id_tramite);
 	if ($tramite->Estado() == "Abierto") {
 		if (!$tramite->Eliminar()) {
-			$pagina->AddError($asunto->error);
+			$pagina->AddError($tramite->error);
 		} else {
 			$pagina->AddInfo(__('Trámite') . ' ' . __('eliminado con éxito'));
 		}
@@ -68,10 +68,8 @@ if ($id_cobro) {
 if ($p_revisor->fields['permitido']) {
 	$where_usuario = '';
 } else {
-	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields[id_usuario] . ") OR usuario.id_usuario=" . $sesion->usuario->fields[id_usuario] . ")";
+	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ")";
 }
-
-$select_usuario = Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' " . $where_usuario . " ORDER BY nombre ASC", "id_usuario", $id_usuario, '', 'Todos', '200');
 
 $where = base64_decode($where);
 if ($where == '') {
@@ -82,7 +80,7 @@ if ($id_usuario != '') {
 	$where .= " AND tramite.id_usuario='$id_usuario' ";
 } else if (!$p_revisor->fields['permitido']) {
 	// Se buscan trabajos de los usuarios a los que se puede revisar.
-	$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields[id_usuario] . ") OR usuario.id_usuario=" . $sesion->usuario->fields[id_usuario] . ") ";
+	$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ") ";
 }
 
 if ($revisado == 'NO') {
@@ -193,6 +191,14 @@ if ($trabajo_si_no == 'SI') {
 	$where .= " AND trabajo_si_no=1 ";
 } else if ($trabajo_si_no == 'NO') {
 	$where .= " AND trabajo_si_no=0 ";
+}
+
+if ($id_encargado_asunto) {
+	$where .= " AND asunto.id_encargado = '$id_encargado_asunto' ";
+}
+
+if ($id_encargado_comercial) {
+	$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
 }
 
 if ($clientes) {
@@ -511,64 +517,91 @@ $pagina->PrintTop($popup);
 							<table style="border: 0px solid black;" >
 								<?php if ($p_revisor->fields['permitido']) { ?>
 									<tr>
-										<td align="right">
+										<td class="buscadorlabel">
 											<?php echo __('Trabajo') ?>
 										</td>
-										<td align='left'>
+										<td align="left" colspan="3">
 											<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no", "trabajo_si_no", $trabajo_si_no, '', 'Todos', '60') ?>
 										</td>
 									</tr>
 								<?php }	?>
 								<tr>
-									<td align="right">
+									<td class="buscadorlabel">
 										<?php echo __('Nombre Cliente') ?>
 									</td>
-									<td nowrap align='left' colspan="3">
+									<td nowrap align="left" colspan="3">
 										<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 									</td>
 								</tr>
+
 								<tr>
-									<td align="right">
+									<td class="buscadorlabel">
 										<?php echo __('Asunto') ?>
 									</td>
-									<td nowrap align='left' colspan="3">
+									<td nowrap align="left" colspan="3">
 										<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, '', $glosa_asunto, false); ?>
-
 									</td>
 								</tr>
 
-								<?php if (strlen($select_usuario) > 164) {  ?>
-									<tr>
-										<td align="right">
-											<?php echo __('Usuario') ?>
-										</td>
-										<td align='left' colspan="3">
-											<?php echo $select_usuario ?>
-										</td>
-									</tr>
-								<?php }
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Usuario Responsable'); ?>
+									</td>
+									<td align="left" colspan="3">
+										<?php echo $Form->select('id_encargado_asunto', $sesion->usuario->ListarActivos('', true), $id_encargado_asunto, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
+									</td>
+								</tr>
 
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Encargado Comercial') ?>
+									</td>
+									<td align="left" colspan="3">
+										<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="buscadorlabel">
+										<?php echo __('Usuario') ?>
+									</td>
+									<td align="left" colspan="3">
+										<?php
+										if ($p_revisor->fields['permitido']) {
+											$where_usuario = '';
+										} else {
+											$where_usuario = "{$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']})";
+										}
+										echo $Form->select('id_usuario', $sesion->usuario->ListarActivos($where_usuario, 'PRO'), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
+										?>
+									</td>
+								</tr>
+								<?php
 								### Validando fecha
 								$hoy = date('Y-m-d');
 								$fecha_ini = Utiles::sql2date($fecha_ini);
 								$fecha_fin = Utiles::sql2date($fecha_fin);
 								?>
 								<tr>
-									<td align="right" colspan="1">
+									<td class="buscadorlabel">
 										<?php echo __('Fecha desde') ?>:
 									</td>
-									<td align="left" colspan="3">
+									<td align="left">
 										<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
-										<?php echo __('Fecha hasta') ?>:&nbsp;
-										<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
+									</td>
+									<td class="buscadorlabel">
+										<?php echo __('Fecha hasta') ?>:
+									</td>
+									<td>
+										<input type="text" name="fecha_fin" class="fechadiff" value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 									</td>
 								</tr>
 								<tr>
 									<td>&nbsp;</td>
-									<td colspan='3'  align="left">
+									<td colspan="2" align="left">
 										<?php echo $Form->submit(__('Buscar'), array('onclick' => "jQuery('#check_tramite').val(1)")); ?>
 									</td>
-									<td>
+									<td align="right">
 										<?php echo $Form->icon_button(__('Agregar') . ' ' . __('trámite'), 'agregar', array('onclick' => "AgregarNuevo('tramite')")); ?>
 									</td>
 								</tr>
