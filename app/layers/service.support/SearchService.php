@@ -167,14 +167,14 @@ class SearchService implements ISearchService {
 	 * @param array          $filterProperties
 	 * @return Criteria
 	 */
-	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $widthIdentity = true) {
+	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $withIdentity = true) {
 		$entity = $searchCriteria->entity();
 		$entity = new ReflectionClass($entity);
 		$entity = $entity->newInstance();
 		if (empty($filterProperties)) {
 			$criteria->add_select($searchCriteria->entity() . '.*');
 		} else {
-			if ($widthIdentity) {
+			if ($withIdentity) {
 				$criteria->add_select($searchCriteria->entity() . '.' . $entity->getIdentity());
 			}
 			foreach ($filterProperties as $filter_property) {
