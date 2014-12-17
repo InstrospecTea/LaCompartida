@@ -24,7 +24,7 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 			$arr_rut = explode('-', $RUT_cliente);
 			$rut = $arr_rut[0];
 			$dv = $arr_rut[1];
-			if (!Utiles::ValidarRut($rut, $dv)) {
+			if (!is_null($dv) && !Utiles::ValidarRut($rut, $dv)) {
 				$errors[] = __('El RUT del cliente no es válido.');
 			}
 		}
