@@ -226,7 +226,8 @@ class SearchService implements ISearchService {
 	private function encapsulateArray($array, $entity) {
 		$result = array();
 		$reflected = new ReflectionClass($entity);
-		foreach ($array as $row) {
+		$total = (int) count($array);
+		for ($i = 0; $i < $total; $i++) {
 			$empty = $reflected->newInstance();
 			$result[] = $this->encapsulate($row, $empty, false);
 		}
