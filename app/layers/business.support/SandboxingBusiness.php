@@ -24,12 +24,25 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 
 	function data() {
 		$this->loadBusiness('Searching');
-		$searchCriteria = new SearchCriteria('Contract');
-		$searchCriteria->filter('activo')->restricted_by('equals')->compare_with("'SI'");
-		$searchCriteria->related_with('Client')->on_property('codigo_cliente');
-		$searchCriteria->related_with('Matter')->joined_with('Client')->on_property('codigo_cliente');
+		$searchCriteria = new SearchCriteria('Work');
+		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
+		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
+		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
+		// $searchCriteria->related_with('Contract')->joined_with('Contract')->on_property('codigo_cliente');
 
-		return $this->SearchingBusiness->searchByGenericCriteria($searchCriteria, array('Contract.codigo_cliente', 'Client.glosa_cliente', 'Matter.glosa_asunto'));
+		$filter_properties = array(
+			'Client.glosa_cliente',
+			'Matter.glosa_asunto',
+			'Work.descripcion',
+			'Work.fecha',
+			'Work.duracion_cobrada',
+			'Work.tarifa_hh'
+		);
+
+		return $this->SearchingBusiness->searchByGenericCriteria(
+			$searchCriteria,
+			$filter_properties
+		);
 	}
 
 	function getSandboxListator($data) {
