@@ -27,8 +27,9 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		$searchCriteria = new SearchCriteria('Contract');
 		$searchCriteria->filter('activo')->restricted_by('equals')->compare_with("'SI'");
 		$searchCriteria->related_with('Client')->on_property('codigo_cliente');
+		$searchCriteria->related_with('Matter')->joined_with('Client')->on_property('codigo_cliente');
 
-		return $this->SearchingBusiness->searchByGenericCriteria($searchCriteria, array('Contract.codigo_cliente', 'Client.glosa_cliente'));
+		return $this->SearchingBusiness->searchByGenericCriteria($searchCriteria, array('Contract.codigo_cliente', 'Client.glosa_cliente', 'Matter.glosa_asunto'));
 	}
 
 	function getSandboxListator($data) {
