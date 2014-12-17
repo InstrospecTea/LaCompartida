@@ -28,7 +28,8 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
 		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
 		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
-		// $searchCriteria->related_with('Contract')->joined_with('Contract')->on_property('codigo_cliente');
+		$searchCriteria->related_with('User')->joined_with('Contract')->on_property('id_usuario')->on_entity_property('id_usuario_responsable');
+		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
 
 		$filter_properties = array(
 			'Client.glosa_cliente',
@@ -36,7 +37,13 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 			'Work.descripcion',
 			'Work.fecha',
 			'Work.duracion_cobrada',
-			'Work.tarifa_hh'
+			'Work.tarifa_hh',
+			'User.nombre',
+			'User.apellido1',
+			'User.apellido2',
+			'Lawyer.nombre',
+			'Lawyer.apellido1',
+			'Lawyer.apellido2'
 		);
 
 		return $this->SearchingBusiness->searchByGenericCriteria(
