@@ -35,7 +35,7 @@
       <tr>
         <th align="right"><?php echo __('Cobrable') ?></th>
         <td colspan="2" align="left">
-          <?php echo $this->Form->select('cobrable', $cobrable_estados, $this->data['forma_cobro'], array('empty' => __('Todos'))) ?>
+          <?php echo $this->Form->select('cobrable', $cobrable_estados, $this->data['cobrable'], array('empty' => __('Todos'))) ?>
         </td>
       </tr>
       <tr>
