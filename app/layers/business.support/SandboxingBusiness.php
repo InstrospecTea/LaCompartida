@@ -22,6 +22,29 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		return $this->SearchingBusiness->paginateByCriteria($searchCriteria, array('codigo_cliente', 'estado'), $page);
 	}
 
+	function data() {
+		$this->loadBusiness('Searching');
+		$searchCriteria = new SearchCriteria('Work');
+		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
+		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
+		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
+		// $searchCriteria->related_with('Contract')->joined_with('Contract')->on_property('codigo_cliente');
+
+		$filter_properties = array(
+			'Client.glosa_cliente',
+			'Matter.glosa_asunto',
+			'Work.descripcion',
+			'Work.fecha',
+			'Work.duracion_cobrada',
+			'Work.tarifa_hh'
+		);
+
+		return $this->SearchingBusiness->searchByGenericCriteria(
+			$searchCriteria,
+			$filter_properties
+		);
+	}
+
 	function getSandboxListator($data) {
 		$listator = new EntitiesListator($data);
 		$listator->addColumn('# Cobro', 'id_cobro');

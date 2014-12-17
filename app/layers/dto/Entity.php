@@ -79,9 +79,9 @@ abstract class Entity {
 	 * array asociativo.
 	 * @param array $properties Propiedades de un objeto.
 	 */
-	public function fillFromArray(array $properties) {
+	public function fillFromArray(array $properties, $changed = true) {
 		foreach ($properties as $propertyName => $propertyValue) {
-			$this->set($propertyName, $propertyValue);
+			$this->set($propertyName, $propertyValue, $changed);
 		}
 	}
 

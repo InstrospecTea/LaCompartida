@@ -13,15 +13,21 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 * @return mixed|void
 	 */
 	public function searchByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array()) {
-		$this->loadService('Search');
-		$criteria = new Criteria($this->sesion);
-		$criteria = $this->SearchService->translateCriteria(
-			$searchCriteria,
-			$filter_properties,
-			$criteria
-		);
-		$criteria = $this->addScopes($searchCriteria, $criteria);
+		$criteria = $this->getCriteria($searchCriteria, $filter_properties);
 		return $this->SearchService->getResults($searchCriteria, $criteria);
+	}
+
+	/**
+	 * Realiza una búsqueda considerando los criterios definidos en una instancia de {@link SearchCriteria}.
+	 * Completa la búsqueda utilizando los distintos scopes definidos y retorna una lista de {@link GenericModel}.
+	 * @param SearchCriteria $searchCriteria
+	 * @param array          $filter_properties
+	 * @return mixed|void
+	 */
+	public function searchByGenericCriteria(SearchCriteria $searchCriteria , array $filter_properties = array()) {
+		$widthIdentity = false;
+		$criteria = $this->getCriteria($searchCriteria, $filter_properties, $widthIdentity);
+		return $this->SearchService->getGenericResults($searchCriteria, $criteria);
 	}
 
 	/**
@@ -61,6 +67,18 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			}
 		}
 		return $criteria;
+	}
+
+	private function getCriteria($searchCriteria, $filter_properties, $widthIdentity = true) {
+		$this->loadService('Search');
+		$criteria = new Criteria($this->sesion);
+		$criteria = $this->SearchService->translateCriteria(
+			$searchCriteria,
+			$filter_properties,
+			$criteria,
+			$widthIdentity
+		);
+		return $this->addScopes($searchCriteria, $criteria);
 	}
 
 }

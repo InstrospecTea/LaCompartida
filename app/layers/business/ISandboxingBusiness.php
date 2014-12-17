@@ -8,6 +8,11 @@ interface ISandboxingBusiness {
 	function getSandboxResults();
 
 	/**
+	 * @return mixed
+	 */
+	function data();
+
+	/**
 	 * @param $data
 	 * @return mixed
 	 */
