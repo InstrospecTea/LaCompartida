@@ -141,7 +141,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	}
 
 	private function getHeader() {
-		return '';
+		return '<h1>waaaaa</h1>';
 	}
 
 	private function getFooter() {
