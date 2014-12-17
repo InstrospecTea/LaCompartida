@@ -12,8 +12,10 @@ class ReportsController extends AbstractController {
   public function produccion_periodo() {
     $this->layoutTitle = 'Reporte de Producción por Periodo';
     $this->loadBusiness('Sandboxing');
+    $this->set('cobrable_estados', array('No', 'Si'));
+    $this->set('mostrar_estados', array('Horas Cobradas', 'Valor Cobrado'));
 
-    $searchResult = $this->SandboxingBusiness->data();
+      $searchResult = $this->SandboxingBusiness->data();
     $this->set('results', $searchResult);
 
     $report = new TimekeeperProductivityReport();
