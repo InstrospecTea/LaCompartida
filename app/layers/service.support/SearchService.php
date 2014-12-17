@@ -47,7 +47,7 @@ class SearchService implements ISearchService {
 	}
 
 	/**
-	 * Retorna un arreglo de instancias que pertenezcan a la jerarquÃŒa de {@link Entity}, que estÃˆn denotadas
+	 * Retorna un arreglo de instancias que pertenezcan a la jerarquía de {@link Entity}, que estén denotadas
 	 * por los criterios establecidos en una instancia de {@link GenericModel}.
 	 * @param SearchCriteria $searchCriteria
 	 * @param Criteria       $criteria
@@ -59,7 +59,7 @@ class SearchService implements ISearchService {
 	}
 
 	/**
-	 * Retorna los datos obtenidos a travÃˆs de la instancia de @{Criteria} y aplica la paginaciÃ›n si es que fue
+	 * Retorna los datos obtenidos a través de la instancia de @{Criteria} y aplica la paginación si es que fue
 	 * configurada en la instancia de @{link SearchCriteria}
 	 * @param SearchCriteria $searchCriteria
 	 * @param Criteria $criteria
@@ -179,10 +179,28 @@ class SearchService implements ISearchService {
 			}
 			foreach ($filterProperties as $filter_property) {
 				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property);
-				$criteria->add_select($field_name);
+				$criteria = $this->addSelectField($criteria, $field_name);
 			}
 		}
 		$criteria->add_from($entity->getPersistenceTarget(), $searchCriteria->entity());
+		return $criteria;
+	}
+
+	/**
+	 * Añade un campo al statement de selección al criterio de búsqueda. Cuando el nombre del campo contiene la entity
+	 * o la tabla correspondiente, agrega un alias con el formato {entity|tabla}_{nombre_campo}
+	 * @param $criteria
+	 * @param $field_name
+	 * @return mixed
+	 */
+	private function addSelectField($criteria, $field_name) {
+		if ( preg_match('/^[a-z0-9_]+\.[a-z0-9_]+/i', $field_name) ) {
+			$propertyAlias = str_replace('.', '_', strtolower($field_name));
+			$criteria->add_select($field_name, $propertyAlias);
+		} else {
+			$criteria->add_select($field_name);
+		}
+
 		return $criteria;
 	}
 
