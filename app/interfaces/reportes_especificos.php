@@ -67,6 +67,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 													<li><a href='resumen_abogado.php' style="color:#000;text-decoration: none;"><?php echo __('Rendimiento profesionales') ?></a></li>
 													<li><a href='reportes_usuarios.php' style="color:#000;text-decoration: none;"><?php echo __('Gr&aacute;fico profesionales') ?></a></li>
 													<li><a href='planillas/planilla_demora_ingreso_horas.php' style="color:#000;text-decoration: none;"><?php echo __('Demora ingreso de horas por profesional') ?></a></li>
+													<li><a href='../Reports/produccion_periodo' style="color:#000;text-decoration: none;"><?php echo __('Producción por Periodo') ?></a></li>
 												</ul>
 											</td>
 										</tr>

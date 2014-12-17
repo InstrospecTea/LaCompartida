@@ -1,0 +1,33 @@
+<?php
+
+class ReportsController extends AbstractController {
+
+  public $helpers = array(array('\TTB\Html', 'Html'), 'Form');
+
+  public function index() {
+    $this->layoutTitle = 'Todos los Reportes';
+    $this->info('Haga clic en algún reporte para verlo');
+  }
+
+  public function produccion_periodo() {
+    $this->layoutTitle = 'Reporte de Producción por Periodo';
+    $this->loadBusiness('Sandboxing');
+
+    $searchResult = $this->SandboxingBusiness->data();
+    $this->set('results', $searchResult);
+
+    $report = new TimekeeperProductivityReport();
+    
+    $data = array(
+      array("dato"=> "437", "dato2" => "359700"),
+      array("dato"=> "438", "dato2" => "359710")
+    );
+
+    $report->setData($data);
+    $report->setOutputType('Simple');
+    $report->setConfiguration('sesion', $this->Session);
+    $this->set('report', $report);
+  }
+    
+}
+
