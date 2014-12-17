@@ -80,7 +80,7 @@ class WsFacturacionNubox extends WsFacturacion{
 		$error .= "\n \nInformación de Nubox:\n";
 		$pattern = '/Errores encontrados:\nLinea (.?).(.*)Fin fase/si';
 		preg_match_all($pattern, $result['Descripcion'], $error_description);
-		$error .= $error_description[2][0];
+		$error .= utf8_decode($error_description[2][0]);
 		return $error;
 	}
 
