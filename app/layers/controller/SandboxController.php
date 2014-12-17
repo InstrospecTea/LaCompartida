@@ -8,9 +8,9 @@ class SandboxController extends AbstractController {
 		$this->layoutTitle = 'Sandbox interface';
 		$this->loadBusiness('Sandboxing');
 		$page = empty($this->params['page']) ? null : $this->params['page'];
-		$searchResult = $this->SandboxingBusiness->getSandboxResults(100, $page);
-		$this->set('results', $searchResult->data);
-		$this->set('Pagination', $searchResult->Pagination);
+		$searchResult = $this->SandboxingBusiness->getSandboxResults(50, $page);
+		$this->set('results', $searchResult->get('data'));
+		$this->set('Pagination', $searchResult->get('Pagination'));
 		$this->info('Esto es un sandbox... de gato!');
 	}
 
