@@ -7,4 +7,9 @@ interface ISandboxingBusiness {
 	 */
 	function getSandboxResults();
 
+	/**
+	 * @return mixed
+	 */
+	function data();
+
 }

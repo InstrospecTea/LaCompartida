@@ -14,4 +14,9 @@ class SandboxController extends AbstractController {
 		$this->info('Esto es un sandbox... de gato!');
 	}
 
+	public function data() {
+		$this->loadBusiness('Sandboxing');
+		$searchResult = $this->SandboxingBusiness->data();
+		$this->set('results', $searchResult);
+	}
 }
