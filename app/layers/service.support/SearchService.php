@@ -41,11 +41,36 @@ class SearchService implements ISearchService {
 	 * @return array
 	 */
 	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
+		$entityName = $searchCriteria->entity();
+		return $this->getData($searchCriteria, $criteria, $entityName);
+	}
+
+	/**
+	 * Retorna un arreglo de instancias que pertenezcan a la jerarquÌa de {@link Entity}, que estÈn denotadas
+	 * por los criterios establecidos en una instancia de {@link GenericModel}.
+	 * @param SearchCriteria $searchCriteria
+	 * @param Criteria       $criteria
+	 * @return array
+	 */
+	public function getGenericResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
+		$entityName = 'GenericModel';
+		return $this->getData($searchCriteria, $criteria, $entityName);
+	}
+
+	/**
+	 * Retorna los datos obtenidos a travÈs de la instancia de @{Criteria} y aplica la paginaciÛn si es que fue
+	 * configurada en la instancia de @{link SearchCriteria}
+	 * @param SearchCriteria $searchCriteria
+	 * @param Criteria $criteria
+	 * @param $entityName
+	 * @return array
+	 * @throws Exception
+	 */
+	private function getData(SearchCriteria $searchCriteria, Criteria $criteria = null, $entityName) {
 		if ($searchCriteria->paginate()) {
 			$criteria->add_limit($searchCriteria->Pagination->rows_per_page(), $searchCriteria->Pagination->current_row());
 		}
-		$entity = $searchCriteria->entity();
-		$entity = new ReflectionClass($entity);
+		$entity = new ReflectionClass($entityName);
 		$entity = $entity->newInstance();
 		$data = $this->encapsulateArray($criteria->run(), $entity);
 		if ($searchCriteria->paginate()) {

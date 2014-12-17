@@ -27,4 +27,14 @@ interface ISearchService {
 	 */
 	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null);
 
+
+	/**
+	 * Retorna un arreglo de instancias que pertenezcan a la jerarquía de {@link Entity}, que estén denotadas
+	 * por los criterios establecidos en una instancia de {@link GenericModel}.
+	 * @param SearchCriteria $searchCriteria
+	 * @param Criteria       $criteria
+	 * @return array
+	 */
+	public function getGenericResults(SearchCriteria $searchCriteria, Criteria $criteria = null);
+
 }
