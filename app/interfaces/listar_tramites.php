@@ -570,7 +570,7 @@ $pagina->PrintTop($popup);
 										if ($p_revisor->fields['permitido']) {
 											$where_usuario = '';
 										} else {
-											$where_usuario = "{$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']})";
+											$where_usuario = "AND {$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']}";
 										}
 										echo $Form->select('id_usuario', $sesion->usuario->ListarActivos($where_usuario, 'PRO'), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
 										?>
