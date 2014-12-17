@@ -3,9 +3,9 @@
 class FacturacionElectronicaNubox extends FacturacionElectronica {
 
 	public static function ValidarFactura(Factura $Factura = null) {
-		global $id_factura_padre, $dte_codigo_referencia, $dte_razon_referencia;
+		global $id_factura_padre, $RUT_cliente, $dte_codigo_referencia, $dte_razon_referencia;
 		if (empty($Factura)) {
-			global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
+			global $pagina, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
 		} else {
 			$campos = array(
 				'RUT_cliente' => null,
@@ -20,6 +20,13 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 		$errors = array();
 		if (empty($RUT_cliente)) {
 			$errors[] = __('Debe ingresar RUT del cliente.');
+		} else {
+			$arr_rut = explode('-', $RUT_cliente);
+			$rut = $arr_rut[0];
+			$dv = $arr_rut[1];
+			if (!Utiles::ValidarRut($rut, $dv)) {
+				$errors[] = __('El RUT del cliente no es válido.');
+			}
 		}
 		if (empty($direccion_cliente)) {
 			$errors[] = __('Debe ingresar Dirección del cliente.');
