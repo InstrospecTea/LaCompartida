@@ -170,9 +170,7 @@ class SearchService implements ISearchService {
 		if (empty($arrayResult)) {
 			return null;
 		}
-		foreach ($arrayResult as $property => $value) {
-			$instance->set($property, $value, false);
-		}
+		$this->instance->fillFromArray($arrayResult);
 		return $instance;
 	}
 

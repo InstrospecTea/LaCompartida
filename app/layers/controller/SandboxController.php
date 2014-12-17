@@ -29,6 +29,19 @@ class SandboxController extends AbstractController {
 		$report->setConfiguration('sesion', $this->Session);
 		$this->set('report', $report);
 	}
-		
+
+	public function report() {
+		$this->layoutTitle = 'Sandbox interface';
+		$data = array(1,2,3,4,5);
+		$report = new AgrupatedWorkReport();
+		$report->setData($data);
+		$report->setOutputType('RTF');
+		$report->render();
+	}
+
+	public function changalanga() {
+		pr(shell_exec('cat /etc/issue'));
+	}
+
 }
 
