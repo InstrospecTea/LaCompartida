@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.21.4
+Miércoles 17 de Diciembre 2014
+* **Add:** [Corregir filtro Usuario en mantenedor de trámites](https://github.com/LemontechSA/ttb/pull/796)
+
 ## Hotfix: 14.21.3
 Martes 12 de Diciembre 2014
 * **Add:** [Agrega filtros encargado asunto y encargado comercial en listado de tramites](https://github.com/LemontechSA/ttb/pull/795)
