@@ -15,7 +15,7 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		$searchCriteria = new SearchCriteria('Charge');
 		$searchCriteria->add_scope('canBeInvoiced');
 		$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with('1');
-		if ($x_page) {
+		if ($per_page) {
 			$searchCriteria->Pagination->rows_per_page($per_page);
 		}
 		$this->loadBusiness('Searching');
