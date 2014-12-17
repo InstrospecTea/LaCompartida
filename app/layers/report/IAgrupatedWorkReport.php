@@ -1,5 +1,5 @@
 <?php
 
-interface IAgrupatedWorkReport extends BaseReport{
+interface IAgrupatedWorkReport extends BaseReport {
 
 }

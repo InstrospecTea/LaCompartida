@@ -1,6 +1,6 @@
 <?php
 
-require_once '../../../dompdf/dompdf_config.inc.php';
+require_once APP_PATH.'/dompdf/dompdf_config.inc.php';
 
 class PDFReportEngine extends AbstractReportEngine implements IPDFReportEngine {
 
@@ -13,7 +13,7 @@ class PDFReportEngine extends AbstractReportEngine implements IPDFReportEngine {
 	protected function buildReport($data) {
 		$this->engine->load_html($this->configuration['html']);
 		$this->engine->render();
-		$this->engine->stream($this->configuration['filename'].'pdf');
+		$this->engine->stream($this->configuration['filename']);
 	}
 
 	protected function configurateReport() {

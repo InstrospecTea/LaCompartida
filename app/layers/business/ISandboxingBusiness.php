@@ -12,4 +12,15 @@ interface ISandboxingBusiness {
 	 */
 	function data();
 
-}
+	/**
+	 * @param $data
+	 * @return mixed
+	 */
+	function getSandboxListator($data);
+
+	/**
+	 * @return mixed
+	 */
+	function generateTemporalFile();
+
+} 

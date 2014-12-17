@@ -63,6 +63,18 @@ abstract class Entity {
 	}
 
 	/**
+	 * Comprueba si la instancia que hereda de esta clase tiene definido un valor para su propiedad de identidad.
+	 * @return bool
+	 */
+	public function haveIdentity() {
+		if(is_null($this->get($this->getIdentity()))) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
 	 * Completa las propiedades de una instancia de un objeto cuya clase herede a este, con los valores definidos en un
 	 * array asociativo.
 	 * @param array $properties Propiedades de un objeto.
