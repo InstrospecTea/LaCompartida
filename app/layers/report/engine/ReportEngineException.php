@@ -1,5 +1,5 @@
 <?php
 
-class ReportEngineException extends Exception{
+class ReportEngineException extends Exception {
 
 }
