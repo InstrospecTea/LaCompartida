@@ -14,12 +14,13 @@ class SearchService implements ISearchService {
 	 * @param SearchCriteria $searchCriteria
 	 * @param array          $filter_properties
 	 * @param Criteria       $criteria
+	 * @param bool $widthIdentity
 	 * @return array
 	 */
-	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null) {
+	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null, $withIdentity = true) {
 		$criteria = $this->prepareRelationships($criteria, $searchCriteria);
 		$criteria = $this->prepareRestrictions($criteria, $searchCriteria);
-		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties);
+		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties, $withIdentity);
 		$criteria = $this->prepareGrouping($criteria, $searchCriteria);
 		return $criteria;
 	}
