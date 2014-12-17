@@ -214,9 +214,7 @@ class SearchService implements ISearchService {
 		if (empty($arrayResult)) {
 			return null;
 		}
-		foreach ($arrayResult as $property => $value) {
-			$instance->set($property, $value, false);
-		}
+		$instance->fields = $arrayResult;
 		return $instance;
 	}
 
