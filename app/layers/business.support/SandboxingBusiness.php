@@ -34,6 +34,7 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		$searchCriteria->filter('fecha')->restricted_by('greater_or_equals_than')->compare_with("'2014-01-01'");
 		$searchCriteria->filter('fecha')->restricted_by('lower_or_equals_than')->compare_with("'2014-12-31'");
 
+
 		$filter_properties = array(
 			'Client.codigo_cliente',
 			'Client.glosa_cliente',
@@ -43,6 +44,7 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 			'Work.fecha',
 			'Work.duracion_cobrada',
 			'Work.tarifa_hh_estandar',
+			'Work.id_moneda',
 			'Work.duracion',
 			'User.id_usuario',
 			'User.nombre',
@@ -52,10 +54,22 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 			'Lawyer.apellido1'
 		);
 
-		return $this->SearchingBusiness->searchByGenericCriteria(
+		$data = $this->SearchingBusiness->searchByGenericCriteria(
 			$searchCriteria,
 			$filter_properties
 		);
+
+		$this->loadReport('AgrupatedWork', 'report');
+		$this->report->setData($data);
+		$this->report->setOutputType('RTF');
+		$this->report->setParameters(
+			array(
+				'company_name' => Conf::GetConf($this->Session, 'NombreEmpresa'),
+				'group_by_partner' => true
+			)
+		);
+
+		return $this->report->render();
 	}
 
 	function getSandboxListator($data) {

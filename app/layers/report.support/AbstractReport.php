@@ -5,6 +5,13 @@ abstract class AbstractReport implements BaseReport {
 	var $data;
 	var $reportEngine;
 	var $parameters;
+	var $Session;
+	private $loadedClass = array();
+
+	public function __construct(Sesion $Session) {
+		$this->Session = $Session;
+		$this->setUp();
+	}
 
 	/**
 	 * Exporta los datos según el tipo de {@link ReportEngine} configurado.
@@ -104,6 +111,24 @@ abstract class AbstractReport implements BaseReport {
 	}
 
 	/**
+	 * Carga un Negocio al vuelo
+	 * @param string $name
+	 * @param string $alias
+	 * @return type
+	 */
+	protected function loadBusiness($name, $alias = null) {
+		$classname = "{$name}Business";
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $alias;
+	}
+
+	/**
 	 * Definición del proceso de agrupación de datos definido para cada reporte.
 	 * @param $data
 	 * @return array
@@ -111,6 +136,8 @@ abstract class AbstractReport implements BaseReport {
 	abstract protected function agrupateData($data);
 
 	abstract protected function present();
+
+	abstract protected function setUp();
 
 
 }

@@ -16,8 +16,8 @@ class SandboxController extends AbstractController {
 
 	public function data() {
 		$this->loadBusiness('Sandboxing');
-		$searchResult = $this->SandboxingBusiness->data();
-		$this->set('results', $searchResult);
+		$report = $this->SandboxingBusiness->report();
+		$report->render();
 	}
 
 	public function reporte() {
