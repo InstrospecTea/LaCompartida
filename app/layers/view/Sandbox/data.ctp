@@ -1,2 +1,2 @@
 <h1>Goat!</h1>
-<?php echo count($results); ?>
+<?php echo var_dump($results[0]); ?>

@@ -230,7 +230,7 @@ class SearchService implements ISearchService {
 		$total = (int) count($array);
 		for ($i = 0; $i < $total; $i++) {
 			$empty = $reflected->newInstance();
-			$result[] = $this->encapsulate($array[$i], $empty, false);
+			$result[] = $this->encapsulate($array[$i], $empty);
 		}
 		return $result;
 	}
