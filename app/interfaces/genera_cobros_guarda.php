@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(__FILE__) . '/../conf.php';
 
 Log::write("Cliente {$_POST['codigo_cliente']}", Cobro::PROCESS_NAME);
@@ -27,7 +28,7 @@ if ((!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0 ) && isset($_
 
 // Retrocompatibilidad con funcionamiento de Conf en GTD Solicitado por @gtigre el 26-03-2014
 if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
-	$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) FROM cobro WHERE id_contrato = '" . $id_contrato . "'";
+	$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) FROM cobro WHERE id_contrato = '$id_contrato'";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	list($fecha_ini_cobro) = mysql_fetch_array($resp);
 } else {
@@ -49,29 +50,27 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
 }
 
-if ($individual) {
+if ($individual && $id_contrato) {
 	$Cobro = new Cobro($Sesion);
-	if ($id_contrato) {
+	$id_proceso_nuevo = $Cobro->GeneraProceso();
 
-		$id_proceso_nuevo = $Cobro->GeneraProceso();
+	if (empty($monto)) {
+		$monto = '';
+	}
 
-		if (empty($monto)) {
-			$monto = '';
-		}
-		if (empty($id_cobro_pendiente)) {
-			$id_cobro_pendiente = '';
-		}
+	if (empty($id_cobro_pendiente)) {
+		$id_cobro_pendiente = '';
+	}
 
-		$id = $Cobro->PrepararCobro(
-				$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios
-		);
+	$id = $Cobro->PrepararCobro(
+		$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios
+	);
 
-		if ($id) {
-			if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
-				die($id);
-			} else {
-				$Pagina->Redirect('cobros5.php?id_cobro=' . $id . '&popup=1');
-			}
+	if ($id) {
+		if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
+			die($id);
+		} else {
+			$Pagina->Redirect('cobros5.php?id_cobro=' . $id . '&popup=1');
 		}
 	}
 }
@@ -88,7 +87,6 @@ if ($codigo_asunto && !$id_contrato) {
 	$Contrato->LoadByCodigoAsunto($codigo_asunto);
 	$id_contrato = $Contrato->fields['id_contrato'];
 }
-
 ####### WHERE SQL ########
 if ($print || $emitir) {
 
@@ -143,9 +141,8 @@ if ($print || $emitir) {
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_generar_cobro') : false;
 
 	$url = "genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
-			"&fecha_fin=$fecha_fin&opc=buscar&rango=$rango&fecha_anio=$fecha_anio&fecha_mes=$fecha_mes&fecha_periodo_ini=$fecha_periodo_ini" .
-			"&fecha_periodo_fin=$fecha_periodo_fin&usar_periodo=$usar_periodo&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto";
-
+		"&fecha_fin=$fecha_fin&opc=buscar&rango=$rango&fecha_anio=$fecha_anio&fecha_mes=$fecha_mes&fecha_periodo_ini=$fecha_periodo_ini" .
+		"&fecha_periodo_fin=$fecha_periodo_fin&usar_periodo=$usar_periodo&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto";
 }
 ####### END #########
 # IMPRESION
@@ -188,7 +185,6 @@ if ($print) {
 			echo "\n<script type=\"text/javascript\">var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
 			die('No hay datos para su criterio de búsqueda');
 		}
-
 	} catch (PDOException $pdoe) {
 		debug($pdoe->getTraceAsString());
 	} catch (Exception $e) {
@@ -198,7 +194,6 @@ if ($print) {
 	if (is_object($Pagina)) {
 		$Pagina->Redirect($url);
 	}
-
 } else if ($emitir) {
 	$Cobro = new Cobro($Sesion);
 	$errores_cobro = array();
@@ -259,7 +254,6 @@ if ($print) {
 		$Pagina->Redirect($url);
 	}
 } else { #Creación masiva de cobros
-
 	$where = 1;
 	$join = "";
 	$newcobro = array();
@@ -365,9 +359,9 @@ if ($print) {
 		Log::write(' |- redirect', Cobro::PROCESS_NAME);
 		Log::write(' -', Cobro::PROCESS_NAME);
 		$Pagina->Redirect(
-				"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
-				"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .
-				"&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto"
+			"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
+			"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .
+			"&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto"
 		);
 	}
 }

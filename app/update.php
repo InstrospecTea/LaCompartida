@@ -10564,10 +10564,27 @@ QUERY;
 							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion` `descripcion` MEDIUMTEXT NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion_modificado` `descripcion_modificado` MEDIUMTEXT NULL DEFAULT NULL ,
-							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL , 
+							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL ,
 							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
+			break;
+		case 7.87:
+			$queries[] = "CREATE TABLE `bloqueo_procesos` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`id_usuario` int(11) NOT NULL,
+							`nombre_usuario` varchar(100) NOT NULL,
+							`proceso` varchar(32) NOT NULL,
+							`bloqueado` tinyint(1) NOT NULL,
+							`estado` varchar(512) NOT NULL DEFAULT '',
+							`notificado` varchar(45) NOT NULL,
+							`fecha_creacion` datetime NOT NULL,
+							`fecha_modificacion` datetime DEFAULT NULL,
+							PRIMARY KEY (`id`),
+							KEY `id_usuario_ndx` (`id_usuario`),
+							KEY `bloqueado_ndx` (`bloqueado`),
+							KEY `notificado_ndx` (`notificado`)
+						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 			break;
 	}
 	if (!empty($queries)) {
@@ -10580,7 +10597,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.86;
+$max_update = 7.87;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

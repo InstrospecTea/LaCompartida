@@ -1946,7 +1946,6 @@ if (!class_exists('Cobro')) {
 				//si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
 				$genera = $emitir_obligatoriamente;
 				if (!$genera) {
-					pr('wip');
 					$wip = $contrato->ProximoCobroEstimado($fecha_ini, $fecha_fin, $contrato->fields['id_contrato']);
 
 					if (!empty($incluye_honorarios)) {
@@ -1963,8 +1962,6 @@ if (!class_exists('Cobro')) {
 						}
 					}
 				}
-
-				pr(compact('fecha_ini', 'fecha_fin', 'id_contrato', 'emitir_obligatoriamente', 'id_proceso', 'monto', 'id_cobro_pendiente', 'id_contrato', 'con_gastos', 'solo_gastos', 'incluye_gastos', 'incluye_honorarios', 'genera'));
 
 				if ($genera) {
 
