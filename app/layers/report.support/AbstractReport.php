@@ -4,6 +4,7 @@ abstract class AbstractReport implements BaseReport {
 
 	var $data;
 	var $reportEngine;
+	var $parameters;
 
 	/**
 	 * Exporta los datos según el tipo de {@link ReportEngine} configurado.
@@ -62,6 +63,23 @@ abstract class AbstractReport implements BaseReport {
 			throw new ReportException('This report instance does not have an instance of ReportEngine.');
 		}
 
+	}
+
+	/**
+	 * Establece los parametros del reporte. Será utilizado para generar la estructura del reporte.
+	 * @param $parameterKey
+	 * @param $parameter
+	 */
+	function setParameter($parameterKey, $parameter) {
+		$this->parameters[$parameterKey] = $parameter;
+	}
+
+	/**
+	 * Establece los parametros del reporte. Será utilizado para generar la estructura del reporte.
+	 * @param $parameters
+	 */
+	function setParameters($parameters) {
+		$this->parameters = $parameters;
 	}
 
 	/**
