@@ -1,5 +1,39 @@
 # Changelog
 
+## Hotfix: 14.21.4
+Miércoles 17 de Diciembre 2014
+* **Add:** [Corregir filtro Usuario en mantenedor de trámites](https://github.com/LemontechSA/ttb/pull/798)
+
+## Hotfix: 14.21.3
+Martes 12 de Diciembre 2014
+* **Add:** [Agrega filtros encargado asunto y encargado comercial en listado de tramites](https://github.com/LemontechSA/ttb/pull/795)
+* **Add:** [Agrega filtro encargado asunto en listado de horas](https://github.com/LemontechSA/ttb/pull/795)
+
+## Hotfix: 14.21.2
+Viernes 12 de Diciembre 2014
+* **Fix:** [Corregir validación de región en formulario de cliente](https://github.com/LemontechSA/ttb/pull/791)
+
+## Hotfix: 14.21.1
+Jueves 11 de Diciembre 2014
+* **Fix:** [Selección de formato de nota de cobro por defecto](https://github.com/LemontechSA/ttb/pull/788)
+
+## Release: 14.21.0
+Miércoles 10 de Diciembre 2014
+* **Feature:** [Notas de Crédito/Débito FacturacionCL](https://github.com/LemontechSA/ttb/pull/774)
+* **Feature:** [Fecha de vencimiento en PDF Facturas](https://github.com/LemontechSA/ttb/pull/764)
+
+## Hotfix: 14.20.9
+Miercoles 10 de Diciembre 2014
+* **Fix:** [Selecciona serie y número de documento correctamente al editar o agregar.](https://github.com/LemontechSA/ttb/pull/786)
+
+## Hotfix: 14.20.8
+Martes 9 de Diciembre 2014
+* **Fix:** [No genera excepción si una de las notas de cobro devuelve vacío, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
+
+## Hotfix: 14.20.7
+Jueves 4 de Diciembre 2014
+* **New:** [Agregar filtros para twig](https://github.com/LemontechSA/ttb/pull/778)
+
 ## Hotfix: 14.20.6
 Viernes 28 de Noviembre 2014
 * **Change:** [Agrega tags a petición de Olmedo](https://github.com/LemontechSA/ttb/pull/773)

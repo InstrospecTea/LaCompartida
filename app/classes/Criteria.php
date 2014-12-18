@@ -129,9 +129,13 @@ class Criteria {
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function add_limit($limit) {
+	public function add_limit($limit, $from = 0) {
 		if (is_numeric($limit) && $limit >= 0) {
-			$this->limit = ' LIMIT ' . $limit;
+			if ($from) {
+				$this->limit = " LIMIT $from, $limit";
+			} else {
+				$this->limit = " LIMIT $limit";
+			}
 			return $this;
 		} else {
 			throw new Exception('Criteria dice: Parámetro asociado al limite de resultados de la query es erróneo. Se esperaba un entero mayor que cero, se obtuvo: ' . "$limit");
@@ -347,7 +351,7 @@ class Criteria {
 	 */
 	private function generate_join_statement() {
 		if (count($this->join_clauses) > 0) {
-			return implode(' ', $this->join_clauses);
+			return "\n" . implode("\n", $this->join_clauses) . "\n" ;
 		} else {
 			return '';
 		}
@@ -425,6 +429,16 @@ class Criteria {
 		$statement = $sesion->pdodbh->prepare($query);
 		$statement->execute();
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public function reset_selection() {
+		$this->select_clauses = array();
+		return $this;
+	}
+
+	public function reset_limits() {
+		$this->limit = '';
+		return $this;
 	}
 
 

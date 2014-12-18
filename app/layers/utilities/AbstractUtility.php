@@ -11,7 +11,7 @@ abstract class AbstractUtility {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	function __call($name, $arguments) {
+	public function __call($name, $arguments) {
 		if (method_exists($this, $name)) {
 			return call_user_func($name, $arguments);
 		} else {
@@ -19,12 +19,15 @@ abstract class AbstractUtility {
 				$reflection = new ReflectionObject($this);
 				$property = $reflection->getProperty($name);
 				$property->setAccessible(true);
-				return $property->getValue($this);
-			}
-			else {
+				if (empty($arguments)) {
+					return $property->getValue($this);
+				} else {
+					$property->setValue($this, $arguments[0]);
+				}
+			} else {
 				throw new UtilityException("No existe referencia a $name");
 			}
 		}
 	}
 
-} 
+}

@@ -141,7 +141,11 @@ class AlertaCron {
 		$prof->LoadId($id_persona);
 
 		$mensaje_restriccion_minimo = "El usuario NO ha ingresado el MINIMO de horas durante los últimos 7 días";
-		$mensaje_restriccion_minimo = Conf::GetConf($sesion, 'MensajeRestriccionSemanal');
+		if (method_exists('Conf', 'GetConf')) {
+			$mensaje_restriccion_minimo = Conf::GetConf($sesion, 'MensajeRestriccionSemanal');
+		} else if (method_exists('Conf', 'MensajeRestriccionSemanal')) {
+			$mensaje_restriccion_minimo = Conf::MensajeRestriccionSemanal();
+		}
 
 		if ($opc_mail == 'mail_hrs_semanales') {
 			if ($prof->fields['restriccion_min'] > 0)
@@ -226,7 +230,10 @@ class AlertaCron {
 
 	function enviarAvisoCobrosProgramados($mensajes, $sesion) {
 		$from = html_entity_decode(Conf::AppName());
-		$to = Conf::GetConf($sesion, 'MailAdmin');
+
+		if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MailAdmin') != '') {
+			$to = Conf::GetConf($sesion, 'MailAdmin'); // Mail al admin
+		}
 
 		foreach ($mensajes as $id_usuario => $mensaje) {
 			Utiles::InsertarPlus($sesion, "Aviso $from", $mensaje, $to, "Administrador");

@@ -5,13 +5,16 @@
  * Clase que define los criterios de búsqueda para distintas entidades.
  * Class SearchCriteria
  */
-class SearchCriteria extends AbstractUtility{
+class SearchCriteria extends AbstractUtility {
 
 
 	protected $entity;
 	protected $filters;
 	protected $relationships;
 	protected $scopes;
+	protected $groups;
+	public $Pagination;
+	public $paginate = false;
 
 	/**
 	 * Crea un criterio de búsqueda de una entidad en particular definida por $entity_name. Esta entidad debe pertenecer
@@ -30,6 +33,7 @@ class SearchCriteria extends AbstractUtility{
 		$this->filters = array();
 		$this->relationships = array();
 		$this->scopes = array();
+		$this->Pagination = new Pagination();
 	}
 
 	/**
@@ -62,7 +66,14 @@ class SearchCriteria extends AbstractUtility{
 		return $this;
 	}
 
-
-
+	/**
+	 * Agrega agrupadores
+	 * @param type $field
+	 * @return \SearchCriteria
+	 */
+	public function grouped_by($field) {
+		$this->groups[] = $field;
+		return $this;
+	}
 
 }

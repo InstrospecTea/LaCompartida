@@ -22,6 +22,7 @@ $Slim->hook('hook_cobros7_botones_after', function($hookArg) {
 $Slim->hook('hook_genera_factura_electronica', function($hookArg) {
   return FacturacionElectronicaCl::GeneraFacturaElectronica($hookArg);
 });
+$Slim->hook('hook_descargar_pdf_factura_electronica', array($clase, 'DescargarPdf'));
 $Slim->hook('hook_anula_factura_electronica', function($hookArg) {
   return FacturacionElectronicaCl::AnulaFacturaElectronica($hookArg);
 });
