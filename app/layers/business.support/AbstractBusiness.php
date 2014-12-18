@@ -2,13 +2,19 @@
 
 class AbstractBusiness implements BaseBusiness {
 
+	/**
+	 * @deprecated
+	 * @var sesion
+	 */
 	var $sesion;
+	var $Session;
 	var $errors = array();
 	var $infos = array();
 	private $loadedClass = array();
 
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
+		$this->Session = $sesion;
 	}
 
 	/**
