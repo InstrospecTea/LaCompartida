@@ -6,8 +6,9 @@ class RTFReportEngine extends AbstractReportEngine implements IRTFReportEngine {
 
 	protected function buildReport($data) {
 		$html = $this->configuration['html'];
+		$filename = $this->configuration['filename'];
 		header('Content-type: application/msword');
-		header('Content-Disposition: attachment; filename=survey_result.rtf');
+		header("Content-Disposition: attachment; filename={$filename}.rtf");
 		echo $html;
 		die();
 	}
