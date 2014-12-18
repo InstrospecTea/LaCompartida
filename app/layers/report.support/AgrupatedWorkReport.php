@@ -18,23 +18,84 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	 * @return array
 	 */
 	protected function agrupateData($data) {
+		if ($this->parameters['agrupationType'] == 'lawyer') {
+			return $this->laywerAgrupation($data);
+		}
+		if ($this->parameters['agrupationType'] == 'client') {
+			return $this->clientAgrupation($data);
+		}
+		return $this->clientAgrupation($data);
+	}
+
+	/**
+	 * @param $data
+	 * @return array
+	 */
+	private function laywerAgrupation($data) {
 		$grupos = array();
 		$t = count($data);
-
 		for ($x = 0; $x < $t; ++$x) {
 			$fila = $data[$x];
+			$id_usuario = $fila->fields['lawyer_id_usuario'];
+			$lawyer_name = "{$fila->fields['lawyer_apellido1']}, {$fila->fields['lawyer_nombre']}";
+			if (empty($grupos[$id_usuario])) {
+				$grupos[$id_usuario] = array(
+					'nombre' => $lawyer_name,
+					'clientes' => array()
+				);
+			}
 
+			$codigo_cliente = $fila->fields['client_codigo_cliente'];
+			if (empty($grupos[$id_usuario]['clientes'][$codigo_cliente])) {
+				$grupos[$id_usuario]['clientes'][$codigo_cliente] = array(
+					'nombre' => $fila->fields['client_glosa_cliente'],
+					'asuntos' => array()
+				);
+			}
+
+			$id_asunto = $fila->fields['matter_id_asunto'];
+			if (empty($grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto])) {
+				$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto] = array(
+					'codigo_cliente' => $codigo_cliente,
+					'nombre' => $fila->fields['matter_glosa_asunto'],
+					'trabajos' => array()
+				);
+			}
+
+			$trabajo = array();
+			$trabajo['usr_nombre'] = $lawyer_name;
+			$trabajo['fecha'] = $fila->fields['work_fecha'];
+			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
+			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
+			$duration_parts = explode(":", $fila->fields['work_duracion']);
+			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
+			$trabajo['valor_facturado'] = $trabajo['duracion_minutos'] * $fila->fields['work_tarifa_hh_estandar'];
+			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
+		}
+		return $grupos;
+	}
+
+	/**
+	 * @param $data
+	 * @return array
+	 */
+	private function clientAgrupation($data) {
+		$grupos = array();
+		$t = count($data);
+		for ($x = 0; $x < $t; ++$x) {
+			$fila = $data[$x];
 			$por_socio = $this->parameters['group_by_partner'];
 			$id_socio = $por_socio ? $fila->fields['user_id_usuario'] : 0;
+
 			if (empty($grupos[$id_socio])) {
 				$grupos[$id_socio] = array(
 					'nombre' => "{$fila->fields['user_apellido1']}, {$fila->fields['user_nombre']}",
 					'usuarios' => array()
 				);
 			}
-
 			$id_usuario = $fila->fields['lawyer_id_usuario'];
 			$lawyer_name = "{$fila->fields['lawyer_apellido1']}, {$fila->fields['lawyer_nombre']}";
+
 			if (empty($grupos[$id_socio]['usuarios'][$id_usuario])) {
 				$grupos[$id_socio]['usuarios'][$id_usuario] = array(
 					'nombre' => $lawyer_name,
@@ -64,14 +125,11 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
 			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
-
 			$duration_parts = explode(":", $fila->fields['work_duracion']);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			$trabajo['valor_facturado'] = $trabajo['duracion_minutos'] * $fila->fields['work_tarifa_hh_estandar'];
-
 			$grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
-
 		return $grupos;
 	}
 

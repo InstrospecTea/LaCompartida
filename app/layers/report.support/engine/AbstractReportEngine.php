@@ -11,9 +11,6 @@ abstract class AbstractReportEngine implements BaseReportEngine {
 	 * @throws ReportEngineException
 	 */
 	function render($data) {
-		if (empty($data)) {
-			throw new ReportEngineException('The data for render can not be empty.');
-		}
 		$this->configurateReport();
 		return $this->buildReport($data);
 	}

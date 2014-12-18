@@ -14,39 +14,10 @@ class SandboxController extends AbstractController {
 		$this->info('Esto es un sandbox... de gato!');
 	}
 
-	public function data() {
-		$this->loadBusiness('Sandboxing');
-		$report = $this->SandboxingBusiness->report();
-		$report->render();
-	}
-
-	public function reporte() {
-		$this->layoutTitle = 'Reporte de Productividad';
-		
-		$report = new TimekeeperProductivityReport();
-		
-		$data = array(
-			array("dato"=> "437", "dato2" => "359700"),
-			array("dato"=> "438", "dato2" => "359710")
-		);
-
-		$report->setData($data);
-		$report->setOutputType('Simple');
-		$report->setConfiguration('sesion', $this->Session);
-		$this->set('report', $report);
-	}
-
 	public function report() {
-		$this->layoutTitle = 'Sandbox interface';
-		$data = array(1,2,3,4,5);
-		$report = new AgrupatedWorkReport();
-		$report->setData($data);
-		$report->setOutputType('RTF');
+		$this->loadBusiness('Sandboxing');
+		$report = $this->SandboxingBusiness->report($this->data);
 		$report->render();
-	}
-
-	public function changalanga() {
-		pr(shell_exec('cat /etc/issue'));
 	}
 
 }
