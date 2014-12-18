@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.21.5
+Jueves 18 de Diciembre 2014
+* **Fix:** [calculo de total de horas por día](https://github.com/LemontechSA/ttb/pull/799)
+
 ## Hotfix: 14.21.4
 Miércoles 17 de Diciembre 2014
 * **Add:** [Corregir filtro Usuario en mantenedor de trámites](https://github.com/LemontechSA/ttb/pull/798)

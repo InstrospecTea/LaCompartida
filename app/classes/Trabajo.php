@@ -67,26 +67,33 @@ class Trabajo extends Objeto
 	}
 
 	function Check() {
-		if ($this->Loaded() && $this->changes['fecha']
-				&& !in_array($this->fields['estado_cobro'], array('', 'SIN COBRO', 'CREADO', 'EN REVISION'))) {
+		if ($this->Loaded() && $this->changes['fecha'] && !in_array($this->fields['estado_cobro'], array('', 'SIN COBRO', 'CREADO', 'EN REVISION'))) {
 			$this->error = 'No se puede mover un trabajo cobrado';
 			return false;
 		}
-		if 	($this->changes['fecha'] || $this->changes['id_usuario'] ||
-				$this->changes['id_trabajo'] || $this->changes['duracion']
-			) {
-				$horasenfecha = $this->HorasEnFecha(
-					$this->fields['fecha'],
-					$this->fields['id_usuario'],
-					$this->fields['id_trabajo']
-				);
-				$duracion = $this->fields['duracion'];
-				$duracionsegundos = strtotime($duracion) - strtotime('today');
-				$totaldiacondicional = ($horasenfecha['duracion'] + $duracionsegundos);
-				if ($totaldiacondicional >= 86400) {
-					$this->error = 'No se puede trabajar más de 24 horas diarias';
-					return false;
-				}
+
+		if ($this->changes['fecha'] || $this->changes['id_usuario'] || $this->changes['id_trabajo'] || $this->changes['duracion']) {
+			$horasenfecha = $this->HorasEnFecha(
+				$this->fields['fecha'],
+				$this->fields['id_usuario'],
+				$this->fields['id_trabajo']
+			);
+
+			// la duración del trabajo que se está editanto se transforma a segundos
+			$parsed = date_parse($this->fields['duracion']);
+			$work_seconds = $parsed['hour'] * 3600 + $parsed['minute'] * 60 + $parsed['second'];
+
+			// la suma total de horas del día vienen en segundos según el método "HorasEnFecha"
+			$works_seconds = $horasenfecha['duracion'];
+
+			// se suman las horas del trabajo mas el total de horas del día
+			$seconds_total_day = $works_seconds + $work_seconds;
+
+			// 86400 = 24 horas
+			if ($seconds_total_day >= 86400) {
+				$this->error = 'No se puede trabajar más de 24 horas diarias';
+				return false;
+			}
 		}
 		return true;
 	}
@@ -126,7 +133,7 @@ class Trabajo extends Objeto
 			$clauses[] = CriteriaRestriction::equals('id_usuario', "'$id_usuario'");
 		}
 		if (!empty($id_trabajo)) {
-			$clauses[] = CriteriaRestriction::equals('id_trabajo', "'$id_trabajo'");
+			$clauses[] = CriteriaRestriction::not_equal('id_trabajo', "'$id_trabajo'");
 		}
 		$criteria->add_restriction(
 			CriteriaRestriction::and_clause($clauses)
