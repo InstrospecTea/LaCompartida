@@ -99,4 +99,22 @@ class AbstractBusiness implements BaseBusiness {
 		$this->loadedClass[] = $alias;
 	}
 
+	/**
+	 * Carga un Reporte al vuelo
+	 * @param string $name
+	 * @param string $alias
+	 * @return type
+	 */
+	protected function loadReport($name, $alias = null) {
+		$classname = "{$name}Report";
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $alias;
+	}
+
 }
