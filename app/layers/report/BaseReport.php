@@ -24,5 +24,16 @@ interface BaseReport {
 	 */
 	function setConfiguration($configurationKey, $configuration);
 
+	/**
+	 * Asigna un parametro al reporte. Será utilizado para generar la estructura del reporte.
+	 * @param $parameterKey
+	 * @param $parameter
+	 */
+	function setParameter($parameterKey, $parameter);
 
+	/**
+	 * Establece los parametros del reporte. Será utilizado para generar la estructura del reporte.
+	 * @param $parameters
+	 */
+	function setParameters($parameters);
 }
