@@ -212,9 +212,6 @@ class SearchService implements ISearchService {
 	 * @return
 	 */
 	private function encapsulate($arrayResult, $instance) {
-		if (empty($arrayResult)) {
-			return null;
-		}
 		$instance->fields = $arrayResult;
 		return $instance;
 	}
@@ -225,12 +222,10 @@ class SearchService implements ISearchService {
 	 * @return array
 	 */
 	private function encapsulateArray($array, $entity) {
-		$result = array();
-		$reflected = new ReflectionClass($entity);
 		$total = (int) count($array);
+		$result = new SplFixedArray($total);
 		for ($i = 0; $i < $total; $i++) {
-			$empty = $reflected->newInstance();
-			$result[] = $this->encapsulate($array[$i], $empty);
+			$result[$i] = $this->encapsulate($array[$i], new $entity());
 		}
 		return $result;
 	}

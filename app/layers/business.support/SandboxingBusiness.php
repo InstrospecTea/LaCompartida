@@ -30,7 +30,9 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
 		$searchCriteria->related_with('User')->joined_with('Contract')->on_property('id_usuario')->on_entity_property('id_usuario_responsable');
 		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
-		$searchCriteria->filter('fecha')->restricted_by('greater_or_equals_than')->compare_with("'2014-10-01'");
+		$searchCriteria->filter('codigo_cliente')->restricted_by('equals')->compare_with("'000003'")->for_entity('Client');
+		$searchCriteria->filter('fecha')->restricted_by('greater_or_equals_than')->compare_with("'2014-01-01'");
+		$searchCriteria->filter('fecha')->restricted_by('lower_or_equals_than')->compare_with("'2014-12-31'");
 
 		$filter_properties = array(
 			'Client.codigo_cliente',
