@@ -1922,7 +1922,7 @@ if (!class_exists('Cobro')) {
 		 * @param type $cobro_programado
 		 * @return type
 		 */
-		function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
+		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
@@ -1946,6 +1946,7 @@ if (!class_exists('Cobro')) {
 				//si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
 				$genera = $emitir_obligatoriamente;
 				if (!$genera) {
+					pr('wip');
 					$wip = $contrato->ProximoCobroEstimado($fecha_ini, $fecha_fin, $contrato->fields['id_contrato']);
 
 					if (!empty($incluye_honorarios)) {
@@ -1962,6 +1963,8 @@ if (!class_exists('Cobro')) {
 						}
 					}
 				}
+
+				pr(compact('fecha_ini', 'fecha_fin', 'id_contrato', 'emitir_obligatoriamente', 'id_proceso', 'monto', 'id_cobro_pendiente', 'id_contrato', 'con_gastos', 'solo_gastos', 'incluye_gastos', 'incluye_honorarios', 'genera'));
 
 				if ($genera) {
 
