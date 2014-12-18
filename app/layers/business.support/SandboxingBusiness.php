@@ -30,6 +30,7 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
 		$searchCriteria->related_with('User')->joined_with('Contract')->on_property('id_usuario')->on_entity_property('id_usuario_responsable');
 		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
+		$searchCriteria->filter('codigo_cliente')->restricted_by('equals')->compare_with("'000003'")->for_entity('Client');
 		$searchCriteria->filter('fecha')->restricted_by('greater_or_equals_than')->compare_with("'2014-10-01'");
 
 		$filter_properties = array(
@@ -41,6 +42,7 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 			'Work.fecha',
 			'Work.duracion_cobrada',
 			'Work.tarifa_hh_estandar',
+			'Work.id_moneda',
 			'Work.duracion',
 			'User.id_usuario',
 			'User.nombre',
@@ -50,10 +52,22 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 			'Lawyer.apellido1'
 		);
 
-		return $this->SearchingBusiness->searchByGenericCriteria(
+		$data = $this->SearchingBusiness->searchByGenericCriteria(
 			$searchCriteria,
 			$filter_properties
 		);
+
+		$this->loadReport('AgrupatedWork', 'report');
+		$this->report->setData($data);
+		$this->report->setOutputType('RTF');
+		$this->report->setParameters(
+			array(
+				'company_name' => Conf::GetConf($this->Session, 'NombreEmpresa'),
+				'group_by_partner' => true
+			)
+		);
+
+		return $this->report->render();
 	}
 
 	function getSandboxListator($data) {
