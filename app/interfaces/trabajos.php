@@ -1244,7 +1244,7 @@ echo $Form->script();
 		});
 
 		jQuery('#descargar_pdf_agrupado').click(function() {
-			var form = jQuery('#form_trabajos');
+			var form = jQuery('#form_trabajos').clone();
 			jQuery('<input>').attr({
 				type: 'hidden',
 				id: 'agrupationType',
@@ -1261,12 +1261,12 @@ echo $Form->script();
 		});
 
 		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
-			var form = jQuery('#form_trabajos');
+			var form = jQuery('#form_trabajos').clone();
 			jQuery('<input>').attr({
-							type: 'hidden',
-							id: 'agrupationType',
-							name: 'agrupationType',
-							value: 'lawyer'
+				type: 'hidden',
+				id: 'agrupationType',
+				name: 'agrupationType',
+				value: 'lawyer'
 			}).appendTo(form);
 			form.attr('action','../Report/agrupatedWork').submit();;
 		});

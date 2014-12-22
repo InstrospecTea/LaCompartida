@@ -31,7 +31,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	 * @param $data
 	 * @return array
 	 */
-	private function laywerAgrupation($data) {
+ 	private function laywerAgrupation($data) {
 		$grupos = array();
 		$t = count($data);
 		for ($x = 0; $x < $t; ++$x) {
@@ -250,7 +250,13 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	}
 
 	private function getHTML() {
-		return $this->createHtmlContent();
+		if ($this->parameters['agrupationType'] == 'lawyer') {
+			return $this->createLawyerHtmlContent();
+		}
+		if ($this->parameters['agrupationType'] == 'client') {
+			return $this->createClientHtmlContent();
+		}
+		return $this->createClientHtmlContent();
 	}
 
 	private function getFileName() {
@@ -263,7 +269,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	}
 
 	private function getHeader() {
-		$header = $this->parameter['company_name'];
+		$header = $this->parameter['companyName'];
 		$title = $this->getTitle();
 		$col1 = __('FECHA');
 		$col2 = __('ABOGADO');
@@ -303,26 +309,22 @@ return <<<HTML
 HTML;
 	}
 
-	private function createHtmlContent() {
+	private function createClientHtmlContent() {
 		$html = '';
-		$por_socio = $this->parameters['group_by_partner'];
-
+		$por_socio = $this->parameters['groupByPartner'];
 		foreach ($this->data as $socio) {
 			$html_usuarios = '';
-
 			foreach ($socio['usuarios'] as $usuario) {
 				$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
 				$html_clientes = '';
 				$ths = '';
 				$total_minutos_abogado = 0;
 				$total_facturado_abogado = 0;
-
 				foreach ($usuario['clientes'] as $cliente) {
 					$nombre_cliente = $this->Html->tag('h3', $cliente['nombre']);
 					$html_asuntos = '';
 					$total_minutos_cliente = 0;
 					$total_facturado_cliente = 0;
-
 					foreach ($cliente['asuntos'] as $asunto) {
 						$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
 						$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], true);
@@ -330,7 +332,6 @@ HTML;
 						$total_minutos_cliente += $trabajos['minutos'];
 						$total_facturado_cliente += $trabajos['total_facturado'];
 					}
-
 					$trs = $this->Html->tag(
 						'tr',
 						$this->Html->tag('th', '', array('class' => 'col1')) .
@@ -338,13 +339,11 @@ HTML;
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
 						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
 					);
-
 					$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
 					$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
 					$total_minutos_abogado += $total_minutos_cliente;
 					$total_facturado_abogado += $total_facturado_cliente;
 				}
-
 				$ths .= $this->Html->tag('th', '', array('class' => 'col1'));
 				$ths .= $this->Html->tag('th', __('Total abogado'), array('class' => 'col2'));
 				$ths .= $this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'));
@@ -358,9 +357,7 @@ HTML;
 					),
 					array('class' => 'col3')
 				);
-
 				$trs = $this->Html->tag('tr', $ths);
-
 				$html_clientes .= $this->Html->tag('table', $trs, array('class' => 'table'));
 				$html_usuarios .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
 			}
@@ -369,6 +366,40 @@ HTML;
 			$html .= $this->Html->tag('div', $this->Html->tag('h2', $nombre_socio) . $html_usuarios);
 		}
 
+		return $html;
+	}
+
+	private function createLawyerHtmlContent() {
+		$html = '';
+		foreach ($this->data as $usuario) {
+			$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
+			$html_clientes = '';
+			$total_minutos_abogado = 0;
+			foreach ($usuario['clientes'] as $cliente) {
+				$nombre_cliente = $this->Html->tag('h3', $cliente['nombre']);
+				$html_asuntos = '';
+				$total_minutos_cliente = 0;
+				foreach ($cliente['asuntos'] as $asunto) {
+					$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
+					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], false);
+					$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
+					$total_minutos_cliente += $trabajos['minutos'];
+				}
+				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
+					$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+					$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
+				);
+				$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
+				$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
+				$total_minutos_abogado += $total_minutos_cliente;
+			}
+			$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
+				$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
+				$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'))
+			);
+			$html_clientes .= $this->Html->tag('table', $trs, array('class' => 'table'));
+			$html .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
+		}
 		return $html;
 	}
 

@@ -81,14 +81,16 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		);
 
 		$this->loadReport('AgrupatedWork', 'report');
-		$this->report->setData($reportData);
-		$this->report->setOutputType('RTF');
 		$this->report->setParameters(
 			array(
-				'company_name' => Conf::GetConf($this->Session, 'NombreEmpresa'),
-				'group_by_partner' => true
+				'companyName' => Conf::GetConf($this->Session, 'NombreEmpresa'),
+				'groupByPartner' => empty($data['group_by_partner']) ? 0 : $data['group_by_partner'],
+				'agrupationType' => $data['agrupationType']
 			)
 		);
+		$this->report->setData($reportData);
+		$this->report->setOutputType('RTF');
+
 
 		return $this->report;
 	}
