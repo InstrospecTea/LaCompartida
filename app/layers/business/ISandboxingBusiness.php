@@ -10,7 +10,7 @@ interface ISandboxingBusiness {
 	/**
 	 * @return mixed
 	 */
-	function data();
+	function report($data);
 
 	/**
 	 * @param $data

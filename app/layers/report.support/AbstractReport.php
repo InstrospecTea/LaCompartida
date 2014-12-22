@@ -4,6 +4,14 @@ abstract class AbstractReport implements BaseReport {
 
 	var $data;
 	var $reportEngine;
+	var $parameters;
+	var $Session;
+	private $loadedClass = array();
+
+	public function __construct(Sesion $Session) {
+		$this->Session = $Session;
+		$this->setUp();
+	}
 
 	/**
 	 * Exporta los datos según el tipo de {@link ReportEngine} configurado.
@@ -65,6 +73,23 @@ abstract class AbstractReport implements BaseReport {
 	}
 
 	/**
+	 * Establece los parametros del reporte. Será utilizado para generar la estructura del reporte.
+	 * @param $parameterKey
+	 * @param $parameter
+	 */
+	function setParameter($parameterKey, $parameter) {
+		$this->parameters[$parameterKey] = $parameter;
+	}
+
+	/**
+	 * Establece los parametros del reporte. Será utilizado para generar la estructura del reporte.
+	 * @param $parameters
+	 */
+	function setParameters($parameters) {
+		$this->parameters = $parameters;
+	}
+
+	/**
 	* Retorna una instancia que pertenece a la jerarquía de {@link ReportEngine} según el tipo indicado como parametro.
 	* @return mixed
 	* @throws ReportException
@@ -86,6 +111,24 @@ abstract class AbstractReport implements BaseReport {
 	}
 
 	/**
+	 * Carga un Negocio al vuelo
+	 * @param string $name
+	 * @param string $alias
+	 * @return type
+	 */
+	protected function loadBusiness($name, $alias = null) {
+		$classname = "{$name}Business";
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $alias;
+	}
+
+	/**
 	 * Definición del proceso de agrupación de datos definido para cada reporte.
 	 * @param $data
 	 * @return array
@@ -93,6 +136,8 @@ abstract class AbstractReport implements BaseReport {
 	abstract protected function agrupateData($data);
 
 	abstract protected function present();
+
+	abstract protected function setUp();
 
 
 }

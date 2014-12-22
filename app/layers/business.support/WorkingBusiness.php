@@ -1,28 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: daniel
- * Date: 10/27/14
- * Time: 12:02 PM
- */
 
-class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness{
+class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
-	/**
-	 * @return mixed
-	 */
-	function getSandboxResults($per_page = null, $page = null) {
-		$searchCriteria = new SearchCriteria('Charge');
-		$searchCriteria->add_scope('canBeInvoiced');
-		$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with('1');
-		if ($per_page) {
-			$searchCriteria->Pagination->rows_per_page($per_page);
-		}
-		$this->loadBusiness('Searching');
-		return $this->SearchingBusiness->paginateByCriteria($searchCriteria, array('codigo_cliente', 'estado'), $page);
-	}
+	function agrupatedWorkReport($data) {
 
-	function report($data) {
 		$this->loadBusiness('Searching');
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
@@ -100,38 +81,18 @@ class SandboxingBusiness extends AbstractBusiness implements ISandboxingBusiness
 		);
 
 		$this->loadReport('AgrupatedWork', 'report');
-		$this->report->setData($reportData);
-		$this->report->setOutputType('RTF');
 		$this->report->setParameters(
 			array(
-				'company_name' => Conf::GetConf($this->Session, 'NombreEmpresa'),
-				'group_by_partner' => true
+				'companyName' => Conf::GetConf($this->Session, 'NombreEmpresa'),
+				'groupByPartner' => empty($data['group_by_partner']) ? 0 : $data['group_by_partner'],
+				'agrupationType' => $data['agrupationType']
 			)
 		);
+		$this->report->setData($reportData);
+		$this->report->setOutputType('RTF');
+
 
 		return $this->report;
 	}
 
-	function getSandboxListator($data) {
-		$listator = new EntitiesListator($data);
-		$listator->addColumn('# Cobro', 'id_cobro');
-		$listator->addColumn('Cliente', 'codigo_cliente');
-		$listator->addColumn('Estado', 'estado');
-		return $listator->render();
-	}
-
-	function generateTemporalFile() {
-		try {
-			$temp = new SplFileObject('example.txt', 'rw+');
-			$temp->setFlags(SPLFileObject::READ_AHEAD);
-			$temp->fwrite("This is the first line\n");
-			$temp->fwrite("And this is the second.\n");
-			$temp->rewind();
-			return $temp;
-		} catch (Exception $ex) {
-			throw new BusinessException('Can not create file');
-		}
-
-	}
-
-} 
+}

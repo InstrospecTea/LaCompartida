@@ -1244,93 +1244,31 @@ echo $Form->script();
 		});
 
 		jQuery('#descargar_pdf_agrupado').click(function() {
-			var Where='<?php echo base64_encode($where) ?>';
-			var Idcobro='<?php echo $id_cobro; ?>';
-			var Motivo='<?php echo $motivo; ?>';
-			var por_socio = jQuery('#por_socio:checked').val();
-			jQuery.post('ajax/estimar_datos.php', {
-				where: Where,
-				id_cobro: Idcobro,
-				motivo:Motivo
-			},
-			function(data) {
-
-				if(parseInt(data)>15000) {
-
-					var formated=data/1000;
-					var dialogoconfirma = top.window.jQuery( "<div/>" );
-					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
-					jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
-
-					dialogoconfirma.dialog({
-						resizable: false,
-						autoOpen: true,
-						height: 220,
-						width: 450,
-						modal: true,
-						close: function(ev,ui) {
-							dialogoconfirma.html('');
-						},
-						buttons: {
-							"<?php echo __('Entiendo y acepto') ?>": function() {
-								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
-								dialogoconfirma.dialog( "close" );
-							},
-							"<?php echo __('Cancelar') ?>": function() {
-								dialogoconfirma.dialog( "close" );
-							}
-						}
-					});
-				} else {
-					window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
-				}
-			});
-
+			var form = jQuery('#form_trabajos').clone();
+			jQuery('<input>').attr({
+				type: 'hidden',
+				id: 'agrupationType',
+				name: 'agrupationType',
+				value: 'client'
+			}).appendTo(form);
+			jQuery('<input>').attr({
+				type: 'hidden',
+				id: 'group_by_partner',
+				name: 'group_by_partner',
+				value: jQuery('#por_socio').val()
+			}).appendTo(form);
+			form.attr('action','../Report/agrupatedWork').submit();
 		});
 
 		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
-			var Where='<?php echo base64_encode($where) ?>';
-			var Idcobro='<?php echo $id_cobro; ?>';
-			var Motivo='<?php echo $motivo; ?>';
-			var por_socio = jQuery('#por_socio:checked').val();
-			jQuery.post('ajax/estimar_datos.php', {
-				where: Where,
-				id_cobro: Idcobro,
-				motivo:Motivo
-			},
-			function(data) {
-
-				if(parseInt(data)>15000) {
-
-					var formated=data/1000;
-					var dialogoconfirma = top.window.jQuery( "<div/>" );
-					dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado y con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
-					jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
-
-					dialogoconfirma.dialog({
-						resizable: false,
-						autoOpen: true,
-						height: 220,
-						width: 450,
-						modal: true,
-						close: function(ev,ui) {
-							dialogoconfirma.html('');
-						},
-						buttons: {
-							"<?php echo __('Entiendo y acepto') ?>": function() {
-								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio;
-								dialogoconfirma.dialog( "close" );
-							},
-							"<?php echo __('Cancelar') ?>": function() {
-								dialogoconfirma.dialog( "close" );
-							}
-						}
-					});
-				} else {
-					window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel_agrupado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>&por_socio=' + por_socio+'&abogado=1';
-				}
-			});
-
+			var form = jQuery('#form_trabajos').clone();
+			jQuery('<input>').attr({
+				type: 'hidden',
+				id: 'agrupationType',
+				name: 'agrupationType',
+				value: 'lawyer'
+			}).appendTo(form);
+			form.attr('action','../Report/agrupatedWork').submit();;
 		});
 
 	});

@@ -26,7 +26,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 */
 	public function searchByGenericCriteria(SearchCriteria $searchCriteria , array $filter_properties = array()) {
 		$widthIdentity = false;
-		$criteria = $this->getCriteria($searchCriteria, $filter_properties, $widthIdentity);
+		$criteria = $this->getCriteria($searchCriteria, $filter_properties, $widthIdentity, true);
 		return $this->SearchService->getGenericResults($searchCriteria, $criteria);
 	}
 
@@ -40,9 +40,10 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1) {
 		$searchCriteria->Pagination->current_page($page);
 		$searchCriteria->paginate(true);
-		$ret = new stdClass();
-		$ret->data = $this->searchByCriteria($searchCriteria, $filter_properties);
-		$ret->Pagination = $searchCriteria->Pagination;
+		// MUERTE!!!
+		$ret = new GenericModel();
+		$ret->set('data', $this->searchByCriteria($searchCriteria, $filter_properties));
+		$ret->set('Pagination', $searchCriteria->Pagination);
 		return $ret;
 	}
 
@@ -69,14 +70,15 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 		return $criteria;
 	}
 
-	private function getCriteria($searchCriteria, $filter_properties, $widthIdentity = true) {
+	private function getCriteria($searchCriteria, $filter_properties, $widthIdentity = true, $genericMode = false) {
 		$this->loadService('Search');
 		$criteria = new Criteria($this->sesion);
 		$criteria = $this->SearchService->translateCriteria(
 			$searchCriteria,
 			$filter_properties,
 			$criteria,
-			$widthIdentity
+			$widthIdentity,
+			$genericMode
 		);
 		return $this->addScopes($searchCriteria, $criteria);
 	}

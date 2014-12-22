@@ -14,13 +14,14 @@ class SearchService implements ISearchService {
 	 * @param SearchCriteria $searchCriteria
 	 * @param array          $filter_properties
 	 * @param Criteria       $criteria
-	 * @param bool $widthIdentity
+	 * @param bool $genericMode
+	 * @param bool $withIdentity
 	 * @return array
 	 */
-	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null, $withIdentity = true) {
+	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null, $withIdentity = true, $genericMode = false) {
 		$criteria = $this->prepareRelationships($criteria, $searchCriteria);
 		$criteria = $this->prepareRestrictions($criteria, $searchCriteria);
-		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties, $withIdentity);
+		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties, $withIdentity, $genericMode);
 		$criteria = $this->prepareGrouping($criteria, $searchCriteria);
 		return $criteria;
 	}
@@ -167,7 +168,7 @@ class SearchService implements ISearchService {
 	 * @param array          $filterProperties
 	 * @return Criteria
 	 */
-	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $withIdentity = true) {
+	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $withIdentity = true, $genericMode = false) {
 		$entity = $searchCriteria->entity();
 		$entity = new ReflectionClass($entity);
 		$entity = $entity->newInstance();
@@ -178,8 +179,8 @@ class SearchService implements ISearchService {
 				$criteria->add_select($searchCriteria->entity() . '.' . $entity->getIdentity());
 			}
 			foreach ($filterProperties as $filter_property) {
-				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property);
-				$criteria = $this->addSelectField($criteria, $field_name);
+				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property );
+				$criteria = $this->addSelectField($criteria, $field_name, $genericMode);
 			}
 		}
 		$criteria->add_from($entity->getPersistenceTarget(), $searchCriteria->entity());
@@ -193,8 +194,8 @@ class SearchService implements ISearchService {
 	 * @param $field_name
 	 * @return mixed
 	 */
-	private function addSelectField($criteria, $field_name) {
-		if ( preg_match('/^[a-z0-9_]+\.[a-z0-9_]+/i', $field_name) ) {
+	private function addSelectField($criteria, $field_name, $genericMode) {
+		if ($genericMode) {
 			$propertyAlias = str_replace('.', '_', strtolower($field_name));
 			$criteria->add_select($field_name, $propertyAlias);
 		} else {
@@ -211,12 +212,7 @@ class SearchService implements ISearchService {
 	 * @return
 	 */
 	private function encapsulate($arrayResult, $instance) {
-		if (empty($arrayResult)) {
-			return null;
-		}
-		foreach ($arrayResult as $property => $value) {
-			$instance->set($property, $value, false);
-		}
+		$instance->fields = $arrayResult;
 		return $instance;
 	}
 
@@ -226,11 +222,10 @@ class SearchService implements ISearchService {
 	 * @return array
 	 */
 	private function encapsulateArray($array, $entity) {
-		$result = array();
-		$reflected = new ReflectionClass($entity);
-		foreach ($array as $row) {
-			$empty = $reflected->newInstance();
-			$result[] = $this->encapsulate($row, $empty, false);
+		$total = (int) count($array);
+		$result = new SplFixedArray($total);
+		for ($i = 0; $i < $total; $i++) {
+			$result[$i] = $this->encapsulate($array[$i], new $entity());
 		}
 		return $result;
 	}
