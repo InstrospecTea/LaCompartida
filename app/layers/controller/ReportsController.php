@@ -15,17 +15,19 @@ class ReportsController extends AbstractController {
     $this->set('cobrable_estados', array('No', 'Si'));
     $this->set('mostrar_estados', array('Horas Cobradas', 'Valor Cobrado'));
 
-      $searchResult = $this->SandboxingBusiness->data();
-    $this->set('results', $searchResult);
+    $searchResult = $this->SandboxingBusiness->data();
+    if (empty($searchResult)) {
+      $this->info('No hay datos para la búsqueda realizada');
+    }
+    $this->set('report_data', $searchResult);
 
     $report = new TimekeeperProductivityReport();
-    
-    $data = array(
+    $searchResult = array(
       array("dato"=> "437", "dato2" => "359700"),
       array("dato"=> "438", "dato2" => "359710")
     );
 
-    $report->setData($data);
+    $report->setData($searchResult);
     $report->setOutputType('Simple');
     $report->setConfiguration('sesion', $this->Session);
     $this->set('report', $report);

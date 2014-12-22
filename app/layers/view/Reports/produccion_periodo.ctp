@@ -73,4 +73,10 @@
 </form>
 <br/>
 <?php
-  $report->render();
+  try {
+    $report->render();
+  } catch (ReportEngineException $ex) {
+    
+  }
+
+  
