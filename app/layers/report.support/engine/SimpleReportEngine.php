@@ -7,15 +7,28 @@ class SimpleReportEngine extends AbstractReportEngine implements ISimpleReportEn
   var $engine;
 
   protected function buildReport($data) {
-    $this->engine->LoadResults($data);
+    $downloadable = ($this->configuration['writer'] == 'Spreadsheet') ;
+    if ($downloadable) {
+      ob_get_clean();
+    }
     $writer = SimpleReport_IOFactory::createWriter($this->engine, $this->configuration['writer']);
-    echo $writer->save($this->configuration['filename']);
+    $this->engine->LoadResults($data);
+    if ($downloadable) {
+      $writer->save($this->configuration['filename']);
+    } else {
+      echo $writer->save($this->configuration['filename']);
+    }
   }
 
   protected function configurateReport() {
     $sesion = $this->configuration['sesion'];
+    $config = $this->configuration['configuration'];
     $this->engine = new SimpleReport($sesion);
-    $this->engine->LoadConfiguration($this->configuration['configuration']);
+    if (is_array($config)) {
+      $this->engine->LoadConfigFromArray($config);
+    } else {
+      $this->engine->LoadConfiguration($config);
+    }
     $this->engine->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($sesion));
   }
 

@@ -1,6 +1,6 @@
 
 <form name="form_busca" id="form_busca" action="" method=post>
-  <input type=hidden name=opc id="opc" value="">
+  <input type=hidden name="opc" id="opc" value="Html">
   <div id="calendar-container" style="width:221px; position:absolute; display:none;">
     <div class="floating" id="calendar"></div>
   </div>
@@ -64,8 +64,10 @@
         <td>
         </td>
         <td  align="right" colspan="2">
-          <input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn" />
-          <input name="boton_xls" id="boton_xls" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn" />
+          <?php 
+          echo $this->Form->submit(__('Buscar'), array('onclick' => "jQuery('#opc').val('Html')"));
+          echo $this->Form->submit(__('Descargar Excel'), array('onclick' => "jQuery('#opc').val('Spreadsheet')"));
+          ?>
         </td>
       </tr>
     </table>
@@ -74,9 +76,10 @@
 <br/>
 <?php
   try {
-    $report->render();
+    if (isset($report)) {
+      $report->render();
+    }
   } catch (ReportEngineException $ex) {
     
   }
 
-  
