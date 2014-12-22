@@ -7,7 +7,7 @@ class ProcessLockingBusiness extends AbstractBusiness implements IProcessLocking
 		$this->loadService('ProcessLock');
 	}
 
-	public function lock($process, $status = '') {
+	public function lock($process, $status = '', $post = '') {
 		if ($this->isLocked($process)) {
 			return true;
 		}
@@ -19,6 +19,7 @@ class ProcessLockingBusiness extends AbstractBusiness implements IProcessLocking
 		$entity->set('id_usuario', $usuario['id_usuario']);
 		$entity->set('nombre_usuario', trim("{$usuario['apellido1']} {$usuario['apellido2']}, {$usuario['nombre']}"));
 		$entity->set('bloqueado', 1);
+		$entity->set('datos_post', empty($post) ? null : $post);
 		$saved = $this->ProcessLockService->saveOrUpdate($entity);
 		return $saved;
 	}

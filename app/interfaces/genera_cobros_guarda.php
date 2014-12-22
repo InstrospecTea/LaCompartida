@@ -354,7 +354,7 @@ if ($print) {
 		unset($Sesion);
 		unset($Cobro);
 		unset($Contrato);
-		die('Proceso ' . $id_proceso_nuevo . ' Cobros ' . implode(', ', $newcobro));
+		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobros' => array_filter($newcobro))));
 	} else {
 		Log::write(' |- redirect', Cobro::PROCESS_NAME);
 		Log::write(' -', Cobro::PROCESS_NAME);

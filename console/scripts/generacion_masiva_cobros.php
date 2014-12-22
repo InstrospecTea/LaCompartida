@@ -2,7 +2,7 @@
 
 /**
  * Clase GeneracionMasivaCobros
- * Realiza las llamadas de generacion masiva de cobros en backgruound
+ * Realiza las llamadas de generación masiva de cobros en background.
  */
 class GeneracionMasivaCobros extends AppShell {
 
@@ -12,11 +12,11 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->Session->usuario = new Usuario($this->Session);
 		$this->Session->usuario->LoadId($this->data['user_id']);
 		$this->loadModel('BloqueoProceso');
-		$this->BloqueoProceso->lock(Cobro::PROCESS_NAME);
+		$this->data['form'] = $this->qs2array($this->data['form']);
+		$this->BloqueoProceso->lock(Cobro::PROCESS_NAME, '', json_encode($this->data['form']));
 		if (isset($this->data['arrayClientes'])) {
 			$this->clients();
 		} else {
-			$this->data['form'] = $this->qs2array($this->data['form']);
 			if (!empty($this->data['arrayGG'])) {
 				$this->generaGG();
 			}
@@ -36,19 +36,24 @@ class GeneracionMasivaCobros extends AppShell {
 			$processing = 0;
 			$total_clientes = count($this->data['arrayClientes']);
 			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
+			$generated = 0;
 			foreach ($this->data['arrayClientes'] as $k => $cliente) {
 				++$processing;
 				$this->status('client', "Procesando $processing de $total_clientes clientes. ({$errores} con errores)");
-				$post_data = preg_replace('/(codigo_cliente=)[^&]*/', "codigo_cliente={$cliente}", $this->data['form']);
-				$ok = $this->post($url, $post_data);
-				if (!$ok) {
-					++$$errores;
+				$post_data = array_merge($this->data['form'], array('codigo_cliente' => $cliente));
+				$result = $this->post($url, $post_data);
+				if (count($result['cobros'])) {
+					$generated += count($result['cobros']);
 				}
 			}
 		} catch (Exeption $e) {
 			++$errores;
 		}
-		$this->status('client', "Se han procesado $processing de $total_clientes clientes. ({$errores} con errores)");
+		if ($generated) {
+			$this->status('client', "Se han generado $generated liquidaciones para $total_clientes clientes. ({$errores} con errores)");
+		} else {
+			$this->status('client', "No se han generado liquidaciones. ({$errores} errores)");
+		}
 	}
 
 	private function generaGG() {
@@ -57,20 +62,24 @@ class GeneracionMasivaCobros extends AppShell {
 			$processing = 0;
 			$total_gg = count($this->data['arrayGG']);
 			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
+			$generated = 0;
 			foreach ($this->data['arrayGG'] as $contrato) {
 				++$processing;
-				$this->status('gg', "Procesando $processing de $total_gg liquidaciones gastos. ($errores con errores)");
-
+				$this->status('gg', "Procesando $processing liquidaciones de gastos. ($errores con errores)");
 				$post_data = array_merge($this->data['form'], $contrato);
-				$ok = $this->post($url, $post_data);
-				if (!$ok) {
-					++$errores;
+				$result = $this->post($url, $post_data);
+				if (count($result['cobros'])) {
+					$generated += count($result['cobros']);
 				}
 			}
 		} catch (Exeption $e) {
 			++$errores;
 		}
-		$this->status('gg', "Se han procesado $processing de $total_gg liquidaciones  de gastos. ({$errores} con errores)");
+		if ($generated) {
+			$this->status('gg', "Se han generado $generated liquidaciones de gastos. ({$errores} con errores)");
+		} else {
+			$this->status('gg', "No se han generado liquidaciones de gastos. ({$errores} errores)");
+		}
 	}
 
 	private function generaHH() {
@@ -78,22 +87,26 @@ class GeneracionMasivaCobros extends AppShell {
 			$errores = 0;
 			$processing = 0;
 			$total_hh = count($this->data['arrayHH']);
-			$get_data = 'generar_silenciosamente=1';
 			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
+			$generated = 0;
 			foreach ($this->data['arrayHH'] as $contrato) {
 				++$processing;
-				$this->status('hh', "Procesando $processing de $total_hh liquidaciones de honorarios. ($errores con errores)");
+				$this->status('hh', "Procesando $processing liquidaciones de honorarios. ($errores con errores)");
 
 				$post_data = array_merge($this->data['form'], $contrato);
-				$ok = $this->post($url, $post_data, $get_data);
-				if (!$ok) {
-					++$errores;
+				$result = $this->post($url, $post_data);
+				if (count($result['cobros'])) {
+					$generated += count($result['cobros']);
 				}
 			}
 		} catch (Exeption $e) {
 			++$errores;
 		}
-		$this->status('hh', "Se han procesado $processing de $total_hh liquidaciones  de honorarios. ({$errores} con errores)");
+		if ($generated) {
+			$this->status('hh', "Se han generado $generated liquidaciones de honorarios. ({$errores} con errores)");
+		} else {
+			$this->status('hh', "No se han generado liquidaciones de honorarios. ({$errores} errores)");
+		}
 	}
 
 	private function generaMIXTAS() {
@@ -101,11 +114,11 @@ class GeneracionMasivaCobros extends AppShell {
 			$errores = 0;
 			$processing = 0;
 			$total_mixtas = count($this->data['arrayMIXTAS']);
-			$get_data = 'generar_silenciosamente=1';
 			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
+			$generated = 0;
 			foreach ($this->data['arrayMIXTAS'] as $contrato) {
 				++$processing;
-				$this->status('mixtas', "Procesando $processing de $total_mixtas liquidaciones mixtas. ($errores con errores)");
+				$this->status('mixtas', "Procesando $processing liquidaciones mixtas. ($errores con errores)");
 				if ($this->data['solo'] == 'honorarios') {
 					$contrato = array_merge($contrato, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
 				} else if ($this->data['solo'] == 'gastos') {
@@ -113,23 +126,38 @@ class GeneracionMasivaCobros extends AppShell {
 				}
 
 				$post_data = array_merge($this->data['form'], $contrato);
-				$ok = $this->post($url, $post_data, $get_data);
-				if (!$ok) {
-					++$errores;
+				$result = $this->post($url, $post_data);
+				if (count($result['cobros'])) {
+					$generated += count($result['cobros']);
 				}
 			}
 		} catch (Exeption $e) {
 			++$errores;
 		}
-		$this->status('mixtas', "Se han procesado $processing de $total_mixtas liquidaciones mixtas. ({$errores} con errores)");
+		if ($generated) {
+			$this->status('mixtas', "Se han generado $generated liquidaciones mixtas. ({$errores} con errores)");
+		} else {
+			$this->status('mixtas', "No se han generado liquidaciones de mixtas. ({$errores} errores)");
+		}
 	}
 
+	/**
+	 * Escribe el estado del proceso actual.
+	 * @param type $type
+	 * @param type $status
+	 */
 	private function status($type, $status) {
 		$this->status[$type] = $status;
 		$st = implode('<br/>', $this->status);
 		$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $st);
 	}
 
+	/**
+	 * Envía una llamada POST a una URL.
+	 * @param type $url
+	 * @param type $post_data
+	 * @return boolean
+	 */
 	private function post($url, $post_data) {
 		if (is_array($post_data)) {
 			$post_data = implode('&', UtilesApp::mergeKeyValue($post_data, '%s=%s'));
@@ -145,20 +173,36 @@ class GeneracionMasivaCobros extends AppShell {
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-		curl_exec($ch);
+		$response = curl_exec($ch);
+
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
+		$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$header = substr($response, 0, $header_size);
+		$body = substr($response, $header_size);
 		curl_close($ch);
-		return $http_code == 200;
+
+		if ($http_code == 200) {
+			return json_decode(trim($body), true);
+		}
+		throw new exception('Ocurrio un error en la llamada post.');
 	}
 
+	/**
+	 * Escribe en el archivo log.
+	 * @param type $value
+	 */
 	private function log($value) {
 		Log::write($value, Cobro::PROCESS_NAME);
 	}
 
+	/**
+	 * Convierte un Query string de url en un array.
+	 * @param type $qs
+	 * @return type
+	 */
 	private function qs2array($qs) {
 		$array = array();
 		$a = explode('&', $qs);
@@ -168,6 +212,5 @@ class GeneracionMasivaCobros extends AppShell {
 		}
 		return $array;
 	}
-
 
 }

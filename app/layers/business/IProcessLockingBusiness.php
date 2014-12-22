@@ -4,10 +4,11 @@ interface IProcessLockingBusiness {
 
 	/**
 	 * Registra un proceso como bloqueado
-	 * @param type $process
-	 * @param type $status
+	 * @param string $process
+	 * @param string $status
+	 * @param string $post JSON que representa los datos de un formulario
 	 */
-	public function lock($process, $status = '');
+	public function lock($process, $status = '', $post = '');
 
 	/**
 	 * Marca un proceso como desbloqueado

@@ -34,7 +34,7 @@ class ProcessLockController extends AbstractController {
 		if ($this->ProcessLockingBusiness->isLocked($process)) {
 			$this->renderJSON(array('error' => 'El proceso indicado se encuentra bloqueado.', 'locker' => $this->ProcessLockingBusiness->getLocker($process)));
 		}
-		$shell = \TTB\Utiles::underscoreize('GeneracionMasivaCobros');
+		$shell = \TTB\Utiles::underscoreize(Cobro::PROCESS_NAME);
 		$data = $this->data;
 		$data['user_id'] = $this->Session->usuario->fields['id_usuario'];
 		$shell_cmd = sprintf("%s/console/console %s --domain=%s --subdir=%s --data='%s' --debug  > /dev/null &", ROOT_PATH, $shell, SUBDOMAIN, ROOTDIR, json_encode($data));

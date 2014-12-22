@@ -16,9 +16,10 @@ class BloqueoProceso {
 	 * Marca como bloqueado el proceso indicado.
 	 * @param type $process
 	 * @param type $status
+	 * @param string $post JSON que representa los datos de un formulario.
 	 */
-	public function lock($process, $status) {
-		return $this->ProcessLockingBusiness->lock($process, $status);
+	public function lock($process, $status = '', $post = '') {
+		return $this->ProcessLockingBusiness->lock($process, $status, $post);
 	}
 
 	/**
