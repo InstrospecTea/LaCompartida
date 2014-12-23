@@ -96,7 +96,7 @@ class ProcessLockingBusiness extends AbstractBusiness implements IProcessLocking
 			CriteriaRestriction::equals('bloqueado', '0'),
 			CriteriaRestriction::equals('notificado', '0')
 		);
-		$entities = $this->ProcessLockService->findAll($restrictions, array('id', 'proceso', 'estado', 'fecha_modificacion'));
+		$entities = $this->ProcessLockService->findAll($restrictions, array('id', 'proceso', 'estado', 'fecha_modificacion', 'datos_post'));
 		return $entities;
 	}
 

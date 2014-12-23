@@ -124,18 +124,19 @@ $Slim=Slim::getInstance('default',true);
 		<?php
 
 		function form_link($proceso, $data) {
+			$data = json_decode($data, true);
 			switch ($proceso) {
 				case 'GeneracionMasivaCobros':
 					$url = 'app/interfaces/genera_cobros.php';
+					$data['opc'] = 'buscar';
 					break;
 				default:
 					return '';
 			}
 			$Form = new Form();
 			$html = '';
-			$data = json_decode($data, true);
 			foreach ($data as $field => $value) {
-				$html .= $Form->hidden($field, $value);
+				$html .= $Form->hidden($field, $value, array('id' => false));
 			}
 			$html .= $Form->Html->link('Ir al formulario', '#', array('onclick' => "jQuery(this).closest(\'form\').submit();return false;"));
 			return $Form->Html->tag('form', $html, array('action' => Conf::Host() . $url, 'method' => 'post'));
