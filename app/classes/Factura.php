@@ -297,12 +297,18 @@ class Factura extends Objeto {
 		),
 	);
 
+	// Twig, the flexible, fast, and secure template language for PHP
+	private $twig;
+	// To render the template with some variables
+	private $template_data;
+
 	function Factura($sesion, $fields = "", $params = "") {
 		$this->tabla = "factura";
 		$this->campo_id = "id_factura";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->log_update = true;
+		$this->template_data = array();
 	}
 
 	function Id($id = null) {
@@ -502,6 +508,8 @@ class Factura extends Objeto {
 	}
 
 	function GeneraHTMLFactura($id_formato_factura = null) {
+		$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
+
 		if ($this->fields['id_moneda'] != 2 && ( ( method_exists('Conf', 'InfoBancariaCYC') && Conf::InfoBancariaCYC() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'InfoBancariaCYC') ) )) {
 			$templateData = UtilesApp::TemplateFactura($this->sesion, 2);
 			$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, 2);
@@ -562,6 +570,8 @@ class Factura extends Objeto {
 		$cobro = new Cobro($this->sesion);
 
 		if ($cobro->Load($this->fields['id_cobro'])) {
+			$this->template_data['Cobro'] = $cobro->fields;
+
 			global $x_detalle_profesional;
 			global $x_resumen_profesional;
 			list( $x_detalle_profesional, $x_resumen_profesional ) = $cobro->DetalleProfesional();
@@ -573,6 +583,7 @@ class Factura extends Objeto {
 		}
 
 		$html = $this->GenerarDocumento($parser, 'CARTA_FACTURA', $lang);
+		$html = $this->RenderTemplate($html);
 
 		$html_css = array();
 		$html_css['html'] = $html;
@@ -2737,6 +2748,19 @@ class Factura extends Objeto {
 		return (!is_null($this->fields['dte_fecha_creacion']));
 	}
 
+	/**
+	 * Reemplazo de tags por twig
+	 * @param string $template html de la factura
+	 */
+	private function RenderTemplate($template) {
+		if (!$this->twig) {
+			$loader = new Twig_Loader_String();
+			$this->twig = new Twig_Environment($loader);
+			$this->twig->addExtension(new DateTwigExtension());
+		}
+
+		return $this->twig->render($template, $this->template_data);
+	}
 }
 
 #end Class
