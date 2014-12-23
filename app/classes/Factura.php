@@ -629,9 +629,13 @@ class Factura extends Objeto {
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
 
+		$this->template_data['Idioma'] = $idioma->fields;
+
 		global $cobro_moneda;
 		$cobro_moneda = new CobroMoneda($this->sesion);
 		$cobro_moneda->Load($this->fields['id_cobro']);
+
+		$this->template_data['MonedaCobro'] = $cobro_moneda->moneda_cobro;
 
 		$cobro = new NotaCobro($this->sesion);
 		$cobro->Load($this->fields['id_cobro']);
