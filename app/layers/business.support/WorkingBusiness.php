@@ -180,9 +180,8 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			)
 		);
 		$this->report->setData($reportData);
-    $this->report->setOutputType('Simple');
-    $this->report->setConfiguration('sesion', $this->Session);
-    
+    	$this->report->setOutputType('Simple');
+    	$this->report->setConfiguration('sesion', $this->Session);
 
 		return $this->report;
 	}
