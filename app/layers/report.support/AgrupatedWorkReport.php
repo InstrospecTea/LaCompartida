@@ -336,13 +336,9 @@ HTML;
 		foreach ($this->data as $socio) {
 			$html_usuarios = '';
 			foreach ($socio['usuarios'] as $usuario) {
-				$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
 				$html_clientes = '';
-				$ths = '';
-				$total_minutos_abogado = 0;
-				$total_facturado_abogado = 0;
 				foreach ($usuario['clientes'] as $cliente) {
-					$nombre_cliente = $this->Html->tag('h3', $cliente['nombre']);
+					$nombre_cliente = $this->Html->tag('h2', $this->Html->tag('u', $cliente['nombre']));
 					$html_asuntos = '';
 					$total_minutos_cliente = 0;
 					$total_facturado_cliente = 0;
@@ -362,29 +358,11 @@ HTML;
 					);
 					$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
 					$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
-					$total_minutos_abogado += $total_minutos_cliente;
-					$total_facturado_abogado += $total_facturado_cliente;
 				}
-				$ths .= $this->Html->tag('th', '', array('class' => 'col1'));
-				$ths .= $this->Html->tag('th', __('Total abogado'), array('class' => 'col2'));
-				$ths .= $this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'));
-				$ths .= $this->Html->tag(
-					'th',
-					$this->CoiningBusiness->formatAmount(
-						$total_facturado_abogado,
-						$this->baseCurrency,
-						',',
-						'.'
-					),
-					array('class' => 'col3')
-				);
-				$trs = $this->Html->tag('tr', $ths);
-				$html_clientes .= $this->Html->tag('table', $trs, array('class' => 'table'));
 				$html_usuarios .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
 			}
 
-			$nombre_socio = $por_socio ? __('Socio a cargo') . ': ' . $this->Html->tag('u', $socio['nombre']) : '';
-			$html .= $this->Html->tag('div', $this->Html->tag('h2', $nombre_socio) . $html_usuarios);
+			$html .= $this->Html->tag('div', $html_usuarios);
 		}
 
 		return $html;
