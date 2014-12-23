@@ -97,6 +97,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 	function productionByPeriodReport($data) {
 		$this->loadBusiness('Searching');
+		$this->loadBusiness('Coining');
 
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
@@ -166,13 +167,17 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		);
 
 		$this->loadReport('TimekeeperProductivity', 'report');
- 
+ 		
+ 		$moneda_filtro = $this->CoiningBusiness->getCurrency($data['moneda_filtro']);
+ 		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
 		$this->report->setParameters(
 			array(
 				'fechaIni' => $data['fecha_ini'],
 				'fechaFin' => $data['fecha_fin'],
 				'mostrarValor' => $data['mostrar_valores'],
-				'format' => $data['opc']
+				'format' => $data['opc'],
+				'monedaFiltro' => $moneda_filtro,
+				'monedaBase' => $moneda_base
 			)
 		);
 		$this->report->setData($reportData);

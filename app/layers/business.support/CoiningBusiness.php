@@ -70,4 +70,26 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $this->CurrencyService->get($id);
 	}
 
+	/** 
+	 * Obtiene todas las instancias de {@link Currency} existentes en el ambiente del cliente
+	 */
+	function getCurrencies() {
+		$searchCriteria = new SearchCriteria('Currency');
+		$this->loadBusiness('Searching');
+		return $this->SearchingBusiness->searchByCriteria($searchCriteria);
+	}
+
+	/** 
+	 * Obtiene un Array asociativo [identidad] => [glosa_moneda], a partir de un array de instancias de {@link Currency}.
+	 */
+	function currenciesToArray($currencies) {
+		$result = array();
+		foreach ($currencies as $currency) {
+			$result[$currency->get($currency->getIdentity())] = $currency->fields['glosa_moneda'];
+		}
+		return $result;
+	}
+
+
+
 } 

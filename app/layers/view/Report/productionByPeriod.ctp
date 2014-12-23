@@ -25,7 +25,7 @@
         </td>
       </tr>
       <tr>
-        <th align="right"><?php echo __('Usuario') ?></th>
+        <th align="right"><?php echo __('Abogado') ?></th>
         <td colspan="2" align="left">
           <?php
           echo $this->Form->select('id_usuario', $this->Session->usuario->ListarActivos('', 'PRO'), $this->data['id_usuario'], array('empty' => __('Todos')));
@@ -58,6 +58,15 @@
         <th align="right"><?php echo __('Mostrar valores en') ?></th>
         <td colspan="2" align="left">
           <?php echo $this->Form->select('mostrar_valores', $mostrar_estados, $this->data['mostrar_valores'], array('empty' => false)) ?>
+        </td>
+      </tr>
+      <tr>
+        <th align=right >
+          <?php echo __('Visualizar en Moneda') ?>:
+        </td>
+        <td align=left>
+          <?php 
+          echo $this->Form->select('moneda_filtro', $monedas, $this->data['moneda_filtro'] ? $this->data['moneda_filtro'] : $moneda_base, array('empty' => false)) ?>
         </td>
       </tr>
       <tr>

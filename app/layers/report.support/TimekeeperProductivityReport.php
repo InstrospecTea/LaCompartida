@@ -15,9 +15,15 @@ class TimekeeperProductivityReport extends AbstractReport implements ITimekeeper
    */
   private function groupDataByUser($data) {
     $results = array();
+    $this->loadBusiness('Coining');
+
+    $moneda_filtro = $this->parameters['monedaFiltro'];
+    $moneda_base = $this->parameters['monedaBase'];
+
     foreach ($data as $row) {
       $id_usuario = $row->fields['lawyer_id_usuario'];
       $periodo = $row->fields['periodo'];
+
       if (is_null($results[$id_usuario]))  {
         $results[$id_usuario] = array();
       }
@@ -28,7 +34,12 @@ class TimekeeperProductivityReport extends AbstractReport implements ITimekeeper
         $results[$id_usuario]['total'] = 0;
       }
 
-      $value = $row->fields[$this->parameters['mostrarValor']];
+      $show_option = $this->mapShowOptions($this->parameters['mostrarValor']);
+      $value = $row->fields[$show_option];
+      if ($show_option == 'total_valor_cobrado') {
+        $value = $this->CoiningBusiness->changeCurrency($value, $moneda_base, $moneda_filtro);
+      }
+
       $results[$id_usuario][$periodo] += $value;
       $results[$id_usuario]['total']  += $value;
       $results[$id_usuario]['abogado'] = "{$row->fields['lawyer_nombre']} {$row->fields['lawyer_apellido1']}";
@@ -36,9 +47,27 @@ class TimekeeperProductivityReport extends AbstractReport implements ITimekeeper
     return $results;
   }
 
-  /* 
-    Convierte un array agrupado por usuario y periodo
-    en un Array desnormalizado de filas
+  /**
+   * Devuelve un string con el atributo correspondiente a la forma de visualizacion de los valores del reporte.
+   * @param  number $option opción seleccionada en la interfaz (Mostrar valores en)
+   * @return string corresponde al atributo
+   */
+  private function mapShowOptions($option) {
+    switch ($option) {
+      case 0:
+        return 'total_horas';
+      case 1:
+        return 'total_horas_cobradas';
+      case 2:
+        return 'total_valor_cobrado';
+      default:
+        return 'total_horas';
+    }
+  }
+
+  /**
+   * Convierte un array agrupado por usuario y periodo
+   * en un Array desnormalizado de filas
   */
   private function groupArrayToRows($results) {
     $data = array();
