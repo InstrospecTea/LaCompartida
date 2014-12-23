@@ -278,38 +278,39 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$col2 = __('ABOGADO');
 		$col3 = __('TIEMPO EN MINUTOS');
 		$col4 = __('VALOR FACTURADO');
-	if ($this->parameters['agrupationType'] == 'lawyer') {
-		return <<<HTML
-			<h1 id="doc_header">
-				{$header}<br />
-				{$title}
-			</h1>
-			<div>
-				<table class="table">
-					<tr>
-						<td class="col1">{$col1}</td>
-						<td>{$col2}</td>
-						<td class="col3 title">{$col3}</td>
-					</tr>
-				</table>
-			</div>
+		
+		if ($this->parameters['agrupationType'] == 'lawyer') {
+			return <<<HTML
+				<h1 id="doc_header">
+					{$header}<br />
+					{$title}
+				</h1>
+				<div>
+					<table class="table">
+						<tr>
+							<td class="col1">{$col1}</td>
+							<td>{$col2}</td>
+							<td class="col3 title">{$col3}</td>
+						</tr>
+					</table>
+				</div>
 HTML;
-	} else {
-		return <<<HTML
-			<h1 id="doc_header">
-				{$header}<br />
-				{$title}
-			</h1>
-			<div>
-				<table class="table">
-					<tr>
-						<td class="col1">{$col1}</td>
-						<td>{$col2}</td>
-						<td class="col3 title">{$col3}</td>
-						<td class="col3 title">{$col4}</td>
-					</tr>
-				</table>
-			</div>
+		} else {
+			return <<<HTML
+				<h1 id="doc_header">
+					{$header}<br />
+					{$title}
+				</h1>
+				<div>
+					<table class="table">
+						<tr>
+							<td class="col1">{$col1}</td>
+							<td>{$col2}</td>
+							<td class="col3 title">{$col3}</td>
+							<td class="col3 title">{$col4}</td>
+						</tr>
+					</table>
+				</div>
 HTML;
 		}
 	}
