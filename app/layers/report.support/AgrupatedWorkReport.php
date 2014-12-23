@@ -149,7 +149,6 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 
 		body {
 			font-family: sans-serif;
-			margin-top: 3cm;
 			text-align: justify;
 			font-size: 11pt;
 		}
@@ -171,7 +170,6 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		}
 		#doc_header {
 			text-align: center;
-			display: none;
 		}
 		#doc_header:first {
 			display: block;
@@ -272,13 +270,13 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	}
 
 	private function getHeader() {
-		$header = $this->parameter['companyName'];
+		$header = strtoupper($this->parameters['companyName']);
 		$title = $this->getTitle();
 		$col1 = __('FECHA');
 		$col2 = __('ABOGADO');
 		$col3 = __('TIEMPO EN MINUTOS');
 		$col4 = __('VALOR FACTURADO');
-		
+
 		if ($this->parameters['agrupationType'] == 'lawyer') {
 			return <<<HTML
 				<h1 id="doc_header">
