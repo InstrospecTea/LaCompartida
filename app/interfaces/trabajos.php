@@ -719,8 +719,8 @@ $pagina->PrintTop($popup);
 			$fecha_ini = Utiles::fecha2sql($fecha_ini, date('Y-m-d', strtotime('-12 month')));
 			$fecha_fin = Utiles::fecha2sql($fecha_fin);
 			// solo permite periodo de un mes
-			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 month"));
-			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario))) { ?>
+			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 year"));
+			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
 				<?php echo $Form->icon_button(__('Descargar listado agrupado por cliente'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
 				<label><input type="checkbox" value="1" id="por_socio" /> Agrupar por socio</label>
 				<br/>
