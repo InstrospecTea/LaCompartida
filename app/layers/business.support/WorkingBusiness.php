@@ -89,8 +89,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			)
 		);
 		$this->report->setData($reportData);
-		$this->report->setOutputType('RTF');
-
+		$this->report->setOutputType('WKPDF');
 
 		return $this->report;
 	}

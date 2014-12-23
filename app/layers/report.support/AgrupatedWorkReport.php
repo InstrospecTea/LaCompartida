@@ -178,7 +178,6 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		}
 		#header,
 		#footer {
-			position: fixed;
 			left: 0;
 			right: 0;
 			color: #000;

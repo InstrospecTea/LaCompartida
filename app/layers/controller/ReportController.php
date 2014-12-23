@@ -6,6 +6,7 @@ class ReportController extends AbstractController {
 		$this->loadBusiness('Working');
 		$report = $this->WorkingBusiness->agrupatedWorkReport($this->data);
 		$report->render();
+		exit;
 	}
 
 	public function productionByPeriod() {
