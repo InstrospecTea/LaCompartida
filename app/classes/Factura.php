@@ -678,7 +678,7 @@ class Factura extends Objeto {
 								cobro.id_cobro,
 								factura.direccion_cliente,
 								factura.numero,
-								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre, 
+								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre,
 								factura.fecha as fecha,
 								factura.fecha_vencimiento as fecha_vencimiento,
 								prm_documento_legal.glosa,
@@ -1305,7 +1305,14 @@ class Factura extends Objeto {
 				$gastos_sin_impuesto = 0;
 				$monto_impuesto_honorarios = 0;
 				$monto_impuesto_gastos = 0;
-				$glosa_banco = "";
+
+				$cuenta_nombre = '';
+				$banco_nombre = '';
+				$cuenta_direccion = '';
+				$cuenta_telefono = '';
+				$cuenta_telefono2 = '';
+				$cuenta_fax = '';
+				$cuenta_codigo_swift = '';
 
 				if (isset($cobro) && $cobro->loaded()) {
 
@@ -1326,14 +1333,26 @@ class Factura extends Objeto {
 					$subtotal_exentos = number_format($honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '');
 
 					$subtotal_completo = $honorarios_con_impuesto + $gastos_con_impuesto + $honorarios_sin_impuesto + $gastos_sin_impuesto;
-					$query_glosa_banco = " SELECT cb.glosa
-												FROM cuenta_banco cb
-													JOIN contrato c ON ( cb.id_cuenta = c.id_cuenta )
-													JOIN cobro cob ON ( c.id_contrato = cob.id_contrato )
-												WHERE cob.id_cobro = '{$cobro->fields[id_cobro]}' LIMIT 1";
-					$resu_glosa = mysql_query($query_glosa_banco, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_banco, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco) = mysql_fetch_array($resu_glosa);
+
+					// obtiene los datos del banco asociado al contrato del cobro
+					$query_cuenta_banco = "SELECT cuenta_banco.glosa, prm_banco.nombre, cuenta_banco.direccion, cuenta_banco.telefono, cuenta_banco.telefono2, cuenta_banco.fax, prm_banco.url, cuenta_banco.cod_swift
+						FROM cuenta_banco
+							JOIN contrato ON cuenta_banco.id_cuenta = contrato.id_cuenta
+							JOIN cobro ON contrato.id_contrato = cobro.id_contrato
+							JOIN prm_banco ON cuenta_banco.id_banco = prm_banco.id_banco
+						WHERE cobro.id_cobro = '{$cobro->fields[id_cobro]}' LIMIT 1";
+					$rs_cuenta = mysql_query($query_cuenta_banco, $this->sesion->dbh) or Utiles::errorSQL($query_cuenta_banco, __FILE__, __LINE__, $this->sesion->dbh);
+					list($cuenta_nombre, $banco_nombre, $cuenta_direccion, $cuenta_telefono, $cuenta_telefono2, $cuenta_fax, $banco_url, $cuenta_codigo_swift) = mysql_fetch_array($rs_cuenta);
 				}
+
+				$html2 = str_replace('%glosa_banco%', $cuenta_nombre, $html2);
+				$html2 = str_replace('%banco_nombre%', $banco_nombre, $html2);
+				$html2 = str_replace('%cuenta_direccion%', $cuenta_direccion, $html2);
+				$html2 = str_replace('%cuenta_telefono%', $cuenta_telefono, $html2);
+				$html2 = str_replace('%cuenta_telefono2%', $cuenta_telefono2, $html2);
+				$html2 = str_replace('%cuenta_fax%', $cuenta_fax, $html2);
+				$html2 = str_replace('%banco_url%', $banco_url, $html2);
+				$html2 = str_replace('%cuenta_codigo_swift%', $cuenta_codigo_swift, $html2);
 
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '%simbolo_honorarios%', $html2);
@@ -1368,7 +1387,6 @@ class Factura extends Objeto {
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', '', $html2);
 				}
 
-				$html2 = str_replace('%glosa_banco%', $glosa_banco, $html2);
 				$html2 = str_replace('%total_exentos%', number_format($subtotal_exentos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%total_diez%', number_format($subtotal_diez, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%total_paraguay%', number_format($subtotal_completo, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1923,7 +1941,7 @@ class Factura extends Objeto {
 	 * Obtiene la glosa de la condición de pago
 	 *
 	 * @return String Glosa, o nulo si no existe
-	 * 
+	 *
 	 */
 	function ObtieneGlosaCondicionPago() {
 		$condicion_pago = $this->fields['condicion_pago'];
