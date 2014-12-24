@@ -2,7 +2,7 @@
 
 require_once APP_PATH . '/classes/Reportes/SimpleReport.php';
 
-class SimpleReportEngine extends AbstractReportEngine implements ISimpleReportEngine {
+class SRReportEngine extends AbstractReportEngine implements ISRReportEngine {
 
   var $engine;
 
