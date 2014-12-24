@@ -12,16 +12,14 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->Session->usuario = new Usuario($this->Session);
 		$this->Session->usuario->LoadId($this->data['user_id']);
 		$this->loadModel('BloqueoProceso');
-		$this->data['form'] = $this->qs2array($this->data['form']);
+		$this->data['form'] = $this->data['form'];
 		$this->BloqueoProceso->lock(Cobro::PROCESS_NAME, '', json_encode($this->data['form']));
 		if (isset($this->data['arrayClientes'])) {
 			$this->clients();
 		} else {
-			if (!empty($this->data['arrayGG'])) {
-				$this->generaGG();
-			}
 			if (!empty($this->data['arrayHH'])) {
 				$this->generaHH();
+				$this->generaGG();
 			}
 			if (!empty($this->data['arrayMIXTAS'])) {
 				$this->generaMIXTAS();
@@ -60,13 +58,19 @@ class GeneracionMasivaCobros extends AppShell {
 		try {
 			$errores = 0;
 			$processing = 0;
-			$total_gg = count($this->data['arrayGG']);
+			$total_gg = count($this->data['arrayHH']);
 			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
 			$generated = 0;
-			foreach ($this->data['arrayGG'] as $contrato) {
+			foreach ($this->data['arrayHH'] as $contrato) {
 				++$processing;
 				$this->status('gg', "Procesando $processing liquidaciones de gastos. ($errores con errores)");
-				$post_data = array_merge($this->data['form'], $contrato);
+				$datos_cobro = array(
+					'id_contrato' => $contrato[0],
+					'fecha_ultimo_cobro' => $contrato[1],
+					'incluye_honorarios' => 0,
+					'incluye_gastos' => 1
+				);
+				$post_data = array_merge($this->data['form'], $datos_cobro);
 				$result = $this->post($url, $post_data);
 				if (count($result['cobros'])) {
 					$generated += count($result['cobros']);
@@ -93,7 +97,14 @@ class GeneracionMasivaCobros extends AppShell {
 				++$processing;
 				$this->status('hh', "Procesando $processing liquidaciones de honorarios. ($errores con errores)");
 
-				$post_data = array_merge($this->data['form'], $contrato);
+				$datos_cobro = array(
+					'id_contrato' => $contrato[0],
+					'fecha_ultimo_cobro' => empty($contrato[1]) ? '' : $contrato[1],
+					'monto' => empty($contrato[2]) ? '' : $contrato[2],
+					'incluye_honorarios' => 1,
+					'incluye_gastos' => 0
+				);
+				$post_data = array_merge($this->data['form'], $datos_cobro);
 				$result = $this->post($url, $post_data);
 				if (count($result['cobros'])) {
 					$generated += count($result['cobros']);
@@ -119,13 +130,20 @@ class GeneracionMasivaCobros extends AppShell {
 			foreach ($this->data['arrayMIXTAS'] as $contrato) {
 				++$processing;
 				$this->status('mixtas', "Procesando $processing liquidaciones mixtas. ($errores con errores)");
+				$datos_cobro = array(
+					'id_contrato' => $contrato[0],
+					'fecha_ultimo_cobro' => empty($contrato[1]) ? '' : $contrato[1],
+					'monto' => $contrato[2],
+					'incluye_honorarios' => 1,
+					'incluye_gastos' => 1,
+				);
 				if ($this->data['solo'] == 'honorarios') {
-					$contrato = array_merge($contrato, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
+					$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
 				} else if ($this->data['solo'] == 'gastos') {
-					$contrato = array_merge($contrato, array('incluye_honorarios' => 0, 'incluye_gastos' => 1));
+					$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 0, 'incluye_gastos' => 1));
 				}
 
-				$post_data = array_merge($this->data['form'], $contrato);
+				$post_data = array_merge($this->data['form'], $datos_cobro);
 				$result = $this->post($url, $post_data);
 				if (count($result['cobros'])) {
 					$generated += count($result['cobros']);
@@ -196,21 +214,6 @@ class GeneracionMasivaCobros extends AppShell {
 	 */
 	private function log($value) {
 		Log::write($value, Cobro::PROCESS_NAME);
-	}
-
-	/**
-	 * Convierte un Query string de url en un array.
-	 * @param type $qs
-	 * @return type
-	 */
-	private function qs2array($qs) {
-		$array = array();
-		$a = explode('&', $qs);
-		foreach ($a as $v) {
-			$b = explode('=', $v);
-			$array[$b[0]] = $b[1];
-		}
-		return $array;
 	}
 
 }

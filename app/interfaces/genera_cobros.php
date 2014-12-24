@@ -138,9 +138,9 @@ if ($opc == 'asuntos_liquidar') {
 
 	$arrayMIXTAS = array();
 	$arrayHH = array();
-	$arrayGG = array();
 	$arrayClientes = array();
 	$arrayContratos = array();
+	$totalHITOS = 0;
 
 	$responseCobrosST = $sesion->pdodbh->query($query);
 	$responseCobrosRS = $responseCobrosST->fetchAll(PDO::FETCH_FUNC, 'url_cobro_individual');
@@ -171,10 +171,10 @@ $Form->defaultLabel = false;
 if ($opc == 'buscar') {
 
 	echo "var arrayHH=" . json_encode($arrayHH) . ";\n";
-	echo "var arrayGG=" . json_encode($arrayGG) . ";\n";
 	echo "var arrayMIXTAS=" . json_encode($arrayMIXTAS) . ";\n";
 	echo "var arrayClientes=" . json_encode(array_values($arrayClientes)) . ";\n";
 	echo "var arrayContratos=" . json_encode(array_values($arrayContratos)) . ";\n";
+	echo "var totalHITOS=" . (empty($totalHITOS) ? '0' : $totalHITOS) . ";\n";
 }
 ?>
 
@@ -339,14 +339,10 @@ if ($opc == 'buscar') {
 
 			text_window += '</div><div style="text-align:center;"> ';
 
-			var largoGG = arrayGG.length;
-			var largoHH = arrayHH.length;
-			var largoMIXTAS = arrayMIXTAS.length;
-			var largototal = largoGG + largoHH + largoMIXTAS;
 			var largoClientes = arrayClientes.length;
 			var largoContratos = arrayContratos.length;
 
-			if (largototal == 0 || largoClientes == 0) {
+			if (largoContratos == 0 || largoClientes == 0) {
 				text_window += '<br><span  style="text-align:center;color:red; " id="respuestagg">No hay datos para los filtros que Ud. ha seleccionado</span></div></div>';
 			} else {
 				text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
@@ -385,14 +381,13 @@ if ($opc == 'buscar') {
 
 								<?php if (Conf::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
 									var data = {
-										'arrayGG': arrayGG,
 										'arrayHH': arrayHH,
 										'arrayMIXTAS': arrayMIXTAS,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': jQuery('#form_busca').serialize()
+										'form': <?php echo json_encode($_POST); ?>
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
-										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generacion de sus cobros.<br><br>Presione "Cerrar" para continuar.');
+										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generacion de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
 										jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 										jQuery('#loading, #nocerrar').hide();
 										jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -559,10 +554,9 @@ if ($opc == 'buscar') {
 
 					var text_window = '<strong><center><?php echo __('A continuación se generarán los borradores del periodo que ha seleccionado.') ?><br><br><?php echo __('¿Desea descargar los cobros del periodo?') ?><center></strong><br><br>';
 
-					var largoGG = arrayGG.length;
 					var largoHH = arrayHH.length;
 					var largoMIXTAS = arrayMIXTAS.length;
-					var largototal = largoGG + largoHH + largoMIXTAS;
+					var largototal = largoHH + largoMIXTAS;
 					var largoClientes = arrayClientes.length;
 					if (largototal == 0 || largoClientes == 0) {
 						text_window += '<strong><center>No hay datos para los filtros que Ud. ha seleccionado</center></strong>';
@@ -1383,58 +1377,29 @@ function funcionTR(& $contrato) {
 
 function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $forma_cobro, $monto, $codigo_idioma, $simbolo, $asuntos, $asunto_lista, $forma_cobro, $monto_total, $activo, $fecha_ultimo_cobro, $glosa_tarifa, $incluir_en_cierre, $retainer_horas, $simbolo_moneda_monto, $cifras_decimales_moneda_monto, $separar_liquidaciones) {
 
+	global $sesion, $arrayHH, $arrayMIXTAS, $arrayClientes, $arrayContratos, $totalHITOS;
+
 	if ($forma_cobro == 'HITOS') {
+		++$totalHITOS;
 		return;
 	}
 
-	global $sesion, $arrayHH, $arrayGG, $arrayMIXTAS, $arrayClientes, $arrayContratos, $fecha_ini, $fecha_fin;
-	$pendientesRS = array();
-	$arrayClientes[$codigo_cliente] = $codigo_cliente;
 
+	$arrayClientes[$codigo_cliente] = $codigo_cliente;
 	$arrayContratos[] = $id_contrato;
 
-	$pendientesRS[0] = array('id_cobro_pendiente' => '', 'monto_estimado' => '');
-
-	$common_array = array(
-		'id_contrato' => $id_contrato,
-		'fecha_ultimo_cobro' => $fecha_ultimo_cobro,
-		'id_cobro_pendiente' => '',
-		'incluye_honorarios' => 0,
-		'incluye_gastos' => 0
-	);
-
+	$datos = array($id_contrato);
+	if (!is_null($fecha_ultimo_cobro)) {
+		$datos[1] = $fecha_ultimo_cobro;
+	}
 	if ($separar_liquidaciones) {
-		foreach ($pendientesRS as $pendiente) {
-			if ($forma_cobro == 'FLAT_FEE') {
-				$arrayHH[] = array_merge($common_array, array(
-					'monto' => $monto,
-					'incluye_honorarios' => 1
-				));
-			} else {
-				$arrayHH[] = array_merge($common_array, array(
-					'incluye_honorarios' => 1
-				));
-			}
+		if ($forma_cobro == 'FLAT_FEE') {
+			$datos[2] = $monto;
 		}
-
-		$arrayGG[] = array_merge($common_array, array(
-			'incluye_gastos' => 1
-		));
+		$arrayHH[] = $datos;
 	} else {
-		if ($forma_cobro == 'FLAT_FEE' || $forma_cobro == 'RETAINER') {
-			$arrayMIXTAS[] = array_merge($common_array, array(
-				'monto_estimado' => '',
-				'monto' => $monto,
-				'incluye_honorarios' => 1,
-				'incluye_gastos' => 1
-			));
-		} else {
-			$arrayMIXTAS[] = array_merge($common_array, array(
-				'monto' => $monto,
-				'incluye_honorarios' => 1,
-				'incluye_gastos' => 1
-			));
-		}
+		$datos[2] = $monto;
+		$arrayMIXTAS[] = $datos;
 	}
 }
 
