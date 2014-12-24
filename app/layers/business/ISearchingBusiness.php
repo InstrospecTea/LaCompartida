@@ -12,6 +12,16 @@ interface ISearchingBusiness{
 	 * @param array          $filter_properties
 	 * @return mixed|void
 	 */
-	function searchByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array());
+	public function searchByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array());
 
-} 
+	/**
+	 * Devuelve el resultado de searchByCriteria() paginado.
+	 * @param SearchCriteria $searchCriteria
+	 * @param array $filter_properties
+	 * @param type $page
+	 * @return \stdClass
+	 */
+	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1);
+
+
+}
