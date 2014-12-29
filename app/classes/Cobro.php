@@ -1920,7 +1920,7 @@ if (!class_exists('Cobro')) {
 		 * @param type $incluye_gastos
 		 * @param type $incluye_honorarios
 		 * @param type $cobro_programado
-		 * @return type
+		 * @return integer id del cobro generado.
 		 */
 		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
