@@ -326,7 +326,7 @@ if ($opc == 'buscar') {
 					})
 				return;
 			}
-			
+
 			<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 				if (jQuery('#tipo_liquidacion').val() == '') {
 					text_window += '<br/><?php echo $Form->radio('radio_generacion', 'gastos', false, array('id' => 'radio_gastos')) . __('Sólo Gastos') ?>';
@@ -369,13 +369,13 @@ if ($opc == 'buscar') {
 			text_window += '<br><span style="font-size:11px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br>';
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
 			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
-			text_window += '<br/><tr><td align="right"><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk);?></td><td align="left"><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?></td></tr>';
+			text_window += '<br/><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk);?></td><td align="left"><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?>';
 			text_window += '</div><div style="text-align:center;"> ';
 			text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
 			text_window += '<br><span id="respuestahh">&nbsp;</span> ';
 			text_window += '<br><span id="respuestamixtas">&nbsp;</span>';
-			text_window += '<br><span  id="respuestagg">&nbsp;</span>';
-			text_window += '<br><span  id="nocerrar">&nbsp;</span></div></div>';
+			text_window += '<br><span id="respuestagg">&nbsp;</span>';
+			text_window += '<br><span id="nocerrar">&nbsp;</span></div></div>';
 
 			text_window += '</div><div style="text-align:center;"> ';
 			jQuery('<p/>')
@@ -389,6 +389,9 @@ if ($opc == 'buscar') {
 						open: function() {
 							jQuery('.ui-dialog-title').addClass('ui-icon-warning');
 							jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+						},
+						close: function() {
+							jQuery(this).dialog('destroy').remove();
 						},
 						buttons: {
 							"Generar": function() {
@@ -441,7 +444,7 @@ if ($opc == 'buscar') {
 
 							},
 							"<?php echo __('Cancelar') ?>": function() {
-								jQuery(this).dialog("close");
+								jQuery(this).dialog('close');
 								interrumpeproceso = 1;
 								return false;
 							}

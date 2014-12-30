@@ -73,19 +73,15 @@ if ($individual && $id_contrato) {
 		$id_proceso_nuevo = $Cobro->GeneraProceso();
 	}
 
-	$con_gastos = $solo_gastos = false;
+	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
 
-	Log::write(' |  |- no separar_liquidaciones', Cobro::PROCESS_NAME);
-	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, '', '', $con_gastos, $solo_gastos, $incluye_gastos, $incluye_honorarios);
-
-	Log::write(' |  -', Cobro::PROCESS_NAME);
-
+	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
 
 	if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
 		Log::write(' |- generar_silenciosamente', Cobro::PROCESS_NAME);
-		Log::write(' -', Cobro::PROCESS_NAME);
+		Log::write(' ----', Cobro::PROCESS_NAME);
 
 		unset($Sesion);
 		unset($Cobro);
@@ -93,7 +89,7 @@ if ($individual && $id_contrato) {
 		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro)));
 	} else {
 		Log::write(' |- redirect', Cobro::PROCESS_NAME);
-		Log::write(' -', Cobro::PROCESS_NAME);
+		Log::write(' ----', Cobro::PROCESS_NAME);
 		$Pagina->Redirect("cobros5.php?id_cobro={$newcobro}&popup=1");
 	}
 }
