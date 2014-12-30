@@ -109,20 +109,27 @@ class TimekeeperProductivityReport extends AbstractReport implements ITimekeeper
         )
       ),
     );
-
+    $moneda_filtro = $this->parameters['monedaFiltro'];
+    $show_option = $this->mapShowOptions($this->parameters['mostrarValor']);
     $range = $this->dateRange($this->parameters['fechaIni'], $this->parameters['fechaFin'], '+1 month', 'Y-m');
     $range_titles = $this->dateRange($this->parameters['fechaIni'], $this->parameters['fechaFin'], '+1 month', 'M-Y');
     foreach ($range as $idx => $column) {
       $config[] = array(
         'field' => $column,
         'title' => $range_titles[$idx],
-        'format' => 'number'
+        'format' => 'number',
+        'extras' => array(
+          'decimals' => ($show_option == 'total_valor_cobrado' ?  $moneda_filtro->get('cifras_decimales') : 2)
+        )
       );
     }
     $config[] = array(
       'field' => 'total',
       'title' => 'Total',
-      'format' => 'number'
+      'format' => 'number',
+      'extras' => array(
+        'decimals' => ($show_option == 'total_valor_cobrado' ?  $moneda_filtro->get('cifras_decimales') : 2)
+      )
     );
     return $config;
   }
