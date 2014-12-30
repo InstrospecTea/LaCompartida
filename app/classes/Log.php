@@ -30,7 +30,7 @@ class Log {
 		if (!file_exists($file)) {
 			$me->writeFile('', $file);
 		}
-		if (!is_writable($file) && $this->debug) {
+		if (!is_writable($file) && $me->debug) {
 			echo $file . __(' no se puede escribir.');
 		}
 		$text = date('Y-m-d H:i:s') . " - {$text}\n";
