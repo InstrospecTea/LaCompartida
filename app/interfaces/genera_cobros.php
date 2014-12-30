@@ -85,6 +85,9 @@ if ($opc == 'asuntos_liquidar') {
 	}
 	if ($tipo_liquidacion) {//1-2 = honorarios-gastos, 3 = mixtas
 		$where .= " AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
+		if ($tipo_liquidacion == 1) {
+			$where .= " AND (contrato.forma_cobro != 'HITOS') ";
+		}
 	}
 
 	$mostrar_codigo_asuntos = "";
@@ -332,7 +335,6 @@ if ($opc == 'buscar') {
 					text_window += '<br/><?php echo $Form->radio('radio_generacion', 'honorarios', false, array('id' => 'radio_honorarios')) . __('Sólo Honorarios') ?>';
 				}
 			<?php } ?>
-
 			text_window += '</div><div style="text-align:center;"> ';
 
 			var largoClientes = arrayClientes.length;
@@ -1076,6 +1078,7 @@ function funcionTR(& $contrato) {
 	if ($contrato->fields['id_contrato'] > 0) {
 		$where = 1;
 		if ($tipo_liquidacion) {
+			$tipo_liquidacion = intval($tipo_liquidacion);
 			$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " .
 					" AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
 		}
@@ -1269,7 +1272,6 @@ function funcionTR(& $contrato) {
 						. $contrato->fields['forma_cobro'] . "'," . $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','','" . Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-") . "',"
 						. ($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0) . "," . $contrato->fields['monto'] . ",'" . $contrato->fields['simbolo'] . "'," . $pendiente->fields['id_cobro_pendiente'] . ", 1, 1)\" >";
 			}
-
 			if ($z == 0) {
 				$html .= "&nbsp;<input type=checkbox name=opc onclick='UpdateContrato(this.checked," . $contrato->fields['id_contrato'] . ");' $check title='" . __('Si está seleccionado se generará un borrador en la generación masiva') . "' >";
 			}
@@ -1385,7 +1387,7 @@ function funcionTR(& $contrato) {
 		if (!$tipo_liquidacion)
 			$html .= "&nbsp;&nbsp;";
 
-		if (!($tipo_liquidacion & 1) || $contrato->fields['forma_cobro'] == 'HITOS') { //1-2 = honorarios-gastos, 3 = mixtas
+		if (!($tipo_liquidacion & 1) || ($contrato->fields['forma_cobro'] == 'HITOS' && !($tipo_liquidacion & 1))) { //1-2 = honorarios-gastos, 3 = mixtas
 			$html .= "<img src='" . Conf::ImgDir() . "/coins_16_gastos.png' title='" . __('Generar cobro individual para gastos') . "' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','" . $fecha_ini . "','" . $fecha_fin . "',0,0,'',0, 0, 1);\" />";
 		}
