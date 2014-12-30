@@ -584,11 +584,13 @@ if ($opc == 'buscar') {
 					if (largototal == 0 || largoClientes == 0) {
 						text_window += '<strong><center>No hay datos para los filtros que Ud. ha seleccionado</center></strong>';
 					} else {
-
-						text_window += '<div style="padding-left:40px; text-align:left; color:red; "><label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:160px;">Formato del borrador:</label>';
+						text_window += '<div style="padding-left:40px; text-align:left; color:red; ">';
+						text_window += '<label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:180px;">Formato del borrador:</label>';
 						text_window += '<?php echo str_replace(array("'", "\n"), array('"', ''), Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", "", "", "Según opciones del " . __('Contrato'), '200px')); ?>';
-						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:160px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
-						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
+						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:180px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
+						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:180px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" />';
+						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, false); ?>';
+						text_window += '</div>';
 					}
 
 					if (jQuery('#advertencia_descargar_borradores').length > 0) {
@@ -620,6 +622,9 @@ if ($opc == 'buscar') {
 										}
 										if (jQuery('#agrupar').is(':checked')) {
 											opciones += ',agrupar';
+										}
+										if (jQuery('#cobrosencero_descargar_borradores').is(':checked')) {
+											jQuery('#cobrosencero').attr('checked', true);
 										}
 										ImpresionCobros(false, opciones, id_formato);
 										jQuery(this).dialog("close");

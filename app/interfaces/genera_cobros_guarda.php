@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 Log::write("Cliente {$_POST['codigo_cliente']}", Cobro::PROCESS_NAME);
@@ -20,7 +19,12 @@ $opcion = explode(',', $opcion);
 $imprimir_cartas = $opcion[0] == 'cartas';
 $agrupar_cartas = $opcion[1] == 'agrupar';
 
-if ((!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0 ) && isset($_GET['generar_silenciosamente'])) {
+$incluir_cobros_en_cero = false;
+if (isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) {
+	$incluir_cobros_en_cero = true;
+}
+
+if (!$incluir_cobros_en_cero && isset($_GET['generar_silenciosamente'])) {
 	$forzar = false;
 } else {
 	$forzar = true;
@@ -45,6 +49,7 @@ $incluye_honorarios = !empty($incluye_honorarios);
 if (!$incluye_gastos && !$incluye_honorarios) {
 	$incluye_gastos = $incluye_honorarios = true;
 }
+
 if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_honorarios = $tipo_liquidacion & 1 ? true : false;
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
@@ -87,19 +92,21 @@ if ($codigo_asunto && !$id_contrato) {
 	$Contrato->LoadByCodigoAsunto($codigo_asunto);
 	$id_contrato = $Contrato->fields['id_contrato'];
 }
-####### WHERE SQL ########
-if ($print || $emitir) {
 
+if ($print || $emitir) {
 	$where = 1;
-	$join_cobro_cliente = "";
+	$join_cobro_cliente = '';
+
 	if ($activo) {
 		$where .= " AND contrato.activo = 'SI' ";
 	} else {
 		$where .= " AND contrato.activo = 'NO' ";
 	}
+
 	if ($id_usuario) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
 	}
+
 	if ($id_usuario_secundario) {
 		$where .= " AND contrato.id_usuario_secundario = '$id_usuario_secundario' ";
 	}
@@ -107,13 +114,16 @@ if ($print || $emitir) {
 	if ($codigo_cliente) {
 		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
 	}
+
 	if ($id_contrato) {
 		$where .= " AND contrato.id_contrato = '$id_contrato' ";
 	}
+
 	if ($id_grupo_cliente) {
 		$join_cobro_cliente = " JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente ";
 		$where .= " AND cliente.id_grupo_cliente = '$id_grupo_cliente' ";
 	}
+
 	if ($rango == '' && $usar_periodo == 1) {
 		$fecha_periodo_ini = $fecha_anio . '-' . $fecha_mes . '-01';
 		$fecha_periodo_fin = $fecha_anio . '-' . $fecha_mes . '-31';
@@ -128,23 +138,26 @@ if ($print || $emitir) {
 			$where .= " AND cobro.fecha_fin <= '" . Utiles::fecha2sql($fecha_fin) . "' ";
 		}
 	}
+
 	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	}
+
 	if ($tipo_liquidacion) {
 		$where .= " AND cobro.incluye_gastos = '$incluye_gastos' AND cobro.incluye_honorarios = '$incluye_honorarios' ";
 	}
 
-	if (!isset($_POST['cobrosencero']) || $_POST['cobrosencero'] == 0) {
-		$where .= " AND ( cobro.monto_subtotal > 0 OR cobro.subtotal_gastos>0 OR cobro.forma_cobro != 'TASA' ) ";
+	if (!$incluir_cobros_en_cero) {
+		$where .= " AND (cobro.monto_subtotal > 0 OR cobro.subtotal_gastos > 0 OR cobro.forma_cobro != 'TASA') ";
 	}
+
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_generar_cobro') : false;
 
 	$url = "genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 		"&fecha_fin=$fecha_fin&opc=buscar&rango=$rango&fecha_anio=$fecha_anio&fecha_mes=$fecha_mes&fecha_periodo_ini=$fecha_periodo_ini" .
 		"&fecha_periodo_fin=$fecha_periodo_fin&usar_periodo=$usar_periodo&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto";
 }
-####### END #########
+
 # IMPRESION
 if ($print) {
 	$NotaCobro = new NotaCobro($Sesion);
@@ -177,13 +190,15 @@ if ($print) {
 		$error_logfile = ini_get('error_log');
 		$logdir = dirname($error_logfile);
 
-		$html = "";
-
 		if ($totaldecobros > 0) {
 			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas);
 		} else {
-			echo "\n<script type=\"text/javascript\">var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
-			die('No hay datos para su criterio de búsqueda');
+			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
+				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>
+				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atención</strong><br/><br/>Error al intentar generar los borradores según periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
+			</div>
+			<script type="text/javascript">setTimeout("window.history.back()", 4000);</script>';
+			exit($detalle_error);
 		}
 	} catch (PDOException $pdoe) {
 		debug($pdoe->getTraceAsString());
