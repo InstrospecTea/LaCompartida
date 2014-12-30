@@ -327,7 +327,8 @@ if ($opc == 'buscar') {
 			text_window += '<br><span style="font-size:11px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br>';
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
 			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
-
+			text_window += '<br/><tr><td align="right"><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk);?></td><td align="left"><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?></td></tr>';
+			
 			<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 				if (jQuery('#tipo_liquidacion').val() == '') {
 					text_window += '<br/><?php echo $Form->radio('radio_generacion', 'gastos', false, array('id' => 'radio_gastos')) . __('Sólo Gastos') ?>';
@@ -351,7 +352,7 @@ if ($opc == 'buscar') {
 				text_window += '<br><span  id="respuestagg">&nbsp;</span>';
 				text_window += '<br><span  id="nocerrar">&nbsp;</span></div></div>';
 			}
-
+		
 			jQuery('<p/>')
 					.attr('title', 'Advertencia')
 					.append(text_window)
@@ -369,7 +370,11 @@ if ($opc == 'buscar') {
 								jQuery(".ui-dialog-buttonpane button:contains('Generar')").button("disable");
 								jQuery('#loading, #nocerrar').show();
 								jQuery('#tiposdecambio').slideUp();
-
+								if (jQuery('#cobrosencero_generacion').is(':checked')) {
+									jQuery('#cobrosencero').attr('checked', true);
+								} else {
+									jQuery('#cobrosencero').attr('checked', false);
+								}
 								jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?generar_silenciosamente=1');
 								<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 									if (jQuery('#radio_gastos').is(':checked')) {
@@ -384,7 +389,8 @@ if ($opc == 'buscar') {
 										'arrayHH': arrayHH,
 										'arrayMIXTAS': arrayMIXTAS,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': <?php echo json_encode($_POST); ?>
+										'form': <?php echo json_encode($_POST);?>,
+										'cobrosencero': jQuery('[name="cobrosencero"]:checked').val()
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generacion de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
@@ -921,17 +927,13 @@ if ($opc == 'buscar') {
 								}
 							}
 							?>
-							<td>
-							</td>
 						</tr>
-
+						<tr>
+							<td align="left"><?php echo $Form->checkbox('cobrosencero', 1, $cobrosencero_chk, array('style' => 'display:none;'));?></td>
+						</tr>
 						<tr>
 							<td align="right"><b><?php echo __('Activo') ?>&nbsp;</b></td>
 							<td align="left"><?php echo $Form->checkbox('activo', 1, $activo_chk);?></td>
-						</tr>
-						<tr>
-							<td align="right"><b><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?></b></td>
-							<td align="left"><?php echo $Form->checkbox('cobrosencero', 1, $cobrosencero_chk);?></td>
 						</tr>
 						<tr>
 							<td></td>

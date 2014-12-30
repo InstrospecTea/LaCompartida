@@ -374,7 +374,7 @@ class Contrato extends Objeto {
 						AND (cta_corriente.id_cobro IS NULL)
 						AND cta_corriente.incluir_en_cobro = 'SI'
 						AND cta_corriente.cobrable = 1
-						AND asunto.id_contrato = '$id_contrato'						";
+						AND asunto.id_contrato = '$id_contrato'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while (list($monto, $id_moneda) = mysql_fetch_array($resp)) {
