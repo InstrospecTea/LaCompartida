@@ -14,11 +14,8 @@ class Log {
 		$this->logFolder = LOGDIR . Conf::dbUser() . '/ttb/' . date('y-m');
 
 		if (!is_dir($this->logFolder)) {
-			try {
-				mkdir($this->logFolder, 0777, true);
-			} catch(Exception $e) {
-				echo ("No es posible crear el directorio '{$this->logFolder}'<br/>\n" . $e->getMessage());
-				exit;
+			if (!mkdir($this->logFolder, 0777, true)) {
+				exit("No es posible crear el directorio '{$this->logFolder}'");
 			}
 		}
 	}
