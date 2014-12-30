@@ -837,7 +837,7 @@ class Contrato extends Objeto {
 
 		$tiempo_inicial = 0;
 		for ($i = 1; $i < 5; $i++) {
-			if (empty($this->fields['esc' . $i . '_tiempo'])) {
+			if (empty($this->fields['esc' . $i . '_tiempo'])) {
 				break;
 			}
 
@@ -1308,9 +1308,9 @@ class Contrato extends Objeto {
 					if ($c > 0) {
 						$query .= ",";
 					}
-					if ($val != 'NULL') {
+					if ($val != 'NULL') { 
 						$query .= "$key = '" . addslashes($val) . "'";
-					} else {
+					} else {
 						$query .= "$key = NULL ";
 					}
 					$c++;
