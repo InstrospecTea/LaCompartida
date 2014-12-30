@@ -118,10 +118,10 @@ for ($x = 3; $x < 14; $x++) {
 $filas++;
 $glosa_comparacion = " Los montos facturados se comparan con el monto THH segun ";
 
-if ($tarifa = 'monto_thh') {
-	$glosa_comparacion .= "tarifa estandar";
-} else {
+if ($tarifa == 'monto_thh') {
 	$glosa_comparacion .= "tarifa del cliente";
+} else {
+	$glosa_comparacion .= "tarifa estandar";
 }
 
 $ws1->write($filas, 1, $glosa_comparacion, $txt_opcion);
