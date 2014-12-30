@@ -10581,6 +10581,18 @@ QUERY;
 			break;
 
 		case 7.88:
+			if (!ExisteCampo('direccion', 'cuenta_banco', $dbh)) {
+				$queries[] = "ALTER TABLE cuenta_banco
+					ADD COLUMN direccion VARCHAR(255) DEFAULT NULL COMMENT 'Direccion de la sucursal',
+					ADD COLUMN telefono VARCHAR(60) DEFAULT NULL COMMENT 'Telefono primario',
+					ADD COLUMN telefono2 VARCHAR(60) DEFAULT NULL COMMENT 'Telefono secundario',
+					ADD COLUMN fax VARCHAR(60) DEFAULT NULL COMMENT 'Telefono FAX'";
+
+				$queries[] = "ALTER TABLE prm_banco ADD COLUMN url VARCHAR(255) DEFAULT NULL COMMENT 'Direccion Web'";
+			}
+			break;
+
+		case 7.89:
 			$queries[] = "CREATE TABLE `bloqueo_procesos` (
 							`id` int(11) NOT NULL AUTO_INCREMENT,
 							`id_usuario` int(11) NOT NULL,
@@ -10598,10 +10610,12 @@ QUERY;
 							KEY `notificado_ndx` (`notificado`)
 						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 			break;
-		case 7.89:
-			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
 
+		case 7.90:
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
+			break;
 	}
+
 	if (!empty($queries)) {
 		ejecutar($queries, $dbh);
 	}
@@ -10612,7 +10626,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.89;
+$max_update = 7.90;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
