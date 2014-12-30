@@ -6,157 +6,170 @@
  */
 class GeneracionMasivaCobros extends AppShell {
 
-	private $status = array();
+	private $status = array(
+		'proceso' => '',
+		'hh' => '',
+		'gg' => '',
+		'mixtas' => ''
+	);
+
+	private $generated = array(
+		'hh' => 0,
+		'gg' => 0,
+		'mixtas' => 0
+	);
+
+	private $errors = array(
+		'hh' => 0,
+		'gg' => 0,
+		'mixtas' => 0
+	);
 
 	public function main() {
 		$this->Session->usuario = new Usuario($this->Session);
 		$this->Session->usuario->LoadId($this->data['user_id']);
 		$this->loadModel('BloqueoProceso');
-		$this->data['form'] = $this->data['form'];
 		$this->BloqueoProceso->lock(Cobro::PROCESS_NAME, '', json_encode($this->data['form']));
 		if (isset($this->data['arrayClientes'])) {
 			$this->clients();
 		} else {
-			if (!empty($this->data['arrayHH'])) {
-				$this->generaHH();
-				$this->generaGG();
-			}
-			if (!empty($this->data['arrayMIXTAS'])) {
-				$this->generaMIXTAS();
-			}
+			$this->contracts();
 		}
 		$this->BloqueoProceso->unlock(Cobro::PROCESS_NAME);
 	}
 
+	private function contracts() {
+		try {
+			$processing = 0;
+			$total_contratos = count($this->data['arrayHH']) + count($this->data['arrayMIXTAS']);
+			foreach ($this->data['arrayHH'] as $id_contrato) {
+				++$processing;
+				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
+				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
+				$this->generaHH($id_contrato);
+				$this->generaGG($id_contrato);
+			}
+			foreach ($this->data['arrayMIXTAS'] as $id_contrato) {
+				++$processing;
+				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
+				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
+				$this->generaMIXTAS($id_contrato);
+			}
+		} catch (Exception $e) {
+			$this->log($e->getMessage());
+		}
+		$msg_procesando = $this->sp($processing, "Se ha procesado 1 contrato de {$total_contratos}", "Se han procesado {$processing} contratos de {$total_contratos}");
+		$this->status('proceso', "$msg_procesando.");
+	}
+
 	private function clients() {
 		try {
-			$errores = 0;
 			$processing = 0;
 			$total_clientes = count($this->data['arrayClientes']);
-			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
-			$generated = 0;
-			foreach ($this->data['arrayClientes'] as $k => $cliente) {
+			foreach ($this->data['arrayClientes'] as $codigo_cliente) {
 				++$processing;
-				$this->status('client', "Procesando $processing de $total_clientes clientes. ({$errores} con errores)");
-				$post_data = array_merge($this->data['form'], array('codigo_cliente' => $cliente));
-				$result = $this->post($url, $post_data);
-				if (count($result['cobros'])) {
-					$generated += count($result['cobros']);
+				$msg_procesando = $this->sp($processing, '1 cliente', "{$processing} clientes");
+				$this->status('proceso', "Procesando $msg_procesando de {$total_clientes}.");
+				$Contrato = new Contrato($this->Session);
+				$contratos = $Contrato->contratosParaBorradorCobro($codigo_cliente, $this->data['form']);
+				foreach ($contratos as $contrato) {
+					if ($contrato['separar_liquidaciones']) {
+						$this->generaHH($contrato['id_contrato']);
+						$this->generaGG($contrato['id_contrato']);
+					} else {
+						$this->generaMIXTAS($contrato['id_contrato']);
+					}
 				}
 			}
-		} catch (Exeption $e) {
-			++$errores;
+		} catch (Exception $e) {
+			$this->log($e->getMessage());
 		}
-		if ($generated) {
-			$this->status('client', "Se han generado $generated liquidaciones para $total_clientes clientes. ({$errores} con errores)");
-		} else {
-			$this->status('client', "No se han generado liquidaciones. ({$errores} errores)");
-		}
+		$msg_procesando = $this->sp($processing, 'ha procesado 1 cliente', "han procesado {$processing}");
+		$this->status('proceso', "Se $msg_procesando de {$total_clientes}.");
 	}
 
-	private function generaGG() {
+	private function generaGG($id_contrato) {
 		try {
-			$errores = 0;
-			$processing = 0;
-			$total_gg = count($this->data['arrayHH']);
-			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
-			$generated = 0;
-			foreach ($this->data['arrayHH'] as $contrato) {
-				++$processing;
-				$this->status('gg', "Procesando $processing liquidaciones de gastos. ($errores con errores)");
-				$datos_cobro = array(
-					'id_contrato' => $contrato[0],
-					'fecha_ultimo_cobro' => $contrato[1],
-					'incluye_honorarios' => 0,
-					'incluye_gastos' => 1
-				);
-				$post_data = array_merge($this->data['form'], $datos_cobro);
-				$result = $this->post($url, $post_data);
-				if (count($result['cobros'])) {
-					$generated += count($result['cobros']);
-				}
+			$datos_cobro = array(
+				'id_contrato' => $id_contrato,
+				'incluye_honorarios' => 0,
+				'incluye_gastos' => 1
+			);
+			$post_data = array_merge($this->data['form'], $datos_cobro);
+			$result = $this->post($post_data);
+			if (!empty($result['cobro'])) {
+				$this->generated['gg'] += empty($result['cobro']) ? 0 : 1;
 			}
-		} catch (Exeption $e) {
-			++$errores;
+		} catch (Exception $e) {
+			$this->log($e->getMessage());
+			++$this->errors['gg'];
 		}
-		if ($generated) {
-			$this->status('gg', "Se han generado $generated liquidaciones de gastos. ({$errores} con errores)");
-		} else {
-			$this->status('gg', "No se han generado liquidaciones de gastos. ({$errores} errores)");
-		}
+		$msg_generado = $this->sp(
+			$this->generated['gg'],
+			'Se ha generado 1 liquidación de gastos',
+			"Se han generado {$this->generated['gg']} liquidaciones de gastos",
+			'No se han generado liquidaciones de gastos'
+		);
+		$msg_error = $this->sp($this->errors['gg'], '1 con error', "{$this->errors['gg']} con errores", 'sin errores');
+		$this->status('gg', "$msg_generado. ($msg_error)");
 	}
 
-	private function generaHH() {
+	private function generaHH($id_contrato) {
 		try {
-			$errores = 0;
-			$processing = 0;
-			$total_hh = count($this->data['arrayHH']);
-			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
-			$generated = 0;
-			foreach ($this->data['arrayHH'] as $contrato) {
-				++$processing;
-				$this->status('hh', "Procesando $processing liquidaciones de honorarios. ($errores con errores)");
-
-				$datos_cobro = array(
-					'id_contrato' => $contrato[0],
-					'fecha_ultimo_cobro' => empty($contrato[1]) ? '' : $contrato[1],
-					'monto' => empty($contrato[2]) ? '' : $contrato[2],
-					'incluye_honorarios' => 1,
-					'incluye_gastos' => 0
-				);
-				$post_data = array_merge($this->data['form'], $datos_cobro);
-				$result = $this->post($url, $post_data);
-				if (count($result['cobros'])) {
-					$generated += count($result['cobros']);
-				}
+			$datos_cobro = array(
+				'id_contrato' => $id_contrato,
+				'incluye_honorarios' => 1,
+				'incluye_gastos' => 0
+			);
+			$post_data = array_merge($this->data['form'], $datos_cobro);
+			$result = $this->post($post_data);
+			if (!empty($result['cobro'])) {
+				$this->generated['hh'] += empty($result['cobro']) ? 0 : 1;
 			}
-		} catch (Exeption $e) {
-			++$errores;
+		} catch (Exception $e) {
+			$this->log($e->getMessage());
+			++$this->errors['hh'];
 		}
-		if ($generated) {
-			$this->status('hh', "Se han generado $generated liquidaciones de honorarios. ({$errores} con errores)");
-		} else {
-			$this->status('hh', "No se han generado liquidaciones de honorarios. ({$errores} errores)");
-		}
+		$msg_generado = $this->sp(
+			$this->generated['hh'],
+			'Se ha generado 1 liquidación de honorarios',
+			"Se han generado {$this->generated['hh']} liquidaciones de honorarios",
+			'No se han generado liquidaciones de honorarios'
+		);
+		$msg_error = $this->sp($this->errors['hh'], '1 con error', "{$this->errors['hh']} con errores", 'sin errores');
+		$this->status('hh', "$msg_generado. ($msg_error)");
 	}
 
-	private function generaMIXTAS() {
+	private function generaMIXTAS($id_contrato) {
 		try {
-			$errores = 0;
-			$processing = 0;
-			$total_mixtas = count($this->data['arrayMIXTAS']);
-			$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
-			$generated = 0;
-			foreach ($this->data['arrayMIXTAS'] as $contrato) {
-				++$processing;
-				$this->status('mixtas', "Procesando $processing liquidaciones mixtas. ($errores con errores)");
-				$datos_cobro = array(
-					'id_contrato' => $contrato[0],
-					'fecha_ultimo_cobro' => empty($contrato[1]) ? '' : $contrato[1],
-					'monto' => $contrato[2],
-					'incluye_honorarios' => 1,
-					'incluye_gastos' => 1,
-				);
-				if ($this->data['solo'] == 'honorarios') {
-					$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
-				} else if ($this->data['solo'] == 'gastos') {
-					$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 0, 'incluye_gastos' => 1));
-				}
-
-				$post_data = array_merge($this->data['form'], $datos_cobro);
-				$result = $this->post($url, $post_data);
-				if (count($result['cobros'])) {
-					$generated += count($result['cobros']);
-				}
+			$datos_cobro = array(
+				'id_contrato' => $id_contrato,
+				'incluye_honorarios' => 1,
+				'incluye_gastos' => 1,
+			);
+			if ($this->data['solo'] == 'honorarios') {
+				$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
+			} else if ($this->data['solo'] == 'gastos') {
+				$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 0, 'incluye_gastos' => 1));
 			}
-		} catch (Exeption $e) {
-			++$errores;
+
+			$post_data = array_merge($this->data['form'], $datos_cobro);
+			$result = $this->post($post_data);
+			if (!empty($result['cobro'])) {
+				$this->generated['mixtas'] += empty($result['cobro']) ? 0 : 1;
+			}
+		} catch (Exception $e) {
+			$this->log($e->getMessage());
+			++$this->errors['mixtas'];
 		}
-		if ($generated) {
-			$this->status('mixtas', "Se han generado $generated liquidaciones mixtas. ({$errores} con errores)");
-		} else {
-			$this->status('mixtas', "No se han generado liquidaciones de mixtas. ({$errores} errores)");
-		}
+		$msg_generado = $this->sp(
+			$this->generated['mixtas'],
+			'Se ha generado 1 liquidación mixta',
+			"Se han generado {$this->generated['mixtas']} liquidaciones mixtas",
+			'No se han generado liquidaciones mixtas'
+		);
+		$msg_error = $this->sp($this->errors['mixtas'], '1 con error', "{$this->errors['mixtas']} con errores", 'sin errores');
+		$this->status('mixtas', "$msg_generado. ($msg_error)");
 	}
 
 	/**
@@ -166,23 +179,23 @@ class GeneracionMasivaCobros extends AppShell {
 	 */
 	private function status($type, $status) {
 		$this->status[$type] = $status;
-		$st = implode('<br/>', $this->status);
+		$st = implode('<br/>', array_filter($this->status));
 		$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $st);
 	}
 
 	/**
 	 * Envía una llamada POST a una URL.
-	 * @param type $url
 	 * @param type $post_data
 	 * @return boolean
 	 */
-	private function post($url, $post_data) {
+	private function post($post_data) {
+		$url = Conf::Server() . Conf::RootDir() . '/app/interfaces/genera_cobros_guarda.php';
 		if (is_array($post_data)) {
 			$post_data = implode('&', UtilesApp::mergeKeyValue($post_data, '%s=%s'));
 		}
 		$url = preg_replace('/^https:\/\//', 'http://', $url);
 		$get_data = 'generar_silenciosamente=1';
-		$post_data .= "&autologin=1&id_usuario_login={$this->data['user_id']}&hash=" . Conf::hash();
+		$post_data .= "&individual=1&autologin=1&id_usuario_login={$this->data['user_id']}&hash=" . Conf::hash();
 		$this->log("{$url}?{$get_data} --post {$post_data}");
 		$ch = curl_init();
 
@@ -205,7 +218,10 @@ class GeneracionMasivaCobros extends AppShell {
 		if ($http_code == 200) {
 			return json_decode(trim($body), true);
 		}
-		throw new exception('Ocurrio un error en la llamada post.');
+
+		$this->log('Ocurrio un error en la llamada post.');
+		$this->log($response);
+		throw new Exception('Ocurrio un error en la llamada post.');
 	}
 
 	/**
@@ -214,6 +230,20 @@ class GeneracionMasivaCobros extends AppShell {
 	 */
 	private function log($value) {
 		Log::write($value, Cobro::PROCESS_NAME);
+	}
+
+	/**
+	 * Devuelve mensaje singular o plural según el valor.
+	 * @param numeric $valor
+	 * @param string $singular mensaje que devuelve si el valor es igual a 1
+	 * @param string $plural mensaje que devuelve si el valor es distinto a 1
+	 * @param string $cero @opcional mensaje que devuelve si el valor es cero, si no viene utiliza el mensaje plural.
+	 */
+	private function sp($valor, $singular, $plural, $cero = '') {
+		if (empty($cero) && $valor == 0) {
+			$valor = 2;
+		}
+		return $valor == 0 ? $cero : ($valor == 1 ? $singular : $plural);
 	}
 
 }

@@ -25,7 +25,7 @@ $Slim=Slim::getInstance('default',true);
 <div id="dialog-confirm" style="display:none;" ></div>
 <div id="lttooltip"></div>
 <?php
-	global $sesion;
+	$sesion = new Sesion();
 	$BloqueoProceso = new BloqueoProceso($sesion);
 	$notificaciones = $BloqueoProceso->getNotifications($sesion->usuario->fields['id_usuario']);
 

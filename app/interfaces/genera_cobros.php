@@ -417,7 +417,12 @@ if ($opc == 'buscar') {
 									});
 
 								<?php } else { ?>
-									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', {'arrayClientes': arrayClientes, 'form': jQuery('#form_busca').serialize()}, function(reply) {
+									var data = {
+										'arrayClientes': arrayClientes,
+										'solo': jQuery('[name="radio_generacion"]:checked').val(),
+										'form': <?php echo json_encode($_POST); ?>
+									};
+									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoClientes + ' clientes para la generacion de sus cobros.<br><br>Presione "Cerrar" para continuar.');
 										jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 										jQuery('#loading, #nocerrar').hide();
@@ -1411,18 +1416,10 @@ function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $fo
 	$arrayClientes[$codigo_cliente] = $codigo_cliente;
 	$arrayContratos[] = $id_contrato;
 
-	$datos = array($id_contrato);
-	if (!is_null($fecha_ultimo_cobro)) {
-		$datos[1] = $fecha_ultimo_cobro;
-	}
 	if ($separar_liquidaciones) {
-		if ($forma_cobro == 'FLAT_FEE') {
-			$datos[2] = $monto;
-		}
-		$arrayHH[] = $datos;
+		$arrayHH[] = $id_contrato;
 	} else {
-		$datos[2] = $monto;
-		$arrayMIXTAS[] = $datos;
+		$arrayMIXTAS[] = $id_contrato;
 	}
 }
 
