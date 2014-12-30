@@ -107,6 +107,12 @@ $Slim=Slim::getInstance('default',true);
 				jQuery.get(root_dir + '/app/ProcessLock/set_notified/' + id)
 			}
 
+			function ir_al_formulario(id, el) {
+				jQuery.get(root_dir + '/app/ProcessLock/set_notified/' + id, function() {
+					jQuery(el).closest('form').submit();
+				});
+			}
+
 			function mostrar_notificacion(mensaje, id) {
 				jQuery.gritter.add({
 					title: 'Finalización de proceso',
@@ -123,11 +129,11 @@ $Slim=Slim::getInstance('default',true);
 
 		<?php
 
-		function form_link($proceso, $data) {
+		function form_link($proceso, $data, $id) {
 			$data = json_decode($data, true);
 			switch ($proceso) {
 				case 'GeneracionMasivaCobros':
-					$url = 'app/interfaces/genera_cobros.php';
+					$url = '/app/interfaces/genera_cobros.php';
 					$data['opc'] = 'buscar';
 					break;
 				default:
@@ -138,15 +144,15 @@ $Slim=Slim::getInstance('default',true);
 			foreach ($data as $field => $value) {
 				$html .= $Form->hidden($field, $value, array('id' => false));
 			}
-			$html .= $Form->Html->link('Ir al formulario', '#', array('onclick' => "jQuery(this).closest(\'form\').submit();return false;"));
-			return $Form->Html->tag('form', $html, array('action' => Conf::Host() . $url, 'method' => 'post'));
+			$html .= $Form->Html->link('Ir al formulario', '#', array('onclick' => "ir_al_formulario($id, this);return false;"));
+			return $Form->Html->tag('form', $html, array('action' => Conf::RootDir() . $url, 'method' => 'post'));
 		}
 
 		$Html = new \TTB\Html();
 		foreach ($notificaciones as $notificacion) {
 			$proceso = \TTB\Utiles::humanize(\TTB\Utiles::underscoreize($notificacion->get('proceso')));
 			$fecha = Utiles::sql3fecha($notificacion->get('fecha_modificacion'), '%d-%m-%Y a las %H:%M hrs.');
-			$form_link = form_link($notificacion->get('proceso'), $notificacion->get('datos_post'));
+			$form_link = form_link($notificacion->get('proceso'), $notificacion->get('datos_post'), $notificacion->get('id'));
 			$script = "mostrar_notificacion('<b>{$proceso}</b><br/>{$fecha}<br/>{$notificacion->get('estado')}<br/>{$form_link}', {$notificacion->get('id')});";
 			echo $Html->script_block($script);
 		}
