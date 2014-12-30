@@ -85,6 +85,9 @@ if ($opc == 'asuntos_liquidar') {
 	}
 	if ($tipo_liquidacion) {//1-2 = honorarios-gastos, 3 = mixtas
 		$where .= " AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
+		if ($tipo_liquidacion == 1) {
+			$where .= " AND (contrato.forma_cobro != 'HITOS') ";
+		}
 	}
 
 	$mostrar_codigo_asuntos = "";
@@ -197,24 +200,20 @@ if ($opc == 'buscar') {
 		nuevaVentana("Subir_Excel", 500, 300, "subir_excel.php");
 	}
 
-	function DeleteCobro(form, id, i, id_contrato)
-	{
-		if (!form) {
-			var form = $('form_busca');
-		}
-
-		var div = $('cobros_' + i);
-
+	function DeleteCobro(id, i, id_contrato) {
 		if (id) {
-
-			var text_window = '<span style="font-size:12px;margin:10px; text-align:center;font-weight:bold"><?php echo __('¿Desea eliminar') . " " . __('el cobro') . " " . __('seleccionado?') ?>.</span><br>';
+			var text_window = '<span style="font-size:12px;margin:10px; text-align:center;font-weight:bold"><?php echo __('¿Desea eliminar') . ' ' . __('el cobro') . ' ' . __('seleccionado?') ?>.</span>';
 
 			interrumpeproceso = 0;
 			jQuery('<p/>')
 					.attr('title', 'Confirmación')
 					.html(text_window)
 					.dialog({
-						resizable: true, autoOpen: true, height: 130, width: 350, modal: true,
+						resizable: true,
+						autoOpen: true,
+						height: 'auto',
+						width: 350,
+						modal: true,
 						close: function(ev, ui) {
 							jQuery(this).html('');
 							interrumpeproceso = 1;
@@ -224,20 +223,30 @@ if ($opc == 'buscar') {
 							jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
 						},
 						buttons: {
-							"<?php echo __('Continuar') ?>": function() {
+							'<?php echo __('Continuar') ?>': function() {
 
-								if ($('fecha_ini'))
+								if (jQuery('#fecha_ini').length) {
 									var fecha_ini = jQuery('#fecha_ini').val();
-								if ($('fecha_fin'))
+								}
+								if (jQuery('#fecha_fin').length) {
 									var fecha_fin = jQuery('#fecha_fin').val();
-								var uurl = 'ajax.php?accion=elimina_cobro&id_cobro=' + id + '&div=' + i + '&id_contrato=' + id_contrato + '&id_proceso=' + form.id_proceso.value + '&fecha_ini=' + fecha_ini + '&fecha_fin=' + fecha_fin;
-								jQuery.get(uurl, function(response) {
+								}
+								var data = {
+									accion: 'elimina_cobro',
+									id_cobro: id,
+									div: i,
+									id_contrato: id_contrato,
+									id_proceso: jQuery('#id_proceso').val(),
+									fecha_ini: fecha_ini,
+									fecha_fin: fecha_fin
+								};
+								jQuery.get('ajax.php', data, function(response) {
 									jQuery('#cobros_' + i).html(response);
 								});
 								jQuery(this).dialog("close");
 								return true;
 							},
-							"<?php echo __('Cancelar') ?>": function() {
+							'<?php echo __('Cancelar') ?>': function() {
 								jQuery(this).dialog("close");
 								return false;
 							}
@@ -317,17 +326,6 @@ if ($opc == 'buscar') {
 					})
 				return;
 			}
-
-			var text_window = '<div style="font-size:11px; text-align:center;font-weight:bold;padding:10px;"><?php echo __('Antes de generar los borradores, asegúrese de haber actualizado los tipos de cambio.') ?>';
-			text_window += '<br><div id="tiposdecambio"><br><?php echo '<a class="btn" style="text-decoration: none;border: 1px solid #AAA;display: block;width: 130px;margin: -10px auto;" href="tipo_cambio.php">' . __('Tipos de Cambio actuales') . '</a>'; ?><br>';
-			text_window += '<table align="center" style="margin:auto;border:1px dotted #666" width=40%><tr><td><b><?php echo __('Moneda') ?></b></td><td><b><?php echo __('Cambio') ?></b></td></tr>';
-			text_window += '<?php while ($monedas = mysql_fetch_array($resp_moneda)) { ?><tr><td><?php echo $monedas[glosa_moneda] ?></td><td><?php echo $monedas[tipo_cambio] ?></td></tr><?php } ?>';
-			text_window += '</table></div>';
-			text_window += '<br><span style="font-size:11px; text-align:center; color:#FF0000;"><?php echo __('Recuerde que al generar los borradores se eliminarán todos los borradores antiguos asociados a los contratos') ?></span><br>';
-			text_window += '<br><span style="font-size:11px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br>';
-			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
-			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
-			text_window += '<br/><tr><td align="right"><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk);?></td><td align="left"><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?></td></tr>';
 			
 			<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 				if (jQuery('#tipo_liquidacion').val() == '') {
@@ -338,27 +336,54 @@ if ($opc == 'buscar') {
 				}
 			<?php } ?>
 
-			text_window += '</div><div style="text-align:center;"> ';
-
 			var largoClientes = arrayClientes.length;
 			var largoContratos = arrayContratos.length;
 
 			if (largoContratos == 0 || largoClientes == 0) {
-				text_window += '<br><span  style="text-align:center;color:red; " id="respuestagg">No hay datos para los filtros que Ud. ha seleccionado</span></div></div>';
-			} else {
-				text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
-				text_window += '<br><span id="respuestahh">&nbsp;</span> ';
-				text_window += '<br><span id="respuestamixtas">&nbsp;</span>';
-				text_window += '<br><span  id="respuestagg">&nbsp;</span>';
-				text_window += '<br><span  id="nocerrar">&nbsp;</span></div></div>';
+				text_window = '<div style="font-weight:bold;padding:10px;">No hay datos para los filtros que Ud. ha seleccionado</div>';
+				jQuery('<p/>')
+					.attr('title', 'Advertencia')
+					.html(text_window)
+					.dialog({
+						autoOpen: true,
+						height: 'auto',
+						width: 350,
+						modal: true,
+						close: function(ev, ui) {
+							jQuery(this).dialog('destroy').remove();
+						},
+						buttons: {
+							'Cerrar': function() {
+								jQuery(this).dialog('close');
+							}
+						}
+					});
+				return
 			}
-		
+			var text_window = '<div style="font-size:11px; text-align:center;font-weight:bold;padding:10px;"><?php echo __('Antes de generar los borradores, asegúrese de haber actualizado los tipos de cambio.') ?>';
+			text_window += '<br><div id="tiposdecambio"><br><?php echo '<a class="btn" style="text-decoration: none;border: 1px solid #AAA;display: block;width: 130px;margin: -10px auto;" href="tipo_cambio.php">' . __('Tipos de Cambio actuales') . '</a>'; ?><br>';
+			text_window += '<table align="center" style="margin:auto;border:1px dotted #666" width=40%><tr><td><b><?php echo __('Moneda') ?></b></td><td><b><?php echo __('Cambio') ?></b></td></tr>';
+			text_window += '<?php while ($monedas = mysql_fetch_array($resp_moneda)) { ?><tr><td><?php echo $monedas[glosa_moneda] ?></td><td><?php echo $monedas[tipo_cambio] ?></td></tr><?php } ?>';
+			text_window += '</table></div>';
+			text_window += '<br><span style="font-size:11px; text-align:center; color:#FF0000;"><?php echo __('Recuerde que al generar los borradores se eliminarán todos los borradores antiguos asociados a los contratos') ?></span><br>';
+			text_window += '<br><span style="font-size:11px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br>';
+			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
+			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
+			text_window += '<br/><tr><td align="right"><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk);?></td><td align="left"><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?></td></tr>';
+			text_window += '</div><div style="text-align:center;"> ';
+			text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
+			text_window += '<br><span id="respuestahh">&nbsp;</span> ';
+			text_window += '<br><span id="respuestamixtas">&nbsp;</span>';
+			text_window += '<br><span  id="respuestagg">&nbsp;</span>';
+			text_window += '<br><span  id="nocerrar">&nbsp;</span></div></div>';
+
+			text_window += '</div><div style="text-align:center;"> ';
 			jQuery('<p/>')
 					.attr('title', 'Advertencia')
 					.append(text_window)
 					.dialog({
 						autoOpen: true,
-						height: 470,
+						height: 'auto',
 						width: 550,
 						modal: true,
 						open: function() {
@@ -393,14 +418,19 @@ if ($opc == 'buscar') {
 										'cobrosencero': jQuery('[name="cobrosencero"]:checked').val()
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
-										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generacion de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
+										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generación de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
 										jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 										jQuery('#loading, #nocerrar').hide();
 										jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
 									});
 
 								<?php } else { ?>
-									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', {'arrayClientes': arrayClientes, 'form': jQuery('#form_busca').serialize()}, function(reply) {
+									var data = {
+										'arrayClientes': arrayClientes,
+										'solo': jQuery('[name="radio_generacion"]:checked').val(),
+										'form': <?php echo json_encode($_POST); ?>
+									};
+									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoClientes + ' clientes para la generacion de sus cobros.<br><br>Presione "Cerrar" para continuar.');
 										jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 										jQuery('#loading, #nocerrar').hide();
@@ -567,11 +597,13 @@ if ($opc == 'buscar') {
 					if (largototal == 0 || largoClientes == 0) {
 						text_window += '<strong><center>No hay datos para los filtros que Ud. ha seleccionado</center></strong>';
 					} else {
-
-						text_window += '<div style="padding-left:40px; text-align:left; color:red; "><label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:160px;">Formato del borrador:</label>';
+						text_window += '<div style="padding-left:40px; text-align:left; color:red; ">';
+						text_window += '<label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:180px;">Formato del borrador:</label>';
 						text_window += '<?php echo str_replace(array("'", "\n"), array('"', ''), Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", "", "", "Según opciones del " . __('Contrato'), '200px')); ?>';
-						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:160px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
-						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:160px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" /></div>';
+						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:180px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
+						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:180px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" />';
+						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, false); ?>';
+						text_window += '</div>';
 					}
 
 					if (jQuery('#advertencia_descargar_borradores').length > 0) {
@@ -584,7 +616,7 @@ if ($opc == 'buscar') {
 							.html(text_window)
 							.dialog({
 								resizable: true,
-								height: 260,
+								height: 'auto',
 								width: 500,
 								modal: true,
 								close: function(ev, ui) {
@@ -603,6 +635,9 @@ if ($opc == 'buscar') {
 										}
 										if (jQuery('#agrupar').is(':checked')) {
 											opciones += ',agrupar';
+										}
+										if (jQuery('#cobrosencero_descargar_borradores').is(':checked')) {
+											jQuery('#cobrosencero').attr('checked', true);
 										}
 										ImpresionCobros(false, opciones, id_formato);
 										jQuery(this).dialog("close");
@@ -647,7 +682,7 @@ if ($opc == 'buscar') {
 					.html(text_window)
 					.dialog({
 						resizable: true,
-						height: 280,
+						height: 'auto',
 						width: 470,
 						modal: true,
 						close: function(ev, ui) {
@@ -748,7 +783,7 @@ if ($opc == 'buscar') {
 				.html(text_window)
 				.dialog({
 					resizable: true,
-					height: 280,
+					height: 'auto',
 					width: 470,
 					modal: true,
 					open: function() {
@@ -1045,6 +1080,7 @@ function funcionTR(& $contrato) {
 	if ($contrato->fields['id_contrato'] > 0) {
 		$where = 1;
 		if ($tipo_liquidacion) {
+			$tipo_liquidacion = intval($tipo_liquidacion);
 			$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " .
 					" AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
 		}
@@ -1184,7 +1220,7 @@ function funcionTR(& $contrato) {
 
 			$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
 			$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='" . __('Continuar con el cobro') . "' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true', '');\">&nbsp;</a>";
-			$html .= "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='" . __('Eliminar cobro') . "'  onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\">&nbsp;</a>";
+			$html .= "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='" . __('Eliminar cobro') . "'  onclick=\"DeleteCobro('{$cobro->fields['id_cobro']}', {$i}, '{$contrato->fields['id_contrato']}')\">&nbsp;</a>";
 			$html .= UtilesApp::LogDialog($sesion, 'cobro', $cobro->fields['id_cobro']);
 
 			$html .= "</td>";
@@ -1238,7 +1274,6 @@ function funcionTR(& $contrato) {
 						. $contrato->fields['forma_cobro'] . "'," . $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','','" . Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-") . "',"
 						. ($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0) . "," . $contrato->fields['monto'] . ",'" . $contrato->fields['simbolo'] . "'," . $pendiente->fields['id_cobro_pendiente'] . ", 1, 1)\" >";
 			}
-
 			if ($z == 0) {
 				$html .= "&nbsp;<input type=checkbox name=opc onclick='UpdateContrato(this.checked," . $contrato->fields['id_contrato'] . ");' $check title='" . __('Si está seleccionado se generará un borrador en la generación masiva') . "' >";
 			}
@@ -1354,7 +1389,7 @@ function funcionTR(& $contrato) {
 		if (!$tipo_liquidacion)
 			$html .= "&nbsp;&nbsp;";
 
-		if (!($tipo_liquidacion & 1) || $contrato->fields['forma_cobro'] == 'HITOS') { //1-2 = honorarios-gastos, 3 = mixtas
+		if (!($tipo_liquidacion & 1) || ($contrato->fields['forma_cobro'] == 'HITOS' && !($tipo_liquidacion & 1))) { //1-2 = honorarios-gastos, 3 = mixtas
 			$html .= "<img src='" . Conf::ImgDir() . "/coins_16_gastos.png' title='" . __('Generar cobro individual para gastos') . "' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'] . ",'" . $contrato->fields['fecha_ultimo_cobro'] . "','" . $fecha_ini . "','" . $fecha_fin . "',0,0,'',0, 0, 1);\" />";
 		}
@@ -1390,18 +1425,10 @@ function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $fo
 	$arrayClientes[$codigo_cliente] = $codigo_cliente;
 	$arrayContratos[] = $id_contrato;
 
-	$datos = array($id_contrato);
-	if (!is_null($fecha_ultimo_cobro)) {
-		$datos[1] = $fecha_ultimo_cobro;
-	}
 	if ($separar_liquidaciones) {
-		if ($forma_cobro == 'FLAT_FEE') {
-			$datos[2] = $monto;
-		}
-		$arrayHH[] = $datos;
+		$arrayHH[] = $id_contrato;
 	} else {
-		$datos[2] = $monto;
-		$arrayMIXTAS[] = $datos;
+		$arrayMIXTAS[] = $id_contrato;
 	}
 }
 
