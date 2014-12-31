@@ -413,7 +413,7 @@ if ($opc == 'buscar') {
 										'arrayMIXTAS': arrayMIXTAS,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST);?>,
-										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked')
+										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generación de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
@@ -427,7 +427,7 @@ if ($opc == 'buscar') {
 										'arrayClientes': arrayClientes,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST); ?>,
-										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked')
+										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoClientes + ' clientes para la generacion de sus cobros.<br><br>Presione "Cerrar" para continuar.');
