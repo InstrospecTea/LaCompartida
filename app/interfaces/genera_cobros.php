@@ -398,11 +398,6 @@ if ($opc == 'buscar') {
 								jQuery(".ui-dialog-buttonpane button:contains('Generar')").button("disable");
 								jQuery('#loading, #nocerrar').show();
 								jQuery('#tiposdecambio').slideUp();
-								if (jQuery('#cobrosencero_generacion').is(':checked')) {
-									jQuery('#cobrosencero').attr('checked', true);
-								} else {
-									jQuery('#cobrosencero').attr('checked', false);
-								}
 								jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?generar_silenciosamente=1');
 								<?php if (Conf::GetConf($sesion, 'SoloGastos')) { ?>
 									if (jQuery('#radio_gastos').is(':checked')) {
@@ -418,7 +413,7 @@ if ($opc == 'buscar') {
 										'arrayMIXTAS': arrayMIXTAS,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST);?>,
-										'cobrosencero': jQuery('[name="cobrosencero"]:checked').val()
+										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked')
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generación de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
@@ -431,7 +426,8 @@ if ($opc == 'buscar') {
 									var data = {
 										'arrayClientes': arrayClientes,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': <?php echo json_encode($_POST); ?>
+										'form': <?php echo json_encode($_POST); ?>,
+										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked')
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoClientes + ' clientes para la generacion de sus cobros.<br><br>Presione "Cerrar" para continuar.');
