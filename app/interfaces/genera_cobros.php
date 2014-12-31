@@ -207,7 +207,7 @@ if ($opc == 'buscar') {
 		nuevaVentana("Subir_Excel", 500, 300, "subir_excel.php");
 	}
 
-	function DeleteCobro(id, i, id_contrato) {
+	function DeleteCobro(id, i, id_contrato, me) {
 		if (id) {
 			var text_window = '<span style="font-size:12px;margin:10px; text-align:center;font-weight:bold"><?php echo __('¿Desea eliminar') . ' ' . __('el cobro') . ' ' . __('seleccionado?') ?>.</span>';
 
@@ -248,7 +248,8 @@ if ($opc == 'buscar') {
 									fecha_fin: fecha_fin
 								};
 								jQuery.get('ajax.php', data, function(response) {
-									jQuery('#cobros_' + i).html(response);
+									var td = jQuery('<td/>').html(response).attr('colspan', 4);
+									jQuery(me).closest('tr').html(td);
 								});
 								jQuery(this).dialog("close");
 								return true;
@@ -1216,7 +1217,7 @@ function funcionTR(& $contrato) {
 
 			$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
 			$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='" . __('Continuar con el cobro') . "' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true', '');\">&nbsp;</a>";
-			$html .= "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='" . __('Eliminar cobro') . "'  onclick=\"DeleteCobro('{$cobro->fields['id_cobro']}', {$i}, '{$contrato->fields['id_contrato']}')\">&nbsp;</a>";
+			$html .= "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='" . __('Eliminar cobro') . "'  onclick=\"DeleteCobro('{$cobro->fields['id_cobro']}', {$i}, '{$contrato->fields['id_contrato']}', this)\">&nbsp;</a>";
 			$html .= UtilesApp::LogDialog($sesion, 'cobro', $cobro->fields['id_cobro']);
 
 			$html .= "</td>";
