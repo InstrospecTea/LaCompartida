@@ -165,6 +165,13 @@ $pagina->titulo = __('Proceso masivo de emisión de cobros');
 $pagina->PrintTop();
 $Form = new Form();
 $Form->defaultLabel = false;
+
+if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
+	$cobrosencero_chk = false;
+} else {
+	$cobrosencero_chk = true;
+}
+
 ?>
 
 <script type="text/javascript">
@@ -369,7 +376,7 @@ if ($opc == 'buscar') {
 			text_window += '<br><span style="font-size:11px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br>';
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
 			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
-			text_window += '<br/><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk);?></td><td align="left"><?php echo 'Incluir ' . __('cobros') . ' de monto cero' ?>';
+			text_window += '<br/><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk, array('label' => 'Incluir ' . __('cobros') . ' de monto cero'));?>';
 			text_window += '</div><div style="text-align:center;"> ';
 			text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
 			text_window += '<br><span id="respuestahh">&nbsp;</span> ';
@@ -601,7 +608,7 @@ if ($opc == 'buscar') {
 						text_window += '<?php echo str_replace(array("'", "\n"), array('"', ''), Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", "", "", "Según opciones del " . __('Contrato'), '200px')); ?>';
 						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:180px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
 						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:180px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" />';
-						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, false); ?>';
+						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, $cobrosencero_chk); ?>';
 						text_window += '</div>';
 					}
 
@@ -636,7 +643,7 @@ if ($opc == 'buscar') {
 											opciones += ',agrupar';
 										}
 										if (jQuery('#cobrosencero_descargar_borradores').is(':checked')) {
-											jQuery('#cobrosencero').attr('checked', true);
+											jQuery('#cobrosencero').val(1);
 										}
 										ImpresionCobros(false, opciones, id_formato);
 										jQuery(this).dialog("close");
@@ -847,7 +854,10 @@ if ($opc == 'buscar') {
 </script>
 
 <form name='form_busca' id='form_busca' action='' method=post>
-	<input type=hidden name=opc id='opc' value=''>
+	<?php
+	echo $Form->hidden('opc', '');
+	echo $Form->hidden('cobrosencero', 0);
+	?>
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
@@ -950,20 +960,7 @@ if ($opc == 'buscar') {
 							} else {
 								$activo_chk = false;
 							}
-
-							if (isset($_POST['cobrosencero'])) {
-								$cobrosencero_chk = $_POST['cobrosencero'] == 1;
-							} else {
-								if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
-									$cobrosencero_chk = false;
-								} else {
-									$cobrosencero_chk = true;
-								}
-							}
 							?>
-						</tr>
-						<tr>
-							<td align="left"><?php echo $Form->checkbox('cobrosencero', 1, $cobrosencero_chk, array('style' => 'display:none;'));?></td>
 						</tr>
 						<tr>
 							<td align="right"><b><?php echo __('Activo') ?>&nbsp;</b></td>
