@@ -1,16 +1,24 @@
 # Changelog
 
+## Hotfix: 14.22.2
+Martes 30 de Diciembre 2014
+* **Feature:** [Corrige la asignaci贸n de moneda en el contrato para formas de cobro distintas a TASA](https://github.com/LemontechSA/ttb/pull/807)
+
+## Hotfix: 14.22.1
+Martes 30 de Diciembre 2014
+* **Feature:** [Corrige la selecci贸n de forma para comparar en el reporte de ventas](https://github.com/LemontechSA/ttb/pull/806)
+
 ## Release: 14.22.0
 Martes 23 de Diciembre 2014
 * **Feature:** [Factura Honorarios y Gastos](https://github.com/LemontechSA/ttb/pull/800)
 
 ## Hotfix: 14.21.5
 Jueves 18 de Diciembre 2014
-* **Fix:** [calculo de total de horas por d韆](https://github.com/LemontechSA/ttb/pull/799)
+* **Fix:** [calculo de total de horas por d铆a](https://github.com/LemontechSA/ttb/pull/799)
 
 ## Hotfix: 14.21.4
-Mi閞coles 17 de Diciembre 2014
-* **Add:** [Corregir filtro Usuario en mantenedor de tr醡ites](https://github.com/LemontechSA/ttb/pull/798)
+Mi茅coles 17 de Diciembre 2014
+* **Add:** [Corregir filtro Usuario en mantenedor de tr谩mites](https://github.com/LemontechSA/ttb/pull/798)
 
 ## Hotfix: 14.21.3
 Martes 12 de Diciembre 2014
@@ -19,24 +27,24 @@ Martes 12 de Diciembre 2014
 
 ## Hotfix: 14.21.2
 Viernes 12 de Diciembre 2014
-* **Fix:** [Corregir validaci髇 de regi髇 en formulario de cliente](https://github.com/LemontechSA/ttb/pull/791)
+* **Fix:** [Corregir validaci贸n de regi贸n en formulario de cliente](https://github.com/LemontechSA/ttb/pull/791)
 
 ## Hotfix: 14.21.1
 Jueves 11 de Diciembre 2014
-* **Fix:** [Selecci髇 de formato de nota de cobro por defecto](https://github.com/LemontechSA/ttb/pull/788)
+* **Fix:** [Selecci贸n de formato de nota de cobro por defecto](https://github.com/LemontechSA/ttb/pull/788)
 
 ## Release: 14.21.0
-Mi閞coles 10 de Diciembre 2014
-* **Feature:** [Notas de Cr閐ito/D閎ito FacturacionCL](https://github.com/LemontechSA/ttb/pull/774)
+Mi茅rcoles 10 de Diciembre 2014
+* **Feature:** [Notas de Cr茅dito/D茅bito FacturacionCL](https://github.com/LemontechSA/ttb/pull/774)
 * **Feature:** [Fecha de vencimiento en PDF Facturas](https://github.com/LemontechSA/ttb/pull/764)
 
 ## Hotfix: 14.20.9
 Miercoles 10 de Diciembre 2014
-* **Fix:** [Selecciona serie y n鷐ero de documento correctamente al editar o agregar.](https://github.com/LemontechSA/ttb/pull/786)
+* **Fix:** [Selecciona serie y n煤mero de documento correctamente al editar o agregar.](https://github.com/LemontechSA/ttb/pull/786)
 
 ## Hotfix: 14.20.8
 Martes 9 de Diciembre 2014
-* **Fix:** [No genera excepci髇 si una de las notas de cobro devuelve vac韔, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
+* **Fix:** [No genera excepci贸n si una de las notas de cobro devuelve vac铆o, al descargar borradores.](https://github.com/LemontechSA/ttb/pull/785)
 
 ## Hotfix: 14.20.7
 Jueves 4 de Diciembre 2014
@@ -44,7 +52,7 @@ Jueves 4 de Diciembre 2014
 
 ## Hotfix: 14.20.6
 Viernes 28 de Noviembre 2014
-* **Change:** [Agrega tags a petici髇 de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
+* **Change:** [Agrega tags a petici贸n de Olmedo](https://github.com/LemontechSA/ttb/pull/773)
 
 ## Hotfix: 14.20.5
 Viernes 27 de Noviembre 2014
@@ -64,9 +72,9 @@ Jueves 27 de Noviembre 2014
 
 ## Release: 14.20.0
 Jueves 26 de Noviembre 2014
-* **Feature:** [Optimizaci髇 Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
+* **Feature:** [Optimizaci贸n Historial de Trabajos](https://github.com/LemontechSA/ttb/pull/653)
 * **Feature:** [Usuario Encargado lista de clientes](https://github.com/LemontechSA/ttb/pull/754)
-* **Feature:** [Agregar decimales a restricci髇 diaria de usuarios](https://github.com/LemontechSA/ttb/pull/747)
+* **Feature:** [Agregar decimales a restricci贸n diaria de usuarios](https://github.com/LemontechSA/ttb/pull/747)
 * **Feature:** [Arquitectura](https://github.com/LemontechSA/ttb/pull/730)
 * **Feature:** [Posibilidad de uso de Vagrant en TTB](https://github.com/LemontechSA/ttb/pull/723)
 
@@ -84,35 +92,35 @@ Martes 18 de Noviembre 2014
 
 ## Hotfix: 14.19.22
 Martes 18 de Noviembre 2014
-* **Fixed:** [Revertir correcci髇 c醠culo cambio de moneda (falla con clientes sin modulo de facturaci髇)](https://github.com/LemontechSA/ttb/pull/757)
+* **Fixed:** [Revertir correcci贸n c谩lculo cambio de moneda (falla con clientes sin modulo de facturaci贸n)](https://github.com/LemontechSA/ttb/pull/757)
 
 ## Hotfix: 14.19.21
 Martes 18 de Noviembre 2014
-* **Fixed:** [Revertir correcci髇 c醠culo cambio de moneda (falla con clientes sin modulo de facturaci髇)](https://github.com/LemontechSA/ttb/pull/756)
+* **Fixed:** [Revertir correcci贸n c谩lculo cambio de moneda (falla con clientes sin modulo de facturaci贸n)](https://github.com/LemontechSA/ttb/pull/756)
 
 ## Hotfix: 14.19.20
 Lunes 17 de Noviembre 2014
-* **Fixed:** [Corregir c醠culo cambio de moneda.](https://github.com/LemontechSA/ttb/pull/755)
+* **Fixed:** [Corregir c谩lculo cambio de moneda.](https://github.com/LemontechSA/ttb/pull/755)
 
 ## Hotfix: 14.19.19
 Jueves 13 de Noviembre 2014
 * **Fixed:** [Agrega indice al arreglo de usuarios que identifica que es administrador.](https://github.com/LemontechSA/ttb/pull/753)
 
 ## Hotfix: 14.19.18
-Mi閞coles 12 de Noviembre 2014
-* **Fixed:** [Corregir c醠culo cambio de moneda](https://github.com/LemontechSA/ttb/pull/752)
+Mi茅rcoles 12 de Noviembre 2014
+* **Fixed:** [Corregir c谩lculo cambio de moneda](https://github.com/LemontechSA/ttb/pull/752)
 
 ## Hotfix: 14.19.17
 Martes 11 de Noviembre 2014
-* **Fixed:** [Modificar query para obtener tarifa en integraci髇 emba.](https://github.com/LemontechSA/ttb/pull/751)
+* **Fixed:** [Modificar query para obtener tarifa en integraci贸n embo.](https://github.com/LemontechSA/ttb/pull/751)
 
 ## Hotfix: 14.19.16
 Martes 11 de Noviembre 2014
-* **Fixed:** [Restablecimiento de filtros de interfaz en la generacion masiva de cobros. Corrige inicializaci髇 de mecanismo de generaci髇 masiva.](https://github.com/LemontechSA/ttb/pull/750)
+* **Fixed:** [Restablecimiento de filtros de interfaz en la generacion masiva de cobros. Corrige inicializaci贸n de mecanismo de generaci贸n masiva.](https://github.com/LemontechSA/ttb/pull/750)
 
 ## Hotfix: 14.19.15
 Martes 11 de Noviembre 2014
-* **Fixed:** [Busqueda de tarifa seg鷑 glosa en integraci髇 moreno baldivieso](https://github.com/LemontechSA/ttb/pull/749)
+* **Fixed:** [Busqueda de tarifa seg煤n glosa en integraci贸n moreno baldivieso](https://github.com/LemontechSA/ttb/pull/749)
 
 ## Hotfix: 14.19.14
 Lunes 10 de Noviembre 2014
@@ -135,67 +143,67 @@ Jueves 30 de Octubre 2014
 * **Fixed:** [Mejora en el generador  masivo de cobros](https://github.com/LemontechSA/ttb/pull/741)
 
 ## Hotfix: 14.19.8
-Mi閞coles 29 de Octubre 2014
+Mi茅rcoles 29 de Octubre 2014
 * **Fixed:** [Ordena los asuntos por glosa al imprimir los borradores de las pre-liquidaciones.](https://github.com/LemontechSA/ttb/pull/740)
 
 ## Hotfix: 14.19.7
-Mi閞coles 29 de Octubre 2014
-* **Fixed:** [Corrige simbolo de moneda en lista de tr醡ites.](https://github.com/LemontechSA/ttb/pull/739)
+Mi茅rcoles 29 de Octubre 2014
+* **Fixed:** [Corrige simbolo de moneda en lista de tr谩mites.](https://github.com/LemontechSA/ttb/pull/739)
 
 ## Hotfix: 14.19.6
-Mi閞coles 29 de Octubre 2014
+Mi茅rcoles 29 de Octubre 2014
 * **Fixed:** [Ordena los asuntos por glosa para la Nota de cobro.](https://github.com/LemontechSA/ttb/pull/738)
 
 ## Hotfix: 14.19.5
-Mi閞coles 29 de Octubre 2014
-* **Fixed:** [Modificar orden combobox pa韘es al agregar clientes](https://github.com/LemontechSA/ttb/pull/737)
+Mi茅rcoles 29 de Octubre 2014
+* **Fixed:** [Modificar orden combobox pa铆ses al agregar clientes](https://github.com/LemontechSA/ttb/pull/737)
 
 ## Hotfix: 14.19.4
-Mi閞coles 29 de Octubre 2014
-* **Fixed:** [Corrige asignaci髇 de mes en nota de cobro cuando selecciona idioma ingles](https://github.com/LemontechSA/ttb/pull/736)
+Mi茅rcoles 29 de Octubre 2014
+* **Fixed:** [Corrige asignaci贸n de mes en nota de cobro cuando selecciona idioma ingl茅s](https://github.com/LemontechSA/ttb/pull/736)
 
 ## Hotfix: 14.19.3
 Martes 28 de Octubre 2014
-* **Fixed:** [Corrige generaci髇 de query en el listado de tr醡ites](https://github.com/LemontechSA/ttb/pull/735)
+* **Fixed:** [Corrige generaci贸n de query en el listado de tr谩mites](https://github.com/LemontechSA/ttb/pull/735)
 
 ## Hotfix: 14.19.2
 Jueves 23 de Octubre 2014
-* **Fixed:** [Corrige definici髇 del m閠odo](https://github.com/LemontechSA/ttb/pull/734)
+* **Fixed:** [Corrige definici贸n del m茅todo](https://github.com/LemontechSA/ttb/pull/734)
 
 ## Hotfix: 14.19.1
 Jueves 23 de Octubre 2014
-* **Fixed:** [Selecci髇 de cliente al agregar asuntos desde el mantenedor del cliente](https://github.com/LemontechSA/ttb/pull/733)
+* **Fixed:** [Selecci贸n de cliente al agregar asuntos desde el mantenedor del cliente](https://github.com/LemontechSA/ttb/pull/733)
 
 ## Release: 14.19.0
 Jueves 23 de Octubre 2014
-* **Fixed:** [Feature modificaci髇 facturaci髇 cl](https://github.com/LemontechSA/ttb/pull/709)
-* **New:** [Feature facturaci髇 nubox](https://github.com/LemontechSA/ttb/pull/674)
-* **Updated** [Actualizaci髇 Framework](https://github.com/LemontechSA/framework/pull/33)
+* **Fixed:** [Feature modificaci贸n facturaci贸n cl](https://github.com/LemontechSA/ttb/pull/709)
+* **New:** [Feature facturaci贸n nubox](https://github.com/LemontechSA/ttb/pull/674)
+* **Updated** [Actualizaci贸n Framework](https://github.com/LemontechSA/framework/pull/33)
 
 ## Hotfix: 14.18.4
 Jueves 23 de Octubre 2014
-* **Fixed:** [Para los montos Flat Fee sin HH del reporte Producci髇 Profesional se incluye la restricci髇 de las horas](https://github.com/LemontechSA/ttb/pull/731)
+* **Fixed:** [Para los montos Flat Fee sin HH del reporte Producci贸n Profesional se incluye la restricci贸n de las horas](https://github.com/LemontechSA/ttb/pull/731)
 
 ## Hotfix: 14.18.3
 Martes 21 de Octubre 2014
-* **Fixed:** [Corrige inconsistencia en la presentaci髇 del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)
+* **Fixed:** [Corrige inconsistencia en la presentaci贸n del tipo de cambio](https://github.com/LemontechSA/ttb/pull/727)
 
 ## Hotfix: 14.18.2
 Lunes 20 de Octubre 2014
-* **Fixed:** [Corrige la condici髇 de creaci髇 de cobros programados](https://github.com/LemontechSA/ttb/pull/725)
+* **Fixed:** [Corrige la condici贸n de creaci贸n de cobros programados](https://github.com/LemontechSA/ttb/pull/725)
 
 ## Hotfix: 14.18.1
 Jueves 16 de Octubre 2014
 * **Fixed:** [Corregir despliegue de carta al descargar borradores](https://github.com/LemontechSA/ttb/pull/724)
 
 ## Release: 14.18.0
-Mi閞coles 15 de Octubre 2014
-* **Fixed:** [Corrige modificaci髇 de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
+Mi茅rcoles 15 de Octubre 2014
+* **Fixed:** [Corrige modificaci贸n de los trabajos modificados desde el excel de cobros](https://github.com/LemontechSA/ttb/pull/683)
 * **Fixed:** [Permisos reporte financiero](https://github.com/LemontechSA/ttb/pull/716)
-* **New:** [Primera versi髇 reporte personal de producci髇](https://github.com/LemontechSA/ttb/pull/719)
+* **New:** [Primera versi贸n reporte personal de producci贸n](https://github.com/LemontechSA/ttb/pull/719)
 
 ## Hotfix: 14.17.6
-Mi閞coles 15 de Octubre 2014
+Mi茅rcoles 15 de Octubre 2014
 * **Fixed:** [Elimina los registros asociados al cobro en la tabla cobro_asunto.](https://github.com/LemontechSA/ttb/pull/721)
 
 ## Hotfix: 14.17.5
@@ -212,7 +220,7 @@ Martes 7 de Octubre 2014
 
 ## Hotfix: 14.17.2
 Martes 7 de Octubre 2014
-* **Fixed:** [Define valores de tabla para cuando no est醤 definidos.](https://github.com/LemontechSA/ttb/pull/714)
+* **Fixed:** [Define valores de tabla para cuando no est谩n definidos.](https://github.com/LemontechSA/ttb/pull/714)
 
 ## Hotfix: 14.17.1
 Martes 7 de Octubre 2014
@@ -233,73 +241,73 @@ Jueves 2 de Octubre 2014
 
 ## Hotfix: 14.16.11
 Jueves 2 de Octubre 2014
-* **Fixed:** [Muestra solo los usuarios visibles en reporte producci髇 profesional](https://github.com/LemontechSA/ttb/pull/705)
+* **Fixed:** [Muestra solo los usuarios visibles en reporte producci贸n profesional](https://github.com/LemontechSA/ttb/pull/705)
 
 ## Hotfix: 14.16.10
 Martes 30 de Septiembre 2014
-* **Fixed:** [Corrige creaci髇 reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
+* **Fixed:** [Corrige creaci贸n reporte adelantos](https://github.com/LemontechSA/ttb/pull/704)
 
-##燞otfix: 14.16.9
+## Hotfix: 14.16.9
 Lunes 29 de Septiembre 2014
 * **Fixed:** [Corrige bug con tipo de cambio en saldo de deuda cliente](https://github.com/LemontechSA/ttb/pull/703)
 
-##燞otfix: 14.16.8
+## Hotfix: 14.16.8
 Jueves 25 de Septiembre 2014
 * **Fixed:** [Corrige NotaCobro para mostrar trabajos segun opcion](https://github.com/LemontechSA/ttb/pull/701)
 
-##燞otfix: 14.16.7
+## Hotfix: 14.16.7
 Jueves 25 de Septiembre 2014
 * **Fixed:** [Corrige problemas de visualizacion de IVA en DTE](https://github.com/LemontechSA/ttb/pull/700)
 
-##燞otfix: 14.16.6
+## Hotfix: 14.16.6
 Jueves 25 de Septiembre 2014
-* **Fixed:** [Corrige Modificaci髇 de tareas](https://github.com/LemontechSA/ttb/pull/699)
+* **Fixed:** [Corrige Modificaci贸n de tareas](https://github.com/LemontechSA/ttb/pull/699)
 
-##燞otfix: 14.16.5
-Mi閞coles 24 de Septiembre 2014
-* **Fixed:** [Corrige eliminaci髇 y b鷖queda de tr醡ites](https://github.com/LemontechSA/ttb/pull/698)
+## Hotfix: 14.16.5
+Mi茅rcoles 24 de Septiembre 2014
+* **Fixed:** [Corrige eliminaci贸n y b煤squeda de tr谩mites](https://github.com/LemontechSA/ttb/pull/698)
 
-##燞otfix: 14.16.4
-Mi閞coles 24 de Septiembre 2014
-* **Fixed:** [Mejora edici髇 de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/697)
+## Hotfix: 14.16.4
+Mi茅rcoles 24 de Septiembre 2014
+* **Fixed:** [Mejora edici贸n de trabajos en cobros](https://github.com/LemontechSA/ttb/pull/697)
 
-##燞otfix: 14.16.3
-Mi閞coles 24 de Septiembre 2014
-* **Fixed:** [Corrige problema con IVA en facturaci髇 electr髇ica MX](https://github.com/LemontechSA/ttb/pull/693)
+## Hotfix: 14.16.3
+Mi茅rcoles 24 de Septiembre 2014
+* **Fixed:** [Corrige problema con IVA en facturaci贸n electr贸nica MX](https://github.com/LemontechSA/ttb/pull/693)
 
-##燞otfix: 14.16.2
+## Hotfix: 14.16.2
 Martes 23 de Septiembre 2014
 * **Fixed:** [Corrige suma mal hecha en saldo adeudado (Nota de cobro)](https://github.com/LemontechSA/ttb/pull/695)
 
-##燞otfix: 14.16.1
+## Hotfix: 14.16.1
 Lunes 22 de Septiembre 2014
-* **Fixed:** [Corrige edici髇 de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
+* **Fixed:** [Corrige edici贸n de facturas con IVA](https://github.com/LemontechSA/ttb/pull/694)
 
 ## Release: 14.16.0
 Jueves 11 de Septiembre 2014
 * **Fixed:** [Feature/editor nota cobro](https://github.com/LemontechSA/ttb/pull/530)
-* **Fixed:** [Agrega opci髇 para descargar excel con formato para tablas din醡icas](https://github.com/LemontechSA/ttb/pull/616)
+* **Fixed:** [Agrega opci贸n para descargar excel con formato para tablas din谩micas](https://github.com/LemontechSA/ttb/pull/616)
 * **Fixed:** [Agrega columna monto cobrado al reporte de rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/644)
-* **Fixed:** [Integraci髇 Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
+* **Fixed:** [Integraci贸n Moreno Baldivieso (Segunda Etapa)](https://github.com/LemontechSA/ttb/pull/672)
 
-##燞otfix: 14.15.15
+## Hotfix: 14.15.15
 Jueves 11 de Septiembre 2014
-* **Fixed:** [Eliminar asignaci髇 de modalidad de c醠culo en cobros 5](https://github.com/LemontechSA/ttb/pull/693)
+* **Fixed:** [Eliminar asignaci贸n de modalidad de c谩lculo en cobros 5](https://github.com/LemontechSA/ttb/pull/693)
 
-##燞otfix: 14.15.14
-Mi閞coles 10 de Septiembre 2014
-* **Fixed:** [Corregir filtros Reporte antig黣dad de deuda](https://github.com/LemontechSA/ttb/pull/689)
+## Hotfix: 14.15.14
+Mi茅rcoles 10 de Septiembre 2014
+* **Fixed:** [Corregir filtros Reporte antig眉edad de deuda](https://github.com/LemontechSA/ttb/pull/689)
 
 ## Hotfix: 14.15.13
-Mi閞coles 10 de Septiembre 2014
-* **Fixed:** [Corregir L骻ica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
+Mi茅rcoles 10 de Septiembre 2014
+* **Fixed:** [Corregir L贸gica Nota Cobro duplicado de Modalidad](https://github.com/LemontechSA/ttb/pull/688)
 
 ## Hotfix: 14.15.12
-Mi閞coles 10 de Septiembre 2014
-* **Fixed:** [Corregir Nota Cobro MB Ingl閟. Monto Saldo aprovisionado](https://github.com/LemontechSA/ttb/pull/687)
+Mi茅rcoles 10 de Septiembre 2014
+* **Fixed:** [Corregir Nota Cobro MB Ingl茅s. Monto Saldo aprovisionado](https://github.com/LemontechSA/ttb/pull/687)
 
 ## Hotfix: 14.15.11
-Mi閞coles 10 de Septiembre 2014
+Mi茅rcoles 10 de Septiembre 2014
 * **Fixed:** [Corregir carta MB](https://github.com/LemontechSA/ttb/pull/686)
 
 ## Hotfix: 14.15.10
@@ -308,7 +316,7 @@ Martes 09 de Septiembre 2014
 
 ## Hotfix: 14.15.9
 Viernes 06 de Septiembre 2014
-* **Fixed:** [Corregir asignaci髇 de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)
+* **Fixed:** [Corregir asignaci贸n de modalidad_calculo en cobros6](https://github.com/LemontechSA/ttb/pull/681)
 
 ## Hotfix: 14.15.8
 Viernes 06 de Septiembre 2014
@@ -319,8 +327,8 @@ Viernes 05 de Septiembre 2014
 * **Fixed:** [Correcciones a reporte de hitos](https://github.com/LemontechSA/ttb/pull/679)
 
 ## Hotfix: 14.15.6
-Mi閞coles 03 de Septiembre 2014
-* **Fixed:** [Ampliaci髇 del rango de fechas en el reporte de ventas](https://github.com/LemontechSA/ttb/pull/676)
+Mi茅rcoles 03 de Septiembre 2014
+* **Fixed:** [Ampliaci贸n del rango de fechas en el reporte de ventas](https://github.com/LemontechSA/ttb/pull/676)
 
 ## Hotfix: 14.15.5
 Lunes 01 de Septiembre 2014
@@ -344,10 +352,10 @@ Viernes 29 de Agosto 2014
 
 ## Hotfix: 14.15.1
 Jueves 28 de Agosto 2014
-* **Fixed:** [Guarda las opciones de impresi髇 de los documentos del cobro](https://github.com/LemontechSA/ttb/pull/667)
+* **Fixed:** [Guarda las opciones de impresi贸n de los documentos del cobro](https://github.com/LemontechSA/ttb/pull/667)
 
 ## Release: 14.15.0
-Mi閞coles 27 de Agosto 2014
+Mi茅rcoles 27 de Agosto 2014
 * **Fixed:** [Permite que cualquier asunto se cobre independiente](https://github.com/LemontechSA/ttb/pull/665)
 
 ## Hotfix: 14.14.2
@@ -356,17 +364,17 @@ Miercoles 27 de Agosto 2014
 
 ## Hotfix: 14.14.1
 Miercoles 27 de Agosto 2014
-* **Fixed:** [amplia el resultado de clientes a 20 en autocompletador, valida c骴igo de clientes y asunto al guardar trabajo con trim en ambos](https://github.com/LemontechSA/ttb/pull/663)
+* **Fixed:** [amplia el resultado de clientes a 20 en autocompletador, valida c贸digo de clientes y asunto al guardar trabajo con trim en ambos](https://github.com/LemontechSA/ttb/pull/663)
 
 ## Release: 14.14.0
-Mi閞coles 27 de Agosto 2014
+Mi茅rcoles 27 de Agosto 2014
 * **Fixed:** [Feature asuntos independientes](https://github.com/LemontechSA/ttb/pull/650)
 * **New:** [Feature/mejoras garciabodan](https://github.com/LemontechSA/ttb/pull/643)
 * **New:** [Feature/integracion moreno baldivieso](https://github.com/LemontechSA/ttb/pull/639)
 
 ## Hotfix: 14.13.6
 Lunes 25 de Agosto 2014
-* **Fixed:** [Corrige c醠culo de Horas Tarificadas en Word](https://github.com/LemontechSA/ttb/pull/660)
+* **Fixed:** [Corrige c谩lculo de Horas Tarificadas en Word](https://github.com/LemontechSA/ttb/pull/660)
 
 ## Hotfix: 14.13.5
 Lunes 25 de Agosto 2014
@@ -374,7 +382,7 @@ Lunes 25 de Agosto 2014
 
 ## Hotfix: 14.13.4
 Domingo 24 de Agosto 2014
-* **Fixed:** [Corrige la asignaci髇 a cliente err髇ea al crear un asunto con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/656)
+* **Fixed:** [Corrige la asignaci贸n a cliente err贸nea al crear un asunto con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/656)
 
 ## Hotfix: 14.13.3
 Viernes 22 de Agosto 2014
@@ -386,7 +394,7 @@ Viernes 22 de Agosto 2014
 
 ## Hotfix: 14.13.1
 Jueves 21 de Agosto 2014
-* **Fixed:** [Corregir asignaci髇 de cobro independiente para los asuntos con c骴igo secundario](https://github.com/LemontechSA/ttb/pull/652)
+* **Fixed:** [Corregir asignaci贸n de cobro independiente para los asuntos con c贸digo secundario](https://github.com/LemontechSA/ttb/pull/652)
 
 ## Release: 14.13.0
 Miercoles 20 de Agosto 2014
@@ -398,7 +406,7 @@ Miercoles 20 de Agosto 2014
 
 ## Hotfix: 14.12.1
 Miercoles 20 de Agosto 2014
-* **Fixed:** [Correcci髇 a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/648)
+* **Fixed:** [Correcci贸n a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/648)
 
 ## Release: 14.12.0
 Martes 19 de Agosto 2014
@@ -408,15 +416,15 @@ Martes 19 de Agosto 2014
 
 ## Hotfix: 14.11.5
 Lunes 18 de Agosto 2014
-* **Fixed:** [Correcci髇 a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/641)
+* **Fixed:** [Correcci贸n a problemas NC MB.](https://github.com/LemontechSA/ttb/pull/641)
 
 ## Hotfix: 14.11.4
 Jueves 14 de Agosto 2014
 * **Fixed:** [Corrige uso de tarifa plana.](https://github.com/LemontechSA/ttb/pull/640)
 
 ## Hotfix: 14.11.3
-Mi閞coles 13 de Agosto 2014
-* **Fixed:** [Cambios, reubicaci髇 y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)
+Mi茅rcoles 13 de Agosto 2014
+* **Fixed:** [Cambios, reubicaci贸n y renombre realizados al reporte de historial de movimientos.](https://github.com/LemontechSA/ttb/pull/637)
 
 ## Hotfix: 14.11.2
 Martes 12 de Agosto 2014
@@ -440,14 +448,14 @@ Jueve 7 de Agosto 2014
 
 ## Hotfix: 14.9.4
 Jueves 7 de Agosto 2014
-* **Fixed:** [Validaci髇 ingreso de horas](https://github.com/LemontechSA/ttb/pull/629)
+* **Fixed:** [Validaci贸n ingreso de horas](https://github.com/LemontechSA/ttb/pull/629)
 
 ## Hotfix: 14.9.3
 Jueves 7 de Agosto 2014
-* **Fix:** [Repara reporte de horas por facturar, al seleccionar separar asuntos el reporte estaba vac韔](https://github.com/LemontechSA/ttb/pull/628)
+* **Fix:** [Repara reporte de horas por facturar, al seleccionar separar asuntos el reporte estaba vac铆o](https://github.com/LemontechSA/ttb/pull/628)
 
 ## Hotfix: 14.9.2
-Mi閞coles 6 de Agosto 2014
+Mi茅rcoles 6 de Agosto 2014
 * **Fix:** [limpia asuntos cuando cambia cliente en autocomplete](https://github.com/LemontechSA/ttb/pull/625)
 * **New:** [Al seleccionar un cliente el asunto comeinza a buscar con el primer caracter, de lo contrario necesita 3 caracteres.](https://github.com/LemontechSA/ttb/pull/625)
 
@@ -482,13 +490,13 @@ Jueves 31 de Julio 2014
 
 ## Hotfix: 14.7.2
 Jueves 31 de Julio 2014
-* **Fixed:** [Corrige eliminaci髇 de trabajo](https://github.com/LemontechSA/ttb/pull/612)
-* **Fixed:** [Corrige asignaci髇 de usuario en ingreso de trabajo](https://github.com/LemontechSA/ttb/pull/612)
-* **Fixed:** [Corrige asignaci髇 de codigo asunto secundario al cargar actividades por JS](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige eliminaci贸n de trabajo](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige asignaci贸n de usuario en ingreso de trabajo](https://github.com/LemontechSA/ttb/pull/612)
+* **Fixed:** [Corrige asignaci贸n de codigo asunto secundario al cargar actividades por JS](https://github.com/LemontechSA/ttb/pull/612)
 
 ## Hotfix: 14.7.1
-Mi閞coles 30 de Julio 2014
-* **Fixed:** [Elimina variable que no se env韆.](https://github.com/LemontechSA/ttb/pull/610)
+Mi茅rcoles 30 de Julio 2014
+* **Fixed:** [Elimina variable que no se env铆a.](https://github.com/LemontechSA/ttb/pull/610)
 
 ## Release: 14.7.0
 Martes 29 de Julio 2014
@@ -501,7 +509,7 @@ Viernes 25 de Julio 2014
 
 ## Hotfix: 14.6.1
 Viernes 25 de Julio 2014
-* **Fixed:** [Corrige validaci髇 en CargarSelect.](https://github.com/LemontechSA/ttb/pull/606)
+* **Fixed:** [Corrige validaci贸n en CargarSelect.](https://github.com/LemontechSA/ttb/pull/606)
 
 ## Release: 14.6.0
 Jueves 24 de Julio 2014
@@ -511,11 +519,11 @@ Jueves 24 de Julio 2014
 
 ## Hotfix: 14.5.3
 Miercoles 23 de Julio 2014
-* **Fixed:** [Agrega c骴igo perdido de un commit.](https://github.com/LemontechSA/ttb/pull/604)
+* **Fixed:** [Agrega c贸digo perdido de un commit.](https://github.com/LemontechSA/ttb/pull/604)
 
 ## Hotfix: 14.5.2
 Martes 22 de Julio 2014
-* **Fixed:** [Corrige generaci髇 de botones en Gastos](https://github.com/LemontechSA/ttb/pull/597)
+* **Fixed:** [Corrige generaci贸n de botones en Gastos](https://github.com/LemontechSA/ttb/pull/597)
 
 ## Hotfix: 14.5.1
 Martes 22 de Julio 2014
@@ -549,39 +557,39 @@ Jueves 10 de Julio 2014
 
 ## Hotfix: 14.4.12
 Martes 8 de Julio 2014
-* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos seg鷑 Config](https://github.com/LemontechSA/ttb/pull/580)
-* **Fixed:** [Se reinicia la paginaci髇 al buscar trabajos](https://github.com/LemontechSA/ttb/pull/580)
+* **Fixed:** [Corrige el problema al ocultar la columna Impuesto en gastos seg煤n Config](https://github.com/LemontechSA/ttb/pull/580)
+* **Fixed:** [Se reinicia la paginaci贸n al buscar trabajos](https://github.com/LemontechSA/ttb/pull/580)
 
 ## Hotfix: 14.4.11
 Lunes 7 de Julio 2014
-* **Fixed:** [Corrige hotfix anterior, por error sint醕tico JS](https://github.com/LemontechSA/ttb/pull/578)
+* **Fixed:** [Corrige hotfix anterior, por error sint谩ctico JS](https://github.com/LemontechSA/ttb/pull/578)
 
 ## Hotfix: 14.4.10
 Lunes 7 de Julio 2014
 * **Fixed:** [Muestra `Ejecutar llenado inicial de datos` solo al admin](https://github.com/LemontechSA/ttb/pull/577)
-* **Fixed:** [Repara error sint醕tico de JS al parsear el c骴igo del asunto al editar trabajo](https://github.com/LemontechSA/ttb/pull/577)
+* **Fixed:** [Repara error sint谩ctico de JS al parsear el c贸digo del asunto al editar trabajo](https://github.com/LemontechSA/ttb/pull/577)
 
 ## Hotfix: 14.4.9
 Viernes 4 de Julio 2014
-* **Fixed:** [Corrige asignaci髇 de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
+* **Fixed:** [Corrige asignaci贸n de estadocobro del trabajo asociado a un cobro](https://github.com/LemontechSA/ttb/pull/575)
 
 ## Hotfix: 14.4.8
-Mi閞coles 2 de Julio 2014
-* **Fixed:** [Corrige asignaci髇 de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
-* **Fixed:** [Cambia los CDN de aspnet a static (varios m骴ulos)](https://github.com/LemontechSA/ttb/pull/574)
-* **Fixed:** [Corrige validaci髇 de monto seg鷑 tipo de cobro y monto en cero en creaci髇 de asuntos.](https://github.com/LemontechSA/ttb/pull/574)
+Mi茅rcoles 2 de Julio 2014
+* **Fixed:** [Corrige asignaci贸n de estado al trabajo que tiene asociado un cobro](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Cambia los CDN de aspnet a static (varios m贸dulos)](https://github.com/LemontechSA/ttb/pull/574)
+* **Fixed:** [Corrige validaci贸n de monto seg煤n tipo de cobro y monto en cero en creaci贸n de asuntos.](https://github.com/LemontechSA/ttb/pull/574)
 
 ## Hotfix: 14.4.7
-Mi閞coles 2 de Julio 2014
-* **Fixed:** [Repara elementos extra駉s en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)
+Mi茅rcoles 2 de Julio 2014
+* **Fixed:** [Repara elementos extra帽os en interfaz de ingreso de horas. Usa exception para controlar query mal formada.](https://github.com/LemontechSA/ttb/pull/573)
 
 ## Hotfix: 14.4.6
-Mi閞coles 2 de Julio 2014
+Mi茅rcoles 2 de Julio 2014
 * **Fixed:** [Corrige asignacion de codigo asunto cuando conf CodigoSecundario esta activo](https://github.com/LemontechSA/ttb/pull/572)
 
 ## Hotfix: 14.4.5
-Mi閞coles 2 de Julio 2014
-* **Fixed:** [Aumenta tiempo de tolerancia para generaci髇 del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
+Mi茅rcoles 2 de Julio 2014
+* **Fixed:** [Aumenta tiempo de tolerancia para generaci贸n del Reporte Consolidado](https://github.com/LemontechSA/ttb/pull/569)
 
 ## Hotfix: 14.4.4
 Martes 1 de Julio 2014
@@ -589,7 +597,7 @@ Martes 1 de Julio 2014
 
 ## Hotfix: 14.4.3
 Martes 1 de Julio 2014
-* **Fixed:** [A馻de rutina JS en respuesta a request AJAX, si aplica un selector de actividades para el cliente](https://github.com/LemontechSA/ttb/pull/567)
+* **Fixed:** [A帽ade rutina JS en respuesta a request AJAX, si aplica un selector de actividades para el cliente](https://github.com/LemontechSA/ttb/pull/567)
 
 ## Hotfix: 14.4.2
 Lunes 30 de Junio 2014
@@ -619,27 +627,27 @@ Lunes 30 de Junio 2014
 
 ## Hotfix: 14.3.12
 Lunes 23 de junio 2014
-* **Fixed:** [Corrige impresion seg鷑 lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/557)
+* **Fixed:** [Corrige impresion seg煤n lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/557)
 
 ## Hotfix: 14.3.11
 Lunes 23 de junio 2014
-* **Fixed:** [Deshabilita impresion seg鷑 lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/556)
+* **Fixed:** [Deshabilita impresion seg煤n lenguaje definido en contrato "descarga borradores"](https://github.com/LemontechSA/ttb/pull/556)
 
 ## Hotfix: 14.3.10
 Lunes 23 de junio 2014
 * **Fixed:** [Corrige selector de idioma en agregar_contrato](https://github.com/LemontechSA/ttb/pull/554)
 
 ## Hotfix: 14.3.9
-Mi閞coles 19 de junio 2014
-* **Fixed:** [A馻de lang en ingl閟 para tags faltantes](https://github.com/LemontechSA/ttb/pull/548)
+Mi茅rcoles 19 de junio 2014
+* **Fixed:** [A帽ade lang en ingl茅s para tags faltantes](https://github.com/LemontechSA/ttb/pull/548)
 
 ## Hotfix: 14.3.8
-Mi閞coles 18 de junio 2014
+Mi茅rcoles 18 de junio 2014
 * **Fixed:** [corrige if y valores para proporcionalidad estandar](https://github.com/LemontechSA/ttb/pull/546)
 
 ## Hotfix: 14.3.7
 Martes 17 de junio 2014
-* **Fixed:** [A馻de lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
+* **Fixed:** [A帽ade lang a tags faltantes para nota de cobro.](https://github.com/LemontechSA/ttb/pull/543)
 
 ## Hotfix: 14.3.6
 Lunes 16 de junio 2014
@@ -674,22 +682,22 @@ Jueves 12 de Junio 2014
 
 ## Hotfix: 14.2.15
 Martes 10 de junio 2014
-* **Fixed:** [Agrega tag secci髇 DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/533)
+* **Fixed:** [Agrega tag secci贸n DETALLE_COBRO](https://github.com/LemontechSA/ttb/pull/533)
 
 ## Hotfix: 14.2.14
 Martes 10 de junio 2014
-* **Fixed:** [Correcci髇 API para responder de manera correcta con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/532)
+* **Fixed:** [Correcci贸n API para responder de manera correcta con CodigoSecundario](https://github.com/LemontechSA/ttb/pull/532)
 
 ## Hotfix: 14.2.13
 Lunes 09 de junio 2014
 * **Fixed:** [Repara query reporte profesional v/s asunto](https://github.com/LemontechSA/ttb/pull/531)
 
 ## Hotfix: 14.2.10
-Mi閞coles 04 de junio 2014
+Mi茅rcoles 04 de junio 2014
 * **Fixed:** [Imprime campos de asunto en interfaz con UtilesApp::CampoAsunto()](https://github.com/LemontechSA/ttb/pull/528)
 
 ## Hotfix: 14.2.9
-Mi閞coles 04 de junio 2014
+Mi茅rcoles 04 de junio 2014
 * **Fixed:** [Agrega lang es_colombia](https://github.com/LemontechSA/ttb/pull/526)
 
 ## Hotfix: 14.2.8
