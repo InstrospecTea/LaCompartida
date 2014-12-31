@@ -206,9 +206,7 @@ class Contrato extends Objeto {
 	}
 
 	function IdiomaPorDefecto($sesion) {
-		if (method_exists('Conf', 'GetConf')) {
-			$codigo_idioma = Conf::GetConf($sesion, 'IdiomaPorDefecto');
-		}
+		$codigo_idioma = Conf::GetConf($sesion, 'IdiomaPorDefecto');
 
 		if (empty($codigo_idioma)) {
 			$codigo_idioma = 'es';
@@ -1308,7 +1306,7 @@ class Contrato extends Objeto {
 					if ($c > 0) {
 						$query .= ",";
 					}
-					if ($val != 'NULL') { 
+					if ($val != 'NULL') {
 						$query .= "$key = '" . addslashes($val) . "'";
 					} else {
 						$query .= "$key = NULL ";
