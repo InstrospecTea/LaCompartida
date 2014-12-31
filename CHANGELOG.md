@@ -1,10 +1,10 @@
 # Changelog
 
-## Release: 14.22.2
+## Hotfix: 14.22.2
 Martes 30 de Diciembre 2014
 * **Feature:** [Corrige la asignación de moneda en el contrato para formas de cobro distintas a TASA](https://github.com/LemontechSA/ttb/pull/807)
 
-## Release: 14.22.1
+## Hotfix: 14.22.1
 Martes 30 de Diciembre 2014
 * **Feature:** [Corrige la selección de forma para comparar en el reporte de ventas](https://github.com/LemontechSA/ttb/pull/806)
 
