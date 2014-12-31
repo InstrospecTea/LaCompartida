@@ -11439,6 +11439,8 @@ class NotaCobro extends Cobro {
 	}
 
 	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas) {
+		global $_LANG;
+
 		set_time_limit(300);
 
 		$NotaCobro = new NotaCobro($this->sesion);
@@ -11466,9 +11468,16 @@ class NotaCobro extends Cobro {
 
 				$NotaCobro->LoadAsuntos();
 
-				$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
+				$lang = $NotaCobro->fields['codigo_idioma'];
+
+				if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
+					$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
+				} else {
+					$lang_archivo = $lang . '.php';
+				}
+
 				$_LANG = array();
-				include Conf::ServerDir() . "/lang/$lang_archivo";
+				require_once Conf::ServerDir() . "/lang/$lang_archivo";
 
 				$html = $NotaCobro->GeneraHTMLCobro(true);
 
@@ -11526,9 +11535,18 @@ class NotaCobro extends Cobro {
 				$NotaCobro->asuntos[] = $asunto['codigo_asunto'];
 			}
 
-			$lang_archivo = $NotaCobro->fields['codigo_idioma'] . '.php';
+			$NotaCobro->LoadAsuntos();
+
+			$lang = $NotaCobro->fields['codigo_idioma'];
+
+			if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
+				$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
+			} else {
+				$lang_archivo = $lang . '.php';
+			}
+
 			$_LANG = array();
-			include Conf::ServerDir() . "/lang/$lang_archivo";
+			require_once Conf::ServerDir() . "/lang/$lang_archivo";
 
 			// asignar formato detalle de carta según cobro
 			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);

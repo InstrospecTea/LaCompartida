@@ -1,7 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-
 $Sesion = new Sesion(array('COB'));
 $pagina = new Pagina($Sesion);
 $cobro = new NotaCobro($Sesion);
