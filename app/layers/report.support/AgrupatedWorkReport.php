@@ -278,8 +278,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$col4 = __('VALOR FACTURADO');
 		$since = $this->formatDate($this->parameters['since']);
 		$until = $this->formatDate($this->parameters['until']);
-
-		if ($this->parameters['agrupationType'] == 'lawyer') {
+		if (!$this->parameters['invoicedValue']) {
 			return <<<HTML
 				<h1 id="doc_header">
 					{$header}<br />
@@ -335,6 +334,7 @@ HTML;
 	private function createClientHtmlContent() {
 		$html = '';
 		$por_socio = $this->parameters['groupByPartner'];
+		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
 		foreach ($this->data as $socio) {
 			$html_usuarios = '';
 			foreach ($socio['usuarios'] as $usuario) {
@@ -346,7 +346,7 @@ HTML;
 					$total_facturado_cliente = 0;
 					foreach ($cliente['asuntos'] as $asunto) {
 						$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
-						$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], true);
+						$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
 						$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
 						$total_minutos_cliente += $trabajos['minutos'];
 						$total_facturado_cliente += $trabajos['total_facturado'];
@@ -372,6 +372,7 @@ HTML;
 
 	private function createLawyerHtmlContent() {
 		$html = '';
+		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
 		foreach ($this->data as $usuario) {
 			$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
 			$html_clientes = '';
@@ -382,7 +383,7 @@ HTML;
 				$total_minutos_cliente = 0;
 				foreach ($cliente['asuntos'] as $asunto) {
 					$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
-					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], false);
+					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
 					$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
 					$total_minutos_cliente += $trabajos['minutos'];
 				}

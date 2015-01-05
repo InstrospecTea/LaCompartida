@@ -722,9 +722,10 @@ $pagina->PrintTop($popup);
 			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 year"));
 			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
 				<?php echo $Form->icon_button(__('Descargar listado agrupado por cliente'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
-				<label><input type="checkbox" value="1" id="por_socio" /> Agrupar por socio</label>
+				<label><input type="checkbox" value="1" id="por_socio" name="por_socio" /> Agrupar por socio</label>
 				<br/>
 				<?php echo $Form->icon_button(__('Descargar listado agrupado por abogado'), 'pdf', array('id' => 'descargar_pdf_agrupado_abogado')); ?>
+				<label><input type="checkbox" value="1" id="valor_facturado" name="valor_facturado" /> Mostrar valor facturado</label>
 			<?php } ?>
 			<br />
 		</center>
@@ -1245,29 +1246,28 @@ echo $Form->script();
 
 		jQuery('#descargar_pdf_agrupado').click(function() {
 			var form = jQuery('#form_trabajos').clone();
-			jQuery('<input>').attr({
-				type: 'hidden',
-				id: 'agrupationType',
-				name: 'agrupationType',
-				value: 'client'
-			}).appendTo(form);
-			jQuery('<input>').attr({
-				type: 'hidden',
-				id: 'group_by_partner',
-				name: 'group_by_partner',
-				value: jQuery('#por_socio').val()
-			}).appendTo(form);
+			var isGrouped = jQuery('#por_socio:checked').val();
+			var isInvoiced = jQuery('#valor_facturado:checked').val();
+			if (isInvoiced === undefined) {
+				isInvoiced = "";
+			}
+			if (isGrouped === undefined) {
+				isGrouped = "";
+			}
+			form.append('<input type="hidden" name="agrupationType" value="client" id="agrupationType" />');
+			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
+			form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
 			form.attr('action','../Report/agrupatedWork').submit();
 		});
 
 		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
 			var form = jQuery('#form_trabajos').clone();
-			jQuery('<input>').attr({
-				type: 'hidden',
-				id: 'agrupationType',
-				name: 'agrupationType',
-				value: 'lawyer'
-			}).appendTo(form);
+			var isInvoiced = jQuery('#valor_facturado:checked').val();
+			if (isInvoiced === undefined) {
+				isInvoiced = "";
+			}
+			form.append('<input type="hidden" name="agrupationType" value="lawyer" id="agrupationType" />');
+			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
 			form.attr('action','../Report/agrupatedWork').submit();;
 		});
 
