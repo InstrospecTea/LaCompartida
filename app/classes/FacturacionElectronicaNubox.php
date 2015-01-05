@@ -218,8 +218,7 @@ EOF;
 
 		if ($Factura->fields['subtotal'] > 0) {
 			$detalle_facturas[] = array(
-				'producto' => 'honorarios',
-				'descripcion' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion']),
+				'producto' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion']),
 				'cantidad' => 1,
 				'precio_unitario' => $Moneda->getFloat($Factura->fields['subtotal'])
 			);
@@ -227,8 +226,7 @@ EOF;
 
 		if ($Factura->fields['subtotal_gastos'] > 0) {
 			$detalle_facturas[] = array(
-				'producto' => 'gastos',
-				'descripcion' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion_subtotal_gastos']),
+				'producto' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion_subtotal_gastos']),
 				'cantidad' => 1,
 				'precio_unitario' => $Moneda->getFloat($Factura->fields['subtotal_gastos'])
 			);
@@ -236,8 +234,7 @@ EOF;
 
 		if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
 			$detalle_facturas[] = array(
-				'producto' => 'gastos exentos',
-				'descripcion' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
+				'producto' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
 				'cantidad' => 1,
 				'precio_unitario' => $Moneda->getFloat($Factura->fields['subtotal_gastos_sin_impuesto'])
 			);
