@@ -85,7 +85,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			array(
 				'companyName' => Conf::GetConf($this->Session, 'NombreEmpresa'),
 				'groupByPartner' => empty($data['group_by_partner']) ? 0 : $data['group_by_partner'],
-				'agrupationType' => $data['agrupationType']
+				'agrupationType' => $data['agrupationType'],
+				'since' => $data['fecha_ini'],
+				'until' => $data['fecha_fin']
 			)
 		);
 		$this->report->setData($reportData);

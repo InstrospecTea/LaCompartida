@@ -276,6 +276,8 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$col2 = __('ABOGADO');
 		$col3 = __('TIEMPO EN MINUTOS');
 		$col4 = __('VALOR FACTURADO');
+		$since = $this->formatDate($this->parameters['since']);
+		$until = $this->formatDate($this->parameters['until']);
 
 		if ($this->parameters['agrupationType'] == 'lawyer') {
 			return <<<HTML
@@ -283,6 +285,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 					{$header}<br />
 					{$title}
 				</h1>
+				<p>Periodo: $since al $until</p>
 				<div>
 					<table class="table">
 						<tr>
@@ -299,6 +302,7 @@ HTML;
 					{$header}<br />
 					{$title}
 				</h1>
+				<p>Periodo: $since al $until</p>
 				<div>
 					<table class="table">
 						<tr>
@@ -415,7 +419,7 @@ HTML;
 			);
 
 			if ($with_invoiced) {
-				$tds .= $this->Html->tag('td', $fila['fecha'], array('class' => 'col1'));
+				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
 				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
 				$tds .= $this->Html->tag(
@@ -431,7 +435,7 @@ HTML;
 
 				$trs .= $this->Html->tag('tr', $tds);
 			} else {
-				$tds .= $this->Html->tag('td', $fila['fecha'], array('class' => 'col1'));
+				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
 				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
 
@@ -473,4 +477,15 @@ HTML;
 		);
 	}
 
+	private function formatDate($string, $inverse = false) {
+		$date = new DateTime();
+		$splitted = explode('-',$string);
+		if (!$inverse) {
+			$date->setDate((int)$splitted[2], (int)$splitted[1], (int)$splitted[0]);
+		} else {
+			$date->setDate((int)$splitted[0], (int)$splitted[1], (int)$splitted[1]);
+		}
+		setlocale(LC_ALL, 'es_ES');
+		return strftime('%d-%b-%y', $date->getTimestamp());
+	}
 }
