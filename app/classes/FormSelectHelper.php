@@ -150,6 +150,7 @@ SCRIPT;
 				FormSelectHelper.reload_$name = function() {
 					var source = "$source";
 					var exists_selected = jQuery("#{$name}").val();
+					FormSelectHelper.original_$name = '$selected';
 					$onSource;
 					jQuery.post(source, {}, function(data) {
 						data_$name = data;

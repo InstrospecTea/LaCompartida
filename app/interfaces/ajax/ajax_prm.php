@@ -8,6 +8,7 @@ $single_class = $_GET['single_class'];
 $prmClass = ($single_class && $single_class == '1') ? $_GET['prm'] : 'Prm' . $_GET['prm'];
 
 $query = $_GET['q'] ? $_GET['q'] : null;
+$id_field = $_GET['id'] ? $_GET['id'] : null;
 $fields = $_GET['fields'] ? $_GET['fields'] : '';
 $hasFields = !empty($fields);
 
@@ -23,6 +24,11 @@ if (!is_null($query)) {
 	}
 	$queryExtra .= implode(' AND ', $queryFields);
 }
+
+if (!is_null($id_field)) {
+	$PrmPrm->campo_id = $id_field;
+}
+
 if ($hasFields && (method_exists($prmClass, 'ListarExt'))) {
 	$list = $PrmPrm->ListarExt($queryExtra, $fields);
 } else {
