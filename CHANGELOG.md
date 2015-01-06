@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 14.22.3
+Martes 06 de Enero 2015
+* **Fix:** [Corrige el orden del listado de trabajos según nombre de usuario](https://github.com/LemontechSA/ttb/pull/809)
+
 ## Hotfix: 14.22.2
 Martes 30 de Diciembre 2014
 * **Feature:** [Corrige la asignación de moneda en el contrato para formas de cobro distintas a TASA](https://github.com/LemontechSA/ttb/pull/807)
