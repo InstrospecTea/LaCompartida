@@ -491,7 +491,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	}
 
 	if ($p_revisor || $p_cobranza || strlen($select_usuario) > 164) {
-		$b->AgregarEncabezado("usr_nombre", __('Usuario'), "align=left");
+		$field_username = 'usr_nombre';
+		if (Conf::GetConf($sesion, 'UsernameEnListaDeTrabajos') || Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
+			$field_username = 'username';
+		}
+		$b->AgregarEncabezado($field_username, __('Usuario'), 'align="left"');
 	}
 
 	$b->AgregarFuncion("Opc.", 'Opciones', "align=center nowrap");
