@@ -8,6 +8,22 @@ $pagina = new Pagina($sesion);
 $DocumentoLegalNumero = new DocumentoLegalNumero($sesion);
 $factura = new Factura($sesion);
 
+if ( !isset($orden) ) {
+	$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
+	$default_order = Conf::GetConf($sesion, 'OrdenarFacturasPorDefecto');
+	$order_split = preg_split('(,|\s)', $default_order);
+	$order_field = $order_split[0];
+	$order_option = strtoupper(end($order_split));
+
+	if ( in_array($order_field, $options) ) {
+		if ($order_option == 'ASC' || $order_option == 'DESC') {
+			$orden = $order_field.' '.$order_option;
+		} else {
+			$orden = $order_field.' ASC';
+		}
+	}
+}
+
 if ($id_factura != '') {
 	$factura->Load($id_factura);
 }
@@ -283,18 +299,17 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 	$x_pag = 25;
-
 	$b = new Buscador($sesion, $search_query, 'Factura', $desde, $x_pag, $orden);
 	$b->titulo = "Documentos Tributarios<br />$glosa_monto_saldo_total";
-	$b->AgregarFuncion(__('Destinatario Documento'), 'FormatoDestinatario', 'width="30%" align="left"');
+	$b->AgregarEncabezado('cliente', __('Destinatario Documento'), 'width="30%" align="left"', '', 'FormatoDestinatario', true);
 	$b->AgregarEncabezado('fecha', __('Fecha Documento'), 'align="center"');
-	$b->AgregarFuncion(__('Datos Documento'), 'FormatoDatos', 'width="10%" align="left"');
+	$b->AgregarEncabezado('numero', __('Datos Documento'), 'width="10%" align="left"', '', 'FormatoDatos', true);
 
 	if ($config->columns['encargado_comercial']->visible) {
 		$b->AgregarEncabezado("encargado_comercial", __('Socio a cargo'), 'align="center"');
 	}
 
-	$b->AgregarFuncion(__('Nº Liquidación'), 'FormatoLiquidacion', 'align="center"');
+	$b->AgregarEncabezado('id_cobro', __('Nº Liquidación'), 'align="center"', '', 'FormatoLiquidacion', true);
 	$b->AgregarFuncion(__('Total'), 'FormatoTotal', 'align="left"');
 	$b->AgregarFuncion(__('Pagos'), 'FormatoPagos', 'align="left"');
 	$b->AgregarEncabezado('estado', __('Estado'), 'align="center"');
