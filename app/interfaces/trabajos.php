@@ -716,10 +716,30 @@ $pagina->PrintTop($popup);
 			<br />
 			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>
 			<?php
-			$fecha_ini = Utiles::fecha2sql($fecha_ini, date('Y-m-d', strtotime('-12 month')));
-			$fecha_fin = Utiles::fecha2sql($fecha_fin);
-			// solo permite periodo de un mes
-			$fecha_ok = (strtotime($fecha_ini) >= strtotime("$fecha_fin -1 year"));
+				if (!empty($fecha_ini) && !empty($fecha_fin)) {
+					$sinceObject = new DateTime($fecha_ini);
+					$untilObject = new DateTime($fecha_fin);
+					if ($sinceObject->diff($untilObject)->format('%a') > 364) {
+						$fecha_ok = false;
+					} else {
+						$fecha_ok = true;
+					}
+				} else {
+					if (empty($fecha_ini) && empty($fecha_fin)) {
+						$fecha_ok = false;
+					} else {
+						$dateInterval = new DateInterval('P364D');
+						if (!empty($fecha_ini)) {
+							$sinceObject = new DateTime($fecha_ini);
+							$untilObject = $sinceObject->add($dateInterval);
+						}
+						if (!empty($fecha_fin)) {
+							$untilObject = new DateTime($fecha_fin);
+							$sinceObject = $untilObject->sub($dateInterval);
+						}
+						$fecha_ok = true;
+					}
+				}
 			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
 				<?php echo $Form->icon_button(__('Descargar listado agrupado por cliente'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
 				<label><input type="checkbox" value="1" id="por_socio" name="por_socio" /> Agrupar por socio</label>

@@ -269,6 +269,21 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		}
 	}
 
+	private function buildPeriod($since, $until) {
+		$period = '';
+		if (empty($since) && empty($until)) {
+			$period = 'Sin periodo';
+		} else {
+			if (!empty($since)) {
+				$period .= "Del $since "; 
+			}
+			if (!empty($until)) {
+				$period .= "al $until.";
+			}
+		}
+		return $period;
+	}
+
 	private function getHeader() {
 		$header = strtoupper($this->parameters['companyName']);
 		$title = $this->getTitle();
@@ -276,15 +291,22 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$col2 = __('ABOGADO');
 		$col3 = __('TIEMPO EN MINUTOS');
 		$col4 = __('VALOR FACTURADO');
-		$since = $this->formatDate($this->parameters['since']);
-		$until = $this->formatDate($this->parameters['until']);
+		$since = $until = '';
+		if (!empty($this->parameters['since'])) {
+			$since = $this->formatDate($this->parameters['since']);
+		}
+		if (!empty($this->parameters['until'])) {
+			$until = $this->formatDate($this->parameters['until']);
+		}
+		$period = $this->buildPeriod($since, $until);
+
 		if (!$this->parameters['invoicedValue']) {
 			return <<<HTML
 				<h1 id="doc_header">
 					{$header}<br />
 					{$title}
 				</h1>
-				<p>Periodo: $since al $until</p>
+				<p>Periodo: $period</p>
 				<div>
 					<table class="table">
 						<tr>
@@ -301,7 +323,7 @@ HTML;
 					{$header}<br />
 					{$title}
 				</h1>
-				<p>Periodo: $since al $until</p>
+				<p>Periodo: $period</p>
 				<div>
 					<table class="table">
 						<tr>

@@ -46,6 +46,29 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 
 		//Rango de fechas
+		$fecha_ini = $data['fecha_ini'];
+		$fecha_fin = $data['fecha_fin'];
+		if (!empty($fecha_ini) && !empty($fecha_fin)) {
+			$sinceObject = new DateTime($fecha_ini);
+			$untilObject = new DateTime($fecha_fin);
+			$data['fecha_ini'] = $sinceObject->format('d-m-Y');
+			$data['fecha_fin'] = $untilObject->format('d-m-Y');
+		} else {
+			$dateInterval = new DateInterval('P364D');
+			if (!empty($fecha_ini)) {
+				$sinceObject = new DateTime($fecha_ini);
+				$data['fecha_ini'] = $sinceObject->format('d-m-Y');
+				$untilObject = $sinceObject->add($dateInterval);
+				$data['fecha_fin'] = $untilObject->format('d-m-Y');
+			}
+			if (!empty($fecha_fin)) {
+				$untilObject = new DateTime($fecha_fin);
+				$data['fecha_fin'] = $untilObject->format('d-m-Y');
+				$sinceObject = $untilObject->sub($dateInterval);
+				$data['fecha_ini'] = $sinceObject->format('d-m-Y');
+			}
+		}
+
 		if ($data['fecha_ini']) {
 			$date = Utiles::fecha2sql($data['fecha_ini']);
 			$searchCriteria->filter('fecha')->restricted_by('greater_or_equals_than')->compare_with("'$date'");
