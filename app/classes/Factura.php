@@ -2538,6 +2538,10 @@ class Factura extends Objeto {
 			, $codigo_asunto, $codigo_asunto_secundario
 			, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
+		if (isset($orden)) {
+			$query .= ' ORDER BY '.$orden;
+		}
+
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
