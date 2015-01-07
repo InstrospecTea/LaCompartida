@@ -719,11 +719,7 @@ $pagina->PrintTop($popup);
 				if (!empty($fecha_ini) && !empty($fecha_fin)) {
 					$sinceObject = new DateTime($fecha_ini);
 					$untilObject = new DateTime($fecha_fin);
-					if ($sinceObject->diff($untilObject)->format('%a') > 364) {
-						$fecha_ok = false;
-					} else {
-						$fecha_ok = true;
-					}
+					$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true; 
 				} else {
 					if (empty($fecha_ini) && empty($fecha_fin)) {
 						$fecha_ok = false;
@@ -731,13 +727,13 @@ $pagina->PrintTop($popup);
 						$dateInterval = new DateInterval('P364D');
 						if (!empty($fecha_ini)) {
 							$sinceObject = new DateTime($fecha_ini);
-							$untilObject = $sinceObject->add($dateInterval);
+							$untilObject = new DateTime('NOW');
 						}
 						if (!empty($fecha_fin)) {
 							$untilObject = new DateTime($fecha_fin);
 							$sinceObject = $untilObject->sub($dateInterval);
 						}
-						$fecha_ok = true;
+						$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true; 
 					}
 				}
 			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
