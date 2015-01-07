@@ -2306,6 +2306,23 @@ class Factura extends Objeto {
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	public function OrdenReporte($default_order) {
+		$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
+		$order_split = preg_split('(,|\s)', $default_order);
+		$order_field = $order_split[0];
+		$order_option = strtolower(end($order_split));
+
+		if ( in_array($order_field, $options) ) {
+			if ($order_option == 'desc') {
+				$orden = $order_field.' '.$order_option;
+			} else {
+				$orden = $order_field;
+			}
+		}
+
+		return $orden;
+	}
+
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 	, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 	, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
