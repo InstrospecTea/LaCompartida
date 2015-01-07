@@ -1176,9 +1176,9 @@ class Contrato extends Objeto {
 			$this->Edit("porcentaje_descuento", '0');
 		}
 
-		// Cuando el contrato no es TASA se asigna la moneda como la moneda de la forma de cobro
+		// Cuando el contrato es FLAT FEE o HITOS se asigna la moneda como la moneda de la forma de cobro
 		// para evitar problemas con la diferencia entre id_moneda / id_moneda_monto
-		if ($this->fields['forma_cobro'] != 'TASA') {
+		if (in_array($this->fields['forma_cobro'], array('FLAT FEE', 'HITOS'))) {
 			$this->fields['id_moneda'] = $this->fields['id_moneda_monto'];
 		}
 	}
