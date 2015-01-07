@@ -2399,12 +2399,10 @@ class Factura extends Objeto {
 			$where = base64_decode($where);
 		}
 
-		if ( empty($orden) ) {
-			$orden_default = Conf::GetConf($this->sesion, 'OrdenarFacturasPorDefecto');
-			$orden = $this->OrdenReporte($orden_default);
+		if ($orden !== false) {
+			$orderby = ' ORDER BY '.$orden;
 		}
 
-		$orderby = ' ORDER BY '.$orden;
 		$groupby = " GROUP BY factura.id_factura ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
