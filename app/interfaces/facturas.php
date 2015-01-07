@@ -8,22 +8,6 @@ $pagina = new Pagina($sesion);
 $DocumentoLegalNumero = new DocumentoLegalNumero($sesion);
 $factura = new Factura($sesion);
 
-if ( !isset($orden) ) {
-	$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
-	$default_order = Conf::GetConf($sesion, 'OrdenarFacturasPorDefecto');
-	$order_split = preg_split('(,|\s)', $default_order);
-	$order_field = $order_split[0];
-	$order_option = strtoupper(end($order_split));
-
-	if ( in_array($order_field, $options) ) {
-		if ($order_option == 'ASC' || $order_option == 'DESC') {
-			$orden = $order_field.' '.$order_option;
-		} else {
-			$orden = $order_field.' ASC';
-		}
-	}
-}
-
 if ($id_factura != '') {
 	$factura->Load($id_factura);
 }
