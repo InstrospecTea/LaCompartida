@@ -58,7 +58,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			if (!empty($fecha_ini)) {
 				$sinceObject = new DateTime($fecha_ini);
 				$data['fecha_ini'] = $sinceObject->format('d-m-Y');
-				$untilObject = $sinceObject->add($dateInterval);
+				$untilObject = new DateTime('NOW');
 				$data['fecha_fin'] = $untilObject->format('d-m-Y');
 			}
 			if (!empty($fecha_fin)) {
