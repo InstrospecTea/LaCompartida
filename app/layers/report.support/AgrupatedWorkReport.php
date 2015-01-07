@@ -69,7 +69,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
 			$duration_parts = explode(":", $fila->fields['work_duracion']);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
-			$trabajo['valor_facturado'] = $trabajo['duracion_minutos'] * $fila->fields['work_tarifa_hh_estandar'];
+			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
 			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
@@ -125,9 +125,9 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
 			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
-			$duration_parts = explode(":", $fila->fields['work_duracion']);
+			$duration_parts = explode(":", $fila->fields['work_duracion_cobrada']);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
-			$trabajo['valor_facturado'] = $trabajo['duracion_minutos'] * $fila->fields['work_tarifa_hh_estandar'];
+			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
 			$grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
@@ -408,19 +408,38 @@ HTML;
 					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
 					$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
 					$total_minutos_cliente += $trabajos['minutos'];
+					$total_facturado_cliente += $trabajos['total_facturado'];
 				}
-				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
-					$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-					$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
-				);
+				if ($with_invoiced) {
+					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
+						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
+						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+					);
+				} else {
+					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
+						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
+					);
+				}
 				$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
 				$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
 				$total_minutos_abogado += $total_minutos_cliente;
+				$total_facturado_abogado += $total_facturado_cliente;
 			}
-			$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
-				$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
-				$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'))
-			);
+			if ($with_invoiced) {
+				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
+					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
+					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3')) .
+					$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_abogado, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+				);
+			} else {
+				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
+					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
+					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'))
+				);
+			}
+			
 			$html_clientes .= $this->Html->tag('table', $trs, array('class' => 'table'));
 			$html .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
 		}
