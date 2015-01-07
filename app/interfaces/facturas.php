@@ -35,6 +35,7 @@ $idioma_default->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 global $factura;
 ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_factura_inicio') : false;
 
+$orden = $factura->OrdenReporte($orden);
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 	if ($exportar_excel || $archivo_contabilidad) {
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
@@ -276,7 +277,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$opciones['mostrar_pagos'] = true;
 	$opciones['mostrar_fecha_ultimo_pago'] = true;
 	$where = '';
-	$search_query = $factura->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+	$search_query = $factura->QueryReporte(false, $where, $numero, $fecha1, $fecha2
 			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
