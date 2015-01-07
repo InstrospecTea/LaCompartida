@@ -2306,17 +2306,20 @@ class Factura extends Objeto {
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	public function OrdenReporte($default_order) {
-		$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
-		$order_split = preg_split('(,|\s)', $default_order);
-		$order_field = $order_split[0];
-		$order_option = strtolower(end($order_split));
+	public function OrdenReporte($orden) {
+		if ( empty($orden) ) {
+			$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
+			$default_order = Conf::GetConf($this->sesion, 'OrdenarFacturasPorDefecto');
+			$order_split = preg_split('(,|\s)', $default_order);
+			$order_field = $order_split[0];
+			$order_option = strtolower(end($order_split));
 
-		if ( in_array($order_field, $options) ) {
-			if ($order_option == 'desc') {
-				$orden = $order_field.' '.$order_option;
-			} else {
-				$orden = $order_field;
+			if (in_array($order_field, $options)) {
+				if ($order_option == 'desc') {
+					$orden = $order_field . ' ' . $order_option;
+				} else {
+					$orden = $order_field;
+				}
 			}
 		}
 
