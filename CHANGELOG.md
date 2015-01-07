@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.22.4
 Miércoles 07 de Enero 2015
-* **Fix:** [Cambia la lógica de la moneda del contrato para FLAT FEE e HITOS](https://github.com/LemontechSA/ttb/pull/811)
+* **Fix:** [Elimina lógica de contratos de #807](https://github.com/LemontechSA/ttb/pull/812)
 
 ## Hotfix: 14.22.3
 Martes 06 de Enero 2015
