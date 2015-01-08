@@ -51,8 +51,12 @@ class SearchCriteria extends AbstractUtility {
 	 * @param $entity_name
 	 * @return SearchRelationship
 	 */
-	public function related_with($entity_name) {
-		$this->relationships[] = new SearchRelationship($entity_name);
+	public function related_with($entity_name, $entity_alias = null) {
+		$relationship = new SearchRelationship($entity_name);
+		if (!empty($entity_alias)) {
+			$relationship->as_alias($entity_alias);
+		}
+		$this->relationships[] = $relationship;
 		return end($this->relationships);
 	}
 
