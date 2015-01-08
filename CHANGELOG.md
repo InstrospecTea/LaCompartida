@@ -2,7 +2,7 @@
 
 ## Hotfix: 14.22.5
 Jueves 08 de Enero 2015
-* **Fix:** [Elimina lógica para seleccionar destinatarios y sus resumenes en alertas semanalaes](https://github.com/LemontechSA/ttb/pull/813)
+* **Fix:** [Elimina lógica para seleccionar destinatarios y sus resumenes en alertas semanales](https://github.com/LemontechSA/ttb/pull/814)
 
 ## Hotfix: 14.22.4
 Miércoles 07 de Enero 2015
