@@ -2306,6 +2306,13 @@ class Factura extends Objeto {
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	/**
+	 * Devuelve el campo para ordenar los datos de una {@link Factura}. En el caso de que el parámetro sea vacío
+	 * devuelve el valor de la configuración OrdenarFacturasPorDefecto.
+	 *
+	 * @param string $orden
+	 * @return string
+	 */
 	public function OrdenReporte($orden) {
 		if ( empty($orden) ) {
 			$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
