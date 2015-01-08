@@ -222,11 +222,6 @@ class CronNotificacion extends Cron {
 			}
 		}
 
-		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
-		$dato_semanal = array_filter($dato_semanal, function ($i) {
-			return !empty($i['alerta_propia']) || $i['admin'];
-		});
-
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
 
 		try {
