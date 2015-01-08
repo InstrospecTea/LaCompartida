@@ -20,5 +20,12 @@ class SandboxController extends AbstractController {
 		$report->render();
 	}
 
+	public function charging() {
+		$this->layoutTitle = 'Sandbox Charging';
+		$this->loadBusiness('Charging');
+		$charge = $this->ChargingBusiness->getCharge(639);
+		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge);
+		var_dump($detail);
+	}
 }
 

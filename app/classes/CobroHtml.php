@@ -79,12 +79,17 @@ HTML;
 		$cobro['f_iva'] = empty($cobro['iva']) ? '' : self::number_format($cobro['iva']);
 		$cobro['f_total'] = self::number_format($cobro['total']);
 
+		$cobro['f_subtotal_honorarios'] = self::number_format($cobro['subtotal_honorarios']);
+		$cobro['f_descuento_honorarios'] = self::number_format($cobro['descuento_honorarios']);
+
+		$honorarios_html = "<li><strong>Subtotal:</strong>{$cobro['f_subtotal_honorarios']}</li><li><strong>Descuento:</strong>{$cobro['f_descuento_honorarios']}</li><li><strong>Total:</strong>{$cobro['f_honorarios']}</li>";
+
 		$html = <<<HTML
 			<tr style="background:#EFE;">
 				<td>{$cobro['cobro']}</td>
 				<td>{$cobro['id_cobro']}</td>
 				<td style="width:78px;">{$cobro['fecha']}</td>
-				<td>{$cobro['f_honorarios']}<input type="hidden" name="honorarios_total" id="honorarios_total" value="{$cobro['saldo_honorarios']}" /></td>
+				<td id='celda_honorarios'>{$cobro['f_honorarios']}<input type="hidden" name="honorarios_total" id="honorarios_total" value="{$cobro['saldo_honorarios']}" /></td>
 				<td>{$cobro['f_gastos_con_impuestos']}<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="{$cobro['saldo_gastos_con_impuestos']}" /></td>
 				<td>{$cobro['f_gastos_sin_impuestos']}<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="{$cobro['saldo_gastos_sin_impuestos']}" /></td>
 				<td>{$cobro['f_iva']}</td>
@@ -94,6 +99,7 @@ HTML;
 				<td></td>
 				<td></td>
 			</tr>
+			<script> new Tip('celda_honorarios', '{$honorarios_html}', {title : 'Detalle Honorarios', effect: '', offset: {x:-2, y:10}}); </script>
 HTML;
 			return $html;
 	}

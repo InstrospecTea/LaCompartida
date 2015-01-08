@@ -200,6 +200,8 @@ if ($opc == 'refrescar') {
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
 
 	if ($cobro->fields['modalidad_calculo'] == 1) {
+		$subtotal_honorarios = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']];
+		$descuento_honorarios = $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
 		$saldo_honorarios = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
 		$saldo_disponible_trabajos = $saldo_trabajos = $x_resultados['monto_trabajos'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
 		if ($saldo_disponible_trabajos < 0) {
@@ -209,6 +211,7 @@ if ($opc == 'refrescar') {
 			$saldo_disponible_tramites = $saldo_tramites = $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']];
 		}
 	} else {
+		$descuento_honorarios = $cobro->fields['descuento'];
 		if ($cobro->fields['porcentaje_impuesto'] > 0) {
 			$honorarios_original = $cobro->fields['monto_subtotal'] - $cobro->fields['descuento'];
 		} else {
@@ -226,6 +229,7 @@ if ($opc == 'refrescar') {
 			$saldo_honorarios = $cobro->fields['monto_contrato'];
 		}
 		$saldo_honorarios = number_format($saldo_honorarios, $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
+		$subtotal_honorarios = $saldo_honorarios + $descuento_honorarios;
 	}
 
 	if ($saldo_honorarios < 0) {
@@ -246,7 +250,7 @@ if ($opc == 'refrescar') {
 		CobroHtml::setMoneda($moneda_documento);
 		CobroHtml::setIdioma($idioma);
 
-		$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos');
+		$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos', 'descuento_honorarios', 'subtotal_honorarios');
 		$data_cobro['fecha'] = date('d-m-Y', strtotime($cobro->fields['fecha_emision']));
 		if ($cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0) {
 			$data_cobro['iva'] = $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']];
