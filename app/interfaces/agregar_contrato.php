@@ -27,6 +27,9 @@ $color_impar = "#ffffff";
 
 $archivo = new Archivo($Sesion);
 $AutocompleteHelper = new FormAutocompleteHelper();
+if (!isset($SelectHelper)) {
+	$SelectHelper = new FormSelectHelper();	
+} 
 // previene override del objero, ya que se incluye desde otras interfaces.
 function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
