@@ -14,4 +14,17 @@ class SandboxController extends AbstractController {
 		$this->info('Esto es un sandbox... de gato!');
 	}
 
+	public function report() {
+		$this->loadBusiness('Sandboxing');
+		$report = $this->SandboxingBusiness->report($this->data);
+		$report->render();
+	}
+
+	public function scales() {
+		$this->loadBusiness('Charging');
+		$this->ChargingBusiness->getSlidingScales(8038);
+		exit;
+	}
+
+
 }

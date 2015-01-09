@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Entity
  * Clase abstracta que define todas aquellas propiedades y métodos comunes a toda entidad del sistema.
@@ -9,6 +8,7 @@
 abstract class Entity {
 
 	public $fields = array();
+
 	public $changes = array();
 
 	/**
@@ -63,13 +63,25 @@ abstract class Entity {
 	}
 
 	/**
+	 * Comprueba si la instancia que hereda de esta clase tiene definido un valor para su propiedad de identidad.
+	 * @return bool
+	 */
+	public function haveIdentity() {
+		if(is_null($this->get($this->getIdentity()))) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
 	 * Completa las propiedades de una instancia de un objeto cuya clase herede a este, con los valores definidos en un
 	 * array asociativo.
 	 * @param array $properties Propiedades de un objeto.
 	 */
-	public function fillFromArray(array $properties) {
+	public function fillFromArray(array $properties, $changed = true) {
 		foreach ($properties as $propertyName => $propertyValue) {
-			$this->set($propertyName, $propertyValue);
+			$this->set($propertyName, $propertyValue, $changed);
 		}
 	}
 
@@ -105,5 +117,4 @@ abstract class Entity {
 			return false;
 		}
 	}
-
 }
