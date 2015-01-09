@@ -719,7 +719,7 @@ $pagina->PrintTop($popup);
 				if (!empty($fecha_ini) && !empty($fecha_fin)) {
 					$sinceObject = new DateTime($fecha_ini);
 					$untilObject = new DateTime($fecha_fin);
-					$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true; 
+					$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true;
 				} else {
 					if (empty($fecha_ini) && empty($fecha_fin)) {
 						$fecha_ok = false;
@@ -733,7 +733,7 @@ $pagina->PrintTop($popup);
 							$untilObject = new DateTime($fecha_fin);
 							$sinceObject = $untilObject->sub($dateInterval);
 						}
-						$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true; 
+						$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true;
 					}
 				}
 			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
@@ -1273,7 +1273,11 @@ echo $Form->script();
 			form.append('<input type="hidden" name="agrupationType" value="client" id="agrupationType" />');
 			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
 			form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
-			form.attr('action','../Report/agrupatedWork').attr('target', '_parent').submit();
+			form.attr('action',root_dir + '/app/Report/agrupatedWork');
+			form.attr('id', 'tmp_form');
+			jQuery('body').append(form);
+			form.submit();
+			jQuery('#tmp_form').remove();
 		});
 
 		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
@@ -1284,7 +1288,11 @@ echo $Form->script();
 			}
 			form.append('<input type="hidden" name="agrupationType" value="lawyer" id="agrupationType" />');
 			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
-			form.attr('action','../Report/agrupatedWork').submit();;
+			form.attr('action',root_dir + '/app/Report/agrupatedWork');
+			form.attr('id', 'tmp_form');
+			jQuery('body').append(form);
+			form.submit();
+			jQuery('#tmp_form').remove();
 		});
 
 	});
