@@ -1273,7 +1273,7 @@ echo $Form->script();
 			form.append('<input type="hidden" name="agrupationType" value="client" id="agrupationType" />');
 			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
 			form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
-			form.attr('action','../Report/agrupatedWork').submit();
+			form.attr('action','../Report/agrupatedWork').attr('target', '_parent').submit();
 		});
 
 		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
