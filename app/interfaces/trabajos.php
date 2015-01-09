@@ -1273,7 +1273,7 @@ echo $Form->script();
 			form.append('<input type="hidden" name="agrupationType" value="client" id="agrupationType" />');
 			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
 			form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
-			form.attr('action',root_dir + '/app/Report/agrupatedWork');
+			form.attr('action',root_dir + '/app/Report/agrupatedWork').attr('target', '_top');
 			form.attr('id', 'tmp_form');
 			jQuery('body').append(form);
 			form.submit();
@@ -1288,7 +1288,7 @@ echo $Form->script();
 			}
 			form.append('<input type="hidden" name="agrupationType" value="lawyer" id="agrupationType" />');
 			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
-			form.attr('action',root_dir + '/app/Report/agrupatedWork');
+			form.attr('action',root_dir + '/app/Report/agrupatedWork').attr('target', '_top');
 			form.attr('id', 'tmp_form');
 			jQuery('body').append(form);
 			form.submit();
