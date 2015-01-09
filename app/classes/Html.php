@@ -13,6 +13,9 @@ class Html extends \Html {
 	protected $jsPath = '//static.thetimebilling.com/js/';
 	protected $cssPath = '//static.thetimebilling.com/css/';
 
+	public function div($text, $attrs = null) {
+		return $this->tag('div', $text, $attrs);
+	}
 	/**
 	 * Construye un tag html
 	 * @param type $tag
@@ -24,7 +27,7 @@ class Html extends \Html {
 	public function tag($tag = 'div', $content = '', $attributes = null, $closed = false) {
 		$html = '';
 
-		$attributes = is_array($attributes) ? $this->attributes($attributes) : $attributes;
+		$attributes = $this->attributes($attributes);
 
 		if ($closed) {
 			$html = sprintf('<%s%s />', $tag, $attributes);
@@ -51,7 +54,7 @@ class Html extends \Html {
 				}
 				$html .= sprintf(' %s="%s"', $name, $value);
 			}
-		} else {
+		} else if (!is_null($attributes)) {
 			$html = $attributes;
 		}
 		return $html;
@@ -81,7 +84,7 @@ class Html extends \Html {
 	 * @param type $attrs
 	 * @return type
 	 */
-	public function link($text, $url, $attrs = '') {
+	public function link($text, $url, $attrs = null) {
 		$_attrs = array(
 			'href' => $url
 		);

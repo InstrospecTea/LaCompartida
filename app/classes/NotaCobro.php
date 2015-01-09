@@ -5,1252 +5,1247 @@ require_once('Numbers/Words.php');
 
 class NotaCobro extends Cobro {
 
-    var $asuntos = array();
-    var $x_resultados = array();
+	var $asuntos = array();
+	var $x_resultados = array();
 
-    /**
-     * @var Sesion
-     */
-    var $sesion = null;
-    var $carta_tabla = 'cobro_rtf';
-    var $carta_id = 'id_formato';
-    var $carta_formato = 'cobro_template';
-    var $siguiente = array();
-    public $secciones = array(
-        'INFORME' => array(
-            'CLIENTE' => 'CLIENTE / GenerarSeccionCliente',
-            'DETALLE_COBRO' => 'DETALLE_COBRO / GenerarDocumento2',
-            'ADELANTOS' => 'ADELANTOS / GenerarDocumento2',
-            'COBROS_ADEUDADOS' => 'COBROS_ADEUDADOS / GenerarDocumento2',
-            'RESUMEN_CAP' => 'RESUMEN_CAP / GenerarDocumento2',
-            'ASUNTOS' => 'ASUNTOS / GenerarDocumentoComun',
-            'GASTOS' => 'GASTOS / GenerarDocumento2',
-            'CTA_CORRIENTE' => 'CTA_CORRIENTE / GenerarDocumento2',
-            'TIPO_CAMBIO' => 'TIPO_CAMBIO / GenerarDocumentoComun',
-            'MOROSIDAD' => 'MOROSIDAD / GenerarDocumento2',
-            'GLOSA_ESPECIAL' => 'GLOSA_ESPECIAL / GenerarDocumentoComun',
-            'RESUMEN_PROFESIONAL_POR_CATEGORIA' => 'RESUMEN_PROFESIONAL_POR_CATEGORIA / GenerarSeccionResumenProfesional',
-            'RESUMEN_PROFESIONAL' => 'RESUMEN_PROFESIONAL / GenerarSeccionResumenProfesional',
-            'ENDOSO' => 'ENDOSO / GenerarDocumentoComun',
-            'SALTO_PAGINA' => 'SALTO_PAGINA / GenerarDocumentoComun',
-            'DESGLOSE_POR_ASUNTO_DETALLE' => 'DESGLOSE_POR_ASUNTO_DETALLE / GenerarDocumentoComun',
-            'DESGLOSE_POR_ASUNTO_TOTALES' => 'DESGLOSE_POR_ASUNTO_TOTALES / GenerarDocumentoComun',
-        ),
-        'DETALLE_COBRO' => array(
-            'FACTURA_NUMERO' => 'FACTURA_NUMERO / GenerarDocumento2',
-            'NUMERO_FACTURA' => 'NUMERO_FACTURA / GenerarDocumento2',
-            'DETALLE_COBRO_RETAINER' => 'DETALLE_COBRO_RETAINER / GenerarDocumentoComun',
-            'DETALLE_TARIFA_ADICIONAL' => 'DETALLE_TARIFA_ADICIONAL / GenerarDocumentoComun',
-            'RESTAR_RETAINER' => 'RESTAR_RETAINER / GenerarDocumento2',
-            'DETALLE_HONORARIOS' => 'DETALLE_HONORARIOS / GenerarDocumento2',
-            'DETALLE_GASTOS' => 'DETALLE_GASTOS / GenerarDocumento2',
-            'DETALLE_TRAMITES' => 'DETALLE_TRAMITES / GenerarDocumento2',
-            'DETALLE_COBRO_MONEDA_TOTAL' => 'DETALLE_COBRO_MONEDA_TOTAL / GenerarDocumento2',
-            'DETALLE_COBRO_DESCUENTO' => 'DETALLE_COBRO_DESCUENTO / GenerarDocumento2',
-            'IMPUESTO' => 'IMPUESTO / GenerarDocumento2',
-            'DETALLES_PAGOS' => 'DETALLES_PAGOS / GenerarSeccionDetallePago',
-            'DETALLES_PAGOS_CONTRATO' => 'DETALLES_PAGOS_CONTRATO / GenerarSeccionDetallePagoContrato',
-        ),
-        'DETALLE_HONORARIOS' => array(
-            'DETALLE_COBRO_DESCUENTO' => 'DETALLE_COBRO_DESCUENTO / GenerarDocumento2',
-            'DETALLE_COBRO_MONEDA_TOTAL' => 'DETALLE_COBRO_MONEDA_TOTAL / GenerarDocumento2',
-        ),
-        'RESUMEN_CAP' => array(
-            'COBROS_DEL_CAP' => 'COBROS_DEL_CAP / GenerarDocumento2',
-        ),
-        'GASTOS' => array(
-            'GASTOS_ENCABEZADO' => 'GASTOS_ENCABEZADO / GenerarDocumentoComun',
-            'GASTOS_FILAS' => 'GASTOS_FILAS / GenerarDocumentoComun',
-            'GASTOS_TOTAL' => 'GASTOS_TOTAL / GenerarDocumentoComun',
-        ),
-        'CTA_CORRIENTE' => array(
-            'CTA_CORRIENTE_SALDO_INICIAL' => 'CTA_CORRIENTE_SALDO_INICIAL / GenerarDocumentoComun',
-            'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO' => 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO / GenerarDocumentoComun',
-            'CTA_CORRIENTE_MOVIMIENTOS_FILAS' => 'CTA_CORRIENTE_MOVIMIENTOS_FILAS / GenerarDocumentoComun',
-            'CTA_CORRIENTE_MOVIMIENTOS_TOTAL' => 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL / GenerarDocumentoComun',
-            'CTA_CORRIENTE_SALDO_FINAL' => 'CTA_CORRIENTE_SALDO_FINAL / GenerarDocumentoComun',
-        ),
-        'MOROSIDAD' => array(
-            'MOROSIDAD_ENCABEZADO' => 'MOROSIDAD_ENCABEZADO / GenerarDocumentoComun',
-            'MOROSIDAD_FILAS' => 'MOROSIDAD_FILAS / GenerarDocumentoComun',
-            'MOROSIDAD_HONORARIOS_TOTAL' => 'MOROSIDAD_HONORARIOS_TOTAL / GenerarDocumentoComun',
-            'MOROSIDAD_GASTOS' => 'MOROSIDAD_GASTOS / GenerarDocumentoComun',
-            'MOROSIDAD_TOTAL' => 'MOROSIDAD_TOTAL / GenerarDocumentoComun',
-        ),
-        'ADELANTOS' => array(
-            'ADELANTOS_ENCABEZADO' => 'ADELANTOS_ENCABEZADO / GenerarDocumento2',
-            'ADELANTOS_FILAS_TOTAL' => 'ADELANTOS_FILAS_TOTAL / GenerarDocumento2',
-        ),
-        'COBROS_ADEUDADOS' => array(
-            'ADELANTOS_ENCABEZADO' => 'ADELANTOS_ENCABEZADO / GenerarDocumento2',
-            'COBROS_ADEUDADOS_FILAS_TOTAL' => 'COBROS_ADEUDADOS_FILAS_TOTAL / GenerarDocumento2',
-        ),
-        'ASUNTOS' => array(
-            'TRABAJOS_ENCABEZADO' => 'TRABAJOS_ENCABEZADO / GenerarDocumentoComun',
-            'TRABAJOS_FILAS' => 'TRABAJOS_FILAS / GenerarDocumentoComun',
-            'TRABAJOS_TOTAL' => 'TRABAJOS_TOTAL / GenerarDocumentoComun',
-            'DETALLE_PROFESIONAL' => 'DETALLE_PROFESIONAL / GenerarDocumentoComun',
-            'HITOS_FILAS' => 'HITOS_FILAS / GenerarDocumentoComun',
-            'HITOS_TOTAL' => 'HITOS_TOTAL / GenerarDocumentoComun',
-            'HITOS_ENCABEZADO' => 'HITOS_ENCABEZADO / GenerarDocumentoComun',
-            'TRAMITES_ENCABEZADO' => 'TRAMITES_ENCABEZADO / GenerarDocumentoComun',
-            'TRAMITES_FILAS' => 'TRAMITES_FILAS / GenerarDocumentoComun',
-            'TRAMITES_TOTAL' => 'TRAMITES_TOTAL / GenerarDocumentoComun',
-            'GASTOS' => 'GASTOS / GenerarDocumentoComun',
-        ),
-        'TRAMITES_FILAS' => array(
-            'TRAMITES_TOTAL' => 'TRAMITES_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-            'TRAMITES_ENCABEZADO' => 'TRAMITES_ENCABEZADO / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-        ),
-        'TRABAJOS_FILAS' => array(
-            'TRABAJOS_TOTAL' => 'TRABAJOS_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-            'TRABAJOS_ENCABEZADO' => 'TRABAJOS_ENCABEZADO / GenerarDocumentoComun / SE LLAMA SOLO, NO EXISTE EL TAG',
-        ),
-        'DETALLE_PROFESIONAL' => array(
-            'PROFESIONAL_ENCABEZADO' => 'PROFESIONAL_ENCABEZADO / GenerarSeccionResumenProfesional',
-            'PROFESIONAL_FILAS' => 'PROFESIONAL_FILAS / GenerarDocumentoComun',
-            'PROFESIONAL_TOTAL' => 'PROFESIONAL_TOTAL / GenerarDocumentoComun',
-            'DETALLE_COBRO_DESCUENTO' => 'DETALLE_COBRO_DESCUENTO / GenerarDocumentoComun',
-            'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO' => 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO / GenerarDocumentoComun',
-            'DETALLE_COBRO_MONEDA_TOTAL' => 'DETALLE_COBRO_MONEDA_TOTAL / GenerarDocumentoComun',
-        ),
-        'PROFESIONAL_TOTAL' => array(
-            'DETALLE_PROFESIONAL_RETAINER' => 'DETALLE_PROFESIONAL_RETAINER / GenerarDocumentoComun',
-        ),
-        'RESUMEN_PROFESIONAL' => array(
-            'PROFESIONAL_ENCABEZADO' => 'PROFESIONAL_ENCABEZADO / GenerarSeccionResumenProfesional / SE LLAMA SOLO, NO EXISTE EL TAG',
-            'PROFESIONAL_FILAS' => 'PROFESIONAL_FILAS / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-            'PROFESIONAL_TOTAL' => 'PROFESIONAL_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-        ),
-        'RESUMEN_PROFESIONAL_POR_CATEGORIA' => array(
-            'RESUMEN_PROFESIONAL_ENCABEZADO' => 'RESUMEN_PROFESIONAL_ENCABEZADO / GenerarSeccionResumenProfesional / SE LLAMA SOLO, NO EXISTE EL TAG',
-            'PROFESIONAL_FILAS' => 'PROFESIONAL_FILAS / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-            'RESUMEN_PROFESIONAL_TOTAL' => 'RESUMEN_PROFESIONAL_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
-        ),
-    );
-    public $diccionario = array(
-        'INFORME' => array(
-            '%xfecha_mes_dos_digitos%' => 'xfecha_mes_dos_digitos',
-            '%xfecha_ano_dos_digitos%' => 'xfecha_ano_dos_digitos',
-            '%xfecha_mes_dia_ano%' => 'xfecha_mes_dia_ano',
-            '%xfecha_mespalabra_dia_ano%' => 'xfecha_mespalabra_dia_ano',
-            '%xnro_factura%' => 'xnro_factura',
-            '%xnombre_cliente%' => 'xnombre_cliente',
-            '%xglosa_cliente%' => 'xglosa_cliente',
-            '%xdireccion%' => 'xdireccion',
-            '%xrut%' => 'xrut',
-            '%COBRO_CARTA%' => 'COBRO_CARTA',
-            '%cobro%' => 'cobro',
-            '%valor_cobro%' => 'valor_cobro',
-            '%logo%' => 'logo',
-            '%titulo%' => 'titulo',
-            '%logo_cobro%' => 'logo_cobro',
-            '%subtitulo%' => 'subtitulo',
-            '%direccion_blr%' => 'direccion_blr',
-            '%glosa_fecha%' => 'glosa_fecha',
-            '%fecha_gqmc%' => 'fecha_gqmc',
-            '%fecha%' => 'fecha',
-            '%fecha_mes_dos_digitos%' => 'fecha_mes_dos_digitos',
-            '%fecha_ano_dos_digitos%' => 'fecha_ano_dos_digitos',
-            '%codigo_cliente%' => 'codigo_cliente',
-            '%fecha_mes_del_cobro%' => 'fecha_mes_del_cobro',
-            '%fecha_larga%' => 'fecha_larga',
-            '%socio%' => 'socio',
-            '%socio_cobrador%' => 'socio_cobrador',
-            '%nombre_socio%' => 'nombre_socio',
-            '%fono%' => 'fono',
-            '%fax%' => 'fax',
-            '%nota_cobro_acl%' => 'nota_cobro_acl',
-            '%reference_no_acl%' => 'reference_no_acl',
-            '%servicios%' => 'servicios',
-            '%honorarios%' => 'honorarios',
-            '%gastos_acl%' => 'gastos_acl',
-            '%otros%' => 'otros',
-            '%subtotales%' => 'subtotales',
-            '%impuestos%' => 'impuestos',
-            '%total_deuda%' => 'total_deuda',
-            '%instruccion_deposito%' => 'instruccion_deposito',
-            '%beneficiario_deposito%' => 'beneficiario_deposito',
-            '%banco%' => 'banco',
-            '%direccion%' => 'direccion',
-            '%cuenta_bancaria%' => 'cuenta_bancaria',
-            '%encargado_comercial%' => 'encargado_comercial',
-            '%rut_encargado%' => 'rut_encargado',
-            '%filas_escalas%' => 'filas_escalas',
-            '%TABLA_ESCALONADA%' => 'TABLA_ESCALONADA',
-            '%TRAMITES%' => 'TRAMITES',
-            '%numero_factura%' => 'numero_factura',
-            '%xcorrelativo_aguilar%' => 'xcorrelativo_aguilar',
-            '%honorarios_vouga%' => 'honorarios_vouga',
-        ),
-        'DETALLE_COBRO' => array(
-            '%honorario_yo_gastos%' => 'honorario_yo_gastos',
-            '%materia%' => 'materia',
-            '%glosa_asunto_sin_codigo%' => 'glosa_asunto_sin_codigo',
-            '%resumen_cobro%' => 'resumen_cobro',
-            '%fecha%' => 'fecha',
-            '%fecha_emision_glosa%' => 'fecha_emision_glosa',
-            '%fecha_emision%' => 'fecha_emision',
-            '%glosa_cobro%' => 'glosa_cobro',
-            '%cobro%' => 'cobro',
-            '%reference%' => 'reference',
-            '%valor_cobro%' => 'valor_cobro',
-            '%total_simbolo%' => 'total_simbolo',
-            '%boleta%' => 'boleta',
-            '%encargado%' => 'encargado',
-            '%encargado_valor%' => 'encargado_valor',
-            '%factura%' => 'factura',
-            '%factura_acl%' => 'factura_acl',
-            '%pctje_blr%' => 'pctje_blr',
-            '%factura_nro%' => 'factura_nro',
-            '%cobro_nro%' => 'cobro_nro',
-            '%nro_cobro%' => 'nro_cobro',
-            '%cobro_factura_nro%' => 'cobro_factura_nro',
-            '%nro_factura%' => 'nro_factura',
-            '%modalidad%' => 'modalidad',
-            '%tipo_honorarios%' => 'tipo_honorarios',
-            '%valor_modalidad_tyc%' => 'valor_modalidad_tyc',
-            '%valor_modalidad%' => 'valor_modalidad',
-            '%valor_modalidad_ucfirst%' => 'valor_modalidad_ucfirst',
-            '%detalle_modalidad%' => 'detalle_modalidad',
-            '%detalle_modalidad_lowercase%' => 'detalle_modalidad_lowercase',
-            '%detalle_modalidad_tyc%' => 'detalle_modalidad_tyc',
-            '%tipo_tarifa%' => 'tipo_tarifa',
-            '%periodo%' => 'periodo',
-            '%periodo_cobro%' => 'periodo_cobro',
-            '%valor_periodo_ini%' => 'valor_periodo_ini',
-            '%valor_periodo_fin%' => 'valor_periodo_fin',
-            '%fecha_ini%' => 'fecha_ini',
-            '%fecha_ini_primer_trabajo%' => 'fecha_ini_primer_trabajo',
-            '%nota_transferencia%' => 'nota_transferencia',
-            '%desde%' => 'desde',
-            '%hasta%' => 'hasta',
-            '%valor_fecha_ini_primer_trabajo%' => 'valor_fecha_ini_primer_trabajo',
-            '%valor_fecha_fin_ultimo_trabajo%' => 'valor_fecha_fin_ultimo_trabajo',
-            '%valor_fecha_ini_o_primer_trabajo%' => 'valor_fecha_ini_o_primer_trabajo',
-            '%valor_fecha_ini%' => 'valor_fecha_ini',
-            '%fecha_fin%' => 'fecha_fin',
-            '%valor_fecha_fin%' => 'valor_fecha_fin',
-            '%horas%' => 'horas',
-            '%valor_horas%' => 'valor_horas',
-            '%honorarios%' => 'honorarios',
-            '%descuento%' => 'descuento',
-            '%saldo%' => 'saldo',
-            '%equivalente%' => 'equivalente',
-            '%honorarios_con_lang%' => 'honorarios_con_lang',
-            '%honorarios_totales%' => 'honorarios_totales',
-            '%honorarios_mta%' => 'honorarios_mta',
-            '%valor_honorarios_totales%' => 'valor_honorarios_totales',
-            '%valor_honorarios_totales_moneda_total%' => 'valor_honorarios_totales_moneda_total',
-            '%fees%' => 'fees',
-            '%expenses%' => 'expenses',
-            '%total_honorarios%' => 'total_honorarios',
-            '%valor_honorarios_demo%' => 'valor_honorarios_demo',
-            '%valor_honorarios%' => 'valor_honorarios',
-            '%horas_decimales%' => 'horas_decimales',
-            '%valor_horas_decimales%' => 'valor_horas_decimales',
-            '%valor_honorarios_cyc%' => 'valor_honorarios_cyc',
-            '%monedabase%' => 'monedabase',
-            '%equivalente_a_la_fecha%' => 'equivalente_a_la_fecha',
-            '%valor_honorarios_monedabase%' => 'valor_honorarios_monedabase',
-            '%valor_honorarios_monedabase_tyc%' => 'valor_honorarios_monedabase_tyc',
-            '%gastos%' => 'gastos',
-            '%valor_gastos%' => 'valor_gastos',
-            '%total_cobro%' => 'total_cobro',
-            '%total_cobro_mta%' => 'total_cobro_mta',
-            '%total_cobro_cyc%' => 'total_cobro_cyc',
-            '%valor_total_cobro_demo%' => 'valor_total_cobro_demo',
-            '%valor_total_cobro_cyc%' => 'valor_total_cobro_cyc',
-            '%iva_cyc%' => 'iva_cyc',
-            '%valor_iva_cyc%' => 'valor_iva_cyc',
-            '%total_cyc%' => 'total_cyc',
-            '%valor_total_cyc%' => 'valor_total_cyc',
-            '%honorarios_y_gastos%' => 'honorarios_y_gastos',
-            '%valor_total_cobro%' => 'valor_total_cobro',
-            '%valor_total_cobro_sin_simbolo%' => 'valor_total_cobro_sin_simbolo',
-            '%valor_uf%' => 'valor_uf',
-            '%glosa_tipo_cambio_moneda%' => 'glosa_tipo_cambio_moneda',
-            '%valor_tipo_cambio_moneda%' => 'valor_tipo_cambio_moneda',
-            '%valor_bruto%' => 'valor_bruto',
-            '%valor_descuento%' => 'valor_descuento',
-            '%valor_equivalente%' => 'valor_equivalente',
-            '%total_subtotal_cobro%' => 'total_subtotal_cobro',
-            '%nota_disclaimer%' => 'nota_disclaimer',
-        ),
-        'RESTAR_RETAINER' => array(
-            '%retainer%' => 'retainer',
-            '%valor_retainer%' => 'valor_retainer',
-        ),
-        'DETALLE_COBRO_RETAINER' => array(
-            '%horas_retainer%' => 'horas_retainer',
-            '%valor_horas_retainer%' => 'valor_horas_retainer',
-            '%horas_adicionales%' => 'horas_adicionales',
-            '%valor_horas_adicionales%' => 'valor_horas_adicionales',
-            '%honorarios_retainer%' => 'honorarios_retainer',
-            '%valor_honorarios_retainer%' => 'valor_honorarios_retainer',
-            '%honorarios_adicionales%' => 'honorarios_adicionales',
-            '%valor_honorarios_adicionales%' => 'valor_honorarios_adicionales',
-        ),
-        'DETALLE_TARIFA_ADICIONAL' => array(
-            '%tarifa_adicional%' => 'tarifa_adicional',
-            '%valores_tarifa_adicionales%' => 'valores_tarifa_adicionales',
-        ),
-        'FACTURA_NUMERO' => array(
-            '%factura_nro%' => 'factura_nro',
-        ),
-        'NUMERO_FACTURA' => array(
-            '%nro_factura%' => 'nro_factura',
-        ),
-        'DETALLE_HONORARIOS' => array(
-            '%horas%' => 'horas',
-            '%valor_horas%' => 'valor_horas',
-            '%honorarios%' => 'honorarios',
-            '%valor_honorarios%' => 'valor_honorarios',
-        ),
-        'DETALLE_GASTOS' => array(
-            '%gastos%' => 'gastos',
-            '%valor_gastos%' => 'valor_gastos',
-        ),
-        'DETALLE_TRAMITES' => array(
-            '%tramites%' => 'tramites',
-            '%valor_tramites%' => 'valor_tramites',
-        ),
-        'DETALLE_COBRO_MONEDA_TOTAL' => array(
-            '%monedabase%' => 'monedabase',
-            '%total_pagar%' => 'total_pagar',
-            '%valor_honorarios_monedabase_demo%' => 'valor_honorarios_monedabase_demo',
-            '%valor_honorarios_monedabase%' => 'valor_honorarios_monedabase',
-        ),
-        'DETALLE_COBRO_DESCUENTO' => array(
-            '%honorarios%' => 'honorarios',
-            '%valor_honorarios%' => 'valor_honorarios',
-            '%valor_descuento%' => 'valor_descuento',
-            '%porcentaje_descuento%' => 'porcentaje_descuento',
-            '%descuento%' => 'descuento',
-            '%valor_honorarios_demo%' => 'valor_honorarios_demo',
-            '%valor_descuento_demo%' => 'valor_descuento_demo',
-            '%porcentaje_descuento_demo%' => 'porcentaje_descuento_demo',
-            '%total_honorarios%' => 'total_honorarios',
-            '%valor_honorarios_con_descuento%' => 'valor_honorarios_con_descuento',
-        ),
-        'RESUMEN_CAP' => array(
-            '%cap%' => 'cap',
-            '%valor_cap%' => 'valor_cap',
-            '%restante%' => 'restante',
-            '%valor_restante%' => 'valor_restante',
-        ),
-        'COBROS_DEL_CAP' => array(
-            '%numero_cobro%' => 'numero_cobro',
-            '%valor_cap_del_cobro%' => 'valor_cap_del_cobro',
-        ),
-        'IMPUESTO' => array(
-            '%impuesto%' => 'impuesto',
-            '%impuesto_mta%' => 'impuesto_mta',
-            '%valor_impuesto%' => 'valor_impuesto',
-            '%valor_impuesto_honorarios%' => 'valor_impuesto_honorarios',
-        ),
-        'GASTOS' => array(
-            '%glosa_gastos%' => 'glosa_gastos',
-            '%expenses%' => 'expenses',
-            '%factura%' => 'factura',
-            '%detalle_gastos%' => 'detalle_gastos',
-        ),
-        'GASTOS_ENCABEZADO' => array(
-            '%glosa_gastos%' => 'glosa_gastos',
-            '%descripcion_gastos%' => 'descripcion_gastos',
-            '%fecha%' => 'fecha',
-            '%num_doc%' => 'num_doc',
-            '%tipo_gasto%' => 'tipo_gasto',
-            '%descripcion%' => 'descripcion',
-            '%monto_original%' => 'monto_original',
-            '%monto_moneda_total%' => 'monto_moneda_total',
-            '%ordenado_por%' => 'ordenado_por',
-            '%asunto_id%' => 'asunto_id',
-            '%monto_impuesto_total%' => 'monto_impuesto_total',
-            '%monto_moneda_total_con_impuesto%' => 'monto_moneda_total_con_impuesto',
-            '%proveedor%' => 'proveedor',
-        ),
-        'GASTOS_FILAS' => array(
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%descripcion_b%' => 'descripcion_b',
-            '%monto_original%' => 'monto_original',
-            '%monto%' => 'monto',
-            '%monto_moneda_total%' => 'monto_moneda_total',
-            '%monto_moneda_total_sin_simbolo%' => 'monto_moneda_total_sin_simbolo',
-            '%valor_codigo_asunto%' => 'valor_codigo_asunto',
-            '%num_doc%' => 'num_doc',
-            '%tipo_gasto%' => 'tipo_gasto',
-            '%monto_impuesto_total%' => 'monto_impuesto_total',
-            '%monto_moneda_total_con_impuesto%' => 'monto_moneda_total_con_impuesto',
-            '%proveedor%' => 'proveedor',
-            '%solicitante%' => 'solicitante',
-        ),
-        'GASTOS_TOTAL' => array(
-            '%total%' => 'total',
-            '%glosa_total%' => 'glosa_total',
-            '%sub_total_gastos%' => 'sub_total_gastos',
-            '%total_gastos_moneda_total%' => 'total_gastos_moneda_total',
-            '%glosa_total_moneda_base%' => 'glosa_total_moneda_base',
-            '%valor_total_moneda_carta%' => 'valor_total_moneda_carta',
-            '%valor_total_moneda_base%' => 'valor_total_moneda_base',
-            '%valor_impuesto_monedabase%' => 'valor_impuesto_monedabase',
-            '%valor_total_monedabase_con_impuesto%' => 'valor_total_monedabase_con_impuesto',
-        ),
-        'CTA_CORRIENTE' => array(
-            '%titulo_detalle_cuenta%' => 'titulo_detalle_cuenta',
-            '%descripcion_cuenta%' => 'descripcion_cuenta',
-            '%monto_cuenta%' => 'monto_cuenta',
-        ),
-        'MOROSIDAD' => array(
-            '%titulo_morosidad%' => 'titulo_morosidad',
-        ),
-        'ADELANTOS' => array(
-            '%titulo_adelantos%' => 'titulo_adelantos',
-        ),
-        'COBROS_ADEUDADOS' => array(
-            '%titulo_adelantos%' => 'titulo_adelantos',
-        ),
-        'ADELANTOS_ENCABEZADO' => array(
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%monto%' => 'monto',
-            '%saldo%' => 'saldo',
-        ),
-        'ADELANTOS_FILAS_TOTAL' => array(
-            '%descripcion%' => 'descripcion',
-            '%saldo_pago%' => 'saldo_pago',
-            '%monto%' => 'monto',
-            '%fecha%' => 'fecha',
-        ),
-        'COBROS_ADEUDADOS_FILAS_TOTAL' => array(
-            '%descripcion%' => 'descripcion',
-            '%saldo_pago%' => 'saldo_pago',
-            '%monto%' => 'monto',
-            '%fecha%' => 'fecha',
-        ),
-        'ENDOSO' => array(
-            '%numero_cuenta_contrato%' => 'numero_cuenta_contrato',
-            '%glosa_banco_contrato%' => 'glosa_banco_contrato',
-            '%codigo_swift%' => 'codigo_swift',
-            '%codigo_cci%' => 'codigo_cci',
-            '%valor_total_sin_impuesto%' => 'valor_total_sin_impuesto',
-            '%valor_impuesto%' => 'valor_impuesto',
-            '%valor_total_con_impuesto%' => 'valor_total_con_impuesto',
-            '%tipo_gbp_segun_moneda%' => 'tipo_gbp_segun_moneda',
-            '%total_sin_impuesto%' => 'total_sin_impuesto',
-            '%impuesto%' => 'impuesto',
-            '%total_factura%' => 'total_factura',
-            '%instrucciones_deposito%' => 'instrucciones_deposito',
-            '%solicitud%' => 'solicitud',
-        ),
-        'DESGLOSE_POR_ASUNTO_DETALLE' => array(
-            '%glosa_asunto%' => 'glosa_asunto',
-            '%simbolo%' => 'simbolo',
-            '%honorarios_asunto%' => 'honorarios_asunto',
-            '%gastos_asunto%' => 'gastos_asunto',
-            '%tramites_asunto%' => 'tramites_asunto',
-        ),
-        'DESGLOSE_POR_ASUNTO_TOTALES' => array(
-            '%simbolo%' => 'simbolo',
-            '%desglose_subtotal_hh%' => 'desglose_subtotal_hh',
-            '%desglose_subtotal_gasto%' => 'desglose_subtotal_gasto',
-            '%desglose_subtotal_tramite%' => 'desglose_subtotal_tramite',
-            '%desglose_impuesto_hh%' => 'desglose_impuesto_hh',
-            '%desglose_impuesto_gasto%' => 'desglose_impuesto_gasto',
-            '%desglose_impuesto_tramite%' => 'desglose_impuesto_tramite',
-            '%desglose_grantotal%' => 'desglose_grantotal',
-            '%subtotales%' => 'subtotales',
-            '%impuestos%' => 'impuestos',
-            '%total_deuda%' => 'total_deuda',
-        ),
-        'ASUNTOS' => array(
-            '%salto_pagina_varios_asuntos%' => 'salto_pagina_varios_asuntos',
-            '%salto_pagina_un_asunto%' => 'salto_pagina_un_asunto',
-            '%asunto_extra%' => 'asunto_extra',
-            '%glosa_asunto_sin_codigo_extra%' => 'glosa_asunto_sin_codigo_extra',
-            '%asunto%' => 'asunto',
-            '%asuntos_cliente%' => 'asuntos_cliente',
-            '%etiqueta_cliente%' => 'etiqueta_cliente',
-            '%codigo_cliente%' => 'codigo_cliente',
-            '%glosa_cliente%' => 'glosa_cliente',
-            '%glosa_asunto%' => 'glosa_asunto',
-            '%glosa_asunto_sin_codigo%' => 'glosa_asunto_sin_codigo',
-            '%glosa_asunto_codigo_area%' => 'glosa_asunto_codigo_area',
-            '%valor_codigo_asunto%' => 'valor_codigo_asunto',
-            '%codigo_cliente_secundario%' => 'codigo_cliente_secundario',
-            '%valor_codigo_cliente_secundario%' => 'valor_codigo_cliente_secundario',
-            '%contacto%' => 'contacto',
-            '%valor_contacto%' => 'valor_contacto',
-            '%registro%' => 'registro',
-            '%telefono%' => 'telefono',
-            '%valor_telefono%' => 'valor_telefono',
-            '%espacio_trabajo%' => 'espacio_trabajo',
-            '%servicios%' => 'servicios',
-            '%hitos%' => 'hitos',
-            '%espacio_tramite%' => 'espacio_tramite',
-            '%servicios_tramites%' => 'servicios_tramites',
-            '%codigo_asunto_mb%' => 'codigo_asunto_mb',
-        ),
-        'HITOS_ENCABEZADO' => array(
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%valor%' => 'valor',
-        ),
-        'HITOS_FILAS' => array(
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%valor_hitos%' => 'valor_hitos',
-        ),
-        'HITOS_TOTAL' => array(
-            '%total%' => 'total',
-            '%total_hitos%' => 'total_hitos',
-        ),
-        'TRAMITES_ENCABEZADO' => array(
-            '%solicitante%' => 'solicitante',
-            '%ordenado_por%' => 'ordenado_por',
-            '%periodo%' => 'periodo',
-            '%valor_periodo_ini%' => 'valor_periodo_ini',
-            '%valor_periodo_fin%' => 'valor_periodo_fin',
-            '%cliente%' => 'cliente',
-            '%glosa_cliente%' => 'glosa_cliente',
-            '%asunto%' => 'asunto',
-            '%glosa_asunto%' => 'glosa_asunto',
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%servicios_prestados%' => 'servicios_prestados',
-            '%servicios_tramites%' => 'servicios_tramites',
-            '%detalle_trabajo%' => 'detalle_trabajo',
-            '%profesional%' => 'profesional',
-            '%abogado%' => 'abogado',
-            '%horas%' => 'horas',
-            '%cobrable%' => 'cobrable',
-            '%categoria_abogado%' => 'categoria_abogado',
-            '%duracion_tramites%' => 'duracion_tramites',
-            '%valor_tramites%' => 'valor_tramites',
-            '%valor%' => 'valor',
-            '%valor_siempre%' => 'valor_siempre',
-            '%tarifa_fee%' => 'tarifa_fee',
-        ),
-        'TRAMITES_FILAS' => array(
-            '%iniciales%' => 'iniciales',
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%valor%' => 'valor',
-            '%duracion_tramites%' => 'duracion_tramites',
-            '%valor_tramites%' => 'valor_tramites',
-            '%profesional%' => 'profesional',
-            '%duracion_decimal%' => 'duracion_decimal',
-            '%duracion%' => 'duracion',
-            '%valor_siempre%' => 'valor_siempre',
-            '%glosa%' => 'glosa',
-            '%cobrable%' => 'cobrable',
-            '%abogado%' => 'abogado',
-            '%categoria_abogado%' => 'categoria_abogado',
-            '%TRAMITES_CATEGORIA%' => 'TRAMITES_CATEGORIA',
-        ),
-        'TRAMITES_TOTAL' => array(
-            '%glosa_tramites%' => 'glosa_tramites',
-            '%glosa%' => 'glosa',
-            '%duracion_decimal%' => 'duracion_decimal',
-            '%duracion_tramites%' => 'duracion_tramites',
-            '%duracion%' => 'duracion',
-            '%valor_tramites%' => 'valor_tramites',
-            '%valor_siempre%' => 'valor_siempre',
-        ),
-        'TRABAJOS_ENCABEZADO' => array(
-            '%td_solicitante%' => 'td_solicitante',
-            '%solicitante%' => 'solicitante',
-            '%id_asunto%' => 'id_asunto',
-            '%tarifa_hora%' => 'tarifa_hora',
-            '%importe%' => 'importe',
-            '%ordenado_por%' => 'ordenado_por',
-            '%ordenado_por_jjr%' => 'ordenado_por_jjr',
-            '%periodo%' => 'periodo',
-            '%valor_periodo_ini%' => 'valor_periodo_ini',
-            '%valor_periodo_fin%' => 'valor_periodo_fin',
-            '%cliente%' => 'cliente',
-            '%glosa_cliente%' => 'glosa_cliente',
-            '%asunto%' => 'asunto',
-            '%glosa_asunto%' => 'glosa_asunto',
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%servicios_prestados%' => 'servicios_prestados',
-            '%detalle_trabajo%' => 'detalle_trabajo',
-            '%profesional%' => 'profesional',
-            '%duracion_cobrable%' => 'duracion_cobrable',
-            '%monto_total%' => 'monto_total',
-            '%staff%' => 'staff',
-            '%abogado%' => 'abogado',
-            '%horas%' => 'horas',
-            '%monto%' => 'monto',
-            '%cobrable%' => 'cobrable',
-            '%categoria_abogado%' => 'categoria_abogado',
-            '%tarifa%' => 'tarifa',
-            '%td_retainer%' => 'td_retainer',
-            '%duracion_retainer%' => 'duracion_retainer',
-            '%duracion_trabajada_bmahj%' => 'duracion_trabajada_bmahj',
-            '%duracion_descontada_bmahj%' => 'duracion_descontada_bmahj',
-            '%duracion_bmahj%' => 'duracion_bmahj',
-            '%duracion_trabajada%' => 'duracion_trabajada',
-            '%duracion_descontada%' => 'duracion_descontada',
-            '%duracion%' => 'duracion',
-            '%duracion_tyc%' => 'duracion_tyc',
-            '%valor%' => 'valor',
-            '%valor_siempre%' => 'valor_siempre',
-            '%tarifa_fee%' => 'tarifa_fee',
-            '%td_categoria%' => 'td_categoria',
-            '%categoria%' => 'categoria',
-            '%td_tarifa%' => 'td_tarifa',
-            '%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
-            '%td_importe%' => 'td_importe',
-            '%td_importe_ajustado%' => 'td_importe_ajustado',
-        ),
-        'TRABAJOS_FILAS' => array(
-            '%valor_codigo_asunto%' => 'valor_codigo_asunto',
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%td_solicitante%' => 'td_solicitante',
-            '%solicitante%' => 'solicitante',
-            '%username%' => 'username',
-            '%profesional%' => 'profesional',
-            '%td_categoria%' => 'td_categoria',
-            '%categoria%' => 'categoria',
-            '%td_tarifa%' => 'td_tarifa',
-            '%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
-            '%tarifa%' => 'tarifa',
-            '%tarifa_ajustada%' => 'tarifa_ajustada',
-            '%td_importe%' => 'td_importe',
-            '%td_importe_ajustado%' => 'td_importe_ajustado',
-            '%importe%' => 'importe',
-            '%importe_ajustado%' => 'importe_ajustado',
-            '%paridad%' => 'paridad',
-            '%iniciales%' => 'iniciales',
-            '%td_retainer%' => 'td_retainer',
-            '%duracion_retainer%' => 'duracion_retainer',
-            '%duracion_decimal_trabajada%' => 'duracion_decimal_trabajada',
-            '%duracion_trabajada%' => 'duracion_trabajada',
-            '%duracion_decduracion_trabajadaimal_descontada%' => 'duracion_decduracion_trabajadaimal_descontada',
-            '%duracion_descontada%' => 'duracion_descontada',
-            '%duracion_decimal%' => 'duracion_decimal',
-            '%duracion%' => 'duracion',
-            '%duracion_decimal_descontada%' => 'duracion_decimal_descontada',
-            '%cobrable%' => 'cobrable',
-            '%valor%' => 'valor',
-            '%valor_cyc%' => 'valor_cyc',
-            '%valor_con_moneda%' => 'valor_con_moneda',
-            '%valor_siempre%' => 'valor_siempre',
-            '%glosa%' => 'glosa',
-            '%TRABAJOS_CATEGORIA%' => 'TRABAJOS_CATEGORIA',
-        ),
-        'TRABAJOS_TOTAL' => array(
-            '%sub_total_fees%' => 'sub_total_fees',
-            '%td_solicitante%' => 'td_solicitante',
-            '%td_categoria%' => 'td_categoria',
-            '%td_tarifa%' => 'td_tarifa',
-            '%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
-            '%td_importe%' => 'td_importe',
-            '%td_importe_ajustado%' => 'td_importe_ajustado',
-            '%importe%' => 'importe',
-            '%importe_ajustado%' => 'importe_ajustado',
-            '%td_retainer%' => 'td_retainer',
-            '%duracion_retainer%' => 'duracion_retainer',
-            '%duracion_decimal_trabajada%' => 'duracion_decimal_trabajada',
-            '%duracion_trabajada%' => 'duracion_trabajada',
-            '%duracion_descontada%' => 'duracion_descontada',
-            '%duracion_decimal_descontada%' => 'duracion_decimal_descontada',
-            '%duracion_decimal%' => 'duracion_decimal',
-            '%duracion%' => 'duracion',
-            '%glosa%' => 'glosa',
-            '%cobrable%' => 'cobrable',
-            '%valor%' => 'valor',
-            '%valor_cyc%' => 'valor_cyc',
-            '%valor_siempre%' => 'valor_siempre',
-        ),
-        'DETALLE_PROFESIONAL' => array(
-            '%glosa_profesional%' => 'glosa_profesional',
-            '%detalle_tiempo_por_abogado%' => 'detalle_tiempo_por_abogado',
-            '%detalle_honorarios%' => 'detalle_honorarios',
-        ),
-        'PROFESIONAL_FILAS' => array(
-            '%nombre%' => 'nombre',
-            '%hrs_retainer%' => 'hrs_retainer',
-            '%hrs_descontadas%' => 'hrs_descontadas',
-            '%hrs_descontadas_real%' => 'hrs_descontadas_real',
-            '%hh%' => 'hh',
-            '%valor_hh%' => 'valor_hh',
-            '%valor_hh_cyc%' => 'valor_hh_cyc',
-            '%iniciales%' => 'iniciales',
-            '%username%' => 'username',
-            '%hrs_trabajadas_real%' => 'hrs_trabajadas_real',
-            '%hrs_trabajadas%' => 'hrs_trabajadas',
-            '%horas_retainer%' => 'horas_retainer',
-            '%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
-            '%total%' => 'total',
-            '%total_cyc%' => 'total_cyc',
-            '%hrs_trabajadas_previo%' => 'hrs_trabajadas_previo',
-            '%horas_trabajadas_especial%' => 'horas_trabajadas_especial',
-            '%horas_cobrables%' => 'horas_cobrables',
-            '%horas%' => 'horas',
-            '%tarifa_horas%' => 'tarifa_horas',
-            '%total_horas%' => 'total_horas',
-        ),
-        'PROFESIONAL_TOTAL' => array(
-            '%hrs_retainer%' => 'hrs_retainer',
-            '%hrs_descontadas%' => 'hrs_descontadas',
-            '%hrs_descontadas_real%' => 'hrs_descontadas_real',
-            '%hh%' => 'hh',
-            '%valor_hh%' => 'valor_hh',
-            '%valor_hh_cyc%' => 'valor_hh_cyc',
-            '%glosa%' => 'glosa',
-            '%glosa_honorarios%' => 'glosa_honorarios',
-            '%hrs_trabajadas_real%' => 'hrs_trabajadas_real',
-            '%hrs_trabajadas%' => 'hrs_trabajadas',
-            '%hrs_trabajadas_previo%' => 'hrs_trabajadas_previo',
-            '%horas_trabajadas_especial%' => 'horas_trabajadas_especial',
-            '%horas_cobrables%' => 'horas_cobrables',
-            '%horas_retainer%' => 'horas_retainer',
-            '%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
-            '%total%' => 'total',
-            '%total_cyc%' => 'total_cyc',
-            '%total_honorarios%' => 'total_honorarios',
-            '%horas%' => 'horas',
-        ),
-        'DETALLE_PROFESIONAL_RETAINER' => array(
-            '%retainer%' => 'retainer',
-            '%valor_retainer%' => 'valor_retainer',
-        ),
-        'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO' => array(
-            '%valor_honorarios_monedabase%' => 'valor_honorarios_monedabase',
-        ),
-        'CTA_CORRIENTE_SALDO_INICIAL' => array(
-            '%saldo_inicial_cuenta%' => 'saldo_inicial_cuenta',
-            '%valor_saldo_inicial_cuenta%' => 'valor_saldo_inicial_cuenta',
-        ),
-        'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO' => array(
-            '%movimientos%' => 'movimientos',
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%egreso%' => 'egreso',
-            '%ingreso%' => 'ingreso',
-        ),
-        'CTA_CORRIENTE_MOVIMIENTOS_FILAS' => array(
-            '%fecha%' => 'fecha',
-            '%descripcion%' => 'descripcion',
-            '%monto_egreso%' => 'monto_egreso',
-            '%monto_ingreso%' => 'monto_ingreso',
-        ),
-        'CTA_CORRIENTE_MOVIMIENTOS_TOTAL' => array(
-            '%total%' => 'total',
-            '%total_monto_egreso%' => 'total_monto_egreso',
-            '%total_monto_ingreso%' => 'total_monto_ingreso',
-            '%saldo_periodo%' => 'saldo_periodo',
-            '%total_monto_gastos%' => 'total_monto_gastos',
-        ),
-        'CTA_CORRIENTE_SALDO_FINAL' => array(
-            '%saldo_final_cuenta%' => 'saldo_final_cuenta',
-            '%valor_saldo_final_cuenta%' => 'valor_saldo_final_cuenta',
-        ),
-        'TIPO_CAMBIO' => array(
-            '%titulo_tipo_cambio%' => 'titulo_tipo_cambio',
-        ),
-        'MOROSIDAD_ENCABEZADO' => array(
-            '%numero_nota_cobro%' => 'numero_nota_cobro',
-            '%numero_factura%' => 'numero_factura',
-            '%fecha%' => 'fecha',
-            '%moneda%' => 'moneda',
-            '%monto_moroso%' => 'monto_moroso',
-        ),
-        'MOROSIDAD_FILAS' => array(
-            '%numero_nota_cobro%' => 'numero_nota_cobro',
-            '%numero_factura%' => 'numero_factura',
-            '%fecha%' => 'fecha',
-            '%moneda%' => 'moneda',
-            '%moneda_total%' => 'moneda_total',
-            '%monto_moroso%' => 'monto_moroso',
-            '%monto_moroso_documento%' => 'monto_moroso_documento',
-            '%monto_moroso_moneda_total%' => 'monto_moroso_moneda_total',
-        ),
-        'MOROSIDAD_HONORARIOS_TOTAL' => array(
-            '%numero_nota_cobro%' => 'numero_nota_cobro',
-            '%numero_factura%' => 'numero_factura',
-            '%fecha%' => 'fecha',
-            '%moneda%' => 'moneda',
-            '%monto_moroso_documento%' => 'monto_moroso_documento',
-            '%monto_moroso%' => 'monto_moroso',
-        ),
-        'MOROSIDAD_GASTOS' => array(
-            '%numero_nota_cobro%' => 'numero_nota_cobro',
-            '%numero_factura%' => 'numero_factura',
-            '%fecha%' => 'fecha',
-            '%moneda%' => 'moneda',
-            '%monto_moroso_documento%' => 'monto_moroso_documento',
-            '%monto_moroso%' => 'monto_moroso',
-        ),
-        'MOROSIDAD_TOTAL' => array(
-            '%numero_nota_cobro%' => 'numero_nota_cobro',
-            '%numero_factura%' => 'numero_factura',
-            '%fecha%' => 'fecha',
-            '%moneda%' => 'moneda',
-            '%monto_moroso_documento%' => 'monto_moroso_documento',
-            '%monto_moroso%' => 'monto_moroso',
-            '%nota%' => 'nota',
-        ),
-        'GLOSA_ESPECIAL' => array(
-            '%glosa_especial%' => 'glosa_especial',
-        ),
-        'SALTO_PAGINA' => array(
-        ),
-        'CLIENTE' => array(
-            '%materia%' => 'materia',
-            '%glosa_asunto_sin_codigo%' => 'glosa_asunto_sin_codigo',
-            '%valor_codigo_asunto%' => 'valor_codigo_asunto',
-            '%glosa_asuntos_sin_codigo%' => 'glosa_asuntos_sin_codigo',
-            '%glosa_numero_cobro%' => 'glosa_numero_cobro',
-            '%numero_cobro%' => 'numero_cobro',
-            '%servicios_prestados%' => 'servicios_prestados',
-            '%a%' => 'a',
-            '%a_min%' => 'a_min',
-            '%cliente%' => 'cliente',
-            '%nombre_cliente%' => 'nombre_cliente',
-            '%factura_razon_social_o_nombre_cliente%' => 'factura_razon_social_o_nombre_cliente',
-            '%factura%' => 'factura',
-            '%fecha_liquidacion%' => 'fecha_liquidacion',
-            '%cliente_corporativo%' => 'cliente_corporativo',
-            '%id_asunto%' => 'id_asunto',
-            '%codigo_cliente%' => 'codigo_cliente',
-            '%fecha_emision%' => 'fecha_emision',
-            '%glosa_cliente%' => 'glosa_cliente',
-            '%direccion%' => 'direccion',
-            '%valor_direccion%' => 'valor_direccion',
-            '%valor_direccion_uc%' => 'valor_direccion_uc',
-            '%direccion_carta%' => 'direccion_carta',
-            '%rut%' => 'rut',
-            '%rut_minuscula%' => 'rut_minuscula',
-            '%valor_rut_sin_formato%' => 'valor_rut_sin_formato',
-            '%valor_rut%' => 'valor_rut',
-            '%giro_factura%' => 'giro_factura',
-            '%giro_factura_valor%' => 'giro_factura_valor',
-            '%contacto%' => 'contacto',
-            '%atencion%' => 'atencion',
-            '%valor_contacto%' => 'valor_contacto',
-            '%atte%' => 'atte',
-            '%telefono%' => 'telefono',
-            '%valor_telefono%' => 'valor_telefono',
-            '%numero_factura%' => 'numero_factura',
-            '%nombre_pais%' => 'nombre_pais',
-            '%nombre_pais_mayuscula%' => 'nombre_pais_mayuscula',
-        ),
-        'DETALLES_PAGOS' => array(
-            '%descripcion%' => 'descripcion',
-            '%saldo_pago%' => 'saldo_pago',
-        ),
-        'DETALLES_PAGOS_CONTRATO' => array(
-            '%descripcion%' => 'descripcion',
-            '%saldo_pago%' => 'saldo_pago',
-        ),
-        'RESUMEN_PROFESIONAL' => array(
-            '%glosa_profesional%' => 'glosa_profesional',
-            '%resumen_profesional%' => 'resumen_profesional',
-            '%nombre%' => 'nombre',
-            '%categoria%' => 'categoria',
-            '%hh_demo%' => 'hh_demo',
-            '%hh_trabajada%' => 'hh_trabajada',
-            '%td_tarifa%' => 'td_tarifa',
-            '%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
-            '%tarifa_horas_demo%' => 'tarifa_horas_demo',
-            '%td_importe%' => 'td_importe',
-            '%td_importe_ajustado%' => 'td_importe_ajustado',
-            '%total_horas_demo%' => 'total_horas_demo',
-            '%td_descontada%' => 'td_descontada',
-            '%td_cobrable%' => 'td_cobrable',
-            '%td_retainer%' => 'td_retainer',
-            '%glosa%' => 'glosa',
-            '%username%' => 'username',
-            '%iniciales%' => 'iniciales',
-            '%hrs_trabajadas%' => 'hrs_trabajadas',
-            '%hrs_trabajadas_vio%' => 'hrs_trabajadas_vio',
-            '%hrs_retainer%' => 'hrs_retainer',
-            '%hrs_retainer_vio%' => 'hrs_retainer_vio',
-            '%hrs_descontadas%' => 'hrs_descontadas',
-            '%hh_descontada%' => 'hh_descontada',
-            '%hh_cobrable%' => 'hh_cobrable',
-            '%hh_retainer%' => 'hh_retainer',
-            '%hh%' => 'hh',
-            '%tarifa_horas%' => 'tarifa_horas',
-            '%tarifa_horas_ajustada%' => 'tarifa_horas_ajustada',
-            '%total_horas%' => 'total_horas',
-            '%total_horas_ajustado%' => 'total_horas_ajustado',
-            '%porcentaje_participacion%' => 'porcentaje_participacion',
-            '%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
-            '%valor_retainer%' => 'valor_retainer',
-            '%valor_retainer_vio%' => 'valor_retainer_vio',
-            '%valor_cobrado_hh%' => 'valor_cobrado_hh',
-            '%total%' => 'total',
-            '%RESUMEN_PROFESIONAL_ENCABEZADO%' => 'RESUMEN_PROFESIONAL_ENCABEZADO',
-            '%RESUMEN_PROFESIONAL_FILAS%' => 'RESUMEN_PROFESIONAL_FILAS',
-            '%RESUMEN_PROFESIONAL_TOTAL%' => 'RESUMEN_PROFESIONAL_TOTAL',
-        ),
-        'RESUMEN_PROFESIONAL_POR_CATEGORIA' => array(
-            '%glosa_profesional%' => 'glosa_profesional',
-            '%nombre%' => 'nombre',
-            '%iniciales%' => 'iniciales',
-            '%hrs_trabajadas%' => 'hrs_trabajadas',
-            '%hrs_retainer%' => 'hrs_retainer',
-            '%hrs_descontadas%' => 'hrs_descontadas',
-            '%hh%' => 'hh',
-            '%total_horas%' => 'total_horas',
-            '%tarifa_horas%' => 'tarifa_horas',
-            '%RESUMEN_PROFESIONAL_FILAS%' => 'RESUMEN_PROFESIONAL_FILAS',
-            '%glosa%' => 'glosa',
-            '%total%' => 'total',
-        ),
-        'RESUMEN_PROFESIONAL_ENCABEZADO' => array(
-            '%nombre%' => 'nombre',
-            '%hrs_retainer%' => 'hrs_retainer',
-            '%hrs_mins_retainer%' => 'hrs_mins_retainer',
-            '%hrs_trabajadas%' => 'hrs_trabajadas',
-            '%hrs_descontadas%' => 'hrs_descontadas',
-            '%hrs_mins_trabajadas%' => 'hrs_mins_trabajadas',
-            '%hrs_mins_descontadas%' => 'hrs_mins_descontadas',
-        ),
-        'PROFESIONAL_ENCABEZADO' => array(
-            '%horas_trabajadas%' => 'horas_trabajadas',
-            '%retainer%' => 'retainer',
-            '%extraordinario%' => 'extraordinario',
-            '%simbolo_moneda_2%' => 'simbolo_moneda_2',
-            '%nombre%' => 'nombre',
-            '%valor_hh%' => 'valor_hh',
-            '%hrs_trabajadas%' => 'hrs_trabajadas',
-            '%porcentaje_participacion%' => 'porcentaje_participacion',
-            '%hrs_retainer%' => 'hrs_retainer',
-            '%valor_retainer%' => 'valor_retainer',
-            '%hh%' => 'hh',
-            '%valor_cobrado_hh%' => 'valor_cobrado_hh',
-            '%fayca_hrs_descontadas%' => 'fayca_hrs_descontadas',
-            '%hrs_mins_trabajadas%' => 'hrs_mins_trabajadas',
-            '%hrs_trabajadas_real%' => 'hrs_trabajadas_real',
-            '%hrs_mins_trabajadas_real%' => 'hrs_mins_trabajadas_real',
-            '%hrs_descontadas_real%' => 'hrs_descontadas_real',
-            '%horas_cobrables%' => 'horas_cobrables',
-            '%hrs_mins_descontadas_real%' => 'hrs_mins_descontadas_real',
-            '%horas_mins_cobrables%' => 'horas_mins_cobrables',
-            '%hrs_mins_retainer%' => 'hrs_mins_retainer',
-            '%columna_horas_no_cobrables_top%' => 'columna_horas_no_cobrables_top',
-            '%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
-            '%hrs_descontadas%' => 'hrs_descontadas',
-            '%hrs_mins_descontadas%' => 'hrs_mins_descontadas',
-            '%hrs_trabajadas_previo%' => 'hrs_trabajadas_previo',
-            '%hrs_mins_trabajadas_previo%' => 'hrs_mins_trabajadas_previo',
-            '%abogados%' => 'abogados',
-            '%hh_trabajada%' => 'hh_trabajada',
-            '%td_descontada%' => 'td_descontada',
-            '%hh_cobrable%' => 'hh_cobrable',
-            '%hh_descontada%' => 'hh_descontada',
-            '%td_cobrable%' => 'td_cobrable',
-            '%td_retainer%' => 'td_retainer',
-            '%hh_retainer%' => 'hh_retainer',
-            '%hh_mins%' => 'hh_mins',
-            '%horas%' => 'horas',
-            '%horas_retainer%' => 'horas_retainer',
-            '%horas_mins%' => 'horas_mins',
-            '%horas_mins_retainer%' => 'horas_mins_retainer',
-            '%td_tarifa%' => 'td_tarifa',
-            '%valor_horas%' => 'valor_horas',
-            '%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
-            '%tarifa_fee%' => 'tarifa_fee',
-            '%simbolo_moneda%' => 'simbolo_moneda',
-            '%td_importe%' => 'td_importe',
-            '%td_importe_ajustado%' => 'td_importe_ajustado',
-            '%importe%' => 'importe',
-            '%importe_ajustado%' => 'importe_ajustado',
-            '%total%' => 'total',
-            '%honorarios%' => 'honorarios',
-            '%categoria%' => 'categoria',
-            '%staff%' => 'staff',
-            '%valor_siempre%' => 'valor_siempre',
-            '%nombre_profesional%' => 'nombre_profesional',
-            '%profesional%' => 'profesional',
-            '%hora_tarificada%' => 'hora_tarificada',
-        ),
-    );
+	/**
+	 * @var Sesion
+	 */
+	var $sesion = null;
+	var $carta_tabla = 'cobro_rtf';
+	var $carta_id = 'id_formato';
+	var $carta_formato = 'cobro_template';
+	var $siguiente = array();
+	public $secciones = array(
+		'INFORME' => array(
+			'CLIENTE' => 'CLIENTE / GenerarSeccionCliente',
+			'DETALLE_COBRO' => 'DETALLE_COBRO / GenerarDocumento2',
+			'ADELANTOS' => 'ADELANTOS / GenerarDocumento2',
+			'COBROS_ADEUDADOS' => 'COBROS_ADEUDADOS / GenerarDocumento2',
+			'RESUMEN_CAP' => 'RESUMEN_CAP / GenerarDocumento2',
+			'ASUNTOS' => 'ASUNTOS / GenerarDocumentoComun',
+			'GASTOS' => 'GASTOS / GenerarDocumento2',
+			'CTA_CORRIENTE' => 'CTA_CORRIENTE / GenerarDocumento2',
+			'TIPO_CAMBIO' => 'TIPO_CAMBIO / GenerarDocumentoComun',
+			'MOROSIDAD' => 'MOROSIDAD / GenerarDocumento2',
+			'GLOSA_ESPECIAL' => 'GLOSA_ESPECIAL / GenerarDocumentoComun',
+			'RESUMEN_PROFESIONAL_POR_CATEGORIA' => 'RESUMEN_PROFESIONAL_POR_CATEGORIA / GenerarSeccionResumenProfesional',
+			'RESUMEN_PROFESIONAL' => 'RESUMEN_PROFESIONAL / GenerarSeccionResumenProfesional',
+			'ENDOSO' => 'ENDOSO / GenerarDocumentoComun',
+			'SALTO_PAGINA' => 'SALTO_PAGINA / GenerarDocumentoComun',
+			'DESGLOSE_POR_ASUNTO_DETALLE' => 'DESGLOSE_POR_ASUNTO_DETALLE / GenerarDocumentoComun',
+			'DESGLOSE_POR_ASUNTO_TOTALES' => 'DESGLOSE_POR_ASUNTO_TOTALES / GenerarDocumentoComun',
+		),
+		'DETALLE_COBRO' => array(
+			'FACTURA_NUMERO' => 'FACTURA_NUMERO / GenerarDocumento2',
+			'NUMERO_FACTURA' => 'NUMERO_FACTURA / GenerarDocumento2',
+			'DETALLE_COBRO_RETAINER' => 'DETALLE_COBRO_RETAINER / GenerarDocumentoComun',
+			'DETALLE_TARIFA_ADICIONAL' => 'DETALLE_TARIFA_ADICIONAL / GenerarDocumentoComun',
+			'RESTAR_RETAINER' => 'RESTAR_RETAINER / GenerarDocumento2',
+			'DETALLE_HONORARIOS' => 'DETALLE_HONORARIOS / GenerarDocumento2',
+			'DETALLE_GASTOS' => 'DETALLE_GASTOS / GenerarDocumento2',
+			'DETALLE_TRAMITES' => 'DETALLE_TRAMITES / GenerarDocumento2',
+			'DETALLE_COBRO_MONEDA_TOTAL' => 'DETALLE_COBRO_MONEDA_TOTAL / GenerarDocumento2',
+			'DETALLE_COBRO_DESCUENTO' => 'DETALLE_COBRO_DESCUENTO / GenerarDocumento2',
+			'IMPUESTO' => 'IMPUESTO / GenerarDocumento2',
+			'DETALLES_PAGOS' => 'DETALLES_PAGOS / GenerarSeccionDetallePago',
+			'DETALLES_PAGOS_CONTRATO' => 'DETALLES_PAGOS_CONTRATO / GenerarSeccionDetallePagoContrato',
+		),
+		'DETALLE_HONORARIOS' => array(
+			'DETALLE_COBRO_DESCUENTO' => 'DETALLE_COBRO_DESCUENTO / GenerarDocumento2',
+			'DETALLE_COBRO_MONEDA_TOTAL' => 'DETALLE_COBRO_MONEDA_TOTAL / GenerarDocumento2',
+		),
+		'RESUMEN_CAP' => array(
+			'COBROS_DEL_CAP' => 'COBROS_DEL_CAP / GenerarDocumento2',
+		),
+		'GASTOS' => array(
+			'GASTOS_ENCABEZADO' => 'GASTOS_ENCABEZADO / GenerarDocumentoComun',
+			'GASTOS_FILAS' => 'GASTOS_FILAS / GenerarDocumentoComun',
+			'GASTOS_TOTAL' => 'GASTOS_TOTAL / GenerarDocumentoComun',
+		),
+		'CTA_CORRIENTE' => array(
+			'CTA_CORRIENTE_SALDO_INICIAL' => 'CTA_CORRIENTE_SALDO_INICIAL / GenerarDocumentoComun',
+			'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO' => 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO / GenerarDocumentoComun',
+			'CTA_CORRIENTE_MOVIMIENTOS_FILAS' => 'CTA_CORRIENTE_MOVIMIENTOS_FILAS / GenerarDocumentoComun',
+			'CTA_CORRIENTE_MOVIMIENTOS_TOTAL' => 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL / GenerarDocumentoComun',
+			'CTA_CORRIENTE_SALDO_FINAL' => 'CTA_CORRIENTE_SALDO_FINAL / GenerarDocumentoComun',
+		),
+		'MOROSIDAD' => array(
+			'MOROSIDAD_ENCABEZADO' => 'MOROSIDAD_ENCABEZADO / GenerarDocumentoComun',
+			'MOROSIDAD_FILAS' => 'MOROSIDAD_FILAS / GenerarDocumentoComun',
+			'MOROSIDAD_HONORARIOS_TOTAL' => 'MOROSIDAD_HONORARIOS_TOTAL / GenerarDocumentoComun',
+			'MOROSIDAD_GASTOS' => 'MOROSIDAD_GASTOS / GenerarDocumentoComun',
+			'MOROSIDAD_TOTAL' => 'MOROSIDAD_TOTAL / GenerarDocumentoComun',
+		),
+		'ADELANTOS' => array(
+			'ADELANTOS_ENCABEZADO' => 'ADELANTOS_ENCABEZADO / GenerarDocumento2',
+			'ADELANTOS_FILAS_TOTAL' => 'ADELANTOS_FILAS_TOTAL / GenerarDocumento2',
+		),
+		'COBROS_ADEUDADOS' => array(
+			'ADELANTOS_ENCABEZADO' => 'ADELANTOS_ENCABEZADO / GenerarDocumento2',
+			'COBROS_ADEUDADOS_FILAS_TOTAL' => 'COBROS_ADEUDADOS_FILAS_TOTAL / GenerarDocumento2',
+		),
+		'ASUNTOS' => array(
+			'TRABAJOS_ENCABEZADO' => 'TRABAJOS_ENCABEZADO / GenerarDocumentoComun',
+			'TRABAJOS_FILAS' => 'TRABAJOS_FILAS / GenerarDocumentoComun',
+			'TRABAJOS_TOTAL' => 'TRABAJOS_TOTAL / GenerarDocumentoComun',
+			'DETALLE_PROFESIONAL' => 'DETALLE_PROFESIONAL / GenerarDocumentoComun',
+			'HITOS_FILAS' => 'HITOS_FILAS / GenerarDocumentoComun',
+			'HITOS_TOTAL' => 'HITOS_TOTAL / GenerarDocumentoComun',
+			'HITOS_ENCABEZADO' => 'HITOS_ENCABEZADO / GenerarDocumentoComun',
+			'TRAMITES_ENCABEZADO' => 'TRAMITES_ENCABEZADO / GenerarDocumentoComun',
+			'TRAMITES_FILAS' => 'TRAMITES_FILAS / GenerarDocumentoComun',
+			'TRAMITES_TOTAL' => 'TRAMITES_TOTAL / GenerarDocumentoComun',
+			'GASTOS' => 'GASTOS / GenerarDocumentoComun',
+		),
+		'TRAMITES_FILAS' => array(
+			'TRAMITES_TOTAL' => 'TRAMITES_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+			'TRAMITES_ENCABEZADO' => 'TRAMITES_ENCABEZADO / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+		),
+		'TRABAJOS_FILAS' => array(
+			'TRABAJOS_TOTAL' => 'TRABAJOS_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+			'TRABAJOS_ENCABEZADO' => 'TRABAJOS_ENCABEZADO / GenerarDocumentoComun / SE LLAMA SOLO, NO EXISTE EL TAG',
+		),
+		'DETALLE_PROFESIONAL' => array(
+			'PROFESIONAL_ENCABEZADO' => 'PROFESIONAL_ENCABEZADO / GenerarSeccionResumenProfesional',
+			'PROFESIONAL_FILAS' => 'PROFESIONAL_FILAS / GenerarDocumentoComun',
+			'PROFESIONAL_TOTAL' => 'PROFESIONAL_TOTAL / GenerarDocumentoComun',
+			'DETALLE_COBRO_DESCUENTO' => 'DETALLE_COBRO_DESCUENTO / GenerarDocumentoComun',
+			'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO' => 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO / GenerarDocumentoComun',
+			'DETALLE_COBRO_MONEDA_TOTAL' => 'DETALLE_COBRO_MONEDA_TOTAL / GenerarDocumentoComun',
+		),
+		'PROFESIONAL_TOTAL' => array(
+			'DETALLE_PROFESIONAL_RETAINER' => 'DETALLE_PROFESIONAL_RETAINER / GenerarDocumentoComun',
+		),
+		'RESUMEN_PROFESIONAL' => array(
+			'PROFESIONAL_ENCABEZADO' => 'PROFESIONAL_ENCABEZADO / GenerarSeccionResumenProfesional / SE LLAMA SOLO, NO EXISTE EL TAG',
+			'PROFESIONAL_FILAS' => 'PROFESIONAL_FILAS / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+			'PROFESIONAL_TOTAL' => 'PROFESIONAL_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+		),
+		'RESUMEN_PROFESIONAL_POR_CATEGORIA' => array(
+			'RESUMEN_PROFESIONAL_ENCABEZADO' => 'RESUMEN_PROFESIONAL_ENCABEZADO / GenerarSeccionResumenProfesional / SE LLAMA SOLO, NO EXISTE EL TAG',
+			'PROFESIONAL_FILAS' => 'PROFESIONAL_FILAS / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+			'RESUMEN_PROFESIONAL_TOTAL' => 'RESUMEN_PROFESIONAL_TOTAL / SE LLAMA Y PARSEA SOLO, NO EXISTE EL TAG NI EL CASE',
+		),
+	);
+	public $diccionario = array(
+		'INFORME' => array(
+			'%xfecha_mes_dos_digitos%' => 'xfecha_mes_dos_digitos',
+			'%xfecha_ano_dos_digitos%' => 'xfecha_ano_dos_digitos',
+			'%xfecha_mes_dia_ano%' => 'xfecha_mes_dia_ano',
+			'%xfecha_mespalabra_dia_ano%' => 'xfecha_mespalabra_dia_ano',
+			'%xnro_factura%' => 'xnro_factura',
+			'%xnombre_cliente%' => 'xnombre_cliente',
+			'%xglosa_cliente%' => 'xglosa_cliente',
+			'%xdireccion%' => 'xdireccion',
+			'%xrut%' => 'xrut',
+			'%COBRO_CARTA%' => 'COBRO_CARTA',
+			'%cobro%' => 'cobro',
+			'%valor_cobro%' => 'valor_cobro',
+			'%logo%' => 'logo',
+			'%titulo%' => 'titulo',
+			'%logo_cobro%' => 'logo_cobro',
+			'%subtitulo%' => 'subtitulo',
+			'%direccion_blr%' => 'direccion_blr',
+			'%glosa_fecha%' => 'glosa_fecha',
+			'%fecha_gqmc%' => 'fecha_gqmc',
+			'%fecha%' => 'fecha',
+			'%fecha_mes_dos_digitos%' => 'fecha_mes_dos_digitos',
+			'%fecha_ano_dos_digitos%' => 'fecha_ano_dos_digitos',
+			'%codigo_cliente%' => 'codigo_cliente',
+			'%fecha_mes_del_cobro%' => 'fecha_mes_del_cobro',
+			'%fecha_larga%' => 'fecha_larga',
+			'%socio%' => 'socio',
+			'%socio_cobrador%' => 'socio_cobrador',
+			'%nombre_socio%' => 'nombre_socio',
+			'%fono%' => 'fono',
+			'%fax%' => 'fax',
+			'%nota_cobro_acl%' => 'nota_cobro_acl',
+			'%reference_no_acl%' => 'reference_no_acl',
+			'%servicios%' => 'servicios',
+			'%honorarios%' => 'honorarios',
+			'%gastos_acl%' => 'gastos_acl',
+			'%otros%' => 'otros',
+			'%subtotales%' => 'subtotales',
+			'%impuestos%' => 'impuestos',
+			'%total_deuda%' => 'total_deuda',
+			'%instruccion_deposito%' => 'instruccion_deposito',
+			'%beneficiario_deposito%' => 'beneficiario_deposito',
+			'%banco%' => 'banco',
+			'%direccion%' => 'direccion',
+			'%cuenta_bancaria%' => 'cuenta_bancaria',
+			'%encargado_comercial%' => 'encargado_comercial',
+			'%rut_encargado%' => 'rut_encargado',
+			'%filas_escalas%' => 'filas_escalas',
+			'%TABLA_ESCALONADA%' => 'TABLA_ESCALONADA',
+			'%TRAMITES%' => 'TRAMITES',
+			'%numero_factura%' => 'numero_factura',
+			'%xcorrelativo_aguilar%' => 'xcorrelativo_aguilar',
+			'%honorarios_vouga%' => 'honorarios_vouga',
+		),
+		'DETALLE_COBRO' => array(
+			'%honorario_yo_gastos%' => 'honorario_yo_gastos',
+			'%materia%' => 'materia',
+			'%glosa_asunto_sin_codigo%' => 'glosa_asunto_sin_codigo',
+			'%resumen_cobro%' => 'resumen_cobro',
+			'%fecha%' => 'fecha',
+			'%fecha_emision_glosa%' => 'fecha_emision_glosa',
+			'%fecha_emision%' => 'fecha_emision',
+			'%glosa_cobro%' => 'glosa_cobro',
+			'%cobro%' => 'cobro',
+			'%reference%' => 'reference',
+			'%valor_cobro%' => 'valor_cobro',
+			'%total_simbolo%' => 'total_simbolo',
+			'%boleta%' => 'boleta',
+			'%encargado%' => 'encargado',
+			'%encargado_valor%' => 'encargado_valor',
+			'%factura%' => 'factura',
+			'%factura_acl%' => 'factura_acl',
+			'%pctje_blr%' => 'pctje_blr',
+			'%factura_nro%' => 'factura_nro',
+			'%cobro_nro%' => 'cobro_nro',
+			'%nro_cobro%' => 'nro_cobro',
+			'%cobro_factura_nro%' => 'cobro_factura_nro',
+			'%nro_factura%' => 'nro_factura',
+			'%modalidad%' => 'modalidad',
+			'%tipo_honorarios%' => 'tipo_honorarios',
+			'%valor_modalidad_tyc%' => 'valor_modalidad_tyc',
+			'%valor_modalidad%' => 'valor_modalidad',
+			'%valor_modalidad_ucfirst%' => 'valor_modalidad_ucfirst',
+			'%detalle_modalidad%' => 'detalle_modalidad',
+			'%detalle_modalidad_lowercase%' => 'detalle_modalidad_lowercase',
+			'%detalle_modalidad_tyc%' => 'detalle_modalidad_tyc',
+			'%tipo_tarifa%' => 'tipo_tarifa',
+			'%periodo%' => 'periodo',
+			'%periodo_cobro%' => 'periodo_cobro',
+			'%valor_periodo_ini%' => 'valor_periodo_ini',
+			'%valor_periodo_fin%' => 'valor_periodo_fin',
+			'%fecha_ini%' => 'fecha_ini',
+			'%fecha_ini_primer_trabajo%' => 'fecha_ini_primer_trabajo',
+			'%nota_transferencia%' => 'nota_transferencia',
+			'%desde%' => 'desde',
+			'%hasta%' => 'hasta',
+			'%valor_fecha_ini_primer_trabajo%' => 'valor_fecha_ini_primer_trabajo',
+			'%valor_fecha_fin_ultimo_trabajo%' => 'valor_fecha_fin_ultimo_trabajo',
+			'%valor_fecha_ini_o_primer_trabajo%' => 'valor_fecha_ini_o_primer_trabajo',
+			'%valor_fecha_ini%' => 'valor_fecha_ini',
+			'%fecha_fin%' => 'fecha_fin',
+			'%valor_fecha_fin%' => 'valor_fecha_fin',
+			'%horas%' => 'horas',
+			'%valor_horas%' => 'valor_horas',
+			'%honorarios%' => 'honorarios',
+			'%descuento%' => 'descuento',
+			'%saldo%' => 'saldo',
+			'%equivalente%' => 'equivalente',
+			'%honorarios_con_lang%' => 'honorarios_con_lang',
+			'%honorarios_totales%' => 'honorarios_totales',
+			'%honorarios_mta%' => 'honorarios_mta',
+			'%valor_honorarios_totales%' => 'valor_honorarios_totales',
+			'%valor_honorarios_totales_moneda_total%' => 'valor_honorarios_totales_moneda_total',
+			'%fees%' => 'fees',
+			'%expenses%' => 'expenses',
+			'%total_honorarios%' => 'total_honorarios',
+			'%valor_honorarios_demo%' => 'valor_honorarios_demo',
+			'%valor_honorarios%' => 'valor_honorarios',
+			'%horas_decimales%' => 'horas_decimales',
+			'%valor_horas_decimales%' => 'valor_horas_decimales',
+			'%valor_honorarios_cyc%' => 'valor_honorarios_cyc',
+			'%monedabase%' => 'monedabase',
+			'%equivalente_a_la_fecha%' => 'equivalente_a_la_fecha',
+			'%valor_honorarios_monedabase%' => 'valor_honorarios_monedabase',
+			'%valor_honorarios_monedabase_tyc%' => 'valor_honorarios_monedabase_tyc',
+			'%gastos%' => 'gastos',
+			'%valor_gastos%' => 'valor_gastos',
+			'%total_cobro%' => 'total_cobro',
+			'%total_cobro_mta%' => 'total_cobro_mta',
+			'%total_cobro_cyc%' => 'total_cobro_cyc',
+			'%valor_total_cobro_demo%' => 'valor_total_cobro_demo',
+			'%valor_total_cobro_cyc%' => 'valor_total_cobro_cyc',
+			'%iva_cyc%' => 'iva_cyc',
+			'%valor_iva_cyc%' => 'valor_iva_cyc',
+			'%total_cyc%' => 'total_cyc',
+			'%valor_total_cyc%' => 'valor_total_cyc',
+			'%honorarios_y_gastos%' => 'honorarios_y_gastos',
+			'%valor_total_cobro%' => 'valor_total_cobro',
+			'%valor_total_cobro_sin_simbolo%' => 'valor_total_cobro_sin_simbolo',
+			'%valor_uf%' => 'valor_uf',
+			'%glosa_tipo_cambio_moneda%' => 'glosa_tipo_cambio_moneda',
+			'%valor_tipo_cambio_moneda%' => 'valor_tipo_cambio_moneda',
+			'%valor_bruto%' => 'valor_bruto',
+			'%valor_descuento%' => 'valor_descuento',
+			'%valor_equivalente%' => 'valor_equivalente',
+			'%total_subtotal_cobro%' => 'total_subtotal_cobro',
+			'%nota_disclaimer%' => 'nota_disclaimer',
+		),
+		'RESTAR_RETAINER' => array(
+			'%retainer%' => 'retainer',
+			'%valor_retainer%' => 'valor_retainer',
+		),
+		'DETALLE_COBRO_RETAINER' => array(
+			'%horas_retainer%' => 'horas_retainer',
+			'%valor_horas_retainer%' => 'valor_horas_retainer',
+			'%horas_adicionales%' => 'horas_adicionales',
+			'%valor_horas_adicionales%' => 'valor_horas_adicionales',
+			'%honorarios_retainer%' => 'honorarios_retainer',
+			'%valor_honorarios_retainer%' => 'valor_honorarios_retainer',
+			'%honorarios_adicionales%' => 'honorarios_adicionales',
+			'%valor_honorarios_adicionales%' => 'valor_honorarios_adicionales',
+		),
+		'DETALLE_TARIFA_ADICIONAL' => array(
+			'%tarifa_adicional%' => 'tarifa_adicional',
+			'%valores_tarifa_adicionales%' => 'valores_tarifa_adicionales',
+		),
+		'FACTURA_NUMERO' => array(
+			'%factura_nro%' => 'factura_nro',
+		),
+		'NUMERO_FACTURA' => array(
+			'%nro_factura%' => 'nro_factura',
+		),
+		'DETALLE_HONORARIOS' => array(
+			'%horas%' => 'horas',
+			'%valor_horas%' => 'valor_horas',
+			'%honorarios%' => 'honorarios',
+			'%valor_honorarios%' => 'valor_honorarios',
+		),
+		'DETALLE_GASTOS' => array(
+			'%gastos%' => 'gastos',
+			'%valor_gastos%' => 'valor_gastos',
+		),
+		'DETALLE_TRAMITES' => array(
+			'%tramites%' => 'tramites',
+			'%valor_tramites%' => 'valor_tramites',
+		),
+		'DETALLE_COBRO_MONEDA_TOTAL' => array(
+			'%monedabase%' => 'monedabase',
+			'%total_pagar%' => 'total_pagar',
+			'%valor_honorarios_monedabase_demo%' => 'valor_honorarios_monedabase_demo',
+			'%valor_honorarios_monedabase%' => 'valor_honorarios_monedabase',
+		),
+		'DETALLE_COBRO_DESCUENTO' => array(
+			'%honorarios%' => 'honorarios',
+			'%valor_honorarios%' => 'valor_honorarios',
+			'%valor_descuento%' => 'valor_descuento',
+			'%porcentaje_descuento%' => 'porcentaje_descuento',
+			'%descuento%' => 'descuento',
+			'%valor_honorarios_demo%' => 'valor_honorarios_demo',
+			'%valor_descuento_demo%' => 'valor_descuento_demo',
+			'%porcentaje_descuento_demo%' => 'porcentaje_descuento_demo',
+			'%total_honorarios%' => 'total_honorarios',
+			'%valor_honorarios_con_descuento%' => 'valor_honorarios_con_descuento',
+		),
+		'RESUMEN_CAP' => array(
+			'%cap%' => 'cap',
+			'%valor_cap%' => 'valor_cap',
+			'%restante%' => 'restante',
+			'%valor_restante%' => 'valor_restante',
+		),
+		'COBROS_DEL_CAP' => array(
+			'%numero_cobro%' => 'numero_cobro',
+			'%valor_cap_del_cobro%' => 'valor_cap_del_cobro',
+		),
+		'IMPUESTO' => array(
+			'%impuesto%' => 'impuesto',
+			'%impuesto_mta%' => 'impuesto_mta',
+			'%valor_impuesto%' => 'valor_impuesto',
+			'%valor_impuesto_honorarios%' => 'valor_impuesto_honorarios',
+		),
+		'GASTOS' => array(
+			'%glosa_gastos%' => 'glosa_gastos',
+			'%expenses%' => 'expenses',
+			'%factura%' => 'factura',
+			'%detalle_gastos%' => 'detalle_gastos',
+		),
+		'GASTOS_ENCABEZADO' => array(
+			'%glosa_gastos%' => 'glosa_gastos',
+			'%descripcion_gastos%' => 'descripcion_gastos',
+			'%fecha%' => 'fecha',
+			'%num_doc%' => 'num_doc',
+			'%tipo_gasto%' => 'tipo_gasto',
+			'%descripcion%' => 'descripcion',
+			'%monto_original%' => 'monto_original',
+			'%monto_moneda_total%' => 'monto_moneda_total',
+			'%ordenado_por%' => 'ordenado_por',
+			'%asunto_id%' => 'asunto_id',
+			'%monto_impuesto_total%' => 'monto_impuesto_total',
+			'%monto_moneda_total_con_impuesto%' => 'monto_moneda_total_con_impuesto',
+			'%proveedor%' => 'proveedor',
+		),
+		'GASTOS_FILAS' => array(
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%descripcion_b%' => 'descripcion_b',
+			'%monto_original%' => 'monto_original',
+			'%monto%' => 'monto',
+			'%monto_moneda_total%' => 'monto_moneda_total',
+			'%monto_moneda_total_sin_simbolo%' => 'monto_moneda_total_sin_simbolo',
+			'%valor_codigo_asunto%' => 'valor_codigo_asunto',
+			'%num_doc%' => 'num_doc',
+			'%tipo_gasto%' => 'tipo_gasto',
+			'%monto_impuesto_total%' => 'monto_impuesto_total',
+			'%monto_moneda_total_con_impuesto%' => 'monto_moneda_total_con_impuesto',
+			'%proveedor%' => 'proveedor',
+			'%solicitante%' => 'solicitante',
+		),
+		'GASTOS_TOTAL' => array(
+			'%total%' => 'total',
+			'%glosa_total%' => 'glosa_total',
+			'%sub_total_gastos%' => 'sub_total_gastos',
+			'%total_gastos_moneda_total%' => 'total_gastos_moneda_total',
+			'%glosa_total_moneda_base%' => 'glosa_total_moneda_base',
+			'%valor_total_moneda_carta%' => 'valor_total_moneda_carta',
+			'%valor_total_moneda_base%' => 'valor_total_moneda_base',
+			'%valor_impuesto_monedabase%' => 'valor_impuesto_monedabase',
+			'%valor_total_monedabase_con_impuesto%' => 'valor_total_monedabase_con_impuesto',
+		),
+		'CTA_CORRIENTE' => array(
+			'%titulo_detalle_cuenta%' => 'titulo_detalle_cuenta',
+			'%descripcion_cuenta%' => 'descripcion_cuenta',
+			'%monto_cuenta%' => 'monto_cuenta',
+		),
+		'MOROSIDAD' => array(
+			'%titulo_morosidad%' => 'titulo_morosidad',
+		),
+		'ADELANTOS' => array(
+			'%titulo_adelantos%' => 'titulo_adelantos',
+		),
+		'COBROS_ADEUDADOS' => array(
+			'%titulo_adelantos%' => 'titulo_adelantos',
+		),
+		'ADELANTOS_ENCABEZADO' => array(
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%monto%' => 'monto',
+			'%saldo%' => 'saldo',
+		),
+		'ADELANTOS_FILAS_TOTAL' => array(
+			'%descripcion%' => 'descripcion',
+			'%saldo_pago%' => 'saldo_pago',
+			'%monto%' => 'monto',
+			'%fecha%' => 'fecha',
+		),
+		'COBROS_ADEUDADOS_FILAS_TOTAL' => array(
+			'%descripcion%' => 'descripcion',
+			'%saldo_pago%' => 'saldo_pago',
+			'%monto%' => 'monto',
+			'%fecha%' => 'fecha',
+		),
+		'ENDOSO' => array(
+			'%numero_cuenta_contrato%' => 'numero_cuenta_contrato',
+			'%glosa_banco_contrato%' => 'glosa_banco_contrato',
+			'%codigo_swift%' => 'codigo_swift',
+			'%codigo_cci%' => 'codigo_cci',
+			'%valor_total_sin_impuesto%' => 'valor_total_sin_impuesto',
+			'%valor_impuesto%' => 'valor_impuesto',
+			'%valor_total_con_impuesto%' => 'valor_total_con_impuesto',
+			'%tipo_gbp_segun_moneda%' => 'tipo_gbp_segun_moneda',
+			'%total_sin_impuesto%' => 'total_sin_impuesto',
+			'%impuesto%' => 'impuesto',
+			'%total_factura%' => 'total_factura',
+			'%instrucciones_deposito%' => 'instrucciones_deposito',
+			'%solicitud%' => 'solicitud',
+		),
+		'DESGLOSE_POR_ASUNTO_DETALLE' => array(
+			'%glosa_asunto%' => 'glosa_asunto',
+			'%simbolo%' => 'simbolo',
+			'%honorarios_asunto%' => 'honorarios_asunto',
+			'%gastos_asunto%' => 'gastos_asunto',
+			'%tramites_asunto%' => 'tramites_asunto',
+		),
+		'DESGLOSE_POR_ASUNTO_TOTALES' => array(
+			'%simbolo%' => 'simbolo',
+			'%desglose_subtotal_hh%' => 'desglose_subtotal_hh',
+			'%desglose_subtotal_gasto%' => 'desglose_subtotal_gasto',
+			'%desglose_subtotal_tramite%' => 'desglose_subtotal_tramite',
+			'%desglose_impuesto_hh%' => 'desglose_impuesto_hh',
+			'%desglose_impuesto_gasto%' => 'desglose_impuesto_gasto',
+			'%desglose_impuesto_tramite%' => 'desglose_impuesto_tramite',
+			'%desglose_grantotal%' => 'desglose_grantotal',
+			'%subtotales%' => 'subtotales',
+			'%impuestos%' => 'impuestos',
+			'%total_deuda%' => 'total_deuda',
+		),
+		'ASUNTOS' => array(
+			'%salto_pagina_varios_asuntos%' => 'salto_pagina_varios_asuntos',
+			'%salto_pagina_un_asunto%' => 'salto_pagina_un_asunto',
+			'%asunto_extra%' => 'asunto_extra',
+			'%glosa_asunto_sin_codigo_extra%' => 'glosa_asunto_sin_codigo_extra',
+			'%asunto%' => 'asunto',
+			'%asuntos_cliente%' => 'asuntos_cliente',
+			'%etiqueta_cliente%' => 'etiqueta_cliente',
+			'%codigo_cliente%' => 'codigo_cliente',
+			'%glosa_cliente%' => 'glosa_cliente',
+			'%glosa_asunto%' => 'glosa_asunto',
+			'%glosa_asunto_sin_codigo%' => 'glosa_asunto_sin_codigo',
+			'%glosa_asunto_codigo_area%' => 'glosa_asunto_codigo_area',
+			'%valor_codigo_asunto%' => 'valor_codigo_asunto',
+			'%codigo_cliente_secundario%' => 'codigo_cliente_secundario',
+			'%valor_codigo_cliente_secundario%' => 'valor_codigo_cliente_secundario',
+			'%contacto%' => 'contacto',
+			'%valor_contacto%' => 'valor_contacto',
+			'%registro%' => 'registro',
+			'%telefono%' => 'telefono',
+			'%valor_telefono%' => 'valor_telefono',
+			'%espacio_trabajo%' => 'espacio_trabajo',
+			'%servicios%' => 'servicios',
+			'%hitos%' => 'hitos',
+			'%espacio_tramite%' => 'espacio_tramite',
+			'%servicios_tramites%' => 'servicios_tramites',
+			'%codigo_asunto_mb%' => 'codigo_asunto_mb',
+		),
+		'HITOS_ENCABEZADO' => array(
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%valor%' => 'valor',
+		),
+		'HITOS_FILAS' => array(
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%valor_hitos%' => 'valor_hitos',
+		),
+		'HITOS_TOTAL' => array(
+			'%total%' => 'total',
+			'%total_hitos%' => 'total_hitos',
+		),
+		'TRAMITES_ENCABEZADO' => array(
+			'%solicitante%' => 'solicitante',
+			'%ordenado_por%' => 'ordenado_por',
+			'%periodo%' => 'periodo',
+			'%valor_periodo_ini%' => 'valor_periodo_ini',
+			'%valor_periodo_fin%' => 'valor_periodo_fin',
+			'%cliente%' => 'cliente',
+			'%glosa_cliente%' => 'glosa_cliente',
+			'%asunto%' => 'asunto',
+			'%glosa_asunto%' => 'glosa_asunto',
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%servicios_prestados%' => 'servicios_prestados',
+			'%servicios_tramites%' => 'servicios_tramites',
+			'%detalle_trabajo%' => 'detalle_trabajo',
+			'%profesional%' => 'profesional',
+			'%abogado%' => 'abogado',
+			'%horas%' => 'horas',
+			'%cobrable%' => 'cobrable',
+			'%categoria_abogado%' => 'categoria_abogado',
+			'%duracion_tramites%' => 'duracion_tramites',
+			'%valor_tramites%' => 'valor_tramites',
+			'%valor%' => 'valor',
+			'%valor_siempre%' => 'valor_siempre',
+			'%tarifa_fee%' => 'tarifa_fee',
+		),
+		'TRAMITES_FILAS' => array(
+			'%iniciales%' => 'iniciales',
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%valor%' => 'valor',
+			'%duracion_tramites%' => 'duracion_tramites',
+			'%valor_tramites%' => 'valor_tramites',
+			'%profesional%' => 'profesional',
+			'%duracion_decimal%' => 'duracion_decimal',
+			'%duracion%' => 'duracion',
+			'%valor_siempre%' => 'valor_siempre',
+			'%glosa%' => 'glosa',
+			'%cobrable%' => 'cobrable',
+			'%abogado%' => 'abogado',
+			'%categoria_abogado%' => 'categoria_abogado',
+			'%TRAMITES_CATEGORIA%' => 'TRAMITES_CATEGORIA',
+		),
+		'TRAMITES_TOTAL' => array(
+			'%glosa_tramites%' => 'glosa_tramites',
+			'%glosa%' => 'glosa',
+			'%duracion_decimal%' => 'duracion_decimal',
+			'%duracion_tramites%' => 'duracion_tramites',
+			'%duracion%' => 'duracion',
+			'%valor_tramites%' => 'valor_tramites',
+			'%valor_siempre%' => 'valor_siempre',
+		),
+		'TRABAJOS_ENCABEZADO' => array(
+			'%td_solicitante%' => 'td_solicitante',
+			'%solicitante%' => 'solicitante',
+			'%id_asunto%' => 'id_asunto',
+			'%tarifa_hora%' => 'tarifa_hora',
+			'%importe%' => 'importe',
+			'%ordenado_por%' => 'ordenado_por',
+			'%ordenado_por_jjr%' => 'ordenado_por_jjr',
+			'%periodo%' => 'periodo',
+			'%valor_periodo_ini%' => 'valor_periodo_ini',
+			'%valor_periodo_fin%' => 'valor_periodo_fin',
+			'%cliente%' => 'cliente',
+			'%glosa_cliente%' => 'glosa_cliente',
+			'%asunto%' => 'asunto',
+			'%glosa_asunto%' => 'glosa_asunto',
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%servicios_prestados%' => 'servicios_prestados',
+			'%detalle_trabajo%' => 'detalle_trabajo',
+			'%profesional%' => 'profesional',
+			'%duracion_cobrable%' => 'duracion_cobrable',
+			'%monto_total%' => 'monto_total',
+			'%staff%' => 'staff',
+			'%abogado%' => 'abogado',
+			'%horas%' => 'horas',
+			'%monto%' => 'monto',
+			'%cobrable%' => 'cobrable',
+			'%categoria_abogado%' => 'categoria_abogado',
+			'%tarifa%' => 'tarifa',
+			'%td_retainer%' => 'td_retainer',
+			'%duracion_retainer%' => 'duracion_retainer',
+			'%duracion_trabajada_bmahj%' => 'duracion_trabajada_bmahj',
+			'%duracion_descontada_bmahj%' => 'duracion_descontada_bmahj',
+			'%duracion_bmahj%' => 'duracion_bmahj',
+			'%duracion_trabajada%' => 'duracion_trabajada',
+			'%duracion_descontada%' => 'duracion_descontada',
+			'%duracion%' => 'duracion',
+			'%duracion_tyc%' => 'duracion_tyc',
+			'%valor%' => 'valor',
+			'%valor_siempre%' => 'valor_siempre',
+			'%tarifa_fee%' => 'tarifa_fee',
+			'%td_categoria%' => 'td_categoria',
+			'%categoria%' => 'categoria',
+			'%td_tarifa%' => 'td_tarifa',
+			'%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
+			'%td_importe%' => 'td_importe',
+			'%td_importe_ajustado%' => 'td_importe_ajustado',
+		),
+		'TRABAJOS_FILAS' => array(
+			'%valor_codigo_asunto%' => 'valor_codigo_asunto',
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%td_solicitante%' => 'td_solicitante',
+			'%solicitante%' => 'solicitante',
+			'%username%' => 'username',
+			'%profesional%' => 'profesional',
+			'%td_categoria%' => 'td_categoria',
+			'%categoria%' => 'categoria',
+			'%td_tarifa%' => 'td_tarifa',
+			'%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
+			'%tarifa%' => 'tarifa',
+			'%tarifa_ajustada%' => 'tarifa_ajustada',
+			'%td_importe%' => 'td_importe',
+			'%td_importe_ajustado%' => 'td_importe_ajustado',
+			'%importe%' => 'importe',
+			'%importe_ajustado%' => 'importe_ajustado',
+			'%paridad%' => 'paridad',
+			'%iniciales%' => 'iniciales',
+			'%td_retainer%' => 'td_retainer',
+			'%duracion_retainer%' => 'duracion_retainer',
+			'%duracion_decimal_trabajada%' => 'duracion_decimal_trabajada',
+			'%duracion_trabajada%' => 'duracion_trabajada',
+			'%duracion_decduracion_trabajadaimal_descontada%' => 'duracion_decduracion_trabajadaimal_descontada',
+			'%duracion_descontada%' => 'duracion_descontada',
+			'%duracion_decimal%' => 'duracion_decimal',
+			'%duracion%' => 'duracion',
+			'%duracion_decimal_descontada%' => 'duracion_decimal_descontada',
+			'%cobrable%' => 'cobrable',
+			'%valor%' => 'valor',
+			'%valor_cyc%' => 'valor_cyc',
+			'%valor_con_moneda%' => 'valor_con_moneda',
+			'%valor_siempre%' => 'valor_siempre',
+			'%glosa%' => 'glosa',
+			'%TRABAJOS_CATEGORIA%' => 'TRABAJOS_CATEGORIA',
+		),
+		'TRABAJOS_TOTAL' => array(
+			'%sub_total_fees%' => 'sub_total_fees',
+			'%td_solicitante%' => 'td_solicitante',
+			'%td_categoria%' => 'td_categoria',
+			'%td_tarifa%' => 'td_tarifa',
+			'%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
+			'%td_importe%' => 'td_importe',
+			'%td_importe_ajustado%' => 'td_importe_ajustado',
+			'%importe%' => 'importe',
+			'%importe_ajustado%' => 'importe_ajustado',
+			'%td_retainer%' => 'td_retainer',
+			'%duracion_retainer%' => 'duracion_retainer',
+			'%duracion_decimal_trabajada%' => 'duracion_decimal_trabajada',
+			'%duracion_trabajada%' => 'duracion_trabajada',
+			'%duracion_descontada%' => 'duracion_descontada',
+			'%duracion_decimal_descontada%' => 'duracion_decimal_descontada',
+			'%duracion_decimal%' => 'duracion_decimal',
+			'%duracion%' => 'duracion',
+			'%glosa%' => 'glosa',
+			'%cobrable%' => 'cobrable',
+			'%valor%' => 'valor',
+			'%valor_cyc%' => 'valor_cyc',
+			'%valor_siempre%' => 'valor_siempre',
+		),
+		'DETALLE_PROFESIONAL' => array(
+			'%glosa_profesional%' => 'glosa_profesional',
+			'%detalle_tiempo_por_abogado%' => 'detalle_tiempo_por_abogado',
+			'%detalle_honorarios%' => 'detalle_honorarios',
+		),
+		'PROFESIONAL_FILAS' => array(
+			'%nombre%' => 'nombre',
+			'%hrs_retainer%' => 'hrs_retainer',
+			'%hrs_descontadas%' => 'hrs_descontadas',
+			'%hrs_descontadas_real%' => 'hrs_descontadas_real',
+			'%hh%' => 'hh',
+			'%valor_hh%' => 'valor_hh',
+			'%valor_hh_cyc%' => 'valor_hh_cyc',
+			'%iniciales%' => 'iniciales',
+			'%username%' => 'username',
+			'%hrs_trabajadas_real%' => 'hrs_trabajadas_real',
+			'%hrs_trabajadas%' => 'hrs_trabajadas',
+			'%horas_retainer%' => 'horas_retainer',
+			'%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
+			'%total%' => 'total',
+			'%total_cyc%' => 'total_cyc',
+			'%hrs_trabajadas_previo%' => 'hrs_trabajadas_previo',
+			'%horas_trabajadas_especial%' => 'horas_trabajadas_especial',
+			'%horas_cobrables%' => 'horas_cobrables',
+			'%horas%' => 'horas',
+			'%tarifa_horas%' => 'tarifa_horas',
+			'%total_horas%' => 'total_horas',
+		),
+		'PROFESIONAL_TOTAL' => array(
+			'%hrs_retainer%' => 'hrs_retainer',
+			'%hrs_descontadas%' => 'hrs_descontadas',
+			'%hrs_descontadas_real%' => 'hrs_descontadas_real',
+			'%hh%' => 'hh',
+			'%valor_hh%' => 'valor_hh',
+			'%valor_hh_cyc%' => 'valor_hh_cyc',
+			'%glosa%' => 'glosa',
+			'%glosa_honorarios%' => 'glosa_honorarios',
+			'%hrs_trabajadas_real%' => 'hrs_trabajadas_real',
+			'%hrs_trabajadas%' => 'hrs_trabajadas',
+			'%hrs_trabajadas_previo%' => 'hrs_trabajadas_previo',
+			'%horas_trabajadas_especial%' => 'horas_trabajadas_especial',
+			'%horas_cobrables%' => 'horas_cobrables',
+			'%horas_retainer%' => 'horas_retainer',
+			'%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
+			'%total%' => 'total',
+			'%total_cyc%' => 'total_cyc',
+			'%total_honorarios%' => 'total_honorarios',
+			'%horas%' => 'horas',
+		),
+		'DETALLE_PROFESIONAL_RETAINER' => array(
+			'%retainer%' => 'retainer',
+			'%valor_retainer%' => 'valor_retainer',
+		),
+		'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO' => array(
+			'%valor_honorarios_monedabase%' => 'valor_honorarios_monedabase',
+		),
+		'CTA_CORRIENTE_SALDO_INICIAL' => array(
+			'%saldo_inicial_cuenta%' => 'saldo_inicial_cuenta',
+			'%valor_saldo_inicial_cuenta%' => 'valor_saldo_inicial_cuenta',
+		),
+		'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO' => array(
+			'%movimientos%' => 'movimientos',
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%egreso%' => 'egreso',
+			'%ingreso%' => 'ingreso',
+		),
+		'CTA_CORRIENTE_MOVIMIENTOS_FILAS' => array(
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%monto_egreso%' => 'monto_egreso',
+			'%monto_ingreso%' => 'monto_ingreso',
+		),
+		'CTA_CORRIENTE_MOVIMIENTOS_TOTAL' => array(
+			'%total%' => 'total',
+			'%total_monto_egreso%' => 'total_monto_egreso',
+			'%total_monto_ingreso%' => 'total_monto_ingreso',
+			'%saldo_periodo%' => 'saldo_periodo',
+			'%total_monto_gastos%' => 'total_monto_gastos',
+		),
+		'CTA_CORRIENTE_SALDO_FINAL' => array(
+			'%saldo_final_cuenta%' => 'saldo_final_cuenta',
+			'%valor_saldo_final_cuenta%' => 'valor_saldo_final_cuenta',
+		),
+		'TIPO_CAMBIO' => array(
+			'%titulo_tipo_cambio%' => 'titulo_tipo_cambio',
+		),
+		'MOROSIDAD_ENCABEZADO' => array(
+			'%numero_nota_cobro%' => 'numero_nota_cobro',
+			'%numero_factura%' => 'numero_factura',
+			'%fecha%' => 'fecha',
+			'%moneda%' => 'moneda',
+			'%monto_moroso%' => 'monto_moroso',
+		),
+		'MOROSIDAD_FILAS' => array(
+			'%numero_nota_cobro%' => 'numero_nota_cobro',
+			'%numero_factura%' => 'numero_factura',
+			'%fecha%' => 'fecha',
+			'%moneda%' => 'moneda',
+			'%moneda_total%' => 'moneda_total',
+			'%monto_moroso%' => 'monto_moroso',
+			'%monto_moroso_documento%' => 'monto_moroso_documento',
+			'%monto_moroso_moneda_total%' => 'monto_moroso_moneda_total',
+		),
+		'MOROSIDAD_HONORARIOS_TOTAL' => array(
+			'%numero_nota_cobro%' => 'numero_nota_cobro',
+			'%numero_factura%' => 'numero_factura',
+			'%fecha%' => 'fecha',
+			'%moneda%' => 'moneda',
+			'%monto_moroso_documento%' => 'monto_moroso_documento',
+			'%monto_moroso%' => 'monto_moroso',
+		),
+		'MOROSIDAD_GASTOS' => array(
+			'%numero_nota_cobro%' => 'numero_nota_cobro',
+			'%numero_factura%' => 'numero_factura',
+			'%fecha%' => 'fecha',
+			'%moneda%' => 'moneda',
+			'%monto_moroso_documento%' => 'monto_moroso_documento',
+			'%monto_moroso%' => 'monto_moroso',
+		),
+		'MOROSIDAD_TOTAL' => array(
+			'%numero_nota_cobro%' => 'numero_nota_cobro',
+			'%numero_factura%' => 'numero_factura',
+			'%fecha%' => 'fecha',
+			'%moneda%' => 'moneda',
+			'%monto_moroso_documento%' => 'monto_moroso_documento',
+			'%monto_moroso%' => 'monto_moroso',
+			'%nota%' => 'nota',
+		),
+		'GLOSA_ESPECIAL' => array(
+			'%glosa_especial%' => 'glosa_especial',
+		),
+		'SALTO_PAGINA' => array(
+		),
+		'CLIENTE' => array(
+			'%materia%' => 'materia',
+			'%glosa_asunto_sin_codigo%' => 'glosa_asunto_sin_codigo',
+			'%valor_codigo_asunto%' => 'valor_codigo_asunto',
+			'%glosa_asuntos_sin_codigo%' => 'glosa_asuntos_sin_codigo',
+			'%glosa_numero_cobro%' => 'glosa_numero_cobro',
+			'%numero_cobro%' => 'numero_cobro',
+			'%servicios_prestados%' => 'servicios_prestados',
+			'%a%' => 'a',
+			'%a_min%' => 'a_min',
+			'%cliente%' => 'cliente',
+			'%nombre_cliente%' => 'nombre_cliente',
+			'%factura_razon_social_o_nombre_cliente%' => 'factura_razon_social_o_nombre_cliente',
+			'%factura%' => 'factura',
+			'%fecha_liquidacion%' => 'fecha_liquidacion',
+			'%cliente_corporativo%' => 'cliente_corporativo',
+			'%id_asunto%' => 'id_asunto',
+			'%codigo_cliente%' => 'codigo_cliente',
+			'%fecha_emision%' => 'fecha_emision',
+			'%glosa_cliente%' => 'glosa_cliente',
+			'%direccion%' => 'direccion',
+			'%valor_direccion%' => 'valor_direccion',
+			'%valor_direccion_uc%' => 'valor_direccion_uc',
+			'%direccion_carta%' => 'direccion_carta',
+			'%rut%' => 'rut',
+			'%rut_minuscula%' => 'rut_minuscula',
+			'%valor_rut_sin_formato%' => 'valor_rut_sin_formato',
+			'%valor_rut%' => 'valor_rut',
+			'%giro_factura%' => 'giro_factura',
+			'%giro_factura_valor%' => 'giro_factura_valor',
+			'%contacto%' => 'contacto',
+			'%atencion%' => 'atencion',
+			'%valor_contacto%' => 'valor_contacto',
+			'%atte%' => 'atte',
+			'%telefono%' => 'telefono',
+			'%valor_telefono%' => 'valor_telefono',
+			'%numero_factura%' => 'numero_factura',
+			'%nombre_pais%' => 'nombre_pais',
+			'%nombre_pais_mayuscula%' => 'nombre_pais_mayuscula',
+		),
+		'DETALLES_PAGOS' => array(
+			'%descripcion%' => 'descripcion',
+			'%saldo_pago%' => 'saldo_pago',
+		),
+		'DETALLES_PAGOS_CONTRATO' => array(
+			'%descripcion%' => 'descripcion',
+			'%saldo_pago%' => 'saldo_pago',
+		),
+		'RESUMEN_PROFESIONAL' => array(
+			'%glosa_profesional%' => 'glosa_profesional',
+			'%resumen_profesional%' => 'resumen_profesional',
+			'%nombre%' => 'nombre',
+			'%categoria%' => 'categoria',
+			'%hh_demo%' => 'hh_demo',
+			'%hh_trabajada%' => 'hh_trabajada',
+			'%td_tarifa%' => 'td_tarifa',
+			'%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
+			'%tarifa_horas_demo%' => 'tarifa_horas_demo',
+			'%td_importe%' => 'td_importe',
+			'%td_importe_ajustado%' => 'td_importe_ajustado',
+			'%total_horas_demo%' => 'total_horas_demo',
+			'%td_descontada%' => 'td_descontada',
+			'%td_cobrable%' => 'td_cobrable',
+			'%td_retainer%' => 'td_retainer',
+			'%glosa%' => 'glosa',
+			'%username%' => 'username',
+			'%iniciales%' => 'iniciales',
+			'%hrs_trabajadas%' => 'hrs_trabajadas',
+			'%hrs_trabajadas_vio%' => 'hrs_trabajadas_vio',
+			'%hrs_retainer%' => 'hrs_retainer',
+			'%hrs_retainer_vio%' => 'hrs_retainer_vio',
+			'%hrs_descontadas%' => 'hrs_descontadas',
+			'%hh_descontada%' => 'hh_descontada',
+			'%hh_cobrable%' => 'hh_cobrable',
+			'%hh_retainer%' => 'hh_retainer',
+			'%hh%' => 'hh',
+			'%tarifa_horas%' => 'tarifa_horas',
+			'%tarifa_horas_ajustada%' => 'tarifa_horas_ajustada',
+			'%total_horas%' => 'total_horas',
+			'%total_horas_ajustado%' => 'total_horas_ajustado',
+			'%porcentaje_participacion%' => 'porcentaje_participacion',
+			'%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
+			'%valor_retainer%' => 'valor_retainer',
+			'%valor_retainer_vio%' => 'valor_retainer_vio',
+			'%valor_cobrado_hh%' => 'valor_cobrado_hh',
+			'%total%' => 'total',
+			'%RESUMEN_PROFESIONAL_ENCABEZADO%' => 'RESUMEN_PROFESIONAL_ENCABEZADO',
+			'%RESUMEN_PROFESIONAL_FILAS%' => 'RESUMEN_PROFESIONAL_FILAS',
+			'%RESUMEN_PROFESIONAL_TOTAL%' => 'RESUMEN_PROFESIONAL_TOTAL',
+		),
+		'RESUMEN_PROFESIONAL_POR_CATEGORIA' => array(
+			'%glosa_profesional%' => 'glosa_profesional',
+			'%nombre%' => 'nombre',
+			'%iniciales%' => 'iniciales',
+			'%hrs_trabajadas%' => 'hrs_trabajadas',
+			'%hrs_retainer%' => 'hrs_retainer',
+			'%hrs_descontadas%' => 'hrs_descontadas',
+			'%hh%' => 'hh',
+			'%total_horas%' => 'total_horas',
+			'%tarifa_horas%' => 'tarifa_horas',
+			'%RESUMEN_PROFESIONAL_FILAS%' => 'RESUMEN_PROFESIONAL_FILAS',
+			'%glosa%' => 'glosa',
+			'%total%' => 'total',
+		),
+		'RESUMEN_PROFESIONAL_ENCABEZADO' => array(
+			'%nombre%' => 'nombre',
+			'%hrs_retainer%' => 'hrs_retainer',
+			'%hrs_mins_retainer%' => 'hrs_mins_retainer',
+			'%hrs_trabajadas%' => 'hrs_trabajadas',
+			'%hrs_descontadas%' => 'hrs_descontadas',
+			'%hrs_mins_trabajadas%' => 'hrs_mins_trabajadas',
+			'%hrs_mins_descontadas%' => 'hrs_mins_descontadas',
+		),
+		'PROFESIONAL_ENCABEZADO' => array(
+			'%horas_trabajadas%' => 'horas_trabajadas',
+			'%retainer%' => 'retainer',
+			'%extraordinario%' => 'extraordinario',
+			'%simbolo_moneda_2%' => 'simbolo_moneda_2',
+			'%nombre%' => 'nombre',
+			'%valor_hh%' => 'valor_hh',
+			'%hrs_trabajadas%' => 'hrs_trabajadas',
+			'%porcentaje_participacion%' => 'porcentaje_participacion',
+			'%hrs_retainer%' => 'hrs_retainer',
+			'%valor_retainer%' => 'valor_retainer',
+			'%hh%' => 'hh',
+			'%valor_cobrado_hh%' => 'valor_cobrado_hh',
+			'%fayca_hrs_descontadas%' => 'fayca_hrs_descontadas',
+			'%hrs_mins_trabajadas%' => 'hrs_mins_trabajadas',
+			'%hrs_trabajadas_real%' => 'hrs_trabajadas_real',
+			'%hrs_mins_trabajadas_real%' => 'hrs_mins_trabajadas_real',
+			'%hrs_descontadas_real%' => 'hrs_descontadas_real',
+			'%horas_cobrables%' => 'horas_cobrables',
+			'%hrs_mins_descontadas_real%' => 'hrs_mins_descontadas_real',
+			'%horas_mins_cobrables%' => 'horas_mins_cobrables',
+			'%hrs_mins_retainer%' => 'hrs_mins_retainer',
+			'%columna_horas_no_cobrables_top%' => 'columna_horas_no_cobrables_top',
+			'%columna_horas_no_cobrables%' => 'columna_horas_no_cobrables',
+			'%hrs_descontadas%' => 'hrs_descontadas',
+			'%hrs_mins_descontadas%' => 'hrs_mins_descontadas',
+			'%hrs_trabajadas_previo%' => 'hrs_trabajadas_previo',
+			'%hrs_mins_trabajadas_previo%' => 'hrs_mins_trabajadas_previo',
+			'%abogados%' => 'abogados',
+			'%hh_trabajada%' => 'hh_trabajada',
+			'%td_descontada%' => 'td_descontada',
+			'%hh_cobrable%' => 'hh_cobrable',
+			'%hh_descontada%' => 'hh_descontada',
+			'%td_cobrable%' => 'td_cobrable',
+			'%td_retainer%' => 'td_retainer',
+			'%hh_retainer%' => 'hh_retainer',
+			'%hh_mins%' => 'hh_mins',
+			'%horas%' => 'horas',
+			'%horas_retainer%' => 'horas_retainer',
+			'%horas_mins%' => 'horas_mins',
+			'%horas_mins_retainer%' => 'horas_mins_retainer',
+			'%td_tarifa%' => 'td_tarifa',
+			'%valor_horas%' => 'valor_horas',
+			'%td_tarifa_ajustada%' => 'td_tarifa_ajustada',
+			'%tarifa_fee%' => 'tarifa_fee',
+			'%simbolo_moneda%' => 'simbolo_moneda',
+			'%td_importe%' => 'td_importe',
+			'%td_importe_ajustado%' => 'td_importe_ajustado',
+			'%importe%' => 'importe',
+			'%importe_ajustado%' => 'importe_ajustado',
+			'%total%' => 'total',
+			'%honorarios%' => 'honorarios',
+			'%categoria%' => 'categoria',
+			'%staff%' => 'staff',
+			'%valor_siempre%' => 'valor_siempre',
+			'%nombre_profesional%' => 'nombre_profesional',
+			'%profesional%' => 'profesional',
+			'%hora_tarificada%' => 'hora_tarificada',
+		),
+	);
 
-    function __construct($sesion, $fields = "", $params = "") {
-        parent::__construct($sesion, $fields);
-        $this->x_resultados = array();
-        $valorsinespacio = '&nbsp;';
-        if (Conf::GetConf($this->sesion, 'ValorSinEspacio')) {
-            $valorsinespacio = '';
-        }
-        $this->espacio = $valorsinespacio;
-    }
+	function __construct($sesion, $fields = "", $params = "") {
+		parent::__construct($sesion, $fields);
+		$this->x_resultados = array();
+		$valorsinespacio = '&nbsp;';
+		if (Conf::GetConf($this->sesion, 'ValorSinEspacio')) {
+			$valorsinespacio = '';
+		}
+		$this->espacio = $valorsinespacio;
+	}
 
-    function NuevoRegistro() {
-        return array(
-            'descripcion' => 'Nueva nota de cobro',
-            'html_header' => '',
-            'html_pie' => '',
-            'cobro_template' => '',
-            'cobro_css' => '',
-            'pdf_encabezado_imagen' => '',
-            'pdf_encabezado_texto' => ''
-        );
-    }
+	function NuevoRegistro() {
+		return array(
+			'descripcion' => 'Nueva nota de cobro',
+			'html_header' => '',
+			'html_pie' => '',
+			'cobro_template' => '',
+			'cobro_css' => '',
+			'pdf_encabezado_imagen' => '',
+			'pdf_encabezado_texto' => ''
+		);
+	}
 
-    public function ObtenerCarta($id = null) {
-        if (empty($id)) {
-            return $this->NuevoRegistro() + array('secciones' => array(key($this->secciones) => ''));
-        }
+	public function ObtenerCarta($id = null) {
+		if (empty($id)) {
+			return $this->NuevoRegistro() + array('secciones' => array(key($this->secciones) => ''));
+		}
 
-        $query = "SELECT * FROM {$this->carta_tabla} WHERE {$this->carta_id} = '$id'";
-        $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-        $carta = mysql_fetch_assoc($resp);
-        $parser = new TemplateParser($carta[$this->carta_formato]);
-        $carta['secciones'] = $parser->tags;
-        return $carta;
-    }
+		$query = "SELECT * FROM {$this->carta_tabla} WHERE {$this->carta_id} = '$id'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$carta = mysql_fetch_assoc($resp);
+		$parser = new TemplateParser($carta[$this->carta_formato]);
+		$carta['secciones'] = $parser->tags;
+		return $carta;
+	}
 
-    function GuardarCarta($data) {
+	function GuardarCarta($data) {
 
-        $data[$this->carta_formato] = $data['formato'];
+		$data[$this->carta_formato] = $data['formato'];
 
-        $Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);
-        $Carta->guardar_fecha = false;
-        $Carta->editable_fields = array_keys($data);
-        $Carta->Fill($data, true);
-        if ($Carta->Write()) {
-            return $Carta->fields[$this->carta_id];
-        }
-        return false;
-    }
+		$Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);
+		$Carta->guardar_fecha = false;
+		$Carta->editable_fields = array_keys($data);
+		$Carta->Fill($data, true);
+		if ($Carta->Write()) {
+			return $Carta->fields[$this->carta_id];
+		}
+		return false;
+	}
 
-    function PrevisualizarDocumento($data, $id_cobro) {
-        $formato = $data['formato'];
-        $html = $this->ReemplazarHTML($formato, $id_cobro);
-        $doc = new DocGenerator(
-            $html,
-            $data['cobro_css'],
-            $this->fields['opc_papel'],
-            $this->fields['opc_ver_numpag'],
-            'PORTRAIT',
-            $data['margen_superior'],
-            $data['margen_derecho'],
-            $data['margen_inferior'],
-            $data['margen_izquierdo'],
-            $this->fields['estado']
-        );
-        libxml_use_internal_errors(true);
-        $doc->output('previsualizacion_carta.doc');
-        exit;
-    }
+	function PrevisualizarDocumento($data, $id_cobro) {
+		$formato = $data['formato'];
+		$html = $this->ReemplazarHTML($formato, $id_cobro);
+		$doc = new DocGenerator($html, $data['cobro_css'], $this->fields['opc_papel'], $this->fields['opc_ver_numpag'], 'PORTRAIT', $data['margen_superior'], $data['margen_derecho'], $data['margen_inferior'], $data['margen_izquierdo'], $this->fields['estado']);
+		libxml_use_internal_errors(true);
+		$doc->output('previsualizacion_carta.doc');
+		exit;
+	}
 
-    function PrevisualizarDocumentoHtml($formato_html, $id_cobro) {
-        return $this->ReemplazarHTML($formato_html, $id_cobro);
-    }
+	function PrevisualizarDocumentoHtml($formato_html, $id_cobro) {
+		return $this->ReemplazarHTML($formato_html, $id_cobro);
+	}
 
-    function PrevisualizarValores($id_cobro) {
-        $html = '';
-        $secciones = array(key($this->secciones));
-        foreach ($this->secciones as $subsecciones) {
-            $secciones = array_merge($secciones, array_keys($subsecciones));
-        }
-        foreach ($secciones as $seccion) {
-            $html .= "\n\n###$seccion###\n<tr><th colspan=3>$seccion</th></tr>\n\n";
+	function PrevisualizarValores($id_cobro) {
+		$html = '';
+		$secciones = array(key($this->secciones));
+		foreach ($this->secciones as $subsecciones) {
+			$secciones = array_merge($secciones, array_keys($subsecciones));
+		}
+		foreach ($secciones as $seccion) {
+			$html .= "\n\n###$seccion###\n<tr><th colspan=3>$seccion</th></tr>\n\n";
 
-            if (isset($this->diccionario[$seccion])) {
-                foreach ($this->diccionario[$seccion] as $tag => $desc_tag) {
-                    $html .= '<tr><td>' . str_replace('%', '&#37;', $tag) . "</td><td>$tag</td><td>" . str_replace('%', '&#37;', $desc_tag) . "</td></tr>\n";
-                }
-            }
-            if (isset($this->secciones[$seccion])) {
-                foreach (array_keys($this->secciones[$seccion]) as $subseccion) {
-                    $html .= "\n%$subseccion%\n";
-                }
-            }
-        }
-        return '<table border="1">' . $this->ReemplazarHTML($html, $id_cobro) . '</table>';
-    }
+			if (isset($this->diccionario[$seccion])) {
+				foreach ($this->diccionario[$seccion] as $tag => $desc_tag) {
+					$html .= '<tr><td>' . str_replace('%', '&#37;', $tag) . "</td><td>$tag</td><td>" . str_replace('%', '&#37;', $desc_tag) . "</td></tr>\n";
+				}
+			}
+			if (isset($this->secciones[$seccion])) {
+				foreach (array_keys($this->secciones[$seccion]) as $subseccion) {
+					$html .= "\n%$subseccion%\n";
+				}
+			}
+		}
+		return '<table border="1">' . $this->ReemplazarHTML($html, $id_cobro) . '</table>';
+	}
 
-    function StrToNumber($str) {
-        $legalChars = "%[^0-9\-\ ]%";
-        $str = preg_replace($legalChars, "", $str);
-        return number_format((float) $str, 0, ',', '.');
-    }
+	function StrToNumber($str) {
+		$legalChars = "%[^0-9\-\ ]%";
+		$str = preg_replace($legalChars, "", $str);
+		return number_format((float) $str, 0, ',', '.');
+	}
 
-    function ReemplazarHTML($html, $id_cobro) {
-        $parser = new TemplateParser($html);
+	function ReemplazarHTML($html, $id_cobro) {
+		$parser = new TemplateParser($html);
 
-        if (empty($id_cobro)) {
-            $query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
-            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-            list($id_cobro) = mysql_fetch_array($resp);
-        }
-        $this->Load($id_cobro);
-        return $this->GenerarEjemplo($parser);
-    }
+		if (empty($id_cobro)) {
+			$query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($id_cobro) = mysql_fetch_array($resp);
+		}
+		$this->Load($id_cobro);
+		return $this->GenerarEjemplo($parser);
+	}
 
-    function GenerarEjemplo($parser) {
-        return $this->GeneraHTMLCobro(false, $parser, 2);
-    }
+	function GenerarEjemplo($parser) {
+		return $this->GeneraHTMLCobro(false, $parser, 2);
+	}
 
-    function ParametrosGeneracion() {
+	function ParametrosGeneracion() {
 
-        // Para mostrar un resumen de horas de cada profesional al principio del documento.
-        global $resumen_profesional_id_usuario;
-        global $resumen_profesional_nombre;
-        global $resumen_profesional_hrs_trabajadas;
-        global $resumen_profesional_hrs_retainer;
-        global $resumen_profesional_hrs_descontadas;
-        global $resumen_profesional_hh;
-        global $resumen_profesional_valor_hh;
-        global $resumen_profesional_categoria;
-        global $resumen_profesional_id_categoria;
-        global $resumen_profesionales;
-        $resumen_profesional_id_usuario = array();
-        $resumen_profesional_nombre = array();
-        $resumen_profesional_hrs_trabajadas = array();
-        $resumen_profesional_hrs_retainer = array();
-        $resumen_profesional_hrs_descontadas = array();
-        $resumen_profesional_hh = array();
-        $resumen_profesional_valor_hh = array();
-        $resumen_profesional_categoria = array();
-        $resumen_profesional_id_categoria = array();
-        $resumen_profesionales = array();
+		// Para mostrar un resumen de horas de cada profesional al principio del documento.
+		global $resumen_profesional_id_usuario;
+		global $resumen_profesional_nombre;
+		global $resumen_profesional_hrs_trabajadas;
+		global $resumen_profesional_hrs_retainer;
+		global $resumen_profesional_hrs_descontadas;
+		global $resumen_profesional_hh;
+		global $resumen_profesional_valor_hh;
+		global $resumen_profesional_categoria;
+		global $resumen_profesional_id_categoria;
+		global $resumen_profesionales;
+		$resumen_profesional_id_usuario = array();
+		$resumen_profesional_nombre = array();
+		$resumen_profesional_hrs_trabajadas = array();
+		$resumen_profesional_hrs_retainer = array();
+		$resumen_profesional_hrs_descontadas = array();
+		$resumen_profesional_hh = array();
+		$resumen_profesional_valor_hh = array();
+		$resumen_profesional_categoria = array();
+		$resumen_profesional_id_categoria = array();
+		$resumen_profesionales = array();
 
-        global $contrato;
-        $contrato = new Contrato($this->sesion);
-        $contrato->Load($this->fields['id_contrato']);
+		global $contrato;
+		$contrato = new Contrato($this->sesion);
+		$contrato->Load($this->fields['id_contrato']);
 
-        global $x_detalle_profesional;
-        global $x_resumen_profesional;
-        global $x_factor_ajuste;
-        list( $x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste ) = $this->DetalleProfesional();
-        global $x_resultados;
-        $x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
-        $this->x_resultados = $x_resultados;
+		global $x_detalle_profesional;
+		global $x_resumen_profesional;
+		global $x_factor_ajuste;
+		list( $x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste ) = $this->DetalleProfesional();
+		global $x_resultados;
+		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+		$this->x_resultados = $x_resultados;
 
-        global $x_cobro_gastos;
-        $x_cobro_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
+		global $x_cobro_gastos;
+		$x_cobro_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
 
-        $lang = $this->fields['codigo_idioma'];
+		$lang = $this->fields['codigo_idioma'];
 
-        $cliente = new Cliente($this->sesion);
-        $cliente->LoadByCodigo($this->fields['codigo_cliente']);
+		$cliente = new Cliente($this->sesion);
+		$cliente->LoadByCodigo($this->fields['codigo_cliente']);
 
-        global $cobro_moneda;
-        $cobro_moneda = new CobroMoneda($this->sesion);
-        $cobro_moneda->Load($this->fields['id_cobro']);
+		global $cobro_moneda;
+		$cobro_moneda = new CobroMoneda($this->sesion);
+		$cobro_moneda->Load($this->fields['id_cobro']);
 
-        global $moneda_total;
-        $moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-        $moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
+		global $moneda_total;
+		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 
-        $tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-        if ($tipo_cambio_moneda_total == 0) {
-            $tipo_cambio_moneda_total = 1;
-        }
+		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+		if ($tipo_cambio_moneda_total == 0) {
+			$tipo_cambio_moneda_total = 1;
+		}
 
-        $idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
-        $idioma->Load($lang);
+		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
+		$idioma->Load($lang);
 
-        // Moneda
-        $moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-        $moneda->Load($this->fields['id_moneda']);
+		// Moneda
+		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda->Load($this->fields['id_moneda']);
 
-        $moneda_base = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-        $moneda_base->Load($this->fields['id_moneda_base']);
+		$moneda_base = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_base->Load($this->fields['id_moneda_base']);
 
-        //Moneda cliente
-        $moneda_cli = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-        $moneda_cli->Load($cliente->fields['id_moneda']);
-        $moneda_cliente_cambio = $cobro_moneda->moneda[$cliente->fields['id_moneda']]['tipo_cambio'];
+		//Moneda cliente
+		$moneda_cli = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_cli->Load($cliente->fields['id_moneda']);
+		$moneda_cliente_cambio = $cobro_moneda->moneda[$cliente->fields['id_moneda']]['tipo_cambio'];
 
-        if ($this->fields['codigo_idioma'] == 'es') {
-            setlocale(LC_ALL, "es_ES");
-        } else if ($this->fields['codigo_idioma'] == 'en') {
-            setlocale(LC_ALL, 'en_US.UTF-8');
-        }
+		if ($this->fields['codigo_idioma'] == 'es') {
+			setlocale(LC_ALL, "es_ES");
+		} else if ($this->fields['codigo_idioma'] == 'en') {
+			setlocale(LC_ALL, 'en_US.UTF-8');
+		}
 
-        return compact('moneda_cliente_cambio', 'moneda_cli', 'lang', 'html2', 'idioma', 'cliente', 'moneda', 'moneda_base', 'trabajo', 'profesionales', 'gasto', 'totales', 'tipo_cambio_moneda_total', 'asunto');
-    }
+		return compact('moneda_cliente_cambio', 'moneda_cli', 'lang', 'html2', 'idioma', 'cliente', 'moneda', 'moneda_base', 'trabajo', 'profesionales', 'gasto', 'totales', 'tipo_cambio_moneda_total', 'asunto');
+	}
 
-    function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '') {
+	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '') {
+		global $masi;
+		$masi = $masivo;
 
-        $parametros = $this->ParametrosGeneracion();
-        extract($parametros);
+		$parametros = $this->ParametrosGeneracion();
+		extract($parametros);
 
-        global $masi;
-        $masi = $masivo;
+		//Usa el segundo formato de nota de cobro
+		//solo si lo tiene definido en el conf y solo tiene gastos
 
-        //Usa el segundo formato de nota de cobro
-        //solo si lo tiene definido en el conf y solo tiene gastos
-
-        $css_cobro = 1;
-        $solo_gastos = true;
-        for ($k = 0; $k < count($this->asuntos); $k++) {
-            $asunto = new Asunto($this->sesion);
-            $asunto->LoadByCodigo($this->asuntos[$k]);
-            $query = "SELECT SUM(TIME_TO_SEC(duracion))
+		$css_cobro = 1;
+		$solo_gastos = true;
+		for ($k = 0; $k < count($this->asuntos); $k++) {
+			$asunto = new Asunto($this->sesion);
+			$asunto->LoadByCodigo($this->asuntos[$k]);
+			$query = "SELECT SUM(TIME_TO_SEC(duracion))
 						FROM trabajo AS t2
 							LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
 						WHERE t2.cobrable = 1
 							AND t2.codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'
 							AND cobro.id_cobro='" . $this->fields['id_cobro'] . "'";
-            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-            list($total_monto_trabajado) = mysql_fetch_array($resp);
-            if ($total_monto_trabajado > 0 || $this->fields['monto_subtotal'] > 0) {
-                $solo_gastos = false;
-            }
-        }
 
-        if (Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
-            if ($solo_gastos && Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
-                $css_cobro = 2;
-            }
-        }
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($total_monto_trabajado) = mysql_fetch_array($resp);
+			if ($total_monto_trabajado > 0 || $this->fields['monto_subtotal'] > 0) {
+				$solo_gastos = false;
+			}
+		}
 
-        $templateData_carta = UtilesApp::TemplateCarta($this->sesion, $this->fields['id_carta']);
-        $cssData = UtilesApp::TemplateCartaCSS($this->sesion, $this->fields['id_carta']);
-        $parser_carta = new TemplateParser($templateData_carta);
+		if (Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
+			if ($solo_gastos && Conf::GetConf($this->sesion, 'CSSSoloGastos')) {
+				$formato = 2;
+			}
+		}
 
-        if ($formato == '' || $formato == 0) {
-            $formato = $css_cobro;
-        }
+		$templateData_carta = UtilesApp::TemplateCarta($this->sesion, $this->fields['id_carta']);
+		$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $this->fields['id_carta']);
+		$parser_carta = new TemplateParser($templateData_carta);
 
-        if (is_numeric($formato)) {
-            $templateData = UtilesApp::TemplateCobro($this->sesion, $formato);
-            $cssData .= UtilesApp::CSSCobro($this->sesion, $formato);
-            $parser = new TemplateParser($templateData);
-        } else {
-            $parser = $formato;
-        }
+		if (is_numeric($formato) || $formato == '') {
+			// buscar formato, de no existir buscar el primero
+			$CobroRtf = new CobroRtf($this->sesion);
+			$CobroRtf->Load($formato);
 
-        /*
-         * $this->fields['modalidad_calculo'] == 1, hacer calculo de forma nueva con la funcion ProcesaCobroIdMoneda
-         * $this->fields['modalidad_calculo'] == 0, hacer calculo de forma antigua
-         */
+			if (!$CobroRtf->Loaded()) {
+				if ($CobroRtf->loadFirst()) {
+					$formato = $CobroRtf->fields['id_formato'];
+				}
+			}
 
-        if (empty($funcion)) {
-            $funcion = $this->fields['modalidad_calculo'] == 1 ? 2 : 1;
-        }
+			$templateData = UtilesApp::TemplateCobro($this->sesion, $formato);
+			$cssData .= UtilesApp::CSSCobro($this->sesion, $formato);
+			$parser = new TemplateParser($templateData);
+		} else {
+			$parser = $formato;
+		}
 
-        $generador = 'GenerarDocumento' . ($funcion == 2 ? '2' : '');
+		/*
+		 * $this->fields['modalidad_calculo'] == 1, hacer calculo de forma nueva con la funcion ProcesaCobroIdMoneda
+		 * $this->fields['modalidad_calculo'] == 0, hacer calculo de forma antigua
+		 */
 
-        $nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
-        $facturasRS = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
-        $totalescontrato = $this->TotalesDelContrato($facturasRS, $nuevomodulofactura, $this->fields['id_cobro']);
+		if (empty($funcion)) {
+			$funcion = $this->fields['modalidad_calculo'] == 1 ? 2 : 1;
+		}
 
-        return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
-    }
+		$generador = 'GenerarDocumento' . ($funcion == 2 ? '2' : '');
 
-    public function iniciales($nombre_encargado) {
+		$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
+		$facturasRS = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
+		$totalescontrato = $this->TotalesDelContrato($facturasRS, $nuevomodulofactura, $this->fields['id_cobro']);
 
-        $trozos = explode(' ', $nombre_encargado);
-        $cadena = '';
+		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
+	}
 
-        foreach ($trozos as $nombre) {
-            $cadena .= strtoupper(substr($nombre, 0, 1));
-        }
+	public function iniciales($nombre_encargado) {
+
+		$trozos = explode(' ', $nombre_encargado);
+		$cadena = '';
+
+		foreach ($trozos as $nombre) {
+			$cadena .= strtoupper(substr($nombre, 0, 1));
+		}
 
         return $cadena;
     }
@@ -3925,7 +3920,7 @@ class NotaCobro extends Cobro {
         }
         return $html;
     }
-    
+
     function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
 
         global $contrato;
@@ -11497,7 +11492,7 @@ class NotaCobro extends Cobro {
 			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
 
 			if (empty($html)) {
-				throw new Exception("HTML nulo o Vacio", 1);
+				continue;
 			}
 
             $opc_papel = $NotaCobro->fields['opc_papel'];
