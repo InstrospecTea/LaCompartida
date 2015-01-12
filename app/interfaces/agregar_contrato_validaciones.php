@@ -397,7 +397,7 @@ SCRIPT;
 		)
 	);
 } else {
-	$error_message = __("Por favor ingrese contanto del solicitante");
+	$error_message = __("Por favor ingrese los datos de contacto del solicitante");
 	$contractValidation->registerValidation(
 		'contacto', array(
 			'value' => $contacto,
