@@ -10589,6 +10589,10 @@ QUERY;
 				$queries[] = "ALTER TABLE prm_banco ADD COLUMN url VARCHAR(255) DEFAULT NULL COMMENT 'Direccion Web'";
 			}
 			break;
+		case 7.89:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10601,7 +10605,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.88;
+$max_update = 7.89;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

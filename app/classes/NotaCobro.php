@@ -1173,8 +1173,8 @@ class NotaCobro extends Cobro {
 		//Usa el segundo formato de nota de cobro
 		//solo si lo tiene definido en el conf y solo tiene gastos
 
-		$css_cobro = 1;
 		$solo_gastos = true;
+
 		for ($k = 0; $k < count($this->asuntos); $k++) {
 			$asunto = new Asunto($this->sesion);
 			$asunto->LoadByCodigo($this->asuntos[$k]);
