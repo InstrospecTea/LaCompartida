@@ -12,4 +12,8 @@ class PrmCodigo extends Objeto {
 		$this->fields = $fields;
 	}
 
+	function LoadById($id_codigo) {
+		$this->campo_id = 'id_codigo';
+		return $this->Load($id_codigo);
+	}
 }

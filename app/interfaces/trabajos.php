@@ -279,6 +279,10 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 
 	$where .= " AND trabajo.id_tramite = 0 ";
 
+	if ($id_encargado_asunto) {
+		$where .= " AND asunto.id_encargado = '$id_encargado_asunto' ";
+	}
+
 	if ($id_encargado_comercial) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
 	}
@@ -495,7 +499,11 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	}
 
 	if ($p_revisor || $p_cobranza || strlen($select_usuario) > 164) {
-		$b->AgregarEncabezado("usr_nombre", __('Usuario'), "align=left");
+		$field_username = 'usr_nombre';
+		if (Conf::GetConf($sesion, 'UsernameEnListaDeTrabajos') || Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
+			$field_username = 'username';
+		}
+		$b->AgregarEncabezado($field_username, __('Usuario'), 'align="left"');
 	}
 
 	$b->AgregarFuncion("Opc.", 'Opciones', "align=center nowrap");
@@ -618,6 +626,15 @@ $pagina->PrintTop($popup);
 							}
 							UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio, $glosa_asunto, false);
 						?>
+					</td>
+				</tr>
+
+				<tr>
+					<td class="buscadorlabel">
+						<?php echo __('Responsable Asunto'); ?>
+					</td>
+					<td align="left" colspan="2">
+						<?php echo $Form->select('id_encargado_asunto', $sesion->usuario->ListarActivos('', true), $id_encargado_asunto, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 					</td>
 				</tr>
 

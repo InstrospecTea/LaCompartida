@@ -10564,7 +10564,7 @@ QUERY;
 							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion` `descripcion` MEDIUMTEXT NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion_modificado` `descripcion_modificado` MEDIUMTEXT NULL DEFAULT NULL ,
-							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL , 
+							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL ,
 							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
@@ -10577,7 +10577,25 @@ QUERY;
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
 			}
 			break;
+
+		case 7.88:
+			if (!ExisteCampo('direccion', 'cuenta_banco', $dbh)) {
+				$queries[] = "ALTER TABLE cuenta_banco
+					ADD COLUMN direccion VARCHAR(255) DEFAULT NULL COMMENT 'Direccion de la sucursal',
+					ADD COLUMN telefono VARCHAR(60) DEFAULT NULL COMMENT 'Telefono primario',
+					ADD COLUMN telefono2 VARCHAR(60) DEFAULT NULL COMMENT 'Telefono secundario',
+					ADD COLUMN fax VARCHAR(60) DEFAULT NULL COMMENT 'Telefono FAX'";
+
+				$queries[] = "ALTER TABLE prm_banco ADD COLUMN url VARCHAR(255) DEFAULT NULL COMMENT 'Direccion Web'";
+			}
+			break;
+
+		case 7.89:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			break;
 	}
+
 	if (!empty($queries)) {
 		ejecutar($queries, $dbh);
 	}
@@ -10588,7 +10606,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.87;
+$max_update = 7.89;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
