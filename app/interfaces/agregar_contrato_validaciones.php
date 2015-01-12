@@ -119,11 +119,10 @@ SCRIPT;
 		)
 	);
 
-
-	$error_message = __('Debe ingresar la ciudad del cliente');
+	$error_message = __('Debe ingresar la comuna del cliente');
 	$contractValidation->registerValidation(
-		'factura_ciudad', array(
-			'value' => $factura_ciudad,
+		'factura_comuna', array(
+			'value' => $factura_comuna,
 			'server' => function($field) use ($Pagina, $error_message, $validacionesCliente) {
 					if ($validacionesCliente) {
 						if (empty($field)) {
@@ -147,28 +146,27 @@ SCRIPT;
 		)
 	);
 
-
-	$error_message = __('Debe ingresar la comuna del cliente');
+	$error_message = __('Debe ingresar la ciudad del cliente');
 	$contractValidation->registerValidation(
-		'factura_comuna', array(
-			'value' => $factura_comuna,
+		'factura_ciudad', array(
+			'value' => $factura_ciudad,
 			'server' => function($field) use ($Pagina, $error_message, $validacionesCliente) {
-					if ($validacionesCliente) {
-						if (empty($field)) {
-							$Pagina->AddError($error_message);
-						}
+				if ($validacionesCliente) {
+					if (empty($field)) {
+						$Pagina->AddError($error_message);
 					}
-				},
+				}
+			},
 			'client' => function($field_name) use ($error_message) {
 				$script = <<<SCRIPT
-					if (!form.$field_name.value){
-						alert("{$error_message}");
-						if (typeof MuestraPorValidacion != 'undefined') {
-							MuestraPorValidacion('datos_factura');
+						if (!form.$field_name.value){
+							alert("{$error_message}");
+							if (typeof MuestraPorValidacion != 'undefined') {
+								MuestraPorValidacion('datos_factura');
+							}
+							form.$field_name.focus();
+							return false;
 						}
-						form.$field_name.focus();
-						return false;
-					}
 SCRIPT;
 				return $script;
 			}
