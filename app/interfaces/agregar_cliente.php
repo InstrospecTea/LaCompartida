@@ -93,6 +93,9 @@ if ($opcion == "guardar") {
 		if (empty($glosa_cliente)) {
 			$Pagina->AddError(__("Por favor ingrese el nombre del cliente"));
 		}
+		if ($id_usuario_encargado == '-1') {
+			$Pagina->AddError(__("Por favor seleccione un usuario encargado"));
+		}
 		if (empty($codigo_cliente)) {
 			$Pagina->AddError(__("Por favor ingrese el codigo del cliente"));
 		}
@@ -706,6 +709,12 @@ $Pagina->PrintTop();
 				form.glosa_cliente.focus();
 				return false;
 			}
+		}
+
+		if (form.id_usuario_encargado.value == "-1") {
+			alert("<?php echo __('Debe seleccionar un usuario encargado') ?>");
+			form.id_usuario_encargado.focus();
+			return false;
 		}
 
 		form.factura_rut.value = form.factura_rut.value.trim();
