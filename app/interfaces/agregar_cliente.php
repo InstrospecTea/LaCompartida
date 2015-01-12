@@ -711,11 +711,13 @@ $Pagina->PrintTop();
 			}
 		}
 
-		if (form.id_usuario_encargado.value == "-1") {
-			alert("<?php echo __('Debe seleccionar un usuario encargado') ?>");
-			form.id_usuario_encargado.focus();
-			return false;
-		}
+		<?php if ($validacionesCliente) { ?>
+			if (form.id_usuario_encargado.value == "-1") {
+				alert("<?php echo __('Debe seleccionar un usuario encargado') ?>");
+				form.id_usuario_encargado.focus();
+				return false;
+			}
+		<?php } ?>
 
 		form.factura_rut.value = form.factura_rut.value.trim();
 		if (form.factura_rut.value) {
