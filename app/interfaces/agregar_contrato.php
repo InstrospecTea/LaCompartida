@@ -1377,6 +1377,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	function validarHito(fila, permitirVacio){
 		var num = fila.id.match(/\d+$/)[0];
 		var fecha = $F('hito_fecha_'+num);
+		var fecha_split = fecha.split('-');
+		var valid_day = (parseInt(fecha_split[0], 10) > 0 && parseInt(fecha_split[0], 10) <= 31);
+		var valid_month = (parseInt(fecha_split[1], 10) > 0 && parseInt(fecha_split[1], 10) <= 12);
+		var valid_year = parseInt(fecha_split[2], 10) >= 1969;
 		var desc = $F('hito_descripcion_'+num);
 		var monto = Number($F('hito_monto_estimado_'+num));
 
@@ -1385,6 +1389,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		}
 		if (permitirVacio && !fecha && !desc && !monto) {
 			return true;
+		}
+		if (!valid_day || !valid_month || !valid_year) {
+			alert('Ingrese una fecha válida para el hito');
+			$('hito_fecha_'+num).focus();
+			return false;
 		}
 		if(!desc){
 			alert('Ingrese una descripción válida para el hito');
