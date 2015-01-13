@@ -892,7 +892,11 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
 
                 $monto_honorarios = UtilesApp::CambiarMoneda(
-                                $this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
+                        $this->fields['monto'], 
+                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], 
+                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], 
+                        $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], 
+                        $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
                 );
 
                 $html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
