@@ -27,7 +27,7 @@ class ChargeScope implements IChargeScope{
 	 */
 	function hasFees(Criteria $criteria) {
 		$criteria->add_restriction(
-			CriteriaRestriction::and_all(array("( SELECT count(1) FROM  trabajo AS t1 WHERE t1.id_cobro = Charge.id_cobro AND t1.id_tramite = 0 ) > 0 "))
+			CriteriaRestriction::and_Aall(array("( SELECT count(1) FROM  trabajo AS t1 WHERE t1.id_cobro = Charge.id_cobro AND t1.id_tramite = 0 ) > 0 "))
 		);
 		return $criteria;
 	}
