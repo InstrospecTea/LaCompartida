@@ -364,6 +364,8 @@ $Pagina->PrintTop();
 
 ?>
 
+<script src="//static.thetimebilling.com/js/bootstrap.min.js" type="text/javascript"></script>
+
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo $_SERVER[PHP_SELF] ?>" >
 	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name='opcion_contrato' value="guardar_contrato" />
@@ -722,9 +724,9 @@ $Pagina->PrintTop();
 
 	legend {
 		vertical-align:top  !important;
-		margin-bottom:15px !important;;
+		margin-bottom:15px !important;
 		border-bottom:0 none !important;
-		width:auto !important
+		width:auto !important;
 	}
 
 	.input-append .add-on, .input-prepend .add-on {
@@ -936,23 +938,6 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 	function iframeLoad(url) {
 		window.document.getElementById('iframe_asuntos').src = url;
 	}
-
-	jQuery(document).ready(function() {
-
-		setTimeout(function() {
-			jQuery("#iframe_asuntos").attr('src', iframesrc);
-		}, 2000);
-	});
-
-	jQuery.ajax({
-		async: true,
-		cache: true,
-		type: "GET",
-		url: "//static.thetimebilling.com/js/bootstrap.min.js",
-		dataType: "script",
-		complete: function() {
-		}
-	});
 
 	jQuery(document).ready(function() {
 		<?php if (Conf::GetConf($Sesion, 'CodigoSecundario') && Conf::GetConf($Sesion, 'CodigoClienteSecundarioCorrelativo')) { ?>
