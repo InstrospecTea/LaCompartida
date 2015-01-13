@@ -652,7 +652,7 @@ $contractValidation->registerValidation(
 							$valid_amount = (count($hito_monto_estimado) <= 1 && empty($hito_descripcion[1]));
 
 							if ($valid_date || $valid_description || $valid_amount) {
-								$Pagina->AddError(__("Por favor ingrese datos validos para el hito"));
+								$Pagina->AddError(__("Debe ingresar a lo menos un hito cuando HITOS es la forma de cobro"));
 							}
 							break;
 						default:
