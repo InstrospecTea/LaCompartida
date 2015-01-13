@@ -2158,6 +2158,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										?>
 										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
 											<td align="center" nowrap>
+												<?php if ($disabled) { ?>
+													<input type="hidden" name="hito_disabled[<?php echo $i ?>]" value= "" />
+												<?php } ?>
 												<input type="text" name="hito_fecha[<?php echo $i ?>]" value='<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>' id="hito_fecha_<?php echo $i ?>" size="11" maxlength="10" <?php echo $disabled ?>/>
 													<?php if (!$disabled) { ?>
 														<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hito_<?php echo $i ?>" style="cursor:pointer" />

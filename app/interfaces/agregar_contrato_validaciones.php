@@ -593,7 +593,7 @@ $contractValidation->registerValidation(
 	'forma_cobro', array(
 		'value' => $forma_cobro,
 		'server' => function($field) use 
-			($Pagina, $error_message, $forma_cobro, $monto, $retainer_horas, $id_moneda_monto, $fecha_inicio_cap, $hito_fecha, $hito_descripcion, $hito_monto_estimado, $validacionesCliente) {
+			($Pagina, $error_message, $forma_cobro, $monto, $retainer_horas, $id_moneda_monto, $fecha_inicio_cap, $hito_fecha, $hito_descripcion, $hito_monto_estimado, $validacionesCliente, $hito_disabled) {
 			if ($validacionesCliente) {
 				if (empty($field)) {
 					$Pagina->AddError($error_message);
@@ -647,11 +647,11 @@ $contractValidation->registerValidation(
 							break;
 						case "TASA":
 						case "HITOS":
-							$valid_date = (count($hito_fecha) <= 1 && empty($hito_fecha[1]));
-							$valid_description = (count($hito_descripcion) <= 1 && empty($hito_descripcion[1]));
-							$valid_amount = (count($hito_monto_estimado) <= 1 && empty($hito_descripcion[1]));
+							$invalid_date = (count($hito_fecha) <= 1 && empty($hito_fecha[1]) && count($hito_disabled) == 0);
+							$invalid_description = (count($hito_descripcion) <= 1 && empty($hito_descripcion[1]) && count($hito_disabled) == 0);
+							$invalid_amount = (count($hito_monto_estimado) <= 1 && empty($hito_descripcion[1]) && count($hito_disabled) == 0);
 
-							if ($valid_date || $valid_description || $valid_amount) {
+							if ($invalid_date || $invalid_description || $invalid_amount) {
 								$Pagina->AddError(__("Debe ingresar a lo menos un hito cuando HITOS es la forma de cobro"));
 							}
 							break;
