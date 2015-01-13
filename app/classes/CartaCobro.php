@@ -1,3 +1,4 @@
+
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
@@ -11,9 +12,9 @@ class CartaCobro extends NotaCobro {
     var $twig;
     public $secciones = array(
         'CARTA' => array(
-            'FECHA' => 'Sección FECHA',
-            'ENVIO_DIRECCION' => 'Sección ENVIO_DIRECCION',
-            'DETALLE' => 'Sección DETALLE',
+            'FECHA' => 'Seccion contiene fechas relacionadas con el cobro',
+            'ENVIO_DIRECCION' => 'Sección contiene datos de facturacion del cliente',
+            'DETALLE' => 'Sección contiene tags con montos, fechas relacionadas con el cobro*',
             'ADJ' => 'Sección ADJ',
             'PIE' => 'Sección PIE',
             'DATOS_CLIENTE' => 'Sección DATOS_CLIENTE',
@@ -27,6 +28,7 @@ class CartaCobro extends NotaCobro {
     );
     public $diccionario = array(
         'CARTA' => array(
+            '' => '',
             '%cuenta_banco%' => 'Cuenta bancaria',
             '%logo_carta%' => 'Imagen logo',
             '%direccion%' => 'Dirección',
@@ -38,94 +40,118 @@ class CartaCobro extends NotaCobro {
             '%xnro_factura%' => 'N° del cobro',
             '%glosa_cliente%' => 'Razón social Factura',
             '%xdireccion%' => 'Dirección Factura',
-            '%xrut%' => 'RUT contrato'
+            '%xrut%' => 'RUT contrato',
+            '%page_break%' => 'Agrega un salto de pagina'
         ),
         'FECHA' => array(
+            '' => '',
             '%fecha_especial%' => 'Ciudad (país), día de mes de año',
             '%fecha_especial2%' => 'Santiago, dia de Mes de año',
             '%fecha_espanol%' => 'dia De Mes De año',
             '%fecha_espanol_del%' => 'dia De Mes Del año',
+            '%fecha_slash%' => 'Ciudad, month dayth, year',
             '%fecha%' => 'mes dia, año',
             '%fecha_con_de%' => 'mes dia de año',
             '%fecha_ingles%' => 'month day, year',
             '%fecha_ingles_ordinal%' => 'month dayth, year',
+            '%ciudad_fecha_ingles%' => 'Ciudad month dayth, year',
             '%ANO%' => 'año fecha fin',
             '%numero_cobro%' => 'número cobro',
             '%inciales_encargado%' => 'iniciales encargado comercial',
-            '%encargado_comercial%' => 'nombre completo enargado comercial'
+            '%encargado_comercial%' => 'nombre completo enargado comercial',
+            '%xrut%' => 'obtiene rut definido en el contrato',
+            '%ciudad_estudio%' => 'Definido en Conf PaisEstudio'
         ),
         'ENVIO_DIRECCION' => array(
-            '%Asunto%' => 'Asunto',
-            '%CodigoAsunto%' => 'CodigoAsunto',
-            '%NombreContacto%' => 'NombreContacto',
-            '%NombreContacto_mayuscula%' => 'NombreContacto_mayuscula',
-            '%NumeroCliente%' => 'NumeroCliente',
-            '%SR%' => 'SR',
-            '%asunto_mb%' => 'asunto_mb',
-            '%asunto_salto_linea%' => 'asunto_salto_linea',
-            '%factura_desc_mta%' => 'factura_desc_mta',
-            '%fecha_con_de%' => 'fecha_con_de',
-            '%fecha_especial%' => 'fecha_especial',
-            '%fecha_especial_minusculas%' => 'fecha_especial_minusculas',
-            '%glosa_cliente%' => 'glosa_cliente',
-            '%glosa_cliente_mayuscula%' => 'glosa_cliente_mayuscula',
-            '%nombre_cliente%' => 'nombre_cliente',
-            '%nombre_contacto_mb%' => 'nombre_contacto_mb',
-            '%nombre_pais%' => 'nombre_pais',
-            '%nombre_pais_mayuscula%' => 'nombre_pais_mayuscula',
-            '%num_factura%' => 'num_factura',
-            '%num_letter%' => 'num_letter',
-            '%num_letter_baz%' => 'num_letter_baz',
-            '%num_letter_documento%' => 'num_letter_documento',
-            '%pais%' => 'pais',
-            '%presente%' => 'presente',
-            '%solicitante%' => 'solicitante',
-            '%sr%' => 'sr',
-            '%titulo_contacto%' => 'titulo_contacto',
-            '%valor_direccion%' => 'valor_direccion',
-            '%valor_direccion_uc%' => 'valor_direccion_uc'
+            '' => '',
+            '%SR%' => 'Por defecto (SR.) o el titulo_contacto definido en el contrato',
+            '%glosa_codigo_postal%' => 'Texto segun lenguaje (Código Postal/Postal Code)',
+            '%codigo_postal%' => 'campo factura_codigopostal definido en el contrato',
+            '%titulo_contacto%' => 'El titulo_contacto definido en el contrato',
+            '%NombreContacto%' => 'Nombre y Apellido del contrato ',
+            '%NombreContacto_mayuscula%' => 'El nombre del contacto en mayuscula',
+            '%xrut%' => 'El rut definido en el contrato',
+            '%contrato_solo_nombre_contacto%' => 'El nombre del contacto',
+            '%contrato_solo_apellido_contacto%' => 'el apellido del contacto',
+            '%factura_razon_social_ucfirst%' => 'la factura_razon_social del contrato',
+            '%glosa_cliente%' => 'la factura_razon_social del contrato',
+            '%glosa_cliente_mayuscula%' => 'la factura_razon_social del contrato (Mayusculas)',
+            '%factura_giro%' => 'Giro factura_giro definido en el contrato',
+            '%valor_direccion%' => 'Direccion del contacto',
+            '%fecha_especial%' => '(Santiago) dia de mes de año, (Santiago (Chile)) month dayth, year',
+            '%fecha_especial_minusculas%' => '(santiago) dia de mes de año, (santiago (chile)) month dayth, year',
+            '%NumeroCliente%' => 'campo id_cliente',
+            '%Asunto%' => 'Glosas de los asuntos relacionados al cobro',
+            '%asunto_salto_linea%' => 'Glosa de los asuntos relacionados con saldo de linea',
+            '%CodigoAsunto%' => 'Codigos de asuntos relacionados',
+            '%pais%' => 'Chile',
+            '%num_letter%' => 'campo id_cobro',
+            '%num_letter_documento%' => 'campo documento',
+            '%presente%' => 'Texto segun lenguaje (Presente/)',
+            '%nombre_pais%' => 'Nombre del pais definido en el contrato',
+            '%nombre_pais_mayuscula%' => 'Nombre del pais definido en el contrato mayuscula',
+            '%fecha_con_de%' => 'Correspondiente al mes de (fecha_fin)',
+            '%factura_desc_mta%' => 'cuenta de cobro o factura',
+            '%doc_tributario%' => 'Documentos tributarios relacionados',
+            '%num_factura%' => 'campo documento de la tabla cobro',
+            '%ciudad_cliente%' => 'campo factura_ciudad del contrato',
+            '%comuna_cliente%' => 'campo factura_comuna del contrato',
+            '%comuna_ciudad_cliente%' => 'Muestra comuna, ciudad si estas estan definidas',
+            '%codigo_postal_cliente%' => 'campo factura_codigopostal del contrato',
+            '%cliente_fax%' => 'campo fono_contacto del contrato',
+            '%cliente_correo%' => 'campo email_contacto del contrato',
+            '%factura_giro%' => 'campo factura_giro',
+            '%asuntos_relacionados%' => 'Imprime segmento de parrafo con los asuntos relaionados'
         ),
         'DETALLE' => array(
+            '' => '',
             '%ApellidoContacto%' => 'Apellido del contacto',
             '%Asunto%' => 'Lista de asuntos',
             '%Asunto_ucwords%' => 'Lista de asuntos con primeros letras en mayuscula',
-            '%FILAS_ASUNTOS_RESUMEN%' => 'FILAS_ASUNTOS_RESUMEN',
-            '%FILAS_FACTURAS_DEL_COBRO%' => 'FILAS_FACTURAS_DEL_COBRO',
-            '%FILA_FACTURAS_PENDIENTES%' => 'FILA_FACTURAS_PENDIENTESS',
+            '%asuntos_relacionados%' => 'Lista asuntos en relacion a los trabajos del cobro',
             '%NombrePilaContacto%' => 'Nombre del contacto',
             '%SoloNombreContacto%' => 'SoloNombreContacto',
-            '%boleta_gastos%' => 'boleta_gastos',
-            '%boleta_honorarios%' => 'boleta_honorarios',
+            '%boleta_gastos%' => 'boleta_gastos (utilizado por mb define CH antes del simbolo de la moneda)',
+            '%boleta_honorarios%' => 'boleta_honorarios (utilizado por mb en su formato antiguo de chile con boleta)',
             '%categoria_encargado_comercial%' => 'categoria_encargado_comercial',
             '%categoria_encargado_comercial_mayusculas%' => 'categoria_encargado_comercial_mayusculas',
-            '%codigo_cci%' => 'codigo_cci',
-            '%codigo_cci2%' => 'codigo_cci2',
-            '%codigo_swift%' => 'codigo_swift',
-            '%codigo_swift2%' => 'codigo_swift2',
-            '%codigopropuesta%' => 'codigopropuesta',
+            '%codigo_cci%' => 'codigo_cci definido en el contrato',
+            '%codigo_cci2%' => 'codigo_cci2 definido en el contrato en relacion a la cuenta secundaria',
+            '%codigo_swift%' => 'codigo_swift definido en el contrato',
+            '%codigo_swift2%' => 'codigo_swift2 definido en el contrato en relacion a la cuenta secundaria',
+            '%codigo_clabe%' => 'codigo_clabe segun la cuenta bancaria definida en el contrato',
+            '%codigo_aba%' => 'codigo_aba segun la cuenta bancaria definida en el contrato',
+            '%CodigoAsuntoGlosaAsunto%' => 'CodigoAsuntoGlosaAsunto en base a los asuntos relacionados con el cobro',
+            '%codigopropuesta%' => 'codigopropuesta (no existe campo)',
             '%concepto_gastos_cuando_hay%' => 'concepto_gastos_cuando_hay',
             '%concepto_honorarios_cuando_hay%' => 'concepto_honorarios_cuando_hay',
-            '%cta_cte_gbp_segun_moneda%' => 'Numero de cuenta que va a cambiar segun moneda (si es dolar una cuenta, en caso contrario otra, para gbplegal',
-            '%cuenta_banco%' => 'cuenta_banco',
+            '%cta_cte_gbp_segun_moneda%' => 'Numero de cuenta que va a cambiar segun moneda (si es dolar una cuenta  en caso contrario otra  para gbplegal',
+            '%datos_bancarios%' => 'datos bancarios segun inteligencia en una columna)',
+            '%cuenta_banco%' => 'cuenta_banco segun la id_cuenta definida en el contrato',
             '%cuenta_mb%' => 'cuenta_mb',
             '%cuenta_mb_boleta%' => 'cuenta_mb_boleta',
             '%cuenta_mb_ny%' => 'direccion de cuenta de MB en Nueva York',
+            '%mb_detalle_chile_boleta%' => 'Segmento especial generado por archivo lang es.php considera GASTOS HONORARIOS y MIXTOS',
             '%despedida_mb%' => 'Frase de despedida_mb',
             '%detalle_careyallende%' => 'Letra de detalle completo del estudio Carey Allende',
             '%detalle_cuenta_gastos%' => 'detalle_cuenta_gastos',
             '%detalle_cuenta_gastos2%' => 'detalle_cuenta_gastos2',
-            '%detalle_cuenta_honorarios%' => 'detalle_cuenta_honorarios',
+            '%detalle_cuenta_honorarios%' => 'detalle_cuenta_honorarios Segmento construido segun condiciones del cobro',
             '%detalle_cuenta_honorarios_primer_dia_mes%' => 'detalle_cuenta_honorarios_primer_dia_mes',
-            '%detalle_ebmo%' => 'Letra de detalle completo del estudio ebmo',
+            '%detalle_cuenta_gastos_cl_boleta%' => 'detalle_cuenta_gastos_cl_boleta (utilizado por mb formato 2014',
+            '%detalle_ebmo%' => 'Letra de detalle completo del estudio ebmo (manejo de honorarios y gastos',
             '%detalle_mb%' => 'Frase especial Morales y Bezas',
             '%detalle_mb_boleta%' => 'Frase descripcion detalle MB',
             '%detalle_mb_ny%' => 'Frase especial MB New York',
             '%duracion_trabajos%' => 'total duracion cobrable de las horas inluido en el cobro',
+            '%documentos_relacionados%' => 'Obtiene documentos (Facturas) relacionadas con el cobro"',
+            '%doc_tributario%' => 'Obtiene documentos (Facturas) relacionadas con el cobro"',
             '%encargado_comercial%' => 'encargado_comercial',
-            '%encargado_comercial_uc%' => 'encargado_comercial_uc',
+            '%encargado_comercial_uc%' => 'encargado_comercial_ucwords',
             '%equivalente_a_baz%' => 'extensión frase de carte en el caso de que se hace una transfería',
-            '%equivalente_dolm%' => 'que ascienden a %monto%',
+            '%equivalente_dolm%' => 'agrega segmento (que ascienden a %monto%) solo si existe diferencia entre id_moneda & opc_moneda_total',
             '%estimado%' => 'Estimada/Estimado',
+            '%factura_razon_social_ucfirst%' => 'Campo factura_razon_social del contrato',
             '%fecha%' => 'Frase que indica el periodo de la fecha',
             '%fecha_al%' => 'En frase del periodo reemplazar la palabra "hasta" con la palabra "al"',
             '%fecha_al_minuscula%' => 'fecha_al_minuscula',
@@ -138,135 +164,168 @@ class CartaCobro extends NotaCobro {
             '%fecha_diff_prestada_durante_mayuscula%' => 'fecha_diff_prestada_durante_mayuscula',
             '%fecha_diff_prestada_durante_minusculas%' => 'fecha_diff_prestada_durante_minusculas',
             '%fecha_emision%' => 'Fecha de emisión del cobro',
-            '%fecha_especial%' => 'fecha_especial',
-            '%fecha_especial_mta%' => 'fecha_especial_mta',
-            '%fecha_especial_mta_en%' => 'fecha_especial_mta_en',
-            '%fecha_facturacion%' => 'fecha_facturacion',
+            '%fecha_especial%' => 'fecha_especial Conf CiudadEstudio + Conf PaisEstudio + DD de MM de YYYY',
+            '%fecha_especial_mta%' => 'fecha_especial_mta = Bogotá  D.C.  + DD de MM de YYYY ',
+            '%fecha_especial_mta_en%' => 'fecha_especial_mta_en = Bogotá MM DD  YYYY',
+            '%fecha_inicial_periodo_exacto%' => 'Considera fecha del primer gasto cuando no hay honorarios  de no ser asi utiliza campo fecha_ini del cobro',
+            '%fecha_fin_periodo_exacto%' => 'Considera fecha del ultimo gasto cuando no hay honorarios  de no ser asi utiliza el campo fecha_fin del cobro',
+            '%fecha_facturacion%' => 'Obtiene (DD de MM de YYYY) segun el campo fecha_facturacion del cobro',
+            '%fecha_facturacion_mes%' => 'Obtiene (MM) segun el campo fecha_facturacion del cobro',
             '%fecha_hasta%' => 'fecha corte del cobro en Formato DIA de MES ( sin año )',
-            '%fecha_mes%' => 'fecha_mes',
-            '%fecha_mta%' => 'fecha_mta',
-            '%fecha_mta_agno%' => 'fecha_mta_agno',
-            '%fecha_mta_dia%' => 'fecha_mta_dia',
-            '%fecha_mta_mes%' => 'fecha_mta_mes',
-            '%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas',
+            '%fecha_hasta_dmy%' => 'fecha corte del cobro en formato DIA MES AÑO',
+            '%fecha_mes%' => 'Agrega (realizados el mes de MM). Según campo fecha_fin de la tabla cobro',
+            '%fecha_mta%' => 'Obtiene la fecha del campo fecha_facturacion si esta no existe considera la fecha de emisión del cobro',
+            '%fecha_mta_agno%' => 'Obtiene el año desde el tag %fecha_mta%',
+            '%fecha_mta_dia%' => 'Obtiene el día desde el tag %fecha_mta%',
+            '%fecha_mta_mes%' => 'Obtiene el mes desde el tag %fecha_mta%',
+            '%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas (desde el dia DD-MM-YYY hasta el mes de MES de YYYY',
             '%fecha_primer_trabajo%' => 'Fecha del primer trabajo del cobro',
-            '%fecha_primer_trabajo_de%' => 'fecha_primer_trabajo_de',
-            '%fecha_primer_trabajo_durante%' => 'fecha_primer_trabajo_durante',
+            '%fecha_primer_trabajo_de%' => 'Agrega segmento (durante el mes mes de MM de YYYY)',
+            '%fecha_primer_trabajo_durante%' => 'Agrega segmento (prestados durante el mes de MM de YYYY',
             '%frase_gastos_egreso%' => 'Frase especial para baz',
             '%frase_gastos_ingreso%' => 'Frase especial para baz',
-            '%frase_moneda%' => 'frase_moneda',
-            '%glosa_banco_contrato%' => 'glosa_banco_contrato',
-            '%glosa_banco_contrato2%' => 'glosa_banco_contrato2',
+            '%frase_moneda%' => 'frase_moneda glosa_moneda_plural de opc_moneda_total "',
+            '%glosa_banco_contrato%' => 'glosa_banco_contrato definido en contrato relacionado con la cuenta definida en el contrato',
+            '%glosa_banco_contrato2%' => 'glosa_banco_contrato2 definido en contrato relacionado con la cuenta secundaria definida en el contrato',
             '%glosa_cliente%' => 'campo "factura_razon_social" de la tabla contrato',
+            '%nombre_del_cliente%' => 'campo "glosa_cliente" de la tabla Cliente',
             '%glosa_cliente_mayuscula%' => 'glosa_cliente_mayuscula',
-            '%glosa_contrato%' => 'glosa_contrato',
+            '%glosa_contrato%' => 'obtiene campo glosa_contrato tabla contrato',
             '%glosa_cuenta_contrato%' => 'glosa_cuenta_contrato',
             '%glosa_cuenta_contrato2%' => 'glosa_cuenta_contrato2',
-            '%lista_asuntos%' => 'lista_asuntos',
+            '%glosa_moneda%' => 'glosa moneda relacionada con la cuenta corriente definida en el contrato',
+            '%lista_asuntos%' => 'listado de asuntos en base a la relacion tabla cobro_asunto',
             '%lista_asuntos_guion%' => 'lista_asuntos_guion',
-            '%logo_carta%' => 'logo_carta',
-            '%monto%' => 'Monto total del cobro',
-            '%monto_con_gasto%' => 'Monto total',
+            '%logo_carta%' => 'Obtiene logo carta Conf->Server() + Conf->ImgDir() (deprecado)',
+            '%simbolo_moneda_cobro%' => 'Simbolo de moneda segun la id_moneda del cobro"',
+            '%monto%' => 'Monto total del cobro (segun opc_moneda_total)',
+            '%monto_con_gasto%' => 'Monto sin gastos segun var $monto_moneda_con_gasto (Flat Fee considera monto_contrato definido en el cobro) (malo)',
             '%monto_en_palabras%' => 'monto_en_palabras',
             '%monto_en_palabras_en%' => 'monto_en_palabras_en',
-            '%monto_en_pesos%' => 'monto total del cobro en moneda base',
-            '%monto_gasto%' => 'total de los gastos',
+            '%monto_en_pesos%' => 'monto total del cobro (equivalentes a la fecha $ + monto)',
+            '%monto_gasto%' => 'total de los gastos definido por campo monto_gastos del cobro',
             '%monto_gasto_separado%' => 'Frase que indica valor de gastos',
             '%monto_gasto_separado_baz%' => 'monto_gasto_separado_baz',
             '%monto_gastos_con_iva%' => 'monto_gastos_con_iva',
             '%monto_gastos_cuando_hay%' => 'monto_gastos_cuando_hay',
             '%monto_gastos_sin_iva%' => 'monto_gastos_sin_iva',
             '%monto_honorarios_cuando_hay%' => 'monto_honorarios_cuando_hay',
-            '%monto_iva%' => 'monto_iva',
-            '%monto_original%' => 'Monto honorarios en la moneda del tarifa',
-            '%monto_sin_gasto%' => 'Monto sin gastos',
-            '%monto_solo_gastos%' => 'Monto solo gastos',
-            '%monto_total_demo%' => 'Monto total',
-            '%monto_total_demo_jdf%' => 'monto_total_demo_jdf',
-            '%monto_total_demo_uf%' => 'monto_total_demo_uf',
-            '%monto_total_sin_iva%' => 'Monto subtotal',
-            '%n_num_factura%' => 'n_num_factura',
+            '%monto_honorarios_moneda_cobro%' => 'moneda->fields[simbolo] + this->fields[monto]"',
+            '%mb_monto_honorarios_moneda_cobro%' => 'Equivalentes a moneda->fields[simbolo] + this->fields[monto]"',
+            '%monto_iva%' => 'Definido por la operacion la diferencia entre monto_total_cobro- monto_cobro_original',
+            '%monto_original%' => 'moneda->fields[simbolo] + this->fields[monto] (hace referencia a la moneda del cobro)"',
+            '%monto_honorarios%' => 'Monto honorarios en la moneda del tarifa',
+            '%monto_impuesto%' => 'monto equivalente a impuestos considerando espacio y simbolo de moneda',
+            '%monto_solo_gastos%' => 'Monto solo gastos definido en la variable $gasto_en_pesos (variable no definida)',
+            '%monto_subtotal%' => 'Monto definido por x_resultados[monto_subtotal_completo][this->fields[opc_moneda_total]]"',
+            '%monto_total_demo%' => 'Monto total segun x_resultados[monto_total_cobro][this->fields[opc_moneda_total]]"',
+            '%monto_total_espacio%' => 'Monto total demo con espacio entre simbolo y monto',
+            '%monto_total_glosa_moneda%' => 'Monto total demo con glosa de la moneda en vez de simbolo',
+            '%monto_total_demo_jdf%' => 'Obtiene un monto total segun x_resultados[monto_total_cobro][this->fields[opc_moneda_total]]"',
+            '%monto_total_demo_uf%' => 'monto_total_demo_uf (monto moneda demo sin simbolo) (no funciona) variable no definida',
+            '%monto_total_sin_iva%' => 'Monto subtotal honorarios y gastos sin iva segun la moneda original del cobro',
+            '%n_num_factura%' => 'n_num_factura (N° + campo documento tabla cobro)',
             '%num_factura%' => 'campo "documento" de la tabla "cobro"',
             '%num_letter%' => 'num_letter',
             '%num_letter_baz%' => 'num_letter_baz',
             '%num_letter_documento%' => 'num_letter_documento',
-            '%num_letter_rebaza%' => 'num_letter_rebaza',
+            '%num_letter_rebaza%' => 'Generado por (la factura N° + this->fields[documento])"',
             '%num_letter_rebaza_especial%' => 'num_letter_rebaza_especial',
-            '%numero_cuenta_contrato%' => 'numero_cuenta_contrato',
-            '%numero_cuenta_contrato2%' => 'numero_cuenta_contrato2',
+            '%numero_cuenta_contrato%' => 'numero_cuenta_contrato segun lo definido en el contrato',
+            '%numero_cuenta_contrato2%' => 'numero_cuenta_contrato2 segun lo definido en el contrato referente a la segunda cuenta bancaria',
+            '%NombreContacto%' => 'Obtiene Nombre del contrato + apellido contacto',
+            '%NombreContacto_mayuscula%' => 'Obtiene Nombre del contrato + apellido contacto en mayuscula',
             '%porcentaje_impuesto%' => 'Numero de Porcentaje (incluye simbolo %)',
             '%porcentaje_impuesto_sin_simbolo%' => 'porcentaje_impuesto_sin_simbolo',
-            '%porcentaje_iva_con_simbolo%' => 'porcentaje_iva_con_simbolo',
-            '%rut_cliente%' => 'rut_cliente',
-            '%saldo_gastos_balance%' => 'saldo_gastos_balance',
-            '%saludo_mb%' => 'Dear %sr% %ApellidoContacto%: / De mi consideración:',
-            '%si_gastos%' => 'si_gastos',
+            '%porcentaje_iva_con_simbolo%' => 'porcentaje_iva_con_simbolo definido por campo porcentaje_impuesto del cobro',
+            '%rut_cliente%' => 'rut_cliente obtenido desde el contrato',
+            '%saldo_egreso_moneda_total%' => 'obtiene la suma del campo monto_cobrable de la tabla gastos cuando el campo egreso > 0',
+            '%saldo_ingreso_moneda_total%' => 'obtiene la suma del campo monto_cobrable de la tabla gastos cuando el campo ingreso > 0',
+            '%saldo_gastos_balance%' => 'saldo_balance_gastos_moneda_total',
+            '%subtotal_gastos_solo_provision%' => 'x_cobro_gastos[subtotal_gastos_solo_provision]"',
+            '%subtotal_gastos_sin_provision%' => 'x_cobro_gastos[subtotal_gastos_sin_provision]"',
+            '%subtotal_gastos_diff_con_sin_provision%' => 'x_cobro_gastos[gasto_total]"',
+            '%saldo_gastos_balance%' => 'Balance de gastos en relacion a ingresos y egresos del cobro',
+            '%saldo_gasto_facturado%' => 'Saldo gasto facturado segun ArrayTotalesDelContrato()',
+            '%saldo_gasto_facturado_moneda_base%' => 'Saldo gastos en moneda base facturado segun ArrayTotalesDelContrato()',
+            '%solo_num_factura%' => 'Obtiene solo los valores numericos del campo documento tabla cobro',
+            '%saludo_mb%' => 'De mi consideración:',
+            '%si_gastos%' => 'agrega segmento de texto (y gastos) solo cuando el monto gastos es > 0',
             '%simbolo_opc_moneda_totall%' => 'simbolo_opc_moneda_totall',
-            '%sr%' => 'Titulo del contacto definido en el contrato, por defecto "Señor"',
+            '%sr%' => 'Titulo del contacto definido en el contrato  por defecto "Señor"',
             '%subtotal_gastos_diff_con_sin_provision%' => 'balance cuenta de gastos',
             '%subtotal_gastos_sin_provision%' => 'monto gastos sin las provisiones',
             '%subtotal_gastos_solo_provision%' => 'monto gastos solo contando las provisiones',
-            '%tipo_cuenta%' => 'tipo_cuenta',
-            '%tipo_gbp_segun_moneda%' => 'Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (si es dolar Extranjera, en caso contrario Nacional para gbplegal',
+            '%tipo_cuenta%' => 'tipo_cuenta considera Cuenta Corriente o Cuenta de ahorro segun lo definido en el contrato',
+            '%tipo_gbp_segun_moneda%' => 'Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (gbplegal)'
         ),
         'ADJ' => array(
-            '%cliente_fax%' => 'cliente_fax',
-            '%firma_careyallende%' => 'firma_careyallende',
+            '' => '',
+            '%cliente_correo%' => 'Obtiene campo email_contacto tabla cobro',
+            '%cliente_fax%' => 'Obtiene campo fono_contacto tabla contrato',
+            '%firma_careyallende%' => 'firma_careyallende elemento generado por lang',
             '%iniciales_encargado_comercial%' => 'iniciales_encargado_comercial',
-            '%nombre_encargado_comercial%' => 'nombre_encargado_comercial',
-            '%nro_factura%' => 'nro_factura',
-            '%num_letter%' => 'num_letter',
-            '%num_letter_baz%' => 'num_letter_baz',
-            '%num_letter_documento%' => 'num_letter_documento',
+            '%nombre_encargado_comercial%' => 'Obtiene nombre del encargado comercial',
+            '%num_letter%' => 'Obtiene campo id_cobro tabla cobro',
+            '%num_letter_baz%' => 'Obtiene campo documento tabla cobro',
+            '%num_letter_documento%' => 'Obtiene campo documento tabla cobro',
+            '%nro_factura%' => 'Obtiene campo documento tabla cobro'
         ),
         'PIE' => array(
-            '%direccion%' => 'direccion',
-            '%logo_carta%' => 'logo_carta',
-            '%num_letter%' => 'num_letter',
-            '%num_letter_documento%' => 'num_letter_documento',
+            '' => '',
+            '%direccion%' => 'Generado por (Conf PdfLinea2 + Conf PdfLinea3 + Conf SitioWeb + Conf::Email)',
+            '%logo_carta%' => 'Obtiene logo carta desde el Conf::Server(). Conf::ImgDir() (no utilizar deprecado)',
+            '%num_letter%' => 'Obtiene campo id_cobro desde tabla cobro',
+            '%num_letter_documento%' => 'Obtiene campo documento desde tabla cobro'
         ),
         'DATOS_CLIENTE' => array(
-            '%ApellidoContacto%' => 'ApellidoContacto',
-            '%NombrePilaContacto%' => 'NombrePilaContacto',
-            '%SR%' => 'SR',
+            '' => '',
+            '%ApellidoContacto%' => 'Obtiene campo apellido_contacto desde tabla contrato',
+            '%NombrePilaContacto%' => 'obtiene campo contacto desde tabla contrato',
             '%encargado_comercial_mayusculas%' => 'encargado_comercial_mayusculas',
-            '%estimado%' => 'estimado',
-            '%glosa_cliente%' => 'glosa_cliente',
-            '%sr%' => 'sr',
+            '%estimado%' => 'estimado(a)',
+            '%glosa_cliente%' => 'Obtiene campo factura_razon_social desde tabla contrato',
+            '%sr%' => 'Señor',
+            '%SR%' => 'Obtiene campo titulo_contacto desde contrato'
         ),
         'FILAS_FACTURAS_DEL_COBRO' => array(
+            '' => '',
             '%factura_impuesto%' => 'factura_impuesto',
             '%factura_moneda%' => 'factura_moneda',
             '%factura_numero%' => 'factura_numero',
             '%factura_periodo%' => 'factura_periodo',
             '%factura_total%' => 'factura_total',
-            '%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto',
+            '%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto'
         ),
         'FILAS_FACTURAS_DEL_COBRO' => array(
+            '' => '',
             '%factura_pendiente%' => 'factura_pendiente',
         ),
         'FILAS_ASUNTOS_RESUMEN' => array(
-            '%fecha_mta%' => 'fecha_mta',
-            '%gastos_asunto%' => 'gastos_asunto',
-            '%gastos_asunto_mi%' => 'gastos_asunto_mi',
+            '' => '',
+            '%fecha_mta%' => 'fecha de facturacion',
+            '%gastos_asunto%' => 'monto de gastos segun la id_moneda',
+            '%gastos_asunto_mi%' => 'monto gastos del asunto opc_ver_moneda',
             '%glosa_asunto%' => 'glosa_asunto',
-            '%honorarios_asunto%' => 'honorarios_asunto',
-            '%honorarios_asunto_mi%' => 'honorarios_asunto_mi',
+            '%honorarios_asunto%' => 'monto honorarios de asuntos segun id_moneda',
+            '%honorarios_asunto_mi%' => 'monto honorarios segun opc_ver_moneda',
             '%num_factura%' => 'num_factura',
             '%num_letter%' => 'num_letter',
-            '%simbolo%' => 'simbolo',
-            '%simbolo_mi%' => 'simbolo_mi',
+            '%simbolo%' => 'simbolo segun id_moneda',
+            '%simbolo_mi%' => 'simbolo segun opc_ver_moneda',
             '%total_asunto%' => 'total_asunto',
-            '%total_asunto_mi%' => 'total_asunto_mi',
+            '%total_asunto_mi%' => 'total del asunto segun opc_ver_moneda'
         ),
         'FILA_FACTURAS_PENDIENTES' => array(
+            '' => '',
             '%facturas_pendientes%' => 'facturas_pendientes'
         ),
         'SALTO_PAGINA' => array()
     );
 
-    function __construct($sesion, $fields, $ArrayFacturasDelContrato, $ArrayTotalesDelContrato) {
-		parent::__construct($sesion, $fields);
+    function __construct($sesion, $fields = array(), $ArrayFacturasDelContrato = array(), $ArrayTotalesDelContrato = array()) {
+        parent::__construct($sesion, $fields);
+
         $this->ArrayFacturasDelContrato = $ArrayFacturasDelContrato;
         $this->ArrayTotalesDelContrato = $ArrayTotalesDelContrato;
 
@@ -280,11 +339,11 @@ class CartaCobro extends NotaCobro {
         $Contrato = new Contrato($this->sesion);
         $Contrato->Load($this->fields['id_contrato']);
 
-				$this->template_data = array(
-					'Cobro' => $this->fields,
-					'Contrato' => $Contrato->fields,
-					'UsuarioActual' => $this->sesion->usuario->fields
-				);
+        $this->template_data = array(
+            'Cobro' => $this->fields,
+            'Contrato' => $Contrato->fields,
+            'UsuarioActual' => $this->sesion->usuario->fields
+        );
     }
 
     function NuevoRegistro() {
@@ -315,9 +374,10 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields;
-				$this->template_data['Moneda'] = $moneda->fields;
-				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'CARTA':
@@ -348,6 +408,7 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
                 $html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
                 $html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
+                $html2 = str_replace('%page_break%', '<br style=""page-break-before: always;/>', $html2);
 
                 $html2 = str_replace('%FECHA%', $this->GenerarDocumentoCartaComun($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
                 $html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCartaComun($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
@@ -831,11 +892,7 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
 
                 $monto_honorarios = UtilesApp::CambiarMoneda(
-                    $this->fields['monto'],
-                    $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
-                    $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],
-                    $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'],
-                    $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
+                                $this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
                 );
 
                 $html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($monto_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1149,9 +1206,10 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields;
-				$this->template_data['Moneda'] = $moneda->fields;
-				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         $_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -2148,9 +2206,9 @@ class CartaCobro extends NotaCobro {
             return;
         }
 
-				$this->template_data['Idioma'] = $idioma->fields;
-				$this->template_data['Moneda'] = $moneda->fields;
-				$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+        $html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
 
         switch ($theTag) {
             case 'FECHA': //GenerarDocumentoCartaComun
@@ -2666,12 +2724,26 @@ class CartaCobro extends NotaCobro {
     }
 
     function RenderTemplate($template) {
-      if (!$this->twig) {
-        $loader = new Twig_Loader_String();
-        $this->twig = new Twig_Environment($loader);
-        $this->twig->addExtension(new DateTwigExtension());
-      }
 
-      return $this->twig->render($template, $this->template_data);
+        if (!$this->twig) {
+            $loader = new Twig_Loader_String();
+            $this->twig = new Twig_Environment($loader);
+            $this->twig->addExtension(new DateTwigExtension());
+        }
+
+        return $this->twig->render($template, $this->template_data);
     }
+
+    function ReemplazarTemplateHTML($template, $id_cobro) {
+        if (empty($id_cobro)) {
+            $query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
+            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+            list($id_cobro) = mysql_fetch_array($resp);
+        }
+
+        $this->Load($id_cobro);
+        $parser = new TemplateParser($template);
+        return $this->GenerarEjemplo($parser);
+    }
+
 }
