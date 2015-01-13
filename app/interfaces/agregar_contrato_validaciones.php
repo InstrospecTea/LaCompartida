@@ -705,7 +705,8 @@ $contractValidation->registerValidation(
 			$script = <<<SCRIPT
 				if ($('fc7').checked) {
 					if ($$('[id^="fila_hito_"]').any(function(elem) {
-						return !validarHito(elem, true);
+						var total_hitos = $$('[id^="fila_hito_"]').length;
+						return !validarHito(elem, total_hitos > 1);
 					})) {
 						return false;
 					}
