@@ -694,19 +694,12 @@ $contractValidation->registerValidation(
 				}
 			}
 		},
-		'client' => function($field_name) use ($error_message) {
+		'client' => function($field_name) {
 			$script = <<<SCRIPT
 				if ($('fc7').checked) {
 					if ($$('[id^="fila_hito_"]').any(function(elem) {
 						return !validarHito(elem, true);
 					})) {
-						return false;
-					}
-					if (!$$('[id^="hito_monto_"]').any(function(elem) {
-						return Number(elem.value) > 0;
-					})) {
-						alert("{$error_message}");
-						$('hito_descripcion_1').focus();
 						return false;
 					}
 				}
