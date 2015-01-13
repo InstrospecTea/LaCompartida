@@ -101,7 +101,7 @@ if ($opcion == "guardar") {
 		}
 		if (Conf::GetConf($Sesion, 'ClienteReferencia') && empty($id_cliente_referencia)) {
 			$Pagina->AddError(__("Por favor ingrese la referencia"));
-		}	  
+		}
 	}
 
 	$contractValidation->validate();
@@ -333,11 +333,13 @@ if (Conf::GetConf($Sesion, 'ClienteReferencia')) {
 }
 
 // TIPS DEL FORMULARIO
- 
+
 $Pagina->titulo = __('Ingreso cliente');
 $Pagina->PrintTop();
 
 ?>
+
+<script src="//static.thetimebilling.com/js/bootstrap.min.js" type="text/javascript"></script>
 
 <form name='formulario' id="formulario-cliente" method="post" action="<?php echo $_SERVER[PHP_SELF] ?>" >
 	<input type="hidden" name="opcion" value="guardar" />
@@ -605,9 +607,9 @@ $Pagina->PrintTop();
 
 	legend {
 		vertical-align:top  !important;
-		margin-bottom:15px !important;;
+		margin-bottom:15px !important;
 		border-bottom:0 none !important;
-		width:auto !important
+		width:auto !important;
 	}
 
 	.input-append .add-on, .input-prepend .add-on {
@@ -742,7 +744,7 @@ $Pagina->PrintTop();
 	<?php } ?>
 
 	<?php echo $contractValidation->getClientValidationsScripts(); ?>
-    
+
 
 <?php } ?>
 
@@ -828,23 +830,6 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 	function iframeLoad(url) {
 		window.document.getElementById('iframe_asuntos').src = url;
 	}
-
-	jQuery(document).ready(function() {
-
-		setTimeout(function() {
-			jQuery("#iframe_asuntos").attr('src', iframesrc);
-		}, 2000);
-	});
-
-	jQuery.ajax({
-		async: true,
-		cache: true,
-		type: "GET",
-		url: "//static.thetimebilling.com/js/bootstrap.min.js",
-		dataType: "script",
-		complete: function() {
-		}
-	});
 
 	jQuery(document).ready(function() {
 		<?php if (Conf::GetConf($Sesion, 'CodigoSecundario') && Conf::GetConf($Sesion, 'CodigoClienteSecundarioCorrelativo')) { ?>

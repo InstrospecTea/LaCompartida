@@ -8,6 +8,10 @@ Martes 13 de Enero 2015.
 * **Fix:** [DTE Nubox (Notas de Crédito/Débito, referencias)](https://github.com/LemontechSA/ttb/pull/793)
 * **Fix:** [Feature/doc manager](https://github.com/LemontechSA/ttb/pull/732)
 
+## Hotfix: 14.22.6
+Martes 13 de Enero 2015
+* **Fix:** [Corregir desactivar contrato de cliente y asunto](https://github.com/LemontechSA/ttb/pull/817)
+
 ## Hotfix: 14.22.5
 Jueves 08 de Enero 2015
 * **Fix:** [Elimina lógica para seleccionar destinatarios y sus resumenes en alertas semanales](https://github.com/LemontechSA/ttb/pull/814)
