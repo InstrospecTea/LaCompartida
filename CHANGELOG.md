@@ -1,6 +1,6 @@
 # Changelog
 
-## Release: 13.5.0
+## Release: 15.0.0
 Martes 13 de Enero 2015.
 * **Fix:** [Validaciones Forma de cobro Hitos](https://github.com/LemontechSA/ttb/pull/813)
 * **Fix:** [Orden Listado (XLS) de Facturas](https://github.com/LemontechSA/ttb/pull/808)

@@ -2314,7 +2314,7 @@ class Factura extends Objeto {
 	 * @return string
 	 */
 	public function OrdenReporte($orden) {
-		if ( empty($orden) ) {
+		if (empty($orden)) {
 			$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
 			$default_order = Conf::GetConf($this->sesion, 'OrdenarFacturasPorDefecto');
 			$order_split = preg_split('(,|\s)', $default_order);
