@@ -86,34 +86,26 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$fila = $data[$x];
 			$por_socio = $this->parameters['group_by_partner'];
 			$id_socio = $por_socio ? $fila->fields['user_id_usuario'] : 0;
+			$lawyer_name = "{$fila->fields['lawyer_apellido1']}, {$fila->fields['lawyer_nombre']}";
 
 			if (empty($grupos[$id_socio])) {
 				$grupos[$id_socio] = array(
 					'nombre' => "{$fila->fields['user_apellido1']}, {$fila->fields['user_nombre']}",
-					'usuarios' => array()
-				);
-			}
-			$id_usuario = $fila->fields['lawyer_id_usuario'];
-			$lawyer_name = "{$fila->fields['lawyer_apellido1']}, {$fila->fields['lawyer_nombre']}";
-
-			if (empty($grupos[$id_socio]['usuarios'][$id_usuario])) {
-				$grupos[$id_socio]['usuarios'][$id_usuario] = array(
-					'nombre' => $lawyer_name,
 					'clientes' => array()
 				);
 			}
 
 			$codigo_cliente = $fila->fields['client_codigo_cliente'];
-			if (empty($grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente])) {
-				$grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente] = array(
+			if (empty($grupos[$id_socio]['clientes'][$codigo_cliente])) {
+				$grupos[$id_socio]['clientes'][$codigo_cliente] = array(
 					'nombre' => $fila->fields['client_glosa_cliente'],
 					'asuntos' => array()
 				);
 			}
 
 			$id_asunto = $fila->fields['matter_id_asunto'];
-			if (empty($grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto])) {
-				$grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto] = array(
+			if (empty($grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto])) {
+				$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto] = array(
 					'codigo_cliente' => $codigo_cliente,
 					'nombre' => $fila->fields['matter_glosa_asunto'],
 					'trabajos' => array()
@@ -128,7 +120,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$duration_parts = explode(":", $fila->fields['work_duracion_cobrada']);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
-			$grupos[$id_socio]['usuarios'][$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
+			$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
 	}
@@ -358,47 +350,41 @@ HTML;
 		$por_socio = $this->parameters['groupByPartner'];
 		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
 		foreach ($this->data as $socio) {
-			$html_usuarios = '';
-			foreach ($socio['usuarios'] as $usuario) {
-				$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
-				$html_clientes = '';
-				foreach ($usuario['clientes'] as $cliente) {
-					$nombre_cliente = $this->Html->tag('h2', $this->Html->tag('u', $cliente['nombre']));
-					$html_asuntos = '';
-					$total_minutos_cliente = 0;
-					$total_facturado_cliente = 0;
-					foreach ($cliente['asuntos'] as $asunto) {
-						$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
-						$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
-						$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
-						$total_minutos_cliente += $trabajos['minutos'];
-						$total_facturado_cliente += $trabajos['total_facturado'];
-					}
-					if ($with_invoiced) {
-						$trs = $this->Html->tag(
-							'tr',
-							$this->Html->tag('th', '', array('class' => 'col1')) .
-							$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-							$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
-							$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
-						);
-					} else {
-						$trs = $this->Html->tag(
-							'tr',
-							$this->Html->tag('th', '', array('class' => 'col1')) .
-							$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-							$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
-						);
-					}
-					$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
-					$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
+			$html_clientes = '';
+			foreach ($socio['clientes'] as $cliente) {
+				$nombre_cliente = $this->Html->tag('h2', $this->Html->tag('u', $cliente['nombre']));
+				$html_asuntos = '';
+				$total_minutos_cliente = 0;
+				$total_facturado_cliente = 0;
+				foreach ($cliente['asuntos'] as $asunto) {
+					$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
+					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
+					$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
+					$total_minutos_cliente += $trabajos['minutos'];
+					$total_facturado_cliente += $trabajos['total_facturado'];
 				}
-				$html_usuarios .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
+				if ($with_invoiced) {
+					$trs = $this->Html->tag(
+						'tr',
+						$this->Html->tag('th', '', array('class' => 'col1')) .
+						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
+						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+					);
+				} else {
+					$trs = $this->Html->tag(
+						'tr',
+						$this->Html->tag('th', '', array('class' => 'col1')) .
+						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
+					);
+				}
+				$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
+				$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
 			}
 			$nombre_socio = $por_socio ? __('Socio a cargo') . ': ' . $this->Html->tag('u', $socio['nombre']) : '';
-			$html .= $this->Html->tag('div', $this->Html->tag('h2', $nombre_socio) . $html_usuarios);
+			$html .= $this->Html->tag('div', $this->Html->tag('h2', $nombre_socio) . $html_clientes);
 		}
-
 		return $html;
 	}
 
