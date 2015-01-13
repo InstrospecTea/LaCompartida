@@ -2,13 +2,19 @@
 
 class AbstractBusiness implements BaseBusiness {
 
+	/**
+	 * @deprecated
+	 * @var sesion
+	 */
 	var $sesion;
+	var $Session;
 	var $errors = array();
 	var $infos = array();
 	private $loadedClass = array();
 
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
+		$this->Session = $sesion;
 	}
 
 	/**
@@ -96,6 +102,24 @@ class AbstractBusiness implements BaseBusiness {
 			return;
 		}
 		$this->{$alias} = new $classname($this->sesion);
+		$this->loadedClass[] = $alias;
+	}
+
+	/**
+	 * Carga un Reporte al vuelo
+	 * @param string $name
+	 * @param string $alias
+	 * @return type
+	 */
+	protected function loadReport($name, $alias = null) {
+		$classname = "{$name}Report";
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
 		$this->loadedClass[] = $alias;
 	}
 

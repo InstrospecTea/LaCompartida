@@ -101,7 +101,7 @@ class Html extends \Html {
 	 * @param type $script_block
 	 */
 	public function script_block($script_block, $attrs = null) {
-		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs));
+		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs)) . "\n";
 	}
 
 	/**
@@ -119,7 +119,7 @@ class Html extends \Html {
 			return $html;
 		}
 		$_attrs = array_merge(array('type' => 'text/javascript', 'src' => $this->path($file, 'js')), (array) $attrs);
-		return $this->tag('script', '', $_attrs);
+		return $this->tag('script', '', $_attrs) . "\n";
 	}
 
 	/**
@@ -129,8 +129,8 @@ class Html extends \Html {
 	 * @return string
 	 */
 	public function css($file, Array $attrs = array()) {
-		$_attrs = array_merge(array('type' => 'text/css', 'rel' => 'stylesheet', 'src' => $this->path($file, 'css')), $attrs);
-		return $this->tag('link', '', $_attrs, true);
+		$_attrs = array_merge(array('type' => 'text/css', 'rel' => 'stylesheet', 'href' => $this->path($file, 'css')), $attrs);
+		return $this->tag('link', '', $_attrs, true) . "\n";
 	}
 
 	/**

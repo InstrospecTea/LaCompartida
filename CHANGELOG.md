@@ -1,5 +1,13 @@
 # Changelog
 
+## Release: 15.0.0
+Martes 13 de Enero 2015.
+* **Fix:** [Validaciones Forma de cobro Hitos](https://github.com/LemontechSA/ttb/pull/813)
+* **Fix:** [Orden Listado (XLS) de Facturas](https://github.com/LemontechSA/ttb/pull/808)
+* **Fix:** [Reportes de Horas](https://github.com/LemontechSA/ttb/pull/804)
+* **Fix:** [DTE Nubox (Notas de Crédito/Débito, referencias)](https://github.com/LemontechSA/ttb/pull/793)
+* **Fix:** [Feature/doc manager](https://github.com/LemontechSA/ttb/pull/732)
+
 ## Hotfix: 14.22.6
 Martes 13 de Enero 2015
 * **Fix:** [Corregir desactivar contrato de cliente y asunto](https://github.com/LemontechSA/ttb/pull/817)
@@ -1529,11 +1537,11 @@ Martes 4 de Junio 2013
 
 ## Hotfix: 13.3.22
 Viernes 31 de Mayo 2013
-* **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias"](https://github.com/LemontechSA/ttb/pull/196)
+* **Fixed:** [Agrega nueva seccion resumen asuntos, recupera funcion queriesprevias](https://github.com/LemontechSA/ttb/pull/196)
 
 ## Hotfix: 13.3.21
 Viernes 28 de Mayo 2013
-* **Fixed:** [Corrige error de campo cliente en agregar_factura y agregar_pago_factura, agrega Ordenado por en resumen horas, corrige problema de decimal en ingresar_documento_pago"](https://github.com/LemontechSA/ttb/pull/189)
+* **Fixed:** [Corrige error de campo cliente en agregar_factura y agregar_pago_factura, agrega Ordenado por en resumen horas, corrige problema de decimal en ingresar_documento_pago](https://github.com/LemontechSA/ttb/pull/189)
 
 ## Hotfix: 13.3.20
 Viernes 17 de Mayo 2013

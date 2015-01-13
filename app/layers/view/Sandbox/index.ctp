@@ -12,3 +12,5 @@ $this->EntitiesListator->addColumn('# Cobro', 'id_cobro');
 $this->EntitiesListator->addColumn('Cliente', 'codigo_cliente');
 $this->EntitiesListator->addColumn('Estado', 'estado');
 echo $this->EntitiesListator->render();
+
+?>

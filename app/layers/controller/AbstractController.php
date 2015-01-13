@@ -22,6 +22,7 @@ abstract class AbstractController {
 
 	public function __construct() {
 		$this->Session = new \TTB\Sesion($this->permisions);
+		Configure::setSession($this->Session);
 		$this->messageManager = new MessageManager();
 	}
 
