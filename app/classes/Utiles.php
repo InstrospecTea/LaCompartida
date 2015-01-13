@@ -12,8 +12,6 @@ use \TipoCorreo as TipoCorreo;
 
 class Utiles extends \Utiles {
 
-
-
 	public function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
 		$mime_boundary = md5(time());
@@ -23,7 +21,7 @@ class Utiles extends \Utiles {
 		$headers .= 'Reply-To: ' . $fromname . '<' . $fromaddress . '>' . $eol;
 		$headers .= 'Return-Path: ' . $fromname . '<' . $fromaddress . '>' . $eol; // these two to set reply address
 		$headers .= "Message-ID: <" . $now . " TheSystem@" . $_SERVER['SERVER_NAME'] . ">" . $eol;
-		$headers .= "X-Mailer: PHP v" . phpversion() . $eol;	// These two to help avoid spam-filters
+		$headers .= "X-Mailer: PHP v" . phpversion() . $eol; // These two to help avoid spam-filters
 		# Boundry for marking the split & Multitype Headers
 		$headers .= 'MIME-Version: 1.0' . $eol;
 		$headers .= "Content-Type: multipart/related; boundary=\"" . $mime_boundary . "\"" . $eol;
@@ -166,5 +164,14 @@ class Utiles extends \Utiles {
 		return ucfirst(str_replace('_', ' ', strtolower($word)));
 	}
 
-}
+	/**
+	 * Devuelve un tamaño de bytes en lectura humana (b, kb, mb, gb, tb o pb)
+	 * @param type $size tamaño en bytes
+	 * @return string
+	 */
+	public static function _h($size) {
+		$unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+		return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+	}
 
+}
