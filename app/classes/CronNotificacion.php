@@ -84,11 +84,15 @@ class CronNotificacion extends Cron {
 	public function semanales($where_usuarios_vacaciones) {
 		$dato_semanal = array();
 
-		/* Mensajes */
+		$alerta_semanal_todos_abogadosa_administradores = Conf::GetConf($this->Sesion, 'AlertaSemanalTodosAbogadosaAdministradores');
+		$reporte_revisados_a_todos_los_abogados = Conf::GetConf($this->Sesion, 'ReporteRevisadosATodosLosAbogados');
+		$resumen_horas_semanales_a_abogados_individuales = Conf::GetConf($this->Sesion, 'ResumenHorasSemanalesAAbogadosIndividuales');
+		$MensajeAlertaProfessionalSemanal = Conf::GetConf($this->Sesion, 'MensajeAlertaProfessionalSemanal');
+
+		// Mensajes
 		$msg = array();
 		$warning = '<span style="color:#CC2233;">Alerta:</span>';
 
-		$MensajeAlertaProfessionalSemanal = Conf::GetConf($this->Sesion, 'MensajeAlertaProfessionalSemanal');
 		if (!empty($MensajeAlertaProfessionalSemanal)) {
 			$msg['horas_minimas_propio'] = $MensajeAlertaProfessionalSemanal;
 		} else {
@@ -100,16 +104,13 @@ class CronNotificacion extends Cron {
 		$msg['horas_maximas_revisado'] = $warning . ' supera su m&aacute;ximo de %MAXIMO horas.';
 
 		$ids_usuarios_profesionales = '';
-		$query = "SELECT usuario.id_usuario,
-					alerta_semanal,
-					usuario.nombre AS nombre_pila,
-					username AS nombre_usuario
-				FROM usuario
+		$query = "SELECT usuario.id_usuario, alerta_semanal, usuario.nombre AS nombre_pila, username AS nombre_usuario
+			FROM usuario
 				JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso = 'PRO' AND activo = 1 $where_usuarios_vacaciones";
+			WHERE codigo_permiso = 'PRO' AND activo = 1 {$where_usuarios_vacaciones}";
 		$resultados = $this->query($query);
 		$total_resultados = count($resultados);
-		$alerta_semanal_todos_abogadosa_administradores = Conf::GetConf($this->Sesion, 'AlertaSemanalTodosAbogadosaAdministradores');
+
 		for ($x = 0; $x < $total_resultados; ++$x) {
 			$resultado = $resultados[$x];
 			$id_usuario = $resultado['id_usuario'];
@@ -127,80 +128,93 @@ class CronNotificacion extends Cron {
 			if ($alerta_semanal_todos_abogadosa_administradores) {
 				$ids_usuarios_profesionales .= ',' . $id_usuario;
 			}
+
 			$tipo_alerta = array();
+
+			// alertar si el usuario no ingresó el minimo de horas requeridas
 			if ($minimo > 0 && $horas < $minimo) {
-				//Alerto al usuario
+				// si el usuario tiene configurado la alerta semanal se construye la alerta para él
 				if ($alerta_semanal) {
 					$txt = str_replace('%HORAS', $horas, $msg['horas_minimas_propio']);
 					$txt = str_replace('%MINIMO', $minimo, $txt);
 					$dato_semanal[$id_usuario]['alerta_propia'] = $txt;
 					$tipo_alerta[] = 'horas_minimas';
 				}
-				//Alerto a sus revisores
+
+				// alerto a sus revisores
 				$txt = str_replace('%HORAS', $horas, $msg['horas_minimas_revisado']);
 				$txt = str_replace('%MINIMO', $minimo, $txt);
 				$cache_revisados[$id_usuario]['alerta'] = $txt;
 			}
+
+			// alertar si usuario supero el máximo de horas requeridas
 			if ($maximo > 0 && $horas > $maximo) {
-				//Alerto al usuario
+				// si el usuario tiene configurado la alerta semanal se construye la alerta para él
 				if ($alerta_semanal) {
 					$txt = str_replace('%HORAS', $horas, $msg['horas_maximas_propio']);
 					$txt = str_replace('%MAXIMO', $maximo, $txt);
 					$dato_semanal[$id_usuario]['alerta_propia'] = $txt;
 					$tipo_alerta[] = 'horas_maximas';
 				}
-				//Alerta a sus revisores
+
+				// alerta a sus revisores
 				$txt = str_replace('%HORAS', $horas, $msg['horas_maximas_revisado']);
 				$txt = str_replace('%MAXIMO', $maximo, $txt);
 				$cache_revisados[$id_usuario]['alerta'] = $txt;
 			}
+
 			$tipo_alerta = implode('-', $tipo_alerta);
 			$this->log("    {$nombre_pila} ({$id_usuario}) Minimo: {$minimo}, Maximo: {$maximo}, Horas: {$horas}, Alerta: {$alerta_semanal}, Tipo: {$tipo_alerta}");
+
 			$dato_semanal[$id_usuario]['nombre_pila'] = htmlentities($nombre_pila);
 			$cache_revisados[$id_usuario]['nombre'] = $nombre_usuario;
 			$cache_revisados[$id_usuario]['horas'] = number_format($horas, 1);
 			$cache_revisados[$id_usuario]['horas_cobrables'] = number_format($horas_cobrables, 1);
 		}
 
-		// Mensaje para REV: horas de cada revisado, alertas.
-		$reporte_revisados_a_todos_los_abogados = Conf::GetConf($this->Sesion, 'ReporteRevisadosATodosLosAbogados');
-		$resumen_horas_semanales_a_abogados_individuales = Conf::GetConf($this->Sesion, 'ResumenHorasSemanalesAAbogadosIndividuales');
 		if ($reporte_revisados_a_todos_los_abogados || $resumen_horas_semanales_a_abogados_individuales || $alerta_semanal_todos_abogadosa_administradores ) {
 			$having = '';
 		} else {
+			// si no existen configuraciones especiales, las alertas serán generadas para los usuarios con permiso revisor o que tenga usuarios en revisión
 			$having = " AND (codigo_permiso = 'REV' OR revisados IS NOT NULL)";
 		}
 
+		// seleccionar a los usuarios que serán alertados según $having o si es administrador o revisor
 		$query = "SELECT usuario.id_usuario, usuario.nombre AS nombre_pila,
-							alerta_semanal, codigo_permiso,
-							GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
-						FROM usuario
-						LEFT JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
-							AND ( usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM' )
-						LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
-						WHERE activo = 1
-							AND (alerta_revisor = 1 OR usuario_permiso.codigo_permiso = 'ADM')
-						GROUP BY usuario.id_usuario
-						HAVING 1 $having";
+				alerta_semanal, codigo_permiso,
+				GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
+			FROM usuario
+				LEFT JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario AND (usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM')
+				LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
+			WHERE activo = 1 AND (alerta_revisor = 1 OR usuario_permiso.codigo_permiso = 'ADM')
+			GROUP BY usuario.id_usuario
+			HAVING 1 {$having}";
+
 		$resultados = $this->query($query);
 		$total_resultados = count($resultados);
+
 		for ($x = 0; $x < $total_resultados; ++$x) {
 			$resultado = $resultados[$x];
 			$id_usuario = $resultado['id_usuario'];
 			$revisados = $resultado['revisados'];
 			$dato_semanal[$id_usuario]['nombre_pila'] = $resultado['nombre_pila'];
+
 			if ($alerta_semanal_todos_abogadosa_administradores) {
+				// Si está activo este conf se notificará al usuario en iteración (si es administrador)
 				if ($resultado['codigo_permiso'] == 'ADM') {
 					$dato_semanal[$id_usuario]['admin'] = 1;
 					$revisados = $ids_usuarios_profesionales;
 				} else {
 					$revisados = $id_usuario;
 				}
-			} else if ($revisados != "") {
+			} else if ($revisados != '') {
+				// los $revisados es un lista de usuarios a los cuales está "revisando" el usuario en iteración
 				$revisados .= ',' . $id_usuario;
 			} else if ($resumen_horas_semanales_a_abogados_individuales) {
+				// si está activa esta conf se notificará las estadísticas del usuario en iteración
 				$revisados = $id_usuario;
 			}
+
 			if ($reporte_revisados_a_todos_los_abogados) {
 				$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
 			} else {
@@ -208,10 +222,6 @@ class CronNotificacion extends Cron {
 			}
 		}
 
-		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
-		$dato_semanal = array_filter($dato_semanal, function ($i) {
-			return !empty($i['alerta_propia']) || $i['admin'];
-		});
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
 
 		try {
@@ -221,7 +231,7 @@ class CronNotificacion extends Cron {
 				}
 			} else if ($this->correo == 'desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 				var_dump($dato_semanal);
-				echo implode('<br/><br/><br/>', $mensajes);
+				print_r($mensajes);
 			} else if ($this->correo == 'simular_correo') {
 				foreach ($mensajes as $id_usuario => $mensaje) {
 					$mensaje['simular'] = true;

@@ -19,6 +19,16 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($data['id_usuario']);
 		}
 
+		//Encargado comercial
+		if ($data['id_encargado_comercial']) {
+			$searchCriteria->filter('id_usuario_responsable')->restricted_by('equals')->compare_with($data['id_encargado_comercial'])->for_entity('Contract');
+		}
+
+		//Actividad
+		if ($data['codigo_actividad']) {
+			$searchCriteria->filter('codigo_actividad')->restricted_by('equals')->compare_with($data['codigo_actividad']);
+		}
+
 		//Cliente
 		if ($data['codigo_cliente_secundario'] || $data['codigo_cliente']) {
 			$codigo = 'codigo_cliente';
