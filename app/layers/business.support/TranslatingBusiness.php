@@ -13,7 +13,7 @@ class TranslatingBusiness extends AbstractBusiness implements ITranslatingBusine
 	 */
 	function getLanguageByCode($languageCode) {
 		$searchCriteria = new SearchCriteria('Language');
-		$searchCriteria->filter('codigo_idioma')->restricted_by('equals')->compare_with($languageCode);
+		$searchCriteria->filter('codigo_idioma')->restricted_by('equals')->compare_with("'".$languageCode."'");
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
 		if (empty($results)) {

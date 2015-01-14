@@ -6,6 +6,7 @@ class EntitiesListator {
 	private $columnHandler;
 	private $trWriter;
 	private $totalizedFields;
+	private $formatOptions;
 
 	/**
 	 * @param array $entities
@@ -31,6 +32,16 @@ class EntitiesListator {
 		} else {
 			return true;
 		}
+	}
+
+	public function setNumberFormatOptions(Currency $currency, Language $language) {
+		if (is_null($currency) || is_null($language)) {
+			$this->formatOptions = array();
+		} else {
+			$this->formatOptions['currency'] = $currency;
+			$this->formatOptions['language'] = $language;
+		}
+
 	}
 
 	/**
@@ -119,7 +130,7 @@ class EntitiesListator {
 					->set_closure(true);
 				foreach ($this->columnHandler as $columnHandler) {
 					$th = new HtmlBuilder();
-					$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
+					$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;text-align:center;');
 					if (is_callable($columnHandler['calculationExpression'])) {
 						$th->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
 					} else {
@@ -149,7 +160,11 @@ class EntitiesListator {
 		}
 		foreach ($this->entities as $entity) {
 			foreach ($accumulators as $acumKey => $accumulator) {
-				$accumulators[$acumKey] = $accumulator + $entity->get($acumKey);
+				$toAcumulate = $entity->get($acumKey);
+				if ( strstr( $toAcumulate, ',' ) ) {
+					$toAcumulate = str_replace( ',', '', $toAcumulate );
+				}
+				$accumulators[$acumKey] = $accumulator + $toAcumulate;
 			}
 		}
 		$tr = new HtmlBuilder();
@@ -159,8 +174,21 @@ class EntitiesListator {
 		foreach ($this->columnHandler as $column) {
 			if (array_key_exists($column['calculationExpression'], $accumulators)) {
 				$th = new HtmlBuilder();
-				$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
-				$th->set_html($accumulators[$column['calculationExpression']]);
+				$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;text-align:center;');
+				if (empty($this->formatOptions)) {
+					$th->set_html($accumulators[$column['calculationExpression']]);
+				} else {
+					$currency = $this->formatOptions['currency'];
+					$language = $this->formatOptions['language'];
+					$th->set_html(
+						number_format(
+							$accumulators[$column['calculationExpression']],
+							$currency->get('cifras_decimales'),
+							$language->get('separador_decimales'),
+							$language->get('separador_miles')
+						)
+					);
+				}
 				$tr->add_child($th);
 			} else {
 				$th = new HtmlBuilder();

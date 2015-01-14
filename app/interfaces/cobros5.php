@@ -379,26 +379,42 @@ echo $refrescar;
 		if(!form) {
 			var form = $('form_cobro5');
 		}
-		console.log(form.find('#id_cobro').val());
-		var text_window = '<strong><center><?php echo __('Detalle de monto') ?><center></strong><br><br>';
+		var text_window = '';
 		jQuery.ajax({
 			type: "POST",
-			url ""
-		})
+			dataType: "JSON",
+			url: root_dir + '/app/Charge/slidingScaleDetail/',
+			data: {
+				"charge": 8038,
+				"language": 'es'
+			},
+			success: function(data, status, jqXHR) {
+				text_window += data.detail;
+				GeneraPopUpDetalleMonto(text_window);
+			},
+			error: function(jqXHR, status, error) {
+				text_window += '<p>No se ha encontrado información.<p/>';
+				GeneraPopUpDetalleMonto(text_window);
+			}
+		});
+		
+	}
+
+	function GeneraPopUpDetalleMonto(html) {
 		jQuery('<p/>')
 			.attr('title', 'Detalle de monto')
-			.html(text_window)
+			.html(html)
 			.dialog({
 				resizable: true,
-				height: 260,
-				width: 500,
+				height: 250,
+				width: 520,
 				modal: true,
 				open: function() {
-					jQuery('.ui-dialog-title').addClass('ui-icon-warning');
+					jQuery('.ui-dialog-title').addClass('ui-icon-info');
 					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
 				},
 				buttons: {
-					"<?php echo __('Cancelar') ?>": function() {
+					"<?php echo __('Aceptar') ?>": function() {
 						jQuery(this).dialog('close');
 						return false;
 					}

@@ -25,26 +25,31 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $results[0];
 	}
 
-	public function getSlidingScalesDetailTable(array $slidingScales) {
+	public function getSlidingScalesDetailTable(array $slidingScales, $currency, $language) {
 		$listator = new EntitiesListator();
 		$listator->loadEntities($slidingScales);
+		$listator->setNumberFormatOptions($currency, $language);
 		$listator->addColumn('#', 'scale_number');
 		$listator->addColumn('Monto Bruto', 'amount');
 		$listator->addColumn('% Descuento', 'discountRate');
 		$listator->addColumn('Descuento', 'discount');
 		$listator->addColumn('Monto Neto', 'netAmount');
-		$listator->totalizeFields(array('Monto Bruto', 'Descuento', 'Monto Neto'));
+		$listator->totalizeFields(array('Monto Neto'));
 		return $listator->render();
 	}
 
-	public function getSlidingScales($chargeId) {
+	public function getSlidingScales($chargeId, $languageCode) {
 		$this->loadService('Charge');
 		$this->loadBusiness('Working');
+		$this->loadBusiness('Translating');
 		$charge = $this->ChargeService->get($chargeId);
+		$language = $this->TranslatingBusiness->getLanguageByCode($languageCode);
 		$slidingScales = $this->constructScaleObjects($charge);
 		$works = $this->WorkingBusiness->getWorksByCharge($chargeId);
+		$works = $works->toArray();
 		$slidingScales = $this->processSlidngScales($works, $slidingScales, $charge);
 		$slidingScales = $this->processSlidingScalesDiscount($slidingScales);
+		$slidingScales = $this->proceessSlidingScalesLanguages($slidingScales, $language);
 		return $slidingScales;
 	}
 
@@ -91,6 +96,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
 			$works = $result['works'];
 			$scale->set('amount', $result['scaleAmount'], false);
+			$scale->set('chargeCurrency', $charge->get('id_moneda'));
 			if (!count($works)) {
 				break;
 			}
@@ -117,6 +123,39 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				false
 			);
 		}
+		return $slidingScale;
+	}
+
+	private function proceessSlidingScalesLanguages($slidingScales, $language) {
+		foreach ($slidingScales as $slidingScale) {
+			$slidingScale = $this->proceessSlidingScaleLanguages($slidingScale, $language);
+		}
+		return $slidingScales;
+	}
+
+	private function proceessSlidingScaleLanguages($slidingScale, $language) {
+		$this->loadBusiness('Coining');
+		$slidingScale->set('amount',
+			$this->CoiningBusiness->formatAmount(
+				$slidingScale->get('amount'), 
+				$this->CoiningBusiness->getCurrency($slidingScale->get('chargeCurrency')),
+				$language
+			)
+		);
+		$slidingScale->set('discount',
+			$this->CoiningBusiness->formatAmount(
+				$slidingScale->get('discount'), 
+				$this->CoiningBusiness->getCurrency($slidingScale->get('chargeCurrency')),
+				$language
+			)
+		);
+		$slidingScale->set('netAmount',
+			$this->CoiningBusiness->formatAmount(
+				$slidingScale->get('netAmount'), 
+				$this->CoiningBusiness->getCurrency($slidingScale->get('chargeCurrency')),
+				$language
+			)
+		);
 		return $slidingScale;
 	}
 
