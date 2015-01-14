@@ -1,5 +1,9 @@
 # Changelog
 
+## Release: 15.1.0
+Miercoles 14 de Enero 2015.
+* **Fix:** [Generación masiva cobros background](https://github.com/LemontechSA/ttb/pull/776)
+
 ## Release: 15.0.0
 Martes 13 de Enero 2015.
 * **Fix:** [Validaciones Forma de cobro Hitos](https://github.com/LemontechSA/ttb/pull/813)
