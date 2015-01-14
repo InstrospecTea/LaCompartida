@@ -1,3 +1,4 @@
 server "amazonap1.thetimebilling.com", :web, {:user => 'ec2-user', :port => 22} #Amazon
-server "localhost", :web, {:user => 'root', :port => 8081} #GTD throw Tunneling
+server "amazonap2.thetimebilling.com", :web, {:user => 'ec2-user', :port => 22} #Amazon
+#server "localhost", :web, {:user => 'root', :port => 8081} #GTD throw Tunneling
 #server "localhost", :web, {:user => 'miusuario', :port => 22} #For Test deploys

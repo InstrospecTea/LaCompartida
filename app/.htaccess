@@ -1,7 +1,6 @@
-RewriteEngine on
+RewriteEngine On
 RewriteBase /
 RewriteCond %{REQUEST_URI} /(\w+)/(\w+)/(.*)$
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ %1/%2/bootstrap.php [NC,L]
-
+RewriteRule ^(.*)$ %1/%2/bootstrap.php [QSA,L]

@@ -10593,6 +10593,16 @@ QUERY;
 			break;
 
 		case 7.89:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			break;
+
+		case 7.90:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
+			break;
+
+		case 7.91:
 			$queries[] = "CREATE TABLE `bloqueo_procesos` (
 							`id` int(11) NOT NULL AUTO_INCREMENT,
 							`id_usuario` int(11) NOT NULL,
@@ -10611,9 +10621,8 @@ QUERY;
 						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 			break;
 
-		case 7.90:
+		case 7.92:
 			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
-			break;
 	}
 
 	if (!empty($queries)) {
@@ -10626,7 +10635,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.90;
+$max_update = 7.92;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

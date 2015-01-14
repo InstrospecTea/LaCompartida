@@ -44,6 +44,16 @@ The Time Billing - Time Tracking
 
       $ sudo pear install OLE-0.5
 
+* [WKHTMLTOPDF](http://wkhtmltopdf.org/)
+  
+  ````
+  wget http://downloads.sourceforge.net/project/wkhtmltopdf/0.12.1/wkhtmltox-0.12.1_linux-centos6-amd6$
+  sudo yum localinstall -y wkhtmltox-0.12.1_linux-centos6-amd64.rpm
+  which wkhtmltopdf
+  sudo yum install urw-fonts
+  wkhtmltopdf www.google.com google.pdf
+  ````
+
 ###requisitos adicionales
 
 * PHP 5 CURL sudo apt-get install php5-curl

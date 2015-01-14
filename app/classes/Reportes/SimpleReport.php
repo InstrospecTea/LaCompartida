@@ -59,7 +59,8 @@ class SimpleReport extends Objeto {
 		'FACTURA_COBRANZA' => 'FacturaProduccion.configuracion_cobranza',
 		'FACTURA_COBRANZA_APLICADA' => 'FacturaProduccion.configuracion_cobranza_aplicada',
 		'GASTOS_NO_COBRABLES' => 'FacturaProduccion.configuracion_gastos',
-		'ADELANTOS' => 'Adelanto'
+		'ADELANTOS' => 'Adelanto',
+		'REPORTE_PRODUCTIVIDAD' => 'ReporteProductividad'
 		// 'TRAMITES' => 'Tramite',
 		// 'USUARIOS' => 'Usuario'
 	);
