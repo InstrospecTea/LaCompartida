@@ -1725,7 +1725,16 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			var codigo = jQuery(this).val();
 			if(codigo == 1 || codigo == 21){
 				//jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
-				jQuery('#fecha_vencimiento_pago_input').val('<?php echo Utiles::sql2date($factura->fields["fecha_vencimiento"]) ?>');
+				var persistedDate = '<?php echo Utiles::sql2date($factura->fields["fecha_vencimiento"]) ?>';
+				if (persistedDate == '') {
+					var dias = 1;
+					var myDate = new Date();
+					var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
+					jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
+				} else {
+					console.log('asd');
+					jQuery('#fecha_vencimiento_pago_input').val(persistedDate);
+				}
 				jQuery('#fecha_vencimiento_pago_input').attr('readonly',false);
 			}
 			else{
