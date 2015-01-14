@@ -1525,7 +1525,8 @@ class Contrato extends Objeto {
 		$where .= " AND cobro_pendiente.id_cobro_pendiente IS NULL ";
 
 		$query = "SELECT contrato.id_contrato,
-						contrato.separar_liquidaciones
+						contrato.separar_liquidaciones,
+						contrato.forma_cobro
 					FROM contrato
 						$join
 						JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa

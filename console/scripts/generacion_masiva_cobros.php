@@ -100,6 +100,9 @@ class GeneracionMasivaCobros extends AppShell {
 				$Contrato = new Contrato($this->Session);
 				$contratos = $Contrato->contratosParaBorradorCobro($codigo_cliente, $this->data['form']);
 				foreach ($contratos as $contrato) {
+					if ($contrato['forma_cobro'] == 'HITOS') {
+						continue;
+					}
 					if ($contrato['separar_liquidaciones']) {
 						$this->generaHH($contrato['id_contrato']);
 						$this->generaGG($contrato['id_contrato']);
@@ -203,8 +206,10 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $st);
 		} catch (PDOException $e) {
 			$this->status['error'] = 'Ocurrio un error inesperado.';
+			++$this->errors[$type];
 		} catch (Exception $e) {
 			$this->status['error'] = 'Ocurrio un error inesperado.';
+			++$this->errors[$type];
 		}
 	}
 
