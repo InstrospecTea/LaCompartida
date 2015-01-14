@@ -381,11 +381,10 @@ EOF;
 			$PrmDocumentoLegal->Load($FacturaPadre->fields['id_documento_legal']);
 			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
 
-			$referenciaId = $Factura->fields['dte_codigo_referencia'];
+			$referenciaId = intval($Factura->fields['dte_codigo_referencia']);
 			$Referencia = new PrmCodigo($Sesion);
-			$Referencia->Load($referenciaId);
+			$Referencia->LoadById($referenciaId);
 			$codigoReferencia = $Referencia->Loaded() ? $Referencia->fields['codigo'] : 1;
-
 			$arrayFactura['referencia'] = array(
 				'tipo_dte'	=> $tipoDTE,
 				'folio'	=> $FacturaPadre->fields['numero'],

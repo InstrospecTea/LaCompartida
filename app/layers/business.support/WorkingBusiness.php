@@ -19,6 +19,16 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($data['id_usuario']);
 		}
 
+		//Encargado comercial
+		if ($data['id_encargado_comercial']) {
+			$searchCriteria->filter('id_usuario_responsable')->restricted_by('equals')->compare_with($data['id_encargado_comercial'])->for_entity('Contract');
+		}
+
+		//Actividad
+		if ($data['codigo_actividad']) {
+			$searchCriteria->filter('codigo_actividad')->restricted_by('equals')->compare_with($data['codigo_actividad']);
+		}
+
 		//Cliente
 		if ($data['codigo_cliente_secundario'] || $data['codigo_cliente']) {
 			$codigo = 'codigo_cliente';
@@ -46,6 +56,29 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 
 		//Rango de fechas
+		$fecha_ini = $data['fecha_ini'];
+		$fecha_fin = $data['fecha_fin'];
+		if (!empty($fecha_ini) && !empty($fecha_fin)) {
+			$sinceObject = new DateTime($fecha_ini);
+			$untilObject = new DateTime($fecha_fin);
+			$data['fecha_ini'] = $sinceObject->format('d-m-Y');
+			$data['fecha_fin'] = $untilObject->format('d-m-Y');
+		} else {
+			$dateInterval = new DateInterval('P364D');
+			if (!empty($fecha_ini)) {
+				$sinceObject = new DateTime($fecha_ini);
+				$data['fecha_ini'] = $sinceObject->format('d-m-Y');
+				$untilObject = new DateTime('NOW');
+				$data['fecha_fin'] = $untilObject->format('d-m-Y');
+			}
+			if (!empty($fecha_fin)) {
+				$untilObject = new DateTime($fecha_fin);
+				$data['fecha_fin'] = $untilObject->format('d-m-Y');
+				$sinceObject = $untilObject->sub($dateInterval);
+				$data['fecha_ini'] = $sinceObject->format('d-m-Y');
+			}
+		}
+
 		if ($data['fecha_ini']) {
 			$date = Utiles::fecha2sql($data['fecha_ini']);
 			$searchCriteria->filter('fecha')->restricted_by('greater_or_equals_than')->compare_with("'$date'");
@@ -197,4 +230,5 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$this->loadBusiness('Searching');
 		return $this->SearchingBusiness->searchbyCriteria($searchCriteria, array('Work.fecha', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda'));
 	}
+
 }

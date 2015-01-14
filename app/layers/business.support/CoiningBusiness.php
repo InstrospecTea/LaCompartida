@@ -21,7 +21,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 	/**
 	 * Realiza un cambio de la moneda de una cantidad.
 	 * @param $amount
-	 * @param Currency $fromCurrency {@link Currency} en la que actualmente estÃ¡ $amount.
+	 * @param Currency $fromCurrency {@link Currency} en la que actualmente está $amount.
 	 * @param Currency $toCurrency {@link Currency} a la que se quiere transformar $amount.
 	 * @return mixed Cantidad en la nueva moneda.
 	 * @throws BusinessException
@@ -30,11 +30,14 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		if (!is_numeric($amount)) {
 			throw new BusinessException('The amount must be numeric');
 		}
+
 		if (!$fromCurrency->haveIdentity() || !$toCurrency->haveIdentity()) {
 			throw new BusinessException('One of the currencies does not have an identity');
 		}
+
 		$newAmount = ($amount * $fromCurrency->get('tipo_cambio')) / $toCurrency->get('tipo_cambio');
 		$newAmount = round($newAmount, $toCurrency->get('cifras_decimales'));
+
 		return $newAmount;
 	}
 
@@ -60,7 +63,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $this->CurrencyService->get($id);
 	}
 
-	/**
+	/** 
 	 * Obtiene todas las instancias de {@link Currency} existentes en el ambiente del cliente
 	 */
 	function getCurrencies() {
@@ -69,7 +72,8 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $this->SearchingBusiness->searchByCriteria($searchCriteria);
 	}
 
-	/**
+
+	/** 
 	 * Obtiene un Array asociativo [identidad] => [glosa_moneda], a partir de un array de instancias de {@link Currency}.
 	 */
 	function currenciesToArray($currencies) {
@@ -100,4 +104,5 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		$currency->set('tipo_cambio', $chargeCurrency->get('tipo_cambio'), false);
 		return $currency;
 	}
+
 } 

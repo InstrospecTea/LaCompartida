@@ -1,6 +1,5 @@
 <?php
 
-
 class CurrencyService extends AbstractService implements ICurrencyService {
 
 	public function getDaoLayer() {

@@ -7,18 +7,16 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  * @author CPS 2.0
  */
 class Log {
-	var $logFile = 'app';
-	var $logFolder = null;
+	public $logFile = 'app';
+	public $logFolder = null;
+	public $debug = false;
 
 	public function __construct() {
 		$this->logFolder = LOGDIR . Conf::dbUser() . '/ttb/' . date('y-m');
 
 		if (!is_dir($this->logFolder)) {
-			try {
-				mkdir($this->logFolder, 0777, true);
-			} catch(Exception $e) {
-				echo ("No es posible crear el directorio '{$this->logFolder}'<br/>\n" . $e->getMessage());
-				exit;
+			if (!mkdir($this->logFolder, 0777, true)) {
+				exit("No es posible crear el directorio '{$this->logFolder}'");
 			}
 		}
 	}
@@ -32,7 +30,7 @@ class Log {
 		if (!file_exists($file)) {
 			$me->writeFile('', $file);
 		}
-		if (!is_writable($file)) {
+		if (!is_writable($file) && $me->debug) {
 			echo $file . __(' no se puede escribir.');
 		}
 		$text = date('Y-m-d H:i:s') . " - {$text}\n";

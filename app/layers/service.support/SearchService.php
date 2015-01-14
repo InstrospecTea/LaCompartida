@@ -14,12 +14,14 @@ class SearchService implements ISearchService {
 	 * @param SearchCriteria $searchCriteria
 	 * @param array          $filter_properties
 	 * @param Criteria       $criteria
+	 * @param bool $genericMode
+	 * @param bool $withIdentity
 	 * @return array
 	 */
-	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null) {
+	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null, $withIdentity = true, $genericMode = false) {
 		$criteria = $this->prepareRelationships($criteria, $searchCriteria);
 		$criteria = $this->prepareRestrictions($criteria, $searchCriteria);
-		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties);
+		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties, $withIdentity, $genericMode);
 		$criteria = $this->prepareGrouping($criteria, $searchCriteria);
 		return $criteria;
 	}
@@ -41,11 +43,36 @@ class SearchService implements ISearchService {
 	 * @return array
 	 */
 	public function getResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
+		$entityName = $searchCriteria->entity();
+		return $this->getData($searchCriteria, $criteria, $entityName);
+	}
+
+	/**
+	 * Retorna un arreglo de instancias que pertenezcan a la jerarquía de {@link Entity}, que estén denotadas
+	 * por los criterios establecidos en una instancia de {@link GenericModel}.
+	 * @param SearchCriteria $searchCriteria
+	 * @param Criteria       $criteria
+	 * @return array
+	 */
+	public function getGenericResults(SearchCriteria $searchCriteria, Criteria $criteria = null) {
+		$entityName = 'GenericModel';
+		return $this->getData($searchCriteria, $criteria, $entityName);
+	}
+
+	/**
+	 * Retorna los datos obtenidos a través de la instancia de @{Criteria} y aplica la paginación si es que fue
+	 * configurada en la instancia de @{link SearchCriteria}
+	 * @param SearchCriteria $searchCriteria
+	 * @param Criteria $criteria
+	 * @param $entityName
+	 * @return array
+	 * @throws Exception
+	 */
+	private function getData(SearchCriteria $searchCriteria, Criteria $criteria = null, $entityName) {
 		if ($searchCriteria->paginate()) {
 			$criteria->add_limit($searchCriteria->Pagination->rows_per_page(), $searchCriteria->Pagination->current_row());
 		}
-		$entity = $searchCriteria->entity();
-		$entity = new ReflectionClass($entity);
+		$entity = new ReflectionClass($entityName);
 		$entity = $entity->newInstance();
 		$data = $this->encapsulateArray($criteria->run(), $entity);
 		if ($searchCriteria->paginate()) {
@@ -141,22 +168,40 @@ class SearchService implements ISearchService {
 	 * @param array          $filterProperties
 	 * @return Criteria
 	 */
-	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $widthIdentity = true) {
+	private function prepareSelection(Criteria $criteria, SearchCriteria $searchCriteria, array $filterProperties, $withIdentity = true, $genericMode = false) {
 		$entity = $searchCriteria->entity();
 		$entity = new ReflectionClass($entity);
 		$entity = $entity->newInstance();
 		if (empty($filterProperties)) {
 			$criteria->add_select($searchCriteria->entity() . '.*');
 		} else {
-			if ($widthIdentity) {
+			if ($withIdentity) {
 				$criteria->add_select($searchCriteria->entity() . '.' . $entity->getIdentity());
 			}
 			foreach ($filterProperties as $filter_property) {
-				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property);
-				$criteria->add_select($field_name);
+				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property );
+				$criteria = $this->addSelectField($criteria, $field_name, $genericMode);
 			}
 		}
 		$criteria->add_from($entity->getPersistenceTarget(), $searchCriteria->entity());
+		return $criteria;
+	}
+
+	/**
+	 * Añade un campo al statement de selección al criterio de búsqueda. Cuando el nombre del campo contiene la entity
+	 * o la tabla correspondiente, agrega un alias con el formato {entity|tabla}_{nombre_campo}
+	 * @param $criteria
+	 * @param $field_name
+	 * @return mixed
+	 */
+	private function addSelectField($criteria, $field_name, $genericMode) {
+		if ($genericMode) {
+			$propertyAlias = str_replace('.', '_', strtolower($field_name));
+			$criteria->add_select($field_name, $propertyAlias);
+		} else {
+			$criteria->add_select($field_name);
+		}
+
 		return $criteria;
 	}
 
@@ -167,12 +212,7 @@ class SearchService implements ISearchService {
 	 * @return
 	 */
 	private function encapsulate($arrayResult, $instance) {
-		if (empty($arrayResult)) {
-			return null;
-		}
-		foreach ($arrayResult as $property => $value) {
-			$instance->set($property, $value, false);
-		}
+		$instance->fields = $arrayResult;
 		return $instance;
 	}
 
@@ -182,11 +222,10 @@ class SearchService implements ISearchService {
 	 * @return array
 	 */
 	private function encapsulateArray($array, $entity) {
-		$result = array();
-		$reflected = new ReflectionClass($entity);
-		foreach ($array as $row) {
-			$empty = $reflected->newInstance();
-			$result[] = $this->encapsulate($row, $empty, false);
+		$total = (int) count($array);
+		$result = new SplFixedArray($total);
+		for ($i = 0; $i < $total; $i++) {
+			$result[$i] = $this->encapsulate($array[$i], new $entity());
 		}
 		return $result;
 	}

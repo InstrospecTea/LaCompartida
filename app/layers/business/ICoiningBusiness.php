@@ -1,6 +1,7 @@
 <?php
 
-interface ICoiningBusiness extends BaseBusiness{
+interface ICoiningBusiness extends BaseBusiness {
+
 	/**
 	 * Obtiene la instancia de {@link Currency} base configurada para el ambiente.
 	 * @return Currency
@@ -10,7 +11,7 @@ interface ICoiningBusiness extends BaseBusiness{
 	/**
 	 * Realiza un cambio de la moneda de una cantidad.
 	 * @param $amount
-	 * @param Currency $fromCurrency {@link Currency} en la que actualmente estÃ¡ $amount.
+	 * @param Currency $fromCurrency {@link Currency} en la que actualmente está $amount.
 	 * @param Currency $toCurrency {@link Currency} a la que se quiere transformar $amount.
 	 * @return mixed Cantidad en la nueva moneda.
 	 */

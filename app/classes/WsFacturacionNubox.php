@@ -19,6 +19,8 @@ class WsFacturacionNubox extends WsFacturacion{
 		$this->rutCliente = $rutCliente;
 		$this->rutUsuario = $login['rutUsuario'];
 		$this->contrasena = $login['contrasena'];
+		$this->url = is_null($login['url']) ? $this->url : $login['url'];
+		$this->url_login = is_null($login['url_login']) ? $this->url_login : $login['url'];
 		$this->sistema = $login['sistema'];
 		$this->numeroSerie = $login['numeroSerie'];
 		if ($this->login()) {
@@ -35,7 +37,8 @@ class WsFacturacionNubox extends WsFacturacion{
 	 * @return array
 	 * @throws Exception
 	 */
-	public function emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste) {
+	public function emitirFactura($archivo, $opcionFolios, $opcionRutClienteExiste, $opcionRutClienteNoExiste, $archivoReferencias = null) {
+		$referencias = !is_null($archivoReferencias);
 		$datos = array(
 			'token' => $this->token,
 			'archivo' => $archivo,
@@ -44,25 +47,41 @@ class WsFacturacionNubox extends WsFacturacion{
 			'opcionRutClienteNoExiste' => $opcionRutClienteNoExiste
 		);
 
+		if ($referencias) {
+			$datos['archivoReferencias'] = $archivoReferencias;
+		}
+
 		try {
 			try {
-				$respuesta = $this->Client->CargarYEmitir($datos);
+				$respuesta = $this->Client->CargarYEmitir2($datos);
 			} catch (SoapFault $sf) {
 				Log::write($sf->__toString(), 'FacturacionElectronicaNubox');
 				throw new Exception('Ocurrió un error al generar el documento.');
 			}
-
-			$sxmle = new SimpleXMLElement($respuesta->CargarYEmitirResult->any);
+			$sxmle = new SimpleXMLElement($respuesta->CargarYEmitir2Result->any);
 			$xml = self::XML2Array($sxmle);
 			if ($xml['Resultado'] != 'OK') {
 				Log::write($xml['Descripcion'], 'FacturacionElectronicaNubox');
-				throw new Exception('Ocurrió un error al generar el documento.');
+				throw new Exception($this->extraerError($xml));
 			}
 			return $xml['Documentos']['Documento']['_attributes'] + array('Identificador' => $xml['Identificador']);
 		} catch (Exception $ex) {
 			Log::write($ex->__toString(), 'FacturacionElectronicaNubox');
 			$this->setError(1, $ex->getMessage());
 		}
+	}
+
+	private function extraerError($result) {
+		if ($result['Resultado'] == 'C1') {
+			$error = __('Ocurrió un error al generar el documento. Por favor verifique que todos los datos del Documento sean correctos.');
+		} else { 			
+			$error = __('Ocurrió un error al emitir el documento.');
+		}
+		$error .= "\n \nInformación de Nubox:\n";
+		$pattern = '/Errores encontrados:\nLinea (.?).(.*)Fin fase/si';
+		preg_match_all($pattern, $result['Descripcion'], $error_description);
+		$error .= utf8_decode($error_description[2][0]);
+		return $error;
 	}
 
 	public function getPdf($id) {

@@ -55,7 +55,7 @@ abstract class Entity {
 			$fields[$property] = $value;
 			$reflected->getProperty('fields')->setValue($this, $fields);
 			if ($changes) {
-				$this->changes[$property] = $value;
+				$this->changes[$property] = true;
 			}
 		} catch (ReflectionException $ex) {
 			throw new Exception($ex->getMessage() . ' at ' . $ex->getLine());

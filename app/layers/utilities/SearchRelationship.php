@@ -87,7 +87,7 @@ class SearchRelationship extends AbstractUtility{
 	 * @param type $alias
 	 * @throws UtilityException
 	 */
-	public function related_with($alias) {
+	public function joined_with($alias) {
 		if (empty($alias)) {
 			throw new UtilityException('La entidad de la relación, no puede ser vacía.');
 		}
