@@ -6,4 +6,4 @@ class CurrencyDAO extends AbstractDAO implements ICurrencyDAO{
         return 'Currency';
     }
 
-} 
+}

@@ -25,10 +25,13 @@ $Slim=Slim::getInstance('default',true);
 <div id="dialog-confirm" style="display:none;" ></div>
 <div id="lttooltip"></div>
 <?php
+	$sesion = new Sesion();
+	$BloqueoProceso = new BloqueoProceso($sesion);
+	$notificaciones = $BloqueoProceso->getNotifications($sesion->usuario->fields['id_usuario']);
+
 	$mostrar_aviso = Aviso::MostrarAviso();
-	if ($mostrar_aviso) {
-		$aviso = Aviso::Obtener();
-		?>
+	if ($mostrar_aviso || !empty($notificaciones)) {
+	?>
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery.gritter.css" />
 		<script type="text/javascript" src="//static.thetimebilling.com/js/jquery.gritter.min.js"></script>
 		<style>
@@ -36,6 +39,11 @@ $Slim=Slim::getInstance('default',true);
 				color: #eee !important;
 			}
 		</style>
+	<?php }
+
+	if ($mostrar_aviso) {
+		$aviso = Aviso::Obtener();
+	?>
 		<script type="text/javascript">
 			var aviso = <?php echo json_encode(UtilesApp::utf8izar($aviso)); ?>;
 			var mensaje;
@@ -91,6 +99,65 @@ $Slim=Slim::getInstance('default',true);
 		</script>
 		<?php
 	}
+
+	if (!empty($notificaciones)) {
+		?>
+		<script type="text/javascript">
+			function cerrar_notificacion(id) { 
+				jQuery.get(root_dir + '/app/ProcessLock/set_notified/' + id)
+			}
+
+			function ir_al_formulario(id, el) {
+				jQuery.get(root_dir + '/app/ProcessLock/set_notified/' + id, function() {
+					jQuery(el).closest('form').submit();
+				});
+			}
+
+			function mostrar_notificacion(mensaje, id) {
+				jQuery.gritter.add({
+					title: 'Finalización de proceso',
+					text: mensaje,
+					image: '//static.thetimebilling.com/cartas/img/icon-48x48.png',
+					sticky: true,
+					class_name: 'notificacion',
+					before_close: function() {
+						cerrar_notificacion(id);
+					}
+				});
+			}
+		</script>
+
+		<?php
+
+		function form_link($proceso, $data, $id) {
+			$data = json_decode($data, true);
+			switch ($proceso) {
+				case 'GeneracionMasivaCobros':
+					$url = '/app/interfaces/genera_cobros.php';
+					$data['opc'] = 'buscar';
+					break;
+				default:
+					return '';
+			}
+			$Form = new Form();
+			$html = '';
+			foreach ($data as $field => $value) {
+				$html .= $Form->hidden($field, $value, array('id' => false));
+			}
+			$html .= $Form->Html->link('Ir al formulario', '#', array('onclick' => "ir_al_formulario($id, this);return false;"));
+			return $Form->Html->tag('form', $html, array('action' => Conf::RootDir() . $url, 'method' => 'post'));
+		}
+
+		$Html = new \TTB\Html();
+		foreach ($notificaciones as $notificacion) {
+			$proceso = \TTB\Utiles::humanize(\TTB\Utiles::underscoreize($notificacion->get('proceso')));
+			$fecha = Utiles::sql3fecha($notificacion->get('fecha_modificacion'), '%d-%m-%Y a las %H:%M hrs.');
+			$form_link = form_link($notificacion->get('proceso'), $notificacion->get('datos_post'), $notificacion->get('id'));
+			$script = "mostrar_notificacion('<b>{$proceso}</b><br/>{$fecha}<br/>{$notificacion->get('estado')}<br/>{$form_link}', {$notificacion->get('id')});";
+			echo $Html->script_block($script);
+		}
+	}
+
 	?>
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/google_analytics.js"></script>
 </body>

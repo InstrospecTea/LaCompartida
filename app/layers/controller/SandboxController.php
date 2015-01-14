@@ -20,6 +20,12 @@ class SandboxController extends AbstractController {
 		$report->render();
 	}
 
+	public function scales() {
+		$this->loadBusiness('Charging');
+		$this->ChargingBusiness->getSlidingScales(8038);
+		exit;
+	}
+
 	public function charging() {
 		$this->layoutTitle = 'Sandbox Charging';
 		$this->loadBusiness('Charging');
@@ -27,5 +33,6 @@ class SandboxController extends AbstractController {
 		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge);
 		var_dump($detail);
 	}
+
 }
 

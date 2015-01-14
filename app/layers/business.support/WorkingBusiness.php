@@ -221,4 +221,14 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		return $this->report;
 	}
+
+	function getWorksByCharge($chargeId) {
+		$searchCriteria = new SearchCriteria('Work');
+		$searchCriteria->related_with('Charge');
+		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($chargeId);
+		$searchCriteria->add_scope('orderFromOlderToNewer');
+		$this->loadBusiness('Searching');
+		return $this->SearchingBusiness->searchbyCriteria($searchCriteria, array('Work.fecha', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda'));
+	}
+
 }

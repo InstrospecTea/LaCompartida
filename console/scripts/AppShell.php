@@ -3,6 +3,7 @@
 abstract class AppShell {
 
 	public $debug;
+	public $data;
 
 	protected $Session;
 

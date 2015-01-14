@@ -1,6 +1,6 @@
 <?php
 
-interface ICoiningBusiness extends BaseBusiness{
+interface ICoiningBusiness extends BaseBusiness {
 
 	/**
 	 * Obtiene la instancia de {@link Currency} base configurada para el ambiente.
@@ -33,5 +33,13 @@ interface ICoiningBusiness extends BaseBusiness{
 	 * @return mixed
 	 */
 	function getCurrency($id);
+
+	/**
+	 * Establece el tipo de cambio de una moneda según el definido para una instancia de {@link Charge} en particular.
+	 * @param Currency $currency
+	 * @param Charge $charge
+	 * @return Currency
+	 */
+	function setCurrencyAmountByCharge(Currency $currency, Charge $charge);
 
 } 
