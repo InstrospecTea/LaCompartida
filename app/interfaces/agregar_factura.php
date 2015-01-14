@@ -1732,7 +1732,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 					var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
 					jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
 				} else {
-					console.log('asd');
 					jQuery('#fecha_vencimiento_pago_input').val(persistedDate);
 				}
 				jQuery('#fecha_vencimiento_pago_input').attr('readonly',false);
