@@ -1745,6 +1745,8 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			}
 		});
 
+		jQuery('#condicion_pago').trigger('change');
+
 		if (cantidad_decimales != -1) {
 			jQuery('.aproximable').each(function() {
 				jQuery(this).val = jQuery(this).parseNumber({format: "0.<?php echo str_pad('', $cifras_decimales_opc_moneda_total, "0"); ?>", locale: "us"}) + 0.0000001;
