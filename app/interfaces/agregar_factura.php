@@ -1724,7 +1724,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		jQuery('#condicion_pago').change(function(){
 			var codigo = jQuery(this).val();
 			if(codigo == 1 || codigo == 21){
-
 				//jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
 				jQuery('#fecha_vencimiento_pago_input').attr('readonly',false);
 				var dias = 1;
@@ -1734,7 +1733,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
 			}
 			else{
-
 				//jQuery('.fecha_vencimiento_pago').css('visibility', 'hidden');
 				jQuery('#fecha_vencimiento_pago_input').attr('readonly',true);
 				var texto = jQuery(this).find(":selected").text();
@@ -1750,8 +1748,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
 			}
 		});
-
-		jQuery('#condicion_pago').trigger('change');
 
 		if (cantidad_decimales != -1) {
 			jQuery('.aproximable').each(function() {
