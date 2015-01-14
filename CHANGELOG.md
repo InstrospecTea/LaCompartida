@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix: 14.22.6
+## Hotfix: 15.0.1
 Miércoles 14 de Enero 2015
 * **Fix:** [Corregir fecha de vencimiento en interfaz de edición de facturas](https://github.com/LemontechSA/ttb/pull/820)
 
