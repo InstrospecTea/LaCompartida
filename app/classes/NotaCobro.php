@@ -11093,7 +11093,7 @@ class NotaCobro extends Cobro {
 				$resumen_total_total += $resumen_total;
 
 				//se muestra el mismo valor que sale en el detalle de cobro
-				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) {
+				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
 					$resumen_total_total = $monto_cobro_menos_monto_contrato_moneda_tarifa;
 				}
 

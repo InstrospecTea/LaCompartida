@@ -10623,6 +10623,7 @@ QUERY;
 
 		case 7.92:
 			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
+			break;
 	}
 
 	if (!empty($queries)) {
