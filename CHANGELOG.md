@@ -2,7 +2,19 @@
 
 ## Release: 15.1.0
 Miercoles 14 de Enero 2015.
-* **Fix:** [Generaci�n masiva cobros background](https://github.com/LemontechSA/ttb/pull/776)
+* **Fix:** [Generación masiva cobros background](https://github.com/LemontechSA/ttb/pull/776)
+
+## Hotfix: 15.0.3
+Jueves 15 de Enero 2015
+* **Fix:** [Corregir validaciones JS al modificar o agregar un contrato](https://github.com/LemontechSA/ttb/pull/823)
+
+## Hotfix: 15.0.2
+Jueves 15 de Enero 2015
+* **Fix:** [Corregir validaciones de TASA al editar o agregar un contrato](https://github.com/LemontechSA/ttb/pull/822)
+
+## Hotfix: 15.0.1
+Miércoles 14 de Enero 2015
+* **Fix:** [Corregir fecha de vencimiento en interfaz de edición de facturas](https://github.com/LemontechSA/ttb/pull/820)
 
 ## Release: 15.0.0
 Martes 13 de Enero 2015.
