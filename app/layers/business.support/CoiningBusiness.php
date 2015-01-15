@@ -42,15 +42,14 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 	}
 
 	/**
-	 * Da formato a un monto basado en la {@link Currency} definida.
+	 * Da formato a un monto basado en la {@link Currency} definida y el {@link Language} definido.
 	 * @param $amount
 	 * @param Currency $amountCurrency
-	 * @param $separadorDecimal
-	 * @param $separadorMiles
+	 * @param Language $language
 	 * @return string
 	 */
-	function formatAmount($amount, Currency $amountCurrency, $separadorDecimal, $separadorMiles) {
-		return number_format($amount, $amountCurrency->get('cifras_decimales'), $separadorDecimal, $separadorMiles);
+	function formatAmount($amount, Currency $amountCurrency, Language $language) {
+		return number_format($amount, $amountCurrency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles'));
 	}
 
 	/**

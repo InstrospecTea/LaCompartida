@@ -372,8 +372,56 @@ function TTip($texto, $as_array = false) {
 echo $refrescar;
 ?>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	<!-- //
+
+	function DetalleMonto( form ) {
+		if(!form) {
+			var form = $('form_cobro5');
+		}
+		var text_window = '';
+		jQuery.ajax({
+			type: "POST",
+			dataType: "JSON",
+			url: root_dir + '/app/Charge/slidingScaleDetail/',
+			data: {
+				"charge": 8038,
+				"language": 'es'
+			},
+			success: function(data, status, jqXHR) {
+				text_window += data.detail;
+				GeneraPopUpDetalleMonto(text_window);
+			},
+			error: function(jqXHR, status, error) {
+				text_window += '<p>No se ha encontrado información.<p/>';
+				GeneraPopUpDetalleMonto(text_window);
+			}
+		});
+		
+	}
+
+	function GeneraPopUpDetalleMonto(html) {
+		jQuery('<p/>')
+			.attr('title', 'Detalle de monto')
+			.html(html)
+			.dialog({
+				resizable: true,
+				height: 250,
+				width: 520,
+				modal: true,
+				open: function() {
+					jQuery('.ui-dialog-title').addClass('ui-icon-info');
+					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+				},
+				buttons: {
+					"<?php echo __('Aceptar') ?>": function() {
+						jQuery(this).dialog('close');
+						return false;
+					}
+				}
+			});
+	}
+
 	function SubirExcel()
 	{
 		nuevaVentana('SubirExcel',500,300,"subir_excel.php");
@@ -705,7 +753,7 @@ echo $refrescar;
 		form.opc.value = 'guardar_cobro';
 		form.submit();
 		return true;
-	}
+	}	
 
 	function ActualizarMontos( form )
 	{
@@ -1602,7 +1650,8 @@ else
 						</td>
 						<td align="left" width="55%" nowrap>
 							<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido( this.id );" value="<?php echo number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?php echo $deshabilitar ?> style="text-align: right;" onkeydown="MontoValido( this.id );">
-							&nbsp;&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>
+							&nbsp;&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>&nbsp;&nbsp;
+							<img src="<?php echo Conf::ImgDir() ?>/noticia16.png" onclick="DetalleMonto(this.form)" style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>
 							<img id="ajustar_monto" <?php echo $display_buton_ajuste ?> src="<?php echo Conf::ImgDir() . '/editar_on.gif' ?>" title="<?php echo __('Ajustar Monto') ?>" border=0 style="cursor:pointer" onclick="AjustarMonto('ajustar');">
 							<img id="cancelar_ajustacion" <?php echo $display_buton_cancelar ?> src="<?php echo Conf::ImgDir() . '/cruz_roja_nuevo.gif' ?>" title="<?php echo __('Usar Monto Original') ?>" border=0 style='cursor:pointer' onclick="AjustarMonto('cancelar')">
 						</td>
@@ -2128,7 +2177,10 @@ else
 
 <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro?>" width=600px height=450px style="border: none;" frameborder=0></iframe>
 
-<script language="javascript" type="text/javascript">
+
+
+
+<script type="text/javascript">
 
 	window.onunload = ActualizarPadre;
 	var form = document.getElementById('form_cobro5');
@@ -2169,16 +2221,17 @@ else
 				$dec .= "0";
 			}
 		}
-	?>
+		?>
 
-	jQuery("#cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda'] ?>").blur(function(){
-		var str = jQuery(this).val();
-			jQuery(this).val( str.replace(',','.') );
-			jQuery(this).parseNumber({format:"#.0000000", locale:"us"});
-			jQuery(this).formatNumber({format:"#.0000000", locale:"us"});
-	});
+		jQuery("#cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda'] ?>").blur(function(){
+			var str = jQuery(this).val();
+				jQuery(this).val( str.replace(',','.') );
+				jQuery(this).parseNumber({format:"#.0000000", locale:"us"});
+				jQuery(this).formatNumber({format:"#.0000000", locale:"us"});
+		});
 
-<?php } ?>
+	<?php } ?>
+
 
 </script>
 

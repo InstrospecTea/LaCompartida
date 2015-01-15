@@ -20,10 +20,15 @@ class SandboxController extends AbstractController {
 		$report->render();
 	}
 
-	public function scales() {
+	public function scales($chargeId) {
 		$this->loadBusiness('Charging');
-		$this->ChargingBusiness->getSlidingScales(8038);
-		exit;
+		$this->loadBusiness('Translating');
+		$this->loadBusiness('Coining');
+		$language = $this->TranslatingBusiness->getLanguageByCode("'es'");
+		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId);
+		$charge = $this->ChargingBusiness->getCharge($chargeId);
+		$this->set('slidingScales', $slidingScales);
+		$this->set('charge', $charge);
 	}
 
 	public function charging() {
