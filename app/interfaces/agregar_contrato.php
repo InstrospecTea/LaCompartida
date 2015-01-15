@@ -31,7 +31,7 @@ $archivo = new Archivo($Sesion);
 function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
 }
-	
+
 if (empty($cliente)) {
 	$cliente = new Cliente($Sesion);
 }
@@ -41,8 +41,9 @@ if (!isset($Pagina)) {
 }
 
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente');
+$validacionesClienteJS = $validacionesCliente ? 'true' : 'false';
+
 if (!isset($contractValidation)) {
-	$validacionesClienteJS = 'true';
 	require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
 }
 
@@ -54,7 +55,7 @@ $obligatorios = function($key) use ($validacionesCliente, $contractValidation) {
 		return $contractValidation->validationSkipped($key) ? '' : '<span class="req">*</span>';
 	} else {
 		return '<span class="req">*</span>';
-	}	
+	}
 };
 
 $modulo_retribuciones_activo = Conf::GetConf($Sesion, 'UsarModuloRetribuciones');
