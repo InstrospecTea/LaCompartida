@@ -13,6 +13,13 @@ interface IChargingBusiness extends BaseBusiness {
 	public function getCharge($chargeId);
 
 	/**
+	 * Obtiene una instancia de {@link Document} en base a una instancia de {@link Charge}
+	 * @param $charge
+	 * @return Document
+	 */
+	public function getChargeDocument(Charge $charge);
+
+	/**
 	 * Obtiene el detalle de las tarifas escalonadas asociadas al cobro.
 	 * @param  number $chargeId Identificador del cobro
 	 * @param  string $languageCode
@@ -22,17 +29,12 @@ interface IChargingBusiness extends BaseBusiness {
 
 	public function getSlidingScalesDetailTable(array $slidingScales, $language, $currency);
 
-	/**
-	 * Obtiene la instancia de {@link Charge} asociada al identificador $id.
-	 * @param $id
-	 * @return mixed
-	 */
-	function getCharge($id);
 
 	/**
 	 * Obtiene un detalle del monto de honorarios de la liquidación
 	 *
 	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la información.
+	 * @param  currency Es una instancia de {@link Currency} para obtener los datos en moneda específica.
 	 * @return GenericModel  
 	 * 
 	 * [
@@ -42,7 +44,7 @@ interface IChargingBusiness extends BaseBusiness {
 	 * ]
 	 * 
 	 */
-	function getAmountDetailOfFees(Charge $charge);
+	function getAmountDetailOfFees(Charge $charge, Currency $currency);
 
 
 }

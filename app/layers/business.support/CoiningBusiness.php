@@ -84,7 +84,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 	}
 
 	/**
-	 * Establece el tipo de cambio de una moneda segÃºn el definido para una instancia de {@link Charge} en particular.
+	 * Establece el tipo de cambio de una moneda según el definido para una instancia de {@link Charge} en particular.
 	 * @param Currency $currency
 	 * @param Charge $charge
 	 * @return Currency

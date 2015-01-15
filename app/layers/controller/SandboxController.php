@@ -34,8 +34,15 @@ class SandboxController extends AbstractController {
 	public function charging() {
 		$this->layoutTitle = 'Sandbox Charging';
 		$this->loadBusiness('Charging');
-		$charge = $this->ChargingBusiness->getCharge(639);
-		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge);
+		$this->loadBusiness('Coining');
+
+		$charge = $this->ChargingBusiness->getCharge(5753);
+		
+		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
+		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
+		$invoiced = $this->ChargingBusiness->getBilledAmount($charge, $currency);
+		echo "<pre>";
+		var_dump($invoiced);
 		var_dump($detail);
 	}
 

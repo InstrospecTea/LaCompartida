@@ -5,6 +5,9 @@
 */
 class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
+	const CALCULATION_TYPE_OLD = 0;
+	const CALCULATION_TYPE_NEW = 1;
+
 	/**
 	 * Obtiene una instancia de {@link Charge} en base a su identificador primario.
 	 * @param $chargeId
@@ -13,6 +16,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	public function getCharge($chargeId) {
 		$this->loadService('Charge');
 		return $this->ChargeService->get($chargeId);
+	}
+
+	/**
+	 * Obtiene una instancia de {@link Document} en base a una instancia de {@link Charge}
+	 * @param $charge
+	 * @return Document
+	 */
+	public function getChargeDocument(Charge $charge) {
+		$this->loadBusiness('Searching');
+		$searchCriteria = new SearchCriteria('Document');
+		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()));
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		return $results && count($result) > 0 ? $results[0] : null;
 	}
 
 	public function getUserFee($userId, $feeId, $currencyId) {
@@ -61,15 +77,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $minutes/60;
 	}
 
-	/**
-	 * Obtiene la instancia de {@link Charge} asociada al identificador $id.
-	 * @param $id
-	 * @return mixed
-	 */
-	function getCharge($id) {
-		$this->loadService('Charge');
-		return $this->ChargeService->get($id);
-	}
 
 	/**
 	 * Obtiene un detalle del monto de honorarios de la liquidación
@@ -84,21 +91,149 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	 * ]
 	 * 
 	 */
-	function getAmountDetailOfFees(Charge $charge) {
-		$charge_id = $charge->get($charge->getIdentity());
-	 	$result = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $charge_id, array(), 0, true);
-	 	$subtotal_honorarios = $result['subtotal_honorarios'][$charge->get('opc_moneda_total')];
-	 	$descuento = $result['descuento_honorarios'][$charge->get('opc_moneda_total')];
-	 	$neto_honorarios = $subtotal_honorarios - $descuento;
-	 	
-		$detail = new GenericModel();
-		$detail->set('subtotal_honorarios', $subtotal_honorarios);
-		$detail->set('descuento', $descuento);
-		$detail->set('neto_honorarios', $neto_honorarios);
+	public function getAmountDetailOfFees(Charge $charge, Currency $currency) {
+		$this->loadBusiness('Coining');
+		$document = $this->getChargeDocument($charge);
+		if (!empty($document)) {
+			$documentCurrency = $this->CoiningBusiness->getCurrency($document->get('id_moneda'));
+		} else {
+			$documentCurrency = $currency;
+		}
 
-		return $detail;
+	 	$result = $this->processCharge($charge, $currency);
+	 	
+	 	if ($documentCurrency->get($documentCurrency->getIdentity()) != $currency->get($currency->getIdentity())) {
+			$documentResult = $this->processCharge($charge, $currency);
+		} else {
+			$documentResult = $result;
+		}
+
+		$modalidad_calculo = $charge->get('modalidad_calculo');
+	 	
+	 	$subtotal_honorarios = 0;
+	 	$descuento_honorarios = 0;
+	 	$saldo_honorarios = 0;
+	 	$saldo_disponible_trabajos = 0;
+	 	$saldo_disponible_tramites = 0;
+	 	$saldo_gastos_con_impuestos = 0;
+	 	$saldo_gastos_sin_impuestos = 0;
+	 	$monto_iva = 0;
+
+	 	if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_NEW) {
+	 		$subtotal_honorarios = $result['subtotal_honorarios'];
+			$descuento_honorarios = $result['descuento_honorarios'];
+			$saldo_honorarios = $subtotal_honorarios - $descuento_honorarios;
+			$saldo_disponible_trabajos = $saldo_trabajos = $result['monto_trabajos'] - $descuento_honorarios;
+			if ($saldo_disponible_trabajos < 0) {
+				$saldo_disponible_tramites = $saldo_tramites = $result['monto_tramites'] + $saldo_disponible_trabajos;
+				$saldo_disponible_trabajos = 0;
+			} else {
+				$saldo_disponible_tramites = $saldo_tramites = $result['monto_tramites'];
+			}
+		}
+ 		//Código que debería estar obsoleto
+		if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_OLD) {
+			$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
+			$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
+			$currency = $this->CoiningBusiness->setCurrencyAmountByCharge($currency, $charge);
+			$descuento_honorarios = $charge->get('descuento');
+			if ($charge->get('porcentaje_impuesto') > 0) {
+				$honorarios_original = $charge->get('monto_subtotal') - $descuento_honorarios;
+			} else {
+				$honorarios_original = $charge->get('monto_subtotal');
+			}
+
+			$saldo_honorarios = $this->CoiningBusiness->changeCurrency($honorarios_original, $chargeCurrency, $currency);
+
+			//Caso retainer menor de un valor y distinta tarifa (diferencia por decimales)
+			if ((($charge->get('total_minutos') / 60) < $charge->get('retainer_horas')) 
+				&& ($charge->get('forma_cobro') == 'RETAINER' 
+					|| $charge->get('forma_cobro') == 'PROPORCIONAL')
+				&& $charge->get('id_moneda') != $charge->get('id_moneda_monto')) {
+				$saldo_honorarios = $this->CoiningBusiness->changeCurrency($honorarios_original, $chargeCurrency, $currency); 
+			}
+
+			//Caso flat fee
+			$monto_tramites = $charge->get('monto_tramites');
+			if ($charge->get('forma_cobro') == 'FLAT FEE'
+				 && $charge->get('id_moneda') != $charge->get('id_moneda_monto')
+				 && $charge->get('id_moneda_monto') == $charge->get('opc_moneda_total')
+				 && empty($descuento_honorarios) && empty($monto_tramites)) {
+				$saldo_honorarios = $charge->get('monto_contrato');
+			}
+			$saldo_honorarios = $this->CoiningBusiness->changeCurrency($saldo_honorarios, $currency, $currency);
+			$subtotal_honorarios = $saldo_honorarios + $descuento_honorarios;
+		}
+
+		if ($saldo_honorarios < 0) {
+			$saldo_honorarios = 0;
+		}
+
+		$saldo_gastos_con_impuestos = $documentResult['subtotal_gastos'] - $documentResult['subtotal_gastos_sin_impuesto'];
+		if ($saldo_gastos_con_impuestos < 0) {
+			$saldo_gastos_con_impuestos = 0;
+		}
+
+		$saldo_gastos_sin_impuestos = $documentResult['subtotal_gastos_sin_impuesto'];
+		if ($saldo_gastos_sin_impuestos < 0) {
+			$saldo_gastos_sin_impuestos = 0;
+		}
+
+		if ($charge->get('porcentaje_impuesto') > 0 || $charge->get('porcentaje_impuesto_gastos') > 0) {
+			$monto_iva = $documentResult['monto_iva'];
+		} else {
+			$monto_iva = 0;
+		}
+
+		$amountDetail = new GenericModel();
+		$amountDetail->set('subtotal_honorarios', $subtotal_honorarios, false);
+	 	$amountDetail->set('descuento_honorarios', $descuento_honorarios, false);
+	 	$amountDetail->set('saldo_honorarios', $saldo_honorarios, false);
+	 	$amountDetail->set('saldo_disponible_trabajos', $saldo_disponible_trabajos, false);
+	 	$amountDetail->set('saldo_disponible_tramites', $saldo_disponible_tramites, false);
+	 	$amountDetail->set('saldo_gastos_con_impuestos', $saldo_gastos_con_impuestos, false);
+	 	$amountDetail->set('saldo_gastos_sin_impuestos', $saldo_gastos_sin_impuestos, false);
+	 	$amountDetail->set('monto_iva', $monto_iva, false);
+
+		return $amountDetail;
 	}
 
+	public function getBilledAmount(Charge $charge, Currency $currency) {
+		$this->loadBusiness('Searching');
+		$this->loadBusiness('Coining');
+		
+   		$searchCriteria = new SearchCriteria('Invoice');
+   		$searchCriteria->related_with('InvoiceCharge');
+   		$searchCriteria->filter('id_estado')->restricted_by('not_in')->compare_with(array(3, 5));
+   		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()))->for_entity('InvoiceCharge');
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		$ingreso = 0;
+		$egreso = 0;
+		$monto_facturado = 0;
+		foreach ($results as $invoice) {
+			$invoiceCurrency = $this->CoiningBusiness->getCurrency($invoice->get('id_moneda'));
+			$total = $this->CoiningBusiness->changeCurrency($invoice->get('total'), $invoiceCurrency, $currency);
+			if ($invoice->get('id_documento_legal') != 2) {
+				$ingreso += $total;
+			} else {
+				$egreso += $total;
+			}
+		}
+		$monto_facturado = $ingreso - $egreso;
+		return $monto_facturado;
+	}
+
+	private function processCharge(Charge $charge, Currency $currency) {
+		$currency_id = $currency->get($currency->getIdentity());
+		$charge_id = $charge->get($charge->getIdentity());
+		$result = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $charge_id);
+		$process = array();
+		foreach ($result as $key => $value) {
+			$process[$key] = $value[$currency_id];
+		}
+		return $process;
+	}
 
 	private function getTotalWorkedHours(array $works) {
 		$minutes = 0;
@@ -249,9 +384,5 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 		return array('works' => $works, 'scaleAmount' => $scaleAmount);
 	}
-
-
-
-
 
 }
