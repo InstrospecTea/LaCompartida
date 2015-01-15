@@ -358,6 +358,7 @@ $tip_subtotal = __("El monto total") . " " . __("del cobro") . " " . __("hasta e
 $tip_descuento = __("El monto del descuento.");
 $tip_total = __("El monto total") . " " . __("del cobro") . " " . __("hasta el momento incluidos descuentos.");
 $tip_actualizar = __("Actualizar los montos");
+$tip_detalle = __("Desglose del monto");
 $tip_refresh = __("Actualizar a cambio actual");
 
 function TTip($texto, $as_array = false) {
@@ -389,7 +390,11 @@ echo $refrescar;
 				"language": 'es'
 			},
 			success: function(data, status, jqXHR) {
-				text_window += data.detail;
+				if (data && data.detail) {
+					text_window += data.detail;
+				} else {
+					text_window += "No existe desglose";
+				}
 				GeneraPopUpDetalleMonto(text_window);
 			},
 			error: function(jqXHR, status, error) {
@@ -402,7 +407,7 @@ echo $refrescar;
 
 	function GeneraPopUpDetalleMonto(html) {
 		jQuery('<p/>')
-			.attr('title', 'Detalle de monto')
+			.attr('title', 'Desglose del monto')
 			.html(html)
 			.dialog({
 				resizable: true,
@@ -1651,7 +1656,7 @@ else
 						<td align="left" width="55%" nowrap>
 							<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido( this.id );" value="<?php echo number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?php echo $deshabilitar ?> style="text-align: right;" onkeydown="MontoValido( this.id );">
 							&nbsp;&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>&nbsp;&nbsp;
-							<img src="<?php echo Conf::ImgDir() ?>/noticia16.png" onclick="DetalleMonto(this.form)" style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>
+							<img src="<?php echo Conf::ImgDir() ?>/noticia16.png" onclick="DetalleMonto(this.form)" style='cursor:pointer' <?php echo TTip($tip_detalle) ?>>
 							<img id="ajustar_monto" <?php echo $display_buton_ajuste ?> src="<?php echo Conf::ImgDir() . '/editar_on.gif' ?>" title="<?php echo __('Ajustar Monto') ?>" border=0 style="cursor:pointer" onclick="AjustarMonto('ajustar');">
 							<img id="cancelar_ajustacion" <?php echo $display_buton_cancelar ?> src="<?php echo Conf::ImgDir() . '/cruz_roja_nuevo.gif' ?>" title="<?php echo __('Usar Monto Original') ?>" border=0 style='cursor:pointer' onclick="AjustarMonto('cancelar')">
 						</td>
