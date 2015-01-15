@@ -1502,46 +1502,6 @@ class Contrato extends Objeto {
 		return $datos;
 	}
 
-	public function contratosParaBorradorCobro($codigo_cliente, $filtros) {
-		$where = "cliente.codigo_cliente = '{$codigo_cliente}' ";
-		$join = '';
-		if ($filtros['tipo_liquidacion']) {
-			$where .= " AND contrato.separar_liquidaciones = " . ($filtros['tipo_liquidacion'] == '3' ? 0 : 1) . " ";
-		}
-		if ($filtros['activo']) {
-			$where .= " AND contrato.activo = 'SI' ";
-		} else {
-			$where .= " AND contrato.activo = 'NO' ";
-		}
-		if ($filtros['id_usuario']) {
-			$where .= " AND contrato.id_usuario_responsable = '{$filtros['id_usuario']}' ";
-		}
-		if ($filtros['forma_cobro']) {
-			$where .= " AND contrato.forma_cobro = '{$filtros['forma_cobro']}' ";
-		}
-
-		$join .= "LEFT JOIN cobro_pendiente ON ( cobro_pendiente.id_contrato=contrato.id_contrato AND cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.fecha_cobro >= NOW() )";
-
-		$where .= " AND cobro_pendiente.id_cobro_pendiente IS NULL ";
-
-		$query = "SELECT contrato.id_contrato,
-						contrato.separar_liquidaciones,
-						contrato.forma_cobro
-					FROM contrato
-						$join
-						JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
-						LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato
-						JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente
-						JOIN prm_moneda  ON (prm_moneda.id_moneda=contrato.id_moneda)
-					WHERE $where AND contrato.incluir_en_cierre = 1
-						AND contrato.forma_cobro != 'HITOS'
-					GROUP BY contrato.id_contrato";
-
-		$st = $this->sesion->pdodbh->query($query);
-
-		return $st->fetchAll(PDO::FETCH_ASSOC);
-	}
-
 	/**
 	 * Find all user generators of matter
 	 */

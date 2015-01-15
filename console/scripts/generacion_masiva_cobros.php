@@ -29,10 +29,17 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->Session->usuario->LoadId($this->data['user_id']);
 		$this->loadModel('BloqueoProceso');
 		$this->BloqueoProceso->lock(Cobro::PROCESS_NAME, '', json_encode($this->data['form']));
-		if (isset($this->data['arrayClientes'])) {
-			$this->clients();
-		} else {
-			$this->contracts();
+		try {
+			$this->loadModel('CobroQuery');
+			$query = $this->CobroQuery->genera_cobros($this->data['form']) . ' ORDER BY cliente.id_cliente';
+			$contratos = $this->Session->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+			if (Configure::read('TipoGeneracionMasiva') == 'contrato') {
+				$this->contracts($contratos);
+			} else {
+				$this->clients($contratos);
+			}
+		} catch (Exception $e) {
+			$this->status('error', 'Ocurrio un error inesperado');
 		}
 		$this->unlookProcess();
 	}
@@ -59,50 +66,59 @@ class GeneracionMasivaCobros extends AppShell {
 		}
 	}
 
-	private function contracts() {
+	private function contracts($contratos) {
 		$processing = 0;
-		$total_contratos = count($this->data['arrayHH']) + count($this->data['arrayMIXTAS']);
-		foreach ($this->data['arrayHH'] as $id_contrato) {
-			try {
-				++$processing;
-				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
-				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
-				$this->generaHH($id_contrato);
-				$this->generaGG($id_contrato);
-				$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
-			} catch (Exception $e) {
-				$this->log('Error contracts: ' . $e->getMessage());
+		// quitar contratos HITOS
+		foreach ($contratos as $key => $contrato) {
+			if ($contrato['forma_cobro'] == 'HITOS') {
+				$contratos[$key] = null;
+				continue;
 			}
 		}
-		foreach ($this->data['arrayMIXTAS'] as $id_contrato) {
+		$contratos = array_filter($contratos);
+		$total_contratos = count($contratos);
+		foreach ($contratos as $contrato) {
 			try {
 				++$processing;
 				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
 				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
-				$this->generaMIXTAS($id_contrato);
-				$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
+				if ($contrato['separar_liquidaciones']) {
+					$this->generaHH($contrato['id_contrato']);
+					$this->generaGG($contrato['id_contrato']);
+				} else {
+					$this->generaMIXTAS($contrato['id_contrato']);
+				}
 			} catch (Exception $e) {
 				$this->log('Error contracts: ' . $e->getMessage());
 			}
+			$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
 		}
 		$msg_procesando = $this->sp($processing, "Se ha procesado 1 contrato de {$total_contratos}", "Se han procesado {$processing} contratos de {$total_contratos}");
 		$this->status('proceso', "$msg_procesando.");
 	}
 
-	private function clients() {
+	private function clients($contratos) {
 		$processing = 0;
-		$total_clientes = count($this->data['arrayClientes']);
-		foreach ($this->data['arrayClientes'] as $codigo_cliente) {
+		$clientes = array();
+		// contar clientes
+		foreach ($contratos as $contrato) {
+			if ($contrato['forma_cobro'] == 'HITOS') {
+				continue;
+			}
+			$codigo_cliente = $contrato['codigo_cliente'];
+			if (!isset($clientes[$codigo_cliente])) {
+				$clientes[$codigo_cliente] = array();
+			}
+			$clientes[$codigo_cliente][] = $contrato;
+		}
+		unset($contratos);
+		$total_clientes = count($clientes);
+		foreach ($clientes as $codigo_cliente => $contratos) {
 			try {
 				++$processing;
 				$msg_procesando = $this->sp($processing, '1 cliente', "{$processing} clientes");
 				$this->status('proceso', "Procesando $msg_procesando de {$total_clientes}.");
-				$Contrato = new Contrato($this->Session);
-				$contratos = $Contrato->contratosParaBorradorCobro($codigo_cliente, $this->data['form']);
 				foreach ($contratos as $contrato) {
-					if ($contrato['forma_cobro'] == 'HITOS') {
-						continue;
-					}
 					if ($contrato['separar_liquidaciones']) {
 						$this->generaHH($contrato['id_contrato']);
 						$this->generaGG($contrato['id_contrato']);

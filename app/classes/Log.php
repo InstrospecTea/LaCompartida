@@ -28,7 +28,7 @@ class Log {
 		}
 		$file = $me->logFolder . '/' . $me->logFile . '.log';
 		if (!file_exists($file)) {
-			$me->writeFile('', $file);
+			shell_exec("touch $file && chmod a+w $file");
 		}
 		if (!is_writable($file) && $me->debug) {
 			echo $file . __(' no se puede escribir.');
