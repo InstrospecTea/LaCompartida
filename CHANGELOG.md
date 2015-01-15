@@ -2,7 +2,7 @@
 
 ## Hotfix: 15.0.2
 Jueves 15 de Enero 2015
-* **Fix:** [Corregir corregir validaciones de TASA al editar o agregar un contrato](https://github.com/LemontechSA/ttb/pull/821)
+* **Fix:** [Corregir corregir validaciones de TASA al editar o agregar un contrato](https://github.com/LemontechSA/ttb/pull/822)
 
 ## Hotfix: 15.0.1
 Miércoles 14 de Enero 2015
