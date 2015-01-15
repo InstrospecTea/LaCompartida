@@ -8,7 +8,7 @@ if (!isset($validacionesClienteJS) || is_null($validacionesClienteJS)) {
 }
 $contractValidation = new ValidationHelper($Sesion, array('disableServer' => !$validacionesCliente,  'validateClient' => $validacionesClienteJS, 'skipped' => $skippedArray));
 
-	# Validar la existencia del RUT del cliente 
+	# Validar la existencia del RUT del cliente
 	# datos de para facturación
 	$error_message = __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente');
 	$contractValidation->registerValidation(
@@ -313,7 +313,7 @@ SCRIPT;
 		)
 	);
 
-	 
+
 	if (Conf::GetConf($Sesion, 'TituloContacto')) {
 		$error_message = __('Debe ingresar el titulo del solicitante');
 		$contractValidation->registerValidation(
@@ -340,7 +340,7 @@ SCRIPT;
 					return $script;
 				}
 			)
-		); 
+		);
 
 		$error_message = __('Debe ingresar el nombre del solicitante');
 		$contractValidation->registerValidation(
@@ -587,12 +587,12 @@ SCRIPT;
 		}
 	)
 );
-		 
+
 $error_message =  __("Por favor ingrese la forma de ") . __("cobro") . __(" en la tarificación");
 $contractValidation->registerValidation(
 	'forma_cobro', array(
 		'value' => $forma_cobro,
-		'server' => function($field) use 
+		'server' => function($field) use
 			($Pagina, $error_message, $forma_cobro, $monto, $retainer_horas, $id_moneda_monto, $fecha_inicio_cap, $hito_fecha, $hito_descripcion, $hito_monto_estimado, $validacionesCliente, $hito_disabled) {
 			if ($validacionesCliente) {
 				if (empty($field)) {
@@ -646,6 +646,7 @@ $contractValidation->registerValidation(
 							}
 							break;
 						case "TASA":
+							break;
 						case "HITOS":
 							$invalid_date = (count($hito_fecha) <= 1 && empty($hito_fecha[1]) && count($hito_disabled) == 0);
 							$invalid_description = (count($hito_descripcion) <= 1 && empty($hito_descripcion[1]) && count($hito_disabled) == 0);
@@ -817,6 +818,6 @@ SCRIPT;
 	);
 }
 
- 
+
 
 
