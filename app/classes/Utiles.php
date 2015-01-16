@@ -107,7 +107,7 @@ class Utiles extends \Utiles {
 		$query .=" AND mensaje= '{$mensaje}' ";
 		$resp = mysql_query($query, $sesion->dbh);
 		if (!$resp) {
-			throw new Exception(preg_replace($clean_patt, ' ', $query));
+			throw new \Exception(preg_replace($clean_patt, ' ', $query));
 		}
 
 		$count = mysql_fetch_assoc($resp);
@@ -129,7 +129,7 @@ class Utiles extends \Utiles {
 				$query2 .= ', enviado = 1, fecha_envio = NOW()';
 			}
 			if (!mysql_query($query2, $sesion->dbh)) {
-				throw new Exception(preg_replace($clean_patt, ' ', $query2));
+				throw new \Exception(preg_replace($clean_patt, ' ', $query2));
 			}
 
 			if ($simular) {

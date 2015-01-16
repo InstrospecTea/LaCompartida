@@ -56,6 +56,15 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('error', '<strong>Ocurrio un error inesperado.</strong>');
 			$this->unlookProcess();
 		}
+		try {
+			$Usuario = $this->loadModel('UsuarioExt', null, true);
+			$Usuario->LoadId($this->data['user_id']);
+			$subject = __('Generación de') . ' ' . __('Cobros') . ' ' . __('finalizada');
+			$messaje = __('Estimado') . " {$Usuario->fields['nombre']}:\n\nEl proceso a finalizado con el siguiente resultado:\n\n{$this->statusText()}\n\n--\nThe Time Billing";
+			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $Usuario->fields['email'], $Usuario->fields['nombre'], false, $this->data['user_id'], 'proceso');
+		} catch (Exception $ex) {
+
+		}
 	}
 
 	private function reconectDb() {
@@ -217,9 +226,8 @@ class GeneracionMasivaCobros extends AppShell {
 	 */
 	private function status($type, $status) {
 		$this->status[$type] = $status;
-		$st = implode('<br/>', array_filter($this->status));
 		try {
-			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $st);
+			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $this->statusText());
 		} catch (PDOException $e) {
 			$this->status['error'] = 'Ocurrio un error inesperado.';
 			++$this->errors[$type];
@@ -227,6 +235,14 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status['error'] = 'Ocurrio un error inesperado.';
 			++$this->errors[$type];
 		}
+	}
+
+	/**
+	 * Genera un texto del array de status.
+	 * @return string
+	 */
+	private function statusText() {
+		return implode('<br/>', array_filter($this->status));
 	}
 
 	/**
