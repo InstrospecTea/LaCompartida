@@ -221,7 +221,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $listator->render();
 	}
 
-	public function getBilledAmount(Charge $charge, Currency $currency) {
+	public function getBilledFeesAmount(Charge $charge, Currency $currency) {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
 		
@@ -236,7 +236,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$monto_facturado = 0;
 		foreach ($results as $invoice) {
 			$invoiceCurrency = $this->CoiningBusiness->getCurrency($invoice->get('id_moneda'));
-			$total = $this->CoiningBusiness->changeCurrency($invoice->get('total'), $invoiceCurrency, $currency);
+			$total = $this->CoiningBusiness->changeCurrency($invoice->get('honorarios'), $invoiceCurrency, $currency);
 			if ($invoice->get('id_documento_legal') != 2) { //:O
 				$ingreso += $total;
 			} else {

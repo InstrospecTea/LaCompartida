@@ -683,24 +683,33 @@ if (count($cobro->asuntos)) {
 	
 	jQuery('.detalle_honorarios_cobro').live('click', function() {
 		var id = jQuery(this).data('id');
-		DetalleCobroHonorarios(id);
+		var options = {
+			"charge": id,
+			"language": 'es'
+		}
+		DetalleHonorarios(options, 'Charge');
 	});
 
 	jQuery('.detalle_honorarios_factura').live('click', function() {
-		
+		var id = jQuery(this).data('id');
+		var chargeId = jQuery(this).data('chargeid');
+		var options = {
+			"invoice": id,
+			"charge": chargeId,
+			"language": 'es'
+		}
+		DetalleHonorarios(options, 'Invoice');
 	});
 
-	function DetalleCobroHonorarios(id) {
+	function DetalleHonorarios(options, type) {
 		var text_window = '';
 		jQuery.ajax({
 			type: "POST",
 			dataType: "JSON",
-			url: root_dir + '/app/Charge/feeAmountDetailTable/',
-			data: {
-				"charge": id,
-				"language": 'es'
-			},
+			url: root_dir + '/app/' + type + '/feeAmountDetailTable/',
+			data: options,
 			success: function(data, status, jqXHR) {
+				console.log(data);
 				if (data && data.detail) {
 					text_window += data.detail;
 				} else {

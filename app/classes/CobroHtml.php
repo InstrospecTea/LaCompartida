@@ -124,7 +124,7 @@ HTML;
 		$datos_factura['numero'] = $Factura->ObtenerNumero(null, null, null, true);
 
 		$html_tools = self::cajafacturasFilaFacturaTools($Factura, $datos_factura);
-		$honorarios_html = "<img data-id='{$Factura->fields['id_factura']}' style='float:right' class='detalle_honorarios_factura' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
+		$honorarios_html = "<img data-id='{$Factura->fields['id_factura']}' data-chargeId='{$datos_factura['id_cobro']}' style='float:right' class='detalle_honorarios_factura' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
 		$html = <<<HTML
 			<tr bgcolor="{$color_fila}">
 				<td>{$datos_factura['tipo']}</td>
