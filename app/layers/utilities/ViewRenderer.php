@@ -22,7 +22,6 @@ class ViewRenderer {
 			$_file = $_element;
 			$file = "{$this->filePath}{$_path}{$_file}.ctp";
 		}
-
 		$vars = array_merge($this->vars, array('title_for_layout' => $this->title));
 		$content_for_layout = $this->_render($file, $vars);
 

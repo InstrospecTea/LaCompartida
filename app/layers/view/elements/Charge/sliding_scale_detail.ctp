@@ -7,5 +7,4 @@
 	$this->EntitiesListator->addColumn('Monto Neto', 'netAmount');
 	$this->EntitiesListator->totalizeFields(array('Monto Bruto', 'Descuento', 'Monto Neto'));
 	echo $this->EntitiesListator->render();
-
 ?>

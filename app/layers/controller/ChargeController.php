@@ -1,6 +1,7 @@
 <?php
 
 class ChargeController extends AbstractController {
+	public $helpers = array('EntitiesListator', array('\TTB\Html', 'Html'), 'Form', 'Paginator');
 
 	public function slidingScaleDetail() {
 		$chargeId = $this->data['charge'];
@@ -16,4 +17,23 @@ class ChargeController extends AbstractController {
 		$this->renderJSON($response);
 	}
 
+	public function feeAmountDetailTable() {
+		$chargeId = $this->data['charge'] ? $this->data['charge'] : $this->params['charge'];
+		
+		$this->loadBusiness('Charging');
+		$this->loadBusiness('Coining');
+		$this->loadBusiness('Translating');
+
+		$charge = $this->ChargingBusiness->getCharge($chargeId);
+		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
+		$language = $this->TranslatingBusiness->getLanguageByCode('es');
+		
+		$detail  = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
+	
+		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId, 'es');
+		$this->set('slidingScales', $slidingScales);
+		$response['detail'] = $this->renderTemplate('Charge/sliding_scale_detail');
+		$this->renderJSON($response);
+		// $this->ChargingBusiness->getAmountDetailOfFeesTable($detail, $currency, $language);
+	}	
 }

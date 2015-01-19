@@ -31,16 +31,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $results && count($result) > 0 ? $results[0] : null;
 	}
 
-	public function getUserFee($userId, $feeId, $currencyId) {
-		$searchCriteria = new SearchCriteria('UserFee');
-		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
-		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
-		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
-		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
-		return $results[0];
-	}
-
 	public function getSlidingScalesDetailTable(array $slidingScales, $currency, $language) {
 		$listator = new EntitiesListator();
 		$listator->loadEntities($slidingScales);
@@ -52,6 +42,17 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$listator->addColumn('Monto Neto', 'netAmount');
 		$listator->totalizeFields(array('Monto Neto'));
 		return $listator->render();
+	}
+
+
+	public function getUserFee($userId, $feeId, $currencyId) {
+		$searchCriteria = new SearchCriteria('UserFee');
+		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
+		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
+		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		return $results[0];
 	}
 
 	public function getSlidingScales($chargeId, $languageCode) {
@@ -198,6 +199,28 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $amountDetail;
 	}
 
+	public function getAmountDetailOfFeesTable($detail, $currency, $language) {
+		$listator = new EntitiesListator();
+
+		$fees = new GenericModel();
+		$fees->set('title', __('Subtotal Honorarios'), false);
+		$fees->set('amount', $detail->get('subtotal_honorarios'), false);
+		
+		$discount = new GenericModel();
+		$discount->set('title', __('Descuento'), false);
+		$discount->set('amount', $detail->get('descuento_honorarios'), false);
+
+		$total = new GenericModel();
+		$total->set('title', __('Total'), false);
+		$total->set('amount', $detail->get('saldo_honorarios'), false);
+		
+		$listator->loadEntities(array($fees, $discount, $total));
+		$listator->setNumberFormatOptions($currency, $language);
+		$listator->addColumn('Detalle', 'title');
+		$listator->addColumn('Monto', 'amount');
+		return $listator->render();
+	}
+
 	public function getBilledAmount(Charge $charge, Currency $currency) {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
@@ -214,7 +237,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach ($results as $invoice) {
 			$invoiceCurrency = $this->CoiningBusiness->getCurrency($invoice->get('id_moneda'));
 			$total = $this->CoiningBusiness->changeCurrency($invoice->get('total'), $invoiceCurrency, $currency);
-			if ($invoice->get('id_documento_legal') != 2) {
+			if ($invoice->get('id_documento_legal') != 2) { //:O
 				$ingreso += $total;
 			} else {
 				$egreso += $total;
@@ -269,11 +292,10 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach ($slidingScales as $scale) {
 			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
 			$works = $result['works'];
-			$scale->set('amount', $result['scaleAmount'], false);
-			$scale->set('chargeCurrency', $charge->get('id_moneda'));
-			if (!count($works)) {
-				break;
+			if (count($works)) {
+				$scale->set('amount', $result['scaleAmount'], false);
 			}
+			$scale->set('chargeCurrency', $charge->get('id_moneda'));
 		}
 		return $slidingScales;
 	}

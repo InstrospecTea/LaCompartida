@@ -82,14 +82,14 @@ HTML;
 		$cobro['f_subtotal_honorarios'] = self::number_format($cobro['subtotal_honorarios']);
 		$cobro['f_descuento_honorarios'] = self::number_format($cobro['descuento_honorarios']);
 
-		$honorarios_html = "<li><strong>Subtotal:</strong>{$cobro['f_subtotal_honorarios']}</li><li><strong>Descuento:</strong>{$cobro['f_descuento_honorarios']}</li><li><strong>Total:</strong>{$cobro['f_honorarios']}</li>";
+		$honorarios_html = "<img data-id='{$cobro['id_cobro']}' style='float:right' class='detalle_honorarios_cobro' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
 
 		$html = <<<HTML
 			<tr style="background:#EFE;">
 				<td>{$cobro['cobro']}</td>
 				<td>{$cobro['id_cobro']}</td>
 				<td style="width:78px;">{$cobro['fecha']}</td>
-				<td id='celda_honorarios'>{$cobro['f_honorarios']}<input type="hidden" name="honorarios_total" id="honorarios_total" value="{$cobro['saldo_honorarios']}" /></td>
+				<td id='celda_honorarios'>{$cobro['f_honorarios']}{$honorarios_html}<input type="hidden" name="honorarios_total" id="honorarios_total" value="{$cobro['saldo_honorarios']}" /></td>
 				<td>{$cobro['f_gastos_con_impuestos']}<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="{$cobro['saldo_gastos_con_impuestos']}" /></td>
 				<td>{$cobro['f_gastos_sin_impuestos']}<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="{$cobro['saldo_gastos_sin_impuestos']}" /></td>
 				<td>{$cobro['f_iva']}</td>
@@ -99,7 +99,6 @@ HTML;
 				<td></td>
 				<td></td>
 			</tr>
-			<script> new Tip('celda_honorarios', '{$honorarios_html}', {title : 'Detalle Honorarios', effect: '', offset: {x:-2, y:10}}); </script>
 HTML;
 			return $html;
 	}
@@ -125,13 +124,13 @@ HTML;
 		$datos_factura['numero'] = $Factura->ObtenerNumero(null, null, null, true);
 
 		$html_tools = self::cajafacturasFilaFacturaTools($Factura, $datos_factura);
-
+		$honorarios_html = "<img data-id='{$Factura->fields['id_factura']}' style='float:right' class='detalle_honorarios_factura' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
 		$html = <<<HTML
 			<tr bgcolor="{$color_fila}">
 				<td>{$datos_factura['tipo']}</td>
 				<td style="width:78px;white-space:nowrap;">{$datos_factura['numero']}</td>
 				<td>{$datos_factura['fecha']}</td>
-				<td>{$datos_factura['f_subtotal_sin_descuento']}</td>
+				<td>{$datos_factura['f_subtotal_sin_descuento']}{$honorarios_html}</td>
 				<td>{$datos_factura['f_subtotal_gastos']}</td>
 				<td>{$datos_factura['f_subtotal_gastos_sin_impuesto']}</td>
 				<td>{$datos_factura['f_iva']}</td>

@@ -680,6 +680,63 @@ if (count($cobro->asuntos)) {
 			});
 		});
 	});
+	
+	jQuery('.detalle_honorarios_cobro').live('click', function() {
+		var id = jQuery(this).data('id');
+		DetalleCobroHonorarios(id);
+	});
+
+	jQuery('.detalle_honorarios_factura').live('click', function() {
+		
+	});
+
+	function DetalleCobroHonorarios(id) {
+		var text_window = '';
+		jQuery.ajax({
+			type: "POST",
+			dataType: "JSON",
+			url: root_dir + '/app/Charge/feeAmountDetailTable/',
+			data: {
+				"charge": id,
+				"language": 'es'
+			},
+			success: function(data, status, jqXHR) {
+				if (data && data.detail) {
+					text_window += data.detail;
+				} else {
+					text_window += "No existe desglose";
+				}
+				GeneraPopUpDetalleMonto(text_window);
+			},
+			error: function(jqXHR, status, error) {
+				text_window += '<p>No se ha encontrado información.<p/>';
+				GeneraPopUpDetalleMonto(text_window);
+			}
+		});
+		
+	}
+
+	function GeneraPopUpDetalleMonto(html) {
+		jQuery('<p/>')
+			.attr('title', 'Desglose del monto')
+			.html(html)
+			.dialog({
+				resizable: true,
+				height: 250,
+				width: 520,
+				modal: true,
+				open: function() {
+					jQuery('.ui-dialog-title').addClass('ui-icon-info');
+					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+				},
+				buttons: {
+					"<?php echo __('Aceptar') ?>": function() {
+						jQuery(this).dialog('close');
+						return false;
+					}
+				}
+			});
+	}
 
     function Refrescarse()
     {

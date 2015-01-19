@@ -37,12 +37,11 @@ class SandboxController extends AbstractController {
 		$this->loadBusiness('Coining');
 
 		$charge = $this->ChargingBusiness->getCharge(5753);
-		
+
 		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
 		$invoiced = $this->ChargingBusiness->getBilledAmount($charge, $currency);
 		echo "<pre>";
-		var_dump($invoiced);
 		var_dump($detail);
 	}
 

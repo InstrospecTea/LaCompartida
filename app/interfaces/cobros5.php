@@ -386,7 +386,7 @@ echo $refrescar;
 			dataType: "JSON",
 			url: root_dir + '/app/Charge/slidingScaleDetail/',
 			data: {
-				"charge": 8038,
+				"charge": form.id_cobro.value,
 				"language": 'es'
 			},
 			success: function(data, status, jqXHR) {
