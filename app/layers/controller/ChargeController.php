@@ -29,11 +29,15 @@ class ChargeController extends AbstractController {
 		$language = $this->TranslatingBusiness->getLanguageByCode('es');
 		
 		$detail  = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
-	
 		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId, 'es');
+
 		$this->set('slidingScales', $slidingScales);
-		$response['detail'] = $this->renderTemplate('Charge/sliding_scale_detail');
+		$this->set('feeDetiail', $detail);
+		$this->set('currency', $currency);
+		$this->set('language', $language);
+
+		$response['detail'] = $this->renderTemplate('Charge/detail_fees');
 		$this->renderJSON($response);
-		// $this->ChargingBusiness->getAmountDetailOfFeesTable($detail, $currency, $language);
+		
 	}	
 }
