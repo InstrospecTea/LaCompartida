@@ -722,8 +722,8 @@ if (count($cobro->asuntos)) {
 			.html(html)
 			.dialog({
 				resizable: true,
-				height: 250,
-				width: 520,
+				height: 350,
+				width: 420,
 				modal: true,
 				open: function() {
 					jQuery('.ui-dialog-title').addClass('ui-icon-info');

@@ -1,21 +1,19 @@
-<?php 
-$listator = new EntitiesListator();
-
-$fees = new GenericModel();
-$fees->set('title', __('Subtotal Honorarios'), false);
-$fees->set('amount', $feeDetiail->get('subtotal_honorarios'), false);
-
-$discount = new GenericModel();
-$discount->set('title', __('Descuento'), false);
-$discount->set('amount', $feeDetiail->get('descuento_honorarios'), false);
-
-$total = new GenericModel();
-$total->set('title', __('Total'), false);
-$total->set('amount', $feeDetiail->get('saldo_honorarios'), false);
-
-$listator->loadEntities(array($fees, $discount, $total));
-$listator->setNumberFormatOptions($currency, $language);
-$listator->addColumn('Detalle', 'title');
-$listator->addColumn('Monto', 'amount');
-
-echo $listator->render();
+<?php $this->Formatter = new Formatter(); ?> 
+<table width="100%" style="border-collapse: collapse;">
+	<tr>
+		<td><?php echo __('Subtotal Honorarios'); ?></td>
+		<td style="text-align:right">
+			<?php 
+				echo $this->Formatter->currency($feeDetiail->get('subtotal_honorarios'), $currency, $language);
+			?>
+		</td>
+	</tr>
+	<tr>
+	<td><?php echo __('Descuento'); ?></td>
+		<td style="text-align:right"><?php echo $this->Formatter->currency($feeDetiail->get('descuento_honorarios'), $currency, $language) ?></td>
+	</tr>
+	<tr style="border-top: solid 1px #888;">
+		<td ><b><?php echo __('Total Honorarios'); ?></b></td>
+		<td style="text-align:right;"><b><?php echo $this->Formatter->currency($feeDetiail->get('saldo_honorarios'), $currency, $language) ?></b></td>
+	</tr>	
+</table>
