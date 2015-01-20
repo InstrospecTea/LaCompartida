@@ -70,7 +70,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $listator->render();
 	}
 
+
+	public function getUserFee($userId, $feeId, $currencyId) {
+		$searchCriteria = new SearchCriteria('UserFee');
+		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
+		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
+		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		return $results[0];
+	}
+
 	public function getSlidingScales($chargeId) {
+
 		$this->loadService('Charge');
 		$this->loadBusiness('Working');
 		$charge = $this->ChargeService->get($chargeId);
@@ -89,7 +101,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$minutes += $workTimeDetail[1];
 		return $minutes/60;
 	}
-
 
 	/**
 	 * Obtiene un detalle del monto de honorarios de la liquidación
@@ -233,7 +244,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $listator->render();
 	}
 
-	public function getBilledAmount(Charge $charge, Currency $currency) {
+	public function getBilledFeesAmount(Charge $charge, Currency $currency) {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
 		
@@ -248,7 +259,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$monto_facturado = 0;
 		foreach ($results as $invoice) {
 			$invoiceCurrency = $this->CoiningBusiness->getCurrency($invoice->get('id_moneda'));
-			$total = $this->CoiningBusiness->changeCurrency($invoice->get('total'), $invoiceCurrency, $currency);
+			$total = $this->CoiningBusiness->changeCurrency($invoice->get('honorarios'), $invoiceCurrency, $currency);
 			if ($invoice->get('id_documento_legal') != 2) { //:O
 				$ingreso += $total;
 			} else {
