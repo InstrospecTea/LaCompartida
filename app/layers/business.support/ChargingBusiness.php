@@ -28,22 +28,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria = new SearchCriteria('Document');
 		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()));
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
-		return $results && count($result) > 0 ? $results[0] : null;
+		return $results && count($results) > 0 ? $results[0] : null;
 	}
-
-	public function getSlidingScalesDetailTable(array $slidingScales, $currency, $language) {
-		$listator = new EntitiesListator();
-		$listator->loadEntities($slidingScales);
-		$listator->setNumberFormatOptions($currency, $language);
-		$listator->addColumn('#', 'scale_number');
-		$listator->addColumn('Monto Bruto', 'amount');
-		$listator->addColumn('% Descuento', 'discountRate');
-		$listator->addColumn('Descuento', 'discount');
-		$listator->addColumn('Monto Neto', 'netAmount');
-		$listator->totalizeFields(array('Monto Neto'));
-		return $listator->render();
-	}
-
 
 	public function getUserFee($userId, $feeId, $currencyId) {
 		$searchCriteria = new SearchCriteria('UserFee');
@@ -52,21 +38,47 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		if (empty($results)) {
+			return null;
+		} else {
+			return $results[0];
+		}
+	}
+
+	public function getDefaultUserFee($userId, $currencyId) {
+		$searchCriteria = new SearchCriteria('UserFee');
+		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
+		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
+		$searchCriteria->related_with('Fee');
+		$searchCriteria->filter('tarifa_defecto')->restricted_by('equals')->compare_with('1');
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
 		return $results[0];
 	}
 
-	public function getSlidingScales($chargeId, $languageCode) {
+
+	public function getSlidingScalesDetailTable(array $slidingScales, $currency, $language) {
+		$listator = new EntitiesListator();
+		$listator->loadEntities($slidingScales);
+		$listator->setNumberFormatOptions($currency, $language);
+		$listator->addColumn('# Escalón', 'scale_number');
+		$listator->addColumn('Monto Bruto', 'amount');
+		$listator->addColumn('% Descuento', 'discountRate');
+		$listator->addColumn('Descuento', 'discount');
+		$listator->addColumn('Monto Neto', 'netAmount');
+		$listator->totalizeFields(array('Monto Neto'));
+		return $listator->render();
+	}
+
+	public function getSlidingScales($chargeId) {
 		$this->loadService('Charge');
 		$this->loadBusiness('Working');
-		$this->loadBusiness('Translating');
 		$charge = $this->ChargeService->get($chargeId);
-		$language = $this->TranslatingBusiness->getLanguageByCode($languageCode);
 		$slidingScales = $this->constructScaleObjects($charge);
 		$works = $this->WorkingBusiness->getWorksByCharge($chargeId);
 		$works = $works->toArray();
 		$slidingScales = $this->processSlidngScales($works, $slidingScales, $charge);
 		$slidingScales = $this->processSlidingScalesDiscount($slidingScales);
-		$slidingScales = $this->proceessSlidingScalesLanguages($slidingScales, $language);
 		return $slidingScales;
 	}
 
@@ -272,6 +284,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$scaleLabel = "esc$scaleNumber";
 		$slidingScale->set('scaleLabel', $scaleLabel, false);
 		$slidingScale->set('scale_number', $scaleNumber, false);
+		$slidingScale->set('fixedAmount', $charge->get("{$scaleLabel}_monto"), false);
 		$slidingScale->set('discountRate', $charge->get("{$scaleLabel}_descuento"), false);
 		$slidingScale->set('hours', $charge->get("{$scaleLabel}_tiempo"), false);
 		$slidingScale->set('feeId', $charge->get("{$scaleLabel}_id_tarifa"), false);
@@ -288,18 +301,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $slidingScales;
 	}
 
-	private function processSlidngScales($works, $slidingScales, $charge) {
-		foreach ($slidingScales as $scale) {
-			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
-			$works = $result['works'];
-			if (count($works)) {
-				$scale->set('amount', $result['scaleAmount'], false);
-			}
-			$scale->set('chargeCurrency', $charge->get('id_moneda'));
-		}
-		return $slidingScales;
-	}
-
 	private function processSlidingScalesDiscount($slidingScales) {
 		foreach ($slidingScales as $slidingScale) {
 			$slidingScale = $this->processSlidingScaleDiscount($slidingScale);
@@ -308,17 +309,20 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	private function processSlidingScaleDiscount($slidingScale) {
-		if (!is_null($slidingScale->get('amount'))) {
-			$amount = $slidingScale->get('amount');
-			$slidingScale->set('discount',
-				$amount * ($slidingScale->get('discountRate') / 100),
-				false
-			);
-			$slidingScale->set('netAmount',
-				$amount - $slidingScale->get('discount'),
-				false
-			);
+		if (is_null($slidingScale->get('amount'))) {
+			$slidingScale->set('amount', 0, false);
 		}
+
+		$amount = $slidingScale->get('amount');
+		$slidingScale->set('discount',
+			($amount * $slidingScale->get('discountRate') / 100),
+			false
+		);
+		$slidingScale->set('netAmount',
+			$amount - $slidingScale->get('discount'),
+			false
+		);
+
 		return $slidingScale;
 	}
 
@@ -355,9 +359,43 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $slidingScale;
 	}
 
+	private function processSlidngScales($works, $slidingScales, $charge) {
+		foreach ($slidingScales as $scale) {
+			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
+			$works = $result['works'];
+			$scale->set('amount', $result['scaleAmount'], false);
+			$scale->set('chargeCurrency', $charge->get('id_moneda'));
+		}
+		return $slidingScales;
+	}
+
 	private function slidingScaleTimeCalculation($works, $scale, $charge, $scaleAmount = 0) {
+		
 		$this->loadBusiness('Coining');
 		$remainingScaleHours = $scale->get('hours');
+		$scaleCurrency = $scale->get('currencyId') ? $scale->get('currencyId') : $charge->get('id_moneda');
+		$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
+		$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
+		$scaleCurrency = $this->CoiningBusiness->getCurrency($scaleCurrency);
+
+		if ($scale->get('hours') == 0) {
+			return array(
+				'works' => $works,
+				'scaleAmount' => 0
+			);
+		}
+		
+		if (empty($works) && $scale->get('fixedAmount')) {
+			return array(
+				'works' => $works,
+				'scaleAmount' => $this->CoiningBusiness->changeCurrency(
+					$scale->get('fixedAmount'),
+					$scaleCurrency,
+					$chargeCurrency
+				)
+			);
+		}
+
 		for ($work = array_shift($works); !empty($work); $work = array_shift($works)) {
 			//Tomo las horas del trabajo de las horas restantes, si el trabajo ya fue usado para llenar un escalón,
 			// o de las horas trabajadas, si es primera vez que se utiliza el trabajo para llenar el escalón.
@@ -373,18 +411,24 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			}
 			$remainingWorkHours = $workedHours - $remainingScaleHours;
 			$remainingScaleHours = $remainingScaleHours - $workedHours;
+			//Obtener la tarifa del usuario en base a la moneda.
+			$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
+			if (is_null($userFee)) {
+				$userFee = $this->getDefaultUserFee($work->get('id_usuario'), $scale->get('currencyId'));
+			}
 			if ($remainingWorkHours <= 0) {
 				//Se acabaron las horas del trabajo al intentar llenar la bolsa de horas del escalón.
-				//Transformar las horas en dinero
-				$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
-				//Cambio de moneda del monto
-				$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
-				$scaleCurrency = $this->CoiningBusiness->getCurrency($scale->get('currencyId'));
-				$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
-				$amount = $workedHours * $userFee->get('tarifa');
-				$scaleAmount += $this->CoiningBusiness->changeCurrency($amount, $scaleCurrency, $chargeCurrency);
+				//Si no se ha fijado un monto para las horas del escalón...
+				if ($scale->get('fixedAmount') == 0) {
+					//Transformar las horas en dinero
+					$amount = $workedHours * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
+					$scaleAmount += $amount;
+				}
 				if ($remainingScaleHours == 0) {
 					// El trabajo se acabó y además se llenó la bolsa del escalón. Hay que cambiar el escalón.
+					if ($scale->get('fixedAmount') != 0) {
+						$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
+					}
 					return array('works' => $works, 'scaleAmount' => $scaleAmount);
 				} else {
 					//Aun hay horas en el escalón. Hay que cambiar el trabajo.
@@ -392,13 +436,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				}
 			} else {
 				//El trabajo aun tiene horas y la bolsa de horas del escalón ya se llenó. Hay que cambiar el escalón.
-				$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
-				//Cambio de moneda del monto
-				$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
-				$scaleCurrency = $this->CoiningBusiness->getCurrency($scale->get('currencyId'));
-				$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
-				$amount = ($remainingScaleHours + $workedHours) * $userFee->get('tarifa');
-				$scaleAmount += $this->CoiningBusiness->changeCurrency($amount, $scaleCurrency, $chargeCurrency);
+				//Transformar las horas en dinero
+				$amount = ($remainingScaleHours + $workedHours) * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
+				$scaleAmount += $amount;
+				//Si la escala tiene un monto fijo entonces reemplazar el acumulado
+				if ($scale->get('fixedAmount') != 0) {
+					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
+				}
 				$work->set('remainingHours', $remainingWorkHours);
 				array_unshift($works, $work);
 				return array('works' => $works, 'scaleAmount' => $scaleAmount);

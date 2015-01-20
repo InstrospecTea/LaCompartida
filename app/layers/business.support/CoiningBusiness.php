@@ -27,6 +27,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 	 * @throws BusinessException
 	 */
 	function changeCurrency($amount, Currency $fromCurrency, Currency $toCurrency) {
+
 		if (!is_numeric($amount)) {
 			throw new BusinessException('The amount must be numeric');
 		}
@@ -35,9 +36,8 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 			throw new BusinessException('One of the currencies does not have an identity');
 		}
 
-		$newAmount = ($amount * $fromCurrency->get('tipo_cambio')) / $toCurrency->get('tipo_cambio');
+		$newAmount = $amount * ($fromCurrency->get('tipo_cambio') / $toCurrency->get('tipo_cambio'));
 		$newAmount = round($newAmount, $toCurrency->get('cifras_decimales'));
-
 		return $newAmount;
 	}
 
