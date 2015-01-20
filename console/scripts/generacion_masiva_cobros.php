@@ -69,7 +69,7 @@ class GeneracionMasivaCobros extends AppShell {
 
 	private function reconectDb() {
 		$this->log('Intentando reconectar a la BD.');
-		while (!$this->Session->dbconnect()) {
+		while (!$this->Session->dbconnect(false)) {
 			sleep(1);
 			$this->reconectDb();
 		}
