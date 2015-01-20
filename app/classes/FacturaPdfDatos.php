@@ -61,6 +61,10 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
+		$chargingBusiness = new ChargingBusiness($this->sesion);
+		$coiningBusiness = new CoiningBusiness($this->sesion);
+		$billingBusiness = new BillingBusiness($this->sesion);
+
 		// Segmento Condiciones de pago
 		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 
@@ -211,6 +215,12 @@ class FacturaPdfDatos extends Objeto {
 			case 'nota_factura':
 				$glosa_dato = $condicion_pago;
 				break;
+			case 'descripcion_subtotal_honorarios':
+				$glosa_dato = __('Subtotal Honorarios');
+				break;
+			case 'descripcion_descuento_honorarios':
+				$glosa_dato = __('Descuento Honorarios');
+				break;
 			case 'descripcion_honorarios':
 				$glosa_dato = $factura->fields['descripcion'];
 				break;
@@ -223,6 +233,34 @@ class FacturaPdfDatos extends Objeto {
 			case 'monto_honorarios':
 				$glosa_dato = number_format(
 					$factura->fields['subtotal_sin_descuento'],
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_descuento_honorarios':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+			
+				$glosa_dato = number_format(
+					-1 * $detail->get('descuento_honorarios'),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_subtotal_honorarios':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+			
+				$glosa_dato = number_format(
+					$detail->get('subtotal_honorarios'),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
@@ -551,6 +589,7 @@ class FacturaPdfDatos extends Objeto {
 		if ($mantencion) {
 			// $pdf->Output("../../pdf/factura.pdf","F");
 		} else {
+			ob_end_clean();
 			$pdf->Output($glosa_documento_legal . '_' . $factura->fields['numero'] . '.pdf', 'D');
 		}
 	}
