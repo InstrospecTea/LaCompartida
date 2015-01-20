@@ -44,7 +44,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $listator->render();
 	}
 
-
 	public function getUserFee($userId, $feeId, $currencyId) {
 		$searchCriteria = new SearchCriteria('UserFee');
 		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
@@ -77,7 +76,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$minutes += $workTimeDetail[1];
 		return $minutes/60;
 	}
-
 
 	/**
 	 * Obtiene un detalle del monto de honorarios de la liquidación

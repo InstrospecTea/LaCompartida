@@ -120,6 +120,26 @@ class FacturaPago extends Objeto {
 					'field' => 'tipo_cambio_pago',
 			),
 			array(
+				'field' => 'bruto_honorarios',
+				'format' => 'number',
+				'title' => 'Subtotal Honorarios',
+				'extras' =>
+				array(
+					'symbol' => 'simbolo',
+					'subtotal' => 'simbolo'
+				),
+			),
+			array(
+				'field' => 'descuento_honorarios',
+				'format' => 'number',
+				'title' => 'Descuento Honorarios',
+				'extras' =>
+				array(
+					'symbol' => 'simbolo',
+					'subtotal' => 'simbolo'
+				),
+			),
+			array(
 					'format' => 'number',
 					'extras' =>
 					array(
@@ -811,11 +831,47 @@ class FacturaPago extends Objeto {
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura) {
 		$query = $this->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura);
-
-		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
+		$results =  $statement->fetchAll(PDO::FETCH_ASSOC);
+		
+		$billingBusiness = new BillingBusiness($this->sesion);
+		$charginBusiness = new ChargingBusiness($this->sesion);
+		$coiningBusiness = new CoiningBusiness($this->sesion);
+
+		$charginData = array();
+		$coiningData = array();
+		$invoiceData = array();
+
+		foreach ($results as $key => $fila) {
+			$id_cobro = $results[$key]['id_cobro'];
+			$id_factura = $results[$key]['id_factura'];
+			$id_moneda = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
+			
+			$invoice = $invoiceData[$id_factura];
+			if (is_null($invoice)) {
+				$invoice = $billingBusiness->getInvoice($id_factura);
+				$invoiceData[$id_factura] = $invoice;
+			}
+			$currency = $coiningData[$id_moneda];
+			if (is_null($currency)) {
+				$currency = $coiningBusiness->getCurrency($id_moneda);
+				$coiningData[$id_moneda] = $currency;
+			}
+			if (is_null($charginData[$id_cobro])) {
+				$charge = $charginBusiness->getCharge($id_cobro);
+				$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+			}
+			$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+			$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
+			$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
+			$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+			
+			$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
+			$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
+
+		}
+		return $results;
 	}
 
 	public function PreCrearDato($data) {

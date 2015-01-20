@@ -49,14 +49,13 @@ interface IBillingBusiness extends BaseBusiness {
 
 
 	/** 
-	* Obitne el monto de honorarios de una Factura de un cobro en determinada moneda
+	* Obitne el monto de honorarios de una Factura en determinada moneda
 	* 
 	* @param $invoice instancia de {@link Invoice}  Factura a evaluar 
-	* @param $charge instancia de {@link Charge} Liquidación a considerar para la factura
 	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los cálculos
 	*
 	* @return Number  monto de honorarios de la factura
 	*/
-	public function getInvoiceFeesAmount(Invoice $invoice, Charge $charge, Currency $currency);
+	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency);
 
 }
