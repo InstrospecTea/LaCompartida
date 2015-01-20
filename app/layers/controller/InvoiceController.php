@@ -18,7 +18,7 @@ class InvoiceController extends AbstractController {
 		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$language = $this->TranslatingBusiness->getLanguageByCode('es');
 
-		$detail = $this->BillingBusiness->getBilledFeesAmount($invoice, $charge, $currency);
+		$detail = $this->BillingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
 		
 		$this->set('feeDetiail', $detail);
 		$this->set('currency', $currency);

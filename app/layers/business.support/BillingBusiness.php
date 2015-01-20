@@ -7,11 +7,32 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $this->InvoiceService->get($invoiceId);
 	}
 
-	public function getBilledFeesAmount(Invoice $invoice, Charge $charge, Currency $currency) {
+	public function getFeesDataOfInvoiceByCharge(Invoice $invoice, Charge $charge, Currency $currency) {	
+		$this->loadBusiness('Charging');	
+		$chargeData = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
+		$chargeFees = $chargeData->get('saldo_honorarios');
+		$chargeDiscount = $chargeData->get('descuento_honorarios');
+		$invoiceFees = $this->getInvoiceFeesAmount($invoice, $charge, $currency);
+		$invoiceFeesData = $this->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+	 	return $invoiceFeesData;
+	}
+
+	public function getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency) {
+		$factor = $invoiceFees / $chargeFees;
+		$invoiceDiscount = $factor * $chargeDiscount;
+		$subtotalFees = $invoiceFees + $invoiceDiscount;
+
+		$amountDetail = new GenericModel();
+		$amountDetail->set('subtotal_honorarios', $subtotalFees, false);
+	 	$amountDetail->set('descuento_honorarios', $chargeDiscount, false);
+	 	$amountDetail->set('saldo_honorarios', $invoiceFees, false);
+
+	 	return $amountDetail;
+	}
+
+	public function getInvoiceFeesAmount(Invoice $invoice, Charge $charge, Currency $currency) {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
-		$this->loadBusiness('Charging');
-
    		$searchCriteria = new SearchCriteria('Invoice');
    		$searchCriteria->related_with('InvoiceCharge');
    		$searchCriteria->filter($invoice->getIdentity())->restricted_by('equals')->compare_with($invoice->get($invoice->getIdentity()));
@@ -29,22 +50,7 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 				$egreso += $total;
 			}
 		}
-		$saldo_honorarios = $ingreso - $egreso;
-
-		$chargeDetail = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
-		$charge_saldo_honorarios = $chargeDetail->get('saldo_honorarios');
-		$charge_descuento_honorarios  = $chargeDetail->get('descuento_honorarios');
-
-		$factor = $saldo_honorarios / $charge_saldo_honorarios;
-		$descuento_honorarios = $factor * $charge_descuento_honorarios;
-		$subtotal_honorarios = $saldo_honorarios + $descuento_honorarios;
-
-		$amountDetail = new GenericModel();
-		$amountDetail->set('subtotal_honorarios', $subtotal_honorarios, false);
-	 	$amountDetail->set('descuento_honorarios', $descuento_honorarios, false);
-	 	$amountDetail->set('saldo_honorarios', $saldo_honorarios, false);
-
-	 	return $amountDetail;
+		return ($ingreso - $egreso);
 	}
 
 }
