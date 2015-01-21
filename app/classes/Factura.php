@@ -567,7 +567,6 @@ class Factura extends Objeto {
 
 		$templateData = $this->ReemplazarMargenes($templateData);
 		$parser = new TemplateParser($templateData);
-
 		$query = "SELECT cobro.codigo_idioma
 							FROM factura
 							LEFT JOIN cobro ON factura.id_cobro=cobro.id_cobro

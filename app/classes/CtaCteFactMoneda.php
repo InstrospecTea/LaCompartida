@@ -109,4 +109,3 @@ class CtaCteFactMoneda extends Objeto
 		return $monto * $this->moneda[$id_moneda]['tipo_cambio'] / $this->base['tipo_cambio'];
 	}
 }
-?>
