@@ -1,8 +1,5 @@
 <?php
 
-/**
-* 
-*/
 class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 	const CALCULATION_TYPE_OLD = 0;
@@ -70,19 +67,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $listator->render();
 	}
 
-
-	public function getUserFee($userId, $feeId, $currencyId) {
-		$searchCriteria = new SearchCriteria('UserFee');
-		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
-		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
-		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
-		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
-		return $results[0];
-	}
-
 	public function getSlidingScales($chargeId) {
-
 		$this->loadService('Charge');
 		$this->loadBusiness('Working');
 		$charge = $this->ChargeService->get($chargeId);
@@ -224,19 +209,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 	public function getAmountDetailOfFeesTable($detail, $currency, $language) {
 		$listator = new EntitiesListator();
-
 		$fees = new GenericModel();
 		$fees->set('title', __('Subtotal Honorarios'), false);
 		$fees->set('amount', $detail->get('subtotal_honorarios'), false);
-		
 		$discount = new GenericModel();
 		$discount->set('title', __('Descuento'), false);
 		$discount->set('amount', $detail->get('descuento_honorarios'), false);
-
 		$total = new GenericModel();
 		$total->set('title', __('Total'), false);
 		$total->set('amount', $detail->get('saldo_honorarios'), false);
-		
 		$listator->loadEntities(array($fees, $discount, $total));
 		$listator->setNumberFormatOptions($currency, $language);
 		$listator->addColumn('Detalle', 'title');
@@ -323,7 +304,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if (is_null($slidingScale->get('amount'))) {
 			$slidingScale->set('amount', 0, false);
 		}
-
 		$amount = $slidingScale->get('amount');
 		$slidingScale->set('discount',
 			($amount * $slidingScale->get('discountRate') / 100),
@@ -333,7 +313,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$amount - $slidingScale->get('discount'),
 			false
 		);
-
 		return $slidingScale;
 	}
 
@@ -381,21 +360,18 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	private function slidingScaleTimeCalculation($works, $scale, $charge, $scaleAmount = 0) {
-		
 		$this->loadBusiness('Coining');
 		$remainingScaleHours = $scale->get('hours');
-		$scaleCurrency = $scale->get('currencyId') ? $scale->get('currencyId') : $charge->get('id_moneda');
-		$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
+		$scaleCurrency = $scale->get('currencyId') ? $scale->get('currencyId') : $charge->get('opc_moneda_total');
+		$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
 		$scaleCurrency = $this->CoiningBusiness->getCurrency($scaleCurrency);
-
 		if ($scale->get('hours') == 0) {
 			return array(
 				'works' => $works,
 				'scaleAmount' => 0
 			);
 		}
-		
 		if (empty($works) && $scale->get('fixedAmount')) {
 			return array(
 				'works' => $works,
@@ -406,7 +382,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				)
 			);
 		}
-
 		for ($work = array_shift($works); !empty($work); $work = array_shift($works)) {
 			//Tomo las horas del trabajo de las horas restantes, si el trabajo ya fue usado para llenar un escalón,
 			// o de las horas trabajadas, si es primera vez que se utiliza el trabajo para llenar el escalón.
@@ -461,5 +436,4 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 		return array('works' => $works, 'scaleAmount' => $scaleAmount);
 	}
-
 }

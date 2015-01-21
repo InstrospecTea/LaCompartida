@@ -440,6 +440,4 @@ class Criteria {
 		$this->limit = '';
 		return $this;
 	}
-
-
 }

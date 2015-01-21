@@ -91,5 +91,4 @@ class SearchFilter extends AbstractUtility {
 		$this->value = $value;
 		return $this;
 	}
-
 }

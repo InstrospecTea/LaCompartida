@@ -41,5 +41,4 @@ class WorkScope implements IWorkScope {
       ->add_grouping('periodo');
     return $criteria;
   }
-
 }
