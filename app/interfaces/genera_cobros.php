@@ -218,57 +218,6 @@ if ($opc == 'buscar') {
 		return true;
 	}
 
-	/**
-	 * Verifica la existencia de procesos de cobros
-	 * Si existe un proceso pendiente la función retorna TRUE, de lo contrario FALSE
-	 *
-	 * @return bool
-	 */
-	function ProcessLock() {
-		var url = root_dir + '/app/ProcessLock';
-		var reply = {};
-		var locker = {};
-
-		jQuery.ajax(url + '/is_locked/<?php echo Cobro::PROCESS_NAME; ?>', {
-			async: false,
-			success: function(result) {
-				reply = result;
-			}
-		});
-
-		if (reply.locked) {
-			jQuery.ajax(url + '/get_locker/<?php echo Cobro::PROCESS_NAME; ?>', {
-				async: false,
-				success: function(result) {
-					locker = result;
-				}
-			});
-
-			jQuery('<p/>')
-				.attr('title', 'Advertencia')
-				.append('<p style="font-size:11px;">El proceso se encuentra bloqueado por el usuario ' + locker.nombre_usuario + '<br/><strong>Estado actual:</strong><br/>' + locker.estado + '</p>')
-				.dialog({
-					autoOpen: true,
-					height: 'auto',
-					width: 400,
-					modal: true,
-					open: function() {
-						jQuery('.ui-dialog-title').addClass('ui-icon-warning');
-						jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
-					},
-					buttons: {
-						'Cerrar': function() {
-							jQuery(this).dialog('close');
-						}
-					}
-				});
-
-			return true;
-		}
-
-		return false;
-	}
-
 	function GeneraCobros(form, desde, opcion, id_formato) {
 
 		if (!form) {
@@ -388,7 +337,7 @@ if ($opc == 'buscar') {
 									});
 
 								<?php } ?>
-
+								startCheckProcessLock();
 							},
 							"<?php echo __('Cancelar') ?>": function() {
 								jQuery(this).dialog('close');
@@ -799,7 +748,99 @@ if ($opc == 'buscar') {
 
 	}
 
+	var timerProcessLock;
+	var seconds = 4;
+	function startCheckProcessLock() {
+		timerProcessLock = window.setTimeout(checkProcessLock, seconds * 1000);
+		if (seconds != 64) {
+			seconds += seconds;
+		}
+	}
+
+	/**
+	 * Revisa por ajax si el proceso ha sido desbloqueado.
+	 */
+	function checkProcessLock() {
+		jQuery.get(root_dir + '/app/ProcessLock/get_process_lock_not_notified/<?php echo Cobro::PROCESS_NAME; ?>', function(proceso) {
+			if (proceso.id) {
+				window.clearTimeout(timerProcessLock);
+				jQuery.get(root_dir + '/app/ProcessLock/get_notification_html/' + proceso.id, function(html) {
+					mostrar_notificacion(html, proceso.id);
+				});
+				return;
+			}
+			startCheckProcessLock();
+		});
+	}
+
+	/**
+	 * Verifica la existencia de procesos de cobros
+	 * Si existe un proceso pendiente la función retorna TRUE, de lo contrario FALSE
+	 * @return bool
+	 */
+	function ProcessLock() {
+		var url = root_dir + '/app/ProcessLock';
+		var reply = {};
+		var locker = {};
+
+		jQuery.ajax(url + '/is_locked/<?php echo Cobro::PROCESS_NAME; ?>', {
+			async: false,
+			success: function(result) {
+				reply = result;
+			}
+		});
+
+		if (reply.locked) {
+			jQuery.ajax(url + '/get_locker/<?php echo Cobro::PROCESS_NAME; ?>', {
+				async: false,
+				success: function(result) {
+					locker = result;
+				}
+			});
+
+			jQuery('<p/>')
+				.attr('title', 'Advertencia')
+				.append('<p style="font-size:11px;">El proceso se encuentra bloqueado por el usuario ' + locker.nombre_usuario + '<br/><strong>Estado actual:</strong><br/>' + locker.estado + '</p>')
+				.dialog({
+					autoOpen: true,
+					height: 'auto',
+					width: 400,
+					modal: true,
+					open: function() {
+						jQuery('.ui-dialog-title')
+							.addClass('ui-icon-warning');
+						jQuery('.ui-dialog-buttonpane')
+							.find('button')
+							.addClass('btn')
+							.removeClass('ui-button ui-state-hover');
+					},
+					buttons: {
+						'Cerrar': function() {
+							jQuery(this).dialog('close');
+						}
+					}
+				});
+
+			return true;
+		}
+
+		return false;
+	}
 </script>
+
+<?php
+$BloqueoProceso = new BloqueoProceso($sesion);
+$proceso = $BloqueoProceso->getProcessLockedByUserId($sesion->usuario->fields['id_usuario'], Cobro::PROCESS_NAME);
+if ($proceso !== false) {
+?>
+	<script type="text/javascript" defer="defer">
+		jQuery.get(root_dir + '/app/ProcessLock/get_process_locked/<?php echo Cobro::PROCESS_NAME; ?>', function(proceso) {
+			if (proceso != false && proceso.bloqueado) {
+				startCheckProcessLock();
+			}
+		});
+	</script>
+<?php } ?>
 
 <form name='form_busca' id='form_busca' action='' method=post>
 	<?php

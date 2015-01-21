@@ -46,4 +46,41 @@ interface IProcessLockingBusiness {
 	 * @param type $user_id
 	 */
 	public function getNotifications($user_id);
+
+	/**
+	 * Obtiene un proceso según su id
+	 * @param type $id
+	 */
+	public function getProcessLockById($id);
+
+	/**
+	 * Obtiene un proceso bloqueado según el id de usuario
+	 * @param type $user_id
+	 * @param type $process_name
+	 */
+	public function getProcessLockedByUserId($user_id, $process_name);
+
+	/**
+	 * Obtiene un proceso desbloqueado que no ha sido notificado según el id de usuario
+	 * @param type $user_id
+	 * @param type $process_name
+	 */
+	public function getProcessLockNotNotifiedByUserId($user_id, $process_name);
+
+	/**
+	 * Genera el html con la notificación del proceso finalizado.
+	 * @deprecated Este metodo debe ser pasado a un View::element() (se utiliza en /app/classes/BloqueoProceso.php)
+	 * @return string
+	 */
+	public function getNotificationHtml($entity);
+
+	/**
+	 * Genera un formulario con un link para volver al formulario original de donde se ejecuta el Proceso
+	 * @param type $proceso
+	 * @param type $data
+	 * @param type $id
+	 * @deprecated Este metodo debe ser pasado a un View::element() (se utiliza en /app/classes/BloqueoProceso.php)
+	 * @return string
+	 */
+	public function getFormLink($proceso, $data, $id);
 }
