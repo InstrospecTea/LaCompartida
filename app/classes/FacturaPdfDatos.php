@@ -324,6 +324,34 @@ class FacturaPdfDatos extends Objeto {
 			case 'moneda_total':
 				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 				break;
+			case 'monto_subtotal_bruto':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+				$discount = $detail->get('descuento_honorarios');
+				$glosa_dato = number_format(
+					$discount + $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_descuento':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+				$discount = $detail->get('descuento_honorarios');
+				$glosa_dato = number_format(
+					-1 * $discount,
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
 			case 'monto_subtotal':
 				$glosa_dato = number_format(
 					$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
