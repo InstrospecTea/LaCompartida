@@ -22,11 +22,17 @@ interface IChargingBusiness extends BaseBusiness {
 	/**
 	 * Obtiene el detalle de las tarifas escalonadas asociadas al cobro.
 	 * @param  number $chargeId Identificador del cobro
-	 * @param  string $languageCode
 	 * @return array            Array que contiene las descripciones de las tarifas escalonadas.
 	 */
-	public function getSlidingScales($chargeId, $languageCode);
+	public function getSlidingScales($chargeId);
 
+	/**
+	 * 
+	 * @param  array  $slidingScales [description]
+	 * @param  Language $language      [description]
+	 * @param  Currency $currency      [description]
+	 * @return string               [description]
+	 */
 	public function getSlidingScalesDetailTable(array $slidingScales, $language, $currency);
 
 

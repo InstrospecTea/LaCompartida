@@ -386,7 +386,7 @@ echo $refrescar;
 			dataType: "JSON",
 			url: root_dir + '/app/Charge/slidingScaleDetail/',
 			data: {
-				"charge": form.id_cobro.value,
+				"charge": jQuery('#id_cobro').val(),
 				"language": 'es'
 			},
 			success: function(data, status, jqXHR) {
@@ -1656,7 +1656,11 @@ else
 						<td align="left" width="55%" nowrap>
 							<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido( this.id );" value="<?php echo number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?php echo $deshabilitar ?> style="text-align: right;" onkeydown="MontoValido( this.id );">
 							&nbsp;&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>&nbsp;&nbsp;
-							<img src="<?php echo Conf::ImgDir() ?>/noticia16.png" onclick="DetalleMonto(this.form)" style='cursor:pointer' <?php echo TTip($tip_detalle) ?>>
+
+							<?php if($cobro->fields['forma_cobro'] == 'ESCALONADA') { ?>
+								<img src="<?php echo Conf::ImgDir() ?>/noticia16.png" onclick="DetalleMonto(this.form)" style='cursor:pointer' <?php echo TTip($tip_detalle) ?>>
+							<?php } ?>
+
 							<img id="ajustar_monto" <?php echo $display_buton_ajuste ?> src="<?php echo Conf::ImgDir() . '/editar_on.gif' ?>" title="<?php echo __('Ajustar Monto') ?>" border=0 style="cursor:pointer" onclick="AjustarMonto('ajustar');">
 							<img id="cancelar_ajustacion" <?php echo $display_buton_cancelar ?> src="<?php echo Conf::ImgDir() . '/cruz_roja_nuevo.gif' ?>" title="<?php echo __('Usar Monto Original') ?>" border=0 style='cursor:pointer' onclick="AjustarMonto('cancelar')">
 						</td>

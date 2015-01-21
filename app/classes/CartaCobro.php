@@ -1266,6 +1266,18 @@ class CartaCobro extends NotaCobro {
 
             case 'DETALLE': //GenerarDocumentoCarta2
 
+                  /**
+                  * Detalle de tarifa escalonada.
+                  */
+                  $chargingBusiness = new ChargingBusiness($this->sesion);
+                  $coiningBusiness = new CoiningBusiness($this->sesion);
+                  $translatingBusiness = new TranslatingBusiness($this->sesion);
+                  $currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+                  $language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+                  $slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+                  $table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+                  $html2 = str_replace('%detalle_escalones%', $table, $html2);
+
                 if (strpos($html2, '%cuenta_banco%')) {
 
                     if ($contrato->fields['id_cuenta']) {
@@ -1737,6 +1749,17 @@ class CartaCobro extends NotaCobro {
                     $documentos_relacionados[] = $data;
                 }
 
+                  /**
+                  * Detalle de tarifa escalonada.
+                  */
+                  $chargingBusiness = new ChargingBusiness($this->sesion);
+                  $coiningBusiness = new CoiningBusiness($this->sesion);
+                  $translatingBusiness = new TranslatingBusiness($this->sesion);
+                  $currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+                  $language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+                  $slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+                  $table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+                  $html2 = str_replace('%detalle_escalones%', $table, $html2);
                 $documentos_rel = '';
 
                 for ($k = 0; $k < count($documentos_relacionados); $k++) {

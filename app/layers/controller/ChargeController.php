@@ -12,14 +12,17 @@ class ChargeController extends AbstractController {
 		$charge = $this->ChargingBusiness->getCharge($chargeId);
 		$currency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
 		$language = $this->TranslatingBusiness->getLanguageByCode($languageCode);
-		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId, $languageCode);
-		$response['detail'] = $this->ChargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId);
+		$this->set('currency', $currency);
+		$this->set('language', $language);
+		$this->set('slidingScales', $slidingScales);
+		$response['detail'] = $this->renderTemplate('Charge/sliding_scale_detail');
 		$this->renderJSON($response);
 	}
 
 	public function feeAmountDetailTable() {
 		$chargeId = $this->data['charge'] ? $this->data['charge'] : $this->params['charge'];
-		
+
 		$this->loadBusiness('Charging');
 		$this->loadBusiness('Coining');
 		$this->loadBusiness('Translating');
