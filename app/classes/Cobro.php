@@ -344,7 +344,8 @@ if (!class_exists('Cobro')) {
 								if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)) as tasa_cambio,
 								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
-									) as tipo_cobro
+									) as tipo_cobro,
+								factura.id_factura
 								FROM cobro
 									LEFT JOIN factura using (id_cobro)
 									LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
