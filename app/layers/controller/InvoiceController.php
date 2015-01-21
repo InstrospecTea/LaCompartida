@@ -5,6 +5,18 @@ class InvoiceController extends AbstractController {
 	public $helpers = array('EntitiesListator', array('\TTB\Html', 'Html'), 'Form', 'Paginator');
 
 	public function feeAmountDetailTable() {
+		$this->set('feeDetiail', $this->getFeeDetailData());
+		$response['detail'] = $this->renderTemplate('Charge/fee_discount_detail');
+		$this->renderJSON($response);
+	}
+
+	public function feeAmountDetailInvoice() {
+		$this->set('feeDetiail', $this->getFeeDetailData());
+		$response['detail'] = $this->renderTemplate('Charge/invoice_fee_discount_detail');
+		$this->renderJSON($response);
+	}
+
+	private function getFeeDetailData() {
 		$this->loadBusiness('Coining');
 		$this->loadBusiness('Charging');
 		$this->loadBusiness('Billing');
@@ -28,12 +40,9 @@ class InvoiceController extends AbstractController {
 			$detail = $this->BillingBusiness->getFeesDataOfInvoiceByAmounts($amount, $chargeFees, $chargeDiscount, $currency);
 		}
 		
-		$this->set('feeDetiail', $detail);
 		$this->set('currency', $currency);
 		$this->set('language', $language);
-		$response['detail'] = $this->renderTemplate('Charge/fee_discount_detail');
-		
-		$this->renderJSON($response);
-	}
 
+		return $detail;
+	}
 }
