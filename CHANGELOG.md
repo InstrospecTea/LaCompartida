@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 15.0.4
+Miércoles 21 de Enero 2015
+* **Fix:** [Eliminar ReporteProductividad del listado de configuraciones](https://github.com/LemontechSA/ttb/pull/826)
+
 ## Hotfix: 15.0.3
 Jueves 15 de Enero 2015
 * **Fix:** [Corregir validaciones JS al modificar o agregar un contrato](https://github.com/LemontechSA/ttb/pull/823)
