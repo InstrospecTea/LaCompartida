@@ -144,7 +144,6 @@ class FacturaPdfDatos extends Objeto {
 			$honorarios_sin_impuesto = $factura->fields['honorarios'];
 		}
 
-
 		switch( $tipo_dato ) {
 			case 'razon_social':
 				$glosa_dato = $factura->fields['cliente'];
@@ -215,11 +214,11 @@ class FacturaPdfDatos extends Objeto {
 			case 'nota_factura':
 				$glosa_dato = $condicion_pago;
 				break;
-			case 'descripcion_subtotal_honorarios':
-				$glosa_dato = __('Subtotal Honorarios');
+			case 'desc_subtotal_honorarios':
+				$glosa_dato = __('SUBTOTAL') .  ' ' . _('HONORARIOS');
 				break;
-			case 'descripcion_descuento_honorarios':
-				$glosa_dato = __('Descuento Honorarios');
+			case 'desc_descuento_honorarios':
+				$glosa_dato = __('DESCUENTO') .  ' ' . _('HONORARIOS');
 				break;
 			case 'descripcion_honorarios':
 				$glosa_dato = $factura->fields['descripcion'];
@@ -281,6 +280,12 @@ class FacturaPdfDatos extends Objeto {
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
 				);
+				break;
+			case 'moneda_subtotal_honorarios':
+				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
+				break;
+			case 'moneda_descuento_honorarios':
+				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 				break;
 			case 'moneda_honorarios':
 				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
@@ -427,6 +432,8 @@ class FacturaPdfDatos extends Objeto {
 		$fila['fecha_ano_ultima_cifra'] = substr(date("Y",strtotime($factura->fields['fecha'])),-1);
 		$fila['fecha_ano_dos_ultimas_cifras'] = substr(date("Y",strtotime($factura->fields['fecha'])),-2);
 		$fila['direccion'] = $factura->fields['direccion_cliente'];
+		$fila['desc_subtotal_honorarios'] = __('Subtotal Honorarios');
+		$fila['desc_descuento_honorarios'] = __('Descuento Honorarios');
 		$fila['descripcion_honorarios'] = $factura->fields['descripcion'];
 		$fila['descripcion_gastos_con_iva'] = $factura->fields['descripcion_subtotal_gastos'];
 		$fila['descripcion_gastos_sin_iva'] = $factura->fields['descripcion_subtotal_gastos_sin_impuesto'];
@@ -448,6 +455,8 @@ class FacturaPdfDatos extends Objeto {
 			$idioma->fields['separador_decimales'],
 			$idioma->fields['separador_miles']
 		);
+		$fila['moneda_subtotal_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
+		$fila['moneda_descuento_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 		$fila['moneda_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 		$fila['moneda_gastos_con_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 		$fila['moneda_gastos_sin_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
