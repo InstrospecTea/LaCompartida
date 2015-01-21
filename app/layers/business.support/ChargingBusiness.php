@@ -71,16 +71,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 
-	public function getUserFee($userId, $feeId, $currencyId) {
-		$searchCriteria = new SearchCriteria('UserFee');
-		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
-		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
-		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
-		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
-		return $results[0];
-	}
-
 	public function getSlidingScales($chargeId) {
 
 		$this->loadService('Charge');
