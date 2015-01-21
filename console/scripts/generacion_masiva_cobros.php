@@ -62,8 +62,8 @@ class GeneracionMasivaCobros extends AppShell {
 			$subject = __('Generación de') . ' ' . __('Cobros') . ' ' . __('finalizada');
 			$messaje = __('Estimado') . " {$Usuario->fields['nombre']}:\n\nEl proceso a finalizado con el siguiente resultado:\n\n{$this->statusText()}\n\n--\nThe Time Billing";
 			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $Usuario->fields['email'], $Usuario->fields['nombre'], false, $this->data['user_id'], 'proceso');
-		} catch (Exception $ex) {
-
+		} catch (Exception $e) {
+			$this->log('ERROR al generar correo: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 		}
 	}
 
@@ -229,9 +229,11 @@ class GeneracionMasivaCobros extends AppShell {
 		try {
 			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $this->statusText());
 		} catch (PDOException $e) {
+			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 			$this->status['error'] = 'Ocurrio un error inesperado.';
 			++$this->errors[$type];
 		} catch (Exception $e) {
+			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 			$this->status['error'] = 'Ocurrio un error inesperado.';
 			++$this->errors[$type];
 		}
