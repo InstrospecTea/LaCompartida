@@ -37,6 +37,7 @@ class ChargeController extends AbstractController {
 		$this->set('billedAmount', $this->ChargingBusiness->getBilledFeesAmount($charge, $currency));
 
 		$this->set('slidingScales', $slidingScales);
+		$this->set('charge', $charge);
 		$this->set('feeDetiail', $detail);
 		$this->set('currency', $currency);
 		$this->set('language', $language);
