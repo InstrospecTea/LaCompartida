@@ -139,6 +139,7 @@ class EntitiesListator {
 						$currency = $this->formatOptions['currency'];
 						$language = $this->formatOptions['language'];
 						if (!empty($currency) && !empty($language)) {
+							$th->add_attribute('style', 'text-align:right;');
 							$th->set_html(number_format($entity->get($columnHandler['calculationExpression']), $currency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles')));
 						} else {
 							$th->set_html($entity->get($columnHandler['calculationExpression']));
@@ -183,6 +184,7 @@ class EntitiesListator {
 				$th = new HtmlBuilder();
 				$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;text-align:center;');
 				if (!empty($currency) && !empty($language)) {
+					$th->add_attribute('style', 'text-align:right;');
 					$th->set_html($currency->get('simbolo').' '.number_format($accumulators[$column['calculationExpression']], $currency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles')));
 				} else {
 					$th->set_html($accumulators[$column['calculationExpression']]);
