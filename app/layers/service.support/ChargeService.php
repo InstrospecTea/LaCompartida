@@ -22,5 +22,4 @@ class ChargeService extends AbstractService implements IChargeService {
 
 		return parent::saveOrUpdate($charge);
 	}
-
 }

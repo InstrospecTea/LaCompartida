@@ -1,8 +1,5 @@
 <?php
 
-/**
-* 
-*/
 interface IChargingBusiness extends BaseBusiness {
 
 	/**
@@ -51,6 +48,4 @@ interface IChargingBusiness extends BaseBusiness {
 	 * 
 	 */
 	function getAmountDetailOfFees(Charge $charge, Currency $currency);
-
-
 }

@@ -1,5 +1,5 @@
 <?php 
-echo $this->element('Charge/sliding_scale_detail', array('slidingScales' => $slidingScales));
+echo $this->element('Charge/sliding_scale_detail', array('slidingScales' => $slidingScales, 'currency' => $currency, 'language' => $language));
 ?>
 <br/>
 <?php 

@@ -34,7 +34,4 @@ interface BaseDAO {
      */
     public function delete($object);
 
-
-
-
 }
