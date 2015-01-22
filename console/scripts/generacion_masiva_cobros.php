@@ -57,11 +57,23 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->unlookProcess();
 		}
 		try {
-			$Usuario = $this->loadModel('UsuarioExt', null, true);
-			$Usuario->LoadId($this->data['user_id']);
+			$Criteria = $this->loadModel('Criteria', null, true);
+			$result = $Criteria
+				->add_from('usuario')
+				->add_select('nombre')
+				->add_select('email')
+				->add_restriction(CriteriaRestriction::equals('id_usuario', $this->data['user_id']))
+				->run();
+			if (empty($result)) {
+				throw new Exception("No se pudo cargar el usuario {$this->data['user_id']}");
+			}
+			$usuario = $result[0];
 			$subject = __('Generación de') . ' ' . __('Cobros') . ' ' . __('finalizada');
-			$messaje = __('Estimado') . " {$Usuario->fields['nombre']}:\n\nEl proceso a finalizado con el siguiente resultado:\n\n{$this->statusText()}\n\n--\nThe Time Billing";
-			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $Usuario->fields['email'], $Usuario->fields['nombre'], false, $this->data['user_id'], 'proceso');
+			$messaje = __('Estimado') .
+						" {$usuario->get['nombre']}:\n\n" .
+						__('El proceso a finalizado con el siguiente resultado') .
+						":\n\n{$this->statusText()}\n\n--\nThe Time Billing";
+			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario->get['email'], $usuario->get['nombre'], false, $this->data['user_id'], 'proceso');
 		} catch (Exception $e) {
 			$this->log('ERROR al generar correo: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 		}
