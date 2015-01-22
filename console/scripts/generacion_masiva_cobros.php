@@ -70,10 +70,10 @@ class GeneracionMasivaCobros extends AppShell {
 			$usuario = $result[0];
 			$subject = __('Generación de') . ' ' . __('Cobros') . ' ' . __('finalizada');
 			$messaje = __('Estimado') .
-						" {$usuario->get['nombre']}:\n\n" .
+						" {$usuario['nombre']}:\n\n" .
 						__('El proceso a finalizado con el siguiente resultado') .
 						":\n\n{$this->statusText()}\n\n--\nThe Time Billing";
-			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario->get['email'], $usuario->get['nombre'], false, $this->data['user_id'], 'proceso');
+			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario['email'], $usuario['nombre'], false, $this->data['user_id'], 'proceso');
 		} catch (Exception $e) {
 			$this->log('ERROR al generar correo: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 		}
