@@ -337,6 +337,7 @@ if ($opc == 'buscar') {
 									});
 
 								<?php } ?>
+								seconds = 4;
 								startCheckProcessLock();
 							},
 							"<?php echo __('Cancelar') ?>": function() {
