@@ -171,8 +171,9 @@ $i = 0;
 foreach ($scan_response->body->Items as $registro) {
 	$i++;
 	foreach ($registro as $etiqueta => $objeto) {
-		foreach (get_object_vars($objeto) as $tipo => $valor)
+		foreach (get_object_vars($objeto) as $tipo => $valor) {
 			$arreglo[$i][$etiqueta] = $valor;
+		}
 	}
 }
 $jsonscan = json_encode($arreglo);
@@ -197,7 +198,7 @@ foreach ($arreglo as $sitio) {
 			$sitio['vhost'],
 			$sitio['dbclon']
 		);
-		$slavehost = ($sitio['dbslave'] != '_' && $sitio['dbslave'] != '') ? $sitio['dbslave'] : $sitio['dbhost'];
+		$slavehost = /*($sitio['dbslave'] != '_' && $sitio['dbslave'] != '') ? $sitio['dbslave'] :*/ $sitio['dbhost'];
 		$subdominiosubdir = explode('.', $sitio['subdominiosubdir']);
 		$bucketname = 'ttbackups';
 		loguear('comprobando bucket S3 ' . $bucketname);
