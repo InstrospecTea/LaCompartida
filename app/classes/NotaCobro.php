@@ -1458,7 +1458,7 @@ class NotaCobro extends Cobro {
                   $language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
                   $slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
                   $table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
-                  $html2 = str_replace('%detalle_escalones%', $table, $html2);
+                  $html = str_replace('%detalle_escalones%', $table, $html);
                   
                 if ($this->fields['opc_ver_resumen_cobro'] == 0) {
                     return '';
