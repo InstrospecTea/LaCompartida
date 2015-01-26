@@ -10,10 +10,7 @@ if (!$cobro->Load($id_cobro)) {
 	$pagina->FatalError(__('Cobro inválido'));
 }
 
-
 $cobro->GuardarCobro();
-
-
 
 $cobro->CargarEscalonadas();
 $enpdf = ( $opc == 'guardar_cobro_pdf' ? true : false );
