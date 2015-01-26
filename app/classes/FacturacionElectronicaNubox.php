@@ -216,6 +216,9 @@ EOF;
 		$Moneda = new Moneda($Sesion);
 		$Moneda->Load($Factura->fields['id_moneda']);
 
+		$Contrato = new Contrato($Sesion);
+		$Contrato->Load($Factura->fields['id_contrato']);
+
 		if ($Factura->fields['subtotal'] > 0) {
 			$detalle_facturas[] = array(
 				'producto' => preg_replace("/[\n\r]+/", ' - ', $Factura->fields['descripcion']),
@@ -259,11 +262,11 @@ EOF;
 				'CANTIDAD' => $detalle_factura['cantidad'],
 				'PRECIO' => $Moneda->getFloat($detalle_factura['precio_unitario']),
 				'PORCENTDSCTO' => 0,
-				'EMAIL' => '',
+				'EMAIL' => $Contrato->fields['email_contacto'],
 				'TIPOSERVICIO' => 3,
 				'PERIODODESDE' => '',
 				'PERIODOHASTA' => '',
-				'FECHAVENCIMIENTO' => '',
+				'FECHAVENCIMIENTO' => Utiles::sql2date($Factura->fields['fecha_vencimiento'], '%d-%m-%Y'),
 				'CODSUCURSAL' => 1,
 				'VENDEDOR' => '',
 				'CODRECEPTOR' => '',
