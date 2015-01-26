@@ -12,7 +12,7 @@ class ProcessLockingBusiness extends AbstractBusiness implements IProcessLocking
 			return true;
 		}
 
-		$usuario = $this->sesion->usuario->fields;
+		$usuario = $this->Session->usuario->fields;
 		$entity = new ProcessLock();
 		$entity->set('proceso', $process);
 		$entity->set('estado', $status);
@@ -98,6 +98,58 @@ class ProcessLockingBusiness extends AbstractBusiness implements IProcessLocking
 		);
 		$entities = $this->ProcessLockService->findAll($restrictions, array('id', 'proceso', 'estado', 'fecha_modificacion', 'datos_post'));
 		return $entities;
+	}
+
+	public function getProcessLockById($id) {
+		$restrictions = CriteriaRestriction::equals('id', $id);
+		return $this->ProcessLockService->findFirst($restrictions);
+	}
+
+	public function getProcessLockedByUserId($user_id, $process_name) {
+		$restrictions = CriteriaRestriction::and_clause(
+			CriteriaRestriction::equals('id_usuario', $user_id),
+			CriteriaRestriction::equals('proceso', "'{$process_name}'"),
+			CriteriaRestriction::equals('bloqueado', '1')
+		);
+		$entities = $this->ProcessLockService->findFirst($restrictions, array('id', 'bloqueado'));
+		return $entities;
+	}
+
+	public function getProcessLockNotNotifiedByUserId($user_id, $process_name) {
+		$restrictions = CriteriaRestriction::and_clause(
+			CriteriaRestriction::equals('id_usuario', $user_id),
+			CriteriaRestriction::equals('proceso', "'{$process_name}'"),
+			CriteriaRestriction::equals('bloqueado', '0'),
+			CriteriaRestriction::equals('notificado', '0')
+		);
+		return $this->ProcessLockService->findFirst($restrictions);
+	}
+
+	public function getNotificationHtml($entity) {
+		$proceso = \TTB\Utiles::humanize(\TTB\Utiles::underscoreize($entity->get('proceso')));
+		$fecha = Utiles::sql3fecha($entity->get('fecha_modificacion'), '%d-%m-%Y a las %H:%M hrs.');
+		$form_link = $this->getFormLink($entity->get('proceso'), $entity->get('datos_post'), $entity->get('id'));
+		$html = "<b>{$proceso}</b><br/>{$fecha}<br/>{$entity->get('estado')}<br/>{$form_link}";
+		return $html;
+	}
+
+	public function getFormLink($proceso, $data, $id) {
+		$data = json_decode($data, true);
+		switch ($proceso) {
+			case 'GeneracionMasivaCobros':
+				$url = '/app/interfaces/genera_cobros.php';
+				$data['opc'] = 'buscar';
+				break;
+			default:
+				return '';
+		}
+		$Form = new Form();
+		$html = '';
+		foreach ($data as $field => $value) {
+			$html .= $Form->hidden($field, $value, array('id' => false));
+		}
+		$html .= $Form->Html->link('Ir al formulario', '#', array('onclick' => "ir_al_formulario($id, this); return false;"));
+		return $Form->Html->tag('form', $html, array('action' => Conf::RootDir() . $url, 'method' => 'post'));
 	}
 
 }

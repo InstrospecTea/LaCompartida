@@ -23,6 +23,24 @@ class ProcessLockController extends AbstractController {
 		$this->renderJSON(array('notified' => $this->ProcessLockingBusiness->setNotified($id)));
 	}
 
+	public function get_process_locked($process) {
+		$user_id = $this->Session->usuario->fields['id_usuario'];
+		$process = $this->ProcessLockingBusiness->getProcessLockedByUserId($user_id, $process);
+		$this->renderJSON($process->fields);
+	}
+
+	public function get_process_lock_not_notified($process) {
+		$user_id = $this->Session->usuario->fields['id_usuario'];
+		$process = $this->ProcessLockingBusiness->getProcessLockNotNotifiedByUserId($user_id, $process);
+		$this->renderJSON($process->fields);
+	}
+
+	public function get_notification_html($id) {
+		$entity = $this->ProcessLockingBusiness->getProcessLockById($id);
+		$this->data = $this->ProcessLockingBusiness->getNotificationHtml($entity);
+		$this->render('/elements/plain_text', 'ajax');
+	}
+
 	/**
 	 * Ejecuta un shell con el mismo nombre del proceso
 	 * @param type $process es el nombre de clase de la Shell que será ejecutada.
