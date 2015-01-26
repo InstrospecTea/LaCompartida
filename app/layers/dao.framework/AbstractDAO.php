@@ -135,7 +135,13 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return false;
 	}
 
-	public function saveOrUpdate($object) {
+	/**
+   * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
+   * @param Entity $object
+   * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
+   * @throws Exception
+   */
+	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
 		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());
@@ -151,7 +157,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		} else {
 			$legacy = $this->get($object->get($object->getIdentity()));
 			$object = $this->update($object);
-			if (is_subclass_of($object, 'LoggeableEntity')) {
+			if ($writeLog && is_subclass_of($object, 'LoggeableEntity')) {
 				$object = $this->merge($legacy, $object);
 				$this->writeLogFromArray('MODIFICAR', $object, $legacy);
 			}

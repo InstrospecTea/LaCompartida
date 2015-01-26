@@ -8,7 +8,7 @@ class ChargeService extends AbstractService implements IChargeService {
 		return 'Charge';
 	}
 
-	public function saveOrUpdate($charge) {
+	public function saveOrUpdate($charge, $writeLog) {
 		$estado = $charge->get('estado');
 		$modalidad_calculo = $charge->get('modalidad_calculo');
 
@@ -18,9 +18,9 @@ class ChargeService extends AbstractService implements IChargeService {
 
 		if (empty($modalidad_calculo)) {
 			$charge->set('modalidad_calculo', '0');
-		} 
+		}
 
-		return parent::saveOrUpdate($charge);
+		return parent::saveOrUpdate($charge, $writeLog);
 	}
 
 }

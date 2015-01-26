@@ -19,7 +19,7 @@ if (!class_exists('Cobro')) {
 			$this->guardar_fecha = true;
 		}
 
-		function Write() {
+		function Write($writeLog = true) {
 			$ingreso_historial = false;
 			if ($this->fields['estado'] != $this->valor_antiguo['estado'] && !empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 				$ingreso_historial = true;
@@ -30,20 +30,14 @@ if (!class_exists('Cobro')) {
 			$charge->fillFromArray($this->fields);
 			$charge->fillChangedFields($this->changes);
 			try {
-				$charge = $chargeService->saveOrUpdate($charge);
+				$charge = $chargeService->saveOrUpdate($charge, $writeLog);
 				$this->fields = $charge->fields;
 			} catch (Exception $ex) {
-
 			}
 
 			// actualizar campo estadocobro de los trabajos según estado del cobro
-			$query = "SELECT trabajo.id_trabajo FROM trabajo WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'";
-			$trabajos = new ListaTrabajos($this->sesion, '', $query);
-			for ($x = 0; $x < $trabajos->num; $x++) {
-				$trabajo = $trabajos->Get($x);
-				$trabajo->Edit('estadocobro', $this->fields['estado']);
-				$trabajo->Write();
-			}
+			$query = "UPDATE trabajo SET estadocobro = '{$this->fields['estado']}' WHERE id_cobro = '{$this->fields['id_cobro']}'";
+			$this->sesion->pdodbh->query($query);
 
 			if ($ingreso_historial) {
 				// Esa linea es necesaria para que el estado no se guardará dos veces
@@ -63,7 +57,6 @@ if (!class_exists('Cobro')) {
 			}
 
 			return true;
-
 		}
 
 		function GlosaSeEstaCobrando() {
@@ -350,7 +343,7 @@ if (!class_exists('Cobro')) {
 									LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
 									LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
 									JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
-                              	WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'
+																WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'
 								 ";
 			} else {
 				$query = "SELECT
@@ -805,9 +798,9 @@ if (!class_exists('Cobro')) {
 		function CalculaMontoTramites() {
 			$query = "SELECT SUM(tarifa_tramite)
 				FROM tramite
-				WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-					AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
-					AND tramite.cobrable = 1 ";
+				WHERE tramite.id_cobro = '{$this->fields['id_cobro']}'
+					AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']}' AND '{$this->fields['fecha_fin']}'
+					AND tramite.cobrable = 1";
 
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($total_monto_tramites) = mysql_fetch_array($resp);
@@ -1047,10 +1040,10 @@ if (!class_exists('Cobro')) {
 		// La variable $mantener_porcentaje_impuesto es importante en la migracion de datos donde no importa el datos
 		// actual guardado en la configuracion sino el dato traspasado
 		function GuardarCobro($emitir = false, $mantener_porcentaje_impuesto = false) {
-
-			if ($this->fields['estado'] != 'CREADO' AND $this->fields['estado'] != 'EN REVISION' AND $this->fields['estado'] != '') {
+			if (!in_array($this->fields['estado'], array('CREADO', 'EN REVISION', ''))) {
 				return "No se puede guardar " . __('el cobro') . " ya que ya se encuentra emitido. Usted debe volver " . __('el cobro') . " a estado creado o en revisión para poder actualizarlo";
 			}
+
 			// Carga de asuntos del cobro
 			$this->LoadAsuntos();
 
@@ -1090,7 +1083,6 @@ if (!class_exists('Cobro')) {
 			}
 
 			if (!$mantener_porcentaje_impuesto) {
-
 				if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado']) {
 					$this->Edit('porcentaje_impuesto', (method_exists('Conf', 'GetConf') ? Conf::GetConf($this->sesion, 'ValorImpuesto') : Conf::ValorImpuesto()));
 				} else {
@@ -1103,48 +1095,48 @@ if (!class_exists('Cobro')) {
 				}
 			}
 
-			$query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
-                                   tramite.tarifa_tramite,
-                                   tramite.id_moneda_tramite,
-                                   tramite.fecha,
-                                   tramite.codigo_asunto,
-                                   tramite.id_tramite_tipo,
-                                   tramite_tipo.glosa_tramite as glosa_tramite,
-                                   tramite.id_moneda_tramite_individual,
-                                   tramite.tarifa_tramite_individual
-                               FROM tramite
-                               JOIN tramite_tipo USING( id_tramite_tipo )
-                               WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-                               AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
-                               ORDER BY tramite.fecha ASC";
-
+			// actualiza los trámites
 			if (!$mantener_porcentaje_impuesto) {
+				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
+						tramite.tarifa_tramite,
+						tramite.id_moneda_tramite,
+						tramite.fecha,
+						tramite.codigo_asunto,
+						tramite.id_tramite_tipo,
+						tramite_tipo.glosa_tramite AS glosa_tramite,
+						tramite.id_moneda_tramite_individual,
+						tramite.tarifa_tramite_individual
+					FROM tramite
+						JOIN tramite_tipo USING(id_tramite_tipo)
+					WHERE tramite.id_cobro = '{$this->fields['id_cobro']}'
+						AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']}' AND '{$this->fields['fecha_fin']}'
+					ORDER BY tramite.fecha ASC";
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
-			}
 
-			for ($z = 0; $z < $lista_tramites->num; $z++) {
-				$tramite = $lista_tramites->Get($z);
+				for ($z = 0; $z < $lista_tramites->num; $z++) {
+					$tramite = $lista_tramites->Get($z);
 
-				if ($tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'] == '') {
-					$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'] = Funciones::TramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $tramite->fields['codigo_asunto']);
-					$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto'] = Funciones::TramiteTarifaDefecto($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda']);
-					$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar'] = Funciones::MejorTramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $this->fields['id_cobro']);
-				}
+					if ($tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'] == '') {
+						$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'] = Funciones::TramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $tramite->fields['codigo_asunto']);
+						$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto'] = Funciones::TramiteTarifaDefecto($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda']);
+						$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar'] = Funciones::MejorTramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+					}
 
-				$tramite->Edit('id_moneda_tramite', $this->fields['id_moneda']);
+					$tramite->Edit('id_moneda_tramite', $this->fields['id_moneda']);
 
-				if ($tramite->fields['tarifa_tramite_individual'] > 0) {
-					$valor_tramite = number_format($tramite->fields['tarifa_tramite_individual'] * ( $cobro_moneda->moneda[$tramite->fields['id_moneda_tramite_individual']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
-				} else {
-					$valor_tramite = $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'];
-				}
+					if ($tramite->fields['tarifa_tramite_individual'] > 0) {
+						$valor_tramite = number_format($tramite->fields['tarifa_tramite_individual'] * ( $cobro_moneda->moneda[$tramite->fields['id_moneda_tramite_individual']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
+					} else {
+						$valor_tramite = $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'];
+					}
 
-				$tramite->Edit('tarifa_tramite', $valor_tramite);
-				$tramite->Edit('tarifa_tramite_defecto', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto']);
-				$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
+					$tramite->Edit('tarifa_tramite', $valor_tramite);
+					$tramite->Edit('tarifa_tramite_defecto', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto']);
+					$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
 
-				if (!$tramite->Write()) {
-					return 'Error, trámite #' . $tramite->fields['id_tramite'] . ' no se pudo guardar';
+					if (!$tramite->Write()) {
+						return 'Error, trámite #' . $tramite->fields['id_tramite'] . ' no se pudo guardar';
+					}
 				}
 			}
 
@@ -1156,7 +1148,7 @@ if (!class_exists('Cobro')) {
 			 * con el cual se recorre la lista de los trabajos.
 			 * Eso vamos a conseguir con la definición de las variables $select_retainer_usuarios y $orden_retainer_usuarios
 			 */
-			if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'RetainerUsuarios') && $this->fields['retainer_usuarios'] != "" && $this->fields['forma_cobro'] == 'RETAINER') {
+			if (Conf::GetConf($this->sesion, 'RetainerUsuarios') && $this->fields['retainer_usuarios'] != "" && $this->fields['forma_cobro'] == 'RETAINER') {
 				$select_retainer_usuarios = "IF( trabajo.id_usuario IN ( " . $this->fields['retainer_usuarios'] . " ), '1', '2' ) as incluir_en_retainer, ";
 				$orden_retainer_usuarios = "incluir_en_retainer, ";
 			} else {
@@ -1176,20 +1168,21 @@ if (!class_exists('Cobro')) {
 					trabajo.descripcion,
 					trabajo.fecha,
 					trabajo.id_usuario,
-					$dato_monto_cobrado as monto_cobrado,
-					trabajo.id_moneda as id_moneda_trabajo,
+					{$dato_monto_cobrado} AS monto_cobrado,
+					trabajo.id_moneda AS id_moneda_trabajo,
 					trabajo.id_trabajo,
 					trabajo.tarifa_hh,
 					trabajo.cobrable,
 					trabajo.visible,
 					trabajo.codigo_asunto,
-					$select_retainer_usuarios
-					CONCAT_WS(' ', nombre, apellido1) as nombre_usuario
+					{$select_retainer_usuarios}
+					CONCAT_WS(' ', nombre, apellido1) AS nombre_usuario
 				FROM trabajo
-					LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-				WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-				AND trabajo.id_tramite=0
-				ORDER BY $orden_retainer_usuarios trabajo.fecha ASC";
+					LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+				WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'
+					AND trabajo.id_tramite = 0
+				ORDER BY {$orden_retainer_usuarios} trabajo.fecha ASC";
+
 			if (!$mantener_porcentaje_impuesto) {
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 			} else {
@@ -1364,6 +1357,7 @@ if (!class_exists('Cobro')) {
 			}
 
 			$cobro_total_honorario_cobrable_original = $cobro_total_honorario_cobrable;
+
 			if ($this->fields['monto_ajustado'] > 0) {
 
 				$cobro_total_honorario_cobrable = $this->fields['monto_ajustado'];
@@ -1383,7 +1377,7 @@ if (!class_exists('Cobro')) {
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 					$monto_cobrado = number_format($trabajo->fields['tarifa_hh'] * $duracion, 6, '.', '');
 					$trabajo->Edit('monto_cobrado', $monto_cobrado);
-					$trabajo->Write();
+					$trabajo->Write(false);
 				}
 			}
 
@@ -1533,6 +1527,7 @@ if (!class_exists('Cobro')) {
 					}
 				}
 			}
+
 			#Obtenemos el saldo_final de GASTOS diferencia de: saldo_inicial - (la suma de los gastos-provisiones de este cobro)
 			#En moneda OPC opciones ver
 			if (!$mantener_porcentaje_impuesto) {
@@ -1553,21 +1548,25 @@ if (!class_exists('Cobro')) {
 				$moneda_del_cobro->Load($this->fields['id_moneda']);
 			}
 
+			$_calcula_monto_tramites = $this->CalculaMontoTramites();
+
 			#DESCUENTOS
 			if ($this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$cobro_descuento = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
-				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - $cobro_descuento;
+				$cobro_descuento = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
+				$cobro_total = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) - $cobro_descuento;
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
 				$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
 			} else {
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
-				$cobro_total = ($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
+				$cobro_total = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 			}
+
 			//Valido CAP
+			$cap_descuento = 0;
+
 			if ($this->fields['forma_cobro'] == 'CAP') {
-				$cap_descuento = 0;
 				$contrato = new Contrato($this->sesion);
 				$contrato->Load($this->fields['id_contrato']);
 				$sumatoria_cobros = $this->TotalCobrosCap('', $this->fields['id_moneda']) + $cobro_honorarios_menos_descuento;
@@ -1576,6 +1575,7 @@ if (!class_exists('Cobro')) {
 					$cap_descuento = min($sumatoria_cobros - $cobro_monto_moneda_cobro, + $cobro_honorarios_menos_descuento);
 				}
 			}
+
 			if ($cap_descuento > 0) {
 				$cap_descuento = round($cap_descuento, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_total = $cobro_total - $cap_descuento;
@@ -1592,10 +1592,10 @@ if (!class_exists('Cobro')) {
 
 			// Se guarda la información del cobro
 
-			$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites() + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_subtotal', number_format($_calcula_monto_tramites + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 			$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
-			$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites(), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+			$this->Edit('monto_tramites', number_format($_calcula_monto_tramites, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 
 			if ($cobro_total_honorario_cobrable != $cobro_total_honorario_cobrable_original && $cobro_total_honorario_cobrable != 0) {
 				$this->Edit('monto_thh', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
@@ -1628,7 +1628,6 @@ if (!class_exists('Cobro')) {
 			$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']); #revisar 15-05-2009
 
 			if ($this->Write()) {
-
 				if ($emitir) {
 
 					if ($provision && $provision_original && Conf::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
@@ -1746,11 +1745,12 @@ if (!class_exists('Cobro')) {
 						$query_factura = " UPDATE factura_cobro SET id_documento = '" . $documento->fields['id_documento'] . "' WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND id_documento IS NULL";
 						$resp = mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
 					}
+
+					if (!$this->Write()) {
+						return __('Error no se pudo emitir') .' ' . __('cobro') . ' # ' . $this->fields['id_cobro'];
+					}
 				}
 			} else {
-				return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
-			}
-			if (!$this->Write()) {
 				return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
 			}
 
@@ -2255,11 +2255,11 @@ if (!class_exists('Cobro')) {
 		}
 
 		/*
-		  Calcula el saldo inicial de la cta. corriente
-		  considera todos cobros <> creado excluyendo el cobro actual.
-		  todos los cobros con fecha emision inferior a la del cobro actual
-		  id_contrato igual al del cobro actual
-		  Devuelve valor en Moneda de Vista
+			Calcula el saldo inicial de la cta. corriente
+			considera todos cobros <> creado excluyendo el cobro actual.
+			todos los cobros con fecha emision inferior a la del cobro actual
+			id_contrato igual al del cobro actual
+			Devuelve valor en Moneda de Vista
 		 */
 
 		function SaldoInicialCuentaCorriente() {
@@ -2432,11 +2432,11 @@ if (!class_exists('Cobro')) {
 				$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) as duracion_incobrables
 									FROM trabajo
 								 WHERE id_cobro = '" . $this->fields['id_cobro'] . "'
-								 	 AND visible = 1
-								 	 AND cobrable = 0
-								 	 AND id_tramite = 0
-								 	 AND id_usuario = '" . $row['id_usuario'] . "'
-								 	 AND codigo_asunto = '" . $row['codigo_asunto'] . "'";
+									 AND visible = 1
+									 AND cobrable = 0
+									 AND id_tramite = 0
+									 AND id_usuario = '" . $row['id_usuario'] . "'
+									 AND codigo_asunto = '" . $row['codigo_asunto'] . "'";
 				$resp2 = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($row['duracion_incobrables']) = mysql_fetch_array($resp2);
 
@@ -2519,11 +2519,11 @@ if (!class_exists('Cobro')) {
 				$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) as duracion_incobrables
 									FROM trabajo
 								 WHERE id_cobro = '" . $this->fields['id_cobro'] . "'
-								 	 AND visible = 1
-								 	 AND cobrable = 0
-								 	 AND id_tramite = 0
-								 	 AND codigo_asunto = '" . $row['codigo_asunto'] . "'
-								 	 AND id_usuario = '" . $row['id_usuario'] . "'";
+									 AND visible = 1
+									 AND cobrable = 0
+									 AND id_tramite = 0
+									 AND codigo_asunto = '" . $row['codigo_asunto'] . "'
+									 AND id_usuario = '" . $row['id_usuario'] . "'";
 				$resp3 = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($row['duracion_incobrables']) = mysql_fetch_array($resp3);
 

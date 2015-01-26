@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 15.0.5
+Lunes 26 de Enero 2015
+* **Fix:** [No se guarda el historial de los trabajos siempre que se llama a Cobro::GuardarCobro()](https://github.com/LemontechSA/ttb/pull/828)
+
 ## Hotfix: 15.0.4
 Miércoles 21 de Enero 2015
 * **Fix:** [Eliminar ReporteProductividad del listado de configuraciones](https://github.com/LemontechSA/ttb/pull/826)
