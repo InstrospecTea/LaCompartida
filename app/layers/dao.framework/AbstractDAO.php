@@ -143,13 +143,13 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
    */
 	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
-		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());
 		$reflected = new ReflectionClass($this->getClass());
 		$id = $object->get($object->getIdentity());
 		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 		//que crear un nuevo registro.
 		if (empty($id)) {
+			$object->fillDefaults();
 			$object = $this->save($object);
 			if (is_subclass_of($object, 'LoggeableEntity')) {
 				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
