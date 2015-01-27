@@ -47,14 +47,19 @@ abstract class AbstractService implements BaseService{
         }
     }
 
-    public function findAll() {
+    public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
         try {
-            return $dao->findAll();
+            return $dao->findAll($restrictions, $fields, $order, $limit);
         } catch (Exception $ex) {
             throw new Exception($ex);
         }
+    }
+
+    public function findFirst($restrictions = null, $fields = null, $order = null) {
+		$result = $this->findAll($restrictions, $fields, $order, 1);
+        return isset($result[0]) ? $result[0] : false;
     }
 
 	/**

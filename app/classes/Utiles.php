@@ -12,8 +12,6 @@ use \TipoCorreo as TipoCorreo;
 
 class Utiles extends \Utiles {
 
-
-
 	public function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
 		$mime_boundary = md5(time());
@@ -23,7 +21,7 @@ class Utiles extends \Utiles {
 		$headers .= 'Reply-To: ' . $fromname . '<' . $fromaddress . '>' . $eol;
 		$headers .= 'Return-Path: ' . $fromname . '<' . $fromaddress . '>' . $eol; // these two to set reply address
 		$headers .= "Message-ID: <" . $now . " TheSystem@" . $_SERVER['SERVER_NAME'] . ">" . $eol;
-		$headers .= "X-Mailer: PHP v" . phpversion() . $eol;	// These two to help avoid spam-filters
+		$headers .= "X-Mailer: PHP v" . phpversion() . $eol; // These two to help avoid spam-filters
 		# Boundry for marking the split & Multitype Headers
 		$headers .= 'MIME-Version: 1.0' . $eol;
 		$headers .= "Content-Type: multipart/related; boundary=\"" . $mime_boundary . "\"" . $eol;
@@ -104,15 +102,19 @@ class Utiles extends \Utiles {
 		$mensaje = mysql_real_escape_string($mensaje);
 		$query = "SELECT COUNT(id_log_correo) total
 					FROM log_correo
-					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo={$id_tipo_correo}  {$where_dia}";
+					WHERE subject='{$subject}'
+						AND mail='{$email}'
+						AND id_tipo_correo={$id_tipo_correo}
+						{$where_dia}";
+
 
 		$query .=" AND mensaje= '{$mensaje}' ";
-		$resp = mysql_query($query, $sesion->dbh);
+		$resp = $sesion->pdodbh->query($query);
 		if (!$resp) {
-			throw new Exception(preg_replace($clean_patt, ' ', $query));
+			throw new \Exception(preg_replace($clean_patt, ' ', $query));
 		}
 
-		$count = mysql_fetch_assoc($resp);
+		$count = $resp->fetch(\PDO::FETCH_ASSOC);
 		if ($count['total'] == 0) {
 			$query2 = "INSERT INTO log_correo SET
 				subject = '{$subject}',
@@ -130,17 +132,17 @@ class Utiles extends \Utiles {
 			if ($simular) {
 				$query2 .= ', enviado = 1, fecha_envio = NOW()';
 			}
-			if (!mysql_query($query2, $sesion->dbh)) {
-				throw new Exception(preg_replace($clean_patt, ' ', $query2));
+			if (!$sesion->pdodbh->query($query2)) {
+				throw new \Exception(preg_replace($clean_patt, ' ', $query2));
 			}
 
 			if ($simular) {
-				echo 'Nuevo Correo<pre>' . "\n" . $subject . "\n" . $tipo . "\n" . $email . "\n" . $nombre . '</pre><hr>';
+				echo "Nuevo Correo<pre>\n{$subject}\n{$tipo}\n{$email}\n{$nombre}</pre><hr>";
 			}
 			return 'Agrega Correo: ' . preg_replace($clean_patt, ' ', $query2);
 		}
 		if ($simular) {
-			echo 'Omitiendo Correo Repetido<pre>' . "\n" . $subject . "\n" . $tipo . "\n" . $email . "\n" . $nombre . '</pre><hr>';
+			echo "Omitiendo Correo Repetido<pre>\n{$subject}\n{$tipo}\n{$email}\n{$nombre}</pre><hr>";
 		}
 		return json_encode(compact('query', 'count'));
 	}
@@ -153,9 +155,27 @@ class Utiles extends \Utiles {
 		return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word);
 	}
 
+	/**
+	 * Convierte PascalCase en underscore_case
+	 * @param type $word
+	 * @return type
+	 */
+	public function underscoreize($word) {
+		return str_replace(' ', '_', strtolower(trim(preg_replace('/([A-Z])/', ' $1', $word))));
+	}
+
 	public function humanize($word) {
 		return ucfirst(str_replace('_', ' ', strtolower($word)));
 	}
 
-}
+	/**
+	 * Devuelve un tamaño de bytes en lectura humana (b, kb, mb, gb, tb o pb)
+	 * @param type $size tamaño en bytes
+	 * @return string
+	 */
+	public static function _h($size) {
+		$unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+		return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+	}
 
+}
