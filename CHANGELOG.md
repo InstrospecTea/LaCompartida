@@ -2,7 +2,7 @@
 
 ## Release: 15.1.1
 Martes 27 de Enero 2015
-* **Fix:** [Reportes avanzados: Tipo dato **Rentabilidad Base**](https://github.com/LemontechSA/ttb/pull/830)
+* **Fix:** [Reportes avanzados: Deshabilitar Tipo dato **Rentabilidad Base**](https://github.com/LemontechSA/ttb/pull/830)
 
 ## Release: 15.1.0
 Lunes 26 de Enero 2015
