@@ -82,7 +82,7 @@ $tipos_de_dato = array(
 	'diferencia_valor_estandar',
 	'valor_estandar',
 	'valor_trabajado_estandar',
-	'rentabilidad_base',
+	//'rentabilidad_base',
 	'costo',
 	'costo_hh'
 );
@@ -1003,7 +1003,7 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
-								<?php echo $ReporteAvanzado->celda('rentabilidad_base') ?>
+								<?php echo $ReporteAvanzado->celda_disabled('rentabilidad_base') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
 							</tr>
