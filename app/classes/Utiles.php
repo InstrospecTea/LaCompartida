@@ -102,15 +102,19 @@ class Utiles extends \Utiles {
 		$mensaje = mysql_real_escape_string($mensaje);
 		$query = "SELECT COUNT(id_log_correo) total
 					FROM log_correo
-					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo={$id_tipo_correo}  {$where_dia}";
+					WHERE subject='{$subject}'
+						AND mail='{$email}'
+						AND id_tipo_correo={$id_tipo_correo}
+						{$where_dia}";
+
 
 		$query .=" AND mensaje= '{$mensaje}' ";
-		$resp = mysql_query($query, $sesion->dbh);
+		$resp = $sesion->pdodbh->query($query);
 		if (!$resp) {
-			throw new Exception(preg_replace($clean_patt, ' ', $query));
+			throw new \Exception(preg_replace($clean_patt, ' ', $query));
 		}
 
-		$count = mysql_fetch_assoc($resp);
+		$count = $resp->fetch(\PDO::FETCH_ASSOC);
 		if ($count['total'] == 0) {
 			$query2 = "INSERT INTO log_correo SET
 				subject = '{$subject}',
@@ -128,17 +132,17 @@ class Utiles extends \Utiles {
 			if ($simular) {
 				$query2 .= ', enviado = 1, fecha_envio = NOW()';
 			}
-			if (!mysql_query($query2, $sesion->dbh)) {
-				throw new Exception(preg_replace($clean_patt, ' ', $query2));
+			if (!$sesion->pdodbh->query($query2)) {
+				throw new \Exception(preg_replace($clean_patt, ' ', $query2));
 			}
 
 			if ($simular) {
-				echo 'Nuevo Correo<pre>' . "\n" . $subject . "\n" . $tipo . "\n" . $email . "\n" . $nombre . '</pre><hr>';
+				echo "Nuevo Correo<pre>\n{$subject}\n{$tipo}\n{$email}\n{$nombre}</pre><hr>";
 			}
 			return 'Agrega Correo: ' . preg_replace($clean_patt, ' ', $query2);
 		}
 		if ($simular) {
-			echo 'Omitiendo Correo Repetido<pre>' . "\n" . $subject . "\n" . $tipo . "\n" . $email . "\n" . $nombre . '</pre><hr>';
+			echo "Omitiendo Correo Repetido<pre>\n{$subject}\n{$tipo}\n{$email}\n{$nombre}</pre><hr>";
 		}
 		return json_encode(compact('query', 'count'));
 	}

@@ -8,7 +8,8 @@ abstract class AppShell {
 	protected $Session;
 
 	public function __construct() {
-		$this->Session = new \TTB\Sesion;
+		$this->Session = new \TTB\Sesion();
+		Configure::setSession($this->Session);
 	}
 
 	public abstract function main();

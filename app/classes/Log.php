@@ -12,13 +12,17 @@ class Log {
 	public $debug = false;
 
 	public function __construct() {
-		$this->logFolder = LOGDIR . Conf::dbUser() . '/ttb/' . date('y-m');
+		$this->logFolder = self::getFolder();
+	}
 
-		if (!is_dir($this->logFolder)) {
-			if (!mkdir($this->logFolder, 0777, true)) {
-				exit("No es posible crear el directorio '{$this->logFolder}'");
+	public static function getFolder() {
+		$folder = LOGDIR . Conf::dbUser() . '/ttb/' . date('y-m');
+		if (!is_dir($folder)) {
+			if (!mkdir($folder, 0777, true)) {
+				exit("No es posible crear el directorio '{$folder}'");
 			}
 		}
+		return $folder;
 	}
 
 	public static function write($text = '', $file_name = null) {
@@ -28,7 +32,7 @@ class Log {
 		}
 		$file = $me->logFolder . '/' . $me->logFile . '.log';
 		if (!file_exists($file)) {
-			$me->writeFile('', $file);
+			shell_exec("touch $file && chmod a+w $file");
 		}
 		if (!is_writable($file) && $me->debug) {
 			echo $file . __(' no se puede escribir.');

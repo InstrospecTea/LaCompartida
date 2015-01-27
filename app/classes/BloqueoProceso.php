@@ -77,4 +77,25 @@ class BloqueoProceso {
 		return $this->ProcessLockingBusiness->getNotifications($user_id);
 	}
 
+	/**
+	 * Obtiene las notificaciones pendientes para el usuario
+	 * @param type $user_id
+	 * @return boolean
+	 */
+	public function getProcessLockedByUserId($user_id, $process_name) {
+		return $this->ProcessLockingBusiness->getProcessLockedByUserId($user_id, $process_name);
+	}
+
+	/**
+	 * Genera el html con la notificación del proceso finalizado.
+	 * @return string
+	 */
+	public function getNotificationHtml($notificacion) {
+		return $this->ProcessLockingBusiness->getNotificationHtml($notificacion);
+	}
+
+	public function getFormLink($proceso, $data, $id) {
+		return $this->ProcessLockingBusiness->getFormLink($proceso, $data, $id);
+	}
+
 }

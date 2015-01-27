@@ -6,10 +6,10 @@ class AbstractBusiness implements BaseBusiness {
 	 * @deprecated
 	 * @var sesion
 	 */
-	var $sesion;
-	var $Session;
-	var $errors = array();
-	var $infos = array();
+	public $sesion;
+	public $Session;
+	public $errors = array();
+	public $infos = array();
 	private $loadedClass = array();
 
 	public function __construct(Sesion $sesion) {

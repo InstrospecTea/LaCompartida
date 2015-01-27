@@ -2,7 +2,13 @@
 
 	<div class="container-fluid">
 		<div class="row" style="padding: 15px 0;">
-			<div class="col-sm-3"><h4>Mantenedor de Cartas</h4></div>
+			<div class="col-sm-3">
+				<?php
+				$icon = $this->Html->tag('span', '', array('class' => 'glyphicon glyphicon-arrow-left'));
+				echo $this->Html->link($icon, Configure::read('RootDir') . '/app/usuarios/index.php', array('class' => 'btn btn-info pull-left', 'title' => 'Volver al inicio', 'style' => 'margin-right: 1em;'));
+				?>
+				<h4>Mantenedor de Cartas</h4>
+			</div>
 			<div class="col-sm-4"><?php echo $this->Form->select('carta[id_carta]', $cartas, $id_carta, array('class' => 'form-control', 'id' => 'carta_id_carta')); ?></div>
 			<div class="col-sm-3" id="nrel_charges">&nbsp;</div>
 			<div class="col-sm-2 text-right">
@@ -42,7 +48,7 @@
 									<textarea class="ckeditor" id="carta_formato" name="carta[formato]" style="width:100%; height: calc(100vh - 70px - 60px - 30px - 45px - 57px); margin-top: 10px;"></textarea>
 								</div>
 								<div class="tab-pane" id="css_code">
-									<textarea id="carta_formato_css" name="carta[formato_css]" style="width:100%; height: calc(100vh - 70px - 60px - 30px - 57px); min-height: calc(100vh - 70px - 60px - 30px - 57px;"></textarea>
+									<textarea id="carta_formato_css" name="carta[formato_css]" style="width:100%; height: calc(100vh - 70px - 60px - 30px - 57px); min-height: calc(100vh - 70px - 60px - 30px - 57px);"></textarea>
 								</div>
 							</div>
 						</div>
