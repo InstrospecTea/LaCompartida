@@ -14,7 +14,11 @@ class ProcessLock extends Entity {
         return 'bloqueo_procesos';
     }
 
-	protected function getDefaults() {
+	public function getTableDefaults() {
+		return array();
+	}
+
+	protected function getFixedDefaults() {
 		return array();
 	}
 }
