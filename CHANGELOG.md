@@ -1,6 +1,10 @@
 # Changelog
 
-## Release: 15.1.1
+## Hotfix: 15.1.2
+Martes 27 de Enero 2015
+* **Fix:** [Se configuran los valores por defecto de los nuevos cobros en el DTO](https://github.com/LemontechSA/ttb/pull/831)
+
+## Hotfix: 15.1.1
 Martes 27 de Enero 2015
 * **Fix:** [Reportes avanzados: Deshabilitar Tipo dato **Rentabilidad Base**](https://github.com/LemontechSA/ttb/pull/830)
 

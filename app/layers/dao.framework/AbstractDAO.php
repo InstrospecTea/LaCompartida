@@ -88,7 +88,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));
 		}
 		$properties = $object->getLoggeableProperties();
-		$legacy->fillDefaults();
 		foreach ($properties as $property) {
 			$alias = $property;
 			if (is_array($property)) {
@@ -143,13 +142,13 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
    */
 	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
-		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());
 		$reflected = new ReflectionClass($this->getClass());
 		$id = $object->get($object->getIdentity());
 		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 		//que crear un nuevo registro.
 		if (empty($id)) {
+			$object = $this->fillDefaults($object);
 			$object = $this->save($object);
 			if (is_subclass_of($object, 'LoggeableEntity')) {
 				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
@@ -284,7 +283,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
-			$newInstance->fillDefaults();
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
 	}
@@ -332,4 +330,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $tags[0];
 	}
 
+	private function fillDefaults(Entity $object) {
+		$table = Descriptor::table($this->sesion, $object->getPersistenceTarget());
+		$defaults = $table->getDefaults($object->getTableDefaults());
+		$object->fillDefaults($defaults);
+		return $object;
+	}
 }

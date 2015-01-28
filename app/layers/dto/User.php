@@ -19,7 +19,11 @@ class User extends Entity {
 		return 'usuario';
 	}
 
-	protected function getDefaults() {
+	public function getTableDefaults() {
+		return array();
+	}
+
+	protected function getFixedDefaults() {
 		return array();
 	}
 
