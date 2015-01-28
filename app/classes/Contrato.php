@@ -298,29 +298,27 @@ class Contrato extends Objeto {
 		$wheregasto.= " AND cta_corriente.fecha <= '$fecha_fin'";
 		$wheretramite.= " AND tramite.fecha <= '$fecha_fin'";
 		$query_select = '';
-		$hh_castigadas = '';
+		$hh_castigadas = 0;
 
 		if ($horas_castigadas) {
-			$query_select = " , (SUM( TIME_TO_SEC( duracion ) ) /3600) AS horas_trabajadas ";
+			$query_select = " , (SUM(TIME_TO_SEC(duracion)) / 3600) AS horas_trabajadas ";
 		}
 
-		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 AS horas_por_cobrar,
-										(SUM(TIME_TO_SEC(duracion_cobrada)* usuario_tarifa.tarifa/3600)) AS monto_por_cobrar
-										$query_select
-								FROM trabajo
-								JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
-								JOIN contrato on asunto.id_contrato = contrato.id_contrato
-          			LEFT JOIN usuario_tarifa ON (
-          				trabajo.id_usuario = usuario_tarifa.id_usuario
-          				AND contrato.id_moneda = usuario_tarifa.id_moneda
-          				AND contrato.id_tarifa = usuario_tarifa.id_tarifa
-          			)
-								LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-								WHERE $wheretrabajo AND
-								trabajo.id_tramite=0 AND
-								(cobro.estado IS NULL)
-								AND trabajo.cobrable = 1 AND contrato.id_contrato = '$id_contrato'
-								GROUP BY contrato.id_contrato";
+		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada)) / 3600 AS horas_por_cobrar,
+						(SUM(TIME_TO_SEC(duracion_cobrada) * usuario_tarifa.tarifa / 3600)) AS monto_por_cobrar
+						$query_select
+					FROM trabajo
+						INNER JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
+						INNER JOIN contrato on asunto.id_contrato = contrato.id_contrato
+						LEFT JOIN usuario_tarifa ON (trabajo.id_usuario = usuario_tarifa.id_usuario AND contrato.id_moneda = usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
+						LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
+					WHERE $wheretrabajo
+						AND trabajo.id_tramite = 0
+						AND cobro.estado IS NULL
+						AND trabajo.cobrable = 1
+						AND contrato.id_contrato = '$id_contrato'
+					GROUP BY contrato.id_contrato";
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		if ($horas_castigadas) {
 			list($horas_por_cobrar, $monto_por_cobrar, $horas_trabajadas) = mysql_fetch_row($resp);
@@ -330,28 +328,26 @@ class Contrato extends Objeto {
 		}
 
 		$query = "SELECT
-									SUM(IF(
-										tramite.tarifa_tramite_individual > 0,
-										tramite.tarifa_tramite_individual * ( moneda_tramite_individual.tipo_cambio / moneda_contrato.tipo_cambio ),
-										tramite_valor.tarifa
-										)) as monto_por_cobrar_tramite,
-									SUM(TIME_TO_SEC(tramite.duracion))/3600 AS horas_por_cobrar_tramite
-								FROM tramite
-								JOIN asunto on tramite.codigo_asunto = asunto.codigo_asunto
-								JOIN contrato on asunto.id_contrato = contrato.id_contrato
-								JOIN prm_moneda as moneda_tramite_individual ON moneda_tramite_individual.id_moneda = tramite.id_moneda_tramite_individual
-								JOIN prm_moneda as moneda_contrato ON moneda_contrato.id_moneda = contrato.id_moneda
-								JOIN tramite_tipo on tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-								JOIN tramite_valor ON (
-									tramite.id_tramite_tipo = tramite_valor.id_tramite_tipo
-									AND contrato.id_moneda = tramite_valor.id_moneda
-									AND contrato.id_tramite_tarifa = tramite_valor.id_tramite_tarifa
-								)
-								LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
-								WHERE $wheretramite AND (cobro.estado IS NULL)
-									AND tramite.cobrable=1
-									AND contrato.id_contrato = '$id_contrato'
-								GROUP BY contrato.id_contrato";
+				SUM(IF(
+					tramite.tarifa_tramite_individual > 0,
+					tramite.tarifa_tramite_individual * ( moneda_tramite_individual.tipo_cambio / moneda_contrato.tipo_cambio ),
+					tramite_valor.tarifa
+					)) as monto_por_cobrar_tramite,
+				SUM(TIME_TO_SEC(tramite.duracion)) / 3600 AS horas_por_cobrar_tramite
+			FROM tramite
+				JOIN asunto on tramite.codigo_asunto = asunto.codigo_asunto
+				JOIN contrato on asunto.id_contrato = contrato.id_contrato
+				JOIN prm_moneda as moneda_tramite_individual ON moneda_tramite_individual.id_moneda = tramite.id_moneda_tramite_individual
+				JOIN prm_moneda as moneda_contrato ON moneda_contrato.id_moneda = contrato.id_moneda
+				JOIN tramite_tipo on tramite.id_tramite_tipo = tramite_tipo.id_tramite_tipo
+				JOIN tramite_valor ON (tramite.id_tramite_tipo = tramite_valor.id_tramite_tipo AND contrato.id_moneda = tramite_valor.id_moneda AND contrato.id_tramite_tarifa = tramite_valor.id_tramite_tarifa)
+				LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
+			WHERE $wheretramite
+				AND cobro.estado IS NULL
+				AND tramite.cobrable = 1
+				AND contrato.id_contrato = '$id_contrato'
+			GROUP BY contrato.id_contrato";
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while (list($monto_por_cobrar_tramite, $horas_por_cobrar_tramite) = mysql_fetch_array($resp)) {
 			$monto_por_cobrar += $monto_por_cobrar_tramite;
@@ -380,35 +376,39 @@ class Contrato extends Objeto {
 
 		$suma_gastos = 0;
 
-		$query = "SELECT if(cta_corriente.ingreso>0,-1,1)*cta_corriente.monto_cobrable, cta_corriente.id_moneda FROM cta_corriente
+		$query = "SELECT
+						if(cta_corriente.ingreso > 0, -1, 1) * cta_corriente.monto_cobrable,
+						cta_corriente.id_moneda
+					FROM cta_corriente
 						LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto
-						WHERE $wheregasto AND (cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)
+					WHERE $wheregasto
+						AND (cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)
 						AND (cta_corriente.id_cobro IS NULL)
 						AND cta_corriente.incluir_en_cobro = 'SI'
 						AND cta_corriente.cobrable = 1
-						AND asunto.id_contrato = '$id_contrato'						";
+						AND asunto.id_contrato = '$id_contrato'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while (list($monto, $id_moneda) = mysql_fetch_array($resp)) {
 			$suma_gastos += UtilesApp::CambiarMoneda($monto //monto_moneda_l
-											, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
-											, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
-											, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
-											, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
+					, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
+					, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
+					, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
+					, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
 			);
 			if ($monto >= 0) {
 				$suma_egresos += UtilesApp::CambiarMoneda($monto //monto_moneda_l
-												, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
-												, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
-												, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
-												, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
+						, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
+						, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
+						, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
+						, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
 				);
-			} else if ($monto < 0) {
+			} elseif ($monto < 0) {
 				$suma_provisiones -= UtilesApp::CambiarMoneda($monto //monto_moneda_l
-												, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
-												, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
-												, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
-												, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
+						, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
+						, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
+						, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
+						, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
 				);
 			}
 		}
@@ -417,11 +417,7 @@ class Contrato extends Objeto {
 			$suma_gastos = 0;
 		}
 
-		if ($horas_castigadas) {
-			return array($horas_por_cobrar, $monto_por_cobrar, $hh_castigadas, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo'], $suma_egresos, $suma_provisiones);
-		} else {
-			return array($horas_por_cobrar, $monto_por_cobrar, 0, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo'], $suma_egresos, $suma_provisiones);
-		}
+		return array($horas_por_cobrar, $monto_por_cobrar, $hh_castigadas, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo'], $suma_egresos, $suma_provisiones);
 	}
 
 	/*
@@ -1042,8 +1038,8 @@ class Contrato extends Objeto {
 	function ObtenerSolicitante() {
 		if (Conf::GetConf($this->sesion, 'TituloContacto')) {
 			$solicitante = $this->fields['titulo_contacto'] . ' ' .
-							$this->fields['contacto'] . ' ' .
-							$this->fields['apellido_contacto'];
+			$this->fields['contacto'] . ' ' .
+			$this->fields['apellido_contacto'];
 		} else {
 			$solicitante = $this->fields['contacto'];
 		}

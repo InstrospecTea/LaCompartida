@@ -1,5 +1,17 @@
 # Changelog
 
+## Release: 15.1.1
+Martes 27 de Enero 2015
+* **Fix:** [Reportes avanzados: Deshabilitar Tipo dato **Rentabilidad Base**](https://github.com/LemontechSA/ttb/pull/830)
+
+## Release: 15.1.0
+Lunes 26 de Enero 2015
+* **Fix:** [Generación masiva cobros background](https://github.com/LemontechSA/ttb/pull/776)
+
+## Hotfix: 15.0.5
+Lunes 26 de Enero 2015
+* **Fix:** [No se guarda el historial de los trabajos siempre que se llama a Cobro::GuardarCobro()](https://github.com/LemontechSA/ttb/pull/828)
+
 ## Hotfix: 15.0.4
 Miércoles 21 de Enero 2015
 * **Fix:** [Eliminar ReporteProductividad del listado de configuraciones](https://github.com/LemontechSA/ttb/pull/826)

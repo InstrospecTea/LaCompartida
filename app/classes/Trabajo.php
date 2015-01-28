@@ -48,7 +48,7 @@ class Trabajo extends Objeto
 		return __('Abierto');
 	}
 
-	function Write() {
+	function Write($writeLog = true) {
 		$this->Prepare();
 		if (!$this->Check()) {
 			return false;
@@ -57,8 +57,9 @@ class Trabajo extends Objeto
 		$work = new Work();
 		$work->fillFromArray($this->fields);
 		$work->fillChangedFields($this->changes);
+
 		try {
-			$work = $workService->saveOrUpdate($work);
+			$work = $workService->saveOrUpdate($work, $writeLog);
 			$this->fields = $work->fields;
 			return true;
 		} catch(ServiceException $ex) {

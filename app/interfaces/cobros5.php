@@ -10,10 +10,7 @@ if (!$cobro->Load($id_cobro)) {
 	$pagina->FatalError(__('Cobro inválido'));
 }
 
-
 $cobro->GuardarCobro();
-
-
 
 $cobro->CargarEscalonadas();
 $enpdf = ( $opc == 'guardar_cobro_pdf' ? true : false );
@@ -195,17 +192,21 @@ if ($opc == 'anular_emision') {
 			$observacion->Write();
 	}
 
-	$ret = $cobro->GuardarCobro();
+	$ret == '';
+	if ($accion != 'emitir') {
+		$ret = $cobro->GuardarCobro();
+	}
 
 	##################### EMISION ######################
 
-	if ($accion == 'emitir' && $ret == '') {
+	if ($accion == 'emitir') {
 		/* Guardo el cobro generando los movimientos de cuenta corriente */
 		$query_pagos = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '{$cobro->fields['id_cobro']}'";
 		$resp_pagos = mysql_query($query_pagos, $sesion->dbh) or Utiles::errorSQL($query_pagos, __FILE__, __LINE__, $sesion->dbh);
 		list($cantidad_pagos) = mysql_fetch_array($resp_pagos);
 
 		if ($cantidad_pagos > 0) {
+			$cobro->GuardarCobro();
 			$cobro->ReiniciarDocumento();
 		} else {
 			$cobro->GuardarCobro(true);
