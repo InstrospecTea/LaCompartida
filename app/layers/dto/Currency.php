@@ -23,8 +23,12 @@ class Currency extends Entity{
 	 * Obtiene los campos por defecto que debe llevar la entidad.
 	 * @return array
 	 */
-	protected function getDefaults() {
+	public function getTableDefaults() {
 		return array();
 	}
 
-} 
+	protected function getFixedDefaults() {
+		return array();
+	}
+
+}
