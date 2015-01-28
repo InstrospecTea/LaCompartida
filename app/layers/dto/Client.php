@@ -19,7 +19,7 @@ class Client extends Entity {
 		return 'cliente';
 	}
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 

@@ -28,7 +28,7 @@ abstract class Entity {
 	 * Obtiene los campos por defecto que debe llevar la entidad.
 	 * @return array
 	 */
-	abstract protected function getDefaults();
+	abstract protected function getDefaults(Sesion $Session);
 
 	/**
 	 * Obtiene el valor de una propiedad del objeto que es instancia de la clase que hereda este abstracto.
@@ -97,8 +97,8 @@ abstract class Entity {
 	/**
 	 * Completa el objeto con los valores por defecto definidos para cada entidad.
 	 */
-	public function fillDefaults() {
-		$defaults = $this->getDefaults();
+	public function fillDefaults(Sesion $Session) {
+		$defaults = $this->getDefaults($Session);
 		foreach ($defaults as $default => $value) {
 			if (is_null($this->get($default))) {
 				$this->set($default, $value);
@@ -116,6 +116,16 @@ abstract class Entity {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Obtiene los valores por defecto desde la descripción de la tabla;
+	 * @param Sesion $Session
+	 * @return type
+	 */
+	public function getDefaultsFromTable(Sesion $Session, $fields) {
+		$table = Descriptor::table($Session, $this->getPersistenceTarget());
+		return $table->getDefaults($fields);
 	}
 
 }

@@ -14,7 +14,7 @@ class ProcessLock extends Entity {
         return 'bloqueo_procesos';
     }
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 }

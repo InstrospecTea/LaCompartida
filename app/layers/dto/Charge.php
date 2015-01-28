@@ -55,10 +55,11 @@ class Charge extends LoggeableEntity {
 		);
 	}
 
-	protected function getDefaults() {
-		return array(
-			'estado' => 'CREADO',
-			'modalidad_calculo' => 1
+	protected function getDefaults(Sesion $Session) {
+		$fields = array('modalidad_calculo');
+		return array_merge(
+			$this->getDefaultsFromTable($Session, $fields),
+			array('estado' => 'CREADO')
 		);
 	}
 

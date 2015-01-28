@@ -23,8 +23,8 @@ class Currency extends Entity{
 	 * Obtiene los campos por defecto que debe llevar la entidad.
 	 * @return array
 	 */
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 
-} 
+}

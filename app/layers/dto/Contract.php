@@ -19,7 +19,7 @@ class Contract extends Entity {
 		return 'contrato';
 	}
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 

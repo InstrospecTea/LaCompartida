@@ -55,7 +55,7 @@ class Work extends LoggeableEntity {
 		);
 	}
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 

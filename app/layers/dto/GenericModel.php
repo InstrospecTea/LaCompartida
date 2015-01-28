@@ -21,8 +21,8 @@ class GenericModel extends Entity{
 		throw new Exception('Generic entity can not have a persistence target!');
 	}
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		throw new Exception("It's not correct the fact of a GenericModel entity having defaults values.");
 	}
 
-} 
+}

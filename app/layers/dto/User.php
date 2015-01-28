@@ -19,7 +19,7 @@ class User extends Entity {
 		return 'usuario';
 	}
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 

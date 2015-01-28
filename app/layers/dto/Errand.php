@@ -58,7 +58,7 @@ class Errand extends LoggeableEntity {
 		return array('id_tramite');
 	}
 
-	protected function getDefaults() {
+	protected function getDefaults(Sesion $Session) {
 		return array();
 	}
 }
