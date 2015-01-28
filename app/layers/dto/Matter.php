@@ -19,8 +19,12 @@ class Matter extends Entity {
 		return 'asunto';
 	}
 
-	protected function getDefaults() {
+	public function getTableDefaults() {
 		return array();
 	}
 
-} 
+	protected function getFixedDefaults() {
+		return array();
+	}
+
+}

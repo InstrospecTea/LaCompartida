@@ -56,6 +56,7 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 $Contrato = new Contrato($Sesion);
 
 if ($individual && $id_contrato) {
+	
 	Log::write(" |- Contrato: {$id_contrato}", Cobro::PROCESS_NAME);
 
 	set_time_limit(100);
@@ -72,9 +73,11 @@ if ($individual && $id_contrato) {
 	if (!$id_proceso_nuevo) {
 		$id_proceso_nuevo = $Cobro->GeneraProceso();
 	}
-
-	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
-
+	
+	$id_cobro_pendiente = !is_null($id_cobro_pendiente) ? $id_cobro_pendiente : '';
+	$monto = !is_null($monto) ? $monto : '';
+	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios);
+	
 	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
