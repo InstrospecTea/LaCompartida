@@ -148,7 +148,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 		//que crear un nuevo registro.
 		if (empty($id)) {
-			$object->fillDefaults($this->sesion);
+			$object = $this->fillDefaults($object);
 			$object = $this->save($object);
 			if (is_subclass_of($object, 'LoggeableEntity')) {
 				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
@@ -330,4 +330,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $tags[0];
 	}
 
+	private function fillDefaults(Entity $object) {
+		$table = Descriptor::table($this->sesion, $object->getPersistenceTarget());
+		$defaults = $table->getDefaults($object->getTableDefaults());
+		$object->fillDefaults($defaults);
+		return $object;
+	}
 }
