@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 15.1.3
+Martes 27 de Enero 2015
+* **Fix:** [Corrige error introducido en Release 15.1.0 al desestimar id_cobro_pendiente al generar el cobro](https://github.com/LemontechSA/ttb/pull/833)
+
 ## Hotfix: 15.1.2
 Martes 27 de Enero 2015
 * **Fix:** [Se configuran los valores por defecto de los nuevos cobros en el DTO](https://github.com/LemontechSA/ttb/pull/831)
