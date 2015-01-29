@@ -4,13 +4,12 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 class CronCobroProgramado extends Cron {
 
+	public $FileNameLog = 'CronCobroProgramado';
 	private $fecha_cron;
 
 	public function __construct() {
-		$this->fecha_cron = date('Y-m-d');
-		$this->FileNameLog = 'CronCobroProgramado';
-
 		parent::__construct();
+		$this->fecha_cron = date('Y-m-d');
 	}
 
 	/**
@@ -117,5 +116,3 @@ class CronCobroProgramado extends Cron {
 		$this->log('< FIN cobrosPendientes >');
 	}
 }
-
-?>

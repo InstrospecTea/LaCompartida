@@ -227,7 +227,6 @@ class AlertaCron {
 	function enviarAvisoCobrosProgramados($mensajes, $sesion) {
 		$from = html_entity_decode(Conf::AppName());
 		$to = Conf::GetConf($sesion, 'MailAdmin');
-
 		foreach ($mensajes as $id_usuario => $mensaje) {
 			Utiles::InsertarPlus($sesion, "Aviso $from", $mensaje, $to, "Administrador");
 		}
