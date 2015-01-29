@@ -1,9 +1,6 @@
 {
   "require": {
-    "twig/twig": "1.*"
-  },
-  "require-dev": {
-    "phpdocumentor/phpdocumentor": "2.*",
-    "evert/phpdoc-md" : "~0.0.7"
+    "twig/twig": "1.*",
+    "mikehaertl/phpwkhtmltopdf": "2.0.1"
   }
 }

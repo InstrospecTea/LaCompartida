@@ -810,7 +810,7 @@ class Reporte {
             LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
             LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
 
-    $add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'));
+    $add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'));
     $s = ' FROM trabajo
           LEFT JOIN usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
           LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario

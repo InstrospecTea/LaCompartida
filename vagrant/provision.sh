@@ -35,6 +35,7 @@ echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf.d/charset
 echo "ServerName localhost" >> /etc/apache2/conf.d/name
 
 sed -i "s/\/var\/www/\/var\/www\/vagrant/" /etc/apache2/sites-available/default
+sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/sites-available/default
 ln -s /vagrant /var/www/vagrant
 
 # PHP
@@ -53,6 +54,7 @@ mysql -u root -p$MYSQL_ROOT_PASS mysql -e "CREATE USER 'admin'@'%' IDENTIFIED BY
 mysql -u root -p$MYSQL_ROOT_PASS mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%'"
 
 # Restart
+a2enmod rewrite
 service apache2 restart
 service mysql restart
 

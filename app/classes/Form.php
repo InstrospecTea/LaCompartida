@@ -8,6 +8,7 @@ class Form {
 
 	public $Utiles;
 	public $Html;
+	public $defaultLabel = true;
 	protected $scripts = array();
 	protected $image_path = '//static.thetimebilling.com/images/';
 
@@ -92,7 +93,7 @@ class Form {
 	 * @return type
 	 */
 	public function input($name, $value, Array $attrs = array()) {
-		$attrs = array_merge(array('type' => 'text', 'value' => $value, 'label' => true, 'name' => null), $attrs);
+		$attrs = array_merge(array('type' => 'text', 'value' => $value, 'label' => $this->defaultLabel, 'name' => null), $attrs);
 		$label = null;
 
 		if ($attrs['type'] == 'hidden') {
@@ -106,7 +107,7 @@ class Form {
 		if (empty($attrs['name']) && !empty($name)) {
 			$attrs['name'] = $name;
 		}
-		if (empty($attrs['id']) && !empty($name)) {
+		if (!isset($attrs['id']) && ($attrs['id'] !== false || $attrs['id'] === true)) {
 			$attrs['id'] = $name;
 		}
 		unset($attrs['label']);
@@ -147,7 +148,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function hidden($name, $value, Array $attrs = array()) {
+	public function hidden($name, $value = '', Array $attrs = array()) {
 		$attrs = array_merge($attrs, array('type' => 'hidden'));
 		return $this->input($name, $value, $attrs);
 	}
@@ -160,7 +161,7 @@ class Form {
 	 * @param Array $attrs
 	 */
 	public function checkbox($name, $value, $checked = false, Array $attrs = array()) {
-		$attrs = $attrs + array('type' => 'checkbox', 'value' => $value, 'label' => true);
+		$attrs = $attrs + array('type' => 'checkbox', 'value' => $value, 'label' => $this->defaultLabel);
 		$label = null;
 
 		if ($attrs['label'] === true) {
@@ -176,7 +177,8 @@ class Form {
 			$attrs['id'] = $name;
 		}
 		$attrs['checked'] = $checked;
-		$radio = $this->Html->tag('input', null, $attrs, true);
+		$radio = $this->hidden($name, '0', array('id' => false))
+				. $this->Html->tag('input', null, $attrs, true);
 		return empty($label) ? $radio : $this->label($radio . $label);
 	}
 
@@ -220,7 +222,7 @@ class Form {
 	 * @param Array $attrs
 	 */
 	public function radio($name, $value, $checked = false, Array $attrs = array()) {
-		$attrs = $attrs + array('type' => 'radio', 'value' => $value, 'label' => true);
+		$attrs = $attrs + array('type' => 'radio', 'value' => $value, 'label' => $this->defaultLabel);
 		$label = null;
 
 		if ($attrs['label'] === true) {
@@ -260,7 +262,7 @@ class Form {
 				$label = empty($_attrs['label']) ? $this->Utiles->pascalize($name) : $_attrs['label'];
 				unset($_attrs['label']);
 			}
-			$attrs = array('label' => true) + $_attrs;
+			$attrs = array('label' => $this->defaultLabel) + $_attrs;
 			if ($attrs['label'] === false) {
 				$value = $label;
 			} else if ($attrs['label'] === true) {
@@ -272,6 +274,38 @@ class Form {
 		}
 		if ($container !== false) {
 			$html = $this->Html->tag($container, $html, $container_attrs);
+		}
+		return $html;
+	}
+
+	/**
+	 *
+	 * @param type $options Array name => label, label puede ser un Array donde sus valores indican los atributos
+	 * @param type $selected
+	 * @param type $container
+	 * @param type $container_attrs
+	 * @return type
+	 */
+	public function checkbox_group($options, Array $checkeds = array(), $container = 'div', Array $container_attrs = array()) {
+		$html = '';
+		$x = 1;
+		foreach ((Array) $options as $name => $label) {
+			$_attrs = array();
+			if (is_array($label)) {
+				$_attrs = $label;
+				$label = empty($_attrs['label']) ? $this->Utiles->pascalize($name) : $_attrs['label'];
+				unset($_attrs['label']);
+			}
+			$attrs = array('label' => $this->defaultLabel) + $_attrs;
+			if ($attrs['label'] === true) {
+				$attrs['label'] = $label;
+			}
+			$attrs['id'] = "{$name}_{$x}";
+			$html .= $this->checkbox($name, 1, in_array($name, $checkeds), $attrs);
+			++$x;
+		}
+		if ($container !== false) {
+			$html = $this->Html->tag($container, $html,  $container_attrs);
 		}
 		return $html;
 	}

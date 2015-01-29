@@ -11,17 +11,18 @@ abstract class AbstractService implements BaseService{
     }
 
 	/**
-	 * @param $object
-	 * @return mixed
-	 * @throws ServiceException
-	 */
-	public function saveOrUpdate($object) {
+     * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
+     * @param Entity $object
+     * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
+     * @throws Exception
+     */
+	public function saveOrUpdate($object, $writeLog = true) {
         $this->checkNullity($object);
         $this->checkClass($object, $this->getClass());
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
         try {
-            return $dao->saveOrUpdate($object);
+            return $dao->saveOrUpdate($object, $writeLog);
         } catch (CouldNotAddEntityException $ex) {
             throw new ServiceException($ex);
         } catch (CouldNotUpdateEntityException $ex) {
@@ -46,14 +47,19 @@ abstract class AbstractService implements BaseService{
         }
     }
 
-    public function findAll() {
+    public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
         $daoClass = $this->getDaoLayer();
         $dao = new $daoClass($this->sesion);
         try {
-            return $dao->findAll();
+            return $dao->findAll($restrictions, $fields, $order, $limit);
         } catch (Exception $ex) {
             throw new Exception($ex);
         }
+    }
+
+    public function findFirst($restrictions = null, $fields = null, $order = null) {
+		$result = $this->findAll($restrictions, $fields, $order, 1);
+        return isset($result[0]) ? $result[0] : false;
     }
 
 	/**

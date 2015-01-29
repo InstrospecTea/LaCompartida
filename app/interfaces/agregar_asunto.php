@@ -451,7 +451,7 @@ function MuestraPorValidacion(divID) {
 			form.id_area_proyecto.focus();
 			return false;
 		}
-
+		
 		<?php
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
@@ -478,7 +478,7 @@ function MuestraPorValidacion(divID) {
 		<?php } ?>
 
 		<?php echo $contractValidation->getClientValidationsScripts(); ?>
-
+ 
 		jQuery(form).submit();
 		return true;
 	}

@@ -38,10 +38,17 @@ class Aviso {
 				$aviso['mensaje'] = nl2br($aviso['mensaje']);
 				if (isset($aviso['permiso'])) {
 					$sesion = new Sesion(array());
-					foreach ($aviso['permiso'] as $permiso) {
+					if (is_array($aviso['permiso'])) {
+						foreach ($aviso['permiso'] as $permiso) {
+							if ($sesion->usuario->TienePermiso($permiso)) {
+								self::$mostrar_aviso = true;
+								break;
+							}
+						}
+					} else {
+						$permiso = $aviso['permiso'];
 						if ($sesion->usuario->TienePermiso($permiso)) {
 							self::$mostrar_aviso = true;
-							break;
 						}
 					}
 				}

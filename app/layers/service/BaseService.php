@@ -4,10 +4,11 @@ interface BaseService {
 
     /**
      * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
-     * @param $object
+     * @param Entity $object
+     * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
      * @throws Exception
      */
-    public function saveOrUpdate($object);
+    public function saveOrUpdate($object, $writeLog);
 
     /**
      * Obtiene una instancia del objeto manejado por la capa, a partir de su identificador primario.

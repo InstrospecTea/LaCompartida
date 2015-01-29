@@ -13,6 +13,8 @@ if ($opc == 'guardar') {
 	$carta = $CartaCobro->ObtenerCarta($id_carta);
 }
 
+echo $CartaCobro->PrevisualizarDocumento($id_carta, $id_cobro);
+
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Cartas de cobro');
 $pagina->PrintTop();
@@ -90,7 +92,7 @@ $Form = new Form;
 		<?php echo $Form->button('Regenerar', array('id' => 'btn_previsualizar_html')); ?>
 	</p>
 
-	<iframe id="previsualizacion_html" style="width:674px;height:730px"></iframe>
+	<iframe id="previsualizacion_html" style="width:800px;height:1100px"></iframe>
 </form>
 
 <?php echo $Form->script(); ?>

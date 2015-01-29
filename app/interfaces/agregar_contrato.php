@@ -44,8 +44,9 @@ if (!isset($Pagina)) {
 }
 
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente');
+$validacionesClienteJS = $validacionesCliente ? 'true' : 'false';
+
 if (!isset($contractValidation)) {
-	$validacionesClienteJS = 'true';
 	require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
 }
 
@@ -1382,6 +1383,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	function validarHito(fila, permitirVacio){
 		var num = fila.id.match(/\d+$/)[0];
 		var fecha = $F('hito_fecha_'+num);
+		var fecha_split = fecha.split('-');
+		var valid_day = (parseInt(fecha_split[0], 10) > 0 && parseInt(fecha_split[0], 10) <= 31);
+		var valid_month = (parseInt(fecha_split[1], 10) > 0 && parseInt(fecha_split[1], 10) <= 12);
+		var valid_year = parseInt(fecha_split[2], 10) >= 1969;
 		var desc = $F('hito_descripcion_'+num);
 		var monto = Number($F('hito_monto_estimado_'+num));
 
@@ -1390,6 +1395,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		}
 		if (permitirVacio && !fecha && !desc && !monto) {
 			return true;
+		}
+		if (!valid_day || !valid_month || !valid_year) {
+			alert('Ingrese una fecha válida para el hito');
+			$('hito_fecha_'+num).focus();
+			return false;
 		}
 		if(!desc){
 			alert('Ingrese una descripción válida para el hito');
@@ -2172,39 +2182,40 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									</tr>
 								</thead>
 								<tbody id="body_hitos">
-									<?php if (!isset($cargar_datos_contrato_cliente_defecto) && $contrato->fields['id_contrato'] != '') {
-										$query = "SELECT fecha_cobro, descripcion, monto_estimado, id_cobro, observaciones FROM cobro_pendiente WHERE id_contrato='{$contrato->fields['id_contrato']}' AND hito = '1' ORDER BY id_cobro_pendiente";
-										$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-										for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
-											$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
-											?>
-											<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
-												<td align="center" nowrap>
-													<input type="text" name="hito_fecha[<?php echo $i ?>]" value='<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>' id="hito_fecha_<?php echo $i ?>" size="11" maxlength="10" <?php echo $disabled ?>/>
-														<?php if (!$disabled) { ?>
-															<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hito_<?php echo $i ?>" style="cursor:pointer" />
-														<?php } ?>
-													<br/>
-													<span style="float:right">Observaciones:</span>
-												</td>
-												<td align="left">
-													<input type="text" name="hito_descripcion[<?php echo $i ?>]" value='<?php echo $temp['descripcion'] ?>' id="hito_descripcion_<?php echo $i ?>" size="40" <?php echo $disabled ?>/>
-													<br/>
-													<input type="text" name="hito_observaciones[<?php echo $i ?>]" value='<?php echo $temp['observaciones'] ?>' id="hito_observaciones_<?php echo $i ?>" size="40" <?php echo $disabled ?>/>
-												</td>
-												<td align="right" nowrap>
-													<span class="moneda_tabla"></span>&nbsp;
-													<input type="text" name="hito_monto_estimado[<?php echo $i ?>]" value='<?php echo empty($temp['monto_estimado']) ? '' : number_format($temp['monto_estimado'], 2, '.', '') ?>' id="hito_monto_estimado_<?php echo $i ?>" size="7" <?php echo $disabled ?>/>
-												</td>
-												<td align="center">
+									<?php
+									$query = "SELECT fecha_cobro, descripcion, monto_estimado, id_cobro, observaciones FROM cobro_pendiente WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND hito = '1' ORDER BY id_cobro_pendiente";
+									$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+									for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
+										$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
+										?>
+										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
+											<td align="center" nowrap>
+												<?php if ($disabled) { ?>
+													<input type="hidden" name="hito_disabled[<?php echo $i ?>]" value= "" />
+												<?php } ?>
+												<input type="text" name="hito_fecha[<?php echo $i ?>]" value='<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>' id="hito_fecha_<?php echo $i ?>" size="11" maxlength="10" <?php echo $disabled ?>/>
 													<?php if (!$disabled) { ?>
-														<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarHito(this);' />
+														<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hito_<?php echo $i ?>" style="cursor:pointer" />
 													<?php } ?>
-												</td>
-											</tr>
-											<?php
-										}
-									} ?>
+												<br/>
+												<span style="float:right">Observaciones:</span>
+											</td>
+											<td align="left">
+												<input type="text" name="hito_descripcion[<?php echo $i ?>]" value='<?php echo $temp['descripcion'] ?>' id="hito_descripcion_<?php echo $i ?>" size="40" <?php echo $disabled ?>/>
+												<br/>
+												<input type="text" name="hito_observaciones[<?php echo $i ?>]" value='<?php echo $temp['observaciones'] ?>' id="hito_observaciones_<?php echo $i ?>" size="40" <?php echo $disabled ?>/>
+											</td>
+											<td align="right" nowrap>
+												<span class="moneda_tabla"></span>&nbsp;
+												<input type="text" name="hito_monto_estimado[<?php echo $i ?>]" value='<?php echo empty($temp['monto_estimado']) ? '' : number_format($temp['monto_estimado'], 2, '.', '') ?>' id="hito_monto_estimado_<?php echo $i ?>" size="7" <?php echo $disabled ?>/>
+											</td>
+											<td align="center">
+												<?php if (!$disabled) { ?>
+													<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarHito(this);' />
+												<?php } ?>
+											</td>
+										</tr>
+									<?php } ?>
 									<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_1">
 										<td align="center" nowrap>
 											<input type="text" name="hito_fecha[1]" value='' id="hito_fecha_1" size="11" maxlength="10" />

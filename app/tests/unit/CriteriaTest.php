@@ -46,7 +46,6 @@ class CriteriaTest extends BaseUnitTest {
 
 	public function testThatCriteriaWithOrClauseIsWellFormedWithOneParameter() {
 		try {
-
 			$this->criteria->add_select('nombre');
 			$this->criteria->add_from('usuario');
 			$this->criteria->add_restriction(
@@ -96,7 +95,6 @@ class CriteriaTest extends BaseUnitTest {
 
 	public function testThatCriteriaWithAndClauseIsWellFormedWithOneParameter() {
 		try {
-
 			$this->criteria->add_select('nombre');
 			$this->criteria->add_from('usuario');
 			$this->criteria->add_restriction(

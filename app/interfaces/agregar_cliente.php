@@ -10,7 +10,6 @@ $cliente = new Cliente($Sesion);
 $contrato = new Contrato($Sesion);
 $archivo = new Archivo($Sesion);
 $codigo_obligatorio = true;
-
 $Form = new Form;
 $SelectHelper = new FormSelectHelper();
 
@@ -94,6 +93,9 @@ if ($opcion == "guardar") {
 	if ($validacionesCliente) {
 		if (empty($glosa_cliente)) {
 			$Pagina->AddError(__("Por favor ingrese el nombre del cliente"));
+		}
+		if ($id_usuario_encargado == '-1') {
+			$Pagina->AddError(__("Por favor seleccione un usuario encargado"));
 		}
 		if (empty($codigo_cliente)) {
 			$Pagina->AddError(__("Por favor ingrese el codigo del cliente"));
@@ -830,6 +832,14 @@ $Pagina->PrintTop();
 			}
 		}
 
+		<?php if ($validacionesCliente) { ?>
+			if (form.id_usuario_encargado.value == "-1") {
+				alert("<?php echo __('Debe seleccionar un usuario encargado') ?>");
+				form.id_usuario_encargado.focus();
+				return false;
+			}
+		<?php } ?>
+
 		form.factura_rut.value = form.factura_rut.value.trim();
 		if (form.factura_rut.value) {
 			validarUnicoCliente(form.factura_rut.value, 'rut', form.id_cliente.value);
@@ -853,6 +863,7 @@ $Pagina->PrintTop();
 	<?php } ?>
 
 	<?php echo $contractValidation->getClientValidationsScripts(); ?>
+
 
 <?php } ?>
 
@@ -1032,9 +1043,6 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 		frame = jQuery(this);
 		frame.css('height', frame[0].contentWindow.document.body.offsetHeight + 'px');
 	});
-
-	Calendar.setup({ inputField: "fecha_creacion", ifFormat: "%d-%m-%Y", button: "fecha_creacion" });
-	Calendar.setup({ inputField: "fecha_creacion", ifFormat: "%d-%m-%Y", button: "img_fecha_creacion" });
 </script>
 
 <?php

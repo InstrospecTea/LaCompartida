@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 /*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
 
 /* IMPORTANTE:
-	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
+  Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
 
 function ExisteCampo($campo, $tabla, $dbh) {
 
@@ -10435,41 +10435,41 @@ QUERY;
 		case 7.79:
 			$queries = array();
 			$queries[] = "CREATE TABLE `tramite_historial` (
-				`id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
-				`id_tramite` int(11) NOT NULL,
-				`id_usuario` int(11) NOT NULL,
-				`fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-				`fecha` datetime DEFAULT NULL,
-				`fecha_modificado` datetime DEFAULT NULL,
-				`descripcion` mediumtext,
-				`descripcion_modificado` mediumtext,
-				`codigo_asunto` varchar(20) DEFAULT NULL,
-				`codigo_asunto_modificado` varchar(20) DEFAULT NULL,
-				`codigo_actividad` varchar(5) DEFAULT NULL,
-				`codigo_actividad_modificado` varchar(5) DEFAULT NULL,
-				`codigo_tarea` varchar(100) DEFAULT NULL,
-				`codigo_tarea_modificado` varchar(100) DEFAULT NULL,
-				`id_tramite_tipo` int(11) DEFAULT NULL,
-				`id_tramite_tipo_modificado` int(11) DEFAULT NULL,
-				`solicitante` varchar(255) DEFAULT NULL,
-				`solicitante_modificado` varchar(255) DEFAULT NULL,
-				`id_moneda_tramite` int(11) DEFAULT NULL,
-				`id_moneda_tramite_modificado` int(11) DEFAULT NULL,
-				`tarifa_tramite` double DEFAULT NULL,
-				`tarifa_tramite_modificado` double DEFAULT NULL,
-				`id_moneda_tramite_individual` int(11) DEFAULT NULL,
-				`id_moneda_tramite_individual_modificado` int(11) DEFAULT NULL,
-				`tarifa_tramite_individual` double DEFAULT NULL,
-				`tarifa_tramite_individual_modificado` double DEFAULT NULL,
-				`cobrable` tinyint(4) DEFAULT NULL,
-				`cobrable_modificado` tinyint(4) DEFAULT NULL,
-				`trabajo_si_no` int(1) DEFAULT NULL,
-				`trabajo_si_no_modificado` int(1) DEFAULT NULL,
-				`duracion` time DEFAULT '00:00:00',
-				`duracion_modificado` time DEFAULT '00:00:00',
-				`accion` varchar(9) NOT NULL DEFAULT '',
-				`app_id` int(3) NOT NULL DEFAULT '1',
-				PRIMARY KEY (`id_tramite_historial`)
+			  `id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_tramite` int(11) NOT NULL,
+			  `id_usuario` int(11) NOT NULL,
+			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `fecha` datetime DEFAULT NULL,
+			  `fecha_modificado` datetime DEFAULT NULL,
+			  `descripcion` mediumtext,
+			  `descripcion_modificado` mediumtext,
+			  `codigo_asunto` varchar(20) DEFAULT NULL,
+			  `codigo_asunto_modificado` varchar(20) DEFAULT NULL,
+			  `codigo_actividad` varchar(5) DEFAULT NULL,
+			  `codigo_actividad_modificado` varchar(5) DEFAULT NULL,
+			  `codigo_tarea` varchar(100) DEFAULT NULL,
+			  `codigo_tarea_modificado` varchar(100) DEFAULT NULL,
+			  `id_tramite_tipo` int(11) DEFAULT NULL,
+			  `id_tramite_tipo_modificado` int(11) DEFAULT NULL,
+			  `solicitante` varchar(255) DEFAULT NULL,
+			  `solicitante_modificado` varchar(255) DEFAULT NULL,
+			  `id_moneda_tramite` int(11) DEFAULT NULL,
+			  `id_moneda_tramite_modificado` int(11) DEFAULT NULL,
+			  `tarifa_tramite` double DEFAULT NULL,
+			  `tarifa_tramite_modificado` double DEFAULT NULL,
+			  `id_moneda_tramite_individual` int(11) DEFAULT NULL,
+			  `id_moneda_tramite_individual_modificado` int(11) DEFAULT NULL,
+			  `tarifa_tramite_individual` double DEFAULT NULL,
+			  `tarifa_tramite_individual_modificado` double DEFAULT NULL,
+			  `cobrable` tinyint(4) DEFAULT NULL,
+			  `cobrable_modificado` tinyint(4) DEFAULT NULL,
+			  `trabajo_si_no` int(1) DEFAULT NULL,
+			  `trabajo_si_no_modificado` int(1) DEFAULT NULL,
+			  `duracion` time DEFAULT '00:00:00',
+			  `duracion_modificado` time DEFAULT '00:00:00',
+			  `accion` varchar(9) NOT NULL DEFAULT '',
+			  `app_id` int(3) NOT NULL DEFAULT '1',
+			  PRIMARY KEY (`id_tramite_historial`)
 			);";
 
 			ejecutar($queries, $dbh);
@@ -10477,38 +10477,38 @@ QUERY;
 		case 7.80:
 			$queries = array();
 			$queries[] = "CREATE TABLE `cobro_movimiento` (
-				`id_cobro_movimiento` int(11) NOT NULL AUTO_INCREMENT,
-				`id_cobro` int(11) DEFAULT NULL,
-				`id_usuario` int(11) DEFAULT NULL,
-				`fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-				`accion` varchar(9) DEFAULT '',
-				`app_id` int(3) DEFAULT NULL,
-				`estado` varchar(20) DEFAULT NULL,
-				`estado_modificado` varchar(20) DEFAULT NULL,
-				`codigo_cliente` varchar(10) DEFAULT '',
-				`codigo_cliente_modificado` varchar(10) DEFAULT '',
-				`id_contrato` int(11) DEFAULT NULL,
-				`fecha_cobro` datetime DEFAULT NULL,
-				`fecha_cobro_modificado` datetime DEFAULT NULL,
-				`id_contrato_modificado` int(11) DEFAULT NULL,
-				`id_moneda` int(11) DEFAULT NULL,
-				`id_moneda_modificado` int(11) DEFAULT NULL,
-				`tipo_cambio_moneda` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
-				`tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
-				`fecha_creacion` datetime DEFAULT NULL,
-				`fecha_en_revision` datetime DEFAULT NULL,
-				`fecha_emision` datetime DEFAULT NULL,
-				`fecha_facturacion` datetime DEFAULT NULL,
-				`fecha_enviado_cliente` datetime DEFAULT NULL,
-				`fecha_pago_parcial` datetime DEFAULT NULL,
-				`fecha_creacion_modificado` datetime DEFAULT NULL,
-				`fecha_en_revision_modificado` datetime DEFAULT NULL,
-				`fecha_emision_modificado` datetime DEFAULT NULL,
-				`fecha_facturacion_modificado` datetime DEFAULT NULL,
-				`fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
-				`fecha_pago_parcial_modificado` datetime DEFAULT NULL,
-				PRIMARY KEY (`id_cobro_movimiento`),
-				INDEX(`id_cobro`)
+			  `id_cobro_movimiento` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_cobro` int(11) DEFAULT NULL,
+			  `id_usuario` int(11) DEFAULT NULL,
+			  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  `accion` varchar(9) DEFAULT '',
+			  `app_id` int(3) DEFAULT NULL,
+			  `estado` varchar(20) DEFAULT NULL,
+			  `estado_modificado` varchar(20) DEFAULT NULL,
+			  `codigo_cliente` varchar(10) DEFAULT '',
+			  `codigo_cliente_modificado` varchar(10) DEFAULT '',
+			  `id_contrato` int(11) DEFAULT NULL,
+			  `fecha_cobro` datetime DEFAULT NULL,
+			  `fecha_cobro_modificado` datetime DEFAULT NULL,
+			  `id_contrato_modificado` int(11) DEFAULT NULL,
+			  `id_moneda` int(11) DEFAULT NULL,
+			  `id_moneda_modificado` int(11) DEFAULT NULL,
+			  `tipo_cambio_moneda` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+			  `tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+			  `fecha_creacion` datetime DEFAULT NULL,
+			  `fecha_en_revision` datetime DEFAULT NULL,
+			  `fecha_emision` datetime DEFAULT NULL,
+			  `fecha_facturacion` datetime DEFAULT NULL,
+			  `fecha_enviado_cliente` datetime DEFAULT NULL,
+			  `fecha_pago_parcial` datetime DEFAULT NULL,
+			  `fecha_creacion_modificado` datetime DEFAULT NULL,
+			  `fecha_en_revision_modificado` datetime DEFAULT NULL,
+			  `fecha_emision_modificado` datetime DEFAULT NULL,
+			  `fecha_facturacion_modificado` datetime DEFAULT NULL,
+			  `fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
+			  `fecha_pago_parcial_modificado` datetime DEFAULT NULL,
+			  PRIMARY KEY (`id_cobro_movimiento`),
+			  INDEX(`id_cobro`)
 			);";
 			$queries[] = "ALTER TABLE `cobro_movimiento`
 				ADD COLUMN `fecha_ini` DATE NULL DEFAULT NULL AFTER `fecha_pago_parcial_modificado`,
@@ -10572,6 +10572,64 @@ QUERY;
 			break;
 
 		case 7.87:
+			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
+			}
+			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
+			}
+			break;
+
+		case 7.88:
+			if (!ExisteCampo('direccion', 'cuenta_banco', $dbh)) {
+				$queries[] = "ALTER TABLE cuenta_banco
+					ADD COLUMN direccion VARCHAR(255) DEFAULT NULL COMMENT 'Direccion de la sucursal',
+					ADD COLUMN telefono VARCHAR(60) DEFAULT NULL COMMENT 'Telefono primario',
+					ADD COLUMN telefono2 VARCHAR(60) DEFAULT NULL COMMENT 'Telefono secundario',
+					ADD COLUMN fax VARCHAR(60) DEFAULT NULL COMMENT 'Telefono FAX'";
+
+				$queries[] = "ALTER TABLE prm_banco ADD COLUMN url VARCHAR(255) DEFAULT NULL COMMENT 'Direccion Web'";
+			}
+			break;
+
+		case 7.89:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			break;
+
+		case 7.90:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
+			break;
+
+		case 7.91:
+			$queries[] = "CREATE TABLE `bloqueo_procesos` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`id_usuario` int(11) NOT NULL,
+							`nombre_usuario` varchar(100) NOT NULL,
+							`proceso` varchar(32) NOT NULL,
+							`bloqueado` tinyint(1) NOT NULL,
+							`estado` varchar(512) NOT NULL DEFAULT '',
+							`datos_post` varchar(512) DEFAULT NULL,
+							`notificado` tinyint(1) NOT NULL,
+							`fecha_creacion` datetime NOT NULL,
+							`fecha_modificacion` datetime DEFAULT NULL,
+							PRIMARY KEY (`id`),
+							KEY `id_usuario_ndx` (`id_usuario`),
+							KEY `bloqueado_ndx` (`bloqueado`),
+							KEY `notificado_ndx` (`notificado`)
+						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+			break;
+
+		case 7.92:
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
+			break;
+
+		case 7.93:
+			$queries[] = "INSERT INTO `prm_tipo_correo` (`nombre`) VALUES ('proceso')";
+			break;
+
+		case 7.94:
 			$queries = array();
 			if (!ExisteCampo('desglose_referencia', 'cliente', $dbh)) {
 				$queries[] = "ALTER TABLE `cliente` ADD `desglose_referencia` VARCHAR(255) NULL COMMENT 'este campo contiene una referencia del cliente adicional' AFTER `id_cliente_referencia` ;";
@@ -10645,17 +10703,6 @@ QUERY;
 					REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
 				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`)
 					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
-
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
-			break;
-
-		case 7.88:
-			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
-			}
-			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
-			}
 			break;
 	}
 
@@ -10665,46 +10712,38 @@ QUERY;
 }
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
-	(No olvidar agregar la notificacion de los cambios) */
+  (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.88;
+$max_update = 7.94;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
 	$max_update = round($_GET['maxupdate'], 2);
 }
-
 if (isset($_GET['minupdate'])) {
 	$min_update = round($_GET['minupdate'], 2);
 }
-
 if (isset($_GET['force'])) {
 	$force = $_GET['force'];
 }
-
 for ($version = max($min_update, 2); $version <= $max_update; $version += 0.01) {
 	$VERSIONES[$num++] = round($version, 2);
 }
-
 if (isset($_GET['lastver'])) {
 	$lastver = array_pop($VERSIONES);
 	echo number_format($lastver, 2, '.', '');
 } else {
-	/**
-	 * LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA
-	 */
+
+	/*	 * ********************************************** LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA ****************************************************** */
 
 	require_once dirname(__FILE__) . '/../app/conf.php';
 
 	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1]) {
 		die('Credenciales inválidas.');
 	}
-
 	$sesion = new Sesion();
-
-	// este usuario y contraseña son necesarios para la actualización de tablas
 	$sesion->dbh = @mysql_connect(Conf::dbHost(), 'admin', 'admin1awdx') or die(mysql_error());
 	mysql_select_db(Conf::dbName(), $sesion->dbh) or mysql_error($sesion->dbh);
 
@@ -10724,10 +10763,10 @@ if (isset($_GET['lastver'])) {
 	foreach ($VERSIONES as $key => $new_version) {
 		if ($VERSION < $new_version || $force == 1) {
 			flush();
-
 			echo '<hr>Comienzo de proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
 
 			try {
+
 				if (!mysql_query("START TRANSACTION", $sesion->dbh)) {
 					throw new Exception(mysql_error($sesion->dbh));
 				}
@@ -10752,7 +10791,7 @@ if (isset($_GET['lastver'])) {
 
 				EnviarLogError($error_message, $exc, $sesion);
 
-				exit;
+				exit(1);
 			}
 
 			GuardarVersion($new_version, $sesion);
@@ -10775,23 +10814,25 @@ function EnviarLogError($error_message, $e, $sesion) {
 			'nombre' => 'Soporte Lemontech'
 		),
 	);
-	$mail = "<p>Ha ocurrido un error al actualizar</p>
-		<p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
-		<p>$error_message</p>";
+	$mail = <<<MAIL
+<p>Ha ocurrido un error al actualizar</p>
+
+<p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
+
+<p>$error_message</p>
+MAIL;
 
 	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
 function InitVersion($version, $sesion) {
 	echo '<hr>Inicializando tabla para versión.<br>';
-
 	mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (
-		`version` decimal(3,1) NOT NULL DEFAULT '0.0',
-		`version_ct` decimal(3,1) NOT NULL DEFAULT '0.0',
-		`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		PRIMARY KEY (`version`,`version_ct`)
-	) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
-
+	`version` decimal(3,1) NOT NULL DEFAULT '0.0',
+	`version_ct` decimal(3,1) NOT NULL DEFAULT '0.0',
+	`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`version`,`version_ct`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
 	$file_name = dirname(__FILE__) . '/version.php';
 	if (file_exists($file_name)) {
 		require_once $file_name;
@@ -10808,22 +10849,19 @@ function GuardarVersion($new_version, $sesion) {
 
 function IngresarNotificacion($notificacion, $permisos = array('ALL')) {
 	global $sesion;
-	$q = "INSERT INTO notificacion SET fecha=NOW(), texto_notificacion = '{$notificacion}'";
-
-	if (!($resp = mysql_query($q, $sesion->dbh))) {
-		throw new Exception($q . '---' . mysql_error());
-	}
+	$q = "INSERT INTO notificacion SET fecha=NOW(),texto_notificacion='" . $notificacion . "'";
+	if (!($resp = mysql_query($q, $sesion->dbh)))
+		throw new Exception($q . "---" . mysql_error());
 
 	$where = "usuario_permiso.codigo_permiso='ADM'";
 	foreach ($permisos as $p) {
-		$where .= " OR usuario_permiso.codigo_permiso='{$p}'";
+		$where .= " OR usuario_permiso.codigo_permiso='" . $p . "'";
 	}
 
 	$query = "UPDATE usuario
-		SET usuario.id_notificacion_tt = LAST_INSERT_ID()
-		WHERE usuario.id_usuario NOT IN (SELECT usuario_permiso.id_usuario FROM usuario_permiso WHERE {$where})";
-
-	if (!($resp = mysql_query($query, $sesion->dbh))) {
-		throw new Exception($query . '---' . mysql_error());
-	}
+						SET usuario.id_notificacion_tt=LAST_INSERT_ID()
+						WHERE usuario.id_usuario NOT IN
+						(SELECT usuario_permiso.id_usuario FROM usuario_permiso WHERE $where)";
+	if (!($resp = mysql_query($query, $sesion->dbh)))
+		throw new Exception($query . "---" . mysql_error());
 }
