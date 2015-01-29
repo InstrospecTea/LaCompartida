@@ -744,6 +744,12 @@ function MuestraPorValidacion(divID) {
 								<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
+
+						<?php 
+							$prmGiro = new PrmGiro($Sesion);
+							$giros = $prmGiro->ListarExt();
+							if (count($giros) > 0) {
+						?>
 						<tr>
 							<td align="right">
 								<?php echo __('Giro') ?>
@@ -773,6 +779,7 @@ function MuestraPorValidacion(divID) {
 								?>
 							</td>
 						</tr>
+						<?php } ?>
 						<tr>
 							<td align="right">
 								<?php echo __('Usuario responsable'); ?>
