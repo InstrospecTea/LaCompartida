@@ -256,9 +256,13 @@ class Reporte {
     //Para GROUP BY - Query secundaria por Cobros
     switch ($s) {
       //Agrupadores que no existen para Cobro sin trabajos:
-      case "area_asunto":
-      case "tipo_asunto":
       case "id_trabajo":
+        break;
+      case "area_asunto":
+        $this->id_agrupador_cobro[] = "area_asunto";
+        break;
+      case "tipo_asunto":
+        $this->id_agrupador_cobro[] = "tipo_asunto";
         break;
       case "glosa_asunto":
       case "glosa_asunto_con_codigo":
@@ -347,8 +351,8 @@ class Reporte {
           CONCAT(' . $this->dato_codigo_asunto . ',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
           asunto.codigo_asunto,
           contrato.id_contrato,
-          \' - \' as tipo_asunto,
-          \' - \' as area_asunto,
+          tipo.glosa_tipo_proyecto AS tipo_asunto,
+          area.glosa AS area_asunto,
           MONTH('.$campo_fecha.') as mes,
           grupo_cliente.id_grupo_cliente,
           IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
@@ -449,6 +453,8 @@ class Reporte {
     $s .= ' FROM cobro
             left join cobro_asunto using (id_cobro)
             LEFT JOIN asunto using (codigo_asunto)
+            LEFT JOIN prm_area_proyecto AS area ON asunto.id_area_proyecto = area.id_area_proyecto
+            LEFT JOIN prm_tipo_proyecto AS tipo ON asunto.id_tipo_asunto = tipo.id_tipo_proyecto
             LEFT JOIN (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro
             LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario
             LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
@@ -510,9 +516,9 @@ class Reporte {
         $agrupa_cobro[] = $a;
       }
 
-
       $s .= ' GROUP BY ' . implode(', ', $agrupa_cobro);
     }
+
     return $s;
   }
 
