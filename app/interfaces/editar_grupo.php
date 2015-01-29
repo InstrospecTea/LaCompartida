@@ -57,14 +57,7 @@ if (!empty($id)) {
                 array('id' => 'id_pais_grupo', 'class' => 'span3', 'style' => 'display:inline'), 
                 array(
                   'source' => 'ajax/ajax_prm.php?prm=Pais&fields=nombre,iso_2siglas',
-                  'selectedName' => 'selected_pais_grupo',
-                  'onLoad' => '
-                    var element = selected_pais_grupo;
-                  ',
-                  'onChange' => '
-                    var element = selected_pais_grupo;
-                  '
-                )
+                  'selectedName' => 'selected_pais_grupo')
               );
             ?> 
           </div>
