@@ -1,8 +1,8 @@
 <?php
-$args = getopt('', array('script:', 'domain:', 'subdir:', 'debug'));
+$args = getopt('', array('script:', 'domain:', 'subdir:', 'data:', 'debug'));
 
 if (!isset($args['script']) || !isset($args['domain']) || !isset($args['subdir'])) {
-	exit("use: console script_name --domain=dev --subdir=ttb [--debug]\n");
+	exit("use: console script_name --domain=dev --subdir=ttb [--data='json_data'] [--debug]\n");
 }
 
 define('__DIR__', dirname(__FILE__));
@@ -20,5 +20,8 @@ $Utiles = new \TTB\Utiles;
 $class_name = $Utiles->pascalize($args['script']);
 
 $script = new $class_name;
+if (isset($args['data'])) {
+	$script->data = json_decode($args['data'], true);
+}
 $script->debug = isset($args['debug']);
 $script->main();

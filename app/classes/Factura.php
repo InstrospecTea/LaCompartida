@@ -297,12 +297,18 @@ class Factura extends Objeto {
 		),
 	);
 
+	// Twig, the flexible, fast, and secure template language for PHP
+	private $twig;
+	// To render the template with some variables
+	private $template_data;
+
 	function Factura($sesion, $fields = "", $params = "") {
 		$this->tabla = "factura";
 		$this->campo_id = "id_factura";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->log_update = true;
+		$this->template_data = array();
 	}
 
 	function Id($id = null) {
@@ -493,7 +499,17 @@ class Factura extends Objeto {
 		return $id_documento_legal;
 	}
 
+	function CodigoTipoDocumentoLegal() {
+		$id_documento_legal = $this->fields['id_documento_legal'];
+		$query_doc = "SELECT codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+		$resp_doc = mysql_query($query_doc, $this->sesion->dbh) or Utiles::errorSQL($query_doc, __FILE__, __LINE__, $this->sesion->dbh);
+		list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
+		return $codigo_documento_legal;
+	}
+
 	function GeneraHTMLFactura($id_formato_factura = null) {
+		$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
+
 		if ($this->fields['id_moneda'] != 2 && ( ( method_exists('Conf', 'InfoBancariaCYC') && Conf::InfoBancariaCYC() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'InfoBancariaCYC') ) )) {
 			$templateData = UtilesApp::TemplateFactura($this->sesion, 2);
 			$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, 2);
@@ -554,6 +570,8 @@ class Factura extends Objeto {
 		$cobro = new Cobro($this->sesion);
 
 		if ($cobro->Load($this->fields['id_cobro'])) {
+			$this->template_data['Cobro'] = $cobro->fields;
+
 			global $x_detalle_profesional;
 			global $x_resumen_profesional;
 			list( $x_detalle_profesional, $x_resumen_profesional ) = $cobro->DetalleProfesional();
@@ -565,6 +583,7 @@ class Factura extends Objeto {
 		}
 
 		$html = $this->GenerarDocumento($parser, 'CARTA_FACTURA', $lang);
+		$html = $this->RenderTemplate($html);
 
 		$html_css = array();
 		$html_css['html'] = $html;
@@ -610,9 +629,13 @@ class Factura extends Objeto {
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
 
+		$this->template_data['Idioma'] = $idioma->fields;
+
 		global $cobro_moneda;
 		$cobro_moneda = new CobroMoneda($this->sesion);
 		$cobro_moneda->Load($this->fields['id_cobro']);
+
+		$this->template_data['MonedaCobro'] = $cobro_moneda->moneda_cobro;
 
 		$cobro = new NotaCobro($this->sesion);
 		$cobro->Load($this->fields['id_cobro']);
@@ -670,7 +693,7 @@ class Factura extends Objeto {
 								cobro.id_cobro,
 								factura.direccion_cliente,
 								factura.numero,
-								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre, 
+								CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre,
 								factura.fecha as fecha,
 								factura.fecha_vencimiento as fecha_vencimiento,
 								prm_documento_legal.glosa,
@@ -1297,7 +1320,14 @@ class Factura extends Objeto {
 				$gastos_sin_impuesto = 0;
 				$monto_impuesto_honorarios = 0;
 				$monto_impuesto_gastos = 0;
-				$glosa_banco = "";
+
+				$cuenta_nombre = '';
+				$banco_nombre = '';
+				$cuenta_direccion = '';
+				$cuenta_telefono = '';
+				$cuenta_telefono2 = '';
+				$cuenta_fax = '';
+				$cuenta_codigo_swift = '';
 
 				if (isset($cobro) && $cobro->loaded()) {
 
@@ -1318,14 +1348,26 @@ class Factura extends Objeto {
 					$subtotal_exentos = number_format($honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '');
 
 					$subtotal_completo = $honorarios_con_impuesto + $gastos_con_impuesto + $honorarios_sin_impuesto + $gastos_sin_impuesto;
-					$query_glosa_banco = " SELECT cb.glosa
-												FROM cuenta_banco cb
-													JOIN contrato c ON ( cb.id_cuenta = c.id_cuenta )
-													JOIN cobro cob ON ( c.id_contrato = cob.id_contrato )
-												WHERE cob.id_cobro = '{$cobro->fields[id_cobro]}' LIMIT 1";
-					$resu_glosa = mysql_query($query_glosa_banco, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_banco, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco) = mysql_fetch_array($resu_glosa);
+
+					// obtiene los datos del banco asociado al contrato del cobro
+					$query_cuenta_banco = "SELECT cuenta_banco.glosa, prm_banco.nombre, cuenta_banco.direccion, cuenta_banco.telefono, cuenta_banco.telefono2, cuenta_banco.fax, prm_banco.url, cuenta_banco.cod_swift
+						FROM cuenta_banco
+							JOIN contrato ON cuenta_banco.id_cuenta = contrato.id_cuenta
+							JOIN cobro ON contrato.id_contrato = cobro.id_contrato
+							JOIN prm_banco ON cuenta_banco.id_banco = prm_banco.id_banco
+						WHERE cobro.id_cobro = '{$cobro->fields[id_cobro]}' LIMIT 1";
+					$rs_cuenta = mysql_query($query_cuenta_banco, $this->sesion->dbh) or Utiles::errorSQL($query_cuenta_banco, __FILE__, __LINE__, $this->sesion->dbh);
+					list($cuenta_nombre, $banco_nombre, $cuenta_direccion, $cuenta_telefono, $cuenta_telefono2, $cuenta_fax, $banco_url, $cuenta_codigo_swift) = mysql_fetch_array($rs_cuenta);
 				}
+
+				$html2 = str_replace('%glosa_banco%', $cuenta_nombre, $html2);
+				$html2 = str_replace('%banco_nombre%', $banco_nombre, $html2);
+				$html2 = str_replace('%cuenta_direccion%', $cuenta_direccion, $html2);
+				$html2 = str_replace('%cuenta_telefono%', $cuenta_telefono, $html2);
+				$html2 = str_replace('%cuenta_telefono2%', $cuenta_telefono2, $html2);
+				$html2 = str_replace('%cuenta_fax%', $cuenta_fax, $html2);
+				$html2 = str_replace('%banco_url%', $banco_url, $html2);
+				$html2 = str_replace('%cuenta_codigo_swift%', $cuenta_codigo_swift, $html2);
 
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '%simbolo_honorarios%', $html2);
@@ -1360,7 +1402,6 @@ class Factura extends Objeto {
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', '', $html2);
 				}
 
-				$html2 = str_replace('%glosa_banco%', $glosa_banco, $html2);
 				$html2 = str_replace('%total_exentos%', number_format($subtotal_exentos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%total_diez%', number_format($subtotal_diez, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%total_paraguay%', number_format($subtotal_completo, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -1911,6 +1952,51 @@ class Factura extends Objeto {
 		}
 	}
 
+	/**
+	 * Obtiene la glosa de la condición de pago
+	 *
+	 * @return String Glosa, o nulo si no existe
+	 *
+	 */
+	function ObtieneGlosaCondicionPago() {
+		$condicion_pago = $this->fields['condicion_pago'];
+		switch ($condicion_pago) {
+			case '1': $condicion_pago = __('CONTADO');
+				break;
+			case '3': $condicion_pago = __('Vencimiento 15 días	');
+				break;
+			case '4': $condicion_pago = __('Vencimiento 30 días	');
+				break;
+			case '5': $condicion_pago = __('Vencimiento 45 días	');
+				break;
+			case '6': $condicion_pago = __('Vencimiento 60 días	');
+				break;
+			case '7': $condicion_pago = __('Vencimiento 75 días	');
+				break;
+			case '8': $condicion_pago = __('Vencimiento 90 días	');
+				break;
+			case '9': $condicion_pago = __('Vencimiento 120 días');
+				break;
+			case '12': $condicion_pago = __('Letra 30 días');
+				break;
+			case '13': $condicion_pago = __('Letra 45 días');
+				break;
+			case '14': $condicion_pago = __('Letra 60 días');
+				break;
+			case '15': $condicion_pago = __('Letra 90 días');
+				break;
+			case '18': $condicion_pago = __('Cheque 30 días');
+				break;
+			case '19': $condicion_pago = __('Cheque 45 días');
+				break;
+			case '20': $condicion_pago = __('Cheque 60 días');
+				break;
+			case '21': $condicion_pago = __('Cheque a fecha');
+				break;
+		}
+		return $condicion_pago;
+	}
+
 	function ObtieneNumeroDocumentoLegal($tipo_documento_legal) {
 		return $this->ObtenerNumeroDocLegal($tipo_documento_legal);
 	}
@@ -2220,6 +2306,33 @@ class Factura extends Objeto {
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	/**
+	 * Devuelve el campo para ordenar los datos de una {@link Factura}. En el caso de que el parámetro sea vacío
+	 * devuelve el valor de la configuración OrdenarFacturasPorDefecto.
+	 *
+	 * @param string $orden
+	 * @return string
+	 */
+	public function OrdenReporte($orden) {
+		if (empty($orden)) {
+			$options = array('cliente', 'fecha', 'numero', 'encargado_comercial', 'id_cobro', 'estado');
+			$default_order = Conf::GetConf($this->sesion, 'OrdenarFacturasPorDefecto');
+			$order_split = preg_split('(,|\s)', $default_order);
+			$order_field = $order_split[0];
+			$order_option = strtolower(end($order_split));
+
+			if (in_array($order_field, $options)) {
+				if ($order_option == 'desc') {
+					$orden = $order_field . ' ' . $order_option;
+				} else {
+					$orden = $order_field;
+				}
+			}
+		}
+
+		return $orden;
+	}
+
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
 	, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 	, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
@@ -2294,6 +2407,10 @@ class Factura extends Objeto {
 			}
 		} else {
 			$where = base64_decode($where);
+		}
+
+		if ($orden !== false) {
+			$orderby = ' ORDER BY '.$orden;
 		}
 
 		$groupby = " GROUP BY factura.id_factura ";
@@ -2666,6 +2783,19 @@ class Factura extends Objeto {
 		return (!is_null($this->fields['dte_fecha_creacion']));
 	}
 
+	/**
+	 * Reemplazo de tags por twig
+	 * @param string $template html de la factura
+	 */
+	private function RenderTemplate($template) {
+		if (!$this->twig) {
+			$loader = new Twig_Loader_String();
+			$this->twig = new Twig_Environment($loader);
+			$this->twig->addExtension(new DateTwigExtension());
+		}
+
+		return $this->twig->render($template, $this->template_data);
+	}
 }
 
 #end Class

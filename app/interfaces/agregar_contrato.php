@@ -1,19 +1,21 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
+$Sesion = new Sesion(array('DAT'));
+
 //Tooltips para las modalidades de cobro.
-$tip_tasa = __("En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.");
-$tip_suma = __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de ") . __("cobro") . __(" que no puede tener límites.");
-$tip_retainer = __("El cliente compra un número de HH. El límite puede ser por horas o por un monto.");
+$tip_tasa = __('Tip tasa');
+$tip_retainer = __('Tip retainer');
+$tip_cap = __('Tip cap');
+$tip_hitos = __('Tip hitos');
+$tip_flat = __('Tip flat');
+$tip_escalonada = __('Tip escalonada');
+$tip_honorarios = __('Tip honorarios');
+$tip_mensual = __('Tip mensual');
+$tip_tarifa_especial = __('Tip tarifa especial');
+$tip_individual = __('Tip individual');
+$tip_proporcional = __('Tip proporcional');
 $tip_retainer_usuarios = __("Si usted selecciona usuarios en esta lista, las horas de estos usuarios se van a descontar de las horas retainer con preferencia");
-$tip_proporcional = __("El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.");
-$tip_flat = __("El cliente acuerda cancelar un <strong>monto fijo</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total");
-$tip_cap = __("Cap");
-$tip_hitos = __("Hitos");
-$tip_escalonada = __("Escalonada");
-$tip_honorarios = __("Solamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.");
-$tip_mensual = __("El cobro se hará de forma mensual.");
-$tip_tarifa_especial = __("Al ingresar una nueva tarifa, esta se actualizará automáticamente.");
 $tip_subtotal = __("El monto total ") . __("del cobro") . __(" hasta el momento sin incluir descuentos.");
 $tip_descuento = __("El monto del descuento.");
 $tip_total = __("El monto total ") . __("del cobro") . __(" hasta el momento incluidos descuentos.");
@@ -23,21 +25,38 @@ $tip_refresh = __("Actualizar a cambio actual");
 $color_par = "#f0f0f0";
 $color_impar = "#ffffff";
 
-$Sesion = new Sesion(array('DAT'));
 $archivo = new Archivo($Sesion);
 
 // previene override del objero, ya que se incluye desde otras interfaces.
+function TTip($texto) {
+	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
+}
+
 if (empty($cliente)) {
 	$cliente = new Cliente($Sesion);
 }
 
-$validaciones_segun_config = Conf::GetConf($Sesion, 'ValidacionesCliente');
-
-if ($validaciones_segun_config) {
-	$obligatorio = '<span class="req">*</span>';
-} else {
-	$obligatorio = '';
+if (!isset($Pagina)) {
+	$Pagina = new Pagina($Sesion);
 }
+
+$validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente');
+$validacionesClienteJS = $validacionesCliente ? 'true' : 'false';
+
+if (!isset($contractValidation)) {
+	require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
+}
+
+$obligatorios = function($key) use ($validacionesCliente, $contractValidation) {
+	if (!$validacionesCliente) {
+		return '';
+	}
+	if (isset($contractValidation)) {
+		return $contractValidation->validationSkipped($key) ? '' : '<span class="req">*</span>';
+	} else {
+		return '<span class="req">*</span>';
+	}
+};
 
 $modulo_retribuciones_activo = Conf::GetConf($Sesion, 'UsarModuloRetribuciones');
 
@@ -47,18 +66,14 @@ if (!defined('HEADERLOADED')) {
 
 if ($addheaderandbottom || ($popup && !$motivo)) {
 
-	$pagina = new Pagina($Sesion);
 	$show = 'inline';
 
-	function TTip($texto) {
-		return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
-	}
 
 	$contrato = new Contrato($Sesion);
 
 	if($id_contrato > 0) {
 		if(!$contrato->Load($id_contrato)) {
-			$pagina->FatalError(__('Código inválido'));
+			$Pagina->FatalError(__('Código inválido'));
 		}
 
 		$cobro = new Cobro($Sesion);
@@ -73,9 +88,9 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 	}
 
 	if($id_contrato) {
-		$pagina->titulo = __('Editar Contrato');
+		$Pagina->titulo = __('Editar Contrato');
 	} else {
-		$pagina->titulo = __('Agregar Contrato');
+		$Pagina->titulo = __('Agregar Contrato');
 	}
 } else {
 	$show = 'none';
@@ -94,7 +109,7 @@ if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contra
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$enviar_mail = 1;
 	if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
-		$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
+		$Pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 		$val = true;
 	} else if ($forma_cobro == 'TASA') {
 		$monto = '0';
@@ -102,7 +117,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 
 	if ($tipo_tarifa == 'flat') {
 		if (empty($tarifa_flat)) {
-			$pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
+			$Pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
 			$val = true;
 		} else {
 			$tarifa = new Tarifa($Sesion);
@@ -112,12 +127,12 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	}
 
 	if ($usuario_responsable_obligatorio && empty($id_usuario_responsable) or $id_usuario_responsable == '-1') {
-		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Principal'));
+		$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Principal'));
 		$val = true;
 	}
 
 	if (Conf::GetConf($Sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
-		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
+		$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
 		$val = true;
 	}
 
@@ -138,11 +153,11 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 				->add_from('asunto')
 				->add_restriction($where)
 				->add_select('count(*)', 'total')
-				->execute();
+				->run();
 			if ($asuntos[0]['total'] > 0) {
 				$query_asuntos = "UPDATE asunto SET activo = 0, fecha_modificacion = now() WHERE id_contrato = {$contrato->fields['id_contrato']} AND activo";
 				mysql_query($query_asuntos, $Sesion->dbh);
-				$pagina->AddInfo(sprintf(__('Se desactivaron %d asuntos'), $asuntos[0]['total']));
+				$Pagina->AddInfo(sprintf(__('Se desactivaron %d asuntos'), $asuntos[0]['total']));
 			}
 		}
 
@@ -202,9 +217,9 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 						"' WHERE id_contrato = " . $contrato->fields['id_contrato'], $Sesion->dbh);
 			}
 		}
-		$pagina->AddInfo(__('Contrato guardado con éxito'));
+		$Pagina->AddInfo(__('Contrato guardado con éxito'));
 	} else {
-		$pagina->AddError($contrato->error);
+		$Pagina->AddError($contrato->error);
 	}
 }
 
@@ -225,7 +240,7 @@ if (empty($tarifa_flat) && !empty($contrato->fields['id_tarifa'])) {
 }
 
 if ($addheaderandbottom || ($popup && !$motivo)) {
-	$pagina->PrintTop($popup);
+	$Pagina->PrintTop($popup);
 }
 
 $contrato->CargarEscalonadas();
@@ -293,174 +308,7 @@ $Html = new \TTB\Html();
 			}
 		<?php } ?>
 
-		<?php if ($validaciones_segun_config) { ?>
-			// DATOS FACTURACION
-
-			if(!form.factura_rut.value)
-			{
-				alert("<?php echo __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
-				form.factura_rut.focus();
-				return false;
-			}
-
-			if(!form.factura_razon_social.value)
-			{
-				alert("<?php echo __('Debe ingresar la razón social del cliente') ?>");
-				form.factura_razon_social.focus();
-				return false;
-			}
-
-			if(!form.factura_giro.value)
-			{
-				alert("<?php echo __('Debe ingresar el giro del cliente') ?>");
-				form.factura_giro.focus();
-				return false;
-			}
-
-			if(!form.factura_direccion.value)
-			{
-				alert("<?php echo __('Debe ingresar la dirección del cliente') ?>");
-				form.factura_direccion.focus();
-				return false;
-			}
-			if(!form.factura_ciudad.value)
-			{
-				alert("<?php echo __('Debe ingresar la cuidad del cliente') ?>");
-				form.factura_cuidad.focus();
-				return false;
-			}
-			if(!form.factura_comuna.value)
-			{
-				alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
-				form.factura_comuna.focus();
-				return false;
-			}
-
-			<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
-				if (!form.region_cliente.value) {
-					alert("<?php echo __('Debe ingresar el estado del cliente') ?>");
-					form.region_cliente.focus();
-					return false;
-				}
-			<?php } ?>
-
-			if(form.id_pais.options[0].selected === true)
-			{
-				alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
-				form.id_pais.focus();
-				return false;
-			}
-
-			if(!form.cod_factura_telefono.value)
-			{
-				alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
-				form.cod_factura_telefono.focus();
-				return false;
-			}
-
-			if(!form.factura_telefono.value)
-			{
-				alert("<?php echo __('Debe ingresar el número de telefono') ?>");
-				form.factura_telefono.focus();
-				return false;
-			}
-
-			// SOLICITANTE
-			if(form.titulo_contacto.options[0].selected === true)
-			{
-				alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
-				form.titulo_contacto.focus();
-				return false;
-			}
-
-			if(!form.nombre_contacto.value)
-			{
-				alert("<?php echo __('Debe ingresar el nombre del solicitante') ?>");
-				form.nombre_contacto.focus();
-				return false;
-			}
-
-			if(!form.apellido_contacto.value)
-			{
-				alert("<?php echo __('Debe ingresar el apellido del solicitante') ?>");
-				form.apellido_contacto.focus();
-				return false;
-			}
-
-			if(!form.fono_contacto_contrato.value)
-			{
-				alert("<?php echo __('Debe ingresar el teléfono del solicitante') ?>");
-				form.fono_contacto_contrato.focus();
-				return false;
-			}
-
-			if(!form.email_contacto_contrato.value)
-			{
-				alert("<?php echo __('Debe ingresar el email del solicitante') ?>");
-				form.email_contacto_contrato.focus();
-				return false;
-			}
-
-			if(!form.direccion_contacto_contrato.value)
-			{
-				alert("<?php echo __('Debe ingresar la dirección de envío del solicitante') ?>");
-				form.direccion_contacto_contrato.focus();
-				return false;
-			}
-
-			// DATOS DE TARIFICACION
-			if(!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
-			{
-				alert("<?php echo __('Debe seleccionar un tipo de tarifa') ?>");
-				form.tipo_tarifa[0].focus();
-				return false;
-			}
-
-			/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
-
-			if( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 )
-			{
-				alert("<?php echo __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
-				form.tarifa_flat.focus();
-				return false;
-			}
-
-			if(!$$('[name="forma_cobro"]').any(function(elem){return elem.checked;}))
-			{
-				alert("<?php echo __('Debe seleccionar una forma de cobro') . ' ' . __('para la tarifa') ?>");
-				form.forma_cobro[0].focus();
-				return false;
-			}
-
-			if($('fc7').checked){
-				if($$('[id^="fila_hito_"]').any(function(elem){return !validarHito(elem, true);})){
-					return false;
-				}
-				if(!$$('[id^="hito_monto_"]').any(function(elem){return Number(elem.value)>0;})){
-					alert("<?php echo __('Debe ingresar al menos un hito válido') ?>");
-					$('hito_descripcion_1').focus();
-					return false;
-				}
-			}
-
-			if(!form.observaciones.value)
-			{
-				alert("<?php echo __('Debe ingresar un detalle para la cobranza') ?>");
-				form.observaciones.focus();
-				return false;
-			}
-
-		<?php } ?>
-
-		<?php if (Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
-			if ($('id_usuario_secundario').value == '-1')
-			{
-				alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
-
-				jQuery('#id_usuario_secundario').removeAttr('disabled').focus();
-				return false;
-			}
-		<?php }	?>
+		<?php echo $contractValidation->getClientValidationsScripts(); ?>
 
 		if($('fc5').checked)
 		{
@@ -1536,6 +1384,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	function validarHito(fila, permitirVacio){
 		var num = fila.id.match(/\d+$/)[0];
 		var fecha = $F('hito_fecha_'+num);
+		var fecha_split = fecha.split('-');
+		var valid_day = (parseInt(fecha_split[0], 10) > 0 && parseInt(fecha_split[0], 10) <= 31);
+		var valid_month = (parseInt(fecha_split[1], 10) > 0 && parseInt(fecha_split[1], 10) <= 12);
+		var valid_year = parseInt(fecha_split[2], 10) >= 1969;
 		var desc = $F('hito_descripcion_'+num);
 		var monto = Number($F('hito_monto_estimado_'+num));
 
@@ -1544,6 +1396,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		}
 		if (permitirVacio && !fecha && !desc && !monto) {
 			return true;
+		}
+		if (!valid_day || !valid_month || !valid_year) {
+			alert('Ingrese una fecha válida para el hito');
+			$('hito_fecha_'+num).focus();
+			return false;
 		}
 		if(!desc){
 			alert('Ingrese una descripción válida para el hito');
@@ -1674,7 +1531,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php
 						echo __('Encargado Comercial');
 						if ($usuario_responsable_obligatorio) {
-							echo $obligatorio;
+							echo $obligatorios('id_usuario_responsable');
 						}
 						?>
 					</div>
@@ -1682,24 +1539,24 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<td class="al">
 					<?php
 					if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
-						echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato_defecto->fields['id_usuario_responsable'], 'class="span3" onchange="CambioEncargado(this)" disabled="disabled"', 'Vacio', '200px');
+						echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable, 'class="span3" onchange="CambioEncargado(this)" disabled="disabled"', 'Vacio', '200px');
 						echo '(Se copia del contrato principal)';
-						echo '<input type="hidden" value="' . $contrato_defecto->fields['id_usuario_responsable'] . '" name="id_usuario_responsable" />';
+						echo '<input type="hidden" value="' . ($contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] :  $id_usuario_responsable) . '" name="id_usuario_responsable" />';
 					} else {
 						if ($contrato_defecto->Loaded() && $contrato->Loaded()) {
 							if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente) {
-								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'], 'class="span3" onchange="CambioEncargado(this)" disabled="disabled"', 'Vacio', '200px');
-								echo '<input type="hidden" value="' . $contrato_defecto->fields['id_usuario_responsable'] . '" name="id_usuario_responsable" />';
+								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, 'class="span3" onchange="CambioEncargado(this)" disabled="disabled"', 'Vacio', '200px');
+								echo '<input type="hidden" value="' . ($contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable) . '" name="id_usuario_responsable" />';
 								echo '(Se copia del contrato principal)';
 							} else {
 								//FFF si estoy agregando o editando un asunto que se cobra por separado
-								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'], 'class="span3" onchange="CambioEncargado(this)"', 'Vacio', '200px');
+								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, 'class="span3" onchange="CambioEncargado(this)"', 'Vacio', '200px');
 							}
 						} else if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
 							// Estoy creando un cliente (y su contrato por defecto).
-							echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'], 'class="span3" onchange="CambioEncargado(this)"', 'Vacio', '200px');
+							echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, 'class="span3" onchange="CambioEncargado(this)"', 'Vacio', '200px');
 						} else {
-							echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'], 'class="span3"', 'Vacio', '200px');
+							echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario_responsable', $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, 'class="span3"', 'Vacio', '200px');
 						}
 					}
 					?>
@@ -1724,8 +1581,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<div class="span4">
 							<?php
 							echo __('Encargado Secundario');
-							if ($usuario_secundario_obligatorio) {
-								echo $obligatorio;
+							if (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioCliente')) {
+								echo $obligatorios('id_usuario_secundario');
 							}
 							?>
 						</div>
@@ -1771,27 +1628,27 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			<table id='datos_factura' style='display:<?php echo $show ?>'>
 				<tr>
 					<td align="right" width='20%'>
-						<?php echo __('ROL/RUT') . $obligatorio; ?>
+						<?php echo __('ROL/RUT') . $obligatorios('factura_rut'); ?>
 					</td>
 					<td align="left" colspan="3">
-						<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ?>" />
+						<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" />
 					</td>
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Razón Social') . $obligatorio; ?>
+						<?php echo __('Razón Social') . $obligatorios('factura_razon_social'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='factura_razon_social' size="50" value="<?php echo $contrato->fields['factura_razon_social'] ?>"  />
+						<input type="text" name='factura_razon_social' size="50" value="<?php echo $contrato->fields['factura_razon_social'] ? $contrato->fields['factura_razon_social'] : $factura_razon_social ?>"  />
 					</td>
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Giro') . $obligatorio; ?>
+						<?php echo __('Giro') . $obligatorios('factura_giro'); ?>
 					</td>
 					<td align="left" colspan="5">
 						<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
-							<?php echo Html::SelectArrayDecente($PrmCodigo->Listar("WHERE prm_codigo.grupo = 'GIRO_CLIENTE' ORDER BY prm_codigo.glosa ASC"), 'id_pais', $contrato->fields['factura_giro']); ?>
+							<?php echo Html::SelectArrayDecente($PrmCodigo->Listar("WHERE prm_codigo.grupo = 'GIRO_CLIENTE' ORDER BY prm_codigo.glosa ASC"), 'id_pais', $contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro); ?>
 						<?php } else { ?>
 							<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
 						<?php } ?>
@@ -1799,18 +1656,18 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Dirección') . $obligatorio; ?>
+						<?php echo __('Dirección') . $obligatorios('factura_direccion'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea class="span4" name='factura_direccion' rows=3 cols="55" ><?php echo $contrato->fields['factura_direccion'] ?></textarea>
+						<textarea class="span4" name='factura_direccion' rows=3 cols="55" ><?php echo $contrato->fields['factura_direccion'] ? $contrato->fields['factura_direccion'] : $factura_direccion ?></textarea>
 					</td>
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Comuna') . $obligatorio; ?>
+						<?php echo __('Comuna') . $obligatorios('factura_comuna'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input  type="text"  name='factura_comuna' size=50 value="<?php echo $contrato->fields['factura_comuna'] ?>"  />
+						<input  type="text"  name='factura_comuna' size=50 value="<?php echo $contrato->fields['factura_comuna'] ? $contrato->fields['factura_comuna'] : $factura_comuna ?>"  />
 					</td>
 				</tr>
 				<tr>
@@ -1818,43 +1675,43 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Código Postal'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
+						<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ? $contrato->fields['factura_codigopostal'] : $factura_codigopostal ?>"  />
 					</td>
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Ciudad') . $obligatorio; ?>
+						<?php echo __('Ciudad') . $obligatorios('factura_ciudad'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input  type="text"  name='factura_ciudad' size=50 value="<?php echo $contrato->fields['factura_ciudad'] ?>"  />
+						<input  type="text"  name='factura_ciudad' size=50 value="<?php echo $contrato->fields['factura_ciudad'] ? $contrato->fields['factura_ciudad'] : $factura_ciudad ?>"  />
 					</td>
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('País') . $obligatorio; ?>
+						<?php echo __('País') . $obligatorios('id_pais'); ?>
 					</td>
 					<td align="left" colspan='3'>
-						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia ASC'), 'id_pais', $contrato->fields['id_pais'], 'class ="span3"', 'Vacío', '260px'); ?>
+						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia ASC'), 'id_pais', $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : $id_pais, 'class ="span3"', 'Vacío', '260px'); ?>
 					</td>
 				</tr>
 
 				<?php if (Conf::GetConf($Sesion, 'RegionCliente')) { ?>
 					<tr>
 						<td align="right" colspan="1">
-					<?php echo __('Región') . $obligatorio; ?>
+					<?php echo __('Región') . $obligatorios('region_cliente'); ?>
 						</td>
 						<td align="left" colspan="5">
-							<input type="text" name='region_cliente' size=50 value="<?php echo $contrato->fields['region_cliente'] ?>" />
+							<input type="text" name='region_cliente' size=50 value="<?php echo $contrato->fields['region_cliente'] ? $contrato->fields['region_cliente'] : $region_cliente ?>" />
 						</td>
 					</tr>
 				<?php } ?>
 
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Teléfono') . $obligatorio; ?>
+						<?php echo __('Teléfono') . $obligatorios('cod_factura_telefono'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" class="span1" name='cod_factura_telefono' size=8 value="<?php echo $contrato->fields['cod_factura_telefono'] ?>" />&nbsp;<input type="text" class="span2" name='factura_telefono' size=30 value="<?php echo $contrato->fields['factura_telefono'] ?>" />
+						<input type="text" class="span1" name='cod_factura_telefono' size=8 value="<?php echo $contrato->fields['cod_factura_telefono'] ? $contrato->fields['cod_factura_telefono'] : $cod_factura_telefono ?>" />&nbsp;<input type="text" class="span2" name='factura_telefono' size=30 value="<?php echo $contrato->fields['factura_telefono'] ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -1862,11 +1719,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Glosa factura') ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea class="span4" name='glosa_contrato' rows=4 cols="55" ><?php echo $contrato->fields['glosa_contrato'] ?></textarea>
+						<textarea class="span4" name='glosa_contrato' rows=4 cols="55" ><?php echo $contrato->fields['glosa_contrato'] ? $contrato->fields['glosa_contrato'] : $glosa_contrato ?></textarea>
 					</td>
 				</tr>
 				<?php
-				$id_banco = $CuentaBanco->IdBancoDeCuenta($contrato->fields['id_cuenta']);
+				$id_banco = $CuentaBanco->IdBancoDeCuenta($contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta);
 				?>
 				<tr>
 					<td align="right" colspan="1">
@@ -1885,7 +1742,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<?php
 				if (Conf::GetConf($Sesion, 'SegundaCuentaBancaria')) {
-					$id_banco2 = $CuentaBanco->IdBancoDeCuenta($contrato->fields['id_cuenta2']);
+					$id_banco2 = $CuentaBanco->IdBancoDeCuenta($contrato->fields['id_cuenta2'] ? $contrato->fields['id_cuenta2'] : $id_cuenta2);
 					?>
 					<tr>
 						<td align="right" colspan="1">
@@ -1938,44 +1795,44 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php if (Conf::GetConf($Sesion, 'TituloContacto')) { ?>
 					<tr>
 						<td align="right" width="20%">
-							<?php echo __('Titulo') . $obligatorio; ?>
+							<?php echo __('Titulo') . $obligatorios('titulo_contacto'); ?>
 						</td>
 						<td align="left" colspan='3'>
 							<?php
 							$PrmTituloPersona = new PrmTituloPersona($Sesion);
-							echo Html::SelectArrayDecente($PrmTituloPersona->Listar('ORDER BY id_titulo'), 'titulo_contacto', $contrato->fields['titulo_contacto'], 'class="span3"', 'Vacio', '120px');
+							echo Html::SelectArrayDecente($PrmTituloPersona->Listar('ORDER BY id_titulo'), 'titulo_contacto', $contrato->fields['titulo_contacto'] ? $contrato->fields['titulo_contacto'] : $titulo_contacto, 'class="span3"', 'Vacio', '120px');
 							?>&nbsp;&nbsp;
 						</td>
 					</tr>
 					<tr>
 						<td align="right" width='20%'>
-							<?php echo __('Nombre') . $obligatorio; ?>
+							<?php echo __('Nombre') . $obligatorios('nombre_contacto'); ?>
 						</td>
 						<td align='left' colspan='3'>
-							<input type="text" size='55' name="nombre_contacto" id="nombre_contacto" value="<?php echo $contrato->fields['contacto'] ?>" />
+							<input type="text" size='55' name="nombre_contacto" id="nombre_contacto" value="<?php echo $contrato->fields['contacto'] ? $contrato->fields['contacto'] : $nombre_contacto ?>" />
 						</td>
 					</tr>
 					<tr>
 						<td align="right" width='20%'>
-							<?php echo __('Apellido') . $obligatorio; ?>
+							<?php echo __('Apellido') . $obligatorios('apellido_contacto'); ?>
 						</td>
 						<td align='left' colspan='3'>
-							<input type="text" size='55' name="apellido_contacto" id="apellido_contacto" value="<?php echo $contrato->fields['apellido_contacto'] ?>"  />
+							<input type="text" size='55' name="apellido_contacto" id="apellido_contacto" value="<?php echo $contrato->fields['apellido_contacto'] ? $contrato->fields['apellido_contacto'] : $apellido_contacto ?>"  />
 						</td>
 					</tr>
 				<?php } else { ?>
 					<tr>
 						<td align="right" width='20%'>
-							<?php echo __('Nombre') . $obligatorio; ?>
+							<?php echo __('Nombre') . $obligatorios('contacto'); ?>
 						</td>
 						<td align='left' colspan='3'>
-							<input type="text" size='55' name="contacto" id="contacto" value="<?php echo $contrato->fields['contacto'] ?>"  />
+							<input type="text" size='55' name="contacto" id="contacto" value="<?php echo $contrato->fields['contacto'] ? $contrato->fields['contacto'] : $contacto ?>"  />
 						</td>
 					</tr>
 				<?php } ?>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Teléfono') . $obligatorio; ?>
+						<?php echo __('Teléfono') . $obligatorios('fono_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
 						<input type="text" name='fono_contacto_contrato' size=30 value="<?php echo $contrato->fields['fono_contacto'] ?>" />
@@ -1983,7 +1840,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('E-mail') . $obligatorio; ?>
+						<?php echo __('E-mail') . $obligatorios('email_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
 						<input type="text" name='email_contacto_contrato' size=55 value="<?php echo $contrato->fields['email_contacto'] ?>"  />
@@ -1991,13 +1848,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr>
 					<td align="right" colspan="1">
-						<?php echo __('Dirección envío') . $obligatorio; ?>
+						<?php echo __('Dirección envío') . $obligatorios('direccion_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
 						<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?></textarea>
 					</td>
 				</tr>
-
 			</table>
 		</fieldset>
 		<!-- FIN SOLICITANTE -->
@@ -2049,7 +1905,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<table width="100%" >
 					<tr id="divthh">
 						<td  class="ar">
-							<?php echo __('Tarifa horas') . $obligatorio; ?>
+							<?php echo __('Tarifa horas') . $obligatorios('tipo_tarifa'); ?>
 						</td>
 						<td align="left" width="80%" style="font-size:10pt;">
 							<table  style="float:left;" class="span7">
@@ -2069,7 +1925,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										</div>
 									</td>
 									<td>
-										<?php echo __('Tarifa en') . $obligatorio; ?>
+										<?php echo __('Tarifa en') . $obligatorios('id_moneda'); ?>
 										<?php echo Html::SelectArrayDecente($Moneda->Listar('ORDER BY id_moneda'), 'id_moneda', $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); ' . $config_validar_tarifa . '"', '', '80px'); ?>
 										<input type="hidden" name="id_moneda_hidden" id="id_moneda_hidden" value="<?php echo $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda; ?>" />
 										&nbsp;&nbsp;
@@ -2084,7 +1940,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td  class="ar ">
-							<?php echo __('Forma de cobro') . $obligatorio; ?>
+							<?php echo __('Forma de cobro') . $obligatorios('forma_cobro'); ?>
 						</td>
 						<?php
 						if (!$contrato->fields['forma_cobro'])
@@ -2100,21 +1956,21 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<td align="left" style="font-size:10pt;">
 							<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/>
 							<div id="div_cobro" class="buttonset">
-								<input <?php echo TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
-								<label for="fc1">Tasas/HH</label>&nbsp;
-								<input <?php echo TTip($tip_retainer) ?> class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
-								<label for="fc2">Retainer</label> &nbsp;
-								<input <?php echo TTip($tip_flat) ?>  class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
-								<label for="fc3"><?php echo __('Flat fee') ?></label>&nbsp;
-								<input <?php echo TTip($tip_cap) ?>   class="formacobro"  id="fc5" type="radio" name="forma_cobro"  value="CAP" <?php echo $contrato_forma_cobro == "CAP" ? "checked='checked'" : "" ?> />
-								<label for="fc5"><?php echo __('Cap') ?></label>&nbsp;
-								<input <?php echo TTip($tip_proporcional) ?>  class="formacobro"  id="fc6" type="radio" name="forma_cobro"  value="PROPORCIONAL" <?php echo $contrato_forma_cobro == "PROPORCIONAL" ? "checked='checked'" : "" ?> />
-								<label for="fc6">Proporcional</label> &nbsp;
-								<input <?php echo TTip($tip_hitos) ?>  class="formacobro"  id="fc7" type="radio" name="forma_cobro"  value="HITOS" <?php echo $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
-								<label for="fc7"><?php echo __('Hitos') ?></label>
+								<input class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
+								<label <?php echo TTip($tip_tasa) ?>  for="fc1">Tasas/HH</label>&nbsp;
+								<input class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
+								<label <?php echo TTip($tip_retainer) ?>  for="fc2">Retainer</label> &nbsp;
+								<input class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
+								<label <?php echo TTip($tip_flat) ?> for="fc3"><?php echo __('Flat fee') ?></label>&nbsp;
+								<input class="formacobro"  id="fc5" type="radio" name="forma_cobro"  value="CAP" <?php echo $contrato_forma_cobro == "CAP" ? "checked='checked'" : "" ?> />
+								<label  <?php echo TTip($tip_cap) ?>  for="fc5"><?php echo __('Cap') ?></label>&nbsp;
+								<input class="formacobro"  id="fc6" type="radio" name="forma_cobro"  value="PROPORCIONAL" <?php echo $contrato_forma_cobro == "PROPORCIONAL" ? "checked='checked'" : "" ?> />
+								<label <?php echo TTip($tip_proporcional) ?> for="fc6">Proporcional</label> &nbsp;
+								<input class="formacobro"  id="fc7" type="radio" name="forma_cobro"  value="HITOS" <?php echo $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
+								<label <?php echo TTip($tip_hitos) ?> for="fc7"><?php echo __('Hitos') ?></label>
 								<?php if (!Conf::GetConf($Sesion, 'EsconderTarifaEscalonada')) { ?>
-									<input <?php echo TTip($tip_escalonada) ?>  class="formacobro"  id="fc8" type="radio" name="forma_cobro"  value="ESCALONADA" <?php echo $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
-									<label for="fc8"><?php echo __('Escalonada') ?></label>
+									<input class="formacobro"  id="fc8" type="radio" name="forma_cobro"  value="ESCALONADA" <?php echo $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
+									<label <?php echo TTip($tip_escalonada) ?> for="fc8"><?php echo __('Escalonada') ?></label>
 								<?php } ?>
 							</div>
 						</td>
@@ -2124,12 +1980,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id="div_forma_cobro">
 								<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 									<span id="span_monto">
-										<?php echo __('Monto') . $obligatorio; ?>
+										<?php echo __('Monto') . $obligatorios('monto_posterior'); ?>
 										<input type="hidden" id="monto_posterior"  name="monto_posterior" value="<?php echo $contrato->fields['monto'] ?>"/>
 										&nbsp;<input id="monto" name="monto" size="7" value="<?php echo $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
 									</span>
 									&nbsp;&nbsp;
-									<?php echo __('Moneda') . $obligatorio; ?>
+									<?php echo __('Moneda') . $obligatorios('id_moneda_monto'); ?>
 									&nbsp;
 									<?php
 									$id_moneda_seleccionada = $contrato->fields['id_moneda_monto'] ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda_monto);
@@ -2138,7 +1994,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</div>
 								<div id="div_horas" align="left" style="display:none; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 									&nbsp;
-									<?php echo __('Horas') . $obligatorio; ?>
+									<?php echo __('Horas') . $obligatorios('retainer_horas'); ?>
 									&nbsp;<input name="retainer_horas" size="7" value="<?php echo $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
 									<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se
 											 desuentan las horas con preferencia -->
@@ -2154,14 +2010,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										<?php if ($cobro) { ?>
 											<tr>
 												<td>
-													<?php echo __('Monto utilizado') . $obligatorio; ?>
+													<?php echo __('Monto utilizado') . $obligatorios('monto'); ?>
 												</td>
 												<td align="left">&nbsp;<label style='background-color:#FFFFFF'> <?php echo $cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0; ?> </label></td>
 											</tr>
 										<?php } ?>
 										<tr>
 											<td>
-												<?php echo __('Fecha inicio') . $obligatorio; ?>
+												<?php echo __('Fecha inicio') . $obligatorios('fecha_inicio_cap'); ?>
 											</td>
 											<td align="left">
 												<input type="text" name="fecha_inicio_cap" value="<?php echo Utiles::sql2date($contrato->fields['fecha_inicio_cap']) ?>" id="fecha_inicio_cap" size="11" maxlength="10" />
@@ -2309,6 +2165,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										?>
 										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
 											<td align="center" nowrap>
+												<?php if ($disabled) { ?>
+													<input type="hidden" name="hito_disabled[<?php echo $i ?>]" value= "" />
+												<?php } ?>
 												<input type="text" name="hito_fecha[<?php echo $i ?>]" value='<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>' id="hito_fecha_<?php echo $i ?>" size="11" maxlength="10" <?php echo $disabled ?>/>
 													<?php if (!$disabled) { ?>
 														<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hito_<?php echo $i ?>" style="cursor:pointer" />
@@ -2359,7 +2218,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<tr><td colspan="2">&nbsp;</td></tr>
 					<tr>
 						<td class="ar" >
-							<?php echo __('Mostrar total en') . $obligatorio; ?>
+							<?php echo __('Mostrar total en') . $obligatorios('opc_moneda_total'); ?>
 						</td>
 						<td align="left">
 							<?php echo Html::SelectArrayDecente($Moneda->Listar('ORDER BY id_moneda'), 'opc_moneda_total', $contrato->fields['opc_moneda_total'] ? $contrato->fields['opc_moneda_total'] : $opc_moneda_total, '', '', '60px; font-size:10pt;'); ?>
@@ -2396,10 +2255,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td class="ar ">
-							<?php echo __('Detalle Cobranza') . $obligatorio; ?>
+							<?php echo __('Detalle Cobranza') . $obligatorios('observaciones'); ?>
 						</td>
 						<td align="left">
-							<textarea name="observaciones" rows="3" cols="47"><?php echo $contrato->fields['observaciones'] ? $contrato->fields['observaciones'] : '' ?></textarea>
+							<textarea name="observaciones" rows="3" cols="47"><?php echo $contrato->fields['observaciones'] ? $contrato->fields['observaciones'] : $observaciones ?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -2797,12 +2656,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<?php $solicitante = Conf::GetConf($Sesion, 'OrdenadoPor');
 				if ($solicitante == 0) {  // no mostrar ?>
 					<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
-				<?php } elseif ($solicitante == 1) { // obligatorio ?>
+				<?php } elseif ($solicitante == 1) { ?>
 					<tr>
 						<td align="right" colspan='1'><input type="hidden" name="opc_ver_solicitante" value="0"/><input type="checkbox" name="opc_ver_solicitante"  value="1" <?php echo $contrato->fields['opc_ver_solicitante'] == '1' ? 'checked="checked"' : '' ?>></td>
 						<td align="left" colspan='5'><label><?php echo __('Mostrar solicitante') ?></label></td>
 					</tr>
-				<?php } elseif ($solicitante == 2) { // opcional ?>
+				<?php } elseif ($solicitante == 2) {  ?>
 					<tr>
 						<td align="right" colspan='1'><input type="hidden" name="opc_ver_solicitante" value="0"/><input type="checkbox" name="opc_ver_solicitante"  value="1" <?php echo $contrato->fields['opc_ver_solicitante'] == '1' ? 'checked="checked"' : '' ?>></td>
 						<td align="left" colspan='5'><label><?php echo __('Mostrar solicitante') ?></label></td>
@@ -3144,5 +3003,5 @@ echo $Form->script();
 echo(InputId::Javascript($Sesion));
 
 if ($addheaderandbottom || ($popup && !$motivo)) {
-	$pagina->PrintBottom($popup);
+	$Pagina->PrintBottom($popup);
 }

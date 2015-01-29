@@ -115,6 +115,9 @@ $_LANG['Editar Contrato'] = "Editar Contrato";
 $_LANG['El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :'] = "El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :";
 $_LANG['Datos generales Contrato'] = "Datos generales Contrato";
 $_LANG['Debes guardar primero el contrato para seleccionar los asuntos'] = "Debes guardar primero el contrato para seleccionar los asuntos";
+$_LANG['Debe ingresar el giro del cliente'] = "Debe ingresar el sector del cliente";
+$_LANG['Debe ingresar la comuna del cliente'] = "Debe ingresar el barrio del cliente";
+$_LANG['Por favor ingrese los datos de contacto del solicitante'] = "Por favor ingrese los datos de contacto del solicitante";
 #Agregando _LANG
 
 #USUARIOS

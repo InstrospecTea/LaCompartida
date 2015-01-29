@@ -28,7 +28,13 @@ abstract class Entity {
 	 * Obtiene los campos por defecto que debe llevar la entidad.
 	 * @return array
 	 */
-	abstract protected function getDefaults();
+	abstract public function getTableDefaults();
+
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad.
+	 * @return array
+	 */
+	abstract protected function getFixedDefaults();
 
 	/**
 	 * Obtiene el valor de una propiedad del objeto que es instancia de la clase que hereda este abstracto.
@@ -55,10 +61,22 @@ abstract class Entity {
 			$fields[$property] = $value;
 			$reflected->getProperty('fields')->setValue($this, $fields);
 			if ($changes) {
-				$this->changes[$property] = $value;
+				$this->changes[$property] = true;
 			}
 		} catch (ReflectionException $ex) {
 			throw new Exception($ex->getMessage() . ' at ' . $ex->getLine());
+		}
+	}
+
+	/**
+	 * Comprueba si la instancia que hereda de esta clase tiene definido un valor para su propiedad de identidad.
+	 * @return bool
+	 */
+	public function haveIdentity() {
+		if(is_null($this->get($this->getIdentity()))) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 
@@ -67,9 +85,9 @@ abstract class Entity {
 	 * array asociativo.
 	 * @param array $properties Propiedades de un objeto.
 	 */
-	public function fillFromArray(array $properties) {
+	public function fillFromArray(array $properties, $changed = true) {
 		foreach ($properties as $propertyName => $propertyValue) {
-			$this->set($propertyName, $propertyValue);
+			$this->set($propertyName, $propertyValue, $changed);
 		}
 	}
 
@@ -85,8 +103,11 @@ abstract class Entity {
 	/**
 	 * Completa el objeto con los valores por defecto definidos para cada entidad.
 	 */
-	public function fillDefaults() {
-		$defaults = $this->getDefaults();
+	public function fillDefaults($defaults) {
+		$defaults = array_merge(
+			$defaults,
+			$this->getFixedDefaults()
+		);
 		foreach ($defaults as $default => $value) {
 			if (is_null($this->get($default))) {
 				$this->set($default, $value);

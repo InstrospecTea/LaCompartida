@@ -13,14 +13,14 @@ switch ($_POST['accion']) {
 	case 'msg_desactivar':
 		$asuntos = $Criteria
 			->add_select('count(*)', 'total')
-			->execute();
+			->run();
 		$img = Conf::ImgDir() . '/alerta_16.gif';
-		$ask = __('¿Está seguro de desactivar este contrato?');
-		$msg1 = __('Ud. está desactivando este contrato, por lo tanto este contrato no aparecerá en la lista de la generación de ');
+		$ask = htmlentities(__('¿Está seguro de desactivar este contrato?'));
+		$msg1 = htmlentities(__('Ud. está desactivando este contrato, por lo tanto este contrato no aparecerá en la lista de la generación de '));
 		$cobro = __('cobros');
 		$msg_cobros = '';
 		if ($asuntos[0]['total'] > 0) {
-			$msg_cobros .= '<br/><br/>' . __('Esta acción desactivará') . " {$asuntos[0]['total']} " . __('asuntos');
+			$msg_cobros .= '<br/><br/>' . htmlentities(__('Esta acción desactivará')) . " {$asuntos[0]['total']} " . __('asuntos');
 			$a = $Html->link(__('ver detalle'), 'javascript:void(0)', array('onclick' => 'ver_cobros_contrato()'));
 			$msg_cobros .= " ($a)";
 		}
@@ -67,13 +67,13 @@ SCRIPT;
 		$asuntos = $Criteria
 				->add_select('glosa_asunto', 'glosa')
 				->add_ordering('glosa')
-				->execute();
+				->run();
 		$lis = array();
 		foreach ($asuntos as $asunto) {
 			$li_text = sprintf('%s - %s', $asunto['codigo'], $asunto['glosa']);
 			$lis[] = $Html->Tag('li', $li_text);
 		}
-		$text = $Html->tag('strong', 'Los siguientes asuntos de desactivaran junto con el contrato');
+		$text = $Html->tag('strong', htmlentities(__('Los siguientes asuntos de desactivarán junto con el contrato')));
 		echo $Html->tag('p', $text) . $Html->tag('ul', implode('', $lis));
 		break;
 }

@@ -10554,6 +10554,7 @@ QUERY;
 				CHANGE COLUMN `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0,
 				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
 			break;
+
 		case 7.86:
 			$queries[] = "ALTER TABLE `trabajo_historial`
 							CHANGE COLUMN `accion` `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `fecha_accion`,
@@ -10564,12 +10565,71 @@ QUERY;
 							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion` `descripcion` MEDIUMTEXT NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion_modificado` `descripcion_modificado` MEDIUMTEXT NULL DEFAULT NULL ,
-							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL , 
+							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL ,
 							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
 			break;
+
+		case 7.87:
+			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
+			}
+			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
+			}
+			break;
+
+		case 7.88:
+			if (!ExisteCampo('direccion', 'cuenta_banco', $dbh)) {
+				$queries[] = "ALTER TABLE cuenta_banco
+					ADD COLUMN direccion VARCHAR(255) DEFAULT NULL COMMENT 'Direccion de la sucursal',
+					ADD COLUMN telefono VARCHAR(60) DEFAULT NULL COMMENT 'Telefono primario',
+					ADD COLUMN telefono2 VARCHAR(60) DEFAULT NULL COMMENT 'Telefono secundario',
+					ADD COLUMN fax VARCHAR(60) DEFAULT NULL COMMENT 'Telefono FAX'";
+
+				$queries[] = "ALTER TABLE prm_banco ADD COLUMN url VARCHAR(255) DEFAULT NULL COMMENT 'Direccion Web'";
+			}
+			break;
+
+		case 7.89:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			break;
+
+		case 7.90:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
+			break;
+
+		case 7.91:
+			$queries[] = "CREATE TABLE `bloqueo_procesos` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`id_usuario` int(11) NOT NULL,
+							`nombre_usuario` varchar(100) NOT NULL,
+							`proceso` varchar(32) NOT NULL,
+							`bloqueado` tinyint(1) NOT NULL,
+							`estado` varchar(512) NOT NULL DEFAULT '',
+							`datos_post` varchar(512) DEFAULT NULL,
+							`notificado` tinyint(1) NOT NULL,
+							`fecha_creacion` datetime NOT NULL,
+							`fecha_modificacion` datetime DEFAULT NULL,
+							PRIMARY KEY (`id`),
+							KEY `id_usuario_ndx` (`id_usuario`),
+							KEY `bloqueado_ndx` (`bloqueado`),
+							KEY `notificado_ndx` (`notificado`)
+						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+			break;
+
+		case 7.92:
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
+			break;
+
+		case 7.93:
+			$queries[] = "INSERT INTO `prm_tipo_correo` (`nombre`) VALUES ('proceso')";
+			break;
 	}
+
 	if (!empty($queries)) {
 		ejecutar($queries, $dbh);
 	}
@@ -10580,7 +10640,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.86;
+$max_update = 7.93;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
