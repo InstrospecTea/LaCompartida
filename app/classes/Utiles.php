@@ -136,7 +136,7 @@ class Utiles extends \Utiles {
 			if ($simular) {
 				$query2 .= ', enviado = 1, fecha_envio = NOW()';
 			}
-pr($mensaje);
+
 			$sth = $sesion->pdodbh->prepare($query2);
 			$sth->bindParam(':subject', $subject, \PDO::PARAM_STR);
 			$sth->bindParam(':email', $email, \PDO::PARAM_STR);
