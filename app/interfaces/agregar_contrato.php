@@ -1650,31 +1650,37 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<?php echo Html::SelectArrayDecente($PrmCodigo->Listar("WHERE prm_codigo.grupo = 'GIRO_CLIENTE' ORDER BY prm_codigo.glosa ASC"), 'id_pais', $contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro); ?>
 						<?php } else { ?>
 							<?php
-								echo $SelectHelper->ajax_select(
-									'factura_giro_select',
-									$contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro,
-									array('class' => 'span3', 'style' => 'display:inline', 'id' => 'factura_giro_select'),
-									array(
-										'source' => 'ajax/ajax_prm.php?prm=Giro&fields=orden,requiere_desglose&id=glosa',
-										'onChange' => '
-											var element = selected_factura_giro_select;
-											var original_value = FormSelectHelper.original_factura_giro_select;
-											if (element && element.requiere_desglose == "1") {
-												jQuery("#factura_giro").val(original_value);
-												jQuery("#factura_giro").show();
-											} else {
-												jQuery("#factura_giro").val(element.glosa);
-												jQuery("#factura_giro").hide();
-											}
-											if (original_value && Object.keys(element).length == 0) {
-												jQuery("#factura_giro_select").val("Otro");
-												jQuery("#factura_giro").val(original_value);
-												jQuery("#factura_giro").show();
-											}
-										'
-									)
-								);
-								echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								$prmGiro = new PrmGiro($Sesion);
+								$giros = $prmGiro->ListarExt();
+								if (count($giros) > 0) {
+									echo $SelectHelper->ajax_select(
+										'factura_giro_select',
+										$contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro,
+										array('class' => 'span3', 'style' => 'display:inline', 'id' => 'factura_giro_select'),
+										array(
+											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=orden,requiere_desglose&id=glosa',
+											'onChange' => '
+												var element = selected_factura_giro_select;
+												var original_value = FormSelectHelper.original_factura_giro_select;
+												if (element && element.requiere_desglose == "1") {
+													jQuery("#factura_giro").val(original_value);
+													jQuery("#factura_giro").show();
+												} else {
+													jQuery("#factura_giro").val(element.glosa);
+													jQuery("#factura_giro").hide();
+												}
+												if (original_value && Object.keys(element).length == 0) {
+													jQuery("#factura_giro_select").val("Otro");
+													jQuery("#factura_giro").val(original_value);
+													jQuery("#factura_giro").show();
+												}
+											'
+										)
+									);
+									echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								} else {
+									echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								}
 							?>
 						<?php } ?>
 					</td>
