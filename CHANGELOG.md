@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 15.1.4
+Lunes 2 de Febrero 2015
+* **Fix:** [Vuelve a utilizar el Conf CantidadDecimalesTotalFactura si tiene algún valor y lo considera por sobre los decimales de la moneda del cobro](https://github.com/LemontechSA/ttb/pull/836)
+
 ## Hotfix: 15.1.3
 Martes 27 de Enero 2015
 * **Fix:** [Corrige error introducido en Release 15.1.0 al desestimar id_cobro_pendiente al generar el cobro](https://github.com/LemontechSA/ttb/pull/833)
