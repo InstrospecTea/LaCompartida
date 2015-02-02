@@ -307,6 +307,14 @@ class Asunto extends Objeto {
 			'extras' => array(
 				'width' => 20
 			)
+		),
+		array(
+			'field' => 'cobro_independiente',
+			'title' => 'Cobro Independiente',
+			'visible' => true,
+			'extras' => array(
+				'width' => 20
+			)
 		)
 	);
 
@@ -649,7 +657,9 @@ class Asunto extends Objeto {
 			SUM(IF(cobro_trabajo.estado IS NULL OR cobro_trabajo.estado = 'CREADO' OR cobro_trabajo.estado = 'EN REVISION',
 				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas,
 
-			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento
+			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
+
+			IF(a1.id_contrato != cliente.id_contrato, 'SI', 'NO') AS cobro_independiente
 
 			FROM asunto AS a1
 			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
@@ -671,11 +681,11 @@ class Asunto extends Objeto {
 	}
 
 	public function DownloadExcel($filtros = array()) {
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
 		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
@@ -690,14 +700,14 @@ class Asunto extends Objeto {
 		$SimpleReport->Config->columns['username']->Visible($usa_username);
 		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username);
 
-        $SimpleReport->Config->columns['username_ec']->Visible($usa_username);
-        $SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
+		$SimpleReport->Config->columns['username_ec']->Visible($usa_username);
+		$SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
 
-        $SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
+		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
 		$SimpleReport->Config->columns['nombre_secundario']->Visible(!$usa_username && $encargado);
 
-        $SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
-        $SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
+		$SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
+		$SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
 
 		if($mostrar_encargado_secundario){
 			$SimpleReport->Config->columns['username_secundario']->Title(__('Encargado Secundario'));
