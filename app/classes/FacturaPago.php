@@ -228,6 +228,11 @@ class FacturaPago extends Objeto {
 					'title' => 'Descripción Factura',
 					'field' => 'descripcion_factura',
 			),
+			array(
+					'field' => 'glosa_estudio',
+					'title' => 'Companía',
+					'visible' => false,
+			)
 	);
 
 	function FacturaPago($sesion, $fields = "", $params = "") {
@@ -806,6 +811,7 @@ class FacturaPago extends Objeto {
 				, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 				, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
 				, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+				, prm_estudio.glosa_estudio
 			FROM factura_pago AS fp
 			JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 			JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
@@ -825,6 +831,7 @@ class FacturaPago extends Objeto {
 			LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 			LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
 			GROUP BY fp.id_factura_pago";
 	}
