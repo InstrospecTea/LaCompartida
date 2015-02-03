@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.1.6
+Martes 3 de Febrero 2015
+* **Fix:** [Corrige la inclusión al archivo lang en la nota de cobro](https://github.com/LemontechSA/ttb/pull/839)
+
 ## Hotfix 15.1.5
 Lunes 2 de Febrero 2015
 * **Fix:** [Corrige funcion quitada de webkit](https://github.com/LemontechSA/ttb/pull/838)
