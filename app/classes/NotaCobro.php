@@ -11503,7 +11503,7 @@ class NotaCobro extends Cobro {
 			}
 
 			$_LANG = array();
-			require_once Conf::ServerDir() . "/lang/$lang_archivo";
+			include Conf::ServerDir() . "/lang/$lang_archivo";
 
 			// asignar formato detalle de carta según cobro
 			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
