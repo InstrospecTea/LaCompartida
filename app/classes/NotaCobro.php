@@ -11503,7 +11503,7 @@ class NotaCobro extends Cobro {
 			}
 
 			$_LANG = array();
-			require_once Conf::ServerDir() . "/lang/$lang_archivo";
+			include Conf::ServerDir() . "/lang/$lang_archivo";
 
 			// asignar formato detalle de carta según cobro
 			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
@@ -11512,23 +11512,24 @@ class NotaCobro extends Cobro {
 				continue;
 			}
 
-            $opc_papel = $NotaCobro->fields['opc_papel'];
-            $id_carta = $NotaCobro->fields['id_carta'];
-            $cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
+			$opc_papel = $NotaCobro->fields['opc_papel'];
+			$id_carta = $NotaCobro->fields['id_carta'];
+			$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
 
-            if ($html) {
-                $cssData .= UtilesApp::CSSCobro($this->sesion);
+			if ($html) {
+				$cssData .= UtilesApp::CSSCobro($this->sesion);
 
-                if (is_object($doc)) {
-                    $doc->newSession($html);
-                } else {
-                    $doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
-                }
-                $doc->chunkedOutput("cobro_masivo.doc");
-            }
-        }
+				if (is_object($doc)) {
+					$doc->newSession($html);
+				} else {
+					$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
+				}
 
-        $doc->endChunkedOutput("cobro_masivo.doc");
-    }
+				$doc->chunkedOutput("cobro_masivo.doc");
+			}
+		}
+
+		$doc->endChunkedOutput("cobro_masivo.doc");
+	}
 
 }
