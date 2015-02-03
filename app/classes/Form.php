@@ -332,7 +332,9 @@ class Form {
 		$tag = $attrs['tag'];
 		unset($attrs['tag']);
 		if ($tag === 'a') {
-			$attrs['href'] = 'javascript:void(0)';
+			if (empty($attrs['href'])) {
+				$attrs['href'] = 'javascript:void(0)';
+			}
 			if (!isset($attrs['title']) || $attrs['title'] !== false) {
 				$attrs['title'] = $text;
 			}
