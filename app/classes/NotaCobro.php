@@ -5,6 +5,10 @@ require_once('Numbers/Words.php');
 
 class NotaCobro extends Cobro {
 
+    // Twig, the flexible, fast, and secure template language for PHP
+	protected $twig;
+	protected $template_data;
+
 	var $asuntos = array();
 	var $x_resultados = array();
 
@@ -983,6 +987,15 @@ class NotaCobro extends Cobro {
 			$valorsinespacio = '';
 		}
 		$this->espacio = $valorsinespacio;
+
+		$Contrato = new Contrato($this->sesion);
+		$Contrato->Load($this->fields['id_contrato']);
+
+		$this->template_data = array(
+			'Cobro' => $this->fields,
+			'Contrato' => $Contrato->fields,
+			'UsuarioActual' => $this->sesion->usuario->fields
+		);
 	}
 
 	function NuevoRegistro() {
@@ -1262,7 +1275,10 @@ class NotaCobro extends Cobro {
             return;
         }
 
-        $html = $parser->tags[$theTag];
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+
+        $html = $this->RenderTemplate($parser->tags[$theTag]);
 
         switch ($theTag) {
             case 'INFORME': //GenerarDocumento
@@ -3939,7 +3955,10 @@ class NotaCobro extends Cobro {
             return;
         }
 
-        $html = $parser->tags[$theTag];
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+
+        $html = $this->RenderTemplate($parser->tags[$theTag]);
 
         switch ($theTag) {
 
@@ -7351,7 +7370,10 @@ class NotaCobro extends Cobro {
             return;
         }
 
-        $html = $parser->tags[$theTag];
+        $this->template_data['Idioma'] = $idioma->fields;
+        $this->template_data['Moneda'] = $moneda->fields;
+
+        $html = $this->RenderTemplate($parser->tags[$theTag]);
 
         switch ($theTag) {
 
@@ -11530,6 +11552,17 @@ class NotaCobro extends Cobro {
 		}
 
 		$doc->endChunkedOutput("cobro_masivo.doc");
+	}
+
+	protected function RenderTemplate($template) {
+
+		if (!$this->twig) {
+			$loader = new Twig_Loader_String();
+			$this->twig = new Twig_Environment($loader);
+			$this->twig->addExtension(new DateTwigExtension());
+		}
+
+		return $this->twig->render($template, $this->template_data);
 	}
 
 }
