@@ -276,7 +276,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->log("{$url}?{$get_data} --post {$post_data}");
 			$ch = curl_init();
 
-			curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'GET');
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 			curl_setopt($ch, CURLOPT_URL, "{$url}?{$get_data}");
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
