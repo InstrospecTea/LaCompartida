@@ -11418,7 +11418,7 @@ class NotaCobro extends Cobro {
 		return $detalle_modalidad;
 	}
 
-	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas) {
+	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null) {
 		global $_LANG;
 
 		set_time_limit(300);
@@ -11447,19 +11447,7 @@ class NotaCobro extends Cobro {
 				}
 
 				$NotaCobro->LoadAsuntos();
-
-				$lang = $NotaCobro->fields['codigo_idioma'];
-
-				if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
-					$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
-				} else {
-					$lang_archivo = $lang . '.php';
-				}
-
-				$_LANG = array();
-				require_once Conf::ServerDir() . "/lang/$lang_archivo";
-
-				$html = $NotaCobro->GeneraHTMLCobro(true);
+				$NotaCobro->ParametrosGeneracion();
 
 				$totales_cobros[$NotaCobro->fields['codigo_cliente']][$cobro]['totales'] = $NotaCobro->x_resultados;
 				$totales_cobros[$NotaCobro->fields['codigo_cliente']][$cobro]['campos'] = $NotaCobro->fields;
@@ -11500,42 +11488,23 @@ class NotaCobro extends Cobro {
 				}
 			}
 
-			$NotaCobro->LoadAsuntos();
-			$Criteria = new Criteria($this->sesion);
-			$asuntos = $Criteria
-				->add_from('asunto')
-				->add_select('codigo_asunto')
-				->add_select('glosa_asunto')
-				->add_restriction(CriteriaRestriction::in('codigo_asunto', $NotaCobro->asuntos))
-				->add_ordering('glosa_asunto')
-				->run();
-			$NotaCobro->asuntos = array();
-			foreach ($asuntos as $asunto) {
-				$NotaCobro->asuntos[] = $asunto['codigo_asunto'];
-			}
-
-			$NotaCobro->LoadAsuntos();
-
 			$lang = $NotaCobro->fields['codigo_idioma'];
 
-			if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
-				$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
-			} else {
-				$lang_archivo = $lang . '.php';
+			// Limpia $_LANG para que no se choquen los LANGS entre liquidaciones
+			$_LANG = UtilesApp::LoadLang($lang, true);
+
+			if (empty($id_formato)) {
+				$id_formato = $NotaCobro->fields['id_formato'];
 			}
 
-			$_LANG = array();
-			include Conf::ServerDir() . "/lang/$lang_archivo";
-
-			// asignar formato detalle de carta según cobro
-			$html = $NotaCobro->GeneraHTMLCobro(true, $NotaCobro->fields['id_formato']);
+			$NotaCobro->LoadAsuntos();
+			$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
 			if (empty($html)) {
 				continue;
 			}
 
 			$opc_papel = $NotaCobro->fields['opc_papel'];
-			$id_carta = $NotaCobro->fields['id_carta'];
 			$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
 
 			if ($html) {
