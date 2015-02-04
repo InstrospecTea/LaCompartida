@@ -8,9 +8,8 @@ class CartaCobro extends NotaCobro {
     var $carta_tabla = 'carta';
     var $carta_id = 'id_carta';
     var $carta_formato = 'formato';
-    // Twig, the flexible, fast, and secure template language for PHP
-    var $twig;
-    public $secciones = array(
+
+	public $secciones = array(
         'CARTA' => array(
             'FECHA' => 'Seccion contiene fechas relacionadas con el cobro',
             'ENVIO_DIRECCION' => 'Sección contiene datos de facturacion del cliente',
@@ -335,15 +334,6 @@ class CartaCobro extends NotaCobro {
         }
 
         $this->monedas = Moneda::GetMonedas($sesion, '', true);
-
-        $Contrato = new Contrato($this->sesion);
-        $Contrato->Load($this->fields['id_contrato']);
-
-        $this->template_data = array(
-            'Cobro' => $this->fields,
-            'Contrato' => $Contrato->fields,
-            'UsuarioActual' => $this->sesion->usuario->fields
-        );
     }
 
     function NuevoRegistro() {
@@ -892,10 +882,10 @@ class CartaCobro extends NotaCobro {
                 $html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
 
                 $monto_honorarios = UtilesApp::CambiarMoneda(
-                        $this->fields['monto'], 
-                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], 
-                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], 
-                        $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], 
+                        $this->fields['monto'],
+                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],
+                        $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'],
                         $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales']
                 );
 
@@ -2725,17 +2715,6 @@ class CartaCobro extends NotaCobro {
         }
 
         return $html2;
-    }
-
-    function RenderTemplate($template) {
-
-        if (!$this->twig) {
-            $loader = new Twig_Loader_String();
-            $this->twig = new Twig_Environment($loader);
-            $this->twig->addExtension(new DateTwigExtension());
-        }
-
-        return $this->twig->render($template, $this->template_data);
     }
 
     function ReemplazarTemplateHTML($template, $id_cobro) {
