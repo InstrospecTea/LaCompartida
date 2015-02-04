@@ -988,14 +988,14 @@ class NotaCobro extends Cobro {
 		}
 		$this->espacio = $valorsinespacio;
 
-        $Contrato = new Contrato($this->sesion);
-        $Contrato->Load($this->fields['id_contrato']);
+		$Contrato = new Contrato($this->sesion);
+		$Contrato->Load($this->fields['id_contrato']);
 
 		$this->template_data = array(
-            'Cobro' => $this->fields,
-            'Contrato' => $Contrato->fields,
-            'UsuarioActual' => $this->sesion->usuario->fields
-        );
+			'Cobro' => $this->fields,
+			'Contrato' => $Contrato->fields,
+			'UsuarioActual' => $this->sesion->usuario->fields
+		);
 	}
 
 	function NuevoRegistro() {
