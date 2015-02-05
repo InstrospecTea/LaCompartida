@@ -307,6 +307,11 @@ class Asunto extends Objeto {
 			'extras' => array(
 				'width' => 20
 			)
+		),
+		array(
+			'field' => 'glosa_estudio',
+			'title' => 'Compañía',
+			'visible' => false
 		)
 	);
 
@@ -649,7 +654,8 @@ class Asunto extends Objeto {
 			SUM(IF(cobro_trabajo.estado IS NULL OR cobro_trabajo.estado = 'CREADO' OR cobro_trabajo.estado = 'EN REVISION',
 				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas,
 
-			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento
+			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
+			prm_estudio.glosa_estudio
 
 			FROM asunto AS a1
 			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
@@ -664,6 +670,7 @@ class Asunto extends Objeto {
 			LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = $on_encargado2
 			LEFT JOIN trabajo ON trabajo.codigo_asunto = a1.codigo_asunto AND trabajo.cobrable = 1
 			LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro
+			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = contrato.id_estudio
 
 			$where
 			GROUP BY a1.codigo_asunto

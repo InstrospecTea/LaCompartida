@@ -42,7 +42,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 				, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 				, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 				, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-				, $descripcion_factura, $serie, $desde_asiento_contable);
+				, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		if ($exportar_excel) {
 			$factura->DownloadExcel($results);
@@ -261,7 +261,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-			, $descripcion_factura, $serie, $desde_asiento_contable);
+			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 	$formato_saldos = array();
 	foreach ($saldos_monedas as $i => $saldo_moneda) {
