@@ -290,6 +290,7 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 //	SEGMENTO USUARIO ENCARGADO
 
 $segmento_usuario_encargado = '';
+$validar_usuario_encargado = false;
 
 if (Conf::GetConf($Sesion, 'VerCampoUsuarioEncargado') != 1) {
 
@@ -309,6 +310,7 @@ if (Conf::GetConf($Sesion, 'VerCampoUsuarioEncargado') != 1) {
 			$segmento_usuario_encargado .= Html::SelectQuery($Sesion, $query, "id_usuario_encargado", $id_default, " class='span3' ", 'Vacio', 'width="170"');
 			$segmento_usuario_encargado .= '</td>';
 			$segmento_usuario_encargado .= '</tr>';
+			$validar_usuario_encargado = true;
 		}
 	}
 }
@@ -491,9 +493,9 @@ $Pagina->PrintTop();
 							var url = 'editar_grupo.php';
 							jQuery.post(url, {'tabla': 'grupo_cliente', id: id}, function(html) {
 								jQuery('<div/>').html(html).dialog({
-									title: 'Agregar/Modificar Grupo', 
-									width: 400, 
-									height: 300, 
+									title: 'Agregar/Modificar Grupo',
+									width: 400,
+									height: 300,
 									modal: true,
 									close: function() {
 										closeModalGrupo();
@@ -844,7 +846,7 @@ $Pagina->PrintTop();
 			}
 		}
 
-		<?php if ($validacionesCliente) { ?>
+		<?php if ($validacionesCliente && $validar_usuario_encargado) { ?>
 			if (form.id_usuario_encargado.value == "-1") {
 				alert("<?php echo __('Debe seleccionar un usuario encargado') ?>");
 				form.id_usuario_encargado.focus();
