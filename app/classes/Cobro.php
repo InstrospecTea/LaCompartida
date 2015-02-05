@@ -183,10 +183,18 @@ if (!class_exists('Cobro')) {
 			}
 		}
 
-		#retorna el listado de asuntos asociados a un cobro
-
+		/**
+		 * Entrega el listado de asuntos asociados a un cobro
+		 * ordenados por glosa del asunto
+		 *
+		 * @return Array Códigos de asuntos
+		 */
 		function LoadAsuntos() {
-			$query = "SELECT codigo_asunto FROM cobro_asunto WHERE id_cobro='" . $this->fields['id_cobro'] . "'";
+			$query = "SELECT cobro_asunto.codigo_asunto
+								FROM cobro_asunto
+								LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+								WHERE cobro_asunto.id_cobro = '{$this->fields['id_cobro']}'
+								ORDER BY asunto.glosa_asunto ASC";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$this->asuntos = array();
 			while (list($codigo) = mysql_fetch_array($resp)) {
