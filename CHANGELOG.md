@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 15.1.10
+Jueves 5 de Febrero 2015
+* **Fix:** [Agrega id_estudio a excel de Asunto, Factura y FacturaPago](https://github.com/LemontechSA/ttb/pull/844)
+
 ## Hotfix 15.1.9
 Jueves 5 de Febrero 2015
-* **Fix:** [Sobre escribe ProcessLockDAO::Write() para evitar la escritura de logs en db.](https://github.com/LemontechSA/ttb/pull/843)
+* **Fix:** [Agrega la propiedad $log_update al DAO (por defecto false) y se define true en ChargeDAO](https://github.com/LemontechSA/ttb/pull/843)
 
 ## Hotfix 15.1.8
 Martes 3 de Febrero 2015
