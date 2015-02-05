@@ -632,7 +632,7 @@ class Asunto extends Objeto {
 		}
 
 		if ($filtros['id_usuario']) {
-			$wheres[] = "a1.id_encargado = '$filtros['id_usuario']' ";
+			$wheres[] = "a1.id_encargado = '{$filtros['id_usuario']}' ";
 		}
 
 		if ($filtros['id_area_proyecto']) {
