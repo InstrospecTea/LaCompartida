@@ -1,5 +1,25 @@
 # Changelog
 
+## Release: 15.2.0
+Jueves 5 de Febrero 2015
+
+[Release 15.2.0](https://github.com/LemontechSA/ttb/pull/845)
+
+* **Fix:** Agregar botón calendario al editar clientes
+* **Fix:** Al agregar un asunto si el filtro tiene un cliente seleccionado que ese cliente venga por defecto
+* **Fix:** Agregar logos en los excel de cobro
+* **Fix:** Mostrar observaciones en el reporte de liquidaciones en la sección de hitos
+* **Fix:** En gastos mostrar los gastos castigados
+* **Fix:** El formato de liquidación arroja dos valores distinto en distintas hojas
+* **Fix:** Al copiar los datos del contrato principal, copiar todo salvo los hitos
+* **Fix:** Corrige las horas facturables para que utilicen la duración en vez de la duración cobrada en reporte avanzado
+* **Fix:** Corrige el problema que considera todos los trabajos al editar (alerta de más de 24 horas)
+* **Fix:** Inconveniente para editar contratos desde la pestaña Pre-Liquidaciones (https://www.pivotaltracker.com/n/projects/286009/stories/85713666)
+* **Feature:** Permite seleccionar un giro de cliente o poder escribir un texto libre
+* **Fix:** Fix para giros cuando no hay giros en la tabla prm_giro y 99% de clientes actuales
+* **Fix:** Fix problemas con bind del formulario de grupos
+* **Fix:** No mostrar giros si no hay al agregar o editar asunto
+
 ## Hotfix 15.1.10
 Jueves 5 de Febrero 2015
 * **Fix:** [Agrega id_estudio a excel de Asunto, Factura y FacturaPago](https://github.com/LemontechSA/ttb/pull/844)

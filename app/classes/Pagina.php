@@ -27,14 +27,18 @@ class Pagina extends \Pagina {
 		}
 	}
 
-	function PrintBottom($popup = false, $forzar_bottom_antiguo = false) {
+	function PrintBottom($popup = false, $forzar_bottom_antiguo = false, $new_javascript = false) {
 		echo '<script type="text/javascript"> var intervalo ='. Conf::GetConf($this->sesion, 'Intervalo') .';</script>';
 
 		if ((method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaDisenoNuevo')) && $forzar_bottom_antiguo == false)  {
 			if (!$popup) {
 				require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/bottom_nuevo.php';
 			} else {
-				require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/bottom_popup_nuevo.php';
+				if (!$new_javascript) {
+					require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/bottom_popup_nuevo.php';
+				} else {
+					require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/bottom_popup_last.php';
+				}
 			}
 		} else {
 			if (!$popup) {

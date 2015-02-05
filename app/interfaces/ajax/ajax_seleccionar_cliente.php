@@ -8,26 +8,17 @@ $id = Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_cliente_secundario':'c
 $id_usuario = empty($_POST['id_usuario']) ? $sesion->usuario->fields['id_usuario']:$_POST['id_usuario'];
 
 if (empty($pedazo)) {
-	$query = "(
-			SELECT DISTINCT
-				cliente.{$id} AS id,
-				cliente.glosa_cliente AS value
-			FROM trabajo
-			INNER JOIN asunto USING (codigo_asunto)
-			INNER JOIN cliente USING (codigo_cliente)
-			WHERE trabajo.id_usuario = {$id_usuario}
-			ORDER BY trabajo.fecha DESC
-			LIMIT 0, 5
-		) UNION (
-			SELECT DISTINCT
-				cliente.{$id},
-				cliente.glosa_cliente
-			FROM asunto
-			INNER JOIN cliente USING (codigo_cliente)
-			ORDER BY asunto.fecha_creacion DESC
-			LIMIT 0, 5
-		)";
-
+	$query = "SELECT
+					cliente.{$id} AS id,
+					cliente.glosa_cliente AS value,
+					max(trabajo.fecha)
+				FROM trabajo
+					INNER JOIN asunto USING (codigo_asunto)
+					INNER JOIN cliente USING (codigo_cliente)
+				WHERE trabajo.id_usuario = {$id_usuario}
+				GROUP BY cliente.codigo_cliente
+				ORDER BY max(trabajo.fecha) DESC
+				LIMIT 0, 5";
 } else {
 	$query = "SELECT {$id} AS id, glosa_cliente AS value
 		FROM cliente

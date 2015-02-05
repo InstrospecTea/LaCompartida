@@ -26,7 +26,10 @@ $color_par = "#f0f0f0";
 $color_impar = "#ffffff";
 
 $archivo = new Archivo($Sesion);
-
+$AutocompleteHelper = new FormAutocompleteHelper();
+if (!isset($SelectHelper)) {
+	$SelectHelper = new FormSelectHelper();	
+} 
 // previene override del objero, ya que se incluye desde otras interfaces.
 function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
@@ -67,7 +70,6 @@ if (!defined('HEADERLOADED')) {
 if ($addheaderandbottom || ($popup && !$motivo)) {
 
 	$show = 'inline';
-
 
 	$contrato = new Contrato($Sesion);
 
@@ -279,7 +281,10 @@ $Idioma = new Idioma($Sesion);
 $TramiteTarifa = new TramiteTarifa($Sesion);
 $Carta = new Carta($Sesion);
 $CobroRtf = new CobroRtf($Sesion);
-$Form = new Form;
+
+$Form = new Form();
+$Html = new \TTB\Html();
+
 ?>
 <script type="text/javascript">
 
@@ -1644,7 +1649,39 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
 							<?php echo Html::SelectArrayDecente($PrmCodigo->Listar("WHERE prm_codigo.grupo = 'GIRO_CLIENTE' ORDER BY prm_codigo.glosa ASC"), 'id_pais', $contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro); ?>
 						<?php } else { ?>
-							<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
+							<?php
+								$prmGiro = new PrmGiro($Sesion);
+								$giros = $prmGiro->ListarExt();
+								if (count($giros) > 0) {
+									echo $SelectHelper->ajax_select(
+										'factura_giro_select',
+										$contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro,
+										array('class' => 'span3', 'style' => 'display:inline', 'id' => 'factura_giro_select'),
+										array(
+											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=orden,requiere_desglose&id=glosa',
+											'onChange' => '
+												var element = selected_factura_giro_select;
+												var original_value = FormSelectHelper.original_factura_giro_select;
+												if (element && element.requiere_desglose == "1") {
+													jQuery("#factura_giro").val(original_value);
+													jQuery("#factura_giro").show();
+												} else {
+													jQuery("#factura_giro").val(element.glosa);
+													jQuery("#factura_giro").hide();
+												}
+												if (original_value && Object.keys(element).length == 0) {
+													jQuery("#factura_giro_select").val("Otro");
+													jQuery("#factura_giro").val(original_value);
+													jQuery("#factura_giro").show();
+												}
+											'
+										)
+									);
+									echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								} else {
+									echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								}
+							?>
 						<?php } ?>
 					</td>
 				</tr>
@@ -1829,7 +1866,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Teléfono') . $obligatorios('fono_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='fono_contacto_contrato' size=30 value="<?php echo $contrato->fields['fono_contacto'] ?>" />
+						<input type="text" name="fono_contacto_contrato" id="fono_contacto_contrato" size="30" value="<?php echo $contrato->fields['fono_contacto'] ? $contrato->fields['fono_contacto'] : $fono_contacto_contrato ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -1837,7 +1874,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('E-mail') . $obligatorios('email_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='email_contacto_contrato' size=55 value="<?php echo $contrato->fields['email_contacto'] ?>"  />
+						<input type="text" name="email_contacto_contrato" id="email_contacto_contrato" size="55" value="<?php echo $contrato->fields['email_contacto'] ? $contrato->fields['email_contacto'] : $email_contacto_contrato ?>"  />
 					</td>
 				</tr>
 				<tr>
@@ -1845,7 +1882,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Dirección envío') . $obligatorios('direccion_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?></textarea>
+						<textarea name="direccion_contacto_contrato" id="direccion_contacto_contrato" rows="4" cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?  $contrato->fields['direccion_contacto'] : $direccion_contacto_contrato ?></textarea>
 					</td>
 				</tr>
 			</table>
