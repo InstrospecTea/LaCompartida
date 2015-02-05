@@ -9,40 +9,14 @@ if (!$cobro->Load($id_cobro)) {
     $pagina->FatalError('Cobro inválido');
 }
 
-$cobro->LoadAsuntos();
-
-$Criteria = new Criteria($Sesion);
-$asuntos = $Criteria
-	->add_from('asunto')
-	->add_select('codigo_asunto')
-	->add_select('glosa_asunto')
-	->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos))
-	->add_ordering('glosa_asunto')
-	->run();
-$cobro->asuntos = array();
-foreach ($asuntos as $asunto) {
-	$cobro->asuntos[] = $asunto['codigo_asunto'];
-}
-
-$comma_separated = implode("','", $cobro->asuntos);
-
-if ($lang == '') {
-    $lang = 'es';
-}
-
-if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
-    $lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
-} else {
-    $lang_archivo = $lang . '.php';
-}
-
-require_once Conf::ServerDir() . "/lang/$lang_archivo";
+$_LANG = array_merge($_LANG, UtilesApp::LoadLang($lang));
 
 //Usa el segundo formato de nota de cobro
 //solo si lo tiene definido en el conf y solo tiene gastos
 
 $css_cobro = 1;
 $solo_gastos = true;
+$cobro->LoadAsuntos();
 
 for ($k = 0; $k < count($cobro->asuntos); $k++) {
     $asunto = new Asunto($Sesion);

@@ -206,7 +206,7 @@ if ($print) {
 		$logdir = dirname($error_logfile);
 
 		if ($totaldecobros > 0) {
-			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas);
+			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas, $id_formato);
 		} else {
 			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
 				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>

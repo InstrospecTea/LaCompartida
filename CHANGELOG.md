@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.1.8
+Martes 3 de Febrero 2015
+* **Fix:** [Corrige la impresión masiva de cobros con el formato seleccionado](https://github.com/LemontechSA/ttb/pull/842)
+
 ## Hotfix 15.1.7
 Martes 3 de Febrero 2015
 * **Fix:** [Agrega twig a la nota de cobro](https://github.com/LemontechSA/ttb/pull/841)
