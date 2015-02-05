@@ -11,6 +11,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	var $sesion;
 
+	/**
+	 * Indica a la Clase que al llamar a Write(), creará un registro en la tabla 'log_db'
+	 * @var boolean
+	 */
+	public $log_update = false;
+
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
 	}
@@ -175,7 +181,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->sesion = $this->sesion;
 		$this->fields = $object->fields;
 		$this->changes = $object->changes;
-		$this->log_update = true;
 		$this->guardar_fecha = true;
 		if ($this->Write()) {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
