@@ -2,7 +2,7 @@
 
 ## Hotfix 15.1.9
 Jueves 5 de Febrero 2015
-* **Fix:** [Sobre escribe ProcessLockDAO::Write() para evitar la escritura de logs en db.](https://github.com/LemontechSA/ttb/pull/842)
+* **Fix:** [Sobre escribe ProcessLockDAO::Write() para evitar la escritura de logs en db.](https://github.com/LemontechSA/ttb/pull/843)
 
 ## Hotfix 15.1.8
 Martes 3 de Febrero 2015
