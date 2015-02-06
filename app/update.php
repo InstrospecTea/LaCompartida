@@ -10428,13 +10428,13 @@ QUERY;
 			break;
 		case 7.78:
 			$queries = array();
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'glosa_factura', 'Encabezado', 'Glosa Factura', 'Invoice Detail', 0)";
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
+			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'glosa_factura', 'Encabezado', 'Glosa Factura', 'Invoice Detail', 0)";
+			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'encargado_comercial', 'Encabezado', 'Encargado Comercial', 'Commercial Manager', 0)";
 			ejecutar($queries, $dbh);
 			break;
 		case 7.79:
 			$queries = array();
-			$queries[] = "CREATE TABLE `tramite_historial` (
+			$queries[] = "CREATE TABLE IF NOT EXISTS `tramite_historial` (
 			  `id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
 			  `id_tramite` int(11) NOT NULL,
 			  `id_usuario` int(11) NOT NULL,
@@ -10476,7 +10476,7 @@ QUERY;
 			break;
 		case 7.80:
 			$queries = array();
-			$queries[] = "CREATE TABLE `cobro_movimiento` (
+			$queries[] = "CREATE TABLE IF NOT EXISTS `cobro_movimiento` (
 			  `id_cobro_movimiento` int(11) NOT NULL AUTO_INCREMENT,
 			  `id_cobro` int(11) DEFAULT NULL,
 			  `id_usuario` int(11) DEFAULT NULL,
@@ -10510,17 +10510,19 @@ QUERY;
 			  PRIMARY KEY (`id_cobro_movimiento`),
 			  INDEX(`id_cobro`)
 			);";
-			$queries[] = "ALTER TABLE `cobro_movimiento`
-				ADD COLUMN `fecha_ini` DATE NULL DEFAULT NULL AFTER `fecha_pago_parcial_modificado`,
-				ADD COLUMN `fecha_fin` DATE NULL DEFAULT NULL AFTER `fecha_ini`,
-				ADD COLUMN `fecha_ini_modificado` DATE NULL DEFAULT NULL AFTER `fecha_fin`,
-				ADD COLUMN `fecha_fin_modificado` DATE NULL DEFAULT NULL AFTER `fecha_ini_modificado`,
-				ADD COLUMN `forma_cobro` VARCHAR(20) NULL DEFAULT NULL AFTER `fecha_fin_modificado`,
-				ADD COLUMN `forma_cobro_modificado` VARCHAR(20) NULL DEFAULT NULL AFTER `forma_cobro`,
-				ADD COLUMN `monto` DOUBLE NULL DEFAULT NULL AFTER `forma_cobro_modificado`,
-				ADD COLUMN `monto_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto`,
-				ADD COLUMN `monto_gastos` DOUBLE NULL DEFAULT NULL AFTER `monto_modificado`,
-				ADD COLUMN `monto_gastos_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto_gastos`;";
+			if (!ExisteCampo('fecha_ini', 'cobro_movimiento', $dbh)) {
+				$queries[] = "ALTER TABLE `cobro_movimiento`
+					ADD COLUMN `fecha_ini` DATE NULL DEFAULT NULL AFTER `fecha_pago_parcial_modificado`,
+					ADD COLUMN `fecha_fin` DATE NULL DEFAULT NULL AFTER `fecha_ini`,
+					ADD COLUMN `fecha_ini_modificado` DATE NULL DEFAULT NULL AFTER `fecha_fin`,
+					ADD COLUMN `fecha_fin_modificado` DATE NULL DEFAULT NULL AFTER `fecha_ini_modificado`,
+					ADD COLUMN `forma_cobro` VARCHAR(20) NULL DEFAULT NULL AFTER `fecha_fin_modificado`,
+					ADD COLUMN `forma_cobro_modificado` VARCHAR(20) NULL DEFAULT NULL AFTER `forma_cobro`,
+					ADD COLUMN `monto` DOUBLE NULL DEFAULT NULL AFTER `forma_cobro_modificado`,
+					ADD COLUMN `monto_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto`,
+					ADD COLUMN `monto_gastos` DOUBLE NULL DEFAULT NULL AFTER `monto_modificado`,
+					ADD COLUMN `monto_gastos_modificado` DOUBLE NULL DEFAULT NULL AFTER `monto_gastos`;";
+			}
 			ejecutar($queries, $dbh);
 			break;
 		case 7.81:
@@ -10530,15 +10532,15 @@ QUERY;
 			break;
 		case 7.82:
 			$queries = array();
-			$queries[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES ('AUDIT', 'Auditoría', '/app/interfaces/reporte_historial_movimientos.php', '0', '99999', 'ADMIN_SIS', '0');";
-			$queries[] = "INSERT INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES ('ADM', 'AUDIT');";
+			$queries[] = "INSERT IGNORE INTO `menu` (`codigo`, `glosa`, `url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES ('AUDIT', 'Auditoría', '/app/interfaces/reporte_historial_movimientos.php', '0', '99999', 'ADMIN_SIS', '0');";
+			$queries[] = "INSERT IGNORE INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES ('ADM', 'AUDIT');";
 			ejecutar($queries, $dbh);
 		case 7.83:
 			$queries = array();
 			$queries[] = "ALTER TABLE `prm_excel_cobro` CHANGE glosa_es glosa_es VARCHAR(255), CHANGE glosa_en glosa_en VARCHAR(255)";
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto', 'Encabezado', 'Concepto', 'Concept', 0)";
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto_glosa', 'Encabezado', 'Servicios profesionales prestados a la compañía durante el mes de %s', 'Professional services provided to the company during %s', 0)";
-			$queries[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'detalle_cobranza', 'Encabezado', 'Detalle Cobranza', 'Detail Billing', 0)";
+			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto', 'Encabezado', 'Concepto', 'Concept', 0)";
+			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto_glosa', 'Encabezado', 'Servicios profesionales prestados a la compañía durante el mes de %s', 'Professional services provided to the company during %s', 0)";
+			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'detalle_cobranza', 'Encabezado', 'Detalle Cobranza', 'Detail Billing', 0)";
 			ejecutar($queries, $dbh);
 			break;
 
@@ -10603,7 +10605,7 @@ QUERY;
 			break;
 
 		case 7.91:
-			$queries[] = "CREATE TABLE `bloqueo_procesos` (
+			$queries[] = "CREATE TABLE IF NOT EXISTS `bloqueo_procesos` (
 							`id` int(11) NOT NULL AUTO_INCREMENT,
 							`id_usuario` int(11) NOT NULL,
 							`nombre_usuario` varchar(100) NOT NULL,
@@ -10626,7 +10628,7 @@ QUERY;
 			break;
 
 		case 7.93:
-			$queries[] = "INSERT INTO `prm_tipo_correo` (`nombre`) VALUES ('proceso')";
+			$queries[] = "INSERT IGNORE INTO `prm_tipo_correo` (`nombre`) VALUES ('proceso')";
 			break;
 
 		case 7.94:
@@ -10674,17 +10676,6 @@ QUERY;
 				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`)
 					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`)  ON DELETE CASCADE);";
 
-			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
-				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
-				`id_area_proyecto` int(11) NOT NULL,
-				`glosa` varchar(120) NOT NULL,
-				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
-				`orden` int(11) NOT NULL DEFAULT '0',
-				PRIMARY KEY (`id_area_proyecto_desglose`),
-				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
-				CONSTRAINT `fk_prm_area_proyecto_id`
-				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
-
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_giro` (
 				`id_giro` int(11) NOT NULL AUTO_INCREMENT,
 				`glosa` varchar(120) NOT NULL,
@@ -10692,7 +10683,6 @@ QUERY;
 				`orden` int(11) NOT NULL DEFAULT '0',
 				PRIMARY KEY (`id_giro`),
 				INDEX `fk_prm_giro_id` (`id_giro` ASC));";
-
 
 			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_giro` (
 				`id_asunto` INT(11) NOT NULL,
