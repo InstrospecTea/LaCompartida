@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.1.11
+Viernes 5 de Febrero 2015
+* **Fix:** [Inicializa variable $_LANG como un array vacío.](https://github.com/LemontechSA/ttb/pull/846)
+
 ## Hotfix 15.1.10
 Jueves 5 de Febrero 2015
 * **Fix:** [Agrega id_estudio a excel de Asunto, Factura y FacturaPago](https://github.com/LemontechSA/ttb/pull/844)

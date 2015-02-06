@@ -2379,6 +2379,8 @@ HTML;
 	 * @param boolean $include Define si se utiliza include o require_once
 	 */
 	public static function LoadLang($lang, $include = false) {
+		$_LANG = array();
+
 		if ($lang == '') {
 			$lang = 'es';
 		}
