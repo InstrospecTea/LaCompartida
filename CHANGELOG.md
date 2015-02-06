@@ -20,6 +20,10 @@ Jueves 5 de Febrero 2015
 * **Fix:** Fix problemas con bind del formulario de grupos
 * **Fix:** No mostrar giros si no hay al agregar o editar asunto
 
+## Hotfix 15.1.11
+Viernes 5 de Febrero 2015
+* **Fix:** [Inicializa variable $_LANG como un array vacío.](https://github.com/LemontechSA/ttb/pull/846)
+
 ## Hotfix 15.1.10
 Jueves 5 de Febrero 2015
 * **Fix:** [Agrega id_estudio a excel de Asunto, Factura y FacturaPago](https://github.com/LemontechSA/ttb/pull/844)
