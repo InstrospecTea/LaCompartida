@@ -11478,7 +11478,7 @@ class NotaCobro extends Cobro {
 			$lang = $NotaCobro->fields['codigo_idioma'];
 
 			// Limpia $_LANG para que no se choquen los LANGS entre liquidaciones
-			$_LANG = UtilesApp::LoadLang($lang, true);
+			$_LANG = array_merge($_LANG, UtilesApp::LoadLang($lang, true));
 
 			if (empty($id_formato)) {
 				$id_formato = $NotaCobro->fields['id_formato'];
