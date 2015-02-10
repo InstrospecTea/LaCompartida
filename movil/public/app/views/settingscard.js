@@ -205,7 +205,6 @@ ToolbarDemo.views.Settingscard = Ext.extend(Ext.form.FormPanel, {
 	cargar_clientes: function(rut,password,contenedor){
 		var rut = rut;
 		var password = password;
-		console.log('cargar clientes con rut '+rut+ ' y pass '+password);
 		$.ajax({
 			type:"post",
 			url:"../clientes",
@@ -276,7 +275,6 @@ ToolbarDemo.views.Settingscard = Ext.extend(Ext.form.FormPanel, {
 								action    : 'loadClientesAsuntos',
 						});
 					}else{
-						console.log(req);
 						var asuntos = JSON.parse(req.responseText);
 						ToolbarDemo.views.usersForm.cargarAsuntos(asuntos);
 

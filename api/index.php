@@ -694,16 +694,17 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 
 $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 	$format = is_null($Slim->request()->params('format')) ? 'pdf' : $Slim->request()->params('format');
+	$original = (is_null($Slim->request()->params('original')) || $Slim->request()->params('original') == 1) ? true : false;
 	if (isset($id)) {
 		try {
 			$Invoice = new Factura($Session);
 			$Invoice->Load($id);
-			$data = array('Factura' => $Invoice);
-			$Slim->applyHook('hook_descargar_pdf_factura_electronica', $data);
 			if (!$Invoice->Loaded()) {
 				throw new Exception('');
 			} else {
+				$data = array('Factura' => $Invoice, 'original' => $original);
 				if ($format == 'pdf') {
+					$Slim->applyHook('hook_descargar_pdf_factura_electronica', $data);
 					$url = $Invoice->fields['dte_url_pdf'];
 					$name = array_shift(explode('?', basename($url)));
 					if ($name === 'descargar.php') {
@@ -824,13 +825,14 @@ function validateAuthTokenSendByHeaders($permission = null) {
 	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
 	$user_token = $UserToken->findByAuthToken($auth_token);
-	$app_id = $UserToken->getAppIdByAppKey($app_key);
-	$_SESSION['app_id'] = is_null($app_id) ? 1 : $app_id;
 
 	// if not exist the auth_token then return error
 	if (!is_object($user_token)) {
 		halt(__('Invalid AUTH TOKEN'), 'SecurityError', 401);
 	} else {
+		$app_id = $UserToken->getAppIdByAppKey($user_token->app_key);
+		$_SESSION['app_id'] = is_null($app_id) ? 1 : $app_id;
+
 		// verify if the token is expired
 		// date_default_timezone_set("UTC");
 		$now = time();
@@ -852,12 +854,12 @@ function validateAuthTokenSendByHeaders($permission = null) {
 		}
 
 		$Session->usuario = new UsuarioExt($Session);
-		$Session->usuario->LoadId($user_token->id);
+		$Session->usuario->LoadId($user_token->user_id);
 		if (!is_null($permission)) {
 			if (!$Session->usuario->Loaded()) {
 				halt(__("The user doesn't exist"), 'UserDoesntExist');
 			} else {
-				$Session->usuario->LoadPermisos($user_token->id);
+				$Session->usuario->LoadPermisos($user_token->user_id);
 			 	$params_array['codigo_permiso'] = $permission;
 				$p = $Session->usuario->permisos->Find('FindPermiso', $params_array);
 				if (!$p->fields['permitido']) {

@@ -83,6 +83,14 @@ class ViewRenderer {
 
 	protected function loadHelpers() {
 		foreach ($this->helpers as $helper) {
+			$file = LAYER_PATH . $this->filePath . "/helpers/{$helper}.php";
+			if (is_readable($file)) {
+				$fileHelper = LAYER_PATH . $this->filePath . "/helpers/Helper.php";
+				if (!class_exists($fileHelper)) {
+					require_once $fileHelper;
+				}
+				require_once $file;
+			}
 			if (is_array($helper)) {
 				$this->loadModel($helper[0], $helper[1]);
 			} else {

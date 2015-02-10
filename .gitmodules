@@ -10,3 +10,6 @@
 [submodule "app/classes/Notifications/ApnsPHP"]
 	path = app/classes/Notifications/ApnsPHP
 	url = git@github.com:LemontechSA/ApnsPHP.git
+[submodule "docs"]
+	path = docs
+	url = git@github.com:LemontechSA/ttb.wiki.git

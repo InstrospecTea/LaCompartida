@@ -2,6 +2,11 @@
 
 class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
+	public function __construct(Sesion $Session) {
+		parent::__construct($Session);
+		$this->loadService('Charge');
+	}
+
 	/**
 	 * Elimina un cobro
 	 * @param type $id_cobro
@@ -92,7 +97,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
 			$this->Documento->Delete();
 		}
-
+	}
+	
+	public function doesChargeExists($id_cobro) {
+		if (empty($id_cobro)) {
+			return false; //el id no puede ser vacío o cero
+		}
+		$restrictions = CriteriaRestriction::equals('id_cobro', "$id_cobro");
+		$entity = $this->ChargeService->findFirst($restrictions, array('id_cobro'));
+		return $entity !== false;
 	}
 
 }

@@ -61,43 +61,7 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
-		// Segmento Condiciones de pago
-		$condicion_pago = $factura->fields['condicion_pago'];
-
-		switch ($condicion_pago) {
-			case '1': $condicion_pago = __('CONTADO');
-				break;
-			case '3': $condicion_pago = __('Vencimiento 15 dï¿½as	');
-				break;
-			case '4': $condicion_pago = __('Vencimiento 30 dï¿½as	');
-				break;
-			case '5': $condicion_pago = __('Vencimiento 45 dï¿½as	');
-				break;
-			case '6': $condicion_pago = __('Vencimiento 60 dï¿½as	');
-				break;
-			case '7': $condicion_pago = __('Vencimiento 75 dï¿½as	');
-				break;
-			case '8': $condicion_pago = __('Vencimiento 90 dï¿½as	');
-				break;
-			case '9': $condicion_pago = __('Vencimiento 120 dï¿½as');
-				break;
-			case '12': $condicion_pago = __('Letra 30 dï¿½as');
-				break;
-			case '13': $condicion_pago = __('Letra 45 dï¿½as');
-				break;
-			case '14': $condicion_pago = __('Letra 60 dï¿½as');
-				break;
-			case '15': $condicion_pago = __('Letra 90 dï¿½as');
-				break;
-			case '18': $condicion_pago = __('Cheque 30 dï¿½as');
-				break;
-			case '19': $condicion_pago = __('Cheque 45 dï¿½as');
-				break;
-			case '20': $condicion_pago = __('Cheque 60 dï¿½as');
-				break;
-			case '21': $condicion_pago = __('Cheque a fecha');
-				break;
-		}
+		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 
 		// Segmento Comodines. Solicitados por @gtigre
 		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
@@ -140,7 +104,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
-		
+
 		$tipo_cambio_usd = $arreglo_monedas[2]['tipo_cambio'];
 		$cifras_decimales_usd = $arreglo_monedas[2]['cifras_decimales'];
 
@@ -168,6 +132,11 @@ class FacturaPdfDatos extends Objeto {
 			$texto_impuesto = '';
 		} else {
 			$texto_impuesto = $FacturaTextoImpuesto;
+		}
+
+		$honorarios_sin_impuesto = 0;
+		if ($factura->fields['porcentaje_impuesto'] == 0) {
+			$honorarios_sin_impuesto = $factura->fields['honorarios'];
 		}
 
 		switch( $tipo_dato ) {
@@ -352,11 +321,30 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
-            case 'lbl_fecha_vencimiento':
-                $glosa_dato = 'Fecha Vencimiento / Due Date:';
-                break;
+			case 'lbl_fecha_vencimiento':
+				$glosa_dato = 'Fecha Vencimiento / Due Date:';
+				break;
+			case 'monto_honorarios_con_iva':
+				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+			case 'subtotal_exento':
+				$glosa_dato = number_format($factura->fields['subtotal_gastos_sin_impuesto'] + $honorarios_sin_impuesto,
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+			case 'subtotal_impuesto':
+				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)) + $factura->fields['subtotal_gastos_sin_impuesto'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']);
+				break;
+
 			default:
-			
+
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
@@ -464,6 +452,22 @@ class FacturaPdfDatos extends Objeto {
 		$fila['glosa_detraccion'] = $factura_texto_detraccion;
 		$fila['texto_impuesto'] = $texto_impuesto;
 		$fila['solicitante'] = $contrato->fields['contacto'];
+		$fila['monto_honorarios_con_iva'] = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
+		$honorarios_sin_impuesto = 0;
+		if ($factura->fields['porcentaje_impuesto'] == 0) {
+			$honorarios_sin_impuesto = $factura->fields['honorarios'];
+		}
+		$fila['subtotal_exento'] = number_format($factura->fields['subtotal_gastos_sin_impuesto'] + $honorarios_sin_impuesto,
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
+		$fila['subtotal_impuesto'] = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)) + $factura->fields['subtotal_gastos_sin_impuesto'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100)),
+			$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']);
 
 		return $fila;
 	}
@@ -482,7 +486,7 @@ class FacturaPdfDatos extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id_documento_legal, $codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 
-		$this->CargarDatos($id_factura, $id_documento_legal, $factura->fields['id_estudio']); // esto trae la posicion, tamaï¿½o y glosa de todos los campos mï¿½s los datos del papel en la variable $this->papel;
+		$this->CargarDatos($id_factura, $id_documento_legal, $factura->fields['id_estudio']); // esto trae la posicion, tamaío y glosa de todos los campos mís los datos del papel en la variable $this->papel;
 
 		if(count($this->papel)) {
 			$pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'], $this->papel['cellH']));
@@ -490,7 +494,7 @@ class FacturaPdfDatos extends Objeto {
 			$pdf->SetAutoPageBreak(true, $margin);
 		} else {
 			// P: hoja vertical
-			// mm: todo se mide en milï¿½metros
+			// mm: todo se mide en milímetros
 			// Letter: formato de hoja
 			$pdf = new FPDF($orientacion, 'mm', $format);
 		}
@@ -501,7 +505,7 @@ class FacturaPdfDatos extends Objeto {
 
 		$pdf->SetTitle($glosa_documento_legal . ' ' . $factura->fields['numero']);
 
-		// La orientaciï¿½n y formato de la pï¿½gina son los mismos que del documento
+		// La orientación y formato de la página son los mismos que del documento
 		$pdf->AddPage();
 		$datos['dato_letra'] = str_replace(array("<br>\n", "<br/>\n", "<br />\n" ), "\n", $datos['dato_letra']);
 

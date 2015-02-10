@@ -11,6 +11,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	var $sesion;
 
+	/**
+	 * Indica a la Clase que al llamar a Write(), creará un registro en la tabla 'log_db'
+	 * @var boolean
+	 */
+	public $log_update = false;
+
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
 	}
@@ -89,7 +95,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$insertCriteria->add_pivot_with_value($inmutableProperty, $object->get($inmutableProperty));
 		}
 		$properties = $object->getLoggeableProperties();
-		$legacy->fillDefaults();
 		foreach ($properties as $property) {
 			$alias = $property;
 			if (is_array($property)) {
@@ -136,15 +141,21 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return false;
 	}
 
-	public function saveOrUpdate($object) {
+	/**
+   * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
+   * @param Entity $object
+   * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
+   * @throws Exception
+   */
+	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
-		$object->fillDefaults();
 		$this->checkClass($object, $this->getClass());
 		$reflected = new ReflectionClass($this->getClass());
 		$id = $object->get($object->getIdentity());
 		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 		//que crear un nuevo registro.
 		if (empty($id)) {
+			$object = $this->fillDefaults($object);
 			$object = $this->save($object);
 			if (is_subclass_of($object, 'LoggeableEntity')) {
 				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
@@ -152,7 +163,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		} else {
 			$legacy = $this->get($object->get($object->getIdentity()));
 			$object = $this->update($object);
-			if (is_subclass_of($object, 'LoggeableEntity')) {
+			if ($writeLog && is_subclass_of($object, 'LoggeableEntity')) {
 				$object = $this->merge($legacy, $object);
 				$this->writeLogFromArray('MODIFICAR', $object, $legacy);
 			}
@@ -171,7 +182,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->sesion = $this->sesion;
 		$this->fields = $object->fields;
 		$this->changes = $object->changes;
-		$this->log_update = true;
 		$this->guardar_fecha = true;
 		if ($this->Write()) {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
@@ -216,10 +226,23 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $this->encapsulate($resultArray, $instance);
 	}
 
-	public function findAll() {
+	/**
+	 * Busca todos los registros según las restricciones dadas
+	 * @param CriteriaRestriction|String $restrictions
+	 * @param type $fields
+	 * @param type $order
+	 * @param type $limit
+	 * @return type
+	 */
+	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
 		$criteria = new Criteria($this->sesion);
 		$reflected = new ReflectionClass($this->getClass());
-		$criteria->add_select('*');
+
+		$this->add_fields($criteria, $fields);
+		$this->add_restriction($criteria, $restrictions);
+		$this->add_ordering($criteria, $order);
+		$this->add_limits($criteria, $limit);
+
 		$criteria->add_from($reflected->getMethod('getPersistenceTarget')->invoke($reflected->newInstance()));
 		$output = array();
 		$results = $criteria->run();
@@ -231,12 +254,41 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $output;
 	}
 
+	private function add_fields($criteria, $fields) {
+		if (is_null($fields) || !is_array($fields)) {
+			$criteria->add_select(empty($fields) ? '*' : $fields);
+		} else {
+			foreach ($fields as $field) {
+				$criteria->add_select($field);
+			}
+		}
+	}
+
+	private function add_restriction($criteria, $restrictions) {
+		$criteria->add_restriction(new CriteriaRestriction($restrictions));
+	}
+
+	private function add_ordering($criteria, $order) {
+		if (is_array($order)) {
+			foreach ($order as $field) {
+				$criteria->add_ordering($field);
+			}
+		} else if (!is_null($order)) {
+			$criteria->add_ordering($order);
+		}
+	}
+
+	private function add_limits($criteria, $limit) {
+		if (!is_null($limit)) {
+			$criteria->add_limit($limit);
+		}
+	}
+
 	public function delete($object) {
 		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
-			$newInstance->fillDefaults();
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
 		if ($object->isLoaded()) {
@@ -290,4 +342,10 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $tags[0];
 	}
 
+	private function fillDefaults(Entity $object) {
+		$table = Descriptor::table($this->sesion, $object->getPersistenceTarget());
+		$defaults = $table->getDefaults($object->getTableDefaults());
+		$object->fillDefaults($defaults);
+		return $object;
+	}
 }

@@ -153,7 +153,8 @@ if ($opcion == "guardar") {
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		$factura->Edit("dte_metodo_pago", $dte_metodo_pago ? $dte_metodo_pago : "");
 		$factura->Edit("dte_metodo_pago_cta", $dte_metodo_pago_cta ? $dte_metodo_pago_cta : "");
-
+		$factura->Edit("dte_codigo_referencia", $dte_codigo_referencia ? $dte_codigo_referencia : "");
+		$factura->Edit("dte_razon_referencia", $dte_razon_referencia ? $dte_razon_referencia : "");
 		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
 			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
@@ -363,6 +364,11 @@ if (!empty($factura->fields['id_factura'])) {
 }
 
 $cifras_decimales_opc_moneda_total = $x_resultados['cifras_decimales_opc_moneda_total'];
+$cifras_decimales_factura_conf = Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura');
+if ($cifras_decimales_factura_conf != -1) {
+	$cifras_decimales_opc_moneda_total = $cifras_decimales_factura_conf;
+}
+
 $subtotal_honorarios = $x_resultados['monto_honorarios'][$opc_moneda_total];
 $subtotal_gastos_sin_impuestos = $x_resultados['subtotal_gastos_sin_impuesto'][$opc_moneda_total];
 $subtotal_gastos = $x_resultados['subtotal_gastos'][$opc_moneda_total] - $subtotal_gastos_sin_impuestos;
@@ -521,7 +527,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			$estudios_array = PrmEstudio::GetEstudios($sesion);
 			if (count($estudios_array) > 1) {
-			?>
+				?>
 				<tr>
 					<td align="right"><?php echo __('Companía'); ?></td>
 					<td align="left" colspan="3">
@@ -534,9 +540,8 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			<?php
 			$numero_documento = '';
-
 			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-				$serie = $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
+				$serie = $factura->Loaded() ? $factura->fields['serie_documento_legal'] : $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
@@ -547,8 +552,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				<td align="left">
 					<?php
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
-						$serie_documento_legal = $factura->fields['serie_documento_legal'];
-						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie_documento_legal, 'onchange="NumeroDocumentoLegal()"', null, 60);
+						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', null, 60);
 					} else {
 						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
 						?>
@@ -570,11 +574,11 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 			//Se debe elegir un documento legal padre si:
 			$buscar_padre = false;
 
-			$query_doc = "SELECT codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+			$query_doc = "SELECT codigo, codigo_dte FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
 			$resp_doc = mysql_query($query_doc, $sesion->dbh) or Utiles::errorSQL($query_doc, __FILE__, __LINE__, $sesion->dbh);
-			list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
+			list($codigo_documento_legal, $codigo_dte) = mysql_fetch_array($resp_doc);
 
-			if (($codigo_documento_legal == 'NC') && ($id_cobro || $codigo_cliente)) {
+			if (($codigo_documento_legal == 'NC' || ($codigo_documento_legal == 'ND' && !is_null($codigo_dte))) && ($id_cobro || $codigo_cliente)) {
 				$glosa_numero_serie = Conf::GetConf($sesion, 'NumeroFacturaConSerie') ? "prm_documento_legal.glosa,' #', factura.serie_documento_legal, '-', numero" : "prm_documento_legal.glosa, ' #', numero";
 				if ($id_cobro) {
 					$query_padre = "SELECT id_factura, CONCAT({$glosa_numero_serie}) FROM factura JOIN prm_documento_legal USING (id_documento_legal) WHERE id_cobro = '{$id_cobro}'";
@@ -1461,7 +1465,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var total = Number($('monto_neto').value.replace(',', '.')) + Number($('iva').value.replace(',', '.'));
 		$('total').value = total.toFixed(decimales);
 
-
 		if (cantidad_decimales != -1) {
 
 			jQuery('.aproximable').each(function() {
@@ -1707,9 +1710,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 	jQuery(document).ready(function() {
 		jQuery(document).data('estudio_serie_numero', {
-			'estudio': jQuery('#id_estudio').attr('value'),
-			'serie': jQuery('#serie').attr('value'),
-			'numero': jQuery('#numero').attr('value')
+			'estudio': jQuery('#id_estudio').val(),
+			'serie': jQuery('#serie').val(),
+			'numero': jQuery('#numero').val()
 		});
 
 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {
@@ -1724,17 +1727,19 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		jQuery('#condicion_pago').change(function(){
 			var codigo = jQuery(this).val();
 			if(codigo == 1 || codigo == 21){
-
 				//jQuery('.fecha_vencimiento_pago').css('visibility', 'visible');
+				var persistedDate = '<?php echo Utiles::sql2date($factura->fields["fecha_vencimiento"]) ?>';
+				if (persistedDate == '') {
+					var dias = 1;
+					var myDate = new Date();
+					var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
+					jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
+				} else {
+					jQuery('#fecha_vencimiento_pago_input').val(persistedDate);
+				}
 				jQuery('#fecha_vencimiento_pago_input').attr('readonly',false);
-				var dias = 1;
-				var myDate = new Date();
-				var fecha_vencimiento_pago = obtiene_fecha_vencimiento(dias, myDate);
-
-				jQuery('#fecha_vencimiento_pago_input').val(fecha_vencimiento_pago);
 			}
 			else{
-
 				//jQuery('.fecha_vencimiento_pago').css('visibility', 'hidden');
 				jQuery('#fecha_vencimiento_pago_input').attr('readonly',true);
 				var texto = jQuery(this).find(":selected").text();

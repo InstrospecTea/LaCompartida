@@ -8,9 +8,19 @@ interface ISandboxingBusiness {
 	function getSandboxResults();
 
 	/**
+	 * @return mixed
+	 */
+	function report($data);
+
+	/**
 	 * @param $data
 	 * @return mixed
 	 */
 	function getSandboxListator($data);
+
+	/**
+	 * @return mixed
+	 */
+	function generateTemporalFile();
 
 } 

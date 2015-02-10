@@ -35,13 +35,14 @@ $idioma_default->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
 global $factura;
 ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_factura_inicio') : false;
 
+$orden = $factura->OrdenReporte($orden);
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 	if ($exportar_excel || $archivo_contabilidad) {
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 				, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 				, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 				, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-				, $descripcion_factura, $serie, $desde_asiento_contable);
+				, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		if ($exportar_excel) {
 			$factura->DownloadExcel($results);
@@ -260,7 +261,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-			, $descripcion_factura, $serie, $desde_asiento_contable);
+			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 	$formato_saldos = array();
 	foreach ($saldos_monedas as $i => $saldo_moneda) {
@@ -276,25 +277,24 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$opciones['mostrar_pagos'] = true;
 	$opciones['mostrar_fecha_ultimo_pago'] = true;
 	$where = '';
-	$search_query = $factura->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+	$search_query = $factura->QueryReporte(false, $where, $numero, $fecha1, $fecha2
 			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
 			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
 			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 	$x_pag = 25;
-
 	$b = new Buscador($sesion, $search_query, 'Factura', $desde, $x_pag, $orden);
 	$b->titulo = "Documentos Tributarios<br />$glosa_monto_saldo_total";
-	$b->AgregarFuncion(__('Destinatario Documento'), 'FormatoDestinatario', 'width="30%" align="left"');
+	$b->AgregarEncabezado('cliente', __('Destinatario Documento'), 'width="30%" align="left"', '', 'FormatoDestinatario', true);
 	$b->AgregarEncabezado('fecha', __('Fecha Documento'), 'align="center"');
-	$b->AgregarFuncion(__('Datos Documento'), 'FormatoDatos', 'width="10%" align="left"');
+	$b->AgregarEncabezado('numero', __('Datos Documento'), 'width="10%" align="left"', '', 'FormatoDatos', true);
 
 	if ($config->columns['encargado_comercial']->visible) {
 		$b->AgregarEncabezado("encargado_comercial", __('Socio a cargo'), 'align="center"');
 	}
 
-	$b->AgregarFuncion(__('Nº Liquidación'), 'FormatoLiquidacion', 'align="center"');
+	$b->AgregarEncabezado('id_cobro', __('Nº Liquidación'), 'align="center"', '', 'FormatoLiquidacion', true);
 	$b->AgregarFuncion(__('Total'), 'FormatoTotal', 'align="left"');
 	$b->AgregarFuncion(__('Pagos'), 'FormatoPagos', 'align="left"');
 	$b->AgregarEncabezado('estado', __('Estado'), 'align="center"');

@@ -10554,6 +10554,7 @@ QUERY;
 				CHANGE COLUMN `usuario`.`restriccion_diario` restriccion_diario FLOAT DEFAULT 0,
 				CHANGE COLUMN `usuario`.`retraso_max` retraso_max FLOAT DEFAULT 0;";
 			break;
+
 		case 7.86:
 			$queries[] = "ALTER TABLE `trabajo_historial`
 							CHANGE COLUMN `accion` `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `fecha_accion`,
@@ -10564,12 +10565,147 @@ QUERY;
 							CHANGE COLUMN `fecha_trabajo_modificado` `fecha_trabajo_modificado` DATE NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion` `descripcion` MEDIUMTEXT NULL DEFAULT NULL ,
 							CHANGE COLUMN `descripcion_modificado` `descripcion_modificado` MEDIUMTEXT NULL DEFAULT NULL ,
-							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL , 
+							CHANGE COLUMN `duracion_modificado` `duracion_modificado` TIME NULL DEFAULT NULL ,
 							CHANGE COLUMN `id_usuario_trabajador` `id_usuario_trabajador` INT(11) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable` `cobrable` TINYINT(4) NULL DEFAULT NULL ,
 							CHANGE COLUMN `cobrable_modificado` `cobrable_modificado` TINYINT(4) NULL DEFAULT NULL ;";
 			break;
+
+		case 7.87:
+			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
+			}
+			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
+			}
+			break;
+
+		case 7.88:
+			if (!ExisteCampo('direccion', 'cuenta_banco', $dbh)) {
+				$queries[] = "ALTER TABLE cuenta_banco
+					ADD COLUMN direccion VARCHAR(255) DEFAULT NULL COMMENT 'Direccion de la sucursal',
+					ADD COLUMN telefono VARCHAR(60) DEFAULT NULL COMMENT 'Telefono primario',
+					ADD COLUMN telefono2 VARCHAR(60) DEFAULT NULL COMMENT 'Telefono secundario',
+					ADD COLUMN fax VARCHAR(60) DEFAULT NULL COMMENT 'Telefono FAX'";
+
+				$queries[] = "ALTER TABLE prm_banco ADD COLUMN url VARCHAR(255) DEFAULT NULL COMMENT 'Direccion Web'";
+			}
+			break;
+
+		case 7.89:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			break;
+
+		case 7.90:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
+			break;
+
+		case 7.91:
+			$queries[] = "CREATE TABLE `bloqueo_procesos` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`id_usuario` int(11) NOT NULL,
+							`nombre_usuario` varchar(100) NOT NULL,
+							`proceso` varchar(32) NOT NULL,
+							`bloqueado` tinyint(1) NOT NULL,
+							`estado` varchar(512) NOT NULL DEFAULT '',
+							`datos_post` varchar(512) DEFAULT NULL,
+							`notificado` tinyint(1) NOT NULL,
+							`fecha_creacion` datetime NOT NULL,
+							`fecha_modificacion` datetime DEFAULT NULL,
+							PRIMARY KEY (`id`),
+							KEY `id_usuario_ndx` (`id_usuario`),
+							KEY `bloqueado_ndx` (`bloqueado`),
+							KEY `notificado_ndx` (`notificado`)
+						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+			break;
+
+		case 7.92:
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
+			break;
+
+		case 7.93:
+			$queries[] = "INSERT INTO `prm_tipo_correo` (`nombre`) VALUES ('proceso')";
+			break;
+
+		case 7.94:
+			$queries = array();
+			if (!ExisteCampo('desglose_referencia', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente` ADD `desglose_referencia` VARCHAR(255) NULL COMMENT 'este campo contiene una referencia del cliente adicional' AFTER `id_cliente_referencia` ;";
+			}
+			if (!ExisteCampo('requiere_desglose', 'prm_cliente_referencia', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_cliente_referencia` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
+			}
+			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
+			}
+			if (!ExisteCampo('contraparte', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `contraparte` VARCHAR(255) NULL COMMENT 'este campo contiene un texto libre para el nombre de la contraparte' AFTER `contacto` ;";
+			}
+			if (!ExisteCampo('cotizado_con', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `cotizado_con` VARCHAR(255) NULL COMMENT 'contiene una descripción de otro asunto cotizado en conjunto' AFTER `contraparte` ;";
+			}
+			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
+			}
+			if (!ExisteCampo('id_pais', 'grupo_cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `grupo_cliente` ADD `id_pais` int(11) NULL;";
+			}
+
+			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
+				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
+				`id_area_proyecto` int(11) NOT NULL,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_area_proyecto_desglose`),
+				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
+				CONSTRAINT `fk_prm_area_proyecto_id`
+				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`) ON DELETE CASCADE);";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_area_proyecto_desglose` (
+				`id_asunto` INT(11) NOT NULL,
+				`id_area_proyecto_desglose` INT(11) NOT NULL,
+				INDEX `fk_asunto_area_proyecto_desglose` (`id_asunto` ASC),
+				INDEX `fk_prm_area_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
+				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`)
+					REFERENCES `asunto` (`id_asunto`)  ON DELETE CASCADE,
+				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`)
+					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`)  ON DELETE CASCADE);";
+
+			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
+				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
+				`id_area_proyecto` int(11) NOT NULL,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_area_proyecto_desglose`),
+				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
+				CONSTRAINT `fk_prm_area_proyecto_id`
+				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_giro` (
+				`id_giro` int(11) NOT NULL AUTO_INCREMENT,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_giro`),
+				INDEX `fk_prm_giro_id` (`id_giro` ASC));";
+
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_giro` (
+				`id_asunto` INT(11) NOT NULL,
+				`id_giro` INT(11) NOT NULL,
+				INDEX `fk_asunto_asunto_giro` (`id_asunto` ASC),
+				INDEX `fk_prm_giro_asunto_giro` (`id_giro` ASC),
+				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`)
+					REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
+				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`)
+					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
+			break;
 	}
+
 	if (!empty($queries)) {
 		ejecutar($queries, $dbh);
 	}
@@ -10580,7 +10716,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.86;
+$max_update = 7.94;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

@@ -2366,9 +2366,37 @@ HTML;
 	public static function mergeKeyValue($array, $template = '%s - %s') {
 		$result = array();
 		foreach ($array as $key => $value) {
-			$result[$key] = sprintf($template, $key, $value);
+			$result[$key] = empty($key) ? $value : sprintf($template, $key, $value);
 		}
 		return $result;
 	}
 
+	/**
+	 * Carga el archivo de $_LANG correcto según las configuraciones del tenant,
+	 * por defecto ocupa el lenguaje 'es' y require_once
+	 *
+	 * @param string $lang Lang a cargar
+	 * @param boolean $include Define si se utiliza include o require_once
+	 */
+	public static function LoadLang($lang, $include = false) {
+		$_LANG = array();
+
+		if ($lang == '') {
+			$lang = 'es';
+		}
+
+		if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
+			$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
+		} else {
+			$lang_archivo = $lang . '.php';
+		}
+
+		if ($include) {
+			include Conf::ServerDir() . "/lang/$lang_archivo";
+		} else {
+			require_once Conf::ServerDir() . "/lang/$lang_archivo";
+		}
+
+		return $_LANG;
+	}
 }
