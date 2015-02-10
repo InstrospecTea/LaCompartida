@@ -51,6 +51,9 @@ if ($id_asunto > 0) {
 	if (!$Asunto->Load($id_asunto)) {
 		$Pagina->FatalError('Código inválido');
 	}
+	if ($Asunto->fields['id_contrato_indep'] == 0) {
+		$contrato_nuevo = true;
+	}
 
 	if ($Asunto->fields['id_contrato'] > 0) {
 		$contrato->Load($Asunto->fields['id_contrato']);

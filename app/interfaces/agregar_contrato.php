@@ -103,7 +103,7 @@ if (!empty($cliente->fields["id_contrato"])) {
 	$contrato_defecto->Load($cliente->fields["id_contrato"]);
 }
 
-$contrato_nuevo = false;
+$contrato_nuevo = isset($contrato_nuevo) ? $contrato_nuevo : false;
 if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
 	$contrato->fields = $cargar_datos_contrato_cliente_defecto;
 	$contrato_nuevo = true;
