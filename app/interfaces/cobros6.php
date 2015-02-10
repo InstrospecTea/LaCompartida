@@ -988,23 +988,23 @@ if (count($cobro->asuntos)) {
 			}
 
 			if (opcion == 'imprimir') {
-	<?php if (Conf::GetConf($sesion, 'ImprimirFacturaPdf') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+				<?php if (Conf::GetConf($sesion, 'ImprimirFacturaPdf') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 						nuovaFinestra('Imprimir_Factura',800,600,'agregar_factura.php?opc=generar_factura&id_cobro=<?php echo $id_cobro ?>&id_factura='+id_factura, 'top=500, left=500, scrollbars=yes');
 						//ValidarTodo(form);
-	<?php } else { ?>
+				<?php } else { ?>
 						form.opc.value='grabar_documento_factura';
 						form.id_factura_grabada.value = id_factura;
-	<?php } ?>
-				} else if(opcion =='imprimir_pdf') {
-					form.opc.value = 'grabar_documento_factura_pdf';
-					form.id_factura_grabada.value = id_factura;
-				} else {
-					$('facturado').checked = true;
-					form.opc.value = 'facturar';
-				}
+				<?php } ?>
+			} else if(opcion =='imprimir_pdf') {
+				form.opc.value = 'grabar_documento_factura_pdf';
+				form.id_factura_grabada.value = id_factura;
+			} else {
+				$('facturado').checked = true;
+				form.opc.value = 'facturar';
+			}
 
-				form.submit();
-				return true;
+			form.submit();
+			return true;
 <?php } else { ?>
 			alert('Funcionalidad en desarrollo.');
 			return false;

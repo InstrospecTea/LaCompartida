@@ -1,5 +1,57 @@
 # Changelog
 
+## Release: 15.2.0
+Jueves 5 de Febrero 2015
+
+[Release 15.2.0](https://github.com/LemontechSA/ttb/pull/845)
+
+* **Fix:** Agregar botón calendario al editar clientes
+* **Fix:** Al agregar un asunto si el filtro tiene un cliente seleccionado que ese cliente venga por defecto
+* **Fix:** Agregar logos en los excel de cobro
+* **Fix:** Mostrar observaciones en el reporte de liquidaciones en la sección de hitos
+* **Fix:** En gastos mostrar los gastos castigados
+* **Fix:** El formato de liquidación arroja dos valores distinto en distintas hojas
+* **Fix:** Al copiar los datos del contrato principal, copiar todo salvo los hitos
+* **Fix:** Corrige las horas facturables para que utilicen la duración en vez de la duración cobrada en reporte avanzado
+* **Fix:** Corrige el problema que considera todos los trabajos al editar (alerta de más de 24 horas)
+* **Fix:** Inconveniente para editar contratos desde la pestaña Pre-Liquidaciones (https://www.pivotaltracker.com/n/projects/286009/stories/85713666)
+* **Feature:** Permite seleccionar un giro de cliente o poder escribir un texto libre
+* **Fix:** Fix para giros cuando no hay giros en la tabla prm_giro y 99% de clientes actuales
+* **Fix:** Fix problemas con bind del formulario de grupos
+* **Fix:** No mostrar giros si no hay al agregar o editar asunto
+
+## Hotfix 15.1.12
+Viernes 6 de Febrero 2015
+* **Fix:** [Mantiene el lang anterior al cargar uno nuevo.](https://github.com/LemontechSA/ttb/pull/847)
+
+## Hotfix 15.1.11
+Viernes 6 de Febrero 2015
+* **Fix:** [Inicializa variable $_LANG como un array vacío.](https://github.com/LemontechSA/ttb/pull/846)
+
+## Hotfix 15.1.10
+Jueves 5 de Febrero 2015
+* **Fix:** [Agrega id_estudio a excel de Asunto, Factura y FacturaPago](https://github.com/LemontechSA/ttb/pull/844)
+
+## Hotfix 15.1.9
+Jueves 5 de Febrero 2015
+* **Fix:** [Agrega la propiedad $log_update al DAO (por defecto false) y se define true en ChargeDAO](https://github.com/LemontechSA/ttb/pull/843)
+
+## Hotfix 15.1.8
+Martes 3 de Febrero 2015
+* **Fix:** [Corrige la impresión masiva de cobros con el formato seleccionado](https://github.com/LemontechSA/ttb/pull/842)
+
+## Hotfix 15.1.7
+Martes 3 de Febrero 2015
+* **Fix:** [Agrega twig a la nota de cobro](https://github.com/LemontechSA/ttb/pull/841)
+
+## Hotfix 15.1.6
+Martes 3 de Febrero 2015
+* **Fix:** [Corrige la inclusión al archivo lang en la nota de cobro](https://github.com/LemontechSA/ttb/pull/839)
+
+## Hotfix 15.1.5
+Lunes 2 de Febrero 2015
+* **Fix:** [Corrige funcion quitada de webkit](https://github.com/LemontechSA/ttb/pull/838)
+
 ## Hotfix: 15.1.4
 Lunes 2 de Febrero 2015
 * **Fix:** [Vuelve a utilizar el Conf CantidadDecimalesTotalFactura si tiene algún valor y lo considera por sobre los decimales de la moneda del cobro](https://github.com/LemontechSA/ttb/pull/836)

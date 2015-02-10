@@ -37,5 +37,4 @@ namespace :deploy do
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'
   
-
 end
