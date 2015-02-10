@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.1.13
+Martes 10 de Febrero 2015
+* **Fix:** [Configura twig con Charset iso-8859-1.](https://github.com/LemontechSA/ttb/pull/848)
+
 ## Hotfix 15.1.12
 Viernes 6 de Febrero 2015
 * **Fix:** [Mantiene el lang anterior al cargar uno nuevo.](https://github.com/LemontechSA/ttb/pull/847)
