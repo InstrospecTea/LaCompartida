@@ -14,20 +14,20 @@ class CobroPendiente extends Objeto {
 		$this->fields = $fields;
 		$this->guardar_fecha = false;
 	}
-	
+
 	#asocia los cobros pendientes por fecha y contrato
 	function AsociarCobro($sesion,$id_cobro) {
 		$query = "UPDATE cobro_pendiente SET id_cobro='$id_cobro' WHERE id_cobro_pendiente='".$this->fields['id_cobro_pendiente']."'";
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		return true;
 	}
-	
+
 	#se borran todas las fechas del contrato
 	function EliminarPorContrato($sesion,$id_contrato) {
 		$query = "DELETE FROM cobro_pendiente WHERE id_contrato = '$id_contrato' AND id_cobro IS NULL";
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	}
-	
+
 	#funcion que se corre una vez al mes por cron para generar los nuevos
 	function GenerarCobrosPeriodicos($sesion) {
 		$query = "SELECT id_contrato,periodo_intervalo,periodo_repeticiones,monto,
@@ -37,8 +37,8 @@ class CobroPendiente extends Objeto {
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		while($contrato = mysql_fetch_array($resp)) {
 			#se saca la ultima fecha en la lista del contrato
-			$query2 = "SELECT SQL_CALC_FOUND_ROWS fecha_cobro 
-						FROM cobro_pendiente 
+			$query2 = "SELECT SQL_CALC_FOUND_ROWS fecha_cobro
+						FROM cobro_pendiente
 						WHERE id_contrato='".$contrato['id_contrato']."' AND hito = 0 ORDER BY fecha_cobro DESC LIMIT 1";
 			$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 			list($ultima_fecha) = mysql_fetch_array($resp2);
@@ -49,9 +49,9 @@ class CobroPendiente extends Objeto {
 			list($numero_pendientes) = mysql_fetch_array($resp3);
 
 			#datos del siguiente cobro pendiente por contrato
-			if($numero_pendientes > 0 
-					&& $contrato['periodo_repeticiones']==0 
-					&& $contrato['periodo_intervalo']!=0 
+			if($numero_pendientes > 0
+					&& $contrato['periodo_repeticiones']==0
+					&& $contrato['periodo_intervalo']!=0
 					&& ($numero_pendientes*$contrato['periodo_intervalo']) < 24) {
 				$numero_pendientes++;
 				$siguiente_fecha = strtotime(date("Y-m-d", strtotime($ultima_fecha)) . " +".$contrato['periodo_intervalo']." month");
@@ -75,11 +75,11 @@ class CobroPendiente extends Objeto {
 	}
 
 	function MontoHitosLiquidados($contrato) {
-		$sql = "SELECT SUM(cobro_pendiente.monto_estimado) AS monto 
+		$sql = "SELECT SUM(cobro_pendiente.monto_estimado) AS monto
 		FROM cobro_pendiente
 			JOIN cobro ON cobro_pendiente.id_cobro = cobro.id_cobro
-		WHERE cobro_pendiente.id_cobro IS NOT NULL AND 
-		cobro_pendiente.hito = 1 AND 
+		WHERE cobro_pendiente.id_cobro IS NOT NULL AND
+		cobro_pendiente.hito = 1 AND
 		cobro_pendiente.id_contrato = " . $contrato . " AND
 		cobro.estado NOT IN ('PAGADO')";
 		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
@@ -88,18 +88,18 @@ class CobroPendiente extends Objeto {
 	}
 
 	function MontoHitosPagados($contrato) {
-		$sql = "SELECT SUM(cobro_pendiente.monto_estimado) AS monto 
+		$sql = "SELECT SUM(cobro_pendiente.monto_estimado) AS monto
 		FROM cobro_pendiente
 			JOIN cobro ON cobro_pendiente.id_cobro = cobro.id_cobro
-		WHERE cobro_pendiente.id_cobro IS NOT NULL AND 
-		cobro_pendiente.hito = 1 AND 
+		WHERE cobro_pendiente.id_cobro IS NOT NULL AND
+		cobro_pendiente.hito = 1 AND
 		cobro_pendiente.id_contrato = " . $contrato . " AND
 		cobro.estado IN ('PAGADO')";
 		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
 		list($monto) = mysql_fetch_array($query);
 		return empty($monto) ? 0 : $monto;
 	}
-	
+
 	function ObtenerHitosCumplidosParaCorreos() {
 		$sql = "SELECT
 			cobro_pendiente.id_cobro_pendiente,
@@ -114,14 +114,14 @@ class CobroPendiente extends Objeto {
 			cliente.codigo_cliente,
 			cobro_pendiente.fecha_cobro,
 			GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ', ') as asuntos
-		FROM 
-			cobro_pendiente 
+		FROM
+			cobro_pendiente
 			LEFT JOIN contrato ON cobro_pendiente.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
 			LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
 			LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
 			LEFT JOIN asunto ON contrato.id_contrato = asunto.id_contrato
-		WHERE 
+		WHERE
 			cobro_pendiente.hito = 1 AND
 			cobro_pendiente.fecha_cobro IS NOT NULL AND
 			cobro_pendiente.fecha_cobro <= NOW() AND
@@ -169,7 +169,7 @@ class CobroPendiente extends Objeto {
 					'fecha_cobro' => $hito['fecha_cobro']
 				);
 			}
-			
+
 			$sql = "UPDATE cobro_pendiente SET fecha_cobro = NULL WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
 			mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
 		}

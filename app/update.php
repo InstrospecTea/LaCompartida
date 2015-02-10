@@ -10628,6 +10628,82 @@ QUERY;
 		case 7.93:
 			$queries[] = "INSERT INTO `prm_tipo_correo` (`nombre`) VALUES ('proceso')";
 			break;
+
+		case 7.94:
+			$queries = array();
+			if (!ExisteCampo('desglose_referencia', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente` ADD `desglose_referencia` VARCHAR(255) NULL COMMENT 'este campo contiene una referencia del cliente adicional' AFTER `id_cliente_referencia` ;";
+			}
+			if (!ExisteCampo('requiere_desglose', 'prm_cliente_referencia', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_cliente_referencia` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
+			}
+			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
+			}
+			if (!ExisteCampo('contraparte', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `contraparte` VARCHAR(255) NULL COMMENT 'este campo contiene un texto libre para el nombre de la contraparte' AFTER `contacto` ;";
+			}
+			if (!ExisteCampo('cotizado_con', 'asunto', $dbh)) {
+				$queries[] = "ALTER TABLE `asunto` ADD `cotizado_con` VARCHAR(255) NULL COMMENT 'contiene una descripción de otro asunto cotizado en conjunto' AFTER `contraparte` ;";
+			}
+			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
+			}
+			if (!ExisteCampo('id_pais', 'grupo_cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `grupo_cliente` ADD `id_pais` int(11) NULL;";
+			}
+
+			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
+				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
+				`id_area_proyecto` int(11) NOT NULL,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_area_proyecto_desglose`),
+				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
+				CONSTRAINT `fk_prm_area_proyecto_id`
+				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`) ON DELETE CASCADE);";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_area_proyecto_desglose` (
+				`id_asunto` INT(11) NOT NULL,
+				`id_area_proyecto_desglose` INT(11) NOT NULL,
+				INDEX `fk_asunto_area_proyecto_desglose` (`id_asunto` ASC),
+				INDEX `fk_prm_area_proyecto_desglose_asunto` (`id_area_proyecto_desglose` ASC),
+				CONSTRAINT `fk_asunto_area_proyecto_desglose` FOREIGN KEY (`id_asunto`)
+					REFERENCES `asunto` (`id_asunto`)  ON DELETE CASCADE,
+				CONSTRAINT `fk_prm_area_proyecto_desglose_asunto` FOREIGN KEY (`id_area_proyecto_desglose`)
+					REFERENCES `prm_area_proyecto_desglose` (`id_area_proyecto_desglose`)  ON DELETE CASCADE);";
+
+			$queries[] = "CREATE TABLE  IF NOT EXISTS `prm_area_proyecto_desglose` (
+				`id_area_proyecto_desglose` int(11) NOT NULL AUTO_INCREMENT,
+				`id_area_proyecto` int(11) NOT NULL,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_area_proyecto_desglose`),
+				INDEX `fk_prm_area_proyecto_id` (`id_area_proyecto` ASC),
+				CONSTRAINT `fk_prm_area_proyecto_id`
+				FOREIGN KEY (`id_area_proyecto`) REFERENCES `prm_area_proyecto` (`id_area_proyecto`));";
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_giro` (
+				`id_giro` int(11) NOT NULL AUTO_INCREMENT,
+				`glosa` varchar(120) NOT NULL,
+				`requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0',
+				`orden` int(11) NOT NULL DEFAULT '0',
+				PRIMARY KEY (`id_giro`),
+				INDEX `fk_prm_giro_id` (`id_giro` ASC));";
+
+
+			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_giro` (
+				`id_asunto` INT(11) NOT NULL,
+				`id_giro` INT(11) NOT NULL,
+				INDEX `fk_asunto_asunto_giro` (`id_asunto` ASC),
+				INDEX `fk_prm_giro_asunto_giro` (`id_giro` ASC),
+				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`)
+					REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
+				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`)
+					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10640,7 +10716,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.93;
+$max_update = 7.94;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

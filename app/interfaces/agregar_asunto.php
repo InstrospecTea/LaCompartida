@@ -1,11 +1,16 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
+use TTB\Pagina as Pagina;
 
 $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
-$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
+
+$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
+
 $Form = new Form;
+$SelectHelper = new FormSelectHelper();
+$AutocompleteHelper = new FormAutocompleteHelper();
 
 if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
 	$codigo_obligatorio = true;
@@ -117,7 +122,7 @@ if ($opcion == 'guardar') {
 			$Pagina->AddError(__("Por favor ingrese el codigo del cliente"));
 		}
 		if (empty($id_area_proyecto)) {
-			$Pagina->AddError(__("Por favor ingrese el área del asunto"));	
+			$Pagina->AddError(__("Por favor ingrese el área del asunto"));
 		}
 	}
 
@@ -177,12 +182,25 @@ if ($opcion == 'guardar') {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		}
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
-		$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
+		if (!empty($id_area_proyecto)) {
+			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
+		} else {
+			$Asunto->Edit("id_area_proyecto", "NULL");
+		}
+
+		if (!is_null($desglose_area)) {
+			$Asunto->Edit("desglose_area", $desglose_area);
+		}
+		if (!is_null($giro)) {
+			$Asunto->Edit("giro", $giro);
+		}
 		$Asunto->Edit("id_idioma", $id_idioma);
 		$Asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
 		$Asunto->Edit("id_encargado2", !empty($id_encargado2) ? $id_encargado2 : "NULL");
 		$Asunto->Edit("contacto", $asunto_contacto);
+		$Asunto->Edit("contraparte", $contraparte);
+		$Asunto->Edit("cotizado_con", $cotizado_con);
 		$Asunto->Edit("fono_contacto", $fono_contacto);
 		$Asunto->Edit("email_contacto", $email_contacto);
 		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
@@ -274,8 +292,11 @@ if ($opcion == 'guardar') {
 				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
 
-				if ($Asunto->Write())
+				if ($Asunto->Write()) {
+					$Asunto->writeAreaDetails($id_desglose_area);
+					$Asunto->writeEconomicActivities($id_asunto_giro);
 					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+				}
 				else
 					$Pagina->AddError($Asunto->error);
 
@@ -311,6 +332,8 @@ if ($opcion == 'guardar') {
 			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 			$Asunto->Edit("id_contrato_indep", null);
 			if ($Asunto->Write()) {
+				$Asunto->writeAreaDetails($id_desglose_area);
+				$Asunto->writeEconomicActivities($id_asunto_giro);
 				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito'));
 				$ContratoObj = new Contrato($Sesion);
 				$ContratoObj->Load($Contrato_indep);
@@ -666,7 +689,51 @@ function MuestraPorValidacion(divID) {
 								<?php echo __('Área') . ' ' . __('asunto') ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden ASC'), 'id_area_proyecto', $Asunto->fields['id_area_proyecto'], '', '', '300px'); ?>
+
+							<?php echo $SelectHelper->ajax_select(
+									'id_area_proyecto',
+									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto,
+									array('class' => 'span3', 'style' => 'display:inline'),
+									array(
+										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
+										'onChange' => '
+											var element = selected_id_area_proyecto;
+											jQuery("#id_desglose_area_container").hide();
+											jQuery("#desglose_area").hide()
+											if (element && element.requiere_desglose == "1") {
+												jQuery("#id_desglose_area_container").show();
+												FormSelectHelper.reload_id_desglose_area();
+											}
+										'
+									)
+								);
+								?>
+								<span style="color:#FF0000; font-size:10px">*</span>
+								<?php echo $SelectHelper->checkboxes(
+										'id_desglose_area',
+										array(),
+									 	$Asunto->getAreaDetails(),
+									 	array('class' => 'span6', 'style' => 'display:inline'),
+									 	array(
+										 	'autoload' => false,
+											'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
+											'onSource' => '
+												source = source + "&q=id_area_proyecto:" + jQuery("#id_area_proyecto").val();
+											',
+											'onChange' => '
+												var element = selected_id_desglose_area;
+												if (element && element.requiere_desglose == "1") {
+													if (checked) {
+														jQuery("#desglose_area").show();
+													} else {
+														jQuery("#desglose_area").val("").hide();
+													}
+												}
+											'
+										)
+									);
+								echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
+								?>
 							</td>
 						</tr>
 						<tr>
@@ -678,6 +745,41 @@ function MuestraPorValidacion(divID) {
 							</td>
 						</tr>
 
+						<?php 
+							$prmGiro = new PrmGiro($Sesion);
+							$giros = $prmGiro->ListarExt();
+							if (count($giros) > 0) {
+						?>
+						<tr>
+							<td align="right">
+								<?php echo __('Giro') ?>
+							</td>
+							<td align="left">
+								<?php echo $SelectHelper->checkboxes(
+										'id_asunto_giro',
+										array(),
+									 	$Asunto->getEconomicActivities(),
+									 	array('class' => 'span6', 'style' => 'display:inline'),
+									 	array(
+										 	'autoload' => true,
+											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
+											'onChange' => '
+												var element = selected_id_asunto_giro;
+												if (element && element.requiere_desglose == "1") {
+													if (checked) {
+														jQuery("#giro").show();
+													} else {
+														jQuery("#giro").val("").hide();
+													}
+												}
+											'
+										)
+									);
+								echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
+								?>
+							</td>
+						</tr>
+						<?php } ?>
 						<tr>
 							<td align="right">
 								<?php echo __('Usuario responsable'); ?>
@@ -701,6 +803,22 @@ function MuestraPorValidacion(divID) {
 								</td>
 							</tr>';
 						<?php } ?>
+						<tr>
+							<td align="right">
+								<?php echo __('Contraparte') ?>
+							</td>
+							<td align="left">
+								<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<?php echo __('Cotizado conjuntamente con') ?>
+							</td>
+							<td align="left">
+								<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<?php echo __('Contacto solicitante') ?>
@@ -924,7 +1042,7 @@ function MuestraPorValidacion(divID) {
 <?php echo InputId::Javascript($Sesion) ?>
 
 <?php
-$Pagina->PrintBottom($popup);
+$Pagina->PrintBottom($popup, false, true);
 
 function EnviarEmail($Asunto) {
 

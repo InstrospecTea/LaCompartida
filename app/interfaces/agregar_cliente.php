@@ -11,6 +11,7 @@ $contrato = new Contrato($Sesion);
 $archivo = new Archivo($Sesion);
 $codigo_obligatorio = true;
 $Form = new Form;
+$SelectHelper = new FormSelectHelper();
 
 if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
 	if (!Conf::CodigoObligatorio()) {
@@ -139,6 +140,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("alerta_monto", $cliente_alerta_monto);
 		$cliente->Edit("limite_hh", $cliente_limite_hh);
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
+		$cliente->Edit("desglose_referencia", $desglose_referencia);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 
 
@@ -292,6 +294,7 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 //	SEGMENTO USUARIO ENCARGADO
 
 $segmento_usuario_encargado = '';
+$validar_usuario_encargado = false;
 
 if (Conf::GetConf($Sesion, 'VerCampoUsuarioEncargado') != 1) {
 
@@ -311,6 +314,7 @@ if (Conf::GetConf($Sesion, 'VerCampoUsuarioEncargado') != 1) {
 			$segmento_usuario_encargado .= Html::SelectQuery($Sesion, $query, "id_usuario_encargado", $id_default, " class='span3' ", 'Vacio', 'width="170"');
 			$segmento_usuario_encargado .= '</td>';
 			$segmento_usuario_encargado .= '</tr>';
+			$validar_usuario_encargado = true;
 		}
 	}
 }
@@ -330,7 +334,32 @@ if (Conf::GetConf($Sesion, 'ClienteReferencia')) {
 	$segmento_cliente_referencia .= '</td>';
 	$segmento_cliente_referencia .= '<td class="al">';
 	$segmento_cliente_referencia .= '<div class="span2">';
-	$segmento_cliente_referencia .= Html::SelectQuery($Sesion, "SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC", "id_cliente_referencia", $cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', " class='span3' ", "Vacio");
+
+	$segmento_cliente_referencia .= $SelectHelper->ajax_select(
+		'id_cliente_referencia',
+		$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : $id_cliente_referencia,
+		array('class' => 'span3', 'style' => 'display:inline'),
+		array(
+			'source' => 'ajax/ajax_prm.php?prm=ClienteReferencia&fields=orden,requiere_desglose',
+			'onLoad' => '
+				var element = selected_id_cliente_referencia;
+				jQuery("#desglose_referencia").hide();
+				if (element && element.requiere_desglose == "1") {
+					jQuery("#desglose_referencia").show();
+				}
+			',
+			'onChange' => '
+				var element = selected_id_cliente_referencia;
+				jQuery("#desglose_referencia").hide();
+				if (element && element.requiere_desglose == "1") {
+					jQuery("#desglose_referencia").show();
+				}
+			'
+		)
+	);
+
+	$segmento_cliente_referencia .= '&nbsp;';
+	$segmento_cliente_referencia .= $Form->input('desglose_referencia', $cliente->fields['desglose_referencia'], array('placeholder' => 'Referido', 'style' => 'display:none', 'class' => 'span5', 'label' => false, 'id' => 'desglose_referencia'));
 	$segmento_cliente_referencia .= '</div>';
 	$segmento_cliente_referencia .= '</td>';
 	$segmento_cliente_referencia .= '</tr>';
@@ -397,7 +426,111 @@ $Pagina->PrintTop();
 					<div class="span2"><?php echo __('Grupo') ?></div>
 				</td>
 				<td class="al">
-					<?php echo Html::SelectQuery($Sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], " class='span3' ", __('Ninguno')) ?>
+					<?php echo $SelectHelper->ajax_select(
+						'id_grupo_cliente',
+						$cliente->fields['id_grupo_cliente'] ? $cliente->fields['id_grupo_cliente'] : $id_grupo_cliente,
+						array('id' => 'id_grupo_cliente', 'class' => 'span3', 'style' => 'display:inline'),
+						array(
+						  'source' => 'ajax/ajax_prm.php?prm=GrupoCliente&single_class=1&fields=glosa_grupo_cliente,codigo_cliente,id_pais,id_grupo_cliente',
+						  'selectedName' => 'selected_group',
+						  'onLoad' => '
+							var element = selected_group;
+							jQuery("#edit_group").hide()
+							if (element && element.id_grupo_cliente) {
+								jQuery("#edit_group").show()
+							}
+						  ',
+						  'onChange' => '
+							var element = selected_group;
+							jQuery("#edit_group").hide()
+							if (element && element.id_grupo_cliente) {
+								jQuery("#edit_group").show()
+							}
+						  '
+						)
+					  );
+					  ?>
+
+					<a href="#" id="add_group" ><img border="0" src="<?php echo Conf::ImgDir()?>/agregar.gif"></a>
+					<a href="#" id="edit_group" style="display:none;"><img border="0" src="<?php echo Conf::ImgDir()?>/editar_on.gif"></a>
+					<script>
+					jQuery(document).ready(function() {
+						var closeModalGrupo = function() {
+							jQuery('#formulario-grupo #id_pais_grupo').remove();
+							jQuery('#formulario-grupo #guardar_grupo').remove();
+							jQuery('#formulario-grupo #cancelar_grupo').remove();
+							jQuery('#formulario-grupo #eliminar_grupo').remove();
+							jQuery('#formulario-grupo').closest('.ui-dialog-content').dialog('destroy').remove();
+						};
+
+						var saveGroup = function() {
+							var url = '../../fw/tablas/ajax_tablas.php';
+							jQuery.post(url, jQuery('#formulario-grupo').serialize(), function(data) {
+								if (data.success) {
+									FormSelectHelper.reload_id_grupo_cliente();
+								} else {
+									alert('Ocurrio un error al guardar.');
+								}
+								closeModalGrupo();
+							}, 'json');
+						  return false;
+									};
+
+						var deleteGroup = function(id) {
+							if (!confirm('¿Está seguro de eliminar el grupo seleccionado?')) {
+								return;
+							}
+							var url = '../../fw/tablas/ajax_tablas.php';
+							jQuery('#formulario-grupo input[name="accion"]').val('eliminar_registro');
+							jQuery.post(url, jQuery('#formulario-grupo').serialize(), function(data) {
+								if (data.success) {
+									FormSelectHelper.reload_id_grupo_cliente();
+								} else {
+									alert('Ocurrio un error al eliminar. Quizá el grupo esté asociado a otro cliente');
+								}
+								closeModalGrupo();
+							}, 'json');
+						  return false;
+						}
+
+						var editGroup = function(id) {
+							var url = 'editar_grupo.php';
+							jQuery.post(url, {'tabla': 'grupo_cliente', id: id}, function(html) {
+								jQuery('<div/>').html(html).dialog({
+									title: 'Agregar/Modificar Grupo',
+									width: 400,
+									height: 300,
+									modal: true,
+									close: function() {
+										closeModalGrupo();
+									}
+								});
+								jQuery('#guardar_grupo').click(function() {
+								  saveGroup();
+								});
+								jQuery('#cancelar_grupo').click(function() {
+								  closeModalGrupo();
+								});
+								jQuery('#eliminar_grupo').click(function() {
+									deleteGroup(jQuery('#id_grupo_cliente').val());
+								  closeModalGrupo();
+								});
+							}, 'html');
+							return false;
+						};
+
+						jQuery('#add_group').click(function() {
+							editGroup();
+							return false;
+						})
+
+						jQuery('#edit_group').click(function() {
+							editGroup(jQuery('#id_grupo_cliente').val());
+							return false;
+						});
+
+					});
+					</script>
 				</td>
 			</tr>
 
@@ -717,7 +850,7 @@ $Pagina->PrintTop();
 			}
 		}
 
-		<?php if ($validacionesCliente) { ?>
+		<?php if ($validacionesCliente && $validar_usuario_encargado) { ?>
 			if (form.id_usuario_encargado.value == "-1") {
 				alert("<?php echo __('Debe seleccionar un usuario encargado') ?>");
 				form.id_usuario_encargado.focus();

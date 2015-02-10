@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-class GrupoCliente extends Objeto {
+class GrupoCliente extends ObjetoExt {
 
 	public static $llave_carga_masiva = 'glosa_grupo_cliente';
 

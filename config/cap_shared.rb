@@ -30,7 +30,7 @@ set :deploy_dir_name, "deploy"
 set :virtual_directory, "/var/www/virtual"
 set :file_path, "#{deploy_dir_name}/#{application}"
 set :deploy_to, "#{base_directory}/#{file_path}"
- 
+
 namespace :composer do
   desc "Setup composer dir and install"
   task :setup do
@@ -42,7 +42,7 @@ namespace :composer do
 
   desc "Install libs"
   task :install do
-    run "cd #{shared_path}/composer && sudo /usr/local/bin/composer update"
+    run "cd #{shared_path}/composer && sudo /usr/local/bin/composer update --no-dev"
   end
 
   desc "Update composer symlinks"
@@ -66,7 +66,7 @@ def update_database(cap_vars)
       puts "\n\e[0;31m      * marked for update: #{i.attributes['dominio']} \e[0m\n"
     else
       i.attributes['update_db'] = '0'
-    end 
+    end
   end
   puts "\n Finished!! \n"
 end

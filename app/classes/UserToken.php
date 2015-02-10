@@ -147,8 +147,7 @@ class UserToken extends Objeto {
 	}
 
 	function getAppIdByAppKey($app_key) {
-		$sql = "SELECT `application`.`id`
-				FROM `application` WHERE `application`.`app_key`=:app_key";
+		$sql = "SELECT `application`.`id` FROM `application` WHERE `application`.`app_key`=:app_key";
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('app_key', $app_key);
 		$Statement->execute();
