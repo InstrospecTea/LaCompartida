@@ -10684,15 +10684,15 @@ QUERY;
 				PRIMARY KEY (`id_giro`),
 				INDEX `fk_prm_giro_id` (`id_giro` ASC));";
 
-			$queries[] = "CREATE TABLE IF NOT EXISTS `asunto_giro` (
-				`id_asunto` INT(11) NOT NULL,
-				`id_giro` INT(11) NOT NULL,
-				INDEX `fk_asunto_asunto_giro` (`id_asunto` ASC),
-				INDEX `fk_prm_giro_asunto_giro` (`id_giro` ASC),
-				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`)
-					REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
-				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`)
-					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
+			$queries[] = "CREATE TABLE `asunto_giro` (
+				`id_asunto` int(11) NOT NULL,
+				`id_giro` int(11) NOT NULL,
+				PRIMARY KEY (`id_asunto`,`id_giro`),
+				KEY `fk_asunto_asunto_giro` (`id_asunto`),
+				KEY `fk_prm_giro_asunto_giro` (`id_giro`),
+				CONSTRAINT `fk_asunto_asunto_giro` FOREIGN KEY (`id_asunto`) REFERENCES `asunto` (`id_asunto`) ON DELETE CASCADE,
+				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`) REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE
+			) ENGINE=InnoDB;";
 			break;
 	}
 
