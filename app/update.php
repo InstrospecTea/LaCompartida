@@ -44,7 +44,7 @@ function ExisteLlaveForanea($tabla, $columna, $tabla_referenciada, $columna_refe
 	$db_name = Conf::dbName();
 	$foraneaquery = "SELECT constraint_name
 						FROM information_schema.KEY_COLUMN_USAGE
-						WHERE REFERENCED_TABLE_SCHEMA = '$db_name'
+						WHERE TABLE_SCHEMA = '$db_name'
 						AND REFERENCED_TABLE_NAME='$tabla_referenciada'
 						AND table_name='$tabla'
 						AND referenced_column_name ='$columna_referenciada'
@@ -10704,6 +10704,11 @@ QUERY;
 				CONSTRAINT `fk_prm_giro_asunto_giro` FOREIGN KEY (`id_giro`)
 					REFERENCES `prm_giro` (`id_giro`) ON DELETE CASCADE);";
 			break;
+
+		case 7.95:
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+				VALUES ('UsaFechaDesdeUltimoCobro', '0', 'Permite definir automáticamente la fecha desde de los cobros según la fecha del último cobro emitido + 1', 'boolean', '6', -1)";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10716,7 +10721,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.94;
+$max_update = 7.95;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
