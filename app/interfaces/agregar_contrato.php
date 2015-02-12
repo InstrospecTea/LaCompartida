@@ -2191,20 +2191,23 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</thead>
 								<tbody id="body_hitos">
 									<?php
-									$Criteria = new Criteria($Sesion);
-									$cobros_pendientes = $Criteria
-											->add_from('cobro_pendiente')
-											->add_select('fecha_cobro')
-											->add_select('descripcion')
-											->add_select('monto_estimado')
-											->add_select($contrato_nuevo ? 'NULL' : 'id_cobro', 'id_cobro')
-											->add_select('observaciones')
-											->add_restriction(CriteriaRestriction::and_clause(
-													CriteriaRestriction::equals('id_contrato', $contrato->fields['id_contrato']),
-													CriteriaRestriction::equals('hito', '1')
-											))
-											->add_ordering('id_cobro_pendiente')
-											->run();
+									$cobros_pendientes = array();
+									if ($contrato->Loaded()) {
+										$Criteria = new Criteria($Sesion);
+										$cobros_pendientes = $Criteria
+												->add_from('cobro_pendiente')
+												->add_select('fecha_cobro')
+												->add_select('descripcion')
+												->add_select('monto_estimado')
+												->add_select($contrato_nuevo ? 'NULL' : 'id_cobro', 'id_cobro')
+												->add_select('observaciones')
+												->add_restriction(CriteriaRestriction::and_clause(
+														CriteriaRestriction::equals('id_contrato', $contrato->fields['id_contrato']),
+														CriteriaRestriction::equals('hito', '1')
+												))
+												->add_ordering('id_cobro_pendiente')
+												->run();
+									}
 									$total_cobros_pendientes = count($cobros_pendientes);
 									for ($i = 2; $i - 2 < $total_cobros_pendientes; $i++) {
 										$temp = $cobros_pendientes[$i - 2];
