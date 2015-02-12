@@ -540,7 +540,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 			<?php
 			$numero_documento = '';
-
 			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 				$serie = $factura->Loaded() ? $factura->fields['serie_documento_legal'] : $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
@@ -1466,7 +1465,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		var total = Number($('monto_neto').value.replace(',', '.')) + Number($('iva').value.replace(',', '.'));
 		$('total').value = total.toFixed(decimales);
 
-
 		if (cantidad_decimales != -1) {
 
 			jQuery('.aproximable').each(function() {
@@ -1712,9 +1710,9 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 	jQuery(document).ready(function() {
 		jQuery(document).data('estudio_serie_numero', {
-			'estudio': jQuery('#id_estudio').attr('value'),
-			'serie': jQuery('#serie').attr('value'),
-			'numero': jQuery('#numero').attr('value')
+			'estudio': jQuery('#id_estudio').val(),
+			'serie': jQuery('#serie').val(),
+			'numero': jQuery('#numero').val()
 		});
 
 		jQuery('#codigo_cliente,#campo_codigo_cliente').change(function() {

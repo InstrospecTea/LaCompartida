@@ -236,11 +236,43 @@ class Asunto extends Objeto {
 			)
 		),
 		array(
+			'field' => 'desglose_area',
+			'title' => 'Desglose área',
+			'visible' => false,
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'sector_economico',
+			'title' => 'Sector económico',
+			'visible' => false,
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
 			'field' => 'fecha_creacion',
 			'title' => 'Fecha Creación',
 			'format' => 'date',
 			'extras' => array(
 				'width' => 20
+			)
+		),
+		array(
+			'field' => 'contraparte',
+			'title' => 'Contraparte',
+			'visible' => false,
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'cotizado_con',
+			'title' => 'Cotizado Conjuntamente con',
+			'visible' => false,
+			'extras' => array(
+				'width' => 40
 			)
 		),
 		array(
@@ -556,56 +588,55 @@ class Asunto extends Objeto {
 	}
 
 	public function QueryReporte($filtros = array()) {
-		extract($filtros);
 		$wheres = array();
 
-		if ($activo) {
-			$wheres[] = "a1.activo = " . ($activo == 'SI' ? 1 : 0);
+		if ($filtros['activo']) {
+			$wheres[] = "a1.activo = " . ($filtros['activo'] == 'SI' ? 1 : 0);
 		}
 
-		if ($id_grupo_cliente) {
-			$wheres[] = "cliente.id_grupo_cliente = '$id_grupo_cliente'";
+		if ($filtros['id_grupo_cliente']) {
+			$wheres[] = "cliente.id_grupo_cliente = '{$filtros['id_grupo_cliente']}'";
 		}
 
-		if ($codigo_asunto != "") {
-			$wheres[] = "a1.codigo_asunto LIKE '$codigo_asunto%'";
+		if ($filtros['codigo_asunto'] != "") {
+			$wheres[] = "a1.codigo_asunto LIKE '{$filtros['codigo_asunto']}%'";
 		}
 
-		if ($glosa_asunto != "") {
-			$nombre = strtr($glosa_asunto, ' ', '%');
+		if ($filtros['glosa_asunto'] != "") {
+			$nombre = strtr($filtros['glosa_asunto'], ' ', '%');
 			$wheres[] = "a1.glosa_asunto LIKE '%$nombre%'";
 		}
 
-		if ($codigo_cliente || $codigo_cliente_secundario) {
+		if ($filtros['codigo_cliente'] || $filtros['codigo_cliente_secundario']) {
 			if (UtilesApp::GetConf($this->sesion,'CodigoSecundario')) {
-				$wheres[] = "cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
+				$wheres[] = "cliente.codigo_cliente_secundario = '{$filtros['codigo_cliente_secundario']}'";
 				$cliente = new Cliente($this->sesion);
-				if ($cliente->LoadByCodigoSecundario($codigo_cliente_secundario)) {
+				if ($cliente->LoadByCodigoSecundario($filtros['codigo_cliente_secundario'])) {
 					$codigo_cliente = $cliente->fields['codigo_cliente'];
 				}
 			} else {
-				$wheres[] = "cliente.codigo_cliente = '$codigo_cliente'";
+				$wheres[] = "cliente.codigo_cliente = '{$filtros['codigo_cliente']}'";
 			}
 		}
 
-		if ($opc == "entregar_asunto") {
-			$wheres[] = "a1.codigo_cliente = '$codigo_cliente' ";
+		if ($filtros['opc'] == "entregar_asunto") {
+			$wheres[] = "a1.codigo_cliente = '{$filtros['codigo_cliente']}' ";
 		}
 
-		if ($fecha1 || $fecha2) {
-			$wheres[] = "a1.fecha_creacion BETWEEN '" . Utiles::fecha2sql($fecha1) . "' AND '" . Utiles::fecha2sql($fecha2) . " 23:59:59'";
+		if ($filtros['fecha1'] || $filtros['fecha2']) {
+			$wheres[] = "a1.fecha_creacion BETWEEN '" . Utiles::fecha2sql($filtros['fecha1']) . "' AND '" . Utiles::fecha2sql($filtros['fecha2']) . " 23:59:59'";
 		}
 
-		if ($motivo == "cobros") {
+		if ($filtros['motivo'] == "cobros") {
 			$wheres[] = "a1.activo='1' AND a1.cobrable = '1'";
 		}
 
-		if ($id_usuario) {
-			$wheres[] = "a1.id_encargado = '$id_usuario' ";
+		if ($filtros['id_usuario']) {
+			$wheres[] = "a1.id_encargado = '{$filtros['id_usuario']}' ";
 		}
 
-		if ($id_area_proyecto) {
-			$wheres[] = "a1.id_area_proyecto = '$id_area_proyecto' ";
+		if ($filtros['id_area_proyecto']) {
+			$wheres[] = "a1.id_area_proyecto = '{$filtros['id_area_proyecto']}' ";
 		}
 
 		$on_encargado2 = UtilesApp::GetConf($this->sesion, 'EncargadoSecundario') ? "contrato.id_usuario_secundario" : "a1.id_encargado2";
@@ -613,7 +644,7 @@ class Asunto extends Objeto {
 		$where = empty($wheres) ? '' : (' WHERE ' . implode(' AND ', $wheres));
 
 		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
-		return "SELECT SQL_CALC_FOUND_ROWS
+		$query = "SELECT SQL_CALC_FOUND_ROWS
 			a1.codigo_asunto,
 			a1.codigo_asunto_secundario as codigo_secundario,
 			a1.glosa_asunto,
@@ -655,8 +686,42 @@ class Asunto extends Objeto {
 				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas,
 
 			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
-			prm_estudio.glosa_estudio
 
+			contraparte,
+			cotizado_con";
+
+		if ($filtros['ver_desglose_area']) {
+			$query .= "
+				, (SELECT GROUP_CONCAT(DISTINCT CASE
+								WHEN prm_area_proyecto_desglose.requiere_desglose = 1
+								THEN CONCAT(prm_area_proyecto_desglose.glosa, ': ', a1.desglose_area)
+								ELSE prm_area_proyecto_desglose.glosa END)
+					FROM asunto_area_proyecto_desglose
+					INNER JOIN prm_area_proyecto_desglose
+						ON asunto_area_proyecto_desglose.id_area_proyecto_desglose = prm_area_proyecto_desglose.id_area_proyecto_desglose
+					WHERE prm_area_proyecto_desglose.id_area_proyecto = prm_area_proyecto.id_area_proyecto
+						AND asunto_area_proyecto_desglose.id_asunto = a1.id_asunto
+					ORDER BY prm_area_proyecto_desglose.glosa ASC) AS desglose_area";
+		}
+
+		if ($filtros['ver_sector_economico']) {
+			$query .= "
+				, (SELECT GROUP_CONCAT(DISTINCT CASE
+								WHEN prm_giro.requiere_desglose = 1
+								THEN CONCAT(prm_giro.glosa, ': ', a1.giro)
+								ELSE prm_giro.glosa END)
+					FROM asunto_giro
+					INNER JOIN prm_giro
+						ON asunto_giro.id_giro = prm_giro.id_giro
+					WHERE asunto_giro.id_asunto = a1.id_asunto
+					ORDER BY prm_giro.glosa ASC) AS sector_economico";
+		}
+
+		if ($filtros['ver_glosa_estudio']) {
+			$query .= ", prm_estudio.glosa_estudio";
+		}
+
+		$query .= "
 			FROM asunto AS a1
 			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
 			LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
@@ -669,26 +734,31 @@ class Asunto extends Objeto {
 			LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario
 			LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = $on_encargado2
 			LEFT JOIN trabajo ON trabajo.codigo_asunto = a1.codigo_asunto AND trabajo.cobrable = 1
-			LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro
-			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = contrato.id_estudio
+			LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro";
 
-			$where
+		if ($filtros['ver_glosa_estudio']) {
+			$query .= " LEFT JOIN prm_estudio ON prm_estudio.id_estudio = contrato.id_estudio";
+		}
+
+		$query .= $where . "
 			GROUP BY a1.codigo_asunto
 			ORDER BY a1.codigo_asunto, a1.codigo_cliente ASC";
+
+		return $query;
 	}
 
 	public function DownloadExcel($filtros = array()) {
-		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
-		$statement->execute();
-		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('ASUNTOS');
 
-		//overridear configuraciones del reporte con confs
+		$filtros['ver_glosa_estudio'] = $SimpleReport->Config->columns['glosa_estudio']->Visible();
+		$filtros['ver_desglose_area'] = $SimpleReport->Config->columns['desglose_area']->Visible();
+		$filtros['ver_sector_economico'] = $SimpleReport->Config->columns['sector_economico']->Visible();
+
+		// Overridear configuraciones del reporte con confs
 		$usa_username = UtilesApp::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema');
 		$mostrar_encargado_secundario = UtilesApp::GetConf($this->sesion, 'EncargadoSecundario');
 		$mostrar_encargado2 = UtilesApp::GetConf($this->sesion, 'AsuntosEncargado2');
@@ -697,25 +767,29 @@ class Asunto extends Objeto {
 		$SimpleReport->Config->columns['username']->Visible($usa_username);
 		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username);
 
-        $SimpleReport->Config->columns['username_ec']->Visible($usa_username);
-        $SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
+		$SimpleReport->Config->columns['username_ec']->Visible($usa_username);
+		$SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username);
 
-        $SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
+		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
 		$SimpleReport->Config->columns['nombre_secundario']->Visible(!$usa_username && $encargado);
 
-        $SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
-        $SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
+		$SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
+		$SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
 
-		if($mostrar_encargado_secundario){
+		if ($mostrar_encargado_secundario) {
 			$SimpleReport->Config->columns['username_secundario']->Title(__('Encargado Secundario'));
 			$SimpleReport->Config->columns['nombre_secundario']->Title(__('Encargado Secundario'));
 		}
 
-		//swapear codigo y codigo_secundario
+		// Swapear codigo y codigo_secundario
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
 			$SimpleReport->Config->columns['codigo_asunto']->Field('codigo_secundario');
 			$SimpleReport->Config->columns['codigo_secundario']->Field('codigo_asunto');
 		}
+
+		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 		$SimpleReport->LoadResults($results);
 
@@ -867,7 +941,7 @@ class Asunto extends Objeto {
 
 		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
 			`matter`.`glosa_asunto` AS `name`,
-		 	`prm_idioma`.`codigo_idioma` AS `language`,
+			`prm_idioma`.`codigo_idioma` AS `language`,
 			`prm_idioma`.`glosa_idioma` AS `language_name`,
 			`matter`.`activo` AS active
 			FROM `cliente` AS `client`
@@ -922,16 +996,18 @@ class Asunto extends Objeto {
 			$sql_include = "";
 		}
 
-		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
-			`matter`.`glosa_asunto` AS `name`,
-			`prm_idioma`.`codigo_idioma` AS `language`,
-			`prm_idioma`.`glosa_idioma` AS `language_name`,
-			`matter`.`activo` AS active
+		$sql = "SELECT
+				$sql_select_client_code AS `client_code`,
+				$sql_select_matter_code AS `code`,
+				`matter`.`glosa_asunto` AS `name`,
+				`prm_idioma`.`codigo_idioma` AS `language`,
+				`prm_idioma`.`glosa_idioma` AS `language_name`,
+				`matter`.`activo` AS active
 			FROM `cliente` AS `client`
-				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
-				LEFT JOIN `prm_idioma` USING (`id_idioma`)
+			INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+			LEFT JOIN `prm_idioma` USING (`id_idioma`)
 			WHERE `matter`.`glosa_asunto`<>'' {$sql_include}
-			 AND (`matter`.`fecha_touch`>=:timestamp OR `matter`.`fecha_creacion`>=:timestamp)
+			AND (`matter`.`fecha_touch`>=:timestamp OR `matter`.`fecha_creacion`>=:timestamp)
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -976,6 +1052,82 @@ class Asunto extends Objeto {
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('Código secundario') . ' existente';
 	}
+
+
+	/**
+	 * Método que realiza la escritura del desglose de áreas para el asunto
+	 * @param $details Array que contiene los Ids de desgloses de áreas a agregar
+	 */
+	public function writeAreaDetails($details) {
+		$sql = "DELETE FROM `asunto_area_proyecto_desglose` WHERE id_asunto=:id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $this->fields[$this->campo_id]);
+		if ($Statement->execute()) {
+			if (is_null($details) || empty($details)) {
+				return;
+			}
+			foreach($details as $id_area_proyecto_desglose) {
+				$sql = "INSERT INTO `asunto_area_proyecto_desglose`
+				SET id_asunto=:id_asunto, id_area_proyecto_desglose=:id_area_proyecto_desglose";
+				$Statement = $this->sesion->pdodbh->prepare($sql);
+				$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+				$Statement->bindParam('id_area_proyecto_desglose', $id_area_proyecto_desglose);
+				$Statement->execute();
+			}
+		}
+	}
+
+	/**
+	 * Método que realiza la escritura de los giros asociados al asunto
+	 * @param $details Array que contiene los Ids de cada giro
+	 */
+	public function writeEconomicActivities($details) {
+		$sql = "DELETE FROM `asunto_giro` WHERE id_asunto=:id";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $this->fields[$this->campo_id]);
+		if ($Statement->execute()) {
+			if (is_null($details) || empty($details)) {
+				return;
+			}
+			foreach ($details as $id_giro) {
+				$sql = "INSERT INTO asunto_giro
+				SET id_asunto=:id_asunto, id_giro=:id_giro";
+				$Statement = $this->sesion->pdodbh->prepare($sql);
+				$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+				$Statement->bindParam('id_giro', $id_giro);
+				$Statement->execute();
+			}
+		}
+	}
+
+	/**
+	 * Método que obtiene todos los desgloses de áreas
+	 */
+	public function getAreaDetails() {
+		$sql = "SELECT `asunto_area_proyecto_desglose`.`id_area_proyecto_desglose`
+			FROM `asunto_area_proyecto_desglose`
+			WHERE `asunto_area_proyecto_desglose`.`id_asunto`=:id_asunto";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+		$Statement->execute();
+		$details = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+		return $details;
+	}
+
+		/**
+		 * Método que obtiene los giros del asunto
+		 */
+	public function getEconomicActivities() {
+		$sql = "SELECT id_giro
+			FROM asunto_giro
+			WHERE id_asunto=:id_asunto";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id_asunto', $this->fields[$this->campo_id]);
+		$Statement->execute();
+		$details = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+		return $details;
+	}
+
 }
 
 class ListaAsuntos extends Lista {

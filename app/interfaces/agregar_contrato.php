@@ -26,7 +26,10 @@ $color_par = "#f0f0f0";
 $color_impar = "#ffffff";
 
 $archivo = new Archivo($Sesion);
-
+$AutocompleteHelper = new FormAutocompleteHelper();
+if (!isset($SelectHelper)) {
+	$SelectHelper = new FormSelectHelper();
+}
 // previene override del objero, ya que se incluye desde otras interfaces.
 function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
@@ -68,7 +71,6 @@ if ($addheaderandbottom || ($popup && !$motivo)) {
 
 	$show = 'inline';
 
-
 	$contrato = new Contrato($Sesion);
 
 	if($id_contrato > 0) {
@@ -101,8 +103,10 @@ if (!empty($cliente->fields["id_contrato"])) {
 	$contrato_defecto->Load($cliente->fields["id_contrato"]);
 }
 
+$contrato_nuevo = isset($contrato_nuevo) ? $contrato_nuevo : false;
 if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
 	$contrato->fields = $cargar_datos_contrato_cliente_defecto;
+	$contrato_nuevo = true;
 }
 
 // CONTRATO GUARDA
@@ -279,7 +283,10 @@ $Idioma = new Idioma($Sesion);
 $TramiteTarifa = new TramiteTarifa($Sesion);
 $Carta = new Carta($Sesion);
 $CobroRtf = new CobroRtf($Sesion);
-$Form = new Form;
+
+$Form = new Form();
+$Html = new \TTB\Html();
+
 ?>
 <script type="text/javascript">
 
@@ -1644,7 +1651,39 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php if (Conf::GetConf($Sesion, 'UsaGiroClienteParametrizable')) { ?>
 							<?php echo Html::SelectArrayDecente($PrmCodigo->Listar("WHERE prm_codigo.grupo = 'GIRO_CLIENTE' ORDER BY prm_codigo.glosa ASC"), 'id_pais', $contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro); ?>
 						<?php } else { ?>
-							<input  type="text" name='factura_giro' size=50 value="<?php echo $contrato->fields['factura_giro'] ?>"  />
+							<?php
+								$prmGiro = new PrmGiro($Sesion);
+								$giros = $prmGiro->ListarExt();
+								if (count($giros) > 0) {
+									echo $SelectHelper->ajax_select(
+										'factura_giro_select',
+										$contrato->fields['factura_giro'] ? $contrato->fields['factura_giro'] : $factura_giro,
+										array('class' => 'span3', 'style' => 'display:inline', 'id' => 'factura_giro_select'),
+										array(
+											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=orden,requiere_desglose&id=glosa',
+											'onChange' => '
+												var element = selected_factura_giro_select;
+												var original_value = FormSelectHelper.original_factura_giro_select;
+												if (element && element.requiere_desglose == "1") {
+													jQuery("#factura_giro").val(original_value);
+													jQuery("#factura_giro").show();
+												} else {
+													jQuery("#factura_giro").val(element.glosa);
+													jQuery("#factura_giro").hide();
+												}
+												if (original_value && Object.keys(element).length == 0) {
+													jQuery("#factura_giro_select").val("Otro");
+													jQuery("#factura_giro").val(original_value);
+													jQuery("#factura_giro").show();
+												}
+											'
+										)
+									);
+									echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								} else {
+									echo $Form->input('factura_giro', $contrato->fields['factura_giro'], array('placeholder' => __('Giro'), 'class' => 'span3', 'label' => false, 'id' => 'factura_giro'));
+								}
+							?>
 						<?php } ?>
 					</td>
 				</tr>
@@ -1829,7 +1868,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Teléfono') . $obligatorios('fono_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='fono_contacto_contrato' size=30 value="<?php echo $contrato->fields['fono_contacto'] ?>" />
+						<input type="text" name="fono_contacto_contrato" id="fono_contacto_contrato" size="30" value="<?php echo $contrato->fields['fono_contacto'] ? $contrato->fields['fono_contacto'] : $fono_contacto_contrato ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -1837,7 +1876,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('E-mail') . $obligatorios('email_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<input type="text" name='email_contacto_contrato' size=55 value="<?php echo $contrato->fields['email_contacto'] ?>"  />
+						<input type="text" name="email_contacto_contrato" id="email_contacto_contrato" size="55" value="<?php echo $contrato->fields['email_contacto'] ? $contrato->fields['email_contacto'] : $email_contacto_contrato ?>"  />
 					</td>
 				</tr>
 				<tr>
@@ -1845,7 +1884,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('Dirección envío') . $obligatorios('direccion_contacto_contrato'); ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?></textarea>
+						<textarea name="direccion_contacto_contrato" id="direccion_contacto_contrato" rows="4" cols="55" ><?php echo $contrato->fields['direccion_contacto'] ?  $contrato->fields['direccion_contacto'] : $direccion_contacto_contrato ?></textarea>
 					</td>
 				</tr>
 			</table>
@@ -2152,9 +2191,26 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</thead>
 								<tbody id="body_hitos">
 									<?php
-									$query = "SELECT fecha_cobro, descripcion, monto_estimado, id_cobro, observaciones FROM cobro_pendiente WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND hito = '1' ORDER BY id_cobro_pendiente";
-									$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-									for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
+									$cobros_pendientes = array();
+									if ($contrato->Loaded()) {
+										$Criteria = new Criteria($Sesion);
+										$cobros_pendientes = $Criteria
+												->add_from('cobro_pendiente')
+												->add_select('fecha_cobro')
+												->add_select('descripcion')
+												->add_select('monto_estimado')
+												->add_select($contrato_nuevo ? 'NULL' : 'id_cobro', 'id_cobro')
+												->add_select('observaciones')
+												->add_restriction(CriteriaRestriction::and_clause(
+														CriteriaRestriction::equals('id_contrato', $contrato->fields['id_contrato']),
+														CriteriaRestriction::equals('hito', '1')
+												))
+												->add_ordering('id_cobro_pendiente')
+												->run();
+									}
+									$total_cobros_pendientes = count($cobros_pendientes);
+									for ($i = 2; $i - 2 < $total_cobros_pendientes; $i++) {
+										$temp = $cobros_pendientes[$i - 2];
 										$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
 										?>
 										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >

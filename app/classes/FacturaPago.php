@@ -14,11 +14,11 @@ class FacturaPago extends Objeto {
 			'titulo' => 'Fecha',
 			'tipo' => 'fecha'
 		),
-    'monto' => array(
+		'monto' => array(
 			'titulo' => 'Monto',
 			'tipo' => 'numero'
 		),
-    'id_moneda' => array(
+		'id_moneda' => array(
 			'titulo' => 'Moneda',
 			'relacion' => 'Moneda'
 		),
@@ -26,193 +26,193 @@ class FacturaPago extends Objeto {
 			'titulo' => 'Tipo Documento',
 			'tipo' => array('EP', 'CP', 'RP', 'TP', 'OP', 'CC')
 		),
-    'nro_documento' => 'Número Doc Pago',
-    'nro_cheque' => 'Número Cheque',
-    'descripcion' => 'Descripción'
+		'nro_documento' => 'Número Doc Pago',
+		'nro_cheque' => 'Número Cheque',
+		'descripcion' => 'Descripción'
 	);
 
 	public static $configuracion_reporte = array(
+		array(
+			'format' => 'date',
+			'title' => 'Fecha Pago',
+			'field' => 'fecha_pago',
+		),
+		array(
+			'title' => 'Tipo',
+			'field' => 'tipo',
+		),
+		array(
+			'title' => 'N° Documento',
+			'field' => 'numero',
+		),
+		array(
+			'title' => 'Serie Documento',
+			'field' => 'serie_documento_legal',
+			'visible' => false,
+		),
+		array(
+			'title' => 'Código Cliente',
+			'field' => 'cliente_pago',
+		),
+		array(
+			'title' => 'Cliente',
+			'field' => 'glosa_cliente',
+		),
+		array(
+			'title' => 'Acuerdo Comercial',
+			'field' => 'idcontrato',
+			'visible' => false,
+		),
+		array(
+			'title' => 'Razón Social',
+			'field' => 'factura_razon_social',
+		),
+		array(
+			'title' => 'Encargado Comercial',
+			'field' => 'encargado_comercial',
+		),
+		array(
+			'title' => 'Estado Documento',
+			'field' => 'estado',
+		),
+		array(
+			'title' => 'N° Liquidación',
+			'field' => 'id_cobro',
+		),
+		array(
+			'title' => 'Concepto Pago',
+			'field' => 'concepto_pago',
+		),
+		array(
+			'title' => 'Descripción Pago',
+			'field' => 'descripcion_pago',
+		),
+		array(
+			'title' => 'Nombre Banco',
+			'field' => 'nombre_banco',
+		),
+		array(
+			'title' => 'N° Cuenta',
+			'field' => 'numero_cuenta',
+		),
+		array(
+			'format' => 'date',
+			'title' => 'Fecha Factura',
+			'field' => 'fecha_factura',
+		),
+		array(
+			'title' => 'Código Idioma',
+			'field' => 'codigo_idioma',
+			'visible' => false,
+		),
+		array(
+			'title' => 'Símbolo Moneda',
+			'field' => 'simbolo_factura',
+		),
+		array(
+			'title' => 'Cifras Decimales',
+			'field' => 'cifras_decimales_factura',
+			'visible' => false,
+		),
+		array(
+			'format' => 'number',
+			'title' => 'Tipo Cambio',
+			'field' => 'tipo_cambio_pago',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'format' => 'date',
-					'title' => 'Fecha Pago',
-					'field' => 'fecha_pago',
+				'symbol' => 'simbolo_factura',
 			),
+			'title' => 'Honorarios',
+			'field' => 'honorarios',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'Tipo',
-					'field' => 'tipo',
+				'symbol' => 'simbolo_factura',
 			),
+			'title' => 'Subtotal Gastos',
+			'field' => 'subtotal_gastos',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'N° Documento',
-					'field' => 'numero',
+				'symbol' => 'simbolo_factura',
 			),
+			'title' => 'Subtotal Gastos sin impuesto',
+			'field' => 'subtotal_gastos_sin_impuesto',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'Serie Documento',
-					'field' => 'serie_documento_legal',
-					'visible' => false,
+				'symbol' => 'simbolo_factura',
 			),
+			'title' => 'IVA',
+			'field' => 'iva',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'Código Cliente',
-					'field' => 'cliente_pago',
+				'symbol' => 'simbolo_factura',
 			),
+			'title' => 'Total Factura',
+			'field' => 'monto_factura',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'Cliente',
-					'field' => 'glosa_cliente',
+				'symbol' => 'simbolo_pago',
 			),
+			'title' => 'Monto Aporte',
+			'field' => 'monto_aporte',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'Acuerdo Comercial',
-					'field' => 'idcontrato',
-					'visible' => false,
+				'symbol' => 'simbolo_factura',
 			),
+			'title' => 'Saldo Factura',
+			'field' => 'saldo_factura',
+		),
+		array(
+			'format' => 'number',
+			'title' => 'Moneda Pago',
+			'field' => 'simbolo_pago',
+		),
+		array(
+			'format' => 'number',
+			'extras' =>
 			array(
-					'title' => 'Razón Social',
-					'field' => 'factura_razon_social',
+				'symbol' => 'simbolo_pago',
 			),
-			array(
-					'title' => 'Encargado Comercial',
-					'field' => 'encargado_comercial',
-			),
-			array(
-					'title' => 'Estado Documento',
-					'field' => 'estado',
-			),
-			array(
-					'title' => 'N° Liquidación',
-					'field' => 'id_cobro',
-			),
-			array(
-					'title' => 'Concepto Pago',
-					'field' => 'concepto_pago',
-			),
-			array(
-					'title' => 'Descripción Pago',
-					'field' => 'descripcion_pago',
-			),
-			array(
-					'title' => 'Nombre Banco',
-					'field' => 'nombre_banco',
-			),
-			array(
-					'title' => 'N° Cuenta',
-					'field' => 'numero_cuenta',
-			),
-			array(
-					'format' => 'date',
-					'title' => 'Fecha Factura',
-					'field' => 'fecha_factura',
-			),
-			array(
-					'title' => 'Código Idioma',
-					'field' => 'codigo_idioma',
-					'visible' => false,
-			),
-			array(
-					'title' => 'Símbolo Moneda',
-					'field' => 'simbolo_factura',
-			),
-			array(
-					'title' => 'Cifras Decimales',
-					'field' => 'cifras_decimales_factura',
-					'visible' => false,
-			),
-			array(
-					'format' => 'number',
-					'title' => 'Tipo Cambio',
-					'field' => 'tipo_cambio_pago',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_factura',
-					),
-					'title' => 'Honorarios',
-					'field' => 'honorarios',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_factura',
-					),
-					'title' => 'Subtotal Gastos',
-					'field' => 'subtotal_gastos',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_factura',
-					),
-					'title' => 'Subtotal Gastos sin impuesto',
-					'field' => 'subtotal_gastos_sin_impuesto',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_factura',
-					),
-					'title' => 'IVA',
-					'field' => 'iva',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_factura',
-					),
-					'title' => 'Total Factura',
-					'field' => 'monto_factura',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_pago',
-					),
-					'title' => 'Monto Aporte',
-					'field' => 'monto_aporte',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_factura',
-					),
-					'title' => 'Saldo Factura',
-					'field' => 'saldo_factura',
-			),
-			array(
-					'format' => 'number',
-					'title' => 'Moneda Pago',
-					'field' => 'simbolo_pago',
-			),
-			array(
-					'format' => 'number',
-					'extras' =>
-					array(
-							'symbol' => 'simbolo_pago',
-					),
-					'title' => 'Saldo Pago',
-					'field' => 'saldo_pago',
-			),
-			array(
-					'title' => 'Códigos Asuntos',
-					'field' => 'codigos_asunto',
-			),
-			array(
-					'title' => 'Asuntos',
-					'field' => 'glosas_asunto',
-			),
-			array(
-					'title' => 'Descripción Factura',
-					'field' => 'descripcion_factura',
-			),
-			array(
-					'field' => 'glosa_estudio',
-					'title' => 'Companía',
-					'visible' => false,
-			)
+			'title' => 'Saldo Pago',
+			'field' => 'saldo_pago',
+		),
+		array(
+			'title' => 'Códigos Asuntos',
+			'field' => 'codigos_asunto',
+		),
+		array(
+			'title' => 'Asuntos',
+			'field' => 'glosas_asunto',
+		),
+		array(
+			'title' => 'Descripción Factura',
+			'field' => 'descripcion_factura',
+		),
+		array(
+			'field' => 'glosa_estudio',
+			'title' => 'Companía',
+			'visible' => false,
+		)
 	);
 
 	function FacturaPago($sesion, $fields = "", $params = "") {
@@ -229,16 +229,19 @@ class FacturaPago extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
-		if ($id)
+		if ($id) {
 			return $this->Load($id);
+		}
 		return false;
 	}
 
 	function Id($id = null) {
-		if ($id)
+		if ($id) {
 			$this->fields[$this->campo_id] = $id;
-		if (empty($this->fields[$this->campo_id]))
+		}
+		if (empty($this->fields[$this->campo_id])) {
 			return false;
+		}
 		return $this->fields[$this->campo_id];
 	}
 
@@ -247,8 +250,9 @@ class FacturaPago extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
-		if ($id)
+		if ($id) {
 			return $this->Load($id);
+		}
 		return false;
 	}
 
@@ -262,9 +266,9 @@ class FacturaPago extends Objeto {
 				$neteo_documento->Delete();
 			}
 			return $this->Delete();
-		}
-		else
+		} else {
 			return false;
+		}
 	}
 
 	function HtmlListaPagos($sesion, & $factura, $id_documento) {
@@ -322,8 +326,9 @@ class FacturaPago extends Objeto {
 	}
 
 	function generarDocumentoPago($parser_factura_pago, $theTag = '', $lang = 'es', $arr_fila_tmp = null) {
-		if (!isset($parser_factura_pago->tags[$theTag]))
+		if (!isset($parser_factura_pago->tags[$theTag])) {
 			return;
+		}
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
 
@@ -357,10 +362,8 @@ class FacturaPago extends Objeto {
 		$lista_facturas_desde_pago = $this->GetListaFacturasSoyPago();
 		$arr_factura = split(',', $lista_facturas_desde_pago);
 		$factura_encabezado->Load($arr_factura[0]);
-		//print_r($factura_encabezado->fields);
 		$glosa_cliente_encabezado = $factura_encabezado->fields['cliente'];
 		$rut_cliente_encabezado = $factura_encabezado->fields['RUT_cliente'];
-
 
 		$html = $parser_factura_pago->tags[$theTag];
 
@@ -423,8 +426,6 @@ class FacturaPago extends Objeto {
 				$html = str_replace('%V_B_hecho_por_valor%', '', $html);
 				$html = str_replace('%aprobado_por_valor%', '', $html);
 				$html = str_replace('%V_B_aprobado_por_valor%', '', $html);
-
-
 
 				$row = "";
 				$html_lista_facturas = $parser_factura_pago->tags['LISTA_FACTURAS'];
@@ -512,10 +513,11 @@ class FacturaPago extends Objeto {
 		$pje = 100 - $pje;
 		$pje = number_format($pje, 0);
 		$mje = "";
-		if ($pje_variable == 1)
+		if ($pje_variable == 1) {
 			$mje = str_replace('%', " $pje%", $glosa_concepto);
-		else
+		} else {
 			$mje = $glosa_concepto;
+		}
 
 		$mje_saldado = $this->GetSoyElUltimoPago();
 		$mje .= " " . $mje_saldado;
@@ -573,7 +575,7 @@ class FacturaPago extends Objeto {
 								LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_pago = ccfm2.id_cta_cte_mvto
 								LEFT JOIN factura_pago fp ON ccfm2.id_factura_pago = fp.id_factura_pago
 								WHERE fp." . $col_condicion . " =  '" . $id . "'";
-//		echo $query; //FFF: Agrego comprobacion vs respaldo documento.//left join documento d on d.id_cobro=f.id_cobro and d.id_factura_pago=fp.id_factura_pago
+		// echo $query; //FFF: Agrego comprobacion vs respaldo documento.//left join documento d on d.id_cobro=f.id_cobro and d.id_factura_pago=fp.id_factura_pago
 		return new ListaFacturas($this->sesion, null, $query);
 	}
 
@@ -620,9 +622,14 @@ class FacturaPago extends Objeto {
 		$writer->save(__('Facturas_Pagos'));
 	}
 
-	public function QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura) {
-		if ($orden == '')
+	public function QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
+		$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
+		$grupo_ventas, $razon_social, $descripcion_factura) {
+
+		if ($orden == '') {
 			$orden = 'fp.fecha DESC';
+		}
 
 		if ($where == '') {
 			$where = 1;
@@ -749,7 +756,7 @@ class FacturaPago extends Objeto {
 		}
 
 		return "SELECT SQL_CALC_FOUND_ROWS
-				  factura.id_factura
+					factura.id_factura
 				, factura.fecha as fecha_factura
 				, factura.id_moneda
 				, factura.honorarios
@@ -816,8 +823,15 @@ class FacturaPago extends Objeto {
 			GROUP BY fp.id_factura_pago";
 	}
 
-	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura) {
-		$query = $this->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura);
+	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
+		$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
+		$grupo_ventas, $razon_social, $descripcion_factura) {
+
+		$query = $this->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
+			$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+			$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
+			$grupo_ventas, $razon_social, $descripcion_factura);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);

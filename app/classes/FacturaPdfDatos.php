@@ -61,7 +61,6 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
-		// Segmento Condiciones de pago
 		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 
 		// Segmento Comodines. Solicitados por @gtigre
@@ -139,7 +138,6 @@ class FacturaPdfDatos extends Objeto {
 		if ($factura->fields['porcentaje_impuesto'] == 0) {
 			$honorarios_sin_impuesto = $factura->fields['honorarios'];
 		}
-
 
 		switch( $tipo_dato ) {
 			case 'razon_social':
@@ -323,9 +321,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
-            case 'lbl_fecha_vencimiento':
-                $glosa_dato = 'Fecha Vencimiento / Due Date:';
-                break;
+			case 'lbl_fecha_vencimiento':
+				$glosa_dato = 'Fecha Vencimiento / Due Date:';
+				break;
 			case 'monto_honorarios_con_iva':
 				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -346,7 +344,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 
 			default:
-			
+
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
