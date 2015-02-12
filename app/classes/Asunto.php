@@ -595,11 +595,11 @@ class Asunto extends Objeto {
 		}
 
 		if ($filtros['id_grupo_cliente']) {
-			$wheres[] = "cliente.id_grupo_cliente = '$id_grupo_cliente'";
+			$wheres[] = "cliente.id_grupo_cliente = '{$filtros['id_grupo_cliente']}'";
 		}
 
 		if ($filtros['codigo_asunto'] != "") {
-			$wheres[] = "a1.codigo_asunto LIKE '$codigo_asunto%'";
+			$wheres[] = "a1.codigo_asunto LIKE '{$filtros['codigo_asunto']}%'";
 		}
 
 		if ($filtros['glosa_asunto'] != "") {
@@ -632,7 +632,7 @@ class Asunto extends Objeto {
 		}
 
 		if ($filtros['id_usuario']) {
-			$wheres[] = "a1.id_encargado = '$filtros['id_usuario']' ";
+			$wheres[] = "a1.id_encargado = '{$filtros['id_usuario']}' ";
 		}
 
 		if ($filtros['id_area_proyecto']) {
@@ -688,11 +688,11 @@ class Asunto extends Objeto {
 			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
 
 			contraparte,
-			cotizado_con,";
+			cotizado_con";
 
 		if ($filtros['ver_desglose_area']) {
 			$query .= "
-				(SELECT GROUP_CONCAT(DISTINCT CASE
+				, (SELECT GROUP_CONCAT(DISTINCT CASE
 								WHEN prm_area_proyecto_desglose.requiere_desglose = 1
 								THEN CONCAT(prm_area_proyecto_desglose.glosa, ': ', a1.desglose_area)
 								ELSE prm_area_proyecto_desglose.glosa END)
@@ -701,12 +701,12 @@ class Asunto extends Objeto {
 						ON asunto_area_proyecto_desglose.id_area_proyecto_desglose = prm_area_proyecto_desglose.id_area_proyecto_desglose
 					WHERE prm_area_proyecto_desglose.id_area_proyecto = prm_area_proyecto.id_area_proyecto
 						AND asunto_area_proyecto_desglose.id_asunto = a1.id_asunto
-					ORDER BY prm_area_proyecto_desglose.glosa ASC) AS desglose_area,";
+					ORDER BY prm_area_proyecto_desglose.glosa ASC) AS desglose_area";
 		}
 
 		if ($filtros['ver_sector_economico']) {
 			$query .= "
-				(SELECT GROUP_CONCAT(DISTINCT CASE
+				, (SELECT GROUP_CONCAT(DISTINCT CASE
 								WHEN prm_giro.requiere_desglose = 1
 								THEN CONCAT(prm_giro.glosa, ': ', a1.giro)
 								ELSE prm_giro.glosa END)
@@ -714,11 +714,11 @@ class Asunto extends Objeto {
 					INNER JOIN prm_giro
 						ON asunto_giro.id_giro = prm_giro.id_giro
 					WHERE asunto_giro.id_asunto = a1.id_asunto
-					ORDER BY prm_giro.glosa ASC) AS sector_economico,";
+					ORDER BY prm_giro.glosa ASC) AS sector_economico";
 		}
 
 		if ($filtros['ver_glosa_estudio']) {
-			$query .= "prm_estudio.glosa_estudio,";
+			$query .= ", prm_estudio.glosa_estudio";
 		}
 
 		$query .= "
@@ -737,7 +737,7 @@ class Asunto extends Objeto {
 			LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro";
 
 		if ($filtros['ver_glosa_estudio']) {
-			$query .= "LEFT JOIN prm_estudio ON prm_estudio.id_estudio = contrato.id_estudio";
+			$query .= " LEFT JOIN prm_estudio ON prm_estudio.id_estudio = contrato.id_estudio";
 		}
 
 		$query .= $where . "
@@ -1055,15 +1055,15 @@ class Asunto extends Objeto {
 
 
 	/**
-		 * Método que realiza la escritura del desglose de áreas para el asunto
-		 * @param $details Array que contiene los Ids de desgloses de áreas a agregar
-		 */
+	 * Método que realiza la escritura del desglose de áreas para el asunto
+	 * @param $details Array que contiene los Ids de desgloses de áreas a agregar
+	 */
 	public function writeAreaDetails($details) {
 		$sql = "DELETE FROM `asunto_area_proyecto_desglose` WHERE id_asunto=:id";
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('id', $this->fields[$this->campo_id]);
 		if ($Statement->execute()) {
-			if (is_null($details) || empty($details)){
+			if (is_null($details) || empty($details)) {
 				return;
 			}
 			foreach($details as $id_area_proyecto_desglose) {
@@ -1078,18 +1078,18 @@ class Asunto extends Objeto {
 	}
 
 	/**
-		 * Método que realiza la escritura de los giros asociados al asunto
-		 * @param $details Array que contiene los Ids de cada giro
-		 */
+	 * Método que realiza la escritura de los giros asociados al asunto
+	 * @param $details Array que contiene los Ids de cada giro
+	 */
 	public function writeEconomicActivities($details) {
 		$sql = "DELETE FROM `asunto_giro` WHERE id_asunto=:id";
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('id', $this->fields[$this->campo_id]);
 		if ($Statement->execute()) {
-			if (is_null($details) || empty($details)){
+			if (is_null($details) || empty($details)) {
 				return;
 			}
-			foreach($details as $id_giro) {
+			foreach ($details as $id_giro) {
 				$sql = "INSERT INTO asunto_giro
 				SET id_asunto=:id_asunto, id_giro=:id_giro";
 				$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -1101,8 +1101,8 @@ class Asunto extends Objeto {
 	}
 
 	/**
-		 * Método que obtiene todos los desgloses de áreas
-		 */
+	 * Método que obtiene todos los desgloses de áreas
+	 */
 	public function getAreaDetails() {
 		$sql = "SELECT `asunto_area_proyecto_desglose`.`id_area_proyecto_desglose`
 			FROM `asunto_area_proyecto_desglose`

@@ -28,8 +28,8 @@ $color_impar = "#ffffff";
 $archivo = new Archivo($Sesion);
 $AutocompleteHelper = new FormAutocompleteHelper();
 if (!isset($SelectHelper)) {
-	$SelectHelper = new FormSelectHelper();	
-} 
+	$SelectHelper = new FormSelectHelper();
+}
 // previene override del objero, ya que se incluye desde otras interfaces.
 function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
@@ -103,8 +103,10 @@ if (!empty($cliente->fields["id_contrato"])) {
 	$contrato_defecto->Load($cliente->fields["id_contrato"]);
 }
 
+$contrato_nuevo = isset($contrato_nuevo) ? $contrato_nuevo : false;
 if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
 	$contrato->fields = $cargar_datos_contrato_cliente_defecto;
+	$contrato_nuevo = true;
 }
 
 // CONTRATO GUARDA
@@ -2189,9 +2191,26 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</thead>
 								<tbody id="body_hitos">
 									<?php
-									$query = "SELECT fecha_cobro, descripcion, monto_estimado, id_cobro, observaciones FROM cobro_pendiente WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND hito = '1' ORDER BY id_cobro_pendiente";
-									$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-									for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
+									$cobros_pendientes = array();
+									if ($contrato->Loaded()) {
+										$Criteria = new Criteria($Sesion);
+										$cobros_pendientes = $Criteria
+												->add_from('cobro_pendiente')
+												->add_select('fecha_cobro')
+												->add_select('descripcion')
+												->add_select('monto_estimado')
+												->add_select($contrato_nuevo ? 'NULL' : 'id_cobro', 'id_cobro')
+												->add_select('observaciones')
+												->add_restriction(CriteriaRestriction::and_clause(
+														CriteriaRestriction::equals('id_contrato', $contrato->fields['id_contrato']),
+														CriteriaRestriction::equals('hito', '1')
+												))
+												->add_ordering('id_cobro_pendiente')
+												->run();
+									}
+									$total_cobros_pendientes = count($cobros_pendientes);
+									for ($i = 2; $i - 2 < $total_cobros_pendientes; $i++) {
+										$temp = $cobros_pendientes[$i - 2];
 										$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
 										?>
 										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
