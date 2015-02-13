@@ -1,15 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../app/classes/NeteoDocumento.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/CobroMoneda.php';
-require_once Conf::ServerDir() . '/../app/classes/Moneda.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 
 class Documento extends Objeto {
 
@@ -30,13 +21,13 @@ class Documento extends Objeto {
 
 	}
 
-	function LoadByCobro($id_cobro) {
+	function LoadByCobro($id_cobro, $fields = null) {
 		$query = "SELECT id_documento FROM documento WHERE id_cobro = '$id_cobro' AND tipo_doc='N';";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
 		if ($id) {
-			return $this->Load($id);
+			return $this->Load($id, $fields);
 		}
 		return false;
 	}
@@ -103,7 +94,7 @@ class Documento extends Objeto {
 		$adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false,
 		$id_contrato = null, $pagar_facturas = false, $id_usuario_ingresa = null, $id_usuario_orden = null,
 		$id_solicitud_adelanto = null, $codigo_asunto = null) {
-		
+
 		list($dtemp, $mtemp, $atemp) = explode("-", $fecha);
 		if (strlen($dtemp) == 2) {
 			$fecha = Utiles::fecha2sql($fecha);
@@ -163,19 +154,19 @@ class Documento extends Objeto {
 			$this->Edit("numero_operacion", $numero_operacion);
 			$this->Edit("numero_cheque", $numero_cheque);
 			$this->Edit("id_factura_pago", $id_factura_pago ? $id_factura_pago : "NULL" );
-			
+
 			if ($pago_retencion) {
 				$this->Edit("pago_retencion", "1");
 			}
-			
+
 			$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
 			if (!empty($adelanto)) {
 				$this->Edit("id_contrato", $id_contrato);
-				
+
 				$query = "SELECT id_contrato FROM asunto WHERE '".$codigo_asunto."'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($id_contrato) = mysql_fetch_array($resp);
-				
+
 				if(empty($id_contrato) || $id_contrato == 'NULL'){
 					$codigo_asunto = 'NULL';
 				} else if(empty($codigo_asunto)) {
@@ -186,8 +177,8 @@ class Documento extends Objeto {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($codigo_asunto) = mysql_fetch_array($resp);
 				}
-				
-				
+
+
 				$this->Edit('codigo_asunto', $codigo_asunto);
 			}
 			$this->Edit("pago_honorarios", empty($pago_honorarios) ? '0' : '1');
