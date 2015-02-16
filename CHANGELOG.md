@@ -2,9 +2,7 @@
 
 ## Release: 15.2.0
 Jueves 5 de Febrero 2015
-
 [Release 15.2.0](https://github.com/LemontechSA/ttb/pull/845)
-
 * **Fix:** Agregar botón calendario al editar clientes
 * **Fix:** Al agregar un asunto si el filtro tiene un cliente seleccionado que ese cliente venga por defecto
 * **Fix:** Agregar logos en los excel de cobro
@@ -19,6 +17,10 @@ Jueves 5 de Febrero 2015
 * **Fix:** Fix para giros cuando no hay giros en la tabla prm_giro y 99% de clientes actuales
 * **Fix:** Fix problemas con bind del formulario de grupos
 * **Fix:** No mostrar giros si no hay al agregar o editar asunto
+
+## Hotfix 15.1.13
+Martes 10 de Febrero 2015
+* **Fix:** [Configura twig con Charset iso-8859-1.](https://github.com/LemontechSA/ttb/pull/848)
 
 ## Hotfix 15.1.12
 Viernes 6 de Febrero 2015

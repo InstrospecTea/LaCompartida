@@ -28,8 +28,8 @@ $color_impar = "#ffffff";
 $archivo = new Archivo($Sesion);
 $AutocompleteHelper = new FormAutocompleteHelper();
 if (!isset($SelectHelper)) {
-	$SelectHelper = new FormSelectHelper();	
-} 
+	$SelectHelper = new FormSelectHelper();
+}
 // previene override del objero, ya que se incluye desde otras interfaces.
 function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
@@ -103,8 +103,10 @@ if (!empty($cliente->fields["id_contrato"])) {
 	$contrato_defecto->Load($cliente->fields["id_contrato"]);
 }
 
+$contrato_nuevo = isset($contrato_nuevo) ? $contrato_nuevo : false;
 if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
 	$contrato->fields = $cargar_datos_contrato_cliente_defecto;
+	$contrato_nuevo = true;
 }
 
 // CONTRATO GUARDA
@@ -165,6 +167,9 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 
 		// cobros pendientes
 		CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+		if ($contrato->fields['forma_cobro'] !== 'FLAT FEE') {
+			$valor_fecha = array();
+		}
 		for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 			$cobro_pendiente = new CobroPendiente($Sesion);
 			$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
@@ -281,10 +286,8 @@ $Idioma = new Idioma($Sesion);
 $TramiteTarifa = new TramiteTarifa($Sesion);
 $Carta = new Carta($Sesion);
 $CobroRtf = new CobroRtf($Sesion);
-
 $Form = new Form();
 $Html = new \TTB\Html();
-
 ?>
 <script type="text/javascript">
 
@@ -640,6 +643,7 @@ $Html = new \TTB\Html();
 		jQuery("#div_escalonada").hide();
 		jQuery("#tabla_hitos").hide();
 		jQuery("#id_moneda_monto").show();
+		jQuery('#tr_cobros_programados').hide();
 
 
 		if(laID=="fc1") {	//ShowTHH();
@@ -659,6 +663,7 @@ $Html = new \TTB\Html();
 			jQuery("#div_monto").show();
 			jQuery("#span_monto").show();
 			jQuery("#divthh").fadeTo('slow',0.2);
+			jQuery('#tr_cobros_programados').show();
 		} else if(laID=="fc5")	{   //ShowCap();
 			jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).show();
 			jQuery("#div_monto").show();
@@ -951,7 +956,7 @@ $Html = new \TTB\Html();
 		var borrar=fila.insertCell(3);
 		fecha.innerHTML="<input type='hidden' class='fecha' value='"+$('valor_fecha_1').value+"' />"+$('valor_fecha_1').value;
 		descripcion.innerHTML="<input type='text' class='descripcion' size='40' value='"+$('valor_descripcion_1').value+"' />";
-		monto.innerHTML="<span class='moneda_tabla' align='center'></span>&nbsp;&nbsp;<input type='text' class='monto_estimado' size='7' value='"+$('valor_monto_estimado_1').value+"' />";
+		monto.innerHTML="<div class='input-prepend input'><span class='moneda_tabla add-on' align='center'></span><input type='text' class='monto_estimado' size='10' value='"+$('valor_monto_estimado_1').value+"' /></div>";
 		borrar.innerHTML="<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarFila(this.parentNode.parentNode.rowIndex);' />";
 		$('valor_fecha_1').value = '';
 		$('valor_descripcion_1').value = '';
@@ -2189,9 +2194,26 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</thead>
 								<tbody id="body_hitos">
 									<?php
-									$query = "SELECT fecha_cobro, descripcion, monto_estimado, id_cobro, observaciones FROM cobro_pendiente WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND hito = '1' ORDER BY id_cobro_pendiente";
-									$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-									for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
+									$cobros_pendientes = array();
+									if ($contrato->Loaded()) {
+										$Criteria = new Criteria($Sesion);
+										$cobros_pendientes = $Criteria
+												->add_from('cobro_pendiente')
+												->add_select('fecha_cobro')
+												->add_select('descripcion')
+												->add_select('monto_estimado')
+												->add_select($contrato_nuevo ? 'NULL' : 'id_cobro', 'id_cobro')
+												->add_select('observaciones')
+												->add_restriction(CriteriaRestriction::and_clause(
+														CriteriaRestriction::equals('id_contrato', $contrato->fields['id_contrato']),
+														CriteriaRestriction::equals('hito', '1')
+												))
+												->add_ordering('id_cobro_pendiente')
+												->run();
+									}
+									$total_cobros_pendientes = count($cobros_pendientes);
+									for ($i = 2; $i - 2 < $total_cobros_pendientes; $i++) {
+										$temp = $cobros_pendientes[$i - 2];
 										$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
 										?>
 										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
@@ -2325,11 +2347,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 
 					<?php
-					$query = "SELECT MAX(fecha_creacion) FROM cobro WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND estado!='CREADO' AND estado!='EN REVISION'";
-					$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-					list($ultimo_cobro) = mysql_fetch_array($resp);
+					$query = "SELECT count(1) AS total FROM asunto WHERE id_contrato='{$contrato->fields['id_contrato']}'";
+					$asuntos = mysql_fetch_assoc(mysql_query($query, $Sesion->dbh));
 					?>
-					<tr>
+					<tr id="tr_cobros_programados">
 						<td colspan="2" align="center">
 							<fieldset style="width: 97%; background-color: #FFFFFF;">
 								<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'datos_cobros_programados\')" style="cursor:pointer"' : '' ?> />
@@ -2339,103 +2360,116 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								&nbsp;<?php echo __('Cobros Programados') ?>
 								</legend>
 								<div id='datos_cobros_programados' style='display:<?php echo $show ?>;' width="100%">
-									<table width="100%">
-										<tr>
-											<td align="right" width="30%">
-												<?php echo __('Generar ') . __('Cobros') . __(' a partir del') ?>
-											</td>
-											<td align="left">
-												<input type="text" name="periodo_fecha_inicio" value="<?php echo $fecha_ini ?>" id="periodo_fecha_inicio" size="11" maxlength="10" />
-												<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_periodo_fecha_inicio" style="cursor:pointer" />
-												&nbsp;<?php echo $ultimo_cobro ? '<span style="font-size:10px">' . __('Fecha último cobro emitido:') . ' ' . Utiles::sql2date($ultimo_cobro) . '</span>' : '' ?>
-											</td>
-										</tr>
-										<tr>
-											<td align="right">
-												<?php echo __('Cobrar cada') ?>
-											</td>
-											<td align="left">
-												<input type="text" name="periodo_intervalo" value="<?php echo empty($contrato->fields['periodo_intervalo']) ? '' : $contrato->fields['periodo_intervalo'] ?>" id="periodo_intervalo" size="3" maxlength="2" />
-												<span style='font-size:10px'><?php echo __('meses') ?></span>
-											</td>
-										</tr>
-										<tr>
-											<td align="right">
-												<?php echo __('Durante') ?>
-											</td>
-											<td align="left">
-												<input  type="text" name=periodo_repeticiones id=periodo_repeticiones size=3 value="<?php echo $contrato->fields['periodo_repeticiones'] ?>" />
-												<span style='font-size:10px'><?php echo __('periodos (0 para perpetuidad)') ?></span>
-											</td>
-										</tr>
-										<tr>
-											<td align="center">
-												<b><?php echo __('Próximos Cobros') ?></b>&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='generarFechas()' style='cursor:pointer' <?php echo TTip(__('Actualizar fechas según período')) ?>>
-											</td>
-											<td>&nbsp;</td>
-										</tr>
-										<tr>
-											<td align="center" colspan="2">
-												<table id="tabla_fechas" class="span8" style='width:80%;border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:1px solid #454545;' cellpadding="2" cellspacing="2" style="border-collapse:collapse;">
-													<thead>
-														<tr bgcolor=#6CA522>
-															<td width="110">Fecha</td>
-															<td  >Descripción</td>
-															<td width="23%">Monto</td>
-															<td width="5%">&nbsp;</td>
-														</tr>
-													</thead>
-													<tbody id="id_body">
-														<tr id="fila_fecha_1">
-															<td align="center" class="span2">
-																<input type="text" class="input-small fechadiff" name="valor_fecha[1]" value='' id="valor_fecha_1" size="10" maxlength="10" />
+									<?php
+									if ($asuntos['total'] > 0) {
+										$query = "SELECT MAX(fecha_creacion) FROM cobro WHERE id_contrato='" . $contrato->fields['id_contrato'] . "' AND estado!='CREADO' AND estado!='EN REVISION'";
+										$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+										list($ultimo_cobro) = mysql_fetch_array($resp);
+										?>
+										<table width="100%">
+											<tr>
+												<td align="right" width="30%">
+													<?php echo __('Generar ') . __('Cobros') . __(' a partir del') ?>
+												</td>
+												<td align="left">
+													<input type="text" name="periodo_fecha_inicio" value="<?php echo $fecha_ini ?>" id="periodo_fecha_inicio" size="11" maxlength="10" />
+													<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_periodo_fecha_inicio" style="cursor:pointer" />
+													&nbsp;<?php echo $ultimo_cobro ? '<span style="font-size:10px">' . __('Fecha último cobro emitido:') . ' ' . Utiles::sql2date($ultimo_cobro) . '</span>' : '' ?>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													<?php echo __('Cobrar cada') ?>
+												</td>
+												<td align="left">
+													<input type="text" name="periodo_intervalo" value="<?php echo empty($contrato->fields['periodo_intervalo']) ? '' : $contrato->fields['periodo_intervalo'] ?>" id="periodo_intervalo" size="3" maxlength="2" />
+													<span style='font-size:10px'><?php echo __('meses') ?></span>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													<?php echo __('Durante') ?>
+												</td>
+												<td align="left">
+													<input  type="text" name=periodo_repeticiones id=periodo_repeticiones size=3 value="<?php echo $contrato->fields['periodo_repeticiones'] ?>" />
+													<span style='font-size:10px'><?php echo __('periodos (0 para perpetuidad)') ?></span>
+												</td>
+											</tr>
+											<tr>
+												<td align="center">
+													<b><?php echo __('Próximos Cobros') ?></b>&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='generarFechas()' style='cursor:pointer' <?php echo TTip(__('Actualizar fechas según período')) ?>>
+												</td>
+												<td>&nbsp;</td>
+											</tr>
+											<tr>
+												<td align="center" colspan="2">
 
-															</td>
-															<td align="left">
-																<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" size="40" />
-															</td>
-															<td align="right">
-
-
-															<div class="input-prepend input">
-																<span class="moneda_tabla add-on"></span><input type="text"  class="span2"   name="valor_monto_estimado[1]" value='' id="valor_monto_estimado_1" size="7" />
-															</div>
-															</td>
-															<td align="center">
-																<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="img_mas" style="cursor:pointer" onclick="agregarFila();" />
-															</td>
-														</tr>
-														<?php
-
-														$color_par = "#f0f0f0";
-														$color_impar = "#ffffff";
-														$query = "SELECT cp.fecha_cobro,cp.descripcion,cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato='" . $contrato->fields['id_contrato'] . "' AND cp.id_cobro IS NULL AND cp.hito = '0' ORDER BY fecha_cobro";
-														$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-														for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
-															?>
-															<tr bgcolor=<?php echo $i % 2 == 0 ? $color_par : $color_impar ?> id="fila_fecha_<?php echo $i ?>" class="<?php echo $i > 6 ? 'esconder' : 'mostrar' ?>">
+													<table id="tabla_fechas" width="70%" style="border:1px solid #999;" cellpadding="2" cellspacing="2" style="border-collapse:collapse;">
+														<thead>
+															<tr bgcolor="#6CA522">
+																<td width="20%">Fecha</td>
+																<td width="65%">Descripci&oacute;n</td>
+																<td width="10%">Monto</td>
+																<td width="5%">&nbsp;</td>
+															</tr>
+														</thead>
+														<tbody id="id_body">
+															<tr id="fila_fecha_1">
 																<td align="center">
-																	<input type='hidden' class="fecha" value="<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>" id='valor_fecha_<?php echo $i ?>' name='valor_fecha[<?php echo $i ?>]'><?php echo Utiles::sql2date($temp['fecha_cobro']) ?>
+																	<input type="text" class="fechadiff" name="valor_fecha[1]" value="" id="valor_fecha_1" maxlength="10" size="10" />
 																</td>
 																<td align="left">
-																	<input size="40" type='text' class="descripcion" value="<?php echo $temp['descripcion'] ?>" id='valor_descripcion_<?php echo $i ?>' name='valor_descripcion[<?php echo $i ?>]'>
+																	<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" size="40" />
 																</td>
 																<td align="right">
-																	<span class="moneda_tabla" align="center"></span>&nbsp;
-																	<input class="monto_estimado" size="7" type='text' align="right" value="<?php echo empty($temp['monto_estimado']) ? '' : $temp['monto_estimado'] ?>" id='valor_monto_estimado_<?php echo $i ?>' name='valor_monto_estimado[<?php echo $i ?>]'>
+																	<div class="input-prepend input">
+																		<span class="moneda_tabla add-on"></span><input type="text" name="valor_monto_estimado[1]" value="" id="valor_monto_estimado_1" size="10" />
+																	</div>
 																</td>
 																<td align="center">
-																	<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarFila(this.parentNode.parentNode.rowIndex);' />
+																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="img_mas" style="cursor:pointer" onclick="agregarFila();" />
 																</td>
 															</tr>
-														<?php } ?>
-													</tbody>
-												</table>
-												<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_mostrar" style="font-size:7pt;text-align:right;">Mostrar todos</a>
-												<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_esconder" style="display:none;font-size:7pt;text-align:right;">Esconder</a>
-											</td>
-										</tr>
-									</table>
+															<?php
+															$color_par = "#f0f0f0";
+															$color_impar = "#ffffff";
+															$query = "SELECT cp.fecha_cobro, cp.descripcion, cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato = '{$contrato->fields['id_contrato']}' AND cp.id_cobro IS NULL AND cp.hito = '0' ORDER BY fecha_cobro";
+															$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+															for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
+																?>
+																<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_fecha_<?php echo $i ?>" class="<?php echo $i > 6 ? 'esconder' : 'mostrar' ?>">
+																	<td align="center" style="vertical-align:middle">
+																		<input type="hidden" class="fecha" value="<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>" id="valor_fecha_<?php echo $i ?>" name="valor_fecha[<?php echo $i ?>]"><?php echo Utiles::sql2date($temp['fecha_cobro']) ?>
+																	</td>
+																	<td align="left">
+																		<input size="40" type="text" class="descripcion" value="<?php echo $temp['descripcion'] ?>" id="valor_descripcion_<?php echo $i ?>" name="valor_descripcion[<?php echo $i ?>]">
+																	</td>
+																	<td align="right">
+																		<div class="input-prepend input">
+																			<span class="moneda_tabla" align="center"></span>
+																			<input class="monto_estimado" size="10" type="text" align="right" value="<?php echo empty($temp['monto_estimado']) ? '' : $temp['monto_estimado'] ?>" id="valor_monto_estimado_<?php echo $i ?>" name="valor_monto_estimado[<?php echo $i ?>]">
+																		</div>
+																	</td>
+																	<td align="center">
+																		<img src="<?php echo Conf::ImgDir() ?>/eliminar.gif" style="cursor:pointer" onclick="eliminarFila(this.parentNode.parentNode.rowIndex);" />
+																	</td>
+																</tr>
+																<?php
+															}
+															?>
+														</tbody>
+													</table>
+
+													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_mostrar" style="font-size:7pt;text-align:right;">Mostrar todos</a>
+													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_esconder" style="display:none;font-size:7pt;text-align:right;">Esconder</a>
+												</td>
+											</tr>
+										</table>
+									<?php
+									} else {
+										echo $Html->alert('El contrato debe tener asuntos asociados para generar ' . __('Cobros Programados'), '', array('class' => 'alert-thin'));
+									}
+									?>
 								</div>
 							</fieldset>
 						</td>

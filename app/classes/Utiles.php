@@ -99,17 +99,21 @@ class Utiles extends \Utiles {
 		if ($es_diario) {
 			$where_dia = 'AND fecha > CURDATE()';
 		}
-		$mensaje = mysql_real_escape_string($mensaje);
+		$mensaje = mysql_real_escape_string(preg_replace($clean_patt, '', $mensaje));
 		$query = "SELECT COUNT(id_log_correo) total
 					FROM log_correo
-					WHERE subject='{$subject}'
-						AND mail='{$email}'
-						AND id_tipo_correo={$id_tipo_correo}
-						{$where_dia}";
+					WHERE subject = :subject
+						AND mail = :email
+						AND id_tipo_correo = :id_tipo_correo
+						AND mensaje= :mensaje
+						{$where_dia} ";
+		$resp = $sesion->pdodbh->prepare($query);
 
-
-		$query .=" AND mensaje= '{$mensaje}' ";
-		$resp = $sesion->pdodbh->query($query);
+		$resp->bindParam(':subject', $subject, \PDO::PARAM_STR);
+		$resp->bindParam(':email', $email, \PDO::PARAM_STR);
+		$resp->bindParam(':mensaje', $mensaje, \PDO::PARAM_STR);
+		$resp->bindParam(':id_tipo_correo', $id_tipo_correo, \PDO::PARAM_INT);
+		$resp->execute();
 		if (!$resp) {
 			throw new \Exception(preg_replace($clean_patt, ' ', $query));
 		}
@@ -117,22 +121,31 @@ class Utiles extends \Utiles {
 		$count = $resp->fetch(\PDO::FETCH_ASSOC);
 		if ($count['total'] == 0) {
 			$query2 = "INSERT INTO log_correo SET
-				subject = '{$subject}',
-				mensaje = '{$mensaje}',
-				mail = '{$email}',
-				nombre = '{$nombre}',
+				subject = :subject,
+				mensaje = :mensaje,
+				mail = :email,
+				nombre = :nombre,
 				fecha = NOW()
 			";
 			if (!empty($id_usuario)) {
-				$query2 .= ", id_usuario = '{$id_usuario}', fecha_modificacion = NOW()";
+				$query2 .= ", id_usuario = :id_usuario, fecha_modificacion = NOW()";
 			}
 			if (!empty($id_tipo_correo)) {
-				$query2 .= ", id_tipo_correo = '{$id_tipo_correo}'";
+				$query2 .= ", id_tipo_correo = :id_tipo_correo";
 			}
 			if ($simular) {
 				$query2 .= ', enviado = 1, fecha_envio = NOW()';
 			}
-			if (!$sesion->pdodbh->query($query2)) {
+
+			$sth = $sesion->pdodbh->prepare($query2);
+			$sth->bindParam(':subject', $subject, \PDO::PARAM_STR);
+			$sth->bindParam(':email', $email, \PDO::PARAM_STR);
+			$sth->bindParam(':mensaje', $mensaje, \PDO::PARAM_STR);
+			$sth->bindParam(':nombre', $nombre, \PDO::PARAM_STR);
+			$id_usuario ? $sth->bindParam(':id_usuario', $id_usuario, \PDO::PARAM_INT) : false;
+			$id_tipo_correo ? $sth->bindParam(':id_tipo_correo', $id_tipo_correo, \PDO::PARAM_INT) : false;
+
+			if (!$sth->execute()) {
 				throw new \Exception(preg_replace($clean_patt, ' ', $query2));
 			}
 
