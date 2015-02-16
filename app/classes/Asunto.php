@@ -695,7 +695,7 @@ class Asunto extends Objeto {
 
 			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
 
-			IF(a1.id_contrato != cliente.id_contrato, 'SI', 'NO') AS cobro_independiente
+			IF(a1.id_contrato != cliente.id_contrato, 'SI', 'NO') AS cobro_independiente,
 			contraparte,
 			cotizado_con";
 
