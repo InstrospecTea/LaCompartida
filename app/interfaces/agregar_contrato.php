@@ -2408,7 +2408,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 														<thead>
 															<tr bgcolor="#6CA522">
 																<td width="20%">Fecha</td>
-																<td width="65%%">Descripci&oacute;n</td>
+																<td width="65%">Descripci&oacute;n</td>
 																<td width="10%">Monto</td>
 																<td width="5%">&nbsp;</td>
 															</tr>
