@@ -18,6 +18,7 @@ $cobro = new Cobro($sesion);
 if ($id_cobro) {
 	$cobro->Load($id_cobro);
 	$id_moneda_cobro = $cobro->fields['opc_moneda_total'];
+	$documento->LoadByCobro($id_cobro);
 }
 
 $pago = new FacturaPago($sesion);
@@ -68,12 +69,9 @@ if ($desde_webservice) {
 			$numeros_facturas = implode(', ', $numeros_facturas_tmp);
 		}
 
-		$query_montos_facturas = "SELECT SUM(honorarios) as honorarios, SUM(subtotal_gastos+subtotal_gastos_sin_impuesto) as gastos
-																FROM factura WHERE id_factura IN ($lista_facturas) ";
-		$res_montos = mysql_query($query_montos_facturas, $sesion->dbh) or Utiles::errorSQL($query_num_facturas, __FILE__, __LINE__, $sesion->dbh);
-		list($honorarios_facturas, $gastos_facturas) = mysql_fetch_array($res_montos);
-		$factura_fake = new Factura($sesion);
-		$hay_adelantos = $factura_fake->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $honorarios_facturas, $gastos_facturas) > 0;
+		$pago_honorarios = $documento->fields['honorarios_pagados'] == 'SI' ? 0 : 1;
+		$pago_gastos = $documento->fields['gastos_pagados'] == 'SI' ? 0 : 1;
+		$hay_adelantos = ($pago_honorarios || $pago_gastos) && $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 	}
 }
 $moneda_pago = new Moneda($sesion);
@@ -94,7 +92,18 @@ $monto_pago_adelanto = $monto_pago;
 
 
 if ($id_adelanto) {
-	$documento_adelanto->Load($id_adelanto);
+	$documento_adelanto->Load($id_adelanto, array(
+			'id_documento',
+			'id_moneda',
+			'monto',
+			'saldo_pago',
+			'tipo_doc',
+			'numero_doc',
+			'numero_cheque',
+			'glosa_documento',
+			'id_banco',
+			'id_cuenta'
+	));
 }
 
 global $saldo_pago;
@@ -113,7 +122,6 @@ if ($id_adelanto) {
 		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
 		$monto_pago = $monto_pago_adelanto * $tipo_cambio_adelanto / $tipo_cambio_cobro;
 	}
-
 	$saldo_pago = (-$documento_adelanto->fields['saldo_pago'] + $pago->fields['monto']) * $tipo_cambio_adelanto / $tipo_cambio_cobro;
 }
 
@@ -144,8 +152,7 @@ if ($opcion == 'guardar') {
 			$errores[] = __('El monto ingresado en el campo "Monto" no es válido, debe ingresar el monto del documento.');
 		if (!is_numeric($monto_moneda_cobro))
 			$errores[] = __('El monto ingresado en el campo "Monto pagado" no es válido, debe ingresar el monto descontado del saldo.');
-	}
-	else {
+	} else {
 		if (empty($id_adelanto)) {
 			if (!is_numeric($monto))
 				$pagina->AddError(__('El monto ingresado en el campo "Monto" no es válido.'));
@@ -189,7 +196,6 @@ if ($opcion == 'guardar') {
 			<?php
 		}
 	} else if ($guardar_datos) {
-		//echo '<pre>';print_r($_POST);echo '</pre>';
 		if (empty($id_neteo_documento_adelanto)) {
 			if (!empty($id_factura_pago)) {
 				$pago->Edit('id_factura_pago', $id_factura_pago);
@@ -239,8 +245,7 @@ if ($opcion == 'guardar') {
 
 			if ($desde_webservice) {
 				$neteos[] = array($id_factura, $monto_moneda_cobro);
-			}
-			else
+			} else {
 				foreach ($_POST as $nombre_variable => $valor) {
 					if (strpos($nombre_variable, 'saldo_') === 0) {
 						$saldo_fact = explode('_', $nombre_variable);
@@ -249,6 +254,7 @@ if ($opcion == 'guardar') {
 						$neteos[] = array($factura, $saldo);
 					}
 				}
+			}
 			$documento->LoadByCobro($id_cobro);
 			$id_factura_pago = $pago->fields['id_factura_pago'];
 			$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
@@ -312,18 +318,20 @@ $query__listado = "SELECT SQL_CALC_FOUND_ROWS
 						$definir_orden,
 						$definir_orden2
 					FROM cta_cte_fact_mvto AS ccfm
-					LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn
-						ON ccfm.id_cta_cte_mvto = ccfmn.id_mvto_deuda
-						AND ccfmn.id_mvto_pago = '{$mvto_pago->fields['id_cta_cte_mvto']}'
-					$join_facturas factura AS f ON ccfm.id_factura = f.id_factura $on_facturas
-					JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda
-					LEFT JOIN prm_documento_legal AS pdl ON pdl.id_documento_legal = f.id_documento_legal
+						LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn
+							ON ccfm.id_cta_cte_mvto = ccfmn.id_mvto_deuda
+							AND ccfmn.id_mvto_pago = '{$mvto_pago->fields['id_cta_cte_mvto']}'
+						$join_facturas factura AS f ON ccfm.id_factura = f.id_factura $on_facturas
+						JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda
+						LEFT JOIN prm_documento_legal AS pdl ON pdl.id_documento_legal = f.id_documento_legal
 					WHERE (f.codigo_cliente = '$codigo_cliente' $where_lista_cobro)
 						AND f.id_moneda = '$id_moneda_cobro'
 						AND f.anulado = 0
 						AND pdl.codigo!='NC'
 						AND ccfm.saldo < 0
 						OR ccfmn.monto != 0";
+$Form = new Form();
+$Form->defaultLabel = false;
 ?>
 
 <script type="text/javascript">
@@ -657,7 +665,7 @@ if ($id_adelanto) {
 		continuar = 1;
 		ValidaMontoSaldoPago(form);
 
-<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
 
 			if ($('codigo_cliente_secundario').value == '') {
 				alert('Debe ingresar un cliente.');
@@ -762,7 +770,6 @@ if ($id_adelanto) {
 	}
 </script>
 
-<?php echo Autocompletador::CSS(); ?>
 <form method=post action="" id="form_documentos" autocomplete='off'>
 	<input type=hidden name=opcion value="guardar" />
 	<input type=hidden name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
@@ -783,15 +790,15 @@ if ($id_adelanto) {
 	<br>
 	<table width='90%'>
 		<tr>
-			<td align=left><b><?php echo $txt_pagina ?></b></td>
+			<td class="al tb"><?php echo $txt_pagina ?></td>
 		</tr>
 	</table>
 	<br>
 
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
-			<td align=left width="50%">
-				<b><?php echo __('Información de Pago') ?> </b>
+			<td class="al tb" width="45%">
+				<?php echo __('Información de Pago') ?>
 			</td>
 			<?php
 			$query = "SELECT count(*) FROM documento WHERE pago_retencion = 1 AND id_cobro = '$id_cobro'";
@@ -800,11 +807,11 @@ if ($id_adelanto) {
 
 			if (Conf::GetConf($sesion, 'PagoRetencionImpuesto') && empty($id_neteo_documento_adelanto)) {
 				?>
-				<td align=right width="50%">
+				<td class="ar" width="50%">
 					<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?php echo $pago->fields['pago_retencion'] ? "checked='checked'" : "" ?> />&nbsp;<?php echo __('Pago retención impuestos') ?>
 				</td>
 			<?php } else { ?>
-				<td align=right width="25%">
+				<td class="ar" width="25%">
 					&nbsp;
 				</td>
 				<?php
@@ -814,57 +821,45 @@ if ($id_adelanto) {
 				$saldo_gastos = $gastos_facturas > 0 ? '&pago_gastos=1' : '';
 				$saldo_honorarios = $honorarios_facturas > 0 ? '&pago_honorarios=1' : '';
 				?>
-				<td align="right" width="25%">
-					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>&desde_factura_pago=1', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');
-			return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
+				<td class="ar" width="30%">
+					<?php echo $Form->button(__('Utilizar un adelanto'), array(
+							'onclick' => "nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro={$id_cobro}&codigo_cliente={$codigo_cliente}&elegir_para_pago=1{$saldo_honorarios}{$saldo_gastos}&id_contrato={$cobro->fields['id_contrato']}&desde_factura_pago=1', 'top=\'100\', left=\'125\', scrollbars=\'yes\'')"
+					)); ?>
 				</td>
 			<?php } ?>
-
-
 		</tr>
 	</table>
-	<table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
+	<hr/>
+	<table id="tabla_informacion" width='100%'>
 		<tr>
-			<td align=right width="20%">
+			<td class="ar tb" width="20%">
 				<?php echo __('Fecha') ?>
 			</td>
-			<td align=left colspan="3">
+			<td class="al" colspan="3">
 				<input type="text" name="fecha" value="<?php echo $pago->fields['fecha'] ? Utiles::sql2date($pago->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
 				<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
 			</td>
 		</tr>
 		<tr>
-			<td align="right" width="20%"><?php echo __('Cliente ') ?></td>
-			<td colspan="3" align="left">
+			<td class="ar tb" width="20%"><?php echo __('Cliente ') ?></td>
+			<td colspan="3" class="al">
 				<?php
+				$codigo_cliente_secundario = null;
 				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					$cliente = new Cliente($sesion);
 					$codigo_cliente = $cobro->fields['codigo_cliente'];
 					$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				}
-
-				if (Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, "CargarTabla(1);");
-					} else {
-						echo Autocompletador::ImprimirSelector($sesion, $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente, '', '', 280, "CargarTabla(1);");
-					}
-				} else {
-					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "", 280);
-					} else {
-						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente, " disabled ", "CargarTabla(1);", 280);
-					}
-				}
+				UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario);
 				?>
 			</td>
 		</tr>
 
 		<tr>
-			<td align=right>
+			<td class="ar tb">
 				<?php echo __('Monto') ?>
 			</td>
-			<td align=left colspan="3">
+			<td class="al" colspan="3">
 				<?php
 				$monto_pago = str_replace(',', '.', $monto_pago);
 				$saldo_pago_original = -$documento_adelanto->fields['saldo_pago'];
@@ -883,48 +878,61 @@ if ($id_adelanto) {
 				if (empty($monto_pago_adelanto)) {
 					$monto_pago_adelanto = 0;
 				}
-				?>
-				<input name="monto" id="monto" size=10 value="<?php echo number_format($monto_pago_adelanto, $moneda_pago->fields['cifras_decimales'], '.', '') ?>" onkeyup="MontoValido(this.id);
-		ActualizarMontoMonedaCobro();"/>
 
-				<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"', '', "80"); ?>
+				echo $Form->input(
+						'monto',
+						$moneda_pago->getFloat($monto_pago_adelanto, false),
+						array(
+								'size' => 10,
+								'onkeyup' => 'MontoValido(this.id); ActualizarMontoMonedaCobro();'
+						)
+				);
+				echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"', '', "80");
+				?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
-				<span id="span_monto_equivalente" style="visibility:<?php echo $id_moneda_cobro == $id_moneda ? 'hidden' : 'visible' ?>">
+				<span id="span_monto_equivalente" style="display:<?php echo $id_moneda_cobro == $id_moneda ? 'none' : 'inline' ?>">
 					Equivalente a <?php echo $moneda_cobro->fields['simbolo'] ?>
-					<input id="monto_moneda_cobro" name="monto_moneda_cobro"  value="<?php echo number_format($pago->fields['monto_moneda_cobro'] ? $pago->fields['monto_moneda_cobro'] : $monto_pago, $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" onkeyup="MontoValido(this.id);
-		ActualizarMontosIndividuales(this.id);" />
-					<input type="hidden" id="id_moneda_cobro" name="id_moneda_cobro" value="<?php echo $id_moneda_cobro ?>" />
+					<?php
+					echo $Form->input(
+							'monto_moneda_cobro',
+							$moneda_cobro->getFloat($pago->fields['monto_moneda_cobro'] ? $pago->fields['monto_moneda_cobro'] : $monto_pago, false),
+							array('onkeyup' => 'MontoValido(this.id); ActualizarMontosIndividuales(this.id);')
+					);
+					echo $Form->hidden('id_moneda_cobro', $id_moneda_cobro);
+					?>
 				</span>
 			</td>
 		</tr>
 
 		<?php if ($id_adelanto) { ?>
 			<tr>
-				<td align=right>
+				<td class="ar tb">
 					<?php echo __('Saldo Adelanto') ?>
 				</td>
-				<td align=left>
-					<input type="text" name="saldo_adelanto" id="saldo_adelanto" size=10 value="<?php echo $saldo_adelanto; ?>" readonly="readonly"/>
-					<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_original" id="saldo_pago_original" size=10 value="<?php echo $saldo_pago_original; ?>" readonly="readonly"/>
-					<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php echo $saldo_pago; ?>" readonly="readonly"/>
+				<td class="al">
+					<?php
+					echo $Form->input('saldo_adelanto', $saldo_adelanto, array('size' => 10, 'readonly' => true));
+					echo $Form->hidden('saldo_pago_original', $saldo_pago_original, array('id' => 'saldo_pago_original'));
+					echo $Form->hidden('saldo_pago_aux', $saldo_pago, array('id' => 'saldo_pago_aux'));
+					?>
 				</td>
 			</tr>
 		<?php } ?>
 
 		<tr>
-			<td align=right>
+			<td class="ar tb">
 				<?php echo __('Concepto') ?>
 			</td>
-			<td align=left colspan="3">
+			<td class="al" colspan="3">
 				<?php echo Html::SelectQuery($sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', '', "168"); ?>
 			</td>
 		</tr>
 		<tr>
-			<td align=right>
+			<td class="ar tb">
 				<?php echo __('Tipo:') ?>
 			</td>
-			<td align=left>
+			<td class="al">
 				<?php
 				$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
 				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -940,22 +948,22 @@ if ($id_adelanto) {
 			</td>
 		</tr>
 		<tr id="tr_cheque" style="display:none;">
-			<td align=right width="30%">
+			<td class="ar tb" width="30%">
 				<?php echo __('N° Cheque') ?>
 			</td>
-			<td align="left" colspan="3" width="70%">
+			<td class="al" colspan="3" width="70%">
 				<input name=numero_cheque id=numero_cheque size=10 value="<?php echo $nro_cheque; ?>" />
 			</td>
 		</tr>
 		<tr>
-			<td align=right>
+			<td class="ar tb">
 				<?php echo __('Descripción') ?>
 			</td>
-			<td align=left colspan="3">
+			<td class="al" colspan="3">
 				<textarea name="glosa_documento" id="glosa_documento" cols="45" rows="3"><?php
-				if ($descripcion)
+				if ($descripcion) {
 					echo $descripcion;
-				else if ($id_cobro) {
+				} else if ($id_cobro) {
 					echo "Pago de Factura # " . $numeros_facturas;
 				}
 				?></textarea>
@@ -963,18 +971,18 @@ if ($id_adelanto) {
 		</tr>
 
 		<tr>
-			<td align=right>
+			<td class="ar tb">
 				<?php echo __('Banco') ?>
 			</td>
-			<td align=left colspan="3">
+			<td class="al" colspan="3">
 				<?php echo Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
 			</td>
 		</tr>
 		<tr>
-			<td align=right>
+			<td class="ar tb">
 				<?php echo __('N° Cuenta') ?>
 			</td>
-			<td align=left colspan="3">
+			<td class="al" colspan="3">
 				<?php
 				if (!empty($id_banco)) {
 					$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
@@ -994,20 +1002,19 @@ if ($id_adelanto) {
 			<td colspan="4" align=center>
 				<?php
 				if ($pago->fields['id_factura_pago']) {
-					?>
-					<input id="btn_imprimir_voucher" type=button class=btn value="<?php echo __('Imprimir voucher') ?>" onclick="Imprimir_voucher(this.form, '<?php echo $pago->fields['id_factura_pago'] ?>');" />
-					&nbsp;
-				<?php } ?>
+					echo $Form->button(__('Imprimir voucher'), array('onclick' => "Imprimir_voucher(jQuery(this).closest('form')[0], '{$pago->fields['id_factura_pago']}')"));
+				}
+				?>
 				<img src="<?php echo Conf::ImgDir() ?>/money_16.gif" border=0> <a href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo __('Actualizar Tipo de Cambio') ?></a>
 			</td>
 		</tr>
 		<tr>
-			<td align=right colspan="4">
+			<td colspan="4">
 				&nbsp;
 			</td>
 		</tr>
 		<tr>
-			<td align=right colspan="4">
+			<td class="ar" colspan="4">
 				<div id="TipoCambioDocumentoPago" style="display:none; left: 50px; top: 250px; background-color: white; position:absolute; z-index: 4;">
 					<fieldset style="background-color:white;">
 						<legend><?php echo __('Tipo de Cambio Documento de Pago') ?></legend>
@@ -1054,28 +1061,31 @@ if ($id_adelanto) {
 									}
 									?>
 								<tr>
-									<td colspan=<?php echo $num_monedas ?> align=center>
-										<input type=button onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?php echo __('Guardar') ?>" />
-										<input type=button onclick="CancelarDocumentoMonedaPago()" value="<?php echo __('Cancelar') ?>" />
-										<input type=hidden id="tipo_cambios_factura_pago" name="tipo_cambios_factura_pago" value="<?php echo implode(',', $tipo_cambios) ?>" />
-										<input type=hidden id="ids_monedas_factura_pago" name="ids_monedas_factura_pago" value="<?php echo implode(',', $ids_monedas) ?>" />
+									<td colspan="<?php echo $num_monedas ?>" align="center">
+										<?php
+										echo $Form->button(__('Guardar'), array('onclick' => "ActualizarDocumentoMonedaPago($('todo_cobro'))"));
+										echo $Form->button(__('Cancelar'), array('onclick' => 'CancelarDocumentoMonedaPago()'));
+										echo $Form->hidden('tipo_cambios_factura_pago', implode(',', $tipo_cambios));
+										echo $Form->hidden('ids_monedas_factura_pago', implode(',', $ids_monedas));
+										?>
 									</td>
 								</tr>
 							</table>
 						</div>
 					</fieldset>
-
 				</div>
 			</td>
 		</tr>
 	</table>
 
-	<br>
-	<table style="border: 0px solid black;" width='90%'>
+	<hr/>
+	<table width='90%'>
 		<tr>
-			<td align=left>
-				<input type=button class=btn id="boton_guardar" value="<?php echo __('Guardar') ?>" onclick='Guardar(this.form);' />
-				<input type=button class=btn value="<?php echo __('Cerrar') ?>" onclick="Cerrar();" />
+			<td class="al">
+				<?php
+				echo $Form->icon_button(__('Guardar'), 'save' ,array('id' => 'boton_guardar', 'onclick' => "Guardar(jQuery(this).closest('form')[0])"));
+				echo $Form->icon_button(__('Cerrar'), 'exit', array('onclick' => 'Cerrar()'));
+				?>
 			</td>
 		</tr>
 	</table>
@@ -1133,20 +1143,16 @@ if ($id_adelanto) {
 	?>
 </form>
 
-
 <script type="text/javascript">
-<?php if (!empty($id_adelanto)) { ?>
+	<?php if (!empty($id_adelanto)) { ?>
 		$('tabla_informacion').select('input, select, textarea').each(function(elem) {
 			elem.disabled = 'disabled';
 		});
-	<?php
-	if ($pago->fields['id_factura_pago']) {
-		?>
+		<?php if ($pago->fields['id_factura_pago']) { ?>
 			$('btn_imprimir_voucher').disabled = false;
-		<?php
+		<?php }
 	}
-}
-?>
+	?>
 
 	Calendar.setup(
 			{
@@ -1164,9 +1170,5 @@ if ($id_adelanto) {
 	);
 </script>
 <?php
-if (Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-	echo Autocompletador::Javascript($sesion, false);
-}
-echo InputId::Javascript($sesion);
+echo $Form->script();
 $pagina->PrintBottom($popup);
-?>

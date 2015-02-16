@@ -73,7 +73,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		// Segmento Monto en palabra solicitado por @gtigre
-		$arreglo_monedas = ArregloMonedas($this->sesion);
+		$arreglo_monedas = UtilesApp::ArregloMonedas($this->sesion);
 		$monto_palabra=new MontoEnPalabra($this->sesion);
 
 		$monto_total_factura = $factura->fields['total'];
@@ -366,7 +366,7 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($cobro->fields['codigo_idioma']);
 
-		$arreglo_monedas = ArregloMonedas($this->sesion);
+		$arreglo_monedas = UtilesApp::ArregloMonedas($this->sesion);
 		$monto_palabra = new MontoEnPalabra($this->sesion);
 		$fila = array();
 

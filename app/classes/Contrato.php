@@ -363,7 +363,7 @@ class Contrato extends Objeto {
 		}
 
 		if (!$this->monedas) {
-			$this->monedas = ArregloMonedas($this->sesion);
+			$this->monedas = UtilesApp::ArregloMonedas($this->sesion);
 		}
 
 		$query = "SELECT separar_liquidaciones, opc_moneda_total, opc_moneda_gastos FROM contrato WHERE id_contrato = '$id_contrato'";

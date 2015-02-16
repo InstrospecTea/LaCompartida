@@ -794,8 +794,18 @@ class Documento extends Objeto {
 		}
 	}
 
+	/**
+	 * Obtiene el saldo disponible de los adelantos.
+	 * @param type $codigo_cliente
+	 * @param type $id_contrato
+	 * @param boolean $pago_honorarios indica ci se quiere pagar honorarios.
+	 * @param boolean $pago_gastos indica si se quiere pagar gastos.
+	 * @param type $id_moneda
+	 * @param type $tipos_cambio
+	 * @return string
+	 */
 	function SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda = null, $tipos_cambio = null) {
-		$monedas = ArregloMonedas($this->sesion);
+		$monedas = UtilesApp::ArregloMonedas($this->sesion);
 		if (empty($tipos_cambio)) {
 			$tipos_cambio = array();
 			foreach ($monedas as $id => $moneda) { //uf:20000, us:500, idmoneda:us. adelanto de 100 uf -> us4000
@@ -815,11 +825,13 @@ class Documento extends Objeto {
 			JOIN prm_moneda ON documento.id_moneda = prm_moneda.id_moneda
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente'
 			$where_contrato AND saldo_pago < 0";
-		if (empty($pago_honorarios)) {
-			$query.= ' AND pago_gastos = 1';
-		} else if (empty($pago_gastos)) {
+		if ($pago_honorarios) {
 			$query.= ' AND pago_honorarios = 1';
 		}
+		if ($pago_gastos) {
+			$query.= ' AND pago_gastos = 1';
+		}
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$saldo = 0;
 		while (list($saldo_pago, $moneda_pago, $tipo_cambio) = mysql_fetch_array($resp)) {

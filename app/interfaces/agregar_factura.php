@@ -1395,7 +1395,8 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 		<?php
 		if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
-			$saldo = $factura->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $subtotal_honorarios, $subtotal_gastos, $cobro->fields['opc_moneda_total']);
+			$documento = new Documento($sesion);
+			$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $subtotal_honorarios, $subtotal_gastos, $cobro->fields['opc_moneda_total']);
 			if ($saldo) {
 				?>
 				if (confirm("<?php echo __('Existen adelantos por ') . $saldo . __(' asociados a esta liquidación. ¿Desea utilizarlos para saldar esta ') . $tipo_documento_legal . '?' ?>")) {

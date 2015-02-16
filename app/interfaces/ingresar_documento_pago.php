@@ -830,9 +830,9 @@ $pagina->PrintTop($popup);
 					<?php
 				}
 				if ($id_cobro) {
-					$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
-					$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
-					$hay_adelantos = $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
+					$pago_honorarios = $documento_cobro->fields['honorarios_pagados'] != 'SI';
+					$pago_gastos = $documento_cobro->fields['gastos_pagados'] != 'SI';
+					$hay_adelantos = ($pago_honorarios || $pago_gastos) && $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 				} else {
 					$hay_adelantos = false;
 				}
@@ -845,7 +845,8 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 	</table>
-	<table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
+	<hr/>
+	<table id="tabla_informacion" width='90%'>
 		<tr>
 			<td align="right"><?php echo __('Fecha') ?></td>
 			<td align="left">
@@ -1096,7 +1097,7 @@ $pagina->PrintTop($popup);
 		?>
 	</table>
 
-	<br>
+	<hr/>
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
 			<td align="left">
