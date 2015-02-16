@@ -11521,9 +11521,9 @@ class NotaCobro extends Cobro {
 		if (!$this->twig) {
 			$loader = new Twig_Loader_String();
 			$this->twig = new Twig_Environment($loader);
+			$this->twig->setCharset('ISO-8859-1');
 			$this->twig->addExtension(new DateTwigExtension());
 		}
-
 		return $this->twig->render($template, $this->template_data);
 	}
 
@@ -11543,7 +11543,6 @@ class NotaCobro extends Cobro {
 		if (!is_array($this->template_data['Contrato'])) {
 			$Contrato = new Contrato($this->sesion);
 			$Contrato->Load($this->fields['id_contrato']);
-
 			$this->template_data['Contrato'] = $Contrato->fields;
 		}
 

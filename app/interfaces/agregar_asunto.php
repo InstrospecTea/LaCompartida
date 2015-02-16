@@ -51,6 +51,9 @@ if ($id_asunto > 0) {
 	if (!$Asunto->Load($id_asunto)) {
 		$Pagina->FatalError('Código inválido');
 	}
+	if ($Asunto->fields['id_contrato_indep'] == 0) {
+		$contrato_nuevo = true;
+	}
 
 	if ($Asunto->fields['id_contrato'] > 0) {
 		$contrato->Load($Asunto->fields['id_contrato']);
@@ -114,15 +117,17 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
-	if ($validacionesCliente) {
-		if (empty($glosa_asunto)) {
-			$Pagina->AddError(__("Por favor ingrese el nombre del cliente"));
-		}
-		if (empty($codigo_cliente)) {
-			$Pagina->AddError(__("Por favor ingrese el codigo del cliente"));
-		}
+	if (empty($glosa_asunto)) {
+		$Pagina->AddError(__('Por favor ingrese un título para el ') . __('asunto'));
+	}
+
+	if (empty($codigo_cliente)) {
+		$Pagina->AddError(__('Por favor ingrese el codigo del cliente'));
+	}
+
+	if (Conf::GetConf($Sesion, 'ValidacionesCliente')) {
 		if (empty($id_area_proyecto)) {
-			$Pagina->AddError(__("Por favor ingrese el área del asunto"));
+			$Pagina->AddError(__('Por favor ingrese el área del ') . __('asunto'));
 		}
 	}
 
@@ -441,17 +446,19 @@ function MuestraPorValidacion(divID) {
 		<?php } ?>
 
 		if (!form.glosa_asunto.value) {
-			alert("Debe ingresar un título");
+			alert("<?php echo __('Por favor ingrese un título para el') . ' ' . __('asunto'); ?>");
 			form.glosa_asunto.focus();
 			return false;
 		}
 
-		if (!form.id_area_proyecto.value) {
-			alert("Debe ingresar el área del asunto");
-			form.id_area_proyecto.focus();
-			return false;
-		}
-		
+		<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
+			if (!form.id_area_proyecto.value) {
+				alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
+				form.id_area_proyecto.focus();
+				return false;
+			}
+		<?php } ?>
+
 		<?php
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
@@ -478,7 +485,7 @@ function MuestraPorValidacion(divID) {
 		<?php } ?>
 
 		<?php echo $contractValidation->getClientValidationsScripts(); ?>
- 
+
 		jQuery(form).submit();
 		return true;
 	}
@@ -708,7 +715,11 @@ function MuestraPorValidacion(divID) {
 									)
 								);
 								?>
-								<span style="color:#FF0000; font-size:10px">*</span>
+
+								<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
+									<span style="color:#FF0000; font-size:10px">*</span>
+								<?php } ?>
+
 								<?php echo $SelectHelper->checkboxes(
 										'id_desglose_area',
 										array(),
@@ -745,7 +756,7 @@ function MuestraPorValidacion(divID) {
 							</td>
 						</tr>
 
-						<?php 
+						<?php
 							$prmGiro = new PrmGiro($Sesion);
 							$giros = $prmGiro->ListarExt();
 							if (count($giros) > 0) {
