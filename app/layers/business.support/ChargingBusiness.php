@@ -30,7 +30,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 
 		$query = "SELECT count(*) total FROM factura WHERE id_cobro = '{$id_cobro}'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$facturas = mysql_fetch_assoc($resp);
 		if ($facturas['total'] > 0) {
 			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar porque tiene un documento tributario asociado.'));
@@ -98,7 +98,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$this->Documento->Delete();
 		}
 	}
-	
+
 	public function doesChargeExists($id_cobro) {
 		if (empty($id_cobro)) {
 			return false; //el id no puede ser vacío o cero
