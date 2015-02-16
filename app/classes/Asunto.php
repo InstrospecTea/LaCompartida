@@ -341,6 +341,14 @@ class Asunto extends Objeto {
 			)
 		),
 		array(
+			'field' => 'cobro_independiente',
+			'title' => 'Cobro Independiente',
+			'visible' => true,
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
 			'field' => 'glosa_estudio',
 			'title' => 'Compañía',
 			'visible' => false
@@ -687,6 +695,7 @@ class Asunto extends Objeto {
 
 			IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) ) AS descuento,
 
+			IF(a1.id_contrato != cliente.id_contrato, 'SI', 'NO') AS cobro_independiente
 			contraparte,
 			cotizado_con";
 
