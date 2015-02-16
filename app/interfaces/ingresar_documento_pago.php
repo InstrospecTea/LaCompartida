@@ -181,7 +181,7 @@ $pagina->PrintTop($popup);
     function formato_numeros() {
 		var cantidad_decimales = $('cifras_decimales').value;
 		var ceros = "0".times(parseFloat(cantidad_decimales));
-		var decimales = '#.' + ceros;
+		var decimales = '0.' + ceros;
 		format = decimales;
 		return {format: format, locale: 'us'};
 	}
@@ -322,7 +322,7 @@ $pagina->PrintTop($popup);
 				jQuery('#monto_aux').val(Number(total));
 				jQuery('#monto_pagos').val(Number(total));
 			}
-			jQuery('#saldo_pago').val(monto_adelanto-total).formatNumber(formato_numeros());
+			jQuery('#saldo_pago').val(monto_adelanto - total);
 		}
 
 		if (jQuery('#saldo_pago_aux').length>0) {
@@ -335,7 +335,7 @@ $pagina->PrintTop($popup);
 				SetMontoPagos();
 			}
 
-			jQuery('#saldo_pago').val(saldopagomaximo-total) ;
+			jQuery('#saldo_pago').val(saldopagomaximo - total) ;
 		}
 		jQuery('#saldo_pago').formatNumber(formato_numeros());
 	}
@@ -541,7 +541,7 @@ $pagina->PrintTop($popup);
 						} else {
 							jQuery('#monto').val(Math.min(total,anterior+1.000*(jQuery('#saldo_pago_aux').val()))).formatNumber(formato_numeros());
 						}
-						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val());
+						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val()).formatNumber(formato_numeros());
 
 					} else {
 						if (tipopago=='documento' || tipopago=='adelanto') {

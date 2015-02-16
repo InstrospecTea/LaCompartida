@@ -358,10 +358,9 @@ $Form->defaultLabel = false;
 			var moneda = jQuery('#id_moneda').val();
 			var num2 = Number(jQuery('#factura_pago_moneda_<?php echo $id_moneda_cobro; ?>').val());
 			var div = Number(jQuery('#factura_pago_moneda_' + moneda).val());
+			var saldo_pago_original = 0;
 
-<?php
-if ($id_adelanto) {
-	?>
+			<?php if ($id_adelanto) { ?>
 				if (total_pagar > max_saldo) {
 					jQuery(this).val(Redondear(Number(jQuery(this).val()) - (total_pagar - max_saldo), decimales_cobro));
 					total_pagar = max_saldo;
@@ -369,11 +368,10 @@ if ($id_adelanto) {
 				if (total > max_saldo) {
 					total = max_saldo;
 				}
-	<?php
-} else {
-	$total_pagar = $total;
-}
-?>
+				saldo_pago_original = Number(jQuery('#saldo_pago_original').val().replace(',', '.'));
+			<?php } else {
+				$total_pagar = $total;
+			} ?>
 
 			jQuery('#monto_moneda_cobro').val(Redondear(total_pagar, decimales_cobro));
 
@@ -381,9 +379,9 @@ if ($id_adelanto) {
 			var monto_total_pagar = Redondear(total_pagar * num2 / div, decimales);
 
 			jQuery('#monto').val(monto_total_pagar);
-			jQuery('#saldo_adelanto').val(Number(jQuery('#saldo_pago_original').val().replace(',', '.')) - monto_total);
-
+			jQuery('#saldo_adelanto').val(Redondear(saldo_pago_original - monto_total, decimales));
 		}).keyup();
+
 		jQuery('#monto_moneda_cobro').keyup(function() {
 			var moneda = jQuery('#id_moneda').val();
 			var num1 = Number(jQuery('#monto_moneda_cobro').val());
@@ -851,6 +849,7 @@ if ($id_adelanto) {
 					$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 				}
 				UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario);
+				echo $Form->hidden('codigo_asunto', ''); // evita que se caiga el script de CampoCliente
 				?>
 			</td>
 		</tr>
