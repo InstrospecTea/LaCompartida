@@ -28,18 +28,6 @@ if (!$incluir_cobros_en_cero && isset($_GET['generar_silenciosamente'])) {
 	$forzar = true;
 }
 
-if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
-	if (Conf::GetConf($Sesion, 'UsaFechaDesdeUltimoCobro')) {
-		$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) FROM cobro WHERE id_contrato = '$id_contrato'";
-		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-		list($fecha_ini_cobro) = mysql_fetch_array($resp);
-	}
-} else {
-	if (!empty($fecha_ini)) {
-		$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
-	}
-}
-
 //si no me llega uno, es 0
 $incluye_gastos = !empty($incluye_gastos);
 $incluye_honorarios = !empty($incluye_honorarios);
@@ -61,14 +49,18 @@ if ($individual && $id_contrato) {
 	Log::write(" |- Contrato: {$id_contrato}", Cobro::PROCESS_NAME);
 
 	set_time_limit(100);
-	//Mala documentación!!! Que significa $contra? Que hace GeneraProceso??? ICC
-	// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM)
+
 	$Cobro = new Cobro($Sesion);
 
-	//Por conf se permite el uso de la fecha desde
 	$fecha_ini_cobro = '';
-	if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
-		$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
+	if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza')) {
+		if (empty($fecha_ini)) {
+			if (Conf::GetConf($Sesion, 'UsaFechaDesdeUltimoCobro')) {
+				$fecha_ini_cobro = $Contrato->FechaFinUltimoCobro($id_contrato, 1);
+			}
+		} else {
+			$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
+		}
 	}
 
 	if (!$id_proceso_nuevo) {
