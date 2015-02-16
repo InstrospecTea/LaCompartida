@@ -956,7 +956,7 @@ $Html = new \TTB\Html();
 		var borrar=fila.insertCell(3);
 		fecha.innerHTML="<input type='hidden' class='fecha' value='"+$('valor_fecha_1').value+"' />"+$('valor_fecha_1').value;
 		descripcion.innerHTML="<input type='text' class='descripcion' size='40' value='"+$('valor_descripcion_1').value+"' />";
-		monto.innerHTML="<span class='moneda_tabla' align='center'></span>&nbsp;&nbsp;<input type='text' class='monto_estimado' size='7' value='"+$('valor_monto_estimado_1').value+"' />";
+		monto.innerHTML="<div class='input-prepend input'><span class='moneda_tabla add-on' align='center'></span><input type='text' class='monto_estimado' size='10' value='"+$('valor_monto_estimado_1').value+"' /></div>";
 		borrar.innerHTML="<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarFila(this.parentNode.parentNode.rowIndex);' />";
 		$('valor_fecha_1').value = '';
 		$('valor_descripcion_1').value = '';
@@ -2403,26 +2403,27 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											</tr>
 											<tr>
 												<td align="center" colspan="2">
-													<table id="tabla_fechas" class="span12" style="border:1px solid #999;" cellpadding="2" cellspacing="2" style="border-collapse:collapse;">
+
+													<table id="tabla_fechas" width="70%" style="border:1px solid #999;" cellpadding="2" cellspacing="2" style="border-collapse:collapse;">
 														<thead>
-															<tr bgcolor=#6CA522>
-																<td width="110">Fecha</td>
-																<td  >Descripción</td>
-																<td width="23%">Monto</td>
+															<tr bgcolor="#6CA522">
+																<td width="20%">Fecha</td>
+																<td width="65%%">Descripci&oacute;n</td>
+																<td width="10%">Monto</td>
 																<td width="5%">&nbsp;</td>
 															</tr>
 														</thead>
 														<tbody id="id_body">
 															<tr id="fila_fecha_1">
-																<td align="center" class="span2">
-																	<input type="text" class="input-small fechadiff" name="valor_fecha[1]" value="" id="valor_fecha_1" size="10" maxlength="10" style="width: 70%" />
+																<td align="center">
+																	<input type="text" class="fechadiff" name="valor_fecha[1]" value="" id="valor_fecha_1" maxlength="10" size="10" />
 																</td>
 																<td align="left">
 																	<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" size="40" />
 																</td>
 																<td align="right">
 																	<div class="input-prepend input">
-																		<span class="moneda_tabla add-on"></span><input type="text" name="valor_monto_estimado[1]" value="" id="valor_monto_estimado_1" size="7" />
+																		<span class="moneda_tabla add-on"></span><input type="text" name="valor_monto_estimado[1]" value="" id="valor_monto_estimado_1" size="10" />
 																	</div>
 																</td>
 																<td align="center">
@@ -2430,31 +2431,35 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 																</td>
 															</tr>
 															<?php
-
 															$color_par = "#f0f0f0";
 															$color_impar = "#ffffff";
-															$query = "SELECT cp.fecha_cobro,cp.descripcion,cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato='" . $contrato->fields['id_contrato'] . "' AND cp.id_cobro IS NULL AND cp.hito = '0' ORDER BY fecha_cobro";
+															$query = "SELECT cp.fecha_cobro, cp.descripcion, cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato = '{$contrato->fields['id_contrato']}' AND cp.id_cobro IS NULL AND cp.hito = '0' ORDER BY fecha_cobro";
 															$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 															for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 																?>
-																<tr bgcolor=<?php echo $i % 2 == 0 ? $color_par : $color_impar ?> id="fila_fecha_<?php echo $i ?>" class="<?php echo $i > 6 ? 'esconder' : 'mostrar' ?>">
-																	<td align="center">
-																		<input type='hidden' class="fecha" value="<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>" id='valor_fecha_<?php echo $i ?>' name='valor_fecha[<?php echo $i ?>]'><?php echo Utiles::sql2date($temp['fecha_cobro']) ?>
+																<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_fecha_<?php echo $i ?>" class="<?php echo $i > 6 ? 'esconder' : 'mostrar' ?>">
+																	<td align="center" style="vertical-align:middle">
+																		<input type="hidden" class="fecha" value="<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>" id="valor_fecha_<?php echo $i ?>" name="valor_fecha[<?php echo $i ?>]"><?php echo Utiles::sql2date($temp['fecha_cobro']) ?>
 																	</td>
 																	<td align="left">
-																		<input size="40" type='text' class="descripcion" value="<?php echo $temp['descripcion'] ?>" id='valor_descripcion_<?php echo $i ?>' name='valor_descripcion[<?php echo $i ?>]'>
+																		<input size="40" type="text" class="descripcion" value="<?php echo $temp['descripcion'] ?>" id="valor_descripcion_<?php echo $i ?>" name="valor_descripcion[<?php echo $i ?>]">
 																	</td>
 																	<td align="right">
-																		<span class="moneda_tabla" align="center"></span>&nbsp;
-																		<input class="monto_estimado" size="7" type='text' align="right" value="<?php echo empty($temp['monto_estimado']) ? '' : $temp['monto_estimado'] ?>" id='valor_monto_estimado_<?php echo $i ?>' name='valor_monto_estimado[<?php echo $i ?>]'>
+																		<div class="input-prepend input">
+																			<span class="moneda_tabla" align="center"></span>
+																			<input class="monto_estimado" size="10" type="text" align="right" value="<?php echo empty($temp['monto_estimado']) ? '' : $temp['monto_estimado'] ?>" id="valor_monto_estimado_<?php echo $i ?>" name="valor_monto_estimado[<?php echo $i ?>]">
+																		</div>
 																	</td>
 																	<td align="center">
-																		<img src='<?php echo Conf::ImgDir() ?>/eliminar.gif' style='cursor:pointer' onclick='eliminarFila(this.parentNode.parentNode.rowIndex);' />
+																		<img src="<?php echo Conf::ImgDir() ?>/eliminar.gif" style="cursor:pointer" onclick="eliminarFila(this.parentNode.parentNode.rowIndex);" />
 																	</td>
 																</tr>
-															<?php } ?>
+																<?php
+															}
+															?>
 														</tbody>
 													</table>
+
 													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_mostrar" style="font-size:7pt;text-align:right;">Mostrar todos</a>
 													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_esconder" style="display:none;font-size:7pt;text-align:right;">Esconder</a>
 												</td>
