@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.2.1
+Martes 17 de Febrero 2015
+* **Fix:** [Agrega lang para error 320 facturación mx y devuelve mensaje de error en caso de excepción](https://github.com/LemontechSA/ttb/pull/851)
+
 ## Release: 15.2.0
 Jueves 5 de Febrero 2015
 [Release 15.2.0](https://github.com/LemontechSA/ttb/pull/845)
