@@ -86,7 +86,43 @@ class Reporte {
     return false;
   }
 
-  //Establece el tipo de dato a buscar, y agrega los filtros correspondientes
+  /**
+   * Establece el tipo de dato a buscar, y agrega los filtros correspondientes
+   * Tipos de dato disponibles:
+   *
+   * +-- horas_trabajadas: Total de Horas Trabajadas
+   * |  +-- horas_cobrables: Total de Horas Trabajadas en asuntos Facturables
+   * |  |  +-- horas_visibles: Horas que ve el Cliente en nota de liquidación (tras revisión)
+   * |  |  |  +-- horas_cobradas: Horas Visibles en Liquidaciones que ya fueron Emitidas
+   * |  |  |  |  +-- horas_pagadas: Horas Cobradas en Cobros con estado Pagado
+   * |  |  |  |  \-- horas_por_pagar: Horas Cobradas que aún no han sido pagadas
+   * |  |  |  +-- horas_por_cobrar: Horas Visibles que aún no se Emiten al Cliente
+   * |  |  |  \-- horas_incobrables: Horas en Cobros Incobrables
+   * |  |  \-- horas_castigadas: Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro
+   * |  \-- horas_no_cobrables: Total de Horas Trabajadas en asuntos no Facturables
+   * |
+   * +-- valor_trabajado: (no implementado)
+   * |  +-- valor_cobrable: (no implementado)
+   * |  |  +-- valor_visible: (no implementado)
+   * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
+   * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
+   * |  |  |  |  \-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
+   * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
+   * |  |  |  \-- valor_incobrable: Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable
+   * |  |  +-- valor_castigado: (no implementado)
+   * |  +-- valor_no_cobrable: (no implementado)
+   * +-- valor_trabajado_estandar: Horas Trabajadas por THH Estándar, para todo Trabajo
+   * +-- valor_estandar: Valor Cobrado, si se hubiera usado THH Estándar
+   * +-- diferencia_valor_estandar: Valor Cobrado - Valor Estándar
+   * +-- valor_hora: Valor Cobrado / Horas Cobradas
+   * +-- rentabilidad_base: Valor Cobrado / Valor Trabajado Estándar
+   * +-- rentabilidad: Valor Cobrado / Valor Estándar
+   * +-- costo: Costo para la firma, por concepto de sueldos
+   * \-- costo_hh: Costo HH para la firma, por concepto de sueldos
+   *
+   * @param $nombre String tipo de dato a considerar en el reporte
+   * @return void sólo asigna los filtros necesarios según tipo de dato
+   */
   public function setTipoDato($nombre) {
     $this->tipo_dato = $nombre;
     switch ($nombre) {
@@ -672,22 +708,22 @@ class Reporte {
         break;
       case "horas_trabajadas":
       case "horas_no_cobrables":
-        $s .= "SUM(TIME_TO_SEC( trabajo.duracion ))/3600.0";
+      case "horas_cobrables":
+        $s .= "SUM(TIME_TO_SEC( trabajo.duracion )) / 3600.0";
         break;
 
-      case "horas_cobrables":
       case 'horas_spot':
       case 'horas_convenio':
-        $s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600.0";
+        $s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada )) / 3600.0";
         break;
 
       case "costo":
-        $s .= $datos_monedas . ", ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*SUM(cut.costo_hh*TIME_TO_SEC( trabajo.duracion ))/3600";
+        $s .= $datos_monedas . ", IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * SUM(cut.costo_hh * TIME_TO_SEC( trabajo.duracion )) / 3600.0";
 
         break;
 
       case "horas_castigadas":
-        $s .= "SUM(TIME_TO_SEC(trabajo.duracion)-TIME_TO_SEC(trabajo.duracion_cobrada))/3600";
+        $s .= "SUM(TIME_TO_SEC( trabajo.duracion ) - TIME_TO_SEC( trabajo.duracion_cobrada )) / 3600.0";
         break;
 
       case "horas_visibles":
@@ -696,12 +732,12 @@ class Reporte {
       case "horas_pagadas":
       case "horas_por_pagar":
       case "horas_incobrables":
-        $s .= "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
+        $s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada )) / 3600.0";
         break;
 
       case 'valor_por_cobrar':
         //Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
-        $s .= " $datos_monedas, IF( cobro.id_cobro IS NOT NULL, $monto_honorarios, $monto_predicho)";
+        $s .= " $datos_monedas, IF(cobro.id_cobro IS NOT NULL, $monto_honorarios, $monto_predicho)";
         break;
 
       case 'valor_trabajado_estandar':
@@ -774,7 +810,7 @@ class Reporte {
             LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
             LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
 
-    $add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'));
+    $add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'));
     $s = ' FROM trabajo
           LEFT JOIN usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
           LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario

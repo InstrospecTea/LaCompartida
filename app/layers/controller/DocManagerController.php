@@ -116,23 +116,9 @@ class DocManagerController extends AbstractController {
 	}
 
 	public function existe_cobro($id_cobro) {
-		$DocManager = new DocManager($this->Session);
-		$existecobro = $DocManager->ExisteCobro($this->Session, $id_cobro);
-		$this->renderJSON(array('existe' => $existecobro));
-	}
-
-	public function obtenenrelncobros($id_carta) {
-		$this->layout = false;
-		$cobros_asociados = 0;
-
-		if (!empty($id_carta)) {
-			$query = "SELECT count(*) AS total FROM cobro WHERE id_carta = {$id_carta}";
-			$resp = mysql_query($query, $this->Session->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Session->dbh);
-			$cobros = mysql_fetch_assoc($resp);
-			$cobros_asociados = $cobros['total'];
-		}
-
-		$this->renderJSON(array('cobros_asociados' => $cobros_asociados));
+		$this->loadBusiness('Charging');
+		$existe = $this->ChargingBusiness->doesChargeExists($id_cobro);
+		$this->renderJSON(compact('existe'));
 	}
 
 }

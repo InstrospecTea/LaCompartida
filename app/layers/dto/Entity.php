@@ -28,7 +28,13 @@ abstract class Entity {
 	 * Obtiene los campos por defecto que debe llevar la entidad.
 	 * @return array
 	 */
-	abstract protected function getDefaults();
+	abstract public function getTableDefaults();
+
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad.
+	 * @return array
+	 */
+	abstract protected function getFixedDefaults();
 
 	/**
 	 * Obtiene el valor de una propiedad del objeto que es instancia de la clase que hereda este abstracto.
@@ -97,8 +103,11 @@ abstract class Entity {
 	/**
 	 * Completa el objeto con los valores por defecto definidos para cada entidad.
 	 */
-	public function fillDefaults() {
-		$defaults = $this->getDefaults();
+	public function fillDefaults($defaults) {
+		$defaults = array_merge(
+			$defaults,
+			$this->getFixedDefaults()
+		);
 		foreach ($defaults as $default => $value) {
 			if (is_null($this->get($default))) {
 				$this->set($default, $value);

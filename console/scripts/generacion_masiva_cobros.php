@@ -29,10 +29,17 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->Session->usuario->LoadId($this->data['user_id']);
 		$this->loadModel('BloqueoProceso');
 		$this->BloqueoProceso->lock(Cobro::PROCESS_NAME, '', json_encode($this->data['form']));
-		if (isset($this->data['arrayClientes'])) {
-			$this->clients();
-		} else {
-			$this->contracts();
+		try {
+			$this->loadModel('CobroQuery');
+			$query = $this->CobroQuery->genera_cobros($this->data['form']) . ' ORDER BY cliente.id_cliente';
+			$contratos = $this->Session->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+			if (Configure::read('TipoGeneracionMasiva') == 'contrato') {
+				$this->contracts($contratos);
+			} else {
+				$this->clients($contratos);
+			}
+		} catch (Exception $e) {
+			$this->status('error', 'Ocurrio un error inesperado');
 		}
 		$this->unlookProcess();
 	}
@@ -49,56 +56,89 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('error', '<strong>Ocurrio un error inesperado.</strong>');
 			$this->unlookProcess();
 		}
+//		try {
+//			$Criteria = $this->loadModel('Criteria', null, true);
+//			$result = $Criteria
+//				->add_from('usuario')
+//				->add_select('nombre')
+//				->add_select('email')
+//				->add_restriction(CriteriaRestriction::equals('id_usuario', $this->data['user_id']))
+//				->run();
+//			if (empty($result)) {
+//				throw new Exception("No se pudo cargar el usuario {$this->data['user_id']}");
+//			}
+//			$usuario = $result[0];
+//			$subject = __('Generación de') . ' ' . __('Cobros') . ' ' . __('finalizada');
+//			$messaje = __('Estimado') .
+//						" {$usuario['nombre']}:\n\n" .
+//						__('El proceso a finalizado con el siguiente resultado') .
+//						":\n\n{$this->statusText()}\n\n--\nThe Time Billing";
+//			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario['email'], $usuario['nombre'], false, $this->data['user_id'], 'proceso');
+//		} catch (Exception $e) {
+//			$this->log('ERROR al generar correo: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
+//		}
 	}
 
 	private function reconectDb() {
 		$this->log('Intentando reconectar a la BD.');
-		while (!$this->Session->dbconnect()) {
+		while (!$this->Session->dbconnect(false)) {
 			sleep(1);
 			$this->reconectDb();
 		}
 	}
 
-	private function contracts() {
+	private function contracts($contratos) {
 		$processing = 0;
-		$total_contratos = count($this->data['arrayHH']) + count($this->data['arrayMIXTAS']);
-		foreach ($this->data['arrayHH'] as $id_contrato) {
-			try {
-				++$processing;
-				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
-				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
-				$this->generaHH($id_contrato);
-				$this->generaGG($id_contrato);
-				$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
-			} catch (Exception $e) {
-				$this->log('Error contracts: ' . $e->getMessage());
+		// quitar contratos HITOS
+		foreach ($contratos as $key => $contrato) {
+			if ($contrato['forma_cobro'] == 'HITOS') {
+				$contratos[$key] = null;
+				continue;
 			}
 		}
-		foreach ($this->data['arrayMIXTAS'] as $id_contrato) {
+		$contratos = array_filter($contratos);
+		$total_contratos = count($contratos);
+		foreach ($contratos as $contrato) {
 			try {
 				++$processing;
 				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
 				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
-				$this->generaMIXTAS($id_contrato);
-				$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
+				if ($contrato['separar_liquidaciones']) {
+					$this->generaHH($contrato['id_contrato']);
+					$this->generaGG($contrato['id_contrato']);
+				} else {
+					$this->generaMIXTAS($contrato['id_contrato']);
+				}
 			} catch (Exception $e) {
 				$this->log('Error contracts: ' . $e->getMessage());
 			}
+			$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
 		}
 		$msg_procesando = $this->sp($processing, "Se ha procesado 1 contrato de {$total_contratos}", "Se han procesado {$processing} contratos de {$total_contratos}");
 		$this->status('proceso', "$msg_procesando.");
 	}
 
-	private function clients() {
+	private function clients($contratos) {
 		$processing = 0;
-		$total_clientes = count($this->data['arrayClientes']);
-		foreach ($this->data['arrayClientes'] as $codigo_cliente) {
+		$clientes = array();
+		// contar clientes
+		foreach ($contratos as $contrato) {
+			if ($contrato['forma_cobro'] == 'HITOS') {
+				continue;
+			}
+			$codigo_cliente = $contrato['codigo_cliente'];
+			if (!isset($clientes[$codigo_cliente])) {
+				$clientes[$codigo_cliente] = array();
+			}
+			$clientes[$codigo_cliente][] = $contrato;
+		}
+		unset($contratos);
+		$total_clientes = count($clientes);
+		foreach ($clientes as $codigo_cliente => $contratos) {
 			try {
 				++$processing;
 				$msg_procesando = $this->sp($processing, '1 cliente', "{$processing} clientes");
 				$this->status('proceso', "Procesando $msg_procesando de {$total_clientes}.");
-				$Contrato = new Contrato($this->Session);
-				$contratos = $Contrato->contratosParaBorradorCobro($codigo_cliente, $this->data['form']);
 				foreach ($contratos as $contrato) {
 					if ($contrato['separar_liquidaciones']) {
 						$this->generaHH($contrato['id_contrato']);
@@ -198,14 +238,25 @@ class GeneracionMasivaCobros extends AppShell {
 	 */
 	private function status($type, $status) {
 		$this->status[$type] = $status;
-		$st = implode('<br/>', array_filter($this->status));
 		try {
-			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $st);
+			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $this->statusText());
 		} catch (PDOException $e) {
+			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 			$this->status['error'] = 'Ocurrio un error inesperado.';
+			++$this->errors[$type];
 		} catch (Exception $e) {
+			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 			$this->status['error'] = 'Ocurrio un error inesperado.';
+			++$this->errors[$type];
 		}
+	}
+
+	/**
+	 * Genera un texto del array de status.
+	 * @return string
+	 */
+	private function statusText() {
+		return implode('<br/>', array_filter($this->status));
 	}
 
 	/**
@@ -225,7 +276,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->log("{$url}?{$get_data} --post {$post_data}");
 			$ch = curl_init();
 
-			curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'GET');
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 			curl_setopt($ch, CURLOPT_URL, "{$url}?{$get_data}");
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);

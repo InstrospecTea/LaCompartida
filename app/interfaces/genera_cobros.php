@@ -2,6 +2,9 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+require_once dirname(__FILE__) . '/../../fw/classes/Buscador.php';
+require_once dirname(__FILE__) . '/../classes/Trabajo.php';
+
 $sesion = new Sesion(array('COB', 'DAT'));
 $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
@@ -45,96 +48,26 @@ if ($opc == 'asuntos_liquidar') {
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
 		$codigo_cliente = $cliente->fields['codigo_cliente'];
+		$_POST['codigo_cliente'] = $codigo_cliente;
 	}
 
 	if ($codigo_asunto_secundario) {
 		$asunto = new Asunto($sesion);
 		$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
 		$codigo_asunto = $asunto->fields['codigo_asunto'];
+		$_POST['codigo_asunto'] = $codigo_asunto;
 	}
 
 	if ($codigo_cliente) {
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigo($codigo_cliente);
 		$codigo_cliente_secundario = $cliente->fields['codigo_cliente_secundario'];
+		$_POST['codigo_cliente_secundario'] = $codigo_cliente_secundario;
 	}
-
-	$where = 1;
-	if ($activo) {
-		$where .= " AND contrato.activo = 'SI' ";
-	} else {
-		$where .= " AND contrato.activo = 'NO' ";
-	}
-	if ($id_usuario) {
-		$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
-	}
-	if ($id_usuario_secundario) {
-		$where .= " AND contrato.id_usuario_secundario = '$id_usuario_secundario' ";
-	}
-	if ($codigo_asunto) {
-		$where .= " AND asunto.codigo_asunto ='" . $codigo_asunto . "' ";
-	}
-	if ($codigo_cliente) {
-		$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
-	}
-	if ($id_grupo_cliente) {
-		$where .= " AND (cliente.id_grupo_cliente = '$id_grupo_cliente' OR grupo_cliente.id_grupo_cliente = '$id_grupo_cliente' )";
-	}
-	if ($forma_cobro) {
-		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
-	}
-	if ($tipo_liquidacion) {//1-2 = honorarios-gastos, 3 = mixtas
-		$where .= " AND contrato.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
-		if ($tipo_liquidacion == 1) {
-			$where .= " AND (contrato.forma_cobro != 'HITOS') ";
-		}
-	}
-
-	$mostrar_codigo_asuntos = "";
-
-	if (Conf::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
-		$mostrar_codigo_asuntos = "asunto.codigo_asunto";
-		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-			$mostrar_codigo_asuntos .= "_secundario";
-		}
-		$mostrar_codigo_asuntos .= ", ' ', ";
-	}
-
-
-	global $contratofields;
-
-	$query = "SELECT SQL_CALC_FOUND_ROWS
-					contrato.id_contrato,
-					contrato.codigo_cliente,
-					cliente.glosa_cliente,
-					contrato.forma_cobro,
-					contrato.monto,
-					contrato.codigo_idioma,
-					moneda.simbolo,
-					GROUP_CONCAT($mostrar_codigo_asuntos glosa_asunto SEPARATOR '|') as asuntos,
-					asunto.glosa_asunto as asunto_lista,
-					contrato.forma_cobro,
-					CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
-					contrato.activo,
-					(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro,
-					tarifa.glosa_tarifa,
-					contrato.incluir_en_cierre,
-					contrato.retainer_horas,
-					moneda_monto.simbolo as simbolo_moneda_monto,
-					moneda_monto.cifras_decimales as cifras_decimales_moneda_monto,
-					contrato.separar_liquidaciones";
-	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_generar_cobro') : false;
-	$query .= "	FROM contrato
-					JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
-					JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente AND cliente.activo = 1
-					LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato
-					LEFT JOIN grupo_cliente  ON grupo_cliente.codigo_cliente=contrato.codigo_cliente
-					JOIN prm_moneda as moneda ON (moneda.id_moneda=contrato.id_moneda)
-					LEFT JOIN prm_moneda as moneda_monto ON moneda_monto.id_moneda=contrato.id_moneda_monto
-				WHERE $where
-				GROUP BY contrato.id_contrato";
 
 	###### BUSCADOR ######
+	$CobroQuery = new CobroQuery($sesion);
+	$query = $CobroQuery->genera_cobros($_POST);
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente, asunto_lista';
 	$b = new Buscador($sesion, $query, "Contrato", $desde, $x_pag, $orden);
@@ -288,7 +221,6 @@ if ($opc == 'buscar') {
 		return true;
 	}
 
-
 	function GeneraCobros(form, desde, opcion, id_formato) {
 
 		if (!form) {
@@ -296,42 +228,8 @@ if ($opc == 'buscar') {
 		}
 
 		if (desde == 'genera') {
-
-			var url = root_dir + '/app/ProcessLock';
-			var reply = {};
-			jQuery.ajax(url + '/is_locked/<?php echo Cobro::PROCESS_NAME; ?>', {
-				async: false,
-				success: function(result) {
-					reply = result;
-				}
-			});
-			if (reply.locked) {
-				var locker = {};
-				jQuery.ajax(url + '/get_locker/<?php echo Cobro::PROCESS_NAME; ?>', {
-					async: false,
-					success: function(result) {
-						locker = result;
-					}
-				});
-
-				jQuery('<p/>')
-					.attr('title', 'Advertencia')
-					.append('<p style="font-size:11px;">El proceso se encuentra bloqueado por el usuario ' + locker.nombre_usuario + '<br/><strong>Estado actual:</strong><br/>' + locker.estado + '</p>')
-					.dialog({
-						autoOpen: true,
-						height: 'auto',
-						width: 400,
-						modal: true,
-						open: function() {
-							jQuery('.ui-dialog-title').addClass('ui-icon-warning');
-							jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
-						},
-						buttons: {
-							'Cerrar': function() {
-								jQuery(this).dialog('close');
-							}
-						}
-					})
+			// Validar que no exista un proceso de generación de cobros pendiente
+			if (ProcessLock()) {
 				return;
 			}
 
@@ -417,8 +315,6 @@ if ($opc == 'buscar') {
 
 								<?php if (Conf::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
 									var data = {
-										'arrayHH': arrayHH,
-										'arrayMIXTAS': arrayMIXTAS,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST);?>,
 										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
@@ -432,7 +328,6 @@ if ($opc == 'buscar') {
 
 								<?php } else { ?>
 									var data = {
-										'arrayClientes': arrayClientes,
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST); ?>,
 										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
@@ -445,7 +340,8 @@ if ($opc == 'buscar') {
 									});
 
 								<?php } ?>
-
+								seconds = 4;
+								startCheckProcessLock();
 							},
 							"<?php echo __('Cancelar') ?>": function() {
 								jQuery(this).dialog('close');
@@ -594,6 +490,10 @@ if ($opc == 'buscar') {
 			interrumpeproceso = 0;
 			if (response) {
 				if (alerta) {
+					// No se pueden descargar los borradores si existe un proceso de generación de cobros pendiente
+					if (ProcessLock()) {
+						return;
+					}
 
 					var text_window = '<strong><center><?php echo __('A continuación se generarán los borradores del periodo que ha seleccionado.') ?><br><br><?php echo __('¿Desea descargar los cobros del periodo?') ?><center></strong><br><br>';
 
@@ -852,7 +752,99 @@ if ($opc == 'buscar') {
 
 	}
 
+	var timerProcessLock;
+	var seconds = 4;
+	function startCheckProcessLock() {
+		timerProcessLock = window.setTimeout(checkProcessLock, seconds * 1000);
+		if (seconds != 64) {
+			seconds += seconds;
+		}
+	}
+
+	/**
+	 * Revisa por ajax si el proceso ha sido desbloqueado.
+	 */
+	function checkProcessLock() {
+		jQuery.get(root_dir + '/app/ProcessLock/get_process_lock_not_notified/<?php echo Cobro::PROCESS_NAME; ?>', function(proceso) {
+			if (proceso.id) {
+				window.clearTimeout(timerProcessLock);
+				jQuery.get(root_dir + '/app/ProcessLock/get_notification_html/' + proceso.id, function(html) {
+					mostrar_notificacion(html, proceso.id);
+				});
+				return;
+			}
+			startCheckProcessLock();
+		});
+	}
+
+	/**
+	 * Verifica la existencia de procesos de cobros
+	 * Si existe un proceso pendiente la función retorna TRUE, de lo contrario FALSE
+	 * @return bool
+	 */
+	function ProcessLock() {
+		var url = root_dir + '/app/ProcessLock';
+		var reply = {};
+		var locker = {};
+
+		jQuery.ajax(url + '/is_locked/<?php echo Cobro::PROCESS_NAME; ?>', {
+			async: false,
+			success: function(result) {
+				reply = result;
+			}
+		});
+
+		if (reply.locked) {
+			jQuery.ajax(url + '/get_locker/<?php echo Cobro::PROCESS_NAME; ?>', {
+				async: false,
+				success: function(result) {
+					locker = result;
+				}
+			});
+
+			jQuery('<p/>')
+				.attr('title', 'Advertencia')
+				.append('<p style="font-size:11px;">El proceso se encuentra bloqueado por el usuario ' + locker.nombre_usuario + '<br/><strong>Estado actual:</strong><br/>' + locker.estado + '</p>')
+				.dialog({
+					autoOpen: true,
+					height: 'auto',
+					width: 400,
+					modal: true,
+					open: function() {
+						jQuery('.ui-dialog-title')
+							.addClass('ui-icon-warning');
+						jQuery('.ui-dialog-buttonpane')
+							.find('button')
+							.addClass('btn')
+							.removeClass('ui-button ui-state-hover');
+					},
+					buttons: {
+						'Cerrar': function() {
+							jQuery(this).dialog('close');
+						}
+					}
+				});
+
+			return true;
+		}
+
+		return false;
+	}
 </script>
+
+<?php
+$BloqueoProceso = new BloqueoProceso($sesion);
+$proceso = $BloqueoProceso->getProcessLockedByUserId($sesion->usuario->fields['id_usuario'], Cobro::PROCESS_NAME);
+if ($proceso !== false) {
+?>
+	<script type="text/javascript" defer="defer">
+		jQuery.get(root_dir + '/app/ProcessLock/get_process_locked/<?php echo Cobro::PROCESS_NAME; ?>', function(proceso) {
+			if (proceso != false && proceso.bloqueado) {
+				startCheckProcessLock();
+			}
+		});
+	</script>
+<?php } ?>
 
 <form name='form_busca' id='form_busca' action='' method=post>
 	<?php

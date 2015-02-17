@@ -105,6 +105,13 @@ class Cliente extends Objeto {
 			)
 		),
 		array(
+			'field' => 'nombre_pais_grupo',
+			'title' => 'País Grupo',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
 			'field' => 'username',
 			'title' => 'Encargado Comercial',
 			'extras' => array(

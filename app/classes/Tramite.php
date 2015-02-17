@@ -98,16 +98,15 @@ class Tramite extends Objeto
 		return $insertCriteria;
 	}
 
-	function Write($historialOnWrite = true, $app_id = null) {
+	function Write($writeLog = true, $app_id = null) {
 		$errandService = new ErrandService($this->sesion);
 		$errand = new Errand();
 		$errand->fillFromArray($this->fields);
 		$errand->fillChangedFields($this->changes);
 		try {
-			$errandService->saveOrUpdate($errand);
+			$errandService->saveOrUpdate($errand, $writeLog);
 			$this->fields = $errand->fields;
 		} catch(Exception $ex) {
-			print_r($ex->getMessage());
 			return false;
 		}
 		return true;

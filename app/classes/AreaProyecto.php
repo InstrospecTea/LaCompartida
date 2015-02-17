@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-class AreaProyecto extends Objeto {
+class AreaProyecto extends ObjetoExt {
 	public static $llave_carga_masiva = 'glosa';
 
 	function AreaProyecto($Sesion, $fields = '', $params = '') {
@@ -21,4 +21,5 @@ class AreaProyecto extends Objeto {
 			$this->Load($project_area_id);
 		}
 	}
+	  
 }

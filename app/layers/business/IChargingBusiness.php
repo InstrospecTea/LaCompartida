@@ -1,13 +1,13 @@
 <?php
 
-interface IChargingBusiness extends BaseBusiness {
+interface IChargingBusiness  extends BaseBusiness {
 
 	/**
-	 * Obtiene una instancia de {@link Charge} en base a su identificador primario.
-	 * @param $chargeId
-	 * @return Charge
+	 * Verifica si existe un cobro segun su ID.
+	 * @param int $id_cobro
+	 * @return boolean
 	 */
-	public function getCharge($chargeId);
+	public function doesChargeExists($id_cobro);
 
 	/**
 	 * Obtiene una instancia de {@link Document} en base a una instancia de {@link Charge}
@@ -34,10 +34,10 @@ interface IChargingBusiness extends BaseBusiness {
 
 
 	/**
-	 * Obtiene un detalle del monto de honorarios de la liquidaciÃ³n
+	 * Obtiene un detalle del monto de honorarios de la liquidación
 	 *
-	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la informaciÃ³n.
-	 * @param  currency Es una instancia de {@link Currency} para obtener los datos en moneda especÃ­fica.
+	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la información.
+	 * @param  currency Es una instancia de {@link Currency} para obtener los datos en moneda específica.
 	 * @return GenericModel  
 	 * 
 	 * [
@@ -48,4 +48,5 @@ interface IChargingBusiness extends BaseBusiness {
 	 * 
 	 */
 	function getAmountDetailOfFees(Charge $charge, Currency $currency);
+
 }

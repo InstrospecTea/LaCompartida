@@ -315,6 +315,11 @@ class Factura extends Objeto {
 			'title' => 'id_factura',
 			'visible' => false,
 		),
+		array(
+			'field' => 'glosa_estudio',
+			'title' => 'Companía',
+			'visible' => false,
+		)
 	);
 
 	// Twig, the flexible, fast, and secure template language for PHP
@@ -2477,7 +2482,8 @@ class Factura extends Objeto {
                 , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
                 , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
                 , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-                , factura.RUT_cliente";
+                , factura.RUT_cliente
+                , prm_estudio.glosa_estudio";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
@@ -2516,6 +2522,7 @@ class Factura extends Objeto {
 		   LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 		   LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+		   LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 		   WHERE ";
 
 		$resultingquery = $query . " \n " . $where . " \n " . $groupby . "\n" . $orderby;
@@ -2585,8 +2592,8 @@ class Factura extends Objeto {
 			, $tipo_documento_legal_buscado
 			, $codigo_cliente, $codigo_cliente_secundario
 			, $codigo_asunto, $codigo_asunto_secundario
-			, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
-		
+			, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
+
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();

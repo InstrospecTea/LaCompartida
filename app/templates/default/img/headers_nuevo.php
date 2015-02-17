@@ -16,6 +16,7 @@
 	<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/app/interfaces/fs-pat.js.php"></script>
 	<!--Droplinemenu-->
 	<link rel="stylesheet" type="text/css" href="droplinetabs.css" />
+<script src="//static.thetimebilling.com/js/vendor/modernizr-2.6.1.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script src="droplinemenu.js" type="text/javascript"></script>
 <script type="text/javascript">

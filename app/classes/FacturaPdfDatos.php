@@ -394,9 +394,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
-            case 'lbl_fecha_vencimiento':
-                $glosa_dato = 'Fecha Vencimiento / Due Date:';
-                break;
+			case 'lbl_fecha_vencimiento':
+				$glosa_dato = 'Fecha Vencimiento / Due Date:';
+				break;
 			case 'monto_honorarios_con_iva':
 				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -417,7 +417,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 
 			default:
-			
+
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
