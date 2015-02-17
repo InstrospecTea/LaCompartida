@@ -140,7 +140,7 @@ EOF;
 						$hookArg['InvoiceURL'] = $file_url;
 					}
 				} catch (Exception $ex) {
-					self::ParseError($ex, 'BuildingInvoiceError');
+					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 				}
 			} else {
 				$hookArg['Error'] = self::ParseError($result, 'BuildingInvoiceError');
@@ -259,7 +259,7 @@ EOF;
 
 		$tra = array();
 		if ($Factura->fields['iva'] > 0) {
-			$tra = array( 
+			$tra = array(
 				'impuesto|IVA',
 				'importe|' . number_format($Factura->fields['iva'], 2, '.', ''),
 				'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', '')
