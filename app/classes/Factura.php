@@ -196,7 +196,7 @@ class Factura extends Objeto {
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			),
-		),		
+		),
 		array(
 			'field' => 'honorarios',
 			'format' => 'number',
@@ -2598,7 +2598,7 @@ class Factura extends Objeto {
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-			
+
 
 		$billingBusiness = new BillingBusiness($this->sesion);
 		$charginBusiness = new ChargingBusiness($this->sesion);
@@ -2611,7 +2611,7 @@ class Factura extends Objeto {
 			//monto_real
 			$monto_real = $this->ObtenerValorReal($fila['id_factura']);
 			$results[$key]['monto_real'] = strtoupper($fila['codigo_estado']) == 'A' ? '0' : $monto_real;
-			
+
 			//Obtener Descuento y Bruto
 			$id_cobro = $results[$key]['id_cobro'];
 			$id_factura = $results[$key]['id_factura'];
@@ -2631,7 +2631,7 @@ class Factura extends Objeto {
 			$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
 			$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
 			$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
-			
+
 			$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
 			$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
 
@@ -2667,7 +2667,7 @@ class Factura extends Objeto {
 			$results[$key]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';
 			$results[$key]['fecha_ultimo_pago'] = $pago['fecha_ultimo_pago'];
 		}
-		return $results;	
+		return $results;
 	}
 
 	public function PreCrearDato($data) {

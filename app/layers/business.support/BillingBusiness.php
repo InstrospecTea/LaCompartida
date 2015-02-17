@@ -7,8 +7,8 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $this->InvoiceService->get($invoiceId);
 	}
 
-	public function getFeesDataOfInvoiceByCharge(Invoice $invoice, Charge $charge, Currency $currency) {	
-		$this->loadBusiness('Charging');	
+	public function getFeesDataOfInvoiceByCharge(Invoice $invoice, Charge $charge, Currency $currency) {
+		$this->loadBusiness('Charging');
 		$chargeData = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
 		$chargeFees = $chargeData->get('saldo_honorarios');
 		$chargeDiscount = $chargeData->get('descuento_honorarios');
@@ -18,7 +18,10 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 	}
 
 	public function getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency) {
-		$factor = $invoiceFees / $chargeFees;
+		$factor = 1;
+		if ($chargeFees > 0) {
+			$factor = $invoiceFees / $chargeFees;
+		}
 		$invoiceDiscount = $factor * $chargeDiscount;
 		$subtotalFees = $invoiceFees + $invoiceDiscount;
 
@@ -33,10 +36,10 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency) {
 		$this->loadBusiness('Coining');
 		return $this->CoiningBusiness->changeCurrency(
-			$invoice->get('honorarios'), 
+			$invoice->get('honorarios'),
 			$this->CoiningBusiness->getCurrency(
 				$invoice->get('id_moneda')
-			), 
+			),
 			$currency);
 	}
 

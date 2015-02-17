@@ -228,6 +228,11 @@ class FacturaPago extends Objeto {
 					'title' => 'Descripción Factura',
 					'field' => 'descripcion_factura',
 			),
+			array(
+					'field' => 'glosa_estudio',
+					'title' => 'Companía',
+					'visible' => false,
+			)
 	);
 
 	function FacturaPago($sesion, $fields = "", $params = "") {
