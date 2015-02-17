@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.2.2
+Martes 17 de Febrero 2015
+* **Fix:** [Enviar email de solicitante a Nubox](https://github.com/LemontechSA/ttb/pull/852)
+
 ## Hotfix 15.2.1
 Martes 17 de Febrero 2015
 * **Fix:** [Agrega lang para error 320 facturación mx y devuelve mensaje de error en caso de excepción](https://github.com/LemontechSA/ttb/pull/851)
