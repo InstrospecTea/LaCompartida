@@ -2420,7 +2420,7 @@ class Migracion {
 		//ingresar un pago a los movimientos de ctacte (con sus neteos)
 		$mvto = $mvto_pago->RegistrarMvto($id_moneda, $monto, '0', $monto, $fecha, $neteos, null, $id_pago, 'P', $ids_monedas_documento, $tipo_cambios_documento);
 
-		$arreglo_monedas = UtilesApp::ArregloMonedas($this->sesion);
+		$arreglo_monedas = Moneda::ArregloMonedas($this->sesion);
 
 		$arreglo_pagos_detalle = array();
 		foreach ($neteos as $neteo) {

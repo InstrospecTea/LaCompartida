@@ -28,7 +28,7 @@ class CtaCteFact extends Objeto
 	{
 		global $sesion;
 
-		$arreglo_monedas = UtilesApp::ArregloMonedas($sesion);
+		$arreglo_monedas = Moneda::ArregloMonedas($sesion);
 
 		$query = "
 		SELECT sum(saldo*prm_moneda.tipo_cambio)
@@ -228,7 +228,7 @@ class CtaCteFact extends Objeto
 			return true;
 		}
 
-		$arreglo_monedas = UtilesApp::ArregloMonedas($this->sesion);
+		$arreglo_monedas = Moneda::ArregloMonedas($this->sesion);
 
 		$arreglo_pagos_detalle = array();
 		foreach($neteos as $neteo){

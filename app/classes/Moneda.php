@@ -5,6 +5,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 class Moneda extends Objeto {
 
 	public static $llave_carga_masiva = 'codigo';
+	public static $arreglo_monedas;
 
 	function Moneda($sesion, $fields = "", $params = "") {
 		$this->tabla = 'prm_moneda';
@@ -212,6 +213,33 @@ class Moneda extends Objeto {
 		}
 		$v = number_format($valor, $this->fields['cifras_decimales'], '.', '');
 		return $convert ? (float) $v : $v;
+	}
+
+	/**
+	 * Devuelve un arreglo con las monedas configuradas en el sistema.
+	 * @param type $sesion
+	 * @return array
+	 */
+	public static function ArregloMonedas($sesion) {
+		if (!empty(self::$arreglo_monedas)) {
+			return self::$arreglo_monedas;
+		}
+		$query = "SELECT
+						prm_moneda.id_moneda,
+						prm_moneda.tipo_cambio,
+						prm_moneda.cifras_decimales,
+						prm_moneda.glosa_moneda,
+						prm_moneda.glosa_moneda_plural,
+						prm_moneda.simbolo
+					FROM prm_moneda";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$moneda = array();
+		while ($moneda = mysql_fetch_assoc($resp)) {
+			$id_moneda = $moneda['id_moneda'];
+			unset($moneda['id_moneda']);
+			self::$arreglo_monedas[$id_moneda] = $moneda;
+		}
+		return self::$arreglo_monedas;
 	}
 
 }
