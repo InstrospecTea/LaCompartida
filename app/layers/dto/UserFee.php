@@ -19,7 +19,15 @@ class UserFee extends Entity {
 		return 'usuario_tarifa';
 	}
 
-	protected function getDefaults() {
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad.
+	 * @return array
+	 */
+	public function getTableDefaults() {
+		return array();
+	}
+
+	protected function getFixedDefaults() {
 		return array();
 	}
 }

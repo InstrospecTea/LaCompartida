@@ -19,7 +19,15 @@ class Fee extends Entity {
 		return 'tarifa';
 	}
 
-	public function getDefaults() {
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad.
+	 * @return array
+	 */
+	public function getTableDefaults() {
+		return array();
+	}
+
+	protected function getFixedDefaults() {
 		return array();
 	}
 

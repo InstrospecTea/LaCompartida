@@ -870,29 +870,29 @@ class FacturaPago extends Objeto {
 			$id_cobro = $results[$key]['id_cobro'];
 			$id_factura = $results[$key]['id_factura'];
 			$id_moneda = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
-			
-			$invoice = $invoiceData[$id_factura];
-			if (is_null($invoice)) {
-				$invoice = $billingBusiness->getInvoice($id_factura);
-				$invoiceData[$id_factura] = $invoice;
+			if ($id_factura) {
+				$invoice = $invoiceData[$id_factura];
+				if (is_null($invoice)) {
+					$invoice = $billingBusiness->getInvoice($id_factura);
+					$invoiceData[$id_factura] = $invoice;
+				}
+				$currency = $coiningData[$id_moneda];
+				if (is_null($currency)) {
+					$currency = $coiningBusiness->getCurrency($id_moneda);
+					$coiningData[$id_moneda] = $currency;
+				}
+				if (is_null($charginData[$id_cobro])) {
+					$charge = $charginBusiness->getCharge($id_cobro);
+					$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+				}
+				$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+				$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
+				$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
+				$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+				
+				$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
+				$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');				
 			}
-			$currency = $coiningData[$id_moneda];
-			if (is_null($currency)) {
-				$currency = $coiningBusiness->getCurrency($id_moneda);
-				$coiningData[$id_moneda] = $currency;
-			}
-			if (is_null($charginData[$id_cobro])) {
-				$charge = $charginBusiness->getCharge($id_cobro);
-				$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
-			}
-			$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
-			$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
-			$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
-			$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
-			
-			$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
-			$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
-
 		}
 		return $results;
 	}
