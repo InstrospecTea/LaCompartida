@@ -152,7 +152,9 @@ class Moneda extends Objeto {
 
 	/**
 	 * Obtiene todas las monedas del sistema para ser utilizadas en Select
-	 * @param type $Sesion
+	 * @param Sesion $Sesion
+	 * @param int $id_moneda
+	 * @param boolean $como_objeto
 	 * @return array Arreglo con monedas para ser usados en Selects
 	 */
 	public static function GetMonedas(&$Sesion, $id_moneda = '', $como_objeto = false) {
@@ -173,22 +175,14 @@ class Moneda extends Objeto {
 		$r = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 		$monedas = array();
 
-		if ($como_objeto) {
-			while (list($id_moneda, $glosa_moneda, $glosa_moneda_plural, $tipo_cambio, $cifras_decimales, $simbolo, $codigo) = mysql_fetch_array($r)) {
-				$monedas[$id_moneda]['id_moneda'] = $id_moneda;
-				$monedas[$id_moneda]['tipo_cambio'] = $tipo_cambio;
-				$monedas[$id_moneda]['glosa_moneda'] = $glosa_moneda;
-				$monedas[$id_moneda]['glosa_moneda_plural'] = $glosa_moneda_plural;
-				$monedas[$id_moneda]['cifras_decimales'] = $cifras_decimales;
-				$monedas[$id_moneda]['simbolo'] = $simbolo;
-				$monedas[$id_moneda]['codigo'] = $codigo;
-			}
-		} else {
-			while ($moneda = mysql_fetch_array($r)) {
+		$fetch = 'mysql_fetch_' . ($como_objeto ? 'assoc' : 'array');
+		while ($moneda = $fetch($r)) {
+			if ($como_objeto) {
+				$monedas[$moneda['id_moneda']] = $moneda;
+			} else {
 				$monedas[] = $moneda;
 			}
 		}
-
 		return $monedas;
 	}
 
@@ -213,33 +207,6 @@ class Moneda extends Objeto {
 		}
 		$v = number_format($valor, $this->fields['cifras_decimales'], '.', '');
 		return $convert ? (float) $v : $v;
-	}
-
-	/**
-	 * Devuelve un arreglo con las monedas configuradas en el sistema.
-	 * @param type $sesion
-	 * @return array
-	 */
-	public static function ArregloMonedas($sesion) {
-		if (!empty(self::$arreglo_monedas)) {
-			return self::$arreglo_monedas;
-		}
-		$query = "SELECT
-						prm_moneda.id_moneda,
-						prm_moneda.tipo_cambio,
-						prm_moneda.cifras_decimales,
-						prm_moneda.glosa_moneda,
-						prm_moneda.glosa_moneda_plural,
-						prm_moneda.simbolo
-					FROM prm_moneda";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$moneda = array();
-		while ($moneda = mysql_fetch_assoc($resp)) {
-			$id_moneda = $moneda['id_moneda'];
-			unset($moneda['id_moneda']);
-			self::$arreglo_monedas[$id_moneda] = $moneda;
-		}
-		return self::$arreglo_monedas;
 	}
 
 }

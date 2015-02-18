@@ -805,7 +805,7 @@ class Documento extends Objeto {
 	 * @return string
 	 */
 	function SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda = null, $tipos_cambio = null) {
-		$monedas = Moneda::ArregloMonedas($this->sesion);
+		$monedas = Moneda::GetMonedas($this->sesion, null, true);
 		if (empty($tipos_cambio)) {
 			$tipos_cambio = array();
 			foreach ($monedas as $id => $moneda) { //uf:20000, us:500, idmoneda:us. adelanto de 100 uf -> us4000

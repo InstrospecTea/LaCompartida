@@ -472,8 +472,9 @@ class ReporteContrato extends Contrato {
 		if ($monto_por_cobrar == '' || is_null($monto_por_cobrar))
 			$monto_por_cobrar = 0;
 
-		if (!$this->monedas)
-			$this->monedas = Moneda::ArregloMonedas($this->sesion);
+		if (!$this->monedas) {
+			$this->monedas = Moneda::GetMonedas($this->sesion, null, true);
+		}
 
 		$query = "SELECT separar_liquidaciones, opc_moneda_total, opc_moneda_gastos FROM contrato WHERE id_contrato = '$id_contrato'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
