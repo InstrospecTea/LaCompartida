@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.2.3
+Martes 17 de Febrero 2015
+* **Fix:** [Agrupador Area asunto en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/853)
+
 ## Hotfix 15.2.2
 Martes 17 de Febrero 2015
 * **Fix:** [Enviar email de solicitante a Nubox](https://github.com/LemontechSA/ttb/pull/852)
