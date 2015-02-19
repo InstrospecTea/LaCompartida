@@ -170,6 +170,7 @@ if ($opc == 'buscar') {
 								}
 								if (jQuery('#fecha_fin').length) {
 									var fecha_fin = jQuery('#fecha_fin').val();
+								}
 								var data = {
 									accion: 'elimina_cobro',
 									id_cobro: id,
