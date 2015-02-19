@@ -373,6 +373,7 @@ if ($accion == "consistencia_cliente_asunto") {
 	try {
 		$cobro_eliminado->Eliminar($id_cobro);
 	} catch (Exception $e) {
+		$respuesta['error'] = true;
 		$respuesta['message'] = $e->getMessage() . '.';
 	}
 	$respuesta['message'] = utf8_encode($respuesta['message']);
