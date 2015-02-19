@@ -81,6 +81,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 
 	public function overrideDocument($id_cobro = null, $estado = 'CREADO', $hay_pagos = false) {
+		$this->loadModel('Documento');
 		if (!$this->Documento->Loaded()) {
 			if (empty($id_cobro)) {
 				return;
