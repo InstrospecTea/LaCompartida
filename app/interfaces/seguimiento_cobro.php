@@ -22,25 +22,12 @@ $query_proceso = "SELECT id_proceso FROM cobro_proceso ORDER BY id_proceso ASC";
 $query_forma_cobro = "SELECT forma_cobro, descripcion FROM prm_forma_cobro";
 
 if ($opc == 'eliminar') {
-
-	if ($cobros->Load($id_cobro_hide)) {
-
-		$documento_cobro = new Documento($sesion);
-		$documento_cobro->LoadByCobro($id_cobro_hide);
-		$lista_pagos = $documento_cobro->ListaPagos();
-
-		$query = "SELECT count(*) FROM factura WHERE id_cobro = '" . $cobros->fields['id_cobro'] . "'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		list($cont_facturas) = mysql_fetch_array($resp);
-
-		if ($lista_pagos) {
-			$pagina->AddError(__('El cobro Nº') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un pago asociado.'));
-		} else if ($cont_facturas > 0) {
-			$pagina->AddError(__('El cobro Nº') . $cobros->fields['id_cobro'] . __(' no se puede borrar porque tiene un documento tributario asociado.'));
-		} else if ($cobros->Eliminar()) {
-			$pagina->AddInfo(__('Cobro eliminado con éxito'));
-		}
+	try {
+		$cobros->Eliminar($id_cobro_hide);
+	} catch (Exception $e) {
+		$pagina->AddError($e->getMessage() . '.');
 	}
+	$pagina->AddInfo(__('Cobro eliminado con éxito') . '.');
 }
 
 if ($opc == 'buscar') {
@@ -489,56 +476,57 @@ $pagina->PrintTop();
 
 	//Elimina Cobro
 	function EliminarCobros(id_cobro, estado) {
-
-		if (estado != 'CREADO' && estado != 'EN REVISION') {
-
-			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('El cobro seleccionado se encuentra en estado EMITIDO, Ud. debe cambiarlo a estado CREADO o EN REVISION para poder eliminarlo.') ?>.</span><br>';
-			text_window += '<br><table><tr>';
-			text_window += '</table>';
-
-			Dialog.confirm(text_window,
-			{
-				top: 150,
-				left: 290,
-				width: 400,
-				okLabel: "<?php echo __('Continuar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
-				id: "myDialogId",
-				cancel: function(win) {
-					return false;
-				},
-				ok: function(win) {
-					nuevaVentana('Editar_Contrato', 1050, 700, 'cobros6.php?id_cobro=' + id_cobro + '&popup=1&contitulo=true');
-					return true;
-				}
-			});
-
-		} else if (estado == 'CREADO' || estado == 'EN REVISION') {
-
-			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-			text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('¿Desea eliminar el cobro seleccionado?') ?></span><br>';
-			text_window += '<br><table><tr>';
-			text_window += '</table>';
-
-			Dialog.confirm(text_window,
-			{
-				top: 150,
-				left: 290,
-				width: 400,
-				okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
-				id: "myDialogId",
-				cancel: function(win) {
-					return false;
-				},
-				ok: function(win) {
-					DeleteCobro(id_cobro);
-					return true;
-				}
-			});
-
+		var okButton = {
+			caption: 'ok',
+			onClick: function(){}
+		};
+		var text_window = '';
+		if (estado == 'CREADO') {
+			text_window = '<span><?php echo __('¿Desea eliminar el cobro seleccionado?') ?></span>';
+			okButton.caption = '<?php echo __('Aceptar') ?>';
+			okButton.onClick = function() {
+				DeleteCobro(id_cobro);
+				jQuery(this).dialog('close');
+			};
 		} else {
-			return false;
+			text_window = '<span><?php echo __('El cobro seleccionado debe estar en estado CREADO para poder eliminarlo.') ?>.</span>';
+			okButton.caption = '<?php echo __('Continuar') ?>';
+			okButton.onClick = function() {
+				nuevaVentana('Editar_Contrato', 1050, 700, 'cobros6.php?id_cobro=' + id_cobro + '&popup=1&contitulo=true');
+				jQuery(this).dialog('close');
+			};
+
 		}
+
+		jQuery('<p/>')
+			.css('font-size', '12px')
+			.css('font-weight', 'bold')
+			.attr('title', '<?php echo __('ALERTA') ?>')
+			.html(text_window)
+			.dialog({
+				resizable: true, autoOpen: true, height: 200, width: 350, modal: true,
+				close: function(ev, ui) {
+					jQuery(this).remove();
+				},
+				open: function() {
+					jQuery('.ui-dialog-title').addClass('ui-icon-warning');
+					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+				},
+				buttons: [
+					{
+						text: okButton.caption,
+						click: okButton.onClick
+					},
+					{
+						text: '<?php echo __('Cancelar') ?>',
+						click: function() {
+							jQuery(this).dialog('close');
+							return false;
+						}
+					}
+				]
+			});
+
 	}
 
 	function DeleteCobro(id_cobro) {
