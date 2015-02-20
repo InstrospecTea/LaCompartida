@@ -1600,6 +1600,21 @@ class Contrato extends Objeto {
 		$Contrato->sesion->pdodbh->exec($updateestado);
 	}
 
+	/**
+	 * Entrega la fecha_fin del último cobro creado para el contrato $id_contrato,
+	 * por defecto entrega la misma fecha, pero se puede solicitar $incremento_en_dias
+	 * días mas
+	 *
+	 * @param int $id_contrato        Id del contrato a consultar
+	 * @param int $incremento_en_dias Cuantos días sumarle a la fecha fin del último cobro
+	 */
+	public function FechaFinUltimoCobro($id_contrato, $incremento_en_dias = 0) {
+		$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL $incremento_en_dias DAY) FROM cobro WHERE id_contrato = '$id_contrato'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($fecha_fin_ultimo_cobro) = mysql_fetch_array($resp);
+		return $fecha_fin_ultimo_cobro;
+	}
+
 }
 
 class ListaContrato extends Lista {
