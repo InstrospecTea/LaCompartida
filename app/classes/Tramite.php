@@ -174,13 +174,3 @@ class Tramite extends Objeto
         return false;
     }
 }
-if(!class_exists('ListaTramites')) {
-	class ListaTramites extends Lista
-	{
-		function ListaTramites($sesion, $params, $query)
-		{
-			$this->Lista($sesion, 'Tramite', $params, $query);
-		}
-	}
-}
-
