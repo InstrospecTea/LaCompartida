@@ -668,14 +668,6 @@ if (!class_exists('Cobro')) {
 			$chargingBusiness = new ChargingBusiness($this->sesion);
 			$chargingBusiness->delete($id_cobro);
 
-			#Se ingresa la anotación en el historial
-			$his = new Observacion($this->sesion);
-			$his->Edit('fecha', @date('Y-m-d H:i:s'));
-			$his->Edit('comentario', __('COBRO ELIMINADO'));
-			$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-			$his->Edit('id_cobro', $id_cobro);
-			$his->Write();
-
 			return true;
 		}
 

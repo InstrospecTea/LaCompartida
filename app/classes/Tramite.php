@@ -98,7 +98,7 @@ class Tramite extends Objeto
 		return $insertCriteria;
 	}
 
-	function Write($writeLog = true, $app_id = null) {
+	function Write($writeLog = true) {
 		$errandService = new ErrandService($this->sesion);
 		$errand = new Errand();
 		$errand->fillFromArray($this->fields);
@@ -113,22 +113,18 @@ class Tramite extends Objeto
 	}
 
 	function Eliminar() {
-		if($this->Estado() == "Abierto") {
-			$errandService = new ErrandService($this->sesion);
-			$errand = new Errand();
-			$errand->fillFromArray($this->fields);
-			$errandService->delete($errand);
-			if($this->fields['trabajo_si_no']==1) {
-				$query = "DELETE FROM trabajo WHERE id_tramite='".$this->fields['id_tramite']."'";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			}
-
-			$query = "DELETE FROM tramite WHERE id_tramite='".$this->fields['id_tramite']."'";;
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			// Si se pudo eliminar, loguear el cambio.
-		} else {
-			$this->error = __("No se puede eliminar un trámite que no está abierto");
+		if($this->Estado() != __('Abierto')) {
+			$this->error = __('No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.');
 			return false;
+		}
+
+		$errandService = new ErrandService($this->sesion);
+		$errand = new Errand();
+		$errand->fillFromArray($this->fields);
+		$errandService->delete($errand);
+		if($this->fields['trabajo_si_no'] == 1) {
+			$query = "DELETE FROM trabajo WHERE id_tramite = '{$this->fields['id_tramite']}'";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		}
 
 		return true;
@@ -145,9 +141,9 @@ class Tramite extends Objeto
 	}
 
 	function Estado() {
-		if (!$this->fields['estadocobro'] && $this->fields['id_cobro']) {
+		if ($this->fields['id_cobro']) {
 			$cobro= new Cobro($this->sesion);
-			$cobro->Load($this->fields['id_cobro']);
+			$cobro->Load($this->fields['id_cobro'], array('estado'));
 			$this->fields['estadocobro'] = $cobro->fields['estado'];
 		}
 
@@ -178,13 +174,3 @@ class Tramite extends Objeto
         return false;
     }
 }
-if(!class_exists('ListaTramites')) {
-	class ListaTramites extends Lista
-	{
-		function ListaTramites($sesion, $params, $query)
-		{
-			$this->Lista($sesion, 'Tramite', $params, $query);
-		}
-	}
-}
-
