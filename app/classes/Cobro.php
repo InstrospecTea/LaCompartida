@@ -657,63 +657,18 @@ if (!class_exists('Cobro')) {
 			return $fecha_ini;
 		}
 
-		function Eliminar() {
-			$id_cobro = $this->fields['id_cobro'];
-
-			if ($id_cobro) {
-				$chargeService = new ChargeService($this->sesion);
-				$charge = new Charge();
-				$charge->fillFromArray($this->fields);
-				$chargeService->delete($charge);
-				//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
-				if ($this->fields['id_provision_generada']) {
-					$provision_generada = new Gasto($this->sesion);
-					$gasto_generado = new Gasto($this->sesion);
-					$provision_generada->Load($this->fields['id_provision_generada']);
-
-					if ($provision_generada->Loaded()) {
-						if (!$provision_generada->fields['id_cobro']) {
-							$provision_generada->Eliminar();
-							$gasto_generado->Load($this->fields['id_gasto_generado']);
-							if ($gasto_generado->Loaded()) {
-								$gasto_generado->Eliminar();
-							}
-						}
-					}
-				}
-
-				$this->AnularDocumento();
-
-				$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				#Se ingresa la anotación en el historial
-				$his = new Observacion($this->sesion);
-				$his->Edit('fecha', @date('Y-m-d H:i:s'));
-				$his->Edit('comentario', __('COBRO ELIMINADO'));
-				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-				$his->Edit('id_cobro', $id_cobro);
-				$his->Write();
-
-				$CobroAsunto = new CobroAsunto($this->sesion);
-				$CobroAsunto->eliminarAsuntos($id_cobro);
-
-				$query = "DELETE FROM cobro WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				return true;
-			} else {
+		function Eliminar($id_cobro = null) {
+			if (!$this->Loaded() && empty($id_cobro)) {
 				return false;
 			}
+			if (empty($id_cobro)) {
+				$id_cobro = $this->fields['id_cobro'];
+			}
+
+			$chargingBusiness = new ChargingBusiness($this->sesion);
+			$chargingBusiness->delete($id_cobro);
+
+			return true;
 		}
 
 		function AnularEmision($estado = 'CREADO') {
@@ -749,19 +704,15 @@ if (!class_exists('Cobro')) {
 			$this->AnularDocumento($estado, $cantidad_pagos > 0 ? true : false);
 		}
 
+		/**
+		 *
+		 * @param type $estado
+		 * @param type $hay_pagos
+		 * @deprecated
+		 */
 		function AnularDocumento($estado = 'CREADO', $hay_pagos = false) {
-			$documento = new Documento($this->sesion);
-			$documento->LoadByCobro($this->fields['id_cobro']);
-
-			if ($estado == 'INCOBRABLE') {
-				$documento->EliminarNeteos();
-				$documento->AnularMontos();
-			} else if (!$hay_pagos) {
-				$documento->EliminarNeteos();
-				$query_factura = "UPDATE factura_cobro SET id_documento = NULL WHERE id_documento = '" . $documento->fields['id_documento'] . "'";
-				mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
-				$documento->Delete();
-			}
+			$chargingBusiness = new ChargingBusiness($this->sesion);
+			return $chargingBusiness->overrideDocument($this->fields['id_cobro'], $estado, $hay_pagos);
 		}
 
 		function IdMoneda($id_cobro = '') {

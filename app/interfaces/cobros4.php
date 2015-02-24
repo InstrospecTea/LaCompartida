@@ -73,15 +73,11 @@ if ($id_cobro) {
 	}
 }
 
-if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
-	$fecha_ini = date("Y-m-d", strtotime($fecha_ini));
-}
-
 if ($fecha_ini == ''){
 	$fecha_ini = '0000-00-00';
 }
 
-if ($fecha_ini != '0000-00-00') {
+if (Conf::GetConf($sesion, 'UsaFechaDesdeCobranza') && $fecha_ini != '0000-00-00') {
 	$fecha_ini = date("Y-m-d", strtotime($fecha_ini));
 }
 

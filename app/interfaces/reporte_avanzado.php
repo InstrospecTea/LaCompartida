@@ -924,42 +924,42 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(13) ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->celda_disabled('valor_trabajado') ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->celda_disabled('valor_cobrable') ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->celda_disabled('valor_visible') ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php //echo $ReporteAvanzado->celda_disabled('valor_trabajado') ?>
+								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php //echo $ReporteAvanzado->celda_disabled('valor_cobrable') ?>
+								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php //echo $ReporteAvanzado->celda_disabled('valor_visible') ?>
+								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php echo $ReporteAvanzado->nada(8) ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_cobrado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_pagado') ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->borde_derecha() ?>
-								<?php echo $ReporteAvanzado->nada() ?>
-								<?php echo $ReporteAvanzado->borde_derecha() ?>
-								<?php echo $ReporteAvanzado->nada() ?>
+								<?php echo $ReporteAvanzado->nada(7) ?>
 								<?php echo $ReporteAvanzado->borde_derecha() ?>
 								<?php echo $ReporteAvanzado->nada() ?>
 								<?php echo $ReporteAvanzado->borde_derecha() ?>
 								<?php echo $ReporteAvanzado->nada() ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(9) ?>
+								<?php echo $ReporteAvanzado->nada(11) ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda_disabled('valor_no_cobrable') ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda_disabled('valor_castigado') ?>
+								<?php //echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
+								<?php //echo $ReporteAvanzado->borde_abajo() ?>
+								<?php //echo $ReporteAvanzado->celda_disabled('valor_no_cobrable') ?>
+								<?php //echo $ReporteAvanzado->borde_abajo() ?>
+								<?php //echo $ReporteAvanzado->celda_disabled('valor_castigado') ?>
+								<?php echo $ReporteAvanzado->nada(7) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_por_cobrar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_por_pagar') ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(6) ?>
+								<?php echo $ReporteAvanzado->nada(7) ?>
 								<?php echo $ReporteAvanzado->borde_derecha() ?>
 								<?php echo $ReporteAvanzado->nada(3) ?>
 							</tr>
@@ -1003,7 +1003,8 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
-								<?php echo $ReporteAvanzado->celda_disabled('rentabilidad_base') ?>
+								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
+								<?php // echo $ReporteAvanzado->celda_disabled('rentabilidad_base') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
 							</tr>

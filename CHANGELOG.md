@@ -1,5 +1,14 @@
 # Changelog
 
+## Release: 15.3.0
+Jueves 19 de Febrero 2015
+[Release 15.3.0](https://github.com/LemontechSA/ttb/pull/845)
+* **Feature:** Agregar columna Cobro Independiente al reporte asuntos
+* **Fix:** Oculta tipos de dato deshabilitados en el reporte avanzado
+* **Fix:** Corrige el conf UsaFechaDesdeCobranza y nuevo conf UsaFechaDesdeUltimoCobro
+* **Fix:** Feature cobro programado
+* **Fix:** Feature elimina cobro
+
 ## Hotfix 15.2.3
 Martes 17 de Febrero 2015
 * **Fix:** [Agrupador Area asunto en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/853)
