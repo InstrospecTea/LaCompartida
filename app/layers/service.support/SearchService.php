@@ -70,7 +70,7 @@ class SearchService implements ISearchService {
 	 */
 	private function getData(SearchCriteria $searchCriteria, Criteria $criteria = null, $entityName) {
 		if ($searchCriteria->paginate()) {
-			$criteria->add_limit($searchCriteria->Pagination->rows_per_page(), $searchCriteria->Pagination->current_row());
+			$criteria->add_limit($searchCriteria->Pagination->rows_per_page(), $searchCriteria->Pagination->current_row() - 1);
 		}
 		$entity = new ReflectionClass($entityName);
 		$entity = $entity->newInstance();

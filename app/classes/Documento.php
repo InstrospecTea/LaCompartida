@@ -270,7 +270,7 @@ class Documento extends Objeto {
 			$pago_honorarios = $data['monto_honorarios'];
 			$pago_gastos = $data['monto_gastos'];
 			$cambio_cobro = $this->TipoCambioDocumento($this->sesion, $id_documento_cobro, $documento_cobro_aux->fields['id_moneda']);
-			$cambio_pago = $this->TipoCambioDocumento($this->sesion, $id_documento_cobro, $id_moneda);
+			$cambio_pago = $moneda->fields['tipo_cambio'];
 			$decimales_cobro = $moneda_documento_cobro->fields['cifras_decimales'];
 			$decimales_pago = $moneda->fields['cifras_decimales'];
 
@@ -433,7 +433,7 @@ class Documento extends Objeto {
 	}
 
 	function ListaPagos() {
-		$modulo_fact = UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
+		$modulo_fact = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
 
 		$out = '';
 		$query = "SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
@@ -865,68 +865,67 @@ class Documento extends Objeto {
 			foreach ($facturas as $id_factura => $total_factura) {
 				$factura = new Factura($this->sesion);
 				$factura->Load($id_factura);
-                                $factor = $total_factura/$factura->fields['total'];
-				$h = $factura->fields['subtotal'] *(1 + $factura->fields['porcentaje_impuesto']/100);
-				$honorarios += ($h*$factor);
-				$gastos += ($factura->fields['total'] - $h)*$factor;
+				$factor = $total_factura / $factura->fields['total'];
+				$h = $factura->fields['subtotal'] * (1 + $factura->fields['porcentaje_impuesto'] / 100);
+				$honorarios += ($h * $factor);
+				$gastos += ($factura->fields['total'] - $h) * $factor;
 			}
 		}
 
-		if(!$honorarios && !$gastos){
+		if (!$honorarios && !$gastos) {
 			return true;
 		}
 
 		$out_neteos = '';
-		$id_moneda = $documento_cobro->fields['id_moneda'];
-		$moneda = new Moneda($this->sesion);
-		$moneda->Load($id_moneda);
+		$moneda_adelanto = new Moneda($this->sesion);
+		$moneda_cobro = new Moneda($this->sesion);
 		$id_cobro = $documento_cobro->fields['id_cobro'];
-		$cobro_moneda = new CobroMoneda($this->sesion);
-		$cobro_moneda->Load($id_cobro);
+		$moneda_cobro->Load($documento_cobro->fields['id_moneda']);
 
 		$query = "SELECT id_documento, -saldo_pago, pago_honorarios, pago_gastos, documento.id_moneda
 			FROM documento
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND (id_contrato = '$id_contrato' OR id_contrato IS NULL) AND saldo_pago < 0";
 		if ($honorarios == 0) {
-			$query .= " AND pago_gastos = 1";
+			$query .= ' AND pago_gastos = 1';
 		} else if ($gastos == 0) {
-			$query .= " AND pago_honorarios = 1";
+			$query .= ' AND pago_honorarios = 1';
 		}
 		if ($id_adelanto) {
 			$query .= " AND id_documento = $id_adelanto";
 		}
-		$query .= " ORDER BY pago_honorarios ASC, pago_gastos ASC, fecha_creacion ASC";
+		$query .= ' ORDER BY pago_honorarios ASC, pago_gastos ASC, fecha_creacion ASC';
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		//tengo los adelantos del cliente con saldo positivo, primero los q solo pagan honorarios, despues los solo gastos, y despues los mixtos, cada grupo ordenado por fecha
 		while (list($id_adelanto, $saldo_pago, $pago_honorarios, $pago_gastos, $id_moneda_adelanto) = mysql_fetch_array($resp)) {
-			$honorarios_convertidos = $honorarios * $cobro_moneda->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'];
-			$gastos_convertidos = $gastos * $cobro_moneda->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'];
+			$moneda_adelanto->Load($id_moneda_adelanto);
+			$honorarios_convertidos = $honorarios * $moneda_cobro->fields['tipo_cambio'] / $moneda_adelanto->fields['tipo_cambio'];
+			$gastos_convertidos = $moneda_adelanto->getFloat($gastos * $moneda_cobro->fields['tipo_cambio'] / $moneda_adelanto->fields['tipo_cambio']);
 
 			$monto_honorarios = 0;
 			if ($honorarios > 0 && $pago_honorarios == 1) {
-				$monto_honorarios = $saldo_pago > $honorarios_convertidos ? $honorarios_convertidos : $saldo_pago;
+				$monto_honorarios = $moneda_adelanto->getFloat($saldo_pago > $honorarios_convertidos ? $honorarios_convertidos : $saldo_pago);
 				$saldo_pago -= $monto_honorarios;
 				$honorarios_convertidos -= $monto_honorarios;
 			}
+
 			$monto_gastos = 0;
 			if ($gastos > 0 && $pago_gastos == 1) {
-				$monto_gastos = $saldo_pago > $gastos_convertidos ? $gastos_convertidos : $saldo_pago;
+				$monto_gastos = $moneda_adelanto->getFloat($saldo_pago > $gastos_convertidos ? $gastos_convertidos : $saldo_pago);
 				$saldo_pago -= $monto_gastos;
 				$gastos_convertidos -= $monto_gastos;
 			}
-			$honorarios = $honorarios_convertidos * $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda]['tipo_cambio'];
-			$gastos = $gastos_convertidos * $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda]['tipo_cambio'];
+			$honorarios = $honorarios_convertidos * $moneda_adelanto->fields['tipo_cambio'] / $moneda_cobro->fields['tipo_cambio'];
+			$gastos = $gastos_convertidos * $moneda_adelanto->fields['tipo_cambio'] / $moneda_cobro->fields['tipo_cambio'];
 
 			if ($monto_honorarios > 0 || $monto_gastos > 0) {
 				$neteos = array(array(
-						'id_moneda' => $id_moneda,
-						'id_documento_cobro' => $id_documento_cobro,
-						'monto_honorarios' => $monto_honorarios,
-						'monto_gastos' => $monto_gastos,
-						'id_cobro' => $id_cobro
-						));
-				$moneda_adelanto = new Moneda($this->sesion);
-				$moneda_adelanto->Load($id_moneda_adelanto);
+								'id_moneda' => $id_moneda,
+								'id_documento_cobro' => $id_documento_cobro,
+								'monto_honorarios' => $monto_honorarios,
+								'monto_gastos' => $monto_gastos,
+								'id_cobro' => $id_cobro
+				));
+
 				$this->AgregarNeteos($id_adelanto, $neteos, $id_moneda_adelanto, $moneda_adelanto, $out_neteos, $facturas, $rehacer_neteos);
 			}
 
@@ -939,16 +938,6 @@ class Documento extends Objeto {
 		$cobro->Load($id_cobro);
 		$cobro->CambiarEstadoSegunFacturas();
 		return true;
-	}
-
-
-
-}
-
-class ListaDocumentos extends Lista {
-
-	function ListaDocumentos($sesion, $params, $query) {
-		$this->Lista($sesion, 'Documento', $params, $query);
 	}
 
 }

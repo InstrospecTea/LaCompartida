@@ -2761,17 +2761,3 @@ class Factura extends Objeto {
 		return $this->twig->render($template, $this->template_data);
 	}
 }
-
-#end Class
-if (!class_exists('ListaFacturas')) {
-
-	class ListaFacturas extends Lista {
-
-		function ListaFacturas($sesion, $params, $query) {
-			$this->Lista($sesion, 'Factura', $params, $query);
-		}
-
-	}
-
-}
-

@@ -830,17 +830,17 @@ $pagina->PrintTop($popup);
 					<?php
 				}
 				if ($id_cobro) {
-					$pago_honorarios = $documento_cobro->fields['honorarios_pagados'] != 'SI';
-					$pago_gastos = $documento_cobro->fields['gastos_pagados'] != 'SI';
+					$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0;
+					$pago_gastos = $documento_cobro->fields['saldo_gastos'] > 0;
 					$hay_adelantos = ($pago_honorarios || $pago_gastos) && $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 				} else {
 					$hay_adelantos = false;
 				}
 				if (!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos) {
-					$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
-					$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';
+					$pago_honorarios = $pago_honorarios ? '&pago_honorarios=1' : '';
+					$pago_gastos = $pago_gastos ? '&pago_gastos=1' : '';
 					?>
-					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
+					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $pago_gastos; ?><?php echo $pago_honorarios; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=100, left=125, scrollbars=yes');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
 				<?php } ?>
 			</td>
 		</tr>
@@ -913,7 +913,7 @@ $pagina->PrintTop($popup);
 				</td>
 				<td align="left">
 					<input type="text" name="saldo_pago" id="saldo_pago" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
-					<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
+					<input type="text" class="oculto" style="display:none;" name="saldo_pago_aux" id="saldo_pago_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
 				</td>
 			</tr>
 		<?php } ?>

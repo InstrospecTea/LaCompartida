@@ -8,4 +8,4 @@ echo $this->element('Flash/flash_notice');
 
 echo $content_for_layout;
 
-$Pagina->PrintBottom();
+$Pagina->PrintBottom($this->params['popup']);

@@ -137,7 +137,7 @@ class Moneda extends Objeto {
 	}
 
 	function GetMonedaReportesAvanzados(&$sesion) {
-		$query = " SELECT id_moneda FROM prm_moneda WHERE glosa_moneda LIKE '%" . UtilesApp::GetConf($sesion, 'MonedaTarifaPorDefecto') . "%' ";
+		$query = " SELECT id_moneda FROM prm_moneda WHERE glosa_moneda LIKE '%" . Conf::GetConf($sesion, 'MonedaTarifaPorDefecto') . "%' ";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_moneda) = mysql_fetch_array($resp);
 

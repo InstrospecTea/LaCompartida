@@ -241,7 +241,7 @@ if ($opc == 'anular_emision') {
 			if (!empty($usar_adelantos)) {
 				$documento = new Documento($sesion);
 				$documento->LoadByCobro($id_cobro);
-				$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento']);
+				$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], null, $id_adelanto);
 			}
 			if (empty($cobro->fields['estado_anterior']) || in_array($cobro->fields['estado_anterior'], array('CREADO', 'EN REVISION'))) {
 				$cobro->CambiarEstadoSegunFacturas();
@@ -537,23 +537,40 @@ echo $refrescar;
 		return true;
 	}
 
-	function Emitir(form)
-	{
-		jQuery('#btn_emitir_cobro').attr("disabled","disabled");
-		var http = getXMLHTTP();
-		http.open('get', 'ajax.php?accion=num_abogados_sin_tarifa&id_cobro='+document.getElementById('id_cobro').value);
+	function seleccionarAdelanto() {
+		var params = {
+			popup: 1,
+			id_cobro: '<?php echo $id_cobro ?>',
+			codigo_cliente: '<?php echo $codigo_cliente ?>',
+			elegir_para_pago: 1,
+			id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
+			desde_factura_pago: 0,
+			pago_honorarios: jQuery('#total_honorarios').val() > 0 ? 1 : 0,
+			pago_gastos: jQuery('#total_gastos').val() > 0 ? 1 : 0,
+			como_funcion: 1
+		};
+		nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
+	}
+	function utilizarAdelanto(id_documento) {
+		jQuery('#id_adelanto').val(id_documento);
+		jQuery('#usar_adelantos').val(1);
+		jQuery('#accion').val('emitir');
+		jQuery('#opc').val('guardar_cobro');
+		jQuery('#form_cobro5').submit();
+	}
 
-		http.onreadystatechange = function()
-		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
-				response = response.split('//');
+	function Emitir(form) {
+		jQuery('#btn_emitir_cobro').prop('disabled', 'disabled');
+		var data_get = {accion: 'num_abogados_sin_tarifa', id_cobro: jQuery('#id_cobro').val()};
+		jQuery.ajax('ajax.php', {
+			async: false,
+			data: data_get,
+			dataType: 'text',
+			success: function(text) {
+				var response = text.split('//');
 
+				var text_window = '';
 				<?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) { ?>
-
-					var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-
 					if( response[0] != 0 ) {
 						if( response[0] < 2 ) {
 							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("El siguiente trabajo ") ?></span><br /><br />';
@@ -580,7 +597,6 @@ echo $refrescar;
 
 				<?php } else { ?>
 
-					var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
 					if( response[0] != 0 ) {
 						if( response[0] < 2 )
 							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("La tarifa del abogado ") ?></span>';
@@ -606,36 +622,43 @@ echo $refrescar;
 
 				<?php } ?>
 
-				Dialog.confirm(text_window,
-				{
-					top:150,
-					left:290,
-					width:400,
-					okLabel: "<?php echo __('Continuar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
-					id: "myDialogId",
+				var div = jQuery('<div/>').attr('title', '<?php echo __("ALERTA") ?>').html(text_window);
+				jQuery(div).dialog({
+					width: 400,
+					height: 'auto',
+					modal: true,
+					open: function() {
+						jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+					},
+					close: function() {
+						jQuery('#btn_emitir_cobro').prop('disabled', '');
+					},
+					buttons: {
+						"<?php echo __('Guardar') ?>": function() {
+							var modulo_facturacion = <?php echo Conf::GetConf($sesion, 'NuevoModuloFactura') ? 'true' : 'false'; ?>;
+							if( !AgregarParametros( form ) ) {
+								return false;
+							} else {
+								var adelantos = jQuery('#saldo_adelantos').val();
+								var total = Number(jQuery('#total_honorarios').val()) + Number(jQuery('#total_gastos').val());
 
-					cancel:function(win){ jQuery('#btn_emitir_cobro').removeAttr("disabled"); return false; },
-					ok:function(win){
-						var modulo_facturacion = <?php echo Conf::GetConf($sesion, 'NuevoModuloFactura') ? 'true' : 'false'; ?>;
-						if( !AgregarParametros( form ) ) {
-							return false;
-						} else {
-							var adelantos = $F('saldo_adelantos');
-							var total = Number($F('total_honorarios'))+Number($F('total_gastos'));
-							if(!modulo_facturacion && adelantos && confirm('Tiene disponibles '+adelantos+' en adelantos.\n¿Desea utilizarlos automáticamente para '+
-								(Number(adelantos.replace(/[^\d\.]/g,'')) < total ? 'abonar' : 'pagar')+' este cobro?')){
-								$('usar_adelantos').value = '1';
+								var msg = '<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar') . ' ' . __('el cobro') . '?' ?>';
+								if(!modulo_facturacion && adelantos && confirm(msg)){
+									seleccionarAdelanto();
+									return false;
+								}
+								jQuery('#accion').val('emitir');
+								jQuery('#opc').val('guardar_cobro');
+								jQuery(form).submit();
 							}
-							form.accion.value = 'emitir';
-							form.opc.value = 'guardar_cobro';
-							form.submit();
-							return true;
+						},
+						"<?php echo __('Cancelar') ?>": function() {
+							jQuery(this).dialog('close');
 						}
 					}
 				});
 			}
-		};
-		http.send(null);
+		});
 	}
 
 	function DefinirTarifas()
@@ -1170,6 +1193,7 @@ else
 
 		?>" id="saldo_adelantos" />
 	<input type="hidden" name="usar_adelantos" value="" id="usar_adelantos" />
+	<input type="hidden" name="id_adelanto" value="" id="id_adelanto" />
 
 	<table width="720px">
 		<tr>
