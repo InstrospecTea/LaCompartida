@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.2
+Martes 03 de Marzo 2015
+* **Fix:** [Validar que el asunto esté activo al guardar un trabajo o un gasto](https://github.com/LemontechSA/ttb/pull/859)
+
 ## Hotfix 15.3.1
 Martes 03 de Marzo 2015
 * **Fix:** [Fecha en reporte PDF en modulo para revisar horas](https://github.com/LemontechSA/ttb/pull/858)
