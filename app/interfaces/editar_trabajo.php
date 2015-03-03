@@ -168,7 +168,7 @@ if ($opcion == "guardar") {
 		$asunto->LoadByCodigo($codigo_asunto);
 	}
 
-	// Solo cuando el gasto sea nuevo valido que el asunto se encuentre activo
+	// Solo cuando el trabajo sea nuevo valido que el asunto se encuentre activo
 	if ($es_trabajo_nuevo) {
 		if (!$asunto->fields['activo']) {
 			$pagina->AddError('Debe seleccionar un ' . __('Asunto') . ' activo');
@@ -596,7 +596,7 @@ if ($refresh_parent) {
 		<?php } ?>
 		<?php if ((Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) && ($permiso_revisor || $permiso_profesional)) { ?>
 			<tr id="actividades">
-				<?php if ($t->Loaded()) { 
+				<?php if ($t->Loaded()) {
 					$codigo_asunto_actividad = $t->fields['codigo_asunto'];
 					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 						$asunto = new Asunto($sesion);
