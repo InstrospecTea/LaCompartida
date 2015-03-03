@@ -66,6 +66,16 @@ if ($opcion == "guardar") {
 		$pagina->AddError("El asunto seleccionado no corresponde al cliente seleccionado.");
 	}
 
+	// Solo cuando el gasto sea nuevo valido que el asunto se encuentre activo
+	if (!empty($id_gasto) || $id_gasto == 0) {
+		$asunto = new Asunto($sesion);
+		$asunto->LoadByCodigo($codigo_asunto);
+
+		if (!$asunto->fields['activo']) {
+			$pagina->AddError('Debe seleccionar un ' . __('Asunto') . ' activo');
+		}
+	}
+
 	$errores = $pagina->GetErrors();
 
 	if (empty($errores)) {
