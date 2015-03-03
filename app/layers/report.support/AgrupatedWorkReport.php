@@ -267,7 +267,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$period = 'Sin periodo';
 		} else {
 			if (!empty($since)) {
-				$period .= "Del $since "; 
+				$period .= "Del $since ";
 			}
 			if (!empty($until)) {
 				$period .= "al $until.";
@@ -437,7 +437,7 @@ HTML;
 					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'))
 				);
 			}
-			
+
 			$html_clientes .= $this->Html->tag('table', $trs, array('class' => 'table'));
 			$html .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
 		}
@@ -523,7 +523,7 @@ HTML;
 		if (!$inverse) {
 			$date->setDate((int)$splitted[2], (int)$splitted[1], (int)$splitted[0]);
 		} else {
-			$date->setDate((int)$splitted[0], (int)$splitted[1], (int)$splitted[1]);
+			$date->setDate((int)$splitted[0], (int)$splitted[1], (int)$splitted[2]);
 		}
 		setlocale(LC_ALL, 'es_ES');
 		return strftime('%d-%b-%y', $date->getTimestamp());

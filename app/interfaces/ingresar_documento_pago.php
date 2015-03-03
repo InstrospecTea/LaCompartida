@@ -868,6 +868,10 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 		<?php
+		if (isset($documento->fields['id_contrato']) && empty($id_contrato)) {
+			$id_contrato = $documento->fields['id_contrato'];
+		}
+
 		if ($adelanto) {
 			UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, 280);
 		}

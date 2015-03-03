@@ -17,7 +17,7 @@ class WKPDFReportEngine extends AbstractReportEngine implements IWKPDFReportEngi
     );
     $this->engine->setOptions($options);
     $this->engine->addPage($this->configuration['html']);
-    $this->engine->send($this->configuration['filename']);
+    $this->engine->send($this->configuration['filename'] . '.pdf');
     exit();
   }
 
@@ -30,7 +30,7 @@ class WKPDFReportEngine extends AbstractReportEngine implements IWKPDFReportEngi
     return <<<HTML
 <div id="footer">
   {$this->configuration['footer']}
-</div>    
+</div>
 HTML;
   }
 
