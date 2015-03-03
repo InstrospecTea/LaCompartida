@@ -16,7 +16,7 @@
     <script type="text/javascript">
       $(function() {
         $.ajaxSetup({
-          headers: {'AUTHTOKEN' : '59970951ba099872a46efff9edea9f26c83f1b79'}
+          headers: {'AUTHTOKEN' : '44f5782a611c636b9698bb982a135c3d259fa699'}
         });
 
         $.ajax({
@@ -40,9 +40,9 @@
           // url: 'users/1/device',
           // url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
 
-          // data: { 'user' : '99511620', 'password' : 'admin.asdwsx', 'app_key' : 'https://lemontech.thetimebilling.com' },
-          data: { 'after' : '1356998400', 'before' : '1388534400' },
-          /*data: {
+          // data: { 'user' : '99511620', 'password' : 'admin.asdwsx', 'app_key' : 'ttb-desktop' },
+          // data: { 'after' : '1356998400', 'before' : '1388534400' },
+          data: {
             'created_date' : 1365193560.328282,
             'date' : 1365134400,
             'duration' : 100,
@@ -51,18 +51,18 @@
             //'requester' : 'test1 test2 test3',
             //'activity_code' : 'A2013',
             //'area_code' : 1,
-            'matter_code' : '006228-22889',
+            'matter_code' : '000003-1201',
             //'task_code' : 1,
             'user_id' : 1,
             'billable' : 1,
             'visible' : 1
-          },*/
+          },
           // data: { 'token' : 'bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf' },
           // data: { 'receive_alerts' : 1, 'alert_hour' :  1357070400 },
 
-          type: 'get'
+          // type: 'get'
           // type: 'post'
-          // type: 'put'
+          type: 'put'
           // type: 'delete'
 
         }).done(function(data) {
