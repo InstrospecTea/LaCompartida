@@ -30,7 +30,11 @@ if (!class_exists('Cobro')) {
 			$chargeService = new ChargeService($this->sesion);
 			$charge = new Charge();
 			$charge->fillFromArray($this->fields);
-			$charge->fillChangedFields($this->changes);
+
+			if (is_array($this->charges)) {
+				$charge->fillChangedFields($this->changes);
+			}
+
 			try {
 				$charge = $chargeService->saveOrUpdate($charge, $writeLog);
 				$this->fields = $charge->fields;
