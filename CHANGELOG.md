@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.3
+Miércoles 04 de Marzo 2015
+* **Fix:** [Corrige el uso de Twig en la descarga masiva y la copia de las observaciones del contrato en el Cobro](https://github.com/LemontechSA/ttb/pull/860)
+
 ## Hotfix 15.3.2
 Martes 03 de Marzo 2015
 * **Fix:** [Validar que el asunto esté activo al guardar un trabajo o un gasto](https://github.com/LemontechSA/ttb/pull/859)
