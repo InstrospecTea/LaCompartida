@@ -70,7 +70,7 @@ HTML;
 		return $html;
 	}
 
-	public static function cajafacturasCobro($cobro) {
+	public static function cajafacturasCobro($cobro, $sesion) {
 		$cobro['cobro'] =  __('Cobro');
 		$cobro['total'] = $cobro['saldo_honorarios'] + $cobro['saldo_gastos_con_impuestos'] + $cobro['saldo_gastos_sin_impuestos'] + $cobro['iva'];
 		$cobro['f_honorarios'] = self::number_format($cobro['saldo_honorarios']);
@@ -82,7 +82,7 @@ HTML;
 		$cobro['f_subtotal_honorarios'] = self::number_format($cobro['subtotal_honorarios']);
 		$cobro['f_descuento_honorarios'] = self::number_format($cobro['descuento_honorarios']);
 
-		if (Conf::GetConf($Sesion,'VisualizaDescuentoEnFactura')) {
+		if (Conf::GetConf($sesion,'VisualizaDescuentoEnFactura')) {
 			$honorarios_html = "<img data-id='{$cobro['id_cobro']}' style='float:right' class='detalle_honorarios_cobro' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
 		} else {
 			$honorarios_html = "";
@@ -128,7 +128,7 @@ HTML;
 		$datos_factura['numero'] = $Factura->ObtenerNumero(null, null, null, true);
 
 		$html_tools = self::cajafacturasFilaFacturaTools($Factura, $datos_factura);
-		if (Conf::GetConf($Sesion,'VisualizaDescuentoEnFactura')) {
+		if (Conf::GetConf($Factura->sesion,'VisualizaDescuentoEnFactura')) {
 			$honorarios_html = "<img data-id='{$Factura->fields['id_factura']}' data-chargeId='{$datos_factura['id_cobro']}' style='float:right' class='detalle_honorarios_factura' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
 		}
 		$html = <<<HTML

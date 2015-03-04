@@ -220,7 +220,7 @@ if ($opc == 'refrescar') {
 	$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos', 'descuento_honorarios', 'subtotal_honorarios', 'iva');
 	$data_cobro['fecha'] = date('d-m-Y', strtotime($charge->get('fecha_emision')));
 	
-	echo CobroHtml::cajafacturasCobro($data_cobro);
+	echo CobroHtml::cajafacturasCobro($data_cobro, $sesion);
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			//documentos existentes. usar funcion magica (???)
