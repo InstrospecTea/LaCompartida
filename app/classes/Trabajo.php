@@ -873,6 +873,10 @@ class Trabajo extends Objeto
 			}
 			if (!$Matter->Loaded()) {
 				return array('error' => true, 'description' => __("The matter doesn't exist"));
+			} else {
+				if (!$Matter->fields['activo']) {
+					return array('error' => true, 'description' => __("The matter is not active"));
+				}
 			}
 		}
 

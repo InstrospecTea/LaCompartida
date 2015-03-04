@@ -869,6 +869,10 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 		<?php
+		if (isset($documento->fields['id_contrato']) && empty($id_contrato)) {
+			$id_contrato = $documento->fields['id_contrato'];
+		}
+
 		if ($adelanto) {
 			if (isset($documento->fields['id_contrato']) && empty($id_contrato)) {
 				$id_contrato = $documento->fields['id_contrato'];
