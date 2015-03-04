@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 $pagina = new Pagina($sesion);
 $tramite = new Tramite($sesion);
-$Form = new Form;
+$Form = new Form();
 
 if ($id_tramite > 0) {
 	$tramite->Load($id_tramite);
@@ -19,10 +19,8 @@ if ($tramite->fields['trabajo_si_no'] == 1 || $como_trabajo == 1) {
 	$trabajo = new Trabajo($sesion);
 }
 
-$params_array['codigo_permiso'] = 'REV';
-$permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
-$params_array['codigo_permiso'] = 'COB';
-$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
+$permiso_rev = $sesion->usuario->Es('REV');
+$permiso_cob = $sesion->usuario->Es('COB');
 
 if ($id_tramite > 0) {
 
@@ -47,7 +45,7 @@ if ($id_tramite > 0) {
 
 	if ($tramite->Estado() == 'Revisado' && $opcion != 'nuevo') {
 
-		if (!$permisos->fields['permitido']) {
+		if (!$permiso_rev) {
 			$pagina->AddError(__(__('Trámite') . ' ya revisado'));
 			$pagina->PrintTop($popup);
 			$pagina->PrintBottom($popup);
@@ -91,7 +89,7 @@ if ($id_tramite > 0) {
 }
 
 // OPCION -> Guardar else Eliminar
-if ($opcion == "guardar") {
+if ($opcion == 'guardar') {
 	$valida = true;
 	$asunto = new Asunto($sesion);
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
@@ -102,8 +100,8 @@ if ($opcion == "guardar") {
 	}
 
 	/*
-	 *	Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
-	 *	y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
+	 * Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
+	 * y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
 	 */
 
 	if ($cambio_asunto) {
@@ -141,7 +139,6 @@ if ($opcion == "guardar") {
 		} else {
 			$trabajo->Edit('duracion_cobrada', $duracion);
 		}
-
 	} else {
 
 		if (!empty($duracion)) {
@@ -153,7 +150,6 @@ if ($opcion == "guardar") {
 		} else {
 			$tramite->Edit('duracion', '00:00:00');
 		}
-
 	}
 
 	if ($trabajo) {
@@ -171,7 +167,6 @@ if ($opcion == "guardar") {
 		} else {
 			$tramite->Edit('solicitante', $solicitante);
 		}
-
 	}
 
 	if ($trabajo) {
@@ -247,7 +242,7 @@ if ($opcion == "guardar") {
 	$contrato->Load($asunto->fields['id_contrato']);
 	$tramite->Edit('id_moneda_tramite', $contrato->fields['id_moneda_tramite']);
 	$tramite_tarifa = Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto);
-	$tramite->Edit('tarifa_tramite', (empty($tramite_tarifa)? 'NULL' : $tramite_tarifa));
+	$tramite->Edit('tarifa_tramite', (empty($tramite_tarifa) ? 'NULL' : $tramite_tarifa));
 
 	if ($trabajo) {
 		if (!$trabajo->fields['tarifa_hh']) {
@@ -318,24 +313,25 @@ if ($opcion == "guardar") {
 		echo "<script>if (window.opener && (window.opener.document.form_semana && window.opener.document.form_semana.submit())) { window.close(); }</script>";
 	}
 //ELIMINAR TRABAJO
-} else if ($opcion == "eliminar") {
+} else if ($opcion == 'eliminar') {
 	$tramite = new Tramite($sesion);
 	$tramite->Load($id_tramite);
-	if (!$tramite->Eliminar()) {
+	if ($tramite->Eliminar()) {
+		$pagina->AddInfo(__('Trámite') . ' ' . __('eliminado con éxito'));
+		if ($trabajo) {
+			unset($trabajo);
+		}
+		unset($tramite);
+		unset($codigo_asunto_secundario);
+		unset($codigo_cliente_secundario);
+		echo "<script>if (window.opener) { window.opener.Refrescar('edit'); }</script>";
+		$tramite = new Tramite($sesion);
+		if ($como_trabajo == 1) {
+			$trabajo = new Trabajo($sesion);
+		}
+	} else {
 		$pagina->AddError($tramite->error);
 	}
-	if ($trabajo) {
-		unset($trabajo);
-	}
-	unset($tramite);
-	unset($codigo_asunto_secundario);
-	unset($codigo_cliente_secundario);
-	echo "<script>if (window.opener) { window.opener.Refrescar('edit'); }</script>";
-	$tramite = new Tramite($sesion);
-	if ($como_trabajo == 1) {
-		$trabajo = new Trabajo($sesion);
-	}
-	$pagina->AddInfo(__('Trámite') . ' ' . __('eliminado con éxito'));
 }
 
 // Título opcion
@@ -587,7 +583,7 @@ $pagina->PrintTop($popup);
 		<?php } ?>
 
 		// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
-		<?php if (!$permiso_cobranza->fields['permitido']) { ?>
+		<?php if (!$permiso_cob) { ?>
 			temp = $('fecha').value.split("-");
 			fecha = new Date(temp[2] + '//' + temp[1] + '//' + temp[0]);
 			hoy = new Date();
@@ -1078,10 +1074,10 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 								if (!$duracion) {
 									$duracion = '00:00:00';
 								}
-								echo SelectorHoras::PrintTimeSelector($sesion, "duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario || $permisos->fields['permitido']);
+								echo SelectorHoras::PrintTimeSelector($sesion, "duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario || $permiso_rev);
 							} else if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 								?>
-								<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion); ?>" id="duracion" size="6" maxlength="4" <?php echo (!$nuevo && $sesion->usuario->fields['id_usuario'] != $id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form, 'duracion');" />
+								<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion); ?>" id="duracion" size="6" maxlength="4" <?php echo (!$nuevo && $sesion->usuario->fields['id_usuario'] != $id_usuario ) || !$permiso_rev ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form, 'duracion');" />
 								<?php
 							} else if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'java') {
 								echo Html::PrintTime("duracion", $duracion, "onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario);
@@ -1089,7 +1085,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 							?>
 						</td>
 						<?php
-						if ($permisos->fields['permitido']) {
+						if ($permiso_rev) {
 							$where = "usuario_permiso.codigo_permiso = 'PRO' ";
 						} else {
 							$where = "(usuario_secretario.id_secretario = '{$sesion->usuario->fields['id_usuario']}' OR usuario.id_usuario IN ('$id_usuario', '{$sesion->usuario->fields['id_usuario']}') OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor = '{$sesion->usuario->fields['id_usuario']}') OR usuario.id_usuario = '{$sesion->usuario->fields[id_usuario]}') ";

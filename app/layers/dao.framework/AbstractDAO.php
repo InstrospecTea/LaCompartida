@@ -43,6 +43,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if (!is_null($this->sesion->usuario->fields['id_usuario'])) {
 			$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 		}
+
 		$reflected = new ReflectionClass($this->getClass());
 		$properties = $reflected->getProperties();
 		foreach ($properties as $property) {
@@ -290,6 +291,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
+		if ($object->isLoaded()) {
+			$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			return true;
+		}
+		return false;
 	}
 
 	/**

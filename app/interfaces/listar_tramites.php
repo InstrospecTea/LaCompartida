@@ -4,32 +4,27 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
 $Form = new Form();
-$params_array['codigo_permiso'] = 'REV';
-$p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
-$params_array['codigo_permiso'] = 'COB';
-$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
+$p_revisor = $sesion->usuario->Es('REV');
+$p_cobranza = $sesion->usuario->Es('COB');
+$p_profesional = $sesion->usuario->Es('PRO');
 
-if ($p_cobranza->fields['permitido']) {
-	$p_revisor->fields['permitido'] = true;
+if ($p_cobranza) {
+	//Si tiene premido COB, se le asigna permiso REV
+	$p_revisor = true;
 }
 
-$params_array['codigo_permiso'] = 'PRO';
-$p_profesional = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
-if ($p_revisor->fields['permitido'] && $accion == "eliminar") {
+if ($accion == 'eliminar' && $p_revisor) {
 	$accion = '';
 	$tramite = new Tramite($sesion);
 	$tramite->Load($id_tramite);
-	if ($tramite->Estado() == "Abierto") {
-		if (!$tramite->Eliminar()) {
-			$pagina->AddError($tramite->error);
-		} else {
-			$pagina->AddInfo(__('Trámite') . ' ' . __('eliminado con éxito'));
-		}
+	if ($tramite->Eliminar()) {
+		$pagina->AddInfo(__('Trámite') . ' ' . __('eliminado con éxito'));
 	} else {
-		$pagina->AddInfo(__('No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.'));
+		$pagina->AddError($tramite->error);
 	}
+	unset($tramite);
 }
 
 ##Seteando FECHAS a formato SQL
@@ -65,7 +60,7 @@ if ($id_cobro) {
 }
 
 // Calculado aquÃ­ para que la variable $select_usuario estÃ© disponible al generar la tabla de trabajos.
-if ($p_revisor->fields['permitido']) {
+if ($p_revisor) {
 	$where_usuario = '';
 } else {
 	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ")";
@@ -78,7 +73,7 @@ if ($where == '') {
 
 if ($id_usuario != '') {
 	$where .= " AND tramite.id_usuario='$id_usuario' ";
-} else if (!$p_revisor->fields['permitido']) {
+} else if (!$p_revisor) {
 	// Se buscan trabajos de los usuarios a los que se puede revisar.
 	$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ") ";
 }
@@ -309,11 +304,11 @@ $b->AgregarEncabezado("tramite_tipo.glosa_tramite", __('Descrip.'), "align=cente
 $b->AgregarEncabezado("tramite.fecha", __('Fecha'));
 $b->AgregarEncabezado("cliente.glosa_cliente,asunto.codigo_asunto", __('Cliente/Asunto'), "align=center");
 
-if ($p_revisor->fields['permitido']) {
+if ($p_revisor) {
 	$b->AgregarEncabezado("tramite.cobrable", __('Cobrable'), "align=center");
 }
 
-if ($p_revisor->fields['permitido']) {
+if ($p_revisor) {
 	$glosa_duracion = __('Hrs Trab.');
 } else {
 	$glosa_duracion = __('Hrs trab.');
@@ -322,11 +317,11 @@ if ($p_revisor->fields['permitido']) {
 $b->AgregarEncabezado("duracion", $glosa_duracion, "", "", "SplitDuracion");
 $b->AgregarEncabezado("tramite.id_cobro", __('Cobro'), "align=center");
 
-if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164) {
+if ($p_revisor || strlen($select_usuario) > 164) {
 	$b->AgregarEncabezado("usr_nombre", __('Usuario'), "align=center");
 }
 
-if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido']) {
+if ($p_revisor || $p_adm->fields['permitido']) {
 	$b->AgregarEncabezado("tramite.tarifa_tramite", __('Tarifa'), "align=center");
 }
 
@@ -335,13 +330,13 @@ $b->color_mouse_over = "#bcff5c";
 $b->funcionTR = "funcionTR";
 
 if ($excel) {
-	if ($p_cobranza->fields['permitido']) {
+	if ($p_cobranza) {
 		$orden = "cliente.glosa_cliente,contrato.id_contrato,asunto.glosa_asunto,tramite.fecha,tramite.descripcion";
 	}
 	$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 	$lista = $b1->lista;
 
-	if ($p_cobranza->fields['permitido'] && Conf::GetConf($sesion, 'CobranzaExcel')) {
+	if ($p_cobranza && Conf::GetConf($sesion, 'CobranzaExcel')) {
 		require_once('cobros_generales_tramites.xls.php');
 	} else {
 		require_once('cobros3_tramites.xls.php');
@@ -515,7 +510,7 @@ $pagina->PrintTop($popup);
 						<fieldset class="tb_base" style="border: 1px solid #BDBDBD;" width="100%">
 							<legend><?php echo __('Filtros') ?></legend>
 							<table style="border: 0px solid black;" >
-								<?php if ($p_revisor->fields['permitido']) { ?>
+								<?php if ($p_revisor) { ?>
 									<tr>
 										<td class="buscadorlabel">
 											<?php echo __('Trabajo') ?>
@@ -567,7 +562,7 @@ $pagina->PrintTop($popup);
 									</td>
 									<td align="left" colspan="3">
 										<?php
-										if ($p_revisor->fields['permitido']) {
+										if ($p_revisor) {
 											$where_usuario = '';
 										} else {
 											$where_usuario = "AND {$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']}";
@@ -679,7 +674,7 @@ function Opciones(& $tramite) {
 		$opc_html = Cobrable($tramite);
 	}
 
-	if ($p_revisor->fields['permitido']) {
+	if ($p_revisor) {
 
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($tramite->fields['id_cobro'])) {
 			$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trámite',650,450,'ingreso_tramite.php?id_cobro=" . $id_cobro . "&id_tramite=" . $tramite->fields['id_tramite'] . "&popup=1&opcion=edit','');\" title=" . __('Editar') . "><img src=$img_dir/editar_on.gif border=0></a>";
@@ -701,7 +696,7 @@ function Opciones(& $tramite) {
 			}
 		}
 
-	} elseif ($p_profesional->fields['permitido']) {
+	} elseif ($p_profesional) {
 
 		if ($tramite->Estado() == 'Revisado') {
 			$opc_html .= "<img src=$img_dir/candado_16.gif border=0 title='" . __('Este trabajo ya ha sido revisado') . "'>";
@@ -795,7 +790,7 @@ function funcionTR(& $tramite) {
 
 	$html .= "<td><b>" . $cliente->fields['glosa_cliente'] . "</b><br>" . $tramite->fields['glosa_asunto'] . "</td>";
 
-	if ($p_revisor->fields['permitido']) {
+	if ($p_revisor) {
 		if ($tramite->fields['cobrable'] == 1) {
 			$html .= "<td align=center>SI</td>";
 		} else {
@@ -805,7 +800,7 @@ function funcionTR(& $tramite) {
 
 	$duracion = $tramite->fields['duracion'];
 
-	if (!$p_revisor->fields['permitido']) {
+	if (!$p_revisor) {
 		$duracion_trabajada = $tramite->fields['duracion'];
 
 		$duracion = $duracion_trabajada;
@@ -819,7 +814,7 @@ function funcionTR(& $tramite) {
 		}
 	}
 	//echo $duracion."fin<br>";
-	if ($p_cobranza->fields['permitido']) {
+	if ($p_cobranza) {
 		$editar_cobro = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Generar Cobro',750,660,'cobros5.php?popup=1&id_cobro=" . $tramite->fields['id_cobro'] . "');\"'>" . $tramite->fields['id_cobro'] . "</a>";
 	} else {
 		$editar_cobro = $tramite->fields['id_cobro'];
@@ -839,14 +834,14 @@ function funcionTR(& $tramite) {
 
 	$html .= "<td align=center>" . $duracion . "</td>";
 	$html .= "<td>" . $editar_cobro . "</td>";
-	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164) {
+	if ($p_revisor || strlen($select_usuario) > 164) {
 		if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 			$html .= "<td align=center>" . $tramite->fields['username'] . "</td>";
 		} else {
 			$html .= "<td align=center>" . substr($tramite->fields['nombre'], 0, 1) . substr($tramite->fields['apellido1'], 0, 1) . substr($tramite->fields['apellido2'], 0, 1) . "</td>";
 		}
 	}
-	if ($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido']) {
+	if ($p_revisor || $p_adm->fields['permitido']) {
 		//$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['codigo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
 		$html .= "<td align=center><strong>" . __('Tarifa') . "</strong><br>" . $moneda_tramite->fields['simbolo'] . " " . number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</td>";
 	}
