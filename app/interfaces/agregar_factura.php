@@ -754,8 +754,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 				<td id="td_honorarios_legales"  align="left" nowrap><?php echo $simbolo; ?>
 					<input type="text" name="monto_honorarios_legales" class="aproximable"  id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"; onkeydown="MontoValido(this.id);">
-				
-				<?php if ($id_cobro > 0) { ?>
+				<?php if ($id_cobro > 0 && Conf::GetConf($Sesion,'VisualizaDescuentoEnFactura')) { ?>
  					<img data-id='<?php echo $factura->fields["id_factura"] ?>' data-chargeId='<?php echo $id_cobro ?>' class='detalle_honorarios_factura' src='<?php echo Conf::ImgDir()  ?>/noticia16.png' style='cursor:pointer' />
 				<?php }?>				
 				</td>

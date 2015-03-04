@@ -82,7 +82,11 @@ HTML;
 		$cobro['f_subtotal_honorarios'] = self::number_format($cobro['subtotal_honorarios']);
 		$cobro['f_descuento_honorarios'] = self::number_format($cobro['descuento_honorarios']);
 
-		$honorarios_html = "<img data-id='{$cobro['id_cobro']}' style='float:right' class='detalle_honorarios_cobro' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
+		if (Conf::GetConf($Sesion,'VisualizaDescuentoEnFactura')) {
+			$honorarios_html = "<img data-id='{$cobro['id_cobro']}' style='float:right' class='detalle_honorarios_cobro' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
+		} else {
+			$honorarios_html = "";
+		}
 
 		$html = <<<HTML
 			<tr style="background:#EFE;">
@@ -124,7 +128,9 @@ HTML;
 		$datos_factura['numero'] = $Factura->ObtenerNumero(null, null, null, true);
 
 		$html_tools = self::cajafacturasFilaFacturaTools($Factura, $datos_factura);
-		$honorarios_html = "<img data-id='{$Factura->fields['id_factura']}' data-chargeId='{$datos_factura['id_cobro']}' style='float:right' class='detalle_honorarios_factura' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
+		if (Conf::GetConf($Sesion,'VisualizaDescuentoEnFactura')) {
+			$honorarios_html = "<img data-id='{$Factura->fields['id_factura']}' data-chargeId='{$datos_factura['id_cobro']}' style='float:right' class='detalle_honorarios_factura' src='" . Conf::ImgDir()  ."/noticia16.png' style='cursor:pointer' />";
+		}
 		$html = <<<HTML
 			<tr bgcolor="{$color_fila}">
 				<td>{$datos_factura['tipo']}</td>

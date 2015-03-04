@@ -10699,6 +10699,11 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
 				VALUES ('UsaFechaDesdeUltimoCobro', '0', 'Permite definir automáticamente la fecha desde de los cobros según la fecha del último cobro emitido + 1', 'boolean', '6', -1)";
 			break;
+
+		case 7.96:
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+				VALUES ('VisualizaDescuentoEnFactura', '0', 'Visualizar el dcto. de la liquidacion en la factura, y el dcto. por tarifa escalonada en la liquidacion y nota de cobro', 'boolean', '6', -1)";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10711,7 +10716,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.95;
+$max_update = 7.96;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
