@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 15.3.4
+Miércoles 04 de Marzo 2015
+* **Fix:** [Generación de alertas por asuntos](https://github.com/LemontechSA/ttb/pull/863)
+
 ## Hotfix 15.3.3
 Miércoles 04 de Marzo 2015
-* **Fix:** [Corrige el uso de Twig en la descarga masiva y la copia de las observaciones del contrato en el Cobro](https://github.com/LemontechSA/ttb/pull/860)
+* **Fix:** [Corrige el uso de Twig en la descarga masiva y la copia de las observaciones del contrato en el Cobro](https://github.com/LemontechSA/ttb/pull/862)
 
 ## Hotfix 15.3.2
 Martes 03 de Marzo 2015

@@ -35,8 +35,6 @@ class CronNotificacion extends Cron {
 	public function main($correo, $desplegar_correo = null, $forzar_semanal = '') {
 		$this->log('INICIO CronNotificacion');
 
-		$this->Sesion->phpConsole(1);
-
 		$this->correo = $correo;
 		if (empty($this->correo)) {
 			$this->Sesion->debug('No se recibió parámetro para la acción a ejecutar. Terminamos.');
@@ -370,13 +368,18 @@ class CronNotificacion extends Cron {
 		$query_asuntos = "SELECT asunto.codigo_asunto,
 								usuario.id_usuario,
 								usuario.username,
-								cliente.glosa_cliente
+								cliente.glosa_cliente,
+								asunto.limite_monto,
+								asunto.limite_hh,
+								asunto.alerta_hh,
+								asunto.alerta_monto
 							FROM asunto
 							JOIN usuario ON (asunto.id_encargado = usuario.id_usuario)
 							JOIN cliente ON (asunto.codigo_cliente = cliente.codigo_cliente)
 							WHERE asunto.activo = '1' AND cliente.activo = '1' $where_usuarios_vacaciones";
 		$asuntos = $this->query($query_asuntos);
 		$total_asuntos = count($asuntos);
+
 		for ($x = 0; $x < $total_asuntos; ++$x) {
 			$asunto_db = $asuntos[$x];
 
@@ -396,6 +399,7 @@ class CronNotificacion extends Cron {
 			} else {
 				$total_horas_trabajadas = 0;
 			}
+
 			//Alerta de limite de horas no emitidas
 			if ($asunto->fields['alerta_hh'] > 0) {
 				$total_horas_ult_cobro = $asunto->TotalHoras(false);
@@ -462,6 +466,7 @@ class CronNotificacion extends Cron {
 					'actual' => $total_horas_ult_cobro);
 				$asunto->Edit('notificado_hr_excedida_ult_cobro', '1');
 			}
+
 			$asunto->Write();
 		}
 	}
