@@ -365,18 +365,13 @@ class CronNotificacion extends Cron {
 	 */
 
 	private function limites_asuntos($where_usuarios_vacaciones) {
-		$query_asuntos = "SELECT asunto.codigo_asunto,
-								usuario.id_usuario,
-								usuario.username,
-								cliente.glosa_cliente,
-								asunto.limite_monto,
-								asunto.limite_hh,
-								asunto.alerta_hh,
-								asunto.alerta_monto
-							FROM asunto
-							JOIN usuario ON (asunto.id_encargado = usuario.id_usuario)
-							JOIN cliente ON (asunto.codigo_cliente = cliente.codigo_cliente)
-							WHERE asunto.activo = '1' AND cliente.activo = '1' $where_usuarios_vacaciones";
+		$query_asuntos = "SELECT asunto.codigo_asunto, usuario.id_usuario, usuario.username, cliente.glosa_cliente, asunto.limite_monto, asunto.limite_hh, asunto.alerta_hh, asunto.alerta_monto
+		FROM asunto
+			JOIN contrato ON contrato.id_contrato = asunto.id_contrato
+			JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
+			JOIN cliente ON cliente.codigo_cliente = asunto.codigo_cliente
+		WHERE asunto.activo = '1' AND cliente.activo = '1' {$where_usuarios_vacaciones}";
+
 		$asuntos = $this->query($query_asuntos);
 		$total_asuntos = count($asuntos);
 
@@ -691,13 +686,12 @@ class CronNotificacion extends Cron {
 	 */
 
 	private function limites_cliente() {
-		$query_clientes = "SELECT cliente.codigo_cliente,
-								usuario.id_usuario,
-								usuario.username,
-								cliente.glosa_cliente
-							FROM cliente
-							INNER JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
-							WHERE cliente.activo = '1'";
+		$query_clientes = "SELECT
+			cliente.codigo_cliente, usuario.id_usuario, usuario.username, cliente.glosa_cliente
+		FROM cliente
+			JOIN contrato ON contrato.id_contrato = cliente.id_contrato
+			JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
+		WHERE cliente.activo = '1'";
 		$resultados_clientes = $this->query($query_clientes);
 		$total_resultados_clientes = count($resultados_clientes);
 		for ($x = 0; $x < $total_resultados_clientes; ++$x) {
