@@ -365,7 +365,15 @@ class CronNotificacion extends Cron {
 	 */
 
 	private function limites_asuntos($where_usuarios_vacaciones) {
-		$query_asuntos = "SELECT asunto.codigo_asunto, usuario.id_usuario, usuario.username, cliente.glosa_cliente, asunto.limite_monto, asunto.limite_hh, asunto.alerta_hh, asunto.alerta_monto
+		$query_asuntos = "SELECT
+			asunto.codigo_asunto,
+			usuario.id_usuario,
+			usuario.username,
+			cliente.glosa_cliente,
+			asunto.limite_monto,
+			asunto.limite_hh,
+			asunto.alerta_hh,
+			asunto.alerta_monto
 		FROM asunto
 			JOIN contrato ON contrato.id_contrato = asunto.id_contrato
 			JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
@@ -687,7 +695,10 @@ class CronNotificacion extends Cron {
 
 	private function limites_cliente() {
 		$query_clientes = "SELECT
-			cliente.codigo_cliente, usuario.id_usuario, usuario.username, cliente.glosa_cliente
+			cliente.codigo_cliente,
+			usuario.id_usuario,
+			usuario.username,
+			cliente.glosa_cliente
 		FROM cliente
 			JOIN contrato ON contrato.id_contrato = cliente.id_contrato
 			JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
