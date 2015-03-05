@@ -1950,7 +1950,7 @@ if (!class_exists('Cobro')) {
 					$this->Edit('id_moneda', $contrato->fields['id_moneda']);
 					$this->Edit('tipo_cambio_moneda', $moneda->fields['tipo_cambio']);
 					$this->Edit('forma_cobro', $hito ? 'FLAT FEE' : $contrato->fields['forma_cobro']);
-
+					$this->Edit('id_estudio', $contrato->fields['id_estudio']);
 					// Pasar configuración de escalonadas ...
 					$this->Edit('esc1_tiempo', $contrato->fields['esc1_tiempo']);
 					$this->Edit('esc1_id_tarifa', $contrato->fields['esc1_id_tarifa']);

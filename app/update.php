@@ -10703,6 +10703,14 @@ QUERY;
 		case 7.96:
 			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
 				VALUES ('VisualizaDescuentoEnFactura', '0', 'Visualizar el dcto. de la liquidacion en la factura, y el dcto. por tarifa escalonada en la liquidacion y nota de cobro', 'boolean', '6', -1)";
+			
+			if (!ExisteCampo('id_estudio', 'cobro', $dbh)) {
+				$queries[] = "ALTER TABLE `cobro` ADD `id_estudio` INT(11) NOT NULL";
+				$queries[] = "UPDATE cobro
+								JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+								 SET cobro.id_estudio = contrato.id_estudio";
+			}
+
 			break;
 	}
 
