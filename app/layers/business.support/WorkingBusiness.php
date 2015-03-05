@@ -5,6 +5,8 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 	function agrupatedWorkReport($data) {
 
 		$this->loadBusiness('Searching');
+		$this->loadBusiness('Coining');
+		
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
 		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
@@ -113,6 +115,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$filter_properties
 		);
 
+		$filter_currency = $this->CoiningBusiness->getCurrency($data['filterCurrency']);
+ 		$base_currency = $this->CoiningBusiness->getBaseCurrency();
+
 		$this->loadReport('AgrupatedWork', 'report');
 		$this->report->setParameters(
 			array(
@@ -120,6 +125,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 				'groupByPartner' => empty($data['groupByPartner']) ? 0 : $data['groupByPartner'],
 				'invoicedValue' => empty($data['invoicedValue']) ? 0 : $data['invoicedValue'],
 				'agrupationType' => $data['agrupationType'],
+				'showHours' => $data['showHours'],
+				'filterCurrency' => $filter_currency,
+				'baseCurrency' => $base_currency,
 				'since' => $data['fecha_ini'],
 				'until' => $data['fecha_fin']
 			)

@@ -23,6 +23,8 @@ class ReporteTrabajoAgrupado {
 		$this->Html = new \TTB\Html;
 		$this->coiningBusiness = new CoiningBusiness($Sesion);
 		$this->baseCurrency = $this->coiningBusiness->getBaseCurrency();
+		$this->translatingBusiness = new TranslatingBusiness($Sesion);
+		$this->defaultLanguage = $this->TranslatingBusiness->getLanguageByCode('es');
 	}
 
 	function imprimir($query, $por_socio, $abogado) {
@@ -520,7 +522,7 @@ HTML;
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
-						$this->Html->tag('th', $this->coiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+						$this->Html->tag('th', $this->coiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 					$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
 					$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
@@ -530,7 +532,7 @@ HTML;
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
 					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3')) .
-					$this->Html->tag('th', $this->coiningBusiness->formatAmount($total_facturado_abogado, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+					$this->Html->tag('th', $this->coiningBusiness->formatAmount($total_facturado_abogado, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
 				);
 				$html_clientes .= $this->Html->tag('table', $trs, array('class' => 'table'));
 				$html_usuarios .= $this->Html->tag('div', $nombre_usuario . $html_clientes, array('class' => 'usuario'));
@@ -560,7 +562,7 @@ HTML;
 				$trs .= $this->Html->tag('tr', $this->Html->tag('td', $fila['fecha'], array('class' => 'col1')) .
 					$this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}") .
 					$this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3')) .
-					$this->Html->tag('td', $this->coiningBusiness->formatAmount($valor_facturado, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+					$this->Html->tag('td', $this->coiningBusiness->formatAmount($valor_facturado, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
 				);
 			} else {
 				$trs .= $this->Html->tag('tr', $this->Html->tag('td', $fila['fecha'], array('class' => 'col1')) .
@@ -583,7 +585,7 @@ HTML;
 			$trs .= $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 					$this->Html->tag('th', __('Total asunto'), array('class' => 'col2')) .
 					$this->Html->tag('th', $total, array('class' => 'col3')) .
-					$this->Html->tag('th', $this->coiningBusiness->formatAmount($total_facturado, $this->baseCurrency, ',','.'), array('class' => 'col3'))
+					$this->Html->tag('th', $this->coiningBusiness->formatAmount($total_facturado, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
 			);
 		}
 		return array('html' => $this->Html->tag('table', $trs, array('class' => 'table')) , 'minutos' => $total , 'total_facturado' => $total_facturado);
