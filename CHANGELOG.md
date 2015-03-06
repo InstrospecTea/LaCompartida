@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.5
+Jueves 05 de Marzo 2015
+* **Fix:** [Error en actualizacion de nota de cobro por campo de más](https://github.com/LemontechSA/ttb/pull/864)
+
 ## Hotfix 15.3.4
 Miércoles 04 de Marzo 2015
 * **Fix:** [Generación de alertas por asuntos](https://github.com/LemontechSA/ttb/pull/863)
