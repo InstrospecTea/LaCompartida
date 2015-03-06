@@ -210,7 +210,7 @@ if ($opcion == 'guardar') {
 			$descripcion = $_POST['glosa_documento'];
 			$id_banco = $_POST['id_banco'];
 			$id_cuenta = $_POST['id_cuenta'];
-			$pago_retencion = $_POST['pago_retencion'];
+			$pago_retencion = (int) $_POST['pago_retencion'];
 			$id_concepto = $_POST['id_concepto'];
 
 			$pago->Edit('codigo_cliente', $codigo_cliente_factura, true);
@@ -836,7 +836,7 @@ $Form->defaultLabel = false;
 				?>
 				<td class="ar" width="30%">
 					<?php echo $Form->button(__('Utilizar un adelanto'), array(
-							'onclick' => "nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?popup=1&id_cobro={$id_cobro}&codigo_cliente={$codigo_cliente}&elegir_para_pago=1{$para_honorarios}{$para_gastos}&id_contrato={$cobro->fields['id_contrato']}&desde_factura_pago=1', 'top=100, left=125, scrollbars=yes')"
+							'onclick' => "nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?popup=1&id_cobro={$id_cobro}&codigo_cliente={$codigo_cliente}&elegir_para_pago=1{$para_honorarios}{$para_gastos}&id_contrato={$cobro->fields['id_contrato']}&desde_factura_pago=1&pago_honorarios={$cobro->fields['incluye_honorarios']}&pago_gastos={$cobro->fields['incluye_gastos']}', 'top=100, left=125, scrollbars=yes')"
 					)); ?>
 				</td>
 			<?php } ?>
