@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.6
+Lunes 09 de Marzo 2015
+* **Fix:** [Error en la generación de gráfico de torta cuando la suma del agrupado entregaba decimales](https://github.com/LemontechSA/ttb/pull/865)
+
 ## Hotfix 15.3.5
 Jueves 05 de Marzo 2015
 * **Fix:** [Error en actualizacion de nota de cobro por campo de más](https://github.com/LemontechSA/ttb/pull/864)

@@ -103,12 +103,13 @@ if ($tipo_dato_comparado) {
 $existen_datos = false;
 $valores = array();
 $labels = array();
-foreach ($r as $id => $fila)
+foreach ($r as $id => $fila) {
 	if (is_array($fila)) {
 		$labels[] = urlencode($fila['label']);
 		$valores[] = str_replace(',', '.', $fila['valor']);
 		$existen_datos = true;
 	}
+}
 
 if ($limite) {
 	$lim_labels = array();
@@ -117,7 +118,7 @@ if ($limite) {
 		$lim_valores_comparados = array();
 	}
 
-	if ($limite > 0 && $limite < 1000)
+	if ($limite > 0 && $limite < 1000) {
 		for ($i = 0; ($i < $limite && $i < sizeof($labels)); $i++) {
 			$lim_labels[] = $labels[$i];
 			$lim_valores[] = $valores[$i];
@@ -125,16 +126,18 @@ if ($limite) {
 				$lim_valores_comparados[] = $valores_comparados[$i];
 			}
 		}
+	}
 
-	if ($agrupar)
+	if ($agrupar) {
 		if ($limite < sizeof($labels)) {
 			$valor_otros = 0;
 			for ($i = $limite; $i < sizeof($labels); $i++) {
 				$valor_otros += $valores[$i];
 			}
-			$lim_labels[] = "Otros";
-			$lim_valores[] = $valor_otros;
+			$lim_labels[] = 'Otros';
+			$lim_valores[] = str_replace(',', '.', $valor_otros);
 		}
+	}
 
 	$valores = $lim_valores;
 	$labels = $lim_labels;
@@ -146,11 +149,12 @@ if ($limite) {
 foreach ($labels as $label) {
 	$datos_grafico .= "&n[]=" . ($label);
 }
+
 $datos_grafico .= "&t=" . implode(',', $valores);
+
 if ($tipo_dato_comparado) {
 	$datos_grafico .= "&c=" . implode(',', $valores_comparados);
 }
-
 
 $html_info = '<style type="text/css">
 		@media print {
