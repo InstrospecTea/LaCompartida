@@ -307,11 +307,8 @@ class Factura extends Objeto {
 	// To render the template with some variables
 	private $template_data;
 
-	function Factura($sesion, $fields = "", $params = "") {
-		$this->tabla = "factura";
-		$this->campo_id = "id_factura";
-		$this->sesion = $sesion;
-		$this->fields = $fields;
+	function Factura($sesion, $fields = '', $params = '') {
+		parent::__construct($sesion, $fields, $params, 'factura', 'id_factura');
 		$this->log_update = true;
 		$this->template_data = array();
 	}
