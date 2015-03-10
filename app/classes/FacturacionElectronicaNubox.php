@@ -162,6 +162,7 @@ EOF;
 								$Factura->Edit('dte_url_pdf', $result['Identificador']);
 								$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 								if ($Factura->Write()) {
+									$Factura->GuardarNumeroDocLegal($Factura->fields['id_documento_legal'], $result['Folio'], $Factura->fields['serie_documento_legal'], $Factura->fields['id_estudio']);
 									$hookArg['InvoiceURL'] = $file_url;
 								}
 							} catch (Exception $ex) {
