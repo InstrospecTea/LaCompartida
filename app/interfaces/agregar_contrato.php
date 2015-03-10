@@ -3025,16 +3025,22 @@ echo $Form->script();
 		?>
 	}
 
-	Calendar.setup({
-		inputField	: "periodo_fecha_inicio",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_periodo_fecha_inicio"		// ID of the button
-	});
-	Calendar.setup({
-		inputField	: "fecha_inicio_cap",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_inicio_cap"		// ID of the button
-	});
+	if (jQuery('#periodo_fecha_inicio').val()) {
+		Calendar.setup({
+			inputField	: "periodo_fecha_inicio",				// ID of the input field
+			ifFormat		: "%d-%m-%Y",			// the date format
+			button			: "img_periodo_fecha_inicio"		// ID of the button
+		});
+	}
+
+	if (jQuery('#fecha_inicio_cap').val()) {
+		Calendar.setup({
+			inputField	: "fecha_inicio_cap",				// ID of the input field
+			ifFormat		: "%d-%m-%Y",			// the date format
+			button			: "img_fecha_inicio_cap"		// ID of the button
+		});
+	}
+
 	$$('[id^="hito_fecha_"]').each(function(elem){
 		Calendar.setup({
 			inputField	: elem.id,				// ID of the input field

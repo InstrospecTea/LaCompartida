@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.3.8
+Martes 10 de Marzo 2015
+* **Fix:** [Apertura de calendario al agregar hitos](https://github.com/LemontechSA/ttb/pull/867)
+* **Fix:** [Mejorar formulario de mantención de tarifas trámites](https://github.com/LemontechSA/ttb/pull/867)
+
 ## Hotfix 15.3.7
 Martes 10 de Marzo 2015
 * **Fix:** [Previene error SQL al descargar excel de borradores de liquidaciones](https://github.com/LemontechSA/ttb/pull/866)

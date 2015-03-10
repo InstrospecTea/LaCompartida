@@ -16,8 +16,8 @@
 	$pagina = new Pagina($sesion);
 
 	$tramite_tarifa = new TramiteTarifa($sesion);
-	
-	
+
+
 	if($opc == 'eliminar')
 	{
 		$tramite_tarifa_eliminar = new TramiteTarifa($sesion);
@@ -29,20 +29,20 @@
 		}
 		else
 			$pagina->AddError($tramite_tarifa_eliminar->error);
-	} 
-	
+	}
+
 	if( !$tramite_tarifa->Load($id_tramite_tarifa_edicion) && $crear != 1 ) {
 		$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto = 1";
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($id_tramite_tarifa_edicion) = mysql_fetch_array($resp);
 		$tramite_tarifa->Load($id_tramite_tarifa_edicion);
 	}
-	
+
 	if($opc != 'guardar')
 	{
 		$query="SELECT id_tramite_tarifa FROM tramite_tarifa WHERE guardado=0";
 		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		while(list($id)=mysql_fetch_array($resp))
 		{
 		$tramite_tarifa_eliminar = new TramiteTarifa($sesion);
@@ -50,12 +50,12 @@
 		$tramite_tarifa_eliminar->Eliminar();
 		}
 	}
-	
+
 	if($crear==1 && !$id_tramite_tarifa_edicion && $opc != 'guardar')
 	{
 		$query="INSERT INTO tramite_tarifa(fecha_creacion) VALUES(NOW())";
 		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	
+
 		$query="SELECT id_tramite_tarifa FROM tramite_tarifa ORDER BY id_tramite_tarifa DESC";
 		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($id_nuevo)=mysql_fetch_array($resp);
@@ -72,19 +72,19 @@
 		$tramite_tarifa->loadById($id_nuevo);
 		$id_tramite_tarifa_edicion=$tramite_tarifa->fields['id_tramite_tarifa'];
 	}
-	
+
 	if($id_tramite_tarifa_previa && $opc != 'guardar')
 	{
 		$query="SELECT id_tramite_tipo, id_moneda, tarifa FROM tramite_valor WHERE id_tramite_tarifa=".$id_tramite_tarifa_previa;
 		$resp=mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		 
+
 		while(list($id_tramite_tipo, $id_moneda, $tarifa)=mysql_fetch_array($resp))
 		{
 		$query2="INSERT INTO tramite_valor(id_tramite_tipo, id_moneda, tarifa, id_tramite_tarifa) VALUES(".$id_tramite_tipo.",".$id_moneda.",".$tarifa.",".$id_nuevo.")";
 		$resp2=mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 		}
 	}
-	
+
 	if($opc == 'guardar')
 	{
 		$tramite_tarifa->Edit('glosa_tramite_tarifa',$glosa_tramite_tarifa);
@@ -112,7 +112,7 @@
 		}
 	$pagina->AddInfo(__('La tarifa se ha modificado satisfactoriamente'));
 	}
-	
+
 	$pagina->titulo = __('Ingreso de Tarifas de Trámites');
 
 	$id_tr_tar_ed = $id_tramite_tarifa_edicion;
@@ -145,7 +145,7 @@ function Eliminar()
 	http.open('get', 'ajax.php?accion=obtener_tramite_tarifa_defecto&id_tarifa=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
 	http.send(null);
 	tarifa_defecto_en_bd = http.responseText;
-	
+
 	if( tarifa_defecto_en_bd != <?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?> ){
 		var http = getXMLHTTP();
 		http.open('get', 'ajax.php?accion=contratos_con_esta_tramite_tarifa&id_tarifa=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
@@ -162,7 +162,7 @@ function Eliminar()
 				location.href="tarifas_tramites.php?popup=<?=$popup?>&id_tramite_tarifa_eliminar=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>&opc=eliminar";
 			} else {
 				return false;
-			}					   
+			}
 		} else {
 			if (confirm('¿<?=__('Está seguro de eliminar la')." ".__('tarifa')?>?')) {
 				location.href="tarifas_tramites.php?popup=<?=$popup?>&id_tramite_tarifa_eliminar=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>&opc=eliminar";
@@ -179,10 +179,10 @@ function Eliminar()
 function CrearTarifa( from, id )
 {
 	if(document.getElementById('usar_tarifa_previa').checked)
-		{	
+		{
 			self.location.href='tarifas_tramites.php?popup=<?=$popup?>&crear=1&id_tramite_tarifa_previa=' + id;
 		}
-	else { 
+	else {
 		self.location.href='tarifas_tramites.php?popup=<?=$popup?>&crear=1';
 		}
 }
@@ -207,63 +207,54 @@ function CrearTarifa( from, id )
 }
 </style>
 
-<? 
-if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
+<?
+if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 	echo "<table width=\"90%\" class=\"tb_base\"><tr><td align=\"center\">"; ?>
 <form name=formulario id=formulario method=post action='' autocomplete="off">
 	<input type=hidden name='id_tramite_tarifa_edicion' value='<?=$tramite_tarifa->fields['id_tramite_tarifa']?>'>
 	<input type=hidden name='opc' value='guardar'>
 	<input type=hidden name='popup' id='popup' value='<?=$popup ?>'>
 
-	<table width='100%' border="0" cellpadding="0" cellspacing="0">
-		<tr>
-<?
-	$colspan=3;
-	
-	if($tramite_tarifa->fields['id_tramite_tarifa'])
-	{
-		$colspan=5;
-?>
-			<td align=right><?=__('Tarifa')?>:&nbsp;</td>
-			<td align=left><?= Html::SelectQuery($sesion, "SELECT * FROM tramite_tarifa ORDER BY glosa_tramite_tarifa","id_tramite_tarifa", $tramite_tarifa->fields['id_tramite_tarifa'],"onchange='cambia_tarifa(this.value)'","","120"); ?></td>
-<?
-	} 
-?>
-			<td> <?=__('Nombre')?>: <input type=text name=glosa_tramite_tarifa value='<?=$tramite_tarifa->fields['glosa_tramite_tarifa']?>' <?=$active?>> </td>
-			<td></td>
-			<td align=right> <?=__('Defecto')?>: <input type=checkbox name=tarifa_defecto value='1' <?=$tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : '' ?>></td>
-		</tr>
-		<tr>
-			<td colspan=<?=$colspan?> align=right>&nbsp;</td>
-		</tr>
-		<tr>
-			<td colspan=<?=$colspan-1?> width="73%" align=right>
-				<input type=submit value='<?=__('Guardar') ?>' class=btn >&nbsp;
-			</td>
-			<td align=left>
-				<input type=button onclick="CrearTarifa( this.form , <?=$id_tramite_tarifa_edicion ?> );" value='<?=__('Crear nueva tarifa') ?>' class=btn >
-				<input type=button onclick="Eliminar();" value='<?=__('Eliminar Tarifa') ?>' class="btn_rojo" >
-			</td>
-		</tr>
-		<tr>
-			<?
-	$colspan=2;
-	
-			if($tramite_tarifa->fields['id_tramite_tarifa'])
-			{
-			$colspan=4;
-			
-			} 
+	<div style="width:95%; text-align:right; margin-bottom:5px;">
+		<input type="button" onclick="CrearTarifa(this.form , <?php echo $id_tramite_tarifa_edicion ;?>);" value='<?php echo __('Crear nueva tarifa'); ?>' class="btn">
+		<label><input type="checkbox" id="usar_tarifa_previa" value="1" <?php echo $usar_tarifa_previa ? 'checked' : '' ?> />Copiar Datos</label>
+	</div>
+	<table width='95%' border="0" style="border: 1px solid #BDBDBD">
+		<tr valign="middle">
+			<?php
+				if ($tramite_tarifa->fields['id_tramite_tarifa']) {
+					if (!isset($crear)) {
+						?>
+						<td align="right"><?php echo __('Tarifa'); ?>:</td>
+						<td align="left">
+							<?php echo Html::SelectQuery($sesion, "SELECT * FROM tramite_tarifa ORDER BY glosa_tramite_tarifa", 'id_tramite_tarifa', $tramite_tarifa->fields['id_tramite_tarifa'],"onchange='cambia_tarifa(this.value)'", '', '120'); ?>
+						</td>
+						<td>
+							<?php echo __('Nombre')?>:
+							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?>>
+							<label><input type="checkbox" name="tarifa_defecto" value="1" <?php echo $tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : ''; ?>> <?php echo __('Defecto')?></label>
+						</td>
+						<?php
+					} else {
+						?>
+						<td align="right">Nueva <?php echo __('Tarifa'); ?></td>
+						<td align="left">
+							<input type="hidden" name="id_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['id_tramite_tarifa']; ?>">
+							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?> placeholder="Nombre">
+							<label><input type="checkbox" name="tarifa_defecto" value="1" <?php echo $tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : ''; ?>> <?php echo __('Defecto')?></label>
+						</td>
+						<?php
+					}
+				}
 			?>
-			<td colspan=<?=$colspan?> ></td><td align=left>
-				<input type=checkbox id=usar_tarifa_previa value='1' <? $usar_tarifa_previa ? 'checked' : '' ?> />Copiar Datos
+			<td align="right">
+				<input type="submit" value='<?php echo __('Guardar'); ?>' class="btn">
+				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Tarifa'); ?>' class="btn_rojo" >
 			</td>
 		</tr>
 	</table>
+
 	<br>
-	
-	
-	
 <?
 /* self.location.href= */
 	######## MONEDAS #########
@@ -330,7 +321,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 			$tab += ($total * ($j+1)) + $j;
 			$money = $lista_monedas->Get($j);
 			$glosa_moneda=$money->fields['glosa_moneda'];
-			
+
 			if($id_moneda == $money->fields['id_moneda'] && $id_tramite_valor == $id_tramite_tipo)
 			{
 				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 id='' name='tarifa_moneda[$id_tramite_tipo][".$money->fields['id_moneda']."]' value='".$tarifa."' $active tabindex=$tab></td> \n";
@@ -345,11 +336,11 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 
 
 
-	
-	
-	
-	
-if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) 
+
+
+
+
+if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) )
 { ?>
 <table width='95%' border="1" style='border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom: none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 	<tr bgcolor=#A3D55C>
@@ -370,7 +361,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo')
 </form>
 <br>
 <?
-if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) 
+if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) )
 echo "</td></tr></table>";
 
 	$pagina->PrintBottom($popup);
