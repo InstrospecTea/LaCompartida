@@ -90,15 +90,13 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 				}
 				var self = jQuery(this);
 				var id_factura = self.data("factura");
+				var id_cobro = self.data("cobro");
 				var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:95px;height:20px;margin-left:-90px;"});
 				self.parent().append(loading);
 				jQuery.ajax({url: root_dir + "/api/index.php/invoices/" + id_factura +  "/build",
 					type: "POST"
 				}).success(function(data) {
-					loading.remove();
-					buttons = jQuery('{$BotonDescargarHTML}');
-					buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
-					self.replaceWith(buttons);
+					jQuery('#cajafacturas').load('ajax/cobros7.php', {id_cobro: id_cobro, opc: 'cajafacturas'});
 				}).error(function(error_data){
 					loading.remove();
 					response = JSON.parse(error_data.responseText);
