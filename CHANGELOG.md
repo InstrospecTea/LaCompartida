@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.7
+Martes 10 de Marzo 2015
+* **Fix:** [Previene error SQL al descargar excel de borradores de liquidaciones](https://github.com/LemontechSA/ttb/pull/866)
+
 ## Hotfix 15.3.6
 Lunes 09 de Marzo 2015
 * **Fix:** [Error en la generación de gráfico de torta cuando la suma del agrupado entregaba decimales](https://github.com/LemontechSA/ttb/pull/865)
