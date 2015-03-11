@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.9
+Martes 10 de Marzo 2015
+* **Fix:** [Corrige problemas de refresco numero factura Nubox](https://github.com/LemontechSA/ttb/pull/868)
+
 ## Hotfix 15.3.8
 Martes 10 de Marzo 2015
 * **Fix:** [Apertura de calendario al agregar hitos](https://github.com/LemontechSA/ttb/pull/867)
