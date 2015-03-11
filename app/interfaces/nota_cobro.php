@@ -5,6 +5,7 @@ $sesion = new Sesion(array('ADM'));
 $NotaCobro = new NotaCobro($sesion);
 
 if ($opc == 'guardar') {
+	unset($nota['secciones']);
 	$id_formato = $NotaCobro->GuardarCarta($nota);
 	die(json_encode(array('id' => $id_formato)));
 } else if ($opc == 'prev') {

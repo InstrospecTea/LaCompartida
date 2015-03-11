@@ -11529,33 +11529,19 @@ class NotaCobro extends Cobro {
 
 	/**
 	 * Llena los datos a utilizar en el RenderTemplate, se llama desde
-	 * GenerarDocumento* y GenerarCarta por lo que se omite la sobrecarga
-	 * del arreglo al cargar solo lo que no está disponible aún
+	 * GenerarDocumento* y GenerarCarta
 	 *
 	 * @param array Fields del idioma
 	 * @param array Fields de la moneda
 	 */
 	protected function FillTemplateData($idioma, $moneda) {
-		if (!is_array($this->template_data['Cobro'])) {
-			$this->template_data['Cobro'] = $this->fields;
-		}
+		$Contrato = new Contrato($this->sesion);
+		$Contrato->Load($this->fields['id_contrato']);
+		$this->template_data['Contrato'] = $Contrato->fields;
 
-		if (!is_array($this->template_data['Contrato'])) {
-			$Contrato = new Contrato($this->sesion);
-			$Contrato->Load($this->fields['id_contrato']);
-			$this->template_data['Contrato'] = $Contrato->fields;
-		}
-
-		if (!is_array($this->template_data['UsuarioActual'])) {
-			$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
-		}
-
-		if (!is_array($this->template_data['Idioma'])) {
-			$this->template_data['Idioma'] = $idioma->fields;
-		}
-
-		if (!is_array($this->template_data['Moneda'])) {
-			$this->template_data['Moneda'] = $moneda->fields;
-		}
+		$this->template_data['Cobro'] = $this->fields;
+		$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
+		$this->template_data['Idioma'] = $idioma->fields;
+		$this->template_data['Moneda'] = $moneda->fields;
 	}
 }

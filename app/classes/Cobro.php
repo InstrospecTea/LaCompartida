@@ -1979,6 +1979,8 @@ if (!class_exists('Cobro')) {
 					$this->Edit('esc4_id_moneda', $contrato->fields['esc4_id_moneda']);
 					$this->Edit('esc4_descuento', $contrato->fields['esc4_descuento']);
 
+					$this->Edit('observaciones', $contrato->fields['observaciones']);
+
 					//este es el monto fijo, pero si no se inclyen honorarios no va
 					$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
 

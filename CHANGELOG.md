@@ -1,5 +1,34 @@
 # Changelog
 
+## Hotfix 15.3.9
+Martes 10 de Marzo 2015
+* **Fix:** [Corrige problemas de refresco numero factura Nubox](https://github.com/LemontechSA/ttb/pull/868)
+
+## Hotfix 15.3.8
+Martes 10 de Marzo 2015
+* **Fix:** [Apertura de calendario al agregar hitos](https://github.com/LemontechSA/ttb/pull/867)
+* **Fix:** [Mejorar formulario de mantención de tarifas trámites](https://github.com/LemontechSA/ttb/pull/867)
+
+## Hotfix 15.3.7
+Martes 10 de Marzo 2015
+* **Fix:** [Previene error SQL al descargar excel de borradores de liquidaciones](https://github.com/LemontechSA/ttb/pull/866)
+
+## Hotfix 15.3.6
+Lunes 09 de Marzo 2015
+* **Fix:** [Error en la generación de gráfico de torta cuando la suma del agrupado entregaba decimales](https://github.com/LemontechSA/ttb/pull/865)
+
+## Hotfix 15.3.5
+Jueves 05 de Marzo 2015
+* **Fix:** [Error en actualizacion de nota de cobro por campo de más](https://github.com/LemontechSA/ttb/pull/864)
+
+## Hotfix 15.3.4
+Miércoles 04 de Marzo 2015
+* **Fix:** [Generación de alertas por asuntos](https://github.com/LemontechSA/ttb/pull/863)
+
+## Hotfix 15.3.3
+Miércoles 04 de Marzo 2015
+* **Fix:** [Corrige el uso de Twig en la descarga masiva y la copia de las observaciones del contrato en el Cobro](https://github.com/LemontechSA/ttb/pull/862)
+
 ## Hotfix 15.3.2
 Martes 03 de Marzo 2015
 * **Fix:** [Validar que el asunto esté activo al guardar un trabajo o un gasto](https://github.com/LemontechSA/ttb/pull/859)
