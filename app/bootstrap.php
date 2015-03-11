@@ -9,6 +9,9 @@ define('LAYER_PATH', dirname(__FILE__) . '/layers');
 $uri = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
 $uri = preg_replace('/^\/|\?.*/', '', $uri);
 
+$parse_url = parse_url($_SERVER['REQUEST_URI']);
+parse_str($parse_url['query'], $_GET);
+
 $exploded_uri = explode('/', $uri);
 $route['controller'] = array_shift($exploded_uri);
 $route['method'] = array_shift($exploded_uri);
