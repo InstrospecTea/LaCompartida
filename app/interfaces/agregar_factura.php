@@ -547,18 +547,22 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 				$numero_documento = $factura->ObtieneNumeroFactura();
 			}
 			?>
+
+			<?php
+				$disableInvoiceNumber = ($factura->loaded() && $factura->FacturaElectronicaCreada()) ? 'readonly' : '';
+			?>
 			<tr>
 				<td width="140" align="right"><?php echo __('Número'); ?></td>
 				<td align="left">
 					<?php
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
-						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()"', null, 60);
+						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()" ' . $disableInvoiceNumber, null, 60);
 					} else {
 						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
 						?>
 						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>
-					<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
+					<input type="text" <? echo $disableInvoiceNumber; ?> name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
 				<td align="right"><?php echo __('Estado'); ?></td>
 				<?php
