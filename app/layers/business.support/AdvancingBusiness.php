@@ -1,6 +1,6 @@
 <?php
 
-class AdvancingBusiness extends AbstractBusiness {//implements ISandboxingBusiness {
+class AdvancingBusiness extends AbstractBusiness {
 
 	/**
 	 * Obtiene la lista paginada de los adelantos que complen las condiciones.
@@ -17,7 +17,7 @@ class AdvancingBusiness extends AbstractBusiness {//implements ISandboxingBusine
 			$searchCriteria->filter('id_documento')->restricted_by('equals')->compare_with($filters['id_documento']);
 		}
 		if (!empty($filters['codigo_cliente'])) {
-			$searchCriteria->filter('codigo_cliente')->restricted_by('equals')->compare_with($filters['codigo_cliente']);
+			$searchCriteria->filter('codigo_cliente')->restricted_by('equals')->compare_with("'{$filters['codigo_cliente']}'");
 		}
 		if (!empty($filters['fecha_inicio'])) {
 			$fecha = date("Y-m-d", strtotime($filters['fecha_inicio']));
