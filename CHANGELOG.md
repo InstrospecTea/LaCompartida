@@ -1,5 +1,10 @@
 # Changelog
 
+## Release: 15.4.0
+Jueves 12 de Marzo 2015
+[Release 15.4.0](https://github.com/LemontechSA/ttb/pull/869)
+* **Feature:** [Feature utilización adelantos](https://github.com/LemontechSA/ttb/pull/857)
+
 ## Hotfix 15.3.9
 Martes 10 de Marzo 2015
 * **Fix:** [Corrige problemas de refresco numero factura Nubox](https://github.com/LemontechSA/ttb/pull/868)
