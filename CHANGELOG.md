@@ -2,7 +2,7 @@
 
 ## Release: 15.4.0
 Jueves 12 de Marzo 2015
-[Release 15.4.0](https://github.com/LemontechSA/ttb/pull/869)
+[Release 15.4.0](https://github.com/LemontechSA/ttb/pull/871)
 * **Feature:** [Feature utilización adelantos](https://github.com/LemontechSA/ttb/pull/857)
 
 ## Hotfix 15.3.10
