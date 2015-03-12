@@ -472,8 +472,9 @@ class ReporteContrato extends Contrato {
 		if ($monto_por_cobrar == '' || is_null($monto_por_cobrar))
 			$monto_por_cobrar = 0;
 
-		if (!$this->monedas)
-			$this->monedas = ArregloMonedas($this->sesion);
+		if (!$this->monedas) {
+			$this->monedas = Moneda::GetMonedas($this->sesion, null, true);
+		}
 
 		$query = "SELECT separar_liquidaciones, opc_moneda_total, opc_moneda_gastos FROM contrato WHERE id_contrato = '$id_contrato'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -683,7 +684,7 @@ class ReporteContrato extends Contrato {
                                t1.simbolo, t1.id_moneda,t1.duracionh t_individual, @acumulado:=@acumulado+t1.duracionh Tacumulado,
                                 if(@acumulado<t1.retainer_horas,0,
                                             if(@acumulado- t1.retainer_horas >t1.duracionh,t1.duracionh,@acumulado-t1.retainer_horas))*t1.tarifa as Macumulado
-                                                                
+
                                                                 FROM (select @acumulado:=0) ac,
                                                                     (select ut1.tarifa, c1.monto   * ( pm2.tipo_cambio / pm1.tipo_cambio ) plata_retainer,c1.retainer_horas,
                                                                            pm1.simbolo, pm1.id_moneda, t1.fecha, t1.id_trabajo, t1.id_usuario,
@@ -716,7 +717,7 @@ class ReporteContrato extends Contrato {
 				//subquery que se repite como mil veces
 //mail('ffigueroa@lemontech.cl','RETAINER',$query)		;
 				break;
-			
+
 
 			case 'PROPORCIONAL':
 
@@ -846,7 +847,7 @@ class ReporteContrato extends Contrato {
                                         AND t1.id_tramite = 0
 					AND asunto.id_contrato=" . $this->fields['id_contrato'];
 				break;
-			
+
 
 			case 'HITOS':
 
@@ -857,19 +858,19 @@ class ReporteContrato extends Contrato {
 					$w_fecha2 = " AND cp.fecha_cobro <= '$fecha_fin' ";
 				}
 
-				$query = " 
-					SELECT SUM(cp.monto_estimado), 
-					    	m.simbolo, 
+				$query = "
+					SELECT SUM(cp.monto_estimado),
+					    	m.simbolo,
         					m.id_moneda
     				FROM cobro_pendiente cp
-					        INNER JOIN contrato cn ON cp.id_contrato = cn.id_contrato 
+					        INNER JOIN contrato cn ON cp.id_contrato = cn.id_contrato
 					        INNER JOIN prm_moneda m ON  cn.id_moneda_monto = m.id_moneda
-    				WHERE 	cp.id_contrato = " .$this->fields['id_contrato']. " 
-							AND cp.hito = 1 
-							AND cp.fecha_cobro is not NULL 
+    				WHERE 	cp.id_contrato = " .$this->fields['id_contrato']. "
+							AND cp.hito = 1
+							AND cp.fecha_cobro is not NULL
 							$w_fecha1
 							$w_fecha2
-    			";				
+    			";
 				break;
 
 

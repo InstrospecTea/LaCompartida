@@ -2,6 +2,7 @@
 
 class ViewRenderer {
 	public $data;
+	public $params;
 	public $title;
 	public $request;
 	public $helpers;
@@ -37,6 +38,7 @@ class ViewRenderer {
 		$Renderer = new self($this->Session);
 		$Renderer->title = $this->title;
 		$Renderer->data = $this->data;
+		$Renderer->params = $this->params;
 		$Renderer->request = $this->request;
 		$Renderer->helpers = $this->helpers;
 		$Renderer->set($vars);

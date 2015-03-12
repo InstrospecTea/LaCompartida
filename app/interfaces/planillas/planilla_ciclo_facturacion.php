@@ -13,7 +13,7 @@ if ($xls) {
 	$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);
 	$id_moneda_base = $moneda->GetMonedaBase($sesion);
 
-	$arreglo_monedas = ArregloMonedas($sesion);
+	$arreglo_monedas = Moneda::GetMonedas($sesion, null, true);
 
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
