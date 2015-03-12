@@ -22,7 +22,6 @@ if ($id_cobro) {
 }
 
 $pago = new FacturaPago($sesion);
-// echo '<pre>';print_r($sesion);echo '</pre>';
 //Desde el webservice viene un id_pago (id_contabilidad).
 if ($desde_webservice) {
 	$pago->LoadByIdContabilidad($id_contabilidad);
@@ -32,16 +31,16 @@ if ($desde_webservice) {
 	}
 
 	if ($id_adelanto) {
-		$query_factura_pago = "select fp.id_factura_pago
-			from factura_pago fp
-			join neteo_documento nd on nd.id_neteo_documento = fp.id_neteo_documento_adelanto
-			join documento dd on dd.id_documento = nd.id_documento_cobro and dd.id_cobro = $id_cobro
-			where nd.id_documento_pago = $id_adelanto
-			";
+		$query_factura_pago = "SELECT fp.id_factura_pago
+			FROM factura_pago fp
+				JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+				JOIN documento dd ON dd.id_documento = nd.id_documento_cobro AND dd.id_cobro = {$id_cobro}
+			WHERE nd.id_documento_pago = {$id_adelanto}";
 		$res = mysql_query($query_factura_pago, $sesion->dbh) or Utiles::errorSQL($query_factura_pago, __FILE__, __LINE__, $sesion->dbh);
 		list($id_factura_pago) = mysql_fetch_array($res);
 		$utilizando_adelanto = true;
 	}
+
 	if (!empty($id_factura_pago)) {
 		$pago->Load($id_factura_pago);
 		$id_moneda = $pago->fields['id_moneda'];
@@ -74,6 +73,7 @@ if ($desde_webservice) {
 		$hay_adelantos = ($pago_honorarios || $pago_gastos) && $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 	}
 }
+
 $moneda_pago = new Moneda($sesion);
 $moneda_pago->Load($id_moneda);
 
@@ -88,32 +88,19 @@ if (!empty($pago->fields['id_neteo_documento_adelanto'])) {
 }
 
 $monto_pago_adelanto = $monto_pago;
-
-
-
-if ($id_adelanto) {
-	$documento_adelanto->Load($id_adelanto, array(
-			'id_documento',
-			'id_moneda',
-			'monto',
-			'saldo_pago',
-			'tipo_doc',
-			'numero_doc',
-			'numero_cheque',
-			'glosa_documento',
-			'id_banco',
-			'id_cuenta'
-	));
-}
-
 $saldo_pago = $id_neteo_documento_adelanto ? $pago->fields['monto_moneda_cobro'] : null;
+
 if ($id_adelanto) {
+	$documento_adelanto->Load($id_adelanto, array('id_documento', 'id_moneda', 'monto', 'saldo_pago', 'tipo_doc', 'numero_doc', 'numero_cheque', 'glosa_documento', 'id_banco', 'id_cuenta'));
+
 	$tipo_cambio_adelanto = $moneda_pago->fields['tipo_cambio'];
 	$tipo_cambio_cobro = $moneda_cobro->fields['tipo_cambio'];
+
 	if ($monto_pago_adelanto > $documento_adelanto->fields['saldo_pago']) {
 		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
 		$monto_pago = $monto_pago_adelanto * $tipo_cambio_adelanto / $tipo_cambio_cobro;
 	}
+
 	$saldo_pago = $moneda_pago->getFloat((-$documento_adelanto->fields['saldo_pago'] + $pago->fields['monto']) * $tipo_cambio_adelanto / $tipo_cambio_cobro);
 }
 
@@ -161,6 +148,7 @@ if ($opcion == 'guardar') {
 	}
 
 	if ($guardar_datos && $id_adelanto) {
+
 		$documento->LoadByCobro($id_cobro);
 		$facturas = array();
 		foreach ($_POST as $nombre_variable => $valor) {
@@ -171,11 +159,12 @@ if ($opcion == 'guardar') {
 				$facturas[$factura] = $saldo;
 			}
 		}
+
 		if ($documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], $facturas, $id_adelanto, true)) {
-			$query_factura_pago_guardar = "select fp.id_factura_pago
-			from factura_pago fp
-			join neteo_documento nd on nd.id_neteo_documento = fp.id_neteo_documento_adelanto
-			where nd.id_documento_pago = $id_adelanto and nd.id_documento_cobro = " . $documento->fields['id_documento'];
+			$query_factura_pago_guardar = "SELECT fp.id_factura_pago
+				FROM factura_pago fp
+					JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+				WHERE nd.id_documento_pago = {$id_adelanto} AND nd.id_documento_cobro = {$documento->fields['id_documento']}";
 
 			$res = mysql_query($query_factura_pago_guardar, $sesion->dbh) or Utiles::errorSQL($query_factura_pago_guardar, __FILE__, __LINE__, $sesion->dbh);
 			list($id_factura_pago) = mysql_fetch_array($res);
