@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.3.10
+Jueves 12 de Marzo 2015
+* **Fix:** [Agrega nuevos tags para las cartas múltiples de García Bodán](https://github.com/LemontechSA/ttb/pull/870)
+
 ## Hotfix 15.3.9
 Martes 10 de Marzo 2015
 * **Fix:** [Corrige problemas de refresco numero factura Nubox](https://github.com/LemontechSA/ttb/pull/868)
