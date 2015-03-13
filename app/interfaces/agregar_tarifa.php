@@ -201,19 +201,16 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		}
 	}
 
-	function ActualizarTarifaUsuario(glosa_categoria, valor, glosa_moneda, vacio)
-	{
+	function ActualizarTarifaUsuario(glosa_categoria, valor, glosa_moneda, vacio) {
 		var glosa_moneda_tarifa = glosa_moneda.replace(" ", "");
 		var clase = '.' + glosa_categoria + '' + glosa_moneda_tarifa;
 
-		if (!vacio || confirm('<?php echo __('Confirma cambio de tarifa para todos los usuarios de esta categoria?') ?>') == true)
-		{
-			$$(clase).each(// Para el cambio del tarifa de la categoria cambia todos los tarifas de usuarios
-					function(item) // que pertenecen a este categoria.
-					{
-						item.value = valor;
-					}
-			);
+		clase = clase.replace(/(?=[() ])/g, '\\');
+
+		if (!vacio || confirm('<?php echo __('Confirma cambio de tarifa para todos los usuarios de esta categoria?') ?>')) {
+			jQuery(clase).each(function (index, value) {
+				jQuery(value).val(valor);
+			});
 		}
 	}
 
