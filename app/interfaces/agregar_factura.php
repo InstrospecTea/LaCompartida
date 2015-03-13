@@ -185,15 +185,15 @@ if ($opcion == "guardar") {
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			$factura->Edit("descripcion", $descripcion_honorarios_legales);
-			$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
-			$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
-			$factura->Edit("subtotal_sin_descuento", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
-			$factura->Edit("descripcion_subtotal_gastos", $descripcion_gastos_con_iva ? $descripcion_gastos_con_iva : NULL);
-			$factura->Edit("subtotal_gastos", $monto_gastos_con_iva ? $monto_gastos_con_iva : NULL);
-			$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", $descripcion_gastos_sin_iva ? $descripcion_gastos_sin_iva : NULL);
-			$factura->Edit("subtotal_gastos_sin_impuesto", $monto_gastos_sin_iva ? $monto_gastos_sin_iva : NULL);
-			$factura->Edit("total", $total ? $total : NULL);
-			$factura->Edit("iva", $iva_hidden ? $iva_hidden : NULL);
+			$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
+			$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
+			$factura->Edit("subtotal_sin_descuento", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
+			$factura->Edit("descripcion_subtotal_gastos", $descripcion_gastos_con_iva ? $descripcion_gastos_con_iva : '');
+			$factura->Edit("subtotal_gastos", $monto_gastos_con_iva ? $monto_gastos_con_iva : 0);
+			$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", $descripcion_gastos_sin_iva ? $descripcion_gastos_sin_iva : '');
+			$factura->Edit("subtotal_gastos_sin_impuesto", $monto_gastos_sin_iva ? $monto_gastos_sin_iva : 0);
+			$factura->Edit("total", $total ? $total : 0);
+			$factura->Edit("iva", $iva_hidden ? $iva_hidden : 0);
 		} else {
 			$factura->Edit("descripcion", $descripcion);
 		}

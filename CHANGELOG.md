@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.4.2
+Viernes 13 de Marzo 2015
+* **Fix:** [Corrección al crear facturas con campos por defecto NULL](https://github.com/LemontechSA/ttb/pull/873)
+
 ## Hotfix 15.4.1
 Viernes 13 de Marzo 2015
 * **Fix:** [Asignación de valores por categoria en mantenedor de tarifas](https://github.com/LemontechSA/ttb/pull/872)

@@ -13,10 +13,7 @@ if (!class_exists('Cobro')) {
 		const PROCESS_NAME = 'GeneracionMasivaCobros';
 
 		function __construct($sesion, $fields = "", $params = "") {
-			$this->tabla = "cobro";
-			$this->campo_id = "id_cobro";
-			$this->sesion = $sesion;
-			$this->fields = $fields;
+			parent::__construct($sesion, $fields, $params, 'cobro', 'id_cobro');
 			$this->log_update = true;
 			$this->guardar_fecha = true;
 		}
