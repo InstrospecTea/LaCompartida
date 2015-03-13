@@ -181,7 +181,7 @@ $pagina->PrintTop($popup);
     function formato_numeros() {
 		var cantidad_decimales = $('cifras_decimales').value;
 		var ceros = "0".times(parseFloat(cantidad_decimales));
-		var decimales = '#.' + ceros;
+		var decimales = '0.' + ceros;
 		format = decimales;
 		return {format: format, locale: 'us'};
 	}
@@ -322,7 +322,7 @@ $pagina->PrintTop($popup);
 				jQuery('#monto_aux').val(Number(total));
 				jQuery('#monto_pagos').val(Number(total));
 			}
-			jQuery('#saldo_pago').val(monto_adelanto-total).formatNumber(formato_numeros());
+			jQuery('#saldo_pago').val(monto_adelanto - total);
 		}
 
 		if (jQuery('#saldo_pago_aux').length>0) {
@@ -335,7 +335,7 @@ $pagina->PrintTop($popup);
 				SetMontoPagos();
 			}
 
-			jQuery('#saldo_pago').val(saldopagomaximo-total) ;
+			jQuery('#saldo_pago').val(saldopagomaximo - total) ;
 		}
 		jQuery('#saldo_pago').formatNumber(formato_numeros());
 	}
@@ -541,7 +541,7 @@ $pagina->PrintTop($popup);
 						} else {
 							jQuery('#monto').val(Math.min(total,anterior+1.000*(jQuery('#saldo_pago_aux').val()))).formatNumber(formato_numeros());
 						}
-						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val());
+						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val()).formatNumber(formato_numeros());
 
 					} else {
 						if (tipopago=='documento' || tipopago=='adelanto') {
@@ -830,22 +830,23 @@ $pagina->PrintTop($popup);
 					<?php
 				}
 				if ($id_cobro) {
-					$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
-					$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
-					$hay_adelantos = $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
+					$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0;
+					$pago_gastos = $documento_cobro->fields['saldo_gastos'] > 0;
+					$hay_adelantos = ($pago_honorarios || $pago_gastos) && $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 				} else {
 					$hay_adelantos = false;
 				}
 				if (!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos) {
-					$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
-					$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';
+					$pago_honorarios = $pago_honorarios ? '&pago_honorarios=1' : '';
+					$pago_gastos = $pago_gastos ? '&pago_gastos=1' : '';
 					?>
-					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
+					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $pago_gastos; ?><?php echo $pago_honorarios; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=100, left=125, scrollbars=yes');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
 				<?php } ?>
 			</td>
 		</tr>
 	</table>
-	<table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
+	<hr/>
+	<table id="tabla_informacion" width='90%'>
 		<tr>
 			<td align="right"><?php echo __('Fecha') ?></td>
 			<td align="left">
@@ -873,6 +874,10 @@ $pagina->PrintTop($popup);
 		}
 
 		if ($adelanto) {
+			if (isset($documento->fields['id_contrato']) && empty($id_contrato)) {
+				$id_contrato = $documento->fields['id_contrato'];
+			}
+
 			UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, 280);
 		}
 		?>
@@ -916,7 +921,7 @@ $pagina->PrintTop($popup);
 				</td>
 				<td align="left">
 					<input type="text" name="saldo_pago" id="saldo_pago" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
-					<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
+					<input type="text" class="oculto" style="display:none;" name="saldo_pago_aux" id="saldo_pago_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
 				</td>
 			</tr>
 		<?php } ?>
@@ -1100,7 +1105,7 @@ $pagina->PrintTop($popup);
 		?>
 	</table>
 
-	<br>
+	<hr/>
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
 			<td align="left">

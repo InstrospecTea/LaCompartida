@@ -4,6 +4,7 @@
 </p>
 
 <?php
+echo $Pagination->text();
 echo $this->Paginator->pages($Pagination);
 echo $this->Paginator->pages($Pagination, true, false, 6);
 echo $this->Paginator->pages($Pagination, true, true, 6);
