@@ -1,5 +1,10 @@
 # Changelog
 
+## Release: 15.4.0
+Jueves 12 de Marzo 2015
+[Release 15.4.0](https://github.com/LemontechSA/ttb/pull/871)
+* **Feature:** [Feature utilización adelantos](https://github.com/LemontechSA/ttb/pull/857)
+
 ## Hotfix 15.3.10
 Jueves 12 de Marzo 2015
 * **Fix:** [Agrega nuevos tags para las cartas múltiples de García Bodán](https://github.com/LemontechSA/ttb/pull/870)
