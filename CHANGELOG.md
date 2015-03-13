@@ -2,7 +2,7 @@
 
 ## Hotfix 15.4.1
 Viernes 13 de Marzo 2015
-* **Fix:** [Asignación de valores por categoria en mantenedor de tarifas](https://github.com/LemontechSA/ttb/pull/871)
+* **Fix:** [Asignación de valores por categoria en mantenedor de tarifas](https://github.com/LemontechSA/ttb/pull/872)
 
 ## Release: 15.4.0
 Jueves 12 de Marzo 2015
