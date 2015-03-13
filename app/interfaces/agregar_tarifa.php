@@ -205,6 +205,9 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		var glosa_moneda_tarifa = glosa_moneda.replace(" ", "");
 		var clase = '.' + glosa_categoria + '' + glosa_moneda_tarifa;
 
+		// la expresión regular busca los parentesis y espacios, le agrega un "\"" para escaparlos
+		// (?=) busca lo que esta alrededor http://www.regular-expressions.info/lookaround.html
+		// ".Socio (1)"" => ".Socio\ \(1\)"
 		clase = clase.replace(/(?=[() ])/g, '\\');
 
 		if (!vacio || confirm('<?php echo __('Confirma cambio de tarifa para todos los usuarios de esta categoria?') ?>')) {
