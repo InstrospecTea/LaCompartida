@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.4.4
+Lunes 16 de Marzo 2015
+* **Fix:** [Corregir asignación por referencia al bindParam (fix FW)](https://github.com/LemontechSA/ttb/pull/875)
+
 ## Hotfix 15.4.3
 Lunes 16 de Marzo 2015
 * **Fix:** [Corregir asignación de valores por defecto en db_log (fix FW)](https://github.com/LemontechSA/ttb/pull/874)
