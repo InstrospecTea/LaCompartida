@@ -2,7 +2,6 @@
 
 class SearchCriteria extends AbstractUtility {
 
-
 	protected $entity;
 	protected $filters;
 	protected $relationships;
@@ -58,10 +57,17 @@ class SearchCriteria extends AbstractUtility {
 	/**
 	 * Agrega un scope de búsqueda con respecto a la entidad definida al construir la instancia de SearchCriteria.
 	 * @param $scope_name
+	 * @param $arg1, $arg2...
 	 * @return $this
 	 */
 	public function add_scope($scope_name) {
-		$this->scopes[] = $scope_name;
+		$scope = $scope_name;
+		$args = func_get_args();
+		if (count($args) > 1) {
+			array_shift($args);
+			$scope = array($scope_name, $args);
+		}
+		$this->scopes[] = $scope;
 		return $this;
 	}
 

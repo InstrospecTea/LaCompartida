@@ -13,10 +13,7 @@ if (!class_exists('Cobro')) {
 		const PROCESS_NAME = 'GeneracionMasivaCobros';
 
 		function __construct($sesion, $fields = "", $params = "") {
-			$this->tabla = "cobro";
-			$this->campo_id = "id_cobro";
-			$this->sesion = $sesion;
-			$this->fields = $fields;
+			parent::__construct($sesion, $fields, $params, 'cobro', 'id_cobro');
 			$this->log_update = true;
 			$this->guardar_fecha = true;
 		}
@@ -30,7 +27,11 @@ if (!class_exists('Cobro')) {
 			$chargeService = new ChargeService($this->sesion);
 			$charge = new Charge();
 			$charge->fillFromArray($this->fields);
-			$charge->fillChangedFields($this->changes);
+
+			if (is_array($this->charges)) {
+				$charge->fillChangedFields($this->changes);
+			}
+
 			try {
 				$charge = $chargeService->saveOrUpdate($charge, $writeLog);
 				$this->fields = $charge->fields;
@@ -1975,6 +1976,8 @@ if (!class_exists('Cobro')) {
 					$this->Edit('esc4_monto', $contrato->fields['esc4_monto']);
 					$this->Edit('esc4_id_moneda', $contrato->fields['esc4_id_moneda']);
 					$this->Edit('esc4_descuento', $contrato->fields['esc4_descuento']);
+
+					$this->Edit('observaciones', $contrato->fields['observaciones']);
 
 					//este es el monto fijo, pero si no se inclyen honorarios no va
 					$monto = empty($monto) ? $contrato->fields['monto'] : $monto;

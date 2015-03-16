@@ -30,4 +30,5 @@ class Document extends Entity {
 	protected function getFixedDefaults() {
 		return array();
 	}
+
 }

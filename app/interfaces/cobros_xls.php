@@ -484,6 +484,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$cobro = new Cobro($sesion);
 	$cobro->Load($id_cobro);
+	if (!$cobro->Loaded()) {
+		continue;
+	}
 	$cobro->LoadAsuntos();
 
 	/*
@@ -524,15 +527,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	 *	generalmente si no tiene data no se escribe
 	 */
 
-	$query_cont_trabajos_cobro = "SELECT COUNT(*) FROM trabajo WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_cont_trabajos_cobro = "SELECT COUNT(*) FROM trabajo WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_cont_trabajos_cobro = mysql_query($query_cont_trabajos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_trabajos_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_trabajos_cobro) = mysql_fetch_array($resp_cont_trabajos_cobro);
 
-	$query_cont_tramites_cobro = "SELECT COUNT(*) FROM tramite WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_cont_tramites_cobro = "SELECT COUNT(*) FROM tramite WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_cont_tramites_cobro = mysql_query($query_cont_tramites_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_tramites_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_tramites_cobro) = mysql_fetch_array($resp_cont_tramites_cobro);
 
-	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_cont_gastos_cobro = mysql_query($query_cont_gastos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_gastos_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_gastos_cobro) = mysql_fetch_array($resp_cont_gastos_cobro);
 
@@ -1029,7 +1032,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$filas += 2;
 
-	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_num_usuarios = mysql_query($query_num_usuarios, $sesion->dbh) or Utiles::errorSQL($query_num_usuarios, __FILE__, __LINE__, $sesion->dbh);
 	$num_usuarios = mysql_num_rows($resp_num_usuarios);
 
@@ -1078,7 +1081,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$where_tramites .= " AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' ";
 		}
 
-		$query_cont_tramites = "SELECT COUNT(*) FROM tramite WHERE $where_tramites AND id_cobro=" . $cobro->fields['id_cobro'];
+		$query_cont_tramites = "SELECT COUNT(*) FROM tramite WHERE $where_tramites AND id_cobro='{$cobro->fields['id_cobro']}'";
 		$resp_cont_tramites = mysql_query($query_cont_tramites, $sesion->dbh) or Utiles::errorSQL($query_cont_tramites, __FILE__, __LINE__, $sesion->dbh);
 		list($cont_tramites) = mysql_fetch_array($resp_cont_tramites);
 
@@ -1152,7 +1155,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
 										LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
 										LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-									WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=" . $cobro->fields['id_cobro'];
+									WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro='{$cobro->fields['id_cobro']}'";
 
 				if (UtilesApp::GetConf($sesion, 'OrdenarPorCategoriaUsuario')) {
 					$orden = " prm_categoria_usuario.orden ASC, usuario.id_usuario ASC, trabajo.fecha ASC, trabajo.descripcion ";

@@ -2723,9 +2723,24 @@ class CartaCobro extends NotaCobro {
 
 					$row = str_replace('%detalle_liquidacion_numero%', $detalle['campos']['id_cobro'], $row);
 
+					$_moneda = $detalle['campos']['opc_moneda_total'];
+					$_simbolo = $this->monedas[$_moneda]['simbolo'];
+					$_cifras_decimales = $this->monedas[$_moneda]['cifras_decimales'];
+					$_separador_miles = $idioma->fields['separador_miles'];
+					$_separador_decimales = $idioma->fields['separador_decimales'];
+
+					$dl_honorarios_sin_iva = $_simbolo . $this->espacio . number_format($detalle['campos']['monto_subtotal'], $_cifras_decimales, $_separador_decimales, $_separador_miles);
+					$row = str_replace('%detalle_liquidacion_honorarios_sin_iva%', $dl_honorarios_sin_iva, $row);
+
+					$dl_impuesto = $_simbolo . $this->espacio . number_format($detalle['campos']['impuesto'], $_cifras_decimales, $_separador_decimales, $_separador_miles);
+					$row = str_replace('%detalle_liquidacion_impuesto%', $dl_impuesto, $row);
+
+					$dl_gastos = $_simbolo . $this->espacio . number_format($detalle['campos']['subtotal_gastos'], $_cifras_decimales, $_separador_decimales, $_separador_miles);
+					$row = str_replace('%detalle_liquidacion_gastos%', $dl_gastos, $row);
+
 					$modalidad = __($detalle['campos']['forma_cobro']);
-					$detalle_modalidad = $this->ObtenerDetalleModalidad($detalle['campos'], $this->monedas[$detalle['campos']['opc_moneda_total']], $idioma);
-					$modalidad .=!empty($detalle_modalidad) ? "<br/>$detalle_modalidad" : "";
+					$detalle_modalidad = $this->ObtenerDetalleModalidad($detalle['campos'], $this->monedas[$_moneda], $idioma);
+					$modalidad .= !empty($detalle_modalidad) ? "<br/>$detalle_modalidad" : "";
 					$row = str_replace('%detalle_liquidacion_forma_cobro%', $modalidad, $row);
 
 					$asuntos = array();
@@ -2736,8 +2751,7 @@ class CartaCobro extends NotaCobro {
 					}
 					$row = str_replace('%detalle_liquidacion_asuntos%', implode('<br/>', $asuntos), $row);
 
-					$opc_moneda_total = $detalle['campos']['opc_moneda_total'];
-					$row = str_replace('%detalle_liquidacion_valor%', $this->monedas[$opc_moneda_total]['simbolo'] . $this->espacio . number_format($detalle['totales']['monto_cobro_original_con_iva'][$opc_moneda_total], $this->monedas[$opc_moneda_total]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					$row = str_replace('%detalle_liquidacion_valor%', $_simbolo . $this->espacio . number_format($detalle['totales']['monto_cobro_original_con_iva'][$_moneda], $_cifras_decimales, $_separador_decimales, $_separador_miles), $row);
 
 					$html2 .= $row;
 				}

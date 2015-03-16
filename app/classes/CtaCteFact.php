@@ -28,7 +28,7 @@ class CtaCteFact extends Objeto
 	{
 		global $sesion;
 
-		$arreglo_monedas = ArregloMonedas($sesion);
+		$arreglo_monedas = Moneda::GetMonedas($sesion, null, true);
 
 		$query = "
 		SELECT sum(saldo*prm_moneda.tipo_cambio)
@@ -228,7 +228,7 @@ class CtaCteFact extends Objeto
 			return true;
 		}
 
-		$arreglo_monedas = ArregloMonedas($this->sesion);
+		$arreglo_monedas = Moneda::GetMonedas($this->sesion, null, true);
 
 		$arreglo_pagos_detalle = array();
 		foreach($neteos as $neteo){
@@ -302,7 +302,7 @@ class CtaCteFact extends Objeto
 
 					$moneda = new Moneda($this->sesion);
 					$moneda->Load($mvto_neteado->fields['id_moneda']);
-					$mvto_neteado->Edit('saldo', number_format($mvto_neteado->fields['saldo'] - $neteo->fields['monto'],$moneda->fields['cifras_decimales'],'.',''));
+					$mvto_neteado->Edit('saldo', $moneda->getFloat($mvto_neteado->fields['saldo'] - $neteo->fields['monto'], false));
 
 					if($mvto_neteado->Write()){
 						//quedo en 0 -> pasar de FACTURADO a COBRADO
