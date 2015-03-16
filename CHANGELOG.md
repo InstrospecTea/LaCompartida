@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.4.3
+Lunes 16 de Marzo 2015
+* **Fix:** [Corregir asignación de valores por defecto en db_log (fix FW)](https://github.com/LemontechSA/ttb/pull/874)
+
 ## Hotfix 15.4.2
 Viernes 13 de Marzo 2015
 * **Fix:** [Corrección al crear facturas con campos por defecto NULL](https://github.com/LemontechSA/ttb/pull/873)
