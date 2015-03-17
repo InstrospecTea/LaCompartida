@@ -8,12 +8,19 @@ $tramite_tarifa = new TramiteTarifa($sesion);
 if ($opc == 'eliminar') {
 	$tramite_tarifa_eliminar = new TramiteTarifa($sesion);
 	$tramite_tarifa_eliminar->loadById($id_tramite_tarifa_eliminar);
-	if ($tramite_tarifa_eliminar->Eliminar()) {
-		$id_tramite_tarifa_edicion = '2';
-		$pagina->AddInfo(__('La tarifa tramite se ha eliminado satisfactoriamente'));
+
+	// validate if the last rate can not be removed
+	if ($tramite_tarifa_eliminar->countRates() > 1) {
+		if ($tramite_tarifa_eliminar->Eliminar()) {
+			$pagina->AddInfo(__('La tarifa tramite se ha eliminado satisfactoriamente'));
+		} else {
+			$pagina->AddError($tramite_tarifa_eliminar->error);
+		}
 	} else {
-		$pagina->AddError($tramite_tarifa_eliminar->error);
+		$pagina->AddError(__('Al menos debe quedar una tarifa activa en el sistema'));
 	}
+
+	$id_tramite_tarifa_edicion = $tramite_tarifa_eliminar->getFirstIdRate();
 }
 
 if (!$tramite_tarifa->Load($id_tramite_tarifa_edicion) && $crear != 1) {
