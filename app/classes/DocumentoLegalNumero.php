@@ -1,8 +1,7 @@
 <?php
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 
 class DocumentoLegalNumero extends Objeto {
+
 	function DocumentoLegalNumero($sesion, $fields = '', $params = '') {
 		$this->tabla = 'prm_doc_legal_numero';
 		$this->campo_id = 'id_doc_legal_numero';
@@ -27,7 +26,7 @@ class DocumentoLegalNumero extends Objeto {
 		$query = "SELECT DISTINCT serie FROM {$this->tabla} WHERE id_documento_legal = $tipo_documento_legal";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-		while($fields = mysql_fetch_assoc($resp)) {
+		while ($fields = mysql_fetch_assoc($resp)) {
 			$lista[] = $fields['serie'];
 		}
 
@@ -44,10 +43,29 @@ class DocumentoLegalNumero extends Objeto {
 		$query = "SELECT serie, numero_inicial AS numero, id_estudio AS estudio FROM {$this->tabla} WHERE id_documento_legal = $tipo_documento_legal";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-		while($fields = mysql_fetch_assoc($resp)) {
+		while ($fields = mysql_fetch_assoc($resp)) {
 			$lista[] = $fields;
 		}
 
 		return $lista;
 	}
+
+	function UltimoNumeroSerieEstudio($tipo_documento_legal, $serie, $id_estudio) {
+		$lista = array();
+		$query = "SELECT numero_inicial FROM {$this->tabla}
+			WHERE id_documento_legal = :id_documento_legal
+			AND serie = :serie
+			AND id_estudio = :id_estudio";
+
+		$Statement = $this->sesion->pdodbh->prepare($query);
+		$Statement->bindParam('id_documento_legal', $tipo_documento_legal, PDO::PARAM_INT);
+		$Statement->bindParam('serie', $serie, PDO::PARAM_STR);
+		$Statement->bindParam('id_estudio', $id_estudio, PDO::PARAM_INT);
+		$Statement->execute();
+		if ($documento = $Statement->fetch(PDO::FETCH_ASSOC)) {
+			return $documento['numero_inicial'];
+		}
+		$Statement->closeCursor();
+	}
+
 }
