@@ -28,7 +28,7 @@ if (!class_exists('Cobro')) {
 			$charge = new Charge();
 			$charge->fillFromArray($this->fields);
 
-			if (is_array($this->charges)) {
+			if (is_array($this->changes)) {
 				$charge->fillChangedFields($this->changes);
 			}
 
@@ -36,6 +36,7 @@ if (!class_exists('Cobro')) {
 				$charge = $chargeService->saveOrUpdate($charge, $writeLog);
 				$this->fields = $charge->fields;
 			} catch (Exception $ex) {
+				Utiles::errorSQL($ex, __FILE__, __LINE__, $this->sesion->dbh)
 			}
 
 			// actualizar campo estadocobro de los trabajos según estado del cobro
