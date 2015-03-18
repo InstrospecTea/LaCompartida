@@ -12,7 +12,7 @@ class EntitiesListator {
 	 * @param array $entities
 	 * @throws UtilityException
 	 */
-	public function loadEntities(array $entities) {
+	public function loadEntities($entities) {
 		foreach ($entities as $element) {
 			if (!$this->checkElementClass($element)) {
 				throw new UtilityException('One of the elements on the Listator is not a subclass of Entity.');
@@ -131,10 +131,10 @@ class EntitiesListator {
 					->set_tag('tr')
 					->set_closure(true);
 				foreach ($this->columnHandler as $columnHandler) {
-					$th = new HtmlBuilder();
-					$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;text-align:center;');
+					$td = new HtmlBuilder();
+					$td->set_tag('td')->set_closure(true)->add_attribute('class','buscador');
 					if (is_callable($columnHandler['calculationExpression'])) {
-						$th->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
+						$td->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
 					} else {
 						$currency = $this->formatOptions['currency'];
 						$language = $this->formatOptions['language'];
@@ -145,7 +145,7 @@ class EntitiesListator {
 							$th->set_html($entity->get($columnHandler['calculationExpression']));
 						}
 					}
-					$tr->add_child($th);
+					$tr->add_child($td);
 				}
 			}
 			$tbody->add_child($tr);

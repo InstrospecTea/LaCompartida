@@ -2162,26 +2162,6 @@ HTML;
 		return $data;
 	}
 
-	public static function ArregloMonedas($sesion) {
-		$query = "SELECT
-						prm_moneda.id_moneda,
-						prm_moneda.tipo_cambio,
-						prm_moneda.cifras_decimales,
-						prm_moneda.glosa_moneda,
-						prm_moneda.glosa_moneda_plural,
-						prm_moneda.simbolo
-					FROM prm_moneda";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while (list($id_moneda, $tipo_cambio, $cifras_decimales, $glosa_moneda, $glosa_moneda_plural, $simbolo) = mysql_fetch_array($resp)) {
-			$moneda[$id_moneda]['tipo_cambio'] = $tipo_cambio;
-			$moneda[$id_moneda]['glosa_moneda'] = $glosa_moneda;
-			$moneda[$id_moneda]['glosa_moneda_plural'] = $glosa_moneda_plural;
-			$moneda[$id_moneda]['cifras_decimales'] = $cifras_decimales;
-			$moneda[$id_moneda]['simbolo'] = $simbolo;
-		}
-		return $moneda;
-	}
-
 	/**
 	 * Validate an email address.
 	 * Provide email address (raw input)

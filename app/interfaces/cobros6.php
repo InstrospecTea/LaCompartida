@@ -44,13 +44,12 @@ if($opc == 'descargar_ledes'){
 	exit;
 }
 
-if ($opc == "eliminar_documento") {
+if ($opc == 'eliminar_documento') {
 	$documento_eliminado = new Documento($sesion);
 	$documento_eliminado->Load($id_documento_eliminado);
-
-	if (empty($documento_eliminado->fields['es_adelanto'])) {
+	if (!$documento_eliminado->fields['es_adelanto']) {
 		$documento_eliminado->EliminarNeteos();
-		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '" . $id_documento_eliminado . "' ";
+		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '{$id_documento_eliminado}' ";
 		mysql_query($query_p, $sesion->dbh) or Utiles::errorSQL($query_p, __FILE__, __LINE__, $sesion->dbh);
 
 		if ($documento_eliminado->Delete()) {
@@ -1224,10 +1223,8 @@ if (count($cobro->asuntos)) {
 		return nuevaVentana('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
 	}
 
-	function EliminaDocumento(id_documento)
-	{
-		var form = $('todo_cobro');
-		if (parseInt(id_documento) > 0 && confirm('¿Desea eliminar el pago #' + id_documento + '?') == true) {
+	function EliminaDocumento(id_documento) {
+		if (parseInt(id_documento) > 0 && confirm('¿Desea eliminar el pago #' + id_documento + '?')) {
 			self.location.href = 'cobros6.php?popup=1&id_cobro=' + <?php echo $id_cobro; ?> + '&id_documento_eliminado=' + id_documento + '&opc=eliminar_documento';
 		}
 	}
@@ -1327,16 +1324,21 @@ if (count($cobro->asuntos)) {
         return Number(texto);
     }
 
-    function UsarAdelanto(honorarios, gastos){
-        nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>' +
-            '&codigo_cliente=<?php echo $cobro->fields['codigo_cliente'] ?>&elegir_para_pago=1&mantener_ventana=1'+
-            (honorarios ? '&pago_honorarios=1' : '')+
-            (gastos ? '&pago_gastos=1' : '')+
-            '&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>',
-        'top=\'100\', left=\'125\', scrollbars=\'yes\'');
-
-        return false;
-    }
+	function UsarAdelanto(honorarios, gastos){
+		var params = {
+			popup: 1,
+			id_cobro: '<?php echo $id_cobro ?>',
+			codigo_cliente: '<?php echo $cobro->fields['codigo_cliente'] ?>',
+			elegir_para_pago: 1,
+			mantener_ventana: 1,
+			id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
+			desde_factura_pago: 0,
+			pago_honorarios: honorarios ? 1 : 0,
+			pago_gastos: gastos ? 1 : 0
+		};
+		nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
+		return false;
+}
 <?php  ($Slim=Slim::getInstance()) ? $Slim->applyHook('hook_cobro6_javascript_after') : false; ?>
 </script>
 <br />

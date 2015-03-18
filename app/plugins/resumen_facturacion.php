@@ -48,7 +48,7 @@ function Descarga_Planilla_Resumen_Facturacion() {
 			'title' => 'ESTADO',
 		));
 
-		$ArregloMonedas = UtilesApp::ArregloMonedas($sesion);
+		$ArregloMonedas = Moneda::GetMonedas($sesion, null, true);
 		foreach($ArregloMonedas as $id_moneda => $Moneda) {
 			array_push($cofiguracion_resumen, array(
 				'field' => "neto_$id_moneda",

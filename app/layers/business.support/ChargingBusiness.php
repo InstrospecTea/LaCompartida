@@ -200,14 +200,14 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	 * Obtiene un detalle del monto de honorarios de la liquidación
 	 *
 	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la información.
-	 * @return GenericModel  
-	 * 
+	 * @return GenericModel
+	 *
 	 * [
 	 *   	subtotal_honorarios 	=> valor
 	 *		descuento 				=> valor
 	 *		neto_honorarios			=> valor
 	 * ]
-	 * 
+	 *
 	 */
 	public function getAmountDetailOfFees(Charge $charge, Currency $currency) {
 		$this->loadBusiness('Coining');
@@ -219,7 +219,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 
 	 	$result = $this->processCharge($charge, $currency);
-	 	
+
 	 	if ($documentCurrency->get($documentCurrency->getIdentity()) != $currency->get($currency->getIdentity())) {
 			$documentResult = $this->processCharge($charge, $currency);
 		} else {
@@ -227,7 +227,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 
 		$modalidad_calculo = $charge->get('modalidad_calculo');
-	 	
+
 	 	$subtotal_honorarios = 0;
 	 	$descuento_honorarios = 0;
 	 	$saldo_honorarios = 0;
@@ -264,11 +264,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$saldo_honorarios = $this->CoiningBusiness->changeCurrency($honorarios_original, $chargeCurrency, $currency);
 
 			//Caso retainer menor de un valor y distinta tarifa (diferencia por decimales)
-			if ((($charge->get('total_minutos') / 60) < $charge->get('retainer_horas')) 
-				&& ($charge->get('forma_cobro') == 'RETAINER' 
+			if ((($charge->get('total_minutos') / 60) < $charge->get('retainer_horas'))
+				&& ($charge->get('forma_cobro') == 'RETAINER'
 					|| $charge->get('forma_cobro') == 'PROPORCIONAL')
 				&& $charge->get('id_moneda') != $charge->get('id_moneda_monto')) {
-				$saldo_honorarios = $this->CoiningBusiness->changeCurrency($honorarios_original, $chargeCurrency, $currency); 
+				$saldo_honorarios = $this->CoiningBusiness->changeCurrency($honorarios_original, $chargeCurrency, $currency);
 			}
 
 			//Caso flat fee
@@ -337,7 +337,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	public function getBilledFeesAmount(Charge $charge, Currency $currency) {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
-		
+
    		$searchCriteria = new SearchCriteria('Invoice');
    		$searchCriteria->related_with('InvoiceCharge');
    		$searchCriteria->filter('id_estado')->restricted_by('not_in')->compare_with(array(3, 5));
@@ -436,21 +436,21 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Coining');
 		$slidingScale->set('amount',
 			$this->CoiningBusiness->formatAmount(
-				$slidingScale->get('amount'), 
+				$slidingScale->get('amount'),
 				$this->CoiningBusiness->getCurrency($slidingScale->get('chargeCurrency')),
 				$language
 			)
 		);
 		$slidingScale->set('discount',
 			$this->CoiningBusiness->formatAmount(
-				$slidingScale->get('discount'), 
+				$slidingScale->get('discount'),
 				$this->CoiningBusiness->getCurrency($slidingScale->get('chargeCurrency')),
 				$language
 			)
 		);
 		$slidingScale->set('netAmount',
 			$this->CoiningBusiness->formatAmount(
-				$slidingScale->get('netAmount'), 
+				$slidingScale->get('netAmount'),
 				$this->CoiningBusiness->getCurrency($slidingScale->get('chargeCurrency')),
 				$language
 			)
@@ -506,16 +506,16 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			}
 			$remainingWorkHours = $workedHours - $remainingScaleHours;
 			$remainingScaleHours = $remainingScaleHours - $workedHours;
-			//Obtener la tarifa del usuario en base a la moneda.
-			$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
-			if (is_null($userFee)) {
-				$userFee = $this->getDefaultUserFee($work->get('id_usuario'), $scale->get('currencyId'));
-			}
 			if ($remainingWorkHours <= 0) {
 				//Se acabaron las horas del trabajo al intentar llenar la bolsa de horas del escalón.
 				//Si no se ha fijado un monto para las horas del escalón...
 				if ($scale->get('fixedAmount') == 0) {
 					//Transformar las horas en dinero
+					//Obtener la tarifa del usuario en base a la moneda.
+					$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
+					if (is_null($userFee)) {
+						$userFee = $this->getDefaultUserFee($work->get('id_usuario'), $scale->get('currencyId'));
+					}
 					$amount = $workedHours * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
 					$scaleAmount += $amount;
 				}
@@ -531,12 +531,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				}
 			} else {
 				//El trabajo aun tiene horas y la bolsa de horas del escalón ya se llenó. Hay que cambiar el escalón.
-				//Transformar las horas en dinero
-				$amount = ($remainingScaleHours + $workedHours) * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
-				$scaleAmount += $amount;
+
 				//Si la escala tiene un monto fijo entonces reemplazar el acumulado
 				if ($scale->get('fixedAmount') != 0) {
 					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
+				} else {
+					//Obtener la tarifa del usuario en base a la moneda.
+					$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
+					if (is_null($userFee)) {
+						$userFee = $this->getDefaultUserFee($work->get('id_usuario'), $scale->get('currencyId'));
+					}
+					//Transformar las horas en dinero
+					$amount = ($remainingScaleHours + $workedHours) * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
+					$scaleAmount += $amount;
 				}
 				$work->set('remainingHours', $remainingWorkHours);
 				array_unshift($works, $work);

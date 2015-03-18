@@ -180,6 +180,7 @@ abstract class AbstractController {
 		$this->loadUtility('ViewRenderer');
 		$this->ViewRenderer->helpers = $this->helpers;
 		$this->ViewRenderer->title = $this->layoutTitle;
+		$this->ViewRenderer->params = $this->params;
 		$this->ViewRenderer->data = $this->data;
 		$this->ViewRenderer->request = $this->request;
 		$this->ViewRenderer->set($this->vars);
