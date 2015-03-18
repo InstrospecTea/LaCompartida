@@ -211,7 +211,11 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 						<td>
 							<?php echo __('Nombre')?>:
 							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?>>
-							<label><input type="checkbox" name="tarifa_defecto" value="1" <?php echo $tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : ''; ?>> <?php echo __('Defecto')?></label>
+							<?php if ($tramite_tarifa->fields['tarifa_defecto']) { ?>
+								<input type="hidden" name="tarifa_defecto" value="1"> <b><?php echo __('Tarifa por Defecto')?></b>
+							<?php } else { ?>
+								<label><input type="checkbox" name="tarifa_defecto" value="1" <?php echo $tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : ''; ?>> <?php echo __('Defecto')?></label>
+							<?php } ?>
 						</td>
 						<?php
 					} else {
