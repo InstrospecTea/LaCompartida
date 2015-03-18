@@ -41,8 +41,6 @@ class SandboxController extends AbstractController {
 		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
 		$invoiced = $this->ChargingBusiness->getBilledAmount($charge, $currency);
-		echo "<pre>";
-		var_dump($detail);
 	}
 
 }

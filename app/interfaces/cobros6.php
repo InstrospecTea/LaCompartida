@@ -709,7 +709,6 @@ if (count($cobro->asuntos)) {
 			url: root_dir + '/app/' + type + '/feeAmountDetailTable/',
 			data: options,
 			success: function(data, status, jqXHR) {
-				console.log(data);
 				if (data && data.detail) {
 					text_window += data.detail;
 				} else {
