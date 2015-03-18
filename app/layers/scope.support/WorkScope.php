@@ -41,4 +41,15 @@ class WorkScope implements IWorkScope {
       ->add_grouping('periodo');
     return $criteria;
   }
+
+    /**
+   * Ordena por glosa del asunto
+   * @param  Criteria $criteria
+   * @return mixed
+   */
+  function orderByMatterGloss(Criteria $criteria) {
+    $criteria->add_ordering('Matter.glosa_asunto', 'ASC');
+    return $criteria;
+  }
+
 }

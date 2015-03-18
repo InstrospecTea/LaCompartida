@@ -21,4 +21,11 @@ interface IWorkScope {
    */
   function groupedByPeriod(Criteria $criteria);
 
+  /**
+   * Ordena por glosa del asunto
+   * @param  Criteria $criteria
+   * @return mixed
+   */
+  function orderByMatterGloss(Criteria $criteria);
+
 }

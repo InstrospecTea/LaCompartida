@@ -13,7 +13,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
 		$searchCriteria->related_with('User')->joined_with('Contract')->on_property('id_usuario')->on_entity_property('id_usuario_responsable');
 		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
-
+		$searchCriteria->add_scope('orderByMatterGloss');
 		// Filtros
 
 		//Abogado
