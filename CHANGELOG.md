@@ -1,5 +1,13 @@
 # Changelog
 
+## Release: 15.4.0
+Jueves 12 de Marzo 2015
+[Release 15.5.0](https://github.com/LemontechSA/ttb/pull/879)
+* **Feature:** [Descuentos tarifa escalonada](https://github.com/LemontechSA/ttb/issues/815)
+* **Feature:** [Descuentos a nivel de factura](https://github.com/LemontechSA/ttb/issues/782)
+* **Feature:** [Mejorar reporte de horas](https://github.com/LemontechSA/ttb/issues/860)
+* **Feature:** [Incorporar Compañía como agrupador en reporte Avanzado](https://github.com/LemontechSA/ttb/issues/860
+
 ## Hotfix 15.4.4
 Lunes 16 de Marzo 2015
 * **Fix:** [Corregir asignación por referencia al bindParam (fix FW)](https://github.com/LemontechSA/ttb/pull/875)
