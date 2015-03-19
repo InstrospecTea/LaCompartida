@@ -1304,14 +1304,13 @@ echo $Form->script();
 						      }
 						    });
 							jQuery('#agrupado_por').change(function() {
-
 								if (jQuery('#agrupado_por').val() === 'lawyer') {
-									console.log('hola');
-									jQuery('#por_socio').parent().parent().css('display', 'none');
+									jQuery('#por_socio').removeAttr('checked');
+									jQuery('#por_socio').attr("disabled", true);
 								} else {
-									jQuery('#por_socio').parent().parent().css('display', 'inline');
+									jQuery('#por_socio').removeAttr("disabled");
 								}
-							})
+							}).change();
 						},
 						buttons: {
 							"<?php echo __('Descargar') ?>": function() {

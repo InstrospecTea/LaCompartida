@@ -6,7 +6,7 @@
       echo $this->Form->select('agrupado_por', $gropued_by, $gropued_by_defaul, array('empty' => false));
       ?>
     </td>
-    <td style="display: none" colspan="2">
+    <td colspan="2">
       <label><input type="checkbox" value="1" id="por_socio" name="por_socio"  /> Agrupar por socio</label>
     </td>
   </tr>
