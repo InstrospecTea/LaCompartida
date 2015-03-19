@@ -1272,9 +1272,9 @@ echo $Form->script();
 
 			jQuery('#descargapro').removeAttr('disabled');
 		});
-		
+
 		<?php
-		
+
 
 		?>
 		jQuery('#descargar_pdf_agrupado').click(function() {
@@ -1286,7 +1286,7 @@ echo $Form->script();
 				success: function(data, status, jqXHR) {
 					if (data && data.detail) {
 						text_window = data.detail;
-					} 
+					}
 					jQuery('<p/>')
 					.attr('title', 'Reporte Agrupado')
 					.html(text_window)
@@ -1303,17 +1303,26 @@ echo $Form->script();
 						        jQuery("#moneda_filtro").attr("disabled", true);
 						      }
 						    });
+							jQuery('#agrupado_por').change(function() {
+
+								if (jQuery('#agrupado_por').val() === 'lawyer') {
+									console.log('hola');
+									jQuery('#por_socio').parent().parent().css('display', 'none');
+								} else {
+									jQuery('#por_socio').parent().parent().css('display', 'inline');
+								}
+							})
 						},
 						buttons: {
 							"<?php echo __('Descargar') ?>": function() {
 								var form = jQuery('#form_trabajos').clone();
-								var gruopedBy = jQuery('#agrupado_por').val();
+								var groupedBy = jQuery('#agrupado_por').val();
 								var isGrouped = jQuery('#por_socio:checked').val();
 								var isInvoiced = jQuery('#valor_facturado:checked').val();
 								var showHours = jQuery('#mostrar_valores').val();
 								var filterCurrency = jQuery('#moneda_filtro').val();
 
-								if (!gruopedBy) {
+								if (!groupedBy) {
 									alert("Debe seleccionar una agrupación");
 									return
 								}
@@ -1331,15 +1340,15 @@ echo $Form->script();
 								if (isGrouped === undefined) {
 									isGrouped = "";
 								}
-								form.append('<input type="hidden" name="agrupationType" value="' + gruopedBy + '" id="agrupationType" />');
+								form.append('<input type="hidden" name="agrupationType" value="' + groupedBy + '" id="agrupationType" />');
 								form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
 								form.append('<input type="hidden" name="showHours" value="' + showHours + '" id="showHours" />');
 								form.append('<input type="hidden" name="filterCurrency" value="' + filterCurrency + '" id="filterCurrency" />');
-								
-								if (gruopedBy === 'client') { 
+
+								if (groupedBy === 'client') {
 									form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
 								}
-								
+
 								form.attr('action',root_dir + '/app/Report/agrupatedWork')
 								form.attr('id', 'tmp_form');
 								jQuery('body').append(form);
