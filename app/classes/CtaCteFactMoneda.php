@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 	require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -109,4 +109,3 @@ class CtaCteFactMoneda extends Objeto
 		return $monto * $this->moneda[$id_moneda]['tipo_cambio'] / $this->base['tipo_cambio'];
 	}
 }
-?>

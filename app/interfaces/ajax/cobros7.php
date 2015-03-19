@@ -195,67 +195,32 @@ if ($opc == 'refrescar') {
 	$idioma->Load($contrato->fields['codigo_idioma']);
 	$contrato->Load($cobro->fields['id_contrato']);
 
+	$chargingBusiness = new ChargingBusiness($sesion);
+	$coiningBusiness = new CoiningBusiness($sesion);
 
-
-	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
-
-	if ($cobro->fields['modalidad_calculo'] == 1) {
-		$saldo_honorarios = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
-		$saldo_disponible_trabajos = $saldo_trabajos = $x_resultados['monto_trabajos'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
-		if ($saldo_disponible_trabajos < 0) {
-			$saldo_disponible_tramites = $saldo_tramites = $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']] + $saldo_disponible_trabajos;
-			$saldo_disponible_trabajos = 0;
-		} else {
-			$saldo_disponible_tramites = $saldo_tramites = $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']];
-		}
-	} else {
-		if ($cobro->fields['porcentaje_impuesto'] > 0) {
-			$honorarios_original = $cobro->fields['monto_subtotal'] - $cobro->fields['descuento'];
-		} else {
-			$honorarios_original = $cobro->fields['monto'];
-		}
-		$aproximacion_monto = number_format($honorarios_original, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', '');
-		$saldo_honorarios = $aproximacion_monto * ($cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']);
-
-		//Caso retainer menor de un valor y distinta tarifa (diferencia por decimales)
-		if ((($cobro->fields['total_minutos'] / 60) < $cobro->fields['retainer_horas']) && ($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL') && $cobro->fields['id_moneda'] != $cobro->fields['id_moneda_monto']) {
-			$saldo_honorarios = $honorarios_original * ($cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']);
-		}
-		//Caso flat fee
-		if ($cobro->fields['forma_cobro'] == 'FLAT FEE' && $cobro->fields['id_moneda'] != $cobro->fields['id_moneda_monto'] && $cobro->fields['id_moneda_monto'] == $cobro->fields['opc_moneda_total'] && empty($cobro->fields['descuento']) && empty($cobro->fields['monto_tramites'])) {
-			$saldo_honorarios = $cobro->fields['monto_contrato'];
-		}
-		$saldo_honorarios = number_format($saldo_honorarios, $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
-	}
-
-	if ($saldo_honorarios < 0) {
-		$saldo_honorarios = 0;
-	}
-
-	$saldo_gastos_con_impuestos = $x_resultados['subtotal_gastos'][$moneda_documento->fields['id_moneda']] - $x_resultados['subtotal_gastos_sin_impuesto'][$moneda_documento->fields['id_moneda']];
-	if ($saldo_gastos_con_impuestos < 0) {
-		$saldo_gastos_con_impuestos = 0;
-	}
-
-	$saldo_gastos_sin_impuestos = $x_resultados['subtotal_gastos_sin_impuesto'][$moneda_documento->fields['id_moneda']];
-	if ($saldo_gastos_sin_impuestos < 0) {
-		$saldo_gastos_sin_impuestos = 0;
-	}
+	$currency = $coiningBusiness->getCurrency($cobro->fields['opc_moneda_total']);
+	$charge = $chargingBusiness->getCharge($id_cobro);
+	$detail = $chargingBusiness->getAmountDetailOfFees($charge, $currency);
 
 	$diferencia_cobro_factura = Conf::GetConf($sesion, 'NuevoModuloFactura') ? $cobro->DiferenciaCobroConFactura() : null;
-		CobroHtml::setMoneda($moneda_documento);
-		CobroHtml::setIdioma($idioma);
 
-		$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos');
-		$data_cobro['fecha'] = date('d-m-Y', strtotime($cobro->fields['fecha_emision']));
-		if ($cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0) {
-			$data_cobro['iva'] = $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']];
-		} else {
-			$data_cobro['iva'] = 0;
-		}
+	CobroHtml::setMoneda($moneda_documento);
+	CobroHtml::setIdioma($idioma);
+	echo CobroHtml::cajafacturasHead($diferencia_cobro_factura);
 
-		echo CobroHtml::cajafacturasHead($diferencia_cobro_factura);
-		echo CobroHtml::cajafacturasCobro($data_cobro);
+	$saldo_gastos_con_impuestos = $detail->get('saldo_gastos_con_impuestos');
+	$saldo_gastos_sin_impuestos = $detail->get('saldo_gastos_sin_impuestos');
+	$saldo_honorarios = $detail->get('saldo_honorarios');
+	$descuento_honorarios = $detail->get('descuento_honorarios');
+	$subtotal_honorarios = $detail->get('subtotal_honorarios');
+	$saldo_disponible_trabajos = $detail->get('saldo_disponible_trabajos');
+	$saldo_disponible_tramites = $detail->get('saldo_disponible_tramites');
+	$iva = $detail->get('monto_iva');
+
+	$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos', 'descuento_honorarios', 'subtotal_honorarios', 'iva');
+	$data_cobro['fecha'] = date('d-m-Y', strtotime($charge->get('fecha_emision')));
+	
+	echo CobroHtml::cajafacturasCobro($data_cobro, $sesion);
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			//documentos existentes. usar funcion magica (???)

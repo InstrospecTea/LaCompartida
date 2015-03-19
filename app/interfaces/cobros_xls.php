@@ -906,6 +906,28 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$minutos_cobrables = sprintf("%02d", $cobro->fields['total_minutos'] % 60);
 
 		$ws->write($filas2++, $col_valor_trabajo, "$horas_cobrables:$minutos_cobrables", $formato_encabezado_derecha);
+
+		if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
+			$chargingBusiness = new ChargingBusiness($sesion);
+			$id_cobro = $cobro->fields['id_cobro'];
+			$scales = $chargingBusiness->getSlidingScales($id_cobro);
+			$bruto = 0;
+			$descuento = 0;
+			$neto = 0;
+			foreach ($scales as $scale) {
+				$bruto += $scale->get('amount');
+				$descuento += $scale->get('discount');
+				$neto += $scale->get('netAmount');
+			}
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'bruto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $bruto, $formato_moneda_encabezado);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $descuento, $formato_moneda_encabezado);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'neto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_encabezado);
+		}
+
+
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 		$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 

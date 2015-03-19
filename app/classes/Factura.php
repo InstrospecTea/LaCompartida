@@ -178,6 +178,26 @@ class Factura extends Objeto {
 			'visible' => false,
 		),
 		array(
+			'field' => 'bruto_honorarios',
+			'format' => 'number',
+			'title' => 'Subtotal Honorarios',
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			),
+		),
+		array(
+			'field' => 'descuento_honorarios',
+			'format' => 'number',
+			'title' => 'Descuento Honorarios',
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			),
+		),
+		array(
 			'field' => 'honorarios',
 			'format' => 'number',
 			'title' => 'Honorarios',
@@ -506,7 +526,6 @@ class Factura extends Objeto {
 
 		$templateData = $this->ReemplazarMargenes($templateData);
 		$parser = new TemplateParser($templateData);
-
 		$query = "SELECT cobro.codigo_idioma
 							FROM factura
 							LEFT JOIN cobro ON factura.id_cobro=cobro.id_cobro
@@ -2219,7 +2238,6 @@ class Factura extends Objeto {
 		$SimpleReport->LoadConfiguration('FACTURAS');
 
 		$SimpleReport->LoadResults($results);
-
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, $tipo);
 		$writer->save(__('Facturas'));
 	}
@@ -2525,22 +2543,53 @@ class Factura extends Objeto {
 	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
-			, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario
-			, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio
-			, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
-			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
+			, $tipo_documento_legal_buscado
+			, $codigo_cliente, $codigo_cliente_secundario
+			, $codigo_asunto, $codigo_asunto_secundario
+			, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+
+		$billingBusiness = new BillingBusiness($this->sesion);
+		$charginBusiness = new ChargingBusiness($this->sesion);
+		$coiningBusiness = new CoiningBusiness($this->sesion);
+
+		$charginData = array();
+		$coiningData = array();
+
 		foreach ($results as $key => $fila) {
 			//monto_real
 			$monto_real = $this->ObtenerValorReal($fila['id_factura']);
 			$results[$key]['monto_real'] = strtoupper($fila['codigo_estado']) == 'A' ? '0' : $monto_real;
 
-			//observaciones
+			//Obtener Descuento y Bruto
+			$id_cobro = $results[$key]['id_cobro'];
+			$id_factura = $results[$key]['id_factura'];
+			$id_moneda = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
+			$invoice = $billingBusiness->getInvoice($id_factura);
+			$currency = $coiningData[$id_moneda];
+			if (is_null($currency)) {
+				$currency = $coiningBusiness->getCurrency($id_moneda);
+				$coiningData[$id_moneda] = $currency;
+			}
+			if (is_null($charginData[$id_cobro])) {
+				$charge = $charginBusiness->getCharge($id_cobro);
+				$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+			}
+
+			$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+			$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
+			$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
+			$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+
+			$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
+			$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
+
+			// observaciones
 			$ids_doc = $this->ObtenerIdsDocumentos($fila['id_factura']);
 			$ids_doc_array = explode('||', $ids_doc);
 			$valores = array();
@@ -2572,7 +2621,6 @@ class Factura extends Objeto {
 			$results[$key]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';
 			$results[$key]['fecha_ultimo_pago'] = $pago['fecha_ultimo_pago'];
 		}
-
 		return $results;
 	}
 

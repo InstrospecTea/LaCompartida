@@ -346,7 +346,8 @@ if (!class_exists('Cobro')) {
 								if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)) as tasa_cambio,
 								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
-									) as tipo_cobro
+									) as tipo_cobro,
+								factura.id_factura
 								FROM cobro
 									LEFT JOIN factura using (id_cobro)
 									LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
@@ -1950,7 +1951,7 @@ if (!class_exists('Cobro')) {
 					$this->Edit('id_moneda', $contrato->fields['id_moneda']);
 					$this->Edit('tipo_cambio_moneda', $moneda->fields['tipo_cambio']);
 					$this->Edit('forma_cobro', $hito ? 'FLAT FEE' : $contrato->fields['forma_cobro']);
-
+					$this->Edit('id_estudio', $contrato->fields['id_estudio']);
 					// Pasar configuración de escalonadas ...
 					$this->Edit('esc1_tiempo', $contrato->fields['esc1_tiempo']);
 					$this->Edit('esc1_id_tarifa', $contrato->fields['esc1_id_tarifa']);

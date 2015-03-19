@@ -142,11 +142,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	/**
-   * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
-   * @param Entity $object
-   * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
-   * @throws Exception
-   */
+	 * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
+	 * @param Entity $object
+	 * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
+	 * @throws Exception
+	 */
 	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
 		$this->checkClass($object, $this->getClass());

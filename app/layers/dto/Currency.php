@@ -1,6 +1,6 @@
 <?php
 
-class Currency extends Entity{
+class Currency extends Entity {
 
 	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.

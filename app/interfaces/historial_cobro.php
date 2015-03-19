@@ -136,7 +136,7 @@ function Validar(form)
 </tr>
 <tr>
 	<td colspan=4 align=right>
-		<input type=submit value="<?=__('Guardar')?>" onclick="return Validar(this.form);">
+		<input type=submit value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);">
 	</td>
 </tr>
 </table>

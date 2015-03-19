@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: dochoaj
- * Date: 12/9/14
- * Time: 10:55 AM
- */
 
 class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 
@@ -42,22 +36,20 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 			throw new BusinessException('One of the currencies does not have an identity');
 		}
 
-		$newAmount = ($amount * $fromCurrency->get('tipo_cambio')) / $toCurrency->get('tipo_cambio');
+		$newAmount = $amount * ($fromCurrency->get('tipo_cambio') / $toCurrency->get('tipo_cambio'));
 		$newAmount = round($newAmount, $toCurrency->get('cifras_decimales'));
-
 		return $newAmount;
 	}
 
 	/**
-	 * Da formato a un monto basado en la {@link Currency} definida.
+	 * Da formato a un monto basado en la {@link Currency} definida y el {@link Language} definido.
 	 * @param $amount
 	 * @param Currency $amountCurrency
-	 * @param $separadorDecimal
-	 * @param $separadorMiles
+	 * @param Language $language
 	 * @return string
 	 */
-	function formatAmount($amount, Currency $amountCurrency, $separadorDecimal, $separadorMiles) {
-		return number_format($amount, $amountCurrency->get('cifras_decimales'), $separadorDecimal, $separadorMiles);
+	function formatAmount($amount, Currency $amountCurrency, Language $language) {
+		return number_format($amount, $amountCurrency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles'));
 	}
 
 	/**
@@ -79,6 +71,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $this->SearchingBusiness->searchByCriteria($searchCriteria);
 	}
 
+
 	/** 
 	 * Obtiene un Array asociativo [identidad] => [glosa_moneda], a partir de un array de instancias de {@link Currency}.
 	 */
@@ -90,6 +83,25 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $result;
 	}
 
-
+	/**
+	 * Establece el tipo de cambio de una moneda según el definido para una instancia de {@link Charge} en particular.
+	 * @param Currency $currency
+	 * @param Charge $charge
+	 * @return Currency
+	 * @throws BusinessException
+	 */
+	function setCurrencyAmountByCharge(Currency $currency, Charge $charge) {
+		$search = new SearchCriteria('ChargeCurrency');
+		$search->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()));
+		$search->filter('id_moneda')->restricted_by('equals')->compare_with($currency->get($currency->getIdentity()));
+		$this->loadBusiness('Searching');
+		$searchResult = $this->SearchingBusiness->searchByCriteria($search);
+		if (count($searchResult) != 1) {
+			throw new BusinessException('There is a problem with the base currency definition.');
+		}
+		$chargeCurrency = $searchResult[0];
+		$currency->set('tipo_cambio', $chargeCurrency->get('tipo_cambio'), false);
+		return $currency;
+	}
 
 } 

@@ -5,6 +5,8 @@
  */
 interface IWorkScope {
 
+	function orderFromOlderToNewer(Criteria $criteria);
+
   /**
    * Añade una selección de datos sumados relacionados a la duración
    * @param $criteria
@@ -19,4 +21,11 @@ interface IWorkScope {
    */
   function groupedByPeriod(Criteria $criteria);
 
-} 
+  /**
+   * Ordena por glosa del asunto
+   * @param  Criteria $criteria
+   * @return mixed
+   */
+  function orderByMatterGloss(Criteria $criteria);
+
+}
