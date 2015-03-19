@@ -154,6 +154,33 @@ class Form {
 	}
 
 	/**
+	 * Crea un elemento textarea
+	 * @param string $name
+	 * @param string $value
+	 * @param Array $attrs
+	 * @return string
+	 */
+	public function textarea($name, $value, Array $attrs = array()) {
+		$attrs = array_merge(array('label' => $this->defaultLabel, 'name' => null, 'rows' => 3), $attrs);
+		$label = null;
+
+		if ($attrs['label'] === true) {
+			$label = $this->Utiles->humanize($name);
+		} else if ($attrs['label'] !== false) {
+			$label = $attrs['label'];
+		}
+		if (empty($attrs['name']) && !empty($name)) {
+			$attrs['name'] = $name;
+		}
+		if (!isset($attrs['id']) && ($attrs['id'] !== false || $attrs['id'] === true)) {
+			$attrs['id'] = $name;
+		}
+		unset($attrs['label']);
+		$input = $this->Html->tag('textarea', $value, $attrs, false);
+		return empty($label) ? $input : $this->label($label, $attrs['name']) . $input;
+	}
+
+	/**
 	 * Devuelve elemento checkbox
 	 * @param type $name
 	 * @param type $value

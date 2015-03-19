@@ -158,6 +158,7 @@ if ($opcion == "guardar") {
 		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
 			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
+		$factura->Edit('dte_comentario', $dte_comentario ? $dte_comentario : NULL);
 
 		$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		if (Conf::GetConf($sesion, 'RegionCliente')) {
