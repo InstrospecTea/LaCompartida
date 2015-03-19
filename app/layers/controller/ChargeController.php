@@ -30,10 +30,10 @@ class ChargeController extends AbstractController {
 		$charge = $this->ChargingBusiness->getCharge($chargeId);
 		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$language = $this->TranslatingBusiness->getLanguageByCode('es');
-		
+
 		$detail  = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
 		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId, 'es');
-		
+
 		$this->set('billedAmount', $this->ChargingBusiness->getBilledFeesAmount($charge, $currency));
 
 		$this->set('slidingScales', $slidingScales);
@@ -45,5 +45,5 @@ class ChargeController extends AbstractController {
 		$response['detail'] = $this->renderTemplate('Charge/detail_fees');
 		$this->renderJSON($response);
 
-	}	
+	}
 }
