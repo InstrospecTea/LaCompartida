@@ -1015,9 +1015,16 @@ class NotaCobro extends Cobro {
 	}
 
 	function GuardarCarta($data) {
-
-		$data[$this->carta_formato] = $data['formato'];
-
+		if (isset($data['secciones'])) {
+			$formato = '';
+			foreach ($data['secciones'] as $seccion => $html) {
+				$formato .= "\n###$seccion###\n$html\n";
+			}
+			unset($data['secciones']);
+			$data[$this->carta_formato] = $formato;
+		} else {
+			$data[$this->carta_formato] = $data['formato'];
+		}
 		$Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);
 		$Carta->guardar_fecha = false;
 		$Carta->editable_fields = array_keys($data);
@@ -1465,7 +1472,7 @@ class NotaCobro extends Cobro {
 				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
 				$html = str_replace('%detalle_escalones%', $table, $html);
-				
+
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
 				}

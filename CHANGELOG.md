@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.4.6
+Jueves 19 de Marzo 2015
+* **Fix:** [Corregir mantenedor de notas de cobro](https://github.com/LemontechSA/ttb/pull/882)
+
 ## Release: 15.4.0
 Jueves 12 de Marzo 2015
 [Release 15.5.0](https://github.com/LemontechSA/ttb/pull/879)
