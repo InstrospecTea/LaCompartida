@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.5.2
+Viernes 20 de Marzo 2015
+* **Fix:** [Devuelve entidad de tarifa usuario en 0](https://github.com/LemontechSA/ttb/pull/883)
+
 ## Hotfix 15.4.6
 Jueves 19 de Marzo 2015
 * **Fix:** [Corregir mantenedor de notas de cobro](https://github.com/LemontechSA/ttb/pull/882)
