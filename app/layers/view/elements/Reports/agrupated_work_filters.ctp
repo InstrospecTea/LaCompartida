@@ -7,7 +7,7 @@
       ?>
     </td>
     <td colspan="2">
-      <label><input type="checkbox" value="1" id="por_socio" name="por_socio" /> Agrupar por socio</label>
+      <label><input type="checkbox" value="1" id="por_socio" name="por_socio"  /> Agrupar por socio</label>
     </td>
   </tr>
 

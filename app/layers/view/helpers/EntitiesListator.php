@@ -139,10 +139,10 @@ class EntitiesListator {
 						$currency = $this->formatOptions['currency'];
 						$language = $this->formatOptions['language'];
 						if (!empty($currency) && !empty($language)) {
-							$th->add_attribute('style', 'text-align:right;');
-							$th->set_html(number_format($entity->get($columnHandler['calculationExpression']), $currency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles')));
+							$td->add_attribute('style', 'text-align:right;');
+							$td->set_html(number_format($entity->get($columnHandler['calculationExpression']), $currency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles')));
 						} else {
-							$th->set_html($entity->get($columnHandler['calculationExpression']));
+							$td->set_html($entity->get($columnHandler['calculationExpression']));
 						}
 					}
 					$tr->add_child($td);

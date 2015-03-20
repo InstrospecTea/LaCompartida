@@ -155,7 +155,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'profesional',
 		'estado',
 		'id_cobro',
-		'id_estudio',
+		'glosa_estudio',
 		'forma_cobro',
 		'tipo_asunto',
 		'area_asunto',

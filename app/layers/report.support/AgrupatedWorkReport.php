@@ -374,6 +374,7 @@ HTML;
 	private function createClientHtmlContent() {
 		$html = '';
 		$por_socio = $this->parameters['groupByPartner'];
+		$currency = $this->parameters['filterCurrency'];
 		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
 		foreach ($this->data as $socio) {
 			$html_clientes = '';
@@ -395,7 +396,7 @@ HTML;
 						$this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
-						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
+						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
 					$trs = $this->Html->tag(
@@ -417,6 +418,7 @@ HTML;
 	private function createLawyerHtmlContent() {
 		$html = '';
 		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
+		$currency = $this->parameters['filterCurrency'];
 		foreach ($this->data as $usuario) {
 			$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
 			$html_clientes = '';
@@ -438,7 +440,7 @@ HTML;
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
-						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
+						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -455,7 +457,7 @@ HTML;
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
 					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3')) .
-					$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_abogado, $this->baseCurrency, $this->defaultLanguage), array('class' => 'col3'))
+					$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_abogado, $currency, $this->defaultLanguage), array('class' => 'col3'))
 				);
 			} else {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -490,6 +492,7 @@ HTML;
 				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
 				$tds .= $this->Html->tag(
 					'td',
+					"{$moneda_filtro->get('simbolo')} " . 
 					$this->CoiningBusiness->formatAmount(
 						$valor_facturado,
 						$moneda_filtro,
@@ -517,6 +520,7 @@ HTML;
 			$ths .= $this->Html->tag('th', $total, array('class' => 'col3'));
 			$ths .= $this->Html->tag(
 				'th',
+				"{$moneda_filtro->get('simbolo')} " . 
 				$this->CoiningBusiness->formatAmount(
 					$total_facturado,
 					$this->baseCurrency,

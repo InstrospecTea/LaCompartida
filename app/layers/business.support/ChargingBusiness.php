@@ -167,7 +167,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$listator = new EntitiesListator();
 		$listator->loadEntities($slidingScales);
 		$listator->setNumberFormatOptions($currency, $language);
-		$listator->addColumn('# EscalÃ³n', 'scale_number');
+		$listator->addColumn('# Escalón', 'scale_number');
 		$listator->addColumn('Monto Bruto', 'amount');
 		$listator->addColumn('% Descuento', 'discountRate');
 		$listator->addColumn('Descuento', 'discount');
@@ -197,9 +197,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	/**
-	 * Obtiene un detalle del monto de honorarios de la liquidaciÃ³n
+	 * Obtiene un detalle del monto de honorarios de la liquidación
 	 *
-	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la informaciÃ³n.
+	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la información.
 	 * @return GenericModel
 	 *
 	 * [
@@ -249,7 +249,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$saldo_disponible_tramites = $saldo_tramites = $result['monto_tramites'];
 			}
 		}
- 		//CÃ³digo que deberÃ­a estar obsoleto
+ 		//Código que deberÃ­a estar obsoleto
 		if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_OLD) {
 			$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
 			$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
@@ -383,9 +383,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	private function getSlidingScale(Charge $charge, $scaleNumber) {
 		$slidingScale = new GenericModel();
 		$scaleLabel = "esc$scaleNumber";
+		$fixedAmount = 0;
+		if (!is_null($charge->get("{$scaleLabel}_monto"))) {
+			$fixedAmount = $charge->get("{$scaleLabel}_monto");
+		}
 		$slidingScale->set('scaleLabel', $scaleLabel, false);
 		$slidingScale->set('scale_number', $scaleNumber, false);
-		$slidingScale->set('fixedAmount', $charge->get("{$scaleLabel}_monto"), false);
+		$slidingScale->set('fixedAmount', $fixedAmount, false);
 		$slidingScale->set('discountRate', $charge->get("{$scaleLabel}_descuento"), false);
 		$slidingScale->set('hours', $charge->get("{$scaleLabel}_tiempo"), false);
 		$slidingScale->set('feeId', $charge->get("{$scaleLabel}_id_tarifa"), false);
@@ -492,14 +496,14 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			);
 		}
 		for ($work = array_shift($works); !empty($work); $work = array_shift($works)) {
-			//Tomo las horas del trabajo de las horas restantes, si el trabajo ya fue usado para llenar un escalÃ³n,
-			// o de las horas trabajadas, si es primera vez que se utiliza el trabajo para llenar el escalÃ³n.
+			//Tomo las horas del trabajo de las horas restantes, si el trabajo ya fue usado para llenar un escalón,
+			// o de las horas trabajadas, si es primera vez que se utiliza el trabajo para llenar el escalón.
 			if ($work->get('remainingHours')) {
 				$workedHours = $work->get('remainingHours');
 			} else {
 				$workedHours = $this->getWorkedHours($work);
 			}
-			//Si es el Ãºltimo escalÃ³n, entonces se utilizan todas las horas, por lo que el valor debe restarse
+			//Si es el Ãºltimo escalón, entonces se utilizan todas las horas, por lo que el valor debe restarse
 			// completamente.
 			if ($scale->get('scale_number') == 4) {
 				$remainingScaleHours = $workedHours;
@@ -507,8 +511,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$remainingWorkHours = $workedHours - $remainingScaleHours;
 			$remainingScaleHours = $remainingScaleHours - $workedHours;
 			if ($remainingWorkHours <= 0) {
-				//Se acabaron las horas del trabajo al intentar llenar la bolsa de horas del escalÃ³n.
-				//Si no se ha fijado un monto para las horas del escalÃ³n...
+				//Se acabaron las horas del trabajo al intentar llenar la bolsa de horas del escalón.
+				//Si no se ha fijado un monto para las horas del escalón...
 				if ($scale->get('fixedAmount') == 0) {
 					//Transformar las horas en dinero
 					//Obtener la tarifa del usuario en base a la moneda.
@@ -520,18 +524,21 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					$scaleAmount += $amount;
 				}
 				if ($remainingScaleHours == 0) {
-					// El trabajo se acabÃ³ y ademÃ¡s se llenÃ³ la bolsa del escalÃ³n. Hay que cambiar el escalÃ³n.
+					// El trabajo se acabó y ademÃ¡s se llenó la bolsa del escalón. Hay que cambiar el escalón.
 					if ($scale->get('fixedAmount') != 0) {
 						$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
 					}
-					return array('works' => $works, 'scaleAmount' => $scaleAmount);
+					if ($scale->get('scale_number') == 4) {
+						continue;
+					} else {
+						return array('works' => $works, 'scaleAmount' => $scaleAmount);
+					}
 				} else {
-					//Aun hay horas en el escalÃ³n. Hay que cambiar el trabajo.
+					//Aun hay horas en el escalón. Hay que cambiar el trabajo.
 					continue;
 				}
 			} else {
-				//El trabajo aun tiene horas y la bolsa de horas del escalÃ³n ya se llenÃ³. Hay que cambiar el escalÃ³n.
-
+				//El trabajo aun tiene horas y la bolsa de horas del escalón ya se llenó. Hay que cambiar el escalón.
 				//Si la escala tiene un monto fijo entonces reemplazar el acumulado
 				if ($scale->get('fixedAmount') != 0) {
 					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
@@ -547,7 +554,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				}
 				$work->set('remainingHours', $remainingWorkHours);
 				array_unshift($works, $work);
-				return array('works' => $works, 'scaleAmount' => $scaleAmount);
+				if ($scale->get('scale_number') == 4) {
+					continue;
+				} else {
+					return array('works' => $works, 'scaleAmount' => $scaleAmount);
+				}
 			}
 		}
 		return array('works' => $works, 'scaleAmount' => $scaleAmount);
