@@ -57,6 +57,9 @@ if ($id_trabajo > 0) {
 		}
 
 		if ($t->ValidarDiasIngresoTrabajo() && $t->Write(true)) {
+			// TODO: gtigre apuró esta solución penca
+			$t->InsertarTrabajoTarifa();
+
 			if (date('N', strtotime($t->fields['fecha'])) == 1) {
 				$lastmonday = date('Y-m-d', strtotime($t->fields['fecha']));
 			} else {

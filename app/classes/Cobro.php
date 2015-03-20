@@ -669,7 +669,12 @@ if (!class_exists('Cobro')) {
 			}
 
 			$chargingBusiness = new ChargingBusiness($this->sesion);
-			$chargingBusiness->delete($id_cobro);
+
+			try {
+				$chargingBusiness->delete($id_cobro);
+			} catch (Exception $e) {
+				return false;
+			}
 
 			return true;
 		}
