@@ -27,6 +27,20 @@ class UserFee extends Entity {
 		return array();
 	}
 
+	/**
+	 * Retorna una entidad con tarifa 0
+	 * @return GenericModel
+	 */
+	public function emptyResult() {
+		$entity = new GenericModel();
+		$entity->set('id_usuario_tarifa', 0, false);
+		$entity->set('id_usuario', 0, false);
+		$entity->set('id_moneda', 0, false);
+		$entity->set('tarifa', 0, false);
+		$entity->set('id_tarifa', 0, 0);
+		return $entity;
+	}
+
 	protected function getFixedDefaults() {
 		return array();
 	}
