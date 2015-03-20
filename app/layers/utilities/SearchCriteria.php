@@ -1,10 +1,5 @@
-
 <?php
 
-/**
- * Clase que define los criterios de búsqueda para distintas entidades.
- * Class SearchCriteria
- */
 class SearchCriteria extends AbstractUtility {
 
 	protected $entity;
@@ -85,5 +80,4 @@ class SearchCriteria extends AbstractUtility {
 		$this->groups[] = $field;
 		return $this;
 	}
-
 }

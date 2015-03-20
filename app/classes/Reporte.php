@@ -316,6 +316,9 @@ class Reporte {
       case "glosa_cliente":
         $this->id_agrupador_cobro[] = "codigo_cliente";
         break;
+      case "glosa_estudio":
+        $this->id_agrupador_cobro[] = "id_estudio";
+        break;
       default:
         $this->id_agrupador_cobro[] = $s;
     }
@@ -372,6 +375,8 @@ class Reporte {
           \'' . __('Indefinido') . '\' as username,
           -1 as id_usuario,
           cliente.id_cliente,
+          IFNULL(cobro.id_estudio, \'Indefinido\') as id_estudio,
+          IFNULL(prm_estudio.glosa_estudio, \'Indefinido\') as glosa_estudio,
           cliente.codigo_cliente,
           ' . (in_array('codigo_cliente_secundario', $this->agrupador) ? 'cliente.codigo_cliente_secundario,' : '') . '
           ' . (in_array('prm_area_proyecto.glosa', $this->agrupador) ? "'" . __('Indefinido') . "' AS glosa," : '') . '
@@ -499,6 +504,7 @@ class Reporte {
             ' . (in_array('id_usuario_responsable', $this->agrupador) ? ' LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable' : '') . '
             ' . (in_array('id_usuario_secundario', $this->agrupador) ? ' LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario' : '') . '
             LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
+            LEFT JOIN prm_estudio ON cobro.id_estudio = prm_estudio.id_estudio
           ';
 
     if ($this->tipo_dato == 'valor_por_cobrar') {
@@ -595,6 +601,10 @@ class Reporte {
             ' . (in_array('dia_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,' : '') . '
             ' . (in_array('mes_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,' : '') . '
             IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
+            
+            IFNULL(cobro.id_estudio, IFNULL(estudio_contrato.id_estudio,  \'Indefinido\')) as id_estudio,
+            IFNULL(prm_estudio.glosa_estudio, IFNULL(estudio_contrato.glosa_estudio,  \'Indefinido\')) as glosa_estudio,
+
             IFNULL(cobro.estado,\'Indefinido\') as estado,
             IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
             ';
@@ -828,6 +838,8 @@ class Reporte {
           LEFT JOIN prm_tipo_proyecto AS tipo ON asunto.id_tipo_asunto = tipo.id_tipo_proyecto
           LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
           LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+          LEFT JOIN prm_estudio ON cobro.id_estudio = prm_estudio.id_estudio
+          LEFT JOIN prm_estudio AS estudio_contrato ON contrato.id_estudio = estudio_contrato.id_estudio
           ' . (in_array('prm_area_proyecto.glosa', $this->agrupador) ? 'LEFT JOIN prm_area_proyecto ON prm_area_proyecto.id_area_proyecto = asunto.id_area_proyecto' : '') . '
           ' . (in_array('area_usuario', $this->agrupador) ? 'LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario' : '') . '
           ' . (in_array('categoria_usuario', $this->agrupador) ? 'LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario' : '') . '

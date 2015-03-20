@@ -617,7 +617,7 @@ $_LANG['Reporte de Retribuciones'] = "Reporte de Retribuciones";
 $_LANG['Horas Cobrables'] = 'Horas Cobrables';
 $_LANG['Montos Cobrables'] = 'Montos Cobrables';
 $_LANG['Calcular según'] = 'Calcular seg&uacute;n';
-
+$_LANG['glosa_estudio'] = 'Compañía';
 
 $_LANG['Informe'] = "Informe";
 $_LANG['Reporte Morosidad'] = "Reporte Deuda cliente";

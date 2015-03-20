@@ -32,187 +32,207 @@ class FacturaPago extends Objeto {
 	);
 
 	public static $configuracion_reporte = array(
-		array(
-			'format' => 'date',
-			'title' => 'Fecha Pago',
-			'field' => 'fecha_pago',
-		),
-		array(
-			'title' => 'Tipo',
-			'field' => 'tipo',
-		),
-		array(
-			'title' => 'N° Documento',
-			'field' => 'numero',
-		),
-		array(
-			'title' => 'Serie Documento',
-			'field' => 'serie_documento_legal',
-			'visible' => false,
-		),
-		array(
-			'title' => 'Código Cliente',
-			'field' => 'cliente_pago',
-		),
-		array(
-			'title' => 'Cliente',
-			'field' => 'glosa_cliente',
-		),
-		array(
-			'title' => 'Acuerdo Comercial',
-			'field' => 'idcontrato',
-			'visible' => false,
-		),
-		array(
-			'title' => 'Razón Social',
-			'field' => 'factura_razon_social',
-		),
-		array(
-			'title' => 'Encargado Comercial',
-			'field' => 'encargado_comercial',
-		),
-		array(
-			'title' => 'Estado Documento',
-			'field' => 'estado',
-		),
-		array(
-			'title' => 'N° Liquidación',
-			'field' => 'id_cobro',
-		),
-		array(
-			'title' => 'Concepto Pago',
-			'field' => 'concepto_pago',
-		),
-		array(
-			'title' => 'Descripción Pago',
-			'field' => 'descripcion_pago',
-		),
-		array(
-			'title' => 'Nombre Banco',
-			'field' => 'nombre_banco',
-		),
-		array(
-			'title' => 'N° Cuenta',
-			'field' => 'numero_cuenta',
-		),
-		array(
-			'format' => 'date',
-			'title' => 'Fecha Factura',
-			'field' => 'fecha_factura',
-		),
-		array(
-			'title' => 'Código Idioma',
-			'field' => 'codigo_idioma',
-			'visible' => false,
-		),
-		array(
-			'title' => 'Símbolo Moneda',
-			'field' => 'simbolo_factura',
-		),
-		array(
-			'title' => 'Cifras Decimales',
-			'field' => 'cifras_decimales_factura',
-			'visible' => false,
-		),
-		array(
-			'format' => 'number',
-			'title' => 'Tipo Cambio',
-			'field' => 'tipo_cambio_pago',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_factura',
+					'format' => 'date',
+					'title' => 'Fecha Pago',
+					'field' => 'fecha_pago',
 			),
-			'title' => 'Honorarios',
-			'field' => 'honorarios',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_factura',
+					'title' => 'Tipo',
+					'field' => 'tipo',
 			),
-			'title' => 'Subtotal Gastos',
-			'field' => 'subtotal_gastos',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_factura',
+					'title' => 'N° Documento',
+					'field' => 'numero',
 			),
-			'title' => 'Subtotal Gastos sin impuesto',
-			'field' => 'subtotal_gastos_sin_impuesto',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_factura',
+					'title' => 'Serie Documento',
+					'field' => 'serie_documento_legal',
+					'visible' => false,
 			),
-			'title' => 'IVA',
-			'field' => 'iva',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_factura',
+					'title' => 'Código Cliente',
+					'field' => 'cliente_pago',
 			),
-			'title' => 'Total Factura',
-			'field' => 'monto_factura',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_pago',
+					'title' => 'Cliente',
+					'field' => 'glosa_cliente',
 			),
-			'title' => 'Monto Aporte',
-			'field' => 'monto_aporte',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_factura',
+					'title' => 'Acuerdo Comercial',
+					'field' => 'idcontrato',
+					'visible' => false,
 			),
-			'title' => 'Saldo Factura',
-			'field' => 'saldo_factura',
-		),
-		array(
-			'format' => 'number',
-			'title' => 'Moneda Pago',
-			'field' => 'simbolo_pago',
-		),
-		array(
-			'format' => 'number',
-			'extras' =>
 			array(
-				'symbol' => 'simbolo_pago',
+					'title' => 'Razón Social',
+					'field' => 'factura_razon_social',
 			),
-			'title' => 'Saldo Pago',
-			'field' => 'saldo_pago',
-		),
-		array(
-			'title' => 'Códigos Asuntos',
-			'field' => 'codigos_asunto',
-		),
-		array(
-			'title' => 'Asuntos',
-			'field' => 'glosas_asunto',
-		),
-		array(
-			'title' => 'Descripción Factura',
-			'field' => 'descripcion_factura',
-		),
-		array(
-			'field' => 'glosa_estudio',
-			'title' => 'Companía',
-			'visible' => false,
-		)
+			array(
+					'title' => 'Encargado Comercial',
+					'field' => 'encargado_comercial',
+			),
+			array(
+					'title' => 'Estado Documento',
+					'field' => 'estado',
+			),
+			array(
+					'title' => 'N° Liquidación',
+					'field' => 'id_cobro',
+			),
+			array(
+					'title' => 'Concepto Pago',
+					'field' => 'concepto_pago',
+			),
+			array(
+					'title' => 'Descripción Pago',
+					'field' => 'descripcion_pago',
+			),
+			array(
+					'title' => 'Nombre Banco',
+					'field' => 'nombre_banco',
+			),
+			array(
+					'title' => 'N° Cuenta',
+					'field' => 'numero_cuenta',
+			),
+			array(
+					'format' => 'date',
+					'title' => 'Fecha Factura',
+					'field' => 'fecha_factura',
+			),
+			array(
+					'title' => 'Código Idioma',
+					'field' => 'codigo_idioma',
+					'visible' => false,
+			),
+			array(
+					'title' => 'Símbolo Moneda',
+					'field' => 'simbolo_factura',
+			),
+			array(
+					'title' => 'Cifras Decimales',
+					'field' => 'cifras_decimales_factura',
+					'visible' => false,
+			),
+			array(
+					'format' => 'number',
+					'title' => 'Tipo Cambio',
+					'field' => 'tipo_cambio_pago',
+			),
+			array(
+				'field' => 'bruto_honorarios',
+				'format' => 'number',
+				'title' => 'Subtotal Honorarios',
+				'extras' =>
+				array(
+					'symbol' => 'simbolo',
+					'subtotal' => 'simbolo'
+				),
+			),
+			array(
+				'field' => 'descuento_honorarios',
+				'format' => 'number',
+				'title' => 'Descuento Honorarios',
+				'extras' =>
+				array(
+					'symbol' => 'simbolo',
+					'subtotal' => 'simbolo'
+				),
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+					),
+					'title' => 'Honorarios',
+					'field' => 'honorarios',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+					),
+					'title' => 'Subtotal Gastos',
+					'field' => 'subtotal_gastos',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+					),
+					'title' => 'Subtotal Gastos sin impuesto',
+					'field' => 'subtotal_gastos_sin_impuesto',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+					),
+					'title' => 'IVA',
+					'field' => 'iva',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+					),
+					'title' => 'Total Factura',
+					'field' => 'monto_factura',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_pago',
+					),
+					'title' => 'Monto Aporte',
+					'field' => 'monto_aporte',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+					),
+					'title' => 'Saldo Factura',
+					'field' => 'saldo_factura',
+			),
+			array(
+					'format' => 'number',
+					'title' => 'Moneda Pago',
+					'field' => 'simbolo_pago',
+			),
+			array(
+					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_pago',
+					),
+					'title' => 'Saldo Pago',
+					'field' => 'saldo_pago',
+			),
+			array(
+					'title' => 'Códigos Asuntos',
+					'field' => 'codigos_asunto',
+			),
+			array(
+					'title' => 'Asuntos',
+					'field' => 'glosas_asunto',
+			),
+			array(
+					'title' => 'Descripción Factura',
+					'field' => 'descripcion_factura',
+			),
+			array(
+					'field' => 'glosa_estudio',
+					'title' => 'Companía',
+					'visible' => false,
+			)
 	);
 
 	function FacturaPago($sesion, $fields = "", $params = "") {
@@ -836,7 +856,45 @@ class FacturaPago extends Objeto {
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		
+		$billingBusiness = new BillingBusiness($this->sesion);
+		$charginBusiness = new ChargingBusiness($this->sesion);
+		$coiningBusiness = new CoiningBusiness($this->sesion);
+
+		$charginData = array();
+		$coiningData = array();
+		$invoiceData = array();
+
+		foreach ($results as $key => $fila) {
+			$id_cobro = $results[$key]['id_cobro'];
+			$id_factura = $results[$key]['id_factura'];
+			$id_moneda = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
+			if ($id_factura) {
+				$invoice = $invoiceData[$id_factura];
+				if (is_null($invoice)) {
+					$invoice = $billingBusiness->getInvoice($id_factura);
+					$invoiceData[$id_factura] = $invoice;
+				}
+				$currency = $coiningData[$id_moneda];
+				if (is_null($currency)) {
+					$currency = $coiningBusiness->getCurrency($id_moneda);
+					$coiningData[$id_moneda] = $currency;
+				}
+				if (is_null($charginData[$id_cobro])) {
+					$charge = $charginBusiness->getCharge($id_cobro);
+					$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+				}
+				$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+				$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
+				$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
+				$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+				
+				$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
+				$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');				
+			}
+		}
+		return $results;
 	}
 
 	public function PreCrearDato($data) {

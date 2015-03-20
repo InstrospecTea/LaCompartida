@@ -1,9 +1,20 @@
 <?php
 
 /**
- * Class WorkScope
- */
-class WorkScope implements IWorkScope{
+* Class WorkScope
+* 		
+*/
+class WorkScope implements IWorkScope {
+	
+	/**
+	 * Ordena los trabajos desde el más viejo al más nuevo.
+	 * @param  Criteria $criteria 
+	 * @return Criteria $criteria
+	 */
+	function orderFromOlderToNewer(Criteria $criteria) {
+		$criteria->add_ordering('Work.fecha', 'ASC');
+		return $criteria;
+	}
 
   /**
    * Añade una selección de datos sumados relacionados a la duración
@@ -30,4 +41,15 @@ class WorkScope implements IWorkScope{
       ->add_grouping('periodo');
     return $criteria;
   }
+
+    /**
+   * Ordena por glosa del asunto
+   * @param  Criteria $criteria
+   * @return mixed
+   */
+  function orderByMatterGloss(Criteria $criteria) {
+    $criteria->add_ordering('Matter.glosa_asunto', 'ASC');
+    return $criteria;
+  }
+
 }

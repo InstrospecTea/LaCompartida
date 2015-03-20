@@ -20,5 +20,28 @@ class SandboxController extends AbstractController {
 		$report->render();
 	}
 
+	public function scales($chargeId) {
+		$this->loadBusiness('Charging');
+		$this->loadBusiness('Translating');
+		$this->loadBusiness('Coining');
+		$language = $this->TranslatingBusiness->getLanguageByCode("'es'");
+		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId);
+		$charge = $this->ChargingBusiness->getCharge($chargeId);
+		$this->set('slidingScales', $slidingScales);
+		$this->set('charge', $charge);
+	}
+
+	public function charging() {
+		$this->layoutTitle = 'Sandbox Charging';
+		$this->loadBusiness('Charging');
+		$this->loadBusiness('Coining');
+
+		$charge = $this->ChargingBusiness->getCharge(5753);
+
+		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
+		$detail = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
+		$invoiced = $this->ChargingBusiness->getBilledAmount($charge, $currency);
+	}
+
 }
 

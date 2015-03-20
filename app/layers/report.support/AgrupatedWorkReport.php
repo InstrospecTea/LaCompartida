@@ -10,6 +10,8 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$this->Html = new \TTB\Html;
 		$this->loadBusiness('Coining');
 		$this->baseCurrency = $this->CoiningBusiness->getBaseCurrency();
+		$this->loadBusiness('Translating');
+		$this->defaultLanguage = $this->TranslatingBusiness->getLanguageByCode('es');
 	}
 
 	/**
@@ -31,9 +33,10 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	 * @param $data
 	 * @return array
 	 */
- 	private function laywerAgrupation($data) {
+	private function laywerAgrupation($data) {
 		$grupos = array();
 		$t = count($data);
+		$show_hours = $this->mapShowOptions($this->parameters['showHours']);
 		for ($x = 0; $x < $t; ++$x) {
 			$fila = $data[$x];
 			$id_usuario = $fila->fields['lawyer_id_usuario'];
@@ -67,7 +70,8 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
 			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
-			$duration_parts = explode(":", $fila->fields['work_duracion']);
+			$duration_parts = explode(":", $fila->fields[$show_hours]);
+
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
 			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
@@ -82,6 +86,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	private function clientAgrupation($data) {
 		$grupos = array();
 		$t = count($data);
+		$show_hours = $this->mapShowOptions($this->parameters['showHours']);
 		for ($x = 0; $x < $t; ++$x) {
 			$fila = $data[$x];
 			$por_socio = $this->parameters['group_by_partner'];
@@ -117,7 +122,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
 			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
-			$duration_parts = explode(":", $fila->fields['work_duracion_cobrada']);
+			$duration_parts = explode(":", $fila->fields[$show_hours]);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
 			$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
@@ -132,6 +137,22 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$this->setConfiguration('style', $this->getStyles());
 		$this->setConfiguration('header', $this->getHeader());
 		$this->setConfiguration('footer', $this->getFooter());
+	}
+
+	/**
+   * Devuelve un string con el atributo correspondiente a la forma de visualizacion de los valores del reporte.
+   * @param  number $option opción seleccionada en la interfaz (Mostrar valores en)
+   * @return string corresponde al atributo
+   */
+	private function mapShowOptions($option) {
+		switch ($option) {
+		  case 0:
+			return 'work_duracion';
+		  case 1:
+			return 'work_duracion_cobrada';
+		  default:
+			return 'work_duracion';
+		}
 	}
 
 	private function getStyles() {
@@ -291,14 +312,17 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$until = $this->formatDate($this->parameters['until']);
 		}
 		$period = $this->buildPeriod($since, $until);
-
+		$currency = $this->parameters['filterCurrency'];
+		$values = $this->parameters['showHours'] == 0 ? 'Horas Trabajadas' : 'Horas Facturables';
 		if (!$this->parameters['invoicedValue']) {
 			return <<<HTML
 				<h1 id="doc_header">
 					{$header}<br />
 					{$title}
 				</h1>
-				<p>Periodo: $period</p>
+				<span><b>Periodo</b>: $period</span></br>
+				<span><b>Valores en</b>: {$values}</span></br>
+				<p>
 				<div>
 					<table class="table">
 						<tr>
@@ -315,7 +339,9 @@ HTML;
 					{$header}<br />
 					{$title}
 				</h1>
-				<p>Periodo: $period</p>
+				<span><b>Periodo</b>: $period</span></br>
+				<span><b>Valores en</b>: {$values}</span></br>
+				<span><b>Moneda</b>: {$currency->get('glosa_moneda')}</span>
 				<div>
 					<table class="table">
 						<tr>
@@ -348,6 +374,7 @@ HTML;
 	private function createClientHtmlContent() {
 		$html = '';
 		$por_socio = $this->parameters['groupByPartner'];
+		$currency = $this->parameters['filterCurrency'];
 		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
 		foreach ($this->data as $socio) {
 			$html_clientes = '';
@@ -369,7 +396,7 @@ HTML;
 						$this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
-						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
 					$trs = $this->Html->tag(
@@ -391,6 +418,7 @@ HTML;
 	private function createLawyerHtmlContent() {
 		$html = '';
 		$with_invoiced = empty($this->parameters['invoicedValue']) ? false : true;
+		$currency = $this->parameters['filterCurrency'];
 		foreach ($this->data as $usuario) {
 			$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
 			$html_clientes = '';
@@ -412,7 +440,7 @@ HTML;
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
-						$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_cliente, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -429,7 +457,7 @@ HTML;
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
 					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3')) .
-					$this->Html->tag('th', $this->CoiningBusiness->formatAmount($total_facturado_abogado, $this->baseCurrency, ',', '.'), array('class' => 'col3'))
+					$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_abogado, $currency, $this->defaultLanguage), array('class' => 'col3'))
 				);
 			} else {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -449,13 +477,13 @@ HTML;
 		$ths = '';
 		$total = 0;
 		$total_facturado = 0;
-
+		$moneda_filtro = $this->parameters['filterCurrency'];
 		foreach ($data as $fila) {
 			$tds = '';
 			$valor_facturado = $this->CoiningBusiness->changeCurrency(
 				$fila['valor_facturado'],
 				$this->CoiningBusiness->getCurrency($fila['id_moneda']),
-				$this->baseCurrency
+				$moneda_filtro
 			);
 
 			if ($with_invoiced) {
@@ -464,11 +492,11 @@ HTML;
 				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
 				$tds .= $this->Html->tag(
 					'td',
+					"{$moneda_filtro->get('simbolo')} " . 
 					$this->CoiningBusiness->formatAmount(
 						$valor_facturado,
-						$this->baseCurrency,
-						',',
-						'.'
+						$moneda_filtro,
+						$this->defaultLanguage
 					),
 					array('class' => 'col3')
 				);
@@ -492,11 +520,11 @@ HTML;
 			$ths .= $this->Html->tag('th', $total, array('class' => 'col3'));
 			$ths .= $this->Html->tag(
 				'th',
+				"{$moneda_filtro->get('simbolo')} " . 
 				$this->CoiningBusiness->formatAmount(
 					$total_facturado,
 					$this->baseCurrency,
-					',',
-					'.'
+					$this->defaultLanguage
 				),
 				array('class' => 'col3')
 			);

@@ -79,7 +79,11 @@ function autocargattb($class_name) {
 
 		require_once dirname(__FILE__) . '/app/layers/report.support/engine/' . $class_name . '.php';
 
-	}   else {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/view/helpers/' . $class_name . '.php')){
+
+        require_once dirname(__FILE__) . '/app/layers/view/helpers/' . $class_name . '.php';
+
+    } else {
 
 		return false;
 

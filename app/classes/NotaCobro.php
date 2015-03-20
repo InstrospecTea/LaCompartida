@@ -1453,6 +1453,19 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'DETALLE_COBRO': //GenerarDocumento
+
+				/**
+				  * Detalle de tarifa escalonada.
+				  */
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html = str_replace('%detalle_escalones%', $table, $html);
+				
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
 				}
@@ -4261,6 +4274,18 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'DETALLE_COBRO': //GenerarDocumento2
+
+				/**
+				  * Detalle de tarifa escalonada.
+				  */
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html = str_replace('%detalle_escalones%', $table, $html);
 
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';

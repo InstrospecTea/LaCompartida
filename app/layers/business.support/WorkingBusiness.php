@@ -5,13 +5,15 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 	function agrupatedWorkReport($data) {
 
 		$this->loadBusiness('Searching');
+		$this->loadBusiness('Coining');
+		
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
 		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
 		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
 		$searchCriteria->related_with('User')->joined_with('Contract')->on_property('id_usuario')->on_entity_property('id_usuario_responsable');
 		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
-
+		$searchCriteria->add_scope('orderByMatterGloss');
 		// Filtros
 
 		//Abogado
@@ -113,6 +115,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$filter_properties
 		);
 
+		$filter_currency = $this->CoiningBusiness->getCurrency($data['filterCurrency']);
+ 		$base_currency = $this->CoiningBusiness->getBaseCurrency();
+
 		$this->loadReport('AgrupatedWork', 'report');
 		$this->report->setParameters(
 			array(
@@ -120,6 +125,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 				'groupByPartner' => empty($data['groupByPartner']) ? 0 : $data['groupByPartner'],
 				'invoicedValue' => empty($data['invoicedValue']) ? 0 : $data['invoicedValue'],
 				'agrupationType' => $data['agrupationType'],
+				'showHours' => $data['showHours'],
+				'filterCurrency' => $filter_currency,
+				'baseCurrency' => $base_currency,
 				'since' => $data['fecha_ini'],
 				'until' => $data['fecha_fin']
 			)
@@ -221,4 +229,14 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		return $this->report;
 	}
+
+	function getWorksByCharge($chargeId) {
+		$searchCriteria = new SearchCriteria('Work');
+		$searchCriteria->related_with('Charge');
+		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($chargeId);
+		$searchCriteria->add_scope('orderFromOlderToNewer');
+		$this->loadBusiness('Searching');
+		return $this->SearchingBusiness->searchbyCriteria($searchCriteria, array('Work.fecha', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda'));
+	}
+
 }
