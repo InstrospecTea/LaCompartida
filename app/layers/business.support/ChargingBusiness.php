@@ -144,7 +144,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
-		if (empty($results)) {
+		if (empty($results[0])) {
 			return null;
 		} else {
 			return $results[0];
@@ -156,10 +156,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$searchCriteria->related_with('Fee');
-		$searchCriteria->filter('tarifa_defecto')->restricted_by('equals')->compare_with('1');
+		$searchCriteria->filter('tarifa_defecto')->for_entity('Fee')->restricted_by('equals')->compare_with('1');
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
-		return $results[0];
+		if (empty($results[0])) {
+			$UserFee = new UserFee($this->sesion);
+			return $UserFee->emptyResult();
+		} else {
+			return $results[0];
+		}
 	}
 
 
