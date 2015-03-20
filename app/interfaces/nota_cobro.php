@@ -5,7 +5,6 @@ $sesion = new Sesion(array('ADM'));
 $NotaCobro = new NotaCobro($sesion);
 
 if ($opc == 'guardar') {
-	unset($nota['secciones']);
 	$id_formato = $NotaCobro->GuardarCarta($nota);
 	die(json_encode(array('id' => $id_formato)));
 } else if ($opc == 'prev') {
@@ -35,7 +34,7 @@ $template_parts = array(
 	<?php echo $Form->submit(__('Editar')); ?>
 </form>
 <hr/>
-<form method="POST" id="form_nota_cobro">
+<form method="POST" id="form_nota_cobro" action="nota_cobro.php">
 	<input type="hidden" name="opc" value="guardar"/>
 	<input type="hidden" name="nota[id_formato]" value="<?php echo $nota['id_formato']; ?>"/>
 	<p>
