@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.5.3
+Viernes 20 de Marzo 2015
+* **Fix:** [Corregir guardar Tarifas al clonar los trabajos](https://github.com/LemontechSA/ttb/pull/884)
+* **Fix:** [Error al generar liquidaciones, eliminar cobros](https://github.com/LemontechSA/ttb/pull/884)
+
 ## Hotfix 15.5.2
 Viernes 20 de Marzo 2015
 * **Fix:** [Devuelve entidad de tarifa usuario en 0](https://github.com/LemontechSA/ttb/pull/883)
