@@ -666,7 +666,7 @@ class Reporte {
                                                 (TIME_TO_SEC(duracion) / 3600) *
                                                 IF(
                                                     cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
-                                                    usuario_tarifa.tarifa * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+                                                    trabajo.tarifa_hh_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
                                                     trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
                                                 )
                                             )";
