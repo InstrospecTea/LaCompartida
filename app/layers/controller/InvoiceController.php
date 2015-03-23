@@ -1,7 +1,7 @@
-<?
+<?php
 
 class InvoiceController extends AbstractController {
-	
+
 	public $helpers = array('EntitiesListator', array('\TTB\Html', 'Html'), 'Form', 'Paginator');
 
 	public function feeAmountDetailTable() {
@@ -39,7 +39,7 @@ class InvoiceController extends AbstractController {
 			$chargeDiscount = $chargeDetail->get('descuento_honorarios');
 			$detail = $this->BillingBusiness->getFeesDataOfInvoiceByAmounts($amount, $chargeFees, $chargeDiscount, $currency);
 		}
-		
+
 		$this->set('currency', $currency);
 		$this->set('language', $language);
 

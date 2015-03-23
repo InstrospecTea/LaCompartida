@@ -466,7 +466,7 @@ class Documento extends Objeto {
 
 				if ($modulo_fact && !$es_adelanto) {
 					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>";
-					if ($this->sesion->usuario->TienePermiso('SADM')) {
+					if ($this->sesion->usuario->Es('SADM')) {
 						//FFF: Lemontech puede editar los pagos con la interfaz vieja, solo para debug
 						$out.="<a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(" . $id . ")\" title=\"Editar Pago\">" . $nombre . "</a>";
 					} else {
@@ -919,7 +919,7 @@ class Documento extends Objeto {
 
 			if ($monto_honorarios > 0 || $monto_gastos > 0) {
 				$neteos = array(array(
-								'id_moneda' => $id_moneda,
+								'id_moneda' => $documento_cobro->fields['id_moneda'],
 								'id_documento_cobro' => $id_documento_cobro,
 								'monto_honorarios' => $monto_honorarios,
 								'monto_gastos' => $monto_gastos,
