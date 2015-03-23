@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.1
+Jueves 26 de Marzo 2015
+* **Fix:** [Mantiene los decimales en los calculos de pagos.](https://github.com/LemontechSA/ttb/pull/886)
+
 ## Release: 15.5.0
 Miércoles 25 de Marzo 2015
 [Release 15.6.0](https://github.com/LemontechSA/ttb/pull/888)
