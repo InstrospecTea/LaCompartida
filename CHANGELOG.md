@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.5.4
+Lunes 23 de Marzo 2015
+* **Fix:** [Corrige monto valor trabajado estándar](https://github.com/LemontechSA/ttb/pull/885)
+
 ## Hotfix 15.5.3
 Viernes 20 de Marzo 2015
 * **Fix:** [Corregir guardar Tarifas al clonar los trabajos](https://github.com/LemontechSA/ttb/pull/884)
