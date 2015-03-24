@@ -20,7 +20,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
-		$contrato->Load($id_contrato);
+		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto'));
 	}
 
 	if (!empty($id_factura)) {

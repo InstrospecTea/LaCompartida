@@ -384,7 +384,7 @@ if ($opc == 'guardar') {
 		}
 	}
 
-	if ($email_cliente != $contrato->fields['email_contacto']) {
+	if (!empty($_POST) && $email_cliente != $contrato->fields['email_contacto']) {
 		$contrato->Edit('email_contacto', $email_cliente);
 		$contrato->Write();
 	}
