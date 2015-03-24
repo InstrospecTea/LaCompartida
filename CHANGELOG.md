@@ -1,5 +1,34 @@
 # Changelog
 
+## Hotfix 15.5.4
+Lunes 23 de Marzo 2015
+* **Fix:** [Corrige monto valor trabajado estándar](https://github.com/LemontechSA/ttb/pull/885)
+
+## Hotfix 15.5.3
+Viernes 20 de Marzo 2015
+* **Fix:** [Corregir guardar Tarifas al clonar los trabajos](https://github.com/LemontechSA/ttb/pull/884)
+* **Fix:** [Error al generar liquidaciones, eliminar cobros](https://github.com/LemontechSA/ttb/pull/884)
+
+## Hotfix 15.5.2
+Viernes 20 de Marzo 2015
+* **Fix:** [Devuelve entidad de tarifa usuario en 0](https://github.com/LemontechSA/ttb/pull/883)
+
+## Hotfix 15.5.1
+Viernes 20 de Marzo 2015
+* **Fix:** [Corregir mantenedor de notas de cobro](https://github.com/LemontechSA/ttb/pull/882)
+
+## Release: 15.5.0
+Jueves 19 de Marzo 2015
+[Release 15.5.0](https://github.com/LemontechSA/ttb/pull/879)
+* **Feature:** [Descuentos tarifa escalonada](https://github.com/LemontechSA/ttb/issues/815)
+* **Feature:** [Descuentos a nivel de factura](https://github.com/LemontechSA/ttb/issues/782)
+* **Feature:** [Mejorar reporte de horas](https://github.com/LemontechSA/ttb/issues/860)
+* **Feature:** [Incorporar Compañía como agrupador en reporte Avanzado](https://github.com/LemontechSA/ttb/issues/860)
+
+## Hotfix 15.4.5
+Martes 17 de Marzo 2015
+* **Fix:** [Corregir la eliminación del último registro en tarifas tramites](https://github.com/LemontechSA/ttb/pull/876)
+
 ## Hotfix 15.4.4
 Lunes 16 de Marzo 2015
 * **Fix:** [Corregir asignación por referencia al bindParam (fix FW)](https://github.com/LemontechSA/ttb/pull/875)

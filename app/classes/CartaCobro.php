@@ -411,6 +411,19 @@ class CartaCobro extends NotaCobro {
 
 			case 'DETALLE': //GenerarDocumentoCarta
 
+				/**
+				* Detalle de tarifa escalonada.
+				*/
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html2 = str_replace('%detalle_escalones%', $table, $html2);
+
+
 				$queryasuntosrel = "SELECT asunto.glosa_asunto
 										FROM trabajo
 									LEFT JOIN asunto ON ( asunto.codigo_asunto = trabajo.codigo_asunto) WHERE id_cobro='" . $this->fields['id_cobro'] . "' GROUP BY asunto.glosa_asunto ";
@@ -1254,7 +1267,19 @@ class CartaCobro extends NotaCobro {
 
 			case 'DETALLE': //GenerarDocumentoCarta2
 
-				if (strpos($html2, '%cuenta_banco%')) {
+				/**
+				* Detalle de tarifa escalonada.
+				*/
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html2 = str_replace('%detalle_escalones%', $table, $html2);
+
+                		if (strpos($html2, '%cuenta_banco%')) {
 
 					if ($contrato->fields['id_cuenta']) {
 						$query_banco = "SELECT glosa FROM cuenta_banco WHERE id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
@@ -1725,7 +1750,19 @@ class CartaCobro extends NotaCobro {
 					$documentos_relacionados[] = $data;
 				}
 
-				$documentos_rel = '';
+				/**
+				* Detalle de tarifa escalonada.
+				*/
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html2 = str_replace('%detalle_escalones%', $table, $html2);
+
+                		$documentos_rel = '';
 
 				for ($k = 0; $k < count($documentos_relacionados); $k++) {
 					$espace = $k < count($documentos_relacionados) - 1 ? ', ' : '';

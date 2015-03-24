@@ -20,7 +20,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
-		$contrato->Load($id_contrato);
+		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto'));
 	}
 
 	if (!empty($id_factura)) {
@@ -158,6 +158,7 @@ if ($opcion == "guardar") {
 		if (!is_null($dte_id_pais) && !empty($dte_id_pais)) {
 			$factura->Edit("dte_id_pais", $dte_id_pais ? $dte_id_pais : "");
 		}
+		$factura->Edit('dte_comentario', $dte_comentario ? $dte_comentario : NULL);
 
 		$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		if (Conf::GetConf($sesion, 'RegionCliente')) {
@@ -749,7 +750,11 @@ $Form->defaultLabel = false;
 				</td>
 
 				<td id="td_honorarios_legales"  align="left" nowrap><?php echo $simbolo; ?>
-					<input type="text" name="monto_honorarios_legales" class="aproximable"  id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura()"; onkeydown="MontoValido(this.id);"></td>
+					<input type="text" name="monto_honorarios_legales" class="aproximable"  id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"; onkeydown="MontoValido(this.id);">
+				<?php if ($id_cobro > 0 && Conf::GetConf($sesion,'VisualizaDescuentoEnFactura')) { ?>
+ 					<img data-id='<?php echo $factura->fields["id_factura"] ?>' data-chargeId='<?php echo $id_cobro ?>' class='detalle_honorarios_factura' src='<?php echo Conf::ImgDir()  ?>/noticia16.png' style='cursor:pointer' />
+				<?php }?>
+				</td>
 				<td id="td_impto_honorarios_legales" align="left" nowrap><?php echo $simbolo; ?>
 					<input type="text" name="monto_iva_honorarios_legales" class="aproximable"   id="monto_iva_honorarios_legales" value="<?php echo $impuesto; ?>" disabled="true" value="0" size="10" maxlength="30" onkeydown="MontoValido(this.id);"></td>
 			</tr>
@@ -908,6 +913,64 @@ $Form->defaultLabel = false;
 <script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 
 <script type="text/javascript">
+
+	jQuery('.detalle_honorarios_factura').live('click', function() {
+		var id = jQuery(this).data('id');
+		var chargeId = jQuery(this).data('chargeid');
+		var options = {
+			"invoice": id,
+			"charge": chargeId,
+			"language": 'es',
+			"amount": jQuery('#monto_honorarios_legales').val()
+		}
+		DetalleHonorarios(options, 'Invoice');
+	});
+
+	function DetalleHonorarios(options, type) {
+		var text_window = '';
+		jQuery.ajax({
+			type: "POST",
+			dataType: "JSON",
+			url: root_dir + '/app/' + type + '/feeAmountDetailTable/',
+			data: options,
+			success: function(data, status, jqXHR) {
+				if (data && data.detail) {
+					text_window += data.detail;
+				} else {
+					text_window += "No existe desglose";
+				}
+				GeneraPopUpDetalleMonto(text_window);
+			},
+			error: function(jqXHR, status, error) {
+				text_window += '<p>No se ha encontrado información.<p/>';
+				GeneraPopUpDetalleMonto(text_window);
+			}
+		});
+
+	}
+
+	function GeneraPopUpDetalleMonto(html) {
+		jQuery('<p/>')
+			.attr('title', 'Desglose del monto')
+			.html(html)
+			.dialog({
+				resizable: true,
+				height: 350,
+				width: 420,
+				modal: true,
+				open: function() {
+					jQuery('.ui-dialog-title').addClass('ui-icon-info');
+					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+				},
+				buttons: {
+					"<?php echo __('Aceptar') ?>": function() {
+						jQuery(this).dialog('close');
+						return false;
+					}
+				}
+			});
+	}
+
 	var cantidad_decimales = <?php echo intval($cifras_decimales_opc_moneda_total); ?>;
 	var string_decimales = "<?php echo str_pad('', $cifras_decimales_opc_moneda_total, '0'); ?>";
 	var porcentaje_impuesto = "<?php echo $porcentaje_impuesto; ?>";

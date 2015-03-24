@@ -2,4 +2,4 @@
 
 interface ICurrencyDAO extends BaseDAO {
 
-} 
+}

@@ -9,5 +9,4 @@ class ChargeService extends AbstractService implements IChargeService {
 	public function getClass() {
 		return 'Charge';
 	}
-
 }

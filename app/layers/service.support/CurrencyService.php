@@ -10,4 +10,4 @@ class CurrencyService extends AbstractService implements ICurrencyService {
 		return 'Currency';
 	}
 
-} 
+}

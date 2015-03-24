@@ -1,9 +1,9 @@
 <?php
 
-class Document extends Entity{
+class Document extends Entity {
 
 	/**
-	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
+	 * Obtiene el nombre de la propiedad que actÃºa como identidad de la instancia del objeto que hereda a esta clase.
 	 * @return string
 	 */
 	public function getIdentity() {

@@ -31,6 +31,4 @@ interface ISearchingBusiness{
 	 * @return \stdClass
 	 */
 	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1);
-
-
 }

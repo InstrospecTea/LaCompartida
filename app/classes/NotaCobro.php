@@ -1015,9 +1015,16 @@ class NotaCobro extends Cobro {
 	}
 
 	function GuardarCarta($data) {
-
-		$data[$this->carta_formato] = $data['formato'];
-
+		if (isset($data['secciones'])) {
+			$formato = '';
+			foreach ($data['secciones'] as $seccion => $html) {
+				$formato .= "\n###$seccion###\n$html\n";
+			}
+			unset($data['secciones']);
+			$data[$this->carta_formato] = $formato;
+		} else {
+			$data[$this->carta_formato] = $data['formato'];
+		}
 		$Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);
 		$Carta->guardar_fecha = false;
 		$Carta->editable_fields = array_keys($data);
@@ -1453,6 +1460,19 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'DETALLE_COBRO': //GenerarDocumento
+
+				/**
+				  * Detalle de tarifa escalonada.
+				  */
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html = str_replace('%detalle_escalones%', $table, $html);
+
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
 				}
@@ -4261,6 +4281,18 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'DETALLE_COBRO': //GenerarDocumento2
+
+				/**
+				  * Detalle de tarifa escalonada.
+				  */
+				$chargingBusiness = new ChargingBusiness($this->sesion);
+				$coiningBusiness = new CoiningBusiness($this->sesion);
+				$translatingBusiness = new TranslatingBusiness($this->sesion);
+				$currency = $coiningBusiness->getCurrency($this->fields['opc_moneda_total']);
+				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
+				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
+				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$html = str_replace('%detalle_escalones%', $table, $html);
 
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';

@@ -1,6 +1,5 @@
 <?php
 
-interface ICurrencyService extends BaseService{
+interface ICurrencyService extends BaseService {
 
-
-} 
+}
