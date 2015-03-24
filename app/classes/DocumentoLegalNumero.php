@@ -62,10 +62,11 @@ class DocumentoLegalNumero extends Objeto {
 		$Statement->bindParam('serie', $serie, PDO::PARAM_STR);
 		$Statement->bindParam('id_estudio', $id_estudio, PDO::PARAM_INT);
 		$Statement->execute();
-		if ($documento = $Statement->fetch(PDO::FETCH_ASSOC)) {
-			return $documento['numero_inicial'];
-		}
+
+		$documento = $Statement->fetch(PDO::FETCH_ASSOC);
 		$Statement->closeCursor();
+
+		return !empty($documento) ? $documento['numero_inicial'] : null;
 	}
 
 }
