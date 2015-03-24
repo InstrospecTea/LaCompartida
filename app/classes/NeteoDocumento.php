@@ -142,11 +142,11 @@ class NeteoDocumento extends Objeto {
 		$honorarios_acumulado = $moneda_pago->getFloat($honorarios_acumulado);
 		$gastos_acumulado = $moneda_pago->getFloat($gastos_acumulado);
 
-		$this->Edit('valor_pago_honorarios', $honorarios_acumulado);
-		$this->Edit('valor_pago_gastos', $gastos_acumulado);
+		$this->Edit('valor_pago_honorarios', $moneda_pago->getFloat($honorarios_acumulado, false));
+		$this->Edit('valor_pago_gastos', $moneda_pago->getFloat($gastos_acumulado, false));
 
-		$cobro_gastos = $moneda_cobro->getFloat($gastos_acumulado * $tasa);
-		$cobro_honorarios = $moneda_cobro->getFloat($honorarios_acumulado * $tasa);
+		$cobro_gastos = $moneda_cobro->getFloat($gastos_acumulado * $tasa, false);
+		$cobro_honorarios = $moneda_cobro->getFloat($honorarios_acumulado * $tasa, false);
 
 		$saldo_cobro_honorarios = 0;
 		$saldo_cobro_gastos = 0;
@@ -174,7 +174,7 @@ class NeteoDocumento extends Objeto {
 				if (($saldo_cobro_honorarios <= 0 && $documento_cobro->fields['honorarios'] >= 0) || ($saldo_cobro_honorarios >= 0 && $documento_cobro->fields['honorarios'] <= 0)) {
 					$documento_cobro->Edit('honorarios_pagados', 'SI');
 				}
-				$documento_cobro->Edit('saldo_honorarios', $moneda_cobro->getFloat($saldo_cobro_honorarios));
+				$documento_cobro->Edit('saldo_honorarios', $moneda_cobro->getFloat($saldo_cobro_honorarios, false));
 
 
 				$out .= $saldo_cobro_honorarios . "</td></tr>";
@@ -184,7 +184,7 @@ class NeteoDocumento extends Objeto {
 				if ($saldo_cobro_gastos <= 0) {
 					$documento_cobro->Edit('gastos_pagados', 'SI');
 				}
-				$documento_cobro->Edit('saldo_gastos', $moneda_cobro->getFloat($saldo_cobro_gastos));
+				$documento_cobro->Edit('saldo_gastos', $moneda_cobro->getFloat($saldo_cobro_gastos, false));
 
 				/* PAGO */
 				$documento_pago = new Documento($this->sesion);
@@ -207,8 +207,8 @@ class NeteoDocumento extends Objeto {
 				if ($pago_gastos > 0 && !Conf::GetConf($this->sesion, 'NuevoModuloGastos')) {
 					$provision = new Gasto($this->sesion);
 					$provision->Edit('id_moneda', $documento_pago->fields['id_moneda']);
-					$provision->Edit('ingreso', $pago_gastos);
-					$provision->Edit('monto_cobrable', $pago_gastos);
+					$provision->Edit('ingreso', $moneda_pago->getFloat($pago_gastos, false));
+					$provision->Edit('monto_cobrable', $moneda_pago->getFloat($pago_gastos, false));
 					$provision->Edit('id_cobro', $id_cobro);
 					$provision->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 					$provision->Edit('id_usuario_orden', $this->sesion->usuario->fields['id_usuario']);
@@ -260,9 +260,9 @@ class NeteoDocumento extends Objeto {
 						$factura_pago->Edit('pago_retencion', $documento_pago->fields['pago_retencion']);
 					}
 					$factura_pago->Edit('id_moneda', $documento_pago->fields['id_moneda']);
-					$factura_pago->Edit('monto', $valor_pago_original);
+					$factura_pago->Edit('monto', $moneda_cobro->getFloat($valor_pago_original, false));
 					$factura_pago->Edit('id_moneda_cobro', $documento_cobro->fields['id_moneda']);
-					$factura_pago->Edit('monto_moneda_cobro', $moneda_cobro->getFloat($valor_pago_original * $tasa));
+					$factura_pago->Edit('monto_moneda_cobro', $moneda_cobro->getFloat($valor_pago_original * $tasa, false));
 
 					//agregarle columnas saldo_gastos y saldo_honorarios al factura_pago?
 					$nueva = !$factura_pago->Id();
@@ -296,7 +296,7 @@ class NeteoDocumento extends Objeto {
 								}
 							}
 							if (is_array($pagar_facturas)) {
-								$factura_pago->Edit('monto', $moneda_pago->getFloat($factura_pago->fields['monto'] + $monto));
+								$factura_pago->Edit('monto', $moneda_pago->getFloat($factura_pago->fields['monto'] + $monto, false));
 							}
 						}
 						$pagina_fake = ''; //la belleza del TT
