@@ -68,11 +68,19 @@ class NeteoDocumento extends Objeto {
 		return $out;
 	}
 
-	function Reestablecer($decimales_cobro) {
+	function Reestablecer() {
 		$out = "<tr><td>";
 		if ($this->Loaded()) {
 			$documento_cobro = new Documento($this->sesion);
 			if ($documento_cobro->Load($this->fields['id_documento_cobro'])) {
+				$documento_pago = new Documento($this->sesion);
+				$documento_pago->Load($this->fields['id_documento_pago']);
+
+				$moneda_cobro = new Moneda($this->sesion);
+				$moneda_cobro->Load($documento_cobro->fields['id_moneda']);
+				$moneda_pago = new Moneda($this->sesion);
+				$moneda_pago->Load($documento_pago->fields['id_moneda']);
+
 				$out.= $documento_cobro->fields['id_cobro'] . "</td><td>";
 
 				$saldo_cobro_honorarios = $documento_cobro->fields['saldo_honorarios'];
@@ -87,20 +95,20 @@ class NeteoDocumento extends Objeto {
 
 				$saldo_cobro_gastos += $this->fields['valor_cobro_gastos'];
 
-				if ($saldo_cobro_gastos != 0)
+				if ($saldo_cobro_gastos != 0) {
 					$documento_cobro->Edit('gastos_pagados', 'NO');
-				if ($saldo_cobro_honorarios != 0)
+				}
+				if ($saldo_cobro_honorarios != 0) {
 					$documento_cobro->Edit('honorarios_pagados', 'NO');
+				}
 
-				$documento_cobro->Edit('saldo_gastos', number_format($saldo_cobro_gastos, $decimales_cobro, '.', ''));
-				$documento_cobro->Edit('saldo_honorarios', number_format($saldo_cobro_honorarios, $decimales_cobro, '.', ''));
+				$documento_cobro->Edit('saldo_gastos', $moneda_cobro->getFloat($saldo_cobro_gastos, false));
+				$documento_cobro->Edit('saldo_honorarios', $moneda_cobro->getFloat($saldo_cobro_honorarios, false));
 
 				$documento_cobro->Write();
 
-				$documento_pago = new Documento($this->sesion);
-				$documento_pago->Load($this->fields['id_documento_pago']);
-
-				$documento_pago->Edit('saldo_pago', $documento_pago->fields['saldo_pago'] - $this->fields['valor_pago_honorarios'] - $this->fields['valor_pago_gastos']);
+				$saldo_pago = $documento_pago->fields['saldo_pago'] - $this->fields['valor_pago_honorarios'] - $this->fields['valor_pago_gastos'];
+				$documento_pago->Edit('saldo_pago', $moneda_pago->getFloat($saldo_pago, false));
 				$documento_pago->Write();
 
 				$this->Edit('valor_cobro_honorarios', '0');
@@ -111,7 +119,7 @@ class NeteoDocumento extends Objeto {
 			}
 
 			//Elimino la provisión que se pudo haber generado por pagar gastos
-			$query = "DELETE from cta_corriente WHERE cta_corriente.id_neteo_documento = '" . $this->fields['id_neteo_documento'] . "' ";
+			$query = "DELETE from cta_corriente WHERE cta_corriente.id_neteo_documento = '{$this->fields['id_neteo_documento']}' ";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 		return $out;
