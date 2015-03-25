@@ -190,10 +190,7 @@ class Documento extends Objeto {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}
-pr($this->fields['saldo_pago']);
 			if ($this->Write()) {
-$this->Load($this->fields['id_documento']);
-pr($this->fields['saldo_pago']);
 				$id_documento = $this->fields['id_documento'];
 				$ids_monedas = explode(',', $ids_monedas_documento);
 				$tipo_cambios = is_array($tipo_cambios_documento)? $tipo_cambios_documento : explode(',', $tipo_cambios_documento);
