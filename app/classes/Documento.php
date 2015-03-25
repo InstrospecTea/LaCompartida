@@ -118,7 +118,7 @@ class Documento extends Objeto {
 			$id_documento = $this->fields['id_documento'];
 			//resetea el saldo y aplica los neteos q lo recalculan
 
-			$this->Edit("saldo_pago", $this->fields['monto']);
+			$this->Edit("saldo_pago", $moneda->getFloat($this->fields['monto'], false));
 			if ($this->Write()) {
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos, $pagar_facturas);
 			}
@@ -126,7 +126,7 @@ class Documento extends Objeto {
 
 			$this->Edit("monto_base", number_format($monto_base * $multiplicador, max(2,$moneda_base['cifras_decimales']), ".", ""));
 
-			$this->Edit("monto", number_format($monto * $multiplicador, max(2,$moneda->fields['cifras_decimales']), ".", ""));
+			$this->Edit("monto", $moneda->getFloat($monto * $multiplicador, false));
 
 			$query = "SELECT SUM(valor_pago_honorarios + valor_pago_gastos) total
 						FROM  neteo_documento
@@ -135,9 +135,9 @@ class Documento extends Objeto {
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$neteo = mysql_fetch_assoc($resp);
 			if (!empty($neteo['total'])) {
-				$this->Edit('saldo_pago', $this->fields['monto'] + $neteo['total']);
+				$this->Edit('saldo_pago', $moneda->getFloat($this->fields['monto'] + $neteo['total'], false));
 			} else {
-				$this->Edit('saldo_pago', $this->fields['monto']);
+				$this->Edit('saldo_pago', $moneda->getFloat($this->fields['monto'], false));
 			}
 
 			if ($id_cobro) {
@@ -190,9 +190,10 @@ class Documento extends Objeto {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}
-
+pr($this->fields['saldo_pago']);
 			if ($this->Write()) {
-
+$this->Load($this->fields['id_documento']);
+pr($this->fields['saldo_pago']);
 				$id_documento = $this->fields['id_documento'];
 				$ids_monedas = explode(',', $ids_monedas_documento);
 				$tipo_cambios = is_array($tipo_cambios_documento)? $tipo_cambios_documento : explode(',', $tipo_cambios_documento);
