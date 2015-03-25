@@ -2,9 +2,9 @@
 
 require_once dirname(__FILE__) . '/conf.php';
 
-define('ROOT_PATH', dirname(dirname(__FILE__)));
 define('APP_PATH', dirname(__FILE__));
-define('LAYER_PATH', dirname(__FILE__) . '/layers');
+define('ROOT_PATH', dirname(APP_PATH));
+define('LAYER_PATH', APP_PATH . '/layers');
 
 $uri = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
 $uri = preg_replace('/^\/|\?.*/', '', $uri);
@@ -21,12 +21,4 @@ $auri = array_merge(
 	array_filter($route)
 );
 
-$class_name = "{$auri['controller']}Controller";
-$filename = LAYER_PATH . "/controller/{$class_name}.php";
-if (!file_exists($filename)) {
-	die('404 File not found!');
-}
-require_once(LAYER_PATH . '/controller/AbstractController.php');
-require_once($filename);
-$instance = new $class_name;
-$instance->_dispatch($auri['method'], array_filter($exploded_uri));
+new ControllerLoader($auri['controller'], $auri['method'], array_filter($exploded_uri));
