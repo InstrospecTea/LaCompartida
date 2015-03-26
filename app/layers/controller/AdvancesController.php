@@ -44,7 +44,7 @@ class AdvancesController extends AbstractController {
 
 		$criteria = new Criteria($this->Session);
 		$result = $criteria
-				->add_select('count(1) > 0', 'used')
+				->add_select('count(1)', 'used')
 				->add_from('neteo_documento')
 				->add_restriction(CriteriaRestriction::and_clause(
 						CriteriaRestriction::equals('id_documento_cobro', $this->Documento->fields['id_documento']),

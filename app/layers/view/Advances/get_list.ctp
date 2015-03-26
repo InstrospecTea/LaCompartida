@@ -58,7 +58,7 @@ echo $this->EntitiesListator->render();
 				async: false,
 				dataType: 'json',
 				success: function(response) {
-					used = response.used;
+					used = response.used > 0;
 				}
 			});
 			var msg = 'Este adelanto ya se ha usado en ' + tipo_doc + '\n\n¿Desea modificarlo?';
