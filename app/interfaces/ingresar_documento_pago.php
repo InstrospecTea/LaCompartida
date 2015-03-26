@@ -162,6 +162,7 @@ $txt_tipo = empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelan
 $pagina->titulo = $txt_pagina;
 
 $pagina->PrintTop($popup);
+$Form = new Form();
 ?>
 
 <script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
@@ -502,7 +503,8 @@ $pagina->PrintTop($popup);
 			if (tipopago=='editaadelanto') {
 				jQuery('#overlaytipocambio').hide();
 				monedaadelanto = jQuery('#id_moneda').val();
-				jQuery('#id_moneda').attr({'id': 'readonlymoneda', 'name': 'readonlymoneda', 'readonly': 'readonly'});
+				jQuery('#id_moneda').attr({'id': 'readonlymoneda', 'name': 'readonlymoneda'});
+				jQuery('#readonlymoneda').prop('disabled', 'disabled');
 				jQuery('#tabla_informacion').append('<input id="id_moneda" name="id_moneda" type="hidden" value="'+monedaadelanto+'" />');
 			}
 			if (tipopago=='documento' || tipopago=='nuevopago' || tipopago=='adelanto') {
@@ -906,8 +908,9 @@ $pagina->PrintTop($popup);
 				} else {
 					$moneda_usada = '';
 				}
+				$Moneda = new Moneda($sesion);
+				echo $Form->select('id_moneda', $Moneda->Listar(), $moneda_usada, array('style' => 'width: 80px', 'empty' => false, 'disabled' => $pago && $documento->fields['es_adelanto']));
 				?>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $moneda_usada, '', '', "80"); ?>
 				<input type="hidden" name="id_moneda_aux" id="moneda_aux" value='<?php echo $moneda_usada ?>'/>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
