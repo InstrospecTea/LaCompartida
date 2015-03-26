@@ -447,8 +447,6 @@ class Documento extends Objeto {
 	}
 
 	function ListaPagos() {
-		$modulo_fact = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
-
 		$out = '';
 		$query = "SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
 					FROM neteo_documento
@@ -463,6 +461,8 @@ class Documento extends Objeto {
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
+		$Form = new Form();
+		$Html = &$Form->Html;
 		while (list($id, $honorarios, $gastos, $pago_retencion, $es_adelanto) = mysql_fetch_array($resp)) {
 			if ($id) {
 				if ($honorarios != 0) {
@@ -477,21 +477,37 @@ class Documento extends Objeto {
 				}
 
 				$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')) . $id;
-
-				if ($modulo_fact && !$es_adelanto) {
-					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>";
-					if ($this->sesion->usuario->Es('SADM')) {
-						//FFF: Lemontech puede editar los pagos con la interfaz vieja, solo para debug
-						$out.="<a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(" . $id . ")\" title=\"Editar Pago\">" . $nombre . "</a>";
-					} else {
-						$out.=$nombre;
-					}
-					$out.="</td><td align = right style=\"color: #333333; font-size: 10px;\"> " . $honorarios . ' ' . $gastos . " </td><td>&nbsp;</td></tr>";
+				$td1_style = 'white-space: nowrap; text-align: left;';
+				$td2_style = 'color: #333333; font-size: 10px; text-align: right;';
+				$link_style = 'color: blue; font-size: 11px;';
+				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					$out .= $Html->tag('tr',
+							$Html->tag('td', $nombre, array('style' => $td1_style)) .
+							$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+							$Html->tag('td')
+					);
 				} else {
-					$out .= "<tr><td style='white-space: nowrap;text-align:left;'><a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(" . $id . ")\" title=\"Editar Pago\">" . $nombre . "</a></td><td align = right style=\"color: #333333; font-size: 10px;\"> " . $honorarios . ' ' . $gastos . " </td> <td><a target=_parent href='javascript:void(0)' onclick=\"EliminaDocumento($id)\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 title=Eliminar></a></td></tr>";
+					if ($es_adelanto) {
+						$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
+						$btn_link = $Form->image_link('cruz_roja.gif', false, array('onclick' => "EliminaDocumento($id)", 'target' => '_parent', 'title' => 'Eliminar'));
+						$out .= $Html->tag('tr',
+								$Html->tag('td', $nombre, array('style' => $td1_style)) .
+								$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+								$Html->tag('td', $btn_link)
+						);
+					} else {
+						if ($this->sesion->usuario->Es('SADM')) {
+							$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
+						}
+						$out .= $Html->tag('tr',
+								$Html->tag('td', $nombre, array('style' => $td1_style)) .
+								$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+								$Html->tag('td')
+						);
+					}
 				}
 				if ($pago_retencion) {
-					$out .= "<tr><td style='text-align:left;' colspan=2> ( Pago retención impuestos ) </td></tr>";
+					$out .= $Html->tag('tr', $Html->tag('td', '( Pago retención impuestos )', array('style' => $td1_style, 'colspan' => 3)));
 				}
 			}
 		}
