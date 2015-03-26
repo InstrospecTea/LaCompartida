@@ -1,5 +1,12 @@
 # Changelog
 
+## Release: 15.5.0
+Miércoles 25 de Marzo 2015
+[Release 15.6.0](https://github.com/LemontechSA/ttb/pull/888)
+* **Feature:** [Nota facturación MX](https://github.com/LemontechSA/ttb/issues/881)
+* **Feature:** [Layers error pages](https://github.com/LemontechSA/ttb/issues/878)
+* **Feature:** [Número facturación Nubox](https://github.com/LemontechSA/ttb/issues/877)
+
 ## Hotfix 15.5.4
 Lunes 23 de Marzo 2015
 * **Fix:** [Corrige monto valor trabajado estándar](https://github.com/LemontechSA/ttb/pull/885)
