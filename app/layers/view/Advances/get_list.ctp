@@ -68,7 +68,7 @@ echo $this->EntitiesListator->render();
 	<?php if ($this->params['mantener_ventana']) { ?>
 				document.location.href = url + '&ocultar_boton_adelantos=1';
 	<?php } else { ?>
-				window.opener.location.href = url;
+				window.opener.location.href = url + '&ocultar_boton_adelantos=1';
 				window.close();
 	<?php } ?>
 			return false;
