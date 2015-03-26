@@ -325,14 +325,18 @@ class Documento extends Objeto {
 		return $documento->Write();
 	}
 
+	/**
+	 * Devuelve los gastos y honorarios descontando los pagos realizados
+	 * @return array
+	 */
 	function calcularSaldosCobro() {
 		$query = "SELECT
-			honorarios - IFNULL(SUM(ND.valor_pago_honorarios), 0) saldo_honorarios,
-			gastos - IFNULL(SUM(ND.valor_pago_gastos), 0) saldo_gastos
-			FROM documento D
-			LEFT JOIN neteo_documento ND ON ND.id_documento_cobro = D.id_documento
+			D.honorarios - IFNULL(SUM(ND.valor_cobro_honorarios), 0) AS saldo_honorarios,
+			D.gastos - IFNULL(SUM(ND.valor_cobro_gastos), 0) AS saldo_gastos
+			FROM documento AS D
+			LEFT JOIN neteo_documento AS ND ON ND.id_documento_cobro = D.id_documento
 			WHERE D.id_documento = {$this->fields['id_documento']}
-			GROUP BY  id_documento";
+			GROUP BY D.id_documento";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		return mysql_fetch_assoc($resp);
 	}
