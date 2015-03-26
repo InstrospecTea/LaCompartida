@@ -2167,6 +2167,7 @@ HTML;
 	 * Provide email address (raw input)
 	 * Returns true if the email address has the email
 	 * address format and the domain exists.
+	 * @param string $email
 	 */
 	public static function isValidEmail($email) {
 		$email = trim($email);

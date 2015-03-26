@@ -54,7 +54,12 @@ class ViewRenderer {
 		$this->loadHelpers();
 		extract($vars);
 		ob_start();
-		require LAYER_PATH . $file;
+		if (!file_exists(LAYER_PATH . $file)) {
+			$get = array('controller' => $this->request['controller'], 'method' => $this->request['action'], 'file' => $file);
+			new ControllerLoader('ErrorPage', 'error_view', array(), $this->request['isAjax'], $get);
+		} else {
+			require LAYER_PATH . $file;
+		}
 		return ob_get_clean();
 	}
 

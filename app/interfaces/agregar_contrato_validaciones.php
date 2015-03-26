@@ -453,24 +453,34 @@ SCRIPT;
 );
 
 $error_message = __('Debe ingresar el email del solicitante');
+$invalid_message = __('E-mail del solicitante incorrecto');
 $contractValidation->registerValidation(
 	'email_contacto_contrato', array(
 		'value' => $email_contacto_contrato,
-		'server' => function($field) use ($Pagina, $error_message, $validacionesCliente) {
+		'server' => function($field) use ($Pagina, $error_message, $invalid_message, $validacionesCliente) {
 			if ($validacionesCliente) {
 				if (empty($field)) {
 					$Pagina->AddError($error_message);
+				} else if (!UtilesApp::isValidEmail($field)) {
+					$Pagina->AddError($invalid_message);
 				}
 			}
 		},
-		'client' => function($field_name) use ($error_message) {
+		'client' => function($field_name) use ($error_message, $invalid_message) {
 			$script = <<<SCRIPT
-				if (!form.$field_name.value){
+				if (!jQuery('#$field_name').val()) {
 					alert("{$error_message}");
 					if (typeof MuestraPorValidacion != 'undefined') {
 						MuestraPorValidacion('datos_solicitante');
 					}
-					form.$field_name.focus();
+					jQuery('#$field_name').focus();
+					return false;
+				} else if (!isValidEmail(jQuery('#$field_name').val())) {
+					alert("{$invalid_message}");
+					if (typeof MuestraPorValidacion != 'undefined') {
+						MuestraPorValidacion('datos_solicitante');
+					}
+					jQuery('#$field_name').focus();
 					return false;
 				}
 SCRIPT;
@@ -817,7 +827,3 @@ SCRIPT;
 		)
 	);
 }
-
-
-
-

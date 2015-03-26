@@ -5,6 +5,9 @@ class SandboxController extends AbstractController {
 	public $helpers = array('EntitiesListator', array('\TTB\Html', 'Html'), 'Form', 'Paginator');
 
 	public function index() {
+		if ($this->request['isAjax']) {
+			$this->layout = 'ajax';
+		}
 		$this->layoutTitle = 'Sandbox interface';
 		$this->loadBusiness('Sandboxing');
 		$page = empty($this->params['page']) ? null : $this->params['page'];

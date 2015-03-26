@@ -354,20 +354,32 @@ class Factura extends Objeto {
 		return false;
 	}
 
-	function LoadByNumero($numero, $serie = null, $tipo_documento = null) {
+	/**
+	 * Carga factura según numero y otros parametros
+	 * @param type $numero
+	 * @param type $serie
+	 * @param type $tipo_documento
+	 * @param type $id_estudio
+	 * @param type $fields campos que se cargaran, por defecto todos
+	 * @return boolean
+	 */
+	function LoadByNumero($numero, $serie = null, $tipo_documento = null, $id_estudio = null, $fields = null) {
 		$query_extras = "";
-		if ($serie) {
+		if (!empty($serie)) {
 			$query_extras .= " AND serie_documento_legal = '$serie'";
 		}
-		if ($tipo_documento) {
+		if (!empty($tipo_documento)) {
 			$query_extras .= " AND id_documento_legal = '$tipo_documento'";
+		}
+		if (!empty($id_estudio)) {
+			$query_extras .= " AND id_estudio = '$id_estudio'";
 		}
 		$query = "SELECT id_factura FROM factura WHERE numero = '$numero' $query_extras;";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
 		if ($id) {
-			return $this->Load($id);
+			return $this->Load($id, $fields);
 		}
 		return false;
 	}
@@ -1991,6 +2003,14 @@ class Factura extends Objeto {
 		return $numero;
 	}
 
+	/**
+	 * Verifica la existencia del numero de documento.
+	 * @param type $tipo_documento_legal
+	 * @param type $numero
+	 * @param type $serie
+	 * @param type $id_estudio
+	 * @return boolean
+	 */
 	function ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie, $id_estudio) {
 		if (empty($tipo_documento_legal) || empty($numero) || empty($serie) || empty($id_estudio)) {
 			return false;

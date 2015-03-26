@@ -684,7 +684,7 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 			if ($error) {
 				halt($error['Message'] ? __($error['Message']) : __($error['Code']), $error['Code'], 400, $data['ExtraData']);
 			} else {
-				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData']));
+				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData'], 'alert' => $data['Alerta']));
 			}
 		}
 	} else {
