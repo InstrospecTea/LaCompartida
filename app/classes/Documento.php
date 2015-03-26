@@ -933,14 +933,14 @@ class Documento extends Objeto {
 
 			$monto_honorarios = 0;
 			if ($honorarios > 0 && $pago_honorarios == 1) {
-				$monto_honorarios = $moneda_adelanto->getFloat($honorarios_convertidos);
+				$monto_honorarios = $moneda_adelanto->getFloat($rehacer_neteos ? $honorarios_convertidos : min($saldo_pago, $honorarios_convertidos));
 				$saldo_pago -= $monto_honorarios;
 				$honorarios_convertidos -= $monto_honorarios;
 			}
 
 			$monto_gastos = 0;
 			if ($gastos > 0 && $pago_gastos == 1) {
-				$monto_gastos = $moneda_adelanto->getFloat($gastos_convertidos);
+				$monto_gastos = $moneda_adelanto->getFloat($rehacer_neteos ? $gastos_convertidos : min($saldo_pago, $gastos_convertidos));
 				$saldo_pago -= $monto_gastos;
 				$gastos_convertidos -= $monto_gastos;
 			}
