@@ -38,4 +38,20 @@ class AdvancesController extends AbstractController {
 		$this->set('Pagination', $searchResult->get('Pagination'));
 	}
 
+	public function isUsedInPay($id_cobro, $id_documento_pago) {
+		$this->loadModel('Documento');
+		$this->Documento->LoadByCobro($id_cobro, 'id_documento');
+
+		$criteria = new Criteria($this->Session);
+		$result = $criteria
+				->add_select('count(1) > 0', 'used')
+				->add_from('neteo_documento')
+				->add_restriction(CriteriaRestriction::and_clause(
+						CriteriaRestriction::equals('id_documento_cobro', $this->Documento->fields['id_documento']),
+						CriteriaRestriction::equals('id_documento_pago', $id_documento_pago)
+				))
+				->run();
+		$this->renderJSON($result[0]);
+	}
+
 }

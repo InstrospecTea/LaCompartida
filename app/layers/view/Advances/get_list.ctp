@@ -4,7 +4,6 @@
 </p>
 
 <?php
-
 echo $this->Paginator->pages($Pagination, true, false, 6);
 $this->EntitiesListator->loadEntities($listResults->toArray());
 $this->EntitiesListator->addColumn(__('N°'), 'id_documento');
@@ -19,11 +18,11 @@ if ($this->params['elegir_para_pago']) {
 
 	$this->EntitiesListator->addColumn(__('Elegir para pago'), function($entity) use ($view) {
 		if ($view->params['desde_factura_pago']) {
-			$onClick = "ElegirParaPago(window.opener.location.href.replace(/&id_moneda=\d+/, '') + '&id_adelanto={$entity->get('id_documento')}&id_moneda={$entity->get('id_moneda')}')";
+			$onClick = "ElegirParaPago(window.opener.location.href.replace(/&id_moneda=\d+/, '') + '&id_adelanto={$entity->get('id_documento')}&id_moneda={$entity->get('id_moneda')}', {$entity->get('id_documento')})";
 		} else if ($view->params['como_funcion']) {
 			$onClick = "window.opener.utilizarAdelanto({$entity->get('id_documento')});window.close();";
 		} else {
-			$onClick = "ElegirParaPago(root_dir + '/app/interfaces/ingresar_documento_pago.php?id_cobro={$view->params['id_cobro']}&id_documento={$entity->get('id_documento')}&popup=1&pago=true&codigo_cliente={$entity->get('codigo_cliente')}')";
+			$onClick = "ElegirParaPago(root_dir + '/app/interfaces/ingresar_documento_pago.php?id_cobro={$view->params['id_cobro']}&id_documento={$entity->get('id_documento')}&popup=1&pago=true&codigo_cliente={$entity->get('codigo_cliente')}', {$entity->get('id_documento')})";
 		}
 		return $view->Form->button('Utilizar', array('onclick' => $onClick));
 	});
@@ -51,7 +50,21 @@ echo $this->EntitiesListator->render();
 	}
 
 <?php if ($this->params['elegir_para_pago']) { ?>
-		function ElegirParaPago(url) {
+		function ElegirParaPago(url, id) {
+			var tipo_doc = '<?php echo Configure::read('NuevoModuloFactura') ? __('la factura') : __('el cobro'); ?>';
+			var ajaxurl = root_dir + '/app/Advances/isUsedInPay/<?php echo $this->params['id_cobro']; ?>/' + id;
+			var used;
+			jQuery.ajax(ajaxurl, {
+				async: false,
+				dataType: 'json',
+				success: function(response) {
+					used = response.used;
+				}
+			});
+			var msg = 'Este adelanto ya se ha usado en ' + tipo_doc + '\n\n¿Desea modificarlo?';
+			if (used && !confirm(msg)) {
+				return false;
+			}
 	<?php if ($this->params['mantener_ventana']) { ?>
 				document.location.href = url + '&ocultar_boton_adelantos=1';
 	<?php } else { ?>
