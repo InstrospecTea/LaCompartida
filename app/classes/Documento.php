@@ -283,7 +283,7 @@ class Documento extends Objeto {
 			//Si el neteo existía, está siendo modificado y se debe partir de 0:
 			if ($neteo_documento->Ids($id_documento, $id_documento_cobro)) {
 				if (!is_array($pagar_facturas)) {
-					$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro);
+					$out_neteos .= $neteo_documento->Reestablecer();
 				}
 			} else {
 				$out_neteos .= "<tr><td>No</td><td>0</td><td>0</td>";
@@ -323,6 +323,18 @@ class Documento extends Objeto {
 		list($suma) = mysql_fetch_array($resp);
 		$documento->Edit('saldo_pago', number_format($documento->fields['monto'] + $suma, 6, '.', ''));
 		return $documento->Write();
+	}
+
+	function calcularSaldosCobro() {
+		$query = "SELECT
+			honorarios - IFNULL(SUM(ND.valor_pago_honorarios), 0) saldo_honorarios,
+			gastos - IFNULL(SUM(ND.valor_pago_gastos), 0) saldo_gastos
+			FROM documento D
+			LEFT JOIN neteo_documento ND ON ND.id_documento_cobro = D.id_documento
+			WHERE D.id_documento = {$this->fields['id_documento']}
+			GROUP BY  id_documento";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		return mysql_fetch_assoc($resp);
 	}
 
 	function EliminarNeteos() {
@@ -901,14 +913,14 @@ class Documento extends Objeto {
 
 			$monto_honorarios = 0;
 			if ($honorarios > 0 && $pago_honorarios == 1) {
-				$monto_honorarios = $moneda_adelanto->getFloat($saldo_pago > $honorarios_convertidos ? $honorarios_convertidos : $saldo_pago);
+				$monto_honorarios = $moneda_adelanto->getFloat($honorarios_convertidos);
 				$saldo_pago -= $monto_honorarios;
 				$honorarios_convertidos -= $monto_honorarios;
 			}
 
 			$monto_gastos = 0;
 			if ($gastos > 0 && $pago_gastos == 1) {
-				$monto_gastos = $moneda_adelanto->getFloat($saldo_pago > $gastos_convertidos ? $gastos_convertidos : $saldo_pago);
+				$monto_gastos = $moneda_adelanto->getFloat($gastos_convertidos);
 				$saldo_pago -= $monto_gastos;
 				$gastos_convertidos -= $monto_gastos;
 			}

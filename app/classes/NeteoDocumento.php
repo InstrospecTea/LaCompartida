@@ -156,13 +156,6 @@ class NeteoDocumento extends Objeto {
 		$cobro_gastos = $moneda_cobro->getFloat($gastos_acumulado * $tasa, false);
 		$cobro_honorarios = $moneda_cobro->getFloat($honorarios_acumulado * $tasa, false);
 
-		$saldo_cobro_honorarios = 0;
-		$saldo_cobro_gastos = 0;
-
-		if ($rehacer_neteos) {
-			$saldo_cobro_honorarios = $this->fields['valor_cobro_honorarios'];
-			$saldo_cobro_gastos = $this->fields['valor_cobro_honorarios'];
-		}
 		$this->Edit('valor_cobro_gastos', $cobro_gastos);
 		$this->Edit('valor_cobro_honorarios', $cobro_honorarios);
 
@@ -172,27 +165,23 @@ class NeteoDocumento extends Objeto {
 
 			$documento_cobro = new Documento($this->sesion);
 			if ($documento_cobro->Load($this->fields['id_documento_cobro'])) {
-
-				$saldo_cobro_honorarios += $documento_cobro->fields['saldo_honorarios'];
-				$saldo_cobro_gastos += $documento_cobro->fields['saldo_gastos'];
-
+				$saldos = $documento_cobro->calcularSaldosCobro();
 				/* HONORARIOS */
-				$saldo_cobro_honorarios -= $this->fields['valor_cobro_honorarios'];
 
-				if (($saldo_cobro_honorarios <= 0 && $documento_cobro->fields['honorarios'] >= 0) || ($saldo_cobro_honorarios >= 0 && $documento_cobro->fields['honorarios'] <= 0)) {
+				if (($saldos['saldo_honorarios'] <= 0 && $documento_cobro->fields['honorarios'] >= 0) || ($saldos['saldo_honorarios'] >= 0 && $documento_cobro->fields['honorarios'] <= 0)) {
 					$documento_cobro->Edit('honorarios_pagados', 'SI');
 				}
-				$documento_cobro->Edit('saldo_honorarios', $moneda_cobro->getFloat($saldo_cobro_honorarios, false));
+				$documento_cobro->Edit('saldo_honorarios', $moneda_cobro->getFloat($saldos['saldo_honorarios'], false));
 
 
-				$out .= $saldo_cobro_honorarios . "</td></tr>";
+				$out .= $saldos['saldo_honorarios'] . "</td></tr>";
 
 				/* GASTOS */
 				$saldo_cobro_gastos -= $this->fields['valor_cobro_gastos'];
-				if ($saldo_cobro_gastos <= 0) {
+				if ($saldos['saldo_gastos'] <= 0) {
 					$documento_cobro->Edit('gastos_pagados', 'SI');
 				}
-				$documento_cobro->Edit('saldo_gastos', $moneda_cobro->getFloat($saldo_cobro_gastos, false));
+				$documento_cobro->Edit('saldo_gastos', $moneda_cobro->getFloat($saldos['saldo_gastos'], false));
 
 				/* PAGO */
 				$documento_pago = new Documento($this->sesion);
