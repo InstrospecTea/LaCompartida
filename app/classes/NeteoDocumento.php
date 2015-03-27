@@ -152,10 +152,8 @@ class NeteoDocumento extends Objeto {
 
 		$this->Edit('valor_pago_honorarios', $moneda_pago->getFloat($honorarios_acumulado, false));
 		$this->Edit('valor_pago_gastos', $moneda_pago->getFloat($gastos_acumulado, false));
-
 		$cobro_gastos = $moneda_cobro->getFloat($gastos_acumulado * $tasa, false);
 		$cobro_honorarios = $moneda_cobro->getFloat($honorarios_acumulado * $tasa, false);
-
 		$this->Edit('valor_cobro_gastos', $cobro_gastos);
 		$this->Edit('valor_cobro_honorarios', $cobro_honorarios);
 

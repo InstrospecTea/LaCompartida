@@ -267,8 +267,13 @@ class Documento extends Objeto {
 			$id_documento_cobro = $documento_cobro_aux->fields['id_documento'];
 			$pago_honorarios = $data['monto_honorarios'];
 			$pago_gastos = $data['monto_gastos'];
-			$cambio_cobro = $this->TipoCambioDocumento($this->sesion, $id_documento_cobro, $documento_cobro_aux->fields['id_moneda']);
 			$cambio_pago = $moneda->fields['tipo_cambio'];
+			$cambio_cobro = $cambio_pago;
+			if ($documento_cobro_aux->fields['id_moneda'] != $moneda->fields['id_moneda']) {
+				$moneda_actual_cobro = new Moneda($this->sesion);
+				$moneda_actual_cobro->Load($documento_cobro_aux->fields['id_moneda']);
+				$cambio_cobro = $moneda_actual_cobro->fields['tipo_cambio'];
+			}
 			$decimales_cobro = $moneda_documento_cobro->fields['cifras_decimales'];
 			$decimales_pago = $moneda->fields['cifras_decimales'];
 
