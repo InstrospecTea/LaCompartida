@@ -176,7 +176,7 @@ if (Conf::EsAmbientePrueba()) {
 	list($anio_fin, $mes_fin, $dia_fin) = split("-", $fecha_fin);
 	$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 
-	$query = "SELECT codigo_asunto FROM asunto";
+	$query = "SELECT codigo_asunto FROM asunto WHERE activo = 1";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	$i = 0;
@@ -444,7 +444,7 @@ if (Conf::EsAmbientePrueba()) {
 			$fecha_mk_fin_periodo = mktime(0, 0, 0, date("m", $fecha_mk_ini) + 1, date("d", $fecha_mk_ini), date("Y", $fecha_mk_ini));
 
 			$end_date = date("Y-m-d", $fecha_mk_fin_periodo);
-			$start_date = date("Y-m-d", $fecha_mk_ini)
+			$start_date = date("Y-m-d", $fecha_mk_ini);
 
 			$query = "SELECT
 									contrato.id_contrato,
