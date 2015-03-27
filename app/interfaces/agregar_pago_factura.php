@@ -92,16 +92,21 @@ $saldo_pago = $id_neteo_documento_adelanto ? $pago->fields['monto_moneda_cobro']
 
 if ($id_adelanto) {
 	$documento_adelanto->Load($id_adelanto, array('id_documento', 'id_moneda', 'monto', 'saldo_pago', 'tipo_doc', 'numero_doc', 'numero_cheque', 'glosa_documento', 'id_banco', 'id_cuenta'));
-
 	$tipo_cambio_adelanto = $moneda_pago->fields['tipo_cambio'];
 	$tipo_cambio_cobro = $moneda_cobro->fields['tipo_cambio'];
-
+	$tasa_cambio = $tipo_cambio_adelanto / $tipo_cambio_cobro;
 	if ($monto_pago_adelanto > $documento_adelanto->fields['saldo_pago']) {
 		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
-		$monto_pago = $monto_pago_adelanto * $tipo_cambio_adelanto / $tipo_cambio_cobro;
+		$monto_pago = $monto_pago_adelanto * $tasa_cambio;
 	}
 
-	$saldo_pago = $moneda_pago->getFloat((-$documento_adelanto->fields['saldo_pago'] + $pago->fields['monto']) * $tipo_cambio_adelanto / $tipo_cambio_cobro);
+	$saldo_adelanto = $moneda_pago->getFloat(-$documento_adelanto->fields['saldo_pago'] + $pago->fields['monto']);
+	$saldo_pago = $moneda_cobro->getFloat($saldo_adelanto * $tasa_cambio);
+	$saldo_pago_moneda_adelanto = $moneda_pago->getFloat($saldo_pago * $tipo_cambio_cobro / $tipo_cambio_adelanto);
+	$diferencia_saldos = $moneda_pago->getFloat($saldo_adelanto - $saldo_pago_moneda_adelanto);
+	if ($diferencia_saldos < 0) {
+		$saldo_pago = $moneda_cobro->getFloat(($saldo_adelanto + $diferencia_saldos) * $tasa_cambio);
+	}
 }
 
 if ($utilizando_adelanto) {
@@ -1119,7 +1124,7 @@ $Form->defaultLabel = false;
 		} else if (in_array($id_factura, $arreglo_facturas)) {
 			$monto_a_pagar = $saldo_pago === null ? $fila->fields['saldo_factura'] : min($fila->fields['saldo_factura'], $saldo_pago);
 		} else {
-			$monto_a_pagar = "0";
+			$monto_a_pagar = '0';
 		}
 		if ($saldo_pago !== null) {
 			$saldo_pago -= $monto_a_pagar;
