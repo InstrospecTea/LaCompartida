@@ -1254,8 +1254,8 @@ if (count($cobro->asuntos)) {
 		?>
         var honorarios = jQuery('#honorarios_' + idx).val().replace(',', '').replace(',', '') * 1;
 
-        var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val()*1;
-        var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1;
+        var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val().replace(',', '').replace(',', '')*1;
+        var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val().replace(',', '').replace(',', '')*1;
 
         var honorarios_disp = jQuery('#honorarios_disponibles').val()*1;
 		var trabajos_disp = jQuery('#trabajos_disponibles').val()*1;
