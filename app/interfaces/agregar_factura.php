@@ -1431,7 +1431,10 @@ $Form->defaultLabel = false;
 		<?php
 		if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
 			$documento = new Documento($sesion);
-			$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $subtotal_honorarios, $subtotal_gastos, $cobro->fields['opc_moneda_total']);
+			$hh = $honorario;
+			$gg = $gastos_con_iva + $gastos_sin_iva;
+
+			$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $hh>0, $gg>0, $cobro->fields['opc_moneda_total']);
 			if ($saldo) {
 				?>
 				if (!jQuery('#id_adelanto').val() && confirm("<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . " $tipo_documento_legal" . '?' ?>")) {

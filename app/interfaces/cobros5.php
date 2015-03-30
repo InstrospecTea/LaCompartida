@@ -403,7 +403,7 @@ echo $refrescar;
 				GeneraPopUpDetalleMonto(text_window);
 			}
 		});
-		
+
 	}
 
 	function GeneraPopUpDetalleMonto(html) {
@@ -594,7 +594,7 @@ echo $refrescar;
 		var params = {
 			popup: 1,
 			id_cobro: '<?php echo $id_cobro ?>',
-			codigo_cliente: '<?php echo $codigo_cliente ?>',
+			codigo_cliente: '<?php echo $cobro->fields['codigo_cliente'] ?>',
 			elegir_para_pago: 1,
 			id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
 			desde_factura_pago: 0,
@@ -782,7 +782,7 @@ echo $refrescar;
 		form.opc.value = 'guardar_cobro';
 		form.submit();
 		return true;
-	}	
+	}
 
 	function ActualizarMontos( form )
 	{

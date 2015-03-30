@@ -118,7 +118,7 @@ class Documento extends Objeto {
 			$id_documento = $this->fields['id_documento'];
 			//resetea el saldo y aplica los neteos q lo recalculan
 
-			$this->Edit("saldo_pago", $this->fields['monto']);
+			$this->Edit("saldo_pago", $moneda->getFloat($this->fields['monto'], false));
 			if ($this->Write()) {
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos, $pagar_facturas);
 			}
@@ -126,7 +126,7 @@ class Documento extends Objeto {
 
 			$this->Edit("monto_base", number_format($monto_base * $multiplicador, max(2,$moneda_base['cifras_decimales']), ".", ""));
 
-			$this->Edit("monto", number_format($monto * $multiplicador, max(2,$moneda->fields['cifras_decimales']), ".", ""));
+			$this->Edit("monto", $moneda->getFloat($monto * $multiplicador, false));
 
 			$query = "SELECT SUM(valor_pago_honorarios + valor_pago_gastos) total
 						FROM  neteo_documento
@@ -135,9 +135,9 @@ class Documento extends Objeto {
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$neteo = mysql_fetch_assoc($resp);
 			if (!empty($neteo['total'])) {
-				$this->Edit('saldo_pago', $this->fields['monto'] + $neteo['total']);
+				$this->Edit('saldo_pago', $moneda->getFloat($this->fields['monto'] + $neteo['total'], false));
 			} else {
-				$this->Edit('saldo_pago', $this->fields['monto']);
+				$this->Edit('saldo_pago', $moneda->getFloat($this->fields['monto'], false));
 			}
 
 			if ($id_cobro) {
@@ -190,9 +190,7 @@ class Documento extends Objeto {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}
-
 			if ($this->Write()) {
-
 				$id_documento = $this->fields['id_documento'];
 				$ids_monedas = explode(',', $ids_monedas_documento);
 				$tipo_cambios = is_array($tipo_cambios_documento)? $tipo_cambios_documento : explode(',', $tipo_cambios_documento);
@@ -269,8 +267,13 @@ class Documento extends Objeto {
 			$id_documento_cobro = $documento_cobro_aux->fields['id_documento'];
 			$pago_honorarios = $data['monto_honorarios'];
 			$pago_gastos = $data['monto_gastos'];
-			$cambio_cobro = $this->TipoCambioDocumento($this->sesion, $id_documento_cobro, $documento_cobro_aux->fields['id_moneda']);
 			$cambio_pago = $moneda->fields['tipo_cambio'];
+			$cambio_cobro = $cambio_pago;
+			if ($documento_cobro_aux->fields['id_moneda'] != $moneda->fields['id_moneda']) {
+				$moneda_actual_cobro = new Moneda($this->sesion);
+				$moneda_actual_cobro->Load($documento_cobro_aux->fields['id_moneda']);
+				$cambio_cobro = $moneda_actual_cobro->fields['tipo_cambio'];
+			}
 			$decimales_cobro = $moneda_documento_cobro->fields['cifras_decimales'];
 			$decimales_pago = $moneda->fields['cifras_decimales'];
 
@@ -285,7 +288,7 @@ class Documento extends Objeto {
 			//Si el neteo existía, está siendo modificado y se debe partir de 0:
 			if ($neteo_documento->Ids($id_documento, $id_documento_cobro)) {
 				if (!is_array($pagar_facturas)) {
-					$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro);
+					$out_neteos .= $neteo_documento->Reestablecer();
 				}
 			} else {
 				$out_neteos .= "<tr><td>No</td><td>0</td><td>0</td>";
@@ -325,6 +328,22 @@ class Documento extends Objeto {
 		list($suma) = mysql_fetch_array($resp);
 		$documento->Edit('saldo_pago', number_format($documento->fields['monto'] + $suma, 6, '.', ''));
 		return $documento->Write();
+	}
+
+	/**
+	 * Devuelve los gastos y honorarios descontando los pagos realizados
+	 * @return array
+	 */
+	function calcularSaldosCobro() {
+		$query = "SELECT
+			D.honorarios - IFNULL(SUM(ND.valor_cobro_honorarios), 0) AS saldo_honorarios,
+			D.gastos - IFNULL(SUM(ND.valor_cobro_gastos), 0) AS saldo_gastos
+			FROM documento AS D
+			LEFT JOIN neteo_documento AS ND ON ND.id_documento_cobro = D.id_documento
+			WHERE D.id_documento = {$this->fields['id_documento']}
+			GROUP BY D.id_documento";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		return mysql_fetch_assoc($resp);
 	}
 
 	function EliminarNeteos() {
@@ -433,8 +452,6 @@ class Documento extends Objeto {
 	}
 
 	function ListaPagos() {
-		$modulo_fact = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
-
 		$out = '';
 		$query = "SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
 					FROM neteo_documento
@@ -449,6 +466,8 @@ class Documento extends Objeto {
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
+		$Form = new Form();
+		$Html = &$Form->Html;
 		while (list($id, $honorarios, $gastos, $pago_retencion, $es_adelanto) = mysql_fetch_array($resp)) {
 			if ($id) {
 				if ($honorarios != 0) {
@@ -463,21 +482,37 @@ class Documento extends Objeto {
 				}
 
 				$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')) . $id;
-
-				if ($modulo_fact && !$es_adelanto) {
-					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>";
-					if ($this->sesion->usuario->TienePermiso('SADM')) {
-						//FFF: Lemontech puede editar los pagos con la interfaz vieja, solo para debug
-						$out.="<a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(" . $id . ")\" title=\"Editar Pago\">" . $nombre . "</a>";
-					} else {
-						$out.=$nombre;
-					}
-					$out.="</td><td align = right style=\"color: #333333; font-size: 10px;\"> " . $honorarios . ' ' . $gastos . " </td><td>&nbsp;</td></tr>";
+				$td1_style = 'white-space: nowrap; text-align: left;';
+				$td2_style = 'color: #333333; font-size: 10px; text-align: right;';
+				$link_style = 'color: blue; font-size: 11px;';
+				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+					$out .= $Html->tag('tr',
+							$Html->tag('td', $nombre, array('style' => $td1_style)) .
+							$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+							$Html->tag('td')
+					);
 				} else {
-					$out .= "<tr><td style='white-space: nowrap;text-align:left;'><a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(" . $id . ")\" title=\"Editar Pago\">" . $nombre . "</a></td><td align = right style=\"color: #333333; font-size: 10px;\"> " . $honorarios . ' ' . $gastos . " </td> <td><a target=_parent href='javascript:void(0)' onclick=\"EliminaDocumento($id)\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 title=Eliminar></a></td></tr>";
+					if ($es_adelanto) {
+						$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
+						$btn_link = $Form->image_link('cruz_roja.gif', false, array('onclick' => "EliminaDocumento($id)", 'target' => '_parent', 'title' => 'Eliminar'));
+						$out .= $Html->tag('tr',
+								$Html->tag('td', $nombre, array('style' => $td1_style)) .
+								$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+								$Html->tag('td', $btn_link)
+						);
+					} else {
+						if ($this->sesion->usuario->Es('SADM')) {
+							$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
+						}
+						$out .= $Html->tag('tr',
+								$Html->tag('td', $nombre, array('style' => $td1_style)) .
+								$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+								$Html->tag('td')
+						);
+					}
 				}
 				if ($pago_retencion) {
-					$out .= "<tr><td style='text-align:left;' colspan=2> ( Pago retención impuestos ) </td></tr>";
+					$out .= $Html->tag('tr', $Html->tag('td', '( Pago retención impuestos )', array('style' => $td1_style, 'colspan' => 3)));
 				}
 			}
 		}
@@ -903,14 +938,14 @@ class Documento extends Objeto {
 
 			$monto_honorarios = 0;
 			if ($honorarios > 0 && $pago_honorarios == 1) {
-				$monto_honorarios = $moneda_adelanto->getFloat($saldo_pago > $honorarios_convertidos ? $honorarios_convertidos : $saldo_pago);
+				$monto_honorarios = $moneda_adelanto->getFloat($rehacer_neteos ? $honorarios_convertidos : min($saldo_pago, $honorarios_convertidos));
 				$saldo_pago -= $monto_honorarios;
 				$honorarios_convertidos -= $monto_honorarios;
 			}
 
 			$monto_gastos = 0;
 			if ($gastos > 0 && $pago_gastos == 1) {
-				$monto_gastos = $moneda_adelanto->getFloat($saldo_pago > $gastos_convertidos ? $gastos_convertidos : $saldo_pago);
+				$monto_gastos = $moneda_adelanto->getFloat($rehacer_neteos ? $gastos_convertidos : min($saldo_pago, $gastos_convertidos));
 				$saldo_pago -= $monto_gastos;
 				$gastos_convertidos -= $monto_gastos;
 			}
@@ -919,7 +954,7 @@ class Documento extends Objeto {
 
 			if ($monto_honorarios > 0 || $monto_gastos > 0) {
 				$neteos = array(array(
-								'id_moneda' => $id_moneda,
+								'id_moneda' => $documento_cobro->fields['id_moneda'],
 								'id_documento_cobro' => $id_documento_cobro,
 								'monto_honorarios' => $monto_honorarios,
 								'monto_gastos' => $monto_gastos,

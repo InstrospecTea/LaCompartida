@@ -282,7 +282,7 @@ class FacturaPago extends Objeto {
 			if (!empty($this->fields['id_neteo_documento_adelanto'])) {
 				$neteo_documento = new NeteoDocumento($this->sesion);
 				$neteo_documento->Load($this->fields['id_neteo_documento_adelanto']);
-				$neteo_documento->Reestablecer(2);
+				$neteo_documento->Reestablecer();
 				$neteo_documento->Delete();
 			}
 			return $this->Delete();
@@ -857,7 +857,7 @@ class FacturaPago extends Objeto {
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-		
+
 		$billingBusiness = new BillingBusiness($this->sesion);
 		$charginBusiness = new ChargingBusiness($this->sesion);
 		$coiningBusiness = new CoiningBusiness($this->sesion);
@@ -889,9 +889,9 @@ class FacturaPago extends Objeto {
 				$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
 				$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
 				$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
-				
+
 				$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
-				$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');				
+				$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
 			}
 		}
 		return $results;
