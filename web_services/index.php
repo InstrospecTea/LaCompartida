@@ -149,6 +149,102 @@ $Slim->map('/EntregarDatos(/:callback)', 'EntregarDatos')->via('GET', 'POST');
 		}
 }
 
+$Slim->map('/EntregarDatosSemaforo(/:callback)', 'EntregarDatosSemaforo')->via('GET', 'POST');
+
+function EntregarDatosSemaforo($callback = '') {
+	global $sesion;
+	$Slim = Slim::getInstance('default',true);
+	$usuarios = array();
+
+	//$desde = date('Y-m-d');
+	//$meses = "1";
+	$a_ini = intval($Slim->request()->params('a_ini'));
+	$m_ini = intval($Slim->request()->params('m_ini'));
+	$a_fin = intval($Slim->request()->params('a_fin'));
+	$m_fin = intval($Slim->request()->params('m_fin'));
+
+	$desde = $a_ini . '-' . $m_ini . '-01';
+	$hasta = $a_fin . '-' . $m_fin . '-01';
+
+	$query_users = "SELECT SUM(timekeeper_activo) as profesionales_activos, SUM(activo) as usuarios_activos,  SUM(total) as usuarios_total, SUM(horas) as usuarios_horas
+	FROM
+	(
+		SELECT if( (up.id_usuario is not null OR !u.activo),1,0) as timekeeper_activo,
+		IF(u.activo, 1, 0) as activo, 1 as total,
+		SUM(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as horas
+		FROM  usuario u
+		LEFT JOIN usuario_permiso up ON up.id_usuario=u.id_usuario and up.codigo_permiso='PRO'
+		LEFT JOIN trabajo ON trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= '$desde 00:00:00' AND trabajo.fecha <= '$hasta 00:00:00'
+		GROUP BY u.id_usuario
+	) as t";
+
+	$query_creados = "SELECT SUM(total) as creados, SUM(total_minutos) as creados_minutos
+	FROM
+	(
+		SELECT 1 as total, total_minutos
+		FROM cobro c
+		WHERE c.fecha_emision IS NULL AND c.fecha_creacion BETWEEN  '$desde 00:00:00' AND '$hasta 00:00:00'
+	) as t";
+
+	$query_emitidos = "SELECT SUM(total) as emitidos, SUM(total_minutos) as emitidos_minutos
+	FROM
+	(
+		SELECT 1 as total, total_minutos
+		FROM cobro c
+		WHERE c.fecha_emision BETWEEN  '$desde 00:00:00' AND '$hasta 00:00:00'
+	) as t";
+
+	$query_pagos = "SELECT IFNULL( SUM(total) , 0) as pagos
+	FROM
+	(
+		SELECT 1 as total
+		FROM documento d
+		WHERE  d.monto_base < 0 AND d.fecha_creacion BETWEEN  '$desde 00:00:00' AND '$hasta 00:00:00'
+	) as t";
+
+	$resp_users = mysql_query($query_users, $sesion->dbh) or die(mysql_error());
+	$resp_creados = mysql_query($query_creados, $sesion->dbh) or die(mysql_error());
+	$resp_emitidos = mysql_query($query_emitidos, $sesion->dbh) or die(mysql_error());
+	$resp_pagos = mysql_query($query_pagos, $sesion->dbh) or die(mysql_error());
+
+	$data = array();
+	$data = array('a_ini' => $a_ini);
+
+	while ($fila = mysql_fetch_assoc($resp_users)) {
+		$datos_user = array('profesionales_activos', 'usuarios_activos', 'usuarios_total', 'usuarios_horas');
+		foreach ($datos_user as $d) {
+			$fila[$d] = utf8_encode($fila[$d]);
+		}
+		$data = array_merge($data, $fila);
+	}
+
+	while ($fila = mysql_fetch_assoc($resp_creados)) {
+		$datos_user = array('creados', 'creados_minutos');
+		foreach($datos_user as $d) {
+			$fila[$d] = utf8_encode($fila[$d]);
+		}
+		$data = array_merge($data, $fila);
+	}
+
+	while ($fila = mysql_fetch_assoc($resp_emitidos)) {
+		$datos_user = array('emitidos', 'emitidos_minutos');
+		foreach($datos_user as $d) {
+			$fila[$d] = utf8_encode($fila[$d]);
+		}
+		$data = array_merge($data,$fila);
+	}
+
+	while ($fila = mysql_fetch_assoc($resp_pagos)) {
+		$datos_user = array('pagos');
+		foreach($datos_user as $d) {
+			$fila[$d] = utf8_encode($fila[$d]);
+		}
+		$data = array_merge($data, $fila);
+	}
+
+	 echo json_encode($data);
+}
+
 //POST route
 $Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('GET', 'POST');
 
