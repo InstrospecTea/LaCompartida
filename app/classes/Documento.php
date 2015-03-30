@@ -469,51 +469,41 @@ class Documento extends Objeto {
 		$Form = new Form();
 		$Html = &$Form->Html;
 		while (list($id, $honorarios, $gastos, $pago_retencion, $es_adelanto) = mysql_fetch_array($resp)) {
-			if ($id) {
-				if ($honorarios != 0) {
-					$honorarios = 'Honorarios: ' . $honorarios;
-				} else {
-					$honorarios = '';
-				}
-				if ($gastos != 0) {
-					$gastos = 'Gastos: ' . $gastos;
-				} else {
-					$gastos = '';
-				}
+			if (!$id) {
+				continue;
+			}
+			if ($honorarios != 0) {
+				$honorarios = 'Honorarios: ' . $honorarios;
+			} else {
+				$honorarios = '';
+			}
+			if ($gastos != 0) {
+				$gastos = 'Gastos: ' . $gastos;
+			} else {
+				$gastos = '';
+			}
 
-				$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')) . $id;
-				$td1_style = 'white-space: nowrap; text-align: left;';
-				$td2_style = 'color: #333333; font-size: 10px; text-align: right;';
-				$link_style = 'color: blue; font-size: 11px;';
-				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-					$out .= $Html->tag('tr',
-							$Html->tag('td', $nombre, array('style' => $td1_style)) .
-							$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
-							$Html->tag('td')
-					);
-				} else {
-					if ($es_adelanto) {
-						$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
-						$btn_link = $Form->image_link('cruz_roja.gif', false, array('onclick' => "EliminaDocumento($id)", 'target' => '_parent', 'title' => 'Eliminar'));
-						$out .= $Html->tag('tr',
-								$Html->tag('td', $nombre, array('style' => $td1_style)) .
-								$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
-								$Html->tag('td', $btn_link)
-						);
-					} else {
-						if ($this->sesion->usuario->Es('SADM')) {
-							$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
-						}
-						$out .= $Html->tag('tr',
-								$Html->tag('td', $nombre, array('style' => $td1_style)) .
-								$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
-								$Html->tag('td')
-						);
-					}
-				}
-				if ($pago_retencion) {
-					$out .= $Html->tag('tr', $Html->tag('td', '( Pago retención impuestos )', array('style' => $td1_style, 'colspan' => 3)));
-				}
+			$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')) . $id;
+			$td1_style = 'white-space: nowrap; text-align: left;';
+			$td2_style = 'color: #333333; font-size: 10px; text-align: right;';
+			$link_style = 'color: blue; font-size: 11px;';
+			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+				$out .= $Html->tag('tr',
+						$Html->tag('td', $nombre, array('style' => $td1_style)) .
+						$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+						$Html->tag('td')
+				);
+			} else {
+				$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
+				$btn_link = $Form->image_link('cruz_roja.gif', false, array('onclick' => "EliminaDocumento($id)", 'target' => '_parent', 'title' => 'Eliminar'));
+				$out .= $Html->tag('tr',
+						$Html->tag('td', $nombre, array('style' => $td1_style)) .
+						$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+						$Html->tag('td', $btn_link)
+				);
+			}
+			if ($pago_retencion) {
+				$out .= $Html->tag('tr', $Html->tag('td', '( Pago retención impuestos )', array('style' => $td1_style, 'colspan' => 3)));
 			}
 		}
 		return $out;
