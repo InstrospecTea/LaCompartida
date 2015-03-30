@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.6.3
+Lunes 30 de Marzo 2015
+* **Fix:** [Permite eliminar pagos sin modulo de facturas.](https://github.com/LemontechSA/ttb/pull/891)
+* **Fix:** [corrige fecha de la alerta de horas semanales.](https://github.com/LemontechSA/ttb/pull/891)
+
 ## Hotfix 15.6.2
 Lunes 30 de Marzo 2015
 * **Fix:** [Corregir formato de decimales por JS en monto de facturas en paso 6 del cobro.](https://github.com/LemontechSA/ttb/pull/890)
