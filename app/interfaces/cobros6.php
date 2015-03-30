@@ -679,7 +679,7 @@ if (count($cobro->asuntos)) {
 			});
 		});
 	});
-	
+
 	jQuery('.detalle_honorarios_cobro').live('click', function() {
 		var id = jQuery(this).data('id');
 		var options = {
@@ -720,7 +720,7 @@ if (count($cobro->asuntos)) {
 				GeneraPopUpDetalleMonto(text_window);
 			}
 		});
-		
+
 	}
 
 	function GeneraPopUpDetalleMonto(html) {
