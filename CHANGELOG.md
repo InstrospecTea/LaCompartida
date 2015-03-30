@@ -2,7 +2,7 @@
 
 ## Hotfix 15.6.2
 Lunes 30 de Marzo 2015
-* **Fix:** [Corregir formato de decimales por JS en monto de facturas en paso 6 del cobro.](https://github.com/LemontechSA/ttb/pull/887)
+* **Fix:** [Corregir formato de decimales por JS en monto de facturas en paso 6 del cobro.](https://github.com/LemontechSA/ttb/pull/890)
 
 ## Hotfix 15.6.1
 Jueves 26 de Marzo 2015
