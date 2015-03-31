@@ -188,8 +188,8 @@ class AlertaCron {
 						CURDATE() fecha_fin
 					FROM trabajo
 					WHERE
-						fecha < CURDATE() AND
-						fecha >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+						fecha <= CURDATE() AND
+						fecha > DATE_SUB(CURDATE(), INTERVAL 7 DAY)
 						AND id_usuario = '$id_usuario'";
 		$resp = mysql_query($query);
 		$result = mysql_fetch_assoc($resp);
