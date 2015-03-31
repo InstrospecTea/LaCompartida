@@ -21,13 +21,21 @@ class WsFacturacionCl extends WsFacturacion {
 	 */
 	public function emitirFactura($dataFactura) {
 		$afecto = $dataFactura['afecto'];
+		$idDoc = array(
+			'TipoDTE' => $dataFactura['tipo_dte'],
+			'Folio' => $dataFactura['folio'],
+			'FchEmis' => $dataFactura['fecha_emision']
+		);
+		if ($dataFactura['tipo_dte'] == 39 || $dataFactura['tipo_dte'] == 41) {
+			$idDoc['Folio'] = 0;
+			$idDoc['IndServicio'] = 1;
+			$idDoc['IndMntNeto'] = 2;
+			$idDoc['PeriodoDesde'] = $dataFactura['fecha_desde'];
+			$idDoc['PeriodoHasta'] = $dataFactura['fecha_hasta'];
+		}
 		$documento = array(
 			'Encabezado' => array(
-				'IdDoc' => array(
-					'TipoDTE' => $dataFactura['tipo_dte'],
-					'Folio' => $dataFactura['folio'],
-					'FchEmis' => $dataFactura['fecha_emision']
-				),
+				'IdDoc' => $idDoc,
 				'Emisor' => array(
 					'RUTEmisor' => $dataFactura['emisor']['rut'],
 					'RznSoc' => $dataFactura['emisor']['razon_social'],
