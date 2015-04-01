@@ -13,7 +13,7 @@ require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
 	$fecha2	: fecha término periodo consulta, en formato dd-mm-aaaa.
 	$vista	: varible que indica la forma de agrupar los datos. Puede tomar los siguientes valores:
 	- 'profesional'
-	- 'mes'
+	- 'mes_reporte'
 	- 'glosa_cliente'
 	- 'glosa_asunto' : agrupa primero por cliente y luego por asunto.
  */
@@ -204,7 +204,7 @@ if ($vista == 'profesional') {
 		$ids[] = sprintf("%04d", $id_cli);
 		++$i;
 	}
-} elseif ($vista == 'mes') {
+} elseif ($vista == 'mes_reporte') {
 	for ($a = 0; $a < $fecha2_a - $fecha1_a + 1; ++$a) {
 		for ($m = ($a == 0 ? $fecha1_m[1] : 0); $m <= ($a == $fecha2_a - $fecha1_a ? $fecha2_m : 12); ++$m) {
 			$ws->write( ++$fila, $offset_columnas, ($fecha1_a + $a) . ' - ' . $meses[$m - 1], $formato_nombre);
@@ -391,7 +391,7 @@ function imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $columna, $form
 	foreach ($r as $k_a => $a) {
 		if (is_array($a)) {
 			foreach ($a as $filtro) {
-				if ($filtro['filtro_campo'] == 'id_usuario' || $filtro['filtro_campo'] == 'codigo_cliente' || $filtro['filtro_campo'] == 'mes' || $filtro['filtro_campo'] == 'codigo_asunto') {
+				if ($filtro['filtro_campo'] == 'id_usuario' || $filtro['filtro_campo'] == 'codigo_cliente' || $filtro['filtro_campo'] == 'mes_reporte' || $filtro['filtro_campo'] == 'codigo_asunto') {
 					for ($t = 0; $t < count($ids); ++$t) {
 						if ($filtro['filtro_valor'] == $ids[$t]) {
 							$ws->writeNumber($offset_filas + 1 + $t, $columna, $a['valor'] ? $a['valor'] : 0, $formato);
