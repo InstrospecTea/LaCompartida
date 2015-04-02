@@ -2253,6 +2253,8 @@ class Factura extends Objeto {
 	public function DownloadExcel($results, $tipo = 'Spreadsheet') {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
+		set_time_limit(0);
+
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('FACTURAS');
