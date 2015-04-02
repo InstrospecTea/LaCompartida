@@ -33,7 +33,7 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 
 <form method="POST" action="actividades.php" name="form_actividades" id="form_actividades">
 	<input type="hidden" name="xdesde" id="xdesde" value="">
-	<input type="hidden" name="opc" value="buscar">
+	<input type="hidden" name="opc" id="opc" value="buscar">
 
 	<div style="width: 95%; text-align: "right"; margin: 4px auto;" align="right">
 		<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Actividad'), 'agregar', array('id' => 'agregar_actividad')); ?>
