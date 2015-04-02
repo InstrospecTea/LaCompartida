@@ -116,7 +116,7 @@ HTML;
 	 */
 	public static function cajafacturasFilaFactura(Factura $Factura, Documento $Documento, $fila, $datos_factura) {
 		$color_fila = $fila % 2 ? '#f2f2ff' : '#ffffff';
-		$onclick = '';
+		$disabled = '';
 		$datos_factura['fecha'] = date('d-m-Y', strtotime($Factura->fields['fecha']));
 		$datos_factura['f_subtotal_sin_descuento'] = self::number_format($datos_factura['subtotal_sin_descuento']);
 		$datos_factura['f_subtotal_gastos'] = self::number_format($datos_factura['subtotal_gastos']);
@@ -134,7 +134,7 @@ HTML;
 		}
 
 		if ($datos_factura['saldo'] == 0) {
-			$onclick = 'this.checked=!this.checked';
+			$disabled = 'disabled';
 		}
 
 		$html = <<<HTML
@@ -157,7 +157,7 @@ HTML;
 				</td>
 
 				<td align="center">
-					<input type="checkbox" name="pagar_factura_{$datos_factura['id_factura']}" id="pagar_factura_{$datos_factura['id_factura']}" value="{$datos_factura['saldo']}" class="tooltip" alt="Active esta casilla y luego pinche en 'Pagar' para añadir pagos" onclick="{$onclick}" />
+					<input type="checkbox" name="pagar_factura_{$datos_factura['id_factura']}" id="pagar_factura_{$datos_factura['id_factura']}" value="{$datos_factura['saldo']}" class="tooltip" alt="Active esta casilla y luego pinche en 'Pagar' para añadir pagos" {$disabled} />
 				</td>
 				<td style="white-space:nowrap;cursor:pointer;">$html_tools</td>
 			</tr>
