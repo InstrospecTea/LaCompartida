@@ -1,5 +1,15 @@
 # Changelog
 
+## Hotfix 15.6.5
+Jueves 2 de Abril 2015
+* **Fix:** [No permite pagar un documento si este no tiene saldo pendiente](https://github.com/LemontechSA/ttb/pull/894)
+
+## Hotfix 15.6.4
+Jueves 2 de Abril 2015
+* **Fix:** [Se ocupa el reporte avanzado para que obtenga ese dato disminuyendo los tiempos de descarga](https://github.com/LemontechSA/ttb/pull/893)
+* **Fix:** [Se agrega id al campo opc en mantenedor de actividades](https://github.com/LemontechSA/ttb/pull/893)
+* **Fix:** [Se agrega el try/catch para evitar el problema de la Exception](https://github.com/LemontechSA/ttb/pull/893)
+
 ## Hotfix 15.6.3
 Lunes 30 de Marzo 2015
 * **Fix:** [Permite eliminar pagos sin modulo de facturas.](https://github.com/LemontechSA/ttb/pull/891)
