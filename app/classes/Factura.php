@@ -2597,8 +2597,13 @@ class Factura extends Objeto {
 				$coiningData[$id_moneda] = $currency;
 			}
 			if (is_null($charginData[$id_cobro])) {
-				$charge = $charginBusiness->getCharge($id_cobro);
-				$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+				try {
+					$charge = $charginBusiness->getCharge($id_cobro);
+					$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+				} catch (Exception $ex) {
+					error_log("No pudo cargar el cobro $id_cobro, significa que esta factura está asociada a un cobro inexistente");
+					continue;
+				}
 			}
 
 			$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);

@@ -122,8 +122,8 @@ $meses_corto = array(
 			<td align="left">
 				<select name="vista" id="vista" onchange="ShowSeleccion();">
 					<?php
-					$vistas = array('profesional', 'mes', 'glosa_cliente', 'glosa_asunto');
-					$nombre_vistas = array(__('profesional'), __('mes'), __('glosa_cliente'), __('glosa_cliente') . ' - ' . __('glosa_asunto'));
+					$vistas = array('profesional', 'mes_reporte', 'glosa_cliente', 'glosa_asunto');
+					$nombre_vistas = array(__('profesional'), __('Mes'), __('glosa_cliente'), __('glosa_cliente') . ' - ' . __('glosa_asunto'));
 					// Las vistas se escriben en el select en el lenguaje actual
 					for ($i = 0; $i < count($vistas); ++$i) {
 						echo "<option value='$vistas[$i]'>$nombre_vistas[$i]</option>\n";

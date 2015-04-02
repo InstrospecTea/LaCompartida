@@ -661,16 +661,27 @@ if ($accion == "consistencia_cliente_asunto") {
 		$id_moneda = ( isset($_GET["id_moneda"]) && is_numeric($_GET["id_moneda"]) ? $_GET["id_moneda"] : 0 );
 	}
 
-	$query_usuarios_profesionales = "SELECT CONCAT( apellido1,' ', apellido2, ', ', nombre) as nombre_completo FROM usuario as u
-			JOIN usuario_permiso as up USING( id_usuario )
-			WHERE up.codigo_permiso = 'PRO'";
+	$query_usuarios_profesionales = "SELECT
+			CONCAT( apellido1,' ', apellido2, ', ', nombre) as nombre_completo
+		FROM usuario as u
+		INNER JOIN usuario_permiso as up USING( id_usuario )
+		WHERE up.codigo_permiso = 'PRO'
+		AND u.activo = 1";
+
 	$resp_usuarios_profesionales = mysql_query($query_usuarios_profesionales, $sesion->dbh) or Utiles::errorSQL($query_usuarios_profesionales, __FILE__, __LINE__, $sesion->dbh);
 	$tup = mysql_num_rows($resp_usuarios_profesionales); // tup = total de usuarios con permisos PROfesional
-	$query_usarios_sin_tarifa = "SELECT CONCAT( apellido1,' ', apellido2, ', ', nombre) as nombre_completo FROM usuario as u
-			JOIN usuario_permiso as up USING( id_usuario )
-			WHERE up.codigo_permiso = 'PRO' AND u.id_usuario NOT IN (
-				SELECT ut.id_usuario FROM usuario_tarifa as ut WHERE ut.id_moneda=" . $id_moneda . " AND ut.id_tarifa = '" . $id_tarifa . "'
-			)";
+	$query_usarios_sin_tarifa = "SELECT
+			CONCAT( apellido1,' ', apellido2, ', ', nombre) as nombre_completo
+		FROM usuario as u
+		INNER JOIN usuario_permiso as up USING( id_usuario )
+		WHERE up.codigo_permiso = 'PRO'
+		AND u.activo = 1
+		AND u.id_usuario NOT IN (
+			SELECT ut.id_usuario
+			FROM usuario_tarifa as ut
+			WHERE ut.id_moneda='{$id_moneda}'
+			AND ut.id_tarifa = '{$id_tarifa}'
+		)";
 	$resp_usuarios_sin_tarifa = mysql_query($query_usarios_sin_tarifa, $sesion->dbh) or Utiles::errorSQL($query_usarios_sin_tarifa, __FILE__, __LINE__, $sesion->dbh);
 	$numrows = mysql_num_rows($resp_usuarios_sin_tarifa);
 	if ($numrows > 0) {
