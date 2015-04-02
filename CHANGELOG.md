@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.6
+Jueves 2 de Abril 2015
+* **Fix:** [corrige error sql 'select * from where = x'](https://github.com/LemontechSA/ttb/pull/895)
+
 ## Hotfix 15.6.5
 Jueves 2 de Abril 2015
 * **Fix:** [No permite pagar un documento si este no tiene saldo pendiente](https://github.com/LemontechSA/ttb/pull/894)
