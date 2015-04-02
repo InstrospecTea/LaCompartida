@@ -1,9 +1,11 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-
 class AreaTrabajo extends Objeto {
+
+	public function __construct($sesion, $fields = '', $params = '') {
+		parent::__construct($sesion, $fields, $params, 'prm_area_trabajo', 'id_area_trabajo', 'glosa');
+	}
+
 	/**
 	 * Find all work areas
 	 * Return an array with next elements:
