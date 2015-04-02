@@ -26,6 +26,11 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Neteos borrado.<br>';
 
+	/* Query para borrar las monedas de los documentos */
+	$query = "TRUNCATE TABLE documento_moneda";
+	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	echo 'Documento Moneda borrado.<br>';
+
 	/* Query para borrar documentos */
 	$query = "DELETE FROM documento WHERE 1";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -37,8 +42,7 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	echo 'Facturas Pagos borrado.<br>';
 
 	/* Query para borrar factura */
-	$query = "DELETE FROM factura 
-							 WHERE 1";
+	$query = "DELETE FROM factura WHERE 1";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Facturas borrado.<br>';
 
@@ -52,19 +56,32 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Todos los datos en cobro_moneda eliminado.<br>';
 
+	/* Borrar cobros movimiento */
+	$query = "TRUNCATE TABLE cobro_monvimiento";
+	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	echo 'Cobros Movimientos borrado.<br>';
+
 	/* Vuelva cobros emitidios atras a creado */
 	$query = " UPDATE cobro SET estado='CREADO' WHERE 1";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
 
 	/* Borrar cobros creados por visitantes */
 	$query = "DELETE FROM cobro WHERE 1";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Cobros borrado.<br>';
 
+	/* Borrar OLAP Liquidaciones */
+	$query = "TRUNCATE TABLE olap_liquidaciones";
+	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	echo 'OLAP Liquidaciones borrado.<br>';
+
+	/* Borrar OLAP Liquidaciones */
+	$query = "TRUNCATE TABLE trabajo_historial";
+	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	echo 'OLAP Liquidaciones borrado.<br>';
+
 	/* Borrar todos los trabajos creados por visitantes */
-	$query = "DELETE FROM trabajo 
-							 WHERE 1";
+	$query = "DELETE FROM trabajo WHERE 1";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Trabajos borrado.<br>';
 
