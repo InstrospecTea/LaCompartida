@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.6.7
+Lunes 6 de Abril 2015
+* **Fix:** [Corrige query de saldo total de facturas.](https://github.com/LemontechSA/ttb/pull/896)
+* **Fix:** [Agrega propiedad name a la columna oculta de Spreadsheet.](https://github.com/LemontechSA/ttb/pull/896)
+
 ## Hotfix 15.6.6
 Jueves 2 de Abril 2015
 * **Fix:** [corrige error sql 'select * from where = x'](https://github.com/LemontechSA/ttb/pull/895)
