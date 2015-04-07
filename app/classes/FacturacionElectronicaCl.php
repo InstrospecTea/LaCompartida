@@ -182,7 +182,10 @@ EOF;
 		if (!is_null($hookArg['Error'])) {
 			return $hookArg;
 		} else {
-			$name = sprintf('Factura_%s.pdf', $Factura->obtenerNumero());
+			$PrmDocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
+			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+			$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
+			$name = sprintf('%s_%s.pdf', $docName, $Factura->obtenerNumero());
 			header("Content-Transfer-Encoding: binary");
 			header("Content-Type: application/pdf");
 			header('Content-Description: File Transfer');

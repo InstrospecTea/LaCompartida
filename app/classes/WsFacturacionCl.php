@@ -145,9 +145,10 @@ class WsFacturacionCl extends WsFacturacion {
 	}
 
 	public function getPdfUrl($documento, $original = true) {
+		$tipomov = in_array($documento['TipoDte'], array(39, 41)) ? 'B' : substr($documento['Operacion'], 0, 1);
 		$params = array(
 			'login' => $this->getLogin(),
-			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
+			'tpomov' => base64_encode($tipomov),
 			'folio' => base64_encode($documento['Folio']),
 			'tipo' => base64_encode($documento['TipoDte']),
 			'cedible' => base64_encode($original ? 'False' : 'True')
