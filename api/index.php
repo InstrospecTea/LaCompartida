@@ -684,7 +684,7 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 			if ($error) {
 				halt($error['Message'] ? __($error['Message']) : __($error['Code']), $error['Code'], 400, $data['ExtraData']);
 			} else {
-				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData']));
+				outputJson(array('invoice_url' => $data['InvoiceURL'], 'extra_data' => $data['ExtraData'], 'alert' => $data['Alerta']));
 			}
 		}
 	} else {
@@ -825,13 +825,14 @@ function validateAuthTokenSendByHeaders($permission = null) {
 	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
 	$user_token = $UserToken->findByAuthToken($auth_token);
-	$app_id = $UserToken->getAppIdByAppKey($app_key);
-	$_SESSION['app_id'] = is_null($app_id) ? 1 : $app_id;
 
 	// if not exist the auth_token then return error
 	if (!is_object($user_token)) {
 		halt(__('Invalid AUTH TOKEN'), 'SecurityError', 401);
 	} else {
+		$app_id = $UserToken->getAppIdByAppKey($user_token->app_key);
+		$_SESSION['app_id'] = is_null($app_id) ? 1 : $app_id;
+
 		// verify if the token is expired
 		// date_default_timezone_set("UTC");
 		$now = time();

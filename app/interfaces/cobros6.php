@@ -44,13 +44,12 @@ if($opc == 'descargar_ledes'){
 	exit;
 }
 
-if ($opc == "eliminar_documento") {
+if ($opc == 'eliminar_documento') {
 	$documento_eliminado = new Documento($sesion);
 	$documento_eliminado->Load($id_documento_eliminado);
-
-	if (empty($documento_eliminado->fields['es_adelanto'])) {
+	if (!$documento_eliminado->fields['es_adelanto']) {
 		$documento_eliminado->EliminarNeteos();
-		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '" . $id_documento_eliminado . "' ";
+		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '{$id_documento_eliminado}' ";
 		mysql_query($query_p, $sesion->dbh) or Utiles::errorSQL($query_p, __FILE__, __LINE__, $sesion->dbh);
 
 		if ($documento_eliminado->Delete()) {
@@ -385,7 +384,7 @@ if ($opc == 'guardar') {
 		}
 	}
 
-	if ($email_cliente != $contrato->fields['email_contacto']) {
+	if (!empty($_POST) && $email_cliente != $contrato->fields['email_contacto']) {
 		$contrato->Edit('email_contacto', $email_cliente);
 		$contrato->Write();
 	}
@@ -680,6 +679,71 @@ if (count($cobro->asuntos)) {
 			});
 		});
 	});
+
+	jQuery('.detalle_honorarios_cobro').live('click', function() {
+		var id = jQuery(this).data('id');
+		var options = {
+			"charge": id,
+			"language": 'es'
+		}
+		DetalleHonorarios(options, 'Charge');
+	});
+
+	jQuery('.detalle_honorarios_factura').live('click', function() {
+		var id = jQuery(this).data('id');
+		var chargeId = jQuery(this).data('chargeid');
+		var options = {
+			"invoice": id,
+			"charge": chargeId,
+			"language": 'es'
+		}
+		DetalleHonorarios(options, 'Invoice');
+	});
+
+	function DetalleHonorarios(options, type) {
+		var text_window = '';
+		jQuery.ajax({
+			type: "POST",
+			dataType: "JSON",
+			url: root_dir + '/app/' + type + '/feeAmountDetailTable/',
+			data: options,
+			success: function(data, status, jqXHR) {
+				if (data && data.detail) {
+					text_window += data.detail;
+				} else {
+					text_window += "No existe desglose";
+				}
+				GeneraPopUpDetalleMonto(text_window);
+			},
+			error: function(jqXHR, status, error) {
+				text_window += '<p>No se ha encontrado información.<p/>';
+				GeneraPopUpDetalleMonto(text_window);
+			}
+		});
+
+	}
+
+	function GeneraPopUpDetalleMonto(html) {
+		jQuery('<p/>')
+			.attr('title', 'Desglose del monto')
+			.html(html)
+			.dialog({
+				resizable: true,
+				height: 350,
+				width: 420,
+				modal: true,
+				open: function() {
+					jQuery('.ui-dialog-title').addClass('ui-icon-info');
+					jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+				},
+				buttons: {
+					"<?php echo __('Aceptar') ?>": function() {
+						jQuery(this).dialog('close');
+						return false;
+					}
+				}
+			});
+	}
 
     function Refrescarse()
     {
@@ -988,23 +1052,23 @@ if (count($cobro->asuntos)) {
 			}
 
 			if (opcion == 'imprimir') {
-	<?php if (Conf::GetConf($sesion, 'ImprimirFacturaPdf') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+				<?php if (Conf::GetConf($sesion, 'ImprimirFacturaPdf') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 						nuovaFinestra('Imprimir_Factura',800,600,'agregar_factura.php?opc=generar_factura&id_cobro=<?php echo $id_cobro ?>&id_factura='+id_factura, 'top=500, left=500, scrollbars=yes');
 						//ValidarTodo(form);
-	<?php } else { ?>
+				<?php } else { ?>
 						form.opc.value='grabar_documento_factura';
 						form.id_factura_grabada.value = id_factura;
-	<?php } ?>
-				} else if(opcion =='imprimir_pdf') {
-					form.opc.value = 'grabar_documento_factura_pdf';
-					form.id_factura_grabada.value = id_factura;
-				} else {
-					$('facturado').checked = true;
-					form.opc.value = 'facturar';
-				}
+				<?php } ?>
+			} else if(opcion =='imprimir_pdf') {
+				form.opc.value = 'grabar_documento_factura_pdf';
+				form.id_factura_grabada.value = id_factura;
+			} else {
+				$('facturado').checked = true;
+				form.opc.value = 'facturar';
+			}
 
-				form.submit();
-				return true;
+			form.submit();
+			return true;
 <?php } else { ?>
 			alert('Funcionalidad en desarrollo.');
 			return false;
@@ -1159,10 +1223,8 @@ if (count($cobro->asuntos)) {
 		return nuevaVentana('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
 	}
 
-	function EliminaDocumento(id_documento)
-	{
-		var form = $('todo_cobro');
-		if (parseInt(id_documento) > 0 && confirm('¿Desea eliminar el pago #' + id_documento + '?') == true) {
+	function EliminaDocumento(id_documento) {
+		if (parseInt(id_documento) > 0 && confirm('¿Desea eliminar el pago #' + id_documento + '?')) {
 			self.location.href = 'cobros6.php?popup=1&id_cobro=' + <?php echo $id_cobro; ?> + '&id_documento_eliminado=' + id_documento + '&opc=eliminar_documento';
 		}
 	}
@@ -1190,10 +1252,9 @@ if (count($cobro->asuntos)) {
 			$id_tipo_documento[$codigo] = $id;
 		}
 		?>
-        var honorarios = jQuery('#honorarios_' + idx).val().replace(',', '').replace(',', '') * 1;
-
-        var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val()*1;
-        var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1;
+        var honorarios = jQuery('#honorarios_' + idx).val().replace(',', '') * 1;
+        var gastos_con_impuestos = jQuery('#gastos_con_impuestos_' + idx).val().replace(',', '') * 1;
+        var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val().replace(',', '') * 1;
 
         var honorarios_disp = jQuery('#honorarios_disponibles').val()*1;
 		var trabajos_disp = jQuery('#trabajos_disponibles').val()*1;
@@ -1262,16 +1323,21 @@ if (count($cobro->asuntos)) {
         return Number(texto);
     }
 
-    function UsarAdelanto(honorarios, gastos){
-        nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>' +
-            '&codigo_cliente=<?php echo $cobro->fields['codigo_cliente'] ?>&elegir_para_pago=1&mantener_ventana=1'+
-            (honorarios ? '&pago_honorarios=1' : '')+
-            (gastos ? '&pago_gastos=1' : '')+
-            '&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>',
-        'top=\'100\', left=\'125\', scrollbars=\'yes\'');
-
-        return false;
-    }
+	function UsarAdelanto(honorarios, gastos){
+		var params = {
+			popup: 1,
+			id_cobro: '<?php echo $id_cobro ?>',
+			codigo_cliente: '<?php echo $cobro->fields['codigo_cliente'] ?>',
+			elegir_para_pago: 1,
+			mantener_ventana: 1,
+			id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
+			desde_factura_pago: 0,
+			pago_honorarios: honorarios ? 1 : 0,
+			pago_gastos: gastos ? 1 : 0
+		};
+		nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
+		return false;
+}
 <?php  ($Slim=Slim::getInstance()) ? $Slim->applyHook('hook_cobro6_javascript_after') : false; ?>
 </script>
 <br />

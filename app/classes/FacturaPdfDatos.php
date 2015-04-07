@@ -61,6 +61,10 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
+		$chargingBusiness = new ChargingBusiness($this->sesion);
+		$coiningBusiness = new CoiningBusiness($this->sesion);
+		$billingBusiness = new BillingBusiness($this->sesion);
+
 		// Segmento Condiciones de pago
 		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 
@@ -74,7 +78,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		// Segmento Monto en palabra solicitado por @gtigre
-		$arreglo_monedas = ArregloMonedas($this->sesion);
+		$arreglo_monedas = Moneda::GetMonedas($this->sesion, null, true);
 		$monto_palabra=new MontoEnPalabra($this->sesion);
 
 		$monto_total_factura = $factura->fields['total'];
@@ -139,7 +143,6 @@ class FacturaPdfDatos extends Objeto {
 		if ($factura->fields['porcentaje_impuesto'] == 0) {
 			$honorarios_sin_impuesto = $factura->fields['honorarios'];
 		}
-
 
 		switch( $tipo_dato ) {
 			case 'razon_social':
@@ -211,6 +214,12 @@ class FacturaPdfDatos extends Objeto {
 			case 'nota_factura':
 				$glosa_dato = $condicion_pago;
 				break;
+			case 'desc_subtotal_honorarios':
+				$glosa_dato = __('SUBTOTAL') .  ' ' . _('HONORARIOS');
+				break;
+			case 'desc_descuento_honorarios':
+				$glosa_dato = __('DESCUENTO') .  ' ' . _('HONORARIOS');
+				break;
 			case 'descripcion_honorarios':
 				$glosa_dato = $factura->fields['descripcion'];
 				break;
@@ -223,6 +232,34 @@ class FacturaPdfDatos extends Objeto {
 			case 'monto_honorarios':
 				$glosa_dato = number_format(
 					$factura->fields['subtotal_sin_descuento'],
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_descuento_honorarios':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+			
+				$glosa_dato = number_format(
+					-1 * $detail->get('descuento_honorarios'),
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_subtotal_honorarios':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+			
+				$glosa_dato = number_format(
+					$detail->get('subtotal_honorarios'),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
@@ -243,6 +280,12 @@ class FacturaPdfDatos extends Objeto {
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
 				);
+				break;
+			case 'moneda_subtotal_honorarios':
+				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
+				break;
+			case 'moneda_descuento_honorarios':
+				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 				break;
 			case 'moneda_honorarios':
 				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
@@ -280,6 +323,34 @@ class FacturaPdfDatos extends Objeto {
 				break;
 			case 'moneda_total':
 				$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
+				break;
+			case 'monto_subtotal_bruto':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+				$discount = $detail->get('descuento_honorarios');
+				$glosa_dato = number_format(
+					$discount + $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_descuento':
+				$chargeId = $factura->fields['id_cobro'];
+				$charge = $chargingBusiness->getCharge($chargeId);
+				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
+				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
+				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
+				$discount = $detail->get('descuento_honorarios');
+				$glosa_dato = number_format(
+					-1 * $discount,
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
 				break;
 			case 'monto_subtotal':
 				$glosa_dato = number_format(
@@ -323,9 +394,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'solicitante':
 				$glosa_dato = $contrato->fields['contacto'];
 				break;
-            case 'lbl_fecha_vencimiento':
-                $glosa_dato = 'Fecha Vencimiento / Due Date:';
-                break;
+			case 'lbl_fecha_vencimiento':
+				$glosa_dato = 'Fecha Vencimiento / Due Date:';
+				break;
 			case 'monto_honorarios_con_iva':
 				$glosa_dato = number_format($factura->fields['honorarios'] * ( 1 + ( $factura->fields['porcentaje_impuesto'] / 100) ),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -346,7 +417,7 @@ class FacturaPdfDatos extends Objeto {
 				break;
 
 			default:
-			
+
 				if (array_key_exists($tipo_dato, $array_comodines)) {
 					$glosa_dato = $array_comodines[$tipo_dato];
 				}
@@ -368,7 +439,7 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($cobro->fields['codigo_idioma']);
 
-		$arreglo_monedas = ArregloMonedas($this->sesion);
+		$arreglo_monedas = Moneda::GetMonedas($this->sesion, null, true);
 		$monto_palabra = new MontoEnPalabra($this->sesion);
 		$fila = array();
 
@@ -389,6 +460,8 @@ class FacturaPdfDatos extends Objeto {
 		$fila['fecha_ano_ultima_cifra'] = substr(date("Y",strtotime($factura->fields['fecha'])),-1);
 		$fila['fecha_ano_dos_ultimas_cifras'] = substr(date("Y",strtotime($factura->fields['fecha'])),-2);
 		$fila['direccion'] = $factura->fields['direccion_cliente'];
+		$fila['desc_subtotal_honorarios'] = __('Subtotal Honorarios');
+		$fila['desc_descuento_honorarios'] = __('Descuento Honorarios');
 		$fila['descripcion_honorarios'] = $factura->fields['descripcion'];
 		$fila['descripcion_gastos_con_iva'] = $factura->fields['descripcion_subtotal_gastos'];
 		$fila['descripcion_gastos_sin_iva'] = $factura->fields['descripcion_subtotal_gastos_sin_impuesto'];
@@ -410,6 +483,8 @@ class FacturaPdfDatos extends Objeto {
 			$idioma->fields['separador_decimales'],
 			$idioma->fields['separador_miles']
 		);
+		$fila['moneda_subtotal_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
+		$fila['moneda_descuento_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 		$fila['moneda_honorarios'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 		$fila['moneda_gastos_con_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
 		$fila['moneda_gastos_sin_iva'] = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'];
@@ -551,6 +626,7 @@ class FacturaPdfDatos extends Objeto {
 		if ($mantencion) {
 			// $pdf->Output("../../pdf/factura.pdf","F");
 		} else {
+			ob_end_clean();
 			$pdf->Output($glosa_documento_legal . '_' . $factura->fields['numero'] . '.pdf', 'D');
 		}
 	}

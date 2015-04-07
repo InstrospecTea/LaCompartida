@@ -9,6 +9,22 @@ class ReportController extends AbstractController {
 		exit;
 	}
 
+	public function agrupatedWorkFilters() {
+		$this->loadBusiness('Coining');
+		
+		$this->set('gropued_by_default', 'lawyer');
+		$this->set('gropued_by', array('lawyer' => 'Abogado', 'client' => 'Cliente'));
+		$this->set('mostrar_valores', array('Horas Trabajadas', 'Horas Facturables'));
+		$this->set('monedas', $this->CoiningBusiness->currenciesToArray($this->CoiningBusiness->getCurrencies()));
+		
+		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
+		$this->set('moneda_base', $moneda_base->get($moneda_base->getIdentity()));
+
+		$response['detail'] = $this->renderTemplate('Reports/agrupated_work_filters');
+		
+		$this->renderJSON($response);
+	}		
+
 	public function productionByPeriod() {
 		$this->loadBusiness('Working');
 		$this->loadBusiness('Coining');

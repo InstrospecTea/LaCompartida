@@ -61,9 +61,9 @@ $Form = new Form;
 
 			if (codigo_cliente == '') {
 				if (usocodigosecundario != '1') {
-					codigo_cliente = jQuery("#campo_codigo_cliente").val();
+					codigo_cliente = jQuery("#campo_codigo_cliente, #codigo_cliente").val();
 				} else {
-					codigo_cliente = jQuery("#campo_codigo_cliente_secundario").val();
+					codigo_cliente = jQuery("#campo_codigo_cliente_secundario, #codigo_cliente_secundario").val();
 				}
  			}
 
@@ -331,19 +331,25 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.id_tipo_asunto = '$id_tipo_asunto' ";
 	}
 
+	$cantidad_decimales_ingreso_horas = Conf::GetConf($Sesion, 'CantidadDecimalesIngresoHoras');
+	if ($cantidad_decimales_ingreso_horas == '') {
+		$cantidad_decimales_ingreso_horas = 1;
+	}
+
 	// Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
 	$query = "SELECT SQL_CALC_FOUND_ROWS cliente.glosa_cliente, a1.glosa_asunto, a1.codigo_asunto, a1.codigo_asunto_secundario, a1.id_moneda, a1.activo,
 		a1.fecha_creacion, contrato.codigo_contrato, a1.id_asunto,
 		(
-			SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600
+			SELECT TRUNCATE(SUM(TIME_TO_SEC(duracion_cobrada)) / 3600, {$cantidad_decimales_ingreso_horas})
 			FROM trabajo AS t2
-				LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
+				LEFT JOIN cobro on t2.id_cobro = cobro.id_cobro
 			WHERE 1
-				AND t2.codigo_asunto=a1.codigo_asunto
+				AND t2.codigo_asunto = a1.codigo_asunto
 				AND t2.cobrable = 1
+				AND (cobro.estado IS NULL OR cobro.estado IN ('CREADO', 'EN REVISION'))
 		) AS horas_no_cobradas,
 		(
-			SELECT SUM(TIME_TO_SEC(duracion))/3600
+			SELECT TRUNCATE(SUM(TIME_TO_SEC(duracion)) / 3600, {$cantidad_decimales_ingreso_horas})
 			FROM trabajo AS t3
 			WHERE t3.codigo_asunto = a1.codigo_asunto AND t3.cobrable = 1
 		) AS horas_trabajadas,

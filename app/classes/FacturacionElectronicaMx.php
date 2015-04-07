@@ -5,26 +5,35 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 	public static function InsertaMetodoPago() {
 		global $factura, $contrato;
 		$Sesion = new Sesion();
+		$Form = new Form();
+		$Form->defaultLabel = false;
 		echo '<tr>';
-		echo '<td align="right" colspan="1">' . __('País') . '------</td>';
+		echo '<td align="right" colspan="1">' . __('País') . '</td>';
 		echo '<td align="left" colspan="3">';
-		echo Html::SelectQuery($Sesion, "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC", "dte_id_pais", $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160);
+		echo Html::SelectQuery($Sesion, 'SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC', 'dte_id_pais', $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160);
 		echo '</td>';
 		echo '</tr>';
 
-		echo "<tr>";
-		echo "<td align='right'>M&eacute;todo de Pago</td>";
-		echo "<td align='left' colspan='3'>";
-		echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", "dte_metodo_pago", $factura->fields['dte_metodo_pago'], "", "", "300");
+		echo '<tr>';
+		echo '<td align="right">M&eacute;todo de Pago</td>';
+		echo '<td align="left" colspan="3">';
+		echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');
 		$cta_pago = $factura->fields['dte_metodo_pago_cta'];
 		if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
 			$cta_pago = "";
 		} else {
 			$cta_pago = (int) $cta_pago;
 		}
-		echo "<input type='text' name='dte_metodo_pago_cta' placeholder='No. cuenta' value='" . $cta_pago . "' id='dte_metodo_pago_cta' size='10' maxlength='30'>";
+		echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		echo "</td>";
-		echo "</tr>";
+		echo '</tr>';
+
+		echo '<tr>';
+		echo '<td align="right">' . __('Nota o comentario') . '</td>';
+		echo '<td align="left" colspan="3">';
+		echo $Form->input('dte_comentario', $factura->fields['dte_comentario'], array('size' => '70', 'maxlength' => '255'));
+		echo '</td>';
+		echo '</tr>';
 	}
 
 	public static function BotonDescargarHTML($id_factura) {
@@ -140,7 +149,7 @@ EOF;
 						$hookArg['InvoiceURL'] = $file_url;
 					}
 				} catch (Exception $ex) {
-					self::ParseError($ex, 'BuildingInvoiceError');
+					$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
 				}
 			} else {
 				$hookArg['Error'] = self::ParseError($result, 'BuildingInvoiceError');
@@ -259,7 +268,7 @@ EOF;
 
 		$tra = array();
 		if ($Factura->fields['iva'] > 0) {
-			$tra = array( 
+			$tra = array(
 				'impuesto|IVA',
 				'importe|' . number_format($Factura->fields['iva'], 2, '.', ''),
 				'tasa|' . number_format($Factura->fields['porcentaje_impuesto'], 2, '.', '')
@@ -364,6 +373,10 @@ EOF;
 				'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
 				'descuento|0.00'
 			);
+		}
+
+		if (!empty($Factura->fields['dte_comentario'])) {
+			$r['ADI'] = array('comentarios|' . $Factura->fields['dte_comentario']);
 		}
 
 		foreach ($r as $identificador => $valores) {

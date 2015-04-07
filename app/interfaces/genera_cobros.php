@@ -2,6 +2,9 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+require_once dirname(__FILE__) . '/../../fw/classes/Buscador.php';
+require_once dirname(__FILE__) . '/../classes/Trabajo.php';
+
 $sesion = new Sesion(array('COB', 'DAT'));
 $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
@@ -177,10 +180,14 @@ if ($opc == 'buscar') {
 									fecha_ini: fecha_ini,
 									fecha_fin: fecha_fin
 								};
-								jQuery.get('ajax.php', data, function(response) {
-									var td = jQuery('<td/>').html(response).attr('colspan', 4);
-									jQuery(me).closest('tr').html(td);
-								});
+								jQuery.get('ajax.php', data, function(deleting) {
+									if (deleting.error) {
+										alert(deleting.message);
+									} else {
+										var div = jQuery('<div/>').addClass('alert alert-danger alert-thin').html(deleting.message);
+										jQuery('#cobros_' + i).html(div);
+									}
+								}, 'json');
 								jQuery(this).dialog("close");
 								return true;
 							},
@@ -743,11 +750,7 @@ if ($opc == 'buscar') {
 					}
 				});
 
-
-
-
-
-	}
+}
 
 	var timerProcessLock;
 	var seconds = 4;

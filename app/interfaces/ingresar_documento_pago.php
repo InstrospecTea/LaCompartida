@@ -3,8 +3,8 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('COB'));
-$autocompletador = (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador');
-$codigoSecundario = (UtilesApp::GetConf($sesion, 'CodigoSecundario'));
+$autocompletador = (Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador');
+$codigoSecundario = (Conf::GetConf($sesion, 'CodigoSecundario'));
 
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
@@ -32,7 +32,7 @@ if ($id_cobro) {
 
 $id_solicitud_adelanto = $_REQUEST['id_solicitud_adelanto'];
 
-if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
+if ($id_solicitud_adelanto && !$id_documento && Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
 	// Para asociar una solicitud al adelanto
 	require_once Conf::ServerDir() . '/classes/SolicitudAdelanto.php';
 
@@ -73,7 +73,7 @@ $cambios_en_saldo_gastos = array();
 if ($id_documento) {
 	$documento->Load($id_documento);
 
-	if (UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
+	if (Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
 		$id_solicitud_adelanto = $documento->fields['id_solicitud_adelanto'];
 	}
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false;
@@ -132,7 +132,6 @@ if ($opcion == "guardar") {
 	$usando_adelanto = $id_documento && !$adelanto && $documento->fields['es_adelanto'];
 
 	$sentencia.=implode("\n", $arreglo_pagos_detalle);
-	$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='el bit es $usando_adelanto y sentencias:" . $sentencia . "\n" . $mensaje1 . "\n" . $mensaje2 . "'";
 
 	try {
 		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $usando_adelanto, $id_contrato, !empty($pagar_facturas), $id_usuario_ingresa, $id_usuario_orden, $id_solicitud_adelanto, $codigo_asunto);
@@ -163,6 +162,7 @@ $txt_tipo = empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelan
 $pagina->titulo = $txt_pagina;
 
 $pagina->PrintTop($popup);
+$Form = new Form();
 ?>
 
 <script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
@@ -181,7 +181,7 @@ $pagina->PrintTop($popup);
     function formato_numeros() {
 		var cantidad_decimales = $('cifras_decimales').value;
 		var ceros = "0".times(parseFloat(cantidad_decimales));
-		var decimales = '#.' + ceros;
+		var decimales = '0.' + ceros;
 		format = decimales;
 		return {format: format, locale: 'us'};
 	}
@@ -270,7 +270,7 @@ $pagina->PrintTop($popup);
 				alert('El adelanto se ha usado para pagar gastos. No puede deshabilitar esta opción.');
 				return false;
 			}
-		<?php } else if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura') && $monto_usado === null) { ?>
+		<?php } else if (Conf::GetConf($sesion, 'NuevoModuloFactura') && $monto_usado === null) { ?>
 			var hayFacturas = $(window.opener.document.documentElement).select('[id^="saldo"]').any(function(e){
 				return $(e).next('[id^="id_moneda"][value="'+$F('id_moneda')+'"]');
 			});
@@ -322,7 +322,7 @@ $pagina->PrintTop($popup);
 				jQuery('#monto_aux').val(Number(total));
 				jQuery('#monto_pagos').val(Number(total));
 			}
-			jQuery('#saldo_pago').val(monto_adelanto-total).formatNumber(formato_numeros());
+			jQuery('#saldo_pago').val(monto_adelanto - total);
 		}
 
 		if (jQuery('#saldo_pago_aux').length>0) {
@@ -335,7 +335,7 @@ $pagina->PrintTop($popup);
 				SetMontoPagos();
 			}
 
-			jQuery('#saldo_pago').val(saldopagomaximo-total) ;
+			jQuery('#saldo_pago').val(saldopagomaximo - total) ;
 		}
 		jQuery('#saldo_pago').formatNumber(formato_numeros());
 	}
@@ -503,7 +503,8 @@ $pagina->PrintTop($popup);
 			if (tipopago=='editaadelanto') {
 				jQuery('#overlaytipocambio').hide();
 				monedaadelanto = jQuery('#id_moneda').val();
-				jQuery('#id_moneda').attr({'id': 'readonlymoneda', 'name': 'readonlymoneda', 'readonly': 'readonly'});
+				jQuery('#id_moneda').attr({'id': 'readonlymoneda', 'name': 'readonlymoneda'});
+				jQuery('#readonlymoneda').prop('disabled', 'disabled');
 				jQuery('#tabla_informacion').append('<input id="id_moneda" name="id_moneda" type="hidden" value="'+monedaadelanto+'" />');
 			}
 			if (tipopago=='documento' || tipopago=='nuevopago' || tipopago=='adelanto') {
@@ -541,7 +542,7 @@ $pagina->PrintTop($popup);
 						} else {
 							jQuery('#monto').val(Math.min(total,anterior+1.000*(jQuery('#saldo_pago_aux').val()))).formatNumber(formato_numeros());
 						}
-						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val());
+						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val()).formatNumber(formato_numeros());
 
 					} else {
 						if (tipopago=='documento' || tipopago=='adelanto') {
@@ -824,28 +825,29 @@ $pagina->PrintTop($popup);
 				$query = "SELECT count(*) FROM documento WHERE pago_retencion = 1 AND id_cobro = '$id_cobro'";
 				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 				list( $existe_pago_retencion ) = mysql_fetch_array($resp);
-				if (!$existe_pago_retencion && $id_cobro && UtilesApp::GetConf($sesion, 'PagoRetencionImpuesto') && (!$id_documento || $documento->fields['es_adelanto'] != '1')) {
+				if (!$existe_pago_retencion && $id_cobro && Conf::GetConf($sesion, 'PagoRetencionImpuesto') && (!$id_documento || $documento->fields['es_adelanto'] != '1')) {
 					?>
 					<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value="1" <?php echo $pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?php echo __('Pago retención impuestos') ?>&nbsp;
 					<?php
 				}
 				if ($id_cobro) {
-					$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
-					$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
-					$hay_adelantos = $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
+					$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0;
+					$pago_gastos = $documento_cobro->fields['saldo_gastos'] > 0;
+					$hay_adelantos = ($pago_honorarios || $pago_gastos) && $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 				} else {
 					$hay_adelantos = false;
 				}
 				if (!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos) {
-					$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
-					$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';
+					$pago_honorarios = $pago_honorarios ? '&pago_honorarios=1' : '';
+					$pago_gastos = $pago_gastos ? '&pago_gastos=1' : '';
 					?>
-					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
+					<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $pago_gastos; ?><?php echo $pago_honorarios; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=100, left=125, scrollbars=yes');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
 				<?php } ?>
 			</td>
 		</tr>
 	</table>
-	<table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
+	<hr/>
+	<table id="tabla_informacion" width='90%'>
 		<tr>
 			<td align="right"><?php echo __('Fecha') ?></td>
 			<td align="left">
@@ -853,7 +855,7 @@ $pagina->PrintTop($popup);
 
 			</td>
 		</tr>
-		<?php if ($id_solicitud_adelanto && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
+		<?php if ($id_solicitud_adelanto && Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
 			<tr>
 				<td align="right"><?php echo __('Solicitud de Adelanto') ?></td>
 				<td align="left">
@@ -868,7 +870,15 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 		<?php
+		if (isset($documento->fields['id_contrato']) && empty($id_contrato)) {
+			$id_contrato = $documento->fields['id_contrato'];
+		}
+
 		if ($adelanto) {
+			if (isset($documento->fields['id_contrato']) && empty($id_contrato)) {
+				$id_contrato = $documento->fields['id_contrato'];
+			}
+
 			UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, 280);
 		}
 		?>
@@ -898,8 +908,9 @@ $pagina->PrintTop($popup);
 				} else {
 					$moneda_usada = '';
 				}
+				$Moneda = new Moneda($sesion);
+				echo $Form->select('id_moneda', $Moneda->Listar(), $moneda_usada, array('style' => 'width: 80px', 'empty' => false, 'disabled' => $pago && $documento->fields['es_adelanto']));
 				?>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $moneda_usada, '', '', "80"); ?>
 				<input type="hidden" name="id_moneda_aux" id="moneda_aux" value='<?php echo $moneda_usada ?>'/>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
@@ -912,7 +923,7 @@ $pagina->PrintTop($popup);
 				</td>
 				<td align="left">
 					<input type="text" name="saldo_pago" id="saldo_pago" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
-					<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
+					<input type="text" class="oculto" style="display:none;" name="saldo_pago_aux" id="saldo_pago_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>
 				</td>
 			</tr>
 		<?php } ?>
@@ -1096,7 +1107,7 @@ $pagina->PrintTop($popup);
 		?>
 	</table>
 
-	<br>
+	<hr/>
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
 			<td align="left">
@@ -1128,7 +1139,7 @@ if (empty($adelanto) || $id_documento) {
 		jQuery('#monto').bind('click', function() {
 			jQuery("input:text[id^='pago_honorarios_'][value!=0], input:text[id^='pago_gastos_'][value!=0]").first().focus().select();
 		});
-		<?php if (UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
+		<?php if (Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
 			CargarTabla(1);
 		<?php } ?>
 	});

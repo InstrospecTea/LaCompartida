@@ -754,11 +754,7 @@ $pagina->PrintTop($popup);
 					}
 				}
 			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
-				<?php echo $Form->icon_button(__('Descargar listado agrupado por cliente'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
-				<label><input type="checkbox" value="1" id="por_socio" name="por_socio" /> Agrupar por socio</label>
-				<br/>
-				<?php echo $Form->icon_button(__('Descargar listado agrupado por abogado'), 'pdf', array('id' => 'descargar_pdf_agrupado_abogado')); ?>
-				<label><input type="checkbox" value="1" id="valor_facturado" name="valor_facturado" /> Mostrar valor facturado</label>
+				<?php echo $Form->icon_button(__('Descargar listado Agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
 			<?php } ?>
 			<br />
 		</center>
@@ -1277,41 +1273,96 @@ echo $Form->script();
 			jQuery('#descargapro').removeAttr('disabled');
 		});
 
+		<?php
+
+
+		?>
 		jQuery('#descargar_pdf_agrupado').click(function() {
-			var form = jQuery('#form_trabajos').clone();
-			var isGrouped = jQuery('#por_socio:checked').val();
-			var isInvoiced = jQuery('#valor_facturado:checked').val();
-			if (isInvoiced === undefined) {
-				isInvoiced = "";
-			}
-			if (isGrouped === undefined) {
-				isGrouped = "";
-			}
-			form.append('<input type="hidden" name="agrupationType" value="client" id="agrupationType" />');
-			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
-			form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
-			form.attr('action',root_dir + '/app/Report/agrupatedWork')
-			form.attr('id', 'tmp_form');
-			jQuery('body').append(form);
-			form.submit();
-			jQuery('#tmp_form').remove();
-		});
+			jQuery.ajax({
+				type: "POST",
+				dataType: "JSON",
+				url: root_dir + '/app/Report/agrupatedWorkFilters/',
+				data: {},
+				success: function(data, status, jqXHR) {
+					if (data && data.detail) {
+						text_window = data.detail;
+					}
+					jQuery('<p/>')
+					.attr('title', 'Reporte Agrupado')
+					.html(text_window)
+					.dialog({
+						resizable: true,
+						width: "400px",
+						modal: true,
+						open: function() {
+							jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+							jQuery('#valor_facturado').click(function() {
+						      if (this.checked) {
+						        jQuery("#moneda_filtro").removeAttr("disabled");
+						      } else {
+						        jQuery("#moneda_filtro").attr("disabled", true);
+						      }
+						    });
+							jQuery('#agrupado_por').change(function() {
+								if (jQuery('#agrupado_por').val() === 'lawyer') {
+									jQuery('#por_socio').removeAttr('checked');
+									jQuery('#por_socio').attr("disabled", true);
+								} else {
+									jQuery('#por_socio').removeAttr("disabled");
+								}
+							}).change();
+						},
+						buttons: {
+							"<?php echo __('Descargar') ?>": function() {
+								var form = jQuery('#form_trabajos').clone();
+								var groupedBy = jQuery('#agrupado_por').val();
+								var isGrouped = jQuery('#por_socio:checked').val();
+								var isInvoiced = jQuery('#valor_facturado:checked').val();
+								var showHours = jQuery('#mostrar_valores').val();
+								var filterCurrency = jQuery('#moneda_filtro').val();
 
-		jQuery('#descargar_pdf_agrupado_abogado').click(function() {
-			var form = jQuery('#form_trabajos').clone();
-			var isInvoiced = jQuery('#valor_facturado:checked').val();
-			if (isInvoiced === undefined) {
-				isInvoiced = "";
-			}
-			form.append('<input type="hidden" name="agrupationType" value="lawyer" id="agrupationType" />');
-			form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
-			form.attr('action',root_dir + '/app/Report/agrupatedWork')
-			form.attr('id', 'tmp_form');
-			jQuery('body').append(form);
-			form.submit();
-			jQuery('#tmp_form').remove();
-		});
+								if (!groupedBy) {
+									alert("Debe seleccionar una agrupación");
+									return
+								}
+								if (showHours === undefined) {
+									alert("Debe seleccionar las horas que desea mostrar");
+									return
+								}
+								if (!filterCurrency) {
+									alert("Debe seleccionar una moneda");
+									return
+								}
+								if (isInvoiced === undefined) {
+									isInvoiced = "";
+								}
+								if (isGrouped === undefined) {
+									isGrouped = "";
+								}
+								form.append('<input type="hidden" name="agrupationType" value="' + groupedBy + '" id="agrupationType" />');
+								form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
+								form.append('<input type="hidden" name="showHours" value="' + showHours + '" id="showHours" />');
+								form.append('<input type="hidden" name="filterCurrency" value="' + filterCurrency + '" id="filterCurrency" />');
 
+								if (groupedBy === 'client') {
+									form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
+								}
+
+								form.attr('action',root_dir + '/app/Report/agrupatedWork')
+								form.attr('id', 'tmp_form');
+								jQuery('body').append(form);
+
+								form.submit();
+								jQuery(this).dialog('close').remove();
+								jQuery('#tmp_form').remove();
+								return false;
+							}
+						}
+					});
+				},
+				error: function(jqXHR, status, error) {}
+			});
+		});
 	});
 
 </script>

@@ -13,10 +13,7 @@ if (!class_exists('Cobro')) {
 		const PROCESS_NAME = 'GeneracionMasivaCobros';
 
 		function __construct($sesion, $fields = "", $params = "") {
-			$this->tabla = "cobro";
-			$this->campo_id = "id_cobro";
-			$this->sesion = $sesion;
-			$this->fields = $fields;
+			parent::__construct($sesion, $fields, $params, 'cobro', 'id_cobro');
 			$this->log_update = true;
 			$this->guardar_fecha = true;
 		}
@@ -30,11 +27,16 @@ if (!class_exists('Cobro')) {
 			$chargeService = new ChargeService($this->sesion);
 			$charge = new Charge();
 			$charge->fillFromArray($this->fields);
-			$charge->fillChangedFields($this->changes);
+
+			if (is_array($this->changes)) {
+				$charge->fillChangedFields($this->changes);
+			}
+
 			try {
 				$charge = $chargeService->saveOrUpdate($charge, $writeLog);
 				$this->fields = $charge->fields;
 			} catch (Exception $ex) {
+				Utiles::errorSQL($ex, __FILE__, __LINE__, $this->sesion->dbh);
 			}
 
 			// actualizar campo estadocobro de los trabajos según estado del cobro
@@ -183,10 +185,18 @@ if (!class_exists('Cobro')) {
 			}
 		}
 
-		#retorna el listado de asuntos asociados a un cobro
-
+		/**
+		 * Entrega el listado de asuntos asociados a un cobro
+		 * ordenados por glosa del asunto
+		 *
+		 * @return Array Códigos de asuntos
+		 */
 		function LoadAsuntos() {
-			$query = "SELECT codigo_asunto FROM cobro_asunto WHERE id_cobro='" . $this->fields['id_cobro'] . "'";
+			$query = "SELECT cobro_asunto.codigo_asunto
+								FROM cobro_asunto
+								LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+								WHERE cobro_asunto.id_cobro = '{$this->fields['id_cobro']}'
+								ORDER BY asunto.glosa_asunto ASC";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$this->asuntos = array();
 			while (list($codigo) = mysql_fetch_array($resp)) {
@@ -337,7 +347,8 @@ if (!class_exists('Cobro')) {
 								if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)) as tasa_cambio,
 								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
 										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
-									) as tipo_cobro
+									) as tipo_cobro,
+								factura.id_factura
 								FROM cobro
 									LEFT JOIN factura using (id_cobro)
 									LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
@@ -649,63 +660,23 @@ if (!class_exists('Cobro')) {
 			return $fecha_ini;
 		}
 
-		function Eliminar() {
-			$id_cobro = $this->fields['id_cobro'];
-
-			if ($id_cobro) {
-				$chargeService = new ChargeService($this->sesion);
-				$charge = new Charge();
-				$charge->fillFromArray($this->fields);
-				$chargeService->delete($charge);
-				//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
-				if ($this->fields['id_provision_generada']) {
-					$provision_generada = new Gasto($this->sesion);
-					$gasto_generado = new Gasto($this->sesion);
-					$provision_generada->Load($this->fields['id_provision_generada']);
-
-					if ($provision_generada->Loaded()) {
-						if (!$provision_generada->fields['id_cobro']) {
-							$provision_generada->Eliminar();
-							$gasto_generado->Load($this->fields['id_gasto_generado']);
-							if ($gasto_generado->Loaded()) {
-								$gasto_generado->Eliminar();
-							}
-						}
-					}
-				}
-
-				$this->AnularDocumento();
-
-				$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				#Se ingresa la anotación en el historial
-				$his = new Observacion($this->sesion);
-				$his->Edit('fecha', @date('Y-m-d H:i:s'));
-				$his->Edit('comentario', __('COBRO ELIMINADO'));
-				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-				$his->Edit('id_cobro', $id_cobro);
-				$his->Write();
-
-				$CobroAsunto = new CobroAsunto($this->sesion);
-				$CobroAsunto->eliminarAsuntos($id_cobro);
-
-				$query = "DELETE FROM cobro WHERE id_cobro = $id_cobro";
-				mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				return true;
-			} else {
+		function Eliminar($id_cobro = null) {
+			if (!$this->Loaded() && empty($id_cobro)) {
 				return false;
 			}
+			if (empty($id_cobro)) {
+				$id_cobro = $this->fields['id_cobro'];
+			}
+
+			$chargingBusiness = new ChargingBusiness($this->sesion);
+
+			try {
+				$chargingBusiness->delete($id_cobro);
+			} catch (Exception $e) {
+				return false;
+			}
+
+			return true;
 		}
 
 		function AnularEmision($estado = 'CREADO') {
@@ -741,19 +712,15 @@ if (!class_exists('Cobro')) {
 			$this->AnularDocumento($estado, $cantidad_pagos > 0 ? true : false);
 		}
 
+		/**
+		 *
+		 * @param type $estado
+		 * @param type $hay_pagos
+		 * @deprecated
+		 */
 		function AnularDocumento($estado = 'CREADO', $hay_pagos = false) {
-			$documento = new Documento($this->sesion);
-			$documento->LoadByCobro($this->fields['id_cobro']);
-
-			if ($estado == 'INCOBRABLE') {
-				$documento->EliminarNeteos();
-				$documento->AnularMontos();
-			} else if (!$hay_pagos) {
-				$documento->EliminarNeteos();
-				$query_factura = "UPDATE factura_cobro SET id_documento = NULL WHERE id_documento = '" . $documento->fields['id_documento'] . "'";
-				mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
-				$documento->Delete();
-			}
+			$chargingBusiness = new ChargingBusiness($this->sesion);
+			return $chargingBusiness->overrideDocument($this->fields['id_cobro'], $estado, $hay_pagos);
 		}
 
 		function IdMoneda($id_cobro = '') {
@@ -1990,7 +1957,7 @@ if (!class_exists('Cobro')) {
 					$this->Edit('id_moneda', $contrato->fields['id_moneda']);
 					$this->Edit('tipo_cambio_moneda', $moneda->fields['tipo_cambio']);
 					$this->Edit('forma_cobro', $hito ? 'FLAT FEE' : $contrato->fields['forma_cobro']);
-
+					$this->Edit('id_estudio', $contrato->fields['id_estudio']);
 					// Pasar configuración de escalonadas ...
 					$this->Edit('esc1_tiempo', $contrato->fields['esc1_tiempo']);
 					$this->Edit('esc1_id_tarifa', $contrato->fields['esc1_id_tarifa']);
@@ -2015,6 +1982,8 @@ if (!class_exists('Cobro')) {
 					$this->Edit('esc4_monto', $contrato->fields['esc4_monto']);
 					$this->Edit('esc4_id_moneda', $contrato->fields['esc4_id_moneda']);
 					$this->Edit('esc4_descuento', $contrato->fields['esc4_descuento']);
+
+					$this->Edit('observaciones', $contrato->fields['observaciones']);
 
 					//este es el monto fijo, pero si no se inclyen honorarios no va
 					$monto = empty($monto) ? $contrato->fields['monto'] : $monto;

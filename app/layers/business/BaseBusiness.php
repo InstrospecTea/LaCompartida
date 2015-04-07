@@ -30,4 +30,4 @@ interface BaseBusiness {
 	 */
 	function infos($message = null);
 
-} 
+}

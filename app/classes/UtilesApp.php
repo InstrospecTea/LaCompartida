@@ -2162,31 +2162,12 @@ HTML;
 		return $data;
 	}
 
-	public static function ArregloMonedas($sesion) {
-		$query = "SELECT
-						prm_moneda.id_moneda,
-						prm_moneda.tipo_cambio,
-						prm_moneda.cifras_decimales,
-						prm_moneda.glosa_moneda,
-						prm_moneda.glosa_moneda_plural,
-						prm_moneda.simbolo
-					FROM prm_moneda";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while (list($id_moneda, $tipo_cambio, $cifras_decimales, $glosa_moneda, $glosa_moneda_plural, $simbolo) = mysql_fetch_array($resp)) {
-			$moneda[$id_moneda]['tipo_cambio'] = $tipo_cambio;
-			$moneda[$id_moneda]['glosa_moneda'] = $glosa_moneda;
-			$moneda[$id_moneda]['glosa_moneda_plural'] = $glosa_moneda_plural;
-			$moneda[$id_moneda]['cifras_decimales'] = $cifras_decimales;
-			$moneda[$id_moneda]['simbolo'] = $simbolo;
-		}
-		return $moneda;
-	}
-
 	/**
 	 * Validate an email address.
 	 * Provide email address (raw input)
 	 * Returns true if the email address has the email
 	 * address format and the domain exists.
+	 * @param string $email
 	 */
 	public static function isValidEmail($email) {
 		$email = trim($email);
@@ -2371,4 +2352,32 @@ HTML;
 		return $result;
 	}
 
+	/**
+	 * Carga el archivo de $_LANG correcto según las configuraciones del tenant,
+	 * por defecto ocupa el lenguaje 'es' y require_once
+	 *
+	 * @param string $lang Lang a cargar
+	 * @param boolean $include Define si se utiliza include o require_once
+	 */
+	public static function LoadLang($lang, $include = false) {
+		$_LANG = array();
+
+		if ($lang == '') {
+			$lang = 'es';
+		}
+
+		if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
+			$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
+		} else {
+			$lang_archivo = $lang . '.php';
+		}
+
+		if ($include) {
+			include Conf::ServerDir() . "/lang/$lang_archivo";
+		} else {
+			require_once Conf::ServerDir() . "/lang/$lang_archivo";
+		}
+
+		return $_LANG;
+	}
 }

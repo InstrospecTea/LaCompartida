@@ -37,6 +37,7 @@ if ($permisos->fields['permitido'] && $accion == "eliminar") {
 
 $pagina->titulo = __('Clientes');
 $pagina->PrintTop();
+$Form = new Form();
 ?>
 <script type="text/javascript">
 function Validar(form)
@@ -84,7 +85,7 @@ function EliminaCliente(id_cliente)
 	return true;
 }
 </script>
-<?php  	
+<?php
 echo Autocompletador::CSS();
 echo Autocompletador::Javascript($sesion,false);
 ?>
@@ -92,93 +93,90 @@ echo Autocompletador::Javascript($sesion,false);
 <!--<input type=hidden name=opcion value="Buscar" />-->
 <input type="hidden" name="id_cliente" value="<?php echo  $cliente->fields['id_cliente'] ?>" />
 <?php if($p_admin) { ?>
-	<table width='720px' cellspacing="3" cellpadding="3">
+	<table style="border: 0px solid black" width="100%">
 		<tr>
-			<td></td>
 			<td align="right">
-				<a href="agregar_cliente.php"><img src="<?php echo Conf::ImgDir()?>/agregar.gif" border="0"> <?php echo __('Nuevo Cliente')?></a>
+				<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Cliente'), 'agregar', array('href' => 'agregar_cliente.php')); ?>
 			</td>
 		</tr>
 	</table>
 <?php } ?>
-	<table width="90%">
-		<tr>
-			<td> 
-				<fieldset width="100%" class="tb_base">
-					<legend><?php echo __('Filtros')?></legend>
-					<table width='720px' cellspacing="3" cellpadding="3">
-						<tr>
-							<td align="right" width="35%" class="cvs">
-								<?php echo __('Nombre Cliente')?>
-							</td>
-							<td align="left">
-								<input type="text" name="glosa_cliente" id="glosa_cliente" size="50" value="<?php echo $glosa_cliente?>">
-								
-								<div id="sugerencias_glosa_cliente" class="autocomplete" style="display:none; z-index:100;"></div>
-							</td>
-						</tr>
-						<tr>
-							<td align="right" class="cvs">
-								<?php echo __('Código')?>
-							</td>
-							<td align="left">
-								<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="codigo" size="20" value="<?php echo $codigo?>">
-							</td>
-						</tr>
-						<tr>
-							<td align="right" class="cvs">
-								<?php echo __('Grupo')?>
-							</td>
-							<td align="left">
-								<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno","width=100px")  ?>
-							</td>
-						</tr>
-					<?php if (Conf::GetConf($sesion, 'UsaGiroClienteParametrizable')) { ?>
-						<tr>
-							<td align="right" class="cvs">
-								<?php echo __('Giro')?>
-							</td>
-							<td align="left">
-								<?php echo  Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "giro", $giro, "", "Cualquiera")  ?>
-							</td>
-						</tr>
-					<?php } ?>
-						<tr>
-							<td align="right" class="cvs">
-								<?php echo __('Fecha Desde')?>
-							</td>
-							<td nowrap align="left" class="cvs">
-								<input class="fechadiff" onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-			 					&nbsp;&nbsp;<?php echo __('Fecha Hasta')?>
-								<input class="fechadiff"  onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-			 				</td>
-						</tr>
-						<tr>
-							<td align="right" class="cvs">
-								<?php echo __('Solo Activos')?>
-							</td>
-							<td align="left">
-							<input type="checkbox" name=solo_activos id=solo_activos value=1 <?php echo $solo_activos ? "checked" : "" ?>>
-							</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td align="left">
-								<a class="btn botonizame"  href="javascript:void(0);"  icon="find" name='buscar'  onclick="Listar(jQuery('#form_cliente').get(0), 'buscar');"><?php echo __('Buscar')?></a>
-								<a class="btn botonizame"  href="javascript:void(0);" icon="xls"   onclick="Listar(jQuery('#form_cliente' ).get(0), 'xls');" ><?php echo __('Descargar listado a Excel')?></a>
-								<?php if (Conf::GetConf($sesion,'ValidacionesCliente')) { ?>
-									<input type=button class=btn value="<?php echo __('Descargar listado clientes datos incompletos')?>" onclick="DescargarIncompletos(this.form);" >
-								<?php } ?>
-							</td>
-						</tr>
-					</table>
-				</fieldset>
-			</td>
-		</tr>
-	</table>
+	<fieldset width="100%" class="tb_base">
+		<legend><?php echo __('Filtros')?></legend>
+		<table width='90%' cellspacing="3" cellpadding="3">
+			<tr>
+				<td width="25%" class="ar tb">
+					<?php echo __('Nombre Cliente')?>
+				</td>
+				<td class="al">
+					<input type="text" name="glosa_cliente" id="glosa_cliente" size="50" value="<?php echo $glosa_cliente?>">
+					<div id="sugerencias_glosa_cliente" class="autocomplete" style="display:none; z-index:100;"></div>
+				</td>
+			</tr>
+			<tr>
+				<td class="ar tb">
+					<?php echo __('Código')?>
+				</td>
+				<td class="al">
+					<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="codigo" size="20" value="<?php echo $codigo?>">
+				</td>
+			</tr>
+			<tr>
+				<td class="ar tb">
+					<?php echo __('Grupo')?>
+				</td>
+				<td class="al">
+					<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno","width=100px")  ?>
+				</td>
+			</tr>
+		<?php if (Conf::GetConf($sesion, 'UsaGiroClienteParametrizable')) { ?>
+			<tr>
+				<td class="ar tb">
+					<?php echo __('Giro')?>
+				</td>
+				<td class="al">
+					<?php echo  Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'GIRO_CLIENTE' ORDER BY glosa ASC", "giro", $giro, "", "Cualquiera")  ?>
+				</td>
+			</tr>
+		<?php } ?>
+			<tr>
+				<td class="ar tb">
+					<?php echo __('Fecha Desde')?>
+				</td>
+				<td nowrap class="al">
+					<input class="fechadiff" onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+					&nbsp;&nbsp;<?php echo __('Fecha Hasta')?>
+					<input class="fechadiff"  onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+				</td>
+			</tr>
+			<tr>
+				<td class="ar tb">
+					<?php echo __('Solo Activos')?>
+				</td>
+				<td class="al">
+					<input type="checkbox" name=solo_activos id=solo_activos value=1 <?php echo $solo_activos ? "checked" : "" ?>>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td class="al">
+					<?php
+					echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'buscar')"));
+					echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'xls')"));
+					if (Conf::GetConf($sesion,'ValidacionesCliente')) {
+						echo $Form->icon_button(__('Descargar listado clientes datos incompletos'), 'xls', array('onclick' => "DescargarIncompletos(jQuery('#form_cliente').get(0));"));
+					}
+					?>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+
 </form>
- 
+
 <?php
+echo $Form->script();
+
 if ($buscar) {
 	$where = '1';
 	$joins = '';
@@ -215,7 +213,7 @@ if ($buscar) {
 				LEFT JOIN grupo_cliente USING (id_grupo_cliente)
 				$joins
 				WHERE $where";
-	
+
 	if ($orden == "") {
 		$orden = "cliente.glosa_cliente";
 	}

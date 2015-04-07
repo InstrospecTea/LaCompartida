@@ -147,6 +147,12 @@ $formato_descripcion = & $wb->addFormat(array('Size' => 7,
 			'Align' => 'left',
 			'Color' => 'black',
 			'TextWrap' => 1));
+$formato_observacion = & $wb->addFormat(array('Size' => 7,
+			'VAlign' => 'top',
+			'Italic' => 1,
+			'Bold' => 1,
+			'Align' => 'left',
+			'Color' => 'black'));
 $formato_tiempo = & $wb->addFormat(array('Size' => 7,
 			'VAlign' => 'top',
 			'Color' => 'black',
@@ -478,6 +484,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$cobro = new Cobro($sesion);
 	$cobro->Load($id_cobro);
+	if (!$cobro->Loaded()) {
+		continue;
+	}
 	$cobro->LoadAsuntos();
 
 	/*
@@ -518,15 +527,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	 *	generalmente si no tiene data no se escribe
 	 */
 
-	$query_cont_trabajos_cobro = "SELECT COUNT(*) FROM trabajo WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_cont_trabajos_cobro = "SELECT COUNT(*) FROM trabajo WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_cont_trabajos_cobro = mysql_query($query_cont_trabajos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_trabajos_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_trabajos_cobro) = mysql_fetch_array($resp_cont_trabajos_cobro);
 
-	$query_cont_tramites_cobro = "SELECT COUNT(*) FROM tramite WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_cont_tramites_cobro = "SELECT COUNT(*) FROM tramite WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_cont_tramites_cobro = mysql_query($query_cont_tramites_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_tramites_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_tramites_cobro) = mysql_fetch_array($resp_cont_tramites_cobro);
 
-	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_cont_gastos_cobro = mysql_query($query_cont_gastos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_gastos_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_gastos_cobro) = mysql_fetch_array($resp_cont_gastos_cobro);
 
@@ -897,6 +906,28 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$minutos_cobrables = sprintf("%02d", $cobro->fields['total_minutos'] % 60);
 
 		$ws->write($filas2++, $col_valor_trabajo, "$horas_cobrables:$minutos_cobrables", $formato_encabezado_derecha);
+
+		if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
+			$chargingBusiness = new ChargingBusiness($sesion);
+			$id_cobro = $cobro->fields['id_cobro'];
+			$scales = $chargingBusiness->getSlidingScales($id_cobro);
+			$bruto = 0;
+			$descuento = 0;
+			$neto = 0;
+			foreach ($scales as $scale) {
+				$bruto += $scale->get('amount');
+				$descuento += $scale->get('discount');
+				$neto += $scale->get('netAmount');
+			}
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'bruto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $bruto, $formato_moneda_encabezado);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $descuento, $formato_moneda_encabezado);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'neto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_encabezado);
+		}
+
+
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 		$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 
@@ -906,7 +937,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$id_moneda = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
 			$opc_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 			$monto_equivalente_a = $monto_subtotal * $id_moneda / $opc_moneda_total;
-            $ws->writeNumber($filas2++, $col_valor_trabajo, round($monto_equivalente_a), $formato_moneda_resumen);
+						$ws->writeNumber($filas2++, $col_valor_trabajo, round($monto_equivalente_a), $formato_moneda_resumen);
 		}
 
 		if ($cobro->fields['descuento'] > 0 && $opc_ver_descuento) {
@@ -1001,7 +1032,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$filas += 2;
 
-	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro=" . $cobro->fields['id_cobro'];
+	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro='{$cobro->fields['id_cobro']}'";
 	$resp_num_usuarios = mysql_query($query_num_usuarios, $sesion->dbh) or Utiles::errorSQL($query_num_usuarios, __FILE__, __LINE__, $sesion->dbh);
 	$num_usuarios = mysql_num_rows($resp_num_usuarios);
 
@@ -1050,7 +1081,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$where_tramites .= " AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' ";
 		}
 
-		$query_cont_tramites = "SELECT COUNT(*) FROM tramite WHERE $where_tramites AND id_cobro=" . $cobro->fields['id_cobro'];
+		$query_cont_tramites = "SELECT COUNT(*) FROM tramite WHERE $where_tramites AND id_cobro='{$cobro->fields['id_cobro']}'";
 		$resp_cont_tramites = mysql_query($query_cont_tramites, $sesion->dbh) or Utiles::errorSQL($query_cont_tramites, __FILE__, __LINE__, $sesion->dbh);
 		list($cont_tramites) = mysql_fetch_array($resp_cont_tramites);
 
@@ -1124,7 +1155,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
 										LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
 										LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-									WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=" . $cobro->fields['id_cobro'];
+									WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro='{$cobro->fields['id_cobro']}'";
 
 				if (UtilesApp::GetConf($sesion, 'OrdenarPorCategoriaUsuario')) {
 					$orden = " prm_categoria_usuario.orden ASC, usuario.id_usuario ASC, trabajo.fecha ASC, trabajo.descripcion ";
@@ -2465,13 +2496,38 @@ $resp_hitos = mysql_query($query_hitos, $sesion->dbh) or Utiles::errorSQL($query
 list($cont_hitos) = mysql_fetch_array($resp_hitos);
 
 if ($cont_hitos > 0) {
-	$query_hitos = "select * from (select id_cobro_pendiente, (select count(*) total from cobro_pendiente cp2 where cp2.id_contrato=cp.id_contrato) total,  @a:=@a+1 as rowid,
-						round(if(cbr.id_cobro=cp.id_cobro, @a,0),0) as thisid,
-						date_format(cast(ifnull(cp.fecha_cobro,ifnull(cbr.fecha_emision,'00000000')) as DATE),'%d/%m/%y') as fecha_hito,
-						cp.descripcion, cp.monto_estimado, pm.simbolo, pm.codigo, pm.tipo_cambio  ,
-						cp.id_contrato, cp.id_cobro , ifnull(cbr.estado,'PENDIENTE') as estado, cbr.monto_thh,cbr.monto_thh_estandar,cbr.total_minutos, cp.fecha_cobro fc2
-						FROM `cobro_pendiente` cp join  contrato c using (id_contrato) join prm_moneda pm using (id_moneda) left join cobro cbr on cbr.id_contrato=c.id_contrato and cbr.id_cobro=cp.id_cobro  join (select @a:=0) FFF
-						where cp.hito=1    ) hitos  where    id_contrato={$cobro->fields['id_contrato']} ";
+	$query_hitos = "SELECT * FROM (
+			SELECT
+				id_cobro_pendiente,
+				(
+					SELECT COUNT(*) total FROM cobro_pendiente cp2
+					WHERE cp2.id_contrato = cp.id_contrato
+				) total,
+				@a:=@a+1 as rowid,
+				ROUND(IF(cbr.id_cobro = cp.id_cobro, @a, 0), 0) as thisid,
+				DATE_FORMAT(CAST(IFNULL(cp.fecha_cobro,IFNULL(cbr.fecha_emision,'00000000')) as DATE),'%d/%m/%y') as fecha_hito,
+				cp.descripcion,
+				cp.observaciones,
+				cp.monto_estimado,
+				pm.simbolo,
+				pm.codigo,
+				pm.tipo_cambio,
+				cp.id_contrato,
+				cp.id_cobro,
+				IFNULL(cbr.estado,'PENDIENTE') as estado,
+				cbr.monto_thh,
+				cbr.monto_thh_estandar,
+				cbr.total_minutos,
+				cp.fecha_cobro fc2
+			FROM `cobro_pendiente` cp
+			INNER JOIN contrato c USING (id_contrato)
+			INNER JOIN prm_moneda pm USING (id_moneda)
+			LEFT JOIN cobro cbr on cbr.id_contrato = c.id_contrato and cbr.id_cobro = cp.id_cobro
+			INNER JOIN (SELECT @a:=0) FFF
+			WHERE cp.hito = 1
+		) hitos
+	WHERE
+		id_contrato = {$cobro->fields['id_contrato']} ";
 
 
 	$resp_hitos = mysql_query($query_hitos, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -2510,6 +2566,9 @@ if ($cont_hitos > 0) {
 		$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $formato_normal);
 		$ws->write($filas, $col_descripcion + 4, $fila_hitos['monto_estimado'], $formato_moneda);
 		$ws->write($filas, $col_descripcion + 5, $monto_thh, $formato_moneda);
+
+		$filas++;
+		$ws->write($filas, $col_descripcion, $fila_hitos['observaciones'], $formato_observacion);
 	}
 
 	$filas++;

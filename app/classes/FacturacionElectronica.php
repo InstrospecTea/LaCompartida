@@ -32,6 +32,7 @@ Class FacturacionElectronica {
 			'title' => 'Generar Factura Electrónica',
 			'class' => 'factura-electronica',
 			'data-factura' => $id_factura,
+			'data-cobro' => $Factura->fields['id_cobro'],
 			'data-codigo-tipo' => $Factura->CodigoTipoDocumentoLegal(),
 			'href' => '#'
 		);

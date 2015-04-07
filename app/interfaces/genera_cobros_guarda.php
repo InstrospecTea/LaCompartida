@@ -28,17 +28,6 @@ if (!$incluir_cobros_en_cero && isset($_GET['generar_silenciosamente'])) {
 	$forzar = true;
 }
 
-// Retrocompatibilidad con funcionamiento de Conf en GTD Solicitado por @gtigre el 26-03-2014
-if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && empty($fecha_ini)) {
-	$query = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) FROM cobro WHERE id_contrato = '$id_contrato'";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	list($fecha_ini_cobro) = mysql_fetch_array($resp);
-} else {
-	if (!empty($fecha_ini)) {
-		$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
-	}
-}
-
 //si no me llega uno, es 0
 $incluye_gastos = !empty($incluye_gastos);
 $incluye_honorarios = !empty($incluye_honorarios);
@@ -56,28 +45,32 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 $Contrato = new Contrato($Sesion);
 
 if ($individual && $id_contrato) {
-	
+
 	Log::write(" |- Contrato: {$id_contrato}", Cobro::PROCESS_NAME);
 
 	set_time_limit(100);
-	//Mala documentación!!! Que significa $contra? Que hace GeneraProceso??? ICC
-	// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM)
+
 	$Cobro = new Cobro($Sesion);
 
-	//Por conf se permite el uso de la fecha desde
 	$fecha_ini_cobro = '';
-	if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
-		$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
+	if (Conf::GetConf($Sesion, 'UsaFechaDesdeCobranza')) {
+		if (empty($fecha_ini)) {
+			if (Conf::GetConf($Sesion, 'UsaFechaDesdeUltimoCobro')) {
+				$fecha_ini_cobro = $Contrato->FechaFinUltimoCobro($id_contrato, 1);
+			}
+		} else {
+			$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);
+		}
 	}
 
 	if (!$id_proceso_nuevo) {
 		$id_proceso_nuevo = $Cobro->GeneraProceso();
 	}
-	
+
 	$id_cobro_pendiente = !is_null($id_cobro_pendiente) ? $id_cobro_pendiente : '';
 	$monto = !is_null($monto) ? $monto : '';
 	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios);
-	
+
 	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
@@ -206,7 +199,7 @@ if ($print) {
 		$logdir = dirname($error_logfile);
 
 		if ($totaldecobros > 0) {
-			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas);
+			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas, $id_formato);
 		} else {
 			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
 				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>

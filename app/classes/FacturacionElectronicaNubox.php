@@ -2,7 +2,7 @@
 
 class FacturacionElectronicaNubox extends FacturacionElectronica {
 
-	public static function ValidarFactura(Factura $Factura = null) {
+	public static function ValidarFactura(Factura $Factura = null, Contrato $Contrato = null) {
 		global $id_factura_padre, $RUT_cliente, $dte_codigo_referencia, $dte_razon_referencia;
 		if (empty($Factura)) {
 			global $pagina, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente;
@@ -51,6 +51,16 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 				$errors[] = __('Debe ingresar razón de la Referencia');
 			}
 		}
+
+		$validate_email = !empty($Contrato);
+		if ($validate_email) {
+			if (empty($Contrato->fields['email_contacto'])) {
+				$errors[] = __('Debe ingresar ' . __('Correo electrrónico') . ' del cliente.');
+			} else if (!UtilesApp::isValidEmail($Contrato->fields['email_contacto'])) {
+				$errors[] = __('Correo electrrónico') . " '{$Contrato->fields['email_contacto']}' " . __(' incorrecto');
+			}
+		}
+
 		if (isset($pagina)) {
 			foreach ($errors as $msg) {
 				$pagina->AddError($msg);
@@ -90,15 +100,16 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 				}
 				var self = jQuery(this);
 				var id_factura = self.data("factura");
+				var id_cobro = self.data("cobro");
 				var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:95px;height:20px;margin-left:-90px;"});
 				self.parent().append(loading);
 				jQuery.ajax({url: root_dir + "/api/index.php/invoices/" + id_factura +  "/build",
 					type: "POST"
 				}).success(function(data) {
-					loading.remove();
-					buttons = jQuery('{$BotonDescargarHTML}');
-					buttons.each(function(i, e) { jQuery(e).attr("data-factura", id_factura)});
-					self.replaceWith(buttons);
+					jQuery('#cajafacturas').load('ajax/cobros7.php', {id_cobro: id_cobro, opc: 'cajafacturas'});
+					if (data.alert) {
+						alert(data.alert);
+					}
 				}).error(function(error_data){
 					loading.remove();
 					response = JSON.parse(error_data.responseText);
@@ -131,12 +142,15 @@ EOF;
 
 	public static function GeneraFacturaElectronica(&$hookArg) {
 		$Sesion = new Sesion();
+		$hookArg['Alerta'] = null;
 		$Factura = $hookArg['Factura'];
 		if (!empty($Factura->fields['dte_url_pdf'])) {
 			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
 		} else {
 			try {
-				$errores = self::ValidarFactura($Factura);
+				$Contrato = new Contrato($Sesion);
+				$Contrato->Load($Factura->fields['id_contrato'], 'email_contacto', 0);
+				$errores = self::ValidarFactura($Factura, $Contrato);
 				if (!empty($errores)) {
 					throw new Exception(implode("\n", $errores), 0);
 				}
@@ -148,7 +162,7 @@ EOF;
 				if ($WsFacturacionNubox->hasError()) {
 					$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
 				} else {
-					$csv_documento = self::FacturaToCsv($Sesion, $Factura, $Estudio);
+					$csv_documento = self::FacturaToCsv($Sesion, $Factura, $Estudio, $Contrato);
 					$csv_referencias = ($Factura->fields['id_factura_padre'] > 0) ? self::ReferenciaToCsv($Sesion, $Factura, $Estudio) : null;
 					$opcionFolios = 1; //los folios son asignados por nubox
 					$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
@@ -160,11 +174,20 @@ EOF;
 							$hookArg['Error'] = self::ParseError($WsFacturacionNubox, 'BuildingInvoiceError');
 						} else {
 							try {
+								$nuevo_numero = self::LiberaNumeroFactura($Factura, $result['Folio']);
 								$Factura->Edit('numero', $result['Folio']);
 								$Factura->Edit('dte_url_pdf', $result['Identificador']);
 								$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 								if ($Factura->Write()) {
+									$DocumentoLegalNumero = new DocumentoLegalNumero($Factura->sesion);
+									$nuevo_ultimo = $DocumentoLegalNumero->UltimoNumeroSerieEstudio($Factura->fields['id_documento_legal'], $Factura->fields['serie_documento_legal'], $Factura->fields['id_estudio']);
+									if ($nuevo_ultimo < $result['Folio']) {
+										$Factura->GuardarNumeroDocLegal($Factura->fields['id_documento_legal'], $result['Folio'], $Factura->fields['serie_documento_legal'], $Factura->fields['id_estudio']);
+									}
 									$hookArg['InvoiceURL'] = $file_url;
+									if ($nuevo_numero !== false) {
+										$hookArg['Alerta'] = __('La Factura')  . " #{$result['Folio']} " . __('cambio a') . " #{$nuevo_numero}";
+									}
 								}
 							} catch (Exception $ex) {
 								$hookArg['Error'] = self::ParseError($ex, 'BuildingInvoiceError');
@@ -204,7 +227,7 @@ EOF;
 	 * @param Factura $Factura
 	 * @return array
 	 */
-	public static function FacturaToCsv(Sesion $Sesion, Factura $Factura, PrmEstudio $Estudio) {
+	public static function FacturaToCsv(Sesion $Sesion, Factura $Factura, PrmEstudio $Estudio, Contrato $Contrato) {
 		$subtotal_factura = $Factura->fields['subtotal'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'];
 		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
@@ -259,11 +282,11 @@ EOF;
 				'CANTIDAD' => $detalle_factura['cantidad'],
 				'PRECIO' => $Moneda->getFloat($detalle_factura['precio_unitario']),
 				'PORCENTDSCTO' => 0,
-				'EMAIL' => '',
+				'EMAIL' => $Contrato->fields['email_contacto'],
 				'TIPOSERVICIO' => 3,
 				'PERIODODESDE' => '',
 				'PERIODOHASTA' => '',
-				'FECHAVENCIMIENTO' => '',
+				'FECHAVENCIMIENTO' => Utiles::sql2date($Factura->fields['fecha_vencimiento'], '%d-%m-%Y'),
 				'CODSUCURSAL' => 1,
 				'VENDEDOR' => '',
 				'CODRECEPTOR' => '',
@@ -306,7 +329,7 @@ EOF;
 		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
 
 		$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-			
+
 		$FacturaPadre = new Factura($Sesion);
 		$FacturaPadre->Load($Factura->fields['id_factura_padre']);
 		$PrmDocumentoLegalPadre->Load($FacturaPadre->fields['id_documento_legal']);
@@ -367,4 +390,26 @@ EOF;
 		exit;
 	}
 
+	public static function LiberaNumeroFactura(Factura $Factura, $numero) {
+		$id_documento_legal = $Factura->fields['id_documento_legal'];
+		$serie = $Factura->fields['serie_documento_legal'];
+		$id_estudio = $Factura->fields['id_estudio'];
+		if (!$Factura->ExisteNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio)) {
+			return false;
+		}
+
+		$fields = array('id_factura', 'numero');
+		$FacturaCambio = new Factura($Factura->sesion);
+		$FacturaCambio->LoadByNumero($numero, $serie, $id_documento_legal, $id_estudio, $fields);
+
+		$DocumentoLegalNumero = new DocumentoLegalNumero($Factura->sesion);
+		$nuevo_numero = $DocumentoLegalNumero->UltimoNumeroSerieEstudio($id_documento_legal, $serie, $id_estudio);
+		$FacturaCambio->Edit('numero', $nuevo_numero);
+		$FacturaCambio->Write();
+
+		$FacturaCambio->GuardarNumeroDocLegal($id_documento_legal, $nuevo_numero, $serie, $id_estudio);
+
+		return $nuevo_numero;
+	}
 }
+

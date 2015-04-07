@@ -1,5 +1,215 @@
 # Changelog
 
+## Hotfix 15.6.7
+Lunes 6 de Abril 2015
+* **Fix:** [Corrige query de saldo total de facturas.](https://github.com/LemontechSA/ttb/pull/896)
+* **Fix:** [Agrega propiedad name a la columna oculta de Spreadsheet.](https://github.com/LemontechSA/ttb/pull/896)
+
+## Hotfix 15.6.6
+Jueves 2 de Abril 2015
+* **Fix:** [corrige error sql 'select * from where = x'](https://github.com/LemontechSA/ttb/pull/895)
+
+## Hotfix 15.6.5
+Jueves 2 de Abril 2015
+* **Fix:** [No permite pagar un documento si este no tiene saldo pendiente](https://github.com/LemontechSA/ttb/pull/894)
+
+## Hotfix 15.6.4
+Jueves 2 de Abril 2015
+* **Fix:** [Se ocupa el reporte avanzado para que obtenga ese dato disminuyendo los tiempos de descarga](https://github.com/LemontechSA/ttb/pull/893)
+* **Fix:** [Se agrega id al campo opc en mantenedor de actividades](https://github.com/LemontechSA/ttb/pull/893)
+* **Fix:** [Se agrega el try/catch para evitar el problema de la Exception](https://github.com/LemontechSA/ttb/pull/893)
+
+## Hotfix 15.6.3
+Lunes 30 de Marzo 2015
+* **Fix:** [Permite eliminar pagos sin modulo de facturas.](https://github.com/LemontechSA/ttb/pull/891)
+* **Fix:** [corrige fecha de la alerta de horas semanales.](https://github.com/LemontechSA/ttb/pull/891)
+
+## Hotfix 15.6.2
+Lunes 30 de Marzo 2015
+* **Fix:** [Corregir formato de decimales por JS en monto de facturas en paso 6 del cobro.](https://github.com/LemontechSA/ttb/pull/890)
+
+## Hotfix 15.6.1
+Jueves 26 de Marzo 2015
+* **Fix:** [Mantiene los decimales en los calculos de pagos.](https://github.com/LemontechSA/ttb/pull/886)
+
+## Release: 15.6.0
+Miércoles 25 de Marzo 2015
+[Release 15.6.0](https://github.com/LemontechSA/ttb/pull/888)
+* **Feature:** [Nota facturación MX](https://github.com/LemontechSA/ttb/issues/881)
+* **Feature:** [Layers error pages](https://github.com/LemontechSA/ttb/issues/878)
+* **Feature:** [Número facturación Nubox](https://github.com/LemontechSA/ttb/issues/877)
+
+## Hotfix 15.5.4
+Lunes 23 de Marzo 2015
+* **Fix:** [Corrige monto valor trabajado estándar](https://github.com/LemontechSA/ttb/pull/885)
+
+## Hotfix 15.5.3
+Viernes 20 de Marzo 2015
+* **Fix:** [Corregir guardar Tarifas al clonar los trabajos](https://github.com/LemontechSA/ttb/pull/884)
+* **Fix:** [Error al generar liquidaciones, eliminar cobros](https://github.com/LemontechSA/ttb/pull/884)
+
+## Hotfix 15.5.2
+Viernes 20 de Marzo 2015
+* **Fix:** [Devuelve entidad de tarifa usuario en 0](https://github.com/LemontechSA/ttb/pull/883)
+
+## Hotfix 15.5.1
+Viernes 20 de Marzo 2015
+* **Fix:** [Corregir mantenedor de notas de cobro](https://github.com/LemontechSA/ttb/pull/882)
+
+## Release: 15.5.0
+Jueves 19 de Marzo 2015
+[Release 15.5.0](https://github.com/LemontechSA/ttb/pull/879)
+* **Feature:** [Descuentos tarifa escalonada](https://github.com/LemontechSA/ttb/issues/815)
+* **Feature:** [Descuentos a nivel de factura](https://github.com/LemontechSA/ttb/issues/782)
+* **Feature:** [Mejorar reporte de horas](https://github.com/LemontechSA/ttb/issues/860)
+* **Feature:** [Incorporar Compañía como agrupador en reporte Avanzado](https://github.com/LemontechSA/ttb/issues/860)
+
+## Hotfix 15.4.5
+Martes 17 de Marzo 2015
+* **Fix:** [Corregir la eliminación del último registro en tarifas tramites](https://github.com/LemontechSA/ttb/pull/876)
+
+## Hotfix 15.4.4
+Lunes 16 de Marzo 2015
+* **Fix:** [Corregir asignación por referencia al bindParam (fix FW)](https://github.com/LemontechSA/ttb/pull/875)
+
+## Hotfix 15.4.3
+Lunes 16 de Marzo 2015
+* **Fix:** [Corregir asignación de valores por defecto en db_log (fix FW)](https://github.com/LemontechSA/ttb/pull/874)
+
+## Hotfix 15.4.2
+Viernes 13 de Marzo 2015
+* **Fix:** [Corrección al crear facturas con campos por defecto NULL](https://github.com/LemontechSA/ttb/pull/873)
+
+## Hotfix 15.4.1
+Viernes 13 de Marzo 2015
+* **Fix:** [Asignación de valores por categoria en mantenedor de tarifas](https://github.com/LemontechSA/ttb/pull/872)
+
+## Release: 15.4.0
+Jueves 12 de Marzo 2015
+[Release 15.4.0](https://github.com/LemontechSA/ttb/pull/871)
+* **Feature:** [Feature utilización adelantos](https://github.com/LemontechSA/ttb/pull/857)
+
+## Hotfix 15.3.10
+Jueves 12 de Marzo 2015
+* **Fix:** [Agrega nuevos tags para las cartas múltiples de García Bodán](https://github.com/LemontechSA/ttb/pull/870)
+
+## Hotfix 15.3.9
+Martes 10 de Marzo 2015
+* **Fix:** [Corrige problemas de refresco numero factura Nubox](https://github.com/LemontechSA/ttb/pull/868)
+
+## Hotfix 15.3.8
+Martes 10 de Marzo 2015
+* **Fix:** [Apertura de calendario al agregar hitos](https://github.com/LemontechSA/ttb/pull/867)
+* **Fix:** [Mejorar formulario de mantención de tarifas trámites](https://github.com/LemontechSA/ttb/pull/867)
+
+## Hotfix 15.3.7
+Martes 10 de Marzo 2015
+* **Fix:** [Previene error SQL al descargar excel de borradores de liquidaciones](https://github.com/LemontechSA/ttb/pull/866)
+
+## Hotfix 15.3.6
+Lunes 09 de Marzo 2015
+* **Fix:** [Error en la generación de gráfico de torta cuando la suma del agrupado entregaba decimales](https://github.com/LemontechSA/ttb/pull/865)
+
+## Hotfix 15.3.5
+Jueves 05 de Marzo 2015
+* **Fix:** [Error en actualizacion de nota de cobro por campo de más](https://github.com/LemontechSA/ttb/pull/864)
+
+## Hotfix 15.3.4
+Miércoles 04 de Marzo 2015
+* **Fix:** [Generación de alertas por asuntos](https://github.com/LemontechSA/ttb/pull/863)
+
+## Hotfix 15.3.3
+Miércoles 04 de Marzo 2015
+* **Fix:** [Corrige el uso de Twig en la descarga masiva y la copia de las observaciones del contrato en el Cobro](https://github.com/LemontechSA/ttb/pull/862)
+
+## Hotfix 15.3.2
+Martes 03 de Marzo 2015
+* **Fix:** [Validar que el asunto esté activo al guardar un trabajo o un gasto](https://github.com/LemontechSA/ttb/pull/859)
+
+## Hotfix 15.3.1
+Martes 03 de Marzo 2015
+* **Fix:** [Fecha en reporte PDF en modulo para revisar horas](https://github.com/LemontechSA/ttb/pull/858)
+* **Fix:** [Asignación de ID contrato al modificar un adelanto](https://github.com/LemontechSA/ttb/pull/858)
+
+## Release: 15.3.0
+Jueves 19 de Febrero 2015
+[Release 15.3.0](https://github.com/LemontechSA/ttb/pull/845)
+* **Feature:** Agregar columna Cobro Independiente al reporte asuntos
+* **Fix:** Oculta tipos de dato deshabilitados en el reporte avanzado
+* **Fix:** Corrige el conf UsaFechaDesdeCobranza y nuevo conf UsaFechaDesdeUltimoCobro
+* **Fix:** Feature cobro programado
+* **Fix:** Feature elimina cobro
+
+## Hotfix 15.2.3
+Martes 17 de Febrero 2015
+* **Fix:** [Agrupador Area asunto en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/853)
+
+## Hotfix 15.2.2
+Martes 17 de Febrero 2015
+* **Fix:** [Enviar email de solicitante a Nubox](https://github.com/LemontechSA/ttb/pull/852)
+
+## Hotfix 15.2.1
+Martes 17 de Febrero 2015
+* **Fix:** [Agrega lang para error 320 facturación mx y devuelve mensaje de error en caso de excepción](https://github.com/LemontechSA/ttb/pull/851)
+
+## Release: 15.2.0
+Jueves 5 de Febrero 2015
+[Release 15.2.0](https://github.com/LemontechSA/ttb/pull/845)
+* **Fix:** Agregar botón calendario al editar clientes
+* **Fix:** Al agregar un asunto si el filtro tiene un cliente seleccionado que ese cliente venga por defecto
+* **Fix:** Agregar logos en los excel de cobro
+* **Fix:** Mostrar observaciones en el reporte de liquidaciones en la sección de hitos
+* **Fix:** En gastos mostrar los gastos castigados
+* **Fix:** El formato de liquidación arroja dos valores distinto en distintas hojas
+* **Fix:** Al copiar los datos del contrato principal, copiar todo salvo los hitos
+* **Fix:** Corrige las horas facturables para que utilicen la duración en vez de la duración cobrada en reporte avanzado
+* **Fix:** Corrige el problema que considera todos los trabajos al editar (alerta de más de 24 horas)
+* **Fix:** Inconveniente para editar contratos desde la pestaña Pre-Liquidaciones (https://www.pivotaltracker.com/n/projects/286009/stories/85713666)
+* **Feature:** Permite seleccionar un giro de cliente o poder escribir un texto libre
+* **Fix:** Fix para giros cuando no hay giros en la tabla prm_giro y 99% de clientes actuales
+* **Fix:** Fix problemas con bind del formulario de grupos
+* **Fix:** No mostrar giros si no hay al agregar o editar asunto
+
+## Hotfix 15.1.13
+Martes 10 de Febrero 2015
+* **Fix:** [Configura twig con Charset iso-8859-1.](https://github.com/LemontechSA/ttb/pull/848)
+
+## Hotfix 15.1.12
+Viernes 6 de Febrero 2015
+* **Fix:** [Mantiene el lang anterior al cargar uno nuevo.](https://github.com/LemontechSA/ttb/pull/847)
+
+## Hotfix 15.1.11
+Viernes 6 de Febrero 2015
+* **Fix:** [Inicializa variable $_LANG como un array vacío.](https://github.com/LemontechSA/ttb/pull/846)
+
+## Hotfix 15.1.10
+Jueves 5 de Febrero 2015
+* **Fix:** [Agrega id_estudio a excel de Asunto, Factura y FacturaPago](https://github.com/LemontechSA/ttb/pull/844)
+
+## Hotfix 15.1.9
+Jueves 5 de Febrero 2015
+* **Fix:** [Agrega la propiedad $log_update al DAO (por defecto false) y se define true en ChargeDAO](https://github.com/LemontechSA/ttb/pull/843)
+
+## Hotfix 15.1.8
+Martes 3 de Febrero 2015
+* **Fix:** [Corrige la impresión masiva de cobros con el formato seleccionado](https://github.com/LemontechSA/ttb/pull/842)
+
+## Hotfix 15.1.7
+Martes 3 de Febrero 2015
+* **Fix:** [Agrega twig a la nota de cobro](https://github.com/LemontechSA/ttb/pull/841)
+
+## Hotfix 15.1.6
+Martes 3 de Febrero 2015
+* **Fix:** [Corrige la inclusión al archivo lang en la nota de cobro](https://github.com/LemontechSA/ttb/pull/839)
+
+## Hotfix 15.1.5
+Lunes 2 de Febrero 2015
+* **Fix:** [Corrige funcion quitada de webkit](https://github.com/LemontechSA/ttb/pull/838)
+
+## Hotfix: 15.1.4
+Lunes 2 de Febrero 2015
+* **Fix:** [Vuelve a utilizar el Conf CantidadDecimalesTotalFactura si tiene algún valor y lo considera por sobre los decimales de la moneda del cobro](https://github.com/LemontechSA/ttb/pull/836)
+
 ## Hotfix: 15.1.3
 Martes 27 de Enero 2015
 * **Fix:** [Corrige error introducido en Release 15.1.0 al desestimar id_cobro_pendiente al generar el cobro](https://github.com/LemontechSA/ttb/pull/833)

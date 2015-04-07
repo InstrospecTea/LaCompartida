@@ -2,6 +2,7 @@
 
 class ViewRenderer {
 	public $data;
+	public $params;
 	public $title;
 	public $request;
 	public $helpers;
@@ -22,7 +23,6 @@ class ViewRenderer {
 			$_file = $_element;
 			$file = "{$this->filePath}{$_path}{$_file}.ctp";
 		}
-
 		$vars = array_merge($this->vars, array('title_for_layout' => $this->title));
 		$content_for_layout = $this->_render($file, $vars);
 
@@ -37,6 +37,7 @@ class ViewRenderer {
 		$Renderer = new self($this->Session);
 		$Renderer->title = $this->title;
 		$Renderer->data = $this->data;
+		$Renderer->params = $this->params;
 		$Renderer->request = $this->request;
 		$Renderer->helpers = $this->helpers;
 		$Renderer->set($vars);
@@ -53,7 +54,12 @@ class ViewRenderer {
 		$this->loadHelpers();
 		extract($vars);
 		ob_start();
-		require LAYER_PATH . $file;
+		if (!file_exists(LAYER_PATH . $file)) {
+			$get = array('controller' => $this->request['controller'], 'method' => $this->request['action'], 'file' => $file);
+			new ControllerLoader('ErrorPage', 'error_view', array(), $this->request['isAjax'], $get);
+		} else {
+			require LAYER_PATH . $file;
+		}
 		return ob_get_clean();
 	}
 

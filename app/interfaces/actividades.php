@@ -24,7 +24,7 @@ switch ($opc) {
 
 $Pagina->titulo = __('Actividades');
 $Pagina->PrintTop();
-$Form = new Form;
+$Form = new Form();
 
 $codigo_actividad = $Actividad->fields['codigo_actividad'];
 $codigo_cliente = $Actividad->extra_fields['codigo_cliente'];
@@ -33,7 +33,8 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 
 <form method="POST" action="actividades.php" name="form_actividades" id="form_actividades">
 	<input type="hidden" name="xdesde" id="xdesde" value="">
-	<input type="hidden" name="opc" value="buscar">
+	<input type="hidden" name="opc" id="opc" value="buscar">
+	<input type="hidden" name="id_actividad" id="id_actividad" value="">
 
 	<div style="width: 95%; text-align: "right"; margin: 4px auto;" align="right">
 		<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Actividad'), 'agregar', array('id' => 'agregar_actividad')); ?>
@@ -100,7 +101,8 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 
 <?php
 echo $Form->script();
-if ($opc == 'buscar') {
+
+if ($opc == 'buscar' || $opc == 'eliminar') {
 	if ($orden == '') {
 		$orden = 'id_actividad';
 	}
@@ -151,8 +153,11 @@ function acciones(& $fila) {
 
 	function EliminarActividad(id) {
 		if (parseInt(id) > 0 && confirm('¿Desea eliminar la actividad seleccionada?') == true) {
-			var url = 'actividades.php?id_actividad=' + id + '&opc=eliminar&desde=<?php echo ($desde) ? $desde : '0' ?>';
-			self.location.href = url;
+			var form = document.forms.namedItem('form_actividades');
+			form.action = 'actividades.php?desde=<?php echo ($desde) ? $desde : 0 ?>';
+			form.id_actividad.value = id;
+			form.opc.value = 'eliminar';
+			form.submit();
 		}
 	}
 

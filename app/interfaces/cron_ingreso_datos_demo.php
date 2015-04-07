@@ -176,7 +176,7 @@ if (Conf::EsAmbientePrueba()) {
 	list($anio_fin, $mes_fin, $dia_fin) = split("-", $fecha_fin);
 	$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 
-	$query = "SELECT codigo_asunto FROM asunto";
+	$query = "SELECT codigo_asunto FROM asunto WHERE activo = 1";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	$i = 0;
@@ -443,90 +443,96 @@ if (Conf::EsAmbientePrueba()) {
 		while ($fecha_mk_ini < $fecha_fin_restriccion) {
 			$fecha_mk_fin_periodo = mktime(0, 0, 0, date("m", $fecha_mk_ini) + 1, date("d", $fecha_mk_ini), date("Y", $fecha_mk_ini));
 
-			$query = "SELECT id_contrato FROM contrato";
+			$end_date = date("Y-m-d", $fecha_mk_fin_periodo);
+			$start_date = date("Y-m-d", $fecha_mk_ini);
+
+			$query = "SELECT
+									contrato.id_contrato,
+									COUNT(trabajo.id_trabajo) AS cont
+								FROM contrato
+								LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
+								LEFT JOIN trabajo ON trabajo.codigo_asunto = asunto.codigo_asunto
+								WHERE
+									contrato.activo = 'SI'
+									AND trabajo.fecha < '{$end_date}'
+									AND trabajo.fecha > '{$start_date}'
+								GROUP BY contrato.id_contrato
+								HAVING cont > 0";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			while (list($id_contrato) = mysql_fetch_array($resp)) {
-				$query2 = "SELECT count(*)
-													FROM trabajo
-													JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-													LEFT JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-													WHERE contrato.id_contrato='$id_contrato'
-														AND trabajo.fecha < '" . date("Y-m-d", $fecha_mk_fin_periodo) . "'
-														AND trabajo.fecha > '" . date("Y-m-d", $fecha_mk_ini) . "'";
-				$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
-				list($cont) = mysql_fetch_array($resp2);
-				if ($cont > 0) {
-					echo 'id_contrato: ' . $id_contrato . '<br>';
-					echo 'fecha_periodo_ini: ' . Utiles::fecha2sql(date("Y-m-d", $fecha_mk_ini)) . '<br>';
-					echo 'fecha_periodo_fin: ' . Utiles::fecha2sql(date("Y-m-d", $fecha_mk_fin_periodo)) . '<br><br>';
-					$cobro = new Cobro($sesion);
-					$id_proceso_nuevo = $cobro->GeneraProceso();
-					$id_cobro = $cobro->PrepararCobro(date("Y-m-d", $fecha_mk_ini), date("Y-m-d", $fecha_mk_fin_periodo), $id_contrato, false, $id_proceso_nuevo);
-					$cobro->Load($id_cobro);
-					echo 'id_cobro: ' . $id_cobro . '<br><br>-----------------------------------<br><br>';
-					$cobro->GuardarCobro(true);
-					$cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
-					$cobro->Edit('estado', 'EMITIDO');
-					$cobro->Edit('fecha_creacion', date('Y-m-d H:i:s', $fecha_mk_fin_periodo));
-					$cobro->Edit('fecha_cobro', date('Y-m-d H:i:s', $fecha_mk_fin_periodo + 172800));
-					$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s', $fecha_mk_fin_periodo + 172800));
-					$cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $fecha_mk_fin_periodo));
+			while (list($id_contrato, $cont) = mysql_fetch_array($resp)) {
+				echo 'id_contrato: ' . $id_contrato . '<br>';
+				echo 'fecha_periodo_ini: ' . Utiles::fecha2sql($start_date) . '<br>';
+				echo 'fecha_periodo_fin: ' . Utiles::fecha2sql($end_date) . '<br><br>';
+				$cobro = new Cobro($sesion);
+				$id_proceso_nuevo = $cobro->GeneraProceso();
+				$id_cobro = $cobro->PrepararCobro($start_date, $end_date, $id_contrato, false, $id_proceso_nuevo);
+				$cobro->Load($id_cobro);
+				echo 'id_cobro: ' . $id_cobro . '<br><br>-----------------------------------<br><br>';
+				$cobro->GuardarCobro(true);
+				$cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
+				$cobro->Edit('estado', 'EMITIDO');
+				$cobro->Edit('fecha_creacion', date('Y-m-d H:i:s', $fecha_mk_fin_periodo));
+				$cobro->Edit('fecha_cobro', date('Y-m-d H:i:s', $fecha_mk_fin_periodo + 172800));
+				$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s', $fecha_mk_fin_periodo + 172800));
+				$cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $fecha_mk_fin_periodo));
 
-					$historial_comentario = __('COBRO EMITIDO');
-					##Historial##
-					$his = new Observacion($sesion);
-					$his->Edit('fecha', date('Y-m-d H:i:s'));
-					$his->Edit('comentario', $historial_comentario);
-					if (!$sesion->usuario->fields['id_usuario'])
-						$his->Edit('id_usuario', $id_usuario_cobro);
-					else
-						$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-					$his->Edit('id_cobro', $cobro->fields['id_cobro']);
-					$his->Write();
+				$historial_comentario = __('COBRO EMITIDO');
+				##Historial##
+				$his = new Observacion($sesion);
+				$his->Edit('fecha', date('Y-m-d H:i:s'));
+				$his->Edit('comentario', $historial_comentario);
+				if (!$sesion->usuario->fields['id_usuario']) {
+					$his->Edit('id_usuario', $id_usuario_cobro);
+				} else {
+					$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+				}
+				$his->Edit('id_cobro', $cobro->fields['id_cobro']);
+				$his->Write();
+				$cobro->Write();
+
+				$cobro_moneda = new CobroMoneda($sesion);
+				$cobro_moneda->Load($cobro->fields['id_cobro']);
+
+				$documento = new Documento($sesion);
+				$documento->LoadByCobro($id_cobro);
+				$documento->Edit('fecha', date("Y-m-d", $fecha_mk_fin_periodo));
+				$documento->Write();
+
+				if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 5184000 || rand(0, 100) < 80) {
+					$cobro->Edit('estado', 'ENVIADO AL CLIENTE');
 					$cobro->Write();
+				}
 
-					$cobro_moneda = new CobroMoneda($sesion);
-					$cobro_moneda->Load($cobro->fields['id_cobro']);
+				if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 7776000 || ( $cobro->fields['estado'] == 'ENVIADO AL CLIENTE' && rand(0, 100) < 60 )) {
+					$multiplicador = -1.0;
+					$documento_pago = new Documento($sesion);
+					$documento_pago->Edit("monto", number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
+					$documento_pago->Edit("monto_base", number_format($documento->fields['monto_base'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda_base']]['cifras_decimales'], ".", ""));
+					$documento_pago->Edit("saldo_pago", number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
+					$documento_pago->Edit("id_cobro", $cobro->fields['id_cobro']);
+					$documento_pago->Edit('tipo_doc', 'T');
+					$documento_pago->Edit("id_moneda", $documento->fields['id_moneda']);
+					$documento_pago->Edit("fecha", date("Y-m-d", $fecha_mk_fin_periodo + 172800));
+					$documento_pago->Edit("glosa_documento", 'Pago de Cobro N°' . $cobro->fields['id_cobro']);
+					$documento_pago->Edit("codigo_cliente", $documento->fields['codigo_cliente']);
+					$documento_pago->Write();
 
-					$documento = new Documento($sesion);
-					$documento->LoadByCobro($id_cobro);
-					$documento->Edit('fecha', date("Y-m-d", $fecha_mk_fin_periodo));
-					$documento->Write();
+					$neteo_documento = new NeteoDocumento($sesion);
+					$neteo_documento->Edit('id_documento_cobro', $documento->fields['id_documento']);
+					$neteo_documento->Edit('id_documento_pago', $documento_pago->fields['id_documento']);
+					$neteo_documento->Edit('valor_cobro_honorarios', $cobro->fields['monto']);
+					$neteo_documento->Edit('valor_cobro_gastos', $cobro->fields['monto_gastos']);
+					$neteo_documento->Edit('valor_pago_honorarios', $cobro->fields['monto']);
+					$neteo_documento->Edit('valor_pago_gastos', $cobro->fields['monto_gastos']);
+					$neteo_documento->Write();
 
-					if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 5184000 || rand(0, 100) < 80) {
-						$cobro->Edit('estado', 'ENVIADO AL CLIENTE');
-						$cobro->Write();
-					}
-
-					if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 7776000 || ( $cobro->fields['estado'] == 'ENVIADO AL CLIENTE' && rand(0, 100) < 60 )) {
-						$multiplicador = -1.0;
-						$documento_pago = new Documento($sesion);
-						$documento_pago->Edit("monto", number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
-						$documento_pago->Edit("monto_base", number_format($documento->fields['monto_base'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda_base']]['cifras_decimales'], ".", ""));
-						$documento_pago->Edit("saldo_pago", number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
-						$documento_pago->Edit("id_cobro", $cobro->fields['id_cobro']);
-						$documento_pago->Edit('tipo_doc', 'T');
-						$documento_pago->Edit("id_moneda", $documento->fields['id_moneda']);
-						$documento_pago->Edit("fecha", date("Y-m-d", $fecha_mk_fin_periodo + 172800));
-						$documento_pago->Edit("glosa_documento", 'Pago de Cobro N°' . $cobro->fields['id_cobro']);
-						$documento_pago->Edit("codigo_cliente", $documento->fields['codigo_cliente']);
-						$documento_pago->Write();
-
-						$neteo_documento = new NeteoDocumento($sesion);
-						$neteo_documento->Edit('id_documento_cobro', $documento->fields['id_documento']);
-						$neteo_documento->Edit('id_documento_pago', $documento_pago->fields['id_documento']);
-						$neteo_documento->Edit('valor_cobro_honorarios', $cobro->fields['monto']);
-						$neteo_documento->Edit('valor_cobro_gastos', $cobro->fields['monto_gastos']);
-						$neteo_documento->Edit('valor_pago_honorarios', $cobro->fields['monto']);
-						$neteo_documento->Edit('valor_pago_gastos', $cobro->fields['monto_gastos']);
-						$neteo_documento->Write();
-
-						$cobro->Edit('estado', 'PAGADO');
-						$cobro->Write();
-					}
+					$cobro->Edit('estado', 'PAGADO');
+					$cobro->Write();
 				}
 			}
 			$fecha_mk_ini = $fecha_mk_fin_periodo;
+			ob_flush();
+			flush();
 		}
 	}
 

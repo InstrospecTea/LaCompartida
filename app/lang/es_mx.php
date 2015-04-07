@@ -60,5 +60,6 @@ $_LANG['ERROR_314'] = "El usuario o contraseña SAT no existe";
 $_LANG['ERROR_315'] = "El formato de factura enviado a SAT es incorrecto. Por favor contacte a Soporte";
 $_LANG['ERROR_316'] = "El formato de factura enviado a SAT es incorrecto. Por favor contacte a Soporte";
 $_LANG['ERROR_317'] = "Ya existe otro documento con esta serie y folio";
+$_LANG['ERROR_320'] = "Su estudio ya no posee folios disponibles para generar facturas electrónicas. Por favor contacte a Soporte de FacturemosYA";
 
 

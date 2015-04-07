@@ -11,6 +11,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	var $sesion;
 
+	/**
+	 * Indica a la Clase que al llamar a Write(), creará un registro en la tabla 'log_db'
+	 * @var boolean
+	 */
+	public $log_update = false;
+
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
 	}
@@ -37,6 +43,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if (!is_null($this->sesion->usuario->fields['id_usuario'])) {
 			$insertCriteria->add_pivot_with_value('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 		}
+
 		$reflected = new ReflectionClass($this->getClass());
 		$properties = $reflected->getProperties();
 		foreach ($properties as $property) {
@@ -135,11 +142,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	/**
-   * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
-   * @param Entity $object
-   * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
-   * @throws Exception
-   */
+	 * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
+	 * @param Entity $object
+	 * @param boolean $writeLog Define si se escribe o no el historial de movimientos.
+	 * @throws Exception
+	 */
 	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
 		$this->checkClass($object, $this->getClass());
@@ -175,7 +182,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->sesion = $this->sesion;
 		$this->fields = $object->fields;
 		$this->changes = $object->changes;
-		$this->log_update = true;
 		$this->guardar_fecha = true;
 		if ($this->Write()) {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
@@ -285,6 +291,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
+		if ($object->isLoaded()) {
+			$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			return true;
+		}
+		return false;
 	}
 
 	/**

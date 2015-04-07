@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Entity
  * Clase abstracta que define todas aquellas propiedades y métodos comunes a toda entidad del sistema.
@@ -9,6 +8,7 @@
 abstract class Entity {
 
 	public $fields = array();
+
 	public $changes = array();
 
 	/**
@@ -126,5 +126,4 @@ abstract class Entity {
 			return false;
 		}
 	}
-
 }

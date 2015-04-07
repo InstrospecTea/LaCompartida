@@ -14,11 +14,11 @@ class FacturaPago extends Objeto {
 			'titulo' => 'Fecha',
 			'tipo' => 'fecha'
 		),
-    'monto' => array(
+		'monto' => array(
 			'titulo' => 'Monto',
 			'tipo' => 'numero'
 		),
-    'id_moneda' => array(
+		'id_moneda' => array(
 			'titulo' => 'Moneda',
 			'relacion' => 'Moneda'
 		),
@@ -26,9 +26,9 @@ class FacturaPago extends Objeto {
 			'titulo' => 'Tipo Documento',
 			'tipo' => array('EP', 'CP', 'RP', 'TP', 'OP', 'CC')
 		),
-    'nro_documento' => 'Número Doc Pago',
-    'nro_cheque' => 'Número Cheque',
-    'descripcion' => 'Descripción'
+		'nro_documento' => 'Número Doc Pago',
+		'nro_cheque' => 'Número Cheque',
+		'descripcion' => 'Descripción'
 	);
 
 	public static $configuracion_reporte = array(
@@ -120,6 +120,26 @@ class FacturaPago extends Objeto {
 					'field' => 'tipo_cambio_pago',
 			),
 			array(
+				'field' => 'bruto_honorarios',
+				'format' => 'number',
+				'title' => 'Subtotal Honorarios',
+				'extras' =>
+				array(
+					'symbol' => 'simbolo',
+					'subtotal' => 'simbolo'
+				),
+			),
+			array(
+				'field' => 'descuento_honorarios',
+				'format' => 'number',
+				'title' => 'Descuento Honorarios',
+				'extras' =>
+				array(
+					'symbol' => 'simbolo',
+					'subtotal' => 'simbolo'
+				),
+			),
+			array(
 					'format' => 'number',
 					'extras' =>
 					array(
@@ -208,6 +228,11 @@ class FacturaPago extends Objeto {
 					'title' => 'Descripción Factura',
 					'field' => 'descripcion_factura',
 			),
+			array(
+					'field' => 'glosa_estudio',
+					'title' => 'Companía',
+					'visible' => false,
+			)
 	);
 
 	function FacturaPago($sesion, $fields = "", $params = "") {
@@ -224,16 +249,19 @@ class FacturaPago extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
-		if ($id)
+		if ($id) {
 			return $this->Load($id);
+		}
 		return false;
 	}
 
 	function Id($id = null) {
-		if ($id)
+		if ($id) {
 			$this->fields[$this->campo_id] = $id;
-		if (empty($this->fields[$this->campo_id]))
+		}
+		if (empty($this->fields[$this->campo_id])) {
 			return false;
+		}
 		return $this->fields[$this->campo_id];
 	}
 
@@ -242,8 +270,9 @@ class FacturaPago extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
-		if ($id)
+		if ($id) {
 			return $this->Load($id);
+		}
 		return false;
 	}
 
@@ -253,13 +282,13 @@ class FacturaPago extends Objeto {
 			if (!empty($this->fields['id_neteo_documento_adelanto'])) {
 				$neteo_documento = new NeteoDocumento($this->sesion);
 				$neteo_documento->Load($this->fields['id_neteo_documento_adelanto']);
-				$neteo_documento->Reestablecer(2);
+				$neteo_documento->Reestablecer();
 				$neteo_documento->Delete();
 			}
 			return $this->Delete();
-		}
-		else
+		} else {
 			return false;
+		}
 	}
 
 	function HtmlListaPagos($sesion, & $factura, $id_documento) {
@@ -317,8 +346,9 @@ class FacturaPago extends Objeto {
 	}
 
 	function generarDocumentoPago($parser_factura_pago, $theTag = '', $lang = 'es', $arr_fila_tmp = null) {
-		if (!isset($parser_factura_pago->tags[$theTag]))
+		if (!isset($parser_factura_pago->tags[$theTag])) {
 			return;
+		}
 		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
 
@@ -352,10 +382,8 @@ class FacturaPago extends Objeto {
 		$lista_facturas_desde_pago = $this->GetListaFacturasSoyPago();
 		$arr_factura = split(',', $lista_facturas_desde_pago);
 		$factura_encabezado->Load($arr_factura[0]);
-		//print_r($factura_encabezado->fields);
 		$glosa_cliente_encabezado = $factura_encabezado->fields['cliente'];
 		$rut_cliente_encabezado = $factura_encabezado->fields['RUT_cliente'];
-
 
 		$html = $parser_factura_pago->tags[$theTag];
 
@@ -418,8 +446,6 @@ class FacturaPago extends Objeto {
 				$html = str_replace('%V_B_hecho_por_valor%', '', $html);
 				$html = str_replace('%aprobado_por_valor%', '', $html);
 				$html = str_replace('%V_B_aprobado_por_valor%', '', $html);
-
-
 
 				$row = "";
 				$html_lista_facturas = $parser_factura_pago->tags['LISTA_FACTURAS'];
@@ -507,10 +533,11 @@ class FacturaPago extends Objeto {
 		$pje = 100 - $pje;
 		$pje = number_format($pje, 0);
 		$mje = "";
-		if ($pje_variable == 1)
+		if ($pje_variable == 1) {
 			$mje = str_replace('%', " $pje%", $glosa_concepto);
-		else
+		} else {
 			$mje = $glosa_concepto;
+		}
 
 		$mje_saldado = $this->GetSoyElUltimoPago();
 		$mje .= " " . $mje_saldado;
@@ -568,7 +595,7 @@ class FacturaPago extends Objeto {
 								LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_pago = ccfm2.id_cta_cte_mvto
 								LEFT JOIN factura_pago fp ON ccfm2.id_factura_pago = fp.id_factura_pago
 								WHERE fp." . $col_condicion . " =  '" . $id . "'";
-//		echo $query; //FFF: Agrego comprobacion vs respaldo documento.//left join documento d on d.id_cobro=f.id_cobro and d.id_factura_pago=fp.id_factura_pago
+		// echo $query; //FFF: Agrego comprobacion vs respaldo documento.//left join documento d on d.id_cobro=f.id_cobro and d.id_factura_pago=fp.id_factura_pago
 		return new ListaFacturas($this->sesion, null, $query);
 	}
 
@@ -615,9 +642,14 @@ class FacturaPago extends Objeto {
 		$writer->save(__('Facturas_Pagos'));
 	}
 
-	public function QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura) {
-		if ($orden == '')
+	public function QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
+		$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
+		$grupo_ventas, $razon_social, $descripcion_factura) {
+
+		if ($orden == '') {
 			$orden = 'fp.fecha DESC';
+		}
 
 		if ($where == '') {
 			$where = 1;
@@ -744,7 +776,7 @@ class FacturaPago extends Objeto {
 		}
 
 		return "SELECT SQL_CALC_FOUND_ROWS
-				  factura.id_factura
+					factura.id_factura
 				, factura.fecha as fecha_factura
 				, factura.id_moneda
 				, factura.honorarios
@@ -786,6 +818,7 @@ class FacturaPago extends Objeto {
 				, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 				, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
 				, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+				, prm_estudio.glosa_estudio
 			FROM factura_pago AS fp
 			JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 			JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
@@ -805,17 +838,63 @@ class FacturaPago extends Objeto {
 			LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 			LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
 			GROUP BY fp.id_factura_pago";
 	}
 
-	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura) {
-		$query = $this->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario, $tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura);
+	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
+		$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
+		$grupo_ventas, $razon_social, $descripcion_factura) {
+
+		$query = $this->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
+			$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+			$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
+			$grupo_ventas, $razon_social, $descripcion_factura);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+		$billingBusiness = new BillingBusiness($this->sesion);
+		$charginBusiness = new ChargingBusiness($this->sesion);
+		$coiningBusiness = new CoiningBusiness($this->sesion);
+
+		$charginData = array();
+		$coiningData = array();
+		$invoiceData = array();
+
+		foreach ($results as $key => $fila) {
+			$id_cobro = $results[$key]['id_cobro'];
+			$id_factura = $results[$key]['id_factura'];
+			$id_moneda = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
+			if ($id_factura) {
+				$invoice = $invoiceData[$id_factura];
+				if (is_null($invoice)) {
+					$invoice = $billingBusiness->getInvoice($id_factura);
+					$invoiceData[$id_factura] = $invoice;
+				}
+				$currency = $coiningData[$id_moneda];
+				if (is_null($currency)) {
+					$currency = $coiningBusiness->getCurrency($id_moneda);
+					$coiningData[$id_moneda] = $currency;
+				}
+				if (is_null($charginData[$id_cobro])) {
+					$charge = $charginBusiness->getCharge($id_cobro);
+					$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+				}
+				$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+				$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
+				$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
+				$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+
+				$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
+				$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
+			}
+		}
+		return $results;
 	}
 
 	public function PreCrearDato($data) {

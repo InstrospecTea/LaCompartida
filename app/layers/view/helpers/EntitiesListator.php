@@ -5,12 +5,14 @@ class EntitiesListator {
 	private $entities;
 	private $columnHandler;
 	private $trWriter;
+	private $totalizedFields;
+	private $formatOptions;
 
 	/**
 	 * @param array $entities
 	 * @throws UtilityException
 	 */
-	public function loadEntities(array $entities) {
+	public function loadEntities($entities) {
 		foreach ($entities as $element) {
 			if (!$this->checkElementClass($element)) {
 				throw new UtilityException('One of the elements on the Listator is not a subclass of Entity.');
@@ -32,6 +34,16 @@ class EntitiesListator {
 		}
 	}
 
+	public function setNumberFormatOptions(Currency $currency, Language $language) {
+		if (is_null($currency) || is_null($language)) {
+			$this->formatOptions = array();
+		} else {
+			$this->formatOptions['currency'] = $currency;
+			$this->formatOptions['language'] = $language;
+		}
+
+	}
+
 	/**
 	 * @param $columnName
 	 * @param $calculationExpression
@@ -41,6 +53,10 @@ class EntitiesListator {
 			'columnName' => $columnName,
 			'calculationExpression' => $calculationExpression
 		);
+	}
+
+	public function totalizeFields(array $fields) {
+		$this->totalizedFields = $fields;
 	}
 
 	public function addOption($columnName, $optionType) {
@@ -99,6 +115,8 @@ class EntitiesListator {
 	 * @return HtmlBuilder
 	 */
 	private function generateBody() {
+		$currency = $this->formatOptions['currency'];
+		$language = $this->formatOptions['language'];
 		$tbody = new HtmlBuilder();
 		$tbody
 			->set_tag('tbody')
@@ -113,19 +131,73 @@ class EntitiesListator {
 					->set_tag('tr')
 					->set_closure(true);
 				foreach ($this->columnHandler as $columnHandler) {
-					$th = new HtmlBuilder();
-					$th->set_tag('th')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
+					$td = new HtmlBuilder();
+					$td->set_tag('td')->set_closure(true)->add_attribute('class','buscador');
 					if (is_callable($columnHandler['calculationExpression'])) {
-						$th->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
+						$td->set_html(call_user_func($columnHandler['calculationExpression'], $entity));
 					} else {
-						$th->set_html($entity->get($columnHandler['calculationExpression']));
+						$currency = $this->formatOptions['currency'];
+						$language = $this->formatOptions['language'];
+						if (!empty($currency) && !empty($language)) {
+							$td->add_attribute('style', 'text-align:right;');
+							$td->set_html(number_format($entity->get($columnHandler['calculationExpression']), $currency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles')));
+						} else {
+							$td->set_html($entity->get($columnHandler['calculationExpression']));
+						}
 					}
-					$tr->add_child($th);
+					$tr->add_child($td);
 				}
 			}
 			$tbody->add_child($tr);
 		}
+		if (!empty($this->totalizedFields)) {
+			$tbody->add_child($this->generateTotalization());
+		}
 		return $tbody;
+	}
+
+	private function generateTotalization() {
+		$currency = $this->formatOptions['currency'];
+		$language = $this->formatOptions['language'];
+		$accumulators = array();
+		foreach ($this->columnHandler as $column) {
+			if (in_array($column['columnName'], $this->totalizedFields)) {
+				if (!is_callable($column['calculationExpression'])) {
+					$accumulators[$column['calculationExpression']] = 0;
+				} else {
+					throw new UtilityException('The totalization could not be done for a column with custom function row writer.');
+				}
+			}
+		}
+		foreach ($this->entities as $entity) {
+			foreach ($accumulators as $acumKey => $accumulator) {
+				$toAcumulate = $entity->get($acumKey);
+				$accumulators[$acumKey] = $accumulator + $toAcumulate;
+			}
+		}
+		$tr = new HtmlBuilder();
+		$tr
+			->set_tag('tr')
+			->set_closure(true);
+		foreach ($this->columnHandler as $column) {
+			if (array_key_exists($column['calculationExpression'], $accumulators)) {
+				$th = new HtmlBuilder();
+				$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;text-align:center;');
+				if (!empty($currency) && !empty($language)) {
+					$th->add_attribute('style', 'text-align:right;');
+					$th->set_html($currency->get('simbolo').' '.number_format($accumulators[$column['calculationExpression']], $currency->get('cifras_decimales'), $language->get('separador_decimales'), $language->get('separador_miles')));
+				} else {
+					$th->set_html($accumulators[$column['calculationExpression']]);
+				}
+				$tr->add_child($th);
+			} else {
+				$th = new HtmlBuilder();
+				$th->set_tag('td')->set_closure(true)->add_attribute('style','padding-left:10px;padding-right:10px;');
+				$th->set_html('');
+				$tr->add_child($th);
+			}
+		}
+		return $tr;
 	}
 
 	/**

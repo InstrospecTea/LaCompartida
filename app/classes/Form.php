@@ -1,7 +1,9 @@
 <?php
 
 require_once dirname(__FILE__) . '/../../app/conf.php';
-
+/**
+ * Esta clase provee helpers para crear elementos de formularios HTML
+ */
 class Form {
 
 	public $Utiles;
@@ -16,12 +18,14 @@ class Form {
 	}
 
 	/**
-	 * Crea elemento select a partir de un Array
-	 * @param type $name
-	 * @param type $options
-	 * @param type $selected
-	 * @param Array $attrs
-	 * @return type
+	 * Construye un select a partir de un Array
+	 *
+	 * @param string $name Nombre del selector en el formulario
+	 * @param array $options Opciones para crear elementos <option/>
+	 * @param string $selected Opción seleccionada por default
+	 * @param array $attrs Atributos del elemento HTML, ej: id, type, etc.
+	 *
+	 * @return string HTML que contiene el selector
 	 */
 	public function select($name, $options, $selected = null, Array $attrs = array()) {
 		$_attrs = $attrs + array('empty' => '');
@@ -150,6 +154,33 @@ class Form {
 	}
 
 	/**
+	 * Crea un elemento textarea
+	 * @param string $name
+	 * @param string $value
+	 * @param Array $attrs
+	 * @return string
+	 */
+	public function textarea($name, $value, Array $attrs = array()) {
+		$attrs = array_merge(array('label' => $this->defaultLabel, 'name' => null, 'rows' => 3), $attrs);
+		$label = null;
+
+		if ($attrs['label'] === true) {
+			$label = $this->Utiles->humanize($name);
+		} else if ($attrs['label'] !== false) {
+			$label = $attrs['label'];
+		}
+		if (empty($attrs['name']) && !empty($name)) {
+			$attrs['name'] = $name;
+		}
+		if (!isset($attrs['id']) && ($attrs['id'] !== false || $attrs['id'] === true)) {
+			$attrs['id'] = $name;
+		}
+		unset($attrs['label']);
+		$input = $this->Html->tag('textarea', $value, $attrs, false);
+		return empty($label) ? $input : $this->label($label, $attrs['name']) . $input;
+	}
+
+	/**
 	 * Devuelve elemento checkbox
 	 * @param type $name
 	 * @param type $value
@@ -176,6 +207,38 @@ class Form {
 		$radio = $this->hidden($name, '0', array('id' => false))
 				. $this->Html->tag('input', null, $attrs, true);
 		return empty($label) ? $radio : $this->label($radio . $label);
+	}
+
+	/**
+	 * Construye un grupo de elementos checkbox
+	 * @param type $options Array name => label, label puede ser un Array donde sus valores indican los atributos
+	 * @param type $checkeds Checkboxes seleccionados por defecto
+	 * @param type $container Contenedor para el grupo de checkbox. Default: div
+	 * @param type $container_attrs Atributos del elemento contenedor, ej: id, class, etc.
+	 * @return string HTML que contiene el grupo de checkboxes
+	 */
+	public function checkbox_group($options, Array $checkeds = array(), $container = 'div', Array $container_attrs = array()) {
+		$html = '';
+		$x = 1;
+		foreach ((Array) $options as $name => $label) {
+			$_attrs = array();
+			if (is_array($label)) {
+				$_attrs = $label;
+				$label = empty($_attrs['label']) ? $this->Utiles->humanize($name) : $_attrs['label'];
+				unset($_attrs['label']);
+			}
+			$attrs = array('label' => $this->defaultLabel) + $_attrs;
+			if ($attrs['label'] === true) {
+				$attrs['label'] = $label;
+			}
+			$attrs['id'] = "{$name}_{$x}";
+			$html .= $this->checkbox($name, 1, in_array($name, $checkeds), $attrs);
+			++$x;
+		}
+		if ($container !== false) {
+			$html = $this->Html->tag($container, $html,  $container_attrs);
+		}
+		return $html;
 	}
 
 	/**
@@ -243,38 +306,6 @@ class Form {
 	}
 
 	/**
-	 *
-	 * @param type $options Array name => label, label puede ser un Array donde sus valores indican los atributos
-	 * @param type $selected
-	 * @param type $container
-	 * @param type $container_attrs
-	 * @return type
-	 */
-	public function checkbox_group($options, Array $checkeds = array(), $container = 'div', Array $container_attrs = array()) {
-		$html = '';
-		$x = 1;
-		foreach ((Array) $options as $name => $label) {
-			$_attrs = array();
-			if (is_array($label)) {
-				$_attrs = $label;
-				$label = empty($_attrs['label']) ? $this->Utiles->pascalize($name) : $_attrs['label'];
-				unset($_attrs['label']);
-			}
-			$attrs = array('label' => $this->defaultLabel) + $_attrs;
-			if ($attrs['label'] === true) {
-				$attrs['label'] = $label;
-			}
-			$attrs['id'] = "{$name}_{$x}";
-			$html .= $this->checkbox($name, 1, in_array($name, $checkeds), $attrs);
-			++$x;
-		}
-		if ($container !== false) {
-			$html = $this->Html->tag($container, $html,  $container_attrs);
-		}
-		return $html;
-	}
-
-	/**
 	 * Agraga boton con icono de TTB
 	 * @param type $text
 	 * @param type $icon
@@ -328,7 +359,9 @@ class Form {
 		$tag = $attrs['tag'];
 		unset($attrs['tag']);
 		if ($tag === 'a') {
-			$attrs['href'] = 'javascript:void(0)';
+			if (empty($attrs['href'])) {
+				$attrs['href'] = 'javascript:void(0)';
+			}
 			if (!isset($attrs['title']) || $attrs['title'] !== false) {
 				$attrs['title'] = $text;
 			}
