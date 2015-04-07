@@ -1,8 +1,8 @@
 # Changelog
 
-## Hotfix 15.6.7
+## Hotfix 15.6.8
 Martes 7 de Abril 2015
-* **Fix:** [Corrige opción Proporcional al editar cobro](https://github.com/LemontechSA/ttb/pull/)
+* **Fix:** [Corrige opción Proporcional al editar cobro](https://github.com/LemontechSA/ttb/pull/898)
 
 ## Hotfix 15.6.7
 Lunes 6 de Abril 2015
