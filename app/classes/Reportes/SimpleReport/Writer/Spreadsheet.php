@@ -166,6 +166,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					$col_subtotal->Field($column->extras['subtotal'])
 							->Title($column->extras['subtotal'])
 							->Format('text')
+							->Name($column->extras['subtotal'])
 							->Extras(array('width' => 0));
 					$aux_columns[$column->extras['subtotal']] = $col_subtotal;
 				}

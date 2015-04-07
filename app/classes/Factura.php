@@ -2294,12 +2294,14 @@ class Factura extends Objeto {
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		// Cambio los select para obtener los saldos de las facturas separados por moneda
-		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, -1 * SUM(cta_cte_fact_mvto.saldo) AS saldo";
+		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, abs(cta_cte_fact_mvto.saldo) AS saldo";
+
 		$query = preg_replace('/(^\s*SELECT\s)[\s\S]+?(\sFROM\s)/mi', "$1 $select $2", $query);
 		$query = preg_replace('/\sORDER BY.+|\sLIMIT.+/mi', '', $query);
-		$query = preg_replace('/\sGROUP BY.+/mi', ' GROUP BY factura.id_moneda ', $query);
+		$query = preg_replace('/\sGROUP BY.+/mi', ' GROUP BY factura.id_factura ', $query);
 
-		$statement = $this->sesion->pdodbh->prepare($query);
+		$query2 = "SELECT id_moneda, simbolo, cifras_decimales, sum(saldo) AS saldo FROM ($query) AS T GROUP BY id_moneda";
+		$statement = $this->sesion->pdodbh->prepare($query2);
 		$statement->execute();
 
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
