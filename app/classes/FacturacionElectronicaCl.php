@@ -42,7 +42,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 				$output = $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento factura-cedible', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));
 			}
 		} else {
-			$output = $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento factura-cedible', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));			
+			$output = $Html->tag('a', $img_pdf_copia, array('title' => 'Descargar copia cedible', 'class' => 'factura-documento factura-cedible', 'data-factura' => $id_factura, 'data-original' => 0, 'href' => '#'));
 		}
 		return $output;
 	}
@@ -108,7 +108,7 @@ class FacturacionElectronicaCl extends FacturacionElectronica {
 					} else {
 						buttons = jQuery('{$BotonDescargarHTML}{$BotonDescargarCedible}');
 					}
-					buttons.each(function(i, e) { 
+					buttons.each(function(i, e) {
 						jQuery(e).attr("data-factura", id_factura);
 					});
 					self.replaceWith(buttons);
@@ -156,11 +156,11 @@ EOF;
 			$Sesion = new Sesion();
 			$Estudio = new PrmEstudio($Sesion);
 			$Estudio->Load($Factura->fields['id_estudio']);
-			
+
 			$rut = $Estudio->GetMetaData('rut');
 			$usuario = $Estudio->GetMetadata('facturacion_electronica_cl.usuario');
 			$password = $Estudio->GetMetadata('facturacion_electronica_cl.password');
-				
+
 			$WsFacturacionCl = new WsFacturacionCl;
 			$WsFacturacionCl->setLogin($rut, $usuario, $password);
 			if ($WsFacturacionCl->hasError()) {
@@ -182,7 +182,10 @@ EOF;
 		if (!is_null($hookArg['Error'])) {
 			return $hookArg;
 		} else {
-			$name = sprintf('Factura_%s.pdf', $Factura->obtenerNumero());
+			$PrmDocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
+			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+			$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
+			$name = sprintf('%s_%s.pdf', $docName, $Factura->obtenerNumero());
 			header("Content-Transfer-Encoding: binary");
 			header("Content-Type: application/pdf");
 			header('Content-Description: File Transfer');
@@ -316,11 +319,22 @@ EOF;
 		$Contrato = new Contrato($Sesion);
 		$Contrato->Load($Factura->fields['id_contrato']);
 
+		if ($tipoDTE == 39 || $tipoDTE == 41) {
+			$Cobro = new Cobro($Sesion);
+			$Cobro->Load($Factura->fields['id_cobro'], array('id_cobro', 'fecha_ini', 'fecha_fin'));
+			$fecha_desde = $Cobro->fields['fecha_ini'];
+			if (empty($fecha_desde) || $fecha_desde == '0000-00-00') {
+				$fecha_desde = $Cobro->fechaPrimerTrabajo();
+			}
+			$fecha_hasta = $Cobro->fields['fecha_fin'];
+		}
 		$arrayFactura = array(
 			'tipo_dte' => $tipoDTE,
 			'afecto' => $afecto,
 			'fecha_emision' => Utiles::sql2date($Factura->fields['fecha'], '%Y-%m-%d'),
 			'fecha_vencimiento' => Utiles::sql2date($Factura->fields['fecha_vencimiento'], '%Y-%m-%d'),
+			'fecha_desde' => $fecha_desde,
+			'fecha_hasta' => $fecha_hasta,
 			'folio' => $Factura->fields['numero'],
 			'monto_neto' => intval($subtotal_factura),
 			'tasa_iva' => intval($Factura->fields['porcentaje_impuesto']),

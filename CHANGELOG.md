@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.9
+Martes 7 de Abril 2015
+* **Fix:** [Se modifican los servicios para emitir boletas electrónicas y obtener su PDF](https://github.com/LemontechSA/ttb/pull/899)
+
 ## Hotfix 15.6.8
 Martes 7 de Abril 2015
 * **Fix:** [Corrige opción Proporcional al editar cobro](https://github.com/LemontechSA/ttb/pull/898)
