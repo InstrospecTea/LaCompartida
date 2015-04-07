@@ -1404,7 +1404,7 @@ else
 					}
 					$formas_cobro['PROPORCIONAL'] = array(
 						'label' => __('Proporcional'),
-						'onclick' => 'HideMonto(); DisplayEscalas(true);'
+						'onclick' => 'DisplayEscalas(false);ShowMonto(true, false);'
 					) + TTip($tip_proporcional, true);
 
 					if (!Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) {
