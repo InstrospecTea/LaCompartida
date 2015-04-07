@@ -29,11 +29,23 @@ if ($xls) {
 	}
 
 	if (!empty($fecha1)) {
-		$criteria->add_restriction(CriteriaRestriction::greater_or_equals_than('cp.fecha_cobro', "'{$fecha1}'"));
+		$criteria->add_restriction(
+			CriteriaRestriction::if_clause(
+				CriteriaRestriction::is_null('cp.fecha_cobro'),
+				CriteriaRestriction::greater_or_equals_than('cob.fecha_emision', "'{$fecha1}'"),
+				CriteriaRestriction::greater_or_equals_than('cp.fecha_cobro', "'{$fecha1}'")
+			)
+		);
 	}
 
 	if (!empty($fecha2)) {
-		$criteria->add_restriction(CriteriaRestriction::lower_or_equals_than('cp.fecha_cobro', "'{$fecha2}'"));
+		$criteria->add_restriction(
+			CriteriaRestriction::if_clause(
+				CriteriaRestriction::is_null('cp.fecha_cobro'),
+				CriteriaRestriction::lower_or_equals_than('cob.fecha_emision', "'{$fecha2}'"),
+				CriteriaRestriction::lower_or_equals_than('cp.fecha_cobro', "'{$fecha2}'")
+			)
+		);
 	}
 
 	if ($mostrar_con_cobro){
