@@ -21,13 +21,21 @@ class WsFacturacionCl extends WsFacturacion {
 	 */
 	public function emitirFactura($dataFactura) {
 		$afecto = $dataFactura['afecto'];
+		$idDoc = array(
+			'TipoDTE' => $dataFactura['tipo_dte'],
+			'Folio' => $dataFactura['folio'],
+			'FchEmis' => $dataFactura['fecha_emision']
+		);
+		if ($dataFactura['tipo_dte'] == 39 || $dataFactura['tipo_dte'] == 41) {
+			$idDoc['Folio'] = 0;
+			$idDoc['IndServicio'] = 1;
+			$idDoc['IndMntNeto'] = 2;
+			$idDoc['PeriodoDesde'] = $dataFactura['fecha_desde'];
+			$idDoc['PeriodoHasta'] = $dataFactura['fecha_hasta'];
+		}
 		$documento = array(
 			'Encabezado' => array(
-				'IdDoc' => array(
-					'TipoDTE' => $dataFactura['tipo_dte'],
-					'Folio' => $dataFactura['folio'],
-					'FchEmis' => $dataFactura['fecha_emision']
-				),
+				'IdDoc' => $idDoc,
 				'Emisor' => array(
 					'RUTEmisor' => $dataFactura['emisor']['rut'],
 					'RznSoc' => $dataFactura['emisor']['razon_social'],
@@ -137,9 +145,10 @@ class WsFacturacionCl extends WsFacturacion {
 	}
 
 	public function getPdfUrl($documento, $original = true) {
+		$tipomov = in_array($documento['TipoDte'], array(39, 41)) ? 'B' : substr($documento['Operacion'], 0, 1);
 		$params = array(
 			'login' => $this->getLogin(),
-			'tpomov' => base64_encode(substr($documento['Operacion'], 0, 1)),
+			'tpomov' => base64_encode($tipomov),
 			'folio' => base64_encode($documento['Folio']),
 			'tipo' => base64_encode($documento['TipoDte']),
 			'cedible' => base64_encode($original ? 'False' : 'True')
