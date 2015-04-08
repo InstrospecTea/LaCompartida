@@ -4,6 +4,7 @@
 Miércoles 8 de Abril 2015
 * **Fix:** [La asignación del identificador de la carta cuando no se tiene configurado una carta MULTIPLE](https://github.com/LemontechSA/ttb/pull/902)
 * **Fix:** [Mantenedor genérico para las tablas paramétricas FW](https://github.com/LemontechSA/ttb/pull/902)
+* **Fix:** [Ordenar selector de actividades ascendentemente (por glosa)](https://github.com/LemontechSA/ttb/pull/902)
 
 ## Hotfix 15.6.10
 Martes 7 de Abril 2015
