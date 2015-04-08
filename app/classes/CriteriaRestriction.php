@@ -221,4 +221,15 @@ class CriteriaRestriction {
 		return new CriteriaRestriction("({$column} BETWEEN {$left} AND {$right})");
 	}
 
+	/**
+	 * Genera una sentencia if de mysql
+	 * @param type $condition
+	 * @param type $result_true
+	 * @param type $result_false
+	 * @return \CriteriaRestriction
+	 */
+	public function if_clause($condition, $result_true, $result_false) {
+		return new CriteriaRestriction("IF({$condition}, {$result_true}, {$result_false})");
+	}
+
 }

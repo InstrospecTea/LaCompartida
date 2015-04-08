@@ -487,19 +487,25 @@ class Documento extends Objeto {
 			$td1_style = 'white-space: nowrap; text-align: left;';
 			$td2_style = 'color: #333333; font-size: 10px; text-align: right;';
 			$link_style = 'color: blue; font-size: 11px;';
-			if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-				$out .= $Html->tag('tr',
-						$Html->tag('td', $nombre, array('style' => $td1_style)) .
-						$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
-						$Html->tag('td')
-				);
-			} else {
+
+			/**
+			 * Si el documento no tiene honorarios ni gastos, es un documento sin neteo
+			 * y se debe poder eliminar por el SADM
+			 */
+			$eliminar_documento = empty($honorarios) && empty($gastos) && $this->sesion->usuario->Es('SADM');
+			if (!Conf::GetConf($this->sesion, 'NuevoModuloFactura') || $eliminar_documento) {
 				$nombre = $Html->link($nombre, 'javascript:void(0)', array('onclick' => "EditarPago($id)", 'style' => $link_style));
 				$btn_link = $Form->image_link('cruz_roja.gif', false, array('onclick' => "EliminaDocumento($id)", 'target' => '_parent', 'title' => 'Eliminar'));
 				$out .= $Html->tag('tr',
 						$Html->tag('td', $nombre, array('style' => $td1_style)) .
 						$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
 						$Html->tag('td', $btn_link)
+				);
+			} else {
+				$out .= $Html->tag('tr',
+						$Html->tag('td', $nombre, array('style' => $td1_style)) .
+						$Html->tag('td', "$honorarios $gastos", array('style' => $td2_style)) .
+						$Html->tag('td')
 				);
 			}
 			if ($pago_retencion) {
