@@ -592,7 +592,7 @@ if ($refresh_parent) {
 				</td>
 				<td align=left width="440" nowrap>
 				<?php
-				echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_trabajo ORDER BY id_area_trabajo ASC", 'id_area_trabajo', $t->fields['id_area_trabajo'], '', 'Elegir', '400');
+				echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_trabajo ORDER BY glosa ASC", 'id_area_trabajo', $t->fields['id_area_trabajo'], '', 'Elegir', '400');
 				?>
 				</td>
 			</tr>

@@ -12,7 +12,7 @@
 	$sesion = new Sesion(array('REP'));
 
 	$pagina = new Pagina($sesion);
-	
+
 	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 	$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
@@ -430,9 +430,9 @@ $hoy = date("Y-m-d");
 	  <td rowspan="2" align=left>
 	  	<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>	  </td>
 	  <td rowspan="2" align=left>
-	  	<? 
-                   if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists( 'Conf','CodigoSecundario' ) && Conf::CodigoSecundario() ) ) 
-	  			echo Html::SelectQuery($sesion,"SELECT codigo_cliente_secundario AS codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]",$clientes,"class=\"selectMultiple\" multiple size=6 ","","200"); 
+	  	<?
+                   if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists( 'Conf','CodigoSecundario' ) && Conf::CodigoSecundario() ) )
+	  			echo Html::SelectQuery($sesion,"SELECT codigo_cliente_secundario AS codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]",$clientes,"class=\"selectMultiple\" multiple size=6 ","","200");
 	 			 else
 	 			 	echo Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]",$clientes,"class=\"selectMultiple\" multiple size=6 ","","200");
 	 		?>
@@ -503,13 +503,13 @@ $hoy = date("Y-m-d");
       <select name="tipo">
       	<option value="Profesional" <?=$tipo == 'Profesional' ? 'selected' : ''?>><?=__('Profesional') ?></option>
         <option value="Cliente" <?=$tipo == 'Cliente' ? 'selected' : ''?>><?=__('Cliente') ?></option>
-     <?php 
-     
+     <?php
+
         if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
         <option value="AreaProfesional" <?=$tipo == 'AreaProfesional' ? 'selected' : '' ?>><?=__('Área Trabajo - Profesional') ?></option>
         <option value="AreaCliente" <?=$tipo == 'AreaCliente' ? 'selected' : '' ?>><?=__('Área Trabajo - Cliente') ?></option>
-       
-     <?php 
+
+     <?php
 
      endif; ?>
       </select><br><br>
@@ -568,7 +568,7 @@ $hoy = date("Y-m-d");
 			</td>
 			<?php if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
 			<td rowspan="2" align="left">
-				<?php echo Html::SelectQuery($sesion,"SELECT * FROM prm_area_trabajo ORDER BY id_area_trabajo ASC",'id_area_trabajo[]', $id_area_trabajo, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200" ); ?>
+				<?php echo Html::SelectQuery($sesion,"SELECT * FROM prm_area_trabajo ORDER BY glosa ASC",'id_area_trabajo[]', $id_area_trabajo, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200" ); ?>
 			</td>
 			<?php 	endif; 	?>
 			<td rowspan="2" align="left">
@@ -623,14 +623,14 @@ if($area_y_categoria)
 		$lista_areas = join("','", $areas);
 		$where_area = " AND usuario.id_area_usuario IN ('$lista_areas')";
 	}
-		
+
 	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')){
 		if ( is_array( $id_area_trabajo ) ){
 			$lista_areas_trabajo = join("','", $id_area_trabajo);
 			$where_area_trabajo = " AND trabajo.id_area_trabajo IN ('$lista_areas_trabajo') ";
 		}
 	}
-	
+
 	if(is_array($categorias)) {
 		$lista_categorias = join("','", $categorias);
 		$where_categoria = " AND usuario.id_categoria_usuario IN ('$lista_categorias')";
@@ -723,21 +723,21 @@ if($horas_sql == 'valor_cobrado')
 	$col_resultado = "UF";
 }
 
-$query ="SELECT 
-						CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as profesional, 
+$query ="SELECT
+						CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as profesional,
 						usuario.username as username_profesional,
-						usuario.id_usuario, 
-						cliente.id_cliente, 
-						cliente.codigo_cliente, 
-						cliente.codigo_cliente_secundario, 
+						usuario.id_usuario,
+						cliente.id_cliente,
+						cliente.codigo_cliente,
+						cliente.codigo_cliente_secundario,
 						cliente.glosa_cliente,
 						CONCAT(asunto.glosa_asunto,' (',asunto.codigo_asunto,')') AS glosa_asunto,
-                                                trabajo.id_area_trabajo as id_area_trabajo, 
-                                                IF( trabajo.id_area_trabajo IS NULL,'Indefinido',prm_area_trabajo.glosa) as glosa_area_trabajo, 
-						asunto.codigo_asunto, 
-						asunto.codigo_asunto_secundario, 
-						grupo_cliente.id_grupo_cliente, 
-						grupo_cliente.glosa_grupo_cliente, 
+                                                trabajo.id_area_trabajo as id_area_trabajo,
+                                                IF( trabajo.id_area_trabajo IS NULL,'Indefinido',prm_area_trabajo.glosa) as glosa_area_trabajo,
+						asunto.codigo_asunto,
+						asunto.codigo_asunto_secundario,
+						grupo_cliente.id_grupo_cliente,
+						grupo_cliente.glosa_grupo_cliente,
 						asunto.codigo_cliente,
 						$select
 						SUM(TIME_TO_SEC(duracion)/60)/60 as hr_trabajadas,
@@ -746,7 +746,7 @@ $query ="SELECT
 						SUM(tarifa_hh*TIME_TO_SEC(duracion_cobrada)/3600*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base*cobro.monto/IF(cobro.monto_thh>0,cobro.monto_thh,cobro.monto)) / SUM(TIME_TO_SEC(duracion_cobrada - duracion)/60)/60 / SUM(TIME_TO_SEC(duracion)/60)/60  as valor_hr_promedio
 					FROM trabajo
 					LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
-                                        LEFT JOIN prm_area_trabajo ON prm_area_trabajo.id_area_trabajo = trabajo.id_area_trabajo 
+                                        LEFT JOIN prm_area_trabajo ON prm_area_trabajo.id_area_trabajo = trabajo.id_area_trabajo
 					LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
@@ -758,7 +758,7 @@ $query ="SELECT
 					$where_area
 					$where_area_trabajo
 					$where_categoria
-					$group_by 
+					$group_by
 					$orderby";
 // echo $query;
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -802,7 +802,7 @@ if($opc=='grafico')
 			$total += $row[$horas_sql];
 		}
 	}
-        
+
         if($ver == 'area_prof' || $ver == 'area_cliente')
         {
                 while($row = mysql_fetch_array($resp))
@@ -816,11 +816,11 @@ if($opc=='grafico')
 			$total += $row[$horas_sql];
 		}
         }
-        
+
 	if($nombres){
 		arsort($tiempos);
 		$otros = 0;
-		
+
 		foreach($tiempos as $key => $tiempo){
 			if($limite-- > 0) $datos_grafico .= "&nombres[]=".$nombres[$key]."&tiempo[]=".str_replace(',','.',$tiempos[$key]);
 			else $otros += $tiempos[$key];
@@ -855,10 +855,10 @@ else
 					$where_cliente
 					$where_area
 					$where_categoria
-					GROUP BY trabajo.id_usuario 
+					GROUP BY trabajo.id_usuario
 					$orderby";
 		$resp_totales_usuarios = mysql_query($query_totales_usuarios,$sesion->dbh) or Utiles::errorSQL($query_totales_usuarios,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		$valores_usuarios = array();
 		while( $row = mysql_fetch_assoc($resp_totales_usuarios) )
 		{
@@ -933,7 +933,7 @@ else
 							$codigo_cliente_actual = $row['codigo_cliente_secundario'];
 						else
 							$codigo_cliente_actual = $row['codigo_cliente'];
-							
+
 						$cont_usuario =1;
 					}
 					else
@@ -1052,7 +1052,7 @@ else
 					$dato2 = $row['hr_cobrable'];
 					if( $valores_usuarios[$row['profesional']]['hr_trabajadas'] > 0 )
 						$porcentaje1 = number_format( 100 * $dato / $valores_usuarios[$row['profesional']]['hr_trabajadas'], 2, ',', ' ');
-					else	
+					else
 						$porcentaje1 = "0,00";
 					if( $valores_usuarios[$row['profesional']]['hr_cobrable'] > 0 )
 						$porcentaje2 = number_format( 100 * $dato2 / $valores_usuarios[$row['profesional']]['hr_cobrable'], 2, ',', ' ');
@@ -1087,7 +1087,7 @@ else
 					$dato = $row[$horas_sql];
 					if( $valores_usuarios[$row['profesional']][$horas_sql] > 0 )
 						$porcentaje = number_format(100 * $row[$horas_sql] / $valores_usuarios[$row['profesional']][$horas_sql],2,',',''); // $total_cliente_actual[$row['glosa_cliente']];
-					else	
+					else
 						$porcentaje = "0,00";
 					$minutos_trabajados = number_format(($row[$horas_sql]-floor($row[$horas_sql]))*60,2);
 					$dato_minutos = floor($row[$horas_sql]).':'.sprintf('%02d',round($minutos_trabajados));
@@ -1245,13 +1245,13 @@ else
             $query_totales_usuarios = " SELECT CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as profesional,
                                                 cliente.codigo_cliente, $select
 						SUM(TIME_TO_SEC(duracion)/60)/60 as hr_trabajadas,
-                                                IF(trabajo.id_area_trabajo IS NOT NULL, prm_area_trabajo.glosa, 'Indefinido') as glosa_area_trabajo, 
-                                                trabajo.id_area_trabajo, 
+                                                IF(trabajo.id_area_trabajo IS NOT NULL, prm_area_trabajo.glosa, 'Indefinido') as glosa_area_trabajo,
+                                                trabajo.id_area_trabajo,
 						SUM(TIME_TO_SEC(if(trabajo.cobrable = 1,duracion_cobrada,0))/60)/60 as hr_cobrable,
 						SUM(tarifa_hh*TIME_TO_SEC(duracion_cobrada)/3600*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base*cobro.monto/IF(cobro.monto_thh>0,cobro.monto_thh,cobro.monto)) as valor_cobrado
 						FROM trabajo
 					LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
-                                        LEFT JOIN prm_area_trabajo ON prm_area_trabajo.id_area_trabajo = trabajo.id_area_trabajo 
+                                        LEFT JOIN prm_area_trabajo ON prm_area_trabajo.id_area_trabajo = trabajo.id_area_trabajo
 					LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
@@ -1262,10 +1262,10 @@ else
 					$where_cliente
 					$where_area
 					$where_categoria
-					GROUP BY glosa_area_trabajo 
+					GROUP BY glosa_area_trabajo
 					$orderby";
 		$resp_totales_usuarios = mysql_query($query_totales_usuarios,$sesion->dbh) or Utiles::errorSQL($query_totales_usuarios,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		$valores_areas = array();
 		while( $row = mysql_fetch_assoc($resp_totales_usuarios) )
 		{
@@ -1278,7 +1278,7 @@ else
 					$valores_areas[$row['glosa_area_trabajo']][$index] = $valor;
 			}
 		}
-                
+
                 $valor_total = 0;
                 foreach($valores_areas as $area => $valor) {
                     $valor_total += $valores_areas[$area][$horas_sql];
@@ -1351,7 +1351,7 @@ else
 							$codigo_cliente_actual = $row['codigo_cliente_secundario'];
 						else
 							$codigo_cliente_actual = $row['codigo_cliente'];
-							
+
 						$cont_area =1;
 					}
 					else
@@ -1471,7 +1471,7 @@ else
 					$dato2 = $row['hr_cobrable'];
 					if( $valores_areas[$row['glosa_area_trabajo']]['hr_trabajadas'] > 0 )
 						$porcentaje1 = number_format( 100 * $dato / $valores_areas[$row['glosa_area_trabajo']]['hr_trabajadas'], 2, ',', ' ');
-					else	
+					else
 						$porcentaje1 = "0,00";
 					if( $valores_areas[$row['glosa_area_trabajo']]['hr_cobrable'] > 0 )
 						$porcentaje2 = number_format( 100 * $dato2 / $valores_areas[$row['glosa_area_trabajo']]['hr_cobrable'], 2, ',', ' ');
@@ -1506,7 +1506,7 @@ else
 					$dato = $row[$horas_sql];
 					if( $valores_areas[$row['glosa_area_trabajo']][$horas_sql] > 0 )
 						$porcentaje = number_format(100 * $row[$horas_sql] / $valores_areas[$row['glosa_area_trabajo']][$horas_sql],2,',',''); // $total_cliente_actual[$row['glosa_cliente']];
-					else	
+					else
 						$porcentaje = "0,00";
 					$minutos_trabajados = number_format(($row[$horas_sql]-floor($row[$horas_sql]))*60,2);
 					$dato_minutos = floor($row[$horas_sql]).':'.sprintf('%02d',round($minutos_trabajados));
@@ -1664,14 +1664,14 @@ else
         else if($ver == 'area_prof') {
                 $query_totales_areas = "SELECT CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as profesional,
                                                 IF(trabajo.id_area_trabajo IS NOT NULL, prm_area_trabajo.glosa, 'Indefinido') as glosa_area_trabajo,
-                                                trabajo.id_area_trabajo, 
+                                                trabajo.id_area_trabajo,
 						cliente.codigo_cliente, $select
 						SUM(TIME_TO_SEC(duracion)/60)/60 as hr_trabajadas,
 						SUM(TIME_TO_SEC(if(trabajo.cobrable = 1,duracion_cobrada,0))/60)/60 as hr_cobrable,
 						SUM(tarifa_hh*TIME_TO_SEC(duracion_cobrada)/3600*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base*cobro.monto/IF(cobro.monto_thh>0,cobro.monto_thh,cobro.monto)) as valor_cobrado
 					FROM trabajo
 					LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
-                                        LEFT JOIN prm_area_trabajo ON prm_area_trabajo.id_area_trabajo = trabajo.id_area_trabajo 
+                                        LEFT JOIN prm_area_trabajo ON prm_area_trabajo.id_area_trabajo = trabajo.id_area_trabajo
 					LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
 					LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
@@ -1682,10 +1682,10 @@ else
 					$where_cliente
 					$where_area
 					$where_categoria
-					GROUP BY glosa_area_trabajo 
+					GROUP BY glosa_area_trabajo
 					$orderby";
 		$resp_totales_areas = mysql_query($query_totales_areas,$sesion->dbh) or Utiles::errorSQL($query_totales_areas,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		$valores_areas = array();
 		while( $row = mysql_fetch_assoc($resp_totales_areas) )
 		{
@@ -1698,7 +1698,7 @@ else
 					$valores_areas[$row['glosa_area_trabajo']][$index] = $valor;
 			}
 		}
-                
+
                 $valor_total = 0;
                 foreach($valores_areas as $area => $valor) {
                     $valor_total += $valores_areas[$area][$horas_sql];
@@ -1754,7 +1754,7 @@ else
 		while($row = mysql_fetch_array($resp))
 		{
 				if($row['glosa_area_trabajo'] != $glosa_area_trabajo_actual || $mas_de_una_area == '')
-				{ 
+				{
 					if($mas_de_una_area == '')
 					{
 						$mas_de_una_area = 1;
@@ -1764,9 +1764,9 @@ else
 
 						$id_usuario_actual = $row['id_usuario'];
 						$glosa_usuario_actual = $row[$letra_profesional];
-                                                    
+
                                                 $tr_usuarios = '';
-                                                
+
 						$cont_area =1;
 					}
 					else
@@ -1776,17 +1776,17 @@ else
 													<td class=grupo_hr style='width:50px'><a href='javascript:void(0)' onclick=\"window.self.location.href='horas.php?fecha_ini=$fecha_ini&fecha_fin=$fecha_fin&from=cliente&id_area_trabajo=".($id_area_trabajo_actual ? $id_area_trabajo_actual : 'NULL')."&usuarios=".base64_encode($lista_usuarios)."';\">".$glosa_show_area."</a></td>
                                                                                                         <td class=grupo_hr style='width:50px'><a href='javascript:void(0)' onclick=\"window.self.location.href='horas.php?fecha_ini=$fecha_ini&fecha_fin=$fecha_fin&from=cliente&id_area_trabajo=".($id_area_trabajo_actual ? $id_area_trabajo_actual : 'NULL')."&usuarios=".base64_encode($lista_usuarios)."';\">".$glosa_porcentaje_area."</a></td>
                                                                                                         <td class=grupo_nombre style='width:600px'><table id='tbl_cliente' width='100%'>".$tr_usuarios."</table></td></tr>\n";
-						
+
                                                 $id_area_trabajo_actual = $row['id_area_trabajo'];
                                                 $glosa_area_trabajo_actual = $row['glosa_area_trabajo'] != '' ? $row['glosa_area_trabajo'] :'-';
-                                                
+
 						$dato_area = 0;
 						$dato_area2 = 0;
 						$tr_areas_trabajos .= $tr_area_trabajo;
-                                                
+
                                                 $tr_usuarios = '';
 						$id_usuario_actual = $row['id_usuario'];
-                                                
+
 						$cont_usuario =1;
 					}
 				}
@@ -1863,7 +1863,7 @@ else
 				}
 				$total_hr += $dato;
 		}
-                
+
 			#AREAS
 			$tr_area_trabajo = $tr_area."
 									<tr>
@@ -1874,15 +1874,15 @@ else
 									</tr>";
 			$glosa_area_trabajo_actual = $row['glosa_area_trabajo'] != '' ? $row['glosa_area_trabajo'] :'-';
 			$id_area_trabajo_actual = $row['id_area_trabajo'];
-                        
+
 			$tr_usuarios = '';
                         $id_usuario_actual = $row['id_usuario'];
-                        
+
 			$dato_area = 0;
 			$dato_area2 = 0;
 			$tr_areas_trabajos .= $tr_area_trabajo;
 
-                        
+
 			$html_info .= "<table width=100%>";
 			if($popup)
 			{
@@ -1929,10 +1929,10 @@ else
 					$where_cliente
 					$where_area
 					$where_categoria
-					GROUP BY cliente.codigo_cliente 
+					GROUP BY cliente.codigo_cliente
 					$orderby";
 		$resp_totales_clientes = mysql_query($query_totales_clientes,$sesion->dbh) or Utiles::errorSQL($query_totales_clientes,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		$valores_clientes = array();
 		while( $row = mysql_fetch_assoc($resp_totales_clientes) )
 		{
@@ -2021,8 +2021,8 @@ else
 							$id_asunto_actual = $row['codigo_asunto_secundario'];
 						else
 							$id_asunto_actual = $row['codigo_asunto'];
-							
-						
+
+
 						$glosa_asunto_actual = $row['glosa_asunto'];
 
 						$id_usuario_actual = $row['id_usuario'];
@@ -2041,7 +2041,7 @@ else
 							$id_asunto_actual = $row['codigo_asunto_secundario'];
 						else
 							$id_asunto_actual = $row['codigo_asunto'];
-							
+
 						$tr_asuntos .= $tr_asunto;
 						$tr_usuarios = '';
 						$dato_asunto = 0;
@@ -2088,7 +2088,7 @@ else
 							$id_asunto_actual = $row['codigo_asunto_secundario'];
 						else
 							$id_asunto_actual = $row['codigo_asunto'];
-							
+
 					$id_usuario_actual = $row['id_usuario'];
 					$tr_asuntos .= $tr_asunto;
 					$tr_usuarios = '';
@@ -2121,7 +2121,7 @@ else
 							$id_asunto_actual = $row['codigo_asunto_secundario'];
 						else
 							$id_asunto_actual = $row['codigo_asunto'];
-							
+
 					$tr_asuntos .= $tr_asunto;
 					$tr_usuarios = '';
 					$dato_asunto = 0;
@@ -2234,7 +2234,7 @@ else
 							$id_asunto_actual = $row['codigo_asunto_secundario'];
 						else
 							$id_asunto_actual = $row['codigo_asunto'];
-							
+
 			$tr_asuntos .= $tr_asunto;
 			$tr_usuarios = '';
 			$dato_asunto = 0;
