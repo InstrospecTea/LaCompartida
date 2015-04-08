@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.12
+Miércoles 8 de Abril 2015
+* **Fix:** [Verifica que todos los usuarios tengan la tarifa plana que se esta asignando](https://github.com/LemontechSA/ttb/pull/903)
+
 ## Hotfix 15.6.11
 Miércoles 8 de Abril 2015
 * **Fix:** [La asignación del identificador de la carta cuando no se tiene configurado una carta MULTIPLE](https://github.com/LemontechSA/ttb/pull/902)
