@@ -729,7 +729,7 @@ $agrupadores = explode('-', $vista);
 							</td>
 							<?php if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) { ?>
 								<td rowspan="2" align="left">
-									<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_trabajo ORDER BY id_area_trabajo ASC", 'areas_trabajoF[]', $areas_trabajoF, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+									<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_trabajo ORDER BY glosa ASC", 'areas_trabajoF[]', $areas_trabajoF, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 								</td>
 							<?php } ?>
 							<td rowspan="2" align="left">

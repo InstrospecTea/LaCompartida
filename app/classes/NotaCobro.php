@@ -11439,6 +11439,7 @@ class NotaCobro extends Cobro {
 
 	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null) {
 		global $_LANG;
+		$carta_multiple = null;
 
 		set_time_limit(300);
 
@@ -11452,7 +11453,12 @@ class NotaCobro extends Cobro {
 
 		if ($agrupar_cartas) {
 			$Carta = new Carta($this->sesion);
-			$carta_multiple = $Carta->LoadByDescripcion('MULTIPLE') ? $Carta->fields['id_carta'] : 1;
+
+			// Se asigna el identificador del la carta múltiple
+			if ($Carta->LoadByDescripcion('MULTIPLE')) {
+				$carta_multiple = $Carta->fields['id_carta'];
+			}
+
 			$totales_cobros = array();
 			$primer_cliente = '';
 
@@ -11501,7 +11507,12 @@ class NotaCobro extends Cobro {
 
 				if ($codigo_cliente != $primer_cliente) {
 					$primer_cliente = $codigo_cliente;
-					$NotaCobro->fields['id_carta'] = $carta_multiple;
+
+					// solo si existe una carta MULTIPLE se sobre escribe el identificador de la carta
+					if (!is_null($carta_multiple)) {
+						$NotaCobro->fields['id_carta'] = $carta_multiple;
+					}
+
 					$NotaCobro->fields['opc_ver_carta'] = 1;
 					$NotaCobro->DetalleLiquidaciones = $totales_cobros[$codigo_cliente];
 				}
