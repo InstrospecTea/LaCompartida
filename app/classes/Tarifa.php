@@ -167,7 +167,6 @@ class Tarifa extends Objeto {
 
 		$usuarios = $uCrireria->run();
 		if (!empty($usuarios)) {
-			pr($usuarios);
 			$usuario_tarifa = new UsuarioTarifa($this->sesion);
 			foreach ($usuarios as $usuario) {
 				$usuario_tarifa->GuardarTarifa($id_tarifa, $usuario['id_usuario'], $id_moneda, $valor);
@@ -189,7 +188,6 @@ class Tarifa extends Objeto {
 		if (!empty($categorias)) {
 			$categoria_tarifa = new CategoriaTarifa($this->sesion);
 			foreach ($categorias as $categoria) {
-				pr($categoria);
 				$categoria_tarifa->GuardarTarifa($id_tarifa, $categoria['id_categoria_usuario'], $id_moneda, $valor);
 			}
 		}
