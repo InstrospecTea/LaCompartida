@@ -99,7 +99,6 @@ class Tarifa extends Objeto {
 	 * @return int id de la tarifa
 	 */
 	function GuardaTarifaFlat($valor, $id_moneda, $id_tarifa = null) {
-
 		$valor = str_replace(',', '.', $valor);
 		$moneda = new Moneda($this->sesion);
 		$moneda->Load($id_moneda);
@@ -108,6 +107,7 @@ class Tarifa extends Objeto {
 		if (!empty($id_tarifa)) {
 			$this->Load($id_tarifa);
 			if ($this->Loaded() && $this->fields['tarifa_flat'] == $valor && $this->fields['glosa_tarifa'] == $glosa) {
+			$this->verificaTerifaFlatUsuarios($id_tarifa, $id_moneda, $valor);
 				return $id_tarifa;
 			}
 		}
@@ -115,8 +115,8 @@ class Tarifa extends Objeto {
 		$query = "SELECT {$this->campo_id} FROM {$this->tabla} where glosa_tarifa = '{$glosa}' AND tarifa_flat = $valor ";
 		$resp = mysql_query($query, $this->sesion->dbh);
 		$tarifa = mysql_fetch_assoc($resp);
-
 		if ($tarifa !== false) {
+			$this->verificaTerifaFlatUsuarios($tarifa[$this->campo_id], $id_moneda, $valor);
 			return $tarifa[$this->campo_id];
 		}
 
@@ -130,20 +130,7 @@ class Tarifa extends Objeto {
 
 		$id_tarifa = $this->fields[$this->campo_id];
 
-		//guardar tarifas de usuarios y categorias
-		$usuario_tarifa = new UsuarioTarifa($this->sesion);
-		$query = "SELECT id_usuario FROM usuario";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		while (list($id_usuario) = mysql_fetch_array($resp)) {
-			$usuario_tarifa->GuardarTarifa($id_tarifa, $id_usuario, $id_moneda, $valor);
-		}
-
-		$categoria_tarifa = new CategoriaTarifa($this->sesion);
-		$query = "SELECT id_categoria_usuario FROM prm_categoria_usuario";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		while (list($id_categoria_usuario) = mysql_fetch_array($resp)) {
-			$categoria_tarifa->GuardarTarifa($id_tarifa, $id_categoria_usuario, $id_moneda, $valor);
-		}
+		$this->verificaTerifaFlatUsuarios($id_tarifa, $id_moneda, $valor);
 
 		//eliminar tarifas flat huachas (se crea 1 por contrato flat, y quedan flotando al cambiarse a variable)
 		$query = "SELECT t.id_tarifa FROM tarifa t LEFT JOIN contrato c ON t.id_tarifa = c.id_tarifa WHERE c.id_contrato IS NULL AND t.tarifa_flat IS NOT NULL";
@@ -158,6 +145,54 @@ class Tarifa extends Objeto {
 		$this->Load($id_tarifa);
 
 		return $id_tarifa;
+	}
+
+	/**
+	 * Guardar tarifas de usuarios y categorias si no existen
+	 * @param type $id_tarifa
+	 * @param type $id_moneda
+	 * @param type $valor
+	 */
+	function verificaTerifaFlatUsuarios($id_tarifa, $id_moneda, $valor) {
+		$uCrireria = new Criteria($this->sesion);
+		$uCrireria
+				->add_select('usuario.id_usuario')
+				->add_from('usuario')
+				->add_left_join_with('usuario_tarifa', CriteriaRestriction::and_clause(
+						CriteriaRestriction::equals('usuario.id_usuario', 'usuario_tarifa.id_usuario'),
+						CriteriaRestriction::equals('usuario_tarifa.id_tarifa', $id_tarifa)
+				))
+				->add_restriction(CriteriaRestriction::is_null('usuario_tarifa.id_tarifa'))
+		;
+
+		$usuarios = $uCrireria->run();
+		if (!empty($usuarios)) {
+			pr($usuarios);
+			$usuario_tarifa = new UsuarioTarifa($this->sesion);
+			foreach ($usuarios as $usuario) {
+				$usuario_tarifa->GuardarTarifa($id_tarifa, $usuario['id_usuario'], $id_moneda, $valor);
+			}
+		}
+
+		$cCrireria = new Criteria($this->sesion);
+		$cCrireria
+				->add_select('PCU.id_categoria_usuario')
+				->add_from('prm_categoria_usuario', 'PCU')
+				->add_left_join_with(array('categoria_tarifa', 'CT'), CriteriaRestriction::and_clause(
+						CriteriaRestriction::equals('PCU.id_categoria_usuario', 'CT.id_categoria_usuario'),
+						CriteriaRestriction::equals('CT.id_tarifa', $id_tarifa)
+				))
+				->add_restriction(CriteriaRestriction::is_null('CT.id_tarifa'))
+		;
+
+		$categorias = $cCrireria->run();
+		if (!empty($categorias)) {
+			$categoria_tarifa = new CategoriaTarifa($this->sesion);
+			foreach ($categorias as $categoria) {
+				pr($categoria);
+				$categoria_tarifa->GuardarTarifa($id_tarifa, $categoria['id_categoria_usuario'], $id_moneda, $valor);
+			}
+		}
 	}
 
 }
