@@ -226,6 +226,9 @@ class Reporte {
 			case "glosa_cliente":
 				$this->id_agrupador[] = "codigo_cliente";
 				break;
+			case "glosa_estudio":
+				$this->id_agrupador_cobro[] = "id_estudio";
+				break;
 			case "glosa_asunto":
 			case "glosa_asunto_con_codigo":
 			case "glosa_cliente_asunto":
@@ -256,9 +259,13 @@ class Reporte {
 		//Para GROUP BY - Query secundaria por Cobros
 		switch ($s) {
 			//Agrupadores que no existen para Cobro sin trabajos:
-			case "area_asunto":
-			case "tipo_asunto":
 			case "id_trabajo":
+				break;
+			case "area_asunto":
+				$this->id_agrupador_cobro[] = "area_asunto";
+				break;
+			case "tipo_asunto":
+				$this->id_agrupador_cobro[] = "tipo_asunto";
 				break;
 			case "glosa_asunto":
 			case "glosa_asunto_con_codigo":
@@ -336,6 +343,8 @@ class Reporte {
 			->add_select($indefinido, 'username')
 			->add_select($indefinido, 'categoria_usuario')
 			->add_select($indefinido, 'area_usuario')
+			->add_select(CriteriaRestriction::ifnull('cobro.id_estudio', $indefinido), 'id_estudio')
+			->add_select(CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', $indefinido), 'glosa_estudio')
 			->add_select(-1, 'id_usuario')
 			->add_select('cliente.id_cliente')
 			->add_select('cliente.codigo_cliente')
@@ -356,7 +365,9 @@ class Reporte {
 			->add_select("DATE_FORMAT({$campo_fecha}, '%d-%m-%Y')", 'dia_reporte')
 			->add_select('cobro.id_cobro')
 			->add_select('cobro.estado', 'estado')
-			->add_select('cobro.forma_cobro', 'forma_cobro');
+			->add_select('cobro.forma_cobro', 'forma_cobro')
+			->add_select('tipo.glosa_tipo_proyecto', 'tipo_asunto')
+			->add_select('area.glosa', 'area_asunto');
 
 		if (in_array('codigo_cliente_secundario', $this->agrupador)) {
 			$Criteria->add_select('cliente.codigo_cliente_secundario', '');
@@ -523,7 +534,9 @@ class Reporte {
 			->add_left_join_with('usuario', CriteriaRestriction::equals('cobro.id_usuario', 'usuario.id_usuario'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'cobro.id_contrato'))
 			->add_left_join_with('cliente', CriteriaRestriction::equals('contrato.codigo_cliente', 'cliente.codigo_cliente'))
-			->add_left_join_with('grupo_cliente', CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
+			->add_left_join_with('grupo_cliente', CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'))
+			->add_left_join_with(array('prm_area_proyecto', 'area'), CriteriaRestriction::equals('asunto.id_area_proyecto', 'area.id_area_proyecto'))
+			->add_left_join_with(array('prm_tipo_proyecto', 'tipo'), CriteriaRestriction::equals('asunto.id_tipo_asunto', 'tipo.id_tipo_proyecto'));
 
 		if (in_array('id_usuario_responsable', $this->agrupador)) {
 			$Criteria->add_left_join_with(array('usuario', 'usuario_responsable'), CriteriaRestriction::equals('usuario_responsable.id_usuario', 'contrato.id_usuario_responsable'));
@@ -532,7 +545,9 @@ class Reporte {
 			$Criteria->add_left_join_with(array('usuario', 'usuario_secundario'), CriteriaRestriction::equals('usuario_secundario.id_usuario', 'contrato.id_usuario_secundario'));
 		}
 
-		$Criteria->add_left_join_with(array('prm_moneda', 'moneda_base'), CriteriaRestriction::equals('moneda_base.moneda_base', '1'));
+		$Criteria
+				->add_left_join_with(array('prm_moneda', 'moneda_base'), CriteriaRestriction::equals('moneda_base.moneda_base', '1'))
+				->add_left_join_with('prm_estudio', CriteriaRestriction::equals('cobro.id_estudio', 'prm_estudio.id_estudio'));
 
 		if ($this->tipo_dato == 'valor_por_cobrar') {
 			$tabla = 'cobro';
@@ -1285,6 +1300,7 @@ class Reporte {
 
 	//SELECT en string de Query. Elige el tipo de dato especificado.
 	private function setSELECT($Criteria) {
+		$indefinido = sprintf("'%s'", __('Indefinido'));
 		$Criteria
 			->add_select($this->dato_usuario, 'profesional')
 			->add_select('usuario.username', 'username')
@@ -1358,7 +1374,9 @@ class Reporte {
 		$Criteria
 			->add_select("IFNULL(cobro.id_cobro, 'Indefinido')", 'id_cobro')
 			->add_select("IFNULL(cobro.estado, 'Indefinido')", 'estado')
-			->add_select("IFNULL(cobro.forma_cobro, 'Indefinido')", 'forma_cobro');
+			->add_select("IFNULL(cobro.forma_cobro, 'Indefinido')", 'forma_cobro')
+			->add_select(CriteriaRestriction::ifnull('cobro.id_estudio', CriteriaRestriction::ifnull('estudio_contrato.id_estudio', $indefinido)), 'id_estudio')
+			->add_select(CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', CriteriaRestriction::ifnull('estudio_contrato.glosa_estudio', $indefinido)), 'glosa_estudio');
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
 			$Criteria->add_select("IFNULL(NULLIF(IFNULL(actividad.glosa_actividad, 'Indefinido' ), ' '), 'Indefinido' )", 'glosa_actividad');
@@ -1418,7 +1436,7 @@ class Reporte {
 										(TIME_TO_SEC(duracion) / 3600) *
 										IF(
 											cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
-											usuario_tarifa.tarifa * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+											trabajo.tarifa_hh_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
 											trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 										)
 									)";
@@ -1588,7 +1606,7 @@ class Reporte {
 			->add_left_join_with('cobro', CriteriaRestriction::equals('trabajo.id_cobro', 'cobro.id_cobro'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'IFNULL(cobro.id_contrato, asunto.id_contrato)'));
 
-		if (in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar'))) {
+		if (in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'))) {
 			$Criteria
 				->add_left_join_with(array('prm_moneda', 'moneda_por_cobrar'), CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
 				->add_left_join_with(array('prm_moneda', 'moneda_display'), CriteriaRestriction::equals('moneda_display.id_moneda', $this->id_moneda));
@@ -1617,7 +1635,9 @@ class Reporte {
 			->add_left_join_with(array('prm_area_proyecto', 'area'), CriteriaRestriction::equals('asunto.id_area_proyecto', 'area.id_area_proyecto'))
 			->add_left_join_with(array('prm_tipo_proyecto', 'tipo'), CriteriaRestriction::equals('asunto.id_tipo_asunto', 'tipo.id_tipo_proyecto'))
 			->add_left_join_with('cliente', CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente'))
-			->add_left_join_with('grupo_cliente', CriteriaRestriction::equals('cliente.id_grupo_cliente', 'grupo_cliente.id_grupo_cliente'));
+			->add_left_join_with('grupo_cliente', CriteriaRestriction::equals('cliente.id_grupo_cliente', 'grupo_cliente.id_grupo_cliente'))
+			->add_left_join_with('prm_estudio', CriteriaRestriction::equals('cobro.id_estudio', 'prm_estudio.id_estudio'))
+			->add_left_join_with(array('prm_estudio', 'estudio_contrato'), CriteriaRestriction::equals('contrato.id_estudio', 'estudio_contrato.id_estudio'));
 
 		if (in_array('prm_area_proyecto.glosa', $this->agrupador)) {
 			$Criteria->add_left_join_with('prm_area_proyecto', CriteriaRestriction::equals('prm_area_proyecto.id_area_proyecto', 'asunto.id_area_proyecto'));
