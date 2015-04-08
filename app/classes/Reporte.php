@@ -357,9 +357,9 @@ class Reporte {
 			->add_select("' - '", 'area_asunto')
 			->add_select("MONTH({$campo_fecha})", 'mes')
 			->add_select('grupo_cliente.id_grupo_cliente')
-			->add_select("IFNULL(grupo_cliente.glosa_grupo_cliente, '-')", 'glosa_grupo_cliente')
+			->add_select(CriteriaRestriction::ifnull('grupo_cliente.glosa_grupo_cliente', '-'), 'glosa_grupo_cliente')
 			->add_select("CONCAT(cliente.glosa_cliente, ' - ', asunto.codigo_asunto, ' ', asunto.glosa_asunto)", 'glosa_cliente_asunto')
-			->add_select('IFNULL(grupo_cliente.glosa_grupo_cliente, cliente.glosa_cliente)', 'grupo_o_cliente')
+			->add_select(CriteriaRestriction::ifnull('grupo_cliente.glosa_grupo_cliente', 'cliente.glosa_cliente'), 'grupo_o_cliente')
 			->add_select($campo_fecha, 'fecha_final')
 			->add_select("DATE_FORMAT({$campo_fecha}, '%m-%Y')", 'mes_reporte')
 			->add_select("DATE_FORMAT({$campo_fecha}, '%d-%m-%Y')", 'dia_reporte')
@@ -1604,7 +1604,7 @@ class Reporte {
 			->add_left_join_with('usuario', CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario'))
 			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto'))
 			->add_left_join_with('cobro', CriteriaRestriction::equals('trabajo.id_cobro', 'cobro.id_cobro'))
-			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', 'IFNULL(cobro.id_contrato, asunto.id_contrato)'));
+			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
 		if (in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'))) {
 			$Criteria
