@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.11
+Miércoles 8 de Abril 2015
+* **Fix:** [La asignación del identificador de la carta cuando no se tiene configurado una carta MULTIPLE](https://github.com/LemontechSA/ttb/pull/901)
+
 ## Hotfix 15.6.10
 Martes 7 de Abril 2015
 * **Fix:** [Corrige filtro de fechas](https://github.com/LemontechSA/ttb/pull/900)
