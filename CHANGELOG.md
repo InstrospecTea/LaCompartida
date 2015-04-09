@@ -3,6 +3,7 @@
 ## Hotfix 15.6.14
 Jueves 9 de Abril 2015
 * **Fix:** [Deja de ordenar por las horas pendientes de cobrar en la pantalla de asuntos](https://github.com/LemontechSA/ttb/pull/906)
+* **Fix:** [Agrega el lang es_panama.php para el primer cliente Panameño](https://github.com/LemontechSA/ttb/pull/906)
 
 ## Hotfix 15.6.13
 Jueves 9 de Abril 2015
