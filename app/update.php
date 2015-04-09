@@ -10714,7 +10714,15 @@ QUERY;
 			break;
 
 		case 7.97:
-			$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_comentario` VARCHAR(255) NULL DEFAULT NULL AFTER `dte_razon_referencia`";
+			if (!ExisteCampo('dte_comentario', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_comentario` VARCHAR(255) NULL DEFAULT NULL AFTER `dte_razon_referencia`";
+			}
+			break;
+	
+		case 7.98:
+			if (!ExisteCampo('fecha_anulacion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_anulacion` DATETIME NULL DEFAULT NULL AFTER `fecha_creacion`";
+			}
 			break;
 	}
 
@@ -10728,7 +10736,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.97;
+$max_update = 7.98;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
