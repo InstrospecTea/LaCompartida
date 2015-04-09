@@ -1,100 +1,90 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Proveedor.php';
+<?php
 
-	$sesion = new Sesion(array('COB'));
-	$pagina = new Pagina($sesion);
-	$id_usuario = $sesion->usuario->fields['id_usuario'];
+require_once dirname(__FILE__).'/../conf.php';
 
-	$proveedor = new Proveedor($sesion);
-	$where = " WHERE 1";
+$sesion = new Sesion(array('COB'));
+$pagina = new Pagina($sesion);
+$id_usuario = $sesion->usuario->fields['id_usuario'];
+
+$proveedor = new Proveedor($sesion);
+$where = " WHERE 1";
 
 
-	if($opcion == 'guardar')
+if($opcion == 'guardar')
+{
+	$txt_tipo = "guardado";
+	if(!empty($id_proveedor))
 	{
-		$txt_tipo = "guardado";
-		if(!empty($id_proveedor))
+		if($proveedor->Load($id_proveedor))
 		{
-			if($proveedor->Load($id_proveedor))
-			{
-				$txt_tipo = "editado";
+			$txt_tipo = "editado";
+		}
+	}
+	$proveedor->Edit('rut', $rut);
+	$proveedor->Edit('glosa', $glosa);
+	if($proveedor->Write())
+	{
+		$pagina->AddInfo( __('Proveedor').' '.$txt_tipo.' '.__('con éxito.'));
+		?>
+		<script type="text/javascript">
+			window.opener.location.reload();
+		</script>
+		<?php
+	}
+} else if( $opcion == 'eliminar' ) {
+	if(!empty($id_proveedor))
+	{
+		if($proveedor->Load($id_proveedor))
+		{
+			if( $proveedor->Eliminar() ) {
+				$pagina->AddInfo( __('Proveedor eliminado con éxito.'));
+				?>
+				<script type="text/javascript">
+					window.opener.location.reload();
+				</script>
+				<?php
+			} else {
+				$pagina->AddError($proveedor->error);
 			}
 		}
-		$proveedor->Edit('rut', $rut);
-		$proveedor->Edit('glosa', $glosa);
-		if($proveedor->Write())
-		{
-			$pagina->AddInfo( __('Proveedor').' '.$txt_tipo.' '.__('con éxito.'));
-			?>
-			<script type="text/javascript">
-				window.opener.location.reload();
-			</script>
-			<?
-		}
-	} else if( $opcion == 'eliminar' ) {
-		if(!empty($id_proveedor))
-		{
-			if($proveedor->Load($id_proveedor))
-			{
-				if( $proveedor->Eliminar() ) {
-					$pagina->AddInfo( __('Proveedor eliminado con éxito.'));
-					?>
-					<script type="text/javascript">
-						window.opener.location.reload();
-					</script>
-					<?
-				} else {
-					$pagina->AddError($proveedor->error);
-				}
-			}
-		}
-		unset($id_proveedor);
 	}
+	unset($id_proveedor);
+}
 
-	if($opcion == 'Buscar')
-	{
-		if($rut)
-			$where .= " AND rut like '%".$rut."%'";
-		if($glosa)
-			$where .= " AND glosa like '%".$glosa."%'";
-	}
-	if($id_proveedor)
-		$where .= " AND id_proveedor = '".$id_proveedor."'";
-	$query = "SELECT SQL_CALC_FOUND_ROWS * ,id_proveedor, rut, glosa
-			 FROM prm_proveedor
-			 ".$where;
+if($opcion == 'Buscar')
+{
+	if($rut)
+		$where .= " AND rut like '%".$rut."%'";
+	if($glosa)
+		$where .= " AND glosa like '%".$glosa."%'";
+}
+if($id_proveedor)
+	$where .= " AND id_proveedor = '".$id_proveedor."'";
+$query = "SELECT SQL_CALC_FOUND_ROWS * ,id_proveedor, rut, glosa
+		 FROM prm_proveedor
+		 ".$where;
 
-	$pagina->titulo = $txt_pagina;
-	$pagina->PrintTop($popup);
+$pagina->titulo = $txt_pagina;
+$pagina->PrintTop($popup);
+$Form = new Form();
 ?>
 
 <script type="text/javascript">
-
-	function Buscar(form)
-	{
-		form.opcion.value='Buscar';
-		form.submit();
+	function Buscar() {
+		jQuery('#opcion').val('Buscar');
+		jQuery('#form_proveedor').submit();
 	}
-	function EditarProveedor(id)
-	{
-		$('id_proveedor').value=id
-		$('rut').value=$('rut_'+id).value
-		$('glosa').value=$('glosa_'+id).value
+	function EditarProveedor(id) {
+		jQuery('#id_proveedor').val(id);
+		jQuery('#rut').val(jQuery('#rut_' + id).val());
+		jQuery('#glosa').val(jQuery('#glosa_'+id).val());
 	}
 
-	function EliminarProveedor(id)
-	{
+	function EliminarProveedor(id) {
 		if( confirm('Está seguro que quiere eliminar el proveedor.') ) {
-			$('id_proveedor').value=id;
-			$('opcion').value = 'eliminar';
-			$('form_documentos').submit();
+			jQuery('#id_proveedor').val(id);
+			jQuery('#opcion').val('eliminar');
+			jQuery('#form_proveedor').submit();
 			return true;
 		} else {
 			return false;
@@ -102,42 +92,36 @@
 	}
 
 	var continuar = 1;
-	function Guardar(form)
-	{
-		if(continuar==0)
-		{
+	function Guardar() {
+		if(continuar == 0) {
 			return false;
 		}
 
-		if(form.rut.value=='')
-		{
-			alert('<?=__('Debe ingresar el rut del proveedor')?>');
-			form.rut.focus();
+		if(jQuery('#rut').val() == '') {
+			alert('<?php echo __('Debe ingresar el rut del proveedor') ?>');
+			jQuery('#rut').focus();
 			return false;
 		}
 
-		if(form.glosa.value=='')
-		{
-			alert('<?=__('Debe ingresar la glosa del proveedor')?>');
-			form.glosa.focus();
+		if(jQuery('#glosa').val() == '') {
+			alert('<?php echo __('Debe ingresar la glosa del proveedor') ?>');
+			jQuery('#glosa').focus();
 			return false;
 		}
 
-		form.opcion.value='guardar';
-		form.submit();
+		jQuery('#opcion').val('guardar');
+		jQuery('#form_proveedor').submit();
 	}
-
-
 
 </script>
 
-<form method=post action="" id="form_documentos" autocomplete='off'>
+<form method=post action="" id="form_proveedor" autocomplete='off'>
 <input type=hidden name="opcion" id="opcion" value="guardar" />
 <input type=hidden name="id_proveedor" id="id_proveedor" value="" />
 <br>
 <table width='90%'>
 	<tr>
-		<td align=left><b><?=$txt_pagina ?></b></td>
+		<td align=left><b><?php echo $txt_pagina ?></b></td>
 	</tr>
 </table>
 <br>
@@ -145,39 +129,41 @@
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
 		<td align=left width="50%">
-			<b><?=__('Información del Proveedor') ?> </b>
+			<b><?php echo __('Información del Proveedor') ?> </b>
 		</td>
 	</tr>
 </table>
 <table style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right width="30%">
-			<?=__('Rut')?>
+			<?php echo __('Rut')?>
 		</td>
 		<td align=left colspan="3">
-			<input type="text" name="rut" value="<?=$proveedor->fields['rut'] ? $proveedor->fields['rut'] : '' ?>" id="rut" size="12" maxlength="15" />
+			<input type="text" name="rut" value="<?php echo $proveedor->fields['rut'] ? $proveedor->fields['rut'] : '' ?>" id="rut" size="30" maxlength="50" />
 		</td>
 	</tr>
 	<tr>
 		<td align="right">
-			<?=__('Glosa')?>
+			<?php echo __('Glosa')?>
 		</td>
 		<td colspan="3" align="left">
-			<input type="text" name="glosa" value="<?=$proveedor->fields['glosa'] ? $proveedor->fields['glosa'] : '' ?>" id="glosa" size="50" maxlength="50" />
+			<input type="text" name="glosa" value="<?php echo $proveedor->fields['glosa'] ? $proveedor->fields['glosa'] : '' ?>" id="glosa" size="50" maxlength="50" />
 		</td>
 	</tr>
 </table>
 <br>
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
-		<td align=left>
-			<input type=button class=btn value="<?=__('Guardar')?>" onclick='Guardar(this.form);' />
-			<input type=button class=btn value="<?=__('Buscar')?>" onclick="Buscar(this.form);" />
-			<input type=button class=btn value="<?=__('Cerrar')?>" onclick="Cerrar();" />
+		<td align="left">
+			<?php
+			echo $Form->icon_button(__('Guardar'), 'save', array('onclick' => 'Guardar()'));
+			echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => 'Buscar()'));
+			echo $Form->icon_button(__('Cerrar'), 'exit', array('onclick' => 'Cerrar()'));
+			?>
 		</td>
 	</tr>
 </table>
-<?
+<?php
 	$x_pag = 15;
 	$b = new Buscador($sesion, $query, "Objeto", 0, 0, "glosa ASC");
 	$b->mensaje_error_fecha = "N/A";
@@ -214,6 +200,7 @@
 </form>
 
 
-<?
-	$pagina->PrintBottom($popup);
+<?php
+echo $Form->script();
+$pagina->PrintBottom($popup);
 ?>

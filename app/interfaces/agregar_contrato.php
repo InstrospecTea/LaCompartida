@@ -1635,7 +1635,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('ROL/RUT') . $obligatorios('factura_rut'); ?>
 					</td>
 					<td align="left" colspan="3">
-						<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" />
+						<input type="text" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" size="30" maxlength="50" />
 					</td>
 				</tr>
 				<tr>
