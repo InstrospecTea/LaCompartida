@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.13
+Jueves 9 de Abril 2015
+* **Fix:** [Amplia la cantidad de caracteres del rut](https://github.com/LemontechSA/ttb/pull/905)
+
 ## Hotfix 15.6.12
 Miércoles 8 de Abril 2015
 * **Fix:** [Verifica que todos los usuarios tengan la tarifa plana que se esta asignando](https://github.com/LemontechSA/ttb/pull/903)
