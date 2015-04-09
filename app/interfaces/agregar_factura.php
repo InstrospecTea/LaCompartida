@@ -628,12 +628,12 @@ $Form->defaultLabel = false;
 				<td align="right"><?php echo __('Doc. Identidad'); ?></td>
 				<td align="left" colspan="3">
 					<?php echo Html::SelectQuery($sesion, "SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad", "tipo_documento_identidad", $factura->fields['id_tipo_documento_identidad'], "", " ", 150); ?>
-					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="40" maxlength="20" />
+					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="30" maxlength="50" />
 				</td>
 			<?php } else { ?>
 				<td align="right"><?php echo __('ROL/RUT'); ?></td>
 				<td align="left" colspan="3">
-					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="70" maxlength="20" />
+					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="30" maxlength="50" />
 				</td>
 			<?php } ?>
 		</tr>
