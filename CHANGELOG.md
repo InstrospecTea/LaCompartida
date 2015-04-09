@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.14
+Jueves 9 de Abril 2015
+* **Fix:** [Deja de ordenar por las horas pendientes de cobrar en la pantalla de asuntos](https://github.com/LemontechSA/ttb/pull/906)
+
 ## Hotfix 15.6.13
 Jueves 9 de Abril 2015
 * **Fix:** [Amplia la cantidad de caracteres del rut](https://github.com/LemontechSA/ttb/pull/905)
