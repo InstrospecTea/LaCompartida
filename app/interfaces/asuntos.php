@@ -25,7 +25,11 @@ $formato_fecha = UtilesApp::ObtenerFormatoFecha($Sesion);
 
 if ($excel) {
 	$Asunto = new Asunto($Sesion);
-	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
+	try {
+		$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
+	} catch (Exception $ex) {
+		$Pagina->AddError("Está tratando de descargar mas de 10.000 registros, por favor limite su búsqueda e intente nuevamente.");
+	}
 }
 
 if ($Sesion->usuario->Es('DAT') && $accion == "eliminar") {

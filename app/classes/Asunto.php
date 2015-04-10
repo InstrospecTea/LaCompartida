@@ -796,8 +796,21 @@ class Asunto extends Objeto {
 			$SimpleReport->Config->columns['codigo_secundario']->Field('codigo_asunto');
 		}
 
-		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
+		$query = $this->QueryReporte($filtros);
+		
+		$query_count = preg_replace('/(^\s*SELECT\s)[\s\S]+(\sFROM\s)/mi', '$1 COUNT(*) $2', $query);
+		$query_count = preg_replace('/\sGROUP BY.+|\sORDER BY.+|\sLIMIT.+/mi', '', $query_count);
+		
+		$result = $this->sesion->pdodbh->query($query_count)->fetch();
+		
+		if ($result[0] > 10000) {
+			throw new Exception();
+		}
+		
+		$this->sesion->pdodbh->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
+		
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 		$SimpleReport->LoadResults($results);
