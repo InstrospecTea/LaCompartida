@@ -25,7 +25,11 @@ $formato_fecha = UtilesApp::ObtenerFormatoFecha($Sesion);
 
 if ($excel) {
 	$Asunto = new Asunto($Sesion);
-	$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto'), 'id_grupo_cliente');
+	try {
+		$Asunto->DownloadExcel(compact('activo', 'id_grupo_cliente', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario', 'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc', 'id_tipo_asunto', 'id_grupo_cliente'));
+	} catch (Exception $ex) {
+		$Pagina->AddError($ex->getMessage());
+	}
 }
 
 if ($Sesion->usuario->Es('DAT') && $accion == "eliminar") {
@@ -337,8 +341,16 @@ if ($buscar || $opc == "entregar_asunto") {
 	}
 
 	// Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
-	$query = "SELECT SQL_CALC_FOUND_ROWS cliente.glosa_cliente, a1.glosa_asunto, a1.codigo_asunto, a1.codigo_asunto_secundario, a1.id_moneda, a1.activo,
-		a1.fecha_creacion, contrato.codigo_contrato, a1.id_asunto,
+	$query = "SELECT SQL_CALC_FOUND_ROWS
+		cliente.glosa_cliente,
+		a1.glosa_asunto,
+		a1.codigo_asunto,
+		a1.codigo_asunto_secundario,
+		a1.id_moneda,
+		a1.activo,
+		a1.fecha_creacion,
+		contrato.codigo_contrato,
+		a1.id_asunto,
 		(
 			SELECT TRUNCATE(SUM(TIME_TO_SEC(duracion_cobrada)) / 3600, {$cantidad_decimales_ingreso_horas})
 			FROM trabajo AS t2
@@ -366,7 +378,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		GROUP BY a1.codigo_asunto";
 
 	if (empty($orden)) {
-		$orden = "a1.activo DESC, horas_no_cobradas DESC, a1.glosa_asunto";
+		$orden = "a1.activo DESC, a1.glosa_asunto";
 	}
 
 	if (stristr($orden, ".") === FALSE) {
