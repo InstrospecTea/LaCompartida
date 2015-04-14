@@ -11534,8 +11534,8 @@ class NotaCobro extends Cobro {
 				continue;
 			}
 
-			$opc_papel = $NotaCobro->fields['opc_papel'];
 			$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
+			list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta($this->sesion, $NotaCobro->fields['id_carta']);
 
 			if ($html) {
 				$cssData .= UtilesApp::CSSCobro($this->sesion);
@@ -11543,7 +11543,24 @@ class NotaCobro extends Cobro {
 				if (is_object($doc)) {
 					$doc->newSession($html);
 				} else {
-					$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
+					$doc = new DocGenerator(
+						$html,
+						$cssData,
+						$NotaCobro->fields['opc_papel'],
+						$NotaCobro->fields['opc_ver_numpag'],
+						$orientacion_papel,
+						$docm_top,
+						$docm_right,
+						$docm_bottom,
+						$docm_left,
+						$NotaCobro->fields['estado'],
+						$id_formato,
+						'',
+						$docm_header,
+						$docm_footer,
+						$lang,
+						$this->sesion
+					);
 				}
 
 				$doc->chunkedOutput("cobro_masivo.doc");
