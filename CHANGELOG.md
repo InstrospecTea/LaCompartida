@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.6.15
+Tuesday 2015, April 14th.
+* **Fix:** [Do a pre-parsing of the quotes on the url before http request on expenses popup.](https://github.com/LemontechSA/ttb/pull/910)
+
+
 ## Hotfix 15.6.14
 Jueves 9 de Abril 2015
 * **Fix:** [Deja de ordenar por las horas pendientes de cobrar en la pantalla de asuntos](https://github.com/LemontechSA/ttb/pull/906)
