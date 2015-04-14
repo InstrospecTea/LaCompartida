@@ -1,9 +1,12 @@
 # Changelog
 
+## Hotfix 15.6.16
+Tuesday 2015, April 14th.
+* **Fix:** [Nubox invoice download improvements](https://github.com/LemontechSA/ttb/pull/911)
+
 ## Hotfix 15.6.15
 Tuesday 2015, April 14th.
 * **Fix:** [Do a pre-parsing of the quotes on the url before http request on expenses popup.](https://github.com/LemontechSA/ttb/pull/910)
-
 
 ## Hotfix 15.6.14
 Jueves 9 de Abril 2015
