@@ -282,14 +282,14 @@
 			}
 
 			if (accion == 'desactivar') {
-				var confirm_str = 'Atención:\n\nSe desactivará al usuario seleccionado';
+				var confirm_str = '<?php echo __('Atención'); ?>:\n\n<?php echo __('Se desactivará al usuario seleccionado'); ?>';
 				var contracts = parseInt(self.attr('data-contracts'));
 
 				if (contracts != 0) {
-					confirm_str += ', el cual está asociado a ' + self.attr('data-contracts') + ' cliente' + (contracts > 1 ? 's' : '') + ' como "Encargado Comercial"';
+					confirm_str += ', <?php echo __('el cual está asociado a'); ?> ' + self.attr('data-contracts') + ' <?php echo __('cliente'); ?>' + (contracts > 1 ? 's' : '') + ' <?php echo __('como'); ?> "<?php echo __('Encargado Comercial'); ?>"';
 				}
 
-				confirm_str += '.\n\n¿Desea continuar?';
+				confirm_str += '.\n\n¿<?php echo __('Desea continuar'); ?>?';
 
 				if (!confirm(confirm_str)) {
 					continuar = false;
