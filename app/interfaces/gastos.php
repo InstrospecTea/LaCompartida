@@ -239,7 +239,7 @@ if ($preparar_cobro == 1) {
 			}
 
 	function rfc3986(str) {
-		return encodeURIComponent(str).replace(/[!'()*]/g, escape);
+		return encodeURIComponent(str).replace(/[!'()*]/g, escape());
 	}
 
 	function EliminaGasto(id) {
