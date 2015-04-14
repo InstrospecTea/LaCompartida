@@ -124,7 +124,23 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 				var self = jQuery(this);
 				var id_factura = self.data("factura");
 				var format = self.data("format") || "pdf";
-				window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
+				var url = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?getUrl=1&format=" + format;
+				var loading = jQuery("<span/>", {class: "loadingbar", style: "float:left;position:absolute;width:95px;height:20px;margin-left:-90px;"});
+				self.parent().append(loading);
+				jQuery.ajax({
+					url: url,
+					success: function(data) {
+						loading.remove();
+						window.location = data.url;
+					}
+				}).error(function(error) {
+					loading.remove();
+					errorObject = JSON.parse(error.responseText);
+					if (errorObject && errorObject.errors) {
+						error_message = errorObject.errors.map(function(d){ return d.message }).join(", ")
+						alert(error_message);
+					}
+				});
 			});
 
 			jQuery(document).on("change", "#dte_metodo_pago",  function() {
@@ -359,6 +375,10 @@ EOF;
 		return implode("\n", $arrayFactura);
 	}
 
+	private static function isURL($url) {
+		return preg_match('#((http|https?|ftp)://(\S*?\.\S*?))([\s)\[\]{},;"\':<]|\.\s|$)#i', $url);
+	}
+
 	/**
 	 * Descarga archivo PDF
 	 * @param type $hookArg
@@ -369,25 +389,31 @@ EOF;
 		if (empty($id)) {
 			throw new Exception('Identificador no valido.');
 		}
-		$Estudio = new PrmEstudio($Factura->sesion);
-		$Estudio->Load($Factura->fields['id_estudio']);
-		$rut = $Estudio->GetMetaData('rut');
-		$login = $Estudio->GetMetadata('facturacion_electronica');
-		$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
-		if ($WsFacturacionNubox->hasError()) {
-			throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+		if (!empty($id) && FacturacionElectronicaNubox::isURL($id)) {
+			$hookArg['InvoiceURL'] = $id;
+		} else {
+			$Estudio = new PrmEstudio($Factura->sesion);
+			$Estudio->Load($Factura->fields['id_estudio']);
+			$rut = $Estudio->GetMetaData('rut');
+			$login = $Estudio->GetMetadata('facturacion_electronica');
+			$WsFacturacionNubox = new WsFacturacionNubox($rut, $login);
+			if ($WsFacturacionNubox->hasError()) {
+				throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+			}
+			$file_data = $WsFacturacionNubox->getPdf($id);
+			if ($WsFacturacionNubox->hasError()) {
+				throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
+			}
+			$PrmDocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
+			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+			$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
+			$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$docName}_{$Factura->obtenerNumero()}.pdf";
+			$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
+			$Factura->Edit('dte_url_pdf', $file_url);
+			if ($Factura->Write()) {
+				$hookArg['InvoiceURL'] = $file_url;
+			}
 		}
-		$result = $WsFacturacionNubox->getPdf($id);
-		if ($WsFacturacionNubox->hasError()) {
-			throw new Exception($WsFacturacionNubox->getErrorMessage(), $WsFacturacionNubox->getErrorCode());
-		}
-		$name = sprintf('Factura_%s.pdf', $Factura->obtenerNumero());
-		header("Content-Transfer-Encoding: binary");
-		header("Content-Type: application/pdf");
-		header('Content-Description: File Transfer');
-		header("Content-Disposition: attachment; filename=$name");
-		echo $result->ObtenerPDFResult;
-		exit;
 	}
 
 	public static function LiberaNumeroFactura(Factura $Factura, $numero) {
