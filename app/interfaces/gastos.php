@@ -238,6 +238,10 @@ if ($preparar_cobro == 1) {
 					form.submit();
 			}
 
+	function rfc3986(str) {
+		return encodeURIComponent(str).replace(/[!'()*]/g, escape);
+	}
+
 	function EliminaGasto(id) {
 	var form = document.getElementById('form_gastos');
 <?php if ($conf_codigo_secundario) { ?>
@@ -354,7 +358,11 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 	contratos = {};
 <?php if ($conf_nuevo_modulo_gastos) { ?>
 		var id_contrato = jQuery('#id_contrato').val();
-				var params = jQuery('#form_gastos').serialize();
+				var form = jQuery('#form_gastos').clone();
+				jQuery(form).find('#glosa_cliente').val(function(i, val) {
+					return rfc3986(val);
+				});
+				var params = jQuery(form).serialize();
 				var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
 				var html_url = './planillas/planilla_saldo.php?popup=1&opcion=buscar&tipo_liquidacion=2&mostrar_detalle=1&id_contrato=' + id_contrato + '&' + params;
 				jQuery('#totalcta').text('');
