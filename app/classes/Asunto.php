@@ -741,10 +741,14 @@ class Asunto extends Objeto {
 			LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
 			LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
 			LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario
-			LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = $on_encargado2
-			LEFT JOIN trabajo ON trabajo.codigo_asunto = a1.codigo_asunto AND trabajo.cobrable = 1
-			LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro";
+			LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = $on_encargado2";
 
+		if (!$filtros['ocultar_trabajos_cobros']) {
+			$query .= "
+				LEFT JOIN trabajo ON trabajo.codigo_asunto = a1.codigo_asunto AND trabajo.cobrable = 1
+				LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro";
+		}
+		
 		if ($filtros['ver_glosa_estudio']) {
 			$query .= " LEFT JOIN prm_estudio ON prm_estudio.id_estudio = contrato.id_estudio";
 		}
@@ -795,9 +799,28 @@ class Asunto extends Objeto {
 			$SimpleReport->Config->columns['codigo_asunto']->Field('codigo_secundario');
 			$SimpleReport->Config->columns['codigo_secundario']->Field('codigo_asunto');
 		}
-
-		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
+		
+		$query = $this->QueryReporte($filtros);
+		
+		$filtros['ocultar_trabajos_cobros'] = true;
+		$query_count = $this->QueryReporte($filtros);
+		$query_count = preg_replace('/(^\s*SELECT\s)[\s\S]+(\sFROM\s)/mi', '$1 COUNT(*) AS n $2', $query_count);
+		$query_count = preg_replace('/\sGROUP BY.+|\sORDER BY.+|\sLIMIT.+/mi', '', $query_count);
+		
+		try {
+			$result = $this->sesion->pdodbh->query($query_count)->fetch();
+		} catch (Exception $ex) {
+			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		}
+		
+		if ($result['n'] > 10000) {
+			throw new Exception('Está tratando de descargar mas de 10.000 registros, por favor limite su búsqueda e intente nuevamente.');
+		}
+		
+		$this->sesion->pdodbh->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
+		
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 		$SimpleReport->LoadResults($results);
