@@ -1,9 +1,5 @@
 # Changelog
 
-## Hotfix 15.6.15
-Lunes 13 de Abril 2015
-* **Fix:** [Add a message when the user will be desactivated](https://github.com/LemontechSA/ttb/pull/907)
-
 ## Hotfix 15.6.14
 Jueves 9 de Abril 2015
 * **Fix:** [Deja de ordenar por las horas pendientes de cobrar en la pantalla de asuntos](https://github.com/LemontechSA/ttb/pull/906)
