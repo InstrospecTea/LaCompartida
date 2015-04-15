@@ -1,9 +1,9 @@
 <?php
 
-defined('DBHOST') || define('DBHOST',	'localhost');
-defined('DBUSER') || define('DBUSER',	'root');
-defined('DBPASS') || define('DBPASS',	'');
-defined('DBNAME') || define('DBNAME',	'timetracking');
+defined('DBHOST') || define('DBHOST', 'localhost');
+defined('DBUSER') || define('DBUSER', 'root');
+defined('DBPASS') || define('DBPASS', 'lapass');
+defined('DBNAME') || define('DBNAME', 'timetracking');
 
 list($nada,$subdir)=explode('/',$_SERVER['REQUEST_URI']);
 defined('ROOTDIR') || define('ROOTDIR',$subdir);
