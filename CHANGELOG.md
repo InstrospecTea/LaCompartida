@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.6.17
+Tuesday 2015, April 14th.
+* **Fix:** [Include the header/footer on masive download of bills](https://github.com/LemontechSA/ttb/pull/912)
+* **Fix:** [Set the dataType before the second Query on the Resumen Profesional Report](https://github.com/LemontechSA/ttb/pull/912)
+
 ## Hotfix 15.6.16
 Tuesday 2015, April 14th.
 * **Fix:** [Nubox invoice download improvements](https://github.com/LemontechSA/ttb/pull/911)

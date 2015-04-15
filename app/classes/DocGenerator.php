@@ -94,10 +94,9 @@ class DocGenerator {
 		$this->lang = $lang;
 
 		$this->configuracion = $configuracion;
-		$this->generateStyles($this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin, $this->estado, $id_formato, $this->headerMargin, $this->footerMargin,$sesion);
+		$this->generateStyles($this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin, $this->estado, $id_formato, $this->headerMargin, $this->footerMargin, $sesion);
 		$this->newSession($html);
 		$this->newPage();
-
 	}
 
 //end DocGenerator()
@@ -130,7 +129,7 @@ class DocGenerator {
 	 * @param $footerMargin: margin of the footer of the document
 	 * @return int: the number of the new session
 	 */
-	function generateStyles($pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL,$sesion=NULL) {
+	function generateStyles($pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL, $sesion = NULL) {
 		setlocale(LC_ALL, 'en_EN');
 
 		$pageOrientation = $pageOrientation === NULL ? $this->pageOrientation : $pageOrientation;
@@ -211,16 +210,10 @@ class DocGenerator {
 		$this->formatBuffer .= "   mso-footer-margin: $footerMargins;\r\n";
 		$this->formatBuffer .= "   mso-paper-source: 0;\r\n";
 
-		if( $id_formato != '' ) {
-			$where = " WHERE id_formato = '$id_formato' ";
-		}else{
+		if ($id_formato != '') {
+			$where = " WHERE id_formato = '{$id_formato}' ";
+		} else {
 			$where = " WHERE 1=2";
-		}
-		$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
-
-		if($sesion) {
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			list($html_header, $html_pie) = mysql_fetch_array($resp);
 		}
 
 		$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
@@ -233,7 +226,6 @@ class DocGenerator {
 		if (( $this->estado == 'CREADO' || $this->estado == 'EN REVISION' ) && ( Conf::dbUser() != 'jjr')) {
 			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') h1;\r\n";
 			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') f1;\r\n";
-
 		} else {
 			if ($html_header) {
 				$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
@@ -253,7 +245,6 @@ class DocGenerator {
 		setlocale(LC_ALL, Conf::Locale());
 	}
 
-
 	/**
 	 * public int newSession(const $pageOrientation = NULL, const $pageType = NULL, int $topMargin = NULL, int $rightMargin = NULL, int $bottomMargin = NULL, int $leftMargin = NULL)
 	 * @param $html: HTML code of the session
@@ -270,9 +261,8 @@ class DocGenerator {
 		setlocale(LC_ALL, Conf::Locale());
 		return $this->lastSessionNumber;
 	}
+
 	//end newSession()
-
-
 
 	/**
 	 * public void output(string $fileName = '', string $saveInPath = '')
@@ -347,6 +337,7 @@ class DocGenerator {
 		echo $this->documentBuffer;
 		$this->documentBuffer = '';
 	}
+
 	//end chunkedOutput()
 
 	/**
@@ -389,7 +380,7 @@ class DocGenerator {
 
 //end setFontSize()
 
-	/*     * **************************************************
+	/*	 * **************************************************
 	 * begin private functions
 	 * ************************************************* */
 
@@ -537,28 +528,30 @@ class DocGenerator {
 
 		return $body;
 	}
+
 //end getBody()
 
-/**
+	/**
 	 * private string getBodyStart(void)
 	 */
 	function getBodyStart() {
 		$body = "<body lang=\"$this->documentLang\" style=\"tab-interval: 35.4pt\">\r\n";
 		return $body;
 	}
+
 //end get_start_body()
 
-/**
+	/**
 	 * private string getBodyEnd(void)
 	 */
 	function getBodyEnd() {
-		$body =  "</body>\r\n";
+		$body = "</body>\r\n";
 
 		return $body;
 	}
-//end get_end_body()
 
-//
+//end get_end_body()
+	//
 	function outputxml($xml, $filename) {
 		$this->endSession();
 		header("Content-Type: application/msword; charset=ISO-8859-1");
