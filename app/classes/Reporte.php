@@ -969,7 +969,6 @@ class Reporte {
 
   //Ejecuta la Query y guarda internamente las filas de resultado.
   public function Query() {
-    $stringquery = "";
     $resp = mysql_unbuffered_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(), __FILE__, __LINE__, $this->sesion->dbh);
 
     $this->row = array();
@@ -983,18 +982,18 @@ class Reporte {
       && $this->tipo_dato != 'valor_hora'
       && $this->tipo_dato != 'costo'
       && $this->tipo_dato != 'costo_hh'
-      && $this->cobroQuery()
       && !$this->filtros['usuario.id_area_usuario']['positivo'][0]
       && !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
       && !$this->ignorar_cobros_sin_horas ) {
 
-        $cobroquery = $this->cobroQuery();
-        $stringquery = " \n\n\n union all \n\n\n $cobroquery";
+      $cobroquery = $this->cobroQuery();
+      if (!empty($cobroquery)) {
         $resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery, __FILE__, __LINE__, $this->sesion->dbh);
 
         while ($row = mysql_fetch_array($resp)) {
           $this->row[] = $row;
         }
+      }
     }
   }
 
