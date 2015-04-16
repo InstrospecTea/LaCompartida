@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.6.19
+Thursday 2015, April 16th.
+* **Fix:** [Fix validation of country on contract form when the tenant is from Mexico](https://github.com/LemontechSA/ttb/pull/916)
+
 ## Hotfix 15.6.18
 Thursday 2015, April 16th.
 * **Fix:** [Prevent the insert of invalid data with the new FKs for expenses](https://github.com/LemontechSA/ttb/pull/914)
