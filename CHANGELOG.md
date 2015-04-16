@@ -1,5 +1,12 @@
 # Changelog
 
+## Release: 15.7.0
+Thursday 2015, April 16th.
+[Release 15.7.0](https://github.com/LemontechSA/ttb/pull/915)
+* **Feature:** [Actualización de vagrant](https://github.com/LemontechSA/ttb/issues/913)
+* **Feature:** [RUT de 50 caracteres](https://github.com/LemontechSA/ttb/issues/906)
+* **Feature:** [Modificaciones a factura](https://github.com/LemontechSA/ttb/issues/904)
+
 ## Hotfix 15.6.18
 Thursday 2015, April 16th.
 * **Fix:** [Prevent the insert of invalid data with the new FKs for expenses](https://github.com/LemontechSA/ttb/pull/914)
