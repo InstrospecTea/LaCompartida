@@ -566,7 +566,7 @@ $Form->defaultLabel = false;
 				<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
 				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
 				<?php 
-						if (!is_null($factura->fields['fecha_anulacion'])) {
+						if (!empty($factura->fields['fecha_anulacion'])) {
 							$fecha_anula = Utiles::sql3fecha($factura->fields['fecha_anulacion'], '%d-%m-%Y'); ?>
 							<span style="background-color:yellow"><?php echo "el {$fecha_anula}"?></span>
 				<?php 	} ?>
