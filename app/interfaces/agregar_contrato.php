@@ -293,17 +293,18 @@ $Html = new \TTB\Html();
 
 	function ValidarContrato(form) {
 
+		if (!form) {
+			var form = jQuery('[name="formulario"]').get(0);
+		}
+
 		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
-		if (plugin_facturacion_mx != ''){
+
+		if (plugin_facturacion_mx != '') {
 			if(form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");
 				form.id_pais.focus();
 				return false;
 			}
-		}
-
-		if(!form) {
-			var form = jQuery('[name="formulario"]').get(0);
 		}
 
 		<?php if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
