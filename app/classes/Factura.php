@@ -2476,7 +2476,8 @@ class Factura extends Objeto {
                 , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
                 , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
                 , factura.RUT_cliente
-                , prm_estudio.glosa_estudio";
+                , prm_estudio.glosa_estudio
+                , factura.fecha_anulacion";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
