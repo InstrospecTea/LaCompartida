@@ -794,6 +794,10 @@ class Factura extends Objeto {
 				$html2 = str_replace('%contrato_fono_contacto%', $contrato_fono_contacto, $html2);
 				$html2 = str_replace('%contrato_email_contacto%', strtoupper($contrato_email_contacto), $html2);
 				$html2 = str_replace('%factura_direccion_cliente%', strtoupper($this->fields['direccion_cliente']), $html2);
+				$html2 = str_replace('%num_dia_venc%', date('d', strtotime($fecha_vencimiento_factura)), $html2);
+				$html2 = str_replace('%num_mes_venc%', date('m', strtotime($fecha_vencimiento_factura)), $html2);
+				$html2 = str_replace('%num_anio_venc%', date('Y', strtotime($fecha_vencimiento_factura)), $html2);
+
 
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
 
