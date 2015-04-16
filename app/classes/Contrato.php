@@ -1204,6 +1204,10 @@ class Contrato extends Objeto {
 			}
 		}
 
+		if(!empty($this->fields['fecha_inicio_cap'])){
+			$this->Edit('fecha_inicio_cap', Utiles::fecha2sql($this->fields['fecha_inicio_cap']));
+		}
+
 		if ($this->extra_fields['activo_contrato'] || empty($this->fields['activo']) || empty($this->fields['id_contrato'])) {
 			$this->Edit("activo", 'SI');
 		} else if ($this->extra_fields['desactivar_contrato']) {
