@@ -2,7 +2,7 @@
 
 ## Hotfix 15.6.19
 Thursday 2015, April 16th.
-* **Fix:** [Fix validation of country on contract form when the tenant is from Mexico](https://github.com/LemontechSA/ttb/pull/916)
+* **Fix:** [Fix validation of country on contract form when the tenant is from Mexico](https://github.com/LemontechSA/ttb/pull/917)
 
 ## Hotfix 15.6.18
 Thursday 2015, April 16th.
