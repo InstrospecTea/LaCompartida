@@ -1204,7 +1204,7 @@ class Contrato extends Objeto {
 			}
 		}
 
-		if(!empty($this->fields['fecha_inicio_cap'])){
+		if (!empty($this->fields['fecha_inicio_cap'])) {
 			$this->Edit('fecha_inicio_cap', Utiles::fecha2sql($this->fields['fecha_inicio_cap']));
 		}
 
