@@ -62,6 +62,7 @@ The Time Billing - Time Tracking
 
 ###Incluir el framework de lemontech en FW y amazon WSDDKforPHP en backups/AWSSDKforPHP
 * https://github.com/LemontechSA/framework, https://github.com/amazonwebservices/aws-sdk-for-php usando:
+    git submodule init
     git submodule update
 
 ###Deshabilitar Slim Error Handler
