@@ -6,6 +6,11 @@ Thursday 2015, April 16th.
 * **Feature:** [Actualización de vagrant](https://github.com/LemontechSA/ttb/issues/913)
 * **Feature:** [RUT de 50 caracteres](https://github.com/LemontechSA/ttb/issues/906)
 * **Feature:** [Modificaciones a factura](https://github.com/LemontechSA/ttb/issues/904)
+* **Feature:** [Corrige campo fecha inicio del cap en el editor de contrato](https://github.com/LemontechSA/ttb/issues/916)
+
+## Hotfix 15.6.19
+Thursday 2015, April 16th.
+* **Fix:** [Fix validation of country on contract form when the tenant is from Mexico](https://github.com/LemontechSA/ttb/pull/917)
 
 ## Hotfix 15.6.18
 Thursday 2015, April 16th.

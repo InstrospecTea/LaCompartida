@@ -293,17 +293,18 @@ $Html = new \TTB\Html();
 
 	function ValidarContrato(form) {
 
+		if (!form) {
+			var form = jQuery('[name="formulario"]').get(0);
+		}
+
 		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
-		if (plugin_facturacion_mx != ''){
+
+		if (plugin_facturacion_mx != '') {
 			if(form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");
 				form.id_pais.focus();
 				return false;
 			}
-		}
-
-		if(!form) {
-			var form = jQuery('[name="formulario"]').get(0);
 		}
 
 		<?php if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
@@ -3033,13 +3034,11 @@ echo $Form->script();
 		});
 	}
 
-	if (jQuery('#fecha_inicio_cap').val()) {
-		Calendar.setup({
-			inputField	: "fecha_inicio_cap",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha_inicio_cap"		// ID of the button
-		});
-	}
+	Calendar.setup({
+		inputField	: "fecha_inicio_cap",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "img_fecha_inicio_cap"		// ID of the button
+	});
 
 	$$('[id^="hito_fecha_"]').each(function(elem){
 		Calendar.setup({
