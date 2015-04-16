@@ -8,7 +8,10 @@ echo "mysql-server-5.6 mysql-server/root_password_again password $MYSQL_ROOT_PAS
 
 apt-get -y --quiet update
 apt-get -y --quiet install lamp-server^
-apt-get -y --quiet install php5-curl curl vim php-pear
+apt-get -y --quiet install php5-curl curl vim php-pear php5-xdebug
+
+# Mostrar errores con html
+sed -i "s/html_errors = Off/html_errors = On/" /etc/php5/apache2/php.ini
 
 if [ ! -f /etc/phpmyadmin/config.inc.php ];
 then
@@ -51,7 +54,7 @@ echo "[mysqld]" >> /etc/mysql/conf.d/character.cnf
 echo "character-set-server = latin1" >> /etc/mysql/conf.d/character.cnf
 echo "character-set-client = latin1" >> /etc/mysql/conf.d/character.cnf
 
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p$MYSQL_ROOT_PASS mysql
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p$MYSQL_ROOT_PASS mysql > /dev/null
 mysql -u root -p$MYSQL_ROOT_PASS mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' IDENTIFIED BY 'admin1awdx'"
 mysql -u root -p$MYSQL_ROOT_PASS mysql -e "DROP DATABASE IF EXISTS timetracking"
 mysql -u root -p$MYSQL_ROOT_PASS mysql -e "CREATE DATABASE IF NOT EXISTS timetracking"
@@ -74,3 +77,14 @@ if [ ! -f /vagrant/ttb/app/miconf.php ]; then
         sed -i "s/lapass/admin.asdwsx/" /vagrant/ttb/app/miconf.php
     fi
 fi
+
+if [ -f /etc/php5/cli/conf.d/xdebug.ini ]; then
+	grep xdebug.auto_trace || echo 'xdebug.auto_trace=1' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_enable || echo 'xdebug.remote_enable=on' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_log || echo 'xdebug.remote_log' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_host || echo 'xdebug.remote_host=localhost' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_handler || echo 'xdebug.remote_handler=dbgp' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_port || echo 'xdebug.remote_port=9000' >> /etc/php5/cli/conf.d/xdebug.ini
+fi
+
+
