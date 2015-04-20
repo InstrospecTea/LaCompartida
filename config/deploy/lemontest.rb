@@ -54,8 +54,9 @@ namespace :deploy do
 
 	if (!isHotfix)
 	  dirname=branch.tr('/','_')
-      dbname='lemontest_' << dirname.tr('_','').tr('.','')[0..63]
-      existedb = `mysql -h192.168.1.24 -uroot -pasdwsx -e "show databases like '#{dbname}'";`
+      	  dbname='lemontest_' << dirname.tr('_','').tr('.','')
+ 	  dbname = dbname[0..63]
+          existedb = `mysql -h192.168.1.24 -uroot -pasdwsx -e "show databases like '#{dbname}'";`
 	end
 
     if(!isHotfix && existedb=='')
