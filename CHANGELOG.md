@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.7.1
+Monday 2015, April 20th.
+* **Fix:** [Sorted grupo cliente results in cliente screen](https://github.com/LemontechSA/ttb/pull/920)
+
 ## Release: 15.7.0
 Thursday 2015, April 16th.
 [Release 15.7.0](https://github.com/LemontechSA/ttb/pull/915)
