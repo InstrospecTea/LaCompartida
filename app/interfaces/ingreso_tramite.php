@@ -867,7 +867,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 	<input type="hidden" name="id_cobro" id="id_cobro" value="<?php echo $tramite->fields['id_cobro'] != 'NULL' ? $tramite->fields['id_cobro'] : ''; ?>" />
 	<input type="hidden" name="popup" value="<?php echo $popup; ?>" id="popup">
 
-	<?php if ($id_tramite > 0) { ?>
+	<?php if ($tramite->fields['id_tramite'] > 0) { ?>
 		<table style="border:0px solid black'; display:<?php echo $txt_opcion ? 'inline' : 'none'; ?>" width="90%">
 			<tr>
 				<td width='40%' align=right>
@@ -1204,7 +1204,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 		<tr>
 			<td colspan="2" align="right">
 				<?php
-				$onclick = $id_tramite > 0 ? "Confirmar('$id_trabajo')" : 'Validar()';
+				$onclick = $tramite->fields['id_tramite'] > 0 ? "Confirmar('$id_trabajo')" : 'Validar()';
 				echo $Form->button(__('Guardar'), array('onclick' => $onclick));
 				?>
 			</td>
