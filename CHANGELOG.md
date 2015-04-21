@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.7.2
+Tuesday 2015, April 21th.
+* **Fix:** [Hide lemontech user in selector from list on Biblioteca](https://github.com/LemontechSA/ttb/pull/924)
+
 ## Hotfix 15.7.1
 Monday 2015, April 20th.
 * **Fix:** [Sorted grupo cliente results in cliente screen](https://github.com/LemontechSA/ttb/pull/920)
