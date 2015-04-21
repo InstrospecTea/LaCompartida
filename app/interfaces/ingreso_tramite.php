@@ -538,7 +538,7 @@ $pagina->PrintTop($popup);
 		}
 
 		if (!form.lista_tramite.value) {
-			alert("<?php echo __('Debe seleccionar un Tipo de  ' + langtramite) ?>");
+			alert("<?php echo __('Debe seleccionar un Tipo de ' ) ?>" + langtramite);
 			form.lista_tramite.focus();
 			return false;
 		}
