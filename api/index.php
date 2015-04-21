@@ -695,6 +695,7 @@ $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 	$format = is_null($Slim->request()->params('format')) ? 'pdf' : $Slim->request()->params('format');
 	$original = (is_null($Slim->request()->params('original')) || $Slim->request()->params('original') == 1) ? true : false;
+	$getUrl = !is_null($Slim->request()->params('getUrl'));
 	if (isset($id)) {
 		try {
 			$Invoice = new Factura($Session);
@@ -702,10 +703,15 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 			if (!$Invoice->Loaded()) {
 				throw new Exception('');
 			} else {
-				$data = array('Factura' => $Invoice, 'original' => $original);
+
+				$data = array('Factura' => $Invoice, 'original' => $original, 'getUrl' => $getUrl);
 				if ($format == 'pdf') {
 					$Slim->applyHook('hook_descargar_pdf_factura_electronica', $data);
 					$url = $Invoice->fields['dte_url_pdf'];
+					if ($getUrl) {
+						outputJson(array('url' => $url));
+						exit;
+					}
 					$name = array_shift(explode('?', basename($url)));
 					if ($name === 'descargar.php') {
 						$name = sprintf('factura_%s.pdf', $Invoice->ObtenerNumero());
@@ -721,7 +727,11 @@ $Slim->get('/invoices/:id/document', function ($id) use ($Session, $Slim) {
 				}
 			}
 		} catch (Exception $ex) {
-			halt(__('Invalid invoice Number'), 'InvalidInvoiceNumber');
+			if ($ex->getCode() == 1) {
+				halt($ex->getMessage(), 'InvalidInvoiceNumber');
+			} else {
+				halt(__('Invalid invoice Number'), 'InvalidInvoiceNumber');
+			}
 		}
 	} else {
 		halt(__('Invalid invoice Number'), 'InvalidInvoiceNumber');

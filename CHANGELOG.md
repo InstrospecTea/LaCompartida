@@ -1,5 +1,38 @@
 # Changelog
 
+## Hotfix 15.7.1
+Monday 2015, April 20th.
+* **Fix:** [Sorted grupo cliente results in cliente screen](https://github.com/LemontechSA/ttb/pull/920)
+
+## Release: 15.7.0
+Thursday 2015, April 16th.
+[Release 15.7.0](https://github.com/LemontechSA/ttb/pull/915)
+* **Feature:** [Actualización de vagrant](https://github.com/LemontechSA/ttb/issues/913)
+* **Feature:** [RUT de 50 caracteres](https://github.com/LemontechSA/ttb/issues/906)
+* **Feature:** [Modificaciones a factura](https://github.com/LemontechSA/ttb/issues/904)
+* **Feature:** [Corrige campo fecha inicio del cap en el editor de contrato](https://github.com/LemontechSA/ttb/issues/916)
+
+## Hotfix 15.6.19
+Thursday 2015, April 16th.
+* **Fix:** [Fix validation of country on contract form when the tenant is from Mexico](https://github.com/LemontechSA/ttb/pull/917)
+
+## Hotfix 15.6.18
+Thursday 2015, April 16th.
+* **Fix:** [Prevent the insert of invalid data with the new FKs for expenses](https://github.com/LemontechSA/ttb/pull/914)
+
+## Hotfix 15.6.17
+Wednesday 2015, April 15th.
+* **Fix:** [Include the header/footer on masive download of bills](https://github.com/LemontechSA/ttb/pull/912)
+* **Fix:** [Set the dataType before the second Query on the Resumen Profesional Report](https://github.com/LemontechSA/ttb/pull/912)
+
+## Hotfix 15.6.16
+Tuesday 2015, April 14th.
+* **Fix:** [Nubox invoice download improvements](https://github.com/LemontechSA/ttb/pull/911)
+
+## Hotfix 15.6.15
+Tuesday 2015, April 14th.
+* **Fix:** [Do a pre-parsing of the quotes on the url before http request on expenses popup.](https://github.com/LemontechSA/ttb/pull/910)
+
 ## Hotfix 15.6.14
 Jueves 9 de Abril 2015
 * **Fix:** [Deja de ordenar por las horas pendientes de cobrar en la pantalla de asuntos](https://github.com/LemontechSA/ttb/pull/906)

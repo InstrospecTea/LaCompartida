@@ -10714,7 +10714,24 @@ QUERY;
 			break;
 
 		case 7.97:
-			$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_comentario` VARCHAR(255) NULL DEFAULT NULL AFTER `dte_razon_referencia`";
+			if (!ExisteCampo('dte_comentario', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_comentario` VARCHAR(255) NULL DEFAULT NULL AFTER `dte_razon_referencia`";
+			}
+			break;
+
+		case 7.98:
+			if (!ExisteCampo('fecha_anulacion', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `fecha_anulacion` DATETIME NULL DEFAULT NULL AFTER `fecha_creacion`";
+			}
+			break;
+
+		case 7.99:
+			$queries[] = "ALTER TABLE `asunto` CHANGE COLUMN `rut` `rut` VARCHAR(50) NULL DEFAULT NULL ";
+			$queries[] = "ALTER TABLE `cliente` CHANGE COLUMN `rut` `rut` VARCHAR(50) NULL DEFAULT '0' ";
+			$queries[] = "ALTER TABLE `contrato` CHANGE COLUMN `rut` `rut` VARCHAR(50) NULL DEFAULT NULL ";
+			$queries[] = "ALTER TABLE `factura` CHANGE COLUMN `RUT_cliente` `RUT_cliente` VARCHAR(50) NULL DEFAULT NULL COMMENT 'En Colombia se usa NIT en vez de RUT' ";
+			$queries[] = "ALTER TABLE `factura_log` CHANGE COLUMN `RUT_cliente` `RUT_cliente` VARCHAR(50) NULL DEFAULT NULL COMMENT 'En Colombia se usa NIT en vez de RUT' ";
+			$queries[] = "ALTER TABLE `prm_proveedor` CHANGE COLUMN `rut` `rut` VARCHAR(50) NOT NULL ";
 			break;
 	}
 
@@ -10728,7 +10745,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.97;
+$max_update = 7.99;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

@@ -7,12 +7,14 @@ define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-
 class Factura extends Objeto {
 
 	var $max_numero = 1000000000;
+
 	public static $estados_dte = array(
 		'Firmado' => 1,
 		'ErrorFirmado' => 2,
 		'ProcesoAnular' => 3,
 		'Anulado' => 4
 	);
+
 	public static $estados_dte_desc = array(
 		'Sin Estado',
 		'Documento Tributario Electrónico Firmado',
@@ -20,7 +22,9 @@ class Factura extends Objeto {
 		'Documento Tributario Electrónico en proceso de Anulación',
 		'Documento Tributario Electrónico Anulado'
 	);
+
 	public static $llave_carga_masiva = CONCAT_FACTURA;
+
 	public static $campos_carga_masiva = array(
 		'id_documento_legal' => array(
 			'titulo' => 'Tipo documento (FA,NC,ND,BO)',
@@ -95,6 +99,7 @@ class Factura extends Objeto {
 		),
 		'id_factura_padre' => 'Factura Asociada'
 	);
+
 	public static $configuracion_reporte = array(
 		array(
 			'field' => 'codigo_cliente',
@@ -318,6 +323,12 @@ class Factura extends Objeto {
 		array(
 			'field' => 'glosa_estudio',
 			'title' => 'Companía',
+			'visible' => false,
+		),
+		array(
+			'field' => 'fecha_anulacion',
+			'title' => 'Fecha Anulación',
+			'format' => 'date',
 			'visible' => false,
 		)
 	);
@@ -794,6 +805,10 @@ class Factura extends Objeto {
 				$html2 = str_replace('%contrato_fono_contacto%', $contrato_fono_contacto, $html2);
 				$html2 = str_replace('%contrato_email_contacto%', strtoupper($contrato_email_contacto), $html2);
 				$html2 = str_replace('%factura_direccion_cliente%', strtoupper($this->fields['direccion_cliente']), $html2);
+				$html2 = str_replace('%num_dia_venc%', date('d', strtotime($fecha_vencimiento_factura)), $html2);
+				$html2 = str_replace('%num_mes_venc%', date('m', strtotime($fecha_vencimiento_factura)), $html2);
+				$html2 = str_replace('%num_anio_venc%', date('Y', strtotime($fecha_vencimiento_factura)), $html2);
+
 
 				$anio_yyyy = date('Y', strtotime($fecha_factura));
 
@@ -2461,7 +2476,8 @@ class Factura extends Objeto {
                 , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
                 , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
                 , factura.RUT_cliente
-                , prm_estudio.glosa_estudio";
+                , prm_estudio.glosa_estudio
+                , factura.fecha_anulacion";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (

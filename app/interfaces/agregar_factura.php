@@ -82,7 +82,8 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 			$requiere_refrescar = "window.opener.Refrescar();";
 		} else {
 			$factura->Edit('estado', 'ANULADA');
-			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
+			$factura->Edit('id_estado', $id_estado ? $id_estado : "1");
+			$factura->Edit('fecha_anulacion', date('Y-m-d H:i:s'));
 			$factura->Edit('anulado', 1);
 			if ($factura->Escribir()) {
 				$pagina->AddInfo(__('Documento Tributario') . ' ' . __('anulado con éxito'));
@@ -172,10 +173,11 @@ if ($opcion == "guardar") {
 		$factura->Edit("numero", $numero ? $numero : "1");
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
 		$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
-
+		$factura->Edit('fecha_anulacion', NULL);
 		if ($id_estado == '5') {
 			$factura->Edit('estado', 'ANULADA');
 			$factura->Edit('anulado', 1);
+			$factura->Edit('fecha_anulacion', date('Y-m-d H:i:s'));
 			$mensaje_accion = 'anulado';
 		} else if (!empty($factura->fields['anulado'])) {
 			$factura->Edit('estado', 'ABIERTA');
@@ -557,13 +559,17 @@ $Form->defaultLabel = false;
 					<?php } ?>
 					<input type="text" <? echo $disableInvoiceNumber; ?> name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
-				<td align="right"><?php echo __('Estado'); ?></td>
+				<td align="right" colspan="2"><?php echo __('Estado'); ?>
 				<?php
 					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
-				<td align="left" nowrap>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
-					<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
+				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
+				<?php 
+						if (!empty($factura->fields['fecha_anulacion'])) {
+							$fecha_anula = Utiles::sql3fecha($factura->fields['fecha_anulacion'], '%d-%m-%Y'); ?>
+							<span style="background-color:yellow"><?php echo "el {$fecha_anula}"?></span>
+				<?php 	} ?>
 				</td>
 			</tr>
 

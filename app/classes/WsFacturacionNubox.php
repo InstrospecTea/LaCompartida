@@ -85,15 +85,18 @@ class WsFacturacionNubox extends WsFacturacion{
 	}
 
 	public function getPdf($id) {
+		Log::write("Getting file for dte_url_pdf: {$id}", 'FacturacionElectronicaNubox');
+		Log::write("Using this auth token: {$this->token}", 'FacturacionElectronicaNubox');
 		$datos = array(
 			'token' => $this->token,
 			'identificadorArchivo' => $id,
 		);
 		$pdf = null;
 		try {
-			$pdf = $this->Client->ObtenerPDF($datos);
+			$pdf = $this->Client->ObtenerPDF($datos)->ObtenerPDFResult;
 		} catch (SoapFault $sf) {
-			$this->setError(1, utf8_decode($sf->getMessage()));
+			$this->setError(1, __("Nubox: El archivo no se puede descargar en este momento; Por favor intente más tarde. DTE ID: {$id}"));
+			Log::write($sf->getMessage(), 'FacturacionElectronicaNubox');
 		}
 		return $pdf;
 	}
