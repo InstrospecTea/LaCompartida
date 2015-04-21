@@ -24,11 +24,11 @@
 		$p_edicion = true;
 	else
 		$p_edicion = false;
-		
+
 	$carpeta = new Carpeta($sesion);
 	if($id_carpeta > 0)
 		$carpeta->Load($id_carpeta);
-	
+
 	if($opcion == 'eliminar')
 	{
 		if(!$carpeta->Eliminar())
@@ -36,7 +36,7 @@
 		else
 			$pagina->AddInfo(__('Archivo').' '.__('eliminado con éxito'));
 	}
-	
+
 	if($codigo_cliente_secundario)
 	{
 		$cliente=new Cliente($sesion);
@@ -82,7 +82,7 @@
 	}
 	if ( $id_usuario_ultimo_movimiento > 0 ) {
 		$where .= " AND usuario.id_usuario = ".$id_usuario_ultimo_movimiento."";
-	}	
+	}
 	if( $link_carpeta != '' && UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) {
 		$where .= " AND carpeta.link_carpeta LIKE '%$link_carpeta%'";
 	}
@@ -92,7 +92,7 @@
 	$query = "SELECT SQL_CALC_FOUND_ROWS *
 						FROM carpeta
 						LEFT JOIN asunto USING (codigo_asunto)
-						LEFT JOIN cliente USING (codigo_cliente) 
+						LEFT JOIN cliente USING (codigo_cliente)
 						LEFT JOIN bodega ON carpeta.id_bodega = bodega.id_bodega
 						LEFT JOIN prm_tipo_carpeta ON carpeta.id_tipo_carpeta = prm_tipo_carpeta.id_tipo_carpeta
 						LEFT JOIN prm_tipo_movimiento_carpeta ON prm_tipo_movimiento_carpeta.id_tipo_movimiento_carpeta=carpeta.id_tipo_movimiento_carpeta
@@ -105,7 +105,7 @@
 	if($buscar)
     {
 		$x_pag = 20;
-					
+
 		$b = new Buscador($sesion, $query, "Carpeta", $desde, $x_pag, $orden);
 		$b->AgregarEncabezado("codigo_carpeta",__('Nº Archivo'),"align=center");
 		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
@@ -123,7 +123,7 @@
 		if ($p_edicion)
   			$b->AgregarFuncion("","Opciones","align=center nowrap");
 		$b->color_mouse_over = "#bcff5c";
-	}	
+	}
   function Opciones(& $fila)
   {
   		global $sesion;
@@ -139,12 +139,12 @@
   }
 	if($excel)
 	{
-		$b1 = new Buscador($sesion, $query, "Carpeta", 0, 6500, $orden);	
+		$b1 = new Buscador($sesion, $query, "Carpeta", 0, 6500, $orden);
 		$lista = $b1->lista;
 		require_once Conf::ServerDir().'/interfaces/carpetas.xls.php';
 		exit;
 	}
-		
+
 	$pagina->titulo = __('Archivo');
 	$pagina->PrintTop();
 	if ($p_edicion)
@@ -152,7 +152,7 @@
         <td align=right colspan=2><a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Carpeta',730,300,'agregar_carpeta.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/agregar.gif' border=0 title='".__('Agregar carpeta')."' alt='' />".__('Agregar carpeta')."</a></td></tr>";
   else
   	$NuevoArchivo = "";
-    
+
 ?>
 <script type="text/javascript">
 	function Listar( form, from )
@@ -161,7 +161,7 @@
 			form.action = 'carpeta.php?buscar=1';
 		else
 			return false;
-		
+
 		form.submit();
 		return true;
 	}
@@ -173,14 +173,14 @@
 			self.location.href = url;
 		}
 	}
-	
+
 	function Validar()
 	{
 		var form = document.getElementById('form_carpetas');
 		form.submit();
 		return true;
 	}
-	
+
 	function descargarPlanilla(form)
 	{
 		alert('hola')
@@ -206,7 +206,7 @@
 														+'&id_tipo_movimiento_carpeta='+xid_tipo_movimiento_carpeta
 														+'&id_usuario_ultimo_movimiento='+xid_usuario_ultimo_movimiento);
 	}
-	
+
 </script>
 <?php echo Autocompletador::CSS(); ?>
 <form method="post" action="<?php echo  $_SERVER[PHP_SELF] ?>" name="form_carpetas" id="form_carpetas">
@@ -265,7 +265,7 @@
 					else
 						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
 				}
-			else	
+			else
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 						echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');", 320,"",true);
@@ -318,7 +318,7 @@
 			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_movimiento_carpeta ORDER BY glosa_tipo_movimiento_carpeta","id_tipo_movimiento_carpeta", $id_tipo_movimiento_carpeta ? $id_tipo_movimiento_carpeta : $carpeta->fields['id_tipo_movimiento_carpeta'],"","Cualquiera","120"); ?>
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<?php echo __('Persona')?>
-			<?php echo  Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario WHERE visible=1","id_usuario_ultimo_movimiento", $id_usuario_ultimo_movimiento ? $id_usuario_ultimo_movimiento : $carpeta->fields['id_usuario_ultimo_movimiento'],"","Cualquiera","200"); ?>
+			<?php echo Html::SelectArrayDecente($sesion->usuario->ListarActivos(), 'id_usuario_ultimo_movimiento', $id_usuario_ultimo_movimiento ? $id_usuario_ultimo_movimiento : $carpeta->fields['id_usuario_ultimo_movimiento'],'','Cualquiera','200'); ?>
 		</td>
 	</tr>
 	<tr>
@@ -339,6 +339,6 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectClient
 {
 	echo(Autocompletador::Javascript($sesion));
 }
-	
+
 	$pagina->PrintBottom();
 ?>
