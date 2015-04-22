@@ -229,6 +229,9 @@ class FacturaPdfDatos extends Objeto {
 			case 'descripcion_gastos_sin_iva':
 				$glosa_dato = $factura->fields['descripcion_subtotal_gastos_sin_impuesto'];
 				break;
+			case 'descripcion_gastos_con_y_sin_iva':
+				$glosa_dato = __('Gastos totales');
+				break;
 			case 'monto_honorarios':
 				$glosa_dato = number_format(
 					$factura->fields['subtotal_sin_descuento'],
@@ -243,7 +246,7 @@ class FacturaPdfDatos extends Objeto {
 				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
 				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
 				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
-			
+
 				$glosa_dato = number_format(
 					-1 * $detail->get('descuento_honorarios'),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -257,7 +260,7 @@ class FacturaPdfDatos extends Objeto {
 				$currency = $coiningBusiness->getCurrency($factura->fields['id_moneda']);
 				$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
 				$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
-			
+
 				$glosa_dato = number_format(
 					$detail->get('subtotal_honorarios'),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -276,6 +279,14 @@ class FacturaPdfDatos extends Objeto {
 			case 'monto_gastos_sin_iva':
 				$glosa_dato = number_format(
 					$factura->fields['subtotal_gastos_sin_impuesto'],
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				);
+				break;
+			case 'monto_gastos_con_y_sin_iva':
+				$glosa_dato = number_format(
+					$factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
