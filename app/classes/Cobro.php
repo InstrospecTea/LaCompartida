@@ -1673,12 +1673,12 @@ if (!class_exists('Cobro')) {
 					$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
 
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
-						$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']]));
+						$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], false));
 					} else {
-						$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']]));
+						$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], false));
 					}
 
-					$documento->Edit('monto_tramites', $moneda_opc_total->getFloat($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']]));
+					$documento->Edit('monto_tramites', $moneda_opc_total->getFloat($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], false));
 					$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 					$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 					$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
@@ -1776,12 +1776,12 @@ if (!class_exists('Cobro')) {
 			$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
 
 			if ($this->fields['forma_cobro'] == 'FLAT FEE') {
-				$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']]));
+				$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], false));
 			} else {
-				$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']]));
+				$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], false));
 			}
 
-			$documento->Edit('monto_tramites', $moneda_opc_total->getFloat($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']]));
+			$documento->Edit('monto_tramites', $moneda_opc_total->getFloat($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], false));
 
 			$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
