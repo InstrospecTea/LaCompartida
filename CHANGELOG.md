@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.7.3
+Wednesday 2015, April 22th.
+* **Fix:** [Uses the right decimals for Cobro and Documento](https://github.com/LemontechSA/ttb/pull/926)
+
 ## Hotfix 15.7.2
 Tuesday 2015, April 21th.
 * **Fix:** [Hide lemontech user in selector from list on Biblioteca](https://github.com/LemontechSA/ttb/pull/924)
