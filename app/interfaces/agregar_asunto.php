@@ -702,7 +702,7 @@ function MuestraPorValidacion(divID) {
 									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto,
 									array('class' => 'span3', 'style' => 'display:inline'),
 									array(
-										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
+										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose&order_by=orden,glosa',
 										'onChange' => '
 											var element = selected_id_area_proyecto;
 											jQuery("#id_desglose_area_container").hide();
