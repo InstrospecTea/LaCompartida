@@ -10733,6 +10733,17 @@ QUERY;
 			$queries[] = "ALTER TABLE `factura_log` CHANGE COLUMN `RUT_cliente` `RUT_cliente` VARCHAR(50) NULL DEFAULT NULL COMMENT 'En Colombia se usa NIT en vez de RUT' ";
 			$queries[] = "ALTER TABLE `prm_proveedor` CHANGE COLUMN `rut` `rut` VARCHAR(50) NOT NULL ";
 			break;
+
+		case 8.00:
+			if (!ExisteCampo('codigo_categoria', 'prm_categoria_usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_categoria_usuario` ADD COLUMN `codigo_categoria` VARCHAR(50) NOT NULL DEFAULT 'OT'";
+
+				// Actualiza todas las categorias
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'PT' WHERE id_categoria_lemontech = 1";
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'AS' WHERE id_categoria_lemontech IN (2, 3)";
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'LA' WHERE id_categoria_lemontech = 4";
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'OT' WHERE id_categoria_lemontech NOT IN (1, 2, 3, 4)";
+			}
 	}
 
 	if (!empty($queries)) {
