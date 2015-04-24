@@ -287,8 +287,6 @@ if ($preparar_cobro == 1) {
 
 	jQuery('document').ready(function() {
 
-		var serialized_form = jQuery('#form_gastos').serialize().replace(/[!'()*]/g, escape);
-
 		jQuery('#selectodos').live('click', function() {
 			if (jQuery(this).is(':checked')) {
 				jQuery('.eligegasto').attr('checked', 'checked');
@@ -299,6 +297,8 @@ if ($preparar_cobro == 1) {
 
 		jQuery('.buscargastos').click(function() {
 			var form = jQuery('#form_gastos');
+			var serialized_form = form.serialize().replace(/[!'()*]/g, escape);
+
 			var from = jQuery(this).attr('rel');
 			//jQuery(this).attr('disabled','disabled');
 <?php
@@ -362,8 +362,8 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			jQuery('#totalcta').text('');
 			jQuery.getJSON(ajax_url, function(data) {
 				var onclick_html = "nuevaVentana('',1000,700,'" + html_url + "', '');";
-				var restul_html = '<b>Balance cuenta gastos: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html + '">' + data.resultado + '</a></b>';
-				jQuery('#totalcta').html(restul_html);
+				var result_html = '<b>Balance cuenta gastos: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html + '">' + data.resultado + '</a></b>';
+				jQuery('#totalcta').html(result_html);
 			});
 <?php } else { ?>
 			jQuery('#totalcta').load('ajax/ajax_gastos.php?totalctacorriente=1&' + serialized_form);
