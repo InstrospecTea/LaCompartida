@@ -153,6 +153,7 @@ SCRIPT;
 					FormSelectHelper.original_$name = '$selected';
 					$onSource;
 					jQuery.post(source, {}, function(data) {
+						console.log(data);
 						data_$name = data;
 						jQuery('#{$name}').empty().append(jQuery('<option/>'));
 						for (key in data_$name) {
