@@ -400,18 +400,19 @@ class Documento extends Objeto {
 		$monto = 0;
 
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-			$query = "SELECT ccfm.monto_bruto - ccfm.saldo
+			$query = "SELECT
+					ccfm.monto_bruto - ccfm.saldo AS monto
 				FROM cta_cte_fact_mvto ccfm
-					JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
-					JOIN documento dc ON nd.id_documento_cobro = dc.id_documento
+				INNER JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
+				INNER JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+				INNER JOIN documento dc ON nd.id_documento_cobro = dc.id_documento
 				WHERE nd.id_documento_pago = '{$this->fields['id_documento']}'
 					AND dc.id_cobro = '{$id_cobro}'";
 		} else {
 			$query = "SELECT
-				IF (neteo_documento.valor_pago_honorarios != 0, neteo_documento.valor_pago_honorarios, neteo_documento.valor_pago_gastos) AS monto
+					neteo_documento.valor_pago_honorarios + neteo_documento.valor_pago_gastos AS monto
 				FROM neteo_documento
-					INNER JOIN documento ON documento.id_documento = neteo_documento.id_documento_cobro
+				INNER JOIN documento ON documento.id_documento = neteo_documento.id_documento_cobro
 				WHERE
 					documento.id_cobro = '{$id_cobro}'
 					AND neteo_documento.id_documento_pago = '{$this->fields['id_documento']}'";
