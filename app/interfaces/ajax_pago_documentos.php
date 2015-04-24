@@ -8,9 +8,9 @@
 	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 	require_once Conf::ServerDir().'/../app/classes/CobroMoneda.php';
 	require_once Conf::ServerDir().'/../app/classes/NeteoDocumento.php';
-	
+
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	
+
 header("Content-Type: text/html; charset=ISO-8859-1");
 
     $sesion = new Sesion('');
@@ -25,7 +25,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 	{
 		$c_gas = explode(',',$c_gas);
 	}
-	
+
 	/* En caso de codigo secundario define codigo normal */
 	if( $codigo_cliente_secundario != '' && $codigo_cliente == '' )
 		{
@@ -36,7 +36,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 	//Normalmente no se incluyen Documentos pagados, pero si se está editando un documento, se deben mostrar los documentos pagados que este documento pague.
 	if($id_documento)
 	{
-		$join_neteo .= "LEFT JOIN neteo_documento AS neteo ON (neteo.id_documento_cobro = documento.id_documento 
+		$join_neteo .= "LEFT JOIN neteo_documento AS neteo ON (neteo.id_documento_cobro = documento.id_documento
 																AND neteo.id_documento_pago = '".$id_documento."')";
 		$or_neteo = "OR neteo.id_neteo_documento IS NOT NULL ";
 	}
@@ -63,8 +63,8 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 		$orden = "documento.id_documento";
 	}
 
-	$query = "SELECT SQL_CALC_FOUND_ROWS *, 
-	
+	$query = "SELECT SQL_CALC_FOUND_ROWS *,
+
 					documento.id_documento,
 					documento.id_cobro,
 
@@ -78,7 +78,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 					documento.gastos_pagados,
 					IF(documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO', 0, 1) as pagado,
 					".$orden_docs."
-					
+
 					cobro.fecha_ini,
 					cobro.fecha_fin,
 					documento.fecha,
@@ -89,29 +89,29 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 
 					moneda_pago.tipo_cambio AS t_c_moneda_pago,
 					moneda_cobro.tipo_cambio AS t_c_moneda_cobro,
-					moneda_pago.cifras_decimales AS decimales_moneda_pago, 
-					moneda_cobro.cifras_decimales AS decimales_moneda_cobro, 
+					moneda_pago.cifras_decimales AS decimales_moneda_pago,
+					moneda_cobro.cifras_decimales AS decimales_moneda_cobro,
 
 					moneda_pago.simbolo,
-					
+
 					moneda_cobro.glosa_moneda AS glosa_moneda_cobro,
 					moneda_pago.glosa_moneda AS glosa_moneda_pago
 
-					FROM documento 
+					FROM documento
 					JOIN prm_moneda moneda_cobro	ON (moneda_cobro.id_moneda = documento.id_moneda)
 					JOIN prm_moneda moneda_pago		ON (moneda_pago.id_moneda = ".$id_moneda.")
 					LEFT JOIN cobro					ON (documento.id_cobro = cobro.id_cobro)
 
-					LEFT JOIN documento_moneda AS documento_moneda_cobro	ON (documento_moneda_cobro.id_documento = documento.id_documento 
+					LEFT JOIN documento_moneda AS documento_moneda_cobro	ON (documento_moneda_cobro.id_documento = documento.id_documento
 														AND
 														documento_moneda_cobro.id_moneda = documento.id_moneda)
 					LEFT JOIN documento_moneda AS documento_moneda_pago		ON (documento_moneda_pago.id_documento = documento.id_documento
 														AND
 														documento_moneda_pago.id_moneda = ".$id_moneda.")
 					".$join_neteo."
-					WHERE (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO'  ".$or_neteo.")  
-					
-					AND (documento.monto > 0 OR documento.id_cobro IS NOT NULL) AND documento.codigo_cliente = '".$codigo_cliente."' AND documento.tipo_doc = 'N' ";	
+					WHERE (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO'  ".$or_neteo.")
+
+					AND (documento.monto > 0 OR documento.id_cobro IS NOT NULL) AND documento.codigo_cliente = '".$codigo_cliente."' AND documento.tipo_doc = 'N' ";
 		if($usar_adelanto) $query .= " AND (documento.id_cobro = '$id_cobro' OR neteo.id_neteo_documento IS NOT NULL)";
 		if($id_contrato) $query .= " AND (cobro.id_contrato = '$id_contrato' OR neteo.id_neteo_documento IS NOT NULL)";
 		$x_pag = 0;
@@ -123,21 +123,21 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 
 
 		//$b->AgregarEncabezado("glosa_documento",__('Descripción'), "align=left");
-		
+
 		$b->AgregarFuncion(__('Descipción'),"DescripcionHonorariosGastos","align=left");
 		$b->AgregarFuncion(__('Fecha'),"Fecha","align=right nowrap");
-		
+
 
 		//$b->AgregarFuncion(__('Honorarios'),"Honorarios","align=right nowrap");
 		$b->AgregarFuncion(__('Saldo Honorarios'),"Saldo_Honorarios","align=right nowrap");
 		$b->AgregarFuncion(__('Pago'),"Pago_Honorarios","align=right nowrap");
-		
+
 
 		//$b->AgregarFuncion(__('Gastos'),"Gastos","align=right nowrap");
 		$b->AgregarFuncion(__('Saldo Gastos'),"Saldo_Gastos","align=right nowrap");
 		$b->AgregarFuncion(__('Pago'),"Pago_Gastos","align=right nowrap");
-		
-		
+
+
 		$b->AgregarFuncion(__('TC'),"TipoCambio","align=right nowrap title='".__('Tipo Cambio')."'");
 
 		$b->color_mouse_over = "#bcff5c";
@@ -179,7 +179,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			if($fila->fields['t_c_documento_moneda_cobro'])
 			{
 				$cambio_cobro = $fila->fields['t_c_documento_moneda_cobro'];
-				$cambio_pago = $fila->fields['t_c_documento_moneda_pago'];	
+				$cambio_pago = $fila->fields['t_c_documento_moneda_pago'];
 			}
 			/*Si el Documento es un Cobro ingresado sólo como documento, se usa el tipo de cambio actual*/
 			else
@@ -188,11 +188,11 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 				$cambio_pago = $fila->fields['t_c_moneda_pago'];
 			}
 			$decimales_pago = $fila->fields['decimales_moneda_pago'];
-		
+
 			/*Redondeo hacia arriba*/
 			$monto_total = $monto * ($cambio_cobro / $cambio_pago);
 			$factor = pow( 10, $decimales_pago );
-			$monto_total = ceil( $monto_total * $factor )/$factor;			
+			$monto_total = ceil( $monto_total * $factor )/$factor;
 
 			$monto_total = number_format($monto_total, $decimales_pago, ',','.');
 			return $monto_total;
@@ -217,11 +217,11 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 				$cambio_pago = $fila->fields['t_c_moneda_pago'];
 			}
 			$decimales_pago = $fila->fields['decimales_moneda_pago'];
-			
+
 			$monto_total = $monto * ($cambio_cobro / $cambio_pago);
 			$factor = pow( 10, $decimales_pago );
-			$monto_total = ceil( $monto_total * $factor )/$factor;	
-			
+			$monto_total = ceil( $monto_total * $factor )/$factor;
+
 			$monto_total = number_format($monto_total, $decimales_pago, ',','.');
 			return $monto_total;
 		}
@@ -233,9 +233,9 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			$id_cobro = $fila->fields['id_cobro'];
 
 			$link = "<a href='cobros5.php?id_cobro=$id_cobro&popup=1'>";
-			
+
 			$html .= $link.$fila->fields['glosa_documento']."</a>";
-			
+
 			/*Honorarios*/
 				$monto_total = Valor_Monto_Honorarios($fila);
 				$html .= "<br>Honorarios: ".$fila->fields['simbolo']."&nbsp;".$monto_total." ";
@@ -245,7 +245,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 				$html .= "Gastos: ".$fila->fields['simbolo']."&nbsp;".$monto_total;
 
 			/*CAMPOS OCULTOS*/
-		
+
 			if($fila->fields['t_c_documento_moneda_cobro'])
 			{
 				$cambio_cobro = $fila->fields['t_c_documento_moneda_cobro'];
@@ -272,7 +272,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			$html .= "<input type=hidden name=\"decimales_cobro_".$id_documento."\" value = \"".$decimales_cobro."\" \>"."";
 			/*Decimales Cobro*/
 			$html .= "<input type=hidden name=\"id_cobro_".$id_documento."\" value = \"".$id_cobro."\" \>"."";
-		 
+
 			return $html;
 		}
 
@@ -285,7 +285,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			if($fila->fields['t_c_documento_moneda_cobro'])
 			{
 				$cambio_cobro = $fila->fields['t_c_documento_moneda_cobro'];
-				$cambio_pago = $fila->fields['t_c_documento_moneda_pago'];	
+				$cambio_pago = $fila->fields['t_c_documento_moneda_pago'];
 			}
 			/*Si el Documento es un Cobro ingresado sólo como documento, se usa el tipo de cambio actual*/
 			else
@@ -295,13 +295,13 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			}
 
 			$decimales = $fila->fields['decimales_moneda_pago'];
-			
+
 			$saldo_total = $saldo * ($cambio_cobro / $cambio_pago);
 			$factor = pow( 10, $decimales );
-		    $saldo_total = round( $saldo_total * $factor )/$factor;	
+		    $saldo_total = round( $saldo_total * $factor )/$factor;
 
 			$saldo_total = number_format($saldo_total, $decimales, ',',$separador_miles);
-			
+
 			return str_replace(',','.',$saldo_total);
 		}
 
@@ -351,7 +351,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			if(!$editable) $html = $valor;
 			if( $fila->fields['honorarios'] != 0)
 			{
-				$html .= "<input type=\"".(!$editable ? 'hidden' : 'text')."\" name=\"pago_honorarios_".$fila->fields['id_documento']."\" id=\"pago_honorarios_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('honorarios',".$fila->fields['id_documento'].");SetMontoPagos();\" /> "; 
+				$html .= "<input type=\"".(!$editable ? 'hidden' : 'text')."\" name=\"pago_honorarios_".$fila->fields['id_documento']."\" id=\"pago_honorarios_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('honorarios',".$fila->fields['id_documento'].");SetMontoPagos();\" /> ";
 
 				$html .= "<input type=\"hidden\" name=\"pago_honorarios_anterior_".$fila->fields['id_documento']."\"  id=\"pago_honorarios_anterior_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" /> ";
 				$html .= "<input type=\"hidden\" name=\"cobro_honorarios_".$fila->fields['id_documento']."\"  id=\"cobro_honorarios_".$fila->fields['id_documento']."\" value=\"".number_format($saldo + $valor_neteo, 2, '.', '')."\" SIZE=\"9\" /> ";
@@ -379,7 +379,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 
 			$saldo_total = $saldo * ($cambio_cobro / $cambio_pago);
 			$factor = pow( 10, $decimales );
-		    $saldo_total = ceil( $saldo_total * $factor )/$factor;		
+		    $saldo_total = ceil( $saldo_total * $factor )/$factor;
 
 			$saldo_total = number_format($saldo_total, $decimales, ',',$separador_miles);
 			return str_replace(',','.',$saldo_total);
@@ -440,7 +440,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			else $html = '0';
 			return $html;
 		}
-		
+
 		function TipoCambio(&$fila)
 		{
 			global $id_cobro;
@@ -460,19 +460,19 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			$moneda_pago = $fila->fields['glosa_moneda_pago'];
 			$cambio_cobro_actual = $fila->fields['t_c_moneda_cobro'];
 			$cambio_pago_actual = $fila->fields['t_c_moneda_pago'];
-			
+
 			$html .= '<img style="cursor:pointer" src="'.Conf::ImgDir().'/money_16.gif" title="Tipo de cambio ' . __('Cobro') . ': '.$cambio_cobro.'. Tipo de cambio Pago: '.$cambio_pago.' " onclick="$(\'calculos_'.$fila->fields['id_documento'].'\').toggle();" />';
-			
+
 			$html .="</td></tr><tr id='calculos_".$fila->fields['id_documento']."' style='display:none;'>
 			<td colspan=8>
 				<fieldset>
 				<legend>Tipo de Cambio</legend>
 				<table width=100% style='border-collapse:collapse;'  cellpadding='3'>
-					<tr>";			
+					<tr>";
 						/*Lista de monedas del documento*/
-						$query = 
-						"SELECT id_documento, prm_moneda.id_moneda, glosa_moneda, documento_moneda.tipo_cambio 
-						FROM documento_moneda 
+						$query =
+						"SELECT id_documento, prm_moneda.id_moneda, glosa_moneda, documento_moneda.tipo_cambio
+						FROM documento_moneda
 						JOIN prm_moneda ON documento_moneda.id_moneda = prm_moneda.id_moneda
 						WHERE id_documento = '".$fila->fields['id_documento']."'";
 						$resp =mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__, $sesion->dbh);
@@ -498,16 +498,16 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 				</table>
 				</fieldset>
 			";
-			
+
 			if($fila->fields['id_cobro'] == $id_cobro)
 				$html.="</td></tr><tr><td colspan = 8> <hr>"; //cierre td dado por buscador
-				
+
 			return $html;
 		}
 
-	
+
 		echo $b->Imprimir("",array(''),false);
 
-		
+
 		echo "<input type=\"hidden\" name=\"monto_pagos\"  id=\"monto_pagos\" value=\"".str_replace(',','.',$pago_default)."\" SIZE=\"9\" />";
 ?>
