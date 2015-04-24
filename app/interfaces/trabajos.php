@@ -544,6 +544,8 @@ $pagina->PrintTop($popup);
 	<input type='hidden' name='popup' id='popup' value='<?php echo $popup ?>'>
 	<input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo ?>'>
 	<input type='hidden' name='id_usuario' id='id_usuario' value='<?php echo $id_usuario ?>'>
+	<input type='hidden' name='desde' id='desde' value='<?php echo $desde ?>'>
+	<input type='hidden' name='orden' id='orden' value='<?php echo $orden ?>'>
 	<?php
 	if ($query_asuntos) {
 		echo '<input type="hidden" name="query_asuntos" id="query_asuntos" value="' . $query_asuntos . '"/>';
@@ -1075,52 +1077,8 @@ echo $Form->script();
 	}
 
 	function Refrescar() {
-		//todo if $motivo=="cobros",$motivo=="horas"
-		var pagina_desde = '<?php echo $desde ? "&desde=$desde" : ''; ?>';
-		var orden = '<?php echo $desde ? "&orden=$orden" : ''; ?>';
-
-		<?php if ($motivo == "horas") {
-			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-		?>
-
-			var cliente = 'codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
-			var asunto = 'codigo_asunto_secundario='+$('codigo_asunto_secundario').value;
-			<?php } else { ?>
-				var cliente = 'codigo_cliente='+$('codigo_cliente').value;
-				var asunto = 'codigo_asunto='+$('codigo_asunto').value;
-			<?php } ?>
-
-			var cobrado = $('cobrado').value;
-			var cobrable = $('cobrable').value;
-			var revisado = $('revisado').value;
-			var id_cobro = $('id_cobro').value;
-			var encargado_comercial = $('id_encargado_comercial').value;
-			var usuario = $('id_usuario').value;
-			var fecha_ini = $('fecha_ini').value;
-			var fecha_fin = $('fecha_fin').value;
-			var url = "trabajos.php?from=horas&motivo=horas&popup=1&opc=buscar"
-				+ "&cobrado=" + cobrado
-				+ "&cobrable=" + cobrable
-				+ "&revisado=" + revisado
-				+ "&id_cobro=" + id_cobro
-				+ "&" + cliente
-				+ "&" + asunto
-				+ "&id_encargado_comercial=" + encargado_comercial
-				+ "&id_usuario=" + usuario
-				+ "&fecha_ini=" + fecha_ini
-				+ "&fecha_fin=" + fecha_fin
-				+ pagina_desde
-				+ orden;
-
-		<?php } else if ($motivo == "cobros") { ?>
-
-			var fecha_ini = $('fecha_ini').value;
-			var fecha_fin = $('fecha_fin').value;
-			var url = "trabajos.php?id_cobro=<?php echo $id_cobro ?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
-
-		<?php } ?>
-
-		self.location.href= url;
+		//no basta con hacer un reload porque la paginacion es por post y se pierden los parametros en la url
+		self.location.href = 'trabajos.php?' + jQuery('#form_trabajos').serialize();
 	}
 
 
