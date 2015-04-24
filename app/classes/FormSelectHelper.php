@@ -153,13 +153,10 @@ SCRIPT;
 					FormSelectHelper.original_$name = '$selected';
 					$onSource;
 					jQuery.post(source, {}, function(data) {
-						console.log(data);
 						data_$name = data;
 						jQuery('#{$name}').empty().append(jQuery('<option/>'));
 						for (key in data_$name) {
-							var id = (data_{$name}[key].id || key);
-							
-							var option = jQuery('<option/>').val(id).text(data_{$name}[key].glosa || data_{$name}[key]);
+							var option = jQuery('<option/>').val(key).text(data_{$name}[key].glosa || data_{$name}[key]);
 							if ('$selected' == key || exists_selected == key) {
 								option.attr('selected', 'selected')
 								$selected_name = data_{$name}[key];

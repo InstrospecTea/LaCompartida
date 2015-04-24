@@ -2,10 +2,9 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 class AreaProyecto extends ObjetoExt {
-
 	public static $llave_carga_masiva = 'glosa';
 
-	public function AreaProyecto($Sesion, $fields = '', $params = '') {
+	function AreaProyecto($Sesion, $fields = '', $params = '') {
 		$this->tabla = 'prm_area_proyecto';
 		$this->campo_id = 'id_area_proyecto';
 		$this->campo_glosa = 'glosa';
@@ -14,7 +13,7 @@ class AreaProyecto extends ObjetoExt {
 		$this->guardar_fecha = false;
 	}
 
-	public function LoadByGlosa($glosa) {
+	function LoadByGlosa($glosa) {
 		$query = "SELECT {$this->campo_id} FROM {$this->tabla} WHERE glosa = '{$glosa}'";
 		$rs = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($project_area_id) = mysql_fetch_array($rs);
@@ -22,21 +21,5 @@ class AreaProyecto extends ObjetoExt {
 			$this->Load($project_area_id);
 		}
 	}
-
-	public function ListarExt($query_extra = '', $fields = '') {
-		$fields .= ' ,' . $this->campo_id . ' AS id';
-
-		$query = $this->queryListar($query_extra, $fields);
-
-		$qr = $this->sesion->pdodbh->query($query);
-		$resp = $qr->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
-
-		$result = array();
-		$index = 0;
-		foreach ($resp as $key => $value) {
-			$result[$index] = $value[0];
-			$index++;
-		}
-		return $result;
-	}
+	  
 }
