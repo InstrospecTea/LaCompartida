@@ -688,7 +688,7 @@ function MuestraPorValidacion(divID) {
 							<td align="left">
 								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
 								<?php echo __('Categoría de asunto') ?>
-								<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
+								<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
 							</td>
 						</tr>
 						<tr>

@@ -1,4 +1,4 @@
-<?php
+<?
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -8,23 +8,22 @@ require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 class Proveedor extends Objeto
 {
-	public function Proveedor($sesion, $fields = "", $params = "")
+	function Proveedor($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "prm_proveedor";
 		$this->campo_id = "id_proveedor";
-		$this->campo_glosa = 'glosa';
 		$this->guardar_fecha = false;
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
 
-	public function Id($id=null){
+	function Id($id=null){
 		if($id) $this->fields[$this->campo_id] = $id;
 		if(empty($this->fields[$this->campo_id])) return false;
 		return $this->fields[$this->campo_id];
 	}
 	
-	public function Eliminar()
+	function Eliminar()
 	{
 		$query = " SELECT count(*) FROM cta_corriente WHERE id_proveedor = '".$this->fields['id_proveedor']."' ";
 		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -37,11 +36,6 @@ class Proveedor extends Objeto
 		
 		$this->Delete();
 		return true;
-	}
-	
-	public function ListadoAlfabetico()
-	{
-		return $this->Listar('ORDER BY glosa ASC');
 	}
 }
 	
