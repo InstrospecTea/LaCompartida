@@ -2321,15 +2321,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<tr>
 						<td colspan="2" align="center">
 							<fieldset style="width: 97%; background-color: #FFFFFF;">
-								<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'datos_tramites\')" style="cursor:pointer"' : '' ?> />
-									<?php echo!$div_show ? '<span id="datos_tramites_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
-									&nbsp;<?php echo __('Tr&aacute;mites') ?>
+								<legend <?php echo !$div_show ? 'onClick="MuestraOculta(\'datos_tramites\')" style="cursor:pointer"' : '' ?> />
+									<?php echo !$div_show ? '<span id="datos_tramites_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
+									&nbsp;<?php echo __('Trámites') ?>
 								</legend>
 								<div id='datos_tramites' style="display:<?php echo $show ?>;" width="100%">
 									<table width="100%">
 										<tr>
 											<td align="right" width="25%">
-												<?php echo __('Tarifa Tr&aacute;mites') ?>
+												<?php echo __('Tarifa Trámites') ?>
 											</td>
 											<td align="left" width="75%">
 												<?php echo Html::SelectArrayDecente($TramiteTarifa->Listar('ORDER BY tramite_tarifa.glosa_tramite_tarifa'), 'id_tramite_tarifa', $contrato->fields['id_tramite_tarifa'] ? $contrato->fields['id_tramite_tarifa'] : $tramite_tarifa_default); ?>&nbsp;&nbsp;
@@ -2342,6 +2342,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											</td>
 										</tr>
 									</table>
+									<br />
 								</div>
 							</fieldset>
 						</td>
@@ -2463,6 +2464,51 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_mostrar" style="font-size:7pt;text-align:right;">Mostrar todos</a>
 													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_esconder" style="display:none;font-size:7pt;text-align:right;">Esconder</a>
+												</td>
+											</tr>
+											<?php
+												$TramiteTipo = new TramiteTipo($Sesion);
+											?>
+											<script type="text/javascript">
+											jQuery('document').ready(function () {
+												var agregarTramiteAutomatico = function() {
+													var _tramite_automatico_lista = jQuery('#tramite_automatico_lista');
+													var _tramite_automatico_tipo = _tramite_automatico_lista.val();
+												};
+											});
+											</script>
+											<tr>
+												<td colspan="2" align="center">
+													<strong><?php echo __('Trámites automáticos') ?></strong>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2">
+													<table width="70%" style="border: 1px solid grey;">
+														<thead>
+															<tr bgcolor="#6CA522">
+																<td width="75%">Trámite</td>
+																<td width="20%">Valor</td>
+																<td width="5%">&nbsp;</td>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td><?php echo Html::SelectArrayDecente($TramiteTipo->Listar('ORDER BY glosa_tramite'), 'tramite_automatico_lista', '', '', 'Seleccione un trámite', '320px'); ?></td>
+																<td align="right" id="tramite_automatico_valor"></td>
+																<td align="center">
+																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas" style="cursor:pointer" onclick="agregarTramiteAutomatico();" />
+																</td>
+															</tr>
+														</tbody>
+														<tfoot>
+															<tr>
+																<td>&nbsp;</td>
+																<td><strong id="tramites_automaticos_total"></strong></td>
+																<td>&nbsp;</td>
+															</tr>
+														</tfoot>
+													</table>
 												</td>
 											</tr>
 										</table>
@@ -2800,7 +2846,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<br/>
 		<!-- ASOCIAR DOC LEGALES -->
 
-		<!-- Modulo de -->
+		<!-- Modulo de  producción-->
 		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
@@ -2844,7 +2890,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					}
 
 					var loadGenerators = function() {
-						$.ajax({url: generator_url})
+						$.ajax({ url: generator_url })
 							.done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
@@ -2852,17 +2898,20 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
 								header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
 								header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
+
 								rows.append(header);
-					$.each(data, function(i, generator){
-						generator_row = $('<tr>');
+
+								$.each(data, function(i, generator) {
+									generator_row = $('<tr>');
 									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
 									generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
-									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">%' + generator.porcentaje_genera + '</td>');
+									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">' + generator.porcentaje_genera + '%</td>');
 									generator_row.append(actionButtons(generator.id_contrato_generador));
-						rows.append(generator_row)
-					});
-					$('#user_generators_result').html(rows)
-					});
+									rows.append(generator_row);
+								});
+
+								$('#user_generators_result').html(rows);
+							});
 					};
 
 					$(document).on('click', '.edit_generator', function() {
