@@ -20,8 +20,8 @@ class Ledes extends Objeto {
 	 */
 	private $decimales = 2;
 
-	function Ledes($sesion) {
-		$this->sesion = $sesion;
+	function Ledes($Sesion) {
+		$this->sesion = $Sesion;
 	}
 
 	/**
@@ -50,8 +50,8 @@ class Ledes extends Objeto {
 		$filas = array();
 
 		//cargar datos de la bd
-		$cobro = new Cobro($this->sesion);
-		$cobro->Load($id_cobro);
+		$Cobro = new Cobro($this->sesion);
+		$Cobro->Load($id_cobro);
 
 		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $id_cobro);
 		$gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $id_cobro);
@@ -279,15 +279,17 @@ class Ledes extends Objeto {
 		 * Obtener los datos de la liquidación
 		 */
 		// Obtengo el código secundario del cliente
+		$Cliente = new Cliente($this->sesion);
+		$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
 
 		$datos_cobro = array(
-			'INVOICE_DATE' => $cobro->fields['fecha_emision'],
+			'INVOICE_DATE' => $Cobro->fields['fecha_emision'],
 			'INVOICE_NUMBER' => $id_cobro,
-			'CLIENT_ID' => $cobro->fields['codigo_cliente'],
+			'CLIENT_ID' => $Cliente->fields['codigo_homologacion'],
 			'INVOICE_TOTAL' => $x_resultados['monto_total_cobro'][$moneda_cobro],
-			'BILLING_START_DATE' => $cobro->fields['fecha_ini'],
-			'BILLING_END_DATE' => $cobro->fields['fecha_fin'],
-			'INVOICE_DESCRIPTION' => $cobro->fields['se_esta_cobrando'],
+			'BILLING_START_DATE' => $Cobro->fields['fecha_ini'],
+			'BILLING_END_DATE' => $Cobro->fields['fecha_fin'],
+			'INVOICE_DESCRIPTION' => $Cobro->fields['se_esta_cobrando'],
 			'LAW_FIRM_ID' => UtilesApp::GetConf($this->sesion, 'IdentificadorEstudio')
 		);
 		if ($datos_cobro['BILLING_START_DATE'] < '2000-01-01') {
@@ -295,7 +297,7 @@ class Ledes extends Objeto {
 		}
 
 		if (!$codigo_asunto) {
-			$query = "SELECT codigo_asunto FROM asunto WHERE id_contrato = " . $cobro->fields['id_contrato'] . " LIMIT 1";
+			$query = "SELECT codigo_asunto FROM asunto WHERE id_contrato = " . $Cobro->fields['id_contrato'] . " LIMIT 1";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($codigo_asunto) = mysql_fetch_assoc($resp);
 		}
@@ -331,7 +333,7 @@ class Ledes extends Objeto {
 
 		/* echo '<pre>';
 		  print_r(array(
-		  'cobro' => $cobro->fields,
+		  'cobro' => $Cobro->fields,
 		  'x_resultados' => $x_resultados,
 		  'gastos' => $gastos,
 		  'filas' => $filas,
