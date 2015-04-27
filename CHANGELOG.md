@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.7.5
+Friday 2015, April 24th.
+* **Fix:** [Fix the serialized expenses form](https://github.com/LemontechSA/ttb/pull/932)
+
 ## Hotfix 15.7.4
 Thursday 2015, April 23th.
 * **Fix:** [Change the way of how calculate the advance](https://github.com/LemontechSA/ttb/pull/929)
