@@ -70,7 +70,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['usr_nombre'] = $lawyer_name;
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
-			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
+			$trabajo['id_moneda'] = $fila->fields['contract_id_moneda'];
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
@@ -126,7 +126,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['usr_nombre'] = $lawyer_name;
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
-			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
+			$trabajo['id_moneda'] = $fila->fields['contract_id_moneda'];
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
