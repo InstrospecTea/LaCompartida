@@ -75,11 +75,9 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor');
-				$trabajo['has_estandar'] =  false;
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor_estandar');
 			} else {
 				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
-				$trabajo['has_estandar'] =  true;
 			}
 			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
@@ -132,11 +130,9 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor');
-				$trabajo['has_estandar'] =  false;
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor_estandar');
 			} else {
 				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
-				$trabajo['has_estandar'] =  true;
 			}
 			$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
@@ -493,15 +489,11 @@ HTML;
 		$moneda_filtro = $this->parameters['filterCurrency'];
 		foreach ($data as $fila) {
 			$tds = '';
-			if ($fila['has_estandar']) {
-				$valor_facturado = $this->CoiningBusiness->changeCurrency(
-					$fila['valor_facturado'],
-					$this->CoiningBusiness->getCurrency($fila['id_moneda']),
-					$moneda_filtro
-				);
-			} else {
-				$valor_facturado = $fila['valor_facturado'];
-			}
+			$valor_facturado = $this->CoiningBusiness->changeCurrency(
+				$fila['valor_facturado'],
+				$this->CoiningBusiness->getCurrency($fila['id_moneda']),
+				$moneda_filtro
+			);
 			if ($with_invoiced) {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
