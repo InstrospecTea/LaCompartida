@@ -158,6 +158,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 	}
 
+	/**
+	 * Obtiene la instancia de {@link WorkFee} que representa los parámetros de búsqueda ingresados.
+	 * @param   $workId
+	 * @param   $currencyId
+	 * @return
+	 */
 	public function getWorkFee($workId, $currencyId) {
 		$searchCriteria = new SearchCriteria('WorkFee');
 		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($workId);
