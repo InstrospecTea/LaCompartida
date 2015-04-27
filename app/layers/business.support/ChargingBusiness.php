@@ -137,6 +137,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $results && count($results) > 0 ? $results[0] : null;
 	}
 
+	/**
+	 * Obtiene la instancia de {@link UserFee} que representa los parámetros de búsqueda ingresados.
+	 * @param   $userId
+	 * @param   $feeId
+	 * @param   $currencyId
+	 * @return
+	 */
 	public function getUserFee($userId, $feeId, $currencyId) {
 		$searchCriteria = new SearchCriteria('UserFee');
 		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
