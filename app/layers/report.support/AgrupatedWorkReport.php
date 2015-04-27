@@ -75,7 +75,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor_estandar');
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['contract_id_moneda'])->get('valor_estandar');
 			} else {
 				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
 			}
@@ -130,7 +130,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor_estandar');
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['contract_id_moneda'])->get('valor_estandar');
 			} else {
 				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
 			}

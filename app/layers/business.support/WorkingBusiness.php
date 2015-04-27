@@ -94,6 +94,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$filter_properties = array(
 			'Client.codigo_cliente',
 			'Client.glosa_cliente',
+			'Contract.id_moneda',
 			'Matter.id_asunto',
 			'Matter.glosa_asunto',
 			'Work.id_trabajo',
