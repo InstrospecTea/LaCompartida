@@ -373,7 +373,8 @@ if ($opcion == "guardar") {
 			if (empty($valor)) {
 				$valor = "0";
 			}
-			$t->ActualizarTrabajoTarifa($id_moneda, $valor);
+			$valor_estandar = Funciones::TarifaDefecto($sesion, $id_usuario, $id_moneda);
+			$t->ActualizarTrabajoTarifa($id_moneda, $valor, null, $valor_estandar);
 			$valores[$id_moneda] = $valor;
 		}
 	}

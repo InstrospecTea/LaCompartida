@@ -1262,7 +1262,8 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 					$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
-					$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$id_usuario]['tarifa']);
+					$valor_estandar = Funciones::TarifaDefecto($sesion, $id_usuario, $this->fields['id_moneda']);
+					$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$id_usuario]['tarifa'], null, $valor_estandar);
 					$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
@@ -1340,8 +1341,8 @@ if (!class_exists('Cobro')) {
 					} else {
 						$factor = 1;
 					}
-
-					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
+					$valor_estandar = Funciones::TarifaDefecto($sesion, $id_usuario, $trabajo->fields['id_moneda']);
+					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''), null, $valor_estandar);
 					$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');

@@ -6,7 +6,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
-		
+
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
 		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
@@ -96,6 +96,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			'Client.glosa_cliente',
 			'Matter.id_asunto',
 			'Matter.glosa_asunto',
+			'Work.id_trabajo',
 			'Work.descripcion',
 			'Work.fecha',
 			'Work.duracion_cobrada',
@@ -191,7 +192,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 
 		if (!empty($data['cobrable'])) {
-			$searchCriteria->filter('cobrable')->restricted_by('equals')->compare_with($data['cobrable'])->for_entity('Work');			
+			$searchCriteria->filter('cobrable')->restricted_by('equals')->compare_with($data['cobrable'])->for_entity('Work');
 		}
 
 		$filter_properties = array(
@@ -210,7 +211,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		);
 
 		$this->loadReport('TimekeeperProductivity', 'report');
- 		
+
  		$moneda_filtro = $this->CoiningBusiness->getCurrency($data['moneda_filtro']);
  		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
 		$this->report->setParameters(

@@ -9,6 +9,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	protected function setUp() {
 		$this->Html = new \TTB\Html;
 		$this->loadBusiness('Coining');
+		$this->loadBusiness('Charging');
 		$this->baseCurrency = $this->CoiningBusiness->getBaseCurrency();
 		$this->loadBusiness('Translating');
 		$this->defaultLanguage = $this->TranslatingBusiness->getLanguageByCode('es');
@@ -73,7 +74,11 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
-			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor');
+			} else {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			}
 			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
@@ -124,7 +129,11 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
-			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['work_id_moneda'])->get('valor');
+			} else {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			}
 			$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
@@ -492,7 +501,7 @@ HTML;
 				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
 				$tds .= $this->Html->tag(
 					'td',
-					"{$moneda_filtro->get('simbolo')} " . 
+					"{$moneda_filtro->get('simbolo')} " .
 					$this->CoiningBusiness->formatAmount(
 						$valor_facturado,
 						$moneda_filtro,
@@ -520,7 +529,7 @@ HTML;
 			$ths .= $this->Html->tag('th', $total, array('class' => 'col3'));
 			$ths .= $this->Html->tag(
 				'th',
-				"{$moneda_filtro->get('simbolo')} " . 
+				"{$moneda_filtro->get('simbolo')} " .
 				$this->CoiningBusiness->formatAmount(
 					$total_facturado,
 					$this->baseCurrency,

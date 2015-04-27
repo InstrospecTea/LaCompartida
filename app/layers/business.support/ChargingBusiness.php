@@ -151,6 +151,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 	}
 
+	public function getWorkFee($workId, $currencyId) {
+		$searchCriteria = new SearchCriteria('WorkFee');
+		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($workId);
+		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		if (empty($results[0])) {
+			return null;
+		} else {
+			return $results[0];
+		}
+	}
+
 	public function getDefaultUserFee($userId, $currencyId) {
 		$searchCriteria = new SearchCriteria('UserFee');
 		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
