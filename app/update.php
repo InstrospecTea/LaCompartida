@@ -10733,6 +10733,12 @@ QUERY;
 			$queries[] = "ALTER TABLE `factura_log` CHANGE COLUMN `RUT_cliente` `RUT_cliente` VARCHAR(50) NULL DEFAULT NULL COMMENT 'En Colombia se usa NIT en vez de RUT' ";
 			$queries[] = "ALTER TABLE `prm_proveedor` CHANGE COLUMN `rut` `rut` VARCHAR(50) NOT NULL ";
 			break;
+
+		case 8.00:
+			if (!ExisteCampo('valor_estandar', 'trabajo_tarifa', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo_tarifa` ADD COLUMN `valor_estandar` DOUBLE NULL DEFAULT 0 AFTER `valor`";
+			}
+			break;			
 	}
 
 	if (!empty($queries)) {
@@ -10745,7 +10751,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.99;
+$max_update = 8.00;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

@@ -171,13 +171,15 @@ class Trabajo extends Objeto
 			if (empty($valor)) {
 				$valor = 0;
 			}
+			$valor_estandar = Funciones::TarifaDefecto($this->sesion, $id_usuario, $id_moneda);
 
 			$query_insert = "INSERT INTO trabajo_tarifa
 												SET
 													id_trabajo = '$id_trabajo',
 													id_moneda = '$id_moneda',
-													valor = '$valor'
-												ON DUPLICATE KEY UPDATE valor = '$valor'";
+													valor = '$valor',
+													valor_estandar = '$valor_estandar'
+												ON DUPLICATE KEY UPDATE valor = '$valor', valor_estandar = '$valor_estandar'";
 
 			mysql_query($query_insert, $dbh) or Utiles::errorSQL($query_insert,__FILE__,__LINE__,$dbh);
 
@@ -203,7 +205,6 @@ class Trabajo extends Objeto
 	}
 
 	function ActualizarTrabajoTarifa($id_moneda, $valor, $id_trabajo = '', $valor_estandar) {
-		pr($id_moneda, $valor, $id_trabajo, $valor_estandar);
 		if ($id_trabajo == '') {
 			$id_trabajo = $this->fields['id_trabajo'];
 		}
