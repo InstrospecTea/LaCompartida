@@ -238,8 +238,9 @@ if ($opcion == 'guardar') {
 			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == '') {
 				$Pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 				$val = true;
-			} elseif ($forma_cobro == 'TASA')
+			} elseif ($forma_cobro == 'TASA') {
 				$monto = '0';
+			}
 
 			if ($tipo_tarifa == 'flat') {
 				if (empty($tarifa_flat)) {
@@ -262,6 +263,7 @@ if ($opcion == 'guardar') {
 			$contrato->Edit('fecha_inicio_cap', Utiles::fecha2sql($fecha_inicio_cap));
 
 			if ($contrato->Write()) {
+
 				#Subiendo Archivo
 				if (!empty($archivo_data)) {
 					$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
@@ -296,14 +298,14 @@ if ($opcion == 'guardar') {
 
 				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
-
 				if ($Asunto->Write()) {
 					$Asunto->writeAreaDetails($id_desglose_area);
 					$Asunto->writeEconomicActivities($id_asunto_giro);
 					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
-				}
-				else
+				} else {
+
 					$Pagina->AddError($Asunto->error);
+				}
 
 				ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				if (is_array($docs_legales)) {
@@ -344,8 +346,9 @@ if ($opcion == 'guardar') {
 				$ContratoObj->Load($Contrato_indep);
 				$ContratoObj->Eliminar();
 			}
-			else
+			else {
 				$Pagina->AddError($Asunto->error);
+			}
 		}
 		$MailAsuntoNuevo = Conf::GetConf($Sesion, 'MailAsuntoNuevo');
 
@@ -688,7 +691,9 @@ function MuestraPorValidacion(divID) {
 							<td align="left">
 								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
 								<?php echo __('Categoría de asunto') ?>
-								<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
+								<?php
+									echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']);
+								?>
 							</td>
 						</tr>
 						<tr>
@@ -702,7 +707,7 @@ function MuestraPorValidacion(divID) {
 									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto,
 									array('class' => 'span3', 'style' => 'display:inline'),
 									array(
-										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose',
+										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose&order_by=orden,glosa&order_by_type=asc',
 										'onChange' => '
 											var element = selected_id_area_proyecto;
 											jQuery("#id_desglose_area_container").hide();
@@ -758,7 +763,7 @@ function MuestraPorValidacion(divID) {
 
 						<?php
 							$prmGiro = new PrmGiro($Sesion);
-							$giros = $prmGiro->ListarExt();
+							$giros = $prmGiro->Listar();
 							if (count($giros) > 0) {
 						?>
 						<tr>

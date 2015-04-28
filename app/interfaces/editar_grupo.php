@@ -26,7 +26,7 @@ if (!empty($id)) {
         </td>
         <td class="al " width="600">
           <div  class="controls controls-row " style="white-space:nowrap;">
-            <? echo $Form->input('data[glosa_grupo_cliente]', $Grupo->fields['glosa_grupo_cliente'], array('label' => false, 'id' => 'glosa_grupo_cliente')); ?> 
+            <?php echo $Form->input('data[glosa_grupo_cliente]', $Grupo->fields['glosa_grupo_cliente'], array('label' => false, 'id' => 'glosa_grupo_cliente')); ?>
           </div>
         </td>
       </tr>
@@ -38,7 +38,7 @@ if (!empty($id)) {
         </td>
         <td class="al " width="600">
           <div  class="controls controls-row " style="white-space:nowrap;">
-            <? echo $Form->input('data[codigo_cliente]', $Grupo->fields['codigo_cliente'], array('label' => false, 'id' => 'codigo_cliente')); ?> 
+            <?php echo $Form->input('data[codigo_cliente]', $Grupo->fields['codigo_cliente'], array('label' => false, 'id' => 'codigo_cliente')); ?>
           </div>
         </td>
       </tr>
@@ -50,16 +50,16 @@ if (!empty($id)) {
         </td>
         <td class="al " width="600">
           <div  class="controls controls-row " style="white-space:nowrap;">
-            <? 
+            <?php
               echo $SelectHelper->ajax_select(
                 'data[id_pais]',
-                $Grupo->fields['id_pais'] ? $Grupo->fields['id_pais'] : '', 
-                array('id' => 'id_pais_grupo', 'class' => 'span3', 'style' => 'display:inline'), 
+                $Grupo->fields['id_pais'] ? $Grupo->fields['id_pais'] : '',
+                array('id' => 'id_pais_grupo', 'class' => 'span3', 'style' => 'display:inline'),
                 array(
                   'source' => 'ajax/ajax_prm.php?prm=Pais&fields=nombre,iso_2siglas',
                   'selectedName' => 'selected_pais_grupo')
               );
-            ?> 
+            ?>
           </div>
         </td>
       </tr>
