@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 15.7.6
+Monday 2015, April 27th.
+* **Fix:** [Change the way of how calculate the amount on pay](https://github.com/LemontechSA/ttb/pull/934)
+
+## Hotfix 15.7.5
+Friday 2015, April 24th.
+* **Fix:** [Fix the serialized expenses form](https://github.com/LemontechSA/ttb/pull/932)
+
+## Hotfix 15.7.4
+Thursday 2015, April 23th.
+* **Fix:** [Change the way of how calculate the advance](https://github.com/LemontechSA/ttb/pull/929)
+
 ## Hotfix 15.7.3
 Wednesday 2015, April 22th.
 * **Fix:** [Uses the right decimals for Cobro and Documento](https://github.com/LemontechSA/ttb/pull/926)

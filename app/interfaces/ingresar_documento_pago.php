@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('COB'));
@@ -26,6 +25,7 @@ if (!$id_cobro) {
 
 $documento = new Documento($sesion);
 $cobro = new Cobro($sesion);
+
 if ($id_cobro) {
 	$cobro->Load($id_cobro);
 }
@@ -140,6 +140,9 @@ if ($opcion == "guardar") {
 	}
 
 	$documento->Load($id_documento);
+	if ($id_cobro) {
+		$monto_usado = $documento->MontoUsadoAdelanto($id_cobro);
+	}
 }
 
 if ($documento->Loaded()) {
@@ -178,7 +181,7 @@ $Form = new Form();
 <?php } ?>
 
 <script type="text/javascript">
-    function formato_numeros() {
+  function formato_numeros() {
 		var cantidad_decimales = $('cifras_decimales').value;
 		var ceros = "0".times(parseFloat(cantidad_decimales));
 		var decimales = '0.' + ceros;
@@ -195,19 +198,20 @@ $Form = new Form();
 	}
 
 	function Validar(form) {
-		var tipopago=jQuery('#tipodocumento').val();
+		var tipopago = jQuery('#tipodocumento').val();
 
 		monto = parseFloat(jQuery('#monto').val());
-		// alert(monto);
+
 		if (isNaN(monto) || monto == '') {
 			alert('<?php echo __('Debe ingresar un monto para el pago') ?>');
 			$('monto').focus();
 			return false;
 		}
-		if(jQuery('#montoadelanto').length>0) {
-			saldo_adelanto=parseFloat(jQuery('#saldo_pago').val());
-			monto_adelanto=parseFloat(jQuery('#montoadelanto').val().replace('-',''));
-			if (saldo_adelanto<0) {
+
+		if (jQuery('#montoadelanto').length > 0) {
+			saldo_adelanto = parseFloat(jQuery('#saldo_pago').val());
+			monto_adelanto = parseFloat(jQuery('#montoadelanto').val().replace('-',''));
+			if (saldo_adelanto < 0) {
 				alert('El adelanto ('+ monto_adelanto +') no alcanza a cubrir la cantidad ingresada ('+ monto +')');
 				return false;
 			}
@@ -234,7 +238,7 @@ $Form = new Form();
 
 		<?php } ?>
 
-		if (monto <= 0 || (jQuery('#montoadelanto').length==0 && monto_pagos_real<=0 && jQuery('#elajax').val() != '')) {
+		if (parseFloat(jQuery('#monto').val()) == 0) {
 			alert('<?php echo __('El monto de un pago debe ser siempre mayor a 0') ?>');
 			$('monto').focus();
 			return false;
@@ -245,22 +249,7 @@ $Form = new Form();
 			form.glosa_documento.focus();
 			return false;
 		}
-		if (monto > monto_pagos && $('es_adelanto') && $F('es_adelanto')!='1') {
-			alert("El Monto del documento ("+monto+") es superior a la suma de los Pagos ("+monto_pagos+").");
-			return false;
-		} else if(monto < monto_pagos) {
-			alert("La suma de los Pagos ("+monto_pagos+") es superior al Monto del documento ("+monto+").");
-			return false;
-		}
 
-		<?php if ($monto_usado !== null) { ?>
-			var monto_neteo = $$('input[type="text"][id^="pago_"]').inject(0, function(suma, elem) { return suma + Number($F(elem)); });
-			var monto_usado = <?php echo $monto_usado; ?>;
-			if(monto_neteo < monto_usado){
-				alert('No puede ingresar un monto menor al monto que ya ha sido usado para pagar otras facturas ('+monto_usado+')');
-				return false;
-			}
-		<?php } ?>
 		<?php if (!empty($adelanto)) { ?>
 			if ($$('input[id^="pago_honorarios_"]:not([value="0"])').length && !$('pago_honorarios').checked){
 				alert('El adelanto se ha usado para pagar honorarios. No puede deshabilitar esta opción.');
@@ -289,55 +278,35 @@ $Form = new Form();
 	function procesar_saldo_pagos(self) {
 		var total = parseFloat(0);
 		var tipopago = jQuery('#tipodocumento').val();
-		var anterior = 0;
+
 		self.val(self.val().replace(',','.'));
-		jQuery("input[id^='pago_gastos_anterior']").each(function() {
-			anterior+=Math.max(0,Number(jQuery(this).val()));
-		});
-		jQuery("input:hidden[id^='pago_honorarios_anterior']").each(function() {
-			anterior+=Math.max(0,Number(jQuery(this).val()));
-		});
+
 		MontoValido(self.attr('id'));
 		self.val(Math.max(0,Math.min(self.val(),Math.max(0,parseFloat(jQuery('#'+self.attr('id').replace('pago','cobro')).val())))));
 
-		jQuery('.saldojq').each(function() {
-			total=parseFloat(total)+parseFloat(jQuery(this).val());
-		});
-
-		total = parseFloat(total)+parseFloat(jQuery("#anteriorduro").val());
-
-		if (tipopago!='adelanto') {
-			jQuery('#monto').val(total).formatNumber(formato_numeros());
+		if (tipopago != 'adelanto') {
+			jQuery('#monto').val(getPagoTotal()).formatNumber(formato_numeros());
 		}
-		jQuery('#monto_aux').val(total).formatNumber(formato_numeros());
-		jQuery('#monto_pagos').val(total).formatNumber(formato_numeros());
 
-		if (jQuery('#montoadelanto').length>0) {
-			monto_adelanto=parseFloat(jQuery('#montoadelanto').val().replace('-',''));
-			var delta=jQuery('#monto_pagos').val()-monto_adelanto;
-			if (delta>0) {
+		if (getSaldoInicialDocumento() > 0) {
+			if (getSaldoActualDocumento() < 0) {
 				alert('Exceso adelanto');
-				self.val(self.val()-delta);
-				total=total-delta;
-				jQuery('#monto_aux').val(Number(total));
-				jQuery('#monto_pagos').val(Number(total));
+				self.val(parseFloat(self.val()) + getSaldoActualDocumento());
 			}
-			jQuery('#saldo_pago').val(monto_adelanto - total);
-		}
 
-		if (jQuery('#saldo_pago_aux').length>0) {
-			saldopagomaximo=anterior+jQuery('#saldo_pago_aux').val()*1.000;
-			if (total>saldopagomaximo) {
-				total=saldopagomaximo;
-			}
-			jQuery('#monto').val(total).formatNumber(formato_numeros());
-			if (tipopago!='documento' && tipopago!='adelanto') {
+			jQuery('#saldo_pago').val(getSaldoActualDocumento());
+			jQuery('#monto').val(getPagoActual());
+
+			if (tipopago != 'documento' && tipopago != 'adelanto') {
 				SetMontoPagos();
 			}
-
-			jQuery('#saldo_pago').val(saldopagomaximo - total) ;
 		}
+
+		jQuery('#monto_aux').val(getPagoTotal()).formatNumber(formato_numeros());
+		jQuery('#monto_pagos').val(getPagoActual()).formatNumber(formato_numeros());
+
 		jQuery('#saldo_pago').formatNumber(formato_numeros());
+		jQuery('#monto').formatNumber(formato_numeros());
 	}
 
 	jQuery('document').ready(function() {
@@ -404,36 +373,82 @@ $Form = new Form();
 
 	});
 
+	function getSaldoInicialDocumento() {
+		var saldo = Math.max(0, (- 1.0000 * '<?php echo $documento->fields['monto'] ?>'));
+		return parseFloat(saldo);
+	}
 
+	function getSaldoActualDocumento() {
+		var pago_actual = getPagoActual();
+		var saldo_actual = getSaldoInicialDocumento() - getPagoAnterior();
+
+		return parseFloat(saldo_actual - pago_actual);
+	}
+
+	function getPagoAnterior() {
+		var anterior = 0;
+
+		jQuery("input:hidden[id^='pago_gastos_anterior']").each(function() {
+			var id = '#' + jQuery(this).attr('id').replace('pago_gastos_anterior_', 'pago_gastos_');
+			if (!jQuery(id).hasClass('saldojq')) {
+				anterior += Math.max(0, jQuery(this).parseNumber(formato_numeros()));
+			}
+		});
+
+		jQuery("input:hidden[id^='pago_honorarios_anterior']").each(function() {
+			var id = '#' + jQuery(this).attr('id').replace('pago_honorarios_anterior_', 'pago_honorarios_');
+			if (!jQuery(id).hasClass('saldojq')) {
+				anterior += Math.max(0, jQuery(this).parseNumber(formato_numeros()));
+			}
+		});
+
+		return parseFloat(anterior);
+	}
+
+	function getPagoActual() {
+		var pago_actual = 0
+
+		jQuery('.saldojq').each(function() {
+			pago_actual += jQuery(this).parseNumber(formato_numeros());
+		});
+
+		return pago_actual;
+	}
+
+	function getPagoTotal() {
+		return getPagoAnterior() + getPagoActual();
+	}
 
 	function Repartir() {
-		var monto_tmp=0;
-		var saldo=(1.0000*jQuery('#monto').val()-1.0000*jQuery("#anteriorduro").val());
-		if (saldo<0 || jQuery('.saldojq').length==0) {
-			if (Number(jQuery("#anteriorduro").val())>0){
+		var monto_tmp = 0;
+		var saldo = getSaldoInicialDocumento() - getPagoAnterior();
+
+		if (saldo < 0 || jQuery('.saldojq').length == 0) {
+			if (Number(jQuery("#anteriorduro").val()) > 0) {
 				jQuery('#monto').val(jQuery("#anteriorduro").val());
 			}
+
 			return false;
 		}
-		//console.log('a repartir: '+saldo);
+
 		jQuery('.saldojq').each(function() {
+			jQuery(this).val(Math.min(saldo, Math.max(0, Number(jQuery('#' + jQuery(this).attr('id').replace('pago', 'cobro')).val()))));
 
-			jQuery(this).val(Math.min(saldo, Math.max(0,Number(jQuery('#'+jQuery(this).attr('id').replace('pago','cobro')).val()))));
+			saldo = saldo - jQuery(this).parseNumber(formato_numeros());
 
-			saldo=saldo-jQuery(this).parseNumber(formato_numeros());
-
-			if (saldo<0) {
-				saldo=0;
+			if (saldo < 0) {
+				saldo = 0;
 			} else {
-				monto_tmp=    monto_tmp+jQuery(this).parseNumber(formato_numeros());
+				monto_tmp = monto_tmp + jQuery(this).parseNumber(formato_numeros());
 			}
+
 			jQuery(this).formatNumber(formato_numeros());
 		});
-		if(monto_tmp>0) {
-			jQuery('#monto, #monto_pagos').val(1.000 * (monto_tmp) + 1.000 * jQuery("#anteriorduro").val());
 
+		if (monto_tmp > 0) {
+			jQuery('#monto').val(1.000 * (monto_tmp)).parseNumber(formato_numeros());
+			jQuery('#monto_pagos').val(1.000 * (monto_tmp) + (1.000 * jQuery("#anteriorduro").val()));
 		}
-
 	}
 
 	function CargarTabla(actualizar, oldtasa, newtasa) {
@@ -485,12 +500,7 @@ $Form = new Form();
 		jQuery.get(url, function(data) {
 			jQuery('#tabla_pagos').html(data);
 
-			jQuery("input:hidden[id^='pago_gastos_anterior']").each(function() {
-				anterior+=Math.max(0,1.000*(jQuery(this).val()));
-			});
-			jQuery("input:hidden[id^='pago_honorarios_anterior']").each(function() {
-				anterior+=Math.max(0,1.000*(jQuery(this).val()));
-			});
+			anterior = getPagoAnterior();
 
 			if (tipopago=='nuevopago' && anterior>0  && id_documento) {
 				tipopago='documento'
@@ -519,33 +529,33 @@ $Form = new Form();
 					jQuery("input:text[id^='pago_gastos_']").removeAttr('disabled').addClass('saldojq');
 				}
 
-				jQuery('.saldojq').each(function() {
-					total=total+(Math.max(0,1.000*jQuery(this).val()));
-				});
+				// los campos con la clase .saldojq solo existen si hay un saldo pendiente en la liquidación
+				total = getPagoActual();
+
 				jQuery('#anteriorduro').val(anterior-total).formatNumber(formato_numeros());
 
-				if(actualizar)   {
+				if (actualizar) {
 					jQuery('#monto_pagos').val(1.000 * total);
 
-					if (jQuery('#saldo_pago_aux').length>0) {
-
-						if ( (tipopago=='documento' || tipopago=='adelanto')) {
-							if (jQuery('.saldojq').length==0) {
-								jQuery('#monto').val(anterior-total).formatNumber(formato_numeros());
-							} else if(total>0) {
-								jQuery('#monto').val(anterior).formatNumber(formato_numeros());
+					// saldo_pago_aux corresponde al saldo que tiene el adelanto
+					if (jQuery('#saldo_pago_aux').length > 0) {
+						if ((tipopago == 'documento' || tipopago == 'adelanto')) {
+							if (jQuery('.saldojq').length == 0 || total > 0) {
+								// cuando editas el pago utilizando un adelanto y la liquidación está completamente pagada
+								// cuando queda saldo pendiente en la liquidación y editas un pago utilizando un adelanto
+								jQuery('#monto').val('<?php echo $monto_usado; ?>').formatNumber(formato_numeros());
 							} else {
-								jQuery('#monto').val(jQuery('#saldo_pago_aux').parseNumber(formato_numeros())+anterior).formatNumber(formato_numeros());
+								// cuando agregas un pago
 								Repartir();
 							}
-
 						} else {
 							jQuery('#monto').val(Math.min(total,anterior+1.000*(jQuery('#saldo_pago_aux').val()))).formatNumber(formato_numeros());
 						}
-						jQuery('#saldo_pago').val(1.000*jQuery('#monto_aux').val()-1.000*jQuery('#monto').val()).formatNumber(formato_numeros());
 
+						jQuery('#saldo_pago').val(getSaldoActualDocumento());
+						jQuery('#saldo_pago').formatNumber(formato_numeros());
 					} else {
-						if (tipopago=='documento' || tipopago=='adelanto') {
+						if (tipopago == 'documento' || tipopago == 'adelanto') {
 							jQuery('#monto').val(anterior).formatNumber(formato_numeros());
 
 						} else {
@@ -619,47 +629,44 @@ $Form = new Form();
 	}
 
 	function  Actualizar_Monto_Pagos(tipo, id) {
+		// wtf?
 		return true;
 	}
 
 	function SetMontoPagos() {
 		var monto_tmp;
-		var tipopago=jQuery('#tipodocumento').val();
+		var tipopago = jQuery('#tipodocumento').val();
 
-		var anterior=0;
-		jQuery("input[id^='pago_gastos_anterior']").each(function() {
-			anterior+=Math.max(0,jQuery(this).parseNumber(formato_numeros()));
-		});
-		jQuery("input:hidden[id^='pago_honorarios_anterior']").each(function() {
-			anterior+=Math.max(0,jQuery(this).parseNumber(formato_numeros()));
-		});
+		var anterior = getPagoAnterior();
 
 		if (tipopago == 'nuevopago') {
-
 			jQuery('#monto_aux').val(jQuery('#monto').parseNumber(formato_numeros()));
 			jQuery('#monto_pagos').val(jQuery('#monto').parseNumber(formato_numeros()));
-
 		} else {
-			jQuery("#pagosanteriores").val(anterior);
-			if (1.000*(jQuery('#monto').val())==0 && (tipopago=='documento' || tipopago=='adelanto'))  {
-				jQuery('#monto').val(anterior);
 
+			jQuery("#pagosanteriores").val(anterior);
+
+			if (1.000 * (jQuery('#monto').val()) == 0) {
+				if (tipopago == 'documento') {
+					jQuery('#monto').val(anterior);
+				}
 			}
 
 			jQuery('#monto_aux').val(jQuery('#monto').parseNumber(formato_numeros()));
 			jQuery('#monto_pagos').val(jQuery('#monto').parseNumber(formato_numeros()));
 		}
 
-
 		<?php
 		if ($_GET['adelanto'] == 1 AND !$_GET['id_documento'] AND !$id_documento) {
 			echo 'return;';
 		}
 		?>
+
 		var cifras_decimales = Number(jQuery('#cifras_decimales').val());
 		if (monto_tmp==undefined) monto_tmp=0;
+
 		if (jQuery('#saldo_pago_aux').length>0) {
-			saldopagomaximo=anterior+Number(jQuery('#saldo_pago_aux').val());
+			saldopagomaximo = anterior+Number(jQuery('#saldo_pago_aux').val());
 			if (monto_tmp>saldopagomaximo) {
 				jQuery('#monto').val(saldopagomaximo);
 				Repartir();
@@ -668,6 +675,7 @@ $Form = new Form();
 
 			jQuery('#saldo_pago').val(saldopagomaximo-monto_tmp);
 		}
+
 		<?php if (!$documento->Loaded()) { ?>
 			if(jQuery('#monto_pagos').length > 0) {
 				var monto_pagos = jQuery('#monto_pagos').parseNumber(formato_numeros());
@@ -675,20 +683,10 @@ $Form = new Form();
 				jQuery('#monto_aux').val(monto_pagos).formatNumber(formato_numeros());
 			}
 		<?php } else if ($documento->fields['es_adelanto'] == '1') { ?>
-			var saldoaux=jQuery('#saldo_pago_aux').parseNumber(formato_numeros());
-			var elmonto=jQuery('#monto').parseNumber(formato_numeros());
-			try {
-				var montoadelanto=jQuery('#mondoadelanto').parseNumber(formato_numeros());
-			} catch (e) {
-			}
-
-			if(jQuery('#mondoadelanto').length>0) {
-				jQuery('#saldo_pago').val(anterior+montoadelanto-elmonto).formatNumber(formato_numeros());
-			} else {
-				jQuery('#saldo_pago').val(anterior+saldoaux-elmonto).formatNumber(formato_numeros());
-			}
+			jQuery('#saldo_pago').val(getSaldoActualDocumento()).formatNumber(formato_numeros());
 		<?php } ?>
-		if(tipopago=='editaadelanto') {
+
+		if (tipopago == 'editaadelanto') {
 			jQuery('#monto').val(jQuery('#monto_aux').parseNumber(formato_numeros())).formatNumber(formato_numeros());
 			jQuery('#saldo_pago').val(jQuery('#saldo_pago_aux').parseNumber(formato_numeros())).formatNumber(formato_numeros());
 		}
@@ -751,6 +749,7 @@ $Form = new Form();
 	}
 </script>
 <?php echo Autocompletador::CSS(); ?>
+
 <form method='post' action="#" id="form_documentos" autocomplete='off'>
 	<input type='hidden' name='opcion' value="guardar" />
 	<input type='hidden' name='id_documento' id ='id_documento' value="<?php echo $documento->fields['id_documento'] ? $documento->fields['id_documento'] : '' ?>" />
@@ -1108,41 +1107,47 @@ $Form = new Form();
 	</table>
 
 	<hr/>
+
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
 			<td align="left">
-				<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_documentos').get(0));"><?php echo __('Guardar') ?></a>
-				<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo __('Cancelar') ?></a>
+				<a class="btn botonizame" href="javascript:void(0)" icon="ui-icon-save" onclick="return Validar(jQuery('#form_documentos').get(0))"><?php echo __('Guardar') ?></a>
+				<a class="btn botonizame" href="javascript:void(0)" icon="ui-icon-exit" onclick="Cerrar()" ><?php echo __('Cancelar') ?></a>
 			</td>
 		</tr>
 	</table>
+
 	<?php if (!empty($adelanto) && empty($id_documento)) { ?>
 		<input type="hidden" id="monto_pagos" />
 	<?php } ?>
 
 	<div id = "tabla_pagos"> </div>
 	<div id = "tabla_jq"> </div>
+
 	<script type="text/javascript">
-<?php if (empty($adelanto) && $id_documento && $documento->fields['es_adelanto'] == '1') { ?>
-		$('tabla_informacion').select('input, select, textarea').each(function(elem){
-			elem.readonly = 'readonly';
-		});
-	<?php
-}
-if (empty($adelanto) || $id_documento) {
-	?>
+		<?php
+		if (empty($adelanto) && $id_documento && $documento->fields['es_adelanto'] == '1') {
+			?>
+			$('tabla_informacion').select('input, select, textarea').each(function(elem){
+				elem.readonly = 'readonly';
+			});
+			<?php
+		}
+		if (empty($adelanto) || $id_documento) {
+			?>
 			CargarTabla(1);
+			<?php
+		}
+		?>
 
-<?php } ?>
-
-	jQuery(document).ready(function() {
-		jQuery('#monto').bind('click', function() {
-			jQuery("input:text[id^='pago_honorarios_'][value!=0], input:text[id^='pago_gastos_'][value!=0]").first().focus().select();
+		jQuery(document).ready(function() {
+			jQuery('#monto').bind('click', function() {
+				jQuery("input:text[id^='pago_honorarios_'][value!=0], input:text[id^='pago_gastos_'][value!=0]").first().focus().select();
+			});
+			<?php if (Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
+				CargarTabla(1);
+			<?php } ?>
 		});
-		<?php if (Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
-			CargarTabla(1);
-		<?php } ?>
-	});
 	</script>
 
 </form>
@@ -1153,6 +1158,7 @@ if (empty($adelanto) || $id_documento) {
 		jQuery('#txt_pagina').hide();
 	}
 </script>
+
 <?php
 if ($autocompletador) {
 	echo Autocompletador::Javascript($sesion, false, 'CargarTabla(1);');
