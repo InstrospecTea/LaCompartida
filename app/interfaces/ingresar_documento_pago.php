@@ -509,7 +509,10 @@ $Form = new Form();
 
 			jQuery('#saldo_pago_aux').val(1.000*jQuery('#monto_aux').val()-1.000*anterior);
 
-			if (tipopago=='adelanto') jQuery('#overlaytipocambio').hide();
+			if (tipopago == 'adelanto') {
+				jQuery('#overlaytipocambio').hide();
+			}
+
 			if (tipopago=='editaadelanto') {
 				jQuery('#overlaytipocambio').hide();
 				monedaadelanto = jQuery('#id_moneda').val();
