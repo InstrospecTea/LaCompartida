@@ -23,4 +23,14 @@ class PrmPais extends ObjetoExt {
 		}
 	}
 
+	/**
+	 * Query de búsqueda de paises
+	 * @param  $params array
+	 * @return Query válida
+	 */
+	function SearchQuery($params = array()) {
+		$query = "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC";
+		return $query;
+	}
+
 }

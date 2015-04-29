@@ -8,13 +8,6 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		$Form = new Form();
 		$Form->defaultLabel = false;
 		echo '<tr>';
-		echo '<td align="right" colspan="1">' . __('País') . '</td>';
-		echo '<td align="left" colspan="3">';
-		echo Html::SelectQuery($Sesion, 'SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC', 'dte_id_pais', $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160);
-		echo '</td>';
-		echo '</tr>';
-
-		echo '<tr>';
 		echo '<td align="right">M&eacute;todo de Pago</td>';
 		echo '<td align="left" colspan="3">';
 		echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY glosa ASC", 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');

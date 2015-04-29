@@ -145,6 +145,15 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		switch( $tipo_dato ) {
+			case 'glosa_cliente':
+				$Cliente = new Cliente($this->sesion);
+				$Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
+				$glosa_dato = $Cliente->fields['glosa_cliente'];
+				break;
+			case 'glosa_asuntos':
+				$cobro->LoadGlosaAsuntos();
+				$glosa_dato = implode(', ', $cobro->glosa_asuntos);
+				break;
 			case 'razon_social':
 				$glosa_dato = $factura->fields['cliente'];
 				break;
@@ -201,6 +210,9 @@ class FacturaPdfDatos extends Objeto {
 				break;
 			case 'ciudad':
 				$glosa_dato = $factura->fields['ciudad_cliente'];
+				break;
+			case 'pais':
+				$glosa_dato = $factura->GetPais();
 				break;
 			case 'giro_cliente':
 				$glosa_dato = $factura->fields['giro_cliente'];
