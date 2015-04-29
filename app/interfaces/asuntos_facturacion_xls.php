@@ -113,7 +113,7 @@
 	$ws1->setColumn( $col, $col++,  15.00);
 	$ws1->setColumn( $col, $col++,  35.00);
 	$ws1->setColumn( $col, $col++,  18.00);
-	if($mostrar_encargado_secundario) {
+	if ($mostrar_encargado_secundario) {
 		$ws1->setColumn($col, $col++, 18.00);
 	} else {
 		unset($headers1[4]);
@@ -148,14 +148,19 @@
 	$info_usr = str_replace('<br>',' - ',$PdfLinea2);
 	$ws1->write(3, 0, utf8_decode($info_usr), $encabezado);
 	$ws1->mergeCells (3, 0, 3, 8);
-	$i=0;
+
+	//Se inicializa el valor de $i para la primera columna de los encabezados
+	// y $fila_inicial como la fila donde comienzan los encabezados.
+	$i = 0;
 	$fila_inicial = 6;
 
-	foreach($headers1 as $h) {
+	foreach ($headers1 as $h) {
 		$ws1->write($fila_inicial, $i, __($h), $tit1);
 		$i++;
 	}
-	foreach($headers2 as $h) {
+	// se continúa con la siguiente columna determinada por el último valor de $i
+	// completando el encabezado
+	foreach ($headers2 as $h) {
 		$ws1->write($fila_inicial,$i, __($h), $tit2);
 		$i++;
 	}
@@ -266,15 +271,14 @@
             $ws1->write($fila_inicial, $col++, $row['glosa_cliente'], $f4);
 
 
-			if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
+			if (UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 	            $ws1->write($fila_inicial, $col++, $row['username'], $f4);
 				if($mostrar_encargado_secundario) {
 					$ws1->write($fila_inicial, $col++, $row['username_secundario'], $f4);
 				}
-			}
-	        else{
+			} else {
 	          	$ws1->write($fila_inicial, $col++, $row['apellido1'].', '.$row['nombre'], $f4);
-				if($mostrar_encargado_secundario) {
+				if ($mostrar_encargado_secundario) {
 					$cell_content = empty($row['username_secundario']) ? '' : $row['apellido1_secundario'] . ', ' . $row['nombre_secundario'];
 					$ws1->write($fila_inicial, $col++, $cell_content, $f4);
 				}
