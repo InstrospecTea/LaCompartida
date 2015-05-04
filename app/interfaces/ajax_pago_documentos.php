@@ -21,15 +21,38 @@ if ($codigo_cliente_secundario != '' && $codigo_cliente == '') {
 }
 
 // Normalmente no se incluyen Documentos pagados, pero si se está editando un documento, se deben mostrar los documentos pagados que este documento pague.
+$join_neteo = '';
+$or_neteo = '';
+
+$join_documento_pago = '';
+
+$join_documento_moneda_cobro = "LEFT JOIN documento_moneda AS documento_moneda_cobro ON (
+			documento_moneda_cobro.id_documento = documento.id_documento
+			AND documento_moneda_cobro.id_moneda = documento.id_moneda
+		)";
+
+$join_documento_moneda_pago = "LEFT JOIN documento_moneda AS documento_moneda_pago ON (
+			documento_moneda_pago.id_documento = documento.id_documento
+			AND documento_moneda_pago.id_moneda = {$id_moneda})";
+
 if ($id_documento) {
 	$join_neteo .= "LEFT JOIN neteo_documento AS neteo ON (
 		neteo.id_documento_cobro = documento.id_documento
 		AND neteo.id_documento_pago = '{$id_documento}'
 	)";
+
 	$or_neteo = 'OR neteo.id_neteo_documento IS NOT NULL ';
-} else {
-	$join_neteo = '';
-	$or_neteo = '';
+
+	$join_documento_pago = "LEFT JOIN documento AS documento_pago ON documento_pago.id_documento = neteo.id_documento_pago";
+
+	$join_documento_moneda_cobro = "LEFT JOIN documento_moneda AS documento_moneda_cobro ON (
+			documento_moneda_cobro.id_documento = '{$id_documento}'
+			AND documento_moneda_cobro.id_moneda = documento_pago.id_moneda
+		)";
+
+	$join_documento_moneda_pago = "LEFT JOIN documento_moneda AS documento_moneda_pago ON (
+			documento_moneda_pago.id_documento = '{$id_documento}'
+			AND documento_moneda_pago.id_moneda = {$id_moneda})";
 }
 
 if ($id_cobro) {
@@ -45,7 +68,7 @@ if ($id_cobro) {
 }
 
 $query = "SELECT
-	SQL_CALC_FOUND_ROWS *,
+	SQL_CALC_FOUND_ROWS
 	documento.id_documento,
 	documento.id_cobro,
 	documento.honorarios,
@@ -54,8 +77,10 @@ $query = "SELECT
 	documento.saldo_gastos,
 	documento.honorarios_pagados,
 	documento.gastos_pagados,
-	IF(documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO', 0, 1) as pagado,
+	IF (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO', 0, 1) as pagado,
+
 	{$orden_docs}
+
 	cobro.fecha_ini,
 	cobro.fecha_fin,
 	documento.fecha,
@@ -73,15 +98,11 @@ $query = "SELECT
 		JOIN prm_moneda moneda_cobro ON (moneda_cobro.id_moneda = documento.id_moneda)
 		JOIN prm_moneda moneda_pago ON (moneda_pago.id_moneda = {$id_moneda})
 		LEFT JOIN cobro ON (documento.id_cobro = cobro.id_cobro)
-		LEFT JOIN documento_moneda AS documento_moneda_cobro ON (
-			documento_moneda_cobro.id_documento = documento.id_documento
-			AND documento_moneda_cobro.id_moneda = documento.id_moneda
-		)
-		LEFT JOIN documento_moneda AS documento_moneda_pago ON (
-			documento_moneda_pago.id_documento = documento.id_documento
-			AND documento_moneda_pago.id_moneda = {$id_moneda})
 
 		{$join_neteo}
+		{$join_documento_pago}
+		{$join_documento_moneda_cobro}
+		{$join_documento_moneda_pago}
 
 	WHERE 1
 		AND (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO' {$or_neteo})
@@ -359,21 +380,14 @@ function TipoCambio(&$fila) {
 	global $id_cobro;
 	global $sesion;
 
-	if ($fila->fields['t_c_documento_moneda_cobro']) {
-		$cambio_cobro = $fila->fields['t_c_documento_moneda_cobro'];
-		$cambio_pago = $fila->fields['t_c_documento_moneda_pago'];
-	} else {
-		// Si el Documento es un Cobro ingresado sólo como documento, se usa el tipo de cambio actual
-		$cambio_cobro = $fila->fields['t_c_moneda_cobro'];
-		$cambio_pago = $fila->fields['t_c_moneda_pago'];
-	}
+	$cambio = obtenerTiposCambios($fila);
 
 	$moneda_cobro = $fila->fields['glosa_moneda_cobro'];
 	$moneda_pago = $fila->fields['glosa_moneda_pago'];
 	$cambio_cobro_actual = $fila->fields['t_c_moneda_cobro'];
 	$cambio_pago_actual = $fila->fields['t_c_moneda_pago'];
 
-	$html .= '<img style="cursor:pointer" src="' . Conf::ImgDir() . '/money_16.gif" title="Tipo de cambio ' . __('Cobro') . ': ' . $cambio_cobro . '. Tipo de cambio Pago: ' . $cambio_pago . ' " onclick="$(\'calculos_' . $fila->fields['id_documento'] . '\').toggle();" />';
+	$html .= '<img style="cursor:pointer" src="' . Conf::ImgDir() . '/money_16.gif" title="Tipo de cambio ' . __('Cobro') . ': ' . $cambio['cobro'] . '. Tipo de cambio Pago: ' . $cambio['pago'] . ' " onclick="$(\'calculos_' . $fila->fields['id_documento'] . '\').toggle();" />';
 
 	$html .= "</td></tr><tr id=\"calculos_{$fila->fields['id_documento']}\" style=\"display:none;\"><td colspan=\"8\"><fieldset><legend>Tipo de Cambio</legend><table width=\"100%\" style=\"border-collapse:collapse;\" cellpadding=\"3\"><tr>";
 
