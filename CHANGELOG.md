@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 15.7.8
+Monday 2015, May 04th.
+* **Fix:** [Fix duplcated documents when a Charge is billed](https://github.com/LemontechSA/ttb/pull/941)
+
 ## Hotfix 15.7.7
-Wednesday 2015, April 29th.
+Monday 2015, May 04th.
 * **Fix:** [refactor and change way how calculate the money change](https://github.com/LemontechSA/ttb/pull/937)
 
 ## Hotfix 15.7.6
