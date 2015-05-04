@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.7.7
+Wednesday 2015, April 29th.
+* **Fix:** [refactor and change way how calculate the money change](https://github.com/LemontechSA/ttb/pull/937)
+
 ## Hotfix 15.7.6
 Monday 2015, April 27th.
 * **Fix:** [Change the way of how calculate the amount on pay](https://github.com/LemontechSA/ttb/pull/934)
