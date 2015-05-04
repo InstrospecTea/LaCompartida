@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.7.8
+Monday 2015, May 04th.
+* **Fix:** [Fix duplcated documents when a Charge is billed](https://github.com/LemontechSA/ttb/pull/941)
+
 ## Hotfix 15.7.6
 Monday 2015, April 27th.
 * **Fix:** [Change the way of how calculate the amount on pay](https://github.com/LemontechSA/ttb/pull/934)
