@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.8.1
+Tuesday 2015, May 5th.
+* **Fix:** [Change time limit and memory on excel report](https://github.com/LemontechSA/ttb/pull/945)
+
 ## [Release 15.7.0](https://github.com/LemontechSA/ttb/pull/938)
 Wednesday 2015, April 29th.
 * **Feature:** [Error en encabezado de planilla excel de asuntos](https://github.com/LemontechSA/ttb/issues/936)
