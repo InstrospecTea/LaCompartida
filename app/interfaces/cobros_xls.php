@@ -4,8 +4,9 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 
-set_time_limit(400);
-ini_set("memory_limit", "256M");
+set_time_limit(0);
+ini_set('memory_limit', '1024M');
+
 $where_cobro = ' 1 ';
 
 if ($id_cobro) {
@@ -936,7 +937,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			/*
 			 * Antes se calculaba la transformación, pero el cálculo ya se encuentra en el documento del cobro
 			 * ya que se guarda el documento en los valores de la moneda total
-			 * 
+			 *
 			$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '');
 			$tipo_cambio_moneda_cobro = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
 			$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
