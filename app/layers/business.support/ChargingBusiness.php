@@ -471,6 +471,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach ($slidingScales as $scale) {
 			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
 			$works = $result['works'];
+			$scale->set('scaleWorks', $result['scaleWorks']);
 			$scale->set('amount', $result['scaleAmount'], false);
 			$scale->set('chargeCurrency', $charge->get('id_moneda'));
 		}
@@ -484,10 +485,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
 		$scaleCurrency = $this->CoiningBusiness->getCurrency($scaleCurrency);
+		$scaleWorks = array();
 		if ($scale->get('hours') == 0) {
 			return array(
 				'works' => $works,
-				'scaleAmount' => 0
+				'scaleAmount' => 0,
+				'scaleWorks' => $scaleWorks
 			);
 		}
 		if (empty($works) && $scale->get('fixedAmount')) {
@@ -497,9 +500,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					$scale->get('fixedAmount'),
 					$scaleCurrency,
 					$chargeCurrency
-				)
+				),
+				'scaleWorks' => $scaleWorks
 			);
 		}
+
 		for ($work = array_shift($works); !empty($work); $work = array_shift($works)) {
 			//Tomo las horas del trabajo de las horas restantes, si el trabajo ya fue usado para llenar un escalón,
 			// o de las horas trabajadas, si es primera vez que se utiliza el trabajo para llenar el escalón.
@@ -516,6 +521,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$remainingWorkHours = $workedHours - $remainingScaleHours;
 			$remainingScaleHours = $remainingScaleHours - $workedHours;
 			if ($remainingWorkHours <= 0) {
+				$work->set('usedTime', $workedHours * 60);
+				$work->set('remainingHours', 0);
 				//Se acabaron las horas del trabajo al intentar llenar la bolsa de horas del escalón.
 				//Si no se ha fijado un monto para las horas del escalón...
 				if ($scale->get('fixedAmount') == 0) {
@@ -526,6 +533,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 						$userFee = $this->getDefaultUserFee($work->get('id_usuario'), $scale->get('currencyId'));
 					}
 					$amount = $workedHours * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
+					$work->set('actual_amount', $amount);
 					$scaleAmount += $amount;
 				}
 				if ($remainingScaleHours == 0) {
@@ -534,17 +542,21 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 						$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
 					}
 					if ($scale->get('scale_number') == 4) {
+						$scaleWorks[] = clone $work;
 						continue;
 					} else {
-						return array('works' => $works, 'scaleAmount' => $scaleAmount);
+						$scaleWorks[] = clone $work;
+						return array('works' => $works, 'scaleAmount' => $scaleAmount, 'scaleWorks' => $scaleWorks);
 					}
 				} else {
 					//Aun hay horas en el escalón. Hay que cambiar el trabajo.
+					$scaleWorks[] = clone $work;
 					continue;
 				}
 			} else {
 				//El trabajo aun tiene horas y la bolsa de horas del escalón ya se llenó. Hay que cambiar el escalón.
 				//Si la escala tiene un monto fijo entonces reemplazar el acumulado
+				$work->set('usedTime', ($remainingScaleHours + $workedHours) * 60);
 				if ($scale->get('fixedAmount') != 0) {
 					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
 				} else {
@@ -555,17 +567,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					}
 					//Transformar las horas en dinero
 					$amount = ($remainingScaleHours + $workedHours) * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
+					$work->set('actual_amount', $amount);
 					$scaleAmount += $amount;
 				}
 				$work->set('remainingHours', $remainingWorkHours);
+				$scaleWorks[] = clone $work;
 				array_unshift($works, $work);
 				if ($scale->get('scale_number') == 4) {
 					continue;
 				} else {
-					return array('works' => $works, 'scaleAmount' => $scaleAmount);
+					return array('works' => $works, 'scaleAmount' => $scaleAmount, 'scaleWorks' => $scaleWorks);
 				}
 			}
 		}
-		return array('works' => $works, 'scaleAmount' => $scaleAmount);
+		return array('works' => $works, 'scaleAmount' => $scaleAmount, 'scaleWorks' => $scaleWorks);
 	}
 }

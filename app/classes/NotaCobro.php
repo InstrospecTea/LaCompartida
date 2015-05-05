@@ -4136,35 +4136,28 @@ class NotaCobro extends Cobro {
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 
 					$this->CargarEscalonadas();
-
 					$html_tabla = "<br /><span class=\"titulo_seccion\">" . __('Detalle Tarifa Escalonada') . "</span> <table class=\"tabla_normal\" width=\"50%\">%filas_escalas%</table>";
 					$html_fila = "";
-
-					for ($i = 1; $i <= $this->escalonadas['num']; $i++) {
-
-						$detalle_escala = "";
-
-						$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
-
-						if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
-							$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
+					for ($i = 1; $i <= 4; $i++) {
+						if ($this->fields['esc' . $i . '_tiempo'] != 0) {
+							$detalle_escala = "";
+							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
+							$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
+							$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
+							if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
+								$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
+							}
+							if (!empty($this->fields['esc' . $i . '_monto']) && $this->fields['esc' . $i . '_monto'] != 'NULL') {
+								$query_glosa_moneda = "SELECT simbolo FROM prm_moneda WHERE id_moneda='{$this->escalonadas[$i]['id_moneda']}' LIMIT 1";
+								$resp = mysql_query($query_glosa_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__, $this->sesion->dbh);
+								list( $simbolo_moneda ) = mysql_fetch_array($resp);
+								$monto_escala = number_format($this->escalonadas[$i]['monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+								$detalle_escala .= ": $simbolo_moneda $monto_escala";
+							}
+							$html_fila .= "	<tr> <td>$detalle_escala</td> </tr>\n";
 						}
-
-						if (!empty($this->fields['esc' . $i . '_monto']) && $this->fields['esc' . $i . '_monto'] != 'NULL') {
-
-							$query_glosa_moneda = "SELECT simbolo FROM prm_moneda WHERE id_moneda='{$this->escalonadas[$i]['id_moneda']}' LIMIT 1";
-							$resp = mysql_query($query_glosa_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__, $this->sesion->dbh);
-							list( $simbolo_moneda ) = mysql_fetch_array($resp);
-							$monto_escala = number_format($this->escalonadas[$i]['monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-							$detalle_escala .= ": $simbolo_moneda $monto_escala";
-						}
-						$html_fila .= "	<tr> <td>$detalle_escala</td> </tr>\n";
 					}
-
 					$html_tabla = str_replace('%filas_escalas%', $html_fila, $html_tabla);
-
 					$html = str_replace('%TABLA_ESCALONADA%', $html_tabla, $html);
 				}
 
@@ -5038,7 +5031,6 @@ class NotaCobro extends Cobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
 						$row = $row_tmpl;
-
 						$horas = floor($duracion_cobrada / 3600);
 						$minutes = (($duracion_cobrada / 60 ) % 60);
 						$seconds = ($duracion_cobrada % 60);
@@ -5085,6 +5077,10 @@ class NotaCobro extends Cobro {
 
 					$html .= $row;
 				}
+
+				break;
+
+			case 'RESUMEN_ESCALONES':
 
 				break;
 
