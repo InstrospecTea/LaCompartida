@@ -1,5 +1,13 @@
 # Changelog
 
+## [Release 15.7.0](https://github.com/LemontechSA/ttb/pull/938)
+Wednesday 2015, April 29th.
+* **Feature:** [Error en encabezado de planilla excel de asuntos](https://github.com/LemontechSA/ttb/issues/936)
+* **Feature:** [Add the column codigo_categoria to prm_categoria_usuario and uses it on the Ledes file](https://github.com/LemontechSA/ttb/issues/930)
+* **Feature:** [Corregir boton para agregar nuevo tramite](https://github.com/LemontechSA/ttb/issues/925)
+* **Feature:** [Add group_client to library](https://github.com/LemontechSA/ttb/issues/923)
+* **Feature:** [Orden alfabético países proveedores categorías](https://github.com/LemontechSA/ttb/issues/922)
+
 ## Hotfix 15.7.7
 Wednesday 2015, April 29th.
 * **Fix:** [refactor and change way how calculate the money change](https://github.com/LemontechSA/ttb/pull/937)
