@@ -10735,10 +10735,30 @@ QUERY;
 			break;
 
 		case 8.00:
+			if (!ExisteCampo('codigo_categoria', 'prm_categoria_usuario', $dbh)) {
+				$queries[] = "ALTER TABLE `prm_categoria_usuario` ADD COLUMN `codigo_categoria` VARCHAR(50) NOT NULL DEFAULT 'OT'";
+
+				// Actualiza todas las categorias
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'PT' WHERE id_categoria_lemontech = 1";
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'AS' WHERE id_categoria_lemontech IN (2, 3)";
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'LA' WHERE id_categoria_lemontech = 4";
+				$queries[] = "UPDATE `prm_categoria_usuario` SET `codigo_categoria` = 'OT' WHERE id_categoria_lemontech NOT IN (1, 2, 3, 4)";
+			}
+
+			if (!ExisteCampo('codigo_homologacion', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente` ADD `codigo_homologacion` VARCHAR( 100 ) NULL COMMENT 'codigo que usa internamente el cliente en su propio sistema. requerido para generar archivos LEDES' ";
+
+				// Actualiza todos los clientes con el código del cliente por defecto
+				$queries[] = "UPDATE `cliente` SET `codigo_homologacion` = `codigo_cliente`";
+			}
+
+			break;
+
+		case 8.01:
 			if (!ExisteCampo('valor_estandar', 'trabajo_tarifa', $dbh)) {
 				$queries[] = "ALTER TABLE `trabajo_tarifa` ADD COLUMN `valor_estandar` DOUBLE NULL DEFAULT 0 AFTER `valor`";
 			}
-			break;			
+			break;
 	}
 
 	if (!empty($queries)) {
