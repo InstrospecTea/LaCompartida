@@ -119,6 +119,9 @@ if ($opcion == "guardar") {
 		$cliente->Edit("glosa_cliente", $glosa_cliente);
 		$cliente->Edit("codigo_cliente", $codigo_cliente);
 
+		// El código de homologación se utiliza para los clientes con LEDES, por defecto es el código del cliente
+		$cliente->Edit("codigo_homologacion", !empty($codigo_homologacion) ? $codigo_homologacion : $codigo_cliente);
+
 		if ($codigo_cliente_secundario) {
 			$cliente->Edit("codigo_cliente_secundario", strtoupper($codigo_cliente_secundario));
 		} else {
@@ -410,6 +413,16 @@ $Pagina->PrintTop();
 					</div>
 				</td>
 			</tr>
+			<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
+				<tr>
+					<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el cliente. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+						<?php echo __('Código de homologación'); ?>
+					</td>
+					<td align="left">
+						<input name="codigo_homologacion" size="45" value="<?php echo $cliente->fields['codigo_homologacion']; ?>" />
+					</td>
+				</tr>
+			<?php } ?>
 
 			<tr class="controls controls-row">
 				<td class="ar">

@@ -86,6 +86,9 @@
 	if( $link_carpeta != '' && UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) {
 		$where .= " AND carpeta.link_carpeta LIKE '%$link_carpeta%'";
 	}
+	if ( $id_grupo_cliente > 0 ) {
+		$where .= " AND cliente.id_grupo_cliente = ".$id_grupo_cliente."";
+	}
 	$query = "SELECT SQL_CALC_FOUND_ROWS *
 						FROM carpeta
 						LEFT JOIN asunto USING (codigo_asunto)
@@ -232,6 +235,21 @@
 			<?php echo __('Contenido')?>
 	<?php } ?>
 			<input name='glosa_carpeta' size='<?php echo (UtilesApp::GetConf($sesion,'CantidadCharsGlosaCarpeta') > 0 ? UtilesApp::GetConf($sesion,'CantidadCharsGlosaCarpeta') : 60 ) ?>' value="<?php echo $glosa_carpeta ?>" />
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+			<?php echo __('Grupo Cliente')?>
+		</td>
+		<td align=left >
+			<?php echo Html::SelectQuery(
+				$sesion,
+				"SELECT * FROM grupo_cliente ORDER BY glosa_grupo_cliente",
+				"id_grupo_cliente",
+				$id_grupo_cliente ? $id_grupo_cliente : $carpeta->fields['id_grupo_cliente'],
+				'',
+				'Cualquiera'
+			); ?>
 		</td>
 	</tr>
 	<tr>
