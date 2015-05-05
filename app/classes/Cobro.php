@@ -1639,6 +1639,7 @@ if (!class_exists('Cobro')) {
 
 					//Documentos
 					$documento = new Documento($this->sesion, '', '');
+					$documento->LoadByCobro($this->fields['id_cobro']);
 					$documento->Edit('id_tipo_documento', '2');
 					$documento->Edit('codigo_cliente', $this->fields['codigo_cliente']);
 					$documento->Edit('id_contrato', $this->fields['id_contrato']);
