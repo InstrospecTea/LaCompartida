@@ -90,10 +90,6 @@ if ($codigoSecundario && $codigo_cliente_secundario != '') {
 }
 
 if ($opcion == "guardar") {
-
-	$mensaje1 = 'monto usado ' . $monto_usado . ' POST: ' . addslashes(var_export($_POST, true));
-	$mensaje2 = 'GET: ' . addslashes(var_export($_GET, true));
-
 	// Construir arreglo_pagos_detalle
 	$datos_neteo = array();
 	foreach ($_POST as $key => $val) {
@@ -509,7 +505,10 @@ $Form = new Form();
 
 			jQuery('#saldo_pago_aux').val(1.000*jQuery('#monto_aux').val()-1.000*anterior);
 
-			if (tipopago=='adelanto') jQuery('#overlaytipocambio').hide();
+			if (tipopago == 'adelanto') {
+				jQuery('#overlaytipocambio').hide();
+			}
+
 			if (tipopago=='editaadelanto') {
 				jQuery('#overlaytipocambio').hide();
 				monedaadelanto = jQuery('#id_moneda').val();
