@@ -36,7 +36,16 @@ class SandboxController extends AbstractController {
 
 	public function scalesWork($chargeId) {
 		$this->loadBusiness('Charging');
+		$this->loadBusiness('Translating');
+		$this->loadBusiness('Coining');
 		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId);
+		$charge = $this->ChargingBusiness->getCharge($chargeId);
+		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
+		$language = $this->TranslatingBusiness->getLanguageByCode($charge->get('codigo_idioma'));
+		$this->set('translatingBusiness', $this->TranslatingBusiness);
+		$this->set('language', $language);
+		$this->set('currency', $currency);
+		$this->set('charge', $charge);
 		$this->set('slidingScales', $slidingScales);
 	}
 

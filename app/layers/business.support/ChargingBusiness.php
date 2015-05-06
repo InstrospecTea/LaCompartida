@@ -167,7 +167,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 	}
 
-
 	public function getSlidingScalesDetailTable(array $slidingScales, $currency, $language) {
 		$listator = new EntitiesListator();
 		$listator->loadEntities($slidingScales);
@@ -343,10 +342,10 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
 
-   		$searchCriteria = new SearchCriteria('Invoice');
-   		$searchCriteria->related_with('InvoiceCharge');
-   		$searchCriteria->filter('id_estado')->restricted_by('not_in')->compare_with(array(3, 5));
-   		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()))->for_entity('InvoiceCharge');
+		$searchCriteria = new SearchCriteria('Invoice');
+		$searchCriteria->related_with('InvoiceCharge');
+		$searchCriteria->filter('id_estado')->restricted_by('not_in')->compare_with(array(3, 5));
+		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()))->for_entity('InvoiceCharge');
 		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 
 		$ingreso = 0;
@@ -475,6 +474,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$scale->set('amount', $result['scaleAmount'], false);
 			$scale->set('chargeCurrency', $charge->get('id_moneda'));
 		}
+
 		return $slidingScales;
 	}
 
@@ -485,6 +485,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
 		$scaleCurrency = $this->CoiningBusiness->getCurrency($scaleCurrency);
+		//Ojo con esta línea. Estoy dando el tipo de cambio a la moneda que está guardado en cobro moneda
+		$scaleCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($scaleCurrency, $charge);
 		$scaleWorks = array();
 		if ($scale->get('hours') == 0) {
 			return array(

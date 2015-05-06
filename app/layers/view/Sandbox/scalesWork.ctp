@@ -34,7 +34,7 @@
     return $thead->add_child($tr);
   }
 
-  function constructTableBody($scale) {
+  function constructTableBody($scale, $language, $currency) {
     //Table body
     $tbody = new HtmlBuilder();
     $tbody->set_tag('tbody');
@@ -55,7 +55,12 @@
       $td_usedTime->set_html($work->get('usedTime'));
       $totalmins += $work->get('usedTime');
       $td_value = new HtmlBuilder('td');
-      $td_value->set_html($work->get('actual_amount'));
+      $formatted = number_format($work->get('actual_amount'),
+        $currency->get('cifras_decimales'),
+        $language->get('separador_decimales'),
+        $language->get('separador_miles')
+      );
+      $td_value->set_html($formatted);
       $tr
         ->add_child($td_date)
         ->add_child($td_user)
@@ -89,7 +94,12 @@
     $td_label->set_html('Total:');
     $td_label->add_attribute('colspan', $index - 1);
     $td_value = new HtmlBuilder('th');
-    $td_value->set_html($scale->get('amount'));
+    $formatted = number_format($scale->get('amount'),
+      $currency->get('cifras_decimales'),
+      $language->get('separador_decimales'),
+      $language->get('separador_miles')
+    );
+    $td_value->set_html($formatted);
     $td_value->add_attribute('colspan', $index);
     $tr->add_child($td_label);
     $tr->add_child($td_value);
@@ -101,7 +111,12 @@
       $td_label->set_html('Descuento ('.$scale->get('discountRate').'%):');
       $td_label->add_attribute('colspan', $index - 1);
       $td_value = new HtmlBuilder('th');
-      $td_value->set_html($scale->get('discount'));
+      $formatted = number_format($scale->get('discount'),
+        $currency->get('cifras_decimales'),
+        $language->get('separador_decimales'),
+        $language->get('separador_miles')
+      );
+      $td_value->set_html($formatted);
       $td_value->add_attribute('colspan', $index);
       $tr->add_child($td_label);
       $tr->add_child($td_value);
@@ -112,7 +127,12 @@
       $td_label->set_html('Total descontado:');
       $td_label->add_attribute('colspan', $index - 1);
       $td_value = new HtmlBuilder('th');
-      $td_value->set_html($scale->get('netAmount'));
+      $formatted = number_format($scale->get('netAmount'),
+        $currency->get('cifras_decimales'),
+        $language->get('separador_decimales'),
+        $language->get('separador_miles')
+      );
+      $td_value->set_html($formatted);
       $td_value->add_attribute('colspan', $index);
       $tr->add_child($td_label);
       $tr->add_child($td_value);
@@ -132,7 +152,7 @@
       $table = new HtmlBuilder();
       $table->set_tag('table');
       $table->add_child(constructTableHead($scale));
-      $table->add_child(constructTableBody($scale));
+      $table->add_child(constructTableBody($scale, $language, $currency));
       $container->add_child($table);
     }
   }
