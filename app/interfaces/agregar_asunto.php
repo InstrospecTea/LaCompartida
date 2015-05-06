@@ -34,9 +34,6 @@ if ($id_asunto > 0) {
 	if (!$Asunto->Load($id_asunto)) {
 		$Pagina->FatalError('Código inválido');
 	}
-	if ($Asunto->fields['id_contrato_indep'] == 0) {
-		$contrato_nuevo = true;
-	}
 
 	if ($Asunto->fields['id_contrato'] > 0) {
 		$contrato->Load($Asunto->fields['id_contrato']);
@@ -128,6 +125,7 @@ if ($opcion == 'guardar') {
 		if ($As->Loaded()) {
 			$enviar_mail = 0;
 		}
+                
 		if (!$Asunto->Loaded() || !$codigo_asunto) {
 			if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
@@ -135,18 +133,18 @@ if ($opcion == 'guardar') {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 			}
 		}
-		if (!$Cliente) {
-			$Cliente = new Cliente($Sesion);
-		}
+                
 		if (!$codigo_cliente_secundario) {
 			$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
 		}
+
 		$Asunto->NoEditar("opcion");
 		$Asunto->NoEditar("popup");
 		$Asunto->NoEditar("motivo");
 		$Asunto->NoEditar("id_usuario_tarifa");
 		$Asunto->NoEditar("id_moneda_tarifa");
 		$Asunto->NoEditar("tarifa_especial");
+
 		$Asunto->Edit("id_usuario", $Sesion->usuario->fields['id_usuario']);
 		$Asunto->Edit("codigo_asunto", $codigo_asunto, true);
 
@@ -158,18 +156,7 @@ if ($opcion == 'guardar') {
 			} else {
 				$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
 			}
-		}
-                
-                $existeCodigoAsuntoSecundario = false;
-                if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
-                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
-                } else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
-                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
-                }
-                
-                if ($existeCodigoAsuntoSecundario) {
-                    $Pagina->AddError(sprintf(__('El código de %s secundario ya es utilizado.'), __('asunto')));
-                }                                    
+		}                                  
                 
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			$glosa_asunto = strtoupper($glosa_asunto);
@@ -197,6 +184,7 @@ if ($opcion == 'guardar') {
 		if (!is_null($giro)) {
 			$Asunto->Edit("giro", $giro);
 		}
+
 		$Asunto->Edit("id_idioma", $id_idioma);
 		$Asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$Asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
@@ -281,29 +269,20 @@ if ($opcion == 'guardar') {
 				}
 
 				foreach (array_keys($hito_fecha) as $i) {
-					if (empty($hito_monto_estimado[$i])) {
-						continue;
-					}
-					$CobroPendiente = new CobroPendiente($Sesion);
-					$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					$CobroPendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-					$CobroPendiente->Edit("descripcion", $hito_descripcion[$i]);
-					$CobroPendiente->Edit("observaciones", $hito_observaciones[$i]);
-					$CobroPendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-					$CobroPendiente->Edit("hito", '1');
-					$CobroPendiente->Write();
+					if (!empty($hito_monto_estimado[$i])) {
+                                            $CobroPendiente = new CobroPendiente($Sesion);
+                                            $CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+                                            $CobroPendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
+                                            $CobroPendiente->Edit("descripcion", $hito_descripcion[$i]);
+                                            $CobroPendiente->Edit("observaciones", $hito_observaciones[$i]);
+                                            $CobroPendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
+                                            $CobroPendiente->Edit("hito", '1');
+                                            $CobroPendiente->Write();                                            
+                                        }
 				}
 
 				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
-				if ($Asunto->Write()) {
-					$Asunto->writeAreaDetails($id_desglose_area);
-					$Asunto->writeEconomicActivities($id_asunto_giro);
-					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
-				} else {
-
-					$Pagina->AddError($Asunto->error);
-				}
 
 				ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				if (is_array($docs_legales)) {
@@ -311,18 +290,23 @@ if ($opcion == 'guardar') {
 						if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
 							continue;
 						}
+                                                
 						$ContratoDocumentoLegal = new ContratoDocumentoLegal($Sesion);
 						$ContratoDocumentoLegal->Edit('id_contrato', $contrato->fields['id_contrato']);
 						$ContratoDocumentoLegal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+                                                
 						if (!empty($doc_legal['honorario'])) {
 							$ContratoDocumentoLegal->Edit('honorarios', 1);
 						}
+                                                
 						if (!empty($doc_legal['gastos_con_iva'])) {
 							$ContratoDocumentoLegal->Edit('gastos_con_impuestos', 1);
 						}
+                                                
 						if (!empty($doc_legal['gastos_sin_iva'])) {
 							$ContratoDocumentoLegal->Edit('gastos_sin_impuestos', 1);
 						}
+                                                
 						$ContratoDocumentoLegal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
 						$ContratoDocumentoLegal->Write();
 					}
@@ -331,21 +315,36 @@ if ($opcion == 'guardar') {
 				$Pagina->AddError($contrato->error);
 			}
 		} else {
+			$Contrato_indep = $Asunto->fields['id_contrato_indep'];                        
 			$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
-
-			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 			$Asunto->Edit("id_contrato_indep", null);
-			if ($Asunto->Write()) {
-				$Asunto->writeAreaDetails($id_desglose_area);
-				$Asunto->writeEconomicActivities($id_asunto_giro);
-				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito'));
+		}                
+                
+                $existeCodigoAsuntoSecundario = false;
+                if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
+                } else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
+                }
+                
+                if ($existeCodigoAsuntoSecundario) {
+                    $Pagina->AddError(sprintf(__('El código de %s secundario ya es utilizado.'), __('asunto')));
+                } else {
+                    if ($Asunto->Write()) {
+                            $Asunto->writeAreaDetails($id_desglose_area);
+                            $Asunto->writeEconomicActivities($id_asunto_giro);
+                            $Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+                            
+                            if ($Asunto->fields['id_contrato_indep'] === null && isset($Contrato_indep)) {
 				$ContratoObj = new Contrato($Sesion);
 				$ContratoObj->Load($Contrato_indep);
-				$ContratoObj->Eliminar();
-			} else {
-				$Pagina->AddError($Asunto->error);
-			}
-		}
+				$ContratoObj->Eliminar();                                
+                            }
+                    } else {
+                            $Pagina->AddError($Asunto->error);
+                    }                        
+                }     
+
 		$MailAsuntoNuevo = Conf::GetConf($Sesion, 'MailAsuntoNuevo');
 
 		if ($enviar_mail && $MailAsuntoNuevo) {
@@ -898,10 +897,13 @@ function MuestraPorValidacion(divID) {
 
 				<br/>
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-					<?php if (!$Sesion->usuario->Es('SASU')) {
+					<?php 
+                                            if (!$Sesion->usuario->Es('SASU')) {
+                                                $contrato_nuevo = (boolean)$Asunto->fields['id_contrato_indep'] && ($id_asunto > 0);
 						$cliente = &$Cliente;
 						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
-					} ?>
+                                            } 
+                                        ?>
 				</div>
 
 				<br/>
