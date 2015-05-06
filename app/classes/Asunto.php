@@ -355,7 +355,7 @@ class Asunto extends Objeto {
 		)
 	);
 
-	function Asunto($sesion, $fields = "", $params = "") {
+	public function Asunto($sesion, $fields = "", $params = "") {
 		$this->tabla = "asunto";
 		$this->campo_id = "id_asunto";
 		$this->sesion = $sesion;
@@ -364,50 +364,50 @@ class Asunto extends Objeto {
 
 	}
 
-	function LoadByCodigo($codigo_asunto) {
+	public function LoadByCodigo($codigo_asunto) {
 		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto='$codigo_asunto'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
 
-	function LoadByCodigoSecundario($codigo_asunto_secundario) {
+	public function LoadByCodigoSecundario($codigo_asunto_secundario) {
 		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto_secundario='$codigo_asunto_secundario'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
 
-	function LoadByContrato($id_contrato) {
+	public function LoadByContrato($id_contrato) {
 		$query = "SELECT id_asunto FROM asunto WHERE id_contrato = '$id_contrato' LIMIT 1";
 		$resp = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
 		return $this->Load($resp['id_asunto']);
 	}
 
-	function CodigoACodigoSecundario($codigo_asunto) {
+	public function CodigoACodigoSecundario($codigo_asunto) {
 		if ($codigo_asunto != '') {
 			$query = "SELECT codigo_asunto_secundario FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($codigo_asunto_secundario) = mysql_fetch_array($resp);
 			return $codigo_asunto_secundario;
-		}
-		else
+		} else {
 			return false;
+                }
 	}
 
-	function CodigoSecundarioACodigo($codigo_asunto_secundario) {
+	public function CodigoSecundarioACodigo($codigo_asunto_secundario) {
 		if ($codigo_asunto_secundario != '') {
 			$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($codigo_asunto) = mysql_fetch_array($resp);
 			return $codigo_asunto;
-		}
-		else
+		} else {
 			return false;
+                }
 	}
 
 	//función que asigna los códigos nuevos
-	function AsignarCodigoAsunto($codigo_cliente, $glosa_asunto = "", $secundario = false) {
+	public function AsignarCodigoAsunto($codigo_cliente, $glosa_asunto = "", $secundario = false) {
 		$campo = 'codigo_asunto' . ($secundario ? '_secundario' : '');
 		$tipo = UtilesApp::GetConf($this->sesion,'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
 		$largo = $tipo == 2 ? 3 : 4;
@@ -429,19 +429,19 @@ class Asunto extends Objeto {
 		$query = "SELECT CONVERT(TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)), UNSIGNED INTEGER) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
-		if(empty($codigo)){
+		if (empty($codigo)){
 			$codigo = $tipo ? 0 : $yy * 100;
 		}
 
 		return sprintf("%s-%0{$largo}d", $codigo_cliente, $codigo + 1);
 	}
 
-	function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario, $glosa_asunto = "") {
+	public function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario, $glosa_asunto = "") {
 		return $this->AsignarCodigoAsunto($codigo_cliente_secundario, $glosa_asunto, true);
 	}
 
 	//funcion que cambia todos los asuntos de un cliente
-	function InsertarCodigoAsuntosPorCliente($codigo_cliente) {
+	public function InsertarCodigoAsuntosPorCliente($codigo_cliente) {
 		$query = "SELECT id_asunto FROM asunto WHERE codigo_cliente='$codigo_cliente'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		for ($i = 1; list($id) = mysql_fetch_array($resp); $i++) {
@@ -454,7 +454,7 @@ class Asunto extends Objeto {
 	}
 
 	//funcion que actualiza todos los codigos de los clientes existentes (usar una vez para actualizar el registro)
-	function ActualizacionCodigosAsuntos() {
+	public function ActualizacionCodigosAsuntos() {
 		$query = "SELECT codigo_cliente FROM cliente";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		for ($i = 1; list($id) = mysql_fetch_array($resp); $i++) {
@@ -464,10 +464,11 @@ class Asunto extends Objeto {
 		return true;
 	}
 
-	function TotalHoras($emitido = true) {
+	public function TotalHoras($emitido = true) {
 		$where = '';
-		if (!$emitido)
+		if (!$emitido) {
 			$where = "AND (t2.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado='EN REVISION')";
+                }
 
 		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 as hrs_no_cobradas
 							FROM trabajo AS t2
@@ -480,10 +481,11 @@ class Asunto extends Objeto {
 		return $total_horas_no_cobradas;
 	}
 
-	function TotalMonto($emitido = true) {
+	public function TotalMonto($emitido = true) {
 		$where = '';
-		if (!$emitido)
+		if (!$emitido) {
 			$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
+                }
 
 		$query = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa), prm_moneda.simbolo
 							FROM trabajo
@@ -501,7 +503,7 @@ class Asunto extends Objeto {
 		return array($total_monto_trabajado, $moneda);
 	}
 
-	function AlertaAdministrador($mensaje, $sesion) {
+	public function AlertaAdministrador($mensaje, $sesion) {
 		$query = "SELECT CONCAT_WS(' ',nombre, apellido1, apellido2) as nombre, email
 								FROM usuario
 							 WHERE activo=1 AND id_usuario = '" . $this->fields['id_encargado'] . "'";
@@ -1146,9 +1148,9 @@ class Asunto extends Objeto {
 		return $details;
 	}
 
-		/**
-		 * Método que obtiene los giros del asunto
-		 */
+        /**
+         * Método que obtiene los giros del asunto
+         */
 	public function getEconomicActivities() {
 		$sql = "SELECT id_giro
 			FROM asunto_giro
@@ -1159,12 +1161,66 @@ class Asunto extends Objeto {
 		$details = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
 		return $details;
 	}
-
+        
+        /**
+         * Retorna true si es que el codigo de asunto secundario es encontrado
+         * y false si es que no fue encontrado.
+         * 
+         * @param mixed $codigo_asunto_secundario
+         * @return boolean
+         */
+        public function existeCodigoAsuntoSecundario($codigo_asunto_secundario) {
+            $sql = 'SELECT COUNT(*)
+                        FROM ' . $this->tabla .
+                    ' WHERE codigo_asunto_secundario = :codigo_asunto_secundario';
+            
+            $Statement = $this->sesion->pdodbh->prepare($sql);
+            $Statement->bindParam('codigo_asunto_secundario', $codigo_asunto_secundario);
+            $Statement->execute();
+            
+            $resp = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+            
+            if (is_array($resp)) {
+                return (boolean)$resp[0];
+            }
+            
+            return false;
+        }
+        
+        /**
+         * Busca un codigo de asunto secundario para un asunto con id_asunto 
+         * distinto del entregado.
+         * 
+         * @param mixed $codigo_asunto_secundario
+         * @param int $id_asunto
+         * @return boolean
+         */
+        public function existeCodigoAsuntoSecundarioParaOtroIdAsunto($codigo_asunto_secundario, $id_asunto)
+        {
+            $sql = 'SELECT COUNT(*)
+                        FROM ' . $this->tabla .
+                    ' WHERE 
+                        codigo_asunto_secundario = :codigo_asunto_secundario
+                        AND id_asunto <> :id_asunto';
+            
+            $Statement = $this->sesion->pdodbh->prepare($sql);
+            $Statement->bindParam('codigo_asunto_secundario', $codigo_asunto_secundario);
+            $Statement->bindParam('id_asunto', $id_asunto);
+            $Statement->execute();
+            
+            $resp = $Statement->fetchAll(PDO::FETCH_COLUMN, 0);
+            
+            if (is_array($resp)) {
+                return (boolean)$resp[0];
+            }
+            
+            return false;            
+        }
 }
 
 class ListaAsuntos extends Lista {
 
-	function ListaAsuntos($sesion, $params, $query) {
+	public function ListaAsuntos($sesion, $params, $query) {
 		$this->Lista($sesion, 'Asunto', $params, $query);
 	}
 

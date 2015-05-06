@@ -12,12 +12,6 @@ $Form = new Form;
 $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
 
-if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
-	$codigo_obligatorio = true;
-} else {
-	$codigo_obligatorio = false;
-}
-
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente') && $cobro_independiente;
 $validacionesClienteJS = Conf::GetConf($Sesion, 'ValidacionesCliente') ? "(document.getElementById('cobro_independiente').checked)" : 'false';
 
@@ -34,17 +28,6 @@ $Asunto = new Asunto($Sesion);
 if ($codigo_cliente_secundario != '') {
 	$Cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
 	$codigo_cliente = $Cliente->fields['codigo_cliente'];
-	$query_codigos = "SELECT id_asunto, codigo_asunto_secundario FROM asunto WHERE codigo_cliente='$codigo_cliente'";
-	$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
-
-	while (list($id_asunto_temp, $codigo_asunto_secundario_temp) = mysql_fetch_array($resp_codigos)) {
-		$caracteres = strlen($codigo_asunto_secundario);
-		if ($codigo_asunto_secundario == substr($codigo_asunto_secundario_temp, $caracteres)) {
-			if (empty($id_asunto) || $id_asunto != $id_asunto_temp) {
-				$Pagina->FatalError('El código ingresado ya existe');
-			}
-		}
-	}
 }
 
 if ($id_asunto > 0) {
@@ -167,10 +150,8 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("id_usuario", $Sesion->usuario->fields['id_usuario']);
 		$Asunto->Edit("codigo_asunto", $codigo_asunto, true);
 
-		$caracteres = strlen($codigo_asunto_secundario);
-
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -$caracteres));
+			$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
 		} else {
 			if ($codigo_asunto_secundario) {
 				$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
@@ -178,15 +159,31 @@ if ($opcion == 'guardar') {
 				$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
 			}
 		}
+                
+                $existeCodigoAsuntoSecundario = false;
+                if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
+                } else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
+                }
+                
+                if ($existeCodigoAsuntoSecundario) {
+                    $Pagina->AddError(sprintf(__('El código de %s secundario ya es utilizado.'), __('asunto')));
+                }                                    
+                
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			$glosa_asunto = strtoupper($glosa_asunto);
 		}
+                
 		$Asunto->Edit("glosa_asunto", $glosa_asunto);
 		$Asunto->Edit("codigo_cliente", $codigo_cliente, true);
+                
 		if (Conf::GetConf($Sesion, 'ExportacionLedes')) {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		}
+                
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
+                
 		if (!empty($id_area_proyecto)) {
 			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
 		} else {
@@ -196,6 +193,7 @@ if ($opcion == 'guardar') {
 		if (!is_null($desglose_area)) {
 			$Asunto->Edit("desglose_area", $desglose_area);
 		}
+                
 		if (!is_null($giro)) {
 			$Asunto->Edit("giro", $giro);
 		}
@@ -210,12 +208,14 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("email_contacto", $email_contacto);
 		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
 		$Asunto->Edit("activo", intval($activo), true);
+
 		if (!$activo) {
 			$fecha_inactivo = date('Y-m-d H:i:s');
 			$Asunto->Edit("fecha_inactivo", $fecha_inactivo, true);
 		} else {
 			$Asunto->Edit("fecha_inactivo", '', true);
 		}
+                
 		$Asunto->Edit("cobrable", intval($cobrable), true);
 		$Asunto->Edit("mensual", $mensual ? "SI" : "NO");
 		$Asunto->Edit("alerta_hh", $asunto_alerta_hh);
@@ -223,8 +223,6 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("limite_hh", $asunto_limite_hh);
 		$Asunto->Edit("limite_monto", $asunto_limite_monto);
 
-		//if($Asunto->Write())
-		//{
 		if ($cobro_independiente) {
 			#CONTRATO
 			if ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) {
@@ -332,8 +330,7 @@ if ($opcion == 'guardar') {
 			} else {
 				$Pagina->AddError($contrato->error);
 			}
-		} #fin if independiente
-		else {
+		} else {
 			$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
 
 			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
@@ -345,8 +342,7 @@ if ($opcion == 'guardar') {
 				$ContratoObj = new Contrato($Sesion);
 				$ContratoObj->Load($Contrato_indep);
 				$ContratoObj->Eliminar();
-			}
-			else {
+			} else {
 				$Pagina->AddError($Asunto->error);
 			}
 		}
@@ -609,7 +605,7 @@ function MuestraPorValidacion(divID) {
 								<?php echo __('Código') ?>
 							</td>
 							<td align="left">
-								<input id="codigo_asunto" name="codigo_asunto" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase();<?php if (!$Asunto->Loaded())
+								<input id="codigo_asunto" name="codigo_asunto" <?php echo Conf::GetConf($Sesion, 'CodigoObligatorio') ? 'readonly="readonly"' : '' ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase();<?php if (!$Asunto->Loaded())
 									echo "CheckCodigo();";
 								?>"/>
 								&nbsp;&nbsp;&nbsp;
@@ -957,7 +953,7 @@ function MuestraPorValidacion(divID) {
 								} else {
 									$funcion_validar = "return Validar(jQuery('#formulario')[0]);";
 								}
-								$Form = new Form;
+
 								echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
 								echo $Form->script();
 								?>
