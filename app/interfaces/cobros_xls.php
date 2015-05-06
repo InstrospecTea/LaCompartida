@@ -4,12 +4,13 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 
-set_time_limit(400);
-ini_set("memory_limit", "256M");
+set_time_limit(0);
+ini_set('memory_limit', '1024M');
+
 $where_cobro = ' 1 ';
 
 if ($id_cobro) {
-	$where_cobro .= " AND cobro.id_cobro='{$id_cobro}' ";
+	$where_cobro .= " AND cobro.id_cobro=$id_cobro ";
 }
 
 if (!isset($forzar_username)) {
@@ -933,19 +934,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 		if ($cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total']) {
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			/*
-			 * Antes se calculaba la transformación, pero el cálculo ya se encuentra en el documento del cobro
-			 * ya que se guarda el documento en los valores de la moneda total
-			 * 
 			$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '');
-			$tipo_cambio_moneda_cobro = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
-			$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
-			$monto_equivalente_a = $monto_subtotal * $tipo_cambio_moneda_cobro / $tipo_cambio_moneda_total;
-			/* */
-			$DocumentoCobro = new Documento($sesion);
-			$DocumentoCobro->LoadByCobro($cobro->fields['id_cobro']);
-			// $Cobro->fields['monto_subtotal'] equivale a $DocumentoCobro->fields['subtotal_honorarios']
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $DocumentoCobro->fields['subtotal_honorarios'], $formato_moneda_resumen);
+			$id_moneda = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
+			$opc_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
+			$monto_equivalente_a = $monto_subtotal * $id_moneda / $opc_moneda_total;
+			$ws->writeNumber($filas2++, $col_valor_trabajo, round($monto_equivalente_a), $formato_moneda_resumen);
 		}
 
 		if ($cobro->fields['descuento'] > 0 && $opc_ver_descuento) {
