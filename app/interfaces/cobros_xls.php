@@ -7,10 +7,19 @@ $sesion = new Sesion(array('ADM', 'COB'));
 set_time_limit(0);
 ini_set('memory_limit', '1024M');
 
-$where_cobro = ' 1 ';
+$searchCriteria = new SearchCriteria('Charge');
+$searchCriteria->related_with('Contract')->on_property('id_contrato')->with_direction('INNER');
+$searchCriteria->related_with('Matter')->joined_with('Contract')->on_property('id_contrato');
+$searchCriteria->related_with('Client')->joined_with('Matter')->on_property('codigo_cliente');
+
+///$searchCriteria->related_with('Document')->on_property('id_cobro');
+//$searchCriteria->filter('tipo_doc')->restricted_by('equals')->compare_with("'N'")->for_entity('Document');
+
+$searchCriteria->add_scope('orderbyClientGlossAndClientCode');
+$searchCriteria->add_scope('withDocument');
 
 if ($id_cobro) {
-	$where_cobro .= " AND cobro.id_cobro=$id_cobro ";
+	$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($id_cobro);
 }
 
 if (!isset($forzar_username)) {
@@ -57,33 +66,35 @@ if ($codigo_cliente) {
 	$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 }
 if ($activo) {
-	$where_cobro .= " AND contrato.activo = 'SI' ";
+	$searchCriteria->filter('activo')->restricted_by('equals')->compare_with("'SI'")->for_entity('Contract');
 } else if ($no_activo) {
-	$where_cobro .= " AND contrato.activo = 'NO' ";
+	$searchCriteria->filter('activo')->restricted_by('equals')->compare_with("'NO'")->for_entity('Contract');
 }
 if ($forma_cobro) {
-	$where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
+	$searchCriteria->filter('forma_cobro')->restricted_by('equals')->compare_with("'$forma_cobro'")->for_entity('Contract');
 }
 if ($id_usuario) {
-	$where_cobro .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
+	$searchCriteria->filter('id_usuario_responsable')->restricted_by('equals')->compare_with("'$id_usuario'")->for_entity('Contract');
 }
 if ($codigo_cliente) {
-	$where_cobro .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
+	$searchCriteria->filter('codigo_cliente')->restricted_by('equals')->compare_with("'$codigo_cliente'")->for_entity('Client');
 }
 if ($id_grupo_cliente) {
-	$where_cobro .= " AND cliente.id_grupo_cliente = '$id_grupo_cliente' ";
+	$searchCriteria->filter('id_grupo_cliente')->restricted_by('equals')->compare_with("'id_grupo_cliente'")->for_entity('Client');
 }
 
 if ($forma_cobro) {
-	$where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
+	$searchCriteria->filter('forma_cobro')->restricted_by('equals')->compare_with("'forma_cobro'")->for_entity('Contract');
 }
+
 if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_honorarios = $tipo_liquidacion & 1 ? true : false;
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
-	$where_cobro .= " AND cobro.incluye_gastos = '$incluye_gastos' AND cobro.incluye_honorarios = '$incluye_honorarios' ";
+	$searchCriteria->filter('incluye_gastos')->restricted_by('equals')->compare_with("'incluye_gastos'");
+	$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with("'incluye_honorarios'");
 }
 if ($codigo_asunto) {
-	$where_cobro .= " AND asunto.codigo_asunto = '$codigo_asunto' ";
+	$searchCriteria->filter('codigo_asunto')->restricted_by('equals')->compare_with("'$codigo_asunto'")->for_entity('Matter');
 }
 
 if (!$id_cobro) {
@@ -472,10 +483,27 @@ $query = "SELECT DISTINCT
 		JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 		LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
 		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-		WHERE $where_cobro AND cobro.estado " . ($borradores ? ' IN (\'CREADO\',\'EN REVISION\')' : '=\'' . $cobro->fields['estado'] . '\'') . "
+		WHERE $where_cobro 
+
+		AND cobro.estado " . ($borradores ? ' IN (\'CREADO\',\'EN REVISION\')' : '=\'' . $cobro->fields['estado'] . '\'') . "
 		ORDER BY cliente.glosa_cliente,cobro.codigo_cliente";
 
+if ($borradores) {
+	$searchCriteria->filter('estado')->restricted_by('in')->compare_with(array("CREADO", "EN REVISION"));
+} else {
+	$estado_cobro = $cobro->fields['estado'];
+	$searchCriteria->filter('estado')->restricted_by('equals')->compare_with("'$estado_cobro'");
+}
+
+
+$SearchingBusiness = new SearchingBusiness($sesion);
+$results = $SearchingBusiness->searchByGenericCriteria($searchCriteria, array('DISTINCT(Charge.id_cobro)'));
+pr($results);
+
+//pr($results);
+exit;
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
 
 while (list($id_cobro) = mysql_fetch_array($resp)) {
 
@@ -934,10 +962,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 		if ($cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total']) {
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			
 			$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '');
 			$id_moneda = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
 			$opc_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 			$monto_equivalente_a = $monto_subtotal * $id_moneda / $opc_moneda_total;
+			
 			$ws->writeNumber($filas2++, $col_valor_trabajo, round($monto_equivalente_a), $formato_moneda_resumen);
 		}
 

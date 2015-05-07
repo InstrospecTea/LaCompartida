@@ -32,6 +32,7 @@ class ChargeScope implements IChargeScope{
 		return $criteria;
 	}
 
+
 	/**
 	 * Añade un filtro que considera a aquellos cobros que tienen gastos.
 	 * @param Criteria $criteria
@@ -92,4 +93,28 @@ class ChargeScope implements IChargeScope{
 		return $criteria;
 	}
 
+  /**
+   * Trae solo los id cobro distintos
+   * @param Criteria $criteria
+   * @return mixed
+   */
+  function orderbyClientGlossAndClientCode(Criteria $criteria) {
+		$criteria->add_ordering('Client.glosa_cliente', 'ASC');
+		$criteria->add_ordering('Charge.codigo_cliente', 'ASC');
+  	return $criteria;
+  }
+
+   /**
+   * Custom left join with document 
+   * @param Criteria $criteria
+   */
+  function withDocument(Criteria $criteria) {
+    $criteria->add_custom_join_with('documento', 
+        CriteriaRestriction::and_clause(
+          CriteriaRestriction::equals('Charge.id_cobro', 'documento.id_cobro'),
+          CriteriaRestriction::equals('documento.tipo_doc',"'N'")
+        )
+    );
+    return $criteria;
+  }
 } 
