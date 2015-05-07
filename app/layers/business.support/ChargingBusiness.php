@@ -677,7 +677,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			);
 		}
 
-		for ($work = array_shift($works); !empty($work); $work = array_shift($works)) {
+		while($work = array_shift($works)) {
 			//Tomo las horas del trabajo de las horas restantes, si el trabajo ya fue usado para llenar un escalón,
 			// o de las horas trabajadas, si es primera vez que se utiliza el trabajo para llenar el escalón.
 			if ($work->get('remainingHours')) {
