@@ -312,7 +312,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$col1 = __('FECHA');
 		$col2 = __('ABOGADO');
 		$col3 = __('TIEMPO EN MINUTOS');
-		$col4 = __('VALOR FACTURADO');
+		$col4 = __('VALOR FACTURABLE ESTANDAR');
 		$since = $until = '';
 		if (!empty($this->parameters['since'])) {
 			$since = $this->formatDate($this->parameters['since']);
