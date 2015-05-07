@@ -328,7 +328,7 @@ if ($opcion == 'guardar') {
                 }
                 
                 if ($existeCodigoAsuntoSecundario) {
-                    $Pagina->AddError(sprintf(__('El código de %s secundario ya es utilizado.'), __('asunto')));
+                    $Pagina->AddError(sprintf(__("El código de %s secundario ingresado ya está siendo utilizado por otro %s"), __('asunto'), __('asunto')));
                 } else {
                     if ($Asunto->Write()) {
                             $Asunto->writeAreaDetails($id_desglose_area);
