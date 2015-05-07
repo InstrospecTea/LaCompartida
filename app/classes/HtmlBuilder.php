@@ -14,16 +14,12 @@ class HtmlBuilder
 	private $value;
 
 
-	function __construct($tag = null){
+	function __construct($tag = 'div'){
 		$this->childs = array();
 		$this->attributes = array();
 		$this->plain_attributes = array();
 		$this->closure = true;
-		if (!is_null($tag)) {
-			$this->tag = $tag;
-		} else {
-			$this->tag = 'div';
-		}
+		$this->tag = $tag;
 		$this->value = null;
 	}
 

@@ -128,8 +128,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Charging');
 		$this->loadBusiness('Translating');
 		$this->loadBusiness('Coining');
-		$slidingScales = $this->ChargingBusiness->getSlidingScales($chargeId);
-		$charge = $this->ChargingBusiness->getCharge($chargeId);
+		$slidingScales = $this->ChargingBusiness->getSlidingScales($charge->get('id_cobro'));
 		$currency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
 		$language = $this->TranslatingBusiness->getLanguageByCode($charge->get('codigo_idioma'));
 
@@ -142,10 +141,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				//Construct table
 				$table = new HtmlBuilder('table');
 				$table->add_child($this->constructTableHead($scale));
-				$table->add_child($this->constructTableBody($scale, $language, $currency));
+				$table->add_child($this->constructTableBody($scale, $language, $currency, $charge));
 				$container->add_child($table);
 			}
 		}
+		return $container->render();
 	}
 
 	private function constructTableHead($scale) {
@@ -180,43 +180,47 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $thead->add_child($tr);
 	}
 
-	private function constructTableBody($scale, $language, $currency) {
+	private function constructTableBody($scale, $language, $currency, $charge) {
 		//Table body
 		$tbody = new HtmlBuilder();
 		$tbody->set_tag('tbody');
 		$totalmins = 0;
 		foreach($scale->get('scaleWorks') as $work) {
-		//One table body row for every work
-		$tr = new HtmlBuilder();
-		$tr->set_tag('tr');
-		$td_date = new HtmlBuilder('td');
-		$td_date->set_html($work->get('fecha'));
-		$td_user = new HtmlBuilder('td');
-		$td_user->set_html($work->get('apellido1'));
-		$td_description = new HtmlBuilder('td');
-		$td_description->set_html($work->get('descripcion'));
-		$td_workedTime = new HtmlBuilder('td');
-		$td_workedTime->set_html($work->get('duracion_cobrada'));
-		$td_usedTime = new HtmlBuilder('td');
-		$td_usedTime->set_html($work->get('usedTime'));
-		$totalmins += $work->get('usedTime');
-		$td_value = new HtmlBuilder('td');
-		$formatted = number_format($work->get('actual_amount'),
-			$currency->get('cifras_decimales'),
-			$language->get('separador_decimales'),
-			$language->get('separador_miles')
-		);
-		$td_value->set_html($formatted);
-		$tr
-			->add_child($td_date)
-			->add_child($td_user)
-			->add_child($td_description)
-			->add_child($td_workedTime)
-			->add_child($td_usedTime);
-		if ($scale->get('fixedAmount') == 0) {
-			$tr->add_child($td_value);
-		}
-		$tbody->add_child($tr);
+			//One table body row for every work
+			$tr = new HtmlBuilder();
+			$tr->set_tag('tr');
+			$td_date = new HtmlBuilder('td');
+			$td_date->set_html($work->get('fecha'));
+			$td_user = new HtmlBuilder('td');
+			if($charge->get('opc_ver_detalles_por_hora_iniciales')) {
+				$td_user->set_html($work->get('username'));
+			} else {
+				$td_user->set_html($work->get('nombre').' '.$work->get('apellido1'));
+			}
+			$td_description = new HtmlBuilder('td');
+			$td_description->set_html($work->get('descripcion'));
+			$td_workedTime = new HtmlBuilder('td');
+			$td_workedTime->set_html($work->get('duracion_cobrada'));
+			$td_usedTime = new HtmlBuilder('td');
+			$td_usedTime->set_html($work->get('usedTime'));
+			$totalmins += $work->get('usedTime');
+			$td_value = new HtmlBuilder('td');
+			$formatted = number_format($work->get('actual_amount'),
+				$currency->get('cifras_decimales'),
+				$language->get('separador_decimales'),
+				$language->get('separador_miles')
+			);
+			$td_value->set_html($formatted);
+			$tr
+				->add_child($td_date)
+				->add_child($td_user)
+				->add_child($td_description)
+				->add_child($td_workedTime)
+				->add_child($td_usedTime);
+			if ($scale->get('fixedAmount') == 0) {
+				$tr->add_child($td_value);
+			}
+			$tbody->add_child($tr);
 		}
 		//Final row
 		if ($scale->get('fixedAmount') == 0) {
@@ -238,6 +242,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$tr = new HtmlBuilder('tr');
 		$td_label = new HtmlBuilder('th');
 		$td_label->set_html('Total:');
+		if ($scale->get('discountRate') != 0) {
+			$td_label->set_html('Subtotal:');
+		}
 		$td_label->add_attribute('colspan', $index - 1);
 		$td_value = new HtmlBuilder('th');
 		$formatted = number_format($scale->get('amount'),
@@ -252,37 +259,37 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$tbody->add_child($tr);
 
 		if ($scale->get('discountRate') != 0) {
-		$tr = new HtmlBuilder('tr');
-		$td_label = new HtmlBuilder('th');
-		$td_label->set_html('Descuento ('.$scale->get('discountRate').'%):');
-		$td_label->add_attribute('colspan', $index - 1);
-		$td_value = new HtmlBuilder('th');
-		$formatted = number_format($scale->get('discount'),
-			$currency->get('cifras_decimales'),
-			$language->get('separador_decimales'),
-			$language->get('separador_miles')
-		);
-		$td_value->set_html($formatted);
-		$td_value->add_attribute('colspan', $index);
-		$tr->add_child($td_label);
-		$tr->add_child($td_value);
-		$tbody->add_child($tr);
+			$tr = new HtmlBuilder('tr');
+			$td_label = new HtmlBuilder('th');
+			$td_label->set_html('Descuento ('.$scale->get('discountRate').'%):');
+			$td_label->add_attribute('colspan', $index - 1);
+			$td_value = new HtmlBuilder('th');
+			$formatted = number_format($scale->get('discount'),
+				$currency->get('cifras_decimales'),
+				$language->get('separador_decimales'),
+				$language->get('separador_miles')
+			);
+			$td_value->set_html($formatted);
+			$td_value->add_attribute('colspan', $index);
+			$tr->add_child($td_label);
+			$tr->add_child($td_value);
+			$tbody->add_child($tr);
 
-		$tr = new HtmlBuilder('tr');
-		$td_label = new HtmlBuilder('th');
-		$td_label->set_html('Total descontado:');
-		$td_label->add_attribute('colspan', $index - 1);
-		$td_value = new HtmlBuilder('th');
-		$formatted = number_format($scale->get('netAmount'),
-			$currency->get('cifras_decimales'),
-			$language->get('separador_decimales'),
-			$language->get('separador_miles')
-		);
-		$td_value->set_html($formatted);
-		$td_value->add_attribute('colspan', $index);
-		$tr->add_child($td_label);
-		$tr->add_child($td_value);
-		$tbody->add_child($tr);
+			$tr = new HtmlBuilder('tr');
+			$td_label = new HtmlBuilder('th');
+			$td_label->set_html('Total:');
+			$td_label->add_attribute('colspan', $index - 1);
+			$td_value = new HtmlBuilder('th');
+			$formatted = number_format($scale->get('netAmount'),
+				$currency->get('cifras_decimales'),
+				$language->get('separador_decimales'),
+				$language->get('separador_miles')
+			);
+			$td_value->set_html($formatted);
+			$td_value->add_attribute('colspan', $index);
+			$tr->add_child($td_label);
+			$tr->add_child($td_value);
+			$tbody->add_child($tr);
 		}
 		return $tbody;
   }

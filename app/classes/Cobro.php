@@ -5,6 +5,8 @@ if (!class_exists('Cobro')) {
 
 	class Cobro extends Objeto {
 
+		const MAX_ESC = 4;
+
 		var $asuntos = array();
 		var $ArrayFacturasDelContrato = array();
 		var $ArrayTotalesDelContrato = array();

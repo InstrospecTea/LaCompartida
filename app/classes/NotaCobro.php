@@ -4140,7 +4140,7 @@ class NotaCobro extends Cobro {
 					$this->CargarEscalonadas();
 					$html_tabla = "<br /><span class=\"titulo_seccion\">" . __('Detalle Tarifa Escalonada') . "</span> <table class=\"tabla_normal\" width=\"50%\">%filas_escalas%</table>";
 					$html_fila = "";
-					for ($i = 1; $i <= 4; $i++) {
+					for ($i = 1; $i <= self::MAX_ESC; $i++) {
 						if ($this->fields['esc' . $i . '_tiempo'] != 0) {
 							$detalle_escala = "";
 							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
