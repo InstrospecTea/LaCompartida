@@ -1473,7 +1473,7 @@ class NotaCobro extends Cobro {
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
 				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->get($this->fields['id_cobro']));
 				$html = str_replace('%detalle_escalones%', $table, $html);
-				$html = str_replace('detalle_trabajos_escalones', $workDetailTable, $html);
+				$html = str_replace('%detalle_trabajos_escalones%', $workDetailTable, $html);
 
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
@@ -4289,7 +4289,7 @@ class NotaCobro extends Cobro {
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
 				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->get($this->fields['id_cobro']));
 				$html = str_replace('%detalle_escalones%', $table, $html);
-				$html = str_replace('detalle_trabajos_escalones', $workDetailTable, $html);
+				$html = str_replace('%detalle_trabajos_escalones%', $workDetailTable, $html);
 
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
