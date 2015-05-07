@@ -109,10 +109,10 @@ class ChargeScope implements IChargeScope{
    * @param Criteria $criteria
    */
   function withDocument(Criteria $criteria) {
-    $criteria->add_custom_join_with('documento', 
+    $criteria->add_custom_join_with('documento AS Document', 
         CriteriaRestriction::and_clause(
-          CriteriaRestriction::equals('Charge.id_cobro', 'documento.id_cobro'),
-          CriteriaRestriction::equals('documento.tipo_doc',"'N'")
+          CriteriaRestriction::equals('Charge.id_cobro', 'Document.id_cobro'),
+          CriteriaRestriction::equals('Document.tipo_doc',"'N'")
         )
     );
     return $criteria;

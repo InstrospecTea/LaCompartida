@@ -27,7 +27,6 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	public function searchByGenericCriteria(SearchCriteria $searchCriteria , array $filter_properties = array()) {
 		$widthIdentity = false;
 		$criteria = $this->getCriteria($searchCriteria, $filter_properties, $widthIdentity, true);
-		pr($criteria->get_plain_query());
 		return $this->SearchService->getGenericResults($searchCriteria, $criteria);
 	}
 

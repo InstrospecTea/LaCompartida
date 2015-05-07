@@ -19,7 +19,6 @@ class SearchService implements ISearchService {
 	 * @return array
 	 */
 	public function translateCriteria(SearchCriteria $searchCriteria, array $filter_properties = array(), Criteria $criteria = null, $withIdentity = true, $genericMode = false) {
-
 		$criteria = $this->prepareRelationships($criteria, $searchCriteria);
 		$criteria = $this->prepareRestrictions($criteria, $searchCriteria);
 		$criteria = $this->prepareSelection($criteria, $searchCriteria, $filter_properties, $withIdentity, $genericMode);
