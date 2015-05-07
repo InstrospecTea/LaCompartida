@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.8.3
+Thursday 2015, May 7th.
+* **Fix:** [Fix amount in cobros_xls](https://github.com/LemontechSA/ttb/pull/950)
+
 ## Hotfix 15.8.2
 Tuesday 2015, May 5th.
 * **Fix:** [Fix duplcated documents when a Charge is billed](https://github.com/LemontechSA/ttb/pull/947)
