@@ -83,18 +83,18 @@ if ($codigo_cliente) {
 }
 
 if ($id_grupo_cliente) {
-	$searchCriteria->filter('id_grupo_cliente')->restricted_by('equals')->compare_with("'id_grupo_cliente'")->for_entity('Client');
+	$searchCriteria->filter('id_grupo_cliente')->restricted_by('equals')->compare_with("'$id_grupo_cliente'")->for_entity('Client');
 }
 
 if ($forma_cobro) {
-	$searchCriteria->filter('forma_cobro')->restricted_by('equals')->compare_with("'forma_cobro'")->for_entity('Contract');
+	$searchCriteria->filter('forma_cobro')->restricted_by('equals')->compare_with("'$forma_cobro'")->for_entity('Contract');
 }
 
 if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_honorarios = $tipo_liquidacion & 1 ? true : false;
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
-	$searchCriteria->filter('incluye_gastos')->restricted_by('equals')->compare_with("'incluye_gastos'");
-	$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with("'incluye_honorarios'");
+	$searchCriteria->filter('incluye_gastos')->restricted_by('equals')->compare_with("'$incluye_gastos'");
+	$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with("'$incluye_honorarios'");
 }
 
 if ($codigo_asunto) {
