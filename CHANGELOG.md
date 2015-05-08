@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.8.3
+Thursday 2015, May 7th.
+* **Fix:** [Fix amount in cobros_xls](https://github.com/LemontechSA/ttb/pull/950)
+
+## Hotfix 15.8.2
+Tuesday 2015, May 5th.
+* **Fix:** [Fix duplcated documents when a Charge is billed](https://github.com/LemontechSA/ttb/pull/947)
+
 ## Hotfix 15.8.1
 Tuesday 2015, May 5th.
 * **Fix:** [Change time limit and memory on excel report](https://github.com/LemontechSA/ttb/pull/945)
@@ -13,7 +21,7 @@ Wednesday 2015, April 29th.
 * **Feature:** [Orden alfabético países proveedores categorías](https://github.com/LemontechSA/ttb/issues/922)
 
 ## Hotfix 15.7.7
-Wednesday 2015, April 29th.
+Monday 2015, May 04th.
 * **Fix:** [refactor and change way how calculate the money change](https://github.com/LemontechSA/ttb/pull/937)
 
 ## Hotfix 15.7.6

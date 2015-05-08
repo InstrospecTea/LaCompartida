@@ -196,7 +196,7 @@ class SearchService implements ISearchService {
 	 */
 	private function addSelectField($criteria, $field_name, $genericMode) {
 		if ($genericMode) {
-			$propertyAlias = str_replace('.', '_', strtolower($field_name));
+			$propertyAlias = $this->makeAliasName($field_name);
 			$criteria->add_select($field_name, $propertyAlias);
 		} else {
 			$criteria->add_select($field_name);
@@ -240,6 +240,13 @@ class SearchService implements ISearchService {
 		} else {
 			return "{$entity}.{$property}";
 		}
+	}
+
+	private function makeAliasName($field_name) {
+		if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) { //is a function
+			$field_name = $match[1];
+		} 
+		return str_replace('.', '_', strtolower($field_name));
 	}
 
 	private function prepareGrouping(Criteria $criteria, SearchCriteria $searchCriteria) {
