@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.8.4
+Friday 2015, May 8th.
+* **Fix:** [Document number is not showing at edit view](https://github.com/LemontechSA/ttb/pull/951)
+
 ## Hotfix 15.8.3
 Thursday 2015, May 7th.
 * **Fix:** [Fix amount in cobros_xls](https://github.com/LemontechSA/ttb/pull/950)
