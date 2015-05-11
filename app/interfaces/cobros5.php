@@ -676,20 +676,40 @@ echo $refrescar;
 				<?php } ?>
 
 				var div = jQuery('<div/>').attr('title', '<?php echo __("ALERTA") ?>').html(text_window);
+				var disableButton = function(button) {
+					button.attr('aria-disabled', 'true').attr('disabled');
+					button.find('.ui-button-text').text('<?php echo __("Guardando...") ?>')
+				};
+				var buttonDisabled = function(button) {
+					return button.attr('aria-disabled') == 'true'
+				};
+				var enableButton = function(button) {
+					button.remove('aria-disabled', 'false').removeAttr('disabled');
+					button.find('.ui-button-text').text('<?php echo __("Guardar") ?>')
+				};
+
 				jQuery(div).dialog({
 					width: 400,
 					height: 'auto',
 					modal: true,
 					open: function() {
 						jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+						var button = jQuery(this).parent().find('button').first();
+						enableButton(button);
 					},
 					close: function() {
 						jQuery('#btn_emitir_cobro').prop('disabled', '');
 					},
 					buttons: {
 						"<?php echo __('Guardar') ?>": function() {
+							var button = jQuery(this).parent().find('button').first();
+							if (buttonDisabled(button)) {
+								return false;
+							}
+							disableButton(button);
 							var modulo_facturacion = <?php echo Conf::GetConf($sesion, 'NuevoModuloFactura') ? 'true' : 'false'; ?>;
 							if( !AgregarParametros( form ) ) {
+								enableButton(button);
 								return false;
 							} else {
 								var adelantos = jQuery('#saldo_adelantos').val();
@@ -697,6 +717,7 @@ echo $refrescar;
 
 								var msg = '<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar') . ' ' . __('el cobro') . '?' ?>';
 								if(!modulo_facturacion && adelantos && confirm(msg)){
+									enableButton(button);
 									seleccionarAdelanto();
 									return false;
 								}
@@ -706,7 +727,7 @@ echo $refrescar;
 							}
 						},
 						"<?php echo __('Cancelar') ?>": function() {
-							jQuery(this).dialog('close');
+							jQuery(this).dialog('close').remove();
 						}
 					}
 				});

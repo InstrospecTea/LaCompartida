@@ -1,5 +1,53 @@
 # Changelog
 
+## Hotfix 15.8.4
+Friday 2015, May 8th.
+* **Fix:** [Document number is not showing at edit view](https://github.com/LemontechSA/ttb/pull/951)
+
+## Hotfix 15.8.3
+Thursday 2015, May 7th.
+* **Fix:** [Fix amount in cobros_xls](https://github.com/LemontechSA/ttb/pull/950)
+
+## Hotfix 15.8.2
+Tuesday 2015, May 5th.
+* **Fix:** [Fix duplcated documents when a Charge is billed](https://github.com/LemontechSA/ttb/pull/947)
+
+## Hotfix 15.8.1
+Tuesday 2015, May 5th.
+* **Fix:** [Change time limit and memory on excel report](https://github.com/LemontechSA/ttb/pull/945)
+
+## [Release 15.7.0](https://github.com/LemontechSA/ttb/pull/938)
+Wednesday 2015, April 29th.
+* **Feature:** [Error en encabezado de planilla excel de asuntos](https://github.com/LemontechSA/ttb/issues/936)
+* **Feature:** [Add the column codigo_categoria to prm_categoria_usuario and uses it on the Ledes file](https://github.com/LemontechSA/ttb/issues/930)
+* **Feature:** [Corregir boton para agregar nuevo tramite](https://github.com/LemontechSA/ttb/issues/925)
+* **Feature:** [Add group_client to library](https://github.com/LemontechSA/ttb/issues/923)
+* **Feature:** [Orden alfabético países proveedores categorías](https://github.com/LemontechSA/ttb/issues/922)
+
+## Hotfix 15.7.7
+Monday 2015, May 04th.
+* **Fix:** [refactor and change way how calculate the money change](https://github.com/LemontechSA/ttb/pull/937)
+
+## Hotfix 15.7.6
+Monday 2015, April 27th.
+* **Fix:** [Change the way of how calculate the amount on pay](https://github.com/LemontechSA/ttb/pull/934)
+
+## Hotfix 15.7.5
+Friday 2015, April 24th.
+* **Fix:** [Fix the serialized expenses form](https://github.com/LemontechSA/ttb/pull/932)
+
+## Hotfix 15.7.4
+Thursday 2015, April 23th.
+* **Fix:** [Change the way of how calculate the advance](https://github.com/LemontechSA/ttb/pull/929)
+
+## Hotfix 15.7.3
+Wednesday 2015, April 22th.
+* **Fix:** [Uses the right decimals for Cobro and Documento](https://github.com/LemontechSA/ttb/pull/926)
+
+## Hotfix 15.7.2
+Tuesday 2015, April 21th.
+* **Fix:** [Hide lemontech user in selector from list on Biblioteca](https://github.com/LemontechSA/ttb/pull/924)
+
 ## Hotfix 15.7.1
 Monday 2015, April 20th.
 * **Fix:** [Sorted grupo cliente results in cliente screen](https://github.com/LemontechSA/ttb/pull/920)
