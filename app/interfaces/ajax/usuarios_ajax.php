@@ -21,8 +21,7 @@ $queryuser = "SELECT
 	SUM(IF(usuario_permiso.codigo_permiso = 'SOC', 1, 0)) AS SOC,
 	SUM(IF(usuario_permiso.codigo_permiso = 'TAR', 1, 0)) AS TAR,
 	SUM(IF(usuario_permiso.codigo_permiso = 'RET', 1, 0)) AS RET,
-	SUM(IF(usuario_permiso.codigo_permiso = 'ALL', 1, 0)) AS PALL,
-	(SELECT count(*) FROM contrato WHERE contrato.id_usuario_responsable = usuario.id_usuario) AS contratos
+	SUM(IF(usuario_permiso.codigo_permiso = 'ALL', 1, 0)) AS PALL
 FROM usuario
 	LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
 WHERE
@@ -35,10 +34,20 @@ echo '{ "aaData": [';
 $i = 0;
 
 while($fila = mysql_fetch_assoc($resp)) {
+	$total_clients_contracts = Cliente::totalClientsLikeUsuarioResponsable($sesion, $fila['id_usuario']);
+	$total_matters_contracts = Asunto::totalMattersLikeUsuarioResponsable($sesion, $fila['id_usuario']);
+	$total_contracts = $total_clients_contracts + $total_matters_contracts;
+
+	$fila['total_contracts'] = $total_contracts;
+	$fila['total_clients_contracts'] = $total_clients_contracts;
+	$fila['total_matters_contracts'] = $total_matters_contracts;
+
 	if (++$i > 1) {
 		echo ',';
 	}
+
 	$fila['nombrecompleto'] = ucwords(utf8_encode(trim($fila['nombrecompleto'])));
+
   echo json_encode($fila) ;
 }
 

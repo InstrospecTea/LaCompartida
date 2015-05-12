@@ -7,11 +7,14 @@ $esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut'
 $rut_limpio = $esRut ? Utiles::LimpiarRut($rut) : preg_replace('/[,\.-]+/', '', $rut);
 $usuario = new UsuarioExt($sesion, $rut_limpio);
 
-$Contrato = new Contrato($sesion);
 $total_contracts = 0;
+$total_clients_contracts = 0;
+$total_matters_contracts = 0;
 
 if ($usuario->loaded) {
-	$total_contracts = $Contrato->totalContractsByUsuarioResponsable($usuario->fields['id_usuario']);
+	$total_clients_contracts = Cliente::totalClientsLikeUsuarioResponsable($sesion, $usuario->fields['id_usuario']);
+	$total_matters_contracts = Asunto::totalMattersLikeUsuarioResponsable($sesion, $usuario->fields['id_usuario']);
+	$total_contracts = $total_clients_contracts + $total_matters_contracts;
 }
 
 $validaciones_segun_config = Conf::GetConf($sesion, 'ValidacionesCliente');
@@ -965,14 +968,26 @@ function CargarPermisos() {
 				var accion = jQuery(me).find('span').html() == activar ? 'activar' : 'desactivar';
 				var label = jQuery(this).prev();
 				var total_contracts = <?php echo $total_contracts; ?>;
+				var total_clients_contracts = <?php echo $total_clients_contracts; ?>;
+				var total_matters_contracts = <?php echo $total_matters_contracts; ?>;
 				var confirm_str = '<?php echo __('Atención'); ?>:\n\n<?php echo __('Se desactivará al usuario seleccionado'); ?>';
 				var continuar = true;
 
 				if (total_contracts != 0) {
-					confirm_str += ', <?php echo __('el cual está asociado a'); ?> ' + total_contracts + ' <?php echo __('cliente'); ?>' + (total_contracts > 1 ? 's' : '') + ' <?php echo __('como'); ?> "<?php echo __('Encargado Comercial'); ?>"';
+					confirm_str += ', <?php echo __('el cual está asociado a'); ?> ' + total_contracts + ' <?php echo __('acuerdos comerciales'); ?>' + ' <?php echo __('como'); ?> "<?php echo __('Encargado Comercial'); ?>"';
+
+					confirm_str += '\n';
+
+					if (total_clients_contracts > 0) {
+						confirm_str += '\n<?php echo __('Clientes'); ?>: ' + total_clients_contracts;
+					}
+
+					if (total_matters_contracts > 0) {
+						confirm_str += '\n<?php echo __('Asuntos'); ?>: ' + total_matters_contracts;
+					}
 				}
 
-				confirm_str += '.\n\n¿<?php echo __('Desea continuar'); ?>?';
+				confirm_str += '\n\n¿<?php echo __('Desea continuar'); ?>?';
 
 				if (accion == 'desactivar' && !confirm(confirm_str)) {
 					continuar = false;

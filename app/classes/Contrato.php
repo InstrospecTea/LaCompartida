@@ -1618,19 +1618,6 @@ class Contrato extends Objeto {
 		list($fecha_fin_ultimo_cobro) = mysql_fetch_array($resp);
 		return $fecha_fin_ultimo_cobro;
 	}
-
-	public function totalContractsByUsuarioResponsable($id_usuario_responsable) {
-		$Criteria = new Criteria($this->sesion);
-
-		$Criteria->add_select('count(*)', 'total')
-			->add_from('contrato')
-			->add_restriction(CriteriaRestriction::equals('contrato.id_usuario_responsable', "'{$id_usuario_responsable}'"));
-
-		$result = array_shift($Criteria->run());
-
-		return (int) $result['total'];
-	}
-
 }
 
 class ListaContrato extends Lista {
