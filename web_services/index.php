@@ -248,40 +248,34 @@ function EntregarDatosSemaforo($callback = '') {
 //POST route
 $Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('GET', 'POST');
 
-    function EntregarDatosClientes($callback='') {
-		 global $sesion;
+function EntregarDatosClientes($callback='') {
+    global $sesion;
+    $usuarios=array();
+    $queryuser = "SELECT u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria,
+                   u.activo, sum(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as hrs_trabajadas
+                   ,if(up.id_usuario is null,0,1) as timekeeper, u.rut AS code ";
 
+    if (existecampo('activo_juicio', 'usuario', $sesion->dbh)) {
+            $queryuser.="  ,  u.activo_juicio ";
+    }
 
+    $queryuser.=" FROM usuario u
+    left JOIN prm_categoria_usuario pcu ON u.id_categoria_usuario = pcu.id_categoria_usuario
+    left JOIN trabajo on trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00')
+    left join  usuario_permiso up on up.id_usuario=u.id_usuario and up.codigo_permiso='PRO'
+     group by  u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria";
 
-			$usuarios=array();
+    $respuser=mysql_query($queryuser, $sesion->dbh) or die(mysql_error());
 
+    while($fila=mysql_fetch_assoc($respuser )) {
+        $fila['nombre']=utf8_encode($fila['nombre']);
+        $fila['apellido1']=utf8_encode($fila['apellido1']);
+        $fila['apellido2']=utf8_encode($fila['apellido2']);
+        $fila['glosa_categoria']=utf8_encode($fila['glosa_categoria']);
+        $usuarios[] = $fila;
+    }
 
-
-
-			$queryuser = "SELECT u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria,
-				u.activo, sum(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as hrs_trabajadas
-				,if(up.id_usuario is null,0,1) as timekeeper ";
-			if(existecampo('activo_juicio', 'usuario', $sesion->dbh)) {
-				$queryuser.="  ,  u.activo_juicio ";
-			}
-			$queryuser.=" FROM usuario u
-			left JOIN prm_categoria_usuario pcu ON u.id_categoria_usuario = pcu.id_categoria_usuario
-			left JOIN trabajo on trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00')
-			left join  usuario_permiso up on up.id_usuario=u.id_usuario and up.codigo_permiso='PRO'
-			 group by  u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria                         ";
-
-			$respuser=mysql_query($queryuser, $sesion->dbh) or die(mysql_error());
-
-
-			while($fila=mysql_fetch_assoc($respuser )) {
-			$fila['nombre']=utf8_encode($fila['nombre']);
-			$fila['apellido1']=utf8_encode($fila['apellido1']);
-			$fila['apellido2']=utf8_encode($fila['apellido2']);
-			$fila['glosa_categoria']=utf8_encode($fila['glosa_categoria']);
-				$usuarios[]=$fila;
-			}
-
-	 echo json_encode($usuarios);
+    echo json_encode($usuarios);
 }
 
 
