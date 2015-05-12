@@ -1157,25 +1157,25 @@ function Substring($string) {
   }
 
   function CargarTarifa() {
-	var id_usuario = jQuery('#id_usuario').val();
+		var id_usuario = jQuery('#id_usuario').val();
 
-	if (CodigoSecundario) {
-	  var codigo_asunto = jQuery('#codigo_asunto_secundario').val();
-	  var codigo_cliente = jQuery('#codigo_cliente_secundario').val();
-	} else {
-	  var codigo_asunto = jQuery('#codigo_asunto').val();
-	  var codigo_cliente = jQuery('#codigo_cliente').val();
-	}
+		if (CodigoSecundario) {
+		  var codigo_asunto = jQuery('#codigo_asunto_secundario').val();
+		  var codigo_cliente = jQuery('#codigo_cliente_secundario').val();
+		} else {
+		  var codigo_asunto = jQuery('#codigo_asunto').val();
+		  var codigo_cliente = jQuery('#codigo_cliente').val();
+		}
 
-	var vurl = 'ajax.php?accion=cargar_tarifa_trabajo&id_usuario=' + id_usuario + '&codigo_asunto=' + codigo_asunto + '&codigo_cliente=' + codigo_cliente;
+		var vurl = 'ajax.php?accion=cargar_tarifa_trabajo&id_usuario=' + id_usuario + '&codigo_asunto=' + codigo_asunto + '&codigo_cliente=' + codigo_cliente;
 
-	jQuery.get(vurl, function(response) {
-	  if (jQuery('#tarifa_trabajo').length > 0) {
-		jQuery('#tarifa_trabajo').val(response);
-	  }
-	});
+		jQuery.get(vurl, function(response) {
+		  if (jQuery('#tarifa_trabajo').length > 0) {
+				jQuery('#tarifa_trabajo').val(response);
+		  }
+		});
 
-	return true;
+		return true;
   }
 
   function IngresarNuevo(form) {
