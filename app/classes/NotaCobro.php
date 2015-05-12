@@ -1471,7 +1471,7 @@ class NotaCobro extends Cobro {
 				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
 				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
-				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->get($this->fields['id_cobro']));
+				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->getCharge($this->fields['id_cobro']));
 				$html = str_replace('%detalle_escalones%', $table, $html);
 				$html = str_replace('%detalle_trabajos_escalones%', $workDetailTable, $html);
 
@@ -4287,7 +4287,7 @@ class NotaCobro extends Cobro {
 				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
 				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
-				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->get($this->fields['id_cobro']));
+				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->getCharge($this->fields['id_cobro']));
 				$html = str_replace('%detalle_escalones%', $table, $html);
 				$html = str_replace('%detalle_trabajos_escalones%', $workDetailTable, $html);
 
