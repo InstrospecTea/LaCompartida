@@ -1,10 +1,34 @@
 # Changelog
 
+## Hotfix 15.8.7
+Tuesday 2015, May 12th.
+* **Feature:** [New lang file for Spain](https://github.com/LemontechSA/ttb/issues/957)
+
+## Hotfix 15.8.6
+Tuesday 2015, May 12th.
+* **Feature:** [Add column "rut" to EntregarDatosClientes method for api /web_services/index.php](https://github.com/LemontechSA/ttb/issues/956)
+
+## Hotfix 15.8.5
+Monday 2015, May 11th.
+* **Fix:** [Fix charge amount](https://github.com/LemontechSA/ttb/pull/952)
+
+## Hotfix 15.8.4
+Friday 2015, May 8th.
+* **Fix:** [Document number is not showing at edit view](https://github.com/LemontechSA/ttb/pull/951)
+
+## Hotfix 15.8.3
+Thursday 2015, May 7th.
+* **Fix:** [Fix amount in cobros_xls](https://github.com/LemontechSA/ttb/pull/950)
+
+## Hotfix 15.8.2
+Tuesday 2015, May 5th.
+* **Fix:** [Fix duplcated documents when a Charge is billed](https://github.com/LemontechSA/ttb/pull/947)
+
 ## Hotfix 15.8.1
 Tuesday 2015, May 5th.
 * **Fix:** [Change time limit and memory on excel report](https://github.com/LemontechSA/ttb/pull/945)
 
-## [Release 15.7.0](https://github.com/LemontechSA/ttb/pull/938)
+## [Release 15.8.0](https://github.com/LemontechSA/ttb/pull/938)
 Wednesday 2015, April 29th.
 * **Feature:** [Error en encabezado de planilla excel de asuntos](https://github.com/LemontechSA/ttb/issues/936)
 * **Feature:** [Add the column codigo_categoria to prm_categoria_usuario and uses it on the Ledes file](https://github.com/LemontechSA/ttb/issues/930)
@@ -13,7 +37,7 @@ Wednesday 2015, April 29th.
 * **Feature:** [Orden alfabético países proveedores categorías](https://github.com/LemontechSA/ttb/issues/922)
 
 ## Hotfix 15.7.7
-Wednesday 2015, April 29th.
+Monday 2015, May 04th.
 * **Fix:** [refactor and change way how calculate the money change](https://github.com/LemontechSA/ttb/pull/937)
 
 ## Hotfix 15.7.6

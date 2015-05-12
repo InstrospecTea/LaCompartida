@@ -947,7 +947,7 @@ $Form = new Form();
 				echo Html::SelectArrayDecente($tipos, 'tipo_doc', $documento->fields['tipo_doc'], 'id="tipo_doc" onchange="ShowCheque();"', '', '100px');
 				echo __('N° Documento:');
 				?>
-				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $numero_doc); ?>" />
+				<input name="numero_doc" size="10" value="<?php echo str_replace("-", "", $documento->fields['numero_doc']); ?>" />
 			</td>
 		</tr>
 

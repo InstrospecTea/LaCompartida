@@ -432,7 +432,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			if ($charge->get('porcentaje_impuesto') > 0) {
 				$honorarios_original = $charge->get('monto_subtotal') - $descuento_honorarios;
 			} else {
-				$honorarios_original = $charge->get('monto_subtotal');
+				$honorarios_original = $charge->get('monto');
 			}
 
 			$saldo_honorarios = $this->CoiningBusiness->changeCurrency($honorarios_original, $chargeCurrency, $currency);
