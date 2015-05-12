@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.8.7
+Tuesday 2015, May 12th.
+* **Feature:** [New lang file for Spain](https://github.com/LemontechSA/ttb/issues/957)
+
 ## Hotfix 15.8.6
 Tuesday 2015, May 12th.
 * **Feature:** [Add column "rut" to EntregarDatosClientes method for api /web_services/index.php](https://github.com/LemontechSA/ttb/issues/956)
