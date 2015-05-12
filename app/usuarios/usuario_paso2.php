@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM'));
@@ -7,6 +6,13 @@ $pagina = new Pagina($sesion);
 $esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut';
 $rut_limpio = $esRut ? Utiles::LimpiarRut($rut) : preg_replace('/[,\.-]+/', '', $rut);
 $usuario = new UsuarioExt($sesion, $rut_limpio);
+
+$Contrato = new Contrato($sesion);
+$total_contracts = 0;
+
+if ($usuario->loaded) {
+	$total_contracts = $Contrato->totalContractsByUsuarioResponsable($usuario->fields['id_usuario']);
+}
 
 $validaciones_segun_config = Conf::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span style="color:#ff0000;font-size:10px;vertical-align:top;">*</span>';
@@ -23,8 +29,6 @@ if ($opc == "eliminar") {
 
 $modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
 $id_categoria_anterior = $usuario->fields['id_categoria_usuario'];
-
-//echo 'Categoria original <b>'.$id_categoria_anterior.'</b></br>';
 
 if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
@@ -960,22 +964,38 @@ function CargarPermisos() {
 				var me = this;
 				var accion = jQuery(me).find('span').html() == activar ? 'activar' : 'desactivar';
 				var label = jQuery(this).prev();
-				jQuery.post('../interfaces/ajax/permiso_ajax.php', {accion: accion, id_usuario: id, permiso: 'ACT'}, function(resp) {
-					resp = jQuery.parseJSON(resp);
-					if (resp.error) {
-						jQuery('#activo_status').html(resp.error.replace(/\n/g, '<br/>')).show();
-						return;
-					}
-					jQuery('#activo_status').html('').hide();
-					jQuery(me).attr('title', resp.estado);
-					jQuery(me).find('span').html(resp.estado);
-					label.html(resp.label + ' ');
-					if (jQuery(me).find('span').html() == activar) {
-						jQuery('#divVisible').show();
-					} else {
-						jQuery('#divVisible').hide();
-					}
-				});
+				var total_contracts = <?php echo $total_contracts; ?>;
+				var confirm_str = '<?php echo __('Atención'); ?>:\n\n<?php echo __('Se desactivará al usuario seleccionado'); ?>';
+				var continuar = true;
+
+				if (total_contracts != 0) {
+					confirm_str += ', <?php echo __('el cual está asociado a'); ?> ' + total_contracts + ' <?php echo __('cliente'); ?>' + (total_contracts > 1 ? 's' : '') + ' <?php echo __('como'); ?> "<?php echo __('Encargado Comercial'); ?>"';
+				}
+
+				confirm_str += '.\n\n¿<?php echo __('Desea continuar'); ?>?';
+
+				if (accion == 'desactivar' && !confirm(confirm_str)) {
+					continuar = false;
+				}
+
+				if (continuar) {
+					jQuery.post('../interfaces/ajax/permiso_ajax.php', {accion: accion, id_usuario: id, permiso: 'ACT'}, function(resp) {
+						resp = jQuery.parseJSON(resp);
+						if (resp.error) {
+							jQuery('#activo_status').html(resp.error.replace(/\n/g, '<br/>')).show();
+							return;
+						}
+						jQuery('#activo_status').html('').hide();
+						jQuery(me).attr('title', resp.estado);
+						jQuery(me).find('span').html(resp.estado);
+						label.html(resp.label + ' ');
+						if (jQuery(me).find('span').html() == activar) {
+							jQuery('#divVisible').show();
+						} else {
+							jQuery('#divVisible').hide();
+						}
+					});
+				}
 			});
 		<?php } ?>
 	});
