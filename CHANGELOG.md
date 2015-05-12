@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.8.5
+Monday 2015, May 11th.
+* **Fix:** [Fix charge amount](https://github.com/LemontechSA/ttb/pull/952)
+
 ## Hotfix 15.8.4
 Friday 2015, May 8th.
 * **Fix:** [Document number is not showing at edit view](https://github.com/LemontechSA/ttb/pull/951)
