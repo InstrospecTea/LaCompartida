@@ -307,11 +307,37 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $results && count($results) > 0 ? $results[0] : null;
 	}
 
+	/**
+	 * Obtiene la instancia de {@link UserFee} que representa los parámetros de búsqueda ingresados.
+	 * @param   $userId
+	 * @param   $feeId
+	 * @param   $currencyId
+	 * @return
+	 */
 	public function getUserFee($userId, $feeId, $currencyId) {
 		$searchCriteria = new SearchCriteria('UserFee');
 		$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($userId);
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		if (empty($results[0])) {
+			return null;
+		} else {
+			return $results[0];
+		}
+	}
+
+	/**
+	 * Obtiene la instancia de {@link WorkFee} que representa los parámetros de búsqueda ingresados.
+	 * @param   $workId
+	 * @param   $currencyId
+	 * @return
+	 */
+	public function getWorkFee($workId, $currencyId) {
+		$searchCriteria = new SearchCriteria('WorkFee');
+		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($workId);
+		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
 		if (empty($results[0])) {
