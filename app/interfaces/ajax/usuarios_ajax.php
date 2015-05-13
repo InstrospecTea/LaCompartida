@@ -34,8 +34,8 @@ echo '{ "aaData": [';
 $i = 0;
 
 while($fila = mysql_fetch_assoc($resp)) {
-	$total_clients_contracts = Cliente::totalClientsLikeUsuarioResponsable($sesion, $fila['id_usuario']);
-	$total_matters_contracts = Asunto::totalMattersLikeUsuarioResponsable($sesion, $fila['id_usuario']);
+	$total_clients_contracts = Cliente::totalClientsOfAccountManager($sesion, $fila['id_usuario']);
+	$total_matters_contracts = Asunto::totalMattersOfAccountManager($sesion, $fila['id_usuario']);
 	$total_contracts = $total_clients_contracts + $total_matters_contracts;
 
 	$fila['total_contracts'] = $total_contracts;

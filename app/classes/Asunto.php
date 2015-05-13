@@ -1160,7 +1160,7 @@ class Asunto extends Objeto {
 		return $details;
 	}
 
-	public static function totalMattersLikeUsuarioResponsable(&$Session, $user_id, $active = true) {
+	public static function totalMattersOfAccountManager(&$Session, $user_id, $active = true) {
 		$Criteria = new Criteria($Session);
 
 		$Criteria->add_select('count(*)', 'total')

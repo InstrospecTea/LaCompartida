@@ -12,8 +12,8 @@ $total_clients_contracts = 0;
 $total_matters_contracts = 0;
 
 if ($usuario->loaded) {
-	$total_clients_contracts = Cliente::totalClientsLikeUsuarioResponsable($sesion, $usuario->fields['id_usuario']);
-	$total_matters_contracts = Asunto::totalMattersLikeUsuarioResponsable($sesion, $usuario->fields['id_usuario']);
+	$total_clients_contracts = Cliente::totalClientsOfAccountManager($sesion, $usuario->fields['id_usuario']);
+	$total_matters_contracts = Asunto::totalMattersOfAccountManager($sesion, $usuario->fields['id_usuario']);
 	$total_contracts = $total_clients_contracts + $total_matters_contracts;
 }
 

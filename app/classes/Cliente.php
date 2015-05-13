@@ -957,7 +957,7 @@ class Cliente extends Objeto {
 		return empty($ultimo) ? true : __('	Código secundario') . ' existente';
 	}
 
-	public static function totalClientsLikeUsuarioResponsable(&$Session, $user_id, $active = true) {
+	public static function totalClientsOfAccountManager(&$Session, $user_id, $active = true) {
 		$Criteria = new Criteria($Session);
 
 		$Criteria->add_select('count(*)', 'total')
