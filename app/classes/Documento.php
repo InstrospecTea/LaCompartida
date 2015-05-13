@@ -143,8 +143,9 @@ class Documento extends Objeto {
 			if ($id_cobro) {
 				$this->Edit("id_cobro", $id_cobro);
 			}
+
 			$this->Edit('tipo_doc', $tipo_doc);
-			$this->Edit("numero_doc", $numero_doc?$numero_doc:"");
+			$this->Edit("numero_doc", $numero_doc? $numero_doc : "");
 			$this->Edit("id_moneda", $id_moneda);
 			$this->Edit("fecha", $fecha);
 			$this->Edit("glosa_documento", $glosa_documento);
@@ -190,6 +191,7 @@ class Documento extends Objeto {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}
+
 			if ($this->Write()) {
 				$id_documento = $this->fields['id_documento'];
 				$ids_monedas = explode(',', $ids_monedas_documento);
@@ -203,26 +205,17 @@ class Documento extends Objeto {
 				if (!empty($primer_tipo_cambio)) {
 					$this->ActualizarDocumentoMoneda($tipo_cambio);
 				}
+
 				$msg = empty($adelanto) ? __('Pago ingresado con éxito') : __('Adelanto ingresado con éxito');
 
-					$pagina->addInfo($msg);
-
-
+				$pagina->addInfo($msg);
 
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
-				 $this->Write();
-
+				$this->Write();
 			} else {
 				 throw new Exception($this->error);
 			}
-
 		}
-
-		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>" . $out_neteos . "</table>";
-		//echo $out_neteos;
-	/*echo '<pre>';
-			print_r($this->fields);
-			echo '</pre>';*/
 
 		return $id_documento;
 	}

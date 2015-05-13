@@ -1,6 +1,6 @@
 <?php
 	ini_set('max_execution_time', 300);
-	
+
 	require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -15,7 +15,7 @@
     require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('REV','ADM') );
-	
+
     $wb = new Spreadsheet_Excel_Writer();
 
     $wb->send('Planilla_Asuntos_Factura.xls');
@@ -29,7 +29,7 @@
                                 'Align' => 'justify',
                                 'Bold' => '1',
                                 'Color' => 'black'));
-  
+
     $tit1 =& $wb->addFormat(array('Size' => 12,
                                 'VAlign' => 'top',
                                 'Align' => 'justify',
@@ -84,8 +84,8 @@
    $ws1->setZoom(75);
    #$ws1->protect( $key );
    $col=0;
-   
-   $headers1 = array( 
+
+   $headers1 = array(
 		'Grupo',
 		'Código',
 		'Nombre cliente',
@@ -94,7 +94,7 @@
 		'Rut',
 		'Dirección'
    );
-   $headers2 = array( 
+   $headers2 = array(
 		'Asunto',
 		'Código',
 		'Datos de Facturación',
@@ -103,7 +103,7 @@
 		'Dirección',
 		'tarifa'
    );
-   
+
 	$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
 	$mostrar_codigo_secundario = UtilesApp::GetConf($sesion,'CodigoSecundario');
 
@@ -113,9 +113,11 @@
 	$ws1->setColumn( $col, $col++,  15.00);
 	$ws1->setColumn( $col, $col++,  35.00);
 	$ws1->setColumn( $col, $col++,  18.00);
-	if($mostrar_encargado_secundario)
-		$ws1->setColumn( $col, $col++,  18.00);
-	else unset($headers1[4]);
+	if ($mostrar_encargado_secundario) {
+		$ws1->setColumn($col, $col++, 18.00);
+	} else {
+		unset($headers1[4]);
+	}
 	$ws1->setColumn( $col, $col++,  16.00);
 	$ws1->setColumn( $col, $col++,  30.00);
 	$ws1->setColumn( $col, $col++,  22.80);
@@ -146,14 +148,23 @@
 	$info_usr = str_replace('<br>',' - ',$PdfLinea2);
 	$ws1->write(3, 0, utf8_decode($info_usr), $encabezado);
 	$ws1->mergeCells (3, 0, 3, 8);
-	$i=0;
+
+	//Se inicializa el valor de $i para la primera columna de los encabezados
+	// y $fila_inicial como la fila donde comienzan los encabezados.
+	$i = 0;
 	$fila_inicial = 6;
 
-	foreach($headers1 as $i => $h)
+	foreach ($headers1 as $h) {
 		$ws1->write($fila_inicial, $i, __($h), $tit1);
-	foreach($headers2 as $j => $h)
-		$ws1->write($fila_inicial, $i+1+$j, __($h), $tit2);
-	
+		$i++;
+	}
+	// se continúa con la siguiente columna determinada por el último valor de $i
+	// completando el encabezado
+	foreach ($headers2 as $h) {
+		$ws1->write($fila_inicial,$i, __($h), $tit2);
+		$i++;
+	}
+
     $fila_inicial++;
 
     ###################################### SQL ######################################
@@ -205,15 +216,15 @@
 
 	if($id_area_proyecto)
 		$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
-		
-    $query = "SELECT SQL_CALC_FOUND_ROWS *, 
+
+    $query = "SELECT SQL_CALC_FOUND_ROWS *,
 						grupo_cliente.glosa_grupo_cliente,
 						cliente.glosa_cliente,
 						cliente.codigo_cliente,
 						a1.codigo_asunto,
 						cliente.codigo_cliente_secundario,
 						a1.codigo_asunto_secundario,
-						
+
 						contrato_cliente.rut AS rut_cliente,
 						IFNULL(contrato.rut, contrato_cliente.rut) AS rut,
 						contrato_cliente.factura_direccion AS direccion_cliente,
@@ -221,7 +232,7 @@
 						IFNULL(contrato.factura_razon_social, contrato_cliente.factura_razon_social) AS razon_social,
 						IFNULL(contrato.factura_giro, contrato_cliente.factura_giro) AS giro,
 						tarifa.glosa_tarifa,
-						a1.id_moneda, 
+						a1.id_moneda,
 						a1.activo,
 						a1.fecha_creacion,
 						usuario.username as username,
@@ -260,31 +271,29 @@
             $ws1->write($fila_inicial, $col++, $row['glosa_cliente'], $f4);
 
 
-			if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
+			if (UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 	            $ws1->write($fila_inicial, $col++, $row['username'], $f4);
-				if($mostrar_encargado_secundario)
+				if($mostrar_encargado_secundario) {
 					$ws1->write($fila_inicial, $col++, $row['username_secundario'], $f4);
-			}
-	        else{
+				}
+			} else {
 	          	$ws1->write($fila_inicial, $col++, $row['apellido1'].', '.$row['nombre'], $f4);
-				if($mostrar_encargado_secundario)
-					$ws1->write($fila_inicial, $col++,
-						empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
+				if ($mostrar_encargado_secundario) {
+					$cell_content = empty($row['username_secundario']) ? '' : $row['apellido1_secundario'] . ', ' . $row['nombre_secundario'];
+					$ws1->write($fila_inicial, $col++, $cell_content, $f4);
+				}
 			}
 
-			
+
 			$ws1->write($fila_inicial, $col++, $row['rut_cliente'], $f4);
 			$ws1->write($fila_inicial, $col++, $row['direccion_cliente'], $f4);
 
-			
+
             $ws1->write($fila_inicial, $col++, $row['glosa_asunto'], $f5);
 
-            if($mostrar_codigo_secundario)
-			{
+			if ($mostrar_codigo_secundario) {
 				$ws1->write($fila_inicial, $col++, $row['codigo_asunto'], $f5);
-			}
-			else
-			{
+			} else {
 				$ws1->write($fila_inicial, $col++, $row['codigo_asunto_secundario'], $f5);
 			}
 
@@ -300,4 +309,3 @@
 
     $wb->close();
     exit;
-?>

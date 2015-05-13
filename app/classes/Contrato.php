@@ -1618,7 +1618,6 @@ class Contrato extends Objeto {
 		list($fecha_fin_ultimo_cobro) = mysql_fetch_array($resp);
 		return $fecha_fin_ultimo_cobro;
 	}
-
 }
 
 class ListaContrato extends Lista {

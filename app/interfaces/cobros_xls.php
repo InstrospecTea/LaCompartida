@@ -1,15 +1,22 @@
 <?php
+
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 
-set_time_limit(400);
-ini_set("memory_limit", "256M");
-$where_cobro = ' 1 ';
+set_time_limit(0);
+ini_set('memory_limit', '1024M');
+
+// Search Criteria para realizar la búsqueda de todos los cobros a incluir
+$searchCriteria = new SearchCriteria('Charge');
+$searchCriteria->related_with('Contract')->on_property('id_contrato')->with_direction('INNER');
+$searchCriteria->related_with('Matter')->joined_with('Contract')->on_property('id_contrato');
+$searchCriteria->related_with('Client')->joined_with('Matter')->on_property('codigo_cliente');
+$searchCriteria->add_scope('orderbyClientGlossAndClientCode');
 
 if ($id_cobro) {
-	$where_cobro .= " AND cobro.id_cobro='{$id_cobro}' ";
+	$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($id_cobro);
 }
 
 if (!isset($forzar_username)) {
@@ -51,38 +58,47 @@ if ($codigo_cliente_secundario) {
 	$cliente = new Cliente($sesion);
 	$codigo_cliente = $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario);
 }
+
 if ($codigo_cliente) {
 	$cliente = new Cliente($sesion);
 	$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 }
+
 if ($activo) {
-	$where_cobro .= " AND contrato.activo = 'SI' ";
+	$searchCriteria->filter('activo')->restricted_by('equals')->compare_with("'SI'")->for_entity('Contract');
 } else if ($no_activo) {
-	$where_cobro .= " AND contrato.activo = 'NO' ";
-}
-if ($forma_cobro) {
-	$where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
-}
-if ($id_usuario) {
-	$where_cobro .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
-}
-if ($codigo_cliente) {
-	$where_cobro .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
-}
-if ($id_grupo_cliente) {
-	$where_cobro .= " AND cliente.id_grupo_cliente = '$id_grupo_cliente' ";
+	$searchCriteria->filter('activo')->restricted_by('equals')->compare_with("'NO'")->for_entity('Contract');
 }
 
 if ($forma_cobro) {
-	$where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
+	$searchCriteria->filter('forma_cobro')->restricted_by('equals')->compare_with("'$forma_cobro'")->for_entity('Contract');
 }
+
+if ($id_usuario) {
+	$searchCriteria->filter('id_usuario_responsable')->restricted_by('equals')->compare_with("'$id_usuario'")->for_entity('Contract');
+}
+
+if ($codigo_cliente) {
+	$searchCriteria->filter('codigo_cliente')->restricted_by('equals')->compare_with("'$codigo_cliente'")->for_entity('Client');
+}
+
+if ($id_grupo_cliente) {
+	$searchCriteria->filter('id_grupo_cliente')->restricted_by('equals')->compare_with("'$id_grupo_cliente'")->for_entity('Client');
+}
+
+if ($forma_cobro) {
+	$searchCriteria->filter('forma_cobro')->restricted_by('equals')->compare_with("'$forma_cobro'")->for_entity('Contract');
+}
+
 if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_honorarios = $tipo_liquidacion & 1 ? true : false;
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
-	$where_cobro .= " AND cobro.incluye_gastos = '$incluye_gastos' AND cobro.incluye_honorarios = '$incluye_honorarios' ";
+	$searchCriteria->filter('incluye_gastos')->restricted_by('equals')->compare_with("'$incluye_gastos'");
+	$searchCriteria->filter('incluye_honorarios')->restricted_by('equals')->compare_with("'$incluye_honorarios'");
 }
+
 if ($codigo_asunto) {
-	$where_cobro .= " AND asunto.codigo_asunto = '$codigo_asunto' ";
+	$searchCriteria->filter('codigo_asunto')->restricted_by('equals')->compare_with("'$codigo_asunto'")->for_entity('Matter');
 }
 
 if (!$id_cobro) {
@@ -461,37 +477,39 @@ if ($borradores) {
 	$ws->setRow($filas, 0, 0, 1);
 }
 
-/*
- *	 Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
- */
+if ($borradores) {
+	$searchCriteria->filter('estado')->restricted_by('in')->compare_with(array("CREADO", "EN REVISION"));
+} else {
+	$estado_cobro = $cobro->fields['estado'];
+	$searchCriteria->filter('estado')->restricted_by('equals')->compare_with("'$estado_cobro'");
+}
 
-$query = "SELECT DISTINCT
-			cobro.id_cobro
-		FROM cobro
-		JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-		LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
-		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-		WHERE $where_cobro AND cobro.estado " . ($borradores ? ' IN (\'CREADO\',\'EN REVISION\')' : '=\'' . $cobro->fields['estado'] . '\'') . "
-		ORDER BY cliente.glosa_cliente,cobro.codigo_cliente";
-
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-while (list($id_cobro) = mysql_fetch_array($resp)) {
-
-	/*
-	 *	Cargar los datos necesarios dentro del cobro
-	 */
-
+$SearchingBusiness = new SearchingBusiness($sesion);
+$results = $SearchingBusiness->searchByGenericCriteria($searchCriteria, array('DISTINCT(Charge.id_cobro)'));
+$chargeIds = array_map(function($element) { 
+	return $element->get('charge_id_cobro');
+}, $results->toArray());
+ 
+// Search criteria que obtiene las entidades Cobro para no hacer
+// select  por cada uno, además trae la información necesaria de Document.
+$chargeSearchCriteria = new SearchCriteria('Charge');
+$chargeSearchCriteria->filter('id_cobro')->restricted_by('in')->compare_with($chargeIds);
+$chargeSearchCriteria->add_scope('withDocument');
+$chargeResults = $SearchingBusiness->searchByCriteria(
+	$chargeSearchCriteria, 
+	array('*', 'Document.subtotal_honorarios as document_subtotal_honorarios')
+);
+ 
+foreach ($chargeResults as $charge) {
+	$id_cobro = $charge->get('id_cobro');
+	
 	$cobro = new Cobro($sesion);
-	$cobro->Load($id_cobro);
-	if (!$cobro->Loaded()) {
-		continue;
-	}
+	$cobro->fields = $charge->fields;
 	$cobro->LoadAsuntos();
-
+	
 	/*
 	*	Si es que el cobro es RETAINER o PROPORCIONAL modifica las columnas del excel
-	 */
+	*/
 
 	if (($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' || $cobro->fields['forma_cobro'] == 'FLAT FEE')) {
 		$col_duracion_retainer = $col_tarificable_hh + 1;
@@ -927,25 +945,20 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_encabezado);
 		}
 
-
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 		$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 
 		if ($cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total']) {
 			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			/*
-			 * Antes se calculaba la transformación, pero el cálculo ya se encuentra en el documento del cobro
-			 * ya que se guarda el documento en los valores de la moneda total
-			 * 
-			$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '');
-			$tipo_cambio_moneda_cobro = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
-			$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
-			$monto_equivalente_a = $monto_subtotal * $tipo_cambio_moneda_cobro / $tipo_cambio_moneda_total;
-			/* */
-			$DocumentoCobro = new Documento($sesion);
-			$DocumentoCobro->LoadByCobro($cobro->fields['id_cobro']);
-			// $Cobro->fields['monto_subtotal'] equivale a $DocumentoCobro->fields['subtotal_honorarios']
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $DocumentoCobro->fields['subtotal_honorarios'], $formato_moneda_resumen);
+			if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION') {
+				$monto_subtotal = number_format($cobro->fields['monto_subtotal'],2, '.', '');
+				$id_moneda = $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
+				$opc_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
+				$monto = $monto_subtotal * $id_moneda / $opc_moneda_total;
+			} else {
+				$monto = $cobro->fields['document_subtotal_honorarios'];
+			}
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $monto, $formato_moneda_resumen);
 		}
 
 		if ($cobro->fields['descuento'] > 0 && $opc_ver_descuento) {

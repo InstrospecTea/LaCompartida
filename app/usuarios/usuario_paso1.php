@@ -218,7 +218,7 @@
 					} else {
 						botones += "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
 					}
-					return botones + " rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'/></div>&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut=" + o.aData['rut'] + "' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
+					return botones + " rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "' data-contracts='" + o.aData['total_contracts'] + "' data-clientscontracts='" + o.aData['total_clients_contracts'] + "' data-matterscontracts='" + o.aData['total_matters_contracts'] + "'/></div>&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut=" + o.aData['rut'] + "' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
 				}, "sClass": "dttactivo", "bUseRendered": false, "aTargets": [16]},
 				{"fnRender": function(o, val) {
 					if (val == 1) {
@@ -260,8 +260,7 @@
 			var dato = self.attr('rel').split(';');
 			var alt = '';
 			var accion = '';
-
-			self.attr('src', 'https://static.thetimebilling.com/images/ico_loading.gif');
+			var continuar = true;
 
 			switch (self.attr('alt')) {
 				case 'OK':
@@ -282,29 +281,60 @@
 					break;
 			}
 
-			jQuery.post(
-				'../interfaces/ajax/permiso_ajax.php',
-				{
-					accion: accion,
-					id_usuario: dato[0],
-					permiso: dato[1]
-				},
-				function(data) {
-					data = jQuery.parseJSON(data);
-					if (data.error != '') {
-						alert(data.error);
-						self.attr('src', src);
-					} else {
-						self.attr('src', data.img);
-						self.attr('alt', alt);
-						if (alt == 'ACTIVO') {
-							self.closest('tr').removeClass('inactivo');
-						} else if (alt == 'INACTIVO') {
-							self.closest('tr').addClass('inactivo');
-						}
+			if (accion == 'desactivar') {
+				var confirm_str = '<?php echo __('Atención'); ?>:\n\n<?php echo __('Se desactivará al usuario seleccionado'); ?>';
+				var total_contracts = parseInt(self.attr('data-contracts'));
+				var total_clients_contracts = parseInt(self.attr('data-clientscontracts'));
+				var total_matters_contracts = parseInt(self.attr('data-matterscontracts'));
+
+				if (total_contracts != 0) {
+					confirm_str += ', <?php echo __('el cual está asociado a'); ?> ' + total_contracts + ' <?php echo __('acuerdos comerciales'); ?>' + ' <?php echo __('como'); ?> "<?php echo __('Encargado Comercial'); ?>"';
+
+					confirm_str += '\n';
+
+					if (total_clients_contracts > 0) {
+						confirm_str += '\n<?php echo __('Clientes'); ?>: ' + total_clients_contracts;
+					}
+
+					if (total_matters_contracts > 0) {
+						confirm_str += '\n<?php echo __('Asuntos'); ?>: ' + total_matters_contracts;
 					}
 				}
-			);
+
+				confirm_str += '\n\n¿<?php echo __('Desea continuar'); ?>?';
+
+				if (!confirm(confirm_str)) {
+					continuar = false;
+				}
+			}
+
+			if (continuar) {
+				self.attr('src', 'https://static.thetimebilling.com/images/ico_loading.gif');
+				jQuery.post(
+					'../interfaces/ajax/permiso_ajax.php',
+					{
+						accion: accion,
+						id_usuario: dato[0],
+						permiso: dato[1]
+					},
+					function(data) {
+						data = jQuery.parseJSON(data);
+						if (data.error != '') {
+							alert(data.error);
+							self.attr('src', src);
+						} else {
+							self.attr('src', data.img);
+							self.attr('alt', alt);
+							if (alt == 'ACTIVO') {
+								self.closest('tr').removeClass('inactivo');
+							} else if (alt == 'INACTIVO') {
+								self.closest('tr').addClass('inactivo');
+							}
+						}
+					}
+				);
+			}
+
 		});
 
 		jQuery('.descargaxls').click(function() {
