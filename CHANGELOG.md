@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.8.7
+Tuesday 2015, May 12th.
+* **Feature:** [New lang file for Spain](https://github.com/LemontechSA/ttb/issues/957)
+
+## Hotfix 15.8.6
+Tuesday 2015, May 12th.
+* **Feature:** [Add column "rut" to EntregarDatosClientes method for api /web_services/index.php](https://github.com/LemontechSA/ttb/issues/956)
+
 ## Hotfix 15.8.5
 Monday 2015, May 11th.
 * **Fix:** [Fix charge amount](https://github.com/LemontechSA/ttb/pull/952)
@@ -20,7 +28,7 @@ Tuesday 2015, May 5th.
 Tuesday 2015, May 5th.
 * **Fix:** [Change time limit and memory on excel report](https://github.com/LemontechSA/ttb/pull/945)
 
-## [Release 15.7.0](https://github.com/LemontechSA/ttb/pull/938)
+## [Release 15.8.0](https://github.com/LemontechSA/ttb/pull/938)
 Wednesday 2015, April 29th.
 * **Feature:** [Error en encabezado de planilla excel de asuntos](https://github.com/LemontechSA/ttb/issues/936)
 * **Feature:** [Add the column codigo_categoria to prm_categoria_usuario and uses it on the Ledes file](https://github.com/LemontechSA/ttb/issues/930)
