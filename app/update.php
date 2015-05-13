@@ -10758,7 +10758,36 @@ QUERY;
 			if (!ExisteCampo('valor_estandar', 'trabajo_tarifa', $dbh)) {
 				$queries[] = "ALTER TABLE `trabajo_tarifa` ADD COLUMN `valor_estandar` DOUBLE NULL DEFAULT 0 AFTER `valor`";
 			}
-			break;
+			$queries[] = "UPDATE trabajo_tarifa ttff
+								   JOIN trabajo t
+								     ON ttff.id_moneda = t.id_moneda
+								    AND ttff.id_trabajo = t.id_trabajo
+								    AND ttff.valor_estandar = 0
+								   JOIN usuario_tarifa tf 
+								     ON t.id_usuario = tf.id_usuario 
+								    AND t.id_moneda = tf.id_moneda 
+								    AND t.tarifa_hh_estandar = 0
+								   JOIN tarifa ta
+								     ON tf.id_tarifa = ta.id_tarifa 
+								    AND ta.tarifa_defecto = 1
+								    SET ttff.valor_estandar =  tf.tarifa;";
+
+			$queries[] = "UPDATE trabajo_tarifa ttff
+							   JOIN trabajo t
+							     ON ttff.id_moneda = t.id_moneda
+							    AND ttff.id_trabajo = t.id_trabajo
+							    AND ttff.valor_estandar = 0
+							   JOIN usuario u
+							     ON t.id_usuario = u.id_usuario
+							   JOIN categoria_tarifa tf 
+							     ON u.id_categoria_usuario  = tf.id_categoria_usuario 
+							    AND t.id_moneda = tf.id_moneda 
+							    AND t.tarifa_hh_estandar = 0
+							   JOIN tarifa ta
+							     ON tf.id_tarifa = ta.id_tarifa 
+								  AND ta.tarifa_defecto = 1
+							   SET ttff.valor_estandar =  tf.tarifa;";
+			break;			
 	}
 
 	if (!empty($queries)) {
@@ -10771,7 +10800,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.00;
+$max_update = 8.01;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
