@@ -21,7 +21,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 	$error_cupo = '';
 
 	if ($Usuario->LoadId($_POST['id_usuario'])) {
-		$error_cupo = "Estimado {$Sesion->usuario->fields['nombre']} {$Sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuación se detalla su cupo actual.\n\n" .
+		$error_cupo = "Estimado {$Sesion->usuario->fields['nombre']} {$Sesion->usuario->fields['apellido1']}, usted ha excedido el cupo de usuarios contratados en el sistema. A continuaciÃ³n se detalla su cupo actual.\n\n" .
 			"* Usuarios activos con perfil Profesional: {$UsuarioPermiso->cupo_profesionales}\n".
 			"* Usuarios activos con perfil Administrativos: {$UsuarioPermiso->cupo_administrativos}\n\n" .
 			"Si desea aumentar su cupo debe contactarse con areacomercial@lemontech.cl o en su defecto puede desactivar usuarios para habilitar cupos.";
@@ -35,13 +35,13 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 							$nombre_dato = 'permisos';
 							$valor_actual = "{$_POST['permiso']}";
 						} else {
-							$error = "Atención: Ocurrió un error al asignar el rol '{$_POST['permiso']}'.";
+							$error = "AtenciÃ³n: OcurriÃ³ un error al asignar el rol '{$_POST['permiso']}'.";
 						}
 					} else {
 						$error = &$error_cupo;
 					}
 				} else {
-					$error = "Atención: Solo a los usuarios activos del sistema se les puede asignar roles.";
+					$error = "AtenciÃ³n: Solo a los usuarios activos del sistema se les puede asignar roles.";
 				}
 				break;
 			case 'revocar':
@@ -51,7 +51,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 						$nombre_dato = 'permisos';
 						$valor_original = "{$_POST['permiso']}";
 					} else {
-						$error = "Atención: Ocurrió un error al revocar el rol '{$_POST['permiso']}'.";
+						$error = "AtenciÃ³n: OcurriÃ³ un error al revocar el rol '{$_POST['permiso']}'.";
 					}
 				} else {
 					$error = "{$UsuarioPermiso->error}\n\n{$error_cupo}";
@@ -79,7 +79,7 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 						$estado = __('Desactivar');
 						$label = __('Usuario Activo');
 					} else {
-						$error = 'Atención: Ocurrió un error al activar al usuario';
+						$error = 'AtenciÃ³n: OcurriÃ³ un error al activar al usuario';
 					}
 				} else {
 					$error = &$error_cupo;
@@ -95,12 +95,12 @@ if (!$Sesion->usuario->TienePermiso('ADM')) {
 					$estado = __('Activar');
 					$label = __('Usuario Inactivo');
 				} else {
-					$error = 'Atención: Ocurrió un error al activar al usuario';
+					$error = 'AtenciÃ³n: OcurriÃ³ un error al activar al usuario';
 				}
 				break;
 		}
 	} else {
-		$error = "Atención: El usuario no existe.";
+		$error = "AtenciÃ³n: El usuario no existe.";
 	}
 
 	if (empty($error)) {

@@ -956,6 +956,20 @@ class Cliente extends Objeto {
 		$ultimo = $qr->fetch(PDO::FETCH_ASSOC);
 		return empty($ultimo) ? true : __('	Código secundario') . ' existente';
 	}
+
+	public static function totalClientsOfAccountManager(&$Session, $user_id, $active = true) {
+		$Criteria = new Criteria($Session);
+
+		$Criteria->add_select('count(*)', 'total')
+			->add_from('cliente')
+			->add_inner_join_with('contrato', 'contrato.id_contrato = cliente.id_contrato')
+			->add_restriction(CriteriaRestriction::equals('cliente.activo', $active ? 1 : 0))
+			->add_restriction(CriteriaRestriction::equals('contrato.id_usuario_responsable', $user_id));
+
+		$result = array_shift($Criteria->run());
+
+		return (int) $result['total'];
+	}
 }
 
 class ListaClientes extends Lista {
