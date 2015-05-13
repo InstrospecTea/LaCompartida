@@ -145,7 +145,7 @@ class Documento extends Objeto {
 			}
 
 			$this->Edit('tipo_doc', $tipo_doc);
-			$this->Edit("numero_doc", $numero_doc?$numero_doc:"");
+			$this->Edit("numero_doc", $numero_doc? $numero_doc : "");
 			$this->Edit("id_moneda", $id_moneda);
 			$this->Edit("fecha", $fecha);
 			$this->Edit("glosa_documento", $glosa_documento);
