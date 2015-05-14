@@ -2,17 +2,6 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Documento.php';
-require_once Conf::ServerDir() . '/../app/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/../app/classes/Tramite.php';
-require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-
 class Ledes extends Objeto {
 
 	/**
@@ -65,6 +54,7 @@ class Ledes extends Objeto {
 		$suma = 0;
 		$fecha_min = date('Y-m-d');
 		$codigo_asunto = null;
+		$last_client_matter_id = "";
 
 		/**
 		 * Obtener los trabajos
@@ -138,6 +128,8 @@ class Ledes extends Objeto {
 			$suma += $fila['LINE_ITEM_TOTAL'];
 
 			$filas[] = $fila;
+
+			$last_client_matter_id = $trabajo['codigo_homologacion'];
 		}
 
 		/**
@@ -211,6 +203,8 @@ class Ledes extends Objeto {
 			$suma += $fila['LINE_ITEM_TOTAL'];
 
 			$filas[] = $fila;
+
+			$last_client_matter_id = $tramite['codigo_homologacion'];
 		}
 
 		/**
@@ -273,6 +267,8 @@ class Ledes extends Objeto {
 			$suma += $fila['LINE_ITEM_TOTAL'];
 
 			$filas[] = $fila;
+
+			$last_client_matter_id = $datos['codigo_homologacion'];
 		}
 
 		/**
@@ -302,8 +298,18 @@ class Ledes extends Objeto {
 			list($codigo_asunto) = mysql_fetch_assoc($resp);
 		}
 
-		//ajuste a nivel de cobro para corregir segun forma de cobro, descuentos, etc
-		//todo: hacer ajustes por separado con descripcion? este hace calzar barsamente
+		// Ajuste a nivel de cobro para corregir segun forma de cobro, descuentos, etc
+
+		if (empty($last_client_matter_id)) {
+			$Cobro->LoadAsuntos();
+			$codigo_asunto = $Cobro->asuntos[0];
+
+			$Asunto = new Asunto($this->sesion);
+			$Asunto->LoadByCodigo($codigo_asunto);
+
+			$last_client_matter_id = $Asunto->fields['codigo_homologacion'];
+		}
+
 		$monto_total = $datos_cobro['INVOICE_TOTAL'] * 1;
 		if (abs($suma - $monto_total) > $monto_total / 100) {
 			$monto = $monto_total - $suma;
@@ -323,7 +329,7 @@ class Ledes extends Objeto {
 				'LINE_ITEM_UNIT_COST' => 0,
 				'TIMEKEEPER_NAME' => '',
 				'TIMEKEEPER_CLASSIFICATION' => '',
-				'CLIENT_MATTER_ID' => ''
+				'CLIENT_MATTER_ID' => $last_client_matter_id
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
