@@ -2380,28 +2380,73 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												</td>
 											</tr>
 											<tr>
-												<td align="right">
+												<td align="right" style="vertical-align: middle;">
 													<?php echo __('Cobrar cada') ?>
 												</td>
-												<td align="left">
-													<input type="text" name="periodo_intervalo" value="<?php echo empty($contrato->fields['periodo_intervalo']) ? '' : $contrato->fields['periodo_intervalo'] ?>" id="periodo_intervalo" size="3" maxlength="2" />
-													<span style='font-size:10px'><?php echo __('meses') ?></span>
+												<td align="left" style="vertical-align: middle;">
+													<?php
+													$intervalos_disponibles = array(
+														'0' => 'Seleccione un intervalo',
+														'1' => '1 ' . __('Mes'),
+														'3' => '3 ' . __('Meses'),
+														'6' => '6 ' . __('Meses'),
+														'12' => '1 ' . __('Año'),
+														'-1' => __('Otro')
+													);
+
+													$repeticiones_disponibles = array(
+														'0' => __('Indefinidamente'),
+														'1' => __('1 período'),
+														'2' => __('2 períodos'),
+														'3' => __('3 períodos'),
+														'4' => __('4 períodos'),
+														'5' => __('5 períodos'),
+														'-1' => __('Otro')
+													);
+													?>
+													<?php echo Html::SelectArrayDecente($intervalos_disponibles, 'periodo_intervalo', $contrato->fields['periodo_intervalo']); ?>
+													&nbsp;
+													<?php echo __('durante'); ?>
+													&nbsp;
+													<?php echo Html::SelectArrayDecente($repeticiones_disponibles, 'periodo_repeticiones', $contrato->fields['periodo_repeticiones']); ?>
 												</td>
 											</tr>
 											<tr>
-												<td align="right">
-													<?php echo __('Durante') ?>
-												</td>
-												<td align="left">
-													<input  type="text" name=periodo_repeticiones id=periodo_repeticiones size=3 value="<?php echo $contrato->fields['periodo_repeticiones'] ?>" />
-													<span style='font-size:10px'><?php echo __('periodos (0 para perpetuidad)') ?></span>
-												</td>
-											</tr>
-											<tr>
-												<td align="center">
-													<b><?php echo __('Próximos Cobros') ?></b>&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='generarFechas()' style='cursor:pointer' <?php echo TTip(__('Actualizar fechas según período')) ?>>
-												</td>
 												<td>&nbsp;</td>
+												<td>
+													<label>
+														<input type="hidden" name="emitir_liquidacion_al_generar" value="0" />
+														<input type="checkbox" name="emitir_liquidacion_al_generar" value="1" <?php echo $contrato->fields['emitir_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
+														<?php echo __('Emitir la liquidación al generar'); ?>
+													</label>
+												</td>
+											</tr>
+											<tr>
+												<td>&nbsp;</td>
+												<td>
+													<label>
+														<input type="hidden" name="enviar_liquidacion_al_generar" value="0" />
+														<input type="checkbox" name="enviar_liquidacion_al_generar" value="1" <?php echo $contrato->fields['enviar_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
+														<?php echo __('Enviar por Email esta liquidación al Cliente'); ?>
+													</label>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2">&nbsp;</td>
+											</tr>
+											<tr>
+												<td colspan="2">
+													<table width="100%">
+														<tr>
+															<td width="15%">&nbsp;</td>
+															<td>
+																<strong><?php echo __('Próximos Cobros') ?></strong>
+																&nbsp;
+																<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='generarFechas()' style='cursor:pointer' <?php echo TTip(__('Actualizar fechas según período')) ?>>
+															</td>
+														</tr>
+													</table>
+												</td>
 											</tr>
 											<tr>
 												<td align="center" colspan="2">
@@ -2466,6 +2511,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_esconder" style="display:none;font-size:7pt;text-align:right;">Esconder</a>
 												</td>
 											</tr>
+											<tr>
+												<td colspan="2">&nbsp;</td>
+											</tr>
 											<?php
 												$TramiteTipo = new TramiteTipo($Sesion);
 											?>
@@ -2478,12 +2526,20 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											});
 											</script>
 											<tr>
-												<td colspan="2" align="center">
-													<strong><?php echo __('Trámites automáticos') ?></strong>
+												<td colspan="2">
+													<table width="100%">
+														<tr>
+															<td width="15%">&nbsp;</td>
+															<td>
+																<strong><?php echo __('Trámites automáticos') ?></strong>
+																<em><?php echo __('(estos trámites se incluirán automáticamente en la nueva liquidación generada)'); ?></em>
+															</td>
+														</tr>
+													</table>
 												</td>
 											</tr>
 											<tr>
-												<td colspan="2">
+												<td colspan="2" align="center">
 													<table width="70%" style="border: 1px solid grey;">
 														<thead>
 															<tr bgcolor="#6CA522">
@@ -2495,7 +2551,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 														<tbody>
 															<tr>
 																<td><?php echo Html::SelectArrayDecente($TramiteTipo->Listar('ORDER BY glosa_tramite'), 'tramite_automatico_lista', '', '', 'Seleccione un trámite', '320px'); ?></td>
-																<td align="right" id="tramite_automatico_valor"></td>
+																<td align="right" id="tramite_automatico_valor">
+																</td>
 																<td align="center">
 																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas" style="cursor:pointer" onclick="agregarTramiteAutomatico();" />
 																</td>
@@ -2503,8 +2560,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 														</tbody>
 														<tfoot>
 															<tr>
-																<td>&nbsp;</td>
-																<td><strong id="tramites_automaticos_total"></strong></td>
+																<td align="right"><strong>Total</strong></td>
+																<td align="right"><strong id="tramites_automaticos_total"></strong></td>
 																<td>&nbsp;</td>
 															</tr>
 														</tfoot>
