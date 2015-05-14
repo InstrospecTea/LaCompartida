@@ -34,6 +34,12 @@ class SandboxController extends AbstractController {
 		$this->set('charge', $charge);
 	}
 
+	public function scalesWork($chargeId) {
+		$this->loadBusiness('Charging');
+		$charge = $this->ChargingBusiness->getCharge($chargeId);
+		$this->set('table', $this->ChargingBusiness->getSlidingScalesWorkDetail($charge));
+	}
+
 	public function charging() {
 		$this->layoutTitle = 'Sandbox Charging';
 		$this->loadBusiness('Charging');

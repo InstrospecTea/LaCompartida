@@ -6,7 +6,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
-		
+
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Matter')->on_property('codigo_asunto');
 		$searchCriteria->related_with('Contract')->joined_with('Matter')->on_property('id_contrato');
@@ -19,6 +19,11 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		//Abogado
 		if ($data['id_usuario']) {
 			$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($data['id_usuario']);
+		}
+
+		//Cobro
+		if ($data['buscar_id_cobro']) {
+			$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($data['buscar_id_cobro']);
 		}
 
 		//Encargado comercial
@@ -94,8 +99,10 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$filter_properties = array(
 			'Client.codigo_cliente',
 			'Client.glosa_cliente',
+			'Contract.id_moneda',
 			'Matter.id_asunto',
 			'Matter.glosa_asunto',
+			'Work.id_trabajo',
 			'Work.descripcion',
 			'Work.fecha',
 			'Work.duracion_cobrada',
@@ -191,7 +198,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 
 		if (!empty($data['cobrable'])) {
-			$searchCriteria->filter('cobrable')->restricted_by('equals')->compare_with($data['cobrable'])->for_entity('Work');			
+			$searchCriteria->filter('cobrable')->restricted_by('equals')->compare_with($data['cobrable'])->for_entity('Work');
 		}
 
 		$filter_properties = array(
@@ -210,7 +217,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		);
 
 		$this->loadReport('TimekeeperProductivity', 'report');
- 		
+
  		$moneda_filtro = $this->CoiningBusiness->getCurrency($data['moneda_filtro']);
  		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
 		$this->report->setParameters(
@@ -233,10 +240,11 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 	function getWorksByCharge($chargeId) {
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Charge');
+		$searchCriteria->related_with('User');
 		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($chargeId);
 		$searchCriteria->add_scope('orderFromOlderToNewer');
 		$this->loadBusiness('Searching');
-		return $this->SearchingBusiness->searchbyCriteria($searchCriteria, array('Work.fecha', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda'));
+		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2'));
 	}
 
 }
