@@ -9,6 +9,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	protected function setUp() {
 		$this->Html = new \TTB\Html;
 		$this->loadBusiness('Coining');
+		$this->loadBusiness('Charging');
 		$this->baseCurrency = $this->CoiningBusiness->getBaseCurrency();
 		$this->loadBusiness('Translating');
 		$this->defaultLanguage = $this->TranslatingBusiness->getLanguageByCode('es');
@@ -69,11 +70,15 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['usr_nombre'] = $lawyer_name;
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
-			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
+			$trabajo['id_moneda'] = $fila->fields['contract_id_moneda'];
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
-			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['contract_id_moneda'])->get('valor_estandar');
+			} else {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			}
 			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
@@ -121,10 +126,14 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['usr_nombre'] = $lawyer_name;
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
-			$trabajo['id_moneda'] = $fila->fields['work_id_moneda'];
+			$trabajo['id_moneda'] = $fila->fields['contract_id_moneda'];
 			$duration_parts = explode(":", $fila->fields[$show_hours]);
 			$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
-			$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['contract_id_moneda'])->get('valor_estandar');
+			} else {
+				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+			}
 			$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
 		return $grupos;
@@ -303,7 +312,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$col1 = __('FECHA');
 		$col2 = __('ABOGADO');
 		$col3 = __('TIEMPO EN MINUTOS');
-		$col4 = __('VALOR FACTURADO');
+		$col4 = __('VALOR FACTURABLE ESTANDAR');
 		$since = $until = '';
 		if (!empty($this->parameters['since'])) {
 			$since = $this->formatDate($this->parameters['since']);
@@ -485,14 +494,13 @@ HTML;
 				$this->CoiningBusiness->getCurrency($fila['id_moneda']),
 				$moneda_filtro
 			);
-
 			if ($with_invoiced) {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
 				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
 				$tds .= $this->Html->tag(
 					'td',
-					"{$moneda_filtro->get('simbolo')} " . 
+					"{$moneda_filtro->get('simbolo')} " .
 					$this->CoiningBusiness->formatAmount(
 						$valor_facturado,
 						$moneda_filtro,
@@ -520,7 +528,7 @@ HTML;
 			$ths .= $this->Html->tag('th', $total, array('class' => 'col3'));
 			$ths .= $this->Html->tag(
 				'th',
-				"{$moneda_filtro->get('simbolo')} " . 
+				"{$moneda_filtro->get('simbolo')} " .
 				$this->CoiningBusiness->formatAmount(
 					$total_facturado,
 					$this->baseCurrency,

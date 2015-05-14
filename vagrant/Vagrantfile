@@ -4,7 +4,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.box = "hashicorp/precise32"
 
 	config.vm.network "forwarded_port", guest: 80, host: 8080 
-	config.vm.network "forwarded_port", guest: 9090, host: 9000
 	config.vm.synced_folder "../../", "/vagrant"
-	config.vm.provision :shell, path: "provision.sh"
+
+	# Provision Main
+	config.vm.provision "shell", path: "main.sh"
+
+	# Provision Apache
+	config.vm.provision "shell", path: "apache.sh"
+
+	# Provision MySQL
+	config.vm.provision "shell", path: "mysql.sh"
+
+	# Provision PHP
+	config.vm.provision "shell", path: "php.sh"	
+
+	# Provision phpmyadmin
+	config.vm.provision "shell", path: "phpmyadmin.sh"
+
+	# Provision Composer
+	config.vm.provision "shell", path: "composer.sh"
+
+	# Provision TTB Clasic
+	config.vm.provision "shell", path: "ttb.sh"
 end
