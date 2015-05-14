@@ -314,16 +314,16 @@ for ($i = 0; $i < $lista->num; $i++) {
     list($duracion, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
     list($h, $m) = split(':', $duracion);
     $duracion_decimal = number_format($h + $m / 60, 1, '.', '');
-    $tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
+    $tiempo_excel_duracion = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
 
     if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
         $valor_duracion = $duracion_decimal;
         $formato_duracion = $fdd;
         $ws->writeNumber($fila_inicial + $i, $col_duracion, $duracion_decimal, $fdd);
     } else {
-        $valor_duracion = $tiempo_excel;
+        $valor_duracion = $tiempo_excel_duracion;
         $formato_duracion = $time_format;
-        $ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
+        $ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel_duracion, $time_format);
     }
 
     if ($revisorpermitido || $mostrar_tarifa_al_profesional) {
@@ -333,13 +333,13 @@ for ($i = 0; $i < $lista->num; $i++) {
         list($h, $m) = split(':', $duracion_cobrada);
 
         $duracion_cobrada_decimal = number_format($h + $m / 60, 1, '.', '');
-        $tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
+        $tiempo_excel_duracion_cobrada = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
         if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
             $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $duracion_cobrada_decimal, $fdd);
             $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $duracion_decimal-$duracion_cobrada_decimal, $fdd);
         } else {
-            $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel, $time_format);
-            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, 0, $time_format);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel_duracion_cobrada, $time_format);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $tiempo_excel_duracion - $tiempo_excel_duracion_cobrada, $time_format);
         }
     } else {
         $ws->write($fila_inicial + $i, $col_duracion_cobrada, '', $time_format);
