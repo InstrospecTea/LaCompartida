@@ -1,5 +1,14 @@
 # Changelog
 
+## [Release 15.9.0](https://github.com/LemontechSA/ttb/pull/960)
+Wednesday 2015, May 13th.
+* **Feature:** [Mantener asuntos en edicion masiva de trabajos](https://github.com/LemontechSA/ttb/issues/955)
+* **Feature:** [New Tag For Sliding Scales Work Detail](https://github.com/LemontechSA/ttb/issues/949)
+* **Feature:** [Código asunto secundario repetido](https://github.com/LemontechSA/ttb/issues/948)
+* **Feature:** [Report of hours with standard fee](https://github.com/LemontechSA/ttb/issues/939)
+* **Feature:** [Corrige y simplifica la recarga del buscador cuando se edita un trabajo](https://github.com/LemontechSA/ttb/issues/931)
+* **Feature:** [Improvements Users](https://github.com/LemontechSA/ttb/issues/909)
+
 ## Hotfix 15.8.7
 Tuesday 2015, May 12th.
 * **Feature:** [New lang file for Spain](https://github.com/LemontechSA/ttb/issues/957)
