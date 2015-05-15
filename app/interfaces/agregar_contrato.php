@@ -2518,11 +2518,96 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												$TramiteTipo = new TramiteTipo($Sesion);
 											?>
 											<script type="text/javascript">
+											var addIncludedErrand;
+											var removeIncludedErrand;
+											var updateErrandRate;
+											var listIncludedErrands;
+
 											jQuery('document').ready(function () {
-												var agregarTramiteAutomatico = function() {
-													var _tramite_automatico_lista = jQuery('#tramite_automatico_lista');
-													var _tramite_automatico_tipo = _tramite_automatico_lista.val();
+												var contract_id = <?php echo $contrato->fields['id_contrato']; ?>;
+												var url_included_errands = root_dir + '/api/index.php/contracts/' + contract_id + '/included_errands';
+
+												addIncludedErrand = function() {
+													var errand_type_id = jQuery('#included_errand_type_id').val();
+
+													jQuery.ajax({
+														url: url_included_errands,
+														type: 'POST',
+														data: {
+															errand_type_id: errand_type_id
+														}
+													}).done(function(data) {
+														jQuery('#included_errand_type_id').val('');
+														jQuery('#included_errand_value').html('');
+														listIncludedErrands();
+													});
 												};
+
+												removeIncludedErrand = function(included_errand_id) {
+													jQuery.ajax({
+														url: url_included_errands,
+														type: 'DELETE',
+														data: {
+															included_errand_id: included_errand_id
+														}
+													}).done(function(data) {
+														listIncludedErrands();
+													});
+												};
+
+												updateErrandRate = function(sender) {
+													var errand_type_id = jQuery(sender).val();
+													var errand_rate_id = jQuery('#id_tramite_tarifa').val();
+													var errand_currency_id = jQuery('#id_moneda_tramite').val();
+													var url = root_dir + '/api/index.php/errand_rates/' + errand_rate_id + '/values';
+
+													jQuery.ajax({
+														url: url,
+														data: {
+															errand_type_id: errand_type_id,
+															errand_currency_id: errand_currency_id
+														}
+													}).done(function(data) {
+														var errand_value = data[0];
+														var value = errand_value.simbolo_moneda + ' ' + errand_value.tarifa;
+														jQuery('#included_errand_value').html(value);
+													});
+												};
+
+												listIncludedErrands = function() {
+													jQuery.ajax({
+														url: url_included_errands
+													}).done(function(included_errands) {
+														var errand = {};
+														var included_errands_html = '';
+														var included_errands_total = 0;
+
+														for (i = 0; i < included_errands.length; i++) {
+															errand = included_errands[i];
+
+															included_errands_total += parseFloat(errand.tarifa_tramite);
+
+															errand_template =
+																'<tr>'
+																	+ '<td>' + errand.glosa_tramite + '</td>'
+																	+ '<td align="right">' + errand.simbolo_moneda + ' ' + errand.tarifa_tramite + '</td>'
+																	+ '<td align="center">'
+																	+	'	<img src="<?php echo Conf::ImgDir() ?>/menos.gif" style="cursor:pointer" onclick="removeIncludedErrand(' + errand.id_contrato_tramite + ');" />'
+																	+ '</td>'
+																+ '</tr>';
+
+															included_errands_html += errand_template;
+														}
+
+														included_errands_total = errand.simbolo_moneda + ' ' + included_errands_total.toFixed(2);
+
+														jQuery('#included_errands_list').html(included_errands_html);
+														jQuery('#included_errands_total').html(included_errands_total);
+													});
+												};
+
+												// First list
+												listIncludedErrands();
 											});
 											</script>
 											<tr>
@@ -2548,20 +2633,20 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 																<td width="5%">&nbsp;</td>
 															</tr>
 														</thead>
-														<tbody>
-															<tr>
-																<td><?php echo Html::SelectArrayDecente($TramiteTipo->Listar('ORDER BY glosa_tramite'), 'tramite_automatico_lista', '', '', 'Seleccione un trámite', '320px'); ?></td>
-																<td align="right" id="tramite_automatico_valor">
-																</td>
-																<td align="center">
-																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas" style="cursor:pointer" onclick="agregarTramiteAutomatico();" />
-																</td>
-															</tr>
+														<tbody id="included_errands_list">
 														</tbody>
 														<tfoot>
 															<tr>
+																<td><?php echo Html::SelectArrayDecente($TramiteTipo->Listar('ORDER BY glosa_tramite'), 'included_errand_type_id', '', 'onChange="updateErrandRate(this);"', 'Seleccione un trámite', '320px'); ?></td>
+																<td align="right" id="included_errand_value">
+																</td>
+																<td align="center">
+																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas" style="cursor:pointer" onclick="addIncludedErrand();" />
+																</td>
+															</tr>
+															<tr>
 																<td align="right"><strong>Total</strong></td>
-																<td align="right"><strong id="tramites_automaticos_total"></strong></td>
+																<td align="right"><strong id="included_errands_total"></strong></td>
 																<td>&nbsp;</td>
 															</tr>
 														</tfoot>

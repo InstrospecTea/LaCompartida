@@ -671,6 +671,58 @@ $Slim->get('/currencies', function () use ($Session, $Slim) {
 	outputJson(array('results' => $results));
 });
 
+$Slim->get('/errand_rates/:errand_rate_id/values', function ($errand_rate_id) use ($Session, $Slim) {
+	$errand_type_id = $Slim->request()->params('errand_type_id');
+	$errand_currency_id = $Slim->request()->params('errand_currency_id');
+
+	$TramiteValor = new TramiteValor($Session);
+
+	$values = $TramiteValor->findAll(array(
+		'id_tramite_tipo' => $errand_type_id,
+		'id_tramite_tarifa' => $errand_rate_id,
+		'id_moneda' => $errand_currency_id
+	));
+
+	outputJson($values);
+});
+
+$Slim->get('/contracts/:contract_id/included_errands', function ($contract_id) use ($Session, $Slim) {
+	$ContratoTramite = new ContratoTramite($Session);
+
+	$errands = $ContratoTramite->findAll(array(
+		'id_contrato' => $contract_id
+	));
+
+	outputJson($errands);
+});
+
+$Slim->post('/contracts/:contract_id/included_errands', function ($contract_id) use ($Session, $Slim) {
+	$errand_type_id = $Slim->request()->params('errand_type_id');
+
+	$ContratoTramite = new ContratoTramite($Session);
+	$ContratoTramite->Edit('id_contrato', $contract_id);
+	$ContratoTramite->Edit('id_tramite_tipo', $errand_type_id);
+
+	if ($ContratoTramite->Write()) {
+		outputJson($ContratoTramite->fields);
+	} else {
+		halt(__('Cant write the Included Errand'), 'InvalidIncludedErrand');
+	}
+});
+
+$Slim->delete('/contracts/:contract_id/included_errands', function ($contract_id) use ($Session, $Slim) {
+	$included_errand_id = $Slim->request()->params('included_errand_id');
+
+	$ContratoTramite = new ContratoTramite($Session);
+	$ContratoTramite->Load($included_errand_id);
+
+	if ($ContratoTramite->Delete()) {
+		outputJson(array('result' => 'OK'));
+	} else {
+		halt(__('Cant delete the Included Errand'), 'CantDeleteIncludedErrand');
+	}
+});
+
 $Slim->post('/invoices/:id/build', function ($id) use ($Session, $Slim) {
 	if (isset($id)) {
 		$Invoice = new Factura($Session);
