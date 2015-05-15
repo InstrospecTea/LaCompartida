@@ -10800,7 +10800,7 @@ QUERY;
 				KEY `id_tipo_tramite` (`id_tramite_tipo`),
 				CONSTRAINT `contrato_tramite_fk_contrato` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON DELETE CASCADE ON UPDATE CASCADE,
 				CONSTRAINT `contrato_tramite_fk_tramite_tipo` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON UPDATE CASCADE
-			) ENGINE=InnoDB DEFAULT CHARSET=latin1;"
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			break;
 	}
 
