@@ -103,6 +103,7 @@ class Ledes extends Objeto {
 			$horas = $this->round($trabajo['horas']);
 			$monto = $this->round($monto);
 			$tarifa = $this->round($tarifa);
+			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
 			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));
 
@@ -111,7 +112,7 @@ class Ledes extends Objeto {
 				'LINE_ITEM_NUMBER' => $linea++, //'H' . $trabajo['id_trabajo'],
 				'EXP/FEE/INV_ADJ_TYPE' => 'F',
 				'LINE_ITEM_NUMBER_OF_UNITS' => $horas,
-				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto - $tarifa * $horas,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $ajuste,
 				'LINE_ITEM_TOTAL' => $monto,
 				'LINE_ITEM_DATE' => $trabajo['fecha'],
 				'LINE_ITEM_TASK_CODE' => $trabajo['codigo_tarea'],
@@ -178,6 +179,7 @@ class Ledes extends Objeto {
 			$horas = $this->round($horas);
 			$monto = $this->round($monto);
 			$tarifa = $this->round($tarifa / $horas);
+			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
 			$descripcion = trim(str_replace("\n", ' ', $tramite['descripcion']));
 
@@ -186,7 +188,7 @@ class Ledes extends Objeto {
 				'LINE_ITEM_NUMBER' => $linea++, //'T' . $tramite['id_tramite'],
 				'EXP/FEE/INV_ADJ_TYPE' => 'F',
 				'LINE_ITEM_NUMBER_OF_UNITS' => $horas,
-				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto - $tarifa * $horas,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $ajuste,
 				'LINE_ITEM_TOTAL' => $monto,
 				'LINE_ITEM_DATE' => $tramite['fecha'],
 				'LINE_ITEM_TASK_CODE' => $trabajo['codigo_tarea'],
