@@ -784,16 +784,16 @@ $Form->defaultLabel = false;
 </script>
 
 <form method=post action="" id="form_documentos" autocomplete='off'>
-	<input type=hidden name=opcion value="guardar" />
-	<input type=hidden name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
-	<input type=hidden name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>' />
+	<input type="hidden" name="opcion" value="guardar" />
+	<input type="hidden" name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
+	<input type="hidden" name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>' />
 	<input type="hidden" name='lista_facturas' id='lista_facturas' value='<?php echo $lista_facturas ?>' />
-	<input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_pago->fields['cifras_decimales'] ?>" />
-	<input type=hidden name='cifras_decimales_cobro' id='cifras_decimales_cobro' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
-	<input type=hidden name='id_factura_pago' id='id_factura_pago' value="<?php echo $pago->fields['id_factura_pago'] ?>" />
+	<input type="hidden" name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_pago->fields['cifras_decimales'] ?>" />
+	<input type="hidden" name='cifras_decimales_cobro' id='cifras_decimales_cobro' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
+	<input type="hidden" name='id_factura_pago' id='id_factura_pago' value="<?php echo $pago->fields['id_factura_pago'] ?>" />
 	<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?php echo $pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>" />
 	<input type="hidden" name="codigo_cliente_factura" value="<?php echo $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente ?>" >
-	<input type=hidden name='id_neteo_documento_adelanto' id='id_neteo_documento_adelanto' value="<?php echo $id_neteo_documento_adelanto ?>" />
+	<input type="hidden" name='id_neteo_documento_adelanto' id='id_neteo_documento_adelanto' value="<?php echo $id_neteo_documento_adelanto ?>" />
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>

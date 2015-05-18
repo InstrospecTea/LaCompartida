@@ -76,12 +76,22 @@ if ($id_documento) {
 	if (Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
 		$id_solicitud_adelanto = $documento->fields['id_solicitud_adelanto'];
 	}
+
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false;
 
 	if ($id_cobro) {
 		$monto_usado = $documento->MontoUsadoAdelanto($id_cobro);
 	}
+
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false;
+
+	if (empty($cifras_decimales)) {
+		// buscar la cantida de decimales de la moneda que tiene el documento
+		$Moneda = new Moneda($sesion);
+		$Moneda->Load($documento->fields['id_moneda']);
+		$cifras_decimales = $Moneda->fields['cifras_decimales'];
+		unset($Moneda);
+	}
 }
 
 if ($codigoSecundario && $codigo_cliente_secundario != '') {

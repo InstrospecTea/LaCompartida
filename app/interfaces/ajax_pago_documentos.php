@@ -77,6 +77,7 @@ $query = "SELECT
 	documento.saldo_gastos,
 	documento.honorarios_pagados,
 	documento.gastos_pagados,
+	documento.glosa_documento,
 	IF (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO', 0, 1) as pagado,
 
 	{$orden_docs}
@@ -218,7 +219,7 @@ function DescripcionHonorariosGastos(&$fila) {
 
 	// Gastos
 	$monto_total = Valor_Monto_Gastos($fila);
-	$html .= "Gastos: {$fila->fields['simbolo']} {$monto_total}";
+	$html .= " Gastos: {$fila->fields['simbolo']} {$monto_total}";
 
 	$cambio = obtenerTiposCambios($fila);
 
@@ -278,7 +279,7 @@ function Pago_Honorarios(&$fila) {
 
 	if ($neteo_documento->Ids($id_documento, $fila->fields['id_documento'])) {
 		$valor_neteo = $neteo_documento->fields['valor_pago_honorarios'];
-		$valor = conversorMoneda($valor_neteo, $cambio['cobro'], $cambio['pago'], $decimales);
+		$valor = $valor_neteo;
 		$valor = formatoNumero($valor, $decimales, '');
 	} else if($id_cobro === $fila->fields['id_cobro'] && !$id_documento) {
 		$valor = $saldo;
@@ -346,7 +347,7 @@ function Pago_Gastos(&$fila) {
 
 	if ($neteo_documento->Ids($id_documento, $fila->fields['id_documento'])) {
 		$valor_neteo = $neteo_documento->fields['valor_pago_gastos'];
-		$valor = conversorMoneda($valor_neteo, $cambio['cobro'], $cambio['pago'], $decimales);
+		$valor = $valor_neteo;
 		$valor = formatoNumero($valor, $decimales, '');
 	} else if ($id_cobro === $fila->fields['id_cobro'] && !$id_documento) {
 		$valor = $saldo;
