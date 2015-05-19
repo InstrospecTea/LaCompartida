@@ -909,7 +909,9 @@ $Form->defaultLabel = false;
 					echo '<input type="hidden" id="id_moneda" name="id_moneda" value="' . $id_moneda . '" >';
 				}
 
-				echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", $currency_input_id, $id_moneda, $currency_input_attributes, '', '80');
+				$currency_input_attributes .= ' id="' . $currency_input_id . '"';
+
+				echo Html::SelectArray(Moneda::GetMonedas($sesion), $currency_input_id, $id_moneda, $currency_input_attributes, '', "80px");
 				?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
@@ -1170,13 +1172,16 @@ $Form->defaultLabel = false;
 				button: "img_fecha"		// ID of the button
 			}
 	);
-	Calendar.setup(
+
+	if (jQuery('#fecha_pago').length > 0) {
+		Calendar.setup(
 			{
 				inputField: "fecha_pago", // ID of the input field
 				ifFormat: "%d-%m-%Y", // the date format
 				button: "img_fecha_pago"		// ID of the button
 			}
-	);
+		);
+	}
 </script>
 <?php
 echo $Form->script();
