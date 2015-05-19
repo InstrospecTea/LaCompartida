@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.9.3
+Tuesday 2015, May 19th.
+* **Fix:** [Fix mass time entry edition when using secondary codes](https://github.com/LemontechSA/ttb/issues/963)
+
+## Hotfix 15.9.2
+Monday 2015, May 18th.
+* **Fix:** [Change the way of how show the amount of previous payments](https://github.com/LemontechSA/ttb/issues/962)
+
 ## Hotfix 15.9.1
 Thursday 2015, May 14th.
 * **Feature:** [Add the CLIENT_MATTER_ID on the adjustment line of the LEDES file](https://github.com/LemontechSA/ttb/issues/961)
