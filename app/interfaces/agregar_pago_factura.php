@@ -900,7 +900,16 @@ $Form->defaultLabel = false;
 								'onchange' => 'MontoValido(this.id); ActualizarMontoMonedaCobro();'
 						)
 				);
-				echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"', '', "80");
+
+				$currency_input_id = 'id_moneda';
+				$currency_input_attributes = 'onchange="ActualizarMontoMonedaCobro()"';
+				if (!is_null($id_factura_pago)) {
+					$currency_input_id = 'id_moneda_disabled';
+					$currency_input_attributes .= ' disabled';
+					echo '<input type="hidden" id="id_moneda" name="id_moneda" value="' . $id_moneda . '" >';
+				}
+
+				echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", $currency_input_id, $id_moneda, $currency_input_attributes, '', '80');
 				?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
