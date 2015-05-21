@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.9.4
+Wednesday 2015, May 20th.
+* **Fix:** [Fix wrong assignment for $contrato_nuevo in agregar_asunto](https://github.com/LemontechSA/ttb/issues/964)
+
 ## Hotfix 15.9.3
 Tuesday 2015, May 19th.
 * **Fix:** [Fix mass time entry edition when using secondary codes](https://github.com/LemontechSA/ttb/issues/963)
