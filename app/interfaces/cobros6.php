@@ -1053,7 +1053,7 @@ if (count($cobro->asuntos)) {
 
 			if (opcion == 'imprimir') {
 				<?php if (Conf::GetConf($sesion, 'ImprimirFacturaPdf') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
-						nuovaFinestra('Imprimir_Factura',800,600,'agregar_factura.php?opc=generar_factura&id_cobro=<?php echo $id_cobro ?>&id_factura='+id_factura, 'top=500, left=500, scrollbars=yes');
+						nuovaFinestra('Imprimir_Factura',800,690,'agregar_factura.php?opc=generar_factura&id_cobro=<?php echo $id_cobro ?>&id_factura='+id_factura, 'top=500, left=500, scrollbars=yes');
 						//ValidarTodo(form);
 				<?php } else { ?>
 						form.opc.value='grabar_documento_factura';
@@ -1295,7 +1295,7 @@ if (count($cobro->asuntos)) {
             }
         }
 
-        nuovaFinestra('Agregar_Factura',800, 610, '<?php echo $url_agregar_factura; ?>' +
+        nuovaFinestra('Agregar_Factura',800, 690, '<?php echo $url_agregar_factura; ?>' +
             '&honorario=' + honorarios +
             '&gastos_con_iva=' + gastos_con_impuestos +
             '&gastos_sin_iva=' + gastos_sin_impuestos +
@@ -1623,12 +1623,12 @@ if (Conf::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
 															<?php if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 																  echo __('Factura N°') .": <input name='documento' size='5' value='". $cobro->fields['documento'] ."'>";
 																  if (Conf::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
-																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,600,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155, scrollbars=yes');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
+																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,690,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155, scrollbars=yes');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
 																	<?php }
 																 } else {
 																  echo __('Factura N°') .": <input name='documento' size='5' value='". $cobro->fields['documento'] ."'>";
 																  if (Conf::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
-																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,600,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155, scrollbars=yes');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
+																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,690,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155, scrollbars=yes');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
 			<?php } ?>
 													<?php } ?>
 														</td>
