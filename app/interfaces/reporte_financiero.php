@@ -148,17 +148,9 @@ $meses_corto = array(
 				<?php echo __('Moneda') ?>
 			</td>
 			<td align="left">
-				<select name="moneda_visualizacion" id="moneda_visualizacion">
 					<?php
-					$query = "SELECT id_moneda, glosa_moneda FROM prm_moneda;";
-					$resp = mysql_query($query, $sesion->dbh);
-					while($moneda = mysql_fetch_assoc($resp)){
-						$id_moneda = $moneda['id_moneda'];
-						$glosa_moneda = $moneda['glosa_moneda'];
-						echo "<option value=\"$id_moneda\">$glosa_moneda</option>\n";
-					}
+					echo Html::SelectArray(Moneda::GetMonedas($sesion), "moneda_visualizacion", "", 'id="moneda_visualizacion"', '', "80px");
 					?>
-				</select>
 			</td>
 		</tr>
 		<tr>
