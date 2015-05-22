@@ -22,7 +22,7 @@ if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
 	exit;
 }
 
-$query = "SELECT id_moneda, simbolo, cifras_decimales FROM prm_moneda WHERE moneda_base=1";
+$query = "SELECT id_moneda, simbolo, cifras_decimales FROM prm_moneda WHERE id_moneda=$moneda_visualizacion";
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp);
 

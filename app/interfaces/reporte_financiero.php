@@ -144,6 +144,24 @@ $meses_corto = array(
 			</td>
 		</tr>
 		<tr>
+			<td align="right">
+				<?php echo __('Moneda') ?>
+			</td>
+			<td align="left">
+				<select name="moneda_visualizacion" id="moneda_visualizacion">
+					<?php
+					$query = "SELECT id_moneda, glosa_moneda FROM prm_moneda;";
+					$resp = mysql_query($query, $sesion->dbh);
+					while($moneda = mysql_fetch_assoc($resp)){
+						$id_moneda = $moneda['id_moneda'];
+						$glosa_moneda = $moneda['glosa_moneda'];
+						echo "<option value=\"$id_moneda\">$glosa_moneda</option>\n";
+					}
+					?>
+				</select>
+			</td>
+		</tr>
+		<tr>
 			<td align=right colspan=2>
 				<input type=hidden name='opc' value='reporte'>
 				<?php echo $Form->submit(__('Generar reporte')); ?>
