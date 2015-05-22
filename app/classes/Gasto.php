@@ -299,39 +299,32 @@ class Gasto extends Objeto {
 		}
 		$where = 1;
 		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
-			if ($request['codigo_cliente_secundario']) {
-				$where .= " AND cliente.codigo_cliente_secundario = '{$request['codigo_cliente_secundario']}'";
-				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigoSecundario($request['codigo_cliente_secundario']);
-
-				if ($request['codigo_asunto_secundario']) {
-					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigoSecundario($request['codigo_asunto_secundario']);
-					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
-					$asuntos_list_secundario = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list_secundario, $codigo);
-					}
-					$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
+			if (!empty($request['codigo_asunto_secundario'])) {
+				$asunto = new Asunto($this->sesion);
+				$asunto->LoadByCodigoSecundario($request['codigo_asunto_secundario']);
+				$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
+				$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+				$asuntos_list_secundario = array();
+				while (list($codigo) = mysql_fetch_array($resp)) {
+					array_push($asuntos_list_secundario, $codigo);
 				}
+				$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
+			} else if (!empty($request['codigo_cliente_secundario'])) {
+				$where .= " AND cliente.codigo_cliente_secundario = '{$request['codigo_cliente_secundario']}'";
 			}
 		} else {
-			if (!empty($request['codigo_cliente'])) {
-				$where .= " AND cta_corriente.codigo_cliente = '{$request['codigo_cliente']}'";
-				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigo($request['codigo_cliente']);
-				if (!empty($request['codigo_asunto'])) {
-					$asunto = new Asunto($this->sesion);
-					$asunto->LoadByCodigo($request['codigo_asunto']);
-					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
-					$asuntos_list = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list, $codigo);
-					}
-					$lista_asuntos = implode("','", $asuntos_list);
+			if (!empty($request['codigo_asunto'])) {
+				$asunto = new Asunto($this->sesion);
+				$asunto->LoadByCodigo($request['codigo_asunto']);
+				$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
+				$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+				$asuntos_list = array();
+				while (list($codigo) = mysql_fetch_array($resp)) {
+					array_push($asuntos_list, $codigo);
 				}
+				$lista_asuntos = implode("','", $asuntos_list);
+			} else if (!empty($request['codigo_cliente'])) {
+				$where .= " AND cta_corriente.codigo_cliente = '{$request['codigo_cliente']}'";
 			}
 		}
 
