@@ -299,12 +299,6 @@ class Gasto extends Objeto {
 		}
 		$where = 1;
 		if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
-			if (!empty($request['codigo_cliente_secundario'])) {
-				$where .= " AND cliente.codigo_cliente_secundario = '{$request['codigo_cliente_secundario']}'";
-				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigoSecundario($request['codigo_cliente_secundario']);
-			}
-
 			if (!empty($request['codigo_asunto_secundario'])) {
 				$asunto = new Asunto($this->sesion);
 				$asunto->LoadByCodigoSecundario($request['codigo_asunto_secundario']);
@@ -315,14 +309,10 @@ class Gasto extends Objeto {
 					array_push($asuntos_list_secundario, $codigo);
 				}
 				$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
+			} else if (!empty($request['codigo_cliente_secundario'])) {
+				$where .= " AND cliente.codigo_cliente_secundario = '{$request['codigo_cliente_secundario']}'";
 			}
 		} else {
-			if (!empty($request['codigo_cliente'])) {
-				$where .= " AND cta_corriente.codigo_cliente = '{$request['codigo_cliente']}'";
-				$cliente = new Cliente($this->sesion);
-				$cliente->LoadByCodigo($request['codigo_cliente']);
-			}
-
 			if (!empty($request['codigo_asunto'])) {
 				$asunto = new Asunto($this->sesion);
 				$asunto->LoadByCodigo($request['codigo_asunto']);
@@ -333,6 +323,8 @@ class Gasto extends Objeto {
 					array_push($asuntos_list, $codigo);
 				}
 				$lista_asuntos = implode("','", $asuntos_list);
+			} else if (!empty($request['codigo_cliente'])) {
+				$where .= " AND cta_corriente.codigo_cliente = '{$request['codigo_cliente']}'";
 			}
 		}
 
