@@ -177,7 +177,7 @@ HTML;
 		$img_dir  = Conf::ImgDir();
 
 		$html = <<<HTML
-			<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 800, 690, 'agregar_factura.php?id_factura={$datos_factura['id_factura']}&popup=1&id_cobro={$datos_factura['id_cobro']}', 'top=100, left=155, scrollbars=yes');" ><img src='{$img_dir}/editar_on.gif' border="0" title="Editar"/></a>
+			<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 800, 745, 'agregar_factura.php?id_factura={$datos_factura['id_factura']}&popup=1&id_cobro={$datos_factura['id_cobro']}', 'top=100, left=155, scrollbars=yes');" ><img src='{$img_dir}/editar_on.gif' border="0" title="Editar"/></a>
 HTML;
 
 		if (Conf::GetConf($Factura->sesion, 'ImprimirFacturaDoc')) {
