@@ -2368,15 +2368,46 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 										list($ultimo_cobro) = mysql_fetch_array($resp);
 										?>
+
+										<script type="text/javascript">
+											var toggleVisibilityOtherInterval;
+											var to;
+											var updateErrandRate;
+											var listIncludedErrands;
+
+											jQuery('document').ready(function () {
+												toggleVisibilityOther = function (sender, id) {
+													var j_other = jQuery('#' + id);
+													var j_sender = jQuery(sender);
+													if (j_sender.val() == -1) {
+														//j_other.attr('disabled', false);
+														j_sender.attr('disabled', true);
+														j_other.show();
+
+													} else {
+														j_sender.attr('disabled', false);
+														j_other.hide();
+													}
+												};
+											});
+										</script>
+
 										<table width="100%">
 											<tr>
 												<td align="right" width="30%">
 													<?php echo __('Generar ') . __('Cobros') . __(' a partir del') ?>
 												</td>
 												<td align="left">
-													<input type="text" name="periodo_fecha_inicio" value="<?php echo $fecha_ini ?>" id="periodo_fecha_inicio" size="11" maxlength="10" />
-													<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_periodo_fecha_inicio" style="cursor:pointer" />
-													&nbsp;<?php echo $ultimo_cobro ? '<span style="font-size:10px">' . __('Fecha último cobro emitido:') . ' ' . Utiles::sql2date($ultimo_cobro) . '</span>' : '' ?>
+													<input type="text" name="periodo_fecha_inicio" id="periodo_fecha_inicio"
+														size="11" maxlength="10" value="<?php echo $fecha_ini ?>" />
+													<img src="<?php echo Conf::ImgDir() ?>/calendar.gif"
+														id="img_periodo_fecha_inicio" style="cursor:pointer" />
+													&nbsp;
+													<?php if ($ultimo_cobro) { ?>
+														<span style="font-size:10px">
+															<?php echo __('Fecha último cobro emitido:') . ' ' . Utiles::sql2date($ultimo_cobro); ?>
+														</span>
+													<?php } ?>
 												</td>
 											</tr>
 											<tr>
@@ -2386,39 +2417,53 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												<td align="left" style="vertical-align: middle;">
 													<?php
 													$intervalos_disponibles = array(
-														'0' => 'Seleccione un intervalo',
 														'1' => '1 ' . __('Mes'),
+														'2' => '2 ' . __('Meses'),
 														'3' => '3 ' . __('Meses'),
+														'4' => '4 ' . __('Meses'),
 														'6' => '6 ' . __('Meses'),
-														'12' => '1 ' . __('Año'),
-														'-1' => __('Otro')
+														'12' => '1 ' . __('Año')/*,
+														'-1' => __('Otro')*/
 													);
 
 													$repeticiones_disponibles = array(
 														'0' => __('Indefinidamente'),
-														'1' => __('1 período'),
-														'2' => __('2 períodos'),
-														'3' => __('3 períodos'),
-														'4' => __('4 períodos'),
-														'5' => __('5 períodos'),
-														'-1' => __('Otro')
+														'1' => __('Por 1 período'),
+														'2' => __('Por 2 períodos'),
+														'3' => __('Por 3 períodos'),
+														'4' => __('Por 4 períodos'),
+														'5' => __('Por 5 períodos')/*,
+														'-1' => __('Otro')*/
+													);
+
+													echo Html::SelectArrayDecente(
+														$intervalos_disponibles,
+														'periodo_intervalo',
+														$contrato->fields['periodo_intervalo'],
+														'onChange="toggleVisibilityOther(this, \'periodic_billing_interval_other\')"'
 													);
 													?>
-													<?php echo Html::SelectArrayDecente($intervalos_disponibles, 'periodo_intervalo', $contrato->fields['periodo_intervalo']); ?>
 													&nbsp;
-													<?php echo __('durante'); ?>
+													<span id="periodic_billing_interval_other" style="display: none">
+														<input type="text" name="periodo_intervalo2" size="3" maxlength="2"
+															value="<?php echo $contrato->fields['periodo_intervalo']; ?>" />
+														<?php echo __('meses'); ?>
+													</span>
+													<?php __('durante'); ?>
 													&nbsp;
-													<?php echo Html::SelectArrayDecente($repeticiones_disponibles, 'periodo_repeticiones', $contrato->fields['periodo_repeticiones']); ?>
-												</td>
-											</tr>
-											<tr>
-												<td>&nbsp;</td>
-												<td>
-													<label>
-														<input type="hidden" name="emitir_liquidacion_al_generar" value="0" />
-														<input type="checkbox" name="emitir_liquidacion_al_generar" value="1" <?php echo $contrato->fields['emitir_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
-														<?php echo __('Emitir la liquidación al generar'); ?>
-													</label>
+													<?php
+													echo Html::SelectArrayDecente(
+														$repeticiones_disponibles,
+														'periodo_repeticiones',
+														$contrato->fields['periodo_repeticiones'],
+														'onChange="toggleVisibilityOther(this, \'periodic_billing_repeat_other\')"'
+													);
+													?>
+													<span id="periodic_billing_repeat_other" style="display: none">
+														<input type="text" name="periodo_repeticiones2" size="3" maxlength="2"
+															value="<?php echo $contrato->fields['periodo_repeticiones']; ?>"/>
+														<?php echo __('veces'); ?>
+													</span>
 												</td>
 											</tr>
 											<tr>
@@ -2426,7 +2471,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												<td>
 													<label>
 														<input type="hidden" name="enviar_liquidacion_al_generar" value="0" />
-														<input type="checkbox" name="enviar_liquidacion_al_generar" value="1" <?php echo $contrato->fields['enviar_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
+														<input type="checkbox" name="enviar_liquidacion_al_generar" value="1"
+															<?php echo $contrato->fields['enviar_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
 														<?php echo __('Enviar por Email esta liquidación al Cliente'); ?>
 													</label>
 												</td>
@@ -2581,6 +2627,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 														var errand = {};
 														var included_errands_html = '';
 														var included_errands_total = 0;
+														var included_errand_currency = '';
 
 														for (i = 0; i < included_errands.length; i++) {
 															errand = included_errands[i];
@@ -2592,14 +2639,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 																	+ '<td>' + errand.glosa_tramite + '</td>'
 																	+ '<td align="right">' + errand.simbolo_moneda + ' ' + errand.tarifa_tramite + '</td>'
 																	+ '<td align="center">'
-																	+	'	<img src="<?php echo Conf::ImgDir() ?>/menos.gif" style="cursor:pointer" onclick="removeIncludedErrand(' + errand.id_contrato_tramite + ');" />'
+																	+	'	<img src="<?php echo Conf::ImgDir() ?>/menos.gif" style="cursor:pointer"'
+																	+ ' onclick="removeIncludedErrand(' + errand.id_contrato_tramite + ');" />'
 																	+ '</td>'
 																+ '</tr>';
 
 															included_errands_html += errand_template;
 														}
 
-														included_errands_total = errand.simbolo_moneda + ' ' + included_errands_total.toFixed(2);
+														included_errand_currency = errand.simbolo_moneda || '';
+														included_errands_total = included_errand_currency + ' ' + included_errands_total.toFixed(2);
 
 														jQuery('#included_errands_list').html(included_errands_html);
 														jQuery('#included_errands_total').html(included_errands_total);
@@ -2617,7 +2666,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 															<td width="15%">&nbsp;</td>
 															<td>
 																<strong><?php echo __('Trámites automáticos') ?></strong>
-																<em><?php echo __('(estos trámites se incluirán automáticamente en la nueva liquidación generada)'); ?></em>
+																<em>
+																	<?php echo __('(estos trámites se incluirán automáticamente en la nueva liquidación generada)'); ?>
+																</em>
 															</td>
 														</tr>
 													</table>
@@ -2637,11 +2688,23 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 														</tbody>
 														<tfoot>
 															<tr>
-																<td><?php echo Html::SelectArrayDecente($TramiteTipo->Listar('ORDER BY glosa_tramite'), 'included_errand_type_id', '', 'onChange="updateErrandRate(this);"', 'Seleccione un trámite', '320px'); ?></td>
+																<td>
+																	<?php
+																	echo Html::SelectArrayDecente(
+																		$TramiteTipo->Listar('ORDER BY glosa_tramite'),
+																		'included_errand_type_id',
+																		'',
+																		'onChange="updateErrandRate(this);"',
+																		'Seleccione un trámite',
+																		'320px'
+																	);
+																	?>
+																</td>
 																<td align="right" id="included_errand_value">
 																</td>
 																<td align="center">
-																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas" style="cursor:pointer" onclick="addIncludedErrand();" />
+																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas"
+																		style="cursor:pointer" onclick="addIncludedErrand();" />
 																</td>
 															</tr>
 															<tr>
@@ -2656,7 +2719,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										</table>
 									<?php
 									} else {
-										echo $Html->alert('El contrato debe tener asuntos asociados para generar ' . __('Cobros Programados'), '', array('class' => 'alert-thin'));
+										echo $Html->alert(
+											'El contrato debe tener asuntos asociados para generar ' . __('Cobros Programados'),
+											'',
+											array('class' => 'alert-thin')
+										);
 									}
 									?>
 								</div>
@@ -3217,7 +3284,7 @@ echo $Form->script();
 		?>
 	}
 
-	if (jQuery('#periodo_fecha_inicio').val()) {
+	if (jQuery('#periodo_fecha_inicio').length > 0) {
 		Calendar.setup({
 			inputField	: "periodo_fecha_inicio",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
@@ -3225,11 +3292,13 @@ echo $Form->script();
 		});
 	}
 
-	Calendar.setup({
-		inputField	: "fecha_inicio_cap",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_inicio_cap"		// ID of the button
-	});
+	if (jQuery('#fecha_inicio_cap').length > 0) {
+		Calendar.setup({
+			inputField	: "fecha_inicio_cap",				// ID of the input field
+			ifFormat		: "%d-%m-%Y",			// the date format
+			button			: "img_fecha_inicio_cap"		// ID of the button
+		});
+	}
 
 	$$('[id^="hito_fecha_"]').each(function(elem){
 		Calendar.setup({

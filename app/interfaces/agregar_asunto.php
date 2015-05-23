@@ -79,9 +79,11 @@ if ($id_asunto > 0) {
 
 if ($codigo_cliente != '' && !$Cliente->Loaded()) {
 	$Cliente->LoadByCodigo($codigo_cliente);
-	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
-		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
-		$Cliente->LoadByCodigo($codigo_cliente);
+	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+		$loaded = $Cliente->LoadByCodigoSecundario($codigo_cliente);
+	} else {
+		$loaded = $Cliente->LoadByCodigo($codigo_cliente);
+	}
 
 	if ($loaded) {
 		$codigo_cliente = $Cliente->fields['codigo_cliente'];
@@ -125,7 +127,7 @@ if ($opcion == 'guardar') {
 		if ($As->Loaded()) {
 			$enviar_mail = 0;
 		}
-                
+
 		if (!$Asunto->Loaded() || !$codigo_asunto) {
 			if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
@@ -133,7 +135,7 @@ if ($opcion == 'guardar') {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 			}
 		}
-                
+
 		if (!$codigo_cliente_secundario) {
 			$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
 		}
@@ -156,21 +158,21 @@ if ($opcion == 'guardar') {
 			} else {
 				$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
 			}
-		}                                  
-                
+		}
+
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			$glosa_asunto = strtoupper($glosa_asunto);
 		}
-                
+
 		$Asunto->Edit("glosa_asunto", $glosa_asunto);
 		$Asunto->Edit("codigo_cliente", $codigo_cliente, true);
-                
+
 		if (Conf::GetConf($Sesion, 'ExportacionLedes')) {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		}
-                
+
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
-                
+
 		if (!empty($id_area_proyecto)) {
 			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
 		} else {
@@ -180,7 +182,7 @@ if ($opcion == 'guardar') {
 		if (!is_null($desglose_area)) {
 			$Asunto->Edit("desglose_area", $desglose_area);
 		}
-                
+
 		if (!is_null($giro)) {
 			$Asunto->Edit("giro", $giro);
 		}
@@ -203,7 +205,7 @@ if ($opcion == 'guardar') {
 		} else {
 			$Asunto->Edit("fecha_inactivo", '', true);
 		}
-                
+
 		$Asunto->Edit("cobrable", intval($cobrable), true);
 		$Asunto->Edit("mensual", $mensual ? "SI" : "NO");
 		$Asunto->Edit("alerta_hh", $asunto_alerta_hh);
@@ -212,7 +214,7 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("limite_monto", $asunto_limite_monto);
 
 		if ($cobro_independiente) {
-			#CONTRATO
+			// CONTRATO
 			if ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) {
 				$contrato->Load($Asunto->fields['id_contrato']);
 			} else if ($Asunto->fields['id_contrato_indep'] > 0 && ($Asunto->fields['id_contrato_indep'] != $Cliente->fields['id_contrato'])) {
@@ -250,14 +252,15 @@ if ($opcion == 'guardar') {
 
 			if ($contrato->Write()) {
 
-				#Subiendo Archivo
+				// Subiendo Archivo
 				if (!empty($archivo_data)) {
 					$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
 					$archivo->Edit('descripcion', $descripcion);
 					$archivo->Edit('archivo_data', $archivo_data);
 					$archivo->Write();
 				}
-				#cobro pendiente
+
+				// Cobro pendiente
 				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 					$CobroPendiente = new CobroPendiente($Sesion);
@@ -270,15 +273,15 @@ if ($opcion == 'guardar') {
 
 				foreach (array_keys($hito_fecha) as $i) {
 					if (!empty($hito_monto_estimado[$i])) {
-                                            $CobroPendiente = new CobroPendiente($Sesion);
-                                            $CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-                                            $CobroPendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-                                            $CobroPendiente->Edit("descripcion", $hito_descripcion[$i]);
-                                            $CobroPendiente->Edit("observaciones", $hito_observaciones[$i]);
-                                            $CobroPendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-                                            $CobroPendiente->Edit("hito", '1');
-                                            $CobroPendiente->Write();                                            
-                                        }
+						$CobroPendiente = new CobroPendiente($Sesion);
+						$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+						$CobroPendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
+						$CobroPendiente->Edit("descripcion", $hito_descripcion[$i]);
+						$CobroPendiente->Edit("observaciones", $hito_observaciones[$i]);
+						$CobroPendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
+						$CobroPendiente->Edit("hito", '1');
+						$CobroPendiente->Write();
+					}
 				}
 
 				$Asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
@@ -290,23 +293,23 @@ if ($opcion == 'guardar') {
 						if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
 							continue;
 						}
-                                                
+
 						$ContratoDocumentoLegal = new ContratoDocumentoLegal($Sesion);
 						$ContratoDocumentoLegal->Edit('id_contrato', $contrato->fields['id_contrato']);
 						$ContratoDocumentoLegal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-                                                
+
 						if (!empty($doc_legal['honorario'])) {
 							$ContratoDocumentoLegal->Edit('honorarios', 1);
 						}
-                                                
+
 						if (!empty($doc_legal['gastos_con_iva'])) {
 							$ContratoDocumentoLegal->Edit('gastos_con_impuestos', 1);
 						}
-                                                
+
 						if (!empty($doc_legal['gastos_sin_iva'])) {
 							$ContratoDocumentoLegal->Edit('gastos_sin_impuestos', 1);
 						}
-                                                
+
 						$ContratoDocumentoLegal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
 						$ContratoDocumentoLegal->Write();
 					}
@@ -315,35 +318,35 @@ if ($opcion == 'guardar') {
 				$Pagina->AddError($contrato->error);
 			}
 		} else {
-			$Contrato_indep = $Asunto->fields['id_contrato_indep'];                        
+			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 			$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
 			$Asunto->Edit("id_contrato_indep", null);
-		}                
-                
-                $existeCodigoAsuntoSecundario = false;
-                if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
-                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
-                } else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
-                    $existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
-                }
-                
-                if ($existeCodigoAsuntoSecundario) {
-                    $Pagina->AddError(sprintf(__("El código de %s secundario ingresado ya está siendo utilizado por otro %s"), __('asunto'), __('asunto')));
-                } else {
-                    if ($Asunto->Write()) {
-                            $Asunto->writeAreaDetails($id_desglose_area);
-                            $Asunto->writeEconomicActivities($id_asunto_giro);
-                            $Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
-                            
-                            if ($Asunto->fields['id_contrato_indep'] === null && isset($Contrato_indep)) {
-				$ContratoObj = new Contrato($Sesion);
-				$ContratoObj->Load($Contrato_indep);
-				$ContratoObj->Eliminar();                                
-                            }
-                    } else {
-                            $Pagina->AddError($Asunto->error);
-                    }                        
-                }     
+		}
+
+		$existeCodigoAsuntoSecundario = false;
+		if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+			$existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
+		} else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+			$existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
+		}
+
+		if ($existeCodigoAsuntoSecundario) {
+			$Pagina->AddError(sprintf(__("El código de %s secundario ingresado ya está siendo utilizado por otro %s"), __('asunto'), __('asunto')));
+		} else {
+			if ($Asunto->Write()) {
+				$Asunto->writeAreaDetails($id_desglose_area);
+				$Asunto->writeEconomicActivities($id_asunto_giro);
+				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+
+				if ($Asunto->fields['id_contrato_indep'] === null && isset($Contrato_indep)) {
+					$ContratoObj = new Contrato($Sesion);
+					$ContratoObj->Load($Contrato_indep);
+					$ContratoObj->Eliminar();
+				}
+			} else {
+				$Pagina->AddError($Asunto->error);
+			}
+		}
 
 		$MailAsuntoNuevo = Conf::GetConf($Sesion, 'MailAsuntoNuevo');
 
@@ -723,10 +726,10 @@ function MuestraPorValidacion(divID) {
 								<?php echo $SelectHelper->checkboxes(
 										'id_desglose_area',
 										array(),
-									 	$Asunto->getAreaDetails(),
-									 	array('class' => 'span6', 'style' => 'display:inline'),
-									 	array(
-										 	'autoload' => false,
+										$Asunto->getAreaDetails(),
+										array('class' => 'span6', 'style' => 'display:inline'),
+										array(
+											'autoload' => false,
 											'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
 											'onSource' => '
 												source = source + "&q=id_area_proyecto:" + jQuery("#id_area_proyecto").val();
@@ -769,10 +772,10 @@ function MuestraPorValidacion(divID) {
 								<?php echo $SelectHelper->checkboxes(
 										'id_asunto_giro',
 										array(),
-									 	$Asunto->getEconomicActivities(),
-									 	array('class' => 'span6', 'style' => 'display:inline'),
-									 	array(
-										 	'autoload' => true,
+										$Asunto->getEconomicActivities(),
+										array('class' => 'span6', 'style' => 'display:inline'),
+										array(
+											'autoload' => true,
 											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
 											'onChange' => '
 												var element = selected_id_asunto_giro;
@@ -897,15 +900,14 @@ function MuestraPorValidacion(divID) {
 
 				<br/>
 				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-					<?php 
-                                            if (!$Sesion->usuario->Es('SASU')) {
-                                                $contrato_nuevo = (boolean)$Asunto->fields['id_contrato_indep'] && ($id_asunto > 0);
-						$cliente = &$Cliente;
-						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
-                                            } 
-                                        ?>
+					<?php
+						if (!$Sesion->usuario->Es('SASU')) {
+							$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
+							$cliente = &$Cliente;
+							require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
+						}
+					?>
 				</div>
-
 				<br/>
 				<fieldset class="border_plomo tb_base">
 					<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>

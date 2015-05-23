@@ -60,16 +60,16 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 			$this->overrideDocument();
 
-			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
+			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			$CobroAsunto = new CobroAsunto($this->sesion);

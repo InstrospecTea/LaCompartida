@@ -1903,30 +1903,45 @@ if (!class_exists('Cobro')) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
-			$contrato = new Contrato($this->sesion, '', '', 'contrato', 'id_contrato');
-			if ($contrato->Load($id_contrato)) {
-				#Se elimina el borrador actual si es que existe
-				$contrato->EliminarBorrador($incluye_gastos, $incluye_honorarios);
+			$Contrato = new Contrato($this->sesion);
 
-				$hito = 0;
-				if (!empty($id_cobro_pendiente)) {
-					$query = "SELECT fecha_cobro, monto_estimado, hito FROM cobro_pendiente WHERE id_cobro_pendiente='$id_cobro_pendiente'";
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($fecha_hito, $monto_hito, $hito) = mysql_fetch_array($resp);
-					if ($hito) {
+			if ($Contrato->Load($id_contrato)) {
+				// Se elimina el borrador actual si es que existe
+				$Contrato->EliminarBorrador($incluye_gastos, $incluye_honorarios);
+
+				$es_cobro_hito = false;
+				$es_cobro_pendiente = !empty($id_cobro_pendiente);
+
+				if ($es_cobro_pendiente) {
+					$CobroPendiente = new CobroPendiente($this->sesion);
+					$CobroPendiente->Load($id_cobro_pendiente);
+
+					$es_cobro_hito = $CobroPendiente->fields['hito'] == '1';
+					if ($es_cobro_hito) {
+						// $query = "SELECT fecha_cobro, monto_estimado, hito FROM cobro_pendiente WHERE id_cobro_pendiente='$id_cobro_pendiente'";
+						// $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+						// list($fecha_hito, $monto_hito, $hito) = mysql_fetch_array($resp);
+						// if ($hito) {
+						// 	$emitir_obligatoriamente = true;
+						// } else {
+						// 	$fecha_fin = $fecha_hito;
+						// }
 						$emitir_obligatoriamente = true;
 					} else {
-						$fecha_fin = $fecha_hito;
+						// TODO: Esto debería ser siempre no?
+						$fecha_fin = $CobroPendiente->fields['fecha_cobro'];
 					}
 				}
 
-				//si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
+				// Si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
 				$genera = $emitir_obligatoriamente;
+
+				// TODO: Entender esto!
 				if (!$genera) {
-					$wip = $contrato->ProximoCobroEstimado($fecha_ini, $fecha_fin, $contrato->fields['id_contrato']);
+					$wip = $Contrato->ProximoCobroEstimado($fecha_ini, $fecha_fin, $Contrato->fields['id_contrato']);
 
 					if (!empty($incluye_honorarios)) {
-						if ($wip[0] > 0 || $contrato->fields['forma_cobro'] != 'TASA' && $contrato->fields['forma_cobro'] != 'CAP') {
+						if ($wip[0] > 0 || $Contrato->fields['forma_cobro'] != 'TASA' && $Contrato->fields['forma_cobro'] != 'CAP') {
 							$genera = true;
 						}
 						if ($wip[1] > 0) { //si tiene trámites
@@ -1941,11 +1956,12 @@ if (!class_exists('Cobro')) {
 				}
 
 				if ($genera) {
+					$Moneda = new Moneda($this->sesion);
+					$Moneda->Load($Contrato->fields['id_moneda']);
 
 					$moneda_base = Utiles::MonedaBase($this->sesion);
-					$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-					$moneda->Load($contrato->fields['id_moneda']);
 
+					// TODO: ENTENDER ESTO!
 					if ((Conf::GetConf($this->sesion, 'LoginDesdeSitio') && !$this->sesion->usuario->fields['id_usuario']) || !$this->sesion->usuario->fields['id_usuario']) {
 
 						if (Conf::GetConf($this->sesion, 'TieneTablaVisitante')) {
@@ -1957,112 +1973,119 @@ if (!class_exists('Cobro')) {
 						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 						list($id_usuario_cobro) = mysql_fetch_array($resp);
 
-						$this->Edit('id_usuario', $id_usuario_cobro);
+
 					} else {
-						$this->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+						$id_usuario_cobro = $this->sesion->usuario->fields['id_usuario'];
 					}
 
-					$this->Edit('codigo_cliente', $contrato->fields['codigo_cliente']);
-					$this->Edit('id_contrato', $contrato->fields['id_contrato']);
-					$this->Edit('id_moneda', $contrato->fields['id_moneda']);
-					$this->Edit('tipo_cambio_moneda', $moneda->fields['tipo_cambio']);
-					$this->Edit('forma_cobro', $hito ? 'FLAT FEE' : $contrato->fields['forma_cobro']);
-					$this->Edit('id_estudio', $contrato->fields['id_estudio']);
+					$this->Edit('id_usuario', $id_usuario_cobro);
+
+					$this->Edit('codigo_cliente', $Contrato->fields['codigo_cliente']);
+					$this->Edit('id_contrato', $Contrato->fields['id_contrato']);
+					$this->Edit('id_moneda', $Contrato->fields['id_moneda']);
+					$this->Edit('tipo_cambio_moneda', $Moneda->fields['tipo_cambio']);
+
+					$forma_cobro = $es_cobro_hito ? 'FLAT FEE' : $Contrato->fields['forma_cobro'];
+					$this->Edit('forma_cobro', $forma_cobro);
+
+					$this->Edit('id_estudio', $Contrato->fields['id_estudio']);
+
 					// Pasar configuración de escalonadas ...
-					$this->Edit('esc1_tiempo', $contrato->fields['esc1_tiempo']);
-					$this->Edit('esc1_id_tarifa', $contrato->fields['esc1_id_tarifa']);
-					$this->Edit('esc1_monto', $contrato->fields['esc1_monto']);
-					$this->Edit('esc1_id_moneda', $contrato->fields['esc1_id_moneda']);
-					$this->Edit('esc1_descuento', $contrato->fields['esc1_descuento']);
+					$this->Edit('esc1_tiempo', $Contrato->fields['esc1_tiempo']);
+					$this->Edit('esc1_id_tarifa', $Contrato->fields['esc1_id_tarifa']);
+					$this->Edit('esc1_monto', $Contrato->fields['esc1_monto']);
+					$this->Edit('esc1_id_moneda', $Contrato->fields['esc1_id_moneda']);
+					$this->Edit('esc1_descuento', $Contrato->fields['esc1_descuento']);
 
-					$this->Edit('esc2_tiempo', $contrato->fields['esc2_tiempo']);
-					$this->Edit('esc2_id_tarifa', $contrato->fields['esc2_id_tarifa']);
-					$this->Edit('esc2_monto', $contrato->fields['esc2_monto']);
-					$this->Edit('esc2_id_moneda', $contrato->fields['esc2_id_moneda']);
-					$this->Edit('esc2_descuento', $contrato->fields['esc2_descuento']);
+					$this->Edit('esc2_tiempo', $Contrato->fields['esc2_tiempo']);
+					$this->Edit('esc2_id_tarifa', $Contrato->fields['esc2_id_tarifa']);
+					$this->Edit('esc2_monto', $Contrato->fields['esc2_monto']);
+					$this->Edit('esc2_id_moneda', $Contrato->fields['esc2_id_moneda']);
+					$this->Edit('esc2_descuento', $Contrato->fields['esc2_descuento']);
 
-					$this->Edit('esc3_tiempo', $contrato->fields['esc3_tiempo']);
-					$this->Edit('esc3_id_tarifa', $contrato->fields['esc3_id_tarifa']);
-					$this->Edit('esc3_monto', $contrato->fields['esc3_monto']);
-					$this->Edit('esc3_id_moneda', $contrato->fields['esc3_id_moneda']);
-					$this->Edit('esc3_descuento', $contrato->fields['esc3_descuento']);
+					$this->Edit('esc3_tiempo', $Contrato->fields['esc3_tiempo']);
+					$this->Edit('esc3_id_tarifa', $Contrato->fields['esc3_id_tarifa']);
+					$this->Edit('esc3_monto', $Contrato->fields['esc3_monto']);
+					$this->Edit('esc3_id_moneda', $Contrato->fields['esc3_id_moneda']);
+					$this->Edit('esc3_descuento', $Contrato->fields['esc3_descuento']);
 
-					$this->Edit('esc4_tiempo', $contrato->fields['esc4_tiempo']);
-					$this->Edit('esc4_id_tarifa', $contrato->fields['esc4_id_tarifa']);
-					$this->Edit('esc4_monto', $contrato->fields['esc4_monto']);
-					$this->Edit('esc4_id_moneda', $contrato->fields['esc4_id_moneda']);
-					$this->Edit('esc4_descuento', $contrato->fields['esc4_descuento']);
+					$this->Edit('esc4_tiempo', $Contrato->fields['esc4_tiempo']);
+					$this->Edit('esc4_id_tarifa', $Contrato->fields['esc4_id_tarifa']);
+					$this->Edit('esc4_monto', $Contrato->fields['esc4_monto']);
+					$this->Edit('esc4_id_moneda', $Contrato->fields['esc4_id_moneda']);
+					$this->Edit('esc4_descuento', $Contrato->fields['esc4_descuento']);
 
-					$this->Edit('observaciones', $contrato->fields['observaciones']);
+					$this->Edit('observaciones', $Contrato->fields['observaciones']);
 
-					//este es el monto fijo, pero si no se inclyen honorarios no va
-					$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
+					// Este es el monto fijo, pero si no se inclyen honorarios no va
+					$monto = empty($monto) ? $Contrato->fields['monto'] : $monto;
 
 					if (empty($incluye_honorarios)) {
 						$monto = '0';
 					}
-					if ($hito) {
-						$monto = $monto_hito;
+					if ($es_cobro_hito) {
+						$monto = $CobroPendiente->fields['monto_estimado'];
 					}
 
 					$this->Edit('monto_contrato', $monto);
-					$this->Edit('retainer_horas', $contrato->fields['retainer_horas']);
-					$this->Edit('retainer_usuarios', $contrato->fields['retainer_usuarios']);
+					$this->Edit('retainer_horas', $Contrato->fields['retainer_horas']);
+					$this->Edit('retainer_usuarios', $Contrato->fields['retainer_usuarios']);
 
-					#Opciones
-					$this->Edit('id_carta', $contrato->fields['id_carta']);
-					$this->Edit('id_formato', $contrato->fields['id_formato']);
-					$this->Edit("opc_ver_modalidad", $contrato->fields['opc_ver_modalidad']);
-					$this->Edit("opc_ver_profesional", $contrato->fields['opc_ver_profesional']);
-					$this->Edit("opc_ver_gastos", $contrato->fields['opc_ver_gastos']);
-					$this->Edit("opc_ver_concepto_gastos", $contrato->fields['opc_ver_concepto_gastos']);
-					$this->Edit("opc_ver_morosidad", $contrato->fields['opc_ver_morosidad']);
-					$this->Edit("opc_ver_resumen_cobro", $contrato->fields['opc_ver_resumen_cobro']);
-					$this->Edit("opc_ver_descuento", $contrato->fields['opc_ver_descuento']);
-					$this->Edit("opc_ver_tipo_cambio", $contrato->fields['opc_ver_tipo_cambio']);
-					$this->Edit("opc_ver_solicitante", $contrato->fields['opc_ver_solicitante']);
-					$this->Edit("opc_ver_numpag", $contrato->fields['opc_ver_numpag']);
-					$this->Edit("opc_ver_carta", $contrato->fields['opc_ver_carta']);
-					$this->Edit("opc_papel", $contrato->fields['opc_papel']);
-					$this->Edit("opc_restar_retainer", $contrato->fields['opc_restar_retainer']);
-					$this->Edit("opc_ver_detalle_retainer", $contrato->fields['opc_ver_detalle_retainer']);
-					$this->Edit("opc_ver_valor_hh_flat_fee", $contrato->fields['opc_ver_valor_hh_flat_fee']);
-					$this->Edit("opc_ver_detalles_por_hora_iniciales", $contrato->fields['opc_ver_detalles_por_hora_iniciales']);
-					$this->Edit("opc_ver_detalles_por_hora_categoria", $contrato->fields['opc_ver_detalles_por_hora_categoria']);
-					$this->Edit("opc_ver_detalles_por_hora_tarifa", $contrato->fields['opc_ver_detalles_por_hora_tarifa']);
-					$this->Edit("opc_ver_detalles_por_hora_importe", $contrato->fields['opc_ver_detalles_por_hora_importe']);
-					$this->Edit("opc_ver_detalles_por_hora", $contrato->fields['opc_ver_detalles_por_hora']);
-					$this->Edit("opc_ver_profesional_iniciales", $contrato->fields['opc_ver_profesional_iniciales']);
-					$this->Edit("opc_ver_profesional_categoria", $contrato->fields['opc_ver_profesional_categoria']);
-					$this->Edit("opc_ver_profesional_tarifa", $contrato->fields['opc_ver_profesional_tarifa']);
-					$this->Edit("opc_ver_profesional_importe", $contrato->fields['opc_ver_profesional_importe']);
+					// Opciones
+					$this->Edit('id_carta', $Contrato->fields['id_carta']);
+					$this->Edit('id_formato', $Contrato->fields['id_formato']);
+					$this->Edit("opc_ver_modalidad", $Contrato->fields['opc_ver_modalidad']);
+					$this->Edit("opc_ver_profesional", $Contrato->fields['opc_ver_profesional']);
+					$this->Edit("opc_ver_gastos", $Contrato->fields['opc_ver_gastos']);
+					$this->Edit("opc_ver_concepto_gastos", $Contrato->fields['opc_ver_concepto_gastos']);
+					$this->Edit("opc_ver_morosidad", $Contrato->fields['opc_ver_morosidad']);
+					$this->Edit("opc_ver_resumen_cobro", $Contrato->fields['opc_ver_resumen_cobro']);
+					$this->Edit("opc_ver_descuento", $Contrato->fields['opc_ver_descuento']);
+					$this->Edit("opc_ver_tipo_cambio", $Contrato->fields['opc_ver_tipo_cambio']);
+					$this->Edit("opc_ver_solicitante", $Contrato->fields['opc_ver_solicitante']);
+					$this->Edit("opc_ver_numpag", $Contrato->fields['opc_ver_numpag']);
+					$this->Edit("opc_ver_carta", $Contrato->fields['opc_ver_carta']);
+					$this->Edit("opc_papel", $Contrato->fields['opc_papel']);
+					$this->Edit("opc_restar_retainer", $Contrato->fields['opc_restar_retainer']);
+					$this->Edit("opc_ver_detalle_retainer", $Contrato->fields['opc_ver_detalle_retainer']);
+					$this->Edit("opc_ver_valor_hh_flat_fee", $Contrato->fields['opc_ver_valor_hh_flat_fee']);
+					$this->Edit("opc_ver_detalles_por_hora_iniciales", $Contrato->fields['opc_ver_detalles_por_hora_iniciales']);
+					$this->Edit("opc_ver_detalles_por_hora_categoria", $Contrato->fields['opc_ver_detalles_por_hora_categoria']);
+					$this->Edit("opc_ver_detalles_por_hora_tarifa", $Contrato->fields['opc_ver_detalles_por_hora_tarifa']);
+					$this->Edit("opc_ver_detalles_por_hora_importe", $Contrato->fields['opc_ver_detalles_por_hora_importe']);
+					$this->Edit("opc_ver_detalles_por_hora", $Contrato->fields['opc_ver_detalles_por_hora']);
+					$this->Edit("opc_ver_profesional_iniciales", $Contrato->fields['opc_ver_profesional_iniciales']);
+					$this->Edit("opc_ver_profesional_categoria", $Contrato->fields['opc_ver_profesional_categoria']);
+					$this->Edit("opc_ver_profesional_tarifa", $Contrato->fields['opc_ver_profesional_tarifa']);
+					$this->Edit("opc_ver_profesional_importe", $Contrato->fields['opc_ver_profesional_importe']);
 
-					/*	Configuración moneda del cobro	*/
-					$moneda_cobro_configurada = $contrato->fields['opc_moneda_total'];
+					// Configuración moneda del cobro
+					$moneda_cobro_configurada = $Contrato->fields['opc_moneda_total'];
 
-					/*	Si incluye solo gastos, utilizar la moneda configurada para ello	*/
+					// Si incluye solo gastos, utilizar la moneda configurada para ello
 					if ($incluye_gastos && !$incluye_honorarios) {
-						$moneda_cobro_configurada = $contrato->fields['opc_moneda_gastos'];
+						$moneda_cobro_configurada = $Contrato->fields['opc_moneda_gastos'];
 					}
 
 					$this->Edit("opc_moneda_total", $moneda_cobro_configurada);
-					$this->Edit("opc_ver_asuntos_separados", $contrato->fields['opc_ver_asuntos_separados']);
-					$this->Edit("opc_ver_horas_trabajadas", $contrato->fields['opc_ver_horas_trabajadas']);
-					$this->Edit("opc_ver_cobrable", $contrato->fields['opc_ver_cobrable']);
+					$this->Edit("opc_ver_asuntos_separados", $Contrato->fields['opc_ver_asuntos_separados']);
+					$this->Edit("opc_ver_horas_trabajadas", $Contrato->fields['opc_ver_horas_trabajadas']);
+					$this->Edit("opc_ver_cobrable", $Contrato->fields['opc_ver_cobrable']);
 
-					/* Guardamos datos de la moneda base */
+					// Guardamos datos de la moneda base
 					$this->Edit('id_moneda_base', $moneda_base['id_moneda']);
 					$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']);
 					$this->Edit('etapa_cobro', '4');
-					$this->Edit('codigo_idioma', $contrato->fields['codigo_idioma'] != '' ? $contrato->fields['codigo_idioma'] : 'es');
+					$this->Edit('codigo_idioma', $Contrato->fields['codigo_idioma'] != '' ? $Contrato->fields['codigo_idioma'] : 'es');
 					$this->Edit('id_proceso', $id_proceso);
 
-					/* descuento */
-					$this->Edit("tipo_descuento", $contrato->fields['tipo_descuento']);
-					$this->Edit("descuento", $contrato->fields['descuento']);
-					$this->Edit("porcentaje_descuento", $contrato->fields['porcentaje_descuento']);
-					$this->Edit("id_moneda_monto", $contrato->fields['id_moneda_monto']);
-					$this->Edit("opc_ver_columna_cobrable", $contrato->fields['opc_ver_columna_cobrable']);
+					// Descuento
+					$this->Edit("tipo_descuento", $Contrato->fields['tipo_descuento']);
+					$this->Edit("descuento", $Contrato->fields['descuento']);
+					$this->Edit("porcentaje_descuento", $Contrato->fields['porcentaje_descuento']);
+
+					$this->Edit("id_moneda_monto", $Contrato->fields['id_moneda_monto']);
+					$this->Edit("opc_ver_columna_cobrable", $Contrato->fields['opc_ver_columna_cobrable']);
 
 					if ($fecha_ini != '') {
 						$this->Edit('fecha_ini', $fecha_ini);
@@ -2080,14 +2103,12 @@ if (!class_exists('Cobro')) {
 					$this->Edit("incluye_gastos", $incluye_gastos);
 
 					if ($this->Write()) {
-						####### AGREGA ASUNTOS AL COBRO #######
-						$contrato->AddCobroAsuntos($this->fields['id_cobro']);
+						$Contrato->AddCobroAsuntos($this->fields['id_cobro']);
 
-						####### MONEDA COBRO #######
-						$cobro_moneda = new CobroMoneda($this->sesion);
-						$cobro_moneda->ActualizarTipoCambioCobro($this->fields['id_cobro']);
+						$CobroMoneda = new CobroMoneda($this->sesion);
+						$CobroMoneda->ActualizarTipoCambioCobro($this->fields['id_cobro']);
 
-						###### GASTOS ######
+						// GASTOS
 						if (Conf::GetConf($this->sesion, 'UsaFechaDesdeCobranza')) {
 							$and_fecha .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 						} else {
@@ -2101,19 +2122,26 @@ if (!class_exists('Cobro')) {
 								$where = '1';
 							}
 
-							$query_gastos = "SELECT cta_corriente.id_movimiento FROM cta_corriente
-												LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto OR cta_corriente.codigo_asunto IS NULL
-												WHERE $where
-												AND (cta_corriente.id_cobro IS NULL)
-												AND cta_corriente.incluir_en_cobro = 'SI'
-												AND cta_corriente.cobrable = 1
-												AND cta_corriente.codigo_cliente = '" . $contrato->fields['codigo_cliente'] . "'
-												AND (asunto.id_contrato = '" . $contrato->fields['id_contrato'] . "')
-												AND cta_corriente.fecha <= '$fecha_fin'";
+							$query_gastos = "SELECT
+									cta_corriente.id_movimiento
+								FROM cta_corriente
+								LEFT JOIN asunto
+									ON cta_corriente.codigo_asunto = asunto.codigo_asunto
+									OR cta_corriente.codigo_asunto IS NULL
+								WHERE $where
+									AND (cta_corriente.id_cobro IS NULL)
+									AND cta_corriente.incluir_en_cobro = 'SI'
+									AND cta_corriente.cobrable = 1
+									AND cta_corriente.codigo_cliente = '{$Contrato->fields['codigo_cliente']}'
+									AND (asunto.id_contrato = '{$Contrato->fields['id_contrato']}')
+									AND cta_corriente.fecha <= '{$fecha_fin}'";
+
 							if ($fecha_ini != '') {
-								$query_gastos.="AND cta_corriente.fecha >= '$fecha_ini'";
+								$query_gastos .= "AND cta_corriente.fecha >= '{$fecha_ini}'";
 							}
+
 							$lista_gastos = new ListaGastos($this->sesion, '', $query_gastos);
+
 							for ($v = 0; $v < $lista_gastos->num; $v++) {
 								$gasto = $lista_gastos->Get($v);
 
@@ -2125,72 +2153,101 @@ if (!class_exists('Cobro')) {
 							}
 						}
 
-						### TRABAJOS ###
-						if (!empty($incluye_honorarios)) {
+						// TRABAJOS
+						if (!empty($incluye_honorarios) && $solo_gastos != true) {
 
-							if ($solo_gastos != true) {
+							$TrabajoEmitir = new Trabajo($this->sesion);
+							$where_up = '1';
 
-								$emitir_trabajo = new Objeto($this->sesion, '', '', 'trabajo', 'id_trabajo');
-								$where_up = '1';
+							if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
+								$where_up .= " AND fecha <= '$fecha_fin' ";
+							} else {
+								$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+							}
 
-								if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
-									$where_up .= " AND fecha <= '$fecha_fin' ";
-								} else {
-									$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+							$query2 = "SELECT
+									trabajo.id_trabajo
+								FROM trabajo
+								INNER JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+								INNER JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+								LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+								WHERE {$where_up}
+									AND contrato.id_contrato = '{$Contrato->fields['id_contrato']}'
+									AND cobro.estado IS NULL";
+
+							$lista_trabajos = new ListaTrabajos($this->sesion, '', $query2);
+
+							for ($x = 0; $x < $lista_trabajos->num; $x++) {
+								$trabajo = $lista_trabajos->Get($x);
+
+								$TrabajoEmitir->Load($trabajo->fields['id_trabajo'], array('id_trabajo', 'id_cobro'));
+								$TrabajoEmitir->Edit('id_cobro', $this->fields['id_cobro']);
+								$TrabajoEmitir->Write();
+							}
+
+							// TRAMITES
+
+							// Si es un cobro_pendiente incluir los trámites automáticos
+							if ($es_cobro_pendiente) {
+								$this->LoadAsuntos();
+								$codigo_asunto = array_pop($this->asuntos);
+
+								$ContratoTramite = new ContratoTramite($this->sesion);
+								$tramites_incluidos = $ContratoTramite->findAll(array(
+									'id_contrato' => $this->fields['id_contrato']
+								));
+
+								foreach ($tramites_incluidos as $tramite_incluido) {
+									$TramiteIncluido = new Tramite($this->sesion);
+
+									$TramiteIncluido->Edit('codigo_asunto', $codigo_asunto);
+									$TramiteIncluido->Edit('descripcion', $tramite_incluido['glosa_tramite']);
+									$TramiteIncluido->Edit('fecha', $CobroPendiente->fields['fecha_cobro']);
+									$TramiteIncluido->Edit('cobrable', '1');
+									$TramiteIncluido->Edit('id_usuario', $id_usuario_cobro);
+									$TramiteIncluido->Edit('id_moneda_tramite_individual', $tramite_incluido['id_moneda_tramite']);
+									$TramiteIncluido->Edit('id_tramite_tipo', $tramite_incluido['id_tramite_tipo']);
+									$TramiteIncluido->Edit('id_moneda_tramite', $tramite_incluido['id_moneda_tramite']);
+									$TramiteIncluido->Edit('tarifa_tramite', 'NULL');
+									$TramiteIncluido->Write();
 								}
+							}
 
-								$query2 = "SELECT trabajo.id_trabajo FROM trabajo
-													JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-													JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-													LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-													WHERE {$where_up}
-													AND contrato.id_contrato = '{$contrato->fields['id_contrato']}'
-													AND cobro.estado IS NULL";
+							$TramiteEmitir = new Tramite($this->sesion);
+							$where_up = '1';
+							if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
+								$where_up .= " AND fecha <= '$fecha_fin' ";
+							} else {
+								$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+							}
+							$query_tramites = "SELECT
+									tramite.id_tramite
+								FROM tramite
+								INNER JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
+								INNER JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+								LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
+								WHERE {$where_up}
+									AND contrato.id_contrato = '{$Contrato->fields['id_contrato']}'
+									AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']}' AND '{$this->fields['fecha_fin']}'
+									AND cobro.estado IS NULL";
 
-								$lista_trabajos = new ListaTrabajos($this->sesion, '', $query2);
+							$lista_tramites = new ListaTramites($this->sesion, '', $query_tramites);
 
-								for ($x = 0; $x < $lista_trabajos->num; $x++) {
-									$trabajo = $lista_trabajos->Get($x);
-									$emitir_trabajo->Load($trabajo->fields['id_trabajo'], array('id_trabajo', 'id_cobro'));
-									$emitir_trabajo->Edit('id_cobro', $this->fields['id_cobro']);
-									$emitir_trabajo->Write();
-								}
+							for ($y = 0; $y < $lista_tramites->num; $y++) {
+								$tramite = $lista_tramites->Get($y);
 
-								$emitir_tramite = new Tramite($this->sesion);
-								$where_up = '1';
-								if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
-									$where_up .= " AND fecha <= '$fecha_fin' ";
-								} else {
-									$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
-								}
-								$query_tramites = "SELECT tramite.id_tramite FROM tramite
-														JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
-														JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-														LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
-															WHERE {$where_up}
-																AND contrato.id_contrato = '{$contrato->fields['id_contrato']}'
-																AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']}' AND '{$this->fields['fecha_fin']}'
-																AND cobro.estado IS NULL";
-
-								$lista_tramites = new ListaTramites($this->sesion, '', $query_tramites);
-
-								for ($y = 0; $y < $lista_tramites->num; $y++) {
-									$tramite = $lista_tramites->Get($y);
-									$emitir_tramite->Load($tramite->fields['id_tramite'], array('id_tramite', 'id_cobro'));
-									$emitir_tramite->Edit('id_cobro', $this->fields['id_cobro']);
-									$emitir_tramite->Write();
-								}
+								$TramiteEmitir->Load($tramite->fields['id_tramite'], array('id_tramite', 'id_cobro'));
+								$TramiteEmitir->Edit('id_cobro', $this->fields['id_cobro']);
+								$TramiteEmitir->Write();
 							}
 						}
 
-						### COBROS PENDIENTES ###
-						$cobro_pendiente = new CobroPendiente($this->sesion);
-						if (!empty($id_cobro_pendiente)) {
-							if ($cobro_pendiente->Load($id_cobro_pendiente)) {
-								$cobro_pendiente->AsociarCobro($this->sesion, $this->fields['id_cobro']);
-							}
+						// COBROS PENDIENTES
+						if ($es_cobro_pendiente) {
+							$CobroPendiente->AsociarCobro($this->sesion, $this->fields['id_cobro']);
 						}
-						#Se ingresa la anotación en el historial
+
+						// Se ingresa la anotación en el historial
 						if ($this->fields['estado'] != 'COBRO CREADO') {
 							$his = new Observacion($this->sesion);
 							$his->Edit('fecha', date('Y-m-d H:i:s'));

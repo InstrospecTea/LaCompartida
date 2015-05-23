@@ -18,12 +18,15 @@ class CronCobroProgramado extends Cron {
 	public function cobrosPendientes() {
 		$this->log('< INICIO cobrosPendientes >');
 
-		$query = "SELECT cobro_pendiente.id_cobro_pendiente, cobro_pendiente.id_contrato, cobro_pendiente.descripcion, cobro_pendiente.monto_estimado
+		$query = "SELECT
+				cobro_pendiente.id_cobro_pendiente,
+				cobro_pendiente.id_contrato,
+				cobro_pendiente.descripcion,
+				cobro_pendiente.monto_estimado
 			FROM cobro_pendiente
 			WHERE cobro_pendiente.id_cobro IS NULL
 				AND DATE_FORMAT(cobro_pendiente.fecha_cobro, '%Y-%m-%d') = '{$this->fecha_cron}'
-				AND cobro_pendiente.hito = 0
-			ORDER BY cobro_pendiente.fecha_cobro";
+				AND cobro_pendiente.hito = 0";
 
 		$cobros_pendientes = $this->query($query);
 
@@ -36,11 +39,14 @@ class CronCobroProgramado extends Cron {
 				$this->log("Generando cobros pendiente #{$cobro_pendiente['id_cobro_pendiente']}: {$cobro_pendiente['descripcion']}");
 				$Cobro = new Cobro($this->Sesion);
 
-				$query = "SELECT c.forma_cobro, cl.glosa_cliente, GROUP_CONCAT(a.glosa_asunto) as asuntos
+				$query = "SELECT
+						c.forma_cobro,
+						cl.glosa_cliente,
+						GROUP_CONCAT(a.glosa_asunto) as asuntos
 					FROM contrato c
-						INNER JOIN cliente cl ON (c.codigo_cliente = cl.codigo_cliente)
-						INNER JOIN asunto a ON (c.id_contrato = a.id_contrato)
-					WHERE c.id_contrato = {$cobro_pendiente['id_contrato']}
+					INNER JOIN cliente cl ON c.codigo_cliente = cl.codigo_cliente
+					INNER JOIN asunto a ON c.id_contrato = a.id_contrato
+					WHERE c.id_contrato = '{$cobro_pendiente['id_contrato']}'
 					GROUP BY c.id_contrato";
 
 				$contrato = $this->query($query);
@@ -51,19 +57,32 @@ class CronCobroProgramado extends Cron {
 					// generamos nueva id para el cobro
 					$id_proceso_nuevo = $Cobro->GeneraProceso();
 
+					$fecha_inicio = '';
+					$fecha_fin = $this->fecha_cron;
+					$id_contrato = $cobro_pendiente['id_contrato'];
+					$emitir_obligatoriamente = true;
+					$id_proceso = $id_proceso_nuevo;
+					$monto = ($contrato['forma_cobro'] != 'FLAT FEE' ? null : $cobro_pendiente['monto_estimado']);
+					$id_cobro_pendiente = $cobro_pendiente['id_cobro_pendiente'];
+					$con_gastos = false;
+					$solo_gastos = false;
+					$incluye_gastos = true;
+					$incluye_honorarios = true;
+					$cobro_programado = false;
+
 					$id_cobro = $Cobro->PrepararCobro(
-						'',
-						$this->fecha_cron,
-						$cobro_pendiente['id_contrato'],
-						true,
-						$id_proceso_nuevo,
-						($contrato['forma_cobro'] != 'FLAT FEE' ? null : $cobro_pendiente['monto_estimado']),
-						$cobro_pendiente['id_cobro_pendiente'],
-						false,
-						false,
-						true,
-						true,
-						true
+						$fecha_inicio,
+						$fecha_fin,
+						$id_contrato,
+						$emitir_obligatoriamente,
+						$id_proceso,
+						$monto,
+						$id_cobro_pendiente,
+						$con_gastos,
+						$solo_gastos,
+						$incluye_gastos,
+						$incluye_honorarios,
+						$cobro_programado
 					);
 
 					$this->log("Cobro preparado #{$id_cobro}");

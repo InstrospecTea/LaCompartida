@@ -144,7 +144,8 @@ class Contrato extends Objeto {
 			'esc4_descuento',
 			'retribucion_usuario_responsable',
 			'retribucion_usuario_secundario',
-			'id_estudio'
+			'id_estudio',
+			'enviar_liquidacion_al_generar'
 	);
 
 	function Contrato($sesion, $fields = "", $params = "") {
@@ -514,11 +515,13 @@ class Contrato extends Objeto {
 	 */
 
 	function EliminarBorrador($incluye_gastos = 1, $incluye_honorarios = 1) {
-		$query = "SELECT id_cobro FROM cobro
-				WHERE estado='CREADO'
-				AND id_contrato='" . $this->fields['id_contrato'] . "'
-				AND incluye_gastos = $incluye_gastos
-				AND incluye_honorarios = $incluye_honorarios";
+		$query = "SELECT
+					id_cobro
+				FROM cobro
+				WHERE estado = 'CREADO'
+					AND id_contrato = '{$this->fields['id_contrato']}'
+					AND incluye_gastos = '{$incluye_gastos}'
+					AND incluye_honorarios = '{$incluye_honorarios}'";
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while (list($id_cobro) = mysql_fetch_array($resp)) {
@@ -529,6 +532,7 @@ class Contrato extends Objeto {
 			$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 			$his->Edit('id_cobro', $id_cobro);
 			$his->Write();
+
 			$borrador = new Cobro($this->sesion);
 
 			if ($borrador->Load($id_cobro)) {
@@ -1208,6 +1212,10 @@ class Contrato extends Objeto {
 			$this->Edit('fecha_inicio_cap', Utiles::fecha2sql($this->fields['fecha_inicio_cap']));
 		}
 
+		if (!empty($this->fields['periodo_fecha_inicio'])) {
+			$this->Edit('periodo_fecha_inicio', Utiles::fecha2sql($this->fields['periodo_fecha_inicio']));
+		}
+
 		if ($this->extra_fields['activo_contrato'] || empty($this->fields['activo']) || empty($this->fields['id_contrato'])) {
 			$this->Edit("activo", 'SI');
 		} else if ($this->extra_fields['desactivar_contrato']) {
@@ -1220,7 +1228,7 @@ class Contrato extends Objeto {
 		$this->Edit("direccion_contacto", $this->extra_fields['direccion_contacto_contrato']);
 
 		if (is_array($this->extra_fields['usuarios_retainer'])) {
-			$retainer_usuarios = implode(',', $usuarios_retainer);
+			$retainer_usuarios = implode(',', $this->extra_fields['usuarios_retainer']);
 		} else {
 			$retainer_usuarios = $this->extra_fields['usuarios_retainer'];
 		}
