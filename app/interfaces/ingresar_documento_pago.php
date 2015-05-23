@@ -16,6 +16,7 @@ if ($_POST['montoadelanto']) {
 if (!$pago) {
 	$pago = $_POST['pago'] = $_GET['pago'];
 }
+
 if (!$codigo_cliente) {
 	$codigo_cliente = $_POST['codigo_cliente'] = $_GET['codigo_cliente'];
 }
@@ -76,12 +77,22 @@ if ($id_documento) {
 	if (Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
 		$id_solicitud_adelanto = $documento->fields['id_solicitud_adelanto'];
 	}
+
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false;
 
 	if ($id_cobro) {
 		$monto_usado = $documento->MontoUsadoAdelanto($id_cobro);
 	}
+
 	($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false;
+
+	if (empty($cifras_decimales)) {
+		// buscar la cantida de decimales de la moneda que tiene el documento
+		$Moneda = new Moneda($sesion);
+		$Moneda->Load($documento->fields['id_moneda']);
+		$cifras_decimales = $Moneda->fields['cifras_decimales'];
+		unset($Moneda);
+	}
 }
 
 if ($codigoSecundario && $codigo_cliente_secundario != '') {
@@ -509,13 +520,14 @@ $Form = new Form();
 				jQuery('#overlaytipocambio').hide();
 			}
 
-			if (tipopago=='editaadelanto') {
+			if (tipopago == 'editaadelanto' || tipopago == 'documento') {
 				jQuery('#overlaytipocambio').hide();
 				monedaadelanto = jQuery('#id_moneda').val();
 				jQuery('#id_moneda').attr({'id': 'readonlymoneda', 'name': 'readonlymoneda'});
 				jQuery('#readonlymoneda').prop('disabled', 'disabled');
 				jQuery('#tabla_informacion').append('<input id="id_moneda" name="id_moneda" type="hidden" value="'+monedaadelanto+'" />');
 			}
+
 			if (tipopago=='documento' || tipopago=='nuevopago' || tipopago=='adelanto') {
 				if (jQuery('#acepta_honorarios').length>0  && jQuery('#acepta_honorarios').val()==0) {
 					jQuery("input:text[id^='pago_honorarios_']").attr('disabled','disabled').removeClass('saldojq');

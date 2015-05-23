@@ -784,16 +784,16 @@ $Form->defaultLabel = false;
 </script>
 
 <form method=post action="" id="form_documentos" autocomplete='off'>
-	<input type=hidden name=opcion value="guardar" />
-	<input type=hidden name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
-	<input type=hidden name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>' />
+	<input type="hidden" name="opcion" value="guardar" />
+	<input type="hidden" name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
+	<input type="hidden" name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>' />
 	<input type="hidden" name='lista_facturas' id='lista_facturas' value='<?php echo $lista_facturas ?>' />
-	<input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_pago->fields['cifras_decimales'] ?>" />
-	<input type=hidden name='cifras_decimales_cobro' id='cifras_decimales_cobro' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
-	<input type=hidden name='id_factura_pago' id='id_factura_pago' value="<?php echo $pago->fields['id_factura_pago'] ?>" />
+	<input type="hidden" name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_pago->fields['cifras_decimales'] ?>" />
+	<input type="hidden" name='cifras_decimales_cobro' id='cifras_decimales_cobro' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
+	<input type="hidden" name='id_factura_pago' id='id_factura_pago' value="<?php echo $pago->fields['id_factura_pago'] ?>" />
 	<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?php echo $pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>" />
 	<input type="hidden" name="codigo_cliente_factura" value="<?php echo $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente ?>" >
-	<input type=hidden name='id_neteo_documento_adelanto' id='id_neteo_documento_adelanto' value="<?php echo $id_neteo_documento_adelanto ?>" />
+	<input type="hidden" name='id_neteo_documento_adelanto' id='id_neteo_documento_adelanto' value="<?php echo $id_neteo_documento_adelanto ?>" />
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
@@ -900,7 +900,18 @@ $Form->defaultLabel = false;
 								'onchange' => 'MontoValido(this.id); ActualizarMontoMonedaCobro();'
 						)
 				);
-				echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"', '', "80");
+
+				$currency_input_id = 'id_moneda';
+				$currency_input_attributes = 'onchange="ActualizarMontoMonedaCobro()"';
+				if (!is_null($id_factura_pago)) {
+					$currency_input_id = 'id_moneda_disabled';
+					$currency_input_attributes .= ' disabled';
+					echo '<input type="hidden" id="id_moneda" name="id_moneda" value="' . $id_moneda . '" >';
+				}
+
+				$currency_input_attributes .= ' id="' . $currency_input_id . '"';
+
+				echo Html::SelectArray(Moneda::GetMonedas($sesion), $currency_input_id, $id_moneda, $currency_input_attributes, '', "80px");
 				?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
@@ -1161,13 +1172,16 @@ $Form->defaultLabel = false;
 				button: "img_fecha"		// ID of the button
 			}
 	);
-	Calendar.setup(
+
+	if (jQuery('#fecha_pago').length > 0) {
+		Calendar.setup(
 			{
 				inputField: "fecha_pago", // ID of the input field
 				ifFormat: "%d-%m-%Y", // the date format
 				button: "img_fecha_pago"		// ID of the button
 			}
-	);
+		);
+	}
 </script>
 <?php
 echo $Form->script();

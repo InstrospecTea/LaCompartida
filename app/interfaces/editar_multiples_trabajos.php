@@ -87,15 +87,14 @@
 		$total_duracion_cobrable_minutos = floor($total_minutos_cobrables % 60);
 	}
 
-	if(!$codigo_asunto_secundario && Conf::GetConf($sesion,'CodigoSecundario')) {
+	if(!$codigo_asunto_secundario && Conf::GetConf($sesion,'CodigoSecundario') && $num_trabajos > 0) {
 		//se carga el codigo secundario
 		$asunto = new Asunto($sesion);
-		$asunto->LoadByCodigo($t[0]->fields['codigo_asunto']);
-		$codigo_asunto_secundario=$asunto->fields['codigo_asunto_secundario'];
+		$asunto->LoadByCodigo($trabajos[0]->fields['codigo_asunto']);
+		$codigo_asunto_secundario = $asunto->fields['codigo_asunto_secundario'];
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigo($asunto->fields['codigo_cliente']);
-		$codigo_cliente_secundario=$cliente->fields['codigo_cliente_secundario'];
-		$codigo_cliente=$asunto->fields['codigo_cliente'];
+		$codigo_cliente_secundario = $cliente->fields['codigo_cliente_secundario'];
 	}
 
 	if($opcion == "guardar") {
@@ -155,6 +154,8 @@
 	if($num_trabajos) {
 		if($valores_default['codigo_asunto']){
 			$valores_default['codigo_cliente'] = $trabajos[0]->get_codigo_cliente();
+			$valores_default['codigo_cliente_secundario'] = $codigo_cliente_secundario;
+			$valores_default['codigo_asunto_secundario'] = $codigo_asunto_secundario;
 		}
 		else if(!empty($ids_trabajos)){
 			$ids_csv = implode($ids_trabajos, ',');
@@ -165,6 +166,7 @@
 			$codigos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_COLUMN);
 			if(count($codigos) == 1){
 				$valores_default['codigo_cliente'] = $codigos[0];
+				$valores_default['codigo_cliente_secundario'] = $codigo_cliente_secundario;
 			}
 		}
 	}
@@ -241,7 +243,7 @@ else
 				<?php echo __('Cliente'); ?>
 			</td>
 			<td align="left">
-				<?php UtilesApp::CampoCliente($sesion, $valores_default['codigo_cliente'], $codigo_cliente_secundario, $valores_default['codigo_asunto'], $codigo_asunto_secundario); ?>
+				<?php UtilesApp::CampoCliente($sesion, $valores_default['codigo_cliente'], $valores_default['codigo_cliente_secundario'], $valores_default['codigo_asunto'], $valores_default['codigo_asunto_secundario']); ?>
 			</td>
 		</tr>
 		<tr>
@@ -255,7 +257,7 @@ else
 				if (Conf::GetConf($sesion, 'UsoActividades') || Conf::GetConf($sesion, 'ExportacionLedes')) {
 					$oncambio .= 'CargarActividad();';
 				}
-				UtilesApp::CampoAsunto($sesion, $valores_default['codigo_cliente'], $codigo_cliente_secundario, $valores_default['codigo_asunto'], $codigo_asunto_secundario, 320, $oncambio, $glosa_asunto, false); ?>
+				UtilesApp::CampoAsunto($sesion, $valores_default['codigo_cliente'], $valores_default['codigo_cliente_secundario'], $valores_default['codigo_asunto'], $valores_default['codigo_asunto_secundario'], 320, $oncambio, $glosa_asunto, false); ?>
 			</td>
 		</tr>
 

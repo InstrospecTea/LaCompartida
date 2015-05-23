@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 15.9.4
+Wednesday 2015, May 20th.
+* **Fix:** [Fix wrong assignment for $contrato_nuevo in agregar_asunto](https://github.com/LemontechSA/ttb/issues/964)
+
+## Hotfix 15.9.3
+Tuesday 2015, May 19th.
+* **Fix:** [Fix mass time entry edition when using secondary codes](https://github.com/LemontechSA/ttb/issues/963)
+
+## Hotfix 15.9.2
+Monday 2015, May 18th.
+* **Fix:** [Change the way of how show the amount of previous payments](https://github.com/LemontechSA/ttb/issues/962)
+
+## Hotfix 15.9.1
+Thursday 2015, May 14th.
+* **Feature:** [Add the CLIENT_MATTER_ID on the adjustment line of the LEDES file](https://github.com/LemontechSA/ttb/issues/961)
+
 ## [Release 15.9.0](https://github.com/LemontechSA/ttb/pull/960)
 Wednesday 2015, May 13th.
 * **Feature:** [Mantener asuntos en edicion masiva de trabajos](https://github.com/LemontechSA/ttb/issues/955)
