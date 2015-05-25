@@ -41,45 +41,28 @@ class CobroPendiente extends Objeto {
 	 * @param $Sesion
 	 */
 	function GenerarCobrosPeriodicos($Sesion) {
-		// $query = "SELECT id_contrato,periodo_intervalo,periodo_repeticiones,monto,
-		// 					forma_cobro
-		// 					FROM contrato
-		// 					WHERE contrato.activo='SI'";
-		// $resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$Sesion->dbh);
-		// while($contrato = mysql_fetch_array($resp)) {
-		// 	#se saca la ultima fecha en la lista del contrato
-		// 	$query2 = "SELECT SQL_CALC_FOUND_ROWS fecha_cobro
-		// 				FROM cobro_pendiente
-		// 				WHERE id_contrato='".$contrato['id_contrato']."' AND hito = 0 ORDER BY fecha_cobro DESC LIMIT 1";
-		// 	$resp2 = mysql_query($query2, $Sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$Sesion->dbh);
-		// 	list($ultima_fecha) = mysql_fetch_array($resp2);
-
-		// 	#cantidad de cobros pendientes
-		// 	$query3 = "SELECT FOUND_ROWS()";
-		// 	$resp3 = mysql_query($query3, $Sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$Sesion->dbh);
-		// 	list($numero_pendientes) = mysql_fetch_array($resp3);
 
 		$query = "SELECT
-								c.id_contrato,
-								c.periodo_fecha_inicio,
-								c.periodo_intervalo,
-								c.periodo_repeticiones,
-								c.enviar_liquidacion_al_generar,
-								c.monto,
-								c.forma_cobro,
-								GREATEST(MAX(cp.fecha_cobro), c.periodo_fecha_inicio) AS ultima_fecha,
-								SUM(IF(cp.id_contrato IS NOT NULL AND cp.id_cobro IS NOT NULL, 1, 0)) AS pendientes_cobrados,
-								SUM(IF(cp.id_contrato IS NOT NULL, 1, 0)) AS pendientes_totales
-							FROM contrato c
-							LEFT JOIN cobro_pendiente cp
-								ON cp.id_contrato = c.id_contrato
-								AND cp.hito = 0
-							WHERE c.activo = 'SI'
-								AND c.forma_cobro != 'HITOS'
-								-- REF: https://dev.mysql.com/doc/refman/5.5/en/sql-mode.html#sqlmode_no_zero_date
-								AND c.periodo_fecha_inicio != '0000-00-00'
-								AND DATE(c.periodo_fecha_inicio) IS NOT NULL
-							GROUP BY c.id_contrato";
+				c.id_contrato,
+				c.periodo_fecha_inicio,
+				c.periodo_intervalo,
+				c.periodo_repeticiones,
+				c.enviar_liquidacion_al_generar,
+				c.monto,
+				c.forma_cobro,
+				GREATEST(MAX(cp.fecha_cobro), c.periodo_fecha_inicio) AS ultima_fecha,
+				SUM(IF(cp.id_contrato IS NOT NULL AND cp.id_cobro IS NOT NULL, 1, 0)) AS pendientes_cobrados,
+				SUM(IF(cp.id_contrato IS NOT NULL, 1, 0)) AS pendientes_totales
+			FROM contrato c
+			LEFT JOIN cobro_pendiente cp
+				ON cp.id_contrato = c.id_contrato
+				AND cp.hito = 0
+			WHERE c.activo = 'SI'
+				AND c.forma_cobro != 'HITOS'
+				-- REF: https://dev.mysql.com/doc/refman/5.5/en/sql-mode.html#sqlmode_no_zero_date
+				AND c.periodo_fecha_inicio != '0000-00-00'
+				AND DATE(c.periodo_fecha_inicio) IS NOT NULL
+			GROUP BY c.id_contrato";
 
 		$result = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 		while ($contrato = mysql_fetch_array($result)) {
