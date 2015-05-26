@@ -2598,8 +2598,27 @@ class Factura extends Objeto {
 		$charginBusiness = new ChargingBusiness($this->sesion);
 		$coiningBusiness = new CoiningBusiness($this->sesion);
 
-		$charginData = array();
-		$coiningData = array();
+		$charginData     = array();
+		$coiningData     = array();
+		$facturaPosition = array();
+
+		// Recupero todos los id_factura de los resultados, para posterior uso
+		$facturasIDs =
+			array_unique(
+				array_map(function($item){
+					return $item['id_factura'];
+				}, $results)
+			);
+
+		$cobrosIDs =
+			array_unique(
+				array_map(function($item){
+					return $item['id_cobro'];
+				}, $results)
+			);
+
+		$invoiceList = $billingBusiness->loadInvoices( $facturasIDs );
+		$chargeList  = $charginBusiness->loadCharges( $cobrosIDs );
 
 		foreach ($results as $key => $fila) {
 			//monto_real
@@ -2607,38 +2626,49 @@ class Factura extends Objeto {
 			$results[$key]['monto_real'] = strtoupper($fila['codigo_estado']) == 'A' ? '0' : $monto_real;
 
 			//Obtener Descuento y Bruto
-			$id_cobro = $results[$key]['id_cobro'];
+			$id_cobro   = $results[$key]['id_cobro'];
 			$id_factura = $results[$key]['id_factura'];
-			$id_moneda = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
-			$invoice = $billingBusiness->getInvoice($id_factura);
-			$currency = $coiningData[$id_moneda];
+			$id_moneda  = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
+			$invoice    = $invoiceList[ $id_factura ];
+			$currency   = $coiningData[$id_moneda];
+
 			if (is_null($currency)) {
 				$currency = $coiningBusiness->getCurrency($id_moneda);
 				$coiningData[$id_moneda] = $currency;
 			}
+
 			if (is_null($charginData[$id_cobro])) {
 				try {
-					$charge = $charginBusiness->getCharge($id_cobro);
+					$charge = $chargeList[ $id_cobro ];
+
+					// TODO: en la siguiente linea se toma aprox el 80% del tiempo de obtención
+					// de los datos del reporte. Es esta función, junto con UtilesApp::ProcesaCobroIdMoneda
+					// que es LA función DIOS de este proceso (mas de 1K linea :) )
+					// Benchmark::instance()->tick('getAmountDetailOfFees');
 					$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+					// Benchmark::instance()->tick('getAmountDetailOfFees');
+
 				} catch (Exception $ex) {
 					error_log("No pudo cargar el cobro $id_cobro, significa que esta factura está asociada a un cobro inexistente");
 					continue;
 				}
 			}
 
-			$invoiceFees = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
-			$chargeFees = $charginData[$id_cobro]->get('saldo_honorarios');
+			$invoiceFees    = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+			$chargeFees     = $charginData[$id_cobro]->get('saldo_honorarios');
 			$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
-			$billingData = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+			$billingData    = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
 
-			$results[$key]['bruto_honorarios'] = $billingData->get('subtotal_honorarios');
+			$results[$key]['bruto_honorarios']     = $billingData->get('subtotal_honorarios');
 			$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
 
 			// observaciones
-			$ids_doc = $this->ObtenerIdsDocumentos($fila['id_factura']);
+			$ids_doc       = $this->ObtenerIdsDocumentos($fila['id_factura']);
+
 			$ids_doc_array = explode('||', $ids_doc);
-			$valores = array();
-			$comentarios = '';
+			$valores       = array();
+			$comentarios   = '';
+
 			if (true || $fila['total'] != $monto_real) {
 				foreach ($ids_doc_array as $par_cod_num) {
 					$documento = strtr($par_cod_num, '::', ' ');
@@ -2650,22 +2680,42 @@ class Factura extends Objeto {
 			}
 			$results[$key]['observaciones'] = $comentarios;
 
-			//saldo pago, fecha ultimo pago
-			$query2 = "SELECT SUM(ccfmn.monto) as saldo_pagos, MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
-							FROM factura_pago AS fp
-							JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-							JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-							LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-							LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
-							WHERE ccfm2.id_factura =  '" . $fila['id_factura'] . "' GROUP BY ccfm2.id_factura ";
+			$facturaPosition[ $fila['id_factura'] ] = $key;
+
+			$results[$key]['pagos']             = '0';
+			$results[$key]['fecha_ultimo_pago'] = null;
+
+		}
+
+		if( count($facturaPosition) ){
+			// saldo pago, fecha ultimo pago
+			$query2 =
+				"SELECT ccfm2.id_factura,
+						SUM(ccfmn.monto) as saldo_pagos,
+						MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
+
+				FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
+
+				WHERE ccfm2.id_factura IN ( [[IDS]] ) GROUP BY ccfm2.id_factura ";
+
+			$query2 = str_replace("[[IDS]]", implode( ", ", array_keys($facturaPosition)), $query2);
+
 
 			$statement = $this->sesion->pdodbh->prepare($query2);
 			$statement->execute();
-			$pago = $statement->fetch(PDO::FETCH_ASSOC);
 
-			$results[$key]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';
-			$results[$key]['fecha_ultimo_pago'] = $pago['fecha_ultimo_pago'];
+			while( $pago = $statement->fetch(PDO::FETCH_ASSOC) ){
+				$position = $facturaPosition[ $pago['id_factura'] ];
+
+				$results[ $position ]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';
+				$results[ $position ]['fecha_ultimo_pago'] = $pago['fecha_ultimo_pago'];
+			}
 		}
+
 		return $results;
 	}
 
