@@ -8,15 +8,20 @@ class Documento extends Objeto {
 
 
 	function __construct($sesion, $fields = "", $params = "") {
-		$this->tabla = "documento";
-		$this->campo_id = "id_documento";
+		$this->tabla          = "documento";
+		$this->campo_id       = "id_documento";
 		#$this->guardar_fecha = false;
-		$this->sesion = $sesion;
-		$this->fields = $fields;
-		$this->log_update = true;
+		$this->sesion         = $sesion;
+		$this->fields         = $fields;
+		$this->log_update     = true;
 
-		$describe=$this->sesion->pdodbh->query( "SHOW COLUMNS FROM   {$this->tabla}");
-		$this->editable_fields=$describe->fetchALL(PDO::FETCH_COLUMN,0 );
+		if( !($this->editable_fields = $this->getCache('editable_fields')) ){
+			$describe = $this->sesion->pdodbh->query( "SHOW COLUMNS FROM {$this->tabla}");
+			$this->editable_fields = $describe->fetchALL( PDO::FETCH_COLUMN, 0 );
+
+			$this->setCache('editable_fields', $this->editable_fields);
+		}
+
 		unset($this->editable_fields[array_search($this->campo_id,$this->editable_fields)]);
 
 	}

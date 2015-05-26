@@ -124,6 +124,32 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 
+	/**
+	 * Obtiene N instancias de {@link Charge} en base a su identificador primario.
+	 * @param array $chargeIds
+	 * @return mapa de Charge con el id_charge como entrada del mapa
+	 */
+	public function loadCharges( $chargeIds ) {
+		$this->loadService('Charge');
+		$this->loadBusiness('Searching');
+
+		$searchCriteria = new SearchCriteria('Charge');
+
+		$searchCriteria
+			->filter('id_cobro')
+		  	->restricted_by('in')
+		  	->compare_with($chargeIds);
+
+		$results = array();
+		$tmp = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		foreach ($tmp as $invoice) {
+			$results[ $invoice->get('id_cobro') ] = $invoice;
+		}
+
+		return $results;
+	}
+
 	public function getSlidingScalesWorkDetail($charge) {
 		$this->loadBusiness('Charging');
 		$this->loadBusiness('Translating');
