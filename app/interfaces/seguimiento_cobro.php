@@ -695,11 +695,12 @@ $pagina->PrintTop();
 			<?php } ?>
 
 			<tr>
-				<td align=right width='30%'>
+				<td align="right" width="30%">
 					<b><?php echo __('Grupo') ?></b>&nbsp;
 				</td>
-				<td align=left colspan=2>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+				<td align="left" colspan="2">
+					<?php $GrupoCliente = new GrupoCliente($sesion); ?>
+					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
 				</td>
 			</tr>
 
