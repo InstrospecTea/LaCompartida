@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.9.6
+Tuesday 2015, May 26th.
+* **Fix:** [Se asigna valor por defecto al usuario modificador del contrato en script de integración estudio emba](https://github.com/LemontechSA/ttb/issues/967)
+
+## Hotfix 15.9.5
+Friday 2015, May 22th.
+* **Fix:** [Se corrige la validación anidada al crear los filtros para el asunto, ya que estaba verificando que el codigo del cliente no fuera vacío para filtrar por asunto](https://github.com/LemontechSA/ttb/issues/965)
+
 ## Hotfix 15.9.4
 Wednesday 2015, May 20th.
 * **Fix:** [Fix wrong assignment for $contrato_nuevo in agregar_asunto](https://github.com/LemontechSA/ttb/issues/964)
