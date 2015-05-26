@@ -3,23 +3,26 @@
 require_once dirname(__FILE__) . '/../conf.php';
 require_once 'Spreadsheet/Excel/Writer.php';
 
-$sesion = new Sesion();
-$pagina = new Pagina($sesion);
+$Sesion = new Sesion();
+$Pagina = new Pagina($Sesion);
+$Moneda = new Moneda($Sesion);
 
 /*
  * El usuario debe tener los permisos ADM y REP para acceder a este reporte.
  */
-if (!$sesion->usuario->Es('ADM') || !$sesion->usuario->Es('REP')) {
+if (!$Sesion->usuario->Es('ADM') || !$Sesion->usuario->Es('REP')) {
 	$_SESSION['flash_msg'] = 'No tienes permisos para acceder a ' . __('Reporte financiero') . '.';
-	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
+	$Pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
 }
 
 if (empty($fecha_a) || $fecha_a < 1) {
 	$fecha_a = date('Y');
 }
+
 if (empty($fecha_m) || $fecha_m < 1 || $fecha_m > 12) {
 	$fecha_m = date('m');
 }
+
 $meses = array(__('Enero'), __('Febrero'), __('Marzo'), __('Abril'), __('Mayo'), __('Junio'), __('Julio'), __('Agosto'), __('Septiembre'), __('Octubre'), __('Noviembre'), __('Diciembre'));
 
 if ($opc == 'reporte') {
@@ -37,9 +40,10 @@ if ($opc == 'reporte') {
 	exit;
 }
 
-$pagina->titulo = __('Reporte financiero');
-$pagina->PrintTop();
-$Form = new Form;
+$Pagina->titulo = __('Reporte financiero');
+$Pagina->PrintTop();
+$Form = new Form();
+
 $meses_corto = array(
 	1 => __('Ene'),
 	2 => __('Feb'),
@@ -79,19 +83,29 @@ $meses_corto = array(
 		}
 	}
 </script>
-<form name="formulario2" id="formulario2" method="post" action='' autocomplete="off">
+<form name="formulario2" id="formulario2" method="post" action="" autocomplete="off">
 	<table style="border: 1px solid black;">
 		<tr>
-			<td align=right>
+			<td align="right">
 				<?php echo __('Fecha desde') ?>
 			</td>
-			<td align=left>
-				<table cellpadding="0" cellspacing="0">
+			<td align="left">
+				<table align="left" cellpadding="0" cellspacing="0">
 					<tbody>
 						<tr>
-							<td valign="middle"><?php echo $Form->select('fecha1_m', $meses_corto, $fecha_m, array('empty' => false)); ?></td>
 							<td valign="middle">
-								<input id="fecha1_a" name="fecha1_a" size="4" maxlength="4" value="<?php echo $fecha_a ?>" onkeypress="return YearDigitsOnly(window.event)" type="text">
+								<?php echo $Form->select('fecha1_m', $meses_corto, $fecha_m, array('empty' => false)); ?>
+							</td>
+							<td valign="middle">
+								<?php
+								$year_input_attributes = array(
+									'size' => '4',
+									'maxlength' => '4',
+									'label' => false,
+									'onKeyPress' => 'return YearDigitsOnly(window.event)'
+								);
+								echo $Form->input('fecha1_a', $fecha_a, $year_input_attributes);
+								?>
 							</td>
 						</tr>
 					</tbody>
@@ -103,12 +117,14 @@ $meses_corto = array(
 				<?php echo __('Fecha hasta') ?>
 			</td>
 			<td align="left">
-				<table cellpadding="0" cellspacing="0">
+				<table align="left" cellpadding="0" cellspacing="0">
 					<tbody>
 						<tr>
-							<td valign="middle"><?php echo $Form->select('fecha2_m', $meses_corto, $fecha_m, array('empty' => false)); ?></td>
+							<td valign="middle">
+								<?php echo $Form->select('fecha2_m', $meses_corto, $fecha_m, array('empty' => false)); ?>
+							</td>
 							<td>
-								<input id="fecha2_a" name="fecha2_a" size="4" maxlength="4" value="<?php echo $fecha_a ?>" onkeypress="return YearDigitsOnly(window.event)" type="text">
+								<?php echo $Form->input('fecha2_a', $fecha_a, $year_input_attributes); ?>
 							</td>
 						</tr>
 					</tbody>
@@ -120,16 +136,15 @@ $meses_corto = array(
 				<?php echo __('Agrupar por') ?>
 			</td>
 			<td align="left">
-				<select name="vista" id="vista" onchange="ShowSeleccion();">
-					<?php
-					$vistas = array('profesional', 'mes_reporte', 'glosa_cliente', 'glosa_asunto');
-					$nombre_vistas = array(__('profesional'), __('Mes'), __('glosa_cliente'), __('glosa_cliente') . ' - ' . __('glosa_asunto'));
-					// Las vistas se escriben en el select en el lenguaje actual
-					for ($i = 0; $i < count($vistas); ++$i) {
-						echo "<option value='$vistas[$i]'>$nombre_vistas[$i]</option>\n";
-					}
-					?>
-				</select>
+				<?php
+				$vistas = array(
+					'profesional' => __('profesional'),
+					'mes_reporte' => __('Mes'),
+					'glosa_cliente' => __('glosa_cliente'),
+					'glosa_asunto' => __('glosa_cliente') . ' - ' . __('glosa_asunto')
+				);
+				echo $Form->select('vista', $vistas, '', array('onchange' => 'ShowSeleccion();', 'empty' => false));
+				?>
 			</td>
 		</tr>
 		<tr id="tr_seleccion">
@@ -137,10 +152,13 @@ $meses_corto = array(
 				<?php echo __('Mostrar') ?>
 			</td>
 			<td align="left">
-				<select name="seleccion" id="seleccion">
-					<option value='profesionales'>solo profesionales</option>
-					<option value='todos'>todo el personal</option>
-				</select>
+				<?php
+				$opciones = array(
+					'profesionales' => __('solo profesionales'),
+					'todo el personal' => __('todo el personal')
+				);
+				echo $Form->select('seleccion', $opciones, '', array('empty' => false));
+				?>
 			</td>
 		</tr>
 		<tr>
@@ -148,14 +166,15 @@ $meses_corto = array(
 				<?php echo __('Moneda') ?>
 			</td>
 			<td align="left">
-					<?php
-					echo Html::SelectArray(Moneda::GetMonedas($sesion), "moneda_visualizacion", "", 'id="moneda_visualizacion"', '', "80px");
-					?>
+				<?php
+				echo $Form->select('moneda_visualizacion', $Moneda->Listar(), $moneda_visualizacion, array('empty' => false));
+				?>
 			</td>
 		</tr>
 		<tr>
-			<td align=right colspan=2>
-				<input type=hidden name='opc' value='reporte'>
+			<td>&nbsp;</td>
+			<td align="left">
+				<input type="hidden" name="opc" value="reporte">
 				<?php echo $Form->submit(__('Generar reporte')); ?>
 			</td>
 		</tr>
@@ -165,5 +184,4 @@ $meses_corto = array(
 <?php
 echo $Form->script();
 
-$pagina->PrintBottom($popup);
-
+$Pagina->PrintBottom($popup);
