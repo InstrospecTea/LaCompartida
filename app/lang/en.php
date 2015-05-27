@@ -1,6 +1,7 @@
 <?php
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
+$_LANG['Nº Registro'] = "#";
 $_LANG['Fecha'] = "Date";
 $_LANG['Fecha:'] = "Date:";
 $_LANG['Periodo'] = "Period";
