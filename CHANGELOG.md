@@ -2,6 +2,10 @@
 
 ## Hotfix 15.9.8
 Wednesday 2015, May 27th.
+* **Fix:** [Sync date format with charge language.](https://github.com/LemontechSA/ttb/pull/971)
+
+## Hotfix 15.9.8
+Wednesday 2015, May 27th.
 * **Fix:** [Add new tag for work number with langs.](https://github.com/LemontechSA/ttb/pull/970)
 
 ## Hotfix 15.9.7
