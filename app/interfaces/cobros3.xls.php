@@ -1,9 +1,7 @@
 <?php
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-
 $sesion = new Sesion(array('REV', 'ADM', 'PRO'));
-
 // Defino los permisos validos
 $cobranzapermitido = false;
 $params_array['codigo_permiso'] = 'COB';
@@ -128,13 +126,15 @@ if ($solicitante == 1 || $solicitante == 2) {
 
 $col_duracion = $col++;
 $col_duracion_cobrada = $col++;
+$col_duracion_castigada = $col++;
 $col_cobrable = $col++;
 $col_tarifa_hh = $col++;
 $col_valor_trabajo = $col++;
 $col_tarifa_hh_normalizado = $col++;
 $col_valor_trabajo_normalizado = $col++;
+$col_estado_hora = $col++;
 
-// Valores para las fórmulas
+// Convierte número de columnas a letras de columnas de excel
 $col_formula_duracion = Utiles::NumToColumnaExcel($col_duracion);
 $col_formula_duracion_cobrada = Utiles::NumToColumnaExcel($col_duracion_cobrada);
 $col_formula_cobrable = Utiles::NumToColumnaExcel($col_cobrable);
@@ -172,11 +172,13 @@ if ($solicitante == 1 || $solicitante == 2) {
 
 $ws->setColumn($col_duracion, $col_duracion, 15.67);
 $ws->setColumn($col_duracion_cobrada, $col_duracion_cobrada, 15.67);
+$ws->setColumn($col_duracion_castigada, $col_duracion_castigada, 15.67);
 $ws->setColumn($col_cobrable, $col_cobrable, 15);
 $ws->setColumn($col_tarifa_hh, $col_tarifa_hh, 15.67);
 $ws->setColumn($col_valor_trabajo, $col_valor_trabajo, 20);
 $ws->setColumn($col_tarifa_hh_normalizado, $col_tarifa_hh_normalizado, 40);
 $ws->setColumn($col_valor_trabajo_normalizado, $col_valor_trabajo_normalizado, 40);
+$ws->setColumn($col_estado_hora, $col_estado_hora, 20);
 
 
 $PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
@@ -219,6 +221,7 @@ if ($solicitante == 1 || $solicitante == 2) {
 
 $ws->write($fila_inicial, $col_duracion, __('Duración'), $tit);
 $ws->write($fila_inicial, $col_duracion_cobrada, __('Duración cobrada'), $tit);
+$ws->write($fila_inicial, $col_duracion_castigada, __('Duración castigada'), $tit);
 $ws->write($fila_inicial, $col_cobrable, __('Cobrable'), $tit);
 
 if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
@@ -226,6 +229,7 @@ if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
     $ws->write($fila_inicial, $col_valor_trabajo, __('Valor Trabajo'), $tit);
     $ws->write($fila_inicial, $col_tarifa_hh_normalizado, __('Tarifa HH (Moneda Defecto)'), $tit);
     $ws->write($fila_inicial, $col_valor_trabajo_normalizado, __('Valor Trabajo (Moneda Defecto)'), $tit);
+    $ws->write($fila_inicial, $col_estado_hora, __('Estado de la hora'), $tit);
 }
 
 $fila_inicial++;
@@ -310,12 +314,16 @@ for ($i = 0; $i < $lista->num; $i++) {
     list($duracion, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
     list($h, $m) = split(':', $duracion);
     $duracion_decimal = number_format($h + $m / 60, 1, '.', '');
-    $tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
+    $tiempo_excel_duracion = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
 
     if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
+        $valor_duracion = $duracion_decimal;
+        $formato_duracion = $fdd;
         $ws->writeNumber($fila_inicial + $i, $col_duracion, $duracion_decimal, $fdd);
     } else {
-        $ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
+        $valor_duracion = $tiempo_excel_duracion;
+        $formato_duracion = $time_format;
+        $ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel_duracion, $time_format);
     }
 
     if ($revisorpermitido || $mostrar_tarifa_al_profesional) {
@@ -325,14 +333,17 @@ for ($i = 0; $i < $lista->num; $i++) {
         list($h, $m) = split(':', $duracion_cobrada);
 
         $duracion_cobrada_decimal = number_format($h + $m / 60, 1, '.', '');
-        $tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
+        $tiempo_excel_duracion_cobrada = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
         if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
             $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $duracion_cobrada_decimal, $fdd);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $duracion_decimal-$duracion_cobrada_decimal, $fdd);
         } else {
-            $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel, $time_format);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel_duracion_cobrada, $time_format);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $tiempo_excel_duracion - $tiempo_excel_duracion_cobrada, $time_format);
         }
     } else {
         $ws->write($fila_inicial + $i, $col_duracion_cobrada, '', $time_format);
+        $ws->write($fila_inicial + $i, $col_duracion_castigada, '', $time_format);
     }
 
     $ws->write($fila_inicial + $i, $col_cobrable, $trabajo->fields['cobrable'] == 1 ? "SI" : "NO", $tex);
@@ -420,6 +431,7 @@ for ($i = 0; $i < $lista->num; $i++) {
 
         $ws->writeFormula($fila_inicial + $i, $col_valor_trabajo, $formula_monto, $money_format);
         $ws->writeFormula($fila_inicial + $i, $col_valor_trabajo_normalizado, $formula_monto_defecto, $default_money_format);
+        $ws->write($fila_inicial + $i, $col_estado_hora, $trabajo->fields['estadocobro'], $tex);
     }
 }
 
