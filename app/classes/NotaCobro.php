@@ -5674,7 +5674,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%id_asunto%', __('Matter <br> ID'), $html);
 					$html = str_replace('%tarifa_hora%', __('Hourly<br> Rate'), $html);
 				}
-
+				$html = str_replace('%num_registro%', __('Nº Registro'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
 				$html = str_replace('%tarifa_hora%', __('Tarifa Hora'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
@@ -6010,6 +6010,7 @@ class NotaCobro extends Cobro {
 					$categoria_duracion_descontada += $duracion_decimal_descontada;
 
 					$row = $row_tmpl;
+					$row = str_replace('%num_trabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
@@ -6019,6 +6020,7 @@ class NotaCobro extends Cobro {
 					}
 					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
+					$row = str_replace('%descripcion_mayus%', strtoupper($trabajo->fields['descripcion']), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
