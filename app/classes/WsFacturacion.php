@@ -65,10 +65,7 @@ class WsFacturacion {
 					self::array_to_xml($value, $xml);
 				}
 			} else {
-				$child = $xml->addChild("$key"); 
-				$node = dom_import_simplexml($child);
-				$no   = $node->ownerDocument;
-				$node->appendChild($no->createCDATASection("$value"));
+				$xml->addChild("$key", "$value"); 
 			}
 		}
 	}
