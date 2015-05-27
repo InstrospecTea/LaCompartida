@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 15.10.0](https://github.com/LemontechSA/ttb/pull/972)
+Wednesday 2015, May 27th.
+* **Feature:** [Added columns 'Duración castigada' & 'Estado de la hora' to excel sheet](https://github.com/LemontechSA/ttb/issues/940)
+* **Feature:** [Agrega filtro por grupo de cliente en pantalla de seguimiento de cobros](https://github.com/LemontechSA/ttb/issues/933)
+
 ## Hotfix 15.9.9
 Wednesday 2015, May 27th.
 * **Fix:** [Sync date format with charge language.](https://github.com/LemontechSA/ttb/pull/971)
