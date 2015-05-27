@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.9.8
+Wednesday 2015, May 27th.
+* **Fix:** [Add new tag for work number with langs.](https://github.com/LemontechSA/ttb/pull/970)
+
 ## Hotfix 15.9.7
 Wednesday 2015, May 27th.
 * **Fix:** [Se utiliza cdata en webservice facturacion para evitar problemas con caracteres extraños en atributos](https://github.com/LemontechSA/ttb/issues/969)
