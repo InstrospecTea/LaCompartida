@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix 15.9.8
+## Hotfix 15.9.9
 Wednesday 2015, May 27th.
 * **Fix:** [Sync date format with charge language.](https://github.com/LemontechSA/ttb/pull/971)
 
