@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.9.7
+Wednesday 2015, May 27th.
+* **Fix:** [Se utiliza cdata en webservice facturacion para evitar problemas con caracteres extraños en atributos](https://github.com/LemontechSA/ttb/issues/969)
+
 ## Hotfix 15.9.6
 Tuesday 2015, May 26th.
 * **Fix:** [Se asigna valor por defecto al usuario modificador del contrato en script de integración estudio emba](https://github.com/LemontechSA/ttb/issues/967)
