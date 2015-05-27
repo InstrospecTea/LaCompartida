@@ -118,7 +118,7 @@ if ($opcion == 'guardar') {
 		$val = true;
 		$loadasuntos = false;
 	}
-
+    
 	if (!$val || $opc_copiar) {
 		$As = new Asunto($Sesion);
 		$As->LoadByCodigo($codigo_asunto);
@@ -129,11 +129,11 @@ if ($opcion == 'guardar') {
 		if (!$Asunto->Loaded() || !$codigo_asunto) {
 			if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
-			} else {
-				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
+			} else {                                
+				$codigo_asunto = ($codigo_asunto == '')?$Asunto->AsignarCodigoAsunto($codigo_cliente):$Asunto->fields['codigo_asunto'];
 			}
 		}
-
+                
 		if (!$codigo_cliente_secundario) {
 			$codigo_cliente_secundario = $Cliente->CodigoACodigoSecundario($codigo_cliente);
 		}
@@ -146,18 +146,22 @@ if ($opcion == 'guardar') {
 		$Asunto->NoEditar("tarifa_especial");
 
 		$Asunto->Edit("id_usuario", $Sesion->usuario->fields['id_usuario']);
-		$Asunto->Edit("codigo_asunto", $codigo_asunto, true);
+                if ($Asunto->fields['id_asunto'] == '') {
+                    $Asunto->Edit("codigo_asunto", $codigo_asunto, true);
+                }	
 
-		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
-		} else {
-			if ($codigo_asunto_secundario) {
-				$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
-			} else {
-				$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
-			}
-		}
-
+                if ($Asunto->fields['id_asunto'] == '') {
+                    if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+                            $Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
+                    } else {
+                            if ($codigo_asunto_secundario) {
+                                    $Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
+                            } else {
+                                    $Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
+                            }
+                    }    
+                }
+		
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			$glosa_asunto = strtoupper($glosa_asunto);
 		}
@@ -604,7 +608,7 @@ function MuestraPorValidacion(divID) {
 								<?php echo __('Código') ?>
 							</td>
 							<td align="left">
-								<input id="codigo_asunto" name="codigo_asunto" <?php echo Conf::GetConf($Sesion, 'CodigoObligatorio') ? 'readonly="readonly"' : '' ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase();<?php if (!$Asunto->Loaded())
+                                                            <input id="codigo_asunto" name="codigo_asunto" readonly size="10" maxlength="10" value="<?php echo (isset($codigo_asunto))?$codigo_asunto:''; ?>" onchange="this.value = this.value.toUpperCase();<?php if (!$Asunto->Loaded())
 									echo "CheckCodigo();";
 								?>"/>
 								&nbsp;&nbsp;&nbsp;
