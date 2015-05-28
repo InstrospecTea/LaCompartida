@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
+
 require_once 'Spreadsheet/Excel/Writer.php';
 
 $Sesion = new Sesion();
@@ -23,18 +24,35 @@ if (empty($fecha_m) || $fecha_m < 1 || $fecha_m > 12) {
 	$fecha_m = date('m');
 }
 
-$meses = array(__('Enero'), __('Febrero'), __('Marzo'), __('Abril'), __('Mayo'), __('Junio'), __('Julio'), __('Agosto'), __('Septiembre'), __('Octubre'), __('Noviembre'), __('Diciembre'));
+if (empty($proporcionalidad)) {
+	$proporcionalidad = "cliente";
+}
+
+$meses = array(
+	__('Enero'),
+	__('Febrero'),
+	__('Marzo'),
+	__('Abril'),
+	__('Mayo'),
+	__('Junio'),
+	__('Julio'),
+	__('Agosto'),
+	__('Septiembre'),
+	__('Octubre'),
+	__('Noviembre'),
+	__('Diciembre')
+);
 
 if ($opc == 'reporte') {
 	// Calcular fechas para resumen horas, en formato dd-mm-aaaa.
 	$duracion_mes = array('31', (Utiles::es_bisiesto($fecha2_a) ? '29' : '28'), '31', '30', '31', '30', '31', '31', '30', '31', '30', '31');
 	// Revisar el orden de las fechas.
 	if ($fecha2_a < $fecha1_a || ($fecha2_a == $fecha1_a && $fecha2_m < $fecha1_m)) {
-		$fecha1 = '01-' . sprintf('%02d', $fecha2_m) . '-' . $fecha2_a;
-		$fecha2 = $duracion_mes[$fecha1_m - 1] . '-' . sprintf('%02d', $fecha1_m) . '-' . $fecha1_a;
+		$fecha1 = sprintf('01-%02d-%s', $fecha2_m, $fecha2_a);
+		$fecha2 = sprintf('%s-%02d-%s', $duracion_mes[$fecha1_m - 1], $fecha1_m, $fecha1_a);
 	} else {
-		$fecha1 = '01-' . sprintf('%02d', $fecha1_m) . '-' . $fecha1_a;
-		$fecha2 = $duracion_mes[$fecha2_m - 1] . '-' . sprintf('%02d', $fecha2_m) . '-' . $fecha2_a;
+		$fecha1 = sprintf('01-%02d-%s', $fecha1_m, $fecha1_a);
+		$fecha2 = sprintf('%s-%02d-%s', $duracion_mes[$fecha2_m - 1], $fecha2_m, $fecha2_a);
 	}
 	require_once('planillas/planilla_resumen_horas.php');
 	exit;
@@ -57,6 +75,11 @@ $meses_corto = array(
 	10 => __('Oct'),
 	11 => __('Nov'),
 	12 => __('Dic')
+);
+
+$proporcionalidades = array(
+	'estandar' => __('Estándar'),
+	'cliente' => __('Cliente')
 );
 ?>
 <style>
@@ -161,14 +184,20 @@ $meses_corto = array(
 				?>
 			</td>
 		</tr>
+		<tr id="tr_seleccion">
+			<td align="right">
+				<?php echo __('Proporcionalidad') ?>
+			</td>
+			<td align="left">
+				<?php echo $Form->select('proporcionalidad', $proporcionalidades, $proporcionalidad, array('empty' => false)); ?>
+			</td>
+		</tr>
 		<tr>
 			<td align="right">
 				<?php echo __('Moneda') ?>
 			</td>
 			<td align="left">
-				<?php
-				echo $Form->select('moneda_visualizacion', $Moneda->Listar(), $moneda_visualizacion, array('empty' => false));
-				?>
+				<?php echo $Form->select('moneda_visualizacion', $Moneda->Listar(), $moneda_visualizacion, array('empty' => false)); ?>
 			</td>
 		</tr>
 		<tr>
@@ -182,6 +211,7 @@ $meses_corto = array(
 </form>
 <br />
 <?php
+
 echo $Form->script();
 
 $Pagina->PrintBottom($popup);

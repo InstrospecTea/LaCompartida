@@ -326,8 +326,12 @@ $datos_reporte = array(
 );
 
 foreach ($datos_reporte as $tipo_dato => $config) {
-	$reporte = new Reporte($Sesion);
-	$reporte->id_moneda = $Moneda->fields['id_moneda'];
+	$reporte = new Reporte($sesion);
+	$reporte->id_moneda = $id_moneda;
+	if (!empty($proporcionalidad)) {
+		$reporte->proporcionalidad = $proporcionalidad;
+	}
+
 	// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
 	$reporte->addRangoFecha($fecha1, $fecha2);
 	imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $config['columna'], $config['formato'], $config['vista']);

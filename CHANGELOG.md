@@ -1,5 +1,62 @@
 # Changelog
 
+## Hotfix 15.10.7
+Thursday 2015, May 28th.
+* **Fix:** [Add proportionality selector to financial report](https://github.com/LemontechSA/ttb/pull/986)
+
+## Hotfix 15.10.6
+Thursday 2015, May 28th.
+* **Fix:** [Change task module config definitions](https://github.com/LemontechSA/ttb/pull/984)
+
+## Hotfix 15.10.5
+Thursday 2015, May 28th.
+* **Fix:** [Use right id_moneda for valor_trabajado_estandar](https://github.com/LemontechSA/ttb/pull/983)
+
+## Hotfix 15.10.4
+Thursday 2015, May 28th.
+* **Feature:** [Add field id_gasto in edit/gasto view](https://github.com/LemontechSA/ttb/pull/982)
+
+## Hotfix 15.10.3
+Thursday 2015, May 28th.
+* **Fix:** [Show an alert when exists time entries without fee in a charge and GuardarTarifaAlIngresoDeHora conf is activated](https://github.com/LemontechSA/ttb/pull/980)
+
+## Hotfix 15.10.2
+Thursday 2015, May 28th.
+* **Fix:** [Fix ajax call of contract data](https://github.com/LemontechSA/ttb/pull/979)
+
+## Hotfix 15.10.1
+Thursday 2015, May 28th.
+* **Fix:** [Remove sorteable feature to opcion column](https://github.com/LemontechSA/ttb/pull/975)
+
+## [Release 15.10.0](https://github.com/LemontechSA/ttb/pull/972)
+Wednesday 2015, May 27th.
+* **Feature:** [Added columns 'Duración castigada' & 'Estado de la hora' to excel sheet](https://github.com/LemontechSA/ttb/issues/940)
+* **Feature:** [Agrega filtro por grupo de cliente en pantalla de seguimiento de cobros](https://github.com/LemontechSA/ttb/issues/933)
+
+## Hotfix 15.9.9
+Wednesday 2015, May 27th.
+* **Fix:** [Sync date format with charge language.](https://github.com/LemontechSA/ttb/pull/971)
+
+## Hotfix 15.9.8
+Wednesday 2015, May 27th.
+* **Fix:** [Add new tag for work number with langs.](https://github.com/LemontechSA/ttb/pull/970)
+
+## Hotfix 15.9.7
+Wednesday 2015, May 27th.
+* **Fix:** [Se utiliza cdata en webservice facturacion para evitar problemas con caracteres extraños en atributos](https://github.com/LemontechSA/ttb/issues/969)
+
+## Hotfix 15.9.6
+Tuesday 2015, May 26th.
+* **Fix:** [Se asigna valor por defecto al usuario modificador del contrato en script de integración estudio emba](https://github.com/LemontechSA/ttb/issues/967)
+
+## Hotfix 15.9.5
+Friday 2015, May 22th.
+* **Fix:** [Se corrige la validación anidada al crear los filtros para el asunto, ya que estaba verificando que el codigo del cliente no fuera vacío para filtrar por asunto](https://github.com/LemontechSA/ttb/issues/965)
+
+## Hotfix 15.9.4
+Wednesday 2015, May 20th.
+* **Fix:** [Fix wrong assignment for $contrato_nuevo in agregar_asunto](https://github.com/LemontechSA/ttb/issues/964)
+
 ## Hotfix 15.9.3
 Tuesday 2015, May 19th.
 * **Fix:** [Fix mass time entry edition when using secondary codes](https://github.com/LemontechSA/ttb/issues/963)

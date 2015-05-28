@@ -86,6 +86,10 @@ if ($opc == 'buscar') {
 		if (!empty($estado) && $estado[0] != '-1') {
 			$where .= " AND cobro.estado in ('" . implode("','", $estado) . "') ";
 		}
+
+		if ($id_grupo_cliente) {
+			$where .= " AND (cliente.id_grupo_cliente = '{$id_grupo_cliente}' OR grupo_cliente.id_grupo_cliente = '{$id_grupo_cliente}') ";
+		}
 	}
 
 	if ($codigo_asunto) {
@@ -189,6 +193,7 @@ if ($opc == 'buscar') {
 				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
 			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+				LEFT JOIN grupo_cliente ON grupo_cliente.codigo_cliente = contrato.codigo_cliente
 				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
 				LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
 				LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa";
@@ -466,6 +471,7 @@ $pagina->PrintTop();
 		} else {
 			form.action = 'seguimiento_cobro.php';
 			form.opc.value = 'buscar';
+			form.desde.value = '';
 			form.submit();
 		}
 	}
@@ -555,55 +561,9 @@ $pagina->PrintTop();
 		}
 	}
 
-	function Refrescar(id_foco) {
-		var _codigo_cliente = 'codigo_cliente';
-		var _codigo_asunto = 'codigo_asunto';
-
-		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-			_codigo_cliente = 'codigo_cliente_secundario';
-			_codigo_asunto = 'codigo_asunto_secundario';
-		<?php } ?>
-
-		var factura = $('factura').value;
-		var proceso = $('proceso').value;
-
-		var codigo_cliente = jQuery('#' + _codigo_cliente).val();
-		var codigo_asunto = jQuery('#' + _codigo_asunto).val();
-
-		var forma_cobro = $('forma_cobro').value;
-		var tipo_liquidacion = $('tipo_liquidacion') ? $('tipo_liquidacion').value : '';
-		var id_usuario = $('id_usuario').value;
-		var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
-		var id_cobro = $('id_cobro').value;
-
-		if ($('usar_periodo').checked == true) {
-			var usar_periodo = $('usar_periodo').value;
-		} else {
-			var usar_periodo = '';
-		}
-
-		if ($('rango').checked == true) {
-			var rango = $('rango').value;
-		} else {
-			var rango = '';
-		}
-
-		var fecha_mes = $('fecha_mes').value;
-		var fecha_anio = $('fecha_anio').value;
-		var fecha_ini = $('fecha_ini').value;
-		var fecha_fin = $('fecha_fin').value;
-
-		var orden = "<?php echo $orden ? '&orden=' . $orden : ''; ?>";
-		var pagina_desde = "<?php echo $desde ? '&desde=' . $desde : ''; ?>";
-
-		var estado = '';
-		jQuery("select[name*=estado] option:selected").each(function() {
-      estado += "&estado[]=" + jQuery(this).text();
-    });
-
-		var url = "seguimiento_cobro.php?id_usuario=" + id_usuario + "&tipo_liquidacion=" + tipo_liquidacion + "&forma_cobro=" + forma_cobro + "&id_usuario_secundario=" + id_usuario_secundario + "&id_cobro=" + id_cobro + "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto + "&opc=buscar" + pagina_desde + "&usar_periodo=" + usar_periodo + "&rango=" + rango + "&proceso=" + proceso + "&fecha_ini=" + fecha_ini + "&fecha_mes=" + fecha_mes + "&fecha_anio=" + fecha_anio + "&fecha_fin=" + fecha_fin + estado + orden + "&id_foco=" + id_foco;
-
-		self.location.href = url;
+	function Refrescar() {
+		$('opc').value = 'buscar';
+		self.location.href = 'seguimiento_cobro.php?' + jQuery('#form_busca').serialize();
 	}
 
 	function ShowDiv(div, valor, dvimg) {
@@ -702,6 +662,8 @@ $pagina->PrintTop();
 <form name="form_busca" id="form_busca" action="" method="post">
 	<input type="hidden" name='opc' id='opc' value=''>
 	<input type="hidden" name='id_cobro_hide' value=''>
+ 	<input type='hidden' name='desde' id='desde' value='<?php echo $desde ?>'>
+ 	<input type='hidden' name='orden' id='orden' value='<?php echo $orden ?>'>
 
 	<fieldset class="tb_base" style="width:850px;">
 	<legend><?php echo 'Filtros' ?></legend>
@@ -731,6 +693,16 @@ $pagina->PrintTop();
 					</td>
 				</tr>
 			<?php } ?>
+
+			<tr>
+				<td align="right" width="30%">
+					<b><?php echo __('Grupo') ?></b>&nbsp;
+				</td>
+				<td align="left" colspan="2">
+					<?php $GrupoCliente = new GrupoCliente($sesion); ?>
+					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+				</td>
+			</tr>
 
 			<tbody id="selectclienteasunto">
 				<tr >
