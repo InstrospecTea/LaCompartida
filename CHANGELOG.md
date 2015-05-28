@@ -2,6 +2,10 @@
 
 ## Hotfix 15.10.1
 Thursday 2015, May 28th.
+* **Fix:** [Fix ajax call of contract data](https://github.com/LemontechSA/ttb/pull/977)
+
+## Hotfix 15.10.1
+Thursday 2015, May 28th.
 * **Fix:** [Remove sorteable feature to opcion column](https://github.com/LemontechSA/ttb/pull/975)
 
 ## [Release 15.10.0](https://github.com/LemontechSA/ttb/pull/972)
