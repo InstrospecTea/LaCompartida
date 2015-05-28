@@ -128,9 +128,9 @@ if ($opcion == 'guardar') {
 
 		if (!$Asunto->Loaded() || !$codigo_asunto) {
 			if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
-				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
-			} else {                                
-				$codigo_asunto = ($codigo_asunto == '')?$Asunto->AsignarCodigoAsunto($codigo_cliente):$Asunto->fields['codigo_asunto'];
+                          $codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
+			} elseif ($codigo_asunto == '') {                                
+                          $codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 			}
 		}
                 
@@ -146,11 +146,9 @@ if ($opcion == 'guardar') {
 		$Asunto->NoEditar("tarifa_especial");
 
 		$Asunto->Edit("id_usuario", $Sesion->usuario->fields['id_usuario']);
-                if ($Asunto->fields['id_asunto'] == '') {
-                    $Asunto->Edit("codigo_asunto", $codigo_asunto, true);
-                }	
 
                 if ($Asunto->fields['id_asunto'] == '') {
+                    $Asunto->Edit("codigo_asunto", $codigo_asunto, true);
                     if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
                             $Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
                     } else {
