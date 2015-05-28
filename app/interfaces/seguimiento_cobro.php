@@ -144,6 +144,7 @@ if ($opc == 'buscar') {
 				cobro.impuesto_gastos,
 				cobro.fecha_ini,
 				cobro.fecha_fin,
+				cobro.fecha_creacion,
 				moneda.simbolo,
 				cobro.id_proceso,
 				cobro.codigo_idioma,
@@ -209,7 +210,8 @@ if ($opc == 'buscar') {
                     WHERE $where
 						GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
-	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
+
+	$orden = $cobros->OrdenResultados();
 
 	if ($print) {
 		$cobros_stmt = $sesion->pdodbh->query($query);

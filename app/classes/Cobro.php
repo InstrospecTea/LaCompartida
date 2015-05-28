@@ -314,6 +314,33 @@ if (!class_exists('Cobro')) {
 			return $cantidad_facturas;
 		}
 
+		/**
+		 * Devuelve el orden que debe ser aplicado a la busquedad de cobros.
+		 *
+		 * @return string
+		 */
+		function OrdenResultados() {
+			$order = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
+			$setting_order = Conf::GetConf($this->sesion, 'OrdenarCobrosPorDefecto');
+			$options = array('fecha_creacion');
+
+			if ($setting_order) {
+				$order_split = preg_split('(,|\s)', $setting_order);
+				$order_field = $order_split[0];
+				$order_option = strtolower(end($order_split));
+
+				if (in_array($order_field, $options)) {
+					if ($order_option == 'desc') {
+						$order = $order_field . ' ' . $order_option;
+					} else {
+						$order = $order_field;
+					}
+				}
+			}
+
+			return $order;
+		}
+
 		/*
 		 * @param $sesion objeto sesion
 		 * @param $nuevomodulofactura bool dice si está activo
