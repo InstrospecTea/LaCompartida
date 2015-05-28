@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 15.10.6
+Thursday 2015, May 28th.
+* **Fix:** [Change task module config definitions](https://github.com/LemontechSA/ttb/pull/984)
+
 ## Hotfix 15.10.5
 Thursday 2015, May 28th.
-* **Fix:** [Use right id_moneda for valor_trabajado_estanadr](https://github.com/LemontechSA/ttb/pull/983)
+* **Fix:** [Use right id_moneda for valor_trabajado_estandar](https://github.com/LemontechSA/ttb/pull/983)
 
 ## Hotfix 15.10.4
 Thursday 2015, May 28th.
