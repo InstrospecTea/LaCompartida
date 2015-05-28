@@ -28,18 +28,18 @@ if (empty($proporcionalidad)) {
 }
 
 $meses = array(
-    __('Enero'),
-    __('Febrero'),
-    __('Marzo'),
-    __('Abril'),
-    __('Mayo'),
-    __('Junio'),
-    __('Julio'),
-    __('Agosto'),
-    __('Septiembre'),
-    __('Octubre'),
-    __('Noviembre'),
-    __('Diciembre')
+	__('Enero'),
+	__('Febrero'),
+	__('Marzo'),
+	__('Abril'),
+	__('Mayo'),
+	__('Junio'),
+	__('Julio'),
+	__('Agosto'),
+	__('Septiembre'),
+	__('Octubre'),
+	__('Noviembre'),
+	__('Diciembre')
 );
 
 if ($opc == 'reporte') {
@@ -48,7 +48,7 @@ if ($opc == 'reporte') {
 	// Revisar el orden de las fechas.
 	if ($fecha2_a < $fecha1_a || ($fecha2_a == $fecha1_a && $fecha2_m < $fecha1_m)) {
 		$fecha1 = sprintf('01-%02d-%s', $fecha2_m, $fecha2_a);
-		$fecha2 = sprintf('%s-%02d-%s', $duracion_mes[$fecha1_m - 1], sprintf('%02d', $fecha1_m), $fecha1_a);
+		$fecha2 = sprintf('%s-%02d-%s', $duracion_mes[$fecha1_m - 1], $fecha1_m, $fecha1_a);
 	} else {
 		$fecha1 = sprintf('01-%02d-%s', $fecha1_m, $fecha1_a);
 		$fecha2 = sprintf('%s-%02d-%s', $duracion_mes[$fecha2_m - 1], $fecha2_m, $fecha2_a);
