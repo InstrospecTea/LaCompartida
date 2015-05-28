@@ -145,7 +145,7 @@ class SearchService implements ISearchService {
 			if ($for == '') {
 				$for = $searchCriteria->entity();
 			}
-			$constructedRestriction = CriteriaRestriction::$restriction($for . '.' . $filter->property(), $filter->value())->__toString();
+			$constructedRestriction = CriteriaRestriction::$restriction($this->makeRestrictionName($for, $filter->property()), $filter->value())->__toString();
 			if ($filter->condition() == 'AND') {
 				$and_filters[] = $constructedRestriction;
 			} else {
@@ -240,6 +240,13 @@ class SearchService implements ISearchService {
 		} else {
 			return "{$entity}.{$property}";
 		}
+	}
+
+	private function makeRestrictionName($for, $property) {
+		if (preg_match('/\((.*)\)/i', $property, $match)) { //is a function
+			 return $property; 
+		} 
+		return $for . '.' . $property;
 	}
 
 	private function makeAliasName($field_name) {
