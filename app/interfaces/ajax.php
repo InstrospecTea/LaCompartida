@@ -228,34 +228,33 @@ if ($accion == "consistencia_cliente_asunto") {
 	} else {
 		echo $respuesta;
 	}
-} else if ($accion == "num_abogados_sin_tarifa") {
-	$query = "SELECT DISTINCT u.id_usuario,
-							CONCAT_WS(' ',u.nombre,u.apellido1, u.apellido2) as nombre_usuario,
-							ut.tarifa
-						FROM trabajo AS t
-							 JOIN cobro AS c ON c.id_cobro=t.id_cobro
-							 JOIN contrato AS co ON c.id_contrato=co.id_contrato
-							 JOIN usuario AS u ON u.id_usuario=t.id_usuario
-							 LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda=c.id_moneda AND ut.id_usuario=u.id_usuario AND co.id_tarifa=ut.id_tarifa )
-													WHERE c.id_cobro=" . $id_cobro . " AND ( ut.tarifa=0 OR ut.tarifa='' OR ut.tarifa IS NULL )";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	$num = mysql_num_rows($resp);
-
-	if ($num > 0) {
-		$respuesta = $num . '//';
+} else if ($accion == "num_items_sin_tarifa") {
+	if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
+		$query = "SELECT t.id_trabajo as id,
+				CONCAT(DATE(t.fecha_creacion), ' (', DATE_FORMAT(t.duracion_cobrada, '%H:%i'), ') - ', a.glosa_asunto) as nombre
+			FROM trabajo AS t
+				JOIN asunto AS a ON a.codigo_asunto = t.codigo_asunto
+				JOIN cobro AS c ON c.id_cobro = t.id_cobro
+				JOIN contrato AS co ON c.id_contrato = co.id_contrato
+				LEFT JOIN trabajo_tarifa AS tt ON (tt.id_trabajo = t.id_trabajo AND
+				 (tt.id_moneda = c.id_moneda OR c.id_moneda < 1 AND tt.id_moneda = co.id_moneda))
+			WHERE c.id_cobro = {$id_cobro} AND t.cobrable = 1 AND ( tt.valor = 0 OR tt.valor = '' OR tt.valor IS NULL)";
 	} else {
-		$respuesta = $num;
+		$query = "SELECT DISTINCT u.id_usuario as id,
+				CONCAT_WS(' ',u.nombre,u.apellido1, u.apellido2) as nombre
+			FROM trabajo AS t
+				JOIN cobro AS c ON c.id_cobro = t.id_cobro
+				JOIN contrato AS co ON c.id_contrato = co.id_contrato
+				JOIN usuario AS u ON u.id_usuario = t.id_usuario
+			  LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda = c.id_moneda AND ut.id_usuario = u.id_usuario AND co.id_tarifa = ut.id_tarifa )
+			WHERE c.id_cobro = {$id_cobro} AND ( ut.tarifa = 0 OR ut.tarifa = '' OR ut.tarifa IS NULL)";
 	}
-	$cont = 1;
-	while (list( $id_usuario, $nombre_usuario, $tarifa ) = mysql_fetch_array($resp)) {
-		if ($cont == $num) {
-			$respuesta .= $id_usuario . '~' . $nombre_usuario;
-		} else {
-			$respuesta .= $id_usuario . '~' . $nombre_usuario . '//';
-		}
-		$cont++;
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$respuesta = array();
+	while ($fila = mysql_fetch_assoc($resp)) {
+		$respuesta[] = $fila;
 	}
-	echo $respuesta;
+	echo json_encode($respuesta);
 } else if ($accion == 'set_duracion_defecto') {
 	$query = "SELECT duracion_defecto, trabajo_si_no_defecto FROM tramite_tipo WHERE id_tramite_tipo = '{$id}'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
