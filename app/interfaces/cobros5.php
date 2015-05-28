@@ -2243,9 +2243,6 @@ else
 	</div>
 	<br/>
 	<br/>
-	<table>
-		<tr/>
-	</table>
 </div>
 
 
