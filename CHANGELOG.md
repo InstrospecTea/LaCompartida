@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.4
+Thursday 2015, May 28th.
+* **Feature:** [Add field id_gasto in edit/gasto view](https://github.com/LemontechSA/ttb/pull/982)
+
 ## Hotfix 15.10.3
 Thursday 2015, May 28th.
 * **Fix:** [Show an alert when exists time entries without fee in a charge and GuardarTarifaAlIngresoDeHora conf is activated](https://github.com/LemontechSA/ttb/pull/980)
