@@ -443,8 +443,13 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_telefono,
 											contrato.glosa_contrato
 										FROM contrato
-											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
-										WHERE (cliente.codigo_cliente = '{$codigo_cliente}' OR cliente.codigo_cliente_secundario = '{$codigo_cliente}')";
+											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente WHERE 1 "; 
+
+	if (!empty($codigo_cliente)) {
+		$codigo_cliente_key = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
+		$query_contrato .= " AND cliente.{$codigo_cliente_key} = '{$codigo_cliente}'";
+	}
+	
 	if (!empty($id_contrato)) {
 		$query_contrato .= " AND contrato.id_contrato = {$id_contrato}";
 	}
