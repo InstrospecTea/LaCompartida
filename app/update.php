@@ -10791,7 +10791,7 @@ QUERY;
 
 		case 8.02:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarCobrosPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Fecha de Creacion del Cobro => fecha_creacion', 'string', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarCobrosPorDefecto', '', 'Campos soportados para ordenamiento:<br/> Fecha de Creacion del Cobro => fecha_creacion', 'string', '6', '-1');";
 			break;
 			
 	}
