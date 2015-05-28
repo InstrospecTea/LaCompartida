@@ -614,68 +614,27 @@ echo $refrescar;
 
 	function Emitir(form) {
 		jQuery('#btn_emitir_cobro').prop('disabled', 'disabled');
-		var data_get = {accion: 'num_abogados_sin_tarifa', id_cobro: jQuery('#id_cobro').val()};
+		var data_get = {accion: 'num_items_sin_tarifa', id_cobro: jQuery('#id_cobro').val()};
 		jQuery.ajax('ajax.php', {
 			async: false,
 			data: data_get,
-			dataType: 'text',
-			success: function(text) {
-				var response = text.split('//');
-
-				var text_window = '';
-				<?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) { ?>
-					if( response[0] != 0 ) {
-						if( response[0] < 2 ) {
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("El siguiente trabajo ") ?></span><br /><br />';
-						} else if ( response[0] <= 10 ) {
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("Los siguientes trabajos ") ?></span><br><br>';
-						} else {
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("hay más de 10 trabajos que") ?></span><br><br>';
-						}
-						for(i=1;i<response.length;i++) {
-							var datos = response[i].split('~');
-							if ( response[0] <= 10 ) {
-								text_window += '<br /><span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span> <a href="javascript:;" onclick="nuevaVentana(\'Editar_Trabajo\',600,500,\'editar_trabajo.php?id_cobro=&id_trabajo='+datos[0]+'&popup=1\',\'\');" style="color:blue;">Corregir aquí</a><br>';
-							}
-						}
-						if( response[0] < 2 ) {
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __(" no tiene tarifa definida.") ?></span><br>';
-						} else {
-							text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?php echo __(" no tienen tarifa definida.") ?></span><br>';
-						}
+			dataType: 'json',
+			success: function(data) {
+				var div = jQuery('<div/>').attr('title', '<?php echo __("ALERTA") ?>').html(jQuery('#confirmacionEmitir').html());
+				var num = data.length;
+				if(num > 0) {
+					var template = div.find('#templateItemTarifaCero').html();
+					var container = div.find('#itemsTarifaCero');
+					for(var i=0; i<num; i++) {
+						container.append(jQuery('<div/>', {
+							html: template.replace(/{{id}}/g, data[i].id).replace(/{{nombre}}/g, data[i].nombre)
+						}));
 					}
-					text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?" ?></span><br>';
-					text_window += '<br><table><tr>';
-					text_window += '</table>';
 
-				<?php } else { ?>
-
-					if( response[0] != 0 ) {
-						if( response[0] < 2 )
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("La tarifa del abogado ") ?></span>';
-						else
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("Las tarifas de los abogados ") ?></span><br><br>';
-						for(i=1;i<response.length;i++)
-						{
-							var datos = response[i].split('~');
-							if( response[0] < 2 )
-								text_window += '<span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span>';
-							else
-								text_window += '<span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span><br>';
-						}
-						if( response[0] < 2 )
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __(" no esta definido.") ?></span><br>';
-						else
-							text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?php echo __(" no estan definidos.") ?></span><br>';
-						text_window += '<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a><br><br>';
-					}
-					text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?" ?></span><br>';
-					text_window += '<br><table><tr>';
-					text_window += '</table>';
-
-				<?php } ?>
-
-				var div = jQuery('<div/>').attr('title', '<?php echo __("ALERTA") ?>').html(text_window);
+					div.find('#tarifasCero').show();
+					var cantidad = num == 1 ? 1 : (num < 10 ? 2 : 3);
+					div.find('[class*=cantidad]').hide().filter('.cantidad' + cantidad).show();
+				}
 				var disableButton = function(button) {
 					button.attr('aria-disabled', 'true').attr('disabled');
 					button.find('.ui-button-text').text('<?php echo __("Guardando...") ?>')
@@ -2232,7 +2191,59 @@ else
 
 <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro?>" width=600px height=450px style="border: none;" frameborder=0></iframe>
 
-
+<div id="confirmacionEmitir" style="display:none">
+	<div style="font-size:11px; color:#000; ">
+		<div id="tarifasCero" style="display:none">
+			<?php if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) { ?>
+				<span>
+					<span class="cantidad1"><?php echo __("El siguiente trabajo ") ?>:</span>
+					<span class="cantidad2"><?php echo __("Los siguientes trabajos ") ?>:</span>
+					<span class="cantidad3"><?php echo __("hay más de 10 trabajos que") ?></span>
+				</span>
+				<span class="cantidad1 cantidad2">
+					<br/>
+					<div id="itemsTarifaCero"></div>
+					<div id="templateItemTarifaCero" style="display:none">
+						<span>{{nombre}}</span>
+						<a href="javascript:;" onclick="nuevaVentana('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=&popup=1&id_trabajo={{id}}', '');" style="color:blue;">Corregir aquí</a>
+						<br/>
+					</div>
+				</span>
+				<span>
+					<span class="cantidad1"><?php echo __(" no tiene tarifa definida."); ?></span>
+					<span class="cantidad2 cantidad3"><?php echo __(" no tienen tarifa definida."); ?></span>
+					<br/>
+					<span>
+						Puede revisar las tarifas de todos los trabajos
+						<a href="cobros3.php?id_cobro=<?php echo $id_cobro; ?>&popup=1&contitulo=true" style="color:blue;">aquí</a></span>
+				</span>
+			<?php } else { ?>
+				<span>
+					<span class="cantidad1"><?php echo __("La tarifa del abogado "); ?></span>
+					<span class="cantidad2 cantidad3"><?php echo __("Las tarifas de los abogados "); ?></span>
+				</span>
+				<div id="itemsTarifaCero"></div>
+				<div id="templateItemTarifaCero" style="display:none">
+					<span>{{nombre}}</span>
+					<br class="cantidad2 cantidad3"/>
+				</div>
+				<span>
+					<span class="cantidad1"><?php echo __(" no esta definido."); ?></span>
+					<span class="cantidad2 cantidad3"><?php echo __(" no estan definidos."); ?></span>
+					<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a>
+				</span>
+			<?php } ?>
+			<br/>
+			<br/>
+		</div>
+		<span>
+			<?php echo __("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") .
+				" " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?"; ?>
+		</span>
+	</div>
+	<br/>
+	<br/>
+</div>
 
 
 <script type="text/javascript">

@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.3
+Thursday 2015, May 28th.
+* **Fix:** [Show an alert when exists time entries without fee in a charge and GuardarTarifaAlIngresoDeHora conf is activated](https://github.com/LemontechSA/ttb/pull/980)
+
 ## Hotfix 15.10.2
 Thursday 2015, May 28th.
 * **Fix:** [Fix ajax call of contract data](https://github.com/LemontechSA/ttb/pull/979)
