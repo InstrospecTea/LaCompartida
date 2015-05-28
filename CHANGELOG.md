@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.5
+Thursday 2015, May 28th.
+* **Fix:** [Use right id_moneda for valor_trabajado_estanadr](https://github.com/LemontechSA/ttb/pull/983)
+
 ## Hotfix 15.10.4
 Thursday 2015, May 28th.
 * **Feature:** [Add field id_gasto in edit/gasto view](https://github.com/LemontechSA/ttb/pull/982)
