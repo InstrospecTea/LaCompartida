@@ -823,7 +823,8 @@ class Reporte {
     $join_por_cobrar .= "usuario_tarifa.id_usuario = trabajo.id_usuario
               AND usuario_tarifa.id_moneda = contrato.id_moneda
               {$join_tarifa}
-            LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
+            LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = " . 
+                (($this->tipo_dato == 'valor_trabajado_estandar') ? 'trabajo' : 'contrato') . ".id_moneda
             LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
 
     $add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'));
