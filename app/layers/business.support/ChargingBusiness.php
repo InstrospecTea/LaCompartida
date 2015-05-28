@@ -190,7 +190,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$tr = new HtmlBuilder();
 			$tr->set_tag('tr');
 			$td_date = new HtmlBuilder('td');
-			$td_date->set_html($work->get('fecha'));
+			$date = new DateTime($work->get('fecha'));
+			$td_date->set_html($date->format(str_replace('%','',$language->get('formato_fecha'))));
 			$td_user = new HtmlBuilder('td');
 			if($charge->get('opc_ver_detalles_por_hora_iniciales')) {
 				$td_user->set_html($work->get('username'));

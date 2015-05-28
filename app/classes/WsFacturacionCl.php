@@ -244,6 +244,29 @@ class WsFacturacionCl extends WsFacturacion {
 		}
 	}
 
+	/**
+	 * Convierte un Array en un String XML
+	 * @param array $array
+	 * @param SimpleXMLElement $xml
+	 */
+	protected static function array_to_xml($array, SimpleXMLElement &$xml) {
+		foreach ($array as $key => $value) {
+			if (is_array($value)) {
+				if (!is_numeric($key)) {
+					$subnode = $xml->addChild("$key");
+					self::array_to_xml($value, $subnode);
+				} else {
+					self::array_to_xml($value, $xml);
+				}
+			} else {
+				$child = $xml->addChild("$key"); 
+				$node = dom_import_simplexml($child);
+				$no   = $node->ownerDocument;
+				$node->appendChild($no->createCDATASection("$value"));
+			}
+		}
+	}
+	
 	private static function crearXML($data) {
 		$xml = new SimpleXMLElement('<DTE/>');
 		$node = $xml->addChild('Documento');
