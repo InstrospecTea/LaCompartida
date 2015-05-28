@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
 use TTB\Pagina as Pagina;
 
 $Sesion = new Sesion(array('DAT', 'SASU'));
@@ -12,6 +11,7 @@ $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente') && $cobro_independiente;
 $validacionesClienteJS = Conf::GetConf($Sesion, 'ValidacionesCliente') ? "(document.getElementById('cobro_independiente').checked)" : 'false';
+require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
 $usuario_responsable_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoComercial');
 $usuario_secundario_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto');
 $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1;
@@ -24,7 +24,8 @@ if ($codigo_cliente_secundario != '') {
   $codigo_cliente = $Cliente->fields['codigo_cliente'];
 }
 
-if ($id_asunto > 0) {
+//  Edicion de un asunto
+if ($id_asunto > 0) { 
   if (!$Asunto->Load($id_asunto)) {
     $Pagina->FatalError('Código inválido');
   }
@@ -43,13 +44,15 @@ if ($id_asunto > 0) {
     // Esto hay que revisarlo se usó como parche y se debería de corregir
     if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
       $codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
+    } elseif ($id_asunto != '') {
+      $codigo_asunto = $Asunto->fields['codigo_asunto'];
     } else {
       $codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
     }
     
     // validación para que al cambiar un asunto de un cliente a otro,
     // no existan cobros ni gastos asociados para el cliente inicial
-    if ($opcion == "guardar") {
+    if ($opcion == "guardar") { //entra aqui cuando la edicion viene desde guardar
       $query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
       $resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
       list($count) = mysql_fetch_array($resp);
