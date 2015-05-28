@@ -413,7 +413,7 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 					{ "sClass": "marginleft", "aTargets": [ 2 ] },
 					{ "sClass": "tablagastos", "aTargets": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10  ]   },
 					{ "sWidth": "60px", "aTargets": [ 0, 1, 5, 6, 11, 12] },
-					{ "bSortable":false, "aTargets": [ 2, 3, 4, 11, 12] },
+					{ "bSortable": false, "aTargets": [ 2, 3, 4, 11, 12, 13] },
 					{ "bVisible": false, "aTargets": [ 5, 10, 12, 14] },
 <?php
 if (!Conf::GetConf($sesion, 'NumeroGasto')) {

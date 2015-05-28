@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.1
+Thursday 2015, May 28th.
+* **Fix:** [Remove sorteable feature to opcion column](https://github.com/LemontechSA/ttb/pull/975)
+
 ## [Release 15.10.0](https://github.com/LemontechSA/ttb/pull/972)
 Wednesday 2015, May 27th.
 * **Feature:** [Added columns 'Duración castigada' & 'Estado de la hora' to excel sheet](https://github.com/LemontechSA/ttb/issues/940)
