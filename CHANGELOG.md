@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.7
+Thursday 2015, May 28th.
+* **Fix:** [Add proportionality selector to financial report](https://github.com/LemontechSA/ttb/pull/986)
+
 ## Hotfix 15.10.6
 Thursday 2015, May 28th.
 * **Fix:** [Change task module config definitions](https://github.com/LemontechSA/ttb/pull/984)
