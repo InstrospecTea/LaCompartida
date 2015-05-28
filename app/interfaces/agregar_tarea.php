@@ -233,7 +233,7 @@ $pagina->PrintTop($popup);
 			<td align='left' colspan='3'>
 				<?php
 					if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
-							if(Conf::GetConf($sesion,'CodigoSecundario') || Conf::CodigoSecundario()) {
+							if(Conf::GetConf($sesion,'CodigoSecundario')) {
 								echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario,'',"320");
 							}else{
 								echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente,'','',"320");
