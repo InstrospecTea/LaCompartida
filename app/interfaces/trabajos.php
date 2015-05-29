@@ -287,6 +287,10 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
 	}
 
+	if ($forma_cobro) {
+		$where .= " AND IFNULL(cobro.forma_cobro, contrato.forma_cobro) = '$forma_cobro' ";
+	}
+
 	// Filtro para Actividades si están activos
 	if (Conf::GetConf($sesion, 'UsoActividades') && !empty($codigo_actividad)) {
 		$where .= " AND actividad.codigo_actividad = '$codigo_actividad'";
@@ -677,7 +681,21 @@ $pagina->PrintTop($popup);
 							?>
 					</td>
 				</tr>
-				<?php
+
+				<tr>
+					<td class="buscadorlabel">
+						<?php echo __('Forma de Tarificación') ?>
+					</td>
+					<td valign="top" class="texto" align="left">
+						<?php
+							$FormaCobro = new PrmFormaCobro($sesion);
+							$FormHelper = new Form();
+							$formas_cobro = $FormaCobro->Listar();
+							echo $FormHelper->select('forma_cobro', $formas_cobro, $forma_cobro, array('empty' => __('Cualquiera')));
+							?>
+					</td>
+				</tr>
+			<?php
 
 			}
 			// Validando fecha

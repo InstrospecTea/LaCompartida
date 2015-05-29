@@ -52,7 +52,7 @@
     </tr>
    <tr>
         <td align=right>
-           <?=__('Forma Cobro')?>
+           <?=__('Forma Tarificación')?>
         </td>
         <td align=left>
             <?=Html::SelectQuery($sesion,"SELECT forma_cobro, descripcion FROM prm_forma_cobro ORDER BY forma_cobro", "forma_cobro[]",$forma_cobro,"multiple size=5",""); ?>

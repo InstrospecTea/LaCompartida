@@ -167,7 +167,7 @@
 		}
     $ws1->write($fila_inicial, $col_tarifa, __('Tarifa'), $tit);
 	$ws1->write($fila_inicial, $col_moneda, __('Moneda'), $tit);
-	$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Cobro'), $tit);
+	$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Tarificación'), $tit);
 	$ws1->write($fila_inicial, $col_monto_asunto, __('Monto(FF/R/C)'), $tit);
     $ws1->write($fila_inicial, $col_tipo_proyecto, __('Tipo de Proyecto'), $tit);
     $ws1->write($fila_inicial, $col_area_proyecto, __('Area de Práctica'), $tit);

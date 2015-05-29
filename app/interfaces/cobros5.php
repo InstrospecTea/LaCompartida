@@ -1346,11 +1346,11 @@ else
 
 	<!-- Modalidad -->
 	<fieldset id="forma_cobro" style="width: 95%; display: <?php echo ( $cobro->fields['incluye_honorarios'] != 0 ? "block" : "none"); ?>">
-		<legend><?php echo __('Forma de cobro') ?></legend>
+		<legend><?php echo __('Forma de Tarificación') ?></legend>
 		<table width='100%' cellspacing='3' cellpadding='3'>
 			<tr>
 				<td align="center">
-					<?php echo __('Forma de cobro') ?>
+					<?php echo __('Forma de Tarificación') ?>
 				</td>
 				<td align="center">
 					<?php if ($cobro->fields['forma_cobro'] == '') {
