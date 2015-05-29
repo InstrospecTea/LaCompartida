@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.10.9
+Friday 2015, May 29th.
+* **Fix:** [Avoid edit manually the matter code](https://github.com/LemontechSA/ttb/pull/990)
+
+## Hotfix 15.10.8
+Friday 2015, May 29th.
+* **Fix:** [add type of charge in filters of time entries review](https://github.com/LemontechSA/ttb/pull/988)
+
 ## Hotfix 15.10.7
 Thursday 2015, May 28th.
 * **Fix:** [Add proportionality selector to financial report](https://github.com/LemontechSA/ttb/pull/986)

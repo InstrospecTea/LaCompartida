@@ -5,22 +5,16 @@ use TTB\Pagina as Pagina;
 $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
-
 $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
-
 $Form = new Form;
 $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
-
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente') && $cobro_independiente;
 $validacionesClienteJS = Conf::GetConf($Sesion, 'ValidacionesCliente') ? "(document.getElementById('cobro_independiente').checked)" : 'false';
-
 require_once Conf::ServerDir() . '/interfaces/agregar_contrato_validaciones.php';
-
 $usuario_responsable_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoComercial');
 $usuario_secundario_obligatorio = Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto');
 $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1;
-
 $contrato = new Contrato($Sesion);
 $Cliente = new Cliente($Sesion);
 $Asunto = new Asunto($Sesion);
@@ -30,6 +24,7 @@ if ($codigo_cliente_secundario != '') {
 	$codigo_cliente = $Cliente->fields['codigo_cliente'];
 }
 
+//  Edicion de un asunto
 if ($id_asunto > 0) {
 	if (!$Asunto->Load($id_asunto)) {
 		$Pagina->FatalError('Código inválido');
@@ -45,17 +40,19 @@ if ($id_asunto > 0) {
 		if ($codigo_cliente != '') {
 			$Cliente->LoadByCodigo($codigo_cliente);
 		}
-	} else if ($Cliente->fields['codigo_cliente'] != $codigo_cliente) {
+	} elseif ($Cliente->fields['codigo_cliente'] != $codigo_cliente) {
 		// Esto hay que revisarlo se usó como parche y se debería de corregir
 		if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
 			$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
+		} elseif ($id_asunto != '') {
+			$codigo_asunto = $Asunto->fields['codigo_asunto'];
 		} else {
 			$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 		}
+
 		// validación para que al cambiar un asunto de un cliente a otro,
 		// no existan cobros ni gastos asociados para el cliente inicial
-		if ($opcion == "guardar") {
-
+		if ($opcion == "guardar") { //entra aqui cuando la edicion viene desde guardar
 			$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
 			$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 			list($count) = mysql_fetch_array($resp);
@@ -72,16 +69,17 @@ if ($id_asunto > 0) {
 				$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));
 			}
 		}
-	} else if ($Cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && Conf::GetConf($Sesion, 'CodigoSecundario')) {
+	} elseif ($Cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 	}
 }
 
 if ($codigo_cliente != '' && !$Cliente->Loaded()) {
 	$Cliente->LoadByCodigo($codigo_cliente);
+
 	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
-		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
-		$Cliente->LoadByCodigo($codigo_cliente);
+					$Cliente->LoadByCodigoSecundario($codigo_cliente) :
+					$Cliente->LoadByCodigo($codigo_cliente);
 
 	if ($loaded) {
 		$codigo_cliente = $Cliente->fields['codigo_cliente'];
@@ -129,7 +127,7 @@ if ($opcion == 'guardar') {
 		if (!$Asunto->Loaded() || !$codigo_asunto) {
 			if (Conf::GetConf($Sesion, 'CodigoEspecialGastos')) {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente, $glosa_asunto);
-			} else {
+			} elseif ($codigo_asunto == '') {
 				$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 			}
 		}
@@ -146,15 +144,17 @@ if ($opcion == 'guardar') {
 		$Asunto->NoEditar("tarifa_especial");
 
 		$Asunto->Edit("id_usuario", $Sesion->usuario->fields['id_usuario']);
-		$Asunto->Edit("codigo_asunto", $codigo_asunto, true);
 
-		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
-		} else {
-			if ($codigo_asunto_secundario) {
+		if ($Asunto->fields['id_asunto'] == '') {
+			$Asunto->Edit("codigo_asunto", $codigo_asunto, true);
+			if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 				$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
 			} else {
-				$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
+				if ($codigo_asunto_secundario) {
+					$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
+				} else {
+					$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
+				}
 			}
 		}
 
@@ -362,348 +362,348 @@ $Pagina->PrintTop($popup);
 if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 	$field_codigo_asunto_secundario = array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario']));
 
-	if (Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) { ?>
+	if (Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) {
+		?>
 		<script type="text/javascript">
 			var codigo_asunto_secundario = <?php echo $Asunto->Loaded() ? $field_codigo_asunto_secundario : 'null'; ?>;
 			function valueInteger(elm) {
-				var patt = /^(0+)/;
-				var val = elm.val();
-				if (patt.test(val) || val !== Math.abs(val)) {
-					elm.val(Math.abs(val.replace(patt, '')));
-				}
-			}
-			jQuery(document).ready(function() {
-				<?php if (!$Asunto->Loaded()) { ?>
-					jQuery.get('ajax/asunto_secundario.php', {'opt': 'ultimo_codigo'}, function(resp) {
-						if (resp.error) {
-							alert(resp.error);
-							return;
-						}
-						jQuery('#codigo_asunto_secundario').val(resp.codigo);
-						codigo_asunto_secundario = resp.codigo;
-					}, 'json');
-				<?php } ?>
-
-				jQuery('#codigo_asunto_secundario').change(function() {
-					var me = jQuery(this);
-					valueInteger(me);
-					if (codigo_asunto_secundario != me.val()) {
-						jQuery.get('ajax/asunto_secundario.php', {'opt': 'validar_codigo', codigo: me.val()}, function(resp) {
-							if (resp.error) {
-								alert(resp.error);
-								me.addClass('error-correlativo');
-								me.data('glosa-error', resp.error);
-							} else {
-								me.removeClass('error-correlativo');
-								me.data('glosa-error', 'resp.error');
-							}
-						}, 'json');
-					} else {
-						me.removeClass('error-correlativo');
-						me.data('glosa-error', 'resp.error');
+					var patt = /^(0+)/;
+					var val = elm.val();
+					if (patt.test(val) || val !== Math.abs(val)) {
+							elm.val(Math.abs(val.replace(patt, '')));
 					}
-				});
+			}
+			jQuery(document).ready(function () {
+		<?php if (!$Asunto->Loaded()) { ?>
+						jQuery.get('ajax/asunto_secundario.php', {'opt': 'ultimo_codigo'}, function (resp) {
+								if (resp.error) {
+										alert(resp.error);
+										return;
+								}
+								jQuery('#codigo_asunto_secundario').val(resp.codigo);
+								codigo_asunto_secundario = resp.codigo;
+						}, 'json');
+		<?php } ?>
+
+					jQuery('#codigo_asunto_secundario').change(function () {
+							var me = jQuery(this);
+							valueInteger(me);
+							if (codigo_asunto_secundario != me.val()) {
+									jQuery.get('ajax/asunto_secundario.php', {'opt': 'validar_codigo', codigo: me.val()}, function (resp) {
+											if (resp.error) {
+													alert(resp.error);
+													me.addClass('error-correlativo');
+													me.data('glosa-error', resp.error);
+											} else {
+													me.removeClass('error-correlativo');
+													me.data('glosa-error', 'resp.error');
+											}
+									}, 'json');
+							} else {
+									me.removeClass('error-correlativo');
+									me.data('glosa-error', 'resp.error');
+							}
+					});
 			});
 		</script>
-	<?php
+		<?php
 	}
 }
 ?>
 <script type="text/javascript">
 	function Volver(form) {
-		window.opener.location = 'agregar_cliente.php?id_cliente=<?php echo $Cliente->fields['id_cliente'] ?>';
-		window.close();
+			window.opener.location = 'agregar_cliente.php?id_cliente=<?php echo $Cliente->fields['id_cliente'] ?>';
+			window.close();
 	}
 
-function MuestraPorValidacion(divID) {
-		var divArea = $(divID);
-		var divAreaImg = $(divID + "_img");
-		var divAreaVisible = divArea.style['display'] != "none";
-		divArea.style['display'] = "inline";
-		divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
+	function MuestraPorValidacion(divID) {
+			var divArea = $(divID);
+			var divAreaImg = $(divID + "_img");
+			var divAreaVisible = divArea.style['display'] != "none";
+			divArea.style['display'] = "inline";
+			divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
 	}
 
 	function Validar(form) {
-		if (!form) {
-			var form = $('formulario');
-		}
-		<?php if (Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1) { ?>
-			if (form.id_encargado && !form.id_encargado.value) {
-				alert('<?php echo 'Debe ingresar ' . __('Usuario encargado') ?>');
-				form.id_encargado.focus();
-				return false;
+			if (!form) {
+					var form = $('formulario');
 			}
-		<?php } ?>
+<?php if (Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') == 1) { ?>
+				if (form.id_encargado && !form.id_encargado.value) {
+						alert('<?php echo 'Debe ingresar ' . __('Usuario encargado') ?>');
+						form.id_encargado.focus();
+						return false;
+				}
+<?php } ?>
 
-		<?php if (Conf::GetConf($Sesion, 'CodigoSecundario') && Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) { ?>
-			if (jQuery('#codigo_asunto_secundario').hasClass('error-correlativo')) {
-				alert(jQuery('#codigo_asunto_secundario').data('glosa-error'));
-				jQuery('#codigo_asunto_secundario').focus();
-				return false;
+<?php if (Conf::GetConf($Sesion, 'CodigoSecundario') && Conf::GetConf($Sesion, 'CodigoAsuntoSecundarioCorrelativo')) { ?>
+				if (jQuery('#codigo_asunto_secundario').hasClass('error-correlativo')) {
+						alert(jQuery('#codigo_asunto_secundario').data('glosa-error'));
+						jQuery('#codigo_asunto_secundario').focus();
+						return false;
+				}
+<?php } ?>
+
+			if (!form.glosa_asunto.value) {
+					alert("<?php echo __('Por favor ingrese un título para el') . ' ' . __('asunto'); ?>");
+					form.glosa_asunto.focus();
+					return false;
 			}
-		<?php } ?>
 
-		if (!form.glosa_asunto.value) {
-			alert("<?php echo __('Por favor ingrese un título para el') . ' ' . __('asunto'); ?>");
-			form.glosa_asunto.focus();
-			return false;
-		}
+<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
+				if (!form.id_area_proyecto.value) {
+						alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
+						form.id_area_proyecto.focus();
+						return false;
+				}
+<?php } ?>
 
-		<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-			if (!form.id_area_proyecto.value) {
-				alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
-				form.id_area_proyecto.focus();
-				return false;
-			}
-		<?php } ?>
+<?php
+if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
+	echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
+}
+?>
 
-		<?php
-		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
-			echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
-		}
-		?>
+<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
+				if (!form.codigo_cliente_secundario.value) {
+						alert("Debe ingresar un cliente");
+						form.codigo_cliente_secundario.focus();
+						return false;
+				}
+				if (!form.codigo_asunto_secundario.value) {
+						alert("<?php echo __('Debe ingresar el código secundario del asunto') ?>");
+						form.codigo_asunto_secundario.focus();
+						return false;
+				}
+<?php } else { ?>
+				if (!form.codigo_cliente.value) {
+						alert("Debe ingresar un cliente");
+						form.codigo_cliente.focus();
+						return false;
+				}
+<?php } ?>
 
-		<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
-			if (!form.codigo_cliente_secundario.value) {
-				alert("Debe ingresar un cliente");
-				form.codigo_cliente_secundario.focus();
-				return false;
-			}
-			if (!form.codigo_asunto_secundario.value) {
-				alert("<?php echo __('Debe ingresar el código secundario del asunto') ?>");
-				form.codigo_asunto_secundario.focus();
-				return false;
-			}
-		<?php } else { ?>
-			if (!form.codigo_cliente.value) {
-				alert("Debe ingresar un cliente");
-				form.codigo_cliente.focus();
-				return false;
-			}
-		<?php } ?>
+<?php echo $contractValidation->getClientValidationsScripts(); ?>
 
-		<?php echo $contractValidation->getClientValidationsScripts(); ?>
-
-		jQuery(form).submit();
-		return true;
+			jQuery(form).submit();
+			return true;
 	}
 
 	function InfoCobro() {
-		cliente = jQuery('#codigo_cliente').val();
-		jQuery.get('ajax.php', {accion: 'info_cobro', codigo_cliente: cliente}, function(response) {
-			if (response.indexOf('|') != -1 && response.indexOf('VACIO') != -1) {
-				alert(response);
-			} else if (response.indexOf('|') != -1) {
-				arreglo = response.split('|');
-			}
-		}, 'text');
+			cliente = jQuery('#codigo_cliente').val();
+			jQuery.get('ajax.php', {accion: 'info_cobro', codigo_cliente: cliente}, function (response) {
+					if (response.indexOf('|') != -1 && response.indexOf('VACIO') != -1) {
+							alert(response);
+					} else if (response.indexOf('|') != -1) {
+							arreglo = response.split('|');
+					}
+			}, 'text');
 	}
 
 	function CheckCodigo() {
-		codigo_asunto = jQuery('#codigo_asunto');
-		asunto = codigo_asunto.val();
-		jQuery.get('ajax.php', {accion: 'check_codigo_asunto', codigo_asunto: asunto}, function(response) {
-			if (response.indexOf('OK') == -1 && response.indexOf('NO') == -1) {
-				alert(response);
-			} else {
-				if (response.indexOf('NO') != -1) {
-					alert("<?php echo __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
-					codigo_asunto.val('');
-					codigo_asunto.focus();
-				}
-			}
-		}, 'text');
+			codigo_asunto = jQuery('#codigo_asunto');
+			asunto = codigo_asunto.val();
+			jQuery.get('ajax.php', {accion: 'check_codigo_asunto', codigo_asunto: asunto}, function (response) {
+					if (response.indexOf('OK') == -1 && response.indexOf('NO') == -1) {
+							alert(response);
+					} else {
+							if (response.indexOf('NO') != -1) {
+									alert("<?php echo __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
+									codigo_asunto.val('');
+									codigo_asunto.focus();
+							}
+					}
+			}, 'text');
 	}
 
 	function HideMonto() {
-		div = document.getElementById("div_monto");
-		div.style.display = "none";
+			div = document.getElementById("div_monto");
+			div.style.display = "none";
 	}
 
 	function ShowMonto() {
-		div = document.getElementById("div_monto");
-		div.style.display = "block";
+			div = document.getElementById("div_monto");
+			div.style.display = "block";
 	}
 
 	function MostrarMonto() {
-		fc1 = document.getElementById("fc1");
+			fc1 = document.getElementById("fc1");
 
-		if (fc1.checked) {
-			HideMonto();
-		} else {
-			ShowMonto();
-		}
+			if (fc1.checked) {
+					HideMonto();
+			} else {
+					ShowMonto();
+			}
 	}
 
 	function MostrarFormaCobro() {
-		cobro_independiente = document.getElementById("cobro_independiente");
+			cobro_independiente = document.getElementById("cobro_independiente");
 
-		if (cobro_independiente.checked) {
-			ShowFormaCobro();
-			MostrarMonto();
-		} else {
-			HideFormaCobro();
-			HideMonto();
-		}
+			if (cobro_independiente.checked) {
+					ShowFormaCobro();
+					MostrarMonto();
+			} else {
+					HideFormaCobro();
+					HideMonto();
+			}
 	}
 
 	function HideFormaCobro() {
-		div = document.getElementById("div_cobro");
-		div.style.display = "none";
+			div = document.getElementById("div_cobro");
+			div.style.display = "none";
 	}
 
 	function ShowFormaCobro() {
-		div = document.getElementById("div_cobro");
-		div.style.display = "block";
+			div = document.getElementById("div_cobro");
+			div.style.display = "block";
 	}
 
 	function Mostrar(form) {
-		alert(form.mensual.value);
+			alert(form.mensual.value);
 	}
 
 	function Contratos(codigo, id_contrato) {
-		jQuery.get('ajax.php', {accion: 'check_codigo_asunto', codigo_asunto: asunto}, function(response) {
-			jQuery('#div_contrato').html(response);
-		}, 'text');
+			jQuery.get('ajax.php', {accion: 'check_codigo_asunto', codigo_asunto: asunto}, function (response) {
+					jQuery('#div_contrato').html(response);
+			}, 'text');
 	}
 
 	function ShowContrato(form, valor) {
-		var tbl = $('tbl_contrato');
-		var check = $(valor);
-		var td = $('tbl_copiar_datos');
+			var tbl = $('tbl_contrato');
+			var check = $(valor);
+			var td = $('tbl_copiar_datos');
 
-		if (check.checked) {
-			tbl.style['display'] = 'inline';
-			td.style['display'] = 'inline';
-		} else {
-			tbl.style['display'] = 'none';
-			td.style['display'] = 'none';
-		}
+			if (check.checked) {
+					tbl.style['display'] = 'inline';
+					td.style['display'] = 'inline';
+			} else {
+					tbl.style['display'] = 'none';
+					td.style['display'] = 'none';
+			}
 	}
 
 	function SetearLetraCodigoSecundario() {
-		var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
-		$('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;' + codigo_cliente_secundario + '-';
+			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
+			$('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;' + codigo_cliente_secundario + '-';
 	}
 </script>
 
 <form name="formulario" id="formulario" method="post">
-	<input type="hidden" name="opcion" value="guardar" />
-	<input type="hidden" name="opc_copiar" value="" />
-	<input type="hidden" name="id_asunto" id="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
-	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
+		<input type="hidden" name="opcion" value="guardar" />
+		<input type="hidden" name="opc_copiar" value="" />
+		<input type="hidden" name="id_asunto" id="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
+		<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
-	<table width="90%">
-		<tr>
-			<td align="center">
-				<fieldset class="border_plomo tb_base">
-					<legend><?php echo __('Datos generales') ?></legend>
-					<table>
-						<tr>
-							<td align="right">
-								<?php echo __('Código') ?>
-							</td>
-							<td align="left">
-								<input id="codigo_asunto" name="codigo_asunto" <?php echo Conf::GetConf($Sesion, 'CodigoObligatorio') ? 'readonly="readonly"' : '' ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase();<?php if (!$Asunto->Loaded())
-									echo "CheckCodigo();";
-								?>"/>
-								&nbsp;&nbsp;&nbsp;
-								<?php
-								echo __('Código secundario');
-								if ($Cliente->fields['codigo_cliente_secundario']) {
-									$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;' . $Cliente->fields['codigo_cliente_secundario'] . '-';
-								} else {
-									$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;';
-								}
-								?>
+		<table width="90%">
+				<tr>
+						<td align="center">
+								<fieldset class="border_plomo tb_base">
+										<legend><?php echo __('Datos generales') ?></legend>
+										<table>
+												<tr>
+														<td align="right">
+<?php echo __('Código') ?>
+														</td>
+														<td align="left">
+																<input id="codigo_asunto" name="codigo_asunto" readonly size="10" maxlength="10" value="<?php echo (isset($codigo_asunto)) ? $codigo_asunto : ''; ?>" onchange="this.value = this.value.toUpperCase();<?php
+																			 if (!$Asunto->Loaded())
+																				 echo "CheckCodigo();";
+?>"/>
+																&nbsp;&nbsp;&nbsp;
+																<?php
+																echo __('Código secundario');
+																if ($Cliente->fields['codigo_cliente_secundario']) {
+																	$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;' . $Cliente->fields['codigo_cliente_secundario'] . '-';
+																} else {
+																	$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;';
+																}
+																?>
 
-								<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
-								<?php
-								if ( Conf::GetConf($Sesion, 'CodigoSecundario')) {
-									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='color:#FF0000; font-size:10px'>*</span>";
-								} else {
-									if ($Asunto->fields['codigo_asunto_secundario'] != ''){
-										list( $codigo_cli_sec, $codigo_asunto_secundario ) = split("-", $Asunto->fields['codigo_asunto_secundario']);
-									}
-									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='20' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='font-size:10px'>(" . __('Opcional') . ")</span>";
-								}
-								?>
-							</td>
-						</tr>
-						<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
-							<tr>
-								<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
-									<?php echo __('Código de homologación'); ?>
-								</td>
-								<td align="left">
-									<input name="codigo_homologacion" size="45" value="<?php echo $Asunto->fields['codigo_homologacion']; ?>" />
-								</td>
-							</tr>
-						<?php } ?>
-						<tr>
-							<td align="right">
-								<?php echo __('Título') ?>
-							</td>
-							<td align="left">
-								<input name="glosa_asunto" size=45 value="<?php echo $Asunto->fields['glosa_asunto'] ?>" />
-								<span style="color:#FF0000; font-size:10px">*</span>
-							</td>
-						</tr>
+																<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
+																<?php
+																if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+																	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='6' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='color:#FF0000; font-size:10px'>*</span>";
+																} else {
+																	if ($Asunto->fields['codigo_asunto_secundario'] != '') {
+																		list( $codigo_cli_sec, $codigo_asunto_secundario ) = split("-", $Asunto->fields['codigo_asunto_secundario']);
+																	}
+																	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='20' value='" . $field_codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/><span style='font-size:10px'>(" . __('Opcional') . ")</span>";
+																}
+																?>
+														</td>
+												</tr>
+																<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
+													<tr>
+															<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+	<?php echo __('Código de homologación'); ?>
+															</td>
+															<td align="left">
+																	<input name="codigo_homologacion" size="45" value="<?php echo $Asunto->fields['codigo_homologacion']; ?>" />
+															</td>
+													</tr>
+																<?php } ?>
+												<tr>
+														<td align="right">
+<?php echo __('Título') ?>
+														</td>
+														<td align="left">
+																<input name="glosa_asunto" size=45 value="<?php echo $Asunto->fields['glosa_asunto'] ?>" />
+																<span style="color:#FF0000; font-size:10px">*</span>
+														</td>
+												</tr>
 
-						<tr>
-							<td align="right">
-								<?php echo __('Cliente') ?>
-							</td>
-							<td align="left">
-								<?php
-								if (!$Asunto->Loaded()) {
-									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
-									} else {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
-									}
-								} else {
-									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
-										$_name = 'codigo_cliente_secundario';
-									} else {
-										$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
-										$_name = 'codigo_cliente';
-									}
-									echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
-									echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
-									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
-								}
-								?>
-								<span style="color:#FF0000; font-size:10px">*</span>
-							</td>
-						</tr>
+												<tr>
+														<td align="right">
+																<?php echo __('Cliente') ?>
+														</td>
+														<td align="left">
+																<?php
+																if (!$Asunto->Loaded()) {
+																	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+																		echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+																	} else {
+																		echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+																	}
+																} else {
+																	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+																		$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
+																		$_name = 'codigo_cliente_secundario';
+																	} else {
+																		$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
+																		$_name = 'codigo_cliente';
+																	}
+																	echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
+																	echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
+																	echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
+																}
+																?>
+																<span style="color:#FF0000; font-size:10px">*</span>
+														</td>
+												</tr>
 
-						<tr>
-							<td align="right">
-								<?php echo __('Idioma') ?>
-							</td>
-							<td align="left">
-								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
-								<?php echo __('Categoría de asunto') ?>
-								<?php
-									echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']);
-								?>
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<?php echo __('Área') . ' ' . __('asunto') ?>
-							</td>
-							<td align="left">
+												<tr>
+														<td align="right">
+																<?php echo __('Idioma') ?>
+														</td>
+														<td align="left">
+																<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
+																<?php echo __('Categoría de asunto') ?>
+<?php
+echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']);
+?>
+														</td>
+												</tr>
+												<tr>
+														<td align="right">
+																<?php echo __('Área') . ' ' . __('asunto') ?>
+														</td>
+														<td align="left">
 
-							<?php echo $SelectHelper->ajax_select(
-									'id_area_proyecto',
-									$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto,
-									array('class' => 'span3', 'style' => 'display:inline'),
-									array(
-										'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose&order_by=orden,glosa&order_by_type=asc',
-										'onChange' => '
+																<?php
+																echo $SelectHelper->ajax_select(
+																				'id_area_proyecto', $Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto, array('class' => 'span3', 'style' => 'display:inline'), array(
+																		'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose&order_by=orden,glosa&order_by_type=asc',
+																		'onChange' => '
 											var element = selected_id_area_proyecto;
 											jQuery("#id_desglose_area_container").hide();
 											jQuery("#desglose_area").hide()
@@ -712,26 +712,23 @@ function MuestraPorValidacion(divID) {
 												FormSelectHelper.reload_id_desglose_area();
 											}
 										'
-									)
-								);
-								?>
+																				)
+																);
+																?>
 
-								<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-									<span style="color:#FF0000; font-size:10px">*</span>
-								<?php } ?>
+																<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
+																	<span style="color:#FF0000; font-size:10px">*</span>
+																<?php } ?>
 
-								<?php echo $SelectHelper->checkboxes(
-										'id_desglose_area',
-										array(),
-										$Asunto->getAreaDetails(),
-										array('class' => 'span6', 'style' => 'display:inline'),
-										array(
-											'autoload' => false,
-											'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
-											'onSource' => '
+																<?php
+																echo $SelectHelper->checkboxes(
+																				'id_desglose_area', array(), $Asunto->getAreaDetails(), array('class' => 'span6', 'style' => 'display:inline'), array(
+																		'autoload' => false,
+																		'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
+																		'onSource' => '
 												source = source + "&q=id_area_proyecto:" + jQuery("#id_area_proyecto").val();
 											',
-											'onChange' => '
+																		'onChange' => '
 												var element = selected_id_desglose_area;
 												if (element && element.requiere_desglose == "1") {
 													if (checked) {
@@ -741,40 +738,37 @@ function MuestraPorValidacion(divID) {
 													}
 												}
 											'
-										)
-									);
-								echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
-								?>
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<?php echo __('Descripción') ?>
-							</td>
-							<td align="left">
-								<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
-							</td>
-						</tr>
+																				)
+																);
+																echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
+																?>
+														</td>
+												</tr>
+												<tr>
+														<td align="right">
+<?php echo __('Descripción') ?>
+														</td>
+														<td align="left">
+																<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
+														</td>
+												</tr>
 
-						<?php
-							$prmGiro = new PrmGiro($Sesion);
-							$giros = $prmGiro->Listar();
-							if (count($giros) > 0) {
-						?>
-						<tr>
-							<td align="right">
-								<?php echo __('Giro') ?>
-							</td>
-							<td align="left">
-								<?php echo $SelectHelper->checkboxes(
-										'id_asunto_giro',
-										array(),
-										$Asunto->getEconomicActivities(),
-										array('class' => 'span6', 'style' => 'display:inline'),
-										array(
-											'autoload' => true,
-											'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
-											'onChange' => '
+<?php
+$prmGiro = new PrmGiro($Sesion);
+$giros = $prmGiro->Listar();
+if (count($giros) > 0) {
+	?>
+													<tr>
+															<td align="right">
+	<?php echo __('Giro') ?>
+															</td>
+															<td align="left">
+	<?php
+	echo $SelectHelper->checkboxes(
+					'id_asunto_giro', array(), $Asunto->getEconomicActivities(), array('class' => 'span6', 'style' => 'display:inline'), array(
+			'autoload' => true,
+			'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
+			'onChange' => '
 												var element = selected_id_asunto_giro;
 												if (element && element.requiere_desglose == "1") {
 													if (checked) {
@@ -784,273 +778,273 @@ function MuestraPorValidacion(divID) {
 													}
 												}
 											'
-										)
-									);
-								echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
-								?>
-							</td>
-						</tr>
-						<?php } ?>
-						<tr>
-							<td align="right">
-								<?php echo __('Usuario responsable'); ?>
-							</td>
-							<td align="left">
-								<?php
-								echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado', $Asunto->fields['id_encargado'], '', 'Seleccione', '200px');
-								if (isset($encargado_obligatorio) && $encargado_obligatorio) {
-									echo $obligatorio;
-								}
-								?>
-							</td>
-						</tr>
-						<?php if (Conf::GetConf($Sesion, 'AsuntosEncargado2')) { ?>
-							<tr>
-								<td align="right">
-									<?php echo __('Encargado 2'); ?>
-								</td>
-								<td align="left">';
-									<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado2', $Asunto->fields['id_encargado2'], '', 'Seleccione', '200'); ?>
-								</td>
-							</tr>';
-						<?php } ?>
-						<tr>
-							<td align="right">
-								<?php echo __('Contraparte') ?>
-							</td>
-							<td align="left">
-								<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<?php echo __('Cotizado conjuntamente con') ?>
-							</td>
-							<td align="left">
-								<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<?php echo __('Contacto solicitante') ?>
-							</td>
-							<td align="left">
-								<input name="asunto_contacto" size="30" value="<?php echo $Asunto->fields['contacto'] ?>" />
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<?php echo __('Teléfono Contacto') ?>
-							</td>
-							<td align="left">
-								<input name="fono_contacto" value="<?php echo $Asunto->fields['fono_contacto'] ?>" />
-								&nbsp;&nbsp;&nbsp;
-								<?php echo __('E-mail contacto') ?>
-								<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<label for="activo"><?php echo __('Activo') ?></label>
-							</td>
-							<td align="left">
-								<input type="checkbox" name="activo" id="activo" value="1" <?php echo $Asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$Asunto->Loaded() ? 'checked' : '' ?> />
-								&nbsp;&nbsp;&nbsp;
-								<label for="cobrable"><?php echo __('Cobrable') ?></label>
-								<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
-								&nbsp;&nbsp;&nbsp;
-								<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
-								<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
-							</td>
-						</tr>
-					</table>
-				</fieldset>
-				<br/>
+					)
+	);
+	echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
+	?>
+															</td>
+													</tr>
+																<?php } ?>
+												<tr>
+														<td align="right">
+<?php echo __('Usuario responsable'); ?>
+														</td>
+														<td align="left">
+<?php
+echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado', $Asunto->fields['id_encargado'], '', 'Seleccione', '200px');
+if (isset($encargado_obligatorio) && $encargado_obligatorio) {
+	echo $obligatorio;
+}
+?>
+														</td>
+												</tr>
+																<?php if (Conf::GetConf($Sesion, 'AsuntosEncargado2')) { ?>
+													<tr>
+															<td align="right">
+	<?php echo __('Encargado 2'); ?>
+															</td>
+															<td align="left">';
+	<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado2', $Asunto->fields['id_encargado2'], '', 'Seleccione', '200'); ?>
+															</td>
+													</tr>';
+<?php } ?>
+												<tr>
+														<td align="right">
+<?php echo __('Contraparte') ?>
+														</td>
+														<td align="left">
+																<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
+														</td>
+												</tr>
+												<tr>
+														<td align="right">
+<?php echo __('Cotizado conjuntamente con') ?>
+														</td>
+														<td align="left">
+																<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
+														</td>
+												</tr>
+												<tr>
+														<td align="right">
+<?php echo __('Contacto solicitante') ?>
+														</td>
+														<td align="left">
+																<input name="asunto_contacto" size="30" value="<?php echo $Asunto->fields['contacto'] ?>" />
+														</td>
+												</tr>
+												<tr>
+														<td align="right">
+<?php echo __('Teléfono Contacto') ?>
+														</td>
+														<td align="left">
+																<input name="fono_contacto" value="<?php echo $Asunto->fields['fono_contacto'] ?>" />
+																&nbsp;&nbsp;&nbsp;
+																<?php echo __('E-mail contacto') ?>
+																<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
+														</td>
+												</tr>
+												<tr>
+														<td align="right">
+																<label for="activo"><?php echo __('Activo') ?></label>
+														</td>
+														<td align="left">
+																<input type="checkbox" name="activo" id="activo" value="1" <?php echo $Asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$Asunto->Loaded() ? 'checked' : '' ?> />
+																&nbsp;&nbsp;&nbsp;
+																<label for="cobrable"><?php echo __('Cobrable') ?></label>
+																<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
+																&nbsp;&nbsp;&nbsp;
+																<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
+																<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
+														</td>
+												</tr>
+										</table>
+								</fieldset>
+								<br/>
 
-				<?php
-				if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
-					$checked = true;
-				} else {
-					$checked = false;
-				}
+<?php
+if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
+	$checked = true;
+} else {
+	$checked = false;
+}
 
-				$hide_areas = false;
-				if ($Sesion->usuario->Es('SASU')) {
-					$hide_areas = true;
-				} else {
-					if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
-						$codigo_cliente = $Asunto->fields['codigo_cliente'];
-					}
-				}
-				?>
+$hide_areas = false;
+if ($Sesion->usuario->Es('SASU')) {
+	$hide_areas = true;
+} else {
+	if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
+		$codigo_cliente = $Asunto->fields['codigo_cliente'];
+	}
+}
+?>
 
-				<table width="100%" cellspacing="0" cellpadding="0">
-					<tr>
-						<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
-							<?php echo $Form->checkbox('cobro_independiente', 1, $checked, array('label' =>__('Se cobrará de forma independiente'), 'onclick' => 'ShowContrato(this.form, this)', 'id' => 'cobro_independiente')); ?>
+								<table width="100%" cellspacing="0" cellpadding="0">
+										<tr>
+												<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
+								<?php echo $Form->checkbox('cobro_independiente', 1, $checked, array('label' => __('Se cobrará de forma independiente'), 'onclick' => 'ShowContrato(this.form, this)', 'id' => 'cobro_independiente')); ?>
+												</td>
+												<td id="tbl_copiar_datos" style="display:<?php echo!empty($checked) ? 'inline' : 'none'; ?>;">
+														&nbsp;
+												</td>
+										</tr>
+								</table>
+
+								<br/>
+								<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
+<?php
+if (!$Sesion->usuario->Es('SASU')) {
+	$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
+	$cliente = &$Cliente;
+	require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
+}
+?>
+								</div>
+
+								<br/>
+								<fieldset class="border_plomo tb_base">
+										<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
+										<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
+										<table>
+												<tr>
+														<td align=right>
+																<input name="asunto_limite_hh" value="<?php echo $Asunto->fields['limite_hh'] ? $Asunto->fields['limite_hh'] : '0' ?>" title="<?php echo __('Total de Horas') ?>" size=5 />
+														</td>
+														<td colspan=3 align=left>
+																<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
+														</td>
+														<td align=right>
+																<input name="asunto_limite_monto" value="<?php echo $Asunto->fields['limite_monto'] ? $Asunto->fields['limite_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>" size=5 />
+														</td>
+														<td colspan=3 align=left>
+																<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
+														</td>
+												</tr>
+												<tr>
+														<td align=right>
+																<input name="asunto_alerta_hh" value="<?php echo $Asunto->fields['alerta_hh'] ? $Asunto->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size=5 />
+														</td>
+														<td colspan=3 align=left>
+																<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
+														</td>
+														<td align=right>
+																<input name="asunto_alerta_monto" value="<?php echo $Asunto->fields['alerta_monto'] ? $Asunto->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
+														</td>
+														<td colspan=3 align=left>
+																<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?></span>
+														</td>
+												</tr>
+										</table>
+								</fieldset>
+								<br>
+
+								<!-- GUARDAR -->
+								<fieldset class="border_plomo tb_base">
+										<legend><?php echo __('Guardar datos') ?></legend>
+										<table>
+												<tr>
+														<td colspan=6 align="center">
+<?php
+if (!$Sesion->usuario->Es('SASU') && Conf::GetConf($Sesion, 'RevisarTarifas')) {
+	$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
+} else {
+	$funcion_validar = "return Validar(jQuery('#formulario')[0]);";
+}
+
+echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
+echo $Form->script();
+?>
+														</td>
+												</tr>
+										</table>
+								</fieldset>
 						</td>
-						<td id="tbl_copiar_datos" style="display:<?php echo !empty($checked) ? 'inline' : 'none'; ?>;">
-							&nbsp;
-						</td>
-					</tr>
-				</table>
-
-				<br/>
-				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-					<?php
-						if (!$Sesion->usuario->Es('SASU')) {
-							$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
-							$cliente = &$Cliente;
-							require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
-						}
-					?>
-				</div>
-
-				<br/>
-				<fieldset class="border_plomo tb_base">
-					<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
-					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
-					<table>
-						<tr>
-							<td align=right>
-								<input name="asunto_limite_hh" value="<?php echo $Asunto->fields['limite_hh'] ? $Asunto->fields['limite_hh'] : '0' ?>" title="<?php echo __('Total de Horas') ?>" size=5 />
-							</td>
-							<td colspan=3 align=left>
-								<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
-							</td>
-							<td align=right>
-								<input name="asunto_limite_monto" value="<?php echo $Asunto->fields['limite_monto'] ? $Asunto->fields['limite_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>" size=5 />
-							</td>
-							<td colspan=3 align=left>
-								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
-							</td>
-						</tr>
-						<tr>
-							<td align=right>
-								<input name="asunto_alerta_hh" value="<?php echo $Asunto->fields['alerta_hh'] ? $Asunto->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size=5 />
-							</td>
-							<td colspan=3 align=left>
-								<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
-							</td>
-							<td align=right>
-								<input name="asunto_alerta_monto" value="<?php echo $Asunto->fields['alerta_monto'] ? $Asunto->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
-							</td>
-							<td colspan=3 align=left>
-								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?></span>
-							</td>
-						</tr>
-					</table>
-				</fieldset>
-				<br>
-
-				<!-- GUARDAR -->
-				<fieldset class="border_plomo tb_base">
-					<legend><?php echo __('Guardar datos') ?></legend>
-					<table>
-						<tr>
-							<td colspan=6 align="center">
-								<?php
-								if (!$Sesion->usuario->Es('SASU') && Conf::GetConf($Sesion, 'RevisarTarifas')) {
-									$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
-								} else {
-									$funcion_validar = "return Validar(jQuery('#formulario')[0]);";
-								}
-
-								echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
-								echo $Form->script();
-								?>
-							</td>
-						</tr>
-					</table>
-				</fieldset>
-			</td>
-		</tr>
-	</table>
-	<br/>
+				</tr>
+		</table>
+		<br/>
 </form>
 
 <script type="text/javascript">
-	var form = $('formulario');
-	ShowContrato(form, 'cobro_independiente');
+																															var form = $('formulario');
+																															ShowContrato(form, 'cobro_independiente');
 
-	jQuery('document').ready(function() {
-		jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function() {
-			CambioEncargadoSegunCliente(jQuery(this).val());
-		});
-	});
+																															jQuery('document').ready(function () {
+																																	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
+																																			CambioEncargadoSegunCliente(jQuery(this).val());
+																																	});
+																															});
 
-	function CambioEncargadoSegunCliente(idcliente) {
-		var CopiarEncargadoAlAsunto = <?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
-		var UsuarioSecundario = <?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
-		var ObligatorioEncargadoSecundarioAsunto = <?php echo (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
-		jQuery('#id_usuario_secundario').removeAttr('disabled');
-		jQuery('#id_usuario_responsable').removeAttr('disabled');
-		jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function(data) {
-			var ladata = data.split('|');
-			jQuery('#id_usuario_responsable').attr({'disabled': ''}).val(ladata[0]);
-			if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
-				if (UsuarioSecundario)
-					jQuery('#id_usuario_secundario').attr({'disabled': ''}).val(ladata[1]);
-			} else {
-				if (ladata[2]) {
-					jQuery('#id_usuario_secundario').append('<option value="' + ladata[1] + '" selected="selected">' + ladata[2] + '</option>').attr({'disabled': ''}).val(ladata[1]);
-				}
-			}
+																															function CambioEncargadoSegunCliente(idcliente) {
+																																	var CopiarEncargadoAlAsunto = <?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
+																																	var UsuarioSecundario = <?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
+																																	var ObligatorioEncargadoSecundarioAsunto = <?php echo (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
+																																	jQuery('#id_usuario_secundario').removeAttr('disabled');
+																																	jQuery('#id_usuario_responsable').removeAttr('disabled');
+																																	jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function (data) {
+																																			var ladata = data.split('|');
+																																			jQuery('#id_usuario_responsable').attr({'disabled': ''}).val(ladata[0]);
+																																			if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
+																																					if (UsuarioSecundario)
+																																							jQuery('#id_usuario_secundario').attr({'disabled': ''}).val(ladata[1]);
+																																			} else {
+																																					if (ladata[2]) {
+																																							jQuery('#id_usuario_secundario').append('<option value="' + ladata[1] + '" selected="selected">' + ladata[2] + '</option>').attr({'disabled': ''}).val(ladata[1]);
+																																					}
+																																			}
 
-			jQuery('#id_usuario_responsable').removeAttr('disabled');
-			if (CopiarEncargadoAlAsunto) {
-				jQuery('#id_usuario_responsable').attr({'disabled': 'disabled'});
-				if (UsuarioSecundario)
-					jQuery('#id_usuario_secundario').attr({'disabled': 'disabled'});
-			} else if (ObligatorioEncargadoSecundarioAsunto) {
+																																			jQuery('#id_usuario_responsable').removeAttr('disabled');
+																																			if (CopiarEncargadoAlAsunto) {
+																																					jQuery('#id_usuario_responsable').attr({'disabled': 'disabled'});
+																																					if (UsuarioSecundario)
+																																							jQuery('#id_usuario_secundario').attr({'disabled': 'disabled'});
+																																			} else if (ObligatorioEncargadoSecundarioAsunto) {
 
-				if (UsuarioSecundario)
-					jQuery('#id_usuario_secundario').removeAttr('disabled');
-			}
+																																					if (UsuarioSecundario)
+																																							jQuery('#id_usuario_secundario').removeAttr('disabled');
+																																			}
 
 
-			jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
-		});
-		jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
-	}
+																																			jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
+																																	});
+																																	jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
+																															}
 
-	function CambioDatosFacturacion(id_cliente) {
-		var url = root_dir + '/app/interfaces/ajax.php';
+																															function CambioDatosFacturacion(id_cliente) {
+																																	var url = root_dir + '/app/interfaces/ajax.php';
 
-		jQuery.get(url, {accion: 'cargar_datos_contrato', codigo_cliente: id_cliente}, function (response) {
-			if (response.indexOf('|') != -1) {
-				response = response.split('\\n');
-				response = response[0];
-				var campos = response.split('~');
+																																	jQuery.get(url, {accion: 'cargar_datos_contrato', codigo_cliente: id_cliente}, function (response) {
+																																			if (response.indexOf('|') != -1) {
+																																					response = response.split('\\n');
+																																					response = response[0];
+																																					var campos = response.split('~');
 
-				if (response.indexOf('VACIO') != -1) {
-					//dejamos los campos en blanco.
-				} else {
-					for (i = 0; i < campos.length; i++) {
-						valores = campos[i].split('|');
-						jQuery('[name="factura_razon_social"]').val(valores[0] != '' ? valores[0] : '');
-						jQuery('[name="factura_direccion"]').val(valores[1] != '' ? valores[1] : '');
-						jQuery('[name="factura_rut"]').val(valores[2] != '' ? valores[2] : '');
-						jQuery('[name="factura_comuna"]').val(valores[3] != '' ? valores[3] : '');
-						jQuery('[name="factura_ciudad"]').val(valores[4] != '' ? valores[4] : '');
-						jQuery('[name="factura_giro"]').val(valores[6] != '' ? valores[6] : '');
-						jQuery('[name="factura_codigopostal"]').val(valores[7] != '' ? valores[7] : '');
-						jQuery('[name="id_pais"]').val(valores[8] != '' ? valores[8] : '');
-						jQuery('[name="cod_factura_telefono"]').val(valores[9] != '' ? valores[9] : '');
-						jQuery('[name="factura_telefono"]').val(valores[10] != '' ? valores[10] : '');
-						jQuery('[name="glosa_contrato"]').val(valores[11] != '' ? valores[11] : '');
-					}
-				}
-			} else {
-				if (response.indexOf('head') != -1) {
-					alert('Sesión Caducada');
-					top.location.href = '<?php echo Conf::Host(); ?>';
-				} else {
-					alert(response);
-				}
-			}
-		}, 'text');
-	}
+																																					if (response.indexOf('VACIO') != -1) {
+																																							//dejamos los campos en blanco.
+																																					} else {
+																																							for (i = 0; i < campos.length; i++) {
+																																									valores = campos[i].split('|');
+																																									jQuery('[name="factura_razon_social"]').val(valores[0] != '' ? valores[0] : '');
+																																									jQuery('[name="factura_direccion"]').val(valores[1] != '' ? valores[1] : '');
+																																									jQuery('[name="factura_rut"]').val(valores[2] != '' ? valores[2] : '');
+																																									jQuery('[name="factura_comuna"]').val(valores[3] != '' ? valores[3] : '');
+																																									jQuery('[name="factura_ciudad"]').val(valores[4] != '' ? valores[4] : '');
+																																									jQuery('[name="factura_giro"]').val(valores[6] != '' ? valores[6] : '');
+																																									jQuery('[name="factura_codigopostal"]').val(valores[7] != '' ? valores[7] : '');
+																																									jQuery('[name="id_pais"]').val(valores[8] != '' ? valores[8] : '');
+																																									jQuery('[name="cod_factura_telefono"]').val(valores[9] != '' ? valores[9] : '');
+																																									jQuery('[name="factura_telefono"]').val(valores[10] != '' ? valores[10] : '');
+																																									jQuery('[name="glosa_contrato"]').val(valores[11] != '' ? valores[11] : '');
+																																							}
+																																					}
+																																			} else {
+																																					if (response.indexOf('head') != -1) {
+																																							alert('Sesión Caducada');
+																																							top.location.href = '<?php echo Conf::Host(); ?>';
+																																					} else {
+																																							alert(response);
+																																					}
+																																			}
+																																	}, 'text');
+																															}
 </script>
 
 <?php echo InputId::Javascript($Sesion) ?>

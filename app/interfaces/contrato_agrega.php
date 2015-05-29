@@ -607,7 +607,7 @@ function InactivaContrato(alerta, opcion)
 
 		  <tr>
 				<td align=right>
-					<?=__('Forma de cobro')?>
+					<?=__('Forma de Tarificación')?>
 				</td>
 	<?
 				if(!$contrato->fields['forma_cobro'])

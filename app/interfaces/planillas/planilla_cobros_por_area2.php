@@ -280,7 +280,7 @@
 				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en Pesos'),$formato_titulo);
 				$ws1->write($filas, $col_gastos_en_moneda_base,__('Gastos'),$formato_titulo);
 				$ws1->write($filas, $col_estado,__('Estado'),$formato_titulo);
-				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Cobro'),$formato_titulo);
+				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Tarificación'),$formato_titulo);
 				$ws1->write($filas, $col_numero_cobro,__('N° del Cobro'),$formato_titulo);
 				$sin_area=true;
 				$tabla_creada = true;
@@ -320,7 +320,7 @@
 				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en Pesos'),$formato_titulo);
 				$ws1->write($filas, $col_gastos_en_moneda_base,__('Gastos'),$formato_titulo);
 				$ws1->write($filas, $col_estado,__('Estado'),$formato_titulo);
-				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Cobro'),$formato_titulo);
+				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Tarificación'),$formato_titulo);
 				$ws1->write($filas, $col_numero_cobro,__('N° del Cobro'),$formato_titulo);
 				$tabla_creada = true;
 				$fila_inicial = $filas + 2;
