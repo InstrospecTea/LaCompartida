@@ -224,14 +224,6 @@ class AlertaCron {
 		return $horas_mes;
 	}
 
-	function enviarAvisoCobrosProgramados($mensajes, $sesion) {
-		$from = html_entity_decode(Conf::AppName());
-		$to = Conf::GetConf($sesion, 'MailAdmin');
-		foreach ($mensajes as $id_usuario => $mensaje) {
-			Utiles::InsertarPlus($sesion, "Aviso $from", $mensaje, $to, "Administrador");
-		}
-	}
-
 	public function queryLog($query, $result) {
 		if (Conf::GetConf($this->sesion, 'LogQueryAlerta')) {
 			$q = array('query' => preg_replace("([\r\n\t]+)", ' ', $query), 'result' => $result);

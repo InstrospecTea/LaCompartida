@@ -2470,6 +2470,17 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												<td>&nbsp;</td>
 												<td>
 													<label>
+														<input type="hidden" name="emitir_liquidacion_al_generar" value="0" />
+														<input type="checkbox" name="emitir_liquidacion_al_generar" value="1"
+															<?php echo $contrato->fields['emitir_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
+														<?php echo __('Emitir esta liquidación al generar'); ?>
+													</label>
+												</td>
+											</tr>
+											<tr>
+												<td>&nbsp;</td>
+												<td>
+													<label>
 														<input type="hidden" name="enviar_liquidacion_al_generar" value="0" />
 														<input type="checkbox" name="enviar_liquidacion_al_generar" value="1"
 															<?php echo $contrato->fields['enviar_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>

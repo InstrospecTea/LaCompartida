@@ -145,6 +145,7 @@ class Contrato extends Objeto {
 			'retribucion_usuario_responsable',
 			'retribucion_usuario_secundario',
 			'id_estudio',
+			'emitir_liquidacion_al_generar',
 			'enviar_liquidacion_al_generar'
 	);
 

@@ -2201,7 +2201,6 @@ if (!class_exists('Cobro')) {
 									$TramiteIncluido = new Tramite($this->sesion);
 
 									$TramiteIncluido->Edit('codigo_asunto', $codigo_asunto);
-									$TramiteIncluido->Edit('descripcion', $tramite_incluido['glosa_tramite']);
 									$TramiteIncluido->Edit('fecha', $CobroPendiente->fields['fecha_cobro']);
 									$TramiteIncluido->Edit('cobrable', '1');
 									$TramiteIncluido->Edit('id_usuario', $id_usuario_cobro);
@@ -2242,9 +2241,12 @@ if (!class_exists('Cobro')) {
 							}
 						}
 
+						$emitir = false;
+
 						// COBROS PENDIENTES
 						if ($es_cobro_pendiente) {
 							$CobroPendiente->AsociarCobro($this->sesion, $this->fields['id_cobro']);
+							$emitir = (boolean) $Contrato->fields['emitir_liquidacion_al_generar'];
 						}
 
 						// Se ingresa la anotación en el historial
@@ -2257,10 +2259,10 @@ if (!class_exists('Cobro')) {
 							$his->Write();
 						}
 
-						$this->GuardarCobro();
+						$this->GuardarCobro($emitir);
 					}
-				} #END cobro
-			} #END contrato
+				} // END cobro
+			} // END contrato
 			return $this->fields['id_cobro'];
 		}
 

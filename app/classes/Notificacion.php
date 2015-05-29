@@ -11,6 +11,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 class Notificacion {
 
 	var $sesion = null;
+	var $twig;
 
 	function Notificacion($sesion) {
 		$this->sesion = $sesion;
@@ -355,46 +356,6 @@ class Notificacion {
 
 				$mail['bottom'] = "</table>";
 				break;
-
-			case 'programados':
-				$mail = array();
-				$mail['header'] =
-					"<table style='border:1px solid black'>
-						<tr>
-							<td colspan=7>Estimado/a %USUARIO:</td>
-						</tr>
-						<tr>
-							<td width='10px'>&nbsp;</td>
-							<td colspan=7>El d&iacute;a de hoy se generaron los borradores de los siguientes cobros programados por contrato:</td>
-						</tr>";
-
-				$mail['tr_cobros_programados'] =
-					"<tr>
-						<td>&nbsp;</td>
-						<td colspan=7>
-							<fieldset>
-							<legend>Cobros Programados</legend>
-								<table width=100% style='border-collapse:collapse;'>
-									<tr style='background-color:#B3E58C;'>
-										<th> Cliente </th>
-										<th> Asuntos </th>
-										<th> Monto </th>
-									</tr>
-									%FILAS
-								</table>
-							</fieldset>
-						</td>
-					</tr>";
-
-				$mail['sub_tr_cobros_programados'] =
-					"<tr style='background-color:%COLOR'>
-						<td> %CLIENTE </td>
-						<td style='padding-right: 8px; padding-left:8px;'> %ASUNTOS </td>
-						<td> %MONTO </td>
-					</tr>";
-
-				$mail['bottom'] = "</table>";
-				break;
 		}
 
 		return $mail;
@@ -708,42 +669,95 @@ class Notificacion {
 		return $mensajes;
 	}
 
-	/* Parseo y emisión de aviso de generación de cobros programados */
-	function mensajeProgramados($dato) {
-		$estructura = $this->estructura('programados');
-		$mensajes = array();
+	/**
+	 * Prepara el mensaje a enviar por correo al administrador para la generación de liquidaciones programadas
+	 *
+	 * @param array $template_data Arreglo con indice 'CobrosProgramados' que contengan al menos
+	 *                             glosa_cliente, asuntos y monto_estimado
+	 */
+	function mensajeProgramados($template_data) {
+		$template = <<<HTML
+<table style="border:1px solid black">
+	<tr>
+		<td>Estimado/a ADMINISTRADOR:</td>
+	</tr>
+	<tr>
+		<td width="10px">&nbsp;</td>
+		<td>El d&iacute;a de hoy se generaron los borradores de los siguientes cobros programados por contrato:</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<fieldset>
+				<legend>Cobros Programados</legend>
+				<table width="100%" style="border-collapse:collapse;">
+					<tr style="background-color:#B3E58C;">
+						<th> Cliente </th>
+						<th> Asuntos </th>
+						<th> Monto </th>
+					</tr>
+					{% for cp in CobrosProgramados %}
+					<tr style="background-color:{{ loop.index is odd ? '#DDDDDD' : '#FFFFFF' }}">
+						<td> {{ cp.glosa_cliente }} </td>
+						<td style="padding-right: 8px; padding-left:8px;">
+							{{ cp.asuntos }}
+						</td>
+						<td> {{ cp.monto_programado }} </td>
+					</tr>
+					{% endfor %}
+				</table>
+			</fieldset>
+		</td>
+	</tr>
+</table>
+HTML;
 
-		if (is_array($dato)) {
-			$i = 0;
-			$filas = '';
+		return $this->RenderTemplate($template, $template_data);
+	}
 
-			foreach ($dato as $id_contrato => $alertas) {
-				$enviar = false;
-				//puse hardcoded 'ADMINISTRADOR' por que se le va a enviar solo al administrador del sistema (seteado por config)
-				$mensaje = str_replace('%USUARIO', "ADMINISTRADOR", $estructura['header']);
+	/**
+	 * Prepara el mensaje a enviar por correo al cliente al generar una liquidación programada
+	 *
+	 * @param array $template_data Arreglo con al menos los siguientes datos:
+	 *
+	 * Contrato: titulo_contacto, contacto, apellido_contacto, detalle_cobranza
+	 * Cobro: id_cobro, monto, moneda_simbolo
+	 */
+	function mensajeClienteProgramado($template_data) {
+		$template = <<<HTML
+<table style="border:1px solid black">
+	<tr>
+		<td>Estimado/a {{ Contrato.titulo_contacto }} {{ Contrato.contacto }} {{ Contrato.apellido_contacto }}:</td>
+	</tr>
+	<tr>
+		<td width="10px">&nbsp;</td>
+		<td>
+			Adjunto se encuentra la liquidación Nº {{ Cobro.id_cobro }} por
+			{{ Cobro.moneda }} {{ Cobro.monto }} por concepto de:</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<fieldset>
+				{{ Contrato.detalle_cobranza }}
+			</fieldset>
+		</td>
+	</tr>
+</table>
+HTML;
 
-				$fila = str_replace('%CLIENTE', $alertas['glosa_cliente'], $estructura['sub_tr_cobros_programados']);
-				$fila = str_replace('%ASUNTOS', $alertas['asuntos'], $fila);
-				$fila = str_replace('%MONTO', $alertas['monto_programado'], $fila);
+		return $this->RenderTemplate($template, $template_data);
+	}
 
-				$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
-				$fila = str_replace('%COLOR', $color, $fila);
-				$filas .= $fila;
-				$i++;
-			}
-
-			$tabla = str_replace('%FILAS', $filas, $estructura['tr_cobros_programados']);
-			$mensaje .= $tabla;
-			$enviar = true;
-
-			$mensaje .= $estructura['bottom'];
-
-			if ($enviar) {
-				array_push($mensajes, $mensaje);
-			}
+	private function RenderTemplate($template, $template_data) {
+		if (!$this->twig) {
+			$loader = new Twig_Loader_String();
+			$this->twig = new Twig_Environment($loader);
+			$this->twig->setCharset('ISO-8859-1');
+			$this->twig->addExtension(new DateTwigExtension());
 		}
 
-		return $mensajes;
+		return $this->twig->render($template, $template_data);
 	}
 
 }

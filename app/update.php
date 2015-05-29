@@ -10802,6 +10802,10 @@ QUERY;
 				CONSTRAINT `contrato_tramite_fk_tramite_tipo` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON UPDATE CASCADE
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
+			if (!ExisteCampo('emitir_liquidacion_al_generar', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE `contrato` ADD `emitir_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Emitir la liquidación al generar'";
+			}
+
 			if (!ExisteCampo('enviar_liquidacion_al_generar', 'contrato', $dbh)) {
 				$queries[] = "ALTER TABLE `contrato` ADD `enviar_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Enviar la liquidación generada al cliente'";
 			}
