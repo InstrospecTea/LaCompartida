@@ -690,8 +690,8 @@ $pagina->PrintTop($popup);
 						<?php
 							$FormaCobro = new PrmFormaCobro($sesion);
 							$FormHelper = new Form();
-							$cosas = $FormaCobro->Listar();
-							echo $FormHelper->select('forma_cobro', $cosas, $forma_cobro, array('empty' => __('Cualquiera')));
+							$formas_cobro = $FormaCobro->Listar();
+							echo $FormHelper->select('forma_cobro', $formas_cobro, $forma_cobro, array('empty' => __('Cualquiera')));
 							?>
 					</td>
 				</tr>
