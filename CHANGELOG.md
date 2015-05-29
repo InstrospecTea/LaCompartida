@@ -2,7 +2,7 @@
 
 ## Hotfix 15.10.10
 Friday 2015, May 29th.
-* **Fix:** [Add currency selector to financial report](https://github.com/LemontechSA/ttb/pull/991)
+* **Fix:** [Add currency selector to financial report](https://github.com/LemontechSA/ttb/pull/993)
 
 ## Hotfix 15.10.9
 Friday 2015, May 29th.
