@@ -19,7 +19,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		//Abogado
 		if ($data['id_usuario']) {
-			$searchCriteria->filter('')->restricted_by('equals')->compare_with($data['id_usuario']);
+			$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($data['id_usuario']);
 		}
 
 		//Cobro
