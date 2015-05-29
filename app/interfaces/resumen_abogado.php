@@ -40,7 +40,7 @@ $Pagina->PrintTop();
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Forma Cobro')?>
+			<?php echo __('Forma Tarificación')?>
 		</td>
 		<td align="left">
 			<?php echo Html::SelectQuery($Sesion,"SELECT forma_cobro, descripcion FROM prm_forma_cobro ORDER BY forma_cobro", "forma_cobro[]",$forma_cobro,"multiple size=5","","200"); ?>

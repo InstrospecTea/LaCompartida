@@ -1977,7 +1977,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td  class="ar ">
-							<?php echo __('Forma de cobro') . $obligatorios('forma_cobro'); ?>
+							<?php echo __('Forma de Tarificación') . $obligatorios('forma_cobro'); ?>
 						</td>
 						<?php
 						if (!$contrato->fields['forma_cobro'])

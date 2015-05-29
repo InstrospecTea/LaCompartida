@@ -89,8 +89,8 @@
 	$_LANG['Revisar cobros'] = "Revisar liquidaciones";
 	$_LANG['Cobro eliminado con éxito'] = "Liquidaciones eliminado con éxito";
 	$_LANG['Listado de cobros'] = "Listado de liquidaciones";
-	$_LANG['Forma de cobro'] = "Forma de liquidación";
-	$_LANG['Forma de Cobro'] = "Forma de Liquidación";
+	$_LANG['Forma de Tarificación'] = "Forma de Liquidación";
+	$_LANG['Forma de tarificación'] = "Forma de liquidación";
 	$_LANG['Resumen final del Cobro'] = "Resumen final de la liquidación";
 	$_LANG['Emitir Cobro'] = "Emitir Liquidación";
 	$_LANG['Emitir cobros'] = "Emisión de Liquidaciones";
@@ -148,8 +148,8 @@
 	$_LANG['Tip mensual'] = "La liquidación se hará de forma mensual.";
 	$_LANG['Tip individual'] = "La liquidación se hará de forma individual de acuerdo al monto definido por Cliente.";
 	$_LANG['No es posible Eliminar el Cobro. Es posible que ya se encuentre eliminado'] = "No es posible Eliminar la liquidación. Es posible que ya se encuentre eliminada";
-	$_LANG['Forma Cobro'] = "Forma Liquidación";
-	$_LANG['Forma cobro'] = "Forma liquidación";
+	$_LANG['Forma Tarificación'] = "Forma Liquidación";
+	$_LANG['Forma tarificación'] = "Forma liquidación";
 	$_LANG['Debe ingresar horas desde el último cobro'] = "Debe ingresar horas desde el última liquidación";
 	$_LANG['Debe seleccionar una forma de cobro'] = "Debe seleccionar una forma de liquidación";
 	$_LANG['¿Está seguro de eliminar el cobro?'] = "¿Está seguro de eliminar la liquidación?";
