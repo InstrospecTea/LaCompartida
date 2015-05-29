@@ -13,17 +13,23 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->related_with('Client')->joined_with('Contract')->on_property('codigo_cliente');
 		$searchCriteria->related_with('User')->joined_with('Contract')->on_property('id_usuario')->on_entity_property('id_usuario_responsable');
 		$searchCriteria->related_with('User', 'Lawyer')->on_property('id_usuario');
+		$searchCriteria->related_with('Charge')->on_property('id_cobro')->with_direction('LEFT');
 		$searchCriteria->add_scope('orderByMatterGloss');
 		// Filtros
 
 		//Abogado
 		if ($data['id_usuario']) {
-			$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($data['id_usuario']);
+			$searchCriteria->filter('')->restricted_by('equals')->compare_with($data['id_usuario']);
 		}
 
 		//Cobro
 		if ($data['buscar_id_cobro']) {
 			$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($data['buscar_id_cobro']);
+		}	
+
+		//Forma de Cobro
+		if ($data['forma_cobro']) {
+			$searchCriteria->filter('IF(charge.forma_cobro IS NULL, contract.forma_cobro, charge.forma_cobro)')->restricted_by('equals')->compare_with("'" . $data['forma_cobro'] . "'");
 		}
 
 		//Encargado comercial
