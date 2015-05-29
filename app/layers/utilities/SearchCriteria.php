@@ -65,7 +65,7 @@ class SearchCriteria extends AbstractUtility {
 	 * )
 	 * @return $this
 	 */
-	public function add_scope($scope_name, Array $options = array()) {
+	public function add_scope($scope_name, array $options = array()) {
 		if (empty($scope_name)) {
 			throw new UtilityException('El nombre del scope está vacío.');
 		}
@@ -92,7 +92,7 @@ class SearchCriteria extends AbstractUtility {
 	 * )
 	 * @return $this
 	 */
-	public function add_scope_for($entity_name, $scope_name, Array $options = array()) {
+	public function add_scope_for($entity_name, $scope_name, array $options = array()) {
 		if (empty($entity_name)) {
 			throw new UtilityException('El nombre de la entidad está vacío.');
 		}
