@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.11
+Friday 2015, May 29th.
+* **Fix:** [Ordenar alfabeticamente los clientes en excel borradores](https://github.com/LemontechSA/ttb/pull/994)
+
 ## Hotfix 15.10.10
 Friday 2015, May 29th.
 * **Fix:** [Add currency selector to financial report](https://github.com/LemontechSA/ttb/pull/993)
