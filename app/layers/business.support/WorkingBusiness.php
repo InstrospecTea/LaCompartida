@@ -29,7 +29,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		//Forma de Cobro
 		if ($data['forma_cobro']) {
-			$searchCriteria->filter('IF(charge.forma_cobro IS NULL, contract.forma_cobro, charge.forma_cobro)')->restricted_by('equals')->compare_with("'" . $data['forma_cobro'] . "'");
+			$searchCriteria->filter('IFNULL(charge.forma_cobro, contract.forma_cobro)')->restricted_by('equals')->compare_with("'" . $data['forma_cobro'] . "'");
 		}
 
 		//Encargado comercial

@@ -288,7 +288,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	}
 
 	if ($forma_cobro) {
-		$where .= " AND IF(cobro.forma_cobro IS NULL, contrato.forma_cobro, cobro.forma_cobro) = '$forma_cobro' ";
+		$where .= " AND IFNULL(cobro.forma_cobro IS NULL, contrato.forma_cobro) = '$forma_cobro' ";
 	}
 
 	// Filtro para Actividades si están activos
