@@ -55,20 +55,55 @@ class SearchCriteria extends AbstractUtility {
 	}
 
 	/**
-	 * Agrega un scope de búsqueda con respecto a la entidad definida al construir la instancia de SearchCriteria.
+	 * Agrega un scope de búsqueda
+	 * Por defecto agrega un scope con respecto a la entidad definida al construir la instancia de SearchCriteria.
 	 * @param $scope_name
-	 * @param $arg1, $arg2...
+	 * @param $options array
+	 * array(
+	 * 	'entity_name' => 'nombre_de_la_entidad',
+	 * 	'args' => array('parametros que se le pasaran', 'al scope')
+	 * )
 	 * @return $this
 	 */
-	public function add_scope($scope_name) {
-		$scope = $scope_name;
-		$args = func_get_args();
-		if (count($args) > 1) {
-			array_shift($args);
-			$scope = array($scope_name, $args);
+	public function add_scope($scope_name, array $options = array()) {
+		if (empty($scope_name)) {
+			throw new UtilityException('El nombre del scope está vacío.');
 		}
-		$this->scopes[] = $scope;
+
+		$scope = $scope_name;
+		$entity_name = empty($options['entity_name']) ? $this->entity : $options['entity_name'];
+
+		if (!empty($options['args'])) {
+			$scope = array($scope_name, $options['args']);
+		}
+
+		$this->scopes[$entity_name][] = $scope;
+
 		return $this;
+	}
+
+	/**
+	 * Agrega un scope de búsqueda para una entidad específica
+	 * @param $entity_name
+	 * @param $scope_name
+	 * @param $options array
+	 * array(
+	 * 	'args' => array('parametros que se le pasaran', 'al scope')
+	 * )
+	 * @return $this
+	 */
+	public function add_scope_for($entity_name, $scope_name, array $options = array()) {
+		if (empty($entity_name)) {
+			throw new UtilityException('El nombre de la entidad está vacío.');
+		}
+
+		if (empty($scope_name)) {
+			throw new UtilityException('El nombre del scope está vacío.');
+		}
+
+		$options['entity_name'] = $entity_name;
+
+		return $this->add_scope($scope_name, $options);
 	}
 
 	/**

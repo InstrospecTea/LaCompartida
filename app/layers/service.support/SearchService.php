@@ -252,7 +252,7 @@ class SearchService implements ISearchService {
 	private function makeAliasName($field_name) {
 		if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) { //is a function
 			$field_name = $match[1];
-		} 
+		}
 		return str_replace('.', '_', strtolower($field_name));
 	}
 

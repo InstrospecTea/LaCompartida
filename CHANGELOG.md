@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 15.10.12
+Friday 2015, May 29th.
+* **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/991)
+
+## Hotfix 15.10.11
+Friday 2015, May 29th.
+* **Fix:** [Ordenar alfabeticamente los clientes en excel borradores](https://github.com/LemontechSA/ttb/pull/994)
+
+## Hotfix 15.10.10
+Friday 2015, May 29th.
+* **Fix:** [Add currency selector to financial report](https://github.com/LemontechSA/ttb/pull/993)
+
 ## Hotfix 15.10.9
 Friday 2015, May 29th.
 * **Fix:** [Avoid edit manually the matter code](https://github.com/LemontechSA/ttb/pull/990)
