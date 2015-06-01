@@ -140,6 +140,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$container->add_child($title);
 				//Construct table
 				$table = new HtmlBuilder('table');
+				$table->add_attribute('class', 'tabla_normal');
 				$table->add_child($this->constructTableHead($scale));
 				$table->add_child($this->constructTableBody($scale, $language, $currency, $charge));
 				$container->add_child($table);
