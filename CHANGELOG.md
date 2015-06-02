@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.17
+Tuesday 2015, June 2nd.
+* **Fix:** [Idioma inglés en facturas.](https://github.com/LemontechSA/ttb/pull/996)
+
 ## Hotfix 15.10.16
 Tuesday 2015, June 2nd.
 * **Fix:** [Fix monto real factura considerando NC en periodo](https://github.com/LemontechSA/ttb/pull/992)
