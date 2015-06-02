@@ -397,34 +397,34 @@ class Factura extends Objeto {
 
 
 	/**
-	 * Obtiene el valor bruto de la factura - menos la suma de los documentos 
+	 * Obtiene el valor bruto de la factura - menos la suma de los documentos
 	 * hijos que la anulan: (Notas de crédito)
-	 * 
+	 *
 	 * @param number  $id_factura 	El identificador de la factura a buscar
-	 * @param boolean $contable 		Especifica si se necesita el valor contable real 
+	 * @param boolean $contable 		Especifica si se necesita el valor contable real
 	 *                              (NC del mismo periodo) o el valor descontado total
 	 */
 	function ObtenerValorReal($id_factura, $contable = true) {
 
 		$Criteria = new Criteria($this->sesion);
 
-		$Criteria->add_select("(-1 * factura_movimiento.monto_bruto 
-			- SUM(IFNULL(hija_movimiento.monto_bruto, 0) 
+		$Criteria->add_select("(-1 * factura_movimiento.monto_bruto
+			- SUM(IFNULL(hija_movimiento.monto_bruto, 0)
 			* IFNULL(moneda_hija.tipo_cambio, 0) / moneda_factura.tipo_cambio))", 'monto_real');
 
 		$Criteria->add_from('factura');
 		$Criteria->add_inner_join_with('cta_cte_fact_mvto factura_movimiento', 'factura_movimiento.id_factura = factura.id_factura');
-		$Criteria->add_inner_join_with('cta_cte_fact_mvto_moneda moneda_factura ', 
+		$Criteria->add_inner_join_with('cta_cte_fact_mvto_moneda moneda_factura ',
 			'factura_movimiento.id_cta_cte_mvto = moneda_factura.id_cta_cte_fact_mvto AND factura_movimiento.id_moneda = moneda_factura.id_moneda'
 		);
 
 		$factura_hija_restriction = array(
 			CriteriaRestriction::equals('factura_hija.id_factura_padre', "factura.id_factura")
 		);
-		
+
 		if ($contable) {
 			$factura_hija_restriction[] = CriteriaRestriction::equals(
-				'EXTRACT(YEAR_MONTH FROM factura.fecha)', 
+				'EXTRACT(YEAR_MONTH FROM factura.fecha)',
 				"EXTRACT(YEAR_MONTH FROM factura_hija.fecha)"
 			);
 		}
@@ -437,12 +437,12 @@ class Factura extends Objeto {
 		);
 
 		$Criteria->add_left_join_with('cta_cte_fact_mvto hija_movimiento', 'hija_movimiento.id_factura = factura_hija.id_factura');
-		$Criteria->add_left_join_with('cta_cte_fact_mvto_moneda moneda_hija', 
+		$Criteria->add_left_join_with('cta_cte_fact_mvto_moneda moneda_hija',
 			'hija_movimiento.id_cta_cte_mvto = moneda_hija.id_cta_cte_fact_mvto AND hija_movimiento.id_moneda = moneda_hija.id_moneda'
 		);
 
 		$Criteria->add_restriction(CriteriaRestriction::equals("factura.id_factura", $id_factura));
- 
+
 		$resultado = array_shift($Criteria->run());
 		return $resultado['monto_real'];
 	}
@@ -1545,14 +1545,18 @@ class Factura extends Objeto {
 
 				$glosa_moneda_lang = __($glosa_moneda);
 				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				$code = $lang;
+
+				//Code name normalization
 				if ($lang == 'en') {
-					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
-					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
-					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, 'en_US'));
-					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $monto_palabra_parte_decimal . ' ' . 'CENTS';
-				} else {
-					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+					$code = 'en_US';
 				}
+
+				list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
+				$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
+				$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
+				$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' .__('CON') . ' ' .$monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
+
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%simbolo_honorarios%', $simbolo, $html2);
 				} else {
