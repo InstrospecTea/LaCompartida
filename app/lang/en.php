@@ -1129,5 +1129,5 @@ $_LANG['Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favo
 $_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
 $_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
 
-$_LANG['CON'] = "WITH";
-$_LANG['CENTAVOS'] = "CENTS";
+$_LANG['CON'] = 'WITH';
+$_LANG['CENTAVOS'] = 'CENTS';
