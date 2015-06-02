@@ -816,11 +816,9 @@ class Factura extends Objeto {
 				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
 				$mes_largo_en = array('JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', ' DECEMBER');
 
-				$cobro = new Cobro($this->sesion);
-				$cobro->Load($this->fields['id_cobro']);
 				$mes_largo = $mes_largo_es;
 
-				if ($cobro->fields['codigo_idioma'] == 'en') {
+				if ($lang == 'en') {
 					$mes_largo = $mes_largo_en;
 				}
 
