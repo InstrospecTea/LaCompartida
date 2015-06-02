@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.18
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix typo en eliminación datos demo](https://github.com/LemontechSA/ttb/pull/1002)
+
 ## Hotfix 15.10.17
 Tuesday 2015, June 2nd.
 * **Fix:** [Idioma inglés en facturas.](https://github.com/LemontechSA/ttb/pull/996)
