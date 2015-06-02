@@ -2,7 +2,7 @@
 
 ## Hotfix 15.10.13
 Tuesday 2015, June 2nd.
-* **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/991)
+* **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/997)
 
 ## Hotfix 15.10.12
 Friday 2015, May 29th.
