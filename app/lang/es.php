@@ -1190,6 +1190,3 @@ $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponible
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 52"] = "No hay folios disponibles para Guia De Despacho Electronica";
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 56"] = "No hay folios disponibles para Nota De Debito Electronica";
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 61"] = "No hay folios disponibles para Nota De Credito Electronica";
-
-$_LANG['CON'] = "CON";
-$_LANG['CENTAVOS'] = "CENTAVOS";
