@@ -220,6 +220,18 @@ class FacturaPdfDatos extends Objeto {
 			case 'desc_descuento_honorarios':
 				$glosa_dato = __('DESCUENTO') .  ' ' . _('HONORARIOS');
 				break;
+			case 'desc_glosa_factura':
+				$glosa_dato = __('Glosa');
+				break;
+			case 'glosa_factura':
+				$glosa_dato = $factura->fields['glosa'];
+				break;
+			case 'desc_encargado_comercial':
+				$glosa_dato = __('Encargado Comercial');
+				break;
+			case 'encargado_comercial':
+				$glosa_dato = $factura->ObtenerEncargadoComercial();
+				break;
 			case 'descripcion_honorarios':
 				$glosa_dato = $factura->fields['descripcion'];
 				break;
@@ -460,6 +472,10 @@ class FacturaPdfDatos extends Objeto {
 		$fila['fecha_ano_ultima_cifra'] = substr(date("Y",strtotime($factura->fields['fecha'])),-1);
 		$fila['fecha_ano_dos_ultimas_cifras'] = substr(date("Y",strtotime($factura->fields['fecha'])),-2);
 		$fila['direccion'] = $factura->fields['direccion_cliente'];
+		$fila['desc_glosa_factura'] = __('Glosa Factura');
+		$fila['glosa_factura'] = $factura->fields['glosa'];
+		$fila['desc_encargado_comercial'] = __('Encargado Comercial');
+		$fila['encargado_comercial'] = $factura->ObtenerEncargadoComercial();
 		$fila['desc_subtotal_honorarios'] = __('Subtotal Honorarios');
 		$fila['desc_descuento_honorarios'] = __('Descuento Honorarios');
 		$fila['descripcion_honorarios'] = $factura->fields['descripcion'];
