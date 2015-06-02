@@ -814,6 +814,15 @@ class Factura extends Objeto {
 				$month_short = array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
 				$mes_corto = array('JAN', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC');
 				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
+				$mes_largo_en = array('JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', ' DECEMBER');
+
+				$cobro = new Cobro($this->sesion);
+				$cobro->Load($this->fields['id_cobro']);
+				$mes_largo = $mes_largo_es;
+
+				if ($cobro->fields['codigo_idioma'] == 'en') {
+					$mes_largo = $mes_largo_en;
+				}
 
 				$html2 = str_replace('%nombre_encargado%', strtoupper($titulo_contacto . ' ' . $contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%direccion_cliente%', $direccion_cliente, $html2);
@@ -823,7 +832,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%giro_cliente%', $giro_cliente, $html2);
 				$html2 = str_replace('%lugar_facturacion%', Conf::GetConf($this->sesion, 'LugarFacturacion'), $html2);
 				$html2 = str_replace('%num_dia%', date('d', strtotime($fecha_factura)), $html2);
-				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo_es, date('M', strtotime($fecha_factura))), $html2);
+				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo, date('M', strtotime($fecha_factura))), $html2);
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_mes%', date('m', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_anio_2cifras%', date('y', strtotime($fecha_factura)), $html2);
@@ -898,7 +907,6 @@ class Factura extends Objeto {
 				break;
 
 			case 'DATOS_FACTURA':
-
 				$select_col = "";
 				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					$select_col = ",
@@ -1089,6 +1097,7 @@ class Factura extends Objeto {
 					$descripcion_subtotal_gastos = strtoupper($descripcion_subtotal_gastos);
 					$descripcion_subtotal_gastos_sin_impuesto = strtoupper($descripcion_subtotal_gastos_sin_impuesto);
 				}
+
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%honorarios_periodo%', $honorarios_descripcion, $html2);
 				} else {
@@ -1536,8 +1545,14 @@ class Factura extends Objeto {
 
 				$glosa_moneda_lang = __($glosa_moneda);
 				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
-
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				if ($lang == 'en') {
+					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
+					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
+					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, 'en_US'));
+					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $monto_palabra_parte_decimal . ' ' . 'CENTS';
+				} else {
+					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				}
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%simbolo_honorarios%', $simbolo, $html2);
 				} else {
