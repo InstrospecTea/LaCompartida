@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.16
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix monto real factura considerando NC en periodo](https://github.com/LemontechSA/ttb/pull/992)
+
 ## Hotfix 15.10.15
 Tuesday 2015, June 2nd.
 * **Fix:** [Optimización queries repetidas cobros_xls](https://github.com/LemontechSA/ttb/pull/999)
