@@ -733,15 +733,15 @@ $Form->defaultLabel = false;
 			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
-		<tr>
-			<td align="right" ><?php echo __('Glosa Factura')?></td>
-			<td align="left" colspan="3" ><textarea id="glosa" name="glosa" cols="50" rows="2" style="font-family: Arial; font-size: 11px"><?php echo trim($glosa); ?></textarea></td>
-		</tr>
 
 		<?php
 		$cantidad_lineas_descripcion = Conf::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			?>
+			<tr>
+				<td align="right" ><?php echo __('Glosa Factura')?></td>
+				<td align="left" colspan="3" ><textarea id="glosa" name="glosa" cols="50" rows="2" style="font-family: Arial; font-size: 11px"><?php echo trim($glosa); ?></textarea></td>
+			</tr>
 			<tr id='descripcion_factura'>
 				<td align="right" width="100">&nbsp;</td>
 				<td align="left" style="vertical-align:bottom" width="250"><?php echo __('Descripción'); ?></td>
