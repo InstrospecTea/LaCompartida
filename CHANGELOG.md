@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.10
+Tuesday 2015, June 2nd.
+* **Fix:** [Se cambia unidad de medida 'un' por 'N/A' (no aplica), en Facturacion Mexico](https://github.com/LemontechSA/ttb/pull/998)
+
 ## Hotfix 15.10.13
 Tuesday 2015, June 2nd.
 * **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/997)
