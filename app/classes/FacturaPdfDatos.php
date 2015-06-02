@@ -221,7 +221,7 @@ class FacturaPdfDatos extends Objeto {
 				$glosa_dato = __('DESCUENTO') .  ' ' . _('HONORARIOS');
 				break;
 			case 'desc_glosa_factura':
-				$glosa_dato = __('Glosa');
+				$glosa_dato = __('Descripción Glosa');
 				break;
 			case 'glosa_factura':
 				$glosa_dato = $factura->fields['glosa'];

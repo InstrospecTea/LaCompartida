@@ -1,6 +1,14 @@
 # Changelog
 
-## Hotfix 15.10.10
+## Hotfix 15.10.16
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix monto real factura considerando NC en periodo](https://github.com/LemontechSA/ttb/pull/992)
+
+## Hotfix 15.10.15
+Tuesday 2015, June 2nd.
+* **Fix:** [Optimización queries repetidas cobros_xls](https://github.com/LemontechSA/ttb/pull/999)
+
+## Hotfix 15.10.14
 Tuesday 2015, June 2nd.
 * **Fix:** [Se cambia unidad de medida 'un' por 'N/A' (no aplica), en Facturacion Mexico](https://github.com/LemontechSA/ttb/pull/998)
 
