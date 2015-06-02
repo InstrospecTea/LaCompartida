@@ -1301,9 +1301,9 @@ foreach ($chargeResults as $charge) {
 					if (!array_key_exists($cobro->fields['id_cobro'], $trabajos_duracion)) {
 						$query_total_cobrable = "SELECT 
 									IF(SUM(TIME_TO_SEC(duracion_cobrada)/3600) <= 0, 1, SUM(TIME_TO_SEC(duracion_cobrada)/3600)) AS duracion_total 
-								FROM trabajo 
-							 WHERE id_cobro = '{$cobro->fields['id_cobro']}' 
-							 	 AND cobrable = 1";
+									FROM trabajo 
+								   WHERE id_cobro = '{$cobro->fields['id_cobro']}' 
+									 AND cobrable = 1";
 						$resp_total_cobrable = mysql_query($query_total_cobrable, $sesion->dbh) or Utiles::errorSQL($query_total_cobrable, __FILE__, __LINE__, $sesion->dbh);
 						list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
 						$trabajos_duracion[$cobro->fields['id_cobro']] = $xtotal_hh_cobrable;
