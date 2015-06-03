@@ -46,7 +46,7 @@ if ($opc == 'buscar') {
 
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
+	} else if (Conf::GetConf($sesion, 'NuevoModuloFactura') && !empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		$factura_obj = new Factura($sesion);
