@@ -211,7 +211,9 @@ if ($opc == 'buscar') {
 						GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
 
-	$orden = $cobros->OrdenResultados();
+	if(empty($orden)) {
+		$orden = $cobros->OrdenResultados();
+	}
 
 	if ($print) {
 		$query .= " ORDER BY $orden";
@@ -474,6 +476,7 @@ $pagina->PrintTop();
 		} else {
 			form.action = 'seguimiento_cobro.php';
 			form.opc.value = 'buscar';
+			form.orden.value = '';
 			form.desde.value = '';
 			form.submit();
 		}
