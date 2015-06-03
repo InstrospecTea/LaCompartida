@@ -472,24 +472,36 @@ class Factura extends Objeto {
 		return new ListaFacturas($this->sesion, null, $query);
 	}
 
-	function ObtenerEncargadoComercial($id_contrato) {
-		if (!empty($this->fields['id_usuario_responsable'])) {
-			$query = "SELECT CONCAT_WS(' ', usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre
+	function EncargadoComercial($id_contrato) {
+			if (!empty($this->fields['id_usuario_responsable'])) {
+			$query = "SELECT CONCAT_WS(' ', usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre, usuario.username
 									FROM usuario 
 									WHERE id_usuario = '{$this->fields['id_usuario_responsable']}'";
 		} else {
-			$query = "SELECT CONCAT_WS(' ',usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre
+			$query = "SELECT CONCAT_WS(' ',usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre, usuario.username
 									FROM contrato
 									LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
 									WHERE id_contrato = '{$this->fields['id_contrato']}'";
 		}
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($nombre_encargado_comercial) = mysql_fetch_array($resp);
+		return mysql_fetch_array($resp);
+	}
 
+	function ObtenerEncargadoComercialUsername($id_contrato) {
+		$datos_encargado = $this->EncargadoComercial($id_contrato);
+		$username_encargado_comercial = $datos_encargado['username'];
+		if ($username_encargado_comercial == '') {
+			$username_encargado_comercial = 'No esta definido';
+		}
+		return $username_encargado_comercial;
+	}
+
+	function ObtenerEncargadoComercial($id_contrato) {
+		$datos_encargado = $this->EncargadoComercial($id_contrato);
+		$nombre_encargado_comercial = $datos_encargado['nombre'];
 		if ($nombre_encargado_comercial == '') {
 			$nombre_encargado_comercial = 'No esta definido';
 		}
-
 		return $nombre_encargado_comercial;
 	}
 

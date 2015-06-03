@@ -167,7 +167,7 @@ class FacturaPdfDatos extends Objeto {
 			'desc_glosa_factura' => __('Descripción Glosa'),
 			'glosa_factura' => $factura->fields['glosa'],
 			'desc_encargado_comercial' => __('Encargado Comercial'),
-			'encargado_comercial' => $factura->ObtenerEncargadoComercial(),
+			'encargado_comercial' => $factura->ObtenerEncargadoComercialUsername(),
 			'descripcion_honorarios' => $factura->fields['descripcion'],
 			'descripcion_gastos_con_iva' => $factura->fields['descripcion_subtotal_gastos'],
 			'descripcion_gastos_sin_iva' => $factura->fields['descripcion_subtotal_gastos_sin_impuesto'],
