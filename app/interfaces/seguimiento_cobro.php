@@ -214,6 +214,7 @@ if ($opc == 'buscar') {
 	$orden = $cobros->OrdenResultados();
 
 	if ($print) {
+		$query .= " ORDER BY $orden";
 		$cobros_stmt = $sesion->pdodbh->query($query);
 		$cobros_result = $cobros_stmt->fetchAll(PDO::FETCH_ASSOC);
 

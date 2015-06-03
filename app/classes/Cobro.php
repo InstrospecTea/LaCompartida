@@ -331,9 +331,9 @@ if (!class_exists('Cobro')) {
 
 				if (in_array($order_field, $options)) {
 					if ($order_option == 'desc') {
-						$order = $order_field . ' ' . $order_option;
+						$order = 'cobro.' . $order_field . ' ' . $order_option;
 					} else {
-						$order = $order_field;
+						$order = 'cobro.' . $order_field;
 					}
 				}
 			}
