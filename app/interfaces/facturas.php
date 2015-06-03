@@ -45,6 +45,9 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 				, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		if ($exportar_excel) {
+			// Horrible workaround mientras se optimiza la funcion UtilesApp.php@ProcesaCobroIdMoneda
+			set_time_limit(0);
+
 			$factura->DownloadExcel($results);
 		} else if ($archivo_contabilidad) {
 			$data = array('Resultados' => $results);
