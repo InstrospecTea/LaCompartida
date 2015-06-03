@@ -343,7 +343,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
 		if (empty($results[0])) {
-			return null;
+			$this->loadBusiness('Working');
+			$work = $this->WorkingBusiness->getWork($workId);
+			$workFee = new WorkFee();
+			$workFee->set('id_moneda', $currency_id);
+			$workFee->set('valor', $work->get('tarifa_hh'));
+			$workFee->set('valor_estandar', $work->get('tarifa_hh_estandar'));
+			return $workFee;
 		} else {
 			return $results[0];
 		}
