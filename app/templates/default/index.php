@@ -70,6 +70,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/admin/problema_documento.php"/>Documentos con Problema</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/auditoria/index.php"/>Auditoría</a>';
 
 				if ($Slim = Slim::getInstance('default', true)) {
