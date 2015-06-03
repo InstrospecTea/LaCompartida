@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.19
+Wednesday 2015, June 3nd.
+* **Fix:** [Fix with work fee when work fee does not exists.](https://github.com/LemontechSA/ttb/pull/1003)
+
 ## Hotfix 15.10.18
 Tuesday 2015, June 2nd.
 * **Fix:** [Fix typo en eliminación datos demo](https://github.com/LemontechSA/ttb/pull/1002)
