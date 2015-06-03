@@ -158,6 +158,7 @@ if ($opc == 'buscar') {
 				contrato.id_contrato,
 				contrato.codigo_cliente,
 				cliente.glosa_cliente,
+				usuario.apellido1,
 				contrato.forma_cobro,
 				contrato.monto,
 				contrato.retainer_horas,
@@ -194,6 +195,7 @@ if ($opc == 'buscar') {
 				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
 			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+			 	LEFT JOIN usuario ON cobro.id_usuario_responsable = usuario.id_usuario
 				LEFT JOIN grupo_cliente ON grupo_cliente.codigo_cliente = contrato.codigo_cliente
 				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
 				LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda

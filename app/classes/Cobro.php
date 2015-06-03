@@ -322,19 +322,37 @@ if (!class_exists('Cobro')) {
 		function OrdenResultados() {
 			$order = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
 			$setting_order = Conf::GetConf($this->sesion, 'OrdenarCobrosPorDefecto');
-			$options = array('fecha_creacion');
+			$option_tables = array(
+				'fecha_creacion' => array(
+					'table' => 'cobro',
+					'field' => 'fecha_creacion'
+				),
+				'nombre_cliente' => array(
+					'table' => 'cliente',
+					'field' => 'glosa_cliente'
+				),
+				'encargado_comercial' => array(
+					'table' => 'usuario',
+					'field' => 'apellido1'
+				),
+				'numero_cobro' => array(
+					'table' => 'cobro',
+					'field' => 'id_cobro'
+				)
+			);
 
 			if ($setting_order) {
 				$order_split = preg_split('(,|\s)', $setting_order);
 				$order_field = $order_split[0];
 				$order_option = strtolower(end($order_split));
 
-				if (in_array($order_field, $options)) {
+				if (in_array($order_field, array_keys($option_tables))) {
 					if ($order_option == 'desc') {
-						$order = 'cobro.' . $order_field . ' ' . $order_option;
+						$order = $option_tables[$order_field]['table'] . '.' . $option_tables[$order_field]['field'] . ' ' . $order_option;
 					} else {
-						$order = 'cobro.' . $order_field;
+						$order = $option_tables[$order_field]['table'] . '.' . $option_tables[$order_field]['field'];
 					}
+
 				}
 			}
 
