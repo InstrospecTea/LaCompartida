@@ -262,7 +262,7 @@ if ($opc == 'buscar') {
 		}
 
 		$cols = 4;
-		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
+		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			$cols++;
 		}
 		$contratofields = $cobro->fields;
@@ -380,7 +380,7 @@ if ($opc == 'buscar') {
 
 		$html .= "</td>";
 
-		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
+		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
