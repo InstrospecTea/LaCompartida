@@ -2605,14 +2605,14 @@ class Factura extends Objeto {
 		// Recupero todos los id_factura de los resultados, para posterior uso
 		$facturasIDs =
 			array_unique(
-				array_map(function($item){
+				array_map(function($item) {
 					return $item['id_factura'];
 				}, $results)
 			);
 
 		$cobrosIDs =
 			array_unique(
-				array_map(function($item){
+				array_map(function($item) {
 					return $item['id_cobro'];
 				}, $results)
 			);
@@ -2687,7 +2687,7 @@ class Factura extends Objeto {
 
 		}
 
-		if( count($facturaPosition) ){
+		if( count($facturaPosition) ) {
 			// saldo pago, fecha ultimo pago
 			$query2 =
 				"SELECT ccfm2.id_factura,
@@ -2708,7 +2708,7 @@ class Factura extends Objeto {
 			$statement = $this->sesion->pdodbh->prepare($query2);
 			$statement->execute();
 
-			while( $pago = $statement->fetch(PDO::FETCH_ASSOC) ){
+			while( $pago = $statement->fetch(PDO::FETCH_ASSOC) ) {
 				$position = $facturaPosition[ $pago['id_factura'] ];
 
 				$results[ $position ]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';

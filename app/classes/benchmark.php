@@ -43,14 +43,13 @@ class Benchmark {
     public function elapsed( $timerID = '' ) {
         if( !$this->exists($timerID) ) {
             $timerID = self::MAINTIMER;
-
         }
 
         if( $this->stopped($timerID) ) {
             $elapsed = $this->stoppedTimers[ $timerID ];
         } else {
-        }
             $elapsed = $this->gettime() - $this->timers[ $timerID ];
+        }
 
         return $elapsed;
     }
@@ -100,7 +99,7 @@ class Benchmark {
         $toLog  = strpos($outputAs, "log") !== false;
         $asJSON = strpos($outputAs, "json") !== false;
         $asTXT  = strpos($outputAs, "txt") !== false;
-        $asHTML  = strpos($outputAs, "html") !== false;
+        $asHTML = strpos($outputAs, "html") !== false;
 
         if( $asJSON ) {
             $output = json_encode( $resume );
