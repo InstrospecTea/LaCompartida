@@ -21,14 +21,14 @@ class Benchmark {
         $this->start( self::MAINTIMER );
     }
 
-    private function __destruct(){
+    private function __destruct() {
         $this->stop( self::MAINTIMER );
     }
 
     /**
     * Singleton endpoint to use class
     */
-    public function instance(){
+    public function instance() {
         if( !(self::$instance instanceof self) ) {
             self::$instance = new self;
         }
@@ -36,7 +36,7 @@ class Benchmark {
         return self::$instance;
     }
 
-    public function start( $timerID ){
+    public function start( $timerID ) {
         $this->timers[$timerID] = $this->gettime();
     }
 
@@ -59,7 +59,7 @@ class Benchmark {
         // The main timer can't be stopped!
         if( $timerID == self::MAINTIMER ) return;
 
-        if( !array_key_exists($timerID, $this->stoppedTimers) ){
+        if( !array_key_exists($timerID, $this->stoppedTimers) ) {
             $this->stoppedTimers[ $timerID ] = array();
         }
 
@@ -67,7 +67,7 @@ class Benchmark {
         unset( $this->timers[ $timerID] );
     }
 
-    public function tick( $timerID ){
+    public function tick( $timerID ) {
         if( !array_key_exists($timerID, $this->ticks) )
             $this->ticks[$timerID] = false;
 
@@ -77,18 +77,18 @@ class Benchmark {
         $this->ticks[$timerID] = !$this->ticks[$timerID];
     }
 
-    public function stopped( $timerID ){
+    public function stopped( $timerID ) {
         return $this->exists($timerID) && array_key_exists($timerID, $this->stoppedTimers);
     }
 
-    public function exists( $timerID ){
+    public function exists( $timerID ) {
         return array_key_exists($timerID, $this->timers) || array_key_exists($timerID, $this->stoppedTimers);
     }
 
-    public function dump( $outputAs = 'txt'){
+    public function dump( $outputAs = 'txt') {
         $output = array();
 
-        foreach($this->timers as $timerID => $time){
+        foreach($this->timers as $timerID => $time) {
             $this->stop( $timerID );
         }
 
@@ -105,7 +105,7 @@ class Benchmark {
         if( $asJSON ) {
             $output = json_encode( $resume );
 
-        } elseif( $asTXT || $asHTML ){
+        } elseif( $asTXT || $asHTML ) {
             foreach($resume['timers'] as $timerID => $elapsed ) {
                 $totalMeasured += $elapsed['total'];
 
@@ -128,7 +128,7 @@ class Benchmark {
         else error_log( $output );
     }
 
-    private function calculateResume(){
+    private function calculateResume() {
         $resume = array();
 
         foreach( $this->stoppedTimers as $timerID => $times ) {
@@ -144,7 +144,7 @@ class Benchmark {
         return $resume;
     }
 
-    private function gettime(){
+    private function gettime() {
         return microtime(true);
     }
 }
