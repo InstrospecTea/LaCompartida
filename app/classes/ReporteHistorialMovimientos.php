@@ -804,14 +804,14 @@ class ReporteHistorialMovimientos
 			),
 			array(
 				'field' => 'forma_cobro',
-				'title' => __('Forma Cobro'),
+				'title' => __('Forma Tarificación'),
 				'extras' => array(
 					'attrs' => 'style="text-align:left;color:red;"'
 				)
 			),
 			array(
 				'field' => 'forma_cobro_modificado',
-				'title' => __('Forma Cobro').' (M)',
+				'title' => __('Forma Tarificación').' (M)',
 				'extras' => array(
 					'attrs' => 'style="text-align:left;color:green;"'
 				)

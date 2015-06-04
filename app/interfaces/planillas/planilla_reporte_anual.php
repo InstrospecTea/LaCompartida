@@ -330,7 +330,7 @@ if ($usa_reporte_valores) {
 $ws1 = & $wb->addWorksheet(__('Hrs Declaradas x FC x mes'));
 iniciar_hoja($ws1, __('Horas Declaradas Corregidas por Forma de Cobro'), $fila, $col, $f);
 
-$encabezados = array(__('Forma de Cobro'), 'Horas');
+$encabezados = array(__('Forma de Tarificación'), 'Horas');
 print_headers($ws1, $encabezados, $fila, $f);
 
 $fila_ini = $fila;
@@ -456,7 +456,7 @@ if ($fila_fin > $fila_ini) {
 
 //HOJA 2 TABLA 1
 $ws2 = & $wb->addWorksheet(__('Hrs Declaradas x FC x grupo'));
-iniciar_hoja($ws2, 'Horas Declaradas por ' . __('Forma de Cobro') . ' desagregadas por Grupo', $fila, $col, $f);
+iniciar_hoja($ws2, 'Horas Declaradas por ' . __('Forma de Tarificación') . ' desagregadas por Grupo', $fila, $col, $f);
 if ($usa_reporte_horas) {
 	$r = $resultado[2];
 	if (is_array($r['labels'])) {
@@ -546,7 +546,7 @@ if ($fila_fin > $fila_ini) {
 
 //HOJA 3 TABLA 1
 $ws3 = & $wb->addWorksheet(__('Hrs Declaradas x FC x prof'));
-iniciar_hoja($ws3, 'Horas Declaradas por ' . __('Forma de Cobro') . ' desagregadas por Profesional', $fila, $col, $f);
+iniciar_hoja($ws3, 'Horas Declaradas por ' . __('Forma de Tarificación') . ' desagregadas por Profesional', $fila, $col, $f);
 if ($usa_reporte_horas) {
 	$r = $resultado[3];
 	if (is_array($r['labels'])) {
@@ -640,7 +640,7 @@ if ($fila_fin > $fila_ini) {
 $ws1 = & $wb->addWorksheet(__('Hrs Liquidadas x FC x mes'));
 iniciar_hoja($ws1, __('Horas Liquidadas por Forma de Cobro'), $fila, $col, $f);
 
-$encabezados = array(__('Forma de Cobro'), 'Horas');
+$encabezados = array(__('Forma de Tarificación'), 'Horas');
 print_headers($ws1, $encabezados, $fila, $f);
 
 $fila_ini = $fila;

@@ -13,7 +13,7 @@ $searchCriteria = new SearchCriteria('Charge');
 $searchCriteria->related_with('Contract')->on_property('id_contrato')->with_direction('INNER');
 $searchCriteria->related_with('Matter')->joined_with('Contract')->on_property('id_contrato');
 $searchCriteria->related_with('Client')->joined_with('Matter')->on_property('codigo_cliente');
-$searchCriteria->add_scope('orderbyClientGlossAndClientCode');
+$searchCriteria->add_scope('orderByClientGlossAndClientCode');
 
 if ($id_cobro) {
 	$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($id_cobro);
@@ -486,27 +486,29 @@ if ($borradores) {
 
 $SearchingBusiness = new SearchingBusiness($sesion);
 $results = $SearchingBusiness->searchByGenericCriteria($searchCriteria, array('DISTINCT(Charge.id_cobro)'));
-$chargeIds = array_map(function($element) { 
+$chargeIds = array_map(function($element) {
 	return $element->get('charge_id_cobro');
 }, $results->toArray());
- 
+
 // Search criteria que obtiene las entidades Cobro para no hacer
 // select  por cada uno, además trae la información necesaria de Document.
 $chargeSearchCriteria = new SearchCriteria('Charge');
-$chargeSearchCriteria->filter('id_cobro')->restricted_by('in')->compare_with($chargeIds);
+$chargeSearchCriteria->related_with('Client')->with_direction('LEFT')->on_property('codigo_cliente');
 $chargeSearchCriteria->add_scope('withDocument');
+$chargeSearchCriteria->filter('id_cobro')->restricted_by('in')->compare_with($chargeIds);
+$chargeSearchCriteria->add_scope_for('Client', 'orderByClientGloss');
 $chargeResults = $SearchingBusiness->searchByCriteria(
-	$chargeSearchCriteria, 
+	$chargeSearchCriteria,
 	array('*', 'Document.subtotal_honorarios as document_subtotal_honorarios')
 );
- 
+
 foreach ($chargeResults as $charge) {
 	$id_cobro = $charge->get('id_cobro');
-	
+
 	$cobro = new Cobro($sesion);
 	$cobro->fields = $charge->fields;
 	$cobro->LoadAsuntos();
-	
+
 	/*
 	*	Si es que el cobro es RETAINER o PROPORCIONAL modifica las columnas del excel
 	*/

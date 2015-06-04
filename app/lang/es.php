@@ -1,6 +1,7 @@
 <?php
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
+$_LANG['Nº Registro'] = "#";
 $_LANG['Fecha'] = "Fecha";
 $_LANG['Periodo'] = "Periodo";
 $_LANG['hasta'] = "hasta";
@@ -284,7 +285,8 @@ $_LANG['Cobros emitidos'] = "Cobros emitidos";
 $_LANG['Revisar cobros'] = "Revisar cobros";
 $_LANG['Cobro eliminado con éxito'] = "Cobro eliminado con éxito";
 $_LANG['Listado de cobros'] = "Listado de cobros";
-$_LANG['Forma de cobro'] = "Forma de cobro";
+$_LANG['Forma de Tarificación'] = "Forma de Tarificación";
+$_LANG['Forma de tarificación'] = "Forma de tarificación";
 $_LANG['Resumen final del Cobro'] = "Resumen final del Cobro";
 $_LANG['Emitir Cobro'] = "Emitir Cobro";
 $_LANG['Parámetros del Cobro'] = "Parámetros del Cobro";
@@ -600,7 +602,8 @@ $_LANG['Tipo de reporte'] = "Tipo de reporte";
 $_LANG['Generar reporte'] = "Generar reporte";
 $_LANG['Debe seleccionar un asunto para este reporte'] = "Debe seleccionar un asunto para este reporte";
 $_LANG['Reporte Resumen Abogado'] = "Reporte Resumen Abogado";
-$_LANG['Forma Cobro'] = "Forma Cobro";
+$_LANG['Forma Tarificación'] = "Forma Tarificación";
+$_LANG['Forma tarificación'] = "Forma tarificación";
 $_LANG['Generar planilla'] = "Generar planilla";
 $_LANG['Abogados'] = "Abogados";
 $_LANG['Reporte Facturación clientes'] = "Reporte Facturación clientes";

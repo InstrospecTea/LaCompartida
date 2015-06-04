@@ -1,6 +1,7 @@
 <?php
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
+$_LANG['Nº Registro'] = "#";
 $_LANG['Fecha'] = "Date";
 $_LANG['Fecha:'] = "Date:";
 $_LANG['Periodo'] = "Period";
@@ -257,7 +258,8 @@ $_LANG['Cobros'] = "Cobros";
 $_LANG['Cobros emitidos'] = "Cobros emitidos";
 $_LANG['Cobro eliminado con éxito'] = "Cobro eliminado con éxito";
 $_LANG['Listado de cobros'] = "Listado de cobros";
-$_LANG['Forma de cobro'] = "Forma de cobro";
+$_LANG['Forma de Tarificación'] = "Forma de Tarificación";
+$_LANG['Forma de tarificación'] = "Forma de tarificación";
 $_LANG['Resumen final del Cobro'] = "Resumen final del Cobro";
 $_LANG['Emitir Cobro'] = "Emitir Cobro";
 $_LANG['Parámetros del Cobro'] = "Parámetros del Cobro";

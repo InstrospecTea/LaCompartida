@@ -232,17 +232,17 @@ $pagina->PrintTop($popup);
 			</td>
 			<td align='left' colspan='3'>
 				<?php
-					if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
-							if(Conf::GetConf($sesion,'CodigoSecundario') || Conf::CodigoSecundario()) {
-								echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario,'',"320");
-							}else{
-								echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente,'','',"320");
+					if (Conf::GetConf($sesion,'TipoSelectCliente') == 'autocompletador') {
+							if (Conf::GetConf($sesion,'CodigoSecundario')) {
+								echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', "320");
+							} else {
+								echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '', '', "320");
 							}
-					}else{
-						if(Conf::GetConf($sesion,'CodigoSecundario')) {
-							echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
-						}else{
-							echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
+					} else {
+						if (Conf::GetConf($sesion,'CodigoSecundario')) {
+							echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
+						} else {
+							echo InputId::Imprimir($sesion, "cliente", "codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
 						}
 					}
 				?>
