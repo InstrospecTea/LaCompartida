@@ -395,7 +395,6 @@ class Factura extends Objeto {
 		return false;
 	}
 
-
 	/**
 	 * Obtiene el valor bruto de la factura - menos la suma de los documentos
 	 * hijos que la anulan: (Notas de crédito)
@@ -473,18 +472,36 @@ class Factura extends Objeto {
 		return new ListaFacturas($this->sesion, null, $query);
 	}
 
-	function ObtenerEncargadoComercial($id_contrato) {
-		$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre
-                    FROM contrato
-                        LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-                            WHERE id_contrato = '{$this->fields['id_contrato']}'";
+	function EncargadoComercial($id_contrato) {
+			if (!empty($this->fields['id_usuario_responsable'])) {
+			$query = "SELECT CONCAT_WS(' ', usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre, usuario.username
+									FROM usuario 
+									WHERE id_usuario = '{$this->fields['id_usuario_responsable']}'";
+		} else {
+			$query = "SELECT CONCAT_WS(' ',usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre, usuario.username
+									FROM contrato
+									LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
+									WHERE id_contrato = '{$this->fields['id_contrato']}'";
+		}
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($nombre_encargado_comercial) = mysql_fetch_array($resp);
+		return mysql_fetch_array($resp);
+	}
 
+	function ObtenerEncargadoComercialUsername($id_contrato) {
+		$datos_encargado = $this->EncargadoComercial($id_contrato);
+		$username_encargado_comercial = $datos_encargado['username'];
+		if ($username_encargado_comercial == '') {
+			$username_encargado_comercial = 'No esta definido';
+		}
+		return $username_encargado_comercial;
+	}
+
+	function ObtenerEncargadoComercial($id_contrato) {
+		$datos_encargado = $this->EncargadoComercial($id_contrato);
+		$nombre_encargado_comercial = $datos_encargado['nombre'];
 		if ($nombre_encargado_comercial == '') {
 			$nombre_encargado_comercial = 'No esta definido';
 		}
-
 		return $nombre_encargado_comercial;
 	}
 
@@ -1008,7 +1025,7 @@ class Factura extends Objeto {
 									subtotal_sin_descuento
 								FROM documento
 								WHERE id_cobro = '{$this->fields["id_cobro"]}'
-                                            AND tipo_doc='N';";
+																						AND tipo_doc='N';";
 
 					$resp_cyc = mysql_query($query_cyc, $this->sesion->dbh) or Utiles::errorSQL($query_cyc, __FILE__, __LINE__, $this->sesion->dbh);
 					list( $monto_subtotal,
@@ -1453,7 +1470,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%total_iva%', number_format($monto_impuesto_honorarios + $monto_impuesto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 
 				/*
-				  Montos Rebaza-alcazar
+					Montos Rebaza-alcazar
 				 */
 
 				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
@@ -1739,13 +1756,13 @@ class Factura extends Objeto {
 
 					//	DESCRIPCION DEL GASTO EN FACTURA
 					$query_detalle_gastos = "SELECT
-                                                cta_corriente.descripcion,
-                                                cta_corriente.numero_documento,
-                                                prm_proveedor.glosa,
-                                                prm_proveedor.rut
-                                            FROM cta_corriente
+																								cta_corriente.descripcion,
+																								cta_corriente.numero_documento,
+																								prm_proveedor.glosa,
+																								prm_proveedor.rut
+																						FROM cta_corriente
 						LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
-                                                    WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "'";
+																										WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "'";
 
 					$resp_detalle_gastos = mysql_query($query_detalle_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_detalle_gastos, __FILE__, __LINE__, $this->sesion->dbh);
 					list( $descripcion_del_gasto, $numero_gasto, $nombre_proveedor, $rut_proveedor ) = mysql_fetch_array($resp_detalle_gastos);
@@ -1756,25 +1773,25 @@ class Factura extends Objeto {
 					$html2 = str_replace('%rut_proveedor%', $rut_proveedor, $html2);
 
 					$query = "SELECT SQL_CALC_FOUND_ROWS
-                                prm_proveedor.glosa as nombre_proveedor,
-                                CONCAT('RUC: ', prm_proveedor.rut) as rut_proveedor,
-                                cta_corriente.descripcion as gasto_descripcion,
-                                cta_corriente.monto_cobrable - IF(cta_corriente.con_impuesto = 'NO', 0, round(cta_corriente.monto_cobrable * cobro.porcentaje_impuesto_gastos / 100, 2)) as valor,
-                                IF(cta_corriente.con_impuesto = 'NO', 0, round(cta_corriente.monto_cobrable * cobro.porcentaje_impuesto_gastos / 100, 2)) as impuesto,
-                                cta_corriente.monto_cobrable as total
-                            FROM
-                                cta_corriente
-                            LEFT JOIN
-                                prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-                            LEFT JOIN
-                                prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
-                            LEFT JOIN
-                                cobro ON cta_corriente.id_cobro = cobro.id_cobro
-                            WHERE cta_corriente.id_cobro='" . $this->fields['id_cobro'] . "'
-                                AND monto_cobrable > 0
-                                AND cta_corriente.incluir_en_cobro = 'SI'
-                                AND cta_corriente.cobrable = 1
-                                    ORDER BY fecha ASC";
+																prm_proveedor.glosa as nombre_proveedor,
+																CONCAT('RUC: ', prm_proveedor.rut) as rut_proveedor,
+																cta_corriente.descripcion as gasto_descripcion,
+																cta_corriente.monto_cobrable - IF(cta_corriente.con_impuesto = 'NO', 0, round(cta_corriente.monto_cobrable * cobro.porcentaje_impuesto_gastos / 100, 2)) as valor,
+																IF(cta_corriente.con_impuesto = 'NO', 0, round(cta_corriente.monto_cobrable * cobro.porcentaje_impuesto_gastos / 100, 2)) as impuesto,
+																cta_corriente.monto_cobrable as total
+														FROM
+																cta_corriente
+														LEFT JOIN
+																prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
+														LEFT JOIN
+																prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+														LEFT JOIN
+																cobro ON cta_corriente.id_cobro = cobro.id_cobro
+														WHERE cta_corriente.id_cobro='" . $this->fields['id_cobro'] . "'
+																AND monto_cobrable > 0
+																AND cta_corriente.incluir_en_cobro = 'SI'
+																AND cta_corriente.cobrable = 1
+																		ORDER BY fecha ASC";
 					$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 					// Segmento de codigo para factura word expertise
@@ -2104,13 +2121,13 @@ class Factura extends Objeto {
 		}
 
 		$query = "SELECT
-                        fp.id_factura_pago
-                    FROM factura_pago AS fp
-                        JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-                        JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-                        LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-                        {$where}
-                        ORDER BY fp.fecha,fp.id_factura_pago DESC";
+												fp.id_factura_pago
+										FROM factura_pago AS fp
+												JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+												JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+												LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+												{$where}
+												ORDER BY fp.fecha,fp.id_factura_pago DESC";
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($ultimo_id_factura_pago) = mysql_fetch_array($resp);
@@ -2122,15 +2139,15 @@ class Factura extends Objeto {
 			$id = $this->Id();
 		}
 		$query = "SELECT
-                        fp.*,
-                        SUM(IF( ccfm2.id_factura = '$id', ccfmn.monto, 0)) AS monto_aporte
-                    FROM factura_pago AS fp
-                    JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-                    LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-                    LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-                    LEFT JOIN neteo_documento AS nd ON fp.id_neteo_documento_adelanto = nd.id_neteo_documento
-                    WHERE ccfm2.id_factura = '$id' OR nd.id_documento_cobro = '$doc_cobro'
-                    GROUP BY fp.id_factura_pago";
+												fp.*,
+												SUM(IF( ccfm2.id_factura = '$id', ccfmn.monto, 0)) AS monto_aporte
+										FROM factura_pago AS fp
+										JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+										LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+										LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+										LEFT JOIN neteo_documento AS nd ON fp.id_neteo_documento_adelanto = nd.id_neteo_documento
+										WHERE ccfm2.id_factura = '$id' OR nd.id_documento_cobro = '$doc_cobro'
+										GROUP BY fp.id_factura_pago";
 		return new ListaFacturaPago($this->sesion, null, $query);
 	}
 
@@ -2205,10 +2222,10 @@ class Factura extends Objeto {
 			list($pais) = mysql_fetch_array($resp);
 		} else {
 			$query = "SELECT
-                            prm_pais.nombre
-                        FROM factura
-                            INNER JOIN contrato ON factura.id_contrato = contrato.id_contrato
-                            INNER JOIN prm_pais ON contrato.id_pais = prm_pais.id_pais
+														prm_pais.nombre
+												FROM factura
+														INNER JOIN contrato ON factura.id_contrato = contrato.id_contrato
+														INNER JOIN prm_pais ON contrato.id_pais = prm_pais.id_pais
 				 WHERE factura.id_factura = {$this->fields[$this->campo_id]};";
 
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -2245,21 +2262,21 @@ class Factura extends Objeto {
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			$formato_numero = Conf::GetConf($this->sesion, 'NumeroFacturaConSerie') ? "CONCAT(f.serie_documento_legal, '-', f.numero)" : "f.numero";
 			$query = "SELECT
-                        group_concat(idDocLegal) as listaDocLegal
-                        FROM (
-                            SELECT
-                                CONCAT(if(f.id_documento_legal != 0,
-                                if(f.letra is not null,
-                                if(f.letra != '',concat('LETRA ',f.letra),
-                                CONCAT(p.codigo,' '," . $formato_numero . ")),
-                                CONCAT(p.codigo,' '," . $formato_numero . ")), ''),
-                                IF(f.anulado=1,' (ANULADO)',''),' ') as idDocLegal,
-                                f.id_cobro
-                            FROM factura f, prm_documento_legal p
-                                WHERE f.id_documento_legal = p.id_documento_legal
-                                AND id_cobro = '" . $this->fields['id_cobro'] . "'
-                        )zz
-                        GROUP BY id_cobro";
+												group_concat(idDocLegal) as listaDocLegal
+												FROM (
+														SELECT
+																CONCAT(if(f.id_documento_legal != 0,
+																if(f.letra is not null,
+																if(f.letra != '',concat('LETRA ',f.letra),
+																CONCAT(p.codigo,' '," . $formato_numero . ")),
+																CONCAT(p.codigo,' '," . $formato_numero . ")), ''),
+																IF(f.anulado=1,' (ANULADO)',''),' ') as idDocLegal,
+																f.id_cobro
+														FROM factura f, prm_documento_legal p
+																WHERE f.id_documento_legal = p.id_documento_legal
+																AND id_cobro = '" . $this->fields['id_cobro'] . "'
+												)zz
+												GROUP BY id_cobro";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($lista) = mysql_fetch_array($resp);
 			return $lista;
@@ -2480,92 +2497,92 @@ class Factura extends Objeto {
 		$groupby = " GROUP BY factura.id_factura ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
-                prm_documento_legal.codigo as tipo
-                , factura.numero
-                , factura.serie_documento_legal
-                , factura.codigo_cliente
-                , cliente.glosa_cliente
-                , contrato.id_contrato as idcontrato
-                , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
-                			OR contrato.factura_razon_social IN ('',' ')
-                			OR contrato.factura_razon_social IS NULL,
-                		factura.cliente,
-                		CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
-                	) as factura_rsocial
-                , usuario.username AS encargado_comercial
-                , factura.fecha
-                , CONCAT_WS(
-                    ' ' ,
-                    IF (factura.honorarios > 0, factura.descripcion, ''),
-                    IF (factura.subtotal_gastos > 0, factura.descripcion_subtotal_gastos, ''),
-                    IF (factura.subtotal_gastos_sin_impuesto > 0, factura.descripcion_subtotal_gastos_sin_impuesto, '')
-                ) AS descripcion
-                , prm_estado_factura.codigo as codigo_estado
-                , prm_estado_factura.glosa as estado
-                , factura.id_cobro
-                , cobro.codigo_idioma as codigo_idioma
-                , prm_moneda.codigo AS codigo_moneda
-                , prm_moneda.simbolo
-                , prm_moneda.cifras_decimales
-                , prm_moneda.tipo_cambio
-                , factura.id_moneda
-                , factura.honorarios
-                , factura.subtotal
-                , factura.subtotal_gastos
-                , factura.subtotal_gastos_sin_impuesto
-                , factura.iva
-                , factura.total
-                , '' as saldo_pagos
-                , -cta_cte_fact_mvto.saldo as saldo
-                , '' as monto_pagos_moneda_base
-                , '' as saldo_moneda_base
-                , factura.id_factura
-                , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-                , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
-                , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-                , factura.RUT_cliente
-                , prm_estudio.glosa_estudio
-                , factura.fecha_anulacion";
+								prm_documento_legal.codigo as tipo
+								, factura.numero
+								, factura.serie_documento_legal
+								, factura.codigo_cliente
+								, cliente.glosa_cliente
+								, contrato.id_contrato as idcontrato
+								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
+											OR contrato.factura_razon_social IN ('',' ')
+											OR contrato.factura_razon_social IS NULL,
+										factura.cliente,
+										CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+									) as factura_rsocial
+								, usuario.username AS encargado_comercial
+								, factura.fecha
+								, CONCAT_WS(
+										' ' ,
+										IF (factura.honorarios > 0, factura.descripcion, ''),
+										IF (factura.subtotal_gastos > 0, factura.descripcion_subtotal_gastos, ''),
+										IF (factura.subtotal_gastos_sin_impuesto > 0, factura.descripcion_subtotal_gastos_sin_impuesto, '')
+								) AS descripcion
+								, prm_estado_factura.codigo as codigo_estado
+								, prm_estado_factura.glosa as estado
+								, factura.id_cobro
+								, cobro.codigo_idioma as codigo_idioma
+								, prm_moneda.codigo AS codigo_moneda
+								, prm_moneda.simbolo
+								, prm_moneda.cifras_decimales
+								, prm_moneda.tipo_cambio
+								, factura.id_moneda
+								, factura.honorarios
+								, factura.subtotal
+								, factura.subtotal_gastos
+								, factura.subtotal_gastos_sin_impuesto
+								, factura.iva
+								, factura.total
+								, '' as saldo_pagos
+								, -cta_cte_fact_mvto.saldo as saldo
+								, '' as monto_pagos_moneda_base
+								, '' as saldo_moneda_base
+								, factura.id_factura
+								, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+								, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
+								, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+								, factura.RUT_cliente
+								, prm_estudio.glosa_estudio
+								, factura.fecha_anulacion";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
-			  		SELECT SUM(ccfmn.monto)
-	  				FROM factura_pago AS fp
+						SELECT SUM(ccfmn.monto)
+						FROM factura_pago AS fp
 						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
 						GROUP BY ccfm2.id_factura
-			  	) AS pagos";
+					) AS pagos";
 		}
 
 		if ($opciones['mostrar_fecha_ultimo_pago']) {
 			$query .= ", (
-				  	SELECT MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
-	  				FROM factura_pago AS fp
+						SELECT MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
+						FROM factura_pago AS fp
 						INNER JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 						INNER JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 						LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 						WHERE ccfm2.id_factura = factura.id_factura
 						GROUP BY ccfm2.id_factura
-			  	) AS fecha_ultimo_pago";
+					) AS fecha_ultimo_pago";
 		}
 
 		($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_query_facturas') : false;
 
 		$query.=" FROM factura
-		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-		   LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-		   LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-		   LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-		   LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-		   LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-		   LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-		   LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
-		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-		   LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
-		   WHERE ";
+			 JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+			 JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+			 LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+			 LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+			 LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+			 LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+			 LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+			 LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+			 LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
+			 LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+			 LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
+			 WHERE ";
 
 		$resultingquery = $query . " \n " . $where . " \n " . $groupby . "\n" . $orderby;
 
@@ -2829,8 +2846,8 @@ class Factura extends Objeto {
 			$generators = Contrato::contractGenerators($this->sesion, $id_contrato);
 			foreach ($generators as $generator) {
 				$sql = "INSERT INTO `factura_generador`
-                SET `factura_generador`.`id_factura`=:id_factura, `factura_generador`.`id_contrato`=:id_contrato,
-                        `factura_generador`.`id_usuario`=:id_usuario, `factura_generador`.`porcentaje_genera`=:porcentaje_genera ";
+								SET `factura_generador`.`id_factura`=:id_factura, `factura_generador`.`id_contrato`=:id_contrato,
+												`factura_generador`.`id_usuario`=:id_usuario, `factura_generador`.`porcentaje_genera`=:porcentaje_genera ";
 
 				$Statement = $this->sesion->pdodbh->prepare($sql);
 				$Statement->bindParam('id_factura', $id_factura);
