@@ -2357,7 +2357,7 @@ class Factura extends Objeto {
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		// Cambio los select para obtener los saldos de las facturas separados por moneda
-		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, abs(cta_cte_fact_mvto.saldo) AS saldo";
+		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, -cta_cte_fact_mvto.saldo AS saldo";
 
 		$query = preg_replace('/(^\s*SELECT\s)[\s\S]+?(\sFROM\s)/mi', "$1 $select $2", $query);
 		$query = preg_replace('/\sORDER BY.+|\sLIMIT.+/mi', '', $query);
