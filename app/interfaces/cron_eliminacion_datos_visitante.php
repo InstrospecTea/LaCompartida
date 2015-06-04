@@ -57,7 +57,7 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	echo 'Todos los datos en cobro_moneda eliminado.<br>';
 
 	/* Borrar cobros movimiento */
-	$query = "TRUNCATE TABLE cobro_monvimiento";
+	$query = "TRUNCATE TABLE cobro_movimiento";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Cobros Movimientos borrado.<br>';
 
@@ -102,27 +102,27 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 		list($id_usuario) = mysql_fetch_array($resp);
 
 		/* Modifica encargados en asuntos y contrato que tiene relacion con un visitante para poder borrarlos despues */
-		$query = "UPDATE asunto 
-										JOIN usuario AS u ON u.id_usuario=asunto.id_usuario 
-										left JOIN usuario AS encargado ON encargado.id_usuario=asunto.id_encargado 
-										left JOIN usuario AS cobrador ON cobrador.id_usuario=asunto.id_cobrador 
-										 SET asunto.id_usuario = " . $id_usuario . ", 
-										 		 asunto.id_encargado = " . $id_usuario . ", 
-										 		 asunto.id_cobrador = " . $id_usuario . " 
+		$query = "UPDATE asunto
+										JOIN usuario AS u ON u.id_usuario=asunto.id_usuario
+										left JOIN usuario AS encargado ON encargado.id_usuario=asunto.id_encargado
+										left JOIN usuario AS cobrador ON cobrador.id_usuario=asunto.id_cobrador
+										 SET asunto.id_usuario = " . $id_usuario . ",
+										 		 asunto.id_encargado = " . $id_usuario . ",
+										 		 asunto.id_cobrador = " . $id_usuario . "
 									 WHERE u.id_visitante > 0 OR encargado.id_visitante > 0 OR cobrador.id_visitante > 0";
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, $sesion->dbh);
 
-		$query = "UPDATE contrato 
-										JOIN usuario AS u ON u.id_usuario=contrato.id_usuario_responsable 
-										 SET id_usuario_responsable = " . $id_usuario . " 
+		$query = "UPDATE contrato
+										JOIN usuario AS u ON u.id_usuario=contrato.id_usuario_responsable
+										 SET id_usuario_responsable = " . $id_usuario . "
 									 WHERE u.id_visitante > 0";
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-		$query = "UPDATE modificaciones_contrato AS mc 
-										JOIN usuario AS ur ON ur.id_usuario=mc.id_usuario_responsable  
-										JOIN usuario AS u ON u.id_usuario=mc.id_usuario 
-										 SET mc.id_usuario_responsable = " . $id_usuario . ",  
-										 		 mc.id_usuario = " . $id_usuario . "  
+		$query = "UPDATE modificaciones_contrato AS mc
+										JOIN usuario AS ur ON ur.id_usuario=mc.id_usuario_responsable
+										JOIN usuario AS u ON u.id_usuario=mc.id_usuario
+										 SET mc.id_usuario_responsable = " . $id_usuario . ",
+										 		 mc.id_usuario = " . $id_usuario . "
 									 WHERE u.id_visitante > 0 OR ur.id_visitante > 0";
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
@@ -137,7 +137,7 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 
 	if (method_exists('Conf', 'BorrarDatosAdministracion') && Conf::BorrarDatosAdministracion()) {
 		/* Borrar todos los tipos trámites ingresados por visitantes */
-		$query = "DELETE FROM tramite_tipo 
+		$query = "DELETE FROM tramite_tipo
 									 WHERE 1";
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		echo 'Tipos Trámites borrado.<br>';

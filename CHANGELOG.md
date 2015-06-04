@@ -1,5 +1,41 @@
 # Changelog
 
+## Hotfix 15.10.21
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong use of abs() when displaying values on invoice module.](https://github.com/LemontechSA/ttb/pull/1006)
+
+## Hotfix 15.10.20
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong Conf call to CodigoObligatorio for perezdearce](https://github.com/LemontechSA/ttb/pull/1005)
+
+## Hotfix 15.10.19
+Wednesday 2015, June 3nd.
+* **Fix:** [Fix with work fee when work fee does not exists.](https://github.com/LemontechSA/ttb/pull/1003)
+
+## Hotfix 15.10.18
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix typo en eliminación datos demo](https://github.com/LemontechSA/ttb/pull/1002)
+
+## Hotfix 15.10.17
+Tuesday 2015, June 2nd.
+* **Fix:** [Idioma inglés en facturas.](https://github.com/LemontechSA/ttb/pull/996)
+
+## Hotfix 15.10.16
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix monto real factura considerando NC en periodo](https://github.com/LemontechSA/ttb/pull/992)
+
+## Hotfix 15.10.15
+Tuesday 2015, June 2nd.
+* **Fix:** [Optimización queries repetidas cobros_xls](https://github.com/LemontechSA/ttb/pull/999)
+
+## Hotfix 15.10.14
+Tuesday 2015, June 2nd.
+* **Fix:** [Se cambia unidad de medida 'un' por 'N/A' (no aplica), en Facturacion Mexico](https://github.com/LemontechSA/ttb/pull/998)
+
+## Hotfix 15.10.13
+Tuesday 2015, June 2nd.
+* **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/997)
+
 ## Hotfix 15.10.12
 Friday 2015, May 29th.
 * **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/991)
