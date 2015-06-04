@@ -10787,6 +10787,7 @@ QUERY;
 							     ON tf.id_tarifa = ta.id_tarifa 
 								  AND ta.tarifa_defecto = 1
 							   SET ttff.valor_estandar =  tf.tarifa;";
+
 			break;
 
 		case 8.02:
@@ -10801,6 +10802,13 @@ QUERY;
 										FOREIGN KEY (`id_usuario_responsable_fk`)
 										REFERENCES `usuario` (`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE";
 			}
+
+			break;			
+
+		case 8.03:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarCobrosPorDefecto', '', 'Campos soportados para ordenamiento:<br/> Fecha de Creacion del Cobro => fecha_creacion<br/>Nombre Cliente => nombre_cliente<br/>Numero Cobro => numero_cobro<br/>Encargado Comercial => encargado_comercial', 'string', '6', '-1');";
+
 			break;
 	}
 
@@ -10814,7 +10822,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.02;
+$max_update = 8.03;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
