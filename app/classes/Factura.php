@@ -2274,6 +2274,11 @@ class Factura extends Objeto {
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('FACTURAS');
 
+		if (!Conf::GetConf($this->sesion, 'VisualizaDescuentoEnFactura')) {
+			$SimpleReport->Config->columns['bruto_honorarios']->Visible(false);
+			$SimpleReport->Config->columns['descuento_honorarios']->Visible(false);
+		}
+
 		$SimpleReport->LoadResults($results);
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, $tipo);
 		$writer->save(__('Facturas'));
@@ -2593,74 +2598,80 @@ class Factura extends Objeto {
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-
-		$billingBusiness = new BillingBusiness($this->sesion);
-		$charginBusiness = new ChargingBusiness($this->sesion);
-		$coiningBusiness = new CoiningBusiness($this->sesion);
-
-		$charginData     = array();
-		$coiningData     = array();
 		$facturaPosition = array();
+		$descuento_en_facturas = Conf::GetConf($this->sesion, 'VisualizaDescuentoEnFactura');
+		
+		if ($descuento_en_facturas) {
+			// Recupero todos los id_factura de los resultados, para posterior uso
+			$facturasIDs =
+				array_unique(
+					array_map(function($item) {
+						return $item['id_factura'];
+					}, $results)
+				);
 
-		// Recupero todos los id_factura de los resultados, para posterior uso
-		$facturasIDs =
-			array_unique(
-				array_map(function($item) {
-					return $item['id_factura'];
-				}, $results)
-			);
+			$cobrosIDs =
+				array_unique(
+					array_map(function($item) {
+						return $item['id_cobro'];
+					}, $results)
+				);
 
-		$cobrosIDs =
-			array_unique(
-				array_map(function($item) {
-					return $item['id_cobro'];
-				}, $results)
-			);
+			//instancias de business y cache para obtener descuento de factura al vuelo
+			$billingBusiness = new BillingBusiness($this->sesion);
+			$charginBusiness = new ChargingBusiness($this->sesion);
+			$coiningBusiness = new CoiningBusiness($this->sesion);
 
-		$invoiceList = $billingBusiness->loadInvoices( $facturasIDs );
-		$chargeList  = $charginBusiness->loadCharges( $cobrosIDs );
+			$charginData     = array();
+			$coiningData     = array();
+
+			$invoiceList = $billingBusiness->loadInvoices( $facturasIDs );
+			$chargeList  = $charginBusiness->loadCharges( $cobrosIDs );
+		}
 
 		foreach ($results as $key => $fila) {
+			//Obtener Descuento y Bruto si está activa la configuración
+			if ($descuento_en_facturas) {
+				$id_cobro   = $results[$key]['id_cobro'];
+				$id_factura = $results[$key]['id_factura'];
+				$id_moneda  = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
+				$invoice    = $invoiceList[ $id_factura ];
+				$currency   = $coiningData[$id_moneda];
+
+				if (is_null($currency)) {
+					$currency = $coiningBusiness->getCurrency($id_moneda);
+					$coiningData[$id_moneda] = $currency;
+				}
+
+				if (is_null($charginData[$id_cobro])) {
+					try {
+						$charge = $chargeList[ $id_cobro ];
+
+						// TODO: en la siguiente linea se toma aprox el 80% del tiempo de obtención
+						// de los datos del reporte. Es esta función, junto con UtilesApp::ProcesaCobroIdMoneda
+						// que es LA función DIOS de este proceso (mas de 1K linea :) )
+						// Benchmark::instance()->tick('getAmountDetailOfFees');
+						$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
+						// Benchmark::instance()->tick('getAmountDetailOfFees');
+
+					} catch (Exception $ex) {
+						error_log("No pudo cargar el cobro $id_cobro, significa que esta factura está asociada a un cobro inexistente");
+						continue;
+					}
+				}
+
+				$invoiceFees    = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
+				$chargeFees     = $charginData[$id_cobro]->get('saldo_honorarios');
+				$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
+				$billingData    = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
+
+				$results[$key]['bruto_honorarios']     = $billingData->get('subtotal_honorarios');
+				$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
+			}
+
 			//monto_real
 			$monto_real = $this->ObtenerValorReal($fila['id_factura']);
 			$results[$key]['monto_real'] = strtoupper($fila['codigo_estado']) == 'A' ? '0' : $monto_real;
-
-			//Obtener Descuento y Bruto
-			$id_cobro   = $results[$key]['id_cobro'];
-			$id_factura = $results[$key]['id_factura'];
-			$id_moneda  = $id_moneda ? $id_moneda : $results[$key]['id_moneda'];
-			$invoice    = $invoiceList[ $id_factura ];
-			$currency   = $coiningData[$id_moneda];
-
-			if (is_null($currency)) {
-				$currency = $coiningBusiness->getCurrency($id_moneda);
-				$coiningData[$id_moneda] = $currency;
-			}
-
-			if (is_null($charginData[$id_cobro])) {
-				try {
-					$charge = $chargeList[ $id_cobro ];
-
-					// TODO: en la siguiente linea se toma aprox el 80% del tiempo de obtención
-					// de los datos del reporte. Es esta función, junto con UtilesApp::ProcesaCobroIdMoneda
-					// que es LA función DIOS de este proceso (mas de 1K linea :) )
-					// Benchmark::instance()->tick('getAmountDetailOfFees');
-					$charginData[$id_cobro] = $charginBusiness->getAmountDetailOfFees($charge, $currency);
-					// Benchmark::instance()->tick('getAmountDetailOfFees');
-
-				} catch (Exception $ex) {
-					error_log("No pudo cargar el cobro $id_cobro, significa que esta factura está asociada a un cobro inexistente");
-					continue;
-				}
-			}
-
-			$invoiceFees    = $billingBusiness->getInvoiceFeesAmountInCurrency($invoice, $currency);
-			$chargeFees     = $charginData[$id_cobro]->get('saldo_honorarios');
-			$chargeDiscount = $charginData[$id_cobro]->get('descuento_honorarios');
-			$billingData    = $billingBusiness->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
-
-			$results[$key]['bruto_honorarios']     = $billingData->get('subtotal_honorarios');
-			$results[$key]['descuento_honorarios'] = $billingData->get('descuento_honorarios');
 
 			// observaciones
 			$ids_doc       = $this->ObtenerIdsDocumentos($fila['id_factura']);
