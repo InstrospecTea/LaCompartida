@@ -946,8 +946,13 @@ function funcionTR(& $trabajo) {
 		} else {
 			$id_moneda_trabajo = $trabajo->fields['id_moneda_contrato'];
 		}
-
-		$tarifa = number_format($t->GetTrabajoTarifa($id_moneda_trabajo, $trabajo->fields['id_trabajo']), $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$chargingBusiness = new ChargingBusiness($sesion);
+		$tarifa = number_format(
+			$chargingBusiness->getWorkFee($trabajo->fields['id_trabajo'], $id_moneda_trabajo)->get('valor'),
+			$moneda_cobro->fields['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']
+		);
 	} else if ($trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0) {
 		$tarifa = number_format($trabajo->fields['tarifa_hh'], $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 	} else if ($trabajo->fields['id_tramite_tipo'] == 0) {
