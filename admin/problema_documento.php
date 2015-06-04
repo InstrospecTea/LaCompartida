@@ -5,7 +5,6 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 
 $Sesion = new Sesion(array('ADM'));
 $Pagina = new Pagina($Sesion);
-$Pagina->titulo = __('Documentos con problemas de saldo');
 
 if (!$Sesion->usuario->TienePermiso('SADM')) {
     die('No Autorizado');
@@ -42,7 +41,7 @@ if( isset($ver) && $ver == 'neteo') {
      </table>
 
      <img src="{$ImgDir}/ver_persona_nuevo.gif" onclick="nuevaVentana('Editar_Cobro',730,580,'$RootDir/app/interfaces/cobros6.php?id_cobro={$neteos[0]->id_cobro}&popup=1&popup=1&contitulo=true', 'top=100, left=155');" />
-    <hr><hr>
+    <hr>
 HTML;
 
     $html .= <<<HTML
@@ -93,6 +92,11 @@ HTML;
            $html .= <<<HTML
                 <td align="center"><input type="number" value="{$neteo->valor_cobro_honorarios}"  /></td>
                 <td align="center"><input type="number" value="{$neteo->valor_cobro_gastos}"  /></td>
+
+                <td>
+                    <br>
+                    <button onclick="saveNeteo({$neteo->id_neteo_documento})">guardar</button>
+                </td>
 HTML;
         }
 
@@ -125,6 +129,44 @@ echo $html;
     exit;
 
 
+} elseif( isset($ver) && $ver == 'update_documento_estado' ) {
+    $pagado = strtoupper($pagado);
+
+    $field = in_array(strtolower($field), array('gastos', 'honorarios')) ? "{$field}_pagados" : "";
+
+    if( !$field ) exit;
+
+    $query = "UPDATE documento SET $field = '$pagado' WHERE id_documento = $id_documento";
+
+
+    $stm = $Sesion->pdodbh->query($query);
+
+    echo $stm->rowCount() . " Rows updated";
+
+    exit;
+
+} elseif( isset($ver) && $ver == 'update_documento_saldo' ) {
+    $pagado = strtoupper($pagado);
+
+    $field = in_array(strtolower($field), array('gastos', 'honorarios')) ? "saldo_{$field}" : "";
+
+    if( !$field ) exit;
+
+    $extra = '';
+
+    if( $saldo == 0 ) {
+        $f = str_replace("saldo_", '', $field);
+        $extra = ", {$f}_pagados = 'SI'";
+    }
+
+    $query = "UPDATE documento SET $field = '$saldo' $extra WHERE id_documento = $id_documento";
+
+    $stm = $Sesion->pdodbh->query($query);
+
+    echo $stm->rowCount() . " Rows updated";
+
+    exit;
+
 } elseif( isset($ver) && $ver == 'update_neteo' ) {
     $query = "UPDATE neteo_documento
                 SET valor_cobro_gastos = $valor_cobro_gastos,
@@ -150,7 +192,8 @@ Round(ifnull(sum(ND.valor_cobro_gastos), 0), M.cifras_decimales) pago_gastos,
 round(saldo_honorarios + saldo_gastos, M.cifras_decimales) AS saldo_documento,
 round((DC.honorarios + DC.gastos) - (ifnull(sum(valor_cobro_honorarios), 0) + ifnull(sum(valor_cobro_gastos), 0)), M.cifras_decimales) AS saldo_final,
 DC.monto, C.estado,
-GROUP_CONCAT(ND.id_neteo_documento) AS neteos
+GROUP_CONCAT(ND.id_neteo_documento) AS neteos,
+COUNT(ND.id_neteo_documento) AS cantidad_neteos
 FROM documento DC
     INNER JOIN cobro C ON( C.id_cobro = DC.id_cobro)
     INNER JOIN prm_moneda M ON M.id_moneda = DC.id_moneda
@@ -171,7 +214,8 @@ round(ifnull(sum(ND.valor_cobro_gastos), 0), M.cifras_decimales) pago_gastos,
 round(saldo_honorarios + saldo_gastos, M.cifras_decimales) AS saldo_documento,
 round((DC.honorarios + DC.gastos) - (ifnull(sum(valor_cobro_honorarios), 0) + ifnull(sum(valor_cobro_gastos), 0)), M.cifras_decimales) AS saldo_final,
 DC.monto, C.estado,
-GROUP_CONCAT(ND.id_neteo_documento) AS neteos
+GROUP_CONCAT(ND.id_neteo_documento) AS neteos,
+COUNT(ND.id_neteo_documento) AS cantidad_neteos
 FROM documento DC
 INNER JOIN cobro C ON( C.id_cobro = DC.id_cobro)
 INNER JOIN prm_moneda M ON M.id_moneda = DC.id_moneda
@@ -179,25 +223,27 @@ LEFT JOIN neteo_documento ND ON id_documento_cobro = id_documento
 WHERE tipo_doc='N'
   AND DC.fecha_creacion >= '2014-01-01'
 GROUP BY id_documento
-HAVING saldo_documento <> saldo_final AND saldo_final < 10
+HAVING saldo_documento <> saldo_final -- AND saldo_final < 10
 ) AS un
 ORDER BY id_cobro";
 
 $documentos = $Sesion->pdodbh->query($query)->fetchAll( PDO::FETCH_OBJ );
 
+$Pagina->titulo = __(count($documentos) . ' Saldos a corregir');
+
 $Pagina->PrintTop();
 ?>
+
 
 <table>
     <thead>
         <tr>
             <th>Documento</th>
             <th>Honorarios Pagados</th>
-            <th>Gastos Pagados</th>
             <th>Saldo Honorarios</th>
+            <th>Gastos Pagados</th>
             <th>Saldo Gastos</th>
             <th>Diferencia entre DocCobro y Neteos</th>
-            <th>&nbsp;</th>
         </tr>
     </thead>
 
@@ -207,44 +253,70 @@ $Pagina->PrintTop();
             <td>
                 <p>Cobro #<?=$documento->id_cobro ?> <img src="<?= Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="nuevaVentana('Editar_Cobro',730,580,'<?= Conf::RootDir() ?>/app/interfaces/cobros6.php?id_cobro=<?=$documento->id_cobro?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');" /> <br><strong><?= $documento->estado ?></strong></p>
             </td>
-            <td >
+            <td id="estado_honorarios-<?= $documento->id_documento ?>" >
                 <p style="text-align:center">
                 <?php if ($documento->DC_honorarios_pagados == 'NO' && $documento->saldo_honorarios == 0): ?>
 
-                    <label for="DC_honorarios_pagados-<?= $documento->id_cobro ?>">NO</label>
-                    <input type="radio" name="DC_honorarios_pagados-<?= $documento->id_cobro ?>" id="DC_honorarios_pagados-<?= $documento->id_cobro ?>" value="NO" <?= $documento->DC_honorarios_pagados == 'NO' ? 'checked' :'' ?> >
-                    <label for="DC_honorarios_pagados-<?= $documento->id_cobro ?>">SI</label>
-                    <input type="radio" name="DC_honorarios_pagados-<?= $documento->id_cobro ?>" id="DC_honorarios_pagados-<?= $documento->id_cobro ?>" value="SI"  <?= $documento->DC_honorarios_pagados == 'SI' ? 'checked' :'' ?> >
+                    <label for="DC_honorarios_pagados-<?= $documento->id_documento ?>-SI">SI</label>
+                    <input type="radio" name="DC_honorarios_pagados-<?= $documento->id_documento ?>" id="DC_honorarios_pagados-<?= $documento->id_documento ?>-SI" value="SI"  <?= $documento->DC_honorarios_pagados == 'SI' ? 'checked' :'' ?> >
+
+                    <label for="DC_honorarios_pagados-<?= $documento->id_documento ?>-NO">NO</label>
+                    <input type="radio" name="DC_honorarios_pagados-<?= $documento->id_documento ?>" id="DC_honorarios_pagados-<?= $documento->id_documento ?>-NO" value="NO" <?= $documento->DC_honorarios_pagados == 'NO' ? 'checked' :'' ?> >
+
+                    <br>
+
+                    <button onclick="saveDocumentoEstado(<?= $documento->id_documento ?>, 'honorarios')">guardar</button>
+
+                <?php elseif( $documento->DC_honorarios_pagados == 'NO' ): ?>
+                    <span>Saldo Pendiente</span>
                 <?php else: ?>
-                    Saldado
+                    <span>SI</span>
+                <?php endif ?>
+                </p>
+            </td>
+
+            <td id="saldo_honorarios-<?= $documento->id_documento ?>">
+                <p>
+                    <input type="number" value="<?= $documento->saldo_honorarios ?>" name="saldo_honorarios" <?= $documento->saldo_honorarios == 0 ? 'disabled': '' ?>>
+                    <?php if( $documento->saldo_honorarios != 0 ): ?>
+                    <button onclick="saveDocumentoSaldo(<?= $documento->id_documento ?>, 'honorarios')">guardar</button>
+                <?php endif ?>
+                </p>
+            </td>
+
+            <td id="estado_gastos-<?= $documento->id_documento ?>" >
+                <p style="text-align:center">
+                <?php if( $documento->DC_gastos_pagados == 'NO' && $documento->saldo_gastos == 0): ?>
+                    <label for="DC_gastos_pagados-<?= $documento->id_documento ?>-SI">SI</label>
+                    <input type="radio" name="DC_gastos_pagados-<?= $documento->id_documento ?>" id="DC_gastos_pagados-<?= $documento->id_documento ?>-SI" value="SI" <?= $documento->DC_gastos_pagados == 'SI' ? 'checked' :'' ?> >
+
+                    <label for="DC_gastos_pagados-<?= $documento->id_documento ?>-NO">NO</label>
+                    <input type="radio" name="DC_gastos_pagados-<?= $documento->id_documento ?>" id="DC_gastos_pagados-<?= $documento->id_documento ?>-NO" value="NO"  <?= $documento->DC_gastos_pagados == 'NO' ? 'checked' :'' ?>  >
+
+                    <br>
+
+                    <button onclick="saveDocumentoEstado(<?= $documento->id_documento ?>, 'gastos')">guardar</button>
+
+                <?php elseif( $documento->DC_gastos_pagados == 'NO' ): ?>
+                    <span>Saldo Pendiente</span>
+
+                <?php else: ?>
+                    <span>SI</span>
+                 <?php endif ?>
+                </p>
+            </td>
+
+            <td id="saldo_gastos-<?= $documento->id_documento ?>">
+                <p>
+                    <input type="number" value="<?= $documento->saldo_gastos ?>" name="saldo_gastos" <?= $documento->saldo_gastos == 0 ? 'disabled': '' ?>>
+                <?php if( $documento->saldo_gastos != 0 ): ?>
+                    <button onclick="saveDocumentoSaldo(<?= $documento->id_documento ?>, 'gastos')">guardar</button>
                 <?php endif ?>
                 </p>
             </td>
             <td>
-                <p style="text-align:center">
-                <?php if ($documento->DC_gastos_pagados == 'NO' && $documento->saldo_gastos == 0): ?>
-
-                    <label for="DC_gastos_pagados-<?= $documento->id_cobro ?>">NO</label>
-                    <input type="radio" name="DC_gastos_pagados-<?= $documento->id_cobro ?>" id="DC_gastos_pagados-<?= $documento->id_cobro ?>" value="NO"  <?= $documento->DC_gastos_pagados == 'NO' ? 'checked' :'' ?>  >
-                    <label for="DC_gastos_pagados-<?= $documento->id_cobro ?>">SI</label>
-                    <input type="radio" name="DC_gastos_pagados-<?= $documento->id_cobro ?>" id="DC_gastos_pagados-<?= $documento->id_cobro ?>" value="SI" <?= $documento->DC_gastos_pagados == 'SI' ? 'checked' :'' ?> >
-                <?php else: ?>
-                    Saldado
-                 <?php endif ?>
-                </p>
-            </td>
-            <td>
-                <p>
-                    <input type="number" value="<?= $documento->saldo_honorarios ?>" <?= $documento->saldo_honorarios == 0 ? 'disabled': '' ?>>
-                </p>
-            </td>
-            <td>
-                <p>
-                    <input type="number" value="<?= $documento->saldo_gastos ?>" <?= $documento->saldo_gastos == 0 ? 'disabled': '' ?>>
-                </p>
-            </td>
-            <td>
-                <p><?= abs($documento->monto - ($documento->pago_gastos + $documento->pago_honorarios)) < 0.1 ? 'NP' : sprintf("D: %0.2f - ND: %0.2f = Dif: %0.2f", $documento->monto, $documento->pago_gastos + $documento->pago_honorarios,
+            <?php if( $documento->cantidad_neteos > 0 ): ?>
+                <p><?= abs($documento->monto - ($documento->pago_gastos + $documento->pago_honorarios)) < 0.1 ? 'NP' : sprintf("D: %0.2f - ND: %0.2f = Dif: <strong>%0.2f</strong>", $documento->monto, $documento->pago_gastos + $documento->pago_honorarios,
                     $documento->monto - ($documento->pago_gastos + $documento->pago_honorarios)) ?>
 
                     <?php if( abs($documento->monto - ($documento->pago_gastos + $documento->pago_honorarios)) >= 0.1 ): ?>
@@ -252,9 +324,10 @@ $Pagina->PrintTop();
             nuevaVentana('Editar_Cobro',730,580,'<?= $RootDir ?>/app/interfaces/cobros6.php?id_cobro=<?= $documento->id_cobro ?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');" />
                     <?php endif ?>
             </p>
+            <?php else: ?>
+                <p>Documento sin Neteos</p>
+            <?php endif ?>
             </td>
-            <td></td>
-            <td></td>
         </tr>
     <?php endforeach ?>
     </tbody>
@@ -278,6 +351,10 @@ td{
 
 td input {
     width:50px;
+}
+
+td input[type="radio"] {
+  width: 20px;
 }
 
 input:not([disabled]) {
@@ -323,6 +400,42 @@ function saveNeteo(id_neteo_documento) {
         },
         function(response){
             alert( response );
+            window.location.reload()
+        }
+    )
+}
+
+function saveDocumentoEstado(id_documento, which){
+    var doc = jQuery("#estado_" + which + "-" + id_documento),
+        pagado = doc.find('[name="DC_' + which + '_pagados-' + id_documento + '"]:checked').val() ;
+
+    jQuery.post(
+        "problema_documento.php?ver=update_documento_estado&field=" + which,
+        {
+            field: which,
+            pagado: pagado,
+            id_documento: id_documento
+        },
+        function( response ){
+            alert(response)
+            window.location.reload()
+        }
+    )
+}
+
+function saveDocumentoSaldo(id_documento, which){
+    var doc = jQuery("#saldo_" + which + "-" + id_documento),
+        saldo = doc.find('[name="saldo_' + which + '"]').val();
+
+    jQuery.post(
+        "problema_documento.php?ver=update_documento_saldo&field=" + which,
+        {
+            field: which,
+            saldo: saldo,
+            id_documento: id_documento
+        },
+        function( response ){
+            alert(response)
             window.location.reload()
         }
     )
