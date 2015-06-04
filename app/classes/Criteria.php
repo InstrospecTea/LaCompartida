@@ -58,18 +58,6 @@ class Criteria {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
 		}
 		return self::query($this->get_plain_query(), $this->sesion);
-
-		// El siguiente pedazo de codigo sirve para medir, a nivel macro y por tipo de query,
-		// los tiempos tomados.
-		// $b = Benchmark::instance();
-		// $qq = preg_replace("/=.*/", "", $this->get_plain_query());
-		// // $b->tick($qq);
-
-		// $q = self::query($this->get_plain_query(), $this->sesion);
-
-		// // $b->tick($qq);
-
-		// return $q;
 	}
 
 	/*
