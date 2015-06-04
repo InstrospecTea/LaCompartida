@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.22
+Thursday 2015, June 4nd.
+* **Fix:** [Apply fallback to show fees when there is not work_fee data.](https://github.com/LemontechSA/ttb/pull/1004)
+
 ## Hotfix 15.10.21
 Thursday 2015, June 4nd.
 * **Fix:** [Fix wrong use of abs() when displaying values on invoice module.](https://github.com/LemontechSA/ttb/pull/1006)
