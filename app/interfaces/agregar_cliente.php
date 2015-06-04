@@ -13,13 +13,8 @@ $codigo_obligatorio = true;
 $Form = new Form;
 $SelectHelper = new FormSelectHelper();
 
-if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
-	if (!Conf::CodigoObligatorio()) {
-		$codigo_obligatorio = false;
-	} else {
-		$codigo_obligatorio = true;
-	}
-}
+$codigo_obligatorio = (boolean) Conf::GetConf($Sesion, 'CodigoObligatorio');
+
 if ($id_cliente > 0) {
 	$cliente->Load($id_cliente);
 	$contrato->Load($cliente->fields['id_contrato']);
