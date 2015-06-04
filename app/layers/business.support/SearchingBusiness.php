@@ -77,7 +77,6 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 				}
 			}
 		}
-
 		return $criteria;
 	}
 
@@ -91,7 +90,8 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$widthIdentity,
 			$genericMode
 		);
-		return $this->addScopes($searchCriteria, $criteria);
+		$criteria = $this->addScopes($searchCriteria, $criteria);
+		return $criteria;
 	}
 
 }
