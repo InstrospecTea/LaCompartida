@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.10.20
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong Conf call to CodigoObligatorio for perezdearce](https://github.com/LemontechSA/ttb/pull/1005)
+
 ## Hotfix 15.10.19
 Wednesday 2015, June 3nd.
 * **Fix:** [Fix with work fee when work fee does not exists.](https://github.com/LemontechSA/ttb/pull/1003)
