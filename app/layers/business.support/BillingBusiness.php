@@ -20,27 +20,29 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 
 		$searchCriteria
 			->filter('id_factura')
-		   ->restricted_by('in')
-		   ->compare_with($invoiceIds);
+			->restricted_by('in')
+			->compare_with( $invoiceIds );
 
-		$results = array();
+		$mapInvoices = array();
 		$tmp = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 
 		foreach ($tmp as $invoice) {
-			$results[ $invoice->get('id_factura') ] = $invoice;
+			$mapInvoices[ $invoice->get('id_factura') ] = $invoice;
 		}
 
-		return $results;
+		return $mapInvoices;
 	}
 
 	public function getFeesDataOfInvoiceByCharge(Invoice $invoice, Charge $charge, Currency $currency) {
 		$this->loadBusiness('Charging');
+
 		$chargeData = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
 		$chargeFees = $chargeData->get('saldo_honorarios');
 		$chargeDiscount = $chargeData->get('descuento_honorarios');
 		$invoiceFees = $this->getInvoiceFeesAmountInCurrency($invoice, $currency);
 		$invoiceFeesData = $this->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
-	 	return $invoiceFeesData;
+
+		return $invoiceFeesData;
 	}
 
 	public function getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency) {
@@ -53,10 +55,10 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 
 		$amountDetail = new GenericModel();
 		$amountDetail->set('subtotal_honorarios', $subtotalFees, false);
-	 	$amountDetail->set('descuento_honorarios', $invoiceDiscount, false);
-	 	$amountDetail->set('saldo_honorarios', $invoiceFees, false);
+		$amountDetail->set('descuento_honorarios', $invoiceDiscount, false);
+		$amountDetail->set('saldo_honorarios', $invoiceFees, false);
 
-	 	return $amountDetail;
+		return $amountDetail;
 	}
 
 	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency) {

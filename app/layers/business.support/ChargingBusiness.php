@@ -123,11 +123,10 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $this->ChargeService->get($chargeId);
 	}
 
-
 	/**
 	 * Obtiene N instancias de {@link Charge} en base a su identificador primario.
 	 * @param array $chargeIds
-	 * @return mapa de Charge con el id_charge como entrada del mapa
+	 * @return map {@link Charge} con el id_charge como entrada del mapa
 	 */
 	public function loadCharges( $chargeIds ) {
 		$this->loadService('Charge');
@@ -137,17 +136,17 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$searchCriteria
 			->filter('id_cobro')
-		  	->restricted_by('in')
-		  	->compare_with($chargeIds);
+			->restricted_by('in')
+			->compare_with($chargeIds);
 
-		$results = array();
+		$mapCharges = array();
 		$tmp = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 
 		foreach ($tmp as $invoice) {
-			$results[ $invoice->get('id_cobro') ] = $invoice;
+			$mapCharges[ $invoice->get('id_cobro') ] = $invoice;
 		}
 
-		return $results;
+		return $mapCharges;
 	}
 
 	public function getSlidingScalesWorkDetail($charge) {
@@ -444,9 +443,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$documentCurrency = $currency;
 		}
 
-	 	$result = $this->processCharge($charge, $currency);
+		$result = $this->processCharge($charge, $currency);
 
-	 	if ($documentCurrency->get($documentCurrency->getIdentity()) != $currency->get($currency->getIdentity())) {
+		if ($documentCurrency->get($documentCurrency->getIdentity()) != $currency->get($currency->getIdentity())) {
 			$documentResult = $this->processCharge($charge, $currency);
 		} else {
 			$documentResult = $result;
@@ -454,17 +453,17 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$modalidad_calculo = $charge->get('modalidad_calculo');
 
-	 	$subtotal_honorarios = 0;
-	 	$descuento_honorarios = 0;
-	 	$saldo_honorarios = 0;
-	 	$saldo_disponible_trabajos = 0;
-	 	$saldo_disponible_tramites = 0;
-	 	$saldo_gastos_con_impuestos = 0;
-	 	$saldo_gastos_sin_impuestos = 0;
-	 	$monto_iva = 0;
+		$subtotal_honorarios = 0;
+		$descuento_honorarios = 0;
+		$saldo_honorarios = 0;
+		$saldo_disponible_trabajos = 0;
+		$saldo_disponible_tramites = 0;
+		$saldo_gastos_con_impuestos = 0;
+		$saldo_gastos_sin_impuestos = 0;
+		$monto_iva = 0;
 
-	 	if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_NEW) {
-	 		$subtotal_honorarios = $result['subtotal_honorarios'];
+		if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_NEW) {
+			$subtotal_honorarios = $result['subtotal_honorarios'];
 			$descuento_honorarios = $result['descuento_honorarios'];
 			$saldo_honorarios = $subtotal_honorarios - $descuento_honorarios;
 			$saldo_disponible_trabajos = $saldo_trabajos = $result['monto_trabajos'] - $descuento_honorarios;
@@ -475,7 +474,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$saldo_disponible_tramites = $saldo_tramites = $result['monto_tramites'];
 			}
 		}
- 		//Código que deberÃ­a estar obsoleto
+		//Código que deberÃ­a estar obsoleto
 		if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_OLD) {
 			$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
 			$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
@@ -531,13 +530,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$amountDetail = new GenericModel();
 		$amountDetail->set('subtotal_honorarios', $subtotal_honorarios, false);
-	 	$amountDetail->set('descuento_honorarios', $descuento_honorarios, false);
-	 	$amountDetail->set('saldo_honorarios', $saldo_honorarios, false);
-	 	$amountDetail->set('saldo_disponible_trabajos', $saldo_disponible_trabajos, false);
-	 	$amountDetail->set('saldo_disponible_tramites', $saldo_disponible_tramites, false);
-	 	$amountDetail->set('saldo_gastos_con_impuestos', $saldo_gastos_con_impuestos, false);
-	 	$amountDetail->set('saldo_gastos_sin_impuestos', $saldo_gastos_sin_impuestos, false);
-	 	$amountDetail->set('monto_iva', $monto_iva, false);
+		$amountDetail->set('descuento_honorarios', $descuento_honorarios, false);
+		$amountDetail->set('saldo_honorarios', $saldo_honorarios, false);
+		$amountDetail->set('saldo_disponible_trabajos', $saldo_disponible_trabajos, false);
+		$amountDetail->set('saldo_disponible_tramites', $saldo_disponible_tramites, false);
+		$amountDetail->set('saldo_gastos_con_impuestos', $saldo_gastos_con_impuestos, false);
+		$amountDetail->set('saldo_gastos_sin_impuestos', $saldo_gastos_sin_impuestos, false);
+		$amountDetail->set('monto_iva', $monto_iva, false);
 
 		return $amountDetail;
 	}
