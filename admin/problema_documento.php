@@ -141,7 +141,7 @@ echo $html;
 
     $stm = $Sesion->pdodbh->query($query);
 
-    echo $stm->rowCount() . " Rows updated";
+    echo $stm->rowCount();
 
     exit;
 
@@ -163,7 +163,7 @@ echo $html;
 
     $stm = $Sesion->pdodbh->query($query);
 
-    echo $stm->rowCount() . " Rows updated";
+    echo $stm->rowCount();
 
     exit;
 
@@ -175,7 +175,7 @@ echo $html;
 
     $stm = $Sesion->pdodbh->query($query);
 
-    echo $stm->rowCount() . " Rows updated";
+    echo $stm->rowCount();
     exit;
 }
 
@@ -399,8 +399,11 @@ function saveNeteo(id_neteo_documento) {
             valor_cobro_gastos: valorCobroGastos
         },
         function(response){
-            alert( response );
-            window.location.reload()
+            alert(response + " Documentos Actualizados");
+
+            if( response != 0 ) {
+                window.location.reload()
+            }
         }
     )
 }
@@ -417,8 +420,11 @@ function saveDocumentoEstado(id_documento, which){
             id_documento: id_documento
         },
         function( response ){
-            alert(response)
-            window.location.reload()
+            alert(response + " Documentos Actualizados");
+
+            if( response != 0 ) {
+                window.location.reload()
+            }
         }
     )
 }
@@ -435,8 +441,11 @@ function saveDocumentoSaldo(id_documento, which){
             id_documento: id_documento
         },
         function( response ){
-            alert(response)
-            window.location.reload()
+            alert(response + " Documentos Actualizados");
+
+            if( response != 0 ) {
+                window.location.reload()
+            }
         }
     )
 }
