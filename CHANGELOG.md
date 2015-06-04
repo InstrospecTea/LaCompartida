@@ -1,8 +1,8 @@
 # Changelog
 
-## Hotfix 15.10.19
+## Hotfix 15.10.20
 Thursday 2015, June 4nd.
-* **Fix:** [Fix wrong Conf call to CodigoObligatorio for perezdearce](https://github.com/LemontechSA/ttb/pull/1004)
+* **Fix:** [Fix wrong Conf call to CodigoObligatorio for perezdearce](https://github.com/LemontechSA/ttb/pull/1005)
 
 ## Hotfix 15.10.19
 Wednesday 2015, June 3nd.

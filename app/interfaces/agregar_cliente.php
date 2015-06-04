@@ -9,8 +9,7 @@ $desde_agrega_cliente = true;
 $cliente = new Cliente($Sesion);
 $contrato = new Contrato($Sesion);
 $archivo = new Archivo($Sesion);
-$codigo_obligatorio = true;
-$Form = new Form;
+$Form = new Form();
 $SelectHelper = new FormSelectHelper();
 
 $codigo_obligatorio = (boolean) Conf::GetConf($Sesion, 'CodigoObligatorio');
