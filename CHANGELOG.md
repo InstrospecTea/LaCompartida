@@ -1,5 +1,12 @@
 # Changelog
 
+## [Release 15.11.0](https://github.com/LemontechSA/ttb/pull/1010)
+Thursday 2015, May 27th.
+* **Feature:** [Guarda glosa y encargado comercial de factura](https://github.com/LemontechSA/ttb/issues/1001)
+* **Feature:** [Configuracion para ordenar cobros](https://github.com/LemontechSA/ttb/issues/985)
+* **Feature:** [Lentitud reporte factura](https://github.com/LemontechSA/ttb/issues/968)
+* **Feature:** [Selector de moneda de visualización en reporte financiero agregado](https://github.com/LemontechSA/ttb/issues/966)
+
 ## Hotfix 15.10.22
 Thursday 2015, June 4nd.
 * **Fix:** [Apply fallback to show fees when there is not work_fee data.](https://github.com/LemontechSA/ttb/pull/1004)
