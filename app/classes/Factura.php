@@ -395,25 +395,56 @@ class Factura extends Objeto {
 		return false;
 	}
 
-	function ObtenerValorReal($id_factura) {
-		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
-					FROM cta_cte_fact_mvto ccfm
-						JOIN factura f USING ( id_factura )
-                                                JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado
-						JOIN factura fp ON ( fp.id_factura = IF( ( f.id_factura_padre IS NULL OR f.id_factura_padre = 0)	, f.id_factura, f.id_factura_padre ) )
-						JOIN cta_cte_fact_mvto_moneda ccfmm ON ( ccfm.id_cta_cte_mvto = ccfmm.id_cta_cte_fact_mvto
-							AND ccfm.id_moneda = ccfmm.id_moneda )
-						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto
-							AND ccfmmbase.id_moneda = fp.id_moneda )
-					WHERE f.id_factura =  '$id_factura';"; //11357
 
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list( $valor_real ) = mysql_fetch_array($resp);
+	/**
+	 * Obtiene el valor bruto de la factura - menos la suma de los documentos
+	 * hijos que la anulan: (Notas de crédito)
+	 *
+	 * @param number  $id_factura 	El identificador de la factura a buscar
+	 * @param boolean $contable 		Especifica si se necesita el valor contable real
+	 *                              (NC del mismo periodo) o el valor descontado total
+	 */
+	function ObtenerValorReal($id_factura, $contable = true) {
 
-		if ($valor_real) {
-			return $valor_real;
+		$Criteria = new Criteria($this->sesion);
+
+		$Criteria->add_select("(-1 * factura_movimiento.monto_bruto
+			- SUM(IFNULL(hija_movimiento.monto_bruto, 0)
+			* IFNULL(moneda_hija.tipo_cambio, 0) / moneda_factura.tipo_cambio))", 'monto_real');
+
+		$Criteria->add_from('factura');
+		$Criteria->add_inner_join_with('cta_cte_fact_mvto factura_movimiento', 'factura_movimiento.id_factura = factura.id_factura');
+		$Criteria->add_inner_join_with('cta_cte_fact_mvto_moneda moneda_factura ',
+			'factura_movimiento.id_cta_cte_mvto = moneda_factura.id_cta_cte_fact_mvto AND factura_movimiento.id_moneda = moneda_factura.id_moneda'
+		);
+
+		$factura_hija_restriction = array(
+			CriteriaRestriction::equals('factura_hija.id_factura_padre', "factura.id_factura")
+		);
+
+		if ($contable) {
+			$factura_hija_restriction[] = CriteriaRestriction::equals(
+				'EXTRACT(YEAR_MONTH FROM factura.fecha)',
+				"EXTRACT(YEAR_MONTH FROM factura_hija.fecha)"
+			);
 		}
-		return false;
+
+		$Criteria->add_left_join_with("(factura factura_hija
+				INNER JOIN prm_estado_factura estado_hija
+								ON factura_hija.id_estado = estado_hija.id_estado
+							 AND (estado_hija.codigo != 'A' AND NOT estado_hija.codigo IS NULL))",
+			CriteriaRestriction::and_clause($factura_hija_restriction)
+		);
+
+		$Criteria->add_left_join_with('cta_cte_fact_mvto hija_movimiento', 'hija_movimiento.id_factura = factura_hija.id_factura');
+		$Criteria->add_left_join_with('cta_cte_fact_mvto_moneda moneda_hija',
+			'hija_movimiento.id_cta_cte_mvto = moneda_hija.id_cta_cte_fact_mvto AND hija_movimiento.id_moneda = moneda_hija.id_moneda'
+		);
+
+		$Criteria->add_restriction(CriteriaRestriction::equals("factura.id_factura", $id_factura));
+
+		$resultado = array_shift($Criteria->run());
+		return $resultado['monto_real'];
 	}
 
 	function ObtenerIdsDocumentos($id_factura) {
@@ -783,6 +814,13 @@ class Factura extends Objeto {
 				$month_short = array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
 				$mes_corto = array('JAN', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC');
 				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
+				$mes_largo_en = array('JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', ' DECEMBER');
+
+				$mes_largo = $mes_largo_es;
+
+				if ($lang == 'en') {
+					$mes_largo = $mes_largo_en;
+				}
 
 				$html2 = str_replace('%nombre_encargado%', strtoupper($titulo_contacto . ' ' . $contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%direccion_cliente%', $direccion_cliente, $html2);
@@ -792,7 +830,7 @@ class Factura extends Objeto {
 				$html2 = str_replace('%giro_cliente%', $giro_cliente, $html2);
 				$html2 = str_replace('%lugar_facturacion%', Conf::GetConf($this->sesion, 'LugarFacturacion'), $html2);
 				$html2 = str_replace('%num_dia%', date('d', strtotime($fecha_factura)), $html2);
-				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo_es, date('M', strtotime($fecha_factura))), $html2);
+				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo, date('M', strtotime($fecha_factura))), $html2);
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_mes%', date('m', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%num_anio_2cifras%', date('y', strtotime($fecha_factura)), $html2);
@@ -867,7 +905,6 @@ class Factura extends Objeto {
 				break;
 
 			case 'DATOS_FACTURA':
-
 				$select_col = "";
 				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					$select_col = ",
@@ -1058,6 +1095,7 @@ class Factura extends Objeto {
 					$descripcion_subtotal_gastos = strtoupper($descripcion_subtotal_gastos);
 					$descripcion_subtotal_gastos_sin_impuesto = strtoupper($descripcion_subtotal_gastos_sin_impuesto);
 				}
+
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%honorarios_periodo%', $honorarios_descripcion, $html2);
 				} else {
@@ -1505,8 +1543,18 @@ class Factura extends Objeto {
 
 				$glosa_moneda_lang = __($glosa_moneda);
 				$glosa_moneda_plural_lang = __($glosa_moneda_plural);
+				$code = $lang;
 
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				//Code name normalization
+				if ($lang == 'en') {
+					$code = 'en_US';
+				}
+
+				list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
+				$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
+				$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
+				$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' .__('CON') . ' ' .$monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
+
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%simbolo_honorarios%', $simbolo, $html2);
 				} else {
@@ -2309,7 +2357,7 @@ class Factura extends Objeto {
 			, $descripcion_factura, $serie, $desde_asiento_contable, $opciones);
 
 		// Cambio los select para obtener los saldos de las facturas separados por moneda
-		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, abs(cta_cte_fact_mvto.saldo) AS saldo";
+		$select = "factura.id_moneda, prm_moneda.simbolo, prm_moneda.cifras_decimales, -cta_cte_fact_mvto.saldo AS saldo";
 
 		$query = preg_replace('/(^\s*SELECT\s)[\s\S]+?(\sFROM\s)/mi', "$1 $select $2", $query);
 		$query = preg_replace('/\sORDER BY.+|\sLIMIT.+/mi', '', $query);

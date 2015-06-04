@@ -502,6 +502,8 @@ $chargeResults = $SearchingBusiness->searchByCriteria(
 	array('*', 'Document.subtotal_honorarios as document_subtotal_honorarios')
 );
 
+$trabajos_duracion = array();
+
 foreach ($chargeResults as $charge) {
 	$id_cobro = $charge->get('id_cobro');
 
@@ -1296,9 +1298,18 @@ foreach ($chargeResults as $charge) {
 					}
 					$ws->writeNumber($filas, $col_tarificable_hh, $duracion_cobrada, $formato_tiempo);
 
-					$query_total_cobrable = "select if(sum(TIME_TO_SEC(duracion_cobrada)/3600)<=0,1,sum(TIME_TO_SEC(duracion_cobrada)/3600)) as duracion_total from trabajo where id_cobro = '" . $cobro->fields['id_cobro'] . "' and cobrable = 1";
-					$resp_total_cobrable = mysql_query($query_total_cobrable, $sesion->dbh) or Utiles::errorSQL($query_total_cobrable, __FILE__, __LINE__, $sesion->dbh);
-					list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
+					if (!array_key_exists($cobro->fields['id_cobro'], $trabajos_duracion)) {
+						$query_total_cobrable = "SELECT 
+									IF(SUM(TIME_TO_SEC(duracion_cobrada)/3600) <= 0, 1, SUM(TIME_TO_SEC(duracion_cobrada)/3600)) AS duracion_total 
+									FROM trabajo 
+								   WHERE id_cobro = '{$cobro->fields['id_cobro']}' 
+									 AND cobrable = 1";
+						$resp_total_cobrable = mysql_query($query_total_cobrable, $sesion->dbh) or Utiles::errorSQL($query_total_cobrable, __FILE__, __LINE__, $sesion->dbh);
+						list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
+						$trabajos_duracion[$cobro->fields['id_cobro']] = $xtotal_hh_cobrable;
+					} else {
+						$xtotal_hh_cobrable = $trabajos_duracion[$cobro->fields['id_cobro']];
+					}
 
 					if ($xtotal_hh_cobrable > 0) {
 						$factor = $cobro->fields['retainer_horas'] / $xtotal_hh_cobrable;
