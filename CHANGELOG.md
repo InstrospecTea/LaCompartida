@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix 15.10.20
+## Hotfix 15.10.21
 Thursday 2015, June 4nd.
 * **Fix:** [Fix wrong use of abs() when displaying values on invoice module.](https://github.com/LemontechSA/ttb/pull/1006)
 
