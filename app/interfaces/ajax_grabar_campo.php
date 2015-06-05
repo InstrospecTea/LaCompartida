@@ -104,13 +104,6 @@ if ($accion == "varios_cobrables") {
 
 	echo(utf8_encode("OK"));
 	
-} else if ($accion == "asunto_actividad") {
-	
-	$query = "SELECT actividades_obligatorias FROM asunto WHERE codigo_asunto='$codigo_asunto'";
-	$result = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	list($obligatorio) = mysql_fetch_array($result);
-	echo(utf8_encode("OK~" . $obligatorio));
-	
 } else if ($accion == "cobrar_trabajo") {
 	
 	if ($id_cobro == "") {
