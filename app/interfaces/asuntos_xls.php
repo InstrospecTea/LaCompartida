@@ -78,7 +78,7 @@
    $ws1->setZoom(75);
    #$ws1->protect( $key );
    $col=0;
-   
+
    $col_codigo = $col++;
    $col_titulo = $col++;
    $col_glosa_cliente = $col++;
@@ -105,7 +105,7 @@
    $col_cobrable = $col++;
    $col_act_oblicatorio = $col++;
    $col_fecha_inactivo = $col++;
-   
+
     // se setea el ancho de las columnas
     $ws1->setColumn( $col_codigo, $col_codigo,  15.00);
 	$ws1->setColumn( $col_titulo, $col_titulo,  45.00);
@@ -231,31 +231,30 @@
 
 		if($id_area_proyecto)
 			$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
-		
+
 		if( $mostrar_encargado_secundario ) {
 			$on_encargado2 = " contrato.id_usuario_secundario = usuario_secundario.id_usuario ";
 		} else {
 			$on_encargado2 = " a1.id_encargado2 = usuario_secundario.id_usuario ";
 		}
-			
+
 		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
     $query = "SELECT SQL_CALC_FOUND_ROWS
 			    							a1.codigo_asunto,
 			    							a1.glosa_asunto,
 			    							a1.descripcion_asunto,
-			    							a1.id_moneda, 
+			    							a1.id_moneda,
 			    							IF(a1.activo=1,'SI','NO') as activo,
 											a1.fecha_inactivo,
-			    							a1.contacto, 
+			    							a1.contacto,
 			    							a1.cobrable,
-			    							a1.fono_contacto, 
-			    							a1.email_contacto, 
+			    							a1.fono_contacto,
+			    							a1.email_contacto,
 			    							a1.direccion_contacto,
-			    							a1.actividades_obligatorias, 
-			            			a1.fecha_creacion, 
+			            			a1.fecha_creacion,
 			            			(
-			            				SELECT 
-			            					SUM(TIME_TO_SEC(duracion_cobrada))/3600 
+			            				SELECT
+			            					SUM(TIME_TO_SEC(duracion_cobrada))/3600
 				            			FROM trabajo AS t2
 													LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
 													WHERE (cobro.estado IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
@@ -263,20 +262,20 @@
 													AND t2.cobrable = 1
 												) AS horas_no_cobradas,
 												(
-													SELECT 
+													SELECT
 														SUM(TIME_TO_SEC(duracion))/3600
 			                    FROM trabajo AS t3
 			                    WHERE
 			                      t3.codigo_asunto=a1.codigo_asunto
 			                    AND t3.cobrable = 1
 			                  ) AS horas_trabajadas,
-												ca.id_cobro AS id_cobro_asunto, 
+												ca.id_cobro AS id_cobro_asunto,
 												tarifa.glosa_tarifa,
 												cliente.glosa_cliente,
 												prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
-												prm_area_proyecto.glosa AS area_proyecto, 
+												prm_area_proyecto.glosa AS area_proyecto,
 												a1.codigo_asunto_secundario as codigo_secundario,
-												prm_idioma.glosa_idioma, 
+												prm_idioma.glosa_idioma,
 												contrato.monto,
 												contrato.forma_cobro,
 											prm_moneda.glosa_moneda,
@@ -299,8 +298,8 @@
                     LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
                     LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
                     LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
-					LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario 
-					LEFT JOIN usuario as usuario_secundario ON $on_encargado2 
+					LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario
+					LEFT JOIN usuario as usuario_secundario ON $on_encargado2
                     WHERE $where
                     GROUP BY a1.codigo_asunto ORDER BY
                     a1.codigo_asunto, a1.codigo_cliente ASC";
@@ -355,7 +354,7 @@
 						$ws1->write($fila_inicial, $col_tipo_proyecto, $row['tipo_proyecto'], $f4);
 						$ws1->write($fila_inicial, $col_area_proyecto, $row['area_proyecto'], $f4);
 
-						$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);						
+						$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 						$formato_fecha = str_replace( "/", "-", $formato_fecha);
 
 						$ws1->write($fila_inicial, $col_fecha_creacion, Utiles::sql2date($row['fecha_creacion'], $formato_fecha, '-'), $f4);
@@ -365,8 +364,7 @@
 						$ws1->write($fila_inicial, $col_dir_contacto, $row['direccion_contacto'], $f4);
 						$ws1->write($fila_inicial, $col_idioma, $row['glosa_idioma'], $f4);
 						$ws1->write($fila_inicial, $col_cobrable, $row['cobrable'] == 1 ? 'SI':'NO', $f4);
-						$ws1->write($fila_inicial, $col_act_oblicatorio, $row['actividades_obligatorias'] == 1 ? 'SI':'NO', $f4);
-						
+
 						$ws1->write($fila_inicial, $col_fecha_inactivo, $row['fecha_inactivo'] != '0000-00-00 00:00:00' ? Utiles::sql2fecha($row['fecha_inactivo'], $formato_fecha, '-') :'-', $f4);
 						$fila_inicial++;
 		}

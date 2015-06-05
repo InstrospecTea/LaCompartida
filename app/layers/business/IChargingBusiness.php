@@ -39,7 +39,7 @@ interface IChargingBusiness  extends BaseBusiness {
 	public function getSlidingScales($chargeId);
 
 	/**
-	 * 
+	 *
 	 * @param  array  $slidingScales [description]
 	 * @param  Language $language      [description]
 	 * @param  Currency $currency      [description]
@@ -53,15 +53,30 @@ interface IChargingBusiness  extends BaseBusiness {
 	 *
 	 * @param  charge Es una instancia de {@link Charge} de la que se quiere obtener la información.
 	 * @param  currency Es una instancia de {@link Currency} para obtener los datos en moneda específica.
-	 * @return GenericModel  
-	 * 
+	 * @return GenericModel
+	 *
 	 * [
 	 *   	subtotal_honorarios 	=> valor
 	 *		descuento 				=> valor
 	 *		neto_honorarios			=> valor
 	 * ]
-	 * 
+	 *
 	 */
 	function getAmountDetailOfFees(Charge $charge, Currency $currency);
+
+
+	/**
+	 * Obtiene una instancia de {@link Charge} en base a su identificador primario.
+	 * @param $chargeId
+	 * @return Charge
+	 */
+	public function getCharge($chargeId);
+
+	/**
+	 * Obtiene N instancias de {@link Charge} en base a su identificador primario.
+	 * @param array $chargeIds
+	 * @return map {@link Charge} con el id_charge como entrada del mapa
+	 */
+	public function loadCharges( $chargeIds );
 
 }

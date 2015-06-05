@@ -316,13 +316,6 @@ class Asunto extends Objeto {
             )
         ),
         array(
-            'field' => 'actividades_obligatorias',
-            'title' => 'Act. Obligatorias',
-            'extras' => array(
-                'width' => 20
-            )
-        ),
-        array(
             'field' => 'fecha_inactivo',
             'title' => 'Fecha Inactivo',
             'format' => 'date',
@@ -664,7 +657,6 @@ class Asunto extends Objeto {
 			a1.fono_contacto,
 			a1.email_contacto,
 			a1.direccion_contacto,
-			IF(a1.actividades_obligatorias=1, 'SI', 'NO') as actividades_obligatorias,
 			a1.fecha_creacion,
 
 			tarifa.glosa_tarifa,

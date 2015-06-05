@@ -1,5 +1,19 @@
 # Changelog
 
+## Hotfix 15.11.2
+Friday 2015, June 5nd.
+* **Fix:** [Ocultar N° de factura cuando no tenga el módulo de facturación activo](https://github.com/LemontechSA/ttb/pull/1014)
+
+## Hotfix 15.11.1
+Friday 2015, June 5nd.
+* **Fix:** [Remove actividades_obligatorias](https://github.com/LemontechSA/ttb/pull/1011)
+
+## [Release 15.11.0](https://github.com/LemontechSA/ttb/pull/1010)
+Thursday 2015, May 27th.
+* **Feature:** [Guarda glosa y encargado comercial de factura](https://github.com/LemontechSA/ttb/issues/1001)
+* **Feature:** [Configuracion para ordenar cobros](https://github.com/LemontechSA/ttb/issues/985)
+* **Feature:** [Lentitud reporte factura](https://github.com/LemontechSA/ttb/issues/968)
+
 ## Hotfix 15.10.22
 Thursday 2015, June 4nd.
 * **Fix:** [Apply fallback to show fees when there is not work_fee data.](https://github.com/LemontechSA/ttb/pull/1004)
