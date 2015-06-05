@@ -16,20 +16,28 @@ class CobroMoneda extends Objeto {
 	}
 
 	function Load($id_cobro) {
+		if( !($this->moneda = $this->getCache("load.moneda.$id_cobro"))){
+			$query = "SELECT cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo, prm_moneda.codigo, prm_moneda.glosa_moneda_plural
+	    					FROM cobro_moneda
+	    					JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
+						    WHERE id_cobro = '$id_cobro'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-		$query = "SELECT cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo, prm_moneda.codigo, prm_moneda.glosa_moneda_plural
-    					FROM cobro_moneda
-    					JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
-					    WHERE id_cobro = '$id_cobro'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($moneda = mysql_fetch_assoc($resp)) {
+				$this->moneda[$moneda['id_moneda']] = $moneda;
+			}
 
-		while ($moneda = mysql_fetch_assoc($resp)) {
-			$this->moneda[$moneda['id_moneda']] = $moneda;
+			$this->setCache("load.moneda.$id_cobro", $this->moneda);
 		}
 
-		$query = "SELECT opc_moneda_total FROM cobro WHERE id_cobro = '$id_cobro'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id_moneda) = mysql_fetch_array($resp);
+		if( !($id_moneda = $this->getCache("load.id_moneda.$id_cobro"))){
+			$query = "SELECT opc_moneda_total FROM cobro WHERE id_cobro = '$id_cobro'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($id_moneda) = mysql_fetch_array($resp);
+
+			$this->setCache("load.id_moneda.$id_cobro", $id_moneda);
+		}
+
 		$this->moneda_cobro = $this->moneda[$id_moneda];
 		$this->moneda_cobro['id_moneda'] = $id_moneda;
 

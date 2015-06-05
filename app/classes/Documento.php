@@ -8,15 +8,20 @@ class Documento extends Objeto {
 
 
 	function __construct($sesion, $fields = "", $params = "") {
-		$this->tabla = "documento";
-		$this->campo_id = "id_documento";
+		$this->tabla          = "documento";
+		$this->campo_id       = "id_documento";
 		#$this->guardar_fecha = false;
-		$this->sesion = $sesion;
-		$this->fields = $fields;
-		$this->log_update = true;
+		$this->sesion         = $sesion;
+		$this->fields         = $fields;
+		$this->log_update     = true;
 
-		$describe=$this->sesion->pdodbh->query( "SHOW COLUMNS FROM   {$this->tabla}");
-		$this->editable_fields=$describe->fetchALL(PDO::FETCH_COLUMN,0 );
+		if( !($this->editable_fields = $this->getCache('editable_fields')) ) {
+			$describe = $this->sesion->pdodbh->query( "SHOW COLUMNS FROM {$this->tabla}");
+			$this->editable_fields = $describe->fetchALL( PDO::FETCH_COLUMN, 0 );
+
+			$this->setCache('editable_fields', $this->editable_fields);
+		}
+
 		unset($this->editable_fields[array_search($this->campo_id,$this->editable_fields)]);
 
 	}
@@ -168,7 +173,7 @@ class Documento extends Objeto {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($id_contrato) = mysql_fetch_array($resp);
 
-				if(empty($id_contrato) || $id_contrato == 'NULL'){
+				if(empty($id_contrato) || $id_contrato == 'NULL') {
 					$codigo_asunto = 'NULL';
 				} else if(empty($codigo_asunto)) {
 					$query = "SELECT codigo_asunto FROM asunto
