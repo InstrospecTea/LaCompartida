@@ -144,6 +144,7 @@ if ($opc == 'buscar') {
 				cobro.impuesto_gastos,
 				cobro.fecha_ini,
 				cobro.fecha_fin,
+				cobro.fecha_creacion,
 				moneda.simbolo,
 				cobro.id_proceso,
 				cobro.codigo_idioma,
@@ -157,6 +158,7 @@ if ($opc == 'buscar') {
 				contrato.id_contrato,
 				contrato.codigo_cliente,
 				cliente.glosa_cliente,
+				usuario.apellido1,
 				contrato.forma_cobro,
 				contrato.monto,
 				contrato.retainer_horas,
@@ -193,6 +195,7 @@ if ($opc == 'buscar') {
 				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
 			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+			 	LEFT JOIN usuario ON cobro.id_usuario_responsable = usuario.id_usuario
 				LEFT JOIN grupo_cliente ON grupo_cliente.codigo_cliente = contrato.codigo_cliente
 				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
 				LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
@@ -209,9 +212,13 @@ if ($opc == 'buscar') {
                     WHERE $where
 						GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
-	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
+
+	if(empty($orden)) {
+		$orden = $cobros->OrdenResultados();
+	}
 
 	if ($print) {
+		$query .= " ORDER BY $orden";
 		$cobros_stmt = $sesion->pdodbh->query($query);
 		$cobros_result = $cobros_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -469,6 +476,7 @@ $pagina->PrintTop();
 		} else {
 			form.action = 'seguimiento_cobro.php';
 			form.opc.value = 'buscar';
+			form.orden.value = '';
 			form.desde.value = '';
 			form.submit();
 		}

@@ -174,10 +174,6 @@ $server->register('EntregarListaAreas',
 			array('usuario' => 'xsd:string', 'password' => 'xsd:string'),
 			array('lista_areas' => 'tns:ListaCodigoGlosa'),
 			$ns);
-$server->register('ActividadesObligatorias',
-			array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'codigo_asunto' => 'xsd:string'),
-			array('resultado' => 'xsd:string'),
-			$ns);
 $server->register('Intervalo',
 			array(),
 			array('resultado' => 'xsd:int'),
@@ -286,28 +282,6 @@ function EntregarListaClientes($usuario, $password) {
 		return new soap_fault('Client', '', 'Error de login.', '');
 	}
 	return new soapval('lista_clientes', 'ListaCodigoGlosa', $lista_clientes);
-}
-
-function ActividadesObligatorias($usuario, $password, $codigo_asunto) {
-	if ($usuario == '' || $password == '') {
-		return new soap_fault('Client', '', 'Debe entregar el usuario y el password.', '');
-	}
-
-	$sesion = new Sesion();
-
-	$lista_asuntos = array();
-
-	if ($sesion->VerificarPassword($usuario, $password)) {
-		$query = "SELECT actividades_obligatorias FROM asunto WHERE codigo_asunto='$codigo_asunto'";
-		if (!($resp = mysql_query($query, $sesion->dbh))) {
-			return new soap_fault('Client', '', 'Error SQL.', '');
-		}
-		list($obligatorias) = mysql_fetch_array($resp);
-
-		return $obligatorias;
-	} else {
-		return new soap_fault('Client', '', 'Error de login.', '');
-	}
 }
 
 function EntregarListaAsuntos($usuario, $password) {

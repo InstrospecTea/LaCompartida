@@ -194,7 +194,6 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("cotizado_con", $cotizado_con);
 		$Asunto->Edit("fono_contacto", $fono_contacto);
 		$Asunto->Edit("email_contacto", $email_contacto);
-		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
 		$Asunto->Edit("activo", intval($activo), true);
 
 		if (!$activo) {
@@ -852,9 +851,6 @@ if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 																&nbsp;&nbsp;&nbsp;
 																<label for="cobrable"><?php echo __('Cobrable') ?></label>
 																<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
-																&nbsp;&nbsp;&nbsp;
-																<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
-																<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
 														</td>
 												</tr>
 										</table>

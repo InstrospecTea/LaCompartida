@@ -1,5 +1,43 @@
 # Changelog
 
+## Hotfix 15.11.1
+Friday 2015, June 5nd.
+* **Fix:** [Remove actividades_obligatorias](https://github.com/LemontechSA/ttb/pull/1011)
+
+## [Release 15.11.0](https://github.com/LemontechSA/ttb/pull/1010)
+Thursday 2015, May 27th.
+* **Feature:** [Guarda glosa y encargado comercial de factura](https://github.com/LemontechSA/ttb/issues/1001)
+* **Feature:** [Configuracion para ordenar cobros](https://github.com/LemontechSA/ttb/issues/985)
+* **Feature:** [Lentitud reporte factura](https://github.com/LemontechSA/ttb/issues/968)
+
+## Hotfix 15.10.22
+Thursday 2015, June 4nd.
+* **Fix:** [Apply fallback to show fees when there is not work_fee data.](https://github.com/LemontechSA/ttb/pull/1004)
+
+## Hotfix 15.10.21
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong use of abs() when displaying values on invoice module.](https://github.com/LemontechSA/ttb/pull/1006)
+
+## Hotfix 15.10.20
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong Conf call to CodigoObligatorio for perezdearce](https://github.com/LemontechSA/ttb/pull/1005)
+
+## Hotfix 15.10.19
+Wednesday 2015, June 3nd.
+* **Fix:** [Fix with work fee when work fee does not exists.](https://github.com/LemontechSA/ttb/pull/1003)
+
+## Hotfix 15.10.18
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix typo en eliminación datos demo](https://github.com/LemontechSA/ttb/pull/1002)
+
+## Hotfix 15.10.17
+Tuesday 2015, June 2nd.
+* **Fix:** [Idioma inglés en facturas.](https://github.com/LemontechSA/ttb/pull/996)
+
+## Hotfix 15.10.16
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix monto real factura considerando NC en periodo](https://github.com/LemontechSA/ttb/pull/992)
+
 ## Hotfix 15.10.15
 Tuesday 2015, June 2nd.
 * **Fix:** [Optimización queries repetidas cobros_xls](https://github.com/LemontechSA/ttb/pull/999)

@@ -7,14 +7,42 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $this->InvoiceService->get($invoiceId);
 	}
 
+	/**
+	* Función que carga con UNA sola query todos los invoices (facturas) de una sola vez
+	* @param array $invoiceIds array de invoices id
+	* @return map list de array, donde cada indice es el id del invoice pedido
+	*/
+	public function loadInvoices( $invoiceIds ) {
+		$this->loadService('Invoice');
+		$this->loadBusiness('Searching');
+
+		$searchCriteria = new SearchCriteria('Invoice');
+
+		$searchCriteria
+			->filter('id_factura')
+			->restricted_by('in')
+			->compare_with( $invoiceIds );
+
+		$mapInvoices = array();
+		$tmp = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		foreach ($tmp as $invoice) {
+			$mapInvoices[ $invoice->get('id_factura') ] = $invoice;
+		}
+
+		return $mapInvoices;
+	}
+
 	public function getFeesDataOfInvoiceByCharge(Invoice $invoice, Charge $charge, Currency $currency) {
 		$this->loadBusiness('Charging');
+
 		$chargeData = $this->ChargingBusiness->getAmountDetailOfFees($charge, $currency);
 		$chargeFees = $chargeData->get('saldo_honorarios');
 		$chargeDiscount = $chargeData->get('descuento_honorarios');
 		$invoiceFees = $this->getInvoiceFeesAmountInCurrency($invoice, $currency);
 		$invoiceFeesData = $this->getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
-	 	return $invoiceFeesData;
+
+		return $invoiceFeesData;
 	}
 
 	public function getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency) {
@@ -27,10 +55,10 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 
 		$amountDetail = new GenericModel();
 		$amountDetail->set('subtotal_honorarios', $subtotalFees, false);
-	 	$amountDetail->set('descuento_honorarios', $invoiceDiscount, false);
-	 	$amountDetail->set('saldo_honorarios', $invoiceFees, false);
+		$amountDetail->set('descuento_honorarios', $invoiceDiscount, false);
+		$amountDetail->set('saldo_honorarios', $invoiceFees, false);
 
-	 	return $amountDetail;
+		return $amountDetail;
 	}
 
 	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency) {

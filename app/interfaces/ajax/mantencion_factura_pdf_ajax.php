@@ -95,7 +95,7 @@ if ($opc == 'dibuja_tabla') {
 
 	$celda = 0;
 	$fila = array();
-	$fila = $factura_pdf_datos->CargarFilaDato($id_factura);
+	$fila = $factura_pdf_datos->CargarGlosaDatos($id_factura);
 
 	$arraypapeles = array();
 	$arraypapeles['216x280'] = 'Carta Portrait';

@@ -1,7 +1,7 @@
 <?php
 
 /**
-* 
+*
 */
 interface IBillingBusiness extends BaseBusiness {
 
@@ -12,10 +12,17 @@ interface IBillingBusiness extends BaseBusiness {
 	*/
 	public function getInvoice($invoiceId);
 
-	/** 
+	/**
+	* Función que carga con UNA sola query todos los invoices (facturas) de una sola vez
+	* @param array $invoiceIds array de invoices id
+	* @return map list de array, donde cada indice es el id del invoice pedido
+	*/
+	public function loadInvoices( $invoiceIds );
+
+	/**
 	* Obitne una instancia de {@link GenericModel} con datos de honorarios de una Factura
-	* 
-	* @param $invoice instancia de {@link Invoice}  Factura a evaluar 
+	*
+	* @param $invoice instancia de {@link Invoice}  Factura a evaluar
 	* @param $charge instancia de {@link Charge} Liquidación a considerar para la factura
 	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los cálculos
 	*
@@ -29,12 +36,12 @@ interface IBillingBusiness extends BaseBusiness {
 	*/
 	public function getFeesDataOfInvoiceByCharge(Invoice $invoice, Charge $charge, Currency $currency);
 
-	/** 
+	/**
 	* Obitne una instancia de {@link GenericModel} con datos de honorarios de una Factura
-	* 
+	*
 	* @param $invoiceFees Monto de honorarios de la factura (monto neto descontado)
 	* @param $chargeFees Monto de honorarios de la liquidación (monto neto descontado)
-	* @param $chargeDiscount Descuento que se aplicó en la liquidación 
+	* @param $chargeDiscount Descuento que se aplicó en la liquidación
 	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los cálculos
 	*
 	* @return {@link GenericModel}
@@ -48,10 +55,10 @@ interface IBillingBusiness extends BaseBusiness {
 	public function getFeesDataOfInvoiceByAmounts($invoiceFees, $chargeFees, $chargeDiscount, $currency);
 
 
-	/** 
+	/**
 	* Obitne el monto de honorarios de una Factura en determinada moneda
-	* 
-	* @param $invoice instancia de {@link Invoice}  Factura a evaluar 
+	*
+	* @param $invoice instancia de {@link Invoice}  Factura a evaluar
 	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los cálculos
 	*
 	* @return Number  monto de honorarios de la factura

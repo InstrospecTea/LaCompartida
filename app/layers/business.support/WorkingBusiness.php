@@ -25,11 +25,11 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		//Cobro
 		if ($data['buscar_id_cobro']) {
 			$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($data['buscar_id_cobro']);
-		}	
+		}
 
 		//Forma de Cobro
 		if ($data['forma_cobro']) {
-			$searchCriteria->filter('IFNULL(charge.forma_cobro, contract.forma_cobro)')->restricted_by('equals')->compare_with("'{$data['forma_cobro']}'");
+			$searchCriteria->filter('IFNULL(Charge.forma_cobro, Contract.forma_cobro)')->restricted_by('equals')->compare_with("'{$data['forma_cobro']}'");
 		}
 
 		//Encargado comercial
@@ -251,6 +251,23 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->add_scope('orderFromOlderToNewer');
 		$this->loadBusiness('Searching');
 		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2'));
+	}
+
+	function getWork($id) {
+		if (empty($id)) {
+			throw new BusinessException('Id can not be null!');
+		}
+		$searchCriteria = new SearchCriteria('Work');
+		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($id);
+
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+
+		if (empty($results[0])) {
+			throw new BusinessException('Work with id '.$id.' is not found.');
+		} else {
+			return $results[0];
+		}
 	}
 
 }
