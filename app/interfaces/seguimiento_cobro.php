@@ -46,7 +46,7 @@ if ($opc == 'buscar') {
 
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !Conf::GetConf($sesion, 'NuevoModuloFactura') && !empty($numero_factura)) {
+	} else if (!empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		$factura_obj = new Factura($sesion);
@@ -269,7 +269,7 @@ if ($opc == 'buscar') {
 		}
 
 		$cols = 4;
-		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') || Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 			$cols++;
 		}
 		$contratofields = $cobro->fields;
@@ -306,7 +306,7 @@ if ($opc == 'buscar') {
 			$ht .= "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') || Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
 								<b>Nº Factura</b>
 							</td>";
@@ -386,7 +386,7 @@ if ($opc == 'buscar') {
 
 		$html .= "</td>";
 
-		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') || Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
 				$html.= "#" . $cobro->fields['documento'];
@@ -687,7 +687,7 @@ $pagina->PrintTop();
 				</td>
 			</tr>
 
-			<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+			<?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 				<tr>
 					<td align="right" width='30%'>
 						<b><?php echo __('Documento legal') ?></b>
