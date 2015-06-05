@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.11.3
+Friday 2015, June 5nd.
+* **Fix:** [Ajustar el tamaño del pop - up ](https://github.com/LemontechSA/ttb/pull/1015)
+
 ## Hotfix 15.11.2
 Friday 2015, June 5nd.
 * **Fix:** [Ocultar N° de factura cuando no tenga el módulo de facturación activo](https://github.com/LemontechSA/ttb/pull/1014)
