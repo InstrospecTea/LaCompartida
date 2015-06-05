@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.11.1
+Friday 2015, June 5nd.
+* **Fix:** [Remove actividades_obligatorias](https://github.com/LemontechSA/ttb/pull/1011)
+
 ## [Release 15.11.0](https://github.com/LemontechSA/ttb/pull/1010)
 Thursday 2015, May 27th.
 * **Feature:** [Guarda glosa y encargado comercial de factura](https://github.com/LemontechSA/ttb/issues/1001)
