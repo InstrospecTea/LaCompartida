@@ -43,24 +43,27 @@ if ($opcion == "guardar") {
 	$val = false;
 
 	if ($cli->Loaded()) {
-
 		if (!$activo) {
 			$cli->InactivarAsuntos();
 		}
-		if (($cli->fields['id_cliente'] != $cliente->fields['id_cliente']) and ($cliente->Loaded())) {
+
+		if (($cli->fields['id_cliente'] != $cliente->fields['id_cliente']) && ($cliente->Loaded())) {
 			$Pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
+
 		if (!$cliente->Loaded()) {
 			$Pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
-		if ($codigo_cliente_secundario and empty($id_cliente)) {
-			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '" . $cli->fields['id_cliente'] . "'";
+
+		if ($codigo_cliente_secundario) {
+			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '{$cliente->fields['id_cliente']}'";
 			$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
+
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$Pagina->FatalError('El código ingresado ya existe');
+					$Pagina->FatalError('El código secundario ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -69,11 +72,19 @@ if ($opcion == "guardar") {
 	} else {
 		$loadasuntos = true;
 		if ($codigo_cliente_secundario) {
-			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente";
+			$where = '1';
+
+			if ($cliente->Loaded()) {
+				$where .= " AND id_cliente != '{$cliente->fields['id_cliente']}'";
+			}
+
+			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE $where";
+
 			$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
+
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$Pagina->FatalError('El código ingresado ya existe');
+					$Pagina->FatalError('El código secundario ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -1017,7 +1028,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 				var dato = jQuery(this).val();
 				var campo = jQuery(this).attr('id');
 				var accion = 'existe_' + campo + '_cliente';
-				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato;
+				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato + '&id_cliente=' + '<?php echo !empty($cliente->fields['id_cliente']) ? $cliente->fields['id_cliente'] : null; ?>';
 
 				jQuery.get(url_ajax, function(data) {
 					objResp = null;
