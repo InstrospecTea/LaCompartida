@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.11.4
+Monday 2015, June 8th.
+* **Fix:** [Fixes codigo_cliente_secundario emptyness and triggered matters creation](https://github.com/LemontechSA/ttb/pull/1018)
+
 ## Hotfix 15.11.3
 Friday 2015, June 5nd.
 * **Fix:** [Ajustar el tamaño del pop - up ](https://github.com/LemontechSA/ttb/pull/1015)
