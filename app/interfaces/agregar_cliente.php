@@ -12,7 +12,7 @@ $archivo = new Archivo($Sesion);
 $Form = new Form();
 $SelectHelper = new FormSelectHelper();
 
-$codigo_obligatorio = (boolean) Conf::GetConf($Sesion, 'CodigoObligatorio');
+$CodigoClienteAsuntoModificable = (boolean) Conf::GetConf($Sesion, 'CodigoClienteAsuntoModificable');
 
 if ($id_cliente > 0) {
 	$cliente->Load($id_cliente);
@@ -391,18 +391,14 @@ $Pagina->PrintTop();
 						<?php echo $obligatorio; ?>
 					</div >
 				</td>
-				<td class="al " width="600">
-					<div   class="controls controls-row " style="white-space:nowrap;">
-						<input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
-						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('Código secundario') ?>
-								<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
-								<?php
-								if ($CodigoSecundario) {
-									echo "<span  class=\"help-inline\" style='color:#FF0000;'>*</span>";
-								} else {
-									echo "<span class=\"help-inline\"  >(" . __('Opcional') . ")</span>";
-								}
-								?>
+				<td class="al" width="600">
+					<div class="controls controls-row" style="white-space:nowrap;">
+						<input type="text" style="float:left;" class="input-small span2" placeholder="0000" name="codigo_cliente" size="5" maxlength="5" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
+						<div class="span4" style="float:left;">
+							&nbsp;&nbsp;&nbsp;
+							<label><?php echo __('Código secundario') ?></label>
+							<input type="text"class="input-small" id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario']; ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
+							<?php echo $CodigoSecundario ? $obligatorio : '<span class="help-inline">(' . __('Opcional') . ')</span>'; ?>
 						</div>
 					</div>
 				</td>
