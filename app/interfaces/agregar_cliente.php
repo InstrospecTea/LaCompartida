@@ -251,9 +251,10 @@ if ($opcion == "guardar") {
 	$asuntos = explode(';', Conf::GetConf($Sesion, 'AgregarAsuntosPorDefecto'));
 
 	if ($asuntos[0] == "true" && $loadasuntos) {
-
+		if (empty($codigo_cliente_secundario)) {
+			$codigo_cliente_secundario = $codigo_cliente;
+		}
 		for ($i = 1; $i < count($asuntos); $i++) {
-
 			$asunto = new Asunto($Sesion);
 			$asunto->Edit('codigo_asunto', $asunto->AsignarCodigoAsunto($codigo_cliente));
 			$asunto->Edit('codigo_asunto_secundario', $asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario));
@@ -273,7 +274,6 @@ if ($opcion == "guardar") {
 			if (!$id_usuario_encargado == -1) {
 				$asunto->Edit("id_encargado", $id_usuario_encargado);
 			}
-
 			$asunto->Write();
 		}
 	}
