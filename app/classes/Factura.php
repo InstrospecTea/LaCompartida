@@ -475,7 +475,7 @@ class Factura extends Objeto {
 	function EncargadoComercial($id_contrato) {
 			if (!empty($this->fields['id_usuario_responsable'])) {
 			$query = "SELECT CONCAT_WS(' ', usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre, usuario.username
-									FROM usuario 
+									FROM usuario
 									WHERE id_usuario = '{$this->fields['id_usuario_responsable']}'";
 		} else {
 			$query = "SELECT CONCAT_WS(' ',usuario.nombre, usuario.apellido1, usuario.apellido2) as nombre, usuario.username
@@ -831,7 +831,7 @@ class Factura extends Objeto {
 				$month_short = array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
 				$mes_corto = array('JAN', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC');
 				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
-				$mes_largo_en = array('JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', ' DECEMBER');
+				$mes_largo_en = array('JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', ' DECEMBER');
 
 				$mes_largo = $mes_largo_es;
 
@@ -2665,7 +2665,7 @@ class Factura extends Objeto {
 
 		$facturaPosition = array();
 		$descuento_en_facturas = Conf::GetConf($this->sesion, 'VisualizaDescuentoEnFactura');
-		
+
 		if ($descuento_en_facturas) {
 			// Recupero todos los id_factura de los resultados, para posterior uso
 			$facturasIDs =
