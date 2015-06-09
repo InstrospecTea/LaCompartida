@@ -136,7 +136,7 @@ class Reporte {
       case "horas_visibles":
       case "horas_castigadas":
         $this->addFiltro('trabajo', 'cobrable', '1');
-        if($dato_extra == 0)
+        if($dato_extra == 1)
           $this->filtros_especiales[] = "(duracion - duracion_cobrada) > 0"; //no mostrar trabajos sin horas castigadas
         break;
 

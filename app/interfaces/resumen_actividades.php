@@ -173,10 +173,10 @@ if (isset($_POST['horas_sql'])) {
 	$tipo_dato_comparado = '';
 }
 
-if(isset($_POST['mostrar_horas_castigadas']) && $_POST['mostrar_horas_castigadas'] == 1)
-	$mostrar_horas_castigadas = 1;
+if(isset($_POST['ocultar_horas_castigadas']) && $_POST['ocultar_horas_castigadas'] == 1)
+	$ocultar_horas_castigadas = 1;
 else
-	$mostrar_horas_castigadas = 0;
+	$ocultar_horas_castigadas = 0;
 
 $agrupadores = explode('-', $vista);
 ?>
@@ -208,7 +208,7 @@ $agrupadores = explode('-', $vista);
 			form.action = 'resumen_actividades.php';
 		}
 
-		form.mostrar_horas_castigadas.value = jQuery("#mostrar_horas_castigadas").is(":checked") ? 1:0;
+		form.ocultar_horas_castigadas.value = jQuery("#ocultar_horas_castigadas").is(":checked") ? 1:0;
 		form.submit();
 	}
 
@@ -708,7 +708,7 @@ $agrupadores = explode('-', $vista);
 								<option value='horas_spot' <?php echo $horas_sql == 'horas_spot' ? 'selected' : '' ?>><?php echo __('hr_spot') ?></option>
 								<option value='horas_convenio' <?php echo $horas_sql == 'horas_convenio' ? 'selected' : '' ?>><?php echo __('hr_convenio') ?></option>
 							</select><br>
-							<div id="checkbox_horas_castigadas"><input type="checkbox" name="mostrar_horas_castigadas" id="mostrar_horas_castigadas" value="0"><?php echo __('¿Mostrar trabajos sin horas castigadas?');?></div>
+							<div id="checkbox_horas_castigadas"><input type="checkbox" name="ocultar_horas_castigadas" id="ocultar_horas_castigadas" value="0"><?php echo __('¿Ocultar trabajos sin horas castigadas?');?></div>
 						</td>
 					</tr>
 					<tr>
@@ -770,7 +770,7 @@ $agrupadores = explode('-', $vista);
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	$reporte->setCampoFecha($campo_fecha);
-	$reporte->setTipoDato($tipo_dato, $mostrar_horas_castigadas);
+	$reporte->setTipoDato($tipo_dato, $ocultar_horas_castigadas);
 	$reporte->setVista($vista);
 	$reporte->addRangoFecha($fecha_ini, $fecha_fin);
 
