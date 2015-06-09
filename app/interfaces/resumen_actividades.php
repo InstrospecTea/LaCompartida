@@ -173,10 +173,12 @@ if (isset($_POST['horas_sql'])) {
 	$tipo_dato_comparado = '';
 }
 
-if(isset($_POST['ocultar_horas_castigadas']) && $_POST['ocultar_horas_castigadas'] == 1)
+if(isset($_POST['ocultar_horas_castigadas']) && $_POST['ocultar_horas_castigadas'] == 1){
 	$ocultar_horas_castigadas = 1;
-else
+}
+else{
 	$ocultar_horas_castigadas = 0;
+}
 
 $agrupadores = explode('-', $vista);
 ?>
@@ -269,16 +271,20 @@ $agrupadores = explode('-', $vista);
 	}
 
 	jQuery(document).ready(function() {
-		if(jQuery("select#horas_sql").val() == "horas_castigadas")
+		if(jQuery("select#horas_sql").val() == "horas_castigadas"){
 			jQuery("#checkbox_horas_castigadas").show();
-		else
+		}
+		else{
 			jQuery("#checkbox_horas_castigadas").hide();
+		}
 
 		jQuery("select#horas_sql").change(function(){
-			if(jQuery("select#horas_sql").val() == "horas_castigadas")
+			if(jQuery("select#horas_sql").val() == "horas_castigadas"){
 				jQuery("#checkbox_horas_castigadas").show();
-			else
+			}
+			else{
 				jQuery("#checkbox_horas_castigadas").hide();
+			}
 		});
 	});
 </script>
