@@ -73,7 +73,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			var Contrapartes = Contrapartes || new jQuery.Deferred();
 		</script>
 		<script type="text/javascript" src="//static.thetimebilling.com/js/pluginsplus.js"></script>
-		<script  type="text/javascript" src="//static.thetimebilling.com/js/all.1234370043.js"></script>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/vendors.20150603061719.js"></script>
                 <script type="text/javascript">
                     jQuery.xhrPool = [];
                     jQuery.xhrPool.abortAll = function() {
