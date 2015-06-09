@@ -271,6 +271,9 @@ $agrupadores = explode('-', $vista);
 	}
 
 	jQuery(document).ready(function() {
+		ocultar_default = <?php echo $ocultar_horas_castigadas;?> == 1 ? true : false;
+		jQuery('#ocultar_horas_castigadas').attr('checked', ocultar_default);
+
 		if(jQuery("select#horas_sql").val() == "horas_castigadas"){
 			jQuery("#checkbox_horas_castigadas").show();
 		}
@@ -714,7 +717,7 @@ $agrupadores = explode('-', $vista);
 								<option value='horas_spot' <?php echo $horas_sql == 'horas_spot' ? 'selected' : '' ?>><?php echo __('hr_spot') ?></option>
 								<option value='horas_convenio' <?php echo $horas_sql == 'horas_convenio' ? 'selected' : '' ?>><?php echo __('hr_convenio') ?></option>
 							</select><br>
-							<div id="checkbox_horas_castigadas"><input type="checkbox" name="ocultar_horas_castigadas" id="ocultar_horas_castigadas" value="0"><?php echo __('¿Ocultar trabajos sin horas castigadas?');?></div>
+							<div id="checkbox_horas_castigadas"><label><input type="checkbox" name="ocultar_horas_castigadas" id="ocultar_horas_castigadas" value="0"><?php echo __('¿Ocultar trabajos sin horas castigadas?');?></label></div>
 						</td>
 					</tr>
 					<tr>
