@@ -12,7 +12,7 @@ $archivo = new Archivo($Sesion);
 $Form = new Form();
 $SelectHelper = new FormSelectHelper();
 
-$codigo_obligatorio = (boolean) Conf::GetConf($Sesion, 'CodigoObligatorio');
+$CodigoClienteAsuntoModificable = (boolean) Conf::GetConf($Sesion, 'CodigoClienteAsuntoModificable');
 
 if ($id_cliente > 0) {
 	$cliente->Load($id_cliente);
@@ -43,24 +43,27 @@ if ($opcion == "guardar") {
 	$val = false;
 
 	if ($cli->Loaded()) {
-
 		if (!$activo) {
 			$cli->InactivarAsuntos();
 		}
-		if (($cli->fields['id_cliente'] != $cliente->fields['id_cliente']) and ($cliente->Loaded())) {
+
+		if (($cli->fields['id_cliente'] != $cliente->fields['id_cliente']) && ($cliente->Loaded())) {
 			$Pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
+
 		if (!$cliente->Loaded()) {
 			$Pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
-		if ($codigo_cliente_secundario and empty($id_cliente)) {
-			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '" . $cli->fields['id_cliente'] . "'";
+
+		if ($codigo_cliente_secundario) {
+			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '{$cliente->fields['id_cliente']}'";
 			$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
+
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$Pagina->FatalError('El código ingresado ya existe');
+					$Pagina->FatalError('El código secundario ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -69,11 +72,19 @@ if ($opcion == "guardar") {
 	} else {
 		$loadasuntos = true;
 		if ($codigo_cliente_secundario) {
-			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente";
+			$where = '1';
+
+			if ($cliente->Loaded()) {
+				$where .= " AND id_cliente != '{$cliente->fields['id_cliente']}'";
+			}
+
+			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE $where";
+
 			$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
+
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$Pagina->FatalError('El código ingresado ya existe');
+					$Pagina->FatalError('El código secundario ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -391,18 +402,14 @@ $Pagina->PrintTop();
 						<?php echo $obligatorio; ?>
 					</div >
 				</td>
-				<td class="al " width="600">
-					<div   class="controls controls-row " style="white-space:nowrap;">
-						<input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
-						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('Código secundario') ?>
-								<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
-								<?php
-								if ($CodigoSecundario) {
-									echo "<span  class=\"help-inline\" style='color:#FF0000;'>*</span>";
-								} else {
-									echo "<span class=\"help-inline\"  >(" . __('Opcional') . ")</span>";
-								}
-								?>
+				<td class="al" width="600">
+					<div class="controls controls-row" style="white-space:nowrap;">
+						<input type="text" style="float:left;" class="input-small span2" placeholder="0000" name="codigo_cliente" size="5" maxlength="5" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
+						<div class="span4" style="float:left;">
+							&nbsp;&nbsp;&nbsp;
+							<label><?php echo __('Código secundario') ?></label>
+							<input type="text"class="input-small" id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario']; ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
+							<?php echo $CodigoSecundario ? $obligatorio : '<span class="help-inline">(' . __('Opcional') . ')</span>'; ?>
 						</div>
 					</div>
 				</td>
@@ -1021,7 +1028,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 				var dato = jQuery(this).val();
 				var campo = jQuery(this).attr('id');
 				var accion = 'existe_' + campo + '_cliente';
-				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato;
+				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato + '&id_cliente=' + '<?php echo !empty($cliente->fields['id_cliente']) ? $cliente->fields['id_cliente'] : null; ?>';
 
 				jQuery.get(url_ajax, function(data) {
 					objResp = null;
