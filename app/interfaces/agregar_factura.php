@@ -20,7 +20,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
-		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto'));
+		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable'));
 	}
 
 	if (!empty($id_factura)) {
@@ -187,6 +187,7 @@ if ($opcion == "guardar") {
 		($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_agregar_factura') : false;
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+			$factura->Edit("glosa", $glosa);
 			$factura->Edit("descripcion", $descripcion_honorarios_legales);
 			$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
 			$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
@@ -199,6 +200,10 @@ if ($opcion == "guardar") {
 			$factura->Edit("iva", $iva_hidden ? $iva_hidden : 0);
 		} else {
 			$factura->Edit("descripcion", $descripcion);
+		}
+
+		if (!empty($contrato)) {
+			$factura->Edit("id_usuario_responsable", $contrato->fields['id_usuario_responsable']);
 		}
 
 		if (Conf::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) {
@@ -386,6 +391,10 @@ $suma_total = $subtotal_honorarios + $subtotal_gastos + $impuesto_gastos + $impu
 //CON DESGLOSE
 $cobro_ = new Cobro($sesion);
 $descripcion_honorario = __(Conf::GetConf($sesion, 'FacturaDescripcionHonorarios'));
+
+if (empty($glosa) && $contrato) {
+	$glosa = $contrato->fields['glosa_contrato'];
+}
 
 if ($descripcion_honorario == '') {
 	$descripcion_honorario = $contrato->fields['glosa_contrato'];
@@ -724,10 +733,15 @@ $Form->defaultLabel = false;
 			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
+
 		<?php
 		$cantidad_lineas_descripcion = Conf::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			?>
+			<tr>
+				<td align="right" ><?php echo __('Glosa Factura')?></td>
+				<td align="left" colspan="3" ><textarea id="glosa" name="glosa" cols="50" rows="2" style="font-family: Arial; font-size: 11px"><?php echo trim($glosa); ?></textarea></td>
+			</tr>
 			<tr id='descripcion_factura'>
 				<td align="right" width="100">&nbsp;</td>
 				<td align="left" style="vertical-align:bottom" width="250"><?php echo __('Descripción'); ?></td>

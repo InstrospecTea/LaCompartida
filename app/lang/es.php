@@ -289,7 +289,6 @@ $_LANG['Forma de Tarificación'] = "Forma de Tarificación";
 $_LANG['Forma de tarificación'] = "Forma de tarificación";
 $_LANG['Resumen final del Cobro'] = "Resumen final del Cobro";
 $_LANG['Emitir Cobro'] = "Emitir Cobro";
-$_LANG['Emitir cobros'] = "Emitir Cobros Masivamente";
 $_LANG['Parámetros del Cobro'] = "Parámetros del Cobro";
 $_LANG['Cobro inválido'] = "Cobro inválido";
 $_LANG['Debe especificar un cobro'] = "Debe especificar un cobro";
@@ -345,7 +344,6 @@ $_LANG['Con Impuesto'] = "Con Impuesto";
 $_LANG['detalledegastos'] = "Detalle de Gastos";
 $_LANG['resumen_raz'] = "Resumen";
 $_LANG['total_raz'] = "Total de horas";
-$_LANG['Generar borradores'] = "Generar borradores masivamente";
 
 #Nota cobro Morales
 $_LANG['Atte'] = "Atte";
@@ -1192,3 +1190,5 @@ $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponible
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 52"] = "No hay folios disponibles para Guia De Despacho Electronica";
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 56"] = "No hay folios disponibles para Nota De Debito Electronica";
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 61"] = "No hay folios disponibles para Nota De Credito Electronica";
+
+$_LANG['Su sesión ha expirado, por favor ingrese nuevamente.'] = 'Su sesión ha expirado, por favor ingrese nuevamente.';
