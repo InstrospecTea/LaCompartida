@@ -11,7 +11,7 @@ class PaginaCobro extends Pagina {
 	 *
 	 * PrintPasos, imprime los pasos del ingreso
 	 */
-	function PrintPasos( $sesion, $paso, $cliente = null, $id_cobro = null, $incluye_gastos = 1, $incluye_honorarios = 1) {
-		require Conf::ServerDir().'/templates/'.Conf::Templates().'/top_cobro.php';
+	function PrintPasos($sesion, $paso, $cliente = null, $id_cobro = null, $incluye_gastos = 1, $incluye_honorarios = 1) {
+		require Conf::ServerDir() . '/templates/' . Conf::Templates() . '/top_cobro.php';
 	}
 }
