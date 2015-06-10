@@ -1,5 +1,11 @@
 # Changelog
 
+## [Release 15.12.0](https://github.com/LemontechSA/ttb/pull/1021)
+Tuesday 2015, June 9th.
+* **Feature:** [Modificar código Cliente - Asunto](https://github.com/LemontechSA/ttb/issues/1017)
+* **Feature:** [Expiración de sesión y peticiones ajax](https://github.com/LemontechSA/ttb/issues/1013)
+* **Feature:** [Reporte General: Horas castigadas](https://github.com/LemontechSA/ttb/issues/1008)
+
 ## Hotfix 15.11.5
 Tuesday 2015, June 8th.
 * **Fix:** [Fixes codigo_cliente_secundario emptyness and triggered matters creation](https://github.com/LemontechSA/ttb/pull/1018)
