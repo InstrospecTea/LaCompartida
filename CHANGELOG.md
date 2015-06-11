@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 15.12.2
+Thursday 2015, June 11th.
+* **Fix:** [Corregir asignación codigo_asunto](https://github.com/LemontechSA/ttb/pull/1023)
+
 ## Hotfix 15.12.1
 Wednesday 2015, June 10th.
-* **Fix:** [Corregir ](https://github.com/LemontechSA/ttb/pull/1022)
+* **Fix:** [Corregir constructor de clase PaginaCobro](https://github.com/LemontechSA/ttb/pull/1022)
 
 ## [Release 15.12.0](https://github.com/LemontechSA/ttb/pull/1021)
 Tuesday 2015, June 9th.

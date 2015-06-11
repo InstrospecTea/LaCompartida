@@ -600,7 +600,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 															<?php echo __('Código'); ?>
 														</td>
 														<td align="left">
-															<input id="codigo_asunto" name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> size="10" maxlength="10" value="<?php echo (isset($codigo_asunto)) ? $codigo_asunto : ''; ?>" onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
+															<input id="codigo_asunto" name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
 															&nbsp;&nbsp;&nbsp;
 															<?php echo __('Código secundario'); ?>
 															<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;">&nbsp;&nbsp;<?php echo !empty($Cliente->fields['codigo_cliente_secundario']) ? "{$Cliente->fields['codigo_cliente_secundario']}-" : ''; ?></div>
