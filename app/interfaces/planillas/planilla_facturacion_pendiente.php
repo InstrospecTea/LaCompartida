@@ -1,8 +1,9 @@
 <?php
-$tini = time();
-$fechactual = date('Ymd');
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
+
+$tini = time();
+$fechactual = date('Ymd');
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);

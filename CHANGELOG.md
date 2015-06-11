@@ -1,5 +1,23 @@
 # Changelog
 
+## Hotfix 15.12.2
+Thursday 2015, June 11th.
+* **Fix:** [Corregir asignación codigo_asunto](https://github.com/LemontechSA/ttb/pull/1023)
+
+## Hotfix 15.12.1
+Wednesday 2015, June 10th.
+* **Fix:** [Corregir constructor de clase PaginaCobro](https://github.com/LemontechSA/ttb/pull/1022)
+
+## [Release 15.12.0](https://github.com/LemontechSA/ttb/pull/1021)
+Tuesday 2015, June 9th.
+* **Feature:** [Modificar código Cliente - Asunto](https://github.com/LemontechSA/ttb/issues/1017)
+* **Feature:** [Expiración de sesión y peticiones ajax](https://github.com/LemontechSA/ttb/issues/1013)
+* **Feature:** [Reporte General: Horas castigadas](https://github.com/LemontechSA/ttb/issues/1008)
+
+## Hotfix 15.11.5
+Tuesday 2015, June 8th.
+* **Fix:** [Fixes codigo_cliente_secundario emptyness and triggered matters creation](https://github.com/LemontechSA/ttb/pull/1018)
+
 ## Hotfix 15.11.3
 Friday 2015, June 5nd.
 * **Fix:** [Ajustar el tamaño del pop - up ](https://github.com/LemontechSA/ttb/pull/1015)
