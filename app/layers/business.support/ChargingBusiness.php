@@ -123,6 +123,31 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $this->ChargeService->get($chargeId);
 	}
 
+	/**
+	 * Obtiene N instancias de {@link Charge} en base a su identificador primario.
+	 * @param array $chargeIds
+	 * @return map {@link Charge} con el id_charge como entrada del mapa
+	 */
+	public function loadCharges( $chargeIds ) {
+		$this->loadService('Charge');
+		$this->loadBusiness('Searching');
+
+		$searchCriteria = new SearchCriteria('Charge');
+
+		$searchCriteria
+			->filter('id_cobro')
+			->restricted_by('in')
+			->compare_with($chargeIds);
+
+		$mapCharges = array();
+		$tmp = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		foreach ($tmp as $invoice) {
+			$mapCharges[ $invoice->get('id_cobro') ] = $invoice;
+		}
+
+		return $mapCharges;
+	}
 
 	public function getSlidingScalesWorkDetail($charge) {
 		$this->loadBusiness('Charging');
@@ -140,6 +165,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$container->add_child($title);
 				//Construct table
 				$table = new HtmlBuilder('table');
+				$table->add_attribute('class', 'tabla_normal');
 				$table->add_child($this->constructTableHead($scale));
 				$table->add_child($this->constructTableBody($scale, $language, $currency, $charge));
 				$container->add_child($table);
@@ -154,26 +180,26 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$thead->set_tag('thead');
 		//Table header row
 		$tr = new HtmlBuilder();
-		$tr->set_tag('tr');
+		$tr->set_tag('tr')->add_attribute('class', 'tr_titulo');
 		//Table headers columns
-		$th_date = new HtmlBuilder('th');
-		$th_date->set_html(__('Fecha'));
-		$th_user = new HtmlBuilder('th');
-		$th_user->set_html(__('Profesional'));
-		$th_description = new HtmlBuilder('th');
-		$th_description->set_html(__('Descripción'));
-		$th_workedTime = new HtmlBuilder('th');
-		$th_workedTime->set_html(__('Tiempo trabajado'));
-		$th_usedTime = new HtmlBuilder('th');
-		$th_usedTime->set_html(__('Tiempo utilizado').('(min)'));
-		$th_value = new HtmlBuilder('th');
-		$th_value->set_html(__('Valor'));
+		$td_date = new HtmlBuilder('td');
+		$td_date->set_html(__('Fecha'));
+		$td_user = new HtmlBuilder('td');
+		$td_user->set_html(__('Profesional'));
+		$td_description = new HtmlBuilder('td');
+		$td_description->set_html(__('Descripción'));
+		$td_workedTime = new HtmlBuilder('td');
+		$td_workedTime->set_html(__('Tiempo trabajado'));
+		$td_usedTime = new HtmlBuilder('td');
+		$td_usedTime->set_html(__('Tiempo utilizado').('(min)'));
+		$td_value = new HtmlBuilder('td');
+		$td_value->set_html(__('Valor'));
 		$tr
-			->add_child($th_date)
-			->add_child($th_user)
-			->add_child($th_description)
-			->add_child($th_workedTime)
-			->add_child($th_usedTime);
+			->add_child($td_date)
+			->add_child($td_user)
+			->add_child($td_description)
+			->add_child($td_workedTime)
+			->add_child($td_usedTime);
 		if ($scale->get('fixedAmount') == 0) {
 			$tr->add_child($th_value);
 		}
@@ -188,7 +214,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach($scale->get('scaleWorks') as $work) {
 			//One table body row for every work
 			$tr = new HtmlBuilder();
-			$tr->set_tag('tr');
+			$tr->set_tag('tr')->add_attribute('class', 'tr_datos');
 			$td_date = new HtmlBuilder('td');
 			$date = new DateTime($work->get('fecha'));
 			$td_date->set_html($date->format(str_replace('%','',$language->get('formato_fecha'))));
@@ -342,7 +368,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Searching');
 		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
 		if (empty($results[0])) {
-			return null;
+			$this->loadBusiness('Working');
+			$work = $this->WorkingBusiness->getWork($workId);
+			$workFee = new WorkFee();
+			$workFee->set('id_moneda', $currency_id);
+			$workFee->set('valor', $work->get('tarifa_hh'));
+			$workFee->set('valor_estandar', $work->get('tarifa_hh_estandar'));
+			return $workFee;
 		} else {
 			return $results[0];
 		}
@@ -419,9 +451,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$documentCurrency = $currency;
 		}
 
-	 	$result = $this->processCharge($charge, $currency);
+		$result = $this->processCharge($charge, $currency);
 
-	 	if ($documentCurrency->get($documentCurrency->getIdentity()) != $currency->get($currency->getIdentity())) {
+		if ($documentCurrency->get($documentCurrency->getIdentity()) != $currency->get($currency->getIdentity())) {
 			$documentResult = $this->processCharge($charge, $currency);
 		} else {
 			$documentResult = $result;
@@ -429,17 +461,17 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$modalidad_calculo = $charge->get('modalidad_calculo');
 
-	 	$subtotal_honorarios = 0;
-	 	$descuento_honorarios = 0;
-	 	$saldo_honorarios = 0;
-	 	$saldo_disponible_trabajos = 0;
-	 	$saldo_disponible_tramites = 0;
-	 	$saldo_gastos_con_impuestos = 0;
-	 	$saldo_gastos_sin_impuestos = 0;
-	 	$monto_iva = 0;
+		$subtotal_honorarios = 0;
+		$descuento_honorarios = 0;
+		$saldo_honorarios = 0;
+		$saldo_disponible_trabajos = 0;
+		$saldo_disponible_tramites = 0;
+		$saldo_gastos_con_impuestos = 0;
+		$saldo_gastos_sin_impuestos = 0;
+		$monto_iva = 0;
 
-	 	if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_NEW) {
-	 		$subtotal_honorarios = $result['subtotal_honorarios'];
+		if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_NEW) {
+			$subtotal_honorarios = $result['subtotal_honorarios'];
 			$descuento_honorarios = $result['descuento_honorarios'];
 			$saldo_honorarios = $subtotal_honorarios - $descuento_honorarios;
 			$saldo_disponible_trabajos = $saldo_trabajos = $result['monto_trabajos'] - $descuento_honorarios;
@@ -450,7 +482,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$saldo_disponible_tramites = $saldo_tramites = $result['monto_tramites'];
 			}
 		}
- 		//Código que deberÃ­a estar obsoleto
+		//Código que deberÃ­a estar obsoleto
 		if ($modalidad_calculo == ChargingBusiness::CALCULATION_TYPE_OLD) {
 			$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('id_moneda'));
 			$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
@@ -506,13 +538,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$amountDetail = new GenericModel();
 		$amountDetail->set('subtotal_honorarios', $subtotal_honorarios, false);
-	 	$amountDetail->set('descuento_honorarios', $descuento_honorarios, false);
-	 	$amountDetail->set('saldo_honorarios', $saldo_honorarios, false);
-	 	$amountDetail->set('saldo_disponible_trabajos', $saldo_disponible_trabajos, false);
-	 	$amountDetail->set('saldo_disponible_tramites', $saldo_disponible_tramites, false);
-	 	$amountDetail->set('saldo_gastos_con_impuestos', $saldo_gastos_con_impuestos, false);
-	 	$amountDetail->set('saldo_gastos_sin_impuestos', $saldo_gastos_sin_impuestos, false);
-	 	$amountDetail->set('monto_iva', $monto_iva, false);
+		$amountDetail->set('descuento_honorarios', $descuento_honorarios, false);
+		$amountDetail->set('saldo_honorarios', $saldo_honorarios, false);
+		$amountDetail->set('saldo_disponible_trabajos', $saldo_disponible_trabajos, false);
+		$amountDetail->set('saldo_disponible_tramites', $saldo_disponible_tramites, false);
+		$amountDetail->set('saldo_gastos_con_impuestos', $saldo_gastos_con_impuestos, false);
+		$amountDetail->set('saldo_gastos_sin_impuestos', $saldo_gastos_sin_impuestos, false);
+		$amountDetail->set('monto_iva', $monto_iva, false);
 
 		return $amountDetail;
 	}

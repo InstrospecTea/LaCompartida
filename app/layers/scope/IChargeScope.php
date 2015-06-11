@@ -45,11 +45,11 @@ interface IChargeScope {
 	 * @param Criteria $criteria
 	 * @return mixed
 	 */
-	function orderbyClientGlossAndClientCode(Criteria $criteria);
+	function orderByClientGlossAndClientCode(Criteria $criteria);
 
 	 /**
-   * Custom left join with document 
+   * Custom left join with document
    * @param Criteria $criteria
    */
   function withDocument(Criteria $criteria);
-} 
+}

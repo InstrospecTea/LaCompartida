@@ -186,7 +186,7 @@ $col=0;
 	$ws1->write($fila_inicial, $col_rsocial, __('Razón Social'), $tit);
 	$ws1->write($fila_inicial, $col_tarifa, __('Tarifa'), $tit);
 	$ws1->write($fila_inicial, $col_moneda, __('Moneda'), $tit);
-	$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Cobro'), $tit);
+	$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Tarificación'), $tit);
 	$ws1->write($fila_inicial, $col_monto, __('Monto(FF/R/C)'), $tit);
 	$ws1->write($fila_inicial, $col_direccion, __('Dirección'), $tit);
 	$ws1->write($fila_inicial, $col_telefono, __('Teléfono'), $tit);    

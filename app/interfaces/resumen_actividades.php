@@ -173,6 +173,13 @@ if (isset($_POST['horas_sql'])) {
 	$tipo_dato_comparado = '';
 }
 
+if(isset($_POST['ocultar_horas_castigadas']) && $_POST['ocultar_horas_castigadas'] == 1){
+	$ocultar_horas_castigadas = 1;
+}
+else{
+	$ocultar_horas_castigadas = 0;
+}
+
 $agrupadores = explode('-', $vista);
 ?>
 <script type="text/javascript">
@@ -203,6 +210,7 @@ $agrupadores = explode('-', $vista);
 			form.action = 'resumen_actividades.php';
 		}
 
+		form.ocultar_horas_castigadas.value = jQuery("#ocultar_horas_castigadas").is(":checked") ? 1:0;
 		form.submit();
 	}
 
@@ -261,6 +269,27 @@ $agrupadores = explode('-', $vista);
 			td_show.style['display'] = 'none';
 		}
 	}
+
+	jQuery(document).ready(function() {
+		ocultar_default = <?php echo $ocultar_horas_castigadas;?> == 1 ? true : false;
+		jQuery('#ocultar_horas_castigadas').attr('checked', ocultar_default);
+
+		if(jQuery("select#horas_sql").val() == "horas_castigadas"){
+			jQuery("#checkbox_horas_castigadas").show();
+		}
+		else{
+			jQuery("#checkbox_horas_castigadas").hide();
+		}
+
+		jQuery("select#horas_sql").change(function(){
+			if(jQuery("select#horas_sql").val() == "horas_castigadas"){
+				jQuery("#checkbox_horas_castigadas").show();
+			}
+			else{
+				jQuery("#checkbox_horas_castigadas").hide();
+			}
+		});
+	});
 </script>
 <style type="text/css">
 	#tbl {
@@ -665,7 +694,7 @@ $agrupadores = explode('-', $vista);
 					}
 					?>
 					<tr valign=top>
-						<td align=left colspan=2>
+						<td align=left colspan=2 style="padding-top: 8px; padding-bottom: 4px;">
 							<?php echo __('Vista') ?>:&nbsp;&nbsp;
 							<select name="tipo">
 								<option value="Profesional" <?php echo $tipo == 'Profesional' ? 'selected' : '' ?>><?php echo __('Profesional') ?></option>
@@ -687,7 +716,8 @@ $agrupadores = explode('-', $vista);
 								<option value='horas_castigadas' <?php echo $horas_sql == 'horas_castigadas' ? 'selected' : '' ?>><?php echo __('hr_castigadas') ?></option>
 								<option value='horas_spot' <?php echo $horas_sql == 'horas_spot' ? 'selected' : '' ?>><?php echo __('hr_spot') ?></option>
 								<option value='horas_convenio' <?php echo $horas_sql == 'horas_convenio' ? 'selected' : '' ?>><?php echo __('hr_convenio') ?></option>
-							</select>
+							</select><br>
+							<div id="checkbox_horas_castigadas"><label><input type="checkbox" name="ocultar_horas_castigadas" id="ocultar_horas_castigadas" value="0"><?php echo __('¿Ocultar trabajos sin horas castigadas?');?></label></div>
 						</td>
 					</tr>
 					<tr>
@@ -748,9 +778,8 @@ $agrupadores = explode('-', $vista);
 }
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
-
 	$reporte->setCampoFecha($campo_fecha);
-	$reporte->setTipoDato($tipo_dato);
+	$reporte->setTipoDato($tipo_dato, $ocultar_horas_castigadas);
 	$reporte->setVista($vista);
 	$reporte->addRangoFecha($fecha_ini, $fecha_fin);
 

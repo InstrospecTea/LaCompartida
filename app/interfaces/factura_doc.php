@@ -10,6 +10,8 @@ if (!$factura->Load($id_factura_grabada)) {
 	$pagina->FatalError('Factura inválido');
 }
 
+
+
 if ($lang == '') {
 	$lang = 'es';
 }

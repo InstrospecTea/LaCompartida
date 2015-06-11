@@ -1409,7 +1409,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                         <td style="height: 26px;  vertical-align: top;" align=left nowrap>
                             <br />
 							<?php echo'Estado ' . __('Cobro') ?>:
-							<br /> <br/><?php echo __('Forma Cobro') ?>
+							<br /> <br/><?php echo __('Forma Tarificación') ?>
 							<br/><?php echo $cobro->fields['forma_cobro'] ?>
                         </td>
                         <td align="left" style="font-size: 11px; font-weight: bold;" >

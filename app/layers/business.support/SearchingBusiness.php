@@ -54,23 +54,27 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 * @return Criteria|mixed
 	 */
 	private function addScopes(SearchCriteria $searchCriteria, Criteria $criteria) {
-		$scopes = $searchCriteria->scopes();
-		if (empty($scopes)) {
+		$entity_scopes = $searchCriteria->scopes();
+
+		if (empty($entity_scopes)) {
 			return $criteria;
 		}
+
 		//Instanciar la clase correspondiente mediante reflection.
-		if (count($scopes)) {
-			$scopeClass = $searchCriteria->entity() . 'Scope';
-			$scopeInstance = new $scopeClass();
-			foreach ($scopes as $scope) {
-				$scope_name = $scope;
-				$args = array($criteria);
-				if (is_array($scope)) {
-					$scope_name = $scope[0];
-					$args = array_merge($args, $scope[1]);
+		if (count($entity_scopes)) {
+			foreach ($entity_scopes as $entity => $scopes) {
+				$scopeClass = $entity . 'Scope';
+				$scopeInstance = new $scopeClass();
+				foreach ($scopes as $scope) {
+					$scope_name = $scope;
+					$args = array($criteria);
+					if (is_array($scope)) {
+						$scope_name = $scope[0];
+						$args = array_merge($args, $scope[1]);
+					}
+					$scopeMethod = new ReflectionMethod($scopeClass, $scope_name);
+					$criteria = $scopeMethod->invokeArgs($scopeInstance, $args);
 				}
-				$scopeMethod = new ReflectionMethod($scopeClass, $scope_name);
-				$criteria = $scopeMethod->invokeArgs($scopeInstance, $args);
 			}
 		}
 		return $criteria;
@@ -86,7 +90,8 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$widthIdentity,
 			$genericMode
 		);
-		return $this->addScopes($searchCriteria, $criteria);
+		$criteria = $this->addScopes($searchCriteria, $criteria);
+		return $criteria;
 	}
 
 }
