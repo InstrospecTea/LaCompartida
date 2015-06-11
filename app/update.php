@@ -10790,12 +10790,14 @@ QUERY;
 			break;
 
 		case 8.02:
-			if (!ExisteCampo('factura', 'glosa', $dbh)) {
+			if (!ExisteCampo('glosa', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `glosa` VARCHAR(255) NULL AFTER `descripcion`;";
 			}
-			if (!ExisteCampo('factura', 'id_usuario_responsable', $dbh)) {
+
+			if (!ExisteCampo('id_usuario_responsable', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `id_usuario_responsable` INT(11) DEFAULT NULL AFTER `id_documento_legal_motivo`;";
 			}
+			
 			if (!ExisteLlaveForanea('factura_usuario_responsable_fk', 'id_usuario_responsable', 'usuario', 'id_usuario', $dbh)) {
 				$query[] = "ALTER TABLE `factura` ADD CONSTRAINT `factura_usuario_responsable`
 										FOREIGN KEY (`id_usuario_responsable_fk`)
