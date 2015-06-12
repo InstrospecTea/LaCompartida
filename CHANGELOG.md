@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.4
+Friday 2015, June 12th.
+* **Fix:** [Agregar tag %monto_total_palabra_cero_cien% a factura.doc](https://github.com/LemontechSA/ttb/pull/1027)
+
 ## Hotfix 15.12.3
 Friday 2015, June 12th.
 * **Fix:** [Corregir asignación de monto en palabra de Factura en PDF y DOC](https://github.com/LemontechSA/ttb/pull/1024)
