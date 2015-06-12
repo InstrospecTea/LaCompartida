@@ -647,9 +647,11 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																	}
 																} else {
 																	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+																		$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
 																		$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
 																		$_name = 'codigo_cliente_secundario';
 																	} else {
+																		$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
 																		$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
 																		$_name = 'codigo_cliente';
 																	}
@@ -658,7 +660,11 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																	echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
 																}
 																?>
+																<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
 																<span style="color:#FF0000; font-size:10px">*</span>
+																<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
+																<?php echo $input_cliente; ?>
+																</div>
 														</td>
 												</tr>
 
@@ -952,6 +958,19 @@ jQuery('document').ready(function () {
 	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
 		CambioEncargadoSegunCliente(jQuery(this).val());
 	});
+
+	jQuery('#change_client').click(function() {
+		var $ = jQuery;
+		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
+		var select_nuevo_codigo = $('select.nuevo_codigo_cliente');
+		var secundario = input_nuevo_codigo.hasClass('secundario') ? '_secundario' : '';
+		var codigo_cliente = $('#campo_codigo_cliente' + secundario).val();
+		var glosa_cliente = $('#glosa_codigo_cliente' + secundario).val();
+		$('#nuevo_codigo').toggleClass('hidden');
+		input_nuevo_codigo.val(codigo_cliente);
+		select_nuevo_codigo.val(codigo_cliente);
+	});
+
 });
 
 function CambioEncargadoSegunCliente(idcliente) {
