@@ -1565,12 +1565,13 @@ class Factura extends Objeto {
 				//Code name normalization
 				if ($lang == 'en') {
 					$code = 'en_US';
+					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
+					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
+					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
+					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' .__('CON') . ' ' .$monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
+				} else {
+					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
 				}
-
-				list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
-				$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
-				$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
-				$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' .__('CON') . ' ' .$monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
 
 				if ($mostrar_honorarios) {
 					$html2 = str_replace('%simbolo_honorarios%', $simbolo, $html2);
