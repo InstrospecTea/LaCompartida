@@ -42,7 +42,7 @@ class AdvancingBusiness extends AbstractBusiness {
 			$searchCriteria->add_scope('hasBalance');
 		}
 		if (!empty($filters['id_contrato'])) {
-			$searchCriteria->add_scope('hasOrNotContract', $filters['id_contrato']);
+			$searchCriteria->add_scope('hasOrNotContract', array('args' => array($filters['id_contrato'])));
 		}
 
 		$this->loadBusiness('Searching');

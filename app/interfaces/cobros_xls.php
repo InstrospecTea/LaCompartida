@@ -13,7 +13,7 @@ $searchCriteria = new SearchCriteria('Charge');
 $searchCriteria->related_with('Contract')->on_property('id_contrato')->with_direction('INNER');
 $searchCriteria->related_with('Matter')->joined_with('Contract')->on_property('id_contrato');
 $searchCriteria->related_with('Client')->joined_with('Matter')->on_property('codigo_cliente');
-$searchCriteria->add_scope('orderbyClientGlossAndClientCode');
+$searchCriteria->add_scope('orderByClientGlossAndClientCode');
 
 if ($id_cobro) {
 	$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($id_cobro);
@@ -486,27 +486,31 @@ if ($borradores) {
 
 $SearchingBusiness = new SearchingBusiness($sesion);
 $results = $SearchingBusiness->searchByGenericCriteria($searchCriteria, array('DISTINCT(Charge.id_cobro)'));
-$chargeIds = array_map(function($element) { 
+$chargeIds = array_map(function($element) {
 	return $element->get('charge_id_cobro');
 }, $results->toArray());
- 
+
 // Search criteria que obtiene las entidades Cobro para no hacer
 // select  por cada uno, además trae la información necesaria de Document.
 $chargeSearchCriteria = new SearchCriteria('Charge');
-$chargeSearchCriteria->filter('id_cobro')->restricted_by('in')->compare_with($chargeIds);
+$chargeSearchCriteria->related_with('Client')->with_direction('LEFT')->on_property('codigo_cliente');
 $chargeSearchCriteria->add_scope('withDocument');
+$chargeSearchCriteria->filter('id_cobro')->restricted_by('in')->compare_with($chargeIds);
+$chargeSearchCriteria->add_scope_for('Client', 'orderByClientGloss');
 $chargeResults = $SearchingBusiness->searchByCriteria(
-	$chargeSearchCriteria, 
+	$chargeSearchCriteria,
 	array('*', 'Document.subtotal_honorarios as document_subtotal_honorarios')
 );
- 
+
+$trabajos_duracion = array();
+
 foreach ($chargeResults as $charge) {
 	$id_cobro = $charge->get('id_cobro');
-	
+
 	$cobro = new Cobro($sesion);
 	$cobro->fields = $charge->fields;
 	$cobro->LoadAsuntos();
-	
+
 	/*
 	*	Si es que el cobro es RETAINER o PROPORCIONAL modifica las columnas del excel
 	*/
@@ -1294,9 +1298,18 @@ foreach ($chargeResults as $charge) {
 					}
 					$ws->writeNumber($filas, $col_tarificable_hh, $duracion_cobrada, $formato_tiempo);
 
-					$query_total_cobrable = "select if(sum(TIME_TO_SEC(duracion_cobrada)/3600)<=0,1,sum(TIME_TO_SEC(duracion_cobrada)/3600)) as duracion_total from trabajo where id_cobro = '" . $cobro->fields['id_cobro'] . "' and cobrable = 1";
-					$resp_total_cobrable = mysql_query($query_total_cobrable, $sesion->dbh) or Utiles::errorSQL($query_total_cobrable, __FILE__, __LINE__, $sesion->dbh);
-					list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
+					if (!array_key_exists($cobro->fields['id_cobro'], $trabajos_duracion)) {
+						$query_total_cobrable = "SELECT 
+									IF(SUM(TIME_TO_SEC(duracion_cobrada)/3600) <= 0, 1, SUM(TIME_TO_SEC(duracion_cobrada)/3600)) AS duracion_total 
+									FROM trabajo 
+								   WHERE id_cobro = '{$cobro->fields['id_cobro']}' 
+									 AND cobrable = 1";
+						$resp_total_cobrable = mysql_query($query_total_cobrable, $sesion->dbh) or Utiles::errorSQL($query_total_cobrable, __FILE__, __LINE__, $sesion->dbh);
+						list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
+						$trabajos_duracion[$cobro->fields['id_cobro']] = $xtotal_hh_cobrable;
+					} else {
+						$xtotal_hh_cobrable = $trabajos_duracion[$cobro->fields['id_cobro']];
+					}
 
 					if ($xtotal_hh_cobrable > 0) {
 						$factor = $cobro->fields['retainer_horas'] / $xtotal_hh_cobrable;

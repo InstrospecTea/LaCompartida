@@ -10759,37 +10759,65 @@ QUERY;
 				$queries[] = "ALTER TABLE `trabajo_tarifa` ADD COLUMN `valor_estandar` DOUBLE NULL DEFAULT 0 AFTER `valor`";
 			}
 			$queries[] = "UPDATE trabajo_tarifa ttff
-									 JOIN trabajo t
-										 ON ttff.id_moneda = t.id_moneda
-										AND ttff.id_trabajo = t.id_trabajo
-										AND ttff.valor_estandar = 0
-									 JOIN usuario_tarifa tf
-										 ON t.id_usuario = tf.id_usuario
-										AND t.id_moneda = tf.id_moneda
-										AND t.tarifa_hh_estandar = 0
-									 JOIN tarifa ta
-										 ON tf.id_tarifa = ta.id_tarifa
-										AND ta.tarifa_defecto = 1
-										SET ttff.valor_estandar =  tf.tarifa;";
+								   JOIN trabajo t
+								     ON ttff.id_moneda = t.id_moneda
+								    AND ttff.id_trabajo = t.id_trabajo
+								    AND ttff.valor_estandar = 0
+								   JOIN usuario_tarifa tf 
+								     ON t.id_usuario = tf.id_usuario 
+								    AND t.id_moneda = tf.id_moneda 
+								    AND t.tarifa_hh_estandar = 0
+								   JOIN tarifa ta
+								     ON tf.id_tarifa = ta.id_tarifa 
+								    AND ta.tarifa_defecto = 1
+								    SET ttff.valor_estandar =  tf.tarifa;";
 
 			$queries[] = "UPDATE trabajo_tarifa ttff
-								 JOIN trabajo t
-									 ON ttff.id_moneda = t.id_moneda
-									AND ttff.id_trabajo = t.id_trabajo
-									AND ttff.valor_estandar = 0
-								 JOIN usuario u
-									 ON t.id_usuario = u.id_usuario
-								 JOIN categoria_tarifa tf
-									 ON u.id_categoria_usuario  = tf.id_categoria_usuario
-									AND t.id_moneda = tf.id_moneda
-									AND t.tarifa_hh_estandar = 0
-								 JOIN tarifa ta
-									 ON tf.id_tarifa = ta.id_tarifa
-									AND ta.tarifa_defecto = 1
-								 SET ttff.valor_estandar =  tf.tarifa;";
+							   JOIN trabajo t
+							     ON ttff.id_moneda = t.id_moneda
+							    AND ttff.id_trabajo = t.id_trabajo
+							    AND ttff.valor_estandar = 0
+							   JOIN usuario u
+							     ON t.id_usuario = u.id_usuario
+							   JOIN categoria_tarifa tf 
+							     ON u.id_categoria_usuario  = tf.id_categoria_usuario 
+							    AND t.id_moneda = tf.id_moneda 
+							    AND t.tarifa_hh_estandar = 0
+							   JOIN tarifa ta
+							     ON tf.id_tarifa = ta.id_tarifa 
+								  AND ta.tarifa_defecto = 1
+							   SET ttff.valor_estandar =  tf.tarifa;";
 			break;
 
 		case 8.02:
+			if (!ExisteCampo('glosa', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `glosa` VARCHAR(255) NULL AFTER `descripcion`;";
+			}
+
+			if (!ExisteCampo('id_usuario_responsable', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `id_usuario_responsable` INT(11) DEFAULT NULL AFTER `id_documento_legal_motivo`;";
+			}
+			
+			if (!ExisteLlaveForanea('factura_usuario_responsable_fk', 'id_usuario_responsable', 'usuario', 'id_usuario', $dbh)) {
+				$query[] = "ALTER TABLE `factura` ADD CONSTRAINT `factura_usuario_responsable`
+										FOREIGN KEY (`id_usuario_responsable_fk`)
+										REFERENCES `usuario` (`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE";
+			}
+
+			break;
+
+		case 8.03:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarCobrosPorDefecto', '', 'Campos soportados para ordenamiento:<br/> Fecha de Creacion del Cobro => fecha_creacion<br/>Nombre Cliente => nombre_cliente<br/>Numero Cobro => numero_cobro<br/>Encargado Comercial => encargado_comercial', 'string', '6', '-1');";
+
+			break;
+
+		case 8.04:
+			$queries = array();
+			$queries[] = "UPDATE configuracion SET glosa_opcion = 'CodigoClienteAsuntoModificable' WHERE glosa_opcion = 'CodigoObligatorio';";
+			break;
+
+		case 8.05:
 			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_tramite` (
 				`id_contrato_tramite` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				`id_contrato` int(11) NOT NULL,
@@ -10823,7 +10851,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.02;
+$max_update = 8.05;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

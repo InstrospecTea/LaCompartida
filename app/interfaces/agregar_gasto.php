@@ -448,6 +448,16 @@ $Form = new Form;
 	</div>
 
 	<table class="border_plomo" style="background-color: #FFFFFF;" width='96%'>
+	<?php if ($id_gasto) { ?>
+		<tr>
+			<td align="right">
+				<?php echo __('Id. gasto'); ?>
+			</td>
+			<td align="left">
+				<input name="id_gasto_cliente" id="id_gasto_cliente" size="10" disabled="disabled" value="<?php echo $id_gasto ?>" />
+			</td>
+		</tr>
+	<?php } ?>
 		<tr>
 			<td align="right">
 				<?php echo __('Fecha'); ?>

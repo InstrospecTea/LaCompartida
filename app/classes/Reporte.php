@@ -121,9 +121,10 @@ class Reporte {
    * \-- costo_hh: Costo HH para la firma, por concepto de sueldos
    *
    * @param $nombre String tipo de dato a considerar en el reporte
+   * @param $dato_extra Datos extras (usado para determinar si mostrar trabajos sin horas castigadas)
    * @return void sólo asigna los filtros necesarios según tipo de dato
    */
-  public function setTipoDato($nombre) {
+  public function setTipoDato($nombre, $dato_extra) {
     $this->tipo_dato = $nombre;
     switch ($nombre) {
       case "costo":
@@ -135,6 +136,9 @@ class Reporte {
       case "horas_visibles":
       case "horas_castigadas":
         $this->addFiltro('trabajo', 'cobrable', '1');
+        if($dato_extra == 1){
+          $this->filtros_especiales[] = "(duracion - duracion_cobrada) > 0"; //no mostrar trabajos sin horas castigadas
+        }
         break;
 
       case "horas_spot":
@@ -823,7 +827,8 @@ class Reporte {
     $join_por_cobrar .= "usuario_tarifa.id_usuario = trabajo.id_usuario
               AND usuario_tarifa.id_moneda = contrato.id_moneda
               {$join_tarifa}
-            LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
+            LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = " . 
+                (($this->tipo_dato == 'valor_trabajado_estandar') ? 'trabajo' : 'contrato') . ".id_moneda
             LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
 
     $add_jpc = in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'));

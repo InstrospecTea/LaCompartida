@@ -287,6 +287,10 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
 	}
 
+	if ($forma_cobro) {
+		$where .= " AND IFNULL(cobro.forma_cobro, contrato.forma_cobro) = '$forma_cobro' ";
+	}
+
 	// Filtro para Actividades si están activos
 	if (Conf::GetConf($sesion, 'UsoActividades') && !empty($codigo_actividad)) {
 		$where .= " AND actividad.codigo_actividad = '$codigo_actividad'";
@@ -677,7 +681,21 @@ $pagina->PrintTop($popup);
 							?>
 					</td>
 				</tr>
-				<?php
+
+				<tr>
+					<td class="buscadorlabel">
+						<?php echo __('Forma de Tarificación') ?>
+					</td>
+					<td valign="top" class="texto" align="left">
+						<?php
+							$FormaCobro = new PrmFormaCobro($sesion);
+							$FormHelper = new Form();
+							$formas_cobro = $FormaCobro->Listar();
+							echo $FormHelper->select('forma_cobro', $formas_cobro, $forma_cobro, array('empty' => __('Cualquiera')));
+							?>
+					</td>
+				</tr>
+			<?php
 
 			}
 			// Validando fecha
@@ -928,8 +946,13 @@ function funcionTR(& $trabajo) {
 		} else {
 			$id_moneda_trabajo = $trabajo->fields['id_moneda_contrato'];
 		}
-
-		$tarifa = number_format($t->GetTrabajoTarifa($id_moneda_trabajo, $trabajo->fields['id_trabajo']), $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$chargingBusiness = new ChargingBusiness($sesion);
+		$tarifa = number_format(
+			$chargingBusiness->getWorkFee($trabajo->fields['id_trabajo'], $id_moneda_trabajo)->get('valor'),
+			$moneda_cobro->fields['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']
+		);
 	} else if ($trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0) {
 		$tarifa = number_format($trabajo->fields['tarifa_hh'], $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 	} else if ($trabajo->fields['id_tramite_tipo'] == 0) {

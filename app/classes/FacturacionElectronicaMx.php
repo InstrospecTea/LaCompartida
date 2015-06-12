@@ -338,7 +338,7 @@ EOF;
 		if ($Factura->fields['subtotal'] > 0) {
 			$r['CON_honorarios'] = array(
 				'cantidad|1.00',
-				'unidad|un',
+				'unidad|N/A',
 				'descripcion|' . ($Factura->fields['descripcion']),
 				'valorUnitario|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 				'importe|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
@@ -349,7 +349,7 @@ EOF;
 		if ($Factura->fields['subtotal_gastos'] > 0) {
 			$r['CON_gastos_con_iva'] = array(
 				'cantidad|1.00',
-				'unidad|un',
+				'unidad|N/A',
 				'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos']),
 				'valorUnitario|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
 				'importe|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
@@ -360,7 +360,7 @@ EOF;
 		if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
 			$r['CON_gastos_sin_iva'] = array(
 				'cantidad|1.00',
-				'unidad|un',
+				'unidad|N/A',
 				'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
 				'valorUnitario|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
 				'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),

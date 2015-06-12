@@ -1,5 +1,125 @@
 # Changelog
 
+## Hotfix 15.12.2
+Thursday 2015, June 11th.
+* **Fix:** [Corregir asignación codigo_asunto](https://github.com/LemontechSA/ttb/pull/1023)
+
+## Hotfix 15.12.1
+Wednesday 2015, June 10th.
+* **Fix:** [Corregir constructor de clase PaginaCobro](https://github.com/LemontechSA/ttb/pull/1022)
+
+## [Release 15.12.0](https://github.com/LemontechSA/ttb/pull/1021)
+Tuesday 2015, June 9th.
+* **Feature:** [Modificar código Cliente - Asunto](https://github.com/LemontechSA/ttb/issues/1017)
+* **Feature:** [Expiración de sesión y peticiones ajax](https://github.com/LemontechSA/ttb/issues/1013)
+* **Feature:** [Reporte General: Horas castigadas](https://github.com/LemontechSA/ttb/issues/1008)
+
+## Hotfix 15.11.5
+Tuesday 2015, June 8th.
+* **Fix:** [Fixes codigo_cliente_secundario emptyness and triggered matters creation](https://github.com/LemontechSA/ttb/pull/1018)
+
+## Hotfix 15.11.3
+Friday 2015, June 5nd.
+* **Fix:** [Ajustar el tamaño del pop - up ](https://github.com/LemontechSA/ttb/pull/1015)
+
+## Hotfix 15.11.2
+Friday 2015, June 5nd.
+* **Fix:** [Ocultar N° de factura cuando no tenga el módulo de facturación activo](https://github.com/LemontechSA/ttb/pull/1014)
+
+## Hotfix 15.11.1
+Friday 2015, June 5nd.
+* **Fix:** [Remove actividades_obligatorias](https://github.com/LemontechSA/ttb/pull/1011)
+
+## [Release 15.11.0](https://github.com/LemontechSA/ttb/pull/1010)
+Thursday 2015, May 27th.
+* **Feature:** [Guarda glosa y encargado comercial de factura](https://github.com/LemontechSA/ttb/issues/1001)
+* **Feature:** [Configuracion para ordenar cobros](https://github.com/LemontechSA/ttb/issues/985)
+* **Feature:** [Lentitud reporte factura](https://github.com/LemontechSA/ttb/issues/968)
+
+## Hotfix 15.10.22
+Thursday 2015, June 4nd.
+* **Fix:** [Apply fallback to show fees when there is not work_fee data.](https://github.com/LemontechSA/ttb/pull/1004)
+
+## Hotfix 15.10.21
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong use of abs() when displaying values on invoice module.](https://github.com/LemontechSA/ttb/pull/1006)
+
+## Hotfix 15.10.20
+Thursday 2015, June 4nd.
+* **Fix:** [Fix wrong Conf call to CodigoObligatorio for perezdearce](https://github.com/LemontechSA/ttb/pull/1005)
+
+## Hotfix 15.10.19
+Wednesday 2015, June 3nd.
+* **Fix:** [Fix with work fee when work fee does not exists.](https://github.com/LemontechSA/ttb/pull/1003)
+
+## Hotfix 15.10.18
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix typo en eliminación datos demo](https://github.com/LemontechSA/ttb/pull/1002)
+
+## Hotfix 15.10.17
+Tuesday 2015, June 2nd.
+* **Fix:** [Idioma inglés en facturas.](https://github.com/LemontechSA/ttb/pull/996)
+
+## Hotfix 15.10.16
+Tuesday 2015, June 2nd.
+* **Fix:** [Fix monto real factura considerando NC en periodo](https://github.com/LemontechSA/ttb/pull/992)
+
+## Hotfix 15.10.15
+Tuesday 2015, June 2nd.
+* **Fix:** [Optimización queries repetidas cobros_xls](https://github.com/LemontechSA/ttb/pull/999)
+
+## Hotfix 15.10.14
+Tuesday 2015, June 2nd.
+* **Fix:** [Se cambia unidad de medida 'un' por 'N/A' (no aplica), en Facturacion Mexico](https://github.com/LemontechSA/ttb/pull/998)
+
+## Hotfix 15.10.13
+Tuesday 2015, June 2nd.
+* **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/997)
+
+## Hotfix 15.10.12
+Friday 2015, May 29th.
+* **Fix:** [Change hour register delay report date comparation to be equal instead of strict.](https://github.com/LemontechSA/ttb/pull/991)
+
+## Hotfix 15.10.11
+Friday 2015, May 29th.
+* **Fix:** [Ordenar alfabeticamente los clientes en excel borradores](https://github.com/LemontechSA/ttb/pull/994)
+
+## Hotfix 15.10.10
+Friday 2015, May 29th.
+* **Fix:** [Add currency selector to financial report](https://github.com/LemontechSA/ttb/pull/993)
+
+## Hotfix 15.10.9
+Friday 2015, May 29th.
+* **Fix:** [Avoid edit manually the matter code](https://github.com/LemontechSA/ttb/pull/990)
+
+## Hotfix 15.10.8
+Friday 2015, May 29th.
+* **Fix:** [add type of charge in filters of time entries review](https://github.com/LemontechSA/ttb/pull/988)
+
+## Hotfix 15.10.7
+Thursday 2015, May 28th.
+* **Fix:** [Add proportionality selector to financial report](https://github.com/LemontechSA/ttb/pull/986)
+
+## Hotfix 15.10.6
+Thursday 2015, May 28th.
+* **Fix:** [Change task module config definitions](https://github.com/LemontechSA/ttb/pull/984)
+
+## Hotfix 15.10.5
+Thursday 2015, May 28th.
+* **Fix:** [Use right id_moneda for valor_trabajado_estandar](https://github.com/LemontechSA/ttb/pull/983)
+
+## Hotfix 15.10.4
+Thursday 2015, May 28th.
+* **Feature:** [Add field id_gasto in edit/gasto view](https://github.com/LemontechSA/ttb/pull/982)
+
+## Hotfix 15.10.3
+Thursday 2015, May 28th.
+* **Fix:** [Show an alert when exists time entries without fee in a charge and GuardarTarifaAlIngresoDeHora conf is activated](https://github.com/LemontechSA/ttb/pull/980)
+
+## Hotfix 15.10.2
+Thursday 2015, May 28th.
+* **Fix:** [Fix ajax call of contract data](https://github.com/LemontechSA/ttb/pull/979)
+
 ## Hotfix 15.10.1
 Thursday 2015, May 28th.
 * **Fix:** [Remove sorteable feature to opcion column](https://github.com/LemontechSA/ttb/pull/975)

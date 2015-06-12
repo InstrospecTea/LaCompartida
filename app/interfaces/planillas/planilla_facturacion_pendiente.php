@@ -1,8 +1,9 @@
 <?php
-$tini = time();
-$fechactual = date('Ymd');
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
+
+$tini = time();
+$fechactual = date('Ymd');
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
@@ -297,7 +298,7 @@ if ($xls) {
 		$ws1->write($filas, $col_fecha_corte, __('Fecha Corte'), $formato_titulo);
 	}
 
-	$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
+	$ws1->write($filas, $col_forma_cobro, __('Forma Tarificación'), $formato_titulo);
 	if ($desglosar_moneda) {
 		foreach ($arreglo_monedas as $id_moneda => $moneda) {
 			$ws1->write($filas, $col_valor_estimado_{$id_moneda}, __('Valor estimado') . ' ' . __($moneda['glosa_moneda']), $formato_titulo);

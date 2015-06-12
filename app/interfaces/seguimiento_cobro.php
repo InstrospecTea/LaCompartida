@@ -46,7 +46,7 @@ if ($opc == 'buscar') {
 
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
+	} else if (!empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		$factura_obj = new Factura($sesion);
@@ -104,7 +104,7 @@ if ($opc == 'buscar') {
 	if (!empty($tipo_liquidacion) && $tipo_liquidacion != '') {
 		$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " . " AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
 	}
-
+ 
 	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
@@ -144,6 +144,7 @@ if ($opc == 'buscar') {
 				cobro.impuesto_gastos,
 				cobro.fecha_ini,
 				cobro.fecha_fin,
+				cobro.fecha_creacion,
 				moneda.simbolo,
 				cobro.id_proceso,
 				cobro.codigo_idioma,
@@ -157,6 +158,7 @@ if ($opc == 'buscar') {
 				contrato.id_contrato,
 				contrato.codigo_cliente,
 				cliente.glosa_cliente,
+				usuario.apellido1,
 				contrato.forma_cobro,
 				contrato.monto,
 				contrato.retainer_horas,
@@ -193,6 +195,7 @@ if ($opc == 'buscar') {
 				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
 			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+			 	LEFT JOIN usuario ON cobro.id_usuario_responsable = usuario.id_usuario
 				LEFT JOIN grupo_cliente ON grupo_cliente.codigo_cliente = contrato.codigo_cliente
 				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
 				LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
@@ -209,9 +212,13 @@ if ($opc == 'buscar') {
                     WHERE $where
 						GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
-	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
+
+	if(empty($orden)) {
+		$orden = $cobros->OrdenResultados();
+	}
 
 	if ($print) {
+		$query .= " ORDER BY $orden";
 		$cobros_stmt = $sesion->pdodbh->query($query);
 		$cobros_result = $cobros_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -304,7 +311,6 @@ if ($opc == 'buscar') {
 								<b>Nº Factura</b>
 							</td>";
 			}
-
 			$ht .= "<td style='font-size:10px; width: 52px;' align=center>
 								<b>Opción</b>
 							</td></tr>";
@@ -381,7 +387,6 @@ if ($opc == 'buscar') {
 		$html .= "</td>";
 
 		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
-
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
 				$html.= "#" . $cobro->fields['documento'];
@@ -471,6 +476,7 @@ $pagina->PrintTop();
 		} else {
 			form.action = 'seguimiento_cobro.php';
 			form.opc.value = 'buscar';
+			form.orden.value = '';
 			form.desde.value = '';
 			form.submit();
 		}
@@ -674,14 +680,14 @@ $pagina->PrintTop();
 				<td colspan="2" align="left">
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
+					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 						&nbsp;&nbsp;<b><?php echo __('Nº Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
 					 <?php } ?>
 				</td>
 			</tr>
 
-			<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+			<?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 				<tr>
 					<td align="right" width='30%'>
 						<b><?php echo __('Documento legal') ?></b>
