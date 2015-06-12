@@ -107,7 +107,7 @@ after "deploy:update_code", "composer:setup"
 
 def ask_option(options)
   puts "=" * 40
-  puts " Choose a option"
+  puts " Choose an option"
   puts "-" * 40
   options.each_with_index do |el, index|
     index = (index+1).to_s.rjust(2)
