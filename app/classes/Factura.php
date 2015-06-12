@@ -1568,9 +1568,11 @@ class Factura extends Objeto {
 					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
 					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
 					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
-					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' .__('CON') . ' ' .$monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
+					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
+					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '0' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
 				} else {
 					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+					$monto_total_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
 				}
 
 				if ($mostrar_honorarios) {
@@ -1578,11 +1580,13 @@ class Factura extends Objeto {
 				} else {
 					$html2 = str_replace('%simbolo_honorarios%', '', $html2);
 				}
+
 				$html2 = str_replace('%simbolo%', $simbolo, $html2);
 				$html2 = str_replace('%subtotal%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_impuesto_sin_gastos%', number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_bruto_sin_gastos%', number_format($total, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%monto_total_palabra%', $monto_total_palabra, $html2);
+				$html2 = str_replace('%monto_total_palabra_cero_cien%', $monto_total_palabra_cero_cien, $html2);
 
 
 				/* SEGMENTO DE CODIGO
