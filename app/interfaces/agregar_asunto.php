@@ -347,6 +347,28 @@ if ($opcion == 'guardar') {
 			EnviarEmail($Asunto);
 		}
 	}
+
+	$errors = $Pagina->GetErrors();
+	if (empty($errors)) {
+		$NuevoCliente = new Cliente($Sesion);
+		if ($nuevo_codigo_cliente_secundario != '') {
+			$NuevoCliente->LoadByCodigoSecundario($nuevo_codigo_cliente_secundario);
+			$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
+		} else {
+			$NuevoCliente = new Cliente($Sesion);
+			$NuevoCliente->LoadByCodigo($nuevo_codigo_cliente);
+		}
+		$response = $Asunto->CambiaCliente($NuevoCliente);
+		if (!empty($response['errors'])) {
+			$Pagina->AddError($response['errors']);
+		} else {
+			if (!empty($response['Client'])) {
+				$NuevoCliente = $response['Client'];
+				$Cliente = $response['Client'];
+				$Pagina->AddInfo("El asunto fue asociado al cliente: <b>{$Cliente->fields['glosa_cliente']}</b>");
+			}
+		}
+	}
 }
 
 $id_idioma_default = $contrato->IdIdiomaPorDefecto($Sesion);
