@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.6
+Monday 2015, June 15th.
+* **Feature:** [Agrega lenguaje ingles PRC](https://github.com/LemontechSA/ttb/pull/1030)
+
 ## Hotfix 15.12.5
 Friday 2015, June 12th.
 * **Fix:** [Corrección sección Biblioteca](https://github.com/LemontechSA/ttb/pull/1029)
