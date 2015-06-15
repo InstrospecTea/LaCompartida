@@ -44,8 +44,8 @@
 	// Definición de columnas
 	$col_codigo_carpeta = 0;
 	$col_codigo_asunto = 1;
-	$col_asunto = 2;
-	$col_nombre = 3;
+	$col_nombre = 2;
+	$col_asunto = 3;
 	$col_contenido = 4;
 	$col_tipo = 5;
 	$col_ubicacion = 6;
@@ -60,8 +60,8 @@
 	// Setear el ancho de las columnas
 	$ws->setColumn($col_codigo_carpeta, $col_codigo_carpeta, 8);
 	$ws->setColumn($col_codigo_asunto, $col_codigo_asunto, 15);
-	$ws->setColumn($col_asunto, $col_asunto, 30);
 	$ws->setColumn($col_nombre, $col_nombre, 30);
+	$ws->setColumn($col_asunto, $col_asunto, 30);
 	$ws->setColumn($col_contenido, $col_contenido, 30);
 	$ws->setColumn($col_tipo, $col_tipo, 17);
 	$ws->setColumn($col_ubicacion, $col_ubicacion, 18);
@@ -76,8 +76,8 @@
 
 	$ws->write($fila_inicial, $col_codigo_carpeta, __('No.'), $tit);
 	$ws->write($fila_inicial, $col_codigo_asunto, __('Código'), $tit);
+	$ws->write($fila_inicial, $col_nombre, __('Cliente'), $tit);
 	$ws->write($fila_inicial, $col_asunto, __('Asunto'), $tit);
-	$ws->write($fila_inicial, $col_nombre, __('Nombre'), $tit);
 	$ws->write($fila_inicial, $col_contenido, __('Contenido'), $tit);
 	$ws->write($fila_inicial, $col_tipo, __('Tipo'), $tit);
 	$ws->write($fila_inicial, $col_ubicacion, __('Ubicación'), $tit);
@@ -94,19 +94,19 @@
 	{
 		$carpeta = $lista->Get($i);
 
-		$ws->write($fila_inicial + $i, $col_codigo_carpeta, $carpeta->fields[codigo_carpeta], $tex);
-		$ws->write($fila_inicial + $i, $col_codigo_asunto, $carpeta->fields[codigo_asunto_secundario], $tex);
-		$ws->write($fila_inicial + $i, $col_asunto, $carpeta->fields[glosa_asunto], $tex);
-		$ws->write($fila_inicial + $i, $col_nombre, $carpeta->fields[nombre_carpeta], $tex);
-		$ws->write($fila_inicial + $i, $col_contenido, $carpeta->fields[glosa_carpeta], $tex);
-		$ws->write($fila_inicial + $i, $col_tipo, $carpeta->fields[glosa_tipo_carpeta], $tex);
-		$ws->write($fila_inicial + $i, $col_ubicacion, $carpeta->fields[glosa_bodega], $tex);
-		$ws->write($fila_inicial + $i, $col_estado, $carpeta->fields[glosa_tipo_movimiento_carpeta], $tex);
-		$ws->write($fila_inicial + $i, $col_usuario_mantenedor, $carpeta->fields[username], $tex);
-		$ws->write($fila_inicial + $i, $col_usuario_modificacion, $carpeta->fields[usuario_modificacion], $tex);
-		$ws->write($fila_inicial + $i, $col_fecha_modificacion, Utiles::sql2date($carpeta->fields[fecha_modificacion]), $tex);
-		$ws->write($fila_inicial + $i, $col_fecha_creacion, Utiles::sql2date($carpeta->fields[fecha_creacion]), $tex);
-		$ws->write($fila_inicial + $i, $col_usuario_creacion, $carpeta->fields[usuario_creacion], $tex);
+		$ws->write($fila_inicial + $i, $col_codigo_carpeta, $carpeta->fields["codigo_carpeta"], $tex);
+		$ws->write($fila_inicial + $i, $col_codigo_asunto, $carpeta->fields["codigo_asunto_secundario"], $tex);
+		$ws->write($fila_inicial + $i, $col_nombre, $carpeta->fields["glosa_cliente"], $tex);
+		$ws->write($fila_inicial + $i, $col_asunto, $carpeta->fields["glosa_asunto"], $tex);
+		$ws->write($fila_inicial + $i, $col_contenido, $carpeta->fields["glosa_carpeta"], $tex);
+		$ws->write($fila_inicial + $i, $col_tipo, $carpeta->fields["glosa_tipo_carpeta"], $tex);
+		$ws->write($fila_inicial + $i, $col_ubicacion, $carpeta->fields["glosa_bodega"], $tex);
+		$ws->write($fila_inicial + $i, $col_estado, $carpeta->fields["glosa_tipo_movimiento_carpeta"], $tex);
+		$ws->write($fila_inicial + $i, $col_usuario_mantenedor, $carpeta->fields["username"], $tex);
+		$ws->write($fila_inicial + $i, $col_usuario_modificacion, $carpeta->fields["usuario_modificacion"], $tex);
+		$ws->write($fila_inicial + $i, $col_fecha_modificacion, Utiles::sql2date($carpeta->fields["fecha_modificacion"]), $tex);
+		$ws->write($fila_inicial + $i, $col_fecha_creacion, Utiles::sql2date($carpeta->fields["fecha_creacion"]), $tex);
+		$ws->write($fila_inicial + $i, $col_usuario_creacion, $carpeta->fields["usuario_creacion"], $tex);
 	}
 	$wb->close();
 	exit;

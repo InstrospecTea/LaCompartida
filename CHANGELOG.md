@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 15.12.5
+Friday 2015, June 12th.
+* **Fix:** [Corrección sección Biblioteca](https://github.com/LemontechSA/ttb/pull/1029)
+
+## Hotfix 15.12.4
+Friday 2015, June 12th.
+* **Fix:** [Agregar tag %monto_total_palabra_cero_cien% a factura.doc](https://github.com/LemontechSA/ttb/pull/1027)
+
+## Hotfix 15.12.3
+Friday 2015, June 12th.
+* **Fix:** [Corregir asignación de monto en palabra de Factura en PDF y DOC](https://github.com/LemontechSA/ttb/pull/1024)
+
 ## Hotfix 15.12.2
 Thursday 2015, June 11th.
 * **Fix:** [Corregir asignación codigo_asunto](https://github.com/LemontechSA/ttb/pull/1023)
