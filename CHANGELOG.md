@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.7
+Monday 2015, June 15th.
+* **Feature:** [Arregla el historial de trabajos cuando el selector de asuntos es autocompletador](https://github.com/LemontechSA/ttb/pull/1031)
+
 ## Hotfix 15.12.6
 Monday 2015, June 15th.
 * **Feature:** [Agrega lenguaje ingles PRC](https://github.com/LemontechSA/ttb/pull/1030)
