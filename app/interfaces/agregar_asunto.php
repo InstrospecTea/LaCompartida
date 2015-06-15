@@ -358,14 +358,16 @@ if ($opcion == 'guardar') {
 			$NuevoCliente = new Cliente($Sesion);
 			$NuevoCliente->LoadByCodigo($nuevo_codigo_cliente);
 		}
-		$response = $Asunto->CambiaCliente($NuevoCliente);
-		if (!empty($response['errors'])) {
-			$Pagina->AddError($response['errors']);
-		} else {
-			if (!empty($response['Client'])) {
-				$NuevoCliente = $response['Client'];
-				$Cliente = $response['Client'];
-				$Pagina->AddInfo("El asunto fue asociado al cliente: <b>{$Cliente->fields['glosa_cliente']}</b>");
+		if ($NuevoCliente->Loaded()) {
+			$response = $Asunto->CambiaCliente($NuevoCliente);
+			if (!empty($response['errors'])) {
+				$Pagina->AddError($response['errors']);
+			} else {
+				if (!empty($response['Client'])) {
+					$NuevoCliente = $response['Client'];
+					$Cliente = $response['Client'];
+					$Pagina->AddInfo("El asunto fue asociado al cliente: <b>{$Cliente->fields['glosa_cliente']}</b>");
+				}
 			}
 		}
 	}
@@ -681,12 +683,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																	echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
 																	echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
 																}
-																?>
+
+																if ($Asunto->Loaded()) {
+ 																?>
 																<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
 																<span style="color:#FF0000; font-size:10px">*</span>
 																<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
 																<?php echo $input_cliente; ?>
 																</div>
+																<?php 
+																}
+																?>
 														</td>
 												</tr>
 
