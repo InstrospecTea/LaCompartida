@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.5
+Friday 2015, June 12th.
+* **Fix:** [Corrección sección Biblioteca](https://github.com/LemontechSA/ttb/pull/1029)
+
 ## Hotfix 15.12.4
 Friday 2015, June 12th.
 * **Fix:** [Agregar tag %monto_total_palabra_cero_cien% a factura.doc](https://github.com/LemontechSA/ttb/pull/1027)
