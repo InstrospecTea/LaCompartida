@@ -15,7 +15,6 @@ if ($lang == '') {
 	$Cobro->Load($factura->fields['id_cobro']);
 	$lang = !empty($Cobro->fields['codigo_idioma']) ? $Cobro->fields['codigo_idioma'] : 'es';
 	unset($Cobro);
-	var_dump($lang); exit;
 }
 
 if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . '.php')) {
