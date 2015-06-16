@@ -743,6 +743,7 @@ $pagina->PrintTop($popup);
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
 				var response = http.responseText;
+				response = decodeURIComponent(escape(response));
 				data.innerHTML = response;
 			}
 		};
