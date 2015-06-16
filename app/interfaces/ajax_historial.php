@@ -38,12 +38,10 @@ if ($accion == "lista_clientes") {
 			continue;
 		}
 
-		echo utf8_encode(
-			'<a href=\'javascript:void(0)\' onclick=\'Lista("lista_asuntos","'
+		echo '<a href=\'javascript:void(0)\' onclick=\'Lista("lista_asuntos","'
 			. $div_posterior . '","'
 			. $codigo_cliente . '")\' class="mano_on">'
-			. $glosa_cliente . '<br>'
-		);
+			. $glosa_cliente . '</a><br>';
 	}
 }
 if ($accion == "lista_asuntos") {
@@ -73,14 +71,12 @@ if ($accion == "lista_asuntos") {
 		$tooltip = '<b>' . __('Asunto') . '</b><br>' . nl2br($glosa_asunto);
 		$glosa = $codigo_asunto != '' ? substr($glosa_asunto, 0, 20) : '<b>' . substr($glosa_asunto, 0, 20) . ' (' . __('Nuevo') . ')</b>';
 		$bg_color = $codigo_asunto == '' ? 'style="background-color:#BAF3A7"' : '';
-		echo utf8_encode(
-			'<a href=\'javascript:void(0)\' onMouseover=\'ddrivetip("'
+		echo '<a href=\'javascript:void(0)\' onMouseover=\'ddrivetip("'
 			. $tooltip . '")\' onMouseout=\'hideddrivetip()\' onclick=\'Lista("lista_trabajos","'
 			. $div_posterior . '","'
 			. $codigo_asunto . '")\' ondblclick="ShowDiv(\'tr_cliente\',\'none\',\'img_historial\');hideddrivetip();" class="mano_on" '
 			. $bg_color . '>'
-			. $glosa . '<br>'
-		);
+			. $glosa . '</a><br>';
 	}
 }
 if ($accion == "lista_trabajos") {
@@ -116,8 +112,7 @@ if ($accion == "lista_trabajos") {
 			$duracion_cobrada = UtilesApp::Time2Decimal($duracion_cobrada);
 		}
 
-		echo utf8_encode(
-			'<a href=\'javascript:void(0)\' onMouseover=\'ddrivetip("'
+		echo '<a href=\'javascript:void(0)\' onMouseover=\'ddrivetip("'
 			. $tooltip . '")\' onMouseout=\'hideddrivetip()\' onclick=\'UpdateTrabajo("'
 			. $id_trabajo . '","'
 			. $descripcion . '","'
@@ -128,8 +123,7 @@ if ($accion == "lista_trabajos") {
 			. $visible . '","'
 			. $fecha . '")\' class="mano_on">'
 			. substr($descripcion, 0, $top)
-			. '<br>'
-		);
+			. '</a><br>';
 	}
 }
 ?>
