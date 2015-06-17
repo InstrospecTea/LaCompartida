@@ -72,11 +72,11 @@ class FacturaPdfDatos extends Objeto {
 
 		list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
 
-		$glosa_moneda_cero_cien = " 00/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
-		$glosa_moneda_plural_cero_cien = " 00/100 ".$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
+		$glosa_moneda_cero_cien = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda']);
+		$glosa_moneda_plural_cero_cien = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']);
 
-		$glosa_moneda = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'];
-		$glosa_moneda_plural = $arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'];
+		$glosa_moneda = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda']);
+		$glosa_moneda_plural = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']);
 
 		if (strlen($monto_parte_decimal) == '2') {
 			$fix_decimal = '1';
@@ -85,11 +85,11 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		if (empty($monto_parte_decimal)) {
-			$monto_en_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'], $glosa_moneda_cero_cien, $glosa_moneda_plural_cero_cien), 'ISO-8859-1');
+			$monto_en_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'], $glosa_moneda_cero_cien, $glosa_moneda_plural_cero_cien, true), 'ISO-8859-1');
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, 'es'));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
 		} else {
-			$monto_en_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($monto_total_factura, $factura->fields['id_moneda'], $glosa_moneda, $glosa_moneda_plural), 'ISO-8859-1');
+			$monto_en_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($monto_total_factura, $factura->fields['id_moneda'], $glosa_moneda, $glosa_moneda_plural, true), 'ISO-8859-1');
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, 'es'));
 			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, 'es'));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1') . ' CON ' . $monto_palabra_parte_decimal . ' CENTAVOS';
@@ -210,8 +210,8 @@ class FacturaPdfDatos extends Objeto {
 					$monto_palabra->ValorEnLetras(
 						$factura->fields['total'],
 						$factura->fields['id_moneda'],
-						$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],
-						$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']
+						__($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda']),
+						__($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])
 					)
 				),
 			'monto_total_palabra' => $monto_total_palabra_fix,

@@ -183,18 +183,17 @@
 
 	function descargarPlanilla(form)
 	{
-		alert('hola')
-		var xopcion = form.opcion.value
-		var xcodigo_carpeta = form.codigo_carpeta.value
-		var xid_carpeta = form.id_carpeta.value
+		var xopcion = form.opcion.value;
+		var xcodigo_carpeta = form.codigo_carpeta.value;
+		var xid_carpeta = form.id_carpeta.value;
 		//var xnombre_carpeta = form.nombre_carpeta.value
 		//var xcodigo_cliente_secundario = form.codigo_cliente_secundario.value
-		var xglosa_carpeta = form.glosa_carpeta.value
+		var xglosa_carpeta = form.glosa_carpeta.value;
 		//var xcodigo_asunto_secundario = form.codigo_asunto_secundario.value
-		var xid_bodega = form.id_bodega.value
-		var xid_tipo_carpeta = form.id_tipo_carpeta.value
-		var xid_tipo_movimiento_carpeta = form.id_tipo_movimiento_carpeta.value
-		var xid_usuario_ultimo_movimiento = form.id_usuario_ultimo_movimiento.value
+		var xid_bodega = form.id_bodega.value;
+		var xid_tipo_carpeta = form.id_tipo_carpeta.value;
+		var xid_tipo_movimiento_carpeta = form.id_tipo_movimiento_carpeta.value;
+		var xid_usuario_ultimo_movimiento = form.id_usuario_ultimo_movimiento.value;
 		window.open('carpeta.php?excel=1&xopcion=opcion&codigo_carpeta='+xcodigo_carpeta
 														+'&id_carpeta='+xid_carpeta
 														//+'&nombre_carpeta='+xnombre_carpeta
