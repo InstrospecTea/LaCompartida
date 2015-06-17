@@ -1,5 +1,6 @@
 require 'capistrano_colors'
 require 'aws'
+require 'colorize'
 
 set :notify_emails, ["implementacion@lemontech.cl"]
 
@@ -102,3 +103,19 @@ def update_symlinks(cap_vars)
 end
 
 after "deploy:update_code", "composer:setup"
+
+
+def ask_option(options)
+  puts "=" * 40
+  puts " Choose an option"
+  puts "-" * 40
+  options.each_with_index do |el, index|
+    index = (index+1).to_s.rjust(2)
+    puts " [ #{index} ]".blue + " #{el}".green
+  end
+  puts "=" * 40
+
+  id = Capistrano::CLI.ui.ask(" > Which?: ".green ).to_i until (1..(options.length)).cover?( id )
+
+  options[ id - 1 ]
+end
