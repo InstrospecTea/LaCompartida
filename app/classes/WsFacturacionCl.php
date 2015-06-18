@@ -73,7 +73,6 @@ class WsFacturacionCl extends WsFacturacion {
 					'TpoCodigo' => $this->tipoCodigo,
 					'VlrCodigo' => $this->ValorCodigo
 				),
-				// 'NmbItem' => $descripcion1,
 				'DscItem' => $detalle['descripcion'],
 				'QtyItem' => $detalle['cantidad'],
 				'PrcItem' => $detalle['precio_unitario'],
@@ -251,14 +250,14 @@ class WsFacturacionCl extends WsFacturacion {
 					self::array_to_xml($value, $xml);
 				}
 			} else {
-				$child = $xml->addChild("$key"); 
+				$child = $xml->addChild("$key");
 				$node = dom_import_simplexml($child);
 				$no   = $node->ownerDocument;
 				$node->appendChild($no->createCDATASection("$value"));
 			}
 		}
 	}
-	
+
 	private static function crearXML($data) {
 		$xml = new SimpleXMLElement('<DTE/>');
 		$node = $xml->addChild('Documento');
