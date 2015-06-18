@@ -720,6 +720,7 @@ if (!class_exists('Cobro')) {
 			try {
 				$chargingBusiness->delete($id_cobro);
 			} catch (Exception $e) {
+				$this->error = $e->getMessage();
 				return false;
 			}
 

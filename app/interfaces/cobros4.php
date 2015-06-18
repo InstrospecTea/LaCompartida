@@ -308,7 +308,7 @@ $b->AgregarEncabezado("glosa_asunto", __('Asunto'), "align=center");
 $b->AgregarEncabezado("descripcion", __('Descripción'));
 $b->AgregarEncabezado("egreso", __('Egreso'), "align=center");
 $b->AgregarEncabezado("ingreso", __('Ingreso'), "align=center");
-$b->AgregarEncabezado("cobrable", __('Cobrable'), "align=center");
+$b->AgregarFuncion("cobrable", __('Cobrable'), "align=center");
 $b->funcionTR = "funcionTR";
 $b->Imprimir();
 
