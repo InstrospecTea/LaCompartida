@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.12.9
+Thursday 2015, June 18th.
+* **Fix:** [Corrige la descripción de la factura enviada a Facturacion.cl](https://github.com/LemontechSA/ttb/pull/1033)
+* **Fix:** [Corrige archivo LEDES para FLAT FEE](https://github.com/LemontechSA/ttb/pull/1033)
+
 ## Hotfix 15.12.8
 Wednesday 2015, June 17th.
 * **Fix:** [Corregir mensaje y validaciones al eliminar un cobro desde el listado](https://github.com/LemontechSA/ttb/pull/1032)
