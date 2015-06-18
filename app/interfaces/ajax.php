@@ -366,16 +366,23 @@ if ($accion == "consistencia_cliente_asunto") {
 } else if ($accion == 'elimina_cobro') {
 	$respuesta = array(
 		'error' => false,
-		'message' => __('Cobro eliminado con éxito') . '.'
+		'message' => __('Cobro') . " #{$id_cobro} eliminado con éxito"
 	);
+
 	$cobro_eliminado = new Cobro($sesion);
+
 	try {
-		$cobro_eliminado->Eliminar($id_cobro);
+		if (!$cobro_eliminado->Eliminar($id_cobro)) {
+			$respuesta['error'] = true;
+			$respuesta['message'] = __($cobro_eliminado->error);
+		}
 	} catch (Exception $e) {
 		$respuesta['error'] = true;
 		$respuesta['message'] = $e->getMessage() . '.';
 	}
+
 	$respuesta['message'] = utf8_encode($respuesta['message']);
+
 	echo json_encode($respuesta);
 
 } else if ($accion == 'update_contrato') {
@@ -442,13 +449,13 @@ if ($accion == "consistencia_cliente_asunto") {
 											contrato.factura_telefono,
 											contrato.glosa_contrato
 										FROM contrato
-											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente WHERE 1 "; 
+											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente WHERE 1 ";
 
 	if (!empty($codigo_cliente)) {
 		$codigo_cliente_key = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$query_contrato .= " AND cliente.{$codigo_cliente_key} = '{$codigo_cliente}'";
 	}
-	
+
 	if (!empty($id_contrato)) {
 		$query_contrato .= " AND contrato.id_contrato = {$id_contrato}";
 	}

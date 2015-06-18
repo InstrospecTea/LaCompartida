@@ -27,9 +27,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$this->loadModel('Documento');
 		$this->Documento->LoadByCobro($id_cobro);
-		$lista_pagos = $this->Documento->ListaPagos();
-		if (!empty($lista_pagos)) {
-			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar porque tiene pago(s) asociados(s).'));
+
+		if ($this->Documento->Loaded()) {
+			$lista_pagos = $this->Documento->ListaPagos();
+			if (!empty($lista_pagos)) {
+				throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar porque tiene pago(s) asociados(s).'));
+			}
 		}
 
 		$query = "SELECT count(*) total FROM factura WHERE id_cobro = '{$id_cobro}'";
