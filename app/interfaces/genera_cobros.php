@@ -184,8 +184,7 @@ if ($opc == 'buscar') {
 									if (deleting.error) {
 										alert(deleting.message);
 									} else {
-										var div = jQuery('<div/>').addClass('alert alert-danger alert-thin').html(deleting.message);
-										jQuery('#cobros_' + i).html(div);
+										jQuery('#tr_cobro_' + id).html('').append(jQuery('<td/>').attr('colspan', 4).append(jQuery('<div/>').addClass('alert alert-danger alert-thin').html(deleting.message)));
 									}
 								}, 'json');
 								jQuery(this).dialog("close");
@@ -1202,7 +1201,7 @@ function funcionTR(& $contrato) {
 			$texto_monto = !empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos']) ?
 					$texto_honorarios . ' y ' . $texto_gastos :
 					(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);
-			$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'><td width=3%>&nbsp;<img src='" . Conf::ImgDir() . "/color_amarillo.gif' border=0></td>
+			$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;' id='tr_cobro_{$cobro->fields['id_cobro']}'><td width=3%>&nbsp;<img src='" . Conf::ImgDir() . "/color_amarillo.gif' border=0></td>
 									<td align=center width=5% style='font-size:10px'>#" . $cobro->fields['id_cobro'] . "</td>
 									<td align=left width=82% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
 
