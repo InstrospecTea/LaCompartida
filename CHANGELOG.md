@@ -1,5 +1,22 @@
 # Changelog
 
+## Hotfix 15.12.8
+Wednesday 2015, June 17th.
+* **Fix:** [Corregir mensaje y validaciones al eliminar un cobro desde el listado](https://github.com/LemontechSA/ttb/pull/1032)
+* **Fix:** [Eliminar ordenamiento por campo cobrable en paso 4 del cobro](https://github.com/LemontechSA/ttb/pull/1032)
+
+## Hotfix 15.12.7
+Monday 2015, June 15th.
+* **Feature:** [Arregla el historial de trabajos cuando el selector de asuntos es autocompletador](https://github.com/LemontechSA/ttb/pull/1031)
+
+## Hotfix 15.12.6
+Monday 2015, June 15th.
+* **Feature:** [Agrega lenguaje ingles PRC](https://github.com/LemontechSA/ttb/pull/1030)
+
+## Hotfix 15.12.5
+Friday 2015, June 12th.
+* **Fix:** [Corrección sección Biblioteca](https://github.com/LemontechSA/ttb/pull/1029)
+
 ## Hotfix 15.12.4
 Friday 2015, June 12th.
 * **Fix:** [Agregar tag %monto_total_palabra_cero_cien% a factura.doc](https://github.com/LemontechSA/ttb/pull/1027)
