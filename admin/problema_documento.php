@@ -26,16 +26,16 @@ if( isset($ver) && $ver == 'neteo') {
     <table>
          <tbody>
              <tr>
-                 <td>Honorarios</td>
-                 <td>{$neteos[0]->honorarios}</td>
+                 <td style="text-align:right">Honorarios: </td>
+                 <td style="text-align:left">{$neteos[0]->honorarios}</td>
              </tr>
              <tr>
-                 <td>Gastos</td>
-                 <td>{$neteos[0]->gastos}</td>
+                 <td style="text-align:right">Gastos: </td>
+                 <td style="text-align:left">{$neteos[0]->gastos}</td>
              </tr>
              <tr>
-                 <td>Total</td>
-                 <td><strong>{$neteos[0]->monto}</strong></td>
+                 <td style="text-align:right">Total: </td>
+                 <td style="text-align:left"><strong>{$neteos[0]->monto}</strong></td>
              </tr>
          </tbody>
      </table>
@@ -169,13 +169,14 @@ HTML;
         INNER JOIN factura_cobro FC ON( FC.id_factura = CCFM_C.id_factura)
 
         WHERE
-        FC.id_cobro = $id_cobro";
+        FC.id_cobro = $id_cobro
+        ORDER BY FP.id_factura_pago";
 
     $stm = $Sesion->pdodbh->query($query);
     $facturasPago = $stm->fetchAll(PDO::FETCH_OBJ);
 
     $html .= <<<HTML
-    <table style="width:100%">
+    <table >
         <thead>
             <tr>
                 <th>Numero</th>
@@ -426,6 +427,9 @@ $Pagina->PrintTop();
 <div id="neteos"></div>
 
 <style>
+table {
+    width:100%;
+}
 tr:hover {
     background:rgba(0,0,0,0.1);
     opacity:1;
