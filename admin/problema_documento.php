@@ -48,18 +48,25 @@ HTML;
     <table>
         <tr>
             <th>ID Neteo</th>
-            <th>Honorarios</th>
-            <th>Gastos</th>
-            <th>Total</th>
+            <th>Hon Cobro</th>
+            <th>Gas Cobro</th>
+            <th>Total Cobro</th>
+            <th>Hon Pago</th>
+            <th>Gas Pago</th>
+            <th>Total Pago</th>
         </tr>
 HTML;
 
-    $total_honorarios = $total_gastos = $total_final = 0;
+    $total_cobros = $total_pagos = $total_final_cobros = $total_final_pagos = 0;
     $cantidadNeteos = count($neteos);
 
     foreach( $neteos as $neteo ) {
-        $total = $neteo->valor_cobro_honorarios + $neteo->valor_cobro_gastos;
-        $total_final += $total;
+        $total_cobros = $neteo->valor_cobro_honorarios + $neteo->valor_cobro_gastos;
+        $total_pagos  = $neteo->valor_pago_honorarios + $neteo->valor_pago_gastos;
+
+        $total_final_cobros += $total_cobros;
+        $total_final_pagos  += $total_pagos;
+
         $html .= <<<HTML
         <tr id="ND-{$neteo->id_neteo_documento}">
             <td>{$neteo->id_neteo_documento}</td>
@@ -83,6 +90,24 @@ HTML;
                     Diff: <strong>{$diferencia_gastos}</strong>
                 </td>
 
+                <td align="center"><br>$total_cobros</td>
+
+                <td align="center">
+                    DC: {$neteo->gastos}
+                    <br>
+                    <input name="valor_pago_honorarios" type="number" value="{$neteo->valor_pago_honorarios}"  /> <br>
+                    Diff: <strong>{$diferencia_gastos}</strong>
+                </td>
+
+                <td align="center">
+                    DC: {$neteo->gastos}
+                    <br>
+                    <input name="valor_pago_gastos" type="number" value="{$neteo->valor_pago_gastos}"  /> <br>
+                    Diff: <strong>{$diferencia_gastos}</strong>
+                </td>
+
+                <td align="center"><br>$total_pagos</td>
+
                 <td>
                     <br>
                     <button onclick="saveNeteo({$neteo->id_neteo_documento})">guardar</button>
@@ -90,8 +115,15 @@ HTML;
 HTML;
         } else {
            $html .= <<<HTML
-                <td align="center"><input type="number" value="{$neteo->valor_cobro_honorarios}"  /></td>
-                <td align="center"><input type="number" value="{$neteo->valor_cobro_gastos}"  /></td>
+                <td align="center"><input type="number" name="valor_cobro_honorarios" value="{$neteo->valor_cobro_honorarios}"  /></td>
+                <td align="center"><input type="number" name="valor_cobro_gastos" value="{$neteo->valor_cobro_gastos}"  /></td>
+
+                <td align="center">$total_cobros</td>
+
+                <td align="center"><input type="number" name="valor_pago_honorarios" value="{$neteo->valor_pago_honorarios}"  /></td>
+                <td align="center"><input type="number" name="valor_pago_gastos" value="{$neteo->valor_pago_gastos}"  /></td>
+
+                <td align="center">$total_pagos</td>
 
                 <td>
                     <br>
@@ -101,26 +133,82 @@ HTML;
         }
 
         $html .= <<<HTML
-            <td align="center"><br>{$total} </td>
         </tr>
 HTML;
-        $total_honorarios += $neteo->valor_cobro_honorarios;
-        $total_gastos += $neteo->valor_cobro_gastos;
+        $total_honorarios_cobro += $neteo->valor_cobro_honorarios;
+        $total_gastos_cobro     += $neteo->valor_cobro_gastos;
+
+        $total_honorarios_pago += $neteo->valor_pago_honorarios;
+        $total_gastos_pago     += $neteo->valor_pago_gastos;
     }
 
     $html .= <<<HTML
     <tfoot>
         <tr>
             <td>&nbsp;</td>
-            <td align="center"><strong>$total_honorarios</strong></td>
-            <td align="center"><strong>$total_gastos</strong></td>
-            <td>&nbsp;</td>
-            <td align="center"><strong>$total_final</strong></td>
+            <td align="center"><strong>$total_honorarios_cobro</strong></td>
+            <td align="center"><strong>$total_gastos_cobro</strong></td>
+            <td><strong>$total_final_cobros</strong></td>
+            <td align="center"><strong>$total_honorarios_pago</strong></td>
+            <td align="center"><strong>$total_gastos_pago</strong></td>
+            <td align="center"><strong>$total_final_pagos</strong></td>
         </tr>
     </tfoot>
     </table>
 
     <hr>DC: informaci&oacute;n Documento de Cobro | Diff: Diferencia de saldos<hr>
+HTML;
+
+
+
+    $query = "SELECT FP.*
+        FROM cta_cte_fact_mvto CCFM_P
+        INNER JOIN cta_cte_fact_mvto_neteo CCFMN ON(CCFMN.id_mvto_pago = CCFM_P.id_cta_cte_mvto)
+        INNER JOIN cta_cte_fact_mvto CCFM_C ON(CCFM_C.id_cta_cte_mvto = CCFMN.id_mvto_deuda)
+        INNER JOIN factura_pago FP ON( FP.id_factura_pago = CCFM_P.id_factura_pago)
+        INNER JOIN factura_cobro FC ON( FC.id_factura = CCFM_C.id_factura)
+
+        WHERE
+        FC.id_cobro = $id_cobro";
+
+    $stm = $Sesion->pdodbh->query($query);
+    $facturasPago = $stm->fetchAll(PDO::FETCH_OBJ);
+
+    $html .= <<<HTML
+    <table style="width:100%">
+        <thead>
+            <tr>
+                <th>Numero</th>
+                <th>Fecha</th>
+                <th>Descripcion</th>
+                <th>Monto</th>
+                <th>Monto Moneda Cobro</th>
+            </tr>
+        </thead>
+        <tbody>
+HTML;
+
+    foreach( $facturasPago as $factura ) {
+        $html .= <<<HTML
+        <tr>
+            <td>{$factura->id_factura_pago}</td>
+            <td>{$factura->fecha}</td>
+            <td>{$factura->descripcion}</td>
+            <td>{$factura->monto}</td>
+            <td>{$factura->monto_moneda_cobro}</td>
+        </tr>
+HTML;
+    }
+
+$html .= <<<HTML
+        </tbody>
+    </table>
+
+    <hr>
+HTML;
+
+
+$html .= <<<HTML
     <button onclick="jQuery('#neteos').hide();" >Cerrar</button>
 HTML;
 
@@ -170,11 +258,13 @@ echo $html;
 } elseif( isset($ver) && $ver == 'update_neteo' ) {
     $query = "UPDATE neteo_documento
                 SET valor_cobro_gastos = $valor_cobro_gastos,
-                    valor_cobro_honorarios = $valor_cobro_honorarios
+                    valor_cobro_honorarios = $valor_cobro_honorarios,
+                    valor_pago_gastos = $valor_pago_gastos,
+                    valor_pago_honorarios = $valor_pago_honorarios
                 WHERE id_neteo_documento = $id_neteo_documento";
 
+echo $query; die;
     $stm = $Sesion->pdodbh->query($query);
-
     echo $stm->rowCount();
     exit;
 }
@@ -321,7 +411,7 @@ $Pagina->PrintTop();
 
                     <?php if( abs($documento->monto - ($documento->pago_gastos + $documento->pago_honorarios)) >= 0.1 ): ?>
                         <img src="<?= Conf::ImgDir() ?>/ver_persona_nuevo.gif" onclick="verNeteo(<?= $documento->id_documento?>, <?= $documento->id_cobro ?>);
-            nuevaVentana('Editar_Cobro',730,580,'<?= $RootDir ?>/app/interfaces/cobros6.php?id_cobro=<?= $documento->id_cobro ?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');" />
+            /*nuevaVentana('Editar_Cobro',730,580,'<?= $RootDir ?>/app/interfaces/cobros6.php?id_cobro=<?= $documento->id_cobro ?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');*/" />
                     <?php endif ?>
             </p>
             <?php else: ?>
@@ -364,13 +454,13 @@ input:not([disabled]) {
 #neteos {
     display:none;
     background: white;
-    width:400px;
-    height:400px;
+    width:600px;
+    height:600px;
     overflow: scroll;
     position:fixed;
     top:50%; left:50%;
-    margin-left: -200px;
-    margin-top:-200px;
+    margin-left: -300px;
+    margin-top:-300px;
     border:3px solid #333;
 }
 
@@ -379,8 +469,13 @@ input:not([disabled]) {
 <script>
 function verNeteo(id_documento_cobro, id_cobro) {
     jQuery('#neteos').html('');
+    var
+        url  = 'problema_documento.php?ver=neteo';
+        url += "&id_documento_cobro=" + id_documento_cobro;
+        url += "&id_cobro=" + id_cobro;
+
     jQuery.get(
-        'problema_documento.php?ver=neteo&id_documento_cobro=' + id_documento_cobro,
+        url,
         function(response){
             jQuery('#neteos').html( response ).show();
         })
@@ -389,14 +484,19 @@ function verNeteo(id_documento_cobro, id_cobro) {
 function saveNeteo(id_neteo_documento) {
     var nd = jQuery("#ND-" + id_neteo_documento),
         valorCobroGastos     = nd.find('[name="valor_cobro_gastos"]').val(),
-        valorCobroHonorarios = nd.find('[name="valor_cobro_honorarios"]').val();
+        valorCobroHonorarios = nd.find('[name="valor_cobro_honorarios"]').val(),
+
+        valorPagoGastos     = nd.find('[name="valor_pago_gastos"]').val(),
+        valorPagoHonorarios = nd.find('[name="valor_pago_honorarios"]').val();
 
     jQuery.post(
         "problema_documento.php?ver=update_neteo",
         {
-            id_neteo_documento : id_neteo_documento,
+            id_neteo_documento :    id_neteo_documento,
             valor_cobro_honorarios: valorCobroHonorarios,
-            valor_cobro_gastos: valorCobroGastos
+            valor_cobro_gastos:     valorCobroGastos,
+            valor_pago_honorarios:  valorPagoHonorarios,
+            valor_pago_gastos:      valorPagoGastos
         },
         function(response){
             alert(response + " Documentos Actualizados");
