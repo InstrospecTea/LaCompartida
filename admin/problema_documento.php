@@ -176,6 +176,8 @@ HTML;
     $facturasPago = $stm->fetchAll(PDO::FETCH_OBJ);
 
     $html .= <<<HTML
+
+    <h4>Informacion de Pagos de Facturas</h4>
     <table >
         <thead>
             <tr>
@@ -459,12 +461,12 @@ input:not([disabled]) {
     display:none;
     background: white;
     width:600px;
-    height:600px;
+    height:700px;
     overflow: scroll;
     position:fixed;
     top:50%; left:50%;
     margin-left: -300px;
-    margin-top:-300px;
+    margin-top:-350px;
     border:3px solid #333;
 }
 
