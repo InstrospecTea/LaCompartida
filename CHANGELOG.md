@@ -2,7 +2,7 @@
 
 ## Hotfix 15.12.10
 Thursday 2015, June 18th.
-* **Add:** New task for capistrano: it's possible delete stage deploys
+* **Add:** New task for capistrano: it's possible delete stage deploys (Read the [Wiki](https://github.com/LemontechSA/ttb/wiki/Deploy-al-entorno-de-Staging))
 
 ## Hotfix 15.12.9
 Thursday 2015, June 18th.
