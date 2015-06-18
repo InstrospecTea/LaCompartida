@@ -67,22 +67,14 @@ class WsFacturacionCl extends WsFacturacion {
 		$documento['Detalle'] = array();
 		$lin = 0;
 		foreach ($dataFactura['detalle'] as $detalle) {
-			if (strlen($detalle['descripcion']) > 80) {
-				$ad = explode("\n", wordwrap($detalle['descripcion'], 80, "\n"));
-				$descripcion1 = array_shift($ad);
-				$descripcion2 = implode(' ', $ad);
-			} else {
-				$descripcion1 = $detalle['descripcion'];
-				$descripcion2 = null;
-			}
 			$linea_detalle = array(
 				'NroLinDet' => ++$lin,
 				'CdgItem' => array(
 					'TpoCodigo' => $this->tipoCodigo,
 					'VlrCodigo' => $this->ValorCodigo
 				),
-				'NmbItem' => $descripcion1,
-				'dscitem' => $descripcion2,
+				// 'NmbItem' => $descripcion1,
+				'DscItem' => $detalle['descripcion'],
 				'QtyItem' => $detalle['cantidad'],
 				'PrcItem' => $detalle['precio_unitario'],
 				'MontoItem' => $detalle['cantidad'] * $detalle['precio_unitario']
