@@ -512,8 +512,8 @@ $Pagina->PrintTop();
 							jQuery.post(url, {'tabla': 'grupo_cliente', id: id}, function(html) {
 								jQuery('<div/>').html(html).dialog({
 									title: 'Agregar/Modificar Grupo',
-									width: 400,
-									height: 300,
+									width: 500,
+									height: 250,
 									modal: true,
 									close: function() {
 										closeModalGrupo();
