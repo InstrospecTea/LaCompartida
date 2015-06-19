@@ -73,6 +73,7 @@ class WsFacturacionCl extends WsFacturacion {
 					'TpoCodigo' => $this->tipoCodigo,
 					'VlrCodigo' => $this->ValorCodigo
 				),
+				'NmbItem' => $detalle['descripcion'],
 				'DscItem' => $detalle['descripcion'],
 				'QtyItem' => $detalle['cantidad'],
 				'PrcItem' => $detalle['precio_unitario'],
