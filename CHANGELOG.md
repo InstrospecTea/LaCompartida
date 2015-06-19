@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.11
+Friday 2015, June 19th.
+* **Fix:** [Corrige calendario en liquidaciones programadas](https://github.com/LemontechSA/ttb/pull/1035)
+
 ## Hotfix 15.12.10
 Thursday 2015, June 18th.
 * **Add:** New task for capistrano: it's possible delete stage deploys (Read the [Wiki](https://github.com/LemontechSA/ttb/wiki/Deploy-al-entorno-de-Staging)) [Pull](https://github.com/LemontechSA/ttb/pull/1034)
