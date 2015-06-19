@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.12
+Friday 2015, June 19th.
+* **Fix:** [Corrige integración con Facturación.cl](https://github.com/LemontechSA/ttb/pull/1036)
+
 ## Hotfix 15.12.11
 Friday 2015, June 19th.
 * **Fix:** [Corrige calendario en liquidaciones programadas](https://github.com/LemontechSA/ttb/pull/1035)
