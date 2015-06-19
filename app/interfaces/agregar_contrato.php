@@ -1948,15 +1948,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<table  style="float:left;" class="span7">
 								<tr>
 									<td class="span4">
-										<div   class="controls controls-row ">
+										<div class="controls controls-row ">
 											<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?php echo empty($valor_tarifa_flat) ? 'checked' : '' ?>/>
 											<?php echo Html::SelectArrayDecente($tarifa->Listar('WHERE tarifa.tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa'), 'id_tarifa', $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true;" ' . ( strlen($config_validar_tarifa) > 0 ? 'onchange="' . $config_validar_tarifa . '"' : '')); ?>
 											<input type="hidden" name="id_tarifa_hidden" id="id_tarifa_hidden" value="<?php echo $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default; ?>" />
 										</div>
 
-										<div   class="controls controls-row ">
-											 <label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
-												 Plana por </label>
+										<div class="controls controls-row ">
+											<label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
+												 <?php echo __('Plana por'); ?>
+											</label>
 											<input id="tarifa_flat" class="input-small" type="text" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?php echo $valor_tarifa_flat ?>"/>
 											<input type="hidden" id="id_tarifa_flat"  name="id_tarifa_flat" value="<?php echo empty($valor_tarifa_flat) ? '' : $contrato->fields['id_tarifa'] ?>"/>
 										</div>
@@ -1994,7 +1995,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/>
 							<div id="div_cobro" class="buttonset">
 								<input class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
-								<label <?php echo TTip($tip_tasa) ?>  for="fc1">Tasas/HH</label>&nbsp;
+								<label <?php echo TTip($tip_tasa) ?>  for="fc1"><?php echo __('Tasas/HH'); ?></label>&nbsp;
 								<input class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
 								<label <?php echo TTip($tip_retainer) ?>  for="fc2">Retainer</label> &nbsp;
 								<input class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
@@ -2323,13 +2324,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<fieldset style="width: 97%; background-color: #FFFFFF;">
 								<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'datos_tramites\')" style="cursor:pointer"' : '' ?> />
 									<?php echo!$div_show ? '<span id="datos_tramites_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
-									&nbsp;<?php echo __('Tr&aacute;mites') ?>
+									&nbsp;<?php echo __('Trámites') ?>
 								</legend>
 								<div id='datos_tramites' style="display:<?php echo $show ?>;" width="100%">
 									<table width="100%">
 										<tr>
 											<td align="right" width="25%">
-												<?php echo __('Tarifa Tr&aacute;mites') ?>
+												<?php echo __('Tarifa Trámites') ?>
 											</td>
 											<td align="left" width="75%">
 												<?php echo Html::SelectArrayDecente($TramiteTarifa->Listar('ORDER BY tramite_tarifa.glosa_tramite_tarifa'), 'id_tramite_tarifa', $contrato->fields['id_tramite_tarifa'] ? $contrato->fields['id_tramite_tarifa'] : $tramite_tarifa_default); ?>&nbsp;&nbsp;

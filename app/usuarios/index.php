@@ -38,7 +38,7 @@ if ($sesion->logged) {
   }
 }
 
-$pagina->titulo = "Bienvenido a " . Conf::AppName();
+$pagina->titulo = __("Bienvenido a ") . Conf::AppName();
 
 $pagina->PrintTop();
 
