@@ -104,7 +104,6 @@ namespace :deploy do
                     dep.strip!
                     dep.split('/').last
                   }
-                  # .reject{ |x| x.length < 4 }
 
     deploys.reject! { |dep|
       branches.include? ( dep )
