@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.13
+Monday 2015, June 22th.
+* **Fix:** [Validación número documento tributario al editar una factura](https://github.com/LemontechSA/ttb/pull/1037)
+
 ## Hotfix 15.12.12
 Friday 2015, June 19th.
 * **Fix:** [Corrige integración con Facturación.cl](https://github.com/LemontechSA/ttb/pull/1036)
