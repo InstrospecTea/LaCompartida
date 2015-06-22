@@ -5,6 +5,10 @@ load 'config/cap_servers_staging'
 
 mysqlCmd = "mysql -u root -padmin1awdx"
 
+set :home_directory, "/mnt/disk1"
+set :base_directory, "#{home_directory}/deploys"
+
+
 # Overwrite of Composer to use one shared folder between releases, not many 'vendor' folders
 namespace :composer do
   composer_folder = ""
@@ -36,9 +40,7 @@ end
 
 namespace :deploy do
   set :current_stage, "staging"
-
-  set :home_directory, "/mnt/disk1"
-  set :base_directory, "#{home_directory}/deploys"
+  set :deploy_to, base_directory
 
   git_branch  = ""
   branch_name = ""
@@ -69,7 +71,7 @@ namespace :deploy do
   task :finalize_update, :except => { :no_release => true } do
     transaction do
       run "mkdir -p #{home_directory}/releases"
-      run "ln -nsf #{current_path} #{home_directory}/releases/#{branch_name[0..20]}"
+      run "ln -nsf #{current_path} #{home_directory}/releases/#{branch_name}"
 
       run "chmod -R g+w #{releases_path}/#{release_name}"
       run "echo 'stage: #{current_stage}' > #{releases_path}/#{release_name}/environment.txt"
@@ -91,6 +93,45 @@ namespace :deploy do
     dbname = ask_option databases
 
     run "sed -e \"s/<<DBNAME>>/#{dbname}/\" /mnt/disk1/miconf.php.template > #{current_path}/app/miconf.php"
+  end
+
+  task :clean_deploys do
+    deploys = deploy.list_deploys
+
+    branches = `git branch -a`
+                  .split
+                  .collect{ |dep|
+                    dep.strip!
+                    dep.split('/').last
+                  }
+
+    deploys.reject! { |dep|
+      branches.include? ( dep )
+    }
+
+    if deploys.length == 0
+      puts "\n =======> Everything is clean! YAY!".green
+
+    else
+      puts "This deploys will be deleted: \n >> #{deploys.join(" \n >> ")}".white.on_red
+      puts "Are you sure?"
+
+      sure = ask_option ["Y", "N"]
+
+      deploys.each { |deploy|
+        run "rm -rf #{base_directory}/#{deploy} #{home_directory}/releases/#{deploy}"
+
+      } if sure == 'Y'
+
+      puts "\n =======> Nothing to do here!".blue if sure == 'N'
+    end
+
+  end
+
+  task :list_deploys do
+    deploys = capture("ls -x #{base_directory}").split(/\s+/).collect(&:strip)
+
+    deploys
   end
 
   before "deploy", "deploy:ask_branch"
