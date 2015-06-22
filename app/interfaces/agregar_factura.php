@@ -238,13 +238,13 @@ if ($opcion == "guardar") {
 			// $numero_documento_legal = $factura->MaxNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 
 			if (!$desde_webservice) {
-				$mensaje_validación_documento_tributario = 'El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar';
+				$mensaje_validacion_documento_tributario = 'El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar';
 
 				if (!empty($factura->fields['id_factura'])) {
-					$mensaje_validación_documento_tributario = 'El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado.';
+					$mensaje_validacion_documento_tributario = 'El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado.';
 				}
 
-				$pagina->AddError($mensaje_validación_documento_tributario);
+				$pagina->AddError($mensaje_validacion_documento_tributario);
 
 				$factura->Edit('numero', $numero_documento_legal);
 			} else {
