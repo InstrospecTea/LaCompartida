@@ -235,7 +235,6 @@ if ($opcion == "guardar") {
 			}
 
 			$numero_documento_legal = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
-			// $numero_documento_legal = $factura->MaxNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 
 			if (!$desde_webservice) {
 				$mensaje_validacion_documento_tributario = 'El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar';
