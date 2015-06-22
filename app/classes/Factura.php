@@ -2125,11 +2125,7 @@ class Factura extends Objeto {
 	}
 
 	function ValidarDocLegal() {
-		$id_factura = null;
-
-		if (!empty($this->fields['id_factura'])) {
-			$id_factura = $this->fields['id_factura'];
-		}
+		$id_factura = !empty($this->fields['id_factura']) ? $this->fields['id_factura'] : null;
 
 		$existe_numero = $this->ExisteNumeroDocLegal(
 			$this->fields['id_documento_legal'],
