@@ -266,7 +266,7 @@ echo $html;
                     valor_pago_honorarios = $valor_pago_honorarios
                 WHERE id_neteo_documento = $id_neteo_documento";
 
-echo $query; die;
+
     $stm = $Sesion->pdodbh->query($query);
     echo $stm->rowCount();
     exit;
