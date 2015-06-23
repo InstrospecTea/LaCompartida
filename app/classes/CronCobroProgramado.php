@@ -180,8 +180,10 @@ class CronCobroProgramado extends Cron {
 				foreach ($client_data as $data) {
 					$nombre = "{$data['Contrato']['titulo_contacto']} {$data['Contrato']['contacto']} {$data['Contrato']['apellido_contacto']}";
 					$correos = array(
-						'nombre' => $nombre,
-						'mail' => $mail
+						array(
+							'nombre' => $nombre,
+							'mail' => $mail
+						)
 					);
 					$body = $Notificacion->mensajeClienteProgramado($data);
 
@@ -196,12 +198,12 @@ class CronCobroProgramado extends Cron {
 					ob_end_clean();
 
 					$adjunto = array(
-						'data_string' => base64_encode($data_string),
-						'filename' => "Liquidacion_{$id_cobro}.doc",
-						// 'base_encode' => '',
-						// 'charset' => '',
-						// 'method' => '',
-						'data_type' => 'application/msword'
+						'data_string' => $data_string,
+						'filename'    => "Liquidacion_{$id_cobro}.doc",
+						'base_encode' => 'base64',
+						// 'charset'  => '',
+						// 'method'   => '',
+						'data_type'   => 'application/msword'
 					);
 
 					Utiles::EnviarMail(
