@@ -151,11 +151,10 @@ class CronCobroProgramado extends Cron {
 		if (!empty($contrato['email_contacto'])) {
 			$Moneda = $this->monedas[$Cobro->fields['id_moneda']];
 
-			$Cobro->fields['moneda_simbolo'] = $Moneda['simbolo'];
-
 			$this->datos_notificacion_cliente[$contrato['email_contacto']][] = array(
 				'Cobro' => $Cobro->fields,
-				'Contrato' => $contrato
+				'Contrato' => $contrato,
+				'MonedaCobro' => $Moneda
 			);
 		}
 	}

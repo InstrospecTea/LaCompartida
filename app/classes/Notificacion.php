@@ -679,7 +679,7 @@ class Notificacion {
 		$template = <<<HTML
 <table style="border:1px solid black">
 	<tr>
-		<td>Estimado/a ADMINISTRADOR:</td>
+		<td colspan="2">Estimado/a ADMINISTRADOR:</td>
 	</tr>
 	<tr>
 		<td width="10px">&nbsp;</td>
@@ -727,13 +727,13 @@ HTML;
 		$template = <<<HTML
 <table style="border:1px solid black">
 	<tr>
-		<td>Estimado/a {{ Contrato.titulo_contacto }} {{ Contrato.contacto }} {{ Contrato.apellido_contacto }}:</td>
+		<td colspan="2">Estimado/a {{ Contrato.titulo_contacto }} {{ Contrato.contacto }} {{ Contrato.apellido_contacto }}:</td>
 	</tr>
 	<tr>
 		<td width="10px">&nbsp;</td>
 		<td>
 			Adjunto se encuentra la liquidación Nº {{ Cobro.id_cobro }} por
-			{{ Cobro.moneda }} {{ Cobro.monto }} por concepto de:
+			{{ MonedaCobro.simbolo }} {{ Cobro.monto|number_format(MonedaCobro.cifras_decimales, '.', '') }} por concepto de:
 		</td>
 	</tr>
 	<tr>
