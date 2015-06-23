@@ -10763,12 +10763,12 @@ QUERY;
 								     ON ttff.id_moneda = t.id_moneda
 								    AND ttff.id_trabajo = t.id_trabajo
 								    AND ttff.valor_estandar = 0
-								   JOIN usuario_tarifa tf 
-								     ON t.id_usuario = tf.id_usuario 
-								    AND t.id_moneda = tf.id_moneda 
+								   JOIN usuario_tarifa tf
+								     ON t.id_usuario = tf.id_usuario
+								    AND t.id_moneda = tf.id_moneda
 								    AND t.tarifa_hh_estandar = 0
 								   JOIN tarifa ta
-								     ON tf.id_tarifa = ta.id_tarifa 
+								     ON tf.id_tarifa = ta.id_tarifa
 								    AND ta.tarifa_defecto = 1
 								    SET ttff.valor_estandar =  tf.tarifa;";
 
@@ -10779,12 +10779,12 @@ QUERY;
 							    AND ttff.valor_estandar = 0
 							   JOIN usuario u
 							     ON t.id_usuario = u.id_usuario
-							   JOIN categoria_tarifa tf 
-							     ON u.id_categoria_usuario  = tf.id_categoria_usuario 
-							    AND t.id_moneda = tf.id_moneda 
+							   JOIN categoria_tarifa tf
+							     ON u.id_categoria_usuario  = tf.id_categoria_usuario
+							    AND t.id_moneda = tf.id_moneda
 							    AND t.tarifa_hh_estandar = 0
 							   JOIN tarifa ta
-							     ON tf.id_tarifa = ta.id_tarifa 
+							     ON tf.id_tarifa = ta.id_tarifa
 								  AND ta.tarifa_defecto = 1
 							   SET ttff.valor_estandar =  tf.tarifa;";
 			break;
@@ -10797,7 +10797,7 @@ QUERY;
 			if (!ExisteCampo('id_usuario_responsable', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `id_usuario_responsable` INT(11) DEFAULT NULL AFTER `id_documento_legal_motivo`;";
 			}
-			
+
 			if (!ExisteLlaveForanea('factura_usuario_responsable_fk', 'id_usuario_responsable', 'usuario', 'id_usuario', $dbh)) {
 				$query[] = "ALTER TABLE `factura` ADD CONSTRAINT `factura_usuario_responsable`
 										FOREIGN KEY (`id_usuario_responsable_fk`)

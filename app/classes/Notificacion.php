@@ -733,7 +733,8 @@ HTML;
 		<td width="10px">&nbsp;</td>
 		<td>
 			Adjunto se encuentra la liquidación Nº {{ Cobro.id_cobro }} por
-			{{ Cobro.moneda }} {{ Cobro.monto }} por concepto de:</td>
+			{{ Cobro.moneda }} {{ Cobro.monto }} por concepto de:
+		</td>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>

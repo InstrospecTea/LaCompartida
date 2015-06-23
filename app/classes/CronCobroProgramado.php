@@ -52,6 +52,7 @@ class CronCobroProgramado extends Cron {
 						c.observaciones AS detalle_cobranza,
 						c.enviar_liquidacion_al_generar,
 						cl.glosa_cliente,
+						c.codigo_idioma,
 						GROUP_CONCAT(a.glosa_asunto) as asuntos
 					FROM contrato c
 					INNER JOIN cliente cl ON c.codigo_cliente = cl.codigo_cliente
@@ -147,7 +148,7 @@ class CronCobroProgramado extends Cron {
 			$this->datos_notificacion_cliente = array();
 		}
 
-		if (!empty($contrato['email_contacto']) {
+		if (!empty($contrato['email_contacto'])) {
 			$Moneda = $this->monedas[$Cobro->fields['id_moneda']];
 
 			$Cobro->fields['moneda_simbolo'] = $Moneda['simbolo'];
@@ -165,20 +166,54 @@ class CronCobroProgramado extends Cron {
 		$from = html_entity_decode(Conf::AppName());
 		$to = Conf::GetConf($this->Sesion, 'MailAdmin');
 
-		$mensajes = array();
-
 		if (!empty($this->datos_notificacion_administrador)) {
-			$mensajes["Aviso $from"] = $Notificacion->mensajeProgramados($this->datos_notificacion_administrador);
+			$subject = "Aviso $from";
+			$mensaje = $Notificacion->mensajeProgramados($this->datos_notificacion_administrador);
+
+			Utiles::Insertar($this->Sesion, $subject, $mensaje, $to, "Administrador");
 		}
 
 		if (!empty($this->datos_notificacion_cliente)) {
-			$key = "Nueva liquidación disponible de $from";
-			$mensajes[$key] = $Notificacion->mensajeClienteProgramado($this->datos_notificacion_cliente);
-		}
+			$subject = "Nueva liquidación disponible de $from";
 
-		foreach ($mensajes as $subject => $mensaje) {
-			foreach ($mensaje as $body) {
-				Utiles::InsertarPlus($this->Sesion, $subject, $body, $to, "Administrador");
+			foreach ($this->datos_notificacion_cliente as $mail => $client_data) {
+				foreach ($client_data as $data) {
+					$nombre = "{$data['Contrato']['titulo_contacto']} {$data['Contrato']['contacto']} {$data['Contrato']['apellido_contacto']}";
+					$correos = array(
+						'nombre' => $nombre,
+						'mail' => $mail
+					);
+					$body = $Notificacion->mensajeClienteProgramado($data);
+
+					$enviar_al_admin = true;
+
+					ob_start();
+					$id_cobro = $data['Cobro']['id_cobro'];
+					$no_exit = true;
+					$_LANG = UtilesApp::LoadLang($data['Contrato']['codigo_idioma']);
+					include dirname(__FILE__) . '/../interfaces/cobro_doc.php';
+					$data_string = ob_get_contents();
+					ob_end_clean();
+
+					$adjunto = array(
+						'data_string' => base64_encode($data_string),
+						'filename' => "Liquidacion_{$id_cobro}.doc",
+						// 'base_encode' => '',
+						// 'charset' => '',
+						// 'method' => '',
+						'data_type' => 'application/msword'
+					);
+
+					Utiles::EnviarMail(
+						$this->Sesion,
+						$correos,
+						$subject,
+						$body,
+						$enviar_al_admin,
+						NULL,
+						$adjunto
+					);
+				}
 			}
 		}
 	}
