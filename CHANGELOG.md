@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.14
+Monday 2015, June 22th.
+* **New:** [Nueva herramienta para arreglar los saldos incorrectos en los cobros](https://github.com/LemontechSA/ttb/pull/1038)
+
 ## Hotfix 15.12.13
 Monday 2015, June 22th.
 * **Fix:** [Validación número documento tributario al editar una factura](https://github.com/LemontechSA/ttb/pull/1037)
