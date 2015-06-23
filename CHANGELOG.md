@@ -1,5 +1,43 @@
 # Changelog
 
+## Hotfix 15.12.14
+Monday 2015, June 22th.
+* **New:** [Nueva herramienta para arreglar los saldos incorrectos en los cobros](https://github.com/LemontechSA/ttb/pull/1038)
+
+## Hotfix 15.12.13
+Monday 2015, June 22th.
+* **Fix:** [Validación número documento tributario al editar una factura](https://github.com/LemontechSA/ttb/pull/1037)
+
+## Hotfix 15.12.12
+Friday 2015, June 19th.
+* **Fix:** [Corrige integración con Facturación.cl](https://github.com/LemontechSA/ttb/pull/1036)
+
+## Hotfix 15.12.11
+Friday 2015, June 19th.
+* **Fix:** [Corrige calendario en liquidaciones programadas](https://github.com/LemontechSA/ttb/pull/1035)
+
+## Hotfix 15.12.10
+Thursday 2015, June 18th.
+* **Add:** New task for capistrano: it's possible delete stage deploys (Read the [Wiki](https://github.com/LemontechSA/ttb/wiki/Deploy-al-entorno-de-Staging)) [Pull](https://github.com/LemontechSA/ttb/pull/1034)
+
+## Hotfix 15.12.9
+Thursday 2015, June 18th.
+* **Fix:** [Corrige la descripción de la factura enviada a Facturacion.cl](https://github.com/LemontechSA/ttb/pull/1033)
+* **Fix:** [Corrige archivo LEDES para FLAT FEE](https://github.com/LemontechSA/ttb/pull/1033)
+
+## Hotfix 15.12.8
+Wednesday 2015, June 17th.
+* **Fix:** [Corregir mensaje y validaciones al eliminar un cobro desde el listado](https://github.com/LemontechSA/ttb/pull/1032)
+* **Fix:** [Eliminar ordenamiento por campo cobrable en paso 4 del cobro](https://github.com/LemontechSA/ttb/pull/1032)
+
+## Hotfix 15.12.7
+Monday 2015, June 15th.
+* **Feature:** [Arregla el historial de trabajos cuando el selector de asuntos es autocompletador](https://github.com/LemontechSA/ttb/pull/1031)
+
+## Hotfix 15.12.6
+Monday 2015, June 15th.
+* **Feature:** [Agrega lenguaje ingles PRC](https://github.com/LemontechSA/ttb/pull/1030)
+
 ## Hotfix 15.12.5
 Friday 2015, June 12th.
 * **Fix:** [Corrección sección Biblioteca](https://github.com/LemontechSA/ttb/pull/1029)

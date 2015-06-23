@@ -103,6 +103,11 @@ class Ledes extends Objeto {
 			$horas = $this->round($trabajo['horas']);
 			$monto = $this->round($monto);
 			$tarifa = $this->round($tarifa);
+
+			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
+				$tarifa = 0;
+			}
+
 			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
 			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));

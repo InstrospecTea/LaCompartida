@@ -3295,7 +3295,7 @@ echo $Form->script();
 		?>
 	}
 
-	if (jQuery('#periodo_fecha_inicio').length > 0) {
+	if (jQuery('#periodo_fecha_inicio').length != 0) {
 		Calendar.setup({
 			inputField	: "periodo_fecha_inicio",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
@@ -3303,7 +3303,7 @@ echo $Form->script();
 		});
 	}
 
-	if (jQuery('#fecha_inicio_cap').length > 0) {
+	if (jQuery('#fecha_inicio_cap').length != 0) {
 		Calendar.setup({
 			inputField	: "fecha_inicio_cap",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format

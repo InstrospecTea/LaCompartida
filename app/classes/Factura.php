@@ -2094,14 +2094,30 @@ class Factura extends Objeto {
 	 * @param type $numero
 	 * @param type $serie
 	 * @param type $id_estudio
+	 * @param integer $id_factura
 	 * @return boolean
 	 */
-	function ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie, $id_estudio) {
+	function ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie, $id_estudio, $id_factura = null) {
+		$where = '';
+
 		if (empty($tipo_documento_legal) || empty($numero) || empty($serie) || empty($id_estudio)) {
 			return false;
 		}
 
-		$query = "SELECT COUNT(*) FROM factura WHERE numero = '$numero' AND id_documento_legal = '$tipo_documento_legal' AND serie_documento_legal = '$serie' AND id_estudio = '{$id_estudio}'";
+		// si es pasado como parámetro el id de la factura, entonces revisa si hay otra factura con el mismo número
+		if (!is_null($id_factura)) {
+			$where .= " AND id_factura <> {$id_factura}";
+		}
+
+		$query = "SELECT COUNT(*)
+			FROM factura
+			WHERE
+			 numero = '{$numero}'
+			 AND id_documento_legal = '{$tipo_documento_legal}'
+			 AND serie_documento_legal = '{$serie}'
+			 AND id_estudio = '{$id_estudio}'
+			 {$where}";
+
 		$cantidad_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cantidad) = mysql_fetch_array($cantidad_resp);
 
@@ -2109,12 +2125,17 @@ class Factura extends Objeto {
 	}
 
 	function ValidarDocLegal() {
-		if (empty($this->fields['id_factura'])) {
-			if ($this->ExisteNumeroDocLegal($this->fields['id_documento_legal'], $this->fields['numero'], $this->fields['serie_documento_legal'], $this->fields['id_estudio'])) {
-				return false;
-			}
-		}
-		return true;
+		$id_factura = !empty($this->fields['id_factura']) ? $this->fields['id_factura'] : null;
+
+		$existe_numero = $this->ExisteNumeroDocLegal(
+			$this->fields['id_documento_legal'],
+			$this->fields['numero'],
+			$this->fields['serie_documento_legal'],
+			$this->fields['id_estudio'],
+			$id_factura
+		);
+
+		return $existe_numero ? false : true;
 	}
 
 	function GetUltimoPagoSoyFactura($id = null) {

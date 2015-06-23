@@ -34,18 +34,19 @@ The Time Billing - Time Tracking
 
         $ sudo pear install Numbers_Words-0.16.4
 
+ * OLE (0.5)
+
+      $ sudo pear install OLE-0.5
+
 * Spreadsheet Excel writer (unestable version)
 
         $ sudo pear install Spreadsheet_Excel_Writer-beta
 
 > Recuerda reiniciar Apache cada vez que hagas cambios en la configuración o instalción de nuevos paquetes
 
- * OLE (0.5)
-
-      $ sudo pear install OLE-0.5
 
 * [WKHTMLTOPDF](http://wkhtmltopdf.org/)
-  
+
   ````
   wget http://downloads.sourceforge.net/project/wkhtmltopdf/0.12.1/wkhtmltox-0.12.1_linux-centos6-amd6$
   sudo yum localinstall -y wkhtmltox-0.12.1_linux-centos6-amd64.rpm
