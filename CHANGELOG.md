@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.15
+Tuesday 2015, June 23th.
+* **Fixed:** [Corregir modificación campo duración al subir excel de cobro](https://github.com/LemontechSA/ttb/pull/1039)
+
 ## Hotfix 15.12.14
 Monday 2015, June 22th.
 * **New:** [Nueva herramienta para arreglar los saldos incorrectos en los cobros](https://github.com/LemontechSA/ttb/pull/1038)
