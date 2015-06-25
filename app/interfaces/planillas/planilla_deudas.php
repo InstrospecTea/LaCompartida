@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $sesion = new sesion(array('REP'));
+$Form = new Form();
 
 $query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
@@ -11,6 +12,7 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 	$codigo_cliente = $_REQUEST['codigo_cliente'];
 	$id_contrato = $_REQUEST['id_contrato'];
 	$tipo_liquidacion = $_REQUEST['tipo_liquidacion'];
+	$id_grupo_cliente = $_REQUEST['id_grupo_cliente'];
 
 	if ($_POST['solo_monto_facturado']) {
 		$linktofile = 'cobros6.php?id_cobro=';
@@ -34,12 +36,12 @@ if (in_array($opcion, array('buscar', 'xls'))) {
 		'codigo_asunto' => $codigo_asunto,
 		'encargado_comercial' => $id_encargado_comercial,
 		'codigo_cliente_secundario' => $codigo_cliente_secundario,
-		'codigo_asunto_secundario' => $codigo_asunto_secundario
+		'codigo_asunto_secundario' => $codigo_asunto_secundario,
+		'id_grupo_cliente' => $id_grupo_cliente
 	);
 
 	$reporte = new ReporteAntiguedadDeudas($sesion, $opciones, $datos);
 	$SimpleReport = $reporte->generar();
-
 }
 
 $Pagina = new Pagina($sesion);
@@ -119,6 +121,14 @@ $Pagina->PrintTop();
 							</td>
 						</tr>
 						<tr>
+							<td align="right" width="30%">
+								<?php echo __('Grupo Cliente'); ?>
+							</td>
+							<td colspan="3" align="left">
+								<?php echo $Form->select('id_grupo_cliente', GrupoCliente::obtenerGruposSelect($sesion), $id_grupo_cliente); ?>
+							</td>
+						</tr>
+						<tr>
 							<td align=right>
 								<label for="tipo_liquidacion"><?php echo __('Tipo de Liquidación') ?></label>
 							</td>
@@ -157,29 +167,6 @@ $Pagina->PrintTop();
 </div>
 <script type="text/javascript">
 <?php echo "var linktofile= '$linktofile';"; ?>
-	// var current_popover;
-	// show_popover = function(sender) {
-	// 	codigo_cliente = sender.data('codigo_cliente');
-
-	// 	if (current_popover != undefined) {
-	// 		codigo_cliente_old = current_popover.data('codigo_cliente');
-	// 		if (codigo_cliente != codigo_cliente_old) {
-	// 			current_popover.popover('hide');
-	// 		} else {
-	// 			sender.popover('hide');
-	// 		}
-	// 	}
-	// 	current_popover = sender;
-	// 	current_popover.popover({
-	// 		title: '<?php echo __('Seguimiento del cliente'); ?>',
-	// 		trigger: 'manual',
-	// 		placement: 'left',
-	// 		html: true,
-	// 		content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente + '" />'
-	// 	});
-
-	// 	current_popover.popover('show')
-	// };
 	show_popover = function(sender) {
 		codigo_cliente = sender.data('codigo_cliente');
 
