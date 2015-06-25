@@ -62,6 +62,11 @@ class Adelanto extends Documento {
 			$where .= " AND adelanto.id_moneda = {$id_moneda}";
 		}
 
+		if (!empty($this->extra_fields['id_grupo_cliente'])) {
+			$id_grupo_cliente = intval($this->extra_fields['id_grupo_cliente']);
+			$where .= " AND cliente.id_grupo_cliente = {$id_grupo_cliente}";
+		}
+
 		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			$select_group_concat = "GROUP_CONCAT(DISTINCT documento_cobro.id_cobro ORDER BY documento_cobro.id_cobro ASC) AS cobros,
 				GROUP_CONCAT(DISTINCT factura.numero ORDER BY factura.numero ASC) AS facturas";
