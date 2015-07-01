@@ -72,14 +72,14 @@ if ($opc == 'buscar') {
 			$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 		}
 
-
-		if ($rango == '' && $usar_periodo == 1) {
-			$fecha_ini = $fecha_anio . '-' . $fecha_mes . '-01';
-			$fecha_fin = $fecha_anio . '-' . $fecha_mes . '-31';
-			$where .= " AND cobro.fecha_creacion >= '$fecha_ini' AND cobro.fecha_creacion <= '$fecha_fin 23:59:59' ";
-		} elseif ($fecha_ini != '' && $fecha_fin != '' && $rango == 1 && $usar_periodo == 1) {
-			$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_ini) . "' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_fin) . " 23:59:59' ";
+		if (empty($rango) && !empty($usar_periodo)) {
+			$fecha_ini = "{$fecha_anio}-{$fecha_mes}-01";
+			$fecha_fin = "{$fecha_anio}-{$fecha_mes}-31";
+			$where .= " AND cobro.fecha_creacion >= '{$fecha_ini} 00:00:00' AND cobro.fecha_creacion <= '{$fecha_fin} 23:59:59' ";
+		} elseif (!empty($rango) && !empty($usar_periodo) && !empty($fecha_ini) && !empty($fecha_fin)) {
+			$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_ini) . " 00:00:00' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_fin) . " 23:59:59' ";
 		}
+
 		if ($codigo_cliente) {
 			$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 		}
@@ -104,7 +104,7 @@ if ($opc == 'buscar') {
 	if (!empty($tipo_liquidacion) && $tipo_liquidacion != '') {
 		$where .= " AND cobro.incluye_honorarios = '" . ($tipo_liquidacion & 1) . "' " . " AND cobro.incluye_gastos = '" . ($tipo_liquidacion & 2 ? 1 : 0) . "' ";
 	}
- 
+
 	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
                              left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
@@ -418,6 +418,16 @@ $pagina->PrintTop();
 		<?php if ($_GET['buscar'] == 1)
 			echo "jQuery('#boton_buscar').click();";
 		?>
+
+		jQuery('#usar_periodo').click(function(e) {
+			jQuery('#rango').prop('checked', false);
+			Rangos(jQuery('#rango'), this.form)
+			if (jQuery(this).is(':checked')) {
+				jQuery('#div_rango').css('display', 'inline');
+			} else {
+				jQuery('#div_rango').hide();
+			}
+		});
 
 		jQueryUI.done(function() {
 
@@ -755,53 +765,66 @@ $pagina->PrintTop();
 					?>
 				</td>
 			</tr>
+
 			<tr>
-				<td align=right><input type=checkbox name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
-				<td align=left colspan=2>
-					<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><?php echo __('Otro rango') ?></span>
-					<?php
-					$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
-					?>
-					<div id=periodo style='display:<?php echo!$rango ? 'inline' : 'none' ?>;'>
-
+				<td align="right">
+					<label>
+						<input type="checkbox" name="usar_periodo" id="usar_periodo" value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : ''; ?>>
+						<b><?php echo __('Periodo creación') ?></b>
+					</label>
+				</td>
+				<td align="left" colspan="2">
+					<div id="div_rango" style="display:<?php echo $usar_periodo ? 'inline' : 'none'; ?>">
+						<label>
+							<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : ''; ?> onclick="Rangos(this, this.form);" title="Otro rango" />
+							<span style='font-size:9px;'><?php echo __('Otro rango'); ?></span>
+						</label>
+					</div>
+					<div id="periodo" style="display:<?php echo !$rango ? 'inline' : 'none' ?>;">
 						<?php
-						echo Html::SelectArray(array(
-							array('1', __('Enero')),
-							array('2', __('Febrero')),
-							array('3', __('Marzo')),
-							array('4', __('Abril')),
-							array('5', __('Mayo')),
-							array('6', __('Junio')),
-							array('7', __('Julio')),
-							array('8', __('Agosto')),
-							array('9', __('Septiembre')),
-							array('10', __('Octubre')),
-							array('11', __('Noviembre')),
-							array('12', __('Diciembre')),
-							)
-							, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', __('Mes'), '80px');
+							$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
+							echo Html::SelectArray(
+								array(
+									array('1', __('Enero')),
+									array('2', __('Febrero')),
+									array('3', __('Marzo')),
+									array('4', __('Abril')),
+									array('5', __('Mayo')),
+									array('6', __('Junio')),
+									array('7', __('Julio')),
+									array('8', __('Agosto')),
+									array('9', __('Septiembre')),
+									array('10', __('Octubre')),
+									array('11', __('Noviembre')),
+									array('12', __('Diciembre')),
+								),
+								'fecha_mes',
+								$fecha_mes,
+								'id="fecha_mes"',
+								__('Mes'),
+								'80px'
+							);
 
-						if (!$fecha_anio)
-							$fecha_anio = date('Y');
+							if (!$fecha_anio) {
+								$fecha_anio = date('Y');
+							}
 						?>
-						<select name="fecha_anio" id='fecha_anio' style='width:55px'>
+						<select name="fecha_anio" id="fecha_anio" style="width:55px">
 							<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
-								<option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
-						<?php } ?>
+								<option value='<?php echo $i; ?>' <?php echo $fecha_anio == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
+							<?php } ?>
 						</select>
 					</div>
 					<br>
-					<div id="periodo_rango" style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
-						<?php echo __('Fecha desde') ?>:
+					<div id="periodo_rango" style="display:<?php echo $rango ? 'inline' : 'none' ?>;">
+						<?php echo __('Fecha desde'); ?>:
 						<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
 						<br />
-						<?php echo __('Fecha hasta') ?>:&nbsp;
-						<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
+						<?php echo __('Fecha hasta'); ?>:&nbsp;
+						<input type="text" name="fecha_fin" class="fechadiff" value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 					</div>
 				</td>
 			</tr>
-
-			<script> new Tip('usar_periodo', '<?php echo __('') ?>', {title: '', effect: '', offset: {x: -2, y: 19}});</script>
 
 			<tr>
 				<td align="right">
