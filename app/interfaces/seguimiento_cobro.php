@@ -421,7 +421,7 @@ $pagina->PrintTop();
 
 		jQuery('#usar_periodo').click(function(e) {
 			jQuery('#rango').prop('checked', false);
-			Rangos(jQuery('#rango'), this.form)
+			Rangos(jQuery('#rango'), this.form);
 			if (jQuery(this).is(':checked')) {
 				jQuery('#div_rango').css('display', 'inline');
 			} else {
