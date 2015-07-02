@@ -196,6 +196,7 @@ config.ru
 #############
 ## Composer
 #############
+composer.lock
 vendor
 vendor/**/
 
