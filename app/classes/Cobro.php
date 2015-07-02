@@ -1764,6 +1764,11 @@ if (!class_exists('Cobro')) {
 						$resp = mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
 					}
 
+					// Cambia el estado al correcto
+					if (empty($this->fields['estado_anterior']) || in_array($this->fields['estado_anterior'], array('CREADO', 'EN REVISION'))) {
+						$this->CambiarEstadoSegunFacturas();
+					}
+
 					if (!$this->Write()) {
 						return __('Error no se pudo emitir') .' ' . __('cobro') . ' # ' . $this->fields['id_cobro'];
 					}
