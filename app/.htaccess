@@ -1,6 +1,6 @@
 RewriteEngine On
 RewriteBase /
-RewriteCond %{REQUEST_URI} /(\w+)/(\w+)/(.*)$
+RewriteCond %{REQUEST_URI} \/([A-Za-z0-9\._]+)\/(\w+)\/(.*)$
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ %1/%2/bootstrap.php [QSA,L]
