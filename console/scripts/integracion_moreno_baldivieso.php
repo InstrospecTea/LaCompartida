@@ -95,7 +95,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$client_currency = 1;
 				$client_user_manager_id = 'NULL';
 
-				// Usuario: values by default.
+				// User: values by default.
 				$modifier_user_id = $this->getAdministratorUserId();
 
 				$Client = new Cliente($this->Session);
@@ -110,7 +110,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$Client->Edit('id_usuario_encargado', $client_user_manager_id);
 				}
 
-				$Client->Edit('glosa_cliente', $client['client_name']);
+				$Client->Edit('glosa_cliente', !empty($client['client_name']) ? $client['client_name'] : 'Glosa mal ingresada en SAP');
 				$Client->Edit('activo', $client['client_active']);
 
 				if ($Client->Write()) {
@@ -239,7 +239,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$Matter->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
 				}
 
-				$Matter->Edit('glosa_asunto', $client['matter_name']);
+				$Matter->Edit('glosa_asunto', !empty($client['matter_name']) ? $client['matter_name'] : 'Glosa mal ingresada en SAP');
 				$Matter->Edit('id_idioma', $language);
 				$Matter->Edit('activo', $client['matter_active']);
 				$Matter->Edit('cobrable', $chargeable);
