@@ -6,9 +6,9 @@
 
 class PaginaCobro extends Pagina
 {
-    function PaginaCobro( $sesion )
-    {
-        $this->Pagina( $sesion );
+
+    public function __construct(&$sesion) {
+        parent::__construct($sesion);
     }
 
   /***
