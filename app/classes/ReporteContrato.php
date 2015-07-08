@@ -165,7 +165,7 @@ class ReporteContrato extends Contrato {
 
 		$Contrato::QueriesPrevias($sesion);
 
-		//Si tengo un dato en el olap y no está en las 3 tablas de origen, significa que fue eliminado, pero no lo borro sino que le pongo flag eliminado.
+		//Si tengo un dato en el olap y no estÃ¡ en las 3 tablas de origen, significa que fue eliminado, pero no lo borro sino que le pongo flag eliminado.
 		$updateeliminado = "UPDATE olap_liquidaciones ol LEFT JOIN trabajo t ON ol.id_entry = t.id_trabajo SET ol.eliminado = 1 WHERE ol.tipo = 'TRB' AND t.id_trabajo is NULL;";
 		$updateeliminado .= "UPDATE olap_liquidaciones ol LEFT JOIN cta_corriente cc ON ol.id_entry = cc.id_movimiento SET ol.eliminado = 1 WHERE ol.tipo = 'GAS' AND cc.id_movimiento is NULL;";
 		$updateeliminado .= "UPDATE olap_liquidaciones ol LEFT JOIN tramite tra ON ol.id_entry = tra.id_tramite SET ol.eliminado = 1 WHERE ol.tipo = 'TRA' AND tra.id_tramite is NULL;";
@@ -175,9 +175,8 @@ class ReporteContrato extends Contrato {
 
 	function InsertQuery($maxolaptime) {
 		try {
-		$this->InsertOlapStatement->execute(array(
-			':maxolaptime'=>$maxolaptime,
-			));
+			$this->InsertOlapStatement->execute(array(':maxolaptime' => $maxolaptime));
+			$this->cleanOlap();
 		} catch (PDOException $e) {
 			debug($e->getMessage());
 			debug($e->getTraceAsString());
@@ -597,7 +596,7 @@ class ReporteContrato extends Contrato {
 				AND incluye_honorarios = $incluye_honorarios";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while (list($id_cobro) = mysql_fetch_array($resp)) {
-			#Se ingresa la anotación en el historial
+			#Se ingresa la anotaciÃ³n en el historial
 			$his = new Observacion($this->sesion);
 			$his->Edit('fecha', date('Y-m-d H:i:s'));
 			$his->Edit('comentario', "COBRO ELIMINADO (OTRO BORRADOR)");
@@ -919,7 +918,7 @@ class ReporteContrato extends Contrato {
 		return array(0, $moneda, $id_moneda, intval($cantidad_asuntos), $monto_hh_contrato, $X, $Y, $monto_hh_asunto, $x, $y);
 	}
 
-	// Cargar información de escalonadas a un objeto
+	// Cargar informaciÃ³n de escalonadas a un objeto
 	function CargarEscalonadas() {
 		$this->escalonadas = array();
 		$this->escalonadas['num'] = 0;
@@ -1015,7 +1014,7 @@ class ReporteContrato extends Contrato {
 			$duracion_retainer_trabajo = 0;
 
 			if ($trabajo->fields['cobrable']) {
-				// Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada
+				// Revisa duraciÃ³n de la hora y suma duracion que sobro del trabajo anterior, si es que se cambiÃ³ de escalonada
 				list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
 				$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 				$duracion_trabajo = $duracion;
@@ -1035,7 +1034,7 @@ class ReporteContrato extends Contrato {
 					$cobro_total_duracion += $duracion_escalonada_actual;
 
 					if (!empty($this->escalonadas[$x_escalonada]['id_tarifa'])) {
-						// Busca la tarifa según abogado y definición de la escalonada
+						// Busca la tarifa segÃºn abogado y definiciÃ³n de la escalonada
 						$tarifa_estandar = UtilesApp::CambiarMoneda(
 										Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda']), $moneda_escalonada->fields['tipo_cambio'], $moneda_escalonada->fields['cifras_decimales'], $moneda_contrato->fields['tipo_cambio'], $moneda_contrato->fields['cifras_decimales']
 						);
@@ -1282,7 +1281,7 @@ GROUP BY  $bagrupador";
 			}
 
 			$query .= " WHERE " . $this->campo_id . "='" . $this->fields[$this->campo_id] . "'";
-			if ($do_update) { //Solo en caso de que se haya modificado algún campo
+			if ($do_update) { //Solo en caso de que se haya modificado algÃºn campo
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 				//Guarda ultimo cambio en la tabla historial de modificaciones
@@ -1293,7 +1292,7 @@ GROUP BY  $bagrupador";
                                                                                     " . (!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" ) . " )";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3, __FILE__, __LINE__, $this->sesion->dbh);
 			}
-			else //Retorna true ya que si no quiere hacer update la función corrió bien
+			else //Retorna true ya que si no quiere hacer update la funciÃ³n corriÃ³ bien
 				return true;
 		}
 		else {
@@ -1332,27 +1331,27 @@ GROUP BY  $bagrupador";
 					$CorreosModificacionAdminDatos = '';
 				}
 				if ($CorreosModificacionAdminDatos != '') {
-					// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
+					// En caso de cambiar a avisar a mÃ¡s de un encargado editar el query y cambiar el if() por while()
 					$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $this->fields['id_usuario_responsable'];
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					if (list($nombre, $email) = mysql_fetch_array($resp)) {
 						$email .= ',' . $CorreosModificacionAdminDatos;
 
-						$subject = 'Creación de contrato';
+						$subject = 'CreaciÃ³n de contrato';
 
 						// Obtener el nombre del cliente asociado al contrato.
 						$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
 						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
 						list($nombre_cliente) = mysql_fetch_array($resp2);
 
-						// Revisar si el contrato está asociado a algún asunto.
+						// Revisar si el contrato estÃ¡ asociado a algÃºn asunto.
 						$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
 						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
 						if (list($glosa_asunto) = mysql_fetch_array($resp2))
 							$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
 						else
 							$asunto_contrato = '';
-						$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el día " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
+						$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el dÃ­a " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
 
 						Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
 					}
@@ -1373,5 +1372,63 @@ GROUP BY  $bagrupador";
 		return Html::SelectQuery($this->sesion, $query, 'id_contrato', $selected, empty($onchange) ? null : 'onchange=' . $onchange, __("Cualquiera"), $width);
 	}
 
-}
+	function cleanOlap($fechaentry_inicio = null, $fechaentry_fin = null) {
+		$where = '';
+		$fechaentry_between = array();
 
+		if (!empty($fechaentry_inicio) && !empty($fechaentry_fin)) {
+			$where = "AND ol.fechaentry BETWEEN ':fechaentry_inicio' AND ':fechaentry_fin'";
+
+			$fechaentry_between = array(
+				':fechaentry_inicio' => $fechaentry_inicio,
+				':fechaentry_fin' => $fechaentry_fin,
+			);
+		}
+
+		// trabajos
+		$query_trabajos = "DELETE ol1
+			FROM olap_liquidaciones ol1
+			JOIN (
+				SELECT ol.id_unico
+				FROM olap_liquidaciones ol
+					LEFT JOIN trabajo t ON t.id_trabajo = (ol.id_unico - 10000000)
+				WHERE ol.tipo = 'TRB'
+					AND t.id_trabajo IS NULL
+					{$where}
+			) ol2 ON ol1.id_unico = ol2.id_unico";
+
+		$trabajo_statement = $this->sesion->pdodbh->prepare($query_trabajos);
+		$trabajo_statement->execute($fechaentry_between);
+
+		// gastos
+		$query_gastos = "DELETE ol1
+			FROM olap_liquidaciones ol1
+			JOIN (
+				SELECT ol.id_unico
+				FROM olap_liquidaciones ol
+					LEFT JOIN cta_corriente cc ON cc.id_movimiento = (ol.id_unico - 20000000)
+				WHERE ol.tipo = 'GAS'
+					AND cc.id_movimiento IS NULL
+					{$where}
+			) ol2 ON ol1.id_unico = ol2.id_unico";
+
+		$gasto_statement = $this->sesion->pdodbh->prepare($query_gastos);
+		$gasto_statement->execute($fechaentry_between);
+
+		// tramites
+		$query_tramites = "DELETE ol1
+			FROM olap_liquidaciones ol1
+			JOIN (
+				SELECT ol.id_unico
+				FROM olap_liquidaciones ol
+					LEFT JOIN tramite t ON t.id_tramite = (ol.id_unico - 30000000)
+				WHERE ol.tipo = 'TRA'
+					AND t.id_tramite IS NULL
+					{$where}
+			) ol2 ON ol1.id_unico = ol2.id_unico";
+
+		$tramite_statement = $this->sesion->pdodbh->prepare($query_tramites);
+		$tramite_statement->execute($fechaentry_between);
+	}
+
+}
