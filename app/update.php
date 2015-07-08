@@ -10806,14 +10806,21 @@ QUERY;
 			break;
 
 		case 8.03:
-			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarCobrosPorDefecto', '', 'Campos soportados para ordenamiento:<br/> Fecha de Creacion del Cobro => fecha_creacion<br/>Nombre Cliente => nombre_cliente<br/>Numero Cobro => numero_cobro<br/>Encargado Comercial => encargado_comercial', 'string', '6', '-1');";
 
 			break;
 
 		case 8.04:
-			$queries = array();
 			$queries[] = "UPDATE configuracion SET glosa_opcion = 'CodigoClienteAsuntoModificable' WHERE glosa_opcion = 'CodigoObligatorio';";
+			break;
+
+		case 8.05:
+			if (!ExisteCampo('cta_corriente', 'cuenta_gasto', $dbh)) {
+				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `cuenta_gasto` VARCHAR(100) DEFAULT NULL;";
+			}
+			if (!ExisteCampo('cta_corriente', 'detraccion', $dbh)) {
+				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `detraccion` VARCHAR(100) DEFAULT NULL;";
+			}
 			break;
 	}
 
@@ -10827,7 +10834,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.04;
+$max_update = 8.05;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
