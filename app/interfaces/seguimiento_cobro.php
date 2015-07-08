@@ -46,7 +46,7 @@ if ($opc == 'buscar') {
 
 	if ($id_cobro) {
 		$where .= " AND cobro.id_cobro = '$id_cobro' ";
-	} else if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !empty($numero_factura)) {
+	} else if (!empty($numero_factura)) {
 		$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
 	} else if ($factura || $tipo_documento_legal || $serie) {
 		$factura_obj = new Factura($sesion);
@@ -72,19 +72,23 @@ if ($opc == 'buscar') {
 			$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 		}
 
-
-		if ($rango == '' && $usar_periodo == 1) {
-			$fecha_ini = $fecha_anio . '-' . $fecha_mes . '-01';
-			$fecha_fin = $fecha_anio . '-' . $fecha_mes . '-31';
-			$where .= " AND cobro.fecha_creacion >= '$fecha_ini' AND cobro.fecha_creacion <= '$fecha_fin 23:59:59' ";
-		} elseif ($fecha_ini != '' && $fecha_fin != '' && $rango == 1 && $usar_periodo == 1) {
-			$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_ini) . "' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_fin) . " 23:59:59' ";
+		if (empty($rango) && !empty($usar_periodo)) {
+			$fecha_ini = "{$fecha_anio}-{$fecha_mes}-01";
+			$fecha_fin = "{$fecha_anio}-{$fecha_mes}-31";
+			$where .= " AND cobro.fecha_creacion >= '{$fecha_ini} 00:00:00' AND cobro.fecha_creacion <= '{$fecha_fin} 23:59:59' ";
+		} elseif (!empty($rango) && !empty($usar_periodo) && !empty($fecha_ini) && !empty($fecha_fin)) {
+			$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_ini) . " 00:00:00' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_fin) . " 23:59:59' ";
 		}
+
 		if ($codigo_cliente) {
 			$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 		}
 		if (!empty($estado) && $estado[0] != '-1') {
 			$where .= " AND cobro.estado in ('" . implode("','", $estado) . "') ";
+		}
+
+		if ($id_grupo_cliente) {
+			$where .= " AND (cliente.id_grupo_cliente = '{$id_grupo_cliente}' OR grupo_cliente.id_grupo_cliente = '{$id_grupo_cliente}') ";
 		}
 	}
 
@@ -140,6 +144,7 @@ if ($opc == 'buscar') {
 				cobro.impuesto_gastos,
 				cobro.fecha_ini,
 				cobro.fecha_fin,
+				cobro.fecha_creacion,
 				moneda.simbolo,
 				cobro.id_proceso,
 				cobro.codigo_idioma,
@@ -153,6 +158,7 @@ if ($opc == 'buscar') {
 				contrato.id_contrato,
 				contrato.codigo_cliente,
 				cliente.glosa_cliente,
+				usuario.apellido1,
 				contrato.forma_cobro,
 				contrato.monto,
 				contrato.retainer_horas,
@@ -189,6 +195,8 @@ if ($opc == 'buscar') {
 				JOIN cobro ON cobro.id_contrato = contrato.id_contrato
 			 	LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 			 	LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+			 	LEFT JOIN usuario ON cobro.id_usuario_responsable = usuario.id_usuario
+				LEFT JOIN grupo_cliente ON grupo_cliente.codigo_cliente = contrato.codigo_cliente
 				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
 				LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
 				LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa";
@@ -204,9 +212,13 @@ if ($opc == 'buscar') {
                     WHERE $where
 						GROUP BY cobro.id_cobro, cobro.id_contrato";
 	$x_pag = 20;
-	$orden = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
+
+	if(empty($orden)) {
+		$orden = $cobros->OrdenResultados();
+	}
 
 	if ($print) {
+		$query .= " ORDER BY $orden";
 		$cobros_stmt = $sesion->pdodbh->query($query);
 		$cobros_result = $cobros_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -299,7 +311,6 @@ if ($opc == 'buscar') {
 								<b>Nº Factura</b>
 							</td>";
 			}
-
 			$ht .= "<td style='font-size:10px; width: 52px;' align=center>
 								<b>Opción</b>
 							</td></tr>";
@@ -376,7 +387,6 @@ if ($opc == 'buscar') {
 		$html .= "</td>";
 
 		if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
-
 			$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 			if ($cobro->fields['documento'])
 				$html.= "#" . $cobro->fields['documento'];
@@ -408,6 +418,16 @@ $pagina->PrintTop();
 		<?php if ($_GET['buscar'] == 1)
 			echo "jQuery('#boton_buscar').click();";
 		?>
+
+		jQuery('#usar_periodo').click(function(e) {
+			jQuery('#rango').prop('checked', false);
+			Rangos(jQuery('#rango'), this.form);
+			if (jQuery(this).is(':checked')) {
+				jQuery('#div_rango').css('display', 'inline');
+			} else {
+				jQuery('#div_rango').hide();
+			}
+		});
 
 		jQueryUI.done(function() {
 
@@ -466,6 +486,8 @@ $pagina->PrintTop();
 		} else {
 			form.action = 'seguimiento_cobro.php';
 			form.opc.value = 'buscar';
+			form.orden.value = '';
+			form.desde.value = '';
 			form.submit();
 		}
 	}
@@ -555,55 +577,9 @@ $pagina->PrintTop();
 		}
 	}
 
-	function Refrescar(id_foco) {
-		var _codigo_cliente = 'codigo_cliente';
-		var _codigo_asunto = 'codigo_asunto';
-
-		<?php if (Conf::GetConf($sesion, 'CodigoSecundario')) { ?>
-			_codigo_cliente = 'codigo_cliente_secundario';
-			_codigo_asunto = 'codigo_asunto_secundario';
-		<?php } ?>
-
-		var factura = $('factura').value;
-		var proceso = $('proceso').value;
-
-		var codigo_cliente = jQuery('#' + _codigo_cliente).val();
-		var codigo_asunto = jQuery('#' + _codigo_asunto).val();
-
-		var forma_cobro = $('forma_cobro').value;
-		var tipo_liquidacion = $('tipo_liquidacion') ? $('tipo_liquidacion').value : '';
-		var id_usuario = $('id_usuario').value;
-		var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
-		var id_cobro = $('id_cobro').value;
-
-		if ($('usar_periodo').checked == true) {
-			var usar_periodo = $('usar_periodo').value;
-		} else {
-			var usar_periodo = '';
-		}
-
-		if ($('rango').checked == true) {
-			var rango = $('rango').value;
-		} else {
-			var rango = '';
-		}
-
-		var fecha_mes = $('fecha_mes').value;
-		var fecha_anio = $('fecha_anio').value;
-		var fecha_ini = $('fecha_ini').value;
-		var fecha_fin = $('fecha_fin').value;
-
-		var orden = "<?php echo $orden ? '&orden=' . $orden : ''; ?>";
-		var pagina_desde = "<?php echo $desde ? '&desde=' . $desde : ''; ?>";
-
-		var estado = '';
-		jQuery("select[name*=estado] option:selected").each(function() {
-      estado += "&estado[]=" + jQuery(this).text();
-    });
-
-		var url = "seguimiento_cobro.php?id_usuario=" + id_usuario + "&tipo_liquidacion=" + tipo_liquidacion + "&forma_cobro=" + forma_cobro + "&id_usuario_secundario=" + id_usuario_secundario + "&id_cobro=" + id_cobro + "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto + "&opc=buscar" + pagina_desde + "&usar_periodo=" + usar_periodo + "&rango=" + rango + "&proceso=" + proceso + "&fecha_ini=" + fecha_ini + "&fecha_mes=" + fecha_mes + "&fecha_anio=" + fecha_anio + "&fecha_fin=" + fecha_fin + estado + orden + "&id_foco=" + id_foco;
-
-		self.location.href = url;
+	function Refrescar() {
+		$('opc').value = 'buscar';
+		self.location.href = 'seguimiento_cobro.php?' + jQuery('#form_busca').serialize();
 	}
 
 	function ShowDiv(div, valor, dvimg) {
@@ -702,6 +678,8 @@ $pagina->PrintTop();
 <form name="form_busca" id="form_busca" action="" method="post">
 	<input type="hidden" name='opc' id='opc' value=''>
 	<input type="hidden" name='id_cobro_hide' value=''>
+ 	<input type='hidden' name='desde' id='desde' value='<?php echo $desde ?>'>
+ 	<input type='hidden' name='orden' id='orden' value='<?php echo $orden ?>'>
 
 	<fieldset class="tb_base" style="width:850px;">
 	<legend><?php echo 'Filtros' ?></legend>
@@ -712,14 +690,14 @@ $pagina->PrintTop();
 				<td colspan="2" align="left">
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=id_cobro id=id_cobro value="<?php echo $id_cobro ?>">
 					<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=hidden size=6 name=proceso id=proceso value="<?php echo $proceso ?>">
-					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) { ?>
+					 <?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && !Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 						&nbsp;&nbsp;<b><?php echo __('Nº Factura') ?></b>&nbsp;
 						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type=text size=6 name=numero_factura id=numero_factura value="<?php echo $numero_factura ?>">
 					 <?php } ?>
 				</td>
 			</tr>
 
-			<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+			<?php if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros') && Conf::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 				<tr>
 					<td align="right" width='30%'>
 						<b><?php echo __('Documento legal') ?></b>
@@ -731,6 +709,16 @@ $pagina->PrintTop();
 					</td>
 				</tr>
 			<?php } ?>
+
+			<tr>
+				<td align="right" width="30%">
+					<b><?php echo __('Grupo') ?></b>&nbsp;
+				</td>
+				<td align="left" colspan="2">
+					<?php $GrupoCliente = new GrupoCliente($sesion); ?>
+					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+				</td>
+			</tr>
 
 			<tbody id="selectclienteasunto">
 				<tr >
@@ -777,53 +765,66 @@ $pagina->PrintTop();
 					?>
 				</td>
 			</tr>
+
 			<tr>
-				<td align=right><input type=checkbox name="usar_periodo" id=usar_periodo value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
-				<td align=left colspan=2>
-					<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><?php echo __('Otro rango') ?></span>
-					<?php
-					$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
-					?>
-					<div id=periodo style='display:<?php echo!$rango ? 'inline' : 'none' ?>;'>
-
+				<td align="right">
+					<label>
+						<input type="checkbox" name="usar_periodo" id="usar_periodo" value="1" title="Seleccione esta opción para utilizar el filtro periodo" <?php echo $usar_periodo ? 'checked' : ''; ?>>
+						<b><?php echo __('Periodo creación') ?></b>
+					</label>
+				</td>
+				<td align="left" colspan="2">
+					<div id="div_rango" style="display:<?php echo $usar_periodo ? 'inline' : 'none'; ?>">
+						<label>
+							<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : ''; ?> onclick="Rangos(this, this.form);" title="Otro rango" />
+							<span style='font-size:9px;'><?php echo __('Otro rango'); ?></span>
+						</label>
+					</div>
+					<div id="periodo" style="display:<?php echo !$rango ? 'inline' : 'none' ?>;">
 						<?php
-						echo Html::SelectArray(array(
-							array('1', __('Enero')),
-							array('2', __('Febrero')),
-							array('3', __('Marzo')),
-							array('4', __('Abril')),
-							array('5', __('Mayo')),
-							array('6', __('Junio')),
-							array('7', __('Julio')),
-							array('8', __('Agosto')),
-							array('9', __('Septiembre')),
-							array('10', __('Octubre')),
-							array('11', __('Noviembre')),
-							array('12', __('Diciembre')),
-							)
-							, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', __('Mes'), '80px');
+							$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
+							echo Html::SelectArray(
+								array(
+									array('1', __('Enero')),
+									array('2', __('Febrero')),
+									array('3', __('Marzo')),
+									array('4', __('Abril')),
+									array('5', __('Mayo')),
+									array('6', __('Junio')),
+									array('7', __('Julio')),
+									array('8', __('Agosto')),
+									array('9', __('Septiembre')),
+									array('10', __('Octubre')),
+									array('11', __('Noviembre')),
+									array('12', __('Diciembre')),
+								),
+								'fecha_mes',
+								$fecha_mes,
+								'id="fecha_mes"',
+								__('Mes'),
+								'80px'
+							);
 
-						if (!$fecha_anio)
-							$fecha_anio = date('Y');
+							if (!$fecha_anio) {
+								$fecha_anio = date('Y');
+							}
 						?>
-						<select name="fecha_anio" id='fecha_anio' style='width:55px'>
+						<select name="fecha_anio" id="fecha_anio" style="width:55px">
 							<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
-								<option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
-						<?php } ?>
+								<option value='<?php echo $i; ?>' <?php echo $fecha_anio == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
+							<?php } ?>
 						</select>
 					</div>
 					<br>
-					<div id="periodo_rango" style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
-						<?php echo __('Fecha desde') ?>:
+					<div id="periodo_rango" style="display:<?php echo $rango ? 'inline' : 'none' ?>;">
+						<?php echo __('Fecha desde'); ?>:
 						<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
 						<br />
-						<?php echo __('Fecha hasta') ?>:&nbsp;
-						<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
+						<?php echo __('Fecha hasta'); ?>:&nbsp;
+						<input type="text" name="fecha_fin" class="fechadiff" value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 					</div>
 				</td>
 			</tr>
-
-			<script> new Tip('usar_periodo', '<?php echo __('') ?>', {title: '', effect: '', offset: {x: -2, y: 19}});</script>
 
 			<tr>
 				<td align="right">

@@ -293,17 +293,18 @@ $Html = new \TTB\Html();
 
 	function ValidarContrato(form) {
 
+		if (!form) {
+			var form = jQuery('[name="formulario"]').get(0);
+		}
+
 		var plugin_facturacion_mx = '<?php echo $plugins_activos ?>';
-		if (plugin_facturacion_mx != ''){
+
+		if (plugin_facturacion_mx != '') {
 			if(form.id_pais.options[0].selected == true) {
 				alert("<?php echo __('Debe ingresar el pais del cliente. Es Obligatorio debido a Facturación Electrónica') ?>");
 				form.id_pais.focus();
 				return false;
 			}
-		}
-
-		if(!form) {
-			var form = jQuery('[name="formulario"]').get(0);
 		}
 
 		<?php if (Conf::GetConf($Sesion, 'NuevoModuloFactura')) { ?>
@@ -1635,7 +1636,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('ROL/RUT') . $obligatorios('factura_rut'); ?>
 					</td>
 					<td align="left" colspan="3">
-						<input type="text" size="20" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" />
+						<input type="text" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" size="30" maxlength="50" />
 					</td>
 				</tr>
 				<tr>
@@ -1656,7 +1657,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php } else { ?>
 							<?php
 								$prmGiro = new PrmGiro($Sesion);
-								$giros = $prmGiro->ListarExt();
+								$giros = $prmGiro->Listar();
 								if (count($giros) > 0) {
 									echo $SelectHelper->ajax_select(
 										'factura_giro_select',
@@ -1727,7 +1728,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('País') . $obligatorios('id_pais'); ?>
 					</td>
 					<td align="left" colspan='3'>
-						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia ASC'), 'id_pais', $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : $id_pais, 'class ="span3"', 'Vacío', '260px'); ?>
+						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia, nombre ASC'), 'id_pais', $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : $id_pais, 'class ="span3"', 'Vacío', '260px'); ?>
 					</td>
 				</tr>
 
@@ -1976,7 +1977,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</tr>
 					<tr>
 						<td  class="ar ">
-							<?php echo __('Forma de cobro') . $obligatorios('forma_cobro'); ?>
+							<?php echo __('Forma de Tarificación') . $obligatorios('forma_cobro'); ?>
 						</td>
 						<?php
 						if (!$contrato->fields['forma_cobro'])
@@ -3025,7 +3026,7 @@ echo $Form->script();
 		?>
 	}
 
-	if (jQuery('#periodo_fecha_inicio').val()) {
+	if (jQuery('#periodo_fecha_inicio').length != 0) {
 		Calendar.setup({
 			inputField	: "periodo_fecha_inicio",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
@@ -3033,7 +3034,7 @@ echo $Form->script();
 		});
 	}
 
-	if (jQuery('#fecha_inicio_cap').val()) {
+	if (jQuery('#fecha_inicio_cap').length != 0) {
 		Calendar.setup({
 			inputField	: "fecha_inicio_cap",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format

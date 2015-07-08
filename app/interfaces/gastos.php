@@ -231,24 +231,24 @@ if ($preparar_cobro == 1) {
 
 <script type="text/javascript">
 
-			var contratos = {};
-			var tablagastos = null;
-			function Preparar_Cobro(form) {
-			form.action = 'gastos.php?preparar_cobro=1';
-					form.submit();
-			}
+	var contratos = {};
+	var tablagastos = null;
+	function Preparar_Cobro(form) {
+		form.action = 'gastos.php?preparar_cobro=1';
+		form.submit();
+	}
 
 	function EliminaGasto(id) {
-	var form = document.getElementById('form_gastos');
+		var form = document.getElementById('form_gastos');
 <?php if ($conf_codigo_secundario) { ?>
 		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente_secundario').value + '&codigo_asunto=' + $('codigo_asunto_secundario').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo Conf::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
 <?php } else { ?>
 		var acc = 'gastos.php?id_gasto=' + id + '&accion=eliminar&codigo_cliente=' + $('codigo_cliente').value + '&codigo_asunto=' + $('codigo_asunto').value + '&fecha1=' + $('fecha1').value + '&fecha2=' + $('fecha2').value<?php echo Conf::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?> + '&opc=buscar';
 <?php } ?>
 
-	if (parseInt(id) > 0 && confirm('¿Desea eliminar el gasto seleccionado?') == true) {
-	self.location.href = acc;
-	}
+		if (parseInt(id) > 0 && confirm('¿Desea eliminar el gasto seleccionado?') == true) {
+			self.location.href = acc;
+		}
 	}
 
 	function CargarContrato(asunto) {
@@ -286,16 +286,19 @@ if ($preparar_cobro == 1) {
 	}
 
 	jQuery('document').ready(function() {
-	jQuery('#selectodos').live('click', function() {
 
-	if (jQuery(this).is(':checked')) {
-	jQuery('.eligegasto').attr('checked', 'checked');
-	} else {
-	jQuery('.eligegasto').removeAttr('checked');
-	}
-	});
-			jQuery('.buscargastos').click(function() {
-	var form = jQuery('#form_gastos');
+		jQuery('#selectodos').live('click', function() {
+			if (jQuery(this).is(':checked')) {
+				jQuery('.eligegasto').attr('checked', 'checked');
+			} else {
+				jQuery('.eligegasto').removeAttr('checked');
+			}
+		});
+
+		jQuery('.buscargastos').click(function() {
+			var form = jQuery('#form_gastos');
+			var serialized_form = form.serialize().replace(/[!'()*]/g, escape);
+
 			var from = jQuery(this).attr('rel');
 			//jQuery(this).attr('disabled','disabled');
 <?php
@@ -308,73 +311,72 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 }
 ?>
 
-	if (from == 'excel') {
-	jQuery('#boton_excel').attr('disabled', 'disabled');
-			jQuery.post('ajax/estimar_datos.php', jQuery('#form_gastos').serialize(), function(data) {
+		if (from == 'excel') {
+			jQuery('#boton_excel').attr('disabled', 'disabled');
+			jQuery.post('ajax/estimar_datos.php', serialized_form, function(data) {
 
-			if (parseInt(data) > 20000) {
-			var formated = data / 1000;
+				if (parseInt(data) > 20000) {
+					var formated = data / 1000;
 					jQuery('#dialog-confirm').attr('title', 'Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna ' + data + ' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado ycon funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
 					jQuery("#dialog:ui-dialog").dialog("destroy");
 					jQuery("#dialog-confirm").dialog({
-			resizable: false,
-					autoOpen:true,
-					height:200,
-					width:450,
-					modal: true,
-					close: function(ev, ui) {
-					jQuery(this).html('');
-					},
-					buttons: {
-					"<?php echo __('Entiendo y acepto') ?>": function() {
+						resizable: false,
+						autoOpen:true,
+						height:200,
+						width:450,
+						modal: true,
+						close: function(ev, ui) {
+							jQuery(this).html('');
+						},
+						buttons: {
+							"<?php echo __('Entiendo y acepto') ?>": function() {
 
-					jQuery('#boton_excel').removeAttr('disabled');
-							jQuery('#form_gastos').attr('action', 'ajax/csv_gastos.php').submit(); //planillon_gastos
-							jQuery(this).dialog("close");
-							return true;
-					},
+								jQuery('#boton_excel').removeAttr('disabled');
+								jQuery('#form_gastos').attr('action', 'ajax/csv_gastos.php').submit(); //planillon_gastos
+								jQuery(this).dialog("close");
+								return true;
+							},
 							"<?php echo __('Cancelar') ?>": function() {
-							jQuery('#boton_excel').removeAttr('disabled');
-									jQuery(this).dialog("close");
-									return false;
+								jQuery('#boton_excel').removeAttr('disabled');
+								jQuery(this).dialog("close");
+								return false;
 							}
-					}
+						}
+					});
+				} else {
+					jQuery('#boton_excel').removeAttr('disabled');
+					<?php echo $pagina_excel ?>
+					return true;
+				}
 			});
-			} else {
-			jQuery('#boton_excel').removeAttr('disabled');
-<?php echo $pagina_excel ?>
 			return true;
-			}
-			});
+		} else if (from == 'excel_resumen') {
+			jQuery('#form_gastos').attr('action', 'gastos_xls_resumen.php').submit();
 			return true;
-	} else if (from == 'excel_resumen') {
-	jQuery('#form_gastos').attr('action', 'gastos_xls_resumen.php').submit();
-			return true;
-	} else if (from == 'datatables' || from == 'buscar') {
-	contratos = {};
+		} else if (from == 'datatables' || from == 'buscar') {
+			contratos = {};
 <?php if ($conf_nuevo_modulo_gastos) { ?>
-		var id_contrato = jQuery('#id_contrato').val();
-				var params = jQuery('#form_gastos').serialize();
-				var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
-				var html_url = './planillas/planilla_saldo.php?popup=1&opcion=buscar&tipo_liquidacion=2&mostrar_detalle=1&id_contrato=' + id_contrato + '&' + params;
-				jQuery('#totalcta').text('');
-				jQuery.getJSON(ajax_url, function(data) {
+			var id_contrato = jQuery('#id_contrato').val();
+			var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + serialized_form;
+			var html_url = './planillas/planilla_saldo.php?popup=1&opcion=buscar&tipo_liquidacion=2&mostrar_detalle=1&id_contrato=' + id_contrato + '&' + serialized_form;
+			jQuery('#totalcta').text('');
+			jQuery.getJSON(ajax_url, function(data) {
 				var onclick_html = "nuevaVentana('',1000,700,'" + html_url + "', '');";
-						var restul_html = '<b>Balance cuenta gastos: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html + '">' + data.resultado + '</a></b>';
-						jQuery('#totalcta').html(restul_html);
-				});
+				var result_html = '<b>Balance cuenta gastos: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html + '">' + data.resultado + '</a></b>';
+				jQuery('#totalcta').html(result_html);
+			});
 <?php } else { ?>
-		jQuery('#totalcta').load('ajax/ajax_gastos.php?totalctacorriente=1&' + jQuery('#form_gastos').serialize());
+			jQuery('#totalcta').load('ajax/ajax_gastos.php?totalctacorriente=1&' + serialized_form);
 <?php } ?>
 
-	tablagastos = jQuery('#tablon').dataTable({
-	"fnPreDrawCallback": function(oSettings) {
-	jQuery('#tablon').fadeTo('fast', 0.1);
-	},
-			"bDestroy": true,
-			"bServerSide": true,
-			"oLanguage": {
-			"sProcessing": "Procesando...",
+			tablagastos = jQuery('#tablon').dataTable({
+				"fnPreDrawCallback": function(oSettings) {
+					jQuery('#tablon').fadeTo('fast', 0.1);
+				},
+				"bDestroy": true,
+				"bServerSide": true,
+				"oLanguage": {
+					"sProcessing": "Procesando...",
 					"sLengthMenu": "Mostrar _MENU_ registros",
 					"sZeroRecords": "No se encontraron resultados",
 					"sInfo": "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
@@ -385,34 +387,34 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 					"sUrl": "",
 					"oPaginate": {
 					"sPrevious": "Anterior",
-							"sNext": "Siguiente"
+						"sNext": "Siguiente"
 					}
-			},
-			"bFilter": false,
-			"bProcessing": true,
-			"sAjaxSource": "ajax/ajax_gastos.php?where=1&" + jQuery('#form_gastos').serialize(),
-			"bJQueryUI": true,
-			"bDeferRender": true,
-			"sServerParams": jQuery('#form_gastos').serialize(),
-			"fnServerData": function (sSource, aoData, fnCallback) {
-			jQuery.ajax({
-			"dataType": 'json',
-					"type": "POST",
-					"url": sSource,
-					"data": aoData,
-					"success": fnCallback,
-					"complete" :function() {
-					jQuery('#tablon').fadeTo(0, 1);
-					}
-			});
-			},
-			"aoColumnDefs": [
-			{ "sClass": "alignleft", "aTargets": [ 1, 2, 3, 4 ] },
-			{ "sClass": "marginleft", "aTargets": [ 2 ] },
-			{ "sClass": "tablagastos", "aTargets": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10  ]   },
-			{ "sWidth": "60px", "aTargets": [ 0, 1, 5, 6, 11, 12] },
-			{ "bSortable":false, "aTargets": [ 2, 3, 4, 11, 12] },
-			{ "bVisible": false, "aTargets": [ 5, 10, 12, 14] },
+				},
+				"bFilter": false,
+				"bProcessing": true,
+				"sAjaxSource": "ajax/ajax_gastos.php?where=1&" + serialized_form,
+				"bJQueryUI": true,
+				"bDeferRender": true,
+				"sServerParams": serialized_form,
+				"fnServerData": function (sSource, aoData, fnCallback) {
+					jQuery.ajax({
+						"dataType": 'json',
+						"type": "POST",
+						"url": sSource,
+						"data": aoData,
+						"success": fnCallback,
+						"complete" :function() {
+							jQuery('#tablon').fadeTo(0, 1);
+						}
+					});
+				},
+				"aoColumnDefs": [
+					{ "sClass": "alignleft", "aTargets": [ 1, 2, 3, 4 ] },
+					{ "sClass": "marginleft", "aTargets": [ 2 ] },
+					{ "sClass": "tablagastos", "aTargets": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10  ]   },
+					{ "sWidth": "60px", "aTargets": [ 0, 1, 5, 6, 11, 12] },
+					{ "bSortable": false, "aTargets": [ 2, 3, 4, 11, 12, 13] },
+					{ "bVisible": false, "aTargets": [ 5, 10, 12, 14] },
 <?php
 if (!Conf::GetConf($sesion, 'NumeroGasto')) {
 	echo ' { "bVisible": false, "aTargets": [ 0 ] },';
@@ -430,145 +432,145 @@ if (!Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 }
 ?>
 
-			{  "fnRender": function (o, val) {
-			return o.aData[2];
-			}, "bUseRendered": false, "aTargets": [2] },
-			{ "fnRender": function (o, val) {
-			var idcobro = o.aData[10];
-					var respuesta = '';
-					if (idcobro > 0) {
-			respuesta += "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro=" + idcobro + "&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">" + idcobro + "</a><br/>";
-			}
+					{ "fnRender": function (o, val) {
+						return o.aData[2];
+					}, "bUseRendered": false, "aTargets": [2] },
+					{ "fnRender": function (o, val) {
+						var idcobro = o.aData[10];
+						var respuesta = '';
+						if (idcobro > 0) {
+							respuesta += "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro=" + idcobro + "&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">" + idcobro + "</a><br/>";
+						}
 
-			return respuesta + '<small>' + o.aData[9] + '</small>';
-			}, "aTargets": [9]},
-			{"fnRender": function (o, val) {
-			var respuesta = '';
-					var estado;
-					var patron = new RegExp("<small>(.*)</small>", "g");
-					if ((estado = patron.exec(o.aData[9])) !== null) {
-			if (estado[1] == 'SIN COBRO' || estado[1] == 'CREADO' || estado[1] == 'EN REVISION') {
-			respuesta += "<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto=" + o.aData[0] + "&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto(" + o.aData[0] + ")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
-					respuesta += "<input type='checkbox' class='eligegasto' id='check_" + o.aData[0] + "'/>";
-			} else {
-			respuesta += "<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido emitido.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
-			}
-			}
+						return respuesta + '<small>' + o.aData[9] + '</small>';
+					}, "aTargets": [9]},
+					{"fnRender": function (o, val) {
+						var respuesta = '';
+						var estado;
+						var patron = new RegExp("<small>(.*)</small>", "g");
+						if ((estado = patron.exec(o.aData[9])) !== null) {
+							if (estado[1] == 'SIN COBRO' || estado[1] == 'CREADO' || estado[1] == 'EN REVISION') {
+								respuesta += "<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto=" + o.aData[0] + "&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto(" + o.aData[0] + ")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
+								respuesta += "<input type='checkbox' class='eligegasto' id='check_" + o.aData[0] + "'/>";
+							} else {
+								respuesta += "<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido emitido.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
+							}
+						}
 
-			return respuesta;
-			}, "bUseRendered": false, "aTargets": [13]},
-			{"fnRender": function (o, val) {
-				var respuesta = '';
-				if (o.aData[13]) {
-					respuesta = o.aData[13];
-					if (o.aData[6]) {
-						respuesta += '<br/><small>' + o.aData[6] + '</small>';
-					}
-				}
-				return respuesta;
-			}, "aTargets": [6]},
-			{"fnRender": function (o, val) {
-			var tipo = (o.aData[15] != ' - ')? o.aData[15] + ' ':'';
-					return o.aData[4] + '<div class="tipodescripcion">(' + tipo + o.aData[5] + ')</div>';
-			}, "aTargets": [4]},
-			{"fnRender": function (o, val) {
-			var activo = (o.aData[12] == 'SI') ? 'activo' :'inactivo';
-					if (typeof (contratos) != "undefined") {
-			contratos['contrato_' + o.aData[0]] = o.aData[12];
-			}
-			var datacliente = o.aData[3].split('|');
-					return '<a href="agregar_cliente.php?codigo_cliente=' + datacliente[0] + '">' + datacliente[0] + '</a> ' + datacliente[1] + '<div class="tipodescripcion">(' + activo + ')</div>';
-			}, "bUseRendered": false, "aTargets": [3] }
-			],
-			"aaSorting": [[0, 'desc']],
-			"iDisplayLength": 25,
-			"aLengthMenu": [[25, 50, 150, 300, 500, - 1], [25, 50, 150, 300, 500, "Todo"]],
-			"sPaginationType": "full_numbers",
-			"sDom":  'T<"top"ip>rt<"bottom">',
-			"oTableTools": { "sSwfPath": "../js/copy_cvs_xls.swf", "aButtons": [
+						return respuesta;
+					}, "bUseRendered": false, "aTargets": [13]},
+					{"fnRender": function (o, val) {
+						var respuesta = '';
+						if (o.aData[13]) {
+							respuesta = o.aData[13];
+							if (o.aData[6]) {
+								respuesta += '<br/><small>' + o.aData[6] + '</small>';
+							}
+						}
+						return respuesta;
+					}, "aTargets": [6]},
+					{"fnRender": function (o, val) {
+						var tipo = (o.aData[15] != ' - ')? o.aData[15] + ' ':'';
+						return o.aData[4] + '<div class="tipodescripcion">(' + tipo + o.aData[5] + ')</div>';
+					}, "aTargets": [4]},
+					{"fnRender": function (o, val) {
+						var activo = (o.aData[12] == 'SI') ? 'activo' :'inactivo';
+						if (typeof (contratos) != "undefined") {
+							contratos['contrato_' + o.aData[0]] = o.aData[12];
+						}
+						var datacliente = o.aData[3].split('|');
+						return '<a href="agregar_cliente.php?codigo_cliente=' + datacliente[0] + '">' + datacliente[0] + '</a> ' + datacliente[1] + '<div class="tipodescripcion">(' + activo + ')</div>';
+					}, "bUseRendered": false, "aTargets": [3] }
+				],
+				"aaSorting": [[0, 'desc']],
+				"iDisplayLength": 25,
+				"aLengthMenu": [[25, 50, 150, 300, 500, - 1], [25, 50, 150, 300, 500, "Todo"]],
+				"sPaginationType": "full_numbers",
+				"sDom":  'T<"top"ip>rt<"bottom">',
+				"oTableTools": { "sSwfPath": "../js/copy_cvs_xls.swf", "aButtons": [
 <?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_js_gastos') : false; ?>  {
 					"sExtends":    "copy",
-							"sAction":     "flash_copy",
-							"sButtonText": "Copiar esta consulta",
-							"fnClick": function (nButton, oConfig, oFlash) {
-
-							var uri = '<?php echo Conf:: Server() . $_SERVER['REQUEST_URI']; ?>';
-									oFlash.setText(uri + '?buscar=1&' + jQuery('#form_gastos').serialize());
-							},
-							"fnComplete": function (nButton, oConfig, oFlash, sFlash) {
-							alert('Se ha copiado la consulta actual al portapapeles');
-							}
-					}, {
-
-			"sExtends":    "text",
-					"sButtonText": "Editar Seleccionados",
+					"sAction":     "flash_copy",
+					"sButtonText": "Copiar esta consulta",
 					"fnClick": function (nButton, oConfig, oFlash) {
-					top.window.jQuery('#dialogomodal .divloading').hide();
+							var uri = '<?php echo Conf:: Server() . $_SERVER['REQUEST_URI']; ?>';
+							oFlash.setText(uri + '?buscar=1&' + serialized_form);
+						},
+						"fnComplete": function (nButton, oConfig, oFlash, sFlash) {
+							alert('Se ha copiado la consulta actual al portapapeles');
+						}
+					}, {
+						"sExtends":    "text",
+						"sButtonText": "Editar Seleccionados",
+						"fnClick": function (nButton, oConfig, oFlash) {
+							top.window.jQuery('#dialogomodal .divloading').hide();
 							if (jQuery('#selectodos').is(':checked')) {
-					var url = 'ajax/ajax_gastos.php?opclistado=listado&selectodos=1&' + jQuery('#form_gastos').serialize();
-					} else {
-					var arrayseleccionados = new Array();
-							jQuery('.eligegasto:checked').each(function() {
-					var laid = jQuery(this).attr('id').replace('check_', '');
-							arrayseleccionados.push(parseInt(laid));
-					});
-							if (arrayseleccionados.length == 0) return false;
-							jQuery('#serializacion').val(arrayseleccionados);
-							var url = 'ajax/ajax_gastos.php?opclistado=listado&movimientos=' + jQuery('#serializacion').val().replace(',', ';');
-					}
+								var url = 'ajax/ajax_gastos.php?opclistado=listado&selectodos=1&' + serialized_form;
+							} else {
+								var arrayseleccionados = new Array();
+								jQuery('.eligegasto:checked').each(function() {
+									var laid = jQuery(this).attr('id').replace('check_', '');
+									arrayseleccionados.push(parseInt(laid));
+								});
+								if (arrayseleccionados.length == 0) {
+									return false;
+								}
+								jQuery('#serializacion').val(arrayseleccionados);
+								var url = 'ajax/ajax_gastos.php?opclistado=listado&movimientos=' + jQuery('#serializacion').val().replace(',', ';');
+							}
 
-					top.window.jQuery('#dialogomodal').dialog('open').dialog('open').dialog('option', 'title', ' Editar Gastos Masivamente ').dialog("option", "buttons", {
-					"Modificar": function() {
-					jQuery.post('ajax/ajax_gastos.php?opc=actualizagastos', jQuery('#form_edita_gastos_masivos').serialize(), function(data) {
-
-					}, 'jsonp');
-							jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
-							jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
-							jQuery(this).dialog("close");
-					},
-							"Cancelar": function() {
-							jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
+							top.window.jQuery('#dialogomodal').dialog('open').dialog('open').dialog('option', 'title', ' Editar Gastos Masivamente ').dialog("option", "buttons", {
+								"Modificar": function() {
+									jQuery.post('ajax/ajax_gastos.php?opc=actualizagastos', jQuery('#form_edita_gastos_masivos').serialize(), function(data) {}, 'jsonp');
+									jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
 									jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
 									jQuery(this).dialog("close");
-							}
-					});
+								},
+								"Cancelar": function() {
+									jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
+									jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
+									jQuery(this).dialog("close");
+								}
+							});
 							top.window.jQuery('#dialogomodal').load(url, function() {
-					if (jQuery('#codcliente').val() == 1) {
-					jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').attr('readonly', 'readonly');
-							jQuery('#overlayeditargastos').prepend(jQuery('#selectclienteasunto'));
+								if (jQuery('#codcliente').val() == 1) {
+									jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').attr('readonly', 'readonly');
+									jQuery('#overlayeditargastos').prepend(jQuery('#selectclienteasunto'));
+								}
+							});
+						}
 					}
-					});
-					}
-			} ]
+				]
 			}
-	}).show();
-			jQuery("#boton_buscar").removeAttr('disabled');
-			return true;
+		}).show();
+		jQuery("#boton_buscar").removeAttr('disabled');
+		return true;
 	} else {
-	return false;
+		return false;
 	}
-	});
+});
 <?php
 if ($opc == 'buscar' || isset($_GET['buscar'])) {
 	echo "jQuery('#boton_buscar').click();";
 }
 ?>
-	});
-			function Refrescarse() {
-			if (window.tablagastos != null) {
-			if (typeof (window.tablagastos.fnDraw) == 'function')  {
-			window.tablagastos.fnDraw(true);
-			}
-			}
-			}
+});
 
-	function Refrescar() {
+function Refrescarse() {
 	if (window.tablagastos != null) {
-	if (typeof (window.tablagastos.fnDraw) == 'function')  {
-	window.tablagastos.fnDraw(true);
+		if (typeof (window.tablagastos.fnDraw) == 'function')  {
+			window.tablagastos.fnDraw(true);
+		}
 	}
+}
+
+function Refrescar() {
+	if (window.tablagastos != null) {
+		if (typeof (window.tablagastos.fnDraw) == 'function')  {
+			window.tablagastos.fnDraw(true);
+		}
 	}
-	}
+}
 </script>
 
 

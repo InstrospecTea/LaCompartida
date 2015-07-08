@@ -67,22 +67,14 @@ class WsFacturacionCl extends WsFacturacion {
 		$documento['Detalle'] = array();
 		$lin = 0;
 		foreach ($dataFactura['detalle'] as $detalle) {
-			if (strlen($detalle['descripcion']) > 80) {
-				$ad = explode("\n", wordwrap($detalle['descripcion'], 80, "\n"));
-				$descripcion1 = array_shift($ad);
-				$descripcion2 = implode(' ', $ad);
-			} else {
-				$descripcion1 = $detalle['descripcion'];
-				$descripcion2 = null;
-			}
 			$linea_detalle = array(
 				'NroLinDet' => ++$lin,
 				'CdgItem' => array(
 					'TpoCodigo' => $this->tipoCodigo,
 					'VlrCodigo' => $this->ValorCodigo
 				),
-				'NmbItem' => $descripcion1,
-				'dscitem' => $descripcion2,
+				'NmbItem' => $detalle['descripcion'],
+				'DscItem' => $detalle['descripcion'],
 				'QtyItem' => $detalle['cantidad'],
 				'PrcItem' => $detalle['precio_unitario'],
 				'MontoItem' => $detalle['cantidad'] * $detalle['precio_unitario']
@@ -241,6 +233,29 @@ class WsFacturacionCl extends WsFacturacion {
 		$respuesta = $this->Client->Online();
 		if ($respuesta-OnlineResult !== 1) {
 			$this->setError('ServiceUnavailable', 'Servicio temporalmente fuera de servicio, re-intente mas tarde.');
+		}
+	}
+
+	/**
+	 * Convierte un Array en un String XML
+	 * @param array $array
+	 * @param SimpleXMLElement $xml
+	 */
+	protected static function array_to_xml($array, SimpleXMLElement &$xml) {
+		foreach ($array as $key => $value) {
+			if (is_array($value)) {
+				if (!is_numeric($key)) {
+					$subnode = $xml->addChild("$key");
+					self::array_to_xml($value, $subnode);
+				} else {
+					self::array_to_xml($value, $xml);
+				}
+			} else {
+				$child = $xml->addChild("$key");
+				$node = dom_import_simplexml($child);
+				$no   = $node->ownerDocument;
+				$node->appendChild($no->createCDATASection("$value"));
+			}
 		}
 	}
 

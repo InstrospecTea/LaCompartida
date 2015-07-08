@@ -8,7 +8,7 @@ require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
 /*
 	Este archivo debe ser llamado mediante require_once() desde otro archivo (actualmente solo desde app/interfaces/reporte_financiero.php)
 	Necesita las liguientes variables para funcionar:
-	$sesion
+	$Sesion
 	$fecha1	: fecha inicio periodo consulta, en formato dd-mm-aaaa.
 	$fecha2	: fecha término periodo consulta, en formato dd-mm-aaaa.
 	$vista	: varible que indica la forma de agrupar los datos. Puede tomar los siguientes valores:
@@ -18,13 +18,17 @@ require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
 	- 'glosa_asunto' : agrupa primero por cliente y luego por asunto.
  */
 
-if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
+if (!Conf::GetConf($Sesion, 'ReportesAvanzados')) {
 	exit;
 }
 
-$query = "SELECT id_moneda, simbolo, cifras_decimales FROM prm_moneda WHERE moneda_base=1";
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp);
+$Moneda = new Moneda($Sesion);
+
+$id_moneda = isset($moneda_visualizacion) ? $moneda_visualizacion : $Moneda::GetMonedaBase($Sesion);
+
+$Moneda->Load($id_moneda);
+$simbolo_moneda = $Moneda->fields['simbolo'];
+$cifras_decimales = $Moneda->fields['cifras_decimales'];
 
 $wb = new Spreadsheet_Excel_Writer();
 
@@ -138,7 +142,7 @@ if ($vista == 'profesional') {
 	$fecha_fin = "{$fecha2_a}-{$fecha2_m}-{$largo_meses}";
 
 
-	if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
+	if (Conf::GetConf($Sesion, 'UsaUsernameEnTodoElSistema')) {
 		$dato_profesional = "username";
 	} else {
 		$dato_profesional = "CONCAT(apellido1,' ',apellido2,', ',nombre)";
@@ -176,7 +180,7 @@ if ($vista == 'profesional') {
 						ORDER BY apellido1, apellido2, nombre, id_usuario";
 
 	//echo '<pre>'; echo $query; exit;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	while (list($nombre_usuario, $id_usr) = mysql_fetch_array($resp)) {
 		$ws->write( ++$fila, $offset_columnas, $nombre_usuario, $formato_nombre);
 		// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
@@ -194,7 +198,7 @@ if ($vista == 'profesional') {
 							codigo_cliente
 						FROM cliente
 						ORDER BY glosa_cliente, id_cliente";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	while (list($nombre_cliente, $id_cli) = mysql_fetch_array($resp)) {
 		$ws->write( ++$fila, $offset_columnas, $nombre_cliente, $formato_nombre);
 		// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
@@ -233,7 +237,7 @@ if ($vista == 'profesional') {
 							AND trabajo.fecha <= '{$_fecha_hasta}'
 						ORDER BY trabajo.codigo_asunto";
 
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	$nombre_temp = '';
 	$n_clientes = 0;
 
@@ -322,8 +326,12 @@ $datos_reporte = array(
 );
 
 foreach ($datos_reporte as $tipo_dato => $config) {
-	$reporte = new Reporte($sesion);
+	$reporte = new Reporte($Sesion);
 	$reporte->id_moneda = $id_moneda;
+	if (!empty($proporcionalidad)) {
+		$reporte->proporcionalidad = $proporcionalidad;
+	}
+
 	// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
 	$reporte->addRangoFecha($fecha1, $fecha2);
 	imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $config['columna'], $config['formato'], $config['vista']);

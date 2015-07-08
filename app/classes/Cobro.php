@@ -5,6 +5,8 @@ if (!class_exists('Cobro')) {
 
 	class Cobro extends Objeto {
 
+		const MAX_ESC = 4;
+
 		var $asuntos = array();
 		var $ArrayFacturasDelContrato = array();
 		var $ArrayTotalesDelContrato = array();
@@ -310,6 +312,51 @@ if (!class_exists('Cobro')) {
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($cantidad_facturas) = mysql_fetch_array($resp);
 			return $cantidad_facturas;
+		}
+
+		/**
+		 * Devuelve el orden que debe ser aplicado a la busquedad de cobros.
+		 *
+		 * @return string
+		 */
+		function OrdenResultados() {
+			$order = 'cliente.glosa_cliente ASC, cobro.id_contrato DESC, cobro.id_cobro DESC';
+			$setting_order = Conf::GetConf($this->sesion, 'OrdenarCobrosPorDefecto');
+			$option_tables = array(
+				'fecha_creacion' => array(
+					'table' => 'cobro',
+					'field' => 'fecha_creacion'
+				),
+				'nombre_cliente' => array(
+					'table' => 'cliente',
+					'field' => 'glosa_cliente'
+				),
+				'encargado_comercial' => array(
+					'table' => 'usuario',
+					'field' => 'apellido1'
+				),
+				'numero_cobro' => array(
+					'table' => 'cobro',
+					'field' => 'id_cobro'
+				)
+			);
+
+			if ($setting_order) {
+				$order_split = preg_split('(,|\s)', $setting_order);
+				$order_field = $order_split[0];
+				$order_option = strtolower(end($order_split));
+
+				if (in_array($order_field, array_keys($option_tables))) {
+					if ($order_option == 'desc') {
+						$order = $option_tables[$order_field]['table'] . '.' . $option_tables[$order_field]['field'] . ' ' . $order_option;
+					} else {
+						$order = $option_tables[$order_field]['table'] . '.' . $option_tables[$order_field]['field'];
+					}
+
+				}
+			}
+
+			return $order;
 		}
 
 		/*
@@ -673,6 +720,7 @@ if (!class_exists('Cobro')) {
 			try {
 				$chargingBusiness->delete($id_cobro);
 			} catch (Exception $e) {
+				$this->error = $e->getMessage();
 				return false;
 			}
 
@@ -1033,10 +1081,12 @@ if (!class_exists('Cobro')) {
 			#$this->fields['id_moneda_monto'] es la moneda a la que se pone el monto, ej retainer por 100 USD aunque la tarifa este en dolares
 			$cobro_monto_moneda_cobro = ($this->fields['monto_contrato'] * $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['tipo_cambio']) / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'];
 
-			//Decimales
+			// Monedas
 			$moneda_del_cobro = new Moneda($this->sesion);
 			$moneda_del_cobro->Load($this->fields['id_moneda']);
-			$decimales = $moneda_del_cobro->fields['cifras_decimales'];
+
+			$moneda_opc_total = new Moneda($this->sesion);
+			$moneda_opc_total->Load($this->fields['opc_moneda_total']);
 
 			if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 				$cobro_total_honorario_cobrable = $cobro_monto_moneda_cobro;
@@ -1260,10 +1310,11 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 					$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
-					$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$id_usuario]['tarifa']);
+					$valor_estandar = Funciones::TarifaDefecto($this->sesion, $id_usuario, $this->fields['id_moneda']);
+					$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$id_usuario]['tarifa'], '', $valor_estandar);
 					$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
-					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
+					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write()) {
 						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
 					}
@@ -1317,7 +1368,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 					$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
-					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
+					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write(false)) {
 						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
 					}
@@ -1338,8 +1389,8 @@ if (!class_exists('Cobro')) {
 					} else {
 						$factor = 1;
 					}
-
-					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
+					$valor_estandar = Funciones::TarifaDefecto($this->sesion, $id_usuario, $trabajo->fields['id_moneda']);
+					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''), '', $valor_estandar);
 					$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
@@ -1637,6 +1688,7 @@ if (!class_exists('Cobro')) {
 
 					//Documentos
 					$documento = new Documento($this->sesion, '', '');
+					$documento->LoadByCobro($this->fields['id_cobro']);
 					$documento->Edit('id_tipo_documento', '2');
 					$documento->Edit('codigo_cliente', $this->fields['codigo_cliente']);
 					$documento->Edit('id_contrato', $this->fields['id_contrato']);
@@ -1671,12 +1723,12 @@ if (!class_exists('Cobro')) {
 					$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
 
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
-						$documento->Edit('monto_trabajos', number_format($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+						$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], false));
 					} else {
-						$documento->Edit('monto_trabajos', number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+						$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], false));
 					}
 
-					$documento->Edit('monto_tramites', number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+					$documento->Edit('monto_tramites', $moneda_opc_total->getFloat($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], false));
 					$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 					$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 					$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
@@ -1730,6 +1782,9 @@ if (!class_exists('Cobro')) {
 			$cobro_moneda = new CobroMoneda($this->sesion);
 			$cobro_moneda->Load($this->fields['id_cobro']);
 
+			$moneda_opc_total = new Moneda($this->sesion);
+			$moneda_opc_total->Load($this->fields['opc_moneda_total']);
+
 			//Documentos
 			$documento = new Documento($this->sesion, '', '');
 			$documento->LoadByCobro($this->fields['id_cobro']);
@@ -1771,12 +1826,13 @@ if (!class_exists('Cobro')) {
 			$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
 
 			if ($this->fields['forma_cobro'] == 'FLAT FEE') {
-				$documento->Edit('monto_trabajos', number_format($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+				$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], false));
 			} else {
-				$documento->Edit('monto_trabajos', number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+				$documento->Edit('monto_trabajos', $moneda_opc_total->getFloat($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], false));
 			}
 
-			$documento->Edit('monto_tramites', number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+			$documento->Edit('monto_tramites', $moneda_opc_total->getFloat($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], false));
+
 			$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);

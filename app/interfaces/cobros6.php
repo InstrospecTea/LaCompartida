@@ -1295,7 +1295,7 @@ if (count($cobro->asuntos)) {
             }
         }
 
-        nuovaFinestra('Agregar_Factura',800, 610, '<?php echo $url_agregar_factura; ?>' +
+        nuovaFinestra('Agregar_Factura',800, 600, '<?php echo $url_agregar_factura; ?>' +
             '&honorario=' + honorarios +
             '&gastos_con_iva=' + gastos_con_impuestos +
             '&gastos_sin_iva=' + gastos_sin_impuestos +
@@ -1409,7 +1409,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                         <td style="height: 26px;  vertical-align: top;" align=left nowrap>
                             <br />
 							<?php echo'Estado ' . __('Cobro') ?>:
-							<br /> <br/><?php echo __('Forma Cobro') ?>
+							<br /> <br/><?php echo __('Forma Tarificación') ?>
 							<br/><?php echo $cobro->fields['forma_cobro'] ?>
                         </td>
                         <td align="left" style="font-size: 11px; font-weight: bold;" >

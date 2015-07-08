@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('COB'));
@@ -11,10 +10,14 @@ if (!$factura->Load($id_factura_grabada)) {
 }
 
 if ($lang == '') {
-	$lang = 'es';
+	// asignar el idioma seleccionado en el cobro
+	$Cobro = new Cobro($sesion);
+	$Cobro->Load($factura->fields['id_cobro']);
+	$lang = !empty($Cobro->fields['codigo_idioma']) ? $Cobro->fields['codigo_idioma'] : 'es';
+	unset($Cobro);
 }
 
-if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . ".php")) {
+if (file_exists(Conf::ServerDir() . "/lang/{$lang}_" . Conf::dbUser() . '.php')) {
 	$lang_archivo = $lang . '_' . Conf::dbUser() . '.php';
 } else {
 	$lang_archivo = $lang . '.php';

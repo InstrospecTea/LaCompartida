@@ -39,4 +39,17 @@ interface IChargeScope {
 	 * @return mixed
 	 */
 	function hasAdvancesAvailables(Criteria $criteria);
-} 
+
+	/**
+	 * Ordena por Glosa cliente y código cliente
+	 * @param Criteria $criteria
+	 * @return mixed
+	 */
+	function orderByClientGlossAndClientCode(Criteria $criteria);
+
+	 /**
+   * Custom left join with document
+   * @param Criteria $criteria
+   */
+  function withDocument(Criteria $criteria);
+}

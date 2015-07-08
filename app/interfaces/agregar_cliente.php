@@ -9,17 +9,11 @@ $desde_agrega_cliente = true;
 $cliente = new Cliente($Sesion);
 $contrato = new Contrato($Sesion);
 $archivo = new Archivo($Sesion);
-$codigo_obligatorio = true;
-$Form = new Form;
+$Form = new Form();
 $SelectHelper = new FormSelectHelper();
 
-if (Conf::GetConf($Sesion, 'CodigoObligatorio')) {
-	if (!Conf::CodigoObligatorio()) {
-		$codigo_obligatorio = false;
-	} else {
-		$codigo_obligatorio = true;
-	}
-}
+$CodigoClienteAsuntoModificable = (boolean) Conf::GetConf($Sesion, 'CodigoClienteAsuntoModificable');
+
 if ($id_cliente > 0) {
 	$cliente->Load($id_cliente);
 	$contrato->Load($cliente->fields['id_contrato']);
@@ -49,24 +43,27 @@ if ($opcion == "guardar") {
 	$val = false;
 
 	if ($cli->Loaded()) {
-
 		if (!$activo) {
 			$cli->InactivarAsuntos();
 		}
-		if (($cli->fields['id_cliente'] != $cliente->fields['id_cliente']) and ($cliente->Loaded())) {
+
+		if (($cli->fields['id_cliente'] != $cliente->fields['id_cliente']) && ($cliente->Loaded())) {
 			$Pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
+
 		if (!$cliente->Loaded()) {
 			$Pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
-		if ($codigo_cliente_secundario and empty($id_cliente)) {
-			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '" . $cli->fields['id_cliente'] . "'";
+
+		if ($codigo_cliente_secundario) {
+			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '{$cliente->fields['id_cliente']}'";
 			$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
+
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$Pagina->FatalError('El código ingresado ya existe');
+					$Pagina->FatalError('El código secundario ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -75,11 +72,19 @@ if ($opcion == "guardar") {
 	} else {
 		$loadasuntos = true;
 		if ($codigo_cliente_secundario) {
-			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente";
+			$where = '1';
+
+			if ($cliente->Loaded()) {
+				$where .= " AND id_cliente != '{$cliente->fields['id_cliente']}'";
+			}
+
+			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE $where";
+
 			$resp_codigos = mysql_query($query_codigos, $Sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $Sesion->dbh);
+
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {
 				if ($codigo_cliente_secundario == $codigo_cliente_secundario_temp) {
-					$Pagina->FatalError('El código ingresado ya existe');
+					$Pagina->FatalError('El código secundario ingresado ya existe');
 					$val = true;
 				}
 			}
@@ -118,6 +123,9 @@ if ($opcion == "guardar") {
 
 		$cliente->Edit("glosa_cliente", $glosa_cliente);
 		$cliente->Edit("codigo_cliente", $codigo_cliente);
+
+		// El código de homologación se utiliza para los clientes con LEDES, por defecto es el código del cliente
+		$cliente->Edit("codigo_homologacion", !empty($codigo_homologacion) ? $codigo_homologacion : $codigo_cliente);
 
 		if ($codigo_cliente_secundario) {
 			$cliente->Edit("codigo_cliente_secundario", strtoupper($codigo_cliente_secundario));
@@ -243,9 +251,10 @@ if ($opcion == "guardar") {
 	$asuntos = explode(';', Conf::GetConf($Sesion, 'AgregarAsuntosPorDefecto'));
 
 	if ($asuntos[0] == "true" && $loadasuntos) {
-
+		if (empty($codigo_cliente_secundario)) {
+			$codigo_cliente_secundario = $codigo_cliente;
+		}
 		for ($i = 1; $i < count($asuntos); $i++) {
-
 			$asunto = new Asunto($Sesion);
 			$asunto->Edit('codigo_asunto', $asunto->AsignarCodigoAsunto($codigo_cliente));
 			$asunto->Edit('codigo_asunto_secundario', $asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario));
@@ -265,7 +274,6 @@ if ($opcion == "guardar") {
 			if (!$id_usuario_encargado == -1) {
 				$asunto->Edit("id_encargado", $id_usuario_encargado);
 			}
-
 			$asunto->Write();
 		}
 	}
@@ -394,22 +402,28 @@ $Pagina->PrintTop();
 						<?php echo $obligatorio; ?>
 					</div >
 				</td>
-				<td class="al " width="600">
-					<div   class="controls controls-row " style="white-space:nowrap;">
-						<input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
-						<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo __('Código secundario') ?>
-								<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
-								<?php
-								if ($CodigoSecundario) {
-									echo "<span  class=\"help-inline\" style='color:#FF0000;'>*</span>";
-								} else {
-									echo "<span class=\"help-inline\"  >(" . __('Opcional') . ")</span>";
-								}
-								?>
+				<td class="al" width="600">
+					<div class="controls controls-row" style="white-space:nowrap;">
+						<input type="text" style="float:left;" class="input-small span2" placeholder="0000" name="codigo_cliente" size="5" maxlength="5" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
+						<div class="span4" style="float:left;">
+							&nbsp;&nbsp;&nbsp;
+							<label><?php echo __('Código secundario') ?></label>
+							<input type="text"class="input-small" id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario']; ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
+							<?php echo $CodigoSecundario ? $obligatorio : '<span class="help-inline">(' . __('Opcional') . ')</span>'; ?>
 						</div>
 					</div>
 				</td>
 			</tr>
+			<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
+				<tr>
+					<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el cliente. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+						<?php echo __('Código de homologación'); ?>
+					</td>
+					<td align="left">
+						<input name="codigo_homologacion" size="45" value="<?php echo $cliente->fields['codigo_homologacion']; ?>" />
+					</td>
+				</tr>
+			<?php } ?>
 
 			<tr class="controls controls-row">
 				<td class="ar">
@@ -498,8 +512,8 @@ $Pagina->PrintTop();
 							jQuery.post(url, {'tabla': 'grupo_cliente', id: id}, function(html) {
 								jQuery('<div/>').html(html).dialog({
 									title: 'Agregar/Modificar Grupo',
-									width: 400,
-									height: 300,
+									width: 500,
+									height: 250,
 									modal: true,
 									close: function() {
 										closeModalGrupo();
@@ -1014,7 +1028,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 				var dato = jQuery(this).val();
 				var campo = jQuery(this).attr('id');
 				var accion = 'existe_' + campo + '_cliente';
-				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato;
+				var url_ajax = 'ajax.php?accion=' + accion + '&dato_cliente=' + dato + '&id_cliente=' + '<?php echo !empty($cliente->fields['id_cliente']) ? $cliente->fields['id_cliente'] : null; ?>';
 
 				jQuery.get(url_ajax, function(data) {
 					objResp = null;

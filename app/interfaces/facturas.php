@@ -2,6 +2,9 @@
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
+// Horrible workaround hasta que se optimice la funcion UtilesApp.php@ProcesaCobroIdMoneda
+set_time_limit(0);
+
 $sesion = new Sesion(array('COB'));
 $pagina = new Pagina($sesion);
 
@@ -46,6 +49,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 		if ($exportar_excel) {
 			$factura->DownloadExcel($results);
+
 		} else if ($archivo_contabilidad) {
 			$data = array('Resultados' => $results);
 			$Slim = Slim::getInstance() ? $Slim->applyHook('hook_facturas_genera_archivo_contabilidad', &$data) : false;

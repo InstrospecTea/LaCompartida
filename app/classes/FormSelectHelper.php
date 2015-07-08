@@ -96,14 +96,16 @@ class FormSelectHelper {
 						data_$name = data;
 						jQuery('#{$container_name}').empty();
 						var line = 0;
-						for (key in data_$name) {
-							var input = jQuery('<input/>').attr('id', '$check_id').attr('name', '$check_id').attr('type', 'checkbox').val(key);
-							var option = jQuery('<label/>').text(data_{$name}[key].glosa || data_{$name}[key]).prepend(input);
+						data_$name.forEach (function(data, index) {
+							var id = data_{$name}[index].id || index;
+							var input = jQuery('<input/>').attr('id', '$check_id').attr('name', '$check_id').attr('type', 'checkbox').val(id);
+							var option = jQuery('<label/>').text(data_{$name}[index].glosa || data_{$name}[index]).prepend(input);
 							option.addClass('column_2');
-							if (jQuery.inArray(key, selected_values_$name) >= 0) {
+
+							if (jQuery.inArray(id, selected_values_$name) >= 0) {
 								input.attr('checked', 'checked')
-								var checked = true
-								selected_$name = data_{$name}[key];
+								var checked = true;
+								selected_$name = data_{$name}[index];
 								$onChange
 							}
 							jQuery('#{$container_name}').append(option);
@@ -112,17 +114,25 @@ class FormSelectHelper {
 								jQuery('#{$container_name}').append(jQuery('<br/>'));
 								line = 0;
 							}
-						}
+						});
 						$onLoad
 						if (callback) {
 							callback()
 						}
 					}, "json");
-				}
+				};
+				function getArrayIndexForKey(arr, key, val){
+						for(var i = 0; i < arr.length; i++){
+								if(arr[i][key] == val)
+										return i;
+						}
+						return -1;
+				};
 				jQuery('#{$container_name}').delegate('[name="$check_id"]', 'change', function () {
 					var checked = this.checked
-					var key = jQuery(this).val();
-					selected_$name = data_{$name}[key];
+					var id = jQuery(this).val();
+					var index = getArrayIndexForKey(data_{$name}, 'id', id);
+					selected_$name = data_{$name}[index];
 					$onChange
 				});
 				if ($autoload) {
@@ -155,22 +165,41 @@ SCRIPT;
 					jQuery.post(source, {}, function(data) {
 						data_$name = data;
 						jQuery('#{$name}').empty().append(jQuery('<option/>'));
-						for (key in data_$name) {
-							var option = jQuery('<option/>').val(key).text(data_{$name}[key].glosa || data_{$name}[key]);
-							if ('$selected' == key || exists_selected == key) {
-								option.attr('selected', 'selected')
-								$selected_name = data_{$name}[key];
-							}
-							jQuery('#{$name}').append(option);
+
+						if (!jQuery.isEmptyObject(data)) {
+							data_$name.forEach(function(data, index) {
+								var id = data_{$name}[index].id || index;
+								var option = jQuery('<option/>').val(id).text(data_{$name}[index].glosa || data_{$name}[index]);
+								if ('$selected' == id || exists_selected == id) {
+									option.attr('selected', 'selected')
+									$selected_name = data_{$name}[index];
+								}
+								jQuery('#{$name}').append(option);
+							});
 						}
+
 						if ($selected_name) {
 							$onChange
 						}
+
 						$extra_script;
 					}, 'json');
 				}
 				jQuery('#{$name}').change(function() {
-					key = jQuery('#{$name} option:selected').val();
+					var key = null;
+
+					i = jQuery('#{$name} option:selected').val();
+					first = data_{$name}[Object.keys(data_{$name})[0]]
+
+					if (data_{$name}[i] && !first.hasOwnProperty('id')) {
+						$selected_name = data_{$name}[i];
+					} else {
+						for(j in data_{$name}) {
+							if (data_{$name}[j].id && data_{$name}[j].id == i) {
+								key = j;
+							}
+						}
+					}
 					$selected_name = data_{$name}[key];
 					$onChange
 				});

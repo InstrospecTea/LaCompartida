@@ -1,5 +1,5 @@
 #!/bin/bash
-MYSQL_ROOT_PASS=admin.asdwsx
+MYSQL_ROOT_PASS='admin.asdwsx'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -8,10 +8,13 @@ echo "mysql-server-5.6 mysql-server/root_password_again password $MYSQL_ROOT_PAS
 
 apt-get -y --quiet update
 apt-get -y --quiet install lamp-server^
-apt-get -y --quiet install php5-curl curl vim php-pear
+apt-get -y --quiet install php5-curl curl vim php-pear php5-xdebug
 
-#if [ ! -f /etc/phpmyadmin/config.inc.php ];
-#then
+# Mostrar errores con html
+sed -i "s/html_errors = Off/html_errors = On/" /etc/php5/apache2/php.ini
+
+if [ ! -f /etc/phpmyadmin/config.inc.php ];
+then
 	echo "phpmyadmin phpmyadmin/dbconfig-install boolean false" | debconf-set-selections
 	echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2" | debconf-set-selections
 	echo "phpmyadmin phpmyadmin/app-password-confirm password $MYSQL_ROOT_PASS" | debconf-set-selections
@@ -21,8 +24,8 @@ apt-get -y --quiet install php5-curl curl vim php-pear
 	echo "phpmyadmin phpmyadmin/database-type select mysql" | debconf-set-selections
 	echo "phpmyadmin phpmyadmin/mysql/app-pass password $MYSQL_ROOT_PASS" | debconf-set-selections
 	apt-get -y install phpmyadmin
-#fi
-apt-get -y --quiet autoremove purge
+fi
+apt-get -y --quiet autoremove
 apt-get -y --quiet clean
 
 pear install Numbers_Words-0.16.4
@@ -34,9 +37,11 @@ echo "AddDefaultCharset ISO-8859-1" >> /etc/apache2/conf.d/charset
 echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf.d/charset
 echo "ServerName localhost" >> /etc/apache2/conf.d/name
 
-sed -i "s/\/var\/www/\/var\/www\/vagrant/" /etc/apache2/sites-available/default
-sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/sites-available/default
-ln -s /vagrant /var/www/vagrant
+if [ ! -L /var/www/vagrant ]; then
+    sed -i "s/\/var\/www/\/var\/www\/vagrant/" /etc/apache2/sites-available/default
+    sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/sites-available/default
+    ln -s /vagrant /var/www/vagrant
+fi
 
 # PHP
 sed -i "s/short_open_tag = Off/short_open_tag = On/g" /etc/php5/apache2/php.ini
@@ -49,12 +54,37 @@ echo "[mysqld]" >> /etc/mysql/conf.d/character.cnf
 echo "character-set-server = latin1" >> /etc/mysql/conf.d/character.cnf
 echo "character-set-client = latin1" >> /etc/mysql/conf.d/character.cnf
 
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p$MYSQL_ROOT_PASS mysql
-mysql -u root -p$MYSQL_ROOT_PASS mysql -e "CREATE USER 'admin'@'%' IDENTIFIED BY 'admin1awdx'"
-mysql -u root -p$MYSQL_ROOT_PASS mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%'"
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p$MYSQL_ROOT_PASS mysql > /dev/null
+mysql -u root -p$MYSQL_ROOT_PASS mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' IDENTIFIED BY 'admin1awdx'"
+mysql -u root -p$MYSQL_ROOT_PASS mysql -e "DROP DATABASE IF EXISTS timetracking"
+mysql -u root -p$MYSQL_ROOT_PASS mysql -e "CREATE DATABASE IF NOT EXISTS timetracking"
+mysql -u root -p$MYSQL_ROOT_PASS timetracking < /vagrant/ttb/vagrant/database.example.sql
 
 # Restart
 a2enmod rewrite
 service apache2 restart
 service mysql restart
+
+if [ ! -f /usr/local/bin/composer ]; then
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
+    mv /usr/local/bin/composer.phar /usr/local/bin/composer && chmod 755 /usr/local/bin/composer
+    cd /vagrant/ttb && /usr/local/bin/composer install
+fi
+
+if [ ! -f /vagrant/ttb/app/miconf.php ]; then
+    if [ -f /vagrant/ttb/app/miconf.php.default ]; then
+        cp /vagrant/ttb/app/miconf.php.default /vagrant/ttb/app/miconf.php
+        sed -i "s/lapass/admin.asdwsx/" /vagrant/ttb/app/miconf.php
+    fi
+fi
+
+if [ -f /etc/php5/cli/conf.d/xdebug.ini ]; then
+	grep xdebug.auto_trace || echo 'xdebug.auto_trace=1' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_enable || echo 'xdebug.remote_enable=on' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_log || echo 'xdebug.remote_log' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_host || echo 'xdebug.remote_host=localhost' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_handler || echo 'xdebug.remote_handler=dbgp' >> /etc/php5/cli/conf.d/xdebug.ini
+	grep xdebug.remote_port || echo 'xdebug.remote_port=9000' >> /etc/php5/cli/conf.d/xdebug.ini
+fi
+
 

@@ -1471,7 +1471,9 @@ class NotaCobro extends Cobro {
 				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
 				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->getCharge($this->fields['id_cobro']));
 				$html = str_replace('%detalle_escalones%', $table, $html);
+				$html = str_replace('%detalle_trabajos_escalones%', $workDetailTable, $html);
 
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
@@ -4136,35 +4138,28 @@ class NotaCobro extends Cobro {
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 
 					$this->CargarEscalonadas();
-
 					$html_tabla = "<br /><span class=\"titulo_seccion\">" . __('Detalle Tarifa Escalonada') . "</span> <table class=\"tabla_normal\" width=\"50%\">%filas_escalas%</table>";
 					$html_fila = "";
-
-					for ($i = 1; $i <= $this->escalonadas['num']; $i++) {
-
-						$detalle_escala = "";
-
-						$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
-
-						if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
-							$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
+					for ($i = 1; $i <= self::MAX_ESC; $i++) {
+						if ($this->fields['esc' . $i . '_tiempo'] != 0) {
+							$detalle_escala = "";
+							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
+							$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
+							$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
+							if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
+								$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
+							}
+							if (!empty($this->fields['esc' . $i . '_monto']) && $this->fields['esc' . $i . '_monto'] != 'NULL') {
+								$query_glosa_moneda = "SELECT simbolo FROM prm_moneda WHERE id_moneda='{$this->escalonadas[$i]['id_moneda']}' LIMIT 1";
+								$resp = mysql_query($query_glosa_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__, $this->sesion->dbh);
+								list( $simbolo_moneda ) = mysql_fetch_array($resp);
+								$monto_escala = number_format($this->escalonadas[$i]['monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+								$detalle_escala .= ": $simbolo_moneda $monto_escala";
+							}
+							$html_fila .= "	<tr> <td>$detalle_escala</td> </tr>\n";
 						}
-
-						if (!empty($this->fields['esc' . $i . '_monto']) && $this->fields['esc' . $i . '_monto'] != 'NULL') {
-
-							$query_glosa_moneda = "SELECT simbolo FROM prm_moneda WHERE id_moneda='{$this->escalonadas[$i]['id_moneda']}' LIMIT 1";
-							$resp = mysql_query($query_glosa_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__, $this->sesion->dbh);
-							list( $simbolo_moneda ) = mysql_fetch_array($resp);
-							$monto_escala = number_format($this->escalonadas[$i]['monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-							$detalle_escala .= ": $simbolo_moneda $monto_escala";
-						}
-						$html_fila .= "	<tr> <td>$detalle_escala</td> </tr>\n";
 					}
-
 					$html_tabla = str_replace('%filas_escalas%', $html_fila, $html_tabla);
-
 					$html = str_replace('%TABLA_ESCALONADA%', $html_tabla, $html);
 				}
 
@@ -4292,7 +4287,9 @@ class NotaCobro extends Cobro {
 				$language = $translatingBusiness->getLanguageByCode($idioma->fields['codigo_idioma']);
 				$slidingScales = $chargingBusiness->getSlidingScales($this->fields['id_cobro']);
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
+				$workDetailTable = $chargingBusiness->getSlidingScalesWorkDetail($chargingBusiness->getCharge($this->fields['id_cobro']));
 				$html = str_replace('%detalle_escalones%', $table, $html);
+				$html = str_replace('%detalle_trabajos_escalones%', $workDetailTable, $html);
 
 				if ($this->fields['opc_ver_resumen_cobro'] == 0) {
 					return '';
@@ -5038,7 +5035,6 @@ class NotaCobro extends Cobro {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					while (list($codigo_asunto, $codigo_asunto_secundario, $glosa_asunto, $duracion_cobrada, $importe) = mysql_fetch_array($resp)) {
 						$row = $row_tmpl;
-
 						$horas = floor($duracion_cobrada / 3600);
 						$minutes = (($duracion_cobrada / 60 ) % 60);
 						$seconds = ($duracion_cobrada % 60);
@@ -5085,6 +5081,10 @@ class NotaCobro extends Cobro {
 
 					$html .= $row;
 				}
+
+				break;
+
+			case 'RESUMEN_ESCALONES':
 
 				break;
 
@@ -5674,7 +5674,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%id_asunto%', __('Matter <br> ID'), $html);
 					$html = str_replace('%tarifa_hora%', __('Hourly<br> Rate'), $html);
 				}
-
+				$html = str_replace('%num_registro%', __('Nº Registro'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
 				$html = str_replace('%tarifa_hora%', __('Tarifa Hora'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
@@ -6019,6 +6019,7 @@ class NotaCobro extends Cobro {
 					}
 					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
+					$row = str_replace('%descripcion_mayus%', strtoupper($trabajo->fields['descripcion']), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
@@ -11439,6 +11440,7 @@ class NotaCobro extends Cobro {
 
 	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null) {
 		global $_LANG;
+		$carta_multiple = null;
 
 		set_time_limit(300);
 
@@ -11452,7 +11454,12 @@ class NotaCobro extends Cobro {
 
 		if ($agrupar_cartas) {
 			$Carta = new Carta($this->sesion);
-			$carta_multiple = $Carta->LoadByDescripcion('MULTIPLE') ? $Carta->fields['id_carta'] : 1;
+
+			// Se asigna el identificador del la carta múltiple
+			if ($Carta->LoadByDescripcion('MULTIPLE')) {
+				$carta_multiple = $Carta->fields['id_carta'];
+			}
+
 			$totales_cobros = array();
 			$primer_cliente = '';
 
@@ -11501,7 +11508,12 @@ class NotaCobro extends Cobro {
 
 				if ($codigo_cliente != $primer_cliente) {
 					$primer_cliente = $codigo_cliente;
-					$NotaCobro->fields['id_carta'] = $carta_multiple;
+
+					// solo si existe una carta MULTIPLE se sobre escribe el identificador de la carta
+					if (!is_null($carta_multiple)) {
+						$NotaCobro->fields['id_carta'] = $carta_multiple;
+					}
+
 					$NotaCobro->fields['opc_ver_carta'] = 1;
 					$NotaCobro->DetalleLiquidaciones = $totales_cobros[$codigo_cliente];
 				}
@@ -11523,8 +11535,8 @@ class NotaCobro extends Cobro {
 				continue;
 			}
 
-			$opc_papel = $NotaCobro->fields['opc_papel'];
 			$cssData = UtilesApp::TemplateCartaCSS($this->sesion, $NotaCobro->fields['id_carta']);
+			list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta($this->sesion, $NotaCobro->fields['id_carta']);
 
 			if ($html) {
 				$cssData .= UtilesApp::CSSCobro($this->sesion);
@@ -11532,7 +11544,24 @@ class NotaCobro extends Cobro {
 				if (is_object($doc)) {
 					$doc->newSession($html);
 				} else {
-					$doc = new DocGenerator($html, $cssData, $opc_papel, 1, $orientacion_papel, 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
+					$doc = new DocGenerator(
+						$html,
+						$cssData,
+						$NotaCobro->fields['opc_papel'],
+						$NotaCobro->fields['opc_ver_numpag'],
+						$orientacion_papel,
+						$docm_top,
+						$docm_right,
+						$docm_bottom,
+						$docm_left,
+						$NotaCobro->fields['estado'],
+						$id_formato,
+						'',
+						$docm_header,
+						$docm_footer,
+						$lang,
+						$this->sesion
+					);
 				}
 
 				$doc->chunkedOutput("cobro_masivo.doc");

@@ -136,8 +136,10 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
-		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
 
+		if ($id_tipo_documento_asociado) {
+			$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado);
+		}
 
 		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
 			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
@@ -446,6 +448,16 @@ $Form = new Form;
 	</div>
 
 	<table class="border_plomo" style="background-color: #FFFFFF;" width='96%'>
+	<?php if ($id_gasto) { ?>
+		<tr>
+			<td align="right">
+				<?php echo __('Id. gasto'); ?>
+			</td>
+			<td align="left">
+				<input name="id_gasto_cliente" id="id_gasto_cliente" size="10" disabled="disabled" value="<?php echo $id_gasto ?>" />
+			</td>
+		</tr>
+	<?php } ?>
 		<tr>
 			<td align="right">
 				<?php echo __('Fecha'); ?>
@@ -502,7 +514,11 @@ $Form = new Form;
 				<?php echo __('Proveedor'); ?>
 			</td>
 			<td align="left">
-				<?php echo Html::SelectQuery($sesion, "SELECT id_proveedor, glosa FROM prm_proveedor ORDER BY glosa", "id_proveedor", $gasto->fields['id_proveedor'] ? $gasto->fields['id_proveedor'] : '0', '', 'Cualquiera', "160"); ?>
+				<?php
+					$proveedor = new Proveedor($sesion);
+					echo Html::SelectArrayDecente($proveedor->Listar('ORDER BY glosa ASC'), 'id_proveedor', $gasto->fields['id_proveedor'], '', 'Cualquiera', '160px');
+
+				?>
 				<a href='javascript:void(0)' onclick="AgregarProveedor();" title="Agregar Proveedor"><img src="<?php echo Conf::ImgDir(); ?>/agregar.gif" border=0 ></a>
 			</td>
 		</tr>

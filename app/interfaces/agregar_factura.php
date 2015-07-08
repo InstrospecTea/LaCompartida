@@ -20,7 +20,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
-		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto'));
+		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable'));
 	}
 
 	if (!empty($id_factura)) {
@@ -82,7 +82,8 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 			$requiere_refrescar = "window.opener.Refrescar();";
 		} else {
 			$factura->Edit('estado', 'ANULADA');
-			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
+			$factura->Edit('id_estado', $id_estado ? $id_estado : "1");
+			$factura->Edit('fecha_anulacion', date('Y-m-d H:i:s'));
 			$factura->Edit('anulado', 1);
 			if ($factura->Escribir()) {
 				$pagina->AddInfo(__('Documento Tributario') . ' ' . __('anulado con éxito'));
@@ -130,7 +131,7 @@ if ($opcion == "guardar") {
 	if ($guardar_datos) {
 
 		//chequear
-		$mensaje_accion = 'guardar';
+		$mensaje_accion = 'guardado';
 		$factura->Edit('subtotal', $monto_neto);
 		$factura->Edit('porcentaje_impuesto', $porcentaje_impuesto);
 
@@ -172,10 +173,11 @@ if ($opcion == "guardar") {
 		$factura->Edit("numero", $numero ? $numero : "1");
 		$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
 		$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
-
+		$factura->Edit('fecha_anulacion', NULL);
 		if ($id_estado == '5') {
 			$factura->Edit('estado', 'ANULADA');
 			$factura->Edit('anulado', 1);
+			$factura->Edit('fecha_anulacion', date('Y-m-d H:i:s'));
 			$mensaje_accion = 'anulado';
 		} else if (!empty($factura->fields['anulado'])) {
 			$factura->Edit('estado', 'ABIERTA');
@@ -185,6 +187,7 @@ if ($opcion == "guardar") {
 		($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_agregar_factura') : false;
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+			$factura->Edit("glosa", $glosa);
 			$factura->Edit("descripcion", $descripcion_honorarios_legales);
 			$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
 			$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales : 0);
@@ -197,6 +200,10 @@ if ($opcion == "guardar") {
 			$factura->Edit("iva", $iva_hidden ? $iva_hidden : 0);
 		} else {
 			$factura->Edit("descripcion", $descripcion);
+		}
+
+		if (!empty($contrato)) {
+			$factura->Edit("id_usuario_responsable", $contrato->fields['id_usuario_responsable']);
 		}
 
 		if (Conf::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) {
@@ -230,7 +237,11 @@ if ($opcion == "guardar") {
 			$numero_documento_legal = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 
 			if (!$desde_webservice) {
-				$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
+				$mensaje_validacion_documento_tributario = "El numero {$numero} del " . __('documento tributario') . ' ya fue usado';
+				$mensaje_validacion_documento_tributario .= empty($factura->fields['id_factura']) ? '.' : ', pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar';
+
+				$pagina->AddError($mensaje_validacion_documento_tributario);
+
 				$factura->Edit('numero', $numero_documento_legal);
 			} else {
 				$resultado = array('error' => 'El número ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, vuelva a intentar con número: ' . $numero_documento_legal);
@@ -246,7 +257,6 @@ if ($opcion == "guardar") {
 					$factura->Load($id_factura);
 				}
 			}
-
 
 			if ($factura->Escribir()) {
 				if ($generar_nuevo_numero) {
@@ -384,6 +394,10 @@ $suma_total = $subtotal_honorarios + $subtotal_gastos + $impuesto_gastos + $impu
 //CON DESGLOSE
 $cobro_ = new Cobro($sesion);
 $descripcion_honorario = __(Conf::GetConf($sesion, 'FacturaDescripcionHonorarios'));
+
+if (empty($glosa) && $contrato) {
+	$glosa = $contrato->fields['glosa_contrato'];
+}
 
 if ($descripcion_honorario == '') {
 	$descripcion_honorario = $contrato->fields['glosa_contrato'];
@@ -555,15 +569,19 @@ $Form->defaultLabel = false;
 						?>
 						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>
-					<input type="text" <? echo $disableInvoiceNumber; ?> name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
+					<input type="text" <?php echo $disableInvoiceNumber; ?> name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
-				<td align="right"><?php echo __('Estado'); ?></td>
+				<td align="right" colspan="2"><?php echo __('Estado'); ?>
 				<?php
 					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
-				<td align="left" nowrap>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
-					<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
+				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
+				<?php
+						if (!empty($factura->fields['fecha_anulacion'])) {
+							$fecha_anula = Utiles::sql3fecha($factura->fields['fecha_anulacion'], '%d-%m-%Y'); ?>
+							<span style="background-color:yellow"><?php echo "el {$fecha_anula}"?></span>
+				<?php 	} ?>
 				</td>
 			</tr>
 
@@ -628,12 +646,12 @@ $Form->defaultLabel = false;
 				<td align="right"><?php echo __('Doc. Identidad'); ?></td>
 				<td align="left" colspan="3">
 					<?php echo Html::SelectQuery($sesion, "SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad", "tipo_documento_identidad", $factura->fields['id_tipo_documento_identidad'], "", " ", 150); ?>
-					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="40" maxlength="20" />
+					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="30" maxlength="50" />
 				</td>
 			<?php } else { ?>
 				<td align="right"><?php echo __('ROL/RUT'); ?></td>
 				<td align="left" colspan="3">
-					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="70" maxlength="20" />
+					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="30" maxlength="50" />
 				</td>
 			<?php } ?>
 		</tr>
@@ -718,10 +736,15 @@ $Form->defaultLabel = false;
 			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
 		</tr>
 
+
 		<?php
 		$cantidad_lineas_descripcion = Conf::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 			?>
+			<tr>
+				<td align="right" ><?php echo __('Glosa Factura')?></td>
+				<td align="left" colspan="3" ><textarea id="glosa" name="glosa" cols="50" rows="2" style="font-family: Arial; font-size: 11px"><?php echo trim($glosa); ?></textarea></td>
+			</tr>
 			<tr id='descripcion_factura'>
 				<td align="right" width="100">&nbsp;</td>
 				<td align="left" style="vertical-align:bottom" width="250"><?php echo __('Descripción'); ?></td>

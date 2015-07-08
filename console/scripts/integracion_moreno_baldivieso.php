@@ -4,6 +4,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 	private $connection;
 	private $dbh;
+	protected $Session;
 
 	public function __construct() {
 		// $this->connection['server'] = '200.87.127.182'; // Test and develop
@@ -19,10 +20,11 @@ class IntegracionMorenoBaldivieso extends AppShell {
 			echo 'Failed to get DB handle: ' . $e->getMessage() . "\n";
 			exit;
 		}
+
+		$this->Session = new Sesion(null, true);
 	}
 
 	public function main() {
-		$Session = new Sesion(null, true);
 		$clients = array();
 
 		$this->debug('Start: ' . date('Y-m-d H:i:s'));
@@ -77,7 +79,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 		$clients = $this->dbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
 		if (!$this->_empty($clients)) {
-			$currency_base_id = Moneda::GetMonedaBase($Session);
+			$currency_base_id = Moneda::GetMonedaBase($this->Session);
 			$clients = UtilesApp::utf8izar($clients, false);
 
 			foreach ($clients as $client) {
@@ -93,8 +95,11 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$client_currency = 1;
 				$client_user_manager_id = 'NULL';
 
-				$Client = new Cliente($Session);
-				$ClientAgreement = new Contrato($Session);
+				// User: values by default.
+				$modifier_user_id = $this->getAdministratorUserId();
+
+				$Client = new Cliente($this->Session);
+				$ClientAgreement = new Contrato($this->Session);
 				$Client->loadByCodigoSecundario($client['client_code']);
 
 				if (!$Client->Loaded()) {
@@ -105,7 +110,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$Client->Edit('id_usuario_encargado', $client_user_manager_id);
 				}
 
-				$Client->Edit('glosa_cliente', $client['client_name']);
+				$Client->Edit('glosa_cliente', !empty($client['client_name']) ? $client['client_name'] : 'Glosa mal ingresada en SAP');
 				$Client->Edit('activo', $client['client_active']);
 
 				if ($Client->Write()) {
@@ -126,6 +131,8 @@ class IntegracionMorenoBaldivieso extends AppShell {
 						$ClientAgreement->Edit('id_tarifa', $client_agreement_rate);
 					}
 
+					$ClientAgreement->Edit('id_usuario_modificador', $modifier_user_id);
+
 					if ($ClientAgreement->Write()) {
 						if ($this->_empty($Client->fields['id_contrato'])) {
 							$Client->Edit('id_contrato', $ClientAgreement->fields['id_contrato']);
@@ -144,7 +151,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$client['matter_code'] = strtoupper($client['matter_code']);
 				$billing_form = $this->_empty($client['charging_data_billing_form']) ? 'FLAT FEE' : $client['charging_data_billing_form'];
 
-				$Rate = new Tarifa($Session);
+				$Rate = new Tarifa($this->Session);
 
 				// Find by name
 				if (!$this->_empty($client['charging_data_rate'])) {
@@ -156,7 +163,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$rate_id = $Rate->Loaded() ? $Rate->fields['id_tarifa'] : 1;
 
 				// Find a currency rate, if not exist select one by default
-				$CurrencyRate = new Moneda($Session);
+				$CurrencyRate = new Moneda($this->Session);
 				$currency_rate_id = null;
 				if (!$this->_empty($client['charging_data_currency_rate'])) {
 					$CurrencyRate->LoadByCode($client['charging_data_currency_rate']);
@@ -172,7 +179,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				// If flat rate is greater than zero
 				$charging_data_flat_rate = floatval($client['charging_data_flat_rate']);
 				if ($charging_data_flat_rate > 0) {
-					$FlatRate = new Tarifa($Session);
+					$FlatRate = new Tarifa($this->Session);
 					$rate_id = $FlatRate->GuardaTarifaFlat($charging_data_flat_rate, $currency_rate_id);
 				}
 
@@ -185,7 +192,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$chargeable = $this->_empty($client['chargeable']) ? 1 : $client['chargeable']; // Chargeable by default
 				$separate_settlements = 1; // Separate settlements by default
 
-				$CurrencyFees = new Moneda($Session);
+				$CurrencyFees = new Moneda($this->Session);
 				$currency_fees_id = null;
 				if (!$this->_empty($client['charging_data_currency_fees'])) {
 					$CurrencyFees->LoadByCode($client['charging_data_currency_fees']);
@@ -198,7 +205,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$currency_fees_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
 				}
 
-				$CurrencyExpenses = new Moneda($Session);
+				$CurrencyExpenses = new Moneda($this->Session);
 				$currency_expenses_id = null;
 				if (!$this->_empty($client['charging_data_currency_expenses'])) {
 					$CurrencyExpenses->LoadByCode($client['charging_data_currency_expenses']);
@@ -211,15 +218,15 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$currency_expenses_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
 				}
 
-				$ProjectArea = new AreaProyecto($Session);
+				$ProjectArea = new AreaProyecto($this->Session);
 				$ProjectArea->LoadByGlosa($client['matter_area']);
 				$project_area_id = 'NULL';
 				if ($ProjectArea->Loaded()) {
 					$project_area_id = $ProjectArea->fields['id_area_proyecto'];
 				}
 
-				$Matter = new Asunto($Session);
-				$MatterAgreement = new Contrato($Session);
+				$Matter = new Asunto($this->Session);
+				$MatterAgreement = new Contrato($this->Session);
 
 				$Matter->log_update = false;
 				$Matter->loadByCodigoSecundario($client['matter_code']);
@@ -232,7 +239,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$Matter->Edit('codigo_cliente', $Client->fields['codigo_cliente']);
 				}
 
-				$Matter->Edit('glosa_asunto', $client['matter_name']);
+				$Matter->Edit('glosa_asunto', !empty($client['matter_name']) ? $client['matter_name'] : 'Glosa mal ingresada en SAP');
 				$Matter->Edit('id_idioma', $language);
 				$Matter->Edit('activo', $client['matter_active']);
 				$Matter->Edit('cobrable', $chargeable);
@@ -241,7 +248,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				// Find a lawyer manager
 				$lawyer_manager_code = $client['lawyer_manager_code'];
 				if (!$this->_empty($lawyer_manager_code)) {
-					$LawyerManager = new UsuarioExt($Session);
+					$LawyerManager = new UsuarioExt($this->Session);
 					$LawyerManager->LoadByNick($lawyer_manager_code);
 					if ($LawyerManager->Loaded()) {
 						$lawyer_manager_id = $LawyerManager->fields['id_usuario'];
@@ -264,7 +271,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 					// Find a trade manager
 					if (!$this->_empty($client['trade_manager_code'])) {
-						$TradeManager = new UsuarioExt($Session);
+						$TradeManager = new UsuarioExt($this->Session);
 						$TradeManager->LoadByNick($client['trade_manager_code']);
 						if ($TradeManager->Loaded()) {
 							$trade_manager_id = $TradeManager->fields['id_usuario'];
@@ -283,7 +290,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 					// Find a country
 					if (!$this->_empty($client['billing_data_country'])) {
-						$Country = new PrmPais($Session);
+						$Country = new PrmPais($this->Session);
 						$Country->LoadByISO($client['billing_data_country']);
 						if ($Country->Loaded()) {
 							$country_id = $Country->fields['id_pais'];
@@ -303,6 +310,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('id_moneda', $currency_rate_id);
 					$MatterAgreement->Edit('opc_moneda_total', $currency_fees_id);
 					$MatterAgreement->Edit('opc_moneda_gastos', $currency_expenses_id);
+					$MatterAgreement->Edit('id_usuario_modificador', $modifier_user_id);
 
 					if ($MatterAgreement->Write()) {
 						$Matter->Edit('id_contrato', $MatterAgreement->fields['id_contrato']);
@@ -325,6 +333,16 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 	private function _empty($var) {
 		return empty($var);
+	}
+
+	private function getAdministratorUserId() {
+		$administrator_rut = '99511620';
+		$admin_user = new UsuarioExt($this->Session);
+		$admin_user->load($administrator_rut);
+		if ($admin_user->Loaded()) {
+			return $admin_user->fields['id_usuario'];
+		}
+		exit('Error: Administrator User doesnt exist.');
 	}
 
 }

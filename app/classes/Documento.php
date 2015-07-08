@@ -8,15 +8,20 @@ class Documento extends Objeto {
 
 
 	function __construct($sesion, $fields = "", $params = "") {
-		$this->tabla = "documento";
-		$this->campo_id = "id_documento";
+		$this->tabla          = "documento";
+		$this->campo_id       = "id_documento";
 		#$this->guardar_fecha = false;
-		$this->sesion = $sesion;
-		$this->fields = $fields;
-		$this->log_update = true;
+		$this->sesion         = $sesion;
+		$this->fields         = $fields;
+		$this->log_update     = true;
 
-		$describe=$this->sesion->pdodbh->query( "SHOW COLUMNS FROM   {$this->tabla}");
-		$this->editable_fields=$describe->fetchALL(PDO::FETCH_COLUMN,0 );
+		if( !($this->editable_fields = $this->getCache('editable_fields')) ) {
+			$describe = $this->sesion->pdodbh->query( "SHOW COLUMNS FROM {$this->tabla}");
+			$this->editable_fields = $describe->fetchALL( PDO::FETCH_COLUMN, 0 );
+
+			$this->setCache('editable_fields', $this->editable_fields);
+		}
+
 		unset($this->editable_fields[array_search($this->campo_id,$this->editable_fields)]);
 
 	}
@@ -143,8 +148,9 @@ class Documento extends Objeto {
 			if ($id_cobro) {
 				$this->Edit("id_cobro", $id_cobro);
 			}
+
 			$this->Edit('tipo_doc', $tipo_doc);
-			$this->Edit("numero_doc", $numero_doc?$numero_doc:"");
+			$this->Edit("numero_doc", $numero_doc? $numero_doc : "");
 			$this->Edit("id_moneda", $id_moneda);
 			$this->Edit("fecha", $fecha);
 			$this->Edit("glosa_documento", $glosa_documento);
@@ -167,7 +173,7 @@ class Documento extends Objeto {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($id_contrato) = mysql_fetch_array($resp);
 
-				if(empty($id_contrato) || $id_contrato == 'NULL'){
+				if(empty($id_contrato) || $id_contrato == 'NULL') {
 					$codigo_asunto = 'NULL';
 				} else if(empty($codigo_asunto)) {
 					$query = "SELECT codigo_asunto FROM asunto
@@ -190,6 +196,7 @@ class Documento extends Objeto {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}
+
 			if ($this->Write()) {
 				$id_documento = $this->fields['id_documento'];
 				$ids_monedas = explode(',', $ids_monedas_documento);
@@ -203,26 +210,17 @@ class Documento extends Objeto {
 				if (!empty($primer_tipo_cambio)) {
 					$this->ActualizarDocumentoMoneda($tipo_cambio);
 				}
+
 				$msg = empty($adelanto) ? __('Pago ingresado con éxito') : __('Adelanto ingresado con éxito');
 
-					$pagina->addInfo($msg);
-
-
+				$pagina->addInfo($msg);
 
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
-				 $this->Write();
-
+				$this->Write();
 			} else {
 				 throw new Exception($this->error);
 			}
-
 		}
-
-		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>" . $out_neteos . "</table>";
-		//echo $out_neteos;
-	/*echo '<pre>';
-			print_r($this->fields);
-			echo '</pre>';*/
 
 		return $id_documento;
 	}
@@ -396,18 +394,31 @@ class Documento extends Objeto {
 		return $id;
 	}
 
-	function MontoUsadoAdelanto($id_cobro) {
-		$query = "SELECT ccfm.monto_bruto - ccfm.saldo
-					FROM cta_cte_fact_mvto ccfm
-					JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
-					JOIN documento dc ON nd.id_documento_cobro = dc.id_documento
-					WHERE nd.id_documento_pago = '" . $this->fields['id_documento'] . "'
-					AND dc.id_cobro = '" . $id_cobro . "';";
+	function MontoUsadoAdelanto($id_cobro = null) {
+		$monto = 0;
+
+		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			$query = "SELECT
+					ccfm.monto_bruto - ccfm.saldo AS monto
+				FROM cta_cte_fact_mvto ccfm
+				INNER JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
+				INNER JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+				INNER JOIN documento dc ON nd.id_documento_cobro = dc.id_documento
+				WHERE nd.id_documento_pago = '{$this->fields['id_documento']}'
+					AND dc.id_cobro = '{$id_cobro}'";
+		} else {
+			$query = "SELECT
+					neteo_documento.valor_pago_honorarios + neteo_documento.valor_pago_gastos AS monto
+				FROM neteo_documento
+				INNER JOIN documento ON documento.id_documento = neteo_documento.id_documento_cobro
+				WHERE
+					documento.id_cobro = '{$id_cobro}'
+					AND neteo_documento.id_documento_pago = '{$this->fields['id_documento']}'";
+		}
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
 		list($monto) = mysql_fetch_array($resp);
+
 		return $monto;
 	}
 

@@ -287,6 +287,10 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 		$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
 	}
 
+	if ($forma_cobro) {
+		$where .= " AND IFNULL(cobro.forma_cobro, contrato.forma_cobro) = '$forma_cobro' ";
+	}
+
 	// Filtro para Actividades si están activos
 	if (Conf::GetConf($sesion, 'UsoActividades') && !empty($codigo_actividad)) {
 		$where .= " AND actividad.codigo_actividad = '$codigo_actividad'";
@@ -339,6 +343,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 			trabajo.codigo_asunto,
 			trabajo.cobrable,
 			trabajo.solicitante,
+			trabajo.estadocobro,
 			prm_moneda.simbolo as simbolo,
 			prm_moneda.id_moneda as id_moneda,
 			asunto.codigo_cliente as codigo_cliente,
@@ -544,6 +549,8 @@ $pagina->PrintTop($popup);
 	<input type='hidden' name='popup' id='popup' value='<?php echo $popup ?>'>
 	<input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo ?>'>
 	<input type='hidden' name='id_usuario' id='id_usuario' value='<?php echo $id_usuario ?>'>
+	<input type='hidden' name='desde' id='desde' value='<?php echo $desde ?>'>
+	<input type='hidden' name='orden' id='orden' value='<?php echo $orden ?>'>
 	<?php
 	if ($query_asuntos) {
 		echo '<input type="hidden" name="query_asuntos" id="query_asuntos" value="' . $query_asuntos . '"/>';
@@ -674,7 +681,21 @@ $pagina->PrintTop($popup);
 							?>
 					</td>
 				</tr>
-				<?php
+
+				<tr>
+					<td class="buscadorlabel">
+						<?php echo __('Forma de Tarificación') ?>
+					</td>
+					<td valign="top" class="texto" align="left">
+						<?php
+							$FormaCobro = new PrmFormaCobro($sesion);
+							$FormHelper = new Form();
+							$formas_cobro = $FormaCobro->Listar();
+							echo $FormHelper->select('forma_cobro', $formas_cobro, $forma_cobro, array('empty' => __('Cualquiera')));
+							?>
+					</td>
+				</tr>
+			<?php
 
 			}
 			// Validando fecha
@@ -925,8 +946,13 @@ function funcionTR(& $trabajo) {
 		} else {
 			$id_moneda_trabajo = $trabajo->fields['id_moneda_contrato'];
 		}
-
-		$tarifa = number_format($t->GetTrabajoTarifa($id_moneda_trabajo, $trabajo->fields['id_trabajo']), $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$chargingBusiness = new ChargingBusiness($sesion);
+		$tarifa = number_format(
+			$chargingBusiness->getWorkFee($trabajo->fields['id_trabajo'], $id_moneda_trabajo)->get('valor'),
+			$moneda_cobro->fields['cifras_decimales'],
+			$idioma->fields['separador_decimales'],
+			$idioma->fields['separador_miles']
+		);
 	} else if ($trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0) {
 		$tarifa = number_format($trabajo->fields['tarifa_hh'], $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 	} else if ($trabajo->fields['id_tramite_tipo'] == 0) {
@@ -1075,52 +1101,8 @@ echo $Form->script();
 	}
 
 	function Refrescar() {
-		//todo if $motivo=="cobros",$motivo=="horas"
-		var pagina_desde = '<?php echo $desde ? "&desde=$desde" : ''; ?>';
-		var orden = '<?php echo $desde ? "&orden=$orden" : ''; ?>';
-
-		<?php if ($motivo == "horas") {
-			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-		?>
-
-			var cliente = 'codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
-			var asunto = 'codigo_asunto_secundario='+$('codigo_asunto_secundario').value;
-			<?php } else { ?>
-				var cliente = 'codigo_cliente='+$('codigo_cliente').value;
-				var asunto = 'codigo_asunto='+$('codigo_asunto').value;
-			<?php } ?>
-
-			var cobrado = $('cobrado').value;
-			var cobrable = $('cobrable').value;
-			var revisado = $('revisado').value;
-			var id_cobro = $('id_cobro').value;
-			var encargado_comercial = $('id_encargado_comercial').value;
-			var usuario = $('id_usuario').value;
-			var fecha_ini = $('fecha_ini').value;
-			var fecha_fin = $('fecha_fin').value;
-			var url = "trabajos.php?from=horas&motivo=horas&popup=1&opc=buscar"
-				+ "&cobrado=" + cobrado
-				+ "&cobrable=" + cobrable
-				+ "&revisado=" + revisado
-				+ "&id_cobro=" + id_cobro
-				+ "&" + cliente
-				+ "&" + asunto
-				+ "&id_encargado_comercial=" + encargado_comercial
-				+ "&id_usuario=" + usuario
-				+ "&fecha_ini=" + fecha_ini
-				+ "&fecha_fin=" + fecha_fin
-				+ pagina_desde
-				+ orden;
-
-		<?php } else if ($motivo == "cobros") { ?>
-
-			var fecha_ini = $('fecha_ini').value;
-			var fecha_fin = $('fecha_fin').value;
-			var url = "trabajos.php?id_cobro=<?php echo $id_cobro ?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
-
-		<?php } ?>
-
-		self.location.href= url;
+		//no basta con hacer un reload porque la paginacion es por post y se pierden los parametros en la url
+		self.location.href = 'trabajos.php?' + jQuery('#form_trabajos').serialize();
 	}
 
 

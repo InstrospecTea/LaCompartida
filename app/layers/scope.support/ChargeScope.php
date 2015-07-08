@@ -92,4 +92,28 @@ class ChargeScope implements IChargeScope{
 		return $criteria;
 	}
 
-} 
+	/**
+	 * Order by client gloss from client and client code from charge
+	 * @param Criteria $criteria
+	 * @return mixed
+	 */
+	function orderByClientGlossAndClientCode(Criteria $criteria) {
+		$criteria->add_ordering('Client.glosa_cliente', 'ASC');
+		$criteria->add_ordering('Charge.codigo_cliente', 'ASC');
+		return $criteria;
+	}
+
+	 /**
+	  * Custom left join with document
+	  * @param Criteria $criteria
+	  */
+	function withDocument(Criteria $criteria) {
+		$criteria->add_custom_join_with('documento AS Document',
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('Charge.id_cobro', 'Document.id_cobro'),
+					CriteriaRestriction::equals('Document.tipo_doc',"'N'")
+				)
+		);
+		return $criteria;
+	}
+}
