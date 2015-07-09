@@ -176,4 +176,22 @@ class CobroPendiente extends Objeto {
 
 		return $cliente_hitos;
 	}
+
+	/**
+	 * Obtiene el primer registro de pago pendiente para el cobro
+	 * @param $id_cobro
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function LoadFirstByIdCobro($id_cobro) {
+		$result = array();
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_select('descripcion')->add_select('observaciones')->add_select('id_contrato')->add_from('cobro_pendiente');
+		$Criteria->add_restriction(CriteriaRestriction::equals('id_cobro', $id_cobro))->add_limit(1);
+		$cobro_pendiente = $Criteria->run();
+		if (count($cobro_pendiente) > 0) {
+			$result = $cobro_pendiente[0];
+		}
+		return $result;
+	}
 }
