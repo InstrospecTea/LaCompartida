@@ -11576,6 +11576,7 @@ class NotaCobro extends Cobro {
 	 * para reemplazar en $template
 	 *
 	 * @param array Valores posibles para reemplazar en el template HTML
+	 * @return string
 	 */
 	protected function RenderTemplate($template) {
 
