@@ -1368,11 +1368,11 @@ GROUP BY  $bagrupador";
 		$bind_params = array();
 
 		if (!empty($this->fecha_ini) && !empty($this->fecha_fin)) {
-			$where = "AND ol.fechaentry BETWEEN ':fecha_ini' AND ':fecha_fin'";
+			$where = "AND ol.fechaentry BETWEEN :fecha_ini AND :fecha_fin";
 
 			$bind_params = array(
-				':fecha_ini' => $this->fecha_ini,
-				':fecha_fin' => $this->fecha_fin
+				':fecha_ini' => "{$this->fecha_ini}",
+				':fecha_fin' => "{$this->fecha_fin}"
 			);
 		}
 
