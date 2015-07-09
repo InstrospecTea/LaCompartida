@@ -186,8 +186,8 @@ class CobroPendiente extends Objeto {
 	public function LoadFirstByIdCobro($id_cobro) {
 		$result = array();
 		$Criteria = new Criteria($this->sesion);
-		$Criteria->add_select('descripcion')->add_select('observaciones')->add_select('id_contrato')->add_from('cobro_pendiente');
-		$Criteria->add_restriction(CriteriaRestriction::equals('id_cobro', $id_cobro))->add_limit(1);
+		$Criteria->add_select('fecha_cobro')->add_select('monto_estimado')->add_select('descripcion')->add_select('observaciones')->add_select('id_contrato')->add_from('cobro_pendiente');
+		$Criteria->add_restriction(CriteriaRestriction::and_clause(array("id_cobro = $id_cobro", "hito = 1")))->add_limit(1);
 		$cobro_pendiente = $Criteria->run();
 		if (count($cobro_pendiente) > 0) {
 			$result = $cobro_pendiente[0];
