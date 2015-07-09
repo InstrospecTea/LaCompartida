@@ -148,9 +148,7 @@ class ReporteContrato extends Contrato {
 
 		$this->InsertOlapStatement=$this->sesion->pdodbh->prepare($queryinsert);
 
-
-
-
+		$this->cleanOlap();
 	}
 
 	 function FillArrays() {
@@ -160,23 +158,13 @@ class ReporteContrato extends Contrato {
 		$this->Descuentos($this->separar_asuntos);
 	}
 
-	static function QueriesPrevias($sesion) {
-		$Contrato = new Contrato($sesion);
-
-		$Contrato::QueriesPrevias($sesion);
-
-		//Si tengo un dato en el olap y no está en las 3 tablas de origen, significa que fue eliminado, pero no lo borro sino que le pongo flag eliminado.
-		$updateeliminado = "UPDATE olap_liquidaciones ol LEFT JOIN trabajo t ON ol.id_entry = t.id_trabajo SET ol.eliminado = 1 WHERE ol.tipo = 'TRB' AND t.id_trabajo is NULL;";
-		$updateeliminado .= "UPDATE olap_liquidaciones ol LEFT JOIN cta_corriente cc ON ol.id_entry = cc.id_movimiento SET ol.eliminado = 1 WHERE ol.tipo = 'GAS' AND cc.id_movimiento is NULL;";
-		$updateeliminado .= "UPDATE olap_liquidaciones ol LEFT JOIN tramite tra ON ol.id_entry = tra.id_tramite SET ol.eliminado = 1 WHERE ol.tipo = 'TRA' AND tra.id_tramite is NULL;";
-
-		$Contrato->sesion->pdodbh->exec($updateeliminado);
+	static function QueriesPrevias(& $sesion) {
+		Contrato::QueriesPrevias($sesion);
 	}
 
 	function InsertQuery($maxolaptime) {
 		try {
 			$this->InsertOlapStatement->execute(array(':maxolaptime' => $maxolaptime));
-			$this->cleanOlap();
 		} catch (PDOException $e) {
 			debug($e->getMessage());
 			debug($e->getTraceAsString());
@@ -1372,20 +1360,24 @@ GROUP BY  $bagrupador";
 		return Html::SelectQuery($this->sesion, $query, 'id_contrato', $selected, empty($onchange) ? null : 'onchange=' . $onchange, __("Cualquiera"), $width);
 	}
 
-	function cleanOlap($fechaentry_inicio = null, $fechaentry_fin = null) {
+	/**
+	 * Elimina los registros asociados a los trabajos, gastos y trámites de la tabla olap_liquidaciones
+	 * @return void
+	 */
+	function cleanOlap() {
 		$where = '';
-		$fechaentry_between = array();
+		$bind_params = array();
 
-		if (!empty($fechaentry_inicio) && !empty($fechaentry_fin)) {
-			$where = "AND ol.fechaentry BETWEEN ':fechaentry_inicio' AND ':fechaentry_fin'";
+		if (!empty($this->fecha_ini) && !empty($this->fecha_fin)) {
+			$where = "AND ol.fechaentry BETWEEN ':fecha_ini' AND ':fecha_fin'";
 
-			$fechaentry_between = array(
-				':fechaentry_inicio' => $fechaentry_inicio,
-				':fechaentry_fin' => $fechaentry_fin,
+			$bind_params = array(
+				':fecha_ini' => $this->fecha_ini,
+				':fecha_fin' => $this->fecha_fin
 			);
 		}
 
-		// trabajos
+		// si el trabajo no existe en la tabla trabajo entonces es eliminado el registro asociado a este en la tabla olap
 		$query_trabajos = "DELETE ol1
 			FROM olap_liquidaciones ol1
 			JOIN (
@@ -1398,9 +1390,9 @@ GROUP BY  $bagrupador";
 			) ol2 ON ol1.id_unico = ol2.id_unico";
 
 		$trabajo_statement = $this->sesion->pdodbh->prepare($query_trabajos);
-		$trabajo_statement->execute($fechaentry_between);
+		$trabajo_statement->execute($bind_params);
 
-		// gastos
+		// si el gasto no existe en la tabla cta_corriente entonces es eliminado el registro asociado a este en la tabla olap
 		$query_gastos = "DELETE ol1
 			FROM olap_liquidaciones ol1
 			JOIN (
@@ -1413,9 +1405,9 @@ GROUP BY  $bagrupador";
 			) ol2 ON ol1.id_unico = ol2.id_unico";
 
 		$gasto_statement = $this->sesion->pdodbh->prepare($query_gastos);
-		$gasto_statement->execute($fechaentry_between);
+		$gasto_statement->execute($bind_params);
 
-		// tramites
+		// si el tramite no existe en la tabla tramite entonces es eliminado el registro asociado a este en la tabla olap
 		$query_tramites = "DELETE ol1
 			FROM olap_liquidaciones ol1
 			JOIN (
@@ -1428,7 +1420,7 @@ GROUP BY  $bagrupador";
 			) ol2 ON ol1.id_unico = ol2.id_unico";
 
 		$tramite_statement = $this->sesion->pdodbh->prepare($query_tramites);
-		$tramite_statement->execute($fechaentry_between);
+		$tramite_statement->execute($bind_params);
 	}
 
 }
