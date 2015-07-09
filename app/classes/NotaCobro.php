@@ -11604,5 +11604,8 @@ class NotaCobro extends Cobro {
 		$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
 		$this->template_data['Idioma'] = $idioma->fields;
 		$this->template_data['Moneda'] = $moneda->fields;
+
+		$CobroPendiente = new CobroPendiente($this->sesion);
+		$this->template_data['CobroPendiente'] = $CobroPendiente->LoadFirstByIdCobro($this->template_data['Cobro']['id_cobro']);
 	}
 }
