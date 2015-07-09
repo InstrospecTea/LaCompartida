@@ -25,7 +25,7 @@ class ReporteCriteria {
 	public $orden_agrupador = array();
 	public $agrupador_principal = 0;
 	//Campos utilizados para determinar los datos en el periodo. Default: trabajo.
-	public $campo_fecha = 'trabajo.fecha';
+	public $campo_fecha = '';
 	public $campo_fecha_2 = '';
 	public $campo_fecha_3 = '';
 	public $campo_fecha_cobro = 'cobro.fecha_fin';
@@ -39,7 +39,7 @@ class ReporteCriteria {
 	//Cuanto se repite la fila para cada agrupador
 	public $filas = array();
 
-	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar');
+	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 
 	const TIPO_TRABAJOS = 0;
 	const TIPO_TRAMITES = 1;
@@ -141,6 +141,7 @@ class ReporteCriteria {
 			case "horas_visibles":
 			case "horas_castigadas":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				if($dato_extra == 1){
 					$this->filtros_especiales[] = "(duracion - duracion_cobrada) > 0"; //no mostrar trabajos sin horas castigadas
 				}
@@ -148,16 +149,19 @@ class ReporteCriteria {
 
 			case "horas_spot":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->filtros_especiales[] = " ( cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' AND ( cobro.forma_cobro IN ('TASA','CAP') )) OR ( (cobro.estado IS NULL OR cobro.estado IN ('CREADO','EN REVISION')) AND (contrato.forma_cobro IN ('TASA','CAP') OR contrato.forma_cobro IS NULL ) ) ";
 				break;
 
 			case "horas_convenio":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->filtros_especiales[] = " ( cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' AND  ( cobro.forma_cobro IN ('FLAT FEE','RETAINER') )) OR ( (cobro.estado IS NULL OR cobro.estado IN ('CREADO','EN REVISION')) AND (contrato.forma_cobro IN ('FLAT FEE','RETAINER') ) )";
 				break;
 
 			case "horas_no_cobrables":
 				$this->addFiltro('trabajo', 'cobrable', '0');
+				$this->addFiltro('tramite', 'cobrable', '0');
 				break;
 
 			case "horas_cobradas":
@@ -169,6 +173,7 @@ class ReporteCriteria {
 			case "valor_estandar":
 			case "valor_pagado_parcial":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->addFiltro('cobro', 'estado', 'EMITIDO');
 				$this->addFiltro('cobro', 'estado', 'FACTURADO');
 				$this->addFiltro('cobro', 'estado', 'ENVIADO AL CLIENTE');
@@ -179,6 +184,7 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "horas_por_cobrar":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->addFiltro('cobro', 'estado', 'EMITIDO', false);
 				$this->addFiltro('cobro', 'estado', 'FACTURADO', false);
 				$this->addFiltro('cobro', 'estado', 'ENVIADO AL CLIENTE', false);
@@ -190,6 +196,7 @@ class ReporteCriteria {
 			case "horas_pagadas":
 			case "valor_pagado":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->addFiltro('cobro', 'estado', 'PAGADO');
 				break;
 
@@ -197,6 +204,7 @@ class ReporteCriteria {
 			case "valor_por_pagar":
 			case "valor_por_pagar_parcial":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->addFiltro('cobro', 'estado', 'EMITIDO');
 				$this->addFiltro('cobro', 'estado', 'FACTURADO');
 				$this->addFiltro('cobro', 'estado', 'ENVIADO AL CLIENTE');
@@ -206,6 +214,7 @@ class ReporteCriteria {
 			case "horas_incobrables":
 			case "valor_incobrable":
 				$this->addFiltro('trabajo', 'cobrable', '1');
+				$this->addFiltro('tramite', 'cobrable', '1');
 				$this->addFiltro('cobro', 'estado', 'INCOBRABLE');
 				break;
 		}
@@ -378,65 +387,9 @@ class ReporteCriteria {
 			return 0;
 		}
 
-		$campo_fecha = $this->alt($this->campo_fecha_cobro, $this->campo_fecha_cobro_2);
-
-		$indefinido = sprintf("'%s'", __('Indefinido'));
-		$por_emitir = sprintf("'%s'", __('Por Emitir'));
 		$Criteria = new Criteria($this->sesion);
 
-		$this->addColumnsToCriteria($Criteria, TIPO_COBROS);
-
-		$Criteria
-			->add_select(CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', $indefinido), 'glosa_estudio')
-			->add_select('contrato.id_contrato')
-			->add_select("MONTH({$campo_fecha})", 'mes')
-			->add_select('grupo_cliente.id_grupo_cliente')
-			->add_select(CriteriaRestriction::ifnull('grupo_cliente.glosa_grupo_cliente', "'-'"), 'glosa_grupo_cliente')
-			->add_select("CONCAT(cliente.glosa_cliente, ' - ', asunto.codigo_asunto, ' ', asunto.glosa_asunto)", 'glosa_cliente_asunto')
-			->add_select(CriteriaRestriction::ifnull('grupo_cliente.glosa_grupo_cliente', 'cliente.glosa_cliente'), 'grupo_o_cliente')
-			->add_select($campo_fecha, 'fecha_final')
-			->add_select("DATE_FORMAT({$campo_fecha}, '%m-%Y')", 'mes_reporte')
-			->add_select("DATE_FORMAT({$campo_fecha}, '%d-%m-%Y')", 'dia_reporte')
-			->add_select('cobro.id_cobro')
-			->add_select('cobro.estado', 'estado')
-			->add_select('cobro.forma_cobro', 'forma_cobro')
-			->add_select('tipo.glosa_tipo_proyecto', 'tipo_asunto')
-			->add_select('area.glosa', 'area_asunto')
-			->add_select($indefinido, 'solicitante');
-
-
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$Criteria->add_select($this->nombre_usuario('usuario_responsable'), 'nombre_usuario_responsable');
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$Criteria->add_select('usuario_responsable.id_usuario', 'id_usuario_responsable');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$Criteria->add_select('usuario_secundario.id_usuario', 'id_usuario_secundario');
-		}
-		if (!$this->vista) {
-			$Criteria->add_select($indefinido, 'agrupador_general');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$Criteria->add_select($this->nombre_usuario('usuario_secundario'), 'nombre_usuario_secundario');
-		}
-		if (in_array('dia_corte', $this->agrupador)) {
-			$Criteria->add_select("DATE_FORMAT(cobro.fecha_fin, '%d-%m-%Y')", 'dia_corte');
-		}
-		if (in_array('dia_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL,'{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))", 'dia_emision');
-		}
-		if (in_array('mes_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL,'{$por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))", 'mes_emision');
-		}
-
-		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$Criteria->add_select("' - '", 'glosa_actividad');
-		}
-
-		if (in_array('area_trabajo', $this->agrupador)) {
-			$Criteria->add_select("' - '", 'area_trabajo');
-		}
+		$this->addCommonColumnsToCriteria($Criteria, TIPO_COBROS);
 
 		// TIPO DE DATO
 		switch ($this->tipo_dato) {
@@ -608,13 +561,14 @@ class ReporteCriteria {
 
 		/* WHERE SIN USUARIOS NI TRABAJOS */
 		unset($this->filtros['trabajo.cobrable']);
+		unset($this->filtros['tramite.cobrable']);
 		unset($this->filtros['trabajo.id_usuario']);
 
 		unset($this->filtros['asunto.id_area_proyecto']);
 		unset($this->filtros['asunto.id_tipo_asunto']);
 
 		$and_wheres = array(
-			$this->getWhere('cobro', $Criteria),
+			$this->getWhere(TIPO_COBROS),
 			CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
 			CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
 		);
@@ -667,44 +621,22 @@ class ReporteCriteria {
 	//Ejecuta la Query y guarda internamente las filas de resultado.
 	public function Query() {
 		$stringquery = "";
-		$resp = mysql_unbuffered_query($this->getQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(), __FILE__, __LINE__, $this->sesion->dbh);
 
 		$this->row = array();
+
+		// Obtiene todos los datos para Trabajos
+		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRABAJOS), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRABAJOS), __FILE__, __LINE__, $this->sesion->dbh);
 		while ($row = mysql_fetch_assoc($resp)) {
 			$this->row[] = $row;
 		}
 
-		$my_custom_row = array(
-	    "profesional" => "Philip AndrÃ© Sanchez",
-	    "username" => "Philip AndrÃ© Sanchez",
-	    "id_usuario" => "23",
-	    "id_cliente" => "1",
-	    "codigo_cliente" => "000001",
-	    "glosa_cliente" => "Aberdeen Asset Management Inc.",
-	    "glosa_asunto" => "AsesorÃ­a - Advise",
-	    "glosa_asunto_con_codigo" => "000001-0002: AsesorÃ­a - Advise",
-	    "codigo_asunto" => "000001-0002",
-	    "id_contrato" => "1",
-	    "tipo_asunto" => "Contrato",
-	    "area_asunto" => "Corporativo",
-	    "id_grupo_cliente" => "1",
-	    "glosa_grupo_cliente" => "8001",
-	    "glosa_cliente_asunto" => "Aberdeen Asset Management Inc. - 000001-0002 AsesorÃ­a - Advise",
-	    "grupo_o_cliente" => "8001",
-	    "fecha_final" => "2015-07-08",
-	    "mes" => "7",
-	    "solicitante" => "",
-	    "id_cobro" => "2876",
-	    "estado" => "EN REVISION",
-	    "forma_cobro" => "TASA",
-	    "id_estudio" => "3",
-	    "glosa_estudio" => "LE",
-	    "id_moneda" => "1",
-	    "tipo_cambio" => "1",
-	    "valor_por_cobrar" => 100000000
-		);
+		// Obtiene todos los datos para Trámites
+		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRAMITES), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRAMITES), __FILE__, __LINE__, $this->sesion->dbh);
+		while ($row = mysql_fetch_assoc($resp)) {
+			$this->row[] = $row;
+		}
 
-		$this->row[] = $my_custom_row;
+		// Obtiene todos los datos para Cobros
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		$cobroquery = $this->cobroQuery();
 		if (
@@ -1375,7 +1307,34 @@ class ReporteCriteria {
 		'codigo_asunto',
 		'area_usuario',
 		'categoria_usuario',
-		'id_estudio'
+		'id_estudio',
+		'agrupador_general',
+		'nombre_usuario_responsable',
+		'id_usuario_responsable',
+		'id_usuario_secundario',
+		'nombre_usuario_secundario',
+		'id_contrato',
+		'tipo_asunto',
+		'area_asunto',
+		'solicitante',
+		'grupo_o_cliente',
+		'id_grupo_cliente',
+		'glosa_grupo_cliente',
+		'glosa_cliente_asunto',
+		'glosa_estudio',
+		'fecha_final',
+		'mes',
+		'mes_reporte',
+		'dia_reporte',
+		'dia_corte',
+		'dia_emision',
+		'mes_emision',
+		'id_cobro',
+		'estado',
+		'forma_cobro',
+		'glosa_actividad',
+		'area_trabajo',
+		'id_trabajo'
 	);
 
 	private function rightValueForColumn($key, $type) {
@@ -1383,16 +1342,19 @@ class ReporteCriteria {
 			return "'La columna {$key} no está en el arreglo de columnas'";
 		}
 		$column_value = null;
+		$undefined = $this->undefined_value;
+		$to_emit = $this->to_emit;
+		$date_field = $this->alt($this->campo_fecha_cobro, $this->campo_fecha_cobro_2);
 		switch ($key) {
 			case "profesional":
 				if ($type == TIPO_TRABAJOS) {
 					$column_value = $this->dato_usuario;
 				}
 				if ($type == TIPO_TRAMITES) {
-					$column_value = $this->undefined_value;
+					$column_value = $this->dato_usuario;
 				}
 				if ($type == TIPO_COBROS) {
-					$column_value = $this->undefined_value;
+					$column_value = $undefined;
 				}
 			 	break;
 			case "username":
@@ -1400,10 +1362,10 @@ class ReporteCriteria {
 					$column_value = 'usuario.username';
 				}
 				if ($type == TIPO_TRAMITES) {
-					$column_value = $this->undefined_value;
+					$column_value = 'usuario.username';
 				}
 				if ($type == TIPO_COBROS) {
-					$column_value = $this->undefined_value;
+					$column_value = $undefined;
 				}
 			 	break;
 			case "id_usuario":
@@ -1411,7 +1373,7 @@ class ReporteCriteria {
 					$column_value = 'usuario.id_usuario';
 				}
 				if ($type == TIPO_TRAMITES) {
-					$column_value = $this->undefined_value;
+					$column_value = 'usuario.id_usuario';
 				}
 				if ($type == TIPO_COBROS) {
 					$column_value = -1;
@@ -1437,10 +1399,10 @@ class ReporteCriteria {
 						$column_value = 'prm_area_proyecto.glosa';
 					}
 					if ($type == TIPO_TRAMITES) {
-						$column_value = $this->undefined_value;
+						$column_value = 'prm_area_proyecto.glosa';
 					}
 					if ($type == TIPO_COBROS) {
-						$column_value = $this->undefined_value;
+						$column_value = $undefined;
 					}
 				}
 			 	break;
@@ -1455,7 +1417,7 @@ class ReporteCriteria {
 						$column_value = $this->dato_codigo_asunto;
 				}
 				if ($type == TIPO_TRAMITES) {
-					$column_value = $this->undefined_value;
+					$column_value = $this->dato_codigo_asunto;
 				}
 				if ($type == TIPO_COBROS) {
 					$column_value = 'asunto.codigo_asunto';
@@ -1467,10 +1429,10 @@ class ReporteCriteria {
 						$column_value = 'IFNULL(prm_area_usuario.glosa,\'-\')';
 					}
 					if ($type == TIPO_TRAMITES) {
-						$column_value = $this->undefined_value;
+						$column_value = 'IFNULL(prm_area_usuario.glosa,\'-\')';
 					}
 					if ($type == TIPO_COBROS) {
-						$column_value = $this->undefined_value;
+						$column_value = $undefined;
 					}
 				}
 			case "categoria_usuario":
@@ -1479,31 +1441,253 @@ class ReporteCriteria {
 						$column_value = 'IFNULL(prm_categoria_usuario.glosa_categoria,\'-\')';
 					}
 					if ($type == TIPO_TRAMITES) {
-						$column_value = $this->undefined_value;
+						$column_value = 'IFNULL(prm_categoria_usuario.glosa_categoria,\'-\')';
 					}
 					if ($type == TIPO_COBROS) {
-						$column_value = $this->undefined_value;
+						$column_value = $undefined;
 					}
 				}
 				break;
 			case "id_estudio":
 				if ($type == TIPO_TRABAJOS) {
-					$column_value = CriteriaRestriction::ifnull('cobro.id_estudio', CriteriaRestriction::ifnull('estudio_contrato.id_estudio', $this->undefined_value));
+					$column_value = CriteriaRestriction::ifnull('cobro.id_estudio', CriteriaRestriction::ifnull('estudio_contrato.id_estudio', $undefined));
 				}
 				if ($type == TIPO_TRAMITES) {
-					$column_value = $this->undefined_value;
+					$column_value = CriteriaRestriction::ifnull('cobro.id_estudio', CriteriaRestriction::ifnull('estudio_contrato.id_estudio', $undefined));
 				}
 				if ($type == TIPO_COBROS) {
-					$column_value = CriteriaRestriction::ifnull('cobro.id_estudio', $this->undefined_value);
+					$column_value = CriteriaRestriction::ifnull('cobro.id_estudio', $undefined);
+				}
+				break;
+			case "agrupador_general":
+				if (!$this->vista) {
+					$column_value = $undefined;
+				}
+				break;
+			case "nombre_usuario_responsable":
+				if (in_array('id_usuario_responsable', $this->agrupador)) {
+					$usuario_responsable = $this->nombre_usuario('usuario_responsable');
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = "IF(usuario_responsable.id_usuario IS NULL, 'Sin Resposable', {$usuario_responsable})";
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = "IF(usuario_responsable.id_usuario IS NULL, 'Sin Resposable', {$usuario_responsable})";
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = $usuario_responsable;
+					}
+				}
+				break;
+			case "id_usuario_responsable":
+				if (in_array('id_usuario_responsable', $this->agrupador)) {
+					$column_value = 'usuario_responsable.id_usuario';
+				}
+				break;
+			case "id_usuario_secundario":
+				if (in_array('id_usuario_secundario', $this->agrupador)) {
+					$column_value = 'usuario_secundario.id_usuario';
+				}
+				break;
+			case "nombre_usuario_secundario":
+				if (in_array('id_usuario_secundario', $this->agrupador)) {
+					$usuario_secundario = $this->nombre_usuario('usuario_secundario');
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = "IF(usuario_secundario.id_usuario IS NULL, 'Sin Resposable Secundario', {$usuario_secundario})";
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = "IF(usuario_secundario.id_usuario IS NULL, 'Sin Resposable Secundario', {$usuario_secundario})";
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = $usuario_secundario;
+					}
+				}
+				break;
+			case "id_contrato":
+				$column_value = 'contrato.id_contrato';
+				break;
+			case "tipo_asunto":
+				$column_value = 'tipo.glosa_tipo_proyecto';
+				break;
+			case "area_asunto":
+				$column_value = 'area.glosa';
+				break;
+			case "solicitante":
+				$usuario_secundario = $this->nombre_usuario('usuario_secundario');
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = 'trabajo.solicitante';
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = 'tramite.solicitante';
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = $undefined;
+				}
+				break;
+			case "grupo_o_cliente":
+				$column_value = CriteriaRestriction::ifnull('grupo_cliente.glosa_grupo_cliente', 'cliente.glosa_cliente');
+				break;
+			case "id_grupo_cliente":
+				$column_value = 'grupo_cliente.id_grupo_cliente';
+				break;
+			case "glosa_grupo_cliente":
+				$column_value = CriteriaRestriction::ifnull('grupo_cliente.glosa_grupo_cliente', "'-'");
+				break;
+			case "glosa_cliente_asunto":
+				$column_value = "CONCAT(cliente.glosa_cliente, ' - ', asunto.codigo_asunto, ' ', asunto.glosa_asunto)";
+				break;
+			case "glosa_estudio":
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', CriteriaRestriction::ifnull('estudio_contrato.glosa_estudio', $undefined));
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', CriteriaRestriction::ifnull('estudio_contrato.glosa_estudio', $undefined));
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', $undefined);
+				}
+				break;
+			case "fecha_final":
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = 'trabajo.fecha';
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = 'tramite.fecha';
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = $date_field;
+				}
+				break;
+			case "mes":
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = 'MONTH(trabajo.fecha)';
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = 'MONTH(tramite.fecha)';
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = "MONTH({$date_field})";
+				}
+				break;
+			case 'mes_reporte':
+				if (in_array('mes_reporte', $this->agrupador)) {
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = "DATE_FORMAT(trabajo.fecha, '%m-%Y')";
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = "DATE_FORMAT(tramite.fecha, '%m-%Y')";
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = "DATE_FORMAT({$date_field}, '%m-%Y')";
+					}
+				}
+				break;
+			case 'dia_reporte':
+				if (in_array('dia_reporte', $this->agrupador)) {
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = "DATE_FORMAT(trabajo.fecha, '%d-%m-%Y')";
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = "DATE_FORMAT(tramite.fecha, '%d-%m-%Y')";
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = "DATE_FORMAT({$date_field}, '%d-%m-%Y')";
+					}
+				}
+				break;
+			case 'dia_corte':
+				if (in_array('dia_corte', $this->agrupador)) {
+					$column_value = "DATE_FORMAT(cobro.fecha_fin , '%d-%m-%Y')";
+				}
+				break;
+			case 'dia_emision':
+				if (in_array('dia_emision', $this->agrupador)) {
+					$column_value = "IF(cobro.fecha_emision IS NULL, {$to_emit}, DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))";
+				}
+				break;
+			case 'mes_emision':
+				if (in_array('mes_emision', $this->agrupador)) {
+					$column_value = "IF(cobro.fecha_emision IS NULL, {$to_emit}, DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))";
+				}
+				break;
+			case 'id_cobro':
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = "IFNULL(cobro.id_cobro, 'Indefinido')";
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = "IFNULL(cobro.id_cobro, 'Indefinido')";
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = 'cobro.id_cobro';
+				}
+				break;
+			case 'estado':
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = "IFNULL(cobro.estado, 'Indefinido')";
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = "IFNULL(cobro.estado, 'Indefinido')";
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = 'cobro.estado';
+				}
+			case 'forma_cobro':
+				if ($type == TIPO_TRABAJOS) {
+					$column_value = "IFNULL(cobro.forma_cobro, 'Indefinido')";
+				}
+				if ($type == TIPO_TRAMITES) {
+					$column_value = "IFNULL(cobro.forma_cobro, 'Indefinido')";
+				}
+				if ($type == TIPO_COBROS) {
+					$column_value = 'cobro.forma_cobro';
+				}
+				break;
+			case 'glosa_actividad':
+				if (Conf::GetConf($this->sesion, 'UsoActividades')) {
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = "IFNULL(NULLIF(IFNULL(actividad.glosa_actividad, 'Indefinido' ), ' '), 'Indefinido' )";
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = "IFNULL(NULLIF(IFNULL(actividad.glosa_actividad, 'Indefinido' ), ' '), 'Indefinido' )";
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = "' - '";
+					}
+				}
+				break;
+			case 'area_trabajo':
+				if (in_array('area_trabajo', $this->agrupador)) {
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = "IFNULL(prm_area_trabajo.glosa, 'Indefinido')";
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = $undefined;
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = "' - '";
+					}
+				}
+				break;
+			case 'id_trabajo':
+				if (in_array('id_trabajo', $this->agrupador)) {
+					if ($type == TIPO_TRABAJOS) {
+						$column_value = 'trabajo.id_trabajo';
+					}
+					if ($type == TIPO_TRAMITES) {
+						$column_value = $undefined;
+					}
+					if ($type == TIPO_COBROS) {
+						$column_value = "' - '";
+					}
 				}
 				break;
 			default:
 			 	$column_value = "'La columna {$key} no está definida'";
+
 		}
 		return $column_value;
 	}
 
-	private function addColumnsToCriteria($Criteria, $type) {
+	private function addCommonColumnsToCriteria($Criteria, $type) {
 		foreach ($this->columns as $column) {
 			$column_value = $this->rightValueForColumn($column, $type);
 			if (!is_null($column_value)) {
@@ -1512,212 +1696,170 @@ class ReporteCriteria {
 		}
 	}
 
-	//SELECT en string de Query. Elige el tipo de dato especificado.
-	private function setSELECT($Criteria) {
-		$indefinido = sprintf("'%s'", __('Indefinido'));
-
-		$this->addColumnsToCriteria($Criteria, TIPO_TRABAJOS);
-
-
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$usuario_responsable = $this->nombre_usuario('usuario_responsable');
-			$Criteria->add_select("IF(usuario_responsable.id_usuario IS NULL, 'Sin Resposable', {$usuario_responsable})", 'nombre_usuario_responsable');
-		}
-		if (in_array('id_usuario_responsable', $this->agrupador)) {
-			$Criteria->add_select('usuario_responsable.id_usuario', 'id_usuario_responsable');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$Criteria->add_select('usuario_secundario.id_usuario', 'id_usuario_secundario');
-		}
-		if (!$this->vista) {
-			$Criteria->add_select("'Indefinido'", 'agrupador_general');
-		}
-		if (in_array('id_usuario_secundario', $this->agrupador)) {
-			$usuario_secundario = $this->nombre_usuario('usuario_secundario');
-			$Criteria->add_select("IF(usuario_secundario.id_usuario IS NULL, 'Sin Resposable Secundario', {$usuario_secundario})", 'nombre_usuario_secundario');
-		}
-
+	private function addCurrenciesToCriteria($Criteria) {
 		$Criteria
-			->add_select('contrato.id_contrato', '')
-			->add_select('tipo.glosa_tipo_proyecto', 'tipo_asunto')
-			->add_select('area.glosa', 'area_asunto')
-			->add_select('grupo_cliente.id_grupo_cliente', '')
-			->add_select("IFNULL(grupo_cliente.glosa_grupo_cliente,  '-')", 'glosa_grupo_cliente')
-			->add_select("CONCAT(cliente.glosa_cliente, ' - ', asunto.codigo_asunto, ' ', asunto.glosa_asunto)", 'glosa_cliente_asunto')
-			->add_select('IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente)', 'grupo_o_cliente')
-			->add_select('trabajo.fecha', 'fecha_final')
-			->add_select('MONTH(trabajo.fecha)', 'mes')
-			->add_select('trabajo.solicitante', 'solicitante');
+			->add_select('cobro_moneda.id_moneda')
+			->add_select('cobro_moneda.tipo_cambio')
+			->add_select('cobro_moneda_base.id_moneda')
+			->add_select('cobro_moneda_base.tipo_cambio')
+			->add_select('cobro_moneda_cobro.id_moneda')
+			->add_select('cobro_moneda_cobro.tipo_cambio');
+	}
 
-		$_por_emitir = __('Por Emitir');
-		if (in_array('mes_reporte', $this->agrupador)) {
-			$Criteria->add_select("DATE_FORMAT(trabajo.fecha, '%m-%Y')", 'mes_reporte');
-		}
-		if (in_array('dia_reporte', $this->agrupador)) {
-			$Criteria->add_select("DATE_FORMAT(trabajo.fecha, '%d-%m-%Y')", 'dia_reporte');
-		}
-		if (in_array('dia_corte', $this->agrupador)) {
-			$Criteria->add_select("DATE_FORMAT(cobro.fecha_fin , '%d-%m-%Y')", 'dia_corte');
-		}
-		if (in_array('dia_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$_por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%d-%m-%Y'))", 'dia_emision');
-		}
-		if (in_array('mes_emision', $this->agrupador)) {
-			$Criteria->add_select("IF(cobro.fecha_emision IS NULL, '{$_por_emitir}', DATE_FORMAT(cobro.fecha_emision, '%m-%Y'))", 'mes_emision');
-		}
+	private function AddCommonDataTypeToCriteria($Criteria, $type, $data_type) {
 
-		$Criteria
-			->add_select("IFNULL(cobro.id_cobro, 'Indefinido')", 'id_cobro')
-			->add_select("IFNULL(cobro.estado, 'Indefinido')", 'estado')
-			->add_select("IFNULL(cobro.forma_cobro, 'Indefinido')", 'forma_cobro')
-			->add_select(CriteriaRestriction::ifnull('prm_estudio.glosa_estudio', CriteriaRestriction::ifnull('estudio_contrato.glosa_estudio', $indefinido)), 'glosa_estudio');
-
-		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$Criteria->add_select("IFNULL(NULLIF(IFNULL(actividad.glosa_actividad, 'Indefinido' ), ' '), 'Indefinido' )", 'glosa_actividad');
-		}
-
-		if (in_array('area_trabajo', $this->agrupador)) {
-			$Criteria->add_select("IFNULL(prm_area_trabajo.glosa, 'Indefinido')", 'area_trabajo');
-		}
-		if (in_array('id_trabajo', $this->agrupador)) {
-			$Criteria->add_select('trabajo.id_trabajo');
-		}
-
-
-
-		//Datos que se repiten
-		$s_monto_thh_simple = "IF(cobro.monto_thh > 0,
-																						cobro.monto_thh,
-																						IF(cobro.monto_trabajos > 0,
-																								cobro.monto_trabajos,
-																								1
-																						)
-																				)";
-		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar > 0,
-																						cobro.monto_thh_estandar,
-																						IF(cobro.monto_trabajos > 0,
-																								cobro.monto_trabajos,
-																								1
-																						)
-																				)";
-
-		//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
-		// A : monto estandar de este trabajo
-		// B : monto total de los trabajos en tarifa estandar
-		// C : monto de este trabajo (tarifa de cliente)
-		// D : monto total de trabajos (tarifa del cliente)
-
-		if ($this->proporcionalidad == 'estandar') {
+		if ($type == TIPO_TRABAJOS) {
 			$s_tarifa = 'tarifa_hh_estandar';
-			$s_monto_thh = $s_monto_thh_estandar;
-		} else {
-			$s_tarifa = "IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh)";
-			$s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE'," . $s_monto_thh_estandar . "," . $s_monto_thh_simple . ")";
-		}
+			$s_monto_thh = "IF(cobro.monto_thh_estandar > 0,
+											cobro.monto_thh_estandar,
+											IF(cobro.monto_trabajos > 0,
+													cobro.monto_trabajos,
+													1))";
 
-		$monto_estandar = "SUM(
-								trabajo.tarifa_hh_estandar
-								* (TIME_TO_SEC( duracion_cobrada)/3600)
-								* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-							)";
-		$monto_predicho = "SUM(
-								usuario_tarifa.tarifa
-								* TIME_TO_SEC( duracion_cobrada )
-								* moneda_por_cobrar.tipo_cambio
-								/ (moneda_display.tipo_cambio * 3600)
-							)";
-		$monto_trabajado_estandar = "SUM(
-										(TIME_TO_SEC(duracion) / 3600) *
-										IF(
-											cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
-											trabajo.tarifa_hh_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
-											trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-										)
-									)";
+			//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
+			// A : monto estandar de este trabajo
+			// B : monto total de los trabajos en tarifa estandar
+			// C : monto de este trabajo (tarifa de cliente)
+			// D : monto total de trabajos (tarifa del cliente)
 
-		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
-		if ($this->tipo_dato != 'valor_por_cobrar') {
-			$monto_honorarios = "SUM(
-									({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-									*
-									(
-										(documento.subtotal_sin_descuento  * cobro_moneda_documento.tipo_cambio)
-										/
-										({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
-									)
-									*
-									(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+			if ($this->proporcionalidad != 'estandar') {
+				$s_tarifa = "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_hh_estandar, tarifa_hh)";
+				$s_monto_thh = "IF(cobro.forma_cobro = 'FLAT FEE', " . $s_monto_thh . ",
+					IF(cobro.monto_thh > 0,
+						cobro.monto_thh,
+						IF(cobro.monto_trabajos > 0,
+								cobro.monto_trabajos,
+								1
+						)
+					)
+				)";
+			}
+
+			$monto_estandar = "SUM(
+									trabajo.tarifa_hh_estandar
+									* (TIME_TO_SEC( duracion_cobrada)/3600)
+									* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 								)";
-		} else {
-			$monto_honorarios = "SUM(
-									(
-										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-										*
-										(cobro.monto_trabajos / {$s_monto_thh})
-									)
-									*
-									(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-								)";
-		}
-		//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
-		$monto_por_pagar_parcial = "SUM(
+
+			$monto_trabajado_estandar = "SUM(
+											(TIME_TO_SEC(duracion) / 3600) *
+											IF(
+												cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
+												trabajo.tarifa_hh_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+												trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+											)
+										)";
+
+			//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
+			if ($this->tipo_dato != 'valor_por_cobrar') {
+				$monto_honorarios = "SUM(
 										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
 										*
 										(
-											(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)
+											(documento.subtotal_sin_descuento  * cobro_moneda_documento.tipo_cambio)
 											/
 											({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
 										)
 										*
-										(documento.saldo_honorarios / documento.honorarios)
+										(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+									)";
+			} else {
+				$monto_honorarios = "SUM(
+										(
+											({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+											*
+											(cobro.monto_trabajos / {$s_monto_thh})
+										)
 										*
 										(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 									)";
-
-		switch ($this->tipo_dato) {
-			case 'costo':
-			case 'valor_por_cobrar':
-			case 'valor_trabajado_estandar':
-			case 'valor_cobrado':
-			case 'valor_pagado':
-			case 'valor_por_pagar':
-			case 'valor_incobrable':
-			case 'valor_por_pagar_parcial':
-			case 'valor_pagado_parcial':
-			case 'valor_estandar':
-			case 'diferencia_valor_estandar':
-			case 'rentabilidad':
-			case 'rentabilidad_base':
-			case 'valor_hora':
-			case 'costo_hh':
-				$Criteria
-					->add_select('cobro_moneda.id_moneda')
-					->add_select('cobro_moneda.tipo_cambio')
-					->add_select('cobro_moneda_base.id_moneda')
-					->add_select('cobro_moneda_base.tipo_cambio')
-					->add_select('cobro_moneda_cobro.id_moneda')
-					->add_select('cobro_moneda_cobro.tipo_cambio');
+			}
+			//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
+			$monto_por_pagar_parcial = "SUM(
+						({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+						*
+						(
+							(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)
+							/
+							({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
+						)
+						*
+						(documento.saldo_honorarios / documento.honorarios)
+						*
+						(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+					)";
 		}
 
+		if ($type == TIPO_TRAMITES) {
+			$s_tarifa = 'tarifa_tramite_estandar';
+			$s_monto_thh = "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 0)";
 
-		switch ($this->tipo_dato) {
+			if ($this->proporcionalidad != 'estandar') {
+				$s_tarifa = "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_tramite_estandar, tarifa_tramite)";
+			}
+
+			$monto_estandar = "SUM(tramite.tarifa_tramite_estandar * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
+
+			$monto_trabajado_estandar = "SUM(
+											IF(
+												cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
+												tramite.tarifa_tramite_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+												tramite.tarifa_tramite_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+											)
+										)";
+
+			$monto_honorarios = "SUM(
+											({$s_tarifa}  * (cobro.monto_tramites / {$s_monto_thh}))
+											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+										)";
+
+
+			$monto_por_pagar_parcial = "0";
+		}
+
+		switch ($data_type) {
 			case 'valor_cobrado_no_estandar':
-				$Criteria->add_select("SUM((IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))", $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select("SUM((IF(cobro.forma_cobro='FLAT FEE', tarifa_hh_estandar, tarifa_hh) * TIME_TO_SEC(duracion_cobrada) / 3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))", $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select("SUM(IF(cobro.forma_cobro='FLAT FEE', tramite_tarifa_estandar, tramite_tarifa) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))", $data_type);
+				}
 				break;
 			case 'horas_trabajadas':
 			case 'horas_no_cobrables':
-				$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion)) / 3600', $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion)) / 3600', $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select('0', $data_type);
+				}
 				break;
 			case 'horas_cobrables':
 			case 'horas_spot':
 			case 'horas_convenio':
-				$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select('0', $data_type);
+				}
 				break;
 			case 'costo':
-				$Criteria->add_select('IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * SUM(cut.costo_hh * TIME_TO_SEC(trabajo.duracion ) / 3600', $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select('IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * SUM(cut.costo_hh * TIME_TO_SEC(trabajo.duracion ) / 3600', $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select('0', $data_type);
+				}
 				break;
 			case 'horas_castigadas':
-				$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion) - TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion) - TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select('0', $data_type);
+				}
 				break;
 			case 'horas_visibles':
 			case 'horas_cobradas':
@@ -1725,96 +1867,162 @@ class ReporteCriteria {
 			case 'horas_pagadas':
 			case 'horas_por_pagar':
 			case 'horas_incobrables':
-				$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select('0', $data_type);
+				}
 				break;
 			case 'valor_por_cobrar':
-				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
-				$Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios}, {$monto_predicho})", $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
+					$Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
+						SUM(
+							usuario_tarifa.tarifa
+							* TIME_TO_SEC( duracion_cobrada )
+							* moneda_por_cobrar.tipo_cambio
+							/ (moneda_display.tipo_cambio * 3600)
+						)
+					)", $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					//TODO: se debe setear %monto_honorarios con el monto correspondienete a trámites
+					// Esto obtiene el valor de $monto_honorarios que ya contempala el tipo de dadtos
+					$Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
+						SUM(tramite.tarifa_tramite)
+							* moneda_por_cobrar.tipo_cambio
+							/ (moneda_display.tipo_cambio * 3600)
+						)", $data_type);
+				}
 				break;
 			case 'valor_trabajado_estandar':
-				$Criteria->add_select($monto_trabajado_estandar, $this->tipo_dato);
+				//TODO: definir monto_trabajado_estanar para trámites
+				// Esto obtiene el valor de $monto_trabajado_estanar que ya contempala el tipo de dadtos
+				$Criteria->add_select($monto_trabajado_estandar, $data_type);
 				break;
 			case 'valor_cobrado':
 			case 'valor_pagado':
 			case 'valor_por_pagar':
 			case 'valor_incobrable':
-				$Criteria->add_select($monto_honorarios, $this->tipo_dato);
+				//TODO: monto honorarios
+				// Esto obtiene el valor de $monto_honorarios que ya contempala el tipo de dadtos
+				$Criteria->add_select($monto_honorarios, $data_type);
 				break;
 			case 'valor_por_pagar_parcial':
-				$Criteria->add_select($monto_por_pagar_parcial, $this->tipo_dato);
+				//TODO: monto honorarios
+				// Esto obtiene el valor de $monto_por_pagar_parcial que ya contempala el tipo de dadtos
+				$Criteria->add_select($monto_por_pagar_parcial, $data_type);
 				break;
 			case 'valor_pagado_parcial':
-				$Criteria->add_select("$monto_honorarios - $monto_por_pagar_parcial", $this->tipo_dato);
+				// Esto obtiene el valor de $monto_honorarios y $monto_por_pagar_parcial que ya contempala el tipo de dadtos
+				$Criteria->add_select("$monto_honorarios - $monto_por_pagar_parcial", $data_type);
 				break;
 			case 'valor_estandar':
-				$Criteria->add_select($monto_estandar, $this->tipo_dato);
+				//TODO: monto_estandar
+				// Esto obtiene el valor de $monto_estandar que ya contempala el tipo de dadtos
+				$Criteria->add_select($monto_estandar, $data_type);
 				break;
 			case 'diferencia_valor_estandar':
-				$Criteria->add_select("$monto_honorarios - $monto_estandar", $this->tipo_dato);
+				$Criteria->add_select("$monto_honorarios - $monto_estandar", $data_type);
 				break;
 			case 'rentabilidad':
-				/* Se necesita resultado extra: lo que se habría cobrado */
 				$Criteria
 					->add_select($monto_estandar, 'valor_divisor')
-					->add_select($monto_honorarios, $this->tipo_dato);
+					->add_select($monto_honorarios, $data_type);
 				break;
 			case 'rentabilidad_base':
 				$Criteria
 					->add_select($monto_trabajado_estandar, 'valor_divisor')
-					->add_select("IF( cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') , $monto_honorarios, 0)", $this->tipo_dato);
+					->add_select("IF( cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') , $monto_honorarios, 0)", $data_type);
 				break;
 			case 'valor_hora':
-				/* Se necesita resultado extra: las horas cobradas */
-				$Criteria
-					->add_select('SUM((TIME_TO_SEC(duracion_cobrada) / 3600))', 'valor_divisor')
-					->add_select($monto_honorarios , $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					/* Se necesita resultado extra: las horas cobradas */
+					$Criteria
+						->add_select('SUM((TIME_TO_SEC(duracion_cobrada) / 3600))', 'valor_divisor')
+						->add_select($monto_honorarios , $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria
+						->add_select('1', 'valor_divisor')
+						->add_select($monto_honorarios, $data_type);
+				}
 				break;
 			case 'costo_hh':
-				$Criteria
-					->add_select('SUM((TIME_TO_SEC(duracion) / 3600))', 'valor_divisor')
-					->add_select('SUM(IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * cut.costo_hh * (TIME_TO_SEC(duracion) / 3600))', $this->tipo_dato);
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria
+						->add_select('SUM((TIME_TO_SEC(duracion) / 3600))', 'valor_divisor')
+						->add_select('SUM(IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * cut.costo_hh * (TIME_TO_SEC(duracion) / 3600))', $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria
+						->add_select('1', 'valor_divisor')
+						->add_select('0', $data_type);
+				}
 				break;
-
 		}
 	}
 
-	//FROM en string de Query. Incluye las tablas necesarias.
-	private function setFrom($Criteria) {
-		$Criteria->add_from('trabajo');
-		//Calculo de valor por cobrar requiere Tarifa, Tipo de Cambio
+	//SELECT en string de Query. Elige el tipo de dato especificado.
+	private function setSELECT($Criteria, $type) {
 
-		$Criteria->add_left_join_with(array('usuario_costo_hh', 'cut'), CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals('trabajo.id_usuario', 'cut.id_usuario'),
-			CriteriaRestriction::equals("date_format(trabajo.fecha, '%Y%m')", 'cut.yearmonth')
-		));
+		$this->addCommonColumnsToCriteria($Criteria, $type);
+
+		if ($this->requiereMoneda($this->tipo_dato)) {
+			$this->addCurrenciesToCriteria($Criteria);
+		}
+
+		$this->AddCommonDataTypeToCriteria($Criteria, $type, $this->tipo_dato);
+
+	}
+
+	//FROM en string de Query. Incluye las tablas necesarias.
+	private function setFrom($Criteria, $type) {
+		$table = 'trabajo';
+		if ($type == TIPO_TRAMITES) {
+			$table = 'tramite';
+		}
+
+		$Criteria->add_from($table);
+
 		$Criteria
-			->add_left_join_with('usuario', CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario'))
-			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto'))
-			->add_left_join_with('cobro', CriteriaRestriction::equals('trabajo.id_cobro', 'cobro.id_cobro'))
+			->add_left_join_with('usuario', CriteriaRestriction::equals('usuario.id_usuario', "{$table}.id_usuario"))
+			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto', "{$table}.codigo_asunto"))
+			->add_left_join_with('cobro', CriteriaRestriction::equals("{$table}.id_cobro", 'cobro.id_cobro'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
+
+		if ($type == TIPO_TRABAJOS) {
+			$Criteria->add_left_join_with(array('usuario_costo_hh', 'cut'), CriteriaRestriction::and_clause(
+				CriteriaRestriction::equals("{$table}.id_usuario", 'cut.id_usuario'),
+				CriteriaRestriction::equals("date_format({$table}.fecha, '%Y%m')", 'cut.yearmonth')
+			));
+		}
 
 		if (in_array($this->tipo_dato, array('valor_por_cobrar', 'valor_trabajado_estandar', 'rentabilidad_base'))) {
 			$Criteria
 				->add_left_join_with(array('prm_moneda', 'moneda_por_cobrar'), CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
 				->add_left_join_with(array('prm_moneda', 'moneda_display'), CriteriaRestriction::equals('moneda_display.id_moneda', $this->id_moneda));
 
-			$on_usuario_tarifa = CriteriaRestriction::and_clause(
-				CriteriaRestriction::equals('usuario_tarifa.id_usuario', 'trabajo.id_usuario'),
-				CriteriaRestriction::equals('usuario_tarifa.id_moneda', 'contrato.id_moneda')
-			);
-			if ($this->tipo_dato != 'valor_trabajado_estandar') {
+			if ($type == TIPO_TRABAJOS) {
 				$on_usuario_tarifa = CriteriaRestriction::and_clause(
-					$on_usuario_tarifa,
-					CriteriaRestriction::equals('usuario_tarifa.id_tarifa', 'contrato.id_tarifa')
+					CriteriaRestriction::equals('usuario_tarifa.id_usuario', "{$table}.id_usuario"),
+					CriteriaRestriction::equals('usuario_tarifa.id_moneda', 'contrato.id_moneda')
 				);
-			}
-			$Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
+				if ($this->tipo_dato != 'valor_trabajado_estandar') {
+					$on_usuario_tarifa = CriteriaRestriction::and_clause(
+						$on_usuario_tarifa,
+						CriteriaRestriction::equals('usuario_tarifa.id_tarifa', 'contrato.id_tarifa')
+					);
+				}
+				$Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
 
-			if ($this->tipo_dato == 'valor_trabajado_estandar') {
-				$Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
-					CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
-				));
+				if ($this->tipo_dato == 'valor_trabajado_estandar') {
+					$Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
+						CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
+						CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
+					));
+				}
 			}
 		}
 
@@ -1878,17 +2086,25 @@ class ReporteCriteria {
 		}
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
-			$Criteria->add_left_join_with('actividad', CriteriaRestriction::equals('trabajo.codigo_actividad', 'actividad.codigo_actividad'));
+			$Criteria->add_left_join_with('actividad', CriteriaRestriction::equals("{$table}.codigo_actividad", 'actividad.codigo_actividad'));
 		}
 
-		if (in_array('area_trabajo', $this->agrupador)) {
-			$Criteria->add_left_join_with('prm_area_trabajo', CriteriaRestriction::equals('trabajo.id_area_trabajo', 'prm_area_trabajo.id_area_trabajo'));
+		if ($type == TIPO_TRABAJOS && in_array('area_trabajo', $this->agrupador)) {
+			$Criteria->add_left_join_with('prm_area_trabajo', CriteriaRestriction::equals("{$table}.id_area_trabajo", 'prm_area_trabajo.id_area_trabajo'));
 		}
 	}
 
 	//WHERE para string de Query. Incluye los filtros agregados anteriormente.
 	//@param from: si viene de la query de trabajo o de cobro.
-	private function getWhere($from = 'trabajo') {
+	private function getWhere($type) {
+		if ($type == TIPO_TRABAJOS) {
+			unset($this->filtros['tramite.cobrable']);
+			$this->campo_fecha = "trabajo.fecha";
+		}
+		if ($type == TIPO_TRAMITES) {
+			unset($this->filtros['trabajo.cobrable']);
+			$this->campo_fecha = "tramite.fecha";
+		}
 		$and_wheres = array();
 		foreach ($this->filtros as $campo => $filtro) {
 			foreach ($filtro as $booleano => $valor) {
@@ -1914,7 +2130,7 @@ class ReporteCriteria {
 			}
 		}
 		//Añado el periodo determinado
-		if ($from == 'trabajo') {
+		if ($type == TIPO_TRABAJOS || $type == TIPO_TRAMITES) {
 			$campo_fecha = $this->campo_fecha;
 			$campo_fecha_2 = $this->campo_fecha_2;
 		} else {
@@ -1940,7 +2156,7 @@ class ReporteCriteria {
 			$and_wheres[] = $and_fecha;
 		}
 		/* Si se filtra el periodo por cobro, los trabajos sin cobro emitido (y posteriores) no se ven */
-		if (($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo') {
+		if (($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && ($type == TIPO_TRABAJOS || $type == TIPO_TRAMITES)) {
 			$and_wheres[] = CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO'));
 		}
 
@@ -1985,13 +2201,13 @@ class ReporteCriteria {
 	}
 
 	//String de Query.
-	private function getQuery() {
+	private function getQuery($type) {
 		$Criteria = new Criteria($this->sesion);
-		$this->setSelect($Criteria);
-		$this->setFrom($Criteria);
-		$Criteria->add_restriction($this->getWhere());
-		$this->setGroup($Criteria);
-		$this->setOrder($Criteria);
+		$this->setSelect($Criteria, $type);
+		$this->setFrom($Criteria, $type);
+		$Criteria->add_restriction($this->getWhere($type));
+		$this->setGroup($Criteria, $type);
+		$this->setOrder($Criteria, $type);
 		return $Criteria->get_plain_query();
 	}
 
