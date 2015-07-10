@@ -197,6 +197,7 @@ class ReporteCriteria {
 			case "valor_pagado":
 				$this->addFiltro('trabajo', 'cobrable', '1');
 				$this->addFiltro('tramite', 'cobrable', '1');
+				$this->addFiltro('cobro', 'estado', 'PAGO PARCIAL');
 				$this->addFiltro('cobro', 'estado', 'PAGADO');
 				break;
 
@@ -1347,10 +1348,7 @@ class ReporteCriteria {
 		$date_field = $this->alt($this->campo_fecha_cobro, $this->campo_fecha_cobro_2);
 		switch ($key) {
 			case "profesional":
-				if ($type == TIPO_TRABAJOS) {
-					$column_value = $this->dato_usuario;
-				}
-				if ($type == TIPO_TRAMITES) {
+				if ($type == TIPO_TRABAJOS || $type == TIPO_TRAMITES) {
 					$column_value = $this->dato_usuario;
 				}
 				if ($type == TIPO_COBROS) {
@@ -1708,114 +1706,94 @@ class ReporteCriteria {
 
 	private function AddCommonDataTypeToCriteria($Criteria, $type, $data_type) {
 
-		if ($type == TIPO_TRABAJOS) {
-			$s_tarifa = 'tarifa_hh_estandar';
-			$s_monto_thh = "IF(cobro.monto_thh_estandar > 0,
-											cobro.monto_thh_estandar,
-											IF(cobro.monto_trabajos > 0,
-													cobro.monto_trabajos,
-													1))";
-
-			//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
-			// A : monto estandar de este trabajo
-			// B : monto total de los trabajos en tarifa estandar
-			// C : monto de este trabajo (tarifa de cliente)
-			// D : monto total de trabajos (tarifa del cliente)
-
-			if ($this->proporcionalidad != 'estandar') {
-				$s_tarifa = "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_hh_estandar, tarifa_hh)";
-				$s_monto_thh = "IF(cobro.forma_cobro = 'FLAT FEE', " . $s_monto_thh . ",
-					IF(cobro.monto_thh > 0,
-						cobro.monto_thh,
-						IF(cobro.monto_trabajos > 0,
-								cobro.monto_trabajos,
-								1
-						)
-					)
-				)";
-			}
-
-			$monto_estandar = "SUM(
-									trabajo.tarifa_hh_estandar
-									* (TIME_TO_SEC( duracion_cobrada)/3600)
-									* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-								)";
-
-			$monto_trabajado_estandar = "SUM(
-											(TIME_TO_SEC(duracion) / 3600) *
+		$values = array(
+			"estandar" => array(
+				"tarifa" => array(
+					TIPO_TRABAJOS => 'tarifa_hh_estandar',
+					TIPO_TRAMITES => 'tarifa_tramite_estandar'
+				),
+				"div_thh" => array(
+					TIPO_TRABAJOS => "IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
+															IF(cobro.monto_trabajos > 0, cobro.monto_trabajos,1))",
+					TIPO_TRAMITES =>  "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 1)"
+				)
+			),
+			"cliente" => array(
+				"tarifa" => array(
+					TIPO_TRABAJOS => "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_hh_estandar, tarifa_hh)",
+					TIPO_TRAMITES => "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_tramite_estandar, tarifa_tramite)"
+				),
+				"div_thh" => array(
+					TIPO_TRABAJOS => "IF(cobro.forma_cobro = 'FLAT FEE',
+															IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
+																IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)),
+																	IF(cobro.monto_thh > 0,
+																		cobro.monto_thh, IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)
+																	)
+														)",
+					TIPO_TRAMITES => "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 1)"
+				)
+			),
+			"monto_estandar" => array(
+				TIPO_TRABAJOS => "SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600)
+													* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))",
+				TIPO_TRAMITES => "SUM(tramite.tarifa_tramite_estandar * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))"
+			),
+			"monto_trabajado_estandar" => array(
+				TIPO_TRABAJOS => "SUM((TIME_TO_SEC(duracion) / 3600) *
 											IF(
 												cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
 												trabajo.tarifa_hh_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
 												trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-											)
-										)";
-
-			//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
-			if ($this->tipo_dato != 'valor_por_cobrar') {
-				$monto_honorarios = "SUM(
-										({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-										*
-										(
-											(documento.subtotal_sin_descuento  * cobro_moneda_documento.tipo_cambio)
-											/
-											({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
-										)
-										*
-										(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-									)";
-			} else {
-				$monto_honorarios = "SUM(
-										(
-											({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-											*
-											(cobro.monto_trabajos / {$s_monto_thh})
-										)
-										*
-										(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-									)";
-			}
-			//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
-			$monto_por_pagar_parcial = "SUM(
-						({$s_tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-						*
-						(
-							(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)
-							/
-							({$s_monto_thh} * cobro_moneda_cobro.tipo_cambio)
-						)
-						*
-						(documento.saldo_honorarios / documento.honorarios)
-						*
-						(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-					)";
-		}
-
-		if ($type == TIPO_TRAMITES) {
-			$s_tarifa = 'tarifa_tramite_estandar';
-			$s_monto_thh = "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 0)";
-
-			if ($this->proporcionalidad != 'estandar') {
-				$s_tarifa = "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_tramite_estandar, tarifa_tramite)";
-			}
-
-			$monto_estandar = "SUM(tramite.tarifa_tramite_estandar * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
-
-			$monto_trabajado_estandar = "SUM(
+											))",
+				TIPO_TRAMITES => "SUM(
 											IF(
 												cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
 												tramite.tarifa_tramite_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
 												tramite.tarifa_tramite_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-											)
-										)";
+											))"
+			)
+		);
 
-			$monto_honorarios = "SUM(
-											({$s_tarifa}  * (cobro.monto_tramites / {$s_monto_thh}))
-											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
-										)";
+		$tarifa = $values[$this->proporcionalidad]["tarifa"][$type];
+		$div_thh = $values[$this->proporcionalidad]["div_thh"][$type];
+		$monto_estandar = $values["monto_estandar"][$type];
+		$monto_trabajado_estandar = $values["monto_trabajado_estandar"][$type];
 
+		if ($type == TIPO_TRABAJOS) {
+			$monto_por_pagar_parcial = "SUM(({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+						* ((documento.monto_trabajos * cobro_moneda_documento.tipo_cambio)
+							/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
+						* (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 
-			$monto_por_pagar_parcial = "0";
+			$monto_honorarios = "SUM(({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+										* ((documento.monto_trabajos * cobro_moneda_documento.tipo_cambio)
+										/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
+										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
+
+			if ($this->tipo_dato == 'valor_por_cobrar') {
+				$monto_honorarios = "SUM((({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
+											* (cobro.monto_trabajos / {$div_thh}))
+											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+			}
 		}
+		if ($type == TIPO_TRAMITES) {
+			$monto_por_pagar_parcial = "SUM(({$tarifa})
+						* ((documento.monto_tramites * cobro_moneda_documento.tipo_cambio)
+							/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
+						* (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+
+			$monto_honorarios = "SUM(({$tarifa})
+										* ((documento.monto_tramites * cobro_moneda_documento.tipo_cambio)
+											/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
+										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
+			if ($this->tipo_dato == 'valor_por_cobrar') {
+				$monto_honorarios = "SUM((({$tarifa})
+											* (cobro.monto_tramites / {$div_thh}))
+											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+			}
+		}
+
 
 		switch ($data_type) {
 			case 'valor_cobrado_no_estandar':
@@ -1847,7 +1825,7 @@ class ReporteCriteria {
 				break;
 			case 'costo':
 				if ($type == TIPO_TRABAJOS) {
-					$Criteria->add_select('IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * SUM(cut.costo_hh * TIME_TO_SEC(trabajo.duracion ) / 3600', $data_type);
+					$Criteria->add_select('IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * SUM(cut.costo_hh * TIME_TO_SEC(trabajo.duracion ) / 3600)', $data_type);
 				}
 				if ($type == TIPO_TRAMITES) {
 					$Criteria->add_select('0', $data_type);
@@ -1887,8 +1865,6 @@ class ReporteCriteria {
 					)", $data_type);
 				}
 				if ($type == TIPO_TRAMITES) {
-					//TODO: se debe setear %monto_honorarios con el monto correspondienete a trámites
-					// Esto obtiene el valor de $monto_honorarios que ya contempala el tipo de dadtos
 					$Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
 						SUM(tramite.tarifa_tramite)
 							* moneda_por_cobrar.tipo_cambio
@@ -1897,29 +1873,25 @@ class ReporteCriteria {
 				}
 				break;
 			case 'valor_trabajado_estandar':
-				//TODO: definir monto_trabajado_estanar para trámites
 				// Esto obtiene el valor de $monto_trabajado_estanar que ya contempala el tipo de dadtos
 				$Criteria->add_select($monto_trabajado_estandar, $data_type);
 				break;
 			case 'valor_cobrado':
-			case 'valor_pagado':
-			case 'valor_por_pagar':
 			case 'valor_incobrable':
-				//TODO: monto honorarios
 				// Esto obtiene el valor de $monto_honorarios que ya contempala el tipo de dadtos
 				$Criteria->add_select($monto_honorarios, $data_type);
 				break;
+			case 'valor_por_pagar':
 			case 'valor_por_pagar_parcial':
-				//TODO: monto honorarios
 				// Esto obtiene el valor de $monto_por_pagar_parcial que ya contempala el tipo de dadtos
 				$Criteria->add_select($monto_por_pagar_parcial, $data_type);
 				break;
+			case 'valor_pagado':
 			case 'valor_pagado_parcial':
 				// Esto obtiene el valor de $monto_honorarios y $monto_por_pagar_parcial que ya contempala el tipo de dadtos
 				$Criteria->add_select("$monto_honorarios - $monto_por_pagar_parcial", $data_type);
 				break;
 			case 'valor_estandar':
-				//TODO: monto_estandar
 				// Esto obtiene el valor de $monto_estandar que ya contempala el tipo de dadtos
 				$Criteria->add_select($monto_estandar, $data_type);
 				break;
@@ -1938,7 +1910,7 @@ class ReporteCriteria {
 				break;
 			case 'valor_hora':
 				if ($type == TIPO_TRABAJOS) {
-					/* Se necesita resultado extra: las horas cobradas */
+					// Se necesita resultado extra: las horas cobradas
 					$Criteria
 						->add_select('SUM((TIME_TO_SEC(duracion_cobrada) / 3600))', 'valor_divisor')
 						->add_select($monto_honorarios , $data_type);
