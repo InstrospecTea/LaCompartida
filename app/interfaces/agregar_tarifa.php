@@ -22,10 +22,13 @@ if ($opc == 'eliminar') {
 		}
 	}
 }
+if (!isset($id_tarifa_edicion) && !isset($nueva)) {
+	$id_tarifa_edicion = load_tarifa_default($tarifa);
+}
+
 
 if (!empty($id_tarifa_edicion) && !$tarifa->Load($id_tarifa_edicion)) {
-	$tarifa->LoadDefault();
-	$Pagina->Redirect('agregar_tarifa.php?id_tarifa_edicion=' . $tarifa->fields['id_tarifa']);
+	$Pagina->AddError(__('Esta tarifa no existe'));
 }
 
 /* * * *
@@ -93,8 +96,6 @@ if ($opc == 'guardar') {
 		if ($tarifa_defecto) {
 			$tarifa->TarifaDefecto($tarifa->fields['id_tarifa']);
 			$tarifa->Edit('tarifa_defecto', '1');
-		} else {
-			$tarifa->Edit('tarifa_defecto', '0');
 		}
 
 		if (empty($glosa_tarifa)) {
@@ -123,6 +124,17 @@ if ($opc == 'guardar') {
 			$Pagina->AddInfo(__('La tarifa se ha modificado satisfactoriamente'));
 		}
 	}
+}
+
+/**
+ * Carga a la tarifa por defecto
+ * @param Tarifa $tarifa
+ * @return int $id_tarifa
+ */
+function load_tarifa_default($tarifa) {
+	$tarifa->LoadDefault();
+	$id_tarifa = $tarifa->fields['id_tarifa'];
+	return $id_tarifa;
 }
 
 
@@ -222,10 +234,10 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		element = document.getElementById('usar_tarifa_previa');
 		if (element && element.checked)
 		{
-			self.location.href = 'agregar_tarifa.php?popup=<?php echo $popup ?>&id_tarifa_previa=' + id;
+			self.location.href = 'agregar_tarifa.php?nueva=true&popup=<?php echo $popup ?>&id_tarifa_previa=' + id;
 		}
 		else {
-			self.location.href = 'agregar_tarifa.php?popup=<?php echo $popup ?>';
+			self.location.href = 'agregar_tarifa.php?nueva=true&popup=<?php echo $popup ?>';
 		}
 	}
 
@@ -268,7 +280,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			?>
 			<td style="text-align:left;vertical-align: middle;" colspan="2"> <?php echo __('Nombre') ?>: <input style="width:200px;" type=text name="glosa_tarifa" value='<?php echo $tarifa->fields['glosa_tarifa'] ?>' <?php echo $active ?>> </td>
 
-			<td style="text-align:right;vertical-align: middle;"> <?php echo __('Defecto') ?>: <input type=checkbox name=tarifa_defecto value='1' <?php echo $tarifa->fields['tarifa_defecto'] ? 'checked' : '' ?>></td>
+			<td style="text-align:right;vertical-align: middle;"> <?php echo __('Defecto') ?>: <input type=checkbox name=tarifa_defecto value='1' <?php echo $tarifa->fields['tarifa_defecto'] ? 'checked readonly onclick="return false"' : '' ?>></td>
 		</tr>
 		<tr>
 			<td colspan="<?php echo $colspan ?>" align=right>&nbsp;</td>
