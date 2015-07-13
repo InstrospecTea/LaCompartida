@@ -39,7 +39,7 @@ class ReporteCriteria {
 	//Cuanto se repite la fila para cada agrupador
 	public $filas = array();
 
-	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
+	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 
 	const TIPO_TRABAJOS = 0;
 	const TIPO_TRAMITES = 1;
@@ -110,6 +110,7 @@ class ReporteCriteria {
 	 * |  +-- valor_cobrable: (no implementado)
 	 * |  |  +-- valor_visible: (no implementado)
 	 * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
+	 * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
 	 * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
 	 * |  |  |  |  \-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
 	 * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
@@ -167,6 +168,7 @@ class ReporteCriteria {
 			case "horas_cobradas":
 			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
+			case "valor_tramites":
 			case "valor_hora":
 			case "rentabilidad":
 			case "diferencia_valor_estandar":
@@ -500,6 +502,7 @@ class ReporteCriteria {
 
 			case 'valor_estandar':
 			case 'valor_trabajado_estandar':
+			case 'valor_tramites':
 			case 'costo_hh':
 				$Criteria->add_select('0', $this->tipo_dato);
 				break;
@@ -1198,6 +1201,7 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
+			case "valor_tramites":
 			case "valor_pagado":
 			case "valor_por_pagar":
 			case "valor_incobrable":
@@ -1238,6 +1242,7 @@ class ReporteCriteria {
 				return "Hr.";
 			case "valor_por_cobrar":
 			case "valor_cobrado":
+			case "valor_tramites":
 			case "valor_pagado":
 			case "valor_por_pagar":
 			case "valor_incobrable":
@@ -1260,6 +1265,7 @@ class ReporteCriteria {
 		switch ($tipo_dato) {
 			case "valor_por_cobrar":
 			case "valor_cobrado":
+			case "valor_tramites":
 			case "valor_cobrado_no_estandar":
 			case "valor_pagado":
 			case "valor_por_pagar":
@@ -1880,6 +1886,14 @@ class ReporteCriteria {
 			case 'valor_incobrable':
 				// Esto obtiene el valor de $monto_honorarios que ya contempala el tipo de dadtos
 				$Criteria->add_select($monto_honorarios, $data_type);
+				break;
+			case 'valor_tramites':
+				if ($type == TIPO_TRABAJOS) {
+					$Criteria->add_select("0", $data_type);
+				}
+				if ($type == TIPO_TRAMITES) {
+					$Criteria->add_select($monto_honorarios, $data_type);
+				}
 				break;
 			case 'valor_por_pagar':
 			case 'valor_por_pagar_parcial':
