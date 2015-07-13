@@ -401,7 +401,7 @@ class ReporteCriteria {
 			case 'valor_hora':
 				$Criteria->add_select('0', 'valor_divisor');
 				$Criteria->add_select('(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
+										* SUM((cobro.monto_subtotal - cobro.monto_tramites)
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 										)', $this->tipo_dato);
@@ -413,7 +413,7 @@ class ReporteCriteria {
 										* SUM(
 											IF(
 												cobro.estado NOT IN ('CREADO', 'EN REVISION'),
-												cobro.monto_subtotal
+												(cobro.monto_subtotal - cobro.monto_tramites)
 													* (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 												, 0
@@ -426,7 +426,7 @@ class ReporteCriteria {
 										* SUM(
 											IF(
 												cobro.estado = 'PAGADO',
-												(cobro.monto_subtotal
+												((cobro.monto_subtotal - cobro.monto_tramites)
 													* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 												),
@@ -437,7 +437,7 @@ class ReporteCriteria {
 
 			case 'valor_pagado_parcial':
 				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
+										* SUM((cobro.monto_subtotal - cobro.monto_tramites)
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 											* (1 - documento.saldo_honorarios / documento.honorarios)
 											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
@@ -446,7 +446,7 @@ class ReporteCriteria {
 
 			case 'valor_por_pagar_parcial':
 				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
+										* SUM((cobro.monto_subtotal - cobro.monto_tramites)
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 											* (documento.saldo_honorarios / documento.honorarios)
 											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
@@ -460,7 +460,7 @@ class ReporteCriteria {
 												cobro.estado IN ('PAGADO', 'INCOBRABLE'),
 												0,
 												(
-													cobro.monto_subtotal
+													(cobro.monto_subtotal - cobro.monto_tramites)
 													* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 												)
@@ -475,7 +475,7 @@ class ReporteCriteria {
 												cobro.estado != 'INCOBRABLE',
 												0,
 												(
-													cobro.monto_subtotal
+													(cobro.monto_subtotal - cobro.monto_tramites)
 													* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 													/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 												)
@@ -487,14 +487,14 @@ class ReporteCriteria {
 			case 'rentabilidad':
 				$Criteria->add_select('0', 'valor_divisor');
 				$Criteria->add_select("(1 / ifnull(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
+										* SUM((cobro.monto_subtotal - cobro.monto_tramites)
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 										)", $this->tipo_dato);
 				break;
 			case 'diferencia_valor_estandar':
 				$Criteria->add_select("(1 / IFNULL(ca2.cant_asuntos, 1))
-										* SUM(cobro.monto_subtotal
+										* SUM((cobro.monto_subtotal - cobro.monto_tramites)
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 											/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 										)", $this->tipo_dato);
