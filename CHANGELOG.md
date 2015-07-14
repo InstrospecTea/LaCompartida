@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.12.18
+Tuesday 2015, July 14th.
+* **Fix:** [Corregir separación hora/minuto al sumar la duración cobrable](https://github.com/LemontechSA/ttb/pull/1049)
+
 ## Hotfix 15.12.17
 Thursday 2015, July 9th.
 * **Fix:** [Eliminar trabajos, trámites y gastos que no existen en olap_liquidaciones](https://github.com/LemontechSA/ttb/pull/1045)
