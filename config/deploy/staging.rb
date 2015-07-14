@@ -138,7 +138,7 @@ namespace :deploy do
   before "deploy:update_code", "deploy:setup"
 
   after  "deploy:update", "deploy:cleanup"
-  after  "deploy", 'deploy:send_notification'
+  #after  "deploy", 'deploy:send_notification'
 
   after "deploy", "deploy:configure_env"
 end
