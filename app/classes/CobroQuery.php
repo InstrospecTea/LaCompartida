@@ -4,8 +4,10 @@ class CobroQuery extends Cobro {
 
 	public function genera_cobros($filtros) {
 		$where = 1;
+		$having = "";
 		if ($filtros['activo']) {
 			$where .= " AND contrato.activo = 'SI' ";
+			$having = " HAVING cantidad_asuntos > 0";
 		} else {
 			$where .= " AND contrato.activo = 'NO' ";
 		}
@@ -56,6 +58,7 @@ class CobroQuery extends Cobro {
 						contrato.codigo_idioma,
 						moneda.simbolo,
 						GROUP_CONCAT($mostrar_codigo_asuntos glosa_asunto SEPARATOR '|') as asuntos,
+						count(glosa_asunto) as cantidad_asuntos,
 						asunto.glosa_asunto as asunto_lista,
 						contrato.forma_cobro,
 						CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
@@ -76,7 +79,8 @@ class CobroQuery extends Cobro {
 						JOIN prm_moneda as moneda ON (moneda.id_moneda=contrato.id_moneda)
 						LEFT JOIN prm_moneda as moneda_monto ON moneda_monto.id_moneda=contrato.id_moneda_monto
 					WHERE $where
-					GROUP BY contrato.id_contrato";
+					GROUP BY contrato.id_contrato
+					$having";
 		return $query;
 	}
 }

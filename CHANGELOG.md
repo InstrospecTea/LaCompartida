@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.12.17
+Thursday 2015, July 9th.
+* **Fix:** [Eliminar trabajos, trámites y gastos que no existen en olap_liquidaciones](https://github.com/LemontechSA/ttb/pull/1045)
+
+## Hotfix 15.12.16
+Wednesday 2015, July 1th.
+* **Feature:** [Corregir comportamiento selector de rangos al buscar liquidaciones](https://github.com/LemontechSA/ttb/pull/1041)
+
 ## Hotfix 15.12.15
 Tuesday 2015, June 23th.
 * **Fixed:** [Corregir modificación campo duración al subir excel de cobro](https://github.com/LemontechSA/ttb/pull/1039)
