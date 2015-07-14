@@ -366,6 +366,7 @@ if ($xls) {
 	$resp = mysql_query($update2, $sesion->dbh);
 	$resp = mysql_query($update3, $sesion->dbh);
 
+	ReporteContrato::QueriesPrevias($sesion);
 	$ReporteContrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2, $AtacheSecundarioSoloAsunto);
 
 	//Quiero saber cuando se actualizó el olap por ultima vez
