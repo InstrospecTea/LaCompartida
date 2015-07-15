@@ -10815,6 +10815,10 @@ QUERY;
 			$queries = array();
 			$queries[] = "UPDATE configuracion SET glosa_opcion = 'CodigoClienteAsuntoModificable' WHERE glosa_opcion = 'CodigoObligatorio';";
 			break;
+
+		case 8.05:
+			$queries = array("UPDATE menu SET url = '/app/interfaces/agregar_tarifa.php' WHERE codigo = 'TARIFA'");
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10827,7 +10831,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.04;
+$max_update = 8.05;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
