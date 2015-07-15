@@ -1,5 +1,13 @@
 # Changelog
 
+## [Release 15.13.0](https://github.com/LemontechSA/ttb/pull/1050)
+Wednesday 2015, July 15th.
+* **Feature:** [Corregir link de tarifas](https://github.com/LemontechSA/ttb/pull/1047)
+* **Feature:** [Hitos en cobro Twig](https://github.com/LemontechSA/ttb/pull/1046)
+* **Feature:** [Factura Colombia](https://github.com/LemontechSA/ttb/pull/1043)
+* **Feature:** [Ajuste a la generación de liquidaciones](https://github.com/LemontechSA/ttb/pull/1042)
+* **Feature:** [Filtro grupo cliente](https://github.com/LemontechSA/ttb/pull/1040)
+
 ## Hotfix 15.12.18
 Tuesday 2015, July 14th.
 * **Fix:** [Corregir separación hora/minuto al sumar la duración cobrable](https://github.com/LemontechSA/ttb/pull/1049)
