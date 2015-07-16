@@ -41,7 +41,7 @@ class Carta extends Objeto {
 	 * @param array $fields
 	 * @return Carta|boolean Devuelve un objeto Carta o false si no se encuentra el id
 	 */
-	public function findById($id, Array $fields = array()) {
+	public function findById($id, array $fields = array()) {
 		$Carta = new Carta($this->sesion);
 		$select = '*';
 		if (!empty($fields)) {
