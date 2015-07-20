@@ -205,7 +205,11 @@ $server->wsdl->addComplexType(
 	'codigo_proveedor' => array('name' => 'codigo_proveedor', 'type' => 'xsd:string'),
 	'nombre_proveedor' => array('name' => 'nombre_proveedor', 'type' => 'xsd:string'),
 	'tipo_documento_asociado' => array('name' => 'tipo_documento_asociado', 'type' => 'xsd:string'),
-	'codigo_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
+	'codigo_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string'),
+	'codigo_cuenta_gasto' => array('name' => 'codigo_cuenta_gasto', 'type' => 'xsd:string'),
+	'glosa_cuenta_gasto' => array('name' => 'glosa_cuenta_gasto', 'type' => 'xsd:string'),
+	'codigo_detraccion' => array('name' => 'codigo_detraccion', 'type' => 'xsd:string'),
+	'glosa_detraccion' => array('name' => 'glosa_detraccion', 'type' => 'xsd:string')
 ));
 
 $server->wsdl->addComplexType(
@@ -1231,7 +1235,26 @@ function ListaGastos($usuario, $password, $timestamp) {
 
 	$Gasto = new Gasto($Sesion);
 	$where = " fecha >= FROM_UNIXTIME($timestamp) ";
-	$query_gastos = $Gasto->SearchQuery($Sesion, $where);
+
+	$col_select = array();
+	$join_extra = array();
+
+	$col_select[] = "cta_corriente.cuenta_gasto AS codigo_cuenta_gasto";
+	$col_select[] = "prm_codigo_cuenta_gasto.glosa AS glosa_cuenta_gasto";
+	$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_cuenta_gasto
+										ON cta_corriente.cuenta_gasto = prm_codigo_cuenta_gasto.codigo
+										AND prm_codigo_cuenta_gasto.grupo = 'CUENTA_GASTO'";
+
+	$col_select[] = "cta_corriente.detraccion AS codigo_detraccion";
+	$col_select[] = "prm_codigo_detraccion.glosa AS glosa_detraccion";
+	$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_detraccion
+										ON cta_corriente.detraccion = prm_codigo_detraccion.codigo
+										AND prm_codigo_detraccion.grupo = 'DETRACCION'";
+
+	$col_select = "," . implode(",", $col_select);
+	$join_extra = implode(" ", $join_extra);
+
+	$query_gastos = $Gasto->SearchQuery($Sesion, $where, $col_select, $join_extra);
 
 	$result_gastos = $Sesion->pdodbh->query($query_gastos)->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1266,6 +1289,10 @@ function ListaGastos($usuario, $password, $timestamp) {
 			'nombre_proveedor' => '' . $gasto['nombre_proveedor'],
 			'tipo_documento_asociado' => '' . $gasto['tipo_documento_asociado'],
 			'codigo_documento_asociado' => '' . $gasto['codigo_documento_asociado'],
+			'codigo_cuenta_gasto' => '' . $gasto['codigo_cuenta_gasto'],
+			'glosa_cuenta_gasto' => '' . $gasto['glosa_cuenta_gasto'],
+			'codigo_detraccion' => '' . $gasto['codigo_detraccion'],
+			'glosa_detraccion' => '' . $gasto['glosa_detraccion']
 		);
 
 		$gastos[] = $gasto_ws;
