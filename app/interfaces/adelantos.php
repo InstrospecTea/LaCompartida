@@ -241,6 +241,14 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 							<td></td>
 						</tr>
 						<tr>
+							<td align="right" width="30%">
+								<?php echo __('Grupo Cliente'); ?>
+							</td>
+							<td colspan="3" align="left">
+								<?php echo $Form->select('id_grupo_cliente', GrupoCliente::obtenerGruposSelect($sesion), $id_grupo_cliente); ?>
+							</td>
+						</tr>
+						<tr>
 							<td align=right>
 								<?php echo __('Sólo ' . __('Adelantos') . ' con Saldo') ?>
 							</td>

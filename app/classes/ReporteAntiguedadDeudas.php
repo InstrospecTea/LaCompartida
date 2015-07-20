@@ -11,11 +11,11 @@ class ReporteAntiguedadDeudas
 	private $sesion;
 	private $criteria;
 	private $and_statements = array();
-	
+
 	//
 	//Opciones de layout
 	//
-	
+
 	//Define el ancho que tendrán los campos numéricos del reporte, que tengan que ver con montos.
 	private $ancho_campo_numerico = 69;
 
@@ -302,9 +302,6 @@ class ReporteAntiguedadDeudas
 				'title' => __('Moneda'),
 			);
 		}
-
-		
-
 
 		$SimpleReport->LoadConfigFromArray($config_reporte);
 		$SimpleReport->LoadResults($agrupacion);
@@ -759,6 +756,10 @@ class ReporteAntiguedadDeudas
 			->add_select("MAX(CONCAT(fecha_creacion, ' | ', comentario))",'comentario')
 			->add_from('cliente_seguimiento')
 			->add_grouping('codigo_cliente');
+
+		if (!empty($this->datos['id_grupo_cliente'])) {
+			$this->and_statements[] = "cliente.id_grupo_cliente = {$this->datos['id_grupo_cliente']}";
+		}
 
 		if (!empty($this->datos['encargado_comercial'])) {
 			$encargado_comercial = $this->datos['encargado_comercial'];

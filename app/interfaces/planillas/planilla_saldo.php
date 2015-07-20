@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
+$Form = new Form();
 
 $tipos_liquidacion = array(
 	1 => __('Honorarios'),
@@ -115,6 +116,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_gastos .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
 		$where_adelantos .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
 		$where_liquidaciones .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
+	}
+
+	if (!empty($id_grupo_cliente)) {
+		$where_gastos .= " AND cliente.id_grupo_cliente = '{$id_grupo_cliente}'";
+		$where_adelantos .= " AND cliente.id_grupo_cliente = '{$id_grupo_cliente}'";
+		$where_liquidaciones .= " AND cliente.id_grupo_cliente = '{$id_grupo_cliente}'";
 	}
 
 	if (!empty($tipo_liquidacion)) { //1-2 = honorarios-gastos, 3 = mixtas
@@ -486,6 +493,14 @@ $Pagina->PrintTop($popup);
 								<?php
 								echo Html::SelectArrayDecente($tipos_liquidacion, 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Total'))
 								?>
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<?php echo __('Grupo Cliente'); ?>
+							</td>
+							<td colspan="2" align="left">
+								<?php echo $Form->select('id_grupo_cliente', GrupoCliente::obtenerGruposSelect($Sesion), $id_grupo_cliente); ?>
 							</td>
 						</tr>
 						<tr>
