@@ -13,7 +13,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	/**
 	 * Elimina un cobro
 	 * @param type $id_cobro
-	 * @throw Exceptions
+	 * @throws Exception
 	 */
 	public function delete($id_cobro) {
 		$this->loadService('Charge');
@@ -360,9 +360,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 	/**
 	 * Obtiene la instancia de {@link WorkFee} que representa los parámetros de búsqueda ingresados.
-	 * @param   $workId
-	 * @param   $currencyId
-	 * @return
+	 * @param $workId
+	 * @param $currencyId
+	 * @return WorkFee
+	 * @throws Exception
+	 * @throws UtilityException
 	 */
 	public function getWorkFee($workId, $currencyId) {
 		$searchCriteria = new SearchCriteria('WorkFee');
