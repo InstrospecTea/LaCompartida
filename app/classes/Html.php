@@ -16,13 +16,14 @@ class Html extends \Html {
 	public function div($text, $attrs = null) {
 		return $this->tag('div', $text, $attrs);
 	}
+
 	/**
 	 * Construye un tag html
-	 * @param type $tag
-	 * @param type $content
-	 * @param type $attributes
-	 * @param type $closed
-	 * @return type
+	 * @param string $tag
+	 * @param string $content
+	 * @param array|string $attributes
+	 * @param bool $closed
+	 * @return string
 	 */
 	public function tag($tag = 'div', $content = '', $attributes = null, $closed = false) {
 		$html = '';
@@ -40,7 +41,7 @@ class Html extends \Html {
 
 	/**
 	 * Crea string de atributos HTML a partir de un Array
-	 * @param type $attributes
+	 * @param array|string $attributes
 	 * @return string
 	 */
 	public function attributes($attributes) {
@@ -79,10 +80,10 @@ class Html extends \Html {
 
 	/**
 	 *
-	 * @param type $text
-	 * @param type $url
-	 * @param type $attrs
-	 * @return type
+	 * @param string $text
+	 * @param string $url
+	 * @param array $attrs
+	 * @return string
 	 */
 	public function link($text, $url, $attrs = null) {
 		$_attrs = array(
@@ -98,7 +99,9 @@ class Html extends \Html {
 
 	/**
 	 *
-	 * @param type $script_block
+	 * @param string $script_block
+	 * @param array $attrs
+	 * @return string
 	 */
 	public function script_block($script_block, $attrs = null) {
 		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs)) . "\n";
@@ -106,8 +109,8 @@ class Html extends \Html {
 
 	/**
 	 * Devuelve tag script con src a archivo JS
-	 * @param type $file
-	 * @param type $attrs
+	 * @param string|array $file
+	 * @param array $attrs
 	 * @return string
 	 */
 	public function script($file, $attrs = null) {
@@ -124,8 +127,8 @@ class Html extends \Html {
 
 	/**
 	 * Devuelve link con href a archivo CSS
-	 * @param type $file
-	 * @param type $attrs
+	 * @param string $file
+	 * @param array|string $attrs
 	 * @return string
 	 */
 	public function css($file, Array $attrs = array()) {
@@ -139,7 +142,7 @@ class Html extends \Html {
 	 * @param atring $alert
 	 * @param string $type success, info, danger, error o vacio
 	 * @param array $attrs
-	 * @return type
+	 * @return string
 	 */
 	public function alert($alert, $type = '', Array $attrs = array()) {
 		$extra_class = '';
@@ -152,16 +155,16 @@ class Html extends \Html {
 		}
 		$_attrs = array_merge(
 			array('class' => trim("alert $type $extra_class")),
-			(array) $arrts
+			(array) $attrs
 		);
 		return $this->tag('div', $alert, $_attrs, false);
 	}
 
 	/**
 	 * Devuelve ruta del archivo indicado
-	 * @param type $file
-	 * @param type $type
-	 * @return type
+	 * @param string $file
+	 * @param string $type
+	 * @return string
 	 */
 	protected function path($file, $type) {
 		if (preg_match('/^(\/|https?:\/\/)/', $file)) {
