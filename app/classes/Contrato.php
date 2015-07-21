@@ -1183,7 +1183,7 @@ class Contrato extends Objeto {
 	 */
 	public function Edit($field, $value, $log_field = false) {
 		if ((isset($this->log_update) && $this->log_update == true) || $log_field == true) {
-			if (isset($this->fields[$field]) && $this->valor_antiguo[$field] != $value) {
+			if (isset($this->valor_antiguo[$field]) && $this->valor_antiguo[$field] != $value) {
 				if (($value != 'NULL' || ($this->fields[$field]) != '')) {
 					if ((empty($this->fields[$field])) == false || empty($value) == false) {
 						$this->logear[$field] = true;
@@ -1204,12 +1204,27 @@ class Contrato extends Objeto {
 	 * @param boolean $edicion indica si se marcan los $parametros para edición
 	 */
 	function Fill($parametros, $edicion = false) {
-		$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
-		$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+		/*
+		 * Se añade este código para validar los cambios hechos en la tabla 'contrato'
+		 * la revisión anterior arrojó que no se estaba realizando bien la comparación, 
+		 * es por esto que se crea la query para comparar datos antiguos con los nuevos.
+		 *
+		 */
+		if (array_key_exists('id_contrato', $parametros)) {
+			$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
+			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		
-		foreach (mysql_fetch_object($result) as $key => $value) {
-		 	$this->valor_antiguo[$key] = $value;
-		 } 
+			foreach (mysql_fetch_object($result) as $key => $value)
+				$this->valor_antiguo[$key] = $value;
+
+		} else if (array_key_exists('id_asunto', $parametros)) {
+			$query = "SELECT C.* FROM asunto A INNER JOIN contrato C ON C.id_contrato = A.id_contrato WHERE A.id_asunto = {$parametros['id_asunto']};";
+			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		
+			foreach (mysql_fetch_object($result) as $key => $value)
+				$this->valor_antiguo[$key] = $value;
+		}
 
 		foreach ($parametros as $campo => $valor) {
 			if (in_array($campo, $this->editable_fields)) {
