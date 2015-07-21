@@ -17,6 +17,8 @@ class Contrato extends Objeto {
 	var $primera_etapa = null;
 	var $monto = null;
 
+	var $valor_antiguo = array();
+
 	/**
 	 * Define los campos de la solicitud de adelanto permitidos para llenar
 	 *
@@ -1174,6 +1176,27 @@ class Contrato extends Objeto {
 	}
 
 	/**
+	 * Edita el valor de un campo
+	 * @param string  $field campo de la tabla
+	 * @param mix  $value valor que se asignará
+	 * @param boolean $log_field si es verdadero entonces se guarda el historial del cambio
+	 */
+	public function Edit($field, $value, $log_field = false) {
+		if ((isset($this->log_update) && $this->log_update == true) || $log_field == true) {
+			if (isset($this->fields[$field]) && $this->valor_antiguo[$field] != $value) {
+				if (($value != 'NULL' || ($this->fields[$field]) != '')) {
+					if ((empty($this->fields[$field])) == false || empty($value) == false) {
+						$this->logear[$field] = true;
+					}
+				}
+			}
+		}
+
+		$this->fields[$field] = $value;
+		$this->changes[$field] = true;
+	}
+
+	/**
 	 * Completa el objeto con los valores que vengan en $parametros
 	 * También sirve para definir cuando un parámetro que no viene debe ser marcado como cero
 	 *
@@ -1181,6 +1204,12 @@ class Contrato extends Objeto {
 	 * @param boolean $edicion indica si se marcan los $parametros para edición
 	 */
 	function Fill($parametros, $edicion = false) {
+		$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
+		$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		
+		foreach (mysql_fetch_object($result) as $key => $value) {
+		 	$this->valor_antiguo[$key] = $value;
+		 } 
 
 		foreach ($parametros as $campo => $valor) {
 			if (in_array($campo, $this->editable_fields)) {
@@ -1311,7 +1340,8 @@ class Contrato extends Objeto {
 				if ($this->logear[$key]) {
 					$query_log = "INSERT INTO log_db SET id_field = '" . $this->fields[$this->campo_id] . "', titulo_tabla = '" . $this->tabla . "', campo_tabla = '" . $key . "', fecha = NOW(), usuario = '" . $this->sesion->usuario->fields['id_usuario'] . "',
 						valor_antiguo = '" . mysql_real_escape_string($this->valor_antiguo[$key], $this->sesion->dbh) . "', valor_nuevo ='" . mysql_real_escape_string($val, $this->sesion->dbh) . "'";
-					$resp_log = mysql_query($query_log, $this->sesion->dbh) or Utiles::errorSQL($query_log, __FILE__, __LINE__, $this->sesion->dbh);
+					echo $query_log . '<br>';
+					//$resp_log = mysql_query($query_log, $this->sesion->dbh) or Utiles::errorSQL($query_log, __FILE__, __LINE__, $this->sesion->dbh);
 					$this->logear[$key] = false;
 				}
 			}
