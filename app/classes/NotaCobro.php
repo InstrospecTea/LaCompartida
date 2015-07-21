@@ -10165,6 +10165,9 @@ class NotaCobro extends Cobro {
 		global $cobro_moneda;
 		global $lang;
 
+		$this->FillTemplateData($idioma, $moneda);
+		$htmlplantilla = $this->RenderTemplate($htmlplantilla);
+
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 
