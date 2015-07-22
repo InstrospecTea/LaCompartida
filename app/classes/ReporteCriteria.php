@@ -2162,7 +2162,6 @@ class ReporteCriteria {
 				->add_grouping('id_cobro');
 		}
 
-		$agrupa = array();
 		$Criteria->add_grouping('id_usuario');
 		$Criteria->add_grouping('id_cliente');
 		$Criteria->add_grouping('codigo_asunto');
