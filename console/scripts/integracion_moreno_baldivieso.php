@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * IntegracionMorenoBaldivieso
+ * console/console integracion_moreno_baldivieso --domain=local --subdir=ttb --debug
+ */
 class IntegracionMorenoBaldivieso extends AppShell {
 
 	private $connection;
@@ -7,8 +11,8 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	protected $Session;
 
 	public function __construct() {
-		// $this->connection['server'] = '200.87.127.182'; // Test and develop
-		$this->connection['server'] = 'embaMSSql'; // Production Only
+		$this->connection['server'] = '200.87.127.182'; // Test and develop
+		// $this->connection['server'] = 'embaMSSql'; // Production Only
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
 		$this->connection['database_name'] = 'EMBA_PROD';
@@ -45,6 +49,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				(CASE WHEN (OPRJ.U_Factur = 'Y') THEN 1 ELSE 0 END) AS 'chargeable',
 				OPRJ.U_AbogadoEncargado AS 'lawyer_manager_code',
 				OPRJ.U_AreaProyecto AS 'matter_area',
+				OPRJ.U_MontoFijo AS amount,
 				OCRD.LicTradNum AS 'billing_data_identification_number',
 				OCRG.GroupName AS 'billing_data_activity',
 				CRD1.Street AS 'billing_data_address',
@@ -131,6 +136,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 						$ClientAgreement->Edit('id_tarifa', $client_agreement_rate);
 					}
 
+					$ClientAgreement->Edit('monto', $client['amount']);
 					$ClientAgreement->Edit('id_usuario_modificador', $modifier_user_id);
 
 					if ($ClientAgreement->Write()) {
@@ -303,7 +309,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('contacto', $applicant_full_name);
 					$MatterAgreement->Edit('fono_contacto', $client['applicant_phone']);
 					$MatterAgreement->Edit('email_contacto', $client['applicant_email']);
-
+					$MatterAgreement->Edit('monto', $client['amount']);
 					$MatterAgreement->Edit('activo', $matter_agreement_active);
 					$MatterAgreement->Edit('forma_cobro', $billing_form);
 					$MatterAgreement->Edit('id_tarifa', $rate_id);
