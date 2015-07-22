@@ -483,7 +483,6 @@ class ReporteCriteria {
 												)
 											)
 										)", $this->tipo_dato);
-				$s .= '';
 				break;
 
 			case 'rentabilidad':
