@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.13.1
+Wednesday 2015, July 22th.
+* **Feature:** [Agregar monto al contrato en integración con moreno baldivieso](https://github.com/LemontechSA/ttb/pull/1053)
+
 ## [Release 15.13.0](https://github.com/LemontechSA/ttb/pull/1050)
 Wednesday 2015, July 15th.
 * **Feature:** [Corregir link de tarifas](https://github.com/LemontechSA/ttb/pull/1047)
