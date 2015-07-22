@@ -1053,25 +1053,25 @@ class ReporteCriteria {
 				foreach ($a as $ag2 => $b) {
 					if (is_array($b)) {
 						if (!isset($data[$ag1][$ag2])) {
-							Reporte::rellenar($data[$ag1][$ag2], $data2[$ag1][$ag2]);
+							ReporteCriteria::rellenar($data[$ag1][$ag2], $data2[$ag1][$ag2]);
 						}
 
 						foreach ($b as $ag3 => $c) {
 							if (is_array($c)) {
 								if (!isset($data[$ag1][$ag2][$ag3])) {
-									Reporte::rellenar($data[$ag1][$ag2][$ag3], $data2[$ag1][$ag2][$ag3]);
+									ReporteCriteria::rellenar($data[$ag1][$ag2][$ag3], $data2[$ag1][$ag2][$ag3]);
 								}
 
 								foreach ($c as $ag4 => $d) {
 									if (is_array($d)) {
 										if (!isset($data[$ag1][$ag2][$ag3][$ag4])) {
-											Reporte::rellenar($data[$ag1][$ag2][$ag3][$ag4], $data2[$ag1][$ag2][$ag3][$ag4]);
+											ReporteCriteria::rellenar($data[$ag1][$ag2][$ag3][$ag4], $data2[$ag1][$ag2][$ag3][$ag4]);
 										}
 
 										foreach ($d as $ag5 => $e) {
 											if (is_array($e)) {
 												if (!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5])) {
-													Reporte::rellenar($data[$ag1][$ag2][$ag3][$ag4][$ag5], $data2[$ag1][$ag2][$ag3][$ag4][$ag5]);
+													ReporteCriteria::rellenar($data[$ag1][$ag2][$ag3][$ag4][$ag5], $data2[$ag1][$ag2][$ag3][$ag4][$ag5]);
 												}
 												foreach ($e as $ag6 => $f) {
 													if (is_array($f)) {
