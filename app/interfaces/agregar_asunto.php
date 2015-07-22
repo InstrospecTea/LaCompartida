@@ -151,7 +151,7 @@ if ($opcion == 'guardar') {
 		if (Conf::GetConf($Sesion, 'CodigoSecundario') || !empty($codigo_asunto_secundario)) {
 			$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
 		} else {
-			$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
+			$Asunto->Edit("codigo_asunto_secundario", null);
 		}
 
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
@@ -599,18 +599,24 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 														<td align="right">
 															<?php echo __('Código'); ?>
 														</td>
-														<td align="left">
-															<input id="codigo_asunto" name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
-															&nbsp;&nbsp;&nbsp;
+													<td align="left">
+														<input id="codigo_asunto"
+														       name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?>
+														       size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>"
+														       onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
+														&nbsp;&nbsp;&nbsp;
+														<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
 															<?php echo __('Código secundario'); ?>
 															<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;">&nbsp;&nbsp;<?php echo !empty($Cliente->fields['codigo_cliente_secundario']) ? "{$Cliente->fields['codigo_cliente_secundario']}-" : ''; ?></div>
-															<input id="codigo_asunto_secundario" name="codigo_asunto_secundario" size="15" maxlength="20" value="<?php echo array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario'])); ?>" onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
-															<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
-																<span style="color:#FF0000; font-size:10px">*</span>
-															<?php } else { ?>
-																<span style='font-size:10px'>(<?php echo __('Opcional'); ?>)</span>
-															<?php } ?>
-														</td>
+															<input id="codigo_asunto_secundario" name="codigo_asunto_secundario" size="15"
+															       maxlength="20"
+															       value="<?php echo array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario'])); ?>"
+															       onchange='this.value=this.value.toUpperCase();'
+															       style='text-transform: uppercase;'/>
+															<span style="color:#FF0000; font-size:10px">*</span>
+														<?php } ?>
+													</td>
+
 												</tr>
 																<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
 													<tr>
