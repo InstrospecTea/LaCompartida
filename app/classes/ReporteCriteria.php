@@ -10,33 +10,35 @@ class ReporteCriteria {
 	public $filtros = array();
 	public $filtros_especiales = array();
 	public $rango = array();
-	//Arreglo de datos
+	// Arreglo de datos
 	public $tipo_dato = 0;
-	//Arreglo con vista
+	// Moneda
+	public $id_moneda = null;
+	// Arreglo con vista
 	public $vista;
-	//Arreglo con resultados
+	// Arreglo con resultados
 	public $row;
 	// String con el último error
 	public $error = '';
-	//El orden de los agrupadores
+	// El orden de los agrupadores
 	public $agrupador = array();
 	public $id_agrupador = array();
 	public $id_agrupador_cobro = array();
 	public $orden_agrupador = array();
 	public $agrupador_principal = 0;
-	//Campos utilizados para determinar los datos en el periodo. Default: trabajo.
+	// Campos utilizados para determinar los datos en el periodo. Default: trabajo.
 	public $campo_fecha = '';
 	public $campo_fecha_2 = '';
 	public $campo_fecha_3 = '';
 	public $campo_fecha_cobro = 'cobro.fecha_fin';
 	public $campo_fecha_cobro_2 = 'cobro.fecha_emision';
-	//Determina como se calcula la proporcionalidad de los montos en Flat Fee
+	// Determina como se calcula la proporcionalidad de los montos en Flat Fee
 	public $proporcionalidad = 'estandar';
 	public $conf = array();
-	//Codigo secundario cuando corresponde
+	// Codigo secundario cuando corresponde
 	public $dato_usuario = 'usuario.username';
 	public $dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
-	//Cuanto se repite la fila para cada agrupador
+	// Cuanto se repite la fila para cada agrupador
 	public $filas = array();
 
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
