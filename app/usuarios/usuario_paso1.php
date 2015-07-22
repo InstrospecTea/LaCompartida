@@ -3,7 +3,7 @@
 
 	$sesion = new Sesion(array('ADM'));
 	$pagina = new Pagina($sesion);
-	$pagina->titulo = __('Administración de Usuarios');
+	$pagina->titulo = __('Administración') . ' ' . __('Usuarios');
 
 	$esRut = strtolower(Conf::GetConf($sesion, 'NombreIdentificador')) == 'rut';
 
@@ -524,28 +524,29 @@
 			<table class="info" style="width:100%">
 				<tr>
 					<td colspan="2" style="text-align:left">
-						<b>Administraci&oacute;n de cupos para usuarios activos en el sistema:</b>
+						<b><?php echo __('Administración de cupos para usuarios activos en el sistema'); ?>:</b>
 					</td>
 				</tr>
 				<tr>
 					<td width="20">&nbsp;</td>
 					<td style="text-align:left">
-						Estimado <?php echo $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1']; ?>, a continuación se detalla su cupo actual de usuarios contratados en el sistema.  
+						<?php echo __('Estimado') . ' ' . $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1']; ?>,
+						<?php echo __('a continuación se detalla su cupo actual de usuarios contratados en el sistema'); ?>.
 					</td>
 				</tr>
 				<tr>
 					<td width="20">&nbsp;</td>
 					<td style="text-align:left">
 						<ul>
-							<li>Usuarios activos con perfil <b>Profesional</b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosProfesionales'); ?></li>
-							<li>Usuarios activos con perfil <b>Administrativos</b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosAdministrativos'); ?></li>
+							<li><?php echo __('Usuarios activos con perfil'); ?> <b><?php echo __('Profesional'); ?></b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosProfesionales'); ?></li>
+							<li><?php echo __('Usuarios activos con perfil'); ?> <b><?php echo __('Administrativos'); ?></b>: <?php echo Conf::GetConf($sesion, 'CupoUsuariosAdministrativos'); ?></li>
 						</ul>
 					</td>
 				</tr>
 				<tr>
 					<td width="20">&nbsp;</td>
 					<td style="text-align:left">
-						Si desea aumentar su cupo debe contactarse con <a href="mailto:areacomercial@lemontech.cl">areacomercial@lemontech.cl</a> o en su defecto puede desactivar usuarios para habilitar cupos.
+						<?php echo __('Si desea aumentar su cupo debe contactarse con <a href="mailto:areacomercial@lemontech.cl">areacomercial@lemontech.cl</a> o en su defecto puede desactivar usuarios para habilitar cupos'); ?>.
 					</td>
 				</tr>
 			</table>
@@ -560,7 +561,7 @@
 				<table  width="100%" class="tb_base">
 					<tr>
 						<td valign="top" class="subtitulo" align="left" colspan="2">
-							<?php echo __('Ingrese ') . Conf::GetConf($sesion, 'NombreIdentificador') . __(' del usuario'); ?>:
+							<?php echo __('Ingrese') . ' ' . Conf::GetConf($sesion, 'NombreIdentificador') . ' ' . __('del usuario'); ?>:
 							<hr class="subtitulo_linea_plomo"/>
 						</td>
 					</tr>
@@ -596,7 +597,7 @@
 						<table width="100%">
 							<tr>
 								<td valign="top" class="subtitulo" align="left" colspan="2">
-									<?php echo __('Modificacion de Datos para todos los usuarios ') ?>:
+									<?php echo __('Modificacion de Datos para todos los usuarios') ?>:
 									<hr class="subtitulo_linea_plomo"/>
 								</td>
 							</tr>
@@ -616,7 +617,7 @@
 										<td width=15% align="left"></td>
 										<td width=20% align="right"></td>
 										<td width=17% align="center">
-											Cambiar valores
+											<?php echo __('Cambiar valores'); ?>
 										</td>
 									</tr>
 									<tr>
@@ -731,19 +732,23 @@
 				<tr>
 					<td valign="top" align="center" style="white-space:nowrap">
 						<form name="act"  method="post">
-							<input type="checkbox" name="activo" id="activo" <?php if (!$activo) echo 'value="1" checked="checked"'; ?> />s&oacute;lo activos &nbsp;&nbsp;&nbsp;
+							<label>
+								<input type="checkbox" name="activo" id="activo" <?php if (!$activo) echo 'value="1" checked="checked"'; ?> />
+								<?php echo __('sólo activos'); ?>
+							</label>
+							&nbsp;&nbsp;&nbsp;
 							<span id="contienefiltro"></span>
 							&nbsp;&nbsp;
-							&nbsp; <a href="#" id="btnbuscar" style="display:none;" class="u1 botonizame" icon="ui-icon-search" rel="buscar">Buscar</a>
-							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls">Descargar Listado</a>
-							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_vacacion">Descargar Vacaciones</a>
-							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_modificaciones">Descargar Modificaciones</a>
+							&nbsp; <a href="#" id="btnbuscar" style="display:none;" class="u1 botonizame" icon="ui-icon-search" rel="buscar"><?php echo __('Buscar Nombre'); ?></a>
+							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls"><?php echo __('Descargar Listado'); ?></a>
+							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_vacacion"><?php echo __('Descargar Vacaciones'); ?></a>
+							&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_modificaciones"><?php echo __('Descargar Modificaciones'); ?></a>
 						</form>
 					</td>
 				</tr>
 				<tr>
 					<td colspan=2>
-						<br /><?php echo __('Para buscar ingrese el nombre del usuario o parte de él.') ?>
+						<br /><?php echo __('Para buscar ingrese el nombre del usuario o parte de él') ?>.
 					</td>
 				</tr>
 				<tr>
@@ -752,23 +757,23 @@
 						<table id="tablapermiso">
 							<thead>
 								<tr>
-									<td class="encabezado">RUT</td>
-									<th>ID</th>
-									<th>Nombre</th>
-									<th>Admin</th>
-									<th>Admin<br>Datos</th>
-									<th width="23">Cobranza</th>
-									<th>Editar<br/>Biblioteca</th>
-									<th>Lectura</th>
-									<th>Oficina</th>
-									<th>Profesional</th>
-									<th>Reportes</th>
-									<th>Revisión</th>
-									<th>Secretaría</th>
-									<th>Socio</th>
-									<th>Tarifa</th>
-									<th>Retribuciones</th>
-									<th width="25">Activo</th>
+									<td class="encabezado"><?php echo __('RUT'); ?></td>
+									<th><?php echo __('ID'); ?></th>
+									<th><?php echo __('Nombre'); ?></th>
+									<th><?php echo __('Admin'); ?></th>
+									<th><?php echo __('Admin<br>Datos'); ?></th>
+									<th width="23"><?php echo __('Cobranza'); ?></th>
+									<th><?php echo __('Editar<br/>Biblioteca'); ?></th>
+									<th><?php echo __('Lectura'); ?></th>
+									<th><?php echo __('Oficina'); ?></th>
+									<th><?php echo __('Profesional'); ?></th>
+									<th><?php echo __('Reportes'); ?></th>
+									<th><?php echo __('Revisión'); ?></th>
+									<th><?php echo __('Secretaría'); ?></th>
+									<th><?php echo __('Socio'); ?></th>
+									<th><?php echo __('Tarifa'); ?></th>
+									<th><?php echo __('Retribuciones'); ?></th>
+									<th width="25"><?php echo __('Activo'); ?></th>
 								</tr>
 							</thead>
 							<tbody></tbody>

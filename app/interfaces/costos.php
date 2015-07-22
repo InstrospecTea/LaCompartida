@@ -215,7 +215,7 @@ if (((method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo
 	<?php } else { ?>
 					<img src='<?php echo Conf::ImgDir() . "/izquierda.gif" ?>' <?php echo $tip_anterior ?> class='mano_on' onclick="CambiaFecha('<?php echo $fecha_m > 6 ? $fecha_a : $fecha_a - 1 ?>', '<?php echo $fecha_m > 6 ? $fecha_m - 6 : $fecha_m + 6 ?>')">
 	<?php } ?>
-				<b><?php echo $fecha_a . " - " . __(($fecha_m > 6 ? "Segundo" : "Primer") . " semestre"); ?></b>
+				<b><?php echo $fecha_a . " - " . __(($fecha_m > 6 ? "Segundo" : "Primer") . ' ' . "semestre"); ?></b>
 	<?php if (((method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo')) || (method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo()))) { ?>
 					<img src='<?php echo Conf::ImgDir() . "/derecha_nuevo.gif" ?>' <?php echo $tip_siguiente ?> class='mano_on' onclick="CambiaFecha('<?php echo $fecha_m > 6 ? $fecha_a + 1 : $fecha_a ?>', '<?php echo $fecha_m > 6 ? $fecha_m - 6 : $fecha_m + 6 ?>')">
 	<?php } else { ?>

@@ -183,7 +183,7 @@ if ($usuario->loaded) {
 	$usuario_historial = $usuario->ListaCambios($usuario->fields['id_usuario']);
 }
 
-$pagina->titulo = __('Administración - Usuarios');
+$pagina->titulo = __('Administración') . ' - ' . __('Usuarios');
 $pagina->PrintTop();
 $Form = new Form;
 if ($usuario->loaded) {
@@ -470,7 +470,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					}
 					?>
 					<br/>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;"><?php echo __('(sólo los usuarios activos pueden ingresar al sistema)') ?></span>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;">(<?php echo __('') ?>)</span>
 					<div id="activo_status" class="alert alert-error" style="display:none;width:300px;margin-top:20px;padding:5px;"></div>
 				</td>
 			</tr>
@@ -670,7 +670,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		</legend>
 		<table id="vacaciones_tabla" style='display:none;' width="400px">
 			<tr>
-				<td colspan="3" align="left"><?php echo __('Seleccione las fecha para ingresar el periodo de vacacciones.'); ?></td>
+				<td colspan="3" align="left"><?php echo __('Seleccione las fecha para ingresar el periodo de vacacciones'); ?>.</td>
 			</tr>
 			<tr>
 				<td align="right"><label for="alerta_diaria" align="right"><?php echo __('Fecha inicio') ?></label></td>
@@ -691,11 +691,11 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				<td colspan="3">&nbsp;</td>
 			</tr>
 			<tr>
-				<td colspan="3" style="font-size:11px; font-weight:bold">Lista de vacaciones ingresadas</td>
+				<td colspan="3" style="font-size:11px; font-weight:bold"><?php echo __('Lista de vacaciones ingresadas'); ?></td>
 			</tr>
 			<tr style="border:1px solid #454545">
-				<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Inicio</td>
-				<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fin</td>
+				<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;"><?php echo __('Inicio'); ?></td>
+				<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;"><?php echo __('Fin'); ?></td>
 				<td width="40px" style="border:1px solid #ccc">&nbsp;</td>
 			</tr>
 
@@ -738,7 +738,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<?php echo $Form->button(__('Cancelar'), array('onclick' => "Cancelar(jQuery('#form_usuario')[0])")); ?>
 
 			<?php if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0 && $rut != '99511620') { ?>
-				<?php echo $Form->button(__('Eliminar Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo')); ?>
+				<?php echo $Form->button(__('Eliminar') . ' ' . ('Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo')); ?>
 			<?php } ?>
 	</fieldset>
 
@@ -809,7 +809,7 @@ if ($usuario->loaded) {
 					?>
 					<label>
 						<input type="checkbox" name="force_reset_password" id="force_reset_password" value="1" <?php echo $checked_str ?> />
-						<span>Solicitar un cambio de contraseña al pr&oacute;ximo inicio de sesi&oacute;n</span>
+						<span><?php echo __('Solicitar un cambio de contraseña al próximo inicio de sesión'); ?></span>
 					</label>
 				</td>
 			</tr>

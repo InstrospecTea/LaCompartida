@@ -725,9 +725,7 @@ echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_ti
 														</td>
 												</tr>
 												<tr>
-														<td align="right">
-<?php echo __('Descripción') ?>
-														</td>
+														<td align="right"><?php echo __('Descripción') ?></td>
 														<td align="left">
 																<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
 														</td>

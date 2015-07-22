@@ -130,7 +130,7 @@ if ($refresh_parent) {
 	<input type="hidden" name="id_actividad" value="<?php echo $Actividad->fields['id_actividad']; ?>" />
 
 	<fieldset class="border_plomo tb_base">
-		<legend>Ingreso de Actividades</legend>
+		<legend><?php echo __('Ingreso de') . ' ' . __('Actividades'); ?></legend>
 		<table style="border: 1px solid #BDBDBD;" class="" width="100%">
 			<tr>
 				<td align="right">
