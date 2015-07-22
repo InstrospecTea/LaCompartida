@@ -406,7 +406,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "class='al'");
 	$b->AgregarEncabezado("horas_no_cobradas", __('Horas a cobrar'), "class='al'");
 	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
-	$b->AgregarEncabezado("fecha_creacion", __('Fecha de creación"'));
+	$b->AgregarEncabezado("fecha_creacion", __('Fecha de creación'));
 
 	if ($Sesion->usuario->Es('DAT') || $Sesion->usuario->Es('SASU')) {
 		$b->AgregarFuncion("$link", 'Opciones', "align=center' nowrap");

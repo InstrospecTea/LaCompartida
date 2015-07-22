@@ -2513,7 +2513,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									<?php echo __('Otros'); ?></label><br />
 									<input type="text" name="notificar_otros_correos" size="65" value="<?php echo $contrato->fields['notificar_otros_correos']; ?>" />
 									<br />
-									<small><em>Separados por coma <strong>(,)</strong> Ej: correo@dominio.com<strong>,</strong>usuario@estudio.net</em></small>
+									<small><em><?php echo __('Separados por coma'); ?> <strong>(,)</strong> Ej: correo@dominio.com<strong>,</strong>usuario@estudio.net</em></small>
 								</td>
 							</tr>
 						</table>
@@ -2849,10 +2849,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							.done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
-								header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
-								header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
-								header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
-								header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Area Usuario'); ?></b></td>');
+								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
+								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 					$.each(data, function(i, generator){
 						generator_row = $('<tr>');
@@ -2954,7 +2954,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_user_generator', '', '', 'Seleccione', '200px'); ?>
 							</td>
 							<td>
-								Porcentaje Genera:
+								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
 							<td>
 								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">
