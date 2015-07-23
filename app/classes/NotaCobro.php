@@ -10165,6 +10165,9 @@ class NotaCobro extends Cobro {
 		global $cobro_moneda;
 		global $lang;
 
+		$this->FillTemplateData($idioma, $moneda);
+		$htmlplantilla = $this->RenderTemplate($htmlplantilla);
+
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 
@@ -11576,6 +11579,7 @@ class NotaCobro extends Cobro {
 	 * para reemplazar en $template
 	 *
 	 * @param array Valores posibles para reemplazar en el template HTML
+	 * @return string
 	 */
 	protected function RenderTemplate($template) {
 
@@ -11604,5 +11608,8 @@ class NotaCobro extends Cobro {
 		$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
 		$this->template_data['Idioma'] = $idioma->fields;
 		$this->template_data['Moneda'] = $moneda->fields;
+
+		$CobroPendiente = new CobroPendiente($this->sesion);
+		$this->template_data['CobroPendiente'] = $CobroPendiente->LoadFirstByIdCobro($this->template_data['Cobro']['id_cobro']);
 	}
 }

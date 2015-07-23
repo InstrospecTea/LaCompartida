@@ -27,7 +27,7 @@ class Form {
 	 *
 	 * @return string HTML que contiene el selector
 	 */
-	public function select($name, $options, $selected = null, Array $attrs = array()) {
+	public function select($name, $options, $selected = null, array $attrs = array()) {
 		$_attrs = $attrs + array('empty' => '');
 		if (empty($_attrs['name']) && !empty($name)) {
 			$_attrs['name'] = $name;
@@ -78,7 +78,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function label($text, $for = null, Array $attrs = array()) {
+	public function label($text, $for = null, array $attrs = array()) {
 		if (!empty($for)) {
 			$_attrs = array_merge(array('for' => $for), $attrs);
 		}
@@ -92,7 +92,7 @@ class Form {
 	 * @param Array $attrs
 	 * @return type
 	 */
-	public function input($name, $value, Array $attrs = array()) {
+	public function input($name, $value, array $attrs = array()) {
 		$attrs = array_merge(array('type' => 'text', 'value' => $value, 'label' => $this->defaultLabel, 'name' => null), $attrs);
 		$label = null;
 
@@ -123,7 +123,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function input_prepend($name, $prepend, $value, Array $attrs = array()) {
+	public function input_prepend($name, $prepend, $value, array $attrs = array()) {
 		$_attrs = array_merge(array('label' => false), $attrs);
 		return $this->Html->tag('span', $prepend, array('class' => 'input_prepend')) . $this->input($name, $value, $_attrs);
 	}
@@ -136,7 +136,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function input_append($name, $append, $value, Array $attrs = array()) {
+	public function input_append($name, $append, $value, array $attrs = array()) {
 		$_attrs = array_merge(array('label' => false), $attrs);
 		return $this->input($name, $value, $_attrs) . $this->Html->tag('span', $append, array('class' => 'input_append'));
 	}
@@ -148,7 +148,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function hidden($name, $value = '', Array $attrs = array()) {
+	public function hidden($name, $value = '', array $attrs = array()) {
 		$attrs = array_merge($attrs, array('type' => 'hidden'));
 		return $this->input($name, $value, $attrs);
 	}
@@ -160,7 +160,7 @@ class Form {
 	 * @param Array $attrs
 	 * @return string
 	 */
-	public function textarea($name, $value, Array $attrs = array()) {
+	public function textarea($name, $value, array $attrs = array()) {
 		$attrs = array_merge(array('label' => $this->defaultLabel, 'name' => null, 'rows' => 3), $attrs);
 		$label = null;
 
@@ -187,7 +187,7 @@ class Form {
 	 * @param type $checked
 	 * @param Array $attrs
 	 */
-	public function checkbox($name, $value, $checked = false, Array $attrs = array()) {
+	public function checkbox($name, $value, $checked = false, array $attrs = array()) {
 		$attrs = $attrs + array('type' => 'checkbox', 'value' => $value, 'label' => $this->defaultLabel);
 		$label = null;
 
@@ -217,7 +217,7 @@ class Form {
 	 * @param type $container_attrs Atributos del elemento contenedor, ej: id, class, etc.
 	 * @return string HTML que contiene el grupo de checkboxes
 	 */
-	public function checkbox_group($options, Array $checkeds = array(), $container = 'div', Array $container_attrs = array()) {
+	public function checkbox_group($options, array $checkeds = array(), $container = 'div', array $container_attrs = array()) {
 		$html = '';
 		$x = 1;
 		foreach ((Array) $options as $name => $label) {
@@ -248,7 +248,7 @@ class Form {
 	 * @param type $checked
 	 * @param Array $attrs
 	 */
-	public function radio($name, $value, $checked = false, Array $attrs = array()) {
+	public function radio($name, $value, $checked = false, array $attrs = array()) {
 		$attrs = $attrs + array('type' => 'radio', 'value' => $value, 'label' => $this->defaultLabel);
 		$label = null;
 
@@ -279,7 +279,7 @@ class Form {
 	 * @param type $container_attrs
 	 * @return type
 	 */
-	public function radio_group($name, $options, $selected, $container = 'div', Array $container_attrs = array()) {
+	public function radio_group($name, $options, $selected, $container = 'div', array $container_attrs = array()) {
 		$html = '';
 		$x = 1;
 		foreach ((Array) $options as $value => $label) {
@@ -312,7 +312,7 @@ class Form {
 	 * @param Array $attrs
 	 * @return type
 	 */
-	public function icon_button($text, $icon, Array $attrs = array()) {
+	public function icon_button($text, $icon, array $attrs = array()) {
 		$_attrs = array(
 			'tag' => 'a'
 		);
@@ -328,7 +328,7 @@ class Form {
 	 * @param Array $attrs
 	 * @return type
 	 */
-	public function icon_submit($text, $icon, Array $attrs = array()) {
+	public function icon_submit($text, $icon, array $attrs = array()) {
 		$_attrs = array(
 			'tag' => 'a'
 		);
@@ -343,7 +343,7 @@ class Form {
 	 * @param Array $attrs
 	 * @return type
 	 */
-	public function button($text, Array $attrs = array()) {
+	public function button($text, array $attrs = array()) {
 		$_attrs = array(
 			'tag' => 'a',
 			'role' => 'button',
@@ -385,7 +385,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function submit($text, Array $attrs = array()) {
+	public function submit($text, array $attrs = array()) {
 		$attrs['onclick'] = isset($attrs['onclick']) ? $attrs['onclick'] : '';
 		$attrs['onclick'] .= ";jQuery(this).closest('form').submit();";
 		return $this->button($text, $attrs);
@@ -398,7 +398,7 @@ class Form {
 	 * @param array $attrs
 	 * @return type
 	 */
-	public function image_link($image, $link, Array $attrs = array()) {
+	public function image_link($image, $link, array $attrs = array()) {
 		$image = $this->Html->img("{$this->image_path}{$image}");
 		$_attrs = array(
 			'href' => $link === false ? 'javascript:void(0)' : $link
@@ -424,7 +424,7 @@ class Form {
 	 * @param type $for
 	 * @param array $attrs
 	 */
-	public function error_label($for, Array $attrs = array()) {
+	public function error_label($for, array $attrs = array()) {
 		$_attrs = array_merge(array('class' => 'error', 'style' => 'display:none'), $attrs);
 		echo $this->label('', $for, $_attrs);
 	}

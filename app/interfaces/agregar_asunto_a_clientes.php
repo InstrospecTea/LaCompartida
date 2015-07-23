@@ -7,48 +7,48 @@
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	
+
 	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
-	
-	if( Debug::debug_echo($sesion,'LEMONTECH') != 'LEMONTECH' ) exit;
-	
+
+	if( !$sesion->usuario->TienePermiso('SADM') ) exit;
+
 	if( $_POST['opc'] == "generar" )
 	{
 			if( $_POST['clientes_activos'] == "solo_activos" )
 				$where = " activo = 1 ";
 			else
 				$where = " 1 ";
-			
+
 			$query = "SELECT codigo_cliente FROM cliente WHERE $where AND LENGTH( codigo_cliente ) = 4";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			
+
 			$contador = 0;
 			while( list($codigo_cliente) = mysql_fetch_array($resp) )
 			{
 				$cliente = new Cliente($sesion);
-				
+
 				if( !$cliente->LoadByCodigo($codigo_cliente) )
 				{
 					echo "Error al cargar el cliente con codigo $codigo_cliente <br>";
 					continue;
 				}
-				
+
 				$contrato_cliente = new Contrato($sesion);
-				
+
 				if( !$contrato_cliente->Load($cliente->fields['id_contrato']) )
 				{
 					echo "Error al crear asunto para cliente ".$cliente->fields['glosa_cliente'].", no se pudo cargar su contrato <br>";
 					continue;
 				}
-				
+
 				$id_contrato = $contrato_cliente->fields['id_contrato'];
-				
+
 				if( $_POST['cobro_independiente'] )
 				{
 					$contra= new Contrato($sesion);
 					$contra->guardar_fecha = false;
-					
+
 					foreach($contrato_cliente->fields as $key => $val)
 					{
 						if( $key == 'id_usuario_responsable' || $key=='id_usuario_secundario' || $key=='id_moneda' || $key=='codigo_cliente' )
@@ -56,13 +56,13 @@
 						else if( $key != "id_contrato" )
 							$contra->Edit($key, $val);
 					}
-					
+
 					$contra->Write( false );
-					
+
 					$id_contrato = $contra->fields['id_contrato'];
 					$id_contrato_indep = $contra->fields['id_contrato'];
 				}
-				
+
 				$asunto=new Asunto($sesion);
 				$asunto->Edit('codigo_asunto',$asunto->AsignarCodigoAsunto(substr($cliente->fields['codigo_cliente'],-4)));
 				$asunto->Edit('codigo_asunto_secundario',$asunto->AsignarCodigoAsuntoSecundario(substr($cliente->fields['codigo_cliente_secundario'],-4)));
@@ -77,7 +77,7 @@
 				$asunto->Edit("email_contacto",$cliente->fields['mail_contacto']);
 				$asunto->Edit("direccion_contacto",$cliente->fields['dir_calle']);
 				$asunto->Edit("id_encargado",( !empty($cliente->fields['id_usuario_encargado']) && $cliente->fields['id_usuario_encargado'] != '-1' ) ? $cliente->fields['id_usuario_encargado'] : "NULL");
-				
+
 				if( $asunto->Write() )
 					$contador++;
 			}
