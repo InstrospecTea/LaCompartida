@@ -186,6 +186,7 @@
 		var xopcion = form.opcion.value;
 		var xcodigo_carpeta = form.codigo_carpeta.value;
 		var xid_carpeta = form.id_carpeta.value;
+
 		//var xnombre_carpeta = form.nombre_carpeta.value
 		//var xcodigo_cliente_secundario = form.codigo_cliente_secundario.value
 		var xglosa_carpeta = form.glosa_carpeta.value;
