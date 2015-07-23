@@ -512,7 +512,7 @@ $where .= " AND usuario.visible = 1";
 								<input type="text" class="fechadiff" value="<?php echo ($semana ? $semana : date('d-m-Y')); ?>" name="semana" id="semanactual">
 							</td>
 							<td align ='left' width='19%'>
-								<input type='button' class='btn' value="Ver semana" id="versemana">
+								<input type='button' class='btn' value="<?php echo __('Ver semana'); ?>" id="versemana">
 							</td>
 							<td align='right' width='3%'>
 								<?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
@@ -528,7 +528,7 @@ $where .= " AND usuario.visible = 1";
 		</tr>
 	<tr>
 		<td style="text-align: center; font-weight: bold; padding: 10px;">
-			Haga click con el botón derecho sobre algún trabajo para modificarlo
+			<?php echo __('Haga click con el botón derecho sobre algún trabajo para modificarlo'); ?>
 		</td>
 	</tr>
 </table>

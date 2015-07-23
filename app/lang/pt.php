@@ -8,6 +8,7 @@ $_LANG['asunto'] = 'assunto';
 $_LANG['Asuntos'] = 'Assuntos';
 $_LANG['asuntos'] = 'assuntos';
 $_LANG['Agregar'] = 'Adicionar';
+$_LANG['Fecha'] = 'Data';
 $_LANG['Fecha Desde'] = 'Data inicial';
 $_LANG['Fecha Hasta'] = 'Data final';
 $_LANG['Fecha Creación'] = 'Data de criação';
@@ -251,3 +252,20 @@ $_LANG['Primer'] = 'Primeiro';
 $_LANG['Segundo'] = 'Segundo';
 $_LANG['semestre'] = 'Semestre';
 $_LANG['Copiar datos de semestre anterior'] = 'Copiar dados do semestre anterior';
+
+// Trabajos
+$_LANG['Trabajo'] = 'Trabalho';
+$_LANG['trabajo'] = 'trabalho';
+$_LANG['Trabajos'] = 'Trabalhos';
+$_LANG['trabajos'] = 'trabalhos';
+$_LANG['Ingreso/Modificación de'] = 'Inserir / Modificar';
+$_LANG['Modificación de'] = 'Modificar';
+$_LANG['Agregando nuevo'] = 'Adicionando novo';
+$_LANG['Duración'] = 'Duração';
+$_LANG['Duración Cobrable'] = 'Horas a faturar';
+$_LANG['Ver semana'] = 'Ver Semana';
+$_LANG['Haga click con el botón derecho sobre algún trabajo para modificarlo'] = 'Clique com o botão direito sobre
+algum trabalho o alterar';
+$_LANG['Semana del'] = 'Semana do';
+$_LANG['Total mes'] = 'Total mês';
+$_LANG['Total mes actual'] = 'Total mês atual';
