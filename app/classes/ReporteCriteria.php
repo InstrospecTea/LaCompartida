@@ -1795,12 +1795,11 @@ class ReporteCriteria {
 											/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
 										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 			if ($this->tipo_dato == 'valor_por_cobrar') {
-				$monto_honorarios = "SUM((({$tarifa})
+				$monto_honorarios = "SUM(((tarifa_tramite)
 											* (cobro.monto_tramites / {$div_thh}))
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 			}
 		}
-
 
 		switch ($data_type) {
 			case 'valor_cobrado_no_estandar':
@@ -1875,7 +1874,7 @@ class ReporteCriteria {
 					$Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
 						SUM(tramite.tarifa_tramite)
 							* moneda_por_cobrar.tipo_cambio
-							/ (moneda_display.tipo_cambio * 3600)
+							/ (moneda_display.tipo_cambio)
 						)", $data_type);
 				}
 				break;
