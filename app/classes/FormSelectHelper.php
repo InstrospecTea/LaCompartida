@@ -166,18 +166,22 @@ SCRIPT;
 						data_$name = data;
 						jQuery('#{$name}').empty().append(jQuery('<option/>'));
 
-						data_$name.forEach(function(data, index) {
-							var id = data_{$name}[index].id || index;
-							var option = jQuery('<option/>').val(id).text(data_{$name}[index].glosa || data_{$name}[index]);
-							if ('$selected' == id || exists_selected == id) {
-								option.attr('selected', 'selected')
-								$selected_name = data_{$name}[index];
-							}
-							jQuery('#{$name}').append(option);
-						});
+						if (!jQuery.isEmptyObject(data)) {
+							data_$name.forEach(function(data, index) {
+								var id = data_{$name}[index].id || index;
+								var option = jQuery('<option/>').val(id).text(data_{$name}[index].glosa || data_{$name}[index]);
+								if ('$selected' == id || exists_selected == id) {
+									option.attr('selected', 'selected')
+									$selected_name = data_{$name}[index];
+								}
+								jQuery('#{$name}').append(option);
+							});
+						}
+
 						if ($selected_name) {
 							$onChange
 						}
+
 						$extra_script;
 					}, 'json');
 				}

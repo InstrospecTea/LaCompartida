@@ -75,16 +75,17 @@
 		}
 	}
 
-	if(!isset($total_duracion_cobrable_horas) && !isset($total_duracion_cobrable_minutos))
-	{
+	if (!isset($total_duracion_cobrable_horas) && !isset($total_duracion_cobrable_minutos)) {
 		$total_minutos_cobrables = 0;
+
 		foreach ($trabajos as $t) {
 			// se calcula en minutos porque el intervalo es en minutos
-			$total_minutos_cobrables += Utiles::time2decimal($t->fields['duracion_cobrada'])*60;
+			$time = explode(':', $t->fields['duracion_cobrada']);
+			$total_minutos_cobrables += intval($time[0]) * 60 + intval($time[1]);
 		}
 
 		$total_duracion_cobrable_horas = floor($total_minutos_cobrables / 60);
-		$total_duracion_cobrable_minutos = floor($total_minutos_cobrables % 60);
+		$total_duracion_cobrable_minutos = $total_minutos_cobrables % 60;
 	}
 
 	if(!$codigo_asunto_secundario && Conf::GetConf($sesion,'CodigoSecundario') && $num_trabajos > 0) {

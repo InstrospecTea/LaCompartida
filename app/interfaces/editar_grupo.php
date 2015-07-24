@@ -33,7 +33,7 @@ if (!empty($id)) {
       <tr  class="controls controls-row " >
         <td class="ar"  width="200">
           <div class="span2">
-            <?php echo __('Codigo'); ?>
+            <?php echo __('Código Cliente'); ?>
           </div >
         </td>
         <td class="al " width="600">
@@ -45,7 +45,7 @@ if (!empty($id)) {
       <tr  class="controls controls-row " >
         <td class="ar"  width="200">
           <div class="span2">
-            <?php echo __('Pa�s') . ' ' . __('procedencia'); ?>
+            <?php echo __('País') . ' ' . __('procedencia'); ?>
           </div >
         </td>
         <td class="al " width="600">

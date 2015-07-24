@@ -1,5 +1,57 @@
 # Changelog
 
+Friday 2015, July 24th.
+* **Fix:** [Doblecero en factura PDF](https://github.com/LemontechSA/ttb/pull/1056)
+
+## [Release 15.14.0](https://github.com/LemontechSA/ttb/pull/1055)
+Thursday 2015, July 23th.
+* [Reporte Avanzado corrección trámites](https://github.com/LemontechSA/ttb/pull/1048)
+* [Panama](https://github.com/LemontechSA/ttb/pull/927)
+
+## Hotfix 15.13.1
+Wednesday 2015, July 22th.
+* **Feature:** [Agregar monto al contrato en integración con moreno baldivieso](https://github.com/LemontechSA/ttb/pull/1053)
+
+## [Release 15.13.0](https://github.com/LemontechSA/ttb/pull/1050)
+Wednesday 2015, July 15th.
+* **Feature:** [Corregir link de tarifas](https://github.com/LemontechSA/ttb/pull/1047)
+* **Feature:** [Hitos en cobro Twig](https://github.com/LemontechSA/ttb/pull/1046)
+* **Feature:** [Factura Colombia](https://github.com/LemontechSA/ttb/pull/1043)
+* **Feature:** [Ajuste a la generación de liquidaciones](https://github.com/LemontechSA/ttb/pull/1042)
+* **Feature:** [Filtro grupo cliente](https://github.com/LemontechSA/ttb/pull/1040)
+
+## Hotfix 15.12.18
+Tuesday 2015, July 14th.
+* **Fix:** [Corregir separación hora/minuto al sumar la duración cobrable](https://github.com/LemontechSA/ttb/pull/1049)
+
+## Hotfix 15.12.17
+Thursday 2015, July 9th.
+* **Fix:** [Eliminar trabajos, trámites y gastos que no existen en olap_liquidaciones](https://github.com/LemontechSA/ttb/pull/1045)
+
+## Hotfix 15.12.16
+Wednesday 2015, July 1th.
+* **Feature:** [Corregir comportamiento selector de rangos al buscar liquidaciones](https://github.com/LemontechSA/ttb/pull/1041)
+
+## Hotfix 15.12.15
+Tuesday 2015, June 23th.
+* **Fixed:** [Corregir modificación campo duración al subir excel de cobro](https://github.com/LemontechSA/ttb/pull/1039)
+
+## Hotfix 15.12.14
+Monday 2015, June 22th.
+* **New:** [Nueva herramienta para arreglar los saldos incorrectos en los cobros](https://github.com/LemontechSA/ttb/pull/1038)
+
+## Hotfix 15.12.13
+Monday 2015, June 22th.
+* **Fix:** [Validación número documento tributario al editar una factura](https://github.com/LemontechSA/ttb/pull/1037)
+
+## Hotfix 15.12.12
+Friday 2015, June 19th.
+* **Fix:** [Corrige integración con Facturación.cl](https://github.com/LemontechSA/ttb/pull/1036)
+
+## Hotfix 15.12.11
+Friday 2015, June 19th.
+* **Fix:** [Corrige calendario en liquidaciones programadas](https://github.com/LemontechSA/ttb/pull/1035)
+
 ## Hotfix 15.12.10
 Thursday 2015, June 18th.
 * **Add:** New task for capistrano: it's possible delete stage deploys (Read the [Wiki](https://github.com/LemontechSA/ttb/wiki/Deploy-al-entorno-de-Staging)) [Pull](https://github.com/LemontechSA/ttb/pull/1034)

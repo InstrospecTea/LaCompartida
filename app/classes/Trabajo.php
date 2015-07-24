@@ -661,16 +661,21 @@ class Trabajo extends Objeto
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 					// Actualizar el trabajo.
-					$query = "UPDATE trabajo
-							SET fecha='$fecha',
-									".($abogado==''?'':"id_usuario = ".$usuario->fields['id_usuario'].", ")."
-									".((($asunto_data==''||$col_asunto==23)&&$codigo_asunto_escondido=='')?'':"codigo_asunto = '".$codigo_asunto."', ")."
-									id_cobro = ".$id_cobro.",
-									".($col_solicitante != 23?"solicitante='".addslashes($solicitante)."',":'')."
-									descripcion='".addslashes($descripcion)."',
-									".($col_duracion_trabajada != 23?"duracion='".$duracion_trabajada."',":'')."
-									duracion_cobrada='$duracion_cobrable'
-							WHERE id_trabajo='$id_trabajo'";
+					$query_usuario = $abogado == '' ? '' : "id_usuario = {$usuario->fields['id_usuario']}, ";
+					$query_asunto = (($asunto_data == '' || $col_asunto == 23) && $codigo_asunto_escondido == '') ? '' : "codigo_asunto = '{$codigo_asunto}', ";
+					$query_solicitante = $col_solicitante != 23 ? "solicitante = '" . addslashes($solicitante) . "'," : '';
+					$_descripcion = addslashes($descripcion);
+
+					$query = "UPDATE trabajo SET
+						fecha = '{$fecha}',
+						{$query_usuario}
+						{$query_asunto}
+						id_cobro = {$id_cobro},
+						{$query_solicitante}
+						descripcion = '{$_descripcion}',
+						duracion_cobrada = '{$duracion_cobrable}'
+					WHERE id_trabajo = '{$id_trabajo}'";
+
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 					++$num_modificados;
 				}
@@ -1271,15 +1276,5 @@ class Trabajo extends Objeto
 			}
 		}
 		return array('modificados' => $contadorModificados, 'info' => $info);
-	}
-}
-
-if (!class_exists('ListaTrabajos')) {
-	class ListaTrabajos extends Lista
-	{
-		function ListaTrabajos($sesion, $params, $query)
-		{
-			$this->Lista($sesion, 'Trabajo', $params, $query);
-		}
 	}
 }

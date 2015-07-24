@@ -159,7 +159,7 @@ $pagina->PrintPasos($sesion, 3, '', $id_cobro, $cobro->fields['incluye_gastos'],
 				var response = http.responseText;
 				var update = new Array();
 				if(response.indexOf('OK') == -1) {
-					alert(response);
+					console.log(response);
 				}
 				offLoading();
 			}

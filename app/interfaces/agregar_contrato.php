@@ -2322,8 +2322,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<tr>
 						<td colspan="2" align="center">
 							<fieldset style="width: 97%; background-color: #FFFFFF;">
-								<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'datos_tramites\')" style="cursor:pointer"' : '' ?> />
-									<?php echo!$div_show ? '<span id="datos_tramites_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
+								<legend <?php echo !$div_show ? 'onClick="MuestraOculta(\'datos_tramites\')" style="cursor:pointer"' : '' ?> />
+									<?php echo !$div_show ? '<span id="datos_tramites_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
 									&nbsp;<?php echo __('Trámites') ?>
 								</legend>
 								<div id='datos_tramites' style="display:<?php echo $show ?>;" width="100%">
@@ -2343,6 +2343,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											</td>
 										</tr>
 									</table>
+									<br />
 								</div>
 							</fieldset>
 						</td>
@@ -2368,40 +2369,142 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 										list($ultimo_cobro) = mysql_fetch_array($resp);
 										?>
+
+										<script type="text/javascript">
+											var toggleVisibilityOtherInterval;
+											var to;
+											var updateErrandRate;
+											var listIncludedErrands;
+
+											jQuery('document').ready(function () {
+												toggleVisibilityOther = function (sender, id) {
+													var j_other = jQuery('#' + id);
+													var j_sender = jQuery(sender);
+													if (j_sender.val() == -1) {
+														//j_other.attr('disabled', false);
+														j_sender.attr('disabled', true);
+														j_other.show();
+
+													} else {
+														j_sender.attr('disabled', false);
+														j_other.hide();
+													}
+												};
+											});
+										</script>
+
 										<table width="100%">
 											<tr>
 												<td align="right" width="30%">
 													<?php echo __('Generar ') . __('Cobros') . __(' a partir del') ?>
 												</td>
 												<td align="left">
-													<input type="text" name="periodo_fecha_inicio" value="<?php echo $fecha_ini ?>" id="periodo_fecha_inicio" size="11" maxlength="10" />
-													<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_periodo_fecha_inicio" style="cursor:pointer" />
-													&nbsp;<?php echo $ultimo_cobro ? '<span style="font-size:10px">' . __('Fecha último cobro emitido:') . ' ' . Utiles::sql2date($ultimo_cobro) . '</span>' : '' ?>
+													<input type="text" name="periodo_fecha_inicio" id="periodo_fecha_inicio"
+														size="11" maxlength="10" value="<?php echo $fecha_ini ?>" />
+													<img src="<?php echo Conf::ImgDir() ?>/calendar.gif"
+														id="img_periodo_fecha_inicio" style="cursor:pointer" />
+													&nbsp;
+													<?php if ($ultimo_cobro) { ?>
+														<span style="font-size:10px">
+															<?php echo __('Fecha último cobro emitido:') . ' ' . Utiles::sql2date($ultimo_cobro); ?>
+														</span>
+													<?php } ?>
 												</td>
 											</tr>
 											<tr>
-												<td align="right">
+												<td align="right" style="vertical-align: middle;">
 													<?php echo __('Cobrar cada') ?>
 												</td>
-												<td align="left">
-													<input type="text" name="periodo_intervalo" value="<?php echo empty($contrato->fields['periodo_intervalo']) ? '' : $contrato->fields['periodo_intervalo'] ?>" id="periodo_intervalo" size="3" maxlength="2" />
-													<span style='font-size:10px'><?php echo __('meses') ?></span>
+												<td align="left" style="vertical-align: middle;">
+													<?php
+													$intervalos_disponibles = array(
+														'1' => '1 ' . __('Mes'),
+														'2' => '2 ' . __('Meses'),
+														'3' => '3 ' . __('Meses'),
+														'4' => '4 ' . __('Meses'),
+														'6' => '6 ' . __('Meses'),
+														'12' => '1 ' . __('Año')/*,
+														'-1' => __('Otro')*/
+													);
+
+													$repeticiones_disponibles = array(
+														'0' => __('Indefinidamente'),
+														'1' => __('Por 1 período'),
+														'2' => __('Por 2 períodos'),
+														'3' => __('Por 3 períodos'),
+														'4' => __('Por 4 períodos'),
+														'5' => __('Por 5 períodos')/*,
+														'-1' => __('Otro')*/
+													);
+
+													echo Html::SelectArrayDecente(
+														$intervalos_disponibles,
+														'periodo_intervalo',
+														$contrato->fields['periodo_intervalo'],
+														'onChange="toggleVisibilityOther(this, \'periodic_billing_interval_other\')"'
+													);
+													?>
+													&nbsp;
+													<span id="periodic_billing_interval_other" style="display: none">
+														<input type="text" name="periodo_intervalo2" size="3" maxlength="2"
+															value="<?php echo $contrato->fields['periodo_intervalo']; ?>" />
+														<?php echo __('meses'); ?>
+													</span>
+													<?php __('durante'); ?>
+													&nbsp;
+													<?php
+													echo Html::SelectArrayDecente(
+														$repeticiones_disponibles,
+														'periodo_repeticiones',
+														$contrato->fields['periodo_repeticiones'],
+														'onChange="toggleVisibilityOther(this, \'periodic_billing_repeat_other\')"'
+													);
+													?>
+													<span id="periodic_billing_repeat_other" style="display: none">
+														<input type="text" name="periodo_repeticiones2" size="3" maxlength="2"
+															value="<?php echo $contrato->fields['periodo_repeticiones']; ?>"/>
+														<?php echo __('veces'); ?>
+													</span>
 												</td>
 											</tr>
 											<tr>
-												<td align="right">
-													<?php echo __('Durante') ?>
-												</td>
-												<td align="left">
-													<input  type="text" name=periodo_repeticiones id=periodo_repeticiones size=3 value="<?php echo $contrato->fields['periodo_repeticiones'] ?>" />
-													<span style='font-size:10px'><?php echo __('periodos (0 para perpetuidad)') ?></span>
-												</td>
-											</tr>
-											<tr>
-												<td align="center">
-													<b><?php echo __('Próximos Cobros') ?></b>&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='generarFechas()' style='cursor:pointer' <?php echo TTip(__('Actualizar fechas según período')) ?>>
-												</td>
 												<td>&nbsp;</td>
+												<td>
+													<label>
+														<input type="hidden" name="emitir_liquidacion_al_generar" value="0" />
+														<input type="checkbox" name="emitir_liquidacion_al_generar" value="1"
+															<?php echo $contrato->fields['emitir_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
+														<?php echo __('Emitir esta liquidación al generar'); ?>
+													</label>
+												</td>
+											</tr>
+											<tr>
+												<td>&nbsp;</td>
+												<td>
+													<label>
+														<input type="hidden" name="enviar_liquidacion_al_generar" value="0" />
+														<input type="checkbox" name="enviar_liquidacion_al_generar" value="1"
+															<?php echo $contrato->fields['enviar_liquidacion_al_generar'] == 1 ? 'checked="checked"' : ''; ?>>
+														<?php echo __('Enviar por Email esta liquidación al Cliente'); ?>
+													</label>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2">&nbsp;</td>
+											</tr>
+											<tr>
+												<td colspan="2">
+													<table width="100%">
+														<tr>
+															<td width="15%">&nbsp;</td>
+															<td>
+																<strong><?php echo __('Próximos Cobros') ?></strong>
+																&nbsp;
+																<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='generarFechas()' style='cursor:pointer' <?php echo TTip(__('Actualizar fechas según período')) ?>>
+															</td>
+														</tr>
+													</table>
+												</td>
 											</tr>
 											<tr>
 												<td align="center" colspan="2">
@@ -2466,10 +2569,173 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 													<a href="javascript:void(0)" onclick="detallesTabla();" id="detalles_tabla_esconder" style="display:none;font-size:7pt;text-align:right;">Esconder</a>
 												</td>
 											</tr>
+											<tr>
+												<td colspan="2">&nbsp;</td>
+											</tr>
+											<?php
+												$TramiteTipo = new TramiteTipo($Sesion);
+											?>
+											<script type="text/javascript">
+											var addIncludedErrand;
+											var removeIncludedErrand;
+											var updateErrandRate;
+											var listIncludedErrands;
+
+											jQuery('document').ready(function () {
+												var contract_id = <?php echo $contrato->fields['id_contrato']; ?>;
+												var url_included_errands = root_dir + '/api/index.php/contracts/' + contract_id + '/included_errands';
+
+												addIncludedErrand = function() {
+													var errand_type_id = jQuery('#included_errand_type_id').val();
+
+													jQuery.ajax({
+														url: url_included_errands,
+														type: 'POST',
+														data: {
+															errand_type_id: errand_type_id
+														}
+													}).done(function(data) {
+														jQuery('#included_errand_type_id').val('');
+														jQuery('#included_errand_value').html('');
+														listIncludedErrands();
+													});
+												};
+
+												removeIncludedErrand = function(included_errand_id) {
+													jQuery.ajax({
+														url: url_included_errands,
+														type: 'DELETE',
+														data: {
+															included_errand_id: included_errand_id
+														}
+													}).done(function(data) {
+														listIncludedErrands();
+													});
+												};
+
+												updateErrandRate = function(sender) {
+													var errand_type_id = jQuery(sender).val();
+													var errand_rate_id = jQuery('#id_tramite_tarifa').val();
+													var errand_currency_id = jQuery('#id_moneda_tramite').val();
+													var url = root_dir + '/api/index.php/errand_rates/' + errand_rate_id + '/values';
+
+													jQuery.ajax({
+														url: url,
+														data: {
+															errand_type_id: errand_type_id,
+															errand_currency_id: errand_currency_id
+														}
+													}).done(function(data) {
+														var errand_value = data[0];
+														var value = errand_value.simbolo_moneda + ' ' + errand_value.tarifa;
+														jQuery('#included_errand_value').html(value);
+													});
+												};
+
+												listIncludedErrands = function() {
+													jQuery.ajax({
+														url: url_included_errands
+													}).done(function(included_errands) {
+														var errand = {};
+														var included_errands_html = '';
+														var included_errands_total = 0;
+														var included_errand_currency = '';
+
+														for (i = 0; i < included_errands.length; i++) {
+															errand = included_errands[i];
+
+															included_errands_total += parseFloat(errand.tarifa_tramite);
+
+															errand_template =
+																'<tr>'
+																	+ '<td>' + errand.glosa_tramite + '</td>'
+																	+ '<td align="right">' + errand.simbolo_moneda + ' ' + errand.tarifa_tramite + '</td>'
+																	+ '<td align="center">'
+																	+	'	<img src="<?php echo Conf::ImgDir() ?>/menos.gif" style="cursor:pointer"'
+																	+ ' onclick="removeIncludedErrand(' + errand.id_contrato_tramite + ');" />'
+																	+ '</td>'
+																+ '</tr>';
+
+															included_errands_html += errand_template;
+														}
+
+														included_errand_currency = errand.simbolo_moneda || '';
+														included_errands_total = included_errand_currency + ' ' + included_errands_total.toFixed(2);
+
+														jQuery('#included_errands_list').html(included_errands_html);
+														jQuery('#included_errands_total').html(included_errands_total);
+													});
+												};
+
+												// First list
+												listIncludedErrands();
+											});
+											</script>
+											<tr>
+												<td colspan="2">
+													<table width="100%">
+														<tr>
+															<td width="15%">&nbsp;</td>
+															<td>
+																<strong><?php echo __('Trámites automáticos') ?></strong>
+																<em>
+																	<?php echo __('(estos trámites se incluirán automáticamente en la nueva liquidación generada)'); ?>
+																</em>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2" align="center">
+													<table width="70%" style="border: 1px solid grey;">
+														<thead>
+															<tr bgcolor="#6CA522">
+																<td width="75%">Trámite</td>
+																<td width="20%">Valor</td>
+																<td width="5%">&nbsp;</td>
+															</tr>
+														</thead>
+														<tbody id="included_errands_list">
+														</tbody>
+														<tfoot>
+															<tr>
+																<td>
+																	<?php
+																	echo Html::SelectArrayDecente(
+																		$TramiteTipo->Listar('ORDER BY glosa_tramite'),
+																		'included_errand_type_id',
+																		'',
+																		'onChange="updateErrandRate(this);"',
+																		'Seleccione un trámite',
+																		'320px'
+																	);
+																	?>
+																</td>
+																<td align="right" id="included_errand_value">
+																</td>
+																<td align="center">
+																	<img src="<?php echo Conf::ImgDir() ?>/mas.gif" id="tramite_automatico_mas"
+																		style="cursor:pointer" onclick="addIncludedErrand();" />
+																</td>
+															</tr>
+															<tr>
+																<td align="right"><strong>Total</strong></td>
+																<td align="right"><strong id="included_errands_total"></strong></td>
+																<td>&nbsp;</td>
+															</tr>
+														</tfoot>
+													</table>
+												</td>
+											</tr>
 										</table>
 									<?php
 									} else {
-										echo $Html->alert('El contrato debe tener asuntos asociados para generar ' . __('Cobros Programados'), '', array('class' => 'alert-thin'));
+										echo $Html->alert(
+											'El contrato debe tener asuntos asociados para generar ' . __('Cobros Programados'),
+											'',
+											array('class' => 'alert-thin')
+										);
 									}
 									?>
 								</div>
@@ -2801,7 +3067,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<br/>
 		<!-- ASOCIAR DOC LEGALES -->
 
-		<!-- Modulo de -->
+		<!-- Modulo de  producción-->
 		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
@@ -2845,7 +3111,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					}
 
 					var loadGenerators = function() {
-						$.ajax({url: generator_url})
+						$.ajax({ url: generator_url })
 							.done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
@@ -2854,16 +3120,18 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
-					$.each(data, function(i, generator){
-						generator_row = $('<tr>');
+
+								$.each(data, function(i, generator) {
+									generator_row = $('<tr>');
 									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
 									generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
-									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">%' + generator.porcentaje_genera + '</td>');
+									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">' + generator.porcentaje_genera + '%</td>');
 									generator_row.append(actionButtons(generator.id_contrato_generador));
-						rows.append(generator_row)
-					});
-					$('#user_generators_result').html(rows)
-					});
+									rows.append(generator_row);
+								});
+
+								$('#user_generators_result').html(rows);
+							});
 					};
 
 					$(document).on('click', '.edit_generator', function() {
@@ -3027,7 +3295,7 @@ echo $Form->script();
 		?>
 	}
 
-	if (jQuery('#periodo_fecha_inicio').val()) {
+	if (jQuery('#periodo_fecha_inicio').length != 0) {
 		Calendar.setup({
 			inputField	: "periodo_fecha_inicio",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
@@ -3035,11 +3303,13 @@ echo $Form->script();
 		});
 	}
 
-	Calendar.setup({
-		inputField	: "fecha_inicio_cap",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_inicio_cap"		// ID of the button
-	});
+	if (jQuery('#fecha_inicio_cap').length != 0) {
+		Calendar.setup({
+			inputField	: "fecha_inicio_cap",				// ID of the input field
+			ifFormat		: "%d-%m-%Y",			// the date format
+			button			: "img_fecha_inicio_cap"		// ID of the button
+		});
+	}
 
 	$$('[id^="hito_fecha_"]').each(function(elem){
 		Calendar.setup({

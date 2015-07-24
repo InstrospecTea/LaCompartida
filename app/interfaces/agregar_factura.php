@@ -131,7 +131,7 @@ if ($opcion == "guardar") {
 	if ($guardar_datos) {
 
 		//chequear
-		$mensaje_accion = 'guardar';
+		$mensaje_accion = 'guardado';
 		$factura->Edit('subtotal', $monto_neto);
 		$factura->Edit('porcentaje_impuesto', $porcentaje_impuesto);
 
@@ -237,7 +237,11 @@ if ($opcion == "guardar") {
 			$numero_documento_legal = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 
 			if (!$desde_webservice) {
-				$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
+				$mensaje_validacion_documento_tributario = "El numero {$numero} del " . __('documento tributario') . ' ya fue usado';
+				$mensaje_validacion_documento_tributario .= empty($factura->fields['id_factura']) ? '.' : ', pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar';
+
+				$pagina->AddError($mensaje_validacion_documento_tributario);
+
 				$factura->Edit('numero', $numero_documento_legal);
 			} else {
 				$resultado = array('error' => 'El número ' . $numero . ' del ' . __('documento tributario') . ' ya fue usado, vuelva a intentar con número: ' . $numero_documento_legal);
@@ -253,7 +257,6 @@ if ($opcion == "guardar") {
 					$factura->Load($id_factura);
 				}
 			}
-
 
 			if ($factura->Escribir()) {
 				if ($generar_nuevo_numero) {
@@ -566,7 +569,7 @@ $Form->defaultLabel = false;
 						?>
 						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>
-					<input type="text" <? echo $disableInvoiceNumber; ?> name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
+					<input type="text" <?php echo $disableInvoiceNumber; ?> name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento; ?>" id="numero" size="11" maxlength="10" />
 				</td>
 				<td align="right" colspan="2"><?php echo __('Estado'); ?>
 				<?php
@@ -574,7 +577,7 @@ $Form->defaultLabel = false;
 				?>
 				<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)" ' . $deshabilita_estado, '', "160"); ?>
 				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
-				<?php 
+				<?php
 						if (!empty($factura->fields['fecha_anulacion'])) {
 							$fecha_anula = Utiles::sql3fecha($factura->fields['fecha_anulacion'], '%d-%m-%Y'); ?>
 							<span style="background-color:yellow"><?php echo "el {$fecha_anula}"?></span>
@@ -691,6 +694,12 @@ $Form->defaultLabel = false;
 			<td align="right"><?php echo __('Giro'); ?></td>
 			<td align="left" colspan="3">
 				<input type="text" name="giro_cliente" value="<?php echo $factura->loaded() ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']; ?>" id="giro_cliente" size="70" maxlength="255" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right" colspan="1"><?php echo __('País'); ?></td>
+			<td align="left" colspan="3">
+				<?php echo Html::SelectQuery($sesion, PrmPais::SearchQuery(), 'dte_id_pais', $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160); ?>
 			</td>
 		</tr>
 		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_metodo_pago') : false; ?>

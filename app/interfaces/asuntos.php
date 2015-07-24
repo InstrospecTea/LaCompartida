@@ -12,11 +12,11 @@ $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
  * Configuraciones utilizadas en la interfaz
  */
 
-# Descripción = Habilita autocompletador de asuntos.
+// Descripción = Habilita autocompletador de asuntos.
 $selectclienteasuntoespecial = Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial') == '1' ? true : false;
 
-# Descripcion = El ambiente del cliente utiliza un codigo personalizado para...
-# manejo de codígos de cliente y asunto en interfaces.
+// Descripcion = El ambiente del cliente utiliza un codigo personalizado para...
+// manejo de codígos de cliente y asunto en interfaces.
 $usocodigosecundario = Conf::GetConf($Sesion, 'CodigoSecundario') == '1' ? true : false;
 
 $Html = new \TTB\Html;

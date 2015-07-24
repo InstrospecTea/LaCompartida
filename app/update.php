@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 /*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
 
 /* IMPORTANTE:
-  Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
+	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
 
 function ExisteCampo($campo, $tabla, $dbh) {
 
@@ -10435,41 +10435,41 @@ QUERY;
 		case 7.79:
 			$queries = array();
 			$queries[] = "CREATE TABLE IF NOT EXISTS `tramite_historial` (
-			  `id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
-			  `id_tramite` int(11) NOT NULL,
-			  `id_usuario` int(11) NOT NULL,
-			  `fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			  `fecha` datetime DEFAULT NULL,
-			  `fecha_modificado` datetime DEFAULT NULL,
-			  `descripcion` mediumtext,
-			  `descripcion_modificado` mediumtext,
-			  `codigo_asunto` varchar(20) DEFAULT NULL,
-			  `codigo_asunto_modificado` varchar(20) DEFAULT NULL,
-			  `codigo_actividad` varchar(5) DEFAULT NULL,
-			  `codigo_actividad_modificado` varchar(5) DEFAULT NULL,
-			  `codigo_tarea` varchar(100) DEFAULT NULL,
-			  `codigo_tarea_modificado` varchar(100) DEFAULT NULL,
-			  `id_tramite_tipo` int(11) DEFAULT NULL,
-			  `id_tramite_tipo_modificado` int(11) DEFAULT NULL,
-			  `solicitante` varchar(255) DEFAULT NULL,
-			  `solicitante_modificado` varchar(255) DEFAULT NULL,
-			  `id_moneda_tramite` int(11) DEFAULT NULL,
-			  `id_moneda_tramite_modificado` int(11) DEFAULT NULL,
-			  `tarifa_tramite` double DEFAULT NULL,
-			  `tarifa_tramite_modificado` double DEFAULT NULL,
-			  `id_moneda_tramite_individual` int(11) DEFAULT NULL,
-			  `id_moneda_tramite_individual_modificado` int(11) DEFAULT NULL,
-			  `tarifa_tramite_individual` double DEFAULT NULL,
-			  `tarifa_tramite_individual_modificado` double DEFAULT NULL,
-			  `cobrable` tinyint(4) DEFAULT NULL,
-			  `cobrable_modificado` tinyint(4) DEFAULT NULL,
-			  `trabajo_si_no` int(1) DEFAULT NULL,
-			  `trabajo_si_no_modificado` int(1) DEFAULT NULL,
-			  `duracion` time DEFAULT '00:00:00',
-			  `duracion_modificado` time DEFAULT '00:00:00',
-			  `accion` varchar(9) NOT NULL DEFAULT '',
-			  `app_id` int(3) NOT NULL DEFAULT '1',
-			  PRIMARY KEY (`id_tramite_historial`)
+				`id_tramite_historial` int(11) NOT NULL AUTO_INCREMENT,
+				`id_tramite` int(11) NOT NULL,
+				`id_usuario` int(11) NOT NULL,
+				`fecha_accion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				`fecha` datetime DEFAULT NULL,
+				`fecha_modificado` datetime DEFAULT NULL,
+				`descripcion` mediumtext,
+				`descripcion_modificado` mediumtext,
+				`codigo_asunto` varchar(20) DEFAULT NULL,
+				`codigo_asunto_modificado` varchar(20) DEFAULT NULL,
+				`codigo_actividad` varchar(5) DEFAULT NULL,
+				`codigo_actividad_modificado` varchar(5) DEFAULT NULL,
+				`codigo_tarea` varchar(100) DEFAULT NULL,
+				`codigo_tarea_modificado` varchar(100) DEFAULT NULL,
+				`id_tramite_tipo` int(11) DEFAULT NULL,
+				`id_tramite_tipo_modificado` int(11) DEFAULT NULL,
+				`solicitante` varchar(255) DEFAULT NULL,
+				`solicitante_modificado` varchar(255) DEFAULT NULL,
+				`id_moneda_tramite` int(11) DEFAULT NULL,
+				`id_moneda_tramite_modificado` int(11) DEFAULT NULL,
+				`tarifa_tramite` double DEFAULT NULL,
+				`tarifa_tramite_modificado` double DEFAULT NULL,
+				`id_moneda_tramite_individual` int(11) DEFAULT NULL,
+				`id_moneda_tramite_individual_modificado` int(11) DEFAULT NULL,
+				`tarifa_tramite_individual` double DEFAULT NULL,
+				`tarifa_tramite_individual_modificado` double DEFAULT NULL,
+				`cobrable` tinyint(4) DEFAULT NULL,
+				`cobrable_modificado` tinyint(4) DEFAULT NULL,
+				`trabajo_si_no` int(1) DEFAULT NULL,
+				`trabajo_si_no_modificado` int(1) DEFAULT NULL,
+				`duracion` time DEFAULT '00:00:00',
+				`duracion_modificado` time DEFAULT '00:00:00',
+				`accion` varchar(9) NOT NULL DEFAULT '',
+				`app_id` int(3) NOT NULL DEFAULT '1',
+				PRIMARY KEY (`id_tramite_historial`)
 			);";
 
 			ejecutar($queries, $dbh);
@@ -10477,38 +10477,38 @@ QUERY;
 		case 7.80:
 			$queries = array();
 			$queries[] = "CREATE TABLE IF NOT EXISTS `cobro_movimiento` (
-			  `id_cobro_movimiento` int(11) NOT NULL AUTO_INCREMENT,
-			  `id_cobro` int(11) DEFAULT NULL,
-			  `id_usuario` int(11) DEFAULT NULL,
-			  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			  `accion` varchar(9) DEFAULT '',
-			  `app_id` int(3) DEFAULT NULL,
-			  `estado` varchar(20) DEFAULT NULL,
-			  `estado_modificado` varchar(20) DEFAULT NULL,
-			  `codigo_cliente` varchar(10) DEFAULT '',
-			  `codigo_cliente_modificado` varchar(10) DEFAULT '',
-			  `id_contrato` int(11) DEFAULT NULL,
-			  `fecha_cobro` datetime DEFAULT NULL,
-			  `fecha_cobro_modificado` datetime DEFAULT NULL,
-			  `id_contrato_modificado` int(11) DEFAULT NULL,
-			  `id_moneda` int(11) DEFAULT NULL,
-			  `id_moneda_modificado` int(11) DEFAULT NULL,
-			  `tipo_cambio_moneda` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
-			  `tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
-			  `fecha_creacion` datetime DEFAULT NULL,
-			  `fecha_en_revision` datetime DEFAULT NULL,
-			  `fecha_emision` datetime DEFAULT NULL,
-			  `fecha_facturacion` datetime DEFAULT NULL,
-			  `fecha_enviado_cliente` datetime DEFAULT NULL,
-			  `fecha_pago_parcial` datetime DEFAULT NULL,
-			  `fecha_creacion_modificado` datetime DEFAULT NULL,
-			  `fecha_en_revision_modificado` datetime DEFAULT NULL,
-			  `fecha_emision_modificado` datetime DEFAULT NULL,
-			  `fecha_facturacion_modificado` datetime DEFAULT NULL,
-			  `fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
-			  `fecha_pago_parcial_modificado` datetime DEFAULT NULL,
-			  PRIMARY KEY (`id_cobro_movimiento`),
-			  INDEX(`id_cobro`)
+				`id_cobro_movimiento` int(11) NOT NULL AUTO_INCREMENT,
+				`id_cobro` int(11) DEFAULT NULL,
+				`id_usuario` int(11) DEFAULT NULL,
+				`fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				`accion` varchar(9) DEFAULT '',
+				`app_id` int(3) DEFAULT NULL,
+				`estado` varchar(20) DEFAULT NULL,
+				`estado_modificado` varchar(20) DEFAULT NULL,
+				`codigo_cliente` varchar(10) DEFAULT '',
+				`codigo_cliente_modificado` varchar(10) DEFAULT '',
+				`id_contrato` int(11) DEFAULT NULL,
+				`fecha_cobro` datetime DEFAULT NULL,
+				`fecha_cobro_modificado` datetime DEFAULT NULL,
+				`id_contrato_modificado` int(11) DEFAULT NULL,
+				`id_moneda` int(11) DEFAULT NULL,
+				`id_moneda_modificado` int(11) DEFAULT NULL,
+				`tipo_cambio_moneda` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+				`tipo_cambio_moneda_modificado` double DEFAULT NULL COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro',
+				`fecha_creacion` datetime DEFAULT NULL,
+				`fecha_en_revision` datetime DEFAULT NULL,
+				`fecha_emision` datetime DEFAULT NULL,
+				`fecha_facturacion` datetime DEFAULT NULL,
+				`fecha_enviado_cliente` datetime DEFAULT NULL,
+				`fecha_pago_parcial` datetime DEFAULT NULL,
+				`fecha_creacion_modificado` datetime DEFAULT NULL,
+				`fecha_en_revision_modificado` datetime DEFAULT NULL,
+				`fecha_emision_modificado` datetime DEFAULT NULL,
+				`fecha_facturacion_modificado` datetime DEFAULT NULL,
+				`fecha_enviado_cliente_modificado` datetime DEFAULT NULL,
+				`fecha_pago_parcial_modificado` datetime DEFAULT NULL,
+				PRIMARY KEY (`id_cobro_movimiento`),
+				INDEX(`id_cobro`)
 			);";
 			if (!ExisteCampo('fecha_ini', 'cobro_movimiento', $dbh)) {
 				$queries[] = "ALTER TABLE `cobro_movimiento`
@@ -10620,7 +10620,7 @@ QUERY;
 							KEY `id_usuario_ndx` (`id_usuario`),
 							KEY `bloqueado_ndx` (`bloqueado`),
 							KEY `notificado_ndx` (`notificado`)
-						  ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 			break;
 
 		case 7.92:
@@ -10787,16 +10787,17 @@ QUERY;
 							     ON tf.id_tarifa = ta.id_tarifa
 								  AND ta.tarifa_defecto = 1
 							   SET ttff.valor_estandar =  tf.tarifa;";
-
 			break;
 
 		case 8.02:
-			if (!ExisteCampo('factura', 'glosa', $dbh)) {
+			if (!ExisteCampo('glosa', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `glosa` VARCHAR(255) NULL AFTER `descripcion`;";
 			}
-			if (!ExisteCampo('factura', 'id_usuario_responsable', $dbh)) {
+
+			if (!ExisteCampo('id_usuario_responsable', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura` ADD COLUMN `id_usuario_responsable` INT(11) DEFAULT NULL AFTER `id_documento_legal_motivo`;";
 			}
+
 			if (!ExisteLlaveForanea('factura_usuario_responsable_fk', 'id_usuario_responsable', 'usuario', 'id_usuario', $dbh)) {
 				$query[] = "ALTER TABLE `factura` ADD CONSTRAINT `factura_usuario_responsable`
 										FOREIGN KEY (`id_usuario_responsable_fk`)
@@ -10815,6 +10816,30 @@ QUERY;
 			$queries = array();
 			$queries[] = "UPDATE configuracion SET glosa_opcion = 'CodigoClienteAsuntoModificable' WHERE glosa_opcion = 'CodigoObligatorio';";
 			break;
+
+		case 8.05:
+			$queries = array("UPDATE menu SET url = '/app/interfaces/agregar_tarifa.php' WHERE codigo = 'TARIFA'");
+			break;
+
+		case 8.06:
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `contrato_tramite` (
+				`id_contrato_tramite` int(11) unsigned NOT NULL AUTO_INCREMENT,
+				`id_contrato` int(11) NOT NULL,
+				`id_tramite_tipo` int(11) NOT NULL,
+				`fecha_creacion` datetime NOT NULL,
+				PRIMARY KEY (`id_contrato_tramite`),
+				KEY `id_contrato` (`id_contrato`),
+				KEY `id_tipo_tramite` (`id_tramite_tipo`),
+				CONSTRAINT `contrato_tramite_fk_contrato` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON DELETE CASCADE ON UPDATE CASCADE,
+				CONSTRAINT `contrato_tramite_fk_tramite_tipo` FOREIGN KEY (`id_tramite_tipo`) REFERENCES `tramite_tipo` (`id_tramite_tipo`) ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "ALTER TABLE `contrato`
+				ADD `emitir_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Emitir la liquidación al generar',
+				ADD `enviar_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Enviar la liquidación generada al cliente'";
+
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10823,11 +10848,11 @@ QUERY;
 }
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
-  (No olvidar agregar la notificacion de los cambios) */
+	(No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.04;
+$max_update = 8.06;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

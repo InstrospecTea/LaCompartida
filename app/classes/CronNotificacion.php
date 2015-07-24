@@ -1031,6 +1031,7 @@ class CronNotificacion extends Cron {
 			}
 			unset($maxolapquery);
 
+			ReporteContrato::QueriesPrevias($this->Sesion);
 			$ReporteContrato->InsertQuery($maxolaptime);
 
 			// Si la ultima actualización fue hace más de dos dias, voy a forzar la inserción de los trabajos que me falten.
