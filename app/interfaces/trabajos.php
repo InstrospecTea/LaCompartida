@@ -89,7 +89,7 @@ if ($cobro) {
 	}
 }
 
-// Calculado aquÃ­ para que la variable $select_usuario estÃ© disponible al generar la tabla de trabajos.
+// Calculado aquí para que la variable $select_usuario esté disponible al generar la tabla de trabajos.
 if ($p_revisor) {
 	$where_usuario = '';
 } else {
@@ -997,7 +997,7 @@ function funcionTR(& $trabajo) {
 	$duracion = $trabajo->fields['duracion'];
 	//echo $duracion;
 	if (!$p_revisor) {
-		list($duracion_trabajada, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
+		list($duracion_trabajada, $duracion_cobrada) = explode('<br>', $trabajo->fields['duracion']);
 		$duracion = $duracion_trabajada;
 		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 			$duracion = UtilesApp::Time2Decimal($duracion_trabajada);
