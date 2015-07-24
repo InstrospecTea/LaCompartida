@@ -1,7 +1,7 @@
 # Changelog
 
 Friday 2015, July 24th.
-* **Feature:** [Doblecero en factura PDF](https://github.com/LemontechSA/ttb/pull/1056)
+* **Fix:** [Doblecero en factura PDF](https://github.com/LemontechSA/ttb/pull/1056)
 
 ## [Release 15.14.0](https://github.com/LemontechSA/ttb/pull/1055)
 Thursday 2015, July 23th.

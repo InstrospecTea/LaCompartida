@@ -146,7 +146,7 @@ class FacturaPdfDatos extends Objeto {
 		$invoice = $billingBusiness->getInvoice($factura->fields['id_factura']);
 		$detail = $billingBusiness->getFeesDataOfInvoiceByCharge($invoice, $charge, $currency);
 		$discount = $detail->get('descuento_honorarios');
-		
+
 		$datos = array(
 			'glosa_cliente' => $Cliente->fields['glosa_cliente'],
 			'glosa_asuntos' => implode(', ', $cobro->glosa_asuntos),
