@@ -51,12 +51,12 @@ class MontoEnPalabra extends Objeto {
 			$s = $this->SubValLetra(intval($Ent));
 		}
 
-		if (substr($s,-9, 9) == 'Millones ' || substr($s,-7, 7) == 'Millón ') {
+		if (substr($s,-9, 9) == 'Millones ' || substr($s,-7, 7) == 'Millï¿½n ') {
 			$s = $s . "de ";
 		}
 
 		if ($considera_ceros) {
-			$s = $s . ' con ' . (empty($Frc)? '0' : $Frc) . '/100 ';
+			$s = $s . ' con ' . (empty($Frc)? '00' : $Frc) . '/100 ';
 		} else {
 			if ($Frc != $this->Void) {
 				$s = $s . ' con ' . $Frc . '/100 ';
@@ -139,7 +139,7 @@ class MontoEnPalabra extends Objeto {
 		$Rtn = str_replace('Veinte Tres', 'Veintitres', $Rtn);
 		$Rtn = str_replace('Veinte Cuatro', 'Veinticuatro', $Rtn);
 		$Rtn = str_replace('Veinte Cinco', 'Veinticinco', $Rtn);
-		$Rtn = str_replace('Veinte Seis', 'Veintiseís', $Rtn);
+		$Rtn = str_replace('Veinte Seis', 'Veintiseï¿½s', $Rtn);
 		$Rtn = str_replace('Veinte Siete', 'Veintisiete', $Rtn);
 		$Rtn = str_replace('Veinte Ocho', 'Veintiocho', $Rtn);
 		$Rtn = str_replace('Veinte Nueve', 'Veintinueve', $Rtn);
@@ -201,7 +201,7 @@ class MontoEnPalabra extends Objeto {
 				Case 800: $t = 'Ochocientos'; break;
 				Case 900: $t = 'Novecientos'; break;
 				Case 1000: $t = 'Mil'; break;
-				Case 1000000: $t = 'Millón'; break;
+				Case 1000000: $t = 'Millï¿½n'; break;
 			}
 
 			if ($t == $this->Void) {
