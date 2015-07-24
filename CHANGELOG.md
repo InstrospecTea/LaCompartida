@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 15.14.0](https://github.com/LemontechSA/ttb/pull/1055)
+Thursday 2015, July 23th.
+* [Reporte Avanzado corrección trámites](https://github.com/LemontechSA/ttb/pull/1048)
+* [Panama](https://github.com/LemontechSA/ttb/pull/927)
+
 ## Hotfix 15.13.1
 Wednesday 2015, July 22th.
 * **Feature:** [Agregar monto al contrato en integración con moreno baldivieso](https://github.com/LemontechSA/ttb/pull/1053)
