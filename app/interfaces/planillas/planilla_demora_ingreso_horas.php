@@ -194,6 +194,7 @@
 	}
 	$pagina->titulo = __('Demora ingreso de horas');
 	$pagina->PrintTop();
+	$Form = new Form($sesion);
 ?>
 
 
@@ -216,17 +217,8 @@
 			</td>
 		</tr>
 		<tr>
-			<td align=center colspan="2">
-				<?=Html::SelectQuery($sesion,	"SELECT
-													usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-												FROM
-													usuario JOIN usuario_permiso USING(id_usuario)
-												WHERE
-													codigo_permiso='PRO'
-												AND
-													usuario.activo = 1
-												ORDER BY
-													apellido1", "usuarios[]", $usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+			<td align=center colspan="2"><!-- Nuevo Select -->
+			<?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'multiple' => 'multiple','size' => '6')); ?>
 			</td>
 		</tr>
 		<tr>

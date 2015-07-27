@@ -1277,4 +1277,157 @@ class Trabajo extends Objeto
 		}
 		return array('modificados' => $contadorModificados, 'info' => $info);
 	}
+
+	public function get_usuarios_editar_trabajo($id_usuario, $permiso_revisor) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
+		 		->add_grouping('U.id_usuario')
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$clauses = array();
+		$clauses[] = CriteriaRestriction::equals('U.visible', 1);
+		$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+
+		$criteria->add_restriction(
+			CriteriaRestriction::or_clause($clauses)
+		);
+
+		$clauses = array();
+
+		if (! $permiso_revisor) {
+			$revisor = new Criteria($this->sesion);
+			$revisor->add_select('id_revisado')
+					->add_from('usuario_revisor')
+					->add_restriction(CriteriaRestriction::equals('id_revisor', $this->sesion->usuario->fields['id_usuario']));
+			$result = $revisor->run();
+
+			$rows = array();
+			foreach ($result as $revisado) {
+				$rows[] = $revisado['id_revisado'];
+			}
+
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+
+			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	public function get_usuarios_trabajo($id_usuario, $permitido) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
+				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
+		 		->add_grouping('U.id_usuario')
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$clauses = array();
+
+		if ($permitido) {
+			$clauses[] = CriteriaRestriction::equals('U.visible', 1);
+			$clauses[] = CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'");
+			$criteria->add_restriction(
+				CriteriaRestriction::and_clause($clauses)
+			);
+		} else {
+			$clauses[] = CriteriaRestriction::equals('US.id_secretario', $sesion->usuario->fields['id_usuario']);
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+			$criteria->add_restriction(
+				CriteriaRestriction::or_clause($clauses)
+			);
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	public function get_usuarios_trabajos($revisor) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$clauses = array();
+
+		if (! $revisor) {
+			$revisor = new Criteria($this->sesion);
+			$revisor->add_select('id_revisado')
+					->add_from('usuario_revisor')
+					->add_restriction(CriteriaRestriction::equals('id_revisor', $this->sesion->usuario->fields['id_usuario']));
+			$result = $revisor->run();
+
+			$rows = array();
+			foreach ($result as $revisado) {
+				$rows[] = $revisado['id_revisado'];
+			}
+
+			$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+
+			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+}
+
+if (!class_exists('ListaTrabajos')) {
+	class ListaTrabajos extends Lista
+	{
+		function ListaTrabajos($sesion, $params, $query)
+		{
+			$this->Lista($sesion, 'Trabajo', $params, $query);
+		}
+	}
 }

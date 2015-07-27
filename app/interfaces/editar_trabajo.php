@@ -733,29 +733,6 @@ $duracion_cobrada = '';
 
 							echo '</td>';
 
-							if ($permiso_revisor) {
-								$where = " usuario_permiso.codigo_permiso='PRO' AND ( ";
-							} else {
-								$where = " usuario_permiso.codigo_permiso='PRO'
-									AND ( usuario_secretario.id_secretario = '{$sesion->usuario->fields['id_usuario']}'
-				  OR usuario.id_usuario IN ('$id_usuario','{$sesion->usuario->fields['id_usuario']}')
-				  OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) ) AND ( ";
-							}
-							$where .= " usuario.visible=1 OR usuario.id_usuario = '$id_usuario' ) ";
-
-							$query = "
-									SELECT SQL_CALC_FOUND_ROWS usuario.id_usuario,
-									CONCAT_WS(' ', apellido1, apellido2,',',nombre)
-									as nombre
-								FROM usuario
-								JOIN usuario_permiso USING(id_usuario)
-								LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
-								WHERE $where GROUP BY id_usuario ORDER BY nombre";
-
-							$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-							list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();", $sesion->dbh));
-							$select_usuario = Html::SelectResultado($sesion, $resp, "id_usuario", $id_usuario, 'onchange="CargarTarifa();"', '', 200);
-
 							if ($permiso_revisor || Conf::GetConf($sesion, 'AbogadoVeDuracionCobrable') || $permiso_revisor_usuario) {
 
 								echo '<td class="seccioncobrable">&nbsp;&nbsp;' . __('Duración Cobrable') . '</td><td  class="seccioncobrable">';
@@ -832,11 +809,13 @@ $duracion_cobrada = '';
 				<?php } ?>
 				</div>
 				&nbsp;&nbsp;&nbsp;&nbsp;
+				<!-- Nuevo Select -->
 				<?php
-				// Depende de que no cambie la función Html::SelectQuery(...)
-				if ($cantidad_usuarios > 1 || $permiso_secretaria) {
+				$usuarios = $t->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor);
+
+				if (sizeof($usuarios) > 1 || $permiso_secretaria) {
 					echo __('Usuario');
-					echo $select_usuario;
+					echo $Form->select('id_usuario', $usuarios, $id_usuario, array('empty' => FALSE, 'style' => 'width: 200px', 'onchange' => 'CargarTarifa()'));
 				} else {
 					echo $Form->input('id_usuario', $sesion->usuario->fields['id_usuario'], array('id' => 'id_usuario', 'type' => 'hidden', 'label' => false));
 				}

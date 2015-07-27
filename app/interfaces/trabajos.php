@@ -89,14 +89,11 @@ if ($cobro) {
 	}
 }
 
-// Calculado aquí para que la variable $select_usuario esté disponible al generar la tabla de trabajos.
-if ($p_revisor) {
-	$where_usuario = '';
-} else {
-	$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ")";
-}
 
-$select_usuario = Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' " . $where_usuario . " ORDER BY nombre ASC", "id_usuario", $id_usuario, '', 'Todos', '200');
+// Calculado aquÃ­ para que la variable $select_usuario estÃ© disponible al generar la tabla de trabajos.
+$t = new Trabajo($sesion);
+
+$select_usuario = $Form->select('id_usuario', $t->get_usuarios_trabajos($p_revisor), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
 
 if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$where = base64_decode($where);
@@ -610,8 +607,8 @@ $pagina->PrintTop($popup);
 					<td class="buscadorlabel">
 						<?php echo __('Encargado Comercial') ?>
 					</td>
-					<td align='left' colspan="2">
-						<?php echo Html::SelectArrayDecente($sesion->usuario->ListarActivos('', 'SOC'), 'id_encargado_comercial', $id_encargado_comercial, '', 'Ninguno', '100px'); ?>
+					<td align='left' colspan="2"><!-- Nuevo Select -->
+						<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => 'Ninguno', 'style' => 'width: 100px')); ?>
 					</td>
 				</tr>
 
@@ -640,7 +637,7 @@ $pagina->PrintTop($popup);
 					<td class="buscadorlabel">
 						<?php echo __('Responsable Asunto'); ?>
 					</td>
-					<td align="left" colspan="2">
+					<td align="left" colspan="2"><!-- Nuevo Select -->
 						<?php echo $Form->select('id_encargado_asunto', $sesion->usuario->ListarActivos('', true), $id_encargado_asunto, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 					</td>
 				</tr>
@@ -660,7 +657,7 @@ $pagina->PrintTop($popup);
 					<td class="buscadorlabel">
 						<?php echo __('Usuario') ?>
 					</td>
-					<td align='left' colspan="2">
+					<td align='left' colspan="2"><!-- Nuevo Select -->
 						<?php echo $select_usuario ?>
 					</td>
 				</tr>

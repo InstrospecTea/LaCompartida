@@ -731,8 +731,8 @@ $Form = new Form;
 				<td align="right">
 					<?php echo __('Ordenado por'); ?>
 				</td>
-				<td align=left>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio", '170'); ?>
+				<td align=left><!-- Nuevo Select -->
+					<?php echo $Form->select('id_usuario_orden', $gasto->get_usuarios(2), $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -740,8 +740,8 @@ $Form = new Form;
 			<td align="right">
 				<?php echo __('Ingresado por'); ?>
 			</td>
-			<td align=left>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE visible = '1' ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio", '170'); ?>
+			<td align=left><!-- Nuevo Select -->
+				<?php echo $Form->select('id_usuario', $gasto->get_usuarios(2), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 			</td>
 		</tr>
 	</table>

@@ -5,6 +5,56 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
+$Form = new Form($sesion);
+
+function get_usuarios($id_area_usuario, $permisos, $permiso_cobranza, $sesion) {
+	$criteria = new Criteria($sesion);
+	$criteria->add_select('U.id_usuario')
+			->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+			->add_from('usuario U')
+			->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+			->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
+			->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+			->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+	 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+	if (! empty($id_area_usuario)) {
+		$criteria->add_restriction(CriteriaRestriction::equals('U.id_area_usuario', mysql_real_escape_string($id_area_usuario)));
+	}
+
+	if (! $permisos->fields['permitido'] || ! $permiso_cobranza->fields['permitido']) {
+		$clauses = array();
+
+		$revisor = new Criteria($sesion);
+		$revisor->add_select('id_revisado')
+				->add_from('usuario_revisor')
+				->add_restriction(CriteriaRestriction::equals('id_revisor', $sesion->usuario->fields['id_usuario']));
+		$result = $revisor->run();
+
+		$rows = array();
+		foreach ($result as $revisado) {
+			$rows[] = $revisado['id_revisado'];
+		}
+
+		$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+
+		$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+	}
+
+	try {
+		$result = $criteria->run();
+		$rows = array();
+
+		foreach ($result as $key => $value) {
+			$rows[$value['id_usuario']] = $value['nombre'];
+		}
+
+		return $rows;
+
+	} catch (Exception $e) {
+		echo "Error: {$e} {$criteria->__toString()}";
+	}
+}
 
 // Revisamos si el usuario tiene categoría de revisor.
 $params_array['codigo_permiso'] = 'REV';
@@ -12,21 +62,6 @@ $permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 // Revisamos si el usuario es de cobranza.
 $params_array['codigo_permiso'] = 'COB';
 $permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
-if ($permisos->fields['permitido'] || $permiso_cobranza->fields['permitido']) {// Si el usuario tiene categorÃ­a de revisor o es de cobranza puede ver a todos
-	$where = '';
-} else { // En otro caso solo puede ver a los que tenga asignados para revisar.
-	$where = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields[id_usuario]}) OR usuario.id_usuario={$sesion->usuario->fields[id_usuario]}) ";
-}
-if (!empty($id_area_usuario)) {
-	$esc_id_area_usuario = mysql_real_escape_string($id_area_usuario);
-	$where .= "AND id_area_usuario = '{$esc_id_area_usuario}'";
-}
-$query_usuarios = "SELECT
-						usuario.id_usuario,
-						CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre
-					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE usuario.visible = 1
-						AND usuario_permiso.codigo_permiso='PRO' {$where} ORDER BY nombre ASC";
 
 /* Eliminando trabajo */
 if ($opcion == 'eliminar') { #ELIMINAR TRABAJO
@@ -39,12 +74,7 @@ if ($opcion == 'eliminar') { #ELIMINAR TRABAJO
 		unset($t);
 	}
 } elseif ($opcion == 'filtro_usuarios') {
-	$resp = mysql_query($query_usuarios, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	$lista_usuarios = array();
-	while ($tmp_usuario = mysql_fetch_assoc($resp)) {
-		$lista_usuarios[$tmp_usuario['id_usuario']] = $tmp_usuario['nombre'];
-	}
-	die(json_encode(UtilesApp::utf8izar($lista_usuarios)));
+	die(json_encode(UtilesApp::utf8izar(get_usuarios($id_area_usuario, $permisos, $permiso_cobranza, $sesion))));
 }
 
 $pagina->titulo = __('Resumen semana');
@@ -78,8 +108,8 @@ $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 					</tr>
 					<tr>
 						<td align="right"><?php echo __('Usuario') ?>: </td>
-						<td align="left">
-							<?php echo(Html::SelectQuery($sesion, $query_usuarios, 'usuarios[]', $usuarios, ' multiple="multiple" size="10"', '', '300')); ?>
+						<td align="left"><!-- Nuevo Select -->
+							<?php echo $Form->select('usuarios[]', get_usuarios($id_area_usuario, $permisos, $permiso_cobranza, $sesion), $usuarios, array('empty' => FALSE, 'style' => 'width: 300px', 'multiple' => 'multiple', 'size' => '10')); ?>
 						</td>
 					</tr>
 					<tr>

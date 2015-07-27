@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $sesion = new sesion(array('REP'));
-$Form = new Form();
+$Form = new Form($sesion);
 
 $query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
@@ -78,7 +78,10 @@ $Pagina->PrintTop();
 								<?php echo __('Encargado Comercial') ?>
 							</td>
 							<td align='left' colspan="2">
+								<!-- Debieran ocutultarse los inactivos, no? -->
 								<?php echo  Html::SelectQuery($sesion, $query_usuario, "id_encargado_comercial", $id_encargado_comercial, "", "Ninguno","width=100px")  ?>
+								<!-- Nuevo Select -->
+						        <?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => 'Ninguno', 'style' => 'width:100px;')); ?>
 							</td>
 						</tr>
 

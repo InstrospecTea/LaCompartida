@@ -9,12 +9,6 @@ $Form = new Form;
 global $contratofields;
 $series_documento = new DocumentoLegalNumero($sesion);
 
-$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
-			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
-
-$query_usuario_activo = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
-			WHERE activo = 1 ORDER BY nombre";
-
 $query_cliente = "SELECT codigo_cliente, glosa_cliente FROM cliente WHERE activo = 1 ORDER BY glosa_cliente ASC";
 
 $query_proceso = "SELECT id_proceso FROM cobro_proceso ORDER BY id_proceso ASC";
@@ -730,18 +724,24 @@ $pagina->PrintTop();
 					<td nowrap colspan="3" align="left"> <?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, '', '', false); ?> </td>
 				</tr>
 			</tbody>
-
+<!-- Debieran ocutultarse los inactivos, no? -->
+<?php
+$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
+			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
+			?>
 			<tr>
-				<td align=right><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
-				<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
+				<td align="right"><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
+				<td colspan="2" align="left"><!-- Nuevo Select -->
+					<?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
+					<?php echo $Form->select('id_usuario', $sesion->usuario->ListarActivos('', 'SOC'), $id_usuario, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')); ?>
+				</td>
 			</tr>
-
 			<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
 				<tr>
-					<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
-					<td colspan=2 align=left><?php echo Html::SelectQuery($sesion, $query_usuario_activo, "id_usuario_secundario", $id_usuario_secundario, '', __('Cualquiera'), '210') ?>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
+					<td align="right"><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
+					<td colspan="2" align="left"><!-- Nuevo Select -->
+						<?php echo $Form->select('id_usuario_secundario', $sesion->usuario->ListarActivos(), $id_usuario_secundario, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')); ?>
+						<input type="hidden" size="6" name="id_proceso" id="id_proceso" value='<?php echo $id_proceso ?>' >
 					</td>
 				</tr>
 			<?php } ?>

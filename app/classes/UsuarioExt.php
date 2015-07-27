@@ -832,16 +832,14 @@ class UsuarioExt extends Usuario {
 	 */
 	public function ListarActivos($where = '', $con_permisos = false) {
 		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
-		if (!$this->Es('SADM')) {
-			$and = "AND usuario.rut != '99511620'";
-		}
+		
 		$permisos = '';
 		if ($con_permisos !== false) {
 			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";
 			$permisos = "INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
 		}
 		$query_extra = "$permisos
-						WHERE usuario.activo = 1
+						WHERE usuario.activo = 1 AND usuario.rut != 99511620
 							$where
 							$and
 						ORDER BY usuario.apellido1";
