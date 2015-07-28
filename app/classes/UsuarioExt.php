@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 require_once Conf::ServerDir() . '/../app/classes/Tarifa.php';
+require_once Conf::ServerDir() . '/../app/classes/Criteria.php';
 
 define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))');
 
@@ -778,12 +779,29 @@ class UsuarioExt extends Usuario {
 		return parent::Write();
 	}
 
-	public static function QueryComerciales() {
-		return "SELECT
-						usuario.id_usuario,
-						CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
-					FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
+	public static function QueryComerciales($sesion, $codigo_permiso = 'SOC') {
+		$criteria = new Criteria($sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'U.id_usuario = UP.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'{$codigo_permiso}'"))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
 	}
 
 	public function Guardar($datos, &$pagina = null, $validaciones_segun_config = false) {
@@ -839,7 +857,7 @@ class UsuarioExt extends Usuario {
 			$permisos = "INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
 		}
 		$query_extra = "$permisos
-						WHERE usuario.activo = 1 AND usuario.rut != 99511620
+						WHERE usuario.activo = 1 AND usuario.visible = 1
 							$where
 							$and
 						ORDER BY usuario.apellido1";

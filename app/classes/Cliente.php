@@ -977,7 +977,7 @@ class Cliente extends Objeto {
 				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
 				->add_from('usuario U')
 				->add_left_join_with('usuario_secretario US', 'U.id_usuario = US.id_profesional')
-				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
 				->add_restriction(CriteriaRestriction::equals('U.activo', 1))
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
 

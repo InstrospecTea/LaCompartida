@@ -1286,7 +1286,6 @@ class Trabajo extends Objeto
 				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
 				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
 				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
-				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
 		 		->add_grouping('U.id_usuario')
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
 
@@ -1340,18 +1339,14 @@ class Trabajo extends Objeto
 				->add_from('usuario U')
 				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
 				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
-				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
+				->add_restriction(CriteriaRestriction::not_equal('U.visible', 1))
 		 		->add_grouping('U.id_usuario')
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
 
 		$clauses = array();
 
 		if ($permitido) {
-			$clauses[] = CriteriaRestriction::equals('U.visible', 1);
-			$clauses[] = CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'");
-			$criteria->add_restriction(
-				CriteriaRestriction::and_clause($clauses)
-			);
+			$criteria->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"));
 		} else {
 			$clauses[] = CriteriaRestriction::equals('US.id_secretario', $sesion->usuario->fields['id_usuario']);
 			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
@@ -1381,7 +1376,6 @@ class Trabajo extends Objeto
 				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
 				->add_from('usuario U')
 				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
-				->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
 				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
 				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');

@@ -22,7 +22,6 @@ function get_usuarios($sesion) {
 			->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
 			->add_from('usuario U')
 	 		->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
-			->add_restriction(CriteriaRestriction::not_equal('U.rut', 99511620))
 			->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
 			->add_restriction(CriteriaRestriction::equals('U.visible', 1))
 	 		->add_ordering('U.apellido1, U.apellido2, U.nombre');

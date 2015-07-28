@@ -519,7 +519,8 @@ $Pagina->PrintTop($popup);
 							</td>
 							<td colspan="2" align="left">
 								<!-- Debieran ocutultarse los inactivos, no? -->
-								<?php echo Html::SelectQuery($Sesion, UsuarioExt::QueryComerciales(), 'encargado_comercial', $_REQUEST['encargado_comercial'], '', __('Cualquiera')); ?>
+								<?php //echo Html::SelectQuery($Sesion, UsuarioExt::QueryComerciales(), 'encargado_comercial', $_REQUEST['encargado_comercial'], '', __('Cualquiera')); ?>
+						        <?php echo $Form->select('encargado_comercial', UsuarioExt::QueryComerciales($Sesion), $_REQUEST['encargado_comercial'], array('empty' => __('Cualquiera'))); ?>
 								<!-- Nuevo Select -->
 						        <?php echo $Form->select('encargado_comercial', $Sesion->usuario->ListarActivos('', 'SOC'), $_REQUEST['encargado_comercial'], array('empty' => __('Cualquiera'))); ?>
 							</td>
