@@ -953,7 +953,7 @@ class Trabajo extends Objeto
 		$mm = (int) $mm;
 		$mm_interval = $mm;
 
-		if (fmod($mm, $interval) <> 0) {
+		if (fmod($mm, $interval) != 0) {
 			$mm_interval = ($mm - fmod($mm, $interval)) + $interval;
 		}
 
