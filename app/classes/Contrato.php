@@ -1215,15 +1215,17 @@ class Contrato extends Objeto {
 			$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		
-			foreach (mysql_fetch_object($result) as $key => $value)
+			foreach (mysql_fetch_object($result) as $key => $value){
 				$this->valor_antiguo[$key] = $value;
+			}
 
 		} else if (array_key_exists('id_asunto', $parametros)) {
 			$query = "SELECT C.* FROM asunto A INNER JOIN contrato C ON C.id_contrato = A.id_contrato WHERE A.id_asunto = {$parametros['id_asunto']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		
-			foreach (mysql_fetch_object($result) as $key => $value)
+			foreach (mysql_fetch_object($result) as $key => $value) {
 				$this->valor_antiguo[$key] = $value;
+			}
 		}
 
 		foreach ($parametros as $campo => $valor) {
