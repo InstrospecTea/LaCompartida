@@ -471,13 +471,8 @@
 		</td>
 	</tr>
 	<tr>
-		<td align=center colspan=2>
-			<!-- Debieran ocutultarse los inactivos, no? -->
-			<?=Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2, ', ', nombre)
-				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
-			<!-- Nuevo Select -->
-            <?php echo $Form->select('socios[]', $sesion->usuario->ListarActivos('', 'SOC'), $socios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '5')); ?>
+		<td align=center colspan=2><!-- Nuevo Select -->
+            <?php echo $Form->select('socios[]', UsuarioExt::QueryComerciales($sesion), $socios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '5')); ?>
 		</td>
 	</tr>
 	<tr valign=top>

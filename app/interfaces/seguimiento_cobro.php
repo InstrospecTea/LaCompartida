@@ -724,16 +724,10 @@ $pagina->PrintTop();
 					<td nowrap colspan="3" align="left"> <?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, '', '', false); ?> </td>
 				</tr>
 			</tbody>
-<!-- Debieran ocutultarse los inactivos, no? -->
-<?php
-$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
-			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
-			?>
 			<tr>
 				<td align="right"><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
 				<td colspan="2" align="left"><!-- Nuevo Select -->
-					<?php echo Html::SelectQuery($sesion, $query_usuario, "id_usuario", $id_usuario, '', __('Cualquiera'), '210') ?>
-					<?php echo $Form->select('id_usuario', $sesion->usuario->ListarActivos('', 'SOC'), $id_usuario, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')); ?>
+					<?php echo $Form->select('id_usuario', UsuarioExt::QueryComerciales($sesion), $id_usuario, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')); ?>
 				</td>
 			</tr>
 			<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>

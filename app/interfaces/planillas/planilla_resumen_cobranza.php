@@ -920,12 +920,8 @@ $pagina->PrintTop();
 						<td rowspan="2" align=left>
 							<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes, "class=\"selectMultiple\" multiple size=6 ", "", "170"); ?>
 						</td>
-						<td rowspan="2" align=left>
-							<!-- Debieran ocutultarse los inactivos, no? -->
-							<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios, "class=\"selectMultiple\" multiple size=6 ", "", "170"); ?><!-- Nuevo Select -->
-							<?php echo $Form->select('socios[]', $sesion->usuario->ListarActivos('', 'SOC'), $socios, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); ?>
+						<td rowspan="2" align=left><!-- Nuevo Select -->
+							<?php echo $Form->select('socios[]', UsuarioExt::QueryComerciales($sesion), $socios, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); ?>
 						</td>
 						<td rowspan="2" align=left>
 							<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos, "class=\"selectMultiple\" multiple size=6 ", "", "170"); ?>
