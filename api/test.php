@@ -16,7 +16,7 @@
     <script type="text/javascript">
       $(function() {
         $.ajaxSetup({
-          headers: {'AUTHTOKEN' : '44f5782a611c636b9698bb982a135c3d259fa699'}
+          headers: {'AUTHTOKEN' : '758f2f689e48c340a9a071304cc5ba492e2fe51e'}
         });
 
         $.ajax({
@@ -25,7 +25,6 @@
           },
           statusCode: {
             400: function(data) {
-              // console.log(data);
               var str = JSON.stringify($.parseJSON(data.responseText), undefined, 4);
               $('#output').html('<pre>' + syntaxHighlight(str) + '</pre>');
             }
@@ -40,18 +39,18 @@
           // url: 'users/1/device',
           // url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
 
-          // data: { 'user' : '99511620', 'password' : 'admin.asdwsx', 'app_key' : 'ttb-desktop' },
+          // data: { 'user' : '99511620', 'password' : 'Etropos2015', 'app_key' : 'ttb-desktop' },
           // data: { 'after' : '1356998400', 'before' : '1388534400' },
           data: {
             'created_date' : 1365193560.328282,
             'date' : 1365134400,
-            'duration' : 100,
+            'duration' : 111,
             'notes' : 'creación en latin1',
             //'rate' : 1,
             //'requester' : 'test1 test2 test3',
             //'activity_code' : 'A2013',
             //'area_code' : 1,
-            'matter_code' : '000003-1201',
+            'matter_code' : '000006-0002',
             //'task_code' : 1,
             'user_id' : 1,
             'billable' : 1,
@@ -66,9 +65,9 @@
           // type: 'delete'
 
         }).done(function(data) {
-          // console.log(data);
           var str = JSON.stringify(data, undefined, 4);
           $('#output').html('<pre>' + syntaxHighlight(str) + '</pre>');
+          // $('#output').html(data);
         });
       });
 
