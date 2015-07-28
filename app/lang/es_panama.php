@@ -16,3 +16,11 @@ $_LANG['ValorImpuestoGastos'] = "Valor ITBMS (%) que se cobra a los gastos";
 
 $_LANG['Generación de Cobros'] = "Pre-Bill";
 $_LANG['Proceso masivo de emisión de cobros'] = "Proceso masivo de planillón y Pre-Bill";
+
+$_LANG['Giro'] = "Referencia";
+$_LANG['giro'] = "referencia";
+
+$_LANG['Glosa Factura'] = "Apuntes";
+$_LANG['Glosa factura'] = "Apuntes";
+$_LANG['glosa factura'] = "apuntes";
+$_LANG['glosa Factura'] = "Apuntes";

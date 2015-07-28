@@ -10,7 +10,7 @@ require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
 	Necesita las liguientes variables para funcionar:
 	$Sesion
 	$fecha1	: fecha inicio periodo consulta, en formato dd-mm-aaaa.
-	$fecha2	: fecha tÃ©rmino periodo consulta, en formato dd-mm-aaaa.
+	$fecha2	: fecha término periodo consulta, en formato dd-mm-aaaa.
 	$vista	: varible que indica la forma de agrupar los datos. Puede tomar los siguientes valores:
 	- 'profesional'
 	- 'mes_reporte'
@@ -25,6 +25,7 @@ if (!Conf::GetConf($Sesion, 'ReportesAvanzados')) {
 $Moneda = new Moneda($Sesion);
 
 $id_moneda = isset($moneda_visualizacion) ? $moneda_visualizacion : $Moneda::GetMonedaBase($Sesion);
+$proporcionalidad = isset($proporcionalidad) ? $proporcionalidad : 'cliente';
 
 $Moneda->Load($id_moneda);
 $simbolo_moneda = $Moneda->fields['simbolo'];
@@ -100,11 +101,11 @@ $ws->mergeCells($offset_filas + 3, $offset_columnas + 1, $offset_filas + 3, $off
 
 $offset_filas += 7;
 
-// Imprimir tÃ­tulos de la tabla
+// Imprimir títulos de la tabla
 if ($vista == 'glosa_asunto') {
 	$ws->write($offset_filas, $offset_columnas, __('glosa_cliente'), $formato_titulo_1);
 	++$offset_columnas;
-	$ws->write($offset_filas, $offset_columnas, __('CÃ³digo'), $formato_titulo_1);
+	$ws->write($offset_filas, $offset_columnas, __('Código'), $formato_titulo_1);
 	++$offset_columnas;
 }
 
@@ -114,14 +115,15 @@ $ws->write($offset_filas, $offset_columnas + 2, __('Horas cobrables'), $formato_
 $ws->write($offset_filas, $offset_columnas + 3, __('Horas cobrables corregidas'), $formato_titulo_2);
 $ws->write($offset_filas, $offset_columnas + 4, __('Horas cobradas'), $formato_titulo_2);
 $ws->write($offset_filas, $offset_columnas + 5, __('Horas pagadas'), $formato_titulo_2);
-$ws->write($offset_filas, $offset_columnas + 6, __('Valor cobrado'), $formato_titulo_3);
-$ws->write($offset_filas, $offset_columnas + 7, __('Valor cobrado por hora'), $formato_titulo_3);
-$ws->write($offset_filas, $offset_columnas + 8, __('Costo'), $formato_titulo_4);
-$ws->write($offset_filas, $offset_columnas + 9, __('Costo por hora trabajada'), $formato_titulo_4);
-$ws->write($offset_filas, $offset_columnas + 10, __('Margen bruto'), $formato_titulo_5);
-$ws->write($offset_filas, $offset_columnas + 11, __('Porcentaje margen'), $formato_titulo_5);
+$ws->write($offset_filas, $offset_columnas + 6, __('Valor trámites'), $formato_titulo_2);
+$ws->write($offset_filas, $offset_columnas + 7, __('Valor cobrado'), $formato_titulo_3);
+$ws->write($offset_filas, $offset_columnas + 8, __('Valor cobrado por hora'), $formato_titulo_3);
+$ws->write($offset_filas, $offset_columnas + 9, __('Costo'), $formato_titulo_4);
+$ws->write($offset_filas, $offset_columnas + 10, __('Costo por hora trabajada'), $formato_titulo_4);
+$ws->write($offset_filas, $offset_columnas + 11, __('Margen bruto'), $formato_titulo_5);
+$ws->write($offset_filas, $offset_columnas + 12, __('Porcentaje margen'), $formato_titulo_5);
 
-// NÃºmero de columnas para rellenar con ceros al final, 5 de horas y 1 de valor cobrado
+// Número de columnas para rellenar con ceros al final, 5 de horas y 1 de valor cobrado
 $numero_columnas_a_llenar = 8;
 
 $fila = $offset_filas;
@@ -183,7 +185,7 @@ if ($vista == 'profesional') {
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	while (list($nombre_usuario, $id_usr) = mysql_fetch_array($resp)) {
 		$ws->write( ++$fila, $offset_columnas, $nombre_usuario, $formato_nombre);
-		// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
+		// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
 		// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
 		for ($j = 0; $j < $numero_columnas_a_llenar; ++$j) {
 			$vacio[$i][$j] = true;
@@ -201,7 +203,7 @@ if ($vista == 'profesional') {
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	while (list($nombre_cliente, $id_cli) = mysql_fetch_array($resp)) {
 		$ws->write( ++$fila, $offset_columnas, $nombre_cliente, $formato_nombre);
-		// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
+		// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
 		// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
 		for ($j = 0; $j < $numero_columnas_a_llenar; ++$j)
 			$vacio[$i][$j] = true;
@@ -212,7 +214,7 @@ if ($vista == 'profesional') {
 	for ($a = 0; $a < $fecha2_a - $fecha1_a + 1; ++$a) {
 		for ($m = ($a == 0 ? $fecha1_m[1] : 0); $m <= ($a == $fecha2_a - $fecha1_a ? $fecha2_m : 12); ++$m) {
 			$ws->write( ++$fila, $offset_columnas, ($fecha1_a + $a) . ' - ' . $meses[$m - 1], $formato_nombre);
-			// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
+			// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
 			// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
 			for ($j = 0; $j < $numero_columnas_a_llenar; ++$j) {
 				$vacio[$i][$j] = true;
@@ -255,7 +257,7 @@ if ($vista == 'profesional') {
 		++$n_clientes;
 		$ws->write($fila, $offset_columnas - 1, $codigo_asunto, $formato_nombre);
 		$ws->write($fila, $offset_columnas, $nombre_asunto, $formato_nombre);
-		// Se lleva un registro de las celdas vacÃ­as para despuÃ©s rellenarlas con ceros.
+		// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
 		// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.
 		for ($j = 0; $j < $numero_columnas_a_llenar; ++$j) {
 			$vacio[$i][$j] = true;
@@ -298,82 +300,88 @@ $datos_reporte = array(
 		'vista' => $vista == "glosa_asunto" ? "codigo_asunto" : $vista,
 		'columna' => $offset_columnas + 5
 	),
-	'valor_cobrado' => array(
+	'valor_tramites' => array(
 		'formato' => $formato_moneda,
 		'vista' => $vista,
 		'columna' => $offset_columnas + 6
+ 	),
+	'valor_cobrado' => array(
+		'formato' => $formato_moneda,
+		'vista' => $vista,
+		'columna' => $offset_columnas + 7
 	),
 	'costo' => array(
 		'formato' => $formato_moneda,
 		'vista' => $vista,
-		'columna' => $offset_columnas + 8
+		'columna' => $offset_columnas + 9
 	)
-	// 'costo_hh' => array(
-	// 	'formato' => $formato_moneda,
-	// 	'vista' => $vista,
-	// 	'columna' => $offset_columnas + 9
-	// )
-	// 'valor_pagado' => array(
-	// 	'formato' => $formato_numero,
-	// 	'vista' => $vista,
-	// 	'columna' => $offset_columnas + 9
-	// ),
-	// 'valor_por_pagar' => array(
-	// 	'formato' => $formato_numero,
-	// 	'vista' => $vista,
-	// 	'columna' => $offset_columnas + 10
-	// ),
 );
 
 foreach ($datos_reporte as $tipo_dato => $config) {
-	$reporte = new Reporte($Sesion);
+	$reporte = new ReporteCriteria($Sesion);
 	$reporte->id_moneda = $id_moneda;
 	if (!empty($proporcionalidad)) {
 		$reporte->proporcionalidad = $proporcionalidad;
 	}
-
 	// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
 	$reporte->addRangoFecha($fecha1, $fecha2);
 	imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $config['columna'], $config['formato'], $config['vista']);
 }
 
-// variables para usar en las fÃ³rmulas
+// variables para usar en las fórmulas
 $col_trabajadas = Utiles::NumToColumnaExcel($offset_columnas + 1);
 $col_cobrables = Utiles::NumToColumnaExcel($offset_columnas + 2);
 $col_cobrables_corregidas = Utiles::NumToColumnaExcel($offset_columnas + 3);
 $col_cobradas = Utiles::NumToColumnaExcel($offset_columnas + 4);
 $col_pagadas = Utiles::NumToColumnaExcel($offset_columnas + 5);
-$col_valor_cobrado = Utiles::NumToColumnaExcel($offset_columnas + 6);
-$col_costo = Utiles::NumToColumnaExcel($offset_columnas + 8);
-$col_margen_bruto = Utiles::NumToColumnaExcel($offset_columnas + 10);
+$col_valor_tramites = Utiles::NumToColumnaExcel($offset_columnas + 6);
+$col_valor_cobrado = Utiles::NumToColumnaExcel($offset_columnas + 7);
+$col_costo = Utiles::NumToColumnaExcel($offset_columnas + 9);
+$col_margen_bruto = Utiles::NumToColumnaExcel($offset_columnas + 11);
 
 for ($t = 0; $t < count($ids); ++$t) {
+	$celda_valor_cobrado = "$col_valor_cobrado" . ($offset_filas + $t + 2);
+	$celda_valor_tramites = "$col_valor_tramites" . ($offset_filas + $t + 2);
+	$celda_horas_trabajadas = "$col_trabajadas" . ($offset_filas + $t + 2);
+	$celda_horas_cobradas = "$col_cobradas" . ($offset_filas + $t + 2);
+	$celda_costo = "$col_costo" . ($offset_filas + $t + 2);
+	$celda_margen_bruto = "$col_margen_bruto" . ($offset_filas + $t + 2);
+
 	// Imprimir valor cobrado por hora
-	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 7, "=IF($col_cobradas" . ($offset_filas + $t + 2) . ">0, $col_valor_cobrado" . ($offset_filas + $t + 2) . "/$col_cobradas" . ($offset_filas + $t + 2) . ", \"- \")", $formato_moneda);
+	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 8, "=IF($celda_horas_cobradas > 0, ($celda_valor_cobrado - $celda_valor_tramites) / $celda_horas_cobradas, \"- \")", $formato_moneda);
 	// Imprimir costo por hora trabajada
-	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 9, "=IF($col_trabajadas" . ($offset_filas + $t + 2) . ">0, $col_costo" . ($offset_filas + $t + 2) . "/$col_trabajadas" . ($offset_filas + $t + 2) . ", \"- \")", $formato_moneda);
+	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 10, "=IF($celda_horas_trabajadas > 0, $celda_costo / $celda_horas_trabajadas, \"- \")", $formato_moneda);
 	// Imprimir margen bruto
-	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 10, "=$col_valor_cobrado" . ($offset_filas + $t + 2) . "-$col_costo" . ($offset_filas + $t + 2), $formato_moneda);
+	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 11, "=$celda_valor_cobrado - $celda_costo", $formato_moneda);
 	// Imprimir porcentaje margen
-	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 11, "=IF($col_valor_cobrado" . ($offset_filas + $t + 2) . ">0, $col_margen_bruto" . ($offset_filas + $t + 2) . "/$col_valor_cobrado" . ($offset_filas + $t + 2) . ", \"- \")", $formato_porcentaje);
+	$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 12, "=IF($celda_valor_cobrado > 0, $celda_margen_bruto / $celda_valor_cobrado, \"- \")", $formato_porcentaje);
 }
 
-// Imprimir totales, estÃ¡n afuera del 'for' porque usan otro formato
+// Imprimir totales, están afuera del 'for' porque usan otro formato
 ++$fila;
+
+$celda_valor_cobrado = "$col_valor_cobrado" . ($offset_filas + $t + 2);
+$celda_valor_tramites = "$col_valor_tramites" . ($offset_filas + $t + 2);
+$celda_horas_trabajadas = "$col_trabajadas" . ($offset_filas + $t + 2);
+$celda_horas_cobradas = "$col_cobradas" . ($offset_filas + $t + 2);
+$celda_costo = "$col_costo" . ($offset_filas + $t + 2);
+$celda_margen_bruto = "$col_margen_bruto" . ($offset_filas + $t + 2);
+
 $ws->write($fila, $offset_columnas, __("Total"), $formato_nombre);
 $ws->writeFormula($fila, $offset_columnas + 1, "=SUM($col_trabajadas" . ($offset_filas + 2) . ":$col_trabajadas" . ($fila) . ")", $formato_numero_total);
 $ws->writeFormula($fila, $offset_columnas + 2, "=SUM($col_cobrables" . ($offset_filas + 2) . ":$col_cobrables" . ($fila) . ")", $formato_numero_total);
 $ws->writeFormula($fila, $offset_columnas + 3, "=SUM($col_cobrables_corregidas" . ($offset_filas + 2) . ":$col_cobrables_corregidas" . ($fila) . ")", $formato_numero_total);
 $ws->writeFormula($fila, $offset_columnas + 4, "=SUM($col_cobradas" . ($offset_filas + 2) . ":$col_cobradas" . ($fila) . ")", $formato_numero_total);
 $ws->writeFormula($fila, $offset_columnas + 5, "=SUM($col_pagadas" . ($offset_filas + 2) . ":$col_pagadas" . ($fila) . ")", $formato_numero_total);
-$ws->writeFormula($fila, $offset_columnas + 6, "=SUM($col_valor_cobrado" . ($offset_filas + 2) . ":$col_valor_cobrado" . ($fila) . ")", $formato_moneda_total);
-$ws->writeFormula($fila, $offset_columnas + 7, "=IF($col_cobradas" . ($offset_filas + $t + 2) . ">0, $col_valor_cobrado" . ($offset_filas + $t + 2) . "/$col_cobradas" . ($offset_filas + $t + 2) . ", \"- \")", $formato_moneda_total);
-$ws->writeFormula($fila, $offset_columnas + 8, "=SUM($col_costo" . ($offset_filas + 2) . ":$col_costo" . ($fila) . ")", $formato_moneda_total);
-$ws->writeFormula($fila, $offset_columnas + 9, "=IF($col_trabajadas" . ($offset_filas + $t + 2) . ">0, $col_costo" . ($offset_filas + $t + 2) . "/$col_trabajadas" . ($offset_filas + $t + 2) . ", \"- \")", $formato_moneda_total);
-$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 10, "=$col_valor_cobrado" . ($offset_filas + $t + 2) . "-$col_costo" . ($offset_filas + $t + 2), $formato_moneda_total);
-$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 11, "=IF($col_valor_cobrado" . ($offset_filas + $t + 2) . ">0, $col_margen_bruto" . ($offset_filas + $t + 2) . "/$col_valor_cobrado" . ($offset_filas + $t + 2) . ", \"- \")", $formato_porcentaje_total);
+$ws->writeFormula($fila, $offset_columnas + 6, "=SUM($col_valor_tramites" . ($offset_filas + 2) . ":$col_valor_tramites" . ($fila) . ")", $formato_moneda_total);
+$ws->writeFormula($fila, $offset_columnas + 7, "=SUM($col_valor_cobrado" . ($offset_filas + 2) . ":$col_valor_cobrado" . ($fila) . ")", $formato_moneda_total);
+$ws->writeFormula($fila, $offset_columnas + 8, "=IF($celda_horas_cobradas > 0, ($celda_valor_cobrado - $celda_valor_tramites) / $celda_horas_cobradas, \"- \")", $formato_moneda_total);
+$ws->writeFormula($fila, $offset_columnas + 9, "=SUM($col_costo" . ($offset_filas + 2) . ":$col_costo" . ($fila) . ")", $formato_moneda_total);
+$ws->writeFormula($fila, $offset_columnas + 10, "=IF($celda_horas_trabajadas > 0, $celda_costo / $celda_horas_trabajadas, \"- \")", $formato_moneda_total);
+$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 11, "=$celda_valor_cobrado - $celda_costo", $formato_moneda_total);
+$ws->writeFormula($offset_filas + $t + 1, $offset_columnas + 12, "=IF($celda_valor_cobrado > 0, $celda_margen_bruto / $celda_valor_cobrado, \"- \")", $formato_porcentaje_total);
 
-// Rellenar con ceros los espacios vacÃ­os
+// Rellenar con ceros los espacios vacíos
 for ($i = 0; $i < count($ids); ++$i) {
 	for ($j = 0; $j < $numero_columnas_a_llenar; ++$j) {
 		if ($vacio[$i][$j] && $j != 6) {
