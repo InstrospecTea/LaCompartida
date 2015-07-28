@@ -36,8 +36,14 @@ class FacturaPdfDatos extends Objeto {
 
 		$valores = $this->CargarGlosaDatos($id_factura);
 		while ($row = mysql_fetch_assoc($resp)) {
-			$row['dato_letra'] = $valores[$row['codigo_tipo_dato']];
-			$this->datos[$row['codigo_tipo_dato']] = $row;
+			foreach($row as $tipo_dato => $valor) {
+				if ($tipo_dato == 'codigo_tipo_dato') {
+					$row['dato_letra'] = $valores[$row['codigo_tipo_dato']];
+					$this->datos[$row['codigo_tipo_dato']] = $row;
+				} else {
+					$this->datos[$row['codigo_tipo_dato']][$tipo_dato] = $valor;
+				}
+			}
 		}
 
 		$this->papel = $this->datos['tipo_papel'];
@@ -50,6 +56,7 @@ class FacturaPdfDatos extends Objeto {
 
 		$cobro = new Cobro($this->sesion);
 		$cobro->Load($factura->fields['id_cobro']);
+		$cobro->LoadGlosaAsuntos();
 
 		$contrato = new Contrato($this->sesion);
 		$contrato->Load($cobro->fields['id_contrato']);
@@ -57,13 +64,15 @@ class FacturaPdfDatos extends Objeto {
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
 
+		$Cliente = new Cliente($this->sesion);
+    $Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
+
 		$chargingBusiness = new ChargingBusiness($this->sesion);
 		$coiningBusiness = new CoiningBusiness($this->sesion);
 		$billingBusiness = new BillingBusiness($this->sesion);
 
 		// Segmento Condiciones de pago
 		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
-
 		// Segmento Monto en palabra solicitado por @gtigre
 		$arreglo_monedas = Moneda::GetMonedas($this->sesion, null, true);
 		$monto_palabra=new MontoEnPalabra($this->sesion);
@@ -139,6 +148,8 @@ class FacturaPdfDatos extends Objeto {
 		$discount = $detail->get('descuento_honorarios');
 
 		$datos = array(
+			'glosa_cliente' => $Cliente->fields['glosa_cliente'],
+			'glosa_asuntos' => implode(', ', $cobro->glosa_asuntos),
 			'razon_social' => $factura->fields['cliente'],
 			'rut' => $factura->fields['RUT_cliente'],
 			'telefono' => $contrato->fields['factura_telefono'],
@@ -158,6 +169,7 @@ class FacturaPdfDatos extends Objeto {
 			'comuna' => $factura->fields['comuna_cliente'],
 			'factura_codigopostal' => $factura->fields['factura_codigopostal'],
 			'ciudad' => $factura->fields['ciudad_cliente'],
+			'pais' => $factura->GetPais(),
 			'giro_cliente' => $factura->fields['giro_cliente'],
 			'lugar' => UtilesApp::GetConf($this->sesion, 'LugarFacturacion'),
 			'id_cobro' => $factura->fields['id_cobro'],
@@ -171,6 +183,7 @@ class FacturaPdfDatos extends Objeto {
 			'descripcion_honorarios' => $factura->fields['descripcion'],
 			'descripcion_gastos_con_iva' => $factura->fields['descripcion_subtotal_gastos'],
 			'descripcion_gastos_sin_iva' => $factura->fields['descripcion_subtotal_gastos_sin_impuesto'],
+			'descripcion_gastos_con_y_sin_iva' => __('Gastos totales'),
 			'monto_honorarios' => number_format(
 					$factura->fields['subtotal_sin_descuento'],
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -201,6 +214,12 @@ class FacturaPdfDatos extends Objeto {
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
 				),
+			'monto_gastos_con_y_sin_iva' => number_format(
+          $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+          $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+          $idioma->fields['separador_decimales'],
+          $idioma->fields['separador_miles']
+        ),
 			'moneda_subtotal_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_descuento_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],

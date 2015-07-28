@@ -127,10 +127,10 @@ if ($opcion == "guardar") {
 		// El código de homologación se utiliza para los clientes con LEDES, por defecto es el código del cliente
 		$cliente->Edit("codigo_homologacion", !empty($codigo_homologacion) ? $codigo_homologacion : $codigo_cliente);
 
-		if ($codigo_cliente_secundario) {
+		if (Conf::GetConf($Sesion, 'CodigoSecundario') && !empty($codigo_cliente_secundario)) {
 			$cliente->Edit("codigo_cliente_secundario", strtoupper($codigo_cliente_secundario));
 		} else {
-			$cliente->Edit("codigo_cliente_secundario", $codigo_cliente);
+			$cliente->Edit("codigo_cliente_secundario", null);
 		}
 
 		$cliente->Edit("id_moneda", 1);
@@ -251,13 +251,18 @@ if ($opcion == "guardar") {
 	$asuntos = explode(';', Conf::GetConf($Sesion, 'AgregarAsuntosPorDefecto'));
 
 	if ($asuntos[0] == "true" && $loadasuntos) {
-		if (empty($codigo_cliente_secundario)) {
-			$codigo_cliente_secundario = $codigo_cliente;
+		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+			if (empty($codigo_cliente_secundario)) {
+				$codigo_cliente_secundario = $codigo_cliente;
+			}
+			$codigo_asunto_secundario = $asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario);
+		} else {
+			$codigo_asunto_secundario = null;
 		}
 		for ($i = 1; $i < count($asuntos); $i++) {
 			$asunto = new Asunto($Sesion);
 			$asunto->Edit('codigo_asunto', $asunto->AsignarCodigoAsunto($codigo_cliente));
-			$asunto->Edit('codigo_asunto_secundario', $asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario));
+			$asunto->Edit('codigo_asunto_secundario', $codigo_asunto_secundario);
 			$asunto->Edit('glosa_asunto', $asuntos[$i]);
 			$asunto->Edit('codigo_cliente', $codigo_cliente);
 			$asunto->Edit('id_contrato', $contrato->fields['id_contrato']);
@@ -405,11 +410,16 @@ $Pagina->PrintTop();
 				<td class="al" width="600">
 					<div class="controls controls-row" style="white-space:nowrap;">
 						<input type="text" style="float:left;" class="input-small span2" placeholder="0000" name="codigo_cliente" size="5" maxlength="5" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> value="<?php echo $cliente->fields['codigo_cliente'] ?>" onchange="this.value = this.value.toUpperCase()" />
+
 						<div class="span4" style="float:left;">
 							&nbsp;&nbsp;&nbsp;
-							<label><?php echo __('Código secundario') ?></label>
-							<input type="text"class="input-small" id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario']; ?>" onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;' />
-							<?php echo $CodigoSecundario ? $obligatorio : '<span class="help-inline">(' . __('Opcional') . ')</span>'; ?>
+							<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
+								<label><?php echo __('Código secundario') ?></label>
+								<input type="text" class="input-small" id="codigo_cliente_secundario" name="codigo_cliente_secundario"
+								       size="15" maxlength="20" value="<?php echo $cliente->fields['codigo_cliente_secundario']; ?>"
+								       onchange="this.value = this.value.toUpperCase()" style='text-transform: uppercase;'/>
+								<?php echo $CodigoSecundario ? $obligatorio : '<span class="help-inline">(' . __('Opcional') . ')</span>'; ?>
+							<?php } ?>
 						</div>
 					</div>
 				</td>

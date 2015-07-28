@@ -222,7 +222,7 @@ class CriteriaRestriction {
 	}
 
 	/**
-	 * Genera una sentencia if de mysql
+	 * Genera una sentencia IF de mysql
 	 * @param type $condition
 	 * @param type $result_true
 	 * @param type $result_false
@@ -232,4 +232,13 @@ class CriteriaRestriction {
 		return new CriteriaRestriction("IF({$condition}, {$result_true}, {$result_false})");
 	}
 
+	/**
+	 * Genera una sentencia IFNULL de mysql
+	 * @param string $column
+	 * @param string $result
+	 * @return \CriteriaRestriction
+	 */
+	public function ifnull($column, $result) {
+		return new CriteriaRestriction("IFNULL({$column}, {$result})");
+	}
 }

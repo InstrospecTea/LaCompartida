@@ -1,7 +1,7 @@
 <?
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
+  require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
@@ -15,7 +15,7 @@
 
 	if($opc == "siguiente")
 	{
-		$pagina->Redirect("cobros2.php?codigo_cliente=".$codigo_cliente);	
+		$pagina->Redirect("cobros2.php?codigo_cliente=".$codigo_cliente);
 	}
 
 	$pagina->titulo = __('Emitir cobro :: Selección del Cliente');
@@ -39,7 +39,7 @@
             <strong><?=__('Carta de Cobro')?></strong>
         </td>
         <td>
-			<?=Html::SelectQuery($sesion,"SELECT contrato.id_contrato, CONCAT(contrato.id_contrato, ' ',if(cliente.id_contrato = contrato.id_contrato,'Cliente', CONCAT('".__('Asunto')." ',temporal.asuntos))) FROM contrato JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente 
+			<?=Html::SelectQuery($sesion,"SELECT contrato.id_contrato, CONCAT(contrato.id_contrato, ' ',if(cliente.id_contrato = contrato.id_contrato,'Cliente', CONCAT('".__('Asunto')." ',temporal.asuntos))) FROM contrato JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
 			LEFT JOIN (	SELECT id_contrato, CONCAT_WS(',',glosa_asunto) as asuntos FROM asunto GROUP BY id_contrato ) as temporal ON contrato.id_contrato = temporal.id_contrato				 WHERE contrato.codigo_cliente = 'AST'","id_usuario",$id_usuario,'','Todos','250')?>
         </td>
     </tr>
@@ -72,12 +72,12 @@ function Validar(form)
 	{
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS *,trabajo.id_asunto
-					FROM trabajo 
+					FROM trabajo
 					JOIN asunto USING(id_asunto)
 					LEFT JOIN actividad ON trabajo.id_actividad=actividad.id_actividad
 					LEFT JOIN cliente ON cliente.id_cliente=asunto.id_cliente
 					";
-						
+
 		$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden);
 		$b->AgregarEncabezado("fecha",__('Fecha'));
 		$b->AgregarEncabezado("cliente",__('Cliente'));

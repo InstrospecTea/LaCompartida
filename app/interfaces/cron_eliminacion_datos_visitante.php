@@ -41,6 +41,10 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo 'Facturas Pagos borrado.<br>';
 
+	$query = "TRUNCATE TABLE `factura_cobro`;";
+	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	echo 'Facturas Cobros borrado.<br>';
+
 	/* Query para borrar factura */
 	$query = "DELETE FROM factura WHERE 1";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);

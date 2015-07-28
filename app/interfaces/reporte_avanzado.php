@@ -84,7 +84,8 @@ $tipos_de_dato = array(
 	'valor_trabajado_estandar',
 	//'rentabilidad_base',
 	'costo',
-	'costo_hh'
+	'costo_hh',
+	'valor_tramites'
 );
 
 if ($debug == 1) {
@@ -191,7 +192,7 @@ $ReporteAvanzado = new ReporteAvanzado($sesion);
 $ReporteAvanzado->comparar = $comparar;
 $ReporteAvanzado->tipo_dato_comparado = $tipo_dato_comparado;
 $ReporteAvanzado->tipo_dato = empty($tipo_dato) ? null : $tipo_dato;
-$ReporteAvanzado->proporcionalidad = $proporcionalidad;
+$ReporteAvanzado->proporcionalidad = empty($proporcionalidad) ? "cliente" : $proporcionalidad;
 $ReporteAvanzado->id_moneda = $id_moneda;
 
 $ReporteAvanzado->glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
@@ -207,6 +208,7 @@ $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no 
 $ReporteAvanzado->glosa_dato['horas_incobrables'] = __("Horas en Cobros Incobrables");
 $ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
 $ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro ya Emitido");
+$ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario de trámites que corresponde a cada Profesional, en un Cobro ya Emitido");
 $ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 $ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");

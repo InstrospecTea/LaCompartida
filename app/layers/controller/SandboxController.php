@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Class SandboxController
+ * @property ChargingBusiness $ChargingBusiness
+ * @property SandboxingBusiness $SandboxingBusiness
+ * @property CoiningBusiness $CoiningBusiness
+ * @property TranslatingBusiness $TranslatingBusiness
+ */
 class SandboxController extends AbstractController {
 
 	public $helpers = array('EntitiesListator', array('\TTB\Html', 'Html'), 'Form', 'Paginator');
