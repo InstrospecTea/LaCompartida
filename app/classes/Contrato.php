@@ -1211,7 +1211,7 @@ class Contrato extends Objeto {
 		 * es por esto que se crea la query para comparar datos antiguos con los nuevos.
 		 *
 		 */
-		if (array_key_exists('id_contrato', $parametros)) {
+		if (array_key_exists('id_contrato', $parametros) && ! empty($parametros['id_contrato'])) {
 			$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		
@@ -1219,7 +1219,7 @@ class Contrato extends Objeto {
 				$this->valor_antiguo[$key] = $value;
 			}
 
-		} else if (array_key_exists('id_asunto', $parametros)) {
+		} else if (array_key_exists('id_asunto', $parametros) && ! empty($parametros['id_asunto'])) {
 			$query = "SELECT C.* FROM asunto A INNER JOIN contrato C ON C.id_contrato = A.id_contrato WHERE A.id_asunto = {$parametros['id_asunto']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		
