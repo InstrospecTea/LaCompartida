@@ -1,6 +1,8 @@
 {
   "require": {
     "twig/twig": "1.*",
-    "mikehaertl/phpwkhtmltopdf": "2.0.1"
+    "mikehaertl/phpwkhtmltopdf": "2.0.1",
+    "amazonwebservices/aws-sdk-for-php": "*",
+    "aws/aws-sdk-php": "*"
   }
 }
