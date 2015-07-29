@@ -6,10 +6,13 @@ error_reporting(0);
 
 defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
 
-if (file_exists('/var/www/html/addbd.php')) {
-	require_once '/var/www/html/addbd.php';
-} else if (file_exists(dirname(__FILE__) . '/miconf.php')) {
+$confFile = dirname(__FILE__) . '/addbd.php';
+
+if( file_exists(dirname(__FILE__) . '/miconf.php') ) {
 	require_once dirname(__FILE__) . '/miconf.php';
+
+} elseif( file_exists($confFile) ) {
+	require_once $confFile;
 }
 
 if (!class_exists('Conf')) {
