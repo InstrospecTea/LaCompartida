@@ -6,7 +6,7 @@ error_reporting(0);
 
 defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
 
-$confFile = dirname(__FILE__) . '/addbd.php';
+$confFile = dirname(__FILE__) . '../config/addbd.php';
 
 if( file_exists(dirname(__FILE__) . '/miconf.php') ) {
 	require_once dirname(__FILE__) . '/miconf.php';

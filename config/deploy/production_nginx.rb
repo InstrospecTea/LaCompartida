@@ -15,7 +15,7 @@ puts "   ######################################################################\
 proceed = STDIN.gets[0..0] rescue nil
 exit unless proceed == 'y' || proceed == 'Y'
 
-set :base_directory, "/apps/"
+set :base_directory, "/apps/deploys"
 
 # TODO: cambiar a master
 set :branch, "feature/migration_nginx"

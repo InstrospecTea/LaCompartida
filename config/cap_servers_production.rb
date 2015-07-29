@@ -12,6 +12,6 @@ instances = ec2.instances
     .tagged_values('ttb-c')
     .each { |instance|
         roles = instance.tags.roles.split(',').map &:to_sym
-        server instance.dns_name, roles, {:user => instance.tags.username, :port => 22}
+        server instance.dns_name, *roles, {:user => instance.tags.username, :port => 22}
     }
 
