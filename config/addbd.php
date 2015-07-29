@@ -84,16 +84,15 @@ if (!function_exists('decrypt')) {
 	}
 }
 
-require '/var/www/private/aws/vendor/autoload.php';
-
 use Aws\Common\Aws;
 use Aws\DynamoDb\Exception\DynamoDbException;
 
 $arrayconfig=array(
    // 'includes' => array('_aws', '_sdk1'),
-	'key'                  => 'AKIAIQYFL5PYVQKORTBA',
-	'secret'               => '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',
-	'region'               => 'us-east-1',
+	'key'    => 'AKIAIQYFL5PYVQKORTBA',
+	'secret' => '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',
+	'region' => 'us-east-1',
+
 	'default_cache_config' =>  array(
 		array(
 			'host' => 'ttbcache.tmcxaq.0001.use1.cache.amazonaws.com',
