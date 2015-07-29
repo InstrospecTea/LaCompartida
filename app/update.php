@@ -10857,19 +10857,6 @@ QUERY;
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
 $max_update = 8.07;
-	}
-
-	if (!empty($queries)) {
-		ejecutar($queries, $dbh);
-	}
-}
-
-/* PASO 2: Agregar el numero de version al arreglo VERSIONES.
-	(No olvidar agregar la notificacion de los cambios) */
-
-$num = 0;
-$min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.06;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
