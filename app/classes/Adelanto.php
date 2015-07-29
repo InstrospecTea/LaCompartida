@@ -88,7 +88,7 @@ class Adelanto extends Documento {
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 			adelanto.id_documento,
 			cliente.glosa_cliente,
-			adelanto.fecha,
+			DATE_FORMAT(adelanto.fecha, '%d-%m-%Y') fecha,
 			IF(adelanto.id_contrato IS NULL, 'Todos los Asuntos', GROUP_CONCAT(DISTINCT asunto.glosa_asunto ORDER BY asunto.glosa_asunto ASC)) AS asuntos,
 			IF(adelanto.monto = 0, 0, adelanto.monto * -1) AS monto,
 			IF(adelanto.saldo_pago = 0, 0, adelanto.saldo_pago * -1) AS saldo_pago,
@@ -113,7 +113,8 @@ class Adelanto extends Documento {
 			LEFT JOIN cuenta_banco ON cuenta_banco.id_banco = adelanto.id_banco
 			{$left_join}
 		WHERE {$where}
-		GROUP BY adelanto.id_documento";
+		GROUP BY adelanto.id_documento
+		ORDER BY adelanto.fecha DESC";
 
 		return $query;
 	}
