@@ -1,5 +1,4 @@
 <?php
-
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
 
@@ -1299,10 +1298,10 @@ foreach ($chargeResults as $charge) {
 					$ws->writeNumber($filas, $col_tarificable_hh, $duracion_cobrada, $formato_tiempo);
 
 					if (!array_key_exists($cobro->fields['id_cobro'], $trabajos_duracion)) {
-						$query_total_cobrable = "SELECT 
-									IF(SUM(TIME_TO_SEC(duracion_cobrada)/3600) <= 0, 1, SUM(TIME_TO_SEC(duracion_cobrada)/3600)) AS duracion_total 
-									FROM trabajo 
-								   WHERE id_cobro = '{$cobro->fields['id_cobro']}' 
+						$query_total_cobrable = "SELECT
+									IF(SUM(TIME_TO_SEC(duracion_cobrada)/3600) <= 0, 1, SUM(TIME_TO_SEC(duracion_cobrada)/3600)) AS duracion_total
+									FROM trabajo
+								   WHERE id_cobro = '{$cobro->fields['id_cobro']}'
 									 AND cobrable = 1";
 						$resp_total_cobrable = mysql_query($query_total_cobrable, $sesion->dbh) or Utiles::errorSQL($query_total_cobrable, __FILE__, __LINE__, $sesion->dbh);
 						list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
@@ -1777,6 +1776,7 @@ foreach ($chargeResults as $charge) {
 		if ($opc_ver_horas_trabajadas) {
 			$ws->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$fila_inicio_detalle_profesional:$col_formula_duracion_trabajada$filas)", $formato_tiempo_total);
 		}
+
 		$ws->writeFormula($filas, $col_tarificable_hh, "=SUM($col_formula_duracion_cobrable$fila_inicio_detalle_profesional:$col_formula_duracion_cobrable$filas)", $formato_tiempo_total);
 		if ($col_duracion_retainer) {
 			$ws->write($filas, $col_duracion_retainer, "=SUM($col_formula_duracion_retainer$fila_inicio_detalle_profesional:$col_formula_duracion_retainer$filas)", $formato_tiempo_total);
@@ -2020,21 +2020,15 @@ foreach ($chargeResults as $charge) {
 		for ($i = 0; $i < $lista_gastos->num; $i++) {
 			$gasto = $lista_gastos->Get($i);
 
-			/*
-			 *	CABECERAS PARA CADA ASUNTO
-			 */
-
-
-			if ($cobro->fields['opc_ver_asuntos_separados'] && $gasto->fields['codigo_asunto'] != $codigo_asunto_anterior) {
+			// CABECERAS PARA CADA ASUNTO
+			if ($cobro->fields['opc_ver_asuntos_separados'] && ($gasto->fields['codigo_asunto'] != $codigo_asunto_anterior)) {
 
 				if (!empty($codigo_asunto_anterior)) {
-
-			/*
-			* 	SUBTOTAL CADA ASUNTO
-			*	FFF guardo la fila de los subtotales, la voy a necesitar al final de la planilla
-			*/
-
-					$lineas_total_asunto_gasto[$gasto->fields['glosa_asunto']] = ($filas + 1);
+					/**
+					 * SUBTOTAL CADA ASUNTO
+					 * FFF guardo la fila de los subtotales, la voy a necesitar al final de la planilla
+					 */
+					$lineas_total_asunto_gasto[$glosa_asunto_anterior] = ($filas + 1);
 
 					if (UtilesApp::GetConf($sesion, 'FacturaAsociada')) {
 						if (UtilesApp::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
@@ -2248,7 +2242,6 @@ foreach ($chargeResults as $charge) {
 					$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $formato_descripcion);
 				}
-
 			} else {
 				if ($cobro->fields['opc_ver_solicitante'] == 1){
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
@@ -2275,11 +2268,13 @@ foreach ($chargeResults as $charge) {
 			} else {
 				$ws->writeNumber($filas, $col_descripcion + 1 + $offsetfactura, -$gasto->fields['monto_cobrable'] * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']), $formato_moneda_gastos);
 			}
+
 			$ws->mergeCells($filas, $col_descripcion + 1 + $offsetfactura, $filas, $col_descripcion + 2 + $offsetfactura);
 
 			++$filas;
 
 			$codigo_asunto_anterior = $gasto->fields['codigo_asunto'];
+			$glosa_asunto_anterior = $gasto->fields['glosa_asunto'];
 		}
 
 		/*
@@ -2389,6 +2384,7 @@ foreach ($chargeResults as $charge) {
 
 					$coltotal = $col_descripcion + 1;
 					$col_formula_temp = Utiles::NumToColumnaExcel($coltotal);
+
 					foreach ($lineas_total_asunto_gasto as $label => $numfila) {
 						$formula_total_gg[] = $col_formula_temp . $numfila;
 					}
@@ -2620,20 +2616,11 @@ if ($cont_hitos > 0) {
 /*
  *  fin bucle cobros
  */
-
 if (isset($ws)) {
-
-	/*
-	 *  Se manda el archivo aquí para que no hayan errores de headers al no haber resultados.
-	 */
-
+	// Se manda el archivo aquí para que no hayan errores de headers al no haber resultados.
 	if (!$guardar_respaldo) {
-
-		/*
-		 * $wb->send('Resumen de cobros.xls');
-		 */
-
 		$wb->send('Resumen de ' . __('cobro') . '_' . $cobro->fields['id_cobro'] . '.xls');
 	}
 }
+
 $wb->close();
