@@ -945,7 +945,24 @@ class Trabajo extends Objeto
 		$this->Edit('cobrable', $billable);
 		$this->Edit('visible', $visible);
 
+		$interval = (int) Conf::GetConf($this->sesion, 'Intervalo');
 		$duration = $type_income_hour == 'decimal' ? UtilesApp::Decimal2Time($data['duration']) : $data['duration'];
+		list($hh, $mm, $ss) = explode(':', $duration);
+
+		$hh = (int) $hh;
+		$mm = (int) $mm;
+		$mm_interval = $mm;
+
+		if (fmod($mm, $interval) != 0) {
+			$mm_interval = ($mm - fmod($mm, $interval)) + $interval;
+		}
+
+		$duration_in_minutes = intval($hh) * 60 + intval($mm_interval);
+
+		$duration_hh = str_pad(floor($duration_in_minutes / 60), 2, '0', STR_PAD_LEFT);
+		$duration_mm = str_pad($duration_in_minutes % 60, 2, '0', STR_PAD_LEFT);
+
+		$duration = "{$duration_hh}:{$duration_mm}:00";
 
 		if ($this->Loaded()) {
 			$update_rate_work = false;
@@ -964,8 +981,6 @@ class Trabajo extends Objeto
 
 				$change_matter = true;
 			}
-
-			$change_duration = strtotime($duration) != strtotime($this->fields['duracion']);
 		}
 
 		if ($change_matter) {
