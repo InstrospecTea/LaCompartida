@@ -203,3 +203,4 @@ vendor/**/
 # Vagrant
 vagrant/.vagrant
 vagrant/machines/
+Vagrantfile
