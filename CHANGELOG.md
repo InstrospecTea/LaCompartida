@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.14.3
+Thursday 2015, July 30th.
+* **Fix:** [corregir suma subtotal asuntos en reporte excel liquidación](https://github.com/LemontechSA/ttb/pull/1061)
+
 ## Hotfix 15.14.2
 Tuesday 2015, July 28th.
 * **Fix:** [Corregir calculo intervalo de duración al guardar trabajos mediante API](https://github.com/LemontechSA/ttb/pull/1058)
